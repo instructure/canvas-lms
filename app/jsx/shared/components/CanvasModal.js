@@ -36,6 +36,8 @@ CanvasModal.propTypes = {
   footer: oneOfType([node, func]), // render prop. usually to render the buttons for the footer.
   padding: View.propTypes.padding,
 
+  title: string, // specify this if the header text should be different than the modal's label
+
   // Optional props to pass to the GenericErrorPage in ErrorBoundary
   errorSubject: string,
   errorCategory: string,
@@ -48,6 +50,7 @@ CanvasModal.defaultProps = {
   padding: 'small',
   errorImageUrl: errorShipUrl,
   footer: null,
+  title: null,
   closeButtonSize: 'small'
 }
 
@@ -57,18 +60,21 @@ export default function CanvasModal({
   errorCategory,
   errorImageUrl,
   label,
+  title,
   onDismiss,
   children,
   footer,
   closeButtonSize,
   ...otherModalProps
 }) {
+  if (title == null) title = label
+
   return (
     <Modal label={label} onDismiss={onDismiss} {...otherModalProps}>
       <Modal.Header>
         <Flex>
           <Flex.Item grow>
-            <Heading>{label}</Heading>
+            <Heading>{title}</Heading>
           </Flex.Item>
           <Flex.Item>
             <CloseButton onClick={onDismiss} size={closeButtonSize}>
@@ -92,7 +98,7 @@ export default function CanvasModal({
           </ErrorBoundary>
         </View>
       </Modal.Body>
-      <Modal.Footer>{typeof footer === 'function' ? footer() : footer}</Modal.Footer>
+      {footer && <Modal.Footer>{typeof footer === 'function' ? footer() : footer}</Modal.Footer>}
     </Modal>
   )
 }

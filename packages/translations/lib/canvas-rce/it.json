@@ -26,6 +26,9 @@
   "audio_player_for_title_20cc70d": {
     "message": "Riproduttore audio di { title }"
   },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Contenuto salvataggio automatico esistente. Caricare al suo posto il contenuto salvato automaticamente?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Aprire automaticamente un’anteprima in linea. (L’anteprima viene visualizzata solo dopo il salvataggio)"
   },
@@ -38,14 +41,23 @@
     "message": "cerchia elenco non ordinato"
   },
   "clear_selected_file_82388e50": { "message": "Cancella file selezionato" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Cancella file selezionato: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Fai clic su una pagina per inserire un link a quella pagina."
   },
   "click_to_embed_imagename_c41ea8df": {
     "message": "Clicca  per incorporare { imageName }"
   },
+  "click_to_hide_preview_3c707763": {
+    "message": "Fai clic per nascondere anteprima"
+  },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Fai clic per inserire un link nell''editor."
+  },
+  "click_to_show_preview_faa27051": {
+    "message": "Fai clic per mostrare anteprima"
   },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Chiudere un menu o una finestra di dialogo. Consente anche di tornare all’area dell’editor"
@@ -96,6 +108,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Visualizza collegamento testuale (Si apre in una nuova scheda)"
   },
+  "document_678cd7bf": { "message": "Documento" },
   "documents_81393201": { "message": "Documenti" },
   "done_54e3d4b6": { "message": "Fatto" },
   "drag_a_file_here_1bf656d5": { "message": "Trascina qui un file" },
@@ -120,6 +133,7 @@
   "embed_preview_2d741e1f": { "message": "Incorpora anteprima" },
   "embed_video_a97a64af": { "message": "Incorpora il video" },
   "embed_video_code_703e10f2": { "message": "Incorpora codice video" },
+  "equation_1c5ac93c": { "message": "Equazione" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Si è verificato un errore durante il collegamento della registrazione video/audio"
   },
@@ -142,6 +156,9 @@
     "message": "Focalizza barra degli strumenti di contesto a comparsa"
   },
   "formatting_5b143aa8": { "message": "Formattazione in corso" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Trovato contenuto salvato automaticamente"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Trovati { count, plural,\n     =0 {# risultati}\n    one {# risultato}\n  other {# risultati}\n}"
   },
@@ -161,10 +178,12 @@
   "heading_3_2c83de44": { "message": "Intestazione 3" },
   "heading_4_b2e74be7": { "message": "Intestazione 4" },
   "height_69b03e15": { "message": "Altezza" },
+  "image_8ad06": { "message": "Immagine" },
   "image_options_5412d02c": { "message": "Opzioni immagine" },
   "image_options_tray_90a46006": { "message": "Barra opzioni immagine" },
   "images_7ce26570": { "message": "Immagini" },
   "increase_indent_6d550a4a": { "message": "Aumenta rientro" },
+  "insert_593145ef": { "message": "Inserisci" },
   "insert_equella_links_49a8dacd": { "message": "Inserisci link Equella" },
   "insert_link_6dc23cae": { "message": "Inserisci link" },
   "insert_math_equation_57c6e767": {
@@ -206,6 +225,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Nessun testo alternativo (Immagine decorativa)"
   },
+  "no_e16d9132": { "message": "No" },
   "no_results_940393cf": { "message": "Nessun risultato." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nessun risultato trovato per { filterTerm }"
@@ -234,6 +254,7 @@
   },
   "posted_when_a578f5ab": { "message": "Postato: { when }" },
   "preformatted_d0670862": { "message": "Preformattato" },
+  "preview_53003fd2": { "message": "Anteprima" },
   "preview_a3f8f854": { "message": "ANTEPRIMA" },
   "previous_page_928fc112": { "message": "Pagina precedente" },
   "published_c944a23d": { "message": "pubblicato" },
@@ -245,6 +266,9 @@
   },
   "recording_98da6bda": { "message": "Registrazione" },
   "remove_link_d1f2f4d0": { "message": "Rimuovi link" },
+  "restore_auto_save_deccd84b": {
+    "message": "Ripristinare salvataggio automatico?"
+  },
   "rich_content_editor_2708ef21": { "message": "Editor di contenuti avanzati" },
   "right_to_left_ec223c81": { "message": "da destra a sinistra" },
   "save_11a80ec3": { "message": "Salva" },
@@ -357,6 +381,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Home page wiki" },
+  "yes_dde87d5": { "message": "Sì" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "La tua webcam potrebbe già essere in uso."
   }

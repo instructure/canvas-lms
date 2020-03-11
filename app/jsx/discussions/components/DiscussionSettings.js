@@ -152,7 +152,6 @@ export default class DiscussionSettings extends Component {
     return (
       <span>
         <Button
-          margin="0 0 0 small"
           size="medium"
           id="discussion_settings"
           ref={button => {

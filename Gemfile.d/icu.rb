@@ -16,5 +16,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :icu do
-  gem 'ffi-icu', '0.1.10'
+  gem 'ffi-icu', '0.2.0'
 end

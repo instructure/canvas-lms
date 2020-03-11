@@ -153,7 +153,7 @@ describe "permissions index" do
       create_role_override(permission_name, student_role, @account, :enabled => false, :locked => true)
       PermissionsIndex.visit(subaccount)
       expect(PermissionsIndex.permission_cell(permission_name, student_role.id).find('button')).
-        to have_class('disabled')
+        to be_disabled
     end
   end
 

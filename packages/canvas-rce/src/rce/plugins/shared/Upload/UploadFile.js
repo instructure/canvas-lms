@@ -47,6 +47,7 @@ export const handleSubmit = (
   source,
   afterInsert = () => {}
 ) => {
+  Bridge.focusEditor(editor.rceWrapper) // necessary since it blurred when the modal opened
   switch (selectedPanel) {
     case 'COMPUTER': {
       const {theFile} = uploadData
@@ -195,6 +196,7 @@ export function UploadFile({
             </Tabs.Panel>
           )
       }
+      return null
     })
   }
 

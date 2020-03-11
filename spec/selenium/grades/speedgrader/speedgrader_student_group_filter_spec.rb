@@ -17,9 +17,9 @@
 
 require_relative '../../common'
 require_relative '../pages/speedgrader_page'
-require_relative '../pages/gradezilla_page'
-require_relative '../pages/gradezilla_grade_detail_tray_page'
-require_relative '../pages/gradezilla_cells_page'
+require_relative '../pages/gradebook_page'
+require_relative '../pages/gradebook_grade_detail_tray_page'
+require_relative '../pages/gradebook_cells_page'
 require_relative '../setup/gradebook_setup'
 require_relative '../../assignments/page_objects/assignment_page'
 
@@ -36,7 +36,6 @@ describe 'filter speed grader by student group' do
       name: "Teacher Boss1",
       active_user: true
     )
-    @course.enable_feature!(:new_gradebook)
     @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
     @course.update!(filter_speed_grader_by_student_group: true)
 
@@ -86,13 +85,13 @@ describe 'filter speed grader by student group' do
     it 'speedgrader link from tray has correct href' do
       show_student_groups_filter(@teacher)
 
-      Gradezilla.visit(@course)
+      Gradebook.visit(@course)
       # select group from gradebook
-      Gradezilla.select_student_group(@category.groups.second)
+      Gradebook.select_student_group(@category.groups.second)
       # verify link is disabled and message
-      Gradezilla::Cells.open_tray(@group2_students.second, @assignment)
+      Gradebook::Cells.open_tray(@group2_students.second, @assignment)
       speedgrader_link_text = "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      expect(Gradezilla::GradeDetailTray.speedgrader_link.attribute("href")).to include(speedgrader_link_text)
+      expect(Gradebook::GradeDetailTray.speedgrader_link.attribute("href")).to include(speedgrader_link_text)
     end
 
     it 'loads speedgrader when group selected' do
@@ -112,11 +111,11 @@ describe 'filter speed grader by student group' do
     end
 
     it 'disables speedgrader from tray' do
-      Gradezilla.visit(@course)
+      Gradebook.visit(@course)
       # verify link is disabled and message
-      Gradezilla::Cells.open_tray(@group2_students.first, @assignment)
-      expect(Gradezilla::GradeDetailTray.group_message).to include_text("you must select a student group")
-      expect(Gradezilla::GradeDetailTray.speedgrader_link).to be_disabled
+      Gradebook::Cells.open_tray(@group2_students.first, @assignment)
+      expect(Gradebook::GradeDetailTray.group_message).to include_text("you must select a student group")
+      expect(Gradebook::GradeDetailTray.speedgrader_link).to be_disabled
     end
   end
 end

@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradezilla_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../pages/srgb_page'
 require_relative '../pages/speedgrader_page'
 
 describe "Individual View Gradebook" do
   include_context 'in-process server selenium tests'
-  include GradezillaCommon
+  include GradebookCommon
 
   before(:once) do
     # create a course with a teacher

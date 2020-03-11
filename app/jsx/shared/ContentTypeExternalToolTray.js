@@ -20,12 +20,6 @@ import {arrayOf, oneOf, bool, string, shape, func} from 'prop-types'
 import CanvasTray from 'jsx/shared/components/CanvasTray'
 import $ from 'jquery'
 
-const iframeStyle = {
-  border: 'none',
-  width: '100%',
-  flexGrow: 1
-}
-
 const toolShape = shape({
   id: string.isRequired,
   title: string.isRequired,
@@ -91,10 +85,11 @@ export default function ContentTypeExternalToolTray({
       placement="end"
       size="regular"
       padding="0"
+      headerPadding="small"
     >
       <iframe
+        style={{border: 'none', display: 'block', width: '100%', height: '100%'}}
         data-testid="ltiIframe"
-        style={iframeStyle}
         src={iframeUrl}
         title={title}
         data-lti-launch="true"

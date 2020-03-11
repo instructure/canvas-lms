@@ -720,6 +720,10 @@ class Message < ActiveRecord::Base
   #
   # Returns an account.
   def context_root_account
+    if context.is_a?(AccountNotification)
+      return context.account.root_account
+    end
+
     unbounded_loop_paranoia_counter = 10
     current_context                 = context
 

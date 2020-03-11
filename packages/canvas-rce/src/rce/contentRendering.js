@@ -25,14 +25,14 @@ import {
   AUDIO_PLAYER_SIZE
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 import {isAudio} from './plugins/shared/fileTypeUtils'
-import {downloadToWrap} from '../common/fileUrl'
+import {prepEmbedSrc, prepLinkedSrc} from '../common/fileUrl'
 
 export function renderLink(data, contents) {
   const linkAttrs = {...data}
-  linkAttrs.href = linkAttrs.href || linkAttrs.url
+  linkAttrs.href = prepLinkedSrc(linkAttrs.href || linkAttrs.url)
   delete linkAttrs.url
   if (linkAttrs.href) {
-    linkAttrs.href = downloadToWrap(cleanUrl(linkAttrs.href), true)
+    linkAttrs.href = cleanUrl(linkAttrs.href)
   }
   linkAttrs.title = linkAttrs.title || formatMessage('Link')
   const children = contents || linkAttrs.text || linkAttrs.title
@@ -56,6 +56,7 @@ export function renderDoc(doc) {
 
 export function renderLinkedImage(linkElem, image) {
   const linkHref = linkElem.getAttribute('href')
+  image.href = prepEmbedSrc(image.href)
 
   return renderToStaticMarkup(
     <a href={linkHref} data-mce-href={linkHref}>
@@ -91,6 +92,7 @@ export function constructJSXImageElement(image, opts = {}) {
 }
 
 export function renderImage(image, opts) {
+  image.href = prepEmbedSrc(image.href)
   return renderToStaticMarkup(constructJSXImageElement(image, opts))
 }
 

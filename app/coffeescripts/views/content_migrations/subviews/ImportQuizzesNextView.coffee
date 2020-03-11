@@ -23,17 +23,25 @@ import $ from 'jquery'
 export default class ImportQuizzesNextView extends Backbone.View
   template: template
   @optionProperty 'quizzesNextEnabled'
+  @optionProperty 'migrationDefault'
   @optionProperty 'questionBank'
 
   events:
     "change #importQuizzesNext" : "setAttribute"
 
+  afterRender: ->
+    @setAttribute()
+
   setAttribute: =>
     settings = @model.get('settings') || {}
     checked = @$el.find('#importQuizzesNext').is(':checked')
     settings.import_quizzes_next = checked
-    @questionBank.setEnabled(!checked,
-      I18n.t('This option is not compatible with New Quizzes'))
+    @updateQuestionBank(checked)
     @model.set('settings', settings)
+
+  updateQuestionBank: (checked) ->
+    if @questionBank?
+      @questionBank.setEnabled(!checked,
+        I18n.t('This option is not compatible with New Quizzes'))
 
   toJSON: -> @options

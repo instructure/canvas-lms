@@ -18,42 +18,25 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Tray} from '@instructure/ui-overlays'
-import {Heading} from '@instructure/ui-elements'
-import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
-import {IconXLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import CanvasTray from 'jsx/shared/components/CanvasTray'
 
 export default function ExternalToolDialogTray(props) {
-  const {open, label, onOpen, onClose, onCloseButton, closeLabel, name, children} = props
+  const {open, label, onOpen, onClose, onCloseButton, name, children} = props
   return (
-    <Tray
+    <CanvasTray
       open={open}
       label={label}
+      title={name}
       onOpen={onOpen}
       onClose={onClose}
+      onDismiss={onCloseButton}
       placement="end"
       size="regular"
+      padding="0"
+      headerPadding="small"
     >
-      <Flex direction="column" height="100vh">
-        <Flex.Item padding="small medium">
-          <Flex>
-            <Flex.Item grow shrink>
-              <Heading ellipsis level="h3" as="h2">
-                {name}
-              </Heading>
-            </Flex.Item>
-            <Flex.Item>
-              <Button variant="icon" icon={IconXLine} onClick={onCloseButton} size="small">
-                <ScreenReaderContent>{closeLabel}</ScreenReaderContent>
-              </Button>
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
-        {children}
-      </Flex>
-    </Tray>
+      {children}
+    </CanvasTray>
   )
 }
 
@@ -63,7 +46,6 @@ ExternalToolDialogTray.propTypes = {
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
   onCloseButton: PropTypes.func,
-  closeLabel: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   children: PropTypes.node
 }

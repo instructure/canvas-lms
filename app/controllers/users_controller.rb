@@ -2464,9 +2464,11 @@ class UsersController < ApplicationController
   #          -H 'Authorization: Bearer <token>'
   #
   # @argument include[] [String, "assignment"]
-  #   Associations to include with the group.
+  #   Associations to include with the group
   # @argument only_current_enrollments [boolean]
   #   Returns submissions for only currently active enrollments
+  # @argument only_published_assignments [boolean]
+  #   Returns submissions for only published assignments
   #
   # @returns [Submission]
   #
@@ -2475,6 +2477,7 @@ class UsersController < ApplicationController
     if authorized_action(@user, @current_user, :read_grades)
       collections = []
       only_current_enrollments = value_to_boolean(params[:only_current_enrollments])
+      only_published_assignments = value_to_boolean(params[:only_published_assignments])
 
       # Plannable Bookmarker enables descending order
       bookmarker = Plannable::Bookmarker.new(Submission, true, :graded_at, :id)
@@ -2484,7 +2487,11 @@ class UsersController < ApplicationController
         else
           Submission.all
         end
-        collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, submissions.for_user(@user).graded)]
+        if only_published_assignments
+          submissions = submissions.joins(:assignment).merge(Assignment.published)
+        end
+        submissions = submissions.for_user(@user).graded
+        collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, submissions)]
       end
 
       scope = BookmarkedCollection.merge(*collections)

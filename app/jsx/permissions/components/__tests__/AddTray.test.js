@@ -20,6 +20,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 import AddTray, {mapStateToProps} from 'jsx/permissions/components/AddTray'
+import {ENABLED_FOR_ALL, ENABLED_FOR_NONE} from '../../propTypes'
 
 const defaultProps = () => ({
   permissions: [
@@ -43,7 +44,7 @@ const defaultProps = () => ({
         account_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: true,
+          enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
           readonly: false
@@ -51,7 +52,7 @@ const defaultProps = () => ({
         course_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: false,
+          enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
           readonly: false
@@ -68,7 +69,7 @@ const defaultProps = () => ({
         account_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: true,
+          enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
           readonly: false
@@ -76,7 +77,7 @@ const defaultProps = () => ({
         course_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: false,
+          enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
           readonly: false
@@ -93,7 +94,7 @@ const defaultProps = () => ({
         account_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: true,
+          enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
           readonly: false
@@ -101,7 +102,7 @@ const defaultProps = () => ({
         course_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: false,
+          enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
           readonly: false
@@ -118,7 +119,7 @@ const defaultProps = () => ({
         account_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: true,
+          enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
           readonly: false
@@ -126,7 +127,7 @@ const defaultProps = () => ({
         course_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: false,
+          enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
           readonly: false
@@ -143,7 +144,7 @@ const defaultProps = () => ({
         account_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: true,
+          enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
           readonly: false
@@ -151,7 +152,7 @@ const defaultProps = () => ({
         course_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: false,
+          enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
           readonly: false
@@ -168,7 +169,7 @@ const defaultProps = () => ({
         account_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: true,
+          enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
           readonly: false
@@ -176,7 +177,7 @@ const defaultProps = () => ({
         course_permission: {
           applies_to_descendants: true,
           applies_to_self: true,
-          enabled: false,
+          enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
           readonly: false

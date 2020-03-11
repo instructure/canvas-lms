@@ -24,7 +24,7 @@
 ### tl;dr
 
   - Item groups come either `item-group` or `item-group-condensed` styles
-  - The `item-group` style is for draggable tiems and `item-group-condensed` is for items that are not draggable
+  - The `item-group-condensed` style is for draggable items and `item-group` is for items that are not draggable
 
 <br/>
 
@@ -206,9 +206,9 @@
 .item-group {
   border: 1px solid $ic-border-light;
   padding: $ic-sp;
-  border-radius: $baseBorderRadius;
-  margin-bottom: $ic-sp*2;
-  background-color: $lightBackground;
+  border-radius: 0;
+  background-color: $ic-bg-light-neutral;
+  margin-bottom: $ic-sp;
 }
 
 .ig-header .name {
@@ -235,6 +235,7 @@
     line-height: 20px;
     margin: auto;
     display: inline-block;
+    flex: 1 1 auto;
 
     .icon-mini-arrow-down {
       vertical-align: middle;
@@ -255,7 +256,6 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  margin-top: 10px;
 }
 
 .ig-list li {
@@ -286,7 +286,7 @@
   display: block;
   padding: direction-sides($ic-sp $ic-sp/2 $ic-sp ($ic-sp/2 + 4)); // add 4px for width of published-state border
   box-sizing: border-box;
-  border-radius: $baseBorderRadius;
+  border-radius: 0;
   color: $ic-font-color--subdued;
   border: 1px solid $ic-border-light;
   background: $ic-color-light;

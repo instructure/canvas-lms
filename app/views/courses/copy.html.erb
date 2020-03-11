@@ -107,6 +107,11 @@
   </div>
 
   <div class="control-group">
+    <% if @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:new_quizzes_migration) %>
+      <div class="controls">
+        <div id="new_quizzes_migrate"></div>
+      </div>
+    <% end %>
     <div id="date_shift"></div>
   </div>
 

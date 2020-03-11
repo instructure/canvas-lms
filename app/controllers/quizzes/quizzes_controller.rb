@@ -108,7 +108,8 @@ class Quizzes::QuizzesController < ApplicationController
           new_assignment_url: new_polymorphic_url([@context, :assignment]),
           new_quiz_url: context_url(@context, :context_quizzes_new_url, :fresh => 1),
           question_banks_url: context_url(@context, :context_question_banks_url),
-          assignment_overrides: api_v1_course_quiz_assignment_overrides_url(@context)
+          assignment_overrides: api_v1_course_quiz_assignment_overrides_url(@context),
+          new_quizzes_assignment_overrides: api_v1_course_new_quizzes_assignment_overrides_url(@context)
         },
         :PERMISSIONS => {
           create: can_do(@context.quizzes.temp_record, @current_user, :create),
@@ -1037,11 +1038,26 @@ class Quizzes::QuizzesController < ApplicationController
     unless @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
       return quizzes_json(old_quizzes, *serializer_options)
     end
-    new_quizzes = Assignments::ScopedToUser.new(@context, @current_user).scope.preload(:duplicate_of).select(&:quiz_lti?)
+    new_quizzes = Assignments::ScopedToUser.new(@context, @current_user).scope.preload(:duplicate_of).type_quiz_lti
     quizzes_next_json(
-      (old_quizzes + new_quizzes).sort_by(&:created_at),
+      sort_quizzes(old_quizzes + new_quizzes),
       *serializer_options
     )
+  end
+
+  def sort_quizzes(quizzes)
+    quizzes.sort_by do |quiz|
+      [
+        quiz_due_date(quiz) || CanvasSort::Last,
+        Canvas::ICU.collation_key(quiz.title || CanvasSort::First)
+      ]
+    end
+  end
+
+  # get the due_date for either a Classic Quiz or a quiz_lti quiz (Assignment)
+  def quiz_due_date(quiz)
+    return quiz.assignment ? quiz.assignment.due_at : quiz.lock_at if quiz.is_a?(Quizzes::Quiz)
+    quiz.due_at || quiz.lock_at
   end
 
   protected
@@ -1071,12 +1087,6 @@ class Quizzes::QuizzesController < ApplicationController
 
     scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
 
-    @_quizzes = scope.sort_by do |quiz|
-      due_date = quiz.assignment ? quiz.assignment.due_at : quiz.lock_at
-      [
-        due_date || CanvasSort::Last,
-        Canvas::ICU.collation_key(quiz.title || CanvasSort::First)
-      ]
-    end
+    @_quizzes = sort_quizzes(scope)
   end
 end

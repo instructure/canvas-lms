@@ -15,19 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative './helpers/gradezilla_common'
+require_relative './helpers/gradebook_common'
 require_relative './helpers/groups_common'
-require_relative './grades/pages/gradezilla_page'
-require_relative './grades/pages/gradezilla_cells_page'
+require_relative './grades/pages/gradebook_page'
+require_relative './grades/pages/gradebook_cells_page'
 
 describe 'Excuse an Assignment' do
   include_context "in-process server selenium tests"
-  include GradezillaCommon
+  include GradebookCommon
   include GroupsCommon
-
-  before :once do
-    Account.default.enable_feature!(:new_gradebook)
-  end
 
   before do |example|
     unless example.metadata[:group]
@@ -120,8 +116,8 @@ describe 'Excuse an Assignment' do
       click_option f('#grading-box-extended'), 'Excused'
 
       get "/courses/#{@course.id}/grades"
-      expect(Gradezilla::Cells.get_grade(@course.students[0], assignment)).to eq "Excused"
-      expect(Gradezilla::Cells.grading_cell(@course.students[0], assignment)).to contain_css(".excused")
+      expect(Gradebook::Cells.get_grade(@course.students[0], assignment)).to eq "Excused"
+      expect(Gradebook::Cells.grading_cell(@course.students[0], assignment)).to contain_css(".excused")
     end
 
     it 'excuses an assignment properly', priority: "1", test_id: 201949 do
@@ -135,13 +131,13 @@ describe 'Excuse an Assignment' do
 
       get "/courses/#{@course.id}/grades"
 
-      expect(Gradezilla::Cells.get_grade(@student, a1)).to eq "20"
+      expect(Gradebook::Cells.get_grade(@student, a1)).to eq "20"
 
       # this should show 'EX' and have excused class
-      expect(Gradezilla::Cells.get_grade(@student, a2)).to eq "Excused"
-      expect(Gradezilla::Cells.grading_cell(@student, a2)).to contain_css(".excused")
+      expect(Gradebook::Cells.get_grade(@student, a2)).to eq "Excused"
+      expect(Gradebook::Cells.grading_cell(@student, a2)).to contain_css(".excused")
 
-      expect(Gradezilla::Cells.get_total_grade(@student)).to eq "100%"
+      expect(Gradebook::Cells.get_total_grade(@student)).to eq "100%"
     end
 
     it 'indicates excused assignment as graded', priority: "1", test_id: 209316 do
@@ -293,12 +289,12 @@ describe 'Excuse an Assignment' do
         else
           get "/courses/#{@course.id}/gradebook/"
 
-          total = Gradezilla::Cells.get_total_grade(@course.students[0])
+          total = Gradebook::Cells.get_total_grade(@course.students[0])
           expect(total).to eq '83%'
 
-          Gradezilla::Cells.edit_grade(@course.students[0], a1, "EX")
+          Gradebook::Cells.edit_grade(@course.students[0], a1, "EX")
           wait_for_ajaximations
-          total = Gradezilla::Cells.get_total_grade(@course.students[0])
+          total = Gradebook::Cells.get_total_grade(@course.students[0])
         end
         expect(total).to eq '100%'
       end
@@ -311,7 +307,7 @@ describe 'Excuse an Assignment' do
     it 'default grade cannot be set to excused', priority: "1", test_id: 209380 do
       assignment = @course.assignments.create! title: 'Test Me!', points_possible: 20
       get "/courses/#{@course.id}/grades"
-      Gradezilla.click_assignment_header_menu_element(assignment.id, 'set default grade')
+      Gradebook.click_assignment_header_menu_element(assignment.id, 'set default grade')
 
       ['EX', 'eX', 'Ex', 'ex'].each_with_index do |ex, i|
         replace_content f("#student_grading_#{assignment.id}"), "#{ex}\n"
@@ -328,8 +324,8 @@ describe 'Excuse an Assignment' do
 
         get "/courses/#{@course.id}/gradebook/"
 
-        Gradezilla::Cells.edit_grade(@course.students[0], assignment, ex)
-        expect { Gradezilla::Cells.get_grade(@course.students[0], assignment) }.to become 'Excused'
+        Gradebook::Cells.edit_grade(@course.students[0], assignment, ex)
+        expect { Gradebook::Cells.get_grade(@course.students[0], assignment) }.to become 'Excused'
       end
     end
   end

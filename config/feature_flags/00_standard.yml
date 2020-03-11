@@ -27,6 +27,14 @@ high_contrast:
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
   autoexpand: true
+disable_celebrations:
+  state: hidden
+  display_name:
+    features.hide_celebrations: Disable Celebration Animations
+  description:
+    disable_celebrations_description: |-
+      Enabling this feature hides all celebration animations.
+  applies_to: User
 underline_all_links:
   state: allowed
   display_name: Underline Links
@@ -92,13 +100,6 @@ anonymous_instructor_annotations:
   description: Anonymize all instructor comments and annotations within DocViewer
   applies_to: Course
   root_opt_in: false
-new_gradebook:
-  state: allowed
-  display_name: New Gradebook
-  description: New Gradebook enables an early release of new Gradebook enhancements.
-  applies_to: Course
-  root_opt_in: true
-  custom_transition_proc: new_gradebook_custom_transition_hook
 final_grades_override:
   state: allowed
   display_name: Final Grade Override

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
-require_relative '../../grades/pages/gradezilla_page'
+require_relative '../../grades/pages/gradebook_page'
 require_relative '../../grades/pages/speedgrader_page'
 
 student_assignments = [
@@ -35,7 +35,6 @@ describe 'Gradebook performance' do
     @courses = []
     (1..4).each do |i|
       course = course_factory(course_name: "My Course #{i}", active_course: true)
-      course.enable_feature!(:new_gradebook)
       @courses.push course
     end
     @course1 = @courses[0]
@@ -100,9 +99,9 @@ describe 'Gradebook performance' do
   end
 
   context '200,000 submissions' do
-    it 'gradezilla loads in less than 25 seconds' do
+    it 'gradebook loads in less than 25 seconds' do
       page_load_start_time = Time.zone.now
-      Gradezilla.visit(@course1)
+      Gradebook.visit(@course1)
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       expect(page_load_end_time - page_load_start_time).to be < 25
@@ -119,9 +118,9 @@ describe 'Gradebook performance' do
   end
 
   context '100,000 submissions 2000x50' do
-    it 'gradezilla loads in less than 25 seconds' do
+    it 'gradebook loads in less than 25 seconds' do
       page_load_start_time = Time.zone.now
-      Gradezilla.visit(@course2)
+      Gradebook.visit(@course2)
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       expect(page_load_end_time - page_load_start_time).to be < 25
@@ -137,9 +136,9 @@ describe 'Gradebook performance' do
   end
 
   context '100,000 submissions 1000x100' do
-    it 'gradezilla loads in less than 25 seconds' do
+    it 'gradebook loads in less than 25 seconds' do
       page_load_start_time = Time.zone.now
-      Gradezilla.visit(@course3)
+      Gradebook.visit(@course3)
       wait_for_ajaximations
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
@@ -156,9 +155,9 @@ describe 'Gradebook performance' do
   end
 
   context '10,000 submissions' do
-    it 'gradezilla loads in less than 18 seconds' do
+    it 'gradebook loads in less than 18 seconds' do
       page_load_start_time = Time.zone.now
-      Gradezilla.visit(@course4)
+      Gradebook.visit(@course4)
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       expect(page_load_end_time - page_load_start_time).to be < 18

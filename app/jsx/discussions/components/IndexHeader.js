@@ -29,7 +29,7 @@ import select from '../../shared/select'
 import {Button} from '@instructure/ui-buttons'
 import DiscussionSettings from './DiscussionSettings'
 import {FormField} from '@instructure/ui-form-field'
-import {Grid, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {IconPlusLine, IconSearchLine} from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextInput} from '@instructure/ui-forms'
@@ -163,73 +163,68 @@ export default class IndexHeader extends Component {
 
   render() {
     return (
-      <View>
-        <View display="block">
-          <Grid>
-            <Grid.Row hAlign="space-between">
-              <Grid.Col width={2}>
-                <FormField
-                  id="discussion-filter"
-                  label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
-                >
-                  <select
-                    name="filter-dropdown"
-                    onChange={this.onFilterChange}
-                    style={{
-                      margin: '0',
-                      width: '100%'
-                    }}
-                  >
-                    {Object.keys(filters).map(filter => (
-                      <option key={filter} value={filter}>
-                        {filters[filter]}
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
-              </Grid.Col>
-              <Grid.Col width={4}>
-                <TextInput
-                  label={
-                    <ScreenReaderContent>
-                      {I18n.t('Search discussion by title')}
-                    </ScreenReaderContent>
-                  }
-                  placeholder={I18n.t('Search by title or author...')}
-                  icon={() => <IconSearchLine />}
-                  onChange={this.onSearchStringChange}
-                  name="discussion_search"
-                />
-              </Grid.Col>
-              <Grid.Col width={6} textAlign="end">
-                {this.props.permissions.create && (
-                  <Button
-                    href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
-                    variant="primary"
-                    id="add_discussion"
-                  >
-                    <IconPlusLine />
-                    <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
-                    <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
-                  </Button>
-                )}
-                {Object.keys(this.props.userSettings).length ? (
-                  <DiscussionSettings
-                    courseSettings={this.props.courseSettings}
-                    userSettings={this.props.userSettings}
-                    permissions={this.props.permissions}
-                    saveSettings={this.props.saveSettings}
-                    toggleModalOpen={this.props.toggleModalOpen}
-                    isSettingsModalOpen={this.props.isSettingsModalOpen}
-                    isSavingSettings={this.props.isSavingSettings}
-                  />
-                ) : null}
-                &nbsp;
-                {this.renderTrayToolsMenu()}
-              </Grid.Col>
-            </Grid.Row>
-          </Grid>
-        </View>
+      <View display="block">
+        <Flex wrapItems wrap="wrap" justifyItems="end">
+          <Flex.Item grow>
+            <FormField
+              id="discussion-filter"
+              label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
+            >
+              <select
+                name="filter-dropdown"
+                onChange={this.onFilterChange}
+                style={{
+                  margin: '0',
+                  width: '100%'
+                }}
+              >
+                {Object.keys(filters).map(filter => (
+                  <option key={filter} value={filter}>
+                    {filters[filter]}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+          </Flex.Item>
+          <Flex.Item grow margin="0 0 0 small">
+            <TextInput
+              label={
+                <ScreenReaderContent>{I18n.t('Search discussion by title')}</ScreenReaderContent>
+              }
+              placeholder={I18n.t('Search by title or author...')}
+              icon={() => <IconSearchLine />}
+              onChange={this.onSearchStringChange}
+              name="discussion_search"
+            />
+          </Flex.Item>
+          <Flex.Item margin="0 0 0 small">
+            {this.props.permissions.create && (
+              <Button
+                href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
+                variant="primary"
+                id="add_discussion"
+              >
+                <IconPlusLine />
+                <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
+                <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
+              </Button>
+            )}
+            &nbsp;
+            {Object.keys(this.props.userSettings).length ? (
+              <DiscussionSettings
+                courseSettings={this.props.courseSettings}
+                userSettings={this.props.userSettings}
+                permissions={this.props.permissions}
+                saveSettings={this.props.saveSettings}
+                toggleModalOpen={this.props.toggleModalOpen}
+                isSettingsModalOpen={this.props.isSettingsModalOpen}
+                isSavingSettings={this.props.isSavingSettings}
+              />
+            ) : null}
+            &nbsp;
+            {this.renderTrayToolsMenu()}
+          </Flex.Item>
+        </Flex>
       </View>
     )
   }
@@ -255,7 +250,4 @@ const selectedActions = [
   'toggleModalOpen'
 ]
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
-export const ConnectedIndexHeader = connect(
-  connectState,
-  connectActions
-)(IndexHeader)
+export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

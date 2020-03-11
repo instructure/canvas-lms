@@ -21,7 +21,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import PermissionsTable from '../PermissionsTable'
 
-import {COURSE} from '../../propTypes'
+import {COURSE, ENABLED_FOR_ALL} from '../../propTypes'
 
 const defaultProps = () => ({
   roles: [
@@ -63,14 +63,14 @@ const granularPermissionProps = () => ({
       base_role_type: 'lead',
       permissions: {
         granular_1: {
-          enabled: true,
+          enabled: ENABLED_FOR_ALL,
           explicit: true,
           group: 'granular_permission_group',
           locked: false,
           readonly: false
         },
         granular_2: {
-          enabled: true,
+          enabled: ENABLED_FOR_ALL,
           explicit: true,
           group: 'granular_permission_group',
           locked: false,
@@ -78,7 +78,7 @@ const granularPermissionProps = () => ({
         },
         granular_permission_group: {
           built_from_granular_permissions: true,
-          enabled: true,
+          enabled: ENABLED_FOR_ALL,
           explicit: true,
           locked: false,
           readonly: false

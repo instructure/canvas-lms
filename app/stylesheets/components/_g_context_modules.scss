@@ -18,21 +18,18 @@
 
 @import "pages/shared/menu_tools.scss";
 
-$context_module_border_color: #aaa;
-$context_module_bg_color: #f2f3f4;
+$context_module_border_color: $tiara;
+$context_module_bg_color: $ic-color-light;
 
 #context_modules {
   min-width: 20px;
 }
 
 .context_module {
-  border: {
-    top: 1px dotted $context_module_border_color;
-    bottom: 1px dotted $context_module_border_color;
-  };
+  border: 0;
   background-color: $context_module_bg_color;
   min-width: 20px;
-  margin-bottom: 15px;
+  margin-top: 15px;
   .links a, .reorder_module_link, .move_item_link {
     opacity: 0.5;
     text-decoration: none;
@@ -40,22 +37,11 @@ $context_module_bg_color: #f2f3f4;
       opacity: 1;
     }
   }
-  .reorder_module_link, .move_item_link {
-    padding-#{direction(left)}: 2px;
-  }
+
   .links {
     padding-#{direction(right)}: 10px;
     text-align: direction(right);
     white-space: nowrap;
-  }
-  .header {
-    background-color: darken($context_module_bg_color, 5%);
-    border-bottom: 1px dotted #aaa;
-    padding: 6px 0;
-    color: #323232;
-    .links {
-      float: direction(right);
-    }
   }
 
   .icon-minimize {

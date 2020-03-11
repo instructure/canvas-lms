@@ -37,12 +37,15 @@ module PactConfig
       FIU = 'lmsAPI'.freeze
     else
       # internal consumers
+      # These first 3 are legacy android consumers.  ANDROID, below, represents our latest pact 
+      # testing effort.
       ANDROID_STUDENT = 'Android Student'.freeze
       ANDROID_TEACHER = 'Android Teacher'.freeze
       ANDROID_PARENT = 'Android Parent'.freeze
       GENERIC_CONSUMER = 'Generic Consumer'.freeze
       QUIZ_LTI = 'Quiz LTI'.freeze
       SISTEMIC = 'Sistemic'.freeze
+      ANDROID = 'android'.freeze
     end
     ALL = Consumers.constants.map { |c| Consumers.const_get(c) }.freeze
   end

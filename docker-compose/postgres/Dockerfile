@@ -15,7 +15,7 @@ RUN apt-get update --quiet=2 \
     build-essential \
     ca-certificates \
     libicu-dev \
-    postgresql-server-dev-9.5 \
+    postgresql-server-dev-all \
     pgxnclient \
     unzip \
   && pgxnclient download --yes --target ~ pg_collkey=${PG_COLLKEY_VERSION} \
@@ -26,10 +26,11 @@ RUN apt-get update --quiet=2 \
   && make \
   && make install \
   && cp ~/pg_collkey-${PG_COLLKEY_VERSION}/pg_collkey--${PG_COLLKEY_VERSION}.sql /usr/share/postgresql/9.5/extension \
+  && cp ~/pg_collkey-${PG_COLLKEY_VERSION}/pg_collkey.control /usr/share/postgresql/9.5/extension \
   && apt-get remove -qqy \
     build-essential \
     ca-certificates \
-    postgresql-server-dev-9.5 \
+    postgresql-server-dev-all \
     pgxnclient \
     unzip \
   && rm -rf \

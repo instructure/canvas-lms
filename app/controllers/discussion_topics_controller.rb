@@ -660,7 +660,7 @@ class DiscussionTopicsController < ApplicationController
             end
           end
           topics = @topic.child_topics
-          unless @topic.grants_right?(@current_user, session, :update)
+          unless @context.grants_right?(@current_user, session, :read_as_admin)
             @groups = @groups.joins(:group_memberships).merge(GroupMembership.active).where(group_memberships: {user_id: @current_user})
             topics = topics.where(context_type: 'Group', context_id: @groups)
           end

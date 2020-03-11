@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../common"
-require_relative "../../helpers/gradezilla_common"
+require_relative "../../helpers/gradebook_common"
 require_relative "../../helpers/groups_common"
 require_relative "../../helpers/assignments_common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../pages/speedgrader_page"
 require_relative "../pages/student_grades_page"
-require_relative "../pages/gradezilla_page"
+require_relative "../pages/gradebook_page"
 require_relative "../../assignments/page_objects/assignment_page"
 require_relative "../../assignments/page_objects/submission_detail_page"
 require 'benchmark'
@@ -30,7 +30,7 @@ require 'benchmark'
 describe 'Speedgrader' do
   include_context "in-process server selenium tests"
   include QuizzesCommon
-  include GradezillaCommon
+  include GradebookCommon
   include GroupsCommon
   include AssignmentsCommon
 
@@ -61,7 +61,6 @@ describe 'Speedgrader' do
   end
 
   before :once do
-    Account.default.enable_feature!(:new_gradebook)
     course_factory(active_all: true)
     @students = create_users_in_course(@course, 5, return_type: :record, name_prefix: "Student_")
   end
@@ -676,7 +675,7 @@ describe 'Speedgrader' do
     it 'navigates to gradebook via link' do
       # make sure gradebook link works
       expect_new_page_load {Speedgrader.gradebook_link.click}
-      expect(Gradezilla.grid).to be_displayed
+      expect(Gradebook.grid).to be_displayed
     end
   end
 

@@ -78,6 +78,7 @@ describe "/assignments/show" do
     before do
       allow_any_instance_of(Assignment).to receive(:multiple_due_dates?) { true }
       allow(view).to receive(:eula_url) { eula_url }
+      allow(view).to receive(:show_confetti).and_return(false)
     end
 
     it 'renders the eula url if present' do
@@ -96,6 +97,23 @@ describe "/assignments/show" do
 
       render 'assignments/show'
       expect(rendered).to include "<a href='https://www.test.com/eula'>End-User License Agreement.</a>"
+    end
+  end
+
+  context "confetti" do
+    before(:each) do
+      course_with_student(active_all: true)
+      view_context(@course, @user)
+      a = @course.assignments.create!(title: "Introduce Yourself")
+      a.save!
+      assign(:assignment, a.overridden_for(@user))
+    end
+
+    it "is rendered when 'show_confetti' is true" do
+      allow(view).to receive(:show_confetti).and_return(true)
+      allow(view).to receive(:show_moderation_link).and_return(false)
+      render 'assignments/show'
+      expect(response).to render_template :partial => "_confetti"
     end
   end
 end

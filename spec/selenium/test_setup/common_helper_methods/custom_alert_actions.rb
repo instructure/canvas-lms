@@ -36,6 +36,7 @@ module CustomAlertActions
   end
 
   def accept_alert
+    wait_for(method: nil, timeout: 5) { alert_present? }
     keep_trying_until do
       alert = driver.switch_to.alert
       alert.accept

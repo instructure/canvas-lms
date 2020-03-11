@@ -23,8 +23,12 @@ import TextHelper from '../str/TextHelper'
 function parseUserAgentString(userAgent) {
   userAgent = (userAgent || '').toLowerCase()
   const data = {
-    version: (userAgent.match(/.+(?:me|ox|it|ra|ie|er|rv|version)[\/: ]([\d.]+)/) || [0, null])[1],
-    chrome: /chrome/.test(userAgent),
+    version: (userAgent.match(/.+(?:me|ox|it|ra|ie|er|rv|dg|version)[\/: ]([\d.]+)/) || [
+      0,
+      null
+    ])[1],
+    edge: /edg[^e]/.test(userAgent),
+    chrome: /chrome/.test(userAgent) && !/edg[^e]/.test(userAgent),
     safari: /webkit/.test(userAgent),
     opera: /opera/.test(userAgent),
     msie: (/msie/.test(userAgent) || /trident/.test(userAgent)) && !/opera/.test(userAgent),
@@ -33,7 +37,9 @@ function parseUserAgentString(userAgent) {
     speedgrader: /speedgrader/.test(userAgent)
   }
   let browser = null
-  if (data.chrome) {
+  if (data.edge) {
+    browser = 'Edge'
+  } else if (data.chrome) {
     browser = 'Chrome'
   } else if (data.safari) {
     browser = 'Safari'

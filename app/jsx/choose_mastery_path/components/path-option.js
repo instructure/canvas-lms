@@ -54,7 +54,7 @@ export default class PathOption extends React.Component {
 
     return (
       <div className={optionClasses}>
-        <div className="item-group-condensed context_module">
+        <div className="item-group">
           <div className="ig-header">
             <span className="name">{I18n.t('Option %{index}', {index: optionIndex + 1})}</span>
             <SelectButton

@@ -22,6 +22,9 @@
     "message": "Anrejistreman Odyo/Videyo pa disponib."
   },
   "audio_player_for_title_20cc70d": { "message": "Lektè odyo pou { title }" },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Anrejistreman otomatik kontni egziste. Èske w t ap pefere chaje kontni ki te anrejistre otomatikman yo pito?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Ovri otomatikman nan apèsi an liy. (Apèsi a ap afiche sèlman aprè anrejistreman an)"
   },
@@ -30,15 +33,20 @@
   "choose_caption_file_9c45bc4e": { "message": "Chwazi fichye soutit" },
   "circle_unordered_list_9e3a0763": { "message": "Antoure lis ki pa òdone" },
   "clear_selected_file_82388e50": { "message": "Efase fichye seleksyone" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Efase fichye seleksyone: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Klike sou nenpòt paj pou ensere yon lyen nan paj sa a."
   },
   "click_to_embed_imagename_c41ea8df": {
     "message": "Klike pou entegre { imageName }"
   },
+  "click_to_hide_preview_3c707763": { "message": "Klike pou kache apèsi" },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Klike pou ensere yon lyen nan editè a"
   },
+  "click_to_show_preview_faa27051": { "message": "Klike pou afiche apèsi" },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Fèmen yon meni oswa yon dyalòg. L ap retounen w tou nan espas editè a"
   },
@@ -84,6 +92,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Lyen Afichaj Tèks (Ouvri nan yon nouvo onglè)"
   },
+  "document_678cd7bf": { "message": "Dokiman" },
   "documents_81393201": { "message": "Dokiman" },
   "done_54e3d4b6": { "message": "Fini" },
   "drag_a_file_here_1bf656d5": { "message": "Deplase yon fichye la a" },
@@ -108,6 +117,7 @@
   "embed_preview_2d741e1f": { "message": "Entegre Apèsi" },
   "embed_video_a97a64af": { "message": "Entegre Videyo a" },
   "embed_video_code_703e10f2": { "message": "Entegre Kòb Videyo" },
+  "equation_1c5ac93c": { "message": "Ekwasyon" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Erè nan transfè anrejistreman videyo/odyo"
   },
@@ -126,6 +136,9 @@
     "message": "Fokalize ba zouti kontekstyèl pòpòp la."
   },
   "formatting_5b143aa8": { "message": "Fòmataj" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Jwenn kontni ki anrejistre otimatikman yo"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Jwenn { count, plural,\n     =0 {# rezilta}\n    one {# rezilta}\n  other {# rezilta}\n}"
   },
@@ -143,10 +156,12 @@
   "heading_3_2c83de44": { "message": "Antèt 3" },
   "heading_4_b2e74be7": { "message": "Antèt 4" },
   "height_69b03e15": { "message": "Wotè" },
+  "image_8ad06": { "message": "Imaj" },
   "image_options_5412d02c": { "message": "Opsyon Imaj" },
   "image_options_tray_90a46006": { "message": "Plato Opsyon Imaj" },
   "images_7ce26570": { "message": "Imaj" },
   "increase_indent_6d550a4a": { "message": "Ogmante endantasyon" },
+  "insert_593145ef": { "message": "Ensere" },
   "insert_equella_links_49a8dacd": { "message": "Ensere lyen Equella" },
   "insert_link_6dc23cae": { "message": "Ensere Lyen" },
   "insert_math_equation_57c6e767": { "message": "Ensere Ekwasyon Matematik" },
@@ -186,6 +201,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Pa gen Tèks Altèn (Imaj Dekoratif)"
   },
+  "no_e16d9132": { "message": "Non" },
   "no_results_940393cf": { "message": "Okenn rezilta." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nou pa jwenn rezilta pou { filterTerm }"
@@ -214,6 +230,7 @@
   },
   "posted_when_a578f5ab": { "message": "Poste: { when }" },
   "preformatted_d0670862": { "message": "Prefòmate" },
+  "preview_53003fd2": { "message": "Apèsi" },
   "preview_a3f8f854": { "message": "APÈSI" },
   "previous_page_928fc112": { "message": "Paj Anvan" },
   "published_c944a23d": { "message": "pibliye" },
@@ -223,6 +240,9 @@
   "record_upload_media_5fdce166": { "message": "Anrejistre/Chaje Medya" },
   "recording_98da6bda": { "message": "Anrejistreman" },
   "remove_link_d1f2f4d0": { "message": "Elimine Lyen" },
+  "restore_auto_save_deccd84b": {
+    "message": "Restore anrejistreman otomatik?"
+  },
   "rich_content_editor_2708ef21": { "message": "Editè Kontni Rich" },
   "right_to_left_ec223c81": { "message": "de dwat a goch" },
   "save_11a80ec3": { "message": "Anrejistre" },
@@ -327,6 +347,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Akèy Wiki" },
+  "yes_dde87d5": { "message": "Wi" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Webcam ou an gendwa ap itilize deja."
   }

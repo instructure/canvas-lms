@@ -124,6 +124,7 @@ describe "calendar2" do
         end
 
         it "should not display attendees for reservation with no participants" do
+          skip('fix in KNO-302')
           create_appointment_group(
             :contexts => [@course],
             :title => "eh",

@@ -2650,8 +2650,8 @@ PUBLIC
         course2 = @course
         @course2_enrollment = course2.enroll_student(@student1)
         @course2_enrollment.accept!
-        assignment = assignment_model(course: course2, submission_types: 'online_text_entry')
-        @most_recent_submission = assignment.grade_student(@student1, grader: teacher2, score: 10).first
+        @assignment1 = assignment_model(course: course2, submission_types: 'online_text_entry')
+        @most_recent_submission = @assignment1.grade_student(@student1, grader: teacher2, score: 10).first
         @most_recent_submission.graded_at = 1.day.ago
         @most_recent_submission.save!
       end
@@ -2709,6 +2709,22 @@ PUBLIC
         action: 'user_graded_submissions',
         format: 'json',
         only_current_enrollments: true
+      })
+      expect(json.count).to eq 2
+      expect(json.map { |s| s['id'] }).to eq [@next_submission.id, @last_submission.id]
+    end
+
+    it 'only gets the users submissions for published assignments when only_published_assignments=true' do
+      # normally there should not be submissions for unpublished assignments
+      # but there's an edge case with late policies
+      # using update_column because we can't unpublish an assignment with submissions
+      @assignment1.update_column(:workflow_state, 'unpublished')
+      json = api_call_as_user(@student1, :get, "/api/v1/users/#{@student1.id}/graded_submissions?only_published_assignments=true", {
+        id: @student1.to_param,
+        controller: 'users',
+        action: 'user_graded_submissions',
+        format: 'json',
+        only_published_assignments: true,
       })
       expect(json.count).to eq 2
       expect(json.map { |s| s['id'] }).to eq [@next_submission.id, @last_submission.id]

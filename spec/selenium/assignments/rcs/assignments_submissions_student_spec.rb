@@ -18,12 +18,12 @@
 require_relative '../../common'
 require_relative '../../helpers/files_common'
 require_relative '../../helpers/submissions_common'
-require_relative '../../helpers/gradezilla_common'
+require_relative '../../helpers/gradebook_common'
 
 describe "submissions" do
   include_context "in-process server selenium tests"
   include FilesCommon
-  include GradezillaCommon
+  include GradebookCommon
   include SubmissionsCommon
 
   context 'as a student' do

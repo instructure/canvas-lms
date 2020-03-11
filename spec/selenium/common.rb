@@ -66,12 +66,11 @@ module SeleniumErrorRecovery
       # no sense trying anymore, give up and hope that other nodes pick up the slack
       puts "Error: got `#{exception}`, aborting"
       RSpec.world.wants_to_quit = true
-    when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout
+    when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout, Selenium::WebDriver::Error::UnknownError
       return false if SeleniumDriverSetup.saucelabs_test_run?
       return false if RSpec.world.wants_to_quit
-      return false unless exception.backtrace.grep(/selenium-webdriver/).present?
+      return false if exception.backtrace.grep(/selenium-webdriver/).blank?
 
-      puts "SELENIUM: webdriver is misbehaving.  Will try to re-initialize."
       SeleniumDriverSetup.reset!
       return true
     end

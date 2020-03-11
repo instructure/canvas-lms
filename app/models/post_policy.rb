@@ -37,10 +37,6 @@ class PostPolicy < ActiveRecord::Base
     Setting.set("post_policies_enabled", true)
   end
 
-  def self.disable_feature!
-    Setting.set("post_policies_enabled", false)
-  end
-
   private
   def set_course_from_assignment
     self.course_id = assignment.context_id if assignment.present? && course.blank?

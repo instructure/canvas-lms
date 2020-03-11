@@ -311,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Vis lenketekst (opnast i ny fane)"
     },
+    "document_678cd7bf": {
+        "message": "Dokument"
+    },
     "documents_81393201": {
         "message": "Dokument"
     },
@@ -376,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Sett inn videokode"
+    },
+    "equation_1c5ac93c": {
+        "message": "Likning"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Feil under lasting av vurderingar"
@@ -491,6 +497,9 @@
     "height_69b03e15": {
         "message": "Høgde"
     },
+    "image_8ad06": {
+        "message": "Bilde"
+    },
     "image_options_5412d02c": {
         "message": "Alternativ for bilde"
     },
@@ -502,6 +511,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Auk innrykk"
+    },
+    "insert_593145ef": {
+        "message": "Set inn"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Sett inn Equella-lenker"

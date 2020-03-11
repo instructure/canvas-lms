@@ -33,23 +33,13 @@ services:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
 
   postgres:
-    image: canvas-lms:previous-postgres-image
-    build:
-      context: ./build/docker-compose/postgres/9.5/
-      dockerfile: ./Dockerfile
-    environment:
-      PGDATA: /data
+    image: starlord.inscloudgate.net/jenkins/postgres:9.5
 
   cassandra:
-    image: canvas-lms:previous-cassandra-image
-    build:
-      context: ./build/docker-compose/cassandra/
-      dockerfile: ./Dockerfile.cachable
+    image: starlord.inscloudgate.net/jenkins/cassandra:2.2
     environment:
       CASSANDRA_START_RPC: 'true'
 
   dynamodb:
-    image: canvas-lms:previous-dynamodb-image
-    build:
-      context: ./build/docker-compose/dynamodb/
-      dockerfile: ./Dockerfile.cachable
+    image: starlord.inscloudgate.net/jenkins/dynamodb-local
+    command: -jar DynamoDBLocal.jar #-dbPath /home/dynamodblocal

@@ -344,7 +344,6 @@ describe ConditionalRelease::Service do
 
     context "when post policies are enabled" do
       before(:each) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -706,7 +705,6 @@ describe ConditionalRelease::Service do
 
       context "when post policies are enabled" do
         before(:each) do
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
 
           graded_submission_model(course: @course, user: @student)

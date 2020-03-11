@@ -128,7 +128,7 @@ describe('RCE Plugins > Filter', () => {
       expect(component.getByLabelText('Content Type').value).toEqual('Course Files')
     })
 
-    it('has "My" options', () => {
+    it('has "User" options', () => {
       renderComponent({userContextType: 'course'})
 
       selectContentType('User Files')
@@ -136,7 +136,7 @@ describe('RCE Plugins > Filter', () => {
       expect(component.getByLabelText('Content Type').value).toEqual('User Files')
     })
 
-    it('includes the Course and My options in course context', () => {
+    it('includes the Link, Course, and User options in course context', () => {
       renderComponent({userContextType: 'course'})
       const contentTypeField = component.getByLabelText('Content Type')
       fireEvent.click(contentTypeField)
@@ -145,11 +145,11 @@ describe('RCE Plugins > Filter', () => {
       expect(component.getByText('Course Files')).toBeInTheDocument()
     })
 
-    it('includes only My option in user context', () => {
+    it('includes only User option in user context', () => {
       renderComponent({userContextType: 'user'})
-      const contentTypeField = component.getByLabelText('Content Type')
-      fireEvent.click(contentTypeField)
-      expect(component.getByText('Links')).toBeInTheDocument()
+      const contentTypeField = component.queryByLabelText('Content Type')
+      expect(contentTypeField).toBeNull() // we replaced the Select with a View
+      expect(component.queryByText('Links')).toBeNull()
       expect(component.getByText('User Files')).toBeInTheDocument()
       expect(component.queryByText('Course Files')).toBeNull()
     })
@@ -157,7 +157,7 @@ describe('RCE Plugins > Filter', () => {
 
   describe('"Content Subtype" field', () => {
     beforeEach(() => {
-      renderComponent()
+      renderComponent({userContextType: 'course'})
       selectContentType('User Files')
     })
 

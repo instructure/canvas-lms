@@ -18,7 +18,6 @@
 
 import assert from 'assert'
 import sinon from 'sinon'
-import K5Uploader from '@instructure/k5uploader'
 import * as actions from '../../../src/sidebar/actions/upload'
 import * as filesActions from '../../../src/sidebar/actions/files'
 import * as imagesActions from '../../../src/sidebar/actions/images'
@@ -304,7 +303,11 @@ describe('Upload data actions', () => {
         assert.ok(
           store.spy.calledWith({
             type: actions.COMPLETE_FILE_UPLOAD,
-            results
+            results: {
+              contextType: 'course',
+              contextId: 42,
+              ...results
+            }
           })
         )
         assert.ok(store.spy.calledWithMatch({type: filesActions.INSERT_FILE}))

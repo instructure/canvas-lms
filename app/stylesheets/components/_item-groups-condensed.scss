@@ -25,8 +25,8 @@
 ### tl;dr
 
   - Item groups come either `item-group` or `item-group-condensed` styles
-  - The `item-group` style is for draggable items and `item-group-condensed` is for items that are not draggable
-  - The outer `item-group-container` div is optional, and adds a background color with a dashed line between groups
+  - The `item-group-condensed` style is for draggable items and `item-group` is for items that are not draggable
+  - The outer `item-group-container` div is optional
 
 <br/>
 
@@ -234,24 +234,14 @@
 */
 
 .item-group-container {
-  background: $lightBackground;
+  background: $ic-color-light;
   padding-bottom: $ic-sp*6;
-  border: 1px solid $ic-border-light;
-  border-top: none;
-
-  .item-group-condensed {
-    border-bottom: 1px dashed $ic-border-dark;
-    padding: $ic-sp*1.5;
-  }
+  border: 0;
 
   .item-group-condensed:last-child,
   .item-group-condensed:last-of-type,
   .item-group-condensed.last {
     border-bottom: 0;
-  }
-
-  .ig-list {
-    margin-top: 0;
   }
 
   .ig-list li {
@@ -263,7 +253,17 @@
   padding: 9px;
 
   .ig-header {
-    padding-#{direction(left)}: 0px;
+    margin-top: 15px;
+    background-color: $ic-bg-light-neutral;
+    border: 1px solid $ic-border-light;
+    padding: direction-sides($ic-sp $ic-sp/2); // match the ig-list and ig-row that appear below the header
+    color: $ic-font-color-dark;
+    position: relative;
+    display: flex;
+
+    .links {
+      float: direction(right);
+    }
   }
 
   .ig-row {
@@ -273,39 +273,30 @@
     border-bottom: 1px solid $ic-border-light;
   }
 
-  .ig-list li:first-child,
-  .ig-list li:first-of-type {
-    margin-top: $ic-sp/2;
-  }
-
   .ig-list li:first-child .ig-row,
   .ig-list li:first-of-type .ig-row,
   .first_visible .ig-row {
-    border-top-#{direction(left)}-radius: $baseBorderRadius;
-    border-top-#{direction(right)}-radius: $baseBorderRadius;
-    border-top: 1px solid $ic-border-light;
-    &.ig-row-empty { border-top: 1px solid #dcdee0; }
+    border-top: 0;
+    // &.ig-row-empty { border-top: 1px solid $ic-border-light; } // don't actually need the top border here
   }
 
   .ig-list li:last-child .ig-row,
   .ig-list li:last-of-type .ig-row,
   .last_visible .ig-row {
-    border-bottom-#{direction(left)}-radius: $baseBorderRadius;
-    border-bottom-#{direction(right)}-radius: $baseBorderRadius;
     &.ig-row-empty { border-bottom: 1px solid $ic-border-light; }
   }
 
   .item-group-expandable {
-    border-radius: $baseBorderRadius;
     background-color: $ic-color-light;
     border: 1px solid $ic-border-light;
+    border-top: none;
 
     .ig-list {
       li { margin: 0; }
       li .ig-row {
         background: none;
         border: none;
-        border-radius: inherit;
+        border-radius: 0;
       }
 
       li:last-child .ig-row,
@@ -315,8 +306,6 @@
 
       li:last-child .ig-sublist,
       li:last-of-type .ig-sublist {
-        border-bottom-#{direction(left)}-radius: $baseBorderRadius;
-        border-bottom-#{direction(right)}-radius: $baseBorderRadius;
         border-bottom: none;
       }
     }
@@ -365,5 +354,4 @@
       }
     }
   }
-
 }

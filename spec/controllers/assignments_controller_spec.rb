@@ -795,7 +795,6 @@ describe AssignmentsController do
           context "when the course has the 'Filter SpeedGrader by Student Group' setting enabled" do
             before(:once) do
               @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
-              @course.enable_feature!(:new_gradebook)
               @course.update!(filter_speed_grader_by_student_group: true)
 
               category = @course.group_categories.create!(name: "category")
@@ -833,7 +832,6 @@ describe AssignmentsController do
         context "when filter_speed_grader_by_student_group? is true" do
           before :once do
             @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
-            @course.enable_feature!(:new_gradebook)
             @course.update!(filter_speed_grader_by_student_group: true)
 
             category = @course.group_categories.create!(name: "category")

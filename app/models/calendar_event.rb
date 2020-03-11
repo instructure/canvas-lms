@@ -176,7 +176,7 @@ class CalendarEvent < ActiveRecord::Base
   scope :undated, -> { where(:start_at => nil, :end_at => nil) }
 
   scope :between, lambda { |start, ending| where(:start_at => start..ending) }
-  scope :current, -> { where("calendar_events.end_at>=?", Time.zone.now.midnight) }
+  scope :current, -> { where("calendar_events.end_at>=?", Time.zone.now) }
   scope :updated_after, lambda { |*args|
     if args.first
       where("calendar_events.updated_at IS NULL OR calendar_events.updated_at>?", args.first)

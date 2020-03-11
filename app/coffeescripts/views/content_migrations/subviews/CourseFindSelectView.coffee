@@ -162,7 +162,9 @@ export default class CourseFindSelectView extends Backbone.View
     else
       @$selectWarning.hide()
 
-    @model.set('settings', {source_course_id: id})
+    settings = @model.get('settings') || {}
+    settings.source_course_id = id
+    @model.set('settings', settings)
     if course = _.find(@courses, (c) -> c.id == id)
       @trigger 'course_changed', course
 

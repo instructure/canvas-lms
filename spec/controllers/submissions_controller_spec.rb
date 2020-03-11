@@ -482,6 +482,83 @@ describe SubmissionsController do
         expect(attachment.instfs_uuid).to eq uuid
       end
     end
+
+    describe "confetti celebrations" do
+      before(:each) do
+        Account.default.enable_feature!(:confetti_for_assignments)
+      end
+
+      context "submission is made before due date" do
+        before(:each) do
+          course_with_student_logged_in(:active_all => true)
+          @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload", :due_at => 5.days.from_now)
+        end
+
+        it "redirects with confetti" do
+          post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}}
+          expect(response).to be_redirect
+          expect(response).to redirect_to(course_assignment_url(@course, @assignment, :confetti => true))
+        end
+
+        context "confetti_for_assignments flag is disabled" do
+          before(:each) do
+            Account.default.disable_feature!(:confetti_for_assignments)
+          end
+
+          it "redirects without confetti" do
+            post 'create', params: {
+              :course_id => @course.id,
+              :assignment_id => @assignment.id,
+              :submission => {:submission_type => "online_url", :url => "url"}
+            }
+            expect(response).to be_redirect
+            expect(response).to_not redirect_to(course_assignment_url(@course, @assignment, :confetti => true))
+          end
+        end
+      end
+
+      context "submission is made after due date" do
+        before(:each) do
+          course_with_student_logged_in(:active_all => true)
+          @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload", :due_at => 5.days.ago)
+        end
+
+        it "redirects without confetti" do
+          post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}}
+          expect(response).to be_redirect
+          expect(response).to_not redirect_to(course_assignment_url(@course, @assignment, :confetti => true))
+        end
+      end
+
+      context "submission is made with no due date" do
+        before(:each) do
+          course_with_student_logged_in(:active_all => true)
+          @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+        end
+
+        it "redirects with confetti" do
+          post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}}
+          expect(response).to be_redirect
+          expect(response).to redirect_to(course_assignment_url(@course, @assignment, :confetti => true))
+        end
+
+        context "confetti_for_assignments flag is disabled" do
+          before(:each) do
+            Account.default.disable_feature!(:confetti_for_assignments)
+          end
+
+          it "redirects without confetti" do
+            post 'create', params: {
+              :course_id => @course.id,
+              :assignment_id => @assignment.id,
+              :submission => {:submission_type => "online_url", :url => "url"}
+            }
+            expect(response).to be_redirect
+            expect(response).to_not redirect_to(course_assignment_url(@course, @assignment, :confetti => true))
+          end
+        end
+      end
+    end
   end
 
   describe "GET zip" do

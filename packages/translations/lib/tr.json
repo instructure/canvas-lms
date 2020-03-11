@@ -314,6 +314,9 @@
     "height_69b03e15": {
         "message": "Yükseklik"
     },
+    "image_8ad06": {
+        "message": "Görsel"
+    },
     "image_options_5412d02c": {
         "message": "Görsel Seçenekleri"
     },
@@ -325,6 +328,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "İçerden başlat"
+    },
+    "insert_593145ef": {
+        "message": "Ekle"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Equella Bağlantısı Ekle"

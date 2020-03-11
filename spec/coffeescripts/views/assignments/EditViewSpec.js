@@ -119,11 +119,9 @@ QUnit.module('EditView', {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
+      use_rce_enhancements: true,
       COURSE_ID: 1
     })
-    // Sometimes TinyMCE has stuff on the dom that causes issues, likely from things that
-    // don't clean up properly, we make sure that these run in a clean tiny state each time
-    tinymce.remove()
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },

@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Audioplayer für { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Automatisch gespeicherte Inhalte vorhanden. Möchten Sie lieber die automatisch gespeicherten Inhalte laden?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Eine Inline-Vorschau automatisch öffnen. (Vorschau wird erst nach dem Speichern angezeigt)"
     },
@@ -143,14 +146,23 @@
     "clear_selected_file_82388e50": {
         "message": "Ausgewählte Datei löschen"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Ausgewählte Datei löschen: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Um einen Link auf einer Seite einzufügen, klicken Sie auf die entsprechende Seite."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "{ imageName } durch Anklicken einbetten"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Vorschau ausblenden"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Einfügen eines Links in den Editor"
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Vorschau einblenden"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Menü oder Dialogfeld schließen. Bringt Sie zurück zum Editor-Bereich"
@@ -299,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Text-Link anzeigen (wird in einem neuen Tab geöffnet)"
     },
+    "document_678cd7bf": {
+        "message": "Dokument"
+    },
     "documents_81393201": {
         "message": "Dokumente"
     },
@@ -364,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Videocode einbetten"
+    },
+    "equation_1c5ac93c": {
+        "message": "Gleichung"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Fehler beim Laden der Noten"
@@ -434,6 +452,9 @@
     "formatting_5b143aa8": {
         "message": "Formatierung"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Automatisch gespeicherte Inhalte gefunden"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Gefundene { count, plural,\n     =0 {# Ergebnisse}\n    one {# Ergebnisse}\n  other {# Ergebnisse}\n}"
     },
@@ -479,6 +500,9 @@
     "height_69b03e15": {
         "message": "Höhe"
     },
+    "image_8ad06": {
+        "message": "Bild"
+    },
     "image_options_5412d02c": {
         "message": "Bildoptionen"
     },
@@ -490,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Einzug vergrößern"
+    },
+    "insert_593145ef": {
+        "message": "Einfügen"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Equella-Links einfügen"
@@ -647,6 +674,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Keine Fälligkeitsdaten zugewiesen"
     },
+    "no_e16d9132": {
+        "message": "Nein"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Keine Note"
     },
@@ -749,6 +779,9 @@
     "preformatted_d0670862": {
         "message": "Vorformatiert"
     },
+    "preview_53003fd2": {
+        "message": "Vorschau"
+    },
     "preview_a3f8f854": {
         "message": "VORSCHAU"
     },
@@ -790,6 +823,9 @@
     },
     "replies_4a8577c8": {
         "message": "Antworten"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Automatisches Speichern wiederherstellen"
     },
     "rich_content_editor_2708ef21": {
         "message": "Rich-Content-Editor"
@@ -1072,6 +1108,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki-Startseite"
+    },
+    "yes_dde87d5": {
+        "message": "Ja"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Gestern, am { date }"

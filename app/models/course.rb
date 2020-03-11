@@ -3275,7 +3275,7 @@ class Course < ActiveRecord::Base
 
   def clear_todo_list_cache_later(association_type)
     raise "invalid association" unless self.association(association_type).klass == User
-    send_later_enqueue_args(:clear_todo_list_cache, { :run_at => 15.seconds.from_now, :singleton => "course_clear_cache_#{global_id}_#{association_type}" }, association_type)
+    send_later_enqueue_args(:clear_todo_list_cache, { :run_at => 15.seconds.from_now, :singleton => "course_clear_cache_#{global_id}_#{association_type}", on_conflict: :loose }, association_type)
   end
 
   def clear_todo_list_cache(association_type)
@@ -3403,7 +3403,7 @@ class Course < ActiveRecord::Base
   end
 
   def filter_speed_grader_by_student_group?
-    return false unless root_account.feature_enabled?(:filter_speed_grader_by_student_group) && feature_enabled?(:new_gradebook)
+    return false unless root_account.feature_enabled?(:filter_speed_grader_by_student_group)
     filter_speed_grader_by_student_group
   end
 
@@ -3483,7 +3483,7 @@ class Course < ActiveRecord::Base
   end
 
   def post_policies_enabled?
-    feature_enabled?(:new_gradebook) && PostPolicy.feature_enabled?
+    PostPolicy.feature_enabled?
   end
 
   private

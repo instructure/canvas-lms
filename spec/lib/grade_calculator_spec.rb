@@ -22,7 +22,6 @@ describe GradeCalculator do
   before :each do
     course_with_student active_all: true
 
-    @course.enable_feature!(:new_gradebook)
     PostPolicy.enable_feature!
   end
 
@@ -184,9 +183,11 @@ describe GradeCalculator do
           submissions <<
             assignments[0].submissions.find_by!(user: @user) <<
             assignments[1].submissions.find_by!(user: @user)
+
+          assignments[0].grade_student(@user, grade: "5", grader: @teacher)
+          assignments[1].grade_student(@user, grade: "2.5", grader: @teacher)
         end
-        submissions[0].update_column(:score, 5.0)
-        submissions[1].update_column(:score, 2.5)
+
         groups
       end
 
@@ -227,11 +228,9 @@ describe GradeCalculator do
           @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
           @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
           @assignment2 = @course.assignments.create!(title: "Some Assignment2", points_possible: 10, assignment_group: @group)
-          @submission = @assignment2.submissions.find_by!(user: @user)
         end
 
-        @submission.update_column(:score, 5)
-        GradeCalculator.recompute_final_score(@user.id, @course.id)
+        @assignment2.grade_student(@user, grade: "5", grader: @teacher)
 
         expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_current_score).to equal(50.0)
         expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_final_score).to equal(25.0)
@@ -256,13 +255,10 @@ describe GradeCalculator do
           @course.assignments.create!(title: "Some Assignment2", due_at: now, points_possible: 10, assignment_group: @group)
           @assignment_in_period = @course.assignments.create!(title: 'In a Grading Period', due_at: 2.months.from_now(now), points_possible: 10)
           @course.assignments.create!(title: 'In a Grading Period', due_at: 2.months.from_now(now), points_possible: 10)
-          @submission = @assignment.submissions.find_by!(user: @user)
-          @submission_in_period = @assignment_in_period.submissions.find_by!(user: @user)
         end
 
-        @submission.update_column(:score, 5)
-        @submission_in_period.update_column(:score, 2)
-        GradeCalculator.recompute_final_score(@user.id, @course.id, grading_period_id: @grading_period.id)
+        @assignment.grade_student(@user, grade: "5", grader: @teacher)
+        @assignment_in_period.grade_student(@user, grade: "2", grader: @teacher)
 
         expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_current_score).to equal(35.0)
         expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_final_score).to equal(17.5)
@@ -273,11 +269,10 @@ describe GradeCalculator do
       it("should update cross-shard scores with assignment groups") do
         @user = User.create!
 
-        allow(GradeCalculator).to receive(:recompute_final_score) {}
         groups = seed_assignment_groups_with_scores
-
-        allow(GradeCalculator).to receive(:recompute_final_score).and_call_original
-        GradeCalculator.recompute_final_score(@user.id, @course.id)
+        @shard1.activate do
+          GradeCalculator.recompute_final_score(@user.id, @course.id)
+        end
 
         enrollment = Enrollment.shard(@course.shard).where(user_id: @user.global_id).first
         expect(enrollment.computed_current_score).to be(37.5)
@@ -513,52 +508,6 @@ describe GradeCalculator do
             it "always incorporates unposted submissions into the Score object's unposted final score" do
               expect(enrollment.unposted_final_score).to eq 75.0
             end
-          end
-        end
-
-        context "when post policies are not enabled" do
-          before :each do
-            PostPolicy.disable_feature!
-            @assignment2.mute!
-          end
-
-          it "should ignore muted assignments by default" do
-            # should have same scores as previous spec despite having a grade
-            @assignment2.grade_student(@user, grade: "500", grader: @teacher)
-            @user.reload
-            expect(@user.enrollments.first.computed_current_score).to equal(50.0)
-            expect(@user.enrollments.first.computed_final_score).to equal(25.0)
-          end
-
-          it "should ignore muted grade for current grade calculation, even when weighted" do
-            # should have same scores as previous spec despite having a grade
-            @assignment2.grade_student(@user, grade: "500", grader: @teacher)
-            @course.group_weighting_scheme = "percent"
-            @course.save!
-            @user.reload
-            expect(@user.enrollments.first.computed_current_score).to equal(50.0)
-            expect(@user.enrollments.first.computed_final_score).to equal(25.0)
-          end
-
-          it "should be possible to compute grades with muted assignments" do
-            @assignment2.unmute!
-            @assignment.mute!
-
-            @course.update_attribute(:group_weighting_scheme, "percent")
-            calc = GradeCalculator.new([@user.id], @course.id, ignore_muted: false)
-            scores = calc.compute_scores.first
-            expect(scores[:current][:grade]).to equal 50.0
-            expect(scores[:final][:grade]).to equal 25.0
-          end
-
-          it "saves unmuted scores" do
-            @assignment.mute!
-            calc = GradeCalculator.new [@user.id],
-                                       @course.id
-            calc.compute_and_save_scores
-            score = Enrollment.where(user_id: @user.id, course_id: @course.id).first.find_score(course_score: true)
-            expect(score.unposted_current_score).to equal 50.0
-            expect(score.current_score).to be_nil
           end
         end
       end

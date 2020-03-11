@@ -25,7 +25,6 @@ import {Alert} from '@instructure/ui-alerts'
 import I18n from 'i18n!ExternalToolDialog'
 import {send} from '../shared/rce/RceCommandShim'
 import TinyMCEContentItem from 'tinymce_plugins/instructure_external_tools/TinyMCEContentItem'
-import {Flex} from '@instructure/ui-layout'
 import processEditorContentItems from '../deep_linking/processors/processEditorContentItems'
 
 const EMPTY_BUTTON = {
@@ -137,7 +136,9 @@ export default class ExternalToolDialog extends React.Component {
     }
   }
 
-  handleOpen = () => this.formRef.submit()
+  handleOpen = () => {
+    if (this.state.open) this.formRef.submit()
+  }
 
   handleRemove = () => {
     this.setState({button: EMPTY_BUTTON})
@@ -173,22 +174,19 @@ export default class ExternalToolDialog extends React.Component {
           onOpen={this.handleOpen}
           onClose={this.handleRemove}
           onCloseButton={this.handleClose}
-          closeLabel={I18n.t('Close')}
           name={button.name}
         >
-          <Flex.Item>
-            <div
-              ref={ref => (this.beforeInfoAlertRef = ref)}
-              tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
-              onFocus={this.handleInfoAlertFocus}
-              onBlur={this.handleInfoAlertBlur}
-              className={
-                infoAlert && infoAlert === this.beforeInfoAlertRef ? '' : 'screenreader-only'
-              }
-            >
-              <Alert margin="small">{I18n.t('The following content is partner provided')}</Alert>
-            </div>
-          </Flex.Item>
+          <div
+            ref={ref => (this.beforeInfoAlertRef = ref)}
+            tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
+            onFocus={this.handleInfoAlertFocus}
+            onBlur={this.handleInfoAlertBlur}
+            className={
+              infoAlert && infoAlert === this.beforeInfoAlertRef ? '' : 'screenreader-only'
+            }
+          >
+            <Alert margin="small">{I18n.t('The following content is partner provided')}</Alert>
+          </div>
           <iframe
             title={label}
             ref={ref => (this.iframeRef = ref)}
@@ -196,29 +194,24 @@ export default class ExternalToolDialog extends React.Component {
             src="/images/ajax-loader-medium-444.gif"
             id="external_tool_button_frame"
             style={{
-              flexGrow: '1',
-              flexShrink: '1',
-              width: button.use_tray ? undefined : button.width || 800,
-              height: button.use_tray ? undefined : button.height || frameHeight,
-              border: '0'
+              width: button.use_tray ? '100%' : button.width || 800,
+              height: button.use_tray ? '100%' : button.height || frameHeight,
+              border: '0',
+              display: 'block'
             }}
             allow={iframeAllowances}
             borderstyle="0"
             data-lti-launch="true"
           />
-          <Flex.Item>
-            <div
-              ref={ref => (this.afterInfoAlertRef = ref)}
-              tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
-              onFocus={this.handleInfoAlertFocus}
-              onBlur={this.handleInfoAlertBlur}
-              className={
-                infoAlert && infoAlert === this.afterInfoAlertRef ? '' : 'screenreader-only'
-              }
-            >
-              <Alert margin="small">{I18n.t('The preceding content is partner provided')}</Alert>
-            </div>
-          </Flex.Item>
+          <div
+            ref={ref => (this.afterInfoAlertRef = ref)}
+            tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
+            onFocus={this.handleInfoAlertFocus}
+            onBlur={this.handleInfoAlertBlur}
+            className={infoAlert && infoAlert === this.afterInfoAlertRef ? '' : 'screenreader-only'}
+          >
+            <Alert margin="small">{I18n.t('The preceding content is partner provided')}</Alert>
+          </div>
         </Overlay>
       </>
     )

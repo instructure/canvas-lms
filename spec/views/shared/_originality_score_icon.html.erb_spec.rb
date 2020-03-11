@@ -93,7 +93,7 @@ describe "/shared/_originality_score_icon" do
   describe "score display" do
     it "renders a score if given scored data and hide_score is not passed" do
       doc = render_element(data: high_score_data)
-      expect(doc.at_css('.turnitin_similarity_score').text).to eq "75%"
+      expect(doc.at_css('.turnitin_similarity_score').text).to eq "75.0%"
     end
 
     it "does not render a score if the data without a score is given" do

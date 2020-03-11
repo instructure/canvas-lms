@@ -4,6 +4,8 @@ en:
     previous_label: "&#8592; Previous"
     next_label: Next &#8594;
     page_gap: "&hellip;"
+    container_aria_label: Pagination
+    page_aria_label: Page %{page}
     page_entries_info:
       single_page:
         zero: No %{model} found
@@ -574,6 +576,7 @@ en:
   features:
     google_docs_domain_restriction: Google Docs Domain Restriction
     high_contrast: High Contrast UI
+    hide_celebrations: Disable Celebration Animations
     learning_mastery_gradebook: Learning Mastery Gradebook
     student_outcome_gradebook: Student Learning Mastery Gradebook
     post_grades: Post Grades to SIS
@@ -593,6 +596,7 @@ en:
   high_contrast_description: |-
     High Contrast enhances the color contrast of the UI (text, buttons, etc.), making those items more
     distinct and easier to identify. Note: Institution branding will be disabled.
+  disable_celebrations_description: Enabling this feature hides all celebration animations.
   underline_links_e7cf9b4f: Underline Links
   underline_all_links_description: |-
     Underline Links displays hyperlinks in navigation menus, the Dashboard, and page sidebars as
@@ -618,8 +622,6 @@ en:
     GradingAssignment, GradingAssignmentScore.
   anonymous_instructor_annotations_2b6c822: Anonymous Instructor Annotations
   anonymize_all_instructor_comments_and_annotations__713924c9: Anonymize all instructor comments and annotations within DocViewer
-  new_gradebook_297f7e2d: New Gradebook
-  new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: New Gradebook enables an early release of new Gradebook enhancements.
   final_grade_override_be8a21cd: Final Grade Override
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: Enable ability to alter the final grade for the entire course without changing scores for assignments.
   k12_description: Update the icons in the Global Navigation Menu that make more sense specifically in a K-12 environment.
@@ -767,6 +769,10 @@ en:
     If you turn this on, when an account admin goes to the page to
     create a global announcement, a checkbox will appear to send
     notification directly to users when announcement starts.
+  course_level_overrides_for_notification_preference_e86d1725: Course level overrides for notification preferences
+  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+    Allows users to override specific notification preferences on a
+    course by course basis.
   rce_auto_save_f004fba9: RCE Auto-Save
   if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
     If RCE Enhancements are also enabled,
@@ -1631,6 +1637,11 @@ en:
         webster:
           login:
             day_drop: 'Minimum course items visited:'
+    wharton_online_student_activity_csv_parameters:
+      account_reports:
+        pearson:
+          outcome:
+            text: 'Course SIS ID:'
     adtalem:
       attendance_extract:
         parameters:
@@ -3442,6 +3453,7 @@ en:
         join_course: Join this Course
         drop_course: Drop this Course
         view_course_calendar: View Course Calendar
+        view_course_notification_settings: View Course Notifications
       headings:
         confirm_unenroll: Confirm Unenrollment
       details:
@@ -3579,6 +3591,7 @@ en:
   pairing_code_bde979a7: Pairing Code
   expires_at_6214b43f: Expires At
   course_atom_feed_9d95214e: Course Atom Feed
+  course_notification_settings_d9821d36: Course Notification Settings
   invalid_restrictions_316cd740: Invalid restrictions
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: There was an error saving the changes to the course
   exported_package_history_bfca44b9: Exported Package History
@@ -9142,6 +9155,7 @@ en:
   media_objects_c2fa37cd: Media Objects
   modules_c4325335: Modules
   names_and_role_ebff0149: Names and Role
+  notification_preference_overrides_e08e079a: Notification Preference Overrides
   notification_preferences_cf47083d: Notification Preferences
   originality_reports_1e36b935: Originality Reports
   outcome_groups_3bc3b150: Outcome Groups
@@ -10898,7 +10912,6 @@ en:
     by_nc_nd: CC Attribution Non-Commercial No Derivatives
   course_card_image_5285f1bf: Course Card Image
   syllabus: Course Syllabus
-  this_feature_can_t_be_disabled_because_there_is_at_a015b943: This feature can't be disabled because there is at least one sub-account or course with this feature enabled.
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: This feature can't be enabled while autodetection of field separators is enabled
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: This feature can't be enabled while semicolons are forced to be field separators
   course_grade_grade_in_course_code_9fa854db: 'Course grade: %{grade}% in %{course_code}'
@@ -11838,27 +11851,7 @@ en:
   gradebook_context_name_9dbae5bc: Gradebook - %{context_name}
   gradebook_1620a0aa: Gradebook
   warning_for_improved_accessibility_please_click_he_e6472c02: 'Warning: For improved accessibility, please click here to use the Individual View Gradebook.'
-  grades_a61eba0a: Grades
-  learning_mastery_5fc34276: Learning Mastery
   keyboard_shortcuts_ed1844bd: Keyboard Shortcuts
-  sync_grades_a16622ca: Sync Grades
-  individual_view_81c2f124: Individual View
-  filter_by_student_name_or_secondary_id_83dc524f: Filter by student name or secondary ID
-  import_1b31507: Import
-  export_de71cd8e: Export
-  csv_file_8061540e: CSV File
-  previous_csv_file_time_d7bfe7ef: Previous CSV File (%{time})
-  gradebook_settings_b45c6df9: Gradebook Settings
-  view_gradebook_history_a9272918: View Gradebook History
-  sync_grades_to_sis_4e7fbc08: Sync grades to SIS
-  hide_student_names_3e59e862: Hide Student Names
-  arrange_columns_by_due_date_f74f9e2d: Arrange columns by due date
-  arrange_columns_by_points_48da9ba3: Arrange columns by points
-  arrange_columns_by_assignment_group_59bbddd0: Arrange columns by assignment group
-  show_attendance_columns_4d160e16: Show Attendance Columns
-  treat_ungraded_as_0_d38c2b41: Treat Ungraded as 0
-  show_concluded_enrollments_6a05544c: Show Concluded Enrollments
-  show_inactive_enrollments_8f4c4824: Show Inactive Enrollments
   search_23a88d5c: Search…
   gradebook_individual_view_8846598e: 'Gradebook: Individual View'
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Submissions Uploaded"
@@ -12464,6 +12457,7 @@ en:
   view_grades_8d3bae6c: View Grades
   send_a_message_to_the_teacher_1ae115b6: Send a Message to the Teacher
   user_search_results_3af96217: User Search results
+  align_outcomes_to_this_page_7d055196: Align outcomes to this page
   academic_benchmark:
     plugin_settings:
       description: You will need access to an [Academic Benchmark](%{url}) account.
@@ -13112,6 +13106,7 @@ en:
   collapsed_510aa02a: Collapsed
   resync_grades_to_sis_d4dcfe12: Resync grades to SIS
   syncing_grades_to_sis_d63112e0: Syncing grades to SIS...
+  sync_grades_to_sis_4e7fbc08: Sync grades to SIS
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: Are you sure you want to resync these grades to the student information system?
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: Are you sure you want to sync these grades to the student information system? You should only do this if all your grades have been finalized.
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: Something went wrong when trying to sync grades to the student information system. Please try again later.
@@ -13626,6 +13621,7 @@ en:
   the_grade_you_entered_has_been_selected_and_can_no_ca87612b: The grade you entered has been selected and can no longer be changed.
   an_error_occurred_updating_this_assignment_21287c7e: An error occurred updating this assignment.
   something_went_wrong_please_try_refreshing_the_pag_3f651814: Something went wrong. Please try refreshing the page. If the problem persists, you can try loading a single student group in SpeedGrader by using the *Large Course setting*.
+  something_went_wrong_please_try_refreshing_the_pag_689be273: Something went wrong. Please try refreshing the page.
   speed_grader_helpers:
     graded: graded
     not_graded: not graded
@@ -14083,17 +14079,46 @@ en:
   download_scores_generated_on_date_ff5b9cd2: Download Scores Generated on %{date}
   external_toolsHomeworkSubmissionLtiContainer:
     no_tools_found: No tools found
+  gradebook_settings_b45c6df9: Gradebook Settings
+  upload_successful_ca47465f: Upload successful
+  override_3de65b2c: Override
+  there_was_an_error_fetching_submission_comments_ce153077: There was an error fetching Submission Comments
+  successfully_saved_the_comment_c87681fd: Successfully saved the comment
+  there_was_a_problem_saving_the_comment_d94cbac9: There was a problem saving the comment
+  successfully_updated_the_comment_946360d5: Successfully updated the comment
+  there_was_a_problem_updating_the_comment_5f3595b9: There was a problem updating the comment
+  successfully_deleted_the_comment_a8bbe561: Successfully deleted the comment
+  there_was_a_problem_deleting_the_comment_93053aa9: There was a problem deleting the comment
+  there_was_a_problem_creating_the_teacher_notes_col_dd73456f: There was a problem creating the teacher notes column.
+  there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: There was a problem hiding the teacher notes column.
+  there_was_a_problem_showing_the_teacher_notes_colu_a6e4a2bc: There was a problem showing the teacher notes column.
+  there_was_a_problem_updating_the_submission_6e5280a1: There was a problem updating the submission.
+  you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: You have entered an invalid grade for this student. Check the value and the grading type and try again.
   unable_to_set_default_grade_because_this_assignmen_d19842a9: Unable to set default grade because this assignment is due in a closed grading period for at least one student
   unable_to_curve_grades_because_this_assignment_is__17f78c27: Unable to curve grades because this assignment is due in a closed grading period for at least one student
   gradebookHeaderMenu:
     errors:
       upload_as_zip: Please upload files as a .zip
   note_length_cannot_exceed_maxlength_characters_82798b1: Note length cannot exceed %{maxLength} characters.
+  gradebookGradebookKeyboardNav:
+    keycodes:
+      sort: s
+      menu: m
+      close_menu: esc
+      goto_assignment: g
+    keyboard_sort_desc: Sort the grid on the current active column
+    keyboard_menu_desc: Open menu for the active column
+    keyboard_close_menu: Close the currently active menu
+    keyboard_assignment_desc: Go to the current assignment's detail page
+  open_the_grade_detail_tray_cea682a5: Open the grade detail tray
+  this_assignment_is_unpublished_64c0f46c: This assignment is unpublished
   dropped_for_grading_purposes_46256461: Dropped for grading purposes
-  submitted_late_3741af29: Submitted late
+  assignment_excused_eb6c08fa: Assignment Excused
+  submitted_late_97730017: Submitted Late
+  missing_submission_ec204c33: Missing Submission
   anonymous_e1b8ad27: Anonymous
   moderated_assignment_12873e87: Moderated Assignment
-  assignment_muted_4cb590a4: Assignment muted
+  assignment_muted_8d74bfa0: Assignment Muted
   resubmitted_since_last_graded_8484d285: Resubmitted since last graded
   not_factored_into_grading_455dcf6a: Not factored into grading
   url_submission_f76327e3: URL Submission
@@ -14115,37 +14140,7 @@ en:
   fail_62dbb06a: fail
   blank_38df4238: blank
   excused_3aab77: excused
-  upload_successful_ca47465f: Upload successful
-  override_3de65b2c: Override
-  there_was_an_error_fetching_submission_comments_ce153077: There was an error fetching Submission Comments
-  successfully_posted_the_comment_12d95d56: Successfully posted the comment
-  there_was_a_problem_posting_the_comment_75d15646: There was a problem posting the comment
-  successfully_updated_the_comment_946360d5: Successfully updated the comment
-  there_was_a_problem_updating_the_comment_5f3595b9: There was a problem updating the comment
-  successfully_deleted_the_comment_a8bbe561: Successfully deleted the comment
-  there_was_a_problem_deleting_the_comment_93053aa9: There was a problem deleting the comment
-  there_was_a_problem_creating_the_teacher_notes_col_dd73456f: There was a problem creating the teacher notes column.
-  there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: There was a problem hiding the teacher notes column.
-  there_was_a_problem_showing_the_teacher_notes_colu_a6e4a2bc: There was a problem showing the teacher notes column.
-  there_was_a_problem_updating_the_submission_6e5280a1: There was a problem updating the submission.
-  you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: You have entered an invalid grade for this student. Check the value and the grading type and try again.
-  gradezillaGradebookKeyboardNav:
-    keycodes:
-      sort: s
-      menu: m
-      close_menu: esc
-      goto_assignment: g
-    keyboard_sort_desc: Sort the grid on the current active column
-    keyboard_menu_desc: Open menu for the active column
-    keyboard_close_menu: Close the currently active menu
-    keyboard_assignment_desc: Go to the current assignment's detail page
-  open_the_grade_detail_tray_cea682a5: Open the grade detail tray
-  this_assignment_is_unpublished_64c0f46c: This assignment is unpublished
-  assignment_excused_eb6c08fa: Assignment Excused
-  submitted_late_97730017: Submitted Late
-  missing_submission_ec204c33: Missing Submission
-  assignment_muted_8d74bfa0: Assignment Muted
-  gradezillaOutcomeGradebookGrid:
+  gradebookOutcomeGradebookGrid:
     learning_outcome: Learning Outcome
   exceeds_mastery_1f995dce: Exceeds Mastery
   meets_mastery_754e1c06: Meets Mastery
@@ -14512,7 +14507,7 @@ en:
     one: 1 student will get %{num} points
     other: "%{studentCount} students will get %{num} points"
   of_students_5d1af0d2: "# of students"
-  gradezillaGradeDisplayWarningDialog:
+  gradebookGradeDisplayWarningDialog:
     grade_display_warning:
       points_text: Students will also see their final grade as points. Are you sure you want to continue?
       percent_text: Students will also see their final grade as a percentage. Are you sure you want to continue?
@@ -14748,7 +14743,7 @@ en:
   grader_is_required_62c88f67: Grader is required
   grader_count_is_required_45b6c85b: Grader count is required
   grader_count_cannot_be_0_9228afe4: Grader count cannot be 0
-  points_possible_must_be_greater_than_0_for_selecte_5708da1b: Points possible must be greater than 0 for selected grading type
+  points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: Points possible must be 0 or more for selected grading type
   external_tool_url_cannot_be_left_blank_a34b6bb2: External Tool URL cannot be left blank
   number_of_attempts_must_be_a_number_greater_than_0_a915568c: Number of attempts must be a number greater than 0
   cannot_be_edited_for_assignments_in_closed_grading_792ef6c1: Cannot be edited for assignments in closed grading periods
@@ -14854,12 +14849,12 @@ en:
     unknown_error: Something went wrong with your search, please try again.
   open_this_keyboard_shortcuts_dialog_9658b83a: Open this keyboard shortcuts dialog
   this_will_affect_every_customer_are_you_sure_a1e0cac6: This will affect every customer. Are you sure?
-  gradebookSectionMenuView:
-    all_sections: All Sections
-  gradezillaHeaderFilterView:
+  gradebookHeaderFilterView:
     course_average: Course average
     course_median: Course median
   there_was_an_error_fetching_outcome_results_45c57590: There was an error fetching outcome results
+  gradebookSectionMenuView:
+    all_sections: All Sections
   clone_group_set_c2a40e15: Clone Group Set
   must_have_at_least_1_group_per_section_9809e708: Must have at least 1 group per section
   count_max_students_2db76773: "%{count} / %{max} students"
@@ -15831,9 +15826,11 @@ en:
   submitted_submitdate_bdd3bf09: 'Submitted: %{submitDate}'
   view_submission_ff3da5d: View Submission
   select_student_name_caaff244: Select student %{name}
+  great_work_from_the_canvas_developers_8c23f1c3: Great work! From the Canvas developers
   starting_import_operation_f25745f0: Starting import operation
   import_started_successfully_a3467411: Import started successfully
   there_was_a_problem_starting_import_operation_4c42c5e: There was a problem starting import operation
+  import_1b31507: Import
   content_share_preview_166f6562: Content Share Preview
   no_content_has_been_shared_with_you_667fde6c: No content has been shared with you.
   count_shared_items_loaded_ef94ef6a:
@@ -15853,6 +15850,7 @@ en:
   high_b5cbd048: High
   low_eab1cadd: Low
   section_section_names_98f172e6: 'Section: %{section_names}'
+  grades_a61eba0a: Grades
   view_grades_for_name_45aeb2f2: View grades for %{name}
   view_analytics_for_name_9b31594e: View analytics for %{name}
   send_a_message_to_student_b2e72576: Send a message to %{student}
@@ -15944,6 +15942,13 @@ en:
   before_publishing_your_course_you_must_either_publ_cdfdc78c: Before publishing your course, you must either publish a module or choose a different home page.
   create_a_new_module_6f31b0fe: Create a new Module
   add_existing_content_7e36da66: Add existing content
+  failed_to_update_course_notification_settings_cbf0eb18: Failed to update course notification settings
+  course_notification_settings_initial_query_error_6dfb24ef: Course Notification Settings initial query error
+  course_notification_settings_error_page_c0512c17: Course Notification Settings Error Page
+  enable_notifications_10a4bf44: Enable Notifications
+  you_are_currently_receiving_notifications_for_this_9646b09d: You are currently receiving notifications for this course. To disable course notifications, use the toggle above.
+  you_will_not_receive_any_course_notifications_at_t_7d9ce24f: You will not receive any course notifications at this time. To enable course notifications, use the toggle above.
+  granular_course_notification_settings_will_be_conf_68f122db: Granular course notification settings will be configurable here in the future.
   complete_registration_by_clicking_the_finish_the_r_fcd13ac8: Complete registration by clicking the “finish the registration process” link sent to your email.
   an_error_ocurred_while_publishing_course_3760cf04: An error ocurred while publishing course
   choose_home_page_80cef4ee: Choose Home Page
@@ -16325,6 +16330,7 @@ en:
   module_menu_3201af4e: Module Menu
   modules_index_menu_c8748e7c: Modules Index Menu
   modules_group_menu_4aae0d5f: Modules Group Menu
+  sync_grades_a16622ca: Sync Grades
   quiz_menu_4fcd5e61: Quiz Menu
   quizzes_index_menu_1ce11b54: Quizzes Index Menu
   user_navigation_a097be0f: User Navigation
@@ -16482,9 +16488,6 @@ en:
   not_anonymously_graded_87574f91: Not anonymously graded
   not_available_assignment_is_anonymous_94e77edf: Not available; assignment is anonymous
   not_available_487d3648: Not available
-  score_pointspossibletranslated_c1ac019e: "%{score}/%{pointsPossibleTranslated}"
-  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: You will be redirected to Gradebook while your file is being uploaded. If you have a large CSV file, your changes may take a few minutes to update. To prevent overwriting any data, please confirm the upload has completed and Gradebook is correct before making additional changes.
-  done_8af51c9b: Done.
   name_error_fee4236: Name Error
   assignment_name_b2d87383: Assignment Name
   no_assignment_name_adbb215b: No Assignment Name
@@ -16565,6 +16568,7 @@ en:
   sis_2164965: SIS
   sync_to_sisname_f343e59: Sync to %{sisName}
   export_in_progress_70db262a: Export in progress
+  export_de71cd8e: Export
   allow_final_grade_override_8cf4336b: Allow final grade override
   anonymous_mode_on_feb53729: 'Anonymous Mode On:'
   unable_to_access_specific_student_go_to_assignment_585e05e9: Unable to access specific student. Go to assignment in SpeedGrader?
@@ -16592,6 +16596,7 @@ en:
   individual_view_d60b9132: Individual View…
   gradebook_history_b03f8524: Gradebook History…
   learning_mastery_6ed4fd63: Learning Mastery…
+  learning_mastery_5fc34276: Learning Mastery
   an_error_occurred_while_saving_your_settings_b503a31c: An error occurred while saving your settings
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: An error occurred while saving the course post policy
   gradebook_settings_updated_fef63d60: Gradebook Settings updated
@@ -16670,14 +16675,18 @@ en:
   integration_id_8a20b328: Integration ID
   inactive_enrollments_3b84be3d: Inactive enrollments
   concluded_enrollments_9da8da6: Concluded enrollments
+  individual_view_81c2f124: Individual View
   no_way_to_monitor_gradebook_exports_provided_b451236a: No way to monitor gradebook exports provided!
   error_exporting_gradebook_msg_6ea31e2f: 'Error exporting gradebook: %{msg}'
   no_way_to_export_gradebooks_provided_b4c2939d: No way to export gradebooks provided!
   an_export_is_already_in_progress_54270f01: An export is already in progress.
+  score_pointspossibletranslated_c1ac019e: "%{score}/%{pointsPossibleTranslated}"
   no_submission_for_assignment_a9cb6fe2: No submission for %{assignment}
   no_grade_for_assignment_97c9bc75: No grade for %{assignment}
   scored_less_than_cutoff_on_assignment_5f5c4303: Scored less than %{cutoff} on %{assignment}
   scored_more_than_cutoff_on_assignment_f422fec: Scored more than %{cutoff} on %{assignment}
+  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: You will be redirected to Gradebook while your file is being uploaded. If you have a large CSV file, your changes may take a few minutes to update. To prevent overwriting any data, please confirm the upload has completed and Gradebook is correct before making additional changes.
+  done_8af51c9b: Done.
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: Invalid CSV file. Grades could not be updated.
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: Are you sure you want to delete this grading period?
   the_grading_period_was_deleted_7814a349: The grading period was deleted
@@ -17087,6 +17096,8 @@ en:
   saving_new_role_458f4ba8: Saving New Role
   enabled_ba7cab66: Enabled
   enabled_and_locked_49ff3de4: Enabled and Locked
+  partially_enabled_cd506819: Partially enabled
+  partially_enabled_and_locked_9a39d38a: Partially enabled and Locked
   disabled_and_locked_d14dc6c2: Disabled and Locked
   enable_and_lock_e6099cc2: Enable and Lock
   disable_and_lock_7d0ef0e8: Disable and Lock
@@ -17294,6 +17305,7 @@ en:
   to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: To publish and unpublish module content, Courses - add / edit / delete and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.
   to_publish_and_unpublish_module_content_courses_ad_ae996413: To publish and unpublish module content, Courses - add / edit / delete and Course Content - view must also be enabled.
   allows_user_to_view_published_and_unpublished_cour_25a5dcc0: Allows user to view published and unpublished course content.
+  new_gradebook_297f7e2d: New Gradebook
   allows_user_to_view_the_new_gradebook_50f53ef0: Allows user to view the New Gradebook.
   admin_tools_undelete_courses_d9bd8631: Admin Tools (Undelete Courses)
   regardless_of_whether_this_permission_is_enabled_o_437ee269: Regardless of whether this permission is enabled or disabled, the user will still be able to manage events on their personal calendar.
@@ -17828,6 +17840,7 @@ en:
   canvas_failed_to_complete_the_upload_864a4c0f: Canvas failed to complete the upload.
   unknown_event_7a0bcda3: Unknown event
   assignment_created_b3ee04d7: Assignment created
+  assignment_muted_4cb590a4: Assignment muted
   assignment_unmuted_2cffe4ca: Assignment unmuted
   assignment_updated_c7482598: Assignment updated
   docviewer_area_created_37502a31: Docviewer area created
@@ -18061,7 +18074,7 @@ en:
   due_datetime_f5a81b81: 'Due: %{dateTime}'
   no_due_date_6e6a23c1: "(no due date)"
   submitted_datetime_fa2e9287: 'Submitted: %{dateTime}'
-  score_muted_82eef66: 'Score: (muted)'
+  score_hidden_f345f875: 'Score: (hidden)'
   due_multiple_dates_cc0ee3f5: 'Due: Multiple Dates'
   due_date_6a281fe3: 'Due: %{date}'
   missing_percent_94534638: 'Missing: %{percent}'
@@ -18071,7 +18084,7 @@ en:
   median_score_4657e907: 'Median: %{score}'
   low_score_4eeb95b2: 'Low: %{score}'
   possible_score_5e0a328e: 'Possible: %{score}'
-  muted_283cfa0f: "(muted)"
+  hidden_b1a6a352: "(hidden)"
   count_participations_ac8f82b7:
     one: 1 participation
     other: "%{count} participations"
@@ -18428,16 +18441,15 @@ en:
       curve_grades: Curve Grades
       download_submissions: Download Submissions
       re_upload_submissions: Re-Upload Submissions
-    section_to_show_menu:
-      showing_sections: Showing *%{currentSection}*
-      choose_a_section_to_show: Choose a section to show
-      showing_course: Showing Course
-  gradezilla:
     header_filter:
       course_average: Course average
       course_median: Course median
     outcome_gradebook:
       toggle_sidebar: Toggle Sidebar
+    section_to_show_menu:
+      showing_sections: Showing *%{currentSection}*
+      choose_a_section_to_show: Choose a section to show
+      showing_course: Showing Course
   hide_outcomes_with_no_results_7e4ce06f: Hide outcomes with no results
   hide_students_with_no_results_6a22f991: Hide students with no results
   export_report_7c5899e: Export report
@@ -18641,10 +18653,6 @@ en:
       was_resubmitted: This assignment has been resubmitted since it was graded last.
       submission_details: Submission Details
       empty_submission_selection: Select a student and an assignment to view and edit grades.
-    header:
-      gradebook_individual_view: 'Gradebook: Individual View'
-      save_instructions: 'Note: Grades and notes will be saved automatically after moving out of the field.'
-      switch_to_gradebook: Switch to Default Gradebook
     learning_mastery:
       select_a_section: Select a section
       hide_student_names_label: Hide Student Names

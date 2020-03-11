@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "{ title } 的音訊播放器"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "自動儲存內容已存在。是否要改為載入自動儲存的內容？"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "自動開啟行中預覽。（僅在儲存後顯示預覽）"
     },
@@ -143,14 +146,23 @@
     "clear_selected_file_82388e50": {
         "message": "清除所選擇的檔案"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "清除所選擇的檔案：{ filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "按一下任何頁面，以向該頁面中插入一個連結。"
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "按一下以嵌入 { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "按一下以隱藏預覽"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "按一下以插入一個連結至編輯。"
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "按一下以顯示預覽"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "關閉選單或對話方塊。另外請返回編輯器區域"
@@ -299,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "顯示文字連結（在新標籤中開啟）"
     },
+    "document_678cd7bf": {
+        "message": "文件"
+    },
     "documents_81393201": {
         "message": "文件"
     },
@@ -364,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "嵌入影片代碼"
+    },
+    "equation_1c5ac93c": {
+        "message": "方程式"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "載入成績時發生錯誤"
@@ -434,6 +452,9 @@
     "formatting_5b143aa8": {
         "message": "格式"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "找到自動儲存的內容"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "找到 { count, plural,\n     =0 {# 個結果 }\n    one {# 個結果 }\n  other {# 個結果 }\n}"
     },
@@ -479,6 +500,9 @@
     "height_69b03e15": {
         "message": "高度"
     },
+    "image_8ad06": {
+        "message": "影像"
+    },
     "image_options_5412d02c": {
         "message": "影像選項"
     },
@@ -490,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "增加縮排"
+    },
+    "insert_593145ef": {
+        "message": "插入"
     },
     "insert_equella_links_49a8dacd": {
         "message": "插入 Equella 連結"
@@ -647,6 +674,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "無指定截止日期"
     },
+    "no_e16d9132": {
+        "message": "否"
+    },
     "no_grade_3b4d7f3e": {
         "message": "無評分"
     },
@@ -749,6 +779,9 @@
     "preformatted_d0670862": {
         "message": "已預先格式化"
     },
+    "preview_53003fd2": {
+        "message": "預覽"
+    },
     "preview_a3f8f854": {
         "message": "預覽"
     },
@@ -790,6 +823,9 @@
     },
     "replies_4a8577c8": {
         "message": "回覆"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "還原自動儲存？"
     },
     "rich_content_editor_2708ef21": {
         "message": "多種格式的內容編輯器"
@@ -1072,6 +1108,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki 首頁"
+    },
+    "yes_dde87d5": {
+        "message": "是"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "昨天 { date }"

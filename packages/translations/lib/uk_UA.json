@@ -326,11 +326,17 @@
     "group_navigation_99f191a": {
         "message": "Навігація групи"
     },
+    "image_8ad06": {
+        "message": "Зображення"
+    },
     "images_7ce26570": {
         "message": "Зображення"
     },
     "increase_indent_6d550a4a": {
         "message": "Збільшити відступ"
+    },
+    "insert_593145ef": {
+        "message": "Вставка"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Вставити посилання Equella"

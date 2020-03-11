@@ -24,3 +24,4 @@ export default class CanvasExportView extends MigrationView
   @child 'chooseMigrationFile', '.chooseMigrationFile'
   @child 'dateShift', '.dateShift'
   @child 'selectContent', '.selectContent'
+  @child 'importQuizzesNext', '.importQuizzesNext'

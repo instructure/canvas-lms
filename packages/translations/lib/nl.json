@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Audio-speler voor { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Er is automatisch opgeslagen inhoud aanwezig. Wil je liever  de automatisch opgeslagen inhoud laden?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Wordt automatisch geopend in een in-line voorbeeld. (Voorbeeld wordt pas na het opslaan weergegeven)"
     },
@@ -143,14 +146,23 @@
     "clear_selected_file_82388e50": {
         "message": "Verwijder geselecteerd bestand"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Verwijder geselecteerd bestand: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Klik op een pagina om een link op die pagina in te voegen."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Klikken om { imageName } in te sluiten"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Klik om voorbeeld te verbergen"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Klik om een koppeling in te voegen in de editor."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Klik om voorbeeld te tonen"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Sluit een menu of dialoogvenster. Hierdoor keert u bovendien terug naar het editorgebied"
@@ -299,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Tekstkoppeling weergeven (Opent in een nieuw tabblad)"
     },
+    "document_678cd7bf": {
+        "message": "Document"
+    },
     "documents_81393201": {
         "message": "Documenten"
     },
@@ -364,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Videocode insluiten"
+    },
+    "equation_1c5ac93c": {
+        "message": "Vergelijking"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Fout bij laden van cijfers"
@@ -434,6 +452,9 @@
     "formatting_5b143aa8": {
         "message": "Opmaak"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Automatisch opgeslagen inhoud gevonden"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "{ count, plural,\n     =0 {# resultaten}\n    one {# resultaat}\n  other {# resultaten}\n} gevonden"
     },
@@ -479,6 +500,9 @@
     "height_69b03e15": {
         "message": "Hoogte"
     },
+    "image_8ad06": {
+        "message": "Afbeelding"
+    },
     "image_options_5412d02c": {
         "message": "Beeldopties"
     },
@@ -490,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Inspringen vergroten"
+    },
+    "insert_593145ef": {
+        "message": "Invoegen"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Equella-koppelingen invoegen"
@@ -647,6 +674,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Geen inleverdatums toegewezen"
     },
+    "no_e16d9132": {
+        "message": "Nee"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Geen cijfer"
     },
@@ -749,6 +779,9 @@
     "preformatted_d0670862": {
         "message": "Voorgeformatteerd"
     },
+    "preview_53003fd2": {
+        "message": "Voorbeeld"
+    },
     "preview_a3f8f854": {
         "message": "VOORBEELD"
     },
@@ -790,6 +823,9 @@
     },
     "replies_4a8577c8": {
         "message": "Antwoorden"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Automatisch opslaan herstellen?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Rich Content Editor"
@@ -1072,6 +1108,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki Home"
+    },
+    "yes_dde87d5": {
+        "message": "Ja"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Gisteren om { date }"

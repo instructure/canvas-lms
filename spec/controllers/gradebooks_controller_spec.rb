@@ -20,7 +20,6 @@ require_relative '../sharding_spec_helper'
 
 describe GradebooksController do
   before :once do
-    Account.default.enable_feature!(:new_gradebook)
     course_with_teacher active_all: true
     @teacher_enrollment = @enrollment
     student_in_course active_all: true
@@ -644,39 +643,39 @@ describe GradebooksController do
       it "renders default gradebook when preferred with 'default'" do
         @admin.preferences[:gradebook_version] = "default"
         get "show", params: { course_id: @course.id }
-        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+        expect(response).to render_template("gradebooks/gradebook")
       end
 
       it "renders default gradebook when preferred with '2'" do
         # most users will have this set from before New Gradebook existed
         @admin.preferences[:gradebook_version] = "2"
         get "show", params: { course_id: @course.id }
-        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+        expect(response).to render_template("gradebooks/gradebook")
       end
 
       it "renders screenreader gradebook when preferred with 'individual'" do
         @admin.preferences[:gradebook_version] = "individual"
         get "show", params: { course_id: @course.id }
-        expect(response).to render_template("gradebooks/gradezilla/individual")
+        expect(response).to render_template("gradebooks/individual")
       end
 
       it "renders screenreader gradebook when preferred with 'srgb'" do
         # most a11y users will have this set from before New Gradebook existed
         @admin.preferences[:gradebook_version] = "srgb"
         get "show", params: { course_id: @course.id }
-        expect(response).to render_template("gradebooks/gradezilla/individual")
+        expect(response).to render_template("gradebooks/individual")
       end
 
       it "renders default gradebook when user has no preference" do
         get "show", params: { course_id: @course.id }
-        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+        expect(response).to render_template("gradebooks/gradebook")
       end
 
       it "ignores the parameter version when not in development" do
         allow(Rails.env).to receive(:development?).and_return(false)
         @admin.preferences[:gradebook_version] = "default"
         get "show", params: { course_id: @course.id, version: "individual" }
-        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+        expect(response).to render_template("gradebooks/gradebook")
       end
     end
 
@@ -689,8 +688,8 @@ describe GradebooksController do
       end
 
       it "renders default gradebook" do
-        get "show", params: { course_id: @course.id, version: "default", new_gradebook: "true" }
-        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+        get "show", params: { course_id: @course.id, version: "default" }
+        expect(response).to render_template("gradebooks/gradebook")
       end
     end
 
@@ -703,8 +702,8 @@ describe GradebooksController do
       end
 
       it "renders screenreader gradebook" do
-        get "show", params: { course_id: @course.id, version: "individual", new_gradebook: "true" }
-        expect(response).to render_template("gradebooks/gradezilla/individual")
+        get "show", params: { course_id: @course.id, version: "individual" }
+        expect(response).to render_template("gradebooks/individual")
       end
     end
 
@@ -1078,7 +1077,7 @@ describe GradebooksController do
       it "redirects to Individual View with a friendly URL" do
         @teacher.preferences[:gradebook_version] = "srgb"
         get "show", params: {:course_id => @course.id}
-        expect(response).to render_template("gradebooks/gradezilla/individual")
+        expect(response).to render_template("gradebooks/individual")
       end
 
       it "requests groups without wiki_page assignments" do
@@ -2077,11 +2076,6 @@ describe GradebooksController do
         expect(js_env[:grading_type]).to eq('percent')
       end
 
-      it 'sets new_gradebook_enabled to true' do
-        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-        expect(js_env[:new_gradebook_enabled]).to eq true
-      end
-
       it 'includes anonymous identities keyed by anonymous_id' do
         @assignment.update!(moderated_grading: true, grader_count: 2)
         anonymous_id = @assignment.create_moderation_grader(@teacher, occupy_slot: true).anonymous_id
@@ -2117,6 +2111,18 @@ describe GradebooksController do
         @assignment.update!(final_grader: @teacher, grader_count: 2, moderated_grading: true)
         get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
         expect(js_env[:final_grader_id]).to eql @teacher.id
+      end
+
+      it "sets filter_speed_grader_by_student_group_feature_enabled to true when enabled" do
+        @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env.fetch(:filter_speed_grader_by_student_group_feature_enabled)).to be true
+      end
+
+      it "sets filter_speed_grader_by_student_group_feature_enabled to false when disabled" do
+        @course.root_account.disable_feature!(:filter_speed_grader_by_student_group)
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env.fetch(:filter_speed_grader_by_student_group_feature_enabled)).to be false
       end
 
       describe "student group filtering" do
@@ -2290,7 +2296,6 @@ describe GradebooksController do
     describe "new_gradebook_plagiarism_icons_enabled" do
       it "is set to true if New Gradebook Plagiarism Icons are on" do
         @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
-
         get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
         expect(assigns[:js_env][:new_gradebook_plagiarism_icons_enabled]).to be true
       end

@@ -97,6 +97,7 @@ export default class LinkOptionsDialogController {
         onExited={this._hasClosed}
         onRequestClose={this._dismissDialog}
         onSave={linkOptions => {
+          bridge.focusEditor(this._editor.rceWrapper)
           this._applyLinkOptions(linkOptions)
         }}
         open={this._shouldOpen}

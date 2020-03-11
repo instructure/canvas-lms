@@ -574,7 +574,6 @@ describe RubricAssessment do
 
       describe "submission posting" do
         before(:once) do
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
         end
 

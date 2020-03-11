@@ -64,7 +64,7 @@ class QuizzesNext::QuizzesApiController < ApplicationController
 
       scope = Assignments::ScopedToUser.new(@context, @current_user).scope
       new_quizzes = Assignment.search_by_attribute(scope, :title, params[:search_term])
-      new_quizzes = new_quizzes.select(&:quiz_lti?)
+      new_quizzes = new_quizzes.type_quiz_lti
 
       old_quizzes + new_quizzes
     end

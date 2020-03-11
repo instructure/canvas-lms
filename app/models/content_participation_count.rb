@@ -91,12 +91,12 @@ class ContentParticipationCount < ActiveRecord::Base
             SQL
         (subs_with_grades + subs_with_comments).uniq
       end
-      already_read_count = ContentParticipation.where(
+      already_read_count = potential_ids.any? ? ContentParticipation.where(
         :content_type => "Submission",
         :content_id => potential_ids,
         :user_id => user,
         :workflow_state => "read"
-      ).count
+      ).count : 0
       potential_ids.size - already_read_count
     end
   end
@@ -107,10 +107,8 @@ class ContentParticipationCount < ActiveRecord::Base
   end
 
   def refresh_unread_count
-    transaction do
-      self.unread_count = ContentParticipationCount.unread_count_for(content_type, context, user)
-      Shackles.activate(:master) {self.save} if self.changed?
-    end
+    self.unread_count = ContentParticipationCount.unread_count_for(content_type, context, user)
+    Shackles.activate(:master) {self.save} if self.changed?
   end
 
   # Things we know of that will only get updated by a refresh:

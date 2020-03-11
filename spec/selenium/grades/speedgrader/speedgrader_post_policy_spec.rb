@@ -76,7 +76,6 @@ describe 'Speed Grader Post Policy' do
   before :once do
     @teacher = course_with_teacher(course_name: 'Post Policy Course', name: 'Teacher', active_all: true).user
     @course = Course.find_by!(name: 'Post Policy Course')
-    @course.enable_feature!(:new_gradebook)
     PostPolicy.enable_feature!
     @course.default_post_policy.update!(post_manually: true)
 

@@ -20,9 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Quizzes::QuizzesController do
 
-  def course_quiz(active=false)
+  def course_quiz(active=false, title=nil)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active
+    @quiz.title = title if title
     @quiz.save!
     @quiz
   end
@@ -274,13 +275,14 @@ describe Quizzes::QuizzesController do
     end
 
     context 'when newquizzes_on_quiz_page FF is enabled' do
+      let_once(:due_at) { Time.zone.now + 1.week }
       let_once(:course_assignments) do
         group = @course.assignment_groups.create(:name => "some group")
         (0..3).map do |i|
           @course.assignments.create(
             title: "some assignment #{i}",
             assignment_group: group,
-            due_at: Time.zone.now + 1.week,
+            due_at: due_at,
             external_tool_tag_attributes: { content: tool },
             workflow_state: workflow_states[i]
           )
@@ -288,7 +290,7 @@ describe Quizzes::QuizzesController do
       end
 
       let_once(:course_quizzes) do
-        [course_quiz, course_quiz(true)]
+        [course_quiz(false, 'quiz 1'), course_quiz(true, 'quiz 2')]
       end
 
       let_once(:workflow_states) do
@@ -317,19 +319,20 @@ describe Quizzes::QuizzesController do
       end
 
       context "teacher interface" do
-        it "includes all old quizzes and new quizzes" do
+        it "includes all old quizzes and new quizzes, sorted by [due_date, title]" do
           user_session(@teacher)
           get 'index', params: { course_id: @course.id }
           expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
           expect(controller.js_env[:QUIZZES][:assignment].count).to eq(4)
+
           expect(
-            controller.js_env[:QUIZZES][:assignment].map{ |x| x[:id] }
-          ).to contain_exactly(
-            course_quizzes[0].id,
-            course_quizzes[1].id,
-            course_assignments[2].id,
-            course_assignments[3].id
-          )
+            controller.js_env[:QUIZZES][:assignment].map{ |x| [x[:id], x[:due_at], x[:title]] }
+          ).to eq([
+            [course_assignments[2].id, due_at, 'some assignment 2'],
+            [course_assignments[3].id, due_at, 'some assignment 3'],
+            [course_quizzes[0].id, nil, 'quiz 1'],
+            [course_quizzes[1].id, nil, 'quiz 2']
+          ])
         end
       end
 
@@ -552,7 +555,6 @@ describe Quizzes::QuizzesController do
         user_session(@student)
         course_quiz(true)
 
-        @quiz.assignment.course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -1314,7 +1316,6 @@ describe Quizzes::QuizzesController do
 
     context "when post policies is enabled" do
       before(:each) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
 
         user_session(@student)
@@ -2584,7 +2585,6 @@ describe Quizzes::QuizzesController do
       end
 
       before(:each) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
 
         @quiz.assignment = assignment

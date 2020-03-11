@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import formatMessage from '../format-message'
 import sanitizeEditorOptions from './sanitizeEditorOptions'
 import wrapInitCb from './wrapInitCb'
 import normalizeLocale from './normalizeLocale'
@@ -56,6 +57,11 @@ export default function(props, tinymce, MutationObserver) {
   // tell tinyMCE not to put its own branding in the footer of the editor
   editorOptions.branding = false
 
+  // we provide our own statusbar
+  editorOptions.statusbar = false
+
+  configureMenus(editorOptions)
+
   return {
     // other props, including overrides
     ...props,
@@ -64,5 +70,20 @@ export default function(props, tinymce, MutationObserver) {
     // props
     editorOptions,
     tinymce
+  }
+}
+
+function configureMenus(editorOptions) {
+  editorOptions.menubar = 'edit insert format tools table'
+  editorOptions.menu = {
+    // default edit menu is fine
+    insert: {
+      title: formatMessage('Insert'),
+      items:
+        'instructure_links instructure_image instructure_media instructure_document | instructure_equation inserttable | hr'
+    }
+    // default format menu is fine
+    // default tools menu is fine
+    // default table menu is fine
   }
 }

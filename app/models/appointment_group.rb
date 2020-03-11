@@ -229,8 +229,8 @@ class AppointmentGroup < ActiveRecord::Base
         )
         COND
   }
-  scope :current, -> { where("end_at>=?", Time.zone.now.midnight) }
-  scope :current_or_undated, -> { where("end_at>=? OR end_at IS NULL", Time.zone.now.midnight) }
+  scope :current, -> { where("end_at>=?", Time.zone.now) }
+  scope :current_or_undated, -> { where("end_at>=? OR end_at IS NULL", Time.zone.now) }
   scope :intersecting, lambda { |start_date, end_date| where("start_at<? AND end_at>?", end_date, start_date) }
 
   set_policy do
@@ -434,13 +434,14 @@ class AppointmentGroup < ActiveRecord::Base
     types.first || 'User'
   end
 
-  def available_slots
+  def available_slots(current_only: false)
     return nil unless participants_per_appointment
     Rails.cache.fetch([self, 'available_slots'].cache_key) do
+      filtered_appointments = current_only ? appointments.current : appointments
       # participants_per_appointment can change after the fact, so a given
       # could exceed it and we can't just say:
       #   appointments.size * participants_per_appointment
-      appointments.inject(0){ |total, appointment|
+      filtered_appointments.inject(0){ |total, appointment|
         total + [participants_per_appointment - appointment.child_events.size, 0].max
       }
     end

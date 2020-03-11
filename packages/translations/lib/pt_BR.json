@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Reprodutor de áudio para { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Conteúdo com salvamento automático existe. Gostaria de carregar o conteúdo com salvamento automático em seu lugar?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Automaticamente abre uma pré-visualização em linha. (Pré-visualização obtida apenas após salvar)"
     },
@@ -143,14 +146,23 @@
     "clear_selected_file_82388e50": {
         "message": "Limpar arquivo selecionado"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Limpar arquivo selecionado: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Clique em qualquer página para inserir um link para para essa página."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Clique para incorporar { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Clique para ocultar a pré-visualização"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Clique para inserir um link no editor."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Clique para mostrar a pré-visualização"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Feche um menu ou diálogo. Também lhe retorna para a área do editor"
@@ -299,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Exibir link de texto (abre em uma nova aba)"
     },
+    "document_678cd7bf": {
+        "message": "Documento"
+    },
     "documents_81393201": {
         "message": "Documentos"
     },
@@ -364,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Incorporar código de vídeo"
+    },
+    "equation_1c5ac93c": {
+        "message": "Equação"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Erro ao carregar notas"
@@ -434,6 +452,9 @@
     "formatting_5b143aa8": {
         "message": "Formatação"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Encontrou conteúdo com salvamento automático"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Encontrou { count, plural,\n     =0 {# resultados}\n    one {# resultado}\n  other {# resultados}\n}"
     },
@@ -479,6 +500,9 @@
     "height_69b03e15": {
         "message": "Altura"
     },
+    "image_8ad06": {
+        "message": "Imagem"
+    },
     "image_options_5412d02c": {
         "message": "Opções de imagem"
     },
@@ -490,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Aumentar recuo"
+    },
+    "insert_593145ef": {
+        "message": "Inserir"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Inserir links Equella"
@@ -647,6 +674,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Nenhum prazo de entrega atribuído"
     },
+    "no_e16d9132": {
+        "message": "Não"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Sem nota"
     },
@@ -749,6 +779,9 @@
     "preformatted_d0670862": {
         "message": "Pré-formatado"
     },
+    "preview_53003fd2": {
+        "message": "Pré-visualização"
+    },
     "preview_a3f8f854": {
         "message": "PRÉ-VISUALIZAÇÃO"
     },
@@ -790,6 +823,9 @@
     },
     "replies_4a8577c8": {
         "message": "Respostas"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Restaurar salvamento automático?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de conteúdo avançado"
@@ -1072,6 +1108,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Página inicial do wiki"
+    },
+    "yes_dde87d5": {
+        "message": "Sim"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Ontem às { date }"

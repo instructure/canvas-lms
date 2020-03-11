@@ -21,7 +21,7 @@
 <% end -%>
 <%= before_label :course, "Course" %> <%= courses %>
 <% if asset.appointment_group.available_slots && asset.grants_right?(user, :read) -%>
-<%= before_label :slots_remaining, "Available time slots" %> <%= asset.appointment_group.available_slots %>
+<%= before_label :slots_remaining, "Available time slots" %> <%= asset.appointment_group.available_slots(current_only: true) %>
 <% end -%>
 
 <%= before_label :cancel_reason, "Reason for canceling" %>

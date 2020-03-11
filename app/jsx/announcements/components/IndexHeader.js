@@ -24,7 +24,7 @@ import I18n from 'i18n!announcements_v2'
 import React, {Component} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
-import {Grid, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {
   IconLockLine,
   IconPlusLine,
@@ -110,104 +110,103 @@ export default class IndexHeader extends Component {
     return (
       <View>
         <View margin="0 0 medium" display="block">
-          <Grid>
-            <Grid.Row hAlign="space-between">
-              <Grid.Col width={2}>
-                <FormField
-                  id="announcement-filter"
-                  label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}
+          <Flex wrapItems wrap="wrap" justifyItems="end">
+            <Flex.Item grow>
+              <FormField
+                id="announcement-filter"
+                label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}
+              >
+                <select
+                  name="filter-dropdown"
+                  onChange={e => this.props.searchAnnouncements({filter: e.target.value})}
+                  style={{
+                    margin: '0',
+                    width: '100%'
+                  }}
                 >
-                  <select
-                    name="filter-dropdown"
-                    onChange={e => this.props.searchAnnouncements({filter: e.target.value})}
-                    style={{
-                      margin: '0',
-                      width: '100%'
-                    }}
-                  >
-                    {Object.keys(filters).map(filter => (
-                      <option key={filter} value={filter}>
-                        {filters[filter]}
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
-              </Grid.Col>
-              <Grid.Col width={4}>
-                <TextInput
-                  label={
-                    <ScreenReaderContent>
-                      {I18n.t('Search announcements by title')}
-                    </ScreenReaderContent>
-                  }
-                  placeholder={I18n.t('Search')}
-                  icon={() => <IconSearchLine />}
-                  ref={this.searchInputRef}
-                  onChange={this.onSearch}
-                  name="announcements_search"
-                />
-              </Grid.Col>
-              <Grid.Col width={6} textAlign="end">
-                {this.props.permissions.manage_content &&
-                  !this.props.announcementsLocked &&
-                  (this.props.isToggleLocking ? (
-                    <Button
-                      disabled={this.props.isBusy || this.props.selectedCount === 0}
-                      size="medium"
-                      margin="0 small 0 0"
-                      id="lock_announcements"
-                      onClick={this.props.toggleSelectedAnnouncementsLock}
-                    >
-                      <IconLockLine />
-                      <ScreenReaderContent>
-                        {I18n.t('Lock Selected Announcements')}
-                      </ScreenReaderContent>
-                    </Button>
-                  ) : (
-                    <Button
-                      disabled={this.props.isBusy || this.props.selectedCount === 0}
-                      size="medium"
-                      margin="0 small 0 0"
-                      id="lock_announcements"
-                      onClick={this.props.toggleSelectedAnnouncementsLock}
-                    >
-                      <IconUnlockLine />
-                      <ScreenReaderContent>
-                        {I18n.t('Unlock Selected Announcements')}
-                      </ScreenReaderContent>
-                    </Button>
+                  {Object.keys(filters).map(filter => (
+                    <option key={filter} value={filter}>
+                      {filters[filter]}
+                    </option>
                   ))}
-                {this.props.permissions.manage_content && (
+                </select>
+              </FormField>
+            </Flex.Item>
+
+            <Flex.Item grow margin="0 0 0 small">
+              <TextInput
+                label={
+                  <ScreenReaderContent>
+                    {I18n.t('Search announcements by title')}
+                  </ScreenReaderContent>
+                }
+                placeholder={I18n.t('Search')}
+                icon={() => <IconSearchLine />}
+                ref={this.searchInputRef}
+                onChange={this.onSearch}
+                name="announcements_search"
+              />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 small">
+              {this.props.permissions.manage_content &&
+                !this.props.announcementsLocked &&
+                (this.props.isToggleLocking ? (
                   <Button
                     disabled={this.props.isBusy || this.props.selectedCount === 0}
                     size="medium"
                     margin="0 small 0 0"
-                    id="delete_announcements"
-                    onClick={this.onDelete}
-                    ref={c => {
-                      this.deleteBtn = c
-                    }}
+                    id="lock_announcements"
+                    onClick={this.props.toggleSelectedAnnouncementsLock}
                   >
-                    <IconTrashLine />
+                    <IconLockLine />
                     <ScreenReaderContent>
-                      {I18n.t('Delete Selected Announcements')}
+                      {I18n.t('Lock Selected Announcements')}
                     </ScreenReaderContent>
                   </Button>
-                )}
-                {this.props.permissions.create && (
+                ) : (
                   <Button
-                    href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
-                    variant="primary"
-                    id="add_announcement"
+                    disabled={this.props.isBusy || this.props.selectedCount === 0}
+                    size="medium"
+                    margin="0 small 0 0"
+                    id="lock_announcements"
+                    onClick={this.props.toggleSelectedAnnouncementsLock}
                   >
-                    <IconPlusLine />
-                    <ScreenReaderContent>{I18n.t('Add announcement')}</ScreenReaderContent>
-                    <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
+                    <IconUnlockLine />
+                    <ScreenReaderContent>
+                      {I18n.t('Unlock Selected Announcements')}
+                    </ScreenReaderContent>
                   </Button>
-                )}
-              </Grid.Col>
-            </Grid.Row>
-          </Grid>
+                ))}
+              {this.props.permissions.manage_content && (
+                <Button
+                  disabled={this.props.isBusy || this.props.selectedCount === 0}
+                  size="medium"
+                  margin="0 small 0 0"
+                  id="delete_announcements"
+                  onClick={this.onDelete}
+                  ref={c => {
+                    this.deleteBtn = c
+                  }}
+                >
+                  <IconTrashLine />
+                  <ScreenReaderContent>
+                    {I18n.t('Delete Selected Announcements')}
+                  </ScreenReaderContent>
+                </Button>
+              )}
+              {this.props.permissions.create && (
+                <Button
+                  href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
+                  variant="primary"
+                  id="add_announcement"
+                >
+                  <IconPlusLine />
+                  <ScreenReaderContent>{I18n.t('Add announcement')}</ScreenReaderContent>
+                  <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
+                </Button>
+              )}
+            </Flex.Item>
+          </Flex>
         </View>
         <ExternalFeedsTray
           atomFeedUrl={this.props.atomFeedUrl}

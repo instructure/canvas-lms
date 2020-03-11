@@ -22,6 +22,7 @@ import Bridge from '../../bridge'
 import {fileEmbed} from '../../common/mimeClass'
 import {isPreviewable} from '../../rce/plugins/shared/Previewable'
 import {isImage, isAudioOrVideo} from '../../rce/plugins/shared/fileTypeUtils'
+import {fixupFileUrl} from '../../common/fileUrl'
 
 export const COMPLETE_FILE_UPLOAD = 'COMPLETE_FILE_UPLOAD'
 export const FAIL_FILE_UPLOAD = 'FAIL_FILE_UPLOAD'
@@ -135,8 +136,17 @@ export function embedUploadResult(results, selectedTabType) {
   const embedData = fileEmbed(results)
 
   if (selectedTabType === 'images' && isImage(embedData.type) && !linkingExistingContent()) {
-    const {href, url, title, display_name, alt_text} = results
-    Bridge.insertImage({href, url, title, display_name, alt_text})
+    const file_props = {
+      href: results.href || results.url,
+      title: results.title,
+      display_name: results.display_name || results.name || results.title || results.filename,
+      alt_text: results.alt_text,
+      content_type: results['content-type'],
+      contextType: results.contextType,
+      contextId: results.contextId,
+      uuid: results.uuid
+    }
+    Bridge.insertImage(file_props)
   } else if (
     selectedTabType === 'media' &&
     isAudioOrVideo(embedData.type) &&
@@ -145,19 +155,26 @@ export function embedUploadResult(results, selectedTabType) {
     Bridge.embedMedia({
       id: embedData.id,
       embedded_iframe_url: results.embedded_iframe_url,
-      href: results.url,
+      href: results.href || results.url,
       media_id: results.media_id,
       title: results.title,
-      type: embedData.type
+      type: embedData.type,
+      contextType: results.contextType,
+      contextId: results.contextId,
+      uuid: results.uuid
     })
   } else {
     Bridge.insertLink(
       {
         'data-canvas-previewable': isPreviewable(results['content-type']),
-        title: results.display_name,
-        href: results.url,
+        href: results.href || results.url,
+        title: results.display_name || results.name || results.title || results.filename,
+        content_type: results['content-type'],
         embed: embedData,
-        target: '_blank'
+        target: '_blank',
+        contextType: results.contextType,
+        contextId: results.contextId,
+        uuid: results.uuid
       },
       false
     )
@@ -253,7 +270,7 @@ export function setUsageRights(source, fileMetaProps, results) {
 }
 
 export function getFileUrlIfMissing(source, results) {
-  if (results.url) {
+  if (results.href || results.url) {
     return Promise.resolve(results)
   }
   return source.getFile(results.id).then(file => {
@@ -331,6 +348,9 @@ export function uploadPreflight(tabContext, fileMetaProps) {
         return getFileUrlIfMissing(source, results)
       })
       .then(results => {
+        return fixupFileUrl(contextType, contextId, results)
+      })
+      .then(results => {
         return generateThumbnailUrl(results, fileMetaProps.domObject, fileReader)
       })
       .then(results => {
@@ -342,7 +362,7 @@ export function uploadPreflight(tabContext, fileMetaProps) {
         return results
       })
       .then(results => {
-        return embedUploadResult(results, tabContext)
+        return embedUploadResult({contextType, contextId, ...results}, tabContext)
       })
       .then(results => {
         dispatch(allUploadCompleteActions(results, fileMetaProps, contextType))
