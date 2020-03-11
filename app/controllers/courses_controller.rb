@@ -2108,6 +2108,13 @@ class CoursesController < ApplicationController
 
   def render_course_notification_settings
     add_crumb(t("Course Notification Settings"))
+    js_env(
+      NOTIFICATION_PREFERENCES_OPTIONS: {
+        granular_course_preferences_enabled: @domain_root_account&.feature_enabled?(:notification_granular_course_preferences),
+        deprecate_sms_enabled: @domain_root_account&.feature_enabled?(:deprecate_sms),
+        allowed_sms_categories: Notification.categories_to_send_in_sms
+      }
+    )
     js_bundle :course_notification_settings_show
     render html: '', layout: true
   end

@@ -17,7 +17,7 @@
  */
 import AlertManager from '../../../shared/components/AlertManager'
 import CourseNotificationSettingsQuery from '../CourseNotificationSettingsQuery'
-import {COURSE_NOTIFICATIONS_ENABLED_QUERY} from '../graphqlData/Queries'
+import {COURSE_NOTIFICATIONS_QUERY} from '../graphqlData/Queries'
 import {createCache} from 'jsx/canvas-apollo'
 import {render} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
@@ -28,14 +28,14 @@ async function createGraphqlMocks(queryOverrides) {
   if (!Array.isArray(queryOverrides)) {
     queryOverrides = [queryOverrides]
   }
-  const queryResult = await mockGraphqlQuery(COURSE_NOTIFICATIONS_ENABLED_QUERY, queryOverrides, {
+  const queryResult = await mockGraphqlQuery(COURSE_NOTIFICATIONS_QUERY, queryOverrides, {
     courseId: 1
   })
 
   return [
     {
       request: {
-        query: COURSE_NOTIFICATIONS_ENABLED_QUERY,
+        query: COURSE_NOTIFICATIONS_QUERY,
         variables: {
           courseId: '1'
         }

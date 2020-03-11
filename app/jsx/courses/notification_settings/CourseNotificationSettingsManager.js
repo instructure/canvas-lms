@@ -21,13 +21,15 @@ import {bool, string} from 'prop-types'
 import I18n from 'i18n!courses'
 import {Mutation} from 'react-apollo'
 import NotificationPreferences from 'jsx/notification_preferences/NotificationPreferences'
+import NotificationPreferencesShape from 'jsx/notification_preferences/NotificationPreferencesShape'
 import React, {Component} from 'react'
 import {UPDATE_COURSE_NOTIFICATION_PREFERENCES} from './graphqlData/Mutations'
 
 export default class CourseNotifcationSettingsManager extends Component {
   static propTypes = {
     courseId: string.isRequired,
-    enabled: bool.isRequired
+    enabled: bool.isRequired,
+    notificationPreferences: NotificationPreferencesShape
   }
 
   handleUpdateComplete = data => {
@@ -59,6 +61,7 @@ export default class CourseNotifcationSettingsManager extends Component {
                 }
               })
             }
+            notificationPreferences={this.props.notificationPreferences}
           />
         )}
       </Mutation>

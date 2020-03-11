@@ -18,65 +18,25 @@
 
 import {arrayOf, shape, string} from 'prop-types'
 
-const CourseActivitiesShape = shape({
-  dueDate: string,
-  gradingPolicies: string,
-  courseContent: string,
-  files: string,
-  announcements: string,
-  announcementsCreatedByYou: string,
-  announcementReply: string,
-  grading: string,
-  invitation: string,
-  allSubmissions: string,
-  lateGrading: string,
-  submissionComment: string,
-  blueprint: string
+const NotificationShape = shape({
+  _id: string,
+  category: string,
+  categoryDisplayName: string,
+  name: string
 })
 
-const DiscussionsShape = shape({
-  discussion: string,
-  discussionEntry: string
-})
-
-const ConversationsShape = shape({
-  addedToConversation: string,
-  conversationMessage: string,
-  conversationCreated: string
-})
-
-const SchedulingShape = shape({
-  studentAppointmentSignups: string,
-  appointmentSignups: string,
-  appointmentCancelations: string,
-  appointmentAvailability: string,
-  calendar: string
-})
-
-const GroupsShape = shape({
-  membershipUpdate: string
-})
-
-const ConferencesShape = shape({
-  recordingReady: string
-})
-
-const AlertsShape = shape({
-  other: string,
-  contentLinkError: string,
-  accountNotification: string
+const NotificationPolicyShape = shape({
+  communicationChannelId: string,
+  frequency: string,
+  notification: NotificationShape
 })
 
 const ChannelShape = shape({
+  _id: string,
   path: string,
   pathType: string,
-  courseActivities: CourseActivitiesShape,
-  discussions: DiscussionsShape,
-  conversations: ConversationsShape,
-  scheduling: SchedulingShape,
-  groups: GroupsShape,
-  conferences: ConferencesShape,
-  alerts: AlertsShape
+  notificationPolicies: arrayOf(NotificationPolicyShape),
+  notificationPolicyOverrides: arrayOf(NotificationPolicyShape)
 })
 
 const NotificationPreferencesShape = shape({
