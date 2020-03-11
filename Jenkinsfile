@@ -217,7 +217,7 @@ pipeline {
           }
         }
 
-        stage('Javscript') {
+        stage('Javascript') {
           steps {
             skipIfPreviouslySuccessful("javascript") {
               build(job: 'test-suites/JS', parameters: buildParameters)
