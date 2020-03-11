@@ -22,6 +22,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 describe UsersController do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   describe "external_tool" do
     let(:account) { Account.default }
 
@@ -900,8 +904,9 @@ describe UsersController do
       before(:each) do
         unposted_assignment = assignment_model(
           course: course, due_at: Time.zone.now,
-          points_possible: 90, muted: true
+          points_possible: 90
         )
+        unposted_assignment.ensure_post_policy(post_manually: true)
         unposted_assignment.grade_student(student, grade: '100%', grader: @teacher)
 
         user_session(@teacher)
