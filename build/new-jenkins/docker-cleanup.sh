@@ -22,7 +22,7 @@ whitelist+=('starlord.inscloudgate.net/jenkins/canvas-lms:master')
 whitelist+=('starlord.inscloudgate.net/jenkins/dynamodb-local')
 whitelist+=('starlord.inscloudgate.net/jenkins/redis')
 whitelist+=('starlord.inscloudgate.net/jenkins/cassandra')
-whitelist+=('starlord.inscloudgate.net/jenkins/postgres')
+whitelist+=('starlord.inscloudgate.net/jenkins/postgis')
 
 ALLOW_FAILURE="0"
 CLEAN_ALL="0"
