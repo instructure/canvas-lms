@@ -22,6 +22,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../lti2_spec_helper')
 
 describe AssignmentsController do
   before :once do
+    PostPolicy.enable_feature!
+
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
     course_assignment
@@ -1040,7 +1042,7 @@ describe AssignmentsController do
 
       describe 'anonymize_students' do
         it "is included in the response" do
-          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: true }, format: 'json'
+          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: !@assignment.muted }, format: 'json'
           assignment_json = json_parse(response.body)['assignment']
           expect(assignment_json).to have_key('anonymize_students')
         end
@@ -1048,20 +1050,20 @@ describe AssignmentsController do
         it "is true if the assignment is anonymous and muted" do
           @assignment.update!(anonymous_grading: true)
           @assignment.unmute!
-          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: true }, format: 'json'
+          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: !@assignment.muted }, format: 'json'
           assignment_json = json_parse(response.body)['assignment']
           expect(assignment_json.fetch('anonymize_students')).to be true
         end
 
         it "is false if the assignment is anonymous and unmuted" do
           @assignment.update!(anonymous_grading: true)
-          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: false }, format: 'json'
+          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: !@assignment.muted }, format: 'json'
           assignment_json = json_parse(response.body)['assignment']
           expect(assignment_json.fetch('anonymize_students')).to be false
         end
 
         it "is false if the assignment is not anonymous" do
-          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: true }, format: 'json'
+          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: !@assignment.muted }, format: 'json'
           assignment_json = json_parse(response.body)['assignment']
           expect(assignment_json.fetch('anonymize_students')).to be false
         end
