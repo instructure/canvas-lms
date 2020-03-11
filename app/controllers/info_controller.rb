@@ -113,4 +113,38 @@ class InfoController < ApplicationController
 
     render status: 404, template: "shared/errors/404_message"
   end
+
+  def mobile_manifest
+    icon = brand_variable('ic-brand-apple-touch-icon')
+    render json: {
+      name: "Canvas",
+      short_name: "Canvas",
+      icons: [
+        {
+          src: icon,
+          sizes: "144x144",
+          type: "image/png"
+        },
+        {
+          src: icon,
+          sizes: "192x192",
+          type: "image/png"
+        }
+      ],
+      prefer_related_applications: true,
+      related_applications: [
+        {
+          platform: "play",
+          url: "https://play.google.com/store/apps/details?id=com.instructure.candroid",
+          id: "com.instructure.candroid"
+        },
+        {
+          platform: "itunes",
+          url: "https://itunes.apple.com/app/canvas-by-instructure/id480883488"
+        }
+      ],
+      start_url: "/",
+      display: "minimal-ui"
+    }
+  end
 end
