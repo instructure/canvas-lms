@@ -22,11 +22,13 @@ import contentItems from './ContentItems'
 
 QUnit.module('TinyMCEContentItem LTI Link', {
   setup() {
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['microphone', 'camera', 'midi']
     const textarea = $("<textarea id='a42' data-rich_text='true'></textarea>")
     $('#fixtures').append(textarea)
     return tinymce.init({selector: '#fixtures textarea#a42'})
   },
   teardown() {
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
     $('#fixtures').empty()
   }
 })
@@ -105,6 +107,7 @@ test("Handles LTI link with presentation target of 'frame' and thumbnail is *NOT
 
 test("Handles LTI link with presentation target of 'iframe' and thumbnail is *NOT* set", () => {
   const contentItem = TinyMCEContentItem.fromJSON(contentItems.lti_iframe)
+  const expectedFrameAllowances = ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')
   equal(contentItem.text, 'Arch Linux plain iframe')
   equal(
     contentItem.url,
@@ -112,7 +115,7 @@ test("Handles LTI link with presentation target of 'iframe' and thumbnail is *NO
   )
   equal(
     contentItem.codePayload,
-    '<iframe src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay *" width="800" height="600" style="width: 800px; height: 600px;"></iframe>'
+    `<iframe src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="${expectedFrameAllowances}" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`
   )
 })
 
@@ -135,8 +138,12 @@ test("Handles LTI link with presentation target of 'window' and thumbnail is *NO
 })
 
 QUnit.module('TinyMCEContentItem File Item', {
-  setup() {},
-  teardown() {}
+  setup() {
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['microphone', 'camera', 'midi']
+  },
+  teardown() {
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
+  }
 })
 
 test("Handles File item with presentation target of 'embed' and thumbnail is set", () => {
@@ -158,11 +165,12 @@ test("Handles File item with presentation target of 'frame' and thumbnail is set
 
 test("Handles File item with presentation target of 'iframe' and thumbnail is set", () => {
   const contentItem = TinyMCEContentItem.fromJSON(contentItems.text_thumb_iframe)
+  const expectedFrameAllowances = ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')
   equal(contentItem.text, 'Arch Linux file item thumbnail iframe')
   equal(contentItem.url, 'http://lti-tool-provider-example.dev/test_file.txt')
   equal(
     contentItem.codePayload,
-    '<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay *" width="800" height="600" style="width: 800px; height: 600px;"></iframe>'
+    `<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="${expectedFrameAllowances}" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`
   )
 })
 
@@ -195,11 +203,12 @@ test("Handles File item with presentation target of 'frame' and thumbnail is *NO
 
 test("Handles File item with presentation target of 'iframe' and thumbnail is *NOT* set", () => {
   const contentItem = TinyMCEContentItem.fromJSON(contentItems.text_iframe)
+  const expectedFrameAllowances = ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')
   equal(contentItem.text, 'Arch Linux file item iframe')
   equal(contentItem.url, 'http://lti-tool-provider-example.dev/test_file.txt')
   equal(
     contentItem.codePayload,
-    '<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay *" width="800" height="600" style="width: 800px; height: 600px;"></iframe>'
+    `<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="${expectedFrameAllowances}" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`
   )
 })
 
