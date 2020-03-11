@@ -21,6 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe GradebooksHelper do
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   before do
     FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible, :anonymous_grading) do
       def anonymous_grading?
@@ -82,21 +86,15 @@ describe GradebooksHelper do
       expect(helper.force_anonymous_grading?(assignment)).to eq true
     end
 
-    it 'returns true for a muted anonymously-graded assignment' do
+    it 'returns true for an anonymously-graded assignment' do
       assignment = assignment_model
-      assignment.anonymous_grading = true
-      assignment.muted = true
+      allow(assignment).to receive(:anonymize_students?).and_return(true)
       expect(helper.force_anonymous_grading?(assignment)).to be true
-    end
-
-    it 'returns false for an unmuted anonymously-graded assignment' do
-      assignment = assignment_model
-      assignment.anonymous_grading = true
-      expect(helper.force_anonymous_grading?(assignment)).to be false
     end
 
     it 'returns false for a non-anonymously-graded assignment' do
       assignment = assignment_model
+      allow(assignment).to receive(:anonymize_students?).and_return(false)
       expect(helper.force_anonymous_grading?(assignment)).to eq false
     end
   end
@@ -113,8 +111,7 @@ describe GradebooksHelper do
 
     it 'returns anonymous grading' do
       assignment = assignment_model
-      assignment.anonymous_grading = true
-      assignment.muted = true
+      allow(assignment).to receive(:anonymize_students?).and_return(true)
       expect(helper.force_anonymous_grading_reason(assignment)).to match(/anonymous grading/)
     end
   end
