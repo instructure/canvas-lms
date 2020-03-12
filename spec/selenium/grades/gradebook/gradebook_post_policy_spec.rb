@@ -45,8 +45,6 @@ describe 'Gradebook Post Policy' do
       active_user: true
     ).course
     @teacher2 = @teacher
-    # enable post policy and set manual/automatically
-    PostPolicy.enable_feature!
     @course_with_manual_post.default_post_policy.update!(post_manually: true)
     @course_with_auto_post.default_post_policy.update!(post_manually: false)
 

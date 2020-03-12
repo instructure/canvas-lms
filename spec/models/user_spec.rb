@@ -525,11 +525,7 @@ describe User do
   end
 
   describe "#recent_feedback" do
-    let_once(:post_policies_course) do
-      course = Course.create!(workflow_state: :available)
-      PostPolicy.enable_feature!
-      course
-    end
+    let_once(:post_policies_course) { Course.create!(workflow_state: :available) }
     let_once(:auto_posted_assignment) { post_policies_course.assignments.create!(points_possible: 10) }
     let_once(:manual_posted_assignment) do
       assignment = post_policies_course.assignments.create!(points_possible: 10)

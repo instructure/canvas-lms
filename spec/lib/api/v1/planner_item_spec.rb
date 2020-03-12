@@ -28,8 +28,6 @@ describe Api::V1::PlannerItem do
   end
 
   before :once do
-    PostPolicy.enable_feature!
-
     course_factory active_all: true
     @course.root_account.enable_feature!(:student_planner)
 

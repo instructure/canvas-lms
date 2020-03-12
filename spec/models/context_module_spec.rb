@@ -19,10 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextModule do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   def course_module
     course_with_student(active_all: true)
     @module = @course.context_modules.create!(:name => "some module")

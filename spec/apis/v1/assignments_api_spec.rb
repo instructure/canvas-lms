@@ -28,10 +28,6 @@ describe AssignmentsApiController, type: :request do
   include Api::V1::Submission
   include LtiSpecHelper
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   context 'locked api item' do
     include_examples 'a locked api item'
 

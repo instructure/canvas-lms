@@ -19,10 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextModuleProgression do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   before do
     @course = course_factory(active_all: true)
     @module = @course.context_modules.create!(:name => "some module")
@@ -169,7 +165,6 @@ describe ContextModuleProgression do
       let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
 
       before(:each) do
-        PostPolicy.enable_feature!
         @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: 90}})
         @submission = assignment.submit_homework(@user, body: "my homework")
       end

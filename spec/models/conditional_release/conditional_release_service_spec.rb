@@ -36,10 +36,6 @@ describe ConditionalRelease::Service do
     allow(Service).to receive(:enabled_in_context?).and_return(true)
   end
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   before(:each) do
     clear_config
   end

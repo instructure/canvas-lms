@@ -30,10 +30,6 @@ class TestCourseApi
 end
 
 describe Api::V1::Course do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   describe '#course_json' do
     before :once do
       @test_api = TestCourseApi.new

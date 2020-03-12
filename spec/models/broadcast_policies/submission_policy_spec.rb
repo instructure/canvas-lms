@@ -208,7 +208,6 @@ module BroadcastPolicies
 
       before(:once) do
         course.enroll_student(student)
-        PostPolicy.enable_feature!
       end
 
       before(:each) do

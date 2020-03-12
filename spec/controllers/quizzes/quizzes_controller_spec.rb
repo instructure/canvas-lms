@@ -66,8 +66,6 @@ describe Quizzes::QuizzesController do
   end
 
   before :once do
-    PostPolicy.enable_feature!
-
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
     @student2 = @student

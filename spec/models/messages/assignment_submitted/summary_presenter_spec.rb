@@ -32,10 +32,6 @@ describe Messages::AssignmentSubmitted::SummaryPresenter do
     @submission.reload
   end
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   describe "Presenter instance" do
     let(:message) { Message.new(context: submission, user: teacher) }
     let(:presenter) { Messages::AssignmentSubmitted::SummaryPresenter.new(message) }

@@ -21,8 +21,6 @@ require_relative '../sharding_spec_helper'
 describe GradeCalculator do
   before :each do
     course_with_student active_all: true
-
-    PostPolicy.enable_feature!
   end
 
   context "computing grades" do

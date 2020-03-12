@@ -22,10 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 describe UsersController do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   describe "external_tool" do
     let(:account) { Account.default }
 

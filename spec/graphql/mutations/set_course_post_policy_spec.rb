@@ -25,8 +25,6 @@ describe Mutations::SetCoursePostPolicy do
   let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
   let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
 
-  before(:each) { PostPolicy.enable_feature! }
-
   def mutation_str(course_id: nil, post_manually: nil)
     input_string = course_id ? "courseId: #{course_id}" : ""
     input_string += " postManually: #{post_manually}" if post_manually.present?

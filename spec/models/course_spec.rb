@@ -23,10 +23,6 @@ require 'csv'
 require 'socket'
 
 describe Course do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   include_examples "outcome import context examples"
 
   describe 'relationships' do
@@ -53,8 +49,6 @@ end
 
 describe Course do
   before :once do
-    PostPolicy.enable_feature!
-
     Account.default
     Account.default.default_enrollment_term
   end
@@ -1755,8 +1749,6 @@ end
 
 describe Course, "gradebook_to_csv" do
   before :once do
-    PostPolicy.enable_feature!
-
     course_with_student active_all: true
     teacher_in_course active_all: true
   end

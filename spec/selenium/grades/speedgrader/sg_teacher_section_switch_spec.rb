@@ -29,8 +29,6 @@ describe "In speedgrader" do
 
   context "as a teacher in course with unlimited sections " do
     before(:each) do
-      PostPolicy.enable_feature!
-
       @teacher_enrollment = course_with_teacher(course: @course, active_all: true)
       user_logged_in(user: @teacher)
       @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)
