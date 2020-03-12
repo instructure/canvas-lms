@@ -58,7 +58,7 @@ class ObserverEnrollment < Enrollment
       context.shard.activate do
         associated_user_ids = context.observer_enrollments.where(user_id: current_user)
           .where("associated_user_id IS NOT NULL").select(:associated_user_id)
-        context.student_enrollments.
+        context.active_students.
           where(user_id: associated_user_ids).group_by(&:user)
       end
     end
