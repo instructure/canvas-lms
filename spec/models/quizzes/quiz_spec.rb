@@ -20,8 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../lib/canvas/draft_state_validations_spec.rb')
 
 describe Quizzes::Quiz do
-
   before :once do
+    PostPolicy.enable_feature!
+
     course_factory
   end
 
@@ -169,28 +170,16 @@ describe Quizzes::Quiz do
       expect(@quiz).not_to be_anonymize_students
     end
 
-    it 'returns true if the assignment is anonymous and muted' do
+    it 'returns true if the assignment anonymizes students' do
       @quiz.assignment = @assignment
-      @assignment.anonymous_grading = true
-      @assignment.muted = true
+      allow(@assignment).to receive(:anonymize_students?).and_return(true)
       expect(@quiz).to be_anonymize_students
     end
 
-    it 'returns false if the assignment is anonymous and unmuted' do
+    it 'returns false if the assignment does not anonymize students' do
       @quiz.assignment = @assignment
-      @assignment.anonymous_grading = true
+      allow(@assignment).to receive(:anonymize_students?).and_return(false)
       expect(@quiz).not_to be_anonymize_students
-    end
-
-    it 'returns false if the assignment is not anonymous' do
-      @quiz.assignment = @assignment
-      expect(@quiz).not_to be_anonymize_students
-    end
-
-    it 'calls Assignment#anonymize_students if an assignment is present' do
-      @quiz.assignment = @assignment
-      expect(@assignment).to receive(:anonymize_students?).once
-      @quiz.anonymize_students?
     end
   end
 
@@ -430,11 +419,12 @@ describe Quizzes::Quiz do
     expect(q.assignment.messages_sent).to be_empty
   end
 
-  it "should send a message if notify_of_update is set" do
+  it "should send a message if notify_of_update is set and grades are posted" do
     Notification.create!(:name => 'Assignment Changed')
     @course.offer
     student_in_course(active_all: true)
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
+    a.unmute!
     expect(a.points_possible).to eql(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
     a.update_attribute(:created_at, Time.now - (40 * 60))

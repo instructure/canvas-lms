@@ -25,6 +25,7 @@ import select from '../../shared/select'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-elements'
@@ -94,50 +95,55 @@ export default class MigrationOptions extends React.Component {
     const isDisabled = MigrationStates.isLoadingState(this.props.migrationStatus)
 
     return (
-      <div className="bcs__history-notification">
-        <div className="bcs__history-settings">
-          <Checkbox
-            label={I18n.t('Include Course Settings')}
-            checked={this.props.willIncludeCourseSettings}
-            onChange={this.handleIncludeCourseSettingsChange}
-            size="small"
-            disabled={isDisabled}
-          />
-          <Checkbox
-            label={I18n.t('Send Notification')}
-            checked={this.props.willSendNotification}
-            onChange={this.handleSendNotificationChange}
-            size="small"
-            disabled={isDisabled}
-          />
-        </div>
+      <FormFieldGroup
+        description={<ScreenReaderContent>{I18n.t('History Settings')}</ScreenReaderContent>}
+        layout="stacked"
+        rowSpacing="small"
+      >
+        <Checkbox
+          label={I18n.t('Include Course Settings')}
+          checked={this.props.willIncludeCourseSettings}
+          onChange={this.handleIncludeCourseSettingsChange}
+          size="small"
+          disabled={isDisabled}
+        />
+        <Checkbox
+          label={I18n.t('Send Notification')}
+          checked={this.props.willSendNotification}
+          onChange={this.handleSendNotificationChange}
+          size="small"
+          disabled={isDisabled}
+        />
         {this.props.willSendNotification ? (
           <div className="bcs__history-notification__add-message">
             <Checkbox
-              label={I18n.t('Add a Message')}
+              label={
+                <div>
+                  <Text size="small">{I18n.t('Add a Message ')}</Text>
+                  <Text
+                    aria-label={I18n.t('%{chars} written, max character length %{len}', {
+                      chars: this.props.notificationMessage.length,
+                      len: MAX_NOTIFICATION_MESSAGE_LENGTH
+                    })}
+                    color="secondary"
+                    size="small"
+                    role="presentation"
+                  >
+                    (
+                    {I18n.t('%{len}/%{maxLen}', {
+                      len: this.props.notificationMessage.length,
+                      maxLen: MAX_NOTIFICATION_MESSAGE_LENGTH
+                    })}
+                    )
+                  </Text>
+                </div>
+              }
               checked={this.props.willIncludeCustomNotificationMessage}
               onChange={this.handleAddAMessageChange}
               inline
               size="small"
               disabled={isDisabled}
             />
-            <Text
-              aria-label={I18n.t('%{chars} written, max character length %{len}', {
-                chars: this.props.notificationMessage.length,
-                len: MAX_NOTIFICATION_MESSAGE_LENGTH
-              })}
-              as="span"
-              color="secondary"
-              size="small"
-              role="presentation"
-            >
-              (
-              {I18n.t('%{len}/%{maxLen}', {
-                len: this.props.notificationMessage.length,
-                maxLen: MAX_NOTIFICATION_MESSAGE_LENGTH
-              })}
-              )
-            </Text>
           </div>
         ) : null}
         {this.props.willSendNotification && this.props.willIncludeCustomNotificationMessage ? (
@@ -153,7 +159,7 @@ export default class MigrationOptions extends React.Component {
             />
           </div>
         ) : null}
-      </div>
+      </FormFieldGroup>
     )
   }
 }

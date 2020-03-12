@@ -126,8 +126,6 @@
   notifications:
     - name: Assignment Graded
       delay_for: <%= 15*60 %>
-    - name: Assignment Unmuted
-      delay_for: 0
     - name: Submission Graded
       delay_for: <%= 60*60 %>
     - name: Submission Grade Changed

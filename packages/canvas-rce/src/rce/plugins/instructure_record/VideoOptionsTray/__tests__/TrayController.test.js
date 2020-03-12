@@ -61,6 +61,12 @@ beforeAll(() => {
     const vid = elem.getAttribute('id')
     return mockVideoPlayers.find(vp => vp.id === vid)
   })
+
+  window.ENV = {
+    FEATURES: {
+      cc_in_rce_video_tray: true
+    }
+  }
 })
 
 afterAll(() => {

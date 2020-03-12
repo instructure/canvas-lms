@@ -598,7 +598,7 @@ describe('FileBrowser', () => {
         .find('TreeButton')
         .at(0)
         .simulate('click')
-      expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBeUndefined()
+      expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBe(false)
       wrapper
         .find('TreeButton')
         .at(1)

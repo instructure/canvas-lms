@@ -25,6 +25,7 @@ import {Spinner} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 import CanvasModal from 'jsx/shared/components/CanvasModal'
 import {CONTENT_SHARE_TYPES} from 'jsx/shared/proptypes/contentShare'
+import {showFlashSuccess} from 'jsx/shared/FlashAlert'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
 
 const DirectShareUserPanel = lazy(() => import('./DirectShareUserPanel'))
@@ -71,7 +72,7 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
   function handleSend() {
     setPostStatus('info')
     startSendOperation()
-      .then(() => setPostStatus('success'))
+      .then(sendSuccessful)
       .catch(err => {
         console.error(err) // eslint-disable-line no-console
         if (err.response) console.error(err.response) // eslint-disable-line no-console
@@ -79,12 +80,17 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
       })
   }
 
+  function sendSuccessful() {
+    showFlashSuccess(I18n.t('Content share started successfully'))()
+    modalProps.onDismiss()
+  }
+
   function Footer() {
     return (
       <>
         <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
         <Button
-          disabled={selectedUsers.length === 0 || postStatus !== null}
+          disabled={selectedUsers.length === 0 || postStatus === 'info'}
           variant="primary"
           margin="0 0 0 x-small"
           onClick={handleSend}
@@ -110,7 +116,6 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
 
   let alertMessage = ''
   if (postStatus === 'info') alertMessage = I18n.t('Starting content share')
-  else if (postStatus === 'success') alertMessage = I18n.t('Content share started successfully')
   else if (postStatus === 'error') alertMessage = I18n.t('Error starting content share')
 
   const alert = alertMessage ? (

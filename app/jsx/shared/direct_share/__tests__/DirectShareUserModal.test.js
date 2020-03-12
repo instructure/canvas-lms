@@ -44,13 +44,22 @@ describe('DirectShareUserModal', () => {
     jest.useFakeTimers()
 
     useContentShareUserSearchApi.mockImplementationOnce(({success}) => {
-      success([{id: 'abc', name: 'abc'}, {id: 'cde', name: 'cde'}])
+      success([
+        {id: 'abc', name: 'abc'},
+        {id: 'cde', name: 'cde'}
+      ])
     })
   })
 
   afterEach(() => {
     fetchMock.restore()
   })
+
+  function selectUser(getByText, getByLabelText, name = 'abc') {
+    fireEvent.change(getByLabelText(/send to:/i), {target: {value: name}})
+    act(() => jest.runAllTimers()) // let the debounce happen
+    fireEvent.click(getByText(name))
+  }
 
   it('disables the send button immediately', () => {
     const {getByText} = render(<DirectShareUserModal open courseId="1" />)
@@ -61,13 +70,11 @@ describe('DirectShareUserModal', () => {
     ).toBe('')
   })
 
-  it('enables the copy button when a user is selected', () => {
+  it('enables the send button only when a user is selected', () => {
     const {getByText, getAllByText, getByLabelText} = render(
       <DirectShareUserModal open courseId="1" />
     )
-    fireEvent.change(getByLabelText(/send to:/i), {target: {value: 'abc'}})
-    act(() => jest.runAllTimers()) // let the debounce happen
-    fireEvent.click(getByText('abc'))
+    selectUser(getByText, getByLabelText)
     expect(
       getByText('Send')
         .closest('button')
@@ -84,8 +91,7 @@ describe('DirectShareUserModal', () => {
 
   it('disables the send button when a search has started', () => {
     const {getByText, getByLabelText} = render(<DirectShareUserModal open courseId="1" />)
-    fireEvent.change(getByLabelText(/send to:/i), {target: {value: 'abc'}})
-    act(() => jest.runAllTimers()) // let the debounce happen
+    selectUser(getByText, getByLabelText)
     fireEvent.click(getByText('Send'))
     expect(
       getByText('Send')
@@ -96,16 +102,16 @@ describe('DirectShareUserModal', () => {
 
   it('starts a share operation and reports status', async () => {
     fetchMock.postOnce('path:/api/v1/users/self/content_shares', 200)
-    const {getByText, getByLabelText} = render(
+    const onDismiss = jest.fn()
+    const {getByText, getAllByText, getByLabelText} = render(
       <DirectShareUserModal
         open
         courseId="1"
         contentShare={{content_type: 'discussion_topic', content_id: '42'}}
+        onDismiss={onDismiss}
       />
     )
-    fireEvent.change(getByLabelText(/send to:/i), {target: {value: 'abc'}})
-    act(() => jest.runAllTimers()) // let the debounce happen
-    fireEvent.click(getByText('abc'))
+    selectUser(getByText, getByLabelText)
     fireEvent.click(getByText('Send'))
     const [, fetchOptions] = fetchMock.lastCall()
     expect(fetchOptions.method).toBe('POST')
@@ -116,22 +122,18 @@ describe('DirectShareUserModal', () => {
     })
     expect(getByText(/start/i)).toBeInTheDocument()
     await act(() => fetchMock.flush(true))
-    expect(getByText(/success/i)).toBeInTheDocument()
+    expect(getAllByText(/success/i)).toHaveLength(2) // visible and sr alert
+    expect(onDismiss).toHaveBeenCalled()
   })
 
   it('clears user selection when the modal is closed', async () => {
     fetchMock.get('*', [{id: 'abc', name: 'abc'}])
-    const {queryByText, getByText, findByLabelText, rerender} = render(
-      <DirectShareUserModal open />
+    const {queryByText, getByText, getByLabelText, rerender} = render(
+      <DirectShareUserModal open courseId="1" />
     )
-    const input = await findByLabelText('Send to:') // allow lazy code to load
-    fireEvent.focus(input)
-    fireEvent.change(input, {target: {value: 'abc'}})
-    act(() => jest.runAllTimers()) // let the debounce happen
-    await act(() => fetchMock.flush(true))
-    fireEvent.click(getByText('abc'))
-    rerender(<DirectShareUserModal open={false} />)
-    rerender(<DirectShareUserModal open />)
+    selectUser(getByText, getByLabelText)
+    rerender(<DirectShareUserModal open={false} courseId="1" />)
+    rerender(<DirectShareUserModal open courseId="1" />)
     expect(queryByText('abc')).toBeNull()
   })
 
@@ -153,12 +155,15 @@ describe('DirectShareUserModal', () => {
           contentShare={{content_type: 'discussion_topic', content_id: '42'}}
         />
       )
-      fireEvent.change(getByLabelText(/send to:/i), {target: {value: 'abc'}})
-      act(() => jest.runAllTimers()) // let the debounce happen
-      fireEvent.click(getByText('abc'))
+      selectUser(getByText, getByLabelText)
       fireEvent.click(getByText('Send'))
       await act(() => fetchMock.flush(true))
       expect(getByText(/error/i)).toBeInTheDocument()
+      expect(
+        getByText('Send')
+          .closest('button')
+          .getAttribute('disabled')
+      ).toBeNull()
     })
   })
 })

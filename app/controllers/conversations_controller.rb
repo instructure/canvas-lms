@@ -387,13 +387,13 @@ class ConversationsController < ApplicationController
         return render_error('context_code', 'invalid')
       end
 
+      if context.is_a?(Course) && context.workflow_state == 'completed' && !context.grants_right?(@current_user, session, :read_as_admin)
+        return render_error('Course concluded', 'Unable to send messages')
+      end
+
       shard = context.shard
       context_type = context.class.name
       context_id = context.id
-    end
-
-    if context.is_a?(Course) && context.workflow_state != 'available'
-      return render_error('Course concluded', 'Unable to send messages')
     end
 
     params[:recipients].each do |recipient|
@@ -880,6 +880,12 @@ class ConversationsController < ApplicationController
   #
   def add_message
     get_conversation(true)
+
+    context = @conversation.conversation.context
+    if context.is_a?(Course) && context.workflow_state == 'completed' && !context.grants_right?(@current_user, session, :read_as_admin)
+      return render json: {message: "Unable to send messages in a concluded course"}, status: :unauthorized
+    end
+
     if @conversation.conversation.replies_locked_for?(@current_user)
       return render_unauthorized_action
     end

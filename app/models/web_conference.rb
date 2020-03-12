@@ -158,6 +158,10 @@ class WebConference < ActiveRecord::Base
   end
   protected :assign_uuid
 
+  def course_broadcast_data
+    context.broadcast_data if context.respond_to?(:broadcast_data)
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :web_conference_invitation
     p.to do
@@ -166,12 +170,14 @@ class WebConference < ActiveRecord::Base
       end
     end
     p.whenever { context_is_available? && @new_participants && !@new_participants.empty? }
+    p.data { course_broadcast_data }
 
     p.dispatch :web_conference_recording_ready
     p.to { user }
     p.whenever do
       recording_ready? && saved_change_to_recording_ready?
     end
+    p.data { course_broadcast_data }
   end
 
   on_create_send_to_streams do

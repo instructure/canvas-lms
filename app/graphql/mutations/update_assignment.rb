@@ -66,7 +66,7 @@ class Mutations::UpdateAssignment < Mutations::AssignmentBase
     # This is here because update_api_assignment no longer respects `muted` as
     # a param. It is also being deprecated from the AssignmentBase mutation.
     muted = input_hash.delete(:muted)
-    if muted.present?
+    unless muted.nil?
       if muted != @working_assignment.muted?
         @working_assignment.update!(muted: muted)
       end

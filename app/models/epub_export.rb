@@ -54,18 +54,24 @@ class EpubExport < ActiveRecord::Base
     state :deleted
   end
 
+  def course_broadcast_data
+    course.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :content_export_finished
     p.to { [user] }
     p.whenever do |record|
       record.changed_state(:generated)
     end
+    p.data { course_broadcast_data }
 
     p.dispatch :content_export_failed
     p.to { [user] }
     p.whenever do |record|
       record.changed_state(:failed)
     end
+    p.data { course_broadcast_data }
   end
 
   after_create do

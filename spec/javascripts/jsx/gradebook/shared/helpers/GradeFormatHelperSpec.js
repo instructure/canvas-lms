@@ -164,6 +164,14 @@ test('rounds grades to two decimal places', () => {
   equal(GradeFormatHelper.formatGrade(10.325), '10.33')
 })
 
+test('rounds very small scores to two decimal places', () => {
+  strictEqual(GradeFormatHelper.formatGrade('.00000001', {gradingType: 'points'}), '0')
+})
+
+test('scientific notation grades show as rounded numeric grades', () => {
+  equal(GradeFormatHelper.formatGrade('1e-8', {gradingType: 'points'}), '0')
+})
+
 test('optionally rounds to a given precision', () => {
   equal(GradeFormatHelper.formatGrade(10.321, {precision: 3}), '10.321')
 })

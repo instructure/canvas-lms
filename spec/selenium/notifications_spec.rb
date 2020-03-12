@@ -24,6 +24,10 @@ describe "Notifications" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   context "admin" do
     before :once do
       course_with_student(active_all: true)
@@ -77,6 +81,7 @@ describe "Notifications" do
         @assignment.peer_reviews = true
         @assignment.anonymous_peer_reviews = true
         @assignment.save!
+        @assignment.unmute!
 
         setup_notification(@student, name: 'Submission Comment')
 

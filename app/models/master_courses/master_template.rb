@@ -277,7 +277,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     associations.keys.each_slice(50) do |master_sis_ids|
       templates = self.active.for_full_course.joins(:course).
         where(:courses => {:root_account_id => root_account, :sis_source_id => master_sis_ids}).
-        select("#{self.table_name}.*, courses.sis_source_id AS sis_source_id").to_a
+        select("#{self.table_name}.*, courses.sis_source_id AS sis_source_id, courses.account_id AS account_id").to_a
       if templates.count != master_sis_ids.count
         (master_sis_ids - templates.map(&:sis_source_id)).each do |missing_id|
           associations[missing_id].each do |target_course_id|
@@ -286,23 +286,28 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
         end
       end
 
+
       templates.each do |template|
         needs_migration = false
         associations[template.sis_source_id].each_slice(50) do |associated_sis_ids|
           data = root_account.all_courses.where(:sis_source_id => associated_sis_ids).not_master_courses.
             joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").
-            pluck(:id, :sis_source_id, "mcs.master_template_id")
+            joins(sanitize_sql(["LEFT OUTER JOIN #{CourseAccountAssociation.quoted_table_name} AS caa ON
+              caa.course_id=courses.id AND caa.account_id = ?", template.account_id])).
+            pluck(:id, :sis_source_id, "mcs.master_template_id", "caa.id")
 
           if data.count != associated_sis_ids
-            (associated_sis_ids - data.map{|id, sis_id, t_id| sis_id}).each do |invalid_id|
+            (associated_sis_ids - data.map{|r| r[1]}).each do |invalid_id|
               messages << "Cannot associate course \"#{invalid_id}\" - is a blueprint course"
             end
           end
-          data.each do |id, associated_sis_id, master_template_id|
+          data.each do |id, associated_sis_id, master_template_id, course_association_id|
             if master_template_id
               if master_template_id != template.id
                 messages << "Cannot associate course \"#{associated_sis_id}\" - is associated to another blueprint course"
               end # otherwise we don't need to do anything - it's already associated
+            elsif course_association_id.nil?
+              messages << "Cannot associate course \"#{associated_sis_id}\" - is not in the same or lower account as the blueprint course"
             else
               needs_migration = true
               template.add_child_course!(id)

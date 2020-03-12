@@ -121,7 +121,7 @@ describe "master courses - course picker" do
   end
 
   it "course search doesn't work with nicknames", priority: "2", test_id: 3178857 do
-    @user.course_nicknames[@course.id] = 'nickname'
+    @user.set_preference(:course_nicknames, @course.id, 'nickname')
     matches = test_filter('nickname')
     expect(matches.length).to eq(0)
   end

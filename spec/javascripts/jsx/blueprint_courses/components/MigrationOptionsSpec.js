@@ -39,7 +39,7 @@ const defaultProps = {
 
 test('renders the MigrationOptions component', () => {
   const tree = enzyme.shallow(<MigrationOptions {...defaultProps} />)
-  const node = tree.find('.bcs__history-settings')
+  const node = tree.find({as: 'fieldset'})
   ok(node.exists())
 })
 

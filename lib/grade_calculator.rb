@@ -989,12 +989,8 @@ class GradeCalculator
   def ignore_submission?(submission:, assignment:)
     return false unless @ignore_muted
 
-    if @course.post_policies_enabled?
-      # If we decided to ignore this submission earlier in this run (see
-      # create_group_sums), it will be nil, in which case keep ignoring it
-      submission.blank? || !submission.posted?
-    else
-      assignment.muted?
-    end
+    # If we decided to ignore this submission earlier in this run (see
+    # create_group_sums), it will be nil, in which case keep ignoring it
+    submission.blank? || !submission.posted?
   end
 end

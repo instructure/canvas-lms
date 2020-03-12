@@ -71,6 +71,7 @@ $dimmedOpacity: 0.6;
 // Completely hide, but make available to screenreader so it can read it.  Used for external tools
 .screenreader-only-tool {
   @extend .screenreader-only;
+  margin-top: 0px;
   position: relative;
   clip-path: inset(50%);
   -webkit-clip-path: inset(50%);

@@ -112,8 +112,15 @@ $darkRowBg: #f9f9f9;
   }
 
   // content cell, aka a table cell with permission buttons inside it
+  // IconButtons and Checkboxes get slightly different margins because
+  // of the difference in size.
   .ic-permissions__cell-content {
-    margin-#{direction(left)}: 20px;
+    margin-#{direction(left)}: 18px;
+    text-align: center;
+  }
+
+  .ic-permissions__cell-content-checkbox {
+    margin-#{direction(left)}: 10px;
     text-align: center;
   }
 
@@ -146,18 +153,6 @@ $darkRowBg: #f9f9f9;
     z-index: 9;
   }
 
-  // the header cells of the expanded row
-  .ic-permissions__left-header__expanded {
-    position: sticky;
-    #{direction(left)}: 0;
-
-    .ic-permissions__left-header__col-wrapper {
-
-      .ic-permissions__header-content {
-        text-align: direction(right);
-      }
-    }
-  }
   // specifically for the column header content
   .ic-permissions__header-content-col {
     justify-content: center;

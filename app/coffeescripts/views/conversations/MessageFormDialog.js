@@ -217,7 +217,8 @@ export default class MessageFormDialog extends DialogBaseView {
       el: this.$messageCourse,
       courses: this.options.courses,
       defaultOption: I18n.t('select_course', 'Select course'),
-      messageableOnly: true
+      messageableOnly: true,
+      excludeConcluded: true
     })
     if (this.model) {
       if (this.model.get('context_code')) {

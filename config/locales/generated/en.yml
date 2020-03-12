@@ -712,7 +712,7 @@ en:
   remove_null_values_from_live_event_payloads_3c826f: Remove null values from live event payloads
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: Canvas will remove keys with null values from live event payloads if this feature is enabled.
   new_course_and_user_analytics_ffbc508c: New Course and User Analytics
-  show_new_analytics_for_course_and_user_data_18e92636: Show new analytics for course and user data
+  show_new_analytics_for_course_and_user_data_data_m_89526eb: Show new analytics for course and user data. Data may take 24 hours to appear in New Analytics after setting this feature flag to ON.
   new_gradebook_plagiarism_indicator_8dd22971: New Gradebook Plagiarism Indicator
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: Enables display of plagiarism reports and similarity scores in the New Gradebook submission tray.
   course_favorites_from_dashboard_27a3515a: Course Favorites From Dashboard
@@ -752,6 +752,8 @@ en:
   changes_the_sort_order_of_the_gradebook_export_to__41b286fd: Changes the sort order of the gradebook export to more closely match the canvas documentation
   submissions_re_upload_status_page_6cdbc96d: Submissions Re-Upload Status Page
   allows_the_user_to_navigate_away_while_submission__276d73b7: Allows the user to navigate away while submission re-uploads are processing
+  include_speedgrader_in_assignment_header_menu_69cd8656: Include SpeedGrader in Assignment Header Menu
+  includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: Includes a link to SpeedGrader in the assignment header menu in Gradebook.
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   pronouns_for_users_da46fb5: Pronouns for users
@@ -762,6 +764,10 @@ en:
   displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
     Displays confetti for users that turn in an assignment prior
     to the set due date.
+  restrict_sms_to_select_types_9dd6399c: Restrict SMS to Select Types
+  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+    Disables SMS notifications for all types except announcements and
+    grade changes.
   mute_notifications_by_course_440e18be: Mute notifications by course
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: Allows users to mute notifications on a course level granularity.
   immediate_notifications_for_global_announcements_682f5a3d: Immediate notifications for global announcements
@@ -777,6 +783,8 @@ en:
   if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
     If RCE Enhancements are also enabled,
     the RCE will auto-save your work as you go
+  edit_closed_captions_e5fdeb79: Edit Closed Captions
+  edit_closed_captions_subtitles_to_videos_from_the__288ae432: Edit closed captions/subtitles to videos from the video options tray in the RCE
   this_is_a_siteadmin_test_feature_flag_3ab5184: This is a SiteAdmin test Feature Flag
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: This flag will not cause any change in behavior.
   assignment_enhancements_student_557372ab: Assignment Enhancements - Student
@@ -787,12 +795,16 @@ en:
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: Allow a teacher to set the number of allowed attempts on an assignment via the UI
   bookmarking_for_enrollments_index_api_840be156: Bookmarking for Enrollments Index API
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: Use bookmarking for API pagination in Enrollments Index
-  discussion_topic_performance_improvements_for_bibs_79a483ef: Discussion Topic performance improvements for Bibsys
-  discussion_topics_will_not_query_permissions_for_e_7570e632: Discussion Topics will not query permissions for every sub-discussion
   syllabus_course_summary_option_951a8144: Syllabus Course Summary Option
   make_the_course_summary_list_of_assignments_and_ev_f739be33: Make the Course Summary (list of assignments and events) optional in the syllabus
+  rce_initialization_fix_4f176bda: RCE Initialization Fix
+  under_some_conditions_the_legacy_rce_fails_to_init_66d515ab: |-
+    Under some conditions, the legacy RCE fails to initialize because tinymce hasn't added the
+    editor instance to its internal list when the RCE requires it.
   outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
+  rubrics_in_course_navigation_539ea536: Rubrics in course navigation
+  includes_rubrics_in_the_course_sidebar_navigation_6dd52682: Includes rubrics in the course sidebar navigation
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_dc466585: |-
     Differentiate between system- and user-generated live events
@@ -4876,8 +4888,6 @@ en:
     sis_import_settings:
       labels:
         parallelism: Number of job processors to use to process SIS imports in parallel
-        minimum_rows_for_parallel: Minimum rows in a SIS import before using parallel processing
-        queue_for_parallel_jobs: Job queue to use for parallel jobs (blank for default)
     ticketing_system_settings:
       description: Ticketing System setup
       labels:
@@ -6288,6 +6298,7 @@ en:
     files: Files
     syllabus: Syllabus
     outcomes: Outcomes
+    rubrics: Rubrics
     quizzes: Quizzes
     modules: Modules
     conferences: Conferences
@@ -6638,6 +6649,8 @@ en:
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} and {b} cannot be used together"
   anonymous_assignments_must_be_manually_posted_a13d2ca5: Anonymous assignments must be manually posted
   moderated_assignments_must_be_manually_posted_unti_39545855: Moderated assignments must be manually posted until grades are released
+  course_level_notification_preferences_require_a_co_2f0a618: Course level notification preferences require a course_id to update
+  account_level_notification_preferences_require_an__66467cd7: Account level notification preferences require an account_id to update
   global_message_icons:
     information: information
     error: error
@@ -6690,6 +6703,8 @@ en:
   quiz_e0dcce8f: Quiz
   page_50c4823d: Page
   unknown_content_type_ae6d08e8: Unknown Content Type
+  item_type_new_quiz_1a1cd9a9: 'Item type: New Quiz'
+  item_type_quiz_c894ddb1: 'Item type: Quiz'
   course_is_already_associated_with_a_blueprint_4d9407cb: Course is already associated with a blueprint
   cannot_have_a_blueprint_course_with_students_248e3e76: Cannot have a blueprint course with students
   title:
@@ -7655,7 +7670,6 @@ en:
       Includes:
 
       * Assignment/submission grade entered/changed
-      * Un-muted assignment grade
       * Grade weight changed
     late_grading_description: |-
       *Instructor and Admin only:*
@@ -8285,23 +8299,6 @@ en:
       labels:
         subject: Subject
         body: Message
-    mute_dialog:
-      gradebook:
-        mute_assignment: Mute Assignment
-      mute_dialog: |-
-        Are you sure you want to mute this assignment? While this assignment
-        is muted, students will not receive new notifications about or be
-        able to see:
-
-        *  Grade change notifications
-        *  Submission comments
-        *  Curving assignments
-        *  Score change notifications
-
-        Students will be able to see that this assignment is muted.
-
-        Once you have muted this assignment, you can begin sending
-        notifications again by clicking the "Unmute Assignment" link.
     new_course_form:
       start_a_new_course: Start a New Course
       labels:
@@ -8496,8 +8493,6 @@ en:
     static_notices:
       javascript_required: You need to have JavaScript enabled in order to access this site.
       bouncing_communication_channels: There appears to be a problem with one of your contact methods. Please check your *Settings Page*.
-    unmute_dialog:
-      unmute_dialog: This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?
     user_lists:
       copy_and_paste_notice_with_login_handle: Copy and paste a list of users. You can use their email address or %{login_handle_name}.
       copy_and_paste_notice_just_email: Copy and paste a list of email addresses to add users.
@@ -9155,7 +9150,6 @@ en:
   media_objects_c2fa37cd: Media Objects
   modules_c4325335: Modules
   names_and_role_ebff0149: Names and Role
-  notification_preference_overrides_e08e079a: Notification Preference Overrides
   notification_preferences_cf47083d: Notification Preferences
   originality_reports_1e36b935: Originality Reports
   outcome_groups_3bc3b150: Outcome Groups
@@ -9738,25 +9732,6 @@ en:
           view_submission: You can view the submission here
         html:
           link: Click here to view the submission
-    assignment_unmuted:
-      email:
-        subject: 'Assignment Unmuted: %{title}, %{course}'
-        body: |-
-          Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
-
-          You can view it here:
-          %{url}
-        html:
-          subject: 'Assignment Unmuted: %{title}, %{course}'
-          link: You can view it here
-          body: Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
-      sms:
-        body: |-
-          Your instructor has released grades and comments for %{title}, %{course}.
-
-          More info at %{website}
-      summary:
-        subject: 'Grades and comments released for: %{title}, %{course}'
     blueprint_content_added:
       email:
         subject: 'Blueprint Sync: %{name}'
@@ -11062,7 +11037,8 @@ en:
   access_token_created_or_regenerated_4ce9ed1f: Access Token Created or Regenerated
   a_canvas_security_token_was_just_generated_for_you_efeeac68: 'A Canvas security token was just generated for your account. If you requested a user token, no further action is necessary. If you did not request a token or would like to manage your canvas access tokens, you can do so here:'
   manage_user_settings_827ab12d: Manage User Settings
-  new_announcement_title_30ba7c1b: 'New announcement: %{title}'
+  new_announcement_in_course_name_title_84607f44: 'New announcement in %{course_name}: %{title}'
+  more_info_at_url_41b4764b: More info at %{url}
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: 'You can check out the group by clicking this link: %{link}'
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: 'Comment by replying to this message, or join the conversation using this link: %{link}. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion.'
   new_comment_discussion_topic_by_user_name_666ccfa: 'New comment: %{discussion_topic} by %{user_name}'
@@ -11641,7 +11617,6 @@ en:
   item_type_download_e949cdb6: 'Item type: Download'
   item_type_discussion_e3ddae9b: 'Item type: Discussion'
   item_type_assignment_13a1132e: 'Item type: Assignment'
-  item_type_quiz_c894ddb1: 'Item type: Quiz'
   item_type_link_5a2abed2: 'Item type: Link'
   must_score_at_least_score_to_complete_this_module__b86b5101: Must score at least %{score} to complete this module item
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: Module item has been completed by scoring at least %{score}
@@ -11870,9 +11845,6 @@ en:
     one: "(1) file was ignored"
     other: "(%{count}) files were ignored"
   there_were_some_files_we_didn_t_know_what_to_do_wi_6156913f: There were some files we didn't know what to do with. They have not been added to anyone's submission page.
-  mute_unmute_assignment_62608e44: Mute/Unmute Assignment
-  unmute_assignment_29a49038: Unmute Assignment
-  mute_assignment_bb505cd8: Mute Assignment
   graded_25cd3fcd: Graded
   previous_bd2ac015: Previous
   next_40e12421: Next
@@ -13540,7 +13512,7 @@ en:
   LongTextEditor:
     save: Save
     cancel: Cancel
-  cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: Cannot view detailed reports for anonymous assignments until grades are unmuted.
+  cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: Cannot view detailed reports for anonymous assignments until grades are posted.
   all_sections_daf11554: All Sections
   show_all_sections_190203e8: Show all sections
   change_section_to_sectionname_6e947e90: Change section to %{sectionName}
@@ -13550,13 +13522,10 @@ en:
       no_students_in_groups_close: Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window.
       no_students_in_groups_back: Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back.
       no_active_students: Sorry, there are either no active students in the course or none are gradable by you.
-    cancel_button: Cancel
-    mute_assignment: Mute Assignment
     buttons:
       saving_settings: Saving Settings...
       dialog_buttons: Cancel
       submitting: Submitting...
-    unmute_assignment: Unmute Assignment
     begin_record_prompt: Click the "Record" button to begin.
     allow_message: Click the "Allow" button to begin recording.
     recording_message: Recording...
@@ -13697,6 +13666,8 @@ en:
   cache_cleared_successfully_9ab84d5a: Cache cleared successfully
   failed_to_clear_cache_7361ab: Failed to clear cache
   no_graded_submissions_e40c957a: No graded submissions
+  unmute_assignment_29a49038: Unmute Assignment
+  mute_assignment_bb505cd8: Mute Assignment
   muting_assignment_a9aeb5c7: Muting Assignment...
   this_assignment_is_currently_muted_that_means_stud_94d63139: This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?
   assignment_muter:
@@ -15682,9 +15653,10 @@ en:
   your_course_db806851: Your Course
   count_of_max_maximum_characters_fcb6ddf8: "%{count} of %{max} maximum characters"
   you_have_reached_the_limit_of_len_characters_in_th_babea8fe: You have reached the limit of %{len} characters in the notification message
+  history_settings_c63dbaaf: History Settings
   include_course_settings_c4c08764: Include Course Settings
   send_notification_81773687: Send Notification
-  add_a_message_a5ed12bf: Add a Message
+  add_a_message_4fee743f: 'Add a Message '
   chars_written_max_character_length_len_fec9bd18: "%{chars} written, max character length %{len}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   message_text_5f692459: Message text
@@ -15943,12 +15915,13 @@ en:
   create_a_new_module_6f31b0fe: Create a new Module
   add_existing_content_7e36da66: Add existing content
   failed_to_update_course_notification_settings_cbf0eb18: Failed to update course notification settings
-  course_notification_settings_initial_query_error_6dfb24ef: Course Notification Settings initial query error
-  course_notification_settings_error_page_c0512c17: Course Notification Settings Error Page
+  course_notification_settings_updated_f6726d7e: Course notification settings updated
   enable_notifications_10a4bf44: Enable Notifications
   you_are_currently_receiving_notifications_for_this_9646b09d: You are currently receiving notifications for this course. To disable course notifications, use the toggle above.
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: You will not receive any course notifications at this time. To enable course notifications, use the toggle above.
   granular_course_notification_settings_will_be_conf_68f122db: Granular course notification settings will be configurable here in the future.
+  course_notification_settings_initial_query_error_6dfb24ef: Course Notification Settings initial query error
+  course_notification_settings_error_page_c0512c17: Course Notification Settings Error Page
   complete_registration_by_clicking_the_finish_the_r_fcd13ac8: Complete registration by clicking the “finish the registration process” link sent to your email.
   an_error_ocurred_while_publishing_course_3760cf04: An error ocurred while publishing course
   choose_home_page_80cef4ee: Choose Home Page
@@ -16114,9 +16087,9 @@ en:
   loading_available_scopes_bc29bf98: Loading Available Scopes
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: When scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user.
   search_endpoints_d5abf37f: Search endpoints
+  permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: Permit usage of all “includes” parameters for this developer key. "Includes" parameters may grant access to additional data not included in the scopes selected below.
   enforce_scopes_be28989c: Enforce Scopes
   allow_include_parameters_bf3d3230: 'Allow Include Parameters '
-  permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: Permit usage of all “includes” parameters for this developer key. "Includes" parameters may grant access to additional data not included in the scopes selected below.
   all_scopename_scopes_6c220783: All %{scopeName} scopes
   disable_all_read_only_scopes_f9ffdd28: Disable all read only scopes.
   enable_all_read_only_scopes_3ddc2bb5: Enable all read only scopes.
@@ -17802,8 +17775,8 @@ en:
   starting_copy_operation_cc46d911: Starting copy operation
   copy_operation_started_successfully_b2f236a1: Copy operation started successfully
   there_was_a_problem_starting_the_copy_operation_dd599cdd: There was a problem starting the copy operation
-  starting_content_share_2d8c2999: Starting content share
   content_share_started_successfully_2c37fb79: Content share started successfully
+  starting_content_share_2d8c2999: Starting content share
   error_starting_content_share_18fb1532: Error starting content share
   remove_name_624e06be: Remove %{name}
   loading_additional_items_ed5f672d: Loading additional items...

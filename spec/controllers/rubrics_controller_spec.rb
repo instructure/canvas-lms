@@ -44,9 +44,39 @@ describe RubricsController do
         expect(assigns[:js_env][:PERMISSIONS][:manage_outcomes]).to eq true
       end
 
+      it "should include manage_rubrics permission" do
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq true
+      end
+
       it "should return non_scoring_rubrics if enabled" do
         get 'index', params: {:course_id => @course.id}
         expect(assigns[:js_env][:NON_SCORING_RUBRICS]).to eq true
+      end
+    end
+
+    describe "after a course has concluded" do
+      before do
+        course_with_teacher_logged_in(:active_all => true)
+        @course.complete!
+      end
+
+      it "cannot access rubrics without FF" do
+        get 'index', params: {:course_id => @course.id}
+        assert_unauthorized
+      end
+
+      describe "with FF enabled" do
+        before { @course.root_account.enable_feature!(:rubrics_in_course_navigation) }
+        it "can access rubrics" do
+          get 'index', params: {:course_id => @course.id}
+          expect(response).to be_successful
+        end
+
+        it "does not include manage_rubrics permission" do
+          get 'index', params: {:course_id => @course.id}
+          expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq false
+        end
       end
     end
   end
@@ -684,12 +714,45 @@ describe RubricsController do
       end
     end
 
-    it "works" do
-      r = Rubric.create! user: @teacher, context: Account.default
-      ra = RubricAssociation.create! rubric: r, context: @course,
-        purpose: :bookmark, association_object: @course
-      get 'show', params: {id: r.id, course_id: @course.id}
-      expect(response).to be_successful
+    describe "with a valid rubric" do
+      before do
+        @r = Rubric.create! user: @teacher, context: Account.default
+        RubricAssociation.create! rubric: @r, context: @course,
+          purpose: :bookmark, association_object: @course
+      end
+
+      it "works" do
+        get 'show', params: {id: @r.id, course_id: @course.id}
+        expect(response).to be_successful
+      end
+
+      it "should include manage_rubrics permission" do
+        get 'show', params: {id: @r.id, course_id: @course.id}
+        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq true
+      end
+
+      describe "after a course has concluded" do
+        before { @course.complete! }
+
+        it "cannot access the rubric without the rubrics_in_course_navigation FF" do
+          get 'show', params: {id: @r.id, course_id: @course.id}
+          assert_unauthorized
+        end
+
+        describe "with rubrics_in_course_navigation FF enabled" do
+          before { @course.root_account.enable_feature!(:rubrics_in_course_navigation) }
+
+          it "can access the rubric" do
+            get 'show', params: {id: @r.id, course_id: @course.id}
+            expect(response).to be_successful
+          end
+
+          it "does not include manage_rubrics permission" do
+            get 'show', params: {id: @r.id, course_id: @course.id}
+            expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq false
+          end
+        end
+      end
     end
   end
 end

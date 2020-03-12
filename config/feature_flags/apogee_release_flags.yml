@@ -51,3 +51,8 @@ submissions_reupload_status_page:
   applies_to: SiteAdmin
   display_name: Submissions Re-Upload Status Page
   description: Allows the user to navigate away while submission re-uploads are processing
+include_speed_grader_in_assignment_header_menu:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Include SpeedGrader in Assignment Header Menu
+  description: Includes a link to SpeedGrader in the assignment header menu in Gradebook.

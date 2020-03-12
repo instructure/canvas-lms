@@ -27,6 +27,7 @@ import {
 } from './contentRendering'
 import scroll from '../common/scroll'
 import {defaultImageSize} from './plugins/instructure_image/ImageEmbedOptions'
+import {cleanUrl} from './contentInsertionUtils'
 
 /** * generic content insertion ** */
 
@@ -174,6 +175,7 @@ function insertUndecoratedLink(editor, linkAttrs) {
   if (linkAttrs.target === '_blank') {
     linkAttrs.rel = 'noopener noreferrer'
   }
+  linkAttrs.href = cleanUrl(linkAttrs.href || linkAttrs.url)
 
   editor.focus()
   if (anchorElm) {

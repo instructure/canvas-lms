@@ -1759,6 +1759,10 @@ class Submission < ActiveRecord::Base
     self.updated_at <=> other.updated_at
   end
 
+  def course_broadcast_data
+    context&.broadcast_data
+  end
+
   # Submission:
   #   Online submission submitted AFTER the due date (notify the teacher) - "Grade Changes"
   #   Submission graded (or published) - "Grade Changes"
@@ -1771,6 +1775,7 @@ class Submission < ActiveRecord::Base
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_assignment_submitted_late?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :assignment_submitted
     p.to { assignment.context.instructors_in_charge_of(user_id) }
@@ -1778,6 +1783,7 @@ class Submission < ActiveRecord::Base
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_assignment_submitted?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :assignment_resubmitted
     p.to { assignment.context.instructors_in_charge_of(user_id) }
@@ -1785,6 +1791,7 @@ class Submission < ActiveRecord::Base
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_assignment_resubmitted?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :group_assignment_submitted_late
     p.to { assignment.context.instructors_in_charge_of(user_id) }
@@ -1792,6 +1799,7 @@ class Submission < ActiveRecord::Base
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_group_assignment_submitted_late?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :submission_graded
     p.to { [student] + User.observing_students_in_course(student, assignment.context) }
@@ -1799,6 +1807,7 @@ class Submission < ActiveRecord::Base
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_graded?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :submission_grade_changed
     p.to { [student] + User.observing_students_in_course(student, assignment.context) }
@@ -1806,6 +1815,7 @@ class Submission < ActiveRecord::Base
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_grade_changed?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :submission_posted
     p.to { [student] + User.observing_students_in_course(student, assignment.context) }
@@ -1813,6 +1823,7 @@ class Submission < ActiveRecord::Base
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_posted?
     }
+    p.data { course_broadcast_data }
 
   end
 

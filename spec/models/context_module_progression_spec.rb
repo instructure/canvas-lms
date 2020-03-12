@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextModuleProgression do
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   before do
     @course = course_factory(active_all: true)
     @module = @course.context_modules.create!(:name => "some module")
@@ -295,7 +299,7 @@ describe ContextModuleProgression do
   context "assignment muting" do
     it "should work with muted assignments" do
       assignment = @course.assignments.create(:title => "some assignment", :points_possible => 100, :submission_types => "online_text_entry")
-      assignment.mute!
+      assignment.ensure_post_policy(post_manually: true)
       tag = @module.add_item({:id => assignment.id, :type => 'assignment'})
       @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
       @module.save!
@@ -317,7 +321,7 @@ describe ContextModuleProgression do
 
     it "should complete when the assignment is unmuted after a grade is assigned without a submission" do
       assignment = @course.assignments.create(:title => "some assignment", :points_possible => 100, :submission_types => "online_text_entry")
-      assignment.mute!
+      assignment.ensure_post_policy(post_manually: true)
       tag = @module.add_item({:id => assignment.id, :type => 'assignment'})
       @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
       @module.save!
@@ -336,7 +340,7 @@ describe ContextModuleProgression do
 
     it "should work with muted quiz assignments" do
       quiz = @course.quizzes.create(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest', :workflow_state => 'available')
-      quiz.assignment.mute!
+      quiz.assignment.ensure_post_policy(post_manually: true)
       tag = @module.add_item({:id => quiz.id, :type => 'quiz'})
       @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
       @module.save!
@@ -360,7 +364,7 @@ describe ContextModuleProgression do
       topic.save!
       assignment.reload
 
-      assignment.mute!
+      assignment.ensure_post_policy(post_manually: true)
       tag = @module.add_item({:id => topic.id, :type => 'discussion_topic'})
       @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
       @module.save!

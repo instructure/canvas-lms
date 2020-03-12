@@ -170,6 +170,10 @@ class SubmissionComment < ActiveRecord::Base
     can :read_author
   end
 
+  def course_broadcast_data
+    submission.context&.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :submission_comment
     p.to do
@@ -191,6 +195,7 @@ class SubmissionComment < ActiveRecord::Base
       record.submission.assignment.context.grants_right?(record.submission.user, :read) &&
       (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
@@ -199,6 +204,7 @@ class SubmissionComment < ActiveRecord::Base
       record.provisional_grade_id.nil? &&
       record.submission.user_id == record.author_id
     }
+    p.data { course_broadcast_data }
   end
 
   def can_view_comment?(user, session)

@@ -17,16 +17,10 @@
  */
 
 import $ from 'jquery'
-import AlertManager from '../shared/components/AlertManager'
-import CourseNotificationSettings from '../courses/notification_settings/CourseNotificationSettings'
+import NotificationSettings from '../courses/notification_settings'
 import React from 'react'
 import ReactDom from 'react-dom'
 
 $(() => {
-  ReactDom.render(
-    <AlertManager>
-      <CourseNotificationSettings />
-    </AlertManager>,
-    $('<div/>').appendTo('#content')[0]
-  )
+  ReactDom.render(<NotificationSettings />, $('<div/>').appendTo('#content')[0])
 })

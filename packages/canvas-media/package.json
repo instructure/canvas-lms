@@ -9,6 +9,7 @@
   "scripts": {
     "test": "jest --runInBand",
     "jest": "jest --runInBand",
+    "test:debug": "node --inspect-brk ../../node_modules/.bin/jest --runInBand",
     "build:canvas": "babel --root-mode upward src -d es & JEST_WORKER_ID=true babel --root-mode upward src -d lib"
   },
   "repository": {
@@ -30,6 +31,7 @@
     "@instructure/ui-buttons": "6",
     "@instructure/ui-color-utils": "6",
     "@instructure/ui-elements": "6",
+    "@instructure/ui-flex": "6",
     "@instructure/ui-forms": "6",
     "@instructure/ui-icons": "6",
     "@instructure/ui-heading": "6",
@@ -44,11 +46,13 @@
     "@instructure/ui-text-input": "6",
     "@instructure/ui-themeable": "6",
     "@instructure/ui-themes": "6",
+    "@instructure/ui-view": "6",
     "@instructure/ui-toggle-details": "6",
-    "@sheerun/mutationobserver-shim": "^0.3.2",
     "@instructure/uid": "6",
     "@sheerun/mutationobserver-shim": "^0.3.2",
     "axios": "^0.18.0",
+    "format-message": "^6",
+    "lodash": "^4",
     "prop-types": "^15",
     "react": "^16",
     "react-dom": "^16"

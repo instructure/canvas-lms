@@ -2,18 +2,15 @@
 # To update this file please edit the relevant template and run the generation
 # task `build/dockerfile_writer.rb`
 
-# See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
-FROM instructure/ruby-passenger:2.4-xenial
+# For documentation, please check doc/docker/README.md in
+# this local repo which is also published at:
+# https://github.com/instructure/canvas-lms/tree/master/doc/docker
+FROM instructure/ruby-passenger:2.6
 
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"
 ENV NGINX_MAX_UPLOAD_SIZE 10g
 ENV YARN_VERSION 1.19.1-1
-
-# Work around github.com/zertosh/v8-compile-cache/issues/2
-# This can be removed once yarn pushes a release including the fixed version
-# of v8-compile-cache.
-ENV DISABLE_V8_COMPILE_CACHE 1
 
 USER root
 WORKDIR /root
@@ -39,7 +36,7 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
 
 WORKDIR $APP_HOME
 
-COPY . $APP_HOME
+COPY --chown=docker:docker . $APP_HOME
 
 # optimizing for size here ... get all the dev dependencies so we can
 # compile assets, then throw away everything we don't need

@@ -473,6 +473,11 @@ module RCENextPage
     wait_for_ajaximations
   end
 
+  def click_embed_media_tab
+    fj('[role="tab"]:contains("Embed")').click
+    wait_for_animations
+  end
+
   def click_course_media
     course_media.click
     wait_for_ajaximations
@@ -618,6 +623,10 @@ module RCENextPage
     decorative_options_checkbox.click
   end
 
+  def click_upload_media_submit_button
+    upload_media_submit_button.click
+  end
+
   def user_media_menu_item
     fj('[role="menuitem"]:contains("User Media")')
   end
@@ -628,5 +637,21 @@ module RCENextPage
 
   def menu_item_by_menu_id(menu_id, item_label)
     fj("##{menu_id}:contains('#{item_label}')")
+  end
+
+  def embed_code_textarea
+    f('textarea[placeholder="Embed Code"]')
+  end
+
+  def upload_media_submit_button
+    f('[aria-label="Upload Media"] button[type="submit"]')
+  end
+
+  def switch_to_html_view
+    fj('button:contains("Switch to raw html editor")').click
+  end
+
+  def switch_to_editor_view
+    fj('button:contains("Switch to rich text editor")').click
   end
 end

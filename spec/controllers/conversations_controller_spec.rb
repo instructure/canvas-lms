@@ -237,13 +237,23 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
-    it 'should not allow creating conversations in concluded courses' do
+    it 'should not allow creating conversations in concluded courses for students' do
       user_session(@student)
       @course.update!(workflow_state: 'completed')
 
       post 'create', params: { recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string }
       expect(response).not_to be_successful
       expect(response.body).to include('Unable to send messages')
+    end
+
+    it 'should allow creating conversations in concluded courses for teachers' do
+      user_session(@teacher)
+      teacher2 = teacher_in_course(active_all: true).user
+      @course.update!(workflow_state: 'claimed')
+
+      post 'create', params: { recipients: [teacher2.id.to_s], body: "yo", context_code: @course.asset_string }
+      expect(response).to be_successful
+      expect(assigns[:conversation]).not_to be_nil
     end
 
     it "should require permissions for sending to other students" do
@@ -554,6 +564,25 @@ describe ConversationsController do
       message = @conversation.messages.first
       student = message.recipients.first
       expect(student.user_notes.size).to eq 1
+    end
+
+    it "should not allow new messages in concluded courses for students" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      @course.update!({workflow_state: 'completed'})
+
+      post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world" }
+      assert_unauthorized
+    end
+
+    it "should allow new messages in concluded courses for teachers" do
+      course_with_teacher_logged_in(:active_all => true)
+      conversation
+      @course.update!({workflow_state: 'completed'})
+
+      post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world" }
+      expect(response).to be_successful
+      expect(assigns[:conversation]).not_to be_nil
     end
   end
 

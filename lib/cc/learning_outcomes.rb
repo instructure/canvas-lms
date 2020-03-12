@@ -41,7 +41,7 @@ module CC
 
         process_outcome_group_content(outs_node, root_group)
 
-        unless export_object?(LearningOutcome.new, 'learning_outcomes')
+        if @manifest&.exporter&.for_master_migration || !export_object?(LearningOutcome.new, 'learning_outcomes')
           # copy straggler outcomes that should be brought in implicitly
           @course.linked_learning_outcomes.where.not(:id => @exported_outcome_ids).each do |item|
             if export_object?(item, 'learning_outcomes')

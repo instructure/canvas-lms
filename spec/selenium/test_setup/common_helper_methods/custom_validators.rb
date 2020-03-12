@@ -68,7 +68,7 @@ module CustomValidators
     if message
       keep_trying_until(5) do
         disable_implicit_wait do
-          expect(ff("#flash_message_holder .ic-flash-#{type}")).to be_any { |el| el.text.include?(message) }
+          expect(ff("#flash_message_holder .ic-flash-#{type}")).to be_any { |el| el.text.include?("#{message}") }
         end
       end
     else

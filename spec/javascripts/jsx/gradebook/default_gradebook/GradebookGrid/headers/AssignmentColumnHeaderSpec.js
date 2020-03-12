@@ -82,6 +82,8 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         onSelect() {}
       },
 
+      includeSpeedGraderMenuItem: false,
+
       muteAssignmentAction: {
         disabled: false,
         onSelect() {}
@@ -816,6 +818,30 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
     })
   })
 
+  QUnit.module('"Options" > "SpeedGrader" action', () => {
+    QUnit.module('when includeSpeedGraderMenuItem is true', includeSpeedGraderHooks => {
+      includeSpeedGraderHooks.beforeEach(() => {
+        props.includeSpeedGraderMenuItem = true
+      })
+
+      test('is present', () => {
+        mountAndOpenOptionsMenu()
+        ok(getMenuItem($menuContent, 'SpeedGrader'))
+      })
+
+      test('links to SpeedGrader for the current assignment', () => {
+        mountAndOpenOptionsMenu()
+        const menuItem = getMenuItem($menuContent, 'SpeedGrader')
+        ok(menuItem.href.includes('/courses/1201/gradebook/speed_grader?assignment_id=2301'))
+      })
+    })
+
+    test('is not present when includeSpeedGraderMenuItem is false', () => {
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'SpeedGrader'))
+    })
+  })
+
   QUnit.module('"Options" > "Message Students Who" action', hooks => {
     hooks.beforeEach(() => {
       sandbox.stub(window, 'messageStudents')
@@ -880,7 +906,10 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Message Students Who').click()
         const [settings] = window.messageStudents.lastCall.args
-        deepEqual(settings.students.map(student => student.name), ['Betty Ford', 'Charlie Xi'])
+        deepEqual(
+          settings.students.map(student => student.name),
+          ['Betty Ford', 'Charlie Xi']
+        )
       })
     })
   })

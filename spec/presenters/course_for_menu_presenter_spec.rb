@@ -64,8 +64,7 @@ describe CourseForMenuPresenter do
     end
 
     it 'returns the course nickname if one is set' do
-      user.course_nicknames[course.id] = 'nickname'
-      user.save!
+      user.set_preference(:course_nicknames, course.id, 'nickname')
       cs_presenter = CourseForMenuPresenter.new(course, user)
       h = cs_presenter.to_h
       expect(h[:originalName]).to eq course.name
@@ -110,8 +109,7 @@ describe CourseForMenuPresenter do
       end
 
       it 'returns a position if one is set' do
-        user.dashboard_positions[course.asset_string] = 3
-        user.save!
+        user.set_dashboard_positions(course.asset_string => 3)
         cs_presenter = CourseForMenuPresenter.new(course, user, @account)
         h = cs_presenter.to_h
         expect(h[:position]).to eq 3

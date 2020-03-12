@@ -24,6 +24,8 @@ describe "speed grader" do
   include SpeedGraderCommon
 
   before(:once) do
+    PostPolicy.enable_feature!
+
     @course = course_factory(active_all: true)
     outcome_with_rubric(course: @course)
     @assignment = @course.assignments.create!(

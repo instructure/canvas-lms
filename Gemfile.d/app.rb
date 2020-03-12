@@ -34,20 +34,20 @@ gem 'after_transaction_commit', '2.0.0'
 gem 'authlogic', '5.0.4'
   gem 'scrypt', '3.0.7'
 gem 'aws-sdk-core', '3.90.1', require: false
-  gem 'aws-partitions', '1.275.0', require: false
-gem 'aws-sdk-dynamodb', '1.43.0'
+  gem 'aws-partitions', '1.279.0', require: false
+gem 'aws-sdk-dynamodb', '1.44.0'
 gem 'aws-sdk-kinesis', '1.20.0', require: false
 gem 'aws-sdk-s3', '1.60.2', require: false
 gem 'aws-sdk-sns', '1.21.0', require: false
 gem 'aws-sdk-sqs', '1.23.1', require: false
 gem 'aws-sdk-kms', '1.29.0', require: false
-gem 'aws-sigv4', '1.1.0', require: false
+gem 'aws-sigv4', '1.1.1', require: false
 gem 'barby', '0.6.8', require: false
   gem 'rqrcode', '1.1.2', require: false
   gem 'chunky_png', '1.3.11', require: false
 gem 'bcrypt', '3.1.13'
 gem 'brotli', '0.2.3', require: false
-gem 'browser', '3.0.3', require: false
+gem 'browser', '4.0.0', require: false
 gem 'builder', '3.2.4'
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.8', require: false
@@ -56,7 +56,7 @@ gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_store'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.12.2', require: false
-gem 'gepub', '1.0.10'
+gem 'gepub', '1.0.11'
 gem 'graphql', '1.9.17'
 gem 'graphql-batch', '0.4.2'
 gem 'hashery', '2.1.2', require: false
@@ -80,7 +80,7 @@ gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.32.0', require: false
 gem 'inst-jobs-statsd', '1.3.1'
 gem 'json', '2.3.0'
-gem 'json_schemer', '0.2.9'
+gem 'json_schemer', '0.2.10'
 gem 'json-jwt', '1.11.0', require: false
 gem 'link_header', '0.0.8'
 gem 'mail', '2.7.1', require: false
@@ -90,26 +90,26 @@ gem 'mime-types', '3.3.1'
 gem 'mini_magick', '4.10.1'
 gem 'multi_json', '1.14.1'
 gem 'net-ldap', '0.16.2', require: false
-gem 'nokogiri', '1.10.8', require: false
+gem 'nokogiri', '1.10.9', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
-gem 'oj', '3.10.2'
+gem 'oj', '3.10.5'
 gem 'parallel', '1.19.1', require: false
   gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
 gem 'prawn-rails', '1.3.0'
 gem 'rack', '2.2.2'
 gem 'rack-test', '1.1.0'
-gem 'rake', '12.3.1'
+gem 'rake', '13.0.1'
 gem 'rails-observers', '0.1.5'
 gem 'ratom-nokogiri', '0.10.8', require: false
-gem 'rdiscount', '1.6.8', require: false
+gem 'rdiscount', '2.2.0.1', require: false
 gem 'redcarpet', '3.5.0', require: false
 gem 'retriable', '1.4.1'
 gem 'ritex', '1.0.1', require: false
 gem 'rotp', '5.1.0', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'rubycas-client', '2.3.9', require: false
-gem 'rubyzip', '1.3.0', require: 'zip'
+gem 'rubyzip', '2.2.0', require: 'zip'
 gem 'safe_yaml', '1.0.5', require: false
 gem 'saml2', '3.0.8'
   gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
@@ -124,7 +124,7 @@ gem 'twilio-ruby', '5.31.1', require: false
 gem 'tzinfo', '1.2.5'
 gem 'vault', '0.13.0', require: false
 gem 'vericite_api', '1.5.3'
-gem 'will_paginate', '3.2.1', require: false # required for folio-pagination
+gem 'will_paginate', '3.3.0', require: false # required for folio-pagination
 
 path 'gems' do
   gem 'activesupport-suspend_callbacks'

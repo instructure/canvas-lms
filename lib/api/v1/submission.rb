@@ -27,7 +27,6 @@ module Api::V1::Submission
   include Api::V1::RubricAssessment
   include CoursesHelper
 
-  # TODO: yikes
   def submission_json(submission, assignment, current_user, session, context = nil, includes = [], params = {}, avatars = false)
     context ||= assignment.context
     hash = submission_attempt_json(submission, assignment, current_user, session, context, params)

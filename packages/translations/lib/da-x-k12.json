@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "Ryd valgt fil"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Ryd valgt fil: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Klik på en vilkårlig side for at indsætte et link til den pågældende side."
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Vis tekstlink (åbnes i en ny fane)"
     },
+    "document_678cd7bf": {
+        "message": "Dokument"
+    },
     "documents_81393201": {
         "message": "Dokumenter"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Indlejr videokode"
+    },
+    "equation_1c5ac93c": {
+        "message": "Regnestykke"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Fejl under indlæsning vurderinger"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "Højde"
     },
+    "image_8ad06": {
+        "message": "Billede"
+    },
     "image_options_5412d02c": {
         "message": "Billedindstillinger"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Øg indrykning"
+    },
+    "insert_593145ef": {
+        "message": "Indsæt"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Indsæt Equella-links"

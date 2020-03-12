@@ -269,7 +269,7 @@ class PlannerController < ApplicationController
     course_ids = @course_ids.map{|id| Shard.relative_id_for(id, @user.shard, shard)}
     course_ids += [nil] if @user_ids.present?
     item_collection('planner_notes',
-                    shard.activate { PlannerNote.active.where(user: user, todo_date: @start_date...@end_date, course_id: course_ids) },
+                    shard.activate { PlannerNote.active.where(user: user, todo_date: @start_date..@end_date, course_id: course_ids) },
                     PlannerNote, [:todo_date, :created_at], :id)
   end
 

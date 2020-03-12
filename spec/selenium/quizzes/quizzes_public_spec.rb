@@ -26,7 +26,10 @@ describe "quizzes for a public course" do
 
   it "should display quizzes list", priority: "1", test_id: 270033 do
     course_quiz(:active)
+    @quiz.update(:title => "hey you should see me")
+
     get "/courses/#{public_course.id}/quizzes"
     validate_selector_displayed('#assignment-quizzes')
+    expect(f('#assignment-quizzes')).to include_text(@quiz.title)
   end
 end

@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require_relative '../spec_helper'
 
 describe BroadcastPolicy::NotificationPolicy do
   let(:subject) do
     policy = BroadcastPolicy::NotificationPolicy.new(:test_notification)
-    policy.to       = ->(record) { ['user@example.com'] }
+    policy.to       = ->(record) { ['user@example.com', 'user2@example.com'] }
     policy.whenever = ->(record) { true }
     policy
   end
@@ -31,6 +31,13 @@ describe BroadcastPolicy::NotificationPolicy do
   before(:each) do
     BroadcastPolicy.notifier = MockNotifier.new
     BroadcastPolicy.notification_finder = MockNotificationFinder.new(test_notification: test_notification)
+  end
+
+  it 'should send_notification for each slice of users' do
+    allow(BroadcastPolicy::NotificationPolicy).to receive(:slice_size).and_return(1)
+    record = double('test record', skip_broadcasts: false, class: double(connection: test_connection_class.new))
+    expect(BroadcastPolicy.notifier).to receive(:send_notification).twice
+    subject.broadcast(record)
   end
 
   it "should call the notifier" do

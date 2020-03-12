@@ -157,8 +157,7 @@ describe Message do
     describe "course nicknames" do
       before(:once) do
         course_with_student(:active_all => true, :course_name => 'badly-named-course')
-        @student.course_nicknames[@course.id] = 'student-course-nick'
-        @student.save!
+        @student.set_preference(:course_nicknames, @course.id, 'student-course-nick')
       end
 
       def check_message(message, asset)

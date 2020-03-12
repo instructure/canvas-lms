@@ -20,13 +20,14 @@ exports[`renders the AlignmentResult component 1`] = `
   >
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       href="http://foo"
       icon={[Function]}
       margin="0"
       size="medium"
+      textAlign="center"
       theme={
         Object {
           "fontWeight": "700",
@@ -36,6 +37,7 @@ exports[`renders the AlignmentResult component 1`] = `
       }
       type="button"
       variant="link"
+      withBackground={true}
     >
       My assignment
     </Button>

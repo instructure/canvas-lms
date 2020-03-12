@@ -1082,6 +1082,10 @@ class Assignment < ActiveRecord::Base
     remove_assignment_updated_flag
   end
 
+  def course_broadcast_data
+    context&.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
     p.to { |assignment|
@@ -1094,6 +1098,7 @@ class Assignment < ActiveRecord::Base
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_due_date_changed?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :assignment_changed
     p.to { |assignment|
@@ -1103,6 +1108,7 @@ class Assignment < ActiveRecord::Base
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_changed?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :assignment_created
     p.to { |assignment|
@@ -1112,28 +1118,26 @@ class Assignment < ActiveRecord::Base
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_created?
     }
+    p.data { course_broadcast_data }
     p.filter_asset_by_recipient { |assignment, user|
       assignment.overridden_for(user, skip_clone: true)
-    }
-
-    p.dispatch :assignment_unmuted
-    p.to { |assignment|
-      BroadcastPolicies::AssignmentParticipants.new(assignment).to
-    }
-    p.whenever { |assignment|
-      BroadcastPolicies::AssignmentPolicy.new(assignment).
-        should_dispatch_assignment_unmuted?
     }
 
     p.dispatch :submissions_posted
     p.to { |assignment|
       assignment.course.participating_instructors
     }
-    p.data(&:posting_params_for_notifications)
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_submissions_posted?
     }
+    p.data do |record|
+      if record.posting_params_for_notifications.present?
+        record.posting_params_for_notifications.merge(course_broadcast_data)
+      else
+        course_broadcast_data
+      end
+    end
   end
 
   def notify_of_update=(val)
@@ -1472,6 +1476,9 @@ class Assignment < ActiveRecord::Base
   def touch_assignment_and_submittable
     self.touch
     self.submittable_object&.touch
+    if self.submittable_object.is_a?(DiscussionTopic) && self.submittable_object.root_topic?
+      self.submittable_object.child_topics.touch_all
+    end
   end
 
   def low_level_locked_for?(user, opts={})
@@ -1655,31 +1662,6 @@ class Assignment < ActiveRecord::Base
     end
 
     users.uniq
-  end
-
-  def set_default_grade(options={})
-    score = self.grade_to_score(options[:default_grade])
-    grade = self.score_to_grade(score)
-    submissions_to_save = []
-    self.context.students.find_in_batches do |students|
-      submissions = find_or_create_submissions(students)
-      submissions_to_save.concat(submissions.select  { !submissions.score || (options[:overwrite_existing_grades] && submissions.score != score) })
-    end
-
-    Submission.active.where(id: submissions_to_save).update_all({
-      :score => score,
-      :grade => grade,
-      :published_score => score,
-      :published_grade => grade,
-      :workflow_state => 'graded',
-      :graded_at => Time.zone.now.utc
-    }) unless submissions_to_save.empty?
-
-    Rails.logger.debug "GRADES: recalculating because assignment #{global_id} had default grade set (#{options.inspect})"
-    self.context.recompute_student_scores
-    student_ids = context.student_ids
-    User.clear_cache_keys(student_ids, :submissions)
-    send_later_if_production(:multiple_module_actions, student_ids, :scored, score)
   end
 
   def title_with_id
@@ -3384,7 +3366,6 @@ class Assignment < ActiveRecord::Base
 
       previously_unposted_submissions.each do |submission|
         submission.grade_posting_in_progress = true
-        # Need to broadcast assignment_unmuted here.
         submission.broadcast_notifications
         submission.grade_posting_in_progress = false
       end

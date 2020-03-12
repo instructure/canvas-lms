@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/gradebooks/grade_summary" do
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   it "should render" do
     course_with_student
     view_context
@@ -43,7 +47,7 @@ describe "/gradebooks/grade_summary" do
 
   it "should not show 'what if' if not the student" do
     course_with_teacher
-    student_in_course
+    student_in_course(active_all: true)
     @student = @user
     @user = @teacher
     view_context
@@ -58,7 +62,7 @@ describe "/gradebooks/grade_summary" do
   it "should know the types of media comments" do
     stub_kaltura
     course_with_teacher
-    student_in_course
+    student_in_course(active_all: true)
     view_context
     a = @course.assignments.create!(:title => 'some assignment', :submission_types => ['online_text_entry'])
     sub = a.submit_homework @student, :submission_type => "online_text_entry", :body => "o hai"
@@ -87,52 +91,58 @@ describe "/gradebooks/grade_summary" do
   describe "submission details link" do
     before(:each) do
       course_with_teacher
-      student_in_course
-      @assignment = @course.assignments.create!(title: 'Moderated Assignment', anonymous_grading: true, muted: true)
+      student_in_course(active_all: true)
+
+      @assignment = @course.assignments.create!(title: 'Moderated Assignment', anonymous_grading: true)
+      @assignment.ensure_post_policy(post_manually: true)
       @assignment.submit_homework @student, :submission_type => "online_text_entry", :body => "o hai"
+      @assignment.grade_student(@student, score: 10, grader: @teacher)
+
       @submission_details_url = context_url(@course, :context_assignment_submission_url, @assignment, @student.id)
     end
 
-    it "should be shown for submitting student if assignment is anonymous grading and muted" do
-      @user = @student
-      assign(:presenter, GradeSummaryPresenter.new(@course, @student, @student.id))
-      view_context
-      render "gradebooks/grade_summary"
-      expect(response).to have_tag("a[href='#{@submission_details_url}']")
-    end
+    context "when the assignment is anonymously graded" do
+      it "is shown for the submitting student" do
+        @user = @student
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@submission_details_url}']")
+      end
 
-    it "should be hidden for non-submitting student if assignment is anonymous grading and muted" do
-      view_context
-      new_student = User.create!
-      @course.enroll_student(new_student, enrollment_state: 'active')
-      assign(:presenter, GradeSummaryPresenter.new(@course, new_student, @student.id))
-      user_session(new_student)
-      render "gradebooks/grade_summary"
-      expect(response).not_to have_tag("a[href='#{@submission_details_url}']")
-    end
+      it "is hidden for a non-submitting student" do
+        view_context
+        new_student = User.create!
+        @course.enroll_student(new_student, enrollment_state: 'active')
+        assign(:presenter, GradeSummaryPresenter.new(@course, new_student, @student.id))
+        user_session(new_student)
+        render "gradebooks/grade_summary"
+        expect(response).not_to have_tag("a[href='#{@submission_details_url}']")
+      end
 
-    it "should be hidden for teacher if assignment is anonymous grading and muted" do
-      @user = @teacher
-      assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
-      view_context
-      render "gradebooks/grade_summary"
-      expect(response).not_to have_tag("a[href='#{@submission_details_url}']")
-    end
+      it "is hidden for a teacher" do
+        @user = @teacher
+        assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).not_to have_tag("a[href='#{@submission_details_url}']")
+      end
 
-    it "should be hidden for admin if assignment is anonymous grading and muted" do
-      @user = account_admin_user
-      assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
-      view_context
-      render "gradebooks/grade_summary"
-      expect(response).not_to have_tag("a[href='#{@submission_details_url}']")
-    end
+      it "is hidden for an admin" do
+        @user = account_admin_user
+        assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).not_to have_tag("a[href='#{@submission_details_url}']")
+      end
 
-    it "should be shown for site admin if assignment is anonymous grading and muted" do
-      @user = site_admin_user
-      assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
-      view_context
-      render "gradebooks/grade_summary"
-      expect(response).to have_tag("a[href='#{@submission_details_url}']")
+      it "is shown for a site admin" do
+        @user = site_admin_user
+        assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@submission_details_url}']")
+      end
     end
   end
 
@@ -140,7 +150,7 @@ describe "/gradebooks/grade_summary" do
     let(:course) { Course.create! }
     let(:site_admin) { site_admin_user }
     let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
-    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:student) { student_in_course(course: course, active_all: true).user }
     let(:attachment) { attachment_model(context: student, content_type: 'text/plain') }
     let(:state) { 'acceptable' }
 
@@ -255,7 +265,11 @@ describe "/gradebooks/grade_summary" do
         course.assignments.create!(title: 'hi', submission_types: 'online_upload', anonymous_grading: true)
       end
 
-      before { assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hello') }
+      before :each do
+        assignment.ensure_post_policy(post_manually: true)
+        assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hello')
+        assignment.grade_student(student, score: 10, grader: teacher)
+      end
 
       context "when viewed by a teacher" do
         let(:presenter) { GradeSummaryPresenter.new(course, teacher, student.id) }
@@ -266,7 +280,7 @@ describe "/gradebooks/grade_summary" do
         end
 
         it "calls turnitin_enabled? and returns false" do
-          expect(presenter).to receive(:turnitin_enabled?).and_return(false)
+          expect(presenter).to receive(:turnitin_enabled?).at_least(1).time.and_return(false)
           render "gradebooks/grade_summary"
         end
 
@@ -428,45 +442,23 @@ describe "/gradebooks/grade_summary" do
       assign(:domain_root_account, Account.default)
     end
 
-    context "when post policies are enabled" do
+    context "when post policy is set to manual" do
       before(:once) do
-        PostPolicy.enable_feature!
+        assignment.ensure_post_policy(post_manually: true)
       end
 
-      context "when post policy is set to manual" do
-        before(:once) do
-          assignment.ensure_post_policy(post_manually: true)
-        end
-
-        it "displays the 'hidden' icon" do
-          render "gradebooks/grade_summary"
-          expect(response).to have_tag(".assignment_score i[@class='icon-off']")
-        end
-
-        it 'adds the "hidden" title to the icon' do
-          render "gradebooks/grade_summary"
-          expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
-        end
-
-        context "when submissions are posted" do
-          before { assignment.post_submissions(submission_ids: submission.id) }
-
-          it 'does not add the "hidden" title to the icon' do
-            render "gradebooks/grade_summary"
-            expect(response).not_to have_tag(".assignment_score i[@title='Instructor is working on grades']")
-          end
-
-          it "does not display the 'hidden' icon" do
-            render "gradebooks/grade_summary"
-            expect(response).not_to have_tag(".assignment_score i[@class='icon-off']")
-          end
-        end
+      it "displays the 'hidden' icon" do
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag(".assignment_score i[@class='icon-off']")
       end
 
-      context "when post policy is set to automatic" do
-        before(:once) do
-          assignment.ensure_post_policy(post_manually: false)
-        end
+      it 'adds the "hidden" title to the icon' do
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
+      end
+
+      context "when submissions are posted" do
+        before { assignment.post_submissions(submission_ids: submission.id) }
 
         it 'does not add the "hidden" title to the icon' do
           render "gradebooks/grade_summary"
@@ -477,44 +469,39 @@ describe "/gradebooks/grade_summary" do
           render "gradebooks/grade_summary"
           expect(response).not_to have_tag(".assignment_score i[@class='icon-off']")
         end
-
-        context "when submissions are graded and unposted" do
-          before do
-            assignment.grade_student(student, score: 10, grader: teacher)
-            assignment.hide_submissions(submission_ids: submission.id)
-          end
-
-          it 'adds the "hidden" title to the icon' do
-            render "gradebooks/grade_summary"
-            expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
-          end
-
-          it "displays the 'hidden' icon" do
-            render "gradebooks/grade_summary"
-            expect(response).to have_tag(".assignment_score i[@class='icon-off']")
-          end
-        end
       end
     end
 
-    context "when post policies are not enabled" do
-      context "when a submission's assignment is muted" do
-        before(:once) { assignment.mute! }
+    context "when post policy is set to automatic" do
+      before(:once) do
+        assignment.ensure_post_policy(post_manually: false)
+      end
 
-        it "displays the 'muted' icon" do
-          render "gradebooks/grade_summary"
-          expect(response).to have_tag(".assignment_score i[@class='icon-muted']")
+      it 'does not add the "hidden" title to the icon' do
+        render "gradebooks/grade_summary"
+        expect(response).not_to have_tag(".assignment_score i[@title='Instructor is working on grades']")
+      end
+
+      it "does not display the 'hidden' icon" do
+        render "gradebooks/grade_summary"
+        expect(response).not_to have_tag(".assignment_score i[@class='icon-off']")
+      end
+
+      context "when submissions are graded and unposted" do
+        before do
+          assignment.grade_student(student, score: 10, grader: teacher)
+          assignment.hide_submissions(submission_ids: submission.id)
         end
 
         it 'adds the "hidden" title to the icon' do
           render "gradebooks/grade_summary"
           expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
         end
-      end
 
-      it "does not display the 'muted' icon when a submission's assignment is not muted" do
-        render "gradebooks/grade_summary"
-        expect(response).not_to have_tag(".assignment_score i[@class='icon-muted']")
+        it "displays the 'hidden' icon" do
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag(".assignment_score i[@class='icon-off']")
+        end
       end
     end
   end

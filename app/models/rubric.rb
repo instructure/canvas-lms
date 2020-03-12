@@ -54,6 +54,9 @@ class Rubric < ActiveRecord::Base
     given {|user, session| self.context.grants_right?(user, session, :manage)}
     can :read and can :create and can :delete_associations
 
+    given {|user, session| self.context.grants_right?(user, session, :read_rubrics) }
+    can :read
+
     # read_only means "associated with > 1 object for grading purposes"
     given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.context.grants_right?(user, session, :manage_assignments)}
     can :update and can :delete

@@ -117,30 +117,6 @@ module BroadcastPolicies
       specify { wont_send_when { allow(assignment).to receive(:saved_change_to_points_possible?).and_return false } }
     end
 
-    describe '#should_dispatch_assignment_unmuted?' do
-      before do
-        allow(assignment).to receive(:recently_unmuted).and_return true
-      end
-
-      it 'is true when the dependent inputs are true' do
-        expect(policy.should_dispatch_assignment_unmuted?).to be_truthy
-      end
-
-      it "returns false when post policies are enabled" do
-        allow(context).to receive(:post_policies_enabled?).and_return true
-        expect(policy.should_dispatch_assignment_unmuted?).to be false
-      end
-
-      def wont_send_when
-        yield
-        expect(policy.should_dispatch_assignment_unmuted?).to be_falsey
-      end
-
-      specify { wont_send_when { allow(context).to receive(:available?).and_return false } }
-      specify { wont_send_when { allow(assignment).to receive(:recently_unmuted).and_return false } }
-
-    end
-
     describe "#should_dispatch_submissions_posted" do
       let(:posting_params) { { graded_only: false } }
 

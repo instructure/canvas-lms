@@ -1418,6 +1418,7 @@ class Attachment < ActiveRecord::Base
       CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
       canvadoc_scope = Canvadoc.where(attachment_id: att.children_and_self.select(:id))
       CanvadocsSubmission.where(:canvadoc_id => canvadoc_scope.select(:id)).delete_all
+      AnonymousOrModerationEvent.where(:canvadoc_id => canvadoc_scope.select(:id)).delete_all
       canvadoc_scope.delete_all
       att.save!
     end

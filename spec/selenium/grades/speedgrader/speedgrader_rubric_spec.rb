@@ -24,6 +24,8 @@ describe "speed grader - rubrics" do
   include SpeedGraderCommon
 
   before(:each) do
+    PostPolicy.enable_feature!
+
     course_with_teacher_logged_in
     outcome_with_rubric
     @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)

@@ -16,7 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, getAllByText, getByLabelText, queryByLabelText, wait} from '@testing-library/dom'
+import {
+  fireEvent,
+  getAllByText,
+  getByLabelText,
+  queryByLabelText,
+  queryByTestId,
+  wait
+} from '@testing-library/dom'
 
 function getSizeOptions($sizeSelect) {
   const controlledId = $sizeSelect.getAttribute('aria-controls')
@@ -60,6 +67,10 @@ export default class VideoOptionsTrayDriver {
     return [...this.$element.querySelectorAll('button,[role="button"]')].find(
       $button => $button.textContent.trim() === 'Done'
     )
+  }
+
+  get $closedCaptionPanel() {
+    return queryByTestId(this.$element, 'ClosedCaptionPanel')
   }
 
   get titleText() {

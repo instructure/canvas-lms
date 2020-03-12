@@ -26,7 +26,6 @@ exports[`The Points component renders the component when assessing with the expe
         display="inline-block"
         inputContainerRef={[Function]}
         inputRef={[Function]}
-        interaction="enabled"
         isRequired={false}
         messages={Array []}
         onBlur={[Function]}
@@ -39,6 +38,7 @@ exports[`The Points component renders the component when assessing with the expe
             Points
           </ScreenReaderContent>
         }
+        shouldNotWrap={false}
         size="medium"
         textAlign="start"
         type="text"

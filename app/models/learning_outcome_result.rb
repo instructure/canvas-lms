@@ -38,6 +38,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   simply_versioned
 
   before_save :infer_defaults
+  before_save :ensure_user_uuid
 
   def calculate_percent!
     scale_data = scale_params
@@ -149,6 +150,10 @@ class LearningOutcomeResult < ActiveRecord::Base
     self.original_mastery = self.mastery if self.original_mastery == nil
     calculate_percent!
     true
+  end
+
+  def ensure_user_uuid
+    self.user_uuid = self.user&.uuid if self.user_uuid.blank?
   end
 
   def calculate_by_scale(scale_data)

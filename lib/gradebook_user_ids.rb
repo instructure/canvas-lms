@@ -17,7 +17,7 @@
 
 class GradebookUserIds
   def initialize(course, user)
-    settings = (user.preferences.dig(:gradebook_settings, course.id) || {}).with_indifferent_access
+    settings = (user.get_preference(:gradebook_settings, course.global_id) || {}).with_indifferent_access
     @course = course
     @user = user
     @include_inactive = settings[:show_inactive_enrollments] == "true"

@@ -160,7 +160,11 @@ class LearningOutcome < ActiveRecord::Base
 
     if context.is_a? Course
       create_missing_outcome_link(context)
-      self.touch if MasterCourses::MasterTemplate.is_master_course?(context)
+      if MasterCourses::MasterTemplate.is_master_course?(context)
+        # mark for re-sync
+        context.learning_outcome_links.polymorphic_where(:content => self).touch_all if self.context_type == "Account"
+        self.touch
+      end
     end
     tag
   end

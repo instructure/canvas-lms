@@ -811,7 +811,9 @@ class ExternalToolsController < ApplicationController
   #   The url of the external tool
   #
   # @argument resource_selection[enabled] [Boolean]
-  #   Set this to enable this feature
+  #   Set this to enable this feature. If set to false,
+  #   not_selectable must also be set to true in order to hide this tool
+  #   from the selection UI in modules and assignments.
   #
   # @argument resource_selection[icon_url] [String]
   #   The url of the icon to show in the module external tool list
@@ -839,7 +841,8 @@ class ExternalToolsController < ApplicationController
   #   "by_url"
   #
   # @argument not_selectable [Boolean]
-  #   Default: false, if set to true the tool won't show up in the external tool
+  #   Default: false. If set to true, and if resource_selection is set to false,
+  #   the tool won't show up in the external tool
   #   selection UI in modules and assignments
   #
   # @argument oauth_compliant [Boolean]

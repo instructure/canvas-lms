@@ -1625,7 +1625,6 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :developer_keys) do
-      get 'developer_keys/:id', action: :show
       delete 'developer_keys/:id', action: :destroy
       put 'developer_keys/:id', action: :update
 
@@ -2242,6 +2241,12 @@ CanvasRails::Application.routes.draw do
     scope(:controller => :media_objects) do
       put 'media_objects/:media_object_id', action: 'update_media_object', as: :update_media_object
     end
+
+    scope(:controller => :media_tracks) do
+      get 'media_objects/:media_object_id/media_tracks', action: 'index', as: :list_media_tracks
+      put 'media_objects/:media_object_id/media_tracks', action: 'update', as: :update_media_tracks
+    end
+
   end
 
     # this is not a "normal" api endpoint in the sense that it is not documented or

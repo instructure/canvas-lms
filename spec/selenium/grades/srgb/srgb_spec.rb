@@ -36,6 +36,10 @@ describe "Screenreader Gradebook" do
   let(:gradebook_cell_css) { '.gradebook-cell' }
   let(:view_grading_history) { f("a[href='/courses/#{@course.id}/gradebook/history']") }
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   def active_element
     driver.switch_to.active_element
   end
@@ -247,6 +251,7 @@ describe "Screenreader Gradebook" do
 
   it 'can mute assignments', priority: '1', test_id: 164001 do
     assignment = basic_percent_setup
+    assignment.unmute!
     SRGB.visit(@course.id)
 
     click_option '#student_select', @students[0].name
@@ -262,8 +267,8 @@ describe "Screenreader Gradebook" do
   it 'can unmute assignments', priority: '1', test_id: 288859 do
     assignment = basic_percent_setup
     assignment.mute!
-
     SRGB.visit(@course.id)
+
     click_option '#student_select', @students[0].name
     click_option '#assignment_select', assignment.name
     f('#assignment_muted_check').click

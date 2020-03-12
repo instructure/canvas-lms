@@ -2454,14 +2454,13 @@ describe CalendarEventsApiController, type: :request do
           format: 'json',
           selected_contexts: ['course_1', 'course_2', 'course_3']
       })
-      expect(@user.reload.preferences[:selected_calendar_contexts]).to eq(['course_1', 'course_2', 'course_3'])
+      expect(@user.reload.get_preference(:selected_calendar_contexts)).to eq(['course_1', 'course_2', 'course_3'])
     end
   end
 
   context 'visible_contexts' do
     it 'includes custom colors' do
-      @user.custom_colors[@course.asset_string] = '#0099ff'
-      @user.save!
+      @user.set_preference(:custom_colors, {@course.asset_string => '#0099ff'})
 
       json = api_call(:get, '/api/v1/calendar_events/visible_contexts', {
         controller: 'calendar_events_api',
@@ -2476,8 +2475,7 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it 'includes whether the context has been selected' do
-      @user.preferences[:selected_calendar_contexts] = [@course.asset_string];
-      @user.save!
+      @user.set_preference(:selected_calendar_contexts, [@course.asset_string])
 
       json = api_call(:get, '/api/v1/calendar_events/visible_contexts', {
         controller: 'calendar_events_api',

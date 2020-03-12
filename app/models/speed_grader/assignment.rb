@@ -36,10 +36,9 @@ module SpeedGrader
       submission_json_fields = %i(id submitted_at workflow_state grade
                                   grade_matches_current_submission graded_at turnitin_data
                                   submission_type score points_deducted assignment_id submission_comments
-                                  grading_period_id excused updated_at attempt)
+                                  grading_period_id excused updated_at attempt posted_at)
 
       submission_json_fields << (anonymous_students?(current_user: current_user, assignment: assignment) ? :anonymous_id : :user_id)
-      submission_json_fields << :posted_at if course.post_policies_enabled?
 
       attachment_json_fields = %i(id comment_id content_type context_id context_type display_name
                                   filename mime_class size submitter_id workflow_state)
@@ -60,7 +59,7 @@ module SpeedGrader
       res['context']['concluded'] = assignment.context.concluded?
       res['anonymize_students'] = assignment.anonymize_students?
       res['anonymize_graders'] = !assignment.can_view_other_grader_identities?(current_user)
-      res['post_manually'] = assignment.post_manually? if course.post_policies_enabled?
+      res['post_manually'] = assignment.post_manually?
 
       # include :provisional here someday if we need to distinguish
       # between provisional and real comments (also in
@@ -177,7 +176,7 @@ module SpeedGrader
           json.merge! provisional_grade_to_json(provisional_grade)
         end
 
-        if course.root_account.feature_enabled?(:allow_postable_submission_comments) && course.post_policies_enabled?
+        if course.root_account.feature_enabled?(:allow_postable_submission_comments)
           json[:has_postable_comments] = sub.submission_comments.select(&:hidden?).present?
         end
 
@@ -412,14 +411,14 @@ module SpeedGrader
 
     def group_id_filter
       return nil unless course.filter_speed_grader_by_student_group?
-      group_id = current_user.preferences.dig(:gradebook_settings, course.id, 'filter_rows_by', 'student_group_id')
+      group_id = current_user.get_preference(:gradebook_settings, course.global_id)&.dig('filter_rows_by', 'student_group_id')
 
       # If we selected a group that is now deleted, don't use it
       Group.active.exists?(id: group_id) ? group_id : nil
     end
 
     def section_id_filter
-      current_user.preferences.dig(:gradebook_settings, course.id, 'filter_rows_by', 'section_id')
+      current_user.get_preference(:gradebook_settings, course.global_id)&.dig('filter_rows_by', 'section_id')
     end
   end
 end

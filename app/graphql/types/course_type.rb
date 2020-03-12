@@ -277,5 +277,10 @@ module Types
         }
       end
     end
+
+    field :notification_preferences_enabled, Boolean, null: false
+    def notification_preferences_enabled
+      NotificationPolicyOverride.enabled_for(current_user, course)
+    end
   end
 end

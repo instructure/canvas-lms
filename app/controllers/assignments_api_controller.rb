@@ -980,7 +980,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[points_possible] [Float]
   #   The maximum points possible on the assignment.
   #
-  # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
+  # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
   #  The strategy used for grading the assignment.
   #  The assignment defaults to "points" if this field is omitted.
   #
@@ -1165,7 +1165,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[points_possible] [Float]
   #   The maximum points possible on the assignment.
   #
-  # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
+  # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
   #  The strategy used for grading the assignment.
   #  The assignment defaults to "points" if this field is omitted.
   #

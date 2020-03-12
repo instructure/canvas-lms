@@ -19,6 +19,11 @@ class AssignmentCreateEditPage
   class << self
     include SeleniumDependencies
 
+    # CSS Selectors
+    def submission_type_selector
+      "#assignment_submission_type"
+    end
+
     # Selectors
     def assignment_form
       f('#edit_assignment_form')
@@ -46,6 +51,26 @@ class AssignmentCreateEditPage
 
     def submission_type
       f('#assignment_submission_type')
+    end
+
+    def limited_attempts_fieldset
+      f("#allowed_attempts_fields")
+    end
+
+    def limited_attempts_dropdown
+      f("#allowed-attempts-target select")
+    end
+
+    def limited_attempts_input
+      f("input[name='allowed_attempts']")
+    end
+
+    def increase_attempts_btn
+      f("button svg[name='IconArrowOpenUp']")
+    end
+
+    def decrease_attempts_btn
+      f("button svg[name='IconArrowOpenDown']")
     end
 
     # Moderated Grading Options

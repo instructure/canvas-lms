@@ -23,7 +23,9 @@
 # no regular words or you'll be exposed to dictionary attacks.
 config = {
   :key           => '_normandy_session',
-  :secret        => (Setting.get("session_secret_key", SecureRandom.hex(64), set_if_nx: true) rescue SecureRandom.hex(64))
+  :secret        => (Setting.get("session_secret_key", SecureRandom.hex(64), set_if_nx: true) rescue SecureRandom.hex(64)),
+  legacy_key: '_legacy_normandy_session',
+  same_site: :none
 }.merge((ConfigFile.load("session_store") || {}).symbolize_keys)
 
 # :expire_after is the "true" option, and :expires is a legacy option, but is applied
@@ -35,5 +37,6 @@ config[:logger] = Rails.logger
 
 Autoextend.hook(:EncryptedCookieStore, :SessionsTimeout)
 
-CanvasRails::Application.config.session_store(:encrypted_cookie_store, config)
+# after iOS12 is dead, change this back to :encrypted_cookie_store and remove lib/samesite_transition_cookie_store.rb
+CanvasRails::Application.config.session_store(:samesite_transition_cookie_store, config)
 CanvasRails::Application.config.secret_token = config[:secret]

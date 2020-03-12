@@ -160,6 +160,7 @@ describe "calendar2" do
 
         get '/calendar2'
         f('.calendar .fc-week .fc-today').click
+        f('#edit_event #edit_event_tabs') # using implicit wait for element to be displayed
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
 

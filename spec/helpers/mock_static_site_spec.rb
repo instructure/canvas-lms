@@ -18,6 +18,9 @@
 require_relative '../spec_helper'
 
 describe "a mock static site" do
+  after :each do
+    WebMock.reset!
+  end
 
   it "should throw exception if static site directory doesn't exist" do
     expect {
@@ -32,7 +35,6 @@ describe "a mock static site" do
   end
 
   context "when created" do
-
     it "finds the index file" do
       MockStaticSite.new('google.com', 'sample_site')
       response = Net::HTTP.get('google.com', '/')

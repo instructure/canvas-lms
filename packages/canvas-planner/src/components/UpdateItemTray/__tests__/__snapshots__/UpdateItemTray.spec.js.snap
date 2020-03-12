@@ -38,13 +38,13 @@ exports[`renders the item to update if provided 1`] = `
         display="block"
         inputContainerRef={[Function]}
         inputRef={[Function]}
-        interaction="enabled"
         isRequired={false}
         messages={Array []}
         onBlur={[Function]}
         onChange={[Function]}
         onFocus={[Function]}
         renderLabel={[Function]}
+        shouldNotWrap={false}
         size="medium"
         textAlign="start"
         type="text"
@@ -131,28 +131,32 @@ exports[`renders the item to update if provided 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         margin="0 x-small 0 0"
         onClick={[Function]}
         size="medium"
+        textAlign="center"
         type="button"
         variant="light"
+        withBackground={true}
       >
         Delete
       </Button>
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
         disabled={false}
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         margin="0 0 0 x-small"
         onClick={[Function]}
         size="medium"
+        textAlign="center"
         type="button"
         variant="primary"
+        withBackground={true}
       >
         Save
       </Button>
@@ -199,13 +203,13 @@ exports[`updates state when new note is passed in 1`] = `
         display="block"
         inputContainerRef={[Function]}
         inputRef={[Function]}
-        interaction="enabled"
         isRequired={false}
         messages={Array []}
         onBlur={[Function]}
         onChange={[Function]}
         onFocus={[Function]}
         renderLabel={[Function]}
+        shouldNotWrap={false}
         size="medium"
         textAlign="start"
         type="text"
@@ -299,28 +303,32 @@ exports[`updates state when new note is passed in 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         margin="0 x-small 0 0"
         onClick={[Function]}
         size="medium"
+        textAlign="center"
         type="button"
         variant="light"
+        withBackground={true}
       >
         Delete
       </Button>
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
         disabled={false}
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         margin="0 0 0 x-small"
         onClick={[Function]}
         size="medium"
+        textAlign="center"
         type="button"
         variant="primary"
+        withBackground={true}
       >
         Save
       </Button>
@@ -367,13 +375,13 @@ exports[`updates state when new note is passed in 2`] = `
         display="block"
         inputContainerRef={[Function]}
         inputRef={[Function]}
-        interaction="enabled"
         isRequired={false}
         messages={Array []}
         onBlur={[Function]}
         onChange={[Function]}
         onFocus={[Function]}
         renderLabel={[Function]}
+        shouldNotWrap={false}
         size="medium"
         textAlign="start"
         type="text"
@@ -467,28 +475,32 @@ exports[`updates state when new note is passed in 2`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         margin="0 x-small 0 0"
         onClick={[Function]}
         size="medium"
+        textAlign="center"
         type="button"
         variant="light"
+        withBackground={true}
       >
         Delete
       </Button>
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
         disabled={false}
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         margin="0 0 0 x-small"
         onClick={[Function]}
         size="medium"
+        textAlign="center"
         type="button"
         variant="primary"
+        withBackground={true}
       >
         Save
       </Button>

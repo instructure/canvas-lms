@@ -59,7 +59,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # adds a new link to an outcome to this group. does nothing if a link already
   # exists (an outcome can be linked into a context multiple times by multiple
   # groups, but only once per group).
-  def add_outcome(outcome, skip_touch: false)
+  def add_outcome(outcome, skip_touch: false, migration_id: nil)
     # no-op if the outcome is already linked under this group
     outcome_link = child_outcome_links.active.where(content_id: outcome).first
     return outcome_link if outcome_link
@@ -69,7 +69,8 @@ class LearningOutcomeGroup < ActiveRecord::Base
     child_outcome_links.create(
       content: outcome,
       context: self.context || self,
-      skip_touch: skip_touch
+      skip_touch: skip_touch,
+      migration_id: migration_id
     )
   end
 

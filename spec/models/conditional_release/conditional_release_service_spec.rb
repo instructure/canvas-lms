@@ -36,6 +36,10 @@ describe ConditionalRelease::Service do
     allow(Service).to receive(:enabled_in_context?).and_return(true)
   end
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   before(:each) do
     clear_config
   end
@@ -278,7 +282,10 @@ describe ConditionalRelease::Service do
     before do
       enable_service
       course_with_student_submissions(active_all: true)
+
       @assignment = Assignment.first
+      @assignment.unmute!
+
       @submission = @assignment.submission_for_student(@student)
       @submission.workflow_state = 'graded'
       @submission.score = 10
@@ -342,17 +349,11 @@ describe ConditionalRelease::Service do
       expect(response[:code]).to eq '400'
     end
 
-    context "when post policies are enabled" do
-      before(:each) do
-        PostPolicy.enable_feature!
-      end
-
-      it "fails for assignments for which the student's submission is not posted" do
-        @assignment.hide_submissions
-        expect(CanvasHttp).to receive(:post).never
-        response = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
-        expect(response[:code]).to eq '400'
-      end
+    it "fails for assignments for which the student's submission is not posted" do
+      @assignment.hide_submissions
+      expect(CanvasHttp).to receive(:post).never
+      response = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
+      expect(response[:code]).to eq '400'
     end
   end
 
@@ -660,6 +661,7 @@ describe ConditionalRelease::Service do
 
       before do
         course_with_student(active_all: true)
+        @course.default_post_policy.update!(post_manually: false)
       end
 
       context 'for cross-shard users' do
@@ -668,25 +670,31 @@ describe ConditionalRelease::Service do
         it 'selects submissions' do
           @shard1.activate do
             course_with_student(account: Account.create!, user: @student)
-            sub = graded_submission_model(course: @course, user: @student)
-            expect_request_rules(sub)
+            @course.enroll_teacher(@teacher, active_all: true).accept!
+            submission_model(course: @course, user: @student)
+            @submission.assignment.grade_student(@student, grade: 10, grader: @teacher)
+            expect_request_rules(@submission.reload)
             Service.rules_for(@course, @student, [], nil)
           end
         end
       end
 
       it 'includes only submissions for the course' do
-        graded_submission_model(course: @course, user: @student)
+        s1 = submission_model(course: @course, user: @student)
+        s1.assignment.grade_student(@student, grade: 10, grader: @teacher)
         course_with_student(user: @student)
-        sub = graded_submission_model(course: @course, user: @student)
-        expect_request_rules(sub)
+        @course.enroll_teacher(@teacher, active_all: true).accept!
+        s2 = graded_submission_model(course: @course, user: @student)
+        s2.assignment.grade_student(@student, grade: 10, grader: @teacher)
+        expect_request_rules(s2.reload)
         Service.rules_for(@course, @student, [], nil)
       end
 
       it 'includes only completely graded submissions' do
-        s1 = graded_submission_model(course: @course, user: @student)
+        s1 = submission_model(course: @course, user: @student)
+        s1.assignment.grade_student(@student, grade: 10, grader: @teacher)
         _s2 = submission_model(course: @course, user: @student)
-        expect_request_rules(s1)
+        expect_request_rules(s1.reload)
         Service.rules_for(@course, @student, [], nil)
       end
 
@@ -703,33 +711,36 @@ describe ConditionalRelease::Service do
         end
       end
 
-      context "when post policies are enabled" do
-        before(:each) do
-          PostPolicy.enable_feature!
+      it "includes assignments with submissions that have been posted to the student" do
+        submission_model(course: @course, user: @student)
+        @submission.assignment.grade_student(@student, grade: 10, grader: @teacher)
 
-          graded_submission_model(course: @course, user: @student)
+        # Add a second student so we have a meaningful distinction between
+        # assignment muted and submission posted
+        @course.enroll_student(User.create!, enrollment_state: :active)
+        @submission.assignment.hide_submissions
 
-          # Add a second student so we have a meaningful distinction between
-          # assignment muted and submission posted
-          @course.enroll_student(User.create!, enrollment_state: :active)
-          @submission.assignment.hide_submissions
+        enable_cache do
+          @submission.assignment.post_submissions(submission_ids: [@submission.id])
+          expect_request_rules(@submission.reload)
+          Service.rules_for(@course, @student, [], nil)
         end
+      end
 
-        it "includes assignments with submissions that have been posted to the student" do
-          enable_cache do
-            @submission.assignment.post_submissions(submission_ids: [@submission.id])
-            expect_request_rules(@submission)
-            Service.rules_for(@course, @student, [], nil)
-          end
-        end
+      it "excludes assignments with submissions that have not been posted to the student" do
+        submission_model(course: @course, user: @student)
+        @submission.assignment.grade_student(@student, grade: 10, grader: @teacher)
 
-        it "excludes assignments with submissions that have not been posted to the student" do
-          enable_cache do
-            @submission.assignment.post_submissions
-            @submission.assignment.hide_submissions(submission_ids: [@submission.id])
-            expect_request_rules([])
-            Service.rules_for(@course, @student, [], nil)
-          end
+        # Add a second student so we have a meaningful distinction between
+        # assignment muted and submission posted
+        @course.enroll_student(User.create!, enrollment_state: :active)
+        @submission.assignment.hide_submissions
+
+        enable_cache do
+          @submission.assignment.post_submissions
+          @submission.assignment.hide_submissions(submission_ids: [@submission.id])
+          expect_request_rules([])
+          Service.rules_for(@course, @student, [], nil)
         end
       end
     end

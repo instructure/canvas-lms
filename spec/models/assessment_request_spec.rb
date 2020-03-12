@@ -96,6 +96,24 @@ describe AssessmentRequest do
       message = @request.messages_sent[notification_name].first
       expect(message.body).to include(@assignment.title)
     end
+
+    it "should send to the correct url if anonymous" do
+      @student.communication_channels.create!(:path => 'test@example.com').confirm!
+      NotificationPolicy.create!(:notification => notification,
+        :communication_channel => @student.communication_channel, :frequency => 'immediately')
+
+      rubric_model
+      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+      @assignment.update_attributes(:anonymous_peer_reviews => true)
+
+      @request.rubric_association = @association
+      @request.save!
+      @request.send_reminder!
+
+      expect(@request.messages_sent.keys).to include(notification_name)
+      message = @request.messages_sent[notification_name].first
+      expect(message.body).to include("/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{@request.asset.anonymous_id}")
+    end
   end
 
   describe 'policies' do

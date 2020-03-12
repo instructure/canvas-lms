@@ -64,20 +64,17 @@ def runInSeriesOrParallel(is_series, stages_map) {
 
 pipeline {
   agent { label 'canvas-docker' }
-  options {
-    ansiColor('xterm')
-  }
+  options { ansiColor('xterm') }
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
     COVERAGE = runCoverage()
     FORCE_FAILURE = isForceFailure()
-    NAME = getImageTagVersion()
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     SENTRY_URL="https://sentry.insops.net"
     SENTRY_ORG="instructure"
     SENTRY_PROJECT="master-javascript-build"
   }
+
   stages {
     stage('Pre-Cleanup') {
       steps {

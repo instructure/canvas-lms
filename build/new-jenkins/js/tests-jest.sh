@@ -11,4 +11,4 @@ if [[ "${COVERAGE:-}" == "1" ]]; then
 fi
 
 docker-compose run --name $CONTAINER_NAME -e COVERAGE -e FORCE_FAILURE -e RAILS_ENV=test $sentry web \
-    bash -c "bundle exec rails graphql:schema && yarn test:jest$EXTRA --runInBand"
+    bash -c "bundle exec rails graphql:schema && yarn test:jest$EXTRA"

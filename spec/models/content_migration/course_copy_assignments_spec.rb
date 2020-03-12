@@ -19,6 +19,10 @@ require File.expand_path(File.dirname(__FILE__) + '/course_copy_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper')
 
 describe ContentMigration do
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   context "course copy assignments" do
     include_examples "course copy"
 
@@ -208,7 +212,7 @@ describe ContentMigration do
           expect(@assignment[attr]).to eq new_assignment[attr]
         end
       end
-      expect(new_assignment.muted).to be_falsey
+      expect(new_assignment.muted).to eq true
       expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
 

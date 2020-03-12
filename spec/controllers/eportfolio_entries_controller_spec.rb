@@ -31,6 +31,8 @@ describe EportfolioEntriesController do
   end
 
   before :once do
+    PostPolicy.enable_feature!
+
     eportfolio_with_user(:active_all => true)
     @user.account_users.create!(account: Account.default, role: student_role)
     eportfolio_category
@@ -246,10 +248,13 @@ describe EportfolioEntriesController do
   describe "GET 'submission'" do
     before(:once) do
       eportfolio_entry(@category)
+      @student = @user
       course = Course.create!
-      course.enroll_student(@user, enrollment_state: @active)
+      course.enroll_student(@student).accept(true)
+      teacher = teacher_in_course(course: course, active_all: true).user
       @assignment = course.assignments.create!
-      @submission = @assignment.submissions.find_by(user: @user)
+      @submission = @assignment.submissions.find_by(user: @student)
+      @assignment.grade_student(@student, grader: teacher, score: 5)
     end
 
     it 'requires authorization' do
@@ -258,7 +263,7 @@ describe EportfolioEntriesController do
     end
 
     it 'passes anonymize_students: false to the template if the assignment is not anonymous' do
-      user_session(@user)
+      user_session(@student)
       expect(controller).to receive(:render).with({
         template: 'submissions/show_preview',
         locals: { anonymize_students: false }
@@ -267,10 +272,10 @@ describe EportfolioEntriesController do
       get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
     end
 
-    it 'passes anonymize_students: false to the template if the assignment is anonymous and unmuted' do
-      user_session(@user)
+    it 'passes anonymize_students: false to the template if the assignment is anonymous and grades are posted' do
+      user_session(@student)
       @assignment.update!(anonymous_grading: true)
-      @assignment.unmute!
+      @assignment.post_submissions
       expect(controller).to receive(:render).with({
         template: 'submissions/show_preview',
         locals: { anonymize_students: false }
@@ -279,9 +284,10 @@ describe EportfolioEntriesController do
       get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
     end
 
-    it 'passes anonymize_students: true to the template if the assignment is anonymous and muted' do
-      user_session(@user)
-      @assignment.update!(anonymous_grading: true, muted: true)
+    it 'passes anonymize_students: true to the template if the assignment is anonymous and grades are unposted' do
+      user_session(@student)
+      @assignment.update!(anonymous_grading: true)
+      @assignment.hide_submissions
       expect(controller).to receive(:render).with({
         template: 'submissions/show_preview',
         locals: { anonymize_students: true }

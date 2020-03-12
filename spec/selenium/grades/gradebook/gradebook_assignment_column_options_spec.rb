@@ -27,6 +27,8 @@ describe "Gradebook - Assignment Column" do
   include GroupsCommon
 
   before(:once) do
+    PostPolicy.enable_feature!
+
     course_with_teacher(active_all: true)
 
     # enroll three students
@@ -139,6 +141,7 @@ describe "Gradebook - Assignment Column" do
       # re-use the course and student setup from the describe block up-above
       # update assignment to be an anonymous assignment
       @assignment.update(title: "Anon Assignment", anonymous_grading: true)
+      @assignment.submissions.update_all(posted_at: nil)
 
       # visit gradebook as teacher
       Gradebook.visit(@course)

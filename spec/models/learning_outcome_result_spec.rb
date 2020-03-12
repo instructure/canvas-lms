@@ -260,6 +260,13 @@ describe LearningOutcomeResult do
     end
   end
 
+  describe '#ensure_user_uuid' do
+    it 'sets user uuid if one is not present' do
+      learning_outcome_result.save!
+      expect(learning_outcome_result.user_uuid).to eq(student.uuid)
+    end
+  end
+
   describe '#save_to_version' do
     it 'updates the attempt version with the current model state' do
       learning_outcome_result.attempt = 1

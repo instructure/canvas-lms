@@ -78,6 +78,8 @@ class RubricAssessment < ActiveRecord::Base
       where(user_id: user.id).
       first_or_initialize
 
+    result.user_uuid = user.uuid
+
     # force the context and artifact
     result.artifact = self
     result.context = alignment.context

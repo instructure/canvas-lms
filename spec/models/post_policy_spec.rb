@@ -92,22 +92,6 @@ describe PostPolicy do
   end
 
   describe "post policies feature" do
-    describe ".feature_enabled?" do
-      it "returns true if the post_policies_enabled setting is set to true" do
-        Setting.set("post_policies_enabled", true)
-        expect(PostPolicy).to be_feature_enabled
-      end
-
-      it "returns false if the post_policies_enabled setting is set to any other value" do
-        Setting.set("post_policies_enabled", "NO")
-        expect(PostPolicy).not_to be_feature_enabled
-      end
-
-      it "returns false if no value is set for the setting" do
-        expect(PostPolicy).not_to be_feature_enabled
-      end
-    end
-
     describe ".enable_feature!" do
       it "sets the post_policies_enabled setting to 'true'" do
         PostPolicy.enable_feature!

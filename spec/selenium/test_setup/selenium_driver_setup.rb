@@ -331,7 +331,7 @@ module SeleniumDriverSetup
 
     def ruby_chrome_driver
       puts "Thread: provisioning local chrome driver"
-      Webdrivers::Chromedriver.required_version = (CONFIG[:chromedriver_version] || "78.0.3904.105")
+      Webdrivers::Chromedriver.required_version = (CONFIG[:chromedriver_version] || "80.0.3987.106")
       chrome_options = Selenium::WebDriver::Chrome::Options.new
       # put `auto_open_devtools: true` in your selenium.yml if you want to have
       # the chrome dev tools open by default by selenium

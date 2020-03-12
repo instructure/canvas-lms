@@ -20,11 +20,15 @@ require_relative '../sharding_spec_helper'
 
 describe PlannerController do
   before :once do
+    PostPolicy.enable_feature!
+
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
     @group = @course.assignment_groups.create(:name => "some group")
     @assignment = course_assignment
     @assignment2 = course_assignment
+    @assignment.unmute!
+    @assignment2.unmute!
   end
 
   def course_assignment
@@ -612,6 +616,7 @@ describe PlannerController do
           dt.change_all_read_state("unread", @student)
 
           @assignment3 = @course.assignments.create!(:submission_types => "online_text_entry")
+          @assignment3.unmute!
           override = @assignment3.assignment_overrides.new(:set => @course.default_section)
           override.override_due_at(2.days.from_now)
           override.save!
@@ -977,7 +982,7 @@ describe PlannerController do
 
         it "should return items with new submission comments" do
           @sub = @assignment2.submit_homework(@student)
-          @sub.submission_comments.create!(comment: "hello", author: @teacher)
+          @sub.add_comment(comment: "hello", author: @teacher)
           get :index, params: {filter: "new_activity"}
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 1
@@ -1140,6 +1145,21 @@ describe PlannerController do
             topic_json = json_parse(response.body).first
             expect(topic_json['plannable']['unread_count']).to be 1
           end
+        end
+      end
+
+      context "date ranges" do
+        let(:start_date) { Time.parse("2020-01-1T00:00:00") }
+        let(:end_date) { Time.parse("2020-01-1T23:59:59Z") }
+
+        it "only returns items between (inclusive) the specified dates" do
+          pn = planner_note_model(course: @course, todo_date: end_date)
+          calendar_event_model(start_at: end_date + 1.second)
+          get :index, params: {:start_date => start_date.iso8601, :end_date => end_date.iso8601}
+          response_json = json_parse(response.body)
+          expect(response_json.length).to eq 1
+          note = response_json.detect { |i| i["plannable_type"] == 'planner_note' }
+          expect(note["plannable"]["title"]).to eq pn.title
         end
       end
     end

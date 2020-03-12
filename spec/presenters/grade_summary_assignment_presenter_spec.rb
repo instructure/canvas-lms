@@ -15,9 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GradeSummaryAssignmentPresenter do
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   before :each do
     attachment_model
     course_factory(active_all: true)
@@ -136,8 +141,8 @@ describe GradeSummaryAssignmentPresenter do
   end
 
   describe "#original_points" do
-    it "returns an empty string when assignment is muted" do
-      @assignment.muted = true
+    it "returns an empty string when grades are hidden" do
+      allow(@submission).to receive(:hide_grade_from_student?).and_return(true)
       expect(presenter.original_points).to eq ''
     end
 
@@ -243,72 +248,56 @@ describe GradeSummaryAssignmentPresenter do
       expect(submissionless_presenter).to be_hide_grade_from_student
     end
 
-    context "when post policies are enabled" do
-      before(:each) { PostPolicy.enable_feature! }
-
-      context "when assignment posts manually" do
-        before(:each) do
-          @assignment.ensure_post_policy(post_manually: true)
-        end
-
-        it "returns false when the student's submission is posted" do
-          @submission.update!(posted_at: Time.zone.now)
-          expect(presenter).not_to be_hide_grade_from_student
-        end
-
-        it "returns true when the student's submission is not posted" do
-          @submission.update!(posted_at: nil)
-          expect(presenter).to be_hide_grade_from_student
-        end
+    context "when assignment posts manually" do
+      before(:each) do
+        @assignment.ensure_post_policy(post_manually: true)
       end
 
-      context "when assignment posts automatically" do
-        before(:each) do
-          @assignment.ensure_post_policy(post_manually: false)
-        end
-
-        it "returns false when the student's submission is posted" do
-          @submission.update!(posted_at: Time.zone.now)
-          expect(presenter).not_to be_hide_grade_from_student
-        end
-
-        it "returns false when the student's submission is not posted and no grade has been issued" do
-          expect(presenter).not_to be_hide_grade_from_student
-        end
-
-        it "returns false when the student has submitted something but no grade is posted" do
-          @assignment.update!(submission_types: "online_text_entry")
-          @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "hi")
-          expect(presenter).not_to be_hide_grade_from_student
-        end
-
-        it "returns true when the student's submission is graded and not posted" do
-          @assignment.grade_student(@student, grader: @teacher, score: 5)
-          @submission.reload
-          @submission.update!(posted_at: nil)
-          expect(presenter).to be_hide_grade_from_student
-        end
-
-        it "returns true when the student has resubmitted to a previously graded and subsequently hidden submission" do
-          @assignment.update!(submission_types: "online_text_entry")
-          @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "hi")
-          @assignment.grade_student(@student, score: 0, grader: @teacher)
-          @assignment.hide_submissions
-          @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "I will not lose")
-          @submission.reload
-          expect(presenter).to be_hide_grade_from_student
-        end
-      end
-    end
-
-    context "when post policies are not enabled" do
-      it "returns false when the assignment is unmuted" do
-        @assignment.unmute!
+      it "returns false when the student's submission is posted" do
+        @submission.update!(posted_at: Time.zone.now)
         expect(presenter).not_to be_hide_grade_from_student
       end
 
-      it "returns true when the assignment is muted" do
-        @assignment.mute!
+      it "returns true when the student's submission is not posted" do
+        @submission.update!(posted_at: nil)
+        expect(presenter).to be_hide_grade_from_student
+      end
+    end
+
+    context "when assignment posts automatically" do
+      before(:each) do
+        @assignment.ensure_post_policy(post_manually: false)
+      end
+
+      it "returns false when the student's submission is posted" do
+        @submission.update!(posted_at: Time.zone.now)
+        expect(presenter).not_to be_hide_grade_from_student
+      end
+
+      it "returns false when the student's submission is not posted and no grade has been issued" do
+        expect(presenter).not_to be_hide_grade_from_student
+      end
+
+      it "returns false when the student has submitted something but no grade is posted" do
+        @assignment.update!(submission_types: "online_text_entry")
+        @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "hi")
+        expect(presenter).not_to be_hide_grade_from_student
+      end
+
+      it "returns true when the student's submission is graded and not posted" do
+        @assignment.grade_student(@student, grader: @teacher, score: 5)
+        @submission.reload
+        @submission.update!(posted_at: nil)
+        expect(presenter).to be_hide_grade_from_student
+      end
+
+      it "returns true when the student has resubmitted to a previously graded and subsequently hidden submission" do
+        @assignment.update!(submission_types: "online_text_entry")
+        @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "hi")
+        @assignment.grade_student(@student, score: 0, grader: @teacher)
+        @assignment.hide_submissions
+        @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "I will not lose")
+        @submission.reload
         expect(presenter).to be_hide_grade_from_student
       end
     end

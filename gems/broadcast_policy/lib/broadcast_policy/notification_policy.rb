@@ -46,17 +46,29 @@ module BroadcastPolicy
         next if to_list.empty?
 
         data = record.instance_eval(&self.data) if self.data
-
-        BroadcastPolicy.notifier.send_notification(
-          record,
-          self.dispatch,
-          notification,
-          to_list,
-          data
-        )
+        to_list.each_slice(NotificationPolicy.slice_size) do |to_slice|
+          BroadcastPolicy.notifier.send_notification(
+            record,
+            self.dispatch,
+            notification,
+            to_slice,
+            data
+          )
+        end
       end
     end
 
+    # if the to_list is users, each user will have a couple of communication channels,
+    # then we need to load the policies for them. Limiting the number to 500 keeps
+    # the process from memory bloat on the job server and large queries in the database.
+    # For 99% of broadcasts this will not change anything.
+    def self.slice_size
+      if defined?(Setting)
+        Setting.get('broadcast_policy_slice_size', 500).to_i
+      else
+        500
+      end
+    end
   end
 
 end

@@ -27,7 +27,7 @@ import {Grid, View} from '@instructure/ui-layout'
 import {IconWarningLine, IconSearchLine, IconInfoLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Spinner, Text} from '@instructure/ui-elements'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 import ScopesList from './ScopesList'
 
@@ -94,6 +94,10 @@ export default class Scopes extends React.Component {
   render() {
     const searchEndpoints = I18n.t('Search endpoints')
     const {developerKey, updateDeveloperKey} = this.props
+    const includeTooltip = I18n.t(
+      'Permit usage of all “includes” parameters for this developer key. "Includes"' +
+        ' parameters may grant access to additional data not included in the scopes selected below.'
+    )
 
     return (
       <Grid>
@@ -127,28 +131,21 @@ export default class Scopes extends React.Component {
           <Grid.Row>
             <Grid.Col>
               <Checkbox
-                label={
-                  <>
-                    <Text>{I18n.t('Allow Include Parameters ')}</Text>
-                    <Tooltip
-                      tip={I18n.t(
-                        'Permit usage of all “includes” parameters for this developer key. "Includes" parameters may grant access to additional data not included in the scopes selected below.'
-                      )}
-                      on={['hover', 'focus']}
-                      variant="inverse"
-                    >
-                      <span tabIndex="0">
-                        <IconInfoLine />
-                      </span>
-                    </Tooltip>
-                  </>
-                }
+                inline
+                label={<Text>{I18n.t('Allow Include Parameters ')}</Text>}
                 checked={developerKey.allow_includes}
                 onChange={e => {
                   updateDeveloperKey('allow_includes', e.currentTarget.checked)
                 }}
                 data-automation="includes-checkbox"
               />
+              &nbsp;
+              <Tooltip renderTip={includeTooltip} on={['hover', 'focus']} variant="inverse">
+                <span tabIndex="0">
+                  <IconInfoLine />
+                  <ScreenReaderContent>{includeTooltip}</ScreenReaderContent>
+                </span>
+              </Tooltip>
             </Grid.Col>
           </Grid.Row>
         )}
@@ -177,7 +174,8 @@ Scopes.propTypes = {
     redirect_uris: PropTypes.string,
     email: PropTypes.string,
     name: PropTypes.string,
-    scopes: PropTypes.arrayOf(PropTypes.string)
+    scopes: PropTypes.arrayOf(PropTypes.string),
+    allow_includes: PropTypes.bool
   }),
   requireScopes: PropTypes.bool,
   onRequireScopesChange: PropTypes.func.isRequired,

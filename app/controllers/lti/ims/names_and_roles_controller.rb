@@ -277,7 +277,7 @@ module Lti::Ims
     #   If the `rlid` parameter is also present, it will be 'and-ed' together with this parameter
     #
     # @argument limit [String]
-    #   May be used to limit the number of NamesAndRoleMemberships returned in a page
+    #   May be used to limit the number of NamesAndRoleMemberships returned in a page. Defaults to 50.
     #
     # @returns NamesAndRoleMemberships
     def course_index
@@ -300,7 +300,7 @@ module Lti::Ims
     #   If the `rlid` parameter is also present, it will be 'and-ed' together with this parameter
     #
     # @argument limit [String]
-    #   May be used to limit the number of NamesAndRoleMemberships returned in a page
+    #   May be used to limit the number of NamesAndRoleMemberships returned in a page. Defaults to 50.
     #
     # @returns NamesAndRoleMemberships
     def group_index

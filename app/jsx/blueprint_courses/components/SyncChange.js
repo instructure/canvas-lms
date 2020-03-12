@@ -22,7 +22,7 @@ import cx from 'classnames'
 
 import get from 'lodash/get'
 import {Grid} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {Pill, Text} from '@instructure/ui-elements'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {IconLock, IconUnlock} from './BlueprintLocks'
@@ -117,26 +117,23 @@ class SyncChange extends Component {
             </Text>
           </div>
           <div className="bcs__history-item__content-grid">
-            <Grid colSpacing="none">
+            <Grid colSpacing="small" hAlign="end">
               <Grid.Row>
-                <Grid.Col width={6}>{this.renderText(asset_name)}</Grid.Col>
+                <Grid.Col width={5}>{this.renderText(asset_name)}</Grid.Col>
                 <Grid.Col width={2}>{this.renderText(itemTypeLabels[asset_type])}</Grid.Col>
                 <Grid.Col width={2}>{this.renderText(changeTypeLabels[change_type])}</Grid.Col>
                 <Grid.Col width={2}>
-                  <div style={{textAlign: 'right'}}>
-                    {hasExceptions ? (
-                      <Text size="x-small" color="secondary">
-                        <span className="pill">
-                          {I18n.t(
-                            {one: '%{count} exception', other: '%{count} exceptions'},
-                            {count: exceptions.length}
-                          )}
-                        </span>
-                      </Text>
-                    ) : (
-                      this.renderText(I18n.t('Applied'))
-                    )}
-                  </div>
+                  {hasExceptions ? (
+                    <Pill
+                      id="exceptionPill"
+                      text={I18n.t(
+                        {one: '%{count} exception', other: '%{count} exceptions'},
+                        {count: exceptions.length}
+                      )}
+                    />
+                  ) : (
+                    this.renderText(I18n.t('Applied'))
+                  )}
                 </Grid.Col>
               </Grid.Row>
             </Grid>

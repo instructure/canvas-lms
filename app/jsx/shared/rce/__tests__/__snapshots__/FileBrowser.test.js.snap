@@ -57,17 +57,19 @@ exports[`FileBrowser renders 1`] = `
     />
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
       disabled={true}
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       icon={[Function]}
       id="image-upload__upload"
       margin="0"
       onClick={[Function]}
       size="medium"
+      textAlign="center"
       type="button"
       variant="ghost"
+      withBackground={true}
     >
       Upload File
        

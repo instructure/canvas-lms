@@ -21,7 +21,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {TextInput} from '@instructure/ui-forms'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Grid} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import CanvasSelect from 'jsx/shared/components/CanvasSelect'
 import propTypes from '../propTypes'
 
@@ -131,45 +131,43 @@ export default class CourseFilter extends React.Component {
           this.wrapper = c
         }}
       >
-        <Grid colSpacing="none">
-          <Grid.Row>
-            <Grid.Col width={7}>
-              <TextInput
-                ref={c => {
-                  this.searchInput = c
-                }}
-                type="search"
-                onChange={this.onChange}
-                onFocus={this.handleFocus}
-                onBlur={this.handleBlur}
-                placeholder={I18n.t('Search by title, short name, or SIS ID')}
-                label={<ScreenReaderContent>{I18n.t('Search Courses')}</ScreenReaderContent>}
-              />
-            </Grid.Col>
-            <Grid.Col width={2}>
-              <CanvasSelect
-                id="termsFilter"
-                key="terms"
-                value={this.state.term}
-                onChange={(e, value) => this.setState({term: value})}
-                label={<ScreenReaderContent>{I18n.t('Select Term')}</ScreenReaderContent>}
-              >
-                {termOptions}
-              </CanvasSelect>
-            </Grid.Col>
-            <Grid.Col width={3}>
-              <CanvasSelect
-                id="subAccountsFilter"
-                key="subAccounts"
-                value={this.state.subAccount}
-                onChange={(e, value) => this.setState({subAccount: value})}
-                label={<ScreenReaderContent>{I18n.t('Select Sub-Account')}</ScreenReaderContent>}
-              >
-                {subAccountOptions}
-              </CanvasSelect>
-            </Grid.Col>
-          </Grid.Row>
-        </Grid>
+        <Flex wrapItems>
+          <Flex.Item grow padding="0 x-small x-small 0">
+            <TextInput
+              ref={c => {
+                this.searchInput = c
+              }}
+              type="search"
+              onChange={this.onChange}
+              onFocus={this.handleFocus}
+              onBlur={this.handleBlur}
+              placeholder={I18n.t('Search by title, short name, or SIS ID')}
+              label={<ScreenReaderContent>{I18n.t('Search Courses')}</ScreenReaderContent>}
+            />
+          </Flex.Item>
+          <Flex.Item padding="0 x-small x-small 0">
+            <CanvasSelect
+              id="termsFilter"
+              key="terms"
+              value={this.state.term}
+              onChange={(e, value) => this.setState({term: value})}
+              label={<ScreenReaderContent>{I18n.t('Select Term')}</ScreenReaderContent>}
+            >
+              {termOptions}
+            </CanvasSelect>
+          </Flex.Item>
+          <Flex.Item padding="0 0 x-small 0">
+            <CanvasSelect
+              id="subAccountsFilter"
+              key="subAccounts"
+              value={this.state.subAccount}
+              onChange={(e, value) => this.setState({subAccount: value})}
+              label={<ScreenReaderContent>{I18n.t('Select Sub-Account')}</ScreenReaderContent>}
+            >
+              {subAccountOptions}
+            </CanvasSelect>
+          </Flex.Item>
+        </Flex>
       </div>
     )
   }

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require_relative '../spec_helper'
 
 describe BroadcastPolicy::SingletonMethods do
   subject do

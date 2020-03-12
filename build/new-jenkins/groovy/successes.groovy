@@ -28,7 +28,7 @@ def hasSuccess(name) {
   copyArtifacts(
     filter: '_buildmeta/*',
     optional: true,
-    projectName: '/${JOB_NAME}',
+    projectName: env.JOB_NAME,
     parameters: "GERRIT_CHANGE_NUMBER=${env.GERRIT_CHANGE_NUMBER},GERRIT_PATCHSET_NUMBER=${GERRIT_PATCHSET_NUMBER}",
     selector: lastCompleted()
   )

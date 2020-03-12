@@ -12,6 +12,7 @@ class Model < ActiveRecord::Base
     p.whenever { |record|
       record.foo_is_true? && record.bar_is_false?
     }
+    p.data { course_id: course_id, root_account_id: root_account_id}
   end
 
 end

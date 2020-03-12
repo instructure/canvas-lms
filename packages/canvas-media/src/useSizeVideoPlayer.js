@@ -36,7 +36,10 @@ export default function useSizeVideoPlayer(theFile, parentPanelRef, isLoading) {
       if (isVideo(theFile.type)) {
         const player = parentPanelRef.current.querySelector('video')
         if (player) {
-          const maxWidth = 0.75 * parentPanelRef.current.clientWidth
+          const maxWidth = Math.min(
+            0.75 * parentPanelRef.current.clientWidth,
+            parseInt(DEFAULT_VIDEO_PLAYER_SIZE.width, 10) // assumes px units
+          )
           if (player.loadedmetadata || player.readyState >= 1) {
             const width = sizeVideoPlayer(player, maxWidth)
             setPlayerWidth(width)

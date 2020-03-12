@@ -20,8 +20,11 @@ require_relative '../common'
 describe "assignments" do
   include_context "in-process server selenium tests"
 
-  context "peer reviews" do
+  before :once do
+    PostPolicy.enable_feature!
+  end
 
+  context "peer reviews" do
     it "allows deleting a peer review", priority: "2", test_id: 216382 do
       skip_if_safari(:alert)
       course_with_teacher_logged_in
@@ -152,11 +155,13 @@ describe "assignments" do
     let!(:reviewed) { student_in_course(active_all: true).user }
     let!(:reviewer) { student_in_course(active_all: true).user }
     let!(:assignment) {
-      assignment_model({
+      @assignment = assignment_model({
         course: review_course,
         peer_reviews: true,
         anonymous_peer_reviews: true
       })
+      @assignment.unmute!
+      @assignment
     }
     let!(:submission) {
       submission_model({
@@ -287,11 +292,11 @@ describe "assignments" do
         submission.turnitin_data_changed!
         submission.save!
       }
+
       it 'should show the plagiarism report link for reviewer', priority: "1", test_id: 216392 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(f(".turnitin_similarity_score")).to be_displayed
       end
     end
-
   end
 end

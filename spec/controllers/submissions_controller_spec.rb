@@ -19,6 +19,10 @@
 require 'spec_helper'
 
 describe SubmissionsController do
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   it_behaves_like 'a submission update action', :submissions
 
   describe "POST create" do
@@ -651,8 +655,8 @@ describe SubmissionsController do
       expect(submission.read?(@teacher)).to be_falsey
     end
 
-    it "renders json with scores for teachers on muted assignments" do
-      @assignment.update!(muted: true)
+    it "renders json with scores for teachers for unposted submissions" do
+      @assignment.ensure_post_policy(post_manually: true)
       request.accept = Mime[:json].to_s
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}, format: :json
       expect(body['id']).to eq @submission.id
@@ -662,9 +666,9 @@ describe SubmissionsController do
       expect(body['published_score']).to eq 10
     end
 
-    it "renders json without scores for students on muted assignments" do
+    it "renders json without scores for students for unposted submissions" do
       user_session(@student)
-      @assignment.update!(muted: true)
+      @assignment.ensure_post_policy(post_manually: true)
       request.accept = Mime[:json].to_s
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}, format: :json
       expect(body['id']).to eq @submission.id
@@ -674,12 +678,12 @@ describe SubmissionsController do
       expect(body['published_score']).to be nil
     end
 
-    it "renders json without scores for students on muted quizzes" do
+    it "renders json without scores for students with an unposted submission for a quiz" do
       quiz = @context.quizzes.create!
       quiz.workflow_state = "available"
       quiz.quiz_questions.create!({ question_data: test_quiz_data.first })
       quiz.save!
-      quiz.assignment.update!(muted: true)
+      quiz.assignment.ensure_post_policy(post_manually: true)
 
       quiz_submission = quiz.generate_submission(@student)
       Quizzes::SubmissionGrader.new(quiz_submission).grade_submission
@@ -693,7 +697,8 @@ describe SubmissionsController do
 
     it "renders the page for submitting student" do
       user_session(@student)
-      @assignment.update!(anonymous_grading: true, muted: true)
+      @assignment.update!(anonymous_grading: true)
+      @assignment.ensure_post_policy(post_manually: true)
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       assert_status(200)
     end
@@ -768,28 +773,28 @@ describe SubmissionsController do
       new_student = User.create!
       @context.enroll_student(new_student, enrollment_state: 'active')
       user_session(new_student)
-      @assignment.update!(anonymous_grading: true, muted: true)
+      @assignment.update!(anonymous_grading: true)
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       assert_unauthorized
     end
 
     it "renders unauthorized for teacher" do
       user_session(@teacher)
-      @assignment.update!(anonymous_grading: true, muted: true)
+      @assignment.update!(anonymous_grading: true)
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       assert_unauthorized
     end
 
     it "renders unauthorized for admin" do
       user_session(account_admin_user)
-      @assignment.update!(anonymous_grading: true, muted: true)
+      @assignment.update!(anonymous_grading: true)
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       assert_unauthorized
     end
 
     it "renders the page for site admin" do
       user_session(site_admin_user)
-      @assignment.update!(anonymous_grading: true, muted: true)
+      @assignment.update!(anonymous_grading: true)
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       assert_status(200)
     end
@@ -819,6 +824,7 @@ describe SubmissionsController do
       @association = @rubric.associate_with @assignment, @context, :purpose => 'grading'
       @assignment.peer_reviews = true
       @assignment.save!
+      @assignment.unmute!
       @assignment.assign_peer_review(@assessor, @submission.user)
       @assessment = @association.assess(:assessor => @assessor, :user => @submission.user, :artifact => @submission, :assessment => { :assessment_type => 'grading'})
       user_session(@assessor)

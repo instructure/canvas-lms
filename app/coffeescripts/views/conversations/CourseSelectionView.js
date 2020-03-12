@@ -55,13 +55,16 @@ export default class CourseSelectionView extends View {
   render() {
     super.render()
     const more = []
+    const concluded = []
     const now = $.fudgeDateForProfileTimezone(new Date())
     this.options.courses.all.each(course => {
       if (this.options.courses.favorites.get(course.id)) return
       if (course.get('access_restricted_by_date')) return
 
       const is_complete = this.is_complete(course, now)
-      if (!is_complete) return more.push(course.toJSON())
+
+      const collection = is_complete ? concluded : more
+      return collection.push(course.toJSON())
     })
 
     let group_json = this.options.courses.groups.toJSON()
@@ -74,6 +77,10 @@ export default class CourseSelectionView extends View {
       favorites: this.options.courses.favorites.toJSON(),
       more,
       groups: group_json
+    }
+
+    if (!this.options.excludeConcluded) {
+      data.concluded = concluded
     }
 
     this.truncate_course_name_data(data)

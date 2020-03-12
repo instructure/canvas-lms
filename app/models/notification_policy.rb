@@ -43,9 +43,7 @@ class NotificationPolicy < ActiveRecord::Base
     end
   }
 
-  # TODO: the scope name should be self-explanatory... change this to
-  # by_frequency or something This is for choosing a policy by frequency
-  scope :by, lambda { |freq| where(:frequency => Array(freq).map(&:to_s)) }
+  scope :by_frequency, lambda { |freq| where(:frequency => Array(freq).map(&:to_s)) }
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 

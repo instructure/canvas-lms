@@ -330,10 +330,12 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="green_square"
-      style="width: 10px; height: 10px; border: solid 1px #8B969E; background: #c2c2c2; display:inline-block; padding:5px 0 0 5px"
-    >Loading...</div>`
+      style="width: 10px; height: 10px; border: solid 1px #8B969E;"
+    />`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
         restoreImage()
@@ -352,10 +354,12 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="green_square"
-      style="width: 320px; height: 100px; border: solid 1px #8B969E; background: #c2c2c2; display:inline-block; padding:5px 0 0 5px"
-    >Loading...</div>`
+      style="width: 320px; height: 100px; border: solid 1px #8B969E;"
+    />`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
         restoreImage()
@@ -374,10 +378,12 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="green_square"
-      style="width: 100px; height: 320px; border: solid 1px #8B969E; background: #c2c2c2; display:inline-block; padding:5px 0 0 5px"
-    >Loading...</div>`
+      style="width: 100px; height: 320px; border: solid 1px #8B969E;"
+    />`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
         restoreImage()
@@ -391,10 +397,12 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="file.txt"
-      style="width: 8rem; height: 1rem; border: solid 1px #8B969E; background: #c2c2c2; display:inline-block; padding:5px 0 0 5px"
-    >Loading...</div>`
+      style="width: 8rem; height: 1rem; border: solid 1px #8B969E;"
+    />`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
       })
@@ -406,10 +414,12 @@ describe('RCEWrapper', () => {
           contentType: 'video/quicktime'
         }
         const imageMarkup = `
-    <div
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="file.mov"
-      style="width: 400px; height: 225px; border: solid 1px #8B969E; background: #c2c2c2; display:inline-block; padding:5px 0 0 5px"
-    >Loading...</div>`
+      style="width: 400px; height: 225px; border: solid 1px #8B969E;"
+    />`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
       })
@@ -421,10 +431,12 @@ describe('RCEWrapper', () => {
           contentType: 'audio/mp3'
         }
         const imageMarkup = `
-    <div
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="file.mp3"
-      style="width: 300px; height: 2.813rem; border: solid 1px #8B969E; background: #c2c2c2; display:inline-block; padding:5px 0 0 5px"
-    >Loading...</div>`
+      style="width: 300px; height: 2.813rem; border: solid 1px #8B969E;"
+    />`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
       })

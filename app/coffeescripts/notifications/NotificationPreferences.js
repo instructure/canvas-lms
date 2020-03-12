@@ -101,16 +101,33 @@ export default class NotificationPreferences {
       return this.policyCellProps(category, channel, frequency)
     })
 
+  getTooltipText = (category, channel) => {
+    if (
+      channel.type === 'sms' &&
+      ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.deprecate_sms_enabled &&
+      !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_sms_categories.includes(category.category)
+    ) {
+      return 'This notification type is not supported in SMS'
+    }
+
+    return ''
+  }
+
   policyCellProps = (category, channel, selectedValue = 'never') => {
     let {buttonData} = this
     if (['push', 'sms', 'twitter', 'slack'].includes(channel.type)) {
       buttonData = this.limitedButtonData
     }
+
+    const disabledTooltipText = this.getTooltipText(category, channel)
+
     return {
       category: category.category,
       channelId: channel.id,
       selection: selectedValue,
       buttonData,
+      disabled: !!disabledTooltipText,
+      disabledTooltipText,
       onValueChanged: this.saveNewPolicyValue
     }
   }

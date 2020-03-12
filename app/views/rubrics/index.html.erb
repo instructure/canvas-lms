@@ -18,11 +18,13 @@
 
 <% provide :page_title, t(:page_title, "Rubrics") %>
 <% add_crumb t('#crumbs.rubrics', "Rubrics") %>
-<% provide :right_side do %>
-  <a href="<%= context_url(@context, :context_rubrics_url) %>" class="btn button-sidebar-wide add_rubric_link">
-    <i class="icon-add"></i>
-    <%= t('buttons.add_rubric', 'Add Rubric') %>
-  </a>
+<% if !!js_env.dig(:PERMISSIONS, :manage_rubrics)%>
+  <% provide :right_side do %>
+    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="btn button-sidebar-wide add_rubric_link">
+      <i class="icon-add"></i>
+      <%= t('buttons.add_rubric', 'Add Rubric') %>
+    </a>
+  <% end %>
 <% end %>
 
 <% js_bundle :edit_rubric %>

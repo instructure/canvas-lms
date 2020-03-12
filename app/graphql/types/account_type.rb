@@ -42,5 +42,10 @@ module Types
     def sub_accounts_connection
       object.sub_accounts.order(:id)
     end
+
+    field :notification_preferences_enabled, Boolean, null: false
+    def notification_preferences_enabled
+      NotificationPolicyOverride.enabled_for(current_user, object)
+    end
   end
 end

@@ -26,7 +26,15 @@ describe Messages::AssignmentSubmittedLate::EmailPresenter do
   let(:student) do
     course_with_user("StudentEnrollment", course: course, name: "Adam Jones", active_all: true).user
   end
-  let(:submission) { assignment.submit_homework(student) }
+  let(:submission) do
+    @submission = assignment.submit_homework(student)
+    assignment.grade_student(student, grade: 5, grader: teacher)
+    @submission.reload
+  end
+
+  before :once do
+    PostPolicy.enable_feature!
+  end
 
   describe "Presenter instance" do
     let(:message) { Message.new(context: submission, user: teacher) }
@@ -71,6 +79,7 @@ describe Messages::AssignmentSubmittedLate::EmailPresenter do
 
       context "when grades have been posted" do
         before(:each) do
+          submission
           assignment.unmute!
         end
 
@@ -133,6 +142,7 @@ describe Messages::AssignmentSubmittedLate::EmailPresenter do
 
       context "when grades have been posted" do
         before(:each) do
+          submission
           assignment.unmute!
         end
 
@@ -193,6 +203,7 @@ describe Messages::AssignmentSubmittedLate::EmailPresenter do
 
       context "when grades have been posted" do
         before(:each) do
+          submission
           assignment.unmute!
         end
 

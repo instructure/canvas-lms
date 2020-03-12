@@ -174,11 +174,14 @@ class ConferencesController < ApplicationController
   def api_index(conferences)
     route = polymorphic_url([:api_v1, @context, :conferences])
     web_conferences = Api.paginate(conferences, self, route)
+    preload_recordings(web_conferences)
     render json: api_conferences_json(web_conferences, @current_user, session)
   end
   protected :api_index
 
   def web_index(conferences)
+    conferences = conferences.to_a
+    preload_recordings(conferences)
     @new_conferences, @concluded_conferences = conferences.partition { |conference|
       conference.ended_at.nil?
     }
@@ -407,5 +410,13 @@ class ConferencesController < ApplicationController
   def conference_params
     params.require(:web_conference).
       permit(:title, :duration, :description, :conference_type, :user_settings => strong_anything)
+  end
+
+  def preload_recordings(conferences)
+    conferences.group_by(&:class).each do |klass, klass_conferences|
+      if klass.respond_to?(:preload_recordings) # should only be BigBlueButton for now
+        klass.preload_recordings(klass_conferences)
+      end
+    end
   end
 end

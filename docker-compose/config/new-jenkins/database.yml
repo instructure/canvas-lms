@@ -1,13 +1,12 @@
 test:
   adapter: postgresql
   encoding: utf8
-  database: <%= ENV['RAILS_DB_NAME_TEST'] %>
-  host: <%= ENV['RAILS_DB_HOST'] %>
-  password: <%= ENV['RAILS_DB_PASS'] %>
-  username: postgres
   timeout: 5000
   shard_name: public
   schema_search_path: "''"
+  use_qualified_names: true
+  database: canvas_test_rails
   shard1: canvas_test_shard_1
   shard2: canvas_test_shard_2
-  use_qualified_names: true
+  test_shard_1: canvas_test_shard_1
+  test_shard_2: canvas_test_shard_2

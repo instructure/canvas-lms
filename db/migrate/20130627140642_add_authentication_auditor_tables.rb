@@ -29,6 +29,11 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
       authentications_by_pseudonym
       authentications_by_account
       authentications_by_user
+      courses_by_course
+      grade_changes_by_assignment
+      grade_changes_by_course
+      grade_changes_by_root_account_student
+      grade_changes_by_root_account_grader
     )
   end
 
@@ -44,7 +49,37 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
         pseudonym_id          bigint,
         account_id            bigint,
         user_id               bigint,
-        event_type            text
+        event_type            text,
+        request_id            text
+      ) #{compression_params}}
+
+    cassandra.execute %{
+      CREATE TABLE courses (
+        id                    text PRIMARY KEY,
+        created_at            timestamp,
+        request_id            text,
+        course_id             bigint,
+        event_type            text,
+        user_id               bigint,
+        data                  text
+      ) #{compression_params}}
+
+    cassandra.execute %{
+      CREATE TABLE grade_changes (
+        id                    text PRIMARY KEY,
+        created_at            timestamp,
+        request_id            text,
+        account_id            bigint,
+        submission_id         bigint,
+        version_number        int,
+        grader_id             bigint,
+        student_id            bigint,
+        assignment_id         bigint,
+        context_id            bigint,
+        context_type          text,
+        event_type            text,
+        grade_before          text,
+        grade_after           text
       ) #{compression_params}}
 
     indexes.each do |index_name|
@@ -64,5 +99,7 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
     end
 
     cassandra.execute %{DROP TABLE authentications;}
+    cassandra.execute %{DROP TABLE courses;}
+    cassandra.execute %{DROP TABLE grade_changes;}
   end
 end

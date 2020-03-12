@@ -28,8 +28,8 @@ class CalendarsController < ApplicationController
     @feed_url = feeds_calendar_url((@context_enrollment || @context).feed_code)
     if params[:include_contexts]
       @selected_contexts = params[:include_contexts].split(",")
-    elsif @current_user.preferences[:selected_calendar_contexts]
-      @selected_contexts = @current_user.preferences[:selected_calendar_contexts]
+    else
+      @selected_contexts = @current_user.get_preference(:selected_calendar_contexts)
     end
     @wrap_titles = @domain_root_account && @domain_root_account.feature_enabled?(:wrap_calendar_event_titles)
     # somewhere there's a bad link that doesn't separate parameters properly.

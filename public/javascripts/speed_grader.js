@@ -184,7 +184,7 @@ let provisionalGraderDisplayNames
 let EG
 const customProvisionalGraderLabel = I18n.t('Custom')
 const anonymousAssignmentDetailedReportTooltip = I18n.t(
-  'Cannot view detailed reports for anonymous assignments until grades are unmuted.'
+  'Cannot view detailed reports for anonymous assignments until grades are posted.'
 )
 
 const HISTORY_PUSH = 'push'
@@ -497,7 +497,6 @@ function initDropdown() {
 }
 
 function setupPostPolicies() {
-  if (!ENV.post_policies_enabled) return
   const {jsonData} = window
   const gradesPublished = !jsonData.moderated_grading || jsonData.grades_published_at != null
 
@@ -518,22 +517,10 @@ function setupPostPolicies() {
   renderPostGradesMenu()
 }
 
-function setupHeader({showMuteButton = true}) {
+function setupHeader() {
   const elements = {
     nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
     settings: {form: $('#settings_form')}
-  }
-
-  if (showMuteButton) {
-    Object.assign(elements, {
-      mute: {
-        icon: $('#mute_link i'),
-        label: $('#mute_link .mute_label'),
-        link: $('#mute_link'),
-        modal: $('#mute_dialog')
-      },
-      unmute: {modal: $('#unmute_dialog')}
-    })
   }
 
   return {
@@ -541,20 +528,12 @@ function setupHeader({showMuteButton = true}) {
     courseId: utils.getParam('courses'),
     assignmentId: utils.getParam('assignment_id'),
     init() {
-      if (showMuteButton) {
-        this.muted = this.elements.mute.link.data('muted')
-      }
-
       this.addEvents()
       this.createModals()
       return this
     },
     addEvents() {
       this.elements.nav.click($.proxy(this.toAssignment, this))
-      if (showMuteButton) {
-        this.elements.mute.link.click($.proxy(this.onMuteClick, this))
-      }
-
       this.elements.settings.form.submit(this.submitSettingsForm.bind(this))
     },
     createModals() {
@@ -569,55 +548,6 @@ function setupHeader({showMuteButton = true}) {
       // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
       // button. So here we'll manually re-enable it.
       this.elements.settings.form.find('.submit_button').removeAttr('disabled')
-
-      if (showMuteButton) {
-        this.elements.mute.modal.dialog({
-          autoOpen: false,
-          buttons: [
-            {
-              text: I18n.t('cancel_button', 'Cancel'),
-              click: $.proxy(function() {
-                this.elements.mute.modal.dialog('close')
-              }, this)
-            },
-            {
-              text: I18n.t('mute_assignment', 'Mute Assignment'),
-              class: 'btn-primary btn-mute',
-              click: $.proxy(function() {
-                this.toggleMute()
-                this.elements.mute.modal.dialog('close')
-              }, this)
-            }
-          ],
-          modal: true,
-          resizable: false,
-          title: this.elements.mute.modal.data('title'),
-          width: 400
-        })
-        this.elements.unmute.modal.dialog({
-          autoOpen: false,
-          buttons: [
-            {
-              text: I18n.t('Cancel'),
-              click: $.proxy(function() {
-                this.elements.unmute.modal.dialog('close')
-              }, this)
-            },
-            {
-              text: I18n.t('Unmute Assignment'),
-              class: 'btn-primary btn-unmute',
-              click: $.proxy(function() {
-                this.toggleMute()
-                this.elements.unmute.modal.dialog('close')
-              }, this)
-            }
-          ],
-          modal: true,
-          resizable: false,
-          title: this.elements.unmute.modal.data('title'),
-          width: 400
-        })
-      }
     },
 
     toAssignment(e) {
@@ -660,56 +590,6 @@ function setupHeader({showMuteButton = true}) {
         event.preventDefault()
       }
       this.elements.settings.form.dialog('open')
-    },
-
-    onMuteClick(e) {
-      e.preventDefault()
-      if (this.muted) {
-        this.elements.unmute.modal.dialog('open')
-      } else {
-        this.elements.mute.modal.dialog('open')
-      }
-    },
-
-    muteUrl() {
-      return `/courses/${this.courseId}/assignments/${this.assignmentId}/mute`
-    },
-
-    toggleMute() {
-      this.muted = !this.muted
-      const label = this.muted
-          ? I18n.t('unmute_assignment', 'Unmute Assignment')
-          : I18n.t('mute_assignment', 'Mute Assignment'),
-        action = this.muted ? 'mute' : 'unmute',
-        actions = {
-          /* Mute action */
-          mute() {
-            this.elements.mute.icon.removeClass('icon-unmuted').addClass('icon-muted')
-            $.ajaxJSON(
-              this.muteUrl(),
-              'put',
-              {status: true},
-              $.proxy(function() {
-                this.elements.mute.label.text(label)
-              }, this)
-            )
-          },
-
-          /* Unmute action */
-          unmute() {
-            this.elements.mute.icon.removeClass('icon-muted').addClass('icon-unmuted')
-            $.ajaxJSON(
-              this.muteUrl(),
-              'put',
-              {status: false},
-              $.proxy(function() {
-                this.elements.mute.label.text(label)
-              }, this)
-            )
-          }
-        }
-
-      actions[action].apply(this)
     }
   }
 }
@@ -3099,9 +2979,7 @@ EG = {
       }
     }
 
-    if (ENV.post_policies_enabled) {
-      renderPostGradesMenu()
-    }
+    renderPostGradesMenu()
 
     return student
   },
@@ -3249,10 +3127,8 @@ EG = {
       $score.text('')
     }
 
-    if (ENV.post_policies_enabled) {
-      if (ENV.MANAGE_GRADES || (jsonData.context.concluded && ENV.READ_AS_ADMIN)) {
-        renderHiddenSubmissionPill(submission)
-      }
+    if (ENV.MANAGE_GRADES || (jsonData.context.concluded && ENV.READ_AS_ADMIN)) {
+      renderHiddenSubmissionPill(submission)
     }
     EG.updateStatsInHeader()
   },
@@ -3765,7 +3641,7 @@ function setupSelectors() {
   isAdmin = _.includes(ENV.current_user_roles, 'admin')
   snapshotCache = {}
   studentLabel = I18n.t('student', 'Student')
-  header = setupHeader({showMuteButton: !ENV.post_policies_enabled})
+  header = setupHeader()
 }
 
 function renderSettingsMenu() {
