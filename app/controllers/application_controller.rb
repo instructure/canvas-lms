@@ -172,6 +172,7 @@ class ApplicationController < ActionController::Base
             show_feedback_link: show_feedback_link?
           },
           FEATURES: {
+            assignment_bulk_edit: Account.site_admin.feature_enabled?(:assignment_bulk_edit),
             la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
             cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
             show_qr_login: Object.const_defined?("InstructureMiscPlugin") && !!@domain_root_account&.feature_enabled?(:mobile_qr_login),
