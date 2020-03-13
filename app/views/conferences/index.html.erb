@@ -24,6 +24,8 @@
 
 <h1 class="screenreader-only"><%= t(:conference_header, 'Conferences')%></h1>
 
+<div id="big-blue-button-message-container"></div>
+
 <% if can_do(WebConference.new(:context => @context), @current_user, :create) %>
   <div class="ic-Action-header ic-Action-header--before-item-groups">
     <div class="ic-Action-header__Secondary">
