@@ -21,9 +21,10 @@ require_relative './pages/permissions_page'
 describe "permissions index" do
   include_context "in-process server selenium tests"
   def create_role_override(permission_name, role, account, opts)
-    RoleOverride.create!(:permission => permission_name, :enabled => opts[:enabled],
+    new_role = RoleOverride.create!(:permission => permission_name, :enabled => opts[:enabled],
       :locked => opts[:locked], :context => account, :applies_to_self => true, :applies_to_descendants => true,
       :role_id => role.id, :context_type => 'Account')
+    new_role.id
   end
 
   def student_role
@@ -114,26 +115,26 @@ describe "permissions index" do
       expect(r.locked).to eq(false)
     end
 
-    it "permissions enables and locks on grid" do
+    it "permissions locks on grid" do
       PermissionsIndex.visit(@account)
       permission_name = "manage_outcomes"
-      PermissionsIndex.change_permission(permission_name, ta_role.id, "enable_and_lock")
+      PermissionsIndex.change_permission(permission_name, ta_role.id, "lock")
       r = RoleOverride.last
       expect(r.role_id).to eq(ta_role.id)
       expect(r.permission).to eq(permission_name)
-      expect(r.enabled).to eq(true)
       expect(r.locked).to eq(true)
     end
 
-    it "permissions disables and locks on grid" do
-      PermissionsIndex.visit(@account)
+    it "permissions unlocks on grid" do
       permission_name = "read_announcements"
-      PermissionsIndex.change_permission(permission_name, student_role.id, "disable_and_lock")
-      r = RoleOverride.last
+      id = create_role_override(permission_name, student_role, @account, :enabled => false, :locked => true)
+      PermissionsIndex.visit(@account)
+      PermissionsIndex.change_permission(permission_name, student_role.id, "lock")
+      r = RoleOverride.find(id)
       expect(r.role_id).to eq(student_role.id)
       expect(r.permission).to eq(permission_name)
       expect(r.enabled).to eq(false)
-      expect(r.locked).to eq(true)
+      expect(r.locked).to eq(false)
     end
 
     it "permissions default on grid works" do
