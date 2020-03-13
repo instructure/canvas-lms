@@ -82,14 +82,11 @@ pipeline {
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-passenger-2.6
     PATCHSET_TAG = "$CANVAS_LMS_IMAGE:$NAME-$TAG_SUFFIX"
 
-    // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-passenger-2.4
-    PUBLISHABLE_TAG = "$CANVAS_LMS_IMAGE:$NAME-postgres-9.5-ruby-passenger-2.4"
+    // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-passenger-2.4-xenial
+    PUBLISHABLE_TAG = "$CANVAS_LMS_IMAGE:$NAME-postgres-9.5-ruby-passenger-2.4-xenial"
 
     // e.g. canvas-lms:master when not on another branch
     MERGE_TAG = "$CANVAS_LMS_IMAGE:$GERRIT_BRANCH"
-
-    // e.g. canvas-lms:previous-image
-    CACHE_TAG = "$CANVAS_LMS_IMAGE:previous-image"
   }
 
   stages {
@@ -213,7 +210,8 @@ pipeline {
             script {
               def flags = load('build/new-jenkins/groovy/commit-flags.groovy')
               if (!flags.hasFlag('skip-cache')) {
-                sh 'docker pull $CACHE_TAG || true'
+                // canvas-lms:$GERRIT_BRANCH as the image cache for this build (i.e. canvas-lms:master)
+                sh 'docker pull $MERGE_TAG || true'
               }
             }
             sh """
@@ -223,8 +221,6 @@ pipeline {
                 --build-arg POSTGRES_VERSION=$POSTGRES \
                 .
             """
-            sh "docker tag $PATCHSET_TAG $CACHE_TAG"
-
             sh "docker push $PATCHSET_TAG"
           }
         }
@@ -351,9 +347,10 @@ pipeline {
             if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
               sh 'docker pull $PATCHSET_TAG'
             }
+
+            // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
             sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
-            // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
-            sh 'docker push $CANVAS_LMS_IMAGE'
+            sh 'docker push $MERGE_TAG'
           }
         }
       }
