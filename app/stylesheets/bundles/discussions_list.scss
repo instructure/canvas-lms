@@ -178,22 +178,17 @@ $announcements-description-line-height: 16px;
   .toggleSelected { margin: 0 8px 0 0; }
 }
 
-.discussion-drag-handle {
-  display: none;
-  background-image: inline-image('drag_handle.png');
-  height: 20px;
-  width: 5px;
-  background-position: center center;
-  background-repeat: no-repeat;
+
+span.discussion-drag-handle .icon-drag-handle {
+  vertical-align: middle;
+  line-height: 18px;
+  cursor: move;
   margin: 0 4px 0 -5px;
-  float: left;
-  cursor: ns-resize;
-  opacity: 0;
-  .touch &, .discussion-topic:hover & { opacity: 0.5; }
-  .ui-sortable & { display: block; }
-  &:hover, &:focus {
-    opacity: 1 !important;
-  }
+  font-size: 12px;
+}
+
+.discussion-column .toggleSelected {
+  vertical-align: -2.4px;
 }
 
 .discussion-title-block {

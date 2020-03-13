@@ -76,7 +76,8 @@ class AnnouncementsApiController < ApplicationController
     scope = Announcement.where(
       :context_type => 'Course',
       :context_id => courses
-    ).where("discussion_topics.id NOT IN (?)", expired_announcements).order("pinned DESC NULLS LAST")
+    ).where("discussion_topics.id NOT IN (?)", expired_announcements)
+    .order("pinned DESC NULLS LAST").order("CASE WHEN pinned = 'true' THEN position END")
 
     include_unpublished = courses.all? { |course| course.grants_right?(@current_user, :view_unpublished_items) }
     scope = if include_unpublished && !value_to_boolean(params[:active_only])

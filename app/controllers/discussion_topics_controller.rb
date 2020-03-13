@@ -292,7 +292,7 @@ class DiscussionTopicsController < ApplicationController
               @context.expired_announcements.order(created_at: :desc)
             elsif params[:only_announcements]
               ancmts = @context.is_a?(Course) ? @context.non_expired_announcements : @context.active_announcements
-              params[:order_by] ? ancmts : ancmts.order("pinned DESC NULLS LAST")
+              params[:order_by] ? ancmts : ancmts.order("pinned DESC NULLS LAST").order("CASE WHEN pinned = 'true' THEN position END")
             else
               @context.active_discussion_topics.only_discussion_topics
             end
@@ -306,7 +306,7 @@ class DiscussionTopicsController < ApplicationController
     scope = if params[:order_by] == 'recent_activity'
               scope.by_last_reply_at
             elsif params[:only_announcements]
-              scope.order("pinned DESC NULLS LAST").by_posted_at
+              scope.order("pinned DESC NULLS LAST").order("CASE WHEN pinned = 'true' THEN position END").by_posted_at
             else
               scope.by_position_legacy
             end
