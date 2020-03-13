@@ -34,6 +34,26 @@ const mockedNotificationPreferences = {
         },
         {
           communicationChannelId: '1',
+          frequency: 'daily',
+          notification: {
+            category: 'Due Date',
+            categoryDisplayName: 'Due Date',
+            name: 'Assignment Due Date Changed',
+            _id: '36'
+          }
+        },
+        {
+          communicationChannelId: '1',
+          frequency: 'daily',
+          notification: {
+            category: 'Due Date',
+            categoryDisplayName: 'Due Date',
+            name: 'Assignment Created',
+            _id: '37'
+          }
+        },
+        {
+          communicationChannelId: '1',
           frequency: 'immediately',
           notification: {
             category: 'Grading',
@@ -99,6 +119,26 @@ const mockedNotificationPreferences = {
             categoryDisplayName: 'Due Date',
             name: 'Assignment Created',
             _id: '37'
+          }
+        },
+        {
+          communicationChannelId: '17',
+          frequency: 'immediately',
+          notification: {
+            category: 'Grading',
+            categoryDisplayName: 'Grading',
+            name: 'Quiz Regrade Finished',
+            _id: '5'
+          }
+        },
+        {
+          communicationChannelId: '17',
+          frequency: 'never',
+          notification: {
+            category: 'All Submissions',
+            categoryDisplayName: 'All Submissions',
+            name: 'Submission Needs Grading',
+            _id: '4'
           }
         }
       ],
