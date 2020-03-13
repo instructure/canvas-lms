@@ -26,6 +26,7 @@ import Conference from 'compiled/models/Conference'
 import ConferenceView from 'compiled/views/conferences/ConferenceView'
 import ConcludedConferenceView from 'compiled/views/conferences/ConcludedConferenceView'
 import EditConferenceView from 'compiled/views/conferences/EditConferenceView'
+import renderBigBlueButtonAlert from '../conferences/renderBigBlueButtonAlert'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_forms'
 import 'jqueryui/dialog'
@@ -35,6 +36,8 @@ import 'jquery.loadingImg'
 import 'compiled/jquery.rails_flash_notifications'
 import 'jquery.templateData'
 import 'jquery.instructure_date_and_time'
+
+renderBigBlueButtonAlert()
 
 const ConferencesRouter = Backbone.Router.extend({
   routes: {
