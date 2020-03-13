@@ -52,7 +52,7 @@ export default class PermissionButton extends Component {
     roleLabel: string,
     roleId: string.isRequired,
     setFocus: bool.isRequired,
-    onFocus: func.isRequired
+    onFocus: func
   }
 
   static defaultProps = {

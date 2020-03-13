@@ -24,7 +24,7 @@ import $ from 'jquery'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
 import 'compiled/jquery.rails_flash_notifications'
 
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button, CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
 
@@ -34,6 +34,7 @@ import {Tooltip} from '@instructure/ui-overlays'
 import {View} from '@instructure/ui-layout'
 
 import actions from '../actions'
+import {GROUP_PERMISSION_DESCRIPTIONS} from '../templates'
 import {ConnectedPermissionButton} from './PermissionButton'
 import propTypes, {ENABLED_FOR_NONE} from '../propTypes'
 
@@ -145,6 +146,18 @@ export default class PermissionsTable extends Component {
       })
     }
 
+    function renderGroupDescription() {
+      const description = GROUP_PERMISSION_DESCRIPTIONS[name]
+      if (typeof description !== 'function') return null
+
+      return [
+        <br key="group-description-br" />,
+        <Text key="group-description-text" weight="light" size="small">
+          {description()}
+        </Text>
+      ]
+    }
+
     return (
       <th scope="row" className="ic-permissions__main-left-header" aria-label={perm.label}>
         <div className="ic-permissions__left-header__col-wrapper">
@@ -152,8 +165,8 @@ export default class PermissionsTable extends Component {
             {hasGranulars && (
               <IconButton
                 data-testid={`expand_${name}`}
+                margin="0 0 0 x-small"
                 withBorder={false}
-                color="primary"
                 size="small"
                 withBackground={false}
                 onClick={toggleExpanded}
@@ -165,9 +178,9 @@ export default class PermissionsTable extends Component {
                 renderIcon={ExpandIcon}
               />
             )}
-            {isGranular && <span style={{minWidth: '28px'}} />}
+            {isGranular && <span style={{minWidth: '2.25rem'}} />}
             <View maxWidth="17rem" as="div" padding="small">
-              <Button
+              <CondensedButton
                 variant="link"
                 onClick={() => this.props.setAndOpenPermissionTray(perm)}
                 id={`permission_${name}`}
@@ -175,7 +188,8 @@ export default class PermissionsTable extends Component {
                 fluidWidth
               >
                 {perm.label}
-              </Button>
+              </CondensedButton>
+              {hasGranulars && renderGroupDescription()}
             </View>
           </div>
         </div>

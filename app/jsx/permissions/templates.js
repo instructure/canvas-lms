@@ -38,9 +38,13 @@ export function deepMerge(a, b) {
 }
 
 export const PERMISSION_DETAIL_SECTIONS = [
-  {title: I18n.t('What it Does'), key: 'what_it_does'},
-  {title: I18n.t('Additional Considerations'), key: 'additional_considerations'}
+  {title: () => I18n.t('What it Does'), key: 'what_it_does'},
+  {title: () => I18n.t('Additional Considerations'), key: 'additional_considerations'}
 ]
+
+export const GROUP_PERMISSION_DESCRIPTIONS = {
+  manage_wiki: () => I18n.t('Create / Delete / Update Pages')
+}
 
 export const generateActionTemplates = (
   permissionsLabel,
