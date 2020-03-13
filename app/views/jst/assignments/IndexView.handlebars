@@ -8,6 +8,10 @@
   </h1>
 {{/if}}
 
+{{#if bulkEditMode}}
+  <div id="bulkEditRoot"></div>
+{{else}}
+
 <div tabindex="0" class="drag_and_drop_warning screenreader-only">
   {{#t}}Warning: for improved accessibility of reordering assignments and groups, please use the Move To Dialog option found in the menu.{{/t}}
 </div>
@@ -84,4 +88,6 @@
   <form data-view="createGroup" class="form-dialog"></form>
   <form data-view="assignmentSettings" class="form-dialog"></form>
   <form data-view="assignmentSyncSettings" class="form-dialog"></form>
+{{/if}}
+
 {{/if}}
