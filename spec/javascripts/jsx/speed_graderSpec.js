@@ -1064,6 +1064,8 @@ QUnit.module('SpeedGrader', rootHooks => {
       sinon.stub($, 'ajaxJSON')
       sinon.stub(SpeedGrader.EG, 'domReady')
       SpeedGrader.setup()
+
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
     },
 
     teardown() {
@@ -1072,6 +1074,8 @@ QUnit.module('SpeedGrader', rootHooks => {
       $.ajaxJSON.restore()
       $.getJSON.restore()
       fakeENV.teardown()
+
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
     }
   })
 
@@ -1094,6 +1098,17 @@ QUnit.module('SpeedGrader', rootHooks => {
     SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, url)
     const [, {allowfullscreen}] = buildIframeStub.firstCall.args
     strictEqual(allowfullscreen, true)
+    buildIframeStub.restore()
+  })
+
+  test('allows options defined in iframeAllowances()', () => {
+    const retrieveUrl =
+      'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
+    const url = 'www.example.com/lti/launch/user/4'
+    const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
+    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, url)
+    const [, {allow}] = buildIframeStub.firstCall.args
+    strictEqual(allow, ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
     buildIframeStub.restore()
   })
 

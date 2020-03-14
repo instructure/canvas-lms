@@ -23,6 +23,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextArea} from '@instructure/ui-forms'
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
 import StatusPill from 'jsx/grading/StatusPill'
@@ -2390,6 +2391,7 @@ EG = {
     const launchUrl = `${urlBase}&url=${encodeURIComponent(externalToolUrl)}`
     const iframe = SpeedgraderHelpers.buildIframe(htmlEscape(launchUrl), {
       className: 'tool_launch',
+      allow: iframeAllowances(),
       allowfullscreen: true
     })
     $div.html($.raw(iframe)).show()
