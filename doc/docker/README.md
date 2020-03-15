@@ -42,3 +42,23 @@ In `~/.dinghy/proxy.conf` add the following:
     proxy_buffer_size 1024k;
 
 Restart dinghy afterwards.
+
+
+### NFS Not Starting
+
+During dinghy boot (normally if you've killed and restarted dinghy since your
+last system reboot), you get a message that indicate NFS could not start
+and it gives you a path to an error file where you see something like:
+
+```
+=== Starting NFS at 2019-09-05T17:31:22-05:00 ===
+
+UNFS3 unfsd 0.9.23 (C) 2009, Pascal Schmidt <unfs3-server@ewetel.net>
+bind: Address already in use
+Couldn't bind to udp port 19091
+```
+
+See this issue on dinghy: https://github.com/codekitchen/dinghy/issues/272
+
+You can reboot your system to clear the zombie process,
+or you can use xhyve as your VM backend.
