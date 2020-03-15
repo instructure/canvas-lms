@@ -43,5 +43,17 @@
         <%= f.check_box :recording_enabled %> <%= f.label :recording_enabled, :en => "Allow conferences to be recorded." %>
       </td>
     </tr>
+    <tr>
+      <td></td>
+      <td>
+        <%= f.check_box :free_trial %> <%= f.label :free_trial, :en => "Mark this BigBlueButton instance as a free trial" %>
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <%= f.check_box :replace_with_alternatives %> <%= f.label :replace_with_alternatives, :en => "Disable BigBlueButton conferences; show a list of alternatives instead" %>
+      </td>
+    </tr>
   </table>
 <% end %>
