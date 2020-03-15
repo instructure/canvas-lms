@@ -78,6 +78,7 @@ module Api::V1::Conferences
         name: conference_type[:plugin].name,
         type: conference_type[:conference_type],
         settings: conference_user_setting_fields_json(conference_type[:user_setting_fields]),
+        free_trial: !!conference_type[:free_trial]
       }
     end
   end
