@@ -37,7 +37,8 @@ import 'compiled/jquery.rails_flash_notifications'
 import 'jquery.templateData'
 import 'jquery.instructure_date_and_time'
 
-if (ENV.can_create_conferences) {
+const bbbSettings = ENV.conference_type_details.find(d => d.type === 'BigBlueButton')
+if (ENV.can_create_conferences && bbbSettings?.free_trial) {
   renderBigBlueButtonAlert()
 }
 
