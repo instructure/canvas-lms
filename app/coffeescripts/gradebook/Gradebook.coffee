@@ -93,7 +93,6 @@ import 'jquery.instructure_misc_plugins'
 import 'vendor/jquery.ba-tinypubsub'
 import 'jqueryui/position'
 import '../jquery/fixDialogButtons'
-import 'jsx/context_cards/StudentContextCardTrigger'
 
 export default do ->
 
