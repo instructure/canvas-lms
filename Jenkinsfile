@@ -83,9 +83,8 @@ def ignoreBuildNeverStartedError(block) {
   }
 }
 
-// ignore builds where the current patchset tag doesn't match the
-// mainline publishable tag. i.e. ignore ruby-passenger-2.6/pg-12
-// upgrade builds
+// return false if the current patchset tag doesn't match the
+// mainline publishable tag. i.e. ignore ruby-2.6/pg-12 upgrade builds
 def isPatchsetPublishable() {
   env.PATCHSET_TAG == env.PUBLISHABLE_TAG
 }
@@ -109,18 +108,18 @@ pipeline {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     BUILD_IMAGE = "$BUILD_REGISTRY_FQDN/jenkins/canvas-lms"
     POSTGRES = configuration.postgres()
-    RUBY_PASSENGER = configuration.rubyPassenger()
+    POSTGRES_CLIENT = configuration.postgresClient()
 
-    // e.g. postgres-9.5-ruby-passenger-2.6
-    TAG_SUFFIX = "postgres-$POSTGRES-ruby-passenger-$RUBY_PASSENGER"
+    // e.g. postgres-9.5-ruby-2.6
+    TAG_SUFFIX = "postgres-$POSTGRES-ruby-$RUBY"
 
     // this is found in the PUBLISHABLE_TAG_SUFFIX config file on jenkins
-    PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffix()
+    PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffixNew()
 
-    // e.g. canvas-lms:01.123456.78-postgres-12-ruby-passenger-2.6
+    // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = "$BUILD_IMAGE:$NAME-$TAG_SUFFIX"
 
-    // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-passenger-2.6
+    // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-2.6
     PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-$PUBLISHABLE_TAG_SUFFIX"
 
     // e.g. canvas-lms:master when not on another branch
@@ -128,6 +127,13 @@ pipeline {
 
     // e.g. canvas-lms:01.123456.78; this is for consumers like Portal 2 who want to build a patchset
     EXTERNAL_TAG = "$CANVAS_LMS_IMAGE:$NAME"
+
+    ALPINE_MIRROR = configuration.alpineMirror()
+    NODE = configuration.node()
+    RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
+    RUBY_IMAGE = "$BUILD_IMAGE-ruby"
+    RUBY_MERGE_IMAGE = "$RUBY_IMAGE:$GERRIT_BRANCH"
+    RUBY_PATCHSET_IMAGE = "$RUBY_IMAGE:$NAME-$TAG_SUFFIX"
   }
 
   stages {
@@ -140,7 +146,7 @@ pipeline {
 
               buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
               buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
-              buildParameters += string(name: 'RUBY_PASSENGER', value: "${env.RUBY_PASSENGER}")
+              buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
               if (env.CANVAS_LMS_REFSPEC) {
                 // the plugin builds require the canvas lms refspec to be different. so only
                 // set this refspec if the main build is requesting it to be set.
@@ -151,7 +157,7 @@ pipeline {
               pullGerritRepo('gerrit_builder', 'master', '.')
               gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
               echo "Plugin list: ${gems}"
-              /* fetch plugins */
+              // fetch plugins
               gems.each { gem ->
                 if (env.GERRIT_PROJECT == gem) {
                   /* this is the commit we're testing */
@@ -221,27 +227,21 @@ pipeline {
       }
     }
 
-    stage ('Build Docker Image') {
+    stage('Build Docker Image') {
       steps {
-        timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
+        timeout(time: 30) {
           skipIfPreviouslySuccessful('docker-build-and-push') {
             script {
               if (configuration.getBoolean('skip-docker-build')) {
                 sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                 sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
-              }
-              else {
+              } else {
                 if (!configuration.getBoolean('skip-cache')) {
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG || true'
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG || true"
                 }
-                sh """
-                  docker build \
-                    --tag $PATCHSET_TAG \
-                    --build-arg RUBY_PASSENGER=$RUBY_PASSENGER \
-                    --build-arg POSTGRES_VERSION=$POSTGRES \
-                    .
-                """
+                sh 'build/new-jenkins/docker-build.sh'
               }
+              sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_PATCHSET_IMAGE"
               sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
               if (isPatchsetPublishable()) {
                 sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'

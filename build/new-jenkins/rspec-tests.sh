@@ -17,5 +17,5 @@ bundle exec parallel_rspec . \
   --only-group "$group" \
   --verbose \
   --group-by runtime \
-  --runtime-log parallel_runtime_rspec.log \
+  --runtime-log log/parallel-runtime-rspec.log \
   ${maybeOnlyFailures[@]}

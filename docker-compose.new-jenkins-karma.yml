@@ -7,5 +7,5 @@ services:
       context: .
       dockerfile: ./build/new-jenkins/js/Dockerfile-karma
       args:
-        image_name: $PATCHSET_TAG
+        PATCHSET_TAG: $PATCHSET_TAG
     init: true

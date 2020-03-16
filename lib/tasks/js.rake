@@ -13,7 +13,7 @@ namespace :js do
         puts "Building client app '#{app_name}'"
 
         if File.exists?('./package.json')
-          output = `yarn install`
+          output = system 'yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1'
           unless $?.exitstatus == 0
             puts "INSTALL FAILURE:\n#{output}"
             raise "Package installation failure for client app #{app_name}"
@@ -53,7 +53,7 @@ namespace :js do
   desc "Ensure up-to-date node environment"
   task :yarn_install do
     puts "node is: #{`node -v`.strip} (#{`which node`.strip})"
-    system "yarn install --frozen-lockfile"
+    system 'yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1'
     unless $?.success?
       raise 'error running yarn install'
     end
