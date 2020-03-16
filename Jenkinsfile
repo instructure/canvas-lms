@@ -38,16 +38,6 @@ def getImageTagVersion() {
   flags.getImageTagVersion()
 }
 
-def runBuildImageMaybe(block) {
-  def flags = load('build/new-jenkins/groovy/commit-flags.groovy')
-  if (flags.hasFlag('skip-docker-build')) {
-    echo "Skip building image requested"
-  } else {
-    def successes = load('build/new-jenkins/groovy/successes.groovy')
-    successes.skipIfPreviouslySuccessful("build-and-push-image", true, block)
-  }
-}
-
 def skipIfPreviouslySuccessful(name, block) {
   def successes = load('build/new-jenkins/groovy/successes.groovy')
   successes.skipIfPreviouslySuccessful(name, true, block)
@@ -206,21 +196,26 @@ pipeline {
     stage ('Build Docker Image') {
       steps {
         timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
-          runBuildImageMaybe() {
+          skipIfPreviouslySuccessful('docker-build-and-push') {
             script {
               def flags = load('build/new-jenkins/groovy/commit-flags.groovy')
-              if (!flags.hasFlag('skip-cache')) {
-                // canvas-lms:$GERRIT_BRANCH as the image cache for this build (i.e. canvas-lms:master)
-                sh 'docker pull $MERGE_TAG || true'
+              if (flags.hasFlag('skip-docker-build')) {
+                sh 'docker pull $MERGE_TAG'
+                sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
+              }
+              else {
+                if (!flags.hasFlag('skip-cache')) {
+                  sh 'docker pull $MERGE_TAG || true'
+                }
+                sh """
+                  docker build \
+                    --tag $PATCHSET_TAG \
+                    --build-arg RUBY_PASSENGER=$RUBY_PASSENGER \
+                    --build-arg POSTGRES_VERSION=$POSTGRES \
+                    .
+                """
               }
             }
-            sh """
-              docker build \
-                --tag $PATCHSET_TAG \
-                --build-arg RUBY_PASSENGER=$RUBY_PASSENGER \
-                --build-arg POSTGRES_VERSION=$POSTGRES \
-                .
-            """
             sh "docker push $PATCHSET_TAG"
           }
         }
