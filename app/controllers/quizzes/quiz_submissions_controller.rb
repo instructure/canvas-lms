@@ -28,7 +28,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   def index
-    if params[:zip] && authorized_action(@quiz, @current_user, :grade)
+    if params[:zip] && authorized_action(@quiz, @current_user, :review_grades)
       generate_submission_zip(@quiz, @context)
     else
       redirect_to named_context_url(@context, :context_quiz_url, @quiz.id)

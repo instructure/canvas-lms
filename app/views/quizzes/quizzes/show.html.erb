@@ -78,7 +78,7 @@
           </li>
         <% end %>
 
-        <% if can_do(@quiz, @current_user, :grade) %>
+        <% if can_do(@quiz, @current_user, :review_grades) %>
           <%= render :partial => 'download_file_upload_submissions' %>
         <% end %>
 
