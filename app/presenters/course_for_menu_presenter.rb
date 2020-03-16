@@ -30,6 +30,7 @@ class CourseForMenuPresenter
 
   def to_h
     position = @user.dashboard_positions[course.asset_string]
+    show_favorites = @user.account.feature_enabled?(:unfavorite_course_from_dashboard)
     {
       longName: "#{course.name} - #{course.short_name}",
       shortName: course.nickname_for(@user),
@@ -41,7 +42,7 @@ class CourseForMenuPresenter
       subtitle: subtitle,
       enrollmentType: course.primary_enrollment_type,
       id: course.id,
-      isFavorited: course.favorite_for_user?(@user) && @user.account.feature_enabled?(:unfavorite_course_from_dashboard),
+      isFavorited: show_favorites && course.favorite_for_user?(@user),
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
       position: position.present? ? position.to_i : nil
     }.tap do |hash|
