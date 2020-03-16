@@ -39,7 +39,7 @@ def hasFlag(name) {
 
 def getImageTagVersion() {
   // 'refs/changes/63/181863/8' -> '63.181863.8'
-  return hasFlag('skip-docker-build') ? 'master' : "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
+  return "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
 }
 
 def forceRunCoverage() {
