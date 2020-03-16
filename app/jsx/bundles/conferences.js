@@ -37,7 +37,9 @@ import 'compiled/jquery.rails_flash_notifications'
 import 'jquery.templateData'
 import 'jquery.instructure_date_and_time'
 
-renderBigBlueButtonAlert()
+if (ENV.can_create_conferences) {
+  renderBigBlueButtonAlert()
+}
 
 const ConferencesRouter = Backbone.Router.extend({
   routes: {

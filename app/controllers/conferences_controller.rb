@@ -202,6 +202,7 @@ class ConferencesController < ApplicationController
       default_conference: default_conference_json(@context, @current_user, session),
       conference_type_details: conference_types_json(WebConference.conference_types),
       users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
+      can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences)
     )
     set_tutorial_js_env
     flash[:error] = t('Some conferences on this page are hidden because of errors while retrieving their status') if @errors
