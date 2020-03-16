@@ -764,7 +764,7 @@ class Account < ActiveRecord::Base
     end
 
     if starting_account_id
-      shackles_env = Account.connection.open_transactions == 0 ? :slave : :master
+      shackles_env = Account.connection.open_transactions == 0 ? :slave : Shackles.environment
       Shackles.activate(shackles_env) do
         chain.concat(Shard.shard_for(starting_account_id).activate do
           Account.find_by_sql(<<-SQL)
