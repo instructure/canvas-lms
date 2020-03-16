@@ -41,6 +41,7 @@ import * as ConvertCase from 'convert_case'
 import htmlEscape from 'str/htmlEscape'
 import * as EnterGradesAsSetting from 'jsx/gradebook/shared/EnterGradesAsSetting'
 import SetDefaultGradeDialogManager from 'jsx/gradebook/shared/SetDefaultGradeDialogManager'
+import AsyncComponents from 'jsx/gradebook/default_gradebook/AsyncComponents'
 import CurveGradesDialogManager from 'jsx/gradebook/default_gradebook/CurveGradesDialogManager'
 import GradebookApi from 'jsx/gradebook/default_gradebook/apis/GradebookApi'
 import SubmissionCommentApi from 'jsx/gradebook/default_gradebook/apis/SubmissionCommentApi'
@@ -62,7 +63,6 @@ import SectionFilter from 'jsx/gradebook/default_gradebook/components/content-fi
 import StudentGroupFilter from 'jsx/gradebook/default_gradebook/components/content-filters/StudentGroupFilter'
 import GridColor from 'jsx/gradebook/default_gradebook/components/GridColor'
 import StatusesModal from 'jsx/gradebook/default_gradebook/components/StatusesModal'
-import SubmissionTray from 'jsx/gradebook/default_gradebook/components/SubmissionTray'
 import GradebookSettingsModal from 'jsx/gradebook/default_gradebook/components/GradebookSettingsModal'
 import AnonymousSpeedGraderAlert from 'jsx/gradebook/default_gradebook/components/AnonymousSpeedGraderAlert'
 import { statusColors } from 'jsx/gradebook/default_gradebook/constants/colors'
@@ -417,6 +417,8 @@ export default do ->
       @dataLoader.loadInitialData()
 
       @gridReady.then () =>
+        # Preload the Grade Detail Tray
+        AsyncComponents.loadGradeDetailTray()
         @renderViewOptionsMenu()
         @renderGradebookSettingsModal()
 
@@ -2276,7 +2278,7 @@ export default do ->
       mountPoint = document.getElementById('StudentTray__Container')
       props = @getSubmissionTrayProps(student)
       @loadSubmissionComments(assignmentId, studentId) if !@getSubmissionCommentsLoaded() and open
-      renderComponent(SubmissionTray, mountPoint, props)
+      AsyncComponents.renderGradeDetailTray(props, mountPoint)
 
     loadSubmissionComments: (assignmentId, studentId) =>
       SubmissionCommentApi.getSubmissionComments(@options.context_id, assignmentId, studentId)
