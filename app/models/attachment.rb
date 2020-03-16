@@ -1657,9 +1657,7 @@ class Attachment < ActiveRecord::Base
       doc = canvadoc || create_canvadoc
       doc.upload({
         annotatable: opts[:wants_annotation],
-        preferred_plugins: opts[:preferred_plugins],
-        # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
-        region: doc.shard.database_server.config[:region] || "none"
+        preferred_plugins: opts[:preferred_plugins]
       })
       update_attribute(:workflow_state, 'processing')
     end
