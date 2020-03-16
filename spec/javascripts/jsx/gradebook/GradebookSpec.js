@@ -41,6 +41,7 @@ import studentRowHeaderConstants from 'jsx/gradebook/default_gradebook/constants
 import {darken, statusColors, defaultColors} from 'jsx/gradebook/default_gradebook/constants/colors'
 import ViewOptionsMenu from 'jsx/gradebook/default_gradebook/components/ViewOptionsMenu'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
+import {waitFor} from '../support/Waiters'
 
 import {
   createGradebook,
@@ -7026,13 +7027,11 @@ QUnit.module('Gradebook#renderSubmissionTray', {
   }
 })
 
-test('shows a submission tray on the page when rendering an open tray', function() {
-  const clock = sinon.useFakeTimers()
+test('shows a submission tray on the page when rendering an open tray', async function() {
   this.gradebook.setSubmissionTrayState(true, '1101', '2301')
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'))
-  clock.tick(500) // wait for Tray to transition open
+  await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
   ok(document.querySelector('[aria-label="Submission tray"]'))
-  clock.restore()
 })
 
 test('does not show a submission tray on the page when rendering a closed tray', function() {
@@ -7044,20 +7043,19 @@ test('does not show a submission tray on the page when rendering a closed tray',
   clock.restore()
 })
 
-test('shows a submission tray when the related submission has not loaded for the student', function() {
-  const clock = sinon.useFakeTimers()
+test('shows a submission tray when the related submission has not loaded for the student', async function() {
   this.gradebook.setSubmissionTrayState(true, '1101', '2301')
   this.gradebook.student('1101').assignment_2301 = undefined
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'))
-  clock.tick(500) // wait for Tray to transition open
+  await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
   ok(document.querySelector('[aria-label="Submission tray"]'))
-  clock.restore()
 })
 
-test('calls getSubmissionTrayProps with the student', function() {
+test('calls getSubmissionTrayProps with the student', async function() {
   sinon.spy(this.gradebook, 'getSubmissionTrayProps')
   this.gradebook.setSubmissionTrayState(true, '1101', '2301')
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'))
+  await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
   deepEqual(this.gradebook.getSubmissionTrayProps.firstCall.args, [this.gradebook.student('1101')])
 })
 
@@ -7158,7 +7156,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     $fixtures.innerHTML = ''
   })
 
-  test('does not show the previous student arrow for the first student', () => {
+  test('does not show the previous student arrow for the first student', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7166,7 +7164,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     strictEqual(
       document.querySelectorAll('#student-carousel .left-arrow-button-container button').length,
@@ -7174,7 +7172,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     )
   })
 
-  test('shows the next student arrow for the first student', () => {
+  test('shows the next student arrow for the first student', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7182,7 +7180,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     strictEqual(
       document.querySelectorAll('#student-carousel .right-arrow-button-container button').length,
@@ -7190,7 +7188,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     )
   })
 
-  test('does not show the next student arrow for the last student', () => {
+  test('does not show the next student arrow for the last student', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7198,7 +7196,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     strictEqual(
       document.querySelectorAll('#student-carousel .right-arrow-button-container button').length,
@@ -7206,7 +7204,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     )
   })
 
-  test('shows the previous student arrow for the last student', () => {
+  test('shows the previous student arrow for the last student', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7214,7 +7212,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     strictEqual(
       document.querySelectorAll('#student-carousel .left-arrow-button-container button').length,
@@ -7222,7 +7220,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     )
   })
 
-  test('clicking the next student arrow calls loadTrayStudent with "next"', () => {
+  test('clicking the next student arrow calls loadTrayStudent with "next"', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7233,7 +7231,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     sinon.stub(gradebook, 'getSubmissionCommentsLoaded').returns(true)
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     const nextStudentButton = document.querySelector(
       '#student-carousel .right-arrow-button-container button'
@@ -7243,7 +7241,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     deepEqual(gradebook.loadTrayStudent.getCall(0).args, ['next'])
   })
 
-  test('clicking the previous student arrow calls loadTrayStudent with "previous"', () => {
+  test('clicking the previous student arrow calls loadTrayStudent with "previous"', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7254,7 +7252,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     sinon.stub(gradebook, 'getSubmissionCommentsLoaded').returns(true)
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     const nextStudentButton = document.querySelector(
       '#student-carousel .left-arrow-button-container button'
