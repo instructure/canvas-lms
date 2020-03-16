@@ -105,7 +105,7 @@ describe 'Gradebook performance' do
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       load_time = page_load_end_time - page_load_start_time
-      puts "200,000 submissions, gradebook loads in less than 25 seconds.  Load time: #{load_time}"
+      puts "\nPage:Gradebook Submissions:200,000 Expected_Load:25 Actual_Load:#{load_time}"
       expect(load_time).to be < 25
     end
 
@@ -116,7 +116,7 @@ describe 'Gradebook performance' do
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       load_time = page_load_end_time - page_load_start_time
-      puts "200,000 submissions, speedgrader loads in less than 100 seconds.  Load time: #{load_time}"
+      puts "\nPage:Speedgrader Submissions:200,000 Expected_Load:100 Actual_Load:#{load_time}"
       expect(load_time).to be < 100
     end
   end
@@ -128,7 +128,7 @@ describe 'Gradebook performance' do
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       load_time = page_load_end_time - page_load_start_time
-      puts "100,000 submissions 2000x50, gradebook loads in less than 25 seconds.  Load time: #{load_time}"
+      puts "\nPage:Gradebook Submissions:100,000_2000x50 Expected_Load:25 Actual_Load:#{load_time}"
       expect(load_time).to be < 25
     end
 
@@ -138,7 +138,7 @@ describe 'Gradebook performance' do
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       load_time = page_load_end_time - page_load_start_time
-      puts "100,000 submissions 2000x50, speedgrader loads in less than 45 seconds.  Load time: #{load_time}"
+      puts "\nPage:Speedgrader Submissions:100,000_2000x50 Expected_Load:45 Actual_Load:#{load_time}"
       expect(load_time).to be < 45
     end
   end
@@ -151,7 +151,7 @@ describe 'Gradebook performance' do
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       load_time = page_load_end_time - page_load_start_time
-      puts "100,000 submissions 1000x100, gradebook loads in less than 25 seconds.  Load time: #{load_time}"
+      puts "\nPage:Gradebook Submissions:100,000_1000x100 Expected_Load:25 Actual_Load:#{load_time}"
       expect(load_time).to be < 25
     end
 
@@ -161,7 +161,7 @@ describe 'Gradebook performance' do
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       load_time = page_load_end_time - page_load_start_time
-      puts "100,000 submissions 2000x50, speedgrader loads in less than 19 seconds.  Load time: #{load_time}"
+      puts "\nPage:Speedgrader Submissions:100,000_2000x50 Expected_Load:19 Actual_Load:#{load_time}"
       expect(load_time).to be < 19
     end
   end
@@ -173,7 +173,7 @@ describe 'Gradebook performance' do
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       load_time = page_load_end_time - page_load_start_time
-      puts "10,000 submissions, gradebook loads in less than 18 seconds.  Load time: #{load_time}"
+      puts "\nPage:Gradebook Submissions:10,000 Expected_Load:18 Actual_Load:#{load_time}"
       expect(load_time).to be < 18
     end
 
@@ -183,7 +183,7 @@ describe 'Gradebook performance' do
       wait_for_ajaximations
       page_load_end_time = Time.zone.now
       load_time = page_load_end_time - page_load_start_time
-      puts "10,000 submissions, speedgrader loads in less than 10 seconds.  Load time: #{load_time}"
+      puts "\nPage:Speedgrader Submissions:10,000 Expected_Load:10 Actual_Load:#{load_time}"
       expect(load_time).to be < 10
     end
   end
