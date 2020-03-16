@@ -51,6 +51,8 @@ class GradebookRouter extends Backbone.Router {
       this.renderPagination(0, 0)
     }
 
+    import('jsx/context_cards/StudentContextCardTrigger')
+
     return this
   }
 
