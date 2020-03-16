@@ -195,6 +195,9 @@ class ConferencesController < ApplicationController
     else
       @users = @context.users.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
     end
+
+    @render_alternatives = WebConference.conference_types.all? { |ct| ct[:replace_with_alternatives] }
+
     # exposing the initial data as json embedded on page.
     js_env(
       current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),
@@ -202,7 +205,8 @@ class ConferencesController < ApplicationController
       default_conference: default_conference_json(@context, @current_user, session),
       conference_type_details: conference_types_json(WebConference.conference_types),
       users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
-      can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences)
+      can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
+      render_alternatives: @render_alternatives
     )
     set_tutorial_js_env
     flash[:error] = t('Some conferences on this page are hidden because of errors while retrieving their status') if @errors
