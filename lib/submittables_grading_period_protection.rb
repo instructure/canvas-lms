@@ -73,6 +73,23 @@ module SubmittablesGradingPeriodProtection
       can_delete_overrides?(submittable, prepared_batch[:overrides_to_delete], flash_message: flash_message)
   end
 
+  def grading_periods_allow_assignment_override_update?(override)
+    return true unless grading_periods? && !current_user_is_context_admin?
+    return true unless override.changed?
+
+    if date_in_closed_grading_period?(override.due_at_was)
+      apply_error(override, :due_at, ERROR_MESSAGES[:change_override_due_at_in_closed], false)
+      return false
+    end
+
+    if date_in_closed_grading_period?(override.due_at)
+      apply_error(override, :due_at, ERROR_MESSAGES[:change_override_due_at_to_closed], false)
+      return false
+    end
+
+    true
+  end
+
   private
 
   def due_at_changed?(submittable)
@@ -149,8 +166,7 @@ module SubmittablesGradingPeriodProtection
     change_due_at_to_closed: I18n.t("Cannot change the due date to a date within a closed grading period"),
     set_override_due_at_in_closed: I18n.t("Cannot set override due date to a date within a closed grading period"),
     change_override_due_at_in_closed: I18n.t("Cannot change the due date of an override in a closed grading period"),
-    change_override_due_at_to_closed: I18n.t("Cannot change an override due date \
-                                             to a date within a closed grading period"),
+    change_override_due_at_to_closed: I18n.t("Cannot change an override due date to a date within a closed grading period"),
     delete_override_in_closed: I18n.t("Cannot delete an override with a due date within a closed grading period"),
     change_only_visible_to_overrides: I18n.t("Cannot set only visible to overrides when due in a closed grading period")
   }.freeze

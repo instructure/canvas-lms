@@ -2941,6 +2941,15 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  # Suspend callbacks that recalculate grading period grades
+  def self.suspend_grading_period_grade_recalculation
+    Assignment.suspend_callbacks(:update_grading_period_grades) do
+      AssignmentOverride.suspend_callbacks(:update_grading_period_grades) do
+        yield
+      end
+    end
+  end
+
   def update_cached_due_dates
     return unless update_cached_due_dates?
     self.clear_cache_key(:availability)

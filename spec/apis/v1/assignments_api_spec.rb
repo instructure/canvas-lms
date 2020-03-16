@@ -5300,6 +5300,226 @@ describe AssignmentsApiController, type: :request do
       expect(a.points_possible).to eq 0
     end
   end
+
+  describe "PUT bulk_update" do
+    before :once do
+      course_with_teacher(:active_all => true)
+      @s1 = @course.course_sections.create! :name => 'other section'
+      @a0 = @course.assignments.create! :title => 'no dates'
+      @a1 = @course.assignments.create! :title => 'basic', :unlock_at => 5.days.ago, :due_at => 4.days.ago, :lock_at => 2.days.from_now
+      @a2 = @course.assignments.create! :title => 'with overrides', :unlock_at => 1.day.ago, :due_at => 3.days.from_now, :lock_at => 4.days.from_now
+      @ao0 = assignment_override_model :assignment => @a2, :set => @course.default_section, :unlock_at => 4.days.ago, :due_at => 3.days.ago, :lock_at => 4.days.from_now
+      @ao1 = assignment_override_model :assignment => @a2, :set => @s1, :due_at => 5.days.from_now, :lock_at => 6.days.from_now
+      @new_dates = (7..9).map { |x| x.days.from_now }
+    end
+
+    it "requires manage_assignments rights" do
+      student_in_course(:active_all => true)
+      api_bulk_update(@course, [], expected_status: 401)
+    end
+
+    it "disallows editing moderated assignments if you're not the moderator" do
+      @course.account.role_overrides.create!(permission: :select_final_grade, enabled: false, role: ta_role)
+      ta_in_course(:active_all => true)
+
+      api_bulk_update(@course, [{'id' => @a0.id, 'all_dates' => []}])
+
+      @a0.moderated_grading = true
+      @a0.final_grader_id = @teacher
+      @a0.grader_count = 1
+      @a0.save!
+      api_bulk_update(@course, [{'id' => @a0.id, 'all_dates' => []}], expected_status: 401)
+    end
+
+    it "expects an array of assignments" do
+      api_bulk_update(@course, {}, expected_status: 400)
+    end
+
+    it "rejects an invalid assignment id" do
+      api_bulk_update(@course, [{'id' => 0, 'all_dates' => [{'id' => 0, 'all_dates' => []}]}], expected_status: 404)
+    end
+
+    it "updates assignment dates" do
+      api_bulk_update(@course, [{
+                                 'id' => @a0.id,
+                                 'all_dates' => [
+                                   {
+                                     'base' => true,
+                                     'due_at' => @new_dates[1].iso8601
+                                   }
+                                 ]
+                               },
+                               {
+                                 'id' => @a1.id,
+                                 'all_dates' => [
+                                   {
+                                     'base' => true,
+                                     'unlock_at' => @new_dates[0].iso8601,
+                                     'due_at' => @new_dates[1].iso8601,
+                                     'lock_at' => @new_dates[2].iso8601
+                                   }
+                                 ]
+                               }])
+      expect(@a0.reload.due_at.to_i).to eq @new_dates[1].to_i
+      expect(@a0.unlock_at).to be_nil
+      expect(@a0.lock_at).to be_nil
+
+      expect(@a1.reload.due_at.to_i).to eq @new_dates[1].to_i
+      expect(@a1.unlock_at.to_i).to eq @new_dates[0].to_i
+      expect(@a1.lock_at.to_i).to eq @new_dates[2].to_i
+    end
+
+    it "validates assignment dates" do
+      json = api_bulk_update(@course, [{
+                                         'id' => @a0.id,
+                                         'all_dates' => [
+                                           {
+                                             'base' => true,
+                                             'due_at' => @new_dates[1].iso8601
+                                           }
+                                         ]
+                                       },
+                                       {
+                                         'id' => @a1.id,
+                                         'all_dates' => [
+                                           {
+                                             'base' => true,
+                                             'unlock_at' => @new_dates[1].iso8601,
+                                             'due_at' => @new_dates[0].iso8601, # out of range
+                                             'lock_at' => @new_dates[2].iso8601
+                                           }
+                                         ]
+                                       }],
+                             expected_result: 'failed')
+      expect(json[0]['assignment_id']).to eq @a1.id
+      expect(json[0]['errors']['due_at'][0]['message']).to eq "must be between availability dates"
+
+      # ensure the partial update didn't happen
+      expect(@a0.due_at.to_i).not_to eq @new_dates[1].to_i
+    end
+
+    it "updates override dates" do
+      api_bulk_update(@course, [{
+                                  'id' => @a2.id,
+                                  'all_dates' => [
+                                    {
+                                      'id' => nil,
+                                      'base' => true,
+                                      'due_at' => @new_dates[2].iso8601
+                                    },
+                                    {
+                                      'id' => @ao0.id,
+                                      'due_at' => @new_dates[1].iso8601,
+                                      'lock_at' => @new_dates[2].iso8601
+                                    },
+                                    {
+                                      'id' => @ao1.id,
+                                      'unlock_at' => @new_dates[0].iso8601,
+                                      'due_at' => @new_dates[1].iso8601,
+                                      'lock_at' => @new_dates[2].iso8601
+                                    }
+                                  ]
+                                }])
+      @a2.reload
+      expect(@a2.due_at.to_i).to eq(@new_dates[2].to_i)
+
+      @ao0.reload
+      expect(@ao0).not_to be_unlock_at_overridden
+      expect(@ao0).to be_due_at_overridden
+      expect(@ao0.due_at.to_i).to eq @new_dates[1].to_i
+      expect(@ao0).to be_lock_at_overridden
+      expect(@ao0.lock_at.to_i).to eq @new_dates[2].to_i
+
+      @ao1.reload
+      expect(@ao1).to be_unlock_at_overridden
+      expect(@ao1.unlock_at.to_i).to eq @new_dates[0].to_i
+      expect(@ao1.due_at.to_i).to eq @new_dates[1].to_i
+      expect(@ao1).to be_lock_at_overridden
+      expect(@ao1.lock_at.to_i).to eq @new_dates[2].to_i
+    end
+
+    describe "with grading periods" do
+      before :once do
+        grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+        term = @course.enrollment_term
+        term.grading_period_group = grading_period_group
+        term.save!
+        Factories::GradingPeriodHelper.new.create_for_group(grading_period_group, {
+          start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
+        })
+        Factories::GradingPeriodHelper.new.create_for_group(grading_period_group, {
+          start_date: 1.day.ago, end_date: 1.month.from_now, close_date: 2.months.from_now
+        })
+        Factories::GradingPeriodHelper.new.create_for_group(grading_period_group, {
+          start_date: 2.months.from_now, end_date: 4.months.from_now, close_date: 5.months.from_now
+        })
+        student_in_course(active_all: true)
+        @user = @teacher
+      end
+
+      it "prohibits moving due/override dates into or out of a closed grading period" do
+        data = [
+          {
+            'id' => @a1.id, # in a closed grading period
+            'all_dates' => [
+              {
+                'base' => true,
+                'due_at' => 5.days.from_now
+              }
+            ]
+          },
+          {
+            'id' => @a2.id,
+            'all_dates' => [
+              {
+                'id' => @ao0.id, # in a closed grading period
+                'due_at' => 5.days.from_now
+              },
+              {
+                'id' => @ao1.id, # not in a closed grading period
+                'due_at' => 5.days.ago
+              }
+            ]
+          }]
+        json = api_bulk_update(@course, data, expected_result: 'failed')
+
+        a1_json = json.detect { |r| r['assignment_id'] == @a1.id }
+        expect(a1_json['errors']['due_at'][0]['message']).to eq "Cannot change the due date when due in a closed grading period"
+
+        ao0_json = json.detect { |r| r['assignment_override_id'] == @ao0.id }
+        expect(ao0_json['assignment_id']).to eq @a2.id
+        expect(ao0_json['errors']['due_at'][0]['message']).to eq "Cannot change the due date of an override in a closed grading period"
+
+        ao1_json = json.detect { |r| r['assignment_override_id'] == @ao1.id }
+        expect(ao1_json['assignment_id']).to eq @a2.id
+        expect(ao1_json['errors']['due_at'][0]['message']).to eq "Cannot change an override due date to a date within a closed grading period"
+      end
+
+      it "recomputes scores once when assignments get moved to new grading periods" do
+        data = [
+          {
+            'id' => @a0.id,
+            'all_dates' => [
+              {
+                'base' => true,
+                'due_at' => 5.days.from_now # third grading period to second
+              }
+            ]
+          },
+          {
+            'id' => @a2.id,
+            'all_dates' => [
+              {
+                'id' => @ao1.id,
+                'due_at' => 3.months.from_now # second grading period to third
+              }
+            ]
+          }]
+        expect_any_instance_of(Course).to receive(:recompute_student_scores_without_send_later).once
+        api_bulk_update(@course, data)
+      end
+    end
+  end
 end
 
 def api_get_assignments_index_from_course(course, params = {})
@@ -5405,4 +5625,20 @@ def api_create_assignment_in_course(course,assignment_params)
              :format => 'json',
              :course_id => course.id.to_s
            }, {:assignment => assignment_params })
+end
+
+def api_bulk_update(course, data, expected_status: 200, expected_result: 'completed')
+  json = api_call(:put, "/api/v1/courses/#{course.id}/assignments/bulk_update",
+           { :controller => 'assignments_api', :action => 'bulk_update',
+             :format => 'json', :course_id => course.to_param },
+           { :_json => data }, {}, { :expected_status => expected_status })
+  return json unless response.status == 200
+
+  progress = Progress.find(json['id'])
+  expect(progress['workflow_state']).to eq 'queued'
+  run_jobs
+
+  progress.reload
+  expect(progress['workflow_state']).to eq expected_result
+  progress.results
 end
