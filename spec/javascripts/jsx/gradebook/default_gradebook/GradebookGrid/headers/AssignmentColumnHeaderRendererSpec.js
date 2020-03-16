@@ -339,13 +339,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       strictEqual(component.props.enterGradesAsSetting.showGradingSchemeOption, true)
     })
 
-    test('includes the mute assignment action', () => {
-      buildGradebook()
-      sinon.spy(gradebook, 'getMuteAssignmentAction')
-      render()
-      equal(component.props.muteAssignmentAction, gradebook.getMuteAssignmentAction.returnValues[0])
-    })
-
     QUnit.module('"Post grades" action', () => {
       QUnit.module('when Post Policies is enabled', contextHooks => {
         let onSelectCallback

@@ -72,7 +72,6 @@ import SubmissionStateMap from 'jsx/gradebook/SubmissionStateMap'
 import DownloadSubmissionsDialogManager from 'jsx/gradebook/shared/DownloadSubmissionsDialogManager'
 import ReuploadSubmissionsDialogManager from 'jsx/gradebook/shared/ReuploadSubmissionsDialogManager'
 import GradebookKeyboardNav from './GradebookKeyboardNav'
-import AssignmentMuterDialogManager from 'jsx/gradebook/shared/AssignmentMuterDialogManager'
 import assignmentHelper from 'jsx/gradebook/shared/helpers/assignmentHelper'
 import TextMeasure from 'jsx/gradebook/shared/helpers/TextMeasure'
 import * as GradeInputHelper from 'jsx/grading/helpers/GradeInputHelper'
@@ -2782,19 +2781,6 @@ export default do ->
           submissionsLoaded: @contentLoadStates.submissionsLoaded
         }
       )
-
-    getMuteAssignmentAction: (assignmentId) =>
-      assignment = @getAssignment(assignmentId)
-      manager = new AssignmentMuterDialogManager(
-        assignment,
-        "#{@options.context_url}/assignments/#{assignmentId}/mute",
-        @contentLoadStates.submissionsLoaded
-      )
-
-      {
-        disabled: !manager.isDialogEnabled()
-        onSelect: manager.showDialog
-      }
 
     ## Gradebook Content Api Methods
 
