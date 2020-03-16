@@ -23,11 +23,13 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import moxios from 'moxios'
 import qs from 'qs'
+
 import fakeENV from 'helpers/fakeENV'
 import UserSettings from 'compiled/userSettings'
 import natcompare from 'compiled/util/natcompare'
 import round from 'compiled/util/round'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
+import AsyncComponents from 'jsx/gradebook/default_gradebook/AsyncComponents'
 import ActionMenu from 'jsx/gradebook/default_gradebook/components/ActionMenu'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
 import DataLoader from 'jsx/gradebook/DataLoader'
@@ -8928,24 +8930,22 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
   let gradebook
 
   function gradebookSettingsModalProps() {
-    return ReactDOM.render.firstCall.args[0].props
+    return AsyncComponents.renderGradebookSettingsModal.lastCall.args[0]
   }
 
   hooks.beforeEach(() => {
     setFixtureHtml($fixtures)
-    sinon.stub(ReactDOM, 'render')
+    sandbox.stub(AsyncComponents, 'renderGradebookSettingsModal')
   })
 
   hooks.afterEach(() => {
-    ReactDOM.render.restore()
     $fixtures.innerHTML = ''
   })
 
   test('renders the GradebookSettingsModal component', () => {
     gradebook = createGradebook()
     gradebook.renderGradebookSettingsModal()
-    const componentName = ReactDOM.render.firstCall.args[0].type.name
-    strictEqual(componentName, 'GradebookSettingsModal')
+    strictEqual(AsyncComponents.renderGradebookSettingsModal.callCount, 1)
   })
 
   test('sets the .courseFeatures prop to #courseFeatures from Gradebook', () => {
