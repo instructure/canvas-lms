@@ -7711,18 +7711,6 @@ QUnit.module('Gradebook Assignment Actions', suiteHooks => {
       equal(typeof action.onSelect, 'function')
     })
   })
-
-  QUnit.module('#getMuteAssignmentAction', () => {
-    test('includes the "disabled" property', () => {
-      const action = gradebook.getMuteAssignmentAction('2301')
-      equal(typeof action.disabled, 'boolean')
-    })
-
-    test('includes the "onSelect" callback', () => {
-      const action = gradebook.getMuteAssignmentAction('2301')
-      equal(typeof action.onSelect, 'function')
-    })
-  })
 })
 
 QUnit.module('Gradebook#setLatePolicy', {

@@ -105,7 +105,6 @@ function getProps(column, gradebook, options) {
       )
     },
 
-    muteAssignmentAction: gradebook.getMuteAssignmentAction(assignmentId),
     onHeaderKeyDown: event => {
       gradebook.handleHeaderKeyDown(event, columnId)
     },

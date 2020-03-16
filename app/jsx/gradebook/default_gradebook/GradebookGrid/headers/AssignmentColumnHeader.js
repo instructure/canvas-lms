@@ -202,11 +202,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       onSelect: func.isRequired
     }).isRequired,
 
-    muteAssignmentAction: shape({
-      disabled: bool.isRequired,
-      onSelect: func.isRequired
-    }).isRequired,
-
     onMenuDismiss: func.isRequired,
     showUnpostedMenuItem: bool.isRequired
   }
@@ -237,10 +232,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
   setDefaultGrades = () => {
     this.invokeAndSkipFocus(this.props.setDefaultGradeAction)
-  }
-
-  muteAssignment = () => {
-    this.invokeAndSkipFocus(this.props.muteAssignmentAction)
   }
 
   downloadSubmissions = () => {
@@ -436,25 +427,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           <span data-menu-item-id="set-default-grade">{I18n.t('Set Default Grade')}</span>
         </Menu.Item>
 
-        {this.props.postGradesAction.featureEnabled ? (
-          <Menu.Item
-            disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
-            onSelect={this.postGrades}
-          >
-            {labelForPostGradesAction(this.props.postGradesAction)}
-          </Menu.Item>
-        ) : (
-          <Menu.Item
-            disabled={this.props.muteAssignmentAction.disabled}
-            onSelect={this.muteAssignment}
-          >
-            <span data-menu-item-id="assignment-muter">
-              {this.props.assignment.muted
-                ? I18n.t('Unmute Assignment')
-                : I18n.t('Mute Assignment')}
-            </span>
-          </Menu.Item>
-        )}
+        <Menu.Item
+          disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
+          onSelect={this.postGrades}
+        >
+          {labelForPostGradesAction(this.props.postGradesAction)}
+        </Menu.Item>
 
         {this.props.postGradesAction.featureEnabled && (
           <Menu.Item
