@@ -63,7 +63,6 @@ import SectionFilter from 'jsx/gradebook/default_gradebook/components/content-fi
 import StudentGroupFilter from 'jsx/gradebook/default_gradebook/components/content-filters/StudentGroupFilter'
 import GridColor from 'jsx/gradebook/default_gradebook/components/GridColor'
 import StatusesModal from 'jsx/gradebook/default_gradebook/components/StatusesModal'
-import GradebookSettingsModal from 'jsx/gradebook/default_gradebook/components/GradebookSettingsModal'
 import AnonymousSpeedGraderAlert from 'jsx/gradebook/default_gradebook/components/AnonymousSpeedGraderAlert'
 import { statusColors } from 'jsx/gradebook/default_gradebook/constants/colors'
 import StudentDatastore from 'jsx/gradebook/default_gradebook/stores/StudentDatastore'
@@ -1357,8 +1356,9 @@ export default do ->
       renderComponent(GridColor, gridColorMountPoint, gridColorProps)
 
     renderGradebookSettingsModal: =>
-      gradebookSettingsModalMountPoint = document.querySelector("[data-component='GradebookSettingsModal']")
-      gradebookSettingsModalProps =
+      @gradebookSettingsModal = React.createRef(null)
+
+      props =
         anonymousAssignmentsPresent: _.some(@assignments, (assignment) => assignment.anonymous_grading)
         courseId: @options.context_id
         courseFeatures: @courseFeatures
@@ -1370,12 +1370,10 @@ export default do ->
           @courseSettings.handleUpdated(settings)
         onLatePolicyUpdate: @onLatePolicyUpdate
         postPolicies: @postPolicies
+        ref: @gradebookSettingsModal
 
-      @gradebookSettingsModal = renderComponent(
-        GradebookSettingsModal,
-        gradebookSettingsModalMountPoint,
-        gradebookSettingsModalProps
-      )
+      $container = document.querySelector("[data-component='GradebookSettingsModal']")
+      AsyncComponents.renderGradebookSettingsModal(props, $container)
 
     renderSettingsButton: =>
       iconSettingsSolid = React.createElement(IconSettingsSolid)
@@ -1385,7 +1383,7 @@ export default do ->
         icon: iconSettingsSolid,
         id: 'gradebook-settings-button',
         variant: 'icon',
-        onClick: @gradebookSettingsModal.open
+        onClick: () => @gradebookSettingsModal.current?.open()
 
       screenReaderContent = React.createElement(ScreenReaderContent, {}, I18n.t('Gradebook Settings'))
       settingsTitle = I18n.t('Gradebook Settings')

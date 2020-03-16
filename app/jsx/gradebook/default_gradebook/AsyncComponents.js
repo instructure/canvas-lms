@@ -23,12 +23,22 @@ async function loadGradeDetailTray() {
   return (await import('./components/SubmissionTray')).default
 }
 
+async function loadGradebookSettingsModal() {
+  return (await import('./components/GradebookSettingsModal')).default
+}
+
 const AsyncRenders = {
   loadGradeDetailTray,
+  loadGradebookSettingsModal,
 
   async renderGradeDetailTray(props, $container) {
     const GradeDetailTray = await loadGradeDetailTray()
     render(<GradeDetailTray {...props} />, $container)
+  },
+
+  async renderGradebookSettingsModal(props, $container) {
+    const GradebookSettingsModal = await loadGradebookSettingsModal()
+    render(<GradebookSettingsModal {...props} />, $container)
   }
 }
 
