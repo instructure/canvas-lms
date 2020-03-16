@@ -17,6 +17,7 @@
 
 import I18n from 'i18n!gradebookHeaderFilterView'
 import {View} from 'Backbone'
+import '../../jquery.kylemenu'
 import Grid from '../../gradebook/OutcomeGradebookGrid'
 import template from 'jst/gradebook/header_filter'
 
