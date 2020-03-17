@@ -233,6 +233,11 @@ class GradebooksController < ApplicationController
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
 
+      # Optimize initial data loading
+      if Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids)
+        prefetch_xhr(user_ids_course_gradebook_url(@context), id: 'user_ids')
+      end
+
       render_gradebook
     end
   end
@@ -339,6 +344,8 @@ class GradebooksController < ApplicationController
     last_exported_attachment = @last_exported_gradebook_csv.try(:attachment)
     grading_standard = @context.grading_standard_or_default
     {
+      prefetch_gradebook_user_ids: Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids),
+
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
         chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
