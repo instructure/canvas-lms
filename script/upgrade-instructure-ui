@@ -25,9 +25,9 @@
 
 const fs = require('fs')
 const lockfile = require('@yarnpkg/lockfile')
-const packageJson = require('../package.json')
 const {promisify} = require('util')
 const exec = promisify(require('child_process').exec)
+const packageJson = require('../package.json')
 
 const yarnFile = fs.readFileSync('yarn.lock', 'utf8')
 const yarnJson = lockfile.parse(yarnFile)
@@ -35,10 +35,15 @@ const yarnJson = lockfile.parse(yarnFile)
 function isInstuiPackageSpec(packageSpec) {
   const nonUiPackages = [
     '@instructure/babel-plugin-themeable-styles',
+    '@instructure/babel-plugin-transform-imports',
+    '@instructure/browserslist-config-instui',
+    '@instructure/canvas-high-contrast-theme',
     '@instructure/canvas-theme',
     '@instructure/command-utils',
     '@instructure/config-loader',
+    '@instructure/console',
     '@instructure/debounce',
+    '@instructure/instructure-theme',
     '@instructure/pkg-utils',
     '@instructure/postcss-themeable-styles',
     '@instructure/uid'
