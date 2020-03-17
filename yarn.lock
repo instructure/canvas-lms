@@ -1558,6 +1558,25 @@
     keycode "^2"
     prop-types "^15"
 
+"@instructure/ui-calendar@6", "@instructure/ui-calendar@^6.21.0":
+  version "6.21.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-calendar/-/ui-calendar-6.21.0.tgz#175c22700d1ec2cdce5ef2159402de1d21647e67"
+  integrity sha512-PmIVkIIWQSbFnBkMOk6cSZyOzjqi3xUIlZf84ZgD6bm9HHbCDa3UiWznesTynLvfdVujxl5urxAytiH1QeV5kw==
+  dependencies:
+    "@babel/runtime" "^7.5.0"
+    "@instructure/console" "^6.21.0"
+    "@instructure/ui-a11y-content" "^6.21.0"
+    "@instructure/ui-i18n" "^6.21.0"
+    "@instructure/ui-prop-types" "^6.21.0"
+    "@instructure/ui-react-utils" "^6.21.0"
+    "@instructure/ui-testable" "^6.21.0"
+    "@instructure/ui-themeable" "^6.21.0"
+    "@instructure/ui-utils" "^6.21.0"
+    "@instructure/ui-view" "^6.21.0"
+    "@instructure/uid" "^6.21.0"
+    classnames "^2"
+    prop-types "^15"
+
 "@instructure/ui-checkbox@6", "@instructure/ui-checkbox@^6.21.0":
   version "6.21.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-checkbox/-/ui-checkbox-6.21.0.tgz#b59acf42c7e6dd9f5c102a2faae616d2302f8885"
@@ -1629,6 +1648,26 @@
     "@instructure/uid" "^5.52.3"
     classnames "^2"
     keycode "^2.1.8"
+    prop-types "^15"
+
+"@instructure/ui-date-input@6":
+  version "6.21.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-date-input/-/ui-date-input-6.21.0.tgz#a44a2b2694d41e4fe2fee73fa954f0a188e80302"
+  integrity sha512-5hgUofwz92StgWWI+arg730AhXIW2+eVZJKZRXGG+FSLiL+anlt0JpR42N9Z0zu0Ky3SkgqNAy8IMinePHtguw==
+  dependencies:
+    "@babel/runtime" "^7.5.0"
+    "@instructure/ui-calendar" "^6.21.0"
+    "@instructure/ui-form-field" "^6.21.0"
+    "@instructure/ui-icons" "^6.21.0"
+    "@instructure/ui-popover" "^6.21.0"
+    "@instructure/ui-position" "^6.21.0"
+    "@instructure/ui-prop-types" "^6.21.0"
+    "@instructure/ui-react-utils" "^6.21.0"
+    "@instructure/ui-selectable" "^6.21.0"
+    "@instructure/ui-testable" "^6.21.0"
+    "@instructure/ui-text-input" "^6.21.0"
+    "@instructure/ui-themeable" "^6.21.0"
+    "@instructure/ui-utils" "^6.21.0"
     prop-types "^15"
 
 "@instructure/ui-decorator@6", "@instructure/ui-decorator@^6.21.0":
