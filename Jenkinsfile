@@ -60,6 +60,12 @@ def isPatchsetPublishable() {
   env.PATCHSET_TAG == env.PUBLISHABLE_TAG
 }
 
+// WARNING! total hack, being removed after covid...
+def isCovid() {
+  env.GERRIT_BRANCH == 'covid'
+}
+// end of hack (covid)
+
 pipeline {
   agent { label 'canvas-docker' }
   options { ansiColor('xterm') }
@@ -105,6 +111,24 @@ pipeline {
             }
 
             def credentials = load ('build/new-jenkins/groovy/credentials.groovy')
+
+            // WARNING! total hack, being removed after covid...
+            // if this build is triggered from a plugin that is from the 
+            // covid branch, we need to checkout the covid branch for canvas-lms
+            if (isCovid() && env.GERRIT_PROJECT != 'canvas-lms') {
+              echo 'checking out canvas-lms covid branch'
+              credentials.withGerritCredentials {
+                sh '''
+                  set -ex
+                  git branch -D covid || true
+                  GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                    git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
+                  git checkout -b covid origin/covid
+                '''
+              }
+            }
+            // end of hack (covid)
+
             credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
             gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
             echo "Plugin list: ${gems}"
@@ -114,7 +138,16 @@ pipeline {
                 /* this is the commit we're testing */
                 credentials.fetchFromGerrit(gem, 'gems/plugins', null, null, env.GERRIT_REFSPEC)
               } else {
-                credentials.fetchFromGerrit(gem, 'gems/plugins')
+                // WARNING! total hack, being removed after covid...
+                // remove if statement when covid is done. only thing in else is needed.
+                if (isCovid()) {
+                  echo "checkin out ${gem} covid branch"
+                  credentials.fetchFromGerrit(gem, 'gems/plugins', null, null, 'covid')
+                }
+                else {
+                  credentials.fetchFromGerrit(gem, 'gems/plugins')
+                }
+                // end of hack (covid)
               }
             }
             credentials.fetchFromGerrit('gergich_user_config', '.')
