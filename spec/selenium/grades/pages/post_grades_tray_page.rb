@@ -72,13 +72,10 @@ module PostGradesTray
   def self.post_grades
     post_button.click
     spinner # wait for spinner to appear
+    wait_for(method: nil) { Delayed::Job.find_by(tag: "Assignment#post_submissions").present? }
+    run_jobs
     # rubocop:disable Specs/NoWaitForNoSuchElement
-    raise "spinner still spinning after waiting" unless wait_for_no_such_element timeout: 8 do
-      # there's a small chance the job hasn't been queued
-      # yet so keep looking for jobs just in case
-      run_jobs
-      spinner
-    end
+    raise "spinner still spinning after waiting" unless wait_for_no_such_element(timeout: 8) { spinner }
     # rubocop:enable Specs/NoWaitForNoSuchElement
   end
 end
