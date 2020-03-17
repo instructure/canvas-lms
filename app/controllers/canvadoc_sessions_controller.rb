@@ -56,6 +56,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:submission_user_id] = submission.user_id
         opts[:course_id] = assignment.context_id
         opts[:assignment_id] = assignment.id
+        opts[:submission_id] = submission.id
         opts[:post_manually] = assignment.post_manually?
         opts[:posted_at] = submission.posted_at
 

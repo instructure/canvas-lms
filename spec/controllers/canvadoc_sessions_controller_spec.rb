@@ -43,7 +43,7 @@ describe CanvadocSessionsController do
       @attachment.associate_with(@submission)
       Canvadoc.create!(attachment: @attachment)
     end
-    
+
     before do
       @blob = {
         attachment_id: @attachment1.global_id,
@@ -166,6 +166,16 @@ describe CanvadocSessionsController do
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
         expect(arg2[:assignment_id]).to eq @assignment.id
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send submission_id when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:submission_id]).to eq @submission.id
       end
 
       get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
