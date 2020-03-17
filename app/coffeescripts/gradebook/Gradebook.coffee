@@ -1225,8 +1225,7 @@ export default do ->
       props =
         assignmentOrOutcome: @options.assignmentOrOutcome
         courseUrl: @options.context_url,
-        learningMasteryEnabled: @options.outcome_gradebook_enabled,
-        navigate: @options.navigate
+        learningMasteryEnabled: @options.outcome_gradebook_enabled
       for mountPoint in mountPoints
         props.variant = mountPoint.getAttribute('data-variant')
         renderComponent(GradebookMenu, mountPoint, props)
