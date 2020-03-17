@@ -73,7 +73,12 @@ export default function CanvasInstUIModal({
       onDismiss={onDismiss}
     >
       <Modal.Header>
-        <CloseButton placement="end" offset="medium" onClick={onDismiss}>
+        <CloseButton
+          data-testid="instui-modal-close"
+          placement="end"
+          offset="medium"
+          onClick={onDismiss}
+        >
           {closeButtonLabel || I18n.t('Close')}
         </CloseButton>
         <Heading>{label}</Heading>

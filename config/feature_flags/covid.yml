@@ -1,0 +1,5 @@
+mobile_qr_login:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "QR for Mobile Login"
+  description: "Include a link to show a QR code to easy mobile login on the profile page."
