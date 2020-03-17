@@ -3222,10 +3222,13 @@ $(document).ready(function() {
   })
 
   $findBankDialog
-    .delegate('.bank', 'click', function() {
-      $findBankDialog.find('.bank.selected').removeClass('selected')
-      $(this).addClass('selected')
-      $findBankDialog.find('.submit_button').attr('disabled', false)
+    .delegate('.bank', 'click keydown', function(e) {
+      const keyboardClick = e.type === 'keydown' && (e.keyCode === 13 || e.keyCode === 32)
+      if (e.type === 'click' || keyboardClick) {
+        $findBankDialog.find('.bank.selected').removeClass('selected')
+        $(this).addClass('selected')
+        $findBankDialog.find('.submit_button').attr('disabled', false)
+      }
     })
     .delegate('.submit_button', 'click', () => {
       const $bank = $findBankDialog.find('.bank.selected:first')
