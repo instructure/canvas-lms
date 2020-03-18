@@ -37,6 +37,9 @@ development:
       ios-pandata-secret: teamrocketblastoffatthespeedoflight
       android-pandata-key: ANDROID_pandata_key
       android-pandata-secret: surrendernoworpreparetofight
+    fullstory:
+        sampling_rate: '0.0' # randomly inject this fraction of the time
+        app_key: 'xyzzy'
 
   private:
     canvas:

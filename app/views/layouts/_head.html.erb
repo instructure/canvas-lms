@@ -98,4 +98,9 @@
   <% end %>
   <title><%= @page_title || (yield :page_title).presence || t('default_page_title', "Canvas LMS") %></title>
   <%= render partial: 'layouts/google_analytics_snippet' %>
+
+  <!-- fullstory snippet -->
+  <% if fullstory_enabled_for_session?(session) %>
+    <%= render :partial => "shared/fullstory_snippet" %>
+  <% end %>
 </head>
