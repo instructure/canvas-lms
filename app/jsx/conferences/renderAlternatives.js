@@ -144,8 +144,8 @@ function ConferenceAlternatives({responsiveSize}) {
     <ApplyTheme theme={theme}>
       <Alert margin="none none medium none" variant="warning">
         {I18n.t(`Conferences, powered by BigBlueButton, is unable to handle current demand.  Consider upgrading to
-    Premium BigBlueButton or use one of the following video conferencing providers.  Please talk to your support
-    staff for additional guidance.`)}
+        Premium BigBlueButton or use one of the following video conferencing providers.  Please talk to your local
+        admin for additional guidance.`)}
       </Alert>
       <View as="div" borderWidth="small 0 0 0" borderColor="primary" padding="medium 0 0 0">
         <Flex direction={responsiveSize === 'large' ? 'row' : 'column'} alignItems="start">
