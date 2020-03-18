@@ -47,7 +47,7 @@ function BigBlueButtonAlert() {
         </View>
         <View as="div">
           {I18n.t(`Not all of these services may be supported by your institution. Please contact your
-          local support for more information.`)}
+          local admin for more information.`)}
         </View>
       </Alert>
     </ApplyTheme>
