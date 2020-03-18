@@ -22,6 +22,8 @@ import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {View} from 'Backbone'
+
+import htmlEscape from 'str/htmlEscape'
 import Slick from 'vendor/slickgrid'
 import Grid from '../../gradebook/OutcomeGradebookGrid'
 import userSettings from '../../userSettings'
@@ -32,6 +34,7 @@ import template from 'jst/gradebook/outcome_gradebook'
 import 'vendor/jquery.ba-tinypubsub'
 import '../../jquery.rails_flash_notifications'
 import 'jquery.instructure_misc_plugins'
+import 'jquery.disableWhileLoading'
 
 Dictionary =
   exceedsMastery:
@@ -55,9 +58,7 @@ export default class OutcomeGradebookView extends View
 
     template: template
 
-    @optionProperty 'gradebook'
-
-    @optionProperty 'router'
+    @optionProperty 'learningMastery'
 
     hasOutcomes: $.Deferred()
 
@@ -84,6 +85,10 @@ export default class OutcomeGradebookView extends View
       if ENV.GRADEBOOK_OPTIONS.outcome_proficiency?.ratings
         @ratings = ENV.GRADEBOOK_OPTIONS.outcome_proficiency.ratings
         @checkboxes = @ratings.map (rating) -> new CheckboxView({color: "\##{rating.color}", label: rating.description})
+
+    remove: ->
+      super()
+      ReactDOM.unmountComponentAtNode(document.querySelector('[data-component="SectionFilter"]'))
 
     # Public: Show/hide the sidebar.
     #
@@ -131,8 +136,8 @@ export default class OutcomeGradebookView extends View
     # options - The options hash passed to the constructor function.
     #
     # Returns nothing on success, raises on failure.
-    _validateOptions: ({gradebook}) ->
-      throw new Error('Missing required option: "gradebook"') unless gradebook
+    _validateOptions: ({learningMastery}) ->
+      throw new Error('Missing required option: "learningMastery"') unless learningMastery
 
     # Internal: Listen for events on child views.
     #
@@ -140,7 +145,7 @@ export default class OutcomeGradebookView extends View
     _attachEvents: ->
       _this = @
       view.on('togglestate', @_createFilter("rating_#{i}")) for view, i in @checkboxes
-      @updateExportLink(@gradebook.getFilterRowsBySetting('sectionId'))
+      @updateExportLink(@learningMastery.getCurrentSectionId())
       @$('#no_results_outcomes').change(() -> _this._toggleOutcomesWithNoResults(this.checked))
       @$('#no_results_students').change(() -> _this._toggleStudentsWithNoResults(this.checked))
 
@@ -206,9 +211,8 @@ export default class OutcomeGradebookView extends View
     #
     # Returns this.
     render: ->
-      $.when(@gradebook.hasSections)
-        .then(=> super)
-        .then(@renderSectionMenu)
+      super()
+      @renderSectionMenu()
       $.when(@hasOutcomes).then(@renderGrid)
       this
 
@@ -223,7 +227,8 @@ export default class OutcomeGradebookView extends View
       Grid.Util.saveOutcomes(response.linked.outcomes)
       Grid.Util.saveStudents(response.linked.users)
       Grid.Util.saveOutcomePaths(response.linked.outcome_paths)
-      Grid.Util.saveSections(@gradebook.sections) # might want to put these into the api results at some point
+      sections = @learningMastery.getSections().map(htmlEscape)
+      Grid.Util.saveSections(sections)
       [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell })
       @columns = columns
       if @$('#no_results_outcomes:checkbox:checked').length == 1
@@ -242,7 +247,7 @@ export default class OutcomeGradebookView extends View
         @grid.init()
         Grid.Events.init(@grid)
         @_attachEvents()
-        Grid.section = @gradebook.getFilterRowsBySetting('sectionId')
+        Grid.section = @learningMastery.getCurrentSectionId()
         Grid.View.redrawHeader(@grid,  Grid.averageFn)
 
     isLoaded: false
@@ -266,10 +271,10 @@ export default class OutcomeGradebookView extends View
     # Internal: Render Section selector.
     # Returns nothing.
     renderSectionMenu: =>
-      sectionList = @gradebook.sectionList()
+      sectionList = @learningMastery.getSections()
       mountPoint = document.querySelector('[data-component="SectionFilter"]')
       if sectionList.length > 1
-        selectedSectionId = @gradebook.getFilterRowsBySetting('sectionId') || '0'
+        selectedSectionId = @learningMastery.getCurrentSectionId() || '0'
         Grid.section = selectedSectionId
         props =
           sections: sectionList
@@ -281,7 +286,7 @@ export default class OutcomeGradebookView extends View
         @sectionFilterMenu = ReactDOM.render(component, mountPoint)
 
     updateCurrentSection: (sectionId) =>
-      @gradebook.updateCurrentSection(sectionId)
+      @learningMastery.updateCurrentSectionId(sectionId)
       Grid.section = sectionId
       @_rerender()
       @updateExportLink(sectionId)
@@ -291,7 +296,7 @@ export default class OutcomeGradebookView extends View
     #
     # Returns nothing.
     loadOutcomes: () ->
-      $.when(@gradebook.hasSections).then(@_loadOutcomes)
+      @_loadOutcomes()
 
     _rollupsUrl: (course, exclude, page) ->
       excluding = if exclude == '' then '' else "&exclude[]=#{exclude}"
@@ -323,7 +328,7 @@ export default class OutcomeGradebookView extends View
       dfd.then (response, status, xhr) =>
         outcomes = @_mergeResponses(outcomes, response)
         @hasOutcomes.resolve(outcomes)
-        @router.renderPagination(
+        @learningMastery.renderPagination(
           response.meta.pagination.page,
           response.meta.pagination.page_count
         )
