@@ -5,7 +5,7 @@
 # For documentation, please check doc/docker/README.md in
 # this local repo which is also published at:
 # https://github.com/instructure/canvas-lms/tree/master/doc/docker
-ARG RUBY_PASSENGER=2.6
+ARG RUBY_PASSENGER=2.4-xenial
 FROM instructure/ruby-passenger:$RUBY_PASSENGER
 ARG POSTGRES_VERSION=9.5
 
