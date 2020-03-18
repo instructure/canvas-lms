@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Login::Shared
+  include FullStoryHelper
+
   def reset_session_for_login
     reset_session_saving_keys(:return_to,
                               :oauth,
@@ -67,6 +69,8 @@ module Login::Shared
     end
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(user)
     @current_user = user
+
+    fullstory_init(@domain_root_account, session)
 
     respond_to do |format|
       if (oauth = session[:oauth2])
