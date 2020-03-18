@@ -37,7 +37,7 @@ module PactConfig
       FIU = 'lmsAPI'.freeze
     else
       # internal consumers
-      # These first 3 are legacy android consumers.  ANDROID, below, represents our latest pact 
+      # These first 3 are legacy android consumers.  ANDROID, below, represents our latest pact
       # testing effort.
       ANDROID_STUDENT = 'Android Student'.freeze
       ANDROID_TEACHER = 'Android Teacher'.freeze
@@ -53,6 +53,7 @@ module PactConfig
 
   # Add new Live Events consumers to this module
   module LiveEventConsumers
+    CATALOG = 'Catalog'.freeze
     OUTCOMES = 'Outcomes'.freeze
     QUIZ_LTI = 'Quiz LTI'.freeze
   end
@@ -69,9 +70,7 @@ module PactConfig
 
     def broker_uri
       URI::HTTP.build(
-        scheme: protocol,
-        userinfo: "#{broker_username}:#{broker_password}",
-        host: broker_host
+        scheme: protocol, userinfo: "#{broker_username}:#{broker_password}", host: broker_host
       ).to_s
     end
 

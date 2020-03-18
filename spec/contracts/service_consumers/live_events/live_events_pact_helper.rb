@@ -26,6 +26,14 @@ module LiveEvents
   module PactHelper
     include PactConfig
 
+    def self.message_contract_for(consumer, event)
+      Pact::Messages.get_message_contract(
+        PactConfig::Providers::CANVAS_LMS_LIVE_EVENTS,
+        consumer,
+        event
+      )
+    end
+
     class Event
       attr_reader :event_message, :event_name, :event_settings, :event_subscriber, :stream_client
 
@@ -66,11 +74,18 @@ module LiveEvents
       end
 
       def contract_message
+        # Canvas Live Event Subscribers
+        catalog  = PactConfig::LiveEventConsumers::CATALOG
+        outcomes = PactConfig::LiveEventConsumers::OUTCOMES
+        quiz_lti = PactConfig::LiveEventConsumers::QUIZ_LTI
+
         case event_subscriber
-        when PactConfig::LiveEventConsumers::QUIZ_LTI
-          LiveEvents::PactHelper.quiz_lti_contract_for(event_name)
-        when PactConfig::LiveEventConsumers::OUTCOMES
-          LiveEvents::PactHelper.outcomes_contract_for(event_name)
+        when catalog
+          LiveEvents::PactHelper.message_contract_for(catalog, event_name)
+        when outcomes
+          LiveEvents::PactHelper.message_contract_for(outcomes, event_name)
+        when quiz_lti
+          LiveEvents::PactHelper.message_contract_for(quiz_lti, event_name)
         else
           raise ArgumentError, "Invalid event_subscriber: #{event_subscriber}"
         end
@@ -106,26 +121,6 @@ module LiveEvents
           'kinesis_stream_name' => kinesis_stream_name,
           'aws_region' => aws_region
         }
-      end
-    end
-
-    class << self
-      def quiz_lti_contract_for(event)
-        message_contract_for(PactConfig::LiveEventConsumers::QUIZ_LTI, event)
-      end
-
-      def outcomes_contract_for(event)
-        message_contract_for(PactConfig::LiveEventConsumers::OUTCOMES, event)
-      end
-
-      private
-
-      def message_contract_for(consumer, event)
-        Pact::Messages.get_message_contract(
-          PactConfig::Providers::CANVAS_LMS_LIVE_EVENTS,
-          consumer,
-          event
-        )
       end
     end
   end
