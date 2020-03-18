@@ -1,10 +1,19 @@
 <% if (google_analytics_key = Setting.get('google_analytics_key', nil)) %>
+  <% dimensions = GoogleAnalyticsDimensions.calculate(
+    domain_root_account: @domain_root_account,
+    real_user: @real_current_user,
+    user: @current_user,
+  ) %>
+
   <script>
     window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
     ga('create', <%= raw(google_analytics_key.to_json) %>, 'auto');
     <% if @google_analytics_page_title %>
       ga('set', 'title', <%= raw(@google_analytics_page_title.to_json) %>);
     <% end %>
+    ga('set', 'dimension1', <%= dimensions.fetch(:enrollments).to_json.html_safe %>);
+    ga('set', 'dimension2', <%= dimensions.fetch(:admin).to_json.html_safe %>);
+    ga('set', 'dimension3', <%= dimensions.fetch(:masquerading).to_json.html_safe %>);
     ga('send', 'pageview');
     (window.requestIdleCallback || window.setTimeout)(function(){
       var s=document.createElement('script'), m=document.getElementsByTagName('script')[0]
