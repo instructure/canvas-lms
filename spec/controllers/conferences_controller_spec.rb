@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require_relative '../apis/api_spec_helper'
 
 describe ConferencesController do
   before :once do

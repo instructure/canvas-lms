@@ -44,6 +44,8 @@ class WebConference < ActiveRecord::Base
 
   scope :with_config, -> { where(conference_type: WebConference.conference_types.map{|ct| ct['conference_type']}) }
 
+  scope :live, -> { where("web_conferences.started_at BETWEEN (NOW() - interval '1 day') AND NOW() AND (web_conferences.ended_at IS NULL OR web_conferences.ended_at > NOW())") }
+
   serialize :settings
   def settings
     read_or_initialize_attribute(:settings, {})

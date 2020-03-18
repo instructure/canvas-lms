@@ -2016,6 +2016,8 @@ CanvasRails::Application.routes.draw do
         get prefix, action: :index, as: "#{context}_conferences"
         post "#{prefix}/:conference_id/recording_ready", action: :recording_ready, as: "#{context}_conferences_recording_ready"
       end
+
+      get "conferences", action: :for_user, as: "conferences"
     end
 
     scope(controller: :custom_gradebook_columns_api) do
