@@ -18,20 +18,42 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const FilesTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Files')}
-    subheading={I18n.t('Images, Documents, and more')}
-    image="/images/tutorial-tray-images/files.svg"
+    subheading={I18n.t('Store and share course assets')}
+    image="/images/tutorial-tray-images/Panda_Files.svg"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-
+      instructor-guide-table-of-contents#jive_content_id_Files`
+    }}
+    links={[
+      {
+        label: I18n.t('How do I use Files as an instructor?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12963-4152314203'
+      },
+      {
+        label: I18n.t('How do I upload a file to a course?'),
+        href: 'https://community.canvaslms.com/docs/DOC-13033-415241383'
+      },
+      {
+        label: I18n.t('How do I bulk upload files to a course?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12732-415241386'
+      },
+      {
+        label: I18n.t('How do I move and organize my files as an instructor?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12728-415241387'
+      }
+    ]}
   >
-    <Text as="p">
-      {I18n.t(`Upload course files, syllabi, readings, or other documents.
-          Lock folders to keep them hidden from students. Add files to Modules,
-          Assignments, Discussions, or Pages.`)}
-    </Text>
+    {I18n.t(`Upload and store course files, or any other files you need to keep
+      on hand. When you save assets in Files, they're easy to insert directly into
+      modules, assignments, discussions, or pages! Distribute files to students
+      from your course folder, or lock files until you're ready for the class
+      to download them.`)}
   </TutorialTrayContent>
 )
 

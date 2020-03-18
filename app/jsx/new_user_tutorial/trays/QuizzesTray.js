@@ -18,18 +18,45 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const QuizzesTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Quizzes')}
-    subheading={I18n.t('Assess and survey your students')}
-    image="/images/tutorial-tray-images/quiz.svg"
+    subheading={I18n.t('Assess student understanding')}
+    image="/images/tutorial-tray-images/Panda_Quizzes.svg"
+    imageWidth="8rem"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-guide-table-of-contents#jive_content_id_Quizzes`
+    }}
+    links={[
+      {
+        label: I18n.t('How do I use the Quizzes Index Page?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12856-4152246404'
+      },
+      {
+        label: I18n.t('How do I create an assessment using New Quizzes?'),
+        href: 'https://community.canvaslms.com/docs/DOC-15057-4152780597'
+      },
+      {
+        label: I18n.t('How do I manage settings for an assessment in New Quizzes?'),
+        href: 'https://community.canvaslms.com/docs/DOC-15053-4152780618'
+      },
+      {
+        label: I18n.t('How do I create a quiz with individual questions?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12943-4152724267'
+      },
+      {
+        label: I18n.t('What options can I set in a quiz?'),
+        href: 'https://community.canvaslms.com/docs/DOC-10152-415241475'
+      }
+    ]}
   >
-    <Text as="p">
-      {I18n.t('Create and administer online quizzes and surveys, both graded and ungraded.')}
-    </Text>
+    {I18n.t(`Use quizzes to challenge student understanding and assess comprehension
+      of course material. The New Quizzes assessment engine allows you to create up to
+      13 types of question types and content. If New Quizzes isn't enabled for your institution,
+      Classic Quizzes are still available to help you achieve your objectives.`)}
   </TutorialTrayContent>
 )
 

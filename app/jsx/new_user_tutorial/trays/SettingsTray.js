@@ -18,19 +18,39 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const AssignmentsTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Settings')}
-    subheading={I18n.t('Manage your course details')}
-    image="/images/tutorial-tray-images/settings.svg"
+    subheading={I18n.t('Customize course details')}
+    image="/images/tutorial-tray-images/Panda_Map.svg"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-guide-table-of-contents#jive_content_id_Settings`
+    }}
+    links={[
+      {
+        label: I18n.t('How do I use course settings?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12814-4152724176'
+      },
+      {
+        label: I18n.t('How do I set details for a course?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12900-415257087'
+      },
+      {
+        label: I18n.t('How do I change a course name and course code?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12851-415241512'
+      },
+      {
+        label: I18n.t('How do I add an image to a course card in the Dashboard?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12780-4152626354'
+      }
+    ]}
   >
-    <Text as="p">
-      {I18n.t(`Update and view sections, course details, navigation, feature
-                options and external app integrations, all visible only to Instructors.`)}
-    </Text>
+    {I18n.t(`Make your course your own! Upload an image to represent your
+      course, allow students to manage course content areas, and hide grade
+      details from students. You may also be able to adjust the course name and code.`)}
   </TutorialTrayContent>
 )
 
