@@ -57,6 +57,7 @@ class ApplicationController < ActionController::Base
   skip_before_action :activate_authlogic
   prepend_before_action :activate_authlogic
 
+  before_action :annotate_apm
   before_action :check_pending_otp
   before_action :set_user_id_header
   before_action :set_time_zone
@@ -530,8 +531,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def annotate_apm
+    Canvas::Apm.annotate_trace(Shard.current, @domain_root_account)
+  end
+
   def store_session_locale
-    return unless locale = params[:session_locale]
+    return unless (locale = params[:session_locale])
     supported_locales = I18n.available_locales.map(&:to_s)
     session[:locale] = locale if supported_locales.include? locale
   end

@@ -14,40 +14,17 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require 'ddtrace'
+require 'canvas/apm'
 
-module DatadogApmConfig
-  class << self
-    def config
-      dynamic_settings = Canvas::DynamicSettings.find(tree: :private)
-      if $canvas_cluster
-        dynamic_settings = Canvas::DynamicSettings.find(tree: :private, cluster: $canvas_cluster)
-      end
-      YAML.safe_load(dynamic_settings['datadog_apm.yml'] || '{}')
-    end
+# If this is not a clustered environment, don't worry about providing
+# this global variable
 
-    def sample_rate
-      config.fetch('sample_rate', 0.0).to_f
-    end
+# rubocop:disable Style/GlobalVars
+Canvas::Apm.canvas_cluster = $canvas_cluster if $canvas_cluster.present?
+# rubocop:enable Style/GlobalVars
 
-    def configured?
-      sample_rate > 0.0
-    end
-
-    def rate_sampler
-      Datadog::RateSampler.new(self.sample_rate)
-    end
-
-    def enable_apm!
-      sampler = self.rate_sampler
-      Datadog.configure do |c|
-        c.tracer sampler: sampler
-        c.use :rails
-      end
-    end
-  end
-end
-
-if DatadogApmConfig.configured?
-  DatadogApmConfig.enable_apm!
-end
+# set this to "true" in your docker-compose override file or in your .env
+# or whatever you use in order to see logging output containing all the
+# APM traces.
+Canvas::Apm.enable_debug_mode = ENV.fetch("DATADOG_APM_DEBUG_MODE", "false").casecmp?("true")
+Canvas::Apm.configure_apm!

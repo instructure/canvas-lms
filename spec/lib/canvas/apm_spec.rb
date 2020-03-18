@@ -15,20 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
-require_relative '../../config/initializers/datadog_apm'
+require_relative '../../sharding_spec_helper'
 
-describe DatadogApmConfig do
+describe Canvas::Apm do
   after(:each) do
     Canvas::DynamicSettings.config = nil
     Canvas::DynamicSettings.reset_cache!
     Canvas::DynamicSettings.fallback_data = nil
+    Canvas::Apm.reset!
   end
 
   describe ".configured?" do
-    it "i sfalse for empty config" do
+    it "is false for empty config" do
       Canvas::DynamicSettings.fallback_data = {}
-      expect(DatadogApmConfig.configured?).to eq(false)
+      expect(Canvas::Apm.configured?).to eq(false)
     end
 
     it "is false for 0 sampling rate" do
@@ -39,10 +39,11 @@ describe DatadogApmConfig do
           }
         }
       }
-      expect(DatadogApmConfig.configured?).to eq(false)
+      expect(Canvas::Apm.configured?).to eq(false)
     end
 
     it "is true for >0 sampling rate" do
+      Canvas::Apm.reset!
       Canvas::DynamicSettings.fallback_data = {
         "private": {
           "canvas": {
@@ -50,7 +51,30 @@ describe DatadogApmConfig do
           }
         }
       }
-      expect(DatadogApmConfig.configured?).to eq(true)
+      expect(Canvas::Apm.config.fetch('sample_rate')).to eq(0.5)
+      expect(Canvas::Apm.sample_rate).to eq(0.5)
+      expect(Canvas::Apm.configured?).to eq(true)
+    end
+  end
+
+  describe "annotating with standard tags" do
+    it "adds shard and account tags to active span" do
+      Canvas::Apm.reset!
+      Canvas::DynamicSettings.fallback_data = {
+        "private": {
+          "canvas": {
+            "datadog_apm.yml": "sample_rate: 0.5"
+          }
+        }
+      }
+      Datadog.tracer.trace("TESTING") do |span|
+        shard = OpenStruct.new({id: 42})
+        account = OpenStruct.new({global_id: 420000042})
+        expect(Datadog.tracer.active_root_span).to eq(span)
+        Canvas::Apm.annotate_trace(shard, account)
+        expect(span.get_tag('shard')).to eq('42')
+        expect(span.get_tag('root_account')).to eq('420000042')
+      end
     end
   end
 end
