@@ -1820,7 +1820,7 @@ describe MasterCourses::MasterMigration do
         aq = @bank.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
         @lo.align(@bank, @copy_from)
       end
-      
+
       run_master_migration
       @bank_to = @copy_to.assessment_question_banks.where(:migration_id => mig_id(@bank)).first
       expect(@bank_to.learning_outcome_alignments.first.learning_outcome).to eq @lo
@@ -2231,6 +2231,20 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       expect(a_to.reload.external_tool_tag).to eq tag # don't change
+    end
+
+    it "can publish a course after initial sync if requested" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      run_master_migration
+      expect(@copy_to.reload).to be_unpublished
+
+      @copy_to2 = course_factory
+      @template.add_child_course!(@copy_to2)
+
+      run_master_migration(:publish_after_initial_sync => true)
+      expect(@copy_to2.reload).to be_available
     end
 
     context "caching" do

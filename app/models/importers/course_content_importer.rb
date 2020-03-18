@@ -210,6 +210,13 @@ module Importers
         migration.workflow_state = :imported unless post_processing?(migration)
         migration.save
 
+        if migration.for_master_course_import? && migration.migration_settings[:publish_after_completion]
+          if course.unpublished?
+            # i could just do it directly but this way preserves the audit trail
+            course.update_one({:event => 'offer'}, migration.user, :blueprint_sync)
+          end
+        end
+
         if course.changed?
           course.save!
         else

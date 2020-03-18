@@ -67,6 +67,10 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     self.migration_settings[:copy_settings] = val
   end
 
+  def publish_after_initial_sync=(val)
+    self.migration_settings[:publish_after_initial_sync] = val
+  end
+
   def hours_until_expire
     Setting.get('master_course_export_job_expiration_hours', '24').to_i
   end
@@ -262,6 +266,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cm.migration_settings[:hide_from_index] = true # we may decide we want to show this after all, but hide them for now
       cm.migration_settings[:master_course_export_id] = export.id
       cm.migration_settings[:master_migration_id] = self.id
+      cm.migration_settings[:publish_after_completion] = type == :full && self.migration_settings[:publish_after_initial_sync]
       cm.child_subscription_id = sub.id
       cm.source_course_id = self.master_template.course_id # apparently this is how some lti tools try to track copied content :/
       cm.workflow_state = 'exported'

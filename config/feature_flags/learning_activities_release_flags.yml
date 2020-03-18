@@ -45,3 +45,10 @@ la_620_old_rce_init_fix:
     editor instance to its internal list when the RCE requires it.
   applies_to: SiteAdmin
   root_opt_in: true
+uxs_4_omg_a_scary_blueprint_checkbox:
+  state: hidden
+  display_name: Allow Blueprint Publishing After Association
+  description: |-
+    Show a checkbox that optionally lets an account admin publish courses
+    automatically after associating and syncing with a blueprint course
+  applies_to: RootAccount

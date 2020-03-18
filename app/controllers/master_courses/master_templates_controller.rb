@@ -359,6 +359,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #     Whether course settings should be copied over to associated courses.
   #     Defaults to true for newly associated courses.
   #
+  # @argument publish_after_initial_sync [Optional, Boolean]
+  #     If set, newly associated courses will be automatically published after the sync completes
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/migrations \
   #     -X POST \
@@ -375,7 +378,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
 
     options = params.permit(:comment, :send_notification).to_unsafe_h
-    options[:copy_settings] = value_to_boolean(params[:copy_settings]) if params.has_key?(:copy_settings)
+    [:copy_settings, :publish_after_initial_sync].each do |bool_key|
+      options[bool_key] = value_to_boolean(params[bool_key]) if params.has_key?(bool_key)
+    end
 
     migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)
     render :json => master_migration_json(migration, @current_user, session)
