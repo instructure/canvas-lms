@@ -357,6 +357,10 @@ class GradebooksController < ApplicationController
     {
       prefetch_gradebook_user_ids: Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids),
 
+      performance_controls: {
+        active_request_limit: Setting.get('gradebook.active_request_limit', '12').to_i,
+      },
+
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
         chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,

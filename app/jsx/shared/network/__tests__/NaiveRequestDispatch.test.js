@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import NaiveRequestDispatch from '../NaiveRequestDispatch'
+import NaiveRequestDispatch, {
+  DEFAULT_ACTIVE_REQUEST_LIMIT,
+  MAX_ACTIVE_REQUEST_LIMIT,
+  MIN_ACTIVE_REQUEST_LIMIT
+} from '../NaiveRequestDispatch'
 import FakeServer from './FakeServer'
 
 describe('Gradebook DataLoader NaiveRequestDispatch', () => {
@@ -27,6 +31,50 @@ describe('Gradebook DataLoader NaiveRequestDispatch', () => {
 
   beforeEach(() => {
     dispatch = new NaiveRequestDispatch({activeRequestLimit: 2})
+  })
+
+  describe('#options', () => {
+    describe('.activeRequestLimit', () => {
+      it('is set to the given value', () => {
+        const {options} = new NaiveRequestDispatch({activeRequestLimit: 4})
+        expect(options.activeRequestLimit).toBe(4)
+      })
+
+      it(`defaults to ${DEFAULT_ACTIVE_REQUEST_LIMIT}`, () => {
+        const {options} = new NaiveRequestDispatch()
+        expect(options.activeRequestLimit).toBe(DEFAULT_ACTIVE_REQUEST_LIMIT)
+      })
+
+      it(`clips values higher than ${MAX_ACTIVE_REQUEST_LIMIT}`, () => {
+        const {options} = new NaiveRequestDispatch({activeRequestLimit: 101})
+        expect(options.activeRequestLimit).toBe(MAX_ACTIVE_REQUEST_LIMIT)
+      })
+
+      it(`clips values lower than ${MIN_ACTIVE_REQUEST_LIMIT}`, () => {
+        const {options} = new NaiveRequestDispatch({activeRequestLimit: 0})
+        expect(options.activeRequestLimit).toBe(MIN_ACTIVE_REQUEST_LIMIT)
+      })
+
+      it('converts valid string numbers', () => {
+        const {options} = new NaiveRequestDispatch({activeRequestLimit: '24'})
+        expect(options.activeRequestLimit).toBe(24)
+      })
+
+      it('rejects invalid strings', () => {
+        const {options} = new NaiveRequestDispatch({activeRequestLimit: 'invalid'})
+        expect(options.activeRequestLimit).toBe(DEFAULT_ACTIVE_REQUEST_LIMIT)
+      })
+
+      it('rejects null', () => {
+        const {options} = new NaiveRequestDispatch({activeRequestLimit: null})
+        expect(options.activeRequestLimit).toBe(DEFAULT_ACTIVE_REQUEST_LIMIT)
+      })
+
+      it('rejects undefined', () => {
+        const {options} = new NaiveRequestDispatch({activeRequestLimit: undefined})
+        expect(options.activeRequestLimit).toBe(DEFAULT_ACTIVE_REQUEST_LIMIT)
+      })
+    })
   })
 
   describe('#getJSON()', () => {

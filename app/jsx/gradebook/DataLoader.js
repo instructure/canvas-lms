@@ -96,7 +96,9 @@ function getCustomColumnData(options, customColumnsDfd, waitForDfds, dispatch) {
 }
 
 function loadGradebookData(opts) {
-  const dispatch = new NaiveRequestDispatch()
+  const dispatch = new NaiveRequestDispatch({
+    activeRequestLimit: opts.activeRequestLimit
+  })
 
   const gotAssignmentGroups = getAssignmentGroups(
     opts.assignmentGroupsURL,

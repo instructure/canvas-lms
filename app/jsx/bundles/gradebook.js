@@ -22,8 +22,9 @@ import('jsx/context_cards/StudentContextCardTrigger')
 
 const gradebook = new Gradebook({
   ...ENV.GRADEBOOK_OPTIONS,
+  currentUserId: ENV.current_user_id,
   locale: ENV.LOCALE,
-  currentUserId: ENV.current_user_id
+  performanceControls: ENV.performance_controls
 })
 
 gradebook.initialize()

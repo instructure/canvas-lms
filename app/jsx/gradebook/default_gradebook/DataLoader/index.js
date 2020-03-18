@@ -36,6 +36,7 @@ export default class DataLoader {
     const promises = OldDataLoader.loadGradebookData({
       gradebook,
 
+      activeRequestLimit: options.performanceControls?.active_request_limit,
       courseId: options.context_id,
       perPage: options.api_max_per_page,
 
