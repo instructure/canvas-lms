@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
 import {Link} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import I18n from 'i18n!conferences_renderBigBlueButton'
 
@@ -33,13 +34,21 @@ function BigBlueButtonAlert() {
   return (
     <ApplyTheme theme={theme}>
       <Alert margin="none none medium none" variant="info">
-        {I18n.t(
-          'Conferences are powered by BigBlueButton, a free service to Canvas users. Extreme increases in usage could cause performance issues. In the event that BigBlueButton is unable to meet current or future demands, Canvas also partners with Zoom, Hangouts, Teams, and other video conferencing tools who are offering free or discounted services.'
-        )}
-        &nbsp;
-        <Link href="https://www.instructure.com/canvas/blog/canvas-partners-and-distance-learning">
-          {I18n.t('Learn More')}
-        </Link>
+        <View>{I18n.t('Canvas Conferences is a free service provided by BigBlueButton.')}</View>
+        <View as="div" padding="small 0">
+          {I18n.t(`If your institution is likely to need more than 10 concurrent Conferences powered by
+          BigBlueButton, we recommend upgrading to Premium BigBlueButton or exploring alternative
+          conferencing solutions Canvas partners with, such as Zoom, Hangouts, Teams, and other
+          video conferencing tools who are offering free or discounted services.`)}
+          &nbsp;
+          <Link href="https://www.instructure.com/canvas/blog/canvas-partners-and-distance-learning">
+            {I18n.t('Learn More')}
+          </Link>
+        </View>
+        <View as="div">
+          {I18n.t(`Not all of these services may be supported by your institution. Please contact your
+          local admin for more information.`)}
+        </View>
       </Alert>
     </ApplyTheme>
   )
