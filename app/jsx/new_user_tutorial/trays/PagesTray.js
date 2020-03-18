@@ -18,20 +18,43 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const PagesTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Pages')}
-    subheading={I18n.t('Create educational resources')}
-    image="/images/tutorial-tray-images/page.svg"
+    subheading={I18n.t('Create interactive course content')}
+    image="/images/tutorial-tray-images/Panda_Pages.svg"
+    imageWidth="14.5rem"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/docs/DOC-10460-
+      canvas-instructor-guide-table-of-contents#jive_content_id_Pages`
+    }}
+    links={[
+      {
+        label: I18n.t('How do I create a new page in a course?'),
+        href: 'https://community.canvaslms.com/docs/DOC-13018-4152724253'
+      },
+      {
+        label: I18n.t('How do I publish or unpublish a page as an instructor?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12796-4152180494'
+      },
+      {
+        label: I18n.t('How do I use the Pages Index Page?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12776-4152322017'
+      },
+      {
+        label: I18n.t('How do I set a Front Page in a course?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12784-415241445'
+      }
+    ]}
   >
-    <Text as="p">
-      {I18n.t(`Build Pages containing content and educational resources that
-                help students learn but aren't assignments. Include text,
-                multimedia, and links to files and external resources.`)}
-    </Text>
+    {I18n.t(`Pages let you create interactive content directly in Canvas,
+      whether it's a weekly update, a collaborative course wiki, or a
+      list of educational resources. Pages can include text, multimedia,
+      and links to files and other course content or pages. You can also
+      allow students to contribute to specific pages in the course.`)}
   </TutorialTrayContent>
 )
 

@@ -22,6 +22,7 @@ import I18n from 'i18n!new_user_tutorial'
 import plainStoreShape from '../../shared/proptypes/plainStoreShape'
 import {Tray} from '@instructure/ui-overlays'
 import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
 import NewUserTutorialToggleButton from '../NewUserTutorialToggleButton'
 import ConfirmEndTutorialDialog from '../ConfirmEndTutorialDialog'
 
@@ -96,9 +97,10 @@ class TutorialTray extends React.Component {
         onExiting={this.handleExiting}
         onEntered={this.handleEntering}
         shouldContainFocus
+        size="regular"
       >
-        <div className="NewUserTutorialTray">
-          <div className="NewUserTutorialTray__ButtonContainer">
+        <View as="div" className="NewUserTutorialTray" padding="medium none none">
+          <View position="absolute" insetInlineEnd="1rem" insetBlockStart="1rem" insetBlockEnd="0">
             <NewUserTutorialToggleButton
               ref={c => {
                 this.toggleButton = c
@@ -106,23 +108,31 @@ class TutorialTray extends React.Component {
               onClick={this.handleToggleClick}
               store={this.props.store}
             />
-          </div>
-          {this.props.children}
-          <div className="NewUserTutorialTray__EndTutorialContainer">
+          </View>
+          <View display="block" padding="none large">
+            {this.props.children}
+          </View>
+          <View
+            display="block"
+            textAlign="end"
+            background="secondary"
+            padding="small medium"
+            borderWidth="small none none"
+          >
             <Button
               onClick={this.handleEndTutorialClick}
               ref={c => {
                 this.endTutorialButton = c
               }}
             >
-              {I18n.t('End Tutorial')}
+              {I18n.t(`Don't Show Again`)}
             </Button>
-          </div>
+          </View>
           <ConfirmEndTutorialDialog
             isOpen={this.state.endUserTutorialShown}
             handleRequestClose={this.closeEndTutorialDialog}
           />
-        </div>
+        </View>
       </Tray>
     )
   }

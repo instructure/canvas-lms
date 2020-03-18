@@ -18,19 +18,41 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const CollaborationsTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Collaborations')}
     subheading={I18n.t('Work and create together')}
-    image="/images/tutorial-tray-images/collaborations.svg"
+    image="/images/tutorial-tray-images/Panda_Collaborations.svg"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/docs/DOC-10460-
+      canvas-instructor-guide-table-of-contents#jive_content_id_Collaborations`
+    }}
+    links={[
+      {
+        label: I18n.t('What are collaborations?'),
+        href: 'https://community.canvaslms.com/docs/DOC-10722-67952720327'
+      },
+      {
+        label: I18n.t('How do I use the Collaborations Index Page?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12842-4152708106'
+      },
+      {
+        label: I18n.t('How do I create a Google Drive collaboration as an instructor?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12799-4152719674'
+      },
+      {
+        label: I18n.t('How do I create a Microsoft Office 365 collaboration as an instructor?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12806-4152719676'
+      }
+    ]}
   >
-    <Text as="p">
-      {I18n.t(`Provide a space for users to work on a single document
-          simultaneously, from within your Canvas course.`)}
-    </Text>
+    {I18n.t(`Canvas helps you leverage collaborative technology so multiple
+      users can work together on the same document at the same time. Create
+      collaborative documents that are saved in real time—a change made by
+      any user will be visible to everyone immediately.`)}
   </TutorialTrayContent>
 )
 

@@ -18,19 +18,39 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const ImportTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Import')}
-    subheading={I18n.t('Bring your content into your course')}
-    image="/images/tutorial-tray-images/import.svg"
+    subheading={I18n.t('Bring existing content into your course')}
+    image="/images/tutorial-tray-images/Panda_Map.svg"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-
+      guide-table-of-contents#jive_content_id_Course_Import_Tool`
+    }}
+    links={[
+      {
+        label: I18n.t('How do I copy a Canvas course into a new course shell?'),
+        href: 'https://community.canvaslms.com/docs/DOC-13035-4152239683'
+      },
+      {
+        label: I18n.t('How do I import a Canvas course export package?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12783-415241324'
+      },
+      {
+        label: I18n.t('How do I select specific content as part of a course import?'),
+        href: 'https://community.canvaslms.com/docs/DOC-13101-4152497985'
+      },
+      {
+        label: I18n.t('How do I adjust events and due dates in a course import?'),
+        href: 'https://community.canvaslms.com/docs/DOC-13099-4152497986'
+      }
+    ]}
   >
-    <Text as="p">
-      {I18n.t(`Bring existing content from another course or course
-          management system into your Canvas course.`)}
-    </Text>
+    {I18n.t(`Easily import or copy content from another Canvas course into
+        your course, or import content from other formats, such as Moodle or QTI.`)}
   </TutorialTrayContent>
 )
 

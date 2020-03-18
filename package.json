@@ -49,6 +49,7 @@
     "@instructure/ui-heading": "6",
     "@instructure/ui-i18n": "6",
     "@instructure/ui-icons": "6",
+    "@instructure/ui-img": "6",
     "@instructure/ui-layout": "6",
     "@instructure/ui-link": "6",
     "@instructure/ui-media-player": "^5.54.0",
