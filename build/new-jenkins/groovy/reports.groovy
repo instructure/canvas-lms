@@ -129,7 +129,7 @@ def _runSnyk(projectContainer, projectDirectory, projectName, snykImage, package
   credentials.withSnykCredentials({ ->
     def RC = sh(
       script: """
-        set +e -x
+        set -o errexit -o nounset -o xtrace
         docker run --rm \
           -v snyk_volume:/project \
           -eSNYK_TOKEN \
@@ -149,14 +149,14 @@ def _runSnyk(projectContainer, projectDirectory, projectName, snykImage, package
 }
 
 def _extractSnykReports(projectContainer, projectDirectory, destinationDirectory) {
-    sh """
-      set +e -x
-      mkdir -p ${destinationDirectory}
-      docker cp ${projectContainer}:${projectDirectory}/snyk-error.log ${destinationDirectory}/snyk-error.log
-      docker cp ${projectContainer}:${projectDirectory}/snyk-result.json ${destinationDirectory}/snyk-result.json
-      docker cp ${projectContainer}:${projectDirectory}/snyk_report.css ${destinationDirectory}/snyk_report.css
-      docker cp ${projectContainer}:${projectDirectory}/snyk_report.html ${destinationDirectory}/snyk_report.html
-    """
+  sh """
+    set -o errexit -o nounset -o xtrace
+    mkdir -vp ${destinationDirectory}
+    docker cp ${projectContainer}:${projectDirectory}/snyk-error.log ${destinationDirectory}/snyk-error.log
+    docker cp ${projectContainer}:${projectDirectory}/snyk-result.json ${destinationDirectory}/snyk-result.json
+    docker cp ${projectContainer}:${projectDirectory}/snyk_report.css ${destinationDirectory}/snyk_report.css
+    docker cp ${projectContainer}:${projectDirectory}/snyk_report.html ${destinationDirectory}/snyk_report.html
+  """
 }
 
 return this
