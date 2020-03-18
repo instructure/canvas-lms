@@ -128,6 +128,26 @@ describe ConferencesController do
         get 'index', params: { course_id: @course.id }
         expect(assigns[:js_env][:render_alternatives]).to be_truthy
       end
+
+      context "should set to true if course setting show_conference_alternatives is set" do
+        before do
+          @course.update! settings: @course.settings.merge(show_conference_alternatives: true)
+        end
+
+        it "when context is a group" do
+          user_session(@student)
+          @group = @course.groups.create!(:name => "some group")
+          @group.add_user(@student)
+          get 'index', params: { group_id: @group.id }
+          expect(assigns[:js_env][:render_alternatives]).to be_truthy
+        end
+
+        it "when context is a course" do
+          user_session(@teacher)
+          get 'index', params: { course_id: @course.id }
+          expect(assigns[:js_env][:render_alternatives]).to be_truthy
+        end
+      end
     end
   end
 
