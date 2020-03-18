@@ -1863,7 +1863,7 @@
     "@instructure/ui-svg-images" "^5.52.3"
     prop-types "^15"
 
-"@instructure/ui-img@^6.21.0":
+"@instructure/ui-img@6", "@instructure/ui-img@^6.21.0":
   version "6.21.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-img/-/ui-img-6.21.0.tgz#84b435129b730d3aa064a1d4f7352dd4ffac27ef"
   integrity sha512-oOalJ59RSYhaPqMveCsCcgenOlnOt+xbSxicB3UIw9CX5xJClSEUpYW2zn/N5uww7zCRRURWdsKy5w2wyjlRxw==
