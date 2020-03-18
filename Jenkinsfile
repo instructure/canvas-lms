@@ -234,7 +234,7 @@ pipeline {
     stage('Parallel Run Tests') {
       parallel {
         stage('Linters') {
-          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms' } }
+          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms' && !isCovid() } }
           steps {
             skipIfPreviouslySuccessful("linters") {
               build(job: 'test-suites/linters', parameters: buildParameters)
@@ -289,7 +289,7 @@ pipeline {
         }
 
         stage ('Flakey Spec Catcher') {
-          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' } }
+          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && !isCovid() } }
           steps {
             skipIfPreviouslySuccessful("flakey-spec-catcher") {
               build(
