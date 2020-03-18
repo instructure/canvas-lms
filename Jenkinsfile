@@ -113,7 +113,7 @@ pipeline {
             def credentials = load ('build/new-jenkins/groovy/credentials.groovy')
 
             // WARNING! total hack, being removed after covid...
-            // if this build is triggered from a plugin that is from the 
+            // if this build is triggered from a plugin that is from the
             // covid branch, we need to checkout the covid branch for canvas-lms
             if (isCovid() && env.GERRIT_PROJECT != 'canvas-lms') {
               echo 'checking out canvas-lms covid branch'
@@ -375,10 +375,12 @@ pipeline {
     failure {
       script {
         if (isPatchsetPublishable() && env.GERRIT_EVENT_TYPE == 'change-merged') {
+          def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
+          def authorSegment = env.GERRIT_EVENT_ACCOUNT_NAME ? "Patchset by ${env.GERRIT_EVENT_ACCOUNT_NAME}. " : ''
           slackSend(
             channel: '#canvas_builds',
             color: 'danger',
-            message: "${env.JOB_NAME} failed on merge (<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
+            message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
           )
         }
       }
