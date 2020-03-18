@@ -23,6 +23,8 @@ import cx from 'classnames'
 
 import Modal from '../../shared/components/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {Flex} from '@instructure/ui-flex'
 
 export default class BlueprintModal extends Component {
   static propTypes = {
@@ -34,7 +36,10 @@ export default class BlueprintModal extends Component {
     hasChanges: PropTypes.bool,
     isSaving: PropTypes.bool,
     saveButton: PropTypes.element,
-    wide: PropTypes.bool
+    wide: PropTypes.bool,
+    willAddAssociations: PropTypes.bool,
+    willPublishCourses: PropTypes.bool,
+    enablePublishCourses: PropTypes.func
   }
 
   static defaultProps = {
@@ -80,6 +85,11 @@ export default class BlueprintModal extends Component {
     }
   }
 
+  publishCoursesChange = event => {
+    const enabled = event.target.checked
+    this.props.enablePublishCourses(enabled)
+  }
+
   render() {
     const classes = cx('bcs__modal-content-wrapper', {
       'bcs__modal-content-wrapper__wide': this.props.wide
@@ -98,19 +108,31 @@ export default class BlueprintModal extends Component {
         </Modal.Body>
         <Modal.Footer ref={c => (this.footer = c)}>
           {this.props.hasChanges && !this.props.isSaving ? (
-            [
-              <Button key="cancel" onClick={this.props.onCancel}>
-                {I18n.t('Cancel')}
-              </Button>,
-              <span key="space">&nbsp;</span>,
-              this.props.saveButton ? (
+            <Flex alignItems="center">
+              {this.props.willAddAssociations && (
+                <Flex.Item margin="0 x-small 0 0">
+                  <Checkbox
+                    label={I18n.t('Publish upon association')}
+                    checked={this.props.willPublishCourses}
+                    onChange={this.publishCoursesChange}
+                  />
+                </Flex.Item>
+              )}
+              <Flex.Item margin="0 x-small 0 0">
+                <Button onClick={this.props.onCancel}>
+                  {I18n.t('Cancel')}
+                </Button>
+              </Flex.Item>
+              {this.props.saveButton ? (
                 this.props.saveButton
               ) : (
-                <Button key="save" onClick={this.props.onSave} variant="primary">
-                  {I18n.t('Save')}
-                </Button>
-              )
-            ]
+                <Flex.Item margin="0 x-small 0 0">
+                  <Button onClick={this.props.onSave} variant="primary">
+                    {I18n.t('Save')}
+                  </Button>
+                </Flex.Item>
+              )}
+            </Flex>
           ) : (
             <Button ref={c => (this.doneBtn = c)} onClick={this.props.onCancel} variant="primary">
               {I18n.t('Done')}

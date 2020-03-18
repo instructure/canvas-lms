@@ -72,6 +72,8 @@ export default class CourseEvent extends Backbone.Model
         json.event_source_present = I18n.t("event_source.api", "Api")
       when "sis"
         json.event_source_present = I18n.t("event_source.sis", "SIS")
+      when "blueprint_sync"
+        json.event_source_present = I18n.t("Blueprint Sync")
       else
         json.event_source_present = json.event_source || I18n.t("blank_placeholder", "-")
 

@@ -264,5 +264,11 @@ export default combineReducers({
       [actionTypes.INCLUDE_COURSE_SETTINGS]: (state, action) => action.payload
     },
     false
+  ),
+  willPublishCourses: handleActions(
+    {
+      [actionTypes.ENABLE_PUBLISH_COURSES]: (state, action) => action.payload
+    },
+    false
   )
 })
