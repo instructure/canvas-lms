@@ -39,8 +39,6 @@ pipeline {
     KNAPSACK_TEST_FILE_PATTERN = '{spec,gems/plugins/*/spec_canvas}/**/*_spec.rb'
     KNAPSACK_EXCLUDE_REGEX = '/selenium/'
     KNAPSACK_TEST_DIR = 'spec'
-    RERUNS_RETRY = 1
-    MAX_FAIL = 50
     COVERAGE = runCoverage()
   }
 
