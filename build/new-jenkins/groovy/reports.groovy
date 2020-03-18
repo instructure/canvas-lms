@@ -129,7 +129,7 @@ def runSnyk(projectContainer, projectDirectory, projectName, snykImage, packageM
   credentials.withSnykCredentials({ ->
     def RC = sh(
       script: """
-        set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+        set -o errexit -o nounset -o xtrace
         docker run --rm \
           -v snyk_volume:/project \
           -eSNYK_TOKEN \
@@ -151,7 +151,7 @@ def runSnyk(projectContainer, projectDirectory, projectName, snykImage, packageM
 
 def extractSnykReports(projectContainer, projectDirectory, destinationDirectory) {
   sh """
-    set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+    set -o errexit -o nounset -o xtrace
     mkdir -vp ${destinationDirectory}
     docker cp ${projectContainer}:${projectDirectory}/snyk-error.log ${destinationDirectory}/snyk-error.log
     docker cp ${projectContainer}:${projectDirectory}/snyk-result.json ${destinationDirectory}/snyk-result.json
