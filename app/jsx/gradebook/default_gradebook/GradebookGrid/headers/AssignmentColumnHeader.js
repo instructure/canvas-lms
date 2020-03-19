@@ -18,16 +18,16 @@
 
 import React from 'react'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
-import {IconMoreSolid, IconOffLine, IconOffSolid} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-elements'
+import {IconMoreSolid, IconOffLine, IconOffSolid} from '@instructure/ui-icons'
 import {Grid} from '@instructure/ui-layout'
 import {Menu} from '@instructure/ui-menu'
-import {Text} from '@instructure/ui-elements'
-import 'message_students'
 import I18n from 'i18n!gradebook'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+
 import {isPostable} from '../../../../grading/helpers/SubmissionHelper'
-import MessageStudentsWhoHelper from '../../../shared/helpers/messageStudentsWhoHelper'
+import AsyncComponents from '../../AsyncComponents'
 import ColumnHeader from './ColumnHeader'
 
 function SecondaryDetailLine(props) {
@@ -281,15 +281,17 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     this.props.enterGradesAsSetting.onSelect(values[0])
   }
 
-  showMessageStudentsWhoDialog = () => {
+  showMessageStudentsWhoDialog = async () => {
     this.state.skipFocusOnClose = true
     this.setState({skipFocusOnClose: true})
-    const settings = MessageStudentsWhoHelper.settings(
-      this.props.assignment,
-      this.activeStudentDetails()
-    )
-    settings.onClose = this.focusAtEnd
-    window.messageStudents(settings)
+    const MessageStudentsWhoDialog = await AsyncComponents.loadMessageStudentsWhoDialog()
+
+    const options = {
+      assignment: this.props.assignment,
+      students: this.activeStudentDetails()
+    }
+
+    MessageStudentsWhoDialog.show(options, this.focusAtEnd)
   }
 
   activeStudentDetails() {
