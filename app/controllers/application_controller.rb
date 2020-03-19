@@ -175,7 +175,8 @@ class ApplicationController < ActionController::Base
             assignment_attempts: Account.site_admin.feature_enabled?(:assignment_attempts),
             assignment_bulk_edit: Account.site_admin.feature_enabled?(:assignment_bulk_edit),
             la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
-            cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray)
+            cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
+            featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links)
           }
         }
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
