@@ -19,6 +19,10 @@
 import React from 'react'
 import {render} from 'react-dom'
 
+async function loadCurveGradesDialog() {
+  return (await import('compiled/shared/CurveGradesDialog')).default
+}
+
 async function loadGradeDetailTray() {
   return (await import('./components/SubmissionTray')).default
 }
@@ -27,7 +31,8 @@ async function loadGradebookSettingsModal() {
   return (await import('./components/GradebookSettingsModal')).default
 }
 
-const AsyncRenders = {
+const AsyncComponents = {
+  loadCurveGradesDialog,
   loadGradeDetailTray,
   loadGradebookSettingsModal,
 
@@ -42,4 +47,4 @@ const AsyncRenders = {
   }
 }
 
-export default AsyncRenders
+export default AsyncComponents
