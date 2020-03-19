@@ -1,5 +1,5 @@
 <label class="checkbox" for="importQuizzesNext" {{#unless quizzesNextEnabled}}style="color: #ccc;"{{/unless}}>
-        <input type="checkbox" name="settings[import_quizzes_next]" id="importQuizzesNext" {{#unless quizzesNextEnabled}}disabled=true{{/unless}} {{#if migrationDefault}}checked{{/if}}/>
+        <input type="checkbox" id="importQuizzesNext" {{#unless quizzesNextEnabled}}disabled=true{{/unless}} {{#if migrationDefault}}checked{{/if}}/>
   {{#t "import_new_quizzes"}}Import assessment content as New Quizzes{{/t}}
   <a href="#" class="element_toggler" style="margin-left: 10px" aria-controls="import_quizzesNext_helpDialog" aria-label="{{#t "import_quizzesNext_help_label"}}Import assessment as New Quizzes Help Icon{{/t}}" title="{{#t "import_quizzesNext_help_title_icon"}}Import assessment as New Quizzes Help Icon{{/t}}"><i class="icon-question"></i></a>
     <div id="import_quizzesNext_helpDialog" data-read-on-open="true" data-turn-into-dialog='{width":600,"modal":true}' style="display:none" title={{#t "import_quizzesNext_help_title"}}New Quizzes{{/t}}>
