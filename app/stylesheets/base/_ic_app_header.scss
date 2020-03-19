@@ -18,7 +18,6 @@
 
 // @mixin primary-nav-badge-border($border-color) { box-shadow: 0 0 0 2px $border-color; }
 
-
 /// These are editable variables from the theme editor.
 /// For more info view stylesheets/brandable_variables.json
 // ic-brand-global-nav-bgd
@@ -31,7 +30,7 @@
 // ic-brand-global-nav-logo-bgd
 
 $ic-global-nav-link-hover: rgba(black, 0.2);
-$ic-global-nav-link-active:  rgba(black, 0.4);
+$ic-global-nav-link-active: rgba(black, 0.4);
 $ic-masquerade-color: $ic-color-action;
 $ic-subnav-panel-bgd: $ic-color-light;
 $ic-subnav-tray-bgd: black;
@@ -44,12 +43,16 @@ $ic-tooltip-arrow-size: 0.375rem;
       margin-#{direction(left)}: $ic-header-primary-width;
     }
   }
+  .navigation-tray-container {
+    min-height: 100vh;
+  }
 }
 
 .ic-app-header {
   box-sizing: border-box;
   position: fixed;
-  top: 0; #{direction(left)}: 0;
+  top: 0;
+  #{direction(left)}: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -84,7 +87,8 @@ $ic-tooltip-arrow-size: 0.375rem;
       background: $ic-color-light;
 
       body:not(.primary-nav-expanded) & {
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           .menu-item__text {
             transition: none;
             transition-delay: 0;
@@ -94,8 +98,7 @@ $ic-tooltip-arrow-size: 0.375rem;
         }
       }
       &:focus {
-        box-shadow:
-          inset 0 0 0 1px var(--ic-brand-global-nav-bgd),
+        box-shadow: inset 0 0 0 1px var(--ic-brand-global-nav-bgd),
           inset 0 0 0 2px var(--ic-brand-global-nav-menu-item__text-color--active);
       }
     }
@@ -116,9 +119,7 @@ $ic-tooltip-arrow-size: 0.375rem;
 
 .ic-app-header__menu-list-link {
   box-sizing: border-box;
-  transition:
-    background-color 0.3s,
-    padding 0.3s;
+  transition: background-color 0.3s, padding 0.3s;
   position: relative;
   text-align: center;
   display: block;
@@ -142,7 +143,8 @@ $ic-tooltip-arrow-size: 0.375rem;
     }
   }
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: $ic-global-nav-link-hover;
     @if $use_high_contrast == false {
       text-decoration: none;
@@ -150,7 +152,9 @@ $ic-tooltip-arrow-size: 0.375rem;
     }
     .ic-avatar {
       border-color: var(--ic-brand-global-nav-avatar-border);
-      &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
+      &.ic-avatar--fake-student {
+        border-color: $ic-masquerade-color;
+      }
     }
     .menu-item__text {
       transform: translate3d($ic-tooltip-arrow-size, 0, 0);
@@ -159,8 +163,7 @@ $ic-tooltip-arrow-size: 0.375rem;
   }
 
   &:focus {
-    box-shadow:
-      inset 0 0 0 1px var(--ic-brand-global-nav-bgd),
+    box-shadow: inset 0 0 0 1px var(--ic-brand-global-nav-bgd),
       inset 0 0 0 2px var(--ic-brand-global-nav-menu-item__text-color);
   }
 
@@ -186,35 +189,39 @@ button.ic-app-header__menu-list-link {
   overflow: hidden;
   border-radius: 100%;
   border: 2px solid var(--ic-brand-global-nav-avatar-border);
-  width: 50px; height: 50px;
+  width: 50px;
+  height: 50px;
   box-sizing: border-box;
   display: inline-block;
   vertical-align: middle;
-  &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
+  &.ic-avatar--fake-student {
+    border-color: $ic-masquerade-color;
+  }
 }
 
 .menu-item-icon-container {
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
   position: relative;
   z-index: 1;
-  width: $ic-sp*4;
+  width: $ic-sp * 4;
   margin: 0 auto;
   color: var(--ic-brand-global-nav-ic-icon-svg-fill);
 
   .ic-avatar {
-    transform: translate3d(0,0,0);
-    width: $ic-sp*2.5;
-    height: $ic-sp*2.5;
+    transform: translate3d(0, 0, 0);
+    width: $ic-sp * 2.5;
+    height: $ic-sp * 2.5;
 
     body.primary-nav-expanded & {
-      width: $ic-sp*3; height: $ic-sp*3;
+      width: $ic-sp * 3;
+      height: $ic-sp * 3;
     }
   }
 }
 
 .menu-item__text {
   // set up properties to transition on hover/focus
-  transform: translate3d(-100%,0,0);
+  transform: translate3d(-100%, 0, 0);
   opacity: 0;
 
   pointer-events: none;
@@ -234,9 +241,7 @@ button.ic-app-header__menu-list-link {
   // this class is added after a 1s delay because the
   // transitions look weird when the nav is being closed
   body.primary-nav-transitions & {
-    transition:
-      transform 0.3s cubic-bezier(0.175, 0.885, 0.320, 1.275),
-      opacity 0.3s;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
     transition-delay: 0.3s;
   }
 
@@ -244,7 +249,7 @@ button.ic-app-header__menu-list-link {
     #{direction(right)}: 100%;
     top: 50%;
     border: solid transparent;
-    content: "";
+    content: '';
     height: 0;
     width: 0;
     position: absolute;
@@ -260,7 +265,8 @@ button.ic-app-header__menu-list-link {
   @include ic-badge-maker;
   transition: all 0.3s ease-out;
   position: absolute;
-  top: -0.5em; #{direction(right)}: 0;
+  top: -0.5em;
+  #{direction(right)}: 0;
   background: var(--ic-brand-global-nav-menu-item__badge-bgd);
   color: var(--ic-brand-global-nav-menu-item__badge-text);
 }
@@ -286,13 +292,14 @@ button.ic-app-header__menu-list-link {
   }
   &:focus {
     outline-style: none;
-    box-shadow:
-      inset 0 0 0 1px var(--ic-brand-global-nav-bgd),
+    box-shadow: inset 0 0 0 1px var(--ic-brand-global-nav-bgd),
       inset 0 0 0 2px var(--ic-brand-global-nav-menu-item__text-color);
   }
 }
 // set to block to avoid any exta inline spacing at bottom
-.ic-app-header__uploaded-logo { display: block; }
+.ic-app-header__uploaded-logo {
+  display: block;
+}
 
 .ic-app-header__menu-list-link {
   padding: 0.5625rem 0;
@@ -300,7 +307,6 @@ button.ic-app-header__menu-list-link {
 
 // stuff that changes when the nav is expanded
 body.primary-nav-expanded {
-
   .ic-app-header {
     width: $ic-header-primary-width;
     overflow-y: auto;
@@ -317,11 +323,9 @@ body.primary-nav-expanded {
 
   .ic-app-header__menu-list-item.ic-app-header__menu-list-item--active {
     .menu-item__text {
-
       @if $use_high_contrast {
         color: var(--ic-link-color);
-      }
-      @else {
+      } @else {
         color: $ic-course-sidenav_list-item--active-font-color;
       }
     }
@@ -334,7 +338,8 @@ body.primary-nav-expanded {
       }
     }
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       .menu-item__text {
         transform: none;
       }
@@ -399,11 +404,11 @@ body.primary-nav-expanded {
   }
 }
 #mobileContextNavContainer {
-  overflow:hidden;
+  overflow: hidden;
   // we transition max-height instead of height because otherwise we'd have to give it an explicit height and not "auto"
-  transition:max-height 1.5s ease-out;
+  transition: max-height 1.5s ease-out;
   max-height: 0px;
-  &[aria-expanded="true"] {
+  &[aria-expanded='true'] {
     max-height: 3000px;
     margin-bottom: 50px;
     box-shadow: 0 0.375rem 0.4375rem rgba(0, 0, 0, 0.1), 0 0.625rem 1.75rem rgba(0, 0, 0, 0.25);
@@ -411,7 +416,10 @@ body.primary-nav-expanded {
 }
 
 @include desktop-only {
-  #mobile-header, #mobileContextNavContainer { display: none}
+  #mobile-header,
+  #mobileContextNavContainer {
+    display: none;
+  }
 }
 .mobile-header-hamburger {
   float: direction(left);
@@ -420,8 +428,9 @@ body.primary-nav-expanded {
   text-align: center;
   display: block;
 }
-.mobile-header-hamburger, .mobile-header-title {
-  padding: $ic-sp*1.3;
+.mobile-header-hamburger,
+.mobile-header-title {
+  padding: $ic-sp * 1.3;
 }
 .ic-brand-mobile-global-nav-logo {
   height: 48px;
@@ -430,4 +439,20 @@ body.primary-nav-expanded {
   background-position: top left;
   background-repeat: no-repeat;
   background-size: contain;
+}
+
+// Tourpoints Styles
+#___reactour {
+  .reactour__helper {
+    background-color: white;
+    color: unset;
+    max-width: 515px;
+    width: calc(100vw - 20px);
+  }
+  .tour-star-image {
+    max-width: 120px;
+    padding: 1rem 0;
+    margin: 0 auto;
+    text-align: center;
+  }
 }

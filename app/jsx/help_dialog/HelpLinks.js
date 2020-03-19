@@ -21,8 +21,10 @@ import {bool, arrayOf, shape, string, func} from 'prop-types'
 import I18n from 'i18n!HelpLinks'
 import {Link} from '@instructure/ui-link'
 import {List, Spinner, Text, Pill} from '@instructure/ui-elements'
-import {View, Flex} from '@instructure/ui-layout'
 import FeaturedHelpLink from './FeaturedHelpLink'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import tourPubSub from '../nav_tourpoints/tourPubsub'
 
 export default function HelpLinks({links, hasLoaded, onClick}) {
   const featuredLink = links.find(link => link.is_featured)
@@ -80,6 +82,20 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
               </List.Item>
             )
           })
+          .concat(
+            // if the current user is a teacher, show a link to
+            // open up the welcome tour
+            window.ENV.FEATURES?.product_tours &&
+              window.ENV.current_user_roles?.includes('teacher') && [
+                <List.Item key="welcome_tour">
+                  <View className="welcome-tour-link">
+                    <Link isWithinText={false} onClick={() => tourPubSub.publish('tour-open')}>
+                      {I18n.t('Show Welcome Tour')}
+                    </Link>
+                  </View>
+                </List.Item>
+              ]
+          )
           .concat(
             // if the current user is an admin, show the settings link to
             // customize this menu

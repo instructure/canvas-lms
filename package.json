@@ -28,6 +28,7 @@
     "@instructure/media-capture": "^5.54.0",
     "@instructure/outcomes-ui": "^1.1.0",
     "@instructure/react-crop": "^5.0.1",
+    "@instructure/reactour": "https://github.com/instructure/reactour#master",
     "@instructure/ready": ">=1",
     "@instructure/ui-a11y": "6",
     "@instructure/ui-alerts": "6",

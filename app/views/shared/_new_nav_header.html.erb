@@ -17,6 +17,11 @@
 %>
 
   <% js_bundle :navigation_header %>
+
+  <% if @domain_root_account && @domain_root_account.feature_enabled?(:product_tours) %>
+  <% js_bundle :nav_tourpoints %>
+  <% end %>
+
   <% if use_responsive_layout? %>
     <header id="mobile-header" class="no-print">
       <button type="button" class="Button Button--icon-action-rev Button--large  mobile-header-hamburger">
@@ -182,4 +187,5 @@
         </ul>
       </div>
     <div id="global_nav_tray_container"></div>
+    <div id="global_nav_tour"></div>
   </header>
