@@ -45,6 +45,14 @@ describe('HelpTray', () => {
     hasLoaded: true
   }
 
+  beforeEach(() => {
+    window.ENV = {FEATURES: {featured_help_links: true}}
+  })
+
+  afterEach(() => {
+    window.ENV = {}
+  })
+
   it('renders loading spinner', () => {
     const {getByTitle, queryByText} = render(<HelpTray {...props} hasLoaded={false} />)
     getByTitle('Loading')

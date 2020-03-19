@@ -20,71 +20,96 @@ import React from 'react'
 import {bool, arrayOf, shape, string, func} from 'prop-types'
 import I18n from 'i18n!HelpLinks'
 import {Link} from '@instructure/ui-link'
-import {List, Spinner, Text} from '@instructure/ui-elements'
+import {List, Spinner, Text, Pill} from '@instructure/ui-elements'
+import {View, Flex} from '@instructure/ui-layout'
+import FeaturedHelpLink from './FeaturedHelpLink'
 
 export default function HelpLinks({links, hasLoaded, onClick}) {
-  return (
-    <List variant="unstyled" margin="small 0" itemSpacing="small">
-      {hasLoaded ? (
-        links
-          .map((link, index) => (
-            <List.Item key={`link-${index}`}>
-              <Link
-                isWithinText={false}
-                href={link.url}
-                target="_blank"
-                rel="noopener"
-                onClick={event => {
-                  if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
-                    event.preventDefault()
-                    onClick(link.url)
-                  }
-                }}
-                theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
-              >
-                {link.text}
-              </Link>
-              {link.subtext && (
-                <Text as="div" size="small">
-                  {link.subtext}
-                </Text>
-              )}
-            </List.Item>
-          ))
+  const featuredLink = links.find(link => link.is_featured)
+  const featuredLinksEnabled = window.ENV.FEATURES.featured_help_links
+  const nonFeaturedLinks = featuredLinksEnabled ? links.filter(link => !link.is_featured) : links
+  const showSeparator = featuredLink && !!nonFeaturedLinks.length && featuredLinksEnabled
+
+  const handleClick = link => event => {
+    if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
+      event.preventDefault()
+      onClick(link.url)
+    }
+  }
+
+  return !hasLoaded ? (
+    <Spinner size="small" renderTitle={I18n.t('Loading')} />
+  ) : (
+    <View>
+      <FeaturedHelpLink featuredLink={featuredLink} handleClick={handleClick} />
+      {showSeparator && (
+        <View display="block" margin="medium 0 0">
+          <Text weight="bold" transform="uppercase" size="small" lineHeight="double">
+            {I18n.t('OTHER RESOURCES')}
+          </Text>
+          <hr role="presentation" style={{marginTop: '0'}} />
+        </View>
+      )}
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
+        {nonFeaturedLinks
+          .map(link => {
+            const has_new_tag = link.is_new && featuredLinksEnabled
+            return (
+              <List.Item key={`link-${link.id}`}>
+                <Flex justifyItems="space-between" alignItems="center">
+                  <Flex.Item size={has_new_tag ? '80%' : '100%'}>
+                    <Link
+                      isWithinText={false}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener"
+                      onClick={handleClick(link)}
+                    >
+                      {link.text}
+                    </Link>
+                    {link.subtext && (
+                      <Text as="div" size="small">
+                        {link.subtext}
+                      </Text>
+                    )}
+                  </Flex.Item>
+                  <Flex.Item>
+                    {has_new_tag && <Pill variant="success" text={I18n.t('NEW')} />}
+                  </Flex.Item>
+                </Flex>
+              </List.Item>
+            )
+          })
           .concat(
             // if the current user is an admin, show the settings link to
             // customize this menu
-            window.ENV.current_user_roles &&
-              window.ENV.current_user_roles.includes('root_admin') && [
-                <List.Item key="hr">
-                  <hr role="presentation" />
-                </List.Item>,
-                <List.Item key="customize">
-                  <Link
-                    isWithinText={false}
-                    href="/accounts/self/settings#custom_help_link_settings"
-                  >
-                    {I18n.t('Customize this menu')}
-                  </Link>
-                </List.Item>
-              ]
+            window.ENV.current_user_roles?.includes('root_admin') && [
+              <List.Item key="hr">
+                <hr role="presentation" />
+              </List.Item>,
+              <List.Item key="customize">
+                <Link isWithinText={false} href="/accounts/self/settings#custom_help_link_settings">
+                  {I18n.t('Customize this menu')}
+                </Link>
+              </List.Item>
+            ]
           )
-          .filter(Boolean)
-      ) : (
-        <List.Item>
-          <Spinner size="small" renderTitle={I18n.t('Loading')} />
-        </List.Item>
-      )}
-    </List>
+          .filter(Boolean)}
+      </List>
+    </View>
   )
 }
 
 HelpLinks.propTypes = {
   links: arrayOf(
     shape({
+      id: string.isRequired,
       url: string.isRequired,
       text: string.isRequired,
-      subtext: string
+      subtext: string,
+      feature_headline: string,
+      is_featured: bool,
+      is_new: bool
     })
   ).isRequired,
   hasLoaded: bool,
