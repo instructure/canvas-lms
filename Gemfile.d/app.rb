@@ -53,6 +53,7 @@ gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.8', require: false
 gem 'canvas_webex', '0.17'
 gem 'crocodoc-ruby', '0.0.1', require: false
+gem 'ddtrace', '0.33.1', require: false
 gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_store'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.12.2', require: false

@@ -36,9 +36,15 @@ import 'jquery.loadingImg'
 import 'compiled/jquery.rails_flash_notifications'
 import 'jquery.templateData'
 import 'jquery.instructure_date_and_time'
+import renderConferenceAlternatives from '../conferences/renderAlternatives'
 
+const bbbSettings = ENV.conference_type_details.find(d => d.type === 'BigBlueButton')
 if (ENV.can_create_conferences) {
-  renderBigBlueButtonAlert()
+  if (ENV.render_alternatives) {
+    renderConferenceAlternatives()
+  } else if (bbbSettings?.free_trial) {
+    renderBigBlueButtonAlert()
+  }
 }
 
 const ConferencesRouter = Backbone.Router.extend({
