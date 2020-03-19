@@ -891,6 +891,7 @@ hu:
       grade_export: 
         course_date_picker_parameter: 
           Optional: "Nem kötelező"
+          settings: "beállítások:"
     include_deleted_parameter: 
       account_reports: 
         default: 
@@ -1589,6 +1590,7 @@ hu:
   admin_navigation_menu_77b801a2: "Admin navigációs menü"
   admin_user_name_29dd115a: admin_user_name
   admins_3e1dce15: Adminisztrátorok
+  afghanistan_93_ab06805: "Afganisztán (+93)"
   after_48b9d69: Után...
   after_4c71e718: Után
   after_date_981cd41b: "%{date} után"
@@ -2388,8 +2390,8 @@ hu:
         assigned_peer_reviews: "Hozzárendelt társértékelések"
         comments: "Megjegyzések:"
         submission: Beadás
-        submission_not_turned_in: "Nincs bekapcsolva!"
-        submission_turned_in: Bekapcsolva!
+        submission_not_turned_in: "Nincs Beadva!"
+        submission_turned_in: Beadva!
     submission_types_form: 
       advanced_turnitin_settings: "Haladó Turnitinbeállítások"
       advanced_vericite_settings: "Haladó VeriCite beállítások"
@@ -3862,6 +3864,7 @@ hu:
         question_bank_placeholder: "Kérdésbank neve"
         question_bank_placeholder_aria: "Új kérdésbank neve"
         question_bank_title: "Új kérdésbank neve"
+        question_banks_disabled: "Ez az opció le van tiltva"
         select_question_bank: "Kérdésbank kiválasztása"
       select_content_checkbox: 
         select_all_content: "Összes tartalom"
@@ -5892,6 +5895,7 @@ hu:
   does_not_meet_expectations_b0736d20: "Nem teljesíti az elvárásokat"
   domain_3b54c511: Tartomány
   domain_is_required_1d4c8b25: "A tartomány megadása kötelező"
+  dominican_republic_1_3cef4021: "Dominikai Köztársaság (+1)"
   don_t_move_lti_query_params_to_post_body_5c80e037: "Ne mozgassa az LTI lekérdezési paramétereket a POST törzsébe"
   done_54e3d4b6: Kész
   done_8af51c9b: Kész.
@@ -7595,6 +7599,7 @@ hu:
   how_is_this_affecting_you_b3b6a639: "Hogy érinti ez Önt ?"
   how_many_minutes_ecca5ee7: "Hány perc?"
   html_editor_fb2ab713: "HTML szerkesztő"
+  hungary_36_cd3e515b: "Magyarország (+36)"
   i_agree_to_the_34aa16ce: "Elfogadom a következőt: "
   i_agree_to_the_terms_of_use_18e16f0c: "Elfogadom a *felhasználási feltételeket*. "
   i_agree_to_the_tool_s_270301a5: "Egyetértek az eszközökkel."
@@ -7604,6 +7609,7 @@ hu:
   i_hold_the_copyright_71ee91b1: "Megtartom a szerzői jogot"
   i_ll_write_free_form_comments_when_assessing_stude_5cf50d06: "Szabad szöveges értékelések írása a hallgatók számára"
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "Szükségem van segítségre, de nem sürgős"
+  iceland_354_1a03c558: "Izland (+354)"
   icon_215a1dc6: Ikon
   icon_url_ecce6557: "Ikon URL:"
   icons: 
@@ -7955,6 +7961,7 @@ hu:
       Funkciók, beállítások és stílusok, amelyek speciálisak a közoktatási környezetben. Jelenleg ez csak
       néhány stílusbeli különbséget jelent, de később több speciális dolog is elérhetővé válik.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kazahsztán (+7)"
   keep_submissions_anonymous_5cbaf419: "Beadandók névtelenségének megőrzése"
   kenya_254_2945663a: "Kenya (+254)"
   key_api_key_68bf80ae: "Kulcs: *%{api_key}*"
@@ -10992,6 +10999,7 @@ hu:
     view_more_link: "További részletek..."
   paginated_view: 
     loading_more_results: "További találatok betöltése"
+  pakistan_92_da28c36: "Pakisztán (+92)"
   panama_507_831fbc99: "Panama (+507)"
   paraguay_595_ca58b83a: "Paraguay (+595)"
   parent_of_a_canvas_user_afba1624: "Ön egy Canvas-felhasználó szülője?"
@@ -11053,6 +11061,7 @@ hu:
   please_enter_your_label_name_7745272d: "Kérjük, adja meg a következőt: %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Kérjük, adja meg a következőt: %{label_name}, majd írja be a jelszavát: "
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Kérjük, ossza meg, mely oldalakat tekintette meg, és a linket, amire kattintott. "
+  please_log_in_to_view_this_content_eec6cd0: "A tartalom megtekintéséhez be kell lépnie."
   please_select_a_user_role_for_this_link_9fb4e655: "Kérjük válassza ki a linkhez tartozó felhasználói szerepet!"
   please_select_one_f931e883: "Kérjük, válasszon egyet..."
   please_upload_files_as_a_zip_5a2c799f: "Kérjük, .zip tömörítéssel töltse fel a fájlokat"
@@ -13277,6 +13286,7 @@ hu:
     plugin_settings: 
       labels: 
         enabled: "Engedélyezve (engedélyeznie kell a QTI átalakítót is)"
+  responsive_layout_54e4ca06: "Reszponzív weboldal"
   restart_link_validation_b61286fc: "Hivatkozás-ellenőrzés újrakezdése"
   restore_courses_182e162e: "Kurzusok helyreállítása"
   restricted_access_d3e99a39: "Korlátozott hozzáférés"
@@ -13490,6 +13500,7 @@ hu:
       remove_rubric: "Értékelőtábla eltávolítása a listámról"
   rubrics_b5ef369b: Értékelőtáblák
   russia_7_87bc99d5: "Oroszország (+7)"
+  rwanda_250_1a6b344b: "Ruanda (+250)"
   salesforce_account_id_eb5c78ad: "Salesforce felhasználó-azonosító"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce különböző belépési hoszttal rendelkezik a sandbox fiókokhoz, mint a production fiókokhoz, így ha Salesforce sanbox fiókkal rendelkezik, és nem aktiválja ezt a jelölőnégyzetet, nem lesz képes hitelesíteni (és fordítva, ha production fiókkal rendelkezik és bejelöli a jelölőnégyzetet, nem lesz képes hitelesíteni)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -14536,6 +14547,7 @@ hu:
   sorted_descending_1e30f0d5: "csökkenő sorrendben"
   sorted_descending_84ec84c8: "csökkenő sorrendben."
   source_code_2395ca74: Forráskód
+  south_africa_27_d5e0f1e1: " Dél-afrikai Köztársaság (+27)"
   south_korea_82_10618967: "Dél-Korea (+82)"
   space_ec476863: Szóköz
   spain_34_d5286826: "Spanyolország (+34)"
@@ -14974,6 +14986,7 @@ hu:
     syllabus: Tematika
     tab_location_error: "Ezen fülelhelyezés helytelen."
     tab_unmanagable_error: "%{css_class} nem kezelhető"
+  taiwan_886_9a5b6bbf: "Tajvan (+886)"
   take_a_picture_d582acf1: "Fotó készítése"
   take_the_quiz_87214d7e: "Kvíz kitöltése"
   take_the_quiz_again_8ea51a6c: "Kvíz kitöltése újra"
@@ -15493,6 +15506,7 @@ hu:
   treat_ungraded_as_0_d38c2b41: "Osztályzat nélküliek kezelése 0-ként"
   tree_browser: 
     folder_tree_instructions: "Használja a fel és le nyilakat a fán való navigáláshoz. Nyomja meg a jobbrát a kinyitáshoz, a balrát az összecsukáshoz, az entert az elem kiválasztásához."
+  trinidad_and_tobago_1_fc2d8d1c: "Trinidad és Tobago (+1)"
   truncated_56b1a661: Rövidítve
   turned_in_submission_date_e9180b8b: "beadás ekkor: %{submission_date}"
   turnitin: 
@@ -15731,6 +15745,7 @@ hu:
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, Önnek be kell \"jelentkeznie*, mielőtt az oldalt megtekintené."
   user_navigation_a097be0f: "Felhasználói navigáció"
   user_not_authorized_to_manage_sis_data_account_sis_47bd4eec: "a felhasználó nem jogosult a SIS adat kezelésére - fiók [sis_fiók_azonosító]"
+  user_not_authorized_to_perform_that_action_until_v_4f095a7c: "a felhasználó nem hajthatja végre ezt a feladatod, amig az e-mail címét nem ellenőrizte"
   user_notes: 
     confirms: 
       delete_journal_entry: "Biztos benne, hogy törli ezt a hírlevél bejegyzést?"
