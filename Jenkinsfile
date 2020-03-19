@@ -223,12 +223,13 @@ pipeline {
     }
 
     stage('Parallel Run Tests') {
-      parallel {
-        stage('Linters') {
-          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms' && !isCovid() } }
-          steps {
-            skipIfPreviouslySuccessful("linters") {
-              script {
+      steps {
+        script {
+          def stages = [:]
+          if (env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms' && !isCovid()) {
+            echo 'adding Linters'
+            stages['Linters'] = {
+              skipIfPreviouslySuccessful("linters") {
                 sh 'build/new-jenkins/linters/run-gergich.sh'
                 if (env.MASTER_BOUNCER_RUN == '1' && env.GERRIT_EVENT_TYPE == 'patchset-created') {
                   def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
@@ -239,90 +240,64 @@ pipeline {
               }
             }
           }
-        }
 
-        stage('Vendored Gems') {
-          steps {
+          echo 'adding Vendored Gems'
+          stages['Vendored Gems'] = {
             skipIfPreviouslySuccessful("vendored-gems") {
               build(job: 'test-suites/vendored-gems', parameters: buildParameters)
             }
           }
-        }
 
-        stage('Javascript') {
-          steps {
+          echo 'adding Javascript'
+          stages['Javascript'] = {
             skipIfPreviouslySuccessful("javascript") {
               build(job: 'test-suites/JS', parameters: buildParameters)
             }
           }
-        }
 
-        stage('Contract Tests') {
-          steps {
+          echo 'adding Contract Tests'
+          stages['Contract Tests'] = {
             skipIfPreviouslySuccessful("contract-tests") {
               build(job: 'test-suites/contract-tests', parameters: buildParameters)
             }
           }
-        }
 
-        stage('Selenium Chrome') {
-          steps {
-            skipIfPreviouslySuccessful("selenium-chrome") {
-              build(
-                job: 'test-suites/selenium-chrome',
-                parameters: buildParameters + string(name: 'CI_NODE_TOTAL', value: env.SELENIUM_CI_NODE_TOTAL)
-              )
+          if (env.GERRIT_EVENT_TYPE != 'change-merged' && !isCovid()) {
+            echo 'adding Flakey Spec Catcher'
+            stages['Flakey Spec Catcher'] = {
+              skipIfPreviouslySuccessful("flakey-spec-catcher") {
+                build(
+                  job: 'test-suites/flakey-spec-catcher',
+                  parameters: buildParameters,
+                  propagate: false,
+                  wait: false
+                )
+              }
             }
           }
+
+          // // keep this around in case there is changes to the subbuilds that need to happen
+          // // and you have no other way to test it except by running a test build.
+          // stages['Test Subbuild'] = {
+          //   skipIfPreviouslySuccessful("test-subbuild") {
+          //     build(job: 'test-suites/test-subbuild', parameters: buildParameters)
+          //   }
+          // }
+
+          // // Don't run these on all patch sets until we have them ready to report results.
+          // // Uncomment stage to run when developing.
+          // stages['Xbrowser'] = {
+          //   skipIfPreviouslySuccessful("xbrowser") {
+          //     build(job: 'test-suites/xbrowser', propagate: false, parameters: buildParameters)
+          //   }
+          // }
+
+          def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
+          distribution.stashBuildScripts()
+          distribution.addRSpecSuites(stages)
+
+          parallel(stages)
         }
-
-        stage('RSpec') {
-          steps {
-            skipIfPreviouslySuccessful("rspec") {
-              build(
-                job: 'test-suites/rspec',
-                parameters: buildParameters + string(name: 'CI_NODE_TOTAL', value: env.RSPEC_CI_NODE_TOTAL)
-              )
-            }
-          }
-        }
-
-        stage ('Flakey Spec Catcher') {
-          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && !isCovid() } }
-          steps {
-            skipIfPreviouslySuccessful("flakey-spec-catcher") {
-              build(
-                job: 'test-suites/flakey-spec-catcher',
-                parameters: buildParameters,
-                propagate: false,
-                wait: false
-              )
-            }
-          }
-        }
-
-        // // keep this around in case there is changes to the subbuilds that need to happen
-        // // and you have no other way to test it except by running a test build.
-        // stage('Test Subbuild') {
-        //   steps {
-        //     skipIfPreviouslySuccessful("test-subbuild") {
-        //       build(job: 'test-suites/test-subbuild', parameters: buildParameters)
-        //     }
-        //   }
-        // }
-
-        // // Don't run these on all patch sets until we have them ready to report results.
-        // // Uncomment stage to run when developing.
-        // stage('Xbrowser') {
-        //   steps {
-        //     skipIfPreviouslySuccessful("xbrowser") {
-        //       // propagate set to false until we can get tests passing
-        //       build(job: 'test-suites/xbrowser', propagate: false, parameters: buildParameters)
-        //       )
-        //     }
-        //   }
-        // }
-
       }
     }
 
@@ -385,7 +360,13 @@ pipeline {
         }
       }
     }
-
+    always {
+      script {
+        def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
+        rspec.uploadSeleniumFailures()
+        rspec.uploadRSpecFailures()
+      }
+    }
     cleanup {
       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
