@@ -31,10 +31,15 @@ async function loadGradebookSettingsModal() {
   return (await import('./components/GradebookSettingsModal')).default
 }
 
+async function loadMessageStudentsWhoDialog() {
+  return (await import('../shared/MessageStudentsWhoDialog')).default
+}
+
 const AsyncComponents = {
   loadCurveGradesDialog,
   loadGradeDetailTray,
   loadGradebookSettingsModal,
+  loadMessageStudentsWhoDialog,
 
   async renderGradeDetailTray(props, $container) {
     const GradeDetailTray = await loadGradeDetailTray()
