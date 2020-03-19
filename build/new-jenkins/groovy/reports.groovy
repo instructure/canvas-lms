@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def stashSpecCoverage(index) {
+def stashSpecCoverage(prefix, index) {
   dir("tmp") {
-    stash name: "spec_coverage_${index}", includes: 'spec_coverage/**/*'
+    stash name: "${prefix}_spec_coverage_${index}", includes: 'spec_coverage/**/*'
   }
 }
 
-def publishSpecCoverageToS3(ci_node_total, coverage_type) {
-  sh 'rm -rf ./coverage_nodes'
+def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
+  sh 'rm -vrf ./coverage_nodes'
   dir('coverage_nodes') {
     for(int index = 0; index < ci_node_total; index++) {
       dir("node_${index}") {
-        unstash "spec_coverage_${index}"
+        unstash "${prefix}_spec_coverage_${index}"
       }
     }
   }
@@ -46,24 +46,23 @@ def publishSpecCoverageToS3(ci_node_total, coverage_type) {
 
 // this method is to ensure that the stashing is done in a way that
 // is expected in publishSpecFailuresAsHTML
-def stashSpecFailures(index) {
+def stashSpecFailures(prefix, index) {
   dir("tmp") {
-    stash name: "spec_failures_${index}", includes: 'spec_failures/**/*', allowEmpty: true
+    stash name: "${prefix}_spec_failures_${index}", includes: 'spec_failures/**/*', allowEmpty: true
   }
 }
 
-def publishSpecFailuresAsHTML(ci_node_total) {
-  sh 'rm -rf ./compiled_failures'
+def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
+  sh 'rm -vrf ./compiled_failures'
 
   dir('compiled_failures') {
     for(int index = 0; index < ci_node_total; index++) {
       dir ("node_${index}") {
         try {
-          unstash "spec_failures_${index}"
+          unstash "${prefix}_spec_failures_${index}"
         } catch(err) {
           println (err)
         }
-
       }
     }
     buildIndexPage();
@@ -76,7 +75,7 @@ def publishSpecFailuresAsHTML(ci_node_total) {
     keepAll: true,
     reportDir: 'compiled_failures',
     reportFiles: htmlFiles.join(','),
-    reportName: 'Test Failures'
+    reportName: report_name
   ]
   sh 'rm -rf ./compiled_failures'
 }
