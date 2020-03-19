@@ -35,11 +35,16 @@ async function loadMessageStudentsWhoDialog() {
   return (await import('../shared/MessageStudentsWhoDialog')).default
 }
 
+async function loadSetDefaultGradeDialog() {
+  return (await import('compiled/shared/SetDefaultGradeDialog')).default
+}
+
 const AsyncComponents = {
   loadCurveGradesDialog,
   loadGradeDetailTray,
   loadGradebookSettingsModal,
   loadMessageStudentsWhoDialog,
+  loadSetDefaultGradeDialog,
 
   async renderGradeDetailTray(props, $container) {
     const GradeDetailTray = await loadGradeDetailTray()
