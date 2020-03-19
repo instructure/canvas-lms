@@ -16,9 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'ddtrace'
+require 'digest/sha1'
+require 'canvas/dynamic_settings'
 
 module Canvas
-  # This class is currently a wrapper for managing connecting with ddtrace
+  # This module is currently a wrapper for managing connecting with ddtrace
   # to send APM information to Datadog, but could in the future be re-worked to
   # be configurable for multiple APM backends.
   #
@@ -38,16 +40,19 @@ module Canvas
   # in contexts where we have canvas-specific attributes available,
   #  calling Canvas::Apm.annotate_trace() with the shard and account
   #  will provide the facets useful for searching by in the aggregation client.
-  class Apm
+  module Apm
+    HOST_SAMPLING_INTERVAL = 10000
     class << self
-      attr_writer :enable_debug_mode
+      attr_writer :enable_debug_mode, :hostname
       attr_accessor :canvas_cluster
 
       def reset!
         @canvas_cluster = nil
         @_config = nil
         @_sample_rate = nil
+        @_host_sample_rate = nil
         @enable_debug_mode = nil
+        @hostname = nil
       end
 
       def config
@@ -64,8 +69,33 @@ module Canvas
         @_sample_rate = self.config.fetch('sample_rate', 0.0).to_f
       end
 
+      def host_sample_rate
+        return @_host_sample_rate if @_host_sample_rate.present?
+        @_host_sample_rate = self.config.fetch('host_sample_rate', 0.0).to_f
+      end
+
       def configured?
-        self.sample_rate > 0.0
+        self.sample_rate > 0.0 && host_chosen?
+      end
+
+      def host_chosen?
+        return false if @hostname.blank? || host_sample_rate <= 0
+        return false if host_sample_rate > 1.0 # invalid ratio
+        get_sampling_decision(@hostname, host_sample_rate, HOST_SAMPLING_INTERVAL)
+      end
+
+      def get_sampling_decision(string_input, rate, interval)
+        # SHA is consistent across machines
+        # and ruby invocations.  Same host and
+        # sampling ratio will always produce same decision.
+        # this is important because we get billed by host
+        # and we want all the passenger processes on a single
+        # host to make the same decision.
+        sha = Digest::SHA1.hexdigest(string_input)
+        sha_int = sha.to_i(16)
+        interval_point = sha_int % interval
+        threshold = rate * interval
+        interval_point <= threshold
       end
 
       def rate_sampler
@@ -79,19 +109,22 @@ module Canvas
           c.tracer sampler: sampler, debug: debug_mode
           c.use :rails
         end
+        Delayed::Worker.plugins << Canvas::Apm::InstJobs::Plugin
       end
 
       def configure_apm!
         self.enable_apm! if self.configured?
       end
 
-      def annotate_trace(shard, root_account)
+      def annotate_trace(shard, root_account, request_context_id, current_user)
         return unless self.configured?
         apm_root_span = Datadog.tracer.active_root_span
         return if apm_root_span.blank?
+        apm_root_span.set_tag('request_context_id', request_context_id.to_s) if request_context_id.present?
         apm_root_span.set_tag('shard', shard.id.to_s) if shard.try(:id).present?
         act_global_id = root_account.try(:global_id)
         apm_root_span.set_tag('root_account', act_global_id.to_s) if act_global_id.present?
+        apm_root_span.set_tag('current_user', current_user.global_id.to_s) if current_user
       end
     end
   end
