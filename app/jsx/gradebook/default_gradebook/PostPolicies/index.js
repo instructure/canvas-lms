@@ -21,8 +21,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import AssignmentPostingPolicyTray from '../../../grading/AssignmentPostingPolicyTray'
-import HideAssignmentGradesTray from '../../../grading/HideAssignmentGradesTray'
 import PostAssignmentGradesTray from '../../../grading/PostAssignmentGradesTray'
+import AsyncComponents from '../AsyncComponents'
 
 function getSubmission(student, assignmentId) {
   const submission = student[`assignment_${assignmentId}`] || {
@@ -50,12 +50,6 @@ export default class PostPolicies {
   }
 
   initialize() {
-    const $hideContainer = document.getElementById('hide-assignment-grades-tray')
-    const bindHideTray = ref => {
-      this._hideAssignmentGradesTray = ref
-    }
-    ReactDOM.render(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
-
     const $postContainer = document.getElementById('post-assignment-grades-tray')
     const bindPostTray = ref => {
       this._postAssignmentGradesTray = ref
@@ -123,12 +117,21 @@ export default class PostPolicies {
     })
   }
 
-  showHideAssignmentGradesTray({assignmentId, onExited}) {
+  async showHideAssignmentGradesTray({assignmentId, onExited}) {
     const assignment = this._gradebook.getAssignment(assignmentId)
     const {anonymous_grading, grades_published, id, name} = assignment
     const sections = this._gradebook.getSections()
 
-    this._hideAssignmentGradesTray.show({
+    const HideAssignmentGradesTray = await AsyncComponents.loadHideAssignmentGradesTray()
+
+    const $hideContainer = document.getElementById('hide-assignment-grades-tray')
+    let tray
+    const bindHideTray = ref => {
+      tray = ref
+    }
+    ReactDOM.render(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
+
+    tray.show({
       assignment: {
         anonymousGrading: anonymous_grading,
         gradesPublished: grades_published,
