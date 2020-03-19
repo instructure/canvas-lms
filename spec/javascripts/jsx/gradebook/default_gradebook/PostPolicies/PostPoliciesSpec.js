@@ -24,6 +24,7 @@ import {
 } from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import AsyncComponents from 'jsx/gradebook/default_gradebook/AsyncComponents'
 import HideAssignmentGradesTray from 'jsx/grading/HideAssignmentGradesTray'
+import PostAssignmentGradesTray from 'jsx/grading/PostAssignmentGradesTray'
 
 QUnit.module('Gradebook PostPolicies', suiteHooks => {
   let $container
@@ -51,14 +52,6 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
   }
 
   QUnit.module('#initialize()', () => {
-    test('renders the "Post Assignment Grades" tray', () => {
-      createPostPolicies()
-      postPolicies.initialize()
-      const $trayContainer = document.getElementById('post-assignment-grades-tray')
-      const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
-      strictEqual(unmounted, true)
-    })
-
     test('renders the assignment "Grade Posting Policy" tray', () => {
       createPostPolicies()
       postPolicies.initialize()
@@ -84,10 +77,13 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
     test('unmounts the "Post Assignment Grades" tray', () => {
       createPostPolicies()
       postPolicies.initialize()
+      sandbox.spy(ReactDOM, 'unmountComponentAtNode')
       postPolicies.destroy()
       const $trayContainer = document.getElementById('post-assignment-grades-tray')
-      const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
-      strictEqual(unmounted, false)
+      const unmounts = ReactDOM.unmountComponentAtNode
+        .getCalls()
+        .filter(call => call.args[0] === $trayContainer)
+      strictEqual(unmounts.length, 1)
     })
 
     test('unmounts the assignment "Grade Posting Policy" tray', () => {
@@ -290,50 +286,66 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       ])
 
       postPolicies.initialize()
-      sinon.stub(postPolicies._postAssignmentGradesTray, 'show')
+
+      sandbox
+        .stub(AsyncComponents, 'loadPostAssignmentGradesTray')
+        .returns(Promise.resolve(PostAssignmentGradesTray))
+      sandbox.stub(PostAssignmentGradesTray.prototype, 'show')
     })
 
-    test('shows the "Post Assignment Grades" tray', () => {
-      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      strictEqual(postPolicies._postAssignmentGradesTray.show.callCount, 1)
+    hooks.afterEach(() => {
+      const $trayContainer = document.getElementById('post-assignment-grades-tray')
+      ReactDOM.unmountComponentAtNode($trayContainer)
     })
 
-    test('includes the assignment id when showing the "Post Assignment Grades" tray', () => {
-      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+    test('renders the "Post Assignment Grades" tray', async () => {
+      await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const $trayContainer = document.getElementById('post-assignment-grades-tray')
+      const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
+      strictEqual(unmounted, true)
+    })
+
+    test('shows the "Post Assignment Grades" tray', async () => {
+      await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      strictEqual(PostAssignmentGradesTray.prototype.show.callCount, 1)
+    })
+
+    test('includes the assignment id when showing the "Post Assignment Grades" tray', async () => {
+      await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{assignment}] = PostAssignmentGradesTray.prototype.show.lastCall.args
       strictEqual(assignment.id, '2301')
     })
 
-    test('includes the assignment name when showing the "Post Assignment Grades" tray', () => {
-      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+    test('includes the assignment name when showing the "Post Assignment Grades" tray', async () => {
+      await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{assignment}] = PostAssignmentGradesTray.prototype.show.lastCall.args
       strictEqual(assignment.name, 'Math 1.1')
     })
 
-    test('includes the assignment anonymous_grading', () => {
-      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+    test('includes the assignment anonymous_grading', async () => {
+      await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{assignment}] = PostAssignmentGradesTray.prototype.show.lastCall.args
       strictEqual(assignment.anonymousGrading, false)
     })
 
-    test('includes the assignment grades_published', () => {
-      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+    test('includes the assignment grades_published', async () => {
+      await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{assignment}] = PostAssignmentGradesTray.prototype.show.lastCall.args
       strictEqual(assignment.gradesPublished, true)
     })
 
-    test('includes the sections', () => {
-      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      const [{sections}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+    test('includes the sections', async () => {
+      await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{sections}] = PostAssignmentGradesTray.prototype.show.lastCall.args
       deepEqual(sections, [
         {id: '2001', name: 'Hogwarts'},
         {id: '2002', name: 'Freshmen'}
       ])
     })
 
-    test('includes the submissions', () => {
-      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      const [{submissions}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+    test('includes the submissions', async () => {
+      await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{submissions}] = PostAssignmentGradesTray.prototype.show.lastCall.args
       deepEqual(submissions, [
         {
           hasPostableComments: true,
@@ -344,18 +356,18 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       ])
     })
 
-    test('the `onExited` callback is passed in onExited', () => {
+    test('the `onExited` callback is passed in onExited', async () => {
       const callback = sinon.stub()
-      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301', onExited: callback})
-      const [{onExited}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301', onExited: callback})
+      const [{onExited}] = PostAssignmentGradesTray.prototype.show.lastCall.args
       onExited()
       strictEqual(callback.callCount, 1)
     })
 
-    test('the `postAssignmentGradesTrayOpenChanged` callback is passed in onExited', () => {
+    test('the `postAssignmentGradesTrayOpenChanged` callback is passed in onExited', async () => {
       const trayOpenOrCloseStub = sinon.stub(gradebook, 'postAssignmentGradesTrayOpenChanged')
-      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      const [{onExited}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{onExited}] = PostAssignmentGradesTray.prototype.show.lastCall.args
       const existingCallCount = trayOpenOrCloseStub.callCount
       onExited()
       strictEqual(trayOpenOrCloseStub.callCount, existingCallCount + 1)
@@ -387,40 +399,40 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         handleSubmissionPostedChangeStub.restore()
       })
 
-      test('calls handleSubmissionPostedChange', () => {
-        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      test('calls handleSubmissionPostedChange', async () => {
+        await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const [{onPosted}] = PostAssignmentGradesTray.prototype.show.lastCall.args
         onPosted(postedOrHiddenInfo)
         strictEqual(handleSubmissionPostedChangeStub.callCount, 1)
       })
 
-      test('calls handleSubmissionPostedChange with the assignment', () => {
-        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      test('calls handleSubmissionPostedChange with the assignment', async () => {
+        await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const [{onPosted}] = PostAssignmentGradesTray.prototype.show.lastCall.args
         onPosted(postedOrHiddenInfo)
         strictEqual(handleSubmissionPostedChangeStub.firstCall.args[0].id, '2301')
       })
 
-      test('updates the assignment anonymize_students when posting for an anonymous assignment', () => {
+      test('updates the assignment anonymize_students when posting for an anonymous assignment', async () => {
         assignment = {...assignment, anonymize_students: true, anonymous_grading: true}
         gradebook.setAssignments({2301: assignment})
-        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+        await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const [{onPosted}] = PostAssignmentGradesTray.prototype.show.lastCall.args
         onPosted(postedOrHiddenInfo)
         strictEqual(gradebook.getAssignment('2301').anonymize_students, false)
       })
 
-      test('updates the posted_at of the submissions', () => {
-        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      test('updates the posted_at of the submissions', async () => {
+        await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const [{onPosted}] = PostAssignmentGradesTray.prototype.show.lastCall.args
         onPosted(postedOrHiddenInfo)
         deepEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
       })
 
-      test('ignores user IDs that do not match known students', () => {
+      test('ignores user IDs that do not match known students', async () => {
         postedOrHiddenInfo.userIds.push('9876')
-        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+        await postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const [{onPosted}] = PostAssignmentGradesTray.prototype.show.lastCall.args
         onPosted(postedOrHiddenInfo)
         ok('onPosted with nonexistent user should not throw an error')
       })
