@@ -219,7 +219,10 @@ require 'csv'
 #                 "admin",
 #                 "observer",
 #                 "unenrolled"
-#               ]
+#               ],
+#               "is_featured": true,
+#               "is_new": false,
+#               "feature_headline": "Check this out!"
 #             }
 #           ]
 #         },
@@ -236,7 +239,10 @@ require 'csv'
 #               "subtext": "Questions are submitted to your instructor",
 #               "url": "#teacher_feedback",
 #               "type": "default",
-#               "id": "instructor_question"
+#               "id": "instructor_question",
+#               "is_featured": false,
+#               "is_new": true,
+#               "feature_headline": ""
 #             },
 #             {
 #               "available_to": [
@@ -251,7 +257,10 @@ require 'csv'
 #               "subtext": "Find answers to common questions",
 #               "url": "http://community.canvaslms.com/community/answers/guides",
 #               "type": "default",
-#               "id": "search_the_canvas_guides"
+#               "id": "search_the_canvas_guides",
+#               "is_featured": false,
+#               "is_new": false,
+#               "feature_headline": ""
 #             },
 #             {
 #               "available_to": [
@@ -266,7 +275,10 @@ require 'csv'
 #               "subtext": "If Canvas misbehaves, tell us about it",
 #               "url": "#create_ticket",
 #               "type": "default",
-#               "id": "report_a_problem"
+#               "id": "report_a_problem",
+#               "is_featured": false,
+#               "is_new": false,
+#               "feature_headline": ""
 #             }
 #           ]
 #         }
@@ -887,7 +899,7 @@ class AccountsController < ApplicationController
           sorted_help_links.map! do |index_with_hash|
             hash = index_with_hash[1].to_hash.with_indifferent_access
             hash.delete('state')
-            hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type", "id"]
+            hash.assert_valid_keys %w[text subtext url available_to type id is_featured is_new feature_headline]
             hash
           end
           @account.settings[:custom_help_links] = @account.help_links_builder.process_links_before_save(sorted_help_links)

@@ -1854,4 +1854,31 @@ describe Account do
       expect(account_user2.reload.workflow_state).to eq 'deleted'
     end
   end
+
+  context 'custom help link validation' do
+    before do
+      account_model
+    end
+
+    it 'should be valid if custom help links are not present' do
+      @account.settings[:foo] = 'bar'
+      expect(@account.valid?).to be true
+    end
+
+    it 'should be valid if custom help links are valid' do
+      @account.settings[:custom_help_links] = [{ is_new: true, is_featured: false }, { is_new: false, is_featured: true }]
+      expect(@account.valid?).to be true
+    end
+
+    it 'should not be valid if custom help links are invalid' do
+      @account.settings[:custom_help_links] = [{ is_new: true, is_featured: true }]
+      expect(@account.valid?).to be false
+    end
+
+    it 'should not check custom help links if not changed' do
+      @account.update_attribute(:settings, [{ is_new: true, is_featured: true }]) # skips validation
+      @account.name = 'foo'
+      expect(@account.valid?).to be true
+    end
+  end
 end
