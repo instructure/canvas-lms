@@ -20,7 +20,6 @@ import tz from 'timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AssignmentPostingPolicyTray from '../../../grading/AssignmentPostingPolicyTray'
 import AsyncComponents from '../AsyncComponents'
 
 function getSubmission(student, assignmentId) {
@@ -46,17 +45,6 @@ export default class PostPolicies {
 
     this._onGradesPostedOrHidden = this._onGradesPostedOrHidden.bind(this)
     this._onAssignmentPostPolicyUpdated = this._onAssignmentPostPolicyUpdated.bind(this)
-  }
-
-  initialize() {
-    const $assignmentPolicyContainer = document.getElementById('assignment-posting-policy-tray')
-    const bindAssignmentPolicyTray = ref => {
-      this._assignmentPolicyTray = ref
-    }
-    ReactDOM.render(
-      <AssignmentPostingPolicyTray ref={bindAssignmentPolicyTray} />,
-      $assignmentPolicyContainer
-    )
   }
 
   destroy() {
@@ -92,11 +80,23 @@ export default class PostPolicies {
     this._gradebook.updateColumnHeaders([columnId])
   }
 
-  showAssignmentPostingPolicyTray({assignmentId, onExited}) {
+  async showAssignmentPostingPolicyTray({assignmentId, onExited}) {
     const assignment = this._gradebook.getAssignment(assignmentId)
     const {id, name} = assignment
 
-    this._assignmentPolicyTray.show({
+    const AssignmentPostingPolicyTray = await AsyncComponents.loadAssignmentPostingPolicyTray()
+
+    const $assignmentPolicyContainer = document.getElementById('assignment-posting-policy-tray')
+    let tray
+    const bindAssignmentPolicyTray = ref => {
+      tray = ref
+    }
+    ReactDOM.render(
+      <AssignmentPostingPolicyTray ref={bindAssignmentPolicyTray} />,
+      $assignmentPolicyContainer
+    )
+
+    tray.show({
       assignment: {
         anonymousGrading: assignment.anonymous_grading,
         gradesPublished: assignment.grades_published,

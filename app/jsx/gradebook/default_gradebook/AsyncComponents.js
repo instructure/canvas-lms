@@ -19,6 +19,10 @@
 import React from 'react'
 import {render} from 'react-dom'
 
+async function loadAssignmentPostingPolicyTray() {
+  return (await import('../../grading/AssignmentPostingPolicyTray')).default
+}
+
 async function loadCurveGradesDialog() {
   return (await import('compiled/shared/CurveGradesDialog')).default
 }
@@ -48,6 +52,7 @@ async function loadSetDefaultGradeDialog() {
 }
 
 const AsyncComponents = {
+  loadAssignmentPostingPolicyTray,
   loadCurveGradesDialog,
   loadGradeDetailTray,
   loadGradebookSettingsModal,

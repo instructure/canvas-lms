@@ -103,8 +103,6 @@ export default class DataLoader {
       gradebook.renderFilters()
     })
 
-    gradebook.postPolicies.initialize()
-
     /*
      * With post policies, the "total grade" column needs to be re-rendered
      * after loading students and submissions so we can indicate there are
