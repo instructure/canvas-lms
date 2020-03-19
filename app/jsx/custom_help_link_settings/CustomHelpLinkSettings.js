@@ -180,68 +180,93 @@ export default class CustomHelpLinkSettings extends React.Component {
   }
 
   add = link => {
-    const links = [...this.state.links]
-    const id = link.id || `link${this.nextLinkIndex(links)}`
+    const id = link.id || `link${this.nextLinkIndex(this.state.links)}`
+    this.setState(state => {
+      const links = [...state.links]
+      const hasFeatured = links[0]?.is_featured
+      let insertIndex = 0
+      if (hasFeatured) {
+        if (link.is_featured) {
+          links[0].is_featured = false
+        } else {
+          insertIndex = 1
+        }
+      }
+      links.splice(insertIndex, 0, {
+        ...link,
+        state: link.type === 'default' ? link.state : 'new',
+        id,
+        type: link.type || 'custom'
+      })
 
-    links.splice(0, 0, {
-      ...link,
-      state: link.type === 'default' ? link.state : 'new',
-      id,
-      type: link.type || 'custom'
-    })
-
-    this.setState(
-      {
+      return {
         links,
-        editing: link.type === 'default' ? this.state.editing : id
-      },
-      this.focus.bind(this, id)
-    )
+        editing: link.type === 'default' ? state.editing : id
+      }
+    }, this.focus.bind(this, id))
   }
 
-  update = link => {
-    const links = [...this.state.links]
+  update = savedLink => {
+    this.setState(state => {
+      const links = state.links.map(link => ({...link}))
 
-    links[link.index] = {
-      ...link,
-      state: link.text ? 'active' : link.state
-    }
+      if (savedLink.is_featured) {
+        links.forEach((link, ix) => {
+          if (ix !== savedLink.index) {
+            link.is_featured = false
+            link.feature_headline = null
+          }
+        })
+      }
 
-    this.setState(
-      {
+      if (savedLink.is_new) {
+        links.forEach((link, ix) => {
+          if (ix !== savedLink.index) {
+            link.is_new = false
+          }
+        })
+      }
+
+      links[savedLink.index] = {
+        ...savedLink,
+        state: savedLink.text ? 'active' : savedLink.state
+      }
+
+      if (savedLink.is_featured && savedLink.index !== 0) {
+        const removed = links.splice(savedLink.index, 1)
+        links.unshift(...removed)
+        $.screenReaderFlashMessage(I18n.t('The featured link was moved to the top of list.'))
+      }
+
+      return {
         links,
         editing: null
-      },
-      this.focus.bind(this, link.id, 'edit')
-    )
+      }
+    }, this.focus.bind(this, savedLink.id, 'edit'))
   }
 
   remove = link => {
-    const links = [...this.state.links]
-    const editing = this.state.editing
+    this.setState(state => {
+      const links = [...state.links]
+      const editing = state.editing
 
-    links.splice(link.index, 1)
+      links.splice(link.index, 1)
 
-    this.setState(
-      {
+      return {
         links,
         editing: editing === link.id ? null : editing
-      },
-      this.focus.bind(this, this.nextFocusable(link.index), 'remove')
-    )
+      }
+    }, this.focus.bind(this, this.nextFocusable(link.index), 'remove'))
   }
 
   move = (link, change, callback) => {
-    const links = [...this.state.links]
+    this.setState(state => {
+      const links = [...state.links]
 
-    links.splice(link.index + change, 0, links.splice(link.index, 1)[0])
+      links.splice(link.index + change, 0, links.splice(link.index, 1)[0])
 
-    this.setState(
-      {
-        links
-      },
-      callback
-    )
+      return {links}
+    }, callback)
   }
 
   validate = link => {
@@ -290,6 +315,9 @@ export default class CustomHelpLinkSettings extends React.Component {
   renderLink = link => {
     const {links} = this.state
     const {index, id} = link
+    const hasFeatured = links[0].is_featured
+    const canMoveUp = index > (hasFeatured ? 1 : 0)
+    const canMoveDown = (!hasFeatured || index > 0) && index !== links.length - 1
 
     return (
       <CustomHelpLink
@@ -298,8 +326,8 @@ export default class CustomHelpLinkSettings extends React.Component {
         }}
         key={id}
         link={link}
-        onMoveUp={index === 0 ? null : this.handleMoveUp}
-        onMoveDown={index === links.length - 1 ? null : this.handleMoveDown}
+        onMoveUp={canMoveUp ? this.handleMoveUp : null}
+        onMoveDown={canMoveDown ? this.handleMoveDown : null}
         onRemove={this.handleRemove}
         onEdit={this.handleEdit}
       />

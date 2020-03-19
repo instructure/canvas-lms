@@ -20,7 +20,19 @@ import React from 'react'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 
 export default function CustomHelpLinkHiddenInputs(props) {
-  const {text, url, subtext, available_to, type, index, state, id} = props.link
+  const {
+    text,
+    url,
+    subtext,
+    available_to,
+    type,
+    index,
+    state,
+    id,
+    is_featured,
+    is_new,
+    feature_headline
+  } = props.link
   const namePrefix = `account[custom_help_links][${index}]`
   return (
     <span>
@@ -34,6 +46,13 @@ export default function CustomHelpLinkHiddenInputs(props) {
         available_to.map(value => (
           <input type="hidden" key={value} name={`${namePrefix}[available_to][]`} value={value} />
         ))}
+      <input type="hidden" name={`${namePrefix}[is_featured]`} value={!!is_featured} />
+      <input type="hidden" name={`${namePrefix}[is_new]`} value={!!is_new} />
+      <input
+        type="hidden"
+        name={`${namePrefix}[feature_headline]`}
+        value={feature_headline || ''}
+      />
     </span>
   )
 }

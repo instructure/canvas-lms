@@ -22,6 +22,7 @@ import I18n from 'i18n!custom_help_link'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 import CustomHelpLinkHiddenInputs from './CustomHelpLinkHiddenInputs'
 import CustomHelpLinkAction from './CustomHelpLinkAction'
+import {Pill} from '@instructure/ui-elements'
 
 export default class CustomHelpLink extends React.Component {
   static propTypes = {
@@ -61,8 +62,21 @@ export default class CustomHelpLink extends React.Component {
   }
 
   focusable = () => {
-    const focusable = this.rootElement.querySelectorAll('button:not([disabled])')
-    return focusable[0]
+    const focusable = this.rootElement?.querySelectorAll('button:not([disabled])')
+    return focusable?.[0]
+  }
+
+  renderPill() {
+    if (!ENV?.FEATURES?.featured_help_links) {
+      return null
+    }
+    const {is_featured, is_new} = this.props.link
+    if (is_featured || is_new) {
+      const text = is_featured ? I18n.t('Featured') : I18n.t('New')
+      return <Pill variant="success" margin="0 small" text={text} />
+    } else {
+      return null
+    }
   }
 
   render() {
@@ -77,7 +91,10 @@ export default class CustomHelpLink extends React.Component {
           this.rootElement = c
         }}
       >
-        <div className="ic-Sortable-item__Text">{text}</div>
+        <div className="ic-Sortable-item__Text">
+          {text}
+          {this.renderPill()}
+        </div>
         <div className="ic-Sortable-item__Actions">
           <div className="ic-Sortable-sort-controls">
             <CustomHelpLinkAction
