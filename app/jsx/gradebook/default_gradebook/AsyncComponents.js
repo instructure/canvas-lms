@@ -39,6 +39,10 @@ async function loadMessageStudentsWhoDialog() {
   return (await import('../shared/MessageStudentsWhoDialog')).default
 }
 
+async function loadPostAssignmentGradesTray() {
+  return (await import('../../grading/PostAssignmentGradesTray')).default
+}
+
 async function loadSetDefaultGradeDialog() {
   return (await import('compiled/shared/SetDefaultGradeDialog')).default
 }
@@ -49,6 +53,7 @@ const AsyncComponents = {
   loadGradebookSettingsModal,
   loadHideAssignmentGradesTray,
   loadMessageStudentsWhoDialog,
+  loadPostAssignmentGradesTray,
   loadSetDefaultGradeDialog,
 
   async renderGradeDetailTray(props, $container) {
