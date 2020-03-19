@@ -9500,12 +9500,6 @@ QUnit.module('Gradebook', () => {
       test('attaches the Post Policies feature module to Gradebook', () => {
         ok(gradebook.postPolicies instanceof PostPolicies)
       })
-
-      test('initializes Post Policies when Gradebook initializes', () => {
-        sinon.spy(gradebook.postPolicies, 'initialize')
-        gradebook.initialize()
-        strictEqual(gradebook.postPolicies.initialize.callCount, 1)
-      })
     })
   })
 })
