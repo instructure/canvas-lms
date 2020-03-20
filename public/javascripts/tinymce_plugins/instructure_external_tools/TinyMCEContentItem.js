@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import {monitorLtiMessages} from '../../../javascripts/lti/messages'
 
 const LTI_MIME_TYPES = [
   'application/vnd.ims.lti.v1.ltilink',
@@ -215,5 +216,7 @@ TinyMCEContentItem.fromJSON = function(data) {
   const contentItem = ContentItem.fromJSON(data)
   return new TinyMCEContentItem(contentItem)
 }
+
+monitorLtiMessages()
 
 export default TinyMCEContentItem
