@@ -18,8 +18,13 @@
 
 @import 'base/environment';
 
-.ic-Layout-wrapper {
+body:not(.responsive_2020_03) .ic-Layout-wrapper {
   min-width: 1100px;
+}
+body.responsive_2020_03 .ic-Layout-wrapper {
+  @include desktop-only {
+    min-width: 1100px;
+  }
 }
 .term .edit_term {
   display: none;
@@ -40,6 +45,9 @@
   font-size: 1.2em;
   padding-#{direction(right)}: 20px;
 }
+body.responsive_2020_03 #terms .term td.header {
+  word-wrap: break-word;
+}
 .term .permissions {
   font-size: 0.8em;
 }
@@ -47,12 +55,40 @@
   border-collapse: collapse;
   width: 100%;
 }
+body.responsive_2020_03 #terms {
+  @include mobile-only {
+    display: block;
+  }
+}
+@include mobile-only {
+  body.responsive_2020_03 #terms > tbody {
+    display: block;
+  }
+  body.responsive_2020_03 #terms > tbody > tr.term > td {
+    display: block;
+  }
+  body.responsive_2020_03 td.permissions > table > tbody > tr > td:not(.edit_term_buttons) {
+    display: block;
+  }
+  body.responsive_2020_03 td.permissions > table > tbody > tr > td:first-child {
+    display: inline-block;
+  }
+}
 #terms td {
   vertical-align: top;
 }
-#terms td.header, #terms td.permissions, #terms td.links {
+body:not(.responsive_2020_03) #terms td.header,
+body:not(.responsive_2020_03) #terms td.permissions,
+body:not(.responsive_2020_03) #terms td.links {
   border-bottom: 1px solid #aaa;
   padding: 2px 0;
+}
+body.responsive_2020_03 #terms > tbody > tr.term {
+  border-bottom: 1px solid #aaa;
+  padding: 2px 0;
+  @include mobile-only {
+    display: block;
+  }
 }
 #terms td.links {
   padding-#{direction(left)}: 5px;
