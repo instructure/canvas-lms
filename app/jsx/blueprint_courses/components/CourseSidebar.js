@@ -49,6 +49,7 @@ export default class CourseSidebar extends Component {
     associations: propTypes.courseList.isRequired,
     migrationStatus: propTypes.migrationState,
     canManageCourse: PropTypes.bool.isRequired,
+    canAutoPublishCourses: PropTypes.bool.isRequired,
     hasLoadedAssociations: PropTypes.bool.isRequired,
     hasAssociationChanges: PropTypes.bool.isRequired,
     willAddAssociations: PropTypes.bool.isRequired,
@@ -111,6 +112,7 @@ export default class CourseSidebar extends Component {
         hasChanges: this.props.hasAssociationChanges,
         isSaving: this.props.isSavingAssociations,
         onSave: this.props.saveAssociations,
+        canAutoPublishCourses: this.props.canAutoPublishCourses,
         willAddAssociations: this.props.willAddAssociations,
         willPublishCourses: this.props.willPublishCourses,
         enablePublishCourses: this.props.enablePublishCourses,
@@ -387,6 +389,8 @@ const connectState = state =>
   Object.assign(
     select(state, [
       'canManageCourse',
+      'canAutoPublishCourses',
+      'willPublishCourses',
       'hasLoadedAssociations',
       'isLoadingBeginMigration',
       'isSavingAssociations',

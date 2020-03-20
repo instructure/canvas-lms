@@ -65,6 +65,7 @@ export default combineReducers({
   isMasterCourse: identity(),
   isChildCourse: identity(),
   canManageCourse: identity(),
+  canAutoPublishCourses: identity(),
   accountId: identity(),
   terms: identity([]),
   subAccounts: identity([]),

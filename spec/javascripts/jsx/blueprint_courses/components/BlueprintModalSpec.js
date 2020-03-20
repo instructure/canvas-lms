@@ -58,7 +58,8 @@ test('renders the Checkbox, Save, and Cancel buttons when there are changes', ()
   const props = {
     ...defaultProps(),
     hasChanges: true,
-    willAddAssociations: true
+    willAddAssociations: true,
+    canAutoPublishCourses: true
   }
   const wrapper = enzyme.shallow(render(props))
   const buttons = wrapper.find('ModalFooter').find('Button')

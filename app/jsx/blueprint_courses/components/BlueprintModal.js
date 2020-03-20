@@ -37,6 +37,7 @@ export default class BlueprintModal extends Component {
     isSaving: PropTypes.bool,
     saveButton: PropTypes.element,
     wide: PropTypes.bool,
+    canAutoPublishCourses: PropTypes.bool,
     willAddAssociations: PropTypes.bool,
     willPublishCourses: PropTypes.bool,
     enablePublishCourses: PropTypes.func
@@ -109,7 +110,7 @@ export default class BlueprintModal extends Component {
         <Modal.Footer ref={c => (this.footer = c)}>
           {this.props.hasChanges && !this.props.isSaving ? (
             <Flex alignItems="center">
-              {this.props.willAddAssociations && (
+              {this.props.canAutoPublishCourses && this.props.willAddAssociations && (
                 <Flex.Item margin="0 x-small 0 0">
                   <Checkbox
                     label={I18n.t('Publish upon association')}
