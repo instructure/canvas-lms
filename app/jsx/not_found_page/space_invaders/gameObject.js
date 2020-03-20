@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2020 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,21 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import OfficialNotFoundGame from './frogger/OfficialNotFoundGame'
-import SpaceInvaders from './space_invaders/SpaceInvaders'
-
-export const renderGameApp = domElement => {
-  const AppRootElement = document.getElementById(domElement)
-  const rng = Math.random()
-  if (ENV.KILL_JOY === 'true' || rng < 0.25) {
-    ReactDOM.render(<OfficialNotFoundGame />, AppRootElement)
-  } else {
-    ReactDOM.render(<SpaceInvaders />, AppRootElement)
+export default class MovingGameObject {
+  constructor(gameImage, x, y, speed, points) {
+    this.img = gameImage
+    this.position = {
+      x,
+      y
+    }
+    this.speed = speed
+    this.points = points
   }
-}
 
-export const renderGameIntoDom = domElement => {
-  renderGameApp(domElement)
+  canCollide() {
+    return this.position.y >= 0 - this.img.height / 2
+  }
+
+  getPoints() {
+    return this.points
+  }
+
+  getBoundBox() {
+    return {
+      x: this.position.x,
+      y: this.position.y,
+      width: this.img.width,
+      height: this.img.height
+    }
+  }
+
+  update(ctx) {
+    this.position.y += this.speed
+    ctx.drawImage(this.img, this.position.x, this.position.y)
+  }
 }

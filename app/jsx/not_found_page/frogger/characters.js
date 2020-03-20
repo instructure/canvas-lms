@@ -47,8 +47,8 @@ export class Character {
   }
 
   move = (dx, dy) => {
-    this.x = this.x + dx
-    this.y = this.y + dy
+    this.x += dx
+    this.y += dy
   }
 
   draw = ctx => {
@@ -72,9 +72,9 @@ export class Obstacle extends Character {
 
   move = () => {
     if (this.goingLeft) {
-      this.x = this.x - this.speed
+      this.x -= this.speed
     } else {
-      this.x = this.x + this.speed
+      this.x += this.speed
     }
   }
 }
@@ -93,9 +93,9 @@ export class GoalObject extends Character {
 
   move = () => {
     if (this.goingLeft) {
-      this.x = this.x - this.speed
+      this.x -= this.speed
     } else {
-      this.x = this.x + this.speed
+      this.x += this.speed
     }
   }
 }

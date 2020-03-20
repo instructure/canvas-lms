@@ -181,7 +181,8 @@ class ApplicationController < ActionController::Base
             responsive_2020_04: !!@domain_root_account&.feature_enabled?(:responsive_2020_04),
             product_tours: !!@domain_root_account&.feature_enabled?(:product_tours),
             module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd)
-          }
+          },
+          KILL_JOY: Setting.get('kill_joy', false)
         }
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
         @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
