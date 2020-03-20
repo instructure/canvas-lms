@@ -172,7 +172,6 @@ class ApplicationController < ActionController::Base
             show_feedback_link: show_feedback_link?
           },
           FEATURES: {
-            assignment_attempts: Account.site_admin.feature_enabled?(:assignment_attempts),
             assignment_bulk_edit: Account.site_admin.feature_enabled?(:assignment_bulk_edit),
             la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
             cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),

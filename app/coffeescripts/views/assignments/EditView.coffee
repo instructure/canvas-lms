@@ -407,7 +407,7 @@ export default class EditView extends ValidatedFormView
 
     _.extend data,
       use_rce_enhancements: ENV?.use_rce_enhancements
-      assignment_attempts: ENV?.FEATURES?.assignment_attempts
+      assignment_attempts: ENV?.assignment_attempts_enabled
       kalturaEnabled: ENV?.KALTURA_ENABLED or false
       postToSISEnabled: ENV?.POST_TO_SIS or false
       postToSISName: ENV.SIS_NAME
@@ -713,7 +713,7 @@ export default class EditView extends ValidatedFormView
     errors
 
   _validateAllowedAttempts: (data, errors) =>
-    return errors unless ENV?.FEATURES?.assignment_attempts
+    return errors unless ENV?.assignment_attempts_enabled
     return errors if @lockedItems.settings # field will be disabled and not submitted
     value = parseInt(data.allowed_attempts, 10)
     unless value > 0 || value == -1
@@ -819,7 +819,7 @@ export default class EditView extends ValidatedFormView
     ReactDOM.render(formFieldGroup, mountPoint)
 
   renderAllowedAttempts: ->
-    return if !ENV?.FEATURES?.assignment_attempts
+    return if !ENV?.assignment_attempts_enabled
     props = {
       limited: @model.get('allowed_attempts') > 0
       attempts: @model.get('allowed_attempts')

@@ -24,6 +24,7 @@
 <% provide :right_side, render(:partial => 'shared/wiki_sidebar') %>
 
 <%
+  js_env :assignment_attempts_enabled => @context.feature_enabled?(:assignment_attempts)
   css_bundle :assignments, :assignments_edit, :tinymce
   js_bundle :assignment_edit
 %>
