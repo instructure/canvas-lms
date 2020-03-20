@@ -199,13 +199,15 @@ module Canvas::Oauth
       end
 
       it 'puts real_user in the json when masquerading' do
-        real_user = User.new
+        real_user = User.create!
         allow(token).to receive(:real_user).and_return(real_user)
         expect(json['real_user']).to eq({
           'id' => real_user.id,
           'name' => real_user.name,
           'global_id' => real_user.global_id.to_s
         })
+        expect(real_user.access_tokens.count).to eq 1
+        expect(user.access_tokens.count).to eq 0
       end
 
       it 'does not put real_user in the json when not masquerading' do
