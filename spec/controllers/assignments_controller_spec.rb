@@ -856,7 +856,7 @@ describe AssignmentsController do
           it "includes the gradebook settings student group id if the group is valid for this assignment" do
             first_group_id = @course.groups.first.id.to_s
             @teacher.preferences[:gradebook_settings] = {
-              @course.id => {
+              @course.global_id => {
                 'filter_rows_by' => {
                   'student_group_id' => first_group_id
                 }
@@ -868,7 +868,7 @@ describe AssignmentsController do
 
           it "does not set selected_student_group_id if the selected group is not eligible for this assignment" do
             @teacher.preferences[:gradebook_settings] = {
-              @course.id => {
+              @course.global_id => {
                 'filter_rows_by' => {
                   'student_group_id' => @course.groups.first.id.to_s
                 }
@@ -911,7 +911,7 @@ describe AssignmentsController do
             @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
             first_group_id = @course.groups.first.id.to_s
             @teacher.preferences[:gradebook_settings] = {
-              @course.id => {
+              @course.global_id => {
                 'filter_rows_by' => {
                   'student_group_id' => first_group_id
                 }
