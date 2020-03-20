@@ -278,9 +278,12 @@ $(document).ready(function() {
         url: $(this).attr('action'),
         success(data) {
           submitting = true
-          window.location = window.location.href
-            .replace(/\#$/g, '')
-            .replace(window.location.hash, '')
+          const url = new URL(window.location.href)
+          url.hash = ''
+          if (window.ENV.CONFETTI_ENABLED && !data?.submission?.late) {
+            url.searchParams.set('confetti', 'true')
+          }
+          window.location = url.toString()
         },
         error(data) {
           submissionForm

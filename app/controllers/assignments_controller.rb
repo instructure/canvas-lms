@@ -262,7 +262,8 @@ class AssignmentsController < ApplicationController
           EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
           PERMISSIONS: permissions,
           ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
-          SIMILARITY_PLEDGE: @similarity_pledge
+          SIMILARITY_PLEDGE: @similarity_pledge,
+          CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
         })
 
         set_master_course_js_env_data(@assignment, @context)

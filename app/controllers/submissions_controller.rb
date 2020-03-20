@@ -274,7 +274,7 @@ class SubmissionsController < SubmissionsBaseController
         log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
         format.html do
           flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
-          if @submission.past_due? || !@domain_root_account&.feature_enabled?(:confetti_for_assignments)
+          if @submission.late? || !@domain_root_account&.feature_enabled?(:confetti_for_assignments)
             redirect_to course_assignment_url(@context, @assignment)
           else
             redirect_to course_assignment_url(@context, @assignment, :confetti => true)
@@ -288,7 +288,7 @@ class SubmissionsController < SubmissionsBaseController
               status: :created,
               location: api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
           else
-            render :json => @submission.as_json(:include => :submission_comments), :status => :created,
+            render :json => @submission.as_json(:include => :submission_comments, :methods => :late), :status => :created,
               :location => course_gradebook_url(@submission.assignment.context)
           end
         end
