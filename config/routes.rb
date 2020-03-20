@@ -1112,6 +1112,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :course_audit_api) do
       get 'audit/course/courses/:course_id', action: :for_course, as: 'audit_course_for_course'
+      get 'audit/course/accounts/:account_id', action: :for_account, as: 'audit_course_for_account'
     end
 
     scope(controller: :assignment_overrides) do
