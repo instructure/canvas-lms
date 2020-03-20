@@ -24,7 +24,7 @@ assignments_2_teacher:
       state: disabled
 assignment_attempts:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: Course
   display_name: Assignment Allowed Attempts
   description: Allow a teacher to set the number of allowed attempts on an assignment via the UI
 bookmarking_for_enrollments_index:
