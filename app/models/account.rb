@@ -1580,7 +1580,8 @@ class Account < ActiveRecord::Base
     else
       help_links_builder.default_links + (links || [])
     end
-    help_links_builder.instantiate_links(result)
+    filtered_result = help_links_builder.filtered_links(result)
+    help_links_builder.instantiate_links(filtered_result)
   end
 
   def help_links_builder
