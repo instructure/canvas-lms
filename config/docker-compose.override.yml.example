@@ -38,7 +38,6 @@ services:
       - quizzes_node_modules:/usr/src/app/client_apps/canvas_quizzes/node_modules
       - quizzes_tmp:/usr/src/app/client_apps/canvas_quizzes/tmp
       - reports:/usr/src/app/reports
-      - selinimum_node_modules:/usr/src/app/gems/selinimum/node_modules
       - styleguide:/usr/src/app/app/views/info
       - tmp:/usr/src/app/tmp
       - translations:/usr/src/app/public/javascripts/translations
@@ -106,7 +105,6 @@ volumes:
   quizzes_node_modules: {}
   quizzes_tmp: {}
   reports: {}
-  selinimum_node_modules: {}
   styleguide: {}
   tmp: {}
   translations: {}

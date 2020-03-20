@@ -10,7 +10,6 @@
   "workspaces": {
     "packages": [
       "gems/canvas_i18nliner",
-      "gems/selinimum",
       "gems/plugins/*",
       "packages/*",
       "client_apps/*"

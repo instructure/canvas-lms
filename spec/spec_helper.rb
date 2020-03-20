@@ -437,36 +437,6 @@ RSpec.configure do |config|
     allow(AttachmentFu::Backends::S3Backend).to receive(:load_s3_config) { StubS3::AWS_CONFIG.dup }
   end
 
-  # this runs on post-merge builds to capture dependencies of each spec;
-  # we then use that data to run just the bare minimum subset of selenium
-  # specs on the patchset builds
-  if ENV["SELINIMUM_CAPTURE"]
-    require "selinimum"
-    require "selinimum/capture"
-
-    config.before :suite do
-      Selinimum::Capture.install!
-    end
-
-    config.prepend_before :all do |group|
-      # ensure these constants get reloaded, otherwise you get the dreaded
-      # `A copy of #{from_mod} has been removed from the module tree but is still active!`
-      BroadcastPolicy.reset_notifiers!
-
-      Selinimum::Capture.current_group = group.class
-    end
-
-    config.around :each do |example|
-      Selinimum::Capture.with_example(example) do
-        example.run
-      end
-    end
-
-    config.after :suite do
-      Selinimum::Capture.report!(ENV["SELINIMUM_BATCH_NAME"])
-    end
-  end
-
   # flush redis before the first spec, and before each spec that comes after
   # one that used redis
   module TrackRedisUsage

@@ -13138,7 +13138,7 @@ jquery@2.x, jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github
   version "1.7.2"
   resolved "https://github.com/ryankshaw/jquery.git#3a48a84c713291b790a2556d9ba036ec4d53c52f"
 
-js-base64@^2.1.8, js-base64@^2.1.9, js-base64@^2.4.3:
+js-base64@^2.1.8, js-base64@^2.1.9:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.5.1.tgz#1efa39ef2c5f7980bb1784ade4a8af2de3291121"
   integrity sha512-M7kLczedRMYX4L8Mdh4MzyAMM9O5osx+4FcOQuTvr3A9F2D9S5JXheN0ewNbrvK2UatkTRhL5ejGmGSjNMiZuw==
@@ -18727,16 +18727,6 @@ sass-graph@^2.2.4:
     scss-tokenizer "^0.2.3"
     yargs "^7.0.0"
 
-sass-graph@^3:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/sass-graph/-/sass-graph-3.0.4.tgz#4fce0fe917f310adc781e74caf4962f89ef9509f"
-  integrity sha512-Dbl2+sbnAOtRgLjRK9aj6zZS+rYdrmJ7Zwu+WzF0beWgk3ZaT0JPIzNHhRox//ekhdi1W6m55ufLnHZbziMsgQ==
-  dependencies:
-    glob "^7.0.0"
-    lodash "^4.17.11"
-    scss-tokenizer "^0.3.0"
-    yargs "^12.0.2"
-
 sax@>=0.6.0, sax@^1.1.4, sax@^1.2.4, sax@~1.2.1, sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
@@ -18816,14 +18806,6 @@ scss-tokenizer@^0.2.3:
   dependencies:
     js-base64 "^2.1.8"
     source-map "^0.4.2"
-
-scss-tokenizer@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/scss-tokenizer/-/scss-tokenizer-0.3.0.tgz#ef7edc3bc438b25cd6ffacf1aa5b9ad5813bf260"
-  integrity sha512-14Zl9GcbBvOT9057ZKjpz5yPOyUWG2ojd9D5io28wHRYsOrs7U95Q+KNL87+32p8rc+LvDpbu/i9ZYjM9Q+FsQ==
-  dependencies:
-    js-base64 "^2.4.3"
-    source-map "^0.7.1"
 
 seekout@^1.0.1:
   version "1.0.2"
@@ -19344,11 +19326,6 @@ source-map@^0.6.0, source-map@^0.6.1, source-map@~0.6.0, source-map@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
-
-source-map@^0.7.1:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
-  integrity sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
 
 sparkles@^1.0.0:
   version "1.0.1"
@@ -22061,7 +22038,7 @@ yargs-unparser@1.6.0:
     lodash "^4.17.15"
     yargs "^13.3.0"
 
-yargs@12.0.5, yargs@^12.0.2, yargs@^12.0.5:
+yargs@12.0.5, yargs@^12.0.5:
   version "12.0.5"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-12.0.5.tgz#05f5997b609647b64f66b81e3b4b10a368e7ad13"
   integrity sha512-Lhz8TLaYnxq/2ObqHDql8dX8CJi97oHxrjUcYtzKbbykPtVW9WB+poxI+NM2UIzsMgNCZTIf0AQwsjK5yMAqZw==
