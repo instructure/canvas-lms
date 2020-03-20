@@ -42,6 +42,7 @@ describe Auditors::Course do
     it "should include event" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
       expect(Auditors::Course.for_course(@course).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::Course.for_account(@course.account).paginate(:per_page => 5)).to include(@event)
     end
 
     it "should set request_id" do
@@ -172,12 +173,20 @@ describe Auditors::Course do
       page = Auditors::Course.for_course(@course, oldest: 12.hours.ago).paginate(:per_page => 2)
       expect(page).to include(@event)
       expect(page).not_to include(@event2)
+
+      acct_page = Auditors::Course.for_account(@course.account, oldest: 12.hours.ago).paginate(:per_page => 2)
+      expect(acct_page).to include(@event)
+      expect(acct_page).not_to include(@event2)
     end
 
     it "should recognize :newest" do
       page = Auditors::Course.for_course(@course, newest: 12.hours.ago).paginate(:per_page => 2)
       expect(page).to include(@event2)
       expect(page).not_to include(@event)
+
+      acct_page = Auditors::Course.for_account(@course.account, newest: 12.hours.ago).paginate(:per_page => 2)
+      expect(acct_page).to include(@event2)
+      expect(acct_page).not_to include(@event)
     end
   end
 end

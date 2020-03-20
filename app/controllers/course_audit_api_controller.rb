@@ -192,6 +192,28 @@ class CourseAuditApiController < AuditorApiController
     end
   end
 
+  # @API Query by account.
+  #
+  # List course change events for a given account.
+  #
+  # @argument start_time [DateTime]
+  #   The beginning of the time range from which you want events.
+  #
+  # @argument end_time [DateTime]
+  #   The end of the time range from which you want events.
+  #
+  # @returns [CourseEvent]
+  #
+  def for_account
+    @account = api_find(Account.active, params[:account_id])
+    if authorize
+      events = Auditors::Course.for_account(@account, query_options)
+      render_events(events, api_v1_audit_course_for_account_url(@account))
+    else
+      render_unauthorized_action
+    end
+  end
+
   private
 
   def authorize
