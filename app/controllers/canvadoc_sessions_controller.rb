@@ -58,6 +58,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:assignment_id] = assignment.id
         opts[:post_manually] = assignment.post_manually?
         opts[:posted_at] = submission.posted_at
+        opts[:assignment_name] = assignment.name
 
         opts[:audit_url] = submission_docviewer_audit_events_url(submission_id) if assignment.auditable?
         opts[:anonymous_instructor_annotations] = !!blob["anonymous_instructor_annotations"] if blob["anonymous_instructor_annotations"]
