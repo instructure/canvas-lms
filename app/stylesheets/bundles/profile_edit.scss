@@ -124,6 +124,27 @@ li[id$=service_google_docs] {
   }
 }
 
+.services-cell {
+  @include desktop-only {
+    & {
+      vertical-align: top;
+      width: 50%;
+    }
+    &:first-of-type {
+      padding-#{direction(right)}: 20px;
+    }
+    &:last-of-type {
+      padding-#{direction(left)}: 20px;
+    }
+  }
+  @include mobile-only {
+    & {
+      width: 100%;
+      display: inline-block;
+    }
+  }
+}
+
 .profile_pic_list {
   .img {
     cursor: pointer;
