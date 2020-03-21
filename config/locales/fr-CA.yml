@@ -390,6 +390,7 @@ fr-CA:
   account_id_2c3b4f15: "identité du compte"
   account_id_73966078: account_id
   account_id_f6e26867: "ID de compte"
+  account_level_notification_preferences_require_an__66467cd7: "Les préférences de notification au niveau du compte nécessitent une account_id mise à jour"
   account_level_settings_manage_4fca6f8e: "Définitions de niveau du compte - gestion"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nom du compte"
@@ -1860,6 +1861,7 @@ fr-CA:
       threshold_should_be_numeric: "Le nombre indiqué doit être positif"
   alerts_add_edit_delete_d71091c6: "Alertes- ajouter/modifier/supprimer"
   alerts_course_settings_53551794: "Alertes (paramètres de cours)"
+  align_outcomes_to_this_page_7d055196: "Aligner les acquis au questionnaire"
   all_4321c3a1: Tous
   all_account_types_e83c1516: "Tous les types de compte"
   all_accounts_3bafc860: "Tous les comptes"
@@ -2285,6 +2287,9 @@ fr-CA:
   allows_users_to_edit_conferences_2d3c960c: "Permet aux utilisateurs de modifier les conférences."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Permet aux utilisateurs d'activer l'option « Lancer SpeedGrader filtré par groupe d'étudiants » pour les cours sur la page des paramètres du cours. Lorsqu'il est actif et qu'un groupe d'étudiants a été sélectionné dans le nouveau Carnet de notes, SpeedGrader ne chargera que les étudiants dans le groupe sélectionné."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Permet aux utilisateurs de couper le son des notifications sur une granularité au niveau du cours."
+  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+      Permet aux utilisateurs de surclasser des préférences de notification spécifiques à un
+      cours sur une base de cours.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Permet aux utilisateurs de choisir les pronoms qui seront affichés après leur nom lorsqu'il est affiché dans l'interface utilisateur."
   allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
       Permet aux utilisateurs de choisir les pronoms qui seront affichés après
@@ -2805,8 +2810,8 @@ fr-CA:
   assignment_menu_91fe3716: "Menu de la tâche"
   assignment_missing_assignment_name_in_course_code_7f940b35: "Tâche manquante : %{assignment_name} dans %{course_code}"
   assignment_missing_assignment_name_in_course_name_680a8338: "Tâche manquante : %{assignment_name} dans %{course_name}"
-  assignment_muted_4cb590a4: "Tâche silencieux"
-  assignment_muted_8d74bfa0: "Tâche mise en sourdine"
+  assignment_muted_4cb590a4: "Tâche mise en veilleuse"
+  assignment_muted_8d74bfa0: "Tâche mise en veilleuse"
   assignment_muter: 
     mute_assignment: "Tâche silencieuse"
     muting_assignment: "Tâche en mode silencieux..."
@@ -4412,6 +4417,7 @@ fr-CA:
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Impossible de définir sis_account_id sur un root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Ne peut pas définir la date d’échéance à une date au cours d'une période de notation fermée"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Impossible d'afficher des rapports détaillés pour les tâches anonymes jusqu'à ce que les notes des tâches soient activées."
+  cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Impossible d’afficher les rapports détaillés pour les tâches anonymes jusqu’à ce que les notes soient affichées."
   canvas: 
     migration: 
       errors: 
@@ -6135,6 +6141,8 @@ fr-CA:
   course_image_settings_eba3ec55: "Paramètres de l'image du cours"
   course_implemented_apps_fa658f5a: "Applications mises en œuvre en cours"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Le cours est déjà associé à un modèle"
+  course_level_notification_preferences_require_a_co_2f0a618: "Les préférences de notification de niveau de cours nécessitent une course_id mise à jour"
+  course_level_overrides_for_notification_preference_e86d1725: "Le niveau du cours surclasse les préférences de notification"
   course_list: 
     favorited_tooltip: "Cliquez pour retirer cet élément du menu des cours."
     nonfavorited_tooltip: "Cliquez pour ajouter cet élément dans le menu des cours."
@@ -6217,6 +6225,9 @@ fr-CA:
   course_name_successfully_added_48116a50: "%{course_name} a été ajouté."
   course_navigation_dd035109: "Navigation du cours"
   course_not_found_c248a721: "Cours introuvable"
+  course_notification_settings_d9821d36: "Paramètres de notification du cours"
+  course_notification_settings_error_page_c0512c17: "Page d’erreur des paramètres de notification de cours"
+  course_notification_settings_initial_query_error_6dfb24ef: "Erreur de requête initiale des paramètres de notification de cours"
   course_option_links_a79d263d: "Liens des options du cours"
   course_outcomes_7dc1cbc7: "Résultats du cours"
   course_pages_449f1dd4: "Pages du cours"
@@ -7464,6 +7475,7 @@ fr-CA:
   disable_a5c05db3: Désactiver
   disable_all_read_only_scopes_f9ffdd28: "Désactiver toutes les zones de lecture seule."
   disable_and_lock_7d0ef0e8: "Désactiver et verrouiller"
+  disable_celebrations_description: "L’activation de cette fonctionnalité masque toutes les animations de célébration."
   disable_content_security_policy_8660a787: "Désactiver la politique de sécurité du contenu"
   disable_extra_filter_options_1d1cdc02: "désactiver les options de filtre supplémentaires"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Désactivez les cases à cocher « Importation et migration du nouveau questionnaire », en les activant par défaut"
@@ -7478,6 +7490,9 @@ fr-CA:
   disabled_links_b3bdea99: "Liens désactivés"
   disabled_not_visible_to_students_2c9d693f: "Désactivé. Non visible pour les étudiants."
   disabled_not_visible_to_students_48d4a90d: "Désactivé. Non visible pour les étudiants"
+  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+      Désactive les notifications SMS pour tous les types, à l’exception des annonces et
+      des changements de note.
   disabling_f594bda: "Désactivation en cours..."
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "La désactivation de « Publier à SIS » (Post to SIS) n'est pas disponible pour les cours non publiés"
   disabling_sync_to_name_failed_e7521ebb: "Échec de la désactivation de la synchronisation pour %{name}"
@@ -8163,6 +8178,7 @@ fr-CA:
       dates butoir fixes. Les tâches peuvent être filtrés par ces périodes de notation dans le relevé de notes.
   enable_new_gradebook_history_page_e0fd9d02: "Activer la nouvelle page d’historique du carnet de notes."
   enable_new_sis_integration_settings_ab6780a4: "Activer nouveaux paramètres d’intégration SIS"
+  enable_notifications_10a4bf44: "Activer les notifications"
   enable_reregistration_for_lti_2_b2a10444: "Activer la réinscription pour LTI 2"
   enable_scope_ac28b832: "Activer la portée"
   enable_student_context_card_links_eba2f2c5: "Activer les liens de carte de contexte de l’étudiant"
@@ -8791,6 +8807,7 @@ fr-CA:
   failed_to_save_please_try_again_later_bb7070fb: "Échec de l’enregistrement. Veuillez réessayer ultérieurement."
   failed_to_submit_draft_comment_1de83451: "Échec d'envoi de l'ébauche du commentaire"
   failed_to_unpin_discussion_503eab82: "Impossible d’ôter l’épingle de la discussion"
+  failed_to_update_course_notification_settings_cbf0eb18: "Échec de la mise à jour des paramètres de notification de cours"
   failed_to_update_discussion_23cc229a: "Impossible de mettre à jour la discussion"
   failed_to_update_permission_33c493f: "Échec de mise à jour des autorisations"
   failed_to_update_role_name_8c7b0119: "Échec de mise à jour de nom de rôle"
@@ -8835,6 +8852,7 @@ fr-CA:
     canvas_parent_display_name: "Canvas Parent"
     google_docs_domain_restriction: "Restriction de domaine pour Google Docs"
     gradebook_list_students_by_sortable_name: "Relevé de notes – Liste des étudiants triée par nom"
+    hide_celebrations: "Désactiver les animations de célébration"
     high_contrast: "IU à contraste élevé"
     k12: "Fonctionnalités spécifiques de la maternelle à la 12e année (K-12)"
     learning_mastery_gradebook: "Relevé de notes pour la maîtrise de l’apprentissage"
@@ -9434,6 +9452,22 @@ fr-CA:
       options: Options
       switch_to_percent: "Passer en pourcentage"
       switch_to_points: "Passer en points"
+  gradebookGradeDisplayWarningDialog: 
+    grade_display_warning: 
+      cancel: Annuler
+      continue: Continuer
+      percent_text: "Les étudiants verront également leurs notes finales en tant que pourcentage. Êtes-vous certain de vouloir continuer?"
+      points_text: "Les étudiants verront également leurs notes finales comme des points. Êtes-vous certain de vouloir continuer?"
+  gradebookGradebookKeyboardNav: 
+    keyboard_assignment_desc: "Accéder à la page détaillée des tâches en cours"
+    keyboard_close_menu: "Fermer le menu actif en cours"
+    keyboard_menu_desc: "Ouvrir le menu pour la colonne active"
+    keyboard_sort_desc: "Trier la grille en fonction de la colonne active"
+    keycodes: 
+      close_menu: Échap
+      goto_assignment: g
+      menu: m
+      sort: s
   gradebookHeaderFilterView: 
     course_average: "Moyenne du cours"
     course_median: "Médiane du cours"
@@ -9938,6 +9972,7 @@ fr-CA:
       grading_scheme_info: "Afficher/Modifier le système de notation"
   grading_standards_b73bfa72: "Critères de notation"
   grading_type_type_7d8b42d7: "Type de notation : %{type}"
+  granular_course_notification_settings_will_be_conf_68f122db: "Les paramètres de notification de parcours granulaire seront configurables ici à l’avenir."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Autorisations granulaires pour la gestion de pages Wiki"
   graph_bar_b5daa23d: Histogramme
   graph_of_grades_for_each_assignment_4c44d4d1: "Graphique des notes pour chaque tâche"
@@ -9950,6 +9985,7 @@ fr-CA:
   graphql_mutation_log_25acc923: "Journal de mutation GraphQL"
   graphs_89fcfeb: Graphiques
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Parfait, vous avez donc un cours. Et maintenant? Eh bien, avant de le dévoiler au monde entier, vous voulez peut-être le vérifier et vous assurer que vous avez bien présenté les bases. Parcourez la liste sur la gauche pour garantir que votre cours est prêt à être utilisé."
+  great_work_from_the_canvas_developers_8c23f1c3: "Bon travail! Des développeurs Canvas"
   greek_65c5b3f7: Grec
   green_15af4778: Vert
   group: 
@@ -10782,6 +10818,7 @@ fr-CA:
   include_unpublished_assignments_83ebbaec: "Inclure les évaluations non publiées"
   include_unpublished_courses_7a0e7aab: "Inclure les cours non publiés"
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Comprend les valeurs de note dans les rapports de note d'administrateur."
+  includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inclut des rubriques dans la barre latérale de navigation du cours"
   incomplete_95612d72: incomplet
   incomplete_da3c2ea2: Incomplet
   incompleteregistration: 
@@ -11010,7 +11047,8 @@ fr-CA:
   item_type_download_e949cdb6: "Type d'élément : Téléchargement"
   item_type_link_5a2abed2: "Type d'élément : Lien"
   item_type_locked_85c560ec: "Type d'élément : Verrouillé"
-  item_type_quiz_c894ddb1: "Type d'élément : Questionnaire"
+  item_type_new_quiz_1a1cd9a9: "Type d’élément : Nouveau questionnaire"
+  item_type_quiz_c894ddb1: "Type d’élément : Questionnaire"
   items_299a7626: "Éléments : "
   items_items_selected_5b55e566: "%{items} éléments sélectionnés"
   items_selected_have_different_usage_rights_52b325cc: "Les éléments sélectionnés ont des droits d’utilisation différents."
@@ -13762,7 +13800,7 @@ fr-CA:
   must_view_the_page_67eec19e: "Doit consulter la page"
   mutation_f0ac253f: Mutations
   mutations_on_search_e5a62790: "mutations sur %{search}"
-  mute_assignment_bb505cd8: "Tâche silencieuse"
+  mute_assignment_bb505cd8: "Couper le son de la tâche"
   mute_dialog: 
     curving_assignments: "Courbe des tâches"
     grade_change_notifications: "Notifications de changement de notes"
@@ -14941,7 +14979,7 @@ fr-CA:
   permissions_365c49e: Autorisations
   permissions_manage_9eea4f8f: "Autorisations - gérer"
   permissions_v2_page_f96dde06: "Page d’autorisations V2"
-  permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Permettre l’utilisation de tous les paramètres « includes » pour cette clé de développeur. Les paramètres « Includes » peuvent accorder l’accès à des données supplémentaires non incluses dans les portées sélectionnées ci-dessous."
+  permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Permettre l’utilisation de tous les paramètres « includes » pour cette clé de développeur. Les paramètres « Includes » peuvent accorder l’accès à des données supplémentaires non incluses dans les portées sélectionnées ci-dessous."
   persian_a8cadb95: Perse
   personal_pronouns_7d271f52: "Pronoms personnels"
   peru_51_d3d38d1f: "Pérou (+51)"
@@ -17589,6 +17627,7 @@ fr-CA:
   restart_link_validation_b61286fc: "Redémarrer la validation de lien"
   restore_courses_182e162e: "Restaurer les cours"
   restored_course_association_course_c9e16045: "Association de cours restauré %{course}"
+  restrict_sms_to_select_types_9dd6399c: "Restreindre les SMS à la sélection des types"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Empêcher les étudiants d'accéder aux cours après leurs dates de fin"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Empêcher les étudiants d'accéder aux cours avant leurs dates de début"
   restrict_students_from_annotating_6c28ab9b: "Restreindre les étudiants d'annoter"
@@ -17837,6 +17876,7 @@ fr-CA:
   rubrics_add_edit_delete_8299eff7: "Rubriques - ajouter/modifier/supprimer"
   rubrics_and_speedgrader_ececaed4: "Rubriques et SpeedGrader"
   rubrics_b5ef369b: Rubriques
+  rubrics_in_course_navigation_539ea536: "Rubriques dans la navigation du cours"
   rubrics_speedgrader_a6ebec57: "Rubriques, SpeedGrader"
   running_c5a4998d: "En cours d'exécution"
   russia_7_87bc99d5: "Russie (+7)"
@@ -19883,6 +19923,7 @@ fr-CA:
     pages: Pages
     people: Personnes
     quizzes: Questionnaires
+    rubrics: Rubriques
     settings: Paramètres
     syllabus: Programme
     tab_location_error: "L’emplacement de cet onglet n’est pas valide"
@@ -20249,7 +20290,7 @@ fr-CA:
   this_assignment_is_not_graded_576f1244: "Cette tâche n'est pas notée."
   this_assignment_is_overdue_a44bea3b: "Cette évaluation est en retard"
   this_assignment_is_still_unpublished_a9185624: "Cette tâche n’est pas encore publiée"
-  this_assignment_is_unpublished_64c0f46c: "Cette tâche n'est pas publiée"
+  this_assignment_is_unpublished_64c0f46c: "Cette tâche n’est pas publiée"
   this_assignment_submission_is_my_own_original_work_e820ce4b: "Cette tâche envoyée est le résultat de mon travail personnel et individuel."
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Cette tâche ne comptera plus dans votre note."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Cette pièce jointe a été retirée par l'auteur."
@@ -22093,7 +22134,9 @@ fr-CA:
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Votre note la plus élevée sera conservée"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Votre dernière note sera conservée"
   will_paginate: 
+    container_aria_label: Pagination
     next_label: "&#8594; suivante"
+    page_aria_label: "Page %{page}"
     page_entries_info: 
       multi_page: "Afficher les %{model} de %{from} à %{to} sur un total de %{count}"
       multi_page_html: "Afficher les %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> sur un total de <b>%{count}</b>"
@@ -22152,6 +22195,7 @@ fr-CA:
   you_are_currently_acting_as_user_name_8d2be0ee: "Vous agissez actuellement en tant que %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Vous êtes actuellement connecté en mode d’affichage étudiant"
   you_are_currently_masquerading_as_user_name_f4a00ade: "Vous vous faites actuellement passer pour %{user_name}."
+  you_are_currently_receiving_notifications_for_this_9646b09d: "Vous recevez actuellement des notifications pour ce cours. Pour désactiver les notifications de cours, utilisez le bouton de bascule ci-dessus."
   you_are_here_54075d8c: "Vous êtes ici :"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Vous êtes connecté à %{institution1} avec vos informations de connexion de %{institution2}"
   you_are_logged_out_of_canvas_8b5fc59a: "Vous êtes déconnecté(e) de Canvas."
@@ -22293,7 +22337,7 @@ fr-CA:
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Vous êtes rappelé d'évaluer %{rubric}, %{context}."
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: "Vous avez mis à jour les critères de notation, ce qui affectera tous les étudiants déjà évalués à l'aide de ce résultat"
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Vous allez être redirigé vers une page de connexion, sur laquelle vous devrez vous connecter avec les identifiants de votre enfant."
-  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Vous allez être redirigé vers le carnet de notes pendant que votre fichier est en train d'être téléversé. Si vous avez un gros fichier CSV, vos modifications peuvent prendre quelques minutes avant d’être mises à jour. Afin d'éviter l'écrasement des données, veuillez confirmer que le téléversement s’est effectué et que le carnet de notes est exact avant de faire d'autres modifications."
+  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Vous allez être redirigé vers le carnet de notes pendant que votre fichier est en train d’être téléversé. Si vous avez un gros fichier CSV, vos modifications peuvent prendre quelques minutes avant d’être mises à jour. Afin d’éviter l’écrasement des données, veuillez confirmer que le téléversement s’est effectué et que le carnet de notes est exact avant de faire d’autres modifications."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       Vous allez devoir créer une [nouvelle application sur Facebook](%{facebook_url}), et permettre la connexion OAuth client
       depuis les paramètres avancés. Vous devriez configurer %{callback_url} comme URL de redirection OAuth valide.
@@ -22332,6 +22376,7 @@ fr-CA:
       Lecture, Écriture et Accès direct aux messages
       Une fois que vous avez créé votre application, prenez note du code client et du code secret client, et indiquez-les ici.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Vous ne pourrez pas prévisualiser vos modifications"
+  you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Vous ne recevrez aucune notification de cours pour le moment. Pour activer les notifications de cours, utilisez le bouton de bascule ci-dessus."
   your_answer_8dad6ea4: "Votre réponse :"
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Votre navigateur ne répond pas aux exigences minimales pour Canvas. Veuillez visiter la *Communauté Canvas* pour y trouver la liste complète des navigateurs pris en charge."
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Votre commentaire a été sauvegardé automatiquement comme brouillon."
