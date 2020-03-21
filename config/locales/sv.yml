@@ -396,6 +396,7 @@ sv:
   account_id_2c3b4f15: konto-Id
   account_id_73966078: account_id
   account_id_f6e26867: Konto-Id
+  account_level_notification_preferences_require_an__66467cd7: "För uppdatering krävs ett account_id för aviseringsinställningar på kontonivå"
   account_level_settings_manage_4fca6f8e: "Inställningar på kontonivå – hantera"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonamn
@@ -1934,6 +1935,7 @@ sv:
       threshold_should_be_numeric: "Det här måste vara ett positivt nummer"
   alerts_add_edit_delete_d71091c6: "Notiser – lägg till/redigera/ta bort"
   alerts_course_settings_53551794: "Notis (kursinställningar)"
+  align_outcomes_to_this_page_7d055196: "Justera lärandemål till den här sidan"
   all_4321c3a1: Alla
   all_account_types_e83c1516: "Ala kontotyper"
   all_accounts_3bafc860: "Alla konton"
@@ -2362,6 +2364,9 @@ sv:
   allows_users_to_edit_conferences_2d3c960c: "Gör det möjligt för användaren att redigera konferenser."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Tillåt användare att aktivera alternativet \"Starta SpeedGrader filtrerad efter studentgrupp\" för kurser på sidan kursinställningar. När alternativet är aktiverad och en studentgrupp har valts i nya omdömesboken, SpeedGrader läses endast studenter i den valda gruppen in."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Låter användare tysta aviseringar på kursnivå."
+  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+      Gör att användare kan åsidosättas specifika aviseringsinställningar för en
+      kurs på kursbasis.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Låt användare välja pronomen som visas efter deras namn i användargränssnittet."
   allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
       Låt användare välja pronomen som visas
@@ -4662,6 +4667,7 @@ sv:
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Det går inte att ställa in sis_account_id på ett root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Det  går inte att ställa in inlämningsdatumet till ett datum inom en stängd bedömningsperiod"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Det går inte att visa detaljerade rapporter för anonyma uppgifter förrän omdömen har tystats."
+  cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Det går inte att visa detaljerade rapporter för anonyma uppgifter tills omdömen publiceras."
   canvas: 
     migration: 
       errors: 
@@ -6514,6 +6520,8 @@ sv:
   course_image_settings_eba3ec55: Kursbildinställningar
   course_implemented_apps_fa658f5a: "Kurs-implementerade appar"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Kursen är redan associerad med en plan"
+  course_level_notification_preferences_require_a_co_2f0a618: "För uppdatering krävs ett course_id för aviseringsinställningar på kursnivå"
+  course_level_overrides_for_notification_preference_e86d1725: "Åsidosättningar på kursnivå för aviseringsinställningar"
   course_list: 
     favorited_tooltip: "Klicka för att ta bort från kursmenyn."
     nonfavorited_tooltip: "Klicka för att lägga till i kursmenyn."
@@ -6598,6 +6606,9 @@ sv:
   course_name_successfully_added_48116a50: "%{course_name} har lagts till!"
   course_navigation_dd035109: Kursnavigering
   course_not_found_c248a721: "Kursen hittades inte"
+  course_notification_settings_d9821d36: "Inställningar för kursaviseringar"
+  course_notification_settings_error_page_c0512c17: "Inställningar för kursaviseringar – felmeddelandesida"
+  course_notification_settings_initial_query_error_6dfb24ef: "Inställningar för kursaviseringar – initialt frågefel"
   course_option_links_a79d263d: Kursalternativlänkar
   course_outcomes_7dc1cbc7: "Kursens lärandemål"
   course_pages_449f1dd4: Kurssidor
@@ -7939,6 +7950,7 @@ sv:
   disable_a5c05db3: Inaktivera
   disable_all_read_only_scopes_f9ffdd28: "Inaktivera alla skrivskyddade omfattningar"
   disable_and_lock_7d0ef0e8: "Inaktivera och lås"
+  disable_celebrations_description: "Om du inaktiverar den här funktionen döljs alla gratulationsanimeringar."
   disable_content_security_policy_8660a787: "Inaktivera säkerhetspolicyn för innehåll"
   disable_extra_filter_options_1d1cdc02: "inaktivera extra filteralternativ"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Avmarkera kryssrutorna för import och migrering för New Quizzes, sätt dem på aktiverade"
@@ -7953,6 +7965,9 @@ sv:
   disabled_links_b3bdea99: "Inaktiverade länkar"
   disabled_not_visible_to_students_2c9d693f: "Inaktiverad. Ej synlig för studenter."
   disabled_not_visible_to_students_48d4a90d: "Inaktiverad. Ej synlig för studenter"
+  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+      Inaktiverar SMS-aviseringar och
+      ändringar i omdömen.
   disabling_f594bda: "Inaktiverar ..."
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Inaktivering av Post till SIS är inte tillgängligt för icke publicerade kurser"
   disabling_sync_to_name_failed_e7521ebb: "Inaktivering av synkronisering med %{name} misslyckades"
@@ -8707,6 +8722,7 @@ sv:
       avbrytande datum. Uppgifter kan filtreras efter dessa betygsperioderna i betygsboken.
   enable_new_gradebook_history_page_e0fd9d02: "Aktivera ny sida för betygshistorik"
   enable_new_sis_integration_settings_ab6780a4: "Aktivera nya SIS integreringsinställningar"
+  enable_notifications_10a4bf44: "Aktivera aviseringar"
   enable_or_condition_for_modules_a16f02d8: "Aktivera \"ELLER\" skick för moduler"
   enable_reregistration_for_lti_2_b2a10444: "Aktivera omregistrering för LTI 2"
   enable_scope_ac28b832: "Aktivera omfattning"
@@ -9437,6 +9453,7 @@ sv:
   failed_to_save_please_try_again_later_bb7070fb: "Det gick inte att spara, försök igen senare"
   failed_to_submit_draft_comment_1de83451: "Kunde inte skicka utkast till kommentar"
   failed_to_unpin_discussion_503eab82: "Misslyckades med att av-fästa diskussionen"
+  failed_to_update_course_notification_settings_cbf0eb18: "Det gick inte att uppdatera inställningarna för kursaviseringar"
   failed_to_update_discussion_23cc229a: "Det gick inte att uppdatera diskussionen"
   failed_to_update_permission_33c493f: "Det gick inte att uppdatera behörighet"
   failed_to_update_role_name_8c7b0119: "Det gick inte att uppdatera rollens namn"
@@ -9492,6 +9509,7 @@ sv:
     ember_modules: "Ember moduler"
     google_docs_domain_restriction: "Domänbegränsningar för Google dokument"
     gradebook_list_students_by_sortable_name: "Bedömningsöversikt – Räkna upp studenter enligt sorterbara namn"
+    hide_celebrations: "Inaktivera gratulationsanimeringar"
     high_contrast: "Högupplöst användargränssnitt"
     html5_first_videos: "Föredra HTML5 för uppspelning av video"
     k12: "K-12 särskilda funktioner"
@@ -10175,6 +10193,22 @@ sv:
       switch_to_percent: "Ändra till procent"
       switch_to_points: "Ändra till poäng"
     ungraded: "Inte inräknat i betyget"
+  gradebookGradeDisplayWarningDialog: 
+    grade_display_warning: 
+      cancel: Avbryt
+      continue: Fortsätt
+      percent_text: "Studenterna kommer även att se sina slutbedömningar som ett procenttal. Vill du fortsätta?"
+      points_text: "Studenterna kommer även att se sina slutbedömningar som poäng. Vill du fortsätta?"
+  gradebookGradebookKeyboardNav: 
+    keyboard_assignment_desc: "Gå till informationssidan för den nuvarande uppgiften"
+    keyboard_close_menu: "Stäng den aktiva menyn"
+    keyboard_menu_desc: "Öppna den aktiva kolumnens meny"
+    keyboard_sort_desc: "Sortera rutnätet för den aktiva kolumnen"
+    keycodes: 
+      close_menu: esc
+      goto_assignment: g
+      menu: m
+      sort: s
   gradebookHeaderFilterView: 
     course_average: Kursgenomsnitt
     course_median: Kursmedian
@@ -10202,7 +10236,7 @@ sv:
   gradebook_import_reserved_names_bugfix_apg_122_32a77a18: "Korrigering av import av reserverade namn från bedömningsöversikten (APG-122)"
   gradebook_individual_view_8846598e: "Bedömningsöversikt: Individuell vy"
   gradebook_performance_764d8b3d: "Betygsboks prestanda"
-  gradebook_settings_b45c6df9: "Inställningar för bedömningsöversikt"
+  gradebook_settings_b45c6df9: "Inställningar för omdömesöversikt"
   gradebook_settings_updated_fef63d60: "Inställningar för bedömningsöversikten har uppdaterats"
   gradebook_speedgrader_66cb7a6a: "Bedömningsöversikt, SpeedGrader"
   gradebook_tutorial_tray_d835c750: "Självstudiefack för bedömningsöversikter"
@@ -10760,6 +10794,7 @@ sv:
       grading_scheme_info: "Visa/redigera bedömningsschema"
   grading_standards_b73bfa72: Omdömesstandarder
   grading_type_type_7d8b42d7: "Betygsättningstyp: %{type}"
+  granular_course_notification_settings_will_be_conf_68f122db: "Detaljinställningar för kursaviseringar kan konfigureras här i framtiden."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Detaljerade behörigheter för hantering av wikisidor"
   graph_bar_b5daa23d: Diagramstapel
   graph_of_grades_for_each_assignment_4c44d4d1: "Diagram med omdöme för varje uppgift"
@@ -10772,6 +10807,7 @@ sv:
   graphql_mutation_log_25acc923: GraphQL-mutationslogg
   graphs_89fcfeb: Grafer
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Perfekt, nu har du en kurs. Vad händer nu? Innan du publicerar den för världen kanske du vill kontrollera att du har grunden klar.  Gå igenom listan till vänster för att se till att din kurs är redo att användas."
+  great_work_from_the_canvas_developers_8c23f1c3: "Bra jobbat! Från Canvas-utvecklarna"
   greek_65c5b3f7: Grekiska
   green_15af4778: Grön
   group: 
@@ -11672,6 +11708,7 @@ sv:
   include_unpublished_assignments_83ebbaec: "Inkludera opublicerade uppgifter"
   include_unpublished_courses_7a0e7aab: "Inkludera avpublicerade kurser"
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Innehåller bedömningsvärden i administratörsomdömesrapporterna."
+  includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Innehåller matriser i kursens sidofältsnavigering"
   incomplete_95612d72: "ej fullständig"
   incomplete_da3c2ea2: Ofullständig
   incompleteregistration: 
@@ -11913,6 +11950,7 @@ sv:
   item_type_download_e949cdb6: "Typ av objekt: Ladda ner"
   item_type_link_5a2abed2: "Typ av objekt: Länk"
   item_type_locked_85c560ec: "Typ av objekt: Låst"
+  item_type_new_quiz_1a1cd9a9: "Typ av objekt: Ny quiz"
   item_type_quiz_c894ddb1: "Typ av objekt: Quiz"
   items_299a7626: "Objekt: "
   items_items_selected_5b55e566: "%{items} objekt valda"
@@ -15011,7 +15049,7 @@ sv:
   must_view_the_page_67eec19e: "Måste visa sidan"
   mutation_f0ac253f: Mutationer
   mutations_on_search_e5a62790: "mutationer på %{search}"
-  mute_assignment_bb505cd8: "Stäng uppgift"
+  mute_assignment_bb505cd8: "Tyst uppgift"
   mute_dialog: 
     curving_assignments: "Justering av uppgifter"
     grade_change_notifications: "Aviseringar om ändrade omdömen"
@@ -19173,6 +19211,7 @@ sv:
   restore_courses_182e162e: "Återställ kurser"
   restored_course_association_course_c9e16045: "Kursassociation har återställts %{course}"
   restrict_access_84ba6bb8: "Begränsa tillgång"
+  restrict_sms_to_select_types_9dd6399c: "Begränsa SMS till utvalda typer"
   restrict_student_access: 
     button_text: 
       cancel: Avbryt
@@ -19443,6 +19482,7 @@ sv:
   rubrics_add_edit_delete_8299eff7: "Matriser – lägg till/redigera/ta bort"
   rubrics_and_speedgrader_ececaed4: "Rubriker och SpeedGrader"
   rubrics_b5ef369b: Matriser
+  rubrics_in_course_navigation_539ea536: "Matriser i kursnavigering"
   rubrics_speedgrader_a6ebec57: "Matriser, SpeedGrader"
   running_c5a4998d: Körs
   russia_7_87bc99d5: "Ryssland (+7)"
@@ -21655,6 +21695,7 @@ sv:
     people: Personer
     profile: Profil
     quizzes: Quiz
+    rubrics: Matriser
     settings: Inställningar
     syllabus: Kursöversikt
     tab_location_error: "Flikens placering är ogiltig"
@@ -23951,7 +23992,9 @@ sv:
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Vi behåller dina högsta resultat"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Vi behåller dina senaste resultat"
   will_paginate: 
+    container_aria_label: Sidnumrering
     next_label: "Nästa &#8594;"
+    page_aria_label: "Sida %{page}"
     page_entries_info: 
       multi_page: "Visar %{model} %{from}–%{to} av totalt %{count}"
       multi_page_html: "Visar %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> av totalt <b>%{count}</b>"
@@ -24016,6 +24059,7 @@ sv:
   you_are_currently_acting_as_user_name_8d2be0ee: "Du agerar för närvarande som %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Du är för tillfället inloggad i Studentens vy"
   you_are_currently_masquerading_as_user_name_f4a00ade: "Du maskerar dig just nu som %{user_name}"
+  you_are_currently_receiving_notifications_for_this_9646b09d: "Du får för närvarande aviseringar för den här kursen. Använd reglaget ovan om du vill inaktivera kursaviseringar."
   you_are_here_54075d8c: "Du är här:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Du är inloggad på %{institution1} och använder dina inloggningsuppgifter från %{institution2}"
   you_are_logged_out_of_canvas_8b5fc59a: "Du är utloggad från Canvas."
@@ -24096,7 +24140,7 @@ sv:
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har ändrat utvecklingskraven för en aktiv kurs. Det kan finnas studenter som redan har gått vidare till den här modulen och andra som är beroende av den."
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Du har slutfört en kamratresponsuppgift för %{person}. Tack"
   you_have_count_submissions_to_grade_6c5b511a: "Du har %{count} inlämningar att bedöma"
-  you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "Du har angett en ogiltig omdöme för den här studenten. Kontrollera värdet och bedömningstypen och försök igen."
+  you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "Du har angett en ogiltig omdöme för den här studenten. Kontrollera värdet och sorteringstypen och försök igen."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har ändrat frågorna i detta quiz.* Dessa ändringar visas inte för studenterna förrän du sparat quizzet."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "Du har inte konfigurerat några samarbetsappar. Prata med din lärare för att konfigurera någon sådan.."
   you_have_no_courses_favorited_reloading_this_page__a2bae9de: "Du har inte favoritmärkt någon kurs. Om du läser in den här sidan igen visas alla\n\
@@ -24208,6 +24252,7 @@ sv:
       Läs, Skriv och tillgång till direktmeddelanden
       Efter att du skapat din applikation skriver du ner Konsumentnyckeln och Konsument hemligheten, och anger dem här.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Du kommer inte att kunna förhandsgranska dina ändringar"
+  you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Du kommer inte att få kursaviseringar. Använd reglaget ovan om du vill aktivera kursaviseringar."
   your_answer_8dad6ea4: "Ditt svar:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din uppgiftslista kan nu hittas på *Kalender* sidan."
   your_assignments_list_has_improved_3eded80e: "Din *Uppgifts* -list har förbättrats!"
