@@ -384,6 +384,7 @@ it:
   account_id_2c3b4f15: "ID account"
   account_id_73966078: account_id
   account_id_f6e26867: "ID account"
+  account_level_notification_preferences_require_an__66467cd7: "Le preferenze di notifica del livello di account richiedono l’aggiornamento di un account_id"
   account_level_settings_manage_4fca6f8e: "Impostazioni a livello di account - gestisci"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nome account"
@@ -1784,6 +1785,7 @@ it:
       threshold_should_be_numeric: "Deve essere un numero positivo"
   alerts_add_edit_delete_d71091c6: "Avvisi - aggiungi/modifica/elimina"
   alerts_course_settings_53551794: "Avvisi (Impostazioni corso)"
+  align_outcomes_to_this_page_7d055196: "Allinea esiti a questa pagina"
   all_4321c3a1: Tutto
   all_account_types_e83c1516: "Tutti i tipi di account"
   all_accounts_3bafc860: "Tutti gli account"
@@ -2208,6 +2210,9 @@ it:
   allows_users_to_edit_conferences_2d3c960c: "Consente agli utenti di modificare le conferenze."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Consente agli utenti di abilitare l'opzione \"Avvia SpeedGrader Filtrato per gruppo di studenti\" per i corsi nella pagina delle impostazioni del corso. Se attivo e se è stato selezionato un gruppo di studenti in Nuovo registro dei voti, SpeedGrader caricherà solo gli studenti del gruppo selezionato."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Consente agli utenti di tacitare le notifiche sulla granularità del livello di un corso."
+  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+      Consente agli utenti di sostituire le preferenze di notifica specifiche su un
+      principio corso dopo corso.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Consente agli utenti di scegliere i pronomi che verranno visualizzati dopo i loro nomi, quando qeusti ultimi vengono visualizzati nell'interfaccia utente."
   allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
       Consente agli utenti di scegliere i pronomi che saranno visualizzati dopo
@@ -4268,6 +4273,7 @@ it:
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Impossibile impostare sis_account_id su un root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Impossibile impostare la data di scadenza su una data entro un periodo di valutazione chiuso"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Impossibile visualizzare report dettagliati per compiti anonimi fino a quando i voti non vengono ripristinati."
+  cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Impossibile visualizzare report dettagliati per compiti anonimi fino a quando i voti non vengono pubblicati."
   canvas: 
     migration: 
       errors: 
@@ -5929,6 +5935,8 @@ it:
   course_image_settings_eba3ec55: "Impostazioni immagine corso"
   course_implemented_apps_fa658f5a: "App implementate corso"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Il corso è già associato con un modello di base"
+  course_level_notification_preferences_require_a_co_2f0a618: "Le preferenze di notifica del livello di corso richiedono l’aggiornamento di un course_id"
+  course_level_overrides_for_notification_preference_e86d1725: "Il livello di corso sostituisce le preferenze di notifica"
   course_list: 
     favorited_tooltip: "Fai clic per rimuovere dal menu dei corsi."
     nonfavorited_tooltip: "Fai clic per aggiungere al menu dei corsi."
@@ -6008,6 +6016,9 @@ it:
   course_name_successfully_added_48116a50: "%{course_name} aggiunto correttamente."
   course_navigation_dd035109: "Esplorazione corso"
   course_not_found_c248a721: "Corso non trovato"
+  course_notification_settings_d9821d36: "Impostazioni notifiche corso"
+  course_notification_settings_error_page_c0512c17: "Pagina di errore Impostazioni notifiche corso"
+  course_notification_settings_initial_query_error_6dfb24ef: "Errore di query iniziale delle Impostazioni notifiche corso"
   course_option_links_a79d263d: "Link opzioni corso"
   course_outcomes_7dc1cbc7: "Esiti corso"
   course_pages_449f1dd4: "Pagine corso"
@@ -7164,6 +7175,7 @@ it:
   disable_a5c05db3: Disabilita
   disable_all_read_only_scopes_f9ffdd28: "Disabilita tutti gli ambiti di sola lettura."
   disable_and_lock_7d0ef0e8: "Disabilita e blocca"
+  disable_celebrations_description: "Se si abilita questa funzione, tutte le animazioni celebrazione saranno nascoste."
   disable_content_security_policy_8660a787: "Disabilita politica sulla sicurezza dei contenuti"
   disable_extra_filter_options_1d1cdc02: "disattiva opzioni extra filtro"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Disabilita le caselle di controllo per l’importazione e la migrazione di nuovi quiz, abilitandole come impostazione predefinita"
@@ -7178,6 +7190,9 @@ it:
   disabled_links_b3bdea99: "Link disabilitati"
   disabled_not_visible_to_students_2c9d693f: "Disabilitato. Non visibile agli studenti."
   disabled_not_visible_to_students_48d4a90d: "Disabilitato. Non visibile agli studenti"
+  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+      Disabilita le notifiche SMS per tutti i tipi tranne gli annunci e
+      modifiche dei voti.
   disabling_f594bda: "Disattivazione in corso..."
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "La disattivazione di Pubblica in SIS non è disponibile per i corsi non pubblicati"
   disabling_sync_to_name_failed_e7521ebb: "Disattivazione della sincronizzazione con %{name} non riuscita"
@@ -7843,6 +7858,7 @@ it:
   enable_moderated_grading_bacd20d8: "Abilitare valutazione moderata."
   enable_moderated_grading_only_relevant_if_the_anon_1dcdc47b: "Abilitare valutazione moderata. Rilevante solo se il contrassegno Valutazione anonima moderata è abilitato."
   enable_new_sis_integration_settings_ab6780a4: "Abilita nuove impostazioni integrazione SIS"
+  enable_notifications_10a4bf44: "Abilita notifiche"
   enable_reregistration_for_lti_2_b2a10444: "Abilita nuova registrazione per LTI 2"
   enable_scope_ac28b832: "Abilita ambito"
   enable_student_context_card_links_eba2f2c5: "Abilita link schede contesto studenti"
@@ -8456,6 +8472,7 @@ it:
   failed_to_save_please_try_again_later_bb7070fb: "Salvataggio non riuscito. Riprova più tardi"
   failed_to_submit_draft_comment_1de83451: "Invio commento bozza non riuscito"
   failed_to_unpin_discussion_503eab82: "Impossibile sbloccare la discussione"
+  failed_to_update_course_notification_settings_cbf0eb18: "Impossibile aggiornare le impostazioni notifiche corso"
   failed_to_update_discussion_23cc229a: "Impossibile aggiornare la discussione"
   failed_to_update_permission_33c493f: "Impossibile aggiornare l'autorizzazione"
   failed_to_update_role_name_8c7b0119: "Impossibile aggiornare il nome del ruolo"
@@ -8499,6 +8516,7 @@ it:
     canvas_parent_display_name: "Canvas Parent"
     google_docs_domain_restriction: "Restrizione dominio Documenti Google"
     gradebook_list_students_by_sortable_name: "Registro dei voti - Elenco studenti per nome ordinabile"
+    hide_celebrations: "Disabilita animazioni celebrazione"
     high_contrast: "IU alto contrasto"
     k12: "Funzioni specifiche K-12"
     learning_mastery_gradebook: "Registro dei livelli padronanza delle competenze"
@@ -8984,6 +9002,22 @@ it:
         error: "VeriCite Punteggio di similarità - Vedi dettagli errore consegna"
         pending: "VeriCite Punteggio di similarità - Consegna in attesa"
         score: "VeriCite Punteggio di similarità - Vedi report dettagliato"
+  gradebookGradeDisplayWarningDialog: 
+    grade_display_warning: 
+      cancel: Annulla
+      continue: Continua
+      percent_text: "Gli studenti vedranno il loro voto finale anche come percentuale. Vuoi continuare?"
+      points_text: "Gli studenti vedranno il loro voto finale anche come punti. Vuoi continuare?"
+  gradebookGradebookKeyboardNav: 
+    keyboard_assignment_desc: "Vai alla pagina dei dettagli del compito corrente"
+    keyboard_close_menu: "Chiudi il menu correntemente attivo"
+    keyboard_menu_desc: "Apri il menu per la colonna attiva"
+    keyboard_sort_desc: "Ordina la griglia nella colonna corrente attiva"
+    keycodes: 
+      close_menu: esc
+      goto_assignment: g
+      menu: m
+      sort: s
   gradebookHeaderFilterView: 
     course_average: "Media corso"
     course_median: "Mediana corso"
@@ -9366,6 +9400,7 @@ it:
       grading_scheme_info: "Visualizza/Modifica schema di valutazione"
   grading_standards_b73bfa72: "Standard di valutazione"
   grading_type_type_7d8b42d7: "Tipo di valutazione: %{type}"
+  granular_course_notification_settings_will_be_conf_68f122db: "In futuro, le impostazioni notifiche corso granulari saranno configurabili qui."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Permessi granulari per gestione pagine wiki"
   graph_bar_b5daa23d: Ortogramma
   graph_of_grades_for_each_assignment_4c44d4d1: "Grafico dei voti per ciascun compito"
@@ -9378,6 +9413,7 @@ it:
   graphql_mutation_log_25acc923: "Registro delle mutazioni di GraphQL"
   graphs_89fcfeb: Grafici
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Perfetto. Hai ottenuto un corso. E ora? Prima di renderlo pubblico a tutti, è opportuno controllare e assicurarti che siano delineati gli elementi di base.  Scorri l'elenco a sinistra per verificare che il tuo corso sia pronto all'uso."
+  great_work_from_the_canvas_developers_8c23f1c3: "Ottimo lavoro! Dagli sviluppatori Canvas"
   greek_65c5b3f7: Greco
   green_15af4778: Verde
   group: 
@@ -10094,6 +10130,7 @@ it:
   include_unpublished_assignments_83ebbaec: "Includi compiti non pubblicati"
   include_unpublished_courses_7a0e7aab: "Includi corsi non pubblicati"
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Include i valori dei voti nei report dei voti admin"
+  includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Include la rubrica nell’esplorazione corso con barra laterale"
   incomplete_95612d72: "non completato"
   incomplete_da3c2ea2: "Non completato"
   incompleteregistration: 
@@ -10316,6 +10353,7 @@ it:
   item_type_download_e949cdb6: "Tipo elemento: Download"
   item_type_link_5a2abed2: "Tipo elemento: Link"
   item_type_locked_85c560ec: "Tipo elemento: Bloccato"
+  item_type_new_quiz_1a1cd9a9: "Tipo elemento: Nuovo quiz"
   item_type_quiz_c894ddb1: "Tipo elemento: Quiz"
   items_299a7626: "Elementi: "
   items_items_selected_5b55e566: "%{items} elementi selezionati"
@@ -16762,6 +16800,7 @@ it:
   restart_link_validation_b61286fc: "Riavvia convalida link"
   restore_courses_182e162e: "Ripristina corsi"
   restored_course_association_course_c9e16045: "Associazione corsi ripristinata %{course}"
+  restrict_sms_to_select_types_9dd6399c: "Limita SMS a tipi selezionati"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Limita l'accesso degli studenti ai corsi dopo la data di fine"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Limita l'accesso degli studenti ai corsi prima della data di inizio"
   restrict_students_from_annotating_6c28ab9b: "Limita le annotazioni degli studenti"
@@ -17008,6 +17047,7 @@ it:
   rubrics_add_edit_delete_8299eff7: "Rubriche - aggiungi/modifica/elimina"
   rubrics_and_speedgrader_ececaed4: "Rubriche e SpeedGrader"
   rubrics_b5ef369b: Rubriche
+  rubrics_in_course_navigation_539ea536: "Rubrica in esplorazione corso"
   rubrics_speedgrader_a6ebec57: "Rubriche, SpeedGrader"
   running_c5a4998d: "In esecuzione"
   russia_7_87bc99d5: "Russia (+7)"
@@ -18851,7 +18891,7 @@ it:
   successfully_added_fb3e6008: "Aggiunto correttamente"
   successfully_created_a_set_38374719: "Set creato correttamente"
   successfully_deleted_discussion_title_a685f345: "Discussione eliminata correttamente %{title}"
-  successfully_deleted_the_comment_a8bbe561: "Commento eliminato"
+  successfully_deleted_the_comment_a8bbe561: "Commento eliminato correttamente"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model} spostato correttamente in %{newGroup}"
   successfully_posted_the_comment_12d95d56: "Commento pubblicato"
   successfully_resubmitted_to_turnitin_c908de0f: "Inviato di nuovo a Turnitin."
@@ -18949,6 +18989,7 @@ it:
     pages: Pagine
     people: Persone
     quizzes: Quiz
+    rubrics: Rubriche
     settings: Impostazioni
     syllabus: "Piano di studio"
     tab_location_error: "La posizione della scheda non è valida"
@@ -19251,7 +19292,7 @@ it:
   there_was_a_problem_updating_the_submission_6e5280a1: "Si è verificato un problema durante l'aggiornamento della consegna."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Si è verificato un errore durante il riporto delle statistiche del corso"
   there_was_an_error_fetching_outcome_results_45c57590: "Si è verificato un errore durante il recupero dei risultati degli esiti"
-  there_was_an_error_fetching_submission_comments_ce153077: "Si è verificato un errore durante il recupero dei commenti sulle consegne"
+  there_was_an_error_fetching_submission_comments_ce153077: "Si è verificato un errore durante il recupero dei Commenti consegna"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Si è verificato un errore durante la generazione del codice di accoppiamento"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Si è verificato un errore durante la generazione dell'avvio dello strumento"
   there_was_an_error_in_processing_your_request_6513a49a: "Si è verificato un errore durante l'elaborazione della tua richiesta"
@@ -21094,7 +21135,9 @@ it:
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Manterrà il più alto di tutti i tuoi punteggi"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Manterrà il più recente di tutti i tuoi punteggi"
   will_paginate: 
+    container_aria_label: Impaginazione
     next_label: "Successivo &#8594;"
+    page_aria_label: "Pagina %{page}"
     page_entries_info: 
       multi_page: "Visualizzazione di %{model} %{from} - %{to} di %{count} in totale"
       multi_page_html: "Visualizzazione di %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> di <b>%{count}</b> in totale"
@@ -21152,6 +21195,7 @@ it:
                     andando su Corsi > Tutti i corsi nel menù principale.
   you_are_currently_acting_as_user_name_8d2be0ee: "Al momento stai agendo come %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Al momento sei connesso alla visualizzazione studenti"
+  you_are_currently_receiving_notifications_for_this_9646b09d: "Al momento stai ricevendo delle notifiche per questo corso. Per disabilitare le notifiche del corso, usa la funzione abilita/disabilita sopra."
   you_are_here_54075d8c: "Sei qui:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Hai effettuato l'accesso a %{institution1} utilizzando le tue credenziali da %{institution2}"
   you_are_logged_out_of_canvas_8b5fc59a: "Sei disconnesso da Canvas."
@@ -21330,6 +21374,7 @@ it:
       Leggi, scrivi e accedi ai messaggi diretti
       Dopo aver creato la tua applicazione, annota la chiave consumer e il segreto consumer, quindi inseriscili qui.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Non potrai visualizzare l'anteprima delle tue modifiche"
+  you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Non riceverai alcuna notifica corso in questo momento. Per abilitare le notifiche del corso, usa la funzione abilita/disabilita sopra."
   your_answer_8dad6ea4: "La tua risposta:"
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Il tuo browser non soddisfa i requisiti minimi per Canvas. Visita la *Community Canvas* per un elenco completo dei browser supportati."
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Il tuo commento è stato salvato automaticamente come bozza."
