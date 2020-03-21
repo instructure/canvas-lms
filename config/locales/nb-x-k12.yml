@@ -377,6 +377,7 @@ nb-x-k12:
   account_id_2c3b4f15: konto-ID
   account_id_73966078: account_id
   account_id_f6e26867: Konto-ID
+  account_level_notification_preferences_require_an__66467cd7: "Varselpreferanser for kontonivå krever en account_id for å kunne oppdateres."
   account_level_settings_manage_4fca6f8e: "Kontonivå-innstillinger - behandle"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonavn
@@ -1773,6 +1774,7 @@ nb-x-k12:
       threshold_should_be_numeric: "Dette skal være et positivt tall"
   alerts_add_edit_delete_d71091c6: "Varslinger - legg til / rediger / slett"
   alerts_course_settings_53551794: "Varsler (faginnstillinger)"
+  align_outcomes_to_this_page_7d055196: "Samle mål på denne siden"
   all_4321c3a1: Alle
   all_account_types_e83c1516: "Alle kontotyper"
   all_accounts_3bafc860: "Alle kontoer"
@@ -2182,6 +2184,9 @@ nb-x-k12:
   allows_users_to_edit_conferences_2d3c960c: "Lar en bruker redigere konferanser."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Lar brukere aktivere valget «Lanser SpeedGrader Filtrert etter Elevgruppe» for faget på innstillings-siden for faget. Hvis aktiv, og en elevgruppe er valg i Ny vurderingsoversikt, SpeedGrader vil bare laster inn elever i den valgte gruppen."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Tillater brukere å dempe varslinger på detaljert fagnivå."
+  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+      Tillater brukere å oppheve bestemte varselpreferanser
+      for hvert enkelt fag.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Gir brukerne mulighet til å velge pronomen som vil vises etter navnet deres når det vises i brukergrensesnittet."
   allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
       Gir brukerne mulighet til å velge pronomen som vil vises etter
@@ -4201,6 +4206,7 @@ nb-x-k12:
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Kan ikke sette sis_account_id på en root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Kan ikke sette forfallsdatoen til en dato innenfor en stengt vurderingsperiode"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Kan ikke vise detaljerte rapporter for anonyme oppgaver før vurderingene er gjenåpnet."
+  cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Kan ikke vise detaljerte rapporter for anonyme oppgaver før vurderingene er lagt ut."
   canvas: 
     migration: 
       errors: 
@@ -5806,6 +5812,8 @@ nb-x-k12:
   course_image_settings_eba3ec55: Fagbilde-innstillinger
   course_implemented_apps_fa658f5a: "Fag-implementerte applikasjoner"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Faget er allerede knyttet til en blåkopi"
+  course_level_notification_preferences_require_a_co_2f0a618: "Varselpreferanser for fagnivå krever en course_id for å kunne oppdateres."
+  course_level_overrides_for_notification_preference_e86d1725: "Varselpreferanser for opphevelser av fagnivå"
   course_list: 
     favorited_tooltip: "Klikk for å fjerne fra fag menyen."
     nonfavorited_tooltip: "Klikk for å legge til fag menyen."
@@ -5885,6 +5893,9 @@ nb-x-k12:
   course_name_successfully_added_48116a50: "%{course_name} ble lagt til!"
   course_navigation_dd035109: Fagnavigering
   course_not_found_c248a721: "Fag ikke funnet"
+  course_notification_settings_d9821d36: "Innstillinger for fag varsler"
+  course_notification_settings_error_page_c0512c17: "Feilside for innstillinger for fag varsler"
+  course_notification_settings_initial_query_error_6dfb24ef: "Ugyldig forespørsel for innstillinger for fag varsler"
   course_option_links_a79d263d: "Lenker for fagvalg"
   course_outcomes_7dc1cbc7: "Mål i faget"
   course_pages_449f1dd4: "Sider for fag"
@@ -7020,6 +7031,7 @@ nb-x-k12:
   disable_a5c05db3: "Slå av"
   disable_all_read_only_scopes_f9ffdd28: "Deaktiver alle med omfang kun lesetilgang."
   disable_and_lock_7d0ef0e8: "Slå av og lås"
+  disable_celebrations_description: "Når du aktiverer denne funksjonen, vil du skjule alle fest animasjonene."
   disable_content_security_policy_8660a787: "Deaktiver innholdssikkerhetspolikk"
   disable_extra_filter_options_1d1cdc02: "deaktiver valg for ekstra filter"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Deaktiver avkrysningsbokser for import og migrasjon av nye tester, og aktiver således valgene som standard"
@@ -7034,6 +7046,9 @@ nb-x-k12:
   disabled_links_b3bdea99: "Deaktiverte lenker"
   disabled_not_visible_to_students_2c9d693f: "Deaktivert. Ikke synlig for elever."
   disabled_not_visible_to_students_48d4a90d: "Deaktivert. Ikke synlig for elevene"
+  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+      Deaktiverer SMS-varslinger for alle typer unntatt beskjeder og
+      vurderingsendringer.
   disabling_f594bda: Deaktiverer...
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Deaktiver innlegg til SIS er ikke tilgjengelig for ikke-publiserte emner"
   disabling_sync_to_name_failed_e7521ebb: "Deaktivere synkronisering til %{name} mislyktes"
@@ -7685,6 +7700,7 @@ nb-x-k12:
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Aktiver i18n-funksjoner i måleksport"
   enable_moderated_grading_bacd20d8: "Aktiver moderert karaktersetting."
   enable_new_sis_integration_settings_ab6780a4: "Aktiver nye SIS-innstillinger for integrering"
+  enable_notifications_10a4bf44: "Aktiver varsler"
   enable_reregistration_for_lti_2_b2a10444: "Aktivere registrering for LTI 2"
   enable_scope_ac28b832: "Aktiver omfang"
   enable_student_context_card_links_eba2f2c5: "Aktiver elevkontekstkort-linker"
@@ -8285,6 +8301,7 @@ nb-x-k12:
   failed_to_save_dashboard_selection_32e71c72: "Kunne ikke lagre oversiktutvalg"
   failed_to_save_please_try_again_later_bb7070fb: "Kunne ikke lagre, vennligst forsøk senere"
   failed_to_submit_draft_comment_1de83451: "Kunne ikke sende inn utkast til kommentar"
+  failed_to_update_course_notification_settings_cbf0eb18: "Kunne ikke oppdatere innstillinger for fag varsler"
   failed_to_update_discussion_23cc229a: "Kunne ikke oppdatere diskusjon"
   failed_to_update_permission_33c493f: "Kunne ikke oppdatere tillatelse"
   failed_to_update_role_name_8c7b0119: "Kunne ikke oppdatere rollenavn"
@@ -8328,6 +8345,7 @@ nb-x-k12:
     canvas_parent_display_name: "Canvas Parent"
     google_docs_domain_restriction: "Domenebegrensning for Google Docs"
     gradebook_list_students_by_sortable_name: "Vurderingsoversikt - List opp elever etter sorteringsnavn"
+    hide_celebrations: "Deaktiver fest animasjoner"
     high_contrast: "Høy kontrast UI"
     k12: "Spesifikke K-12 funksjoner"
     learning_mastery_gradebook: "Vurderingsoversikt for måloppnåelse"
@@ -8805,6 +8823,22 @@ nb-x-k12:
         error: "VeriCite Likhetsresultat –se feildetaljer for innlevering"
         pending: "VeriCite Likhetsresultat –innlevering venter"
         score: "VeriCite Likhetsresultat –se detaljert rapport"
+  gradebookGradeDisplayWarningDialog: 
+    grade_display_warning: 
+      cancel: Avbryt
+      continue: Fortsett
+      percent_text: "Elever får også se endelig vurderingen som prosent. Er du sikker på at du vil fortsette?"
+      points_text: "Elever får også se den endelige vurderingen som poeng. Er du sikker på at du vil fortsette?"
+  gradebookGradebookKeyboardNav: 
+    keyboard_assignment_desc: "Gå til den nåværende oppgavens detaljside"
+    keyboard_close_menu: "Lukk den gjeldende aktive menyen"
+    keyboard_menu_desc: "Åpne menyen for den aktive kolonnen"
+    keyboard_sort_desc: "Sorter rutenettet i den aktive kolonnen"
+    keycodes: 
+      close_menu: esc
+      goto_assignment: g
+      menu: m
+      sort: s
   gradebookHeaderFilterView: 
     course_average: "Gjennomsnitt i faget"
     course_median: Fagmedian
@@ -9180,6 +9214,7 @@ nb-x-k12:
       grading_scheme_info: "Se/rediger vurderingsskala"
   grading_standards_b73bfa72: "Retningslinjer for vurdering"
   grading_type_type_7d8b42d7: "Vurderingstype: %{type}"
+  granular_course_notification_settings_will_be_conf_68f122db: "Detaljerte innstillinger for fag varsler vil bli gjort tilgjengelig for konfigurering i fremtiden."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Detaljerte tillatelser for håndtering av wiki-sider"
   graph_bar_b5daa23d: "Grafisk søyle"
   graph_of_grades_for_each_assignment_4c44d4d1: "Diagram over vurderinger for hver oppgave"
@@ -9192,6 +9227,7 @@ nb-x-k12:
   graphql_mutation_log_25acc923: "GraphQL mutasjonslogg"
   graphs_89fcfeb: Grafer
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Flott, nå har du et fag. Hva nå? Vel, før du går hen og publiserer det til verden, kan det være lurt å sjekke og sørge for at du har alt det grunnleggende på plass. Arbeid gjennom listen til venstre for å sikre at faget er klart til bruk."
+  great_work_from_the_canvas_developers_8c23f1c3: "Veldig bra jobbet! Fra utviklerne av Canvas"
   greek_65c5b3f7: Gresk
   green_15af4778: Grønn
   group: 
@@ -9879,6 +9915,7 @@ nb-x-k12:
   include_unpublished_assignments_83ebbaec: "Inkluder ikkepubliserte oppgaver"
   include_unpublished_courses_7a0e7aab: "Inkluder ikke-publiserte fag"
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inkluderer vurderingsverdier i administrators vurderingsrapport."
+  includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inkluderer vurderingskriterier i sidestolpen for navigering innad i faget"
   incomplete_95612d72: "ikke fullført"
   incomplete_da3c2ea2: "Ikke fullført"
   incompleteregistration: 
@@ -10096,7 +10133,8 @@ nb-x-k12:
   item_type_download_e949cdb6: "Elementtype: nedlasting"
   item_type_link_5a2abed2: "Elementtype: lenke"
   item_type_locked_85c560ec: "Elementtype: Låst"
-  item_type_quiz_c894ddb1: "Elementtype: test"
+  item_type_new_quiz_1a1cd9a9: "Elementtype: Ny test"
+  item_type_quiz_c894ddb1: "Elementtype: Test"
   items_299a7626: "Elementer: "
   items_items_selected_5b55e566: "%{items} elementer valgt"
   items_selected_have_different_usage_rights_52b325cc: "Elementer som er valgt har ulike brukerrettigheter."
@@ -16469,6 +16507,7 @@ nb-x-k12:
   restart_link_validation_b61286fc: "Restart lenkevalidering"
   restore_courses_182e162e: "Gjenopprett fag"
   restored_course_association_course_c9e16045: "Gjenopprettet fagassosiering %{course}"
+  restrict_sms_to_select_types_9dd6399c: "Begrens SMS-er til kun valgte typer"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Begrense elevene fra å få tilgang til fagene etter sluttdato"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Begrense elevene fra å få tilgang til fagene før oppstartsdato"
   restrict_students_from_annotating_6c28ab9b: "Hindrer elevene fra å kommentere"
@@ -16706,6 +16745,7 @@ nb-x-k12:
       remove_rubric: "Fjern dette vurderingskriteriet fra listen min"
   rubrics_add_edit_delete_8299eff7: "Vurderingskriterier - legg til / rediger / slett"
   rubrics_b5ef369b: Vurderingskriterier
+  rubrics_in_course_navigation_539ea536: "Vurderingskriterier i fag navigering"
   rubrics_speedgrader_a6ebec57: "Vurderingskriterier, SpeedGrader"
   running_c5a4998d: Kjører
   russia_7_87bc99d5: "Russland (+7)"
@@ -18596,6 +18636,7 @@ nb-x-k12:
     pages: Sider
     people: Deltakere
     quizzes: Tester
+    rubrics: Vurderingskriterier
     settings: Innstillinger
     syllabus: Fagoversikt
     tab_location_error: "Den faneplasseringen er ugyldig"
@@ -20683,7 +20724,9 @@ nb-x-k12:
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Vil beholde ditt høyeste resultat"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Vil beholde ditt siste resultat"
   will_paginate: 
+    container_aria_label: Sidenummerering
     next_label: "Neste &#8594;"
+    page_aria_label: "Side %{page}"
     page_entries_info: 
       multi_page: "Viser %{model} %{from} - %{to} of %{count} til sammen"
       multi_page_html: "Viser %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> of <b>%{count}</b> til sammen"
@@ -20741,6 +20784,7 @@ nb-x-k12:
                     ved å navigere til Fag > Alle fag fra hovedmenyen.
   you_are_currently_acting_as_user_name_8d2be0ee: "Du opptrer for øyeblikket som %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Du er logget inn på vis som elev"
+  you_are_currently_receiving_notifications_for_this_9646b09d: "Du vil motta varsler for dette faget. For å deaktivere fag varsler, benytt vekselbryteren ovenfor."
   you_are_here_54075d8c: "Du er her:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Du er logget inn på %{institution1} ved hjelp av legitimerende opplysninger fra %{institution2}"
   you_are_logged_out_of_canvas_8b5fc59a: "Du er logget ut av Canvas."
@@ -20812,7 +20856,7 @@ nb-x-k12:
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har endret progresjonskrav for et aktivt fag. Det kan være elever som allerede har kommet til denne modul, og til andre som er avhengige av den."
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Du har fullført en medelevvurdering for %{person}. Takk"
   you_have_count_submissions_to_grade_6c5b511a: "Du har %{count} innleveringer å vurdere"
-  you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "Du har angitt en ugyldig rekkevidde for denne eleven. Sjekk verdien og vurderingstypen og prøv igjen."
+  you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "Du har skrevet inn en ugyldig vurdering for denne eleven. Sjekk verdien og vurderingstype og prøv igjen."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort endringer på spørsmål i denne testen.* Disse endringene vil ikke vises for elevene før du lagrer testen."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "Du har ingen samarbeids-apper konfigurert. Snakk med læreren din for å få noen satt opp."
   you_have_no_courses_favorited_reloading_this_page__a2bae9de: "Du har ikke noen fagfavoritt. Ved å laste inn denne siden på nytt vil det vise alle\n\
@@ -20914,6 +20958,7 @@ nb-x-k12:
       Lese, skrive og og få tilgang til direktemeldinger
       Etter at du har opprettet applikasjonen, noter Consumer Key og Consumer Secret, og oppgi dem her.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Du vil ikke kunne forhåndsvise endringene dine"
+  you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Du vil ikke lenger motta fag varsler. For å aktivere fag varsler, benytt vekselbryteren ovenfor."
   your_answer_8dad6ea4: "Ditt svar:"
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Din nettleser imøtekommer ikke minstekravene til Canvas. Vennligst besøk *Canvas Community* for en fullstendig liste over støttede nettlesere."
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Din kommentar ble auto-lagret som et utkast."
