@@ -785,7 +785,7 @@ describe SpeedGrader::Assignment do
 
         reps = @assignment.representatives(user: @teacher, includes: [:completed])
         user = reps.find { |u| u.name == @first_group.name }
-        expect(enrollments.find { |u| u.user == user }).to_not be_nil
+        expect(enrollments.find_by(user: user)).to be_present
       end
 
       it 'does not include concluded students when included' do
@@ -803,7 +803,7 @@ describe SpeedGrader::Assignment do
 
         reps = @assignment.representatives(user: @teacher, includes: [:inactive])
         user = reps.find { |u| u.name == @first_group.name }
-        expect(enrollments.find { |u| u.user == user }).to_not be_nil
+        expect(enrollments.find_by(user: user)).to be_present
       end
 
       it 'does not include inactive students when included' do
