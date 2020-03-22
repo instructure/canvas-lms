@@ -92,11 +92,9 @@ describe "assignment groups" do
 
       assign = create_assignment!
       visit_assignment_edit_page(assign)
-
       wait_for_ajaximations
       select_first_override_section(default_section.name)
       select_first_override_header("Mastery Paths")
-
       first_due_at_element.clear
       first_due_at_element.
         send_keys(format_date_for_view(default_section_due, :medium))
@@ -104,7 +102,6 @@ describe "assignment groups" do
       add_override
       wait_for_ajaximations
       select_last_override_section(other_section.name)
-
       last_due_at_element.
         send_keys(format_date_for_view(other_section_due, :medium))
 
