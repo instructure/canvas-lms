@@ -291,12 +291,9 @@ describe "people" do
       get "/courses/#{@course.id}/users"
       create_student_group
       fj('.group-category-actions:visible a:visible').click
+      wait_for(method: nil, timeout: 2) { f('.delete-category').displayed? } # simple wait for option to be visible
       f('.delete-category').click
-      keep_trying_until do
-        expect(driver.switch_to.alert).not_to be_nil
-        driver.switch_to.alert.accept
-        true
-      end
+      accept_alert
       wait_for_ajaximations
       refresh_page
       expect(f('.empty-groupset-instructions')).to be_displayed
