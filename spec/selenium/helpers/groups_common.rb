@@ -277,7 +277,7 @@ module GroupsCommon
     wait_for_ajaximations
     f('.delete-group').click
 
-    driver.switch_to.alert.accept
+    accept_alert
     wait_for_animations
   end
 
@@ -287,7 +287,7 @@ module GroupsCommon
 
     fln('Delete').click
 
-    driver.switch_to.alert.accept
+    accept_alert
     wait_for_animations
   end
 
