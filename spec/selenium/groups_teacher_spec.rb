@@ -225,8 +225,7 @@ describe "new groups" do
       f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
       wait_for_ajaximations
       f(".ui-menu-item .edit-group-assignment").click
-      wait_for_ajaximations
-      sleep 0.1 # uses sleep because it has an animation that can't be waited on by wait_for_ajaximations
+      wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
       ff(".move-select .move-select__group option").last.click
       f('.move-select button[type="submit"]').click
       wait_for_ajaximations
@@ -318,18 +317,13 @@ describe "new groups" do
       get "/courses/#{@course.id}/groups"
 
       f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
-
-      expect(f(".group-leader .icon-user")).to be_displayed
-
+      wait_for_ajaximations
       f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
-
+      wait_for(method: nil, timeout: 1) { f(".ui-menu-item .edit-group-assignment").displayed? }
       f(".ui-menu-item .edit-group-assignment").click
-
-      option = ff(".move-select .move-select__group option").last
-      keep_trying_until { option.click; true } # have to wait for instUI animations
-
-      button = f('.move-select button[type="submit"]')
-      keep_trying_until { button.click; true } # have to wait for instUI animations
+      wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
+      ff(".move-select .move-select__group option").last.click
+      f('.move-select button[type="submit"]').click
       wait_for_ajaximations
 
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
@@ -903,7 +897,6 @@ describe "new groups" do
           create_and_submit_assignment_from_group(@students.last)
 
           get "/courses/#{@course.id}/groups"
-
           move_unassigned_student_to_group
 
           select_change_groups_option
@@ -936,9 +929,9 @@ describe "new groups" do
 
           # Moves Test User 2 to Test Group 1
           ff('.group-user-actions').last.click
-          wait_for_ajaximations
+          wait_for(method: nil, timeout: 1) { f(".ui-menu-item .edit-group-assignment").displayed? }
           ff('.edit-group-assignment').last.click
-          wait_for_ajaximations
+          wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
           click_option('.move-select .move-select__group select', "#{@testgroup.first.name}")
 
           sleep 0.3 # have to wait for instUI animations
