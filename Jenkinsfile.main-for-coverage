@@ -24,7 +24,6 @@ pipeline {
   options { ansiColor('xterm') }
 
   environment {
-    CANVAS_LMS_REFSPEC = "${env.CANVAS_LMS_REFSPEC}"
     RUN_COVERAGE = '1'
     POSTGRES = '9.5'
     RUBY_PASSENGER = '2.4-xenial'
@@ -60,6 +59,7 @@ pipeline {
           def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
           distribution.stashBuildScripts()
           distribution.addRSpecSuites(stages)
+          distribution.addSeleniumSuites(stages)
 
           parallel(stages)
         }

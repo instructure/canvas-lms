@@ -293,6 +293,7 @@ pipeline {
           def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
           distribution.stashBuildScripts()
           distribution.addRSpecSuites(stages)
+          distribution.addSeleniumSuites(stages)
 
           parallel(stages)
         }

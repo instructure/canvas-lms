@@ -23,11 +23,13 @@
  * @nodes: the hash of nodes to be ran later
  * @stage_count: the amount of nodes to add to the hash
  * @stage_name_prefix: the name to prefix the stages with
+ * @success_mark: what to mark the success as. null/false if no marking.
  * @stage_block: the closure thats exectued after unstashing build scripts
  */
 def appendStagesAsBuildNodes(nodes,
                              stage_count,
                              stage_name_prefix,
+                             success_mark,
                              stage_block) {
   for(int i = 0; i < stage_count; i++) {
     // make this a local variable so when the closure resolves
@@ -37,12 +39,17 @@ def appendStagesAsBuildNodes(nodes,
     def stage_name = "$stage_name_prefix ${index + 1}"
     nodes[stage_name] = {
       node('canvas-docker') {
-        stage(stage_name) {
-          // make sure to unstash
-          unstash name: "build-dir"
-          unstash name: "build-docker-compose"
-          stage_block(index)
-        }
+        // make sure to unstash
+        unstash name: "build-dir"
+        unstash name: "build-docker-compose"
+        stage_block(index)
+      }
+
+      // mark with instance index.
+      // we need to do this on the main node so we dont run into
+      // concurrency issues with persisting the success
+      if (success_mark) {
+        load('build/new-jenkins/groovy/successes.groovy').saveSuccess(success_mark)
       }
     }
   }
@@ -59,21 +66,40 @@ def stashBuildScripts() {
 }
 
 /**
- * common helper for adding both rspec and selenium tests to be ran
+ * common helper for adding rspec tests to be ran
  */
 def addRSpecSuites(stages) {
-  def rspec_config = load('build/new-jenkins/groovy/rspec.groovy').config()
-  def selenium_node_total = rspec_config.selenium_node_total
-  def rspec_node_total = rspec_config.rspec_node_total
+  def rspec_node_total = load('build/new-jenkins/groovy/rspec.groovy').config().rspec_node_total
+  def successes = load('build/new-jenkins/groovy/successes.groovy')
 
-  echo 'adding Selenium Test Sets'
-  appendStagesAsBuildNodes(stages, selenium_node_total, "Selenium Test Set") { index ->
-    load('build/new-jenkins/groovy/rspec.groovy').runSeleniumSuite(selenium_node_total, index)
+  if (successes.hasSuccess('rspec', rspec_node_total)) {
+    echo 'not running rspec. already successful'
   }
+  else {
+    echo 'adding RSpec Test Sets'
+    successes.clearSuccesses('rspec')
+    appendStagesAsBuildNodes(stages, rspec_node_total, 'RSpec Test Set', 'rspec') { index ->
+      load('build/new-jenkins/groovy/rspec.groovy').runRSpecSuite(rspec_node_total, index)
+    }
+  }
+}
 
-  echo 'adding RSpec Test Sets'
-  appendStagesAsBuildNodes(stages, rspec_node_total, "RSpec Test Set") { index ->
-    load('build/new-jenkins/groovy/rspec.groovy').runRSpecSuite(rspec_node_total, index)
+/**
+ * common helper for adding selenium tests to be ran
+ */
+def addSeleniumSuites(stages) {
+  def selenium_node_total = load('build/new-jenkins/groovy/rspec.groovy').config().selenium_node_total
+  def successes = load('build/new-jenkins/groovy/successes.groovy')
+
+  if (successes.hasSuccess('selenium', selenium_node_total)) {
+    echo 'not running selenium. already successful'
+  }
+  else {
+    echo 'adding Selenium Test Sets'
+    successes.clearSuccesses('selenium')
+    appendStagesAsBuildNodes(stages, selenium_node_total, 'Selenium Test Set', 'selenium') { index ->
+      load('build/new-jenkins/groovy/rspec.groovy').runSeleniumSuite(selenium_node_total, index)
+    }
   }
 }
 
