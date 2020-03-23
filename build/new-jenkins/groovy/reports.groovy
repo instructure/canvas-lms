@@ -53,9 +53,10 @@ def stashSpecFailures(prefix, index) {
 }
 
 def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
-  sh 'rm -vrf ./compiled_failures'
+  def working_dir = "${prefix}_compiled_failures"
+  sh "rm -vrf ./$working_dir"
 
-  dir('compiled_failures') {
+  dir(working_dir) {
     for(int index = 0; index < ci_node_total; index++) {
       dir ("node_${index}") {
         try {
@@ -73,11 +74,11 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
     allowMissing: false,
     alwaysLinkToLastBuild: false,
     keepAll: true,
-    reportDir: 'compiled_failures',
+    reportDir: working_dir,
     reportFiles: htmlFiles.join(','),
     reportName: report_name
   ]
-  sh 'rm -rf ./compiled_failures'
+  sh "rm -vrf ./$working_dir"
 }
 
 def buildIndexPage() {
