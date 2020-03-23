@@ -84,7 +84,7 @@ export function QRLoginModal({onDismiss, refreshInterval, pollInterval}) {
     async function getQRCode() {
       isFetching = true
       try {
-        const {json} = await doFetchApi({path: 'canvas/login.png', method: 'POST'})
+        const {json} = await doFetchApi({path: '/canvas/login.png', method: 'POST'})
         displayValidFor(moment().add(QR_CODE_LIFETIME))
         refetchAt = moment().add(refreshInterval)
         setImagePng(json.png)
