@@ -79,7 +79,7 @@ class DelayedNotification < ActiveRecord::Base
     lookups.each do |klass, ids|
       includes = []
       includes = [ :notification_policies, { user: :pseudonyms } ] if klass == CommunicationChannel
-      includes = [ :pseudonyms, { communication_channel: :notification_policies } ] if klass == User
+      includes = [ :pseudonyms, { communication_channels: :notification_policies } ] if klass == User
 
       ids.each_slice(100) do |slice|
         yield klass.where(:id => slice).preload(includes).to_a
