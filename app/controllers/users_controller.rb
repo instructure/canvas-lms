@@ -176,7 +176,7 @@ class UsersController < ApplicationController
     :user_dashboard, :toggle_hide_dashcard_color_overlays,
     :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
     :activity_stream_summary, :pandata_events_token, :dashboard_cards,
-    :user_graded_submissions]
+    :user_graded_submissions, :avatar_image]
   before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
