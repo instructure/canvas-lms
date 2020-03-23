@@ -74,7 +74,7 @@ describe('Navigation Header > Trays', () => {
 
       it('renders the modal', () => {
         const {getByText} = render(<QRLoginModal onDismiss={handleDismiss} />)
-        expect(getByText(/Scan this QR code/)).toBeInTheDocument()
+        expect(getByText(/To log in to your Canvas account/)).toBeInTheDocument()
       })
 
       it('renders a spinner', () => {
