@@ -754,6 +754,10 @@ en:
   allows_the_user_to_navigate_away_while_submission__276d73b7: Allows the user to navigate away while submission re-uploads are processing
   include_speedgrader_in_assignment_header_menu_69cd8656: Include SpeedGrader in Assignment Header Menu
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: Includes a link to SpeedGrader in the assignment header menu in Gradebook.
+  prefetch_user_ids_in_gradebook_b96521b0: Prefetch User IDs in Gradebook
+  load_user_ids_upon_page_load_so_that_gradebook_loa_c51693aa: Load user ids upon page load so that Gradebook loads more quickly.
+  qr_for_mobile_login_1b1560ce: QR for Mobile Login
+  include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: Include a link to show a QR code to easy mobile login on the profile page.
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   pronouns_for_users_da46fb5: Pronouns for users
@@ -801,6 +805,10 @@ en:
   under_some_conditions_the_legacy_rce_fails_to_init_66d515ab: |-
     Under some conditions, the legacy RCE fails to initialize because tinymce hasn't added the
     editor instance to its internal list when the RCE requires it.
+  allow_blueprint_publishing_after_association_fae6ba95: Allow Blueprint Publishing After Association
+  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+    Show a checkbox that optionally lets an account admin publish courses
+    automatically after associating and syncing with a blueprint course
   outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
   rubrics_in_course_navigation_539ea536: Rubrics in course navigation
@@ -4711,6 +4719,8 @@ en:
         domain: Domain
         secret: Secret
         recording_enabled: Allow conferences to be recorded.
+        free_trial: Mark this BigBlueButton instance as a free trial
+        replace_with_alternatives: Disable BigBlueButton conferences; show a list of alternatives instead
       domain_description: "**hostname** or **ip address** of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)"
       secret_description: This is the %{parameter_name} parameter that can be found in the %{filename} config file.
     canvadocs_settings:
@@ -8944,6 +8954,8 @@ en:
   admin_view_a2f4cd5c: Admin View
   rce_contents_replace_display_name: RCE Contents Replace
   rce_contents_replace_description: Enable RCE full text replace from LTI's
+  conference_guides_for_remote_classrooms_287173dd: Conference Guides for Remote Classrooms
+  get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: Get help on how to use and configure conferences in canvas.
   submit_a_feature_idea_2d4baa3d: Submit a Feature Idea
   this_canvas_installation_is_only_for_testing_and_w_12e52370: This Canvas installation is only for testing and *will reset every month.*
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2:
@@ -11829,6 +11841,8 @@ en:
   keyboard_shortcuts_ed1844bd: Keyboard Shortcuts
   search_23a88d5c: Search…
   gradebook_individual_view_8846598e: 'Gradebook: Individual View'
+  learning_mastery_context_name_a0b70957: Learning Mastery - %{context_name}
+  learning_mastery_5fc34276: Learning Mastery
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Submissions Uploaded"
   back_to_assignment_1df86a69: Back to Assignment
   no_submissions_have_been_uploaded_2fb02710: No Submissions Have Been Uploaded
@@ -14230,6 +14244,7 @@ en:
       large_roster: Large Roster
       public_syllabus: Public Syllabus
   unpublished_8b6107d6: Unpublished
+  blueprint_sync_90d0dfd5: Blueprint Sync
   course_restore:
     restore_error: There was an error attempting to restore the course. Course was not restored.
   models_DateGroup:
@@ -15606,6 +15621,7 @@ en:
   locked_objects_cannot_be_edited_in_associated_cour_1af858c8: Locked objects cannot be edited in associated courses.
   locked_objects_by_type_ff376c6c: Locked Objects by Type
   blueprint_5cca2ef: Blueprint
+  publish_upon_association_53cb0450: Publish upon association
   open_sidebar_2852e8c8: Open sidebar
   blueprint_settings_233e909a: Blueprint Settings
   close_sidebar_10b0fbb4: Close sidebar
@@ -15798,6 +15814,32 @@ en:
   submitted_submitdate_bdd3bf09: 'Submitted: %{submitDate}'
   view_submission_ff3da5d: View Submission
   select_student_name_caaff244: Select student %{name}
+  zoom_f3e54d69: Zoom
+  paste_zoom_into_calendar_events_announcements_disc_d873358e: Paste Zoom into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE).
+  visit_zoom_14636084: Visit Zoom
+  to_create_a_link_you_can_use_in_canvas_you_ll_need_5c6d93e4: to create a link you can use in Canvas. You’ll need to sign-up for a Zoom account if you don’t already have one.
+  google_meet_f896b61c: Google Meet
+  paste_google_meet_links_into_calendar_events_annou_2e363fc7: Paste Google Meet links into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE)
+  visit_google_meet_ebdaf94f: Visit Google Meet
+  to_create_a_link_you_can_use_in_canvas_you_ll_need_7dd85497: to create a link you can use in Canvas. You’ll need a Google account to use Google Meet.
+  learn_how_to_use_google_meet_in_canvas_3e7aadd9: Learn how to use Google Meet in Canvas
+  microsoft_teams_99cb45c0: Microsoft Teams
+  if_your_school_uses_microsoft_teams_you_can_use_th_992dff59: If your school uses Microsoft Teams, you can use the Enhanced Rich Content Editor (RCE) to easily add a Team room while creating Calendar Events, Announcements, discussions posts and more.
+  learn_how_to_use_microsoft_teams_in_canvas_8b79dde: Learn how to use Microsoft Teams in Canvas
+  conferences_powered_by_bigbluebutton_is_unable_to__37ef28fe: |-
+    Conferences, powered by BigBlueButton, is unable to handle current demand.  Consider upgrading to
+            Premium BigBlueButton or use one of the following video conferencing providers.  Please talk to your local
+            admin for additional guidance.
+  canvas_conferences_is_a_free_service_provided_by_b_cc0253e: Canvas Conferences is a free service provided by BigBlueButton.
+  if_your_institution_is_likely_to_need_more_than_10_297382d: |-
+    If your institution is likely to need more than 10 concurrent Conferences powered by
+              BigBlueButton, we recommend upgrading to Premium BigBlueButton or exploring alternative
+              conferencing solutions Canvas partners with, such as Zoom, Hangouts, Teams, and other
+              video conferencing tools who are offering free or discounted services.
+  learn_more_7a8d626: Learn More
+  not_all_of_these_services_may_be_supported_by_your_155d9f70: |-
+    Not all of these services may be supported by your institution. Please contact your
+              local admin for more information.
   great_work_from_the_canvas_developers_8c23f1c3: Great work! From the Canvas developers
   starting_import_operation_f25745f0: Starting import operation
   import_started_successfully_a3467411: Import started successfully
@@ -16569,7 +16611,6 @@ en:
   individual_view_d60b9132: Individual View…
   gradebook_history_b03f8524: Gradebook History…
   learning_mastery_6ed4fd63: Learning Mastery…
-  learning_mastery_5fc34276: Learning Mastery
   an_error_occurred_while_saving_your_settings_b503a31c: An error occurred while saving your settings
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: An error occurred while saving the course post policy
   gradebook_settings_updated_fef63d60: Gradebook Settings updated
@@ -16912,6 +16953,9 @@ en:
   count_unread_cff5855: "%{count} unread."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.
   user_profile_picture_46bffbc7: User profile picture
+  an_error_occurred_while_retrieving_your_qr_code_5392e2da: An error occurred while retrieving your QR Code
+  waiting_for_your_qr_code_to_load_809299e5: Waiting for your QR Code to load
+  scan_this_qr_code_from_any_canvas_mobile_app_to_ac_b5700d38: Scan this QR code from any Canvas mobile app to access your Canvas account when you're on the go.
   end_course_set_up_tutorial_f358b85d: End Course Set-up Tutorial
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Options in your User Settings.
   expand_tutorial_tray_22630c49: Expand tutorial tray

@@ -49,8 +49,17 @@ class CanvadocSessionsController < ApplicationController
         opts[:enrollment_type] = blob["enrollment_type"]
         # If we STILL don't have a role, something went way wrong so let's be unauthorized.
         return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
-
         assignment = submission.assignment
+        # If we're doing annotations, DocViewer needs additional information to send notifications
+        opts[:canvas_base_url] = assignment.course.root_account.domain
+        opts[:user_id] = @current_user.id
+        opts[:submission_user_id] = submission.user_id
+        opts[:course_id] = assignment.context_id
+        opts[:assignment_id] = assignment.id
+        opts[:post_manually] = assignment.post_manually?
+        opts[:posted_at] = submission.posted_at
+        opts[:assignment_name] = assignment.name
+
         opts[:audit_url] = submission_docviewer_audit_events_url(submission_id) if assignment.auditable?
         opts[:anonymous_instructor_annotations] = !!blob["anonymous_instructor_annotations"] if blob["anonymous_instructor_annotations"]
       end
@@ -59,8 +68,6 @@ class CanvadocSessionsController < ApplicationController
         opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
       end
 
-      # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
-      opts[:region] = attachment.shard.database_server.config[:region] || "none"
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
 
       url = attachment.canvadoc.session_url(opts.merge(user_session_params))

@@ -31,20 +31,21 @@ describe "assignment" do
       @teacher1.register!
       @course1.enroll_teacher(@teacher1, :enrollment_state => 'active')
       @assignment1 = @course1.assignments.create!(
-        :title => 'Existing Assignment', 
-        :points_possible => 10, 
+        :title => 'Existing Assignment',
+        :points_possible => 10,
         :submission_types => "online_url,online_upload,online_text_entry"
       )
       @assignment2_paper = @course1.assignments.create!(
-        :title => 'Existing Assignment', 
-        :points_possible => 10, 
+        :title => 'Existing Assignment',
+        :points_possible => 10,
         :submission_types => "on_paper"
       )
     end
 
     context "with feature on" do
       before(:each) do
-        Account.site_admin.enable_feature! :assignment_attempts
+        Account.site_admin.allow_feature! :assignment_attempts
+        @course1.enable_feature! :assignment_attempts
         user_session(@teacher1)
       end
 
@@ -63,24 +64,24 @@ describe "assignment" do
       it "with feature on, displays the attempts field on create view" do
         AssignmentCreateEditPage.visit_new_assignment_create_page(@course1.id)
         click_option(AssignmentCreateEditPage.submission_type_selector, "External Tool")
-        
+
         expect(AssignmentCreateEditPage.limited_attempts_fieldset.displayed?).to be true
       end
 
       it "with feature on, hides the attempts field on create view when no submissions is needed" do
         AssignmentCreateEditPage.visit_new_assignment_create_page(@course1.id)
         click_option(AssignmentCreateEditPage.submission_type_selector, "No Submission")
-        
+
         expect(AssignmentCreateEditPage.limited_attempts_fieldset.displayed?).to be false
       end
 
       it "allows user to set submission limit", custom_timeout: 25 do
         AssignmentCreateEditPage.visit_assignment_edit_page(@course1.id, @assignment1.id)
         click_option(AssignmentCreateEditPage.limited_attempts_dropdown, "Limited")
-        
+
         # default attempt count is 1
         expect(AssignmentCreateEditPage.limited_attempts_input.attribute('value')).to eq "1"
-        
+
         # increase attempts count
         AssignmentCreateEditPage.increase_attempts_btn.click()
         AssignmentCreateEditPage.assignment_save_button.click()

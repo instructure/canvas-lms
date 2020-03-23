@@ -5,7 +5,7 @@
 # For documentation, please check doc/docker/README.md in
 # this local repo which is also published at:
 # https://github.com/instructure/canvas-lms/tree/master/doc/docker
-FROM instructure/ruby-passenger:2.6
+FROM instructure/ruby-passenger:2.4-xenial
 
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"

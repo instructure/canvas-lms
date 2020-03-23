@@ -1,0 +1,377 @@
+/*
+ * Copyright (C) 2013 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'pages/shared/_outcome_colors';
+
+$border-light: #d3d9d9;
+$border-sidebar: #c9d0d6;
+$border-dark:  #bbb;
+$default-link-color: #0088cc;
+$font-color: #555;
+$header-child-margin: direction-sides(10px 8px 2px 8px);
+$header-font-color: #627382;
+$page-light: #f3f5f7;
+$page-dark: #ebeff2;
+
+
+/* bootstrap overrides */
+.nav-pills li a {
+  color: $ic-font-color-dark;
+}
+
+.gradebook-navigation-pills {
+  margin: 0;
+}
+
+
+/* page overrides */
+#breadcrumbs {
+  border-bottom: 0;
+}
+
+/* checkbox view */
+.checkbox-view,
+.operation-view {
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: block;
+  @include fontSize($ic-font-size--medium);
+  padding: 8px;
+
+  &:hover, &:focus {
+    border-color: $border-light;
+  }
+}
+.checkbox-view {
+  max-width: 210px;
+}
+.checkbox-view .checkbox,
+.operation-view .operation {
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: inline-block;
+  height: 18px;
+  float: direction(left);
+  margin-#{direction(right)}: 24px;
+  min-height: 18px; /* overwrites .checkbox in g_vendor */
+  padding: 0;
+  width: 18px;
+}
+.checkbox-label {
+  display: block;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-wrap: break-word; /* for IE support */
+}
+
+.checkbox[aria-checked=false] {
+  border: 1px solid #999;
+}
+
+/* layout */
+.outcome-gradebook {
+  background: $page-light;
+  border-top: 1px solid $border-dark;
+  box-sizing: border-box;
+  color: $font-color;
+  box-sizing: border-box;
+  padding-#{direction(left)}: 22px;
+}
+
+.outcome-gradebook-wrapper {
+  padding-top: 19px;
+}
+
+.outcome-gradebook-wrapper, .outcome-gradebook-sidebar {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.outcome-gradebook-sidebar {
+  background: $page-dark;
+  border-#{direction(left)}: 1px solid $border-dark;
+  float: direction(right);
+  position: relative;
+}
+
+.outcome-gradebook-sidebar .sidebar-toggle {
+  color: $font-color;
+
+  &:before {
+    @include fontSize(28px);
+  }
+}
+
+.outcome-gradebook-sidebar-header {
+  border-bottom: 1px solid $border-sidebar;
+  margin: 0 12px 16px;
+  padding: 8px 12px;
+}
+
+.outcome-gradebook-sidebar.collapsed {
+  width: 50px;
+
+  .outcome-gradebook-sidebar-header {
+    padding: 8px 0;
+    margin: 0 6px 16px;
+  }
+
+  .outcome-gradebook-sidebar-content {
+    padding: 0 4px;
+  }
+
+  .checkbox-label,
+  .operation-label {
+    display: none;
+  }
+
+  .checkbox,
+  .operation {
+    float: none;
+    margin: 0;
+    position: relative;
+    top: 2px;
+  }
+
+  .checkbox-view,
+  .operation-view {
+    text-align: center;
+  }
+}
+
+
+.outcome-gradebook-sidebar-content {
+  width: auto;
+  padding-#{direction(left)}: 12px;
+  padding-#{direction(right)}: 12px;
+  .operations {
+    border-top: 1px solid $border-sidebar;
+    a {
+      color: $font-color;
+      @include fontSize($ic-font-size--medium);
+    }
+  }
+}
+
+.gradebook-header {
+  display: flex;
+  align-items: direction(right);
+  @include clearfix;
+  padding-top: $ic-sp;
+  + .assignment-gradebook-container {
+    #gradebook-toolbar { border-top: 1px solid $ic-border-light; }
+  }
+  .gradebook-navigation { margin-top: 3px; }
+
+  .header-buttons {
+    flex: 1;
+    text-align: direction(right);
+    margin-bottom: $ic-sp;
+
+    .post-grades-button-placeholder {
+      display: inline-block;
+    }
+    .section-button-placeholder {
+      display: inline-block;
+    }
+  }
+}
+
+/* slickgrid */
+
+/* slickgrid overrides */
+.outcome-gradebook-wrapper {
+  .slick-viewport {
+    border-#{direction(left)}: 1px solid $border-light;
+    border-top: 1px solid $border-dark;
+  }
+
+  .ui-state-default {
+    background: none;
+    border: none;
+    box-shadow: none;
+    color: $font-color;
+    text-shadow: none;
+  }
+
+  .ui-widget-content {
+    color: $font-color;
+  }
+
+  .slick-header-column.ui-state-hover, .slick-header-column.slick-header-column-active {
+    background: none;
+  }
+
+  .slick-sort-indicator {
+    display: none;
+  }
+
+  .slick-header-column-sorted, .slick-header-column-sorted:hover {
+    background: #fff;
+    font-style: normal;
+    font-weight: bold;
+  }
+
+  .slick-header-column:hover .slick-resizable-handle {
+    background-color: $border-light;
+  }
+
+  .ui-widget-content {
+    background: none;
+  }
+
+  .even, .odd {
+    .slick-cell {
+      background: none;
+      border: none;
+    }
+  }
+}
+
+/* slickgrid styles */
+.outcome-gradebook-wrapper {
+  .grid-canvas {
+    background: #fff;
+  }
+
+  .slick-header-column {
+    @include fontSize(13px);
+
+    .slick-column-name {
+      color: $header-font-color;
+      font-weight: bold;
+    }
+
+    &.ui-state-default {
+      height: 51px;
+      line-height: 51px;
+      padding: 4px;
+    }
+  }
+
+  .slick-headerrow, .slick-header {
+    border-#{direction(left)}: 1px solid transparent;
+  }
+
+  .slick-headerrow-column {
+    background: #fff;
+    border: 1px solid transparent;
+    border-#{direction(left)}: none;
+    border-#{direction(right)}-color: $border-light;
+    border-bottom-color: $border-light;
+    border-top-color: $border-light;
+    line-height: 37px;
+    min-height: 37px;
+    height: 40px;
+
+    &.ui-state-default {
+      padding: 0;
+    }
+
+    &.average-filter {
+      background: transparent;
+      border: none;
+      @include fontSize(15px);
+      font-weight: bold;
+      line-height: 39px;
+      min-height: 40px;
+    }
+
+    &.average-filter a {
+      color: $font-color;
+    }
+
+    &.f1 {
+      border-#{direction(left)}: 1px solid $border-light;
+    }
+  }
+
+  .even, .odd {
+    .slick-cell {
+      border: 1px solid transparent;
+      border-top: none;
+      border-#{direction(left)}: none;
+      border-bottom-color: $border-light;
+      border-#{direction(right)}-color: $border-light;
+      @include fontSize(15px);
+      height: 37px;
+      line-height: 37px;
+      padding: 0;
+    }
+  }
+
+  .outcome-student-header-cell {
+    text-align: direction(right);
+  }
+
+  .outcome-student-cell.slick-cell {
+    @include fontSize($ic-font-size--small);
+    line-height: 21px;
+    .student-section {
+      color: $font-color;
+      margin-top: -5px;
+      @include fontSize(12px);
+    }
+  }
+
+  .outcome-student-cell-content {
+    padding-#{direction(left)}: 8px;
+    margin-top: 1px;
+    .avatar {
+      width: 25px;
+      height: 25px;
+      margin-top: 3px;
+      margin-#{direction(right)}: 4px;
+      float: direction(left);
+      position: relative;
+      z-index: 1;
+    }
+  }
+}
+
+.outcome-description {
+  width: 70%;
+  float: direction(left);
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.outcome-cell-wrapper {
+  text-align: direction(right);
+  padding-#{direction(right)}: 10px;
+}
+
+.outcome-score {
+  font-weight: bold;
+}
+
+.outcome-result {
+  border-radius: 3px;
+  display: inline-block;
+  height: 18px;
+  width: 18px;
+  margin-#{direction(left)}: 10px;
+  vertical-align: text-top;
+
+  &.exceeds      { background: $exceeds-color; }
+  &.mastery      { background: $mastery-color; }
+  &.near-mastery { background: $near-color; }
+  &.remedial     { background: $remedial-color; }
+}

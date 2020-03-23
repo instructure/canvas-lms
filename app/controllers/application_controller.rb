@@ -172,7 +172,6 @@ class ApplicationController < ActionController::Base
             show_feedback_link: show_feedback_link?
           },
           FEATURES: {
-            assignment_attempts: Account.site_admin.feature_enabled?(:assignment_attempts),
             la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
             cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
             show_qr_login: Object.const_defined?("InstructureMiscPlugin") && !!@domain_root_account&.feature_enabled?(:mobile_qr_login)
@@ -368,10 +367,12 @@ class ApplicationController < ActionController::Base
       course: @context.slice(:id, :name, :enrollment_term_id),
     }
     if is_master
+      can_manage = @context.account.grants_right?(@current_user, :manage_master_courses)
       bc_data.merge!(
         subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
         terms: @context.account.root_account.enrollment_terms.active.to_a.map{|term| {id: term.id, name: term.name}},
-        canManageCourse: @context.account.grants_right?(@current_user, :manage_master_courses)
+        canManageCourse: can_manage,
+        canAutoPublishCourses: can_manage && @domain_root_account.feature_enabled?(:uxs_4_omg_a_scary_blueprint_checkbox)
       )
     end
     js_env :BLUEPRINT_COURSES_DATA => bc_data

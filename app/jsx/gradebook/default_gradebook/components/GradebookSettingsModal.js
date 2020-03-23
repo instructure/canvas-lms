@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {bool, func, instanceOf, shape, string} from 'prop-types'
+import {bool, func, shape, string} from 'prop-types'
 import _ from 'underscore'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-overlays'
@@ -32,7 +32,6 @@ import {
   updateCourseSettings,
   updateLatePolicy
 } from '../apis/GradebookSettingsModalApi'
-import PostPolicies from '../PostPolicies'
 import {getAssignmentPostPolicies, setCoursePostPolicy} from '../PostPolicies/PostPolicyApi'
 import LatePoliciesTabPanel from './LatePoliciesTabPanel'
 import GradePostingPolicyTabPanel from './GradePostingPolicyTabPanel'
@@ -96,7 +95,13 @@ export default class GradebookSettingsModal extends React.Component {
     gradedLateSubmissionsExist: bool.isRequired,
     onCourseSettingsUpdated: func.isRequired,
     onLatePolicyUpdate: func.isRequired,
-    postPolicies: instanceOf(PostPolicies)
+    postPolicies: shape({
+      coursePostPolicy: shape({
+        postManually: bool.isRequired
+      }),
+      setAssignmentPostPolicies: func.isRequired,
+      setCoursePostPolicy: func.isRequired
+    })
   }
 
   static defaultProps = {

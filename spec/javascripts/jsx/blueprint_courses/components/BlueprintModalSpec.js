@@ -54,14 +54,22 @@ test('renders the Done button when there are no changes', () => {
   equal(buttons.at(0).prop('children'), 'Done')
 })
 
-test('renders the Save + Cancel buttons when there are changes', () => {
+test('renders the Checkbox, Save, and Cancel buttons when there are changes', () => {
   const props = {
     ...defaultProps(),
-    hasChanges: true
+    hasChanges: true,
+    willAddAssociations: true,
+    canAutoPublishCourses: true
   }
   const wrapper = enzyme.shallow(render(props))
   const buttons = wrapper.find('ModalFooter').find('Button')
   equal(buttons.length, 2)
+  ok(
+    wrapper
+      .find('ModalFooter')
+      .find('Checkbox')
+      .exists()
+  )
   equal(buttons.at(0).prop('children'), 'Cancel')
   equal(buttons.at(1).prop('children'), 'Save')
 })
@@ -77,3 +85,4 @@ test('renders the Done button when there are changes, but is in the process of s
   equal(buttons.length, 1)
   equal(buttons.at(0).prop('children'), 'Done')
 })
+

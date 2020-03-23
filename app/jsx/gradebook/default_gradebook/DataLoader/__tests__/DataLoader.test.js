@@ -18,6 +18,8 @@
 
 import sinon from 'sinon'
 
+import {clearPrefetchedXHRs, getPrefetchedXHR, setPrefetchedXHR} from '@instructure/js-utils'
+
 import FakeServer, {
   paramsFromRequest,
   pathFromRequest
@@ -179,10 +181,40 @@ describe('Gradebook DataLoader', () => {
       })
 
       it('resolves .gotStudentIds with the user ids', async () => {
-        let loadedStudentIds
         await loadGradebookData()
-        dataLoader.gotStudentIds.then(studentIds => (loadedStudentIds = studentIds))
+        const loadedStudentIds = await dataLoader.gotStudentIds
         expect(loadedStudentIds).toEqual({user_ids: exampleData.studentIds})
+      })
+
+      describe('when student ids have been prefetched', () => {
+        beforeEach(() => {
+          ENV.prefetch_gradebook_user_ids = true
+          const jsonString = JSON.stringify({user_ids: exampleData.studentIds})
+          const response = new Response(jsonString)
+          setPrefetchedXHR('user_ids', Promise.resolve(response))
+        })
+
+        afterEach(() => {
+          clearPrefetchedXHRs()
+          delete ENV.prefetch_gradebook_user_ids
+        })
+
+        it('does not sends the request using the given course id', async () => {
+          await loadGradebookData()
+          const requests = server.filterRequests(urls.userIds)
+          expect(requests).toHaveLength(0)
+        })
+
+        it('resolves .gotStudentIds with the user ids', async () => {
+          await loadGradebookData()
+          const loadedStudentIds = await dataLoader.gotStudentIds
+          expect(loadedStudentIds).toEqual({user_ids: exampleData.studentIds})
+        })
+
+        it('removes the prefetch request', async () => {
+          await loadGradebookData()
+          expect(getPrefetchedXHR('user_ids')).toBeUndefined()
+        })
       })
     })
 

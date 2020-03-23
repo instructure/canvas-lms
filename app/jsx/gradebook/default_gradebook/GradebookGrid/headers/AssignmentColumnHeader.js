@@ -18,16 +18,16 @@
 
 import React from 'react'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
-import {IconMoreSolid, IconOffLine, IconOffSolid} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-elements'
+import {IconMoreSolid, IconOffLine, IconOffSolid} from '@instructure/ui-icons'
 import {Grid} from '@instructure/ui-layout'
 import {Menu} from '@instructure/ui-menu'
-import {Text} from '@instructure/ui-elements'
-import 'message_students'
 import I18n from 'i18n!gradebook'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+
 import {isPostable} from '../../../../grading/helpers/SubmissionHelper'
-import MessageStudentsWhoHelper from '../../../shared/helpers/messageStudentsWhoHelper'
+import AsyncComponents from '../../AsyncComponents'
 import ColumnHeader from './ColumnHeader'
 
 function SecondaryDetailLine(props) {
@@ -202,11 +202,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       onSelect: func.isRequired
     }).isRequired,
 
-    muteAssignmentAction: shape({
-      disabled: bool.isRequired,
-      onSelect: func.isRequired
-    }).isRequired,
-
     onMenuDismiss: func.isRequired,
     showUnpostedMenuItem: bool.isRequired
   }
@@ -237,10 +232,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
   setDefaultGrades = () => {
     this.invokeAndSkipFocus(this.props.setDefaultGradeAction)
-  }
-
-  muteAssignment = () => {
-    this.invokeAndSkipFocus(this.props.muteAssignmentAction)
   }
 
   downloadSubmissions = () => {
@@ -290,15 +281,17 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     this.props.enterGradesAsSetting.onSelect(values[0])
   }
 
-  showMessageStudentsWhoDialog = () => {
+  showMessageStudentsWhoDialog = async () => {
     this.state.skipFocusOnClose = true
     this.setState({skipFocusOnClose: true})
-    const settings = MessageStudentsWhoHelper.settings(
-      this.props.assignment,
-      this.activeStudentDetails()
-    )
-    settings.onClose = this.focusAtEnd
-    window.messageStudents(settings)
+    const MessageStudentsWhoDialog = await AsyncComponents.loadMessageStudentsWhoDialog()
+
+    const options = {
+      assignment: this.props.assignment,
+      students: this.activeStudentDetails()
+    }
+
+    MessageStudentsWhoDialog.show(options, this.focusAtEnd)
   }
 
   activeStudentDetails() {
@@ -436,25 +429,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           <span data-menu-item-id="set-default-grade">{I18n.t('Set Default Grade')}</span>
         </Menu.Item>
 
-        {this.props.postGradesAction.featureEnabled ? (
-          <Menu.Item
-            disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
-            onSelect={this.postGrades}
-          >
-            {labelForPostGradesAction(this.props.postGradesAction)}
-          </Menu.Item>
-        ) : (
-          <Menu.Item
-            disabled={this.props.muteAssignmentAction.disabled}
-            onSelect={this.muteAssignment}
-          >
-            <span data-menu-item-id="assignment-muter">
-              {this.props.assignment.muted
-                ? I18n.t('Unmute Assignment')
-                : I18n.t('Mute Assignment')}
-            </span>
-          </Menu.Item>
-        )}
+        <Menu.Item
+          disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
+          onSelect={this.postGrades}
+        >
+          {labelForPostGradesAction(this.props.postGradesAction)}
+        </Menu.Item>
 
         {this.props.postGradesAction.featureEnabled && (
           <Menu.Item

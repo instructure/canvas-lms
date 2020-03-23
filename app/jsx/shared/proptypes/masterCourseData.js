@@ -20,6 +20,7 @@ import {shape, bool, string, number, oneOfType} from 'prop-types'
 
 const masterCourseData = shape({
   canManageCourse: bool,
+  canAutoPublishCourses: bool,
   isChildCourse: bool,
   isMasterCourse: bool,
   accountId: oneOfType([string, number]),

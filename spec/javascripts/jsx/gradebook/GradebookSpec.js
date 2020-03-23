@@ -23,11 +23,13 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import moxios from 'moxios'
 import qs from 'qs'
+
 import fakeENV from 'helpers/fakeENV'
 import UserSettings from 'compiled/userSettings'
 import natcompare from 'compiled/util/natcompare'
 import round from 'compiled/util/round'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
+import AsyncComponents from 'jsx/gradebook/default_gradebook/AsyncComponents'
 import ActionMenu from 'jsx/gradebook/default_gradebook/components/ActionMenu'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
 import DataLoader from 'jsx/gradebook/DataLoader'
@@ -41,6 +43,7 @@ import studentRowHeaderConstants from 'jsx/gradebook/default_gradebook/constants
 import {darken, statusColors, defaultColors} from 'jsx/gradebook/default_gradebook/constants/colors'
 import ViewOptionsMenu from 'jsx/gradebook/default_gradebook/components/ViewOptionsMenu'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
+import {waitFor} from '../support/Waiters'
 
 import {
   createGradebook,
@@ -2835,7 +2838,7 @@ QUnit.module('Gradebook#updateCurrentSection', {
     this.gradebook.postGradesStore = {
       setSelectedSection: sinon.stub()
     }
-    sandbox.stub(this.gradebook, 'reloadStudentData')
+    sandbox.stub(this.gradebook.dataLoader, 'reloadStudentDataForSectionFilterChange')
     sinon.spy(this.gradebook, 'saveSettings')
     sandbox.stub(this.gradebook, 'updateSectionFilterVisibility')
   },
@@ -2904,7 +2907,7 @@ test('has no effect when the section has not changed', function() {
 
 test('reloads student data after saving settings', function() {
   this.gradebook.updateCurrentSection('2001')
-  strictEqual(this.gradebook.reloadStudentData.callCount, 1)
+  strictEqual(this.gradebook.dataLoader.reloadStudentDataForSectionFilterChange.callCount, 1)
 })
 
 QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {
@@ -4898,7 +4901,7 @@ QUnit.module('Gradebook#toggleEnrollmentFilter', {
         updateColumnHeaders: sinon.stub()
       }
     }
-    sandbox.stub(this.gradebook, 'reloadStudentData').returns({})
+    sandbox.stub(this.gradebook.dataLoader, 'reloadStudentDataForEnrollmentFilterChange')
     sandbox.stub(this.gradebook, 'saveSettings').callsFake((_data, callback) => {
       callback()
     })
@@ -4934,7 +4937,7 @@ test('includes the "student" column id when updating column headers', function()
 
 test('reloads student data after saving settings', function() {
   this.gradebook.toggleEnrollmentFilter('inactive')
-  strictEqual(this.gradebook.reloadStudentData.callCount, 1)
+  strictEqual(this.gradebook.dataLoader.reloadStudentDataForEnrollmentFilterChange.callCount, 1)
 })
 
 QUnit.module('Gradebook "Enter Grades as" Setting', suiteHooks => {
@@ -7026,13 +7029,11 @@ QUnit.module('Gradebook#renderSubmissionTray', {
   }
 })
 
-test('shows a submission tray on the page when rendering an open tray', function() {
-  const clock = sinon.useFakeTimers()
+test('shows a submission tray on the page when rendering an open tray', async function() {
   this.gradebook.setSubmissionTrayState(true, '1101', '2301')
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'))
-  clock.tick(500) // wait for Tray to transition open
+  await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
   ok(document.querySelector('[aria-label="Submission tray"]'))
-  clock.restore()
 })
 
 test('does not show a submission tray on the page when rendering a closed tray', function() {
@@ -7044,20 +7045,19 @@ test('does not show a submission tray on the page when rendering a closed tray',
   clock.restore()
 })
 
-test('shows a submission tray when the related submission has not loaded for the student', function() {
-  const clock = sinon.useFakeTimers()
+test('shows a submission tray when the related submission has not loaded for the student', async function() {
   this.gradebook.setSubmissionTrayState(true, '1101', '2301')
   this.gradebook.student('1101').assignment_2301 = undefined
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'))
-  clock.tick(500) // wait for Tray to transition open
+  await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
   ok(document.querySelector('[aria-label="Submission tray"]'))
-  clock.restore()
 })
 
-test('calls getSubmissionTrayProps with the student', function() {
+test('calls getSubmissionTrayProps with the student', async function() {
   sinon.spy(this.gradebook, 'getSubmissionTrayProps')
   this.gradebook.setSubmissionTrayState(true, '1101', '2301')
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'))
+  await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
   deepEqual(this.gradebook.getSubmissionTrayProps.firstCall.args, [this.gradebook.student('1101')])
 })
 
@@ -7158,7 +7158,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     $fixtures.innerHTML = ''
   })
 
-  test('does not show the previous student arrow for the first student', () => {
+  test('does not show the previous student arrow for the first student', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7166,7 +7166,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     strictEqual(
       document.querySelectorAll('#student-carousel .left-arrow-button-container button').length,
@@ -7174,7 +7174,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     )
   })
 
-  test('shows the next student arrow for the first student', () => {
+  test('shows the next student arrow for the first student', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7182,7 +7182,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     strictEqual(
       document.querySelectorAll('#student-carousel .right-arrow-button-container button').length,
@@ -7190,7 +7190,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     )
   })
 
-  test('does not show the next student arrow for the last student', () => {
+  test('does not show the next student arrow for the last student', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7198,7 +7198,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     strictEqual(
       document.querySelectorAll('#student-carousel .right-arrow-button-container button').length,
@@ -7206,7 +7206,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     )
   })
 
-  test('shows the previous student arrow for the last student', () => {
+  test('shows the previous student arrow for the last student', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7214,7 +7214,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     strictEqual(
       document.querySelectorAll('#student-carousel .left-arrow-button-container button').length,
@@ -7222,7 +7222,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     )
   })
 
-  test('clicking the next student arrow calls loadTrayStudent with "next"', () => {
+  test('clicking the next student arrow calls loadTrayStudent with "next"', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7233,7 +7233,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     sinon.stub(gradebook, 'getSubmissionCommentsLoaded').returns(true)
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     const nextStudentButton = document.querySelector(
       '#student-carousel .right-arrow-button-container button'
@@ -7243,7 +7243,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     deepEqual(gradebook.loadTrayStudent.getCall(0).args, ['next'])
   })
 
-  test('clicking the previous student arrow calls loadTrayStudent with "previous"', () => {
+  test('clicking the previous student arrow calls loadTrayStudent with "previous"', async () => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
@@ -7254,7 +7254,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     sinon.stub(gradebook, 'getSubmissionCommentsLoaded').returns(true)
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
-    clock.tick(500) // wait for Tray to transition open
+    await waitFor(() => document.querySelector('[aria-label="Submission tray"]'))
 
     const nextStudentButton = document.querySelector(
       '#student-carousel .left-arrow-button-container button'
@@ -7708,18 +7708,6 @@ QUnit.module('Gradebook Assignment Actions', suiteHooks => {
 
     test('includes the "onSelect" callback', () => {
       const action = gradebook.getCurveGradesAction('2301')
-      equal(typeof action.onSelect, 'function')
-    })
-  })
-
-  QUnit.module('#getMuteAssignmentAction', () => {
-    test('includes the "disabled" property', () => {
-      const action = gradebook.getMuteAssignmentAction('2301')
-      equal(typeof action.disabled, 'boolean')
-    })
-
-    test('includes the "onSelect" callback', () => {
-      const action = gradebook.getMuteAssignmentAction('2301')
       equal(typeof action.onSelect, 'function')
     })
   })
@@ -8942,24 +8930,22 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
   let gradebook
 
   function gradebookSettingsModalProps() {
-    return ReactDOM.render.firstCall.args[0].props
+    return AsyncComponents.renderGradebookSettingsModal.lastCall.args[0]
   }
 
   hooks.beforeEach(() => {
     setFixtureHtml($fixtures)
-    sinon.stub(ReactDOM, 'render')
+    sandbox.stub(AsyncComponents, 'renderGradebookSettingsModal')
   })
 
   hooks.afterEach(() => {
-    ReactDOM.render.restore()
     $fixtures.innerHTML = ''
   })
 
   test('renders the GradebookSettingsModal component', () => {
     gradebook = createGradebook()
     gradebook.renderGradebookSettingsModal()
-    const componentName = ReactDOM.render.firstCall.args[0].type.name
-    strictEqual(componentName, 'GradebookSettingsModal')
+    strictEqual(AsyncComponents.renderGradebookSettingsModal.callCount, 1)
   })
 
   test('sets the .courseFeatures prop to #courseFeatures from Gradebook', () => {
@@ -9325,8 +9311,7 @@ QUnit.module('Gradebook#updateStudentHeadersAndReloadData', hooks => {
 
   hooks.beforeEach(() => {
     gradebook = createGradebook()
-    const reloadStudentDataResponse = {updateGradingPeriodAssignments: {then: fn => fn()}}
-    sinon.stub(gradebook, 'reloadStudentData').returns(reloadStudentDataResponse)
+    sinon.stub(gradebook.dataLoader, 'reloadStudentDataForEnrollmentFilterChange')
   })
 
   test('makes a call to update column headers', () => {
@@ -9350,7 +9335,7 @@ QUnit.module('Gradebook#updateStudentHeadersAndReloadData', hooks => {
 
   test('reloads student data', () => {
     gradebook.updateStudentHeadersAndReloadData()
-    strictEqual(gradebook.reloadStudentData.callCount, 1)
+    strictEqual(gradebook.dataLoader.reloadStudentDataForEnrollmentFilterChange.callCount, 1)
   })
 
   test('reloads the student data after the column headers have been updated', () => {
@@ -9359,7 +9344,10 @@ QUnit.module('Gradebook#updateStudentHeadersAndReloadData', hooks => {
       'updateColumnHeaders'
     )
     gradebook.updateStudentHeadersAndReloadData()
-    sinon.assert.callOrder(updateColumnHeaders, gradebook.reloadStudentData)
+    sinon.assert.callOrder(
+      updateColumnHeaders,
+      gradebook.dataLoader.reloadStudentDataForEnrollmentFilterChange
+    )
   })
 })
 
@@ -9511,12 +9499,6 @@ QUnit.module('Gradebook', () => {
 
       test('attaches the Post Policies feature module to Gradebook', () => {
         ok(gradebook.postPolicies instanceof PostPolicies)
-      })
-
-      test('initializes Post Policies when Gradebook initializes', () => {
-        sinon.spy(gradebook.postPolicies, 'initialize')
-        gradebook.initialize()
-        strictEqual(gradebook.postPolicies.initialize.callCount, 1)
       })
     })
   })
