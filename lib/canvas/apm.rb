@@ -107,7 +107,11 @@ module Canvas
         debug_mode = @enable_debug_mode.presence || false
         Datadog.configure do |c|
           c.tracer sampler: sampler, debug: debug_mode
+          c.use :aws
+          c.use :faraday
+          c.use :graphql
           c.use :rails
+          c.use :redis
         end
         Delayed::Worker.plugins << Canvas::Apm::InstJobs::Plugin
       end
