@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,32 +20,48 @@ require 'aws-sdk-sqs'
 
 module Services
   class NotificationService
-    def self.process(global_id, body, type, to)
-      return unless notification_queue.present?
+    def self.process(global_id, body, type, to, priority=false)
+      queue_url = choose_queue_url(priority)
+      return unless queue_url.present?
 
-      notification_queue.send_message(message_body: {
+      notification_sqs.send_message(message_body: {
           global_id: global_id,
           type: type,
           message: body,
           target: to,
           request_id: RequestContextGenerator.request_id
         }.to_json,
-        queue_url: @queue_url)
+        queue_url: queue_url)
     end
 
     class << self
       private
 
-      def notification_queue
+      QUEUE_NAME_KEYS = {
+        priority: 'notification_service_priority_queue_name',
+        default: 'notification_service_queue_name'
+      }.freeze
+
+      def notification_sqs
         return nil if config.blank?
 
-        @notification_queue ||= begin
+        @notification_sqs ||= begin
           conf = Canvas::AWS.validate_v2_config(config, 'notification_service.yml')
-          queue_name = conf['notification_service_queue_name']
-          sqs = Aws::SQS::Client.new(conf.except('notification_service_queue_name'))
-          @queue_url = sqs.get_queue_url(queue_name: queue_name).queue_url
+          sqs = Aws::SQS::Client.new(conf.except(*QUEUE_NAME_KEYS.values))
+          @queue_urls = {}
+          QUEUE_NAME_KEYS.each do |key, queue_name_key|
+            queue_name = conf[queue_name_key]
+            next unless queue_name.present?
+            @queue_urls[key] = sqs.get_queue_url(queue_name: queue_name).queue_url
+          end
           sqs
         end
+      end
+
+      def choose_queue_url(priority)
+        return nil unless notification_sqs.present?
+        url = @queue_urls[:priority] if priority
+        url || @queue_urls[:default]
       end
 
       def config
