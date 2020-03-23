@@ -119,7 +119,7 @@ export function QRLoginModal({onDismiss, refreshInterval, pollInterval}) {
       <Modal.Body>
         <View display="block">
           {I18n.t(
-            'Scan this QR code from any Canvas mobile app to access your Canvas account when youʼre on the go.'
+            'To log in to your Canvas account when you’re on the go, scan this QR code from the Canvas Student app.'
           )}
         </View>
         {renderQRCode()}
