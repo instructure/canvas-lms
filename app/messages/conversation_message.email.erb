@@ -25,7 +25,7 @@
 <% end %>
 
 <% if asset.conversation.subject.present? %>
-  Subject: <%= asset.conversation.subject %>
+  <%= t "Subject: %{subject}", subject: asset.conversation.subject %>
 <% end %>
 
 <%= asset.body %>
