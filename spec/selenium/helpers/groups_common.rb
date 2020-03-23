@@ -274,7 +274,7 @@ module GroupsCommon
 
   def manually_delete_group
     f('.group-actions .icon-more').click
-    wait_for_ajaximations
+    wait_for(method: nil, timeout: 1) { f('.delete-group').displayed? }
     f('.delete-group').click
 
     accept_alert
