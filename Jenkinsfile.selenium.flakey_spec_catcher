@@ -24,6 +24,8 @@ def result_test_count = -1
 def result_node_count = -1
 @groovy.transform.Field
 def changed_tests = ''
+@groovy.transform.Field
+def fsc_timeout = false
 
 def getImageTagVersion() {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
@@ -85,6 +87,15 @@ def executeFlakeySpecCatcher(prefix = 'main') {
       sh 'build/new-jenkins/rspec-flakey-spec-catcher.sh'
     }
   }
+  // Don't fail the build for timeouts
+  catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    if (!e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+      throw e
+    } else {
+      echo "Not failing the build due to timeouts"
+      fsc_timeout = true
+    }
+  }
   finally {
     sh "mkdir -p tmp/$prefix"
     sh(
@@ -99,6 +110,9 @@ def sendSlack(success) {
   def color = success ? "good" : "danger"
   def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>"
   def message = "$jobInfo\n$changed_tests"
+  if (fsc_timeout) {
+    message = "Timeout Occurred!\n$message"
+  }
   slackSend channel: '#flakey_spec_catcher_noisy', color: color, message: message
 }
 
