@@ -36,6 +36,7 @@ module Canvas
           attr_writer :tracer
 
           def reset!
+            super
             @tracer = nil
           end
 

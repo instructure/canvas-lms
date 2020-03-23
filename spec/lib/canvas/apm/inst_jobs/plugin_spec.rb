@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'spec_helper'
+require_relative '../../../../sharding_spec_helper'
+
 require 'delayed/testing'
 require_dependency "canvas/apm/inst_jobs/plugin"
 
@@ -75,6 +76,7 @@ describe Canvas::Apm::InstJobs::Plugin do
   end
 
   describe 'instrumented job invocation' do
+    specs_require_sharding
     let(:sample_job_object) do
       stub_const('SampleJob', Class.new do
         def perform; end
@@ -84,6 +86,7 @@ describe Canvas::Apm::InstJobs::Plugin do
     it 'has resource name equal to job name' do
       expect(Canvas::Apm::InstJobs::Plugin.tracer).to eq(tracer)
       job = Delayed::Job.enqueue(sample_job_object.new, {})
+      job.account_id = 12345
       Delayed::Testing.run_job(job)
       expect(span.resource).to eq('SampleJob')
       expect(span.tags["inst_jobs.id"] > 0).to be_truthy
@@ -91,8 +94,10 @@ describe Canvas::Apm::InstJobs::Plugin do
       expect(span.tags["inst_jobs.priority"] > 0).to be_truthy
       expect(span.tags["inst_jobs.attempts"]).to eq(0)
       expect(span.tags["inst_jobs.strand"]).to be_nil
-      expect(span.tags["shard"]).to eq(job.shard_id)
-      expect(span.tags["root_account"]).to eq(job.account_id)
+      expect(job.shard_id > 0).to be_truthy
+      expect(span.tags["shard"]).to eq(job.shard_id.to_s)
+      expect(job.account_id > 0).to be_truthy
+      expect(span.tags["root_account"]).to eq(job.account_id.to_s)
     end
   end
 end
