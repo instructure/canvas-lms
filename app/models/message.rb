@@ -640,7 +640,8 @@ class Message < ActiveRecord::Base
           notification_service_id,
           notification_message,
           path_type,
-          target
+          target,
+          self.notification.priority?
         )
       end
       complete_dispatch
