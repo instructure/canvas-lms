@@ -22,12 +22,12 @@ import {filterUselessConsoleMessages} from '@instructure/js-utils'
 
 filterUselessConsoleMessages(console)
 
-global.fetch = require('jest-fetch-mock')
+require('jest-fetch-mock').enableFetchMocks()
 
 window.scroll = () => {}
 window.ENV = {}
 
-Enzyme.configure({ adapter: new Adapter() })
+Enzyme.configure({adapter: new Adapter()})
 
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element
 document.documentElement.setAttribute('dir', 'ltr')
@@ -42,13 +42,16 @@ if (process.env.DEPRECATION_SENTRY_DSN) {
     autoBreadcrumbs: {
       xhr: false
     }
-  }).install();
+  }).install()
 
-  const setupRavenConsoleLoggingPlugin = require('../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin').default;
-  setupRavenConsoleLoggingPlugin(Raven, { loggerName: 'console-jest' });
+  const setupRavenConsoleLoggingPlugin = require('../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin')
+    .default
+  setupRavenConsoleLoggingPlugin(Raven, {loggerName: 'console-jest'})
 }
 
 // set up mocks for native APIs
 if (!('MutationObserver' in window)) {
-  Object.defineProperty(window, 'MutationObserver', { value: require('@sheerun/mutationobserver-shim') })
+  Object.defineProperty(window, 'MutationObserver', {
+    value: require('@sheerun/mutationobserver-shim')
+  })
 }

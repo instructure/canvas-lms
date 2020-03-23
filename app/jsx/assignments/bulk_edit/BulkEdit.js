@@ -19,6 +19,7 @@
 import I18n from 'i18n!assignments_bulk_edit'
 import React, {useState} from 'react'
 import {func, string} from 'prop-types'
+import produce from 'immer'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -48,6 +49,15 @@ export default function BulkEdit({courseId, onCancel}) {
     }
   })
 
+  function updateAssignment({dateKey, newDate, assignmentId, overrideId, base}) {
+    const nextAssignments = produce(assignments, draftAssignments => {
+      const assignment = draftAssignments.find(a => a.id === assignmentId)
+      const override = assignment.all_dates.find(o => (base ? o.base : o.id === overrideId))
+      override[dateKey] = newDate ? newDate.toISOString() : null
+    })
+    setAssignments(nextAssignments)
+  }
+
   function renderHeader() {
     return (
       <Flex as="div">
@@ -63,14 +73,14 @@ export default function BulkEdit({courseId, onCancel}) {
 
   function renderError() {
     return (
-      <Alert variant="error">{I18n.t('There was an error retrieving assignment due dates.')}</Alert>
+      <Alert variant="error">{I18n.t('There was an error retrieving assignment dates.')}</Alert>
     )
   }
 
   function renderBody() {
     if (loading) return <LoadingIndicator />
     if (error) return renderError()
-    return <BulkEditTable assignments={assignments} />
+    return <BulkEditTable assignments={assignments} updateAssignmentDate={updateAssignment} />
   }
 
   return (
