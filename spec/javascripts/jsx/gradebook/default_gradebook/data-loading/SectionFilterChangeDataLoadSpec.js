@@ -67,7 +67,10 @@ QUnit.module('Gradebook Section Filter Change Data Loading', suiteHooks => {
       context_id: '1201',
       context_modules_url: '/context-modules',
       custom_column_data_url: '/custom-column-data',
-      sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
+      sections: [
+        {id: '2001', name: 'Freshmen'},
+        {id: '2002', name: 'Sophomores'}
+      ],
       settings: {
         filter_rows_by: {
           section_id: null
@@ -129,16 +132,34 @@ QUnit.module('Gradebook Section Filter Change Data Loading', suiteHooks => {
   }
 
   QUnit.module('when the section filter changes', () => {
+    test('updates the students loaded status', () => {
+      initializeAndLoadGradebook()
+      sandbox.spy(gradebook, 'updateStudentsLoaded')
+      changeSectionFilter()
+      strictEqual(gradebook.updateStudentsLoaded.callCount, 1)
+    })
+
     test('sets the students as not loaded', () => {
       initializeAndLoadGradebook()
+      sandbox.spy(gradebook, 'updateStudentsLoaded')
       changeSectionFilter()
-      strictEqual(gradebook.contentLoadStates.studentsLoaded, false)
+      const [loaded] = gradebook.updateStudentsLoaded.lastCall.args
+      strictEqual(loaded, false)
+    })
+
+    test('updates the submissions loaded status', () => {
+      initializeAndLoadGradebook()
+      sandbox.spy(gradebook, 'updateSubmissionsLoaded')
+      changeSectionFilter()
+      strictEqual(gradebook.updateSubmissionsLoaded.callCount, 1)
     })
 
     test('sets the submissions as not loaded', () => {
       initializeAndLoadGradebook()
+      sandbox.spy(gradebook, 'updateSubmissionsLoaded')
       changeSectionFilter()
-      strictEqual(gradebook.contentLoadStates.submissionsLoaded, false)
+      const [loaded] = gradebook.updateSubmissionsLoaded.lastCall.args
+      strictEqual(loaded, false)
     })
 
     test('calls DataLoader.loadGradebookData()', () => {
@@ -264,29 +285,6 @@ QUnit.module('Gradebook Section Filter Change Data Loading', suiteHooks => {
         const [options] = DataLoader.loadGradebookData.lastCall.args
         strictEqual(options.getGradingPeriodAssignments, false)
       })
-    })
-
-    test('re-renders the filters', () => {
-      initializeAndLoadGradebook()
-      sandbox.spy(gradebook, 'renderFilters')
-      changeSectionFilter()
-      strictEqual(gradebook.renderFilters.callCount, 1)
-    })
-
-    test('re-renders the filters after students load status is updated', () => {
-      initializeAndLoadGradebook()
-      sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.studentsLoaded, false)
-      })
-      changeSectionFilter()
-    })
-
-    test('re-renders the filters after submissions load status is updated', () => {
-      initializeAndLoadGradebook()
-      sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.submissionsLoaded, false)
-      })
-      changeSectionFilter()
     })
 
     QUnit.module('when student ids finish loading', contextHooks => {

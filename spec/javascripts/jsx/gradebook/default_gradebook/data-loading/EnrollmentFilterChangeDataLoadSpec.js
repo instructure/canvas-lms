@@ -143,16 +143,34 @@ QUnit.module('Gradebook Enrollment Filter Change Data Loading', suiteHooks => {
   }
 
   QUnit.module('when the enrollment filter changes', () => {
+    test('updates the students loaded status', () => {
+      initializeAndLoadGradebook()
+      sandbox.spy(gradebook, 'updateStudentsLoaded')
+      changeEnrollmentFilter()
+      strictEqual(gradebook.updateStudentsLoaded.callCount, 1)
+    })
+
     test('sets the students as not loaded', () => {
       initializeAndLoadGradebook()
+      sandbox.spy(gradebook, 'updateStudentsLoaded')
       changeEnrollmentFilter()
-      strictEqual(gradebook.contentLoadStates.studentsLoaded, false)
+      const [loaded] = gradebook.updateStudentsLoaded.lastCall.args
+      strictEqual(loaded, false)
+    })
+
+    test('updates the submissions loaded status', () => {
+      initializeAndLoadGradebook()
+      sandbox.spy(gradebook, 'updateSubmissionsLoaded')
+      changeEnrollmentFilter()
+      strictEqual(gradebook.updateSubmissionsLoaded.callCount, 1)
     })
 
     test('sets the submissions as not loaded', () => {
       initializeAndLoadGradebook()
+      sandbox.spy(gradebook, 'updateSubmissionsLoaded')
       changeEnrollmentFilter()
-      strictEqual(gradebook.contentLoadStates.submissionsLoaded, false)
+      const [loaded] = gradebook.updateSubmissionsLoaded.lastCall.args
+      strictEqual(loaded, false)
     })
 
     test('calls DataLoader.loadGradebookData()', () => {
@@ -283,29 +301,6 @@ QUnit.module('Gradebook Enrollment Filter Change Data Loading', suiteHooks => {
         const [options] = DataLoader.loadGradebookData.lastCall.args
         strictEqual(options.getGradingPeriodAssignments, true)
       })
-    })
-
-    test('re-renders the filters', () => {
-      initializeAndLoadGradebook()
-      sandbox.spy(gradebook, 'renderFilters')
-      changeEnrollmentFilter()
-      strictEqual(gradebook.renderFilters.callCount, 1)
-    })
-
-    test('re-renders the filters after students load status is updated', () => {
-      initializeAndLoadGradebook()
-      sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.studentsLoaded, false)
-      })
-      changeEnrollmentFilter()
-    })
-
-    test('re-renders the filters after submissions load status is updated', () => {
-      initializeAndLoadGradebook()
-      sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.submissionsLoaded, false)
-      })
-      changeEnrollmentFilter()
     })
   })
 

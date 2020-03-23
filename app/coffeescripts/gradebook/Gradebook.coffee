@@ -199,6 +199,7 @@ export default do ->
   ## Gradebook Application State
   getInitialContentLoadStates = ->
     {
+      assignmentGroupsLoaded: false
       assignmentsLoaded: false
       contextModulesLoaded: false
       overridesColumnUpdating: false
@@ -490,6 +491,14 @@ export default do ->
 
       @invalidateRowsForStudentIds(_.uniq(studentIds))
 
+    # Assignment Group Data & Lifecycle Methods
+
+    updateAssignmentGroups: (assigmentGroups) =>
+      @gotAllAssignmentGroups(assigmentGroups)
+      @contentLoadStates.assignmentsLoaded = true
+      @renderViewOptionsMenu()
+      @updateColumnHeaders()
+
     gotAllAssignmentGroups: (assignmentGroups) =>
       @setAssignmentGroupsLoaded(true)
       # purposely passing the @options and assignmentGroups by reference so it can update
@@ -501,6 +510,13 @@ export default do ->
           assignment.due_at = tz.parse(assignment.due_at)
           @updateAssignmentEffectiveDueDates(assignment)
           @assignments[assignment.id] = assignment
+
+    # Grading Period Assignment Data & Lifecycle Methods
+
+    updateGradingPeriodAssignments: (gradingPeriodAssignments) =>
+      @gotGradingPeriodAssignments({grading_period_assignments: gradingPeriodAssignments})
+      if @_gridHasRendered()
+        @updateColumns()
 
     gotGradingPeriodAssignments: ({ grading_period_assignments: gradingPeriodAssignments }) =>
       @courseContent.gradingPeriodAssignments = gradingPeriodAssignments
@@ -524,7 +540,16 @@ export default do ->
         else
           @students[student.id] = htmlEscape(student)
 
-        @updateStudentAttributes(student)
+        student.computed_current_score ||= 0
+        student.computed_final_score ||= 0
+
+        student.isConcluded = _.every student.enrollments, (e) ->
+          e.enrollment_state == 'completed'
+        student.isInactive = _.every student.enrollments, (e) ->
+          e.enrollment_state == 'inactive'
+
+        student.cssClass = "student_#{student.id}"
+
         @updateStudentRow(student)
 
       @gridReady.then =>
@@ -579,27 +604,24 @@ export default do ->
       assignment.effectiveDueDates = @effectiveDueDates[assignment.id] || {}
       assignment.inClosedGradingPeriod = _.some(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
 
-    updateStudentAttributes: (student) =>
-      student.computed_current_score ||= 0
-      student.computed_final_score ||= 0
+    # Student Data & Lifecycle Methods
 
-      student.isConcluded = _.every student.enrollments, (e) ->
-        e.enrollment_state == 'completed'
-      student.isInactive = _.every student.enrollments, (e) ->
-        e.enrollment_state == 'inactive'
+    updateStudentIds: (studentIds) =>
+      @courseContent.students.setStudentIds(studentIds)
+      @assignmentStudentVisibility = {}
+      @buildRows()
 
-      student.cssClass = "student_#{student.id}"
+    updateStudentsLoaded: (loaded) =>
+      @setStudentsLoaded(loaded)
+      if @_gridHasRendered()
+        @updateColumnHeaders()
+      @renderFilters()
 
-    updateStudentRow: (student) =>
-      index = @gridData.rows.findIndex (row) => row.id == student.id
-      if index != -1
-        @gridData.rows[index] = @buildRow(student)
-        @gradebookGrid.invalidateRow(index)
-
-    gotAllStudents: =>
-      @setStudentsLoaded(true)
-      @renderedGrid.then =>
-        @gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
+      if (loaded && @contentLoadStates.submissionsLoaded)
+        # The "total grade" column needs to be re-rendered after loading all
+        # students and submissions so that the column can indicate any hidden
+        # submissions.
+        @updateTotalGradeColumn()
 
     studentsThatCanSeeAssignment: (assignmentId) ->
       @courseContent.assignmentStudentVisibility[assignmentId] ||= (
@@ -857,6 +879,19 @@ export default do ->
     buildRow: (student) =>
       # because student is current mutable, we need to retain the reference
       student
+
+    # Submission Data & Lifecycle Methods
+
+    updateSubmissionsLoaded: (loaded) =>
+      @setSubmissionsLoaded(loaded)
+      @updateColumnHeaders()
+      @renderFilters()
+
+      if (loaded && @contentLoadStates.studentsLoaded)
+        # The "total grade" column needs to be re-rendered after loading all
+        # students and submissions so that the column can indicate any hidden
+        # submissions.
+        @updateTotalGradeColumn()
 
     gotSubmissionsChunk: (student_submissions) =>
       changedStudentIds = []
@@ -1935,6 +1970,14 @@ export default do ->
 
       @updateColumnHeaders()
 
+    # Grid Update Methods
+
+    updateStudentRow: (student) =>
+      index = @gridData.rows.findIndex (row) => row.id == student.id
+      if index != -1
+        @gridData.rows[index] = @buildRow(student)
+        @gradebookGrid.invalidateRow(index)
+
     # Filtered Content Information Methods
 
     updateFilteredContentInfo: =>
@@ -2684,6 +2727,14 @@ export default do ->
     listVisibleCustomColumns: ->
       @gradebookContent.customColumns.filter((column) -> !column.hidden)
 
+    # Context Module Data & Lifecycle Methods
+
+    updateContextModules: (contextModules) =>
+      @setContextModules(contextModules)
+      @contentLoadStates.contextModulesLoaded = true
+      @renderViewOptionsMenu()
+      @renderFilters()
+
     setContextModules: (contextModules) =>
       @courseContent.contextModules = contextModules
       @courseContent.modulesById = {}
@@ -2921,3 +2972,14 @@ export default do ->
       $(document).unbind('gridready')
       @gradebookGrid.destroy()
       @postPolicies?.destroy()
+
+    ## "PRIVILEGED" methods
+
+    # The methods here are intended to support specs, but not intended to be a
+    # permanent part of the API for this class. The existence of these methods
+    # suggests that the behavior they provide does not yet have a more suitable
+    # home elsewhere in the code. They are prefixed with '_' to suggest this
+    # aspect of their presence here.
+
+    _gridHasRendered: () =>
+      @gridReady.state() == 'resolved'

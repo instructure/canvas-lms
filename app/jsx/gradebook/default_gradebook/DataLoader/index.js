@@ -29,10 +29,6 @@ export default class DataLoader {
     const gradebook = this._gradebook
     const {options} = gradebook
 
-    gradebook.setAssignmentGroupsLoaded(false)
-    gradebook.setStudentsLoaded(false)
-    gradebook.setSubmissionsLoaded(false)
-
     const promises = OldDataLoader.loadGradebookData({
       gradebook,
 
@@ -66,54 +62,46 @@ export default class DataLoader {
       customColumnDataParams: {include_hidden: true}
     })
 
-    promises.gotStudentIds.then(response => {
-      gradebook.courseContent.students.setStudentIds(response.user_ids)
-      gradebook.buildRows()
+    // eslint-disable-next-line promise/catch-or-return
+    promises.gotStudentIds.then(data => {
+      gradebook.updateStudentIds(data.user_ids)
     })
 
     if (promises.gotGradingPeriodAssignments != null) {
-      promises.gotGradingPeriodAssignments.then(gradebook.gotGradingPeriodAssignments)
+      // eslint-disable-next-line promise/catch-or-return
+      promises.gotGradingPeriodAssignments.then(data => {
+        gradebook.updateGradingPeriodAssignments(data.grading_period_assignments)
+      })
     }
 
-    promises.gotAssignmentGroups.then(gradebook.gotAllAssignmentGroups)
-    promises.gotCustomColumns.then(gradebook.gotCustomColumns)
-    promises.gotStudents.then(gradebook.gotAllStudents)
+    // eslint-disable-next-line promise/catch-or-return
+    promises.gotAssignmentGroups.then(assignmentGroups => {
+      gradebook.updateAssignmentGroups(assignmentGroups)
+    })
 
+    // eslint-disable-next-line promise/catch-or-return
+    promises.gotCustomColumns.then(customColumns => {
+      gradebook.gotCustomColumns(customColumns)
+    })
+
+    // eslint-disable-next-line promise/catch-or-return
     promises.gotStudents.then(() => {
-      gradebook.setStudentsLoaded(true)
-      gradebook.updateColumnHeaders()
-      gradebook.renderFilters()
+      gradebook.updateStudentsLoaded(true)
     })
 
-    promises.gotAssignmentGroups.then(() => {
-      gradebook.contentLoadStates.assignmentsLoaded = true
-      gradebook.renderViewOptionsMenu()
-      gradebook.updateColumnHeaders()
-    })
-
+    // eslint-disable-next-line promise/catch-or-return
     promises.gotContextModules.then(contextModules => {
-      gradebook.setContextModules(contextModules)
-      gradebook.contentLoadStates.contextModulesLoaded = true
-      gradebook.renderViewOptionsMenu()
-      gradebook.renderFilters()
+      gradebook.updateContextModules(contextModules)
     })
 
+    // eslint-disable-next-line promise/catch-or-return
     promises.gotSubmissions.then(() => {
-      gradebook.setSubmissionsLoaded(true)
-      gradebook.updateColumnHeaders()
-      gradebook.renderFilters()
+      gradebook.updateSubmissionsLoaded(true)
     })
 
-    /*
-     * With post policies, the "total grade" column needs to be re-rendered
-     * after loading students and submissions so we can indicate there are
-     * hidden submissions
-     */
-    $.when(promises.gotStudents, promises.gotSubmissions).then(() => {
-      gradebook.updateTotalGradeColumn()
-    })
-
-    gradebook.renderedGrid = $.when(
+    // TODO: In TALLY-769, remove this entire block.
+    // eslint-disable-next-line promise/catch-or-return
+    $.when(
       promises.gotStudentIds,
       promises.gotContextModules,
       promises.gotCustomColumns,
@@ -183,9 +171,8 @@ export default class DataLoader {
     const gradebook = this._gradebook
     const {options} = gradebook
 
-    gradebook.setStudentsLoaded(false)
-    gradebook.setSubmissionsLoaded(false)
-    gradebook.renderFilters()
+    gradebook.updateStudentsLoaded(false)
+    gradebook.updateSubmissionsLoaded(false)
 
     const promises = OldDataLoader.loadGradebookData({
       gradebook,
@@ -212,37 +199,25 @@ export default class DataLoader {
     })
 
     if (promises.gotGradingPeriodAssignments != null) {
-      promises.gotGradingPeriodAssignments.then(response => {
-        gradebook.gotGradingPeriodAssignments(response)
-        gradebook.updateColumns()
+      // eslint-disable-next-line promise/catch-or-return
+      promises.gotGradingPeriodAssignments.then(data => {
+        gradebook.updateGradingPeriodAssignments(data.grading_period_assignments)
       })
     }
 
-    promises.gotStudentIds.then(response => {
-      gradebook.courseContent.students.setStudentIds(response.user_ids)
-      gradebook.assignmentStudentVisibility = {}
-      gradebook.buildRows()
+    // eslint-disable-next-line promise/catch-or-return
+    promises.gotStudentIds.then(data => {
+      gradebook.updateStudentIds(data.user_ids)
     })
 
+    // eslint-disable-next-line promise/catch-or-return
     promises.gotStudents.then(() => {
-      gradebook.setStudentsLoaded(true)
-      gradebook.updateColumnHeaders()
-      gradebook.renderFilters()
+      gradebook.updateStudentsLoaded(true)
     })
 
+    // eslint-disable-next-line promise/catch-or-return
     promises.gotSubmissions.then(() => {
-      gradebook.setSubmissionsLoaded(true)
-      gradebook.updateColumnHeaders()
-      gradebook.renderFilters()
-    })
-
-    /*
-     * With post policies, the "total grade" column needs to be re-rendered
-     * after loading students and submissions so we can indicate there are
-     * hidden submissions
-     */
-    $.when(promises.gotStudents, promises.gotSubmissions).then(() => {
-      gradebook.updateTotalGradeColumn()
+      gradebook.updateSubmissionsLoaded(true)
     })
   }
 }
