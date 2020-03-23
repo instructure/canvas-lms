@@ -31,7 +31,15 @@ describe DelayedNotification do
       expect(messages.size).to eq 1
       messages.first.user == group_user
     end
- end
+
+    it 'processes a notification to lots of users' do
+      to_list = 10.times.map { "user_#{user_with_communication_channel(active_all: true).id}" }
+      messages = DelayedNotification.process(group_membership, notification, to_list, nil)
+
+      expect(messages.size).to eq 10
+    end
+
+  end
 
 end
 
