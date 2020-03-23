@@ -104,7 +104,7 @@ class Message < ActiveRecord::Base
     state :created do
       event :stage, :transitions_to => :staged do
         self.dispatch_at = Time.now.utc + self.delay_for
-        if self.to != 'dashboard' && !@stage_without_dispatch
+        if self.to != 'dashboard'
           MessageDispatcher.dispatch(self)
         end
       end
@@ -362,7 +362,8 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def stage_without_dispatch!
-    @stage_without_dispatch = true
+    self.dispatch_at = Time.now.utc + self.delay_for
+    self.workflow_state = 'staged'
   end
 
   # Public: Stage the message during the dispatch process. Messages travel
