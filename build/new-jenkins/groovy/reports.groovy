@@ -55,6 +55,7 @@ def stashSpecFailures(prefix, index) {
 def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
   def working_dir = "${prefix}_compiled_failures"
   sh "rm -vrf ./$working_dir"
+  sh "mkdir $working_dir"
 
   dir(working_dir) {
     for(int index = 0; index < ci_node_total; index++) {
@@ -70,6 +71,7 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
     htmlFiles = findFiles glob: '**/index.html'
   }
 
+  archiveArtifacts(artifacts: "$working_dir/**")
   publishHTML target: [
     allowMissing: false,
     alwaysLinkToLastBuild: false,
