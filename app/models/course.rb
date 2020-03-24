@@ -3314,21 +3314,20 @@ class Course < ActiveRecord::Base
     feature_enabled?(:gradebook_list_students_by_sortable_name)
   end
 
-  ##
-  # Returns a boolean describing if the user passed in has marked this course
-  # as a favorite.
+  def refresh_content_participation_counts(_progress)
+    content_participation_counts.each(&:refresh_unread_count)
+  end
+
+  attr_accessor :preloaded_nickname, :preloaded_favorite
   def favorite_for_user?(user)
+    return @preloaded_favorite if defined?(@preloaded_favorite)
     user.favorites.where(:context_type => 'Course', :context_id => self).exists?
   end
 
   def nickname_for(user, fallback = :name)
-    nickname = user && user.course_nickname(self)
+    nickname = defined?(@preloaded_nickname) ? @preloaded_nickname : (user && user.course_nickname(self))
     nickname ||= self.send(fallback) if fallback
     nickname
-  end
-
-  def refresh_content_participation_counts(_progress)
-    content_participation_counts.each(&:refresh_unread_count)
   end
 
   def name
@@ -3338,6 +3337,17 @@ class Course < ActiveRecord::Base
 
   def apply_nickname_for!(user)
     @nickname = nickname_for(user, nil)
+  end
+
+  def self.preload_menu_data_for(courses, user)
+    ActiveRecord::Associations::Preloader.new.preload(courses, :enrollment_term)
+    # preload favorites and nicknames
+    favorite_ids = user.account.feature_enabled?(:unfavorite_course_from_dashboard) ? user.favorite_context_ids("Course") : []
+    nicknames = user.all_course_nicknames(courses)
+    courses.each do |course|
+      course.preloaded_favorite = favorite_ids.include?(course.id)
+      course.preloaded_nickname = nicknames[course.id]
+    end
   end
 
   def any_assignment_in_closed_grading_period?
