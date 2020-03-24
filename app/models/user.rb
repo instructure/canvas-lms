@@ -55,7 +55,7 @@ class User < ActiveRecord::Base
     Enrollment::QueryBuilder.new(state).conditions or raise "invalid enrollment conditions"
   end
 
-  has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy
+  has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy, inverse_of: :user
   has_many :notification_policies, through: :communication_channels
   has_many :notification_policy_overrides, through: :communication_channels
   has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }

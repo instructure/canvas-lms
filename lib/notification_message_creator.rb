@@ -159,7 +159,13 @@ class NotificationMessageCreator
       message.parse!('summary')
       delayed_message = policy.delayed_messages.build(:notification => @notification,
                                     :frequency => policy.frequency,
-                                    :communication_channel_id => policy.communication_channel_id,
+                                    # policy.communication_channel should
+                                    # already be loaded in memory as the
+                                    # inverse association of loading the
+                                    # policy from the channel. passing the
+                                    # object through here lets the delayed
+                                    # message use it without having to re-query.
+                                    :communication_channel => policy.communication_channel,
                                     :root_account_id => message.context_root_account.try(:id),
                                     :name_of_topic => message.subject,
                                     :link => message.url,
