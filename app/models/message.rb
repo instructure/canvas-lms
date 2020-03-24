@@ -188,6 +188,7 @@ class Message < ActiveRecord::Base
   scope :for, lambda { |context| where(:context_type => context.class.base_class.to_s, :context_id => context) }
 
   scope :after, lambda { |date| where("messages.created_at>?", date) }
+  scope :more_recent_than, lambda { |date| where("messages.created_at>? AND messages.dispatch_at>?", date, date) }
 
   scope :to_dispatch, -> {
     where("messages.workflow_state='staged' AND messages.dispatch_at<=? AND 'messages.to'<>'dashboard'", Time.now.utc)

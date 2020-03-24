@@ -45,8 +45,6 @@ class NotificationMessageCreator
   #
   # Returns a list of the messages dispatched immediately
   def create_message
-    @user_counts = {}
-
     to_user_channels = Hash.new([])
     @to_users.each do |user|
       to_user_channels[user] += [user.email_channel]
@@ -55,6 +53,8 @@ class NotificationMessageCreator
       to_user_channels[channel.user] += [channel]
     end
     to_user_channels.each_value{ |channels| channels.uniq! }
+
+    @user_counts = recent_messages_for_users(to_user_channels.keys)
 
     dashboard_messages = []
     immediate_messages = []
@@ -105,8 +105,6 @@ class NotificationMessageCreator
     delayed_messages.each{ |message| message.save! }
     dispatch_dashboard_messages(dashboard_messages)
     dispatch_immediate_messages(immediate_messages)
-
-    @user_counts.each{|user_id, cnt| recent_messages_for_user(user_id, cnt) }
 
     return immediate_messages + dashboard_messages
   end
@@ -188,7 +186,6 @@ class NotificationMessageCreator
     channels.each do |channel|
       messages << user.messages.build(message_options.merge(:communication_channel => channel,
                                                             :to => channel.path))
-      increment_user_counts(user) if ['email', 'sms'].include?(channel.path_type)
     end
     messages.each(&:parse!)
     messages
@@ -289,11 +286,6 @@ class NotificationMessageCreator
     message_options
   end
 
-  def increment_user_counts(user_id, count=1)
-    @user_counts[user_id] ||= 0
-    @user_counts[user_id] += count
-  end
-
   def user_asset_context(user_asset)
     if user_asset.is_a?(Context)
       user_asset
@@ -334,27 +326,16 @@ class NotificationMessageCreator
   end
 
   def too_many_messages_for?(user)
-    all_messages = recent_messages_for_user(user.id) || 0
-    @user_counts[user.id] = all_messages
-    all_messages >= user.max_messages_per_day
+    @user_counts[user.id] >= user.max_messages_per_day
   end
 
   # Cache the count for number of messages sent to a user/user-with-category,
   # it can also be manually re-set to reflect new rows added... this cache
   # data can get out of sync if messages are cancelled for being repeats...
   # not sure if we care about that...
-  def recent_messages_for_user(id, messages=nil)
-    if !id
-      nil
-    elsif messages
-      Rails.cache.write(['recent_messages_for', id].cache_key, messages, :expires_in => 1.hour)
-    else
-      user_id = id
-      messages = Rails.cache.fetch(['recent_messages_for', id].cache_key, :expires_in => 1.hour) do
-        Shackles.activate(:slave) do
-          Message.where("dispatch_at>? AND created_at>? AND user_id=? AND to_email=?", 24.hours.ago, 24.hours.ago, user_id, true).count
-        end
-      end
+  def recent_messages_for_users(users)
+    Shackles.activate(:slave) do
+      Hash.new(0).merge(Message.more_recent_than(24.hours.ago).where(user_id: users, to_email: true).group(:user_id).count)
     end
   end
 end
