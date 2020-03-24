@@ -143,7 +143,9 @@ module BookmarkedCollection
     end
 
     def order_by
-      @order_by ||= Arel.sql(columns.map { |col| column_order(col) }.join(', '))
+      @order_by ||= {}
+      locale = defined?(Canvas::ICU) ? Canvas::ICU.locale_for_collation : :default
+      @order_by[locale] ||= Arel.sql(columns.map { |col| column_order(col) }.join(', '))
     end
 
     def column_order(col_name)
