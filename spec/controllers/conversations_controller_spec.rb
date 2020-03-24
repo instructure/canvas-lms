@@ -492,6 +492,22 @@ describe ConversationsController do
         @students.each{|x| expect(x.user_notes.size).to be(1)}
       end
     end
+
+    describe "for recipients the sender has no relationship with" do
+      it "should fail" do
+        user_session(@student)
+        post 'create', params: { recipients: [User.create.id.to_s], body: "foo" }
+        expect(response.status).to eq 400
+      end
+
+      context "as a siteadmin user with send_messages grants" do
+        it "should succeed" do
+          user_session(site_admin_user)
+          post 'create', params: { recipients: [User.create.id.to_s], body: "foo" }
+          expect(response.status).to eq 201
+        end
+      end
+    end
   end
 
   describe "POST 'update'" do
