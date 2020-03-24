@@ -20,7 +20,12 @@
   <% css_bundle :user_logins %>
   <% js_bundle :user_logins %>
   <% js_env :PASSWORD_POLICY => (@domain_root_account.try(:password_policy) || {}) %>
-  <fieldset id="login_information">
+  <fieldset
+    id="login_information"
+    <% if @domain_root_account.feature_enabled?(:responsive_2020_03) %>
+      class="responsive"
+    <% end %>
+  >
     <legend>
       <h4 class="profileHeader">
         <%= t('titles.logins', 'Login Information') %>
@@ -38,7 +43,7 @@
               </span>
             <% end %>
           </td>
-          <th scope='row'>
+          <th class='overview' scope='row'>
             <b class='unique_id'><%= pseudonym && pseudonym.unique_id %></b>
             <% if pseudonym && ((pseudonym.sis_user_id && can_do(pseudonym.account, @current_user, :read_sis)) || can_do(pseudonym, @current_user, :manage_sis)) %>
               <div>
@@ -50,7 +55,8 @@
                 <div>
                   <%= before_label('integration_id', 'Integration ID') %> <span id="integration_id_<%= pseudonym.id %>" class="integration_id"><%= pseudonym.integration_id %></span>
                 </div>
-            <% end %>          </th>
+            <% end %>
+          </th>
           <td class='account'>
             <%= link_to(pseudonym ? pseudonym.account.name : nbsp, account_url(pseudonym ? pseudonym.account : "{{ account_id }}"), :class => 'account_name') %>
           </td>

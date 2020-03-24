@@ -48,8 +48,8 @@
   }
   .login_details:last-child {
     & td {
-     border-bottom: none;
-  }
+      border-bottom: none;
+    }
   }
   .login_details_link {
     font-style: normal;
@@ -59,5 +59,33 @@
     text-align: direction(right);
     font-size: 0.8em;
     padding-#{direction(left)}: 30px;
+  }
+}
+
+#login_information.responsive {
+  .overview, .account, .details {
+    width: 100%;
+    display: inline-block;
+    padding-#{direction(right)}: 0;
+  }
+
+  .links {
+    padding-#{direction(left)}: 0;
+  }
+
+  @include breakpoint(desktop) {
+    tr.login > th, tr.login > td {
+      border-bottom: 1px solid #eee;
+    }
+
+    .overview, .account, .details {
+      width: initial;
+      display: table-cell;
+      padding-#{direction(right)}: initial;
+    }
+
+    .links {
+      padding-#{direction(left)}: 30px;
+    }
   }
 }
