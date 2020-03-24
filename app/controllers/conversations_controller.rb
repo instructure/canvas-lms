@@ -1142,7 +1142,12 @@ class ConversationsController < ApplicationController
     end
 
     users, contexts = AddressBook.partition_recipients(params[:recipients])
-    known = @current_user.address_book.known_users(users, context: context, conversation_id: params[:from_conversation_id])
+    known = @current_user.address_book.known_users(
+      users,
+      context: context,
+      conversation_id: params[:from_conversation_id],
+      strict_checks: !Account.site_admin.grants_right?(@current_user, session, :send_messages)
+    )
     contexts.each{ |context| known.concat(@current_user.address_book.known_in_context(context)) }
     @recipients = known.uniq(&:id)
     @recipients.reject!{|u| u.id == @current_user.id} unless @recipients == [@current_user] && params[:recipients].count == 1

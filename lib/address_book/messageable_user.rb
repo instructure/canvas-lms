@@ -20,6 +20,7 @@ module AddressBook
   # implementation of AddressBook interface backed by MessageableUser
   class MessageableUser < AddressBook::Base
     def known_users(users, options={})
+      options = { :strict_checks => true }.merge(options)
       if options[:context]
         user_ids = users.map{ |user| Shard.global_id_for(user) }.to_set
         asset_string = options[:context].respond_to?(:asset_string) ? options[:context].asset_string : options[:context]
@@ -47,7 +48,7 @@ module AddressBook
         # (MessageableUser was original built to want that optimization, but
         # now we don't)
         users = users.map(&:id) if users.first.is_a?(::MessageableUser)
-        known_users = @sender.load_messageable_users(users, conversation_id: options[:conversation_id])
+        known_users = @sender.load_messageable_users(users, conversation_id: options[:conversation_id], strict_checks: options[:strict_checks])
       end
       known_users.each{ |user| @cache.store(user, user.common_courses, user.common_groups) }
       known_users
