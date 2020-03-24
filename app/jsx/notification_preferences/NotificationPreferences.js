@@ -30,7 +30,7 @@ const NotificationPreferences = props => {
   const capitalizedContextType = props.contextType[0].toUpperCase() + props.contextType.slice(1)
   return (
     <Flex direction="column">
-      <Flex.Item>
+      <Flex.Item overflowY="visible">
         <Heading>
           {I18n.t('%{contextType} Notification Settings', {
             contextType: capitalizedContextType
