@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require 'canvas/apm'
+require 'socket'
 
 # If this is not a clustered environment, don't worry about providing
 # this global variable
@@ -27,4 +28,5 @@ Canvas::Apm.canvas_cluster = $canvas_cluster if $canvas_cluster.present?
 # or whatever you use in order to see logging output containing all the
 # APM traces.
 Canvas::Apm.enable_debug_mode = ENV.fetch("DATADOG_APM_DEBUG_MODE", "false").casecmp?("true")
+Canvas::Apm.hostname = Socket.gethostname
 Canvas::Apm.configure_apm!

@@ -529,7 +529,12 @@ class ApplicationController < ActionController::Base
   end
 
   def annotate_apm
-    Canvas::Apm.annotate_trace(Shard.current, @domain_root_account)
+    Canvas::Apm.annotate_trace(
+      Shard.current,
+      @domain_root_account,
+      RequestContextGenerator.request_id,
+      @current_user
+    )
   end
 
   def store_session_locale
