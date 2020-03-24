@@ -30,6 +30,94 @@ describe "google analytics" do
     Setting.set('google_analytics_key', 'testing123')
     get "/"
     wait_for_ajaximations
-    expect(fj('script[src$="google-analytics.com/analytics.js"]')).not_to be_nil
+    expect(f('script[src$="google-analytics.com/analytics.js"]')).not_to be_nil
+  end
+
+  context 'with GA enabled' do
+    before(:each) do
+      Setting.set('google_analytics_key', 'testing123')
+    end
+
+    let(:dimensions) do
+      {
+        admin: { key: 'dimension2', default: '00' },
+        enrollments: { key: 'dimension1', default: '000' },
+        masquerading: { key: 'dimension3', default: '0' },
+      }
+    end
+
+    let(:ga_script) do
+      driver.execute_script('return arguments[0].innerText',
+        fj('head script:contains(window.ga)')
+      )
+    end
+
+    def expect_dimensions_to_include(expected_values)
+      dimensions.each do |(dim, spec)|
+        expected_value = expected_values.fetch(dim, spec[:default])
+        # i shall bear your hatred eternal -- long live the pasta:
+        expect(ga_script).to include(
+          "ga('set', '#{spec[:key]}', #{expected_value.to_json})" # e.g. ga('set', 'dimension1', false)
+        )
+      end
+    end
+
+    def start_with(&block)
+      yield if block_given?
+      get '/'
+      wait_for_ajaximations
+    end
+
+    it "should include user roles as dimensions" do
+      start_with { nil } # anonymous
+
+      expect_dimensions_to_include({})
+    end
+
+    it "should include student status as a dimension" do
+      start_with { course_with_student_logged_in }
+
+      expect_dimensions_to_include(enrollments: '100')
+    end
+
+    it "should include teacher status as a dimension" do
+      start_with { course_with_teacher_logged_in }
+
+      expect_dimensions_to_include(enrollments: '010')
+    end
+
+    it "should include observer status as a dimension" do
+      start_with { course_with_observer_logged_in }
+
+      expect_dimensions_to_include(enrollments: '001')
+    end
+
+    it "should include admin status as a dimension" do
+      start_with { admin_logged_in }
+
+      expect_dimensions_to_include(admin: '11')
+    end
+
+    it "should include masquerading status as a dimension" do
+      start_with do
+        admin_logged_in
+
+        masquerade_as(
+          user_with_pseudonym(active_all: true).tap do |user|
+            course_with_student({
+              active_course: true,
+              active_enrollment: true,
+              user: user,
+            })
+          end
+        )
+      end
+
+      expect_dimensions_to_include(
+        admin: '00',
+        enrollments: '100',
+        masquerading: '1',
+      )
+    end
   end
 end
