@@ -22,6 +22,7 @@ import HeaderFilterView from '../views/gradebook/HeaderFilterView'
 import OutcomeColumnView from '../views/gradebook/OutcomeColumnView'
 import cellTemplate from 'jst/gradebook/outcome_gradebook_cell'
 import studentCellTemplate from 'jst/gradebook/outcome_gradebook_student_cell'
+import 'jsx/context_cards/StudentContextCardTrigger'
 
 ###
 xsslint safeString.method cellHtml

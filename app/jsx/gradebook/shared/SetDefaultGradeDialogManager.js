@@ -18,9 +18,8 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!gradebooksharedSetDefaultGradeDialogManager'
+import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
 import 'compiled/jquery.rails_flash_notifications'
-
-import AsyncComponents from '../default_gradebook/AsyncComponents'
 
 class SetDefaultGradeDialogManager {
   constructor(
@@ -50,9 +49,8 @@ class SetDefaultGradeDialogManager {
     }
   }
 
-  async showDialog(cb) {
+  showDialog(cb) {
     if (this.isAdmin || !this.assignment.inClosedGradingPeriod) {
-      const SetDefaultGradeDialog = await AsyncComponents.loadSetDefaultGradeDialog()
       const dialog = new SetDefaultGradeDialog(this.getSetDefaultGradeDialogOptions())
 
       dialog.show(cb)

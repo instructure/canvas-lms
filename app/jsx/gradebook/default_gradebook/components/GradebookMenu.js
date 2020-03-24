@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {oneOf, bool, string} from 'prop-types'
+import {oneOf, bool, string, func} from 'prop-types'
 import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
@@ -28,6 +28,7 @@ class GradebookMenu extends React.Component {
   static propTypes = {
     courseUrl: string.isRequired,
     learningMasteryEnabled: bool.isRequired,
+    navigate: func.isRequired,
     variant: oneOf(['DefaultGradebook', 'DefaultGradebookLearningMastery']).isRequired
   }
 
@@ -46,11 +47,11 @@ class GradebookMenu extends React.Component {
   }
 
   handleDefaultGradebookSelect() {
-    this.setLocation(`${this.props.courseUrl}/gradebook?view=gradebook`)
+    this.props.navigate('tab-assignment', {trigger: true})
   }
 
   handleLearningMasterySelect() {
-    this.setLocation(`${this.props.courseUrl}/gradebook?view=learning_mastery`)
+    this.props.navigate('tab-outcome', {trigger: true})
   }
 
   handleIndividualGradebookSelect() {

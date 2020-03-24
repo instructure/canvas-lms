@@ -67,10 +67,7 @@ QUnit.module('Gradebook Enrollment Filter Change Data Loading', suiteHooks => {
       context_id: '1201',
       context_modules_url: '/context-modules',
       custom_column_data_url: '/custom-column-data',
-      sections: [
-        {id: '2001', name: 'Freshmen'},
-        {id: '2002', name: 'Sophomores'}
-      ],
+      sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
       settings: {
         filter_rows_by: {
           section_id: null
@@ -351,6 +348,11 @@ QUnit.module('Gradebook Enrollment Filter Change Data Loading', suiteHooks => {
         )
       })
       dataLoadingWrapper.loadGradingPeriodAssignments(nextData.gradingPeriodAssignments)
+    })
+
+    test('sets focus on the "Student Name Options" menu trigger', () => {
+      dataLoadingWrapper.loadGradingPeriodAssignments(nextData.gradingPeriodAssignments)
+      strictEqual(document.activeElement, getStudentNameOptionsMenuTrigger())
     })
   })
 

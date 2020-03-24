@@ -19,9 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AsyncComponents from 'jsx/gradebook/default_gradebook/AsyncComponents'
 import AssignmentColumnHeader from 'jsx/gradebook/default_gradebook/GradebookGrid/headers/AssignmentColumnHeader'
-import MessageStudentsWhoDialog from 'jsx/gradebook/shared/MessageStudentsWhoDialog'
 import {blurElement, getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 /* eslint-disable qunit/no-identical-names */
@@ -85,6 +83,11 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       },
 
       includeSpeedGraderMenuItem: false,
+
+      muteAssignmentAction: {
+        disabled: false,
+        onSelect() {}
+      },
 
       postGradesAction: {
         enabled: false,
@@ -840,14 +843,8 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
   })
 
   QUnit.module('"Options" > "Message Students Who" action', hooks => {
-    let loadMessageStudentsWhoDialogPromise
-
     hooks.beforeEach(() => {
-      loadMessageStudentsWhoDialogPromise = Promise.resolve(MessageStudentsWhoDialog)
-      sandbox
-        .stub(AsyncComponents, 'loadMessageStudentsWhoDialog')
-        .returns(loadMessageStudentsWhoDialogPromise)
-      sandbox.stub(MessageStudentsWhoDialog, 'show')
+      sandbox.stub(window, 'messageStudents')
     })
 
     test('is always present', () => {
@@ -876,44 +873,39 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
     })
 
     QUnit.module('when clicked', () => {
-      test('does not restore focus to the "Options" menu trigger', async () => {
+      test('does not restore focus to the "Options" menu trigger', () => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Message Students Who').click()
-        await loadMessageStudentsWhoDialogPromise
         notEqual(document.activeElement, getOptionsMenuTrigger())
       })
 
-      test('opens the message students dialog', async () => {
+      test('opens the message students dialog', () => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Message Students Who').click()
-        await loadMessageStudentsWhoDialogPromise
-        strictEqual(MessageStudentsWhoDialog.show.callCount, 1)
+        strictEqual(window.messageStudents.callCount, 1)
       })
 
-      test('includes a callback for restoring focus upon dialog close', async () => {
+      test('includes a callback for restoring focus upon dialog close', () => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Message Students Who').click()
-        await loadMessageStudentsWhoDialogPromise
-        const [, onClose] = MessageStudentsWhoDialog.show.lastCall.args
-        onClose()
+        const [settings] = window.messageStudents.lastCall.args
+        settings.onClose()
         strictEqual(document.activeElement, getOptionsMenuTrigger())
       })
 
-      test('includes non-test students in the "settings" hash', async () => {
+      test('includes non-test students in the "settings" hash', () => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Message Students Who').click()
-        await loadMessageStudentsWhoDialogPromise
-        const [settings] = MessageStudentsWhoDialog.show.lastCall.args
+        const [settings] = window.messageStudents.lastCall.args
         strictEqual(settings.students.length, 3)
       })
 
-      test('excludes test students from the "settings" hash', async () => {
+      test('excludes test students from the "settings" hash', () => {
         props.students[0].isTestStudent = true
 
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Message Students Who').click()
-        await loadMessageStudentsWhoDialogPromise
-        const [settings] = MessageStudentsWhoDialog.show.lastCall.args
+        const [settings] = window.messageStudents.lastCall.args
         deepEqual(
           settings.students.map(student => student.name),
           ['Betty Ford', 'Charlie Xi']
@@ -1014,6 +1006,126 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
     })
   })
 
+  QUnit.module('"Options" > "Mute Assignment" action', () => {
+    test('is present when the assignment is not muted', () => {
+      mountAndOpenOptionsMenu()
+      ok(getMenuItem($menuContent, 'Mute Assignment'))
+    })
+
+    test('is not present when the assignment is muted', () => {
+      props.assignment.muted = true
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'Mute Assignment'))
+    })
+
+    test('is not present when post policies is enabled', () => {
+      props.postGradesAction.featureEnabled = true
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'Mute Assignment'))
+    })
+
+    test('is disabled when .muteAssignmentAction.disabled is true', () => {
+      props.muteAssignmentAction.disabled = true
+      mountAndOpenOptionsMenu()
+      const $menuItem = getMenuItem($menuContent, 'Mute Assignment')
+      strictEqual($menuItem.getAttribute('aria-disabled'), 'true')
+    })
+
+    test('is not disabled when .muteAssignmentAction.disabled is false', () => {
+      mountAndOpenOptionsMenu()
+      const $menuItem = getMenuItem($menuContent, 'Mute Assignment')
+      strictEqual($menuItem.getAttribute('aria-disabled'), null)
+    })
+
+    QUnit.module('when clicked', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.muteAssignmentAction.onSelect = sinon.stub()
+      })
+
+      test('does not restore focus to the "Options" menu trigger', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Mute Assignment').click()
+        notEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+
+      test('calls the .muteAssignmentAction.onSelect callback', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Mute Assignment').click()
+        strictEqual(props.muteAssignmentAction.onSelect.callCount, 1)
+      })
+
+      test('includes a callback for restoring focus upon dialog close', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Mute Assignment').click()
+        const [callback] = props.muteAssignmentAction.onSelect.lastCall.args
+        callback()
+        strictEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+    })
+  })
+
+  QUnit.module('"Options" > "Unmute Assignment" action', hooks => {
+    hooks.beforeEach(() => {
+      props.assignment.muted = true
+    })
+
+    test('is present when the assignment is muted', () => {
+      mountAndOpenOptionsMenu()
+      ok(getMenuItem($menuContent, 'Unmute Assignment'))
+    })
+
+    test('is not present when the assignment is not muted', () => {
+      props.assignment.muted = false
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'Unmute Assignment'))
+    })
+
+    test('is not present when post policies is enabled', () => {
+      props.postGradesAction.featureEnabled = true
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'Unmute Assignment'))
+    })
+
+    test('is disabled when .muteAssignmentAction.disabled is true', () => {
+      props.muteAssignmentAction.disabled = true
+      mountAndOpenOptionsMenu()
+      const $menuItem = getMenuItem($menuContent, 'Unmute Assignment')
+      strictEqual($menuItem.getAttribute('aria-disabled'), 'true')
+    })
+
+    test('is not disabled when .muteAssignmentAction.disabled is false', () => {
+      mountAndOpenOptionsMenu()
+      const $menuItem = getMenuItem($menuContent, 'Unmute Assignment')
+      strictEqual($menuItem.getAttribute('aria-disabled'), null)
+    })
+
+    QUnit.module('when clicked', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.muteAssignmentAction.onSelect = sinon.stub()
+      })
+
+      test('does not restore focus to the "Options" menu trigger', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Unmute Assignment').click()
+        notEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+
+      test('calls the .muteAssignmentAction.onSelect callback', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Unmute Assignment').click()
+        strictEqual(props.muteAssignmentAction.onSelect.callCount, 1)
+      })
+
+      test('includes a callback for restoring focus upon dialog close', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Unmute Assignment').click()
+        const [callback] = props.muteAssignmentAction.onSelect.lastCall.args
+        callback()
+        strictEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+    })
+  })
+
   QUnit.module('"Options" > "Post grades" action', hooks => {
     hooks.beforeEach(() => {
       props.postGradesAction.featureEnabled = true
@@ -1052,6 +1164,12 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
           'true'
         )
       })
+    })
+
+    test('is not present when post policies is not enabled', () => {
+      props.postGradesAction.featureEnabled = false
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'Post grades'))
     })
 
     QUnit.module('when clicked', contextHooks => {
