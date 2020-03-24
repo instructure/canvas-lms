@@ -80,7 +80,9 @@ export default class DashboardCard extends Component {
     moveCard: PropTypes.func,
     onConfirmUnfavorite: PropTypes.func,
     totalCards: PropTypes.number,
-    position: PropTypes.oneOfType([PropTypes.number, PropTypes.func])
+    position: PropTypes.oneOfType([PropTypes.number, PropTypes.func]),
+    enrollmentType: PropTypes.string,
+    observee: PropTypes.string
   }
 
   static defaultProps = {
@@ -358,6 +360,11 @@ export default class DashboardCard extends Component {
               <div className="ic-DashboardCard__header-term ellipsis" title={this.props.term}>
                 {this.props.term ? this.props.term : null}
               </div>
+              {this.props.enrollmentType === 'ObserverEnrollment' && this.props.observee && (
+                <div className="ic-DashboardCard__header-term ellipsis" title={this.props.observee}>
+                  {I18n.t('Observing: %{observee}', {observee: this.props.observee})}
+                </div>
+              )}
             </div>
           </a>
           {this.renderHeaderButton()}
