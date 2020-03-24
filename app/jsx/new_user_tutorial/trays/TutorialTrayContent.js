@@ -18,25 +18,66 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Heading, Img} from '@instructure/ui-elements'
-import SVGWrapper from '../../shared/SVGWrapper'
+import {Img} from '@instructure/ui-img'
+import {Flex} from '@instructure/ui-flex'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
+import {IconQuestionLine} from '@instructure/ui-icons'
 
 const TutorialTrayContent = props => (
-  <div className={props.name}>
-    <Heading level="h2" as="h2" ellipsis>
-      {props.heading}
-    </Heading>
-    <div className="NewUserTutorialTray__Subheading">
-      <Heading level="h3" as="h3">
-        {props.subheading}
+  <div className={`NewUserTutorialTray__Content ${props.name}`}>
+    <div>
+      <Heading level="h3" margin="none none medium" ellipsis>
+        {props.heading}
       </Heading>
+      <Text size="large">{props.subheading}</Text>
+      <View as="p" margin="small none none">
+        {props.children}
+      </View>
+      {props.links && (
+        <View
+          as="div"
+          borderWidth="small none none"
+          padding="medium x-small"
+          margin="medium none none"
+        >
+          {props.links.map((link, index) => {
+            return (
+              <Flex
+                key={link.href}
+                margin={index === 0 ? 'none' : 'x-small none none'}
+                alignItems="start"
+              >
+                <Flex.Item padding="xxx-small small none none">
+                  <IconQuestionLine inline={false} size="x-small" />
+                </Flex.Item>
+                <Flex.Item shouldGrow shouldShrink>
+                  <Link href={link.href} isWithinText={false} display="block" target="_blank">
+                    {link.label}
+                  </Link>
+                </Flex.Item>
+              </Flex>
+            )
+          })}
+        </View>
+      )}
+      {props.seeAllLink && (
+        <View as="div" padding="medium x-small" borderWidth="small none none">
+          <Link href={props.seeAllLink.href} isWithinText={false} target="_blank">
+            {props.seeAllLink.label}
+          </Link>
+        </View>
+      )}
     </div>
-    {props.children}
-    {props.image ? (
-      <div className="NewUserTutorialTray__ImageContainer" aria-hidden="true">
-        {/\.svg$/.test(props.image) ? <SVGWrapper url={props.image} /> : <Img src={props.image} />}
-      </div>
-    ) : null}
+    {props.image && (
+      <Flex aria-hidden="true" height="100%" padding="none none x-small" justifyItems="center">
+        <Flex.Item>
+          <Img src={props.image} width={props.imageWidth} alt="" />
+        </Flex.Item>
+      </Flex>
+    )}
   </div>
 )
 
@@ -45,12 +86,18 @@ TutorialTrayContent.propTypes = {
   heading: PropTypes.string.isRequired,
   subheading: PropTypes.string.isRequired,
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-  image: PropTypes.string
+  image: PropTypes.string,
+  imageWidth: PropTypes.string,
+  links: PropTypes.array,
+  seeAllLink: PropTypes.object
 }
 TutorialTrayContent.defaultProps = {
   children: [],
   image: null,
-  name: ''
+  imageWidth: '7.5rem',
+  name: '',
+  links: undefined,
+  seeAllLink: undefined
 }
 
 export default TutorialTrayContent

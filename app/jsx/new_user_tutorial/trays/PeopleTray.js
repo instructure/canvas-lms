@@ -18,18 +18,44 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const PeopleTray = () => (
   <TutorialTrayContent
     heading={I18n.t('People')}
-    subheading={I18n.t('Add Students, TAs, and Observers to your course')}
-    image="/images/tutorial-tray-images/people.svg"
+    subheading={I18n.t('Know your users')}
+    image="/images/tutorial-tray-images/Panda_People.svg"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-
+      instructor-guide-table-of-contents#jive_content_id_People`
+    }}
+    links={[
+      {
+        label: I18n.t('How do I use the People page in a course as an instructor?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12705-415255479'
+      },
+      {
+        label: I18n.t('How do I add users to a course?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12973-4152724200'
+      },
+      {
+        label: I18n.t('How do I view a context card for a student in a course?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12709-4152698664'
+      },
+      {
+        label: I18n.t('How do I view user details for an enrollment in a course?'),
+        href: 'https://community.canvaslms.com/docs/DOC-10390-415257134'
+      }
+    ]}
   >
-    <Text as="p">
-      {I18n.t('Manage enrollment status, create groups, and add users from this page.')}
-    </Text>
+    {I18n.t(
+      `What's a class without people to take and lead it? The People page
+      shows the list of users in your course. Depending on your permissions,
+      you may be able to add students, teacher assistants, and observers to
+      your course. You can also create student groups to house group assignments,
+      discussions, and files.`
+    )}
   </TutorialTrayContent>
 )
 

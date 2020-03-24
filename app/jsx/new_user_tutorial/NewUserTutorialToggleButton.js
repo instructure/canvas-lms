@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconMoveStartLine, IconMoveEndLine} from '@instructure/ui-icons'
 import plainStoreShape from '../shared/proptypes/plainStoreShape'
 
@@ -58,21 +58,24 @@ class NewUserTutorialToggleButton extends React.Component {
   }
 
   render() {
+    const isCollapsed = this.state.isCollapsed
+
     return (
-      <Button
+      <IconButton
         ref={c => {
           this.button = c
         }}
         variant="icon"
         id="new_user_tutorial_toggle"
         onClick={this.handleButtonClick}
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel={
+          isCollapsed ? I18n.t('Expand tutorial tray') : I18n.t('Collapse tutorial tray')
+        }
       >
-        {this.state.isCollapsed ? (
-          <IconMoveStartLine title={I18n.t('Expand tutorial tray')} />
-        ) : (
-          <IconMoveEndLine title={I18n.t('Collapse tutorial tray')} />
-        )}
-      </Button>
+        {isCollapsed ? <IconMoveStartLine /> : <IconMoveEndLine />}
+      </IconButton>
     )
   }
 }
