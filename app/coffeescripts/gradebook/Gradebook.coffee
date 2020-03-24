@@ -15,13 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from 'timezone'
+import DataLoader from 'jsx/gradebook/DataLoader'
 import React from 'react'
 import ReactDOM from 'react-dom'
-
 import LongTextEditor from 'slickgrid.long_text_editor'
 import KeyboardNavDialog from '../views/KeyboardNavDialog'
 import KeyboardNavTemplate from 'jst/KeyboardNavDialog'
@@ -41,12 +40,10 @@ import * as ConvertCase from 'convert_case'
 import htmlEscape from 'str/htmlEscape'
 import * as EnterGradesAsSetting from 'jsx/gradebook/shared/EnterGradesAsSetting'
 import SetDefaultGradeDialogManager from 'jsx/gradebook/shared/SetDefaultGradeDialogManager'
-import AsyncComponents from 'jsx/gradebook/default_gradebook/AsyncComponents'
 import CurveGradesDialogManager from 'jsx/gradebook/default_gradebook/CurveGradesDialogManager'
 import GradebookApi from 'jsx/gradebook/default_gradebook/apis/GradebookApi'
 import SubmissionCommentApi from 'jsx/gradebook/default_gradebook/apis/SubmissionCommentApi'
 import CourseSettings from 'jsx/gradebook/default_gradebook/CourseSettings'
-import DataLoader from 'jsx/gradebook/default_gradebook/DataLoader'
 import FinalGradeOverrides from 'jsx/gradebook/default_gradebook/FinalGradeOverrides'
 import GradebookGrid from 'jsx/gradebook/default_gradebook/GradebookGrid'
 import studentRowHeaderConstants from 'jsx/gradebook/default_gradebook/constants/studentRowHeaderConstants'
@@ -63,6 +60,8 @@ import SectionFilter from 'jsx/gradebook/default_gradebook/components/content-fi
 import StudentGroupFilter from 'jsx/gradebook/default_gradebook/components/content-filters/StudentGroupFilter'
 import GridColor from 'jsx/gradebook/default_gradebook/components/GridColor'
 import StatusesModal from 'jsx/gradebook/default_gradebook/components/StatusesModal'
+import SubmissionTray from 'jsx/gradebook/default_gradebook/components/SubmissionTray'
+import GradebookSettingsModal from 'jsx/gradebook/default_gradebook/components/GradebookSettingsModal'
 import AnonymousSpeedGraderAlert from 'jsx/gradebook/default_gradebook/components/AnonymousSpeedGraderAlert'
 import { statusColors } from 'jsx/gradebook/default_gradebook/constants/colors'
 import StudentDatastore from 'jsx/gradebook/default_gradebook/stores/StudentDatastore'
@@ -71,6 +70,7 @@ import SubmissionStateMap from 'jsx/gradebook/SubmissionStateMap'
 import DownloadSubmissionsDialogManager from 'jsx/gradebook/shared/DownloadSubmissionsDialogManager'
 import ReuploadSubmissionsDialogManager from 'jsx/gradebook/shared/ReuploadSubmissionsDialogManager'
 import GradebookKeyboardNav from './GradebookKeyboardNav'
+import AssignmentMuterDialogManager from 'jsx/gradebook/shared/AssignmentMuterDialogManager'
 import assignmentHelper from 'jsx/gradebook/shared/helpers/assignmentHelper'
 import TextMeasure from 'jsx/gradebook/shared/helpers/TextMeasure'
 import * as GradeInputHelper from 'jsx/grading/helpers/GradeInputHelper'
@@ -91,7 +91,9 @@ import 'jquery.instructure_misc_helpers'
 import 'jquery.instructure_misc_plugins'
 import 'vendor/jquery.ba-tinypubsub'
 import 'jqueryui/position'
+import '../jquery.kylemenu'
 import '../jquery/fixDialogButtons'
+import 'jsx/context_cards/StudentContextCardTrigger'
 
 export default do ->
 
@@ -277,8 +279,6 @@ export default do ->
         allowFinalGradeOverride: @options.course_settings.allow_final_grade_override
       })
 
-      @dataLoader = new DataLoader(@)
-
       @gridData = {
         columns: {
           definitions: {}
@@ -413,11 +413,90 @@ export default do ->
           @saveColumnWidthPreference(column.id, column.width)
 
     initialize: ->
-      @dataLoader.loadInitialData()
+      @setAssignmentGroupsLoaded(false)
+      @setStudentsLoaded(false)
+      @setSubmissionsLoaded(false)
+
+      dataLoader = DataLoader.loadGradebookData(
+        gradebook: @
+
+        courseId: @options.context_id
+        perPage: @options.api_max_per_page
+        assignmentGroupsURL: @options.assignment_groups_url
+        assignmentGroupsParams:
+          exclude_response_fields: @fieldsToExcludeFromAssignments
+          include: @fieldsToIncludeWithAssignments
+        contextModulesURL: @options.context_modules_url
+        customColumnsURL: @options.custom_columns_url
+        getGradingPeriodAssignments: @gradingPeriodSet?
+
+        sectionsURL: @options.sections_url
+
+        studentsURL: @options.students_stateless_url
+        studentsPageCb: @gotChunkOfStudents
+        studentsParams: @studentsParams()
+        loadedStudentIds: []
+
+        submissionsURL: @options.submissions_url
+        submissionsChunkCb: @gotSubmissionsChunk
+        submissionsChunkSize: @options.chunk_size
+        customColumnDataURL: @options.custom_column_data_url
+        customColumnDataPageCb: @gotCustomColumnDataChunk
+        customColumnDataParams:
+          include_hidden: true
+      )
+
+      dataLoader.gotStudentIds.then (response) =>
+        @courseContent.students.setStudentIds(response.user_ids)
+        @buildRows()
+
+      dataLoader.gotGradingPeriodAssignments?.then @gotGradingPeriodAssignments
+      dataLoader.gotAssignmentGroups.then @gotAllAssignmentGroups
+      dataLoader.gotCustomColumns.then @gotCustomColumns
+      dataLoader.gotStudents.then @gotAllStudents
+
+      dataLoader.gotStudents.then () =>
+        @setStudentsLoaded(true)
+        @updateColumnHeaders()
+        @renderFilters()
+
+      dataLoader.gotAssignmentGroups.then () =>
+        @contentLoadStates.assignmentsLoaded = true
+        @renderViewOptionsMenu()
+        @updateColumnHeaders()
+
+      dataLoader.gotContextModules.then (contextModules) =>
+        @setContextModules(contextModules)
+        @contentLoadStates.contextModulesLoaded = true
+        @renderViewOptionsMenu()
+        @renderFilters()
+
+      dataLoader.gotSubmissions.then () =>
+        @setSubmissionsLoaded(true)
+        @updateColumnHeaders()
+        @renderFilters()
+
+      @postPolicies?.initialize()
+
+      # With post policies, the "total grade" column needs to be re-rendered
+      # after loading students and submissions so we can indicate there are
+      # hidden submissions
+      $.when(
+        dataLoader.gotStudents,
+        dataLoader.gotSubmissions
+      ).then () =>
+        @updateTotalGradeColumn() if @options.post_policies_enabled?
+
+      @renderedGrid = $.when(
+        dataLoader.gotStudentIds,
+        dataLoader.gotContextModules,
+        dataLoader.gotCustomColumns,
+        dataLoader.gotAssignmentGroups,
+        dataLoader.gotGradingPeriodAssignments
+      ).then () =>
+        @finishRenderingUI()
 
       @gridReady.then () =>
-        # Preload the Grade Detail Tray
-        AsyncComponents.loadGradeDetailTray()
         @renderViewOptionsMenu()
         @renderGradebookSettingsModal()
 
@@ -438,9 +517,72 @@ export default do ->
       else
         $('#gradebook_grid').trigger('resize.fillWindowWithMe')
 
+    reloadStudentData: (optionOverrides = {}, afterColumnsUpdated) =>
+      @setStudentsLoaded(false)
+      @setSubmissionsLoaded(false)
+      @renderFilters()
+
+      dataLoaderOptions =
+        gradebook: @
+        courseId: @options.context_id
+        perPage: @options.api_max_per_page
+        studentsURL: @options.students_stateless_url
+        studentsPageCb: @gotChunkOfStudents
+        studentsParams: @studentsParams()
+        loadedStudentIds: @courseContent.students.listStudentIds()
+        submissionsURL: @options.submissions_url
+        submissionsChunkCb: @gotSubmissionsChunk
+        submissionsChunkSize: @options.chunk_size
+        customColumnIds: @gradebookContent.customColumns.map((column) -> column.id)
+        customColumnDataURL: @options.custom_column_data_url
+        customColumnDataPageCb: @gotCustomColumnDataChunk
+        customColumnDataParams:
+          include_hidden: true
+        getGradingPeriodAssignments: false
+
+      dataLoader = DataLoader.loadGradebookData(Object.assign(dataLoaderOptions, optionOverrides))
+
+      dataLoader.gotGradingPeriodAssignments?.then (response) =>
+        @gotGradingPeriodAssignments(response)
+        @updateColumns()
+        afterColumnsUpdated() if afterColumnsUpdated
+
+      dataLoader.gotStudentIds.then (response) =>
+        @courseContent.students.setStudentIds(response.user_ids)
+        @courseContent.assignmentStudentVisibility = {}
+        @buildRows()
+
+      dataLoader.gotStudents.then () =>
+        @setStudentsLoaded(true)
+        @updateColumnHeaders()
+        @renderFilters()
+
+      dataLoader.gotSubmissions.then () =>
+        @setSubmissionsLoaded(true)
+        @updateColumnHeaders()
+        @renderFilters()
+
+      # With post policies, the "total grade" column needs to be re-rendered
+      # after loading students and submissions so we can indicate there are
+      # hidden submissions
+      $.when(
+        dataLoader.gotStudents,
+        dataLoader.gotSubmissions
+      ).then () =>
+        @updateTotalGradeColumn() if @options.post_policies_enabled?
+
     loadOverridesForSIS: ->
-      if @options.post_grades_feature
-        @dataLoader.loadOverridesForSIS()
+      return unless @options.post_grades_feature
+
+      assignmentGroupsURL = @options.assignment_groups_url.replace('&include%5B%5D=assignment_visibility', '')
+      overrideDataLoader = DataLoader.loadGradebookData(
+        assignmentGroupsURL: assignmentGroupsURL
+        assignmentGroupsParams:
+          exclude_response_fields: @fieldsToExcludeFromAssignments
+          include: ['overrides']
+        onlyLoadAssignmentGroups: true
+      )
+      $.when(overrideDataLoader.gotAssignmentGroups).then(@addOverridesToPostGradesStore)
 
     addOverridesToPostGradesStore: (assignmentGroups) =>
       for group in assignmentGroups
@@ -1039,7 +1181,7 @@ export default do ->
         @postGradesStore.setSelectedSection(sectionId)
         @saveSettings({}, =>
           @updateSectionFilterVisibility()
-          @dataLoader.reloadStudentDataForSectionFilterChange()
+          @reloadStudentData()
         )
 
     showSections: ->
@@ -1076,7 +1218,7 @@ export default do ->
         @setFilterRowsBySetting('studentGroupId', groupId)
         @saveSettings({}, =>
           @updateStudentGroupFilterVisibility()
-          @dataLoader.reloadStudentDataForStudentGroupFilterChange()
+          @reloadStudentData()
         )
 
     assignmentGroupList: ->
@@ -1225,7 +1367,8 @@ export default do ->
       props =
         assignmentOrOutcome: @options.assignmentOrOutcome
         courseUrl: @options.context_url,
-        learningMasteryEnabled: @options.outcome_gradebook_enabled
+        learningMasteryEnabled: @options.outcome_gradebook_enabled,
+        navigate: @options.navigate
       for mountPoint in mountPoints
         props.variant = mountPoint.getAttribute('data-variant')
         renderComponent(GradebookMenu, mountPoint, props)
@@ -1355,9 +1498,8 @@ export default do ->
       renderComponent(GridColor, gridColorMountPoint, gridColorProps)
 
     renderGradebookSettingsModal: =>
-      @gradebookSettingsModal = React.createRef(null)
-
-      props =
+      gradebookSettingsModalMountPoint = document.querySelector("[data-component='GradebookSettingsModal']")
+      gradebookSettingsModalProps =
         anonymousAssignmentsPresent: _.some(@assignments, (assignment) => assignment.anonymous_grading)
         courseId: @options.context_id
         courseFeatures: @courseFeatures
@@ -1369,10 +1511,12 @@ export default do ->
           @courseSettings.handleUpdated(settings)
         onLatePolicyUpdate: @onLatePolicyUpdate
         postPolicies: @postPolicies
-        ref: @gradebookSettingsModal
 
-      $container = document.querySelector("[data-component='GradebookSettingsModal']")
-      AsyncComponents.renderGradebookSettingsModal(props, $container)
+      @gradebookSettingsModal = renderComponent(
+        GradebookSettingsModal,
+        gradebookSettingsModalMountPoint,
+        gradebookSettingsModalProps
+      )
 
     renderSettingsButton: =>
       iconSettingsSolid = React.createElement(IconSettingsSolid)
@@ -1382,7 +1526,7 @@ export default do ->
         icon: iconSettingsSolid,
         id: 'gradebook-settings-button',
         variant: 'icon',
-        onClick: () => @gradebookSettingsModal.current?.open()
+        onClick: @gradebookSettingsModal.open
 
       screenReaderContent = React.createElement(ScreenReaderContent, {}, I18n.t('Gradebook Settings'))
       settingsTitle = I18n.t('Gradebook Settings')
@@ -1988,7 +2132,7 @@ export default do ->
     showNotesColumn: =>
       if @teacherNotesNotYetLoaded
         @teacherNotesNotYetLoaded = false
-        @dataLoader.loadCustomColumnData(@getTeacherNotesColumn().id)
+        DataLoader.getDataForColumn(@getTeacherNotesColumn().id, @options.custom_column_data_url, {}, @gotCustomColumnDataChunk)
 
       @getTeacherNotesColumn()?.hidden = false
       @toggleNotesColumn()
@@ -2001,6 +2145,9 @@ export default do ->
       return false unless @gradingPeriodSet?
       return false if @gradingPeriodSet.displayTotalsForAllGradingPeriods
       not @isFilteringColumnsByGradingPeriod()
+
+    fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'in_closed_grading_period']
+    fieldsToIncludeWithAssignments: ['grades_published', 'module_ids', 'post_manually', 'assignment_group_id']
 
     studentsParams: ->
       enrollmentStates = ['invited', 'active']
@@ -2275,7 +2422,7 @@ export default do ->
       mountPoint = document.getElementById('StudentTray__Container')
       props = @getSubmissionTrayProps(student)
       @loadSubmissionComments(assignmentId, studentId) if !@getSubmissionCommentsLoaded() and open
-      AsyncComponents.renderGradeDetailTray(props, mountPoint)
+      renderComponent(SubmissionTray, mountPoint, props)
 
     loadSubmissionComments: (assignmentId, studentId) =>
       SubmissionCommentApi.getSubmissionComments(@options.context_id, assignmentId, studentId)
@@ -2587,7 +2734,10 @@ export default do ->
 
     updateStudentHeadersAndReloadData: =>
       @gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
-      @dataLoader.reloadStudentDataForEnrollmentFilterChange()
+      optionOverrides =
+        getGradingPeriodAssignments: @gradingPeriodSet?
+      afterColumnsUpdated = => @getHeaderComponentRef('student')?.focusAtEnd()
+      @reloadStudentData(optionOverrides, afterColumnsUpdated)
 
     applyEnrollmentFilter: =>
       showInactive = @getEnrollmentFilters().inactive
@@ -2779,6 +2929,19 @@ export default do ->
           submissionsLoaded: @contentLoadStates.submissionsLoaded
         }
       )
+
+    getMuteAssignmentAction: (assignmentId) =>
+      assignment = @getAssignment(assignmentId)
+      manager = new AssignmentMuterDialogManager(
+        assignment,
+        "#{@options.context_url}/assignments/#{assignmentId}/mute",
+        @contentLoadStates.submissionsLoaded
+      )
+
+      {
+        disabled: !manager.isDialogEnabled()
+        onSelect: manager.showDialog
+      }
 
     ## Gradebook Content Api Methods
 

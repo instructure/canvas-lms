@@ -18,25 +18,10 @@
 
 import $ from 'jquery'
 
-import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
-
 import NaiveRequestDispatch from '../shared/network/NaiveRequestDispatch'
 import StudentContentDataLoader from './default_gradebook/DataLoader/StudentContentDataLoader'
 
 function getStudentIds(courseId) {
-  if (ENV.prefetch_gradebook_user_ids) {
-    /*
-     * When user ids have been prefetched, the data is only known valid for the
-     * first request. Consume it by pulling it out of the prefetch store, which
-     * will force all subsequent requests for user ids to call through the
-     * network.
-     */
-    const promise = consumePrefetchedXHR('user_ids')
-    if (promise) {
-      return asJson(promise)
-    }
-  }
-
   const url = `/courses/${courseId}/gradebook/user_ids`
   return $.ajaxJSON(url, 'GET', {})
 }
