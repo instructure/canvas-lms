@@ -26,7 +26,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   belongs_to :pseudonym
   has_many :pseudonyms
-  belongs_to :user
+  belongs_to :user, inverse_of: :communication_channels
   has_many :notification_policies, :dependent => :destroy
   has_many :notification_policy_overrides, inverse_of: :communication_channel, dependent: :destroy
   has_many :delayed_messages, :dependent => :destroy
