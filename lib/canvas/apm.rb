@@ -110,6 +110,7 @@ module Canvas
           c.use :aws
           c.use :faraday
           c.use :graphql
+          c.use :http
           c.use :rails
           c.use :redis
         end
