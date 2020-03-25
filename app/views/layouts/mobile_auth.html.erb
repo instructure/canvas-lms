@@ -21,7 +21,7 @@
 <head>
   <meta charset="utf-8">
   <title><%= yield :page_title || t("log_in_to_canvas", "Log In To Canvas") %></title>
-  <%= browser_performance_monitor_embed %>
+  <%= render_datadog_rum_js %>
   <meta name="HandheldFriendly" content="True">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black">

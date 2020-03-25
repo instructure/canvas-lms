@@ -61,3 +61,8 @@ prefetch_gradebook_user_ids:
   applies_to: SiteAdmin
   display_name: Prefetch User IDs in Gradebook
   description: Load user ids upon page load so that Gradebook loads more quickly.
+datadog_rum_js:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Datadog RUM JS Agent
+  description: Include the Datadog RUM JS Agent in the document HEAD.

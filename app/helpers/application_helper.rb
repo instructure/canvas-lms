@@ -22,6 +22,7 @@ module ApplicationHelper
   include HtmlTextHelper
   include LocaleSelection
   include Canvas::LockExplanation
+  include DatadogRumHelper
 
   def context_user_name_display(user)
     name = user.try(:short_name) || user.try(:name)
@@ -1251,10 +1252,6 @@ module ApplicationHelper
         'placements[]' => 'assignment_view'
       ))
     end
-  end
-
-  def browser_performance_monitor_embed
-    # stub
   end
 
   def prefetch_xhr(url, id: nil, options: {})
