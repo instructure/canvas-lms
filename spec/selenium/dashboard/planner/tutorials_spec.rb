@@ -61,7 +61,7 @@ describe "Tutorials" do
       get "/courses/#{@course.id}"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Home")
-      expect(element).to include_text("Course landing page")
+      expect(element).to include_text("Welcome your students")
       expect(element).to include_text("The Course Home Page is the first page students see")
       expect(element).to include_text("The Home Page can display the course participation activity stream")
     end
