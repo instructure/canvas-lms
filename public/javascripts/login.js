@@ -55,7 +55,8 @@ $('#forgot_password_form').formSubmit({
       ),
       15 * 60 * 1000 // fifteen minutes isn't forever but should be plenty
     )
-    $('.login_link:first').click()
+    // Focus on the close button of the alert we just put up, per a11y
+    $('ul#flash_message_holder button.close_link').focus()
   },
   error(_data) {
     $(this).loadingImage('remove')
