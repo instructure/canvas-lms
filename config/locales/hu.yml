@@ -1508,6 +1508,9 @@ hu:
     errors: 
       messages: 
         record_invalid: "A hitelesítés sikertelen: %{errors}"
+        restrict_dependent_destroy: 
+          has_many: "Egy függő %{record} miatt nem törölhető a rekord"
+          has_one: "Egy függő %{record} miatt nem törölhető a rekord"
   activity_by_category_9c2033d1: "Tevékenységek kategóriánként"
   activity_by_date_878c5b49: "Tevékenységek dátumok szerint"
   add_2nd_review_ea988088: "2. értékelő hozzáadása"
@@ -1690,6 +1693,7 @@ hu:
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "A hallgatók láthassák, kik jelentkeztek már be az időpontra."
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Annak engedélyezése, hogy az értesítések az elküldési soron kerüljenek kiküldésre."
   allowed_attempts_4e229caa: "Próbálkozás engedélyezése"
+  allows_the_duplication_of_calendar_events_7bb0d6c5: "Naptári eseény megduplázásának engedélyezése"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Ismétlődő naptári események ütemezésének engedélyezése"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Engedélyezi, hogy a nemzetközi telefonszámmal rendelkező hallgatók szöveges üzeneteket kapjanak a Canvas-tól."
   always_3a59e701: Mindig
@@ -1913,6 +1917,7 @@ hu:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Biztos benne, hogy törli ezt az osztályzási időszakot?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Biztos benne, hogy törli ezt az osztályzási időszakot?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Biztos benne, hogy törli ezt az osztályzási rendszert?"
+  are_you_sure_you_want_to_delete_this_page_2185844: "Biztos benne, hogy törli ezt az oldalt?"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Biztos benne, hogy törölni szeretné ezt az elemet?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     one: "Biztos benne, hogy törli az üzenetváltás másolatát? Ezt a műveletet nem lehet visszavonni."
@@ -2715,6 +2720,9 @@ hu:
   background_color_b92b52ac: Háttérszín
   background_image_1a401e1a: Háttérkép
   base_847aca7c: Alap
+  base_message_please_make_sure_name_has_a_due_date_928ae7ab: "%{base_message} Kérjük, ellenőrizze, hogy %{name} rendelkezik határidővel!"
+  base_message_please_make_sure_name_has_a_due_date__9e9b0cfd: "%{base_message} Kérjük, ellenőrizze, hogy %{name} rendelkezik határidőval és a neve sem túl hosszú!"
+  base_message_please_make_sure_name_name_is_not_too_d0c9454f: "%{base_message} Kérjük, ellenőrizze, hogy %{name} neve nem túl hosszú!"
   base_role_type_a9cc892d: alap_szerep_típusa
   bb_display: "Blackboard tanulás"
   bb_file_description: "Blackboard 6/7/8/9 exportált .zip fájl"
@@ -3857,6 +3865,8 @@ hu:
       folder_picker: 
         default_select_folder: "Mappa kiválasztása"
         upload_to: "Feltöltés ide"
+      import_quizzes_next_view: 
+        import_quizzesNext_help_title: "Új kvízek"
       overwrite_assessment_content: 
         assessment_help_label: "Értékelés felülírás súgó ikonja"
         assessment_help_text: "Néhány rendszer újrahasználja az azonosítóit minden egyes új exportálás alkalmával. Ennek eredményeképpen, ha exportál két kérdésbankot, azoknak ugyanolyan azonosítói lesznek. Az adatvesztés megakadályozása érdekében mi ezeket az objektumokat különállóként kezeljük az azonosítók ellenére. Ennek az opciónak a kiválasztásával ez a biztonsági funkció letiltásra kerül és engedélyezve lesz, hogy az értékelési adatok felülírjanak létező adatokat megegyező azonosítóval."
@@ -4665,6 +4675,8 @@ hu:
     sis_id_taken: "A következő SIS ID már használatban van: \"%{sis_id}\""
   course_section_7a988066: Kurzusszekció
   course_selection_245808bf: Kurzusválasztás
+  course_set_up_tutorial_6ab7c2d1: "Kurzus felállítási útmutató"
+  course_set_up_tutorial_provides_tips_on_how_to_lev_3c098131: "A kurzus felállítási útmutató tippeket ad arra, hogy használjuk ki a lehetőségeket a Canvas minden egyes oldalán. Ez különösen hasznos, ha most kezded használni a Canvast vagy hosszú kihagyás után először állítasz fel új kurzust."
   course_settings: 
     buttons: 
       add_section: "Szekció hozzáadása"
@@ -5031,6 +5043,7 @@ hu:
         join_course: "Csatlakozás a kurzushoz"
         new_announcement: "Új hirdetmény"
         student_view: "Hallgatói nézet"
+        view_course_calendar: "Kurzusnaptár megtekintése"
         view_course_stream: "Kurzusfolyam megtekintése"
       re_sending: Újraküldés...
       send_done: "Kész! Az üzenet küldése eltarthat néhány percig. "
@@ -5612,6 +5625,7 @@ hu:
   disabled_18c33a73: (letiltva)
   disabled_3b1b332a: Letiltott
   disabled_links_b3bdea99: "Letiltott hivatkozások"
+  disabled_not_visible_to_students_48d4a90d: "Letiltva. Hallgatók számára nem látható"
   discovery_url_3dce06d9: "Discovery URL"
   discussion_6719c51d: Fórum
   discussion_entries: 
@@ -5964,6 +5978,7 @@ hu:
   duplicate_item_339f54bb: "Elem duplikálása"
   duplicate_modules_8ea35557: "Modulok duplikálása"
   duplicate_provider_provider_d9842134: "Dupla szolgáltató: %{provider} "
+  duplicating_calendar_events_9932cd37: "Naptári esemény megduplázása"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "pl.: Kovács, János"
   e_g_http_university_edu_helpdesk_acab04d6: "pl. http://egyetem.hu/sugo"
@@ -6111,6 +6126,7 @@ hu:
   enable_reregistration_for_lti_2_b2a10444: "LTI 2 újraregisztráció engedélyezése"
   enabled_ba7cab66: Engedélyezve
   enabled_links_be110215: "Engedélyezett hivatkozások"
+  end_course_set_up_tutorial_f358b85d: "Kurzus felállítási útmutató befejezése"
   end_date_cannot_be_before_start_date_eb62ed6d: "A záródátum nem lehet a kezdődátumnál korábbi"
   end_date_e0093ed7: Záródátum
   end_time_250391e8: "Záró időpont"
@@ -6449,12 +6465,17 @@ hu:
       invalid: érvénytelen
       less_than: "kevesebbnek kell lennie ennél: %{count}"
       less_than_or_equal_to: "kevesebbnek vagy egyenlőnek kell lennie ezzel: %{count}"
+      model_invalid: "A hitelesítés sikertelen: %{errors}"
       not_a_number: "nem szám"
       not_an_integer: "egész számnak kell lennie"
       odd: "páratlannak kell lennie"
       other_than: "nem lehet %{count}"
       present: "üresnek kell lennie"
+      required: "léteznie kell"
       taken: "már foglalt "
+      too_long: 
+        one: "túl hosszú (maximum 1 karakter lehet)"
+        other: "túl hosszú (maximum %{count} karakter lehet)"
       too_short: 
         one: "túl rövid (minimum 1 karakter kell legyen)"
         other: "túl rövid (minimum %{count} karakter kell legyen)"
@@ -6625,6 +6646,8 @@ hu:
     lor: "LOR külső eszközök"
     post_grades: "Értékelések beküldése a SIS-be"
     quiz_log_auditing: Kvíznapló-auditálás
+    quizzes: 
+      next: "Új kvízek"
     student_outcome_gradebook: "Hallgatói jártassági szint napló"
   features_2581da: Funkciók
   federated_attributes_5cbe6441: "Egyesített jellemzők"
@@ -7980,6 +8003,8 @@ hu:
   keyboard_shortcuts_ed1844bd: Billentyűparancsok
   kind_7f0a88c4: Típus
   label_3c9a991: "%{label}:"
+  label_disabled_not_visible_to_students_da093eec: "%{label}. Letiltva. Hallgatók számára nem látható"
+  label_no_content_not_visible_to_students_84345d2f: "%{label}. Nincs tartalom. Hallgatók számára nem látható"
   labels: 
     lock_module_until: "Zárolva eddig"
   language_6b3e2c7c: Nyelv
@@ -8093,6 +8118,7 @@ hu:
         quizzes: Kvízek
         rubrics: Értékelőtáblák
         syllabus_body: "Tematika törzse"
+        tool_profiles: Eszközprofil
         wikis: Oldalak
     cc: 
       standard: 
@@ -8198,6 +8224,7 @@ hu:
     hu: Magyar
   location_e17bd402: Helyszín
   lock_at_time_3c8a044e: "Zárolva ekkor: %{time}"
+  lock_c341af13: Zárolás
   lock_date_cannot_be_after_course_end_a473158b: "A zárolási időpont nem lehet a kurzus vége után"
   lock_date_cannot_be_after_section_end_d37da70c: "A zárolási időpont nem lehet a szekció vége után"
   lock_date_cannot_be_after_term_end_cf1a188f: "A zárolási időpont nem lehet a a félév vége után"
@@ -8205,6 +8232,7 @@ hu:
   lock_questions_after_answering_5aecef9d: "Kérdések zárolása a válaszadás után"
   lock_this_setting_for_sub_accounts_2ae5af17: "Ezen beállítás zárolása az alfiókok esetén"
   locked_762f138b: Zárolt
+  locked_click_to_unlock_50747e11: "Zárolva. Kattintson a zárolás feloldásához."
   locked_until_unlock_date_498ead5f: "Zárolva eddig %{unlock_date}"
   locking_91f476a5: Zárolás...
   log_on_url_fc166e4c: "Bejelentkezési URL"
@@ -10112,7 +10140,13 @@ hu:
     browsers: 
       unrecognized: "Ismeretlen böngésző"
   modelsQuiz: 
+    assignment_points_possible: 
+      one: "1 pont"
+      other: "%{count} pont"
     cant_unpublish_when_students_submit: "Nem lehet visszavonni a publikálást, ha vannak a hallgatóknak beadandói"
+    question_count: 
+      one: "1 kérdés"
+      other: "%{count} kérdés"
   modelsSection: 
     overrides: 
       everyone: Mindenki
@@ -10354,6 +10388,7 @@ hu:
   no_collaboration_apps_3bbd30ce: "Nincsenek együttműködési applikációk"
   no_content_5dbc9acf: "Nincs tartalom"
   no_content_has_been_added_f36bab43: "* nincs tartalom hozzáadva"
+  no_content_not_visible_to_students_b59f4867: "Nincs tartalom. Hallgatók számára nem látható"
   no_courses_found_12d68a74: "Nem található kurzus"
   no_date_bfeb2df7: "Nincs dátum"
   no_description_c2554c25: "Nincs leírás"
@@ -10978,10 +11013,10 @@ hu:
     cancel_button: Mégse
     cannot_unpublish_front_page: "A kezdőlap publikálását nem lehet visszavonni"
     delete_button: Törlés
-    delete_confirmation: "Biztos benne, hogy törli ezt a wikioldalt?"
-    delete_dialog_title: "Wikioldal törlése"
+    delete_confirmation: "Biztos benne, hogy törli ezt az oldalt?"
+    delete_dialog_title: "Oldal törlése"
     deleting_button: Törlés...
-    edit_dialog_title: "Wikioldal szerkesztése"
+    edit_dialog_title: "Oldal szerkesztése"
     errors: 
       require_title: "Be kell írnia egy címet"
     headers: 
@@ -11881,6 +11916,8 @@ hu:
     cant_unpublish: "Nem lehet a publikálást visszavonni"
   published_4bb5209e: Publikált
   published_c944a23d: publikált
+  published_click_to_unpublish_db016671: "Publikált. Kattintson a visszavonáshoz."
+  published_click_to_unpublish_title_358122a: "Publikálva. Kattintson ide a/az %{title} publikálás visszavonásához . "
   publishing_is_disabled_for_this_item_efa7803f: "Ennél az elemnél a publikálás nem lehetséges"
   publishing_item_name_is_disabled_8207a9e7: "%{item_name} publikálása nem lehetséges"
   purple_7678a9fc: Lila
@@ -14716,6 +14753,9 @@ hu:
   student_sis_id_abe6b292: "hallgatói SIS azonosító"
   student_view_ac9b672f: "Hallgatói nézet"
   student_viewed_document_9065adb8: "Hallgató által megtekintett dokumentum"
+  studentcount_students_will_get_num_points_fdd43b55: 
+    one: "1 hallgató fog kapni %{num} pontot"
+    other: "%{studentCount} hallgató fog kapni %{num} pontot"
   students_1b8cd07b: Hallgatók
   students_being_observed_4de3e520: "A hallgatók megfigyelés alatt állnak "
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "A hallgatók nem tekinthetik meg a kvízválaszokat, miután a kurzus befejeződött/lezárult"
@@ -14932,7 +14972,10 @@ hu:
   success_file_uploaded_8174e93f: "A fájl felöltése sikeres."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Az értékeléseket sikeresen közzétette a naplóban."
   successfully_created_a_set_38374719: "Halmaz sikeresen létrehozva!"
+  successfully_deleted_the_comment_a8bbe561: "A hozzászólást sikerült törölni"
   successfully_moved_model_to_newgroup_f7b7aa5a: " %{model} sikeresen áthelyezve ide %{newGroup}"
+  successfully_posted_the_comment_12d95d56: "A hozzászólást sikerült hozzáadni"
+  successfully_updated_the_comment_946360d5: "A hozzászólást sikerült frissíteni"
   sum_of_all_files_in_mb_2b705055: "Az összes fájl mérete MB-ban"
   summary_statistics_f74852a5: "Összegzés statisztikák"
   support: 
@@ -14952,6 +14995,7 @@ hu:
       contact_support_sub_text: "Kérjen támogatást az időérzékeny problémákhoz."
       curriculum_assessment_errata: "Tanterv/értékelés hibajegyzék"
       curriculum_assessment_errata_description: "A már jelzett értékelési és tananyag hibák megtekintése. "
+      global_support_desk: "NetAcad támogatás"
       global_support_desk_description: "Az ASC-k az első sorát jelentik a támogatásnak, és össze tudják kötni Önt a Globális Támogatói hálózattal, ha a jelzett probléma további beavatkozást igényel."
       networking_academy_description: "Cisco válaszok megtekintése a leggyakrabban feltett kérdésekre."
       networking_academy_faqs: "Networking Academy GYIK"
@@ -15391,6 +15435,7 @@ hu:
     riga: Riga
     riyadh: Rijád
     rome: Róma
+    samara: Samara
     samoa: Szamoa
     santiago: "Santiago de Chile"
     sapporo: Szapporo
@@ -15561,6 +15606,7 @@ hu:
   undated_15c2e5fe: "Időpont nélküli"
   undated_items_toggle_list_visibility_6219e641: "Dátum nélküli elemlista láthatóságának megváltoztatása"
   undelivered_message_459916a9: "Kézbesítetlen üzenet"
+  underline_all_links_description: "A Hivatkozások aláhúzása *aláhúzott szövegként* jeleníti meg a hiperhivatkozásokat a navigációs menükben, a Műszerfalon és a lap oldalsávjain. Ezt a funkciót a rendszer nem alkalmazza a felhasználó által a hivatkozásokat minden felhasználónál mindig aláhúzó RTF-szerkesztőben létrehozott  tartalomhivatkozásokban."
   underline_links_e7cf9b4f: "Aláhúzott hivatkozások"
   undo_a7be8fef: Visszavonás
   unenrolled_bc89d5e3: Kiiratkozott
@@ -15595,6 +15641,9 @@ hu:
   unlock_date_cannot_be_before_term_start_d3c01813: "A zárolás feloldásának ideje nem lehet a félév kezdete előtt"
   unlock_f6196bf5: "Zárolás feloldása"
   unlock_module_on_date_17144fbd: "Modul zárolásának feloldása a következő dátumon"
+  unlocked_beee43de: "Zárolás feloldva"
+  unlocked_click_to_lock_53262ce7: "Zárolás feloldva. Kattintson a zároláshoz."
+  unlocking_a6b5c02d: "Zárolás feloldása..."
   unmute_assignment_29a49038: "Feladat inaktivitása feloldva"
   unnamed_account_id_e688ad87: "Név nélküli fiók (%{id})"
   unnamed_tool_961cb95b: "Névtelen eszköz"
@@ -15603,7 +15652,9 @@ hu:
   unprocessable_entity_message: "Érvénytelen feliratkozott találkozóazonosító "
   unpublish_9f2d730b: "Publikálás visszavonása"
   unpublished_8b6107d6: "Nem publikált"
+  unpublished_click_to_publish_6a6d12e1: "Nem publikált, kattintson a publikáláshoz"
   unpublished_click_to_publish_c073631a: "Nem publikált, kattintson a publikáláshoz"
+  unpublished_click_to_publish_title_7c57293f: "Nem publikált. Kattintson ide a/az %{title} publikálásához."
   unpublished_courses_title: "Nem publikált kurzusok"
   unpublished_dfd8801: "nem publikált"
   unread_e9c1b19c: Olvasatlan
