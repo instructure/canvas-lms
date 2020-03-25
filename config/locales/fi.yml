@@ -258,6 +258,7 @@ fi:
   account_groups_2f301732: Tiliryhmät
   account_id_2c3b4f15: "tilin tunnus"
   account_id_73966078: account_id
+  account_level_notification_preferences_require_an__66467cd7: "Tilitason ilmoitusasetukset vaativat account_id päivittääkseen"
   account_level_settings_manage_4fca6f8e: "Tilin tason asetukset - hallitse"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "tilin nimi"
@@ -277,11 +278,11 @@ fi:
         header: Esimerkki
       end_text: "Päättyy: %{end_at};"
       error_text: "Epäonnistui, raportoi seuraava virhekoodi järjestelmäsi pääkäyttäjälle: Virheraportti:%{error};"
-      extra_text_term: "Käsite: %{term_name};"
+      extra_text_term: "Kausi: %{term_name};"
       message: "%{type} raportti on luotu onnistuneesti seuraavilla asetuksilla. Tili: %{account}; %{options}"
       section_text: "Osiolle: %{section};"
       start_text: "Aloitettu: %{start_at};"
-      term_text: "Käsite: %{term_name};"
+      term_text: "Kausi: %{term_name};"
     grades: 
       limited: "poistetut objektit rajoitettu määritettyjen päivien määrällä;"
     outcomes: 
@@ -362,7 +363,7 @@ fi:
     report_header_student_sis_id: "opiskelijan sis-tunnus"
     report_header_submission_date: lähetyspäivä
     report_header_submission_score: "lähetyksen pistemäärä"
-    report_header_term: käsite
+    report_header_term: kausi
     report_header_term__id: term_id
     report_header_term_id: "käsitteen tunnus"
     report_header_term_sis: "käsitteen sis"
@@ -464,7 +465,7 @@ fi:
         from_name: Lähettäjä
         reply_to: Vastaus
         sent_at: Lähetetty
-        to: Johonkin
+        to: Vastaanottaja
       comm_messages_search_overview: 
         messages_viewed: "Ilmoitukset lähetetty *%{user}* lähtien *%{start_date}* asti *%{end_date}*."
       comm_messages_search_results: 
@@ -472,7 +473,7 @@ fi:
       course_logging_details: 
         Field: Kenttä
         From: Lähettäjä
-        To: Johonkin
+        To: Vastaanottaja
         Value: Arvo
         blank_placeholder: "-"
         copied_from_label: "Kopioi kohteesta"
@@ -532,7 +533,7 @@ fi:
         Course: Kurssi
         Grader: "Arvosanojen antaja"
         Student: Opiskelija
-        To: Johonkin
+        To: Vastaanottaja
         date: Päivämäärä
         from: Lähettäjä
         no_item_found: "Kohteita ei löytynyt"
@@ -778,7 +779,7 @@ fi:
       feature_options: "Ominaisuuden asetukset"
       feature_preview: "Ominaisuuden esikatselu"
       features_title: Ominaisuudet
-      global_announcements_title: "Globaalit ilmoitukset"
+      global_announcements_title: "Organisaatiotason ilmoitukset"
       google_docs_domain: "Sallittu Google Docs -verkkotunnus"
       headers: 
         report_last_run: "Viimeinen ajo"
@@ -833,7 +834,7 @@ fi:
         teachers_can_create_courses: Opettajat
         trusted_referers: "Luotetut HTTP-viittaajat"
         turnitin_account_id: Turnitin-tilitunnus
-        turnitin_comments: "Lähetyksen kommentit"
+        turnitin_comments: "Tehtäväpalautusten kommentit"
         turnitin_host: Turnitin-isäntä
         turnitin_pledge: "Similarity Pledge"
         turnitin_shared_secret: "Turnitinin jaettu salaisuus"
@@ -860,7 +861,7 @@ fi:
         custom_name_description: "Jos tämä valitaan, se korvaa kaikki muut brändäykset, jotka lähetettiin Canvasin ilmoituksissa."
         email_date: Päivämäärä
         email_reply_to: "Vastaa kohteeseen"
-        email_to: Johonkin
+        email_to: Vastaanottaja
         example: "Esimerkki:"
         external_services: "Ilmoitukset lähetetty ulkoisiin palveluihin"
         external_services_label: "Näytä kertaluontoinen ponnahdusvaroitus ilmoitusasetussivulla."
@@ -1059,7 +1060,7 @@ fi:
       account_reports: 
         default: 
           parameters: 
-            header: Käsite
+            header: Kausi
     test_ldap_dialog_title: "Testaa LDAP-asetukset"
     test_ldap_result_canceled: Peruutettu
     test_ldap_result_failed: Epäonnistui
@@ -1306,6 +1307,7 @@ fi:
       threshold_should_be_numeric: "Tämän pitäisi olla positiivinen numero"
   alerts_add_edit_delete_d71091c6: "Hälytykset - lisää/muokkaa/poista"
   alerts_course_settings_53551794: "Hälytykset (Kurssin asetukset)"
+  align_outcomes_to_this_page_7d055196: "Linjaa tulokset tälle sivulle"
   all_4321c3a1: Kaikki
   all_account_types_e83c1516: "Kaikki tilityypit"
   all_accounts_3bafc860: "Kaikki tilit"
@@ -1699,6 +1701,9 @@ fi:
   allows_users_to_edit_conferences_2d3c960c: "Sallii käyttäjien muokkaavan konferensseja."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Salli käyttäjien ottavan käyttöön \"Käynnistä SpeedGrader suodatettu opiskelijaryhmän perusteella\" -vaihtoehto kursseille kurssin asetukset-sivulla. Kun aktiivinen ja opiskelijaryhmä on valittu uudessa arvosanakirjassa, SpeedGrader se lataa opiskelijat valitussa ryhmä."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Salli käyttäjien mykistävän ilmoitukset kurssin tason tarkkuudelle."
+  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+      Sallii käyttäjien ohittavan erityiset ilmoitusasetukset
+      kurssilla kurssin perusteella.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Mahdollistaa käyttäjien poimivan pronomineja, jotka näytetään heidän nimensä jälkeen, kun se näkyy käyttöliittymässä."
   allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
       Mahdollistaa käyttäjien poimivan pronomineja, jotka näytetään heidän nimensä
@@ -2506,8 +2511,8 @@ fi:
         allow_url: "Verkkosivuston URL"
         allowed_extensions: "Sallitut tiedostopäätteet"
         restrict_file_extensions: "Rajoita tiedostotyyppien latausta"
-      online_entry_options: "Verkon merkintävaihtoehdot"
-      submission_type: Lähetystyyppi
+      online_entry_options: "Eri palautusmuodot verkossa"
+      submission_type: Palautustapa
       submission_types: 
         external_tool: "Ulkoinen työkalu"
         no_submission: "Ei lähetystä"
@@ -2941,7 +2946,7 @@ fi:
       Jos haluat muokata blueprint-lukitusasetuksia Keskustelut- indeksisivulla, Keskustelut - valvo täytyy myös olla käytössä.
   blueprint_courses_must_be_enabled_for_an_account_b_4a79dc67: "Pääkäyttäjän täytyy ottaa Blueprint-kurssit käyttöön. Kurssin roolit voidaan hallita sisältöä vain Blueprint-kursseilla, jos ne on lisätty Blueprint-kurssille opettajan, apuopettajan tai suunnittelijan roolissa. Jos tämä asetus on pois käytöstä, ja Keskustelut - tarkastele on käytössä, käyttäjä voi yhä säätää sisällön lukitusasetuksia yksilöllisissä keskusteluissa Blueprint-pääkurssilla."
   blueprint_courses_must_be_enabled_for_an_account_b_4ef094f4: "Pääkäyttäjän täytyy ottaa Blueprint-kurssit käyttöön. Kurssin roolit voidaan hallita sisältöä vain Blueprint-kursseilla, jos ne on lisätty Blueprint-kurssille opettajan, apuopettajan tai suunnittelijan roolissa. Jos tämä käyttöoikeus on pois käytöstä, ja Keskustelut - tarkastele on käytössä, käyttäjä voi yhä säätää sisällön lukitusasetuksia yksilöllisissä keskusteluissa Blueprint-pääkurssilla."
-  blueprint_courses_must_be_enabled_for_an_account_b_5ab5b804: "Pääkäyttäjän täytyy ottaa Blueprint-kurssit käyttöön. Kurssin roolit voidaan hallita sisältöä vain Blueprint-kursseilla, jos ne on lisätty Blueprint-kurssille opettajan, apuopettajan tai suunnittelijan roolissa. Jos tämä käyttöoikeus on pois käytöstä, ja Keskustelut - tarkastele on käytössä, käyttäjä voi yhä säätää sisällön lukitusasetuksia yksilöllisillä sivuilla Blueprint-pääkurssilla."
+  blueprint_courses_must_be_enabled_for_an_account_b_5ab5b804: "Pääkäyttäjän täytyy ottaa Blueprint-kurssit käyttöön. Kurssin roolit voidaan hallita sisältöä vain Blueprint-kursseilla, jos ne on lisätty Blueprint-kurssille opettajan, apuopettajan tai suunnittelijan roolissa. Jos tämä käyttöoikeus on pois käytöstä, käyttäjä voi yhä säätää sisällön lukitusasetuksia yksilöllisillä sivuilla Blueprint-pääkurssilla."
   blueprint_courses_must_be_enabled_for_an_account_b_79b2d93e: |-
       Blueprint-kurssien täytyy olla käytössä tilillä pääkäyttäjän toimesta.
       Kurssin rooleilla voi hallita sisältöä Blueprint-kursseilla vain, jos ne lisätään Blueprint-kurssiin opettajan, apuopettajan tai suunnittelijan roolissa.
@@ -3471,6 +3476,7 @@ fi:
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Ei voida määrittää  sis_account_id kohteeseen root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Ei voida määrittää määräpäivää suljetulla arvosanojen antojaksolla"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Ei voida tarkastella yksityiskohtia raportteja nimettömille tehtäville, kunnes arvojen mykistys kumotaan."
+  cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Ei voida tarkastella yksityiskohtia raportteja nimettömille tehtäville, kunnes arvojen mykistys lähetetään."
   canvas: 
     migration: 
       errors: 
@@ -4138,7 +4144,7 @@ fi:
       show_issues: "Näytä ongelmat"
     progressing_content_migration_collection: 
       no_items: "Töitä ei ole pantu jonoon"
-      progress_label: "Nykyiset työpaikat"
+      progress_label: "Tuodut sisällöt"
     progressing_issues: 
       loading: Ladataan
     qti_zip: 
@@ -4630,7 +4636,7 @@ fi:
         course: Kurssi
         select_course: "Valitse kurssi"
         subject: Aihe
-        to: Johonkin
+        to: Vastaanottaja
       links: 
         media_comment: Nauhoita
       media_comment: Mediakommentti
@@ -4949,6 +4955,8 @@ fi:
   course_image_for_course_cfbb08df: "Kurssin kuva kohteelle %{course}"
   course_image_settings_eba3ec55: "Kurssin kuva-asetukset"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Kurssi on jo liitetty suunnitelmalla"
+  course_level_notification_preferences_require_a_co_2f0a618: "Kurssitason ilmoitusasetukset vaativat course_id päivittääkseen"
+  course_level_overrides_for_notification_preference_e86d1725: "Kurssitaso ohittaa ilmoitusasetukset"
   course_list: 
     favorited_tooltip: "Napsauta poistaaksesi kurssit-valikosta."
     nonfavorited_tooltip: "Napsauta lisätäksesi kurssit-valikko."
@@ -5028,6 +5036,9 @@ fi:
   course_name_successfully_added_48116a50: "%{course_name} lisäys onnistui!"
   course_navigation_dd035109: "Kurssin navigointi"
   course_not_found_c248a721: "Kurssia ei löydy"
+  course_notification_settings_d9821d36: "Kurssin ilmoitusasetukset"
+  course_notification_settings_error_page_c0512c17: "Kurssin ilmoitusasetusten virhesivu"
+  course_notification_settings_initial_query_error_6dfb24ef: "Kurssin ilmoitusasetusten ensimmäisen kyselyn virhe"
   course_option_links_a79d263d: "Kurssiasetusten linkit"
   course_outcomes_7dc1cbc7: "Kurssin tulokset"
   course_pages_449f1dd4: "Kurssin sivut"
@@ -5127,7 +5138,7 @@ fi:
       content_label: Sisältö
       course_code: "Kurssin koodi"
       details: "Anna uuden kurssin tiedot."
-      enrollment_term_id: Käsite
+      enrollment_term_id: Kausi
       headings: 
         copy_course: "Kopioi %{course}"
       name: Nimi
@@ -5315,7 +5326,7 @@ fi:
         course_status_unpublished: "Kurssin julkaisu peruutettiin"
         course_visibility: Näkyvyys
         custom_course_visibility: Mukauttaa
-        enrollment_term_id: Käsite
+        enrollment_term_id: Kausi
         grading_scheme: "Arvosanojen asteikko"
         grading_standard_enabled: "Ota kurssinarvostelujärjestelmä käyttöön"
         hide_distribution_graphs: "Piilota arvosanan jakelukaaviot opiskelijoilta"
@@ -5411,7 +5422,7 @@ fi:
         student_view: Opiskelijanäkymä
         view_course_calendar: "Näytä kurssikalenteri"
         view_course_notification_settings: "Näytä kurssin ilmoituksia"
-        view_course_stream: "Näytä kurssin virtaus"
+        view_course_stream: "Näytä uusimmat tapahtumat"
       re_sending: "Lähetetään uudelleen..."
       send_done: "Valmis! Viesti saattaa kestää muutaman minuutin."
       send_failed: "Pyyntö epäonnistui. Yritä uudelleen."
@@ -5425,9 +5436,9 @@ fi:
         total: Yhteensä
         weight: Paino
       labels: 
-        assignments_weighting: "Tehtävät punnistaan ryhmän perusteella"
+        assignments_weighting: "Tehtävät painotetaan seuraavasti"
       no_groups: "Ei määritettyjä ryhmiä"
-      not_weighted: "Kurssin tehtäviä ei ole punnittu."
+      not_weighted: "Kurssin tehtäviä ei painoteta."
     statistics: 
       active_students: "Aktiiviset opiskelijat"
       all_rubrics: "Kaikki rubriikit"
@@ -5458,7 +5469,7 @@ fi:
       quiz_questions: "Tietovisan kysymykset"
       quiz_submissions: "Tietovisan lähetykset"
       quizzes: Tietovisat
-      submission_type: Lähetystyyppi
+      submission_type: Palautustapa
       tabs: 
         assignments: Tehtävät
         files: "Tiedoston tallennustila"
@@ -6046,6 +6057,7 @@ fi:
   disable_a5c05db3: "Poistettu käytöstä"
   disable_all_read_only_scopes_f9ffdd28: "Poista käytöstä kaikki vain luku -alat."
   disable_and_lock_7d0ef0e8: "Poista käytöstä ja lukitse"
+  disable_celebrations_description: "Tämän ominaisuuden ominaisuus piilottaa kaikki juhlinnan animaatiot."
   disable_content_security_policy_8660a787: "Ota käyttöön sisällön tietoturvakäytäntö"
   disable_extra_filter_options_1d1cdc02: "poista ylimääräiset suodatin vaihtoehdot"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Poista uusien kyselyiden tuonnin ja siirron valintaruudut pois käytöstä, oletuksena käyttöön otto"
@@ -6059,6 +6071,9 @@ fi:
   disabled_links_b3bdea99: "Poistetut linkit"
   disabled_not_visible_to_students_2c9d693f: "Poistettu käytöstä Ei näkyvissä opiskelijoille."
   disabled_not_visible_to_students_48d4a90d: "Poistettu käytöstä. Ei näkyvissä opiskelijoille."
+  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+      Poistaa tekstiviesti-ilmoitukset kaikille tyypeille lukuun ottamatta ilmoituksia ja
+      arvosanamuutoksia.
   disabling_f594bda: "Poistetaan käytöstä..."
   disabling_sync_to_name_failed_e7521ebb: "Synkronoinnin käytöstä poisto kohteeseen %{name} epäonnistui"
   disabling_this_permission_will_override_if_enabled_6481b015: "Tämän käyttöoikeuden poistaminen käytöstä korvaa (jos käytössä) Rubriikit - lisää/muokkaa/poista-oikeudet  ja estää käyttäjää luomasta tai muokkaamasta rubriikkeja yksittäisestä tehtävästä. Jos Oppimisen tulokset  - lisää/muokkaa/poista​ ovat kuitenkin käytössä, käyttäjä voi yhä lisätä rubriikkeja tulosten kautta (Hallitse Rubriikkeja -painike)."
@@ -6132,7 +6147,7 @@ fi:
       buttons: 
         save_and_publish: "Tallenna ja julkaise"
       delay_posting: "Viivästytä lähetystä"
-      enable_podcast_feed: "Poista Podcast-syöte käytöstä"
+      enable_podcast_feed: "Ota podcast-syöte käyttöön"
       include_replies_in_podcast_feed: "Sisällytä opiskelijan vastaukset Podcast-syötteeseen"
       only_graders_can_like: "Vain arvostelijat voivat tykätä"
       options: Asetukset
@@ -6360,7 +6375,7 @@ fi:
   don_t_move_lti_query_params_to_post_body_5c80e037: "Älä siirrä LTI-tietovisan parametria LÄHETYKSEN runkoon"
   don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Älä lähetä tuloksia oppimisen hallinnan arvosanakirjaan"
   done_54e3d4b6: Valmis
-  done_8af51c9b: Vlms
+  done_8af51c9b: Vlms.
   done_editing_9f7379d9: "Muokkaus valmis"
   done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "Valmis! Otimme lataamasi tiedostot ja liitimme niihin lyhyen kommentin tämän jokaisen tehtävän käyttäjän lähetyssivulle. Opiskelijat saavat ilmoituksen siitä, että uusi kommentti lisättiin."
   down_5831a426: Alas
@@ -6623,6 +6638,7 @@ fi:
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Ota i18n-ominaisuudet käyttöön tulosten viennissä"
   enable_moderated_grading_bacd20d8: "Ota valvottu arvosanojen anto käyttöön."
   enable_new_sis_integration_settings_ab6780a4: "Ota käyttöön uudet SIS-integraatioasetukset"
+  enable_notifications_10a4bf44: "Ota ilmoitukset käyttöön"
   enable_reregistration_for_lti_2_b2a10444: "Ota LTI 2:n uudelleenrekisteröinti käyttöön"
   enable_scope_ac28b832: "Ota ala käyttöön"
   enable_student_context_card_links_eba2f2c5: "Ota käyttöön opiskelijan kontekstikortin linkit"
@@ -7177,6 +7193,7 @@ fi:
   failed_to_save_dashboard_selection_32e71c72: "Koontinäytön valinta epäonnistui"
   failed_to_save_please_try_again_later_bb7070fb: "Tallennus epäonnistui, yritä myöhemmin uudelleen"
   failed_to_submit_draft_comment_1de83451: "Luonnoksen kommentin lähettäminen epäonnistui"
+  failed_to_update_course_notification_settings_cbf0eb18: "Kurssin ilmoitusasetusten päivittäminen epäonnistui"
   failed_to_update_discussion_23cc229a: "Keskustelun päivittäminen epäonnistui"
   failed_to_update_permission_33c493f: "Käyttöoikeuksien päivittäminen epäonnistui"
   failed_to_update_role_name_8c7b0119: "Roolin nimen päivitys epäonnistui"
@@ -7212,6 +7229,7 @@ fi:
     canvas_parent_display_name: "Canvas Parent"
     google_docs_domain_restriction: "Google Docs -verkkotunnusrajoitus"
     gradebook_list_students_by_sortable_name: "Arvosanakirja - Luettelo opiskelijat lajiteltavan nimen perusteella"
+    hide_celebrations: "Poista juhlinnan animaatiot"
     high_contrast: "Voimakkaan kontrastin käyttöliittymä"
     k12: "K-12 Määrätyt ominaisuudet"
     learning_mastery_gradebook: "Oppimisen hallinnan arvosanakirja"
@@ -7320,7 +7338,7 @@ fi:
   filter_by_student_name_or_secondary_id_83dc524f: "Suodata opiskelijan nimen tai toissijaisen tunnuksen perusteella"
   filter_by_term_cfe778b2: "Suodata kauden perusteella"
   filter_by_user_type_dbbd3e3d: "Suodata käyttäjän tyypin perusteella"
-  filter_conversations_by_type_1ce8c064: "Suodata keskustelut tyypin perusteella"
+  filter_conversations_by_type_1ce8c064: "Suodata viestit tyypin perusteella"
   filter_e3398407: Suodatin
   filter_ip_addresses_2f296bd2: "Suodattimen IP-osoitteet"
   filter_replies_by_unread_342e8e90: "Suodattimen vastaukset lukemattomien perusteella"
@@ -7456,8 +7474,8 @@ fi:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Anna kaikille opiskelijoille saman prosenttinen arvosana*%{assignment.name}* syöttämällä ja lähettämällä arvosanan arvo alla:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Anna kaikille opiskelijoille saman *prosenttinen* arvosana**%{assignment.name}** syöttämällä ja lähettämällä arvosanan arvo alla:"
-  global_announcements_a78912c8: "Globaalit ilmoitukset"
-  global_announcements_add_edit_delete_843ca4d2: "Globaalit ilmoitukset - lisää/muokkaa/poista"
+  global_announcements_a78912c8: "Organisaatiotason ilmoitukset"
+  global_announcements_add_edit_delete_843ca4d2: "Organisaatiotason ilmoitukset - lisää/muokkaa/poista"
   global_branding_df1cae12: "Globaali brändäys"
   global_message_icons: 
     announcement: ilmoitus
@@ -7644,6 +7662,22 @@ fi:
       tooltip: 
         error: "VeriCite Samanlaisuuden pistemäärä - katso lähetyksen virhetietoja"
         pending: "VeriCite Samanlaisuuden pistemäärä - lähetys odottaa"
+  gradebookGradeDisplayWarningDialog: 
+    grade_display_warning: 
+      cancel: Peruuta
+      continue: Jatka
+      percent_text: "Opiskelijat näkevät myös lopullisen arvosanansa prosenttiosuuksina. Haluatko varmasti jatkaa?"
+      points_text: "Opiskelijat näkevät myös lopullisen arvosanansa pisteinä. Haluatko varmasti jatkaa?"
+  gradebookGradebookKeyboardNav: 
+    keyboard_assignment_desc: "Siirry nykyisen tehtävän tietosivulle"
+    keyboard_close_menu: "Sulje parhaillaan aktiivinen valikko"
+    keyboard_menu_desc: "Avaa valikko aktiiviselle sarakkeelle"
+    keyboard_sort_desc: "Lajittele ristikko nykyisessä aktiivisessa sarakkeessa"
+    keycodes: 
+      close_menu: esc
+      goto_assignment: g
+      menu: m
+      sort: s
   gradebookHeaderFilterView: 
     course_average: "Kurssin keskiarvo"
     course_median: "Kurssin keskiarvo"
@@ -7752,7 +7786,7 @@ fi:
         high: Korkein
         low: Alhainen
         mean: Keskiarvo
-        only_graded: "Laske arvosteltujen tehtävien perusteella"
+        only_graded: "Laske arvioitujen tehtävien perusteella"
         total: Yhteensä
         your_score: Pistemääräsi
       learning_outcomes: "Oppimisen hallinta"
@@ -7874,7 +7908,7 @@ fi:
   graders_anonymous_to_graders_turned_on_6ccf213f: "Nimettömät arvosanan antajat arvosanan antajiksi kytketty päälle"
   graders_can_view_each_other_s_comments_d836b848: "Arvostelijat voivat tarkastella toistensa kommentteja"
   graders_cannot_view_each_other_s_names_b1fa7899: "Arvostelijat eivät voi tarkastella toistensa nimiä"
-  graders_cannot_view_student_names_2e8d3ff9: "Arvostelijat eivät voi nähdä opiskelijan nimiä"
+  graders_cannot_view_student_names_2e8d3ff9: "Arvioijat eivät voi nähdä opiskelijoiden nimiä"
   grades_a61eba0a: Arvosanat
   grades_are_now_reverted_to_original_scores_e6deade1: "Arvosanat palautetaan nyt alkuperäisiin pistemääriin"
   grades_are_now_showing_what_if_scores_711a8be2: "Arvosanat näytetään nyt mitä jos -pistemäärinä"
@@ -8004,10 +8038,12 @@ fi:
     titles: 
       grading_scheme_info: "Näytä/Muokkaa arvosanojen asteikkoa"
   grading_type_type_7d8b42d7: "Arvosanojen antotyyppi: %{type}"
+  granular_course_notification_settings_will_be_conf_68f122db: "Karkeat kurssin ilmoitusasetukset konfiguroidaan täällä tulevaisuudessa."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Karkeat käyttöoikeudet wiki-sivujen hallintaan"
   graphql_mutation_activity_5a47678b: GraphQL-mutaatioaktiviteetti
   graphql_mutation_log_25acc923: GraphQL-mutaatioloki
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Hienoa, joten sinulla on kurssi. Mitä nyt? No, ennen kuin siirryt julkaisemaan sitä maailmalle, haluat ehkä tarkistaa ja varmistaa, että sinulla on kaikki perusasiat kohdallaan.  Käy lista läpi vasemmalla ja varmista, että kurssisi on valmis käytettäväksi."
+  great_work_from_the_canvas_developers_8c23f1c3: "Hienoa! Canvasin kehittäjiltä"
   greek_65c5b3f7: kreikka
   green_15af4778: Vihreä
   group: 
@@ -8665,7 +8701,7 @@ fi:
   in_progress_9d1ce8b9: Käynnissä
   inactive_cd40317f: ei-aktiivinen
   inactive_enrollments_3b84be3d: "Passiiviset rekisteröitymiset"
-  inbox_bb245a60: "Tulevien laatikko"
+  inbox_bb245a60: Saapuneet
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Lisää linkki kuvaruutukaappaukseen esim. *Jing*-muotoa."
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: "Sisällytä tavutilausmerkki yhteensopivissa arvosanakirjojen vienneissä"
   include_byte_order_mark_in_gradebook_exports_d2ad0d4e: "Sisällytä tavutilausmerkki arvosanakirjojen viennissä"
@@ -8673,10 +8709,11 @@ fi:
   include_deleted_objects_3cced3b5: "Sisällytä poistetut esineet;"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Sisällytä integraation tunnukset arvosanakirjojen vienteihin."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
-      Sisällytä pistemäärät, kun hälytät arvosanoista.
-                Jos sähköpostiosoitteesi ei ole laitoksen sähköpostiosoite, tämä tarkoittaa, että arkaluontoista sisältöä lähetetään laitoksesi ulkopuolelle.
+      Sisällytä pistemäärät, kun lähetät herätteen arvosanoista.
+                Jos sähköpostiosoitteesi ei ole organisaation sähköpostiosoite, tämä tarkoittaa, että arkaluontoista sisältöä lähetetään organisaatiosi ulkopuolelle.
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Sisällytä tämä tehtävä arvosanoihin, kun synkronoit koulusi opiskelijan tietojärjestelmää"
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Sisältää arvosanan arvot pääkäyttäjän arvosanaraporteissa."
+  includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Kurssin ilmoitusasetukset"
   incomplete_95612d72: keskeneräinen
   incomplete_da3c2ea2: Keskeneräinen
   incompleteregistration: 
@@ -8882,6 +8919,7 @@ fi:
   item_type_download_e949cdb6: "Kohteen tyyppi: Lataa"
   item_type_link_5a2abed2: "Kohteen tyyppi: Linkki"
   item_type_locked_85c560ec: "Kohteen tyyppi: Lukittu"
+  item_type_new_quiz_1a1cd9a9: "Kohteen tyyppi: Uusi kysely"
   item_type_quiz_c894ddb1: "Kohteen tyyppi: Tietovisa"
   items_299a7626: "Kohdetta: "
   items_items_selected_5b55e566: "%{items} kohdetta valittu"
@@ -9105,7 +9143,7 @@ fi:
   length_results_found_3afd01e5: "%{length} tulosta löytynyt"
   let_students_see_the_correct_answers_dacc2faf: "Anna opiskelijoiden nähdä oikeat vastaukset"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Anna opiskelijoiden nähdä tietovisan vastaukset (virheelliset kysymykset merkitään opiskelijapalautteeseen)"
-  letter_grade_29ff1938: "Kirjeen arvosana"
+  letter_grade_29ff1938: Kirjainarvosana
   letter_grade_f00fedc4: kirjainarvosana
   level_5fdf654a: Taso
   lib: 
@@ -10573,7 +10611,7 @@ fi:
         reply_to: Vastaus
         sent_at: Lähetetty
         subject: Aihe
-        to: Johonkin
+        to: Vastaanottaja
     messages: 
       failure: "Sähköpostin lähettämisessä ilmeni virhe. Lataa sivu uudelleen ja yritä uudelleen."
       success: "Sähköpostisi toimitetaan."
@@ -11384,7 +11422,7 @@ fi:
     score_change_notifications: "Pistemäärän vaihtoilmoitukset"
     see_grade: "Heidän arvosanansa tehtävässä"
     students_will_see: "Opiskelijat pystyvät näkemään, että tämä tehtävä on ”mykistetty”."
-    submission_comments: "Lähetyksen kommentit"
+    submission_comments: "Tehtäväpalautusten kommentit"
     sure_you_want_to_mute: "Haluatko varmasti mykistää tämän tehtävän? Kun tämä tehtävä on mykistetty, opiskelijat eivät saa uusia ilmoituksia tai pysty näkemään seuraavia:"
   mute_notifications_by_course_440e18be: "Mykistä kurssin ilmoitukset"
   mute_unmute_assignment_62608e44: "Mykistä tehtävä/Poista tehtävän mykistys"
@@ -11686,9 +11724,9 @@ fi:
   notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: "Ilmoitus: Arvosanojen antojakso on suljettu tälle opiskelijalle"
   notification: 
     account_notification_description: "Laitoksenlaajuiset ilmoitukset (näytetään myös koontinäyttösivuilla)"
-    account_notification_display: "Globaalit ilmoitukset"
+    account_notification_display: "Organisaatiotason ilmoitukset"
     added_to_conversation_description: "Sinut lisättiin keskusteluun"
-    added_to_conversation_display: "Lisätty keskusteluun"
+    added_to_conversation_display: "Lisätty viestiketjuun"
     all_submissions_description: |-
         *Vain ohjaaja ja pääkäyttäjä:*
         
@@ -11710,7 +11748,7 @@ fi:
         
         Sisältö synkronoitiin blueprint-kurssista liitettyihin kursseihin
     blueprint_display: "Blueprintin synkronointi"
-    calendar_description: "Uudet ja vaihdetut kohteet kurssikalenterissasi"
+    calendar_description: "Uusia tai muuttuneita merkintöjä kurssikalenterissasi"
     calendar_display: Kalenteri
     categories: 
       account_notification: "Tilin ilmoitus"
@@ -11747,7 +11785,7 @@ fi:
     content_link_error_display: "Sisällön linkin virhe"
     conversation_created_description: "Loit keskustelun"
     conversation_created_display: "Luomani keskustelut"
-    conversation_message_description: "Uusia Saapuvan laatikon viestejä"
+    conversation_message_description: "Uusia viestejä"
     conversation_message_display: "Keskustelun viesti"
     course_content_description: |-
         Muuta kurssin sisältöä: 
@@ -11771,7 +11809,7 @@ fi:
         * Mykistämätön tehtävän arvosana
         * Arvosanan paino muutettu
     grading_display: "Arvosanojen anto"
-    grading_policies_description: "Kurssin arvostelukäytännön muutos"
+    grading_policies_description: "Kurssin arviointikäytännön muutos"
     grading_policies_display: "Arvosanojen antokäytäntö"
     invitation_description: |-
         Kutsu: 
@@ -11779,7 +11817,7 @@ fi:
         * Verkkokonferenssi
         * Ryhmä
         * Yhteistyö
-        * Kollegan arvostelu ja muistutus
+        * Vertaisarviointi ja muistutus
     invitation_display: Kutsu
     late_grading_description: |-
         *Vain ohjaaja ja pääkäyttäjä:*
@@ -11798,7 +11836,7 @@ fi:
       account_notification: "Tilin ilmoitus"
       account_user_notification: "Tilin käyttäjän ilmoitus"
       account_user_registration: "Tilin käyttäjän rekisteröinti"
-      added_to_conversation: "Lisätty keskusteluun"
+      added_to_conversation: "Lisätty viestiketjuun"
       alert: Ilmoitus
       announcement_created_by_you: "Luomasi ilmoitus"
       announcement_reply: "Ilmoituksen vastaus"
@@ -12804,7 +12842,7 @@ fi:
       default_comments_settings: "*Tähän syötetty teksti näytetään opiskelijoille, kun se lähetetään tehtävälle.*"
       labels: 
         account_id: "VeriCite Kuluttajan avain"
-        comments: "Lähetyksen kommentit"
+        comments: "Tehtäväpalautusten kommentit"
         exclude_quotes: "Sulje lainaukset pois"
         exclude_self_plag: "Sulje itseplagiointi pois"
         host: "VeriCite Palvelin"
@@ -12974,7 +13012,7 @@ fi:
       headers: 
         notification_preferences: Ilmoitusasetukset
       page_title: Ilmoitusasetukset
-      weekly_notification_range: "Viikoittaiset ilmoitukset lähetetään %{weekday} %{start_time} ja %{end_time} välillä."
+      weekly_notification_range: "Viikoittaiset ilmoitukset lähetetään %{weekday} klo %{start_time}-%{end_time} välillä."
     confirming_contact: "Vahvistetaan ..."
     confirms: 
       delete_access_key: "Haluatko varmasti poistaa tämän käyttöavaimen?"
@@ -13313,7 +13351,7 @@ fi:
   publish_btn_module: 
     buttons: 
       publish: Julkaise
-      published: Julkaistut
+      published: Julkaistu
       publishing: Julkaistaan...
       unpublish: "Peruuta julkaisu"
       unpublishing: "Julkaisua kumotaan..."
@@ -14735,6 +14773,7 @@ fi:
   restart_link_validation_b61286fc: "Käynnistä linkin vahvistus uudelleen"
   restore_courses_182e162e: "Palauta kurssit"
   restored_course_association_course_c9e16045: "Kurssin liitos %{course} palautettu"
+  restrict_sms_to_select_types_9dd6399c: "Valitse tyypit rajoittamalla tekstiviestejä"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Rajoita opiskelijoiden pääsyä kursseille päättymispäivän jälkeen"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Rajoita opiskelijoiden pääsyä kursseille ennen alkamispäivää"
   restrict_students_from_annotating_6c28ab9b: "Rajoita opiskelijoita tekemästä huomautuksia"
@@ -14932,6 +14971,7 @@ fi:
       remove_rubric: "Poista tämä rubriikki luettelostani"
   rubrics_add_edit_delete_8299eff7: "Rubriikit - lisää/muokkaa/poista"
   rubrics_b5ef369b: Rubriikit
+  rubrics_in_course_navigation_539ea536: "Rubriikit kurssin navigoinnissa"
   rubrics_speedgrader_a6ebec57: "Rubriikit, SpeedGrader"
   running_c5a4998d: Suoritetaan
   russia_7_87bc99d5: "Venäjä (+7)"
@@ -16227,10 +16267,10 @@ fi:
     student_hidden_name: "Opiskelija %{position}"
   sso_settings_ebf98263: SSO-asetukset
   star_conversation_2e2ba614: "Merkitse keskustelu tähdellä"
-  starred_5a9efa8a: "Merkitty tähdellä"
-  starred_no_subject_click_to_unstar_3191d64: "Merkitty tähdellä \"(Ei aihetta)\", napsauta poistaaksesi tähti."
-  starred_no_subject_click_to_unstar_bff04bce: "Merkitty tähdellä \"(Ei aihetta)\", napsauta poistaaksesi tähti."
-  starred_subject_click_to_unstar_6aafcddc: "Merkitty tähdellä \"%{subject}\", napsauta poistaaksesi tähti."
+  starred_5a9efa8a: "Tähdellä merkityt"
+  starred_no_subject_click_to_unstar_3191d64: "Tähdellä merkityt \"(Ei aihetta)\", napsauta poistaaksesi tähti."
+  starred_no_subject_click_to_unstar_bff04bce: "Tähdellä merkityt \"(Ei aihetta)\", napsauta poistaaksesi tähti."
+  starred_subject_click_to_unstar_6aafcddc: "Tähdellä merkityt \"%{subject}\", napsauta poistaaksesi tähti."
   start_date_e937be8a: Alkamispäivä
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} kohteeseen %{end_time}"
   start_entry_4b491f60: "Aloita merkintä"
@@ -16420,8 +16460,8 @@ fi:
   submission_comment_sent_3f2af3d0: "Lähetyksen kommentti lähetetty"
   submission_comment_updated_8d917ded: "Lähetyksen kommentti päivitetty"
   submission_comment_user_name_assignment_title_cour_d88ba875: "Lähetyksen kommentti: %{user_name}, %{assignment_title}, %{course_name}"
-  submission_comments_4fa03a17: "Lähetyksen kommentit"
-  submission_comments_b6d65841: "Lähetyksen kommentit"
+  submission_comments_4fa03a17: "Tehtäväpalautusten kommentit"
+  submission_comments_b6d65841: "Tehtäväpalautusten kommentit"
   submission_date_8f659c0c: Lähetyspäivä
   submission_date_a7920dac: lähetyspäivä
   submission_detail: 
@@ -16458,7 +16498,7 @@ fi:
   submission_score_b7a291e8: "lähetyksen pistemäärä"
   submission_sent_3f0d2ee1: "Lähetys lähetetty"
   submission_tray_429ac3df: Lähetysalue
-  submission_type_a925fc5f: Lähetystyyppi
+  submission_type_a925fc5f: Palautustapa
   submission_updated_8897f3b7: "Lähetys päivitetty"
   submission_user_name_assignment_title_2cf5e3e9: "Lähetys: %{user_name}, %{assignment_title}"
   submissions: 
@@ -16598,13 +16638,13 @@ fi:
   successfully_added_fb3e6008: "Lisätty onnistuneesti"
   successfully_created_a_set_38374719: "Joukko luotu onnistuneesti"
   successfully_deleted_discussion_title_a685f345: "Keskustelu %{title} poistettu onnistuneesti"
-  successfully_deleted_the_comment_a8bbe561: "Kommentin poistaminen onnistui."
+  successfully_deleted_the_comment_a8bbe561: "Kommentin poistaminen onnistui"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model} siirrettiin onnistuneesti kohteeseen %{newGroup}"
   successfully_posted_the_comment_12d95d56: "Kommentin lähettäminen onnistui."
   successfully_resubmitted_to_turnitin_c908de0f: "Uudelleenlähetys Turnitiniin onnistui."
   successfully_resubmitted_to_vericite_dab924b6: "Uudelleenlähetys VeriCiteen onnistui."
-  successfully_saved_the_comment_c87681fd: "Kommentin tallennus onnistui."
-  successfully_updated_the_comment_946360d5: "Kommentin päivitys onnistui."
+  successfully_saved_the_comment_c87681fd: "Kommentin tallennus onnistui"
+  successfully_updated_the_comment_946360d5: "Kommentin päivitys onnistui"
   sum_of_all_files_in_mb_2b705055: "kaikkien tiedostojen summa MB"
   support: 
     array: 
@@ -16694,6 +16734,7 @@ fi:
     pages: Sivut
     people: Henkilöt
     quizzes: Tietovisat
+    rubrics: Rubriikit
     settings: Asetukset
     syllabus: Opinto-ohjelma
     tab_location_error: "Välilehden sijainti ei ole voimassa"
@@ -16716,10 +16757,10 @@ fi:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Kerro meille kuinka ja milloin haluaisit saada ilmoituksia tapahtumista Canvasissa."
   templates_4ca13d07: Mallit
   tenant_d2a41f78: Vuokralainen
-  term_41f37cae: käsite
-  term_42976f1c: "Käsite:"
+  term_41f37cae: kausi
+  term_42976f1c: "Kausi:"
   term_created_27d27c2b: "Kausi luotu "
-  term_e1c1d390: Käsite
+  term_e1c1d390: Kausi
   term_id_74b933ef: "käsitteen tunnus"
   term_sis_7edb8ab7: "käsitteen sis"
   term_start_b8c2aad1: "kausi alkaa"
@@ -16802,7 +16843,7 @@ fi:
       Jos haluat nähdä Analyysi-linkin käyttäjän sivupalkissa Ihmiset-sivulla, profiilien täytyy olla pois käytöstä tililläsi.
   the_analytics_feature_must_be_enabled_in_account_s_cf577263: "Analyysi-ominaisuus täytyy olla käytössä tilien asetuksissa, jotta analyysisivua voi tarkastella. Jos haluat nähdä Analyysi-linkin käyttäjän sivupalkissa Ihmiset-sivulla, profiilien täytyy olla pois käytöstä tililläsi."
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "Ilmoitusta \\\"%{title}\\\" ei voitu linkittää moduuliin \\\"%{mod_title}\\\""
-  the_announcements_tab_is_always_visible_to_admins__58df854d: "Ilmoitukset-välilehti on aina näkyvissä pääkäyttäjille; jos kuitenkin haluat hallita ilmoituksia, Globaalit ilmoitukset - lisää/muokkaa/poista täytyy myös olla käytössä."
+  the_announcements_tab_is_always_visible_to_admins__58df854d: "Ilmoitukset-välilehti on aina näkyvissä pääkäyttäjille; jos kuitenkin haluat hallita ilmoituksia, Organisaatiotason ilmoitukset - lisää/muokkaa/poista täytyy myös olla käytössä."
   the_announcements_tab_is_always_visible_to_admins__eb447785: "Ilmoitukset-välilehti on aina näkyvissä pääkäyttäjille; jos kuitenkin haluat hallita ilmoituksia, Globaalit ilmoitukset - lisää/muokkaa/poista​ täytyy myös olla käytössä."
   the_app_was_activated_a84e055f: "Sovellus aktivoitiin"
   the_app_was_added_58e2836a: "Sovellus lisättiin"
@@ -16936,7 +16977,7 @@ fi:
   there_is_currently_1_available_grader_758e4a21: "Parhaillaan on 1 arvostelija saatavissa"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Ilmeni virhe uloskirjaduttaessa IdP:stäsi"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Ilmeni virhe luotaessa opettajan huomautusten saraketta."
-  there_was_a_problem_deleting_the_comment_93053aa9: "Kommentin poistamisessa ilmeni ongelma."
+  there_was_a_problem_deleting_the_comment_93053aa9: "Kommentin poistamisessa ilmeni ongelma"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Arvostelujaksojen poistamisessa ilmeni ongelma"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Arvosanojen asteikon poistamisessa ilmeni ongelma"
   there_was_a_problem_exporting_c33dc250: "Viennissä ilmeni ongelma."
@@ -17104,7 +17145,7 @@ fi:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Tämä käyttöoikeus ei vaikuta mahdollisuuteen hallita kurssitason kysymyspankkeja kyselyissä. Sen sijaan Hallitse kysymyspankkeja riippuu Tehtävät ja kyselyt - lisää/muokkaa/poista -käyttöoikeudesta. Jotta kurssin kysymyspankkeja voi hallita täysin, tämä käyttöoikeus ja Tehtävät ja kyselyt - lisää/muokkaa/poista täytyy molempien olla käytössä."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Tämä käyttöoikeus ei vaikuta mahdollisuuteen hallita kurssitason kysymyspankkeja kyselyissä. Sen sijaan Hallitse kysymyspankkeja riippuu Tehtävät ja kyselyt - lisää/muokkaa/poista -käyttöoikeudesta. Jotta kurssin kysymyspankkeja voi hallita täysin, tämä käyttöoikeus ja Tehtävät ja kyselyt - lisää/muokkaa/poista täytyy molempien olla käytössä."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Tämä käyttöoikeus on kaikkien Canvasin tilien käytössä, mutta vain käytössä laitoksille, jotka on liitetty Canvas Catalog -tiliin. Käyttöoikeuksilla ei parhaillaan ole etupään vaikutuksia, mutta koneenrakennuksen ehdotusten käyttöoikeuden pysyvät pääkäyttäjien käytössä. Muille rooleille käyttöoikeudet voidaan poistaa käytöstä."
-  this_permission_only_affects_course_announcements__6bc2b0a5: "Tämä käyttöoikeus vaikuttaa vain kurssin ilmoituksiin. Jos haluat hallita globaaleja ilmoituksia, Globaalit ilmoitukset - lisää/muokkaa/poista​ täytyy olla käytössä."
+  this_permission_only_affects_course_announcements__6bc2b0a5: "Tämä käyttöoikeus vaikuttaa vain kurssin ilmoituksiin. Jos haluat hallita globaaleja ilmoituksia, Organisaatiotason ilmoitukset - lisää/muokkaa/poista​ täytyy olla käytössä."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Tämä käyttöoikeus kontrolloi vain käyttäjien lisäämistä tilitasolla. Jos haluat lisätäkäyttäjiä kurssiin, Käyttäjät - lisää/poista opiskelijoita kurssilta ja/tai Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy myös olla käytössä."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
       Tämä käyttöoikeus kontrolloi vain käyttäjien lisäämistä tilitasolla. Jos haluat lisätä
@@ -17386,11 +17427,11 @@ fi:
   tls_7a2eaba5: TLS
   to_1126ab55: " -"
   to_35c6baa2: "- "
-  to_51406be9: Johonkin
+  to_51406be9: Vastaanottaja
   to_access_the_account_courses_page_courses_view_li_e1da6165: "Jos haluat käyttää tilin Kurssit-sivua, Kurssit - tarkastele luetteloa täytyy olla käytössä."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "Jos haluat käyttää Tehtävät-indeksisivua, Kurssin sisältö - tarkastele täytyy olla käytössä. Jos haluat erotella tehtäviä yksittäisille opiskelijoille, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Jos haluat käyttää Ihmiset-sivua ja tarkastella ryhmiä, Käyttäjät - tarkastele luetteloa​ täytyy olla käytössä."
-  to_access_the_people_page_users_view_list_must_be__1e9e5d75: "Jos haluat käyttää Ihmiset-sivua, Käyttäjät - tarkastele luetteloa​ täytyy olla käytössä. Jos Avoin rekisteröinti -tiliasetukset on käytössä, käyttäjät, joilla on tämä käyttöoikeus, voivat lisätä opiskelijoita kurssille  sähköpostiosoitteen kautta, jos käyttäjällä ei ole jo Canvas-tiliä. Jos haluat tarkastella SIS-tunnuksia, SIS-tiedot - lue täytyy olla käytössä. Jos haluat lisätä käyttäjän kurssin SIS-tunnuksen kautta, SIS-tiedot - hallitse täytyy myös olla käytössä. Jos haluat muokata opiskelijan osaa, Käyttäjät - tarkastele luetteloa ja Keskustelut - lähetä viestit yksittäisille kurssin jäsenille täytyy myös olla käytössä. Jos haluat linkittää havaitsijan  opiskelijaan, Keskustelut - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
+  to_access_the_people_page_users_view_list_must_be__1e9e5d75: "Jos haluat käyttää Ihmiset-sivua, Käyttäjät - tarkastele luetteloa​ täytyy olla käytössä. Jos Avoin rekisteröinti -tiliasetukset on käytössä, käyttäjät, joilla on tämä käyttöoikeus, voivat lisätä opiskelijoita kurssille  sähköpostiosoitteen kautta, jos käyttäjällä ei ole jo Canvas-tiliä. Jos haluat tarkastella SIS-tunnuksia, SIS-tiedot - lue täytyy olla käytössä. Jos haluat lisätä käyttäjän kurssin SIS-tunnuksen kautta, SIS-tiedot - hallitse täytyy myös olla käytössä. Jos haluat muokata opiskelijan osaa, Käyttäjät - tarkastele luetteloa ja Viestit - lähetä viestit yksittäisille kurssin jäsenille täytyy myös olla käytössä. Jos haluat linkittää havaitsijan opiskelijaan, Viestit - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
   to_access_the_people_page_users_view_list_must_be__2f01333b: "Jos haluat käyttää Ihmiset-sivua, Käyttäjät - tarkastele luetteloa​ täytyy olla käytössä. Jos tämä käyttöoikeus on käytössä, ja jos Käyttäjät -  tarkastele kirjautumistunnuksia on pois käytöstä, käyttäjät näkevät sisäänkirjautumistunnuksina käytetyt sähköpostiosoitteet. Jos haluat tarkastella sisäänkirjautumistunnuksia, Käyttäjät - lisää/poista opiskelijoita kurssilta ja/tai Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy myös olla käytössä."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "Jos haluat käyttää Ihmiset-sivua, Käyttäjät - tarkastele luetteloa​ täytyy olla käytössä."
   to_access_the_people_page_users_view_list_must_be__6f42bf9e: "Jos haluat käyttää Ihmiset-sivua, Käyttäjät - tarkastele luetteloa​ täytyy olla käytössä."
@@ -17413,7 +17454,7 @@ fi:
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "Jos haluat lisätä ilmoituksia, Ilmoitukset - valvo täytyy myös olla käytössä. Jos haluat tarkastella viimeaikaisia ilmoituksia aloitussivulla, Kurssin aloitussivun valintaruutu täytyy olla valittuna kurssiasetuksissa."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "Jos haluat lisätä, muokata tai poistaa ryhmiä, Ryhmät - lisää/muokkaa/poista täytyy olla käytössä."
   to_add_students_to_a_moderation_set_grades_view_al_40f2b8eb: "Jos haluat lisätä opiskelijoita valvontajoukkoon, Arvosanat - näytä kaikki arvosanat täytyy myös olla käytössä."
-  to_add_users_to_a_course_users_add_remove_students_1c4d63d7: "Jos haluat lisätä käyttäjiä kurssille, Käyttäjät - lisää/poista opiskelijoita kurssilta ja/tai Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy myös olla käytössä. Jos haluat muokata opiskelijan osaa, Keskustelut - lähetä viestejä yksittäisille kurssin jäsenille ja Käyttäjät - lisää/poista opiskelijoita kursseilta täytyy myös molempien olla käytössä. Jos haluat muokata opettajan, kurssin suunnittelijan tai apuopettajan osaa, Keskustelut - lähetä viestejä yksittäisille kurssin jäsenille ​ja Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy myös olla käytössä."
+  to_add_users_to_a_course_users_add_remove_students_1c4d63d7: "Jos haluat lisätä käyttäjiä kurssille, Käyttäjät - lisää/poista opiskelijoita kurssilta ja/tai Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy myös olla käytössä. Jos haluat muokata opiskelijan osaa, Viestit - lähetä viestejä yksittäisille kurssin jäsenille ja Käyttäjät - lisää/poista opiskelijoita kursseilta täytyy myös molempien olla käytössä. Jos haluat muokata opettajan, kurssin suunnittelijan tai apuopettajan osaa, Viestit - lähetä viestejä yksittäisille kurssin jäsenille ​ja Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy myös olla käytössä."
   to_add_users_to_a_course_users_add_remove_students_5036ad25: |-
       Jos haluat lisätä käyttäjiä kurssille, Käyttäjät - lisää/poista opiskelijoita kurssilta ja/tai Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy
       myös olla käytössä.
@@ -17483,7 +17524,7 @@ fi:
       Jos haluat muokata opiskelijan osaa, Käyttäjät - lisää/poista opiskelijoita kursseilla ja Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä.
       Jos haluat muokata opettajan, kurssin suunnittelijan tai apuopettajan osaa, Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilla ja Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä.
   to_edit_a_student_s_section_users_add_remove_stude_684e6cc3: "Jos haluat muokata opiskelijan osaa, Käyttäjät - lisää/poista opiskelijoita kursseilta ja Käyttäjät - tarkastele täytyy myös olla käytössä. Jos haluat muokata opettajan, kurssin suunnittelijan tai apuopettajan osaa, Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta ja Käyttäjät - tarkastele täytyy myös olla käytössä."
-  to_edit_a_student_s_section_users_add_remove_stude_73beca5c: "Jos haluat muokata opiskelijan osaa, Käyttäjät - lisää/poista opiskelijoita kursseilta ja Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat muokata opettajan, apuopettajan tai kurssin suunnittelijan osaa, Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta kurssille ja Keskustelut - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
+  to_edit_a_student_s_section_users_add_remove_stude_73beca5c: "Jos haluat muokata opiskelijan osaa, Käyttäjät - lisää/poista opiskelijoita kursseilta ja Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat muokata opettajan, apuopettajan tai kurssin suunnittelijan osaa, Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta kurssille ja Viestit - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
   to_edit_a_student_s_section_users_add_remove_stude_aab8752b: |-
       Jos haluat muokata opiskelijan osaa, Käyttäjät - lisää/poista opiskelijoita kursseilta ja Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä.
       Jos haluat muokata opettajan, kurssin suunnittelijan tai apuopettajan osaa, Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta ja Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä.
@@ -17577,7 +17618,7 @@ fi:
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "Jos haluat etsiä muutoslokeja, Arvosanat - tarkastele muutoslokeja täytyy olla myös käytössä."
   to_see_the_course_setup_checklist_option_on_the_co_41322a29: "Jos haluat nähdä kurssiasetusten tarkistusluettelon kurssin aloitussivulla, Hallitse kursseja ( lisää/muokkaa/poista ) täytyy myös olla käytössä."
   to_see_the_course_setup_checklist_option_on_the_co_6c485483: "Jos haluat nähdä kurssiasetusten tarkistusluettelon kurssin aloitussivulla, Hallitse kursseja lisää/muokkaa/poista täytyy myös olla käytössä."
-  to_send_a_message_to_an_individual_user_conversati_8d86a0da: "Jos haluat lähettää viestin yksittäiselle käyttäjälle, Keskustelut - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
+  to_send_a_message_to_an_individual_user_conversati_8d86a0da: "Jos haluat lähettää viestin yksittäiselle käyttäjälle, Viestit - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
   to_share_a_discussion_to_commons_course_content_ad_962c5e53: "Jos haluat jakaa keskustelun Commonsiin, Kurssin sisältö- lisää/muokkaa/poista täytyy myös olla käytössä."
   to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "Jos haluat jakaa keskustelun Commonsiin, Keskustelut - tarkastele täytyy myös olla käytössä."
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: "Jos haluat jakaa keskustelun Commonsiin, Keskustelut - tarkastele täytyy myös olla käytössä."
@@ -17627,7 +17668,7 @@ fi:
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "Jos haluat tarkastella käyttäjiä tilillä, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä."
   to_view_the_list_of_users_in_an_account_users_view_e08a4f3c: "Jos haluat tarkastella käyttäjiä tilillä, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä."
   to_view_the_list_of_users_in_the_course_users_view_26412777: "Jos haluat tarkastele käyttäjiä kurssilla, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat lisätä käyttäjiä SIS-tunnuksen kautta, Käyttäjät - lisää/poista opiskelijoita kurssilta ja/tai Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy myös olla käytössä."
-  to_view_the_list_of_users_in_the_course_users_view_34c164ea: "Jos haluat tarkastele käyttäjiä kurssilla, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat tarkastella SIS-tunnuksia, SIS-tiedot - lue täytyy olla käytössä. Jos haluat lisätä käyttäjän kurssin SIS-tunnuksen kautta, SIS-tiedot - hallitse täytyy myös olla käytössä. Jos haluat muokata opettajan tai apuopettajan osaa, Keskustelut - lähetä viestit yksittäisille kurssin jäsenille täytyy myös olla käytössä. Jos haluat linkittää havaitsijan  opiskelijaan, Keskustelut - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
+  to_view_the_list_of_users_in_the_course_users_view_34c164ea: "Jos haluat tarkastele käyttäjiä kurssilla, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat tarkastella SIS-tunnuksia, SIS-tiedot - lue täytyy olla käytössä. Jos haluat lisätä käyttäjän kurssin SIS-tunnuksen kautta, SIS-tiedot - hallitse täytyy myös olla käytössä. Jos haluat muokata opettajan tai apuopettajan osaa, Viestit - lähetä viestit yksittäisille kurssin jäsenille täytyy myös olla käytössä. Jos haluat linkittää havaitsijan opiskelijaan, Viestit - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
   to_view_the_list_of_users_in_the_course_users_view_524275e5: |-
       Jos haluat tarkastella käyttäjien listaa kurssilla Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä.
       Jos haluat tarkastella SID-tunnuksia, SIS-tiedot - lue täytyy myös olla käytössä.
@@ -17636,7 +17677,7 @@ fi:
   to_view_the_list_of_users_in_the_course_users_view_63e7f0c3: |-
       Jos haluat tarkastella käyttäjien luetteloa kurssilla, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä.
       Jos haluat lisätä käyttäjiä SIS-tunnuksen kautta, Käyttäjät - lisää/poista opiskelijoita kurssilta ja/tai Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy myös olla käytössä.
-  to_view_the_list_of_users_in_the_course_users_view_79e1eb45: "Jos haluat tarkastele käyttäjiä kurssilla, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat tarkastella SIS-tunnuksia, SIS-tiedot - lue täytyy olla käytössä. Jos haluat lisätä käyttäjän kurssin SIS-tunnuksen kautta, SIS-tiedot - hallitse täytyy myös olla käytössä. Jos haluat muokata opiskelijan osaa ja kurssin roolia, Käyttäjät - tarkastele luetteloa ja Keskustelut - lähetä viestejä yksilöllisille kurssin jäsenille täytyy myös olla käytössä. Jos haluat peruuttaa käyttäjiä, Käyttäjän tiedot -, Tarkastele kurssien luetteloa ja Katso käyttäjien luetteloa täytyy myös olla käytössä. Sallii käyttäjän lähettävän kurssin kutsut kurssin Ihmiset-sivulla. Jos Avoin rekisteröinti -tiliasetukset on käytössä, käyttäjät, joilla on tämä käyttöoikeus, voivat lisätä opiskelijoita kurssille kurssilta Ihmiset-sivulla sähköpostiosoitteiden kautta, jos käyttäjällä ei ole jo Canvas-tiliä. Jos haluat linkittää havaitsijan tiliin, Käyttäjät - hallitse sisäänkirjautumistietoja ja Keskustelut - lähetä yksilöllisille kurssin jäsenille täytyy olla käytössä."
+  to_view_the_list_of_users_in_the_course_users_view_79e1eb45: "Jos haluat tarkastele käyttäjiä kurssilla, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat tarkastella SIS-tunnuksia, SIS-tiedot - lue täytyy olla käytössä. Jos haluat lisätä käyttäjän kurssin SIS-tunnuksen kautta, SIS-tiedot - hallitse täytyy myös olla käytössä. Jos haluat muokata opiskelijan osaa ja kurssin roolia, Käyttäjät - tarkastele luetteloa ja Viestit - lähetä viestejä yksilöllisille kurssin jäsenille täytyy myös olla käytössä. Jos haluat peruuttaa käyttäjiä, Käyttäjän tiedot -, Tarkastele kurssien luetteloa ja Katso käyttäjien luetteloa täytyy myös olla käytössä. Sallii käyttäjän lähettävän kurssin kutsut kurssin Ihmiset-sivulla. Jos Avoin rekisteröinti -tiliasetukset on käytössä, käyttäjät, joilla on tämä käyttöoikeus, voivat lisätä opiskelijoita kurssille kurssilta Ihmiset-sivulla sähköpostiosoitteiden kautta, jos käyttäjällä ei ole jo Canvas-tiliä. Jos haluat linkittää havaitsijan tiliin, Käyttäjät - hallitse sisäänkirjautumistietoja ja Viestit - lähetä yksilöllisille kurssin jäsenille täytyy olla käytössä."
   to_view_the_list_of_users_in_the_course_users_view_96d03136: "Jos haluat tarkastele käyttäjiä kurssilla, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat lisätä käyttäjiä SIS-tunnuksen kautta, Käyttäjät - lisää/poista opiskelijoita kurssilta ja tai Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy myös olla käytössä."
   to_view_the_list_of_users_in_the_course_users_view_b1e0773b: |-
       Jos haluat tarkastele käyttäjien luetteloa kurssilla, Käyttäjät - tarkastele luetteloa​ täytyy olla käytössä.
@@ -17644,7 +17685,7 @@ fi:
       Jos haluat muokata opettajan tai apuopettajan osaa, Keskustelut - lähetä viestit yksittäisille kurssin jäsenille täytyy myös olla käytössä.
       Jos haluat linkittää havaitsijan  opiskelijaan, Keskustelut - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä.
   to_view_the_list_of_users_in_the_course_users_view_bc0462e3: "Jos haluat tarkastele käyttäjiä kurssilla, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat lisätä käyttäjiä SIS-tunnuksen kautta, Käyttäjät - lisää/poista opiskelijoita kurssilta ja/tai Käyttäjät - lisää/poista opettajia, kurssin suunnittelijoita tai apuopettajia kursseilta täytyy myös olla käytössä."
-  to_view_the_list_of_users_in_the_course_users_view_c44bdef0: "Jos haluat tarkastele käyttäjiä kurssilla, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat tarkastella SIS-tunnuksia, SIS-tiedot - lue täytyy olla käytössä. Jos haluat muokata opettajan tai apuopettajan osaa, Käyttäjät - tarkastele luetteloa Keskustelut - lähetä viestejä yksittäisille kurssin jäsenille täytyy olla myös käytössä. Jos haluat linkittää havaitsijan  opiskelijaan, Keskustelut - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
+  to_view_the_list_of_users_in_the_course_users_view_c44bdef0: "Jos haluat tarkastele käyttäjiä kurssilla, Käyttäjät - tarkastele luetteloa täytyy myös olla käytössä. Jos haluat tarkastella SIS-tunnuksia, SIS-tiedot - lue täytyy olla käytössä. Jos haluat muokata opettajan tai apuopettajan osaa, Käyttäjät - tarkastele luetteloa Viestit - lähetä viestejä yksittäisille kurssin jäsenille täytyy olla myös käytössä. Jos haluat linkittää havaitsijan opiskelijaan, Viestit - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
   to_view_the_list_of_users_in_the_course_users_view_f5a54b37: |-
       Jos haluat tarkastele käyttäjien luetteloa kurssilla, Käyttäjät - tarkastele luetteloa​ täytyy olla käytössä.
       Jos haluat tarkastella SIS-tunnuksia, SIS-tiedot - lue täytyy olla käytössä. Jos haluat lisätä käyttäjän kurssille SIS-tunnuksen kautta, SIS-tiedot - hallitse täytyy myös olla käytössä.
@@ -18691,7 +18732,9 @@ fi:
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Pitää kaikkien pistemääriesi korkeimmat"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Pitää kaikkien pistemääriesi uusimmat"
   will_paginate: 
+    container_aria_label: Sivutus
     next_label: "Seuraava &#8594;"
+    page_aria_label: "Sivu %{page}"
     page_entries_info: 
       multi_page: "Näytetään %{model} %{from} - %{to}/%{count} yhteensä"
       multi_page_html: "Näytetään %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> / <b>%{count}</b> yhteensä"
@@ -18746,6 +18789,7 @@ fi:
                     siirtymällä kohtaan Kurssit > Kaikki kurssit päävalikosta.
   you_are_currently_acting_as_user_name_8d2be0ee: "Toimit parhaillaan roolissa %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Olet parhaillaan kirjautunut sisään opiskelijanäkymään"
+  you_are_currently_receiving_notifications_for_this_9646b09d: "Saat parhaillaan ilmoituksia tälle kurssille. Jos haluat poistaa kurssin ilmoitukset käytöstä, vaihda yllä olevalla valinnalla."
   you_are_here_54075d8c: "Olet täällä:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Olet kirjautunut sisään %{institution1} valtuutustunnuksilla kohteesta %{institution2}"
   you_are_logged_out_of_canvas_8b5fc59a: "Sinut on kirjattu ulos Canvasista."
@@ -18909,6 +18953,7 @@ fi:
       Lue, Kirjoita ja Käytä suoria viestejä
        Kun olet luonut sovelluksesi, tee huomautus kuluttajatunnuksesta ja kuluttajan salaisuudesta ja syötä ne tänne.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Et pysty esikatselemaan muutoksiasi"
+  you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Et saa kurssin ilmoituksia tällä kertaa. Jos haluat ottaa kurssin ilmoitukset käyttöön, vaihda yllä olevalla valinnalla."
   your_answer_8dad6ea4: "Vastauksesi:"
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Selaimesi ei täytä Canvasin minimivaatimuksia. Käy *Canvasin yhteisössä* ja tee valmiiksi lista tuetuista selaimista."
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Kommenttisi tallennettiin automaattisesti luonnoksena."

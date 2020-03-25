@@ -72,7 +72,12 @@ describe 'CrocodocDocument' do
     end
 
     context "submitter permissions" do
-      it "should see everything (unless the assignment is muted)" do
+      before :once do
+        @assignment.ensure_post_policy(post_manually: true)
+      end
+
+      it "should see everything when grades are posted" do
+        @assignment.post_submissions
         expect(@crocodoc.permissions_for_user(@submitter)).to eq({
           :filter => 'all',
           :admin => false,
@@ -80,8 +85,7 @@ describe 'CrocodocDocument' do
         })
       end
 
-      it "should only see their own annotations when assignment is muted" do
-        @assignment.mute!
+      it "should only see their own annotations when grades are not posted" do
         expect(@crocodoc.permissions_for_user(@submitter)).to eq({
           :filter => @submitter.crocodoc_id,
           :admin => false,

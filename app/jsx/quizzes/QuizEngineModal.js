@@ -17,6 +17,8 @@
  */
 
 import React, {useState} from 'react'
+import $ from 'jquery'
+import 'jquery.ajaxJSON'
 import I18n from 'i18n!quiz_engine_modal'
 import CanvasModal from 'jsx/shared/components/CanvasModal'
 import {Link} from '@instructure/ui-link'
@@ -30,6 +32,7 @@ const NEW = 'new'
 
 function QuizEngineModal({setOpen, onDismiss}) {
   const [option, setOption] = useState()
+  const [checked, setChecked] = useState(false)
   const authenticity_token = () => getCookie('_csrf_token')
 
   const link = (
@@ -94,7 +97,22 @@ function QuizEngineModal({setOpen, onDismiss}) {
     form.submit()
   }
 
-  function handleSubmit() {
+  function saveQuizEngineSelection() {
+    const newquizzes_engine = option === NEW
+    $.ajaxJSON(
+      ENV.URLS.new_quizzes_selection,
+      'PUT',
+      {
+        newquizzes_engine_selected: newquizzes_engine
+      },
+      () => {
+        window.location.reload()
+        loadQuizEngine()
+      }
+    )
+  }
+
+  function loadQuizEngine() {
     if (option === CLASSIC) {
       post(ENV.URLS.new_quiz_url, {authenticity_token: authenticity_token()})
     } else if (option === NEW) {
@@ -102,8 +120,20 @@ function QuizEngineModal({setOpen, onDismiss}) {
     }
   }
 
+  function handleSubmit() {
+    if (checked) {
+      saveQuizEngineSelection()
+    } else {
+      loadQuizEngine()
+    }
+  }
+
   function handleChange(e, value) {
     setOption(value)
+  }
+
+  function checkboxChange() {
+    setChecked(!checked)
   }
 
   return (
@@ -115,12 +145,28 @@ function QuizEngineModal({setOpen, onDismiss}) {
       footer={footer}
     >
       {description}
-      <RadioInputGroup name="quizEngine" onChange={handleChange} defaultValue={option}>
+      <RadioInputGroup
+        name="quizEngine"
+        onChange={handleChange}
+        defaultValue={option}
+        description=""
+      >
         <RadioInput key={CLASSIC} value={CLASSIC} label={classicLabel} size="large" />
         {classicDesc}
         <RadioInput key={NEW} value={NEW} label={newQuizLabel} size="large" />
         {newDesc}
       </RadioInputGroup>
+      <hr />
+      <p>
+        <input
+          name="persistSelection"
+          type="checkbox"
+          defaultChecked={checked}
+          onChange={checkboxChange}
+          style={{marginRight: '0.25rem', height: '1.5rem', width: '1.5rem'}}
+        />
+        <label htmlFor="persistSelection">{I18n.t(`Remember my choice for this course`)}</label>
+      </p>
     </CanvasModal>
   )
 }

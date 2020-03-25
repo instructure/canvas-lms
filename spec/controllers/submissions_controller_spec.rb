@@ -19,10 +19,6 @@
 require 'spec_helper'
 
 describe SubmissionsController do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   it_behaves_like 'a submission update action', :submissions
 
   describe "POST create" do

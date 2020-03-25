@@ -28,7 +28,6 @@ QUnit.module('GradebookMenu', {
         variant="DefaultGradebook"
         learningMasteryEnabled
         courseUrl="http://someUrl/"
-        navigate={() => {}}
       />
     )
   },
@@ -68,13 +67,11 @@ test('#handleGradebookHistorySelect calls setLocation', function() {
 
 QUnit.module('Variant DefaultGradebook with Learning Mastery Enabled', {
   setup() {
-    this.navigateStub = sinon.stub()
     this.wrapper = mount(
       <GradebookMenu
         variant="DefaultGradebook"
         learningMasteryEnabled
         courseUrl="http://someUrl/"
-        navigate={this.navigateStub}
       />
     )
     this.wrapper.find('button').simulate('click')
@@ -85,9 +82,11 @@ QUnit.module('Variant DefaultGradebook with Learning Mastery Enabled', {
   }
 })
 
-test('handleDefaultGradbookLearningMasterySelect calls navigate', function() {
+test('handleDefaultGradbookLearningMasterySelect calls setLocation', function() {
+  const setLocationStub = sandbox.stub(GradebookMenu.prototype, 'setLocation')
   document.querySelector('[data-menu-item-id="learning-mastery"]').click()
-  ok(this.navigateStub.withArgs('tab-outcome', {trigger: true}).calledOnce)
+  const url = `${this.wrapper.props().courseUrl}/gradebook?view=learning_mastery`
+  ok(setLocationStub.withArgs(url).calledOnce)
 })
 
 test('Learning Mastery Menu Item is first in the Menu', function() {
@@ -113,7 +112,6 @@ QUnit.module('Variant DefaultGradebook with Learning Mastery Disabled', {
         variant="DefaultGradebook"
         learningMasteryEnabled={false}
         courseUrl="http://someUrl/"
-        navigate={() => {}}
       />
     )
     this.wrapper.find('button').simulate('click')
@@ -138,13 +136,11 @@ test('Gradebook History Menu Item is second in the Menu', function() {
 
 QUnit.module('Variant DefaultGradebookLearningMastery with Learning Mastery Enabled', {
   setup() {
-    this.navigateStub = sinon.stub()
     this.wrapper = mount(
       <GradebookMenu
         variant="DefaultGradebookLearningMastery"
         learningMasteryEnabled
         courseUrl="http://someUrl/"
-        navigate={this.navigateStub}
       />
     )
     this.wrapper.find('button').simulate('click')
@@ -155,9 +151,11 @@ QUnit.module('Variant DefaultGradebookLearningMastery with Learning Mastery Enab
   }
 })
 
-test('handleDefaultGradbookSelect calls navigate', function() {
+test('handleDefaultGradbookSelect calls setLocation', function() {
+  const setLocationStub = sandbox.stub(GradebookMenu.prototype, 'setLocation')
   document.querySelector('[data-menu-item-id="default-gradebook"]').click()
-  ok(this.navigateStub.withArgs('tab-assignment', {trigger: true}).calledOnce)
+  const url = `${this.wrapper.props().courseUrl}/gradebook?view=gradebook`
+  ok(setLocationStub.withArgs(url).calledOnce)
 })
 
 test('Learning Mastery trigger button is present', function() {

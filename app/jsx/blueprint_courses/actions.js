@@ -60,7 +60,8 @@ const types = [
   'NOTIFY_INFO',
   'NOTIFY_ERROR',
   'CLEAR_NOTIFICATION',
-  'INCLUDE_COURSE_SETTINGS'
+  'INCLUDE_COURSE_SETTINGS',
+  'ENABLE_PUBLISH_COURSES'
 ]
 const actions = createActions(...types)
 

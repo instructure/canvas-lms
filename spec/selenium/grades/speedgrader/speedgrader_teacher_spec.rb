@@ -30,8 +30,6 @@ describe "speed grader" do
   include GroupsCommon
 
   before(:each) do
-    PostPolicy.enable_feature!
-
     stub_kaltura
     course_with_teacher_logged_in
     @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)

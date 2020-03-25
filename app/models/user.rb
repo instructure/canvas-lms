@@ -55,7 +55,7 @@ class User < ActiveRecord::Base
     Enrollment::QueryBuilder.new(state).conditions or raise "invalid enrollment conditions"
   end
 
-  has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy
+  has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy, inverse_of: :user
   has_many :notification_policies, through: :communication_channels
   has_many :notification_policy_overrides, through: :communication_channels
   has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
@@ -1493,6 +1493,18 @@ class User < ActiveRecord::Base
 
   def dashboard_view=(new_dashboard_view)
     preferences[:dashboard_view] = new_dashboard_view
+  end
+
+  def all_course_nicknames(courses=nil)
+    if preferences[:course_nicknames] == UserPreferenceValue::EXTERNAL
+      self.shard.activate do
+        scope = user_preference_values.where(:key => :course_nicknames)
+        scope = scope.where("sub_key IN (?)", courses.map(&:id).map(&:to_json)) if courses
+        Hash[scope.pluck(:sub_key, :value)]
+      end
+    else
+      preferences[:course_nicknames] || {}
+    end
   end
 
   def course_nickname_hash

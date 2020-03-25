@@ -38,7 +38,7 @@ def getImageTagVersion() {
 }
 
 def copyFiles(docker_name, docker_dir, host_dir) {
-  sh "mkdir -p ./$host_dir"
+  sh "mkdir -vp ./$host_dir"
   sh "docker cp \$(docker ps -qa -f name=$docker_name):/usr/src/app/$docker_dir ./$host_dir"
 }
 
@@ -81,10 +81,11 @@ pipeline {
         timeout(time: 2) {
           sh 'build/new-jenkins/docker-cleanup.sh'
           sh 'build/new-jenkins/print-env-excluding-secrets.sh'
-          sh 'rm -rf ./tmp/*'
+          sh 'rm -vrf ./tmp/*'
         }
       }
     }
+
     stage('Tests Setup') {
       steps {
         timeout(time: 60) {
@@ -170,6 +171,7 @@ pipeline {
       }
     }
   }
+
   post {
     always {
       script {

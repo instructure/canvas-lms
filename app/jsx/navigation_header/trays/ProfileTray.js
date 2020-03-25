@@ -24,6 +24,7 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-layout'
 import LogoutButton from '../LogoutButton'
 import {AccessibleContent} from '@instructure/ui-a11y'
+import {showQRLoginModal} from './QRLoginModal'
 
 // Trying to keep this as generalized as possible, but it's still a bit
 // gross matching on the id of the tray tabs given to us by Rails
@@ -62,7 +63,20 @@ ProfileTab.propTypes = {
 }
 
 export default function ProfileTray(props) {
-  const {userDisplayName, userAvatarURL, loaded, userPronouns, tabs, counts} = props
+  const {
+    userDisplayName,
+    userAvatarURL,
+    loaded,
+    userPronouns,
+    tabs,
+    counts,
+    showQRLoginLink
+  } = props
+
+  function onOpenQRLoginModal() {
+    showQRLoginModal()
+  }
+
   return (
     <View as="div" padding="medium">
       <View textAlign="center">
@@ -91,10 +105,20 @@ export default function ProfileTray(props) {
         {loaded ? (
           tabs.map(tab => <ProfileTab key={tab.id} {...tab} counts={counts} />)
         ) : (
-          <List.Item key="loading">
+          <List.Item>
             <div style={{textAlign: 'center'}}>
               <Spinner margin="medium" renderTitle="Loading" />
             </div>
+          </List.Item>
+        )}
+
+        {showQRLoginLink && loaded && (
+          <List.Item>
+            <View as="div" margin="small 0">
+              <Link isWithinText={false} onClick={onOpenQRLoginModal}>
+                {I18n.t('QR for Mobile Login')}
+              </Link>
+            </View>
           </List.Item>
         )}
       </List>
@@ -108,5 +132,6 @@ ProfileTray.propTypes = {
   loaded: bool.isRequired,
   userPronouns: string,
   tabs: arrayOf(shape(ProfileTab.propTypes)).isRequired,
-  counts: object.isRequired
+  counts: object.isRequired,
+  showQRLoginLink: bool.isRequired
 }

@@ -24,9 +24,14 @@ assignments_2_teacher:
       state: disabled
 assignment_attempts:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: Course
   display_name: Assignment Allowed Attempts
   description: Allow a teacher to set the number of allowed attempts on an assignment via the UI
+assignment_bulk_edit:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Assignment Bulk Editing
+  description: Allow teachers to change the dates on a set of assignments in one step
 bookmarking_for_enrollments_index:
   state: allowed
   applies_to: RootAccount
@@ -45,3 +50,16 @@ la_620_old_rce_init_fix:
     editor instance to its internal list when the RCE requires it.
   applies_to: SiteAdmin
   root_opt_in: true
+uxs_4_omg_a_scary_blueprint_checkbox:
+  state: hidden
+  display_name: Allow Blueprint Publishing After Association
+  description: |-
+    Show a checkbox that optionally lets an account admin publish courses
+    automatically after associating and syncing with a blueprint course
+  applies_to: RootAccount
+enable_fullstory:
+  state: hidden
+  display_name: Enable fullstory
+  description: |-
+    Include FullStory recording of the user's session
+  applies_to: RootAccount

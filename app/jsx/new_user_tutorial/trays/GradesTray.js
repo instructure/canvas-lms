@@ -18,20 +18,52 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const GradesTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Grades')}
-    subheading={I18n.t('Track individual student and class progress')}
-    image="/images/tutorial-tray-images/grades.svg"
+    subheading={I18n.t('Enter and distribute grades')}
+    image="/images/tutorial-tray-images/Panda_Grades.svg"
+    imageWidth="8.5rem"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-
+      guide-table-of-contents#jive_content_id_Grades`
+    }}
+    links={[
+      {
+        label: I18n.t('How do I use the Gradebook?'),
+        href: 'https://community.canvaslms.com/docs/DOC-16554-4152813659'
+      },
+      {
+        label: I18n.t('How do I enter and edit grades in the Gradebook?'),
+        href: 'https://community.canvaslms.com/docs/DOC-16572-4152813671'
+      },
+      {
+        label: I18n.t('How do I post grades for an assignment in the Gradebook?'),
+        href: 'https://community.canvaslms.com/docs/DOC-17330-41521116619'
+      },
+      {
+        label: I18n.t('How do I view assignments or students individually in the Gradebook?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12875-4152212381'
+      },
+      {
+        label: I18n.t('How do I use SpeedGrader?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12774-415255021'
+      },
+      {
+        label: I18n.t('How do I view the details of a submission for a student in SpeedGrader?'),
+        href: 'https://community.canvaslms.com/docs/DOC-13088-415255024'
+      }
+    ]}
   >
-    <Text as="p">
-      {I18n.t(`Input and distribute grades for students. Display grades as
-          points, percentages, complete or incomplete, pass or fail, GPA scale,
-          and letter grades. Group assignments for grade weighting.`)}
-    </Text>
+    {I18n.t(`Display grades as
+      points, percentages, complete/incomplete, or any other method that matches
+      your course grading scheme, and filter and arrange Gradebook entries
+      according to your preferences. Automatically apply a grade for missing or
+      late submissions, and easily hide grades until you're ready for students
+      to view them. For simplified grading, use SpeedGrader to view and grade submissions.`)}
   </TutorialTrayContent>
 )
 

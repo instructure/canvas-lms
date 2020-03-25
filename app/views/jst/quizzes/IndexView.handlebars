@@ -46,6 +46,13 @@
             </a>
           </li>
           {{/ifAll}}
+          {{#ifAll flags.quiz_lti_enabled}}
+          <li role="presentation">
+            <a href="#" tabindex="-1" role="menuitem" class="reset-quiz-engine">
+              {{#t }}Reset quiz engine choice{{/t}}
+            </a>
+          </li>
+          {{/ifAll}}
 
           {{>ExternalTools/external_tools_menu quizIndexPlacements}}
         </ul>

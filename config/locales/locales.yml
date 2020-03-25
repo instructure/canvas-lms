@@ -121,6 +121,14 @@ da:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
 da-x-k12:
   bigeasy_locale: da_DK
   date:
@@ -163,6 +171,14 @@ da-x-k12:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
 de:
   bigeasy_locale: de_DE
   date:
@@ -203,6 +219,14 @@ de:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
 el:
   bigeasy_locale: el_GR
   crowdsourced: true
@@ -244,6 +268,14 @@ el:
     formats:
       tiny: "%l:%M%P"
       tiny_on_the_hour: "%l%P"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
 en:
   bigeasy_locale: en_US
   locales:
@@ -526,6 +558,14 @@ fr:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 fr-CA:
   bigeasy_locale: fr_CA
   date:
@@ -566,6 +606,14 @@ fr-CA:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 he:
   bigeasy_locale: he_IL
   crowdsourced: true
@@ -648,6 +696,14 @@ ht:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 hu:
   bigeasy_locale: hu_HU
   crowdsourced: true
@@ -689,6 +745,14 @@ hu:
     formats:
       tiny: "%H:%M "
       tiny_on_the_hour: "%H:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 hy:
   bigeasy_locale: hy_AM
   crowdsourced: true
@@ -772,6 +836,14 @@ is:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
 it:
   bigeasy_locale: it_IT
   date:
@@ -812,6 +884,14 @@ it:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
 ja:
   bigeasy_locale: ja_JP
   date:
@@ -978,6 +1058,14 @@ nb:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 nb-x-k12:
   bigeasy_locale: nb_NO
   date:
@@ -1020,6 +1108,14 @@ nb-x-k12:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 nl:
   bigeasy_locale: nl_NL
   crowdsourced: false
@@ -1061,6 +1157,14 @@ nl:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
 nn:
   bigeasy_locale: nn_NO
   crowdsourced: true
@@ -1103,6 +1207,14 @@ nn:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 pl:
   bigeasy_locale: pl_PL
   date:
@@ -1143,6 +1255,14 @@ pl:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 pt:
   bigeasy_locale: pt_PT
   date:
@@ -1183,6 +1303,14 @@ pt:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 pt-BR:
   date:
     abbr_month_names:
@@ -1269,6 +1397,14 @@ ru:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 sl:
   bigeasy_locale: sl_SI
   date:
@@ -1348,6 +1484,14 @@ sv:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 sv-x-k12:
   bigeasy_locale: sv_SE
   date:
@@ -1431,6 +1575,14 @@ tr:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%l%P"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
 uk:
   bigeasy_locale: uk_UA
   crowdsourced: true
@@ -1472,6 +1624,14 @@ uk:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
 zh-Hans:
   aliases: zh-CN
   bigeasy_locale: zh_CN

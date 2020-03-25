@@ -23,8 +23,6 @@ describe Submission do
   subject(:submission) { Submission.new }
 
   before(:once) do
-    PostPolicy.enable_feature!
-
     course_with_teacher(active_all: true)
     course_with_student(active_all: true, course: @course)
     @context = @course

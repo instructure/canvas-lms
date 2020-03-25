@@ -29,10 +29,6 @@ describe DataFixup::AddPostPoliciesToAssignments do
   let_once(:student1) { course.enroll_student(User.create!, enrollment_state: "active").user }
   let_once(:student2) { course.enroll_student(User.create!, enrollment_state: "active").user }
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   def run_for_submissions
     submission_ids = Submission.all.order(:id).pluck(:id)
     DataFixup::AddPostPoliciesToAssignments.set_submission_posted_at_dates(submission_ids.first, submission_ids.last)

@@ -30,6 +30,7 @@ import userSettings from '../../userSettings'
 import GradingPeriodsAPI from '../../api/gradingPeriodsApi'
 import IndexMenu from 'jsx/assignments/IndexMenu'
 import configureIndexMenuStore from 'jsx/assignments/store/indexMenuStore'
+import BulkEditIndex from 'jsx/assignments/bulk_edit/BulkEditIndex'
 import '../../jquery.rails_flash_notifications'
 
 export default class IndexView extends Backbone.View
@@ -53,16 +54,20 @@ export default class IndexView extends Backbone.View
   els:
     '#addGroup': '$addGroupButton'
     '#assignmentSettingsCog': '$assignmentSettingsButton'
+    '#settingsMountPoint': '$settingsMountPoint'
+    '#bulkEditRoot': '$bulkEditRoot'
 
   initialize: ->
     super
     @collection.once 'reset', @enableSearch, @
     @collection.on 'cancelSearch', @clearSearch, @
+    @bulkEditMode = false
 
   toJSON: ->
     json = super
     json.course_home = ENV.COURSE_HOME
     json.weight_final_grades = ENV.WEIGHT_FINAL_GRADES
+    json.bulkEditMode = @bulkEditMode
     json
 
   afterRender: ->
@@ -87,21 +92,33 @@ export default class IndexView extends Backbone.View
       contextType = contextInfo[0]
       contextId = parseInt(contextInfo[1], 10)
 
+      requestBulkEditFn =
+        (!ENV.COURSE_HOME && ENV.FEATURES.assignment_bulk_edit && @requestBulkEdit) ||
+        undefined
+
+      if @$settingsMountPoint.length
+        ReactDOM.render(
+          React.createElement(IndexMenu, {
+            store: @indexMenuStore,
+            contextType: contextType,
+            contextId: contextId,
+            requestBulkEdit: requestBulkEditFn,
+            setTrigger: @assignmentSettingsView.setTrigger.bind(@assignmentSettingsView)
+            setDisableTrigger: @assignmentSyncSettingsView.setTrigger.bind(@assignmentSyncSettingsView)
+            registerWeightToggle: @assignmentSettingsView.on.bind(@assignmentSettingsView)
+            disableSyncToSis: @assignmentSyncSettingsView.openDisableSync.bind(@assignmentSyncSettingsView)
+            sisName: ENV.SIS_NAME
+            postToSisDefault: ENV.POST_TO_SIS_DEFAULT
+            hasAssignments: ENV.HAS_ASSIGNMENTS,
+            assignmentGroupsCollection: @collection
+          }),
+          @$settingsMountPoint[0]
+        )
+
+    if @bulkEditMode && @$bulkEditRoot.length
       ReactDOM.render(
-        React.createElement(IndexMenu, {
-          store: @indexMenuStore,
-          contextType: contextType,
-          contextId: contextId,
-          setTrigger: @assignmentSettingsView.setTrigger.bind(@assignmentSettingsView)
-          setDisableTrigger: @assignmentSyncSettingsView.setTrigger.bind(@assignmentSyncSettingsView)
-          registerWeightToggle: @assignmentSettingsView.on.bind(@assignmentSettingsView)
-          disableSyncToSis: @assignmentSyncSettingsView.openDisableSync.bind(@assignmentSyncSettingsView)
-          sisName: ENV.SIS_NAME
-          postToSisDefault: ENV.POST_TO_SIS_DEFAULT
-          hasAssignments: ENV.HAS_ASSIGNMENTS,
-          assignmentGroupsCollection: @collection
-        }),
-        $('#settingsMountPoint')[0]
+        React.createElement(BulkEditIndex, {}),
+        @$bulkEditRoot[0]
       )
 
     @filterKeyBindings() if !@canManage()
@@ -112,6 +129,10 @@ export default class IndexView extends Backbone.View
     window.onkeydown = @focusOnAssignments
 
     @selectGradingPeriod()
+
+  requestBulkEdit: =>
+    @bulkEditMode = true
+    @render()
 
   enableSearch: ->
     @$('#search_term').prop 'disabled', false

@@ -1,0 +1,15 @@
+mobile_qr_login:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "QR for Mobile Login"
+  description: "Include a link to show a QR code to easy mobile login on the profile page."
+product_tours:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Product Tours"
+  description: "In-product training walkthrough and tourpoints for teachers"
+responsive_2020_03:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "March 2020 Responsiveness"
+  description: "Collection of responsive improvements throughout Canvas"

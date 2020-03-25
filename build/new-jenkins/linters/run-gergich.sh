@@ -10,6 +10,10 @@ inputs+=("--env GERRIT_HOST=$GERRIT_HOST")
 inputs+=("--env GERRIT_PROJECT=$GERRIT_PROJECT")
 inputs+=("--env GERRIT_BRANCH=$GERRIT_BRANCH")
 inputs+=("--env GERRIT_EVENT_ACCOUNT_EMAIL=$GERRIT_EVENT_ACCOUNT_EMAIL")
+inputs+=("--env GERRIT_PATCHSET_NUMBER=$GERRIT_PATCHSET_NUMBER")
+inputs+=("--env GERRIT_PATCHSET_REVISION=$GERRIT_PATCHSET_REVISION")
+inputs+=("--env GERRIT_CHANGE_ID=$GERRIT_CHANGE_ID")
+inputs+=("--env GERRIT_CHANGE_NUMBER=$GERRIT_CHANGE_NUMBER")
 
 # the GERRIT_REFSPEC is required for the commit message to actually
 # send things to gergich
@@ -17,9 +21,6 @@ inputs+=("--env GERRIT_REFSPEC=$GERRIT_REFSPEC")
 
 cat <<EOF | docker run --interactive ${inputs[@]} $PATCHSET_TAG /bin/bash -
 set -ex
-
-# the linters expect this to be here else it will just look at master
-export GERRIT_PATCHSET_REVISION=`git rev-parse HEAD`
 
 # ensure we run the gergich comments with the Lint-Review label
 export GERGICH_REVIEW_LABEL="Lint-Review"
@@ -38,8 +39,12 @@ bundle exec ruby script/rlint
 bundle exec ruby script/eslint
 bundle exec ruby script/lint_commit_message
 
+git status
 gergich status
 if [[ "$GERGICH_PUBLISH" == "1" ]]; then
+  # we need to do this because it forces gergich to not use git (because no git repo is there).
+  # and being that we rebased, the commit hash changes, so this will make it use the variables passed in
+  export GERGICH_GIT_PATH=".."
   gergich publish
 fi
 EOF

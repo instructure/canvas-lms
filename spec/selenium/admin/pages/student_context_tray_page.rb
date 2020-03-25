@@ -52,6 +52,7 @@ module StudentContextTray
     #------------------------ Actions & Methods ---------------------------
     def wait_for_student_tray
       wait_for(method: nil, timeout: 1) { student_name_link.displayed? }
+      wait_for_ajaximations
     end
 
     def todo_tray_select_course_from_dropdown(course_name='Optional: Add Course')

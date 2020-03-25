@@ -278,6 +278,30 @@ module PostgreSQLAdapterExtensions
       @nested_column_definitions = false
     end
   end
+
+  def primary_keys(table_name)
+    # shamelessly copied from column_definitions
+    return super if ActiveRecord::Base.in_migration
+
+    # be wary of error reporting inside of MultiCache triggering a
+    # separate model access
+    return super if @nested_primary_keys
+    @nested_primary_keys = true
+    begin
+      got_inside = false
+      MultiCache.fetch(["primary_keys", table_name]) do
+        got_inside = true
+        super
+      end
+    rescue
+      raise if got_inside
+      # we never got inside, so something is wrong with the cache,
+      # just ignore it
+      super
+    ensure
+      @nested_primary_keys = false
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)

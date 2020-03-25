@@ -20,8 +20,6 @@ require_relative '../sharding_spec_helper'
 
 describe GradebooksController do
   before :once do
-    PostPolicy.enable_feature!
-
     course_with_teacher active_all: true
     @teacher_enrollment = @enrollment
     student_in_course active_all: true
@@ -976,6 +974,19 @@ describe GradebooksController do
           expect(returned_section_ids).to contain_exactly(@course.default_section.id)
         end
       end
+
+      describe "include_speed_grader_in_assignment_header_menu" do
+        it "is set to true when the feature flag of the same name is true" do
+          Account.site_admin.enable_feature!(:include_speed_grader_in_assignment_header_menu)
+          get :show, params: {course_id: @course.id}
+          expect(gradebook_options.fetch(:include_speed_grader_in_assignment_header_menu)).to be true
+        end
+
+        it "is set to false when the feature flag of the same name is false" do
+          get :show, params: {course_id: @course.id}
+          expect(gradebook_options.fetch(:include_speed_grader_in_assignment_header_menu)).to be false
+        end
+      end
     end
 
     describe "csv" do
@@ -1185,6 +1196,129 @@ describe GradebooksController do
         get :show, params: { course_id: @course.id }
         periods = assigns[:js_env][:GRADEBOOK_OPTIONS][:grading_period_set][:grading_periods]
         expect(periods).to all include(:id, :start_date, :end_date, :close_date, :is_closed, :is_last)
+      end
+    end
+
+    context "when outcome gradebook is enabled" do
+      before :once do
+        @course.enable_feature!(:outcome_gradebook)
+      end
+
+      before :each do
+        user_session(@teacher)
+      end
+
+      def preferred_gradebook_view
+        gradebook_preferences = @teacher.get_preference(:gradebook_settings, @course.global_id) || {}
+        gradebook_preferences["gradebook_view"]
+      end
+
+      def update_preferred_gradebook_view!(gradebook_view)
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+          "gradebook_view" => gradebook_view,
+        })
+      end
+
+      context "when the user has no preferred view" do
+        it "renders 'gradebook' when no view is requested" do
+          get "show", params: {course_id: @course.id}
+          expect(response).to render_template("gradebooks/gradebook")
+        end
+
+        it "updates the user's preference when the requested view is 'gradebook'" do
+          get "show", params: {course_id: @course.id, view: "gradebook"}
+          @teacher.reload
+          expect(preferred_gradebook_view).to eql("gradebook")
+        end
+
+        it "redirects to the gradebook when the requested view is 'gradebook'" do
+          get "show", params: {course_id: @course.id, view: "gradebook"}
+          expect(response).to redirect_to(action: "show")
+        end
+
+        it "updates the user's preference when the requested view is 'learning_mastery'" do
+          get "show", params: {course_id: @course.id, view: "learning_mastery"}
+          @teacher.reload
+          expect(preferred_gradebook_view).to eql("learning_mastery")
+        end
+
+        it "redirects to the gradebook when the requested view is 'learning_mastery'" do
+          get "show", params: {course_id: @course.id, view: "learning_mastery"}
+          expect(response).to redirect_to(action: "show")
+        end
+      end
+
+      context "when the user prefers gradebook" do
+        before :once do
+          update_preferred_gradebook_view!("gradebook")
+        end
+
+        it "renders 'gradebook' when no view is requested" do
+          get "show", params: {course_id: @course.id}
+          expect(response).to render_template("gradebooks/gradebook")
+        end
+
+        it "redirects to the gradebook when requesting the preferred view" do
+          get "show", params: {course_id: @course.id, view: "gradebook"}
+          expect(response).to redirect_to(action: "show")
+        end
+
+        it "updates the user's preference when the requested view is 'learning_mastery'" do
+          get "show", params: {course_id: @course.id, view: "learning_mastery"}
+          @teacher.reload
+          expect(preferred_gradebook_view).to eql("learning_mastery")
+        end
+
+        it "redirects to the gradebook when changing the requested view" do
+          get "show", params: {course_id: @course.id, view: "learning_mastery"}
+          expect(response).to redirect_to(action: "show")
+        end
+      end
+
+      context "when the user prefers learning mastery" do
+        before :each do
+          update_preferred_gradebook_view!("learning_mastery")
+        end
+
+        it "renders 'learning_mastery' when no view is requested" do
+          get "show", params: {course_id: @course.id}
+          expect(response).to render_template("gradebooks/learning_mastery")
+        end
+
+        it "redirects to the gradebook when requesting the preferred view" do
+          get "show", params: {course_id: @course.id, view: "learning_mastery"}
+          expect(response).to redirect_to(action: "show")
+        end
+
+        it "updates the user's preference when the requested view is 'gradebook'" do
+          get "show", params: {course_id: @course.id, view: "gradebook"}
+          @teacher.reload
+          expect(preferred_gradebook_view).to eql("gradebook")
+        end
+
+        it "redirects to the gradebook when changing the requested view" do
+          get "show", params: {course_id: @course.id, view: "gradebook"}
+          expect(response).to redirect_to(action: "show")
+        end
+      end
+
+      describe "ENV" do
+        before do
+          user_session(@teacher)
+          @proficiency = outcome_proficiency_model(@course.account)
+          @course.root_account.enable_feature! :non_scoring_rubrics
+
+          update_preferred_gradebook_view!("learning_mastery")
+          get 'show', params: {course_id: @course.id}
+
+          @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+        end
+
+        describe ".outcome_proficiency" do
+          it "is set to the outcome proficiency on the course" do
+            expect(@gradebook_env[:outcome_proficiency]).to eq(@proficiency.as_json)
+          end
+        end
       end
     end
   end

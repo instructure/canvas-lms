@@ -19,10 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GradeSummaryAssignmentPresenter do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   before :each do
     attachment_model
     course_factory(active_all: true)

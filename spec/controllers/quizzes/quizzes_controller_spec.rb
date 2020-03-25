@@ -19,7 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Quizzes::QuizzesController do
-
   def course_quiz(active=false, title=nil)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active
@@ -554,8 +553,6 @@ describe Quizzes::QuizzesController do
       before(:each) do
         user_session(@student)
         course_quiz(true)
-
-        PostPolicy.enable_feature!
       end
 
       let(:submission) { @quiz.generate_submission(@student) }
@@ -1158,6 +1155,7 @@ describe Quizzes::QuizzesController do
   describe "GET 'history'" do
     before :once do
       course_quiz
+      @quiz.assignment.unmute!
     end
 
     it "should require authorization" do
@@ -1314,30 +1312,24 @@ describe Quizzes::QuizzesController do
       end
     end
 
-    context "when post policies is enabled" do
-      before(:each) do
-        PostPolicy.enable_feature!
+    it "allows a student to view their own history if the submission is posted" do
+      user_session(@student)
+      quiz_submission = @quiz.generate_submission(@student)
+      Quizzes::SubmissionGrader.new(quiz_submission).grade_submission
+      get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id}
+      expect(response).to be_successful
+    end
 
-        user_session(@student)
-      end
+    it "does not allow a student to view their own history if the submission is not posted" do
+      user_session(@student)
+      quiz_submission = @quiz.generate_submission(@student)
+      Quizzes::SubmissionGrader.new(quiz_submission).grade_submission
+      quiz_submission.submission.update!(posted_at: nil)
+      get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id}
 
-      let(:quiz_submission) { @quiz.generate_submission(@student) }
-
-      it "allows a student to view their own history if the submission is posted" do
-        Quizzes::SubmissionGrader.new(quiz_submission).grade_submission
-        get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id}
-        expect(response).to be_successful
-      end
-
-      it "does not allow a student to view their own history if the submission is not posted" do
-        Quizzes::SubmissionGrader.new(quiz_submission).grade_submission
-        quiz_submission.submission.update!(posted_at: nil)
-        get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id}
-
-        aggregate_failures do
-          expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
-          expect(flash[:notice]).to match(/You cannot view the quiz history while the quiz is muted/)
-        end
+      aggregate_failures do
+        expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
+        expect(flash[:notice]).to match(/You cannot view the quiz history while the quiz is muted/)
       end
     end
 
@@ -2575,29 +2567,21 @@ describe Quizzes::QuizzesController do
       expect(response.body).to match(/^\s?$/)
     end
 
-    context "when post policies are enabled" do
-      let(:assignment) do
-        @course.assignments.create!(
-          title: "my humdrum quiz",
-          workflow_state: "available",
-          submission_types: "online_quiz"
-        )
-      end
+    it "renders nothing when the submission is not posted" do
+      assignment = @course.assignments.create!(
+        title: "my humdrum quiz",
+        workflow_state: "available",
+        submission_types: "online_quiz"
+      )
 
-      before(:each) do
-        PostPolicy.enable_feature!
+      @quiz.assignment = assignment
+      user_session(@teacher)
 
-        @quiz.assignment = assignment
-        user_session(@teacher)
-      end
+      assignment.post_policy.update!(post_manually: true)
+      @quiz.generate_submission(@teacher)
 
-      it "renders nothing when the submission is not posted" do
-        assignment.post_policy.update!(post_manually: true)
-        @quiz.generate_submission(@teacher)
-
-        get 'submission_versions', params: {:course_id => @course.id, :quiz_id => @quiz.id}
-        expect(response.body).to match(/^\s?$/)
-      end
+      get 'submission_versions', params: {:course_id => @course.id, :quiz_id => @quiz.id}
+      expect(response.body).to match(/^\s?$/)
     end
   end
 

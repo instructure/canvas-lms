@@ -1412,6 +1412,43 @@ class CoursesController < ApplicationController
     end
   end
 
+  def update_user_engine_choice (course, selection_obj, user_id)
+    old_selection = course.settings[:engine_selected][:user_id]
+    new_settings = {}
+    new_selections = {}
+    new_selections[:user_id] = {
+      newquizzes_engine_selected: selection_obj[:newquizzes_engine_selected],
+      expiration: selection_obj[:expiration]
+    }
+    new_selections.reverse_merge!(course.settings[:engine_selected])
+    new_selections
+  end
+
+  def new_quizzes_selection_update
+    @course = api_find(Course, params[:id])
+    if @course.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+      old_settings = @course.settings
+      key_exists = old_settings.key?(:engine_selected)
+      user_id = @current_user.id
+      selection_obj = {
+        newquizzes_engine_selected: params[:newquizzes_engine_selected],
+        expiration: Time.zone.today + 30.days
+      }
+
+      new_settings = {}
+
+      if key_exists
+        new_settings[:engine_selected] = update_user_engine_choice(@course, selection_obj, user_id)
+      else
+        new_settings[:engine_selected] = {user_id: selection_obj}
+      end
+      new_settings.reverse_merge!(old_settings)
+      @course.settings = new_settings
+      @course.save
+      render :json => new_settings
+    end
+  end
+
   # @API Update course settings
   # Can update the following course settings:
   #
@@ -3318,7 +3355,7 @@ class CoursesController < ApplicationController
       :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed,
       :abstract_course, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates, :use_rights_required,
       :restrict_student_past_view, :restrict_student_future_view, :grading_standard, :grading_standard_enabled,
-      :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :lock_all_announcements, :public_syllabus,
+      :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :lock_all_announcements, :public_syllabus, :quiz_engine_selected,
       :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group
     )

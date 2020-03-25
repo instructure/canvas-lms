@@ -299,7 +299,10 @@ class RceApiSource {
         throw error
       }
       const fileId = matchData[1]
-      return this.getFile(fileId)
+      return this.getFile(fileId).then(fileResults => {
+        fileResults.uuid = uploadResults.uuid // if present, we'll need the uuid for the file verifier downstream
+        return fileResults
+      })
     } else {
       // local-storage upload, this _is_ the attachment information
       return Promise.resolve(uploadResults)

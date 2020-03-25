@@ -17,7 +17,7 @@
  */
 
 import {COURSE_NOTIFICATIONS_ENABLED_QUERY} from './graphqlData/Queries'
-import CourseNotificationSettings from './CourseNotificationSettings'
+import CourseNotificationSettingsManager from './CourseNotificationSettingsManager'
 import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import GenericErrorPage from '../../shared/components/GenericErrorPage'
 import I18n from 'i18n!courses'
@@ -42,7 +42,7 @@ export default function CourseNotificationSettingsQuery(props) {
     )
 
   return (
-    <CourseNotificationSettings
+    <CourseNotificationSettingsManager
       courseId={props.courseId}
       enabled={data?.course?.notificationPreferencesEnabled}
     />

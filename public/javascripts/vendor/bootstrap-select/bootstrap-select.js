@@ -198,7 +198,7 @@
               if (_subLiA.length && !$this.next().length) {
                 var group = _liA.pop();
                 $.each(_subLiA, function(i, item) {
-                    group += "<li rel='" + i + "' tabindex='0'>" + item + "</li>";
+                  group += "<li rel='" + i + "' tabindex='0'>" + item + "</li>";
                 });
                 group += '</ul></div>';
                 _liA.push(group);

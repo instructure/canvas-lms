@@ -754,8 +754,6 @@ describe Quizzes::QuizSubmission do
       end
 
       before(:each) do
-        PostPolicy.enable_feature!
-
         student_in_course
       end
 

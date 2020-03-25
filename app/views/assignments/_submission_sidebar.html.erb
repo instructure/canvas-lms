@@ -22,7 +22,8 @@
   @current_user_submission,
   Time.zone.utc_offset,
   @assigned_assessments.count,
-  @assigned_assessments.count(&:incomplete?)
+  @assigned_assessments.count(&:incomplete?),
+  @assignment.anonymous_peer_reviews ? 1 : 0
 ].cache_key) do %>
 <div class="details">
   <h2><%= t 'titles.submission', "Submission" %></h2>

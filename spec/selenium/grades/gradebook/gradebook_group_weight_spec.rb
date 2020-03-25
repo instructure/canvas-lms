@@ -39,10 +39,6 @@ describe "Gradebook - group weights" do
     wait_for_ajax_requests
   end
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   before(:each) do
     course_with_teacher_logged_in
     student_in_course

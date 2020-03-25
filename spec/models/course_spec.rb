@@ -1304,21 +1304,13 @@ describe Course do
   describe "#post_manually?" do
     let_once(:course) { Course.create! }
 
-    context "when post policies are enabled" do
-      before(:once) { PostPolicy.enable_feature! }
-
-      it "returns true if a policy with manual posting is attached to the course" do
-        course.default_post_policy.update!(post_manually: true)
-        expect(course).to be_post_manually
-      end
-
-      it "returns false if a policy without manual posting is attached to the course" do
-        course.default_post_policy.update!(post_manually: false)
-        expect(course).not_to be_post_manually
-      end
+    it "returns true if a policy with manual posting is attached to the course" do
+      course.default_post_policy.update!(post_manually: true)
+      expect(course).to be_post_manually
     end
 
-    it "returns false when post policies are not enabled" do
+    it "returns false if a policy without manual posting is attached to the course" do
+      course.default_post_policy.update!(post_manually: false)
       expect(course).not_to be_post_manually
     end
   end
@@ -1326,65 +1318,61 @@ describe Course do
   describe "#apply_post_policy!" do
     let_once(:course) { Course.create! }
 
-    context "when post policies are enabled" do
-      before(:once) { PostPolicy.enable_feature! }
+    it "sets the post policy for the course" do
+      course.apply_post_policy!(post_manually: true)
+      expect(course.reload).to be_post_manually
+    end
 
-      it "sets the post policy for the course" do
+    it "explicitly sets a post policy for assignments without one" do
+      assignment = course.assignments.create!
+
+      course.apply_post_policy!(post_manually: true)
+      expect(assignment.reload.post_policy).to be_post_manually
+    end
+
+    it "updates the post policy for assignments with an existing-but-different policy" do
+      assignment = course.assignments.create!
+      assignment.ensure_post_policy(post_manually: false)
+
+      course.apply_post_policy!(post_manually: true)
+      expect(assignment.reload.post_policy).to be_post_manually
+    end
+
+    it "does not update assignments that have an equivalent post policy" do
+      assignment = course.assignments.create!
+      assignment.ensure_post_policy(post_manually: true)
+
+      expect {
         course.apply_post_policy!(post_manually: true)
-        expect(course.reload).to be_post_manually
-      end
+      }.not_to change {
+        PostPolicy.find_by!(assignment: assignment).updated_at
+      }
+    end
 
-      it "explicitly sets a post policy for assignments without one" do
-        assignment = course.assignments.create!
+    it "does not change the post policy for anonymous assignments" do
+      course.apply_post_policy!(post_manually: true)
+      anonymous_assignment = course.assignments.create!(anonymous_grading: true)
 
-        course.apply_post_policy!(post_manually: true)
-        expect(assignment.reload.post_policy).to be_post_manually
-      end
+      expect {
+        course.apply_post_policy!(post_manually: false)
+      }.not_to change {
+        PostPolicy.find_by!(assignment: anonymous_assignment).post_manually
+      }
+    end
 
-      it "updates the post policy for assignments with an existing-but-different policy" do
-        assignment = course.assignments.create!
-        assignment.ensure_post_policy(post_manually: false)
+    it "does not change the post policy for moderated assignments" do
+      course.apply_post_policy!(post_manually: true)
+      moderated_assignment = course.assignments.create!(
+        final_grader: course.enroll_teacher(User.create!, enrollment_state: :active).user,
+        grader_count: 2,
+        moderated_grading: true
+      )
 
-        course.apply_post_policy!(post_manually: true)
-        expect(assignment.reload.post_policy).to be_post_manually
-      end
-
-      it "does not update assignments that have an equivalent post policy" do
-        assignment = course.assignments.create!
-        assignment.ensure_post_policy(post_manually: true)
-
-        expect {
-          course.apply_post_policy!(post_manually: true)
-        }.not_to change {
-          PostPolicy.find_by!(assignment: assignment).updated_at
-        }
-      end
-
-      it "does not change the post policy for anonymous assignments" do
-        course.apply_post_policy!(post_manually: true)
-        anonymous_assignment = course.assignments.create!(anonymous_grading: true)
-
-        expect {
-          course.apply_post_policy!(post_manually: false)
-        }.not_to change {
-          PostPolicy.find_by!(assignment: anonymous_assignment).post_manually
-        }
-      end
-
-      it "does not change the post policy for moderated assignments" do
-        course.apply_post_policy!(post_manually: true)
-        moderated_assignment = course.assignments.create!(
-          final_grader: course.enroll_teacher(User.create!, enrollment_state: :active).user,
-          grader_count: 2,
-          moderated_grading: true
-        )
-
-        expect {
-          course.apply_post_policy!(post_manually: false)
-        }.not_to change {
-          PostPolicy.find_by(assignment: moderated_assignment).post_manually
-        }
-      end
+      expect {
+        course.apply_post_policy!(post_manually: false)
+      }.not_to change {
+        PostPolicy.find_by(assignment: moderated_assignment).post_manually
+      }
     end
   end
 
@@ -1410,13 +1398,8 @@ describe Course do
   describe "#post_policies_enabled?" do
     let_once(:course) { Course.create! }
 
-    it "returns true when post policies is enabled" do
-      PostPolicy.enable_feature!
+    it "returns true" do
       expect(course).to be_post_policies_enabled
-    end
-
-    it "returns false when post policies is not enabled" do
-      expect(course).not_to be_post_policies_enabled
     end
   end
 end
@@ -2145,7 +2128,7 @@ describe Course, "gradebook_to_csv" do
     expect(rows.length).to eq 4
   end
 
-  it "should include muted if any assignments are muted" do
+  it "should include manual posting if any assignments are manually-posted" do
       course_factory(active_all: true)
       @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
       student_in_course(:user => @user1)
@@ -2157,12 +2140,12 @@ describe Course, "gradebook_to_csv" do
       @user1.pseudonym.save!
       @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-      @assignment.muted = true
-      @assignment.save!
+      @assignment.ensure_post_policy(post_manually: true)
       @assignment.grade_student(@user1, grade: "10", grader: @teacher)
       @assignment.grade_student(@user2, grade: "9", grader: @teacher)
       @assignment.grade_student(@user3, grade: "9", grader: @teacher)
       @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+      @assignment2.ensure_post_policy(post_manually: false)
       @course.recompute_student_scores
       @course.reload
 
@@ -2175,7 +2158,7 @@ describe Course, "gradebook_to_csv" do
       expect(rows[0][3]).to eq 'SIS Login ID'
       expect(rows[0][4]).to eq 'Section'
       expect(rows[1][0]).to eq nil
-      expect(rows[1][5]).to eq 'Muted'
+      expect(rows[1][5]).to eq 'Manual Posting'
       expect(rows[1][6]).to eq nil
       expect(rows[2][2]).to eq nil
       expect(rows[2][3]).to eq nil

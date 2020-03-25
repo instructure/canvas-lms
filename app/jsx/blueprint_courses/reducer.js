@@ -65,6 +65,7 @@ export default combineReducers({
   isMasterCourse: identity(),
   isChildCourse: identity(),
   canManageCourse: identity(),
+  canAutoPublishCourses: identity(),
   accountId: identity(),
   terms: identity([]),
   subAccounts: identity([]),
@@ -262,6 +263,12 @@ export default combineReducers({
   willIncludeCourseSettings: handleActions(
     {
       [actionTypes.INCLUDE_COURSE_SETTINGS]: (state, action) => action.payload
+    },
+    false
+  ),
+  willPublishCourses: handleActions(
+    {
+      [actionTypes.ENABLE_PUBLISH_COURSES]: (state, action) => action.payload
     },
     false
   )

@@ -20,7 +20,6 @@ require 'lti2_spec_helper'
 
 describe SpeedGrader::Assignment do
   before :once do
-    PostPolicy.enable_feature!
     course_with_teacher(active_all: true)
     student_in_course(active_all: true, user_name: "some user")
   end
@@ -786,7 +785,7 @@ describe SpeedGrader::Assignment do
 
         reps = @assignment.representatives(user: @teacher, includes: [:completed])
         user = reps.find { |u| u.name == @first_group.name }
-        expect(user).to eql(enrollments.first.user)
+        expect(enrollments.find_by(user: user)).to be_present
       end
 
       it 'does not include concluded students when included' do
@@ -804,7 +803,7 @@ describe SpeedGrader::Assignment do
 
         reps = @assignment.representatives(user: @teacher, includes: [:inactive])
         user = reps.find { |u| u.name == @first_group.name }
-        expect(user).to eql(enrollments.first.user)
+        expect(enrollments.find_by(user: user)).to be_present
       end
 
       it 'does not include inactive students when included' do

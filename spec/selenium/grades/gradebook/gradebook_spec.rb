@@ -27,7 +27,6 @@ describe "Gradebook" do
   include GroupsCommon
 
   before(:once) do
-    PostPolicy.enable_feature!
     gradebook_data_setup
   end
 

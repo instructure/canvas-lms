@@ -997,8 +997,6 @@ describe CoursesController do
 
     context "show feedback for the current course only on course front page" do
       before(:once) do
-        PostPolicy.enable_feature!
-
         course_with_teacher(active_all: true)
         @course1 = @course
         student_in_course(active_all: true, course: @course1)

@@ -32,7 +32,6 @@ describe "/quizzes/quizzes/_quiz_right_side" do
     before(:each) do
       course_with_student
       view_context
-      PostPolicy.enable_feature!
 
       quiz_with_graded_submission([], user: @student, course: @course)
     end

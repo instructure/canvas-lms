@@ -91,38 +91,38 @@
     <% opts = {:id => "course_form", :class => "formtable"} %>
     <% opts[:disabled] = 'disabled' unless can_manage %>
     <%= form_for @context, :html => opts do |f| %>
-    <table class="coursesettings">
+    <div class="coursesettings">
       <% if @context.feature_enabled?(:course_card_images) %>
-      <tr>
-        <td class="form-label"><%= f.blabel :image, :en => "Image" %></td>
-        <td>
+      <div class="form-row">
+        <div class="form-label"><%= f.blabel :image, :en => "Image" %></div>
+        <div>
           <div class="CourseImageSelector__Container"></div>
-        </td>
-      </tr>
+        </div>
+      </div>
       <% end %>
-      <tr>
-        <td class="form-label"><%= f.blabel :name, :course_name, :en => "Name" %></td>
-        <td>
+      <div class="form-row">
+        <div class="form-label"><%= f.blabel :name, :course_name, :en => "Name" %></div>
+        <div>
           <% if can_rename_course %>
             <%= f.text_field :name, :class => "course_form", :maxlength => '255', :style => "width: 150px;" %>
           <% else %>
             <span id="course_name"><%= @context.name %></span>
           <% end %>
-        </td>
-      </tr>
-      <tr>
-        <td class="form-label nobr"><%= f.blabel :course_code, :en => "Course Code" %></td>
-        <td>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label nobr"><%= f.blabel :course_code, :en => "Course Code" %></div>
+        <div>
           <% if can_rename_course %>
             <%= f.text_field :course_code, :maxlength => '255', :style => "width: 100px;" %>
           <% else %>
             <span id="course_course_code"><%= @context.course_code %></span>
           <% end %>
-        </td>
-      </tr>
-      <tr>
-        <td class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></td>
-        <td class="nobr">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></div>
+        <div class="nobr">
           <% if master_course %>
             <% if master_course.grants_right? @current_user, session, :read %>
               <a href="<%= course_url(master_course) %>"><%= master_course.nickname_for(@current_user) %></a>
@@ -137,11 +137,11 @@
               <span id="course_blueprint"><%= is_master_course ? t("Yes") : t("No") %></span>
             <% end %>
           <% end %>
-        </td>
-      </tr>
-      <tr>
-        <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
-        <td>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label"><%= f.blabel :time_zone, :en => "Time Zone" %></div>
+        <div>
           <% if can_manage %>
             <%= f.time_zone_select :time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone %>
           <% else %>
@@ -151,11 +151,11 @@
               <%= t(:none, "None") %>
             <% end %>
           <% end %>
-        </td>
+        </div>
       <% if @context.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
-        </tr><tr>
-          <td class="form-label"><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
-          <td style="word-wrap: break-word;">
+        </div><div class="form-row">
+          <div class="form-label"><%= f.blabel :sis_source_id, :en => "SIS ID" %></div>
+          <div style="word-wrap: break-word;">
             <% if can_manage && can_do(@context.root_account, @current_user, :manage_sis) %>
               <%= f.text_field :sis_source_id, :style => "width: 202px;", :title => t('sis_source_id', "SIS ID"), :value => @context.sis_source_id %>
             <% else %>
@@ -163,16 +163,16 @@
                 <%= @context.sis_source_id %>
               </span>
             <% end %>
-          </td>
+          </div>
       <% end %>
       <% if @current_user && Account.site_admin.account_users_for(@current_user).present? %>
-        </tr><tr>
-          <td class="form-label"><%= f.blabel :root_account, :en => "Root Account" %></td>
-          <td><%= link_to @context.root_account.name, account_url(@context.root_account.id), :id => "course_root_account" %></td>
+        </div><div class="form-row">
+          <div class="form-label"><%= f.blabel :root_account, :en => "Root Account" %></div>
+          <div><%= link_to @context.root_account.name, account_url(@context.root_account.id), :id => "course_root_account" %></div>
       <% end %>
-      </tr><tr>
-        <td class="form-label"><%= f.blabel :account_id, :en => "Subaccount" %></td>
-        <td>
+      </div><div class="form-row">
+        <div class="form-label"><%= f.blabel :account_id, :en => "Subaccount" %></div>
+        <div>
           <% can_edit_account = false %>
           <% if can_manage %>
             <% account_chain = @context.account.account_chain.reverse %>
@@ -202,10 +202,10 @@
               <% end %>
             </span>
           <% end %>
-        </td>
-      </tr><tr>
-        <td class="form-label"><%= f.blabel :enrollment_term_id, :en => "Term" %></td>
-        <td>
+        </div>
+      </div><div class="form-row">
+        <div class="form-label"><%= f.blabel :enrollment_term_id, :en => "Term" %></div>
+        <div>
           <% if can_manage && can_do(@context.account, @current_user, :manage_courses) %>
             <select name="course[enrollment_term_id]" id="course_enrollment_term_id">
               <% @context.root_account.enrollment_terms.active.sort_by{|t| t.start_at || CanvasSort::First}.each do |term| %>
@@ -217,26 +217,26 @@
               <%= @context.enrollment_term.name %>
             </span>
           <% end %>
-        </td>
-      </tr><tr>
-        <td></td>
-        <td class="tall-row">
+        </div>
+      </div><div class="form-row">
+        <div></div>
+        <div class="tall-row">
           <div class="aside top-hint">
             <%= t "Changing course dates may override term availability settings and placement in the Courses page and Dashboard. Please confirm term dates before modifying course dates." %>
           </div>
-        </td>
-      </tr><tr>
-        <td class="form-label"><%= f.blabel :start_at, :en => "Starts" %></td>
-        <td class="nobr">
+        </div>
+      </div><div class="form-row">
+        <div class="form-label"><%= f.blabel :start_at, :en => "Starts" %></div>
+        <div class="nobr">
           <% if can_manage %>
             <%= f.text_field :start_at, :class => "date_entry", :value => datetime_string(@context.start_at, :verbose) %>
           <% else %>
             <%= datetime_string(@context.start_at, :verbose) %>
           <% end %>
-        </td>
-      </tr><tr>
-        <td class="form-label"><%= f.blabel :conclude_at, :en => "Ends" %></td>
-        <td class="nobr tall-row">
+        </div>
+      </div><div class="form-row course-conclude-at-row">
+        <div class="form-label"><%= f.blabel :conclude_at, :en => "Ends" %></div>
+        <div class="nobr tall-row">
           <% if can_manage %>
           <div>
             <% warning_message = t(:course_conclude_at_warning_message, "The course is currently set to end at midnight, meaning that the previous day will be the last day this course is active.") %>
@@ -246,9 +246,10 @@
               <%= warning_message %></p></div>">
               <span class="screenreader-only"><%= warning_message %></span>
             </i>
-
+<div class="checkbox-flex-container">
             <%= f.check_box :restrict_enrollments_to_course_dates, "aria-describedby" => 'users-can-only-participate-description' %>
             <%= f.label :restrict_enrollments_to_course_dates, :en => "Students can only participate in the course between these dates" %>
+</div>
           </div>
           <div class="aside bottom-hint" id="users-can-only-participate-description">
             <%= t "When selected, the course is in a read-only state outside these dates." %>
@@ -256,24 +257,24 @@
           <% else %>
             <%= datetime_string(@context.conclude_at, :verbose) %>
           <% end %>
-        </td>
+        </div>
       <% unless can_manage %>
-        </tr><tr>
-        <td class="form-label"></td>
-        <td class="nobr">
+        </div><div class="form-row">
+        <div class="form-label"></div>
+        <div class="nobr checkbox-flex-container">
           <%= f.check_box :restrict_enrollments_to_course_dates, :disabled => true %>
           <%= f.label :restrict_enrollments_to_course_dates, :en => "Students can only participate in the course between these dates" %>
-        </td>
+        </div>
       <% end %>
-      </tr><tr>
-        <td></td>
-        <td class="tall-row">
+      </div><div class="form-row">
+        <div></div>
+        <div class="tall-row">
           <div class="nobr" role="group" aria-describedby="restrict-view-description">
-            <div>
+            <div class="checkbox-flex-container">
               <%= f.check_box :restrict_student_past_view, :disabled => !can_manage || @context.account.restrict_student_past_view[:locked] %>
               <%= f.label :restrict_student_past_view, :en => "Restrict students from viewing this course after end date" %>
             </div>
-            <div>
+            <div class="checkbox-flex-container">
               <%= f.check_box :restrict_student_future_view, :disabled => !can_manage || @context.account.restrict_student_future_view[:locked] %>
               <%= f.label :restrict_student_future_view, :en => "Restrict students from viewing this course before start date" %>
             </div>
@@ -281,11 +282,11 @@
           <div class="aside bottom-hint" id="restrict-view-description">
             <%= t "When selected, the course is inaccessible outside course dates. If the course dates are blank, these start and end dates apply to the term dates." %>
           </div>
-        </td>
+        </div>
       <% if available_locales.size > 1 %>
-      </tr><tr>
-        <td class="form-label"><%= f.blabel :locale, :language, :en => "Language" %></td>
-        <td class="tall-row">
+      </div><div class="form-row">
+        <div class="form-label"><%= f.blabel :locale, :language, :en => "Language" %></div>
+        <div class="tall-row">
           <% no_language = t(:no_language_preference, "Not set (user-configurable, defaults to %{language})", :language => available_locales[infer_locale(:context => @context.account)]) %>
           <% if can_manage %>
             <div>
@@ -300,54 +301,56 @@
           <% else %>
             <%= @context.locale ? available_locales[@context.locale] : no_language %>
           <% end %>
-        </td>
+        </div>
       <% end %>
-      </tr><tr>
-        <td class="form-label"><%= f.blabel :storage_quota_mb, :storage_quota, :en => "File Storage" %></td>
-        <td>
+      </div><div class="form-row">
+        <div class="form-label"><%= f.blabel :storage_quota_mb, :storage_quota, :en => "File Storage" %></div>
+        <div>
           <% if can_manage && can_do(@context.account, @current_user, :manage_storage_quotas) %>
             <%= f.text_field :storage_quota_mb, :style => "width: 50px;", :title => t('megabytes', "megabytes"), :value => @context.storage_quota_mb %>
           <% else %>
             <%= @context.storage_quota_mb %>
           <% end %>
           <%= t('megabytes', %{megabytes}) %>
-        </td>
+        </div>
       <% if @context.turnitin_enabled? %>
-      </tr><tr>
-        <td class="form-label"><%= f.blabel :turnitin_comments, :en => "Turnitin Comments" %></td>
-        <td class="nobr">
+      </div><div class="form-row">
+        <div class="form-label"><%= f.blabel :turnitin_comments, :en => "Turnitin Comments" %></div>
+        <div class="nobr">
           <span class="aside"><%= t('turnitin', %{these comments will be shown to students when submitting a Turnitin-enabled assignment}) %></span>
           <br/>
           <%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;", :disabled => !can_manage %>
-        </td>
+        </div>
       <% end %>
-      </tr>
+      </div>
       <% if @context.root_account.feature_enabled?(:filter_speed_grader_by_student_group) %>
-        <tr>
-          <td class="form-label">
+        <div class="form-row">
+          <div class="form-label">
             <label for="course_large_course"><%= t("Large Course:") %></label>
-          </td>
-          <td id="course_large_course">
+          </div>
+          <div id="course_large_course">
             <%= f.check_box :filter_speed_grader_by_student_group, disabled: !can_manage %>
             <%= f.label :filter_speed_grader_by_student_group, t("Launch SpeedGrader Filtered by Student Group") %>
-          </td>
-        </tr>
+          </div>
+        </div>
       <% end %>
-      <tr>
-        <td class="form-label">
+      <div class="form-row">
+        <div class="form-label">
           <label for="course_grading_scheme"><%= before_label('grading_scheme', %{Grading Scheme}) %></label>
-        </td>
-        <td id="course_grading_scheme">
+        </div>
+        <div id="course_grading_scheme">
+        <div class="checkbox-flex-container">
           <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_manage %>
           <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
+        </div>
           <div class="grading_standard_link" style="margin-<%= direction('left') %>: 20px;">
             <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_enabled? ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td class="form-label"><label for="course_license"><%= before_label('license', %{License}) %></label></td>
-        <td colspan="3">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label"><label for="course_license"><%= before_label('license', %{License}) %></label></div>
+        <div colspan="3">
           <% if can_manage %>
             <% cc, non_cc = Course.licenses.map { |id, attrs| [attrs[:readable_license].call, id]}.partition{|n, id| id.start_with?('cc')} %>
             <select name="course[license]" id="course_license">
@@ -358,15 +361,16 @@
           <% else %>
             <%= @context.readable_license %>
           <% end %>
-        </td>
-      </tr><tr>
-        <td class="form-label"><%= f.blabel :usage_rights_required, :en => "File Copyright" %></td>
-        <td id="usage_rights_required"><%= f.check_box :usage_rights_required, :disabled => !can_manage || @context.account.usage_rights_required[:locked] %>
+        </div>
+      </div><div class="form-row">
+        <div class="form-label"><%= f.blabel :usage_rights_required, :en => "File Copyright" %></div>
+        <div id="usage_rights_required" class="checkbox-flex-container">
+          <%= f.check_box :usage_rights_required, :disabled => !can_manage || @context.account.usage_rights_required[:locked] %>
           <%= f.label :usage_rights_required, t('Copyright and license information must be provided for files before they are published.') %>
-        </td>
-      </tr><tr>
-        <td class="form-label"><label for="course_visibility"><%= before_label('course_visibility', %{Visibility}) %></label></td>
-        <td colspan="3" id="course_visibility">
+        </div>
+      </div><div class="form-row course-visibility-row">
+        <div class="form-label"><label for="course_visibility"><%= before_label('course_visibility', %{Visibility}) %></label></div>
+        <div colspan="3" id="course_visibility">
           <% if can_do(@context, @current_user, :manage_course_visibility) %>
             <span>
               <%= f.select :course_visibility, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], id] }, {}, {"aria-label" => t("Course Visibility Options")} %>
@@ -377,13 +381,13 @@
               <%= f.label :custom_course_visibility, :en => "Customize" %>
               <% @context.customize_course_visibility_list.map do |setting, options| %>
                 <div id="customize_course_visibility">
-                  <%= f.label :syllabus_visibility_option, options[:setting] %>
+                  <%= f.label :syllabus_visibility_option, options[:setting], :class => "syllabus-visibility" %>
                   <%= f.select :syllabus_visibility_option, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], "#{id}"] }, {}, {:id => options[:setting], "aria-label" => t("Syllabus Visibility Options")} %>
                 </div>
               <% end %>
             </div>
             <br/>
-            <div class="public_options">
+            <div class="public_options checkbox-flex-container">
               <%= f.check_box :indexed %>
               <%= f.label :indexed, :en => "Include this course in the public course index" %>
             </div>
@@ -398,56 +402,56 @@
               <%= f.select :course_visibility, [[vis_value, @context.course_visibility]], {}, {"disabled" => true, "aria-label" => t("Course Visibility Options")} %>
               <%= visibility_help_link %>
             </span>
-            <div class="public_options">
+            <div class="public_options checkbox-flex-container">
               <%= f.check_box :indexed, disabled: true %>
               <%= f.label :indexed, en: "Include this course in the public course index" %>
             </div>
           <% end %>
-        </td>
-      </tr><tr>
-        <td class="form-label"><label for="course_course_format"><%= before_label('course_format', %{Format}) %></label></td>
+        </div>
+      </div><div class="form-row">
+        <div class="form-label"><label for="course_course_format"><%= before_label('course_format', %{Format}) %></label></div>
         <% format_options = [[t('#course.course_format.not_set', 'Not Set'), ''],
           [t('#course.course_format.on_campus', "On-Campus"), "on_campus"],
           [t('#course.course_format.online', "Online"), "online"],
           [t('#course.course_format.blended', "Blended"), "blended"]] %>
-        <td>
+        <div>
           <% if can_manage %>
             <%= f.select :course_format, format_options %>
           <% else %>
             <%= (format_options.detect{|text, key| key == @context.course_format} || format_options.first).first %>
           <% end %>
-        </td>
-      </tr>
+        </div>
+      </div>
       <% if @context.feature_enabled?(:epub_export) && !@context.account.enable_offline_web_export? %>
-        <tr>
-          <td class="form-label"><label for="course_epub_export"><%= before_label('course_epub_export', %{Epub Export}) %></label></td>
-          <td colspan="3" id="epub_export">
-            <div>
+        <div class="form-row">
+          <div class="form-label"><label for="course_epub_export"><%= before_label('course_epub_export', %{Epub Export}) %></label></div>
+          <div colspan="3" id="epub_export">
+            <div class="checkbox-flex-container">
               <%= f.check_box :organize_epub_by_content_type, :disabled => !can_manage %>
               <%= f.label :organize_epub_by_content_type, t("Organize epub by content type (default is by module).") %>
             </div>
-          </td>
-        </tr>
+          </div>
+        </div>
       <% end %>
       <% if @context.account.enable_offline_web_export? %>
-        <tr>
-          <td class="form-label"><label for="course_offline_export"><%= before_label('course_offline_export', %{Offline Course}) %></label></td>
-          <td colspan="3" id="offline_web_export">
-            <div>
+        <div class="form-row">
+          <div class="form-label"><label for="course_offline_export"><%= before_label('course_offline_export', %{Offline Course}) %></label></div>
+          <div colspan="3" id="offline_web_export">
+            <div class="checkbox-flex-container">
               <%= f.check_box :enable_offline_web_export, :disabled => !can_manage %>
               <%= f.label :enable_offline_web_export, t("Allow course content to be downloaded and viewed offline") %>
             </div>
-          </td>
-        </tr>
+          </div>
+        </div>
       <% end %>
-      <tr>
-        <td class="form-label"><label for="course_public_description"><%= before_label('course_description', %{Description}) %></label></td>
-        <td colspan="3">
+      <div class="form-row">
+        <div class="form-label"><label for="course_public_description"><%= before_label('course_description', %{Description}) %></label></div>
+        <div colspan="3">
           <%= f.text_area :public_description, :style => "height: 100px;", :disabled => !can_manage %>
-        </td>
-      </tr><tr>
-        <td></td>
-        <td colspan="3">
+        </div>
+      </div><div class="form-row">
+        <div></div>
+        <div colspan="3">
           <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment_enabled? && !is_master_course %>">
             <% if @context.root_account.self_registration? %>
               <%= t 'course_open_enrollment', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
@@ -469,37 +473,56 @@
           <a href="#" role="button" class="course_form course_form_more_options_link" style="padding-<%= direction('left') %>: 20px;"><%= t('links.more_options', %{more options}) %></a>
           <div class="course_form_more_options" style="display: none; padding-<%= direction('left') %>: 20px;">
             <% if @context.self_enrollment_allowed? %>
-              <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox', :disabled => !can_manage %>
-              <label for="course_self_enrollment">
-                <% if @context.root_account.self_registration? %>
-                  <%= t :self_enrollment, "Let students self-enroll by sharing with them a secret URL or code" %>
-                <% else %>
-                  <%= t :self_enrollment_without_code, "Let students self-enroll by sharing with them a secret URL" %>
-                <% end %>
-              </label><br/>
-              <div class="open_enrollment_holder" style="display: none;">
+              <div class="checkbox-flex-container">
+                <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox', :disabled => !can_manage %>
+                <label for="course_self_enrollment">
+                  <% if @context.root_account.self_registration? %>
+                    <%= t :self_enrollment, "Let students self-enroll by sharing with them a secret URL or code" %>
+                  <% else %>
+                    <%= t :self_enrollment_without_code, "Let students self-enroll by sharing with them a secret URL" %>
+                  <% end %>
+                </label>
+              </div>
+              <br/>
+              <div class="open_enrollment_holder checkbox-flex-container" style="display: none;">
               <%= f.check_box :open_enrollment, :disabled => !can_manage %>
               <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>
               </div>
             <% end %>
+            <div class="checkbox-flex-container">
             <%= f.check_box :show_announcements_on_home_page, :disabled => !can_manage %>
             <%= f.label :show_announcements_on_home_page, :en => "Show recent announcements on Course home page" %><br/>
+            </div>
             <%= f.select :home_page_announcement_limit, options_for_select(1..15, @context.home_page_announcement_limit || 3), {}, {:disabled => !can_manage || !@context.show_announcements_on_home_page?, :style => 'width: 75px'} %>
             <%= f.label :home_page_announcement_limit, :en => 'Number of announcements shown on the homepage' %><br/>
+            <div class="checkbox-flex-container">
             <%= f.check_box :allow_student_forum_attachments, :disabled => !can_manage %>
             <%= f.label :allow_student_forum_attachments, :en => "Let students attach files to discussions" %><br/>
+            </div>
+            <div class="checkbox-flex-container">
             <%= f.check_box :allow_student_discussion_topics, :disabled => !can_manage %>
             <%= f.label :allow_student_discussion_topics, :en => "Let students create discussion topics" %><br/>
+            </div>
+            <div class="checkbox-flex-container">
             <%= f.check_box :allow_student_discussion_editing, :disabled => !can_manage %>
             <%= f.label :allow_student_discussion_editing, :en => "Let students edit or delete their own discussion posts" %><br/>
+            </div>
+            <div class="checkbox-flex-container">
             <%= f.check_box :allow_student_organized_groups, :disabled => !can_manage %>
             <%= f.label :allow_student_organized_groups, :en => "Let students organize their own groups" %><br/>
+            </div>
+            <div class="checkbox-flex-container">
             <%= f.check_box :hide_final_grades, :disabled => !can_manage %>
             <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
+            </div>
+            <div class="checkbox-flex-container">
             <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
             <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
+            </div>
+            <div class="checkbox-flex-container">
             <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
             <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />
+            </div>
             <%= f.select :default_wiki_editing_roles, [
               [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
               [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
@@ -516,11 +539,11 @@
               <div id="csp_options"></div>
             <% end %>
           </div>
-        </td>
-      </tr>
+        </div>
+      </div>
       <% if can_manage %>
-        <tr>
-          <td colspan="4">
+        <div class="form-row">
+          <div colspan="4">
             <% if Setting.get('cross_root_account_course_moves', 'false') == 'true' && Account.site_admin.grants_right?(@current_user, :manage_courses) && Account.root_accounts.length > 1 %>
               <a href="#" class="move_course_link btn"><i class="icon-arrow-right"></i> <%= t('links.move_course', %{Move To Another Account}) %></a>
             <% end %>
@@ -529,10 +552,10 @@
                 <button type="submit" class="btn btn-primary"><%= t('buttons.update_course', %{Update Course Details}) %></button>
               </div>
             </span>
-          </td>
-        </tr>
+          </div>
+        </div>
       <% end %>
-    </table>
+    </div>
     <% end %>
   </div>
   <div id="tab-sections">

@@ -54,6 +54,9 @@ class FeatureFlag < ActiveRecord::Base
     if self.context
       self.class.connection.after_transaction_commit { self.context.feature_flag_cache.delete(self.context.feature_flag_cache_key(feature)) }
       self.context.touch if Feature.definitions[feature].try(:touch_context)
+      if ::Rails.env.development? && self.context.is_a?(Account) && Account.all_special_accounts.include?(self.context)
+        Account.clear_special_account_cache!(true)
+      end
     end
   end
 

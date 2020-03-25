@@ -18,19 +18,42 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const AnnouncementsTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Announcements')}
-    subheading={I18n.t('Share important updates with users')}
-    image="/images/tutorial-tray-images/announcements.svg"
+    subheading={I18n.t('Keep students informed')}
+    image="/images/tutorial-tray-images/Panda_Announcements.svg"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-instructor
+      -guide-table-of-contents#jive_content_id_Announcements`
+    }}
+    links={[
+      {
+        label: I18n.t('What are announcements?'),
+        href: 'https://community.canvaslms.com/docs/DOC-10736-67952724136'
+      },
+      {
+        label: I18n.t('How do I add an announcement in a course?'),
+        href: 'https://community.canvaslms.com/docs/DOC-10405-415250731'
+      },
+      {
+        label: I18n.t('How do I edit an announcement in a course?'),
+        href: 'https://community.canvaslms.com/docs/DOC-10407-415250732'
+      },
+      {
+        label: I18n.t('How do I use the Announcements Index Page?'),
+        href: 'https://community.canvaslms.com/docs/DOC-10214-415276768'
+      }
+    ]}
   >
-    <Text as="p">
-      {I18n.t(`Share important information with all users in your course.
-          Choose to get a copy of your own announcements in Notifications.`)}
-    </Text>
+    {I18n.t(`Share important information about your course with all users.
+      Use announcements to remind students of important dates and tasks,
+      point students to internal and external resources to help them achieve
+      course outcomes, celebrate student success, and highlight events of interest.
+      Announcements can include text, multimedia, and files.`)}
   </TutorialTrayContent>
 )
 

@@ -31,8 +31,6 @@ describe Assignment do
   end
 
   before :once do
-    PostPolicy.enable_feature!
-
     course_with_teacher(active_all: true)
     @initial_student = student_in_course(active_all: true, user_name: 'a student').user
   end

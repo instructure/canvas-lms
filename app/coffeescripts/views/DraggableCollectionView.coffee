@@ -53,8 +53,8 @@ export default class DraggableCollectionView extends CollectionView
     super
     @collection.on 'add', @_noItemsViewIfEmpty
 
-  initSort: ->
-    @$list.sortable(_.extend({}, @sortOptions, scope: @cid))
+  initSort: (opts = {}) ->
+    @$list.sortable(_.extend({}, @sortOptions, opts, scope: @cid))
       .on('sortstart', @modifyPlaceholder)
       .on('sortreceive', @_onReceive)
       .on('sortupdate', @_updateSort)

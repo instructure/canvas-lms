@@ -20,6 +20,7 @@ import gql from 'graphql-tag'
 export const COURSE_NOTIFICATIONS_ENABLED_QUERY = gql`
   query GetNotificationPreferences($courseId: ID!) {
     course(id: $courseId) {
+      _id
       notificationPreferencesEnabled
     }
   }

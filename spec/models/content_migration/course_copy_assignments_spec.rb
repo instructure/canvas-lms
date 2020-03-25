@@ -208,7 +208,7 @@ describe ContentMigration do
           expect(@assignment[attr]).to eq new_assignment[attr]
         end
       end
-      expect(new_assignment.muted).to be_falsey
+      expect(new_assignment.muted).to eq true
       expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
 

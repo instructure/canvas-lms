@@ -24,35 +24,41 @@
 
 <h1 class="screenreader-only"><%= t(:conference_header, 'Conferences')%></h1>
 
-<% if can_do(WebConference.new(:context => @context), @current_user, :create) %>
-  <div class="ic-Action-header ic-Action-header--before-item-groups">
-    <div class="ic-Action-header__Secondary">
-      <button type="button" class="btn btn-primary new-conference-btn" title="<%= t(:new_conference, 'New Conference') %>" aria-label="<%= t(:new_conference, 'New Conference') %>">
-        <i class="icon-plus"></i>
-        <%= t(:conference, 'Conference') %>
-      </button>
+<div id="big-blue-button-message-container"></div>
+<div id="conference-alternatives-container"></div>
+
+<% unless @render_alternatives %>
+  <% if can_do(WebConference.new(:context => @context), @current_user, :create) %>
+    <div class="ic-Action-header ic-Action-header--before-item-groups">
+      <div class="ic-Action-header__Secondary">
+        <button type="button" class="btn btn-primary new-conference-btn" title="<%= t(:new_conference, 'New Conference') %>" aria-label="<%= t(:new_conference, 'New Conference') %>">
+          <i class="icon-plus"></i>
+          <%= t(:conference, 'Conference') %>
+        </button>
+      </div>
     </div>
-  </div>
+  <% end %>
 <% end %>
 
 <div class="item-group-container item-box">
-
-  <div class="item-group-condensed">
-    <div class="ig-header">
-      <h2 class="ig-header-title">
-        <a
-          class="element_toggler accessible-toggler"
-           href="#"
-           aria-label= "<%= t('New Conferences') %>"
-           aria-controls="new-conference-list"
-           aria-expanded="true">
-          <i class="icon-mini-arrow-down auto_rotate"></i>
-          <%= t(:new_conferences, 'New Conferences') %>
-        </a>
-      </h2>
+  <% unless @render_alternatives %>
+    <div class="item-group-condensed">
+      <div class="ig-header">
+        <h2 class="ig-header-title">
+          <a
+            class="element_toggler accessible-toggler"
+            href="#"
+            aria-label= "<%= t('New Conferences') %>"
+            aria-controls="new-conference-list"
+            aria-expanded="true">
+            <i class="icon-mini-arrow-down auto_rotate"></i>
+            <%= t(:new_conferences, 'New Conferences') %>
+          </a>
+        </h2>
+      </div>
+      <div class="item-group-expandable" id="new-conference-list"></div>
     </div>
-    <div class="item-group-expandable" id="new-conference-list"></div>
-  </div>
+  <% end %>
 
   <div class="item-group-condensed">
     <div class="ig-header">

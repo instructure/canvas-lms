@@ -44,6 +44,7 @@ describe Types::SubmissionCommentType do
 
   describe 'Submission Comment Read' do
     it 'returns the correct read state' do
+      @assignment.post_submissions
       expect(
         submission_type.resolve('commentsConnection { nodes { read }}')
       ).to eq [false]

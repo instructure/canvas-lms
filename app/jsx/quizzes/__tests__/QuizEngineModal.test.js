@@ -63,7 +63,7 @@ describe('QuizEngineModal', () => {
     ).toBeNull()
   })
 
-  it('submits to new quizzes', () => {
+  it('submits to new quizzes without saving', () => {
     const handleDismiss = jest.fn()
     const windLoc = global.window.location
     delete global.window.location
@@ -75,11 +75,36 @@ describe('QuizEngineModal', () => {
     global.window.location = windLoc
   })
 
-  it('submits to classic quizzes', () => {
+  it('submits to classic quizzes without saving', () => {
     const handleDismiss = jest.fn()
     window.HTMLFormElement.prototype.submit = jest.fn()
     const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
     fireEvent.click(getByText('Classic Quizzes'))
+    fireEvent.click(getByText('Submit').closest('button'))
+    expect(window.HTMLFormElement.prototype.submit).toHaveBeenCalled()
+    const form = document.querySelector(`[method="post"][action="${ENV.URLS.new_quiz_url}"]`)
+    expect(form).toBeTruthy()
+  })
+
+  it('redirects to new quizzes after saving engine choice', () => {
+    const handleDismiss = jest.fn()
+    const windLoc = global.window.location
+    delete global.window.location
+    global.window.location = {href: 'http://localhost'}
+    const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
+    fireEvent.click(getByText('New Quizzes'))
+    fireEvent.click(getByText('Remember my choice for this course'))
+    fireEvent.click(getByText('Submit').closest('button'))
+    expect(window.location.href).toBe('http://localhost/assignments?quiz_lti')
+    global.window.location = windLoc
+  })
+
+  it('redirects to classic quizzes after saving engine choice', () => {
+    const handleDismiss = jest.fn()
+    window.HTMLFormElement.prototype.submit = jest.fn()
+    const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
+    fireEvent.click(getByText('Classic Quizzes'))
+    fireEvent.click(getByText('Remember my choice for this course'))
     fireEvent.click(getByText('Submit').closest('button'))
     expect(window.HTMLFormElement.prototype.submit).toHaveBeenCalled()
     const form = document.querySelector(`[method="post"][action="${ENV.URLS.new_quiz_url}"]`)

@@ -51,6 +51,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
     document.body.appendChild($container)
 
     gradebookOptions = {
+      include_speed_grader_in_assignment_header_menu: false,
       post_policies_enabled: true
     }
   })
@@ -336,13 +337,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       assignment.grading_type = 'gpa_scale'
       render()
       strictEqual(component.props.enterGradesAsSetting.showGradingSchemeOption, true)
-    })
-
-    test('includes the mute assignment action', () => {
-      buildGradebook()
-      sinon.spy(gradebook, 'getMuteAssignmentAction')
-      render()
-      equal(component.props.muteAssignmentAction, gradebook.getMuteAssignmentAction.returnValues[0])
     })
 
     QUnit.module('"Post grades" action', () => {
@@ -861,6 +855,21 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       gradebook.setSortRowsBySetting('assignment_2301', 'grade', 'ascending')
       render()
       equal(component.props.sortBySetting.settingKey, 'grade')
+    })
+
+    QUnit.module('includeSpeedGraderMenuItem', () => {
+      test('is set to true if the option is enabled in gradebook', () => {
+        gradebookOptions.include_speed_grader_in_assignment_header_menu = true
+        buildGradebook()
+        render()
+        strictEqual(component.props.includeSpeedGraderMenuItem, true)
+      })
+
+      test('is set to false if the option is not enabled in gradebook', () => {
+        buildGradebook()
+        render()
+        strictEqual(component.props.includeSpeedGraderMenuItem, false)
+      })
     })
   })
 

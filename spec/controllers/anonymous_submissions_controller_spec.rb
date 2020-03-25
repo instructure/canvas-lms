@@ -19,10 +19,6 @@
 require_relative '../spec_helper'
 
 RSpec.describe AnonymousSubmissionsController do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   it_behaves_like 'a submission update action', :anonymous_submissions
 
   describe "GET show" do

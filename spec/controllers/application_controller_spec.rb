@@ -186,6 +186,35 @@ RSpec.describe ApplicationController do
       expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
     end
 
+    context "show_qr_login (QR for Mobile Login)" do
+      before(:each) do
+        allow(Object).to receive(:const_defined?).and_call_original
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+      end
+
+      it 'is false if InstructureMiscPlugin is not defined and the feature flag is off' do
+        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(false).once
+        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_falsey
+      end
+
+      it 'is false if InstructureMiscPlugin is defined and the feature flag is off' do
+        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(true).once
+        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_falsey
+      end
+
+      it 'is false if InstructureMiscPlugin is not defined and the feature flag is on' do
+        Account.default.enable_feature!(:mobile_qr_login)
+        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(false).once
+        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_falsey
+      end
+
+      it 'is true if InstructureMiscPlugin is defined and the feature flag is on' do
+        Account.default.enable_feature!(:mobile_qr_login)
+        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(true).once
+        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_truthy
+      end
+    end
+
     it 'sets LTI_LAUNCH_FRAME_ALLOWANCES' do
       expect(@controller.js_env[:LTI_LAUNCH_FRAME_ALLOWANCES]).to match_array [
         "geolocation *",
@@ -764,7 +793,23 @@ RSpec.describe ApplicationController do
           allow(controller).to receive(:polymorphic_url).and_return('host/quizzes')
         end
 
-        context 'is set to gradebook page when launched from graedbook page' do
+        context 'is set to homepage page when launched from homepage' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1')
+            expect(controller).to receive(:polymorphic_url).with([course]).and_return('host')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100')
+            expect(controller).to receive(:polymorphic_url).with([course]).and_return('host')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host'
+          end
+        end
+
+        context 'is set to gradebook page when launched from gradebook page' do
           it 'for small id' do
             allow(controller.request).to receive(:referer).and_return('courses/1/gradebook')
             expect(controller).to receive(:polymorphic_url).with([course, :gradebook]).and_return('host/gradebook')

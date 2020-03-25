@@ -453,8 +453,6 @@ describe Canvas::LiveEvents do
 
       context "with post policies enabled" do
         before(:each) do
-          PostPolicy.enable_feature!
-
           assignment.hide_submissions
         end
 
