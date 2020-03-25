@@ -53,7 +53,7 @@ class CanvadocSessionsController < ApplicationController
         # If we're doing annotations, DocViewer needs additional information to send notifications
         opts[:canvas_base_url] = assignment.course.root_account.domain
         opts[:user_id] = @current_user.id
-        opts[:submission_user_id] = submission.user_id
+        opts[:submission_user_ids] = submission.group_id ? submission.group.users.pluck(:id) : [submission.user_id] 
         opts[:course_id] = assignment.context_id
         opts[:assignment_id] = assignment.id
         opts[:post_manually] = assignment.post_manually?
