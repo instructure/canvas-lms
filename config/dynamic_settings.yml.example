@@ -27,6 +27,9 @@ development:
         app-host: "rce.docker"
       common_cartridge_viewer:
         base_url: "http://localhost:3300"
+      fullstory:
+        sampling_rate: '0.0' # randomly inject this fraction of the time
+        app_key: 'xyzzy'
     # another service
     inst-fs:
       app-host: "http://api.instfs.docker"
@@ -37,9 +40,6 @@ development:
       ios-pandata-secret: teamrocketblastoffatthespeedoflight
       android-pandata-key: ANDROID_pandata_key
       android-pandata-secret: surrendernoworpreparetofight
-    fullstory:
-        sampling_rate: '0.0' # randomly inject this fraction of the time
-        app_key: 'xyzzy'
 
   private:
     canvas:
