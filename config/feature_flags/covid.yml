@@ -23,3 +23,8 @@ responsive_2020_04:
   applies_to: RootAccount
   display_name: "April 2020 Responsiveness"
   description: "Collection of responsive improvements throughout Canvas"
+unpublished_courses:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Help for Unpublished Courses"
+  description: "Improved visual reminders to encourage instructors to publish courses"
