@@ -34,14 +34,16 @@
  */
 export function cleanUrl(input) {
   let url = input
-  if (input.match(/@/) && !input.match(/\//) && !input.match(/^mailto:/)) {
-    url = 'mailto:' + input
-  } else if (!input.match(/^\w+:\/\//) && !input.match(/^mailto:/) && !input.match(/^\//)) {
-    url = 'http://' + input
-  }
+  if (input) {
+    if (input.match(/@/) && !input.match(/\//) && !input.match(/^mailto:/)) {
+      url = 'mailto:' + input
+    } else if (!input.match(/^\w+:\/\//) && !input.match(/^mailto:/) && !input.match(/^\//)) {
+      url = 'http://' + input
+    }
 
-  if (url.indexOf('@') != -1 && url.indexOf('mailto:') != 0 && !url.match(/^http/)) {
-    url = 'mailto:' + url
+    if (url.indexOf('@') != -1 && url.indexOf('mailto:') != 0 && !url.match(/^http/)) {
+      url = 'mailto:' + url
+    }
   }
   return url
 }
