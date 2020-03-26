@@ -1731,6 +1731,7 @@ sv:
   add_a_comment_872470ac: "Lägg till en kommentar"
   add_a_course_b72b18d7: "Lägg till en kurs"
   add_a_custom_help_link_4328252f: "Lägg till en egen hjälplänk"
+  add_a_message_4fee743f: "Lägg till ett meddelande "
   add_a_message_a5ed12bf: "Lägg till ett meddelande"
   add_a_new_announcement_878b717f: "Lägg till nytt meddelande"
   add_a_new_course_4a041207: "Lägg till en ny kurs"
@@ -5282,6 +5283,7 @@ sv:
         join: "Anslut nu"
     type_disabled_error: "Den här sortens konferens är inte längre aktiverad för den här Canvas-platsen"
   conferences_a0a8984b: Konferenser
+  conferences_are_powered_by_bigbluebutton_a_free_se_a5b2e27e: "Konferenser tillhandahålls av BigBlueButton, en kostnadsfri tjänst till Canvas-användare. Extrem ökning i användning kan orsaka prestandaproblem. Om BigBlueButton inte kan uppfylla aktuella eller framtida krav har Canvas även ett samarbete med Zoom, Hangouts, Teams och andra videokonferensverktyg som erbjuder kostnadsfria eller rabatterade tjänster."
   conferences_tutorial_tray_6f071ce2: "Självstudiefack för konferenser"
   confetti_for_on_time_submissions_394e16ce: "Konfetti för tidsmässiga inlämningar"
   config_url_e96ceaf3: "Konfigurera URL"
@@ -5986,6 +5988,7 @@ sv:
     one: "%{contextName} och %{count} annan"
     other: "%{contextName} och %{count} andra"
   contextscount_more_66b2f99b: "+ %{contextsCount} mer"
+  contexttype_notification_settings_d72acd58: "%{contextType} Aviseringsinställningar"
   continue_ac067716: Fortsätt
   continue_typing_to_find_additional_sections_or_stu_49786085: "Fortsätt skriva för att hitta fler sektioner eller studenter."
   contributed_to_this_module_item_and_is_complete_2799d5c: "Bidrog till det här modulobjektet och är färdig"
@@ -6609,6 +6612,7 @@ sv:
   course_notification_settings_d9821d36: "Inställningar för kursaviseringar"
   course_notification_settings_error_page_c0512c17: "Inställningar för kursaviseringar – felmeddelandesida"
   course_notification_settings_initial_query_error_6dfb24ef: "Inställningar för kursaviseringar – initialt frågefel"
+  course_notification_settings_updated_f6726d7e: "Inställningarna för kursaviseringar har uppdaterats"
   course_option_links_a79d263d: Kursalternativlänkar
   course_outcomes_7dc1cbc7: "Kursens lärandemål"
   course_pages_449f1dd4: Kurssidor
@@ -8538,6 +8542,8 @@ sv:
   edit_assignment_name_mastery_paths_40b50541: "Redigera uppgiftens %{name} måluppfyllesevägar"
   edit_bank_92eb8e14: "Redigera %{bank}"
   edit_c5fbea07: Redigera
+  edit_closed_captions_e5fdeb79: "Redigera undertext"
+  edit_closed_captions_subtitles_to_videos_from_the__288ae432: "Redigera undertext/underrubriker i videor från videoalternativsfacket i RCE"
   edit_collaboration_b014c18b: "Redigera samarbete"
   edit_comment_comment_e74afa04: "Redigera kommentar: %{comment}"
   edit_conference_title_6e234815: "Redigera \"%{conference_title}\""
@@ -10794,6 +10800,7 @@ sv:
       grading_scheme_info: "Visa/redigera bedömningsschema"
   grading_standards_b73bfa72: Omdömesstandarder
   grading_type_type_7d8b42d7: "Betygsättningstyp: %{type}"
+  granular_contexttype_notification_settings_will_be_c5dfc901: "Detaljerade %{contextType}-aviseringsinställningar kan konfigureras här i framtiden."
   granular_course_notification_settings_will_be_conf_68f122db: "Detaljinställningar för kursaviseringar kan konfigureras här i framtiden."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Detaljerade behörigheter för hantering av wikisidor"
   graph_bar_b5daa23d: Diagramstapel
@@ -11434,6 +11441,7 @@ sv:
   highest_28ad71e6: Högsta
   highest_score_e080551e: "Högsta poäng"
   hindi_9bcd4b34: Hindi
+  history_settings_c63dbaaf: Historikinställningar
   home_351838cd: Startsida
   home_page_is_not_valid_2e8a25ae: "Startsidan är inte giltig"
   home_tutorial_tray_66826983: "Självstudiefack för startsidor"
@@ -11703,10 +11711,12 @@ sv:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkludera resultat vid notifiering om omdömen.
                 Om din e-postadress inte är en institutionsadress innebär det att känsligt innehåll skickas utanför institutionen.
+  include_speedgrader_in_assignment_header_menu_69cd8656: "Inkludera SpeedGrader i rubrikmenyn för Uppgifter"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkludera betyget på den här uppgiften när du postar till din skolas studentinformationssystem"
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Inkludera bedömningarna för denna uppgift när du synkroniserar med skolans studentinformationssystem"
   include_unpublished_assignments_83ebbaec: "Inkludera opublicerade uppgifter"
   include_unpublished_courses_7a0e7aab: "Inkludera avpublicerade kurser"
+  includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inkluderar en länk till SpeedGrader i rubrikmenyn för uppgiften i bedömningsöversikten."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Innehåller bedömningsvärden i administratörsomdömesrapporterna."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Innehåller matriser i kursens sidofältsnavigering"
   incomplete_95612d72: "ej fullständig"
@@ -14923,6 +14933,7 @@ sv:
   more_courses_5ebbe998: "Fler kurser"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Canvas gör det dessutom möjligt för dig att lägga till lärandemål i dina bedömningsmatriser så att du kan utvärdera måluppfyllelse när du bedömer uppgifter. När du har ställt in dina lärandemål klickar du på Hantera matriser för att börja använda dem för bedömning."
   more_info_at_course_name_56dc8c10: "Mer information på %{course_name}"
+  more_info_at_url_41b4764b: "Mer information på %{url}"
   more_info_at_web_address_dba7e187: "Mer information på %{web_address}"
   more_information_3dfb76b5: "Mer information"
   more_information_about_ratings_57cdd446: "Mer information om värderingar: "
@@ -15147,6 +15158,7 @@ sv:
   new_analytics_api_access_7eec1ead: "API-åtkomst för New Analytics"
   new_annotations_66932016: "Nya annoteringar"
   new_announcement_23af4598: "Nytt anslag"
+  new_announcement_in_course_name_title_84607f44: "Nytt meddelande i %{course_name}: %{title}"
   new_announcement_title_30ba7c1b: "Nytt anslag: %{title}"
   new_announcement_title_course_da7c0ca6: "Nytt meddelande %{title}, %{course}"
   new_anonymous_comment_by_student_author_id_for_ass_6e579da4: "Ny anonym kommentar av studenten (%{author_id}) för %{assignment_title}, studenten (%{user_id}), %{course_name}."
@@ -15485,7 +15497,6 @@ sv:
         Inkluderar: 
         
         * Uppgift/inlämningsomdöme angivet/ändrat
-        * Aktiverat uppgiftsomdöme
         * Ändring av bedömningsvikt
     grading_display: Bedömning
     grading_notify_include_grade: "Inkludera poäng vid meddelande om betygsändringar."
@@ -18911,6 +18922,7 @@ sv:
   ratio_responded_correctly_6d890107: "%{ratio}% svarade korrekt"
   rce_auto_save_f004fba9: "RCE – Automatisk spar-funktion"
   rce_enhancements_5701e06: "Förbättringar av Innehållsredigeraren"
+  rce_initialization_fix_4f176bda: "Initieringskorrigering för RCE"
   re_activate_user_f7d77c9a: "Återaktivera användare"
   re_reported_b9671073: Återrapporterad
   re_send_notification_directly_to_users_when_announ_c421cea5: "Skicka om aviseringen direkt till användare när anslaget börjar"
@@ -19092,6 +19104,7 @@ sv:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Släppt av måluppfyllelseväg: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Släppt av målväg: %{path}"
   releasing_grades_31a57dde: "Publicerar omdömen"
+  remember_my_choice_for_this_course_5a3b7206: "Kom ihåg mitt val för den här kursen"
   remind_me_next_time_6402eb7d: "Påminn mig nästa gång"
   reminder_ffd21289: Påminnelse
   remove_account_from_this_profile_c3095eb2: "Ta bort konto från den här profilen"
@@ -19197,6 +19210,7 @@ sv:
   reserved_f247b60b: Reserverad
   reset_95a81614: Återställ
   reset_multi_factor_authentication_2b63a558: "Återställ multifaktorautentisering"
+  reset_quiz_engine_choice_323a40e6: "Återställ val av quizmotor"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Återställ denna kontaktmetodens avvisande antal"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Återställ denna e-postadressens avvisande antal"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "resurslänk måste matcha resurshanterarens domän"
@@ -20839,6 +20853,7 @@ sv:
   show_name_of_observed_students_in_notifications_a56dd9e4: "Visa namn på observerade studenter i aviseringar."
   show_navigation_menu_34e7f441: "Visa navigeringsmeny"
   show_new_analytics_for_course_and_user_data_18e92636: "Visa nya analyser för kursen och användardata"
+  show_new_analytics_for_course_and_user_data_data_m_89526eb: "Visa New Analytics för kurs- och användardata. Det kan ta upp till 24 timmar för data att visas i New Analytics när funktionsflaggan ställts in på PÅ."
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Visa New Quizzes på sidan Quiz"
   show_notes_column_22d2b6c1: "Visa anteckningskolumnen"
   show_one_question_at_a_time_271e346d: "Visa en fråga i taget"
@@ -22002,6 +22017,7 @@ sv:
   there_was_a_problem_posting_the_comment_75d15646: "Det uppstod ett problem vid publicering av kommentaren"
   there_was_a_problem_publishing_grades_b0b9202f: "Det gick inte att publicera omdömet."
   there_was_a_problem_releasing_grades_fa0ae6: "Det gick inte att publicera omdömen."
+  there_was_a_problem_resetting_your_quiz_engine_cho_ba4277c7: "Det gick inte att återställa ditt val av quizmotor"
   there_was_a_problem_saving_the_comment_d94cbac9: "Det gick inte att spara kommentaren"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Det gick inte att spara bedömningen."
   there_was_a_problem_saving_the_grades_5e61f9e2: "Det gick inte att spara bedömningarna."
@@ -22919,6 +22935,9 @@ sv:
   undated_15c2e5fe: Odaterade
   undated_items_toggle_list_visibility_6219e641: "Synlighet för odaterade objekts växlingslista"
   undelivered_message_459916a9: "Olevererat meddelande"
+  under_some_conditions_the_legacy_rce_fails_to_init_66d515ab: |-
+      I vissa fall kan inte äldre RCE initiera eftersom tinymce inte lagt till
+      redigeringsinstansen till dess interna lista när RCE kräver den.
   underline_all_links_description: |-
       Understrukna länkar visar hyperlänkar i navigeringsmenyer, översikt och sidofält som
       *understruken text*. Detta funktionsalternativ gäller inte användargenererade innehållslänkar i
@@ -24059,6 +24078,7 @@ sv:
   you_are_currently_acting_as_user_name_8d2be0ee: "Du agerar för närvarande som %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Du är för tillfället inloggad i Studentens vy"
   you_are_currently_masquerading_as_user_name_f4a00ade: "Du maskerar dig just nu som %{user_name}"
+  you_are_currently_receiving_notifications_for_this_4f542bb2: "Du tar för närvarande emot aviseringar för den här %{contextType}. För att inaktivera %{contextType}-aviseringar, använd reglaget ovan."
   you_are_currently_receiving_notifications_for_this_9646b09d: "Du får för närvarande aviseringar för den här kursen. Använd reglaget ovan om du vill inaktivera kursaviseringar."
   you_are_here_54075d8c: "Du är här:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Du är inloggad på %{institution1} och använder dina inloggningsuppgifter från %{institution2}"
@@ -24252,6 +24272,7 @@ sv:
       Läs, Skriv och tillgång till direktmeddelanden
       Efter att du skapat din applikation skriver du ner Konsumentnyckeln och Konsument hemligheten, och anger dem här.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Du kommer inte att kunna förhandsgranska dina ändringar"
+  you_will_not_receive_any_contexttype_notifications_da7a58f1: "Du kommer inte att få några %{contextType}-aviseringar för närvarande. För att aktivera %{contextType}-aviseringar, använd reglaget ovan."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Du kommer inte att få kursaviseringar. Använd reglaget ovan om du vill aktivera kursaviseringar."
   your_answer_8dad6ea4: "Ditt svar:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din uppgiftslista kan nu hittas på *Kalender* sidan."
@@ -24281,6 +24302,7 @@ sv:
   your_outcomes_were_successfully_imported_c5de884: "Dina resultat importerades."
   your_password_has_been_changed_df0e72aa: "Ditt lösenord har ändrats."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Din profilbild kunde inte uppdateras. Du kan ha överskridit din uppladdningsgräns."
+  your_quiz_engine_choice_has_been_reset_68d268c1: "Ditt val av quizmotor har återställts!"
   your_score_a1fc2fcf: "Ditt resultat"
   your_score_score_fb785381: "Ditt resultat: %{score}"
   your_search_encountered_the_following_errors_fc3e5e7f: 
