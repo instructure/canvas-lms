@@ -31,6 +31,11 @@ describe Account::HelpLinks do
       links = [{ text: -> { 'abc' }}]
       expect(subject.instantiate_links(links)).to eq [{ text: 'abc' }]
     end
+
+    it 'reorders featured links to the front' do
+      links = [{ id: 'a', is_featured: false }, { id: 'b', is_featured: false }, { id: 'c', is_featured: true }, { id: 'd', is_featured: false }]
+      expect(subject.instantiate_links(links).pluck(:id)).to eq ['c', 'a', 'b', 'd']
+    end
   end
 
   describe '.map_default_links' do
