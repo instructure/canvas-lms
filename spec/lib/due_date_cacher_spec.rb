@@ -29,6 +29,13 @@ describe DueDateCacher do
       @instance = double('instance', :recompute => nil)
     end
 
+    it "doesn't call self.recompute_course if the assignment passed in hasn't been persisted" do
+      expect(DueDateCacher).not_to receive(:recompute_course)
+
+      assignment = Assignment.new(course: @course, workflow_state: :published)
+      DueDateCacher.recompute(assignment)
+    end
+
     it "wraps assignment in an array" do
       expect(DueDateCacher).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: false)).
         and_return(@instance)
