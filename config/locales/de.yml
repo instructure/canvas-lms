@@ -1701,6 +1701,7 @@ de:
   add_a_comment_872470ac: "Einen Kommentar hinzufügen"
   add_a_course_b72b18d7: "Einen Kurs hinzufügen"
   add_a_custom_help_link_4328252f: "Einen angepassten Hilfe-Link hinzufügen"
+  add_a_message_4fee743f: "Eine Nachricht hinzufügen "
   add_a_message_a5ed12bf: "Eine Nachricht hinzufügen"
   add_a_new_announcement_878b717f: "Neue Ankündigung hinzufügen"
   add_a_new_course_4a041207: "Neuen Kurs hinzufügen"
@@ -5230,6 +5231,7 @@ de:
         join: "Jetzt beitreten"
     type_disabled_error: "Dieser Konferenztyp ist für diese Canvas-Website nicht länger verfügbar."
   conferences_a0a8984b: Konferenzen
+  conferences_are_powered_by_bigbluebutton_a_free_se_a5b2e27e: "Konferenzen werden von BigBlueButton unterstützt, einem kostenlosen Service für Canvas-Benutzer. Ein extremer Anstieg der Auslastung kann zu Performanceproblemen führen. Für den Fall, dass BigBlueButton nicht in der Lage ist, aktuelle oder zukünftige Anforderungen zu erfüllen, unterhält Canvas auch eine Partnerschaft mit Zoom, Hangouts, Teams und anderen Videokonferenz-Tools, die einen kostenlosen oder ermäßigten Service anbieten."
   conferences_tutorial_tray_6f071ce2: Konferenzen-Übungsfach
   confetti_for_on_time_submissions_394e16ce: "Konfetti für pünktliche Abgaben"
   config_url_e96ceaf3: "URL konfigurieren"
@@ -5932,6 +5934,7 @@ de:
     one: "%{contextName} und %{count} andere"
     other: "%{contextName} und %{count} andere"
   contextscount_more_66b2f99b: "+ %{contextsCount} mehr"
+  contexttype_notification_settings_d72acd58: "%{contextType}-Benachrichtigungseinstellungen"
   continue_ac067716: Fortfahren
   continue_typing_to_find_additional_sections_or_stu_49786085: "Bitte mit der Eingabe fortfahren, um zusätzliche Bereiche oder Studenten zu finden."
   contributed_to_this_module_item_and_is_complete_2799d5c: "Hat an diesem Modulelement mitgewirkt und ist abgeschlossen"
@@ -6550,6 +6553,7 @@ de:
   course_notification_settings_d9821d36: Kursbenachrichtigungseinstellungen
   course_notification_settings_error_page_c0512c17: "Fehlerseite der Kursbenachrichtigungseinstellungen"
   course_notification_settings_initial_query_error_6dfb24ef: "Anfänglicher Abfragefehler bei Kursbenachrichtigungseinstellungen"
+  course_notification_settings_updated_f6726d7e: "Kursbenachrichtigungseinstellungen aktualisiert"
   course_option_links_a79d263d: Kursoptions-Links
   course_outcomes_7dc1cbc7: Kursergebnisse
   course_pages_449f1dd4: Kursseiten
@@ -8478,6 +8482,8 @@ de:
   edit_assignment_name_mastery_paths_40b50541: "Leistungsziel-Pfade der Aufgabe %{name} ändern"
   edit_bank_92eb8e14: "Ändern %{bank}"
   edit_c5fbea07: Ändern
+  edit_closed_captions_e5fdeb79: "Untertitel ändern"
+  edit_closed_captions_subtitles_to_videos_from_the__288ae432: "Untertitel für Videos aus dem Video-Optionsfach im RCE bearbeiten"
   edit_collaboration_b014c18b: "Zusammenarbeit ändern"
   edit_comment_comment_e74afa04: "Kommentar bearbeiten: %{comment}"
   edit_conference_title_6e234815: "„%{conference_title}“ ändern"
@@ -10723,6 +10729,7 @@ de:
       grading_scheme_info: "Benotungssystem anzeigen/bearbeiten"
   grading_standards_b73bfa72: Benotungsstandards
   grading_type_type_7d8b42d7: "Benotungsart: %{type}"
+  granular_contexttype_notification_settings_will_be_c5dfc901: "In Zukunft wird es hier möglich sein, granulare %{contextType}-Benachrichtigungseinstellungen zu konfigurieren."
   granular_course_notification_settings_will_be_conf_68f122db: "In Zukunft werden hier granulare Kursbenachrichtigungseinstellungen konfigurierbar sein."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Granulare Berechtigungen für die Verwaltung von Wiki-Seiten"
   graph_bar_b5daa23d: Diagrammbalken
@@ -11355,6 +11362,7 @@ de:
   highest_28ad71e6: Höchste/r/s
   highest_score_e080551e: "Höchste Punktzahl"
   hindi_9bcd4b34: Hindi
+  history_settings_c63dbaaf: Verlaufseinstellungen
   home_351838cd: Start
   home_page_is_not_valid_2e8a25ae: "Startseite ist nicht gültig"
   home_tutorial_tray_66826983: "Home Übungsfach"
@@ -11624,10 +11632,12 @@ de:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Punktzahl anhängen, wenn eine Notenbenachrichtigung erfolgt.
       Falls es sich bei Ihrer E-Mail nicht um eine Institutions-E-Mail-Adresse handelt, bedeutet dies, dass vertrauliche Daten und Inhalte die Institution verlassen.
+  include_speedgrader_in_assignment_header_menu_69cd8656: "SpeedGrader in Aufgaben-Header-Menü aufnehmen"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Die Noten für diese Aufgabe bei der Veröffentlichung im Studenten-Informationssystem Ihrer Schule mit einbeziehen"
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Diese Aufgabenbenotungen bei der Synchronisierung mit dem Studenteninformationssystem Ihres Instituts mit einbeziehen"
   include_unpublished_assignments_83ebbaec: "Nicht veröffentlichte Aufgaben einbeziehen"
   include_unpublished_courses_7a0e7aab: "Nicht veröffentlichte Kurse mit einbeziehen"
+  includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Nimmt einen Link auf SpeedGrader in das Aufgaben-Header-Menü im Notenbuch auf."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Fügt Notenwerte in Admin-Bewertungsberichte ein."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Bezieht Bewertungsschemata in die Kursnavigation auf der Seitenleiste ein"
   incomplete_95612d72: unvollständig
@@ -14835,6 +14845,7 @@ de:
   more_courses_5ebbe998: "Weitere Kurse"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Was noch wichtiger ist: Mit Canvas können Sie Ergebnisse zu Ihren Bewertungsschemata hinzufügen, sodass Sie Ihr Leistungsziel einschätzen können während Sie Aufgaben lösen. Sobald Sie Ergebnisse erreicht haben, klicken Sie auf „Bewertungsschemata verwalten“, um ihre Ergebnisse in die Benotung einfließen zu lassen."
   more_info_at_course_name_56dc8c10: "Weitere Informationen unter %{course_name}"
+  more_info_at_url_41b4764b: "Mehr Infos unter %{url}"
   more_info_at_web_address_dba7e187: "Weitere Informationen unter %{web_address}"
   more_information_3dfb76b5: "Weitere Information"
   more_information_about_ratings_57cdd446: "Weitere Informationen über Bewertungen"
@@ -15059,6 +15070,7 @@ de:
   new_analytics_api_access_7eec1ead: "Neuer Analytics API-Zugang"
   new_annotations_66932016: "Neue Anmerkungen"
   new_announcement_23af4598: "Neue Ankündigung"
+  new_announcement_in_course_name_title_84607f44: "Neue Ankündigung in %{course_name}: %{title}"
   new_announcement_title_30ba7c1b: "Neue Ankündigung: %{title}"
   new_announcement_title_course_da7c0ca6: "Neue Ankündigung %{title}, %{course}"
   new_anonymous_comment_by_student_author_id_for_ass_6e579da4: "Neuer anonymer Kommentar von Student (%{author_id}) zur Aufgabe %{assignment_title}, Student (%{user_id}), %{course_name}."
@@ -15393,7 +15405,6 @@ de:
         Enthält: 
         
         * Note für Aufgabe/Abgabe eingegeben/geändert
-        * Note der lautgeschalteten Aufgabe
         * Notengewichtung geändert
     grading_display: Benotung
     grading_notify_include_grade: "Bei Benachrichtigungen über Notenänderungen Punktzahlen einfügen"
@@ -16709,7 +16720,7 @@ de:
   points_possible_1c0b3445: "Mögliche Punkte"
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
-  points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Für den ausgewählten Benotungstyp muss der Wert für die möglichen Punkte 0 oder höher sein"
+  points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Für den ausgewählten Benotungstyp muss der Wert für die möglichen Punkte 0 oder höher sein"
   points_possible_must_be_greater_than_0_for_selecte_5708da1b: "Für die ausgewählte Benotungsart müssen die möglichen Punkte größer als 0 sein."
   points_possible_points_fda3b111: "%{points_possible} Punkte"
   points_pts_e5596bf7: "%{points} Pkte."
@@ -18809,6 +18820,7 @@ de:
   ratio_responded_correctly_6d890107: "%{ratio}% haben richtig geantwortet"
   rce_auto_save_f004fba9: "Automatisches Speichern in RCE"
   rce_enhancements_5701e06: RCE-Erweiterungen
+  rce_initialization_fix_4f176bda: RCE-Initialisierungskorrektur
   re_activate_user_f7d77c9a: "Benutzer reaktivieren"
   re_reported_b9671073: "Erneut berichtet"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Senden Sie eine Benachrichtigung erneut direkt an die Benutzer, wenn die Ankündigung beginnt"
@@ -18990,6 +19002,7 @@ de:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Aktiviert vom Leistungsziel-Pfad: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Aktiviert vom Leistungsziel-Pfad: %{path}"
   releasing_grades_31a57dde: "Noten veröffentlichen"
+  remember_my_choice_for_this_course_5a3b7206: "Meine Wahl für diesen Kurs merken"
   remind_me_next_time_6402eb7d: "Nächstes Mal erinnern"
   reminder_ffd21289: Erinnerung
   remove_account_from_this_profile_c3095eb2: "Konto aus diesem Profil entfernen"
@@ -19095,6 +19108,7 @@ de:
   reserved_f247b60b: Reserviert
   reset_95a81614: Zurücksetzen
   reset_multi_factor_authentication_2b63a558: "Mehrstufige Authentifizierung zurücksetzen"
+  reset_quiz_engine_choice_323a40e6: "Quizsystemwahl zurücksetzen"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Die Bounce-Zählung dieser Kontaktmethode zurücksetzen"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Die Bounce-Zählung dieser E-Mail-Adresse zurücksetzen"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "Der Ressourcen-URL muss mit der Domäne des Ressourcen-Handlers übereinstimmen"
@@ -20739,6 +20753,7 @@ de:
   show_name_of_observed_students_in_notifications_a56dd9e4: "Den Namen der beobachteten Studenten in Benachrichtigungen anzeigen."
   show_navigation_menu_34e7f441: "Navigationsmenü einblenden"
   show_new_analytics_for_course_and_user_data_18e92636: "Neue Analysen für Kurs- und Benutzerdaten anzeigen"
+  show_new_analytics_for_course_and_user_data_data_m_89526eb: "Neue Analysen für Kurs- und Benutzerdaten zeigen. Es kann bis zu 24 Stunden dauern, dass die Daten in New Analytics sichtbar werden, nachdem dieses Funktions-Flag auf AN eingestellt wurde."
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Neue Quizzes auf der Quiz-Seite anzeigen"
   show_notes_column_22d2b6c1: "Anmerkungsspalte anzeigen"
   show_one_question_at_a_time_271e346d: "Fragen einzeln anzeigen"
@@ -21892,6 +21907,7 @@ de:
   there_was_a_problem_posting_the_comment_75d15646: "Problem beim Posten des Kommentars"
   there_was_a_problem_publishing_grades_b0b9202f: "Es gab ein Problem beim Veröffentlichen von Noten."
   there_was_a_problem_releasing_grades_fa0ae6: "Beim Veröffentlichen der Noten gab es ein Problem."
+  there_was_a_problem_resetting_your_quiz_engine_cho_ba4277c7: "Beim Zurücksetzen Ihrer Quizsystemwahl gab es ein Problem."
   there_was_a_problem_saving_the_comment_d94cbac9: "Problem beim Speichern des Kommentars"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Beim Speichern der Note ist ein Problem aufgetreten."
   there_was_a_problem_saving_the_grades_5e61f9e2: "Beim Speichern der Noten ist ein Problem aufgetreten."
@@ -22809,6 +22825,9 @@ de:
   undated_15c2e5fe: Undatiert
   undated_items_toggle_list_visibility_6219e641: "Sichtbarkeit der Liste undatierter Elemente ein-/ausschalten"
   undelivered_message_459916a9: "Nicht zugestellte Nachricht"
+  under_some_conditions_the_legacy_rce_fails_to_init_66d515ab: |-
+      Unter bestimmten Bedingungen, wird das alte RCE nicht initialisiert, da TinyMCE nicht die
+      Editorinstanz zu seiner internen Liste hinzugefügt hat, obwohl das RCE sie benötigt.
   underline_all_links_description: |-
       Unterstrichene Links zeigen Hyperlinks in den Navigationsmenüs, auf dem Dashboard und den Seitenleisten als
       *unterstrichenen Text*. Diese Option gilt nicht für im
@@ -23942,6 +23961,7 @@ de:
   you_are_currently_acting_as_user_name_8d2be0ee: "Sie sind maskiert als %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Momentan sind Sie in der Studentenansicht angemeldet."
   you_are_currently_masquerading_as_user_name_f4a00ade: "Sie sind derzeit als %{user_name} maskiert"
+  you_are_currently_receiving_notifications_for_this_4f542bb2: "Sie erhalten momentan Benachrichtigungen für diesen %{contextType}. Nutzen Sie den obigen Schalter, um %{contextType}-Benachrichtigungen zu deaktivieren."
   you_are_currently_receiving_notifications_for_this_9646b09d: "Sie erhalten momentan Benachrichtigungen über diesen Kurs. Um die Kursbenachrichtigungen zu deaktivieren, nutzen Sie den obigen Schalter."
   you_are_here_54075d8c: "Sie sind hier:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Sie sind bei %{institution1} mit Ihren Zugangsdaten von %{institution2} angemeldet."
@@ -24135,6 +24155,7 @@ de:
       Lesen, Schreiben und direkter Zugriff.
       Wenn Sie Ihre Anwendung erzeugt haben, notieren Sie sich Consumer Key und Consumer-Secret, und geben Sie beide hier ein.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Sie können Ihre Änderungen nicht in der Vorschau sehen."
+  you_will_not_receive_any_contexttype_notifications_da7a58f1: "Sie erhalten diesmal keine %{contextType}-Benachrichtigungen. Um %{contextType}-Benachrichtigungen zu aktivieren , nutzen Sie den obigen Schalter."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Sie erhalten zu diesem Zeitpunkt keine Kursbenachrichtigungen. Um Kursbenachrichtigungen zu aktivieren , nutzen Sie den obigen Schalter."
   your_answer_8dad6ea4: "Ihre Antwort:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Sie finden die Liste mit Ihren Aufgaben jetzt auf der Seite *Kalender*."
@@ -24164,6 +24185,7 @@ de:
   your_outcomes_were_successfully_imported_c5de884: "Ihre Ergebnisse wurden erfolgreich importiert."
   your_password_has_been_changed_df0e72aa: "Ihr Kennwort wurde geändert."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Ihr Profilfoto konnte nicht hochgeladen werden. Möglicherweise haben Sie Ihr Upload-Limit überschritten."
+  your_quiz_engine_choice_has_been_reset_68d268c1: "Die Wahl Ihres Quizsystems wurde zurückgesetzt!"
   your_score_a1fc2fcf: "Ihr Ergebnis"
   your_score_score_fb785381: "Ihre Punktzahl: %{score}"
   your_search_encountered_the_following_errors_fc3e5e7f: 
