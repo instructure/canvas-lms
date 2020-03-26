@@ -1,6 +1,7 @@
 {
   "address_3159962f": { "message": "Cím:" },
   "all_day_fb42c4fc": { "message": "Egész nap" },
+  "all_items_loaded_aa256183": { "message": "Minden elem betöltve" },
   "announcement_fb4cb645": { "message": "Hirdetmény" },
   "assignment_976578a8": { "message": "Feladat" },
   "calendar_a8563bb2": { "message": "Naptár" },
@@ -11,13 +12,18 @@
   },
   "course_8a63b4a3": { "message": "Kurzus" },
   "date_ee500367": { "message": "Dátum" },
+  "date_is_required_8660ec22": { "message": "Dátum szükséges" },
   "delete_a6efa79d": { "message": "Törlés" },
   "details_98a31b68": { "message": "Részletek" },
   "details_a6f427c3": { "message": "Részletek:" },
   "discussion_6719c51d": { "message": "Fórum" },
   "due_5d7267be": { "message": "Határidő: " },
   "edit_c5fbea07": { "message": "Szerkesztés" },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Nem sikerült több elemet betölteni"
+  },
   "excused_cf8792eb": { "message": "Felmentve" },
+  "feedback_6dcc1991": { "message": "Visszajelzés" },
   "graded_25cd3fcd": { "message": "Értékelve" },
   "late_2be42b88": { "message": "Késve" },
   "load_more_a36f9cf9": { "message": "Továbbiak betöltése" },
@@ -28,18 +34,27 @@
   "new_13daf639": { "message": "Új" },
   "next_month_749b1778": { "message": "Következő hónap" },
   "nothing_for_now_e3e3ce2a": { "message": "Egyelőre semmi" },
+  "optional_add_course_ef0d70fc": {
+    "message": "Opcionális: kurzus hozzáadása"
+  },
   "page_50c4823d": { "message": "Oldal" },
   "peer_review_74f26a13": { "message": "Társértékelés" },
   "points_bceb5005": { "message": "pontszám" },
   "previous_month_bb1e3c84": { "message": "Előző hónap" },
   "pts_699bd9aa": { "message": "pont" },
   "quiz_e0dcce8f": { "message": "Kvíz" },
+  "replies_4a8577c8": { "message": "Válaszok" },
   "save_11a80ec3": { "message": "Mentés" },
   "submitted_318fad53": { "message": "Beadva" },
+  "task_16b0ef38": { "message": "Feladat" },
   "time_2b5aac58": { "message": "Idő" },
   "title_ee03d132": { "message": "Cím" },
+  "title_is_required_6ddcab69": { "message": "cím szükséges" },
   "to_do_1d554f36": { "message": "Teendők" },
   "today_76e10f9c": { "message": "Ma" },
   "tomorrow_9a6c9a00": { "message": "Holnap" },
-  "yesterday_c6bd6abf": { "message": "Tegnap" }
+  "yesterday_c6bd6abf": { "message": "Tegnap" },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Meg kell adni a dátumot és az időt"
+  }
 }

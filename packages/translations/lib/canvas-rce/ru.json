@@ -1,6 +1,7 @@
 {
   "accessibility_checker_b3af1f6c": { "message": "Контроллер доступности" },
   "add_8523c19b": { "message": "Добавить" },
+  "add_another_f4e50d57": { "message": "Добавить другой" },
   "add_cc_subtitles_55f0394e": { "message": "Добавить копию/подзаголовки" },
   "align_11050992": { "message": "Согласовать" },
   "align_center_ca078feb": { "message": "Выровнять по центру" },
@@ -133,6 +134,7 @@
   "embed_preview_2d741e1f": { "message": "Встроить предварительный просмотр" },
   "embed_video_a97a64af": { "message": "Вставить видео" },
   "embed_video_code_703e10f2": { "message": "Вставить код видео" },
+  "embedded_content_aaeb4d3d": { "message": "интегрированный контент" },
   "equation_1c5ac93c": { "message": "Формула" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Ошибка при загрузке видео-/аудиозаписи"
@@ -230,6 +232,7 @@
     "message": "Нет альтернативного текста (декоративное изображение)"
   },
   "no_e16d9132": { "message": "Нет" },
+  "no_file_chosen_9a880793": { "message": "Не выбран ни один файл" },
   "no_results_940393cf": { "message": "Нет результатов." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Не найдены результаты для { filterTerm }"
@@ -310,6 +313,9 @@
   "submit_a3cc6859": { "message": "Отправить" },
   "subscript_59744f96": { "message": "Надпись снизу" },
   "superscript_8cb349a2": { "message": "Надпись сверху" },
+  "supported_file_types_srt_or_webvtt_7d827ed": {
+    "message": "Поддерживаемые типы файлов: SRT или WebVTT"
+  },
   "switch_to_raw_html_editor_4c9ac7de": {
     "message": "Перейти в редактор raw html"
   },

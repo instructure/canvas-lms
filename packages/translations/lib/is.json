@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "Bæta við"
     },
+    "add_another_f4e50d57": {
+        "message": "Bæta við öðrum"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "Bæta við skjátexta"
     },
@@ -380,6 +383,9 @@
     "embed_video_code_703e10f2": {
         "message": "Fella inn myndbandskóða"
     },
+    "embedded_content_aaeb4d3d": {
+        "message": "innfellt efni"
+    },
     "equation_1c5ac93c": {
         "message": "Jafna"
     },
@@ -677,6 +683,9 @@
     "no_e16d9132": {
         "message": "Nei"
     },
+    "no_file_chosen_9a880793": {
+        "message": "Engin skrá valin"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Engin einkunn"
     },
@@ -937,6 +946,9 @@
     },
     "superscript_8cb349a2": {
         "message": "Yfirskrift"
+    },
+    "supported_file_types_srt_or_webvtt_7d827ed": {
+        "message": "Studdar skráagerðir: SRT eða WebVTT"
     },
     "switch_to_raw_html_editor_4c9ac7de": {
         "message": "Skipta yfir í hráan html ritil"

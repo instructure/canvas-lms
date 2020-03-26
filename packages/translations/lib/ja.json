@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "追加"
     },
+    "add_another_f4e50d57": {
+        "message": "もう 1 つ追加"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "CC /字幕を追加"
     },
@@ -380,6 +383,9 @@
     "embed_video_code_703e10f2": {
         "message": "ビデオコードの埋め込み"
     },
+    "embedded_content_aaeb4d3d": {
+        "message": "埋め込まれたコンテンツ"
+    },
     "equation_1c5ac93c": {
         "message": "方程式"
     },
@@ -677,6 +683,9 @@
     "no_e16d9132": {
         "message": "いいえ"
     },
+    "no_file_chosen_9a880793": {
+        "message": "ファイルが選択されていません"
+    },
     "no_grade_3b4d7f3e": {
         "message": "成績なし"
     },
@@ -937,6 +946,9 @@
     },
     "superscript_8cb349a2": {
         "message": "上付き"
+    },
+    "supported_file_types_srt_or_webvtt_7d827ed": {
+        "message": "サポートされるファイルタイプ：SRT または WebVTT"
     },
     "switch_to_raw_html_editor_4c9ac7de": {
         "message": "ロー html エディタに切り替える"

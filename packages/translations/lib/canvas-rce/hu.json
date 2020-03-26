@@ -32,10 +32,14 @@
   "discussions_a5f96392": { "message": "Fórumok" },
   "discussions_index_6c36ced": { "message": "Fórumok indexe" },
   "done_54e3d4b6": { "message": "Kész" },
+  "drag_a_file_here_39357b48": { "message": "Húzz egy file-t ide" },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Határidő: Több határidő van érvényben"
   },
   "embed_image_1080badc": { "message": "Beágyazott kép" },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "Hiba történt a video/audio feltöltés közben."
+  },
   "files_c300e900": { "message": "Fájlok" },
   "files_index_af7c662b": { "message": "Fájlok indexe" },
   "generating_preview_45b53be0": { "message": "Előnézet generálása... " },
@@ -81,6 +85,7 @@
   "rich_content_editor_2708ef21": { "message": "Vizuális szövegszerkesztő" },
   "save_11a80ec3": { "message": "Mentés" },
   "search_280d00bd": { "message": "Keresés" },
+  "select_language_7c93a900": { "message": "Válassz nyelvet" },
   "selected_274ce24f": { "message": "Kiválasztva" },
   "size_b30e1077": { "message": "Méret" },
   "start_over_f7552aa9": { "message": "Újrakezdés" },

@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "添加"
     },
+    "add_another_f4e50d57": {
+        "message": "添加其他"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "添加副本/字幕"
     },
@@ -380,6 +383,9 @@
     "embed_video_code_703e10f2": {
         "message": "嵌入影片代碼"
     },
+    "embedded_content_aaeb4d3d": {
+        "message": "嵌入內容"
+    },
     "equation_1c5ac93c": {
         "message": "方程式"
     },
@@ -677,6 +683,9 @@
     "no_e16d9132": {
         "message": "否"
     },
+    "no_file_chosen_9a880793": {
+        "message": "未選擇檔案"
+    },
     "no_grade_3b4d7f3e": {
         "message": "無評分"
     },
@@ -937,6 +946,9 @@
     },
     "superscript_8cb349a2": {
         "message": "上標"
+    },
+    "supported_file_types_srt_or_webvtt_7d827ed": {
+        "message": "支援的檔案類型：SRT 或 WebVTT"
     },
     "switch_to_raw_html_editor_4c9ac7de": {
         "message": "切換到原始 html 編輯器"

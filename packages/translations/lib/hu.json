@@ -11,6 +11,9 @@
     "all_day_fb42c4fc": {
         "message": "Egész nap"
     },
+    "all_items_loaded_aa256183": {
+        "message": "Minden elem betöltve"
+    },
     "announcement_fb4cb645": {
         "message": "Hirdetmény"
     },
@@ -80,6 +83,9 @@
     "date_ee500367": {
         "message": "Dátum"
     },
+    "date_is_required_8660ec22": {
+        "message": "Dátum szükséges"
+    },
     "decrease_indent_de6343ab": {
         "message": "Behúzás csökkentése"
     },
@@ -107,6 +113,9 @@
     "done_54e3d4b6": {
         "message": "Kész"
     },
+    "drag_a_file_here_39357b48": {
+        "message": "Húzz egy file-t ide"
+    },
     "due_5d7267be": {
         "message": "Határidő: "
     },
@@ -119,8 +128,17 @@
     "embed_image_1080badc": {
         "message": "Beágyazott kép"
     },
+    "error_loading_more_items_3f109d9f": {
+        "message": "Nem sikerült több elemet betölteni"
+    },
+    "error_uploading_video_audio_recording_16d9730a": {
+        "message": "Hiba történt a video/audio feltöltés közben."
+    },
     "excused_cf8792eb": {
         "message": "Felmentve"
+    },
+    "feedback_6dcc1991": {
+        "message": "Visszajelzés"
     },
     "files_c300e900": {
         "message": "Fájlok"
@@ -230,6 +248,9 @@
     "nothing_for_now_e3e3ce2a": {
         "message": "Egyelőre semmi"
     },
+    "optional_add_course_ef0d70fc": {
+        "message": "Opcionális: kurzus hozzáadása"
+    },
     "options_3ab0ea65": {
         "message": "Beállítások"
     },
@@ -275,6 +296,9 @@
     "recording_98da6bda": {
         "message": "Felvétel"
     },
+    "replies_4a8577c8": {
+        "message": "Válaszok"
+    },
     "rich_content_editor_2708ef21": {
         "message": "Vizuális szövegszerkesztő"
     },
@@ -283,6 +307,9 @@
     },
     "search_280d00bd": {
         "message": "Keresés"
+    },
+    "select_language_7c93a900": {
+        "message": "Válassz nyelvet"
     },
     "selected_274ce24f": {
         "message": "Kiválasztva"
@@ -302,11 +329,17 @@
     "syllabus_f191f65b": {
         "message": "Tematika"
     },
+    "task_16b0ef38": {
+        "message": "Feladat"
+    },
     "time_2b5aac58": {
         "message": "Idő"
     },
     "title_ee03d132": {
         "message": "Cím"
+    },
+    "title_is_required_6ddcab69": {
+        "message": "cím szükséges"
     },
     "to_do_1d554f36": {
         "message": "Teendők"
@@ -337,5 +370,8 @@
     },
     "yesterday_c6bd6abf": {
         "message": "Tegnap"
+    },
+    "you_must_provide_a_date_and_time_a86839d2": {
+        "message": "Meg kell adni a dátumot és az időt"
     }
 }
