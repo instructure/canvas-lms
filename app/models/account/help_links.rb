@@ -65,7 +65,7 @@ class Account::HelpLinks
   end
 
   def instantiate_links(links)
-    links.map do |link|
+    instantiated = links.map do |link|
       link = link.dup
       link[:text] = link[:text].call if link[:text].respond_to?(:call)
       link[:subtext] = link[:subtext].call if link[:subtext].respond_to?(:call)
@@ -73,6 +73,8 @@ class Account::HelpLinks
       link = link.except(:is_featured, :is_new, :feature_headline) unless Account.site_admin.feature_enabled?(:featured_help_links)
       link
     end
+    featured, not_featured = instantiated.partition {|link| link[:is_featured]}
+    featured + not_featured
   end
 
   # take an array of links, and infer default values for links that aren't customized
