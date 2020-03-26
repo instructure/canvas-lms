@@ -164,6 +164,18 @@ body:not(.course-menu-expanded) {
     justify-content: flex-end;
     a { margin-#{direction(right)}: 0; margin-#{direction(left)}: $ic-sp; }
   }
+
+  body.responsive_2020_03 & {
+    a {
+      @include mobile-only {
+        display: inline-block;
+        width: 100%;
+      }
+    }
+    @include mobile-only {
+      display: block;
+    }
+  }
 }
 
 .ic-app {
