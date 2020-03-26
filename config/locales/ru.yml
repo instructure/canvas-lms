@@ -1755,6 +1755,7 @@ ru:
   add_a_comment_872470ac: "Добавление комментария"
   add_a_course_b72b18d7: "Добавить курс"
   add_a_custom_help_link_4328252f: "Добавить пользовательскую ссылку помощи "
+  add_a_message_4fee743f: "Добавить сообщение "
   add_a_message_a5ed12bf: "Добавить сообщение"
   add_a_new_announcement_878b717f: "Добавить новое объявление"
   add_a_new_course_4a041207: "Добавить новый курс"
@@ -5334,6 +5335,7 @@ ru:
         join: "Присоединиться сейчас"
     type_disabled_error: "Этот тип конференции больше не включен для этого сайта Canvas"
   conferences_a0a8984b: Конференции
+  conferences_are_powered_by_bigbluebutton_a_free_se_a5b2e27e: "Конференции работают на основе бесплатного для пользователей Canvas сервиса BigBlueButton. Пиковые повышения нагрузки могут привести к проблемам производительности. На случай, если BigBlueButton не будет соответствовать текущим или будущим потребностям, Canvas также сотрудничает с такими сервисами, предоставляющими услуги видеоконференц-связи, как Zoom, Hangouts, Teams и другие, предлагающие бесплатные услуги или услуги со скидками."
   conferences_tutorial_tray_6f071ce2: "Лоток справки по конференциям"
   confetti_for_on_time_submissions_394e16ce: "Похвала за своевременную отправку"
   config_url_e96ceaf3: "Настройка URL-адреса"
@@ -6040,6 +6042,7 @@ ru:
     one: "%{contextName} и %{count} другой"
     other: "%{contextName} и %{count} другие"
   contextscount_more_66b2f99b: "+ %{contextsCount} дополнительно"
+  contexttype_notification_settings_d72acd58: "%{contextType} Настройки уведомлений"
   continue_ac067716: Продолжить
   continue_typing_to_find_additional_sections_or_stu_49786085: "Продолжить ввод, чтобы найти дополнительные разделы или студентов."
   contributed_to_this_module_item_and_is_complete_2799d5c: "Этот модуль элемента добавлен и является полным"
@@ -6735,6 +6738,7 @@ ru:
   course_notification_settings_d9821d36: "Настройки уведомлений по курсу"
   course_notification_settings_error_page_c0512c17: "Страница ошибок настроек уведомлений по курсу"
   course_notification_settings_initial_query_error_6dfb24ef: "Ошибка начального запроса настроек уведомлений по курсу"
+  course_notification_settings_updated_f6726d7e: "Настройки уведомлений о курсах обновлены"
   course_option_links_a79d263d: "Ссылки на опции курса"
   course_outcomes_7dc1cbc7: "Результаты курса"
   course_pages_449f1dd4: "Страницы курса"
@@ -8720,6 +8724,8 @@ ru:
   edit_assignment_name_mastery_paths_40b50541: "Редактировать пути усваивания %{name} задания"
   edit_bank_92eb8e14: "Редактировать %{bank}"
   edit_c5fbea07: Редактировать
+  edit_closed_captions_e5fdeb79: "Редактировать скрытые субтитры"
+  edit_closed_captions_subtitles_to_videos_from_the__288ae432: "Редактировать скрытые субтитры к видео из лотка опций видео в RCE"
   edit_collaboration_b014c18b: "Редактировать сотрудничество"
   edit_comment_comment_e74afa04: "Редактировать комментарий: %{comment}"
   edit_conference_title_6e234815: "Редактировать \"%{conference_title}\""
@@ -11025,6 +11031,7 @@ ru:
       grading_scheme_info: "Просмотр/редактирование схемы оценок"
   grading_standards_b73bfa72: "Стандарты оценок"
   grading_type_type_7d8b42d7: "Тип оценки: %{type}"
+  granular_contexttype_notification_settings_will_be_c5dfc901: "Детализированные настройки уведомлений по %{contextType} могут быть сконфигурированы здесь в будущем."
   granular_course_notification_settings_will_be_conf_68f122db: "Детализированные настройки уведомлений по курсу могут быть сконфигурированы здесь в будущем."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Детализированные разрешения для управления страницами Вики"
   graph_bar_b5daa23d: Гистограмма
@@ -11674,6 +11681,7 @@ ru:
   highest_28ad71e6: "Самая высокая"
   highest_score_e080551e: "Наивысшая оценка"
   hindi_9bcd4b34: Хинди
+  history_settings_c63dbaaf: "Настройки истории"
   home_351838cd: "Начальная страница"
   home_page_is_not_valid_2e8a25ae: "Недопустимая домашняя страница"
   home_tutorial_tray_66826983: "Лоток справки по домашней странице"
@@ -11944,10 +11952,12 @@ ru:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Включает баллы, когда оповещает об оценках.
                 Если ваш электронный адрес не является электронным адресом организации, это означает, что требующее особого обращения содержимое будет отправляться за пределы организации.
+  include_speedgrader_in_assignment_header_menu_69cd8656: "Включить SpeedGrader в меню заголовка заданий"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Включить эти оценки за задания при размещении в школьной Системе информации о студенте"
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Включить оценки этого задания при синхронизации в информационную систему обучения вашей школы"
   include_unpublished_assignments_83ebbaec: "Включить Неопубликованные Задания"
   include_unpublished_courses_7a0e7aab: "Включить неопубликованные курсы"
+  includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Включает ссылку в SpeedGrader в меню заголовка заданий в журнале оценок."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Включает значения оценок в административные отчеты об успеваемости."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Включает рубрики в боковую панель навигации по курсам"
   incomplete_95612d72: незавершенный
@@ -15215,6 +15225,7 @@ ru:
   more_courses_5ebbe998: "Другие курсы"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Что еще более важно, Canvas позволяет добавлять результаты в ваши рубрики выставления оценок, чтобы вы могли оценивать усвоение по мере того, как вы оцениваете задания. После того, как вы настроили результаты, нажмите «Управление рубриками», чтобы начать использовать результаты для выставления оценок."
   more_info_at_course_name_56dc8c10: "Дополнительные сведения доступны в %{course_name}"
+  more_info_at_url_41b4764b: "Больше информации на %{url}"
   more_info_at_web_address_dba7e187: "Больше информации на %{web_address}"
   more_information_3dfb76b5: "Дополнительная информация"
   more_information_about_ratings_57cdd446: "Более подробная информация о рейтингах"
@@ -15441,6 +15452,7 @@ ru:
   new_analytics_api_access_7eec1ead: "Доступ к New Analytics API"
   new_annotations_66932016: "Новые Аннотации"
   new_announcement_23af4598: "Новое объявление"
+  new_announcement_in_course_name_title_84607f44: "Новое объявление в %{course_name} %{title}"
   new_announcement_title_30ba7c1b: "Новое объявление: %{title}"
   new_announcement_title_course_da7c0ca6: "Новое объявление %{title}, %{course}"
   new_anonymous_comment_by_student_author_id_for_ass_6e579da4: "Новый анонимный комментарий от учащегося (%{author_id}) для %{assignment_title}, учащийся (%{user_id}), %{course_name}."
@@ -15777,7 +15789,6 @@ ru:
         Включает: 
         
         * Введенная/измененная оценка задания/отправки
-        * Оценка задания с отмененным отключением звука
         * Измененный вес оценки
     grading_display: Аттестация
     grading_notify_include_grade: "Включить оценки при уведомлении об изменении оценок."
@@ -19310,6 +19321,7 @@ ru:
   rce_contents_replace_description: "Включить полную замену текста RCE из LTI"
   rce_contents_replace_display_name: "Замена содержимого RCE"
   rce_enhancements_5701e06: "Усовершенствования RCE"
+  rce_initialization_fix_4f176bda: "RCE Initialization Fix"
   re_activate_user_f7d77c9a: "Реактивировать пользователя"
   re_reported_b9671073: "Повторно включено в отчет"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Повторно отправить уведомление напрямую пользователям в начале объявления"
@@ -19503,6 +19515,7 @@ ru:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Освобождено путем достижения владения: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Освобождено путем достижения владения: %{path}"
   releasing_grades_31a57dde: "Публикация оценок"
+  remember_my_choice_for_this_course_5a3b7206: "Запомнить мой выбор для этого курса"
   remind_me_next_time_6402eb7d: "Напомнить в следующий раз"
   reminder_ffd21289: Напоминание
   remove_account_from_this_profile_c3095eb2: "Удалить учетную запись из этого профиля"
@@ -19609,6 +19622,7 @@ ru:
   reserved_f247b60b: Зарезервировано
   reset_95a81614: Сброс
   reset_multi_factor_authentication_2b63a558: "Сбросить многофакторную аутентификацию"
+  reset_quiz_engine_choice_323a40e6: "Сбросить выбор механизма тестирования"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Сброс количества отказов этого метода контакта"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Сброс количества отказов этого адреса электронной почты"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "url ресурса должен совпадать с доменом оператора ресурса"
@@ -21289,6 +21303,7 @@ ru:
   show_name_of_observed_students_in_notifications_a56dd9e4: "Показывать имена наблюдаемых учащихся в уведомлениях."
   show_navigation_menu_34e7f441: "Показать меню навигации"
   show_new_analytics_for_course_and_user_data_18e92636: "Показать новую аналитику для курса и пользовательских данных"
+  show_new_analytics_for_course_and_user_data_data_m_89526eb: "Показать новую аналитику для курса и пользовательских данных. После установки флажка в окне ВКЛ для этой функции может пройти до 24 часов, прежде чем данные появятся в разделе Новая аналитика."
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Показать новые тестирования на странице «Тестирования»"
   show_notes_column_22d2b6c1: "Показать столбец заметок"
   show_one_question_at_a_time_271e346d: "Показывать по одному вопросу за раз"
@@ -22477,6 +22492,7 @@ ru:
   there_was_a_problem_posting_the_comment_75d15646: "Возникла проблема при размещении комментария"
   there_was_a_problem_publishing_grades_b0b9202f: "Возникла проблема при опубликовании оценок."
   there_was_a_problem_releasing_grades_fa0ae6: "Возникла проблема при публикации оценок."
+  there_was_a_problem_resetting_your_quiz_engine_cho_ba4277c7: "Возникал проблема при сбросе вашего выбора механизма тестирования"
   there_was_a_problem_saving_the_comment_d94cbac9: "Возникла проблема при сохранении комментария"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Возникла проблема при сохранении оценки."
   there_was_a_problem_saving_the_grades_5e61f9e2: "При сохранении оценок произошла ошибка."
@@ -23398,6 +23414,9 @@ ru:
   undated_15c2e5fe: "Без даты"
   undated_items_toggle_list_visibility_6219e641: "Переключить видимость списка недатированных предметов"
   undelivered_message_459916a9: "Недоставленное сообщение"
+  under_some_conditions_the_legacy_rce_fails_to_init_66d515ab: |-
+      В некоторых ситуациях не удается запустить RCE предыдущих версий, потому что TinyMCE не добавил
+      копию редактора в свой внутренний список, когда RCE запрашивает ее.
   underline_all_links_description: |-
       Функция Underline Links (Подчеркивать ссылки) отображает гиперссылки в меню навигации, на информационной панели и на боковых панелях страниц в виде
       *подчеркнутого текста*. Эта функция не применяется к создаваемым пользователем ссылкам на контент в
@@ -24566,6 +24585,7 @@ ru:
   you_are_currently_acting_as_user_name_8d2be0ee: "В настоящее время вы действуете как %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "В настоящее время вы зашли в систему как студент"
   you_are_currently_masquerading_as_user_name_f4a00ade: "В настоящий момент вы подменены как %{user_name}"
+  you_are_currently_receiving_notifications_for_this_4f542bb2: "В настоящее время вы получаете уведомления для этого %{contextType}. Для отключения уведомлений %{contextType} используйте расположенный выше переключатель."
   you_are_currently_receiving_notifications_for_this_9646b09d: "В настоящее время вы получаете уведомления для этого курса. Для отключения уведомлений используйте расположенный выше переключатель."
   you_are_here_54075d8c: "Вы находитесь здесь:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Вы вошли в систему в %{institution1}, используя учетные данные, предоставленные вам %{institution2}"
@@ -24767,6 +24787,7 @@ ru:
       Читать, Писать, и Получать прямой доступ к сообщениям
       После создания приложения, создайте примечание Ключ потребителя и Секретный Вопрос Потребителя, и введите их здесь.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Вы не сможете предварительно просмотреть изменения"
+  you_will_not_receive_any_contexttype_notifications_da7a58f1: "Вы не будете получать никаких уведомлений по %{contextType} в это время. Для включения уведомлений %{contextType} используйте расположенный выше переключатель."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Вы не будете получать никаких уведомлений по курсу в это время. Для включения уведомлений используйте расположенный выше переключатель."
   your_answer_8dad6ea4: "Ваш ответ:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Ваш список заданий теперь можно найти на странице *Календаря*."
@@ -24796,6 +24817,7 @@ ru:
   your_outcomes_were_successfully_imported_c5de884: "Ваши результаты были успешно импортированы."
   your_password_has_been_changed_df0e72aa: "Ваш пароль был изменен."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Не удалось загрузить фото вашего профиля. Возможно, вы превысили лимит на загрузку содержимого."
+  your_quiz_engine_choice_has_been_reset_68d268c1: "Ваш выбор механизма тестирования был сброшен!"
   your_score_a1fc2fcf: "Ваша оценка"
   your_score_score_fb785381: "Ваша оценка: %{score}"
   your_search_encountered_the_following_errors_fc3e5e7f: 
