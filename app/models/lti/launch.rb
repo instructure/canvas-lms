@@ -25,7 +25,9 @@ module Lti
     attr_accessor :link_text, :resource_url, :params, :launch_type, :tool_dimensions, :base_string
 
     def self.iframe_allowances(user_agent = nil)
-      if user_agent.blank? || Browser.new(user_agent).chrome?
+      browser = Browser.new(user_agent)
+
+      if user_agent.blank? || browser.chrome? || browser.firefox?(">= 74")
         return FRAME_ALLOWANCES.map { |s| "#{s} *" }
       end
       FRAME_ALLOWANCES
