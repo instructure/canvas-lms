@@ -1728,6 +1728,7 @@ nb:
   add_a_comment_872470ac: "Legg til en kommentar"
   add_a_course_b72b18d7: "Legg til et emne"
   add_a_custom_help_link_4328252f: "Legg til en tilpasset hjelpelenke"
+  add_a_message_4fee743f: "Legg til en melding "
   add_a_message_a5ed12bf: "Legg til en melding"
   add_a_new_announcement_878b717f: "Legg til en ny kunngjøring"
   add_a_new_course_4a041207: "Legg til et nytt emne"
@@ -5267,6 +5268,7 @@ nb:
         join: "Koble deg til nå"
     type_disabled_error: "Denne type konferanse er ikke lenger mulig med denne Canvas-installasjonen"
   conferences_a0a8984b: Konferanser
+  conferences_are_powered_by_bigbluebutton_a_free_se_a5b2e27e: "Konferanser kjøres av BigBlueButton, en gratis tjeneste for Canvas-brukere. Høye økninger i bruk kan medføre problemer med bruken. I det tilfellet der BigBlueButton er utilgjengelig for å tilpasse nåværende eller fremtidige krav, har Canvas også samarbeid med Zoom, Hangouts, Teams og andre video konferanseverktøy som tilbyr gratis eller billige tjenester."
   conferences_tutorial_tray_6f071ce2: "Konferanser Tutorial Tray"
   confetti_for_on_time_submissions_394e16ce: "Konfetti for rett-tidig innleveringer"
   config_url_e96ceaf3: "Konfig URL"
@@ -5974,6 +5976,7 @@ nb:
     one: "%{contextName} og %{count} annen"
     other: "%{contextName} og %{count} andre"
   contextscount_more_66b2f99b: "+ %{contextsCount} mer"
+  contexttype_notification_settings_d72acd58: "%{contextType} Innstillinger for emnevarsler"
   continue_ac067716: Fortsett
   continue_typing_to_find_additional_sections_or_stu_49786085: "Fortsett å skrive for å finne ytterligere seksjoner eller studenter."
   contributed_to_this_module_item_and_is_complete_2799d5c: "Bidratt til dette modulelementet og er fullført"
@@ -6597,6 +6600,7 @@ nb:
   course_notification_settings_d9821d36: "Innstillinger for emnevarsler"
   course_notification_settings_error_page_c0512c17: "Feilside for innstillinger for emnevarsler"
   course_notification_settings_initial_query_error_6dfb24ef: "Ugyldig forespørsel for innstillinger for emnevarsler"
+  course_notification_settings_updated_f6726d7e: "Oppdatert innstillinger for emnevarsler"
   course_option_links_a79d263d: "Lenker for emnevalg"
   course_outcomes_7dc1cbc7: "Læringsmål i emnet"
   course_pages_449f1dd4: "Sider for emne"
@@ -8525,6 +8529,8 @@ nb:
   edit_assignment_name_mastery_paths_40b50541: "Rediger mestringsveier for oppgave %{name}"
   edit_bank_92eb8e14: "Rediger %{bank}"
   edit_c5fbea07: Rediger
+  edit_closed_captions_e5fdeb79: "Rediger Underteksting"
+  edit_closed_captions_subtitles_to_videos_from_the__288ae432: "Rediger Underteksting/tekst av videoer i Videovalgbrettet til RCE"
   edit_collaboration_b014c18b: "Rediger samarbeid"
   edit_comment_comment_e74afa04: "Rediger kommentar: %{comment}"
   edit_conference_title_6e234815: "Redigere %{conference_title}\""
@@ -10786,6 +10792,7 @@ nb:
       grading_scheme_info: "Se/rediger vurderingsskala"
   grading_standards_b73bfa72: "Retningslinjer for karaktersetting"
   grading_type_type_7d8b42d7: "Karaktersettingstype: %{type}"
+  granular_contexttype_notification_settings_will_be_c5dfc901: "Detaljerte innstillinger for %{contextType} varsler vil bli gjort tilgjengelig for konfigurering i fremtiden."
   granular_course_notification_settings_will_be_conf_68f122db: "Detaljerte innstillinger for emnevarsler vil bli gjort tilgjengelig for konfigurering i fremtiden."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Detaljerte tillatelser for håndtering av wiki-sider"
   graph_bar_b5daa23d: "Grafisk søyle"
@@ -11427,6 +11434,7 @@ nb:
   highest_28ad71e6: Høyest
   highest_score_e080551e: "Høyeste poengsum"
   hindi_9bcd4b34: Hindi
+  history_settings_c63dbaaf: Minneinnstillinger
   home_351838cd: Hjem
   home_page_is_not_valid_2e8a25ae: "Hjemmesiden er ikke gyldig"
   home_tutorial_tray_66826983: "Lærebrett (Tutorial Tray) for hjem"
@@ -11696,10 +11704,12 @@ nb:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkluder resultat ved karaktervarsling.
                 Hvis e-posten din ikke er e-post tilhørende institusjonen betyr det at sensitivt innhold vil sendes på utsiden av institusjonen.
+  include_speedgrader_in_assignment_header_menu_69cd8656: "Inkluderer SpeedGrader i menyen oppgaveoverskrift ( Assignment Header Menu)"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder denne oppgavens karakterer når du poster til skolens Student Information System"
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Inkluder denne oppgavens karakterer ved synkronisering til skolens studentinformasjonssystem"
   include_unpublished_assignments_83ebbaec: "Inkluder ikkepubliserte oppgaver"
   include_unpublished_courses_7a0e7aab: "Inkluder ikkepubliserte emner"
+  includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inneholder en lenke til SpeedGrader i menyen oppgaveoverskrift i Karakteroversikten."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inkluderer vurderingsverdier i administrators vurderingsrapport."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inkluderer rubrikker i sidestolpen for navigering innad i emnet"
   incomplete_95612d72: "ikke godkjent"
@@ -14907,6 +14917,7 @@ nb:
   more_courses_5ebbe998: "Flere emner"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Ikke minst, lar Canvas deg legge til resultater i karakterrubrikkene dine, slik at du kan vurdere læringsmål mens du karaktersetter oppgaver. Når du har satt opp resultater, klikk på Behandle rubrikker for å bruke resultater for karaktersetting."
   more_info_at_course_name_56dc8c10: "Mer info på %{course_name}"
+  more_info_at_url_41b4764b: "Mer informasjon på %{url}"
   more_info_at_web_address_dba7e187: "Mer info på %{web_address}"
   more_information_3dfb76b5: "Mer informasjon"
   more_information_about_ratings_57cdd446: "Mer informasjon om rangeringer"
@@ -15128,6 +15139,7 @@ nb:
   new_analytics_api_access_7eec1ead: "API-tilgang Ny Analytics"
   new_annotations_66932016: "Nye merknader"
   new_announcement_23af4598: "Ny kunngjøring"
+  new_announcement_in_course_name_title_84607f44: "Ny kunngjøring om %{course_name}: %{title}"
   new_announcement_title_30ba7c1b: "Ny kunngjøring: %{title}"
   new_announcement_title_course_da7c0ca6: "Ny kunngjøring %{title}, %{course}"
   new_anonymous_comment_by_student_author_id_for_ass_6e579da4: "Ny anonym kommentar av student (%{author_id}) fra %{assignment_title}, Student (%{user_id}), %{course_name}."
@@ -15466,7 +15478,6 @@ nb:
         Inkluderer: 
         
         * Oppgave/innleverings karakter skrevet inn/endret
-        * Åpnet karakter for oppgave
         * Karaktervekting endret
     grading_display: Karaktersetting
     grading_notify_include_grade: "Inkluder resultat når det varsles om karakterendringer."
@@ -18897,6 +18908,7 @@ nb:
   rce_contents_replace_description: "Aktivere RCE erstatte all tekst fra LTIer"
   rce_contents_replace_display_name: "Rik teksteditor erstatte innhold"
   rce_enhancements_5701e06: "Rik teksteditor forbedringer"
+  rce_initialization_fix_4f176bda: "RCE oppstart-korrigering"
   re_activate_user_f7d77c9a: "Reaktivere bruker"
   re_reported_b9671073: "Rapporteres på nytt"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Sende melding på nytt direkte til brukere når kunngjøringen begynner"
@@ -19078,6 +19090,7 @@ nb:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Utgitt av læringsstier: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Utgitt av læringsstier: %{path}"
   releasing_grades_31a57dde: "Publiser karakterer"
+  remember_my_choice_for_this_course_5a3b7206: "Husk mitt valg for dette emnet"
   remind_me_next_time_6402eb7d: "Minn meg neste gang"
   reminder_ffd21289: Påminnelse
   remove_account_from_this_profile_c3095eb2: "Fjern konto fra denne profilen"
@@ -19183,6 +19196,7 @@ nb:
   reserved_f247b60b: Reservert
   reset_95a81614: Tilbakestill
   reset_multi_factor_authentication_2b63a558: "Tilbakestille flerfaktors autentisering"
+  reset_quiz_engine_choice_323a40e6: "Tilbakestille mitt valg av testmotor"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Nullstill antall avviste på denne kontaktmetoden"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Nullstill antall avviste på denne e-postadressen"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "URL-adressen må samsvare med håndteringsdomenet"
@@ -20839,6 +20853,7 @@ nb:
   show_name_of_observed_students_in_notifications_a56dd9e4: "Vis navn på observerte studenter i varslinger."
   show_navigation_menu_34e7f441: "Vis navigeringsmenyen"
   show_new_analytics_for_course_and_user_data_18e92636: "Vis ny statistikk for emne og brukerdata"
+  show_new_analytics_for_course_and_user_data_data_m_89526eb: "Vis ny statistikk for emne og brukerdata. Det kan ta opp til 24 timer for nye analyser å dukke opp etter at denne innstillingen er innstilt på PÅ (ON)."
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Vis Ny Quizzes på Quizzes-siden"
   show_notes_column_22d2b6c1: "Vis merknadskolonne"
   show_one_question_at_a_time_271e346d: "Vis ett spørsmål om gangen"
@@ -21998,6 +22013,7 @@ nb:
   there_was_a_problem_posting_the_comment_75d15646: "Det oppstod et problem med å poste kommentaren"
   there_was_a_problem_publishing_grades_b0b9202f: "Kunne ikke publisere karakterene."
   there_was_a_problem_releasing_grades_fa0ae6: "Kunne ikke publisere karakterene."
+  there_was_a_problem_resetting_your_quiz_engine_cho_ba4277c7: "Det oppsto et problem ved å tilbakestille ditt valg av testmotor"
   there_was_a_problem_saving_the_comment_d94cbac9: "Det oppsto et problem med lagring av kommentaren"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Kunne ikke lagre karakterer."
   there_was_a_problem_saving_the_grades_5e61f9e2: "Det oppsto et problem ved lagring av karakterene."
@@ -22914,6 +22930,9 @@ nb:
   undated_15c2e5fe: Udatert
   undated_items_toggle_list_visibility_6219e641: "Udaterte elementer veksler synligheten på listen"
   undelivered_message_459916a9: "Melding ikke sendt"
+  under_some_conditions_the_legacy_rce_fails_to_init_66d515ab: |-
+      Under noen forhold mislykkes den eldre RCE å starte opp fordi tinymce ikke er lagt inn i
+      redigeringstilfelle i sine intervall-lister når RCE krever det.
   underline_all_links_description: |-
       Lenker som er understreket viser hyperkobling i navigasjonsmenyen, dashbordet og sidelinjen som
       *understreket tekst*. Dette funksjonsvalget gjelder ikke brukergenerert innholdslenker i
@@ -24053,6 +24072,7 @@ nb:
   you_are_currently_acting_as_user_name_8d2be0ee: "Du opptrer for øyeblikket som %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Du er logget inn på studentvisning"
   you_are_currently_masquerading_as_user_name_f4a00ade: "Du er maskeradet som %{user_name}"
+  you_are_currently_receiving_notifications_for_this_4f542bb2: "Du vil motta varsler for dette %{contextType}. For å deaktivere %{contextType} varsler, benytt vekselbryteren ovenfor."
   you_are_currently_receiving_notifications_for_this_9646b09d: "Du vil motta varsler for dette emnet. For å deaktivere emnevarsler, benytt vekselbryteren ovenfor."
   you_are_here_54075d8c: "Du er her:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Du er logget inn på %{institution1} ved hjelp av legitimerende opplysninger fra %{institution2}"
@@ -24246,6 +24266,7 @@ nb:
       Lese, skrive og og få tilgang til direktemeldinger
       Etter at du har opprettet applikasjonen, noter Consumer Key og Consumer Secret, og oppgi dem her.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Du vil ikke kunne forhåndsvise endringene dine"
+  you_will_not_receive_any_contexttype_notifications_da7a58f1: "Du vil ikke lenger motta %{contextType} varsler. For å aktivere %{contextType} varsler, benytt vekselbryteren ovenfor."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Du vil ikke lenger motta emnevarsler. For å aktivere emnevarsler, benytt vekselbryteren ovenfor."
   your_answer_8dad6ea4: "Ditt svar:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din Oppgavelisten kan nå bli funnet på *Kalender* side."
@@ -24278,6 +24299,7 @@ nb:
   your_outcomes_were_successfully_imported_c5de884: "Resultatene dine ble importert."
   your_password_has_been_changed_df0e72aa: "Passordet ditt har blitt endret."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Profilbildet ditt kunne ikke lastes opp. Du kan ha overskredet grensen for opplasting."
+  your_quiz_engine_choice_has_been_reset_68d268c1: "Ditt valg av testmotor er tilbakestilt!"
   your_score_a1fc2fcf: "Ditt resultat"
   your_score_score_fb785381: "Ditt resultat: %{score}"
   your_search_encountered_the_following_errors_fc3e5e7f: 
