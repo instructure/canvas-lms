@@ -1728,6 +1728,7 @@ zh-Hant:
   add_a_comment_872470ac: 添加評論
   add_a_course_b72b18d7: 添加一個課程
   add_a_custom_help_link_4328252f: 新增自訂説明連結
+  add_a_message_4fee743f: "添加訊息 "
   add_a_message_a5ed12bf: 新增訊息
   add_a_new_announcement_878b717f: 新增新宣告
   add_a_new_course_4a041207: 添加新課程
@@ -5271,6 +5272,7 @@ zh-Hant:
         join: 現在就加入
     type_disabled_error: "不再為此 Canvas 網站啟用這種類型的會議"
   conferences_a0a8984b: 會議
+  conferences_are_powered_by_bigbluebutton_a_free_se_a5b2e27e: "會議的贊助者是 BigBlueButton，這是提供給 Canvas 使用者的免費服務。使用情況的急遽增加可能導致效能問題。如果 BigBlueButton 無法符合目前或將來的需求，Canvas 也會和 Zoom、Hangouts、Teams 與其他提供免費或優惠服務的視訊會議工具合作。"
   conferences_tutorial_tray_6f071ce2: 會議教程列表
   confetti_for_on_time_submissions_394e16ce: 準時提交項目的碎紙
   config_url_e96ceaf3: "配置 URL"
@@ -5975,6 +5977,7 @@ zh-Hant:
     one: "%{contextName} 和 %{count} 其他"
     other: "%{contextName} 和 %{count} 其他"
   contextscount_more_66b2f99b: "+ %{contextsCount} 更多"
+  contexttype_notification_settings_d72acd58: "%{contextType} 通知設定"
   continue_ac067716: 繼續
   continue_typing_to_find_additional_sections_or_stu_49786085: 請鍵入更多資訊，以查找其他班別或學生
   contributed_to_this_module_item_and_is_complete_2799d5c: 參與此單元項目並且已完成
@@ -6597,6 +6600,7 @@ zh-Hant:
   course_notification_settings_d9821d36: 課程通知設定
   course_notification_settings_error_page_c0512c17: 課程通知設定錯誤頁面
   course_notification_settings_initial_query_error_6dfb24ef: 課程通知設定初始查詢錯誤
+  course_notification_settings_updated_f6726d7e: 課程通知設定已更新
   course_option_links_a79d263d: 課程選項連結
   course_outcomes_7dc1cbc7: 課程結果
   course_pages_449f1dd4: 課程頁面
@@ -8524,6 +8528,8 @@ zh-Hant:
   edit_assignment_name_mastery_paths_40b50541: "編輯作業 %{name} 路徑"
   edit_bank_92eb8e14: "編輯%{bank}"
   edit_c5fbea07: 編輯
+  edit_closed_captions_e5fdeb79: 編輯隱藏字幕
+  edit_closed_captions_subtitles_to_videos_from_the__288ae432: "編輯來自 RCE 的視訊選項收集箱中的視訊隱藏字幕"
   edit_collaboration_b014c18b: 編輯協作
   edit_comment_comment_e74afa04: "編輯評論：%{comment}"
   edit_conference_title_6e234815: "編輯『%{conference_title}』"
@@ -10775,6 +10781,7 @@ zh-Hant:
       grading_scheme_info: 檢視/編輯評分方案
   grading_standards_b73bfa72: 等級評分標準
   grading_type_type_7d8b42d7: "評分類別：%{type}"
+  granular_contexttype_notification_settings_will_be_c5dfc901: "將來在此配置細微 %{contextType} 通知設定。"
   granular_course_notification_settings_will_be_conf_68f122db: 將來在此配置細微課程通知設定。
   granular_permissions_for_managing_wiki_pages_3ed89a84: 管理維基頁面的細微權限
   graph_bar_b5daa23d: 圖表欄
@@ -11409,6 +11416,7 @@ zh-Hant:
   highest_28ad71e6: 最高
   highest_score_e080551e: 最高得分
   hindi_9bcd4b34: 印地語
+  history_settings_c63dbaaf: 歷程記錄設定
   home_351838cd: 首頁
   home_page_is_not_valid_2e8a25ae: 無效的主頁
   home_tutorial_tray_66826983: 首頁教學列表
@@ -11676,10 +11684,12 @@ zh-Hant:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       在提示有關成績更改時附上分數。
                 如果您的電郵地址並非機構電郵地址，則意味著敏感內容會發送到該機構之外。
+  include_speedgrader_in_assignment_header_menu_69cd8656: "在「作業標題選單」中納入 SpeedGrader"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 在發佈到您所在學校的學生資訊系統上時，包括該任務的評分
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: 在同步到您所在學校的學生資訊系統上時，包括該作業的成績
   include_unpublished_assignments_83ebbaec: 包括未發佈的任務
   include_unpublished_courses_7a0e7aab: 包括未發佈的課程
+  includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "納入連結到成績單中的作業標題選單中的 SpeedGrader。"
   includes_grade_values_in_the_admin_grade_reports_a28200da: 在管理員評分報告中包括評分值。
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: 在課程側欄導航中加入評分標準
   incomplete_95612d72: 未完成
@@ -14890,6 +14900,7 @@ zh-Hant:
   more_courses_5ebbe998: 更多課程
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "更重要的是，Canvas 允許您將學習成果添加到您的評分標準中，以便您在評分作業時評估掌握程度。設定好學習成果後，點擊「管理評分標準」以開始使用學習成果進行等級評分。"
   more_info_at_course_name_56dc8c10: "在 %{course_name} 上有更多資訊"
+  more_info_at_url_41b4764b: "在 %{url} 上有更多資訊"
   more_info_at_web_address_dba7e187: "在 %{web_address} 上有更多資訊"
   more_information_3dfb76b5: 更多資訊
   more_information_about_ratings_57cdd446: 更多有關評分的資訊
@@ -15114,6 +15125,7 @@ zh-Hant:
   new_analytics_api_access_7eec1ead: "新分析工具 API 存取"
   new_annotations_66932016: 新的評註
   new_announcement_23af4598: 新通告
+  new_announcement_in_course_name_title_84607f44: "%{course_name} 中的新通告：%{title}"
   new_announcement_title_30ba7c1b: "新通告：%{title}"
   new_announcement_title_course_da7c0ca6: "新的通告 %{title}, %{course}"
   new_anonymous_comment_by_student_author_id_for_ass_6e579da4: "學生 (%{author_id}) 對 %{assignment_title} 的新匿名評論，學生 (%{user_id})，%{course_name}。"
@@ -15452,7 +15464,6 @@ zh-Hant:
         包含: 
         
         * 作業/提交件評分的輸入內容/更改內容
-        * 解除靜音的作業成績
         * 已更改的評分權重
     grading_display: 評分
     grading_notify_include_grade: 包括當提示關於成績更改時的分數。
@@ -18879,6 +18890,7 @@ zh-Hant:
   ratio_responded_correctly_6d890107: "%{ratio}% 回答正確"
   rce_auto_save_f004fba9: "RCE 自動儲存"
   rce_enhancements_5701e06: "RCE 強化"
+  rce_initialization_fix_4f176bda: "RCE 初始化修復程式"
   re_activate_user_f7d77c9a: 重新啟用使用者
   re_reported_b9671073: 重新報告
   re_send_notification_directly_to_users_when_announ_c421cea5: 通告開始時直接向使用者重新傳送通知
@@ -19060,6 +19072,7 @@ zh-Hant:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "從掌握歷程釋放：%{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "從掌握歷程釋放：%{path}"
   releasing_grades_31a57dde: 發佈成績
+  remember_my_choice_for_this_course_5a3b7206: 記住我對此課程的選擇
   remind_me_next_time_6402eb7d: 下次提醒我
   reminder_ffd21289: 提醒
   remove_account_from_this_profile_c3095eb2: 從此個人檔案中刪除帳戶
@@ -19165,6 +19178,7 @@ zh-Hant:
   reserved_f247b60b: 已預約
   reset_95a81614: 重設
   reset_multi_factor_authentication_2b63a558: 重設多因素驗證
+  reset_quiz_engine_choice_323a40e6: 重設測驗引擎選擇
   reset_this_contact_method_s_bounce_count_3845ecf4: 重設這個聯繫方式的退信計數
   reset_this_email_address_s_bounce_count_d81d8fd9: 重設這個電郵地址的退信計數
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "資源 url 必須吻合資源處理程式網域"
@@ -20806,6 +20820,7 @@ zh-Hant:
   show_name_of_observed_students_in_notifications_a56dd9e4: 於通知顯示被觀察的學生名稱。
   show_navigation_menu_34e7f441: 顯示導航工具選單
   show_new_analytics_for_course_and_user_data_18e92636: 顯示課程與使用者資料新分析
+  show_new_analytics_for_course_and_user_data_data_m_89526eb: "顯示使用於課程和使用者資料的新分析工具。將此功能新增標記設定為 ON（開）後，資料在「新分析工具」中出現可能需要花費 24 小時的時間。"
   show_new_quizzes_on_the_quizzes_page_b2db14d8: 顯示測驗頁面的新測驗
   show_notes_column_22d2b6c1: 顯示注釋欄
   show_one_question_at_a_time_271e346d: 每次顯示一個問題
@@ -21964,6 +21979,7 @@ zh-Hant:
   there_was_a_problem_posting_the_comment_75d15646: 在發佈評論時發生了一個問題
   there_was_a_problem_publishing_grades_b0b9202f: 發佈成績時發生問題。
   there_was_a_problem_releasing_grades_fa0ae6: 發佈成績時出現問題。
+  there_was_a_problem_resetting_your_quiz_engine_cho_ba4277c7: 重設您的測驗引擎選擇時出現問題
   there_was_a_problem_saving_the_comment_d94cbac9: 儲存評論時發生問題
   there_was_a_problem_saving_the_grade_8ea5d2ac: 保存評分時出現問題。
   there_was_a_problem_saving_the_grades_5e61f9e2: 儲存成績時出現問題。
@@ -22881,6 +22897,9 @@ zh-Hant:
   undated_15c2e5fe: 未注明日期
   undated_items_toggle_list_visibility_6219e641: 未註明日期的項目切換清單可見性
   undelivered_message_459916a9: 未發送的郵件
+  under_some_conditions_the_legacy_rce_fails_to_init_66d515ab: |-
+      在有些情況中，舊版 RCE 無法初始化，因為 TinyMCE 在 RCE 需要時還尚未加 
+       編輯器實例到其內部清單中。
   underline_all_links_description: |-
       加下劃線的連結顯示導航工具選單、控制面板和頁面側邊欄中作為
       *加下劃線文字*的超連結。此功能選項不適用於
@@ -24017,6 +24036,7 @@ zh-Hant:
   you_are_currently_acting_as_user_name_8d2be0ee: "您目前正在作為%{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: 您目前已登入學生視圖
   you_are_currently_masquerading_as_user_name_f4a00ade: "您目前正在偽裝成 %{user_name}"
+  you_are_currently_receiving_notifications_for_this_4f542bb2: "您目前正在接收此 %{contextType} 的通知。若要停用 %{contextType} 通知，請使用以上的切換。"
   you_are_currently_receiving_notifications_for_this_9646b09d: 您目前正在接收此課程的通知。若要停用通知，請使用以上的切換。
   you_are_here_54075d8c: 你在此：
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "您使用您來自 %{institution2} 的認證登入了 %{institution1}"
@@ -24210,6 +24230,7 @@ zh-Hant:
       限級別調至允許閲讀、撰寫和獲取直接訊息。 完成程式創建後，
       請保存好您的使用者密鑰和客戶密碼，並在此輸入。
   you_will_not_be_able_to_preview_your_changes_f7b868fb: 您將無法預覽您的改動
+  you_will_not_receive_any_contexttype_notifications_da7a58f1: "此時您將不會收到任何 %{contextType} 通知。若要啟用 %{contextType} 通知 ，請使用以上的切換。"
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: 此時您將不會收到任何課程通知。若要啟用通知，請使用以上的切換。
   your_answer_8dad6ea4: 您的答案：
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "您的任務列表現在可以在 *月曆* 頁面上找到。"
@@ -24239,6 +24260,7 @@ zh-Hant:
   your_outcomes_were_successfully_imported_c5de884: 您的學習成果已經成功匯入。
   your_password_has_been_changed_df0e72aa: 您的密碼已變更。
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: 您的個人資料照片無法上傳。您可能已超過上傳限制。
+  your_quiz_engine_choice_has_been_reset_68d268c1: 您的測驗引擎選擇已經重設！
   your_score_a1fc2fcf: 您的分數
   your_score_score_fb785381: "您的分數：%{score}"
   your_search_encountered_the_following_errors_fc3e5e7f: 
