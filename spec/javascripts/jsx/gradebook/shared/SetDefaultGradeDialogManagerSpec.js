@@ -20,7 +20,6 @@ import $ from 'jquery'
 
 import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
 import SetDefaultGradeDialogManager from 'jsx/gradebook/shared/SetDefaultGradeDialogManager'
-import AsyncComponents from '../../../../../app/jsx/gradebook/default_gradebook/AsyncComponents'
 
 function createAssignmentProp() {
   return {
@@ -115,51 +114,48 @@ QUnit.module('SetDefaultGradeDialogManager#showDialog', {
 
   setup() {
     this.flashErrorStub = sandbox.stub($, 'flashError')
-    sandbox
-      .stub(AsyncComponents, 'loadSetDefaultGradeDialog')
-      .returns(Promise.resolve(SetDefaultGradeDialog))
     this.showDialogStub = sandbox.stub(SetDefaultGradeDialog.prototype, 'show')
   }
 })
 
-test('shows the SetDefaultGradeDialog when assignment is not in a closed grading period', async function() {
+test('shows the SetDefaultGradeDialog when assignment is not in a closed grading period', function() {
   const manager = this.setupDialogManager({inClosedGradingPeriod: false, isAdmin: false})
-  await manager.showDialog()
+  manager.showDialog()
 
   equal(this.showDialogStub.callCount, 1)
 })
 
-test('does not show an error when assignment is not in a closed grading period', async function() {
+test('does not show an error when assignment is not in a closed grading period', function() {
   const manager = this.setupDialogManager({inClosedGradingPeriod: false, isAdmin: false})
-  await manager.showDialog()
+  manager.showDialog()
 
   equal(this.flashErrorStub.callCount, 0)
 })
 
-test('shows the SetDefaultGradeDialog when assignment is in a closed grading period but isAdmin is true', async function() {
+test('shows the SetDefaultGradeDialog when assignment is in a closed grading period but isAdmin is true', function() {
   const manager = this.setupDialogManager({inClosedGradingPeriod: true, isAdmin: true})
-  await manager.showDialog()
+  manager.showDialog()
 
   equal(this.showDialogStub.callCount, 1)
 })
 
-test('does not show an error when assignment is in a closed grading period but isAdmin is true', async function() {
+test('does not show an error when assignment is in a closed grading period but isAdmin is true', function() {
   const manager = this.setupDialogManager({inClosedGradingPeriod: true, isAdmin: true})
-  await manager.showDialog()
+  manager.showDialog()
 
   equal(this.flashErrorStub.callCount, 0)
 })
 
-test('shows an error message when assignment is in a closed grading period and isAdmin is false', async function() {
+test('shows an error message when assignment is in a closed grading period and isAdmin is false', function() {
   const manager = this.setupDialogManager({inClosedGradingPeriod: true, isAdmin: false})
-  await manager.showDialog()
+  manager.showDialog()
 
   equal(this.flashErrorStub.callCount, 1)
 })
 
-test('does not show the SetDefaultGradeDialog when assignment is in a closed grading period and isAdmin is false', async function() {
+test('does not show the SetDefaultGradeDialog when assignment is in a closed grading period and isAdmin is false', function() {
   const manager = this.setupDialogManager({inClosedGradingPeriod: true, isAdmin: false})
-  await manager.showDialog()
+  manager.showDialog()
 
   equal(this.showDialogStub.callCount, 0)
 })

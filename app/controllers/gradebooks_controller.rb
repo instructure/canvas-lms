@@ -226,30 +226,14 @@ class GradebooksController < ApplicationController
 
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      if requested_gradebook_view.present?
-        update_preferred_gradebook_view!(requested_gradebook_view) if requested_gradebook_view != preferred_gradebook_view
-        redirect_to polymorphic_url([@context, 'gradebook'])
-        return
-      end
-
       @last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
       set_current_grading_period if grading_periods?
+      set_gradebook_env
       set_tutorial_js_env
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
 
-      if preferred_gradebook_view == "learning_mastery" && outcome_gradebook_enabled?
-        set_learning_mastery_env
-        render "gradebooks/learning_mastery"
-      else
-        # Optimize initial data loading
-        if Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids)
-          prefetch_xhr(user_ids_course_gradebook_url(@context), id: 'user_ids')
-        end
-
-        set_gradebook_env
-        render_gradebook
-      end
+      render_gradebook
     end
   end
 
@@ -355,8 +339,6 @@ class GradebooksController < ApplicationController
     last_exported_attachment = @last_exported_gradebook_csv.try(:attachment)
     grading_standard = @context.grading_standard_or_default
     {
-      prefetch_gradebook_user_ids: Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids),
-
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
         chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
@@ -416,7 +398,7 @@ class GradebooksController < ApplicationController
         active_grading_periods: active_grading_periods_json,
         grading_period_set: grading_period_group_json,
         current_grading_period_id: @current_grading_period_id,
-        outcome_gradebook_enabled: outcome_gradebook_enabled?,
+        outcome_gradebook_enabled: @context.feature_enabled?(:outcome_gradebook),
         custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
         custom_column_url: api_v1_course_custom_gradebook_column_url(@context, ":id"),
         custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
@@ -457,25 +439,6 @@ class GradebooksController < ApplicationController
     set_student_context_cards_js_env
     env = old_gradebook_env.deep_merge(new_gradebook_env)
     js_env(env)
-  end
-
-  def set_learning_mastery_env
-    set_student_context_cards_js_env
-
-    js_env({
-      GRADEBOOK_OPTIONS: {
-        context_id: @context.id.to_s,
-        context_url: named_context_url(@context, :context_url),
-        outcome_proficiency: outcome_proficiency,
-        sections: sections_json(@context.active_course_sections, @current_user, session, [], allow_sis_ids: true),
-        settings: gradebook_settings(@context.global_id),
-        settings_update_url: api_v1_course_gradebook_settings_update_url(@context)
-      }
-    })
-  end
-
-  def outcome_gradebook_enabled?
-    @context.feature_enabled?(:outcome_gradebook)
   end
 
   def post_grades_feature?
@@ -987,21 +950,6 @@ class GradebooksController < ApplicationController
     else
       !!ENV['GRADEBOOK_DEVELOPMENT']
     end
-  end
-
-  def requested_gradebook_view
-    return nil if params[:view].blank?
-    params[:view] == "learning_mastery" ? "learning_mastery" : "gradebook"
-  end
-
-  def preferred_gradebook_view
-    gradebook_settings(context.global_id)["gradebook_view"]
-  end
-
-  def update_preferred_gradebook_view!(gradebook_view)
-    context_settings = gradebook_settings(context.global_id)
-    context_settings.deep_merge!({"gradebook_view" => gradebook_view})
-    @current_user.set_preference(:gradebook_settings, @context.global_id, context_settings)
   end
 
   def render_gradebook

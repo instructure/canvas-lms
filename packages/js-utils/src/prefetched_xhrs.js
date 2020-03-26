@@ -18,59 +18,8 @@
 
 // These are helpful methods you can use along side the ruby ApplicationHelper::prefetch_xhr helper method in canvas
 
-/**
- * Retrieve the fetch response promise assigned to the given id. This will
- * return `undefined` if there are no prefetched requests or there is no
- * request assigned to the given id. When a request is assigned to the given
- * id, it will remain stored for subsequent retrievals, if needed.
- *
- * @param {String} id
- * @returns {Promise<Response>} fetchResponsePromise
- */
 export function getPrefetchedXHR(id) {
   return window.prefetched_xhrs && window.prefetched_xhrs[id]
-}
-
-/**
- * Retrieve the fetch response promise assigned to the given id. This will
- * return `undefined` if there are no prefetched requests or there is no
- * request assigned to the given id. When a request is assigned to the given
- * id, it will be removed from request storage. This is important for requests
- * which are expected to return fresh results upon each request.
- *
- * @param {String} id
- * @returns {Promise<Response>} fetchResponsePromise
- */
-export function consumePrefetchedXHR(id) {
-  if (window.prefetched_xhrs) {
-    const value = window.prefetched_xhrs[id]
-    delete window.prefetched_xhrs[id]
-    return value
-  }
-
-  return undefined
-}
-
-/**
- * Store a fetch response promise assigned to the given id. This function is
- * intended for specs so that they do not need awareness of the implementation
- * details for how prefetched requests are managed.
- *
- * @param {String} id
- * @param {Promise<Response>} fetchResponsePromise
- */
-export function setPrefetchedXHR(id, fetchResponsePromise) {
-  window.prefetched_xhrs = window.prefetched_xhrs || {}
-  window.prefetched_xhrs[id] = fetchResponsePromise
-}
-
-/**
- * Remove all prefetched requests from storage. This function is intended for
- * specs so that they can clean up after assertions without needing awareness
- * of the implementation details for how prefetched requests are managed.
- */
-export function clearPrefetchedXHRs() {
-  delete window.prefetched_xhrs
 }
 
 /**
