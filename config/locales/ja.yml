@@ -1728,6 +1728,7 @@ ja:
   add_a_comment_872470ac: コメントを追加
   add_a_course_b72b18d7: コースの追加
   add_a_custom_help_link_4328252f: "カスタム ヘルプ リンクを追加する"
+  add_a_message_4fee743f: "メッセージを追加 "
   add_a_message_a5ed12bf: メッセージを追加
   add_a_new_announcement_878b717f: 新しいアナウンスの追加
   add_a_new_course_4a041207: 新しいコースの追加
@@ -5267,6 +5268,7 @@ ja:
         join: 今すぐ参加する
     type_disabled_error: "このタイプの会議は、この Canvas サイトではもう使用できません"
   conferences_a0a8984b: 会議
+  conferences_are_powered_by_bigbluebutton_a_free_se_a5b2e27e: "会議は Canvas ユーザーへの無料サービスである BigBlueButton を使って行われます。使用量の大幅な増加はパフォーマンス問題の原因となる場合があります。BigBlueButton が現在または将来の需要を満たせない場合、Canvas では無料または割引サービスを提供する Zoom、Hangouts、Teams、およびその他ビデオ会議ツールとも提携します。"
   conferences_tutorial_tray_6f071ce2: 会議のチュートリアルトレイ
   confetti_for_on_time_submissions_394e16ce: 定刻提出のための紙吹雪
   config_url_e96ceaf3: "URL 設定"
@@ -5971,6 +5973,7 @@ ja:
     one: "%{contextName} および %{count} その他"
     other: "%{contextName} および %{count} その他"
   contextscount_more_66b2f99b: "+ %{contextsCount} より多く"
+  contexttype_notification_settings_d72acd58: "%{contextType}通知設定"
   continue_ac067716: 続行
   continue_typing_to_find_additional_sections_or_stu_49786085: 更にタイプして、追加のセクションまたは生徒を見つける
   contributed_to_this_module_item_and_is_complete_2799d5c: このモジュールアイテムに貢献し、完了しました
@@ -6593,6 +6596,7 @@ ja:
   course_notification_settings_d9821d36: コースの通知設定
   course_notification_settings_error_page_c0512c17: コースの通知設定エラーページ
   course_notification_settings_initial_query_error_6dfb24ef: コースの通知設定の初期クエリエラー
+  course_notification_settings_updated_f6726d7e: コースの通知設定が更新されました
   course_option_links_a79d263d: コースオプションリンク
   course_outcomes_7dc1cbc7: コースの成果
   course_pages_449f1dd4: コースページ
@@ -8519,6 +8523,8 @@ ja:
   edit_assignment_name_mastery_paths_40b50541: "課題%{name}マスタリーパスを編集"
   edit_bank_92eb8e14: "編集%{bank}"
   edit_c5fbea07: 編集
+  edit_closed_captions_e5fdeb79: 字幕を編集する
+  edit_closed_captions_subtitles_to_videos_from_the__288ae432: "RCE にあるビデオオプショントレイからビデオの字幕を編集する"
   edit_collaboration_b014c18b: コラボレーションを編集する
   edit_comment_comment_e74afa04: "コメントを編集：%{comment}"
   edit_conference_title_6e234815: "\"%{conference_title}\"を編集"
@@ -10774,6 +10780,7 @@ ja:
       grading_scheme_info: 採点スキームの表示/編集
   grading_standards_b73bfa72: 採点基準
   grading_type_type_7d8b42d7: "採点タイプ: %{type}"
+  granular_contexttype_notification_settings_will_be_c5dfc901: "将来、ここから詳細な%{contextType}の通知設定を行うことができるようになる予定です。"
   granular_course_notification_settings_will_be_conf_68f122db: 将来、ここから詳細なコースの通知設定を行うことができるようになる予定です。
   granular_permissions_for_managing_wiki_pages_3ed89a84: Wikiページを管理するための詳細な権限
   graph_bar_b5daa23d: グラフバー
@@ -11411,6 +11418,7 @@ ja:
   highest_28ad71e6: 最高
   highest_score_e080551e: 最高スコア
   hindi_9bcd4b34: ヒンディー語
+  history_settings_c63dbaaf: 履歴設定
   home_351838cd: ホーム
   home_page_is_not_valid_2e8a25ae: ホームページが無効です
   home_tutorial_tray_66826983: ホーム.チュートリアルトレイ
@@ -11680,10 +11688,12 @@ ja:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       成績に関するアラートには、スコアを記載してください。
                 使用している電子メールが教育機関の電子メールでない場合は、機密情報を含むコンテンツが教育機関外部に送信されることになります。
+  include_speedgrader_in_assignment_header_menu_69cd8656: 課題ヘッダメニューにSpeedGraderを含める
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 学校の受講生情報システムに投稿する際にこの課題の成績を含める
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: あなたの学校の受講生情報システムと同期するとき、にこの課題の成績を含める
   include_unpublished_assignments_83ebbaec: 未公開の課題を含む
   include_unpublished_courses_7a0e7aab: 未公開のコースを含む
+  includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: グレードブックの課題ヘッダメニューにSpeedGraderへのリンクを含めます。
   includes_grade_values_in_the_admin_grade_reports_a28200da: 管理者の成績レポートに成績値を含めます。
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: コースサイドバーナビゲーションに規定を含める
   incomplete_95612d72: 未完了
@@ -12135,7 +12145,7 @@ ja:
       view_all_or_customize: すべて表示またはカスタマイズ
     mobile_auth: 
       log_in_to_canvas: "Canvas へのログイン"
-  learn_more_7a8d626: もっと詳しく
+  learn_more_7a8d626: 詳細はこちらから
   learn_more_about_collaborations_2978f66d: コラボレーションについての詳細を確認する
   learn_more_about_the_differences_a1217479: 違いについてさらに詳しく知る。
   learning_analytics_beta_view_46deb4c8: 学習分析（ベータ）-表示
@@ -14896,6 +14906,7 @@ ja:
   more_courses_5ebbe998: その他のコース
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "さらに重要なことに、Canvas では成績表に成果を追加できるため、成績を評価する際に習得を評価することができます。成果を設定したら、[ルーブリックスの管理]をクリックして、成果の採点への使用を開始します。"
   more_info_at_course_name_56dc8c10: "詳細は %{course_name} をご覧ください"
+  more_info_at_url_41b4764b: "詳細は%{url}でご覧ください"
   more_info_at_web_address_dba7e187: "詳細は%{web_address}まで"
   more_information_3dfb76b5: 詳細
   more_information_about_ratings_57cdd446: 格付け評価に関する詳細情報
@@ -15120,6 +15131,7 @@ ja:
   new_analytics_api_access_7eec1ead: "New Analytics APIアクセス"
   new_annotations_66932016: 新しい注釈
   new_announcement_23af4598: 新しいアナウンス
+  new_announcement_in_course_name_title_84607f44: "%{course_name}の新しいお知らせ：%{title}"
   new_announcement_title_30ba7c1b: "新規発表：%{title}"
   new_announcement_title_course_da7c0ca6: "新しいアナウンス %{title}、%{course}"
   new_anonymous_comment_by_student_author_id_for_ass_6e579da4: "受講生 (%{author_id}) %{assignment_title}の、受講生 (%{user_id}) の%{course_name}への新しい匿名のコメント。"
@@ -15458,7 +15470,6 @@ ja:
         以下を含みます：
         
         * 課題/提出物の成績入力済み/変更済み
-        * 消音解除された課題の成績
         * 成績の重み付けが変更されました
     grading_display: 採点
     grading_notify_include_grade: 成績変更に関するアラートには、スコアを記載してください。
@@ -18880,6 +18891,7 @@ ja:
   ratio_responded_correctly_6d890107: "%{ratio}% が正しく回答されています"
   rce_auto_save_f004fba9: RCE自動保存
   rce_enhancements_5701e06: RCEの機能強化
+  rce_initialization_fix_4f176bda: "RCE 初期化修正"
   re_activate_user_f7d77c9a: ユーザーを再アクティブ化する
   re_reported_b9671073: 再報告
   re_send_notification_directly_to_users_when_announ_c421cea5: アナウンスの開始時にユーザーに直接通知を再送信する
@@ -19061,6 +19073,7 @@ ja:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "マスタリーパスからリリース%{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "マスタリーパスからリリース%{path}"
   releasing_grades_31a57dde: 成績のリリース
+  remember_my_choice_for_this_course_5a3b7206: このコースの選択を記憶する
   remind_me_next_time_6402eb7d: 次回通知する
   reminder_ffd21289: 事前通知
   remove_account_from_this_profile_c3095eb2: このプロフィールからアカウントを削除
@@ -19166,6 +19179,7 @@ ja:
   reserved_f247b60b: 予約済み
   reset_95a81614: リセット
   reset_multi_factor_authentication_2b63a558: マルチファクタ認証をリセットしてください
+  reset_quiz_engine_choice_323a40e6: クイズエンジンの選択をリセットする
   reset_this_contact_method_s_bounce_count_3845ecf4: この連絡方法のバウンスカウントをリセット
   reset_this_email_address_s_bounce_count_d81d8fd9: このメールアドレスのバウンスカウントをリセット
   resource_url_must_match_the_resource_handler_s_dom_b768cf: リソースURLはリソースハンドラのドメインと一致しなければなりません
@@ -20811,6 +20825,7 @@ ja:
   show_name_of_observed_students_in_notifications_a56dd9e4: 通知内にあった受講生の名前を表示します。
   show_navigation_menu_34e7f441: ナビゲーションメニューを表示する
   show_new_analytics_for_course_and_user_data_18e92636: コースおよびユーザーデータの新しい分析を表示する
+  show_new_analytics_for_course_and_user_data_data_m_89526eb: "コースとユーザーデータの新しい分析を表示します。新しい分析にデータが表示されるまで、この機能フラグをオンに設定してから 24 時間かかる場合があります。"
   show_new_quizzes_on_the_quizzes_page_b2db14d8: クイズページに新しいクイズを表示する
   show_notes_column_22d2b6c1: メモ列を表示
   show_one_question_at_a_time_271e346d: "一度に 1 つの問題を表示する"
@@ -21973,6 +21988,7 @@ ja:
   there_was_a_problem_posting_the_comment_75d15646: コメントを掲示中に問題がありました
   there_was_a_problem_publishing_grades_b0b9202f: 成績を送信する際に問題がありました。
   there_was_a_problem_releasing_grades_fa0ae6: 成績のリリース中に問題が発生しました。
+  there_was_a_problem_resetting_your_quiz_engine_cho_ba4277c7: クイズエンジンの選択のリセット中に問題が発生しました。
   there_was_a_problem_saving_the_comment_d94cbac9: コメントの保存中に問題が発生しました
   there_was_a_problem_saving_the_grade_8ea5d2ac: 成績を保存する際に問題がありました。
   there_was_a_problem_saving_the_grades_5e61f9e2: 成績を保存する際に問題がありました。
@@ -22890,6 +22906,9 @@ ja:
   undated_15c2e5fe: 日付けがない
   undated_items_toggle_list_visibility_6219e641: "日付のないアイテム: リストの表示/非表示の切り替え"
   undelivered_message_459916a9: 送信されなかったメッセージ
+  under_some_conditions_the_legacy_rce_fails_to_init_66d515ab: |-
+      状況に応じて、レガシー RCE が tinymce 
+       エディタインスタンスを必要とするにもかかわらず、このインスタンスがその内部リストに追加されていないことから、レガシー RCE が初期化に失敗する場合があります。
   underline_all_links_description: |-
       下線のあるリンクは、ナビゲーションメニュー、ダッシュボード、およびページサイドバーのハイパーリンクを
       *下線付きテキスト*として表示します。この機能オプションは、Rich Content Editor 内のユーザー作成
@@ -24027,6 +24046,7 @@ ja:
   you_are_currently_acting_as_user_name_8d2be0ee: "あなたは現在、～として行動しています%{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: 現在、受講生ビューにログインしています
   you_are_currently_masquerading_as_user_name_f4a00ade: "現在、%{user_name} としてマスカレードしています"
+  you_are_currently_receiving_notifications_for_this_4f542bb2: "現在この%{contextType}の通知を受け取っています。%{contextType}の通知を無効にするには、上記の切り替えを使用してください。"
   you_are_currently_receiving_notifications_for_this_9646b09d: 現在このコースの通知を受け取っています。コースの通知を無効にするには、上記の切り替えを使用してください。
   you_are_here_54075d8c: "あなたの現在地:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "%{institution2} からの資格情報を使用して %{institution1} にログインしています"
@@ -24220,6 +24240,7 @@ ja:
       読む、各そしてアクセスダイレクトメッセージに設定します。
       アプリケーションの作成後、コンシューマーキーとシークレットをメモし、それらをここに入力してください。
   you_will_not_be_able_to_preview_your_changes_f7b868fb: 変更をプレビューすることができません
+  you_will_not_receive_any_contexttype_notifications_da7a58f1: "現在%{contextType}の通知は受け取らないことになっています。%{contextType}の通知を有効にするには、上記の切り替えを使用してください。"
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: 現在コースの通知は受け取らないことになっています。コースの通知を有効にするには、上記の切り替えを使用してください。
   your_answer_8dad6ea4: "あなたの解答:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "課題リストは、*カレンダー* ページにあります。"
@@ -24249,6 +24270,7 @@ ja:
   your_outcomes_were_successfully_imported_c5de884: 結果は正常にインポートされました。
   your_password_has_been_changed_df0e72aa: あなたのパスワードが変更されました。
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: プロフィール写真をアップロードできませんでした。アップロードの制限を超過している可能性があります。
+  your_quiz_engine_choice_has_been_reset_68d268c1: クイズエンジンの選択がリセットされました！
   your_score_a1fc2fcf: あなたのスコア
   your_score_score_fb785381: "あなたのスコア：%{score}"
   your_search_encountered_the_following_errors_fc3e5e7f: 
