@@ -1727,6 +1727,7 @@ da:
   add_a_comment_872470ac: "Tilføj en kommentar"
   add_a_course_b72b18d7: "Tilføj et fag"
   add_a_custom_help_link_4328252f: "Tilføj et brugertilpasset hjælp-link"
+  add_a_message_4fee743f: "Tilføj en besked "
   add_a_message_a5ed12bf: "Tilføj en besked"
   add_a_new_announcement_878b717f: "Opret en Ny Meddelelse"
   add_a_new_course_4a041207: "Tilføj et nyt fag"
@@ -5265,6 +5266,7 @@ da:
         join: "Tilslut nu"
     type_disabled_error: "Denne konferencetype er ikke længere aktiveret til denne Canvas-side"
   conferences_a0a8984b: Konferencer
+  conferences_are_powered_by_bigbluebutton_a_free_se_a5b2e27e: "Konferencer drives af BigBlueButton, en gratis service til Canvas-brugere. Ekstreme stigninger i brugen kan forårsage ydelsesproblemer. I tilfælde af at BigBlueButton ikke er i stand til at imødekomme aktuelle eller fremtidige krav, arbejder Canvas også sammen med Zoom, Hangouts, Teams og andre videokonferenceværktøjer, der tilbyder gratis eller nedsatte tjenester."
   conferences_tutorial_tray_6f071ce2: "Selvstudiumområde for konferencer"
   confetti_for_on_time_submissions_394e16ce: "Konfetti for rettidige indsendelser"
   config_url_e96ceaf3: "Konfig URL"
@@ -5969,6 +5971,7 @@ da:
     one: "%{contextName} og %{count} anden"
     other: "%{contextName} og %{count} andre"
   contextscount_more_66b2f99b: "+ %{contextsCount} mere"
+  contexttype_notification_settings_d72acd58: "%{contextType} Meddelelses-indstillinger"
   continue_ac067716: Fortsæt
   continue_typing_to_find_additional_sections_or_stu_49786085: "Fortsæt med at indtaste for at finde yderligere sektioner eller studerende."
   contributed_to_this_module_item_and_is_complete_2799d5c: "Biddrog til dette modulelement og har fuldført"
@@ -6592,6 +6595,7 @@ da:
   course_notification_settings_d9821d36: "Indstillinger for fagmeddelelser"
   course_notification_settings_error_page_c0512c17: "Fejlside for fagmeddelelsesindstillinger"
   course_notification_settings_initial_query_error_6dfb24ef: "Indledende forespørgselsfejl for fagmeddelelsesindstillinger"
+  course_notification_settings_updated_f6726d7e: "Indstillinger for fagmeddelelser opdateret"
   course_option_links_a79d263d: "Links til fagets muligheder"
   course_outcomes_7dc1cbc7: "Fagets læringsudbytte"
   course_pages_449f1dd4: Fagsider
@@ -8518,6 +8522,8 @@ da:
   edit_assignment_name_mastery_paths_40b50541: "Rediger opgave %{name} læringsstier"
   edit_bank_92eb8e14: "Rediger %{bank}"
   edit_c5fbea07: Rediger
+  edit_closed_captions_e5fdeb79: "Rediger billedtekster"
+  edit_closed_captions_subtitles_to_videos_from_the__288ae432: "Rediger billed- / undertekster til videoer fra videoindstillingsbakken i RCE"
   edit_collaboration_b014c18b: "Rediger samarbejde"
   edit_comment_comment_e74afa04: "Rediger kommentar: %{comment}"
   edit_conference_title_6e234815: "Rediger \"%{conference_title}\""
@@ -10778,6 +10784,7 @@ da:
       grading_scheme_info: "Vis/rediger karakterordning"
   grading_standards_b73bfa72: Karakterstandarder
   grading_type_type_7d8b42d7: "Karaktertype: %{type}"
+  granular_contexttype_notification_settings_will_be_c5dfc901: "Granulære %{contextType} meddelelses-indstillinger kan konfigureres her i fremtiden."
   granular_course_notification_settings_will_be_conf_68f122db: "Granulære fagmeddelelsesindstillinger vil kunne konfigureres her i fremtiden."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Granulære tilladelser til styring af wikisider"
   graph_bar_b5daa23d: Graflinje
@@ -11417,6 +11424,7 @@ da:
   highest_28ad71e6: Højeste
   highest_score_e080551e: "Højeste resultat"
   hindi_9bcd4b34: Hindi
+  history_settings_c63dbaaf: Historikindstillinger
   home_351838cd: Startside
   home_page_is_not_valid_2e8a25ae: "Hjemmesiden er ikke gyldig"
   home_tutorial_tray_66826983: "Hjem selvstudiumområde"
@@ -11687,10 +11695,12 @@ da:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkluder resultater, når der gives besked om karakterer.
                 Hvis din e-mail ikke er en institution-e-mail, betyder dette at følsomme oplysninger vil blive sendt udenfor institutionen.
+  include_speedgrader_in_assignment_header_menu_69cd8656: "Inkluder SpeedGrader i menuen Opgave-overskrift"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder denne opgaves karakterer, når du lægger dem ud på de studerendes informationssystem"
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Inkluder denne opgaves karakterer, når du synkroniserer med de studerendes informationssystem på din skole"
   include_unpublished_assignments_83ebbaec: "Inkluder ikke-offentliggjorte opgaver"
   include_unpublished_courses_7a0e7aab: "Inkluder ikke-offentliggjorte fag"
+  includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Indeholder et link til SpeedGrader i menuen Opgave-overskrift i karakteroversigten."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inkluderer karakterværdier i rapporterne om admin-karakterer."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inkluderer rubrikker i fagets sidelinjenavigation"
   incomplete_95612d72: ufuldstændig
@@ -14903,6 +14913,7 @@ da:
   more_courses_5ebbe998: "Flere fag"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Endnu vigtigere kan Canvas give dig mulighed for at tilføje læringsudbytter til dine karakterrubrikker, så du kan evaluere opfyldelse af læringsmål, mens du giver opgaver karakterer. Når du har oprettet læringsudbytter, skal du klikke på Administrer rubrikker for at begynde at bruge dine læringsudbytter til karaktergivning."
   more_info_at_course_name_56dc8c10: "Yderligere oplysninger på %{course_name}"
+  more_info_at_url_41b4764b: "Yderligere oplysninger på %{url}"
   more_info_at_web_address_dba7e187: "Yderligere oplysninger på %{web_address}"
   more_information_3dfb76b5: "Yderligere oplysninger"
   more_information_about_ratings_57cdd446: "Flere oplysninger om vurderinger"
@@ -15127,6 +15138,7 @@ da:
   new_analytics_api_access_7eec1ead: "Ny Analytics API-adgang"
   new_annotations_66932016: "Nye anmærkninger"
   new_announcement_23af4598: "Ny besked"
+  new_announcement_in_course_name_title_84607f44: "Ny besked i %{course_name}: %{title}"
   new_announcement_title_30ba7c1b: "Ny besked %{title}"
   new_announcement_title_course_da7c0ca6: "Ny besked %{title}, %{course}"
   new_anonymous_comment_by_student_author_id_for_ass_6e579da4: "Ny anonym kommentar af studerende (%{author_id}) til %{assignment_title}, studerende (%{user_id}), %{course_name}."
@@ -15465,7 +15477,6 @@ da:
         Inkluderer: 
         
         * Opgaver / indtastet/ændret indsendelseskarakter
-        * Offentliggjort karakter til opgave
         * Ændret karaktervægt
     grading_display: Karaktergivning
     grading_notify_include_grade: "Inkluder scorer når der alarmeres om karakterændringer."
@@ -18896,6 +18907,7 @@ da:
   rce_contents_replace_description: "Aktiver RCE fuldtekst udskift fra LTI’er"
   rce_contents_replace_display_name: "RCE-indhold udskift"
   rce_enhancements_5701e06: RCE-forbedringer
+  rce_initialization_fix_4f176bda: "RCE initialiseringsrettelse"
   re_activate_user_f7d77c9a: "Genaktiver bruger"
   re_reported_b9671073: Genrapporteret
   re_send_notification_directly_to_users_when_announ_c421cea5: "Send meddelelsen direkte til brugerne igen, når beskeden starter"
@@ -19077,6 +19089,7 @@ da:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Udgivet af læringssti: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Udgivet af læringssti: %{path}"
   releasing_grades_31a57dde: "Frigiver karakterer"
+  remember_my_choice_for_this_course_5a3b7206: "Husk mit valg for dette fag"
   remind_me_next_time_6402eb7d: "Påmind mig næste gang"
   reminder_ffd21289: Påmindelse
   remove_account_from_this_profile_c3095eb2: "Slet konto fra denne profil"
@@ -19182,6 +19195,7 @@ da:
   reserved_f247b60b: Reserveret
   reset_95a81614: Nulstil
   reset_multi_factor_authentication_2b63a558: "Nulstil multi-faktor-autentifikation"
+  reset_quiz_engine_choice_323a40e6: "Nulstil valg af testprogram"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Nulstil antallet af denne kontaktmetodes afviste antal"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Nulstil antallet af denne e-mailadresses afviste antal"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "ressource-url skal matche ressource-handlerens domæne"
@@ -20832,6 +20846,7 @@ da:
   show_name_of_observed_students_in_notifications_a56dd9e4: "Vis navn på observerede studerende i meddelelser."
   show_navigation_menu_34e7f441: "Vis navigationsmenu"
   show_new_analytics_for_course_and_user_data_18e92636: "Vis ny analyse for fag- og brugerdata"
+  show_new_analytics_for_course_and_user_data_data_m_89526eb: "Vis ny analyse for fag- og brugerdata. Det kan tage 24 timer, før datene vises i New Analytics, efter at dette funktionsflag er blevet indstillet til ON."
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Vis New Quizzes på siden Tests"
   show_notes_column_22d2b6c1: "Vis notekolonne"
   show_one_question_at_a_time_271e346d: "Vis et spørgsmål ad gangen"
@@ -21990,6 +22005,7 @@ da:
   there_was_a_problem_posting_the_comment_75d15646: "Der opstod et problem ved indsendelse af kommentaren"
   there_was_a_problem_publishing_grades_b0b9202f: "Der opstod et problem ved offentliggørelse af diskussioner."
   there_was_a_problem_releasing_grades_fa0ae6: "Der opstod et problem under frigivelse af karakterer."
+  there_was_a_problem_resetting_your_quiz_engine_cho_ba4277c7: "Der opstod et problem med at nulstille dit valg af testprogram"
   there_was_a_problem_saving_the_comment_d94cbac9: "Der opstod et problem, da kommentaren skulle gemmes"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Der opstod et problem ved lagring af karakteren."
   there_was_a_problem_saving_the_grades_5e61f9e2: "Der opstod et problem ved lagring af karaktererne."
@@ -22907,6 +22923,9 @@ da:
   undated_15c2e5fe: Udateret
   undated_items_toggle_list_visibility_6219e641: "Skift synlighed for liste med udaterede elementer"
   undelivered_message_459916a9: "Ikke leveret besked"
+  under_some_conditions_the_legacy_rce_fails_to_init_66d515ab: |-
+      Under nogle betingelser kan den ældre RCE ikke initialisere, fordi tinymce ikke har tilføjet
+      redigeringsinstansen til sin interne liste, når RCE påkræver det.
   underline_all_links_description: |-
       Understreg links viser hyperlinks i navigationsmenuer, oversigten og sidepaneler som
       *understreget tekst*. Denne funktion gælder ikke for brugergenererede indholdslinks i
@@ -24048,6 +24067,7 @@ da:
   you_are_currently_acting_as_user_name_8d2be0ee: "Du fungerer aktuelt som %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Du er aktuelt logget i visning som studerende"
   you_are_currently_masquerading_as_user_name_f4a00ade: "Du maskerer dig aktuelt som %{user_name}"
+  you_are_currently_receiving_notifications_for_this_4f542bb2: "Du modtager i øjeblikket meddelelser om denne %{contextType}. For at deaktivere %{contextType} meddelelser, kan du skifte ovenfor."
   you_are_currently_receiving_notifications_for_this_9646b09d: "Du modtager i øjeblikket meddelelser for dette fag. For at deaktivere fagmeddelelser skal du bruge knappen ovenfor."
   you_are_here_54075d8c: "Du er her:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Du er logget ind på %{institution1} med dine brugeroplysninger fra %{institution2}"
@@ -24239,6 +24259,7 @@ da:
       Læse, Skrive og direkte adgang til beskeder.
       Når du har oprettet din applikation, noterer du dig forbrugernøgle og -hemmelighed og indtaster dem her.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Du vil ikke være i stand til at vise dine ændringer på forhånd"
+  you_will_not_receive_any_contexttype_notifications_da7a58f1: "Du modtager ikke nogen %{contextType} meddelelser på dette tidspunkt. For at aktivere %{contextType} meddelelser, kan du skifte ovenfor."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Du modtager ikke fagmeddelelser på nuværende tidspunkt. For at aktivere fagmeddelelser skal du bruge knappen ovenfor."
   your_answer_8dad6ea4: "Dit svar:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din opgavelsite kan nu findes på *Kalender* siden."
@@ -24268,6 +24289,7 @@ da:
   your_outcomes_were_successfully_imported_c5de884: "Dine læringsudbytter blev importeret."
   your_password_has_been_changed_df0e72aa: "Dit kodeord er blevet ændret."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Dit profilbillede kunne ikke uploades. Du har muligvis overskredet grænsen for upload."
+  your_quiz_engine_choice_has_been_reset_68d268c1: "Dit valg af testprogram er nulstillet!"
   your_score_a1fc2fcf: "Dit resultat"
   your_score_score_fb785381: "Dit resultat: %{score}"
   your_search_encountered_the_following_errors_fc3e5e7f: 
