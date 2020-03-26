@@ -105,6 +105,16 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "conversation" do
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:conversation_created).once
+      sender = user_model
+      recipient = user_model
+      conversation(sender, recipient)
+    end
+  end
+
+
   describe "course" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:course_created).once

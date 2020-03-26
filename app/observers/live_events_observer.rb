@@ -18,6 +18,7 @@
 class LiveEventsObserver < ActiveRecord::Observer
   observe :content_export,
           :content_migration,
+          :conversation,
           :course,
           :discussion_entry,
           :discussion_topic,

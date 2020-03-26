@@ -93,6 +93,19 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".conversation_created" do
+    it "should trigger a conversation live event with conversation details" do
+      user1 = user_model
+      user2 = user_model
+      conversation = conversation(user1, user2)
+      expect_event("conversation_created",
+        hash_including(
+          conversation_id: conversation.id.to_s
+        ))
+      Canvas::LiveEvents.conversation_created(conversation)
+    end
+  end
+
   describe ".enrollment_updated" do
     it "should not include associated_user_id for non-observer enrollments" do
       enrollment = course_with_student

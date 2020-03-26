@@ -45,6 +45,13 @@ module Canvas::LiveEvents
     ctx
   end
 
+  def self.conversation_created(conversation)
+    post_event_stringified('conversation_created', {
+      conversation_id: conversation.id,
+      updated_at: conversation.updated_at
+    })
+  end
+
   def self.get_course_data(course)
     {
       course_id: course.global_id,
