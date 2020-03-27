@@ -86,7 +86,7 @@ describe Canvas::Apm do
         }
       }
       Canvas::Apm.hostname = "testbox"
-      Datadog.tracer.trace("TESTING") do |span|
+      Canvas::Apm.tracer.trace("TESTING") do |span|
         shard = OpenStruct.new({id: 42})
         account = OpenStruct.new({global_id: 420000042})
         user = OpenStruct.new({global_id: 42100000421})
@@ -117,6 +117,94 @@ describe Canvas::Apm do
       samples = decisions.select{|x| x}
       expect(samples.size > 50).to be_truthy
       expect(samples.size < 500).to be_truthy
+    end
+  end
+
+  describe "general tracing" do
+    class FakeSpan
+      attr_reader :tags
+      attr_accessor :resource, :span_type
+      def initialize
+        self.reset!
+      end
+
+      def reset!
+        @tags = {}
+      end
+
+      def set_tag(key, val)
+        @tags[key] = val
+      end
+    end
+
+    class FakeTracer
+      attr_reader :span
+      def initialize
+        @span = FakeSpan.new
+      end
+
+      def trace(_name, opts = {})
+        span.resource = opts.fetch(:resource, nil)
+        yield span
+      end
+
+      def enabled
+        true
+      end
+    end
+
+    let(:tracer){ FakeTracer.new }
+    let(:span){ tracer.span }
+
+    around do |example|
+      Canvas::Apm.reset!
+      Canvas::DynamicSettings.fallback_data = {
+        "private": {
+          "canvas": {
+            "datadog_apm.yml": "sample_rate: 1.0\nhost_sample_rate: 1.0"
+          }
+        }
+      }
+      Canvas::Apm.hostname = "testbox"
+      Canvas::Apm.tracer = tracer
+      example.run
+      span.reset!
+      Canvas::Apm.reset!
+    end
+
+    it "provides a hook to the dd tracer" do
+      expect(Canvas::Apm.sample_rate).to eq(1.0)
+      expect(Canvas::Apm).to be_configured
+      expect(Canvas::Apm.tracer).to eq(tracer)
+      Canvas::Apm.reset!
+      Canvas::Apm.hostname = "testbox"
+      expect(Canvas::Apm).to be_configured
+      expect(Canvas::Apm.tracer).to eq(Datadog.tracer)
+    end
+
+    it "traces arbitrary code" do
+      expect(Canvas::Apm.sample_rate).to eq(1.0)
+      expect(Canvas::Apm).to be_configured
+      Canvas::Apm.trace("test") do |span|
+        span.set_tag("TEST", "VALUE")
+        # arbitrary other code
+      end
+      expect(span.resource).to eq("test")
+    end
+
+    it 'still yields if there is no configuration' do
+      Canvas::Apm.reset!
+      Canvas::DynamicSettings.fallback_data = {
+        "private": {
+          "canvas": {
+            "datadog_apm.yml": "sample_rate: 0.0\nhost_sample_rate: 0.0"
+          }
+        }
+      }
+      expect(Canvas::Apm).to_not be_configured
+      Canvas::Apm.trace("test") do |span|
+        expect(span.class).to eq(Canvas::Apm::StubTracer::StubSpan)
+      end
     end
   end
 end
