@@ -52,6 +52,14 @@ module Canvas::LiveEvents
     })
   end
 
+  def self.conversation_forwarded(conversation)
+    post_event_stringified('conversation_forwarded', {
+      conversation_id: conversation.id,
+      updated_at: conversation.updated_at
+      },
+      amended_context(nil))
+  end
+
   def self.get_course_data(course)
     {
       course_id: course.global_id,

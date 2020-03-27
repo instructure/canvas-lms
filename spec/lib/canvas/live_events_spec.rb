@@ -252,6 +252,25 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".conversation_forwarded" do
+    before(:each) do
+      @user1 = user_model
+      @user2 = user_model
+      @convo = Conversation.initiate([@user1, @user2], false)
+      @convo.add_message(@user1, 'Hi! You are doing great...')
+    end
+
+    it "should trigger live event if a new user is added to a conversation" do
+      @user3 = user_model
+      @convo.add_participants(@user1, [@user3])
+      expect_event('conversation_forwarded',
+        hash_including(
+          conversation_id: @convo.id.to_s
+        ), { compact_live_events: true }).once
+      Canvas::LiveEvents.conversation_forwarded(@convo)
+    end
+  end
+
   describe '.course_grade_change' do
     before(:once) do
       @user = User.create!
