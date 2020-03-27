@@ -480,10 +480,10 @@ describe AssignmentGroupsController, type: :request do
     a1.reload
 
     json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=all_dates",
+          "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=all_dates&include[]=can_edit",
           { controller: 'assignment_groups', action: 'index',
             format: 'json', course_id: @course.id.to_s,
-            include: ['assignments', 'all_dates'] })
+            include: ['assignments', 'all_dates', 'can_edit'] })
 
     expected = [
       {
@@ -496,8 +496,8 @@ describe AssignmentGroupsController, type: :request do
         'integration_data' => {},
         'sis_source_id' => nil,
         'assignments' => [
-          controller.assignment_json(a1, @user,session, include_all_dates: true).as_json,
-          controller.assignment_json(a2, @user,session, include_all_dates: true).as_json
+          controller.assignment_json(a1, @user,session, include_all_dates: true, include_can_edit: true).as_json,
+          controller.assignment_json(a2, @user,session, include_all_dates: true, include_can_edit: true).as_json
         ]
       }
     ]

@@ -627,10 +627,14 @@ class AssignmentsApiController < ApplicationController
 
   # @API List assignments
   # Returns the paginated list of assignments for the current course or assignment group.
-  # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"|"observed_users"]
-  #   Associations to include with the assignment. The "assignment_visibility" option
-  #   requires that the Differentiated Assignments course feature be turned on. If
-  #   "observed_users" is passed, submissions for observed users will also be included as an array.
+  # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"|"observed_users"|"can_edit"]
+  #   Optional information to include with each assignment:
+  #   submission:: The current user's current +Submission+
+  #   assignment_visibility:: An array of ids of students who can see the assignment
+  #   all_dates:: An array of +AssignmentDate+ structures, one for each override, and also a +base+ if the assignment has an "Everyone" / "Everyone Else" date
+  #   overrides:: An array of +AssignmentOverride+ structures
+  #   observed_users:: An array of submissions for observed users
+  #   can_edit:: an extra Boolean value will be included with each +Assignment+ (and +AssignmentDate+ if +all_dates+ is supplied) to indicate whether the caller can edit the assignment or date. Moderated grading and closed grading periods may restrict a user's ability to edit an assignment.
   # @argument search_term [String]
   #   The partial title of the assignments to match and return.
   # @argument override_assignment_dates [Boolean]
@@ -827,7 +831,8 @@ class AssignmentsApiController < ApplicationController
                         include_all_dates: include_all_dates,
                         bucket: params[:bucket],
                         include_overrides: include_override_objects,
-                        preloaded_user_content_attachments: preloaded_attachments
+                        preloaded_user_content_attachments: preloaded_attachments,
+                        include_can_edit: include_params.include?('can_edit')
                         )
       end
       hashes
@@ -836,7 +841,7 @@ class AssignmentsApiController < ApplicationController
 
   # @API Get a single assignment
   # Returns the assignment with the given id.
-  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"|"can_edit"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on. If
   #   "observed_users" is passed, submissions for observed users will also be included.
@@ -879,7 +884,8 @@ class AssignmentsApiController < ApplicationController
         include_visibility: include_visibility,
         needs_grading_count_by_section: needs_grading_count_by_section,
         include_all_dates: include_all_dates,
-        include_overrides: include_override_objects
+        include_overrides: include_override_objects,
+        include_can_edit: included_params.include?('can_edit')
       }
 
       result_json = if use_quiz_json?
