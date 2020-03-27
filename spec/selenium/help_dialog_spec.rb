@@ -167,4 +167,47 @@ describe "help dialog" do
       expect(f("#help_tray")).to_not include_text("Customize this menu")
     end
   end
+
+  context "featured and new links" do
+    before :each do
+      user_logged_in(:active_all => true)
+      Setting.set('show_feedback_link', 'true')
+      Account.site_admin.enable_feature! :featured_help_links
+      Account.default.account_users.create!(:user => @user)
+    end
+
+    it "should have the default link at the top of the tray" do
+      get "/accounts/#{Account.default.id}/settings"
+      f('.HelpMenuOptions__Container button').click
+      fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
+      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'FEATURED LINK'
+      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'FEATURED subtext'
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://featuredurl.example.com'
+      fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
+      f('#custom_help_link_settings button[type="submit"]').click
+      form = f('#account_settings')
+      form.submit
+      wait_for_ajaximations
+      f('#global_nav_help_link').click
+      wait_for_ajaximations
+      expect(fxpath("//span[img[@alt = 'Cheerful panda holding a map']]//span[contains(text(),'FEATURED LINK')]")).to include_text("FEATURED LINK")
+    end
+
+    it "should have a New Link in the tray" do
+      get "/accounts/#{Account.default.id}/settings"
+      f('.HelpMenuOptions__Container button').click
+      fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
+      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'NEW LINK'
+      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'NEW subtext'
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://newurl.example.com'
+      fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
+      f('#custom_help_link_settings button[type="submit"]').click
+      form = f('#account_settings')
+      form.submit
+      wait_for_ajaximations
+      f('#global_nav_help_link').click
+      wait_for_ajaximations
+      expect(fxpath("//*[*/a[contains(text(),'NEW LINK')]]//*[text() = 'NEW']")).to include_text("NEW")
+    end
+  end
 end
