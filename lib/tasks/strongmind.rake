@@ -135,6 +135,19 @@ namespace :strongmind do
     puts "Chat widget set to: #{chat_widget}"
   end
 
+  desc "Enable Observer Dashboard"
+  task :enable_observer_dashboard, [:switch] => :environment do |task, args|
+    switch = (args[:switch] != "false")
+    SettingsService.update_settings(
+      id: '1',
+      setting: "observer_dashboard",
+      value: switch,
+      object: "school"
+    )
+
+    puts "Observer dashboard set to: #{switch}"
+  end
+
   desc "redistribute due dates on courses after X start date"
   task :redistribute_date_dates_after => :environment do
     abort("No date specified in ENV") unless ENV['REDISTRIBUTE_AFTER']

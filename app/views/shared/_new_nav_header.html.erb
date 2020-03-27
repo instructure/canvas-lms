@@ -138,6 +138,16 @@
                 <% end %>
                 </a>
               </li>
+              <% if observer_dashboard_enabled? %>
+                <li class="menu-item ic-app-header__menu-list-item">
+                  <a href="/observers" class="ic-app-header__menu-list-link">
+                    <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
+                      <%= svg_icon :student_view %>
+                    </div>
+                    <div class="menu-item__text"><%= t('Observing') %></div>
+                  </a>
+                </li>
+              <% end %>
               <li class="menu-item ic-app-header__menu-list-item">
                 <% tutapoint_url = SettingsService.get_settings(object: 'school', id: 1)['tutapoint_url'] %>
                 <% if @current_user && tutapoint_url %>
