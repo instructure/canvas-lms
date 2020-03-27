@@ -45,6 +45,7 @@ class BigBlueButtonConference < WebConference
       settings[:admin_key] = 8.times.map{ chars[chars.size * rand] }.join until settings[:admin_key] && settings[:admin_key] != settings[:user_key]
     end
     settings[:record] &&= config[:recording_enabled]
+    settings[:domain] ||= config[:domain] # save the domain
     current_host = URI(settings[:default_return_url] || "http://www.instructure.com").host
     send_request(:create, {
       :meetingID => conference_key,
@@ -141,13 +142,19 @@ class BigBlueButtonConference < WebConference
     filtered_conferences = conferences.select{|c| c.conference_key && c.settings[:record]}
     return unless filtered_conferences.any?
 
+    fallback_conferences, current_conferences = conferences.partition{|c| c.use_fallback_config?}
+    fetch_and_preload_recordings(fallback_conferences, use_fallback_config: true) if fallback_conferences.any?
+    fetch_and_preload_recordings(current_conferences, use_fallback_config: false) if current_conferences.any?
+  end
+
+  def self.fetch_and_preload_recordings(conferences, use_fallback_config: false)
     # have a limit so we don't send a ridiculously long URL over
     limit = Setting.get("big_blue_button_preloaded_recordings_limit", "50").to_i
-    filtered_conferences.each_slice(limit) do |sliced_conferences|
+    conferences.each_slice(limit) do |sliced_conferences|
       meeting_ids = sliced_conferences.map(&:conference_key).join(",")
-      response = send_request(:getRecordings, {
-        :meetingID => meeting_ids,
-      })
+      response = send_request(:getRecordings,
+        {:meetingID => meeting_ids},
+        use_fallback_config: use_fallback_config)
       result = response[:recordings] if response
       result = [] if result.is_a?(String)
       grouped_result = Array(result).group_by{|r| r[:meetingID]}
@@ -155,6 +162,11 @@ class BigBlueButtonConference < WebConference
         c.loaded_recordings = grouped_result[c.conference_key] || []
       end
     end
+  end
+
+  def use_fallback_config?
+    # use the fallback config (if possible) if it wasn't created with the current config
+    self.settings[:domain] != self.class.config[:domain]
   end
 
   private
@@ -208,18 +220,23 @@ class BigBlueButtonConference < WebConference
     self.class.generate_request(*args)
   end
 
-  def self.generate_request(action, options)
+  def self.fallback_config
+    Canvas::Plugin.find(:big_blue_button_fallback).settings&.with_indifferent_access
+  end
+
+  def self.generate_request(action, options, use_fallback_config: false)
+    config_to_use = (use_fallback_config && fallback_config.presence) || config
     query_string = options.to_query
-    query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config[:secret_dec]))
-    "https://#{config[:domain]}/bigbluebutton/api/#{action}?#{query_string}"
+    query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config_to_use[:secret_dec]))
+    "https://#{config_to_use[:domain]}/bigbluebutton/api/#{action}?#{query_string}"
   end
 
-  def send_request(*args)
-    self.class.send_request(*args)
+  def send_request(action, options)
+    self.class.send_request(action, options, use_fallback_config: use_fallback_config?)
   end
 
-  def self.send_request(action, options)
-    url_str = generate_request(action, options)
+  def self.send_request(action, options, use_fallback_config: false)
+    url_str = generate_request(action, options, use_fallback_config: use_fallback_config)
     http_response = nil
     Canvas.timeout_protection("big_blue_button") do
       logger.debug "big blue button api call: #{url_str}"
