@@ -1008,6 +1008,7 @@ class GradebooksController < ApplicationController
     if ["srgb", "individual"].include?(gradebook_version)
       render_individual_gradebook
     else
+      opt_in_datadog_rum_js
       render_default_gradebook
     end
   end
