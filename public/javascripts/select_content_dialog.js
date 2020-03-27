@@ -186,7 +186,7 @@ SelectContentDialog.Events = {
         $dialog.append(
           $('<iframe/>', {
             id: 'resource_selection_iframe',
-            style: 'width: 800px; height: ' + frameHeight + 'px; border: 0;',
+            style: `width: 800px; height: ${frameHeight}px; max-height: ${frameHeight}px; border: 0;`,
             src: '/images/ajax-loader-medium-444.gif',
             borderstyle: '0',
             tabindex: '0',
