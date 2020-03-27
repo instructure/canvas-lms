@@ -23,73 +23,76 @@ let wrapper
 
 const renderComponent = () => ReactDOM.render(<FileSelectBox contextString="test_3" />, wrapper)
 
+const folders = [
+  {
+    full_name: 'course files',
+    id: 112,
+    parent_folder_id: null
+  },
+  {
+    full_name: 'course files/A',
+    id: 113,
+    parent_folder_id: 112
+  },
+  {
+    full_name: 'course files/C',
+    id: 114,
+    parent_folder_id: 112
+  },
+  {
+    full_name: 'course files/B',
+    id: 115,
+    parent_folder_id: 112
+  },
+  {
+    full_name: 'course files/NoFiles',
+    id: 116,
+    parent_folder_id: 112
+  }
+]
+
+const files = [
+  {
+    id: 1,
+    folder_id: 112,
+    display_name: 'cf-1'
+  },
+  {
+    id: 2,
+    folder_id: 113,
+    display_name: 'A-1'
+  },
+  {
+    id: 3,
+    folder_id: 114,
+    display_name: 'C-1'
+  },
+  {
+    id: 4,
+    folder_id: 115,
+    display_name: 'B-1'
+  }
+]
+
+const setupServer = () => {
+  const server = sinon.fakeServer.create()
+  server.respondWith('GET', /\/tests\/3\/files/, [
+    200,
+    {'Content-Type': 'application/json'},
+    JSON.stringify(files)
+  ])
+  server.respondWith('GET', /\/tests\/3\/folders/, [
+    200,
+    {'Content-Type': 'application/json'},
+    JSON.stringify(folders)
+  ])
+  return server
+}
+
 QUnit.module('FileSelectBox', {
   setup() {
     wrapper = document.getElementById('fixtures')
-    this.server = sinon.fakeServer.create()
-
-    this.folders = [
-      {
-        full_name: 'course files',
-        id: 112,
-        parent_folder_id: null
-      },
-      {
-        full_name: 'course files/A',
-        id: 113,
-        parent_folder_id: 112
-      },
-      {
-        full_name: 'course files/C',
-        id: 114,
-        parent_folder_id: 112
-      },
-      {
-        full_name: 'course files/B',
-        id: 115,
-        parent_folder_id: 112
-      },
-      {
-        full_name: 'course files/NoFiles',
-        id: 116,
-        parent_folder_id: 112
-      }
-    ]
-
-    this.files = [
-      {
-        id: 1,
-        folder_id: 112,
-        display_name: 'cf-1'
-      },
-      {
-        id: 2,
-        folder_id: 113,
-        display_name: 'A-1'
-      },
-      {
-        id: 3,
-        folder_id: 114,
-        display_name: 'C-1'
-      },
-      {
-        id: 4,
-        folder_id: 115,
-        display_name: 'B-1'
-      }
-    ]
-
-    this.server.respondWith('GET', /\/tests\/3\/files/, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(this.files)
-    ])
-    this.server.respondWith('GET', /\/tests\/3\/folders/, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(this.folders)
-    ])
-
+    this.server = setupServer()
     this.component = renderComponent()
   },
 
@@ -100,6 +103,15 @@ QUnit.module('FileSelectBox', {
 
 test('it renders', function() {
   ok(this.component)
+})
+
+test('it renders singular use of file', function() {
+  ok(wrapper.innerText.match(/ New File /))
+  ok(
+    $(this.component.refs.selectBox)
+      .attr('aria-label')
+      .match(/file you/)
+  )
 })
 
 test('it should alphabetize the folder list', function() {
@@ -125,4 +137,30 @@ test('it should show the loading state while files are loading', function() {
     .toArray()
     .filter(x => x.text === 'Loading...')
   equal(loading.length, 0)
+})
+
+QUnit.module('FileSelectBox with module_dnd enabled', {
+  setup() {
+    this.reset_env = window.ENV
+    window.ENV = {FEATURES: {module_dnd: true}}
+    wrapper = document.getElementById('fixtures')
+    this.server = setupServer()
+    this.component = renderComponent()
+  },
+
+  teardown() {
+    window.ENV = this.reset_env
+    ReactDOM.unmountComponentAtNode(wrapper)
+  }
+})
+
+test('it renders plural use of file', function() {
+  ReactDOM.unmountComponentAtNode(wrapper)
+  this.component = renderComponent()
+  ok(wrapper.innerText.match(/ New File\(s\) /))
+  ok(
+    $(this.component.refs.selectBox)
+      .attr('aria-label')
+      .match(/files you/)
+  )
 })

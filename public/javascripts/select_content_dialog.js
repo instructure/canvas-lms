@@ -517,7 +517,7 @@ $(document).ready(function() {
           let data = $(
             '#select_context_content_dialog .module_item_option:visible:first'
           ).getFormData()
-          const callback = function(data) {
+          const process_upload = function(data) {
             let obj
 
             // discussion_topics will come from real api v1 and so wont be nested behind a `discussion_topic` or 'wiki_page' root object
@@ -570,7 +570,7 @@ $(document).ready(function() {
             }
             uploadFile(url, data, file)
               .then(attachment => {
-                callback(attachment)
+                process_upload(attachment)
               })
               .catch(response => {
                 $('#select_context_content_dialog').loadingImage('remove')
@@ -584,7 +584,7 @@ $(document).ready(function() {
               'POST',
               data,
               data => {
-                callback(data)
+                process_upload(data)
               },
               data => {
                 $('#select_context_content_dialog').loadingImage('remove')

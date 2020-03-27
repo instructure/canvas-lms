@@ -178,7 +178,8 @@ class ApplicationController < ActionController::Base
             featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links),
             show_qr_login: Object.const_defined?("InstructureMiscPlugin") && !!@domain_root_account&.feature_enabled?(:mobile_qr_login),
             responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03),
-            product_tours: !!@domain_root_account&.feature_enabled?(:product_tours)
+            product_tours: !!@domain_root_account&.feature_enabled?(:product_tours),
+            module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd)
           }
         }
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
