@@ -63,8 +63,10 @@ COPY --chown=docker:docker yarn.lock       ${APP_HOME}
 COPY --chown=docker:docker babel.config.js ${APP_HOME}
 
 USER docker
+# if yarn hits a snag try one more time with concurrency set to 1
+# https://github.com/yarnpkg/yarn/issues/2629
 RUN bundle install --jobs 8 \
-  && yarn install --pure-lockfile
+  && (yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1)
 COPY --chown=docker:docker . $APP_HOME
 RUN mkdir -p .yardoc \
              app/stylesheets/brandable_css_brands \
