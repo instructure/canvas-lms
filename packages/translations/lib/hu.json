@@ -1,9 +1,39 @@
 {
+    "accessibility_checker_b3af1f6c": {
+        "message": "Akadálymentesség ellenőrzése"
+    },
     "add_8523c19b": {
         "message": "Hozzáadás"
     },
+    "add_another_f4e50d57": {
+        "message": "Másik hozzáadása"
+    },
+    "add_cc_subtitles_55f0394e": {
+        "message": "Felirat hozzáadása"
+    },
+    "add_to_do_7537af64": {
+        "message": "Teendő hozzáadása"
+    },
+    "add_to_do_7def3c37": {
+        "message": "Teendő hozzáadása"
+    },
     "address_3159962f": {
         "message": "Cím:"
+    },
+    "align_11050992": {
+        "message": "Igazítás"
+    },
+    "align_center_ca078feb": {
+        "message": "Középre igazítás"
+    },
+    "align_left_e9f1f93b": {
+        "message": "Balra igazítás"
+    },
+    "align_right_9bad3ac1": {
+        "message": "Jobbra igazítás"
+    },
+    "alignment_and_indentation_f7de34bf": {
+        "message": "Igazítás és behúzás"
     },
     "all_4321c3a1": {
         "message": "Összes"
@@ -13,6 +43,18 @@
     },
     "all_items_loaded_aa256183": {
         "message": "Minden elem betöltve"
+    },
+    "alphabetical_55b5b4e0": {
+        "message": "Betűrendben"
+    },
+    "alt_text_611fb322": {
+        "message": "Alternatív szöveg"
+    },
+    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+        "message": "Hiba történt, amikor megpróbálta elvetni a lehetőséget."
+    },
+    "an_error_occurred_generating_the_file_preview_cf259955": {
+        "message": "Hiba történt a fájl előnézetének létrehozásakor."
     },
     "announcement_fb4cb645": {
         "message": "Hirdetmény"
@@ -25,6 +67,9 @@
     },
     "apps_54d24a47": {
         "message": "Alkalmazások"
+    },
+    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+        "message": "Biztosan törölni szeretné ezt a tervezőbeli elemet?"
     },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Képarány megtartása"
@@ -46,6 +91,12 @@
     },
     "canvas_plugins_705a5016": {
         "message": "Canvas Pluginok"
+    },
+    "clear_selected_file_82388e50": {
+        "message": "Kiválasztott fájl törlése"
+    },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Kiválasztott fájl törlése: { filename }"
     },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Az oldalra mutató link beszúrásához kattintson a kívánt oldalra."
@@ -74,17 +125,32 @@
     "course_8a63b4a3": {
         "message": "Kurzus"
     },
+    "course_documents_104d76e0": {
+        "message": "Kurzus dokumentumai"
+    },
     "course_files_62deb8f8": {
         "message": "Kurzusfájlok"
     },
+    "course_images_f8511d04": {
+        "message": "Kurzus képei"
+    },
+    "course_links_b56959b9": {
+        "message": "Kurzus linkjei"
+    },
     "course_navigation_dd035109": {
         "message": "Kurzusnavigáció"
+    },
+    "date_added_ed5ad465": {
+        "message": "Dátum hozzáadva"
     },
     "date_ee500367": {
         "message": "Dátum"
     },
     "date_is_required_8660ec22": {
         "message": "Dátum szükséges"
+    },
+    "date_time_d9fbf2d7": {
+        "message": "Dátum és idő"
     },
     "decrease_indent_de6343ab": {
         "message": "Behúzás csökkentése"
@@ -109,6 +175,21 @@
     },
     "discussions_index_6c36ced": {
         "message": "Fórumok indexe"
+    },
+    "dismiss_itemtitle_a9fae1b3": {
+        "message": "{ itemTitle } elvetése"
+    },
+    "dismiss_opportunityname_5995176f": {
+        "message": "{ opportunityName } elvetése"
+    },
+    "dismissed_8b0b1fc9": {
+        "message": "Elvetve"
+    },
+    "document_678cd7bf": {
+        "message": "Dokumentum"
+    },
+    "documents_81393201": {
+        "message": "Dokumentumok"
     },
     "done_54e3d4b6": {
         "message": "Kész"
