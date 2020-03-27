@@ -45,7 +45,8 @@ propTypes.course = shape({
     shape({
       display_name: string.isRequired
     })
-  ).isRequired,
+  ),
+  teacher_count: string,
   sis_course_id: string
 })
 propTypes.courseList = arrayOf(propTypes.course)

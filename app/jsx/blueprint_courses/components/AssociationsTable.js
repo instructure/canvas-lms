@@ -176,7 +176,11 @@ export default class AssociationsTable extends React.Component {
           <td>{this.renderCellText(course.term.name)}</td>
           <td>{this.renderCellText(course.sis_course_id)}</td>
           <td>
-            {this.renderCellText(course.teachers.map(teacher => teacher.display_name).join(', '))}
+            {this.renderCellText(
+              course.teachers
+                ? course.teachers.map(teacher => teacher.display_name).join(', ')
+                : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count})
+            )}
           </td>
           <td className="bca-associations__x-col">
             <form
@@ -214,7 +218,11 @@ export default class AssociationsTable extends React.Component {
           <td>{this.renderCellText(course.term.name)}</td>
           <td>{this.renderCellText(course.sis_course_id)}</td>
           <td>
-            {this.renderCellText(course.teachers.map(teacher => teacher.display_name).join(', '))}
+            {this.renderCellText(
+              course.teachers
+                ? course.teachers.map(teacher => teacher.display_name).join(', ')
+                : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count})
+            )}
           </td>
           <td className="bca-associations__x-col">
             <form

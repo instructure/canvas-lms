@@ -183,7 +183,7 @@ module Api::V1::Course
   def preload_teachers(courses)
     threshold = params[:teacher_limit].presence&.to_i
     if threshold
-      scope = TeacherEnrollment.active_or_pending.where(:course_id => courses).distinct.select(:user_id, :course_id)
+      scope = TeacherEnrollment.where.not(:workflow_state => %w{deleted rejected}).where(:course_id => courses).distinct.select(:user_id, :course_id)
       teacher_counts = Enrollment.from("(#{scope.to_sql}) AS t").group("t.course_id").count
       to_preload = []
       courses.each do |course|

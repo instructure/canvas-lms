@@ -54,6 +54,7 @@ const ApiClient = {
       {blueprint_associated: 'false'},
       {'include[]': 'term'},
       {'include[]': 'teachers'},
+      {teacher_limit: '5'},
       {search_term: search},
       {enrollment_term_id: term}
     ])
@@ -62,7 +63,7 @@ const ApiClient = {
   },
 
   getAssociations({masterCourse}) {
-    const params = this._queryString([{per_page: '100'}])
+    const params = this._queryString([{per_page: '100'}, {teacher_limit: '5'}])
 
     return this._depaginate(
       `/api/v1/courses/${masterCourse.id}/blueprint_templates/default/associated_courses?${params}`
