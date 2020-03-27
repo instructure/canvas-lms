@@ -22,6 +22,14 @@ module InstFS
       Canvas::Plugin.find('inst_fs').enabled? && !!app_host && !!jwt_secret
     end
 
+    def check_migration_rate?
+      rand < Canvas::Plugin.find('inst_fs').settings[:migration_rate].to_f / 100.0
+    end
+
+    def migrate_attachment?(attachment)
+      enabled? && !attachment.instfs_hosted? && Attachment.s3_storage? && check_migration_rate?
+    end
+
     def login_pixel(user, session, oauth_host)
       return if session[:oauth2] # don't stomp an existing oauth flow in progress
       return if session[:pending_otp]
@@ -151,6 +159,60 @@ module InstFS
       end
 
       raise InstFS::DirectUploadError, "received code \"#{response.code}\" from service, with message \"#{response.body}\""
+    end
+
+    def export_reference(attachment)
+      raise InstFS::ExportReferenceError, "attachment already has instfs_uuid" if attachment.instfs_hosted?
+      raise InstFS::ExportReferenceError, "can't export non-s3 attachments to inst-fs" unless Attachment.s3_storage?
+
+      # compare to s3_bucket_url in the aws-sdk-s3 gem's
+      # lib/aws-sdk-s3/customizations/bucket.rb; we're leaving out the bucket
+      # name from the url. otherwise, this is effectively
+      # `attachment.bucket.url`
+      s3_client = attachment.bucket.client
+      s3_url = s3_client.config.endpoint.dup
+      if s3_client.config.region == 'us-east-1' &&
+         s3_client.config.s3_us_east_1_regional_endpoint == 'legacy'
+        s3_url.host = Aws::S3::Plugins::IADRegionalEndpoint.legacy_host(s3_url.host)
+      end
+
+      body = {
+        objectStore: {
+          type: "s3",
+          params: {
+            host: s3_url.to_s,
+            bucket: attachment.bucket.name
+          }
+        },
+        # single reference
+        references: [{
+          storeKey: attachment.full_filename,
+          timestamp: attachment.created_at.to_i,
+          filename: attachment.filename,
+          displayName: attachment.display_name,
+          content_type: attachment.content_type,
+          encoding: attachment.encoding,
+          size: attachment.size,
+          user_id: attachment.context_user&.global_id&.to_s,
+          root_account_id: attachment.root_account&.global_id&.to_s,
+          sha512: nil, # to be calculated by inst-fs
+        }]
+      }.to_json
+
+      response = CanvasHttp.post(export_references_url, body: body, content_type: "application/json")
+      raise InstFS::ExportReferenceError, "received code \"#{response.code}\" from service, with message \"#{response.body}\"" unless response.class == Net::HTTPOK
+
+      json_response = JSON.parse(response.body)
+      well_formed =
+        json_response.is_a?(Hash) &&
+        json_response.key?("success") &&
+        json_response["success"].is_a?(Array) &&
+        json_response["success"].length == 1 &&
+        json_response["success"][0].is_a?(Hash)
+        json_response["success"][0].key?("id")
+      raise InstFS::ExportReferenceError, "import succeeded, but response body did not have expected shape" unless well_formed
+
+      json_response["success"][0]["id"]
     end
 
     def duplicate_file(instfs_uuid)
@@ -387,6 +449,7 @@ module InstFS
   end
 
   class DirectUploadError < StandardError; end
+  class ExportReferenceError < StandardError; end
   class DuplicationError < StandardError; end
   class DeletionError < StandardError; end
 end

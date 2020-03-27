@@ -512,6 +512,14 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def root_account
+    begin
+      root_account_id && Account.find_cached(root_account_id)
+    rescue ::Canvas::AccountCacheError
+      nil
+    end
+  end
+
   def namespace
     read_attribute(:namespace) || (new_record? ? write_attribute(:namespace, infer_namespace) : nil)
   end
@@ -836,11 +844,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def url_ttl
-    settings = begin
-      root_account_id && Account.find_cached(root_account_id).settings
-    rescue ::Canvas::AccountCacheError
-    end
-    setting = settings&.[](:s3_url_ttl_seconds)
+    setting = root_account&.settings&.[](:s3_url_ttl_seconds)
     setting ||= Setting.get('attachment_url_ttl', 1.hour.to_s)
     setting.to_i.seconds
   end

@@ -1,5 +1,5 @@
-<%
-# Copyright (C) 2016 - present Instructure, Inc.
+#
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,23 +14,20 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
+#
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
-  <table style="width: 500px;" class="formtable">
-    <tr>
-      <td colspan="2">
-        <p><%= t(:description, <<-TEXT)
-          Hosts uploaded files with the Inst-FS service.
-          TEXT
-        %></p>
-      </td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :migration_rate, :en => "Chance of migrating older files into Inst-FS on access (0 to 100)" %></td>
-      <td>
-        <%= f.text_field :migration_rate %>
-      </td>
-    </tr>
-  </table>
-<% end %>
+module Canvas::Plugins::Validators::InstFsValidator
+  def self.validate(settings, plugin_setting)
+    if settings[:migration_rate].blank?
+      migration_rate = 0
+    else
+      migration_rate = settings[:migration_rate].to_f rescue nil
+    end
+    if migration_rate.nil? || migration_rate < 0 || migration_rate > 100
+      plugin_setting.errors.add(:base, I18n.t('Please enter a number between 0 and 100 for the migration rate'))
+      return false
+    end
+    settings[:migration] = migration_rate
+    settings.slice(:migration_rate).to_h.with_indifferent_access
+  end
+end

@@ -405,8 +405,11 @@ Canvas::Plugin.register('inst_fs', nil, {
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
   :version => '0.0.1',
-  :settings => nil,
-  :settings_partial => 'plugins/inst_fs_settings'
+  :settings => {
+    :migration_rate => 0,
+  },
+  :settings_partial => 'plugins/inst_fs_settings',
+  :validator => 'InstFsValidator'
 })
 Canvas::Plugin.register('unsplash', nil, {
   name: lambda{ t :name, 'Unsplash' },
