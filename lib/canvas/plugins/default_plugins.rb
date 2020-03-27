@@ -155,6 +155,18 @@ Canvas::Plugin.register('big_blue_button', :web_conferencing, {
   :validator => 'BigBlueButtonValidator',
   :encrypted_settings => [:secret]
 })
+Canvas::Plugin.register('big_blue_button_fallback', nil, {
+  :name => lambda{ t :name, "BigBlueButton Fallback For Migration" },
+  :description => lambda{ t :description, "BigBlueButton previous settings to preserve recordings during migration" },
+  :website => 'http://bigbluebutton.org',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/big_blue_button_settings',
+  :validator => 'BigBlueButtonValidator',
+  :encrypted_settings => [:secret]
+})
+
 require_dependency 'cc/importer/cc_worker'
 Canvas::Plugin.register 'canvas_cartridge_importer', :export_system, {
   :name => lambda{ I18n.t 'canvas_cartridge_name', 'Canvas Cartridge Importer' },

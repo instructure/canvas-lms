@@ -234,6 +234,32 @@ describe BigBlueButtonConference do
         expect(@bbb.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
         expect(@bbb2.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting2"])
       end
+
+      it "should make a separate api call for old conferences" do
+        old_config = {
+          :domain => "bbb_old.instructure.com",
+          :secret_dec => "old_secret",
+        }.with_indifferent_access
+        allow(Canvas::Plugin.find(:big_blue_button_fallback)).to receive(:settings).and_return(old_config)
+
+        @bbb2 = BigBlueButtonConference.create!(:context => @bbb.context, :user => @bbb.user, :user_settings => @bbb.user_settings)
+        @bbb2.settings[:domain] = "bbb.instructure.com" # use the current config
+        allow(@bbb).to receive(:conference_key).and_return('instructure_web_conference_somemeetingkey1')
+        allow(@bbb2).to receive(:conference_key).and_return('instructure_web_conference_somemeetingkey2')
+
+        response = JSON.parse(get_recordings_bulk_fixture, {symbolize_names: true})
+        expect(BigBlueButtonConference).to receive(:send_request).
+          with(:getRecordings, {:meetingID => 'instructure_web_conference_somemeetingkey1'}, use_fallback_config: true).
+          and_return(response)
+        expect(BigBlueButtonConference).to receive(:send_request).
+          with(:getRecordings, {:meetingID => 'instructure_web_conference_somemeetingkey2'}, use_fallback_config: false).
+          and_return(response)
+
+        BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
+        [@bbb, @bbb2].each{|c| expect(c).to_not receive(:send_request)} # shouldn't need to send individual requests anymore
+        expect(@bbb.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
+        expect(@bbb2.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting2"])
+      end
     end
   end
 
@@ -261,6 +287,57 @@ describe BigBlueButtonConference do
       expect(bbb).to receive(:send_request).with(:create, hash_including(record: "false"))
       bbb.initiate_conference
       expect(bbb.user_settings[:record]).to be_falsey
+    end
+  end
+
+  describe "config fallback" do
+    before :each do
+      old_config = {
+        :domain => "bbb_old.instructure.com",
+        :secret_dec => "old_secret",
+      }.with_indifferent_access
+      allow(Canvas::Plugin.find(:big_blue_button_fallback)).to receive(:settings).and_return(old_config)
+
+      allow(WebConference).to receive(:plugins).and_return([
+        web_conference_plugin_mock("big_blue_button", {
+          :domain => "bbb_new.instructure.com",
+          :secret_dec => "new_secret"
+        })
+      ])
+    end
+
+    it "should save the domain for the current config when initiating the conference" do
+      bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
+      expect(CanvasHttp).to receive(:get).with(/bbb_new\.instructure\.com/, anything) # should initiate on the current config
+      bbb.initiate_conference
+      expect(bbb.settings[:domain]).to eq "bbb_new.instructure.com"
+    end
+
+    it "should generate a url with the current config if the saved domain matches" do
+      bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
+      bbb.settings[:domain] = "bbb_new.instructure.com"
+      expect(CanvasHttp).to receive(:get).with(/bbb_new\.instructure\.com/, anything)
+      bbb.send(:send_request, :action, {:query => 1})
+    end
+
+    it "should generate a url with the fallback config if the saved domain doesn't match" do
+      bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
+      bbb.settings[:domain] = "bbb_old.instructure.com"
+      expect(CanvasHttp).to receive(:get).with(/bbb_old\.instructure\.com/, anything)
+      bbb.send(:send_request, :action, {:query => 1})
+    end
+
+    it "should generate a url with the fallback config if the saved domain wasn't set (i.e. old data)" do
+      bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
+      expect(CanvasHttp).to receive(:get).with(/bbb_old\.instructure\.com/, anything)
+      bbb.send(:send_request, :action, {:query => 1})
+    end
+
+    it "should generate a url with the current config if the saved domain wasn't set but there is no fallback configured" do
+      allow(Canvas::Plugin.find(:big_blue_button_fallback)).to receive(:settings).and_return(nil)
+      bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
+      expect(CanvasHttp).to receive(:get).with(/bbb_new\.instructure\.com/, anything)
+      bbb.send(:send_request, :action, {:query => 1})
     end
   end
 end
