@@ -52,19 +52,27 @@ $darkRowBg: #f9f9f9;
 .ic-permissions__table-container {
   // dimensions of the table on screen, the table will scroll inside this container
   // might want to change to match design
-  width: 72vw;
-  height: 64vh;
+
+  body:not(.responsive_2020_03) & {
+    width: 72vw;
+    height: 64vh;
+    margin: direction-sides(20px 20px 20px 0px);
+  }
+
+  body.responsive_2020_03 & {
+    margin: $ic-sp 0;
+    @include breakpoint(tablet) {
+      height: 64vh;
+    }
+  }
 
   // needed for scrolling + sticky headers
   overflow: auto;
   position: relative;
-
   border: 1px solid $border-color;
-
-  margin: direction-sides(20px 20px 20px 0px);
 }
 
-.permissions-v2__header_contianer {
+body:not(.responsive_2020_03) .permissions-v2__header_container {
   width: 70vw;
   margin: direction-sides(20px 20px 20px 0px);
 }
