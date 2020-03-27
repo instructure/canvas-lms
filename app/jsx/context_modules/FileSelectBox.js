@@ -107,18 +107,21 @@ export default class FileSelectBox extends React.Component {
   }
 
   render() {
+    const moduleDnd = window?.ENV?.FEATURES?.module_dnd
+    const ariaLabel = moduleDnd
+      ? I18n.t('Select the files you want to associate, or add files by selecting "New File(s)".')
+      : I18n.t('Select the file you want to associate, or add a file by selecting "New File".')
+    const newFile = moduleDnd ? I18n.t('[ New File(s) ]') : I18n.t('[ New File ]')
     return (
       <div>
         <select
           ref="selectBox"
           aria-busy={this.isLoading()}
           className="module_item_select"
-          aria-label={I18n.t(
-            'Select the file you want to associate, or add a file by selecting "New File".'
-          )}
+          aria-label={ariaLabel}
           multiple
         >
-          <option value="new">{I18n.t('[ New File ]')}</option>
+          <option value="new">{newFile}</option>
           {this.renderFilesAndFolders()}
         </select>
       </div>
