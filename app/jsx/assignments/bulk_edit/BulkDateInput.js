@@ -17,20 +17,57 @@
  */
 
 import React from 'react'
-import {func, instanceOf, string} from 'prop-types'
+import {bool, func, instanceOf, string} from 'prop-types'
 import tz from 'timezone'
+import moment from 'moment-timezone'
+import {DateTime} from '@instructure/ui-i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
 
 BulkDateInput.propTypes = {
   label: string.isRequired,
   selectedDate: instanceOf(Date),
-  onSelectedDateChange: func.isRequired
+  onSelectedDateChange: func.isRequired,
+  timezone: string,
+  fancyMidnight: bool
 }
 
-export default function BulkDateInput({label, selectedDate, onSelectedDateChange}) {
+BulkDateInput.defaultProps = {
+  timezone: null,
+  fancyMidnight: false
+}
+
+export default function BulkDateInput({
+  label,
+  selectedDate,
+  onSelectedDateChange,
+  timezone,
+  fancyMidnight
+}) {
+  // do this here so tests can modify ENV.TIMEZONE
+  timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
+
   function formatDate(date) {
     return tz.format(date, 'date.formats.medium_with_weekday')
+  }
+
+  function handleSelectedDateChange(newDate) {
+    if (!newDate) {
+      onSelectedDateChange(null)
+    } else if (selectedDate) {
+      // preserve the existing selected time by adding it to the new date
+      const selectedMoment = moment.tz(selectedDate, timezone)
+      const timeOfDayMs = selectedMoment.diff(selectedMoment.clone().startOf('day'))
+      const newMoment = moment.tz(newDate, timezone)
+      newMoment.add(timeOfDayMs, 'ms')
+      onSelectedDateChange(newMoment.toDate())
+    } else {
+      // assign a default time to the new date
+      const newMoment = moment.tz(newDate, timezone)
+      if (fancyMidnight) newMoment.endOf('day')
+      else newMoment.startOf('day')
+      onSelectedDateChange(newMoment.toDate())
+    }
   }
 
   return (
@@ -38,7 +75,8 @@ export default function BulkDateInput({label, selectedDate, onSelectedDateChange
       renderLabel={<ScreenReaderContent>{label}</ScreenReaderContent>}
       selectedDate={selectedDate}
       formatDate={formatDate}
-      onSelectedDateChange={onSelectedDateChange}
+      onSelectedDateChange={handleSelectedDateChange}
+      timezone={timezone}
     />
   )
 }
