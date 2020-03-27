@@ -28,3 +28,8 @@ unpublished_courses:
   applies_to: RootAccount
   display_name: "Help for Unpublished Courses"
   description: "Improved visual reminders to encourage instructors to publish courses"
+files_dnd:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Files Drag and Drop Enhancements"
+  description: "Improve discoverability of drag and drop in Files"
