@@ -142,6 +142,18 @@ describe UserPreferenceValue do
         "assignment_#{assignment2.id}", "assignment_group_#{assignment_group2.id}", "custom_col_#{column2.id}")
     end
 
+    it "should not attempt to re-migrate when a new non-migrated preference value appears" do
+      u = User.create!
+      User.where(:id => u).update_all(:preferences => {:closed_notifications => [], :gradebook_column_size => old_format})
+      u.reload
+      u.migrate_preferences_if_needed
+      u.save!
+      u.preferences[:closed_notifications] << 123
+      expect(u.needs_preference_migration?).to be true
+      expect { u.migrate_preferences_if_needed }.not_to raise_error
+      expect(u.user_preference_values.where(key: 'closed_notifications').take.value).to eq [123]
+    end
+
     it "should work even if the objects are from a different shard than the user" do
       old_format # instantiate on default shard
       @shard1.activate do
