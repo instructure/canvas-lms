@@ -69,6 +69,7 @@ class UserPreferenceValue < ActiveRecord::Base
       UserPreferenceValue.settings.each do |key, settings|
         value = self.preferences[key]
         next unless value.present?
+        next if value == EXTERNAL
 
         if settings[:use_sub_keys]
           value.each do |sub_key, sub_value|
