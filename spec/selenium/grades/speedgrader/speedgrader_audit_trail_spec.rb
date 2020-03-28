@@ -23,6 +23,8 @@ describe 'Audit Trail' do
   include_context 'in-process server selenium tests'
 
   before(:once) do
+    PostPolicy.enable_feature!
+
     @account = Account.default
     role1 = @account.roles.create!(name: "Auditor", base_role_type: "TeacherEnrollment")
     @account.role_overrides.create!(role: role1, permission: :view_audit_trail, enabled: true)
@@ -191,7 +193,7 @@ describe 'Audit Trail' do
     wait_for_ajaximations
     # wait for element to exist, means page has loaded
     ModeratePage.grades_released_button
-    # unmute using Post to Students button
+    # Post grades to students
     ModeratePage.click_post_to_students_button
     driver.switch_to.alert.accept
     wait_for_ajaximations

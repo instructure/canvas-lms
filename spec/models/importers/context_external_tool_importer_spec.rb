@@ -199,11 +199,11 @@ describe Importers::ContextExternalToolImporter do
   context "searching for existing tools" do
     before :once do
       course_model
-      @tool1 = Account.default.context_external_tools.create!(:name => "somethin", :domain => "example.com",
+      @tool1 = Account.default.context_external_tools.create!(:name => "tool", :domain => "example.com",
         :shared_secret => 'secret', :consumer_key => 'test', :privacy_level => 'name_only')
       @tool1.settings[:selection_width] = 100
       @tool1.save!
-      @tool2 = Account.default.context_external_tools.create!(:name => "somethin else", :url => "http://notexample.com/whatever",
+      @tool2 = Account.default.context_external_tools.create!(:name => "tool", :url => "http://notexample.com/whatever",
         :shared_secret => 'secret', :consumer_key => 'test', :privacy_level => 'name_only')
       @migration = @course.content_migrations.new(:migration_type => "canvas_cartridge_importer")
       @data = [
@@ -234,6 +234,32 @@ describe Importers::ContextExternalToolImporter do
       expect(@migration.find_external_tool_translation('1')).to eq [@tool1.id, {'ihasacustomfield' => 'blah'}]
       expect(@migration.find_external_tool_translation('2')).to eq [@tool1.id, nil]
       expect(@migration.find_external_tool_translation('4')).to eq [@tool2.id, nil]
+    end
+
+    it "should not use an existing tool if the names don't match" do
+      @migration.migration_settings[:prefer_existing_tools] = true
+      @data.each do |hash|
+        if hash[:migration_id] == "4"
+          hash[:title] = "haha totally different tool"
+        end
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+      end
+
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['3', '4'] # brings in tool 4 now
+    end
+
+    it "should use an existing tool even if the names don't match if we're doing regular cc import" do
+      # because tool compaction changes the name
+      @migration.migration_settings[:prefer_existing_tools] = true
+      @migration.migration_type = "common_cartridge_importer"
+      @data.each do |hash|
+        if hash[:migration_id] == "4"
+          hash[:title] = "haha totally different tool"
+        end
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+      end
+
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['3'] # still compacts
     end
   end
 

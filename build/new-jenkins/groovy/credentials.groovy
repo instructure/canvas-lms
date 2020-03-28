@@ -47,4 +47,10 @@ def withSentryCredentials(block) {
   ]) { block.call() }
 }
 
+def withSnykCredentials(block) {
+  withCredentials([
+    string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')
+  ]) { block.call() }
+}
+
 return this

@@ -18,13 +18,12 @@
 class PopulateFinalGradeOverrideCourseSetting < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
-  def change
-    DataFixup::PopulateFinalGradeOverrideCourseSetting.send_later_if_production_enqueue_args(
-      :run,
-      {
-        priority: Delayed::LOW_PRIORITY,
-        n_strand: ["DataFixup::PopulateFinalGradeOverrideCourseSetting", Shard.current.database_server.id]
-      }
-    )
+  def up
+    if User.exists? # don't raise for a fresh install
+      raise "DataFixup::PopulateFinalGradeOverrideCourseSetting needs to be run on a previous release"
+    end
+  end
+
+  def down
   end
 end

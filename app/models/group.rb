@@ -354,6 +354,14 @@ class Group < ActiveRecord::Base
     memberships
   end
 
+  def broadcast_data
+    if context_type == 'Course'
+      { course_id: context_id, root_account_id: root_account_id }
+    else
+      {}
+    end
+  end
+
   def bulk_add_users_to_group(users, options = {})
     return if users.empty?
     user_ids = users.map(&:id)
@@ -372,11 +380,12 @@ class Group < ActiveRecord::Base
 
       users.each_with_index do |user, index|
         BroadcastPolicy.notifier.send_later_enqueue_args(:send_notification,
-                                                           {:priority => Delayed::LOW_PRIORITY},
-                                                           new_group_memberships[index],
-                                                           notification_name.parameterize.underscore.to_sym,
-                                                           notification,
-                                                           [user])
+                                                         { :priority => Delayed::LOW_PRIORITY },
+                                                         new_group_memberships[index],
+                                                         notification_name.parameterize.underscore.to_sym,
+                                                         notification,
+                                                         [user],
+                                                         broadcast_data)
       end
     end
     new_group_memberships

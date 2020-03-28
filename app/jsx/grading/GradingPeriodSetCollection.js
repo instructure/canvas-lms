@@ -57,7 +57,7 @@ const getEditGradingPeriodSetRef = function(set) {
 
 const {bool, string, shape} = PropTypes
 
-class GradingPeriodSetCollection extends React.Component {
+export default class GradingPeriodSetCollection extends React.Component {
   static propTypes = {
     readOnly: bool.isRequired,
 
@@ -85,7 +85,7 @@ class GradingPeriodSetCollection extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.editSet.id && prevState.editSet.id !== this.state.editSet.id) {
       const set = {id: prevState.editSet.id}
-      this.refs[this.getShowGradingPeriodSetRef(set)].refs.editButton.focus()
+      this.refs[this.getShowGradingPeriodSetRef(set)]._refs.editButton.focus()
     }
   }
 
@@ -255,7 +255,7 @@ class GradingPeriodSetCollection extends React.Component {
     } else {
       const setRef = this.getShowGradingPeriodSetRef(this.state.sets[index - 1])
       const setToFocus = this.refs[setRef]
-      return setToFocus.refs.editButton
+      return setToFocus._refs.editButton
     }
   }
 
@@ -342,7 +342,7 @@ class GradingPeriodSetCollection extends React.Component {
     )
   }
 
-  renderSets = () => {
+  renderSets() {
     const urls = {
       batchUpdateURL: this.props.urls.gradingPeriodsUpdateURL,
       gradingPeriodSetsURL: this.props.urls.gradingPeriodSetsURL,
@@ -434,5 +434,3 @@ class GradingPeriodSetCollection extends React.Component {
     )
   }
 }
-
-export default GradingPeriodSetCollection

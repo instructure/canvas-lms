@@ -126,11 +126,19 @@ test('shows solid quiz icon for new.quizzes', () => {
   equal(view.$('i.icon-quiz.icon-Solid').length, 1)
 })
 
-test('shows line quiz icon for old quizzes', () => {
+test('shows a non-student a line quiz icon for old quizzes', () => {
+  Object.assign(window.ENV, {current_user_roles: ['teacher']})
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})
   equal(view.$('i.icon-quiz').length, 1)
   equal(view.$('i.icon-quiz.icon-Solid').length, 0)
+})
+
+test('shows a student a solid quiz icon for old quizzes', () => {
+  Object.assign(window.ENV, {current_user_roles: ['student']})
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+  const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})
+  equal(view.$('i.icon-quiz.icon-Solid').length, 1)
 })
 
 test('#migrateQuiz is called', function() {
@@ -588,6 +596,20 @@ QUnit.module('direct share', hooks => {
     equal(args[0].props.open, true)
     equal(args[0].props.sourceCourseId, 123)
     deepEqual(args[0].props.contentShare, {content_type: 'quiz', content_id: '1'})
+
+    clearTimeout(args[0].props.onDismiss())
+    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+  })
+
+  test('uses the correct content_type for new quizzes', () => {
+    const quiz = createQuiz({id: '1', title: 'Foo', can_update: true, quiz_type: 'quizzes.next'})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    view.$(`.al-trigger`).simulate('click')
+    view.$(`.quiz-send-to`).simulate('click')
+    const args = ReactDOM.render.firstCall.args
+    equal(args[0].props.open, true)
+    equal(args[0].props.sourceCourseId, 123)
+    deepEqual(args[0].props.contentShare, {content_type: 'assignment', content_id: '1'})
 
     clearTimeout(args[0].props.onDismiss())
     equal(ReactDOM.render.lastCall.args[0].props.open, false)

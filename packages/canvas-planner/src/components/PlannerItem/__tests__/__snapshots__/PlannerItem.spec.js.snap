@@ -85,10 +85,12 @@ exports[`does not render end time if the same as start time 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             margin="0"
             onClick={[Function]}
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -97,6 +99,7 @@ exports[`does not render end time if the same as start time 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -248,10 +251,12 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -260,6 +265,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -421,10 +427,12 @@ exports[`renders Announcement correctly with everything 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -433,6 +441,7 @@ exports[`renders Announcement correctly with everything 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -594,10 +603,12 @@ exports[`renders Announcement correctly with just date 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -606,6 +617,7 @@ exports[`renders Announcement correctly with just date 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -738,10 +750,12 @@ exports[`renders Announcement correctly with just points 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -750,6 +764,7 @@ exports[`renders Announcement correctly with just points 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -911,10 +926,12 @@ exports[`renders Announcement correctly without right side content 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -923,6 +940,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1055,10 +1073,12 @@ exports[`renders Assignment correctly with everything 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://www.non_default_url.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -1067,6 +1087,7 @@ exports[`renders Assignment correctly with everything 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1228,10 +1249,12 @@ exports[`renders Assignment correctly with just date 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -1240,6 +1263,7 @@ exports[`renders Assignment correctly with just date 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1372,10 +1396,12 @@ exports[`renders Assignment correctly with just points 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -1384,6 +1410,7 @@ exports[`renders Assignment correctly with just points 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1545,10 +1572,12 @@ exports[`renders Assignment correctly without right side content 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -1557,6 +1586,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1689,10 +1719,12 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             margin="0"
             onClick={[Function]}
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -1701,6 +1733,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1851,10 +1884,12 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             margin="0"
             onClick={[Function]}
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -1863,6 +1898,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2042,10 +2078,12 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             margin="0"
             onClick={[Function]}
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -2054,6 +2092,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2204,10 +2243,12 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             margin="0"
             onClick={[Function]}
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -2216,6 +2257,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2367,10 +2409,12 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             margin="0"
             onClick={[Function]}
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -2379,6 +2423,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2529,10 +2574,12 @@ exports[`renders Discussion correctly with everything 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -2541,6 +2588,7 @@ exports[`renders Discussion correctly with everything 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2702,10 +2750,12 @@ exports[`renders Discussion correctly with just date 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -2714,6 +2764,7 @@ exports[`renders Discussion correctly with just date 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2846,10 +2897,12 @@ exports[`renders Discussion correctly with just points 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -2858,6 +2911,7 @@ exports[`renders Discussion correctly with just points 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3019,10 +3073,12 @@ exports[`renders Discussion correctly without right side content 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -3031,6 +3087,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3163,10 +3220,12 @@ exports[`renders Note correctly with Group 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="/groups/9/pages/this-is-an-account-level-group-page"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -3175,6 +3234,7 @@ exports[`renders Note correctly with Group 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3314,10 +3374,12 @@ exports[`renders Note correctly with everything 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             margin="0"
             onClick={[Function]}
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -3326,6 +3388,7 @@ exports[`renders Note correctly with everything 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3356,7 +3419,7 @@ exports[`renders Note correctly with everything 1`] = `
               immutable={false}
               theme={
                 Object {
-                  Symbol(Button__eHiXd): Object {
+                  Symbol(Button__MTA0NDg4): Object {
                     "iconColor": undefined,
                   },
                 }
@@ -3364,15 +3427,17 @@ exports[`renders Note correctly with everything 1`] = `
             >
               <Button
                 as="button"
-                buttonRef={[Function]}
                 cursor="pointer"
-                fluidWidth={false}
+                display="inline-block"
+                elementRef={[Function]}
                 icon={[Function]}
                 margin="0"
                 onClick={[Function]}
                 size="medium"
+                textAlign="center"
                 type="button"
                 variant="icon"
+                withBackground={true}
               >
                 <ScreenReaderContent
                   as="span"
@@ -3498,10 +3563,12 @@ exports[`renders Note correctly without Course 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             margin="0"
             onClick={[Function]}
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -3510,6 +3577,7 @@ exports[`renders Note correctly without Course 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3540,7 +3608,7 @@ exports[`renders Note correctly without Course 1`] = `
               immutable={false}
               theme={
                 Object {
-                  Symbol(Button__eHiXd): Object {
+                  Symbol(Button__MTA0NDg4): Object {
                     "iconColor": undefined,
                   },
                 }
@@ -3548,15 +3616,17 @@ exports[`renders Note correctly without Course 1`] = `
             >
               <Button
                 as="button"
-                buttonRef={[Function]}
                 cursor="pointer"
-                fluidWidth={false}
+                display="inline-block"
+                elementRef={[Function]}
                 icon={[Function]}
                 margin="0"
                 onClick={[Function]}
                 size="medium"
+                textAlign="center"
                 type="button"
                 variant="icon"
+                withBackground={true}
               >
                 <ScreenReaderContent
                   as="span"
@@ -3675,10 +3745,12 @@ exports[`renders Page correctly with everything 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -3687,6 +3759,7 @@ exports[`renders Page correctly with everything 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3848,10 +3921,12 @@ exports[`renders Page correctly with just date 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -3860,6 +3935,7 @@ exports[`renders Page correctly with just date 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3992,10 +4068,12 @@ exports[`renders Page correctly with just points 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -4004,6 +4082,7 @@ exports[`renders Page correctly with just points 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4165,10 +4244,12 @@ exports[`renders Page correctly without right side content 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -4177,6 +4258,7 @@ exports[`renders Page correctly without right side content 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4309,10 +4391,12 @@ exports[`renders Quiz correctly with everything 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -4321,6 +4405,7 @@ exports[`renders Quiz correctly with everything 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4482,10 +4567,12 @@ exports[`renders Quiz correctly with just date 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -4494,6 +4581,7 @@ exports[`renders Quiz correctly with just date 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4626,10 +4714,12 @@ exports[`renders Quiz correctly with just points 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -4638,6 +4728,7 @@ exports[`renders Quiz correctly with just points 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4799,10 +4890,12 @@ exports[`renders Quiz correctly without right side content 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -4811,6 +4904,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4943,10 +5037,12 @@ exports[`renders assignment peer reviews correctly 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -4955,6 +5051,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -5087,10 +5184,12 @@ exports[`renders correctly 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -5099,6 +5198,7 @@ exports[`renders correctly 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -5260,10 +5360,12 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -5272,6 +5374,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -5432,10 +5535,12 @@ exports[`renders feedback if available 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -5444,6 +5549,7 @@ exports[`renders feedback if available 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -5605,10 +5711,12 @@ exports[`renders media feedback if available 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -5617,6 +5725,7 @@ exports[`renders media feedback if available 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -5778,10 +5887,12 @@ exports[`renders the end time if available 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             margin="0"
             onClick={[Function]}
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -5790,6 +5901,7 @@ exports[`renders the end time if available 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -5941,10 +6053,12 @@ exports[`renders the location if available 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -5953,6 +6067,7 @@ exports[`renders the location if available 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -6105,10 +6220,12 @@ exports[`renders user-created Todo correctly 1`] = `
             as="button"
             buttonRef={[Function]}
             cursor="pointer"
-            fluidWidth={false}
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
             margin="0"
             size="medium"
+            textAlign="center"
             theme={
               Object {
                 "mediumHeight": "normal",
@@ -6117,6 +6234,7 @@ exports[`renders user-created Todo correctly 1`] = `
             }
             type="button"
             variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"

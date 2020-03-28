@@ -1,7 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.context, asset]) %>
-<% end %>
-
-<% define_content :subject do %>
-  <%= t :subject, "Grades and comments released for: %{title}, %{course}", :title => asset.title, :course => asset.context.name %>
-<% end %>

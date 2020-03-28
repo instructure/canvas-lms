@@ -18,19 +18,43 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const DiscussionsTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Discussions')}
-    subheading={I18n.t('Encourage class participation')}
-    image="/images/tutorial-tray-images/discussions.svg"
+    subheading={I18n.t('Encourage student discourse')}
+    image="/images/tutorial-tray-images/Panda_Discussions.svg"
+    imageWidth="9rem"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-
+      instructor-guide-table-of-contents#jive_content_id_Discussions`
+    }}
+    links={[
+      {
+        label: I18n.t('How do I create a discussion as an instructor?'),
+        href: 'https://community.canvaslms.com/docs/DOC-13016-4152724374'
+      },
+      {
+        label: I18n.t('How do I publish or unpublish a discussion as an instructor?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12798-4152180495'
+      },
+      {
+        label: I18n.t('How do I reply to a discussion as an instructor?'),
+        href: 'https://community.canvaslms.com/docs/DOC-12716-415250010'
+      },
+      {
+        label: I18n.t('How do I view and sort discussion replies as an instructor?'),
+        href: 'https://community.canvaslms.com/docs/DOC-13038-415264223'
+      }
+    ]}
   >
-    <Text as="p">
-      {I18n.t(`Create as many discussion topics as needed, as assignments
-          for grading or as a forum for shared ideas and information.`)}
-    </Text>
+    {I18n.t(`Discussions allow students and instructors to communicate about
+      course topics at any time. Create discussions for a grade, or facilitiate
+      discussions for students to exchange ideas and solve problems. Threaded
+      discussions are perfect for keeping in-depth or long-term discussions
+      organized, while Focused discussions are best suited for short-lived exchanges.`)}
   </TutorialTrayContent>
 )
 

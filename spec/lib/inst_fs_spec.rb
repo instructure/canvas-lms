@@ -74,6 +74,11 @@ describe InstFS do
           .to match("#{@app_host}/files/#{@attachment.instfs_uuid}/#{@attachment.filename}")
       end
 
+      it "constructs metadata url properly" do
+        expect(InstFS.authenticated_metadata_url(@attachment, {}))
+          .to match("#{@app_host}/files/#{@attachment.instfs_uuid}/meta")
+      end
+
       it "prefers the display_name over filename if different" do
         @attachment.display_name = "renamed.txt"
         expect(InstFS.authenticated_url(@attachment, {}))

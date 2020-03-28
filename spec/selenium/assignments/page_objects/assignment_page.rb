@@ -71,5 +71,9 @@ class AssignmentPage
     def copy_to_menuitem
       fj("li:contains('Copy To...')")
     end
+
+    def allowed_attempts_count
+      fj("div.control-group:contains('Allowed Attempts')")
+    end
   end
 end

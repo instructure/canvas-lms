@@ -59,6 +59,9 @@ module BroadcastPolicy
       self.current_notification.data = block
     end
 
+    # filter_asset_by_recipient is a way for the asset (ie assignment, announcement)
+    # to filter users out that do not apply to the notification like when a due
+    # date is different for a specific user when using variable due dates.
     def filter_asset_by_recipient(&block)
       self.current_notification.recipient_filter = block
     end

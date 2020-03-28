@@ -22,6 +22,8 @@ describe "speed grader - quiz submissions" do
   include_context "in-process server selenium tests"
 
   before(:each) do
+    PostPolicy.enable_feature!
+
     course_with_teacher_logged_in
     @assignment = @course.assignments.create(
       name: 'Quiz', points_possible: 10, submission_types: 'online_quiz'

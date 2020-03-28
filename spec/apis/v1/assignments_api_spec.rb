@@ -28,6 +28,10 @@ describe AssignmentsApiController, type: :request do
   include Api::V1::Submission
   include LtiSpecHelper
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   context 'locked api item' do
     include_examples 'a locked api item'
 
@@ -3476,6 +3480,7 @@ describe AssignmentsApiController, type: :request do
         @student.email_channel.notification_policies.create!(notification: @notification,
                                                              frequency: 'immediately')
         @assignment = @course.assignments.create!
+        @assignment.unmute!
         Assignment.where(:id => @assignment).update_all(:created_at => Time.zone.now - 1.day)
         @adhoc_due_at = 5.days.from_now
         @section_due_at = 7.days.from_now
@@ -4785,27 +4790,22 @@ describe AssignmentsApiController, type: :request do
       expect(result['anonymous_grading']).to be false
     end
 
-    it 'is false for anonymize_students when the assignment is not anonymous' do
-      expect(result['anonymize_students']).to be false
+    it "contains true for anonymous_grading when the assignment has anonymous grading enabled" do
+      @assignment.anonymous_grading = true
+      expect(result['anonymous_grading']).to be true
     end
 
-    context 'when the assignment is anonymous' do
-      before(:once) do
-        @assignment.anonymous_grading = true
-      end
+    it "contains true for anonymize_students when the assignment is anonymized for students" do
+      @assignment.update!(anonymous_grading: true)
+      @assignment.ensure_post_policy(post_manually: true)
+      student_in_course(course: @course, active_all: true)
+      @assignment.grade_student(@student, grader: @teacher, score: 5)
+      expect(result['anonymous_grading']).to be true
+    end
 
-      it 'contains true for anonymous_grading' do
-        expect(result['anonymous_grading']).to be true
-      end
-
-      it 'is true for anonymize_students when the assignment is muted' do
-        @assignment.muted = true
-        expect(result['anonymize_students']).to be true
-      end
-
-      it 'is false for anonymize_students when the assignment is unmuted' do
-        expect(result['anonymize_students']).to be false
-      end
+    it "contains false for anonymize_students when the assignment is not anonymized for students" do
+      @assignment.anonymous_grading = false
+      expect(result['anonymize_students']).to be false
     end
   end
 
@@ -5066,6 +5066,8 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "includes submissions for observed users when requested with all assignments" do
+      @assignment.unmute!
+      @submission.reload
       json = api_call_as_user(@observer, :get,
                               "/api/v1/courses/#{@observer_course.id}/assignments?include[]=observed_users&include[]=submission",
                               { :controller => 'assignments_api',
@@ -5084,7 +5086,7 @@ describe AssignmentsApiController, type: :request do
          "grading_period_id" => @submission.grading_period_id,
          "grade_matches_current_submission" => true,
          "graded_at" => nil,
-         "posted_at" => nil,
+         "posted_at" => @submission.posted_at.as_json,
          "grader_id" => @teacher.id,
          "id" => @submission.id,
          "score" => 99.0,
@@ -5106,6 +5108,8 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "includes submissions for observed users when requested with a single assignment" do
+      @assignment.unmute!
+      @submission.reload
       json = api_call_as_user(@observer, :get,
                               "/api/v1/courses/#{@observer_course.id}/assignments/#{@assignment.id}?include[]=observed_users&include[]=submission",
                               { :controller => 'assignments_api',
@@ -5124,7 +5128,7 @@ describe AssignmentsApiController, type: :request do
          "grading_period_id" => @submission.grading_period_id,
          "grade_matches_current_submission" => true,
          "graded_at" => nil,
-         "posted_at" => nil,
+         "posted_at" => @submission.posted_at.as_json,
          "grader_id" => @teacher.id,
          "id" => @submission.id,
          "score" => 99.0,

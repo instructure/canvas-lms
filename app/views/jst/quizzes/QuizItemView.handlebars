@@ -57,7 +57,12 @@
   <div class="ig-row__layout">
 
     <div class="ig-type-icon">
-      <i class="icon-quiz{{#if isQuizzesNext}} icon-Solid{{/if}}" aria-hidden="true"></i>
+      <i class="icon-quiz{{#if useQuizzesNextIcon}} icon-Solid{{/if}}" aria-hidden="true"></i>
+      {{#if isQuizzesNextAndNotStudent}}
+        <span class="screenreader-only">{{#t}}New Quiz{{/t}}</span>
+      {{else}}
+        <span class="screenreader-only">{{#t}}Quiz{{/t}}</span>
+      {{/if}}
     </div>
 
     <div class="ig-info">

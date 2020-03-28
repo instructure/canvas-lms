@@ -18,17 +18,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def build_parameters = [
+def buildParameters = [
   string(name: 'CANVAS_LMS_REFSPEC', value: "${env.CANVAS_LMS_REFSPEC}"),
-  string(name: 'RUN_COVERAGE', value: "1")
+  string(name: 'RUN_COVERAGE', value: '1'),
+  string(name: 'POSTGRES', value: '9.5'),
+  string(name: 'RUBY_PASSENGER', value: '2.4-xenial'),
+  string(name: 'PATCHSET_TAG', value: "${env.DOCKER_REGISTRY_FQDN}/jenkins/canvas-lms:master")
 ]
 
 pipeline {
   agent { label 'canvas-docker' }
-
-  options {
-    ansiColor('xterm')
-  }
+  options { ansiColor('xterm') }
 
   stages {
     stage('Print Env Variables') {
@@ -43,28 +43,19 @@ pipeline {
       parallel {
         stage('JS') {
           steps {
-            build(
-              job: 'test-suites/JS',
-              parameters: build_parameters
-            )
+            build(job: 'test-suites/JS', parameters: buildParameters)
           }
         }
 
         stage('Selenium Chrome') {
           steps {
-            build(
-              job: 'test-suites/selenium-chrome',
-              parameters: build_parameters
-            )
+            build(job: 'test-suites/selenium-chrome', parameters: buildParameters)
           }
         }
 
-        stage('Rspec') {
+        stage('RSpec') {
           steps {
-            build(
-              job: 'test-suites/rspec',
-              parameters: build_parameters
-            )
+            build(job: 'test-suites/rspec', parameters: buildParameters)
           }
         }
       }

@@ -152,6 +152,31 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           end
         end
       end
+
+      context 'when there are multiple data pages' do
+        subject do
+          api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/all_quizzes?per_page=2",
+            controller: "quizzes_next/quizzes_api",
+            action: "index",
+            format: "json",
+            course_id: @course.id.to_s,
+            per_page: 2
+          )
+        end
+
+        it "include a response header Link" do
+          subject
+          link_header = response.headers['Link']
+          expect(link_header).to eq(
+            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"current\","\
+            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=2&per_page=2>; rel=\"next\","\
+            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"first\","\
+            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=4&per_page=2>; rel=\"last\""
+          )
+        end
+      end
     end
 
     context 'as a student' do

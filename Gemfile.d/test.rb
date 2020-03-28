@@ -26,7 +26,7 @@ group :test do
   gem 'simplecov', '0.15.1', require: false
     gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
-  gem 'puma', '4.3.1'
+  gem 'puma', '4.3.3'
 
   gem 'rspec', '3.9.0'
   gem 'rspec_around_all', '0.2.0'
@@ -43,11 +43,10 @@ group :test do
   gem 'rubocop-rspec', '1.22.2', require: false
 
   gem 'once-ler', '0.1.4'
-  gem 'sauce_whisk', '0.1.0'
+  gem 'sauce_whisk', '0.2.2'
 
-  # Keep this gem synced with docker-compose/seleniumff/Dockerfile
-  gem 'selenium-webdriver', '3.141.5926'
-    gem 'childprocess', '1.0.1', require: false
+  gem 'selenium-webdriver', '3.142.7'
+    gem 'childprocess', '3.0.0', require: false
   gem 'webdrivers', '4.2.0', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test-queue', github: 'instructure/test-queue', ref: 'd35166408df3a5396cd809e85dcba175136a69ba', require: false

@@ -40,10 +40,17 @@ export const EXTERNAL_TOOLS_QUERY = gql`
 `
 
 export const RUBRIC_QUERY = gql`
-  query GetRubric($rubricID: ID!, $submissionID: ID!, $courseID: ID!, $submissionAttempt: Int!) {
-    rubric: node(id: $rubricID) {
-      ... on Rubric {
-        ...Rubric
+  query GetRubric(
+    $assignmentLid: ID!
+    $submissionID: ID!
+    $courseID: ID!
+    $submissionAttempt: Int!
+  ) {
+    assignment: legacyNode(_id: $assignmentLid, type: Assignment) {
+      ... on Assignment {
+        rubric {
+          ...Rubric
+        }
       }
     }
     submission(id: $submissionID) {

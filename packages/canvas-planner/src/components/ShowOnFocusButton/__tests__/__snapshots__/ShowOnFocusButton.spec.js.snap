@@ -8,13 +8,16 @@ exports[`renders a ScreenReaderContent by default 1`] = `
     as="button"
     buttonRef={[Function]}
     cursor="pointer"
-    fluidWidth={false}
+    display="inline-block"
+    elementRef={[Function]}
     margin="0"
     onBlur={[Function]}
     onFocus={[Function]}
     size="medium"
+    textAlign="center"
     type="button"
     variant="link"
+    withBackground={true}
   >
     Button
   </Button>

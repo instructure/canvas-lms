@@ -43,37 +43,37 @@ development:
       # use a unique subdomain per attachment, so that browsers will enforce security
       # permissions (such as microphone/camera access) per-file. You must have wildcard
       # DNS set up for this to work.
-      attachment_specific_file_domain: true
-      ha_cache.yml: |
-        cache_store: ha_store
-        servers:
-         - redis://localhost/2
-        # keep stale data for up to 1 week in the cache
-        race_condition_ttl: 604800
-        # how long it might take to recompute a cache value
-        # before the lock times out and another process is
-        # allowed to write it
-        lock_timeout: 5
-        # how long before a cache entry is considered stale
-        expires_in: 300
-        # when deleting from the cache, trigger a consul event
-        # you can use the example script/consume_consul_events
-        # to delete from local nodes, but may need to tweak
-        # slightly if your config doesn't match
-        consul_event: "canvas/dev/invalidate_ha_cache"
-        # if configured, trigger the event in multiple Consul
-        # datacenters, rather than just the local one
-        # if you use this you SHOULD still list the local
-        # dc; it won't be added for you
-        consul_datacenters:
-        - dc1
-        - dc2
-      clone_url_strand.yml: |
-        lti1.instructure.com: lti1
-        lti2.instructure.com: lti2
-      csp_logging.yml: |
-        host: https://csplogging.inscloudgate.net/
-        shared_secret: s00p3r_s3cr3t
+      # attachment_specific_file_domain: true
+      # ha_cache.yml: |
+      #   cache_store: ha_store
+      #   servers:
+      #    - redis://localhost/2
+      #   # keep stale data for up to 1 week in the cache
+      #   race_condition_ttl: 604800
+      #   # how long it might take to recompute a cache value
+      #   # before the lock times out and another process is
+      #   # allowed to write it
+      #   lock_timeout: 5
+      #   # how long before a cache entry is considered stale
+      #   expires_in: 300
+      #   # when deleting from the cache, trigger a consul event
+      #   # you can use the example script/consume_consul_events
+      #   # to delete from local nodes, but may need to tweak
+      #   # slightly if your config doesn't match
+      #   consul_event: "canvas/dev/invalidate_ha_cache"
+      #   # if configured, trigger the event in multiple Consul
+      #   # datacenters, rather than just the local one
+      #   # if you use this you SHOULD still list the local
+      #   # dc; it won't be added for you
+      #   consul_datacenters:
+      #   - dc1
+      #   - dc2
+      # clone_url_strand.yml: |
+      #   lti1.instructure.com: lti1
+      #   lti2.instructure.com: lti2
+      # csp_logging.yml: |
+      #   host: https://csplogging.inscloudgate.net/
+      #   shared_secret: s00p3r_s3cr3t
   store:
     canvas:
       lti-keys:

@@ -105,7 +105,7 @@ export async function saveClosedCaptions(mediaId, files) {
         const content = e.target.result
         const params = {
           content,
-          locale: file.language.selectedOptionId
+          locale: file.language
         }
         axios
           .post(`/media_objects/${mediaId}/media_tracks`, params)

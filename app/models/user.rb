@@ -49,6 +49,7 @@ class User < ActiveRecord::Base
   include TimeZoneHelper
   time_zone_attribute :time_zone
   include Workflow
+  include UserPreferenceValue::UserMethods # include after other callbacks are defined
 
   def self.enrollment_conditions(state)
     Enrollment::QueryBuilder.new(state).conditions or raise "invalid enrollment conditions"
@@ -173,6 +174,7 @@ class User < ActiveRecord::Base
   has_many :progresses, :as => :context, :inverse_of => :context
   has_many :one_time_passwords, -> { order(:id) }, inverse_of: :user
   has_many :past_lti_ids, class_name: 'UserPastLtiId', inverse_of: :user
+  has_many :user_preference_values, inverse_of: :user
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
@@ -1454,11 +1456,11 @@ class User < ActiveRecord::Base
   end
 
   def new_user_tutorial_statuses
-    preferences[:new_user_tutorial_statuses] ||= {}
+    get_preference(:new_user_tutorial_statuses) || {}
   end
 
   def custom_colors
-    colors_hash = (preferences[:custom_colors] ||= {})
+    colors_hash = get_preference(:custom_colors) || {}
     if Shard.current != self.shard
       # translate asset strings to be relative to current shard
       colors_hash = Hash[
@@ -1475,11 +1477,11 @@ class User < ActiveRecord::Base
   end
 
   def dashboard_positions
-    preferences[:dashboard_positions] ||= {}
+    get_preference(:dashboard_positions) || {}
   end
 
-  def dashboard_positions=(new_positions)
-    preferences[:dashboard_positions] = new_positions
+  def set_dashboard_positions(new_positions)
+    set_preference(:dashboard_positions, new_positions)
   end
 
   # Use the user's preferences for the default view
@@ -1493,17 +1495,29 @@ class User < ActiveRecord::Base
     preferences[:dashboard_view] = new_dashboard_view
   end
 
-  def course_nicknames
-    preferences[:course_nicknames] ||= {}
+  def all_course_nicknames(courses=nil)
+    if preferences[:course_nicknames] == UserPreferenceValue::EXTERNAL
+      self.shard.activate do
+        scope = user_preference_values.where(:key => :course_nicknames)
+        scope = scope.where("sub_key IN (?)", courses.map(&:id).map(&:to_json)) if courses
+        Hash[scope.pluck(:sub_key, :value)]
+      end
+    else
+      preferences[:course_nicknames] || {}
+    end
   end
 
   def course_nickname_hash
-    course_nicknames.any? ? Digest::MD5.hexdigest(course_nicknames.sort.join(",")) : "default"
+    if preferences[:course_nicknames].present?
+      @nickname_hash ||= Digest::MD5.hexdigest(user_preference_values.where(:key => :course_nicknames).pluck(:sub_key, :value).sort.join(","))
+    else
+      "default"
+    end
   end
 
   def course_nickname(course)
     shard.activate do
-      course_nicknames[course.id]
+      get_preference(:course_nicknames, course.id)
     end
   end
 
@@ -1516,13 +1530,12 @@ class User < ActiveRecord::Base
   end
 
   def close_announcement(announcement)
-    preferences[:closed_notifications] ||= []
+    closed = get_preference(:closed_notifications) || []
     # serialize ids relative to the user
     self.shard.activate do
-      preferences[:closed_notifications] << announcement.id
+      closed << announcement.id
     end
-    preferences[:closed_notifications].uniq!
-    save
+    set_preference(:closed_notifications, closed.uniq)
   end
 
   def prefers_high_contrast?
@@ -1562,6 +1575,9 @@ class User < ActiveRecord::Base
   def default_notifications_disabled?
     !!preferences[:default_notifications_disabled]
   end
+
+  # ***** OHI If you're going to add a lot of data into `preferences` here maybe take a look at app/models/user_preference_value.rb instead ***
+  # it will store the data in a separate table on the db and lighten the load on poor `users`
 
   def uuid
     if !read_attribute(:uuid)

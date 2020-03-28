@@ -18,8 +18,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe GradeSummaryPresenter do
-  describe '#courses_with_grades' do
+  before :once do
+    PostPolicy.enable_feature!
+  end
 
+  describe '#courses_with_grades' do
     describe 'all on one shard' do
       let(:course) { Course.create! }
       let(:presenter) { GradeSummaryPresenter.new(course, @user, nil) }
@@ -615,40 +618,26 @@ describe GradeSummaryPresenter do
 
     let_once(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
 
-    context "when post policies are enabled" do
-      before(:once) do
-        PostPolicy.enable_feature!
-        assignment1.ensure_post_policy(post_manually: true)
-        assignment2.ensure_post_policy(post_manually: false)
-      end
-
-      it "returns true if any of the student's submissions in the course are graded and unposted" do
-        assignment1.grade_student(student, grader: teacher, score: 1)
-
-        expect(presenter).to be_hidden_submissions
-      end
-
-      it "returns true if any of the student's submissions are unposted and assignment posts manually" do
-        expect(presenter).to be_hidden_submissions
-      end
-
-      it "returns false if all of the student's submissions in the course are posted" do
-        assignment1.post_submissions
-        assignment2.post_submissions
-
-        expect(presenter).not_to be_hidden_submissions
-      end
+    before(:once) do
+      assignment1.ensure_post_policy(post_manually: true)
+      assignment2.ensure_post_policy(post_manually: false)
     end
 
-    context "when post policies are not enabled" do
-      it "returns true if any assignment in the course is muted" do
-        assignment1.mute!
-        expect(presenter).to be_hidden_submissions
-      end
+    it "returns true if any of the student's submissions in the course are graded and unposted" do
+      assignment1.grade_student(student, grader: teacher, score: 1)
 
-      it "returns false if no assignments in the course are muted" do
-        expect(presenter).not_to be_hidden_submissions
-      end
+      expect(presenter).to be_hidden_submissions
+    end
+
+    it "returns true if any of the student's submissions are unposted and assignment posts manually" do
+      expect(presenter).to be_hidden_submissions
+    end
+
+    it "returns false if all of the student's submissions in the course are posted" do
+      assignment1.post_submissions
+      assignment2.post_submissions
+
+      expect(presenter).not_to be_hidden_submissions
     end
   end
 

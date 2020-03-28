@@ -75,7 +75,7 @@ def computeDistributedCount() {
 def executeFlakeySpecCatcher(prefix = 'main') {
   sh 'rm -rf tmp'
   try {
-    timeout(60) {
+    timeout(30) {
       sh 'build/new-jenkins/docker-compose-pull.sh'
       sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
       sh 'build/new-jenkins/docker-compose-build-up.sh'
@@ -85,7 +85,7 @@ def executeFlakeySpecCatcher(prefix = 'main') {
   }
   finally {
     sh "mkdir -p tmp/$prefix"
-    sh (
+    sh(
       script: "docker cp \$(docker-compose ps -q web):/usr/src/app/tmp/fsc.out ./tmp/$prefix/fsc.out",
       returnStatus: true
     )
@@ -95,14 +95,10 @@ def executeFlakeySpecCatcher(prefix = 'main') {
 
 pipeline {
   agent { label 'canvas-docker' }
-
   options { ansiColor('xterm') }
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml:docker-compose.new-jenkins-flakey-spec-catcher.yml'
-    NAME = getImageTagVersion()
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
-
     // there will be a node for every 10 tests
     DISTRIBUTED_FACTOR = '10'
     // this causes distribution to trigger at an offset
@@ -173,7 +169,7 @@ pipeline {
                 }
               }
             }
-            parallel(nodes);
+            parallel(nodes)
           }
         }
       }

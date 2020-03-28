@@ -133,6 +133,33 @@ describe NotificationMessageCreator do
       expect(channels).to include(a)
     end
 
+    it 'does not send a notification when policy override is disabled for a course' do
+      notification_set(notification_opts: { :category => "Announcement" })
+      @course.root_account.enable_feature!(:mute_notifications_by_course)
+      NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
+      data = { course_id: @course.id, root_account_id: @course.root_account_id }
+      messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
+      expect(messages).to be_empty
+    end
+
+    it 'does send a notification when course_id is not passed in' do
+      notification_set(notification_opts: { :category => "Announcement" })
+      @course.root_account.enable_feature!(:mute_notifications_by_course)
+      NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
+      data = { root_account_id: @course.root_account_id }
+      messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
+      expect(messages.length).to eql(1)
+    end
+
+    it 'does send other notifications when policy override is in effect' do
+      notification_set(notification_opts: { :category => "Registration" })
+      @course.root_account.enable_feature!(:mute_notifications_by_course)
+      NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
+      data = { course_id: @course.id, root_account_id: @course.root_account_id }
+      messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
+      expect(messages.length).to eql(1)
+    end
+
     it "should not send dispatch messages for pre-registered users" do
       course_factory
       notification_model

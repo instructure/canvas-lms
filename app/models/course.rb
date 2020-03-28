@@ -739,6 +739,10 @@ class Course < ActiveRecord::Base
     current_users
   end
 
+  def broadcast_data
+    { course_id: id, root_account_id: root_account_id }
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { participating_students_by_date + participating_observers_by_date }
@@ -749,6 +753,7 @@ class Course < ActiveRecord::Base
           record.saved_changes[:group_weighting_scheme] != [nil, "equal"] # not a functional change
         )
     }
+    p.data { broadcast_data }
 
     p.dispatch :new_course
     p.to { self.root_account.account_users.active }
@@ -759,6 +764,7 @@ class Course < ActiveRecord::Base
          record.name != Course.default_name)
       )
     }
+    p.data { broadcast_data }
   end
 
   def self.default_name
@@ -1479,7 +1485,7 @@ class Course < ActiveRecord::Base
     # Active admins (Teacher/TA/Designer)
     given { |user| (self.available? || self.created? || self.claimed?) && user &&
       fetch_on_enrollments("has_active_admin_enrollment", user) { enrollments.for_user(user).of_admin_type.active_by_date.exists? } }
-    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags
+    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags and can :read_rubrics
 
     # Teachers and Designers can delete/reset, but not TAs
     given { |user| !self.deleted? && !self.sis_source_id && user &&
@@ -1506,7 +1512,7 @@ class Course < ActiveRecord::Base
       !self.deleted? && user &&
         fetch_on_enrollments("has_completed_admin_enrollment", user) { enrollments.for_user(user).of_admin_type.completed_by_date.exists? }
     end
-    can [:read, :read_as_admin, :use_student_view, :read_outcomes, :view_unpublished_items]
+    can [:read, :read_as_admin, :use_student_view, :read_outcomes, :view_unpublished_items, :read_rubrics]
 
     # overrideable permissions for concluded users
     RoleOverride.concluded_permission_types.each do |permission, details|
@@ -2649,6 +2655,7 @@ class Course < ActiveRecord::Base
   TAB_OUTCOMES = 15
   TAB_COLLABORATIONS = 16
   TAB_COLLABORATIONS_NEW = 17
+  TAB_RUBRICS = 18
 
   def self.default_tabs
     [{
@@ -2705,6 +2712,11 @@ class Course < ActiveRecord::Base
       :label => t('#tabs.outcomes', "Outcomes"),
       :css_class => 'outcomes',
       :href => :course_outcomes_path
+    }, {
+      :id => TAB_RUBRICS,
+       :label => t('#tabs.rubrics', "Rubrics"),
+       :css_class => 'rubrics',
+       :href => :course_rubrics_path
     }, {
       :id => TAB_QUIZZES,
       :label => t('#tabs.quizzes', "Quizzes"),
@@ -2793,6 +2805,12 @@ class Course < ActiveRecord::Base
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
       tabs << settings_tab
 
+      # remove rubrics tab if FF is not enabled
+      # remove conditional when FF is enabled on all root accounts
+      unless self.root_account.feature_enabled?(:rubrics_in_course_navigation)
+        tabs.delete_if {|t| t[:id] == TAB_RUBRICS}
+      end
+
       if opts[:only_check]
         tabs = tabs.select { |t| opts[:only_check].include?(t[:id]) }
       end
@@ -2860,6 +2878,7 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_DISCUSSIONS], :read_forum, :post_to_forum, :create_forum, :moderate_forum)
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
+        delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
 
         # remove outcomes tab for logged-out users or non-students
         outcome_tab = tabs.detect { |t| t[:id] == TAB_OUTCOMES }
@@ -3295,21 +3314,20 @@ class Course < ActiveRecord::Base
     feature_enabled?(:gradebook_list_students_by_sortable_name)
   end
 
-  ##
-  # Returns a boolean describing if the user passed in has marked this course
-  # as a favorite.
+  def refresh_content_participation_counts(_progress)
+    content_participation_counts.each(&:refresh_unread_count)
+  end
+
+  attr_accessor :preloaded_nickname, :preloaded_favorite
   def favorite_for_user?(user)
+    return @preloaded_favorite if defined?(@preloaded_favorite)
     user.favorites.where(:context_type => 'Course', :context_id => self).exists?
   end
 
   def nickname_for(user, fallback = :name)
-    nickname = user && user.course_nickname(self)
+    nickname = defined?(@preloaded_nickname) ? @preloaded_nickname : (user && user.course_nickname(self))
     nickname ||= self.send(fallback) if fallback
     nickname
-  end
-
-  def refresh_content_participation_counts(_progress)
-    content_participation_counts.each(&:refresh_unread_count)
   end
 
   def name
@@ -3319,6 +3337,17 @@ class Course < ActiveRecord::Base
 
   def apply_nickname_for!(user)
     @nickname = nickname_for(user, nil)
+  end
+
+  def self.preload_menu_data_for(courses, user)
+    ActiveRecord::Associations::Preloader.new.preload(courses, :enrollment_term)
+    # preload favorites and nicknames
+    favorite_ids = user.account.feature_enabled?(:unfavorite_course_from_dashboard) ? user.favorite_context_ids("Course") : []
+    nicknames = user.all_course_nicknames(courses)
+    courses.each do |course|
+      course.preloaded_favorite = favorite_ids.include?(course.id)
+      course.preloaded_nickname = nicknames[course.id]
+    end
   end
 
   def any_assignment_in_closed_grading_period?

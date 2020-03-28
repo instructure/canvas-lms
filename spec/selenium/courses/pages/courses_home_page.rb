@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
-
 require_relative './course_wizard_page_component'
 
 module CoursesHomePage
@@ -42,6 +41,10 @@ module CoursesHomePage
     "a.wizard_popup_link"
   end
 
+  def accept_enrollment_alert_selector
+    ".ic-notification button[name='accept']"
+  end
+
   #------------------------- Elements ---------------------------
   def secondary_content
     f(secondary_content_selector)
@@ -55,9 +58,37 @@ module CoursesHomePage
     f(course_setup_checklist_selector)
   end
 
+  def unpublish_btn
+    fj("button:contains('Unpublish')")
+  end
+
+  def publish_btn
+    fj("button:contains('Publish')")
+  end
+
+  def course_user_list
+    ff('.roster .rosterUser')
+  end
+
+  def accept_enrollment_button
+    f(accept_enrollment_alert_selector)
+  end
+
+  def decline_enrollment_button
+    f(".ic-notification button[name=reject]")
+  end
+
+  def course_page_content
+    f('#content')
+  end
+
   #----------------------- Actions/Methods ----------------------
   def visit_course(course)
     get "/courses/#{course.id}"
+  end
+
+  def visit_course_people(course)
+    get "/courses/#{@course.id}/users"
   end
 
   def open_course_wizard

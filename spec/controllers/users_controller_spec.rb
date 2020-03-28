@@ -22,6 +22,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 describe UsersController do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   describe "external_tool" do
     let(:account) { Account.default }
 
@@ -900,8 +904,9 @@ describe UsersController do
       before(:each) do
         unposted_assignment = assignment_model(
           course: course, due_at: Time.zone.now,
-          points_possible: 90, muted: true
+          points_possible: 90
         )
+        unposted_assignment.ensure_post_policy(post_manually: true)
         unposted_assignment.grade_student(student, grade: '100%', grader: @teacher)
 
         user_session(@teacher)
@@ -2113,7 +2118,33 @@ describe UsersController do
         groups = assigns[:js_env][:STUDENT_PLANNER_GROUPS]
         expect(groups.map {|g| g[:id]}).to eq [group.id]
       end
+    end
 
+    context "data preloading" do
+      before :each do
+        course_with_student_logged_in(active_all: true)
+        @course1 = @course
+        @course2 = course_with_student(active_all: true, user: @user).course
+        @current_user = @user
+      end
+
+      it "should load favorites" do
+        Account.default.enable_feature!(:unfavorite_course_from_dashboard)
+        @user.favorites.where(:context_type => 'Course', :context_id => @course1).first_or_create!
+        get 'user_dashboard'
+        course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
+        expect(course_data.detect{|h| h[:id] == @course1.id}[:isFavorited]).to eq true
+        expect(course_data.detect{|h| h[:id] == @course2.id}[:isFavorited]).to eq false
+      end
+
+      it "should load nicknames" do
+        @user.set_preference(:course_nicknames, @course1.id, "some nickname or whatever")
+        expect_any_instance_of(User).to_not receive(:course_nickname)
+        get 'user_dashboard'
+        course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
+        expect(course_data.detect{|h| h[:id] == @course1.id}[:shortName]).to eq "some nickname or whatever"
+        expect(course_data.detect{|h| h[:id] == @course2.id}[:shortName]).to eq @course2.name
+      end
     end
   end
 

@@ -19,6 +19,10 @@
 require_relative '../spec_helper'
 
 RSpec.describe AnonymousSubmissionsController do
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   it_behaves_like 'a submission update action', :anonymous_submissions
 
   describe "GET show" do
@@ -83,10 +87,10 @@ RSpec.describe AnonymousSubmissionsController do
       expect(submission.read?(@teacher)).to be_falsey
     end
 
-    it "renders json with a not-found error for teachers when the assignment is anonymous and muted" do
+    it "renders json with a not-found error for teachers when the assignment is anonymous and grades are not posted" do
       @student.update!(name: 'some student')
       user_session(@teacher)
-      @assignment.update!(muted: true)
+      @assignment.mute!
       request.accept = Mime[:json].to_s
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id}, format: :json
 
@@ -94,9 +98,9 @@ RSpec.describe AnonymousSubmissionsController do
       expect(JSON.parse(response.body)['errors']).to eq "The specified user () is not a student in this course"
     end
 
-    it "renders json without scores for students on muted assignments" do
+    it "renders json without scores for students whose grades have not posted" do
       user_session(@student)
-      @assignment.update!(muted: true)
+      @assignment.mute!
       request.accept = Mime[:json].to_s
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id}, format: :json
       expect(body['anonymous_id']).to eq @submission.anonymous_id

@@ -679,7 +679,7 @@ class Message < ActiveRecord::Base
   def notification_targets
     case path_type
     when "push"
-      self.user.notification_endpoints.map(&:arn)
+      self.user.notification_endpoints.pluck(:arn)
     when "twitter"
       twitter_service = user.user_services.where(service: 'twitter').first
       [

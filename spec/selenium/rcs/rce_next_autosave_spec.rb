@@ -141,5 +141,31 @@ describe "RCE Next autosave feature" do
       expect(f('body')).not_to contain_css('[data-testid="RCE_RestoreAutoSaveModal"]')
       driver.local_storage.clear
     end
+
+    it "should remove placholder images from autosaved content" do
+      create_and_edit_announcement
+
+      # simulate a placeholder image
+      switch_to_html_view
+      f("textarea#discussion-topic-message8")
+        .send_keys("<img data-placeholder-for='someimage.jpg' style='width: 200px; height: 50px; border: solid 1px #8B969E;'/>")
+      switch_to_editor_view
+
+      f('#discussion-title').click # blur tinymce to force autosave
+      driver.navigate.refresh
+      accept_alert
+      wait_for_rce
+
+      # say "yes" to restore
+      expect(fj('h2:contains("Found auto-saved content")')).to be_present
+      fj('button:contains("Yes")').click
+      wait_for_animations
+
+      in_frame tiny_rce_ifr_id do
+        expect(f("body")).not_to contain_css('img')
+        expect(f("body").text).to eql('hello')
+      end
+      driver.local_storage.clear
+    end
   end
 end

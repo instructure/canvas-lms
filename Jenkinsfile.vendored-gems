@@ -25,33 +25,28 @@ def getImageTagVersion() {
 
 pipeline {
   agent { label 'canvas-docker' }
-  options {
-    ansiColor('xterm')
-  }
+  options { ansiColor('xterm') }
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
-    // 'refs/changes/63/181863/8' -> '63.181863.8'
-    NAME = getImageTagVersion()
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
   }
 
   stages {
-    stage ('Pre-Cleanup') {
+    stage ('Setup') {
       steps {
-        timeout(time: 2) {
+        timeout(time: 5) {
           sh 'build/new-jenkins/docker-cleanup.sh'
+          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
+          sh 'build/new-jenkins/docker-compose-pull.sh'
+          sh 'build/new-jenkins/docker-compose-build-up.sh'
+          sh 'build/new-jenkins/docker-compose-create-database.sh'
         }
       }
     }
 
     stage ('Run Vendored Gems specs') {
       steps {
-        timeout(time: 60) {
-          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
-          sh 'build/new-jenkins/docker-compose-pull.sh'
-          sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'build/new-jenkins/docker-compose-create-database.sh'
+        timeout(time: 10) {
           sh 'build/new-jenkins/test-gems.sh'
         }
       }
@@ -60,24 +55,24 @@ pipeline {
 
   post {
     always {
-    // copy the test results from the container
-    sh 'docker cp $(docker ps -f "ancestor"="$PATCHSET_TAG" -q):/usr/src/app/tmp/spec_results/. ./spec_results/'
-    script {
-      def htmlFiles
-      // find all results files
-      dir ('spec_results') {
-        sh 'mv report.html canvas_i18nliner_results.html'
-        htmlFiles = findFiles glob: '*results.html'
-      }
+      // copy the test results from the container
+      sh 'docker cp $(docker ps -f "ancestor"="$PATCHSET_TAG" -q):/usr/src/app/tmp/spec_results/. ./spec_results/'
+      script {
+        def htmlFiles
+        // find all results files
+        dir ('spec_results') {
+          sh 'mv report.html canvas_i18nliner_results.html'
+          htmlFiles = findFiles glob: '*results.html'
+        }
 
-      // publish html
-      publishHTML target: [
-        allowMissing: false,
-        alwaysLinkToLastBuild: false,
-        keepAll: true,
-        reportDir: "spec_results",
-        reportFiles: htmlFiles.join(','),
-        reportName: 'Test Results'
+        // publish html
+        publishHTML target: [
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: true,
+          reportDir: "spec_results",
+          reportFiles: htmlFiles.join(','),
+          reportName: 'Test Results'
         ]
       }
     }

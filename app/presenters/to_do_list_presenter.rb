@@ -222,6 +222,9 @@ class ToDoListPresenter
     delegate :context, :context_name, :short_context_name, to: :assignment_presenter
     attr_reader :assignment
 
+    include ApplicationHelper
+    include Rails.application.routes.url_helpers
+
     def initialize(view, assessment_request, user)
       @view = view
       @assessment_request = assessment_request
@@ -238,7 +241,11 @@ class ToDoListPresenter
     end
 
     def submission_path
-      @view.course_assignment_submission_path(@assignment.context_id, @assignment.id, @assessment_request.user_id)
+      if @assignment.anonymous_peer_reviews?
+        context_url(context, :context_assignment_anonymous_submission_url, @assignment.id, @assessment_request.submission.anonymous_id)
+      else
+        @view.course_assignment_submission_path(@assignment.context_id, @assignment.id, @assessment_request.user_id)
+      end
     end
 
     def ignore_url

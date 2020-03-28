@@ -1,4 +1,5 @@
-# GraphQL API
+GraphQL API
+===============================
 
 ## GraphQL Introduction
 

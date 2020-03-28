@@ -1,9 +1,11 @@
 #!/bin/bash
 
-ip_address=`hostname -i`
+set -x
+
+ip_address=$(hostname -i)
 echo Attempting connection to postgres...
-for i in {1..60}; do
-  gosu postgres pg_isready --host=$ip_address && echo "Postgres connected!" && exit
+for _ in {1..60}; do
+  gosu postgres pg_isready --host="$ip_address" && echo "Postgres connected!" && exit
   sleep 1
 done
 echo Postgres is still down after 60 seconds.

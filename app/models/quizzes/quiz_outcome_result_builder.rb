@@ -43,6 +43,8 @@ module Quizzes
         where(user_id: @qs.user.id).
         first_or_initialize
 
+      quiz_result.user_uuid = @qs.user.uuid
+
       # get data from quiz submission's question result to ensure result should be generated
       cached_question = @qs.quiz_data.detect { |q| q[:assessment_question_id] == question.id }
       cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
@@ -88,6 +90,8 @@ module Quizzes
           for_associated_asset(@qs.quiz).
           where(user_id: @qs.user.id).
           first_or_initialize
+
+        result.user_uuid = @qs.user.uuid
 
         result.artifact = @qs
         result.context = @qs.quiz.context || alignment.context

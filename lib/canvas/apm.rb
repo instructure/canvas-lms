@@ -43,16 +43,18 @@ module Canvas
   module Apm
     HOST_SAMPLING_INTERVAL = 10000
     class << self
-      attr_writer :enable_debug_mode, :hostname
+      attr_writer :enable_debug_mode, :hostname, :tracer
       attr_accessor :canvas_cluster
 
       def reset!
-        @canvas_cluster = nil
         @_config = nil
-        @_sample_rate = nil
         @_host_sample_rate = nil
+        @_host_sampling_decision = nil
+        @_sample_rate = nil
+        @canvas_cluster = nil
         @enable_debug_mode = nil
         @hostname = nil
+        @tracer = nil
       end
 
       def config
@@ -79,9 +81,10 @@ module Canvas
       end
 
       def host_chosen?
+        return @_host_sampling_decision if @_host_sampling_decision.present?
         return false if @hostname.blank? || host_sample_rate <= 0
         return false if host_sample_rate > 1.0 # invalid ratio
-        get_sampling_decision(@hostname, host_sample_rate, HOST_SAMPLING_INTERVAL)
+        @_host_sampling_decision = get_sampling_decision(@hostname, host_sample_rate, HOST_SAMPLING_INTERVAL)
       end
 
       def get_sampling_decision(string_input, rate, interval)
@@ -107,7 +110,12 @@ module Canvas
         debug_mode = @enable_debug_mode.presence || false
         Datadog.configure do |c|
           c.tracer sampler: sampler, debug: debug_mode
+          c.use :aws
+          c.use :faraday
+          c.use :graphql
+          c.use :http
           c.use :rails
+          c.use :redis
         end
         Delayed::Worker.plugins << Canvas::Apm::InstJobs::Plugin
       end
@@ -125,6 +133,44 @@ module Canvas
         act_global_id = root_account.try(:global_id)
         apm_root_span.set_tag('root_account', act_global_id.to_s) if act_global_id.present?
         apm_root_span.set_tag('current_user', current_user.global_id.to_s) if current_user
+      end
+
+      # use this to wrap arbitrary code in traces
+      # without referencing the datadog library directly
+      # while still getting to avoid (for now) having to wrap
+      # every possible option in their API.
+      #
+      # To trace any Ruby code, you can use the Canvas::Apm.tracer.trace method:
+      #
+      # Canvas::Apm.tracer.trace(name, options) do |span|
+      #   # Wrap this block around the code you want to instrument
+      #   # Additionally, you can modify the span here.
+      #   # e.g. Change the resource name, set tags, etc...
+      # end
+      #
+      # See datadog examples here:
+      # http://gems.datadoghq.com/trace/docs/#Manual_Instrumentation
+      def tracer
+        return Canvas::Apm::StubTracer.instance unless self.configured?
+        @tracer || Datadog.tracer
+      end
+
+      # Alternatively you can just call this to get
+      # the service name and trace type preset for you
+      #
+      # Canvas::Apm.trace("timezone setup", options) do |span|
+      #  # the code to trace goes here
+      # end
+      #
+      # see available "Options" to be passed on here:
+      # http://gems.datadoghq.com/trace/docs/#Manual_Instrumentation
+      def trace(resource_name, opts = {})
+        opts[:service] = opts.fetch(:service, 'canvas_custom')
+        opts[:resource] = resource_name
+        opts[:span_type] = opts.fetch(:span_type, 'canvas_ruby')
+        tracer.trace("application.code", opts) do |span|
+          yield span
+        end
       end
     end
   end

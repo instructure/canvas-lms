@@ -140,7 +140,7 @@ QUnit.module('GradingPeriodSetCollection - API Data Load', {
   },
 
   stubSetsFailure() {
-    const setsFailure = Promise.reject('FAIL')
+    const setsFailure = Promise.reject(new Error('FAIL'))
     sandbox.stub(gradingPeriodSetsApi, 'list').returns(setsFailure)
     return setsFailure
   },
@@ -359,15 +359,6 @@ test('searchTextMatchesTitles returns true if the search text exactly matches on
   })
 })
 
-test('searchTextMatchesTitles returns true if the search text exactly matches one of the titles', function() {
-  const titles = ['hello world', 'goodbye friend']
-  const collection = renderComponent()
-  return Promise.all([this.terms, this.sets]).then(() => {
-    collection.changeSearchText('hello world')
-    equal(collection.searchTextMatchesTitles(titles), true)
-  })
-})
-
 test('searchTextMatchesTitles returns true if the search text is a substring of one of the titles', function() {
   const titles = ['hello world', 'goodbye friend']
   const collection = renderComponent()
@@ -558,7 +549,7 @@ test('removeGradingPeriodSet focuses on the set above the one deleted, if one ex
     const remainingSet = collection.state.sets[0]
     const gradingPeriodSetRef = collection.getShowGradingPeriodSetRef(remainingSet)
     const gradingPeriodSetComponent = collection.refs[gradingPeriodSetRef]
-    ok(gradingPeriodSetComponent.refs.editButton.focused)
+    strictEqual(gradingPeriodSetComponent._refs.editButton, document.activeElement)
   })
 })
 
@@ -619,9 +610,8 @@ test('renders the "edit grading period set" when "edit grading period set" is cl
       !!set.refs['edit-grading-period-set-1'],
       'the edit grading period set form is not visible'
     )
-    const {editButton} = set.refs['show-grading-period-set-1'].refs
-    const button = findRenderedDOMComponentWithTag(editButton, 'button')
-    Simulate.click(button)
+    const {editButton} = set.refs['show-grading-period-set-1']._refs
+    Simulate.click(editButton)
     ok(set.refs['edit-grading-period-set-1'], 'the edit form is visible')
   })
 })
@@ -629,10 +619,9 @@ test('renders the "edit grading period set" when "edit grading period set" is cl
 test('disables other "grading period set" actions while open', function() {
   const set = renderComponent()
   return Promise.all([this.sets, this.terms]).then(() => {
-    const {editButton} = set.refs['show-grading-period-set-1'].refs
-    const button = findRenderedDOMComponentWithTag(editButton, 'button')
-    Simulate.click(button)
-    notEqual(button.getAttribute('aria-disabled'), 'true')
+    const {editButton} = set.refs['show-grading-period-set-1']._refs
+    Simulate.click(editButton)
+    notEqual(editButton.getAttribute('aria-disabled'), 'true')
     ok(set.refs['show-grading-period-set-2'].props.actionsDisabled)
   })
 })
@@ -640,9 +629,8 @@ test('disables other "grading period set" actions while open', function() {
 test('"onCancel" removes the "edit grading period set" form', function() {
   const set = renderComponent()
   return Promise.all([this.sets, this.terms]).then(() => {
-    const {editButton} = set.refs['show-grading-period-set-1'].refs
-    const button = findRenderedDOMComponentWithTag(editButton, 'button')
-    Simulate.click(button)
+    const {editButton} = set.refs['show-grading-period-set-1']._refs
+    Simulate.click(editButton)
     set.refs['edit-grading-period-set-1'].props.onCancel()
     notOk(!!set.refs['edit-grading-period-set-1'])
   })
@@ -651,9 +639,8 @@ test('"onCancel" removes the "edit grading period set" form', function() {
 test('"onCancel" focuses on the "edit grading period set" button', function() {
   const set = renderComponent()
   return Promise.all([this.sets, this.terms]).then(() => {
-    const {editButton} = set.refs['show-grading-period-set-1'].refs
-    const button = findRenderedDOMComponentWithTag(editButton, 'button')
-    Simulate.click(button)
+    const {editButton} = set.refs['show-grading-period-set-1']._refs
+    Simulate.click(editButton)
     set.refs['edit-grading-period-set-1'].props.onCancel()
     equal(document.activeElement.title, `Edit ${exampleSets[0].title}`)
   })
@@ -662,11 +649,10 @@ test('"onCancel" focuses on the "edit grading period set" button', function() {
 test('"onCancel" re-enables all grading period set actions', function() {
   const set = renderComponent()
   return Promise.all([this.sets, this.terms]).then(() => {
-    const {editButton} = set.refs['show-grading-period-set-1'].refs
-    const button = findRenderedDOMComponentWithTag(editButton, 'button')
-    Simulate.click(button)
+    const {editButton} = set.refs['show-grading-period-set-1']._refs
+    Simulate.click(editButton)
     set.refs['edit-grading-period-set-1'].props.onCancel()
-    notEqual(button.getAttribute('aria-disabled'), 'true')
+    notEqual(editButton.getAttribute('aria-disabled'), 'true')
     notOk(set.refs['show-grading-period-set-2'].props.actionsDisabled)
   })
 })
@@ -681,9 +667,8 @@ QUnit.module('GradingPeriodSetCollection "Edit Grading Period Set - onSave"', {
     const component = renderComponent()
     component.onTermsLoaded(exampleTerms)
     component.onSetsLoaded(exampleSets)
-    const {editButton} = component.refs['show-grading-period-set-1'].refs
-    const button = findRenderedDOMComponentWithTag(editButton, 'button')
-    Simulate.click(button)
+    const {editButton} = component.refs['show-grading-period-set-1']._refs
+    Simulate.click(editButton)
     return component
   },
 
@@ -738,7 +723,7 @@ test('re-enables all grading period set actions', function() {
 })
 
 test('preserves the "edit grading period set" form upon failure', function() {
-  const failure = Promise.reject('FAIL')
+  const failure = Promise.reject(new Error('FAIL'))
   sandbox.stub(gradingPeriodSetsApi, 'update').returns(failure)
   const collection = this.renderComponent()
   this.callOnSave(collection)

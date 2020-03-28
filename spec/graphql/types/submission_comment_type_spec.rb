@@ -21,6 +21,8 @@ require_relative "../graphql_spec_helper"
 
 describe Types::SubmissionCommentType do
   before(:once) do
+    PostPolicy.enable_feature!
+
     student_in_course(active_all: true)
     @student1 = @student
     student_in_course(active_all: true)
@@ -44,6 +46,7 @@ describe Types::SubmissionCommentType do
 
   describe 'Submission Comment Read' do
     it 'returns the correct read state' do
+      @assignment.post_submissions
       expect(
         submission_type.resolve('commentsConnection { nodes { read }}')
       ).to eq [false]

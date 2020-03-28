@@ -35,6 +35,7 @@ module LiveAssessments
       outcome_result.artifact = self
       outcome_result.assessed_at = assessed_at
       outcome_result.submitted_at = assessed_at
+      outcome_result.user_uuid = user.uuid
 
       outcome_result.score = score
       outcome_result.possible = possible

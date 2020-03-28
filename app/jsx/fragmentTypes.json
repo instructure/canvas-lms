@@ -2,77 +2,29 @@
   "__schema": {
     "types": [
       {
-        "kind": "INTERFACE",
-        "name": "Node",
+        "kind": "UNION",
+        "name": "AssignmentOverrideSet",
         "possibleTypes": [
           {
-            "name": "Account"
-          },
-          {
-            "name": "Assignment"
-          },
-          {
-            "name": "AssignmentGroup"
-          },
-          {
-            "name": "AssignmentOverride"
-          },
-          {
-            "name": "Course"
-          },
-          {
-            "name": "Discussion"
-          },
-          {
-            "name": "Enrollment"
-          },
-          {
-            "name": "File"
-          },
-          {
-            "name": "GradingPeriod"
+            "name": "Section"
           },
           {
             "name": "Group"
           },
           {
-            "name": "GroupSet"
+            "name": "AdhocStudents"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "AssignmentsConnectionInterface",
+        "possibleTypes": [
+          {
+            "name": "AssignmentGroup"
           },
           {
-            "name": "MediaObject"
-          },
-          {
-            "name": "Module"
-          },
-          {
-            "name": "ModuleItem"
-          },
-          {
-            "name": "Page"
-          },
-          {
-            "name": "PostPolicy"
-          },
-          {
-            "name": "Progress"
-          },
-          {
-            "name": "Quiz"
-          },
-          {
-            "name": "Rubric"
-          },
-          {
-            "name": "Section"
-          },
-          {
-            "name": "Submission"
-          },
-          {
-            "name": "Term"
-          },
-          {
-            "name": "User"
+            "name": "Course"
           }
         ]
       },
@@ -188,6 +140,168 @@
         ]
       },
       {
+        "kind": "UNION",
+        "name": "Lockable",
+        "possibleTypes": [
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "Discussion"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "Module"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "ModuleItemInterface",
+        "possibleTypes": [
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "Discussion"
+          },
+          {
+            "name": "ExternalTool"
+          },
+          {
+            "name": "ExternalUrl"
+          },
+          {
+            "name": "File"
+          },
+          {
+            "name": "ModuleExternalTool"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "SubHeader"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "Node",
+        "possibleTypes": [
+          {
+            "name": "Account"
+          },
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "AssignmentGroup"
+          },
+          {
+            "name": "AssignmentOverride"
+          },
+          {
+            "name": "Course"
+          },
+          {
+            "name": "Discussion"
+          },
+          {
+            "name": "Enrollment"
+          },
+          {
+            "name": "File"
+          },
+          {
+            "name": "GradingPeriod"
+          },
+          {
+            "name": "Group"
+          },
+          {
+            "name": "GroupSet"
+          },
+          {
+            "name": "MediaObject"
+          },
+          {
+            "name": "Module"
+          },
+          {
+            "name": "ModuleItem"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "PostPolicy"
+          },
+          {
+            "name": "Progress"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "Rubric"
+          },
+          {
+            "name": "Section"
+          },
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "Term"
+          },
+          {
+            "name": "User"
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
+        "name": "ProgressContext",
+        "possibleTypes": [
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "Course"
+          },
+          {
+            "name": "File"
+          },
+          {
+            "name": "GroupSet"
+          },
+          {
+            "name": "User"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "SubmissionInterface",
+        "possibleTypes": [
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "SubmissionHistory"
+          }
+        ]
+      },
+      {
         "kind": "INTERFACE",
         "name": "Timestamped",
         "possibleTypes": [
@@ -263,99 +377,6 @@
         ]
       },
       {
-        "kind": "INTERFACE",
-        "name": "AssignmentsConnectionInterface",
-        "possibleTypes": [
-          {
-            "name": "AssignmentGroup"
-          },
-          {
-            "name": "Course"
-          }
-        ]
-      },
-      {
-        "kind": "INTERFACE",
-        "name": "ModuleItemInterface",
-        "possibleTypes": [
-          {
-            "name": "Assignment"
-          },
-          {
-            "name": "Discussion"
-          },
-          {
-            "name": "ExternalTool"
-          },
-          {
-            "name": "ExternalUrl"
-          },
-          {
-            "name": "File"
-          },
-          {
-            "name": "ModuleExternalTool"
-          },
-          {
-            "name": "Page"
-          },
-          {
-            "name": "Quiz"
-          },
-          {
-            "name": "SubHeader"
-          }
-        ]
-      },
-      {
-        "kind": "UNION",
-        "name": "Lockable",
-        "possibleTypes": [
-          {
-            "name": "Assignment"
-          },
-          {
-            "name": "Discussion"
-          },
-          {
-            "name": "Quiz"
-          },
-          {
-            "name": "Page"
-          },
-          {
-            "name": "Module"
-          }
-        ]
-      },
-      {
-        "kind": "UNION",
-        "name": "AssignmentOverrideSet",
-        "possibleTypes": [
-          {
-            "name": "Section"
-          },
-          {
-            "name": "Group"
-          },
-          {
-            "name": "AdhocStudents"
-          }
-        ]
-      },
-      {
-        "kind": "INTERFACE",
-        "name": "SubmissionInterface",
-        "possibleTypes": [
-          {
-            "name": "Submission"
-          },
-          {
-            "name": "SubmissionHistory"
-          }
-        ]
-      },
-      {
         "kind": "UNION",
         "name": "TurnitinContext",
         "possibleTypes": [
@@ -364,27 +385,6 @@
           },
           {
             "name": "File"
-          }
-        ]
-      },
-      {
-        "kind": "UNION",
-        "name": "ProgressContext",
-        "possibleTypes": [
-          {
-            "name": "Assignment"
-          },
-          {
-            "name": "Course"
-          },
-          {
-            "name": "File"
-          },
-          {
-            "name": "GroupSet"
-          },
-          {
-            "name": "User"
           }
         ]
       }

@@ -158,7 +158,7 @@ class ApplicationController < ActionController::Base
           use_responsive_layout: use_responsive_layout?,
           use_rce_enhancements: (@context.is_a?(User) ? @domain_root_account : @context).try(:feature_enabled?, :rce_enhancements),
           rce_auto_save: @context.try(:feature_enabled?, :rce_auto_save),
-          DIRECT_SHARE_ENABLED: @domain_root_account.try(:feature_enabled?, :direct_share),
+          DIRECT_SHARE_ENABLED: !@context.is_a?(Group) && @domain_root_account.try(:feature_enabled?, :direct_share),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
           use_high_contrast: @current_user.try(:prefers_high_contrast?),
@@ -172,8 +172,9 @@ class ApplicationController < ActionController::Base
             show_feedback_link: show_feedback_link?
           },
           FEATURES: {
-            assignment_attempts: Account.site_admin.feature_enabled?(:assignment_attempts),
-            la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix)
+            la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
+            cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
+            show_qr_login: Object.const_defined?("InstructureMiscPlugin") && !!@domain_root_account&.feature_enabled?(:mobile_qr_login)
           }
         }
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
@@ -366,10 +367,12 @@ class ApplicationController < ActionController::Base
       course: @context.slice(:id, :name, :enrollment_term_id),
     }
     if is_master
+      can_manage = @context.account.grants_right?(@current_user, :manage_master_courses)
       bc_data.merge!(
         subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
         terms: @context.account.root_account.enrollment_terms.active.to_a.map{|term| {id: term.id, name: term.name}},
-        canManageCourse: @context.account.grants_right?(@current_user, :manage_master_courses)
+        canManageCourse: can_manage,
+        canAutoPublishCourses: can_manage && @domain_root_account.feature_enabled?(:uxs_4_omg_a_scary_blueprint_checkbox)
       )
     end
     js_env :BLUEPRINT_COURSES_DATA => bc_data
@@ -462,8 +465,10 @@ class ApplicationController < ActionController::Base
     end
     opts.push({}) unless opts[-1].is_a?(Hash)
     include_host = opts[-1].delete(:include_host)
-    if !include_host
+    unless include_host
+      # rubocop:disable Style/RescueModifier
       opts[-1][:host] = context.host_name rescue nil
+      # rubocop:enable Style/RescueModifier
       opts[-1][:only_path] = true unless name.end_with?("_path")
     end
     self.send name, *opts
@@ -1777,8 +1782,12 @@ class ApplicationController < ActionController::Base
     # but we still use the assignment#new page to create the quiz.
     # also handles launch from existing quiz on quizzes page.
     if ref.present? && @assignment&.quiz_lti?
-      if (ref.include?('assignments/new') || ref =~ /courses\/*.\/quizzes/i) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+      if (ref.include?('assignments/new') || ref =~ /courses\/[0-9]+\/quizzes/i) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
         return polymorphic_url([@context, :quizzes])
+      end
+
+      if ref =~ /courses\/[0-9]+\/gradebook/i
+        return polymorphic_url([@context, :gradebook])
       end
     end
     named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)

@@ -21,7 +21,8 @@ import {mockAssignment} from '../../test-utils'
 import {renderTeacherQuery} from './integration/integration-utils'
 
 describe('TeacherQuery', () => {
-  it('renders a loading spinner and then the assignment with data from the query', async () => {
+  // eslint-disable-next-line jest/no-disabled-tests
+  it.skip('renders a loading spinner and then the assignment with data from the query', async () => {
     const assignment = mockAssignment()
     const {getAllByText, getByTitle} = renderTeacherQuery(assignment)
     expect(getByTitle('Loading...')).toBeInTheDocument()

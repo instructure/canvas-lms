@@ -13,4 +13,4 @@ services:
     environment:
       VIRTUAL_HOST: lti.docker
       RAILS_ENV: development
-      DATABASE_URL: postgres://postgres@postgres:5432
+      DATABASE_URL: postgres://postgres:sekret@postgres:5432

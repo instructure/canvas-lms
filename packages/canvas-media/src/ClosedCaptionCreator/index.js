@@ -16,49 +16,73 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component} from 'react'
+import {arrayOf, func, objectOf, shape, string} from 'prop-types'
+import formatMessage from 'format-message'
 
-import {Flex} from '@instructure/ui-layout'
+import {Alert} from '@instructure/ui-alerts'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconAddLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 
-import AddClosedCaptionButton from './AddClosedCaptionButton'
 import ClosedCaptionCreatorRow from './ClosedCaptionCreatorRow'
-import ClosedCaptionHeader from './ClosedCaptionHeader'
-import ClosedCaptionRow from './ClosedCaptionRow'
 import shortId from '../shared/shortid'
 
 // TODO:
 //   - Limit file creation
-//   - Ellipsis long file names
 //   - Get current subtitles from API
 //   - Upload new subtitles via API
 //   - Download existing subtitles via download button
 //   - Delete existing subtitles locally and via API
-//   - Figure out fix for dynamic translations (ex: 'delete %{filename}')
 
 export default class ClosedCaptionPanel extends Component {
+  static propTypes = {
+    liveRegion: func.isRequired,
+    updateSubtitles: func.isRequired,
+    uploadMediaTranslations: shape({
+      UploadMediaStrings: objectOf(string),
+      SelectStrings: objectOf(string)
+    }).isRequired,
+    languages: arrayOf(
+      shape({
+        id: string,
+        label: string
+      })
+    ).isRequired
+  }
+
   state = {
     addingNewClosedCaption: true,
     newSelectedFile: null,
     newSelectedLanguage: null,
-    subtitles: []
+    subtitles: [],
+    announcement: null
+  }
+
+  componentDidUpdate() {
+    if (this._addButtonRef) {
+      window.setTimeout(() => {
+        this._addButtonRef && this._addButtonRef.focus()
+      }, 100)
+    }
   }
 
   newButtonClick = () => {
     this.setState({
       addingNewClosedCaption: true,
       newSelectedFile: null,
-      newSelectedLanguage: null
+      newSelectedLanguage: null,
+      announcement: null
     })
   }
 
-  onFileSelected = e => {
-    if (this.state.newSelectedLanguage) {
-      e.persist()
+  onFileSelected = newFile => {
+    if (this.state.newSelectedLanguage && newFile) {
       this.setState(prevState => {
         const subtitles = prevState.subtitles.concat([
           {
             id: shortId(),
-            language: prevState.newSelectedLanguage,
-            file: e.target.files[0],
+            language: prevState.newSelectedLanguage.id,
+            file: newFile,
             isNew: true
           }
         ])
@@ -67,95 +91,127 @@ export default class ClosedCaptionPanel extends Component {
           subtitles,
           addingNewClosedCaption: false,
           newSelectedFile: null,
-          newSelectedLanguage: null
+          newSelectedLanguage: null,
+          announcement: formatMessage(
+            this.props.uploadMediaTranslations.UploadMediaStrings.ADDED_CAPTION,
+            {lang: prevState.newSelectedLanguage.label}
+          )
         }
       })
     } else {
-      this.setState({newSelectedFile: e.target.files[0]})
+      this.setState({newSelectedFile: newFile, announcement: null})
     }
   }
 
-  onOptionSelected = option => {
+  onLanguageSelected = lang => {
     if (this.state.newSelectedFile) {
       this.setState(prevState => {
         const subtitles = prevState.subtitles.concat([
-          {id: shortId(), language: option, file: prevState.newSelectedFile, isNew: true}
+          {id: shortId(), language: lang.id, file: prevState.newSelectedFile, isNew: true}
         ])
         this.props.updateSubtitles(subtitles)
         return {
           subtitles,
           addingNewClosedCaption: false,
           newSelectedFile: null,
-          newSelectedLanguage: null
+          newSelectedLanguage: null,
+          announcement: formatMessage(
+            this.props.uploadMediaTranslations.UploadMediaStrings.ADDED_CAPTION,
+            {lang: lang.label}
+          )
         }
       })
     } else {
-      this.setState({newSelectedLanguage: option})
+      this.setState({newSelectedLanguage: lang, announcement: null})
     }
   }
 
   onRowDelete = subtitle => {
-    this.setState(prevState => {
-      const subtitles = prevState.subtitles.filter(s => s.id !== subtitle.id)
-      this.props.updateSubtitles(subtitles)
-      return {
-        subtitles,
-        addingNewClosedCaption: subtitles.length > 0 ? prevState.addingNewClosedCaption : true
-      }
-    })
+    if (subtitle.id) {
+      this.setState(prevState => {
+        const deletedLang = this.props.languages.find(l => l.id === subtitle.id)
+        const subtitles = prevState.subtitles.filter(s => s.id !== subtitle.id)
+        this.props.updateSubtitles(subtitles)
+        return {
+          subtitles,
+          addingNewClosedCaption: subtitles.length > 0 ? prevState.addingNewClosedCaption : true,
+          announcement: formatMessage(
+            this.props.uploadMediaTranslations.UploadMediaStrings.DELETED_CAPTION,
+            {lang: deletedLang?.label}
+          )
+        }
+      })
+    } else {
+      // should never get here
+      this.setState({
+        addingNewClosedCaption: true,
+        newSelectedFile: null,
+        newSelectedLanguage: null,
+        announcement: null
+      })
+    }
   }
 
   render() {
-    const {
-      CLOSED_CAPTIONS_LANGUAGE_HEADER,
-      CLOSED_CAPTIONS_FILE_NAME_HEADER,
-      CLOSED_CAPTIONS_ACTIONS_HEADER,
-      CLOSED_CAPTIONS_ADD_SUBTITLE_SCREENREADER
-    } = this.props.uploadMediaTranslations.UploadMediaStrings
-
+    const {ADD_NEW_CAPTION_OR_SUBTITLE} = this.props.uploadMediaTranslations.UploadMediaStrings
     return (
-      <div>
-        <Flex direction="column">
-          <Flex.Item>
-            <ClosedCaptionHeader
-              CLOSED_CAPTIONS_LANGUAGE_HEADER={CLOSED_CAPTIONS_LANGUAGE_HEADER}
-              CLOSED_CAPTIONS_FILE_NAME_HEADER={CLOSED_CAPTIONS_FILE_NAME_HEADER}
-              CLOSED_CAPTIONS_ACTIONS_HEADER={CLOSED_CAPTIONS_ACTIONS_HEADER}
-            />
-          </Flex.Item>
+      <View display="inline-block" data-testid="ClosedCaptionPanel">
+        {this.state.announcement && (
+          <Alert
+            liveRegion={this.props.liveRegion}
+            screenReaderOnly
+            isLiveRegionAtomic
+            liveRegionPoliteness="assertive"
+          >
+            {this.state.announcement}
+          </Alert>
+        )}
+        <View display="inline-block">
           {this.state.subtitles.map(cc => (
-            <Flex.Item key={cc.id} overflowY="visible" padding="small 0 0 0">
-              <ClosedCaptionRow closedCaption={cc} trashButtonOnClick={this.onRowDelete} />
-            </Flex.Item>
+            <ClosedCaptionCreatorRow
+              key={cc.id}
+              liveRegion={this.props.liveRegion}
+              uploadMediaTranslations={this.props.uploadMediaTranslations}
+              onDeleteRow={this.onRowDelete}
+              onLanguageSelected={this.onLanguageSelected}
+              onFileSelected={this.onFileSelected}
+              languages={this.props.languages}
+              selectedLanguage={this.props.languages.find(l => l.id === cc.language)}
+              selectedFile={cc.file}
+              rowId={cc.id}
+            />
           ))}
-          {this.state.addingNewClosedCaption ? (
-            <Flex.Item overflowY="visible" padding="small 0 0 0">
-              <ClosedCaptionCreatorRow
-                uploadMediaTranslations={this.props.uploadMediaTranslations}
-                onOptionSelected={this.onOptionSelected}
-                liveRegion={this.props.liveRegion}
-                onFileSelected={this.onFileSelected}
-                languages={this.props.languages}
-                selectedFileName={this.state.newSelectedFile ? this.state.newSelectedFile.name : ''}
-                fileSelected={this.state.newSelectedFile}
-                renderTrashButton={this.state.subtitles.length > 0}
-                trashButtonOnClick={() =>
-                  this.setState({
-                    addingNewClosedCaption: false,
-                    newSelectedFile: null,
-                    newSelectedLanguage: null
-                  })
-                }
-              />
-            </Flex.Item>
-          ) : null}
-        </Flex>
-        <AddClosedCaptionButton
-          CLOSED_CAPTIONS_ADD_SUBTITLE_SCREENREADER={CLOSED_CAPTIONS_ADD_SUBTITLE_SCREENREADER}
-          disabled={this.state.addingNewClosedCaption}
-          newButtonClick={this.newButtonClick}
-        />
-      </div>
+        </View>
+        {this.state.addingNewClosedCaption ? (
+          <View as="div">
+            <ClosedCaptionCreatorRow
+              liveRegion={this.props.liveRegion}
+              uploadMediaTranslations={this.props.uploadMediaTranslations}
+              onDeleteRow={this.onRowDelete}
+              onLanguageSelected={this.onLanguageSelected}
+              onFileSelected={this.onFileSelected}
+              languages={this.props.languages}
+              selectedLanguage={this.state.newSelectedLanguage}
+              selectedFile={this.state.newSelectedFile}
+            />
+          </View>
+        ) : (
+          <div style={{position: 'relative', textAlign: 'center'}}>
+            <IconButton
+              elementRef={el => {
+                this._addButtonRef = el
+              }}
+              shape="circle"
+              color="primary"
+              screenReaderLabel={ADD_NEW_CAPTION_OR_SUBTITLE}
+              onClick={this.newButtonClick}
+              margin="x-small auto"
+            >
+              <IconAddLine />
+            </IconButton>
+          </div>
+        )}
+      </View>
     )
   }
 }

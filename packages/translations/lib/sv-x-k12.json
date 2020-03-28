@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "Rensa vald fil"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Rensa vald fil: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Klicka på en sida för att infoga en länk till sidan."
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Visa textlänk (öppnas i en ny flik)"
     },
+    "document_678cd7bf": {
+        "message": "Dokument"
+    },
     "documents_81393201": {
         "message": "Dokument"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Bädda in videokod"
+    },
+    "equation_1c5ac93c": {
+        "message": "Ekvation"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Det gick inte att läsa in omdömen"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "Höjd"
     },
+    "image_8ad06": {
+        "message": "Bild"
+    },
     "image_options_5412d02c": {
         "message": "Bildalternativ"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Öka indrag"
+    },
+    "insert_593145ef": {
+        "message": "Infoga"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Infoga Equella-länkar"

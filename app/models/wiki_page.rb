@@ -332,6 +332,10 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  def course_broadcast_data
+    context&.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :updated_wiki_page
     p.to { participants }
@@ -339,6 +343,7 @@ class WikiPage < ActiveRecord::Base
       BroadcastPolicies::WikiPagePolicy.new(wiki_page).
         should_dispatch_updated_wiki_page?
     end
+    p.data { course_broadcast_data }
   end
 
   def participants

@@ -22,13 +22,5 @@
       <td><%= f.blabel :parallelism, :en => "Number of job processors to use to process SIS imports in parallel" %></td>
       <td><%= f.text_field :parallelism %></td>
     </tr>
-    <tr>
-      <td><%= f.blabel :minimum_rows_for_parallel, :en => "Minimum rows in a SIS import before using parallel processing" %></td>
-      <td><%= f.text_field :minimum_rows_for_parallel %></td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :queue_for_parallel_jobs, :en => "Job queue to use for parallel jobs (blank for default)" %></td>
-      <td><%= f.text_field :queue_for_parallel_jobs %></td>
-    </tr>
   </table>
 <% end %>

@@ -88,7 +88,8 @@ const ApiClient = {
     willSendNotification,
     willIncludeCustomNotificationMessage,
     notificationMessage,
-    willIncludeCourseSettings
+    willIncludeCourseSettings,
+    willPublishCourses
   }) {
     const params = {
       send_notification: willSendNotification
@@ -98,6 +99,9 @@ const ApiClient = {
     }
     if (willIncludeCustomNotificationMessage && notificationMessage) {
       params.comment = notificationMessage
+    }
+    if (willPublishCourses) {
+      params.publish_after_initial_sync = true
     }
     return axios.post(
       `/api/v1/courses/${masterCourse.id}/blueprint_templates/default/migrations`,

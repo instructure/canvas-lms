@@ -12,12 +12,15 @@ exports[`renders nothing if no opportunities 1`] = `
   }
 >
   <CloseButton
+    as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     margin="0"
     offset="x-small"
     onClick={[Function]}
     placement="end"
     size="small"
+    type="button"
     variant="icon"
   >
     Close Opportunity Center popup
@@ -90,12 +93,15 @@ exports[`renders the base component correctly with one of each kind of opportuni
   }
 >
   <CloseButton
+    as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     margin="0"
     offset="x-small"
     onClick={[Function]}
     placement="end"
     size="small"
+    type="button"
     variant="icon"
   >
     Close Opportunity Center popup
@@ -200,12 +206,15 @@ exports[`renders the right course with the right opportunity 1`] = `
   }
 >
   <CloseButton
+    as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     margin="0"
     offset="x-small"
     onClick={[Function]}
     placement="end"
     size="small"
+    type="button"
     variant="icon"
   >
     Close Opportunity Center popup

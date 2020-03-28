@@ -83,10 +83,6 @@ class Speedgrader
       fxpath('//ul[@role = "menu"]//span[text() = "Keyboard Shortcuts"]')
     end
 
-    def mute_button
-      f('button#mute_link')
-    end
-
     def post_or_hide_grades_button
       fj('button[title="Post or Hide Grades"]:visible')
     end
@@ -97,6 +93,10 @@ class Speedgrader
 
     def post_grades_link
       fj("[role=menuitem]:contains('Post Grades'):visible")
+    end
+
+    def no_grades_to_post_button
+      fj("[role=menuitem]:contains('No Grades to Post'):visible")
     end
 
     def all_grades_posted_link

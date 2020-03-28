@@ -214,11 +214,7 @@ describe 'Grade Detail Tray:' do
 
     context 'when the rightmost column is an assignment column' do
       before(:each) do
-        unless @teacher.preferences.key?(:gradebook_column_order)
-          @teacher.preferences[:gradebook_column_order] = {}
-        end
-
-        @teacher.preferences[:gradebook_column_order][@course.id] = {
+        @teacher.set_preference(:gradebook_column_order, @course.global_id, {
           sortType: 'custom',
           customOrder: [
             "assignment_#{@a1.id}",
@@ -228,8 +224,7 @@ describe 'Grade Detail Tray:' do
             'total_grade',
             "assignment_#{@a4.id}"
           ]
-        }
-        @teacher.save!
+        })
         Gradebook.visit(@course)
       end
 

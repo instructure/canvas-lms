@@ -36,6 +36,14 @@ describe CanvadocSessionsController do
   end
 
   describe '#show' do
+    before(:once) do
+      @assignment = assignment_model(course: @course)
+      @submission = submission_model(assignment: @assignment, user: @student)
+      @attachment = attachment_model(content_type: 'application/pdf', user: @student)
+      @attachment.associate_with(@submission)
+      Canvadoc.create!(attachment: @attachment)
+    end
+    
     before do
       @blob = {
         attachment_id: @attachment1.global_id,
@@ -112,11 +120,102 @@ describe CanvadocSessionsController do
       get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
     end
 
-    it "should send region" do
+    it "should send canvas_base_url when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
-        expect(arg2[:region].class).to eq String
+        expect(arg2[:canvas_base_url]).to eq @course.root_account.domain
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should contain multiple submission_user_ids when group assignment" do
+      group = @course.groups.create(:name => "some group")
+      student2 = User.create
+      group.add_user(@student, 'accepted', true)
+      group.add_user(student2, 'accepted', true)
+      group_assignment = assignment_model(course: @course, assignment_group: @group)
+      group_submission = submission_model(assignment: group_assignment, user: @student)
+      group_attachment = attachment_model(content_type: 'application/pdf', user: @student)
+      group_attachment.associate_with(group_submission)
+      Canvadoc.create!(attachment: group_attachment)
+
+      allow(Attachment).to receive(:find).and_return(group_attachment)
+      expect(group_attachment).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:submission_user_ids].length()).to eq 2
+        expect(arg2[:submission_user_ids]).to match_array [@student.id, student2.id]
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send user_id when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:user_id]).to eq @teacher.id
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send submission_user_ids when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:submission_user_ids]).to match_array [@submission.user_id]
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send course_id when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:course_id]).to eq @assignment.context_id
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send assignment_id when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:assignment_id]).to eq @assignment.id
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send post_manually when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:post_manually]).to eq @assignment.post_manually?
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send posted_at when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:posted_at]).to eq @submission.posted_at
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send assignment_name when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:assignment_name]).to eq @assignment.name
       end
 
       get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}

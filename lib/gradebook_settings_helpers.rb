@@ -21,8 +21,8 @@ module GradebookSettingsHelpers
 
   def gradebook_includes(user:, course:)
     @gradebook_includes ||= begin
-      course_id = course.id
-      gb_settings = user.preferences.fetch(:gradebook_settings, {}).fetch(course_id, {})
+      course_id = course.global_id
+      gb_settings = user.get_preference(:gradebook_settings, course_id) || {}
 
       includes = []
       includes << :inactive if gb_settings.fetch('show_inactive_enrollments', "false") == "true"

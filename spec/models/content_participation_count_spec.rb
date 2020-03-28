@@ -20,8 +20,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentParticipationCount do
   before :once do
+    PostPolicy.enable_feature!
+
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
+
+    @course.default_post_policy.update!(post_manually: false)
 
     @assignment = @course.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
@@ -171,6 +175,7 @@ describe ContentParticipationCount do
     end
 
     it "ignores hidden comments" do
+      @assignment.ensure_post_policy(post_manually: true)
       @submission = @assignment.update_submission(
         @student,
         {

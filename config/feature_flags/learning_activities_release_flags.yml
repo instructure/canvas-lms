@@ -24,7 +24,7 @@ assignments_2_teacher:
       state: disabled
 assignment_attempts:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: Course
   display_name: Assignment Allowed Attempts
   description: Allow a teacher to set the number of allowed attempts on an assignment via the UI
 bookmarking_for_enrollments_index:
@@ -32,14 +32,6 @@ bookmarking_for_enrollments_index:
   applies_to: RootAccount
   display_name: Bookmarking for Enrollments Index API
   description: Use bookmarking for API pagination in Enrollments Index
-discussion_topic_performance_enhancement:
-  state: allowed
-  applies_to: SiteAdmin
-  display_name: Discussion Topic performance improvements for Bibsys
-  description: Discussion Topics will not query permissions for every sub-discussion
-  environments:
-    ci:
-      state: 'on'
 syllabus_course_summary_option:
   state: allowed
   applies_to: SiteAdmin
@@ -53,3 +45,10 @@ la_620_old_rce_init_fix:
     editor instance to its internal list when the RCE requires it.
   applies_to: SiteAdmin
   root_opt_in: true
+uxs_4_omg_a_scary_blueprint_checkbox:
+  state: hidden
+  display_name: Allow Blueprint Publishing After Association
+  description: |-
+    Show a checkbox that optionally lets an account admin publish courses
+    automatically after associating and syncing with a blueprint course
+  applies_to: RootAccount

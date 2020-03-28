@@ -1,2 +1,3 @@
-<%= t "New announcement: %{title}", :title => asset.title %>
+<%= t "New announcement in %{course_name}: %{title}", :title => asset.title, :course_name => asset.context.name %>
 
+<%= t "More info at %{url}", url: polymorphic_url([asset.context, asset]) %>

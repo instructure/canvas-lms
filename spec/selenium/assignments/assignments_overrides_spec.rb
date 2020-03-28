@@ -58,6 +58,7 @@ describe "assignment groups" do
     end
 
     it "should edit a due date", priority: "2", test_id: 216346 do
+      skip('flaky spec, LA-749')
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
 

@@ -41,7 +41,7 @@ const SyncHistoryItem = ({migration, heading, ChangeComponent}) => {
         </Text>
       </header>
       {comment && <Text as="p" color="secondary" size="small">{`"${comment}"`}</Text>}
-      <div role="grid">
+      <div>
         {changes.length ? heading : null}
         {changes.length
           ? changes.map(change => (

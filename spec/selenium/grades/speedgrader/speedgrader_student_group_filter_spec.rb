@@ -28,6 +28,8 @@ describe 'filter speed grader by student group' do
   include GradebookSetup
 
   before :once do
+    PostPolicy.enable_feature!
+
     # course with student groups
     course_with_teacher(
       course_name: "Filter Speedgrader Course",

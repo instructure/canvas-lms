@@ -17,31 +17,47 @@
  */
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
-
 import ClosedCaptionCreatorRow from '../ClosedCaptionCreatorRow'
 
-function makeProps() {
+function makeProps(overrides = {}) {
   return {
-    languages: [{id: 'en', label: 'English'}, {id: 'fr', label: 'French'}],
+    rowId: undefined,
+    languages: [
+      {id: 'en', label: 'English'},
+      {id: 'fr', label: 'French'}
+    ],
     liveRegion: () => document.getElementById('flash_screenreader_holder'),
     uploadMediaTranslations: {
       UploadMediaStrings: {
-        CLOSED_CAPTIONS_LANGUAGE_HEADER: 'Language',
-        CLOSED_CAPTIONS_FILE_NAME_HEADER: 'File Name',
-        CLOSED_CAPTIONS_ACTIONS_HEADER: 'Actions',
-        CLOSED_CAPTIONS_ADD_SUBTITLE: 'Subtitle',
-        CLOSED_CAPTIONS_ADD_SUBTITLE_SCREENREADER: 'Add Subtitle',
-        CLOSED_CAPTIONS_CHOOSE_FILE: 'Choose File',
-        CLOSED_CAPTIONS_SELECT_LANGUAGE: 'Select Language'
+        REMOVE_FILE: 'Remove {lang} closed captions',
+        NO_FILE_CHOSEN: 'no file chosen',
+        SUPPORTED_FILE_TYPES: 'supported file types',
+        CLOSED_CAPTIONS_CHOOSE_FILE: 'choose file',
+        CLOSED_CAPTIONS_SELECT_LANGUAGE: 'select language'
+      },
+      SelectStrings: {
+        USE_ARROWS: 'Use arrows',
+        LIST_COLLAPSED: 'List collapsed.',
+        LIST_EXPANDED: 'List expanded.',
+        OPTION_SELECTED: '{option} selected.'
       }
     },
-    onOptionSelected: () => {},
+    onDeleteRow: () => {},
     onFileSelected: () => {},
-    fileSelected: false,
-    selectedFileName: '',
-    renderTrashButton: false,
-    trashButtonOnClick: () => {}
+    onLanguageSelected: () => {},
+    selectedFile: null,
+    selectedLanguage: null,
+    ...overrides
   }
+}
+
+function makeConfiguredProps(overrides = {}) {
+  return makeProps({
+    selectedLanguage: {id: 'en', label: 'English'},
+    selectedFile: {name: 'thefile.srt'},
+    rowId: 'en',
+    ...overrides
+  })
 }
 
 describe('ClosedCaptionCreatorRow', () => {
@@ -60,42 +76,62 @@ describe('ClosedCaptionCreatorRow', () => {
     document.body.appendChild(node)
   })
 
-  it('renders normally', () => {
-    const {getByText} = render(<ClosedCaptionCreatorRow {...makeProps()} />)
-    expect(getByText('Select Language')).toBeInTheDocument()
-    expect(getByText('Choose File')).toBeInTheDocument()
+  describe('when showing configured caption data', () => {
+    it('renders normally', () => {
+      const {getByText} = render(<ClosedCaptionCreatorRow {...makeConfiguredProps()} />)
+      expect(getByText('English')).toBeInTheDocument()
+      expect(getByText('Remove English closed captions')).toBeInTheDocument()
+    })
+
+    it('calls onDeleteRow when trashcan is clicked', () => {
+      const onDeleteRow = jest.fn()
+      const {getByText} = render(
+        <ClosedCaptionCreatorRow {...makeConfiguredProps({onDeleteRow})} />
+      )
+      const trashcan = getByText('Remove English closed captions').closest('button')
+      fireEvent.click(trashcan)
+      expect(onDeleteRow).toHaveBeenCalled()
+    })
   })
 
-  it('renders trash can when renderTrashButton is present', () => {
-    const callback = jest.fn()
-    const props = makeProps()
-    props.renderTrashButton = true
-    props.trashButtonOnClick = callback
-    const {getByText} = render(<ClosedCaptionCreatorRow {...props} />)
-    const deleteRowButton = getByText('Delete Row').closest('button')
-    fireEvent.click(deleteRowButton)
-    expect(getByText('Delete Row')).toBeInTheDocument()
-    expect(callback).toHaveBeenCalledTimes(1)
-  })
+  describe('when editing caption data', () => {
+    it('renders normally', () => {
+      const {getByText} = render(<ClosedCaptionCreatorRow {...makeProps()} />)
+      expect(getByText('select language')).toBeInTheDocument()
+      expect(getByText('choose file')).toBeInTheDocument()
+      expect(getByText('no file chosen')).toBeInTheDocument()
+      expect(getByText('supported file types')).toBeInTheDocument()
+    })
 
-  it('renders selectedFileName if fileSelected', () => {
-    const props = makeProps()
-    props.selectedFileName = 'thebestfilename.webvtt'
-    props.fileSelected = true
-    const {getByText} = render(<ClosedCaptionCreatorRow {...props} />)
-    expect(getByText(props.selectedFileName)).toBeInTheDocument()
-  })
+    it('renders selected file name if a file is selected', () => {
+      const {getByText} = render(
+        <ClosedCaptionCreatorRow {...makeProps({selectedFile: {name: 'caps.srt'}})} />
+      )
+      expect(getByText('caps.srt')).toBeInTheDocument()
+    })
 
-  it('calls onFileSelected when file is selected', () => {
-    const props = makeProps()
-    const callback = jest.fn()
-    props.onFileSelected = callback
-    const {container} = render(<ClosedCaptionCreatorRow {...props} />)
-    const fileInput = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
-    selectFile(fileInput, [file])
-    // We can validate the event object here but the parent is the one grabbing the file
-    // from the input
-    expect(callback).toHaveBeenCalledTimes(1)
+    it('renders selected language when a language is selected', () => {
+      const {getByDisplayValue} = render(
+        <ClosedCaptionCreatorRow {...makeProps({selectedLanguage: {id: 'fr', name: 'French'}})} />
+      )
+      expect(getByDisplayValue('French')).toBeInTheDocument()
+    })
+
+    it('calls onFileSelected when file is selected', () => {
+      const onFileSelected = jest.fn()
+      const {container} = render(
+        <ClosedCaptionCreatorRow
+          {...makeProps({
+            onFileSelected
+          })}
+        />
+      )
+      const fileInput = container.querySelector('input[type="file"]')
+      const file = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
+      selectFile(fileInput, [file])
+      // We can validate the event object here but the parent is the one grabbing the file
+      // from the input
+      expect(onFileSelected).toHaveBeenCalledTimes(1)
+    })
   })
 })

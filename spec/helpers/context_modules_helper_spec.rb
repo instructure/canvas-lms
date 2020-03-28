@@ -59,7 +59,7 @@ describe ContextModulesHelper do
       expect(module_item_translated_content_type(nil)).to eq ''
     end
 
-    it 'returns Quiz for lti-quiz type' do
+    it 'returns New Quiz for lti-quiz type' do
       tool = t_course.context_external_tools.create!(
           :name => 'Quizzes.Next',
           :consumer_key => 'test_key',
@@ -74,7 +74,25 @@ describe ContextModulesHelper do
         }
       )
       item = t_module.add_item(type: 'assignment', id: assignment.id)
-      expect(module_item_translated_content_type(item)).to eq 'Quiz'
+      expect(module_item_translated_content_type(item)).to eq 'New Quiz'
+    end
+
+    it 'returns Quiz for lti-quiz type if is_student' do
+      tool = t_course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+    assignment = t_course.assignments.create(
+      submission_types: 'external_tool',
+      external_tool_tag_attributes: {
+        content: tool
+      }
+    )
+    item = t_module.add_item(type: 'assignment', id: assignment.id)
+    expect(module_item_translated_content_type(item, true)).to eq 'Quiz'
     end
 
     it 'returns a string for a recognized content type' do

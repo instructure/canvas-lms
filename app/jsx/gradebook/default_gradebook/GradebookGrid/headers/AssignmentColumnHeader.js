@@ -108,6 +108,12 @@ function labelForHideGradesAction(hideGradesAction) {
   return I18n.t('No grades to hide')
 }
 
+function speedGraderUrl(assignment) {
+  return encodeURI(
+    `/courses/${assignment.courseId}/gradebook/speed_grader?assignment_id=${assignment.id}`
+  )
+}
+
 export default class AssignmentColumnHeader extends ColumnHeader {
   static propTypes = {
     ...ColumnHeader.propTypes,
@@ -134,6 +140,8 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       hasGradesOrCommentsToHide: bool.isRequired,
       onSelect: func.isRequired
     }).isRequired,
+
+    includeSpeedGraderMenuItem: bool.isRequired,
 
     postGradesAction: shape({
       featureEnabled: bool.isRequired,
@@ -403,6 +411,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
             )}
           </Menu.Group>
         </Menu>
+
+        {this.props.includeSpeedGraderMenuItem && (
+          <Menu.Item href={speedGraderUrl(this.props.assignment)}>
+            {I18n.t('SpeedGrader')}
+          </Menu.Item>
+        )}
 
         <Menu.Item
           disabled={!this.props.submissionsLoaded || this.props.assignment.anonymizeStudents}

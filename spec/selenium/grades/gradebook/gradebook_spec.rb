@@ -26,7 +26,11 @@ describe "Gradebook" do
   include GradebookCommon
   include GroupsCommon
 
-  before(:once) { gradebook_data_setup }
+  before(:once) do
+    PostPolicy.enable_feature!
+    gradebook_data_setup
+  end
+
   before(:each) do
     user_session(@teacher)
   end
@@ -61,32 +65,6 @@ describe "Gradebook" do
   it "shows students sorted by their sortable_name", priority: "1", test_id: 210022 do
     Gradebook.visit(@course)
     expect(Gradebook.fetch_student_names).to eq @all_students.map(&:name)
-  end
-
-  context "muting/un-muting assignment" do
-    before(:each) do
-      Gradebook.visit(@course)
-      Gradebook.toggle_assignment_muting(@second_assignment.id)
-    end
-
-    it "handles muting correctly", priority: "1", test_id: 164227 do
-      # TODO "change test ids when Gradebook test cases are created"
-      expect(Gradebook.total_cell_mute_icon_select).to be_displayed
-      expect(@second_assignment.reload).to be_muted
-
-      # reload the page and make sure it remembered the setting
-      Gradebook.visit(@course)
-      expect(Gradebook.total_cell_mute_icon_select).to be_displayed
-    end
-
-    it "handles un-muting correctly", priority: "1", test_id: 164227 do
-      # TODO "change test ids when Gradebook test cases are created"
-      # make sure you can un-mute
-      Gradebook.toggle_assignment_muting(@second_assignment.id)
-
-      expect(Gradebook.content_selector).not_to contain_css(".total-cell .icon-off")
-      expect(@second_assignment.reload).not_to be_muted
-    end
   end
 
   context "unpublished course" do

@@ -85,6 +85,14 @@ describe ContextController do
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [@student.id, active_student.id, inactive_student.id]
     end
 
+    it "should redirect 'disabled', if disabled by the teacher" do
+      user_session(@student)
+      @course.update_attribute(:tab_configuration, [{'id'=>Course::TAB_PEOPLE,'hidden'=>true}])
+      get 'roster', params: {:course_id => @course.id}
+      expect(response).to be_redirect
+      expect(flash[:notice]).to match(/That page has been disabled/)
+    end
+
     context "student context cards" do
       before(:once) do
         @course.root_account.enable_feature! :student_context_cards

@@ -164,8 +164,11 @@ class CommunicationChannelsController < ApplicationController
         return render :json => { errors: { type: 'SNS is not configured for this developer key'}}, status: :bad_request
       end
 
-      endpoint = @current_user.notification_endpoints.where("lower(token) = ?", params[:communication_channel][:token].downcase).first
-      endpoint ||= @access_token.notification_endpoints.create!(token: params[:communication_channel][:token])
+      NotificationEndpoint.unique_constraint_retry do
+        unless @current_user.notification_endpoints.where("lower(token) = lower(?)", params[:communication_channel][:token]).exists?
+          @access_token.notification_endpoints.create!(token: params[:communication_channel][:token])
+        end
+      end
 
       skip_confirmation = true
       params[:build_pseudonym] = nil

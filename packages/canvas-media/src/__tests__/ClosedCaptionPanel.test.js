@@ -15,27 +15,38 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 
 import ClosedCaptionCreator from '../ClosedCaptionCreator'
 
-function makeProps() {
+function makeProps(options = {}) {
   return {
-    languages: [{id: 'en', label: 'English'}, {id: 'fr', label: 'French'}],
+    languages: [
+      {id: 'en', label: 'English'},
+      {id: 'fr', label: 'French'}
+    ],
     liveRegion: () => document.getElementById('flash_screenreader_holder'),
     uploadMediaTranslations: {
       UploadMediaStrings: {
-        CLOSED_CAPTIONS_LANGUAGE_HEADER: 'Language',
-        CLOSED_CAPTIONS_FILE_NAME_HEADER: 'File Name',
-        CLOSED_CAPTIONS_ACTIONS_HEADER: 'Actions',
-        CLOSED_CAPTIONS_ADD_SUBTITLE: 'Subtitle',
-        CLOSED_CAPTIONS_ADD_SUBTITLE_SCREENREADER: 'Add Subtitle',
+        ADDED_CAPTION: 'added caption',
+        ADD_NEW_CAPTION_OR_SUBTITLE: 'add new caption',
+        REMOVE_FILE: 'Remove {lang} closed captions',
+        NO_FILE_CHOSEN: 'no file chosen',
+        SUPPORTED_FILE_TYPES: 'supported file types',
         CLOSED_CAPTIONS_CHOOSE_FILE: 'Choose File',
-        CLOSED_CAPTIONS_SELECT_LANGUAGE: 'Select Language'
+        CLOSED_CAPTIONS_SELECT_LANGUAGE: 'select language',
+        DELETED_CAPTION: 'deleted caption'
+      },
+      SelectStrings: {
+        USE_ARROWS: 'Use arrows',
+        LIST_COLLAPSED: 'List collapsed.',
+        LIST_EXPANDED: 'List expanded.',
+        OPTION_SELECTED: '{option} selected.'
       }
     },
-    updateSubtitles: () => {}
+    updateSubtitles: () => {},
+    ...options
   }
 }
 
@@ -56,169 +67,99 @@ describe('ClosedCaptionPanel', () => {
   })
 
   it('renders normally', () => {
-    const {getByText} = render(<ClosedCaptionCreator {...makeProps()} />)
-    expect(getByText('Add Subtitle')).toBeInTheDocument()
+    const {getByTestId} = render(<ClosedCaptionCreator {...makeProps()} />)
+    expect(getByTestId('CC-CreatorRow-choosing')).toBeInTheDocument()
   })
 
-  describe('add subtitle button', () => {
-    it('starts with a new row', () => {
-      const {getByText} = render(<ClosedCaptionCreator {...makeProps()} />)
-      expect(getByText('Choose File')).toBeInTheDocument()
-      expect(getByText('Add Subtitle').closest('button')).toHaveAttribute('disabled')
-    })
+  it('selects a file', () => {
+    const updateSubtitles = jest.fn()
+    const {container, getByText, getByPlaceholderText, getByTestId} = render(
+      <ClosedCaptionCreator {...makeProps({updateSubtitles})} />
+    )
+    const selectLang = getByPlaceholderText('select language')
+    fireEvent.click(selectLang)
+    const frOpt = getByText('French')
+    fireEvent.click(frOpt)
 
-    it('disables trashcan on first addition', () => {
-      const {getByText, queryByText} = render(<ClosedCaptionCreator {...makeProps()} />)
-      expect(getByText('Choose File')).toBeInTheDocument()
-      expect(getByText('Add Subtitle').closest('button')).toHaveAttribute('disabled')
-      expect(queryByText('Delete Row')).not.toBeInTheDocument()
-    })
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.srt', {type: 'application/srt'})
+    selectFile(fileInput, [file])
 
-    it('renders file name when one is selected', async () => {
-      const {getByText, container} = render(<ClosedCaptionCreator {...makeProps()} />)
-      expect(getByText('Choose File')).toBeInTheDocument()
-      const file = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
-      const fileInput = container.querySelector('input[type="file"]')
-      selectFile(fileInput, [file])
-
-      expect(await waitForElement(() => getByText('file1.vtt'))).toBeInTheDocument()
-    })
-
-    it('creates a new row', async () => {
-      const {getByText, getByDisplayValue, queryByText, container} = render(
-        <ClosedCaptionCreator {...makeProps()} />
-      )
-      expect(getByText('Choose File')).toBeInTheDocument()
-      const file = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
-      const fileInput = container.querySelector('input[type="file"]')
-      selectFile(fileInput, [file])
-      fireEvent.click(getByDisplayValue('Select Language'))
-      fireEvent.click(getByText('French'))
-      expect(await waitForElement(() => getByText('file1.vtt'))).toBeInTheDocument()
-      expect(queryByText('Choose File')).not.toBeInTheDocument()
-      const addButton = getByText('Add Subtitle').closest('button')
-      fireEvent.click(addButton)
-      expect(getByText('Choose File')).toBeInTheDocument()
-    })
-
-    it('deletes new row when trash is clicked', async () => {
-      const {getByText, getByDisplayValue, queryByText, container} = render(
-        <ClosedCaptionCreator {...makeProps()} />
-      )
-      expect(getByText('Choose File')).toBeInTheDocument()
-      const file = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
-      const fileInput = container.querySelector('input[type="file"]')
-      selectFile(fileInput, [file])
-      fireEvent.click(getByDisplayValue('Select Language'))
-      fireEvent.click(getByText('French'))
-      expect(await waitForElement(() => getByText('file1.vtt'))).toBeInTheDocument()
-      expect(queryByText('Choose File')).not.toBeInTheDocument()
-      const addButton = getByText('Add Subtitle').closest('button')
-      fireEvent.click(addButton)
-      expect(getByText('Choose File')).toBeInTheDocument()
-      const deleteRowButton = getByText('Delete Row').closest('button')
-      fireEvent.click(deleteRowButton)
-      expect(queryByText('Choose File')).not.toBeInTheDocument()
-    })
-
-    it('deletes subtitle row when trash is clicked', async () => {
-      const {getByText, getByDisplayValue, queryByText, container} = render(
-        <ClosedCaptionCreator {...makeProps()} />
-      )
-      expect(getByText('Choose File')).toBeInTheDocument()
-      const file1 = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
-      const file2 = new File(['foo'], 'file2.vtt', {type: 'application/vtt'})
-      const fileInput1 = container.querySelector('input[type="file"]')
-
-      // Add first subtitle
-      selectFile(fileInput1, [file1])
-      fireEvent.click(getByDisplayValue('Select Language'))
-      fireEvent.click(getByText('French'))
-      expect(await waitForElement(() => getByText('file1.vtt'))).toBeInTheDocument()
-
-      const addButton = getByText('Add Subtitle').closest('button')
-      fireEvent.click(addButton)
-
-      // Add second subtitle
-      const fileInput2 = container.querySelector('input[type="file"]')
-      selectFile(fileInput2, [file2])
-      fireEvent.click(getByDisplayValue('Select Language'))
-      fireEvent.click(getByText('English'))
-      expect(await waitForElement(() => getByText('file2.vtt'))).toBeInTheDocument()
-
-      // Delete first subtitle
-      const deleteRowButton = getByText('Delete file1.vtt').closest('button')
-      fireEvent.click(deleteRowButton)
-
-      expect(queryByText('file1.vtt')).not.toBeInTheDocument()
-    })
+    expect(getByTestId('CC-CreatorRow-chosen')).toBeInTheDocument()
+    expect(getByText('add new caption')).toBeInTheDocument()
+    expect(updateSubtitles).toHaveBeenCalledWith(
+      expect.arrayContaining([expect.objectContaining({language: 'fr'})])
+    )
   })
 
-  /*
-  describe('adding a new closed caption', () => {
-    it('has the language set to "Select Language" by default', () => {
-      expect(true).toEqual(false)
-    })
+  it('adds a new row when + is clicked', () => {
+    const {container, getByText, getByPlaceholderText, getAllByTestId} = render(
+      <ClosedCaptionCreator {...makeProps()} />
+    )
+    expect(getAllByTestId('CC-CreatorRow-choosing').length).toBe(1)
 
-    it('lets you select another language', () => {
-      expect(true).toEqual(false)
-    })
+    // create the first row
+    const selectLang = getByPlaceholderText('select language')
+    fireEvent.click(selectLang)
+    const frOpt = getByText('French')
+    fireEvent.click(frOpt)
 
-    it('has the "Submit" button disabled if a file is uploaded with no language selected', () => {
-      expect(true).toEqual(false)
-    })
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.srt', {type: 'application/srt'})
+    selectFile(fileInput, [file])
 
-    it('has the "Submit" button disabled if no file is uploaded with a language selected', () => {
-      expect(true).toEqual(false)
-    })
+    expect(getAllByTestId('CC-CreatorRow-chosen').length).toBe(1)
 
-    it('has the "Submit" button enabled if no file is uploaded nor a languaged selected ', () => {
-      expect(true).toEqual(false)
-    })
+    // click the + button to add a new row
+    const plusBtn = getByText('add new caption')
+    fireEvent.click(plusBtn)
 
-    it('has the "Submit" button enabled if a file is uploaded and a languaged is selected ', () => {
-      expect(true).toEqual(false)
-    })
-
-    it('makes an API call when the submit button is clicked', () => {
-      expect(true).toEqual(false)
-    })
+    expect(getAllByTestId('CC-CreatorRow-chosen').length).toBe(1)
+    expect(getAllByTestId('CC-CreatorRow-choosing').length).toBe(1)
   })
 
-  describe('removing a closed caption', () => {
-    describe('for a not saved row', () => {
-      it('can be removed', () => {
-        expect(true).toEqual(false)
-      })
+  it('deletes a row when trashcan is clicked', () => {
+    const {container, getByText, getByPlaceholderText, getAllByTestId} = render(
+      <ClosedCaptionCreator {...makeProps()} />
+    )
+    expect(getAllByTestId('CC-CreatorRow-choosing').length).toBe(1)
 
-      it('does not make an API call upon removal', () => {
-        expect(true).toEqual(false)
-      })
-    })
+    // create the first row
+    let selectLang = getByPlaceholderText('select language')
+    fireEvent.click(selectLang)
+    let opt = getByText('French')
+    fireEvent.click(opt)
 
-    describe('for a saved row', () => {
-      it('can be removed', () => {
-        expect(true).toEqual(false)
-      })
+    let fileInput = container.querySelector('input[type="file"]')
+    let file = new File(['foo'], 'file1.srt', {type: 'application/srt'})
+    selectFile(fileInput, [file])
 
-      it('does make an API call upon removal', () => {
-        expect(true).toEqual(false)
-      })
-    })
+    expect(getAllByTestId('CC-CreatorRow-chosen').length).toBe(1)
+
+    // click the + button to add a new row
+    const plusBtn = getByText('add new caption')
+    fireEvent.click(plusBtn)
+
+    expect(getAllByTestId('CC-CreatorRow-chosen').length).toBe(1)
+    expect(getAllByTestId('CC-CreatorRow-choosing').length).toBe(1)
+
+    // create the 2nd row
+    selectLang = getByPlaceholderText('select language')
+    fireEvent.click(selectLang)
+    opt = getByText('English')
+    fireEvent.click(opt)
+
+    fileInput = container.querySelector('input[type="file"]')
+    file = new File(['bar'], 'file2.srt', {type: 'application/srt'})
+    selectFile(fileInput, [file])
+
+    expect(getAllByTestId('CC-CreatorRow-chosen').length).toBe(2)
+
+    // delete the first row
+    const trashcan = getByText('Remove French closed captions').closest('button')
+    fireEvent.click(trashcan)
+
+    expect(getAllByTestId('CC-CreatorRow-chosen').length).toBe(1)
+    expect(getByText('English')).toBeInTheDocument()
   })
-
-  describe('download button', () => {
-    it('does not show up for a closed caption that has not been saved', () => {
-      expect(true).toEqual(false)
-    })
-
-    it('shows up for a saved closed caption', () => {
-      expect(true).toEqual(false)
-    })
-
-    it('makes an API call when clicked', () => {
-      expect(true).toEqual(false)
-    })
-  })
-  */
 })

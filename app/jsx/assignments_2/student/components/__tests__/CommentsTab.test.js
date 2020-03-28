@@ -24,7 +24,14 @@ import CommentsTab from '../CommentsTab'
 import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
 import {mockAssignmentAndSubmission, mockQuery, mockSubmission} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
-import {render, waitForElement, fireEvent, wait, act} from '@testing-library/react'
+import {
+  act,
+  fireEvent,
+  render,
+  wait,
+  waitForDomChange,
+  waitForElement
+} from '@testing-library/react'
 import React from 'react'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 
@@ -100,7 +107,9 @@ describe('CommentsTab', () => {
     mockedSetOnSuccess = jest.fn().mockResolvedValue({})
   })
 
-  it('renders error alert when data returned from mutation fails', async () => {
+  // https://instructure.atlassian.net/browse/USERS-379
+  // eslint-disable-next-line jest/no-disabled-tests
+  it.skip('renders error alert when data returned from mutation fails', async () => {
     const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
     mocks[1].error = new Error('aw shucks')
     const props = await mockAssignmentAndSubmission()
@@ -114,6 +123,7 @@ describe('CommentsTab', () => {
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
+    await waitForDomChange({textArea})
     fireEvent.click(getByText('Send Comment'))
 
     await wait(() =>
@@ -129,7 +139,7 @@ describe('CommentsTab', () => {
         <CommentsTab {...props} />
       </MockedProvider>
     )
-    expect(await waitForElement(() => getByTestId('comments-container'))).toBeInTheDocument()
+    await wait(() => expect(getByTestId('comments-container')).toBeInTheDocument())
   })
 
   it('renders Load More Comments button when pages remain', async () => {

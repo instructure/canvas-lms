@@ -5,6 +5,9 @@
   "add_8523c19b": {
     "message": "Add"
   },
+  "add_another_f4e50d57": {
+    "message": "Add another"
+  },
   "add_cc_subtitles_55f0394e": {
     "message": "Add CC/Subtitles"
   },
@@ -384,6 +387,9 @@
   "embed_video_code_703e10f2": {
     "message": "Embed Video Code"
   },
+  "embedded_content_aaeb4d3d": {
+    "message": "embedded content"
+  },
   "equation_1c5ac93c": {
     "message": "Equation"
   },
@@ -685,6 +691,9 @@
   "no_e16d9132": {
     "message": "No"
   },
+  "no_file_chosen_9a880793": {
+    "message": "No file chosen"
+  },
   "no_grade_3b4d7f3e": {
     "message": "No Grade"
   },
@@ -947,6 +956,9 @@
   },
   "superscript_8cb349a2": {
     "message": "Superscript"
+  },
+  "supported_file_types_srt_or_webvtt_7d827ed": {
+    "message": "Supported file types: SRT or WebVTT"
   },
   "switch_to_raw_html_editor_4c9ac7de": {
     "message": "Switch to raw html editor"

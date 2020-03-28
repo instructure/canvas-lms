@@ -24,6 +24,8 @@ describe "speed grader" do
   include AssignmentsCommon
 
   before(:once) do
+    PostPolicy.enable_feature!
+
     @teacher1 = course_with_teacher(name: 'Teacher Boss1', active_user: true, active_enrollment: true, active_course: true).user
     @teacher2 = course_with_teacher(course: @course, name: 'Teacher Boss2', active_user: true, active_enrollment: true, active_course: true).user
 
@@ -474,4 +476,3 @@ describe "speed grader" do
     end
   end
 end
-

@@ -142,7 +142,7 @@ describe 'Moderated Marking' do
       # wait for element to exist, means page has loaded
       ModeratePage.grades_released_button
 
-      # unmute using Post to Students button
+      # Post grades to students
       ModeratePage.click_post_to_students_button
       driver.switch_to.alert.accept
       wait_for_ajaximations
@@ -178,7 +178,7 @@ describe 'Moderated Marking' do
       # wait for element to exist, means page has loaded
       ModeratePage.grades_released_button
 
-      # unmute using Post to Students button
+      # Post grades to students
       ModeratePage.click_post_to_students_button
       driver.switch_to.alert.accept
       wait_for_ajaximations

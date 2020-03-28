@@ -170,6 +170,10 @@ class AssignmentGroup < ActiveRecord::Base
     Rails.cache.delete(['has_assignment_group', global_context_id].cache_key) if context_id
   end
 
+  def course_broadcast_data
+    context&.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { context.participating_students_by_date }
@@ -177,6 +181,7 @@ class AssignmentGroup < ActiveRecord::Base
       false &&
       record.changed_in_state(:available, :fields => :group_weight)
     }
+    p.data { course_broadcast_data }
   end
 
   def students

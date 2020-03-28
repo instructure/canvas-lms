@@ -68,7 +68,7 @@ function ungradedOverrides() {
 async function makeProps(opts = {}) {
   const variables = {
     courseID: '1',
-    rubricID: '1',
+    assignmentLid: '1',
     submissionID: '1',
     submissionAttempt: 0
   }
@@ -76,7 +76,8 @@ async function makeProps(opts = {}) {
   const overrides = opts.graded ? gradedOverrides() : ungradedOverrides()
   const allOverrides = [
     {
-      Node: {__typename: 'Rubric'},
+      Node: {__typename: 'Assignment'},
+      Assignment: {rubric: {}},
       Rubric: {
         criteria: [{}]
       },
@@ -88,7 +89,7 @@ async function makeProps(opts = {}) {
   return {
     assessments: result.data.submission.rubricAssessmentsConnection?.nodes,
     proficiencyRatings: result.data.course.account.proficiencyRatingsConnection?.nodes,
-    rubric: result.data.rubric
+    rubric: result.data.assignment.rubric
   }
 }
 

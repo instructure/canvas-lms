@@ -6,3 +6,8 @@ rce_auto_save:
     the RCE will auto-save your work as you go
   applies_to: Course
   root_opt_in: true
+cc_in_rce_video_tray:
+  state: hidden
+  display_name: Edit Closed Captions
+  description: Edit closed captions/subtitles to videos from the video options tray in the RCE
+  applies_to: SiteAdmin

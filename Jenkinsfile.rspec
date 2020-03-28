@@ -28,17 +28,12 @@ def getImageTagVersion() {
   return env.RUN_COVERAGE == '1' ? 'master' : flags.getImageTagVersion()
 }
 
-def ci_node_total = 15; // how many nodes to run on
 pipeline {
   agent { label 'canvas-docker' }
-  options {
-    ansiColor('xterm')
-  }
+  options { ansiColor('xterm') }
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
-    NAME = getImageTagVersion()
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     KNAPSACK_ENABLED = 1
     KNAPSACK_GENERATE_REPORT = 'false'
     KNAPSACK_TEST_FILE_PATTERN = '{spec,gems/plugins/*/spec_canvas}/**/*_spec.rb'
@@ -48,20 +43,30 @@ pipeline {
     MAX_FAIL = 50
     COVERAGE = runCoverage()
   }
+
   stages {
-    stage ('Distribute Rspec Tests') {
+    stage ('Distribute RSpec Tests') {
       steps {
         script {
+          stash name: "build-scripts", includes: 'build/**/*'
+          stash name: "build-yml", includes: 'docker-compose.*.yml'
           def nodes = [:];
+          def ci_node_total = env.CI_NODE_TOTAL as Integer
           for(int i = 0; i < ci_node_total; i++) {
             def index = i;
             nodes["rspec set ${(i).toString().padLeft(2, '0')}"] = {
-              withEnv(["TEST_ENV_NUMBER=$index", "CI_NODE_INDEX=$index", "CI_NODE_TOTAL=$ci_node_total"]) {
+              withEnv([
+                "CI_NODE_INDEX=$index",
+                "POSTGRES=$POSTGRES",
+                "RUBY_PASSENGER=$RUBY_PASSENGER",
+                "TEST_ENV_NUMBER=$index"
+              ]) {
                 node('canvas-docker') {
                   stage("Running RSpec Set ${index}") {
                     try {
                       sh 'rm -rf ./tmp'
-                      checkout scm
+                      unstash name: "build-scripts"
+                      unstash name: "build-yml"
                       sh 'build/new-jenkins/docker-cleanup.sh'
                       sh 'mkdir -p tmp'
                       timeout(time: 60) {
@@ -92,7 +97,7 @@ pipeline {
               }
             }
           }
-          parallel(nodes);
+          parallel(nodes)
         }
       }
     }
@@ -102,16 +107,17 @@ pipeline {
       steps {
         script {
           def reports = load 'build/new-jenkins/groovy/reports.groovy'
-          reports.publishSpecCoverageToS3(ci_node_total, "canvas-lms-rspec")
+          reports.publishSpecCoverageToS3(env.CI_NODE_TOTAL, "canvas-lms-rspec")
         }
       }
     }
   }
+
   post {
     failure {
       script {
         def reports = load 'build/new-jenkins/groovy/reports.groovy'
-        reports.publishSpecFailuresAsHTML(ci_node_total)
+        reports.publishSpecFailuresAsHTML(env.CI_NODE_TOTAL as Integer)
       }
     }
   }

@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def build_parameters = [
+def buildParameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
   string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
   string(name: 'GERRIT_PROJECT', value: "${env.GERRIT_PROJECT}"),
@@ -34,102 +34,136 @@ def build_parameters = [
 ]
 
 def getImageTagVersion() {
-  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
-  return flags.getImageTagVersion()
+  def flags = load('build/new-jenkins/groovy/commit-flags.groovy')
+  flags.getImageTagVersion()
 }
 
-def runBuildImageMaybe(saveSuccess, block) {
-  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+def runBuildImageMaybe(block) {
+  def flags = load('build/new-jenkins/groovy/commit-flags.groovy')
   if (flags.hasFlag('skip-docker-build')) {
     echo "Skip building image requested"
   } else {
-    def skips = load 'build/new-jenkins/groovy/successes.groovy'
-    skips.skipIfPreviouslySuccessful("build-and-push-image", saveSuccess, block)
+    def successes = load('build/new-jenkins/groovy/successes.groovy')
+    successes.skipIfPreviouslySuccessful("build-and-push-image", true, block)
   }
 }
 
 def skipIfPreviouslySuccessful(name, block) {
-  def skips = load 'build/new-jenkins/groovy/successes.groovy'
-  skips.skipIfPreviouslySuccessful(name, true, block)
+  def successes = load('build/new-jenkins/groovy/successes.groovy')
+  successes.skipIfPreviouslySuccessful(name, true, block)
 }
+
+// ignore builds where the current patchset tag doesn't match the
+// mainline publishable tag. i.e. ignore ruby-passenger-2.6/pg-12
+// upgrade builds
+def isPatchsetPublishable() {
+  env.PATCHSET_TAG == env.PUBLISHABLE_TAG
+}
+
+// WARNING! total hack, being removed after covid...
+def isCovid() {
+  env.GERRIT_BRANCH == 'covid'
+}
+// end of hack (covid)
 
 pipeline {
   agent { label 'canvas-docker' }
-
-  options {
-    ansiColor('xterm')
-  }
+  options { ansiColor('xterm') }
 
   environment {
-    // include selenium while smoke is running locally
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
-
     NAME = getImageTagVersion()
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
-    MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
-    CACHE_TAG = "canvas-lms:previous-image"
-    POSTGRES_CACHE_TAG = "canvas-lms:previous-postgres-image"
-    CASSANDRA_CACHE_TAG = "canvas-lms:previous-cassandra-image"
-    DYNAMODB_CACHE_TAG = "canvas-lms:previous-dynamodb-image"
+    CANVAS_LMS_IMAGE = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms"
+
+    // e.g. postgres-9.5-ruby-passenger-2.4-xenial
+    TAG_SUFFIX = "postgres-$POSTGRES-ruby-passenger-$RUBY_PASSENGER"
+
+    // e.g. canvas-lms:01.123456.78-postgres-12-ruby-passenger-2.6
+    PATCHSET_TAG = "$CANVAS_LMS_IMAGE:$NAME-$TAG_SUFFIX"
+
+    // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-passenger-2.4
+    PUBLISHABLE_TAG = "$CANVAS_LMS_IMAGE:$NAME-postgres-9.5-ruby-passenger-2.4"
+
+    // e.g. canvas-lms:master when not on another branch
+    MERGE_TAG = "$CANVAS_LMS_IMAGE:$GERRIT_BRANCH"
+
+    // e.g. canvas-lms:previous-image
+    CACHE_TAG = "$CANVAS_LMS_IMAGE:previous-image"
   }
 
   stages {
-    stage('Print Env Variables') {
+    stage('Setup') {
       steps {
-        timeout(time: 20, unit: 'SECONDS') {
-          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
-        }
-      }
-    }
-
-    stage ('Pre-Cleanup') {
-      steps {
-        timeout(time: 2) {
-          sh 'build/new-jenkins/docker-cleanup.sh'
-        }
-      }
-    }
-
-    stage('Plugins and Config Files') {
-      steps {
-        timeout(time: 3) {
+        timeout(time: 5) {
           script {
+            sh 'build/new-jenkins/print-env-excluding-secrets.sh'
+            sh 'build/new-jenkins/docker-cleanup.sh'
+
+            buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
+            buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
+            buildParameters += string(name: 'RUBY_PASSENGER', value: "${env.RUBY_PASSENGER}")
             if (env.CANVAS_LMS_REFSPEC) {
               // the plugin builds require the canvas lms refspec to be different. so only
               // set this refspec if the main build is requesting it to be set.
               // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
-              build_parameters += string(name: 'CANVAS_LMS_REFSPEC', value: "${env.CANVAS_LMS_REFSPEC}")
+              buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
             }
-            def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+
+            def credentials = load ('build/new-jenkins/groovy/credentials.groovy')
+
+            // WARNING! total hack, being removed after covid...
+            // if this build is triggered from a plugin that is from the
+            // covid branch, we need to checkout the covid branch for canvas-lms
+            if (isCovid() && env.GERRIT_PROJECT != 'canvas-lms') {
+              echo 'checking out canvas-lms covid branch'
+              credentials.withGerritCredentials {
+                sh '''
+                  set -ex
+                  git branch -D covid || true
+                  GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                    git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
+                  git checkout -b covid origin/covid
+                '''
+              }
+            }
+            // end of hack (covid)
+
             credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
             gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
-            println "Plugin list: ${gems}"
+            echo "Plugin list: ${gems}"
             /* fetch plugins */
             gems.each { gem ->
               if (env.GERRIT_PROJECT == gem) {
                 /* this is the commit we're testing */
                 credentials.fetchFromGerrit(gem, 'gems/plugins', null, null, env.GERRIT_REFSPEC)
               } else {
-                credentials.fetchFromGerrit(gem, 'gems/plugins')
+                // WARNING! total hack, being removed after covid...
+                // remove if statement when covid is done. only thing in else is needed.
+                if (isCovid()) {
+                  echo "checkin out ${gem} covid branch"
+                  credentials.fetchFromGerrit(gem, 'gems/plugins', null, null, 'covid')
+                }
+                else {
+                  credentials.fetchFromGerrit(gem, 'gems/plugins')
+                }
+                // end of hack (covid)
               }
             }
             credentials.fetchFromGerrit('gergich_user_config', '.')
             credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
-            sh '''
-              mv -v gerrit_builder/canvas-lms/config/* config/
-              mv -v config/knapsack_rspec_report.json ./
-              rm -v config/cache_store.yml
-              rmdir -p gerrit_builder/canvas-lms/config
-              cp -v docker-compose/config/selenium.yml config/
-              cp -vR docker-compose/config/new-jenkins config/new-jenkins
-              cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml
-              cp -v config/domain.yml.example config/domain.yml
-              cp -v config/external_migration.yml.example config/external_migration.yml
-              cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml
-              cp -v ./gergich_user_config/gergich_user_config.yml ./gems/dr_diff/config/gergich_user_config.yml
-            '''
+
+            sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
+            sh 'mv -v config/knapsack_rspec_report.json ./'
+            sh 'rm -v config/cache_store.yml'
+            sh 'rmdir -p gerrit_builder/canvas-lms/config'
+            sh 'cp -v docker-compose/config/selenium.yml config/'
+            sh 'cp -vR docker-compose/config/new-jenkins config/new-jenkins'
+            sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
+            sh 'cp -v config/domain.yml.example config/domain.yml'
+            sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
+            sh 'cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml'
+            sh 'cp -v ./gergich_user_config/gergich_user_config.yml ./gems/dr_diff/config/gergich_user_config.yml'
           }
         }
       }
@@ -140,11 +174,11 @@ pipeline {
       steps {
         timeout(time: 2) {
           script {
-            def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+            def credentials = load('build/new-jenkins/groovy/credentials.groovy')
             credentials.withGerritCredentials({ ->
               sh '''
                 GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                  git fetch origin $GERRIT_BRANCH
+                  git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
 
                 git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
                 git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
@@ -172,30 +206,26 @@ pipeline {
       }
     }
 
-    stage('Build Image') {
+    stage ('Build Docker Image') {
       steps {
-        runBuildImageMaybe(false) {
-          timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
+        timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
+          runBuildImageMaybe() {
             script {
-              def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+              def flags = load('build/new-jenkins/groovy/commit-flags.groovy')
               if (!flags.hasFlag('skip-cache')) {
-                dockerCacheLoad(image: "$CACHE_TAG")
+                sh 'docker pull $CACHE_TAG || true'
               }
-              sh 'docker build -t $PATCHSET_TAG .'
-              sh 'docker tag $PATCHSET_TAG $CACHE_TAG'
             }
-          }
-        }
-      }
-    }
+            sh """
+              docker build \
+                --tag $PATCHSET_TAG \
+                --build-arg RUBY_PASSENGER=$RUBY_PASSENGER \
+                --build-arg POSTGRES_VERSION=$POSTGRES \
+                .
+            """
+            sh "docker tag $PATCHSET_TAG $CACHE_TAG"
 
-    stage('Publish Patchset Image') {
-      steps {
-        runBuildImageMaybe(true) {
-          timeout(time: 5) {
-            // always push the patchset tag otherwise when a later
-            // patchset is merged this patchset tag is overwritten
-            sh 'docker push $PATCHSET_TAG'
+            sh "docker push $PATCHSET_TAG"
           }
         }
       }
@@ -204,13 +234,10 @@ pipeline {
     stage('Parallel Run Tests') {
       parallel {
         stage('Linters') {
-          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms' } }
+          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms' && !isCovid() } }
           steps {
             skipIfPreviouslySuccessful("linters") {
-              build(
-                job: 'test-suites/linters',
-                parameters: build_parameters
-              )
+              build(job: 'test-suites/linters', parameters: buildParameters)
             }
           }
         }
@@ -218,21 +245,15 @@ pipeline {
         stage('Vendored Gems') {
           steps {
             skipIfPreviouslySuccessful("vendored-gems") {
-              build(
-                job: 'test-suites/vendored-gems',
-                parameters: build_parameters
-              )
+              build(job: 'test-suites/vendored-gems', parameters: buildParameters)
             }
           }
         }
 
-        stage('JS') {
+        stage('Javascript') {
           steps {
-            skipIfPreviouslySuccessful("js") {
-              build(
-                job: 'test-suites/JS',
-                parameters: build_parameters
-              )
+            skipIfPreviouslySuccessful("javascript") {
+              build(job: 'test-suites/JS', parameters: buildParameters)
             }
           }
         }
@@ -240,10 +261,7 @@ pipeline {
         stage('Contract Tests') {
           steps {
             skipIfPreviouslySuccessful("contract-tests") {
-              build(
-                job: 'test-suites/contract-tests',
-                parameters: build_parameters
-              )
+              build(job: 'test-suites/contract-tests', parameters: buildParameters)
             }
           }
         }
@@ -253,79 +271,101 @@ pipeline {
             skipIfPreviouslySuccessful("selenium-chrome") {
               build(
                 job: 'test-suites/selenium-chrome',
-                parameters: build_parameters
+                parameters: buildParameters + string(name: 'CI_NODE_TOTAL', value: env.SELENIUM_CI_NODE_TOTAL)
               )
             }
           }
         }
 
-        stage('Rspec') {
+        stage('RSpec') {
           steps {
             skipIfPreviouslySuccessful("rspec") {
               build(
                 job: 'test-suites/rspec',
-                parameters: build_parameters
+                parameters: buildParameters + string(name: 'CI_NODE_TOTAL', value: env.RSPEC_CI_NODE_TOTAL)
               )
             }
           }
         }
 
         stage ('Flakey Spec Catcher') {
-          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' } }
-           steps {
-            skipIfPreviouslySuccessful("flakey_spec_catcher") {
+          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && !isCovid() } }
+          steps {
+            skipIfPreviouslySuccessful("flakey-spec-catcher") {
               build(
                 job: 'test-suites/flakey-spec-catcher',
-                parameters: build_parameters
+                parameters: buildParameters,
+                propagate: false,
+                wait: false
               )
             }
           }
         }
 
-        // keep this around in case there is changes to the subbuilds that need to happen
-        // and you have no other way to test it except by running a test build.
+        // // keep this around in case there is changes to the subbuilds that need to happen
+        // // and you have no other way to test it except by running a test build.
         // stage('Test Subbuild') {
         //   steps {
         //     skipIfPreviouslySuccessful("test-subbuild") {
-        //       build(
-        //         job: 'test-suites/test-subbuild',
-        //         parameters: build_parameters
+        //       build(job: 'test-suites/test-subbuild', parameters: buildParameters)
+        //     }
+        //   }
+        // }
+
+        // // Don't run these on all patch sets until we have them ready to report results.
+        // // Uncomment stage to run when developing.
+        // stage('Xbrowser') {
+        //   steps {
+        //     skipIfPreviouslySuccessful("xbrowser") {
+        //       // propagate set to false until we can get tests passing
+        //       build(job: 'test-suites/xbrowser', propagate: false, parameters: buildParameters)
         //       )
         //     }
         //   }
         // }
-/*
- *  Don't run these on all patch sets until we have them ready to report results.
- *  Uncomment stage to run when developing.
- *
- *
- *       stage('Xbrowser') {
- *         steps {
- *           skipIfPreviouslySuccessful("xbrowser") {
- *             // propagate set to false until we can get tests passing
- *             build(
- *               job: 'test-suites/xbrowser',
- *               propagate: false,
- *               parameters: build_parameters
- *             )
- *           }
- *         }
- *       }
- */
+
       }
     }
 
-    stage('Publish Merged Image') {
-      when { expression { env.GERRIT_EVENT_TYPE == 'change-merged' } }
+    stage('Publish Image on Merge') {
+      when {
+        allOf {
+          expression { isPatchsetPublishable() }
+          expression { env.GERRIT_EVENT_TYPE == 'change-merged' }
+        }
+      }
       steps {
         timeout(time: 10) {
           script {
-            sh '''
-              docker tag $PATCHSET_TAG $MERGE_TAG
-              docker push $MERGE_TAG
-            '''
-            dockerCacheStore(image: "$CACHE_TAG")
+            // Retriggers won't have an image to tag/push, pull that
+            // image if doesn't exist. If image is not found it will
+            // return NULL
+            if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
+              sh 'docker pull $PATCHSET_TAG'
+            }
+            sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
+            // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
+            sh 'docker push $CANVAS_LMS_IMAGE'
           }
+        }
+      }
+    }
+
+    stage('Dependency Check') {
+      when { expression { env.GERRIT_EVENT_TYPE == 'change-merged' } }
+      steps {
+        script {
+          def reports = load 'build/new-jenkins/groovy/reports.groovy'
+          reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
+        }
+      }
+    }
+
+    stage('Mark Build as Successful') {
+      steps {
+        script {
+          def successes = load 'build/new-jenkins/groovy/successes.groovy'
+          successes.markBuildAsSuccessful()
         }
       }
     }
@@ -334,21 +374,18 @@ pipeline {
   post {
     failure {
       script {
-        if ( env.GERRIT_EVENT_TYPE == 'change-merged' ) {
+        if (isPatchsetPublishable() && env.GERRIT_EVENT_TYPE == 'change-merged') {
+          def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
+          def authorSegment = env.GERRIT_EVENT_ACCOUNT_NAME ? "Patchset by ${env.GERRIT_EVENT_ACCOUNT_NAME}. " : ''
           slackSend(
             channel: '#canvas_builds',
             color: 'danger',
-            message: "${env.JOB_NAME} failed on merge (<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
+            message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
           )
         }
       }
     }
-    success {
-      script {
-        def successes = load 'build/new-jenkins/groovy/successes.groovy'
-        successes.markBuildAsSuccessful()
-      }
-    }
+
     cleanup {
       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }

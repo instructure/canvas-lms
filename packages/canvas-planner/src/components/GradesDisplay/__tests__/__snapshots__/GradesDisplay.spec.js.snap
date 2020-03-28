@@ -70,12 +70,13 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="/courses/1/grades"
         margin="0"
         size="small"
+        textAlign="center"
         theme={
           Object {
             "smallHeight": "normal",
@@ -84,6 +85,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         <Text
           as="span"
@@ -300,12 +302,13 @@ exports[`renders some course grades 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="/courses/1/grades"
         margin="0"
         size="small"
+        textAlign="center"
         theme={
           Object {
             "smallHeight": "normal",
@@ -314,6 +317,7 @@ exports[`renders some course grades 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         <Text
           as="span"
@@ -362,12 +366,13 @@ exports[`renders some course grades 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="/courses/2/grades"
         margin="0"
         size="small"
+        textAlign="center"
         theme={
           Object {
             "smallHeight": "normal",
@@ -376,6 +381,7 @@ exports[`renders some course grades 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         <Text
           as="span"
@@ -424,12 +430,13 @@ exports[`renders some course grades 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="/courses/3/grades"
         margin="0"
         size="small"
+        textAlign="center"
         theme={
           Object {
             "smallHeight": "normal",
@@ -438,6 +445,7 @@ exports[`renders some course grades 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         <Text
           as="span"

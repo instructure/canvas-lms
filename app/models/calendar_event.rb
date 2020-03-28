@@ -377,12 +377,21 @@ class CalendarEvent < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  def course_broadcast_data
+    if context.respond_to?(:broadcast_data)
+      context.broadcast_data
+    else
+      {}
+    end
+  end
+
   set_broadcast_policy do
     dispatch :new_event_created
     to { participants(include_observers: true) - [@updating_user] }
     whenever {
       !appointment_group && context.available? && just_created && !hidden?
     }
+    data { course_broadcast_data }
 
     dispatch :event_date_changed
     to { participants(include_observers: true) - [@updating_user] }
@@ -393,6 +402,7 @@ class CalendarEvent < ActiveRecord::Base
         changed_in_state(:active, :fields => :end_at)
       ) && !hidden?
     }
+    data { course_broadcast_data }
 
     dispatch :appointment_reserved_by_user
     to { appointment_group.instructors +
@@ -402,7 +412,7 @@ class CalendarEvent < ActiveRecord::Base
       just_created &&
       context == appointment_group.participant_for(@updating_user)
     }
-    data { {:updating_user_name => @updating_user.name} }
+    data { { updating_user_name: @updating_user.name }.merge(course_broadcast_data) }
 
     dispatch :appointment_canceled_by_user
     to { appointment_group.instructors +
@@ -414,10 +424,7 @@ class CalendarEvent < ActiveRecord::Base
       @updating_user &&
       context == appointment_group.participant_for(@updating_user)
     }
-    data { {
-      :updating_user_name => @updating_user.name,
-      :cancel_reason => @cancel_reason
-    } }
+    data { { updating_user_name: @updating_user.name, cancel_reason: @cancel_reason }.merge(course_broadcast_data) }
 
     dispatch :appointment_reserved_for_user
     to { participants(include_observers: true) - [@updating_user] }
@@ -425,7 +432,7 @@ class CalendarEvent < ActiveRecord::Base
       appointment_group && parent_event &&
       just_created
     }
-    data { {:updating_user_name => @updating_user.name} }
+    data { { updating_user_name: @updating_user.name }.merge(course_broadcast_data) }
 
     dispatch :appointment_deleted_for_user
     to { participants(include_observers: true) - [@updating_user] }
@@ -434,10 +441,7 @@ class CalendarEvent < ActiveRecord::Base
       deleted? &&
       saved_change_to_workflow_state?
     }
-    data { {
-      :updating_user_name => @updating_user.name,
-      :cancel_reason => @cancel_reason
-    } }
+    data { { updating_user_name: @updating_user.name, cancel_reason: @cancel_reason }.merge(course_broadcast_data) }
   end
 
   def participants(include_observers: false)

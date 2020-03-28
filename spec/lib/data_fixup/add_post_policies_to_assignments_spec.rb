@@ -19,11 +19,19 @@ require 'spec_helper'
 
 describe DataFixup::AddPostPoliciesToAssignments do
   let_once(:course) { Course.create! }
-  let_once(:assignment) { course.assignments.create! }
+  let_once(:assignment) do
+    @assignment = course.assignments.create!
+    @assignment.unmute!
+    @assignment
+  end
 
   let_once(:teacher) { course.enroll_teacher(User.create!, enrollment_state: "active").user }
   let_once(:student1) { course.enroll_student(User.create!, enrollment_state: "active").user }
   let_once(:student2) { course.enroll_student(User.create!, enrollment_state: "active").user }
+
+  before :once do
+    PostPolicy.enable_feature!
+  end
 
   def run_for_submissions
     submission_ids = Submission.all.order(:id).pluck(:id)
@@ -54,9 +62,12 @@ describe DataFixup::AddPostPoliciesToAssignments do
     context "for an assignment that would receive an automatic post policy" do
       it "sets the posted_at of graded submissions to their graded_at time" do
         assignment.grade_student(student1, grader: teacher, score: 10)
+        assignment.unmute!
         student1_submission = assignment.submission_for_student(student1)
 
         student1_submission.update!(posted_at: nil)
+        assignment.reload.update!(muted: false)
+        clear_post_policy(assignment: assignment)
         run_for_submissions
 
         expect(student1_submission.reload.posted_at).to eq(student1_submission.graded_at)

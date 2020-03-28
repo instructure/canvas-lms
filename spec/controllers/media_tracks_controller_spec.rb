@@ -89,4 +89,48 @@ describe MediaTracksController do
       expect(MediaTrack.where(:id => track.id).first).to be_nil
     end
   end
+
+  describe "#index" do
+    it "should list tracks" do
+      tracks = {}
+      tracks["en"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "en subs", user_id: @teacher.id)
+      tracks["af"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'af', content: "af subs", user_id: @teacher.id)
+      get 'index', params: {:media_object_id => @mo.media_id, :include => ["content"]}
+      expect(response).to be_successful
+      response.body.sub!("while(1)\;", "")
+      parsed = JSON.parse(response.body)
+      expect(parsed.length).to be(2)
+      parsed.each do |t|
+        expect(t["content"]).to eql tracks[t["locale"]]["content"]
+        expect(t["id"]).to eql tracks[t["locale"]]["id"]
+        expect(t["locale"]).to eql tracks[t["locale"]]["locale"]
+        expect(t["kind"]).to eql tracks[t["locale"]]["kind"]
+        expect(t["media_object_id"]).to eql tracks[t["locale"]]["media_object_id"]
+        expect(t["user_id"]).to eql tracks[t["locale"]]["user_id"]
+      end
+    end
+  end
+
+  describe "#update" do
+    it "should update tracks" do
+      tracks = {}
+      tracks["en"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "en subs", user_id: @teacher.id)
+      tracks["af"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'af', content: "af subs", user_id: @teacher.id)
+      tracks["br"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'br', content: "br subs", user_id: @teacher.id)
+      put 'update',
+        params: {
+          :media_object_id => @mo.media_id,
+          :include => ["content"]
+        },
+        body: JSON.generate([{locale: 'en', content: 'new en'}, {locale: 'es', content: 'es subs'}, {locale: 'br'}]),
+        format: :json
+        expect(response).to be_successful
+      response.body.sub!("while(1)\;", "")
+      parsed = JSON.parse(response.body)
+      expect(parsed.length).to be(3)
+      expect(parsed.any? { |t| t['locale'] == 'en' && t['content'] == 'new en'}).to be
+      expect(parsed.any? { |t| t['locale'] == 'es' && t['content'] == 'es subs'}).to be
+      expect(parsed.any? { |t| t['locale'] == 'br' && t['content'] == 'br subs'}).to be
+    end
+  end
 end

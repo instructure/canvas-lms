@@ -22,7 +22,6 @@ import HelpTray from '../HelpTray'
 
 describe('HelpTray', () => {
   const trayTitle = 'Halp'
-  const closeTray = jest.fn()
   const links = [
     {
       text: 'Search the Canvas Guides',
@@ -42,7 +41,6 @@ describe('HelpTray', () => {
 
   const props = {
     trayTitle,
-    closeTray,
     links,
     hasLoaded: true
   }

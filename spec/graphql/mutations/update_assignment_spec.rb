@@ -20,6 +20,10 @@ require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::UpdateAssignment do
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   before do
     @account = Account.create!
     @course = @account.courses.create!
@@ -129,7 +133,7 @@ describe Mutations::UpdateAssignment do
     ["gradingType", :grading_type, "points", "not_graded", "not_graded"],
     ["allowedExtensions", :allowed_extensions, [], '[ "docs", "blah" ]', [ "docs", "blah" ]],
     ["allowedAttempts", :allowed_attempts, nil, 10, 10],
-    ["muted", :muted?, false, true, true],
+    ["muted", :muted?, true, false, false],
     ["onlyVisibleToOverrides", :only_visible_to_overrides, false, true, true],
     ["submissionTypes", :submission_types, "none", '[ discussion_topic, not_graded ]', [ "discussion_topic", "not_graded" ], "discussion_topic,not_graded"],
     ["gradeGroupStudentsIndividually", :grade_group_students_individually, false, true, true],

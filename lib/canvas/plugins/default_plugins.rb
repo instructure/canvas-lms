@@ -263,9 +263,7 @@ Canvas::Plugin.register('sis_import', :sis, {
   :author_website => 'http://www.instructure.com',
   :version => '1.0.0',
   :settings_partial => 'plugins/sis_import_settings',
-  :settings => { :parallelism => 1,
-                 :minimum_rows_for_parallel => 1000,
-                 :queue_for_parallel_jobs => nil }
+  :settings => { :parallelism => 1 }
 })
 
 Canvas::Plugin.register('sessions', nil, {
