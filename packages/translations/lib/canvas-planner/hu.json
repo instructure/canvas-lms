@@ -12,6 +12,18 @@
     "message": "Biztosan törölni szeretné ezt a tervezőbeli elemet?"
   },
   "assignment_976578a8": { "message": "Feladat" },
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } készként megjelölve."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } nincs megjelölve készként."
+  },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType } { title }, emlékeztető { datetime }."
+  },
   "calendar_a8563bb2": { "message": "Naptár" },
   "calendar_event_89aadc1c": { "message": "Naptáresemény" },
   "close_d634289d": { "message": "Bezár" },
@@ -33,21 +45,45 @@
   "dismissed_8b0b1fc9": { "message": "Elvetve" },
   "due_5d7267be": { "message": "Határidő: " },
   "edit_c5fbea07": { "message": "Szerkesztés" },
+  "edit_title_72e5a21e": { "message": "{ title } szerkesztése" },
   "error_loading_more_items_3f109d9f": {
     "message": "Nem sikerült több elemet betölteni"
   },
   "excused_cf8792eb": { "message": "Felmentve" },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Nem sikerült a tennivaló törlése"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Nem sikerült a lehetőségek betöltése"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Nem sikerült a tennivaló mentése"
+  },
   "feedback_6dcc1991": { "message": "Visszajelzés" },
   "graded_25cd3fcd": { "message": "Értékelve" },
+  "grades_are_loading_c899652d": { "message": "Értékelések betöltése" },
+  "grades_loaded_5056277c": { "message": "Értékelések betöltve" },
   "late_2be42b88": { "message": "Késve" },
+  "list_expanded_efec2d0": { "message": "Lista kibontva." },
   "load_more_a36f9cf9": { "message": "Továbbiak betöltése" },
   "loading_25990131": { "message": "Betöltés..." },
   "loading_725811ca": { "message": "betöltés" },
   "location_3b6ff307": { "message": "Helyszín:" },
   "missing_1a256b3b": { "message": "Hiányzik" },
+  "my_grades_98834476": { "message": "Az én értékeléseim" },
   "new_13daf639": { "message": "Új" },
+  "new_activity_8b84847d": { "message": "Új aktivitás" },
+  "new_activity_for_title_14c9c3af": {
+    "message": "Új aktivitás ehhez: { title }"
+  },
+  "new_opportunities_7d349c4d": { "message": "Új lehetőségek" },
   "next_month_749b1778": { "message": "Következő hónap" },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Nincs hozzárendelve esedékességi dátum"
+  },
+  "no_grade_3b4d7f3e": { "message": "Nincs értékelés" },
   "nothing_for_now_e3e3ce2a": { "message": "Egyelőre semmi" },
+  "nothing_more_to_do_b665da42": { "message": "Nincs több tennivaló" },
   "optional_add_course_ef0d70fc": {
     "message": "Opcionális: kurzus hozzáadása"
   },
@@ -66,9 +102,18 @@
   "title_is_required_6ddcab69": { "message": "cím szükséges" },
   "to_do_1d554f36": { "message": "Teendők" },
   "today_76e10f9c": { "message": "Ma" },
+  "today_at_date_8ac30d6": { "message": "Ma ekkor: { date }" },
   "tomorrow_9a6c9a00": { "message": "Holnap" },
+  "tomorrow_at_date_b53f2cf1": { "message": "Holnap ekkor: { date }" },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Használja a nyíl billentyűket az opció kiválasztására!"
+  },
+  "yesterday_at_date_1aa6d18e": { "message": "Tegnap ekkor: { date }" },
   "yesterday_c6bd6abf": { "message": "Tegnap" },
   "you_must_provide_a_date_and_time_a86839d2": {
     "message": "Meg kell adni a dátumot és az időt"
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Elérte a legelső tennivalót!"
   }
 }
