@@ -1530,7 +1530,7 @@ class User < ActiveRecord::Base
   end
 
   def close_announcement(announcement)
-    closed = get_preference(:closed_notifications) || []
+    closed = get_preference(:closed_notifications).dup || []
     # serialize ids relative to the user
     self.shard.activate do
       closed << announcement.id
