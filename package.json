@@ -64,6 +64,7 @@
     "@instructure/ui-progress": "6",
     "@instructure/ui-radio-input": "6",
     "@instructure/ui-react-utils": "6",
+    "@instructure/ui-responsive": "6",
     "@instructure/ui-select": "6",
     "@instructure/ui-spinner": "6",
     "@instructure/ui-svg-images": "6",

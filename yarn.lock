@@ -2489,6 +2489,21 @@
     prop-types "^15"
     react-lifecycles-compat "^3.0.4"
 
+"@instructure/ui-responsive@6.21":
+  version "6.21.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-responsive/-/ui-responsive-6.21.0.tgz#56bab58bd83c6bdb4e6d603509c7f6e71252bfbc"
+  integrity sha512-2ptWSafX4m/S3VU5/H4DEyuIIFE/1GLldLj3ZxhxwoIeozG4n/tn9vOFTKRefQKLdntkdFkWkvG0aIqkQ2hl0A==
+  dependencies:
+    "@babel/runtime" "^7.5.0"
+    "@instructure/console" "^6.21.0"
+    "@instructure/debounce" "^6.21.0"
+    "@instructure/ui-dom-utils" "^6.21.0"
+    "@instructure/ui-react-utils" "^6.21.0"
+    "@instructure/ui-testable" "^6.21.0"
+    "@instructure/ui-themeable" "^6.21.0"
+    "@instructure/ui-utils" "^6.21.0"
+    prop-types "^15"
+
 "@instructure/ui-select@6":
   version "6.21.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-select/-/ui-select-6.21.0.tgz#4005586582efbd9aea5fd9a3dafc811875f14ae7"
