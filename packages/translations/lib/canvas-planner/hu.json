@@ -15,6 +15,18 @@
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
   },
+  "assignmenttype_title_all_day_on_datetime_9768903c": {
+    "message": "{ assignmentType } { title }, egész nap { datetime }-kor."
+  },
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, { datetime }-kor."
+  },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title }, { datetime }-kor { endTime }-ig"
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, esedékes ekkor: { datetime }."
+  },
   "assignmenttype_title_is_marked_as_done_a8dc46ef": {
     "message": "{ assignmentType } { title } készként megjelölve."
   },
@@ -24,6 +36,9 @@
   "assignmenttype_title_reminder_datetime_33fa66d5": {
     "message": "{ assignmentType } { title }, emlékeztető { datetime }."
   },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "A Tennivaló Listád Elkezdése"
+  },
   "calendar_a8563bb2": { "message": "Naptár" },
   "calendar_event_89aadc1c": { "message": "Naptáresemény" },
   "close_d634289d": { "message": "Bezár" },
@@ -32,6 +47,9 @@
   },
   "course_8a63b4a3": { "message": "Kurzus" },
   "date_ee500367": { "message": "Dátum" },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } nem érvényes dátum."
+  },
   "date_is_required_8660ec22": { "message": "Dátum szükséges" },
   "date_time_d9fbf2d7": { "message": "Dátum és idő" },
   "delete_a6efa79d": { "message": "Törlés" },
@@ -43,6 +61,7 @@
     "message": "{ opportunityName } elvetése"
   },
   "dismissed_8b0b1fc9": { "message": "Elvetve" },
+  "dismissed_opportunities_f0826640": { "message": "Elvetetett lehetőségek" },
   "due_5d7267be": { "message": "Határidő: " },
   "edit_c5fbea07": { "message": "Szerkesztés" },
   "edit_title_72e5a21e": { "message": "{ title } szerkesztése" },
@@ -53,6 +72,9 @@
   "failed_to_delete_to_do_64edff49": {
     "message": "Nem sikerült a tennivaló törlése"
   },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Nem sikerült új tevékenységet szerezni"
+  },
   "failed_to_load_opportunities_52ab6404": {
     "message": "Nem sikerült a lehetőségek betöltése"
   },
@@ -60,16 +82,26 @@
     "message": "Nem sikerült a tennivaló mentése"
   },
   "feedback_6dcc1991": { "message": "Visszajelzés" },
+  "go_to_card_view_dashboard_9d03970e": {
+    "message": "Átirányítás a kártya nézetű vezérlőpultra"
+  },
   "graded_25cd3fcd": { "message": "Értékelve" },
   "grades_are_loading_c899652d": { "message": "Értékelések betöltése" },
   "grades_loaded_5056277c": { "message": "Értékelések betöltve" },
   "late_2be42b88": { "message": "Késve" },
+  "list_collapsed_9ac35920": { "message": "Összecsukott lista." },
+  "list_collapsed_dde87718": { "message": "Összecsukott lista" },
   "list_expanded_efec2d0": { "message": "Lista kibontva." },
   "load_more_a36f9cf9": { "message": "Továbbiak betöltése" },
+  "load_prior_dates_f2b0f6f0": { "message": "Korábbi dátumok betöltése" },
   "loading_25990131": { "message": "Betöltés..." },
   "loading_725811ca": { "message": "betöltés" },
+  "loading_past_items_ca499e75": { "message": "Korábbi elemek betöltése" },
   "location_3b6ff307": { "message": "Helyszín:" },
   "missing_1a256b3b": { "message": "Hiányzik" },
+  "missing_items_for_title_516511f8": {
+    "message": "Hiányzó elem ehhez: { title }"
+  },
   "my_grades_98834476": { "message": "Az én értékeléseim" },
   "new_13daf639": { "message": "Új" },
   "new_activity_8b84847d": { "message": "Új aktivitás" },
@@ -84,6 +116,18 @@
   "no_grade_3b4d7f3e": { "message": "Nincs értékelés" },
   "nothing_for_now_e3e3ce2a": { "message": "Egyelőre semmi" },
   "nothing_more_to_do_b665da42": { "message": "Nincs több tennivaló" },
+  "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+    "message": "Semmi nincs tervben mára. A legutóbbi elem kiválasztása."
+  },
+  "nothing_planned_today_selecting_next_item_f6718aa": {
+    "message": "Semmi nincs tervben mára. A következő elem kiválasztása."
+  },
+  "nothing_planned_yet_8675ffe9": { "message": "Még semmi nincs tervben" },
+  "numpoints_points_8621a43b": { "message": "{ numPoints } pont" },
+  "opportunities_popup_f6703842": { "message": "lehetőségek popup" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } kiválaszva. Lista összecsukva."
+  },
   "optional_add_course_ef0d70fc": {
     "message": "Opcionális: kurzus hozzáadása"
   },
@@ -93,10 +137,33 @@
   "previous_month_bb1e3c84": { "message": "Előző hónap" },
   "pts_699bd9aa": { "message": "pont" },
   "quiz_e0dcce8f": { "message": "Kvíz" },
+  "reminder_date_4564d12d": { "message": "Emlékeztető: { date }" },
   "replies_4a8577c8": { "message": "Válaszok" },
   "save_11a80ec3": { "message": "Mentés" },
+  "scroll_up_to_see_your_history_19b14cad": {
+    "message": "Görgessen felfelé, hogy lássa az előzményeket!"
+  },
+  "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+    "message": "Felgörgetés a korábbi elemhez új tevékenységgel."
+  },
+  "show_all_ae37d610": { "message": "Összes megjelenítése" },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate }-tól/től { endDate }-ig"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
+  },
+  "starttime_to_endtime_d7cc249d": {
+    "message": "{ startTime }-tól/től { endTime }-ig"
+  },
   "submitted_318fad53": { "message": "Beadva" },
   "task_16b0ef38": { "message": "Feladat" },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Ekkorra kell megcsinálni ezt"
+  },
   "time_2b5aac58": { "message": "Idő" },
   "title_ee03d132": { "message": "Cím" },
   "title_is_required_6ddcab69": { "message": "cím szükséges" },
@@ -105,6 +172,9 @@
   "today_at_date_8ac30d6": { "message": "Ma ekkor: { date }" },
   "tomorrow_9a6c9a00": { "message": "Holnap" },
   "tomorrow_at_date_b53f2cf1": { "message": "Holnap ekkor: { date }" },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Nem lehet készként megjelölni."
+  },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Használja a nyíl billentyűket az opció kiválasztására!"
   },
