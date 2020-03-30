@@ -55,6 +55,7 @@ signupDialog = (id, title, path=null) ->
     terms_required: ENV.ACCOUNT.terms_required
     terms_html: termsHtml(ENV.ACCOUNT)
     path: path
+    require_email: ENV.ACCOUNT.registration_settings.require_email
   )
   $node.html html
   $node.find('.signup_link').click preventDefault ->
