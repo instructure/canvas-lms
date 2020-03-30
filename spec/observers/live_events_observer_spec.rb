@@ -115,6 +115,16 @@ describe LiveEventsObserver do
   end
 
 
+  describe "conversation messsage" do
+    it "posts conversation message create events" do
+      expect(Canvas::LiveEvents).to receive(:conversation_message_created).once
+      user1 = user_model
+      user2 = user_model
+      convo = Conversation.initiate([user1, user2], false)
+      convo.add_message(user1, "create new conversation message")
+    end
+  end
+
   describe "course" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:course_created).once

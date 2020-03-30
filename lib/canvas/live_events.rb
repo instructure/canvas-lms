@@ -88,6 +88,15 @@ module Canvas::LiveEvents
     })
   end
 
+  def self.conversation_message_created(conversation_message)
+    post_event_stringified('conversation_message_created', {
+      author_id: conversation_message.author_id,
+      conversation_id: conversation_message.conversation_id,
+      created_at: conversation_message.created_at,
+      message_id: conversation_message.id
+    })
+  end
+
   def self.discussion_entry_created(entry)
     post_event_stringified('discussion_entry_created', get_discussion_entry_data(entry))
   end
