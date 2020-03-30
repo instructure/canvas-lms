@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Rails.application.config.after_initialize do
-  Switchman.cache = -> { MultiCache.cache }
+Switchman.cache = -> { MultiCache.cache }
 
+Rails.application.config.after_initialize do
   # WillPaginate needs to allow args to Relation#to_a
   WillPaginate::ActiveRecord::RelationMethods.class_eval do
     def to_a(*args)
