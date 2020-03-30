@@ -1779,6 +1779,10 @@ class Account < ActiveRecord::Base
     authentication_providers.where(parent_registration: true).first
   end
 
+  def require_email_for_registration?
+    Canvas::Plugin.value_to_boolean(settings[:require_email_for_registration]) || false
+  end
+
   def to_param
     return 'site_admin' if site_admin?
     super
