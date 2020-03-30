@@ -16,7 +16,7 @@
     "message": "{ assignmentType } { title }."
   },
   "assignmenttype_title_all_day_on_datetime_9768903c": {
-    "message": "{ assignmentType } { title }, egész nap { datetime }-kor."
+    "message": "{ title } { assignmentType } , egész nap { datetime }-kor."
   },
   "assignmenttype_title_at_datetime_478f0709": {
     "message": "{ assignmentType } { title }, { datetime }-kor."
@@ -26,6 +26,9 @@
   },
   "assignmenttype_title_due_datetime_a112d8ff": {
     "message": "{ assignmentType } { title }, esedékes ekkor: { datetime }."
+  },
+  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+    "message": "A { title } című { assignmentType } beadási határideje { datetime }."
   },
   "assignmenttype_title_is_marked_as_done_a8dc46ef": {
     "message": "{ assignmentType } { title } készként megjelölve."
@@ -41,11 +44,17 @@
   },
   "calendar_a8563bb2": { "message": "Naptár" },
   "calendar_event_89aadc1c": { "message": "Naptáresemény" },
+  "canvas_planner_98ed106": { "message": "Canvas Tervező" },
   "close_d634289d": { "message": "Bezár" },
+  "close_opportunity_center_popup_9907d981": {
+    "message": "A Lehetőségek popup ablak bezárása"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
   },
   "course_8a63b4a3": { "message": "Kurzus" },
+  "course_to_do_bcbbab54": { "message": "Tennivalók { course } tantárgyból" },
+  "date_at_time_dbdb1b99": { "message": "{ date } { time }-kor" },
   "date_ee500367": { "message": "Dátum" },
   "date_is_not_a_valid_date_4ef9f8ba": {
     "message": "#{ date } nem érvényes dátum."
@@ -63,10 +72,17 @@
   "dismissed_8b0b1fc9": { "message": "Elvetve" },
   "dismissed_opportunities_f0826640": { "message": "Elvetetett lehetőségek" },
   "due_5d7267be": { "message": "Határidő: " },
+  "due_date_124fdd99": { "message": "Határidő: { date }" },
   "edit_c5fbea07": { "message": "Szerkesztés" },
   "edit_title_72e5a21e": { "message": "{ title } szerkesztése" },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Hiba történt az értékelések betöltése közben."
+  },
   "error_loading_more_items_3f109d9f": {
     "message": "Nem sikerült több elemet betölteni"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Hiba történt a korábbi elemek betöltése közben."
   },
   "excused_cf8792eb": { "message": "Felmentve" },
   "failed_to_delete_to_do_64edff49": {
@@ -83,7 +99,7 @@
   },
   "feedback_6dcc1991": { "message": "Visszajelzés" },
   "go_to_card_view_dashboard_9d03970e": {
-    "message": "Átirányítás a kártya nézetű vezérlőpultra"
+    "message": "Ugrás a vezérlőpult kártya nézetére"
   },
   "graded_25cd3fcd": { "message": "Értékelve" },
   "grades_are_loading_c899652d": { "message": "Értékelések betöltése" },
@@ -96,8 +112,13 @@
   "load_prior_dates_f2b0f6f0": { "message": "Korábbi dátumok betöltése" },
   "loading_25990131": { "message": "Betöltés..." },
   "loading_725811ca": { "message": "betöltés" },
+  "loading_grades_c842c887": { "message": "Értékelések betöltése" },
   "loading_past_items_ca499e75": { "message": "Korábbi elemek betöltése" },
+  "loading_planner_items_947a813d": { "message": "Tervező elemek betöltése" },
   "location_3b6ff307": { "message": "Helyszín:" },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Úgy tűnik, itt nincsen semmi."
+  },
   "missing_1a256b3b": { "message": "Hiányzik" },
   "missing_items_for_title_516511f8": {
     "message": "Hiányzó elem ehhez: { title }"
@@ -124,6 +145,9 @@
   },
   "nothing_planned_yet_8675ffe9": { "message": "Még semmi nincs tervben" },
   "numpoints_points_8621a43b": { "message": "{ numPoints } pont" },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Csak a legutóbbi értékelési periódus látható."
+  },
   "opportunities_popup_f6703842": { "message": "lehetőségek popup" },
   "option_selected_list_collapsed_e00180ff": {
     "message": "{ option } kiválaszva. Lista összecsukva."
@@ -133,7 +157,11 @@
   },
   "page_50c4823d": { "message": "Oldal" },
   "peer_review_74f26a13": { "message": "Társértékelés" },
+  "peer_review_for_itemtitle_358cb413": {
+    "message": "Társértékelés ehhez az elemhez: { itemTitle }"
+  },
   "points_bceb5005": { "message": "pontszám" },
+  "points_points_63e59cce": { "message": "{ points } pont" },
   "previous_month_bb1e3c84": { "message": "Előző hónap" },
   "pts_699bd9aa": { "message": "pont" },
   "quiz_e0dcce8f": { "message": "Kvíz" },
@@ -147,6 +175,7 @@
     "message": "Felgörgetés a korábbi elemhez új tevékenységgel."
   },
   "show_all_ae37d610": { "message": "Összes megjelenítése" },
+  "show_my_grades_ebd08684": { "message": "Az értékeléseim mutatása" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate }-tól/től { endDate }-ig"
   },
@@ -160,14 +189,22 @@
     "message": "{ startTime }-tól/től { endTime }-ig"
   },
   "submitted_318fad53": { "message": "Beadva" },
+  "success_to_do_created_e34ed395": {
+    "message": "Sikerült: tennivaló létrehozva"
+  },
   "task_16b0ef38": { "message": "Feladat" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Ekkorra kell megcsinálni ezt"
+  },
+  "there_are_no_points_associated_with_this_item_449c712a": {
+    "message": "Ehhez az elemhez nincsenek pontok rendelve."
   },
   "time_2b5aac58": { "message": "Idő" },
   "title_ee03d132": { "message": "Cím" },
   "title_is_required_6ddcab69": { "message": "cím szükséges" },
   "to_do_1d554f36": { "message": "Teendők" },
+  "to_do_date_4b211ad0": { "message": "Elkészítendő { date }-ig." },
+  "to_do_items_loading_d1cdfcd5": { "message": "Tennivaló elemek töltődnek" },
   "today_76e10f9c": { "message": "Ma" },
   "today_at_date_8ac30d6": { "message": "Ma ekkor: { date }" },
   "tomorrow_9a6c9a00": { "message": "Holnap" },
@@ -180,6 +217,9 @@
   },
   "yesterday_at_date_1aa6d18e": { "message": "Tegnap ekkor: { date }" },
   "yesterday_c6bd6abf": { "message": "Tegnap" },
+  "you_have_media_feedback_f5f9aba8": {
+    "message": "Önnek média visszajelzése van."
+  },
   "you_must_provide_a_date_and_time_a86839d2": {
     "message": "Meg kell adni a dátumot és az időt"
   },
