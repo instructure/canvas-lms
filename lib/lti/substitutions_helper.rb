@@ -268,16 +268,32 @@ module Lti
       # we can cache on the last migration because even if copies are done elsewhere they won't affect anything
       # until a new copy is made to _this_ course
       Rails.cache.fetch(["recursive_copied_course_lti_ids", @context.global_id, last_migration_id].cache_key) do
-        Course.where(
-          "EXISTS (?)", ContentMigration.where(workflow_state: :imported).where("context_id = ? OR context_id IN (
-              WITH RECURSIVE t AS (
-                SELECT context_id, source_course_id FROM #{ContentMigration.quoted_table_name} WHERE context_id = ?
-                UNION
-                SELECT content_migrations.context_id, content_migrations.source_course_id FROM #{ContentMigration.quoted_table_name} INNER JOIN t ON content_migrations.context_id=t.source_course_id
-              )
-              SELECT DISTINCT context_id FROM t
-            )", @context.id, @context.id).where("content_migrations.source_course_id = courses.id")
-        ).pluck(:id, :lti_context_id)
+        Course.connection.select_rows(<<-SQL)
+          WITH RECURSIVE all_contexts AS (
+            SELECT context_id, source_course_id
+            FROM #{ContentMigration.quoted_table_name}              
+            WHERE context_id=#{@context.id}              
+            UNION
+            SELECT content_migrations.context_id, content_migrations.source_course_id
+            FROM #{ContentMigration.quoted_table_name}
+              INNER JOIN all_contexts t ON content_migrations.context_id = t.source_course_id
+          ),
+          interesting_contexts AS (
+            SELECT DISTINCT context_id
+            FROM all_contexts
+          )
+          SELECT "courses"."id", "courses"."lti_context_id"
+          FROM #{Course.quoted_table_name}
+          WHERE (EXISTS (
+            SELECT "content_migrations".*
+            FROM #{ContentMigration.quoted_table_name}
+            WHERE
+              "content_migrations"."workflow_state" = 'imported'
+              AND (context_id IN (
+                  SELECT x.context_id
+                  FROM interesting_contexts x))
+              AND (content_migrations.source_course_id = courses.id)))
+        SQL
       end
     end
   end
