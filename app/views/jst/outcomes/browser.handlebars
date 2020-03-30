@@ -15,10 +15,19 @@
       <i class="icon-plus"></i>
       <span class="ui-button-text" aria-hidden="true">{{#t}}Group{{/t}}</span>
     </button>
-    <button class="import_outcomes ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Import a set of Outcomes{{/t}}">
-      <i class="icon-upload"></i>
-      <span class="ui-button-text" aria-hidden="true">{{#t}}Import{{/t}}</span>
-    </button>
+    {{#if importPermissionFF }}
+      {{#if canImportOutcomes }}
+        <button class="import_outcomes ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Import a set of Outcomes{{/t}}">
+          <i class="icon-upload"></i>
+          <span class="ui-button-text" aria-hidden="true">{{#t}}Import{{/t}}</span>
+        </button>
+      {{/if}}
+    {{else}}
+      <button class="import_outcomes ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Import a set of Outcomes{{/t}}">
+        <i class="icon-upload"></i>
+        <span class="ui-button-text" aria-hidden="true">{{#t}}Import{{/t}}</span>
+      </button>
+    {{/if}}
     <button class="find_outcome ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Find an Outcome{{/t}}">
       <i class="icon-search"></i>
       <span class="ui-button-text" aria-hidden="true">{{#t}}Find{{/t}}</span>
