@@ -82,7 +82,7 @@ class DueDateCacher
   def self.recompute(assignment, update_grades: false, executing_user: nil)
     current_caller = caller(1..1).first
     Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{current_caller}"
-    return unless assignment.active?
+    return unless assignment.persisted? && assignment.active?
     # We use a strand here instead of a singleton because a bunch of
     # assignment updates with upgrade_grades could end up causing
     # score table fights.
@@ -168,13 +168,14 @@ class DueDateCacher
     # in a transaction on the correct shard:
     @course.shard.activate do
       values = []
+
+      assignments_by_id = Assignment.find(@assignment_ids).index_by(&:id)
+
       effective_due_dates.to_hash.each do |assignment_id, student_due_dates|
         students_without_priors = student_due_dates.keys - enrollment_counts.prior_student_ids
-        existing_anonymous_ids = Submission.where.not(user: nil).
-          where(user: students_without_priors).
-          anonymous_ids_for(assignment_id)
+        existing_anonymous_ids = existing_anonymous_ids_by_assignment_id[assignment_id]
 
-        create_moderation_selections_for_assignment(assignment_id, student_due_dates.keys, @user_ids)
+        create_moderation_selections_for_assignment(assignments_by_id[assignment_id], student_due_dates.keys, @user_ids)
 
         quiz_lti = quiz_lti_assignments.include?(assignment_id)
 
@@ -190,24 +191,28 @@ class DueDateCacher
         end
       end
 
+      assignments_to_delete_all_submissions_for = []
       # Delete submissions for students who don't have visibility to this assignment anymore
       @assignment_ids.each do |assignment_id|
         assigned_student_ids = effective_due_dates.find_effective_due_dates_for_assignment(assignment_id).keys
-        submission_scope = Submission.active.where(assignment_id: assignment_id)
 
         if @user_ids.blank? && assigned_student_ids.blank? && enrollment_counts.prior_student_ids.blank?
-          submission_scope.in_batches.update_all(workflow_state: :deleted, updated_at: Time.zone.now)
+          assignments_to_delete_all_submissions_for << assignment_id
         else
           # Delete the users we KNOW we need to delete in batches (it makes the database happier this way)
           deletable_student_ids =
             enrollment_counts.accepted_student_ids - assigned_student_ids - enrollment_counts.prior_student_ids
           deletable_student_ids.each_slice(1000) do |deletable_student_ids_chunk|
             # using this approach instead of using .in_batches because we want to limit the IDs in the IN clause to 1k
-            submission_scope.where(user_id: deletable_student_ids_chunk).
+            Submission.active.where(assignment_id: assignment_id, user_id: deletable_student_ids_chunk).
               update_all(workflow_state: :deleted, updated_at: Time.zone.now)
           end
           User.clear_cache_keys(deletable_student_ids, :submissions)
         end
+      end
+      unless assignments_to_delete_all_submissions_for.empty?
+        Submission.active.where(assignment_id: assignments_to_delete_all_submissions_for).
+          in_batches.update_all(workflow_state: :deleted, updated_at: Time.zone.now)
       end
 
       # Get any stragglers that might have had their enrollment removed from the course
@@ -411,5 +416,14 @@ class DueDateCacher
         merge(ContextExternalTool.quiz_lti).
         where(context_type: 'Assignment', context_id: @assignment_ids).
         where.not(workflow_state: 'deleted').distinct.pluck(:context_id).to_set
+  end
+
+  def existing_anonymous_ids_by_assignment_id
+    @existing_anonymous_ids_by_assignment_id ||=
+      Submission.
+        anonymized.
+        for_assignment(effective_due_dates.to_hash.keys).
+        pluck(:assignment_id, :anonymous_id).
+        each_with_object(Hash.new { |h,k| h[k] = [] }) { |data, h| h[data.first] << data.last }
   end
 end

@@ -16,17 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Moderation
-  def create_moderation_selections_for_assignment(assignment_id, student_ids, student_context)
-    assignment = Assignment.find(assignment_id)
+  def create_moderation_selections_for_assignment(assignment, student_ids, student_context)
+    assignment = Assignment.find(assignment) unless assignment.is_a?(Assignment)
     return unless assignment.moderated_grading
 
     # Add selections for students in Student IDs
     already_moderated_ids = assignment.moderated_grading_selections.pluck(:student_id)
     to_add_ids = student_ids - already_moderated_ids
-    to_add = User.where(id: to_add_ids)
 
-    to_add.each do |student|
-      assignment.moderated_grading_selections.create! student: student
+    to_add_ids.each do |student_id|
+      assignment.moderated_grading_selections.create! student_id: student_id
     end
 
     # Delete selections not in Student IDs but in the context of students to be considered
