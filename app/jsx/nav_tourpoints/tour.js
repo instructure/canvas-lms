@@ -191,6 +191,84 @@ const allSteps = {
         await handleOpenTray('help')
       }
     }
+  ],
+  student: [
+    {
+      selector: '#global_nav_help_link',
+      content: () => (
+        <section>
+          {/* Hide the overlay on the first step. */}
+          <style>
+            {`#___reactour svg rect {
+              opacity:0;
+            }`}
+          </style>
+          <Heading level="h3">
+            {I18n.t(`Hello%{name}!`, {
+              name:
+                window.ENV.current_user && window.ENV.current_user.display_name
+                  ? ` ${window.ENV.current_user.display_name}`
+                  : ''
+            })}
+          </Heading>
+          <p>{I18n.t("Here's some quick tips to get you started in Canvas!")}</p>
+          <ol>
+            <li>{I18n.t('How do I find my courses?')}</li>
+            <li>{I18n.t('How do I contact my instructor?')}</li>
+            <li>{I18n.t('How do I download the Student App?')}</li>
+          </ol>
+          <div className="tour-star-image" aria-hidden>
+            <img src={require('../confetti/svg/Star.svg')} alt="star" />
+          </div>
+        </section>
+      )
+    },
+    {
+      selector: '#global_nav_dashboard_link',
+      content: (
+        <section>
+          <Heading level="h3">{I18n.t('How do I find my courses?')}</Heading>
+          {I18n.t('Find your classes or subjects in the Dashboard...')}
+        </section>
+      )
+    },
+    {
+      selector: '.navigation-tray-container',
+      content: (
+        <section>
+          <Heading level="h3">{I18n.t('How do I find my courses?')}</Heading>
+          {I18n.t('...or in the Courses list.')}
+        </section>
+      ),
+      actionBefore: async () => {
+        await handleOpenTray('courses')
+      }
+    },
+    {
+      selector: '#global_nav_conversations_link',
+      content: (
+        <section>
+          <Heading level="h3">{I18n.t('How do I contact my instructor?')}</Heading>
+          {I18n.t('Start a conversation with your instructor in the Canvas Inbox.')}
+        </section>
+      )
+    },
+    {
+      selector: '.navigation-tray-container',
+      content: (
+        <section>
+          <Heading level="h3">
+            {I18n.t('How do I download the Student App and get additional help?')}
+          </Heading>
+          {I18n.t(
+            'Access your courses and groups using any iOS or Android mobile device and find more information in the Help menu.'
+          )}
+        </section>
+      ),
+      actionBefore: async () => {
+        await handleOpenTray('help')
+      }
+    }
   ]
 }
 
@@ -206,12 +284,24 @@ const softCloseSteps = [
   }
 ]
 
-const Tour = ({role}) => {
-  const steps = allSteps[role]
+const Tour = ({roles}) => {
+  const [currentRole, setCurrentRole] = React.useState(() => {
+    if (
+      window.ENV?.COURSE?.is_student &&
+      roles.includes('student') &&
+      !localStorage.getItem(`canvas-tourpoints-shown-student`)
+    ) {
+      // The current page is for a course that the user is a student is in.
+      // And they haven't seen the tour yet. Change roles to student.
+      return 'student'
+    }
+    return roles[0]
+  })
+  const steps = allSteps[currentRole]
 
   // TODO: Someday, it would be great if this were stored
   // in user data as a user setting.
-  const [hasOpened, setHasOpened] = useLocalStorage(`canvas-tourpoints-shown-${role}`, false)
+  const [hasOpened, setHasOpened] = useLocalStorage(`canvas-tourpoints-shown-${currentRole}`, false)
   const [open, setOpen] = React.useState(!hasOpened)
   const [reopened, setReopened] = React.useState(false)
   const [softClose, setSoftClose] = React.useState(false)
@@ -282,9 +372,11 @@ const Tour = ({role}) => {
   }
 
   React.useEffect(() => {
-    blockApplicationScreenReader()
+    if (open) {
+      blockApplicationScreenReader()
+    }
     return () => restoreTrayScreenReader()
-  }, [])
+  }, [open])
 
   React.useEffect(() => {
     const unsub = tourPubSub.subscribe('tour-open', () => {
@@ -293,15 +385,22 @@ const Tour = ({role}) => {
       setOpen(true)
       setReopened(true)
       setSoftClose(true)
+
+      // If we are on a course the user is a student in, show the student tour
+      if (window.ENV?.COURSE?.is_student && roles.includes('student')) {
+        setCurrentRole('student')
+      } else if (roles.includes('teacher')) {
+        setCurrentRole('teacher')
+      }
     })
     return () => unsub()
-  }, [])
+  }, [roles])
 
-  if (!role || !steps) return null
+  if (!currentRole || !steps) return null
 
   return (
     <Reactour
-      key={`${softClose}-${open}`}
+      key={`${softClose}-${open}-${currentRole}`}
       CustomHelper={props => (
         <TourContainer
           softClose={handleSoftClose}

@@ -24,22 +24,24 @@ const Tour = React.lazy(() => import('../nav_tourpoints/tour'))
 
 ready(() => {
   const current_roles = window.ENV.current_user_roles || []
-  let role = null
+  const roles = []
 
   // Decide which tour to show based on the role
   if (current_roles.includes('teacher')) {
-    role = 'teacher'
+    roles.push('teacher')
   }
-
+  if (current_roles.includes('student')) {
+    roles.push('student')
+  }
   const globalNavTourContainer = document.getElementById('global_nav_tour')
 
   // If the user doesn't have a role with a tour
   // don't even mount it. This saves us from having
   // to download the code-split bundle.
-  if (globalNavTourContainer && role) {
+  if (globalNavTourContainer && roles.length > 0) {
     ReactDOM.render(
       <React.Suspense fallback={null}>
-        <Tour role={role} />
+        <Tour roles={roles} />
       </React.Suspense>,
       globalNavTourContainer
     )
