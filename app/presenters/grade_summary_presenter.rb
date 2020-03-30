@@ -142,7 +142,7 @@ class GradeSummaryPresenter
   end
 
   def assignments_visible_to_student
-    includes = [:assignment_overrides]
+    includes = [:assignment_overrides, :post_policy]
     includes << :assignment_group if @assignment_order == :assignment_group
     AssignmentGroup.
       visible_assignments(student, @context, all_groups, includes).
@@ -185,9 +185,12 @@ class GradeSummaryPresenter
   def submissions
     @submissions ||= begin
       ss = @context.submissions
-      .preload(:visible_submission_comments,
-                {:rubric_assessments => [:rubric, :rubric_association]},
-                :content_participations)
+      .preload(
+        :visible_submission_comments,
+        {:rubric_assessments => [:rubric, :rubric_association]},
+        :content_participations,
+        {:assignment => [:context, :post_policy]}
+      )
       .where("assignments.workflow_state != 'deleted'")
       .where(user_id: student).to_a
 
