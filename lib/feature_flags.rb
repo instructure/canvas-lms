@@ -94,6 +94,7 @@ module FeatureFlags
   # starting with site admin
   def feature_flag_account_ids
     return [Account.site_admin.global_id] if is_a?(User)
+    return [] if self.is_a?(Account) && self.site_admin?
 
     RequestCache.cache('feature_flag_account_ids', self) do
       shard.activate do
