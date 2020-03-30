@@ -131,18 +131,37 @@ class GradeCalculator
     # done after calculate_hidden_scores -- so changes in that inner call are also captured. But
     # it must be done before calculate_course_score so if @update_course_score is true (we are
     # scoring a grading period, not a course) we don't trigger an additional alert/live event here.
-    create_course_grade_alerts_and_live_events(scores_prior_to_compute)
+    if performance_improvements_enabled?
+      create_course_grade_alerts_and_live_events(scores_prior_to_compute)
+    else
+      old_create_course_grade_alerts_and_live_events(scores_prior_to_compute)
+    end
 
     calculate_course_score if @update_course_score
   end
 
   private
 
+  # TODO: delete this method once grade_calculator_performance_improvements is enabled everywhere
+  def performance_improvements_enabled?
+    return @performance_improvements_enabled if defined?(@performance_improvements_enabled)
+
+    @performance_improvements_enabled = Account.site_admin.feature_enabled?(:grade_calculator_performance_improvements)
+  end
+
   def effective_due_dates
     @effective_due_dates ||= EffectiveDueDates.for_course(@course, @assignments).filter_students_to(@user_ids)
   end
 
-  def create_course_grade_alerts_and_live_events(scores)
+  def observer_ids
+    @observer_ids ||= ObserverEnrollment.where.not(workflow_state: [:rejected, :deleted]).
+      where(course: @course).
+      pluck(:user_id).
+      uniq
+  end
+
+  # TODO: delete this method once grade_calculator_performance_improvements is enabled everywhere
+  def old_create_course_grade_alerts_and_live_events(scores)
     @course.shard.activate do
       ActiveRecord::Associations::Preloader.new.preload(scores, :enrollment)
       # Make only one alert per user even if they have multiple enrollments (sections in same course)
@@ -151,7 +170,36 @@ class GradeCalculator
       scores.each do |score|
         # Note: only the old score has enrollment pre-loaded
         create_course_grade_live_event(score, reloaded_scores[score.id]) if @emit_live_event
-        create_course_grade_alert(score, reloaded_scores[score.id])
+        old_create_course_grade_alert(score, reloaded_scores[score.id])
+      end
+    end
+  end
+
+  def create_course_grade_alerts_and_live_events(scores)
+    @course.shard.activate do
+      ActiveRecord::Associations::Preloader.new.preload(scores, :enrollment)
+      # Make only one alert per user even if they have multiple enrollments (sections in same course)
+      scores = scores.uniq{|s| s.enrollment.user_id}
+
+      scores.each_slice(100) do |scores_batch|
+        scores_info = scores_batch.each_with_object({ student_ids: [], ids: [] }) do |score, memo|
+          memo[:student_ids] << score.enrollment.user_id
+          memo[:ids] << score.id
+        end
+
+        preloaded_thresholds = ObserverAlertThreshold.active.
+          where(user_id: scores_info[:student_ids], alert_type: ['course_grade_high', 'course_grade_low']).
+          group_by(&:user_id)
+
+        reloaded_scores = Score.where(id: scores_info[:ids]).index_by(&:id)
+        scores_batch.each do |score|
+          reloaded_score = reloaded_scores[score.id]
+          # Note: only the old score has enrollment pre-loaded
+          create_course_grade_live_event(score, reloaded_score) if @emit_live_event
+
+          thresholds = preloaded_thresholds.fetch(score.enrollment.user_id, [])
+          create_course_grade_alert(score, reloaded_score, thresholds)
+        end
       end
     end
   end
@@ -164,7 +212,8 @@ class GradeCalculator
     Canvas::LiveEvents.course_grade_change(score, old_score_values, old_score.enrollment)
   end
 
-  def create_course_grade_alert(old_score, score)
+  # TODO: delete this method once grade_calculator_performance_improvements is enabled everywhere
+  def old_create_course_grade_alert(old_score, score)
     # Use preloaded enrollment in old_score
     thresholds = ObserverAlertThreshold.active.where(student: old_score.enrollment.user_id, alert_type: ['course_grade_high', 'course_grade_low'])
 
@@ -173,6 +222,21 @@ class GradeCalculator
       next unless threshold.observer.enrollments.where(course_id: @course.id).first.present?
 
       ObserverAlert.create(observer: threshold.observer, student: threshold.student,
+        observer_alert_threshold: threshold,
+        context: @course, action_date: score.updated_at, alert_type: threshold.alert_type,
+        title: I18n.t("Course grade: %{grade}% in %{course_code}", {
+          grade: score.current_score,
+          course_code: @course.course_code
+        }))
+    end
+  end
+
+  def create_course_grade_alert(old_score, score, thresholds)
+    thresholds.each do |threshold|
+      next unless threshold.did_pass_threshold(old_score.current_score, score.current_score)
+      next unless observer_ids.include?(threshold.observer_id)
+
+      ObserverAlert.create(observer_id: threshold.observer_id, user_id: threshold.user_id,
         observer_alert_threshold: threshold,
         context: @course, action_date: score.updated_at, alert_type: threshold.alert_type,
         title: I18n.t("Course grade: %{grade}% in %{course_code}", {
