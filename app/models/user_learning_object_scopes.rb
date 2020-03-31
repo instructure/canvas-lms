@@ -279,7 +279,7 @@ module UserLearningObjectScopes
 
   # opts forwaded to course_ids_for_todo_lists
   def submissions_needing_grading_count(**opts)
-    if ::Canvas::DynamicSettings.find(tree: :private)["disable_needs_grading_queries"]
+    if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
       return 0
     end
     course_ids = course_ids_for_todo_lists(:manage_grades, **opts)
@@ -314,7 +314,7 @@ module UserLearningObjectScopes
     scope_only: false,
     **opts # arguments that are just forwarded to objects_needing
   )
-    if ::Canvas::DynamicSettings.find(tree: :private)["disable_needs_grading_queries"]
+    if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
       return scope_only ? Assignment.none : []
     end
     params = _params_hash(binding)
