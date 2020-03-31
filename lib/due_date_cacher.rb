@@ -267,12 +267,12 @@ class DueDateCacher
                     (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)
                   );
           INSERT INTO #{Submission.quoted_table_name}
-            (assignment_id, user_id, workflow_state, created_at, updated_at, context_code,
+            (assignment_id, user_id, workflow_state, created_at, updated_at, context_code, course_id,
             cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti)
             SELECT
               assignments.id, vals.student_id, 'unsubmitted',
               now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',
-              assignments.context_code, vals.due_date::timestamptz, vals.grading_period_id::integer,
+              assignments.context_code, assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,
               vals.anonymous_id,
               vals.cached_quiz_lti
             FROM (VALUES #{batch_values.join(',')})
