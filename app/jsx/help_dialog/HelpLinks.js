@@ -24,6 +24,7 @@ import {List, Spinner, Text, Pill} from '@instructure/ui-elements'
 import FeaturedHelpLink from './FeaturedHelpLink'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import tourPubSub from '../nav_tourpoints/tourPubsub'
 
 export default function HelpLinks({links, hasLoaded, onClick}) {
@@ -69,6 +70,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                     >
                       {link.text}
                     </Link>
+                    {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
                     {link.subtext && (
                       <Text as="div" size="small">
                         {link.subtext}
@@ -76,7 +78,11 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                     )}
                   </Flex.Item>
                   <Flex.Item>
-                    {has_new_tag && <Pill variant="success" text={I18n.t('NEW')} />}
+                    {has_new_tag && (
+                      <PresentationContent>
+                        <Pill variant="success" text={I18n.t('NEW')} />
+                      </PresentationContent>
+                    )}
                   </Flex.Item>
                 </Flex>
               </List.Item>
