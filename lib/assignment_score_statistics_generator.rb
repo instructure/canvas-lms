@@ -37,8 +37,6 @@ class AssignmentScoreStatisticsGenerator
   end
 
   def self.update_score_statistics(course_id)
-    course = Course.find(course_id)
-
     # performance note: There is an overlap between
     # Submission.not_placeholder and the submission where clause.
     #
@@ -46,15 +44,38 @@ class AssignmentScoreStatisticsGenerator
     # by assignment_student_visibilities, if a stat is added that doesn't
     # require score then add a filter when the DA feature is on
     statistics = Shackles.activate(:slave) do
-      course.assignments.published.preload(score_statistic: :assignment).
-        joins(:submissions).
-        joins("INNER JOIN #{Enrollment.quoted_table_name} enrollments ON submissions.user_id = enrollments.user_id").
-        merge(course.all_enrollments.of_student_type.active_or_pending).
-        merge(Submission.not_placeholder.where("submissions.excused IS NOT TRUE")).
-        where.not(submissions: { score: nil }).
-        where(submissions: { workflow_state: 'graded' }).
-        group("assignments.id").
-        select("assignments.id, max(score) max, min(score) min, avg(score) avg, count(submissions.id) count").to_a
+      connection = ScoreStatistic.connection
+      connection.select_all(<<-SQL)
+      WITH want_assignments AS (
+        SELECT a.id, a.created_at
+        FROM #{Assignment.quoted_table_name} a
+        WHERE a.context_id = #{course_id} AND a.context_type = 'Course' AND a.workflow_state = 'published'
+      ), interesting_submissions AS (
+        SELECT s.assignment_id, s.user_id, s.score, a.created_at
+        FROM #{Submission.quoted_table_name} s
+        JOIN want_assignments a ON s.assignment_id = a.id
+        WHERE
+          s.excused IS NOT true
+          AND s.score IS NOT NULL
+          AND s.workflow_state = 'graded'
+      ), want_users AS (
+        SELECT e.user_id
+        FROM #{Enrollment.quoted_table_name} e
+        WHERE e.type = 'StudentEnrollment' AND e.course_id = #{course_id} AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')
+      )
+      SELECT
+        s.assignment_id AS id,
+        MAX(s.score) AS max,
+        MIN(s.score) AS min,
+        AVG(s.score) AS avg,
+        COUNT(*) AS count
+      FROM
+        interesting_submissions s
+      WHERE
+        s.user_id IN (SELECT user_id FROM want_users)
+      GROUP BY s.assignment_id
+      ORDER BY MIN(s.created_at)
+SQL
     end
 
     connection = ScoreStatistic.connection
@@ -62,11 +83,11 @@ class AssignmentScoreStatisticsGenerator
     bulk_values = statistics.map do |assignment|
       values =
         [
-          connection.quote(assignment.id),
-          connection.quote(assignment.max),
-          connection.quote(assignment.min),
-          connection.quote(assignment.avg),
-          connection.quote(assignment.count),
+          assignment['id'],
+          assignment['max'],
+          assignment['min'],
+          assignment['avg'],
+          assignment['count'],
           now,
           now
         ].join(',')
