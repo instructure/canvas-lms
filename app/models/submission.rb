@@ -1333,6 +1333,7 @@ class Submission < ActiveRecord::Base
   def infer_values
     if assignment
       self.context_code = assignment.context_code
+      self.course_id = assignment.context_id
     end
 
     self.seconds_late_override = nil unless late_policy_status == 'late'

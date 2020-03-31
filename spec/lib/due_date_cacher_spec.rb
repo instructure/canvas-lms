@@ -985,6 +985,11 @@ describe DueDateCacher do
         expect(submission).to be_cached_quiz_lti
       end
     end
+
+    it "should add course_id" do
+      cacher.recompute
+      expect(submission.course_id).to eq @course.id
+    end
   end
 
   describe "AnonymousOrModerationEvent logging" do
