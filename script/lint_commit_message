@@ -96,6 +96,8 @@ starts_with_spec = subject =~ /\Aspec: /i
 exit if starts_with_spec # we're trusting you here, don't be evil
 
 commit_files = git("show --pretty=format:"" --name-only").split("\n")
+puts "detected file changes"
+puts commit_files
 only_affects_specs = commit_files.all? { |f| f =~ %r{\Aspec/} }
 if only_affects_specs
   comment "warn", 1, "since your commit only affects specs, please prefix your commit message with \"spec: \""

@@ -30,7 +30,10 @@ class Account::HelpLinks
         :subtext => -> { I18n.t('#help_dialog.instructor_question_sub', 'Questions are submitted to your instructor') },
         :url => '#teacher_feedback',
         :type => 'default',
-        :id => :instructor_question
+        :id => :instructor_question,
+        :is_featured => false,
+        :is_new => false,
+        :feature_headline => -> { '' }
       }.freeze,
       {
         :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
@@ -38,15 +41,21 @@ class Account::HelpLinks
         :subtext => -> { I18n.t('#help_dialog.canvas_help_sub', 'Find answers to common questions') },
         :url => Setting.get('help_dialog_canvas_guide_url', 'http://community.canvaslms.com/community/answers/guides'),
         :type => 'default',
-        :id => :search_the_canvas_guides
-      }.freeze,
+        :id => :search_the_canvas_guides,
+        :is_featured => true,
+        :is_new => false,
+        :feature_headline => -> { I18n.t('Little lost? Try here first!') }
+        }.freeze,
       {
         :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
         :text => -> { I18n.t('#help_dialog.report_problem', 'Report a Problem') },
         :subtext => -> { I18n.t('#help_dialog.report_problem_sub', 'If Canvas misbehaves, tell us about it') },
         :url => '#create_ticket',
         :type => 'default',
-        :id => :report_a_problem
+        :id => :report_a_problem,
+        :is_featured => false,
+        :is_new => false,
+        :feature_headline => -> { '' }
       }.freeze
     ]
   end
@@ -56,15 +65,19 @@ class Account::HelpLinks
   end
 
   def instantiate_links(links)
-    links.map do |link|
+    instantiated = links.map do |link|
       link = link.dup
       link[:text] = link[:text].call if link[:text].respond_to?(:call)
       link[:subtext] = link[:subtext].call if link[:subtext].respond_to?(:call)
+      link[:feature_headline] = link[:feature_headline].call if link[:feature_headline].respond_to?(:call)
+      link = link.except(:is_featured, :is_new, :feature_headline) unless Account.site_admin.feature_enabled?(:featured_help_links)
       link
     end
+    featured, not_featured = instantiated.partition {|link| link[:is_featured]}
+    featured + not_featured
   end
 
-  # take an array of links, and infer the default text, subtext, and url for links that don't customize these
+  # take an array of links, and infer default values for links that aren't customized
   # (text is only stored in account settings if it's customized)
   def map_default_links(links)
     links.map do |link|
@@ -74,23 +87,47 @@ class Account::HelpLinks
         link[:text] ||= default_link[:text]
         link[:subtext] ||= default_link[:subtext]
         link[:url] ||= default_link[:url]
+        link[:is_featured] = default_link[:is_featured] unless link.key?(:is_featured)
+        link[:is_new] = default_link[:is_new] unless link.key?(:is_new)
+        link[:feature_headline] ||= default_link[:feature_headline]
       end
       link
     end
   end
 
-  # complementing the above method: for each link, remove the text, subtext, and/or url
+  # complementing the above method: for each link, remove the values
   # if these match the defaults from the code. this way, other users will see localized text
+  # also enforces limits on featured and new links
   def process_links_before_save(links)
+    links = links.dup
+    links.each do |link|
+      link[:is_featured] = Canvas::Plugin.value_to_boolean(link[:is_featured])
+      link[:is_new] = Canvas::Plugin.value_to_boolean(link[:is_new])
+    end
+
     links.map do |link|
       default_link = link[:type] == 'default' && default_links_hash[link[:id]&.to_sym]
       if default_link
-        link = link.dup
         link.delete(:text) if link[:text] == default_link[:text].call
         link.delete(:subtext) if link[:subtext] == default_link[:subtext].call
         link.delete(:url) if link[:url] == default_link[:url]
+        link.delete(:is_featured) if link[:is_featured] == default_link[:is_featured]
+        link.delete(:is_new) if link[:is_new] == default_link[:is_new]
+        link.delete(:feature_headline) if link[:feature_headline] == default_link[:feature_headline].try(:call)
       end
       link
     end
+  end
+
+  def self.validate_links(links)
+    errors = []
+    if links.count {|link| link[:is_featured]} > 1
+      errors << 'at most one featured link is permitted'
+    elsif links.count {|link| link[:is_new]} > 1
+      errors << 'at most one new link is permitted'
+    elsif links.any? {|link| link[:is_new] && link[:is_featured]}
+      errors << 'a link cannot be featured and new'
+    end
+    errors
   end
 end

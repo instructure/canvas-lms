@@ -138,6 +138,7 @@ class Account < ActiveRecord::Base
   validates :workflow_state, presence: true
   validate :no_active_courses, if: lambda { |a| a.workflow_state_changed? && !a.active? }
   validate :no_active_sub_accounts, if: lambda { |a| a.workflow_state_changed? && !a.active? }
+  validate :validate_help_links, if: lambda { |a| a.settings_changed? }
 
   include StickySisFields
   are_sis_sticky :name, :parent_account_id
@@ -1224,6 +1225,15 @@ class Account < ActiveRecord::Base
       self.auth_discovery_url = value
     rescue URI::Error, ArgumentError
       errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))
+    end
+  end
+
+  def validate_help_links
+    links = self.settings[:custom_help_links]
+    return if links.blank?
+    link_errors = HelpLinks.validate_links(links)
+    link_errors.each do |link_error|
+      errors.add(:custom_help_links, link_error)
     end
   end
 

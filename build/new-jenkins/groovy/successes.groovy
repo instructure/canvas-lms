@@ -24,16 +24,40 @@ def successFile() {
   return "_buildmeta/${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}-successes"
 }
 
-def hasSuccess(name) {
-  copyArtifacts(
-    filter: '_buildmeta/*',
-    optional: true,
-    projectName: env.JOB_NAME,
-    parameters: "GERRIT_CHANGE_NUMBER=${env.GERRIT_CHANGE_NUMBER},GERRIT_PATCHSET_NUMBER=${GERRIT_PATCHSET_NUMBER}",
-    selector: lastCompleted()
-  )
-  archiveArtifacts(artifacts: '_buildmeta/*', allowEmptyArchive: true)
-  return fileExists(successFile()) && readFile(successFile()).contains("|$name|")
+def hasSuccess(name, required_count = 1) {
+  if (!fileExists(successFile())) {
+    copyArtifacts(
+      filter: '_buildmeta/*',
+      optional: true,
+      projectName: env.JOB_NAME,
+      parameters: "GERRIT_CHANGE_NUMBER=${env.GERRIT_CHANGE_NUMBER},GERRIT_PATCHSET_NUMBER=${GERRIT_PATCHSET_NUMBER}",
+      selector: lastCompleted()
+    )
+    archiveArtifacts(artifacts: '_buildmeta/*', allowEmptyArchive: true)
+  }
+  def result = false
+  if (fileExists(successFile())) {
+    // read the file and split for lines
+    def lines = readFile(successFile()).split('\n')
+    // count how many times the success has been marked
+    def count = lines.count { it == "|$name|" }
+    // check if the required amount of successes have happened
+    result = required_count <= count
+  }
+  return result
+}
+
+def clearSuccesses(name) {
+  if (hasSuccess(name)) {
+    // read all the lines from the success file
+    def lines = readFile(successFile()).split('\n')
+    // filter all of the successes we dont want
+    def keeping = lines.findAll { it != "|$name|" }
+    // save the new success file
+    sh "rm ${successFile()}"
+    sh "echo '${keeping.join('\n')}' >> ${successFile()}"
+    archiveArtifacts(artifacts: '_buildmeta/*')
+  }
 }
 
 def saveSuccess(name) {

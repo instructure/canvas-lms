@@ -81,7 +81,7 @@ describe "login logout test" do
     f('#pseudonym_session_unique_id_forgot').send_keys(@user.primary_pseudonym.unique_id)
     submit_form('#forgot_password_form')
     wait_for_ajaximations
-    assert_flash_notice_message "Password confirmation sent to #{@user.primary_pseudonym.unique_id}"
+    assert_flash_notice_message "Your password recovery instructions will be sent to #{@user.primary_pseudonym.unique_id}"
   end
 
   it "should validate back button works in forgot password page", priority: "2" do

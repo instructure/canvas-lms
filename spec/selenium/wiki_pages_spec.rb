@@ -348,8 +348,7 @@ describe "Wiki Pages" do
         </p>
       )
       element.send_keys(html_contents)
-      f(".btn-primary").click
-      wait_for_ajaximations
+      wait_for_new_page_load { f(".btn-primary").click }
       expect(f("iframe")).to be_present
     end
   end

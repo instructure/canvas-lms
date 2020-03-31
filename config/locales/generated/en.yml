@@ -719,6 +719,8 @@ en:
   this_allows_the_user_to_unfavorite_a_course_direct_828d0587: This allows the user to unfavorite a course directly from its dashboard card.
   import_commons_favorites_e68fce81: Import Commons Favorites
   if_commons_is_installed_allows_importing_favorited_eff368f: If Commons is installed, allows importing favorited content items from within Canvas.
+  featured_help_links_d805fe44: Featured Help Links
+  allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu.
   quiz_log_auditing_desc: |-
     Enable the tracking of events for a quiz submission, and the ability
           to view a log of those events once a submission is made.
@@ -754,10 +756,12 @@ en:
   allows_the_user_to_navigate_away_while_submission__276d73b7: Allows the user to navigate away while submission re-uploads are processing
   include_speedgrader_in_assignment_header_menu_69cd8656: Include SpeedGrader in Assignment Header Menu
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: Includes a link to SpeedGrader in the assignment header menu in Gradebook.
-  prefetch_user_ids_in_gradebook_b96521b0: Prefetch User IDs in Gradebook
-  load_user_ids_upon_page_load_so_that_gradebook_loa_c51693aa: Load user ids upon page load so that Gradebook loads more quickly.
   qr_for_mobile_login_1b1560ce: QR for Mobile Login
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: Include a link to show a QR code to easy mobile login on the profile page.
+  product_tours_1e19eb95: Product Tours
+  in_product_training_walkthrough_and_tourpoints_for_2e185119: In-product training walkthrough and tourpoints for teachers
+  march_2020_responsiveness_f810a65b: March 2020 Responsiveness
+  collection_of_responsive_improvements_throughout_c_dedfe6dc: Collection of responsive improvements throughout Canvas
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   pronouns_for_users_da46fb5: Pronouns for users
@@ -797,6 +801,8 @@ en:
   use_the_new_assignments_teacher_page_8add7e46: Use the new assignments teacher page
   assignment_allowed_attempts_7e3d43ee: Assignment Allowed Attempts
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: Allow a teacher to set the number of allowed attempts on an assignment via the UI
+  assignment_bulk_editing_37248ca4: Assignment Bulk Editing
+  allow_teachers_to_change_the_dates_on_a_set_of_ass_4d48baec: Allow teachers to change the dates on a set of assignments in one step
   bookmarking_for_enrollments_index_api_840be156: Bookmarking for Enrollments Index API
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: Use bookmarking for API pagination in Enrollments Index
   syllabus_course_summary_option_951a8144: Syllabus Course Summary Option
@@ -5288,7 +5294,6 @@ en:
         update_password: Update Password
     login:
       parent_signup: Parent Signup
-      password_confirmation_sent: Password confirmation sent to %{email_address}. Make sure you check your spam box.
       invalid_login: Invalid login
       invalid_password: Invalid password
   the_link_you_used_has_expired_click_forgot_passwor_80569899: The link you used has expired. Click "Forgot Password?" to get a new reset-password link.
@@ -6892,6 +6897,7 @@ en:
     your_email_address: Your email address
     Submitting_Ticket: Submitting Ticket...
     submit_this_support_request: Submit Ticket
+  little_lost_try_here_first_9e24e575: Little lost? Try here first!
   account_notification:
     errors:
       invalid_account_notification_end_at: Account notification end time precedes start time
@@ -10962,7 +10968,7 @@ en:
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: Cannot change the due date to a date within a closed grading period
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: Cannot set override due date to a date within a closed grading period
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: Cannot change the due date of an override in a closed grading period
-  cannot_change_an_override_due_date_to_a_date_withi_8b1be496: Cannot change an override due date                                              to a date within a closed grading period
+  cannot_change_an_override_due_date_to_a_date_withi_8b1be496: Cannot change an override due date to a date within a closed grading period
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: Cannot delete an override with a due date within a closed grading period
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: Cannot set only visible to overrides when due in a closed grading period
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: Can create and view assignment data in the gradebook associated with the tool.
@@ -11841,8 +11847,6 @@ en:
   keyboard_shortcuts_ed1844bd: Keyboard Shortcuts
   search_23a88d5c: Search…
   gradebook_individual_view_8846598e: 'Gradebook: Individual View'
-  learning_mastery_context_name_a0b70957: Learning Mastery - %{context_name}
-  learning_mastery_5fc34276: Learning Mastery
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Submissions Uploaded"
   back_to_assignment_1df86a69: Back to Assignment
   no_submissions_have_been_uploaded_2fb02710: No Submissions Have Been Uploaded
@@ -13248,6 +13252,7 @@ en:
       link_to_student: Link to Student
     buttons:
       link: Link to Student
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: Your password recovery instructions will be sent to *%{email_address}*. This may take up to 30 minutes. Make sure to check your spam box.
   manage_avatars:
     prompts:
       delete_avatar: Are you sure you want to delete this user's profile pic?
@@ -15252,6 +15257,7 @@ en:
   disable_sync_to_name_10c371dc: Disable Sync to %{name}
   assignments_settings_30613d0c: Assignments Settings
   assignment_options_1e5b7074: Assignment Options
+  bulk_edit_bc023ac5: Bulk Edit
   assignment_groups_weight_2f1a5a7c: Assignment Groups Weight
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: Moderated grading cannot be enabled for group assignments
   moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: Moderated grading cannot be enabled for peer reviewed assignments
@@ -15967,6 +15973,8 @@ en:
   complete_registration_by_clicking_the_finish_the_r_fcd13ac8: Complete registration by clicking the “finish the registration process” link sent to your email.
   an_error_ocurred_while_publishing_course_3760cf04: An error ocurred while publishing course
   choose_home_page_80cef4ee: Choose Home Page
+  featured_83f6041d: Featured
+  new_13daf639: New
   move_text_up_91fb4241: Move %{text} up
   move_text_down_7176acd4: Move %{text} down
   edit_text_27d8aa3d: Edit %{text}
@@ -15981,6 +15989,8 @@ en:
   link_url_a213671c: Link URL
   e_g_http_university_edu_helpdesk_acab04d6: e.g., http://university.edu/helpdesk
   available_to_b7350e02: Available to
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(May have one Featured link and one New link at a time)"
+  feature_headline_3f0daf4: Feature headline
   add_link_fc336ed6: Add link
   update_link_b7cab181: Update link
   icon_215a1dc6: Icon
@@ -15993,6 +16003,7 @@ en:
   link_7262adec: Link
   add_help_menu_links_de9fc34f: Add help menu links
   add_custom_link_22059c0: Add Custom Link
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: The featured link was moved to the top of list.
   please_enter_a_name_for_this_link_318f01a4: Please enter a name for this link.
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: Please enter a valid URL. Protocol is required (e.g. http://, https://, ftp://, tel:, mailto:).
   please_select_a_user_role_for_this_link_9fb4e655: Please select a user role for this link.
@@ -16611,6 +16622,7 @@ en:
   individual_view_d60b9132: Individual View…
   gradebook_history_b03f8524: Gradebook History…
   learning_mastery_6ed4fd63: Learning Mastery…
+  learning_mastery_5fc34276: Learning Mastery
   an_error_occurred_while_saving_your_settings_b503a31c: An error occurred while saving your settings
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: An error occurred while saving the course post policy
   gradebook_settings_updated_fef63d60: Gradebook Settings updated
@@ -16898,6 +16910,10 @@ en:
   extreme_critical_emergency_80b3dbda: EXTREME CRITICAL EMERGENCY!
   your_email_address_f881e583: Your email address
   submit_ticket_5515ffd: Submit Ticket
+  cheerful_panda_holding_a_map_17ba47ee: Cheerful panda holding a map
+  other_resources_fee3ddda: OTHER RESOURCES
+  new_bd30f253: NEW
+  show_welcome_tour_a105aa2e: Show Welcome Tour
   customize_this_menu_efa72a9: Customize this menu
   message_sent_f4cba0c: Message sent.
   loading_courses_bd1bffe: Loading courses...
@@ -16930,6 +16946,23 @@ en:
   before_cb32fc0: Before..
   after_48b9d69: After..
   at_the_bottom_a6a5f0fe: At the Bottom
+  current_of_totalsteps_19d7ee37: "%{current} of %{totalSteps}"
+  not_now_afa29fa7: Not Now
+  start_tour_29787099: Start Tour
+  hello_name_cabdd4ce: Hello%{name}!
+  we_know_getting_your_courses_online_quickly_during_40424e8: 'We know getting your courses online quickly during this time is priority. This quick tour will show you how to:'
+  set_up_your_notifications_9c005279: Set up your Notifications
+  get_your_content_online_9546ecff: Get your Content online
+  access_canvas_resources_and_guides_c179db68: Access Canvas Resources and Guides
+  set_up_your_notifications_568ecf91: Set Up Your Notifications
+  click_on_the_account_navigation_button_to_access_n_fbe82181: Click on the account navigation button to access notification preferences.
+  don_t_miss_notifications_from_your_students_900e9e30: Don't miss notifications from your students.
+  get_your_content_online_quickly_41fd925b: Get Your Content Online Quickly
+  click_on_the_courses_navigation_button_to_access_y_138d4dfb: Click on the courses navigation button to access your courses.
+  set_up_your_canvas_course_in_30_minutes_or_less_94817b6d: Set up your Canvas course in 30 minutes or less.
+  visit_the_help_section_any_time_for_new_tips_and_g_4dcf2a28: Visit the Help section any time for new tips and guides.
+  come_back_later_5eab7dba: Come back later!
+  you_can_access_the_welcome_tour_here_any_time_as_w_95b44855: You can access the Welcome Tour here any time as well as other new resources.
   logout_a9312e35: Logout
   disabled_not_visible_to_students_2c9d693f: Disabled. Not visible to students.
   no_content_not_visible_to_students_905f8996: No content. Not visible to students.
@@ -16953,82 +16986,177 @@ en:
   count_unread_cff5855: "%{count} unread."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.
   user_profile_picture_46bffbc7: User profile picture
-  an_error_occurred_while_retrieving_your_qr_code_5392e2da: An error occurred while retrieving your QR Code
   waiting_for_your_qr_code_to_load_809299e5: Waiting for your QR Code to load
-  scan_this_qr_code_from_any_canvas_mobile_app_to_ac_b5700d38: Scan this QR code from any Canvas mobile app to access your Canvas account when you're on the go.
+  this_code_expires_in_timefromnow_ec7ccef4: This code expires in %{timeFromNow}.
+  this_code_has_expired_41f76642: This code has expired.
+  an_error_occurred_while_retrieving_your_qr_code_5392e2da: An error occurred while retrieving your QR Code
+  to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.
   end_course_set_up_tutorial_f358b85d: End Course Set-up Tutorial
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Options in your User Settings.
   expand_tutorial_tray_22630c49: Expand tutorial tray
   collapse_tutorial_tray_66ee7dc1: Collapse tutorial tray
-  share_important_updates_with_users_97ec11ad: Share important updates with users
-  share_important_information_with_all_users_in_your_bc49ee7f: |-
-    Share important information with all users in your course.
-              Choose to get a copy of your own announcements in Notifications.
-  create_content_for_your_course_500a7032: Create content for your course
-  create_assignments_on_the_assignments_page_organiz_90c78fdc: |-
-    Create assignments on the Assignments page. Organize assignments
-                    into groups like Homework, In-class Work, Essays, Discussions
-                    and Quizzes. Assignment groups can be weighted.
+  keep_students_informed_3f41a7e6: Keep students informed
+  see_more_in_canvas_guides_fc90a457: See more in Canvas Guides
+  what_are_announcements_52175539: What are announcements?
+  how_do_i_add_an_announcement_in_a_course_63396bb7: How do I add an announcement in a course?
+  how_do_i_edit_an_announcement_in_a_course_815c3c60: How do I edit an announcement in a course?
+  how_do_i_use_the_announcements_index_page_94a14011: How do I use the Announcements Index Page?
+  share_important_information_about_your_course_with_dceacbf9: |-
+    Share important information about your course with all users.
+          Use announcements to remind students of important dates and tasks,
+          point students to internal and external resources to help them achieve
+          course outcomes, celebrate student success, and highlight events of interest.
+          Announcements can include text, multimedia, and files.
+  reinforce_student_understanding_304d18a6: Reinforce student understanding
+  how_do_i_create_an_assignment_35532b59: How do I create an assignment?
+  how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: How do I publish or unpublish an assignment as an instructor?
+  what_assignment_types_can_i_create_in_a_course_1ed4eed4: What assignment types can I create in a course?
+  how_do_i_add_or_edit_details_in_an_assignment_fa779906: How do I add or edit details in an assignment?
+  assignments_include_quizzes_graded_discussions_and_182e5899: |-
+    Assignments include quizzes, graded discussions, and many types
+          of online submissions (files, images, text, URLs, and media). Assign
+          them to everyone in a course, or assign different due dates for specific
+          sections or users. Create assignment groups to organize your assignments
+          and to weight groups by percentage. Enable Peer Review so students can
+          review each other's work.
   work_and_create_together_c65f358b: Work and create together
-  provide_a_space_for_users_to_work_on_a_single_docu_9e4fc18c: |-
-    Provide a space for users to work on a single document
-              simultaneously, from within your Canvas course.
+  what_are_collaborations_27c20a98: What are collaborations?
+  how_do_i_use_the_collaborations_index_page_68ee88b5: How do I use the Collaborations Index Page?
+  how_do_i_create_a_google_drive_collaboration_as_an_28274cf7: How do I create a Google Drive collaboration as an instructor?
+  how_do_i_create_a_microsoft_office_365_collaborati_52e46698: How do I create a Microsoft Office 365 collaboration as an instructor?
+  canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
+    Canvas helps you leverage collaborative technology so multiple
+          users can work together on the same document at the same time. Create
+          collaborative documents that are saved in real time—a change made by
+          any user will be visible to everyone immediately.
   virtual_lectures_in_real_time_a1778dea: Virtual lectures in real-time
-  conduct_virtual_lectures_virtual_office_hours_and__cc05907b: |-
-    Conduct virtual lectures, virtual office hours, and student
-              groups. Broadcast real-time audio and video, share presentation
-              slides, give demonstrations of applications and online resources,
-              and more.
-  encourage_class_participation_4e069479: Encourage class participation
-  create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
-    Create as many discussion topics as needed, as assignments
-              for grading or as a forum for shared ideas and information.
-  images_documents_and_more_dccb362f: Images, Documents, and more
-  upload_course_files_syllabi_readings_or_other_docu_21f8725f: |-
-    Upload course files, syllabi, readings, or other documents.
-              Lock folders to keep them hidden from students. Add files to Modules,
-              Assignments, Discussions, or Pages.
-  track_individual_student_and_class_progress_c13cf2d1: Track individual student and class progress
-  input_and_distribute_grades_for_students_display_g_9a2e46a0: |-
-    Input and distribute grades for students. Display grades as
-              points, percentages, complete or incomplete, pass or fail, GPA scale,
-              and letter grades. Group assignments for grade weighting.
+  how_do_i_create_a_conference_in_a_course_69affbf4: How do I create a conference in a course?
+  how_do_i_start_a_conference_52792795: How do I start a conference?
+  how_do_i_conclude_a_conference_689d60dc: How do I conclude a conference?
+  how_do_i_record_a_conference_e4845e7: How do I record a conference?
+  conduct_lectures_office_hours_and_student_group_me_13ec766c: |-
+    Conduct lectures, office hours, and student group meetings all
+          from your computer. Broadcast real-time audio and video, share presentation
+          slides, give demonstrations of applications and online resources,
+          and more.
+  encourage_student_discourse_7836b9f7: Encourage student discourse
+  how_do_i_create_a_discussion_as_an_instructor_fa6c26d6: How do I create a discussion as an instructor?
+  how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: How do I publish or unpublish a discussion as an instructor?
+  how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: How do I reply to a discussion as an instructor?
+  how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: How do I view and sort discussion replies as an instructor?
+  discussions_allow_students_and_instructors_to_comm_ce03ca43: |-
+    Discussions allow students and instructors to communicate about
+          course topics at any time. Create discussions for a grade, or facilitiate
+          discussions for students to exchange ideas and solve problems. Threaded
+          discussions are perfect for keeping in-depth or long-term discussions
+          organized, while Focused discussions are best suited for short-lived exchanges.
+  store_and_share_course_assets_82a9967c: Store and share course assets
+  how_do_i_use_files_as_an_instructor_70a996b: How do I use Files as an instructor?
+  how_do_i_upload_a_file_to_a_course_e8332cfe: How do I upload a file to a course?
+  how_do_i_bulk_upload_files_to_a_course_b145d8cc: How do I bulk upload files to a course?
+  how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: How do I move and organize my files as an instructor?
+  upload_and_store_course_files_or_any_other_files_y_b00cb954: |-
+    Upload and store course files, or any other files you need to keep
+          on hand. When you save assets in Files, they're easy to insert directly into
+          modules, assignments, discussions, or pages! Distribute files to students
+          from your course folder, or lock files until you're ready for the class
+          to download them.
+  enter_and_distribute_grades_c1216df: Enter and distribute grades
+  how_do_i_use_the_gradebook_622395dc: How do I use the Gradebook?
+  how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: How do I enter and edit grades in the Gradebook?
+  how_do_i_post_grades_for_an_assignment_in_the_grad_bc01018e: How do I post grades for an assignment in the Gradebook?
+  how_do_i_view_assignments_or_students_individually_2b7211f8: How do I view assignments or students individually in the Gradebook?
+  how_do_i_use_speedgrader_e18e4ca2: How do I use SpeedGrader?
+  how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: How do I view the details of a submission for a student in SpeedGrader?
+  display_grades_as_points_percentages_complete_inco_fa848380: |-
+    Display grades as
+          points, percentages, complete/incomplete, or any other method that matches
+          your course grading scheme, and filter and arrange Gradebook entries
+          according to your preferences. Automatically apply a grade for missing or
+          late submissions, and easily hide grades until you're ready for students
+          to view them. For simplified grading, use SpeedGrader to view and grade submissions.
   home_351838cd: Home
-  this_is_your_course_landing_page_33d445ec: This is your course landing page
-  when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
-    When people visit your course, this is the first page they'll see.
-              We've set your homepage to Modules, but you have the option to change it.
-  you_can_publish_your_course_from_the_home_page_whe_a36d49d6: |-
-    You can publish your course from the home page whenever you’re ready
-              to share it with students. Until your course is published, only instructors will be able to access it.
-  bring_your_content_into_your_course_c0f3df7e: Bring your content into your course
-  bring_existing_content_from_another_course_or_cour_6e740692: |-
-    Bring existing content from another course or course
-              management system into your Canvas course.
-  organize_your_course_content_c3c7ed03: Organize your course content
-  organize_and_segment_your_course_by_topic_unit_cha_4c38a6b9: |-
-    Organize and segment your course by topic, unit, chapter,
-                      or week. Sequence select modules by defining criteria and
-                      prerequisites.
-  create_educational_resources_8219326e: Create educational resources
-  build_pages_containing_content_and_educational_res_6474319f: |-
-    Build Pages containing content and educational resources that
-                    help students learn but aren't assignments. Include text,
-                    multimedia, and links to files and external resources.
-  add_students_tas_and_observers_to_your_course_e84692dd: Add Students, TAs, and Observers to your course
-  manage_enrollment_status_create_groups_and_add_use_3c91de1b: Manage enrollment status, create groups, and add users from this page.
-  assess_and_survey_your_students_ce8172a9: Assess and survey your students
-  create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: Create and administer online quizzes and surveys, both graded and ungraded.
-  manage_your_course_details_664c335f: Manage your course details
-  update_and_view_sections_course_details_navigation_de248be8: |-
-    Update and view sections, course details, navigation, feature
-                    options and external app integrations, all visible only to Instructors.
-  an_auto_generated_chronological_summary_of_your_co_eeafee13: An auto-generated chronological summary of your course
-  communicate_to_your_students_exactly_what_will_be__7312d45d: |-
-    Communicate to your students exactly what will be required
-              of them throughout the course in chronological order. Generate a
-              built-in Syllabus based on Assignments and Events that you've created.
-  end_tutorial_7fb16b6f: End Tutorial
+  course_landing_page_49a53ade: Course landing page
+  how_do_i_use_the_course_home_page_as_an_instructor_af32848e: How do I use the Course Home Page as an instructor?
+  what_layout_options_are_available_in_the_course_ho_5d364ce3: What layout options are available in the Course Home Page as an instructor?
+  how_do_i_change_the_course_home_page_326cee50: How do I change the Course Home Page?
+  the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
+    The Course Home Page is the first page students see when they open
+          your course. The Home Page can display the course participation activity
+          stream, the Course Modules page, the Course Assignments list, Syllabus,
+          or a page you design as the front page.
+  bring_existing_content_into_your_course_c5fc7e1b: Bring existing content into your course
+  how_do_i_copy_a_canvas_course_into_a_new_course_sh_1633c6c1: How do I copy a Canvas course into a new course shell?
+  how_do_i_import_a_canvas_course_export_package_ed3aafd4: How do I import a Canvas course export package?
+  how_do_i_select_specific_content_as_part_of_a_cour_11fe2c8d: How do I select specific content as part of a course import?
+  how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: How do I adjust events and due dates in a course import?
+  easily_import_or_copy_content_from_another_canvas__c6312f32: |-
+    Easily import or copy content from another Canvas course into
+            your course, or import content from other formats, such as Moodle or QTI.
+  organize_course_content_11de8958: Organize course content
+  how_do_i_add_a_module_65f5bf13: How do I add a module?
+  how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: How do I publish or unpublish a module as an instructor?
+  how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: How do I add assignment types, pages, and files as module items?
+  how_do_i_move_or_reorder_a_module_e64a4baa: How do I move or reorder a module?
+  use_modules_to_organize_your_content_and_create_a__1da4149: |-
+    Use modules to organize your content and create a linear flow for
+          what students should do in the course. Modules can be used to organize
+          content by weeks, units, or a different organization structure.
+          Add files, discussions, assignments, quizzes, and other learning materials.
+          Require prerequisites to be completed before moving to a module or next
+          module item, or lock an entire module until a specific date.
+  create_interactive_course_content_76665336: Create interactive course content
+  how_do_i_create_a_new_page_in_a_course_37a87285: How do I create a new page in a course?
+  how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: How do I publish or unpublish a page as an instructor?
+  how_do_i_use_the_pages_index_page_dafb986c: How do I use the Pages Index Page?
+  how_do_i_set_a_front_page_in_a_course_a5f53cd5: How do I set a Front Page in a course?
+  pages_let_you_create_interactive_content_directly__9933eb32: |-
+    Pages let you create interactive content directly in Canvas,
+          whether it's a weekly update, a collaborative course wiki, or a
+          list of educational resources. Pages can include text, multimedia,
+          and links to files and other course content or pages. You can also
+          allow students to contribute to specific pages in the course.
+  know_your_users_5c1323be: Know your users
+  how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: How do I use the People page in a course as an instructor?
+  how_do_i_add_users_to_a_course_4a88efaf: How do I add users to a course?
+  how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: How do I view a context card for a student in a course?
+  how_do_i_view_user_details_for_an_enrollment_in_a__308e9ac0: How do I view user details for an enrollment in a course?
+  what_s_a_class_without_people_to_take_and_lead_it__4470b81a: |-
+    What's a class without people to take and lead it? The People page
+          shows the list of users in your course. Depending on your permissions,
+          you may be able to add students, teacher assistants, and observers to
+          your course. You can also create student groups to house group assignments,
+          discussions, and files.
+  assess_student_understanding_1e0b8d7f: Assess student understanding
+  how_do_i_use_the_quizzes_index_page_cc2e15d3: How do I use the Quizzes Index Page?
+  how_do_i_create_an_assessment_using_new_quizzes_801b0146: How do I create an assessment using New Quizzes?
+  how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: How do I manage settings for an assessment in New Quizzes?
+  how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: How do I create a quiz with individual questions?
+  what_options_can_i_set_in_a_quiz_53522d76: What options can I set in a quiz?
+  use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
+    Use quizzes to challenge student understanding and assess comprehension
+          of course material. The New Quizzes assessment engine allows you to create up to
+          13 types of question types and content. If New Quizzes isn't enabled for your institution,
+          Classic Quizzes are still available to help you achieve your objectives.
+  customize_course_details_26fd4afe: Customize course details
+  how_do_i_use_course_settings_1e8467e6: How do I use course settings?
+  how_do_i_set_details_for_a_course_52cfbeff: How do I set details for a course?
+  how_do_i_change_a_course_name_and_course_code_23b41292: How do I change a course name and course code?
+  how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: How do I add an image to a course card in the Dashboard?
+  make_your_course_your_own_upload_an_image_to_repre_ec57713e: |-
+    Make your course your own! Upload an image to represent your
+          course, allow students to manage course content areas, and hide grade
+          details from students. You may also be able to adjust the course name and code.
+  communicate_course_objectives_f457158c: Communicate course objectives
+  how_do_i_use_the_syllabus_as_an_instructor_82f00933: How do I use the Syllabus as an instructor?
+  how_do_i_edit_the_syllabus_description_in_a_course_57f25a87: How do I edit the Syllabus description in a course?
+  the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
+    The Syllabus lets you welcome your course users and share expectations
+          with your students. Use the Syllabus description to clarify course objectives,
+          preferred contact methods, and other details, or upload a PDF of an existing
+          Syllabus. The Syllabus page can also display all assignments and events
+          within the course.
+  don_t_show_again_8c7b7297: Don't Show Again
   modules_tutorial_tray_d58ac3cb: Modules Tutorial Tray
   pages_tutorial_tray_169464a9: Pages Tutorial Tray
   syllabus_tutorial_tray_97e8ef82: Syllabus Tutorial Tray

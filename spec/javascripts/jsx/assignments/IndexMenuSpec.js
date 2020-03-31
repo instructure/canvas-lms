@@ -79,6 +79,32 @@ testCase('renders a dropdown menu trigger and options list', () => {
   ReactDOM.unmountComponentAtNode(component.node.parentElement)
 })
 
+testCase('renders a bulk edit option if property is specified', () => {
+  const requestBulkEditFn = sinon.stub()
+  const component = renderComponent(generateProps({requestBulkEdit: requestBulkEditFn}))
+
+  const menuitem = TestUtils.scryRenderedDOMComponentsWithClass(
+    component,
+    'requestBulkEditMenuItem'
+  )
+  equal(menuitem.length, 1)
+  TestUtils.Simulate.click(menuitem[0])
+  ok(requestBulkEditFn.called)
+  component.closeModal()
+  ReactDOM.unmountComponentAtNode(component.node.parentElement)
+})
+
+testCase('does not render a bulk edit option if property is not specified', () => {
+  const component = renderComponent(generateProps())
+  const menuitem = TestUtils.scryRenderedDOMComponentsWithClass(
+    component,
+    'requestBulkEditMenuItem'
+  )
+  equal(menuitem.length, 0)
+  component.closeModal()
+  ReactDOM.unmountComponentAtNode(component.node.parentElement)
+})
+
 testCase('renders a LTI tool modal', () => {
   const component = renderComponent(generateProps({}, {modalIsOpen: true}))
 

@@ -45,7 +45,7 @@ function ProfileTab({id, html_url, label, counts}) {
 
   return (
     <List.Item key={id}>
-      <View as="div" margin="small 0">
+      <View className={`profile-tab-${id}`} as="div" margin="small 0">
         <Link isWithinText={false} href={html_url}>
           {label}
           {renderCountBadge()}

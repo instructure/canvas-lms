@@ -623,6 +623,7 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::Submission
   include Api::V1::AssignmentOverride
   include Api::V1::Quiz
+  include Api::V1::Progress
 
   # @API List assignments
   # Returns the paginated list of assignments for the current course or assignment group.
@@ -1190,6 +1191,10 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[assignment_overrides][] [AssignmentOverride]
   #   List of overrides for the assignment.
+  #   If the +assignment[assignment_overrides]+ key is absent, any existing
+  #   overrides are kept as is. If the +assignment[assignment_overrides]+ key is
+  #   present, existing overrides are updated or deleted (and new ones created,
+  #   as necessary) to match the provided list.
   #
   # @argument assignment[only_visible_to_overrides] [Boolean]
   #   Whether this assignment is only visible to overrides
@@ -1203,11 +1208,6 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[grading_standard_id] [Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #   This will update the grading_type for the course to 'letter_grade' unless it is already 'gpa_scale'.
-  #
-  # If the assignment [assignment_overrides] key is absent, any existing
-  # overrides are kept as is. If the assignment [assignment_overrides] key is
-  # present, existing overrides are updated or deleted (and new ones created,
-  # as necessary) to match the provided list.
   #
   # @argument assignment[omit_from_final_grade] [Boolean]
   #   Whether this assignment is counted towards a student's final grade.
@@ -1258,6 +1258,63 @@ class AssignmentsApiController < ApplicationController
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
       render_create_or_update_result(result, opts)
     end
+  end
+
+  # @API Bulk update assignment dates
+  #
+  # Update due dates and availability dates for multiple assignments in a course.
+  #
+  # Accepts a JSON array of objects containing two keys each: +id+, the assignment id,
+  # and +all_dates+, an array of +AssignmentDate+ structures containing the base and/or override
+  # dates for the assignment, as returned from the {api:AssignmentsApiController#index List assignments}
+  # endpoint with +include[]=all_dates+.
+  #
+  # This endpoint cannot create or destroy assignment overrides; any existing assignment overrides
+  # that are not referenced in the arguments will be left alone. If an override is given, any dates
+  # that are not supplied with it will be defaulted. To clear a date, specify null explicitly.
+  #
+  # All referenced assignments will be validated before any are saved. A list of errors will
+  # be returned if any provided dates are invalid, and no changes will be saved.
+  #
+  # The bulk update is performed in a background job, use the {api:ProgressController#show Progress API}
+  # to check its status.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/bulk_update' \
+  #        -X PUT \
+  #        --data '[{
+  #              "id": 1,
+  #              "all_dates": [{
+  #                "base": true,
+  #                "due_at": "2020-08-29T23:59:00-06:00"
+  #              }, {
+  #                "id": 2,
+  #                "due_at": "2020-08-30T23:59:00-06:00"
+  #              }]
+  #            }]' \
+  #        -H "Content-Type: application/json" \
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @returns Progress
+  def bulk_update
+    return render_json_unauthorized unless @context.grants_right?(@current_user, session, :manage_assignments)
+    data = params.permit(:_json => [:id, :all_dates => [:id, :base, :due_at, :unlock_at, :lock_at]]).to_h[:_json]
+    return render json: { message: 'expected array' }, status: :bad_request unless data.is_a?(Array)
+    return render json: { message: 'missing assignment id' }, status: :bad_request unless data.all? { |a| a.key?('id') }
+
+    assignments = @context.assignments.active.where(id: data.map { |a| a['id'] }).to_a
+    raise ActiveRecord::RecordNotFound unless assignments.size == data.size
+    assignments.each do |assignment|
+      return render_json_unauthorized unless assignment.user_can_update?(@current_user, session)
+    end
+
+    progress = Progress.create!(context: @context, tag: "assignment_bulk_update")
+    progress.process_job(Assignment::BulkUpdate.new(@context, @current_user),
+                         :run,
+                         { strand: "assignment_bulk_update:#{@context.global_id}" },
+                         data)
+    render json: progress_json(progress, @current_user, session)
   end
 
   private
