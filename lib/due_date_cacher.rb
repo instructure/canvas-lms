@@ -210,9 +210,9 @@ class DueDateCacher
           User.clear_cache_keys(deletable_student_ids, :submissions)
         end
       end
-      unless assignments_to_delete_all_submissions_for.empty?
-        Submission.active.where(assignment_id: assignments_to_delete_all_submissions_for).
-          in_batches.update_all(workflow_state: :deleted, updated_at: Time.zone.now)
+      assignments_to_delete_all_submissions_for.each_slice(50) do |assignment_slice|
+        subs = Submission.active.where(assignment_id: assignment_slice).limit(1_000)
+        while subs.update_all(workflow_state: :deleted, updated_at: Time.zone.now) > 0; end
       end
 
       # Get any stragglers that might have had their enrollment removed from the course
