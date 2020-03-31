@@ -170,7 +170,7 @@ class UserPreferenceValue < ActiveRecord::Base
     # also make the other ones use global course ids
     def reorganize_gradebook_preferences
       sizes = preferences[:gradebook_column_size]
-      if sizes.present?
+      if sizes.present? && sizes != EXTERNAL
         new_sizes = {"shared" => {}}
         id_map = {}
 
@@ -219,6 +219,7 @@ class UserPreferenceValue < ActiveRecord::Base
       [:gradebook_column_order, :gradebook_settings].each do |gb_pref_key|
         current_gb_prefs = preferences[gb_pref_key]
         next unless current_gb_prefs.present?
+        next if current_gb_prefs == EXTERNAL
         new_gb_prefs = {}
         current_gb_prefs.each do |local_course_id, value|
           # we don't know exactly which shard it was set for, so just set it for them all associated shards
