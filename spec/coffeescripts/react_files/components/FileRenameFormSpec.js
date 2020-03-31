@@ -90,6 +90,21 @@ test('calls passed in props method to resolve conflict', function() {
   Simulate.click(this.form.refs.commitChangeBtn)
 })
 
+test('onNameConflictResolved preserves expandZip option when skipping', function() {
+  expect(1)
+  this.renderForm({
+    fileOptions: {
+      file: {name: 'file_name.md'},
+      expandZip: 'true'
+    },
+    onNameConflictResolved(options) {
+      equal(options.expandZip, 'true')
+    },
+    allowSkip: true
+  })
+  Simulate.click(this.form.refs.skipBtn)
+})
+
 test('onNameConflictResolved preserves expandZip option when renaming', function() {
   expect(2)
   this.renderForm({
