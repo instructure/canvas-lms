@@ -18,3 +18,8 @@ module_dnd:
   applies_to: RootAccount
   display_name: "Module Content Import Enhancements"
   description: "Drag and Drop files on modules and multi-file module item uploads"
+responsive_2020_04:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "April 2020 Responsiveness"
+  description: "Collection of responsive improvements throughout Canvas"
