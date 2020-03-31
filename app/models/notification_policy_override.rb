@@ -68,7 +68,7 @@ class NotificationPolicyOverride < ActiveRecord::Base
     !(find_all_for(user, context).where(notification_id: nil).take&.workflow_state == 'disabled')
   end
 
-  def self.find_all_for(user, context)
-    NotificationPolicyOverride.where(communication_channel_id: user.communication_channels, context: context)
+  def self.find_all_for(user, context, channel_id = user.communication_channels)
+    NotificationPolicyOverride.where(communication_channel_id: channel_id, context: context)
   end
 end
