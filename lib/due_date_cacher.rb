@@ -211,8 +211,8 @@ class DueDateCacher
         end
       end
       assignments_to_delete_all_submissions_for.each_slice(50) do |assignment_slice|
-        Submission.active.where(assignment_id: assignment_slice).
-          update_all(workflow_state: :deleted, updated_at: Time.zone.now)
+        subs = Submission.active.where(assignment_id: assignment_slice).limit(1_000)
+        while subs.update_all(workflow_state: :deleted, updated_at: Time.zone.now) > 0; end
       end
 
       # Get any stragglers that might have had their enrollment removed from the course
