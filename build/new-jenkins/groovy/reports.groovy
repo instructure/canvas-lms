@@ -44,6 +44,39 @@ def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
   sh 'rm -vrf ./coverage'
 }
 
+def appendFailMessageReport(message, link) {
+  dir ("_buildmeta") {
+    if (!fileExists("failure_messages.txt")) {
+      sh "echo 'failure links:' >> failure_messages.txt"
+    }
+    sh "echo '$message' >> failure_messages.txt"
+    sh "echo '$link' >> failure_messages.txt"
+  }
+  archiveArtifacts(artifacts: '_buildmeta/*')
+}
+
+def sendFailureMessageIfPresent() {
+  if (fileExists("_buildmeta/failure_messages.txt")) {
+    echo "sending failure message"
+    sh "cat _buildmeta/failure_messages.txt"
+    if (!env.GERRIT_CHANGE_NUMBER || !env.GERRIT_PATCHSET_NUMBER) {
+      echo "build not associated with a PS... not sending message"
+    }
+    else {
+      load('build/new-jenkins/groovy/credentials.groovy').withGerritCredentials({
+        sh '''
+          gerrit_message=`cat _buildmeta/failure_messages.txt`
+          ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
+            $GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
+        '''
+      })
+    }
+  }
+  else {
+    echo "no failure messages to send"
+  }
+}
+
 // this method is to ensure that the stashing is done in a way that
 // is expected in publishSpecFailuresAsHTML
 def stashSpecFailures(prefix, index) {
@@ -52,7 +85,7 @@ def stashSpecFailures(prefix, index) {
   }
 }
 
-def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
+def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
   def working_dir = "${prefix}_compiled_failures"
   sh "rm -vrf ./$working_dir"
   sh "mkdir $working_dir"
@@ -71,6 +104,11 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
     htmlFiles = findFiles glob: '**/index.html'
   }
 
+  def report_name = "spec-failure-$prefix"
+  if (htmlFiles.size() > 1) {
+    def url_name = java.net.URLEncoder.encode(report_name, "UTF-8")
+    appendFailMessageReport("$report_title:", "${BUILD_URL}${url_name}")
+  }
   archiveArtifacts(artifacts: "$working_dir/**")
   publishHTML target: [
     allowMissing: false,
@@ -78,7 +116,8 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
     keepAll: true,
     reportDir: working_dir,
     reportFiles: htmlFiles.join(','),
-    reportName: report_name
+    reportName: report_name,
+    reportTitles: report_title
   ]
   sh "rm -vrf ./$working_dir"
 }
