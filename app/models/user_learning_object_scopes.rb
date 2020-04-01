@@ -327,7 +327,9 @@ module UserLearningObjectScopes
       if scope_only
         as # This needs the below `select` somehow to work
       else
-        as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
+        Shackles.activate(:slave) do
+          as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
+        end
       end
     end
   end
@@ -387,7 +389,9 @@ module UserLearningObjectScopes
       if scope_only
         as # This needs the below `select` somehow to work
       else
-        as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
+        Shackles.activate(:slave) do
+          as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
+        end
       end
     end
   end
