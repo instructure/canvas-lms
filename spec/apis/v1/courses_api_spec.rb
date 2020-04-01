@@ -3917,6 +3917,42 @@ describe CoursesController, type: :request do
     @enrollment.reload
     expect(@enrollment.last_activity_at).not_to be_nil
   end
+
+  describe "#student_view_student" do
+    let(:course) { Course.create! }
+    let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: "active").user }
+    let(:student) { course.enroll_student(User.create!, enrollment_state: "active").user }
+
+    let(:path) { "/api/v1/courses/#{course.id}/student_view_student" }
+    let(:request_params) do
+      { controller: "courses", action: "student_view_student", course_id: course.id, format: :json }
+    end
+    let(:api_response) { api_call_as_user(teacher, :get, path, request_params) }
+
+    it "returns data for a test student in the course" do
+      user_id = api_response["id"]
+      expect(user_id).to eq course.student_view_student.id
+    end
+
+    it "creates a new test student if one does not exist" do
+      expect {
+        api_response
+      }.to change { StudentViewEnrollment.where(course_id: course.id).count }.by(1)
+    end
+
+    it "does not create a new test student if one already exists" do
+      course.student_view_student
+
+      expect {
+        api_response
+      }.not_to change { StudentViewEnrollment.where(course_id: course.id).count }
+    end
+
+    it "returns unauthorized if the caller does not have permission to use the student view" do
+      response = api_call_as_user(student, :get, path, request_params)
+      expect(response["status"]).to eq "unauthorized"
+    end
+  end
 end
 
 def each_copy_option

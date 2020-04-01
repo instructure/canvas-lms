@@ -1498,6 +1498,25 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API Return test student for course
+  #
+  # Returns information for a test student in this course. Creates a test
+  # student if one does not already exist for the course. The caller must have
+  # permission to access the course's student view.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/<course_id>/student_view_student \
+  #     -X GET \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns User
+  def student_view_student
+    get_context
+    if authorized_action(@context, @current_user, :use_student_view)
+      render json: user_json(@context.student_view_student, @current_user, session)
+    end
+  end
+
   def observer_pairing_codes_csv
     get_context
     return render_unauthorized_action unless @context.root_account.self_registration? && @context.grants_right?(@current_user, :generate_observer_pairing_code)

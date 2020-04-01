@@ -1010,6 +1010,8 @@ CanvasRails::Application.routes.draw do
       get  'users/:user_id/courses', action: :user_index, as: 'user_courses'
       get 'courses/:course_id/effective_due_dates', action: :effective_due_dates, as: 'course_effective_due_dates'
       get 'courses/:course_id/permissions', action: :permissions
+
+      get 'courses/:course_id/student_view_student', action: :student_view_student
     end
 
     scope(controller: :account_notifications) do
