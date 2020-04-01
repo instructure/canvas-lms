@@ -30,7 +30,8 @@ class AssignmentScoreStatisticsGenerator
       :update_score_statistics,
       {
         singleton: "AssignmentScoreStatisticsGenerator:#{course_id}",
-        run_at: rand(min..max).seconds.from_now
+        run_at: rand(min..max).seconds.from_now,
+        on_conflict: :loose
       },
       course_id
     )
