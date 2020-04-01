@@ -23,7 +23,7 @@ import TutorialTrayContent from './TutorialTrayContent'
 const ConferencesTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Conferences')}
-    subheading={I18n.t('Virtual lectures in real-time')}
+    subheading={I18n.t('Host virtual lectures in real time')}
     image="/images/tutorial-tray-images/Panda_Conferences.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
