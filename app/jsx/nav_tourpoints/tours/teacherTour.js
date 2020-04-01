@@ -19,6 +19,7 @@ import React from 'react'
 import I18n from 'i18n!TourPoints'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import handleOpenTray from '../handleOpenTray'
@@ -67,7 +68,48 @@ export default [
               {I18n.t('Get your Content online')}
             </Link>
           </li>
-          <li>{I18n.t('Access Canvas Resources and Guides')}</li>
+          <li>
+            <Link
+              as="a"
+              href="https://community.canvaslms.com/docs/DOC-12687-41524130"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {I18n.t('Learn more about Video Conferencing')}
+            </Link>
+            <ul>
+              <li>
+                <Link
+                  as="a"
+                  href="https://community.canvaslms.com/docs/DOC-23893"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Zoom
+                </Link>
+              </li>
+              <li>
+                <Link
+                  as="a"
+                  href="https://community.canvaslms.com/docs/DOC-18570-google-hangouts-meet-lti"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Google Meet
+                </Link>
+              </li>
+              <li>
+                <Link
+                  as="a"
+                  href="https://www.youtube.com/watch?v=zUXXeiRCFfY"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Microsoft Teams
+                </Link>
+              </li>
+            </ul>
+          </li>
         </ol>
         <div className="tour-star-image" aria-hidden>
           <img src={require('../../confetti/svg/Star.svg')} alt={I18n.t('star')} />
@@ -148,8 +190,51 @@ export default [
     selector: '.navigation-tray-container',
     content: (
       <section>
-        <Heading level="h3">{I18n.t('Access Canvas Resources and Guides')}</Heading>
-        <Text as="p">{I18n.t('Visit the Help section any time for new tips and guides.')}</Text>
+        <Heading level="h3">{I18n.t('Learn more about Video Conferencing')}</Heading>
+        <View as="div" margin="small 0 0 0">
+          <ul>
+            <li>
+              <Link
+                as="a"
+                href="https://community.canvaslms.com/docs/DOC-23893"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Zoom
+              </Link>
+            </li>
+            <li>
+              <Link
+                as="a"
+                href="https://community.canvaslms.com/docs/DOC-18570-google-hangouts-meet-lti"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Google Meet
+              </Link>
+            </li>
+            <li>
+              <Link
+                as="a"
+                href="https://www.youtube.com/watch?v=zUXXeiRCFfY"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Microsoft Teams
+              </Link>
+            </li>
+            <li>
+              <Link
+                as="a"
+                href="https://community.canvaslms.com/docs/DOC-12687-41524130"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {I18n.t('More Video Conferencing Tools')}
+              </Link>
+            </li>
+          </ul>
+        </View>
       </section>
     ),
     actionBefore: async () => {
