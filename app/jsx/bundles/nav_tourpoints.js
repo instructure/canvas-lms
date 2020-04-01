@@ -27,10 +27,13 @@ ready(() => {
   const roles = []
 
   // Decide which tour to show based on the role
-  if (current_roles.includes('teacher')) {
+  if (current_roles.includes('admin')) {
+    roles.push('admin')
+  }
+  if (current_roles.includes('teacher') || window.ENV.COURSE?.is_instructor) {
     roles.push('teacher')
   }
-  if (current_roles.includes('student')) {
+  if (current_roles.includes('student') || window.ENV.COURSE?.is_student) {
     roles.push('student')
   }
   const globalNavTourContainer = document.getElementById('global_nav_tour')
