@@ -22,8 +22,8 @@ class Account::HelpLinks
     @account = account
   end
 
-  def default_links
-    [
+  def default_links(filter=true)
+    defaults = [
       {
         :available_to => ['student'],
         :text => -> { I18n.t('#help_dialog.instructor_question', 'Ask Your Instructor a Question') },
@@ -56,12 +56,31 @@ class Account::HelpLinks
         :is_featured => false,
         :is_new => false,
         :feature_headline => -> { '' }
+      }.freeze,
+      {
+        :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
+        :text => -> { I18n.t('#help_dialog.covid', 'COVID-19 Canvas Resources') },
+        :subtext => -> { I18n.t('#help_dialog.covid_sub', 'Tips for teaching and learning online') },
+        :url => Setting.get('help_dialog_covid_url', 'https://community.canvaslms.com/groups/admins/pages/contingency'),
+        :type => 'default',
+        :id => :covid,
+        :is_new => true,
+        :is_featured => false,
+        :feature_headline => -> { '' }
       }.freeze
     ]
+    filter ? filtered_links(defaults) : defaults
   end
 
   def default_links_hash
     @default_links_hash ||= default_links.index_by { |link| link[:id] }
+  end
+
+  # do not return the covid help link unless the featured_help_links FF is enabled
+  def filtered_links(links)
+    links.select do |link|
+      link[:id].to_s == 'covid' ? Account.site_admin.feature_enabled?(:featured_help_links) : true
+    end
   end
 
   def instantiate_links(links)

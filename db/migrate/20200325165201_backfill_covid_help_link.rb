@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,10 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-InstStatsd::DefaultTracking.track_sql
-InstStatsd::DefaultTracking.track_active_record
-InstStatsd::DefaultTracking.track_cache
-InstStatsd::DefaultTracking.track_jobs(enable_periodic_queries: false)
-InstJobsStatsd::Naming.configure(strand_filter: ->(job) { DelayedJobConfig.strands_to_send_to_statsd.include?(job.strand) })
-InstStatsd::BlockTracking.logger = InstStatsd::RequestLogger.new(Rails.logger)
-InstStatsd::RequestTracking.enable logger: Rails.logger
+class BackfillCovidHelpLink < ActiveRecord::Migration[5.2]
+  tag :postdeploy
+
+  def up
+    DataFixup::BackfillNewDefaultHelpLink.send_later_if_production_enqueue_args(
+      :run,
+      { priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups' },
+      :covid
+    )
+  end
+end
