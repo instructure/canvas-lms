@@ -19,257 +19,19 @@
 import React from 'react'
 import Reactour from '@instructure/reactour/dist/reactour.cjs'
 import I18n from 'i18n!TourPoints'
-import {Link} from '@instructure/ui-link'
 import tourPubSub from './tourPubsub'
 import TourContainer from './TourContainer'
 import {Heading} from '@instructure/ui-heading'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
 import useLocalStorage from '../shared/hooks/useLocalStorage'
-
-async function handleOpenTray(trayType) {
-  tourPubSub.publish('navigation-tray-open', {type: trayType, noFocus: true})
-  await new Promise(resolve => {
-    let resolved = false
-    let timeout
-    const unsubscribe = tourPubSub.subscribe('navigation-tray-opened', type => {
-      if (resolved) return
-      if (type === trayType) {
-        // For A11y, we need to do some DOM shenanigans so the Tour portal
-        // has screen reader focus and not the greedy nav trays.
-        // The Nav Tray will automatically remove this attribute when it opens
-        // when the tour is done.
-        const navElement = document.getElementById('nav-tray-portal')
-        if (navElement) {
-          navElement.setAttribute('aria-hidden', true)
-        }
-        const tourElement = document.getElementById('___reactour')
-        if (tourElement) {
-          tourElement.setAttribute('aria-hidden', false)
-        }
-        clearTimeout(timeout)
-        unsubscribe()
-        resolve()
-      }
-    })
-    // 5 second timeout just in case it never resolves
-    timeout = setTimeout(() => {
-      resolved = true
-      unsubscribe()
-      resolve()
-    }, 5000)
-  })
-}
+import adminTour from './tours/adminTour'
+import teacherTour from './tours/teacherTour'
+import studentTour from './tours/studentTour'
+import handleOpenTray from './handleOpenTray'
 
 const allSteps = {
-  teacher: [
-    {
-      selector: '#global_nav_help_link',
-      content: () => (
-        <section>
-          {/* Hide the overlay on the first step. */}
-          <style>
-            {`#___reactour svg rect {
-              opacity:0;
-            }`}
-          </style>
-          <Heading level="h3">
-            {I18n.t(`Hello%{name}!`, {
-              name:
-                window.ENV.current_user && window.ENV.current_user.display_name
-                  ? ` ${window.ENV.current_user.display_name}`
-                  : ''
-            })}
-          </Heading>
-          <p>
-            {I18n.t(
-              'We know getting your courses online quickly during this time is priority. This quick tour will show you how to:'
-            )}
-          </p>
-          <ol>
-            <li>
-              <Link
-                as="a"
-                href="https://community.canvaslms.com/docs/DOC-13111-4152719738"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {I18n.t('Set up your Notifications')}
-              </Link>
-            </li>
-            <li>
-              <Link
-                as="a"
-                href="https://community.canvaslms.com/docs/DOC-18584-set-up-your-canvas-course-in-30-minutes-or-less"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {I18n.t('Get your Content online')}
-              </Link>
-            </li>
-            <li>{I18n.t('Access Canvas Resources and Guides')}</li>
-          </ol>
-          <div className="tour-star-image" aria-hidden>
-            <img src={require('../confetti/svg/Star.svg')} alt="star" />
-          </div>
-        </section>
-      )
-    },
-    {
-      observe: '.profile-tab-notifications',
-      selector: '.profile-tab-notifications',
-      content: (
-        <section>
-          <Heading level="h3">{I18n.t('Set Up Your Notifications')}</Heading>
-          <ScreenReaderContent>
-            {I18n.t('Click on the account navigation button to access notification preferences.')}
-          </ScreenReaderContent>
-          <Link
-            as="a"
-            href="https://community.canvaslms.com/docs/DOC-13111-4152719738"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {I18n.t("Don't miss notifications from your students.")}
-          </Link>
-          <iframe
-            title="Canvas Notifications Tutorial Video"
-            src="https://player.vimeo.com/video/75514816?title=0&byline=0&portrait=0"
-            width="100%"
-            height="277px"
-            style={{marginTop: '1rem'}}
-            frameBorder="0"
-            allow="autoplay; fullscreen"
-            allowFullScreen
-          />
-        </section>
-      ),
-      actionBefore: async () => {
-        await handleOpenTray('profile')
-      }
-    },
-    {
-      selector: '.navigation-tray-container',
-      content: (
-        <section>
-          <Heading level="h3">{I18n.t('Get Your Content Online Quickly')}</Heading>
-          <ScreenReaderContent>
-            {I18n.t('Click on the courses navigation button to access your courses.')}
-          </ScreenReaderContent>
-          <Link
-            as="a"
-            href="https://community.canvaslms.com/docs/DOC-18584-set-up-your-canvas-course-in-30-minutes-or-less"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {I18n.t('Set up your Canvas course in 30 minutes or less.')}
-          </Link>
-          <iframe
-            title="Canvas Course Tutorial Video"
-            src="https://player.vimeo.com/video/69658934?title=0&byline=0&portrait=0"
-            width="100%"
-            height="277px"
-            style={{marginTop: '1rem'}}
-            frameBorder="0"
-            allow="autoplay; fullscreen"
-            allowFullScreen
-          />
-        </section>
-      ),
-      actionBefore: async () => {
-        await handleOpenTray('courses')
-      }
-    },
-    {
-      selector: '.navigation-tray-container',
-      content: (
-        <section>
-          <Heading level="h3">{I18n.t('Access Canvas Resources and Guides')}</Heading>
-          {I18n.t('Visit the Help section any time for new tips and guides.')}
-        </section>
-      ),
-      actionBefore: async () => {
-        await handleOpenTray('help')
-      }
-    }
-  ],
-  student: [
-    {
-      selector: '#global_nav_help_link',
-      content: () => (
-        <section>
-          {/* Hide the overlay on the first step. */}
-          <style>
-            {`#___reactour svg rect {
-              opacity:0;
-            }`}
-          </style>
-          <Heading level="h3">
-            {I18n.t(`Hello%{name}!`, {
-              name:
-                window.ENV.current_user && window.ENV.current_user.display_name
-                  ? ` ${window.ENV.current_user.display_name}`
-                  : ''
-            })}
-          </Heading>
-          <p>{I18n.t("Here's some quick tips to get you started in Canvas!")}</p>
-          <ol>
-            <li>{I18n.t('How do I find my courses?')}</li>
-            <li>{I18n.t('How do I contact my instructor?')}</li>
-            <li>{I18n.t('How do I download the Student App?')}</li>
-          </ol>
-          <div className="tour-star-image" aria-hidden>
-            <img src={require('../confetti/svg/Star.svg')} alt="star" />
-          </div>
-        </section>
-      )
-    },
-    {
-      selector: '#global_nav_dashboard_link',
-      content: (
-        <section>
-          <Heading level="h3">{I18n.t('How do I find my courses?')}</Heading>
-          {I18n.t('Find your classes or subjects in the Dashboard...')}
-        </section>
-      )
-    },
-    {
-      selector: '.navigation-tray-container',
-      content: (
-        <section>
-          <Heading level="h3">{I18n.t('How do I find my courses?')}</Heading>
-          {I18n.t('...or in the Courses list.')}
-        </section>
-      ),
-      actionBefore: async () => {
-        await handleOpenTray('courses')
-      }
-    },
-    {
-      selector: '#global_nav_conversations_link',
-      content: (
-        <section>
-          <Heading level="h3">{I18n.t('How do I contact my instructor?')}</Heading>
-          {I18n.t('Start a conversation with your instructor in the Canvas Inbox.')}
-        </section>
-      )
-    },
-    {
-      selector: '.navigation-tray-container',
-      content: (
-        <section>
-          <Heading level="h3">
-            {I18n.t('How do I download the Student App and get additional help?')}
-          </Heading>
-          {I18n.t(
-            'Access your courses and groups using any iOS or Android mobile device and find more information in the Help menu.'
-          )}
-        </section>
-      ),
-      actionBefore: async () => {
-        await handleOpenTray('help')
-      }
-    }
-  ]
+  admin: adminTour,
+  teacher: teacherTour,
+  student: studentTour
 }
 
 const softCloseSteps = [
@@ -294,6 +56,14 @@ const Tour = ({roles}) => {
       // The current page is for a course that the user is a student is in.
       // And they haven't seen the tour yet. Change roles to student.
       return 'student'
+    }
+    if (
+      window.ENV?.COURSE?.is_instructor &&
+      roles.includes('teacher') &&
+      !localStorage.getItem(`canvas-tourpoints-shown-teacher`)
+    ) {
+      // Same for teacher
+      return 'teacher'
     }
     return roles[0]
   })
@@ -387,10 +157,31 @@ const Tour = ({roles}) => {
       setSoftClose(true)
 
       // If we are on a course the user is a student in, show the student tour
-      if (window.ENV?.COURSE?.is_student && roles.includes('student')) {
+      if (roles.length === 1) {
+        setCurrentRole(roles[0])
+      }
+      // If user is a student, only show on courses page
+      // that student is enrolled in.
+      else if (window.ENV?.COURSE?.is_student && roles.includes('student')) {
         setCurrentRole('student')
-      } else if (roles.includes('teacher')) {
+      }
+      // If that user is a teacher and not an admin,
+      // just show the tour
+      else if (roles.includes('teacher') && !roles.includes('admin')) {
         setCurrentRole('teacher')
+      }
+      // If that user is a teacher and an admin, only show on
+      // courses page which the teacher is instructor in
+      else if (
+        window.ENV?.COURSE?.is_instructor &&
+        roles.includes('teacher') &&
+        roles.includes('admin')
+      ) {
+        setCurrentRole('teacher')
+      }
+      // If that user is an admin, show the admin tour
+      else if (roles.includes('admin')) {
+        setCurrentRole('admin')
       }
     })
     return () => unsub()
@@ -398,6 +189,11 @@ const Tour = ({roles}) => {
 
   if (!currentRole || !steps) return null
 
+  const firstStepLabels = {
+    student: I18n.t('Student Tour'),
+    teacher: I18n.t('Teacher Tour'),
+    admin: I18n.t('Admin Tour')
+  }
   return (
     <Reactour
       key={`${softClose}-${open}-${currentRole}`}
@@ -409,6 +205,7 @@ const Tour = ({roles}) => {
             restoreTrayScreenReader()
             props.close()
           }}
+          firstLabel={firstStepLabels[currentRole] || ''}
           {...props}
         />
       )}

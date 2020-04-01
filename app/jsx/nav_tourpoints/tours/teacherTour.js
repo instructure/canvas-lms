@@ -1,0 +1,159 @@
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+import React from 'react'
+import I18n from 'i18n!TourPoints'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import handleOpenTray from '../handleOpenTray'
+
+export default [
+  {
+    selector: '#global_nav_help_link',
+    content: () => (
+      <section>
+        {/* Hide the overlay on the first step. */}
+        <style>
+          {`#___reactour svg rect {
+            opacity:0;
+          }`}
+        </style>
+        <Heading level="h3">
+          {I18n.t(`Hello%{name}!`, {
+            name: window.ENV?.current_user?.display_name
+              ? `, ${window.ENV?.current_user?.display_name}`
+              : ''
+          })}
+        </Heading>
+        <Text as="p">
+          {I18n.t(
+            'We know getting your courses online quickly during this time is priority. This quick tour will show you how to:'
+          )}
+        </Text>
+        <ol>
+          <li>
+            <Link
+              as="a"
+              href="https://community.canvaslms.com/docs/DOC-13111-4152719738"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {I18n.t('Set up your Notifications')}
+            </Link>
+          </li>
+          <li>
+            <Link
+              as="a"
+              href="https://community.canvaslms.com/docs/DOC-18584-set-up-your-canvas-course-in-30-minutes-or-less"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {I18n.t('Get your Content online')}
+            </Link>
+          </li>
+          <li>{I18n.t('Access Canvas Resources and Guides')}</li>
+        </ol>
+        <div className="tour-star-image" aria-hidden>
+          <img src={require('../../confetti/svg/Star.svg')} alt={I18n.t('star')} />
+        </div>
+      </section>
+    )
+  },
+  {
+    observe: '.profile-tab-notifications',
+    selector: '.profile-tab-notifications',
+    content: (
+      <section>
+        <Heading level="h3">{I18n.t('Set Up Your Notifications')}</Heading>
+        <ScreenReaderContent>
+          {I18n.t('Click on the account navigation button to access notification preferences.')}
+        </ScreenReaderContent>
+        <Text as="p">
+          <Link
+            as="a"
+            href="https://community.canvaslms.com/docs/DOC-13111-4152719738"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {I18n.t("Don't miss notifications from your students.")}
+          </Link>
+        </Text>
+        <iframe
+          title={I18n.t('Canvas Notifications Tutorial Video')}
+          src="https://player.vimeo.com/video/75514816?title=0&byline=0&portrait=0"
+          width="100%"
+          height="277px"
+          style={{marginTop: '1rem'}}
+          frameBorder="0"
+          allow="autoplay; fullscreen"
+          allowFullScreen
+        />
+      </section>
+    ),
+    actionBefore: async () => {
+      await handleOpenTray('profile')
+    }
+  },
+  {
+    selector: '.navigation-tray-container',
+    content: (
+      <section>
+        <Heading level="h3">{I18n.t('Get Your Content Online Quickly')}</Heading>
+        <ScreenReaderContent>
+          {I18n.t('Click on the courses navigation button to access your courses.')}
+        </ScreenReaderContent>
+        <Text as="p">
+          <Link
+            as="a"
+            href="https://community.canvaslms.com/docs/DOC-18584-set-up-your-canvas-course-in-30-minutes-or-less"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {I18n.t('Set up your Canvas course in 30 minutes or less.')}
+          </Link>
+        </Text>
+        <iframe
+          title={I18n.t('Canvas Course Tutorial Video')}
+          src="https://player.vimeo.com/video/69658934?title=0&byline=0&portrait=0"
+          width="100%"
+          height="277px"
+          style={{marginTop: '1rem'}}
+          frameBorder="0"
+          allow="autoplay; fullscreen"
+          allowFullScreen
+        />
+      </section>
+    ),
+    actionBefore: async () => {
+      await handleOpenTray('courses')
+    }
+  },
+  {
+    selector: '.navigation-tray-container',
+    content: (
+      <section>
+        <Heading level="h3">{I18n.t('Access Canvas Resources and Guides')}</Heading>
+        <Text as="p">{I18n.t('Visit the Help section any time for new tips and guides.')}</Text>
+      </section>
+    ),
+    actionBefore: async () => {
+      await handleOpenTray('help')
+    }
+  }
+]
