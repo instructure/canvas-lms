@@ -75,6 +75,7 @@
   body_classes << 'full-width' if @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
   body_classes << "context-#{@context.asset_string}" if @context
   body_classes << "responsive_2020_03" if !!@domain_root_account&.feature_enabled?(:responsive_2020_03)
+  body_classes << "responsive_2020_04" if !!@domain_root_account&.feature_enabled?(:responsive_2020_04)
 -%>
 <body class="<%= (body_classes).uniq.join(" ") %>">
 <%if @current_user && @real_current_user && @real_current_user != @current_user %>
