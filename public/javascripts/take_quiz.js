@@ -557,6 +557,10 @@ $(function() {
         return
       }
 
+      if ($(this).hasClass('file_preview_link')) {
+        return
+      }
+
       if (!event.isDefaultPrevented()) {
         const url = $(this).attr('href') || ''
         let hashStripped = location.href
