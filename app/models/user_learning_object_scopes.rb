@@ -279,6 +279,9 @@ module UserLearningObjectScopes
 
   # opts forwaded to course_ids_for_todo_lists
   def submissions_needing_grading_count(**opts)
+    if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
+      return 0
+    end
     course_ids = course_ids_for_todo_lists(:manage_grades, **opts)
     Submission.active.
       needs_grading.
@@ -300,6 +303,9 @@ module UserLearningObjectScopes
     scope_only: false,
     **opts # arguments that are just forwarded to objects_needing
   )
+    if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
+      return scope_only ? Assignment.none : []
+    end
     params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
     objects_needing('Assignment', 'grading', :manage_grades, params, 120.minutes, **params) do |assignment_scope|
