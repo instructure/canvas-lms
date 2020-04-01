@@ -64,18 +64,27 @@ module GoogleDrive
 
       file = response.data.to_hash
       entry = GoogleDrive::Entry.new(file, extensions)
-      result = client_execute(:uri => entry.download_url)
-      if result.status == 200
-        file_name = file['title']
-        name_extension = file_name[/\.([a-z]+$)/, 1]
-        file_extension = name_extension || file_extension_from_header(result.headers, entry)
+      @uri = entry.download_url
+      redirect_limit = 3
+      loop do
+        raise(ConnectionException) if redirect_limit <= 0
+        result = client_execute(:uri => @uri)
 
-        # file_name should contain the file_extension
-        file_name += ".#{file_extension}" unless name_extension
-        content_type = result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
-        [result, file_name, file_extension, content_type]
-      else
-        raise ConnectionException, result.error_message
+        if result.status == 200
+          file_name = file['title']
+          name_extension = file_name[/\.([a-z]+$)/, 1]
+          file_extension = name_extension || file_extension_from_header(result.headers, entry)
+
+          # file_name should contain the file_extension
+          file_name += ".#{file_extension}" unless name_extension
+          content_type = result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
+          return [result, file_name, file_extension, content_type]
+        elsif result.status == 307
+          @uri = result.response['Location']
+          redirect_limit -= 1
+        else
+          raise ConnectionException, result.error_message
+        end
       end
     end
 
