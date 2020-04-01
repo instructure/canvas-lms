@@ -32,7 +32,15 @@
           <span class="current-selection-label"></span>
         </span>
         <select class="course-filter" id="course-filter" aria-haspopup="true" aria-labelledby="course-filter-description"></select>
-        <div id="conversation_filter" style="display:inline-block; vertical-align: middle;"></div>
+        <div
+          id="conversation_filter"
+          <% if @domain_root_account.feature_enabled?(:responsive_2020_04) %>
+            class="conversations__filter"
+          <% else %>
+            style="display:inline-block; vertical-align: middle;"
+          <% end %>
+        >
+        </div>
       </div>
       </div>
       <div class="panel__secondary">
@@ -164,10 +172,29 @@
     </div>
   </header>
 
-  <div class="row-fluid messaging-wrapper">
-    <div class="span4 message-list-scroller">
+  <div
+    <% if @domain_root_account.feature_enabled?(:responsive_2020_04) %>
+      class="messaging-wrapper"
+    <% else %>
+      class="row-fluid messaging-wrapper"
+    <% end %>
+  >
+    <div
+      <% if @domain_root_account.feature_enabled?(:responsive_2020_04) %>
+        class="message-list-scroller"
+      <% else %>
+        class="span4 message-list-scroller"
+      <% end %>
+    >
       <div class="message-list"></div>
     </div>
-    <div class="span8 message-detail"></div>
+    <div
+      <% if @domain_root_account.feature_enabled?(:responsive_2020_04) %>
+        class="message-detail conversations__message-detail"
+      <% else %>
+        class="span8 message-detail"
+      <% end %>
+    >
+    </div>
   </div>
 </div>
