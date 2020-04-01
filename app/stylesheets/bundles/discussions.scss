@@ -702,3 +702,11 @@ $discussion-dark-text: $ic-color-dark;
     .topic-unsubscribe-button { display:inline-block; }
   }
 }
+
+@include mobile-only {
+  .responsive_2020_03 {
+    .discussion_subscribe {
+      width: inherit;
+    }
+  }
+}
