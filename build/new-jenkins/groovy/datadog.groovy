@@ -24,7 +24,7 @@ import groovy.time.*
 // Source https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/?tab=metrics
 def hackyMetricSend(metric, value, tags) {
   def script = """#!/bin/bash
-    echo -n "${metric}:${value}|c|1|#${tags.join(',')}" > /dev/udp/localhost/8125
+    echo -n "${metric}:${value}|d|1|#${tags.join(',')}" > /dev/udp/localhost/8125
   """
   // exit code is captured in case we want upstream caller status correction
   return sh(script: script, returnStatus: true)
@@ -36,7 +36,7 @@ def runDataDogForMetric(name, block) {
   def timeStop = new Date()
   def duration = TimeCategory.minus(timeStop, timeStart).toMilliseconds()
 
-  hackyMetricSend("jenkins.stage.elapsedTime", duration, ["stage:${name}"])
+  hackyMetricSend("jenkins.stage.elapsedTimeDist", duration, ["stage:${name}"])
 }
 
 def runDataDogForMetricWithExtraTags(name, extraTags, block) {
@@ -45,7 +45,7 @@ def runDataDogForMetricWithExtraTags(name, extraTags, block) {
   def timeStop = new Date()
   def duration = TimeCategory.minus(timeStop, timeStart).toMilliseconds()
 
-  hackyMetricSend("jenkins.stage.elapsedTime", duration, ["stage:${name}", extraTags].flatten())
+  hackyMetricSend("jenkins.stage.elapsedTimeDist", duration, ["stage:${name}", extraTags].flatten())
 }
 
 return this
