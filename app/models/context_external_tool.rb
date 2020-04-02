@@ -656,28 +656,30 @@ end
   #
   # Tools with exclude_tool_id as their ID will never be returned.
   def self.find_external_tool(url, context, preferred_tool_id=nil, exclude_tool_id=nil)
-    contexts = contexts_to_search(context)
-    preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
-    if preferred_tool && contexts.member?(preferred_tool.context) && (url == nil || preferred_tool.matches_domain?(url))
-      return preferred_tool
+    Shackles.activate(:slave) do
+      contexts = contexts_to_search(context)
+      preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
+      if preferred_tool && contexts.member?(preferred_tool.context) && (url == nil || preferred_tool.matches_domain?(url))
+        return preferred_tool
+      end
+
+      return nil unless url
+
+      all_external_tools = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active.to_a
+      sorted_external_tools = all_external_tools.sort_by { |t| [contexts.index { |c| c.id == t.context_id && c.class.name == t.context_type }, t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last] }
+
+      res = sorted_external_tools.detect{ |tool| tool.url && tool.matches_url?(url) && tool.id != exclude_tool_id }
+      return res if res
+
+      # If exactly match doesn't work, try to match by ignoring extra query parameters
+      res = sorted_external_tools.detect{ |tool| tool.url && tool.matches_url?(url, false) && tool.id != exclude_tool_id }
+      return res if res
+
+      res = sorted_external_tools.detect{ |tool| tool.domain && tool.matches_tool_domain?(url) && tool.id != exclude_tool_id }
+      return res if res
+
+      nil
     end
-
-    return nil unless url
-
-    all_external_tools = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active.to_a
-    sorted_external_tools = all_external_tools.sort_by { |t| [contexts.index { |c| c.id == t.context_id && c.class.name == t.context_type }, t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last] }
-
-    res = sorted_external_tools.detect{ |tool| tool.url && tool.matches_url?(url) && tool.id != exclude_tool_id }
-    return res if res
-
-    # If exactly match doesn't work, try to match by ignoring extra query parameters
-    res = sorted_external_tools.detect{ |tool| tool.url && tool.matches_url?(url, false) && tool.id != exclude_tool_id }
-    return res if res
-
-    res = sorted_external_tools.detect{ |tool| tool.domain && tool.matches_tool_domain?(url) && tool.id != exclude_tool_id }
-    return res if res
-
-    nil
   end
 
   scope :having_setting, lambda { |setting| setting ? joins(:context_external_tool_placements).
