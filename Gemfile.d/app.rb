@@ -74,7 +74,7 @@ gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.7.0'
-gem 'inst-jobs', '0.15.16'
+gem 'inst-jobs', '0.15.18'
   gem 'fugit', '1.3.3', require: false
     gem 'et-orbi', '1.2.2', require: false
 gem 'inst-jobs-autoscaling', '1.0.5'
