@@ -60,9 +60,11 @@ class GradebookImporter
     @attachment = attachment
     @progress = progress
 
-    @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
-      course_id: @context.id, user_id: @context.all_students.pluck(:id)
-    )
+    Shackles.activate(:slave) do
+      @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
+        course_id: @context.id, user_id: @context.all_students.pluck(:id)
+      )
+    end
   end
 
   CSV::Converters[:nil] = lambda do |e|
