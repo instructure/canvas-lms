@@ -27,7 +27,13 @@ export default function UserLink({size, avatar_url, name, avatarName, ...propsTo
       theme={{mediumPadding: '0', mediumHeight: '1rem'}}
       {...propsToPassOnToLink}
     >
-      <Avatar size={size} name={avatarName} src={avatar_url} margin="0 x-small xxx-small 0" />
+      <Avatar
+        size={size}
+        name={avatarName}
+        src={avatar_url}
+        margin="0 x-small xxx-small 0"
+        data-fs-exclude
+      />
       {name}
     </Button>
   )

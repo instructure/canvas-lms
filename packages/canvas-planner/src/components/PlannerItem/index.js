@@ -282,7 +282,12 @@ export class PlannerItem extends Component {
         return <IconPeerReviewLine />
       default:
         return (
-          <Avatar name={currentUser.displayName || '?'} src={currentUser.avatarUrl} size="small" />
+          <Avatar
+            name={currentUser.displayName || '?'}
+            src={currentUser.avatarUrl}
+            size="small"
+            data-fs-exclude
+          />
         )
     }
   }
@@ -480,6 +485,7 @@ export class PlannerItem extends Component {
               name={feedback.author_name || '?'}
               src={feedback.author_avatar_url}
               size="small"
+              data-fs-exclude
             />
           </span>
           <span className={styles.feedbackComment}>

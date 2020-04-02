@@ -137,6 +137,7 @@ export default class MobileGlobalMenu extends React.Component {
                         name={this.props.current_user.display_name}
                         src={this.props.current_user.avatar_image_url}
                         size="x-small"
+                        data-fs-exclude
                       />
                     </Flex.Item>
                     <Flex.Item>
