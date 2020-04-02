@@ -13,31 +13,34 @@
   },
   "assignment_976578a8": { "message": "Feladat" },
   "assignmenttype_title_6612d008": {
-    "message": "{ assignmentType } { title }."
+    "message": "{ title } című { assignmentType }."
   },
   "assignmenttype_title_all_day_on_datetime_9768903c": {
-    "message": "{ title } { assignmentType } , egész nap { datetime }-kor."
+    "message": "{ title } című { assignmentType } egész nap ekkor: { datetime }."
   },
   "assignmenttype_title_at_datetime_478f0709": {
-    "message": "{ assignmentType } { title }, { datetime }-kor."
+    "message": "{ title } című { assignmentType } ekkor: { datetime }."
   },
   "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-    "message": "{ assignmentType } { title }, { datetime }-kor { endTime }-ig"
+    "message": "{ title } című { assignmentType } ekkor: { datetime }, eddig: { endTime }."
   },
   "assignmenttype_title_due_datetime_a112d8ff": {
-    "message": "{ assignmentType } { title }, esedékes ekkor: { datetime }."
+    "message": "{ title } című { assignmentType }, esedékes ekkor: { datetime }."
   },
   "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-    "message": "A { title } című { assignmentType } beadási határideje { datetime }."
+    "message": "A(z) { title } című { assignmentType } befejezési határideje { datetime }."
   },
   "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-    "message": "{ assignmentType } { title } készként megjelölve."
+    "message": "A(z) { title } című { assignmentType } készként megjelölve."
   },
   "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-    "message": "{ assignmentType } { title } nincs megjelölve készként."
+    "message": "A(z) { title } című { assignmentType } nincs megjelölve készként."
+  },
+  "assignmenttype_title_posted_datetime_cab69444": {
+    "message": "A(z) { title } című { assignmentType } ekkor lett közzétéve: { datetime }."
   },
   "assignmenttype_title_reminder_datetime_33fa66d5": {
-    "message": "{ assignmentType } { title }, emlékeztető { datetime }."
+    "message": "{ title } című { assignmentType }, emlékeztető ekkor: { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "A Tennivaló Listád Elkezdése"
@@ -48,6 +51,9 @@
   "close_d634289d": { "message": "Bezár" },
   "close_opportunity_center_popup_9907d981": {
     "message": "A Lehetőségek popup ablak bezárása"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# lehetőség}\n    one {# lehetőség}\n  other {# lehetőség}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
@@ -104,12 +110,18 @@
   "graded_25cd3fcd": { "message": "Értékelve" },
   "grades_are_loading_c899652d": { "message": "Értékelések betöltése" },
   "grades_loaded_5056277c": { "message": "Értékelések betöltve" },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } befejezve { items, plural,\n     =1 {elem}\n  other {elem}\n}"
+  },
   "late_2be42b88": { "message": "Késve" },
   "list_collapsed_9ac35920": { "message": "Összecsukott lista." },
   "list_collapsed_dde87718": { "message": "Összecsukott lista" },
   "list_expanded_efec2d0": { "message": "Lista kibontva." },
   "load_more_a36f9cf9": { "message": "Továbbiak betöltése" },
   "load_prior_dates_f2b0f6f0": { "message": "Korábbi dátumok betöltése" },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "Loaded { count, plural,\n     =0 {# elem}\n    one {# elem}\n  other {# elem}\n} betöltve"
+  },
   "loading_25990131": { "message": "Betöltés..." },
   "loading_725811ca": { "message": "betöltés" },
   "loading_grades_c842c887": { "message": "Értékelések betöltése" },
@@ -136,7 +148,13 @@
   },
   "no_grade_3b4d7f3e": { "message": "Nincs értékelés" },
   "nothing_for_now_e3e3ce2a": { "message": "Egyelőre semmi" },
+  "nothing_here_needs_attention_c4eaded6": {
+    "message": "Itt semmi nem igényli a figyelmét."
+  },
   "nothing_more_to_do_b665da42": { "message": "Nincs több tennivaló" },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Semmi újdonság nem igényli a figyelmét."
+  },
   "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
     "message": "Semmi nincs tervben mára. A legutóbbi elem kiválasztása."
   },
@@ -180,10 +198,10 @@
     "message": "{ startDate }-tól/től { endDate }-ig"
   },
   "startdatetime_enddatetime_20abc10e": {
-    "message": "{ startDateTime } - { endDateTime }"
+    "message": "{ startDateTime } – { endDateTime }"
   },
   "startdatetime_endtime_49741bbe": {
-    "message": "{ startDateTime } - { endTime }"
+    "message": "{ startDateTime } – { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime }-tól/től { endTime }-ig"

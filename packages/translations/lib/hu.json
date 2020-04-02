@@ -81,31 +81,34 @@
         "message": "Feladatok"
     },
     "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }."
+        "message": "{ title } című { assignmentType }."
     },
     "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ title } { assignmentType } , egész nap { datetime }-kor."
+        "message": "{ title } című { assignmentType } egész nap ekkor: { datetime }."
     },
     "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }, { datetime }-kor."
+        "message": "{ title } című { assignmentType } ekkor: { datetime }."
     },
     "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title }, { datetime }-kor { endTime }-ig"
+        "message": "{ title } című { assignmentType } ekkor: { datetime }, eddig: { endTime }."
     },
     "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }, esedékes ekkor: { datetime }."
+        "message": "{ title } című { assignmentType }, esedékes ekkor: { datetime }."
     },
     "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "A { title } című { assignmentType } beadási határideje { datetime }."
+        "message": "A(z) { title } című { assignmentType } befejezési határideje { datetime }."
     },
     "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "{ assignmentType } { title } készként megjelölve."
+        "message": "A(z) { title } című { assignmentType } készként megjelölve."
     },
     "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "{ assignmentType } { title } nincs megjelölve készként."
+        "message": "A(z) { title } című { assignmentType } nincs megjelölve készként."
+    },
+    "assignmenttype_title_posted_datetime_cab69444": {
+        "message": "A(z) { title } című { assignmentType } ekkor lett közzétéve: { datetime }."
     },
     "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }, emlékeztető { datetime }."
+        "message": "{ title } című { assignmentType }, emlékeztető ekkor: { datetime }."
     },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Audio és videó rögzítés nem elérhető."
@@ -115,6 +118,9 @@
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Van automatikusan mentett tartalom. Szeretné inkább azt betölteni?"
+    },
+    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+        "message": "Automatikusan megnyit egy beágyazott előnézetet. (Az előnézet csak mentés után jelenik meg.)"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "A Tennivaló Listád Elkezdése"
@@ -136,6 +142,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Feliratfájl választása"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "rendezetlen lista körökkel"
     },
     "clear_selected_file_82388e50": {
         "message": "Kiválasztott fájl törlése"
@@ -184,6 +193,12 @@
     },
     "content_type_2cf90d95": {
         "message": "Tartalom típusa "
+    },
+    "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+        "message": "{ count, plural,\n     =0 {0 szó}\n    one {1 szó}\n  other {# szó}\n}"
+    },
+    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+        "message": "{ count, plural,\n     =0 {# lehetőség}\n    one {# lehetőség}\n  other {# lehetőség}\n}"
     },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
@@ -266,6 +281,12 @@
     "dimensions_45ddb7b7": {
         "message": "Méretek"
     },
+    "directionality_ebcae6d0": {
+        "message": "irányítottság"
+    },
+    "disable_in_line_preview_2a675175": {
+        "message": "Letiltja a beágyazott előnézetet."
+    },
     "discussion_6719c51d": {
         "message": "Fórum"
     },
@@ -290,6 +311,9 @@
     "display_options_315aba85": {
         "message": "Megjelenítési beállítások"
     },
+    "display_text_link_opens_in_a_new_tab_75e9afc9": {
+        "message": "Szöveges link megjelenítése (új lapfülön jelenik meg)"
+    },
     "document_678cd7bf": {
         "message": "Dokumentum"
     },
@@ -307,6 +331,12 @@
     },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Húzza ide vagy keressen a számítógépen"
+    },
+    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+        "message": "Húzza a fogantyút. Átméretezéshez használja a fel és le nyilakat."
+    },
+    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
+        "message": "Húzzon át ide elemeket, vagy kattintson a számítógépen való tallózáshoz."
     },
     "due_5d7267be": {
         "message": "Határidő: "
@@ -422,11 +452,17 @@
     "finish_bc343002": {
         "message": "Befejezés"
     },
+    "focus_the_popup_context_toolbar_7979f4f8": {
+        "message": "Az előugró környezeti eszköztár fókuszba helyezése"
+    },
     "formatting_5b143aa8": {
         "message": "Formázás"
     },
     "found_auto_saved_content_3f6e4ca5": {
         "message": "Automatikusan mentett tartalmat találtunk"
+    },
+    "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
+        "message": "{ count, plural,\n     =0 {# eredmény}\n    one {# eredmény}\n  other {# eredmény}\n} található"
     },
     "generating_preview_45b53be0": {
         "message": "Előnézet generálása... "
@@ -503,6 +539,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Érvénytelen fájltípus"
     },
+    "items_completed_items_plural_1_item_other_items_717d579f": {
+        "message": "{ items } befejezve { items, plural,\n     =1 {elem}\n  other {elem}\n}"
+    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Billentyűparancsok"
     },
@@ -550,6 +589,9 @@
     },
     "load_prior_dates_f2b0f6f0": {
         "message": "Korábbi dátumok betöltése"
+    },
+    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+        "message": "Loaded { count, plural,\n     =0 {# elem}\n    one {# elem}\n  other {# elem}\n} betöltve"
     },
     "loading_25990131": {
         "message": "Betöltés..."
@@ -662,8 +704,14 @@
     "nothing_for_now_e3e3ce2a": {
         "message": "Egyelőre semmi"
     },
+    "nothing_here_needs_attention_c4eaded6": {
+        "message": "Itt semmi nem igényli a figyelmét."
+    },
     "nothing_more_to_do_b665da42": {
         "message": "Nincs több tennivaló"
+    },
+    "nothing_new_needs_attention_3ac548d4": {
+        "message": "Semmi újdonság nem igényli a figyelmét."
     },
     "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
         "message": "Semmi nincs tervben mára. A legutóbbi elem kiválasztása."
@@ -736,6 +784,9 @@
     },
     "posted_when_a578f5ab": {
         "message": "Közzétéve: { when }"
+    },
+    "preformatted_d0670862": {
+        "message": "Előre formázott"
     },
     "preview_53003fd2": {
         "message": "Előnézet"
@@ -857,6 +908,9 @@
     "sort_by_e75f9e3e": {
         "message": "Rendezés"
     },
+    "square_unordered_list_b15ce93b": {
+        "message": "rendezetlen lista négyzetekkel"
+    },
     "start_over_f7552aa9": {
         "message": "Újrakezdés"
     },
@@ -867,10 +921,10 @@
         "message": "{ startDate }-tól/től { endDate }-ig"
     },
     "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
+        "message": "{ startDateTime } – { endDateTime }"
     },
     "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
+        "message": "{ startDateTime } – { endTime }"
     },
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime }-tól/től { endTime }-ig"
@@ -919,6 +973,9 @@
     },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Ehhez az elemhez nincsenek pontok rendelve."
+    },
+    "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+        "message": "Bár a videója a megfelelő címmel jelenik majd meg a böngészőben, az adatbázisban nem sikerült frissíteni."
     },
     "time_2b5aac58": {
         "message": "Idő"
@@ -1011,7 +1068,10 @@
         "message": "Használja a nyíl billentyűket az opció kiválasztására!"
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
-        "message": "Képernyőolvasó használta egy kép tartalmának leírásához"
+        "message": "Képernyőolvasók által egy kép tartalmának leírásához használt szöveg"
+    },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Képernyőolvasók által a videó leírásához használt szöveg"
     },
     "user_documents_c206e61f": {
         "message": "A felhasználó dokumentumai"

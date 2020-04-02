@@ -32,9 +32,13 @@
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Van automatikusan mentett tartalom. Szeretné inkább azt betölteni?"
   },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Automatikusan megnyit egy beágyazott előnézetet. (Az előnézet csak mentés után jelenik meg.)"
+  },
   "cancel_caeb1e68": { "message": "Mégse" },
   "canvas_plugins_705a5016": { "message": "Canvas Pluginok" },
   "choose_caption_file_9c45bc4e": { "message": "Feliratfájl választása" },
+  "circle_unordered_list_9e3a0763": { "message": "rendezetlen lista körökkel" },
   "clear_selected_file_82388e50": { "message": "Kiválasztott fájl törlése" },
   "clear_selected_file_filename_2fe8a58e": {
     "message": "Kiválasztott fájl törlése: { filename }"
@@ -66,6 +70,9 @@
   },
   "content_subtype_5ce35e88": { "message": "Tartalom altípusa" },
   "content_type_2cf90d95": { "message": "Tartalom típusa " },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 szó}\n    one {1 szó}\n  other {# szó}\n}"
+  },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
   },
@@ -88,9 +95,16 @@
   "describe_the_image_e65d2e32": { "message": "(A kép leírása)" },
   "describe_the_video_2fe8f46a": { "message": "(A videó leírása)" },
   "dimensions_45ddb7b7": { "message": "Méretek" },
+  "directionality_ebcae6d0": { "message": "irányítottság" },
+  "disable_in_line_preview_2a675175": {
+    "message": "Letiltja a beágyazott előnézetet."
+  },
   "discussions_a5f96392": { "message": "Fórumok" },
   "discussions_index_6c36ced": { "message": "Fórumok indexe" },
   "display_options_315aba85": { "message": "Megjelenítési beállítások" },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "Szöveges link megjelenítése (új lapfülön jelenik meg)"
+  },
   "document_678cd7bf": { "message": "Dokumentum" },
   "documents_81393201": { "message": "Dokumentumok" },
   "done_54e3d4b6": { "message": "Kész" },
@@ -98,6 +112,12 @@
   "drag_a_file_here_39357b48": { "message": "Húzz egy file-t ide" },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Húzza ide vagy keressen a számítógépen"
+  },
+  "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+    "message": "Húzza a fogantyút. Átméretezéshez használja a fel és le nyilakat."
+  },
+  "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
+    "message": "Húzzon át ide elemeket, vagy kattintson a számítógépen való tallózáshoz."
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Határidő: Több határidő van érvényben"
@@ -132,9 +152,15 @@
   "files_c300e900": { "message": "Fájlok" },
   "files_index_af7c662b": { "message": "Fájlok indexe" },
   "finish_bc343002": { "message": "Befejezés" },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "Az előugró környezeti eszköztár fókuszba helyezése"
+  },
   "formatting_5b143aa8": { "message": "Formázás" },
   "found_auto_saved_content_3f6e4ca5": {
     "message": "Automatikusan mentett tartalmat találtunk"
+  },
+  "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
+    "message": "{ count, plural,\n     =0 {# eredmény}\n    one {# eredmény}\n  other {# eredmény}\n} található"
   },
   "generating_preview_45b53be0": { "message": "Előnézet generálása... " },
   "go_to_the_editor_s_menubar_e6674c81": {
@@ -226,6 +252,7 @@
     "message": "Kérjük, engedélyezze, hogy a Canvas elérje a mikrofonját és a webkameráját!"
   },
   "posted_when_a578f5ab": { "message": "Közzétéve: { when }" },
+  "preformatted_d0670862": { "message": "Előre formázott" },
   "preview_53003fd2": { "message": "Előnézet" },
   "preview_a3f8f854": { "message": "ELŐNÉZET" },
   "previous_page_928fc112": { "message": "Előző oldal" },
@@ -271,6 +298,9 @@
     "message": "Hiba történt a feltöltés közben! Ellenőrizze a kapcsolatát és próbálja újra."
   },
   "sort_by_e75f9e3e": { "message": "Rendezés" },
+  "square_unordered_list_b15ce93b": {
+    "message": "rendezetlen lista négyzetekkel"
+  },
   "start_over_f7552aa9": { "message": "Újrakezdés" },
   "start_recording_9a65141a": { "message": "Felvétel elkezdése" },
   "styles_2aa721ef": { "message": "Stílusok" },
@@ -289,6 +319,9 @@
   "syllabus_f191f65b": { "message": "Tematika" },
   "tab_arrows_4cf5abfc": { "message": "Tab/Nyilak" },
   "text_7f4593da": { "message": "Szöveg" },
+  "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+    "message": "Bár a videója a megfelelő címmel jelenik majd meg a böngészőben, az adatbázisban nem sikerült frissíteni."
+  },
   "title_ee03d132": { "message": "Cím" },
   "to_be_posted_when_d24bf7dc": { "message": "Időzített közzététel: { when }" },
   "to_do_when_2783d78f": { "message": "Teendő : { when }" },
@@ -321,7 +354,10 @@
   },
   "url_22a5f3b8": { "message": "URL" },
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
-    "message": "Képernyőolvasó használta egy kép tartalmának leírásához"
+    "message": "Képernyőolvasók által egy kép tartalmának leírásához használt szöveg"
+  },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Képernyőolvasók által a videó leírásához használt szöveg"
   },
   "user_documents_c206e61f": { "message": "A felhasználó dokumentumai" },
   "user_files_78e21703": { "message": "A felhasználó fájlai" },
