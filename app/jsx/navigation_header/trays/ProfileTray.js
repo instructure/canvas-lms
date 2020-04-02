@@ -87,6 +87,7 @@ export default function ProfileTray(props) {
           size="x-large"
           inline={false}
           margin="auto"
+          data-fs-exclude
         />
         <div style={{wordBreak: 'break-word'}}>
           <Heading level="h3" as="h2">

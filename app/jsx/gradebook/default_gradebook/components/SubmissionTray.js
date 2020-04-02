@@ -39,7 +39,7 @@ import {extractSimilarityInfo} from '../../../grading/helpers/SubmissionHelper'
 function renderAvatar(name, avatarUrl) {
   return (
     <div id="SubmissionTray__Avatar">
-      <Avatar name={name} src={avatarUrl} size="auto" />
+      <Avatar name={name} src={avatarUrl} size="auto" data-fs-exclude />
     </div>
   )
 }

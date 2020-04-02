@@ -54,6 +54,7 @@ export default function CommentRow(props) {
           name={author ? author.shortName : I18n.t('Anonymous')}
           src={author ? author.avatarUrl : ''}
           margin="0 small 0 0"
+          data-fs-exclude
         />
       </div>
       <div className="comment-text-comment-container">
@@ -89,4 +90,3 @@ export default function CommentRow(props) {
 CommentRow.propTypes = {
   comment: SubmissionComment.shape.isRequired
 }
-

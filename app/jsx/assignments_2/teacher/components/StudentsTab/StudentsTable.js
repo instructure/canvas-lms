@@ -105,7 +105,13 @@ export default class StudentsTable extends React.Component {
     const displayName = student.shortName || student.name || I18n.t('User')
     return (
       <>
-        <Avatar name={student.name} src={student.avatarUrl} size="small" margin="0 small 0 0" />
+        <Avatar
+          name={student.name}
+          src={student.avatarUrl}
+          size="small"
+          margin="0 small 0 0"
+          data-fs-exclude
+        />
         {displayName}
       </>
     )

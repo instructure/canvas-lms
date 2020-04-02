@@ -62,4 +62,4 @@ enable_fullstory:
   display_name: Enable fullstory
   description: |-
     Include FullStory recording of the user's session
-  applies_to: RootAccount
+  applies_to: SiteAdmin

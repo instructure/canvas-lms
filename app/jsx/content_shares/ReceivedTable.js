@@ -151,6 +151,7 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
             size="small"
             name={share.sender.display_name}
             src={share.sender.avatar_image_url}
+            data-fs-exclude
           />{' '}
           {share.sender.display_name}
         </Table.Cell>

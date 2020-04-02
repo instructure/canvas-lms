@@ -22,19 +22,19 @@ require 'spec_helper'
     include FullStoryHelper
 
     before :each do
-      @domain_root_account = Account.default
+      @site_admin_account = Account.site_admin
       @session = {}
     end
 
     context "with feature enabled" do
       before :each do
-        @domain_root_account.enable_feature!(:enable_fullstory)
+        @site_admin_account.enable_feature!(:enable_fullstory)
       end
 
       it 'is enabled if login is sampled' do
         allow(FullStoryHelper).to receive(:rand).and_return(0.5)
         override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
-          fullstory_init(@domain_root_account, @session)
+          fullstory_init(@site_admin_account, @session)
           expect(fullstory_app_key).to eql('12345')
           expect(@session[:fullstory_enabled]).to be_truthy
           expect(fullstory_enabled_for_session?(@session)).to be_truthy
@@ -44,7 +44,7 @@ require 'spec_helper'
       it 'is disabled if login is not sampled' do
         allow(FullStoryHelper).to receive(:rand).and_return(0.5)
         override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 0, app_key: '12345'} } }) do
-          fullstory_init(@domain_root_account, @session)
+          fullstory_init(@site_admin_account, @session)
           expect(fullstory_app_key).to eql('12345')
           expect(@session[:fullstory_enabled]).to be_falsey
           expect(fullstory_enabled_for_session?(@session)).to be_falsey
@@ -54,7 +54,7 @@ require 'spec_helper'
       it "doesn't explode if the dynamic settings are missing" do
         allow(FullStoryHelper).to receive(:rand).and_return(0.5)
         override_dynamic_settings(config: {canvas: { fullstory: nil } }) do
-          fullstory_init(@domain_root_account, @session)
+          fullstory_init(@site_admin_account, @session)
           expect(fullstory_app_key).to be_nil
           expect(@session[:fullstory_enabled]).to be_falsey
           expect(fullstory_enabled_for_session?(@session)).to be_falsey
@@ -64,13 +64,13 @@ require 'spec_helper'
 
     context "with feature disabled" do
       before :each do
-        @domain_root_account.disable_feature!(:enable_fullstory)
+        @site_admin_account.disable_feature!(:enable_fullstory)
       end
 
       it 'is disabled' do
         allow(FullStoryHelper).to receive(:rand).and_return(0.5)
         override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
-          fullstory_init(@domain_root_account, @session)
+          fullstory_init(@site_admin_account, @session)
           expect(fullstory_app_key).to eql('12345')
           expect(@session[:fullstory_enabled]).to be_falsey
           expect(fullstory_enabled_for_session?(@session)).to be_falsey
