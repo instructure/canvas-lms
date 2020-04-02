@@ -1,0 +1,7 @@
+---
+canvas_k6_theme:
+  state: allowed
+  display_name: Canvas Elementary Theming
+  description: Elementary friendly theme font and limited course navigation.
+  applies_to: Course
+  root_opt_in: true
