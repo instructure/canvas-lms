@@ -31,6 +31,30 @@ module Canvas
           raise "cassandra_cluster is required to be defined" unless respond_to?(:cassandra_cluster) && cassandra_cluster.present?
           Switchman::Shard.current == Switchman::Shard.birth && Canvas::Cassandra::DatabaseBuilder.configured?(cassandra_cluster)
         end
+
+        def cassandra_table_exists?(table)
+          cql = %{
+            SELECT *
+            FROM #{table}
+            LIMIT 1
+          }
+          cassandra.execute(cql)
+          true
+        rescue CassandraCQL::Error::InvalidRequestException
+          false
+        end
+
+        def cassandra_column_exists?(table, column)
+          cql = %{
+            SELECT #{column}
+            FROM #{table}
+            LIMIT 1
+          }
+          cassandra.execute(cql)
+          true
+        rescue CassandraCQL::Error::InvalidRequestException
+          false
+        end
       end
 
       def self.included(migration)
