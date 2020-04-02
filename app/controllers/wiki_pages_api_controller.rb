@@ -526,19 +526,21 @@ class WikiPagesApiController < ApplicationController
   end
 
   def get_wiki_page
-    @wiki = @context.wiki
+    Shackles.activate(:slave) do
+      @wiki = @context.wiki
 
-    # attempt to find an existing page
-    url = params[:url]
-    if is_front_page_action?
-      @page = @wiki.front_page
-    else
-      @page = @wiki.find_page(url)
+      # attempt to find an existing page
+      @url = params[:url]
+      if is_front_page_action?
+        @page = @wiki.front_page
+      else
+        @page = @wiki.find_page(@url)
+      end
     end
 
     # create a new page if the page was not found
     unless @page
-      @page = @wiki.build_wiki_page(@current_user, :url => url)
+      @page = @wiki.build_wiki_page(@current_user, :url => @url)
       if is_front_page_action?
         @page.workflow_state = 'active'
         @set_front_page = true

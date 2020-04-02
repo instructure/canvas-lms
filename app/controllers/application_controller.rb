@@ -1622,16 +1622,18 @@ class ApplicationController < ActionController::Base
   # Retrieving wiki pages needs to search either using the id or
   # the page title.
   def get_wiki_page
-    @wiki = @context.wiki
+    Shackles.activate(params[:action] == "edit" ? :master : :slave) do
+      @wiki = @context.wiki
 
-    @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
-    if(params[:format] && !['json', 'html'].include?(params[:format]))
-      @page_name += ".#{params[:format]}"
-      params[:format] = 'html'
+      @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
+      if(params[:format] && !['json', 'html'].include?(params[:format]))
+        @page_name += ".#{params[:format]}"
+        params[:format] = 'html'
+      end
+      return if @page || !@page_name
+
+      @page = @wiki.find_page(@page_name) if params[:action] != 'create'
     end
-    return if @page || !@page_name
-
-    @page = @wiki.find_page(@page_name) if params[:action] != 'create'
 
     unless @page
       if params[:titleize].present? && !value_to_boolean(params[:titleize])
