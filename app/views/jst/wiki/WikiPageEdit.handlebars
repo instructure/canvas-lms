@@ -78,10 +78,12 @@
       {{checkbox "notify_of_update"}}
       {{#t "notify_users_text"}}Notify users that this content has changed{{/t}}
     </label>
-    <button class="btn cancel">{{#t "buttons.cancel"}}Cancel{{/t}}</button>
-    {{#if CAN.PUBLISH_NOW}}
-      <button class="btn btn-default save_and_publish">{{#t "buttons.save_and_publish"}}Save & Publish{{/t}}</button>
-    {{/if}}
-    <button class="btn btn-primary submit">{{#t "buttons.save"}}Save{{/t}}</button>
+    <div class="page-edit__action_buttons">
+      <button class="btn cancel">{{#t "buttons.cancel"}}Cancel{{/t}}</button>
+      {{#if CAN.PUBLISH_NOW}}
+        <button class="btn btn-default save_and_publish">{{#t "buttons.save_and_publish"}}Save & Publish{{/t}}</button>
+      {{/if}}
+      <button class="btn btn-primary submit">{{#t "buttons.save"}}Save{{/t}}</button>
+    </div>
   </div>
 </div>

@@ -66,6 +66,17 @@ div.form-column-left {
     /* for labels that correspond to an un-grouped form el */
     margin-top: 0px;
   }
+
+  body.responsive_2020_04 & {
+    text-align: direction(left);
+    padding: 5px 0px;
+    label { margin-bottom: 0px }
+    @include breakpoint(mini-tablet) {
+      text-align: direction(right);
+      padding: 5px 10px;
+      label { margin-bottom: 5px }
+    }
+  }
 }
 #discussion_point_change_warning {
   margin-top: 15px;
@@ -77,7 +88,17 @@ div.form-column-left {
 /* for grouped and un-grouped form els */
 div.form-column-right, div.overrides-column-right {
   display: inline-block;
-  width: 380px;
+
+  body:not(.responsive_2020_04) & {
+    width: 380px;
+  }
+
+  body.responsive_2020_04 & {
+    width: 100%;
+    @include breakpoint(mini-tablet) {
+      width: 380px;
+    }
+  }
 
   /* for groups of form els ONLY */
   .border {
@@ -165,8 +186,25 @@ div.form-column-right, div.overrides-column-right {
 
   .ContainerDueDate { // date inputs
     .Available-from-to {
-      .from, .to {  // or the from and to collapse on each other in ie11
-        width: 50%;
+      body.responsive_2020_04 & {
+        flex-direction: column;
+        .from {
+          margin-bottom: 18px;
+        }
+        @include breakpoint(mini-tablet) {
+          flex-direction: row;
+          .from {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+    body.responsive_2020_04 & {
+      .input-append {
+        display: flex;
+        @include breakpoint(mini-tablet) {
+          display: inline-block;
+        }
       }
     }
     // make the box of dates layout look right
@@ -294,5 +332,30 @@ div.form-column-right, div.overrides-column-right {
   // The hover looks weird in this case
   label:hover {
     background: none;
+  }
+}
+// Increased specificity to override common styles
+#edit_assignment_form .form-actions {
+  padding-#{direction(left)}: 10px;
+  .pull-left {
+    min-width: 300px;
+  }
+  body.responsive_2020_04 & {
+    .assignment__action-buttons {
+      width: 100%;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: flex-start;
+      button {
+        margin-top: 10px;
+      }
+      @include breakpoint(mini-tablet) {
+        display: inline-block;
+        width: unset;
+        button {
+          margin-top: 0px;
+        }
+      }
+    }
   }
 }
