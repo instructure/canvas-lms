@@ -271,17 +271,19 @@ class ConferencesController < ApplicationController
     }
     log_asset_access([ "conferences", @context ], "conferences", "other")
 
-    @render_alternatives = WebConference.conference_types.all? { |ct| ct[:replace_with_alternatives] }
-    case @context
-    when Course
-      @users = User.where(:id => @context.current_enrollments.not_fake.active_by_date.where.not(:user_id => @current_user).select(:user_id)).
-        order(User.sortable_name_order_by_clause).to_a
-      @render_alternatives ||= @context.settings[:show_conference_alternatives].present?
-    when Group
-      @users = @context.participating_users_in_context.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
-      @render_alternatives ||= @context.context.settings[:show_conference_alternatives].present?
-    else
-      @users = @context.users.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
+    Shackles.activate(:slave) do
+      @render_alternatives = WebConference.conference_types.all? { |ct| ct[:replace_with_alternatives] }
+      case @context
+      when Course
+        @users = User.where(:id => @context.current_enrollments.not_fake.active_by_date.where.not(:user_id => @current_user).select(:user_id)).
+          order(User.sortable_name_order_by_clause).to_a
+        @render_alternatives ||= @context.settings[:show_conference_alternatives].present?
+      when Group
+        @users = @context.participating_users_in_context.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
+        @render_alternatives ||= @context.context.settings[:show_conference_alternatives].present?
+      else
+        @users = @context.users.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
+      end
     end
 
     # exposing the initial data as json embedded on page.
