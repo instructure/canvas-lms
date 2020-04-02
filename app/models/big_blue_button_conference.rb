@@ -142,7 +142,7 @@ class BigBlueButtonConference < WebConference
     filtered_conferences = conferences.select{|c| c.conference_key && c.settings[:record]}
     return unless filtered_conferences.any?
 
-    fallback_conferences, current_conferences = conferences.partition{|c| c.use_fallback_config?}
+    fallback_conferences, current_conferences = filtered_conferences.partition{|c| c.use_fallback_config?}
     fetch_and_preload_recordings(fallback_conferences, use_fallback_config: true) if fallback_conferences.any?
     fetch_and_preload_recordings(current_conferences, use_fallback_config: false) if current_conferences.any?
   end
