@@ -300,4 +300,35 @@ describe ProfileController do
       end
     end
   end
+
+  describe "GET #qr_mobile_login" do
+    subject(:response) { get :qr_mobile_login }
+
+    context "mobile_qr_login flag is enabled" do
+      before :once do
+        Account.default.enable_feature! :mobile_qr_login
+      end
+
+      it "should render empty html layout" do
+        user_session(@user)
+        expect(response).to render_template "layouts/application"
+        expect(response.body).to eq ""
+      end
+
+      it "should redirect to login if no active session" do
+        expect(response).to redirect_to "/login"
+      end
+    end
+
+    context "mobile_qr_login flag is disabled" do
+      before :once do
+        Account.default.disable_feature! :mobile_qr_login
+      end
+
+      it "should 404" do
+        user_session(@user)
+        expect(response).to be_not_found
+      end
+    end
+  end
 end

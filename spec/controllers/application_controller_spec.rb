@@ -186,35 +186,6 @@ RSpec.describe ApplicationController do
       expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
     end
 
-    context "show_qr_login (QR for Mobile Login)" do
-      before(:each) do
-        allow(Object).to receive(:const_defined?).and_call_original
-        controller.instance_variable_set(:@domain_root_account, Account.default)
-      end
-
-      it 'is false if InstructureMiscPlugin is not defined and the feature flag is off' do
-        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(false).once
-        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_falsey
-      end
-
-      it 'is false if InstructureMiscPlugin is defined and the feature flag is off' do
-        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(true).once
-        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_falsey
-      end
-
-      it 'is false if InstructureMiscPlugin is not defined and the feature flag is on' do
-        Account.default.enable_feature!(:mobile_qr_login)
-        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(false).once
-        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_falsey
-      end
-
-      it 'is true if InstructureMiscPlugin is defined and the feature flag is on' do
-        Account.default.enable_feature!(:mobile_qr_login)
-        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(true).once
-        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_truthy
-      end
-    end
-
     context "responsive_2020_03" do
       before(:each) do
         controller.instance_variable_set(:@domain_root_account, Account.default)

@@ -16,43 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!QRLoginModal'
+import I18n from 'i18n!QRMobileLogin'
 import React, {useState, useEffect} from 'react'
-import ReactDOM from 'react-dom'
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
 
-import Modal from '../../shared/components/InstuiModal'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {Img} from '@instructure/ui-img'
-import {Button} from '@instructure/ui-buttons'
-import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import moment from 'moment'
-import {func, object} from 'prop-types'
+import {object} from 'prop-types'
 
 const REFRESH_INTERVAL = moment.duration(9.75, 'minutes') // 9 min 45 sec
 const POLL_INTERVAL = moment.duration(5, 'seconds')
 const QR_CODE_LIFETIME = moment.duration(10, 'minutes')
 
-let modalContainer
-
-// exported for tests only
-export function killQRLoginModal() {
-  if (modalContainer) ReactDOM.unmountComponentAtNode(modalContainer)
-  modalContainer.remove()
-  modalContainer = undefined
-}
-
-// exported for tests only
-export function QRLoginModal({onDismiss, refreshInterval, pollInterval}) {
+export function QRMobileLogin({refreshInterval, pollInterval}) {
   const [imagePng, setImagePng] = useState(null)
   const [validFor, setValidFor] = useState(null)
 
   function renderQRCode() {
     const body = imagePng ? (
       <span className="fs-exclude">
-        <Img data-testid="qr-code-image" src={`data:image/png;base64, ${imagePng}`} />
+        <Img
+          alt={I18n.t('QR Code Image')}
+          constrain="contain"
+          data-testid="qr-code-image"
+          src={`data:image/png;base64, ${imagePng}`}
+        />
       </span>
     ) : (
       <Spinner
@@ -61,7 +55,7 @@ export function QRLoginModal({onDismiss, refreshInterval, pollInterval}) {
       />
     )
     return (
-      <View display="block" textAlign="center" padding="small 0 0">
+      <View display="block" textAlign="center" padding="small xx-large">
         {body}
       </View>
     )
@@ -95,7 +89,6 @@ export function QRLoginModal({onDismiss, refreshInterval, pollInterval}) {
           message: I18n.t('An error occurred while retrieving your QR Code'),
           err
         })
-        onDismiss()
       } finally {
         isFetching = false
       }
@@ -117,49 +110,46 @@ export function QRLoginModal({onDismiss, refreshInterval, pollInterval}) {
   useEffect(startTimedEvents, [])
 
   return (
-    <Modal onDismiss={onDismiss} open label={I18n.t('QR for Mobile Login')} size="small">
-      <Modal.Body>
-        <View display="block">
-          {I18n.t(
-            'To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.'
+    <Flex direction="column" justifyItems="center" margin="none medium">
+      <Flex.Item margin="xx-small" padding="xx-small">
+        <Heading level="h1">{I18n.t('QR for Mobile Login')}</Heading>
+      </Flex.Item>
+      <Flex.Item>
+        <View {...flexViewProps}>
+          <View display="block">
+            {I18n.t(
+              'To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.'
+            )}
+          </View>
+          {renderQRCode()}
+
+          {validFor && (
+            <Text weight="light" size="small">
+              {validFor}
+            </Text>
           )}
         </View>
-        {renderQRCode()}
-
-        {validFor && (
-          <Text weight="light" size="small">
-            {validFor}
-          </Text>
-        )}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button data-testid="qr-close-button" variant="primary" onClick={onDismiss}>
-          {I18n.t('Done')}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+      </Flex.Item>
+    </Flex>
   )
 }
 
-QRLoginModal.propTypes = {
-  onDismiss: func,
+const flexViewProps = {
+  borderColor: 'primary',
+  borderWidth: 'small',
+  borderRadius: 'medium',
+  padding: 'medium',
+  margin: 'medium small',
+  maxWidth: '30rem',
+  as: 'div'
+}
+
+QRMobileLogin.propTypes = {
   refreshInterval: object,
   pollInterval: object
 }
 
-QRLoginModal.defaultProps = {
-  onDismiss: killQRLoginModal,
+QRMobileLogin.defaultProps = {
   refreshInterval: REFRESH_INTERVAL,
   pollInterval: POLL_INTERVAL
-}
-
-export function showQRLoginModal(props = {}) {
-  if (modalContainer) return // Modal is already up
-  const {QRModal, ...modalProps} = props
-  modalContainer = document.createElement('div')
-  modalContainer.setAttribute('id', 'qr_login_modal_container')
-  document.body.appendChild(modalContainer)
-
-  const Component = QRModal || QRLoginModal
-  ReactDOM.render(<Component {...modalProps} />, modalContainer)
 }

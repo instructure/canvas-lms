@@ -176,7 +176,6 @@ class ApplicationController < ActionController::Base
             la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
             cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
             featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links),
-            show_qr_login: Object.const_defined?("InstructureMiscPlugin") && !!@domain_root_account&.feature_enabled?(:mobile_qr_login),
             responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03),
             responsive_2020_04: !!@domain_root_account&.feature_enabled?(:responsive_2020_04),
             product_tours: !!@domain_root_account&.feature_enabled?(:product_tours),

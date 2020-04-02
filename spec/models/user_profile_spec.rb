@@ -210,5 +210,27 @@ describe UserProfile do
         end
       end
     end
+
+    describe "QR mobile login" do
+      before :once do
+        user_factory(active_all: true)
+      end
+
+      context "mobile_qr_login flag is enabled" do
+        it "should show the QR mobile login tab" do
+          account.enable_feature! :mobile_qr_login
+          tabs = @user.profile.tabs_available(@user, :root_account => account)
+          expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_QR_MOBILE_LOGIN
+        end
+      end
+
+      context "mobile_qr_login flag is disabled" do
+        it "should not show the QR mobile login tab" do
+          account.disable_feature! :mobile_qr_login
+          tabs = @user.profile.tabs_available(@user, :root_account => account)
+          expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_QR_MOBILE_LOGIN
+        end
+      end
+    end
   end
 end

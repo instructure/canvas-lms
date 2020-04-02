@@ -296,7 +296,6 @@ export default class Navigation extends React.Component {
             loaded={this.state.profileAreLoaded}
             tabs={this.state.profile}
             counts={{unreadShares: this.state.unreadSharesCount}}
-            showQRLoginLink={window.ENV.FEATURES.show_qr_login}
           />
         )
       case 'help':

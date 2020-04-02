@@ -860,6 +860,7 @@ CanvasRails::Application.routes.draw do
   scope '/profile' do
     post 'toggle_disable_inbox' => 'profile#toggle_disable_inbox'
     get 'profile_pictures' => 'profile#profile_pics', as: :profile_pics
+    get 'qr_mobile_login' => 'profile#qr_mobile_login', as: :qr_mobile_login
     delete 'user_services/:id' => 'users#delete_user_service', as: :profile_user_service
     post 'user_services' => 'users#create_user_service', as: :profile_create_user_service
   end
