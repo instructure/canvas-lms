@@ -19,6 +19,14 @@ css_bundle :dashboard_card
 
 default_number_of_fake_dashcards_to_show = 5
 
+number_of_fake_published_cards_to_show =
+  Rails.cache.read(['last_known_dashboard_cards_published_count', @current_user.global_id].cache_key) ||
+  default_number_of_fake_dashcards_to_show
+
+number_of_fake_unpublished_cards_to_show =
+  Rails.cache.read(['last_known_dashboard_cards_unpublished_count', @current_user.global_id].cache_key) ||
+  default_number_of_fake_dashcards_to_show
+
 number_of_fake_cards_to_show =
   Rails.cache.read(['last_known_dashboard_cards_count', @current_user.global_id].cache_key) ||
   default_number_of_fake_dashcards_to_show
@@ -32,21 +40,57 @@ render_on_pageload = user_dashboard_view == 'cards'
 <% end %>
 <div id="DashboardCard_Container" style="display: <%= render_on_pageload ? 'block' : 'none' %>">
   <div class="ic-DashboardCard__box">
-    <% for i in 1..number_of_fake_cards_to_show do %>
-      <div class="ic-DashboardCard">
-        <svg xmlns="http://www.w3.org/2000/svg" class="ic-DashboardCard__placeholder-svg" version="1.1" x="0" y="0" viewBox="-1087 618 260 254" xml:space="preserve">
-          <title>Empty Card</title>
-          <g class="ic-DashboardCard__placeholder-animates">
-            <path d="M-1087 618h260v126h-260V618z"/>
-            <rect x="-1062" y="759.5" class="st0" width="184" height="16"/>
-            <rect x="-1062" y="785.5" class="st0" width="106" height="9"/>
-            <circle cx="-1054" cy="842.5" r="8"/>
-            <circle cx="-989" cy="842.5" r="8"/>
-            <circle cx="-924" cy="842.5" r="8"/>
-            <circle cx="-859" cy="842.5" r="8"/>
-          </g>
-        </svg>
-      </div>
+    <% if @domain_root_account.feature_enabled?(:unpublished_courses) %>
+      <% for i in 1..number_of_fake_published_cards_to_show do %>
+        <div class="ic-DashboardCard">
+          <svg xmlns="http://www.w3.org/2000/svg" class="ic-DashboardCard__placeholder-svg" version="1.1" x="0" y="0" viewBox="-1087 618 260 254" xml:space="preserve">
+            <title>Empty Card</title>
+            <g class="ic-DashboardCard__placeholder-animates">
+              <path d="M-1087 618h260v126h-260V618z"/>
+              <rect x="-1062" y="759.5" class="st0" width="184" height="16"/>
+              <rect x="-1062" y="785.5" class="st0" width="106" height="9"/>
+              <circle cx="-1054" cy="842.5" r="8"/>
+              <circle cx="-989" cy="842.5" r="8"/>
+              <circle cx="-924" cy="842.5" r="8"/>
+              <circle cx="-859" cy="842.5" r="8"/>
+            </g>
+          </svg>
+        </div>
+      <% end %>
+      <br/>
+      <% for i in 1..number_of_fake_unpublished_cards_to_show do %>
+        <div class="ic-DashboardCard">
+          <svg xmlns="http://www.w3.org/2000/svg" class="ic-DashboardCard__placeholder-svg" version="1.1" x="0" y="0" viewBox="-1087 618 260 254" xml:space="preserve">
+            <title>Empty Card</title>
+            <g class="ic-DashboardCard__placeholder-animates">
+              <path d="M-1087 618h260v126h-260V618z"/>
+              <rect x="-1062" y="759.5" class="st0" width="184" height="16"/>
+              <rect x="-1062" y="785.5" class="st0" width="106" height="9"/>
+              <circle cx="-1054" cy="842.5" r="8"/>
+              <circle cx="-989" cy="842.5" r="8"/>
+              <circle cx="-924" cy="842.5" r="8"/>
+              <circle cx="-859" cy="842.5" r="8"/>
+            </g>
+          </svg>
+        </div>
+      <% end %>
+    <% else %>
+      <% for i in 1..number_of_fake_cards_to_show do %>
+        <div class="ic-DashboardCard">
+          <svg xmlns="http://www.w3.org/2000/svg" class="ic-DashboardCard__placeholder-svg" version="1.1" x="0" y="0" viewBox="-1087 618 260 254" xml:space="preserve">
+            <title>Empty Card</title>
+            <g class="ic-DashboardCard__placeholder-animates">
+              <path d="M-1087 618h260v126h-260V618z"/>
+              <rect x="-1062" y="759.5" class="st0" width="184" height="16"/>
+              <rect x="-1062" y="785.5" class="st0" width="106" height="9"/>
+              <circle cx="-1054" cy="842.5" r="8"/>
+              <circle cx="-989" cy="842.5" r="8"/>
+              <circle cx="-924" cy="842.5" r="8"/>
+              <circle cx="-859" cy="842.5" r="8"/>
+            </g>
+          </svg>
+        </div>
+      <% end %>
     <% end %>
   </div>
 

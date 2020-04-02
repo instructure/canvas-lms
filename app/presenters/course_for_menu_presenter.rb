@@ -68,6 +68,9 @@ class CourseForMenuPresenter
           presenter.to_h
         end
       end
+      if course.root_account.feature_enabled?(:unpublished_courses)
+        hash[:published] = course.published?
+      end
     end
   end
 

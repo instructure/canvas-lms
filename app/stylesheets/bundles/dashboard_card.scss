@@ -31,6 +31,23 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   padding: $ic-sp 0.125rem 0;
 }
 
+.unpublished_courses_redesign .ic-DashboardCard__box {
+  padding: $ic-sp $ic-sp*2;
+}
+
+.unpublished_courses_redesign .ic-DashboardCard__box__header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  border-bottom: 1px solid $ic-border-light;
+  background: rgba($ic-color-light, 0.95);
+  box-sizing: border-box;
+  margin-bottom: $ic-sp*2;
+  @include mobile-only {
+    & { font-size: 1.5em };
+  }
+}
+
 @supports (position: sticky) or (position: -webkit-sticky) {
   .ic-DashboardCard__box {
     padding-top: $ic-sp * 2;

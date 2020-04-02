@@ -103,6 +103,18 @@ describe CourseForMenuPresenter do
       expect(h[:isFavorited]).to eq false
     end
 
+    context 'with the `unpublished_courses` FF enabled' do
+      before(:each) do
+        course.root_account.enable_feature!(:unpublished_courses)
+      end
+
+      it 'sets the published key' do
+        cs_presenter = CourseForMenuPresenter.new(course, user)
+        h = cs_presenter.to_h
+        expect(h.key?(:published)).to eq true
+      end
+    end
+
     context 'Dashcard Reordering' do
       before(:each) do
         @account = Account.default

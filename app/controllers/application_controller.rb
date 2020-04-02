@@ -184,7 +184,8 @@ class ApplicationController < ActionController::Base
             responsive_misc: !!@domain_root_account&.feature_enabled?(:responsive_misc),
             product_tours: !!@domain_root_account&.feature_enabled?(:product_tours),
             module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd),
-            files_dnd: !!@domain_root_account&.feature_enabled?(:files_dnd)
+            files_dnd: !!@domain_root_account&.feature_enabled?(:files_dnd),
+            unpublished_courses: !!@domain_root_account&.feature_enabled?(:unpublished_courses)
           },
           KILL_JOY: Setting.get('kill_joy', false)
         }
