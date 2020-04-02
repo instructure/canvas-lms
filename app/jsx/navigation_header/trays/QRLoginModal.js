@@ -51,7 +51,9 @@ export function QRLoginModal({onDismiss, refreshInterval, pollInterval}) {
 
   function renderQRCode() {
     const body = imagePng ? (
-      <Img data-testid="qr-code-image" src={`data:image/png;base64, ${imagePng}`} />
+      <span className="fs-exclude">
+        <Img data-testid="qr-code-image" src={`data:image/png;base64, ${imagePng}`} />
+      </span>
     ) : (
       <Spinner
         data-testid="qr-code-spinner"

@@ -223,6 +223,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
                 size="small"
                 name={this.state.data.user.name}
                 src={this.props.user.avatar_url}
+                data-fs-exclude
               />{' '}
               {I18n.t('Edit User Details')}
             </span>
