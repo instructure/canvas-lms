@@ -1645,35 +1645,37 @@ class User < ActiveRecord::Base
   # made a tree, it would be the chain between the root and the first branching
   # point.
   def common_account_chain(in_root_account)
-    rid = in_root_account.id
-    accts = self.associated_accounts.where("accounts.id = ? OR accounts.root_account_id = ?", rid, rid)
-    return [] if accts.blank?
-    children = accts.inject({}) do |hash,acct|
-      pid = acct.parent_account_id
-      if pid.present?
-        hash[pid] ||= []
-        hash[pid] << acct
+    Shackles.activate(:slave) do
+      rid = in_root_account.id
+      accts = self.associated_accounts.where("accounts.id = ? OR accounts.root_account_id = ?", rid, rid)
+      return [] if accts.blank?
+      children = accts.inject({}) do |hash,acct|
+        pid = acct.parent_account_id
+        if pid.present?
+          hash[pid] ||= []
+          hash[pid] << acct
+        end
+        hash
       end
-      hash
+
+      enrollment_account_ids = in_root_account.
+        all_enrollments.
+        current_and_concluded.
+        where(user_id: self).
+        joins(:course).
+        distinct.
+        pluck(:account_id)
+
+      longest_chain = [in_root_account]
+      while true
+        break if enrollment_account_ids.include?(longest_chain.last.id)
+
+        next_children = children[longest_chain.last.id]
+        break unless next_children.present? && next_children.count == 1
+        longest_chain << next_children.first
+      end
+      longest_chain
     end
-
-    enrollment_account_ids = in_root_account.
-      all_enrollments.
-      current_and_concluded.
-      where(user_id: self).
-      joins(:course).
-      distinct.
-      pluck(:account_id)
-
-    longest_chain = [in_root_account]
-    while true
-      break if enrollment_account_ids.include?(longest_chain.last.id)
-
-      next_children = children[longest_chain.last.id]
-      break unless next_children.present? && next_children.count == 1
-      longest_chain << next_children.first
-    end
-    longest_chain
   end
 
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
