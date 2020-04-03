@@ -2012,6 +2012,7 @@ ru:
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Разрешить модератору рассмотреть несколько независимых оценок для выбранных документов"
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Позволяет преподавателю задавать число разрешенных попыток выполнения задания через пользовательский интерфейс"
   allow_bb7ce9b1: Разрешить
+  allow_blueprint_publishing_after_association_fae6ba95: "Позволяет публиковать шаблонный курс после присоединения"
   allow_bulk_grade_export_to_sis_e11a6e66: "Разрешить массовый экспорт оценок в SIS"
   allow_comments_a1f45d8: "Разрешить комментарии"
   allow_comments_for_title_7ac9e00: "Разрешить комментарии для %{title}"
@@ -2048,6 +2049,7 @@ ru:
   allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "Разрешить учащимся видеть, кто был записан на отрезки времени, которые все еще доступны."
   allow_switching_to_the_enhanced_rce_317e746f: "Разрешить переключение на усовершенствованный RCE"
   allow_switching_to_the_new_assignments_page_9ac0ad93: "Разрешить переключение на страницу новых заданий"
+  allow_teachers_to_change_the_dates_on_a_set_of_ass_4d48baec: "Позволяет преподавателям изменять даты нескольких назначений за одно действие"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Разрешить возможность отправки уведомлений через нашу очередь диспетчера"
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: "Разрешить возможность отправлять уведомления через нашу диспетчерскую очередь "
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Разрешить этому инструменту доступ к IMS Names и службе присвоения ролей Role Provisioning"
@@ -2064,6 +2066,7 @@ ru:
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Позволяет экзаменаторам просматривать лоток проверки оценки в SpeedGrader для анонимных или модерируемых заданий."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Позволяет создавать объявления для конкретного раздела"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Разрешить создавать дискуссии по отдельным разделам"
+  allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Позволяет отмечать ссылки для вызова справки как выбранные или новые и постоянно отображать ссылку для вызова выбранной функции справки в меню справки"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Позволяет ролям преподавателя, разработчика, ассистента преподавателя получать доступ к инструменту «Чат»."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Позволяет ролям преподавателя / разработчика / ассистента преподавателя получать доступ к инструменту «Чат»."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Позволяет ролям преподавателя / ассистента преподавателя получать доступ к инструменту «Посещаемость»."
@@ -2441,6 +2444,7 @@ ru:
   an_error_occurred_while_loading_late_policies_c415f676: "Произошла ошибка при загрузке политик опозданий"
   an_error_occurred_while_locking_announcements_8115ccd7: "Произошла ошибка при блокировании объявлений."
   an_error_occurred_while_migrating_405ac0b5: "При переносе данных произошла ошибка."
+  an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Произошла ошибка при попытке получения вашего QR кода"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Произошла ошибка при сохранении оценок по специальной подготовке для учетной записи"
   an_error_occurred_while_saving_associations_bd66f3f4: "Произошла ошибка при сохранении ассоциаций"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Ошибка при сохранении политики публикации задания"
@@ -2792,6 +2796,7 @@ ru:
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "По мере ввода текста в это поле, список результатов будет автоматически обновляться."
   ask_your_instructor_a_question_a61ca5e9: "Задайте вопрос вашему преподавателю"
   assess_and_survey_your_students_ce8172a9: "Оцените и опросите ваших учащихся"
+  assess_student_understanding_1e0b8d7f: "Оценка степени усвоения информации учащимися"
   assessment_audit_d4a76709: "Аудит оценки"
   assessment_audit_events_for_creatorname_56e84e8: "События аудита оценки для %{creatorName}"
   assessment_audit_events_for_username_eb2144ad: "События аудита оценки для %{userName}"
@@ -2875,6 +2880,7 @@ ru:
   assignment_allowed_attempts_7e3d43ee: "Разрешенное число попыток выполнения задания"
   assignment_assignment_submission_paper_view_8a4c9776: "Отправка %{assignment} задания Представление на бумажном носителе"
   assignment_assignment_submission_plain_text_view_b217d372: "Отправка %{assignment} задание Представление в виде обычного текста"
+  assignment_bulk_editing_37248ca4: "Групповое редактирование назначений"
   assignment_comments_e43ed898: "Комментарии задания"
   assignment_configuration_4153cb88: "Конфигурация задания"
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} был оценен для %{name}."
@@ -3669,6 +3675,13 @@ ru:
   assignments_group_menu_c2522316: "Меню Группа заданий"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Задания в этой группе не имеют возможных баллов и не могут учитываться при вычислении оценки"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Для заданий в данной группе не указано возможное количество баллов, и они не могут быть включены в подсчет оценки."
+  assignments_include_quizzes_graded_discussions_and_182e5899: |-
+      Назначения включают в себя опросы, различные обсуждения и многочисленные типы
+             онлайновых публикаций (файлы, изображения, тексты, URL, а также мультимедийная информация). Назначьте данную информацию
+            всем участникам курсов, либо назначьте различные даты сдачи отдельным 
+            модулям или пользователя. Создайте группы назначений, чтобы систематизировать ваши назначения
+            , присвойте группам весовые коэффициенты в процентах. Включите опцию коллегиального обзора, чтобы учащиеся могли
+             проверять работы друг друга.
   assignments_index_menu_4088a035: "Меню указателя заданий"
   assignments_list_fe3e54be: "Список заданий"
   assignments_settings_30613d0c: "Настройки заданий"
@@ -4045,6 +4058,7 @@ ru:
   blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Концептуальные курсы должны быть включены для учетной записи администратором. Роли в рамках курса могут управлять содержимым в концептуальных курсах, только если они добавлены в концептуальный курс как роли преподавателя, ассистента преподавателя или разработчика."
   blueprint_information_95dcef55: "Информация о шаблоне"
   blueprint_settings_233e909a: "Настройки шаблона"
+  blueprint_sync_90d0dfd5: "Синхронизация шаблона"
   bmp_e297149c: BMP
   body_9f663faf: Тело
   body_f48fe5cd: "Тело письма:"
@@ -4090,6 +4104,7 @@ ru:
       Переносите содержимое из другого курса или системы 
                 управления курсами в ваш курс Canvas.
   bring_existing_content_from_another_course_or_cour_9dc6453d: "Переносите содержимое из других курсов или системы управления курсами в ваш курс Canvas."
+  bring_existing_content_into_your_course_c5fc7e1b: "Перенесите в ваш курс существующий контент"
   bring_your_content_into_your_course_c0f3df7e: "Перенесите ваше содержимое в ваш курс"
   broccoli_cloud: 
     hidden_title: "Скрыто. Доступно по ссылке "
@@ -4165,6 +4180,7 @@ ru:
       user_name: "Имя пользователя"
       user_name_description: "Имя пользователя, принадлежащее пользователю, который имеет доступ учителя/дизайнера к курсу для строки. Оно должно совпадать с одним из имен пользователей, записанных в учетных данных для входа в систему Blackboard."
     only_one_bulk_migration: "В один момент времени может быть запущено только одно массовое перемещение курса."
+  bulk_edit_bc023ac5: "Групповое редактирование"
   bulk_migration: 
     buttons: 
       migrate_courses: "Переместить курсы"
@@ -4770,6 +4786,7 @@ ru:
   canvas_cartridge_name: "Импортер Canvas Cartridge"
   canvas_catalog_87f39420: "Каталог Canvas"
   canvas_cloud_information_fdd404f2: "Облако данных Canvas"
+  canvas_conferences_is_a_free_service_provided_by_b_cc0253e: "Конференции Canvas Conferences - это бесплатный сервис, предоставляемый BigBlueButton."
   canvas_content_security_policy_c3d7bf2b: "Политика защиты информации Canvas"
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Сслки на приборную панель Canvas переведут вас в каталог приборной панели"
@@ -4783,6 +4800,11 @@ ru:
   canvas_failed_to_initiate_the_upload_8e3824d5: "Canvas не удается запустить отправку."
   canvas_files_889a274f: "Файлы Canvas"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
+  canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
+      Canvas позволяет вам воспользоваться технологиями сотрудничества и создания совместных проектов, когда несколько
+             пользователей работают вместе одновременно над одним и тем же документом. Создайте 
+            документы по совместному проекту, которые будут сохраняться в реальном времени — изменения, внесенные
+            любым из пользователей, сразу же станут видны всем остальным пользователям.
   canvas_id_f42f6ad: "Canvas ID"
   canvas_insights_beta_view_4cf67797: "Canvas Insights (бета) - просмотр"
   canvas_introduction_video_2d81f3ad: "Ознакомительное видео Canvas"
@@ -5144,6 +5166,7 @@ ru:
   collapse_subdiscussion_89af1f5c: "Свернуть под-обсуждение"
   collapse_tutorial_tray_66ee7dc1: "Свернуть лоток справки"
   collapsed_510aa02a: "Все свернуто"
+  collection_of_responsive_improvements_throughout_c_dedfe6dc: "Сбор данных об эффективных улучшениях посредством Canvas"
   colombia_57_c6c75620: "Колумбия (+57)"
   colombia_919c87f9: Колумбия
   color_a363e1b0: Цвет
@@ -5170,6 +5193,7 @@ ru:
   common_cartridge_name: "Импортер Common Cartridge"
   common_timezones_2b00baba: "Обычные часовые пояса"
   commons_ed0252fb: Commons
+  communicate_course_objectives_f457158c: "Проинформируйте окружающих о целях учебного курса"
   communicate_to_your_students_exactly_what_will_be__57a679c5: "Сообщайте вашим учащимся то, что от них требуется при изучении курса, в хронологическом порядке. Составляйте вложенные Учебные планы на основе созданных вами Заданий и Событий."
   communicate_to_your_students_exactly_what_will_be__7312d45d: |-
       Доносите до ваших учащихся в точности то, что от них будет требоваться во время
@@ -5263,6 +5287,11 @@ ru:
   conditional_content_7d39e313: "Условный контент"
   conditional_content_b284da8f: "Условный контент"
   conditional_release_d206e93b: "Условный выпуск"
+  conduct_lectures_office_hours_and_student_group_me_13ec766c: |-
+      Читайте лекции, выполняйте офисную работу и проводите групповые занятия с учащимися 
+            со своего компьютера. Трансляция в реальном времени аудио- и видеоматериалов, совместное использование слайдов презентаций
+            , демонстрации работы приложения и онлайновых ресурсов,
+            и так далее.
   conduct_virtual_lectures_virtual_office_hours_and__959d6996: "Проводите виртуальные лекции и занятия и создавайте виртуальные группы учащихся. Транслируйте аудио и видео в реальном времени, делитесь слайдами презентаций, устраивайте демонстрационные показы приложений и онлайновых ресурсов и многое другое."
   conduct_virtual_lectures_virtual_office_hours_and__cc05907b: |-
       Проводите виртуальные лекции, занятия и коллоквиумы. Транслируйте
@@ -5336,6 +5365,10 @@ ru:
     type_disabled_error: "Этот тип конференции больше не включен для этого сайта Canvas"
   conferences_a0a8984b: Конференции
   conferences_are_powered_by_bigbluebutton_a_free_se_a5b2e27e: "Конференции работают на основе бесплатного для пользователей Canvas сервиса BigBlueButton. Пиковые повышения нагрузки могут привести к проблемам производительности. На случай, если BigBlueButton не будет соответствовать текущим или будущим потребностям, Canvas также сотрудничает с такими сервисами, предоставляющими услуги видеоконференц-связи, как Zoom, Hangouts, Teams и другие, предлагающие бесплатные услуги или услуги со скидками."
+  conferences_powered_by_bigbluebutton_is_unable_to__37ef28fe: |-
+      Веб-конференции, поддерживаемые BigBlueButton, не способны удовлетворить существующий в настоящее время спрос.  Рассмотрите возможность обновления до
+              Premium BigBlueButton, либо воспользуйтесь услугами одного из следующих провайдеров видео-конференций.  Свяжитесь в вашим местным администратором
+              , чтобы получить дополнительные рекомендации.
   conferences_tutorial_tray_6f071ce2: "Лоток справки по конференциям"
   confetti_for_on_time_submissions_394e16ce: "Похвала за своевременную отправку"
   config_url_e96ceaf3: "Настройка URL-адреса"
@@ -6649,6 +6682,7 @@ ru:
   course_image_settings_eba3ec55: "Настройки изображения курса"
   course_implemented_apps_fa658f5a: "Реализованные приложения курса"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Курс уже ассоциирован с шаблоном"
+  course_landing_page_49a53ade: "Исходная страница учебного курса"
   course_level_notification_preferences_require_a_co_2f0a618: "Предпочтения уведомлений на уровне курса требуют обновления course_id"
   course_level_overrides_for_notification_preference_e86d1725: "Уровень курса обходит предпочтения уведомлений"
   course_list: 
@@ -7407,6 +7441,7 @@ ru:
   create_edit_line_item_scores_116482c7: "Создать/редактировать оценки элементов строки"
   create_educational_resources_8219326e: "Создать образовательные ресурсы"
   create_failed_15d07ad4: "Ошибка при создании"
+  create_interactive_course_content_76665336: "Создайте интерактивный контент для учебного курса"
   create_item_base: 
     there_was_an_error: "Произошла ошибка при сохранении \"%{title}\". Пожалуйста, повторите попытку."
   create_module_item: 
@@ -7599,6 +7634,7 @@ ru:
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Пользовательские ссылки для включения в диалог помощи всплывающего окна"
   custom_reports_experimental_features_40bbfe7c: "Пользовательские отчеты: Экспериментальные функции"
   customize_configuration_69c22ef3: "Настроить конфигурацию"
+  customize_course_details_26fd4afe: "Настройка деталей учебного курса"
   customize_help_link_62cd05eb: "Настроить ссылку справки"
   customize_learning_mastery_ratings_4ace142a: "Настроить оценки усвоения материала"
   customize_this_menu_efa72a9: "Настроить это меню"
@@ -8512,6 +8548,12 @@ ru:
     unsubscribed: "Подписка отменена"
     unsubscribed_hint: "Вы не подписаны на данную тему. Щелкните, чтобы подписаться"
   discussions_a5f96392: Дискуссии
+  discussions_allow_students_and_instructors_to_comm_ce03ca43: |-
+      Дискуссии позволяют учащимся и инструкторам в любое время обмениваться мнениями по
+             вопросам учебного курса. Создайте дискуссии для оценки знаний или упрощения процесса обмена мнениями с учащимися
+             и решения проблем. Разветвленные 
+            обсуждения способствуют углубленным или длительным дискуссиям
+             с сохранением их структуры, тогда как фокусные дискуссии лучше подходят для быстрого обмена мнениями.
   discussions_create_94dff604: "Обсуждения - создать"
   discussions_index_menu_42591bc9: "Меню указателя обсуждений"
   discussions_menu_f18eb4a2: "Меню обсуждений"
@@ -8528,6 +8570,13 @@ ru:
   display_as_percentage_3e755dc: "Показать в процентах"
   display_as_points_63084235: "Отобразить как точки"
   display_course_catalog: "Отображает список курсов с возможностью поиска данной корневой учетной записи с включенным флагом \"Включить данный курс в индекс общедоступного курса\"."
+  display_grades_as_points_percentages_complete_inco_fa848380: |-
+      Отображение оценок в виде
+            баллов, процентов, выполнения/невыполнения, или с использованием любого другого способа, отвечающего
+            системе оценок для вашего учебного курса, а также фильтрация и систематизация записей в журнале успеваемости
+            в соответствии с вашими предпочтениями. Автоматическое применение оценки для невыполненных работ или работ
+            , не представленных в срок, а также возможность скрыть оценки до тех пор, пока вы не будете готовы сообщить их учащимся
+            . Чтобы упростить процесс выставления оценок, воспользуйтесь SpeedGrader для просмотра и оценки представленных работ.
   display_name_6c2cfc58: "Отобразить имя:"
   display_name_b80c243e: "Отображать имя"
   display_to_students_e1301f99: "Показать студентам"
@@ -8583,6 +8632,7 @@ ru:
   don_t_move_lti_query_params_to_post_body_5c80e037: "Не перемещать запросы параметров LTI для тела POST"
   don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Не заносить результаты в основной журнал успеваемости обучающихся"
   don_t_show_again_15d8253e: "больше не показывать"
+  don_t_show_again_8c7b7297: "Не показывать снова"
   done_54e3d4b6: Готово
   done_8af51c9b: Готово.
   done_editing_9f7379d9: "Редактирование завершено"
@@ -8709,6 +8759,9 @@ ru:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Каждая полоска представляет собой количество *просмотров страницы* за этот день. Оранжевая линия указывает на то, что какой-либо пользователь **выполнял какие-то действия** на курсе за этот день."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Каждая полоска представляет собой количество просмотров страницы, связанных с данной категорией."
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Каждая строка представляет собой одно задание. Ромбик обозначает дату выполнения, а полоска простирается до даты отправки. Зеленым цветом отмечаются *отправки, сделанные вовремя*, желтым цветом   **отправки с опозданием**, а красным цветом – ***отсутствующие задания***. Серыми ромбиками помечаются задания, для которых не указаны даты выполнения. Ромбики устанавливаются на момент отправки."
+  easily_import_or_copy_content_from_another_canvas__c6312f32: |-
+      Просто импортируйте или копируйте контент из другого учебного курса Canvas 
+              в ваш курс, или импортируйте контент из других форматов, таких, как Moodle или QTI.
   ecollege_file_description: Ecollege
   ecollege_name: "Конвертер Ecollege"
   ecuador_593_dfcc235a: "Эквадор (+593)"
@@ -8934,6 +8987,7 @@ ru:
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Включает конечные точки API для курса и данные пользователя, предоставленные New Analytics."
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Активирует сортировку по идентификатору SIS, идентификатору интеграции и идентификатору входа в систему в новом журнале оценок."
   encourage_class_participation_4e069479: "Поощряйте активную работу учащихся на занятиях"
+  encourage_student_discourse_7836b9f7: "Поощряйте обмен мнениями учащихся"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Зашифрованные Sourcedids для основных результатов"
   end_course_set_up_tutorial_dialog_5b812ec6: "Завершить диалог справки по настройке курса"
   end_course_set_up_tutorial_f358b85d: "Выйти из справки по настройке курса"
@@ -9000,6 +9054,7 @@ ru:
   enter_a_valid_date_46d77547: "Введите правильную дату"
   enter_a_what_if_score_668c91a3: "Введите оценку «что, если»."
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Введите \"{{ACCOUNT_DOMAIN}}\", чтобы подставить домен корневой учетной записи пользователя"
+  enter_and_distribute_grades_c1216df: "Ставьте оценки и доводите их до сведения учащихся"
   enter_at_least_count_characters_1c7a0b36: "Введите не менее %{count} символов"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Введите \"{{CANVAS_USER_ID}}\", чтобы заменить уникальный идентификатор пользователя Canvas"
   enter_grades_as_e113e606: "Ввести оценки как"
@@ -9697,6 +9752,7 @@ ru:
   feature_options_enable_disable_7e748054: "Параметры функции - включить / отключить"
   feature_options_view_a170e80c: "Опции функции – показать"
   feature_preview_5e1216a0: "Предварительный просмотр функции"
+  featured_help_links_d805fe44: "Ссылки для вызова выбранных функций справки"
   features: 
     allow_opt_out_of_inbox: "Разрешить пользователям отказаться от ящика входящих сообщений"
     better_file_browsing: "Просмотр лучшего файла"
@@ -10082,6 +10138,7 @@ ru:
       что им необходимо обновить их интеграцию с Google Docs.
   google_docs_preview_9f41b23c: "Функция предварительного просмотра Google Docs"
   google_drive_7cb003c9: "Диск Google"
+  google_meet_f896b61c: "Google Meet"
   google_template_29640bc0: "Шаблон Google"
   goto_first_page_650f1638: "Перейти к первой странице"
   goto_last_page_405adce9: "Перейти к последней странице"
@@ -11696,6 +11753,61 @@ ru:
   hour_s_b6e8d238: Час(-ы/-ов)
   hours_late_989e9081: "Часы, опоздание"
   hover_over_me_496521b9: "Наведите курсор на меня"
+  how_do_i_add_a_module_65f5bf13: "Как мне добавить модуль?"
+  how_do_i_add_an_announcement_in_a_course_63396bb7: "Как мне добавить оповещение в учебный курс?"
+  how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: "Каким образом я могу добавить изображение к карте учебного курса на информационной панели?"
+  how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "Как я могу добавить типы назначений, страницы и файлы в качестве элементов модуля?"
+  how_do_i_add_or_edit_details_in_an_assignment_fa779906: "Как я могу добавлять или редактировать детали назначений?"
+  how_do_i_add_users_to_a_course_4a88efaf: "Как мне добавить пользователей в учебный курс?"
+  how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: "Каким образом я могу корректировать события и даты при импорте учебного курса?"
+  how_do_i_bulk_upload_files_to_a_course_b145d8cc: "Как мне загрузить в учебный курс несколько файлов одновременно?"
+  how_do_i_change_a_course_name_and_course_code_23b41292: "Каким образом я могу изменить название и код учебного курса?"
+  how_do_i_change_the_course_home_page_326cee50: "Как я могу изменить исходную домашнюю страницу учебного курса?"
+  how_do_i_conclude_a_conference_689d60dc: "Как мне завершить веб-конференцию?"
+  how_do_i_copy_a_canvas_course_into_a_new_course_sh_1633c6c1: "Каким образом я могу скопировать учебный курс Canvas в оболочку нового учебного курса?"
+  how_do_i_create_a_conference_in_a_course_69affbf4: "Каким образом я могу создать веб-конференцию для учебного курса?"
+  how_do_i_create_a_discussion_as_an_instructor_fa6c26d6: "Каким образом я могу создать дискуссию, будучи инструктором?"
+  how_do_i_create_a_google_drive_collaboration_as_an_28274cf7: "Каким образом я могу создать совместный проект Google Drive, будучи инструктором?"
+  how_do_i_create_a_microsoft_office_365_collaborati_52e46698: "Каким образом я могу создать совместный проект Microsoft Office 365, будучи инструктором?"
+  how_do_i_create_a_new_page_in_a_course_37a87285: "Каким образом я могу создать новую страницу в учебном курсе?"
+  how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: "Каким образом я могу создать опрос с индивидуальными вопросами?"
+  how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Каким образом я могу создать оценку, используя опцию \"Новые опросы\"?"
+  how_do_i_create_an_assignment_35532b59: "Как создать назначение?"
+  how_do_i_edit_an_announcement_in_a_course_815c3c60: "Как мне отредактировать оповещение в учебном курсе?"
+  how_do_i_edit_the_syllabus_description_in_a_course_57f25a87: "Как мне отредактировать описание программы занятий в учебном курсе?"
+  how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Как ставить оценки в журнале успеваемости и редактировать их?"
+  how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Каким образом я могу импортировать пакет экспорта учебного курса Canvas?"
+  how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: "Каким образом я могу управлять настройками для создания оценки в опции \"Новые опросы\"?"
+  how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Каким образом я могу перемещать и сортировать мои файлы, будучи инструктором?"
+  how_do_i_move_or_reorder_a_module_e64a4baa: "Каким образом мне переместить или перегруппировать модуль?"
+  how_do_i_post_grades_for_an_assignment_in_the_grad_bc01018e: "Как мне ставить оценки за назначение в журнале успеваемости?"
+  how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "Каким образом я могу опубликовать дискуссию или отменить ее публикацию, будучи инструктором?"
+  how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "Каким образом я могу опубликовать модуль или отменить его публикацию, будучи инструктором?"
+  how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Каким образом я могу опубликовать страницу или отменить ее публикацию, будучи инструктором?"
+  how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "Каким образом я могу опубликовать назначение или отменить его публикацию, будучи инструктором?"
+  how_do_i_record_a_conference_e4845e7: "Как мне записать веб-конференцию?"
+  how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Каким образом я могу реагировать на дискуссию, будучи инструктором?"
+  how_do_i_select_specific_content_as_part_of_a_cour_11fe2c8d: "Как мне выбрать конкретный контент, который является частью импортируемого учебного курса?"
+  how_do_i_set_a_front_page_in_a_course_a5f53cd5: "Каким образом я могу настроить титульную страницу учебного курса?"
+  how_do_i_set_details_for_a_course_52cfbeff: "Каким образом я могу настроить детали учебного курса?"
+  how_do_i_start_a_conference_52792795: "Как мне начать веб-конференцию?"
+  how_do_i_upload_a_file_to_a_course_e8332cfe: "Как мне загрузить файл в учебный курс?"
+  how_do_i_use_course_settings_1e8467e6: "Как я могу работать с настройками учебного курса?"
+  how_do_i_use_files_as_an_instructor_70a996b: "Каким образом я могу использовать файлы, будучи инструктором?"
+  how_do_i_use_speedgrader_e18e4ca2: "Каким образом я могу использовать опцию SpeedGrader?"
+  how_do_i_use_the_announcements_index_page_94a14011: "Как я могу использовать страницу указателя оповещений?"
+  how_do_i_use_the_collaborations_index_page_68ee88b5: "Как я могу использовать страницу указателя совместных проектов?"
+  how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "Как я могу использовать исходную домашнюю страницу учебного курса, будучи инструктором?"
+  how_do_i_use_the_gradebook_622395dc: "Как я могу работать с журналом успеваемости?"
+  how_do_i_use_the_pages_index_page_dafb986c: "Как я могу использовать страницу указателя страниц?"
+  how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Как я могу использовать страницу учебного курса \"Люди\", будучи инструктором?"
+  how_do_i_use_the_quizzes_index_page_cc2e15d3: "Как я могу использовать страницу указателя опросов?"
+  how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Каким образом я могу использовать программу занятий, будучи инструктором?"
+  how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "Как я могу просмотреть контекстную карту учащегося в учебном курсе?"
+  how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Каким образом я могу просматривать реплики в ходе дискуссии и сортировать их, будучи инструктором?"
+  how_do_i_view_assignments_or_students_individually_2b7211f8: "Как я могу просматривать в индивидуальном порядке назначения или учащихся в журнале успеваемости?"
+  how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "Каким образом я могу просматривать детали публикаций учащегося в опции SpeedGrader?"
+  how_do_i_view_user_details_for_an_enrollment_in_a__308e9ac0: "Как я могу просмотреть подробные сведения о пользователе для регистрации его в учебном курсе?"
   how_is_the_grade_determined_bb75bf53: "Как определяется оценка?"
   how_is_this_affecting_you_b3b6a639: "Как это влияет на вас?"
   how_many_minutes_ecca5ee7: "Сколько минут?"
@@ -11848,6 +11960,12 @@ ru:
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "При желании можно переименовать «SIS» во что-то более знакомое"
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "Если вы хотели бы сохранить ваши неотправленные комментарии, пожалуйста, сохраните их до выхода с этой страницы."
   if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: "Если вы хотите перейти по ссылке на вебсайт поддержки вашего университетского городка в диалоге помощи, вы можете сделать это здесь."
+  if_your_institution_is_likely_to_need_more_than_10_297382d: |-
+      Если ваше учреждение с большой степенью вероятности нуждается более чем в 10 одновременно проводимых конференциях, поддерживаемых
+                BigBlueButton, рекомендует выполнить обновление до Premium BigBlueButton, либо рассмотреть альтернативные решения по организации веб-конференций
+                , предлагаемые партнерами Canvas, такими, как Zoom, Hangouts, Teams, а также другие средства
+                организации видеоконференций, предлагаемые бесплатными или дисконтными сервисами.
+  if_your_school_uses_microsoft_teams_you_can_use_th_992dff59: "Если ваше учебное заведение использует  Microsoft Teams, вы можете воспользоваться расширенным Rich Content Editor (RCE), чтобы без затруднений добавить офисное пространство для коллективной работы при создании Календарных событий, Оповещений, дискуссионных постов и т.д."
   ignore_91750df8: Игнорировать
   ignore_assignment_738b3c99: "Игнорировать задание"
   ignore_assignment_a4837cb3: "Игнорировать %{assignment}"
@@ -11932,6 +12050,7 @@ ru:
   in_class_23eeca38: "В классе"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Для того, чтобы завершить процесс вы будете перенаправлены на страницу входа, где вам нужно будет войти с учетными данными вашего ребенка."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Чтобы сразу импортировать большое количество результатов или обновить ваши существующие результаты, *следуйте формату CSV*."
+  in_product_training_walkthrough_and_tourpoints_for_2e185119: "Пошаговое руководство к учебному курсу по продукту и основные пункты для преподавателей"
   in_progress_13b9e26f: выполняется
   in_progress_646a8aef: Выполняется
   in_progress_9d1ce8b9: Выполняется
@@ -11941,6 +12060,7 @@ ru:
   inactive_enrollments_3b84be3d: "Неактивные регистрации"
   inbox_bb245a60: Входящие
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Включите ссылку на скринкаст / скриншоте, используя что-то вроде *jing*."
+  include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: "Включает в себя ссылку, позволяющую показать код QR для упрощения регистрации на странице профиля с мобильного устройства."
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: "Включить метку порядка байтов в совместимый экспорт бухучета"
   include_byte_order_mark_in_gradebook_exports_d2ad0d4e: "Включать метку порядка байтов в экспорт журналов оценок"
   include_course_settings_c4c08764: "Включить настройки курса"
@@ -12317,6 +12437,7 @@ ru:
   k_2521301c: k
   kazakhstan_7_8fe892c: "Казахстан (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Имейте в виду, что эта отправка заданий будет учитываться для каждого члена вашей группы %{groupType}."
+  keep_students_informed_3f41a7e6: "Сообщите сведения учащимся"
   keep_submissions_anonymous_5cbaf419: "Сохранить отправки анонимными"
   kenya_254_2945663a: "Кения (+254)"
   key_api_key_68bf80ae: "Ключ: *%{api_key}*"
@@ -12330,6 +12451,7 @@ ru:
     esc_key_notification: "Нажмите клавишу Выход перед использованием сочетания клавиш при навигации по сетке Зачетной книжки."
   keyboard_shortcuts_ed1844bd: "Клавиши быстрого доступа"
   kind_7f0a88c4: Тип
+  know_your_users_5c1323be: "Познакомьтесь с вашими пользователями"
   korean_da812d9: Корейский
   label_3c9a991: "%{label}:"
   label_disabled_not_visible_to_students_da093eec: "%{label}. Отключено. Не отображается для студентов"
@@ -12427,12 +12549,15 @@ ru:
       view_all_or_customize: "Просмотреть все или настроить"
     mobile_auth: 
       log_in_to_canvas: "Войти в систему Canvas"
+  learn_how_to_use_google_meet_in_canvas_3e7aadd9: "Узнайте, как использовать Google Meet в Canvas"
+  learn_how_to_use_microsoft_teams_in_canvas_8b79dde: "Узнайте, как использовать Microsoft Teams в Canvas"
   learn_more_7a8d626: "Узнать больше"
   learn_more_about_collaborations_2978f66d: "Узнайте больше о сотрудничестве"
   learn_more_about_the_differences_a1217479: "Узнать больше о различиях."
   learning_analytics_beta_view_46deb4c8: "Learning Analytics (бета-версия) - просмотр"
   learning_mastery_5fc34276: "Усвоение обучения"
   learning_mastery_6ed4fd63: "Владение учебным материалом…"
+  learning_mastery_context_name_a0b70957: "Усвоение обучения - %{context_name}"
   learning_mastery_gradebook_description: |-
       Журнал успеваемости учащихся позволяет преподавателям быстро просматривать прогресс учащихся и курсов
       по усвоению обучения. Результаты представлены в похожем на журнал успеваемости
@@ -12647,6 +12772,7 @@ ru:
   load_more_a36f9cf9: "Загрузить еще"
   load_more_comments_dc00ac34: "Загрузить больше комментариев"
   load_more_results_460f49a9: "Загрузить больше результатов"
+  load_user_ids_upon_page_load_so_that_gradebook_loa_c51693aa: "Загрузить ИД пользователей при загрузке страницы, чтобы ускорить процесс загрузки журнала успеваемости."
   loaded_more_collaborations_13f1d630: "Загружено больше совместных работ."
   loaded_more_developer_keys_7ea76fbe: "Загружены дополнительные ключи разработчиков."
   loaded_more_developer_keys_focus_moved_to_the_dele_f5b867f8: "Загружены дополнительные ключи разработчиков. Фокус смещен для удаления кнопки последнего загруженного ключа программиста в списке."
@@ -12907,6 +13033,10 @@ ru:
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Убедитесь, что вы выбрали наиболее подходящий вариант, поскольку это МОЖЕТ повлиять на оценки студентов."
   make_the_course_summary_list_of_assignments_and_ev_f739be33: "Сделать обзор курса (список заданий и событий) опциональным в описании курса"
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Откройте этот курс для публичного просмотра (данные студентов по-прежнему будут скрыты)"
+  make_your_course_your_own_upload_an_image_to_repre_ec57713e: |-
+      Создайте собственный учебный курс! Загрузите изображение, которое будет представлять ваш
+            учебный курс, позвольте учащимся управлять отдельными областями контента в учебном курсе и скройте от них детали оценки
+            . Вы можете также изменять имя и код учебного курса.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Позволяет отображать ссылку на Microsoft Immersive Reader в Википедии."
   making_a_copy_of_original_assignment_name_8f029a9b: "Создать копию \"%{original_assignment_name}\""
   making_a_copy_of_originalassignmentname_b7268992: "Выполнение копии \"%{originalAssignmentName}\""
@@ -12954,6 +13084,7 @@ ru:
   manually_9de23e1f: Вручную
   manually_mark_posts_as_read_afa5d035: "Отметить сообщения как прочитанные вручную"
   manually_post_grades_18248306: "Публиковать оценки вручную"
+  march_2020_responsiveness_f810a65b: "Март 2020 Динамичность"
   mark_as_done_6fa48d2f: "Отметить как выполненное"
   mark_as_done_779556d7: "отметить как выполненное"
   mark_as_read_e7de2ce3: "Отметить как прочитанное"
@@ -14933,6 +15064,7 @@ ru:
   mgp_grade_export_d29b471f: "Экспорт оценки MGP"
   mic_a7f3d311: Микрофон
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - бесплатная демонстрационная версия (Википедия)"
+  microsoft_teams_99cb45c0: "Microsoft Teams"
   migrate_67c9f753: Перенос
   migrate_quiz_5d0f777: "Перенос контрольной работы"
   migrating_name_e05aa53e: "Перенос \"%{name}\""
@@ -15644,6 +15776,9 @@ ru:
   not_a_number: "должно быть положительным числом"
   not_a_valid_date_d3ac20ba: "Не является действительной датой"
   not_a_valid_utf_8_string_string_7f6819c: "Недействительная строка utf-8: %{string}"
+  not_all_of_these_services_may_be_supported_by_your_155d9f70: |-
+      Ваше учреждение может поддерживать далеко не все эти сервисы. Обратитесь к вашему местному администратору
+                за дополнительной информацией.
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Этот элемент будет назначен не для всех разделов."
   not_all_settings_options_are_available_at_the_suba_20efaa98: "Не все параметры настроек доступны на уровне субучетной записи, включая вкладку «Уведомления»."
   not_anonymously_graded_87574f91: "Анонимно оценки не выставляются"
@@ -16223,6 +16358,7 @@ ru:
   organize_and_segment_your_course_by_topic_unit_cha_6ac2de91: |-
       Организуйте и группируйте ваши курсы по темам, юнитам, главам,
       или неделям. Создавайте последовательности из выбранных модулей на основании заданных критериев и предварительных условий.
+  organize_course_content_11de8958: "Структурирование содержания учебного курса"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Организовать EPUB по типу содержимого (по умолчанию по модулям)."
   organize_your_course_content_c3c7ed03: "Упорядочите содержание вашего курса"
   originality_report_5d461681: "Отчет по оригинальности"
@@ -16502,6 +16638,12 @@ ru:
   pages_e5414c2c: Страницы
   pages_front_page_9ce5188: "Страницы титульной страницы"
   pages_index_menu_f391bf04: "Меню указателя страниц"
+  pages_let_you_create_interactive_content_directly__9933eb32: |-
+      Страницы позволяют вам создавать интерактивный контент непосредственно в Canvas,
+            независимо от того, будет ли это еженедельное обновление, редактируемая страница совместного проекта по учебному курсу или
+            список образовательных ресурсов. Страницы могут содержать текст, мультимедийные средства
+            и ссылки на файлы, а также контент или страницы других учебных курсов. Вы можете также позволить студентам
+            вносить собственный вклад в отдельные страницы учебного курса.
   pages_settings_968392a3: "Настройки страниц"
   pages_tutorial_tray_169464a9: "Лоток справки по страницам"
   pages_update_6c1750af: "Страницы - Обновить"
@@ -16536,9 +16678,11 @@ ru:
   past_14da759a: Прошлые
   past_collaborations_1241938f: "Предыдущие Сотрудничества"
   past_terms_4b6ec40e: "Прошлые четверти"
+  paste_google_meet_links_into_calendar_events_annou_2e363fc7: "Вставьте ссылки Google Meet в Календарные события, Оповещения, Дискуссии, а также в другие места, где вы пользуетесь редактором Rich Content Editor (RCE) (редактор богатого информационного наполнения)."
   paste_json_26ad8050: "Вставить JSON"
   paste_url_8213b83: "Вставить URL"
   paste_xml_cda3a64e: "Вставить XML"
+  paste_zoom_into_calendar_events_announcements_disc_d873358e: "Вставить опцию \"Изменить масштаб\" в Календарные события, Оповещения, Дискуссии, а также в другие места, где вы пользуетесь редактором Rich Content Editor (RCE) (редактор богатого информационного наполнения)."
   path_4f9abf12: Путь
   pause_12af3bb4: Пауза
   paypal: 
@@ -16698,7 +16842,9 @@ ru:
       domain_description: "**Имя хоста** или **ip-адрес** установки BigBlueButton (например, bigbluebutton.mycompany.com)"
       labels: 
         domain: Домен
+        free_trial: "Помечает данную копию BigBlueButton как бесплатную демонстрационную версию"
         recording_enabled: "Разрешить записывать конференции."
+        replace_with_alternatives: "Запрещает веб-конференции BigBlueButton; вместо этого отображается перечень альтернативных вариантов"
         secret: Секретная
       secret_description: "Это параметр %{parameter_name}, который находится в файле конфигурации %{filename}."
     buttons: 
@@ -17203,6 +17349,7 @@ ru:
   ppt_534cb87: PPT
   practice_quiz_19a8505d: "Практическое тестирование"
   pre_processing_92865c1d: "Предварительная обработка"
+  prefetch_user_ids_in_gradebook_b96521b0: "Предварительная выборка ИД пользователей в журнале успеваемости"
   prerequisite_completion_period_c562d63: "Период выполнения предварительных условий"
   prerequisites_49659f16: "Предварительные условия:"
   prerequisites_list_62d66d12: "Предварительные условия: %{list}"
@@ -17255,6 +17402,7 @@ ru:
   process_multiple_content_items_from_course_modules_6de90fd8: "Обрабатывает несколько элементов контента со страницы модулей курса"
   processing_2fcc9739: "Идет обработка"
   product_name: Canvas
+  product_tours_1e19eb95: "Ознакомление с продуктами"
   proficiency_rating_6346119f: "Оценка по специальной подготовке"
   proficiency_rating_deleted_77827473: "Оценка по специальной подготовке удалена"
   proficiency_ratings_2bbabdcd: "Оценки по специальной подготовке"
@@ -17703,6 +17851,7 @@ ru:
     unpublishing: "Отмена публикации…"
   publish_the_course_f2f6ef80: "Опубликовать курс"
   publish_title_102f2d90: "Разместить %{title}"
+  publish_upon_association_53cb0450: "Публикация при присоединении"
   publishable: 
     cant_unpublish: "Невозможно отменить публикацию"
   publishableModuleItem: 
@@ -17732,6 +17881,7 @@ ru:
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Вопрос: Что постоянно меняет цвет, становясь то черным, то белым, то черным, то белым?  Ответ: Медведь панда, катящийся с горы."
   qatar_974_7e9684ca: "Катар (+974)"
   qatar_d52a8d27: Катар
+  qr_for_mobile_login_1b1560ce: "QR для регистрации с мобильного устройства"
   qti_display: QTI
   qti_export_from_date_8f018de5: "*QTI-экспорт из %{date}*"
   qti_file_description: "ZIP-файл QTI"
@@ -19510,6 +19660,7 @@ ru:
     welcome_to_canvas: "Вас приветствует Canvas!"
   registration_url_60e0eaaa: "URL-адрес регистрации"
   regular_style_checkbox_ee3d71c1: "Обычная флаговая кнопка"
+  reinforce_student_understanding_304d18a6: "Закрепление усвоения информации учащимися"
   release_grades_c68fbcc: "Опубликовать оценки"
   released_by_mastery_path_b87fcdf5: "Высвобождено путем усвоения"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Освобождено путем достижения владения: %{cyoe.releasedLabel}"
@@ -20267,6 +20418,7 @@ ru:
   sections_94731e51: Разделы
   security_7a7e8808: Безопасность
   security_tab_failed_to_load_2d2242a: "Не удалось загрузить вкладку «Безопасность»"
+  see_more_in_canvas_guides_fc90a457: "См. подробные данные в руководстве по Canvas"
   see_other_users_primary_email_address_59c8473f: "См. основные адреса эл. почты других пользователей"
   see_rubric_results_62a6447d: "См. результаты рубрики"
   see_scoring_details_f7fd1f3b: "См. сведения об оценке"
@@ -20522,6 +20674,12 @@ ru:
   settings_for_title_label_e103bdd6: "Настройки %{title_label}"
   settings_tutorial_tray_6f37761b: "Лоток справки по настройкам"
   setup_checklist_eb8b00b8: "Настроить контрольный список"
+  share_important_information_about_your_course_with_dceacbf9: |-
+      Поделитесь важной информацией о вашем учебном курсе со всеми пользователями.
+            Используйте оповещения для напоминания учащимся о важных датах и задачах ,
+            уведомите их о внутренних и внешних ресурсах, которые помогут им
+            достичь результатов, намеченных в учебном курсе, отмечайте успехи учащихся и подчеркивайте события, которые могут вызвать интерес.
+            Оповещения могут содержать тексты, мультимедийную информацию и файлы.
   share_important_information_with_all_users_in_your_bc49ee7f: |-
       Делитесь важной информацией со всеми пользователями вашего курса.
                 Выберите для получения копий ваших объявлений, размещаемых в Уведомлениях.
@@ -21264,6 +21422,9 @@ ru:
   short_name_ad9bf84f: "краткое имя"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "должно быть очевидным, Идентификатор canvas отчетного пользователя "
   show_76c0ed1c: Показать
+  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+      Указывает флажок, который дополнительно позволяет администратору учетных записей публиковать курсы
+      автоматически после присоединения и синхронизации с шаблонным курсом
   show_account_navigation_menu_d97270a9: "Показать меню навигации учетной записи"
   show_admin_navigation_menu_92fb579f: "Показать меню навигации администратора"
   show_all_artifacts_34b91a83: "Показать все искажения"
@@ -21680,6 +21841,7 @@ ru:
   stop_acting_as_user_8809a97f: "Перестать действовать как пользователь"
   storage_quotas_manage_6ca14bbb: "Квоты хранилища - управление"
   storage_used_in_mb_c75fbd9c: "используемое хранилище в МБ"
+  store_and_share_course_assets_82a9967c: "Сохраняйте и делитесь мнениями и информацией, накопленной в ходе учебного курса"
   stream_items_api: 
     assessment_request_title: "Рассмотрение коллегами для %{title}"
   strip_domain_from_login_attribute_value_bb6daa88: "Снять домен из значения атрибута входа в систему"
@@ -22323,6 +22485,11 @@ ru:
                      до %{max_domains} доменов в свой белый список. Рекомендуется использовать подстановочные символы
                      (напр., *.instructure.com). Домены Canvas и Instructure включены
                      автоматически и не учитываются в вашем лимите в 50 доменов.
+  the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
+      Исходная домашняя страница учебного курса - это первая страница, которую видят учащиеся, когда они открывают
+            ваш учебный курс. На домашней странице может отображаться поток работ, выполняемых в ходе учебного курса
+            , страница модулей учебного курса, перечень назначений учебного курса, программа занятий,
+            либо это может быть страница, которую вы используете в качестве титульного листа.
   the_course_link_validator_searches_course_content__563fa215: "Валидатор ссылок курса ищет в содержимом курса недействительные или недоступные ссылки и изображения."
   the_course_link_validator_searches_through_course__76f0bc63: "Валидатор ссылок курса просматривает содержание курса и предоставляет сведения о каждой найденной недействительной или безответной ссылке. Обратите внимание, что некоторые ссылки, помеченные как не отвечающие, могут быть просто недоступными на нашем сервере и будут по-прежнему работать для студентов."
   the_course_state_manage_permission_allows_the_user_1d9da094: "Параметр «Статус курса - управление разрешениями» позволяет пользователю публиковать курсы, которые не содержат модулей. Чтобы опубликовать и отменить публикацию контента модуля, необходимо включить параметр «Содержание курса - добавить / редактировать / удалить»."
@@ -22424,6 +22591,12 @@ ru:
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Указанный пользователь (%{id}) не является студентом этого курса"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Указанный пользователь не является студентом этого курса"
   the_state_parameter_is_required_ffadf213: "Необходимо ввести параметр состояния"
+  the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
+      Программа занятий позволяет вам поприветствовать пользователей, регистрирующихся в учебном курсе, и поделиться ожиданиями
+            с вашими учениками. Воспользуйтесь описанием программы занятий, чтобы уточнить цели учебного курса,
+            предпочитаемые методы общения и прочие детали, либо загрузите документ в формате PDF с уже существующей
+            программой занятий. На странице программы занятий также будут отображаться все назначения и события
+            , происходящие в ходе учебного курса.
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Настройка Sync to SIS не может быть активирована для задания \"%{assignment_name}\" без срока сдачи."
   the_term_has_ended_for_this_course_f0ab367: "Закончился срок для этого курса"
   the_title_cannot_be_longer_than_length_characters_7a822943: "Заголовок не может быть длиннее %{length} символов"
@@ -22576,6 +22749,8 @@ ru:
   this_assignment_submission_is_my_own_original_work_e820ce4b: "Это отправленное задание — моя собственная работа"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Это задание больше не повлияет на вашу оценку."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Это вложение не было опубликовано автором."
+  this_code_expires_in_timefromnow_ec7ccef4: "Срок действия этого кода истекает в %{timeFromNow}."
+  this_code_has_expired_41f76642: "Срок действия данного кода истек."
   this_conference_may_be_recorded_f76deeeb: "Эта конференция может записываться."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Этот курс сейчас не может быть добавлен в меню курсов."
   this_course_does_not_allow_score_uploads_4b35fe07: "Нельзя загружать оценки для этого курса."
@@ -23063,6 +23238,8 @@ ru:
       и получить ID Клиента и Секретный Вопрос Клиента.
       
       Если провайдер может настроить действующий обратный вызов или перенаправление URI, используйте %{callback_url}.
+  to_create_a_link_you_can_use_in_canvas_you_ll_need_5c6d93e4: "чтобы создать ссылку, которую вы сможете использовать в Canvas. Вы должны подписаться на учетную запись \"Изменить масштаб\", если вы еще не сделали этого."
+  to_create_a_link_you_can_use_in_canvas_you_ll_need_7dd85497: "чтобы создать ссылку, которую вы сможете использовать в Canvas. Для использования Google Meet вы должны иметь учетную запись Google."
   to_create_announcements_discussions_manage_must_al_932ac38f: "Для создания объявлений параметр «Обсуждения - управление» должен быть также активирован."
   to_create_announcements_discussions_moderate_must__8a8278f2: "Для создания объявлений необходимо также активировать параметр «Обсуждения - модерировать»."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Чтобы внести раздел в перекрестный список, также необходимо включить параметр « Разделы курса - добавить / редактировать / удалить». Чтобы отредактировать идентификатор SIS курса, необходимо также включить «Данные SIS - управление». Чтобы позволить пользователю уровня учетной записи удалить курс, должен быть включен также параметр «Статус курса - управление»."
@@ -23115,6 +23292,7 @@ ru:
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "Чтобы импортировать данные SIS, необходимо также включить параметр «Данные SIS - импорт»."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "Чтобы импортировать данные SIS, необходимо также включить параметр «Данные SIS - импорт»."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Чтобы связать слушателя курса *%{name}* со студентом, начните вводить имя студента ниже, чтобы найти его, а затем нажмите кнопку Обновить."
+  to_log_in_to_your_canvas_account_when_you_re_on_th_54faeb1c: "Чтобы зарегистрироваться в вашей учетной записи Canvas, из которой вы вышли, отсканируйте данный QR код из приложения Canvas Student"
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "Для управления настройками концептуального курса в настройках курса, также должен быть включен параметр «Курсы - добавить / редактировать / удалить»."
   to_manage_course_content_course_content_add_edit_d_94caa77f: "Для управления содержимым курса необходимо включить параметр «Содержание курса - добавить / редактировать / удалить»."
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
@@ -23570,6 +23748,12 @@ ru:
   upload_a_css_file_ec22214b: "Загрузить файл CSS..."
   upload_a_js_file_c89d795: "Загрузить файл JS..."
   upload_a_picture_9f5f6e3c: "Загрузить изображение"
+  upload_and_store_course_files_or_any_other_files_y_b00cb954: |-
+      Загружайте и сохраняйте файлы, относящиеся к учебному курсу, а также любые другие файлы
+            , которые могут вам потребоваться. При сохранении накопленных вами знаний в файлах вы можете без затруднений вставить данные файлы непосредственно в
+            модули, назначения, дискуссии или страницы! Делитесь с учащимися файлами
+            из папки вашего учебного курса, либо заблокируйте файлы, пока вы не подготовите учащихся
+             к их загрузке.
   upload_button: 
     upload: Загрузить
   upload_course_files_syllabi_readings_or_other_docu_21f8725f: |-
@@ -23625,11 +23809,23 @@ ru:
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Используйте HTML5 Recorder в редакторе контента вместо Flash"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Использовать MathMan для преобразования LaTeX в MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Использовать MathMan для преобразования LaTeX в SVG?"
+  use_modules_to_organize_your_content_and_create_a__1da4149: |-
+      Используйте модули для структурирования содержания вашего курса и создавайте линейный поток, описывающий действия
+            , которые учащиеся должны выполнить в ходе учебного процесса. Модули можно использовать для структурирования
+            контента по неделям, модулям, либо в соответствии с какой-либо другой организационной структурой.
+            Добавляйте файлы, дискуссии, назначения, опросы и другие учебные материалы.
+            Укажите обязательные требования, которые необходимо выполнить, прежде чем переходить к следующему модулю или к следующему
+            пункту модуля, либо полностью заблокируйте модуль до указанной даты.
   use_new_folder_tree_in_files_bc0ea09f: "Использовать новое дерево папок в Файлах"
   use_new_folder_tree_in_files_eb5a451b: "Использовать новое дерево папок в Файлах"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Используйте новую улучшенную боковую панель редактора форматированного текста везде"
   use_pairing_code_for_parent_sign_up_10b091f8: "Использовать код сопряжения для родительской регистрации"
   use_parent_account_setting_f25a721f: "Использовать настройки родительской учетной записи"
+  use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
+      Используйте опросы для оценки степени усвоения информации учащимся и оценки уровня понимания
+            материала учебного курса. Механизм оценки с использованием опции "Новые опросы" позволяет создавать до
+            13 типов вопросов, а также контент. Если опция "Новые опросы" еще не включена в вашем учреждении,
+            можно продолжать использовать опцию "Классические опросы", которая поможет вам достичь ваших целей.
   use_remote_service_for_notifications_9fe667c6: "Использовать удаленное обслуживание для уведомлений"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Используйте удаленную версию Редактора форматированного текста"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Используйте удаленную версию Редактора форматированного текста И боковую панель"
@@ -24244,9 +24440,12 @@ ru:
   violation_log_tray_d4eff9f4: "Лоток журнала нарушений"
   virtual_lectures_in_real_time_a1778dea: "Виртуальные лекции в реальном времени"
   visit_864b4060: Посетить
+  visit_google_meet_ebdaf94f: "Обратитесь к опции Google Meet,"
   visit_group_group_name_7a816081: "Посетить группу %{group_name}"
+  visit_zoom_14636084: "Обратитесь к опции \"Изменить масштаб\""
   waiting_for_attempted_login_6d00cb49: "Ожидание попытки входа в систему"
   waiting_for_selection_ce0398c7: "Ожидание выбора"
+  waiting_for_your_qr_code_to_load_809299e5: "Дождитесь загрузки вашего QR кода"
   warning_6576b5b8: предупреждение
   warning_aacb8c24: Предупреждение
   warning_all_permissions_will_change_to_match_the_s_e3c9819f: "Внимание! Все разрешения будут изменены для соответствия выбранной базовой роли."
@@ -24331,10 +24530,21 @@ ru:
     many: "произошли ошибки"
     one: "произошла ошибка"
     other: "произошли ошибки"
+  what_are_announcements_52175539: "Что представляют собой оповещения?"
+  what_are_collaborations_27c20a98: "Что такое \"совместные проекты\"?"
   what_are_self_sign_up_groups_af1f002a: "Что такое группы самостоятельной регистрации?"
+  what_assignment_types_can_i_create_in_a_course_1ed4eed4: "Какие типы назначений я могу создавать в учебном курсе?"
   what_does_provisioning_only_mean_eac9a4a1: "Что означает Только Наполнение данными?"
   what_happened_322d8259: "Что случилось?"
   what_it_does_d4debc07: "Что оно делает"
+  what_layout_options_are_available_in_the_course_ho_5d364ce3: "Какие опции компоновки исходной домашней страницы учебного курса я могу использовать, будучи инструктором?"
+  what_options_can_i_set_in_a_quiz_53522d76: "Какие опции я могу установить в опросе?"
+  what_s_a_class_without_people_to_take_and_lead_it__4470b81a: |-
+      Что за класс, если в нем нет учеников, которых следует учить и направлять? На странице "Люди"
+            отображается перечень пользователей, участвующих в вашем учебном курсе. В зависимости от имеющихся у вас разрешений,
+            вы можете добавлять учащихся, помощников преподавателя и наблюдателей в ваш to
+            учебный курс. Вы можете также создавать группы студентов, к которым будут относиться групповые назначения,
+            дискуссии и файлы.
   what_should_the_csv_file_look_like_985a59ac: "Как должен быть выполнен CSV-файл?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "При добавлении нескольких пользователей разделяйте их запятыми или разрывами строк."
   when_disabled_students_can_still_send_individual_m_567a911c: "Если отключено, студенты все равно могут отправлять отдельные сообщения преподавателям курсов, ассистентам преподавателей курсов и студентам, которые входят в те же группы уровня учетной записи."
@@ -24856,3 +25066,4 @@ ru:
     upload: "Загрузить его"
     zip_options: "Свойства zip-файла"
   zip_no_folder_error: "Указанная папка не найдена в этом курсе."
+  zoom_f3e54d69: "Изменить масштаб"
