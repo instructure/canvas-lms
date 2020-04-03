@@ -62,7 +62,7 @@ module AvatarHelper
       end
     end
     link_opts = {}
-    link_opts[:class] = 'avatar '+opts[:class].to_s
+    link_opts[:class] = 'fs-exclude avatar '+opts[:class].to_s
     link_opts[:style] = "background-image: url(#{avatar_url})"
     link_opts[:style] += ";width: #{opts[:size]}px;height: #{opts[:size]}px" if opts[:size]
     link_opts[:href] = url if url

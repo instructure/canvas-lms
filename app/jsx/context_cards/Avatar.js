@@ -44,7 +44,7 @@ class Avatar extends React.Component {
             href={`/courses/${this.props.courseId}/users/${user._id}`}
             aria-label={I18n.t("Go to %{name}'s profile", {name})}
           >
-            <InstUIAvatar size="x-large" name={name} src={user.avatar_url} />
+            <InstUIAvatar size="x-large" name={name} src={user.avatar_url} data-fs-exclude />
           </Link>
           {canMasquerade && (
             <Text size="x-small" weight="bold" as="div">

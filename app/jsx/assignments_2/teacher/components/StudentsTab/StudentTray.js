@@ -73,7 +73,7 @@ export default class StudentTray extends React.Component {
           aria-label={I18n.t("Go to %{name}'s profile", {name})}
           target="_blank"
         >
-          <Avatar size="x-large" name={name} src={this.props.student.avatarUrl} />
+          <Avatar size="x-large" name={name} src={this.props.student.avatarUrl} data-fs-exclude />
         </Link>
       </View>
     )

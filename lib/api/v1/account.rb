@@ -52,7 +52,10 @@ module Api::V1::Account
       hash['integration_id'] = account.integration_id if !account.root_account? && account.root_account.grants_any_right?(user, :read_sis, :manage_sis)
       hash['lti_guid'] = account.lti_guid if includes.include?('lti_guid')
       if includes.include?('registration_settings')
-        hash['registration_settings'] = {:login_handle_name => account.login_handle_name_with_inference}
+        hash['registration_settings'] = {
+          :login_handle_name => account.login_handle_name_with_inference,
+          :require_email => account.require_email_for_registration?
+        }
         if account.root_account?
           hash['terms_required'] = account.terms_required?
           hash['terms_of_use_url'] = terms_of_use_url

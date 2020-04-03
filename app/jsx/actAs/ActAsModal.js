@@ -211,6 +211,7 @@ export default class ActAsModal extends React.Component {
                         src={user.avatar_image_url}
                         size="small"
                         margin="medium 0 x-small 0"
+                        data-fs-exclude
                       />
                     </View>
                     <View as="div" textAlign="center">
