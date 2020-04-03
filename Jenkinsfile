@@ -83,6 +83,9 @@ pipeline {
 
     // e.g. canvas-lms:master when not on another branch
     MERGE_TAG = "$CANVAS_LMS_IMAGE:$GERRIT_BRANCH"
+
+    // e.g. canvas-lms:01.123456.78; this is for consumers like Portal 2 who want to build a patchset
+    EXTERNAL_TAG = "$CANVAS_LMS_IMAGE:$NAME"
   }
 
   stages {
@@ -227,8 +230,12 @@ pipeline {
                     .
                 """
               }
+              sh "docker push $PATCHSET_TAG"
+              if (isPatchsetPublishable()) {
+                sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
+                sh 'docker push $EXTERNAL_TAG'
+              }
             }
-            sh "docker push $PATCHSET_TAG"
           }
         }
       }
