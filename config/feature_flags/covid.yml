@@ -33,3 +33,13 @@ files_dnd:
   applies_to: RootAccount
   display_name: "Files Drag and Drop Enhancements"
   description: "Improve discoverability of drag and drop in Files"
+conference_selection_lti_placement:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "Allow Conference Selection LTI placement"
+  description: "Allows users to add LTI tools with conference_selection placement type"
+calendar_conferences:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Add Conferences from Calendar"
+  description: "Allows users to add conferences from the calendar"

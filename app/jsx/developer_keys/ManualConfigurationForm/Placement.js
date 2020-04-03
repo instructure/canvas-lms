@@ -41,7 +41,12 @@ export default class Placement extends React.Component {
     this.state = {placement}
   }
 
-  alwaysDeeplinking = ['editor_button', 'migration_selection', 'homework_submission']
+  alwaysDeeplinking = [
+    'editor_button',
+    'migration_selection',
+    'homework_submission',
+    'conference_selection'
+  ]
 
   canBeEither = ['assignment_selection', 'link_selection']
 

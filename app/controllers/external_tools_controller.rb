@@ -1184,7 +1184,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def set_tool_attributes(tool, params)
-    attrs = Lti::ResourcePlacement::PLACEMENTS
+    attrs = Lti::ResourcePlacement.valid_placements
     attrs += [:name, :description, :url, :icon_url, :canvas_icon_class, :domain, :privacy_level, :consumer_key, :shared_secret,
               :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id,
               :oauth_compliant]
