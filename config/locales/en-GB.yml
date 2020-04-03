@@ -1988,6 +1988,7 @@ en-GB:
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Allow a moderator to review multiple independent grades for selected submissions"
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Allow a teacher to set the number of allowed attempts on an assignment via the UI"
   allow_bb7ce9b1: Allow
+  allow_blueprint_publishing_after_association_fae6ba95: "Allow Blueprint Publishing After Association"
   allow_bulk_grade_export_to_sis_e11a6e66: "Allow bulk grade export to SIS"
   allow_comments_a1f45d8: "Allow comments"
   allow_comments_for_title_7ac9e00: "Allow comments for %{title}"
@@ -2024,6 +2025,7 @@ en-GB:
   allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "Allow students to see who was signed up for time slots that are still available"
   allow_switching_to_the_enhanced_rce_317e746f: "Allow switching to the enhanced RCE"
   allow_switching_to_the_new_assignments_page_9ac0ad93: "Allow switching to the new assignments page"
+  allow_teachers_to_change_the_dates_on_a_set_of_ass_4d48baec: "Allow teachers to change the dates on a set of assignments in one step"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Allow ability to send notifications through our dispatch queue"
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: "Allow the ability to send notifications through our dispatch queue"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Allow this tool to access the IMS Names and Role Provisioning Service"
@@ -2040,6 +2042,7 @@ en-GB:
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Allows assessors to view the assessment audit tray in SpeedGrader for anonymous or moderated assignments."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Allows creating announcements for a specific section"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Allows creating discussions for a specific section"
+  allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu."
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Allows teacher, designer, TA-based roles to access the Chat tool."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Allows teacher/designer/TA-based roles to access the Chat tool."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Allows teacher/TA-based roles to access the Attendance tool."
@@ -2417,6 +2420,7 @@ en-GB:
   an_error_occurred_while_loading_late_policies_c415f676: "An error occurred while loading late policies"
   an_error_occurred_while_locking_announcements_8115ccd7: "An error occurred while locking announcements."
   an_error_occurred_while_migrating_405ac0b5: "An error occurred while migrating."
+  an_error_occurred_while_retrieving_your_qr_code_5392e2da: "An error occurred while retrieving your QR Code"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "An error occurred while saving account proficiency ratings"
   an_error_occurred_while_saving_associations_bd66f3f4: "An error occurred while saving associations"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "An error occurred while saving the assignment post policy"
@@ -2757,6 +2761,7 @@ en-GB:
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "As you type in this field, the list of results will be automatically updated."
   ask_your_instructor_a_question_a61ca5e9: "Ask your instructor a question"
   assess_and_survey_your_students_ce8172a9: "Assess and survey your students"
+  assess_student_understanding_1e0b8d7f: "Assess student understanding"
   assessment_audit_d4a76709: "Assessment audit"
   assessment_audit_events_for_creatorname_56e84e8: "Assessment audit events for %{creatorName}"
   assessment_audit_events_for_username_eb2144ad: "Assessment audit events for %{userName}"
@@ -2838,6 +2843,7 @@ en-GB:
   assignment_allowed_attempts_7e3d43ee: "Assignment Allowed Attempts"
   assignment_assignment_submission_paper_view_8a4c9776: "Assignment %{assignment} submission paper view"
   assignment_assignment_submission_plain_text_view_b217d372: "Assignment %{assignment} submission plain text view"
+  assignment_bulk_editing_37248ca4: "Assignment Bulk Editing"
   assignment_comments_e43ed898: "Assignment comments"
   assignment_configuration_4153cb88: "Assignment Configuration"
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} has been graded for %{name}."
@@ -3612,6 +3618,13 @@ en-GB:
   assignments_group_menu_c2522316: "Assignments Group Menu"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Assignments in this group have no points possible and cannot be included in grade calculation"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Assignments in this group have no points possible and cannot be included in grade calculation."
+  assignments_include_quizzes_graded_discussions_and_182e5899: |-
+      Assignments include quizzes, graded discussions, and many types
+            of online submissions (files, images, text, URLs, and media). Assign
+            them to everyone in a course, or assign different due dates for specific
+            sections or users. Create assignment groups to organise your assignments
+            and to weight groups by percentage. Enable Peer Review so students can
+            review each other's work.
   assignments_index_menu_4088a035: "Assignments Index Menu"
   assignments_list_fe3e54be: "Assignments list"
   assignments_settings_30613d0c: "Assignments settings"
@@ -3986,6 +3999,7 @@ en-GB:
   blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Blueprint courses must be enabled for an account by an admin. Course roles can only manage content in Blueprint courses if they are added to the Blueprint course as a teacher, TA, or designer role."
   blueprint_information_95dcef55: "Blueprint Information"
   blueprint_settings_233e909a: "Blueprint settings"
+  blueprint_sync_90d0dfd5: "Blueprint Sync"
   bmp_e297149c: BMP
   body_9f663faf: Body
   body_f48fe5cd: "Body:"
@@ -4033,6 +4047,7 @@ en-GB:
   bring_existing_content_from_another_course_or_cour_9dc6453d: |-
       Bring existing content from another course or course
       management system into your Canvas course.
+  bring_existing_content_into_your_course_c5fc7e1b: "Bring existing content into your course"
   bring_your_content_into_your_course_c0f3df7e: "Bring your content into your course"
   broccoli_cloud: 
     hidden_title: "Hidden. Available with a link"
@@ -4111,6 +4126,7 @@ en-GB:
       user_name: "User Name"
       user_name_description: "The username of the user that has teacher/designer access to the course for the row. This must match one of the usernames listed in the Blackboard login credentials above."
     only_one_bulk_migration: "Only one bulk course migration can be run at a time."
+  bulk_edit_bc023ac5: "Bulk Edit"
   bulk_migration: 
     buttons: 
       migrate_courses: "Migrate courses"
@@ -4714,6 +4730,7 @@ en-GB:
   canvas_cartridge_name: "Canvas cartridge importer"
   canvas_catalog_87f39420: "Canvas Catalogue"
   canvas_cloud_information_fdd404f2: "Canvas cloud information"
+  canvas_conferences_is_a_free_service_provided_by_b_cc0253e: "Canvas Conferences is a free service provided by BigBlueButton."
   canvas_content_security_policy_c3d7bf2b: "Canvas Content Security Policy"
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Canvas dashboard links will navigate to the Catalog dashboard"
@@ -4727,6 +4744,11 @@ en-GB:
   canvas_failed_to_initiate_the_upload_8e3824d5: "Canvas failed to initiate the upload."
   canvas_files_889a274f: "Canvas Files"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
+  canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
+      Canvas helps you leverage collaborative technology so multiple
+            users can work together on the same document at the same time. Create
+            collaborative documents that are saved in real time—a change made by
+            any user will be visible to everyone immediately.
   canvas_id_f42f6ad: "Canvas ID"
   canvas_insights_beta_view_4cf67797: "Canvas Insights (Beta) - view"
   canvas_introduction_video_2d81f3ad: "Canvas introduction video"
@@ -5086,6 +5108,7 @@ en-GB:
   collapse_subdiscussion_89af1f5c: "Collapse Sub discussion"
   collapse_tutorial_tray_66ee7dc1: "Collapse tutorial tray"
   collapsed_510aa02a: Collapsed
+  collection_of_responsive_improvements_throughout_c_dedfe6dc: "Collection of responsive improvements throughout Canvas"
   colombia_57_c6c75620: "Colombia (+57)"
   colombia_919c87f9: Colombia
   color_a363e1b0: Colour
@@ -5112,6 +5135,7 @@ en-GB:
   common_cartridge_name: "Common Cartridge Importer"
   common_timezones_2b00baba: "Common time zones"
   commons_ed0252fb: Commons
+  communicate_course_objectives_f457158c: "Communicate course objectives"
   communicate_to_your_students_exactly_what_will_be__57a679c5: |-
       Communicate to your students exactly what will be required
       of them throughout the course in chronological order. Generate a
@@ -5208,6 +5232,11 @@ en-GB:
   conditional_content_7d39e313: "Conditional content"
   conditional_content_b284da8f: "Conditional content"
   conditional_release_d206e93b: "Conditional release"
+  conduct_lectures_office_hours_and_student_group_me_13ec766c: |-
+      Conduct lectures, office hours, and student group meetings all
+            from your computer. Broadcast real-time audio and video, share presentation
+            slides, give demonstrations of applications and online resources,
+            and more.
   conduct_virtual_lectures_virtual_office_hours_and__959d6996: |-
       Conduct virtual lectures, virtual office hours, and student
       groups. Broadcast real-time audio and video, share presentation
@@ -5285,6 +5314,10 @@ en-GB:
     type_disabled_error: "This type of conference is no longer enabled for this Canvas site"
   conferences_a0a8984b: Conferences
   conferences_are_powered_by_bigbluebutton_a_free_se_a5b2e27e: "Conferences are powered by BigBlueButton, a free service to Canvas users. Extreme increases in usage could cause performance issues. In the event that BigBlueButton is unable to meet current or future demands, Canvas also partners with Zoom, Hangouts, Teams, and other video conferencing tools who are offering free or discounted services."
+  conferences_powered_by_bigbluebutton_is_unable_to__37ef28fe: |-
+      Conferences, powered by BigBlueButton, is unable to handle current demand.  Consider upgrading to
+              Premium BigBlueButton or use one of the following video conferencing providers.  Please talk to your local
+              admin for additional guidance.
   conferences_tutorial_tray_6f071ce2: "Conferences tutorial tray"
   confetti_for_on_time_submissions_394e16ce: "Confetti for On-Time Submissions"
   config_url_e96ceaf3: "Config URL"
@@ -6524,6 +6557,7 @@ en-GB:
   course_image_settings_eba3ec55: "Course image settings"
   course_implemented_apps_fa658f5a: "Course-implemented apps"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Course is already associated with a blueprint"
+  course_landing_page_49a53ade: "Course landing page"
   course_level_notification_preferences_require_a_co_2f0a618: "Course level notification preferences require a course_id to update"
   course_level_overrides_for_notification_preference_e86d1725: "Course level overrides for notification preferences"
   course_list: 
@@ -7281,6 +7315,7 @@ en-GB:
   create_edit_line_item_scores_116482c7: "Create/Edit Line Item Scores"
   create_educational_resources_8219326e: "Create educational resources"
   create_failed_15d07ad4: "Create failed"
+  create_interactive_course_content_76665336: "Create interactive course content"
   create_item_base: 
     there_was_an_error: "There was an error saving \"%{title}\", please try again."
   create_module_item: 
@@ -7473,6 +7508,7 @@ en-GB:
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Custom links to include in the help dialog pop-up"
   custom_reports_experimental_features_40bbfe7c: "Custom Reports: Experimental Features"
   customize_configuration_69c22ef3: "Customise Configuration"
+  customize_course_details_26fd4afe: "Customise course details"
   customize_help_link_62cd05eb: "Customise help link"
   customize_learning_mastery_ratings_4ace142a: "Customise learning mastery ratings"
   customize_this_menu_efa72a9: "Customise this menu"
@@ -8334,6 +8370,12 @@ en-GB:
     unsubscribed: Unsubscribed
     unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
   discussions_a5f96392: Discussions
+  discussions_allow_students_and_instructors_to_comm_ce03ca43: |-
+      Discussions allow students and instructors to communicate about
+            course topics at any time. Create discussions for a grade, or facilitate
+            discussions for students to exchange ideas and solve problems. Threaded
+            discussions are perfect for keeping in-depth or long-term discussions
+            organised, while Focused discussions are best suited for short-lived exchanges.
   discussions_create_94dff604: "Discussions - create"
   discussions_index_menu_42591bc9: "Discussions Index Menu"
   discussions_menu_f18eb4a2: "Discussions Menu"
@@ -8350,6 +8392,13 @@ en-GB:
   display_as_percentage_3e755dc: "Display as percentage"
   display_as_points_63084235: "Display as points"
   display_course_catalog: "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled."
+  display_grades_as_points_percentages_complete_inco_fa848380: |-
+      Display grades as
+            points, percentages, complete/incomplete, or any other method that matches
+            your course grading scheme, and filter and arrange Gradebook entries
+            according to your preferences. Automatically apply a grade for missing or
+            late submissions, and easily hide grades until you're ready for students
+            to view them. For simplified grading, use SpeedGrader to view and grade submissions.
   display_name_6c2cfc58: "Display name:"
   display_name_b80c243e: "Display name"
   display_to_students_e1301f99: "Display to students"
@@ -8405,6 +8454,7 @@ en-GB:
   don_t_move_lti_query_params_to_post_body_5c80e037: "Do not move LTI query params to POST body"
   don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Don't post outcomes results to learning mastery gradebook"
   don_t_show_again_15d8253e: "don't show again"
+  don_t_show_again_8c7b7297: "Don't Show Again"
   done_54e3d4b6: Done
   done_8af51c9b: Completed.
   done_editing_9f7379d9: "Done editing"
@@ -8531,6 +8581,9 @@ en-GB:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Each bar represents the number of *page views* on that day. An orange bar indicates that some user **took an action** within the course on that day."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Each bar represents the number of page views related to that category."
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Each row is one assignment. The diamond is the due date and the bar extends to the submission date. Green indicates an *on time submission*, yellow a **late submission**, and red a ***missed assignment***. Grey diamonds are assignments without due dates, placed at the time of submission."
+  easily_import_or_copy_content_from_another_canvas__c6312f32: |-
+      Easily import or copy content from another Canvas course into
+              your course, or import content from other formats, such as Moodle or QTI.
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege converter"
   ecuador_593_dfcc235a: "Ecuador (+593)"
@@ -8752,6 +8805,7 @@ en-GB:
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Enables new API endpoints for the course and user data provided by New Analytics."
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Enables sorting by SIS ID, integration ID and login ID in New Gradebook."
   encourage_class_participation_4e069479: "Encourage class participation"
+  encourage_student_discourse_7836b9f7: "Encourage student discourse"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Encrypted Sourcedids for Basic Outcomes"
   end_course_set_up_tutorial_dialog_5b812ec6: "End course set-up tutorial dialog"
   end_course_set_up_tutorial_f358b85d: "End course set-up tutorial"
@@ -8818,6 +8872,7 @@ en-GB:
   enter_a_valid_date_46d77547: "Enter a valid date"
   enter_a_what_if_score_668c91a3: "Enter a What-if score."
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "To substitute user's root account domain, enter \"{{ACCOUNT_DOMAIN}}\""
+  enter_and_distribute_grades_c1216df: "Enter and distribute grades"
   enter_at_least_count_characters_1c7a0b36: "Enter at least %{count} characters"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "To substitute user's root account domain, enter \"{{CANVAS_USER_ID}}\""
   enter_grades_as_e113e606: "Enter Grades as"
@@ -9502,6 +9557,7 @@ en-GB:
   feature_options_enable_disable_7e748054: "Feature options - enable / disable"
   feature_options_view_a170e80c: "Feature Options - view"
   feature_preview_5e1216a0: "Feature Preview"
+  featured_help_links_d805fe44: "Featured Help Links"
   features: 
     allow_opt_out_of_inbox: "Allow users to opt-out of the inbox"
     better_file_browsing: "Better File Browsing"
@@ -9882,6 +9938,7 @@ en-GB:
       that they will need to update their Google Docs integration.
   google_docs_preview_9f41b23c: "Google Docs preview"
   google_drive_7cb003c9: "Google Drive"
+  google_meet_f896b61c: "Google Meet"
   google_template_29640bc0: "Google Template"
   goto_first_page_650f1638: "Goto first page"
   goto_last_page_405adce9: "Goto last page"
@@ -11463,6 +11520,61 @@ en-GB:
   hour_s_b6e8d238: Hour(s)
   hours_late_989e9081: "Hours late"
   hover_over_me_496521b9: "Hover over me"
+  how_do_i_add_a_module_65f5bf13: "How do I add a module?"
+  how_do_i_add_an_announcement_in_a_course_63396bb7: "How do I add an announcement in a course?"
+  how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: "How do I add an image to a course card in the Dashboard?"
+  how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "How do I add assignment types, pages, and files as module items?"
+  how_do_i_add_or_edit_details_in_an_assignment_fa779906: "How do I add or edit details in an assignment?"
+  how_do_i_add_users_to_a_course_4a88efaf: "How do I add users to a course?"
+  how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: "How do I adjust events and due dates in a course import?"
+  how_do_i_bulk_upload_files_to_a_course_b145d8cc: "How do I bulk upload files to a course?"
+  how_do_i_change_a_course_name_and_course_code_23b41292: "How do I change a course name and course code?"
+  how_do_i_change_the_course_home_page_326cee50: "How do I change the Course Home Page?"
+  how_do_i_conclude_a_conference_689d60dc: "How do I conclude a conference?"
+  how_do_i_copy_a_canvas_course_into_a_new_course_sh_1633c6c1: "How do I copy a Canvas course into a new course shell?"
+  how_do_i_create_a_conference_in_a_course_69affbf4: "How do I create a conference in a course?"
+  how_do_i_create_a_discussion_as_an_instructor_fa6c26d6: "How do I create a discussion as an instructor?"
+  how_do_i_create_a_google_drive_collaboration_as_an_28274cf7: "How do I create a Google Drive collaboration as an instructor?"
+  how_do_i_create_a_microsoft_office_365_collaborati_52e46698: "How do I create a Microsoft Office 365 collaboration as an instructor?"
+  how_do_i_create_a_new_page_in_a_course_37a87285: "How do I create a new page in a course?"
+  how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: "How do I create a quiz with individual questions?"
+  how_do_i_create_an_assessment_using_new_quizzes_801b0146: "How do I create an assessment using New Quizzes?"
+  how_do_i_create_an_assignment_35532b59: "How do I create an assignment?"
+  how_do_i_edit_an_announcement_in_a_course_815c3c60: "How do I edit an announcement in a course?"
+  how_do_i_edit_the_syllabus_description_in_a_course_57f25a87: "How do I edit the Syllabus description in a course?"
+  how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "How do I enter and edit grades in the Gradebook?"
+  how_do_i_import_a_canvas_course_export_package_ed3aafd4: "How do I import a Canvas course export package?"
+  how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: "How do I manage settings for an assessment in New Quizzes?"
+  how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "How do I move and organise my files as an instructor?"
+  how_do_i_move_or_reorder_a_module_e64a4baa: "How do I move or reorder a module?"
+  how_do_i_post_grades_for_an_assignment_in_the_grad_bc01018e: "How do I post grades for an assignment in the Gradebook?"
+  how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "How do I publish or unpublish a discussion as an instructor?"
+  how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "How do I publish or unpublish a module as an instructor?"
+  how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "How do I publish or unpublish a page as an instructor?"
+  how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "How do I publish or unpublish an assignment as an instructor?"
+  how_do_i_record_a_conference_e4845e7: "How do I record a conference?"
+  how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "How do I reply to a discussion as an instructor?"
+  how_do_i_select_specific_content_as_part_of_a_cour_11fe2c8d: "How do I select specific content as part of a course import?"
+  how_do_i_set_a_front_page_in_a_course_a5f53cd5: "How do I set a Front Page in a course?"
+  how_do_i_set_details_for_a_course_52cfbeff: "How do I set details for a course?"
+  how_do_i_start_a_conference_52792795: "How do I start a conference?"
+  how_do_i_upload_a_file_to_a_course_e8332cfe: "How do I upload a file to a course?"
+  how_do_i_use_course_settings_1e8467e6: "How do I use course settings?"
+  how_do_i_use_files_as_an_instructor_70a996b: "How do I use Files as an instructor?"
+  how_do_i_use_speedgrader_e18e4ca2: "How do I use SpeedGrader?"
+  how_do_i_use_the_announcements_index_page_94a14011: "How do I use the Announcements Index Page?"
+  how_do_i_use_the_collaborations_index_page_68ee88b5: "How do I use the Collaborations Index Page?"
+  how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "How do I use the Course Home Page as an instructor?"
+  how_do_i_use_the_gradebook_622395dc: "How do I use the Gradebook?"
+  how_do_i_use_the_pages_index_page_dafb986c: "How do I use the Pages Index Page?"
+  how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "How do I use the People page in a course as an instructor?"
+  how_do_i_use_the_quizzes_index_page_cc2e15d3: "How do I use the Quizzes Index Page?"
+  how_do_i_use_the_syllabus_as_an_instructor_82f00933: "How do I use the Syllabus as an instructor?"
+  how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "How do I view a context card for a student in a course?"
+  how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "How do I view and sort discussion replies as an instructor?"
+  how_do_i_view_assignments_or_students_individually_2b7211f8: "How do I view assignments or students individually in the Gradebook?"
+  how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "How do I view the details of a submission for a student in SpeedGrader?"
+  how_do_i_view_user_details_for_an_enrollment_in_a__308e9ac0: "How do I view user details for an enrolment in a course?"
   how_is_the_grade_determined_bb75bf53: "How is the grade determined?"
   how_is_this_affecting_you_b3b6a639: "How is this affecting you?"
   how_many_minutes_ecca5ee7: "How many minutes?"
@@ -11615,6 +11727,12 @@ en-GB:
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "If you wish, you can rename \"SIS\" to something more familiar to your staff"
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "If you wish to keep your not-yet submitted comments, please save them before navigating away from this page."
   if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: "If you would like to link to your own campus support website in the help dialog, you can do that here."
+  if_your_institution_is_likely_to_need_more_than_10_297382d: |-
+      If your institution is likely to need more than 10 concurrent Conferences powered by
+                BigBlueButton, we recommend upgrading to Premium BigBlueButton or exploring alternative
+                conferencing solutions Canvas partners with, such as Zoom, Hangouts, Teams, and other
+                video conferencing tools who are offering free or discounted services.
+  if_your_school_uses_microsoft_teams_you_can_use_th_992dff59: "If your school uses Microsoft Teams, you can use the Enhanced Rich Content Editor (RCE) to easily add a Team room while creating Calendar Events, Announcements, discussions posts and more."
   ignore_91750df8: Ignore
   ignore_assignment_738b3c99: "Ignore assignment"
   ignore_assignment_a4837cb3: "Ignore %{assignment}"
@@ -11699,6 +11817,7 @@ en-GB:
   in_class_23eeca38: "In Class"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "In order to complete the process, you will be redirected to a log-in page where you must log in with your child's credentials."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "In order to import a large quantity of outcomes at once, or to update your existing outcomes, please *follow the CSV format*."
+  in_product_training_walkthrough_and_tourpoints_for_2e185119: "In-product training walkthrough and tour points for teachers"
   in_progress_13b9e26f: in-progress
   in_progress_646a8aef: "In progress"
   in_progress_9d1ce8b9: "In Progress"
@@ -11708,6 +11827,7 @@ en-GB:
   inactive_enrollments_3b84be3d: "Inactive enrolments"
   inbox_bb245a60: Inbox
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Include a link to a screencast/screenshot using something like *Jing*."
+  include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: "Include a link to show a QR code to easy mobile login on the profile page."
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: "Include Byte-Order Mark in compatible spreadsheet exports"
   include_byte_order_mark_in_gradebook_exports_d2ad0d4e: "Include byte-order mark in gradebook exports"
   include_course_settings_c4c08764: "Include Course Settings"
@@ -12087,6 +12207,7 @@ en-GB:
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kazakhstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Keep in mind, this submission will count for everyone in your %{groupType} group."
+  keep_students_informed_3f41a7e6: "Keep students informed"
   keep_submissions_anonymous_5cbaf419: "Keep submissions anonymous"
   kenya_254_2945663a: "Kenya (+254)"
   key_api_key_68bf80ae: "Key: *%{api_key}*"
@@ -12100,6 +12221,7 @@ en-GB:
     esc_key_notification: "When navigating the gradebook grid, press the escape key before using keyboard shortcuts."
   keyboard_shortcuts_ed1844bd: "Keyboard shortcuts"
   kind_7f0a88c4: Kind
+  know_your_users_5c1323be: "Know your users"
   korean_da812d9: Korean
   label_3c9a991: "%{label}:"
   label_disabled_not_visible_to_students_da093eec: "%{label}. Disabled. Not visible to students"
@@ -12192,12 +12314,15 @@ en-GB:
       view_all_or_customize: "View All or Customise"
     mobile_auth: 
       log_in_to_canvas: "Log in to Canvas"
+  learn_how_to_use_google_meet_in_canvas_3e7aadd9: "Learn how to use Google Meet in Canvas"
+  learn_how_to_use_microsoft_teams_in_canvas_8b79dde: "Learn how to use Microsoft Teams in Canvas"
   learn_more_7a8d626: "Learn More"
   learn_more_about_collaborations_2978f66d: "Learn more about collaborations"
   learn_more_about_the_differences_a1217479: "Learn more about the differences."
   learning_analytics_beta_view_46deb4c8: "Learning Analytics (Beta) - view"
   learning_mastery_5fc34276: "Learning mastery"
   learning_mastery_6ed4fd63: "Learning mastery…"
+  learning_mastery_context_name_a0b70957: "Learning Mastery - %{context_name}"
   learning_mastery_gradebook_description: |-
       Learning Mastery Gradebook provides a way for teachers to quickly view student and course
       progress on course learning outcomes. Outcomes are presented in a Gradebook-like
@@ -12408,6 +12533,7 @@ en-GB:
   load_more_a36f9cf9: "Load more"
   load_more_comments_dc00ac34: "Load More Comments"
   load_more_results_460f49a9: "Load more results"
+  load_user_ids_upon_page_load_so_that_gradebook_loa_c51693aa: "Load user Ids upon page load so that Gradebook loads more quickly."
   loaded_more_collaborations_13f1d630: "Loaded more collaborations."
   loaded_more_developer_keys_7ea76fbe: "Loaded more developer keys."
   loaded_more_developer_keys_focus_moved_to_the_dele_f5b867f8: "Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list."
@@ -12666,6 +12792,10 @@ en-GB:
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Make sure you choose the most appropiate option as students' scores MAY be affected."
   make_the_course_summary_list_of_assignments_and_ev_f739be33: "Make the Course Summary (list of assignments and events) optional in the syllabus"
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Make this course publicly visible (student data will remain private)"
+  make_your_course_your_own_upload_an_image_to_repre_ec57713e: |-
+      Make your course your own! Upload an image to represent your
+            course, allow students to manage course content areas, and hide grade
+            details from students. You may also be able to adjust the course name and code.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Makes a Microsoft Immersive Reader link option show up on wiki pages."
   making_a_copy_of_original_assignment_name_8f029a9b: "Making a copy of \"%{original_assignment_name}\""
   making_a_copy_of_originalassignmentname_b7268992: "Making a copy of \"%{originalAssignmentName}\""
@@ -12713,6 +12843,7 @@ en-GB:
   manually_9de23e1f: Manually
   manually_mark_posts_as_read_afa5d035: "Manually mark posts as read"
   manually_post_grades_18248306: "Manually Post Grades"
+  march_2020_responsiveness_f810a65b: "March 2020 Responsiveness"
   mark_as_done_6fa48d2f: "Mark as done"
   mark_as_done_779556d7: "mark as done"
   mark_as_read_e7de2ce3: "Mark as read"
@@ -14670,6 +14801,7 @@ en-GB:
   mgp_grade_export_d29b471f: "MGP grade export"
   mic_a7f3d311: Mic
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - Free Trial (Wiki Pages)"
+  microsoft_teams_99cb45c0: "Microsoft Teams"
   migrate_67c9f753: Migrate
   migrate_quiz_5d0f777: "Migrate quiz"
   migrating_name_e05aa53e: "Migrating \"%{name}\""
@@ -15371,6 +15503,9 @@ en-GB:
   not_a_number: "must be a positive number"
   not_a_valid_date_d3ac20ba: "Not a valid date"
   not_a_valid_utf_8_string_string_7f6819c: "Not a valid utf-8 string: %{string}"
+  not_all_of_these_services_may_be_supported_by_your_155d9f70: |-
+      Not all of these services may be supported by your institution. Please contact your
+                local admin for more information.
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Not all sections will be assigned this item."
   not_all_settings_options_are_available_at_the_suba_20efaa98: "Not all settings options are available at the sub-account level, including the notifications tab."
   not_anonymously_graded_87574f91: "Not anonymously graded"
@@ -15945,6 +16080,7 @@ en-GB:
       Organise and segment your course by topic, unit, chapter,
       or week. Sequence select modules by defining criteria and
       pre-requisites.
+  organize_course_content_11de8958: "Organise course content"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organise epub by content type (default is by module)."
   organize_your_course_content_c3c7ed03: "Organise your course content"
   originality_report_5d461681: "Originality report"
@@ -16220,6 +16356,12 @@ en-GB:
   pages_e5414c2c: Pages
   pages_front_page_9ce5188: "Pages front page"
   pages_index_menu_f391bf04: "Pages Index Menu"
+  pages_let_you_create_interactive_content_directly__9933eb32: |-
+      Pages let you create interactive content directly in Canvas,
+            whether it's a weekly update, a collaborative course wiki, or a
+            list of educational resources. Pages can include text, multimedia,
+            and links to files and other course content or pages. You can also
+            allow students to contribute to specific pages in the course.
   pages_settings_968392a3: "Pages Settings"
   pages_tutorial_tray_169464a9: "Pages tutorial tray"
   pages_update_6c1750af: "Pages - Update"
@@ -16254,9 +16396,11 @@ en-GB:
   past_14da759a: Past
   past_collaborations_1241938f: "Past collaborations"
   past_terms_4b6ec40e: "Past Terms"
+  paste_google_meet_links_into_calendar_events_annou_2e363fc7: "Paste Google Meet links into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE)"
   paste_json_26ad8050: "Paste JSON"
   paste_url_8213b83: "Paste URL"
   paste_xml_cda3a64e: "Paste XML"
+  paste_zoom_into_calendar_events_announcements_disc_d873358e: "Paste Zoom into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE)."
   path_4f9abf12: Path
   pause_12af3bb4: Pause
   paypal: 
@@ -16416,7 +16560,9 @@ en-GB:
       domain_description: "**hostname** or **ip address** of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domain
+        free_trial: "Mark this BigBlueButton instance as a free trial"
         recording_enabled: "Allow conferences to be recorded."
+        replace_with_alternatives: "Disable BigBlueButton conferences; show a list of alternatives instead"
         secret: Secret
       secret_description: "This is the %{parameter_name} parameter that can be found in the %{filename} config file."
     buttons: 
@@ -16921,6 +17067,7 @@ en-GB:
   ppt_534cb87: PPT
   practice_quiz_19a8505d: "Practice quiz"
   pre_processing_92865c1d: Pre-processing
+  prefetch_user_ids_in_gradebook_b96521b0: "Prefetch User IDs in Gradebook"
   prerequisite_completion_period_c562d63: "Prerequisite Completion Period"
   prerequisites_49659f16: "Prerequisites:"
   prerequisites_list_62d66d12: "Pre-requisites: %{list}"
@@ -16973,6 +17120,7 @@ en-GB:
   process_multiple_content_items_from_course_modules_6de90fd8: "Process multiple content items from course modules page"
   processing_2fcc9739: Processing
   product_name: Canvas
+  product_tours_1e19eb95: "Product Tours"
   proficiency_rating_6346119f: "Proficiency rating"
   proficiency_rating_deleted_77827473: "Proficiency rating deleted"
   proficiency_ratings_2bbabdcd: "Proficiency ratings"
@@ -17423,6 +17571,7 @@ en-GB:
     unpublishing: Unpublishing...
   publish_the_course_f2f6ef80: "Publish the course"
   publish_title_102f2d90: "Publish %{title}"
+  publish_upon_association_53cb0450: "Publish upon association"
   publishable: 
     cant_unpublish: "Can't unpublish"
   publishableModuleItem: 
@@ -17452,6 +17601,7 @@ en-GB:
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Q: What goes black, white, black, white?  A: A panda rolling down a hill."
   qatar_974_7e9684ca: "Qatar (+974)"
   qatar_d52a8d27: Qatar
+  qr_for_mobile_login_1b1560ce: "QR for Mobile Login"
   qti_display: QTI
   qti_export_from_date_8f018de5: "*QTI Export from %{date}*"
   qti_file_description: "QTI .zip file"
@@ -19136,6 +19286,7 @@ en-GB:
     welcome_to_canvas: "Welcome to Canvas!"
   registration_url_60e0eaaa: "Registration URL"
   regular_style_checkbox_ee3d71c1: "Regular-style checkbox"
+  reinforce_student_understanding_304d18a6: "Reinforce student understanding"
   release_grades_c68fbcc: "Release Grades"
   released_by_mastery_path_b87fcdf5: "Released by Mastery Path"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Released by mastery path: %{cyoe.releasedLabel}"
@@ -19879,6 +20030,7 @@ en-GB:
   sections_94731e51: Sections
   security_7a7e8808: Security
   security_tab_failed_to_load_2d2242a: "Security Tab failed to load"
+  see_more_in_canvas_guides_fc90a457: "See more in Canvas Guides"
   see_other_users_primary_email_address_59c8473f: "See other users' primary email address"
   see_rubric_results_62a6447d: "See rubric results"
   see_scoring_details_f7fd1f3b: "See scoring details"
@@ -20132,6 +20284,12 @@ en-GB:
   settings_for_title_label_e103bdd6: "Settings for %{title_label}"
   settings_tutorial_tray_6f37761b: "Settings tutorial tray"
   setup_checklist_eb8b00b8: "Setup checklist"
+  share_important_information_about_your_course_with_dceacbf9: |-
+      Share important information about your course with all users.
+            Use announcements to remind students of important dates and tasks,
+            point students to internal and external resources to help them achieve
+            course outcomes, celebrate student success, and highlight events of interest.
+            Announcements can include text, multimedia, and files.
   share_important_information_with_all_users_in_your_bc49ee7f: |-
       Share important information with all users in your course.
       Choose to get a copy of your own announcements in notifications.
@@ -20864,6 +21022,9 @@ en-GB:
   short_name_ad9bf84f: "short name"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "should be self-evident, the canvas ID of the reporting user"
   show_76c0ed1c: Show
+  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+      Show a checkbox that optionally lets an account admin publish courses
+      automatically after associating and syncing with a blueprint course
   show_account_navigation_menu_d97270a9: "Show account navigation menu"
   show_admin_navigation_menu_92fb579f: "Show admin navigation menu"
   show_all_artifacts_34b91a83: "Show all artifacts"
@@ -21278,6 +21439,7 @@ en-GB:
   stop_acting_as_user_8809a97f: "Stop acting as user"
   storage_quotas_manage_6ca14bbb: "Storage quotas - manage"
   storage_used_in_mb_c75fbd9c: "storage used in MB"
+  store_and_share_course_assets_82a9967c: "Store and share course assets"
   stream_items_api: 
     assessment_request_title: "Peer Review for %{title}"
   strip_domain_from_login_attribute_value_bb6daa88: "Strip Domain From Login Attribute Value"
@@ -21904,6 +22066,11 @@ en-GB:
                      up to %{max_domains} domains to your whitelist. Wild cards are recommended
                      (e.g. *.instructure.com). Canvas and Instructure domains are included
                      automatically and do not count against your 50 domain limit.
+  the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
+      The Course Home Page is the first page students see when they open
+            your course. The Home Page can display the course participation activity
+            stream, the Course Modules page, the Course Assignments list, Syllabus,
+            or a page you design as the front page.
   the_course_link_validator_searches_course_content__563fa215: "The course link validator searches course content for invalid or unreachable links and images."
   the_course_link_validator_searches_through_course__76f0bc63: "The course-link validator searches through course content and returns every invalid or unresponsive link that it comes across. Please note that some links flagged as unresponsive are just inaccessible from our servers and will still work for students."
   the_course_state_manage_permission_allows_the_user_1d9da094: "The Course State - manage permission allows the user to publish courses that do not contain modules. To publish and unpublish module content, Course Content - add / edit / delete must be enabled."
@@ -22005,6 +22172,12 @@ en-GB:
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "The specified user (%{id}) is not a student in this course"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "The specified user is not a student in this course"
   the_state_parameter_is_required_ffadf213: "The state parameter is required"
+  the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
+      The Syllabus lets you welcome your course users and share expectations
+            with your students. Use the Syllabus description to clarify course objectives,
+            preferred contact methods, and other details, or upload a PDF of an existing
+            Syllabus. The Syllabus page can also display all assignments and events
+            within the course.
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "The Sync to SIS setting could not be enabled for the assignment \"%{assignment_name}\" without a due date."
   the_term_has_ended_for_this_course_f0ab367: "The term has ended for this course"
   the_title_cannot_be_longer_than_length_characters_7a822943: "The title cannot be longer than %{length} characters"
@@ -22151,6 +22324,8 @@ en-GB:
   this_assignment_submission_is_my_own_original_work_e820ce4b: "This assignment submission is my own, original work"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "This assignment will no longer count towards your grade."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "This attachment has not been published by the author."
+  this_code_expires_in_timefromnow_ec7ccef4: "This code expires in %{timeFromNow}."
+  this_code_has_expired_41f76642: "This code has expired."
   this_conference_may_be_recorded_f76deeeb: "This conference might be recorded."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "This course cannot be added to the courses menu at this time."
   this_course_does_not_allow_score_uploads_4b35fe07: "This course does not allow score uploads."
@@ -22634,6 +22809,8 @@ en-GB:
       obtain a Client ID and Client Secret.
       
       If the provider can configure valid callback or redirect URIs, use %{callback_url}.
+  to_create_a_link_you_can_use_in_canvas_you_ll_need_5c6d93e4: "to create a link you can use in Canvas. You’ll need to sign-up for a Zoom account if you don’t already have one."
+  to_create_a_link_you_can_use_in_canvas_you_ll_need_7dd85497: "to create a link you can use in Canvas. You’ll need a Google account to use Google Meet."
   to_create_announcements_discussions_manage_must_al_932ac38f: "To create announcements, Discussions - manage must also be enabled."
   to_create_announcements_discussions_moderate_must__8a8278f2: "To create announcements, Discussions - moderate must also be enabled."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "To cross-list a section, Course sections - add / edit / delete must also be enabled. To edit the course SIS ID, SIS Data - manage must also be enabled. To allow an account-level user to delete a course, Course state - manage must also be enabled."
@@ -22686,6 +22863,7 @@ en-GB:
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "To import SIS data, SIS Data - import must also be enabled."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "To import SIS data, SIS Data - import​ must also be enabled."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "To link the course observer *%{name}* to a student, start typing the student's name below to find them, then click Update."
+  to_log_in_to_your_canvas_account_when_you_re_on_th_54faeb1c: "To log in to your Canvas account when you’re on the go, scan this QR code from the Canvas Student app."
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "To manage Blueprint course settings in Course Settings, Courses - add / edit / delete must also be enabled."
   to_manage_course_content_course_content_add_edit_d_94caa77f: "To manage course content, Course Content - add / edit / delete must be enabled."
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
@@ -23143,6 +23321,12 @@ en-GB:
   upload_a_css_file_ec22214b: "Upload a CSS file..."
   upload_a_js_file_c89d795: "Upload a JS file..."
   upload_a_picture_9f5f6e3c: "Upload a picture"
+  upload_and_store_course_files_or_any_other_files_y_b00cb954: |-
+      Upload and store course files, or any other files you need to keep
+            on hand. When you save assets in Files, they're easy to insert directly into
+            modules, assignments, discussions, or pages! Distribute files to students
+            from your course folder, or lock files until you're ready for the class
+            to download them.
   upload_button: 
     upload: Upload
   upload_course_files_syllabi_readings_or_other_docu_21f8725f: |-
@@ -23199,11 +23383,23 @@ en-GB:
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Use HTML5 Recorder in Content Editor instead of Flash"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Use MathMan to convert LaTeX to MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Use MathMan to convert LaTeX to SVG?"
+  use_modules_to_organize_your_content_and_create_a__1da4149: |-
+      Use modules to organise your content and create a linear flow for
+            what students should do in the course. Modules can be used to organise
+            content by weeks, units, or a different organisation structure.
+            Add files, discussions, assignments, quizzes, and other learning materials.
+            Require prerequisites to be completed before moving to a module or next
+            module item, or lock an entire module until a specific date.
   use_new_folder_tree_in_files_bc0ea09f: "Use new folder tree in files"
   use_new_folder_tree_in_files_eb5a451b: "Use new folder tree in Files"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Use new rich content editor with enhanced sidebar everywhere"
   use_pairing_code_for_parent_sign_up_10b091f8: "Use pairing code for parent sign-up"
   use_parent_account_setting_f25a721f: "Use parent account setting"
+  use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
+      Use quizzes to challenge student understanding and assess comprehension
+            of course material. The New Quizzes assessment engine allows you to create up to
+            13 types of question types and content. If New Quizzes isn't enabled for your institution,
+            Classic Quizzes are still available to help you achieve your objectives.
   use_remote_service_for_notifications_9fe667c6: "Use remote service for notifications"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Use remote version of Rich Content Editor"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Use remote version of Rich Content Editor AND sidebar"
@@ -23803,9 +23999,12 @@ en-GB:
   violation_log_tray_d4eff9f4: "Violation Log Tray"
   virtual_lectures_in_real_time_a1778dea: "Virtual lectures in real-time"
   visit_864b4060: Visit
+  visit_google_meet_ebdaf94f: "Visit Google Meet"
   visit_group_group_name_7a816081: "Visit group %{group_name}"
+  visit_zoom_14636084: "Visit Zoom"
   waiting_for_attempted_login_6d00cb49: "Waiting for attempted login"
   waiting_for_selection_ce0398c7: "Waiting for selection"
+  waiting_for_your_qr_code_to_load_809299e5: "Waiting for your QR Code to load"
   warning_6576b5b8: warning
   warning_aacb8c24: Warning
   warning_all_permissions_will_change_to_match_the_s_e3c9819f: "Warning: All permissions will change to match the selected base role."
@@ -23886,10 +24085,21 @@ en-GB:
   were_errors_27343020: 
     one: "was an error"
     other: "were errors"
+  what_are_announcements_52175539: "What are announcements?"
+  what_are_collaborations_27c20a98: "What are collaborations?"
   what_are_self_sign_up_groups_af1f002a: "What are self sign-up groups?"
+  what_assignment_types_can_i_create_in_a_course_1ed4eed4: "What assignment types can I create in a course?"
   what_does_provisioning_only_mean_eac9a4a1: "What does Provisioning only mean?"
   what_happened_322d8259: "What happened?"
   what_it_does_d4debc07: "What it Does"
+  what_layout_options_are_available_in_the_course_ho_5d364ce3: "What layout options are available in the Course Home Page as an instructor?"
+  what_options_can_i_set_in_a_quiz_53522d76: "What options can I set in a quiz?"
+  what_s_a_class_without_people_to_take_and_lead_it__4470b81a: |-
+      What's a class without people to take and lead it? The People page
+            shows the list of users in your course. Depending on your permissions,
+            you may be able to add students, teacher assistants, and observers to
+            your course. You can also create student groups to house group assignments,
+            discussions, and files.
   what_should_the_csv_file_look_like_985a59ac: "What should the CSV file look like?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "When adding multiple users, use a comma or line break to separate users."
   when_disabled_students_can_still_send_individual_m_567a911c: "When disabled, students can still send individual messages to course teachers, course TAs, and students that belong to the same account-level groups."
@@ -24403,3 +24613,4 @@ en-GB:
     upload: "Upload it"
     zip_options: "Zip file options"
   zip_no_folder_error: "The specified folder couldn't be found in this course."
+  zoom_f3e54d69: Zoom
