@@ -303,9 +303,9 @@ module UserLearningObjectScopes
       return scope_only ? Assignment.none : []
     end
     if Setting.get('assignments_needing_grading_b', 'true') == 'true'
-      assignments_needing_grading_b(opts)
+      assignments_needing_grading_b(scope_only: scope_only, **opts)
     else
-      assignments_needing_grading_a(opts)
+      assignments_needing_grading_a(scope_only: scope_only, **opts)
     end
   end
 
