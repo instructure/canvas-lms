@@ -46,12 +46,14 @@ module Lti
         end
         pagination_args = {max_per_page: 100}
         respond_to do |format|
-          launch_defs = Api.paginate(
-            collection,
-            self,
-            named_context_url(@context, :api_v1_context_launch_definitions_url, include_host: true),
-            pagination_args
-          )
+          launch_defs = Shackles.activate(:slave) do
+            Api.paginate(
+              collection,
+              self,
+              named_context_url(@context, :api_v1_context_launch_definitions_url, include_host: true),
+              pagination_args
+            )
+          end
           format.json do
             cancel_cache_buster
             expires_in 10.minutes
