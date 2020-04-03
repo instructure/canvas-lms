@@ -298,7 +298,7 @@ module UserLearningObjectScopes
                      purpose: 'grading').where('asset_id=submissions.assignment_id')).count
   end
 
-  def assignments_needing_grading(**opts)
+  def assignments_needing_grading(scope_only: false, **opts)
     if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
       return scope_only ? Assignment.none : []
     end
