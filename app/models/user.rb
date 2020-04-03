@@ -2894,11 +2894,15 @@ class User < ActiveRecord::Base
 
   def user_roles(root_account, exclude_deleted_accounts = nil)
     roles = ['user']
-    enrollment_types = root_account.all_enrollments.where(user_id: self, workflow_state: 'active').distinct.pluck(:type)
+    enrollment_types = Shackles.activate(:slave) do
+      root_account.all_enrollments.where(user_id: self, workflow_state: 'active').distinct.pluck(:type)
+    end
     roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
     roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
     roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
-    account_users = root_account.cached_all_account_users_for(self)
+    account_users = Shackles.activate(:slave) do
+      root_account.cached_all_account_users_for(self)
+    end
 
     if exclude_deleted_accounts
       account_users = account_users.select { |a| a.account.workflow_state == 'active' }
