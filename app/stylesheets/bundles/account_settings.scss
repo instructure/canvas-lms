@@ -27,6 +27,16 @@
     display: block;
     max-width: 320px;
   }
+
+  body.responsive_2020_04 {
+    .long-word {
+      word-break: break-all;
+    }
+
+    .custom-text {
+      display: block;
+    }
+  }
 }
 
 body.responsive_2020_03 .delete_filter_link {
