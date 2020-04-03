@@ -43,6 +43,10 @@ if settings.present?
   end
 
   Rails.configuration.to_prepare do
+    Settings.get('ignorable_errors', '').split(',').each do |error|
+      SentryProxy.register_ignorable_error(error)
+    end
+
     Canvas::Errors.register!(:sentry_notification) do |exception, data|
       setting = Setting.get("sentry_error_logging_enabled", 'true')
       SentryProxy.capture(exception, data) if setting == 'true'
