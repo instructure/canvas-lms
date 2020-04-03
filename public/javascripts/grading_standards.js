@@ -469,6 +469,8 @@ $(document).ready(() => {
     Object.keys(data).forEach(key => {
       let parsedValue
 
+      data[key] = data[key].trim()
+
       if (/^grading_standard\[.*\]\[value\]$/.test(key)) {
         parsedValue = numberHelper.parse(data[key])
         if (!isNaN(parsedValue)) {
