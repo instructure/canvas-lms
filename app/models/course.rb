@@ -360,11 +360,13 @@ class Course < ActiveRecord::Base
 
   def sequential_module_item_ids
     Rails.cache.fetch(['ordered_module_item_ids', self].cache_key) do
-      self.context_module_tags.not_deleted.joins(:context_module).
-        where("context_modules.workflow_state <> 'deleted'").
-        where("content_tags.content_type <> 'ContextModuleSubHeader'").
-        reorder(Arel.sql("COALESCE(context_modules.position, 0), context_modules.id, content_tags.position NULLS LAST")).
-        pluck(:id)
+      Shackles.activate(:slave) do
+        self.context_module_tags.not_deleted.joins(:context_module).
+          where("context_modules.workflow_state <> 'deleted'").
+          where("content_tags.content_type <> 'ContextModuleSubHeader'").
+          reorder(Arel.sql("COALESCE(context_modules.position, 0), context_modules.id, content_tags.position NULLS LAST")).
+          pluck(:id)
+      end
     end
   end
 
