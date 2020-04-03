@@ -23,44 +23,94 @@ import {View} from '@instructure/ui-layout'
 import {Heading, List, Spinner, Text} from '@instructure/ui-elements'
 import {Link} from '@instructure/ui-link'
 
+const UNPUBLISHED = 'unpublished'
+
 export default function CoursesTray({courses, hasLoaded}) {
+  const showSplitList =
+    window.ENV?.FEATURES?.unpublished_courses && window.ENV.current_user_roles?.includes('teacher')
+
+  function renderSplitList() {
+    const published = courses.filter(course => course.workflow_state !== UNPUBLISHED)
+    const unpublished = courses.filter(course => course.workflow_state === UNPUBLISHED)
+    return (
+      <>
+        {published.length > 0 && (
+          <Heading level="h4" key="published_courses">
+            {I18n.t('Published Courses')}
+          </Heading>
+        )}
+        <List key="published" variant="unstyled" margin="small small" itemSpacing="small">
+          {published.map(renderCourse)}
+        </List>
+        {unpublished.length > 0 && (
+          <Heading level="h4" key="unpublished_courses">
+            {I18n.t('Unpublished Drafts')}
+          </Heading>
+        )}
+        <List key="unpublished" variant="unstyled" margin="small small" itemSpacing="small">
+          {unpublished.map(renderCourse)}
+        </List>
+      </>
+    )
+  }
+
+  function renderCourse(course) {
+    return (
+      <List.Item key={course.id}>
+        <Link isWithinText={false} href={`/courses/${course.id}`}>
+          {course.name}
+        </Link>
+        {course.enrollment_term_id > 1 && (
+          <Text as="div" size="x-small" weight="light">
+            {course.term.name}
+          </Text>
+        )}
+      </List.Item>
+    )
+  }
+
+  function renderContent() {
+    const courseList = showSplitList ? (
+      renderSplitList()
+    ) : (
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
+        {courses.map(renderCourse)}
+      </List>
+    )
+    return (
+      <>
+        {courseList}
+        <List variant="unstyled" margin="small 0" itemSpacing="small">
+          <List.Item key="hr">
+            <hr role="presentation" />
+          </List.Item>
+          <List.Item key="all">
+            <Link isWithinText={false} href="/courses">
+              {I18n.t('All Courses')}
+            </Link>
+          </List.Item>
+        </List>
+      </>
+    )
+  }
+
+  function renderLoading() {
+    return (
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
+        <List.Item>
+          <Spinner size="small" renderTitle={I18n.t('Loading')} />
+        </List.Item>
+      </List>
+    )
+  }
+
   return (
     <View as="div" padding="medium">
       <Heading level="h3" as="h2">
         {I18n.t('Courses')}
       </Heading>
       <hr role="presentation" />
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
-        {hasLoaded ? (
-          courses
-            .map(course => (
-              <List.Item key={course.id}>
-                <Link isWithinText={false} href={`/courses/${course.id}`}>
-                  {course.name}
-                </Link>
-                {course.enrollment_term_id > 1 && (
-                  <Text as="div" size="x-small" weight="light">
-                    {course.term.name}
-                  </Text>
-                )}
-              </List.Item>
-            ))
-            .concat([
-              <List.Item key="hr">
-                <hr role="presentation" />
-              </List.Item>,
-              <List.Item key="all">
-                <Link isWithinText={false} href="/courses">
-                  {I18n.t('All Courses')}
-                </Link>
-              </List.Item>
-            ])
-        ) : (
-          <List.Item>
-            <Spinner size="small" renderTitle={I18n.t('Loading')} />
-          </List.Item>
-        )}
-      </List>
+      {hasLoaded ? renderContent() : renderLoading()}
       <br />
       <Text as="div">
         {I18n.t(
