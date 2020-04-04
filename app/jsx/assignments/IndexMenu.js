@@ -30,6 +30,7 @@ export default class IndexMenu extends React.Component {
     store: PropTypes.object.isRequired,
     contextType: PropTypes.string.isRequired,
     contextId: PropTypes.number.isRequired,
+    requestBulkEdit: PropTypes.func, // not required. no menu item if not specified
     setTrigger: PropTypes.func.isRequired,
     setDisableTrigger: PropTypes.func.isRequired,
     registerWeightToggle: PropTypes.func.isRequired,
@@ -42,7 +43,7 @@ export default class IndexMenu extends React.Component {
 
   state = this.props.store.getState()
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setState(this.props.store.getState())
   }
 
@@ -202,6 +203,21 @@ export default class IndexMenu extends React.Component {
           <span className="screenreader-only">{I18n.t('Assignment Options')}</span>
         </a>
         <ul className="al-options" role="menu">
+          {this.props.requestBulkEdit && (
+            <li role="menuitem">
+              <a
+                tabIndex="0"
+                id="requestBulkEditMenuItem"
+                className="requestBulkEditMenuItem"
+                role="button"
+                title={I18n.t('Bulk Edit')}
+                onClick={this.props.requestBulkEdit}
+              >
+                <i className="icon-edit" />
+                {I18n.t('Bulk Edit')}
+              </a>
+            </li>
+          )}
           <li role="menuitem">
             <a
               ref="trigger"

@@ -773,6 +773,29 @@ describe "assignments" do
       expect(as.collect(&:position)).to eq [2, 1, 3, 4]
     end
 
+    context "with Responsive fix" do
+      before :each do
+        Account.default.enable_feature!('responsive_2020_03')
+      end
+
+      it "should reorder assignments with drag and drop", priority: "2", test_id: 647848 do
+        ag = @course.assignment_groups.first
+        as = []
+        4.times do |i|
+          as << @course.assignments.create!(:name => "assignment_#{i}", :assignment_group => ag)
+        end
+        expect(as.collect(&:position)).to eq [1, 2, 3, 4]
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        drag_with_js("#assignment_#{as[0].id} .draggable-handle", 0, 50)
+        wait_for_ajaximations
+
+        as.each { |a| a.reload }
+        expect(as.collect(&:position)).to eq [2, 1, 3, 4]
+      end
+    end
+
     context "with modules" do
       before do
         @module = @course.context_modules.create!(:name => "module 1")

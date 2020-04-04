@@ -59,6 +59,40 @@ module Lti
           ]
         end
       end
+
+      context 'when FF >= 74 is used' do
+        let(:user_agent) do
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/74.0"
+        end
+
+        it 'sets allowed origin to "*"' do
+          expect(subject).to match_array [
+            'geolocation *',
+            'microphone *',
+            'camera *',
+            'midi *',
+            'encrypted-media *',
+            'autoplay *'
+          ]
+        end
+      end
+
+      context 'when FF < 74 is used' do
+        let(:user_agent) do
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/73.0"
+        end
+
+        it 'does not set allowed origin to "*"' do
+          expect(subject).to match_array [
+            'geolocation',
+            'microphone',
+            'camera',
+            'midi',
+            'encrypted-media',
+            'autoplay'
+          ]
+        end
+      end
     end
 
     describe 'initialize' do

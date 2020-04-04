@@ -274,10 +274,10 @@ module GroupsCommon
 
   def manually_delete_group
     f('.group-actions .icon-more').click
-    wait_for_ajaximations
+    wait_for(method: nil, timeout: 1) { f('.delete-group').displayed? }
     f('.delete-group').click
 
-    driver.switch_to.alert.accept
+    accept_alert
     wait_for_animations
   end
 
@@ -287,7 +287,7 @@ module GroupsCommon
 
     fln('Delete').click
 
-    driver.switch_to.alert.accept
+    accept_alert
     wait_for_animations
   end
 

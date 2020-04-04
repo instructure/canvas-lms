@@ -51,7 +51,9 @@ export function QRLoginModal({onDismiss, refreshInterval, pollInterval}) {
 
   function renderQRCode() {
     const body = imagePng ? (
-      <Img data-testid="qr-code-image" src={`data:image/png;base64, ${imagePng}`} />
+      <span className="fs-exclude">
+        <Img data-testid="qr-code-image" src={`data:image/png;base64, ${imagePng}`} />
+      </span>
     ) : (
       <Spinner
         data-testid="qr-code-spinner"
@@ -119,7 +121,7 @@ export function QRLoginModal({onDismiss, refreshInterval, pollInterval}) {
       <Modal.Body>
         <View display="block">
           {I18n.t(
-            'To log in to your Canvas account when you’re on the go, scan this QR code from the Canvas Student app.'
+            'To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.'
           )}
         </View>
         {renderQRCode()}

@@ -22,6 +22,10 @@
 def result_test_count = -1
 @groovy.transform.Field
 def result_node_count = -1
+@groovy.transform.Field
+def changed_tests = ''
+@groovy.transform.Field
+def fsc_timeout = false
 
 def getImageTagVersion() {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
@@ -39,11 +43,11 @@ def computeTestCount() {
                \$PATCHSET_TAG \
         bundle exec flakey_spec_catcher --use-parent --dry-run-quiet > tmp/test_list
   """
-  def raw_result = readFile('tmp/test_list').trim()
-  echo "raw result from catcher: \n====\n$raw_result\n===="
+  changed_tests = readFile('tmp/test_list').trim()
+  echo "raw result from catcher: \n====\n$changed_tests\n===="
   def test_count = 0
-  if (raw_result) {
-    test_count = raw_result.split('\n').length
+  if (changed_tests) {
+    test_count = changed_tests.split('\n').length
   }
   echo "expected tests to run: $test_count"
   result_test_count = test_count
@@ -83,6 +87,15 @@ def executeFlakeySpecCatcher(prefix = 'main') {
       sh 'build/new-jenkins/rspec-flakey-spec-catcher.sh'
     }
   }
+  // Don't fail the build for timeouts
+  catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    if (!e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+      throw e
+    } else {
+      echo "Not failing the build due to timeouts"
+      fsc_timeout = true
+    }
+  }
   finally {
     sh "mkdir -p tmp/$prefix"
     sh(
@@ -91,6 +104,16 @@ def executeFlakeySpecCatcher(prefix = 'main') {
     )
     archiveArtifacts(artifacts: "tmp/$prefix/fsc.out", allowEmptyArchive: true)
   }
+}
+
+def sendSlack(success) {
+  def color = success ? "good" : "danger"
+  def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>"
+  def message = "$jobInfo\n$changed_tests"
+  if (fsc_timeout) {
+    message = "Timeout Occurred!\n$message"
+  }
+  slackSend channel: '#flakey_spec_catcher_noisy', color: color, message: message
 }
 
 pipeline {
@@ -171,6 +194,14 @@ pipeline {
             }
             parallel(nodes)
           }
+        }
+      }
+      post {
+        success {
+          sendSlack(true)
+        }
+        failure {
+          sendSlack(false)
         }
       }
     }

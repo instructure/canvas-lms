@@ -20,12 +20,40 @@ module Canvas
     module Migration
       module ClassMethods
         def cassandra
-          @cassandra ||= Canvas::Cassandra::DatabaseBuilder.from_config(cassandra_cluster)
+          # Our current cassandra.yml in production set a timeout of 15 seconds. We've seen some migrations appear to
+          # fail but actually succeded in a way that seems like timeout issues. For a migration we'll just override the
+          # statement timeout to be 3 minutes. (It should hopefully never take 3 minutes.)
+          @cassandra ||= Canvas::Cassandra::DatabaseBuilder.from_config(cassandra_cluster,
+            override_options: { 'timeout' => 180 })
         end
 
         def runnable?
           raise "cassandra_cluster is required to be defined" unless respond_to?(:cassandra_cluster) && cassandra_cluster.present?
           Switchman::Shard.current == Switchman::Shard.birth && Canvas::Cassandra::DatabaseBuilder.configured?(cassandra_cluster)
+        end
+
+        def cassandra_table_exists?(table)
+          cql = %{
+            SELECT *
+            FROM #{table}
+            LIMIT 1
+          }
+          cassandra.execute(cql)
+          true
+        rescue CassandraCQL::Error::InvalidRequestException
+          false
+        end
+
+        def cassandra_column_exists?(table, column)
+          cql = %{
+            SELECT #{column}
+            FROM #{table}
+            LIMIT 1
+          }
+          cassandra.execute(cql)
+          true
+        rescue CassandraCQL::Error::InvalidRequestException
+          false
         end
       end
 

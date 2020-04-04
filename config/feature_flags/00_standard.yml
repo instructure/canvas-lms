@@ -449,3 +449,9 @@ commons_favorites:
   display_name: Import Commons Favorites
   description: If Commons is installed, allows importing favorited content
     items from within Canvas.
+featured_help_links:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Featured Help Links
+  description: Allows Help Links to be tagged as Featured or New and
+    prominently displays the Featured Help Link in the Help Menu.

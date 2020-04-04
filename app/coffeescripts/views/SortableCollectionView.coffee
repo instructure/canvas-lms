@@ -40,8 +40,8 @@ export default class SortableCollectionView extends CollectionView
   # Internal: Enable sorting of the this view's itemViews.
   #
   # Returns nothing.
-  _initSort: ->
-    @$list.sortable(_.extend({}, @sortOptions, scope: @cid))
+  _initSort: (opts = {}) ->
+    @$list.sortable(_.extend({}, @sortOptions, opts, scope: @cid))
     @$list.on('sortupdate', @_updateSort)
     @$list.disableSelection()
 

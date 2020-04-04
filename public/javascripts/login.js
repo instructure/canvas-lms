@@ -36,32 +36,34 @@ $('.field-with-fancyplaceholder input').fancyPlaceholder()
 $('#forgot_password_form').formSubmit({
   object_name: 'pseudonym_session',
   required: ['unique_id_forgot'],
-  beforeSubmit(data) {
+  beforeSubmit(_data) {
     $(this).loadingImage()
   },
-  success(data) {
+  success(_data) {
     $(this).loadingImage('remove')
     $.flashMessage(
       htmlEscape(
         I18n.t(
-          'password_confirmation_sent',
-          'Password confirmation sent to %{email_address}. Make sure you check your spam box.',
+          'Your password recovery instructions will be sent to *%{email_address}*. This may take up to 30 minutes. Make sure to check your spam box.',
           {
+            wrappers: ['<b>$1</b>'],
             email_address: $(this)
               .find('.email_address')
               .val()
           }
         )
-      )
+      ),
+      15 * 60 * 1000 // fifteen minutes isn't forever but should be plenty
     )
-    $('.login_link:first').click()
+    // Focus on the close button of the alert we just put up, per a11y
+    $('ul#flash_message_holder button.close_link').focus()
   },
-  error(data) {
+  error(_data) {
     $(this).loadingImage('remove')
   }
 })
 
-$('#login_form').submit(function(event) {
+$('#login_form').submit(function(_event) {
   const data = $(this).getFormData({object_name: 'pseudonym_session'})
   let success = true
   if (!data.unique_id || data.unique_id.length < 1) {

@@ -18,17 +18,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def buildParameters = [
-  string(name: 'CANVAS_LMS_REFSPEC', value: "${env.CANVAS_LMS_REFSPEC}"),
-  string(name: 'RUN_COVERAGE', value: '1'),
-  string(name: 'POSTGRES', value: '9.5'),
-  string(name: 'RUBY_PASSENGER', value: '2.4-xenial'),
-  string(name: 'PATCHSET_TAG', value: "${env.DOCKER_REGISTRY_FQDN}/jenkins/canvas-lms:master")
-]
 
 pipeline {
   agent { label 'canvas-docker' }
   options { ansiColor('xterm') }
+
+  environment {
+    RUN_COVERAGE = '1'
+    POSTGRES = '9.5'
+    RUBY_PASSENGER = '2.4-xenial'
+    PATCHSET_TAG = "${env.DOCKER_REGISTRY_FQDN}/jenkins/canvas-lms:master"
+    COVERAGE = '1'
+  }
 
   stages {
     stage('Print Env Variables') {
@@ -40,24 +41,48 @@ pipeline {
     }
 
     stage('Parallel Run Tests') {
-      parallel {
-        stage('JS') {
-          steps {
-            build(job: 'test-suites/JS', parameters: buildParameters)
-          }
-        }
+      steps {
+        script {
+          def stages = [:]
 
-        stage('Selenium Chrome') {
-          steps {
-            build(job: 'test-suites/selenium-chrome', parameters: buildParameters)
+          echo 'adding Javascript'
+          stages['Javascript'] = {
+            build(job: 'test-suites/JS', parameters: [
+              string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC),
+              string(name: 'RUN_COVERAGE', value: env.RUN_COVERAGE),
+              string(name: 'POSTGRES', value: env.POSTGRES),
+              string(name: 'RUBY_PASSENGER', value: env.RUBY_PASSENGER),
+              string(name: 'PATCHSET_TAG', value: env.PATCHSET_TAG)
+            ])
           }
-        }
 
-        stage('RSpec') {
-          steps {
-            build(job: 'test-suites/rspec', parameters: buildParameters)
-          }
+          def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
+          distribution.stashBuildScripts()
+          distribution.addRSpecSuites(stages)
+          distribution.addSeleniumSuites(stages)
+
+          parallel(stages)
         }
+      }
+    }
+
+    stage('Upload Coverage') {
+      steps {
+        script {
+          def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
+          rspec.uploadSeleniumCoverage()
+          rspec.uploadRSpecCoverage()
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      script {
+        def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
+        rspec.uploadSeleniumFailures()
+        rspec.uploadRSpecFailures()
       }
     }
   }

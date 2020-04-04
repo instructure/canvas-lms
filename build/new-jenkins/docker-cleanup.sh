@@ -102,7 +102,12 @@ else
   done
   image_ids=$(docker images --all | awk '{ print $1 ":" $2 " " $3 }' | grep --fixed-strings --invert-match ${regex[@]} | awk '{ print $2 }' || echo '')
   if [[ $image_ids != "" ]]; then
-    docker rmi --force $image_ids
+    # This is a best-effort scenario, as the naive filter implemented will
+    # sometimes attempt to delete images which are "Parent" objects to the
+    # retained images from the whitelist
+    # Resolves the error:
+    # `conflict: unable to delete <image_sha> (cannot be forced) - image has dependent child images`
+    docker rmi --force $image_ids || true
   fi
   docker system prune --force --volumes
 fi

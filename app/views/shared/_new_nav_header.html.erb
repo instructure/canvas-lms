@@ -17,6 +17,11 @@
 %>
 
   <% js_bundle :navigation_header %>
+
+  <% if @domain_root_account && @domain_root_account.feature_enabled?(:product_tours) %>
+  <% js_bundle :nav_tourpoints %>
+  <% end %>
+
   <% if use_responsive_layout? %>
     <header id="mobile-header" class="no-print">
       <button type="button" class="Button Button--icon-action-rev Button--large  mobile-header-hamburger">
@@ -51,7 +56,7 @@
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/profile') %>">
               <a id="global_nav_profile_link" role="button" href="/profile" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container">
-                  <div aria-hidden="true" class="ic-avatar <% if @real_current_user && @real_current_user != @current_user %>ic-avatar--fake-student<% end %>">
+                  <div aria-hidden="true" class="fs-exclude ic-avatar <% if @real_current_user && @real_current_user != @current_user %>ic-avatar--fake-student<% end %>">
                     <img src="<%= @current_user.try { |usr| avatar_image_attrs(usr).first } %>" alt="<%= @current_user.short_name %>" />
                   </div>
                   <span class="menu-item__badge"></span>
@@ -182,4 +187,5 @@
         </ul>
       </div>
     <div id="global_nav_tray_container"></div>
+    <div id="global_nav_tour"></div>
   </header>

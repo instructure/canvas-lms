@@ -112,7 +112,7 @@ function Attribution({name, avatarUrl, profileUrl}) {
   return (
     <Flex>
       <Flex.Item margin="xx-small">
-        <Avatar name={name} src={avatarUrl} size="small" />
+        <Avatar name={name} src={avatarUrl} size="small" data-fs-exclude />
       </Flex.Item>
       <Flex.Item margin="xx-small" shrink>
         <Button

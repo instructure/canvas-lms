@@ -180,7 +180,7 @@ module Lti
         expected_json = group.users.map do |user|
           user_json(user, user, nil, [], group.context, tool_includes: %w(email lti_id))
         end
-        expect(parsed_body).to eq(expected_json)
+        expect(parsed_body.sort_by{|u| u[:id]}).to eq(expected_json.sort_by{|u| u[:id]})
       end
 
       it 'responds with 401 if group is not in tool context' do
@@ -214,7 +214,7 @@ module Lti
         expected_json = group.users.map do |user|
           user_json(user, user, nil, [], group.context, tool_includes: %w(email lti_id))
         end
-        expect(parsed_body).to eq(expected_json)
+        expect(parsed_body.sort_by{|u| u[:id]}).to eq(expected_json.sort_by{|u| u[:id]})
       end
     end
   end
