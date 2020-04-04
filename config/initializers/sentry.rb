@@ -49,6 +49,7 @@ if settings.present?
 
     # This error means the service failed and we will retry later.
     SentryProxy.register_ignorable_error(Turnitin::Errors::SubmissionNotScoredError)
+    SentryProxy.register_ignorable_error(ConditionalRelease::ServiceError)
     # This error can be caused by LTI tools.
     SentryProxy.register_ignorable_error("Grade pass back failure")
 
