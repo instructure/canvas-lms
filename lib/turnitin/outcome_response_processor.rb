@@ -83,6 +83,9 @@ module Turnitin
       if turnitin_client.scored?
         update_turnitin_data!(submission, asset_string, turnitin_client.turnitin_data)
       elsif attempt_number < self.class.max_attempts
+        InstStatsd::Statsd.increment("submission_not_scored.account_#{@assignment.root_account.global_id}",
+                                     short_stat: 'submission_not_scored',
+                                     tags: { root_account_id: @assignment.root_account.global_id })
         raise Errors::SubmissionNotScoredError
       else
         new_data = {
