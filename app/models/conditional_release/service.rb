@@ -222,6 +222,9 @@ module ConditionalRelease
         headers = headers_for(course, current_user, domain_for(course), session)
         request = CanvasHttp.get(rules_url, headers)
         unless request && request.code == '200'
+          InstStatsd::Statsd.increment("conditional_release_service_error",
+                                       short_stat: 'conditional_release_service_error',
+                                       tags: { type: 'active_rules' })
           raise ServiceError, "error fetching active rules #{request}"
         end
         rules = JSON.parse(request.body)
@@ -325,6 +328,9 @@ module ConditionalRelease
         rules_data[:rules] = merge_assignment_data(rules_data[:rules], assignments)
         rules_data[:rules]
       rescue ConditionalRelease::ServiceError => e
+        InstStatsd::Statsd.increment("conditional_release_service_error",
+                                     short_stat: 'conditional_release_service_error',
+                                     tags: { type: 'rules_data' })
         Canvas::Errors.capture(e, course_id: context.global_id, user_id: student.global_id)
         []
       end
@@ -350,6 +356,9 @@ module ConditionalRelease
         if req && req.code == '200'
           JSON.parse(req.body)
         else
+          InstStatsd::Statsd.increment("conditional_release_service_error",
+                                       short_stat: 'conditional_release_service_error',
+                                       tags: { type: 'applied_rules' })
           message = "error fetching applied rules #{req}"
           raise ServiceError, message
         end
