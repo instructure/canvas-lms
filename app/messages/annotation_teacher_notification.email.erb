@@ -1,0 +1,13 @@
+<% presenter = Messages::SubmissionCommentForTeacher::AnnotationEmailPresenter.new(self) %>
+
+<% define_content :link do %>
+  <%= presenter.link %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= presenter.subject %>
+<% end %>
+
+<%= presenter.body %>
+
+<%= t("You can review the submission details using this link: %{link}.", link: presenter.link) %>
