@@ -270,9 +270,11 @@ class ApplicationController < ActionController::Base
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
-    tools = ContextExternalTool.all_tools_for(context, {:placements => type,
+    tools = Shackles.activate(:slave) do
+      ContextExternalTool.all_tools_for(context, {:placements => type,
       :root_account => @domain_root_account, :current_user => @current_user,
       :tool_ids => tool_ids}).to_a
+    end
 
     tools.select! do |tool|
       tool.visible_with_permission_check?(type, @current_user, context, session) &&

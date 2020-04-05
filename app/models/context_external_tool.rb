@@ -878,7 +878,7 @@ end
         batch_object: user, batched_keys: [:enrollments, :account_users]) do
       # let them see admin level tools if there are any courses they can manage
       if root_account.grants_right?(user, :manage_content) ||
-        Course.manageable_by_user(user.id, true).not_deleted.where(:root_account_id => root_account).exists?
+        Shackles.activate(:slave) { Course.manageable_by_user(user.id, true).not_deleted.where(:root_account_id => root_account).exists? }
         'admins'
       else
         'members'
