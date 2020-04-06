@@ -485,19 +485,23 @@ body.responsive_2020_04 .conversations__filter {
     width: 68.08511%;
     height: 100%;
     flex-grow: 1;
+
+    .subject {
+      float: direction(left);
+    }
   }
 
   body.responsive_2020_04 & {
     min-width: 1px;
     flex: 1;
+
+    .subject {
+      line-height: $ic-label-line-height;
+    }
   }
 
   &:focus {
     outline: none;
-  }
-
-  .subject {
-    float: direction(left);
   }
 
   .no-messages {
@@ -542,8 +546,15 @@ body.responsive_2020_04 .conversations__filter {
   }
 
   .message-detail-actions {
-    li {
-      display: inline;
+    body.responsive_2020_04 & {
+      display: flex;
+      align-items: center;
+    }
+
+    body:not(.responsive_2020_04) & {
+      li {
+        display: inline;
+      }
     }
   }
 
@@ -571,9 +582,23 @@ body.responsive_2020_04 .conversations__filter {
 
   .message-info {
     margin-bottom: $ic-sp;
+
+    body.responsive_2020_04 & {
+      @include breakpoint(desktop) {
+        display: flex;
+        flex-wrap: wrap;
+      }
+    }
   }
 
   .user-info {
+    body.responsive_2020_04 & {
+      @include breakpoint(desktop) {
+        flex: 1;
+        padding-#{direction(right)}: $ic-sp;
+      }
+    }
+
     .avatar {
       float: direction(left);
       margin-#{direction(right)}: 8px;
@@ -591,27 +616,46 @@ body.responsive_2020_04 .conversations__filter {
 
   .message-metadata {
     position: relative;
+
+    body.responsive_2020_04 & {
+      @include breakpoint(desktop) {
+        text-align: direction(right);
+      }
+    }
   }
 
   .date {
     color: darken($ic-color-neutral, 50);
-    position: absolute;
-    #{direction(right)}: 10px;
-    top: 0;
+
+    body:not(.responsive_2020_04) & {
+      position: absolute;
+      #{direction(right)}: 10px;
+      top: 0;
+    }
   }
 
   .actions {
-    #{direction(right)}: 9999em;
-    position: relative;
-    top: 0;
-    margin: direction-sides(20px 10px 0 8px);
+    body:not(.responsive_2020_04) & {
+      #{direction(right)}: 9999em;
+      position: relative;
+      top: 0;
+      margin: direction-sides(20px 10px 0 8px);
+    }
   }
 
   .actions li {
     border: none;
-    float: direction(left);
-    margin:0 0 0 8px;
     padding: 0;
+
+    body:not(.responsive_2020_04) & {
+      margin: 0 0 0 8px;
+      float: direction(left);
+    }
+
+    body.responsive_2020_04 & {
+      margin: 0 0 0 $ic-sp / 3;
+      display: inline-block;
+    }
   }
 
   .message-detail-actions li a,
@@ -626,19 +670,20 @@ body.responsive_2020_04 .conversations__filter {
   }
 }
 
-.touch .message-detail .actions {
-  #{direction(right)}: -7px;
-  top: 24px;
-}
+body.responsive_2020_04 {
+  .touch .message-detail .actions {
+    #{direction(right)}: -7px;
+    top: 24px;
+  }
 
-.touch .message-item-view:hover, .touch .message-metadata.hover {
-  .date {
-    #{direction(right)}: 0;
+  .touch .message-item-view:hover, .touch .message-metadata.hover {
+    .date {
+      #{direction(right)}: 0;
+    }
   }
 }
 
-.message-item-view:hover, .message-metadata.hover {
-
+body:not(.responsive_2020_04) .message-item-view:hover, .message-metadata.hover {
   .actions {
     display: block;
     #{direction(right)}: -7px;
