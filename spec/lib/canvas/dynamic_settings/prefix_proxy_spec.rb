@@ -57,6 +57,7 @@ module Canvas
         end
 
         it 'must use the dynamic settings cache for previously fetched values' do
+          expect(LocalCache).to receive(:fetch).with(DynamicSettings::CACHE_KEY_PREFIX + 'foo/bar/baz').ordered
           expect(LocalCache).to receive(:fetch).with(DynamicSettings::CACHE_KEY_PREFIX + '/', expires_in: 3.minutes).ordered
           expect(LocalCache).to receive(:fetch).with(DynamicSettings::CACHE_KEY_PREFIX + 'foo/bar/baz').ordered
           expect(LocalCache).to receive(:fetch).with(DynamicSettings::CACHE_KEY_PREFIX + 'global/foo/bar/baz', expires_in: 3.minutes).ordered
