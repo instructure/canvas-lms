@@ -18,6 +18,7 @@
 
 <% js_bundle :select_content_dialog %>
 <% css_bundle :select_content_dialog %>
+<% css_bundle :react_files %>
 <% only ||= nil # only is an optimization, so that tabs that aren't going to be used won't have their data loaded %>
 <% lti_app_placements ||= [] %>
 <% cache([@context, 'select_context_content_dialog_1', only].cache_key) do %>
@@ -181,8 +182,9 @@
             <tr>
               <% if @context.root_account.feature_enabled?(:module_dnd) %>
                 <td><%= before_label :files, "Files" %></td>
-                <td>
-                  <input id="module_attachment_uploaded_data" type="file" name="attachment[uploaded_data]" class="item_title" multiple='true'/>
+                <td style="width:100%;">
+                  <div id="module_attachment_upload_form"></div>
+                  <div id="module_attachment_upload_progress" style="display: none"></div>
                 </td>
               <% else %>
                 <td><%= before_label :file, "File" %></td>

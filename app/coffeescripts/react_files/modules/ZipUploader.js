@@ -62,8 +62,9 @@ export default class ZipUploader extends BaseUploader {
     this._cancelToken = null
     // will get the cancel button un-rendered
     this.onProgress(this.progress, this.file)
-    super.onUploadPosted(arguments)
-    return this.getContentMigration()
+    const migrationPromise = this.getContentMigration()
+    super.onUploadPosted()
+    return migrationPromise
   }
 
   // get the content migration when ready and use progress api to pull migration progress

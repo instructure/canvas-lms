@@ -30,7 +30,9 @@ class UploadQueue {
   }
 
   flush() {
-    return (this._queue = [])
+    this._queue = []
+    this.currentUploader = null
+    this.onChange()
   }
 
   getAllUploaders() {

@@ -126,5 +126,26 @@ QUnit.module(
     const {collisions, resolved} = FileOptionsCollection.segregateOptionBuckets([one])
     equal(collisions.length, 0)
     equal(resolved.length, 0)
+  }),
+
+  test('segregateOptionBuckets treats zip files like regular files if alwaysUploadZips is true', () => {
+    setupFolderWith(['other.zip', 'bar', 'baz'])
+    const one = createFileOption('other.zip')
+    one.file.type = 'application/zip'
+    FileOptionsCollection.setUploadOptions({alwaysUploadZips: true})
+    const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
+    equal(resolved.length, 0)
+    equal(collisions.length, 1)
+    equal(zips.length, 0)
+  }),
+
+  test('segregateOptionBuckets automaticaly renames files when alwaysRename is true', () => {
+    setupFolderWith(['foo', 'bar', 'baz'])
+    const one = createFileOption('foo')
+    FileOptionsCollection.setUploadOptions({alwaysRename: true})
+    const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
+    equal(resolved.length, 1)
+    equal(collisions.length, 0)
+    equal(zips.length, 0)
   })
 )

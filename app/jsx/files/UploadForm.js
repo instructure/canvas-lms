@@ -29,8 +29,10 @@ export const UploadFormPropTypes = {
   visible: bool,
   inputId: string,
   inputName: string,
-  autoUpload: bool,
+  autoUpload: bool, // if true, upload as soon as file(s) are selected
   disabled: bool,
+  alwaysRename: bool, // if true offer to rename files
+  alwaysUploadZips: bool, // if true offer to expand zip files
   onChange: func
 }
 
@@ -39,7 +41,10 @@ class UploadForm extends React.Component {
 
   static defaultProps = {
     autoUpload: true,
-    disabled: false
+    disabled: false,
+    alwaysRename: false,
+    alwaysUploadZips: false,
+    onChange: () => {}
   }
 
   constructor(props) {
@@ -50,6 +55,7 @@ class UploadForm extends React.Component {
     this.resolvedUserAction = false
     this.state = {...FileOptionsCollection.getState()}
     this.setFolder(props.currentFolder)
+    this.setUploadOptions(props)
   }
 
   setFolder(folder) {
@@ -61,7 +67,11 @@ class UploadForm extends React.Component {
   }
 
   reset() {
-    this.formRef?.current?.reset()
+    this.formRef.current?.reset()
+  }
+
+  setUploadOptions({alwaysRename, alwaysUploadZips}) {
+    FileOptionsCollection.setUploadOptions({alwaysRename, alwaysUploadZips})
   }
 
   queueUploads() {
@@ -74,39 +84,48 @@ class UploadForm extends React.Component {
   }
 
   handleFilesInputChange = e => {
-    if (this.props.onChange) {
-      this.props.onChange(e)
-    }
+    this.props.onChange(e)
     this.resolvedUserAction = false
     FileOptionsCollection.setOptionsFromFiles(e.target.files)
-    this.setState(FileOptionsCollection.getState())
+    this.setStateFromOptions()
   }
 
   onNameConflictResolved = fileNameOptions => {
     FileOptionsCollection.onNameConflictResolved(fileNameOptions)
     this.resolvedUserAction = true
-    this.setState(FileOptionsCollection.getState())
+    this.setStateFromOptions(() => {
+      if (
+        this.state.resolvedNames.length +
+          this.state.nameCollisions.length +
+          this.state.zipOptions.length ===
+        0
+      ) {
+        this.reset()
+        this.props.onChange()
+      }
+    })
   }
 
   onZipOptionsResolved = fileNameOptions => {
     FileOptionsCollection.onZipOptionsResolved(fileNameOptions)
     this.resolvedUserAction = true
-    this.setState(FileOptionsCollection.getState())
+    this.setStateFromOptions()
   }
 
   onClose = () => {
-    this.formRef.current.reset()
+    this.reset()
     if (!this.resolvedUserAction) {
       // user dismissed zip or name conflict modal without resolving things
       // reset state to dump previously selected files
       FileOptionsCollection.resetState()
-      this.setState(FileOptionsCollection.getState())
+      this.setStateFromOptions()
     }
     this.resolvedUserAction = false
   }
 
   componentDidUpdate() {
     this.setFolder(this.props.currentFolder)
+    this.setUploadOptions(this.props)
 
     if (
       this.props.autoUpload &&
@@ -115,7 +134,7 @@ class UploadForm extends React.Component {
       this.state.resolvedNames.length > 0 &&
       FileOptionsCollection.hasNewOptions()
     ) {
-      this.queueUploads()
+      this.queueUploads(this.props.contextType, this.props.contextId)
     } else {
       this.resolvedUserAction = false
     }
@@ -129,12 +148,12 @@ class UploadForm extends React.Component {
     FileOptionsCollection.onChange = null
   }
 
-  setStateFromOptions = () => {
-    this.setState(FileOptionsCollection.getState())
+  setStateFromOptions = callback => {
+    this.setState(FileOptionsCollection.getState(), callback)
   }
 
   buildPotentialModal() {
-    if (this.state.zipOptions.length) {
+    if (this.state.zipOptions.length && !this.props.alwaysUploadZips) {
       return (
         <ZipFileOptionsForm
           fileOptions={this.state.zipOptions[0]}
@@ -142,7 +161,7 @@ class UploadForm extends React.Component {
           onClose={this.onClose}
         />
       )
-    } else if (this.state.nameCollisions.length) {
+    } else if (this.state.nameCollisions.length && !this.props.alwaysRename) {
       return (
         <FileRenameForm
           fileOptions={this.state.nameCollisions[0]}

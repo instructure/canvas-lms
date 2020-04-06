@@ -38,13 +38,6 @@ describe "/shared/_select_content_dialog" do
       file_select = page.css("#file_select_label")
       expect(file_select.inner_text).to match(/New File\(s\)\./)
     end
-
-    it "should allow multiple file upload" do
-      render partial: 'shared/select_content_dialog'
-      page = Nokogiri(response.body)
-      uploader = page.css("#module_attachment_uploaded_data")[0]
-      expect(uploader.keys).to include 'multiple'
-    end
   end
 
   describe "with module_dnd FF disabled" do
