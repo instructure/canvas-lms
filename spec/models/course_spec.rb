@@ -359,7 +359,6 @@ describe Course do
 
     @course.update_attribute(:public_syllabus, true)
     expect(@course.syllabus_visibility_option).to eq('public')
-
   end
 
   it 'should return offline web export flag' do
@@ -2329,6 +2328,22 @@ describe Course, "tabs_available" do
       expect(tab_ids.length).to eql(length)
     end
 
+    it "should return K-6 tabs if feature flag is enabled for teachers" do
+      begin
+        @course.enable_feature!(:canvas_k6_theme)
+        tabs = @course.tabs_available(@user)
+        expect(tabs.count {|t| !t[:hidden] }).to eq 5
+        expect(tabs.count {|t| t[:hidden] }).to eq 12
+      ensure
+        @course.disable_feature!(:canvas_k6_theme)
+      end
+    end
+
+    it "should default tab configuration to an empty array" do
+      course = Course.new
+      expect(course.tab_configuration).to eq []
+    end
+
     it "should overwrite the order of tabs if configured" do
       @course.tab_configuration = [{ id: Course::TAB_COLLABORATIONS }]
       available_tabs = @course.tabs_available(@user).map { |tab| tab[:id] }
@@ -2404,6 +2419,16 @@ describe Course, "tabs_available" do
   context "students" do
     before :once do
       course_with_student(:active_all => true)
+    end
+
+    it "should return K-6 tabs if feature flag is enabled for students" do
+      begin
+        @course.enable_feature!(:canvas_k6_theme)
+        tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+        expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_GRADES]
+      ensure
+        @course.disable_feature!(:canvas_k6_theme)
+      end
     end
 
     it "should hide unused tabs if not an admin" do
@@ -4023,6 +4048,30 @@ describe Course, 'tabs_available' do
       @course.root_account.enable_feature!(:rubrics_in_course_navigation)
       tab_ids = @course.tabs_available(@teacher).map{|t| t[:id]}
       expect(tab_ids).to include(Course::TAB_RUBRICS)
+    end
+  end
+end
+
+describe Course, 'tab_hidden?' do
+  before :once do
+    course_model
+  end
+
+  it "should not have any hidden tabs by default" do
+    Course.default_tabs.each do |tab|
+      expect(@course.tab_hidden?(tab[:id])).to be_falsey
+    end
+  end
+
+  it "should hide certain tabs when canvas_k6_theme feature flag is enabled" do
+    begin
+      @course.enable_feature!(:canvas_k6_theme)
+      Course.default_tabs.each do |tab|
+        hidden = !Course::CANVAS_K6_TAB_IDS.include?(tab[:id])
+        expect(@course.tab_hidden?(tab[:id])).to(hidden ? be_truthy : be_falsey)
+      end
+    ensure
+      @course.disable_feature!(:canvas_k6_theme)
     end
   end
 end

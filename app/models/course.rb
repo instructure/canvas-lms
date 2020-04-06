@@ -951,7 +951,6 @@ class Course < ActiveRecord::Base
   end
 
   def assert_defaults
-    self.tab_configuration ||= [] unless self.tab_configuration == []
     self.name = nil if self.name && self.name.strip.empty?
     self.name ||= t('missing_name', "Unnamed Course")
     self.course_code = nil if self.course_code == ''
@@ -2637,7 +2636,12 @@ class Course < ActiveRecord::Base
   end
 
   def tab_configuration
-    super.map {|h| h.with_indifferent_access } rescue []
+    # `account_id.present?` is there to prevent a failure in `feature_enabled?`
+    # if an account hasn't been set on the course yet
+    if account_id.present? && feature_enabled?(:canvas_k6_theme) && super.nil?
+      return canvas_k6_tab_configuration.map(&:with_indifferent_access)
+    end
+    super.map(&:with_indifferent_access) rescue []
   end
 
   TAB_HOME = 0
@@ -2658,6 +2662,8 @@ class Course < ActiveRecord::Base
   TAB_COLLABORATIONS = 16
   TAB_COLLABORATIONS_NEW = 17
   TAB_RUBRICS = 18
+
+  CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
 
   def self.default_tabs
     [{
@@ -3532,5 +3538,10 @@ class Course < ActiveRecord::Base
     return if default_post_policy.present?
 
     create_default_post_policy(assignment: nil, post_manually: false)
+  end
+
+  def canvas_k6_tab_configuration
+    visible, hidden = Course.default_tabs.partition {|tab| CANVAS_K6_TAB_IDS.include?(tab[:id])}
+    [*visible, *hidden.tap {|tabs| tabs.each{|t| t[:hidden]=true }}]
   end
 end
