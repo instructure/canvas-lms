@@ -23,8 +23,11 @@ import tokyo from 'timezone/Asia/Tokyo'
 import moment from 'moment-timezone'
 import BulkEdit from '../BulkEdit'
 
+// Because node 10 is dumb and doesn't have this yet
+import 'array-flat-polyfill'
+
 async function flushPromises() {
-  await act(() => new Promise(resolve => setTimeout(resolve, 0)))
+  await act(() => Promise.resolve())
 }
 
 function standardAssignmentResponse() {
@@ -98,14 +101,17 @@ function renderBulkEdit(overrides = {}) {
 }
 
 async function renderBulkEditAndWait(overrides = {}, assignments = standardAssignmentResponse()) {
-  fetch.mockResponse(JSON.stringify(assignments))
+  fetch.mockResponseOnce(JSON.stringify(assignments))
   const result = renderBulkEdit(overrides)
   await flushPromises()
   result.assignments = assignments
   return result
 }
 
-beforeEach(() => fetch.resetMocks())
+beforeEach(() => {
+  jest.useFakeTimers()
+  fetch.resetMocks()
+})
 
 describe('Assignment Bulk Edit Dates', () => {
   let oldEnv
@@ -119,7 +125,8 @@ describe('Assignment Bulk Edit Dates', () => {
     timezone.changeZone(tokyo, 'Asia/Tokyo')
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    await flushPromises()
     window.ENV = oldEnv
     timezone.restore(timezoneSnapshot)
   })
@@ -128,13 +135,17 @@ describe('Assignment Bulk Edit Dates', () => {
     mockStandardAssignmentsResponse()
     const {getByText} = renderBulkEdit()
     expect(getByText('Loading')).toBeInTheDocument()
-    await flushPromises()
   })
 
   it('invokes onCancel when cancel button is clicked', async () => {
     const {getByText, onCancel} = await renderBulkEditAndWait()
     fireEvent.click(getByText('Cancel'))
     expect(onCancel).toHaveBeenCalled()
+  })
+
+  it('disables save when nothing has been edited', async () => {
+    const {getByText} = await renderBulkEditAndWait()
+    expect(getByText('Save').closest('button').disabled).toBe(true)
   })
 
   it('shows the specified dates', async () => {
@@ -155,28 +166,31 @@ describe('Assignment Bulk Edit Dates', () => {
     expect(getAllByLabelText('Due At')).toHaveLength(2)
   })
 
-  it('modifies unlock date', async () => {
-    const {getByDisplayValue} = await renderBulkEditAndWait()
+  it('modifies unlock date and enables save', async () => {
+    const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
     const assignmentUnlockInput = getByDisplayValue('Thu Mar 19, 2020')
     fireEvent.change(assignmentUnlockInput, {target: {value: '2020-01-01'}})
     fireEvent.blur(assignmentUnlockInput)
     expect(assignmentUnlockInput.value).toBe('Wed Jan 1, 2020')
+    expect(getByText('Save').closest('button').disabled).toBe(false)
   })
 
-  it('modifies lock at date', async () => {
-    const {getByDisplayValue} = await renderBulkEditAndWait()
+  it('modifies lock at date and enables save', async () => {
+    const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
     const overrideLockInput = getByDisplayValue('Tue Mar 31, 2020')
     fireEvent.change(overrideLockInput, {target: {value: '2020-12-31'}})
     fireEvent.blur(overrideLockInput)
     expect(overrideLockInput.value).toBe('Thu Dec 31, 2020')
+    expect(getByText('Save').closest('button').disabled).toBe(false)
   })
 
-  it('modifies due date', async () => {
-    const {getAllByLabelText} = await renderBulkEditAndWait()
+  it('modifies due date and enables save', async () => {
+    const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
     const nullDueDate = getAllByLabelText('Due At')[2]
     fireEvent.change(nullDueDate, {target: {value: '2020-06-15'}})
     fireEvent.blur(nullDueDate)
     expect(nullDueDate.value).toBe('Mon Jun 15, 2020')
+    expect(getByText('Save').closest('button').disabled).toBe(false)
   })
 
   it('disables non-editable dates', async () => {
@@ -266,17 +280,15 @@ describe('Assignment Bulk Edit Dates', () => {
       ])
     }, 30000) // if this reaches 30 seconds we really need to have a better plan
 
-    it('renders a spinner and disables the Save button while saving', async () => {
+    it('disables the Save button while saving', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const overrideDueAtInput = getAllByLabelText('Due At')[1]
       const dueAtDate = '2020-04-01'
       fireEvent.change(overrideDueAtInput, {target: {value: dueAtDate}})
       const saveButton = getByText('Save').closest('button')
-      expect(saveButton.getAttribute('disabled')).toBe(null)
+      expect(saveButton.disabled).toBe(false)
       fireEvent.click(saveButton)
-      expect(saveButton.getAttribute('disabled')).toBe('')
-      expect(getByText('Saving Dates')).toBeInTheDocument()
-      await flushPromises()
+      expect(saveButton.disabled).toBe(true)
     }, 10000)
 
     it('can clear an existing date', async () => {
@@ -386,5 +398,105 @@ describe('Assignment Bulk Edit Dates', () => {
         }
       ])
     }, 10000)
+
+    it('displays an error if starting the save fails', async () => {
+      const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
+      fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: '2020-04-01'}})
+      fetch.mockResponseOnce(JSON.stringify({errors: [{message: 'something bad happened'}]}), {
+        status: 401
+      })
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      expect(getByText(/something bad happened/)).toBeInTheDocument()
+    }, 10000)
+  })
+
+  describe('save progress', () => {
+    async function renderBulkEditAndSave() {
+      const fns = await renderBulkEditAndWait()
+      fireEvent.change(fns.getAllByLabelText('Due At')[0], {target: {value: '2020-04-01'}})
+      fetch.mockResponses(
+        [JSON.stringify({url: 'progress url'})],
+        [JSON.stringify({url: 'progress url', workflow_state: 'queued', completion: 0})]
+      )
+      fireEvent.click(fns.getByText('Save'))
+      await flushPromises()
+      return fns
+    }
+
+    it('polls for progress and updates a progress bar', async () => {
+      const {getByText} = await renderBulkEditAndSave()
+      expect(fetch).toHaveBeenCalledWith('progress url', expect.anything())
+      expect(getByText('0%')).toBeInTheDocument()
+
+      fetch.mockResponses(
+        [JSON.stringify({url: 'progress url', workflow_state: 'running', completion: 42})],
+        [JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100})]
+      )
+
+      act(jest.runOnlyPendingTimers)
+      await flushPromises()
+      expect(getByText('42%')).toBeInTheDocument()
+
+      act(jest.runOnlyPendingTimers)
+      await flushPromises()
+      expect(getByText(/saved successfully/)).toBeInTheDocument()
+      expect(getByText('Save').closest('button').disabled).toBe(true)
+      // complete, expect no more polling
+      fetch.resetMocks()
+      act(jest.runAllTimers)
+      await flushPromises()
+      expect(fetch).not.toHaveBeenCalled()
+    }, 10000)
+
+    it('displays an error if the progress fetch fails', async () => {
+      const {getByText} = await renderBulkEditAndSave()
+      fetch.mockResponseOnce(JSON.stringify({errors: [{message: 'could not get progress'}]}), {
+        status: 401
+      })
+      act(jest.runAllTimers)
+      await flushPromises()
+      expect(getByText(/could not get progress/)).toBeInTheDocument()
+      expect(getByText('Save').closest('button').disabled).toBe(false)
+    }, 10000)
+
+    it('displays an error if the job fails', async () => {
+      const {getByText} = await renderBulkEditAndSave()
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          completion: 42,
+          workflow_state: 'failed',
+          results: [
+            {assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}}
+          ]
+        })
+      )
+      act(jest.runAllTimers)
+      await flushPromises()
+      expect(getByText(/some bad dates/)).toBeInTheDocument()
+      expect(getByText('Save').closest('button').disabled).toBe(false)
+    }, 10000)
+
+    it('can start a second save operation', async () => {
+      const {getByText, queryByText, getAllByLabelText} = await renderBulkEditAndSave()
+      fetch.mockResponseOnce(
+        JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100})
+      )
+      act(jest.runAllTimers)
+      await flushPromises()
+      expect(getByText(/saved successfully/)).toBeInTheDocument()
+      expect(getByText('Save').closest('button').disabled).toBe(true)
+
+      fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: '2020-04-02'}})
+      expect(queryByText(/saved successfully/)).toBe(null)
+
+      fetch.mockResponses(
+        [JSON.stringify({url: 'progress url'})],
+        [JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100})]
+      )
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      expect(getByText(/saved successfully/)).toBeInTheDocument()
+    }, 15000)
   })
 })

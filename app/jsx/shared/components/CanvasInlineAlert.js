@@ -43,9 +43,9 @@ export default function CanvasInlineAlert({
       </span>
     )
   }
-  if (screenReaderOnly) {
-    body = <ScreenReaderContent>{body}</ScreenReaderContent>
-  }
 
+  if (screenReaderOnly) {
+    return <ScreenReaderContent>{body}</ScreenReaderContent>
+  }
   return <Alert {...alertProps}>{body}</Alert>
 }

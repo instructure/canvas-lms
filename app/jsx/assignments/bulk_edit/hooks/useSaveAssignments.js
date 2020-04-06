@@ -19,7 +19,7 @@
 import I18n from 'i18n!assignments_bulk_edit_use_save_assignment'
 import {useCallback, useState} from 'react'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
-import {originalDateField} from '../utils'
+import {originalDateField, extractFetchErrorMessage} from '../utils'
 
 const DATE_FIELDS = ['due_at', 'lock_at', 'unlock_at']
 
@@ -44,43 +44,34 @@ function extractEditedAssignmentsAndOverrides(assignments) {
   return editedAssignments
 }
 
-async function extractErrorMessages(err) {
-  if (!err.response) return [{message: err.message}]
-  const errors = await err.response.json()
-  if (errors.message) return [{message: errors.message}]
-  if (Array.isArray(errors)) {
-    return errors.map(error => {
-      const messages = []
-      if (error.errors.due_at) messages.push(error.errors.due_at.message)
-      if (error.errors.unlock_at) messages.push(error.errors.unlock_at.message)
-      if (error.errors.lock_at) messages.push(error.errors.lock_at.message)
-      return {messages, assignmentId: error.assignment_id, overrideId: error.assignment_override_id}
-    })
-  }
-  return [{message: I18n.t('An unknown error occurred')}]
-}
-
 export default function useSaveAssignments(courseId) {
-  const [isSavingAssignments, setIsSavingAssignments] = useState(false)
-  const [savingAssignmentsErrors, setSavingAssignmentsErrors] = useState([])
+  const [startingSave, setStartingSave] = useState(false)
+  const [startingSaveError, setStartingSaveError] = useState(null)
+  const [progressUrl, setProgressUrl] = useState(null)
 
   const saveAssignments = useCallback(
     async assignments => {
       const editedAssignments = extractEditedAssignmentsAndOverrides(assignments)
       if (!editedAssignments.length) return
 
-      setIsSavingAssignments(true)
-      setSavingAssignmentsErrors([])
+      setStartingSave(true)
+      setStartingSaveError(null)
       try {
-        await doFetchApi({
+        const {json} = await doFetchApi({
           path: `/api/v1/courses/${courseId}/assignments/bulk_update`,
           method: 'PUT',
           body: editedAssignments
         })
+        setProgressUrl(json.url)
       } catch (err) {
-        setSavingAssignmentsErrors(await extractErrorMessages(err))
+        setStartingSaveError(
+          await extractFetchErrorMessage(
+            err,
+            I18n.t('There was an error starting the save assignment dates job')
+          )
+        )
       } finally {
-        setIsSavingAssignments(false)
+        setStartingSave(false)
       }
     },
     [courseId]
@@ -88,9 +79,11 @@ export default function useSaveAssignments(courseId) {
 
   return {
     saveAssignments,
-    isSavingAssignments,
-    setIsSavingAssignments,
-    savingAssignmentsErrors,
-    setSavingAssignmentsErrors
+    startingSave,
+    setStartingSave,
+    startingSaveError,
+    setStartingSaveError,
+    progressUrl,
+    setProgressUrl
   }
 }

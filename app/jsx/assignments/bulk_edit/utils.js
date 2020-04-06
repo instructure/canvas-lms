@@ -19,3 +19,10 @@
 export function originalDateField(dateField) {
   return `original_${dateField}`
 }
+
+export async function extractFetchErrorMessage(err, fallback) {
+  if (!err.response) return err.message
+  const errorJson = await err.response.json()
+  if (errorJson?.errors?.length) return errorJson.errors[0].message
+  return fallback
+}

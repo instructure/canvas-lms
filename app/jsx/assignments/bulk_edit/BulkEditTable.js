@@ -21,12 +21,12 @@ import React from 'react'
 import {arrayOf, func} from 'prop-types'
 import tz from 'timezone'
 import {Table} from '@instructure/ui-table'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Responsive} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {IconWarningLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
 import BulkDateInput from './BulkDateInput'
 import {AssignmentShape} from './BulkAssignmentShape'
 
@@ -91,7 +91,12 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     return (
       <Tooltip renderTip={assignment.name}>
         <Text as="div" size="large">
-          <div className="ellipsis">{assignment.name}</div>
+          <PresentationContent>
+            <div className="ellipsis">{assignment.name}</div>
+          </PresentationContent>
+          <ScreenReaderContent>
+            {`${assignment.name}: ${I18n.t('default dates')}`}
+          </ScreenReaderContent>
         </Text>
       </Tooltip>
     )
@@ -145,7 +150,7 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
         </Table.Row>
       )
     } else {
-      // Need all 4 Table.Cells or you get weird borders on this row
+      // Need all Table.Cells or you get weird borders on this row
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
           <Table.Cell>{renderAssignmentTitle(assignment)}</Table.Cell>
@@ -167,7 +172,12 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
             <View as="div" padding="0 0 0 xx-large">
               <Tooltip renderTip={override.title}>
                 <Text as="div" size="medium">
-                  <div className="ellipsis">{override.title}</div>
+                  <PresentationContent>
+                    <div className="ellipsis">{override.title}</div>
+                  </PresentationContent>
+                  <ScreenReaderContent>
+                    {`${assignment.name}: ${override.title}`}
+                  </ScreenReaderContent>
                 </Text>
               </Tooltip>
             </View>

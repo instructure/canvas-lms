@@ -214,7 +214,7 @@ export default class IndexMenu extends React.Component {
                 onClick={this.props.requestBulkEdit}
               >
                 <i className="icon-edit" />
-                {I18n.t('Edit Dates')}
+                {I18n.t('Edit Assignment Dates')}
               </a>
             </li>
           )}
