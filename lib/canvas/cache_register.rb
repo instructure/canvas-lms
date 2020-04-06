@@ -29,7 +29,7 @@ module Canvas
     ALLOWED_TYPES = {
       'Account' => %w{account_chain role_overrides global_navigation},
       'Course' => %w{account_associations},
-      'User' => %w{enrollments groups account_users todo_list submissions},
+      'User' => %w{enrollments groups account_users todo_list submissions user_services},
       'Assignment' => %w{availability},
       'Quizzes::Quiz' => %w{availability}
     }.freeze
