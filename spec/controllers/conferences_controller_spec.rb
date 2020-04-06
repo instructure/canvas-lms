@@ -19,6 +19,8 @@
 require_relative '../apis/api_spec_helper'
 
 describe ConferencesController do
+  include ExternalToolsSpecHelper
+
   before :once do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.create!(name: 'wimba')
@@ -306,6 +308,55 @@ describe ConferencesController do
           expect(page_view.url).to match %r{^http://test\.host/courses/\d+/conferences/\d+/join}
           expect(page_view.participated).to be_truthy
         end
+      end
+    end
+  end
+
+  context 'LTI conferences' do
+    before(:once) do
+      Account.site_admin.enable_feature! :conference_selection_lti_placement
+    end
+
+    let_once(:course) { course_model }
+
+    let_once(:tool) do
+      new_valid_tool(course).tap do |t|
+        t.name = 'course tool'
+        t.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+        t.save!
+      end
+    end
+
+    let_once(:account_tool) do
+      new_valid_tool(course.account).tap do |t|
+        t.name = 'account_tool'
+        t.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+        t.save!
+      end
+    end
+
+    context '#index' do
+      it 'lists include LTI conference types' do
+        user_session(@teacher)
+        get 'index', params: { course_id: @course.id }
+        conference_types = assigns[:js_env][:conference_type_details]
+        expect(conference_types.pluck(:name)).to include(tool.name)
+        expect(conference_types.pluck(:name)).to include(account_tool.name)
+      end
+    end
+
+    context '#create' do
+      it 'can create LTI conferences' do
+        user_session(@teacher)
+        post 'create', params: {
+          course_id: @course.id,
+          web_conference: {
+            title: "My Conference",
+            conference_type: 'LtiConference',
+            lti_settings: { tool_id: tool.id }
+          }
+        }, format: 'json'
+        expect(response).to be_successful
       end
     end
   end

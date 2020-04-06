@@ -851,6 +851,10 @@ RSpec.configure do |config|
     def enabled?; true; end
 
     def base; end
+
+    def name
+      id.to_s.humanize
+    end
   end
   def web_conference_plugin_mock(id, settings)
     WebConferencePluginMock.new(id, settings)

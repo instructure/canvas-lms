@@ -29,7 +29,7 @@ class BigBlueButtonConference < WebConference
     description: ->{ t('recording_setting_enabled_description', 'Enable recording for this conference') },
     type: :boolean,
     default: false,
-    visible: ->{ WebConference.config(BigBlueButtonConference.to_s)[:recording_enabled] },
+    visible: ->{ WebConference.config(class_name: BigBlueButtonConference.to_s)[:recording_enabled] },
   }
 
   def initiate_conference

@@ -19,6 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WebConference do
+  include ExternalToolsSpecHelper
+
   before(:each)   { stub_plugins }
 
   def stub_plugins
@@ -308,4 +310,123 @@ describe WebConference do
     end
   end
 
+  context "LTI conferences" do
+    let_once(:course) { course_model }
+    let_once(:tool) do
+      new_valid_tool(course).tap do |t|
+        t.name = 'course tool'
+        t.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+        t.save!
+      end
+    end
+    let_once(:user) { user_model }
+
+    it "should not include LTI conference types without the feature flag enabled" do
+      expect(WebConference.conference_types(course).pluck(:conference_type)).not_to include 'LtiConference'
+    end
+
+    context "with conference_selection_lti_placement FF" do
+      before do
+        Account.site_admin.enable_feature! :conference_selection_lti_placement
+      end
+
+      context "self.conference_types" do
+        it "should include  an LTI conference type" do
+          expect(WebConference.conference_types(course).pluck(:conference_type)).to include 'LtiConference'
+          expect(WebConference.conference_types(course).pluck(:name)).to include tool.name
+        end
+
+        it "should include LTI tools from reachable contexts" do
+          tool.update! context: Account.default
+          expect(WebConference.conference_types(course).pluck(:name)).to include tool.name
+        end
+
+        it "can include multiple LTI conference type" do
+          another_tool = new_valid_tool(course)
+          another_tool.name = 'same course tool'
+          another_tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.save!
+          expect(WebConference.conference_types(course).pluck(:name)).to include tool.name
+          expect(WebConference.conference_types(course).pluck(:name)).to include another_tool.name
+        end
+
+        it "should only include tools with conference_selection placements" do
+          editor_button = new_valid_tool(course)
+          editor_button.name = 'different type of tool'
+          editor_button.editor_button = { message_type: 'LtiResourceLinkRequest' }
+          editor_button.save!
+
+          expect(WebConference.conference_types(course).pluck(:name)).not_to include editor_button.name
+        end
+
+        it "should only include types from the given context" do
+          another_course = course_model
+          another_tool = new_valid_tool(another_course)
+          another_tool.name = 'another course tool'
+          another_tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.save!
+
+          expect(WebConference.conference_types(course).pluck(:name)).not_to include another_tool.name
+          expect(WebConference.conference_types(another_course).pluck(:name)).to include another_tool.name
+        end
+      end
+
+      context ".active scope" do
+        it "should include LTI conferences" do
+          conference = course.web_conferences.create! do |c|
+            c.user = user
+            c.conference_type = 'LtiConference'
+            c.lti_settings = { tool_id: tool.id }
+          end
+          expect(WebConference.active.pluck(:id)).to include conference.id
+        end
+      end
+
+      context "instance methods" do
+        it "should allow creating an LTI conference" do
+          conference = course.web_conferences.create! do |c|
+            c.user = user
+            c.conference_type = 'LtiConference'
+            c.lti_settings = { tool_id: tool.id }
+          end
+          expect(conference).not_to be_nil
+        end
+
+        it "should require an external tool be specified" do
+          conference = course.web_conferences.build
+          conference.user = user
+          conference.conference_type = 'LtiConference'
+          conference.lti_settings = { foo: 'bar' }
+          expect(conference).not_to be_valid
+          expect(conference.errors[:settings].to_s).to include('must exist')
+        end
+
+        it "should require the external tool be visible from the conference context" do
+          another_tool = new_valid_tool(course_model)
+          another_tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.save!
+
+          conference = course.web_conferences.build
+          conference.user = user
+          conference.conference_type = 'LtiConference'
+          conference.lti_settings = { tool_id: another_tool.id }
+          expect(conference).not_to be_valid
+          expect(conference.errors[:settings].to_s).to include('visible in context')
+        end
+
+        it "should require the external tool have a conference_selection placement" do
+          another_tool = new_valid_tool(course)
+          another_tool.editor_button = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.save!
+
+          conference = course.web_conferences.build
+          conference.user = user
+          conference.conference_type = 'LtiConference'
+          conference.lti_settings = { tool_id: another_tool.id }
+          expect(conference).not_to be_valid
+          expect(conference.errors[:settings].to_s).to include('conference_selection placement')
+        end
+      end
+    end
+  end
 end

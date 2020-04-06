@@ -2012,9 +2012,10 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :conferences) do
-      %w(course group).each do |context|
+      %w(user course group).each do |context|
         prefix = "#{context}s/:#{context}_id/conferences"
         get prefix, action: :index, as: "#{context}_conferences"
+        post "#{prefix}", action: :create
         post "#{prefix}/:conference_id/recording_ready", action: :recording_ready, as: "#{context}_conferences_recording_ready"
       end
 
