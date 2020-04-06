@@ -605,6 +605,11 @@ class Message < ActiveRecord::Base
                                  tags: {path_type: path_type, notification_name: notification_name})
 
     check_acct = user&.account || Account.site_admin
+    global_account_id = Shard.global_id_for(root_account_id, self.shard)
+    InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{global_account_id}",
+                                 short_stat: 'message.deliver_per_account',
+                                 tags: {path_type: path_type, root_account_id: global_account_id})
+
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
     else
