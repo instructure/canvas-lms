@@ -32,7 +32,6 @@ import * as FlashAlert from 'jsx/shared/FlashAlert'
 import AsyncComponents from 'jsx/gradebook/default_gradebook/AsyncComponents'
 import ActionMenu from 'jsx/gradebook/default_gradebook/components/ActionMenu'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
-import DataLoader from 'jsx/gradebook/DataLoader'
 import AnonymousSpeedGraderAlert from 'jsx/gradebook/default_gradebook/components/AnonymousSpeedGraderAlert'
 import GradebookApi from 'jsx/gradebook/default_gradebook/apis/GradebookApi'
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
@@ -47,8 +46,7 @@ import {waitFor} from '../support/Waiters'
 
 import {
   createGradebook,
-  setFixtureHtml,
-  stubDataLoader
+  setFixtureHtml
 } from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import {createCourseGradesWithGradingPeriods as createGrades} from './GradeCalculatorSpecHelper'
 
@@ -270,7 +268,6 @@ test('updates partial .filterColumnsBy settings with the default values', () => 
 QUnit.module('Gradebook#initialize', () => {
   QUnit.module('with dataloader stubs', moduleHooks => {
     moduleHooks.beforeEach(() => {
-      stubDataLoader()
       setFixtureHtml($fixtures)
     })
 
@@ -2030,7 +2027,6 @@ QUnit.module('#listHiddenAssignments', hooks => {
 
 QUnit.module('Gradebook#showNotesColumn', {
   setup() {
-    sandbox.stub(DataLoader, 'getDataForColumn')
     const teacherNotes = {
       id: '2401',
       title: 'Notes',
@@ -2039,6 +2035,7 @@ QUnit.module('Gradebook#showNotesColumn', {
       hidden: true
     }
     this.gradebook = createGradebook({teacher_notes: teacherNotes})
+    sandbox.stub(this.gradebook.dataLoader, 'loadCustomColumnData')
     sandbox.stub(this.gradebook, 'toggleNotesColumn')
   }
 })
@@ -2046,20 +2043,20 @@ QUnit.module('Gradebook#showNotesColumn', {
 test('loads the notes if they have not yet been loaded', function() {
   this.gradebook.teacherNotesNotYetLoaded = true
   this.gradebook.showNotesColumn()
-  equal(DataLoader.getDataForColumn.callCount, 1)
+  strictEqual(this.gradebook.dataLoader.loadCustomColumnData.callCount, 1)
 })
 
 test('loads the notes using the teacher notes column id', function() {
   this.gradebook.teacherNotesNotYetLoaded = true
   this.gradebook.showNotesColumn()
-  const [columnId] = DataLoader.getDataForColumn.lastCall.args
+  const [columnId] = this.gradebook.dataLoader.loadCustomColumnData.lastCall.args
   strictEqual(columnId, '2401')
 })
 
 test('does not load the notes if they are already loaded', function() {
   this.gradebook.teacherNotesNotYetLoaded = false
   this.gradebook.showNotesColumn()
-  equal(DataLoader.getDataForColumn.callCount, 0)
+  strictEqual(this.gradebook.dataLoader.loadCustomColumnData.callCount, 0)
 })
 
 QUnit.module('Gradebook#getTeacherNotesViewOptionsMenuProps')
@@ -2553,7 +2550,7 @@ QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
       setColumns() {},
       setNumberOfColumnsToFreeze() {}
     }
-    sandbox.stub(DataLoader, 'getDataForColumn')
+    sandbox.stub(this.gradebook.dataLoader, 'loadCustomColumnData')
     sandbox.stub(this.gradebook, 'reorderCustomColumns')
     sandbox.stub(this.gradebook, 'renderViewOptionsMenu')
   }
@@ -5181,7 +5178,6 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     setFixtureHtml($fixtures)
-    stubDataLoader()
   })
 
   suiteHooks.afterEach(() => {
@@ -9480,7 +9476,6 @@ QUnit.module('Gradebook', () => {
     hooks.beforeEach(() => {
       $container = document.body.appendChild(document.createElement('div'))
       setFixtureHtml($container)
-      stubDataLoader()
 
       options = {
         post_policies_enabled: true

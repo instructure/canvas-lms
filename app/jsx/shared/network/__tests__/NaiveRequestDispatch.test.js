@@ -23,7 +23,7 @@ import NaiveRequestDispatch, {
 } from '../NaiveRequestDispatch'
 import FakeServer from './FakeServer'
 
-describe('Gradebook DataLoader NaiveRequestDispatch', () => {
+describe('Shared > Network > NaiveRequestDispatch', () => {
   const URL = 'http://localhost/example'
 
   let dispatch

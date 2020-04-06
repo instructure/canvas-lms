@@ -43,6 +43,47 @@ QUnit.module('Gradebook > Students', suiteHooks => {
     return gradebook.gridData.rows.find(row => row.id === studentId)
   }
 
+  QUnit.module('#updateStudentIds()', hooks => {
+    let studentIds
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      studentIds = ['1101', '1102', '1103']
+    })
+
+    test('stores the loaded student ids in the Gradebook', () => {
+      gradebook.updateStudentIds(studentIds)
+      deepEqual(gradebook.courseContent.students.listStudentIds(), studentIds)
+    })
+
+    test('resets student assignment student visibility', () => {
+      gradebook.assignmentStudentVisibility = {2301: ['1101', '1102']}
+      gradebook.updateStudentIds(studentIds)
+      deepEqual(gradebook.assignmentStudentVisibility, {})
+    })
+
+    test('rebuilds grid rows', () => {
+      sinon.stub(gradebook, 'buildRows')
+      gradebook.updateStudentIds(studentIds)
+      strictEqual(gradebook.buildRows.callCount, 1)
+    })
+
+    test('rebuilds grid rows after storing the student ids', () => {
+      sinon.stub(gradebook, 'buildRows').callsFake(() => {
+        deepEqual(gradebook.courseContent.students.listStudentIds(), studentIds)
+      })
+      gradebook.updateStudentIds(studentIds)
+    })
+
+    test('rebuilds grid rows after updating assignment student visibility', () => {
+      gradebook.assignmentStudentVisibility = {2301: ['1101', '1102']}
+      sinon.stub(gradebook, 'buildRows').callsFake(() => {
+        deepEqual(gradebook.assignmentStudentVisibility, {})
+      })
+      gradebook.updateStudentIds(studentIds)
+    })
+  })
+
   QUnit.module('#updateStudentsLoaded()', hooks => {
     hooks.beforeEach(() => {
       gradebook = createGradebook()
