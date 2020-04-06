@@ -178,7 +178,8 @@ class ApplicationController < ActionController::Base
             show_qr_login: Object.const_defined?("InstructureMiscPlugin") && !!@domain_root_account&.feature_enabled?(:mobile_qr_login),
             responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03),
             featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links),
-            product_tours: !!@domain_root_account&.feature_enabled?(:product_tours)
+            product_tours: !!@domain_root_account&.feature_enabled?(:product_tours),
+            module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd)
           }
         }
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
@@ -269,9 +270,11 @@ class ApplicationController < ActionController::Base
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
-    tools = ContextExternalTool.all_tools_for(context, {:placements => type,
+    tools = Shackles.activate(:slave) do
+      ContextExternalTool.all_tools_for(context, {:placements => type,
       :root_account => @domain_root_account, :current_user => @current_user,
       :tool_ids => tool_ids}).to_a
+    end
 
     tools.select! do |tool|
       tool.visible_with_permission_check?(type, @current_user, context, session) &&

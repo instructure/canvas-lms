@@ -889,8 +889,11 @@ class Account < ActiveRecord::Base
 
   def self.sub_account_ids_recursive(parent_account_id)
     if connection.adapter_name == 'PostgreSQL'
-      sql = Account.sub_account_ids_recursive_sql(parent_account_id)
-      Account.find_by_sql(sql).map(&:id)
+      shackles_env = Account.connection.open_transactions == 0 ? :slave : Shackles.environment
+      Shackles.activate(shackles_env) do
+        sql = Account.sub_account_ids_recursive_sql(parent_account_id)
+        Account.find_by_sql(sql).map(&:id)
+      end
     else
       account_descendants = lambda do |ids|
         as = Account.where(:parent_account_id => ids).active.pluck(:id)

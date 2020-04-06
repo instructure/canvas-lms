@@ -755,6 +755,16 @@ describe UserLearningObjectScopes do
       it "should apply a global limit" do
         expect(@teacher.assignments_needing_grading(:limit => 1).length).to eq 1
       end
+
+      it 'should not fail with the dynamic setting turned off' do
+        [Shard.default, @shard1, @shard2].each do |shard|
+          shard.activate do
+            override_dynamic_settings(private: { canvas: { disable_needs_grading_queries: true } }) do
+              expect(@teacher.assignments_needing_grading).to eq []
+            end
+          end
+        end
+      end
     end
 
     context "differentiated assignments" do

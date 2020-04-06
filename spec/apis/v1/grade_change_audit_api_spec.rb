@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 describe "GradeChangeAudit API", type: :request do
   context "not configured" do
     before do
-      allow(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(false)
+      allow(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).and_return(false)
       user_with_pseudonym(account: Account.default)
       @user.account_users.create(account: Account.default)
     end

@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def runDatadogMetric(name, extraTags, body) {
+  def dd = load('build/new-jenkins/groovy/datadog.groovy')
+  dd.runDataDogForMetricWithExtraTags(name,extraTags,body)
+}
+
 /**
  * appends stages to the nodes based on the count passed into
  * the closure.
@@ -36,13 +41,16 @@ def appendStagesAsBuildNodes(nodes,
     // it gets the correct number
     def index = i;
     // we cant use String.format, so... yea
-    def stage_name = "$stage_name_prefix ${index + 1}"
+    def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     nodes[stage_name] = {
       node('canvas-docker') {
         // make sure to unstash
         unstash name: "build-dir"
         unstash name: "build-docker-compose"
-        stage_block(index)
+        def extraTags = ["parallelStageName:${stage_name}"]
+        runDatadogMetric(success_mark,extraTags) {
+          stage_block(index)
+        }
       }
 
       // mark with instance index.

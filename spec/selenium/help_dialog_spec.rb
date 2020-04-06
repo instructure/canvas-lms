@@ -210,4 +210,39 @@ describe "help dialog" do
       expect(fxpath("//*[*/a[contains(text(),'NEW LINK')]]//*[text() = 'NEW']")).to include_text("NEW")
     end
   end
+  
+  context 'welcome tour' do
+    before :each do
+      course_with_student_logged_in(active_all: true)
+      Account.default.enable_feature!('product_tours')
+    end
+
+    it 'opens up the welcome tour on page load and shows the welcome tour link and opens the tour when clicked' do
+      Setting.set('show_feedback_link', 'true')
+
+      course_with_ta(course: @course)
+      get "/"
+      driver.local_storage.clear
+      wait_for_ajaximations
+      
+      get "/courses/#{@course.id}"
+      wait_for_ajaximations
+      wait_for(method: nil, timeout: 1) { f('#___reactour').displayed? }
+      # Welcome tour is already opened
+      expect(f('#___reactour')).to include_text(
+        "Here's some quick tips to get you started in Canvas!"
+      )
+
+      # Close the currently-open tutorial overlay
+      close = f('#___reactour .tour-close-button button')
+      close.click
+      wait_for_ajaximations
+
+      expect(f('#___reactour')).to include_text(
+        'You can access the Welcome Tour here any time as well as other new resources.'
+      )
+      close = f('#___reactour .tour-close-button button')
+      close.click
+    end
+  end
 end

@@ -20,7 +20,7 @@ require 'raven/base'
 class SentryProxy
   def self.capture(exception, data)
     if exception.is_a?(String) || exception.is_a?(Symbol)
-      Raven.capture_message(exception.to_s, data)
+      Raven.capture_message(exception.to_s, data) if reportable?(exception.to_s)
     else
       Raven.capture_exception(exception, data) if reportable?(exception)
     end
@@ -32,7 +32,7 @@ class SentryProxy
   #  configure the sentry client in an initializer).  This allows plugins and extensions
   # to register their own errors that they don't want to get reported to sentry
   def self.register_ignorable_error(error_class)
-    @ignorable_errors = (self.ignorable_errors << error_class).uniq
+    @ignorable_errors = (self.ignorable_errors << error_class.to_s).uniq
   end
 
   def self.ignorable_errors
@@ -44,7 +44,11 @@ class SentryProxy
   end
 
   def self.reportable?(exception)
-    !ignorable_errors.include?(exception.class)
+    if exception.is_a?(String)
+      !ignorable_errors.include?(exception.to_s)
+    else
+      !ignorable_errors.include?(exception.class.to_s)
+    end
   end
 
 end

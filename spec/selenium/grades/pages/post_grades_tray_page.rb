@@ -53,7 +53,7 @@ module PostGradesTray
   end
 
   def self.spinner
-    fj("svg:contains('Posting grades')", tray)
+    fxpath("//*[text()='Posting grades']", tray)
   end
 
   def self.select_sections(sections:)

@@ -29,6 +29,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
        libxmlsec1-dev \
        python-lxml \
        libicu-dev \
+       parallel \
        postgresql-client-$POSTGRES_VERSION \
        unzip \
        pbzip2 \
@@ -52,19 +53,22 @@ RUN unzip woff-code-latest.zip -d woff \
 
 WORKDIR $APP_HOME
 
-COPY --chown=docker:docker Gemfile         ${APP_HOME}
-COPY --chown=docker:docker Gemfile.d       ${APP_HOME}Gemfile.d
-COPY --chown=docker:docker config          ${APP_HOME}config
-COPY --chown=docker:docker gems            ${APP_HOME}gems
-COPY --chown=docker:docker packages        ${APP_HOME}packages
-COPY --chown=docker:docker script          ${APP_HOME}script
-COPY --chown=docker:docker package.json    ${APP_HOME}
-COPY --chown=docker:docker yarn.lock       ${APP_HOME}
-COPY --chown=docker:docker babel.config.js ${APP_HOME}
+COPY --chown=docker:docker Gemfile            ${APP_HOME}
+COPY --chown=docker:docker Gemfile.d          ${APP_HOME}Gemfile.d
+COPY --chown=docker:docker config             ${APP_HOME}config
+COPY --chown=docker:docker gems               ${APP_HOME}gems
+COPY --chown=docker:docker packages           ${APP_HOME}packages
+COPY --chown=docker:docker script             ${APP_HOME}script
+COPY --chown=docker:docker package.json       ${APP_HOME}
+COPY --chown=docker:docker yarn.lock          ${APP_HOME}
+COPY --chown=docker:docker babel.config.js    ${APP_HOME}
+COPY --chown=docker:docker build/new-jenkins  ${APP_HOME}build/new-jenkins
 
 USER docker
+# if yarn hits a snag try one more time with concurrency set to 1
+# https://github.com/yarnpkg/yarn/issues/2629
 RUN bundle install --jobs 8 \
-  && yarn install --pure-lockfile
+  && (yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1)
 COPY --chown=docker:docker . $APP_HOME
 RUN mkdir -p .yardoc \
              app/stylesheets/brandable_css_brands \

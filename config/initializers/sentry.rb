@@ -43,6 +43,16 @@ if settings.present?
   end
 
   Rails.configuration.to_prepare do
+    Settings.get('ignorable_errors', '').split(',').each do |error|
+      SentryProxy.register_ignorable_error(error)
+    end
+
+    # This error means the service failed and we will retry later.
+    SentryProxy.register_ignorable_error(Turnitin::Errors::SubmissionNotScoredError)
+    SentryProxy.register_ignorable_error(ConditionalRelease::ServiceError)
+    # This error can be caused by LTI tools.
+    SentryProxy.register_ignorable_error("Grade pass back failure")
+
     Canvas::Errors.register!(:sentry_notification) do |exception, data|
       setting = Setting.get("sentry_error_logging_enabled", 'true')
       SentryProxy.capture(exception, data) if setting == 'true'

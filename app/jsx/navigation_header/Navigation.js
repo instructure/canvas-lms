@@ -132,6 +132,12 @@ export default class Navigation extends React.Component {
       ({type, noFocus}) => {
         this.ensureLoaded(type)
         this.openTray(type, noFocus)
+
+        // If we're already open for the specified type
+        // send a message that we are open.
+        if (this.state.isTrayOpen && this.state.type === type) {
+          tourPubSub.publish('navigation-tray-opened', type)
+        }
       }
     )
     this.closePublishUnsubscribe = tourPubSub.subscribe('navigation-tray-close', () => {

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 def buildParameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
   string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
@@ -38,9 +37,16 @@ def getImageTagVersion() {
   flags.getImageTagVersion()
 }
 
+def runDatadogMetric(name, body) {
+  def dd = load('build/new-jenkins/groovy/datadog.groovy')
+  dd.runDataDogForMetric(name,body)
+}
+
 def skipIfPreviouslySuccessful(name, block) {
-  def successes = load('build/new-jenkins/groovy/successes.groovy')
-  successes.skipIfPreviouslySuccessful(name, true, block)
+   runDatadogMetric(name) {
+    def successes = load('build/new-jenkins/groovy/successes.groovy')
+    successes.skipIfPreviouslySuccessful(name, true, block)
+  }
 }
 
 // ignore builds where the current patchset tag doesn't match the
@@ -84,68 +90,71 @@ pipeline {
       steps {
         timeout(time: 5) {
           script {
-            sh 'build/new-jenkins/print-env-excluding-secrets.sh'
-            sh 'build/new-jenkins/docker-cleanup.sh'
+            runDatadogMetric("Setup"){
+              sh 'build/new-jenkins/print-env-excluding-secrets.sh'
+              sh 'build/new-jenkins/docker-cleanup.sh'
 
-            buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
-            buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
-            buildParameters += string(name: 'RUBY_PASSENGER', value: "${env.RUBY_PASSENGER}")
-            if (env.CANVAS_LMS_REFSPEC) {
-              // the plugin builds require the canvas lms refspec to be different. so only
-              // set this refspec if the main build is requesting it to be set.
-              // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
-              buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
-            }
-
-            def credentials = load ('build/new-jenkins/groovy/credentials.groovy')
-
-            // WARNING! total hack, being removed after covid...
-            // if this build is triggered from a plugin that is from the
-            // covid branch, we need to checkout the covid branch for canvas-lms
-            if (isCovid() && env.GERRIT_PROJECT != 'canvas-lms') {
-              echo 'checking out canvas-lms covid branch'
-              credentials.withGerritCredentials {
-                sh '''
-                  set -ex
-                  git branch -D covid || true
-                  GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                    git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
-                  git checkout -b covid origin/covid
-                '''
+              buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
+              buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
+              buildParameters += string(name: 'RUBY_PASSENGER', value: "${env.RUBY_PASSENGER}")
+              if (env.CANVAS_LMS_REFSPEC) {
+                // the plugin builds require the canvas lms refspec to be different. so only
+                // set this refspec if the main build is requesting it to be set.
+                // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
+                buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
               }
-            }
-            // end of hack (covid)
 
-            credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
-            gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
-            echo "Plugin list: ${gems}"
-            /* fetch plugins */
-            gems.each { gem ->
-              if (env.GERRIT_PROJECT == gem) {
-                /* this is the commit we're testing */
-                credentials.fetchFromGerrit(gem, 'gems/plugins', null, null, env.GERRIT_REFSPEC)
-              } else {
-                // WARNING! total hack, being removed after covid...
-                // remove if statement when covid is done. only thing in else is needed.
-                if (isCovid()) {
-                  echo "checkin out ${gem} covid branch"
-                  credentials.fetchFromGerrit(gem, 'gems/plugins', null, null, 'covid')
+              def credentials = load ('build/new-jenkins/groovy/credentials.groovy')
+
+              // WARNING! total hack, being removed after covid...
+              // if this build is triggered from a plugin that is from the
+              // covid branch, we need to checkout the covid branch for canvas-lms
+              if (isCovid() && env.GERRIT_PROJECT != 'canvas-lms') {
+                echo 'checking out canvas-lms covid branch'
+                credentials.withGerritCredentials {
+                  sh '''
+                    set -ex
+                    git branch -D covid || true
+                    GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                      git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
+                    git checkout -b covid origin/covid
+                  '''
                 }
-                else {
-                  credentials.fetchFromGerrit(gem, 'gems/plugins')
-                }
-                // end of hack (covid)
               }
-            }
+              // end of hack (covid)
+
+              credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
+              gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
+              echo "Plugin list: ${gems}"
+              /* fetch plugins */
+              gems.each { gem ->
+                if (env.GERRIT_PROJECT == gem) {
+                  /* this is the commit we're testing */
+                  credentials.fetchFromGerrit(gem, 'gems/plugins', null, null, env.GERRIT_REFSPEC)
+                } else {
+                  // WARNING! total hack, being removed after covid...
+                  // remove if statement when covid is done. only thing in else is needed.
+                  if (isCovid()) {
+                    echo "checkin out ${gem} covid branch"
+                    credentials.fetchFromGerrit(gem, 'gems/plugins', null, null, 'covid')
+                  }
+                  else {
+                    credentials.fetchFromGerrit(gem, 'gems/plugins')
+                  }
+                  // end of hack (covid)
+                }
+              }
             credentials.fetchFromGerrit('gergich_user_config', '.')
             credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
 
             sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
-            sh 'mv -v config/knapsack_rspec_report.json ./'
             sh 'rm -v config/cache_store.yml'
             sh 'rmdir -p gerrit_builder/canvas-lms/config'
+            sh 'rm -v config/database.yml'
+            sh 'rm -v config/security.yml'
+            sh 'rm -v config/selenium.yml'
             sh 'cp -v docker-compose/config/selenium.yml config/'
-            sh 'cp -vR docker-compose/config/new-jenkins config/new-jenkins'
+            sh 'cp -vR docker-compose/config/new-jenkins/* config/'
             sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
             sh 'cp -v config/domain.yml.example config/domain.yml'
             sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
@@ -155,39 +164,42 @@ pipeline {
         }
       }
     }
+  }
 
     stage('Rebase') {
       when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms' } }
       steps {
         timeout(time: 2) {
           script {
-            def credentials = load('build/new-jenkins/groovy/credentials.groovy')
-            credentials.withGerritCredentials({ ->
-              sh '''
-                GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                  git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
+            runDatadogMetric("Rebase") {
+              def credentials = load('build/new-jenkins/groovy/credentials.groovy')
+              credentials.withGerritCredentials({ ->
+                sh '''
+                  GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                    git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
 
-                git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
-                git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
+                  git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
+                  git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
 
-                # this helps current build issues where cleanup is needed before proceeding.
-                # however the later git rebase --abort should be enough once this has
-                # been on jenkins for long enough to hit all nodes, maybe a couple days?
-                if [ -d .git/rebase-merge ]; then
-                  echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
-                  git rebase --abort
-                  git checkout $GERRIT_REFSPEC
-                fi
+                  # this helps current build issues where cleanup is needed before proceeding.
+                  # however the later git rebase --abort should be enough once this has
+                  # been on jenkins for long enough to hit all nodes, maybe a couple days?
+                  if [ -d .git/rebase-merge ]; then
+                    echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
+                    git rebase --abort
+                    git checkout $GERRIT_REFSPEC
+                  fi
 
-                # store exit_status inline to  ensures the script doesn't exit here on failures
-                git rebase --preserve-merges origin/$GERRIT_BRANCH; exit_status=$?
-                if [ $exit_status != 0 ]; then
-                  echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
-                  git rebase --abort
-                  exit $exit_status
-                fi
-              '''
-            })
+                  # store exit_status inline to  ensures the script doesn't exit here on failures
+                  git rebase --preserve-merges origin/$GERRIT_BRANCH; exit_status=$?
+                  if [ $exit_status != 0 ]; then
+                    echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
+                    git rebase --abort
+                    exit $exit_status
+                  fi
+                '''
+              })
+            }
           }
         }
       }
@@ -292,6 +304,7 @@ pipeline {
 
           def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
           distribution.stashBuildScripts()
+
           distribution.addRSpecSuites(stages)
           distribution.addSeleniumSuites(stages)
 
@@ -310,16 +323,19 @@ pipeline {
       steps {
         timeout(time: 10) {
           script {
-            // Retriggers won't have an image to tag/push, pull that
-            // image if doesn't exist. If image is not found it will
-            // return NULL
-            if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
-              sh 'docker pull $PATCHSET_TAG'
-            }
+            runDatadogMetric("publishImageOnMerge") {
+              // Retriggers won't have an image to tag/push, pull that
+              // image if doesn't exist. If image is not found it will
+              // return NULL
+              if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
+                sh 'docker pull $PATCHSET_TAG'
+              }
 
-            // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
-            sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
-            sh 'docker push $MERGE_TAG'
+              // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
+              sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
+              // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
+              sh 'docker push $MERGE_TAG'
+            }
           }
         }
       }
@@ -329,8 +345,10 @@ pipeline {
       when { expression { env.GERRIT_EVENT_TYPE == 'change-merged' } }
       steps {
         script {
-          def reports = load 'build/new-jenkins/groovy/reports.groovy'
-          reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
+            runDatadogMetric("dependencyCheck") {
+              def reports = load 'build/new-jenkins/groovy/reports.groovy'
+              reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
+            }
         }
       }
     }
@@ -338,8 +356,10 @@ pipeline {
     stage('Mark Build as Successful') {
       steps {
         script {
-          def successes = load 'build/new-jenkins/groovy/successes.groovy'
-          successes.markBuildAsSuccessful()
+          runDatadogMetric("markBuildAsSuccessful") {
+            def successes = load 'build/new-jenkins/groovy/successes.groovy'
+            successes.markBuildAsSuccessful()
+          }
         }
       }
     }

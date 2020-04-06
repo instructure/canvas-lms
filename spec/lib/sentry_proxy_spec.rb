@@ -52,11 +52,10 @@ describe SentryProxy do
     end
   end
 
-
   describe ".register_ignorable_error" do
     it "keeps track of errors we don't care about reporting" do
       SentryProxy.register_ignorable_error(MyCustomError)
-      expect(SentryProxy.ignorable_errors).to include(MyCustomError)
+      expect(SentryProxy.ignorable_errors).to include(MyCustomError.to_s)
     end
 
     it "prevents the same error from being registered many times" do
@@ -64,6 +63,14 @@ describe SentryProxy do
       10.times { SentryProxy.register_ignorable_error(MyCustomError) }
       expect(SentryProxy.ignorable_errors.size).to eq(start_count + 1)
     end
+
+    it "registers strings to skip capture_message" do
+      e = "Some Message"
+      SentryProxy.register_ignorable_error(e)
+      expect(Raven).to receive(:capture_message).never
+      SentryProxy.capture(e, data)
+    end
+
   end
 
 end
