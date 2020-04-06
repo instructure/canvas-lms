@@ -150,6 +150,10 @@ export default class DashboardCardBox extends React.Component {
         enrollmentType={card.enrollmentType}
         observee={card.observee}
         published={!!card.published}
+        canChangeCourseState={!!card.canChangeCourseState}
+        defaultView={card.defaultView}
+        pagesUrl={card.pagesUrl}
+        frontPageTitle={card.frontPageTitle}
       />
     )
   }

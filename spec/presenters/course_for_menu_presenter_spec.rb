@@ -108,10 +108,14 @@ describe CourseForMenuPresenter do
         course.root_account.enable_feature!(:unpublished_courses)
       end
 
-      it 'sets the published key' do
+      it 'sets additional keys' do
         cs_presenter = CourseForMenuPresenter.new(course, user)
         h = cs_presenter.to_h
         expect(h.key?(:published)).to eq true
+        expect(h.key?(:canChangeCourseState)).to eq true
+        expect(h.key?(:defaultView)).to eq true
+        expect(h.key?(:pagesUrl)).to eq true
+        expect(h.key?(:frontPageTitle)).to eq true
       end
     end
 

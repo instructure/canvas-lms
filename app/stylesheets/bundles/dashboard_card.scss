@@ -140,6 +140,13 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   @include dashcardHeaderButton;
 }
 
+.ic-DashboardCard__header-publish {
+  position: absolute;
+  top: $ic-sp;
+  #{direction(left)}: $ic-sp;
+  height: $ic-sp*3;
+}
+
 .ic-DashboardCard_settings_icon {
   color: white;
   opacity: 0.6;

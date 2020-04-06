@@ -28,6 +28,11 @@ class CourseForMenuPresenter
   end
   attr_reader :course
 
+
+  def default_url_options
+    { protocol: HostUrl.protocol, host: HostUrl.context_host(@course.root_account) }
+  end
+
   def to_h
     position = @user.dashboard_positions[course.asset_string]
     show_favorites = @user.account.feature_enabled?(:unfavorite_course_from_dashboard)
@@ -70,6 +75,10 @@ class CourseForMenuPresenter
       end
       if course.root_account.feature_enabled?(:unpublished_courses)
         hash[:published] = course.published?
+        hash[:canChangeCourseState] = course.grants_right?(@user, :change_course_state)
+        hash[:defaultView] = course.default_view
+        hash[:pagesUrl] = polymorphic_url([course, :wiki_pages])
+        hash[:frontPageTitle] = course&.wiki&.front_page&.title
       end
     end
   end

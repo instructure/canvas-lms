@@ -22,39 +22,18 @@ import createStore from '../shared/helpers/createStore'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 import I18n from 'i18n!courses_show'
-import axios from 'axios'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import {initializePlanner, renderToDoSidebar} from 'canvas-planner'
 import {showFlashAlert} from '../shared/FlashAlert'
 import apiUserContent from 'compiled/str/apiUserContent'
+import * as apiClient from './apiClient'
 
 const defaultViewStore = createStore({
   selectedDefaultView: ENV.COURSE.default_view,
   savedDefaultView: ENV.COURSE.default_view
 })
-
-const publishCourse = () => {
-  axios
-    .put(`/api/v1/courses/${ENV.COURSE.id}`, {
-      course: {event: 'offer'}
-    })
-    .then(() => {
-      window.location.reload()
-    })
-    .catch(e => {
-      if (e.response.status == 401 && e.response.data.status == 'unverified') {
-        $.flashWarning(
-          I18n.t(
-            'Complete registration by clicking the “finish the registration process” link sent to your email.'
-          )
-        )
-      } else {
-        $.flashError(I18n.t('An error ocurred while publishing course'))
-      }
-    })
-}
 
 class ChooseHomePageButton extends React.Component {
   state = {
@@ -123,37 +102,38 @@ $(() => {
   $('#course_status_form').submit(e => {
     const input = e.target.elements.namedItem('course[event]')
     const value = input && input.value
+    const courseId = ENV.COURSE.id
     if (value === 'offer') {
       e.preventDefault()
 
       const defaultView = defaultViewStore.getState().savedDefaultView
       const container = document.getElementById('choose_home_page_not_modules')
       if (container) {
-        axios.get(`/api/v1/courses/${ENV.COURSE.id}/modules`).then(({data: modules}) => {
+        apiClient.getModules({courseId}).then(({data: modules}) => {
           if (defaultView === 'modules' && modules.length === 0) {
             ReactDOM.render(
               <HomePagePromptContainer
                 forceOpen
                 store={defaultViewStore}
-                courseId={ENV.COURSE.id}
+                courseId={courseId}
                 wikiFrontPageTitle={ENV.COURSE.front_page_title}
                 wikiUrl={ENV.COURSE.pages_url}
                 returnFocusTo={$('.btn-publish').get(0)}
                 onSubmit={() => {
                   if (defaultViewStore.getState().savedDefaultView !== 'modules') {
-                    publishCourse()
+                    apiClient.publishCourse({courseId})
                   }
                 }}
               />,
               container
             )
           } else {
-            publishCourse()
+            apiClient.publishCourse({courseId})
           }
         })
       } else {
         // we don't have the ability to change to change the course home page so just publish it
-        publishCourse()
+        apiClient.publishCourse({courseId})
       }
     }
   })
