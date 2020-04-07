@@ -25,7 +25,7 @@ def runCoverage() {
 
 def isForceFailure() {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
-  return flags.isForceFailure() ? "1" : ''
+  return flags.isForceFailureJS() ? "1" : ''
 }
 
 def getImageTagVersion() {

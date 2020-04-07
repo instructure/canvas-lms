@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def config() {
+def seleniumConfig() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
   [
-    selenium_node_total: (env.SELENIUM_CI_NODE_TOTAL ?: '25') as Integer,
-    selenium_max_fail: (env.SELENIUM_MAX_FAIL ?: "100") as Integer,
-    selenium_reruns_retry: (env.SELENIUM_RERUN_RETRY ?: "3") as Integer,
-    rspec_node_total: (env.RSPEC_CI_NODE_TOTAL ?: '15') as Integer,
-    rspec_max_fail: (env.RSPEC_MAX_FAIL ?: "100") as Integer,
-    rspec_reruns_retry: (env.RSPEC_RERUN_RETRY ?: "1") as Integer
+    node_total: (env.SELENIUM_CI_NODE_TOTAL ?: '25') as Integer,
+    max_fail: (env.SELENIUM_MAX_FAIL ?: "100") as Integer,
+    reruns_retry: (env.SELENIUM_RERUN_RETRY ?: "3") as Integer,
+    force_failure: flags.isForceFailureSelenium() ? "1" : ''
   ]
 }
 
@@ -33,12 +32,23 @@ def runSeleniumSuite(total, index) {
       index,
       'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
       'selenium',
-      config().selenium_max_fail,
-      config().selenium_reruns_retry,
+      seleniumConfig().max_fail,
+      seleniumConfig().reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
-      '6'
+      '6',
+      seleniumConfig().force_failure
   )
+}
+
+def rspecConfig() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  [
+    node_total: (env.RSPEC_CI_NODE_TOTAL ?: '15') as Integer,
+    max_fail: (env.RSPEC_MAX_FAIL ?: "100") as Integer,
+    reruns_retry: (env.RSPEC_RERUN_RETRY ?: "1") as Integer,
+    force_failure: flags.isForceFailureRspec() ? "1" : '',
+  ]
 }
 
 def runRSpecSuite(total, index) {
@@ -47,11 +57,12 @@ def runRSpecSuite(total, index) {
       index,
       'docker-compose.new-jenkins.yml',
       'rspec',
-      config().rspec_max_fail,
-      config().rspec_reruns_retry,
+      rspecConfig().max_fail,
+      rspecConfig().reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/selenium',
-      '8'
+      '8',
+      rspecConfig().force_failure
   )
 }
 
@@ -64,7 +75,8 @@ def _runRspecTestSuite(
     reruns_retry,
     test_file_pattern,
     exclude_regex,
-    docker_processes) {
+    docker_processes,
+    force_failure) {
   withEnv([
       "CI_NODE_INDEX=$index",
       "COMPOSE_FILE=$compose",
@@ -73,7 +85,8 @@ def _runRspecTestSuite(
       "TEST_PATTERN=$test_file_pattern",
       "EXCLUDE_TESTS=$exclude_regex",
       "CI_NODE_TOTAL=$total",
-      "DOCKER_PROCESSES=$docker_processes"
+      "DOCKER_PROCESSES=$docker_processes",
+      "FORCE_FAILURE=$force_failure"
   ]) {
     try {
       sh 'rm -rf ./tmp'
@@ -106,11 +119,11 @@ def _runRspecTestSuite(
 }
 
 def uploadSeleniumCoverage() {
-  _uploadCoverage('selenium', config().selenium_node_total, 'canvas-lms-selenium')
+  _uploadCoverage('selenium', seleniumConfig().node_total, 'canvas-lms-selenium')
 }
 
 def uploadRSpecCoverage() {
-  _uploadCoverage('rspec', config().rspec_node_total, 'canvas-lms-rspec')
+  _uploadCoverage('rspec', rspecConfig().node_total, 'canvas-lms-rspec')
 }
 
 def _uploadCoverage(prefix, total, coverage_name) {
@@ -119,11 +132,11 @@ def _uploadCoverage(prefix, total, coverage_name) {
 }
 
 def uploadSeleniumFailures() {
-  _uploadSpecFailures('selenium', config().selenium_node_total, 'Selenium Test Failures')
+  _uploadSpecFailures('selenium', seleniumConfig().node_total, 'Selenium Test Failures')
 }
 
 def uploadRSpecFailures() {
-  _uploadSpecFailures('rspec', config().rspec_node_total, 'Rspec Test Failures')
+  _uploadSpecFailures('rspec', rspecConfig().node_total, 'Rspec Test Failures')
 }
 
 def _uploadSpecFailures(prefix, total, test_name) {

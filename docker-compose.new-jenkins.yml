@@ -16,6 +16,7 @@ services:
       RERUNS_RETRY:
       MAX_FAIL:
       COVERAGE:
+      FORCE_FAILURE:
 
       # parallel_tests
       CI_NODE_TOTAL:
