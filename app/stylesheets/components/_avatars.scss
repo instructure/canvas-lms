@@ -15,6 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+// define width and padding in order to calculate table cell width for display
+$online-now-width: 30px;
+$online-now-padding: 5px;
 
 .avatar {
   width: 50px;
@@ -26,6 +30,28 @@
   background-color: white;
   border-radius: 500px;
   display: block;
+
+  &.online-now {
+    border-color: #24a936;
+    display: inline-block;
+    margin-right: 5px;
+  
+    &::after {
+      content: 'online';
+      font-size: 7px;
+      line-height: 1;
+      margin-left: 19px;
+      background-color: #24a936;
+      border-radius: 20px;
+      color: #fff;
+      font-weight: bold;
+      text-transform: uppercase;
+      vertical-align: middle;
+      padding: 2px $online-now-padding;
+      width: $online-now-width;
+      text-align: center;
+    }
+  }
 }
 
 #avatars tr .avatar_state {

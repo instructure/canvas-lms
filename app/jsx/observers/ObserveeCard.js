@@ -5,9 +5,11 @@ import ObserveeCourseDetails from './ObserveeCourseDetails'
 
 const Card = styled.div`
   border: 1px solid #D7D7D7;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
   text-align: center;
   // I'm sorry, future Jessic ):
-  min-height: 340px;
+  min-height: 360px;
   height: 100%;
   width: 100%;
   position: relative;
@@ -19,18 +21,47 @@ const Card = styled.div`
     padding: 1rem 0;
     border-bottom: 1px solid #d7d7d7;
     
-    p {
+    > p {
       color: #006ba6;
       font-size: 14px;
       font-weight: bold;
     }
 
-    img {
+    .avatar {
+      background-image: url(${props => props.avatar_image});
       width: 50px;
       height: 50px;
-      border-radius: 100%;
-      border: 1px solid #d7d7d7;
-      overflow: hidden;
+      max-width: 50px;
+      max-height: 50px;
+      margin: 0 auto;
+
+      &.online-now {
+        &:after {
+          margin-left: 40px;
+        }
+      }
+    }
+  }
+
+  .attendance-lockout {
+    background-color: #F68F92;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: -1rem;
+    padding: 0 1rem;
+
+    > * {
+      color: #5F0D13;
+    }
+
+    i {
+      margin-right: 1rem;
+    }
+
+    p {
+      display: inline-block;
+      font-weight: bold;
     }
   }
 
@@ -95,7 +126,7 @@ class ObserveeCard extends React.Component {
     student: {},
   };
 
-  
+  // pass a state change from child so we can hide the child on an event inside the child component
   reset() {
     this.setState({showDetails: 0, detailClicked: false})
   }
@@ -137,12 +168,19 @@ class ObserveeCard extends React.Component {
       is_showing={this.state.detailClicked}></ObserveeCourseDetails>
   }
 
+  renderAttendanceLockout(status) {
+    if (status) {
+      return <div className="attendance-lockout"><i className="icon-lock"></i><p>Student locked out of courses</p></div>;
+    }
+  }
+
   render() {
     return (
-      <Card>
+      <Card avatar_image={this.state.user.avatar_image_url}>
         <div className="observee-info">
-          <img src={this.state.user.avatar_image_url}></img>
+          <div className={`avatar ${this.state.user.is_online ? 'online-now' : ''}`}></div>
           <p>{this.state.user.name}</p>
+          {this.renderAttendanceLockout(this.state.user.locked_out)}
         </div>
         <div className="observee-courses">
             {
