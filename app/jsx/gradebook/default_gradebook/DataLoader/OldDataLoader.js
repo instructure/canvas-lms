@@ -20,8 +20,8 @@ import $ from 'jquery'
 
 import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
 
-import NaiveRequestDispatch from '../shared/network/NaiveRequestDispatch'
-import StudentContentDataLoader from './default_gradebook/DataLoader/StudentContentDataLoader'
+import NaiveRequestDispatch from '../../../shared/network/NaiveRequestDispatch'
+import StudentContentDataLoader from './StudentContentDataLoader'
 
 function getStudentIds(courseId) {
   if (ENV.prefetch_gradebook_user_ids) {

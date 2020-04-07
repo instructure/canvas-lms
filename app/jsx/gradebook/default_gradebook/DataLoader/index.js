@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-import OldDataLoader from '../../DataLoader'
+import OldDataLoader from './OldDataLoader'
 
 export default class DataLoader {
   constructor(gradebook) {
