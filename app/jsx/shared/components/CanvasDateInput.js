@@ -36,13 +36,15 @@ CanvasDateInput.propTypes = {
   messages: arrayOf(shape({type: string, text: string})),
   timezone: string,
   formatDate: func.isRequired,
-  onSelectedDateChange: func.isRequired
+  onSelectedDateChange: func.isRequired,
+  interaction: string
 }
 
 CanvasDateInput.defaultProps = {
   timezone: ENV?.TIMEZONE || DateTime.browserTimeZone(),
   renderLabel: I18n.t('Choose a date'),
-  messages: []
+  messages: [],
+  interaction: 'enabled'
 }
 
 export default function CanvasDateInput({
@@ -51,7 +53,8 @@ export default function CanvasDateInput({
   messages,
   timezone,
   formatDate,
-  onSelectedDateChange
+  onSelectedDateChange,
+  interaction
 }) {
   const todayMoment = moment().tz(timezone)
   const selectedMoment = selectedDate && moment.tz(selectedDate, timezone)
@@ -214,6 +217,7 @@ export default function CanvasDateInput({
       renderPrevMonthButton={renderMonthChangeButton('prev')}
       renderNextMonthButton={renderMonthChangeButton('next')}
       renderWeekdayLabels={renderWeekdayLabels()}
+      interaction={interaction}
     >
       {renderDays()}
     </DateInput>

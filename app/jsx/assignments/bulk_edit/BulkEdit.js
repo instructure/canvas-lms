@@ -50,7 +50,7 @@ export default function BulkEdit({courseId, onCancel}) {
     path: `/api/v1/courses/${courseId}/assignments/`,
     fetchAllPages: true,
     params: {
-      include: ['all_dates'],
+      include: ['all_dates', 'can_edit'],
       order_by: 'due_at'
     }
   })

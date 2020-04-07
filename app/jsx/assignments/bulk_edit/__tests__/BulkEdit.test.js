@@ -27,39 +27,64 @@ async function flushPromises() {
   await act(() => new Promise(resolve => setTimeout(resolve, 0)))
 }
 
-function mockStandardAssignmentsResponse() {
-  const assignments = standardAssignmentResponse()
-  fetch.mockResponse(JSON.stringify(assignments))
-  return assignments
-}
-
 function standardAssignmentResponse() {
   return [
     {
       id: 'assignment_1',
       name: 'First Assignment',
+      can_edit: true,
       all_dates: [
         {
           base: true,
           unlock_at: '2020-03-19',
           due_at: '2020-03-20T03:00:00Z',
-          lock_at: '2020-03-21'
+          lock_at: '2020-03-21',
+          can_edit: true
         },
         {
           id: 'override_1',
           title: '2 students',
           unlock_at: '2020-03-29',
           due_at: '2020-03-30',
-          lock_at: '2020-03-31'
+          lock_at: '2020-03-31',
+          can_edit: true
         }
       ]
     },
     {
       id: 'assignment_2',
       name: 'second assignment',
-      all_dates: [{base: true, unlock_at: null, due_at: null, lock_at: null}]
+      can_edit: true,
+      all_dates: [{base: true, unlock_at: null, due_at: null, lock_at: null, can_edit: true}]
     }
   ]
+}
+
+function restrictedAssignmentResponse() {
+  const data = standardAssignmentResponse()
+  data[0].all_dates[1].can_edit = false
+  data[0].all_dates[1].in_closed_grading_period = true
+  data[0].all_dates.push({
+    id: 'override_2',
+    title: 'blah',
+    unlock_at: '2020-03-20',
+    due_at: '2020-03-21',
+    lock_at: '2020-03-22',
+    can_edit: false
+  })
+  data[1].can_edit = false
+  data[1].all_dates[0].can_edit = false
+  data[1].moderated_grading = true
+  return data
+}
+
+function mockAssignmentsResponse(assignments) {
+  fetch.mockResponse(JSON.stringify(assignments))
+  return assignments
+}
+
+function mockStandardAssignmentsResponse() {
+  return mockAssignmentsResponse(standardAssignmentResponse())
 }
 
 function renderBulkEdit(overrides = {}) {
@@ -152,6 +177,22 @@ describe('Assignment Bulk Edit Dates', () => {
     fireEvent.change(nullDueDate, {target: {value: '2020-06-15'}})
     fireEvent.blur(nullDueDate)
     expect(nullDueDate.value).toBe('Mon Jun 15, 2020')
+  })
+
+  it('disables non-editable dates', async () => {
+    const {getByTitle, getAllByLabelText} = await renderBulkEditAndWait(
+      {},
+      restrictedAssignmentResponse()
+    )
+    const dueDateInputs = getAllByLabelText('Due At')
+    expect(dueDateInputs.map(i => i.disabled)).toEqual([false, true, true, true])
+    const unlockAtInputs = getAllByLabelText('Available From')
+    expect(unlockAtInputs.map(i => i.disabled)).toEqual([false, true, true, true])
+    const lockAtInputs = getAllByLabelText('Available Until')
+    expect(lockAtInputs.map(i => i.disabled)).toEqual([false, true, true, true])
+    expect(getByTitle('In closed grading period')).toBeInTheDocument()
+    expect(getByTitle('Only the moderator can edit this assignment')).toBeInTheDocument()
+    expect(getByTitle('You do not have permission to edit this assignment')).toBeInTheDocument()
   })
 
   describe('saving data', () => {

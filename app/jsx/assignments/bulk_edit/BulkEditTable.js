@@ -25,6 +25,8 @@ import {Responsive} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
+import {IconWarningLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import BulkDateInput from './BulkDateInput'
 import {AssignmentShape} from './BulkAssignmentShape'
 
@@ -60,6 +62,7 @@ BulkEditTable.propTypes = {
 
 export default function BulkEditTable({assignments, updateAssignmentDate}) {
   const DATE_COLUMN_WIDTH_REMS = 14
+  const NOTE_COLUMN_WIDTH_REMS = 3
 
   const createUpdateAssignmentFn = opts => newDate => {
     updateAssignmentDate({newDate, ...opts})
@@ -79,6 +82,7 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
         selectedDate={tz.parse(dates[dateKey])}
         onSelectedDateChange={handleSelectedDateChange}
         fancyMidnight={DATE_INPUT_META[dateKey].fancyMidnight}
+        interaction={dates.can_edit ? 'enabled' : 'disabled'}
       />
     )
   }
@@ -99,12 +103,32 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     // depend on the cell overflow as being visible. I think that's pretty safe since that's the
     // default overflow.
     return (
-      <View as="div" minWidth={`${DATE_COLUMN_WIDTH_REMS * 3}rem`}>
+      <View as="div" minWidth={`${DATE_COLUMN_WIDTH_REMS * 3 + NOTE_COLUMN_WIDTH_REMS}rem`}>
         <Text size="medium" fontStyle="italic">
           {I18n.t('This assignment has no default dates.')}
         </Text>
       </View>
     )
+  }
+
+  function renderNote(assignment, dateSet) {
+    if (!dateSet.can_edit) {
+      let explanation
+      if (dateSet.in_closed_grading_period) {
+        explanation = I18n.t('In closed grading period')
+      } else if (assignment.moderated_grading) {
+        explanation = I18n.t('Only the moderator can edit this assignment')
+      } else {
+        explanation = I18n.t('You do not have permission to edit this assignment')
+      }
+      return (
+        <Tooltip renderTip={explanation}>
+          <IconWarningLine color="warning" title={explanation} />
+        </Tooltip>
+      )
+    } else {
+      return null
+    }
   }
 
   function renderBaseRow(assignment) {
@@ -117,14 +141,16 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', baseDates)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'unlock_at', baseDates)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'lock_at', baseDates)}</Table.Cell>
+          <Table.Cell>{renderNote(assignment, baseDates)}</Table.Cell>
         </Table.Row>
       )
     } else {
-      // Need all 3 Table.Cells or you get weird borders on this row
+      // Need all 4 Table.Cells or you get weird borders on this row
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
           <Table.Cell>{renderAssignmentTitle(assignment)}</Table.Cell>
           <Table.Cell>{renderNoDefaultDates()}</Table.Cell>
+          <Table.Cell />
           <Table.Cell />
           <Table.Cell />
         </Table.Row>
@@ -153,6 +179,7 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
           <Table.Cell>
             {renderDateInput(assignment.id, 'lock_at', override, override.id)}
           </Table.Cell>
+          <Table.Cell>{renderNote(assignment, override)}</Table.Cell>
         </Table.Row>
       )
     })
@@ -169,6 +196,7 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
 
   function renderTable(_props = {}, matches = []) {
     const widthProp = `${DATE_COLUMN_WIDTH_REMS}rem`
+    const noteWidthProp = `${NOTE_COLUMN_WIDTH_REMS}rem`
     const layoutProp = matches.includes('small') ? 'stacked' : 'fixed'
     return (
       <Table caption={I18n.t('Assignment Dates')} hover layout={layoutProp}>
@@ -184,6 +212,9 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
             <Table.ColHeader width={widthProp} id="lock">
               {DATE_INPUT_META.lock_at.label}
             </Table.ColHeader>
+            <Table.ColHeader id="note" width={noteWidthProp}>
+              <ScreenReaderContent>{I18n.t('Notes')}</ScreenReaderContent>
+            </Table.ColHeader>
           </Table.Row>
         </Table.Head>
         <Table.Body>{renderAssignments()}</Table.Body>
@@ -196,7 +227,7 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     return (
       <Responsive
         match="media"
-        query={{small: {maxWidth: `${5 * DATE_COLUMN_WIDTH_REMS}rem`}}}
+        query={{small: {maxWidth: `${5 * DATE_COLUMN_WIDTH_REMS + NOTE_COLUMN_WIDTH_REMS}rem`}}}
         render={renderTable}
       />
     )

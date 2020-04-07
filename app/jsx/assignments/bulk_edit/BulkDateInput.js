@@ -29,12 +29,14 @@ BulkDateInput.propTypes = {
   selectedDate: instanceOf(Date),
   onSelectedDateChange: func.isRequired,
   timezone: string,
-  fancyMidnight: bool
+  fancyMidnight: bool,
+  interaction: string
 }
 
 BulkDateInput.defaultProps = {
   timezone: null,
-  fancyMidnight: false
+  fancyMidnight: false,
+  interaction: 'enabled'
 }
 
 export default function BulkDateInput({
@@ -42,7 +44,8 @@ export default function BulkDateInput({
   selectedDate,
   onSelectedDateChange,
   timezone,
-  fancyMidnight
+  fancyMidnight,
+  interaction
 }) {
   // do this here so tests can modify ENV.TIMEZONE
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
@@ -77,6 +80,7 @@ export default function BulkDateInput({
       formatDate={formatDate}
       onSelectedDateChange={handleSelectedDateChange}
       timezone={timezone}
+      interaction={interaction}
     />
   )
 }
