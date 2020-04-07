@@ -78,13 +78,21 @@ module Canvas
           ["global", tree, service, prefix, key].compact.join("/"),
         ].uniq - keys
 
-        # pre-cache an entire tree
-        tree_key = [tree, service, environment].compact.join("/")
-        subtree = LocalCache.fetch(CACHE_KEY_PREFIX + tree_key + '/', expires_in: ttl) do
-          result = @kv_client.get(tree_key, :recurse, :stale)
-          result.values if result&.status == 200
+        # try to get the local cache first right away
+        keys.each do |full_key|
+          result = LocalCache.fetch(CACHE_KEY_PREFIX + full_key)
+          return result if result
         end
-        populate_cache(tree_key, subtree, ttl)
+
+        # okay now pre-cache an entire tree
+        tree_key = [tree, service, environment].compact.join("/")
+        LocalCache.fetch(CACHE_KEY_PREFIX + tree_key + '/', expires_in: ttl) do
+          result = @kv_client.get(tree_key, :recurse, :stale)
+          if result&.status == 200
+            populate_cache(tree_key, result.values, ttl) # only populate recursively when we missed
+            result.values
+          end
+        end
 
         keys.each do |full_key|
           # these keys will have been populated (or not!) above; don't
