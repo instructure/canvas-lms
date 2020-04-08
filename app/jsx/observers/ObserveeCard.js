@@ -22,7 +22,7 @@ const Card = styled.div`
     border-bottom: 1px solid #d7d7d7;
     
     > p {
-      color: #006ba6;
+      color: #212329;
       font-size: 14px;
       font-weight: bold;
     }
@@ -83,12 +83,11 @@ const Card = styled.div`
         cursor: pointer;
   
         .course-name {
-          color: #1e1e1e;
+          color: #005888;
           text-align: left;
           word-break: break-word;
   
           &:hover {
-            color: #1e1e1e;
             text-decoration: underline;
           }
         }
@@ -96,7 +95,16 @@ const Card = styled.div`
         .course-score {
           font-weight: bold;
           text-align: right;
-          flex-basis: 25%;
+          flex-basis: 40%;
+
+          i {
+            &:before {
+              color: #212329;
+              font-size: 8px;
+              font-weight: bold !important;
+              margin-left: 5px;
+            }
+          }
         }
       }
   
@@ -190,7 +198,10 @@ class ObserveeCard extends React.Component {
                     { this.state.showDetails === enr.id ? this.renderCourseDetails(enr, this.getCustomColor(enr), this.formatScore(enr.score), this.state.courseDetails) : undefined }
                     <p className="course-list-item" onClick={this.showCourseInfo.bind(this, enr)}>
                       <span className="course-name">{enr.course_name}</span>
-                      <span className="course-score">{this.formatScore(enr.score)}</span>
+                      <span className="course-score">
+                        {this.formatScore(enr.score)}
+                        <i className="icon-arrow-open-right"></i>
+                      </span>
                     </p>
                   </div>
                 )

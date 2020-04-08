@@ -209,15 +209,15 @@ class ObserveeCourseDetails extends React.Component {
           <p className="course-score">{this.props.score}</p>
           <div className="flex-widgets">
             <div>
-              <p className="submission-date">
-                <span className="title">Last submission:</span>
-                <span>{this.props.course_details.last_submission}</span>
-              </p>
-            </div>
-            <div>
               <p className="last-active">
                 <span className="title">Last active:</span>
                 <span>{this.determineLastActive(this.props.course_details.last_active)}</span>
+              </p>
+            </div>
+            <div>
+              <p className="submission-date">
+                <span className="title">Last submission:</span>
+                <span>{this.props.course_details.last_submission}</span>
               </p>
             </div>
           </div>
