@@ -2521,19 +2521,6 @@ describe GradebooksController do
     end
   end
 
-  describe '#post_grades_tools' do
-    it 'returns a tools with a type of post_grades if the post_grades feature option is enabled' do
-      @course.enable_feature!(:post_grades)
-      @controller.instance_variable_set(:@context, @course)
-      expect(@controller.post_grades_tools).to eq([{:type=>:post_grades}])
-    end
-
-    it 'does not return a tools with a type of post_grades if the post_grades feature option is enabled' do
-      @controller.instance_variable_set(:@context, @course)
-      expect(@controller.post_grades_tools).to eq([])
-    end
-  end
-
   describe '#post_grades_feature?' do
     it 'returns false when :post_grades feature disabled for context' do
       context = object_double(@course, feature_enabled?: false)

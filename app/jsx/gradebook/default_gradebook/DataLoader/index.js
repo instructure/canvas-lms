@@ -47,7 +47,6 @@ export default class DataLoader {
 
       contextModulesURL: options.context_modules_url,
       customColumnsURL: options.custom_columns_url,
-      sectionsURL: options.sections_url,
 
       studentsURL: options.students_stateless_url,
       studentsPageCb: gradebook.gotChunkOfStudents,
