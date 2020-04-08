@@ -670,7 +670,6 @@ export default {
       current_user_id: 1,
       context_asset_string: 'course_1',
       GRADEBOOK_OPTIONS: {
-        effective_due_dates_url: '/api/v1/courses/1/effective_due_dates',
         enrollments_url: '/api/v1/enrollments',
         enrollments_with_concluded_url: '/api/v1/concluded_enrollments',
         assignment_groups_url: '/api/v1/assignment_groups',
