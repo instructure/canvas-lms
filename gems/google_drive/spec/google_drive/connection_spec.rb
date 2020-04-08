@@ -166,6 +166,7 @@ describe GoogleDrive::Connection do
     describe "#download" do
       let(:export_url) { 'https://docs.google.com/feeds/download/documents/export/Export?exportFormat=docx&id=**file_id**' }
       let(:files_url) { 'https://www.googleapis.com/drive/v2/files/42' }
+      let(:redirect_url) { 'https://docs.google.com/redirect/feeds/download/documents/export/Export?exportFormat=docx&id=**file_id**' }
       let(:http_status) { 200 }
 
       before do
@@ -197,6 +198,48 @@ describe GoogleDrive::Connection do
             expect(e.message).to eq("Google Drive connection timed out")
           end
         )
+      end
+
+      context 'with 307 temporary redirect response' do
+        before do
+          stub_request(:get, redirect_url).to_return(
+            status: 200,
+            body: '',
+            headers: {
+              'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            }
+          )
+        end
+
+        it 'will follow redirect response' do
+          stub_request(:get, export_url).to_return(
+            status: 307,
+            headers: {'Content-Type' => 'application/json', 'Location' => redirect_url}
+          ).times(1)
+          connection.download("42", nil)
+          output = connection.download("42", nil)
+          expect(output[1]).to eq("Biology 100 Collaboration.docx")
+          expect(output[2]).to eq("docx")
+        end
+
+        it 'will retry on redirect response' do
+          stub_request(:get, export_url).to_return(
+            status: 307,
+            headers: {'Content-Type' => 'application/json', 'Location' => redirect_url}
+          )
+          stub_request(:get, redirect_url).to_return(
+            status: 307,
+            body: '',
+            headers: {
+              'Content-Type' => 'application/json', 'Location' => redirect_url
+            }
+          )
+
+          expect { connection.download("42", nil) }.to raise_error GoogleDrive::ConnectionException
+
+          expect(WebMock).to(have_requested(:get, export_url).times(1))
+          expect(WebMock).to(have_requested(:get, redirect_url).times(2))
+        end
       end
 
       context 'with 429 throttling response' do
