@@ -12,6 +12,7 @@ module MarkTemplateStreaming
       # Same as org implmenation except don't set the transfer-encoding header
       # The Rack::Chunked middleware will handle it
       headers["Cache-Control"] ||= "no-cache"
+      headers["Last-Modified"] ||= Time.now.httpdate
       headers.delete('Content-Length')
       options[:stream] = stream
     end
