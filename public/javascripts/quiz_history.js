@@ -51,357 +51,383 @@ const parentWindow = {
 }
 // end parentWindow object
 
-const data = $('#submission_details').getTemplateData({textValues: ['version_number', 'user_id']})
+let _scoringSnapshot
+function getScoringSnapshot() {
+  if (_scoringSnapshot) return _scoringSnapshot
+  const data = $('#submission_details').getTemplateData({textValues: ['version_number', 'user_id']})
 
-const scoringSnapshot = {
-  snapshot: {
-    user_id: data.user_id || null,
-    version_number: data.version_number,
-    last_question_touched: null,
-    question_updates: {},
-    fudge_points: 0
-  },
+  const scoringSnapshot = {
+    snapshot: {
+      user_id: data.user_id || null,
+      version_number: data.version_number,
+      last_question_touched: null,
+      question_updates: {},
+      fudge_points: 0
+    },
 
-  $quizBody: null,
+    $quizBody: null,
 
-  jumpPosition(question_id) {
-    const $question = $('#question_' + question_id)
-    if ($question.length > 0) {
-      return $question.offset().top - 110
-    } else {
-      return 0
-    }
-  },
-
-  checkQuizBody() {
-    if (scoringSnapshot.$quizBody === null) {
-      scoringSnapshot.$quizBody = $('html,body')
-    }
-  },
-
-  // Animates scrolling to question if there is no page reload
-  jumpToQuestion(question_id) {
-    const top = scoringSnapshot.jumpPosition(question_id)
-    scoringSnapshot.checkQuizBody()
-    scoringSnapshot.$quizBody.stop()
-    scoringSnapshot.$quizBody.clearQueue()
-    scoringSnapshot.$quizBody.animate({scrollTop: top}, 500)
-  },
-
-  // Jumps directly to question upon a page reload
-  jumpDirectlyToQuestion(question_id) {
-    const top = scoringSnapshot.jumpPosition(question_id)
-    scoringSnapshot.checkQuizBody()
-    scoringSnapshot.$quizBody.scrollTop(top)
-  },
-
-  externallySet: false,
-
-  setSnapshot(data, cancelIfAlreadyExternallySet) {
-    if (data) {
-      if (cancelIfAlreadyExternallySet && scoringSnapshot.externallySet) {
-        return
+    jumpPosition(question_id) {
+      const $question = $('#question_' + question_id)
+      if ($question.length > 0) {
+        return $question.offset().top - 110
+      } else {
+        return 0
       }
-      scoringSnapshot.externallySet = true
-      scoringSnapshot.snapshot = data
-      for (const idx in data.question_updates) {
-        const question = data.question_updates[idx]
-        const $question = $('#question_' + idx)
+    },
+
+    checkQuizBody() {
+      if (scoringSnapshot.$quizBody === null) {
+        scoringSnapshot.$quizBody = $('html,body')
+      }
+    },
+
+    // Animates scrolling to question if there is no page reload
+    jumpToQuestion(question_id) {
+      const top = scoringSnapshot.jumpPosition(question_id)
+      scoringSnapshot.checkQuizBody()
+      scoringSnapshot.$quizBody.stop()
+      scoringSnapshot.$quizBody.clearQueue()
+      scoringSnapshot.$quizBody.animate({scrollTop: top}, 500)
+    },
+
+    // Jumps directly to question upon a page reload
+    jumpDirectlyToQuestion(question_id) {
+      const top = scoringSnapshot.jumpPosition(question_id)
+      scoringSnapshot.checkQuizBody()
+      scoringSnapshot.$quizBody.scrollTop(top)
+    },
+
+    externallySet: false,
+
+    setSnapshot(submissionData, cancelIfAlreadyExternallySet) {
+      if (submissionData) {
+        if (cancelIfAlreadyExternallySet && scoringSnapshot.externallySet) {
+          return
+        }
+        scoringSnapshot.externallySet = true
+        scoringSnapshot.snapshot = submissionData
+        for (const idx in submissionData.question_updates) {
+          const question = submissionData.question_updates[idx]
+          const $question = $('#question_' + idx)
+          if (!ENV.GRADE_BY_QUESTION) {
+            $question.addClass('modified_but_not_saved')
+          }
+          $question
+            .find('.question_input_hidden')
+            .val(question.points)
+            .end()
+            .find('.user_points :text')
+            .val(I18n.n(question.points))
+            .end()
+            .find('.question_neutral_comment .question_comment_text textarea')
+            .val(question.comments)
+        }
+        if (parentWindow.hasProperty('lastQuestionTouched') && !ENV.GRADE_BY_QUESTION) {
+          scoringSnapshot.jumpToQuestion(window.parent.INST.lastQuestionTouched)
+        } else if (scoringSnapshot.snapshot.last_question_touched && !ENV.GRADE_BY_QUESTION) {
+          scoringSnapshot.jumpToQuestion(scoringSnapshot.snapshot.last_question_touched)
+        }
+      } else if (cancelIfAlreadyExternallySet) {
+        if (parentWindow.hasProperty('lastQuestionTouched') && !ENV.GRADE_BY_QUESTION) {
+          scoringSnapshot.jumpToQuestion(window.parent.INST.lastQuestionTouched)
+        }
+      }
+      if (scoringSnapshot.externallySet || cancelIfAlreadyExternallySet) {
+        $('#feel_free_to_toggle_message').show()
+      }
+      if (parentWindow.respondsTo('refreshQuizSubmissionSnapshot')) {
+        window.parent.INST.refreshQuizSubmissionSnapshot(scoringSnapshot.snapshot)
+      }
+    },
+
+    update(question_id, submissionData) {
+      scoringSnapshot.snapshot.question_updates[question_id] = submissionData
+      scoringSnapshot.snapshot.last_question_touched = question_id
+      scoringSnapshot.setSnapshot()
+    }
+  }
+  // end of scoringSnapshot object
+
+  return (_scoringSnapshot = scoringSnapshot)
+}
+
+let _gradingForm
+function getGradingForm() {
+  if (_gradingForm) return _gradingForm
+  const scoringSnapshot = getScoringSnapshot()
+  const gradingForm = {
+    ensureSelectEventsFire() {
+      $('input[type=text]').focus(function() {
+        $(this).select()
+      })
+    },
+
+    scrollToUpdatedQuestion(event, hash) {
+      if (hash.indexOf('#question') === 0) {
+        const id = hash.substring(10)
+        scoringSnapshot.jumpToQuestion(id)
+      }
+    },
+
+    updateSnapshotFor($question) {
+      const question_id = $question.attr('id').substring(9) || null
+      if (question_id) {
+        const data = {}
         if (!ENV.GRADE_BY_QUESTION) {
           $question.addClass('modified_but_not_saved')
         }
-        $question
-          .find('.question_input_hidden')
-          .val(question.points)
-          .end()
-          .find('.user_points :text')
-          .val(I18n.n(question.points))
-          .end()
-          .find('.question_neutral_comment .question_comment_text textarea')
-          .val(question.comments)
+        data.points = numberHelper.parse($question.find('.user_points :text').val())
+        data.comments =
+          $question.find('.question_neutral_comment .question_comment_text textarea').val() || ''
+        scoringSnapshot.update(question_id, data)
       }
-      if (parentWindow.hasProperty('lastQuestionTouched') && !ENV.GRADE_BY_QUESTION) {
-        scoringSnapshot.jumpToQuestion(window.parent.INST.lastQuestionTouched)
-      } else if (scoringSnapshot.snapshot.last_question_touched && !ENV.GRADE_BY_QUESTION) {
-        scoringSnapshot.jumpToQuestion(scoringSnapshot.snapshot.last_question_touched)
+      $(document).triggerHandler('score_changed')
+    },
+
+    addFudgePoints(points) {
+      if (points || points === 0) {
+        scoringSnapshot.snapshot.fudge_points = points
+        scoringSnapshot.setSnapshot()
       }
-    } else if (cancelIfAlreadyExternallySet) {
-      if (parentWindow.hasProperty('lastQuestionTouched') && !ENV.GRADE_BY_QUESTION) {
-        scoringSnapshot.jumpToQuestion(window.parent.INST.lastQuestionTouched)
-      }
-    }
-    if (scoringSnapshot.externallySet || cancelIfAlreadyExternallySet) {
+      $(document).triggerHandler('score_changed')
+    },
+
+    setInitialSnapshot(data) {
       $('#feel_free_to_toggle_message').show()
-    }
-    if (parentWindow.respondsTo('refreshQuizSubmissionSnapshot')) {
-      window.parent.INST.refreshQuizSubmissionSnapshot(scoringSnapshot.snapshot)
-    }
-  },
-
-  update(question_id, data) {
-    scoringSnapshot.snapshot.question_updates[question_id] = data
-    scoringSnapshot.snapshot.last_question_touched = question_id
-    scoringSnapshot.setSnapshot()
-  }
-}
-// end of scoringSnapshot object
-
-const gradingForm = {
-  ensureSelectEventsFire() {
-    $('input[type=text]').focus(function() {
-      $(this).select()
-    })
-  },
-
-  scrollToUpdatedQuestion(event, hash) {
-    if (hash.indexOf('#question') == 0) {
-      const id = hash.substring(10)
-      scoringSnapshot.jumpToQuestion(id)
-    }
-  },
-
-  updateSnapshotFor($question) {
-    const question_id = $question.attr('id').substring(9) || null
-    if (question_id) {
-      const data = {}
-      if (!ENV.GRADE_BY_QUESTION) {
-        $question.addClass('modified_but_not_saved')
-      }
-      data.points = numberHelper.parse($question.find('.user_points :text').val())
-      data.comments =
-        $question.find('.question_neutral_comment .question_comment_text textarea').val() || ''
-      scoringSnapshot.update(question_id, data)
-    }
-    $(document).triggerHandler('score_changed')
-  },
-
-  addFudgePoints(points) {
-    if (points || points === 0) {
-      scoringSnapshot.snapshot.fudge_points = points
-      scoringSnapshot.setSnapshot()
-    }
-    $(document).triggerHandler('score_changed')
-  },
-
-  setInitialSnapshot(data) {
-    $('#feel_free_to_toggle_message').show()
-    if (data) {
-      scoringSnapshot.setSnapshot(data)
-    } else {
-      scoringSnapshot.setSnapshot(null, true)
-    }
-  },
-
-  onScoreChanged() {
-    const $total = $('#after_fudge_points_total')
-    let total = 0
-    $('.display_question .user_points:visible').each(function() {
-      let points =
-        numberHelper.parse(
-          $(this)
-            .find('input.question_input')
-            .val()
-        ) || 0
-      points = Math.round(points * 100.0) / 100.0
-      total += points
-    })
-    let fudge = numberHelper.parse($('#fudge_points_entry').val()) || 0
-    fudge = Math.round(fudge * 100.0) / 100.0
-    total += fudge
-    $total.text(I18n.n(total) || '0')
-  },
-
-  questions() {
-    return $('.question_holder')
-      .map((index, el) => $(el).position().top - 320)
-      .toArray()
-  },
-
-  onScroll() {
-    quizNavBar.activateCorrectLink()
-    quizNavBar.toggleDropShadow()
-  },
-
-  onWindowResize() {
-    // Add padding to the bottom of the last question
-    const winHeight = $(window).innerHeight()
-    const lastHeight = $('div.question_holder:last-child').outerHeight()
-    const fixedButtonHeight = $('#speed_update_scores_container').outerHeight()
-    const paddingHeight = Math.max(winHeight - lastHeight - 150, fixedButtonHeight)
-    $('#update_history_form .quiz-submission.headless').css('marginBottom', paddingHeight + 'px')
-  }
-}
-// end of gradingForm object
-
-const quizNavBar = {
-  index: 0,
-  windowSize: 10,
-  minWidth: 66,
-  startingLeftPos: 32,
-  navItemWidth: 34,
-
-  initialize() {
-    $('.user_points > .question_input').each(function(_index) {
-      quizNavBar.updateStatusFor($(this))
-    })
-
-    if (ENV.GRADE_BY_QUESTION) {
-      const questionIndex = parseInt(parentWindow.get('active_question_index'), 10)
-      const questionId = $('.q' + questionIndex).data('id')
-      if (!Number.isNaN(questionId)) {
-        scoringSnapshot.jumpDirectlyToQuestion(questionId)
-      }
-    }
-
-    quizNavBar.updateWindowSize()
-    quizNavBar.setScrollWindowPosition(0)
-  },
-
-  size() {
-    return $('.question-nav-link').length
-  },
-
-  tooBig() {
-    return quizNavBar.size() > quizNavBar.windowSize
-  },
-
-  updateWindowSize() {
-    const fullWidth = $('.quiz-nav, .quiz-nav-fullpage').width()
-    const minPadding = 10
-    const maxWidth = fullWidth - minPadding * 2
-    const itemCount = Math.floor((maxWidth - quizNavBar.minWidth) / quizNavBar.navItemWidth)
-    quizNavBar.windowSize = itemCount
-    const actualWidth = itemCount * quizNavBar.navItemWidth + quizNavBar.minWidth
-    $('.quiz-nav .nav, .quiz-nav-fullpage .nav').animate({width: actualWidth + 'px'}, 10)
-  },
-
-  navArrowCache: null,
-
-  $navArrows() {
-    if (quizNavBar.navArrowCache === null) {
-      quizNavBar.navArrowCache = $('.quiz-nav .nav-arrow, .quiz-nav-fullpage .nav-arrow')
-    }
-    return quizNavBar.navArrowCache
-  },
-
-  navWrapperCache: null,
-
-  $navWrapper() {
-    if (quizNavBar.navWrapperCache === null) {
-      quizNavBar.navWrapperCache = $('#quiz-nav-inner-wrapper')
-    }
-    return quizNavBar.navWrapperCache
-  },
-
-  updateArrows() {
-    if (quizNavBar.tooBig()) {
-      quizNavBar.$navArrows().show()
-      quizNavBar.$navWrapper().css({position: 'absolute'})
-    } else {
-      quizNavBar.$navArrows().hide()
-      quizNavBar.$navWrapper().css({position: 'relative'})
-    }
-  },
-
-  toggleDropShadow() {
-    // Add shadow to top bar
-    $('.quiz-nav').toggleClass('drshadow', $(document).scrollTop() > 0)
-  },
-
-  updateStatusFor($scoreInput) {
-    try {
-      const questionId = $scoreInput.attr('data-question-id')
-      const scoreValue = numberHelper.parse($scoreInput.val())
-      $('#quiz_nav_' + questionId).toggleClass('complete', !Number.isNaN(scoreValue))
-    } catch (err) {
-      // do nothing; if there's no status to update, continue with other execution
-    }
-  },
-
-  activateLink(index) {
-    $('.quiz-nav li').removeClass('active')
-    $('.q' + index).addClass('active')
-  },
-
-  activateCorrectLink() {
-    let qNum = 1
-    const qArray = gradingForm.questions()
-    const docScroll = $(document).scrollTop()
-    const $questions = $('.question')
-    for (let t = 0; t <= qArray.length; t++) {
-      const $question = $($questions[t])
-      const currentQuestionNum = t + 1
-      if (
-        (docScroll > qArray[t] && docScroll < qArray[t + 1]) ||
-        (t == qArray.length - 1 && docScroll > qArray[t])
-      ) {
-        qNum = currentQuestionNum
-        parentWindow.set('active_question_index', currentQuestionNum)
-        quizNavBar.activateLink(currentQuestionNum)
-        $question.addClass('selected_single_question')
+      if (data) {
+        scoringSnapshot.setSnapshot(data)
       } else {
-        $('.q' + currentQuestionNum).removeClass('active')
-        $question.removeClass('selected_single_question')
+        scoringSnapshot.setSnapshot(null, true)
       }
+    },
+
+    onScoreChanged() {
+      const $total = $('#after_fudge_points_total')
+      let total = 0
+      $('.display_question .user_points:visible').each(function() {
+        let points =
+          numberHelper.parse(
+            $(this)
+              .find('input.question_input')
+              .val()
+          ) || 0
+        points = Math.round(points * 100.0) / 100.0
+        total += points
+      })
+      let fudge = numberHelper.parse($('#fudge_points_entry').val()) || 0
+      fudge = Math.round(fudge * 100.0) / 100.0
+      total += fudge
+      $total.text(I18n.n(total) || '0')
+    },
+
+    questions() {
+      return $('.question_holder')
+        .map((index, el) => $(el).position().top - 320)
+        .toArray()
+    },
+
+    onWindowResize() {
+      // Add padding to the bottom of the last question
+      const winHeight = $(window).innerHeight()
+      const lastHeight = $('div.question_holder:last-child').outerHeight()
+      const fixedButtonHeight = $('#speed_update_scores_container').outerHeight()
+      const paddingHeight = Math.max(winHeight - lastHeight - 150, fixedButtonHeight)
+      $('#update_history_form .quiz-submission.headless').css('marginBottom', paddingHeight + 'px')
     }
-    quizNavBar.setScrollWindowPosition(qNum)
-    return qNum
-  },
-
-  showQuestionsInWindow(startingIndex, _endingIndex) {
-    const $navWrapper = $('#quiz-nav-inner-wrapper')
-    const leftPosition = quizNavBar.startingLeftPos - startingIndex * quizNavBar.navItemWidth
-    const newPos = '' + leftPosition + 'px'
-    const currentPos = $navWrapper.css('left')
-    if (newPos !== currentPos) {
-      $navWrapper.stop()
-      $navWrapper.clearQueue()
-      $navWrapper.animate({left: leftPosition + 'px'}, 300)
-    }
-  },
-
-  windowScrollLength() {
-    return Math.floor(quizNavBar.windowSize / 2.0)
-  },
-
-  setScrollWindowPosition(currentIndex) {
-    if (Number.isNaN(currentIndex)) {
-      currentIndex = 0
-    }
-    quizNavBar.index = currentIndex
-    quizNavBar.updateArrows()
-    if (quizNavBar.tooBig()) {
-      let startingIndex = currentIndex - quizNavBar.windowScrollLength()
-      const maxStartingIndex = quizNavBar.size() - quizNavBar.windowSize
-
-      if (startingIndex < 0) {
-        startingIndex = 0
-        quizNavBar.index = 0
-      } else if (startingIndex > maxStartingIndex) {
-        startingIndex = maxStartingIndex
-        quizNavBar.index = maxStartingIndex + quizNavBar.windowScrollLength()
-      }
-
-      const endingIndex = startingIndex + quizNavBar.windowSize - 1
-      quizNavBar.showQuestionsInWindow(startingIndex, endingIndex)
-    }
-  },
-
-  previousQuestionBlock() {
-    quizNavBar.setScrollWindowPosition(quizNavBar.index - quizNavBar.windowSize)
-  },
-
-  nextQuestionBlock() {
-    quizNavBar.setScrollWindowPosition(quizNavBar.index + quizNavBar.windowSize)
   }
+  // end of gradingForm object
+
+  return (_gradingForm = gradingForm)
 }
-// End of quizNavBar object
+
+let _quizNavBar
+function getQuizNavBar() {
+  if (_quizNavBar) return _quizNavBar
+  const scoringSnapshot = getScoringSnapshot()
+  const gradingForm = getGradingForm()
+
+  const quizNavBar = {
+    index: 0,
+    windowSize: 10,
+    minWidth: 66,
+    startingLeftPos: 32,
+    navItemWidth: 34,
+
+    initialize() {
+      $('.user_points > .question_input').each(function(_index) {
+        quizNavBar.updateStatusFor($(this))
+      })
+
+      if (ENV.GRADE_BY_QUESTION) {
+        const questionIndex = parseInt(parentWindow.get('active_question_index'), 10)
+        const questionId = $('.q' + questionIndex).data('id')
+        if (!Number.isNaN(questionId)) {
+          scoringSnapshot.jumpDirectlyToQuestion(questionId)
+        }
+      }
+
+      quizNavBar.updateWindowSize()
+      quizNavBar.setScrollWindowPosition(0)
+    },
+
+    size() {
+      return $('.question-nav-link').length
+    },
+
+    tooBig() {
+      return quizNavBar.size() > quizNavBar.windowSize
+    },
+
+    updateWindowSize() {
+      const fullWidth = $('.quiz-nav, .quiz-nav-fullpage').width()
+      const minPadding = 10
+      const maxWidth = fullWidth - minPadding * 2
+      const itemCount = Math.floor((maxWidth - quizNavBar.minWidth) / quizNavBar.navItemWidth)
+      quizNavBar.windowSize = itemCount
+      const actualWidth = itemCount * quizNavBar.navItemWidth + quizNavBar.minWidth
+      $('.quiz-nav .nav, .quiz-nav-fullpage .nav').animate({width: actualWidth + 'px'}, 10)
+    },
+
+    navArrowCache: null,
+
+    $navArrows() {
+      if (quizNavBar.navArrowCache === null) {
+        quizNavBar.navArrowCache = $('.quiz-nav .nav-arrow, .quiz-nav-fullpage .nav-arrow')
+      }
+      return quizNavBar.navArrowCache
+    },
+
+    navWrapperCache: null,
+
+    $navWrapper() {
+      if (quizNavBar.navWrapperCache === null) {
+        quizNavBar.navWrapperCache = $('#quiz-nav-inner-wrapper')
+      }
+      return quizNavBar.navWrapperCache
+    },
+
+    updateArrows() {
+      if (quizNavBar.tooBig()) {
+        quizNavBar.$navArrows().show()
+        quizNavBar.$navWrapper().css({position: 'absolute'})
+      } else {
+        quizNavBar.$navArrows().hide()
+        quizNavBar.$navWrapper().css({position: 'relative'})
+      }
+    },
+
+    toggleDropShadow() {
+      // Add shadow to top bar
+      $('.quiz-nav').toggleClass('drshadow', $(document).scrollTop() > 0)
+    },
+
+    updateStatusFor($scoreInput) {
+      try {
+        const questionId = $scoreInput.attr('data-question-id')
+        const scoreValue = numberHelper.parse($scoreInput.val())
+        $('#quiz_nav_' + questionId).toggleClass('complete', !Number.isNaN(scoreValue))
+      } catch (err) {
+        // do nothing; if there's no status to update, continue with other execution
+      }
+    },
+
+    activateLink(index) {
+      $('.quiz-nav li').removeClass('active')
+      $('.q' + index).addClass('active')
+    },
+
+    activateCorrectLink() {
+      let qNum = 1
+      const qArray = gradingForm.questions()
+      const docScroll = $(document).scrollTop()
+      const $questions = $('.question')
+      for (let t = 0; t <= qArray.length; t++) {
+        const $question = $($questions[t])
+        const currentQuestionNum = t + 1
+        if (
+          (docScroll > qArray[t] && docScroll < qArray[t + 1]) ||
+          (t === qArray.length - 1 && docScroll > qArray[t])
+        ) {
+          qNum = currentQuestionNum
+          parentWindow.set('active_question_index', currentQuestionNum)
+          quizNavBar.activateLink(currentQuestionNum)
+          $question.addClass('selected_single_question')
+        } else {
+          $('.q' + currentQuestionNum).removeClass('active')
+          $question.removeClass('selected_single_question')
+        }
+      }
+      quizNavBar.setScrollWindowPosition(qNum)
+      return qNum
+    },
+
+    showQuestionsInWindow(startingIndex, _endingIndex) {
+      const $navWrapper = $('#quiz-nav-inner-wrapper')
+      const leftPosition = quizNavBar.startingLeftPos - startingIndex * quizNavBar.navItemWidth
+      const newPos = '' + leftPosition + 'px'
+      const currentPos = $navWrapper.css('left')
+      if (newPos !== currentPos) {
+        $navWrapper.stop()
+        $navWrapper.clearQueue()
+        $navWrapper.animate({left: leftPosition + 'px'}, 300)
+      }
+    },
+
+    windowScrollLength() {
+      return Math.floor(quizNavBar.windowSize / 2.0)
+    },
+
+    setScrollWindowPosition(currentIndex) {
+      if (Number.isNaN(currentIndex)) {
+        currentIndex = 0
+      }
+      quizNavBar.index = currentIndex
+      quizNavBar.updateArrows()
+      if (quizNavBar.tooBig()) {
+        let startingIndex = currentIndex - quizNavBar.windowScrollLength()
+        const maxStartingIndex = quizNavBar.size() - quizNavBar.windowSize
+
+        if (startingIndex < 0) {
+          startingIndex = 0
+          quizNavBar.index = 0
+        } else if (startingIndex > maxStartingIndex) {
+          startingIndex = maxStartingIndex
+          quizNavBar.index = maxStartingIndex + quizNavBar.windowScrollLength()
+        }
+
+        const endingIndex = startingIndex + quizNavBar.windowSize - 1
+        quizNavBar.showQuestionsInWindow(startingIndex, endingIndex)
+      }
+    },
+
+    previousQuestionBlock() {
+      quizNavBar.setScrollWindowPosition(quizNavBar.index - quizNavBar.windowSize)
+    },
+
+    nextQuestionBlock() {
+      quizNavBar.setScrollWindowPosition(quizNavBar.index + quizNavBar.windowSize)
+    },
+
+    onScroll() {
+      quizNavBar.activateCorrectLink()
+      quizNavBar.toggleDropShadow()
+    }
+  }
+  // End of quizNavBar object
+
+  return (_quizNavBar = quizNavBar)
+}
 
 $(document).ready(function() {
+  const scoringSnapshot = getScoringSnapshot()
+  const gradingForm = getGradingForm()
+  const quizNavBar = getQuizNavBar()
+
   gradingForm.ensureSelectEventsFire()
 
   if (ENV.GRADE_BY_QUESTION) {
-    $(document).scroll(gradingForm.onScroll)
+    $(document).scroll(quizNavBar.onScroll)
     gradingForm.onWindowResize()
 
     $('.question_holder').click(function() {
@@ -427,6 +453,10 @@ $(document).ready(function() {
       scoringSnapshot.snapshot.version_number
     )
     gradingForm.setInitialSnapshot(data)
+  }
+
+  if (ENV.SCORE_UPDATED && parentWindow.respondsTo('clearQuizSubmissionSnapshot')) {
+    window.parent.INST.clearQuizSubmissionSnapshot(scoringSnapshot.snapshot)
   }
 
   $(
@@ -473,15 +503,10 @@ $(document).ready(function() {
     quizNavBar.setScrollWindowPosition(quizNavBar.index)
     gradingForm.onWindowResize()
   })
-})
 
-if (ENV.SCORE_UPDATED) {
-  $(document).ready(() => {
+  if (ENV.SCORE_UPDATED) {
     if (parentWindow.respondsTo('refreshGrades')) {
       window.parent.INST.refreshGrades()
     }
-    if (parentWindow.respondsTo('clearQuizSubmissionSnapshot')) {
-      window.parent.INST.clearQuizSubmissionSnapshot(scoringSnapshot.snapshot)
-    }
-  })
-}
+  }
+})
