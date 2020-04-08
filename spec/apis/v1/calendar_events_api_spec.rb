@@ -1308,6 +1308,61 @@ describe CalendarEventsApiController, type: :request do
         expect(response).to be_successful
       end
     end
+
+    context "web_conferences" do
+      before(:once) do
+        Account.site_admin.enable_feature! :calendar_conferences
+        plugin = PluginSetting.create!(name: 'big_blue_button')
+        plugin.update_attribute(:settings, { key: 'value' })
+      end
+
+      let_once(:conference) { WebConference.create(context: @course, user: @user, conference_type: 'BigBlueButton') }
+      let_once(:event_with_conference) do
+        @course.calendar_events.create(title: "event with conference", workflow_state: 'active',
+          web_conference: conference)
+      end
+
+      it "should not show web conferences by default" do
+        json = api_call(:get, "/api/v1/calendar_events/#{event_with_conference.id}", {
+          :controller => 'calendar_events_api', :action => 'show', :format => 'json', id: event_with_conference.id
+        })
+        expect(json).not_to have_key 'web_conference'
+      end
+
+      it "should show web conferences when include specified" do
+        json = api_call(:get, "/api/v1/calendar_events/#{event_with_conference.id}?include[]=web_conference", {
+          :controller => 'calendar_events_api', :action => 'show', :format => 'json', id: event_with_conference.id,
+          include: ['web_conference']
+        })
+        expect(json).to have_key 'web_conference'
+        expect(json['web_conference']['id']).to eq conference.id
+      end
+
+      it "should create with web_conference_id" do
+        json = api_call(:post, "/api/v1/calendar_events.json", {
+          :controller => 'calendar_events_api', :action => 'create', :format => 'json'
+        }, {
+          :calendar_event => {
+            :context_code => "course_#{@course.id}",
+            :title => "API Test",
+            web_conference_id: conference.id
+          }
+        })
+        expect(CalendarEvent.find(json['id']).web_conference_id).to eq conference.id
+      end
+
+      it "should update with web_conference_id" do
+        event = @course.calendar_events.create(title: 'to update', workflow_state: 'active')
+        api_call(:put, "/api/v1/calendar_events/#{event.id}", {
+          :controller => 'calendar_events_api', :action => 'update', :format => 'json', id: event.id
+        }, {
+          :calendar_event => {
+            web_conference_id: conference.id
+          }
+        })
+        expect(event.reload.web_conference_id).to eq conference.id
+      end
+    end
   end
 
   context 'assignments' do
@@ -2297,6 +2352,38 @@ describe CalendarEventsApiController, type: :request do
         }
       )
       expect(json.map { |a| a.dig('assignment', 'id') }).to match_array [text_assignment.id, ungraded_assignment.id]
+    end
+
+    context "web_conferences" do
+      before(:once) do
+        Account.site_admin.enable_feature! :calendar_conferences
+        plugin = PluginSetting.create!(name: 'big_blue_button')
+        plugin.update_attribute(:settings, { key: 'value' })
+        3.times do |idx|
+          conference = WebConference.create(context: @course, user: @user, conference_type: 'BigBlueButton')
+          conference.add_initiator(@user)
+          @course.calendar_events.create(title: "event #{idx}", workflow_state: 'active',
+            web_conference: conference)
+        end
+      end
+
+      it "should not return web conferences by default" do
+        json = api_call(:get,
+          "/api/v1/users/#{@user.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}", {
+          controller: 'calendar_events_api', action: 'user_index', format: 'json',
+          context_codes: @contexts, all_events: true, user_id: @user.id
+        })
+        expect(json.any? {|e| e.key?('web_conference')}).to be false
+      end
+
+      it "should include web conferences when include specified" do
+        json = api_call(:get,
+          "/api/v1/users/#{@user.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}&include[]=web_conference", {
+          controller: 'calendar_events_api', action: 'user_index', format: 'json',
+          context_codes: @contexts, all_events: true, user_id: @user.id, include: ['web_conference']
+        })
+        expect(json.pluck('web_conference').compact.length).to be 3
+      end
     end
   end
 

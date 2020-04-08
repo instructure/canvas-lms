@@ -41,7 +41,7 @@ class CalendarEvent < ActiveRecord::Base
 
   PERMITTED_ATTRIBUTES = [:title, :description, :start_at, :end_at, :location_name,
     :location_address, :time_zone_edited, :cancel_reason, :participants_per_appointment,
-    :remove_child_events, :all_day, :comments].freeze
+    :remove_child_events, :all_day, :comments, :web_conference_id].freeze
   def self.permitted_attributes
     PERMITTED_ATTRIBUTES
   end
@@ -51,11 +51,14 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :user
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
   has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
+  belongs_to :web_conference
+
   validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comments, maximum: 255, allow_nil: true, allow_blank: true
+  validate :validate_conference_visibility
   before_save :default_values
   after_save :touch_context
   after_save :replace_child_events
@@ -166,7 +169,7 @@ class CalendarEvent < ActiveRecord::Base
 
   scope :not_hidden, -> do
     where("NOT EXISTS (
-      SELECT id 
+      SELECT id
       FROM #{CalendarEvent.quoted_table_name} sub_events
       WHERE sub_events.parent_calendar_event_id=calendar_events.id
         AND sub_events.workflow_state <> 'deleted'
@@ -730,6 +733,23 @@ class CalendarEvent < ActiveRecord::Base
       cal.add_event(event) if event
 
       return cal.to_ical
+    end
+  end
+
+  def validate_conference_visibility
+    return unless web_conference_id_changed?
+    unless user.blank? || web_conference.grants_right?(user, :read)
+      errors.add(:web_conference_id, 'cannot add web conference without read access for user')
+      return
+    end
+    conference_context = case context
+                         when Course, Group
+                           context
+                         when CourseSection
+                           context.course
+    end
+    if conference_context != web_conference.context
+      errors.add(:web_conference_id, 'cannot add web conference from different context')
     end
   end
 end

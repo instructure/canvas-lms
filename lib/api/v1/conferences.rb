@@ -28,16 +28,18 @@ module Api::V1::Conferences
   }.freeze
 
   def api_conferences_json(conferences, user, session)
-    json = conferences.map do |c|
-      api_json(c, user, session, API_CONFERENCE_JSON_OPTS).tap do |j|
-        j['lti_settings'] = c.lti_settings if Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
-        j['has_advanced_settings'] = value_to_boolean(j['has_advanced_settings'])
-        j['long_running'] = value_to_boolean(j['long_running'])
-        j['duration'] = j['duration'].to_i if j['duration']
-        j['users'] = Array(j.delete('user_ids'))
-      end
-    end
+    json = conferences.map {|c| api_conference_json(c, user, session)}
     {'conferences' => json}
+  end
+
+  def api_conference_json(conference, user, session)
+    api_json(conference, user, session, API_CONFERENCE_JSON_OPTS).tap do |j|
+      j['lti_settings'] = conference.lti_settings if Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
+      j['has_advanced_settings'] = value_to_boolean(j['has_advanced_settings'])
+      j['long_running'] = value_to_boolean(j['long_running'])
+      j['duration'] = j['duration'].to_i if j['duration']
+      j['users'] = Array(j.delete('user_ids'))
+    end
   end
 
   def ui_conferences_json(conferences, context, user, session)

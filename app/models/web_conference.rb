@@ -21,6 +21,7 @@ class WebConference < ActiveRecord::Base
   include TextHelper
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: [:course, :group, :account]
+  has_one :calendar_event, inverse_of: :web_conference
   has_many :web_conference_participants
   has_many :users, :through => :web_conference_participants
   has_many :invitees, -> { where(web_conference_participants: { participation_type: 'invitee' }) }, through: :web_conference_participants, source: :user

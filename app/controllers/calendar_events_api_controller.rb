@@ -272,6 +272,9 @@ class CalendarEventsApiController < ApplicationController
   before_action :require_authorization, :only => %w(index user_index)
 
   RECURRING_EVENT_LIMIT = 200
+
+  DEFAULT_INCLUDES = %w[child_events]
+
   # @API List calendar events
   #
   # Retrieve the paginated list of calendar events or assignments for the current user
@@ -363,7 +366,6 @@ class CalendarEventsApiController < ApplicationController
       if @type == :assignment
         events = apply_assignment_overrides(events, user)
         mark_submitted_assignments(user, events)
-        includes = Array(params[:include])
         if includes.include?("submission")
           submissions = Submission.active.where(assignment_id: events, user_id: user).
             group_by(&:assignment_id)
@@ -396,7 +398,7 @@ class CalendarEventsApiController < ApplicationController
         json = events.map do |event|
           subs = submissions[event.id] if submissions
           sub = subs.sort_by(&:submitted_at).last if subs
-          event_json(event, user, session, {excludes: params[:excludes], submission: sub})
+          event_json(event, user, session, {include: includes, excludes: params[:excludes], submission: sub})
         end
         render :json => json
       else
@@ -513,7 +515,7 @@ class CalendarEventsApiController < ApplicationController
   def show
     get_event(true)
     if authorized_action(@event, @current_user, :read)
-      render :json => event_json(@event, @current_user, session)
+      render :json => event_json(@event, @current_user, session, include: includes)
     end
   end
 
@@ -1196,7 +1198,9 @@ class CalendarEventsApiController < ApplicationController
       scope = scope.for_context_codes(@context_codes)
       scope = scope.send(*date_scope_and_args) unless @all_events
     end
-
+    if includes.include?('web_conference')
+      scope = scope.preload(:web_conference)
+    end
     scope
   end
 
@@ -1410,5 +1414,9 @@ class CalendarEventsApiController < ApplicationController
       end
     end
     true
+  end
+
+  def includes
+    (Array(params[:include]) + DEFAULT_INCLUDES).uniq
   end
 end
