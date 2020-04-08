@@ -291,7 +291,7 @@ module Api::V1::Submission
     if attachment
       stale = (attachment.locked != anonymous)
       stale ||= (attachment.created_at < Setting.get('submission_zip_ttl_minutes', '60').to_i.minutes.ago)
-      stale ||= (attachment.created_at < (updated_at || assignment.submissions.maximum(:submitted_at)))
+      stale ||= (attachment.created_at < (updated_at || assignment.submissions.maximum(:submitted_at) || attachment.created_at))
       stale ||= (@current_user &&
         (enrollment_updated_at = assignment.context.enrollments.for_user(@current_user).maximum(:updated_at)) &&
         (attachment.created_at < enrollment_updated_at))

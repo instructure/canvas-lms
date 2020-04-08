@@ -71,6 +71,14 @@ INST.downloadSubmissions = function(url, onClose) {
 
             location.href = url
             return
+          } else if (attachment.workflow_state === 'errored') {
+            // The only way the backend gets to an "errored" state is if there are no files to add
+            // to the zip in the first place...
+            $('#download_submissions_dialog .progress').progressbar('value', 100)
+            $('#download_submissions_dialog .status').text(
+              I18n.t('No submissions to zip. Please try again after student submissions.')
+            )
+            cancelled = true
           } else {
             let progress = parseInt(attachment.file_state, 10)
             if (isNaN(progress)) {
