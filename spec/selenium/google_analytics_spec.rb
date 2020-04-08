@@ -119,5 +119,19 @@ describe "google analytics" do
         masquerading: '1',
       )
     end
+
+    it "should identify the user" do
+      start_with { course_with_student_logged_in }
+
+      alternative_user_id = GoogleAnalyticsDimensions.calculate(
+        domain_root_account: Account.default,
+        real_user: nil,
+        user: @student
+      ).fetch(:user_id)
+
+      expect(ga_script).to include(
+        "ga('set', 'userId', #{alternative_user_id.to_json})"
+      )
+    end
   end
 end
