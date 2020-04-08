@@ -1061,16 +1061,9 @@ describe GradebooksController do
     end
 
     context 'includes data needed by the Gradebook Action menu in ENV' do
-      let(:create_proficiency) { false }
-      let(:enable_non_scoring_rubrics) { false }
-
       before do
         user_session(@teacher)
-        @proficiency = outcome_proficiency_model(@course.account) if create_proficiency
-        @course.root_account.enable_feature! :non_scoring_rubrics if enable_non_scoring_rubrics
-
         get 'show', params: {course_id: @course.id}
-
         @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
       end
 
@@ -1090,41 +1083,6 @@ describe GradebooksController do
 
       it "includes the context_modules_url in the ENV" do
         expect(@gradebook_env[:context_modules_url]).to eq(api_v1_course_context_modules_url(@course))
-      end
-
-      shared_examples_for 'returns no outcome proficiency' do
-        it 'returns nil for outcome proficiency' do
-          expect(@gradebook_env[:outcome_proficiency]).to be_nil
-        end
-      end
-
-      context 'non-scoring rubrics feature flag disabled' do
-        context 'no outcome proficiency on account' do
-          include_examples 'returns no outcome proficiency'
-        end
-
-        skip 'outcome proficiency on account' do
-          skip('NSRs are not being disabled properly even with the disable_feature! method')
-          let(:create_proficiency) { true }
-
-          include_examples 'returns no outcome proficiency'
-        end
-      end
-
-      context 'non-scoring rubrics feature flag enabled' do
-        let(:enable_non_scoring_rubrics) { true }
-
-        context 'no outcome proficiency on account' do
-          include_examples 'returns no outcome proficiency'
-        end
-
-        context 'outcome proficiency on account' do
-          let(:create_proficiency) { true }
-
-          it 'returns an outcome proficiency' do
-            expect(@gradebook_env[:outcome_proficiency]).to eq(@proficiency.as_json)
-          end
-        end
       end
     end
 
