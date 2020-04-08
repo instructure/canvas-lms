@@ -38,6 +38,7 @@ export function createGradebook(options = {}) {
     currentUserId: '1',
     custom_column_data_url: '/api/v1/courses/1201/custom_gradebook_columns/:id',
     custom_columns_url: '/api/v1/courses/1201/custom_gradebook_columns',
+    dataloader_improvements: true,
     default_grading_standard: [
       ['A', 0.9],
       ['B', 0.8],

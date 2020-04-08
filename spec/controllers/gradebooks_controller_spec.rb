@@ -755,6 +755,22 @@ describe GradebooksController do
         end
       end
 
+      describe "dataloader_improvements" do
+        # TODO: remove this entire block with TALLY-831
+
+        it "is true when 'gradebook_dataloader_improvements' is enabled" do
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:dataloader_improvements)).to be true
+        end
+
+        it "is false when 'gradebook_dataloader_improvements' is disabled" do
+          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_dataloader_improvements).and_return(false)
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:dataloader_improvements)).to be false
+        end
+      end
+
       describe "default_grading_standard" do
         it "uses the course's grading standard" do
           grading_standard = grading_standard_for(@course)

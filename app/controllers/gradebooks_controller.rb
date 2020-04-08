@@ -413,6 +413,8 @@ class GradebooksController < ApplicationController
       custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
       custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
       custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
+      # TODO: remove `dataloader_improvements` with TALLY-831
+      dataloader_improvements:  Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements),
       default_grading_standard: grading_standard.data,
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
       enrollments_url: custom_course_enrollments_api_url(per_page: per_page),
