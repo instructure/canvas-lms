@@ -2773,6 +2773,7 @@ hu:
   authentication_with_provider_was_successful_but_no_6a194137: "A %{provider} általi hitelesítés sikeres, de nem biztosított a Canvas bejelentkezés számára egyedi azonosítót"
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest elküldve az IdP-nek"
   authnresponse_from_idp_185037e9: "AuthnResponse az IdP-től"
+  author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} épp új megjegyzést fűzött %{user_name} beadott munkájához: %{assignment_title}. "
   author_s_name_b35e905a: "Szerző neve"
   authorize_e3f25bb4: Engedélyezés
   authorize_url_f28167a3: "URL engedélyezése"
@@ -10708,6 +10709,7 @@ hu:
   new_assignment_2a984756: "Új feladat"
   new_assignment_for_course_name_f71dd337: "Új feladat a következő kurzushoz:  %{course_name}"
   new_canvas_message_from_user_name_94cc720: "Új Canvas üzenet a következő felhasználótól: %{user_name}"
+  new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "Új hozzászólás tőle: %{author_name} ehhez: %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "Új hozzászólás: %{discussion_topic}%{user_name}ˇáltal"
   new_comment_for_discussion_topic_course_38febf3b: "Új megjegyzés itt: %{discussion_topic}, %{course}"
   new_comment_on_announcement_discussion_topic_cours_7905b782: "Új megjegyzés a hirdetményhez: %{discussion_topic}, %{course}"
@@ -10906,9 +10908,9 @@ hu:
     conversation_message_description: "Új bejövő üzenetek"
     conversation_message_display: "Üzenetváltási üzenet"
     course_content_description: |-
-        Kurzustartalommá változtatás:
+        Váltás a kurzus tartalomra:
         
-        * Wikioldal
+        * Oldal tartalom
         * Kvíz tartalom
         * Feladat tartalom
     course_content_display: Kurzustartalom
