@@ -244,5 +244,34 @@ describe "help dialog" do
       close = f('#___reactour .tour-close-button button')
       close.click
     end
+
+    it 'shows the welcome tour for Account Admins' do
+      Setting.set('show_feedback_link', 'true')
+
+      Account.default.account_users.create!(:user => @user)
+      get "/"
+      driver.local_storage.clear
+      wait_for_ajaximations
+      
+      # Reload so the local storage clearing take effect
+      get "/"
+      wait_for_ajaximations
+      wait_for(method: nil, timeout: 1) { f('#___reactour').displayed? }
+      # Welcome tour is already opened
+      expect(f('#___reactour')).to include_text(
+        "We know it's a priority to transition your institution for online learning during this time."
+      )
+
+      # Close the currently-open tutorial overlay
+      close = f('#___reactour .tour-close-button button')
+      close.click
+      wait_for_ajaximations
+
+      expect(f('#___reactour')).to include_text(
+        'You can access the Welcome Tour here any time as well as other new resources.'
+      )
+      close = f('#___reactour .tour-close-button button')
+      close.click
+    end
   end
 end
