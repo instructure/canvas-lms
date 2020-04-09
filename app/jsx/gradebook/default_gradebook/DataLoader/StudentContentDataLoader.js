@@ -23,6 +23,7 @@ import {showFlashAlert} from '../../../shared/FlashAlert'
 
 const submissionsParams = {
   exclude_response_fields: ['preview_url'],
+  grouped: 1,
   response_fields: [
     'assignment_id',
     'attachments',
@@ -76,12 +77,14 @@ function getStudentsChunk(studentIds, options, dispatch) {
   })
 }
 
-function getSubmissionsForStudents(studentIds, options, allEnqueued, dispatch) {
+function getSubmissionsForStudents(courseId, studentIds, allEnqueued, dispatch) {
   return new Promise((resolve, reject) => {
+    const url = `/api/v1/courses/${courseId}/students/submissions`
     const params = {student_ids: studentIds, ...submissionsParams}
+
     /* eslint-disable promise/catch-or-return */
     dispatch
-      .getDepaginated(options.submissionsUrl, params, undefined, allEnqueued)
+      .getDepaginated(url, params, undefined, allEnqueued)
       .then(resolve)
       .fail(() => {
         flashSubmissionLoadError()
@@ -92,6 +95,8 @@ function getSubmissionsForStudents(studentIds, options, allEnqueued, dispatch) {
 }
 
 function getContentForStudentIdChunk(studentIds, options, dispatch) {
+  const {gradebook} = options
+
   let resolveEnqueued
   const allEnqueued = new Promise(resolve => {
     resolveEnqueued = resolve
@@ -106,9 +111,10 @@ function getContentForStudentIdChunk(studentIds, options, dispatch) {
 
   submissionRequestChunks.forEach(submissionRequestChunkIds => {
     let submissions
+
     const submissionRequest = getSubmissionsForStudents(
+      options.courseId,
       submissionRequestChunkIds,
-      options,
       resolveEnqueued,
       dispatch
     )
@@ -119,9 +125,10 @@ function getContentForStudentIdChunk(studentIds, options, dispatch) {
       .then(() => {
         // if the student request fails, this callback will not be called
         // the failure will be caught and otherwise ignored
-        return options.onSubmissionsChunkLoaded(submissions)
+        gradebook.gotSubmissionsChunk(submissions)
       })
       .catch(ignoreFailure)
+
     submissionRequests.push(submissionRequest)
   })
 

@@ -57,8 +57,6 @@ export default class DataLoader {
       studentsPageCb: gradebook.gotChunkOfStudents,
       studentsParams: gradebook.studentsParams(),
 
-      submissionsURL: options.submissions_url,
-      submissionsChunkCb: gradebook.gotSubmissionsChunk,
       submissionsChunkSize: options.chunk_size,
 
       customColumnDataURL: options.custom_column_data_url,
@@ -186,8 +184,6 @@ export default class DataLoader {
       studentsPageCb: gradebook.gotChunkOfStudents,
       studentsParams: gradebook.studentsParams(),
 
-      submissionsURL: options.submissions_url,
-      submissionsChunkCb: gradebook.gotSubmissionsChunk,
       submissionsChunkSize: options.chunk_size,
 
       customColumnIds: gradebook.gradebookContent.customColumns.map(column => column.id),

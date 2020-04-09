@@ -43,7 +43,7 @@ describe('Gradebook StudentContentDataLoader', () => {
 
   const urls = {
     students: '/students',
-    submissions: '/submissions'
+    submissions: '/api/v1/courses/1201/students/submissions'
   }
 
   let dataLoader
@@ -86,7 +86,9 @@ describe('Gradebook StudentContentDataLoader', () => {
     gradebook = {
       course: {
         id: '1201'
-      }
+      },
+
+      gotSubmissionsChunk: sinon.spy()
     }
 
     gradebook.finalGradeOverrides = new FinalGradeOverrides(gradebook)
@@ -98,12 +100,10 @@ describe('Gradebook StudentContentDataLoader', () => {
       courseId: '1201',
       gradebook,
       onStudentsChunkLoaded() {},
-      onSubmissionsChunkLoaded() {},
       studentsChunkSize: 2,
       studentsParams: {enrollment_state: ['active']},
       studentsUrl: urls.students,
-      submissionsChunkSize: 2,
-      submissionsUrl: urls.submissions
+      submissionsChunkSize: 2
     }
 
     dispatch = new NaiveRequestDispatch()
@@ -225,14 +225,14 @@ describe('Gradebook StudentContentDataLoader', () => {
 
       it('calls the submissions chunk callback for each chunk of submissions', async () => {
         const submissionChunks = []
-        options.onSubmissionsChunkLoaded = submissionChunks.push.bind(submissionChunks)
+        gradebook.gotSubmissionsChunk = submissionChunks.push.bind(submissionChunks)
         await load()
         expect(submissionChunks).toHaveLength(2)
       })
 
       it('includes loaded submissions with each callback', async () => {
         const submissionChunks = []
-        options.onSubmissionsChunkLoaded = submissionChunks.push.bind(submissionChunks)
+        gradebook.gotSubmissionsChunk = submissionChunks.push.bind(submissionChunks)
         await load()
         expect(submissionChunks).toEqual([
           exampleData.submissions.slice(0, 1),
@@ -242,7 +242,7 @@ describe('Gradebook StudentContentDataLoader', () => {
 
       it('does not call submissions chunk callback until related student callback is called', async () => {
         const submissionChunks = []
-        options.onSubmissionsChunkLoaded = submissionChunks.push.bind(submissionChunks)
+        gradebook.gotSubmissionsChunk = submissionChunks.push.bind(submissionChunks)
         await load()
         const requests = server.filterRequests(urls.submissions)
         expect(requests).toHaveLength(2)
@@ -314,7 +314,7 @@ describe('Gradebook StudentContentDataLoader', () => {
         events = []
 
         options.onStudentsChunkLoaded = eventLogger('onStudentsChunkLoaded')
-        options.onSubmissionsChunkLoaded = eventLogger('onSubmissionsChunkLoaded')
+        gradebook.gotSubmissionsChunk = eventLogger('gotSubmissionsChunk')
 
         server.unsetResponses(urls.students)
         server.unsetResponses(urls.submissions)
@@ -367,14 +367,14 @@ describe('Gradebook StudentContentDataLoader', () => {
       it('calls student callback before submission callback on first load', async () => {
         await load()
         const studentChunkIndex = events.indexOf('onStudentsChunkLoaded:1101,1102')
-        const submissionChunkIndex = events.indexOf('onSubmissionsChunkLoaded:2501')
+        const submissionChunkIndex = events.indexOf('gotSubmissionsChunk:2501')
         expect(studentChunkIndex).toBeLessThan(submissionChunkIndex)
       })
 
       it('calls student callback before submission callback on subsequent loads', async () => {
         await load()
         const studentChunkIndex = events.indexOf('onStudentsChunkLoaded:1103')
-        const submissionChunkIndex = events.indexOf('onSubmissionsChunkLoaded:2502,2503')
+        const submissionChunkIndex = events.indexOf('gotSubmissionsChunk:2502,2503')
         expect(studentChunkIndex).toBeLessThan(submissionChunkIndex)
       })
     })
@@ -405,7 +405,7 @@ describe('Gradebook StudentContentDataLoader', () => {
         events = []
 
         options.onStudentsChunkLoaded = eventLogger('onStudentsChunkLoaded')
-        options.onSubmissionsChunkLoaded = eventLogger('onSubmissionsChunkLoaded')
+        gradebook.gotSubmissionsChunk = eventLogger('gotSubmissionsChunk')
 
         server.unsetResponses(urls.students)
         server.unsetResponses(urls.submissions)
@@ -492,9 +492,9 @@ describe('Gradebook StudentContentDataLoader', () => {
         expect(loadedStudents).toEqual(exampleData.students.slice(2, 3))
       })
 
-      it('does not call onSubmissionsChunkLoaded for related submissions', async () => {
+      it('does not call gotSubmissionsChunk for related submissions', async () => {
         const loadedSubmissions = []
-        options.onSubmissionsChunkLoaded = submissions => {
+        gradebook.gotSubmissionsChunk = submissions => {
           loadedSubmissions.push(...submissions)
         }
         await load()
@@ -548,9 +548,9 @@ describe('Gradebook StudentContentDataLoader', () => {
         expect(loadedStudents).toEqual(exampleData.students)
       })
 
-      it('does not call onSubmissionsChunkLoaded for the failed submissions', async () => {
+      it('does not call gotSubmissionsChunk for the failed submissions', async () => {
         const loadedSubmissions = []
-        options.onSubmissionsChunkLoaded = submissions => {
+        gradebook.gotSubmissionsChunk = submissions => {
           loadedSubmissions.push(...submissions)
         }
         await load()
@@ -605,9 +605,9 @@ describe('Gradebook StudentContentDataLoader', () => {
         expect(loadedStudents).toEqual(exampleData.students)
       })
 
-      it('does not call onSubmissionsChunkLoaded for the failed submissions', async () => {
+      it('does not call gotSubmissionsChunk for the failed submissions', async () => {
         const loadedSubmissions = []
-        options.onSubmissionsChunkLoaded = submissions => {
+        gradebook.gotSubmissionsChunk = submissions => {
           loadedSubmissions.push(...submissions)
         }
         await load()
