@@ -53,10 +53,6 @@ export default class DataLoader {
       contextModulesURL: options.context_modules_url,
       customColumnsURL: options.custom_columns_url,
 
-      studentsURL: options.students_stateless_url,
-      studentsPageCb: gradebook.gotChunkOfStudents,
-      studentsParams: gradebook.studentsParams(),
-
       submissionsChunkSize: options.chunk_size,
 
       customColumnDataURL: options.custom_column_data_url,
@@ -180,9 +176,6 @@ export default class DataLoader {
         loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null,
 
       loadedStudentIds: gradebook.courseContent.students.listStudentIds(),
-      studentsURL: options.students_stateless_url,
-      studentsPageCb: gradebook.gotChunkOfStudents,
-      studentsParams: gradebook.studentsParams(),
 
       submissionsChunkSize: options.chunk_size,
 

@@ -2051,6 +2051,7 @@ export default do ->
       return false if @gradingPeriodSet.displayTotalsForAllGradingPeriods
       not @isFilteringColumnsByGradingPeriod()
 
+    # TODO: remove this method with TALLY-831
     studentsParams: ->
       enrollmentStates = ['invited', 'active']
 

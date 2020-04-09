@@ -462,6 +462,7 @@ class GradebooksController < ApplicationController
       sis_name: @context.root_account.settings[:sis_name],
       speed_grader_enabled: @context.allows_speed_grader?,
       student_groups: group_categories_json(@context.group_categories.active, @current_user, session, {include: ['groups']}),
+      # TODO: remove `students_stateless_url` with TALLY-831
       students_stateless_url: custom_course_users_api_url(exclude_states: true, per_page: per_page),
       # TODO: remove `submissions_url` with TALLY-831
       submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),

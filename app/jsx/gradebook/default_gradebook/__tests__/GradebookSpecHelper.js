@@ -86,7 +86,8 @@ export function createGradebook(options = {}) {
     settings_update_url: '/path/to/settingsUpdateUrl',
     speed_grader_enabled: true,
     student_groups: [],
-    students_stateless_url: '/courses/1201/users',
+    // TODO: remove `students_stateless_url` with TALLY-831
+    students_stateless_url: '/api/v1/courses/1201/users',
     // TODO: remove `submissions_url` with TALLY-831
     submissions_url: '/api/v1/courses/1201/students/submissions',
     ...options

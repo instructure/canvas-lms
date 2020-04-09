@@ -116,10 +116,7 @@ function loadGradebookData(opts) {
       courseId: opts.courseId,
       gradebook: opts.gradebook,
       loadedStudentIds: opts.loadedStudentIds,
-      onStudentsChunkLoaded: opts.studentsPageCb,
       studentsChunkSize: opts.perPage,
-      studentsParams: opts.studentsParams,
-      studentsUrl: opts.studentsURL,
       submissionsChunkSize: opts.submissionsChunkSize
     },
     dispatch

@@ -66,14 +66,18 @@ function flashSubmissionLoadError() {
 
 function ignoreFailure() {}
 
-function getStudentsChunk(studentIds, options, dispatch) {
+function getStudentsChunk(courseId, studentIds, options, dispatch) {
+  const url = `/api/v1/courses/${courseId}/users`
   const params = {
-    ...options.studentsParams,
+    enrollment_state: ['active', 'completed', 'inactive', 'invited'],
+    enrollment_type: ['student', 'student_view'],
+    include: ['avatar_url', 'enrollments', 'group_ids'],
     per_page: options.studentsChunkSize,
     user_ids: studentIds
   }
+
   return new Promise((resolve, reject) => {
-    dispatch.getJSON(options.studentsUrl, params, resolve, reject)
+    dispatch.getJSON(url, params, resolve, reject)
   })
 }
 
@@ -102,8 +106,8 @@ function getContentForStudentIdChunk(studentIds, options, dispatch) {
     resolveEnqueued = resolve
   })
 
-  const studentRequest = getStudentsChunk(studentIds, options, dispatch).then(
-    options.onStudentsChunkLoaded
+  const studentRequest = getStudentsChunk(options.courseId, studentIds, options, dispatch).then(
+    gradebook.gotChunkOfStudents
   )
 
   const submissionRequestChunks = _.chunk(studentIds, options.submissionsChunkSize)

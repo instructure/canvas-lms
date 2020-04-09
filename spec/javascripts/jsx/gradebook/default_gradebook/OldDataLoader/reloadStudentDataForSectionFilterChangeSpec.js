@@ -29,7 +29,7 @@ import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGra
 QUnit.module('Gradebook > OldDataLoader', suiteHooks => {
   const urls = {
     customColumnData: columnId => `/api/v1/courses/1201/custom_gradebook_columns/${columnId}`,
-    students: '/courses/1201/users',
+    students: '/api/v1/courses/1201/users',
     submissions: '/api/v1/courses/1201/students/submissions',
     userIds: '/courses/1201/gradebook/user_ids'
   }
