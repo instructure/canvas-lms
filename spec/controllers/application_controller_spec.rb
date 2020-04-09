@@ -232,6 +232,22 @@ RSpec.describe ApplicationController do
       end
     end
 
+    context "files_dnd" do
+      before(:each) do
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+      end
+
+      it 'is false if the feature flag is off' do
+        Account.default.disable_feature!(:files_dnd)
+        expect(controller.js_env[:FEATURES][:files_dnd]).to be_falsey
+      end
+
+      it 'is true if the feature flag is on' do
+        Account.default.enable_feature!(:files_dnd)
+        expect(controller.js_env[:FEATURES][:files_dnd]).to be_truthy
+      end
+    end
+
     it 'sets LTI_LAUNCH_FRAME_ALLOWANCES' do
       expect(@controller.js_env[:LTI_LAUNCH_FRAME_ALLOWANCES]).to match_array [
         "geolocation *",

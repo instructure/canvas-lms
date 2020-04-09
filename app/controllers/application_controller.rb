@@ -180,7 +180,8 @@ class ApplicationController < ActionController::Base
             responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03),
             responsive_2020_04: !!@domain_root_account&.feature_enabled?(:responsive_2020_04),
             product_tours: !!@domain_root_account&.feature_enabled?(:product_tours),
-            module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd)
+            module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd),
+            files_dnd: !!@domain_root_account&.feature_enabled?(:files_dnd)
           },
           KILL_JOY: Setting.get('kill_joy', false)
         }
