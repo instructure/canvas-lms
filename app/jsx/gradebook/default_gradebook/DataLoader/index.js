@@ -41,14 +41,9 @@ export default class DataLoader {
       courseId: options.context_id,
       perPage: options.api_max_per_page,
 
+      getAssignmentGroups: true,
       getGradingPeriodAssignments: gradebook.gradingPeriodSet != null,
       loadedStudentIds: [],
-
-      assignmentGroupsURL: options.assignment_groups_url,
-      assignmentGroupsParams: {
-        exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
-        include: ['assignment_group_id', 'grades_published', 'module_ids', 'post_manually']
-      },
 
       contextModulesURL: options.context_modules_url,
       customColumnsURL: options.custom_columns_url,

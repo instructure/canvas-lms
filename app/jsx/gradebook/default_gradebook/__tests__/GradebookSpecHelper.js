@@ -21,7 +21,8 @@ import Gradebook from 'compiled/gradebook/Gradebook'
 export function createGradebook(options = {}) {
   const gradebook = new Gradebook({
     api_max_per_page: 50,
-    assignment_groups_url: '/api/v1/assignment_groups',
+    // TODO: remove `assignment_groups_url` with TALLY-831
+    assignment_groups_url: '/api/v1/courses/1201/assignment_groups',
     chunk_size: 50,
     closed_grading_period_ids: [],
     colors: {},

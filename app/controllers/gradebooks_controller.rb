@@ -368,7 +368,6 @@ class GradebooksController < ApplicationController
     gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
-    ag_includes = [:assignments, :assignment_visibility, :grades_published]
 
     last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
     last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
@@ -382,9 +381,10 @@ class GradebooksController < ApplicationController
       additional_sort_options_enabled: @context.feature_enabled?(:new_gradebook_sort_options),
       api_max_per_page: per_page,
 
+      # TODO: remove `assignment_groups_url` with TALLY-831
       assignment_groups_url: api_v1_course_assignment_groups_url(
         @context,
-        include: ag_includes,
+        include: %w[assignments assignment_visibility grades_published],
         override_assignment_dates: "false",
         exclude_assignment_submission_types: ['wiki_page']
       ),

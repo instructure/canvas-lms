@@ -45,7 +45,22 @@ function getGradingPeriodAssignments(courseId) {
   return $.ajaxJSON(url, 'GET', {})
 }
 
-function getAssignmentGroups(url, params, dispatch) {
+function getAssignmentGroups(options, dispatch) {
+  const url = `/api/v1/courses/${options.courseId}/assignment_groups`
+  const params = {
+    exclude_assignment_submission_types: ['wiki_page'],
+    exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
+    include: [
+      'assignment_group_id',
+      'assignment_visibility',
+      'assignments',
+      'grades_published',
+      'module_ids',
+      'post_manually'
+    ],
+    override_assignment_dates: false
+  }
+
   return dispatch.getDepaginated(url, params)
 }
 
@@ -97,11 +112,7 @@ function getCustomColumnData(options, customColumnsDfd, waitForDfds, dispatch) {
 function loadGradebookData(opts) {
   const {dispatch} = opts
 
-  const gotAssignmentGroups = getAssignmentGroups(
-    opts.assignmentGroupsURL,
-    opts.assignmentGroupsParams,
-    dispatch
-  )
+  const gotAssignmentGroups = opts.getAssignmentGroups ? getAssignmentGroups(opts, dispatch) : null
 
   // Begin loading Students before any other data.
   const gotStudentIds = getStudentIds(opts.courseId)
