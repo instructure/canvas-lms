@@ -102,9 +102,6 @@ function loadGradebookData(opts) {
     opts.assignmentGroupsParams,
     dispatch
   )
-  if (opts.onlyLoadAssignmentGroups) {
-    return {gotAssignmentGroups}
-  }
 
   // Begin loading Students before any other data.
   const gotStudentIds = getStudentIds(opts.courseId)

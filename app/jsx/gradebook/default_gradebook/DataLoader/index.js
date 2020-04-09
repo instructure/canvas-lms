@@ -133,24 +133,15 @@ export default class DataLoader {
     const gradebook = this._gradebook
     const {options} = gradebook
 
-    const assignmentGroupsURL = options.assignment_groups_url.replace(
-      '&include%5B%5D=assignment_visibility',
-      ''
-    )
+    const url = `/api/v1/courses/${options.context_id}/assignment_groups`
+    const params = {
+      exclude_assignment_submission_types: ['wiki_page'],
+      exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
+      include: ['assignments', 'grades_published', 'overrides'],
+      override_assignment_dates: false
+    }
 
-    const promises = OldDataLoader.loadGradebookData({
-      dispatch: this.dispatch,
-      assignmentGroupsURL,
-
-      assignmentGroupsParams: {
-        exclude_response_fields: ['description', 'needs_grading_count', 'in_closed_grading_period'],
-        include: ['overrides']
-      },
-
-      onlyLoadAssignmentGroups: true
-    })
-
-    $.when(promises.gotAssignmentGroups).then(gradebook.addOverridesToPostGradesStore)
+    this.dispatch.getDepaginated(url, params).then(gradebook.addOverridesToPostGradesStore)
   }
 
   reloadStudentDataForEnrollmentFilterChange() {
