@@ -100,6 +100,8 @@ export default function CanvasDateInput({
   }
 
   function renderDays() {
+    // This is expensive, so only do it if the calendar is open
+    if (!isShowingCalendar) return null
     const days = generateMonthMoments().map(dayMoment => (
       <DateInput.Day
         key={dayMoment.toISOString()}
