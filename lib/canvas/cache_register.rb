@@ -47,8 +47,7 @@ module Canvas
     end
 
     def self.enabled?
-      # add a switch just in case things aren't getting cleared quite the way they should
-       !::Rails.cache.is_a?(::ActiveSupport::Cache::NullStore) && Canvas.redis_enabled? && Setting.get("revert_cache_register", "false") != "true"
+       !::Rails.cache.is_a?(::ActiveSupport::Cache::NullStore) && Canvas.redis_enabled?
     end
 
     module ActiveRecord
