@@ -151,6 +151,7 @@ class ApplicationController < ActionController::Base
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
           current_user_id: @current_user.try(:id),
           current_user_roles: @current_user.try(:roles, @domain_root_account),
+          current_user_types: @current_user.try{|u| u.account_users.map{|t| t.readable_type }},
           current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
