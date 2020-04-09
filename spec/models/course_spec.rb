@@ -5233,9 +5233,10 @@ describe Course do
 
   describe 'grade weight notification' do
     before :once do
-      course_with_student(:active_all => true, :active_cc => true)
+      course_with_student(:active_all => true)
+      @student.communication_channels.create!(:path => 'test@example.com').confirm!
       n = Notification.create!(name: 'Grade Weight Changed', category: 'TestImmediately')
-      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+      NotificationPolicy.create!(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
     end
 
     it "sends a notification when the course scheme changes" do
