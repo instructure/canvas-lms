@@ -264,7 +264,7 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 10000)
+    }, 30000) // if this reaches 30 seconds we really need to have a better plan
 
     it('renders a spinner and disables the Save button while saving', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
