@@ -17,7 +17,8 @@
 
 require 'ddtrace'
 require 'digest/sha1'
-require 'canvas/dynamic_settings'
+
+require_dependency 'canvas/dynamic_settings'
 
 module Canvas
   # This module is currently a wrapper for managing connecting with ddtrace
