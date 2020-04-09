@@ -75,6 +75,7 @@ class Attachment < ActiveRecord::Base
   has_one :thumbnail, -> { where(thumbnail: 'thumb') }, foreign_key: "parent_id"
   has_many :thumbnails, :foreign_key => "parent_id"
   has_many :children, foreign_key: :root_attachment_id, class_name: 'Attachment'
+  has_many :attachment_upload_statuses
   has_one :crocodoc_document
   has_one :canvadoc
   belongs_to :usage_rights
