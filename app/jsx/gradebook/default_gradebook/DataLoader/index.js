@@ -42,10 +42,10 @@ export default class DataLoader {
       perPage: options.api_max_per_page,
 
       getAssignmentGroups: true,
+      getContextModules: true,
       getGradingPeriodAssignments: gradebook.gradingPeriodSet != null,
       loadedStudentIds: [],
 
-      contextModulesURL: options.context_modules_url,
       customColumnsURL: options.custom_columns_url,
 
       submissionsChunkSize: options.chunk_size,

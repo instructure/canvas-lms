@@ -28,7 +28,8 @@ export function createGradebook(options = {}) {
     colors: {},
     context_allows_gradebook_uploads: true,
     context_id: '1',
-    context_modules_url: '/api/v1/courses/1201/context_modules',
+    // TODO: remove `context_modules_url` with TALLY-831
+    context_modules_url: '/api/v1/courses/1201/modules',
     context_url: '/courses/1/',
 
     course_settings: {

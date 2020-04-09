@@ -397,6 +397,7 @@ class GradebooksController < ApplicationController
       context_allows_gradebook_uploads: @context.allows_gradebook_uploads?,
       context_code: @context.asset_string,
       context_id: @context.id.to_s,
+      # TODO: remove `context_modules_url` with TALLY-831
       context_modules_url: api_v1_course_context_modules_url(@context),
       context_sis_id: @context.sis_source_id,
       context_url: named_context_url(@context, :context_url),

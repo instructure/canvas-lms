@@ -64,7 +64,8 @@ function getAssignmentGroups(options, dispatch) {
   return dispatch.getDepaginated(url, params)
 }
 
-function getContextModules(url, dispatch) {
+function getContextModules(courseId, dispatch) {
+  const url = `/api/v1/courses/${courseId}/modules`
   return dispatch.getDepaginated(url)
 }
 
@@ -133,7 +134,9 @@ function loadGradebookData(opts) {
     dispatch
   )
 
-  const gotContextModules = getContextModules(opts.contextModulesURL, dispatch)
+  const gotContextModules = opts.getContextModules
+    ? getContextModules(opts.courseId, dispatch)
+    : null
 
   const gotStudents = $.Deferred()
   const gotSubmissions = $.Deferred()
