@@ -18,11 +18,15 @@
 
 import $ from 'jquery'
 
+import NaiveRequestDispatch from '../../../shared/network/NaiveRequestDispatch'
 import OldDataLoader from './OldDataLoader'
 
 export default class DataLoader {
-  constructor(gradebook) {
+  constructor({gradebook}) {
     this._gradebook = gradebook
+    this.dispatch = new NaiveRequestDispatch({
+      activeRequestLimit: gradebook.options.activeRequestLimit
+    })
   }
 
   loadInitialData() {
@@ -31,6 +35,7 @@ export default class DataLoader {
 
     const promises = OldDataLoader.loadGradebookData({
       gradebook,
+      dispatch: this.dispatch,
 
       activeRequestLimit: options.performanceControls?.active_request_limit,
       courseId: options.context_id,
@@ -119,7 +124,8 @@ export default class DataLoader {
       customColumnId,
       options.custom_column_data_url,
       {},
-      gradebook.gotCustomColumnDataChunk
+      gradebook.gotCustomColumnDataChunk,
+      this.dispatch
     )
   }
 
@@ -133,6 +139,7 @@ export default class DataLoader {
     )
 
     const promises = OldDataLoader.loadGradebookData({
+      dispatch: this.dispatch,
       assignmentGroupsURL,
 
       assignmentGroupsParams: {
@@ -175,6 +182,7 @@ export default class DataLoader {
 
     const promises = OldDataLoader.loadGradebookData({
       gradebook,
+      dispatch: this.dispatch,
 
       courseId: options.context_id,
       perPage: options.api_max_per_page,

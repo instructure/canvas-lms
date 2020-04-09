@@ -20,7 +20,6 @@ import $ from 'jquery'
 
 import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
 
-import NaiveRequestDispatch from '../../../shared/network/NaiveRequestDispatch'
 import StudentContentDataLoader from './StudentContentDataLoader'
 
 function getStudentIds(courseId) {
@@ -61,7 +60,7 @@ function getCustomColumns(url, dispatch) {
 // This function is called from showNoteColumn in Gradebook.coffee
 // when the notes column is revealed. In that case dispatch won't
 // exist so we'll create a new Dispatcher for this request.
-function getDataForColumn(columnId, url, params, cb, dispatch = new NaiveRequestDispatch()) {
+function getDataForColumn(columnId, url, params, cb, dispatch) {
   const columnUrl = url.replace(/:id/, columnId)
   const augmentedCallback = data => cb(columnId, data)
   return dispatch.getDepaginated(columnUrl, params, augmentedCallback)
@@ -96,9 +95,7 @@ function getCustomColumnData(options, customColumnsDfd, waitForDfds, dispatch) {
 }
 
 function loadGradebookData(opts) {
-  const dispatch = new NaiveRequestDispatch({
-    activeRequestLimit: opts.activeRequestLimit
-  })
+  const {dispatch} = opts
 
   const gotAssignmentGroups = getAssignmentGroups(
     opts.assignmentGroupsURL,

@@ -280,7 +280,9 @@ export default do ->
       })
 
       if @options.dataloader_improvements
-        @dataLoader = new DataLoader(@)
+        @dataLoader = new DataLoader({
+          gradebook: @
+        })
       else
         @dataLoader = new OldDataLoader(@)
 
