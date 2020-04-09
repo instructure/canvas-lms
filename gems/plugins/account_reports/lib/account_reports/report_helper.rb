@@ -357,7 +357,7 @@ module AccountReports::ReportHelper
   end
 
   def activate_report_db(&block)
-    if !!Shard.current.database_server.config[:report]
+    if !!Shard.current.database_server.config[:report] && Setting.get('use_report_dbs_for_reports', 'true') == 'true'
       Shackles.activate(:report, &block)
     else
       Shackles.activate(:slave, &block)
