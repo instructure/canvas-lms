@@ -94,6 +94,7 @@ function renderBulkEdit(overrides = {}) {
   const props = {
     courseId: '42',
     onCancel: jest.fn(),
+    onSave: jest.fn(),
     ...overrides
   }
   const result = {...render(<BulkEdit {...props} />), ...props}
@@ -142,6 +143,13 @@ describe('Assignment Bulk Edit Dates', () => {
     fireEvent.click(getByText('Cancel'))
     expect(onCancel).toHaveBeenCalled()
   })
+
+  it('invokes onSave when the save button is clicked', async () => {
+    const {getByText, getAllByLabelText, onSave} = await renderBulkEditAndWait()
+    fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: '2020-04-01'}})
+    fireEvent.click(getByText('Save'))
+    expect(onSave).toHaveBeenCalled()
+  }, 10000)
 
   it('disables save when nothing has been edited', async () => {
     const {getByText} = await renderBulkEditAndWait()

@@ -35,10 +35,15 @@ import {originalDateField} from './utils'
 
 BulkEdit.propTypes = {
   courseId: string.isRequired,
-  onCancel: func.isRequired
+  onCancel: func.isRequired,
+  onSave: func // for now, this is just informational that save has been clicked
 }
 
-export default function BulkEdit({courseId, onCancel}) {
+BulkEdit.defaultProps = {
+  onSave: () => {}
+}
+
+export default function BulkEdit({courseId, onCancel, onSave}) {
   const [assignments, setAssignments] = useState([])
   const [loadingError, setLoadingError] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -85,6 +90,7 @@ export default function BulkEdit({courseId, onCancel}) {
   }, [jobSuccess])
 
   function handleSave() {
+    onSave()
     saveAssignments(assignments)
   }
 
