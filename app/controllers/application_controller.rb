@@ -1988,6 +1988,7 @@ class ApplicationController < ActionController::Base
     else
       return false unless authorized_action(@context, @current_user, :manage_account_settings)
     end
+    true
   end
 
   def require_root_account_management

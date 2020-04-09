@@ -278,6 +278,12 @@ describe "AuthenticationProviders API", type: :request do
       course_with_student(:course => @course)
       call_show(0, 401)
     end
+
+    it "should allow seeing the canvas auth type for any authenticated user" do
+      @account.authentication_providers.create!(auth_type: 'canvas')
+      course_with_student(:course => @course)
+      call_show('canvas')
+    end
   end
 
   context "/update" do
