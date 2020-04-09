@@ -15,29 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CreateQuizSubmissionEvents < ActiveRecord::Migration[4.2]
+class EnsureBuiltInRoles < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up
-    create_table :quiz_submission_events do |t|
-      t.integer :attempt
-      t.string :event_type
-      t.integer :quiz_submission_id, limit: 8, null: false
-      t.text :answers
-      t.datetime :created_at
-    end
-
-    # for sorting:
-    add_index :quiz_submission_events, :created_at
-
-    # for locating predecessor events:
-    add_index :quiz_submission_events, [ :quiz_submission_id, :attempt, :created_at ],
-      name: 'event_predecessor_locator_index'
-
-    add_foreign_key :quiz_submission_events, :quiz_submissions
+    Role.ensure_built_in_roles!
   end
 
   def down
-    drop_table :quiz_submission_events
+    Role.where(:workflow_state => "built_in").delete_all
   end
 end
