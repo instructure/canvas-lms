@@ -11,7 +11,7 @@ product_tours:
 module_dnd:
   state: hidden
   applies_to: RootAccount
-  display_name: "Module Content Import Enhancements"
+  display_name: "Module File Upload Enhancements"
   description: "Drag and Drop files on modules and multi-file module item uploads"
 responsive_admin_settings:
   state: hidden

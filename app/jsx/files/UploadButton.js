@@ -42,6 +42,7 @@ const UploadButton = function(props) {
   return (
     <>
       <UploadForm
+        allowSkip={window?.ENV?.FEATURES?.files_dnd}
         ref={formRef}
         currentFolder={props.currentFolder}
         contextId={props.contextId}

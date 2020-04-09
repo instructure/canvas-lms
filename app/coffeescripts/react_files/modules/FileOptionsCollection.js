@@ -60,11 +60,7 @@ class FileOptionsCollection {
   }
 
   findMatchingFile(name) {
-    if (this.folder.files.models) {
-      return _.find(this.folder.files.models, f => f.get('display_name') === name)
-    } else {
-      return _.find(this.folder.files, f => f.get('display_name') === name)
-    }
+    return (this.folder.files.models || this.folder.files).find(f => f.get('display_name') === name)
   }
 
   isZipFile(file) {

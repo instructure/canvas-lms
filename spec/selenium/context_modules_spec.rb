@@ -298,6 +298,83 @@ describe "context modules" do
       course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
+    describe "module drag and drop" do
+      before(:once) do
+        @course.root_account.enable_feature!(:module_dnd)
+        @course.context_modules.create!(:name => "files module")
+      end
+
+      it 'should upload file via module drag and drop ' do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+
+        # empty module should have a DnD area
+        expect(f('.module_dnd input[type="file"]')).to be_displayed
+        filename1, fullpath1, _data = get_file("testfile1.txt")
+
+        f('.module_dnd input[type="file"]').send_keys(fullpath1)
+        wait_for_ajaximations
+
+        expect(fj(".context_module_item:contains(#{filename1.inspect})")).to be_displayed
+
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+
+        # non-empty module should not have a DnD area
+        expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
+      end
+
+      it 'creating a new module should display a drag and drop area' do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+
+        f('button.add_module_link').click
+        wait_for_ajaximations
+
+        replace_content(f('#context_module_name'), "New Module")
+        f('#add_context_module_form button.submit_button').click
+        wait_for_ajaximations
+
+        expect(ff('.module_dnd input[type="file"]')).to have_size(2)
+      end
+
+      describe 'with duplicate modules enabled' do
+        before(:once) do
+          @course.root_account.enable_feature!(:duplicate_modules)
+        end
+
+        it 'duplicate of an empty module should display a drag and drop area' do
+          get "/courses/#{@course.id}/modules"
+          wait_for_ajaximations
+
+          f('button.al-trigger').click
+          wait_for_ajaximations
+
+          f('a.duplicate_module_link').click
+          wait_for_ajaximations
+
+          expect(ff('.module_dnd input[type="file"]')).to have_size(2)
+        end
+
+        it 'duplicate of a non-empty module should not display a drag and drop area' do
+          pub_assignment = Assignment.create!(context: @course, title: 'Published Assignment')
+          @course.context_modules.first.add_item(type: 'assignment', id: pub_assignment.id)
+
+          get "/courses/#{@course.id}/modules"
+          wait_for_ajaximations
+
+          f('button.al-trigger').click
+          wait_for_ajaximations
+
+          f('a.duplicate_module_link').click
+          wait_for_ajaximations
+
+          # non-empty module should not have a DnD area
+          expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
+        end
+      end
+    end
+
     it "should add a file item to a module", priority: "1", test_id: 126728 do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#attachments_select', 'File', FILE_NAME)

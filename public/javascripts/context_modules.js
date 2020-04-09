@@ -27,6 +27,7 @@ import PublishableModuleItem from 'compiled/models/PublishableModuleItem'
 import PublishIconView from 'compiled/views/PublishIconView'
 import LockIconView from 'compiled/views/LockIconView'
 import MasterCourseModuleLock from 'jsx/blueprint_courses/apps/MasterCourseModuleLock'
+import ModuleFileDrop from 'jsx/context_modules/ModuleFileDrop'
 import INST from './INST'
 import I18n from 'i18n!context_modulespublic'
 import $ from 'jquery'
@@ -1153,6 +1154,18 @@ modules.initModuleManagement = function() {
       }
       relock_modules_dialog.renderIfNeeded(data.context_module)
       $module.triggerHandler('update', data)
+      const module_dnd = $module.find('.module_dnd')[0]
+      if (module_dnd) {
+        const contextModules = document.getElementById('context_modules')
+        ReactDOM.render(
+          <ModuleFileDrop
+            courseId={ENV.course_id}
+            moduleId={data.context_module.id}
+            contextModules={contextModules}
+          />,
+          module_dnd
+        )
+      }
     },
     error(data, $module) {
       $module.loadingImage('remove')
@@ -1382,15 +1395,28 @@ modules.initModuleManagement = function() {
           const $newModule = $newContent.find(`#context_module_${newModuleId}`)
           $tempElement.remove()
           $newModule.insertAfter(duplicatedModuleElement)
+          const module_dnd = $newModule.find('.module_dnd')[0]
+          if (module_dnd) {
+            const contextModules = document.getElementById('context_modules')
+            ReactDOM.render(
+              <ModuleFileDrop
+                courseId={ENV.course_id}
+                moduleId={newModuleId}
+                contextModules={contextModules}
+              />,
+              module_dnd
+            )
+          }
           $newModule.find('.collapse_module_link').focus()
           modules.updateAssignmentData()
-          // Without these 'die' commands, the event handler happens twice after
+          // Without these 'die'/'off' commands, the event handler happens twice after
           // initModuleManagement is called.
           $('.delete_module_link').die()
           $('.duplicate_module_link').die()
           $('.duplicate_item_link').die()
           $('.add_module_link').die()
           $('.edit_module_link').die()
+          $('#context_modules').off('addFileToModule')
           $('#add_context_module_form .add_prerequisite_link').off()
           $('#add_context_module_form .add_completion_criterion_link').off()
           $('.context_module')
@@ -1430,6 +1456,10 @@ modules.initModuleManagement = function() {
           const $toFocus = $prevModule.length
             ? $('.ig-header-admin .al-trigger', $prevModule)
             : $addModuleButton
+          const module_dnd = $(this).find('.module_dnd')[0]
+          if (module_dnd) {
+            ReactDOM.unmountComponentAtNode(module_dnd)
+          }
           $(this).slideUp(function() {
             $(this).remove()
             modules.updateTaggedItems()
@@ -1758,6 +1788,21 @@ modules.initModuleManagement = function() {
     modules.addModule()
   })
 
+  // This allows ModuleFileDrop to create module items
+  // once a file is uploaded. See ModuleFileDrop#handleDrop
+  // for details on the custom event.
+  $('#context_modules').on('addFileToModule', event => {
+    event.preventDefault()
+    const moduleId = event.originalEvent.moduleId
+    const attachment = event.originalEvent.attachment
+    const item_data = {
+      'item[id]': attachment.id,
+      'item[type]': 'attachment',
+      'item[title]': attachment.display_name
+    }
+    generate_submit(moduleId, false)(item_data)
+  })
+
   $('.add_module_item_link').on('click', function(event) {
     event.preventDefault()
     const $trigger = $(event.currentTarget)
@@ -1791,46 +1836,52 @@ modules.initModuleManagement = function() {
       options.close = function() {
         $trigger.focus()
       }
-      let nextPosition = modules.getNextPosition($module)
-      options.submit = function(item_data) {
-        item_data.content_details = ['items']
-        item_data['item[position]'] = nextPosition++
-        const $module = $('#context_module_' + id)
-        let $item = modules.addItemToModule($module, item_data)
-        $module
-          .find('.context_module_items.ui-sortable')
-          .sortable('refresh')
-          .sortable('disable')
-        const url = $module.find('.add_module_item_link').attr('rel')
-        $module.disableWhileLoading(
-          $.ajaxJSON(url, 'POST', item_data, data => {
-            $item.remove()
-            data.content_tag.type = item_data['item[type]']
-            $item = modules.addItemToModule($module, data.content_tag)
-            $module
-              .find('.context_module_items.ui-sortable')
-              .sortable('enable')
-              .sortable('refresh')
-            initNewItemPublishButton($item, data.content_tag)
-            modules.updateAssignmentData()
-
-            $item.find('.lock-icon').data({
-              moduleType: data.content_tag.type,
-              contentId: data.content_tag.content_id,
-              moduleItemId: data.content_tag.id
-            })
-            modules.loadMasterCourseData(data.content_tag.id)
-          }),
-          {
-            onComplete() {
-              $module.find('.add_module_item_link').focus()
-            }
-          }
-        )
-      }
+      options.submit = generate_submit(id)
       INST.selectContentDialog(options)
     }
   })
+
+  function generate_submit(id, focusLink = true) {
+    return item_data => {
+      const $module = $('#context_module_' + id)
+      let nextPosition = modules.getNextPosition($module)
+      item_data.content_details = ['items']
+      item_data['item[position]'] = nextPosition++
+      let $item = modules.addItemToModule($module, item_data)
+      $module
+        .find('.context_module_items.ui-sortable')
+        .sortable('refresh')
+        .sortable('disable')
+      const url = $module.find('.add_module_item_link').attr('rel')
+      $module.disableWhileLoading(
+        $.ajaxJSON(url, 'POST', item_data, data => {
+          $item.remove()
+          data.content_tag.type = item_data['item[type]']
+          $item = modules.addItemToModule($module, data.content_tag)
+          $module
+            .find('.context_module_items.ui-sortable')
+            .sortable('enable')
+            .sortable('refresh')
+          initNewItemPublishButton($item, data.content_tag)
+          modules.updateAssignmentData()
+
+          $item.find('.lock-icon').data({
+            moduleType: data.content_tag.type,
+            contentId: data.content_tag.content_id,
+            moduleItemId: data.content_tag.id
+          })
+          modules.loadMasterCourseData(data.content_tag.id)
+        }),
+        {
+          onComplete() {
+            if (focusLink) {
+              $module.find('.add_module_item_link').focus()
+            }
+          }
+        }
+      )
+    }
+  }
 
   $('.duplicate_item_link').live('click', function(event) {
     event.preventDefault()

@@ -31,6 +31,12 @@ function setupFolderWith(names) {
   return FileOptionsCollection.setFolder(folder)
 }
 
+function setupModelLessFolderWith(names) {
+  const mockFiles = names.map(name => mockFile(name))
+  const folder = {files: mockFiles}
+  return FileOptionsCollection.setFolder(folder)
+}
+
 function createFileOption(fileName, dup, optionName) {
   const options = {file: {name: fileName}}
   if (dup) {
@@ -55,6 +61,11 @@ QUnit.module(
 
   test('findMatchingFile correctly finds existing files by display_name', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
+    ok(FileOptionsCollection.findMatchingFile('foo'))
+  }),
+
+  test('findMatchingFile correctly finds existing files without model attribute', () => {
+    setupModelLessFolderWith(['foo', 'bar', 'baz'])
     ok(FileOptionsCollection.findMatchingFile('foo'))
   }),
 

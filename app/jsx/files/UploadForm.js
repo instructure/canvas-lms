@@ -26,25 +26,29 @@ export const UploadFormPropTypes = {
   contextId: oneOfType([string, number]).isRequired,
   contextType: string.isRequired,
   currentFolder: object, // could be instanceOf(Folder), but if I import 'compiled/models/Folder', jest fails to run
+  allowSkip: bool,
   visible: bool,
   inputId: string,
   inputName: string,
   autoUpload: bool, // if true, upload as soon as file(s) are selected
   disabled: bool,
-  alwaysRename: bool, // if true offer to rename files
-  alwaysUploadZips: bool, // if true offer to expand zip files
-  onChange: func
+  alwaysRename: bool, // if false offer to rename files
+  alwaysUploadZips: bool, // if false offer to expand zip files
+  onChange: func,
+  onEmptyOrClose: func
 }
 
 class UploadForm extends React.Component {
   static propTypes = UploadFormPropTypes
 
   static defaultProps = {
+    allowSkip: false,
     autoUpload: true,
     disabled: false,
     alwaysRename: false,
     alwaysUploadZips: false,
-    onChange: () => {}
+    onChange: () => {},
+    onEmptyOrClose: () => {}
   }
 
   constructor(props) {
@@ -121,6 +125,7 @@ class UploadForm extends React.Component {
       this.setStateFromOptions()
     }
     this.resolvedUserAction = false
+    this.props.onEmptyOrClose()
   }
 
   componentDidUpdate() {
@@ -131,10 +136,13 @@ class UploadForm extends React.Component {
       this.props.autoUpload &&
       this.state.zipOptions.length === 0 &&
       this.state.nameCollisions.length === 0 &&
-      this.state.resolvedNames.length > 0 &&
       FileOptionsCollection.hasNewOptions()
     ) {
-      this.queueUploads(this.props.contextType, this.props.contextId)
+      if (this.state.resolvedNames.length > 0) {
+        this.queueUploads(this.props.contextType, this.props.contextId)
+      } else {
+        this.props.onEmptyOrClose()
+      }
     } else {
       this.resolvedUserAction = false
     }
@@ -152,7 +160,7 @@ class UploadForm extends React.Component {
     this.setState(FileOptionsCollection.getState(), callback)
   }
 
-  buildPotentialModal() {
+  buildPotentialModal = () => {
     if (this.state.zipOptions.length && !this.props.alwaysUploadZips) {
       return (
         <ZipFileOptionsForm
@@ -167,7 +175,7 @@ class UploadForm extends React.Component {
           fileOptions={this.state.nameCollisions[0]}
           onNameConflictResolved={this.onNameConflictResolved}
           onClose={this.onClose}
-          allowSkip={window?.ENV?.FEATURES?.files_dnd}
+          allowSkip={this.props.allowSkip}
         />
       )
     }
