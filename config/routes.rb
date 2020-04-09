@@ -1404,9 +1404,11 @@ CanvasRails::Application.routes.draw do
       post 'users/:id/clear_cache', :action => :clear_cache, :as => 'clear_cache'
 
       scope(controller: :user_observees) do
+        get    'users/:user_id/observers', action: :observers, as: 'user_observers'
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
         post   'users/:user_id/observees', action: :create
         get    'users/:user_id/observees/:observee_id', action: :show, as: 'user_observee'
+        get    'users/:user_id/observers/:observer_id', action: :show_observer, as: 'user_observer'
         put    'users/:user_id/observees/:observee_id', action: :update
         delete 'users/:user_id/observees/:observee_id', action: :destroy
       end

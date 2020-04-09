@@ -98,6 +98,25 @@ describe UserObserveesController, type: :request do
     json
   end
 
+  def observers_call(opts={})
+    json = raw_observers_call(opts)
+    return nil if opts[:expected_status]
+    json.map{|o| o['id'] }.sort
+  end
+  def raw_observers_call(opts={})
+    params[:user_id] = opts[:user_id] || student.id
+    json = api_call_as_user(
+      opts[:api_user] || allowed_admin,
+      :get,
+      "/api/v1/users/#{params[:user_id]}/observers",
+      params.merge(action: 'observers'),
+      {},
+      {},
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      )
+    json
+  end
+
   def create_call(data, opts={})
     params[:user_id] = opts[:user_id] || parent.id
 
@@ -127,6 +146,23 @@ describe UserObserveesController, type: :request do
       {},
       { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
     )
+    return nil if opts[:expected_status]
+    json['id']
+  end
+
+  def show_observer_call(opts={})
+    params[:user_id] = opts[:user_id] || student.id
+    params[:observer_id] = opts[:observer_id] || parent.id
+
+    json = api_call_as_user(
+      opts[:api_user] || allowed_admin,
+      :get,
+      "/api/v1/users/#{params[:user_id]}/observers/#{params[:observer_id]}",
+      params.merge(action: 'show_observer'),
+      {},
+      {},
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      )
     return nil if opts[:expected_status]
     json['id']
   end
@@ -162,6 +198,48 @@ describe UserObserveesController, type: :request do
     )
     return nil if opts[:expected_status]
     json['id']
+  end
+
+  context 'GET #observers' do
+    specs_require_sharding
+    it 'should list observers' do
+      add_linked_observer(student, parent)
+      expect(observers_call).to eq [parent.id]
+    end
+
+    it 'should list observers (for self managed users)' do
+      add_linked_observer(student, parent)
+      expect(observers_call(api_user: student)).to eq [parent.id]
+    end
+
+    it 'should list observers (for external accounts)' do
+      add_linked_observer(external_student, external_parent, root_account: external_account)
+      json = observers_call(user_id: external_student.id, api_user: multi_admin, domain_root_account: external_account)
+      expect(json).to eq [external_parent.id]
+    end
+
+    it 'should not accept an invalid user' do
+      observers_call(user_id: 0, expected_status: 404)
+    end
+
+    it 'should not allow admins from an external account' do
+      add_linked_observer(external_student, external_parent, root_account: external_account)
+      observers_call(user_id: external_student.id, domain_root_account: external_account, expected_status: 401)
+    end
+
+    it 'should not allow unauthorized admins' do
+      observers_call(api_user: disallowed_admin, expected_status: 401)
+    end
+
+    it "should only return linked root accounts the admin has rights for" do
+      UserObservationLink.create_or_restore(observer: multi_parent, student: multi_student, root_account: Account.default)
+      UserObservationLink.create_or_restore(observer: multi_parent, student: multi_student, root_account: external_account)
+      json = raw_observers_call(:user_id => multi_student.id, :api_user => allowed_admin)
+      expect(json.first["observation_link_root_account_ids"]).to eq [Account.default.id]
+
+      json2 = raw_observers_call(:user_id => multi_student.id, :api_user => multi_admin)
+      expect(json2.first["observation_link_root_account_ids"]).to match_array [Account.default.id, external_account.id]
+    end
   end
 
   context 'GET #index' do
@@ -383,6 +461,43 @@ describe UserObserveesController, type: :request do
     it 'should not allow unauthorized admins' do
       add_linked_observer(student, parent)
       show_call(api_user: disallowed_admin, expected_status: 401)
+    end
+  end
+
+  context 'GET #show_observer' do
+    it 'should show an observee' do
+      add_linked_observer(student, parent)
+      expect(show_observer_call).to eq parent.id
+    end
+
+    it 'should show an observee (for self managed users)' do
+      add_linked_observer(student, parent)
+      expect(show_observer_call(api_user: student)).to eq parent.id
+    end
+
+    it 'should show an observee (for external accounts)' do
+      add_linked_observer(external_student, external_parent, root_account: external_account)
+      json = show_observer_call(user_id: external_student.id, observer_id: external_parent.id, api_user: multi_admin, domain_root_account: external_account)
+      expect(json).to eq external_parent.id
+    end
+
+    it 'should not accept an invalid user' do
+      show_observer_call(user_id: 0, expected_status: 404)
+    end
+
+    it 'should not accept a non-observed user' do
+      add_linked_observer(student, parent)
+      show_observer_call(observer_id: student2.id, expected_status: 404)
+    end
+
+    it 'should not allow admins from an external account' do
+      add_linked_observer(external_student, external_parent, root_account: external_account)
+      show_observer_call(user_id: external_student.id, observer_id: external_parent.id, domain_root_account: external_account, expected_status: 401)
+    end
+
+    it 'should not allow unauthorized admins' do
+      add_linked_observer(student, parent)
+      show_observer_call(api_user: disallowed_admin, expected_status: 401)
     end
   end
 
