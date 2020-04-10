@@ -3327,8 +3327,12 @@ class Course < ActiveRecord::Base
     user.favorites.where(:context_type => 'Course', :context_id => self).exists?
   end
 
+  def preloaded_nickname?
+    !!defined?(@preloaded_nickname)
+  end
+
   def nickname_for(user, fallback = :name)
-    nickname = defined?(@preloaded_nickname) ? @preloaded_nickname : (user && user.course_nickname(self))
+    nickname = preloaded_nickname? ? @preloaded_nickname : (user && user.course_nickname(self))
     nickname ||= self.send(fallback) if fallback
     nickname
   end
@@ -3342,13 +3346,13 @@ class Course < ActiveRecord::Base
     @nickname = nickname_for(user, nil)
   end
 
-  def self.preload_menu_data_for(courses, user)
+  def self.preload_menu_data_for(courses, user, preload_favorites: false)
     ActiveRecord::Associations::Preloader.new.preload(courses, :enrollment_term)
     # preload favorites and nicknames
-    favorite_ids = user.account.feature_enabled?(:unfavorite_course_from_dashboard) ? user.favorite_context_ids("Course") : []
+    favorite_ids = preload_favorites && user.favorite_context_ids("Course")
     nicknames = user.all_course_nicknames(courses)
     courses.each do |course|
-      course.preloaded_favorite = favorite_ids.include?(course.id)
+      course.preloaded_favorite = favorite_ids.include?(course.id) if favorite_ids
       course.preloaded_nickname = nicknames[course.id]
     end
   end

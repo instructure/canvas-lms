@@ -158,7 +158,7 @@ module Api::V1::Course
   end
 
   def apply_nickname(hash, course, user)
-    nickname = user.course_nickname(course)
+    nickname = course.preloaded_nickname? ? course.preloaded_nickname : user.course_nickname(course)
     if nickname
       hash['original_name'] = hash['name']
       hash['name'] = nickname

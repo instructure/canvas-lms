@@ -3311,6 +3311,7 @@ class CoursesController < ApplicationController
     permissions_to_precalculate = [:read_sis, :manage_sis]
     permissions_to_precalculate += SectionTabHelper::PERMISSIONS_TO_PRECALCULATE if includes.include?('tabs')
     all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(courses, permissions_to_precalculate)
+    Course.preload_menu_data_for(courses, @current_user, preload_favorites: true)
 
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course
