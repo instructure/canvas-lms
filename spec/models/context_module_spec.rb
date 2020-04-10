@@ -39,6 +39,15 @@ describe ContextModule do
     end
   end
 
+  describe "#set_root_account_id" do
+    subject { context_module.root_account }
+
+    let(:course) { course_factory }
+    let(:context_module) { course.context_modules.create! }
+
+    it { is_expected.to eq course.root_account }
+  end
+
   describe "publish_items!" do
     before :once do
       course_module

@@ -26,6 +26,7 @@ class ContextModule < ActiveRecord::Base
   restrict_columns :state, [:workflow_state]
 
   belongs_to :context, polymorphic: [:course]
+  belongs_to :root_account, :class_name => 'Account'
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, -> { order('content_tags.position, content_tags.title') }, dependent: :destroy
   acts_as_list scope: { context: self, workflow_state: ['active', 'unpublished'] }
@@ -35,6 +36,7 @@ class ContextModule < ActiveRecord::Base
   before_save :infer_position
   before_save :validate_prerequisites
   before_save :confirm_valid_requirements
+  before_save :set_root_account_id
 
   after_save :touch_context
   after_save :invalidate_progressions
@@ -226,6 +228,10 @@ class ContextModule < ActiveRecord::Base
     new_tag
   end
   private :duplicate_content_tag
+
+  def set_root_account_id
+    self.root_account_id ||= context&.root_account_id
+  end
 
   def duplicate
     copy_title = get_copy_title(self, t("Copy"), self.name)
