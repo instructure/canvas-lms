@@ -18,15 +18,15 @@
 
 import sinon from 'sinon'
 
-import FakeServer, {paramsFromRequest} from '../../../../shared/network/__tests__/FakeServer'
-import NaiveRequestDispatch from '../../../../shared/network/NaiveRequestDispatch'
-import * as FlashAlert from '../../../../shared/FlashAlert'
-import * as FinalGradeOverrideApi from '../../FinalGradeOverrides/FinalGradeOverrideApi'
-import CourseSettings from '../../CourseSettings'
-import FinalGradeOverrides from '../../FinalGradeOverrides'
-import StudentContentDataLoader from '../StudentContentDataLoader'
+import FakeServer, {paramsFromRequest} from 'jsx/shared/network/__tests__/FakeServer'
+import NaiveRequestDispatch from 'jsx/shared/network/NaiveRequestDispatch'
+import * as FlashAlert from 'jsx/shared/FlashAlert'
+import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
+import CourseSettings from 'jsx/gradebook/default_gradebook/CourseSettings'
+import FinalGradeOverrides from 'jsx/gradebook/default_gradebook/FinalGradeOverrides'
+import StudentContentDataLoader from 'jsx/gradebook/default_gradebook/DataLoader/StudentContentDataLoader'
 
-describe('Gradebook StudentContentDataLoader', () => {
+QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => {
   const exampleData = {
     finalGradeOverrides: {
       1101: {
@@ -62,7 +62,7 @@ describe('Gradebook StudentContentDataLoader', () => {
     return latch
   }
 
-  beforeEach(() => {
+  suiteHooks.beforeEach(() => {
     server = new FakeServer()
 
     server
@@ -79,7 +79,7 @@ describe('Gradebook StudentContentDataLoader', () => {
       .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
       .respond([{status: 200, body: exampleData.submissions.slice(1, 3)}])
 
-    sinon
+    sandbox
       .stub(FinalGradeOverrideApi, 'getFinalGradeOverrides')
       .returns(Promise.resolve({finalGradeOverrides: exampleData.finalGradeOverrides}))
 
@@ -110,19 +110,18 @@ describe('Gradebook StudentContentDataLoader', () => {
     dispatch = new NaiveRequestDispatch()
   })
 
-  afterEach(() => {
-    FinalGradeOverrideApi.getFinalGradeOverrides.restore()
+  suiteHooks.afterEach(() => {
     server.teardown()
   })
 
-  describe('.load()', () => {
+  QUnit.module('.load()', () => {
     async function load(studentIds) {
       dataLoader = new StudentContentDataLoader(options, dispatch)
       await dataLoader.load(studentIds || exampleData.studentIds)
     }
 
-    describe('loading students', () => {
-      beforeEach(() => {
+    QUnit.module('loading students', contextHooks => {
+      contextHooks.beforeEach(() => {
         server.unsetResponses(urls.students)
       })
 
@@ -135,42 +134,42 @@ describe('Gradebook StudentContentDataLoader', () => {
         server.for(urls.submissions, {student_ids: ids}).respond([{status: 200, body: submissions}])
       }
 
-      it('requests students using the given student ids', async () => {
+      test('requests students using the given student ids', async () => {
         setStudentsResponse(exampleData.studentIds, exampleData.students)
         options.studentsChunkSize = 50
         await load()
         const studentRequest = server.findRequest(urls.students)
         const params = paramsFromRequest(studentRequest)
-        expect(params.user_ids).toEqual(exampleData.studentIds)
+        deepEqual(params.user_ids, exampleData.studentIds)
       })
 
-      it('does not request students already loaded', async () => {
+      test('does not request students already loaded', async () => {
         setStudentsResponse(['1102'], [{id: '1102'}])
         setSubmissionsResponse(['1102'], [{id: '2502'}])
         options = {...options, loadedStudentIds: ['1101', '1103'], studentsChunkSize: 50}
         await load()
         const studentRequest = server.findRequest(urls.students)
         const params = paramsFromRequest(studentRequest)
-        expect(params.user_ids).toEqual(['1102'])
+        deepEqual(params.user_ids, ['1102'])
       })
 
-      it('chunks students when per page limit is less than count of student ids', async () => {
+      test('chunks students when per page limit is less than count of student ids', async () => {
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
         options.studentsChunkSize = 2
         await load()
         const requests = server.filterRequests(urls.students)
-        expect(requests).toHaveLength(2)
+        strictEqual(requests.length, 2)
       })
 
-      it('calls the students page callback when each students page request resolves', async () => {
+      test('calls the students page callback when each students page request resolves', async () => {
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
         await load()
-        expect(gradebook.gotChunkOfStudents.callCount).toEqual(2)
+        strictEqual(gradebook.gotChunkOfStudents.callCount, 2)
       })
 
-      it('includes loaded students with each callback', async () => {
+      test('includes loaded students with each callback', async () => {
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
         const loadedStudents = []
@@ -178,121 +177,121 @@ describe('Gradebook StudentContentDataLoader', () => {
           loadedStudents.push(...students)
         }
         await load()
-        expect(loadedStudents).toEqual(exampleData.students)
+        deepEqual(loadedStudents, exampleData.students)
       })
 
-      it('does not request students when given an empty list of student ids', async () => {
+      test('does not request students when given an empty list of student ids', async () => {
         await load([])
         const requests = server.filterRequests(urls.students)
-        expect(requests).toHaveLength(0)
+        strictEqual(requests.length, 0)
       })
 
-      it('does not request students when requested student ids are already loaded', async () => {
+      test('does not request students when requested student ids are already loaded', async () => {
         options = {...options, loadedStudentIds: exampleData.studentIds}
         await load(exampleData.studentIds)
         const requests = server.filterRequests(urls.students)
-        expect(requests).toHaveLength(0)
+        strictEqual(requests.length, 0)
       })
     })
 
-    describe('loading submissions', () => {
-      it('requests submissions for each page of students', async () => {
+    QUnit.module('loading submissions', () => {
+      test('requests submissions for each page of students', async () => {
         await load()
         const requests = server.filterRequests(urls.submissions)
-        expect(requests).toHaveLength(2)
+        strictEqual(requests.length, 2)
       })
 
-      it('includes "points_deducted" in response fields', async () => {
+      test('includes "points_deducted" in response fields', async () => {
         await load()
         const submissionsRequest = server.findRequest(urls.submissions)
         const params = paramsFromRequest(submissionsRequest)
-        expect(params.response_fields).toContain('points_deducted')
+        ok(params.response_fields.includes('points_deducted'))
       })
 
-      it('includes "cached_due_date" in response fields', async () => {
+      test('includes "cached_due_date" in response fields', async () => {
         await load()
         const submissionsRequest = server.findRequest(urls.submissions)
         const params = paramsFromRequest(submissionsRequest)
-        expect(params.response_fields).toContain('cached_due_date')
+        ok(params.response_fields.includes('cached_due_date'))
       })
 
-      it('includes "posted_at" in response fields', async () => {
+      test('includes "posted_at" in response fields', async () => {
         await load()
         const submissionsRequest = server.findRequest(urls.submissions)
         const params = paramsFromRequest(submissionsRequest)
-        expect(params.response_fields).toContain('posted_at')
+        ok(params.response_fields.includes('posted_at'))
       })
 
-      it('calls the submissions chunk callback for each chunk of submissions', async () => {
+      test('calls the submissions chunk callback for each chunk of submissions', async () => {
         const submissionChunks = []
         gradebook.gotSubmissionsChunk = submissionChunks.push.bind(submissionChunks)
         await load()
-        expect(submissionChunks).toHaveLength(2)
+        strictEqual(submissionChunks.length, 2)
       })
 
-      it('includes loaded submissions with each callback', async () => {
+      test('includes loaded submissions with each callback', async () => {
         const submissionChunks = []
         gradebook.gotSubmissionsChunk = submissionChunks.push.bind(submissionChunks)
         await load()
-        expect(submissionChunks).toEqual([
+        deepEqual(submissionChunks, [
           exampleData.submissions.slice(0, 1),
           exampleData.submissions.slice(1, 3)
         ])
       })
 
-      it('does not call submissions chunk callback until related student callback is called', async () => {
+      test('does not call submissions chunk callback until related student callback is called', async () => {
         const submissionChunks = []
         gradebook.gotSubmissionsChunk = submissionChunks.push.bind(submissionChunks)
         await load()
         const requests = server.filterRequests(urls.submissions)
-        expect(requests).toHaveLength(2)
+        strictEqual(requests.length, 2)
       })
 
-      it('does not request submissions when given an empty list of student ids', async () => {
+      test('does not request submissions when given an empty list of student ids', async () => {
         await load([])
         const requests = server.filterRequests(urls.submissions)
-        expect(requests).toHaveLength(0)
+        strictEqual(requests.length, 0)
       })
 
-      it('does not request submissions when requested student ids are already loaded', async () => {
+      test('does not request submissions when requested student ids are already loaded', async () => {
         options = {...options, loadedStudentIds: exampleData.studentIds}
         await load(exampleData.studentIds)
         const requests = server.filterRequests(urls.submissions)
-        expect(requests).toHaveLength(0)
+        strictEqual(requests.length, 0)
       })
     })
 
-    describe('loading final grade overrides', () => {
-      it('optionally requests final grade overrides', async () => {
+    QUnit.module('loading final grade overrides', () => {
+      test('optionally requests final grade overrides', async () => {
         await load()
-        expect(FinalGradeOverrideApi.getFinalGradeOverrides.callCount).toEqual(1)
+        strictEqual(FinalGradeOverrideApi.getFinalGradeOverrides.callCount, 1)
       })
 
-      it('optionally does not request final grade overrides', async () => {
+      test('optionally does not request final grade overrides', async () => {
         gradebook.courseSettings = new CourseSettings(gradebook, {allowFinalGradeOverride: false})
         await load()
-        expect(FinalGradeOverrideApi.getFinalGradeOverrides.callCount).toEqual(0)
+        strictEqual(FinalGradeOverrideApi.getFinalGradeOverrides.callCount, 0)
       })
 
-      it('uses the given course id when loading final grade overrides', async () => {
+      test('uses the given course id when loading final grade overrides', async () => {
         await load()
         const [courseId] = FinalGradeOverrideApi.getFinalGradeOverrides.lastCall.args
-        expect(courseId).toEqual('1201')
+        strictEqual(courseId, '1201')
       })
 
-      it('updates Gradebook when the final grade overrides have loaded', async () => {
+      test('updates Gradebook when the final grade overrides have loaded', async () => {
         await load()
-        expect(gradebook.finalGradeOverrides.setGrades.callCount).toEqual(1)
+        strictEqual(gradebook.finalGradeOverrides.setGrades.callCount, 1)
       })
 
-      it('updates Gradebook with the loaded final grade overrides', async () => {
+      test('updates Gradebook with the loaded final grade overrides', async () => {
         await load()
         const [finalGradeOverrides] = gradebook.finalGradeOverrides.setGrades.lastCall.args
-        expect(finalGradeOverrides).toEqual(exampleData.finalGradeOverrides)
+        deepEqual(finalGradeOverrides, exampleData.finalGradeOverrides)
       })
     })
 
-    describe('when submissions return before related students', () => {
+    QUnit.module('when submissions return before related students', contextHooks => {
       let events
 
       function joinIds(records) {
@@ -309,7 +308,7 @@ describe('Gradebook StudentContentDataLoader', () => {
         }
       }
 
-      beforeEach(() => {
+      contextHooks.beforeEach(() => {
         const submissionPromises = [latchPromise(), latchPromise()]
         events = []
 
@@ -350,36 +349,36 @@ describe('Gradebook StudentContentDataLoader', () => {
           .respond([{status: 200, body: exampleData.submissions.slice(1, 3)}])
       })
 
-      it('requests submissions before additional chunks of students', async () => {
+      test('requests submissions before additional chunks of students', async () => {
         await load()
         const submissionRequest1Index = events.indexOf('request submissions:1101,1102')
         const studentRequest2Index = events.indexOf('request students:1103')
-        expect(submissionRequest1Index).toBeLessThan(studentRequest2Index)
+        ok(submissionRequest1Index < studentRequest2Index)
       })
 
-      it('requests submissions before related students have returned', async () => {
+      test('requests submissions before related students have returned', async () => {
         await load()
         const submissionRequest1Index = events.indexOf('request submissions:1101,1102')
         const studentChunkIndex = events.indexOf('gotChunkOfStudents:1101,1102')
-        expect(submissionRequest1Index).toBeLessThan(studentChunkIndex)
+        ok(submissionRequest1Index < studentChunkIndex)
       })
 
-      it('calls student callback before submission callback on first load', async () => {
+      test('calls student callback before submission callback on first load', async () => {
         await load()
         const studentChunkIndex = events.indexOf('gotChunkOfStudents:1101,1102')
         const submissionChunkIndex = events.indexOf('gotSubmissionsChunk:2501')
-        expect(studentChunkIndex).toBeLessThan(submissionChunkIndex)
+        ok(studentChunkIndex < submissionChunkIndex)
       })
 
-      it('calls student callback before submission callback on subsequent loads', async () => {
+      test('calls student callback before submission callback on subsequent loads', async () => {
         await load()
         const studentChunkIndex = events.indexOf('gotChunkOfStudents:1103')
         const submissionChunkIndex = events.indexOf('gotSubmissionsChunk:2502,2503')
-        expect(studentChunkIndex).toBeLessThan(submissionChunkIndex)
+        ok(studentChunkIndex < submissionChunkIndex)
       })
     })
 
-    describe('when a submission request returns multiple pages', () => {
+    QUnit.module('when a submission request returns multiple pages', contextHooks => {
       let events
 
       function joinIds(records) {
@@ -400,7 +399,7 @@ describe('Gradebook StudentContentDataLoader', () => {
         }
       }
 
-      beforeEach(() => {
+      contextHooks.beforeEach(() => {
         const submissionPromises = [latchPromise(), latchPromise()]
         events = []
 
@@ -445,7 +444,7 @@ describe('Gradebook StudentContentDataLoader', () => {
           .respond([{status: 200, body: []}])
       })
 
-      it('requests all pages of submissions before additional chunks of students', async () => {
+      test('requests all pages of submissions before additional chunks of students', async () => {
         await load()
         const submissionRequestIndices = [
           events.indexOf('request submissions page 1'),
@@ -453,12 +452,12 @@ describe('Gradebook StudentContentDataLoader', () => {
           events.indexOf('request submissions page 3')
         ]
         const studentRequest2Index = events.indexOf('request students:1103')
-        expect(Math.max(...submissionRequestIndices)).toBeLessThan(studentRequest2Index)
+        ok(Math.max(...submissionRequestIndices) < studentRequest2Index)
       })
     })
 
-    describe('when a student request fails', () => {
-      beforeEach(() => {
+    QUnit.module('when a student request fails', contextHooks => {
+      contextHooks.beforeEach(() => {
         server.unsetResponses(urls.students)
         server.unsetResponses(urls.submissions)
 
@@ -476,45 +475,41 @@ describe('Gradebook StudentContentDataLoader', () => {
           .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
           .respond([{status: 200, body: exampleData.submissions.slice(1, 3)}])
 
-        sinon.stub(FlashAlert, 'showFlashAlert')
+        sandbox.stub(FlashAlert, 'showFlashAlert')
       })
 
-      afterEach(() => {
-        FlashAlert.showFlashAlert.restore()
-      })
-
-      it('does not call gotChunkOfStudents for the failed students', async () => {
+      test('does not call gotChunkOfStudents for the failed students', async () => {
         const loadedStudents = []
         gradebook.gotChunkOfStudents = students => {
           loadedStudents.push(...students)
         }
         await load()
-        expect(loadedStudents).toEqual(exampleData.students.slice(2, 3))
+        deepEqual(loadedStudents, exampleData.students.slice(2, 3))
       })
 
-      it('does not call gotSubmissionsChunk for related submissions', async () => {
+      test('does not call gotSubmissionsChunk for related submissions', async () => {
         const loadedSubmissions = []
         gradebook.gotSubmissionsChunk = submissions => {
           loadedSubmissions.push(...submissions)
         }
         await load()
-        expect(loadedSubmissions).toEqual(exampleData.submissions.slice(1, 3))
+        deepEqual(loadedSubmissions, exampleData.submissions.slice(1, 3))
       })
 
-      it('shows a flash alert', async () => {
+      test('shows a flash alert', async () => {
         await load()
-        expect(FlashAlert.showFlashAlert.callCount).toBe(1)
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      it('flashes an error', async () => {
+      test('flashes an error', async () => {
         await load()
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
-        expect(type).toBe('error')
+        equal(type, 'error')
       })
     })
 
-    describe('when an initial submission request fails', () => {
-      beforeEach(() => {
+    QUnit.module('when an initial submission request fails', contextHooks => {
+      contextHooks.beforeEach(() => {
         server.unsetResponses(urls.students)
         server.unsetResponses(urls.submissions)
 
@@ -532,45 +527,41 @@ describe('Gradebook StudentContentDataLoader', () => {
           .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
           .respond([{status: 200, body: exampleData.submissions.slice(1, 3)}])
 
-        sinon.stub(FlashAlert, 'showFlashAlert')
+        sandbox.stub(FlashAlert, 'showFlashAlert')
       })
 
-      afterEach(() => {
-        FlashAlert.showFlashAlert.restore()
-      })
-
-      it('calls gotChunkOfStudents for related students', async () => {
+      test('calls gotChunkOfStudents for related students', async () => {
         const loadedStudents = []
         gradebook.gotChunkOfStudents = students => {
           loadedStudents.push(...students)
         }
         await load()
-        expect(loadedStudents).toEqual(exampleData.students)
+        deepEqual(loadedStudents, exampleData.students)
       })
 
-      it('does not call gotSubmissionsChunk for the failed submissions', async () => {
+      test('does not call gotSubmissionsChunk for the failed submissions', async () => {
         const loadedSubmissions = []
         gradebook.gotSubmissionsChunk = submissions => {
           loadedSubmissions.push(...submissions)
         }
         await load()
-        expect(loadedSubmissions).toEqual(exampleData.submissions.slice(1, 3))
+        deepEqual(loadedSubmissions, exampleData.submissions.slice(1, 3))
       })
 
-      it('shows a flash alert', async () => {
+      test('shows a flash alert', async () => {
         await load()
-        expect(FlashAlert.showFlashAlert.callCount).toBe(1)
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      it('flashes an error', async () => {
+      test('flashes an error', async () => {
         await load()
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
-        expect(type).toBe('error')
+        equal(type, 'error')
       })
     })
 
-    describe('when a subsequent submission page request fails', () => {
-      beforeEach(() => {
+    QUnit.module('when a subsequent submission page request fails', contextHooks => {
+      contextHooks.beforeEach(() => {
         server.unsetResponses(urls.students)
         server.unsetResponses(urls.submissions)
 
@@ -589,40 +580,36 @@ describe('Gradebook StudentContentDataLoader', () => {
           .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
           .respond([{status: 200, body: exampleData.submissions.slice(2, 3)}])
 
-        sinon.stub(FlashAlert, 'showFlashAlert')
+        sandbox.stub(FlashAlert, 'showFlashAlert')
       })
 
-      afterEach(() => {
-        FlashAlert.showFlashAlert.restore()
-      })
-
-      it('calls gotChunkOfStudents for related students', async () => {
+      test('calls gotChunkOfStudents for related students', async () => {
         const loadedStudents = []
         gradebook.gotChunkOfStudents = students => {
           loadedStudents.push(...students)
         }
         await load()
-        expect(loadedStudents).toEqual(exampleData.students)
+        deepEqual(loadedStudents, exampleData.students)
       })
 
-      it('does not call gotSubmissionsChunk for the failed submissions', async () => {
+      test('does not call gotSubmissionsChunk for the failed submissions', async () => {
         const loadedSubmissions = []
         gradebook.gotSubmissionsChunk = submissions => {
           loadedSubmissions.push(...submissions)
         }
         await load()
-        expect(loadedSubmissions).toEqual(exampleData.submissions.slice(2, 3))
+        deepEqual(loadedSubmissions, exampleData.submissions.slice(2, 3))
       })
 
-      it('shows a flash alert', async () => {
+      test('shows a flash alert', async () => {
         await load()
-        expect(FlashAlert.showFlashAlert.callCount).toBe(1)
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      it('flashes an error', async () => {
+      test('flashes an error', async () => {
         await load()
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
-        expect(type).toBe('error')
+        equal(type, 'error')
       })
     })
   })
