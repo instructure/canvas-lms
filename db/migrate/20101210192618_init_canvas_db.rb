@@ -57,7 +57,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :abstract_courses, :enrollment_term_id
 
     create_table :access_tokens do |t|
-      t.integer :developer_key_id, :limit => 8
+      t.integer :developer_key_id, :limit => 8, :null => false
       t.integer :user_id, :limit => 8
       t.datetime :last_used_at
       t.datetime :expires_at
@@ -115,6 +115,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "parameters"
     end
     add_index :account_reports, :attachment_id
+    add_index :account_reports, [:account_id, :report_type, :updated_at], order: { updated_at: :desc }, name: 'index_account_reports_latest_per_account'
 
     create_table :account_notification_roles do |t|
       t.integer :account_notification_id, :limit => 8, :null => false
@@ -514,7 +515,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "encoding"
       t.boolean  "need_notify"
       t.string   "upload_error_message"
-      t.datetime "last_inline_view"
       t.integer  "replacement_attachment_id", :limit => 8
       t.integer  "usage_rights_id", :limit => 8
     end
@@ -641,8 +641,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "created_at"
       t.datetime "updated_at"
       t.boolean  "build_pseudonym_on_confirm"
-      t.integer  "access_token_id", :limit => 8
-      t.string   "internal_path"
     end
 
     add_index "communication_channels", ["pseudonym_id", "position"]
@@ -1012,7 +1010,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "self_enrollment_limit"
       t.string   "integration_id"
       t.string   "time_zone"
-      t.string   "lti_context_id"
+      t.string   "lti_context_id" 
+      t.integer  "turnitin_id", :limit => 8, :unique => true
     end
 
     add_index "courses", ["account_id"], :name => "index_courses_on_account_id"
@@ -1134,6 +1133,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "sns_arn"
       t.boolean  "trusted"
       t.boolean  "force_token_reuse"
+      t.string   "workflow_state", default: "active", null: false
     end
     add_index :developer_keys, [:tool_id], :unique => true
 
@@ -1159,7 +1159,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :discussion_entries, :parent_id
     add_index :discussion_entries, [:root_entry_id, :workflow_state, :created_at], :name => "index_discussion_entries_root_entry"
     add_index :discussion_entries, [:discussion_topic_id, :updated_at, :created_at], :name => "index_discussion_entries_for_topic"
-    add_index :discussion_entries, :attachment_id, where: 'attachment_id IS NOT NULL'
 
     create_table "discussion_entry_participants" do |t|
       t.integer "discussion_entry_id", :limit => 8, :null => false
@@ -1308,6 +1307,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "last_activity_at"
       t.integer  "total_activity_time"
       t.integer  "role_id", :limit => 8, :null => false
+      t.datetime "graded_at"
     end
 
     add_index "enrollments", ["course_id", "workflow_state"], :name => "index_enrollments_on_course_id_and_workflow_state"
@@ -1525,28 +1525,36 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.float :current_grade
       t.float :final_grade
       t.timestamps null: true
+      t.string :workflow_state, default: "active", null: false
     end
     add_index :grading_period_grades, :enrollment_id
     add_index :grading_period_grades, :grading_period_id
+    add_index :grading_period_grades, :workflow_state
 
     create_table :grading_period_groups do |t|
       t.integer :course_id, :limit => 8
       t.integer :account_id, :limit => 8
       t.timestamps null: true
+      t.string :workflow_state, default: "active", null: false
     end
     add_index :grading_period_groups, :course_id
     add_index :grading_period_groups, :account_id
+    add_index :grading_period_groups, :workflow_state
 
     create_table :grading_periods do |t|
-      t.float :weight, :null => false
+      t.float :weight
       t.datetime :start_date, :null => false
       t.datetime :end_date, :null => false
       t.timestamps null: true
       t.string :title
-      t.string :workflow_state
-      t.integer :grading_period_group_id, limit: 8
+      t.string :workflow_state, default: "active", null: false
+      # someone used change_column instead of change_column_null and
+      # accidentally lost the limit: 8 on this foreign key
+      # (went from bigint -> int). needs to be fixed.
+      t.integer :grading_period_group_id, null: false
     end
     add_index :grading_periods, :grading_period_group_id
+    add_index :grading_periods, :workflow_state
 
     create_table "grading_standards", :force => true do |t|
       t.string   "title"
@@ -1881,10 +1889,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :media_tracks, [:media_object_id, :locale], :name => 'media_object_id_locale'
 
     create_table "messages", :force => true do |t|
-      t.string   "to"
-      t.string   "from"
-      t.string   "cc"
-      t.string   "bcc"
+      t.text     "to"
+      t.text     "from"
       t.text     "subject"
       t.text     "body"
       t.integer  "delay_for",                :default => 120
@@ -1933,6 +1939,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamps null: true
     end
     add_index :migration_issues, :content_migration_id
+
+    create_table :notification_endpoints do |t|
+      t.integer :access_token_id, limit: 8, null: false
+      t.string :token, null: false
+      t.string :arn, null: false
+      t.timestamps null: true
+    end
+    add_index :notification_endpoints, :access_token_id
 
     create_table "notification_policies", :force => true do |t|
       t.integer  "notification_id", :limit => 8
@@ -2478,7 +2492,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table "sis_batches", :force => true do |t|
       t.integer  "account_id", :limit => 8, :null => false
-      t.string   "batch_id"
       t.datetime "ended_at"
       t.integer  "errored_attempts"
       t.string   "workflow_state", :null => false
@@ -2493,10 +2506,16 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "batch_mode_term_id", :limit => 8
       t.text     "options"
       t.integer  "user_id", :limit => 8
+      t.datetime "started_at"
+      t.string   "diffing_data_set_identifier"
+      t.boolean  "diffing_remaster"
+      t.integer  "generated_diff_id", :limit => 8
     end
     add_index :sis_batches, [:account_id, :created_at], :where => "workflow_state='created'", name: "index_sis_batches_pending_for_accounts"
     add_index :sis_batches, [:account_id, :created_at], :name => "index_sis_batches_account_id_created_at"
     add_index :sis_batches, :batch_mode_term_id, where: "batch_mode_term_id IS NOT NULL"
+    add_index :sis_batches, [:account_id, :diffing_data_set_identifier, :created_at],
+      name: 'index_sis_batches_diffing'
     
     create_table :sis_post_grades_statuses do |t|
       t.integer :course_id, :null => false, :limit => 8
@@ -2922,11 +2941,17 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         ON cs.course_id = c.id
         AND e.course_section_id = cs.id
 
+      LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
+        ON aos.assignment_id = a.id
+        AND aos.user_id = e.user_id
+
       LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
         ON ao.assignment_id = a.id
         AND ao.workflow_state = 'active'
-        AND ao.set_type = 'CourseSection'
-        AND ao.set_id = cs.id
+        AND (
+          (ao.set_type = 'CourseSection' AND ao.set_id = cs.id)
+          OR (ao.set_type = 'ADHOC' AND ao.set_id IS NULL AND ao.id = aos.assignment_override_id)
+        )
 
       LEFT JOIN #{Submission.quoted_table_name} s
         ON s.user_id = e.user_id
@@ -2960,11 +2985,17 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         ON cs.course_id = c.id
         AND e.course_section_id = cs.id
 
+      LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
+        ON aos.quiz_id = q.id
+        AND aos.user_id = e.user_id
+
       LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
         ON ao.quiz_id = q.id
         AND ao.workflow_state = 'active'
-        AND ao.set_type = 'CourseSection'
-        AND ao.set_id = cs.id
+        AND (
+          (ao.set_type = 'CourseSection' AND ao.set_id = cs.id)
+          OR (ao.set_type = 'ADHOC' AND ao.set_id IS NULL AND ao.id = aos.assignment_override_id)
+        )
 
       LEFT JOIN #{Assignment.quoted_table_name} a
         ON a.context_id = q.context_id
@@ -3027,7 +3058,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :collaborators, :collaborations
     add_foreign_key :collaborators, :groups
     add_foreign_key :collaborators, :users
-    add_foreign_key :communication_channels, :access_tokens
     add_foreign_key :communication_channels, :users
     add_foreign_key :content_exports, :attachments
     add_foreign_key :content_exports, :content_migrations
@@ -3071,7 +3101,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :data_exports, :users
     add_foreign_key :delayed_messages, :communication_channels
     add_foreign_key :delayed_messages, :notification_policies
-    add_foreign_key :discussion_entries, :attachments
     add_foreign_key :discussion_entries, :discussion_entries, column: :parent_id
     add_foreign_key :discussion_entries, :discussion_entries, column: :root_entry_id
     add_foreign_key :discussion_entries, :discussion_topics
@@ -3145,6 +3174,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :media_objects, :accounts, :column => :root_account_id
     add_foreign_key :media_objects, :users
     add_foreign_key :migration_issues, :content_migrations
+    add_foreign_key :notification_endpoints, :access_tokens
     add_foreign_key :notification_policies, :communication_channels
     add_foreign_key :oauth_requests, :users
     add_foreign_key :one_time_passwords, :users
