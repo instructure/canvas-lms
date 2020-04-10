@@ -741,6 +741,10 @@ class Course < ActiveRecord::Base
     current_users
   end
 
+  def potential_collaborators_for(current_user)
+    users_visible_to(current_user)
+  end
+
   def broadcast_data
     { course_id: id, root_account_id: root_account_id }
   end
