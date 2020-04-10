@@ -157,7 +157,7 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
             )}
             <Flex.Item>
               <Button margin="0 0 0 small" onClick={onCancel}>
-                {I18n.t('Cancel')}
+                {jobSuccess ? I18n.t('Close') : I18n.t('Cancel')}
               </Button>
             </Flex.Item>
             <Flex.Item>
@@ -169,7 +169,7 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
                 }
                 onClick={handleSave}
               >
-                {I18n.t('Save')}
+                {startingSave || jobRunning ? I18n.t('Saving...') : I18n.t('Save')}
               </Button>
             </Flex.Item>
           </Flex>

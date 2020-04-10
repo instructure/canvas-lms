@@ -297,6 +297,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(saveButton.disabled).toBe(false)
       fireEvent.click(saveButton)
       expect(saveButton.disabled).toBe(true)
+      expect(getByText('Saving...')).toBeInTheDocument()
     }, 10000)
 
     it('can clear an existing date', async () => {
@@ -450,6 +451,7 @@ describe('Assignment Bulk Edit Dates', () => {
       await flushPromises()
       expect(getByText(/saved successfully/)).toBeInTheDocument()
       expect(getByText('Save').closest('button').disabled).toBe(true)
+      expect(getByText('Close')).toBeInTheDocument()
       // complete, expect no more polling
       fetch.resetMocks()
       act(jest.runAllTimers)
