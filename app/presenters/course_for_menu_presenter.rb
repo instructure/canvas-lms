@@ -72,10 +72,6 @@ class CourseForMenuPresenter
   end
 
   private
-  def role
-    Role.get_role_by_id(Shard.relative_id_for(course.primary_enrollment_role_id, course.shard, Shard.current)) ||
-      Enrollment.get_built_in_role_for_type(course.primary_enrollment_type)
-  end
 
   def subtitle
     label = if course.primary_enrollment_state == 'invited'
@@ -83,7 +79,7 @@ class CourseForMenuPresenter
     else
       before_label('#shared.menu_enrollment.labels.enrolled_as', 'enrolled as')
     end
-    [ label, role.try(:label) ].join(' ')
+    [ label, course.primary_enrollment_role.try(:label) ].join(' ')
   end
 
   def term

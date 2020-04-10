@@ -123,21 +123,4 @@ describe CourseForMenuPresenter do
     end
 
   end
-
-  describe '#role' do
-    specs_require_sharding
-    it "should retrieve the correct role for cross-shard enrollments" do
-      @shard1.activate do
-        account = Account.create
-        @role = account.roles.create :name => "1337 Student"
-        @role.base_role_type = 'StudentEnrollment'
-        @role.save!
-
-        @cs_course = account.courses.create!
-        @cs_course.primary_enrollment_role_id = @role.local_id
-      end
-      cs_presenter = CourseForMenuPresenter.new(@cs_course)
-      expect(cs_presenter.send(:role)).to eq @role
-    end
-  end
 end

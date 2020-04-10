@@ -30,7 +30,7 @@ class Course < ActiveRecord::Base
   include Courses::ItemVisibilityHelper
   include OutcomeImportContext
 
-  attr_accessor :teacher_names, :master_course
+  attr_accessor :teacher_names, :master_course, :primary_enrollment_role
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
 
   time_zone_attribute :time_zone
