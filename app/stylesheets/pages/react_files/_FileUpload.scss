@@ -16,27 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UploadQueue from '../modules/UploadQueue'
+.FileUpload {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: none;
+}
 
-export default {
-  displayName: 'CurrentUploads',
+.FileUpload__dragging {
+  display: block;
+  background: rgba(254, 254, 254, 0.9);
+  // hide on smaller screens
+  @include mobile-only {
+    display: none;
+  }
+}
 
-  getInitialState() {
-    return {currentUploads: []}
-  },
-
-  componentWillMount() {
-    UploadQueue.onChange = () => {
-      this.setState({currentUploads: UploadQueue.getAllUploaders()}, () => {
-        if (this.props.onUploadChange) {
-          this.props.onUploadChange(this.state.currentUploads.length)
-        }
-      })
-    }
-  },
-
-  componentWillUnmount() {
-    // noop
-    UploadQueue.onChange = function() {}
+.FileUpload__full {
+  position: static;
+  display: block;
+  margin-bottom: 25px;
+  // hide on smaller screens
+  @include mobile-only {
+    display: none;
   }
 }
