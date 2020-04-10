@@ -899,31 +899,28 @@ ActiveRecord::Relation.class_eval do
       table = "#{table_name}_find_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
       table = table[-63..-1] if table.length > 63
 
-      connection.execute "CREATE TEMPORARY TABLE #{table} AS #{sql}"
+      rows = connection.update("CREATE TEMPORARY TABLE #{table} AS #{sql}")
+
       begin
-        index = "temp_primary_key"
-        case connection.adapter_name
-          when 'PostgreSQL'
-            begin
-              old_proc = connection.raw_connection.set_notice_processor {}
-              if pluck && pluck.any?{|p| p == primary_key.to_s}
-                connection.execute("CREATE INDEX #{connection.quote_local_table_name(index)} ON #{connection.quote_local_table_name(table)}(#{connection.quote_column_name(primary_key)})")
-                index = primary_key.to_s
-              else
-                pluck.unshift(index) if pluck
-                connection.execute "ALTER TABLE #{table}
-                                 ADD temp_primary_key SERIAL PRIMARY KEY"
-              end
-            ensure
-              connection.raw_connection.set_notice_processor(&old_proc) if old_proc
+        if (rows > batch_size)
+          index = "temp_primary_key"
+          begin
+            old_proc = connection.raw_connection.set_notice_processor {}
+            if pluck && pluck.any?{|p| p == primary_key.to_s}
+              connection.execute("CREATE INDEX #{connection.quote_local_table_name(index)} ON #{connection.quote_local_table_name(table)}(#{connection.quote_column_name(primary_key)})")
+              index = primary_key.to_s
+            else
+              pluck.unshift(index) if pluck
+              connection.execute "ALTER TABLE #{table}
+                               ADD temp_primary_key SERIAL PRIMARY KEY"
             end
-          else
-            raise "Temp tables not supported!"
+          ensure
+            connection.raw_connection.set_notice_processor(&old_proc) if old_proc
+          end
         end
 
         includes = includes_values + preload_values
         klass.unscoped do
-
           quoted_plucks = pluck && pluck.map do |column_name|
             # Rails 4.2 is going to try to quote them anyway but unfortunately not to the temp table, so just make it explicit
             column_names.include?(column_name) ?
@@ -931,12 +928,23 @@ ActiveRecord::Relation.class_eval do
           end
 
           if pluck
-            batch = klass.from(table).order(Arel.sql(index)).limit(batch_size).pluck(*quoted_plucks)
+            if index
+              batch = klass.from(table).order(Arel.sql(index)).limit(batch_size).pluck(*quoted_plucks)
+            else
+              batch = klass.from(table).pluck(*quoted_plucks)
+            end
           else
-            sql = "SELECT * FROM #{table} ORDER BY #{index} LIMIT #{batch_size}"
-            batch = klass.find_by_sql(sql)
+            if index
+              sql = "SELECT * FROM #{table} ORDER BY #{index} LIMIT #{batch_size}"
+              batch = klass.find_by_sql(sql)
+            else
+              batch = klass.find_by_sql("SELECT * FROM #{table}")
+            end
           end
-          while !batch.empty?
+
+          while rows > 0
+            rows -= batch.size
+
             ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
             yield batch
             break if batch.size < batch_size
