@@ -206,6 +206,7 @@ pipeline {
               sh 'rm -v config/database.yml'
               sh 'rm -v config/security.yml'
               sh 'rm -v config/selenium.yml'
+              sh 'rm -v config/file_store.yml'
               sh 'cp -v docker-compose/config/selenium.yml config/'
               sh 'cp -vR docker-compose/config/new-jenkins/* config/'
               sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
@@ -310,6 +311,13 @@ pipeline {
                   }
                 }
               }
+            }
+          }
+
+          echo 'adding Consumer Smoke Test'
+          stages['Consumer Smoke Test'] = {
+            skipIfPreviouslySuccessful("consumer-smoke-test") {
+              sh 'build/new-jenkins/consumer-smoke-test.sh'
             }
           }
 
