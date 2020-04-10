@@ -38,7 +38,8 @@ export function createGradebook(options = {}) {
     },
 
     currentUserId: '1',
-    custom_column_data_url: '/api/v1/courses/1201/custom_gradebook_columns/:id',
+    // TODO: remove `custom_column_data_url` with TALLY-831
+    custom_column_data_url: '/api/v1/courses/1201/custom_gradebook_columns/:id/data',
     // TODO: remove `custom_columns_url` with TALLY-831
     custom_columns_url: '/api/v1/courses/1201/custom_gradebook_columns',
     dataloader_improvements: true,

@@ -47,11 +47,7 @@ export default class DataLoader {
       getGradingPeriodAssignments: gradebook.gradingPeriodSet != null,
       loadedStudentIds: [],
 
-      submissionsChunkSize: options.chunk_size,
-
-      customColumnDataURL: options.custom_column_data_url,
-      customColumnDataPageCb: gradebook.gotCustomColumnDataChunk,
-      customColumnDataParams: {include_hidden: true}
+      submissionsChunkSize: options.chunk_size
     })
 
     // eslint-disable-next-line promise/catch-or-return
@@ -109,9 +105,9 @@ export default class DataLoader {
     const {options} = gradebook
 
     OldDataLoader.getDataForColumn(
+      options.context_id,
       customColumnId,
-      options.custom_column_data_url,
-      {},
+      {perPage: options.api_max_per_page},
       gradebook.gotCustomColumnDataChunk,
       this.dispatch
     )
@@ -173,10 +169,7 @@ export default class DataLoader {
 
       submissionsChunkSize: options.chunk_size,
 
-      customColumnIds: gradebook.gradebookContent.customColumns.map(column => column.id),
-      customColumnDataURL: options.custom_column_data_url,
-      customColumnDataPageCb: gradebook.gotCustomColumnDataChunk,
-      customColumnDataParams: {include_hidden: true}
+      customColumnIds: gradebook.gradebookContent.customColumns.map(column => column.id)
     })
 
     if (promises.gotGradingPeriodAssignments != null) {

@@ -77,34 +77,29 @@ function getCustomColumns(courseId, dispatch) {
 // This function is called from showNoteColumn in Gradebook.coffee
 // when the notes column is revealed. In that case dispatch won't
 // exist so we'll create a new Dispatcher for this request.
-function getDataForColumn(columnId, url, params, cb, dispatch) {
-  const columnUrl = url.replace(/:id/, columnId)
-  const augmentedCallback = data => cb(columnId, data)
-  return dispatch.getDepaginated(columnUrl, params, augmentedCallback)
+function getDataForColumn(courseId, columnId, options, perPageCallback, dispatch) {
+  const url = `/api/v1/courses/${courseId}/custom_gradebook_columns/${columnId}/data`
+  const augmentedCallback = data => perPageCallback(columnId, data)
+  const params = {include_hidden: true, per_page: options.perPage}
+  return dispatch.getDepaginated(url, params, augmentedCallback)
 }
 
-function getCustomColumnData(options, customColumnsDfd, waitForDfds, dispatch) {
-  const url = options.customColumnDataURL
-  const params = options.customColumnDataParams
-  const cb = options.customColumnDataPageCb
+function getCustomColumnData(options, customColumnsDfd, dispatch) {
+  const {courseId, gradebook} = options
+  const perPageCallback = gradebook.gotCustomColumnDataChunk
   const customColumnDataLoaded = $.Deferred()
 
-  if (url) {
-    // waitForDfds ensures that custom column data is loaded *last*
-    $.when(...waitForDfds).then(() => {
-      if (options.customColumnIds) {
-        const customColumnDataDfds = options.customColumnIds.map(columnId =>
-          getDataForColumn(columnId, url, params, cb, dispatch)
-        )
-        $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
-      } else {
-        customColumnsDfd.then(customColumns => {
-          const customColumnDataDfds = customColumns.map(col =>
-            getDataForColumn(col.id, url, params, cb, dispatch)
-          )
-          $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
-        })
-      }
+  if (options.customColumnIds) {
+    const customColumnDataDfds = options.customColumnIds.map(columnId =>
+      getDataForColumn(courseId, columnId, options, perPageCallback, dispatch)
+    )
+    $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
+  } else {
+    customColumnsDfd.then(customColumns => {
+      const customColumnDataDfds = customColumns.map(column =>
+        getDataForColumn(courseId, column.id, options, perPageCallback, dispatch)
+      )
+      $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
     })
   }
 
@@ -151,12 +146,7 @@ function loadGradebookData(opts) {
     })
 
   // Custom Column Data will load only after custom columns and all submissions.
-  const gotCustomColumnData = getCustomColumnData(
-    opts,
-    gotCustomColumns,
-    [gotSubmissions],
-    dispatch
-  )
+  gotSubmissions.then(() => getCustomColumnData(opts, gotCustomColumns, dispatch))
 
   return {
     gotAssignmentGroups,
@@ -165,8 +155,7 @@ function loadGradebookData(opts) {
     gotGradingPeriodAssignments,
     gotStudentIds,
     gotStudents,
-    gotSubmissions,
-    gotCustomColumnData
+    gotSubmissions
   }
 }
 
