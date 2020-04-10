@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import 'jquery.ajaxJSON'
 
+import {deferPromise} from '../../async'
 import cheaterDepaginate from './CheatDepaginator'
 
 export const DEFAULT_ACTIVE_REQUEST_LIMIT = 12 // overall limit
@@ -71,7 +72,7 @@ export default class RequestDispatch {
 
   getDepaginated(url, params, pageCallback = () => {}, pagesEnqueuedCallback = () => {}) {
     const request = {
-      deferred: new $.Deferred(),
+      deferred: deferPromise(),
       active: false
     }
 
@@ -96,8 +97,8 @@ export default class RequestDispatch {
 
       cheaterDepaginate(url, params, pageCallback, allEnqueued, this)
         .then(request.deferred.resolve)
-        .fail(request.deferred.reject)
-        .always(() => {
+        .catch(request.deferred.reject)
+        .finally(() => {
           /*
            * If there is ever a problem with the initial request, there is
            * likely a larger problem with Canvas/Gradebook or the user
@@ -111,12 +112,12 @@ export default class RequestDispatch {
 
     this.addRequest(request)
 
-    return request.deferred
+    return request.deferred.promise
   }
 
-  getJSON(url, params, resolve, reject) {
+  getJSON(url, params) {
     const request = {
-      deferred: new $.Deferred(),
+      deferred: deferPromise(),
       active: false
     }
 
@@ -128,7 +129,7 @@ export default class RequestDispatch {
        */
       request.active = true
 
-      $.ajaxJSON(url, 'GET', params, resolve, reject)
+      $.ajaxJSON(url, 'GET', params)
         .then(request.deferred.resolve)
         .fail(request.deferred.reject)
         .always(() => {
@@ -139,6 +140,22 @@ export default class RequestDispatch {
 
     this.addRequest(request)
 
-    return request.deferred
+    return request.deferred.promise
+  }
+
+  // PRIVILEGED
+
+  _getJSON(url, params) {
+    return new Promise((resolve, reject) => {
+      $.ajaxJSON(
+        url,
+        'GET',
+        params,
+        (data, xhr) => {
+          resolve({data, xhr})
+        },
+        reject
+      )
+    })
   }
 }

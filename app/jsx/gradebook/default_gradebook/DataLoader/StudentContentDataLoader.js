@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {chunk, difference} from 'lodash'
 import I18n from 'i18n!gradebook'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
@@ -76,9 +76,7 @@ function getStudentsChunk(courseId, studentIds, options, dispatch) {
     user_ids: studentIds
   }
 
-  return new Promise((resolve, reject) => {
-    dispatch.getJSON(url, params, resolve, reject)
-  })
+  return dispatch.getJSON(url, params)
 }
 
 function getSubmissionsForStudents(courseId, studentIds, allEnqueued, dispatch) {
@@ -86,15 +84,13 @@ function getSubmissionsForStudents(courseId, studentIds, allEnqueued, dispatch) 
     const url = `/api/v1/courses/${courseId}/students/submissions`
     const params = {student_ids: studentIds, ...submissionsParams}
 
-    /* eslint-disable promise/catch-or-return */
     dispatch
       .getDepaginated(url, params, undefined, allEnqueued)
       .then(resolve)
-      .fail(() => {
+      .catch(() => {
         flashSubmissionLoadError()
         reject()
       })
-    /* eslint-enable promise/catch-or-return */
   })
 }
 
@@ -110,7 +106,7 @@ function getContentForStudentIdChunk(studentIds, options, dispatch) {
     gradebook.gotChunkOfStudents
   )
 
-  const submissionRequestChunks = _.chunk(studentIds, options.submissionsChunkSize)
+  const submissionRequestChunks = chunk(studentIds, options.submissionsChunkSize)
   const submissionRequests = []
 
   submissionRequestChunks.forEach(submissionRequestChunkIds => {
@@ -151,7 +147,7 @@ export default class StudentContentDataLoader {
 
   load(studentIds) {
     const loadedStudentIds = this.options.loadedStudentIds || []
-    const studentIdsToLoad = _.difference(studentIds, loadedStudentIds)
+    const studentIdsToLoad = difference(studentIds, loadedStudentIds)
 
     if (studentIdsToLoad.length === 0) {
       return
@@ -159,7 +155,7 @@ export default class StudentContentDataLoader {
 
     const studentRequests = []
     const submissionRequests = []
-    const studentIdChunks = _.chunk(studentIdsToLoad, this.options.studentsChunkSize)
+    const studentIdChunks = chunk(studentIdsToLoad, this.options.studentsChunkSize)
 
     // wait for all chunk requests to have been enqueued
     return new Promise(resolve => {

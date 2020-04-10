@@ -19,7 +19,7 @@
 import sinon from 'sinon'
 
 import FakeServer, {paramsFromRequest} from 'jsx/shared/network/__tests__/FakeServer'
-import NaiveRequestDispatch from 'jsx/shared/network/NaiveRequestDispatch'
+import {RequestDispatch} from 'jsx/shared/network'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
 import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 import CourseSettings from 'jsx/gradebook/default_gradebook/CourseSettings'
@@ -107,7 +107,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       submissionsChunkSize: 2
     }
 
-    dispatch = new NaiveRequestDispatch()
+    dispatch = new RequestDispatch()
   })
 
   suiteHooks.afterEach(() => {

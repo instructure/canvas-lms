@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import _ from 'underscore'
-import 'jquery.ajaxJSON'
+import {find, isArray} from 'lodash'
+
+import {deferPromise} from '../../async'
 
 /*
  * Fires callback for paginated APIs in order
@@ -33,7 +33,7 @@ function consumePagesInOrder(callback, data) {
   const orderedConsumer = (response, page) => {
     if (page === wantedPage) {
       if (callback) callback(response)
-      if (_.isArray(response)) {
+      if (isArray(response)) {
         data.push(...response)
       } else {
         data.push(response)
@@ -43,7 +43,7 @@ function consumePagesInOrder(callback, data) {
       pendingResponses.push([response, page])
     }
 
-    const nextPage = _.find(pendingResponses, ([_pageData, pageNum]) => pageNum === wantedPage)
+    const nextPage = find(pendingResponses, ([_pageData, pageNum]) => pageNum === wantedPage)
     if (nextPage) {
       const [pageData, pageNum] = nextPage
       orderedConsumer(pageData, pageNum)
@@ -64,42 +64,34 @@ function consumePagesInOrder(callback, data) {
  * @param url - canvas api endpoint
  * @param params - params to be passed along with each request
  * @param pageCallback - called for each page of data
- * @returns a jQuery Deferred that will be resolved when all pages have been fetched
+ * @returns a Promise that will be resolved when all pages have been fetched
  */
-function cheaterDepaginate(
-  url,
-  params,
-  pageCallback,
-  pagesEnqueuedCallback = () => {},
-  dispatch = null
-) {
-  const gotAllPagesDfd = $.Deferred()
+function cheaterDepaginate(url, params, pageCallback, pagesEnqueuedCallback = () => {}, dispatch) {
+  const gotAllPagesDeferred = deferPromise()
   const data = []
   const errHandler = () => {
     pagesEnqueuedCallback([])
-    gotAllPagesDfd.reject()
+    gotAllPagesDeferred.reject()
   }
   const orderedPageCallback = consumePagesInOrder(pageCallback, data)
 
-  $.ajaxJSON(
-    url,
-    'GET',
-    params,
-    (firstPageResponse, xhr) => {
+  dispatch
+    ._getJSON(url, params)
+    .then(({data: firstPageResponse, xhr}) => {
       orderedPageCallback(firstPageResponse, 1)
 
       const paginationLinks = xhr.getResponseHeader('Link')
       const lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
       if (lastLink === null) {
         pagesEnqueuedCallback([])
-        gotAllPagesDfd.resolve(data)
+        gotAllPagesDeferred.resolve(data)
         return
       }
 
       const lastPage = parseInt(lastLink[0].match(/page=(\d+)/)[1], 10)
       if (lastPage === 1) {
         pagesEnqueuedCallback([])
-        gotAllPagesDfd.resolve(data)
+        gotAllPagesDeferred.resolve(data)
         return
       }
 
@@ -113,29 +105,21 @@ function cheaterDepaginate(
         return response => orderedPageCallback(response, page)
       }
 
-      const dfds = []
+      const promises = []
 
-      if (dispatch == null) {
-        const fetchPage = page =>
-          $.ajaxJSON(url, 'GET', paramsForPage(page), bindPageCallback(page))
-
-        for (let page = 2; page <= lastPage; page++) {
-          dfds.push(fetchPage(page))
-        }
-      } else {
-        for (let page = 2; page <= lastPage; page++) {
-          const deferred = dispatch.getJSON(url, paramsForPage(page), bindPageCallback(page))
-          dfds.push(deferred)
-        }
+      for (let page = 2; page <= lastPage; page++) {
+        const promise = dispatch.getJSON(url, paramsForPage(page)).then(bindPageCallback(page))
+        promises.push(promise)
       }
-      pagesEnqueuedCallback(dfds)
+      pagesEnqueuedCallback(promises)
 
-      $.when(...dfds).then(() => gotAllPagesDfd.resolve(data), errHandler)
-    },
-    errHandler
-  )
+      Promise.all(promises)
+        .then(() => gotAllPagesDeferred.resolve(data))
+        .catch(errHandler)
+    })
+    .catch(errHandler)
 
-  return gotAllPagesDfd
+  return gotAllPagesDeferred.promise
 }
 
 export default cheaterDepaginate

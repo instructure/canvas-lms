@@ -16,13 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-
 import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
 
+import {deferPromise} from '../../../shared/async'
 import StudentContentDataLoader from './StudentContentDataLoader'
 
-function getStudentIds(courseId) {
+function getStudentIds(courseId, dispatch) {
   if (ENV.prefetch_gradebook_user_ids) {
     /*
      * When user ids have been prefetched, the data is only known valid for the
@@ -37,12 +36,12 @@ function getStudentIds(courseId) {
   }
 
   const url = `/courses/${courseId}/gradebook/user_ids`
-  return $.ajaxJSON(url, 'GET', {})
+  return dispatch.getJSON(url)
 }
 
-function getGradingPeriodAssignments(courseId) {
+function getGradingPeriodAssignments(courseId, dispatch) {
   const url = `/courses/${courseId}/gradebook/grading_period_assignments`
-  return $.ajaxJSON(url, 'GET', {})
+  return dispatch.getJSON(url)
 }
 
 function getAssignmentGroups(options, dispatch) {
@@ -87,23 +86,23 @@ function getDataForColumn(courseId, columnId, options, perPageCallback, dispatch
 function getCustomColumnData(options, customColumnsDfd, dispatch) {
   const {courseId, gradebook} = options
   const perPageCallback = gradebook.gotCustomColumnDataChunk
-  const customColumnDataLoaded = $.Deferred()
+  const customColumnDataLoaded = deferPromise()
 
   if (options.customColumnIds) {
     const customColumnDataDfds = options.customColumnIds.map(columnId =>
       getDataForColumn(courseId, columnId, options, perPageCallback, dispatch)
     )
-    $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
+    Promise.all(customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
   } else {
     customColumnsDfd.then(customColumns => {
       const customColumnDataDfds = customColumns.map(column =>
         getDataForColumn(courseId, column.id, options, perPageCallback, dispatch)
       )
-      $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
+      Promise.all(customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
     })
   }
 
-  return customColumnDataLoaded
+  return customColumnDataLoaded.promise
 }
 
 function loadGradebookData(opts) {
@@ -112,10 +111,10 @@ function loadGradebookData(opts) {
   const gotAssignmentGroups = opts.getAssignmentGroups ? getAssignmentGroups(opts, dispatch) : null
 
   // Begin loading Students before any other data.
-  const gotStudentIds = getStudentIds(opts.courseId)
+  const gotStudentIds = getStudentIds(opts.courseId, dispatch)
   let gotGradingPeriodAssignments
   if (opts.getGradingPeriodAssignments) {
-    gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId)
+    gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId, dispatch)
   }
 
   const gotCustomColumns = opts.getCustomColumns ? getCustomColumns(opts.courseId, dispatch) : null
@@ -135,8 +134,8 @@ function loadGradebookData(opts) {
     ? getContextModules(opts.courseId, dispatch)
     : null
 
-  const gotStudents = $.Deferred()
-  const gotSubmissions = $.Deferred()
+  const gotStudents = deferPromise()
+  const gotSubmissions = deferPromise()
 
   Promise.resolve(gotStudentIds)
     .then(data => studentContentDataLoader.load(data.user_ids))
@@ -146,7 +145,7 @@ function loadGradebookData(opts) {
     })
 
   // Custom Column Data will load only after custom columns and all submissions.
-  gotSubmissions.then(() => getCustomColumnData(opts, gotCustomColumns, dispatch))
+  gotSubmissions.promise.then(() => getCustomColumnData(opts, gotCustomColumns, dispatch))
 
   return {
     gotAssignmentGroups,
@@ -154,8 +153,8 @@ function loadGradebookData(opts) {
     gotCustomColumns,
     gotGradingPeriodAssignments,
     gotStudentIds,
-    gotStudents,
-    gotSubmissions
+    gotStudents: gotStudents.promise,
+    gotSubmissions: gotSubmissions.promise
   }
 }
 

@@ -88,14 +88,7 @@ describe('Shared > Network > RequestDispatch', () => {
     }
 
     function getJSON(resourceIndex) {
-      return new Promise((resolve, reject) => {
-        /* eslint-disable promise/catch-or-return */
-        dispatch
-          .getJSON(URL, {resourceIndex})
-          .then(resolve)
-          .fail(reject)
-        /* eslint-enable promise/catch-or-return */
-      })
+      return dispatch.getJSON(URL, {resourceIndex})
     }
 
     beforeEach(() => {
@@ -135,20 +128,16 @@ describe('Shared > Network > RequestDispatch', () => {
           exampleData[resourceIndex].push({pageIndex, resourceIndex})
         }
 
-        const pageResponses = exampleData[resourceIndex].map(body => ({status: 200, body}))
+        const pageResponses = exampleData[resourceIndex].map(resourceDatum => ({
+          status: 200,
+          body: [resourceDatum]
+        }))
         server.for(URL, {resourceIndex}).respond(pageResponses)
       }
     }
 
     function getDepaginated(resourceIndex) {
-      return new Promise((resolve, reject) => {
-        /* eslint-disable promise/catch-or-return */
-        dispatch
-          .getDepaginated(URL, {resourceIndex})
-          .then(resolve)
-          .fail(reject)
-        /* eslint-enable promise/catch-or-return */
-      })
+      return dispatch.getDepaginated(URL, {resourceIndex})
     }
 
     beforeEach(() => {

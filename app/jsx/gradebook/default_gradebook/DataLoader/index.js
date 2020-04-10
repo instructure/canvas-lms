@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-
 import {RequestDispatch} from '../../../shared/network'
 import OldDataLoader from './OldDataLoader'
 
@@ -89,13 +87,13 @@ export default class DataLoader {
 
     // TODO: In TALLY-769, remove this entire block.
     // eslint-disable-next-line promise/catch-or-return
-    $.when(
+    Promise.all([
       promises.gotStudentIds,
       promises.gotContextModules,
       promises.gotCustomColumns,
       promises.gotAssignmentGroups,
       promises.gotGradingPeriodAssignments
-    ).then(() => {
+    ]).then(() => {
       gradebook.finishRenderingUI()
     })
   }
