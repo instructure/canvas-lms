@@ -16,12 +16,61 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
+  # @API Accounts (LTI)
+  #
+  # API for accessing account data using an LTI dev key. Allows a tool to get account
+  # information via LTI Advantage authorization scheme, which does not require a
+  # user session like normal developer keys do. Requires the account lookup scope on
+  # the LTI key.
+  #
+  # @model Account
+  #     {
+  #       "id": "Account",
+  #       "description": "",
+  #       "properties": {
+  #         "id": {
+  #           "description": "the ID of the Account object",
+  #           "example": 2,
+  #           "type": "integer"
+  #         },
+  #         "name": {
+  #           "description": "The display name of the account",
+  #           "example": "Canvas Account",
+  #           "type": "string"
+  #         },
+  #         "uuid": {
+  #           "description": "The UUID of the account",
+  #           "example": "WvAHhY5FINzq5IyRIJybGeiXyFkG3SqHUPb7jZY5",
+  #           "type": "string"
+  #         },
+  #         "parent_account_id": {
+  #           "description": "The account's parent ID, or null if this is the root account",
+  #           "example": 1,
+  #           "type": "integer"
+  #         },
+  #         "root_account_id": {
+  #           "description": "The ID of the root account, or null if this is the root account",
+  #           "example": 1,
+  #           "type": "integer"
+  #         },
+  #         "workflow_state": {
+  #           "description": "The state of the account. Can be 'active' or 'deleted'.",
+  #           "example": "active",
+  #           "type": "string"
+  #         }
+  #       }
+  #     }
+  #
   class AccountLookupController < ApplicationController
     include Ims::Concerns::AdvantageServices
     include Api::V1::Account
 
     MIME_TYPE = 'application/vnd.canvas.accountlookup+json'.freeze
 
+    # @API Get account
+    # Retrieve information on an individual account, given by local or global ID.
+    #
+    # @returns Account
     def show
       # sending read_only=true; sending false would give more fields but passes the
       # nil session in to extensions' extend_account_json() which may not be safe
