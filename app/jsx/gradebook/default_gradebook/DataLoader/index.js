@@ -18,13 +18,13 @@
 
 import $ from 'jquery'
 
-import NaiveRequestDispatch from '../../../shared/network/NaiveRequestDispatch'
+import {RequestDispatch} from '../../../shared/network'
 import OldDataLoader from './OldDataLoader'
 
 export default class DataLoader {
   constructor({gradebook}) {
     this._gradebook = gradebook
-    this.dispatch = new NaiveRequestDispatch({
+    this.dispatch = new RequestDispatch({
       activeRequestLimit: gradebook.options.activeRequestLimit
     })
   }
