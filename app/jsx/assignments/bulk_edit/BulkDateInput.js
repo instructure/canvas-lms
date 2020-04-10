@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {bool, func, instanceOf, string} from 'prop-types'
+import React, {useCallback} from 'react'
+import {bool, func, oneOf, string} from 'prop-types'
 import tz from 'timezone'
 import moment from 'moment-timezone'
 import {DateTime} from '@instructure/ui-i18n'
@@ -26,8 +26,11 @@ import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
 
 BulkDateInput.propTypes = {
   label: string.isRequired,
-  selectedDate: instanceOf(Date),
-  onSelectedDateChange: func.isRequired,
+  selectedDateString: string,
+  dateKey: oneOf(['due_at', 'unlock_at', 'lock_at']),
+  assignmentId: string.isRequired,
+  overrideId: string, // may be null
+  updateAssignmentDate: func.isRequired,
   timezone: string,
   fancyMidnight: bool,
   interaction: string
@@ -39,10 +42,17 @@ BulkDateInput.defaultProps = {
   interaction: 'enabled'
 }
 
-export default function BulkDateInput({
+function formatDate(date) {
+  return tz.format(date, 'date.formats.medium_with_weekday')
+}
+
+function BulkDateInput({
   label,
-  selectedDate,
-  onSelectedDateChange,
+  selectedDateString,
+  dateKey,
+  assignmentId,
+  overrideId,
+  updateAssignmentDate,
   timezone,
   fancyMidnight,
   interaction
@@ -50,32 +60,39 @@ export default function BulkDateInput({
   // do this here so tests can modify ENV.TIMEZONE
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
 
-  function formatDate(date) {
-    return tz.format(date, 'date.formats.medium_with_weekday')
-  }
+  const setDate = useCallback(
+    newDate => updateAssignmentDate({newDate, dateKey, assignmentId, overrideId}),
+    [updateAssignmentDate, dateKey, assignmentId, overrideId]
+  )
 
-  function handleSelectedDateChange(newDate) {
-    if (!newDate) {
-      onSelectedDateChange(null)
-    } else if (selectedDate) {
-      // preserve the existing selected time by adding it to the new date
-      const selectedMoment = moment.tz(selectedDate, timezone)
-      const timeOfDayMs = selectedMoment.diff(selectedMoment.clone().startOf('day'))
-      const newMoment = moment.tz(newDate, timezone)
-      newMoment.add(timeOfDayMs, 'ms')
-      onSelectedDateChange(newMoment.toDate())
-    } else {
-      // assign a default time to the new date
-      const newMoment = moment.tz(newDate, timezone)
-      if (fancyMidnight) newMoment.endOf('day')
-      else newMoment.startOf('day')
-      onSelectedDateChange(newMoment.toDate())
-    }
-  }
+  const handleSelectedDateChange = useCallback(
+    newDate => {
+      if (!newDate) {
+        setDate(null)
+      } else if (selectedDateString) {
+        // preserve the existing selected time by adding it to the new date
+        const selectedMoment = moment.tz(selectedDateString, timezone)
+        const timeOfDayMs = selectedMoment.diff(selectedMoment.clone().startOf('day'))
+        const newMoment = moment.tz(newDate, timezone)
+        newMoment.add(timeOfDayMs, 'ms')
+        setDate(newMoment.toDate())
+      } else {
+        // assign a default time to the new date
+        const newMoment = moment.tz(newDate, timezone)
+        if (fancyMidnight) newMoment.endOf('day')
+        else newMoment.startOf('day')
+        setDate(newMoment.toDate())
+      }
+    },
+    [fancyMidnight, selectedDateString, setDate, timezone]
+  )
 
+  const renderLabel = useCallback(() => <ScreenReaderContent>{label}</ScreenReaderContent>, [label])
+
+  const selectedDate = tz.parse(selectedDateString)
   return (
     <CanvasDateInput
-      renderLabel={<ScreenReaderContent>{label}</ScreenReaderContent>}
+      renderLabel={renderLabel}
       selectedDate={selectedDate}
       formatDate={formatDate}
       onSelectedDateChange={handleSelectedDateChange}
@@ -84,3 +101,5 @@ export default function BulkDateInput({
     />
   )
 }
+
+export default React.memo(BulkDateInput)

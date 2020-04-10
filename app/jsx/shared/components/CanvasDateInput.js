@@ -153,7 +153,10 @@ export default function CanvasDateInput({
     // If we do not have a selectedMoment, we'll just select the first day of
     // the currently rendered month.
     const newMoment = selectedMoment
-      ? selectedMoment.clone().add(step, type)
+      ? selectedMoment
+          .clone()
+          .add(step, type)
+          .startOf('day')
       : renderedMoment.clone().startOf('month')
 
     syncInput(newMoment)
@@ -161,7 +164,12 @@ export default function CanvasDateInput({
   }
 
   function modifyRenderedMoment(step, type) {
-    setRenderedMoment(renderedMoment.clone().add(step, type))
+    setRenderedMoment(
+      renderedMoment
+        .clone()
+        .add(step, type)
+        .startOf('day')
+    )
   }
 
   function renderWeekdayLabels() {

@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!assignments_bulk_edit'
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {func, string} from 'prop-types'
 import produce from 'immer'
 import {Button} from '@instructure/ui-buttons'
@@ -69,39 +69,47 @@ export default function BulkEdit({courseId, onCancel}) {
 
   useEffect(() => {
     function clearOriginalDates() {
-      const nextAssignments = produce(assignments, draftAssignments => {
-        const draftOverrides = draftAssignments.flatMap(assignment => assignment.all_dates)
-        draftOverrides.forEach(draftOverride => {
-          delete draftOverride[originalDateField('due_at')]
-          delete draftOverride[originalDateField('unlock_at')]
-          delete draftOverride[originalDateField('lock_at')]
+      setAssignments(currentAssignments =>
+        produce(currentAssignments, draftAssignments => {
+          const draftOverrides = draftAssignments.flatMap(assignment => assignment.all_dates)
+          draftOverrides.forEach(draftOverride => {
+            delete draftOverride[originalDateField('due_at')]
+            delete draftOverride[originalDateField('unlock_at')]
+            delete draftOverride[originalDateField('lock_at')]
+          })
         })
-      })
-      setAssignments(nextAssignments)
+      )
     }
 
     if (jobSuccess) clearOriginalDates()
-  }, [assignments, jobSuccess])
+  }, [jobSuccess])
 
   function handleSave() {
     saveAssignments(assignments)
   }
 
-  function updateAssignment({dateKey, newDate, assignmentId, overrideId, base}) {
-    // Clear anything from the previous save operation so those elements don't show anymore and so
-    // the above effect doesn't try to clear the original dates.
-    setJobSuccess(false)
-    setProgressUrl(null)
+  const updateAssignment = useCallback(
+    ({dateKey, newDate, assignmentId, overrideId}) => {
+      const isBaseOverride = !overrideId
 
-    const nextAssignments = produce(assignments, draftAssignments => {
-      const assignment = draftAssignments.find(a => a.id === assignmentId)
-      const override = assignment.all_dates.find(o => (base ? o.base : o.id === overrideId))
-      const originalField = originalDateField(dateKey)
-      if (!override.hasOwnProperty(originalField)) override[originalField] = override[dateKey]
-      override[dateKey] = newDate ? newDate.toISOString() : null
-    })
-    setAssignments(nextAssignments)
-  }
+      // Clear anything from the previous save operation so those elements don't show anymore and so
+      // the above effect doesn't try to clear the original dates.
+      setJobSuccess(false)
+      setProgressUrl(null)
+      setAssignments(currentAssignments =>
+        produce(currentAssignments, draftAssignments => {
+          const assignment = draftAssignments.find(a => a.id === assignmentId)
+          const override = assignment.all_dates.find(o =>
+            isBaseOverride ? o.base : o.id === overrideId
+          )
+          const originalField = originalDateField(dateKey)
+          if (!override.hasOwnProperty(originalField)) override[originalField] = override[dateKey]
+          override[dateKey] = newDate ? newDate.toISOString() : null
+        })
+      )
+    },
+    [setJobSuccess, setProgressUrl]
+  )
 
   function anyAssignmentsEdited() {
     const overrides = assignments.flatMap(a => a.all_dates)

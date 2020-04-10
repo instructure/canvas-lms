@@ -19,7 +19,6 @@
 import I18n from 'i18n!assignments_bulk_edit'
 import React from 'react'
 import {arrayOf, func} from 'prop-types'
-import tz from 'timezone'
 import {Table} from '@instructure/ui-table'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Responsive} from '@instructure/ui-layout'
@@ -64,23 +63,16 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
   const DATE_COLUMN_WIDTH_REMS = 14
   const NOTE_COLUMN_WIDTH_REMS = 3
 
-  const createUpdateAssignmentFn = opts => newDate => {
-    updateAssignmentDate({newDate, ...opts})
-  }
-
   function renderDateInput(assignmentId, dateKey, dates, overrideId = null) {
     const label = DATE_INPUT_META[dateKey].label
-    const handleSelectedDateChange = createUpdateAssignmentFn({
-      dateKey,
-      assignmentId,
-      overrideId,
-      base: overrideId === null
-    })
     return (
       <BulkDateInput
         label={label}
-        selectedDate={tz.parse(dates[dateKey])}
-        onSelectedDateChange={handleSelectedDateChange}
+        selectedDateString={dates[dateKey]}
+        dateKey={dateKey}
+        assignmentId={assignmentId}
+        overrideId={overrideId}
+        updateAssignmentDate={updateAssignmentDate}
         fancyMidnight={DATE_INPUT_META[dateKey].fancyMidnight}
         interaction={dates.can_edit ? 'enabled' : 'disabled'}
       />
