@@ -413,6 +413,7 @@ class GradebooksController < ApplicationController
       current_grading_period_id: @current_grading_period_id,
       custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
       custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
+      # TODO: remove `custom_columns_url` with TALLY-831
       custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
       # TODO: remove `dataloader_improvements` with TALLY-831
       dataloader_improvements:  Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements),

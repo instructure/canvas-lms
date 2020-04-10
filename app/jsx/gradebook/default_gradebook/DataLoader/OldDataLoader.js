@@ -69,7 +69,8 @@ function getContextModules(courseId, dispatch) {
   return dispatch.getDepaginated(url)
 }
 
-function getCustomColumns(url, dispatch) {
+function getCustomColumns(courseId, dispatch) {
+  const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
   return dispatch.getDepaginated(url, {include_hidden: true})
 }
 
@@ -121,7 +122,8 @@ function loadGradebookData(opts) {
   if (opts.getGradingPeriodAssignments) {
     gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId)
   }
-  const gotCustomColumns = getCustomColumns(opts.customColumnsURL, dispatch)
+
+  const gotCustomColumns = opts.getCustomColumns ? getCustomColumns(opts.courseId, dispatch) : null
 
   const studentContentDataLoader = new StudentContentDataLoader(
     {
