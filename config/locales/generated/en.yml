@@ -762,6 +762,8 @@ en:
   in_product_training_walkthrough_and_tourpoints_for_2e185119: In-product training walkthrough and tourpoints for teachers
   march_2020_responsiveness_f810a65b: March 2020 Responsiveness
   collection_of_responsive_improvements_throughout_c_dedfe6dc: Collection of responsive improvements throughout Canvas
+  module_content_import_enhancements_c00b0ea2: Module Content Import Enhancements
+  drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: Drag and Drop files on modules and multi-file module item uploads
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   pronouns_for_users_da46fb5: Pronouns for users
@@ -815,6 +817,8 @@ en:
   show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
     Show a checkbox that optionally lets an account admin publish courses
     automatically after associating and syncing with a blueprint course
+  enable_fullstory_5c673a06: Enable fullstory
+  include_fullstory_recording_of_the_user_s_session_656d131e: Include FullStory recording of the user's session
   outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
   rubrics_in_course_navigation_539ea536: Rubrics in course navigation
@@ -4666,6 +4670,9 @@ en:
     big_blue_button:
       name: BigBlueButton
       description: BigBlueButton web conferencing support
+    big_blue_button_fallback:
+      name: BigBlueButton Fallback For Migration
+      description: BigBlueButton previous settings to preserve recordings during migration
     grade_export:
       name: Grade Export
       description: Grade Export for SIS
@@ -6870,6 +6877,8 @@ en:
     canvas_help_sub: Find answers to common questions
     report_problem: Report a Problem
     report_problem_sub: If Canvas misbehaves, tell us about it
+    covid: COVID-19 Canvas Resources
+    covid_sub: Tips for teaching and learning online
     training_services_portal: Training Services Portal
     training_services_portal_sub: Access Canvas training videos and courses
     stuff: Stuff
@@ -8476,6 +8485,7 @@ en:
         url: URL
         page_name: Page Name
         wiki_page_name: Page Name
+        files: Files
         file: File
         folder: Folder
         quiz_name: Quiz Name
@@ -8490,7 +8500,6 @@ en:
       loading: Loading...
       domain_match_notice: to use this tool the domain must match %{domain}
       new_page_option: "[ New Page ]"
-      file_notice: Select the file you want to associate with this *module*, or add a file by selecting "New File".
       quiz_notice: Select the quiz you want to associate with this *module*, or add a new one by selecting "New Quiz".
       quiz_select_label: Select the quiz you want to associate, or add a new one by selecting "New Quiz".
       new_quiz_option: "[ New Quiz ]"
@@ -12370,6 +12379,8 @@ en:
   points_out_of_total_24f61148: "*%{points}* out of **%{total}**"
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: Select the page you want to associate with this *module*, or add a new page by selecting "New Page".
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: Select the page you want to associate, or add a new page by selecting "New Page".
+  select_the_files_you_want_to_associate_with_this_m_82677c50: Select the files you want to associate with this *module*, or add files by selecting "New File(s)".
+  select_the_file_you_want_to_associate_with_this_mo_c88fcd46: Select the file you want to associate with this *module*, or add a file by selecting "New File".
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: You're editing your Canvas Theme! The changes have not been applied yet.
   you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: You're editing your Canvas Theme! Apply or cancel changes from within the *Theme Editor*.
   note_sub_account_themes_are_not_active_during_this_a5dd9da: 'Note: sub-account themes are not active during this preview.'
@@ -12674,6 +12685,7 @@ en:
   account_domain_78f43049: Account Domain
   trusted_account_url_e6200e41: Trusted Account URL
   trusted_account_669ba397: Trusted Account
+  we_could_not_automatically_log_you_in_d836d1b5: We could not automatically log you in
   site_admin:
     domain_not_found:
       page_title: Oops, Canvas can’t find your login page.
@@ -14485,6 +14497,7 @@ en:
         username: Username
         password: Password
         password_confirmation: Confirm Password
+        email: Email
       buttons:
         start_learning: Start Learning
   sharedCurveGradesDialog:
@@ -15269,6 +15282,12 @@ en:
   unlimited_ff19e96d: Unlimited
   limited_322546c5: Limited
   number_of_attempts_b0994c2f: Number of Attempts
+  edit_dates_ed31061: Edit Dates
+  there_was_an_error_retrieving_assignment_due_dates_c010cf8a: There was an error retrieving assignment due dates.
+  choose_a_due_date_73354c20: Choose a due date
+  assignment_dates_dccc98de: Assignment Dates
+  due_at_5d7d2fa: Due At
+  lock_at_76afa49c: Lock At
   select_group_to_grade_6df28d80: Select Group to Grade
   must_select_a_student_group_first_15c6a3cb: Must select a student group first
   no_content_5dbc9acf: No Content
@@ -15879,7 +15898,9 @@ en:
   page_views_eb64cf53: Page Views
   grade_10d1e5a1: "%{grade}"
   last_length_graded_items_6db7374e: Last %{length} Graded Items
+  select_the_files_you_want_to_associate_or_add_file_9acd7878: Select the files you want to associate, or add files by selecting "New File(s)".
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: Select the file you want to associate, or add a file by selecting "New File".
+  new_file_s_8876bba1: "[ New File(s) ]"
   new_file_135ae520: "[ New File ]"
   restart_link_validation_b61286fc: Restart Link Validation
   start_link_validation_dc0ac99c: Start Link Validation
@@ -16024,6 +16045,7 @@ en:
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: Choose a color or course nickname or move course card for %{course}
   course_image_for_course_cfbb08df: Course image for %{course}
   course_card_color_region_for_course_c356a69c: Course card color region for %{course}
+  observing_observee_d31d5fa2: 'Observing: %{observee}'
   actions_for_course_312ff446: Actions for %{course}
   color_a363e1b0: Color
   dashboard_card_movement_menu_b65b98f5: Dashboard Card Movement Menu
@@ -16949,7 +16971,38 @@ en:
   current_of_totalsteps_19d7ee37: "%{current} of %{totalSteps}"
   not_now_afa29fa7: Not Now
   start_tour_29787099: Start Tour
+  come_back_later_5eab7dba: Come back later!
+  you_can_access_the_welcome_tour_here_any_time_as_w_95b44855: You can access the Welcome Tour here any time as well as other new resources.
+  student_tour_38b735c8: Student Tour
+  teacher_tour_26282921: Teacher Tour
+  admin_tour_36d89fbb: Admin Tour
   hello_name_cabdd4ce: Hello%{name}!
+  we_know_it_s_a_priority_to_transition_your_institu_9a5bed0c: 'We know it''s a priority to transition your institution for online learning during this time. This quick tour will show you how to:'
+  add_people_and_courses_to_canvas_5c4bfff9: Add People and Courses to Canvas
+  quickly_share_course_content_and_templates_with_te_c70a5eeb: Quickly share Course Content and Templates with Teachers
+  set_up_video_conferencing_and_other_tools_1a94a350: Set up Video Conferencing and Other Tools
+  find_training_resources_and_more_help_f148612c: Find Training Resources and More Help
+  star_2d27c137: star
+  click_on_the_admin_navigation_button_to_access_acc_d0438ab7: Click on the admin navigation button to access account settings.
+  to_add_individual_courses_click_courses_c5355180: To add individual courses, click Courses.
+  to_add_individual_users_click_people_4d6de56a: To add individual users, click People.
+  to_add_bulk_users_courses_and_enrollments_click_si_4395c26: To add bulk users, courses, and enrollments, click SIS Imports.
+  quickly_share_course_content_and_templates_with_te_1cf3dc6f: Quickly Share Course Content and Templates with Teachers
+  learn_more_about_using_commons_and_blueprints_3df953f6: Learn more about using Commons and Blueprints.
+  set_up_video_conferencing_c0049abe: Set up Video Conferencing
+  video_conferencing_tools_enable_face_to_face_conne_144420a5: Video conferencing tools enable face-to-face connection between teachers and students.
+  access_canvas_training_videos_and_courses_ea43173a: Access Canvas training videos and courses
+  here_s_some_quick_tips_to_get_you_started_in_canva_72425979: Here's some quick tips to get you started in Canvas!
+  how_do_i_find_my_courses_b826e4ce: How do I find my courses?
+  how_do_i_contact_my_instructor_184e35ed: How do I contact my instructor?
+  how_do_i_download_the_student_app_4a4b8a63: How do I download the Student App?
+  find_your_classes_or_subjects_in_the_dashboard_72e1ed47: Find your classes or subjects in the Dashboard...
+  or_in_the_courses_list_6201030: "...or in the Courses list."
+  start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: Start a conversation with your instructor in the Canvas Inbox.
+  how_do_i_download_the_student_app_and_get_addition_3604c207: How do I download the Student App and get additional help?
+  access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: Access your courses and groups using any iOS or Android mobile device and find more information in the Help menu.
+  download_canvas_ios_app_11c8651b: Download Canvas iOS app
+  download_canvas_android_app_60b5595f: Download Canvas Android app
   we_know_getting_your_courses_online_quickly_during_40424e8: 'We know getting your courses online quickly during this time is priority. This quick tour will show you how to:'
   set_up_your_notifications_9c005279: Set up your Notifications
   get_your_content_online_9546ecff: Get your Content online
@@ -16957,12 +17010,12 @@ en:
   set_up_your_notifications_568ecf91: Set Up Your Notifications
   click_on_the_account_navigation_button_to_access_n_fbe82181: Click on the account navigation button to access notification preferences.
   don_t_miss_notifications_from_your_students_900e9e30: Don't miss notifications from your students.
+  canvas_notifications_tutorial_video_79b8e768: Canvas Notifications Tutorial Video
   get_your_content_online_quickly_41fd925b: Get Your Content Online Quickly
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: Click on the courses navigation button to access your courses.
   set_up_your_canvas_course_in_30_minutes_or_less_94817b6d: Set up your Canvas course in 30 minutes or less.
+  canvas_course_tutorial_video_5205c1c1: Canvas Course Tutorial Video
   visit_the_help_section_any_time_for_new_tips_and_g_4dcf2a28: Visit the Help section any time for new tips and guides.
-  come_back_later_5eab7dba: Come back later!
-  you_can_access_the_welcome_tour_here_any_time_as_w_95b44855: You can access the Welcome Tour here any time as well as other new resources.
   logout_a9312e35: Logout
   disabled_not_visible_to_students_2c9d693f: Disabled. Not visible to students.
   no_content_not_visible_to_students_905f8996: No content. Not visible to students.
@@ -17029,7 +17082,7 @@ en:
           users can work together on the same document at the same time. Create
           collaborative documents that are saved in real time—a change made by
           any user will be visible to everyone immediately.
-  virtual_lectures_in_real_time_a1778dea: Virtual lectures in real-time
+  host_virtual_lectures_in_real_time_150cef95: Host virtual lectures in real time
   how_do_i_create_a_conference_in_a_course_69affbf4: How do I create a conference in a course?
   how_do_i_start_a_conference_52792795: How do I start a conference?
   how_do_i_conclude_a_conference_689d60dc: How do I conclude a conference?
@@ -17076,7 +17129,7 @@ en:
           late submissions, and easily hide grades until you're ready for students
           to view them. For simplified grading, use SpeedGrader to view and grade submissions.
   home_351838cd: Home
-  course_landing_page_49a53ade: Course landing page
+  welcome_your_students_e1d96088: Welcome your students
   how_do_i_use_the_course_home_page_as_an_instructor_af32848e: How do I use the Course Home Page as an instructor?
   what_layout_options_are_available_in_the_course_ho_5d364ce3: What layout options are available in the Course Home Page as an instructor?
   how_do_i_change_the_course_home_page_326cee50: How do I change the Course Home Page?
@@ -17897,6 +17950,9 @@ en:
   list_collapsed_9ac35920: List collapsed.
   count_options_loaded_cd59cc3b: "%{count} options loaded."
   type_to_search_de63ad38: Type to search
+  choose_a_date_cd0263fe: Choose a date
+  that_s_not_a_date_3f350dba: That's not a date!
+  type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: Type a date or use arrow keys to navigate date picker.
   list_expanded_efec2d0: List expanded.
   list_collapsed_dde87718: List collapsed
   option_selected_list_collapsed_70a356b4: "%{option} selected. List collapsed."
@@ -18197,7 +18253,6 @@ en:
   25th_75th_ile_406a67bf: 25th-75th %ile
   instructor_messages_a4c28674: Instructor Messages
   student_messages_b0a242d: Student Messages
-  due_at_5d7d2fa: Due At
   submitted_at_4d5ea3aa: Submitted At
   announcements_17c6a6bf: announcements
   assignments_989ed7fb: assignments
@@ -18251,6 +18306,18 @@ en:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: 'Click on a snapshot to revert back to your trial as it was when the snapshot was taken. Note: You will lose any work you have done since the snapshot was taken and it cannot be undone!'
   switch_to_ea940b5b: 'Switch to:'
   snapshots_6e1806b4: Snapshots
+  which_canvas_account_would_you_like_to_use_to_log__c3718dc6: Which Canvas account would you like to use to log in?
+  choose_canvas_account_ec2f0279: Choose Canvas Account…
+  go_30af2a7b: Go
+  already_have_a_canvas_account_c4368ac9: Already have a Canvas Account?
+  log_in_5c66644d: Log In
+  try_out_canvas_for_free_e2265d30: Try out Canvas for Free!
+  sign_up_dafdee18: Sign Up
+  to_join_the_canvas_community_you_must_first_have_a_6fe1b7d8: To join the Canvas Community, you must first have a Canvas Account.
+  sorry_but_we_couldn_t_automatically_log_you_into_p_e1518750: Sorry, but we couldnʼt automatically log you into %{provider}.
+  sorry_but_we_couldn_t_automatically_log_you_into_t_9e77ce17: Sorry, but we couldnʼt automatically log you into the Community.
+  confused_panda_questioning_what_to_do_next_42941484: Confused Panda questioning what to do next
+  powered_by_instructure_504d676d: Powered By Instructure
   authentication_provider_2ba1abfa: Authentication Provider
   delete_name_81c1b5b2: Delete %{name}
   add_domain_lookup_825f9eb7: Add Domain Lookup

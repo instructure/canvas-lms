@@ -38,6 +38,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
        unzip \
        pbzip2 \
        fontforge \
+       parallel \
 <% end -%>
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
@@ -111,6 +112,7 @@ USER docker
 COPY --chown=docker:docker Gemfile         ${APP_HOME}
 COPY --chown=docker:docker Gemfile.d       ${APP_HOME}Gemfile.d
 COPY --chown=docker:docker config          ${APP_HOME}config
+COPY --chown=docker:docker build/new-jenkins  ${APP_HOME}build/new-jenkins
 COPY --chown=docker:docker gems            ${APP_HOME}gems
 COPY --chown=docker:docker packages        ${APP_HOME}packages
 COPY --chown=docker:docker script          ${APP_HOME}script
@@ -119,8 +121,10 @@ COPY --chown=docker:docker yarn.lock       ${APP_HOME}
 COPY --chown=docker:docker babel.config.js ${APP_HOME}
 
 USER docker
+# if yarn hits a snag try one more time with concurrency set to 1
+# https://github.com/yarnpkg/yarn/issues/2629
 RUN bundle install --jobs 8 \
-  && yarn install --pure-lockfile
+  && (yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1)
 COPY --chown=docker:docker . $APP_HOME
 RUN mkdir -p <%= docker_compose_volume_paths.join(" \\\n             ") %>
 

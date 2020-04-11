@@ -166,7 +166,11 @@
       <div id="attachments_select" class="module_item_option">
         <div style="font-size: 0.8em;" id="file_select_label">
           <i class="icon-paperclip" aria-hidden="true"></i>
-          <%= t :file_notice, 'Select the file you want to associate with this *module*, or add a file by selecting "New File".', :wrapper => '<span class="holder_type">\1</span>' %>
+          <% if @context.root_account.feature_enabled?(:module_dnd) %>
+            <%= t 'Select the files you want to associate with this *module*, or add files by selecting "New File(s)".', :wrapper => '<span class="holder_type">\1</span>' %>
+          <% else %>
+            <%= t 'Select the file you want to associate with this *module*, or add a file by selecting "New File".', :wrapper => '<span class="holder_type">\1</span>' %>
+          <% end %>
         </div>
         <div style="margin-top: 5px;">
           <div id="module_item_select_file">
@@ -175,8 +179,15 @@
         <div class="new" style="margin-top: 5px;">
           <table>
             <tr>
-              <td><%= before_label :file, "File" %></td>
-              <td><input id="module_attachment_uploaded_data" type="file" name="attachment[uploaded_data]" class="item_title"/></td>
+              <% if @context.root_account.feature_enabled?(:module_dnd) %>
+                <td><%= before_label :files, "Files" %></td>
+                <td>
+                  <input id="module_attachment_uploaded_data" type="file" name="attachment[uploaded_data]" class="item_title" multiple='true'/>
+                </td>
+              <% else %>
+                <td><%= before_label :file, "File" %></td>
+                <td><input id="module_attachment_uploaded_data" type="file" name="attachment[uploaded_data]" class="item_title"/></td>
+              <% end %>
             </tr><tr>
               <td>
                 <a href="<%= context_url(@context, :context_files_url, :format => :text) %>" style="display: none;" class="add_item_url">&nbsp;</a>

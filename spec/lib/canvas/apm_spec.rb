@@ -18,11 +18,41 @@
 require_relative '../../sharding_spec_helper'
 
 describe Canvas::Apm do
+
   after(:each) do
     Canvas::DynamicSettings.config = nil
     Canvas::DynamicSettings.reset_cache!
     Canvas::DynamicSettings.fallback_data = nil
     Canvas::Apm.reset!
+  end
+
+  def inject_apm_settings(yaml_string)
+    Canvas::DynamicSettings.fallback_data = {
+        "private": {
+          "canvas": {
+            "datadog_apm.yml": yaml_string
+          }
+        }
+      }
+  end
+
+  describe "settings parsing" do
+    describe "analytics setting" do
+      it "is true for bool string" do
+        inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0\napp_analytics_enabled: true")
+        expect(Canvas::Apm.config['app_analytics_enabled']).to eq(true)
+        expect(Canvas::Apm).to be_analytics_enabled
+      end
+
+      it "is false if missing or set to false" do
+        inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0")
+        expect(Canvas::Apm).to_not be_analytics_enabled
+        Canvas::Apm.reset!
+        Canvas::DynamicSettings.reset_cache!
+        inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0\napp_analytics_enabled: false")
+        expect(Canvas::Apm).to_not be_analytics_enabled
+      end
+    end
   end
 
   describe ".configured?" do
@@ -32,26 +62,14 @@ describe Canvas::Apm do
     end
 
     it "is false for 0 sampling rate" do
-      Canvas::DynamicSettings.fallback_data = {
-        "private": {
-          "canvas": {
-            "datadog_apm.yml": "sample_rate: 0.0\nhost_sample_rate: 1.0"
-          }
-        }
-      }
+      inject_apm_settings("sample_rate: 0.0\nhost_sample_rate: 1.0")
       Canvas::Apm.hostname = "testbox"
       expect(Canvas::Apm.configured?).to eq(false)
     end
 
     it "is true for >0 sampling rate" do
       Canvas::Apm.reset!
-      Canvas::DynamicSettings.fallback_data = {
-        "private": {
-          "canvas": {
-            "datadog_apm.yml": "sample_rate: 0.5\nhost_sample_rate: 1.0"
-          }
-        }
-      }
+      inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0")
       Canvas::Apm.hostname = "testbox"
       expect(Canvas::Apm.config.fetch('sample_rate')).to eq(0.5)
       expect(Canvas::Apm.sample_rate).to eq(0.5)
@@ -61,13 +79,7 @@ describe Canvas::Apm do
 
     it "is false when no hosts are sampled" do
       Canvas::Apm.reset!
-      Canvas::DynamicSettings.fallback_data = {
-        "private": {
-          "canvas": {
-            "datadog_apm.yml": "sample_rate: 0.5\nhost_sample_rate: 0.0"
-          }
-        }
-      }
+      inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 0.0")
       Canvas::Apm.hostname = "testbox"
       expect(Canvas::Apm.config.fetch('sample_rate')).to eq(0.5)
       expect(Canvas::Apm.host_sample_rate).to eq(0.0)
@@ -78,13 +90,7 @@ describe Canvas::Apm do
   describe "annotating with standard tags" do
     it "adds shard and account tags to active span" do
       Canvas::Apm.reset!
-      Canvas::DynamicSettings.fallback_data = {
-        "private": {
-          "canvas": {
-            "datadog_apm.yml": "sample_rate: 0.5\nhost_sample_rate: 1.0"
-          }
-        }
-      }
+      inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0")
       Canvas::Apm.hostname = "testbox"
       Canvas::Apm.tracer.trace("TESTING") do |span|
         shard = OpenStruct.new({id: 42})

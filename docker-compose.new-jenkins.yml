@@ -11,20 +11,18 @@ services:
     environment:
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
       RAILS_ENV: test
-      DATABASE_URL: postgres://postgres:sekret@postgres:5432/canvas_test
+      DATABASE_URL: postgres://postgres:sekret@postgres:5432/canvas_test0
       RANDOMIZE_SEQUENCES: 1
       RERUNS_RETRY:
       MAX_FAIL:
       COVERAGE:
 
-      # knapsack
+      # parallel_tests
       CI_NODE_TOTAL:
       CI_NODE_INDEX:
-      KNAPSACK_ENABLED:
-      KNAPSACK_TEST_FILE_PATTERN:
-      KNAPSACK_EXCLUDE_REGEX:
-      KNAPSACK_TEST_DIR:
-      KNAPSACK_GENERATE_REPORT:
+      DOCKER_PROCESSES:
+      EXCLUDE_TESTS:
+      TEST_PATTERN:
 
   redis:
     image: starlord.inscloudgate.net/jenkins/redis:alpine

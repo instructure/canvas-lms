@@ -146,6 +146,8 @@ export default class DashboardCardBox extends React.Component {
           moveCard={this.moveCard}
           totalCards={this.state.courseCards.length}
           isFavorited={card.isFavorited}
+          enrollmentType={card.enrollmentType}
+          observee={card.observee}
         />
       )
     })

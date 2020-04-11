@@ -16,8 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Suspense} from 'react'
+import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 
-export default function BulkEditIndex() {
-  return <h2>Bulk Editing Mode!</h2>
+const BulkEdit = React.lazy(() => import('./BulkEdit'))
+
+// See BulkEdit for propTypes
+export default function BulkEditIndex(props) {
+  return (
+    <Suspense fallback={<LoadingIndicator />}>
+      <BulkEdit {...props} />
+    </Suspense>
+  )
 }

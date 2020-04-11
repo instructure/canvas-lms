@@ -67,87 +67,91 @@ class AccountNotification < ActiveRecord::Base
   end
 
   def self.for_user_and_account(user, root_account)
-    if root_account.site_admin?
-      current = self.for_account(root_account)
-    else
-      course_ids = user.enrollments.active_or_pending.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
-      # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
-      all_account_ids = Course.where(:id => course_ids).not_deleted.
-        distinct.pluck(:account_id, :root_account_id).flatten.uniq
-      all_account_ids += user.account_users.active.shard(user.in_region_associated_shards).
-        joins(:account).where(accounts: {workflow_state: 'active'}).
-        distinct.pluck(:account_id).uniq
-      all_account_ids = Account.multi_account_chain_ids(all_account_ids) # get all parent sub-accounts too
-      current = self.for_account(root_account, all_account_ids)
-    end
+    Shackles.activate(:slave) do
+      if root_account.site_admin?
+        current = self.for_account(root_account)
+      else
+        course_ids = user.enrollments.active_or_pending.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
+        # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
+        all_account_ids = Course.where(:id => course_ids).not_deleted.
+          distinct.pluck(:account_id, :root_account_id).flatten.uniq
+        all_account_ids += user.account_users.active.shard(user.in_region_associated_shards).
+          joins(:account).where(accounts: {workflow_state: 'active'}).
+          distinct.pluck(:account_id).uniq
+        all_account_ids = Account.multi_account_chain_ids(all_account_ids) # get all parent sub-accounts too
+        current = self.for_account(root_account, all_account_ids)
+      end
 
-    user_role_ids = {}
-    sub_account_ids_map = {}
+      user_role_ids = {}
+      sub_account_ids_map = {}
 
-    current.select! do |announcement|
-      # use role.id instead of role_id to trigger Role#id magic for built in
-      # roles. try(:id) because the AccountNotificationRole may have an
-      # explicitly nil role_id to indicate the announcement's intended for
-      # users not enrolled in any courses
-      role_ids = announcement.account_notification_roles.map { |anr| anr.role&.role_for_shard&.id }
+      current.select! do |announcement|
+        # use role.id instead of role_id to trigger Role#id magic for built in
+        # roles. try(:id) because the AccountNotificationRole may have an
+        # explicitly nil role_id to indicate the announcement's intended for
+        # users not enrolled in any courses
+        role_ids = announcement.account_notification_roles.map { |anr| anr.role&.role_for_shard&.id }
 
-      unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
-        # choose enrollments and account users to inspect
-        if announcement.account.site_admin?
-          enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending.distinct.select(:role_id).to_a
-          account_users = user.account_users.shard(user.in_region_associated_shards).distinct.select(:role_id).to_a
-        else
-          announcement.shard.activate do
-            sub_account_ids_map[announcement.account_id] ||=
-              Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
-            enrollments = Enrollment.where(user_id: user).active_or_pending.joins(:course).
-              where(:courses => {:account_id => sub_account_ids_map[announcement.account_id]}).select(:role_id).to_a
-            account_users = announcement.account.root_account.cached_all_account_users_for(user)
+        unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
+          # choose enrollments and account users to inspect
+          if announcement.account.site_admin?
+            enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending.distinct.select(:role_id).to_a
+            account_users = user.account_users.shard(user.in_region_associated_shards).distinct.select(:role_id).to_a
+          else
+            announcement.shard.activate do
+              sub_account_ids_map[announcement.account_id] ||=
+                Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
+              enrollments = Enrollment.where(user_id: user).active_or_pending.joins(:course).
+                where(:courses => {:account_id => sub_account_ids_map[announcement.account_id]}).select(:role_id).to_a
+              account_users = announcement.account.root_account.cached_all_account_users_for(user)
+            end
+          end
+
+          # preload role objects for those enrollments and account users
+          ActiveRecord::Associations::Preloader.new.preload(enrollments, [:role])
+          ActiveRecord::Associations::Preloader.new.preload(account_users, [:role])
+
+          # map to role ids. user role.id instead of role_id to trigger Role#id
+          # magic for built in roles. announcements intended for users not
+          # enrolled in any courses have the NilEnrollment role type
+          user_role_ids[announcement.account_id] = enrollments.map{ |e| e.role.role_for_shard.id }
+          user_role_ids[announcement.account_id] = [nil] if user_role_ids[announcement.account_id].empty?
+          user_role_ids[announcement.account_id] |= account_users.map{ |au| au.role.role_for_shard.id }
+        end
+
+        role_ids.empty? || (role_ids & user_role_ids[announcement.account_id]).present?
+      end
+
+      user.shard.activate do
+        closed_ids = user.get_preference(:closed_notifications) || []
+        # If there are ids marked as 'closed' that are no longer
+        # applicable, they probably need to be cleared out.
+        current_ids = current.map(&:id)
+        if !(closed_ids - current_ids).empty?
+          Shackles.activate(:master) do
+            user.set_preference(:closed_notifications, closed_ids & current_ids)
+          end
+        end
+        current.reject! { |announcement| closed_ids.include?(announcement.id) }
+
+        # filter out announcements that have a periodic cycle of display,
+        # and the user isn't in the set of users to display it to this month (based
+        # on user id)
+        current.reject! do |announcement|
+          if months_in_period = announcement.months_in_display_cycle
+            !self.display_for_user?(user.id, months_in_period)
           end
         end
 
-        # preload role objects for those enrollments and account users
-        ActiveRecord::Associations::Preloader.new.preload(enrollments, [:role])
-        ActiveRecord::Associations::Preloader.new.preload(account_users, [:role])
+        roles = user.enrollments.shard(user.in_region_associated_shards).active_or_pending.distinct.pluck(:type)
 
-        # map to role ids. user role.id instead of role_id to trigger Role#id
-        # magic for built in roles. announcements intended for users not
-        # enrolled in any courses have the NilEnrollment role type
-        user_role_ids[announcement.account_id] = enrollments.map{ |e| e.role.role_for_shard.id }
-        user_role_ids[announcement.account_id] = [nil] if user_role_ids[announcement.account_id].empty?
-        user_role_ids[announcement.account_id] |= account_users.map{ |au| au.role.role_for_shard.id }
-      end
-
-      role_ids.empty? || (role_ids & user_role_ids[announcement.account_id]).present?
-    end
-
-    user.shard.activate do
-      closed_ids = user.get_preference(:closed_notifications) || []
-      # If there are ids marked as 'closed' that are no longer
-      # applicable, they probably need to be cleared out.
-      current_ids = current.map(&:id)
-      if !(closed_ids - current_ids).empty?
-        user.set_preference(:closed_notifications, closed_ids & current_ids)
-      end
-      current.reject! { |announcement| closed_ids.include?(announcement.id) }
-
-      # filter out announcements that have a periodic cycle of display,
-      # and the user isn't in the set of users to display it to this month (based
-      # on user id)
-      current.reject! do |announcement|
-        if months_in_period = announcement.months_in_display_cycle
-          !self.display_for_user?(user.id, months_in_period)
+        if roles == ['StudentEnrollment'] && !root_account.include_students_in_global_survey?
+          current.reject! { |announcement| announcement.required_account_service == 'account_survey_notifications' }
         end
       end
 
-      roles = user.enrollments.shard(user.in_region_associated_shards).active_or_pending.distinct.pluck(:type)
-
-      if roles == ['StudentEnrollment'] && !root_account.include_students_in_global_survey?
-        current.reject! { |announcement| announcement.required_account_service == 'account_survey_notifications' }
-      end
+      current
     end
-
-    current
   end
 
   def self.for_account(root_account, all_visible_account_ids=nil)

@@ -1205,54 +1205,56 @@ class CoursesController < ApplicationController
   #
   # For full documentation, see the API documentation for the user todo items, in the user api.
   def todo_items
-    get_context
-    if authorized_action(@context, @current_user, :read)
-      bookmark = Plannable::Bookmarker.new(Assignment, false, [:due_at, :created_at], :id)
+    Shackles.activate(:slave) do
+      get_context
+      if authorized_action(@context, @current_user, :read)
+        bookmark = Plannable::Bookmarker.new(Assignment, false, [:due_at, :created_at], :id)
 
-      grading_scope = @current_user.assignments_needing_grading(:contexts => [@context], scope_only: true).
-        reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz, :duplicate_of)
-      submitting_scope = @current_user.
-        assignments_needing_submitting(
-          :contexts => [@context],
-          include_ungraded: true,
-          scope_only: true).
-        reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
-
-      grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
-      grading_collection = BookmarkedCollection.transform(grading_collection) do |a|
-        todo_item_json(a, @current_user, session, 'grading')
-      end
-      submitting_collection = BookmarkedCollection.wrap(bookmark, submitting_scope)
-      submitting_collection = BookmarkedCollection.transform(submitting_collection) do |a|
-        todo_item_json(a, @current_user, session, 'submitting')
-      end
-
-      collections = [
-        ['grading', grading_collection],
-        ['submitting', submitting_collection]
-      ]
-
-      if Array(params[:include]).include? 'ungraded_quizzes'
-        quizzes_bookmark = Plannable::Bookmarker.new(Quizzes::Quiz, false, [:due_at, :created_at], :id)
-        quizzes_scope = @current_user.
-          ungraded_quizzes(
+        grading_scope = @current_user.assignments_needing_grading(:contexts => [@context], scope_only: true).
+          reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz, :duplicate_of)
+        submitting_scope = @current_user.
+          assignments_needing_submitting(
             :contexts => [@context],
-            :needing_submitting => true,
-            :scope_only => true
-          ).
-          reorder(:due_at, :id)
-        quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
-        quizzes_collection = BookmarkedCollection.transform(quizzes_collection) do |a|
+            include_ungraded: true,
+            scope_only: true).
+          reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
+
+        grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
+        grading_collection = BookmarkedCollection.transform(grading_collection) do |a|
+          todo_item_json(a, @current_user, session, 'grading')
+        end
+        submitting_collection = BookmarkedCollection.wrap(bookmark, submitting_scope)
+        submitting_collection = BookmarkedCollection.transform(submitting_collection) do |a|
           todo_item_json(a, @current_user, session, 'submitting')
         end
 
-        collections << ['quizzes', quizzes_collection]
+        collections = [
+          ['grading', grading_collection],
+          ['submitting', submitting_collection]
+        ]
+
+        if Array(params[:include]).include? 'ungraded_quizzes'
+          quizzes_bookmark = Plannable::Bookmarker.new(Quizzes::Quiz, false, [:due_at, :created_at], :id)
+          quizzes_scope = @current_user.
+            ungraded_quizzes(
+              :contexts => [@context],
+              :needing_submitting => true,
+              :scope_only => true
+            ).
+            reorder(:due_at, :id)
+          quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
+          quizzes_collection = BookmarkedCollection.transform(quizzes_collection) do |a|
+            todo_item_json(a, @current_user, session, 'submitting')
+          end
+
+          collections << ['quizzes', quizzes_collection]
+        end
+
+        paginated_collection = BookmarkedCollection.merge(*collections)
+        todos = Api.paginate(paginated_collection, self, api_v1_course_todo_list_items_url)
+
+        render :json => todos
       end
-
-      paginated_collection = BookmarkedCollection.merge(*collections)
-      todos = Api.paginate(paginated_collection, self, api_v1_course_todo_list_items_url)
-
-      render :json => todos
     end
   end
 
@@ -1493,6 +1495,25 @@ class CoursesController < ApplicationController
       else
         render :json => @course.errors, :status => :bad_request
       end
+    end
+  end
+
+  # @API Return test student for course
+  #
+  # Returns information for a test student in this course. Creates a test
+  # student if one does not already exist for the course. The caller must have
+  # permission to access the course's student view.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/<course_id>/student_view_student \
+  #     -X GET \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns User
+  def student_view_student
+    get_context
+    if authorized_action(@context, @current_user, :use_student_view)
+      render json: user_json(@context.student_view_student, @current_user, session)
     end
   end
 
@@ -1927,7 +1948,9 @@ class CoursesController < ApplicationController
                    id: @context.id.to_s,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
                    front_page_title: @context&.wiki&.front_page&.title,
-                   default_view: default_view
+                   default_view: default_view,
+                   is_student: @context.user_is_student?(@current_user),
+                   is_instructor: @context.user_is_instructor?(@current_user)
                  }
                })
 

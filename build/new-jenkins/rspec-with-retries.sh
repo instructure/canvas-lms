@@ -8,7 +8,7 @@ export ERROR_CONTEXT_BASE_PATH="/usr/src/app/log/spec_failures/Initial"
 
 success_status=0
 webdriver_crash_status=98
-test_failure_status=99
+test_failure_status=1
 
 max_failures=${MAX_FAIL:=200} # TODO: need to get env variable setup, MAX number of failures before quit
 rerun_number=0

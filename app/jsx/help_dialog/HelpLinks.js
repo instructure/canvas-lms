@@ -86,7 +86,9 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
             // if the current user is a teacher, show a link to
             // open up the welcome tour
             window.ENV.FEATURES?.product_tours &&
-              window.ENV.current_user_roles?.includes('teacher') && [
+              (window.ENV.current_user_types?.includes('Account Admin') ||
+                window.ENV.current_user_roles?.includes('teacher') ||
+                window.ENV.current_user_roles?.includes('student')) && [
                 <List.Item key="welcome_tour">
                   <View className="welcome-tour-link">
                     <Link isWithinText={false} onClick={() => tourPubSub.publish('tour-open')}>

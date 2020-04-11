@@ -39,10 +39,19 @@ if settings.present?
       AuthenticationMethods::LoggedOutError
       ActionController::InvalidAuthenticityToken
       Folio::InvalidPage
+      Turnitin::Errors::SubmissionNotScoredError
+      ConditionalRelease::ServiceError
     }
   end
 
   Rails.configuration.to_prepare do
+    Setting.get('ignorable_errors', '').split(',').each do |error|
+      SentryProxy.register_ignorable_error(error)
+    end
+
+    # This error can be caused by LTI tools.
+    SentryProxy.register_ignorable_error("Grade pass back failure")
+
     Canvas::Errors.register!(:sentry_notification) do |exception, data|
       setting = Setting.get("sentry_error_logging_enabled", 'true')
       SentryProxy.capture(exception, data) if setting == 'true'

@@ -21,7 +21,15 @@ import {Flex} from '@instructure/ui-flex'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import I18n from 'i18n!TourPoints'
 
-const TourContainer = ({current, totalSteps, gotoStep, close, softClose = close, content}) => {
+const TourContainer = ({
+  current,
+  totalSteps,
+  gotoStep,
+  close,
+  firstLabel,
+  softClose = close,
+  content
+}) => {
   const closeButtonRef = React.useRef()
   const focusRef = React.useRef()
   React.useEffect(() => {
@@ -53,17 +61,21 @@ const TourContainer = ({current, totalSteps, gotoStep, close, softClose = close,
         borderRadius="small"
         shadow="topmost"
       >
-        <CloseButton
-          elementRef={el => (closeButtonRef.current = el)}
-          placement="end"
-          offset="small"
-          screenReaderLabel="Close"
-          onClick={close}
-        />
+        <View className="tour-close-button">
+          <CloseButton
+            elementRef={el => (closeButtonRef.current = el)}
+            placement="end"
+            offset="small"
+            screenReaderLabel={I18n.t('Close')}
+            onClick={close}
+          />
+        </View>
         {content}
         <Flex margin="medium 0 0 0">
           <Flex.Item shouldGrow>
-            {current !== 0 && (
+            {current === 0 ? (
+              firstLabel
+            ) : (
               <p>{I18n.t('%{current} of %{totalSteps}', {current, totalSteps: totalSteps - 1})}</p>
             )}
           </Flex.Item>

@@ -324,7 +324,7 @@ class Speedgrader
     def visit(course_id, assignment_id, timeout = 10)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
       visibility_check = grade_input
-      keep_trying_until(timeout) { visibility_check.displayed? }
+      wait_for(method: :visit, timeout: timeout) { visibility_check.displayed? }
     end
 
     def select_provisional_grade_by_label(label)

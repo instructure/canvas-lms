@@ -71,8 +71,10 @@ class ContextModulesController < ApplicationController
 
       @menu_tools = {}
       placements = [:assignment_menu, :discussion_topic_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu]
-      tools = ContextExternalTool.all_tools_for(@context, placements: placements,
-                                        :root_account => @domain_root_account, :current_user => @current_user).to_a
+      tools = Shackles.activate(:slave) do
+        ContextExternalTool.all_tools_for(@context, placements: placements,
+          :root_account => @domain_root_account, :current_user => @current_user).to_a
+      end
       placements.select { |p| @menu_tools[p] = tools.select{|t| t.has_placement? p} }
 
       favorites_enabled = @domain_root_account&.feature_enabled?(:commons_favorites)

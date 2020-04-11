@@ -83,7 +83,6 @@ module SeleniumDriverSetup
 
     attr_accessor :browser_log,
                   :browser_process,
-                  :headless,
                   :server,
                   :server_ip,
                   :server_port
@@ -148,11 +147,7 @@ module SeleniumDriverSetup
         Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
       end
 
-      set_up_display_buffer if run_headless?
-
       @driver = create_driver
-
-      focus_viewport if run_headless?
 
       set_timeouts(TIMEOUTS)
 
@@ -221,60 +216,6 @@ module SeleniumDriverSetup
       puts "#{browser} log:"
       browser_log.rewind
       puts browser_log.read
-    end
-
-    def run_headless?
-      ENV.key?("TEST_ENV_NUMBER") && !saucelabs_test_run?
-    end
-
-    HEADLESS_DEFAULTS = {
-      dimensions: "1920x1080x24",
-      reuse: true,
-      destroy_at_exit: true,
-      video: {
-        provider: :ffmpeg,
-        # yay interframe compression
-        codec: 'libx264',
-        # use less CPU. doesn't actually shrink the resulting file much.
-        frame_rate: 4,
-        extra: [
-          # quicktime doesn't understand the default yuv422p
-          '-pix_fmt', 'yuv420p',
-          # limit videos to 1 minute 20 seconds in case something bad happens and we forget to stop recording
-          '-t', '80',
-          # use less CPU
-          '-preset', 'superfast'
-        ]
-      }.freeze
-    }.freeze
-
-    def set_up_display_buffer
-      # start_driver can get called again if firefox dies, but
-      # self.headless should already be good to go
-      return if headless
-
-      require "headless"
-
-      test_number = ENV["TEST_ENV_NUMBER"]
-      # it'll be '', '2', '3', '4'...
-      test_number = test_number.blank? ? 1 : test_number.to_i
-      # start at 21 to avoid conflicts with other test runner Xvfb stuff
-      display = 20 + test_number
-
-      self.headless = Headless.new(HEADLESS_DEFAULTS.merge({
-                                                             display: display
-                                                           }))
-      headless.start
-      puts "Setting up DISPLAY=#{ENV['DISPLAY']}"
-    end
-
-    def focus_viewport
-      # force the viewport to have focus right away; otherwise certain specs
-      # will fail unless they follow another dialog accepting/dismissing spec,
-      # since they rely on focus/blur events, which don't fire if the window
-      # doesn't have focus
-      driver.execute_script "alert('yolo')"
-      driver.switch_to.alert.accept
     end
 
     def ie_driver

@@ -275,7 +275,7 @@ module AccountReports::ReportHelper
     ExtendedCSV.open(file, "w", options) do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
-      Shackles.activate(:slave) { yield csv } if block_given?
+      activate_report_db { yield csv } if block_given?
       Shackles.activate(:master) { @account_report.update_attribute(:current_line, csv.lineno) }
     end
     file
@@ -356,6 +356,14 @@ module AccountReports::ReportHelper
     @account_report.write_report_runners
   end
 
+  def activate_report_db(&block)
+    if !!Shard.current.database_server.config[:report] && Setting.get('use_report_dbs_for_reports', 'true') == 'true'
+      Shackles.activate(:report, &block)
+    else
+      Shackles.activate(:slave, &block)
+    end
+  end
+
   def run_account_report_runner(report_runner, headers, files: nil)
     return if report_runner.reload.workflow_state == 'aborted'
     @account_report = report_runner.account_report
@@ -367,7 +375,7 @@ module AccountReports::ReportHelper
       # runners can be completed before they get here, and we should not try to process them.
       unless report_runner.workflow_state == 'completed'
         report_runner.start
-        Shackles.activate(:slave) { AccountReports::REPORTS[@account_report.report_type].parallel_proc.call(@account_report, report_runner) }
+        activate_report_db { AccountReports::REPORTS[@account_report.report_type].parallel_proc.call(@account_report, report_runner) }
       end
     rescue => e
       report_runner.fail
