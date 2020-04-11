@@ -338,7 +338,7 @@ class Account < ActiveRecord::Base
   def enable_canvas_authentication
     return unless root_account?
     # for migrations creating a new db
-    return unless AuthenticationProvider::Canvas.columns_hash.key?('workflow_state')
+    return unless Account.connection.data_source_exists?("authentication_providers")
     return if authentication_providers.active.where(auth_type: 'canvas').exists?
     authentication_providers.create!(auth_type: 'canvas')
   end

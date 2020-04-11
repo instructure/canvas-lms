@@ -53,6 +53,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       table.boolean  :next_in_strand, :default => true, :null => false
       table.integer  :shard_id, :limit => 8
       table.string   :source
+      table.integer  :max_concurrent, :default => 1, :null => false
     end
 
     connection.execute("CREATE INDEX get_delayed_jobs_index ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} (priority, run_at) WHERE locked_at IS NULL AND queue = 'canvas_queue' AND next_in_strand = 't'")
@@ -61,6 +62,8 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     add_index :delayed_jobs, :locked_by, :where => "locked_by IS NOT NULL"
     add_index :delayed_jobs, %w[run_at tag]
     add_index :delayed_jobs, :shard_id
+
+    search_path = Shard.current.name
 
     # use an advisory lock based on the name of the strand, instead of locking the whole table
     # note that we're using half of the md5, so collisions are possible, but we don't really
@@ -88,13 +91,15 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     execute(<<-CODE)
     CREATE FUNCTION #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')} () RETURNS trigger AS $$
     BEGIN
-      PERFORM pg_advisory_xact_lock(half_md5_as_bigint(NEW.strand));
-      IF (SELECT 1 FROM delayed_jobs WHERE strand = NEW.strand LIMIT 1) = 1 THEN
-        NEW.next_in_strand := 'f';
+      IF NEW.strand IS NOT NULL THEN
+        PERFORM pg_advisory_xact_lock(half_md5_as_bigint(NEW.strand));
+        IF (SELECT COUNT(*) FROM delayed_jobs WHERE strand = NEW.strand) >= NEW.max_concurrent THEN
+          NEW.next_in_strand := 'f';
+        END IF;
       END IF;
       RETURN NEW;
     END;
-    $$ LANGUAGE plpgsql;
+    $$ LANGUAGE plpgsql SET search_path TO #{search_path};
     CODE
     execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')}()")
 
@@ -102,11 +107,18 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     execute(<<-CODE)
     CREATE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
     BEGIN
-      PERFORM pg_advisory_xact_lock(half_md5_as_bigint(OLD.strand));
-      UPDATE delayed_jobs SET next_in_strand = 't' WHERE id = (SELECT id FROM delayed_jobs j2 WHERE j2.strand = OLD.strand ORDER BY j2.strand, j2.id ASC LIMIT 1 FOR UPDATE);
+      IF OLD.strand IS NOT NULL THEN
+        PERFORM pg_advisory_xact_lock(half_md5_as_bigint(OLD.strand));
+        IF (SELECT COUNT(*) FROM delayed_jobs WHERE strand = OLD.strand AND next_in_strand = 't') < OLD.max_concurrent THEN
+          UPDATE delayed_jobs SET next_in_strand = 't' WHERE id = (
+            SELECT id FROM delayed_jobs j2 WHERE next_in_strand = 'f' AND
+            j2.strand = OLD.strand ORDER BY j2.id ASC LIMIT 1 FOR UPDATE
+          );
+        END IF;
+      END IF;
       RETURN OLD;
     END;
-    $$ LANGUAGE plpgsql;
+    $$ LANGUAGE plpgsql SET search_path TO #{search_path};
     CODE
     execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')}()")
 
