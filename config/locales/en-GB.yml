@@ -2115,6 +2115,7 @@ en-GB:
       Allows user to add assignment groups in a course.
       Allows user to enable and edit assignment group weighting in a course.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox. "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Allows user to add new assignments to a module."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox."
@@ -2294,6 +2295,7 @@ en-GB:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Allows user to view and manage subaccounts for the account."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Allows user to view and manage terms for the account."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Allows user to view and manage the Settings and notifications tabs in Account settings."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "Allows user to view Canvas Insights."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Allows user to view Choose home page and Course setup checklist buttons in the Homepage."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Allows user to view course analytics through the course dashboard. Allows user to view student analytics."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Allows user to view course and student analytics from the Course homepage or People page."
@@ -4840,6 +4842,7 @@ en-GB:
   check_to_select_all_98e484f1: "Check to select all"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Check to skip adding a user for %{loginid}"
   checked_883b93fd: checked
+  cheerful_panda_holding_a_map_17ba47ee: "Cheerful panda holding a map"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Child course must belong to the same root account as master course"
   child_s_username_dde3aa9: "Child's Username"
   chile_56_88238b47: "Chile (+56)"
@@ -8774,6 +8777,7 @@ en-GB:
   enable_dashboard_images_for_courses_5af458b0: "Enable dashboard images for courses"
   enable_extra_filter_options_b52c23e6: "enable extra filter options"
   enable_feature_title_987d8e9a: "Enable feature: %{title}"
+  enable_fullstory_5c673a06: "Enable fullstory"
   enable_gradebook_list_students_by_sortable_name: "List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Enable Gradezilla (name is only a placeholder as it will replace Gradebook in the future)."
   enable_gravatar_8a865b41: "Enable Gravatar"
@@ -9552,11 +9556,13 @@ en-GB:
       no_features_available: "No features are currently available."
   feature_flags_52141c74: "Feature flags"
   feature_flags_enable_disable_32e8f1ab: "Feature flags - enable / disable"
+  feature_headline_3f0daf4: "Feature headline"
   feature_options_37a2c317: "Feature Options"
   feature_options_account_settings_294a39f8: "Feature options (account settings)"
   feature_options_enable_disable_7e748054: "Feature options - enable / disable"
   feature_options_view_a170e80c: "Feature Options - view"
   feature_preview_5e1216a0: "Feature Preview"
+  featured_83f6041d: Featured
   featured_help_links_d805fe44: "Featured Help Links"
   features: 
     allow_opt_out_of_inbox: "Allow users to opt-out of the inbox"
@@ -11833,6 +11839,7 @@ en-GB:
   include_course_settings_c4c08764: "Include Course Settings"
   include_deleted_enrollments_1c87684a: "Include deleted enrolments"
   include_deleted_objects_3cced3b5: "Include deleted objects;"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "Include FullStory recording of the user's session"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Include Integration IDs in the gradebook exports."
   include_scores_when_alerting_about_grade_changes_623ec201: "Include scores when alerting changes in marks."
   include_scores_when_alerting_about_grades_89728ae1: "Include scores when alerting about marks."
@@ -11900,6 +11907,7 @@ en-GB:
   insert_math_equation_57c6e767: "Insert Math Equation"
   insert_row_below_25187f89: "Insert row below"
   insert_row_below_name_a5b3bd41: "Insert row below %{name}"
+  insights_b514ad8d: Insights
   install_c54fad9b: Install
   installed_7b284a91: Installed
   installed_by_admin_97c3a721: "Installed by Admin"
@@ -12522,6 +12530,7 @@ en-GB:
   list_expanded_efec2d0: "List expanded."
   list_view_430aecce: "List View"
   lithuanian_5adcbe24: Lithuanian
+  little_lost_try_here_first_9e24e575: "Little lost? Try here first!"
   live_event_subscription_webhooks_1dae83bb: "Live Event Subscription Webhooks"
   live_event_tool_documentation_f6dcc3d7: "Live Event Tool Documentation"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Live events subscriptions service is not configured"
@@ -12890,6 +12899,7 @@ en-GB:
   max_users_groups_per_appointment_867c505b: "Maximum users/groups per appointment"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maximum number of appointments a participant may attend"
   maximum_number_of_communication_channels_reached_70c4d2f9: "Maximum number of communication channels reached"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(May have one Featured link and one New link at a time)"
   media_af190855: Media
   media_comment_dialog_manager: 
     messages: 
@@ -15320,6 +15330,7 @@ en-GB:
   new_assignment_2a984756: "New assignment"
   new_assignment_for_course_name_f71dd337: "New assignment for %{course_name}"
   new_attempt_57eae3d9: "New Attempt"
+  new_bd30f253: NEW
   new_canvas_message_from_user_name_94cc720: "New Canvas message from %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "New comment by %{author_name} for %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "New comment: %{discussion_topic} by %{user_name}"
@@ -16090,6 +16101,7 @@ en-GB:
   other_ddacb37d: other
   other_incorrect_match_options_c1418af5: "Other Incorrect Match Options:"
   other_options_d25f199c: "Other Options"
+  other_resources_fee3ddda: "OTHER RESOURCES"
   other_timezones_42530564: "Other time zones"
   out_of_78a76f91: "out of"
   out_of_formattedoutof_e08e90d5: "out of %{formattedOutOf}"
@@ -22085,6 +22097,7 @@ en-GB:
                 is complete.
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "The engine that processes SIS imports has been refactored to better handle thestability of large SIS imports. The functionality of SIS imports has not changed."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Error stack trace, if there is one"
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "The featured link was moved to the top of list."
   the_field_field_is_required_56512820: "The \"%{field}\" field is required"
   the_field_field_must_have_no_spaces_d1c2fc37: "The \"%{field}\" field must have no spaces"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "The Files tab is the place to share lecture slides, example documents, study helps - anything your students will want to download.  Uploading and organising your files is easy with Canvas.  We'll show you how."
@@ -22425,6 +22438,7 @@ en-GB:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "This permission does not affect ability to manage course level question banks in Quizzes. Instead, Manage question banks are dependent on the assignments and quizzes - add / edit / delete permission. For full management of course question banks, this permission and assignments and quizzes - add / edit / delete must both be enabled."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "This permission does not affect the ability to manage course level question banks in Quizzes. Instead, Manage question banks are dependent on the assignments and quizzes - add / edit / delete permission. For full management of course question banks, this permission and assignments and quizzes - add / edit / delete must both be enabled."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "This permission is available for all Canvas accounts but only in use for institutions associated with a Canvas catalogue account. Permission currently has no front-end effects, but engineering suggests the permission remain enabled for admins. For other roles the permission can be disabled."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "This permission is only supported when Canvas Insights is enabled for an account. Please contact your Customer Success Manager for details."
   this_permission_only_affects_course_announcements__6bc2b0a5: "This permission only affects course announcements; to manage global announcements, Global Announcements - add / edit / delete​ must be enabled."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "This permission only controls adding users at the account level. To add users to a course, Users - add/remove students from courses or Users - add/remove teachers, course designers, or TAs from courses to the course must be enabled."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -24575,6 +24589,7 @@ en-GB:
   your_name_7665e1d8: "Your Name"
   your_outcomes_were_successfully_imported_c5de884: "Your outcomes were successfully imported."
   your_password_has_been_changed_df0e72aa: "Your password has been changed."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Your password recovery instructions will be sent to *%{email_address}*. This may take up to 30 minutes. Make sure to check your spam box."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Your profile photo could not be uploaded. You may have exceeded your upload limit."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Your quiz engine choice has been reset!"
   your_score_a1fc2fcf: "Your score"
