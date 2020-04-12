@@ -2161,6 +2161,7 @@ ar:
       يسمح للمستخدم بإضافة مجموعات المهام في المساقات.
       يسمح للمستخدم بتمكين أوزان مجموعات المهام وتحريرها في المساقات.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "لتمكين المستخدم من إضافة أحداث للوحة معلومات عرض القائمة عبر إضافة إلى مربع تحديد قائمة مهام الطلب. "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "لتمكين المستخدم من إضافة أحداث للوحة معلومات عرض القائمة عبر إضافة إلى مربع تحديد قائمة مهام الطلب."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "يسمح للمستخدم بإضافة المهام الجديدة إلى الوحدة النمطية."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "لتمكين المستخدم من إضافة النقاشات بدون تقييم للوحة معلومات عرض القائمة عبر إضافة إلى مربع تحديد قائمة مهام الطلب."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "لتمكين المستخدم من إضافة صفحات للوحة معلومات عرض القائمة عبر إضافة إلى مربع تحديد قائمة مهام الطلب."
@@ -2340,6 +2341,7 @@ ar:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "يسمح للمستخدم بعرض الحسابات الفرعية وإدارتها للحساب."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "يسمح للمستخدم بعرض الفصول الدراسية وإدارتها للحساب."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "يسمح للمستخدم بعرض وإدارة علامات تبويب الإعدادات والإعلامات في إعدادات الحساب."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "للسماح للمستخدم بعرض Canvas Insights."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "يسمح للمستخدم بعرض أزرار اختر الصفحة الرئيسية وقائمة اختيار إعداد المساق في الصفحة الرئيسية."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "يسمح للمستخدم بعرض تحليلات المساق من خلال لوحة معلومات المساق. يسمح للمستخدم بعرض تحليلات الطالب."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "يسمح للمستخدم بعرض تحليلات المساق والطالب من الصفحة الرئيسية للمساق وصفحة الأشخاص."
@@ -4951,6 +4953,7 @@ ar:
   check_to_select_all_98e484f1: "حدد لاختيار الكل"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "تحقق لتخطي إضافة مستخدم لـ %{loginid}"
   checked_883b93fd: "تم التحقق"
+  cheerful_panda_holding_a_map_17ba47ee: "باندا سعيدة تحمل خريطة"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "يجب أن ينتمي المساق الفرعي إلى نفس الحساب الرئيسي كمساق أصلي"
   child_s_username_dde3aa9: "اسم مستخدم الطفل"
   chile_56_88238b47: "تشيلي (+56)"
@@ -9148,6 +9151,7 @@ ar:
   enable_dashboard_images_for_courses_5af458b0: "تمكين صور لوحة المعلومات للمساقات"
   enable_extra_filter_options_b52c23e6: "تمكين خيارات التصفية الإضافية"
   enable_feature_title_987d8e9a: "تمكين الميزة: %{title}"
+  enable_fullstory_5c673a06: "تمكين القصة الكاملة"
   enable_gradebook_list_students_by_sortable_name: "إدراج الطلاب بأسمائهم القابلة للفرز في دفتر الدرجات. يتم تعيين الاسم القابل للفرز افتراضيًا إلى \"اسم العائلة، الاسم الأول\" ويمكن تغيير من الإعدادات."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "تمكين Gradezilla (الاسم مجرد عنصر نائب، حيث سيستبدل Gradebook في المستقبل)."
   enable_gravatar_8a865b41: "تمكين صورة أفاتار"
@@ -9951,11 +9955,13 @@ ar:
       no_features_available: "لا توجد ميزات متاحة حاليًا."
   feature_flags_52141c74: "مفاتيح المزايا"
   feature_flags_enable_disable_32e8f1ab: "علامات الميزة - تمكين / تعطيل"
+  feature_headline_3f0daf4: "العنوان المميز"
   feature_options_37a2c317: "خيارات الميزة"
   feature_options_account_settings_294a39f8: "خيارات الميزة (إعدادات الحساب)"
   feature_options_enable_disable_7e748054: "خيارات الميزة - تمكين / تعطيل"
   feature_options_view_a170e80c: "اختيارات الميزة - عرض"
   feature_preview_5e1216a0: "معاينة الميزة"
+  featured_83f6041d: مميز
   featured_help_links_d805fe44: "روابط التعليمات البارزة"
   features: 
     allow_opt_out_of_inbox: "السماح للمستخدمين بإلغاء الاشتراك في صندوق الوارد"
@@ -12314,6 +12320,7 @@ ar:
   include_course_settings_c4c08764: "تضمين إعدادات المساق"
   include_deleted_enrollments_1c87684a: "تضمين التسجيلات المحذوفة"
   include_deleted_objects_3cced3b5: "تضمين الكائنات المحذوفة؛"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "تضمين تسجيل FullStory من جلسة المستخدم"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "يتضمن معرفات التكامل في تصديرات دفتر الدرجات."
   include_scores_when_alerting_about_grade_changes_623ec201: "تضمين النقاط عند حدوث تنبيه بشأن تغيير في الدرجة."
   include_scores_when_alerting_about_grades_89728ae1: "تضمين النقاط عند التنبيه حول الدرجات."
@@ -12380,6 +12387,7 @@ ar:
   insert_math_equation_57c6e767: "إدخال معادلة رياضية"
   insert_row_below_25187f89: "إدراج صف أسفل"
   insert_row_below_name_a5b3bd41: "إدراج صف أسفل %{name}"
+  insights_b514ad8d: "معلومات دقيقة"
   install_c54fad9b: تثبيت
   installed_7b284a91: مثبت
   installed_by_admin_97c3a721: "تثبيت بواسطة المسؤول"
@@ -13001,6 +13009,7 @@ ar:
   list_expanded_efec2d0: "تم توسيع القائمة."
   list_view_430aecce: "عرض القائمة"
   lithuanian_5adcbe24: الليتوانية
+  little_lost_try_here_first_9e24e575: "تائه بعض الشيء؟ جرب هنا أولاً!"
   live_event_subscription_webhooks_1dae83bb: "خطافات ويب اشتراكات الأحداث المباشرة"
   live_event_tool_documentation_f6dcc3d7: "وثائق أداة الحدث المباشر"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "لم يتم تكوين خدمة اشتراكات الأحداث المباشرة"
@@ -13373,6 +13382,7 @@ ar:
   max_users_groups_per_appointment_867c505b: "الحد الأقصى لعدد المستخدمين/المجموعات لكل موعد"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "الحد الأقصى لعدد المواعيد التي يمكن للمشارك حضورها"
   maximum_number_of_communication_channels_reached_70c4d2f9: "تم بلوغ الحد الأقصى من قنوات التواصل"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(يمكن الحصول على ارتباط مميز واحد وارتباط جديد واحد في كل مرة)"
   media_af190855: الوسائط
   media_comment_dialog_manager: 
     messages: 
@@ -15866,6 +15876,7 @@ ar:
   new_assignment_2a984756: "مهمة جديدة"
   new_assignment_for_course_name_f71dd337: "مهمة جديدة لـ %{course_name}"
   new_attempt_57eae3d9: "محاولة جديدة"
+  new_bd30f253: جديد
   new_canvas_message_from_user_name_94cc720: "رسالة جديدة على Canvas من %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "تعليق جديد بواسطة %{author_name} لـ %{assignment_title}، %{user_name}، %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "تعليق جديد: %{discussion_topic} بواسطة %{user_name}"
@@ -16643,6 +16654,7 @@ ar:
   other_ddacb37d: أخرى
   other_incorrect_match_options_c1418af5: "خيارات المطابقة غير الصحيحة الأخرى:"
   other_options_d25f199c: "خيارات أخرى"
+  other_resources_fee3ddda: "موارد أخرى"
   other_timezones_42530564: "مناطق زمنية أخرى"
   out_of_78a76f91: "من إجمالي"
   out_of_formattedoutof_e08e90d5: "من إجمالي %{formattedOutOf}"
@@ -22910,6 +22922,7 @@ ar:
                 عند اكتمال التنزيل.
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "تم إعادة تصميم المحرك الذي يعالج عمليات استيراد SIS لتحسين معالجة استقرار عمليات استيراد SIS الكبيرة. لم يتم تغيير الأداء الوظيفي لعمليات استيراد SIS."
   the_error_stack_trace_if_there_is_one_b7e008a1: "تتبع تكدس الخطأ، إذا وُجد"
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "تم نقل الارتباط المميز إلى أعلى القائمة."
   the_field_field_is_required_56512820: "الحقل \"%{field}\" مطلوب"
   the_field_field_must_have_no_spaces_d1c2fc37: "يجب أن يشتمل الحقل \"%{field}\" على مسافات"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "تعتبر علامة التبويب الملفات هي المكان المناسب لمشاركة شرائح المحاضرة ومستندات الأمثلة وتعليمات الدراسة؛ وأي شيء يريد الطلاب تنزيله. إن تحميل الملفات وتنظيمها صار سهلا ً عبر Canvas. وسنوضح لك كيف ذلك."
@@ -23262,6 +23275,7 @@ ar:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "لا يؤثر هذا الإذن على القدرة على إدارة بنوك أسئلة من مستوى المساقات في الاختبارات الموجزة. بدلاً من ذلك، تعتمد إدارة بنوك الأسئلة على إذن المهام والاختبارات الموجزة - إضافة / تحرير / حذف. للإدارة الكاملة لبنوك أسئلة المساق، يجب تمكين هذه الميزة وميزة المهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "لا يؤثر هذا الإذن على القدرة على إدارة بنوك أسئلة من مستوى المساقات في الاختبارات الموجزة. بدلاً من ذلك، تعتمد إدارة بنوك الأسئلة على إذن المهام والاختبارات الموجزة - إضافة / تحرير / حذف. للإدارة الكاملة لبنوك أسئلة المساق، يجب تمكين هذه الميزة وميزة المهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "يتوفر هذا الإذن لجميع حسابات Canvas ولكن يستخدم فقط للمؤسسات المقترنة بحساب Canvas Catalog. لا يوجد تأثير على الواجهة الأمامية في الوقت الحالي، ولكن يقترح المهندسون بقاء الإذن ممكّنًا للمسؤولين. يمكن تعطيل الإذن للأدوار الأخرى."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "لا يتم دعم هذا الإذن إلا عند تمكين Canvas Insights للحسابات. الرجاء الاتصال بمدير نجاح العملاء للتعرف على التفاصيل."
   this_permission_only_affects_course_announcements__6bc2b0a5: "يؤثر هذا الإذن على إعلانات المساق فقط، لإدارة الإعلانات العامة، يجب تمكين الإعلانات العامة - إضافة / تحرير / حذف."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "يمكن لهذا الإذن أن يتحكم في إضافة المستخدمين على مستوى الحساب. لإضافة مستخدمين إلى المساقات، يجب أيضًا تمكين المستخدمون - إضافة/إزالة الطلاب من المساقات أو المستخدمون - إضافة/إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين من المساقات إلى المساق الذي يجب تمكينه."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -25461,6 +25475,7 @@ ar:
   your_name_7665e1d8: اسمك
   your_outcomes_were_successfully_imported_c5de884: "تم استيراد النواتج الخاصة بك بنجاح."
   your_password_has_been_changed_df0e72aa: "تم تغيير كلمة المرور الخاصة بك."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "سيتم إرسال إرشادات استعادة كلمة المرور إلى *%{email_address}*. قد يستغرق هذا حتى 30 دقيقة. تأكد من التحقق من صندوق البريد العشوائي."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "تعذر تحميل صورة ملف التعريف. من المحتمل أنك تجاوزت حد التحميل."
   your_quiz_engine_choice_has_been_reset_68d268c1: "تم إعادة تعيين اختيار محرك الاختبار الموجز!"
   your_score_a1fc2fcf: نتيجتك
