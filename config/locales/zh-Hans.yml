@@ -2109,6 +2109,7 @@ zh-Hans:
       允许用户在课程中添加作业组。
       允许用户在课程中启用和编辑作业组权重。
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "允许用户通过“添加学生到待办事项”选框，添加事件至“查看列表控制面板”。 "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: 允许用户通过“添加学生到待办事项”选框，添加事件至“查看列表控制面板”。
   allows_user_to_add_new_assignments_to_a_module_51ae198c: 允许用户向单元添加新作业。
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: 允许用户通过“添加学生到待办事项”选框，添加未评分讨论至“查看列表控制面板”。
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: 允许用户通过“添加学生到待办事项”选框，添加页面至“查看列表控制面板”。
@@ -2288,6 +2289,7 @@ zh-Hans:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: 允许用户查看和管理帐户的子帐户。
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: 允许用户查看和管理帐户的学期。
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: 允许用户在“帐户设置”中查看和管理“设置”和“通知”选项卡。
+  allows_user_to_view_canvas_insights_f4f7ba8b: "允许用户查看 Canvas Insights。"
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: 允许用户在主页中查看“选择主页”和“课程设置清单”按钮。
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: 允许用户通过课程仪表板查看课程分析。允许用户查看学生分析。
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: 允许用户从“课程主页”或“人员”页面查看课程和学生分析。
@@ -4825,6 +4827,7 @@ zh-Hans:
   check_to_select_all_98e484f1: 选中所有
   check_to_skip_adding_a_user_for_loginid_5fa643da: "勾选以跳过为……添加用户%{loginid}"
   checked_883b93fd: 已勾选
+  cheerful_panda_holding_a_map_17ba47ee: 熊猫高兴地拿着地图
   child_course_must_belong_to_the_same_root_account__66ed7b8e: 子课程必须属于与主课程相同的母账户
   child_s_username_dde3aa9: 孩子的用户名
   chile_56_88238b47: 智利(+56)
@@ -8742,6 +8745,7 @@ zh-Hans:
   enable_dashboard_images_for_courses_5af458b0: 为课程启用控制面板的图片
   enable_extra_filter_options_b52c23e6: 启用额外的筛选选项
   enable_feature_title_987d8e9a: "启用功能：%{title}"
+  enable_fullstory_5c673a06: 启用全文
   enable_gradebook_list_students_by_sortable_name: 在评分册中按照学生的可排序姓名列示学生。可排序姓名默认为‘姓氏、名字’，并且可以在设置中更改。
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "启用 Gradezilla（名称仅为占位符，它将来将取代成绩单）。"
   enable_gravatar_8a865b41: 启用Gravatar
@@ -9521,11 +9525,13 @@ zh-Hans:
       no_features_available: 当前没有可用的功能。
   feature_flags_52141c74: 功能标记
   feature_flags_enable_disable_32e8f1ab: "功能旗帜 - 启用/禁用"
+  feature_headline_3f0daf4: 精选标题
   feature_options_37a2c317: 功能选项
   feature_options_account_settings_294a39f8: 功能选项（帐户设置）
   feature_options_enable_disable_7e748054: "功能选项 - 启用/禁用"
   feature_options_view_a170e80c: "功能选项 - 视图"
   feature_preview_5e1216a0: 功能预览
+  featured_83f6041d: 精选
   featured_help_links_d805fe44: 特色帮助链接
   features: 
     allow_opt_out_of_inbox: 允许用户选择退出收件箱
@@ -11791,6 +11797,7 @@ zh-Hans:
   include_course_settings_c4c08764: 包括课程设置
   include_deleted_enrollments_1c87684a: 包括已删除的注册
   include_deleted_objects_3cced3b5: 包括已删除的对象
+  include_fullstory_recording_of_the_user_s_session_656d131e: "包括用户会议的 FullStory 录制"
   include_integration_ids_in_the_gradebook_exports_4b94c795: 包括评分册导出中的集成ID。
   include_scores_when_alerting_about_grade_changes_623ec201: 提醒评分变化时，包括分数。
   include_scores_when_alerting_about_grades_89728ae1: 当提示有关成绩时，包括分数在内。
@@ -11854,6 +11861,7 @@ zh-Hans:
   insert_math_equation_57c6e767: 插入数学等式
   insert_row_below_25187f89: 在下面插入行
   insert_row_below_name_a5b3bd41: "在下面插入行%{name}"
+  insights_b514ad8d: 洞察力
   install_c54fad9b: 安装
   installed_7b284a91: 已安装
   installed_by_admin_97c3a721: 已由管理员安装
@@ -12461,6 +12469,7 @@ zh-Hans:
   list_expanded_efec2d0: 列表已展开。
   list_view_430aecce: 列表视图
   lithuanian_5adcbe24: 立陶宛语
+  little_lost_try_here_first_9e24e575: 信息丢失？先尝试这里！
   live_event_subscription_webhooks_1dae83bb: 实时事件订阅网络钩子
   live_event_tool_documentation_f6dcc3d7: 实时事件工具文档
   live_events_subscriptions_service_is_not_configure_8c6024e2: 未配置现场活动订阅服务
@@ -12829,6 +12838,7 @@ zh-Hans:
   max_users_groups_per_appointment_867c505b: 每个预约的最多用户/小组
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: 一个参与者可以最多参加的预约次数
   maximum_number_of_communication_channels_reached_70c4d2f9: 已达到通信渠道最大数量
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: （可能一次有一个精选链接和一个新建链接）
   media_af190855: 媒体
   media_comment_dialog_manager: 
     messages: 
@@ -15244,7 +15254,7 @@ zh-Hans:
   netherlands_14ca4f6d: 荷兰
   netherlands_31_63e4f1b9: 荷兰(+31)
   never_df100b49: 从不
-  new_13daf639: 新的
+  new_13daf639: 新建
   new_account_role_6e5c4964: 新建帐户角色
   new_analytics_api_access_7eec1ead: "New Analytics API 访问"
   new_annotations_66932016: 新注解
@@ -15258,6 +15268,7 @@ zh-Hans:
   new_assignment_2a984756: 新作业
   new_assignment_for_course_name_f71dd337: "为 %{course_name}的新作业"
   new_attempt_57eae3d9: 新尝试
+  new_bd30f253: 新建
   new_canvas_message_from_user_name_94cc720: "%{user_name} 发来的新 Canvas 消息"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "%{author_name} 对 %{assignment_title}，%{user_name}，%{course_name} 发表的新评论。"
   new_comment_discussion_topic_by_user_name_666ccfa: "新评论：%{discussion_topic}，由 %{user_name} 发表"
@@ -16022,6 +16033,7 @@ zh-Hans:
   other_ddacb37d: 其他
   other_incorrect_match_options_c1418af5: 其他错误的匹配选项：
   other_options_d25f199c: 其他选项
+  other_resources_fee3ddda: 其他资源
   other_timezones_42530564: 其他时区
   out_of_78a76f91: 共
   out_of_formattedoutof_e08e90d5: "共%{formattedOutOf}"
@@ -21991,6 +22003,7 @@ zh-Hans:
       面，下载完成后将通知您。
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "处理 SIS 导入的引擎已重构，以更好地应对大型 SIS 导入的稳定性。SIS 导入的功能性不变。"
   the_error_stack_trace_if_there_is_one_b7e008a1: 错误堆跟踪，如果有一个
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: 精选链接已移动到列表顶部。
   the_field_field_is_required_56512820: "“%{field}”字段必填"
   the_field_field_must_have_no_spaces_d1c2fc37: "“%{field}”字段不能含有空格"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "“文件”选项卡是共享演讲幻灯片、示例文档、学习帮助等学生希望下载的任何内容的位置。使用 Canvas 可轻松上传和组织您的文件。我们将向您展示操作方法。"
@@ -22331,6 +22344,7 @@ zh-Hans:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "此权限不会影响在测验中管理课程级别的题库。相反，“管理题库”取决于“作业和测验 - 添加/编辑/删除”权限。要实现对课程题库的完全管理，必须同时启用此权限以及“作业和测验 - 添加/编辑/删除”。"
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "此项权限不影响在测验里管理课程级别题库的功能。相反，“管理题库”取决于“作业和测验 - 添加/编辑/删除”权限。要实现对课程题库的完全管理，必须同时启用此权限以及“作业和测验 - 添加/编辑/删除”。"
   this_permission_is_available_for_all_canvas_accoun_25cd5444: 此权限提供给所有Canvas帐户，但仅对与Canvas目录帐户关联的机构使用。权限目前没有前端效果，但工程师建议仍然对管理员启用此权限。对于其他角色，可以禁用该权限。
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "仅当对帐户启用 Canvas Insights 时支持该权限。请联系您的客户成功经理了解详情。"
   this_permission_only_affects_course_announcements__6bc2b0a5: "此权限仅影响课程公告；要管理全局公告，必须启用“全局公告 - 添加/编辑/删除”。"
   this_permission_only_controls_adding_users_at_the__5a2463b1: "此权限仅控制在帐户级别添加用户。要在课程中添加用户，必须启用“用户 (Users) - 在课程中添加/删除学生”或“用户 (Users) - 在课程中添加/删除教师、课程设计者或助教”。"
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -24460,6 +24474,7 @@ zh-Hans:
   your_name_7665e1d8: 您的名字
   your_outcomes_were_successfully_imported_c5de884: 您的结果已成功导入。
   your_password_has_been_changed_df0e72aa: 您的密码已更改。
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "您的密码找回说明将发送到 *%{email_address}*。可能需要最多 30 分钟。请务必查看您的垃圾邮件文件夹。"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: 您的个人资料照片无法上传。您可能已超过上传限制。
   your_quiz_engine_choice_has_been_reset_68d268c1: 您的测验引擎选择已重设！
   your_score_a1fc2fcf: 您的评分
