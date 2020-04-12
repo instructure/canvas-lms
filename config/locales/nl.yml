@@ -2109,6 +2109,7 @@ nl:
       Hiermee kan een gebruiker opdrachtgroepen aan een cursus toevoegen.
       Hiermee kan een gebruiker de weging van opdrachtgroepen in een cursus inschakelen en bewerken.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Hiermee kan de gebruiker gebeurtenissen toevoegen aan het dashboard Lijstweergave via het selectievakje Toevoegen aan to-do lijst van cursist. "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Hiermee kan de gebruiker gebeurtenissen toevoegen aan het dashboard Lijstweergave via het selectievakje Toevoegen aan to-do lijst van cursist."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Hiermee kan een gebruiker nieuwe opdrachten aan een module toevoegen."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Hiermee kan de gebruiker niet-beoordeelde discussies toevoegen aan het dashboard Lijstweergave via het selectievakje Toevoegen aan to-do lijst van cursist."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Hiermee kan de gebruiker pagina's toevoegen aan het dashboard Lijstweergave via het selectievakje Toevoegen aan to-do lijst van cursist."
@@ -2288,6 +2289,7 @@ nl:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Hiermee kan een gebruiker subaccounts voor het account weergeven en beheren."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Hiermee kan een gebruiker voorwaarden voor het account weergeven en beheren."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Hiermee kan een gebruiker de tabbladen Instellingen en Meldingen in Accountinstellingen weergeven en beheren."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "Hiermee kan een gebruiker Canvas Insights weergeven."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Hiermee kan een gebruiker de knoppen Startpagina kiezen en Controlelijst voor cursus-setup op de startpagina weergeven."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Hiermee kan een gebruiker cursusanalyses via het cursusdashboard weergeven. Hiermee kan een gebruiker cursistanalyses weergeven."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Hiermee kan een gebruiker cursus- en cursistanalyses weergeven op de pagina startpagina van de cursus of de pagina Personen."
@@ -4826,6 +4828,7 @@ nl:
   check_to_select_all_98e484f1: "Inschakelen om alles te selecteren"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Inschakelen om het toevoegen van een gebruiker over te slaan voor %{loginid}"
   checked_883b93fd: ingeschakeld
+  cheerful_panda_holding_a_map_17ba47ee: "Vrolijke panda die een kaart vasthoudt"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Onderliggende cursus moet deel uitmaken van dezelfde hoofdaccount als de hoofdcursus"
   child_s_username_dde3aa9: "Gebruikersnaam van kind"
   chile_56_88238b47: "Chili (+56)"
@@ -8749,6 +8752,7 @@ nl:
   enable_dashboard_images_for_courses_5af458b0: "Dashboard afbeeldingen inschakelen voor cursussen"
   enable_extra_filter_options_b52c23e6: "extra filteropties inschakelen"
   enable_feature_title_987d8e9a: "Functie inschakelen: %{title}"
+  enable_fullstory_5c673a06: "Fullstory inschakelen"
   enable_gradebook_list_students_by_sortable_name: "Een lijst van te sorteren namen van cursisten in de Cijferlijst maken. Namen worden standaard op 'Achternaam voornaam' gesorteerd en kunnen in instellingen worden veranderd."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Gradezilla inschakelen (dit is slechts een tijdelijke aanduiding omdat Gradebook in de toekomst wordt vervangen)."
   enable_gravatar_8a865b41: "Gravatar inschakelen"
@@ -9526,11 +9530,13 @@ nl:
       no_features_available: "Er zijn momenteel geen functies beschikbaar"
   feature_flags_52141c74: Functietags
   feature_flags_enable_disable_32e8f1ab: "Functietags - inschakelen/uitschakelen"
+  feature_headline_3f0daf4: "Aanbevolen kop"
   feature_options_37a2c317: Functieopties
   feature_options_account_settings_294a39f8: "Functieopties (Accountinstellingen)"
   feature_options_enable_disable_7e748054: "Functieopties - inschakelen/uitschakelen"
   feature_options_view_a170e80c: "Functieopties - bekijken"
   feature_preview_5e1216a0: Functievoorbeeld
+  featured_83f6041d: Aanbevolen
   featured_help_links_d805fe44: "Aanbevolen Help-links"
   features: 
     allow_opt_out_of_inbox: "Opt-out van de inbox voor gebruikers toestaan"
@@ -11798,6 +11804,7 @@ nl:
   include_course_settings_c4c08764: "Cursusinstellingen opnemen"
   include_deleted_enrollments_1c87684a: "Inclusief verwijderde inschrijvingen"
   include_deleted_objects_3cced3b5: "Inclusief verwijderde objecten;"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "Neem een FullStory-opname van de gebruikerssessie op"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Neem integratie-ID's op bij het exporteren van cijferlijsten."
   include_scores_when_alerting_about_grade_changes_623ec201: "Scores insluiten wanneer waarschuwingen over wijzigingen in cijfers worden verstuurd."
   include_scores_when_alerting_about_grades_89728ae1: "Scores invoegen bij het attent maken op cijfers."
@@ -11861,6 +11868,7 @@ nl:
   insert_math_equation_57c6e767: "Wiskundige vergelijking invoeren"
   insert_row_below_25187f89: "Rij hieronder invoegen"
   insert_row_below_name_a5b3bd41: "Rij invoegen onder %{name}"
+  insights_b514ad8d: Inzichten
   install_c54fad9b: Installeren
   installed_7b284a91: Geïnstalleerd
   installed_by_admin_97c3a721: "Geïnstalleerd door beheerder"
@@ -12468,6 +12476,7 @@ nl:
   list_expanded_efec2d0: "Lijst uitgevouwen."
   list_view_430aecce: Lijstweergave
   lithuanian_5adcbe24: Litouws
+  little_lost_try_here_first_9e24e575: "Een beetje verdwaald? Begin hier dan eens!"
   live_event_subscription_webhooks_1dae83bb: "Webhooks voor abonnement op live gebeurtenissen"
   live_event_tool_documentation_f6dcc3d7: "Documentatie bij tool voor live gebeurtenissen"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Abonneeservice voor live evenementen is niet geconfigureerd"
@@ -12836,6 +12845,7 @@ nl:
   max_users_groups_per_appointment_867c505b: "Max gebruikers/groepen per afspraak"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maximum aantal afspraken dat een deelnemer kan bijwonen"
   maximum_number_of_communication_channels_reached_70c4d2f9: "Maximumaantal communicatiekanalen bereikt"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Kan één Aanbevolen-link en één Nieuwe link tegelijk hebben)"
   media_af190855: Media
   media_comment_dialog_manager: 
     messages: 
@@ -15265,6 +15275,7 @@ nl:
   new_assignment_2a984756: "Nieuwe opdracht"
   new_assignment_for_course_name_f71dd337: "Nieuwe cursus voor %{course_name}"
   new_attempt_57eae3d9: "Nieuwe poging"
+  new_bd30f253: NIEUW
   new_canvas_message_from_user_name_94cc720: "Nieuw Canvas-bericht van %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "Nieuwe opmerking door %{author_name} voor %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "Nieuwe opmerking: %{discussion_topic} van %{user_name}"
@@ -16029,6 +16040,7 @@ nl:
   other_ddacb37d: andere
   other_incorrect_match_options_c1418af5: "Andere onjuiste vergelijkingsopties:"
   other_options_d25f199c: "Andere opties"
+  other_resources_fee3ddda: "ANDERE BRONNEN"
   other_timezones_42530564: "Andere tijdzones"
   out_of_78a76f91: van
   out_of_formattedoutof_e08e90d5: "van %{formattedOutOf}"
@@ -22010,6 +22022,7 @@ nl:
                 het downloaden gereed is.
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "De engine voor het verwerken van SIS-importbestanden is gewijzigd om de stabiliteit van grote SIS-importbestanden te verbeteren. De functionaliteit van SIS-importbestanden verandert daardoor niet."
   the_error_stack_trace_if_there_is_one_b7e008a1: "De fout stapeltracering, als er een is"
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "De aanbevolen link is naar het begin van de lijst verplaatst."
   the_field_field_is_required_56512820: "Het veld \"%{field}\" is vereist"
   the_field_field_must_have_no_spaces_d1c2fc37: "Het veld \"%{field}\" mag geen spaties bevatten"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Het tabblad Bestanden is de plaats waar je dia's van lezingen, voorbeelden van documenten, hulpstukken om te studeren -- wat dan ook dat jouw cursist wil downloaden, deelt. Jouw bestanden met Canvas uploaden en organiseren is makkelijk. Wij zullen je laten zien hoe."
@@ -22350,6 +22363,7 @@ nl:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Deze machtiging heeft geen invloed op de mogelijkheid om toetsbanken op cursusniveau te beheren in Toetsen. Toetsbanken beheren is daarentegen afhankelijk van de machtiging Opdrachten en toetsen - toevoegen/bewerken/verwijderen. Voor het volledig beheer van toetsbanken moeten deze machtiging en Opdrachten en toetsen - toevoegen/bewerken/verwijderen beide zijn ingeschakeld."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Deze machtiging heeft geen invloed op de mogelijkheid om toetsbanken op cursusniveau te beheren in Toetsen. Toetsbanken beheren is daarentegen afhankelijk van de machtiging Opdrachten en toetsen - toevoegen/bewerken/verwijderen. Voor het volledig beheer van toetsbanken moeten deze machtiging en Opdrachten en toetsen - toevoegen/bewerken/verwijderen beide zijn ingeschakeld."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Deze machtiging is beschikbaar voor alle Canvas-accounts maar dan wel alleen voor organisaties die gekoppeld zijn aan een Canvas Catalog-account. Momenteel heeft de machtiging geen front-endeffecten, maar engineering adviseert de machtiging ingeschakeld te houden voor beheerders. Voor andere rollen kan de machtiging worden uitgeschakeld."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "Deze machtiging wordt alleen ondersteund als Canvas Insights is ingeschakeld voor een account. Neem contact op met je Customer Success Manager voor meer informatie."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Deze machtiging heeft alleen betrekking op cursusaankondigingen. Voor het beheren van algemene aankondigingen moet Algemene aankondigingen - toevoegen/bewerken/verwijderen​ zijn ingeschakeld."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Deze machtiging is alleen bedoeld voor het toevoegen van gebruikers op accountniveau. Om gebruikers toe te voegen, moet Gebruikers - cursisten toevoegen aan/verwijderen uit cursussen of Gebruikers - cursusleiders, cursusontwerpers of onderwijsassistenten toevoegen aan/verwijderen uit cursussen ook zijn ingeschakeld."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -24484,6 +24498,7 @@ nl:
   your_name_7665e1d8: "Jouw naam"
   your_outcomes_were_successfully_imported_c5de884: "Je leerdoelen zijn geïmporteerd."
   your_password_has_been_changed_df0e72aa: "Je wachtwoord is gewijzigd."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "De instructies voor wachtwoordherstel worden verzonden naar *%{email_address}*. Dat kan 30 minuten duren. Vergeet niet je map met spam te controleren."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Je profielfoto kon niet geüpload worden. Mogelijk heb je jouw upload limiet overschreden."
   your_quiz_engine_choice_has_been_reset_68d268c1: "De keuze van je toetsengine is opnieuw ingesteld!"
   your_score_a1fc2fcf: "Je score"
