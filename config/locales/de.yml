@@ -2080,6 +2080,7 @@ de:
       Erlaubt dem Benutzer, Aufgabengruppen zu einem Kurs hinzuzufügen.
       Erlaubt dem Benutzer, die Aufgabengruppengewichtung in einem Kurs zu aktivieren und zu ändern.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Erlaubt dem Benutzer, Ereignisse zur Listenansicht „Dashboard“ per Kontrollkästchen „Zu Studentenaufgaben hinzufügen“ hinzuzufügen. "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Erlaubt dem Benutzer, Ereignisse zur Listenansicht „Dashboard“ per Kontrollkästchen „Zu Studentenaufgaben hinzufügen“ hinzuzufügen."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Erlaubt dem Benutzer, neue Aufgaben zu einem Modul hinzuzufügen."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Erlaubt dem Benutzer, nicht benotete Diskussionen zur Listenansicht „Dashboard“ per Kontrollkästchen „Zu Studentenaufgaben hinzufügen“ hinzuzufügen."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Erlaubt dem Benutzer, Seiten zur Listenansicht „Dashboard“ per Kontrollkästchen „Zu Studentenaufgaben hinzufügen“ hinzuzufügen."
@@ -2259,6 +2260,7 @@ de:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Erlaubt dem Benutzer, Unterkonten für das Konto anzuzeigen und zu verwalten."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Erlaubt dem Benutzer, die Semester für das Konto anzuzeigen und zu verwalten."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Erlaubt dem Benutzer, die Registerkarten „Einstellungen“ und „Benachrichtigungen“ in den Kontoeinstellungen anzuzeigen und zu verwalten."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "Erlaubt dem Benutzer, Canvas Insights zu sehen."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Erlaubt dem Benutzer, die Schaltflächen „Startseite auswählen“ und „Checkliste für Kurseinstellungen“ anzuzeigen."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Erlaubt dem Benutzer, anhand des Kurs-Dashboards die Kursanalyse anzuzeigen. Erlaubt dem Benutzer, die Teilnehmeranalysen zu sehen."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Erlaubt dem Benutzer, auf der Startseite des Kurses oder auf der Seite Kursteilnehmer die Kurs- und Teilnehmeranalysen zu sehen."
@@ -4796,6 +4798,7 @@ de:
   check_to_select_all_98e484f1: "Alle auswählen"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Markieren, um das Hinzufügen eines Benutzers für %{loginid} zu überspringen"
   checked_883b93fd: markiert
+  cheerful_panda_holding_a_map_17ba47ee: "Fröhlicher Panda hält eine Karte"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Der abhängige Kurs muss demselben Root-Konto angehören wie der Hauptkurs."
   child_s_username_dde3aa9: "Benutzername des Kindes"
   chile_56_88238b47: "Chile (+56)"
@@ -8710,6 +8713,7 @@ de:
   enable_dashboard_images_for_courses_5af458b0: "Dashboard-Bilder für Kurse aktivieren"
   enable_extra_filter_options_b52c23e6: "zusätzliche Filteroptionen aktivieren"
   enable_feature_title_987d8e9a: "Feature %{title} aktivieren"
+  enable_fullstory_5c673a06: "Gesamte Story aktivieren"
   enable_gradebook_list_students_by_sortable_name: "Studenten nach ihrem sortierbaren Namen im Notenbuch auflisten. Sortiert wird standardmäßig nach „Nachname, Vorname“. Dies kann in den Einstellungen geändert werden."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Gradezilla aktivieren (der Name ist nur ein Platzhalter, da er in Zukunft Gradebook ersetzen wird)."
   enable_gravatar_8a865b41: "Gravatar aktivieren"
@@ -9484,11 +9488,13 @@ de:
       no_features_available: "Derzeit sind keine Funktionen verfügbar."
   feature_flags_52141c74: Funktions-Flags
   feature_flags_enable_disable_32e8f1ab: "Funktions-Flags – aktivieren/deaktivieren"
+  feature_headline_3f0daf4: "Überschrift der Empfehlung"
   feature_options_37a2c317: Wahloptionen
   feature_options_account_settings_294a39f8: "Optionen (Kontoeinstellungen)"
   feature_options_enable_disable_7e748054: "Optionen – aktivieren / deaktivieren"
   feature_options_view_a170e80c: "Optionen – Anzeigen"
   feature_preview_5e1216a0: Funktionsvorschau
+  featured_83f6041d: Empfohlen
   featured_help_links_d805fe44: "Ausgewählte Hilfelinks"
   features: 
     allow_opt_out_of_inbox: "Benutzern das Abmelden vom Posteingangs ermöglichen"
@@ -11643,7 +11649,7 @@ de:
   if_your_institution_is_likely_to_need_more_than_10_297382d: |-
       Wenn Ihre Einrichtung wahrscheinlich mehr als 10 gleichzeitige Konferenzen mit
                 BigBlueButton benötigt, empfehlen wir ein Upgrade auf Premium BigBlueButton oder die Suche nach alternativen
-                Konferenzlösungen, mit denen Canvas zusammenarbeitet, wie z. B. Zoom, Hangouts, Teams und andere
+                Konferenzlösungen, mit denen Canvas zusammenarbeitet, wie z. B. Zoom, Hangouts, Teams und andere
                 Videokonferenz-Tools, die kostenlose oder ermäßigte Dienste anbieten.
   if_your_school_uses_microsoft_teams_you_can_use_th_992dff59: "Wenn Ihre Schule Microsoft Teams verwendet, können Sie den Enhanced Rich Content Editor (RCE) verwenden, um einfach einen Teamraum hinzuzufügen, während Sie Kalenderereignisse, Announcements, Diskussionsbeiträge und mehr erstellen."
   ignore_91750df8: Ignorieren
@@ -11746,6 +11752,7 @@ de:
   include_course_settings_c4c08764: "Kurseinstellungen einbeziehen"
   include_deleted_enrollments_1c87684a: "Gelöschte Einschreibungen einschließen"
   include_deleted_objects_3cced3b5: "Gelöschte Objekte einschließen;"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "FullStory-Aufnahme in Sitzung des Benutzers einschließen"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Beziehen Sie die Integration-IDs in die Notenbuchexporte ein."
   include_scores_when_alerting_about_grade_changes_623ec201: "Bei Benachrichtigungen über Notenänderungen Punktzahlen einfügen"
   include_scores_when_alerting_about_grades_89728ae1: "Bei Benachrichtigungen über Noten Punktzahlen einfügen"
@@ -11812,6 +11819,7 @@ de:
   insert_math_equation_57c6e767: "Math. Gleichung einfügen"
   insert_row_below_25187f89: "Zeile unten einfügen"
   insert_row_below_name_a5b3bd41: "Zeile einfügen nach %{name}"
+  insights_b514ad8d: Einblicke
   install_c54fad9b: Installieren
   installed_7b284a91: Installiert
   installed_by_admin_97c3a721: "Vom Administrator installiert"
@@ -12417,6 +12425,7 @@ de:
   list_expanded_efec2d0: "Liste eingeblendet."
   list_view_430aecce: Listenansicht
   lithuanian_5adcbe24: Litauisch
+  little_lost_try_here_first_9e24e575: "Wissen Sie nicht weiter? Versuchen Sie dies!"
   live_event_subscription_webhooks_1dae83bb: "Webhooks für Abonnements von Live-Ereignissen"
   live_event_tool_documentation_f6dcc3d7: "Dokumentation des Live-Ereignis-Tools"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Live Events Abonnements-Service ist nicht konfiguriert."
@@ -12782,6 +12791,7 @@ de:
   max_users_groups_per_appointment_867c505b: "Max. Benutzer/Gruppen pro Termin"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maximale Anzahl an Terminen, die ein Teilnehmer wahrnehmen kann"
   maximum_number_of_communication_channels_reached_70c4d2f9: "Höchstzahl der Kommunikationskanäle erreicht"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(kann gleichzeitig einen Empfohlen-Link und einen Neu-Link haben)"
   media_af190855: Medien
   media_comment_dialog_manager: 
     messages: 
@@ -15211,6 +15221,7 @@ de:
   new_assignment_2a984756: "Neue Aufgabe"
   new_assignment_for_course_name_f71dd337: "Neue Aufgabe für %{course_name}"
   new_attempt_57eae3d9: "Neuer Versuch"
+  new_bd30f253: NEU
   new_canvas_message_from_user_name_94cc720: "Neue Canvas-Nachricht von %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "Neuer Kommentar von %{author_name} zu %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "Neuer Kommentar: %{discussion_topic} von %{user_name}"
@@ -15973,6 +15984,7 @@ de:
   other_ddacb37d: sonstige
   other_incorrect_match_options_c1418af5: "Andere falsche Trefferoptionen:"
   other_options_d25f199c: "Andere Optionen"
+  other_resources_fee3ddda: "ANDERE RESSOURCEN"
   other_timezones_42530564: "Andere Zeitzonen"
   out_of_78a76f91: "von insgesamt"
   out_of_formattedoutof_e08e90d5: "von %{formattedOutOf}"
@@ -21926,6 +21938,7 @@ de:
                 abgeschlossen ist.
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Das System, das SIS-Importe verarbeitet, wurde für eine bessere Stabilität großer SIS-Importe umgestaltet. Die Funktionalität von SIS-Importen hat sich nicht geändert."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Der Fehler-Stack-Trace, sollte es einen geben."
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Der Empfohlen-Link wurde an den Anfang der Liste verschoben."
   the_field_field_is_required_56512820: "Das Feld „%{field}“ ist erforderlich."
   the_field_field_must_have_no_spaces_d1c2fc37: "Das Feld „%{field}“ darf keine Leerzeichen enthalten."
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Auf der Registerkarte „Dateien“ können Sie Ihren Studenten Vorlesungsfolien, Beispieldokumente und Lehrmaterial zum Herunterladen bereitstellen. Das Hochladen und Verwalten Ihrer Dateien ist mit Canvas denkbar einfach. Wir zeigen Ihnen, wie es geht."
@@ -22265,6 +22278,7 @@ de:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Diese Berechtigung hat keinen Einfluss auf die Fähigkeit, Fragenpools in Quizzen auf Kursebene zu verwalten. Dagegen hängt „Fragenpools verwalten“ von der Berechtigung „Aufgaben und Quizze – hinzufügen / ändern / löschen“ ab. Für die vollständige Verwaltung von Kursfragenpools müssen diese Berechtigung und „Aufgaben und Quizze – hinzufügen / ändern / löschen“ aktiviert sein."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Diese Berechtigung hat keinen Einfluss auf die Fähigkeit, Fragenpools in Quizzen auf Kursebene zu verwalten. Dagegen hängt „Fragenpools verwalten“ von der Berechtigung „Aufgaben und Quizze – hinzufügen / ändern / löschen“ ab. Für die vollständige Verwaltung von Kursfragenpools müssen diese Berechtigung und „Aufgaben und Quizze – hinzufügen / ändern / löschen“ aktiviert sein."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Diese Berechtigung ist für alle Canvas-Konten verfügbar, aber nur für die Institutionen in Verwendung, die mit einem Canvas-Katalog-Konto verknüpft sind. Die Berechtigung hat derzeit keine Frontend-Auswirkungen, aber der Entwickler empfiehlt, die Berechtigung für Admins aktiviert zu lassen. Für andere Rollen kann die Berechtigung deaktiviert werden."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "Diese Berechtigung wird nur unterstützt, wenn Canvas Insights für ein Konto aktiviert ist. Bitte wenden Sie sich für mehr Informationen an Ihren Customer Success Manager."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Diese Berechtigung betrifft nur Kursansagen; zur Verwaltung globaler Ansagen, muss „Global Announcements – hinzufügen / ändern / löschen“ aktiviert sein."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Diese Berechtigung steuert nur das Hinzufügen von Benutzern auf Kontoebene. Um Benutzer zu einem Kurs hinzuzufügen, muss mindestens eine der Optionen „Benutzer – Studenten zu Kursen hinzufügen oder daraus entfernen“ und „Benutzer – Lehrer, Kursdesigner oder TAs zu Kursen hinzufügen oder daraus entfernen“ aktiviert sein."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -24394,6 +24408,7 @@ de:
   your_name_7665e1d8: "Ihr Name"
   your_outcomes_were_successfully_imported_c5de884: "Ihre Ergebnisse wurden erfolgreich importiert."
   your_password_has_been_changed_df0e72aa: "Ihr Kennwort wurde geändert."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Die Anweisung zur Wiederherstellung Ihres Kennworts werden an *%{email_address}* gesendet. Das kann bis zu 30 Minuten in Anspruch nehmen. Bitte überprüfen Sie auch Ihren Spam-Ordner."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Ihr Profilfoto konnte nicht hochgeladen werden. Möglicherweise haben Sie Ihr Upload-Limit überschritten."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Die Wahl Ihres Quizsystems wurde zurückgesetzt!"
   your_score_a1fc2fcf: "Ihr Ergebnis"
