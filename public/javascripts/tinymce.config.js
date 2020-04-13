@@ -63,6 +63,10 @@ export default class EditorConfig {
    */
   defaultConfig() {
     return {
+      body_class: window.ENV.FEATURES.canvas_k6_theme ? 'elementary-theme' : 'default-theme',
+      font_formats: window.ENV.FEATURES.canvas_k6_theme
+        ? "Architect's Daughter=Architects Daughter,lato,Helvetica Neue,Helvetica,Arial,sans- serif; Lato=lato,Helvetica Neue,Helvetica,Arial,sans- serif; Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats"
+        : 'Lato=lato,Helvetica Neue,Helvetica,Arial,sans- serif; Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats',
       selector: `#${this.idAttribute}`,
       toolbar: this.toolbar(),
       [!window.ENV.use_rce_enhancements && 'theme']: 'modern',
@@ -194,7 +198,7 @@ export default class EditorConfig {
   fontBtnGroup = 'ltr rtl fontsizeselect formatselect check_a11y'
 
   /**
-   * usese the width to decide how many lines of buttons to break
+   * uses the width to decide how many lines of buttons to break
    * up the toolbar over.
    *
    * @private

@@ -21854,14 +21854,15 @@ ws@^6.1.2, ws@^6.2.1:
   dependencies:
     async-limiter "~1.0.0"
 
-wsrun@^5:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/wsrun/-/wsrun-5.1.0.tgz#75bb43610b5cf57f6e64918fbb9f8a13df4e6e56"
-  integrity sha512-YBhT0XQh5iXTjHT2JKIp+XwaahmJihrY22SvdcS5otEHuTsnBarBC0wjqDysDYtE6b052EG9Sd88khKAiwq00A==
+wsrun@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/wsrun/-/wsrun-5.2.0.tgz#a7c0587cb371ea29352f0b3cad002ea839a25b0f"
+  integrity sha512-48j1AltgQxEy3dwDrqWJTZIYSNYPGHtkZzTDjQiHPICXv2qtXPXFj+XutE4aZlCCWKZW+Lc+v6dUjBdH3yg8PQ==
   dependencies:
     bluebird "^3.5.1"
     chalk "^2.3.0"
     glob "^7.1.2"
+    jest-changed-files "^24.9.0"
     lodash "^4.17.4"
     minimatch "^3.0.4"
     split "^1.0.1"
