@@ -100,6 +100,11 @@ module Lti
 #         "submission_time": {
 #            "description": "The submitted_at date time of the submission.",
 #            "type": "datetime"
+#         },
+#         "root_account_id": {
+#            "description": "The id of the root Account associated with the OriginalityReport",
+#            "example": "1",
+#            "type": "integer"
 #         }
 #       }
 #     }
