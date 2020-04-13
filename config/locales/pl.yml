@@ -2136,6 +2136,7 @@ pl:
       Pozwala użytkownikowi na dodawanie grup w kursie.
       Pozwala użytkownikowi na włączanie i edytowanie ważenia grup zadań w kursie.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Pozwala użytkownikowi dodawać wydarzenia do panelu nawigacyjnego listy za pomocą pola wyboru Dodaj do listy zadań uczestnika. "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Pozwala użytkownikowi dodawać wydarzenia do panelu nawigacyjnego listy za pomocą pola wyboru Dodaj do listy zadań uczestnika."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Pozwala użytkownikowi na dodawanie nowych zadań do modułu."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Pozwala użytkownikowi dodawać niepodlegające ocenie dyskusje do panelu nawigacyjnego listy za pomocą pola wyboru Dodaj do listy zadań uczestnika."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Pozwala użytkownikowi dodawać strony do panelu nawigacyjnego listy za pomocą pola wyboru Dodaj do listy zadań uczestnika."
@@ -2315,6 +2316,7 @@ pl:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Pozwala użytkownikowi na wyświetlanie podkont konta i zarządzanie nimi."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Pozwala użytkownikowi na wyświetlanie terminów dla konta i zarządzanie nimi."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Pozwala użytkownikowi na wyświetlanie karty Ustawienia i Powiadomienia w ustawieniach konta oraz zarządzanie nimi."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "Pozwala użytkownikom wyświetlać Canvas Insights."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Pozwala użytkownikowi na wyświetlanie przycisków Wybierz stronę główną i Lista kontrolna konfiguracji kursu na stronie głównej."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Pozwala użytkownikowi na wyświetlanie analizy kursu za pomocą panelu nawigacyjnego kursu. Pozwala użytkownikowi na wyświetlanie analizy uczestników."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Pozwala użytkownikowi na wyświetlanie analizy kursu i uczestników na stronie Ludzie lub stronie głównej kursu."
@@ -4892,6 +4894,7 @@ pl:
   check_to_select_all_98e484f1: "Kliknij, aby zaznaczyć wszystkie"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Zaznacz, aby pominąć dodawanie użytkownika do %{loginid}"
   checked_883b93fd: zaznaczono
+  cheerful_panda_holding_a_map_17ba47ee: "Wesoła panda trzymająca mapę"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Kurs dla dzieci musi należeć do tego samego konta głównego co kurs główny"
   child_s_username_dde3aa9: "Nazwa użytkownika dziecka"
   chile_56_88238b47: "Chile (+56)"
@@ -8954,6 +8957,7 @@ pl:
   enable_dashboard_images_for_courses_5af458b0: "Włącz obrazy panelu nawigacyjnego dla kursów"
   enable_extra_filter_options_b52c23e6: "włącz dodatkowe opcje filtra"
   enable_feature_title_987d8e9a: "Włącz funkcję: %{title}"
+  enable_fullstory_5c673a06: "Włącz Fullstory"
   enable_gradebook_list_students_by_sortable_name: "Wyświetl listę uczestników według sortowalnych nazw w dzienniczku. Wartość domyślna nazwy to „Nazwisko, Imię” i można ją zmienić w ustawieniach."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Włącz usługę Gradezilla (nazwa jest elementem zastępczym, który zostanie później zmieniony)"
   enable_gravatar_8a865b41: "Włącz grawatar"
@@ -9745,11 +9749,13 @@ pl:
       no_features_available: "Obecnie nie są dostępne żadne funkcje."
   feature_flags_52141c74: "Flagi funkcji"
   feature_flags_enable_disable_32e8f1ab: "Flagi funkcji - włącz / wyłącz"
+  feature_headline_3f0daf4: "Nagłówek polecanego"
   feature_options_37a2c317: "Opcje funkcji"
   feature_options_account_settings_294a39f8: "Opcje elementu (Ustawienia konta)"
   feature_options_enable_disable_7e748054: "Opcje elementu - Włącz/wyłącz"
   feature_options_view_a170e80c: "Opcje funkcji - widok"
   feature_preview_5e1216a0: "Podgląd funkcji"
+  featured_83f6041d: Polecane
   featured_help_links_d805fe44: "Polecane łącza pomocy"
   features: 
     allow_opt_out_of_inbox: "Pozwól użytkownikom wypisać się ze skrzynki"
@@ -12058,6 +12064,7 @@ pl:
   include_course_settings_c4c08764: "Uwzględnij ustawienia kursu"
   include_deleted_enrollments_1c87684a: "Dołącz usunięte zapisy"
   include_deleted_objects_3cced3b5: "Dołącz usunięte obiekty"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "Uwzględnij zapisywanie sesji użytkownika przez FullStory"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Uwzględnij ID integracji w eksportach dzienników ocen."
   include_scores_when_alerting_about_grade_changes_623ec201: "Przesyłaj wyniki punktowe w alertach o zmianach ocen."
   include_scores_when_alerting_about_grades_89728ae1: "Przesyłaj wyniki punktowe w alertach o zmianach ocen."
@@ -12125,6 +12132,7 @@ pl:
   insert_math_equation_57c6e767: "Wpisz równanie matematyczne"
   insert_row_below_25187f89: "Wstaw rząd poniżej"
   insert_row_below_name_a5b3bd41: "Wstaw rząd poniżej %{name}"
+  insights_b514ad8d: Spostrzeżenia
   install_c54fad9b: Zainstaluj
   installed_7b284a91: Zainstalowano
   installed_by_admin_97c3a721: "Zainstalowane przez administratora"
@@ -12741,6 +12749,7 @@ pl:
   list_expanded_efec2d0: "Rozszerzono listę."
   list_view_430aecce: "Widok listy"
   lithuanian_5adcbe24: Litewski
+  little_lost_try_here_first_9e24e575: "Zgubiłeś się? Spróbuj tutaj!"
   live_event_subscription_webhooks_1dae83bb: "Webhooki subskrypcji Live Event"
   live_event_tool_documentation_f6dcc3d7: "Dokumentacja narzędzia Live Event"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Nie skonfigurowano usługi subskrypcji wydarzeń na żywo"
@@ -13111,6 +13120,7 @@ pl:
   max_users_groups_per_appointment_867c505b: "Maksymalna liczba użytkowników/grup na spotkanie"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maksymalna liczba spotkań, na które może zapisać się uczestnik"
   maximum_number_of_communication_channels_reached_70c4d2f9: "Osiągnięto maks. liczbę kanałów komunikacyjnych"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(dozwolone jedno polecane łącze i jedno nowe jednocześnie)"
   media_af190855: Multimedia
   media_comment_dialog_manager: 
     messages: 
@@ -15558,7 +15568,7 @@ pl:
   netherlands_14ca4f6d: Holandia
   netherlands_31_63e4f1b9: "Holandia (+31)"
   never_df100b49: Nigdy
-  new_13daf639: Nowy
+  new_13daf639: Nowe
   new_account_role_6e5c4964: "Nowa rola konta"
   new_analytics_api_access_7eec1ead: "Dostęp do New Analytics API"
   new_annotations_66932016: "Nowe adnotacje"
@@ -15572,6 +15582,7 @@ pl:
   new_assignment_2a984756: "Nowe zadanie"
   new_assignment_for_course_name_f71dd337: "Nowe zadanie dla %{course_name}"
   new_attempt_57eae3d9: "Nowa próba"
+  new_bd30f253: NOWE
   new_canvas_message_from_user_name_94cc720: "Nowa wiadomość Canvas od %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "Nowy komentarz %{author_name} do %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "Nowy komentarz: %{discussion_topic} przez %{user_name}"
@@ -16349,6 +16360,7 @@ pl:
   other_ddacb37d: inne
   other_incorrect_match_options_c1418af5: "Inne niepoprawne możliwości dopasowania:"
   other_options_d25f199c: "Inne opcje"
+  other_resources_fee3ddda: "INNE ZASOBY"
   other_timezones_42530564: "Inne strefy czasowe"
   out_of_78a76f91: z
   out_of_formattedoutof_e08e90d5: "z %{formattedOutOf}"
@@ -22462,6 +22474,7 @@ pl:
                 opuścić stronę.
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Mechanizm przetwarzający importy SIS został ulepszony, aby sprawniej obsługiwać duże importy SIS. Funkcja importów SIS nie uległa zmianie."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Błąd śladu, jeśli istnieje"
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Polecane łącze zostało przeniesione na górę listy."
   the_field_field_is_required_56512820: "Pole \"%{field}\" jest obowiązkowe"
   the_field_field_must_have_no_spaces_d1c2fc37: "Pole \"%{field}\" nie może zawierać spacji"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Zakładka Pliki służy do udostępniania materiałów związanych z wykładami, np. dokumentów, pomocy naukowych — wszystkiego, co uczestnicy mogliby pobrać. Program Canvas zapewnia łatwy sposób przekazywania i organizacji plików. Wszystko zostanie dokładnie przedstawione."
@@ -22808,6 +22821,7 @@ pl:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "To uprawnienie nie wpływa na możliwość zarządzania bankami pytań na poziomie kursu w testach. Zarządzanie bankami pytań zależy od uprawnienia Zadania i testy - Dodaj / edytuj / usuń. Dla możliwości pełnego zarządzania bankami pytań kursu należy włączyć to uprawnienia oraz Zadania i testy - Dodaj / edytuj / usuń."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "To uprawnienie nie wpływa na możliwość zarządzania bankami pytań na poziomie kursu w testach. Zarządzanie bankami pytań zależy od uprawnienia Zadania i testy - Dodaj / edytuj / usuń. Dla możliwości pełnego zarządzania bankami pytań kursu należy włączyć to uprawnienia oraz Zadania i testy - Dodaj / edytuj / usuń."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "To uprawnienie jest dostępne dla wszystkich konta Canvas, ale w użyciu tylko dla instytucji powiązanych z kontem Katalogu Canvas. Upewnienie to nie ma obecnie wpływu na obsługę klienta, ale dział techniczny sugeruje, aby pozostawić je włączone dla administratora. W przypadku innych ról uprawnienie to można wyłączyć."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "To uprawnienie jest obsługiwane, jeśli włączono funkcję Canvas Insights konta. Szczegóły można uzyskać od kierownika ds. obsługi klienta."
   this_permission_only_affects_course_announcements__6bc2b0a5: "To uprawnienie wpływa tylko na ogłoszenia dotyczące kursu; aby zarządzać globalnymi ogłoszeniami, należy włączyć uprawnienia Globalne ogłoszenia - Dodaj / edytuj / usuń."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "To uprawnienie steruje tylko dodawaniem użytkowników na poziomie konta. Aby dodać użytkowników do kursu, należy także włączyć opcje Użytkownicy - Dodaj / usuń uczestników z kursów i/lub Użytkownicy - Dodaj / usuń nauczycieli, projektantów kursów lub asystentów instruktorów z kursów."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -24984,6 +24998,7 @@ pl:
   your_name_7665e1d8: "Twoje imię i nazwisko"
   your_outcomes_were_successfully_imported_c5de884: "Udało się zaimportować wyniki."
   your_password_has_been_changed_df0e72aa: "Twoje hasło zostało zmienione."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Instrukcję odzyskiwania hasła otrzymasz pod adresem *%{email_address}*. Może to potrwać maksymalnie 30 minut. Sprawdź skrzynkę ze spamem."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Twoje zdjęcie profilowe nie mogło zostać przesłane. Być może przekroczono limit przesyłania."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Zresetowano Twój wybór mechanizmu testów."
   your_score_a1fc2fcf: "Twój wynik"

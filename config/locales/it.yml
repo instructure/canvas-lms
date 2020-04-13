@@ -1958,6 +1958,7 @@ it:
       Consente all'utente di aggiungere gruppi di compiti in un corso.
       Consente all'utente di abilitare e modificare la ponderazione per i gruppi di compiti in un corso.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Consente all’utente di aggiungere eventi alla dashboard con visualizzazione a elenco mediante la casella di spunta Aggiungi all'elenco di cose da fare dello studente."
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Consente all’utente di aggiungere eventi alla dashboard con visualizzazione a elenco mediante la casella di spunta Aggiungi all'elenco di cose da fare dello studente."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Consente all'utente di aggiungere nuovi compiti a un modulo."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Consente all’utente di aggiungere discussioni non valutate alla dashboard con visualizzazione a elenco mediante la casella di spunta Aggiungi all'elenco di cose da fare dello studente."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Consente all’utente di aggiungere pagine alla dashboard con visualizzazione a elenco mediante la casella di spunta Aggiungi all'elenco di cose da fare dello studente."
@@ -2137,6 +2138,7 @@ it:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Consente all'utente di visualizzare e gestire i subaccount per l'account."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Consente all'utente di visualizzare e gestire i termini per l'account."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Consente all'utente di visualizzare e gestire le schede Impostazioni e Notifiche nelle impostazioni account."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "Consente all'utente di visualizzazione le informazioni dettagliate su Canvas."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Consente all'utente di visualizzare i pulsanti Scegli home page ed Elenco di controllo configurazione corso nella home page."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Consente all'utente di visualizzare le analisi del corso tramite la dashboard del corso. Consente all'utente di visualizzare le analisi dello studente."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Consente all'utente di visualizzare le analisi del corso e dello studente dalla home page del corso o dalla pagina Persone."
@@ -4442,6 +4444,7 @@ it:
   check_to_select_all_98e484f1: "Fai clic per selezionare tutto"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Fai clic per ignorare l'aggiunta di un utente per %{loginid}"
   checked_883b93fd: selezionata
+  cheerful_panda_holding_a_map_17ba47ee: "Panda allegro con una mappa"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Il corso secondario deve appartenere allo stesso account radice del corso master"
   child_s_username_dde3aa9: "Nome utente dell'elemento secondario"
   chile_56_88238b47: "Cile (+56)"
@@ -7911,6 +7914,7 @@ it:
   enable_dashboard_images_for_courses_5af458b0: "Abilita immagini dashboard per i corsi"
   enable_extra_filter_options_b52c23e6: "attiva opzioni extra filtro"
   enable_feature_title_987d8e9a: "Abilita funzione: %{title}"
+  enable_fullstory_5c673a06: "Abilita storia completa"
   enable_gradebook_list_students_by_sortable_name: "Elenca gli studenti in base ai nomi ordinabili nel registro dei voti. Il valore predefinito del nome ordinabile è \"Cognome, Nome\" e può essere modificato nelle impostazioni."
   enable_gravatar_8a865b41: "Attiva Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Attiva le caratteristiche i18n nelle esportazioni dei risultati"
@@ -8568,10 +8572,12 @@ it:
       no_features_available: "Nessuna funzione è al momento disponibile."
   feature_flags_52141c74: "Flag funzionalità"
   feature_flags_enable_disable_32e8f1ab: "Flag funzione - attiva/disattiva"
+  feature_headline_3f0daf4: "Intestazione funzione"
   feature_options_account_settings_294a39f8: "Opzioni funzioni (Impostazioni account)"
   feature_options_enable_disable_7e748054: "Opzioni funzioni - Abilita/Disabilita"
   feature_options_view_a170e80c: "Opzioni funzioni - vista"
   feature_preview_5e1216a0: "Anteprima funzione"
+  featured_83f6041d: "In evidenza"
   featured_help_links_d805fe44: "Link alla pagina di assistenza presentati"
   features: 
     allow_opt_out_of_inbox: "Consenti agli utenti di disattivare la Posta in arrivo"
@@ -10250,6 +10256,7 @@ it:
   include_course_settings_c4c08764: "Includi impostazioni del corso"
   include_deleted_enrollments_1c87684a: "Includi iscrizioni eliminate"
   include_deleted_objects_3cced3b5: "Includi oggetti eliminati;"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "Includi registrazione FullStory della sessione utente"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Includere gli ID di integrazione nelle esportazioni del registro dei voti."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Includi punteggi negli avvisi sui voti.
@@ -10303,6 +10310,7 @@ it:
   insert_math_equation_57c6e767: "Inserisci equazione matematica"
   insert_row_below_25187f89: "Inserisci riga sotto"
   insert_row_below_name_a5b3bd41: "Inserisci riga sotto %{name}"
+  insights_b514ad8d: "Informazioni dettagliate"
   install_c54fad9b: Installa
   installed_7b284a91: Installato
   institution_14179014: Istituto
@@ -10876,6 +10884,7 @@ it:
   list_expanded_efec2d0: "L’elenco si è espanso."
   list_view_430aecce: "Visualizzazione elenco"
   lithuanian_5adcbe24: Lituano
+  little_lost_try_here_first_9e24e575: "Ti sei un po’ perso? Prima prima qui!"
   live_event_subscription_webhooks_1dae83bb: "Abbonamento evento in diretta Webhooks"
   live_event_tool_documentation_f6dcc3d7: "Documentazione dello strumento per gli eventi in diretta"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Il servizio di sottoscrizione agli eventi in diretta non è configurato"
@@ -11201,6 +11210,7 @@ it:
   max_users_groups_per_appointment_867c505b: "Numero massimo utenti/gruppi per appuntamento"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Numero massimo di appuntamenti a cui un partecipante può prendere parte"
   maximum_number_of_communication_channels_reached_70c4d2f9: "Raggiunto numero massimo di canali di comunicazione"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Potresti avere un link In evidenza e un link Nuovo in una volta)"
   media_af190855: "Elementi multimediali"
   media_comment_dialog_manager: 
     messages: 
@@ -13302,6 +13312,7 @@ it:
   negative_points_fda45730: "Punti negativi"
   netherlands_31_63e4f1b9: "Paesi Bassi (+31)"
   never_df100b49: Mai
+  new_13daf639: Nuovo
   new_account_role_6e5c4964: "Nuovo ruolo account"
   new_analytics_api_access_7eec1ead: "Nuovo accesso Analytics API"
   new_annotations_66932016: "Nuove annotazioni"
@@ -13315,6 +13326,7 @@ it:
   new_assignment_2a984756: "Nuovo compito"
   new_assignment_for_course_name_f71dd337: "Nuovo compito per %{course_name}"
   new_attempt_57eae3d9: "Nuovo tentativo"
+  new_bd30f253: NUOVO
   new_canvas_message_from_user_name_94cc720: "Nuovo messaggio Canvas da %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "Nuovo commento di %{author_name} per %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "Nuovo commento: %{discussion_topic} Da %{user_name}"
@@ -14024,6 +14036,7 @@ it:
   other_ddacb37d: altro
   other_incorrect_match_options_c1418af5: "Altre opzioni di corrispondenza non corrette:"
   other_options_d25f199c: "Altre opzioni"
+  other_resources_fee3ddda: "ALTRE RISORSE"
   other_timezones_42530564: "Altri fusi orari"
   out_of_78a76f91: su
   out_of_formattedoutof_e08e90d5: "su %{formattedOutOf}"
@@ -19322,6 +19335,7 @@ it:
       Il motore che elabora le importazioni SIS è stato sottoposto a refactoring per gestire al meglio la
       stabilità delle importazioni SIS di grandi dimensioni. La funzionalità delle importazioni SIS non è cambiata.
   the_error_stack_trace_if_there_is_one_b7e008a1: "Analisi dello stack errori, se presente"
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Il link In evidenza è stato spostato in cima all’elenco."
   the_field_field_is_required_56512820: "Il campo \"%{field}\" è obbligatorio"
   the_field_field_must_have_no_spaces_d1c2fc37: "Il campo \"%{field}\" non deve contenere spazi"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "La scheda File consente di condividere diapositive delle lezioni, documenti di esempio, guide allo studio e qualsiasi risorsa utile che i tuoi studenti desiderano scaricare.  Caricare e organizzare i file è piuttosto semplice con Canvas.  Ti mostreremo come fare."
@@ -19640,6 +19654,7 @@ it:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Questa autorizzazione non ha conseguenze sull'abilità di gestire le banche di domande a livello di corso nei quiz. Al contrario, l'autorizzazione Gestisci banche domande dipende dall'autorizzazione Compiti e quiz - Aggiungi/Modifica/Elimina. Per la gestione completa delle banche di domande del corso, è necessario abilitare questa autorizzazione e Compiti e quiz - Aggiungi/Modifica/Elimina."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Questa autorizzazione non ha conseguenze sull'abilità di gestire le banche di domande a livello di corso nei quiz. Al contrario, l'autorizzazione Gestisci banche domande dipende dall'autorizzazione Compiti e quiz - Aggiungi/Modifica/Elimina. Per la gestione completa delle banche di domande del corso, è necessario abilitare questa autorizzazione e Compiti e quiz - Aggiungi/Modifica/Elimina."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Questa autorizzazione è disponibile per tutti gli account Canvas ma viene utilizzata solo per gli istituti associati a un account Canvas Catalog. Attualmente l'autorizzazione non ha effetti front-end, ma la progettazione suggerisce che l'autorizzazione rimanga abilitata per gli amministratori. È possibile disattivare l'autorizzazione per altri ruoli."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "Questa autorizzazione è supportata solo quando le informazioni dettagliate su Canvas sono abilitate per un account. Per i dettagli contatta il Customer Success Manager."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Questa autorizzazione ha conseguenze solo sugli annunci del corso; per gestire gli annunci globali, è necessario abilitare l'autorizzazione Annunci globali - Aggiungi/Modifica/Elimina."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Questa autorizzazione controlla solo l'aggiunta di utenti a livello di account. Per aggiungere utenti"
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -21628,6 +21643,7 @@ it:
   your_name_7665e1d8: "Il tuo nome"
   your_outcomes_were_successfully_imported_c5de884: "I tuoi esiti sono stati importati."
   your_password_has_been_changed_df0e72aa: "La tua password è stata modificata."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Le istruzioni per il recupero della tua password saranno inviate a *%{email_address}*. Questo processo potrebbe richiedere fino a 30 minuti. Assicurati di controllare la cartella dello spam."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Impossibile caricare la tua immagine del profilo. Puoi aver superato il limite di caricamento."
   your_quiz_engine_choice_has_been_reset_68d268c1: "La scelta del motore del quiz è stata azzerata!"
   your_score_a1fc2fcf: "Il tuo punteggio"

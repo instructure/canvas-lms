@@ -2109,6 +2109,7 @@ es:
       Permite al usuario agregar grupos de tareas en un curso.
       Permite al usuario habilitar y editar la ponderación del grupo de tareas en un curso.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Permite que el usuario agregue eventos al Tablero de vista de lista mediante la casilla Agregar a las actividades por hacer del estudiante. "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Permite que el usuario agregue eventos al Tablero de vista de lista mediante la casilla Agregar a las actividades por hacer del estudiante."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Permite al usuario agregar nuevas tareas a un módulo."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Permite que el usuario agregue foros de discusión no calificados al Tablero de vista de lista mediante la casilla Agregar a las actividades por hacer del estudiante."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Permite que el usuario agregue páginas al Tablero de vista de lista mediante la casilla Agregar a las actividades por hacer del estudiante."
@@ -2288,6 +2289,7 @@ es:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Permite al usuario ver y administrar subcuentas para la cuenta."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Permite al usuario ver y administrar los términos para la cuenta."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Permite al usuario ver y administrar las pestañas Configuraciones y Notificaciones en las Configuraciones de la Cuenta."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "Les permite a los usuarios ver Canvas Insights."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Permite al usuario ver los botones Elegir página de inicio y Lista de comprobación de la configuración del curso en la página Inicio."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Permite al usuario ver las analíticas del curso a través del tablero del curso. Permite al usuario ver las analíticas del estudiante."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Permite al usuario ver las analíticas del curso y del estudiante desde la página de Inicio del curso o la página de Personas."
@@ -4829,6 +4831,7 @@ es:
   check_to_select_all_98e484f1: "Marcar para seleccionar todo"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Marque para saltar agregar un usuario para %{loginid}"
   checked_883b93fd: marcado
+  cheerful_panda_holding_a_map_17ba47ee: "Un panda alegre sosteniendo un mapa"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "El curso hijo debe pertenecer a la misma cuenta raíz que el curso principal"
   child_s_username_dde3aa9: "Nombre de usuario de su hijo"
   chile_56_88238b47: "Chile (+56)"
@@ -8757,6 +8760,7 @@ es:
   enable_dashboard_images_for_courses_5af458b0: "Habilitar Imágenes del tablero para cursos"
   enable_extra_filter_options_b52c23e6: "activar opciones de filtros adicionales"
   enable_feature_title_987d8e9a: "Habilitar funcionalidad: %{title}"
+  enable_fullstory_5c673a06: "Habilitar FullStory"
   enable_gradebook_list_students_by_sortable_name: "Haga una lista de los estudiantes por sus nombres clasificables en el Libro de calificaciones. El nombre clasificable se presenta de forma predeterminada como 'Apellido, Nombre' y se puede cambiar en las configuraciones."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Habilitar Gradezilla (el nombre solo es un referente, ya que en el futuro sustituirá al Libro de calificaciones)."
   enable_gravatar_8a865b41: "Habilitar Gravatar"
@@ -9534,11 +9538,13 @@ es:
       no_features_available: "No hay funciones disponibles actualmente"
   feature_flags_52141c74: "Mostrar marcadores"
   feature_flags_enable_disable_32e8f1ab: "Indicadores de funciones: habilitar/deshabilitar"
+  feature_headline_3f0daf4: "Destacar encabezado"
   feature_options_37a2c317: "Opciones de características"
   feature_options_account_settings_294a39f8: "Opciones de funcionalidad (Configuraciones de la cuenta)"
   feature_options_enable_disable_7e748054: "Opciones de funcionalidad: activar/desactivar"
   feature_options_view_a170e80c: "Opciones de funcionalidad: ver"
   feature_preview_5e1216a0: "Vista previa de la funcionalidad"
+  featured_83f6041d: Destacado
   featured_help_links_d805fe44: "Enlaces de ayuda destacados"
   features: 
     allow_opt_out_of_inbox: "Permitir a los usuarios realizar una baja voluntaria de la bandeja de entrada"
@@ -11697,7 +11703,7 @@ es:
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "Si desea mantener sus comentarios no presentados, guárdelos antes de salir de esta página."
   if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: "Si desea crear un enlace a la página de asistencia técnica de sus propias instalaciones en el diálogo de ayuda, lo puede hacer aquí."
   if_your_institution_is_likely_to_need_more_than_10_297382d: |-
-      Si es probable que su institución requiera más de 10 conferencias simultáneas de
+      Si es probable que su institución requiera más de 10 conferencias simultáneas de
                 BigBlueButton, recomendamos obtener una licencia prémium de BigBlueButton o analizar soluciones de conferencia alternativas
                 con las que Canvas está asociada, como Zoom, Hangouts, Teams y otras
                 herramientas de videoconferencia que ofrezcan servicios gratuitos o rebajados.
@@ -11802,6 +11808,7 @@ es:
   include_course_settings_c4c08764: "Incluir configuraciones del curso"
   include_deleted_enrollments_1c87684a: "Incluir las inscripciones eliminadas"
   include_deleted_objects_3cced3b5: "Incluir los objetos eliminados;"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "Incluir la grabación de FullStory de la sesión del usuario"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Incluir identificaciones de integración en las exportaciones del libro de calificaciones."
   include_scores_when_alerting_about_grade_changes_623ec201: "Incluír calificaciones al alertar acerca de cambios de calificaciones."
   include_scores_when_alerting_about_grades_89728ae1: "Incluír calificaciones al alertar sobre las calificaciones."
@@ -11868,6 +11875,7 @@ es:
   insert_math_equation_57c6e767: "Insertar la ecuación matemática"
   insert_row_below_25187f89: "Insertar fila debajo"
   insert_row_below_name_a5b3bd41: "Insertar fila debajo de %{name}"
+  insights_b514ad8d: Estadísticas
   install_c54fad9b: Instalar
   installed_7b284a91: Instalada
   installed_by_admin_97c3a721: "Instalado por el administrador"
@@ -12475,6 +12483,7 @@ es:
   list_expanded_efec2d0: "Lista expandida."
   list_view_430aecce: "Vista de lista"
   lithuanian_5adcbe24: Lituano
+  little_lost_try_here_first_9e24e575: "¿No sabe a dónde ir? ¡Pruebe por aquí!"
   live_event_subscription_webhooks_1dae83bb: "Webhooks de suscripción a los eventos en vivo"
   live_event_tool_documentation_f6dcc3d7: "Documentos de la herramienta de eventos en vivo"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "El servicio de suscripción a eventos en vivo no está configurado"
@@ -12843,6 +12852,7 @@ es:
   max_users_groups_per_appointment_867c505b: "Cantidad máxima de usuarios/grupos por cita"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Cantidad máxima de citas a las que puede asistir un participante"
   maximum_number_of_communication_channels_reached_70c4d2f9: "Se alcanzó el número máximo de canales de comunicación"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Puede tener solo un enlace Destacado y un enlace Nuevo a la vez)"
   media_af190855: Multimedia
   media_comment_dialog_manager: 
     messages: 
@@ -15271,6 +15281,7 @@ es:
   new_assignment_2a984756: "Nueva tarea"
   new_assignment_for_course_name_f71dd337: "Nueva tarea para %{course_name}"
   new_attempt_57eae3d9: "Nuevo intento"
+  new_bd30f253: NUEVO
   new_canvas_message_from_user_name_94cc720: "Nuevo mensaje de Canvas de %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "Comentario nuevo por %{author_name} para %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "Nuevo comentario: %{discussion_topic} por %{user_name}"
@@ -16038,6 +16049,7 @@ es:
   other_ddacb37d: otro
   other_incorrect_match_options_c1418af5: "Otras opciones de coincidencia incorrecta:"
   other_options_d25f199c: "Otras opciones"
+  other_resources_fee3ddda: "OTROS RECURSOS"
   other_timezones_42530564: "Otras zonas horarias"
   out_of_78a76f91: de
   out_of_formattedoutof_e08e90d5: "de %{formattedOutOf}"
@@ -22005,6 +22017,7 @@ es:
                 se complete.
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "El motor que procesa las importaciones de SIS ha sido rediseñado para manejar la estabilidad de las grandes importaciones de SIS de mejor manera. La funcionalidad de las importaciones de SIS no ha cambiado."
   the_error_stack_trace_if_there_is_one_b7e008a1: "La traza de pila del error, si existe alguno"
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "El enlace destacado se movió al comienzo de la lista."
   the_field_field_is_required_56512820: "El campo \"%{field}\" es obligatorio"
   the_field_field_must_have_no_spaces_d1c2fc37: "El campo \"%{field}\" no debe tener espacios"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "La pestaña Archivos es el lugar donde se pueden compartir diapositivas de conferencias, documentos de ejemplos, material colateral de estudio... cualquier cosa que deseen descargar sus estudiantes.  Actualizar y organizar sus archivos es muy fácil con Canvas.  Le enseñaremos cómo."
@@ -22342,6 +22355,7 @@ es:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Este permiso no afecta la capacidad de administrar los bancos de preguntas a nivel del curso en Exámenes. En cambio, los Bancos de preguntas dependen del permiso Tareas y exámenes: agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete). Para una administración completa de los bancos de preguntas del curso, deben estar habilitados este permiso y Tareas y exámenes: agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete)."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Este permiso no afecta la capacidad de administrar los bancos de preguntas a nivel del curso en Exámenes. En cambio, los Bancos de preguntas dependen del permiso Tareas y exámenes: agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete). Para una administración completa de los bancos de preguntas del curso, deben estar habilitados este permiso y Tareas y exámenes: agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete)."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Este permiso está disponible para todas las cuentas de Canvas, pero solamente está en uso para las instituciones asociadas con una cuenta de Canvas Catalog. El permiso actualmente no tiene efectos por adelantado, pero ingeniería sugiere que el permiso permanezca habilitado para los administradores. Para otros roles, el permiso puede estar desactivado."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "Este permiso solo es compatible cuando Canvas Insights está habilitado para una cuenta. Comuníquese con su gerente de éxito del cliente para más información."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Este permiso solamente afecta los anuncios del curso; para administrar los anuncios globales, debe estar habilitado Anuncios globales: agregar/editar/eliminar."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Este permiso solo controla el agregado de usuarios al nivel de la cuenta. Para agregar usuarios a un curso, deben estar habilitados Usuarios: agregar/eliminar estudiantes de los cursos (Users - add/remove students from courses) o Usuarios: agregar/eliminar profesores, diseñadores de cursos o profesores asistentes de los cursos al curso (Users - add/remove teachers, course designers, or TAs from courses to the course)."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -23313,7 +23327,7 @@ es:
   use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
       Use las evaluaciones para poner a prueba el conocimiento de los estudiantes y para evaluar la comprensión
             del material del curso. El motor de evaluaciones de Nuevas evaluaciones le permite crear hasta
-            13 tipos de preguntas y contenido. Si Nuevas evaluaciones no está habilitado para su institución,
+            13 tipos de preguntas y contenido. Si Nuevas evaluaciones no está habilitado para su institución,
             las Evaluaciones clásicas siguen estando disponibles para ayudarlo a alcanzar sus objetivos.
   use_remote_service_for_notifications_9fe667c6: "Usar servicio remoto para las notificaciones"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Usar la versión remota del editor de contenido enriquecido"
@@ -24473,6 +24487,7 @@ es:
   your_name_7665e1d8: "Su nombre"
   your_outcomes_were_successfully_imported_c5de884: "Sus resultados se importaron con éxito."
   your_password_has_been_changed_df0e72aa: "Su contraseña ha sido cambiada."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Las instrucciones para que recupere su contraseña se enviarán a *%{email_address}*. Esto podría tardar hasta 30 minutos. Asegúrese de verificar su casilla de correo no deseado."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "No se pudo cargar su foto de perfil. Es posible que haya superado el límite de carga."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Se restableció su elección de motor de evaluación."
   your_score_a1fc2fcf: "Su puntaje"

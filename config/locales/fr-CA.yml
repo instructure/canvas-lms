@@ -1965,7 +1965,7 @@ fr-CA:
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Permet aux évaluateurs de consulter le plateau d’audit d'évaluation dans SpeedGrader pour les tâches modérées ou anonymes."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Permet de créer des annonces pour une section spécifique"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Permet de créer des discussions pour une section spécifique"
-  allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permet de marquer les liens d’aide comme « Principaux » ou « Nouveau » et affiche bien en évidence le lien d’aide principal dans le menu d’aide."
+  allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permet de marquer les liens d’aide comme « Principaux » ou « Nouveau » et affiche bien en évidence le lien d’aide principal dans le menu d’aide."
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Permet aux rôles d’enseignant/concepteur/AE d’accéder à l’outil de clavardage."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permet aux rôles d’enseignant/concepteur/AE d’accéder à l’outil de clavardage."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permet aux rôles d’enseignant/AE d’accéder à l’outil de Participation."
@@ -2035,6 +2035,7 @@ fr-CA:
       Permet à l'utilisateur d'ajouter un groupe de tâches dans un cours.
       Permet à l'utilisateur d'activer et de modifier le coefficient de pondération des groupes de tâches dans un cours.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Permet à l’utilisateur d’ajouter des événements au tableau de bord de la vue de liste par l’entremise de la case à cocher Ajouter à la liste des choses à faire de l’étudiant. "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Permet à l’utilisateur d’ajouter des événements au tableau de bord de la vue de liste par l’entremise de la case à cocher Ajouter à la liste des choses à faire de l’étudiant."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Permet à l'utilisateur d'ajouter de nouvelles tâches à un module."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Permet à l’utilisateur d’ajouter des discussions non notées au tableau de bord de la vue de liste par l’entremise de la case à cocher Ajouter à la liste des choses à faire de l’étudiant."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Permet à l’utilisateur d’ajouter des pages au tableau de bord de la vue de liste par l’entremise de la case à cocher Ajouter à la liste des choses à faire de l’étudiant."
@@ -2214,6 +2215,7 @@ fr-CA:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Permet à l'utilisateur de voir et de gérer les sous-comptes du compte."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Permet à l'utilisateur de voir et de gérer les trimestres pour le compte."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Permet à l'utilisateur de voir et de gérer l’onglet « Paramètres et Notifications » dans les paramètres du compte."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "Permet à l’utilisateur de voir les Canvas Insights."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Permet à l'utilisateur de voir les boutons « Choisir la page d'accueil » et la « Liste de vérification de la configuration du cours » dans la page d'accueil."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Permet à l'utilisateur de voir les analyses du cours grâce au tableau de bord du cours. Permet à l'utilisateur de voir les analyses de l’étudiant."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Permet à l'utilisateur de voir les analyses du cours et de l’étudiant depuis la page d’accueil du cours ou la page des Personnes."
@@ -4587,6 +4589,7 @@ fr-CA:
   check_to_select_all_98e484f1: "Cochez la case pour tout sélectionner"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Cocher cette case pour sauter l’action d’ajouter un utilisateur pour %{loginid}"
   checked_883b93fd: coché
+  cheerful_panda_holding_a_map_17ba47ee: "Panda joyeux tenant une carte"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Le cours dépendant doit appartenir au même compte racine que le cours maître"
   child_s_username_dde3aa9: "Nom d'utilisateur de votre enfant"
   chile_56_88238b47: "Chili (+56)"
@@ -8226,6 +8229,7 @@ fr-CA:
   enable_dashboard_images_for_courses_5af458b0: "Autoriser les images du tableau de bord pour les cours"
   enable_extra_filter_options_b52c23e6: "activer les options de filtre supplémentaires"
   enable_feature_title_987d8e9a: "Activer la fonctionnalité : %{title}"
+  enable_fullstory_5c673a06: "Activer l'historique complet"
   enable_gradebook_list_students_by_sortable_name: "Afficher la liste des étudiants triée par leur nom dans le carnet de notes. Par défaut, le tri s’effectue d’après les données « Nom, prénom », mais vous pouvez modifier ces paramètres."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Activer Gradezilla (le nom est uniquement un espace réservé puisqu’il remplacera Gradebook à l'avenir)"
   enable_gravatar_8a865b41: "Activer Gravatar"
@@ -8903,11 +8907,13 @@ fr-CA:
       no_features_available: "Il n’y a aucune fonctionnalité disponible actuellement."
   feature_flags_52141c74: "Drapeaux d'entités"
   feature_flags_enable_disable_32e8f1ab: "Drapeaux d'entités - activer/désactiver"
+  feature_headline_3f0daf4: "Titre à la une"
   feature_options_37a2c317: "Options de la fonction"
   feature_options_account_settings_294a39f8: "Options de la fonction (paramètres du compte)"
   feature_options_enable_disable_7e748054: "Options de la fonction - activer/désactiver"
   feature_options_view_a170e80c: "Options des fonctionnalités - voir"
   feature_preview_5e1216a0: "Aperçu des fonctionnalités"
+  featured_83f6041d: "Mise en avant"
   featured_help_links_d805fe44: "Liens d’aide principaux"
   features: 
     allow_opt_out_of_inbox: "Autoriser les utilisateurs à sortir de la boîte de réception"
@@ -10937,6 +10943,7 @@ fr-CA:
   include_course_settings_c4c08764: "Inclure les paramètres de cours"
   include_deleted_enrollments_1c87684a: "Inclure les inscriptions supprimées"
   include_deleted_objects_3cced3b5: "Inclure les objets supprimés;"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "Inclure l'enregistrement FullStory de la session de l'utilisateur"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Inclure les ID d'intégration dans les exportations de carnets de notes."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inclure les notes lors de message d'alerte à propos des notations.
@@ -10996,6 +11003,7 @@ fr-CA:
   insert_math_equation_57c6e767: "Insérer une équation mathématique"
   insert_row_below_25187f89: "Insérer une ligne ci-dessous"
   insert_row_below_name_a5b3bd41: "Insérer une ligne sous %{name}"
+  insights_b514ad8d: Perspectives
   install_c54fad9b: Installer
   installed_7b284a91: Installés
   installed_by_admin_97c3a721: "Installé par l’administrateur"
@@ -11583,6 +11591,7 @@ fr-CA:
   list_expanded_efec2d0: "Liste développée."
   list_view_430aecce: "Vue de liste"
   lithuanian_5adcbe24: Lituanien
+  little_lost_try_here_first_9e24e575: "Un peu perdu? Essayez d'abord ici!"
   live_event_subscription_webhooks_1dae83bb: "Webhooks d’abonnement d’événements en direct"
   live_event_tool_documentation_f6dcc3d7: "Documentation de l'outil d'événement en direct"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Le service des abonnements aux événements en direct n'est pas configuré"
@@ -11916,6 +11925,7 @@ fr-CA:
   max_users_groups_per_appointment_867c505b: "Nombre max. d'utilisateurs/groupes par rendez-vous"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Nombre maximum de rendez-vous auxquels un participant peut assister"
   maximum_number_of_communication_channels_reached_70c4d2f9: "Nombre maximal de canaux de communication atteints"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Peut avoir un lien « Mise en avant » et un lien « Nouveau » à la fois)"
   media_af190855: "Support média"
   media_comment_dialog_manager: 
     messages: 
@@ -14034,6 +14044,7 @@ fr-CA:
   negative_points_fda45730: "Points négatifs"
   netherlands_31_63e4f1b9: "Hollande (+31)"
   never_df100b49: Jamais
+  new_13daf639: Nouveau
   new_account_role_6e5c4964: "Nouveau rôle de compte"
   new_analytics_api_access_7eec1ead: "Accès à l’API de New Analytics"
   new_annotations_66932016: "Nouvelles annotations"
@@ -14047,6 +14058,7 @@ fr-CA:
   new_assignment_2a984756: "Nouveau tâche"
   new_assignment_for_course_name_f71dd337: "Nouveau tâche pour %{course_name}"
   new_attempt_57eae3d9: "Nouvelle tentative"
+  new_bd30f253: NOUVEAU
   new_canvas_message_from_user_name_94cc720: "Nouveau message Canvas de %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "Nouveau commentaire de %{author_name} pour %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "Nouveau commentaire : %{discussion_topic} par %{user_name}"
@@ -14780,6 +14792,7 @@ fr-CA:
   other_ddacb37d: autre
   other_incorrect_match_options_c1418af5: "Autres options de correspondance incorrecte :"
   other_options_d25f199c: "Options supplémentaires"
+  other_resources_fee3ddda: "AUTRES RESSOURCES"
   other_timezones_42530564: "D'autres fuseaux horaires"
   out_of_78a76f91: sur
   out_of_formattedoutof_e08e90d5: "sur %{formattedOutOf}"
@@ -20259,6 +20272,7 @@ fr-CA:
                 sera terminé.
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Le moteur qui traite les importations SIS a été remanié pour mieux gérer la stabilité des importations importantes SIS. La fonctionnalité des importations SIS n'a pas changée."
   the_error_stack_trace_if_there_is_one_b7e008a1: "La trace d'appels de l'erreur, s'il y en a une"
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Le lien « Mise en avant » a été déplacé en haut de la liste."
   the_field_field_is_required_56512820: "Le champ « %{field} » est requis"
   the_field_field_must_have_no_spaces_d1c2fc37: "Le champ « %{field} » ne doit pas contenir d’espace"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "L’onglet Fichiers permet de partager des diapositives de conférence, des documents d’exemples, des aides à l’étude -- tout ce que vos étudiants sont susceptibles de télécharger. La mise en ligne et l’organisation de vos fichiers sont des tâches simples dans Canvas. Nous vous expliquerons comment."
@@ -20582,6 +20596,7 @@ fr-CA:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Cette autorisation n’affecte pas la capacité de gérer les banques de questions du niveau du cours dans des questionnaires. Au lieu de cela, la gestion des banques de questions est dépendante de l’autorisation « Tâches et questionnaires — ajouter/modifier/supprimer ». Pour la gestion complète des banques de questions du cours, cette autorisation et « Tâches et questionnaires — ajouter/modifier/supprimer » doivent être activés."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Cette autorisation n’affecte pas la capacité de gérer les banques de questions du niveau du cours dans des questionnaires. Au lieu de cela, la gestion des banques de questions est dépendante de l’autorisation « Tâches et questionnaires — ajouter/modifier/supprimer ». Pour la gestion complète des banques de questions du cours, cette autorisation et « Tâches et questionnaires — ajouter/modifier/supprimer » doivent être activés."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Cette autorisation est disponible pour tous les comptes Canvas, mais seulement pour utilisation pour les institutions associées avec un compte de catalogue Canvas. L’autorisation n'a actuellement aucun effet intégral, mais les ingénieurs suggèrent que l'autorisation reste activée pour les administrateurs. Pour d'autres rôles, l’autorisation peut être désactivée."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "Cette autorisation n'est prise en charge que lorsque Canvas Insights est activé pour un compte. Veuillez contacter votre gestionnaire de réussite du client pour plus d’informations."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Cette autorisation ne concerne que les annonces de cours; pour gérer les annonces générales, « Annonces générales - ajouter/modifier/supprimer » doit être activé."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Cette autorisation ne contrôle que l’ajout d’utilisateurs au niveau du compte. Pour ajouter des utilisateurs à un cours, « Utilisateurs — ajouter/retirer des étudiants des cours » ou « Utilisateurs — ajouter/retirer les enseignants, les concepteurs de cours, ou les AE des cours » doit être activé."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -22631,6 +22646,7 @@ fr-CA:
   your_name_7665e1d8: "Votre nom"
   your_outcomes_were_successfully_imported_c5de884: "Vos acquis ont été importés avec succès."
   your_password_has_been_changed_df0e72aa: "Votre mot de passe a été modifié."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Vos instructions de récupération de mot de passe seront envoyées à *%{email_address}*. Ceci peut prendre jusqu’à 30 minutes. Assurez-vous de vérifier votre boîte de pourriels."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Impossible de mettre en ligne la photo de votre profil. Vous avez peut-être dépassé votre quota."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Votre choix d’engin de questionnaire a été réinitialisé!"
   your_score_a1fc2fcf: "Votre score"

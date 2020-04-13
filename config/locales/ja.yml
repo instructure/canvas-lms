@@ -2108,7 +2108,8 @@ ja:
       ユーザーが課題設定を管理できるようにします。
       ユーザーがコースに課題グループを追加できるようにします。
       ユーザーがコースで課題グループの重み付けを有効にして編集できるようにします。
-  allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "ユーザーが[受講生に追加] タスクチェックボックスを使用して、イベントをリスト表示ダッシュボードに追加できるようにします。 "
+  allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "ユーザーが [受講生 To-Do に追加する] チェックボックスを使用して、リストビューダッシュボードにイベントを追加できるようにします。 "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "ユーザーが [受講生 To-Do に追加する] チェックボックスを使用して、リストビューダッシュボードにイベントを追加できるようにします。"
   allows_user_to_add_new_assignments_to_a_module_51ae198c: ユーザーが新しい課題をモジュールに追加できるようにします。
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "ユーザーが[受講生に追加] タスクチェックボックスを使用して、未採点のディスカッションをリスト表示ダッシュボードに追加できるようにします。"
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "ユーザーが[受講生に追加] タスクチェックボックスを使用して、ページをリスト表示ダッシュボードに追加できるようにします。"
@@ -2288,6 +2289,7 @@ ja:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: ユーザーがアカウントのサブアカウントを表示および管理できるようにします。
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: ユーザーがアカウントの用語を表示および管理できるようにします。
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: ユーザーがアカウント設定の設定タブと通知タブを表示および管理できるようにします。
+  allows_user_to_view_canvas_insights_f4f7ba8b: "ユーザーが Canvas Insights を表示できるようにします。"
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: ユーザーがホームページのホームページを選択およびコース設定チェックリストボタンを表示できるようにします。
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: ユーザーがコースダッシュボードを通じてコース分析を表示できるようにします。ユーザーが受講生の分析を表示できるようにします。
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: ユーザーがコースのホームページや人物のページからコースや受講生の分析を表示できるようにします。
@@ -4832,6 +4834,7 @@ ja:
   check_to_select_all_98e484f1: チェックしてすべてを選択する
   check_to_skip_adding_a_user_for_loginid_5fa643da: "チェックボックスをオンにして～へのユーザーを追加をスキップする%{loginid}"
   checked_883b93fd: チェック済み
+  cheerful_panda_holding_a_map_17ba47ee: 地図を持つ元気なパンダ
   child_course_must_belong_to_the_same_root_account__66ed7b8e: チャイルドコースは、マスターコースト同じルートアカウントに属さなければなりません
   child_s_username_dde3aa9: 子どものユーザ名
   chile_56_88238b47: "チリ (+56)"
@@ -8751,6 +8754,7 @@ ja:
   enable_dashboard_images_for_courses_5af458b0: コースのダッシュボード画像を有効にする
   enable_extra_filter_options_b52c23e6: 特別フィルタオプションを有効にする
   enable_feature_title_987d8e9a: "機能を有効にします: %{title}"
+  enable_fullstory_5c673a06: "Fullstory を有効化する"
   enable_gradebook_list_students_by_sortable_name: 成績表に、分類可能な名前で受講生を一覧表示します。並べ替え可能な名前のデフォルトは「姓、名」で、設定で変更することができます。
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Gradezillaを有効にする（名前は、今後 Gradebook を置き換えるためのプレースホルダ用としてのみです）。"
   enable_gravatar_8a865b41: "Gravatar を有効にする"
@@ -9531,11 +9535,13 @@ ja:
       no_features_available: 現在利用できる機能はありません。
   feature_flags_52141c74: 機能フラグ
   feature_flags_enable_disable_32e8f1ab: "機能フラグ - 有効/無効"
+  feature_headline_3f0daf4: 機能ヘッドライン
   feature_options_37a2c317: 機能オプション
   feature_options_account_settings_294a39f8: 機能オプション（アカウント設定）
   feature_options_enable_disable_7e748054: "機能オプション - 有効/無効"
   feature_options_view_a170e80c: "機能オプション - 表示"
   feature_preview_5e1216a0: 機能プレビュー
+  featured_83f6041d: 注目
   featured_help_links_d805fe44: 注目のヘルプリンク
   features: 
     allow_opt_out_of_inbox: ユーザに受信箱のオプトアウトを許可
@@ -11802,6 +11808,7 @@ ja:
   include_course_settings_c4c08764: コース設定を含める
   include_deleted_enrollments_1c87684a: 削除された登録を含む
   include_deleted_objects_3cced3b5: 削除されたオブジェクトを含む;
+  include_fullstory_recording_of_the_user_s_session_656d131e: "ユーザーのセッションの FullStory 録画を含める"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "成績帳エックスポートに統合 ID が含まれます。"
   include_scores_when_alerting_about_grade_changes_623ec201: 成績変更に関するアラートには、スコアを記載してください。
   include_scores_when_alerting_about_grades_89728ae1: 成績に関する通知をする場合は、スコアを含むようにしてください。
@@ -11868,6 +11875,7 @@ ja:
   insert_math_equation_57c6e767: 数学数式を挿入
   insert_row_below_25187f89: 下に行を挿入
   insert_row_below_name_a5b3bd41: "%{name}の下に行を挿入"
+  insights_b514ad8d: Insights
   install_c54fad9b: インストール
   installed_7b284a91: インストール済み
   installed_by_admin_97c3a721: 管理者によってインストール済み
@@ -12475,6 +12483,7 @@ ja:
   list_expanded_efec2d0: リストが拡張されました。
   list_view_430aecce: リストビュー
   lithuanian_5adcbe24: リトアニア語
+  little_lost_try_here_first_9e24e575: 迷っておられませんか？こちらを最初にお試しください
   live_event_subscription_webhooks_1dae83bb: ライブイベントの購読Webhook
   live_event_tool_documentation_f6dcc3d7: ライブイベントツールのドキュメント
   live_events_subscriptions_service_is_not_configure_8c6024e2: ライブイベントサブスクリプションサービスが設定されていません
@@ -12843,6 +12852,7 @@ ja:
   max_users_groups_per_appointment_867c505b: 予定あたりの最大ユーザ/グループ数
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: 参加者が出席できる予定の最大数
   maximum_number_of_communication_channels_reached_70c4d2f9: 通信チャンネルの最大数に達しました
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: (ひとつの注目リンクとひとつの新規リンクを同時に使用できます)
   media_af190855: メディア
   media_comment_dialog_manager: 
     messages: 
@@ -15272,6 +15282,7 @@ ja:
   new_assignment_2a984756: 新しい課題
   new_assignment_for_course_name_f71dd337: "%{course_name} への新しい課題"
   new_attempt_57eae3d9: 新しい試行
+  new_bd30f253: 新規
   new_canvas_message_from_user_name_94cc720: "%{user_name}からの新しい Canvas メッセージ"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "%{author_name}による%{assignment_title}への新しコメント%{user_name}、%{course_name}。"
   new_comment_discussion_topic_by_user_name_666ccfa: "新しいコメント：%{user_name}が%{discussion_topic}を担当"
@@ -16038,6 +16049,7 @@ ja:
   other_ddacb37d: その他
   other_incorrect_match_options_c1418af5: その他の間違ったマッチのオプション：
   other_options_d25f199c: 他のオプション
+  other_resources_fee3ddda: 他のリソース
   other_timezones_42530564: 他のタイムゾーン
   out_of_78a76f91: 中
   out_of_formattedoutof_e08e90d5: "中%{formattedOutOf}"
@@ -22004,6 +22016,7 @@ ja:
                 届きます。
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: SISのインポートを処理するエンジンは、大規模なSISインポートの安定性をよりよく処理できるよう、リファクタリングされています。SISのインポート機能は変更されていません。
   the_error_stack_trace_if_there_is_one_b7e008a1: 存在する場合のエラースタックトレース
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: 注目リンクがリストのトップに移動されました。
   the_field_field_is_required_56512820: "\"%{field}\" 名前フィールドは必須です"
   the_field_field_must_have_no_spaces_d1c2fc37: "\"%{field}\" フィールドにはスペスはありません"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "[ファイル] タブは、講義用スライド、文書サンプル、補助教材など、受講生にダウンロードしてもらうものを何でも共有できる場所です。ファイルのアップロードや整理は、Canvas で簡単に行うことができます。詳しくは使用方法をご覧ください。"
@@ -22346,6 +22359,7 @@ ja:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "この権限は、クイズでコースレベルの問題バンクを管理する能力には影響しません。代わりに、問題バンクの管理は、課題とクイズ（追加/編集/削除の許可）に依存します。コースの問題バンクを完全に管理するには、この権限と課題とクイズ - 追加/編集/削除の両方が有効にされていなければなりません。"
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "この権限は、クイズでコースレベルの問題バンクを管理する能力には影響しません。代わりに、問題バンクの管理は、課題とクイズ（追加/編集/削除の許可）に依存します。コースの問題バンクを完全に管理するには、この権限と課題とクイズ - 追加/編集/削除の両方が有効にされていなければなりません。"
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "この権限は、すべての Canvas アカウントで使用できますが、Canvas カタログアカウントに関連付けられている機関でのみ使用できます。現在のところ、権限にはフロントエンドの影響はありませんが、エンジニアリングは管理者には権限を有効なままにしておくよう提案しています。他の役割には、権限を無効にすることができます。"
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "この許可がサポートされるのは、アカウント向けに Canvas Insights が有効化されている場合のみです。詳細については、担当のカスタマーサクセスマネージャーにお問い合わせください。"
   this_permission_only_affects_course_announcements__6bc2b0a5: "この権限はコースのアナウンスにのみ影響します。グローバルアナウンスを管理するには、グローバルアナウンスメント - 追加/編集/削除が有効にされていなければなりません。"
   this_permission_only_controls_adding_users_at_the__5a2463b1: "この権限は、アカウントレベルでのユーザーの追加のみを制御します。コースにユーザーを追加するには、ユーザー - コースまたはユーザーからの受講生の追加/削除 - コースのコースから講師、コースデザイナー、またはTAの追加/削除が有効にされていなければなりません。"
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -24479,6 +24493,7 @@ ja:
   your_name_7665e1d8: お名前
   your_outcomes_were_successfully_imported_c5de884: 結果は正常にインポートされました。
   your_password_has_been_changed_df0e72aa: あなたのパスワードが変更されました。
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "パスワードリカバリ手順が *%{email_address}* に送信されます。これには最大 30 分かかる場合があります。迷惑メールをチェックするようにしてください。"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: プロフィール写真をアップロードできませんでした。アップロードの制限を超過している可能性があります。
   your_quiz_engine_choice_has_been_reset_68d268c1: クイズエンジンの選択がリセットされました！
   your_score_a1fc2fcf: あなたのスコア
