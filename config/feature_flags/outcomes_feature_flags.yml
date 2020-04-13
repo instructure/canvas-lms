@@ -12,3 +12,9 @@ rubrics_in_course_navigation:
   description: |-
     Includes rubrics in the course sidebar navigation
   touch_context: true
+decouple_rubrics:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Modify permissions for Account Rubrics"
+  description: "Change Rubrics visibility on Accounts to depend on the Rubrics permission
+    instead of the Learning Outcomes permission"

@@ -21,13 +21,22 @@ import 'jquery.ajaxJSON'
 
 import cheaterDepaginate from './CheatDepaginator'
 
-const ACTIVE_REQUEST_LIMIT = 12 // naive limit
+export const DEFAULT_ACTIVE_REQUEST_LIMIT = 12 // naive limit
+export const MAX_ACTIVE_REQUEST_LIMIT = 100
+export const MIN_ACTIVE_REQUEST_LIMIT = process.env.NODE_ENV !== 'production' ? 1 : 10
+
+function ensureValidRequestLimit(value) {
+  let cleanValue = Number.parseInt(value, 10)
+  cleanValue = Number.isNaN(cleanValue) ? DEFAULT_ACTIVE_REQUEST_LIMIT : cleanValue
+  cleanValue = Math.min(MAX_ACTIVE_REQUEST_LIMIT, cleanValue)
+  return Math.max(MIN_ACTIVE_REQUEST_LIMIT, cleanValue)
+}
 
 export default class NaiveRequestDispatch {
   constructor(options = {}) {
     this.options = {
-      activeRequestLimit: ACTIVE_REQUEST_LIMIT,
-      ...options
+      ...options,
+      activeRequestLimit: ensureValidRequestLimit(options.activeRequestLimit)
     }
     this.requests = []
   }

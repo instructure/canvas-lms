@@ -20,8 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe 'CrocodocDocument' do
   before :once do
-    PostPolicy.enable_feature!
-
     Setting.set 'crocodoc_counter', 0
     PluginSetting.create! :name => 'crocodoc',
                           :settings => { :api_key => "blahblahblahblahblah" }

@@ -279,6 +279,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     courses = Api.paginate(scope, self, api_v1_course_blueprint_associated_courses_url)
     can_read_sis = @course.account.grants_any_right?(@current_user, :read_sis, :manage_sis)
 
+    preload_teachers(courses)
     json = courses.map do |course|
       course_summary_json(course, can_read_sis: can_read_sis, include_teachers: true)
     end

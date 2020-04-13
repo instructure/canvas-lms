@@ -21,6 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/eportfolios/show" do
   before do
+    assign(:domain_root_account, Account.default)
     eportfolio_with_user
     view_portfolio
     category = assign(:category, @portfolio.eportfolio_categories.create!(:name => "some category"))

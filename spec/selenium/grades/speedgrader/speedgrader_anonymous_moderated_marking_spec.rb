@@ -25,8 +25,6 @@ describe "SpeedGrader" do
   include SpeedGraderCommon
 
   before(:once) do
-    PostPolicy.enable_feature!
-
     # a course with 1 teacher
     @teacher1 = course_with_teacher(name: 'Teacher1', active_all: true).user
     @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user

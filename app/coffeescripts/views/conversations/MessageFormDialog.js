@@ -67,13 +67,22 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   dialogOptions() {
+    const responsive_2020_04 = !!window.ENV?.FEATURES?.responsive_2020_04
+
+    const smallTablet = window.matchMedia('(min-width: 550px)').matches
+    const tablet = window.matchMedia('(min-width: 700px)').matches
+
+    const responsiveMinWidth = smallTablet ? 550 : 320
+    const responsiveWidth = tablet ? 700 : smallTablet ? 550 : 320
+    const responsiveHeight = smallTablet ? 550 : 'auto'
+
     return {
       id: 'compose-new-message',
       autoOpen: false,
-      minWidth: 550,
-      width: 700,
+      minWidth: responsive_2020_04 ? responsiveMinWidth : 550,
+      width: responsive_2020_04 ? responsiveWidth : 700,
       minHeight: 500,
-      height: 550,
+      height: responsive_2020_04 ? responsiveHeight : 550,
       resizable: true,
       title: I18n.t('Compose Message'),
       // Event handler for catching when the dialog is closed.

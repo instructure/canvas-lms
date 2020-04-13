@@ -46,6 +46,7 @@ module PactConfig
       QUIZ_LTI = 'Quiz LTI'.freeze
       SISTEMIC = 'Sistemic'.freeze
       ANDROID = 'android'.freeze
+      CANVAS_IOS = 'canvas-ios'.freeze
     end
     ALL = Consumers.constants.map { |c| Consumers.const_get(c) }.freeze
   end

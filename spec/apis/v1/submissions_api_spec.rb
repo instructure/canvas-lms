@@ -24,10 +24,6 @@ describe 'Submissions API', type: :request do
 
   let(:params) { {} }
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   before :each do
     allow(HostUrl).to receive(:file_host_with_shard).and_return(["www.example.com", Shard.default])
   end

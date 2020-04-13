@@ -561,6 +561,7 @@ describe ExternalToolsController, type: :request do
     end
     et.context_external_tool_placements.new(:placement_type => opts[:placement]) if opts[:placement]
     et.allow_membership_service_access = opts[:allow_membership_service_access] if opts[:allow_membership_service_access]
+    et.conference_selection = {:url=>"http://www.example.com/ims/lti/conference", :icon_url=>"/images/delete.png", :text=>"conference selection"}
     et.save!
     et
   end
@@ -824,7 +825,15 @@ describe ExternalToolsController, type: :request do
      "similarity_detection"=>nil,
      "assignment_edit"=>nil,
      "assignment_view"=>nil,
-     "course_assignments_menu" => begin
+    # Add when conference_selection_lti_placement FF removed
+    #  "conference_selection"=>
+    #   {"icon_url"=>"/images/delete.png",
+    #     "text"=>"conference selection",
+    #     "url"=>"http://www.example.com/ims/lti/conference",
+    #     "label"=>"conference selection",
+    #     "selection_height"=>400,
+    #     "selection_width"=>800},
+    "course_assignments_menu" => begin
        if et && et.course_assignments_menu
          {
            "text" => "course assignments menu",

@@ -24,7 +24,6 @@ describe UsersController, type: :request do
   include Api::V1::Assignment
 
   before :once do
-    PostPolicy.enable_feature!
     course_with_student(:active_all => true)
   end
 

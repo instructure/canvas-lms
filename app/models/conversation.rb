@@ -192,8 +192,9 @@ class Conversation < ActiveRecord::Base
           # announce their arrival
           message = add_event_message(current_user, {:event_type => :users_added, :user_ids => user_ids}, options)
         end
+        self.touch
+        Canvas::LiveEvents.conversation_forwarded(self)
       end
-      self.touch
     end
     message
   end

@@ -18,3 +18,28 @@ module_dnd:
   applies_to: RootAccount
   display_name: "Module Content Import Enhancements"
   description: "Drag and Drop files on modules and multi-file module item uploads"
+responsive_2020_04:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "April 2020 Responsiveness"
+  description: "Collection of responsive improvements throughout Canvas"
+unpublished_courses:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Help for Unpublished Courses"
+  description: "Improved visual reminders to encourage instructors to publish courses"
+files_dnd:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Files Drag and Drop Enhancements"
+  description: "Improve discoverability of drag and drop in Files"
+conference_selection_lti_placement:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "Allow Conference Selection LTI placement"
+  description: "Allows users to add LTI tools with conference_selection placement type"
+calendar_conferences:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Add Conferences from Calendar"
+  description: "Allows users to add conferences from the calendar"

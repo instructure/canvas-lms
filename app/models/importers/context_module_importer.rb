@@ -187,7 +187,7 @@ module Importers
             c_reqs << req
           end
         end
-        if c_reqs.length > 0
+        if c_reqs.length > 0 || migration.for_master_course_import? # allow clearing requirements on sync
           item.completion_requirements = c_reqs
           item.save
         end

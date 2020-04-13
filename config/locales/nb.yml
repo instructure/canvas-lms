@@ -2109,6 +2109,7 @@ nb:
       Lar en bruker legge til oppgavegrupper i et emne.
       Lar en bruker aktivere og endre vekting av gruppeoppgave i et emne.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Lar brukeren legge til hendelser i Listevisning dashbord via avkryssingsboksen Legg til studentoppgave. "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Lar brukeren legge til hendelser i Listevisning dashbord via avkryssingsboksen Legg til studentoppgave."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Lar en bruker legge til nye oppgaver i en modul."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Lar brukeren legge til ikke-karaktersatte diskusjoner i Listevisning dashbord via avkryssingsboksen Legg til studentoppgave."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Lar brukeren legge til sider i Listevisning dashbord via avkryssingsboksen Legg til studentoppgave."
@@ -2288,6 +2289,7 @@ nb:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Lar en bruker vise og administrere underkontoer for kontoen."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Lar en bruker vise og administrere semestre i kontoen."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Lar en bruker vise og administrere innstillinger- og varslinger-fanene kontoinnstillinger."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "Lar en bruker vise Canvas Insights."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Lar en bruker vise 'Velg hjemmeside'- og 'Sjekkliste for emneetablering'-knappene på hjemmesiden."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Lar en bruker vise emneanalyser gjennom emnedashbordet. Lar en bruker vise studentanalyser."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Lar en bruker vise emne- og studentanalyser fra startsiden for emner eller folk-siden."
@@ -4825,6 +4827,7 @@ nb:
   check_to_select_all_98e484f1: "Merk for å velge alle"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Marker for å hoppe over å legge til en bruker for %{loginid}"
   checked_883b93fd: markert
+  cheerful_panda_holding_a_map_17ba47ee: "Munter panda som holder et kart"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Underemnet må tilhøre samme hovedkontoen som det videregående emnet"
   child_s_username_dde3aa9: "Barnets brukernavn"
   chile_56_88238b47: "Chile (+56)"
@@ -8757,6 +8760,7 @@ nb:
   enable_dashboard_images_for_courses_5af458b0: "Aktiver dashbordbilder for emner"
   enable_extra_filter_options_b52c23e6: "aktiver valg for ekstra filter"
   enable_feature_title_987d8e9a: "Aktiver funksjon: %{title}"
+  enable_fullstory_5c673a06: "Aktiver fullstory"
   enable_gradebook_list_students_by_sortable_name: "Ramse opp studentnavnene ved deres navn for sortering i karakteroversikten. Standard navn for sortering på « Etternavn, fornavn» og kan endres i innstillinger."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Aktiver Gradezilla (navnet er kun en plassholder ettersom det vil erstatte Gradebook i fremtiden)."
   enable_gravatar_8a865b41: "Aktiver gravatar"
@@ -9540,11 +9544,13 @@ nb:
       no_features_available: "Ingen funksjoner er tilgjengelige for tiden."
   feature_flags_52141c74: "Merk funksjonen"
   feature_flags_enable_disable_32e8f1ab: "Funksjonsflagg - aktiver / deaktiver"
+  feature_headline_3f0daf4: Funksjonsoverskrift
   feature_options_37a2c317: Funksjonsvalg
   feature_options_account_settings_294a39f8: "Funksjonsvalg (kontoinnstillinger)"
   feature_options_enable_disable_7e748054: "Funksjonsvalg - aktiver / deaktiver"
   feature_options_view_a170e80c: "Funksjonsvalg - vis"
   feature_preview_5e1216a0: "Forhåndsvisning funksjon"
+  featured_83f6041d: Inneholder
   featured_help_links_d805fe44: "Viste Hjelp-lenker"
   features: 
     allow_opt_out_of_inbox: "Tillate brukerne å opt-out av innboksen"
@@ -11817,6 +11823,7 @@ nb:
   include_course_settings_c4c08764: "Inkluder emneinnstillinger"
   include_deleted_enrollments_1c87684a: "Inkluder slettede påmeldinger"
   include_deleted_objects_3cced3b5: "Inkluder slettede objekter:"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "Inkluder FullStory opptak av brukerens økt"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Inneholder integrerings-IDer i eksportene av karakteroversiktene."
   include_scores_when_alerting_about_grade_changes_623ec201: "Inkluder score når som varsler om karakteren endringer."
   include_scores_when_alerting_about_grades_89728ae1: "Inkluder resultater når det varsles om karakterer."
@@ -11880,6 +11887,7 @@ nb:
   insert_math_equation_57c6e767: "Sett matte likning"
   insert_row_below_25187f89: "Sett inn rad under"
   insert_row_below_name_a5b3bd41: "Sett inn raden under %{name}"
+  insights_b514ad8d: Innsikter
   install_c54fad9b: Installere
   installed_7b284a91: Installert
   installed_by_admin_97c3a721: "Installert av admin"
@@ -12487,6 +12495,7 @@ nb:
   list_expanded_efec2d0: "Liste utvidet"
   list_view_430aecce: Listevisning
   lithuanian_5adcbe24: Litauisk
+  little_lost_try_here_first_9e24e575: "Litt forvirret? Prøv her først!"
   live_event_subscription_webhooks_1dae83bb: "Abonnement i Webhooks på live arrangementer"
   live_event_tool_documentation_f6dcc3d7: "Verktøy til Live arrangements-dokumentasjon"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Abonnement-tjenesten Live-arrangementer er ikke konfigurert"
@@ -12853,6 +12862,7 @@ nb:
   max_users_groups_per_appointment_867c505b: "Maks brukere/grupper per avtale"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maks. antall avtaler en deltaker kan delta i"
   maximum_number_of_communication_channels_reached_70c4d2f9: "Maksimalt antall kommunikasjonskanaler nådd"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Kan ha en Featured-lenke og en Ny-lenke om gangen)"
   media_af190855: Medie
   media_comment_dialog_manager: 
     messages: 
@@ -15279,6 +15289,7 @@ nb:
   new_assignment_2a984756: "Ny oppgave"
   new_assignment_for_course_name_f71dd337: "Nye oppgaver i %{course_name}"
   new_attempt_57eae3d9: "Nytt forsøk"
+  new_bd30f253: NY
   new_canvas_message_from_user_name_94cc720: "Ny Canvas-melding fra %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "Ny kommentar av %{author_name} fra %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "Ny kommentar: %{discussion_topic} av %{user_name}"
@@ -16043,6 +16054,7 @@ nb:
   other_ddacb37d: annen
   other_incorrect_match_options_c1418af5: "Andre feilaktige match-alternativer:"
   other_options_d25f199c: "Andre valg"
+  other_resources_fee3ddda: "ANDRE RESSURSER"
   other_timezones_42530564: "Andre tidssoner"
   out_of_78a76f91: "ut av"
   out_of_formattedoutof_e08e90d5: "av %{formattedOutOf}"
@@ -22029,6 +22041,7 @@ nb:
                 fullført.
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Motoren som prosesserer SIS-import har blitt opparbeidet til bedre å behandle stabiliteten til store SIS-importeringer. Funksjonaliteten til SIS-importeringer har ikke endret seg."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Avvik stakksporing, hvis det finnes noen"
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Funksjonslenken ble flyttet til toppen av listen."
   the_field_field_is_required_56512820: "Feltet «%{field}» er påkrevd"
   the_field_field_must_have_no_spaces_d1c2fc37: "Feltet «%{field}» kan ikke ha mellomrom"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Files kategorien er stedet å dele forelesningslysbilder, eksempeldokumenter, studiehjelp -- hva som helst studenten måtte ønske å laste ned. Last opp og organiser filene dine er lett med Canvas. Vi viser deg hvordan."
@@ -22369,6 +22382,7 @@ nb:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Denne tillatelsen påvirker ikke muligheten til å administrere spørsmålsbanker i tester på emnenivå. I stedet er 'Administrer spørsmålsbanker' avhengig av 'Oppgaver og tester - legg til / rediger / slett'-tillatelsen. For full administrering av spørsmålsbanker i emner må både denne tillatelsen og 'Oppgaver og tester - legg til / rediger / slett' være aktiverte."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Denne tillatelsen påvirker ikke muligheten til å administrere spørsmålsbanker i tester på emnenivå. I stedet er 'Administrer spørsmålsbanker' avhengig av 'Oppgaver og tester - legg til / rediger / slett'-tillatelsen. For full administrering av spørsmålsbanker i emner må både denne tillatelsen og 'Oppgaver og tester - legg til / rediger / slett' være aktiverte."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Denne tillatelsen er tilgjengelig for alle Canvas-kontoer men er kun i bruk for institusjoner tilknyttet en Canvas Catalog-konto. Tillatelsen har per i dag ingen effekt på front-end men teknikeravdelingen foreslår at tillatelsen forblir aktivert for administratorer. Tillatelsen kan deaktiveres for andre roller."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "Denne tillatelsen støttes kun når Canvas Insights er aktivert for en konto. Kontakt leder for kundesuksess for mer informasjon."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Denne tillatelsen påvirker kun emnekunngjøring; for å administrere globale kunngjøringer må 'Globale kunngjøringer - legg til / rediger / slett' være aktivert."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Denne tillatelsen kontrollerer kun det å legge til brukere på kontonivå. For å legge til brukere i emner må «Brukere - legg til / fjern studenter fra emner» eller «Brukere - legg til / fjern lærere, emnedesignere eller LA-er fra emner» være aktivert."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -24506,6 +24520,7 @@ nb:
   your_name_7665e1d8: "Ditt navn"
   your_outcomes_were_successfully_imported_c5de884: "Resultatene dine ble importert."
   your_password_has_been_changed_df0e72aa: "Passordet ditt har blitt endret."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Instruksjoner for gjenoppretting av passord blir sendt til *%{email_address}*. Dette kan ta opptil 30 minutter. Sørg for å sjekke spaminnboksen."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Profilbildet ditt kunne ikke lastes opp. Du kan ha overskredet grensen for opplasting."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Ditt valg av testmotor er tilbakestilt!"
   your_score_a1fc2fcf: "Ditt resultat"

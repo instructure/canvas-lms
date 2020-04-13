@@ -3,6 +3,7 @@
     "message": "Verificador de acessibilidade:"
   },
   "add_8523c19b": { "message": "Adicionar" },
+  "add_another_f4e50d57": { "message": "Adicionar outro" },
   "add_cc_subtitles_55f0394e": { "message": "Adicionar legenda" },
   "align_11050992": { "message": "Alinhar" },
   "align_center_ca078feb": { "message": "Centralizar" },
@@ -133,6 +134,7 @@
   "embed_preview_2d741e1f": { "message": "Incorporar pré-visualização" },
   "embed_video_a97a64af": { "message": "Incorporar vídeo" },
   "embed_video_code_703e10f2": { "message": "Incorporar código de vídeo" },
+  "embedded_content_aaeb4d3d": { "message": "conteúdo incorporado" },
   "equation_1c5ac93c": { "message": "Equação" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Erro ao carregar vídeo/gravação de mídia"
@@ -224,6 +226,7 @@
     "message": "Sem texto alt (imagem decorativa)"
   },
   "no_e16d9132": { "message": "Não" },
+  "no_file_chosen_9a880793": { "message": "Nenhum arquivo escolhido" },
   "no_results_940393cf": { "message": "Sem resultados." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nenhum resultado encontrado para { filterTerm }"
@@ -302,6 +305,9 @@
   "submit_a3cc6859": { "message": "Enviar" },
   "subscript_59744f96": { "message": "Subscrito" },
   "superscript_8cb349a2": { "message": "Sobrescrito" },
+  "supported_file_types_srt_or_webvtt_7d827ed": {
+    "message": "Tipos de arquivos suportados: SRT ou WebVTT"
+  },
   "switch_to_raw_html_editor_4c9ac7de": {
     "message": "Alternar para editor html não processado"
   },

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {COURSE_NOTIFICATIONS_ENABLED_QUERY} from './graphqlData/Queries'
-import CourseNotificationSettings from './CourseNotificationSettings'
+import {COURSE_NOTIFICATIONS_QUERY} from './graphqlData/Queries'
+import CourseNotificationSettingsManager from './CourseNotificationSettingsManager'
 import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import GenericErrorPage from '../../shared/components/GenericErrorPage'
 import I18n from 'i18n!courses'
@@ -27,7 +27,7 @@ import {string} from 'prop-types'
 import {useQuery} from 'react-apollo'
 
 export default function CourseNotificationSettingsQuery(props) {
-  const {loading, error, data} = useQuery(COURSE_NOTIFICATIONS_ENABLED_QUERY, {
+  const {loading, error, data} = useQuery(COURSE_NOTIFICATIONS_QUERY, {
     variables: {courseId: props.courseId}
   })
 
@@ -42,9 +42,10 @@ export default function CourseNotificationSettingsQuery(props) {
     )
 
   return (
-    <CourseNotificationSettings
+    <CourseNotificationSettingsManager
       courseId={props.courseId}
       enabled={data?.course?.notificationPreferencesEnabled}
+      notificationPreferences={data?.course?.notificationPreferences}
     />
   )
 }

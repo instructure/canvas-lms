@@ -135,8 +135,15 @@ describe BasicLTI do
           http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
           http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
           <blti:launch_url>  https://example.com/   </blti:launch_url>
-          <blti:title>Attendance</blti:title>
-          <blti:description>Provides an interactive seating chart and attendance tool</blti:description>
+          <blti:title>
+            Attendance
+          </blti:title>
+          <blti:description>
+            Provides an interactive seating chart and attendance tool
+          </blti:description>
+          <blti:icon>
+            https://www.example.com/myattendance/toolicon.png
+          </blti:icon>
           <blti:extensions platform="canvas.instructure.com">
             <lticm:property name="privacy_level">public</lticm:property>
             <lticm:options name="course_navigation">
@@ -149,15 +156,28 @@ describe BasicLTI do
     XML
     end
 
-    it "strips leading and trailing whitespace from launch URL" do
+    let(:tool_hash) do
       lti = CC::Importer::BLTIConverter.new
-      tool_hash = lti.convert_blti_xml(config_xml)
+      lti.convert_blti_xml(config_xml)
+    end
+
+    it "strips leading and trailing whitespace from launch URL" do
       expect(tool_hash[:url] =~ /^\s|\s$/).to be_nil
     end
 
+    it "strips leading and trailing whitespace from title" do
+      expect(tool_hash[:title]).to eq('Attendance')
+    end
+
+    it "strips leading and trailing whitespace from description" do
+      expect(tool_hash[:description]).to eq('Provides an interactive seating chart and attendance tool')
+    end
+
+    it "strips leading and trailing whitespace from icon url" do
+      expect(tool_hash[:settings][:icon_url]).to eq('https://www.example.com/myattendance/toolicon.png')
+    end
+
     it "strips leading/trailing whitespace from settings URLs" do
-      lti = CC::Importer::BLTIConverter.new
-      tool_hash = lti.convert_blti_xml(config_xml)
       expect(tool_hash[:settings]['course_navigation']['url'] =~ /^\s|\s$/).to be_nil
     end
   end

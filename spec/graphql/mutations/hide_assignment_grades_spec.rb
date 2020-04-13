@@ -54,10 +54,6 @@ describe Mutations::HideAssignmentGrades do
     CanvasSchema.execute(mutation_str, context: context)
   end
 
-  before(:each) do
-    PostPolicy.enable_feature!
-  end
-
   context "when user has grade permission" do
     let(:context) { { current_user: teacher } }
 

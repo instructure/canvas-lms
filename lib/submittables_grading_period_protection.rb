@@ -16,10 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module SubmittablesGradingPeriodProtection
+  def constrained_by_grading_periods?
+    grading_periods? && !current_user_is_context_admin?
+  end
+
   def grading_periods_allow_submittable_create?(submittable, submittable_params, flash_message: false)
     apply_grading_params(submittable, submittable_params)
     return true unless submittable.graded?
-    return true unless grading_periods? && !current_user_is_context_admin?
+    return true unless constrained_by_grading_periods?
     return true if submittable_params[:only_visible_to_overrides]
 
     submittable.due_at = submittable_params[:due_at]
@@ -36,7 +40,7 @@ module SubmittablesGradingPeriodProtection
       submittable_params[:only_visible_to_overrides] if submittable_params.key?(:only_visible_to_overrides)
     submittable.due_at = submittable_params[:due_at] if submittable_params.key?(:due_at)
     return true unless submittable.only_visible_to_overrides_changed? || due_at_changed?(submittable)
-    return true unless grading_periods? && !current_user_is_context_admin?
+    return true unless constrained_by_grading_periods?
 
     in_closed_grading_period = date_in_closed_grading_period?(submittable.due_at_was)
 
@@ -59,7 +63,7 @@ module SubmittablesGradingPeriodProtection
   end
 
   def grading_periods_allow_assignment_overrides_batch_create?(submittable, overrides, flash_message: false)
-    return true unless grading_periods? && !current_user_is_context_admin?
+    return true unless constrained_by_grading_periods?
     return true unless overrides.any? {|override| date_in_closed_grading_period?(override[:due_at])}
 
     apply_error(submittable, :due_at, ERROR_MESSAGES[:set_override_due_at_in_closed], flash_message)
@@ -67,14 +71,14 @@ module SubmittablesGradingPeriodProtection
   end
 
   def grading_periods_allow_assignment_overrides_batch_update?(submittable, prepared_batch, flash_message: false)
-    return true unless grading_periods? && !current_user_is_context_admin?
+    return true unless constrained_by_grading_periods?
     can_create_overrides?(submittable, prepared_batch[:overrides_to_create], flash_message: flash_message) &&
       can_update_overrides?(submittable, prepared_batch[:overrides_to_update], flash_message: flash_message) &&
       can_delete_overrides?(submittable, prepared_batch[:overrides_to_delete], flash_message: flash_message)
   end
 
   def grading_periods_allow_assignment_override_update?(override)
-    return true unless grading_periods? && !current_user_is_context_admin?
+    return true unless constrained_by_grading_periods?
     return true unless override.changed?
 
     if date_in_closed_grading_period?(override.due_at_was)
@@ -88,6 +92,10 @@ module SubmittablesGradingPeriodProtection
     end
 
     true
+  end
+
+  def date_in_closed_grading_period?(date)
+    GradingPeriodHelper.date_in_closed_grading_period?(date, context_grading_periods)
   end
 
   private
@@ -149,10 +157,6 @@ module SubmittablesGradingPeriodProtection
 
   def context_grading_periods
     @context_grading_periods ||= GradingPeriod.for(@context)
-  end
-
-  def date_in_closed_grading_period?(date)
-    GradingPeriodHelper.date_in_closed_grading_period?(date, context_grading_periods)
   end
 
   def apply_error(submittable, attribute, message, flash_message)

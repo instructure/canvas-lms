@@ -32,8 +32,6 @@ describe "Default Account Reports" do
   end
 
   before(:once) do
-    PostPolicy.enable_feature!
-
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')

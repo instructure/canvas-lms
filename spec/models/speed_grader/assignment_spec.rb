@@ -20,7 +20,6 @@ require 'lti2_spec_helper'
 
 describe SpeedGrader::Assignment do
   before :once do
-    PostPolicy.enable_feature!
     course_with_teacher(active_all: true)
     student_in_course(active_all: true, user_name: "some user")
   end

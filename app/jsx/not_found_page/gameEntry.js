@@ -18,11 +18,17 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import OfficialNotFoundGame from './OfficialNotFoundGame'
+import OfficialNotFoundGame from './frogger/OfficialNotFoundGame'
+import SpaceInvaders from './space_invaders/SpaceInvaders'
 
 export const renderGameApp = domElement => {
   const AppRootElement = document.getElementById(domElement)
-  ReactDOM.render(<OfficialNotFoundGame />, AppRootElement)
+  const rng = Math.random()
+  if (ENV.KILL_JOY === 'true' || rng < 0.25) {
+    ReactDOM.render(<OfficialNotFoundGame />, AppRootElement)
+  } else {
+    ReactDOM.render(<SpaceInvaders />, AppRootElement)
+  }
 }
 
 export const renderGameIntoDom = domElement => {

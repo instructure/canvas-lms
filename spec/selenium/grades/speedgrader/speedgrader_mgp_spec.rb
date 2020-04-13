@@ -26,8 +26,6 @@ describe "speedgrader with grading periods" do
 
   context 'with close and end dates' do
     before do
-      PostPolicy.enable_feature!
-
       term_name = "First Term"
       create_grading_periods(term_name)
       add_teacher_and_student

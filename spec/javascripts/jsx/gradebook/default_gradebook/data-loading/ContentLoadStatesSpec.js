@@ -18,8 +18,7 @@
 
 import {
   createGradebook,
-  setFixtureHtml,
-  stubDataLoader
+  setFixtureHtml
 } from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {
@@ -31,7 +30,6 @@ QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {
     setFixtureHtml($container)
 
     gradebook = createGradebook()
-    stubDataLoader()
   })
 
   suiteHooks.afterEach(() => {

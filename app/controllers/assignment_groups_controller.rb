@@ -101,8 +101,8 @@ class AssignmentGroupsController < ApplicationController
   # Returns the paginated list of assignment groups for the current context.
   # The returned groups are sorted by their position field.
   #
-  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"|"observed_users"]
-  #  Associations to include with the group. "discussion_topic", "all_dates"
+  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"|"observed_users"|"can_edit"]
+  #  Associations to include with the group. "discussion_topic", "all_dates", "can_edit",
   #  "assignment_visibility" & "submission" are only valid if "assignments" is also included.
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #  If "observed_users" is passed along with "assignments" and "submission", submissions for observed users will also be included as an array.

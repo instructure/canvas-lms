@@ -21,8 +21,6 @@ require 'csv'
 
 describe GradebookExporter do
   before(:once) do
-    PostPolicy.enable_feature!
-
     @course = course_model(grading_standard_id: 0)
     course_with_teacher(course: @course, active_all: true)
   end

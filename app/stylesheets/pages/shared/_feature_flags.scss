@@ -177,3 +177,23 @@ $switch-text: rgba($ic-color-light, 0.8);
     }
   }
 }
+
+.ui-buttonset--feature-settings-responsive {
+  white-space: nowrap;
+
+  @include breakpoint(desktop) {
+    white-space: normal;
+  }
+}
+
+.row-fluid .span5-responsive {
+  width: initial;
+  margin-#{direction(left)}: 0;
+  text-align: initial;
+
+  @include breakpoint(desktop) {
+    width: 40.42553%;
+    margin-#{direction(left)}: 2.12766%;
+    text-align: direction(right);
+  }
+}

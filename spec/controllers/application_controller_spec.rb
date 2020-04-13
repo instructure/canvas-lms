@@ -186,35 +186,6 @@ RSpec.describe ApplicationController do
       expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
     end
 
-    context "show_qr_login (QR for Mobile Login)" do
-      before(:each) do
-        allow(Object).to receive(:const_defined?).and_call_original
-        controller.instance_variable_set(:@domain_root_account, Account.default)
-      end
-
-      it 'is false if InstructureMiscPlugin is not defined and the feature flag is off' do
-        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(false).once
-        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_falsey
-      end
-
-      it 'is false if InstructureMiscPlugin is defined and the feature flag is off' do
-        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(true).once
-        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_falsey
-      end
-
-      it 'is false if InstructureMiscPlugin is not defined and the feature flag is on' do
-        Account.default.enable_feature!(:mobile_qr_login)
-        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(false).once
-        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_falsey
-      end
-
-      it 'is true if InstructureMiscPlugin is defined and the feature flag is on' do
-        Account.default.enable_feature!(:mobile_qr_login)
-        allow(Object).to receive(:const_defined?).with("InstructureMiscPlugin").and_return(true).once
-        expect(controller.js_env[:FEATURES][:show_qr_login]).to be_truthy
-      end
-    end
-
     context "responsive_2020_03" do
       before(:each) do
         controller.instance_variable_set(:@domain_root_account, Account.default)
@@ -227,6 +198,21 @@ RSpec.describe ApplicationController do
       it 'is true if the feature flag is on' do
         Account.default.enable_feature!(:responsive_2020_03)
         expect(controller.js_env[:FEATURES][:responsive_2020_03]).to be_truthy
+      end
+    end
+
+    context "responsive_2020_04" do
+      before(:each) do
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+      end
+
+      it 'is false if the feature flag is off' do
+        expect(controller.js_env[:FEATURES][:responsive_2020_04]).to be_falsey
+      end
+
+      it 'is true if the feature flag is on' do
+        Account.default.enable_feature!(:responsive_2020_04)
+        expect(controller.js_env[:FEATURES][:responsive_2020_04]).to be_truthy
       end
     end
 
@@ -243,6 +229,22 @@ RSpec.describe ApplicationController do
       it 'is true if the feature flag is on' do
         Account.default.enable_feature!(:module_dnd)
         expect(controller.js_env[:FEATURES][:module_dnd]).to be_truthy
+      end
+    end
+
+    context "files_dnd" do
+      before(:each) do
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+      end
+
+      it 'is false if the feature flag is off' do
+        Account.default.disable_feature!(:files_dnd)
+        expect(controller.js_env[:FEATURES][:files_dnd]).to be_falsey
+      end
+
+      it 'is true if the feature flag is on' do
+        Account.default.enable_feature!(:files_dnd)
+        expect(controller.js_env[:FEATURES][:files_dnd]).to be_truthy
       end
     end
 
@@ -824,7 +826,23 @@ RSpec.describe ApplicationController do
           allow(controller).to receive(:polymorphic_url).and_return('host/quizzes')
         end
 
-        context 'is set to gradebook page when launched from graedbook page' do
+        context 'is set to homepage page when launched from homepage' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1')
+            expect(controller).to receive(:polymorphic_url).with([course]).and_return('host')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100')
+            expect(controller).to receive(:polymorphic_url).with([course]).and_return('host')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host'
+          end
+        end
+
+        context 'is set to gradebook page when launched from gradebook page' do
           it 'for small id' do
             allow(controller.request).to receive(:referer).and_return('courses/1/gradebook')
             expect(controller).to receive(:polymorphic_url).with([course, :gradebook]).and_return('host/gradebook')

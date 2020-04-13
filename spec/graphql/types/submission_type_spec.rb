@@ -21,8 +21,6 @@ require_relative "../graphql_spec_helper"
 
 describe Types::SubmissionType do
   before(:once) do
-    PostPolicy.enable_feature!
-
     student_in_course(active_all: true)
     @assignment = @course.assignments.create! name: "asdf", points_possible: 10
     @submission = @assignment.grade_student(@student, score: 8, grader: @teacher).first

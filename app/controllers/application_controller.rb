@@ -173,15 +173,17 @@ class ApplicationController < ActionController::Base
             show_feedback_link: show_feedback_link?
           },
           FEATURES: {
-            assignment_bulk_edit: Account.site_admin.feature_enabled?(:assignment_bulk_edit),
+            assignment_bulk_edit: @domain_root_account&.feature_enabled?(:assignment_bulk_edit),
             la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
             cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
-            show_qr_login: Object.const_defined?("InstructureMiscPlugin") && !!@domain_root_account&.feature_enabled?(:mobile_qr_login),
-            responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03),
             featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links),
+            responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03),
+            responsive_2020_04: !!@domain_root_account&.feature_enabled?(:responsive_2020_04),
             product_tours: !!@domain_root_account&.feature_enabled?(:product_tours),
-            module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd)
-          }
+            module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd),
+            files_dnd: !!@domain_root_account&.feature_enabled?(:files_dnd)
+          },
+          KILL_JOY: Setting.get('kill_joy', false)
         }
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
         @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
@@ -1790,12 +1792,16 @@ class ApplicationController < ActionController::Base
     # but we still use the assignment#new page to create the quiz.
     # also handles launch from existing quiz on quizzes page.
     if ref.present? && @assignment&.quiz_lti?
-      if (ref.include?('assignments/new') || ref =~ /courses\/[0-9]+\/quizzes/i) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+      if (ref.include?('assignments/new') || ref =~ /courses\/\d+\/quizzes/i) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
         return polymorphic_url([@context, :quizzes])
       end
 
-      if ref =~ /courses\/[0-9]+\/gradebook/i
+      if ref =~ /courses\/\d+\/gradebook/i
         return polymorphic_url([@context, :gradebook])
+      end
+
+      if ref =~ /courses\/\d+$/i
+        return polymorphic_url([@context])
       end
     end
     named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)

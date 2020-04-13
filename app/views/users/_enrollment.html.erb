@@ -16,10 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% @responsive_2020_04 = @domain_root_account.feature_enabled?(:responsive_2020_04) %>
 <li class="<%= 'unpublished' if enrollment.course.created? || enrollment.course.claimed? %> <%= enrollment.state_based_on_date %> clearfix">
 
   <a href="<%= course_user_path(enrollment.course_id, enrollment.user_id) %>" style="float: <%= direction('left') %>; max-width: 800px;">
-    <span class="name" title="<%= enrollment.long_name(@current_user) %>">
+    <span
+      class="name"
+      title="<%= enrollment.long_name(@current_user) %>"
+      style="<%= @responsive_2020_04 ? 'word-break: break-word;' : '' %>">
       <%= enrollment.long_name(@current_user) %>
       <% if enrollment.course.created? || enrollment.course.claimed? %>
         <i class="icon-unpublish" title="<%= t('course_not_published', "This course hasn't been published yet") %>"></i>
@@ -27,10 +31,16 @@
     </span>
 
     <% unless enrollment.course.enrollment_term.default_term? %>
-      <span class="subtitle ellipsis"><%= enrollment.course.enrollment_term.name %></span>
+      <span
+        class="subtitle<%= @responsive_2020_04 ? '' : ' ellipsis' %>"
+        style="<%= @responsive_2020_04 ? 'word-break: break-word;' : '' %>">
+        <%= enrollment.course.enrollment_term.name %>
+      </span>
     <% end %>
 
-    <span class="subtitle ellipsis">
+    <span
+      class="subtitle<%= @responsive_2020_04 ? '' : ' ellipsis' %>"
+      style="<%= @responsive_2020_04 ? 'word-break: break-word;' : '' %>">
       <%= Enrollment.workflow_readable_type(enrollment.readable_state_based_on_date) %>,
       <%=
         case enrollment.class.to_s

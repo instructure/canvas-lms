@@ -120,6 +120,7 @@ export default class IndexView extends Backbone.View
         React.createElement(BulkEditIndex, {
           courseId: ENV.COURSE_ID
           onCancel: @cancelBulkEdit
+          onSave: @handleBulkEditSaved
         }),
         @$bulkEditRoot[0]
       )
@@ -137,9 +138,15 @@ export default class IndexView extends Backbone.View
     @bulkEditMode = true
     @render()
 
+  handleBulkEditSaved: =>
+    @bulkEditSaved = true
+
   cancelBulkEdit: =>
-    @bulkEditMode = false
-    @render()
+    if @bulkEditSaved
+      location.reload()
+    else
+      @bulkEditMode = false
+      @render()
 
   enableSearch: ->
     @$('#search_term').prop 'disabled', false

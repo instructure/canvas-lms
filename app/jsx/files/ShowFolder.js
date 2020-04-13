@@ -25,6 +25,7 @@ import ShowFolder from 'compiled/react_files/components/ShowFolder'
 import FilePreview from './FilePreview'
 import FolderChild from './FolderChild'
 import UploadDropZone from './UploadDropZone'
+import FileUpload from './FileUpload'
 import ColumnHeaders from './ColumnHeaders'
 import CurrentUploads from './CurrentUploads'
 import LoadingIndicator from './LoadingIndicator'
@@ -123,6 +124,12 @@ ShowFolder.render = function() {
     'screenreader-only': this.state.hideToggleAll
   })
 
+  const hasLoadedAll = !!(
+    this.props.currentFolder.folders.loadedAll && this.props.currentFolder.files.loadedAll
+  )
+
+  const showNewFileUpload = window.ENV?.FEATURES?.files_dnd
+
   // We have to put the "select all" checkbox out here because VO won't read the table properly
   // if it's in the table header, and won't read it at all if it's outside the table but inside
   // the <div role="grid">.
@@ -150,16 +157,36 @@ ShowFolder.render = function() {
             'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
           )}
         </div>
-        <UploadDropZone currentFolder={this.props.currentFolder} />
-        <CurrentUploads />
-        <ColumnHeaders
-          ref="columnHeaders"
-          query={this.props.query}
-          pathname={this.props.pathname}
-          areAllItemsSelected={this.props.areAllItemsSelected}
-          usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
-        />
-        {this.renderFolderChildOrEmptyContainer()}
+        {!showNewFileUpload && (
+          <>
+            <UploadDropZone currentFolder={this.props.currentFolder} />
+            <CurrentUploads />
+            <ColumnHeaders
+              ref="columnHeaders"
+              query={this.props.query}
+              pathname={this.props.pathname}
+              areAllItemsSelected={this.props.areAllItemsSelected}
+              usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+            />
+            {this.renderFolderChildOrEmptyContainer()}
+          </>
+        )}
+        {showNewFileUpload && hasLoadedAll && (
+          <>
+            <FileUpload
+              currentFolder={this.props.currentFolder}
+              filesDirectoryRef={this.props.filesDirectoryRef}
+            />
+            <ColumnHeaders
+              ref="columnHeaders"
+              query={this.props.query}
+              pathname={this.props.pathname}
+              areAllItemsSelected={this.props.areAllItemsSelected}
+              usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+            />
+            {this.renderFolderChildOrEmptyContainer()}
+          </>
+        )}
         <LoadingIndicator isLoading={foldersNextPageOrFilesNextPage} />
         {this.renderFilePreview()}
       </div>

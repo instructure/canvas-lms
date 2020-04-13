@@ -2105,6 +2105,28 @@ describe MasterCourses::MasterMigration do
       expect(mod2_to.reload.prerequisites).to be_empty
     end
 
+    it "copies module requirements (and lack thereof)" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      mod1 = @copy_from.context_modules.create! :name => 'mod'
+      page = @copy_from.wiki_pages.create!(:title => "some page")
+      page_tag = mod1.add_item({:id => page.id, :type => 'wiki_page', :indent => 1})
+      mod1.update_attributes(:completion_requirements => [{:id => page_tag.id, :type => 'must_view'}])
+
+      run_master_migration
+
+      mod1_to = @copy_to.context_modules.where(:migration_id => mig_id(mod1)).first
+      page_tag_to = mod1_to.content_tags.first
+      expect(mod1_to.completion_requirements).to eq([{:id => page_tag_to.id, :type => 'must_view'}])
+
+      Timecop.freeze(1.minute.from_now) do
+        mod1.update_attributes(:completion_requirements => [])
+      end
+      run_master_migration
+      expect(mod1_to.reload.completion_requirements).to eq([])
+    end
+
     it "should copy the lack of a module unlock date" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)

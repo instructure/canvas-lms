@@ -77,7 +77,7 @@ pipeline {
 
   post {
     failure {
-      sh 'mkdir -p spec_results'
+      sh 'mkdir -vp spec_results'
       sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/. ./spec_results/'
       script {
         dir('spec_results') {
@@ -95,7 +95,7 @@ pipeline {
       }
     }
     cleanup {
-      sh 'rm -rf spec_results/'
+      sh 'rm -vrf spec_results/'
       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }

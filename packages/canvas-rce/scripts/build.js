@@ -26,7 +26,15 @@ const exec = promisify(require('child_process').exec)
 const getTranslationList = require('@instructure/translations/bin/get-translation-list')
 
 shell.set('-e')
-shell.rm('-rf', 'lib/')
+
+// We make this directory if it doesn't exist so that the following delete command works outside of docker.  This
+// directory is automatically created via a volume mount when using docker, so the -p flag prevents the mkdir command
+// from failing
+shell.exec('mkdir -p lib')
+
+// We can't delete this directory when inside docker because it is used as a volume mount point, so instead we
+// delete everything in it.
+shell.exec('rm -rf lib/*')
 const npm_bin_path = shell.exec('npm bin').trim()
 
 shell.echo('Building CommonJS version')

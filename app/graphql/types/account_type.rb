@@ -47,5 +47,10 @@ module Types
     def notification_preferences_enabled
       NotificationPolicyOverride.enabled_for(current_user, object)
     end
+
+    field :notification_preferences, NotificationPreferencesType, null: true
+    def notification_preferences
+      {channels: Loaders::AssociationLoader.for(User, :communication_channels).load(current_user)}
+    end
   end
 end

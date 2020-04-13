@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "Ychwanegu"
     },
+    "add_another_f4e50d57": {
+        "message": "Ychwanegu un arall"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "Ychwanegu CC/Is-deitlau"
     },
@@ -380,6 +383,9 @@
     "embed_video_code_703e10f2": {
         "message": "Plannu Cod Fideo"
     },
+    "embedded_content_aaeb4d3d": {
+        "message": "cynnwys wedi''i blannu"
+    },
     "equation_1c5ac93c": {
         "message": "Hafaliad"
     },
@@ -677,6 +683,9 @@
     "no_e16d9132": {
         "message": "Na"
     },
+    "no_file_chosen_9a880793": {
+        "message": "Dim ffeil wedi’i dewis"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Dim Gradd"
     },
@@ -937,6 +946,9 @@
     },
     "superscript_8cb349a2": {
         "message": "Uwchysgrif"
+    },
+    "supported_file_types_srt_or_webvtt_7d827ed": {
+        "message": "Mathau o ffeiliau y mae modd delio â nhw: SRT neu WebVTT"
     },
     "switch_to_raw_html_editor_4c9ac7de": {
         "message": "Newid i olygydd html crai"

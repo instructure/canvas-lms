@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "Dodaj"
     },
+    "add_another_f4e50d57": {
+        "message": "Dodaj dodatno"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "Dodaj Kp/podnaslov"
     },
@@ -380,6 +383,9 @@
     "embed_video_code_703e10f2": {
         "message": "Vdelaj kodo videoposnetka"
     },
+    "embedded_content_aaeb4d3d": {
+        "message": "vdelano vsebino"
+    },
     "equation_1c5ac93c": {
         "message": "Enačba"
     },
@@ -677,6 +683,9 @@
     "no_e16d9132": {
         "message": "Ne"
     },
+    "no_file_chosen_9a880793": {
+        "message": "Izbrana ni nobena datoteka"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Ni ocen."
     },
@@ -937,6 +946,9 @@
     },
     "superscript_8cb349a2": {
         "message": "Nadpisano"
+    },
+    "supported_file_types_srt_or_webvtt_7d827ed": {
+        "message": "Podprte vrste datotek: SRT ali WebVTT"
     },
     "switch_to_raw_html_editor_4c9ac7de": {
         "message": "Preklopi v surovi prikaz html"

@@ -23,8 +23,6 @@ describe 'Audit Trail' do
   include_context 'in-process server selenium tests'
 
   before(:once) do
-    PostPolicy.enable_feature!
-
     @account = Account.default
     role1 = @account.roles.create!(name: "Auditor", base_role_type: "TeacherEnrollment")
     @account.role_overrides.create!(role: role1, permission: :view_audit_trail, enabled: true)

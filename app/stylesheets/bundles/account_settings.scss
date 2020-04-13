@@ -21,3 +21,24 @@
 @import "pages/shared/external_tools.scss";
 @import "pages/shared/feature_flags";
 @import "components/ic-sortable-list.scss";
+
+@include mobile-only {
+  body.responsive_2020_03 table.narrow td {
+    display: block;
+    max-width: 320px;
+  }
+
+  body.responsive_2020_04 {
+    .long-word {
+      word-break: break-all;
+    }
+
+    .custom-text {
+      display: block;
+    }
+  }
+}
+
+body.responsive_2020_03 .delete_filter_link {
+  margin: auto 5px;
+}

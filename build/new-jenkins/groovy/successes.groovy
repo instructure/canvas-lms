@@ -64,7 +64,7 @@ def saveSuccess(name) {
   sh 'mkdir -p _buildmeta'
   sh "echo '|$name|' >> ${successFile()}"
   archiveArtifacts(artifacts: '_buildmeta/*')
-  log "Success artifact created, future builds will skip this step ${env.JOB_NAME}: ${successFile()}"
+  log "Success artifact created, future builds will skip this step $name: ${successFile()}"
   sh "cat ${successFile()}"
 }
 

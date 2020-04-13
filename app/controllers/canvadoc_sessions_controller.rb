@@ -56,6 +56,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:submission_user_ids] = submission.group_id ? submission.group.users.pluck(:id) : [submission.user_id] 
         opts[:course_id] = assignment.context_id
         opts[:assignment_id] = assignment.id
+        opts[:submission_id] = submission.id
         opts[:post_manually] = assignment.post_manually?
         opts[:posted_at] = submission.posted_at
         opts[:assignment_name] = assignment.name

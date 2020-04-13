@@ -56,6 +56,13 @@ export default class FeatureFlag extends Backbone.Model
   isSiteAdmin: ->
     !!ENV.ACCOUNT?.site_admin
 
+  # TODO: Remove this and all referencing code once the feature flag is no longer needed
+  isResponsive: ->
+    !!window.ENV?.FEATURES?.responsive_2020_03
+
+  isThreeState: ->
+    @currentContextIsAccount() && !@transitionLocked('allowed')
+
   contextType: ->
     ENV.context_asset_string.split('_')[0]
 
@@ -99,9 +106,10 @@ export default class FeatureFlag extends Backbone.Model
 
   toJSON: ->
     _.extend(super, isAllowed: @isAllowed(), isHidden: @isHidden(),
-      isOff: @isOff(), isOn: @isOn()
+      isOff: @isOff(), isOn: @isOn(), isResponsive: @isResponsive()
       currentContextIsAccount: @isContext('account'),
-      threeState: @currentContextIsAccount() && !@transitionLocked('allowed'),
+      threeState: @isThreeState(),
+      isResponsiveAndThreeState: @isResponsive() && @isThreeState()
       disableOn: @isLocked() || @transitionLocked('on'),
       disableAllow: @isLocked() || @transitionLocked('allowed'),
       disableOff: @isLocked() || @transitionLocked('off'),

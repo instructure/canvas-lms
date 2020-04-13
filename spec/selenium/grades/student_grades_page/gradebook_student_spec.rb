@@ -25,10 +25,6 @@ describe 'Student Gradebook' do
   include GradebookCommon
   include GradebookSetup
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   let(:assignments) do
     assignments = []
     (1..3).each do |i|

@@ -68,7 +68,7 @@ describe('Outcomes > IndividualStudentMastery > NaiveFetchDispatch', () => {
 
     it('resolves with the data from the request', async () => {
       const response = await fetch(1)
-      expect(response.body).toEqual(JSON.stringify(exampleData[1]))
+      expect(await response.json()).toMatchObject(exampleData[1])
     })
 
     it('resolves when flooded with requests', async () => {

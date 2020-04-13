@@ -155,6 +155,10 @@ class Notification < ActiveRecord::Base
     Setting.get('allowed_sms_notification_categories', 'announcement,grading').split(',')
   end
 
+  def self.types_to_send_in_sms
+    Setting.get('allowed_sms_notification_types', 'Assignment Graded,Confirm SMS Communication Channel,New Announcement,Submission Grade Changed,Submission Graded').split(',')
+  end
+
   def show_in_feed?
     self.category == "TestImmediately" || Notification.types_to_show_in_feed.include?(self.name)
   end

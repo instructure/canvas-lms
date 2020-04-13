@@ -21,8 +21,6 @@ require_relative "../graphql_spec_helper"
 
 describe Types::SubmissionCommentType do
   before(:once) do
-    PostPolicy.enable_feature!
-
     student_in_course(active_all: true)
     @student1 = @student
     student_in_course(active_all: true)

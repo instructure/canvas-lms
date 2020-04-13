@@ -16,6 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+const originals = {
+  clearInterval: window.clearInterval,
+  clearTimeout: window.clearTimeout,
+  setInterval: window.setInterval,
+  setTimeout: window.setTimeout
+}
+
 export function waitFor(conditionFn, timeout = 200) {
   return new Promise((resolve, reject) => {
     let timeoutId
@@ -24,8 +31,8 @@ export function waitFor(conditionFn, timeout = 200) {
     const intervalFn = () => {
       const result = conditionFn()
       if (result || result == null) {
-        clearInterval(intervalId)
-        clearTimeout(timeoutId)
+        originals.clearInterval.call(window, intervalId)
+        originals.clearTimeout.call(window, timeoutId)
       }
       if (result == null) {
         reject(
@@ -38,12 +45,12 @@ export function waitFor(conditionFn, timeout = 200) {
         resolve(result)
       }
     }
-    const intervalId = setInterval(intervalFn, interval)
+    const intervalId = originals.setInterval.call(window, intervalFn, interval)
 
     const timeoutFn = () => {
-      clearInterval(intervalId)
+      originals.clearInterval.call(window, intervalId)
       reject(new Error('Timeout waiting for condition'))
     }
-    timeoutId = setTimeout(timeoutFn, timeout)
+    timeoutId = originals.setTimeout.call(window, timeoutFn, timeout)
   })
 }

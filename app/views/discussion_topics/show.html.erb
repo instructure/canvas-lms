@@ -273,11 +273,15 @@
           <% end %>
         </div>
       </div>
-
       <div id="discussion-toolbar" class="toolbarView">
         <div class="headerBar" data-sticky>
+          <% if @domain_root_account.feature_enabled?(:responsive_2020_04) %>
+          <div class="form-inline headerBar__layout">
+            <div class="headerBar__controls">
+          <% else %>
           <div class="row-fluid form-inline" style="overflow: visible;">
             <div class="span9">
+          <% end %>
               <label class="screenreader-only" for="discussion-search">
                 <%= t("Search entries or author") %>
               </label>
@@ -311,8 +315,11 @@
                 <span class="screenreader-only">Expand replies</span>
               </button>
             </div>
-
-            <div class="span3 right-align">
+            <% if @domain_root_account.feature_enabled?(:responsive_2020_04) %>
+            <div class="discussion_subscribe headerBar__subscribe">
+            <% else %>
+            <div class="span3 right-align discussion_subscribe">
+            <% end %>
               <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
                  title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
                  role="button"

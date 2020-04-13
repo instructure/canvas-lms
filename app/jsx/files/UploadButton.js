@@ -38,6 +38,7 @@ UploadButton.buildPotentialModal = function() {
         fileOptions={this.state.nameCollisions[0]}
         onNameConflictResolved={this.onNameConflictResolved}
         onClose={this.onClose}
+        allowSkip={window?.ENV?.FEATURES?.files_dnd}
       />
     )
   }

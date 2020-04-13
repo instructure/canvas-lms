@@ -23,6 +23,7 @@ import {showFlashAlert} from 'jsx/shared/FlashAlert'
 import I18n from 'i18n!confetti'
 
 export default function Confetti() {
+  const [zIndex, setZIndex] = React.useState(0)
   React.useEffect(() => {
     if (window.ENV.disable_celebrations) {
       return
@@ -40,6 +41,7 @@ export default function Confetti() {
       if (forcefulCleanup) {
         forcefulCleanup = clearTimeout(forcefulCleanup)
       }
+      setZIndex(-1)
     }
 
     confetti = new ConfettiGenerator({
@@ -73,5 +75,7 @@ export default function Confetti() {
     return cleanup
   }, [])
 
-  return <canvas id="confetti-canvas" style={{position: 'fixed', top: 0, left: 0}} />
+  return window.ENV.disable_celebrations ? null : (
+    <canvas id="confetti-canvas" style={{position: 'fixed', top: 0, left: 0, zIndex}} />
+  )
 }

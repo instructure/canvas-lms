@@ -29,7 +29,7 @@ assignment_attempts:
   description: Allow a teacher to set the number of allowed attempts on an assignment via the UI
 assignment_bulk_edit:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: RootAccount
   display_name: Assignment Bulk Editing
   description: Allow teachers to change the dates on a set of assignments in one step
 bookmarking_for_enrollments_index:

@@ -32,6 +32,10 @@ import SyllabusTray from '../trays/SyllabusTray'
 import CollaborationsTray from '../trays/CollaborationsTray'
 import ImportTray from '../trays/ImportTray'
 import ConferencesTray from '../trays/ConferencesTray'
+import OutcomesTray from '../trays/OutcomesTray'
+import RubricsTray from '../trays/RubricsTray'
+import ZoomTray from '../trays/ZoomTray'
+import NewAnalyticsTray from '../trays/NewAnalyticsTray'
 
 const generateObject = (component, label, pageName) => ({
   component,
@@ -73,6 +77,26 @@ const getProperTray = (path = window.location.pathname) => {
     return generateObject(ImportTray, I18n.t('Import Tutorial Tray'), 'collaborations')
   } else if (path.includes('conferences')) {
     return generateObject(ConferencesTray, I18n.t('Conferences Tutorial Tray'), 'conferences')
+  } else if (path.includes('outcomes')) {
+    return generateObject(OutcomesTray, I18n.t('Outcomes Tutorial Tray'), 'outcomes')
+  } else if (path.includes('rubrics')) {
+    return generateObject(RubricsTray, I18n.t('Rubrics Tutorial Tray'), 'rubrics')
+  }
+  if (path.includes('external_tools')) {
+    // We are in an LTI App. Check the resource URL
+    if (window.ENV.LTI_LAUNCH_RESOURCE_URL === 'https://applications.zoom.us/lti/rich') {
+      // Zoom Video Conferencing
+      return generateObject(ZoomTray, I18n.t('Zoom Tutorial Tray'), 'zoom')
+    }
+    if (window.ENV.LTI_LAUNCH_RESOURCE_URL.includes('canvas-analytics')) {
+      return generateObject(
+        NewAnalyticsTray,
+        I18n.t('New Analytics Tutorial Tray'),
+        'new-analytics'
+      )
+    }
+    // Return null if we don't have a tutorial tray
+    return null
   }
   return generateObject(HomeTray, I18n.t('Home Tutorial Tray'), 'home')
 }

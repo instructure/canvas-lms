@@ -34,9 +34,9 @@ def getImageTagVersion() {
 
 def computeTestCount() {
   // oops, probably should have added an easier way to _count_ tests...
-  sh 'rm -rf tmp'
-  sh 'mkdir tmp'
-  sh 'chmod 777 tmp'
+  sh 'rm -vrf tmp'
+  sh 'mkdir -v tmp'
+  sh 'chmod -vv 777 tmp'
   sh """
     docker run --volume \$WORKSPACE/.git:/usr/src/app/.git \
                --volume \$WORKSPACE/tmp:/usr/src/app/tmp \
@@ -77,7 +77,7 @@ def computeDistributedCount() {
 }
 
 def executeFlakeySpecCatcher(prefix = 'main') {
-  sh 'rm -rf tmp'
+  sh 'rm -vrf tmp'
   try {
     timeout(30) {
       sh 'build/new-jenkins/docker-compose-pull.sh'
@@ -97,7 +97,7 @@ def executeFlakeySpecCatcher(prefix = 'main') {
     }
   }
   finally {
-    sh "mkdir -p tmp/$prefix"
+    sh "mkdir -vp tmp/$prefix"
     sh(
       script: "docker cp \$(docker-compose ps -q web):/usr/src/app/tmp/fsc.out ./tmp/$prefix/fsc.out",
       returnStatus: true
@@ -136,7 +136,7 @@ pipeline {
       steps {
         timeout(time: 5) {
           sh 'build/new-jenkins/docker-cleanup.sh'
-          sh 'rm -rf ./tmp/'
+          sh 'rm -vrf ./tmp/'
         }
       }
     }
@@ -178,13 +178,13 @@ pipeline {
                   node('canvas-docker') {
                     stage("Running Flakey Set $node_number") {
                       try {
-                        sh 'rm -rf ./tmp'
+                        sh 'rm -vrf ./tmp'
                         checkout scm
                         sh 'build/new-jenkins/docker-cleanup.sh'
                         executeFlakeySpecCatcher("node$node_number")
                       }
                       finally {
-                        sh 'rm -rf ./tmp'
+                        sh 'rm -vrf ./tmp'
                         sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
                       }
                     }
@@ -209,7 +209,7 @@ pipeline {
 
   post {
     cleanup {
-      sh 'rm -rf ./tmp/'
+      sh 'rm -vrf ./tmp/'
       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }

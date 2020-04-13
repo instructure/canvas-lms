@@ -24,10 +24,6 @@ describe "assignments" do
   include GoogleDriveCommon
   include AssignmentsCommon
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   context "as a student" do
     before(:each) do
       course_with_student_logged_in

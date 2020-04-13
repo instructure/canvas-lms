@@ -36,6 +36,9 @@ class RubricsController < ApplicationController
         manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
       },
       :NON_SCORING_RUBRICS => @domain_root_account.feature_enabled?(:non_scoring_rubrics)
+
+    set_tutorial_js_env
+
     @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
     @rubric_associations = Canvas::ICU.collate_by(@rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
     @rubrics = @rubric_associations.map(&:rubric)

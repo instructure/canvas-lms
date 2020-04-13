@@ -33,10 +33,17 @@ describe('fileEmbed', () => {
   it('uses content-type to identify video and audio', () => {
     const video = fileEmbed(getBaseFile({'content-type': 'video/mp4'}))
     const audio = fileEmbed(getBaseFile({'content-type': 'audio/mpeg'}))
+    const notaudio = fileEmbed(
+      getBaseFile({'content-type': 'x-audio/mpeg', preview_url: undefined})
+    )
+    const notvideo = fileEmbed(getBaseFile({'content-type': 'x-video/mp4', preview_url: undefined}))
+
     assert.equal(video.type, 'video')
     assert.equal(video.id, 'maybe')
     assert.equal(audio.type, 'audio')
     assert.equal(audio.id, 'maybe')
+    assert.equal(notaudio.type, 'file')
+    assert.equal(notvideo.type, 'file')
   })
 
   it('returns media entry id if provided', () => {

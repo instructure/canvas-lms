@@ -20,8 +20,8 @@
                                                       :style => 'display: none; margin-top: 10px;' }) do |f| %>
 <h2 tabindex="-1"><%= t 'titles.new', "Start a New Collaboration" %></h2>
 <table class="formtable">
-  <tr>
-    <td style="white-space: nowrap">
+  <tr id="collaboration_selection_row">
+    <td id="collaboration_selection_label">
       <%= f.label :collaboration_type, t('labels.collaboration_type', 'Collaborate using:') %>
     </td>
     <td style="width: 90%;">

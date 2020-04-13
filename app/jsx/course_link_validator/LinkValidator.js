@@ -21,12 +21,14 @@ import 'compiled/jquery.rails_flash_notifications'
 import React from 'react'
 import I18n from 'i18n!link_validator'
 import ValidatorResults from './ValidatorResults'
+import {Confetti} from '../confetti'
 
 class LinkValidator extends React.Component {
   state = {
     results: [],
     displayResults: false,
-    error: false
+    error: false,
+    showConfetti: false
   }
 
   componentWillMount() {
@@ -50,7 +52,8 @@ class LinkValidator extends React.Component {
             buttonDisabled: false,
             results: data.results.issues,
             displayResults: true,
-            error: false
+            error: false,
+            showConfetti: !initial_load && data.results.issues.length === 0
           })
           $('#all-results').show()
         } else {
@@ -84,6 +87,10 @@ class LinkValidator extends React.Component {
 
   startValidation = () => {
     $('#all-results').hide()
+
+    this.setState({
+      showConfetti: false
+    })
 
     this.setLoadingState()
     $.screenReaderFlashMessage(I18n.t('Link validation is running'))
@@ -128,7 +135,7 @@ class LinkValidator extends React.Component {
           {this.state.buttonMessage}
         </button>
         {loadingImage}
-
+        {window.ENV.VALIDATION_CONFETTI_ENABLED && this.state.showConfetti && <Confetti />}
         <ValidatorResults
           results={this.state.results}
           displayResults={this.state.displayResults}

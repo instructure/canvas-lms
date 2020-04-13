@@ -26,7 +26,13 @@ export default {
   },
 
   componentWillMount() {
-    UploadQueue.onChange = () => this.setState({currentUploads: UploadQueue.getAllUploaders()})
+    UploadQueue.onChange = () => {
+      this.setState({currentUploads: UploadQueue.getAllUploaders()}, () => {
+        if (this.props.onUploadChange) {
+          this.props.onUploadChange(this.state.currentUploads.length)
+        }
+      })
+    }
   },
 
   componentWillUnmount() {

@@ -56,3 +56,18 @@ include_speed_grader_in_assignment_header_menu:
   applies_to: SiteAdmin
   display_name: Include SpeedGrader in Assignment Header Menu
   description: Includes a link to SpeedGrader in the assignment header menu in Gradebook.
+prefetch_gradebook_user_ids:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Prefetch User IDs in Gradebook
+  description: Load user ids upon page load so that Gradebook loads more quickly.
+datadog_rum_js:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Datadog RUM JS Agent
+  description: Include the Datadog RUM JS Agent in the document HEAD.
+grade_calculator_performance_improvements:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Grade Calculator Performance Improvements
+  description: Performance improvements for the grade calculation process.

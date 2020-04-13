@@ -860,6 +860,7 @@ CanvasRails::Application.routes.draw do
   scope '/profile' do
     post 'toggle_disable_inbox' => 'profile#toggle_disable_inbox'
     get 'profile_pictures' => 'profile#profile_pics', as: :profile_pics
+    get 'qr_mobile_login' => 'profile#qr_mobile_login', as: :qr_mobile_login
     delete 'user_services/:id' => 'users#delete_user_service', as: :profile_user_service
     post 'user_services' => 'users#create_user_service', as: :profile_create_user_service
   end
@@ -978,6 +979,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/users', action: :users, as: 'course_users'
       get 'courses/:course_id/collaborations', controller: :collaborations, action: :api_index, as: 'course_collaborations_index'
       delete 'courses/:course_id/collaborations/:id', controller: :collaborations, action: :destroy
+      put 'courses/:id/quizzes', action: 'new_quizzes_selection_update', as: 'course_new_quizzes_selection_update'
 
       # this api endpoint has been removed, it was redundant with just courses#users
       # we keep it around for backward compatibility though
@@ -1546,11 +1548,6 @@ CanvasRails::Application.routes.draw do
       put 'users/self/communication_channels/:communication_channel_id/notification_preferences', action: :update_all
       put 'users/self/communication_channels/:type/:address/notification_preferences', action: :update_all, constraints: { address: %r{[^/?]+} }
       put 'users/self/communication_channels/:communication_channel_id/notification_preference_categories/:category', action: :update_preferences_by_category
-    end
-
-    scope(controller: :notification_preference_overrides) do
-      get 'users/self/courses/:course_id/notifications_enabled', action: :enabled_for_context
-      put 'users/self/courses/:course_id/enable_notifications', action: :enable
     end
 
     scope(controller: :comm_messages_api) do

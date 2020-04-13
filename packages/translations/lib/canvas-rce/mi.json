@@ -3,6 +3,7 @@
     "message": "Kaitirotiro te whakaurutanga"
   },
   "add_8523c19b": { "message": "Tāpiri" },
+  "add_another_f4e50d57": { "message": "Tāpiri tētahi atu" },
   "add_cc_subtitles_55f0394e": { "message": "Tāpiri CC/Ngā Tohuwai" },
   "align_11050992": { "message": "Whakarārangi" },
   "align_center_ca078feb": { "message": "Whakarārangi ki waenganui" },
@@ -139,6 +140,7 @@
   "embed_preview_2d741e1f": { "message": "Whakauru Arokite" },
   "embed_video_a97a64af": { "message": "Whakauru Ataata" },
   "embed_video_code_703e10f2": { "message": "Whakauru Ataata Waehere" },
+  "embedded_content_aaeb4d3d": { "message": "ihirangi tāmau" },
   "equation_1c5ac93c": { "message": "Whārite" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "He hapa i te wā e tikiake ana i te ataata/orooro hopukanga"
@@ -232,6 +234,7 @@
     "message": "Kaore Alt Kuputuhi (Āhua Whakapaipai)"
   },
   "no_e16d9132": { "message": "Kahore" },
+  "no_file_chosen_9a880793": { "message": "Kaore he kōnae i tīpakotia" },
   "no_results_940393cf": { "message": "Kaore he hua." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Kaore i kitea he hua mo { filterTerm }"
@@ -306,6 +309,9 @@
   "submit_a3cc6859": { "message": "Tuku" },
   "subscript_59744f96": { "message": "Tuhinga" },
   "superscript_8cb349a2": { "message": "Tuhinga nui" },
+  "supported_file_types_srt_or_webvtt_7d827ed": {
+    "message": "Ngā kōnae momo kua tautokotia: SRT me WebVTT rānei"
+  },
   "switch_to_raw_html_editor_4c9ac7de": {
     "message": "Huri ki te mata html ētita"
   },

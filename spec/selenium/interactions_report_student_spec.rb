@@ -20,10 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "student interactions report" do
   include_context "in-process server selenium tests"
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   context "as a student" do
     before(:each) do
       course_with_teacher_logged_in(active_all: true)

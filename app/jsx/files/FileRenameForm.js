@@ -95,6 +95,18 @@ FileRenameForm.buildButtons = function() {
         {I18n.t('Replace')}
       </button>
     ]
+    if (this.props.allowSkip) {
+      buildButtonsToRender.unshift(
+        <button
+          key="skipBtn"
+          ref="skipBtn"
+          className="btn btn-default"
+          onClick={this.handleSkipClick}
+        >
+          {I18n.t('Skip')}
+        </button>
+      )
+    }
   } else {
     buildButtonsToRender = [
       <button

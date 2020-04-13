@@ -24,7 +24,7 @@
 <h1 class="theme-preview__page-header"><%= t('Welcome to the Canvas Theme Editor') %></h1>
 <p>
   <%= t do %>
-    This sample page includes common UI elements in Canvas to help you build your custom branding. Once you start making changes to the color values and images in the left sidebar, you will see a <b>Preview Your Changes</b> button. Click it to refresh this page and see how your changes look.
+    This sample page includes common UI elements in Canvas to help you build your custom branding. Once you start making changes to color values and images, you will see a <b>Preview Your Changes</b> button. Click it to refresh this page and see how your changes look.
     <% end %>
 </p>
 <p>
@@ -36,7 +36,13 @@
 <br />
 <div class="content-box">
   <div class="grid-row">
-    <div class="col-xs-7">
+    <div
+      <% if @domain_root_account.feature_enabled?(:responsive_2020_03) %>
+        class="col-xs-12 col-md-7"
+      <% else %>
+        class="col-xs-7"
+      <% end %>
+    >
       <p style="margin-top: 0;">Set Canvas' default text color using the <b>Main Text Color</b> field in Theme Editor. Check this text after you change it to see your edits.</p>
       <div class="ic-Form-group">
         <div class="ic-Form-control">
@@ -93,7 +99,13 @@
         </div>
       </div>
     </div>
-    <div class="col-xs-4 off-xs-1">
+    <div
+      <% if @domain_root_account.feature_enabled?(:responsive_2020_03) %>
+        class="col-xs-12 col-md-4 off-md-1"
+      <% else %>
+        class="col-xs-4 off-xs-1"
+      <% end %>
+    >
       <div>
         <button type="button" class="Button Button--primary Button--block"><%= t('Primary color button') %></button>
         <div class="content-box-mini">
@@ -253,7 +265,13 @@
   </div>
   <div class="content-box">
     <div class="grid-row">
-      <div class="col-xs-3">
+      <div
+        <% if @domain_root_account.feature_enabled?(:responsive_2020_03) %>
+          class="col-xs-12 col-md-3"
+        <% else %>
+          class="col-xs-3"
+        <% end %>
+      >
         <div class="list-view">
           <nav class="theme-preview" aria-label="context" role="navigation">
             <ul>
@@ -266,25 +284,28 @@
           </nav>
         </div>
       </div>
-      <div class="col-xs-8 off-xs-1">
+      <div
+        <% if @domain_root_account.feature_enabled?(:responsive_2020_03) %>
+          class="col-xs-12 col-md-8 off-md-1"
+        <% else %>
+          class="col-xs-8 off-xs-1"
+        <% end %>
+      >
         <table class="ic-Table ic-Table--hover-row">
           <thead>
             <tr>
               <th><%= t('Name') %></th>
               <th><%= t('Email address') %></th>
-              <th><%= t('More information') %></th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><a href="#">Joe Bloggs</a></td>
               <td>jbloggs1980@gmail.com</td>
-              <td><%= t('Hover over me') %></td>
             </tr>
             <tr>
               <td><a href="#">Jane Doe</a></td>
               <td>jane-doe-11@hotmail.com</td>
-              <td><%= t('Hover over me') %></td>
             </tr>
           </tbody>
         </table>
@@ -332,7 +353,13 @@
     </div>
   </div>
 </div>
-<div class="content-box">
+<div
+  <% if @domain_root_account.feature_enabled?(:responsive_2020_03) %>
+    class="content-box theme-preview__login"
+  <% else %>
+    class="content-box"
+  <% end %>
+>
   <h3 id="login-preview">
     <%= t('Login') %>
   </h3>

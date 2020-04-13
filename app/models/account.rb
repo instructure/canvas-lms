@@ -1515,6 +1515,8 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       if user && self.grants_right?(user, :manage_outcomes)
         tabs << { :id => TAB_OUTCOMES, :label => t('#account.tab_outcomes', "Outcomes"), :css_class => 'outcomes', :href => :account_outcomes_path }
+      end
+      if self.can_see_rubrics_tab?(user)
         tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :css_class => 'rubrics', :href => :account_rubrics_path }
       end
       tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && self.grants_right?(user, :manage_grades)
@@ -1549,6 +1551,14 @@ class Account < ActiveRecord::Base
     tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :css_class => 'settings', :href => :account_settings_path }
     tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, :manage)
     tabs
+  end
+
+  def can_see_rubrics_tab?(user)
+    if root_account.feature_enabled?(:decouple_rubrics)
+      user && self.grants_right?(user, :manage_rubrics)
+    else
+      user && self.grants_right?(user, :manage_outcomes)
+    end
   end
 
   def can_see_admin_tools_tab?(user)

@@ -60,6 +60,7 @@ export default class GroupCategorySelector extends Backbone.View
   @optionProperty 'hideGradeIndividually'
   @optionProperty 'sectionLabel'
   @optionProperty 'fieldLabel'
+  @optionProperty 'isResponsiveDiscussion'
   @optionProperty 'lockedMessage'
   @optionProperty 'inClosedGradingPeriod'
 
@@ -137,6 +138,7 @@ export default class GroupCategorySelector extends Backbone.View
 
     sectionLabel: @sectionLabel
     fieldLabel: @fieldLabel
+    isResponsiveDiscussion: @isResponsiveDiscussion
     lockedMessage: @lockedMessage
     ariaChecked: if @parentModel.groupCategoryId() then 'true' else 'false'
 

@@ -66,12 +66,12 @@ module CC::Importer
       blti = nil unless doc.namespaces["xmlns:#{blti}"]
       link_css_path = "cartridge_basiclti_link"
       tool = {}
-      tool[:description] = get_node_val(doc, "#{link_css_path} > #{blti}|description")
-      tool[:title] = get_node_val(doc, "#{link_css_path} > #{blti}|title")
+      tool[:description] = get_node_val(doc, "#{link_css_path} > #{blti}|description")&.strip
+      tool[:title] = get_node_val(doc, "#{link_css_path} > #{blti}|title")&.strip
       tool[:url] = get_node_val(doc, "#{link_css_path} > #{blti}|secure_launch_url")
       tool[:url] ||= get_node_val(doc, "#{link_css_path} > #{blti}|launch_url")
       tool[:url] &&= tool[:url].strip
-      if custom_node = doc.css("#{link_css_path} > #{blti}|custom").first
+      if (custom_node = doc.css("#{link_css_path} > #{blti}|custom").first)
         tool[:custom_fields] = get_custom_properties(custom_node)
       end
       tool[:custom_fields] ||= {}
@@ -97,9 +97,9 @@ module CC::Importer
           tool[:extensions] << ext
         end
       end
-      if icon = get_node_val(doc, "#{link_css_path} > #{blti}|icon")
+      if (icon = get_node_val(doc, "#{link_css_path} > #{blti}|icon"))
         tool[:settings] ||= {}
-        tool[:settings][:icon_url] = icon
+        tool[:settings][:icon_url] = icon.strip
       end
       tool
     end

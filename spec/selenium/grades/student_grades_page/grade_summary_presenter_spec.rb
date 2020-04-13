@@ -22,10 +22,6 @@ describe GradeSummaryPresenter do
   include_context 'in-process server selenium tests'
   include_context 'reusable_gradebook_course'
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   describe 'deleted submissions', priority: "2" do
     it 'should navigate to grade summary page' do
       course_with_student_logged_in

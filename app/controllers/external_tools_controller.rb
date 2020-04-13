@@ -385,6 +385,10 @@ class ExternalToolsController < ApplicationController
       @lti_launch = lti_launch(tool: @tool, selection_type: placement, post_live_event: true)
       return unless @lti_launch
 
+      # Some LTI apps have tutorial trays. Provide some details to the client to know what tray, if any, to show
+      js_env(:LTI_LAUNCH_RESOURCE_URL => @lti_launch.resource_url)
+      set_tutorial_js_env
+
       render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: params[:display])
     end
   end
@@ -1180,7 +1184,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def set_tool_attributes(tool, params)
-    attrs = Lti::ResourcePlacement::PLACEMENTS
+    attrs = Lti::ResourcePlacement.valid_placements
     attrs += [:name, :description, :url, :icon_url, :canvas_icon_class, :domain, :privacy_level, :consumer_key, :shared_secret,
               :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id,
               :oauth_compliant]

@@ -736,6 +736,8 @@ en:
     GraphQL mutations
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: Microsoft Immersive Reader - Free Trial (Wiki Pages)
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: Makes a Microsoft Immersive Reader link option show up on wiki pages.
+  canvas_elementary_theming_a42fa76f: Canvas Elementary Theming
+  elementary_friendly_theme_font_and_limited_course__4dc48217: Elementary friendly theme font and limited course navigation.
   new_post_policy_icons_da13a62c: New Post Policy Icons
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: Updates the display of Post Policy icons in the New Gradebook assignment column header.
   gradebook_import_reserved_names_bugfix_apg_122_32a77a18: Gradebook Import Reserved Names Bugfix (APG-122)
@@ -756,6 +758,12 @@ en:
   allows_the_user_to_navigate_away_while_submission__276d73b7: Allows the user to navigate away while submission re-uploads are processing
   include_speedgrader_in_assignment_header_menu_69cd8656: Include SpeedGrader in Assignment Header Menu
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: Includes a link to SpeedGrader in the assignment header menu in Gradebook.
+  prefetch_user_ids_in_gradebook_b96521b0: Prefetch User IDs in Gradebook
+  load_user_ids_upon_page_load_so_that_gradebook_loa_c51693aa: Load user ids upon page load so that Gradebook loads more quickly.
+  datadog_rum_js_agent_4c3bea75: Datadog RUM JS Agent
+  include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: Include the Datadog RUM JS Agent in the document HEAD.
+  grade_calculator_performance_improvements_564af0de: Grade Calculator Performance Improvements
+  performance_improvements_for_the_grade_calculation_7d9b0b16: Performance improvements for the grade calculation process.
   qr_for_mobile_login_1b1560ce: QR for Mobile Login
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: Include a link to show a QR code to easy mobile login on the profile page.
   product_tours_1e19eb95: Product Tours
@@ -764,6 +772,15 @@ en:
   collection_of_responsive_improvements_throughout_c_dedfe6dc: Collection of responsive improvements throughout Canvas
   module_content_import_enhancements_c00b0ea2: Module Content Import Enhancements
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: Drag and Drop files on modules and multi-file module item uploads
+  april_2020_responsiveness_54028e36: April 2020 Responsiveness
+  help_for_unpublished_courses_512a08d7: Help for Unpublished Courses
+  improved_visual_reminders_to_encourage_instructors_f203c7f: Improved visual reminders to encourage instructors to publish courses
+  files_drag_and_drop_enhancements_da55de57: Files Drag and Drop Enhancements
+  improve_discoverability_of_drag_and_drop_in_files_421e9e25: Improve discoverability of drag and drop in Files
+  allow_conference_selection_lti_placement_c020ad8d: Allow Conference Selection LTI placement
+  allows_users_to_add_lti_tools_with_conference_sele_c38545ab: Allows users to add LTI tools with conference_selection placement type
+  add_conferences_from_calendar_98cb86b1: Add Conferences from Calendar
+  allows_users_to_add_conferences_from_the_calendar_f36c5008: Allows users to add conferences from the calendar
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   pronouns_for_users_da46fb5: Pronouns for users
@@ -774,6 +791,10 @@ en:
   displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
     Displays confetti for users that turn in an assignment prior
     to the set due date.
+  confetti_for_valid_links_7506df83: Confetti for valid links
+  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+    Displays confetti for teachers that run the link validator on
+    a course and no issues are found.
   restrict_sms_to_select_types_9dd6399c: Restrict SMS to Select Types
   disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
     Disables SMS notifications for all types except announcements and
@@ -823,6 +844,8 @@ en:
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
   rubrics_in_course_navigation_539ea536: Rubrics in course navigation
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: Includes rubrics in the course sidebar navigation
+  modify_permissions_for_account_rubrics_6c3aee59: Modify permissions for Account Rubrics
+  change_rubrics_visibility_on_accounts_to_depend_on_967b4caa: Change Rubrics visibility on Accounts to depend on the Rubrics permission instead of the Learning Outcomes permission
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_dc466585: |-
     Differentiate between system- and user-generated live events
@@ -849,6 +872,8 @@ en:
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: Disable New Quiz importing and migration checkboxes, defaulting them to enabled
   send_notifications_when_manually_created_access_to_a1631123: Send notifications when manually created access tokens are made
   granular_permissions_for_managing_wiki_pages_3ed89a84: Granular permissions for managing wiki pages
+  disable_smart_app_banner_on_mobile_devices_bed9bf3b: Disable Smart App Banner on Mobile Devices
+  remove_safari_mobile_banner_suggesting_user_downlo_b4251078: Remove Safari mobile banner suggesting user download application from app store.
   announcement_successfully_created_731a707f: Announcement successfully created
   announcement_creation_failed_f7d227f5: Announcement creation failed
   announcement_successfully_updated_7bc5130: Announcement successfully updated
@@ -5042,6 +5067,7 @@ en:
     crumbs:
       settings_frd: "%{user}'s Profile"
       observees: Observing
+      mobile_qr_login: QR for Mobile Login
     crumb: "%{user}'s settings"
     errors:
       invalid_old_passowrd: Invalid old password for the login %{pseudonym}
@@ -6328,6 +6354,7 @@ en:
     settings: Settings
     eportfolios: ePortfolios
     observees: Observing
+    qr_mobile_login: QR for Mobile Login
   end_dates_cannot_be_before_start_dates_d6018daf: End dates cannot be before start dates
   terms:
     errors:
@@ -6881,10 +6908,6 @@ en:
     covid_sub: Tips for teaching and learning online
     training_services_portal: Training Services Portal
     training_services_portal_sub: Access Canvas training videos and courses
-    stuff: Stuff
-    things: Things
-    hi: Hi
-    hello: Hello
     which_course_is_this_question_about: Which course is this question about?
     message_will_be_sent_to_all_the_teachers_tas_in_the_course: Message will be sent to all the Teachers / TA's in the course.
     message: Message
@@ -8941,6 +8964,14 @@ en:
   the_beginning_date_range_for_the_courses_to_report_82353138: The beginning date range for the courses to report on
   the_ending_date_for_the_courses_to_report_on_1c417d5e: The ending date for the courses to report on
   the_ending_date_range_for_the_courses_to_report_on_99e0ea8f: The ending date range for the courses to report on
+  the_start_date_was_set_to_the_beginning_of_last_we_39f49e1d: The start date was set to the beginning of last week.
+  group_id_e76ac9b5: group id
+  group_sis_id_70133b7e: group sis id
+  group_name_e4066daa: group name
+  conference_type_7bd581e: conference type
+  conference_participant_count_87e86c5c: conference participant count
+  conference_created_date_7ef1e8d4: conference created date
+  conference_recorded_7e776ec2: conference recorded
   lbs_report_header_lbs_no: LBSNo
   lbs_report_header_student_name: Student Name
   lbs_report_header_program_code: Program Code
@@ -8969,7 +9000,7 @@ en:
   admin_view_a2f4cd5c: Admin View
   rce_contents_replace_display_name: RCE Contents Replace
   rce_contents_replace_description: Enable RCE full text replace from LTI's
-  conference_guides_for_remote_classrooms_287173dd: Conference Guides for Remote Classrooms
+  video_conferencing_guides_for_remote_classrooms_ffab4a1b: Video Conferencing Guides for Remote Classrooms
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: Get help on how to use and configure conferences in canvas.
   submit_a_feature_idea_2d4baa3d: Submit a Feature Idea
   this_canvas_installation_is_only_for_testing_and_w_12e52370: This Canvas installation is only for testing and *will reset every month.*
@@ -11473,7 +11504,7 @@ en:
     After you create your application, make a note of the Consumer Key and Consumer Secret, and enter them here.
   current_provider_6c3f7f96: Current Provider
   welcome_to_the_canvas_theme_editor_73091d1: Welcome to the Canvas Theme Editor
-  this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: This sample page includes common UI elements in Canvas to help you build your custom branding. Once you start making changes to the color values and images in the left sidebar, you will see a *Preview Your Changes* button. Click it to refresh this page and see how your changes look.
+  this_sample_page_includes_common_ui_elements_in_ca_ef71449d: This sample page includes common UI elements in Canvas to help you build your custom branding. Once you start making changes to color values and images, you will see a *Preview Your Changes* button. Click it to refresh this page and see how your changes look.
   important_note_educational_institutions_have_an_ob_c9350304: "*Important note: Educational institutions have an obligation to make their content as accessible as possible. Instructure recommends at least a 3:1 text-to-background-color ratio to keep your text readable. Easily test your contrast ratios with the **WebAIM Color Contrast Checker***."
   text_input_d3480b8c: Text input
   select_input_3dbd73c1: Select input
@@ -11507,8 +11538,6 @@ en:
   context_nav_link_8d15d95: Context nav link
   context_nav_link_active_78adb0fa: Context nav link active
   email_address_6e0443a5: Email address
-  more_information_3dfb76b5: More information
-  hover_over_me_496521b9: Hover over me
   tab_1_3d6b3fb: Tab 1
   tab_2_9adfe241: Tab 2
   tab_3_edd8d2d7: Tab 3
@@ -11856,6 +11885,8 @@ en:
   keyboard_shortcuts_ed1844bd: Keyboard Shortcuts
   search_23a88d5c: Search…
   gradebook_individual_view_8846598e: 'Gradebook: Individual View'
+  learning_mastery_context_name_a0b70957: Learning Mastery - %{context_name}
+  learning_mastery_5fc34276: Learning Mastery
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Submissions Uploaded"
   back_to_assignment_1df86a69: Back to Assignment
   no_submissions_have_been_uploaded_2fb02710: No Submissions Have Been Uploaded
@@ -12574,6 +12605,7 @@ en:
     This is a report of all students enrolled in a course in a given term that
     have submitted an assignment. This report contains one row per student
       submission.
+  submission_records_will_be_filtered_by_date_using__b3990a1: Submission records will be filtered by date using the "submitted_at" timestamp if it is available. When "submitted_at" is not available, the "graded_at" field will be used. If neither field is populated the submisssion record will never be included in the report when filtering by date.
   include_unsubmitted_deleted_submissions_99fc2aad: Include Unsubmitted & Deleted Submissions
   course_sis_id_sis_id_or_canvas_id_4d323f5c: 'Course SIS ID (SIS_ID:####) OR Canvas ID: (###)'
   start_dates_8f1c22a8: 'Start Dates:'
@@ -12591,6 +12623,7 @@ en:
   id_del_alumno_bc4bcf8a: ID del Alumno
   sis_del_alumno_716babc5: SIS del Alumno
   this_report_displays_teacher_engagement_activity_f_5888d45b: This report displays teacher engagement activity for each teacher enrollment.
+  this_report_gets_recent_big_blue_button_conference_5d7dcddb: This report gets recent Big blue button conferences for an account.
   models_to_include_9fb154ca: Models to include
   additional_options_7cefee79: Additional Options
   always_include_dates_1ae2935e: Always Include Dates
@@ -14951,6 +14984,8 @@ en:
     one: 1 quiz found.
     other: "%{count} quizzes found."
     zero: No matching quizzes found.
+  your_quiz_engine_choice_has_been_reset_68d268c1: Your quiz engine choice has been reset!
+  there_was_a_problem_resetting_your_quiz_engine_cho_ba4277c7: There was a problem resetting your quiz engine choice
   migration_in_progress_6f0ed4f9: Migration in progress
   an_error_occurred_while_migrating_405ac0b5: An error occurred while migrating.
   EditRubricPage:
@@ -15270,7 +15305,8 @@ en:
   disable_sync_to_name_10c371dc: Disable Sync to %{name}
   assignments_settings_30613d0c: Assignments Settings
   assignment_options_1e5b7074: Assignment Options
-  bulk_edit_bc023ac5: Bulk Edit
+  edit_dates_ed31061: Edit Dates
+  edit_assignment_dates_6f8c72b: Edit Assignment Dates
   assignment_groups_weight_2f1a5a7c: Assignment Groups Weight
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: Moderated grading cannot be enabled for group assignments
   moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: Moderated grading cannot be enabled for peer reviewed assignments
@@ -15282,12 +15318,27 @@ en:
   unlimited_ff19e96d: Unlimited
   limited_322546c5: Limited
   number_of_attempts_b0994c2f: Number of Attempts
-  edit_dates_ed31061: Edit Dates
-  there_was_an_error_retrieving_assignment_due_dates_c010cf8a: There was an error retrieving assignment due dates.
-  choose_a_due_date_73354c20: Choose a due date
-  assignment_dates_dccc98de: Assignment Dates
+  percent_af88d1b1: "%{percent}%"
+  saving_assignment_dates_progress_9856153d: Saving assignment dates progress
+  saving_assignment_dates_progress_percent_a5ea89a1: 'Saving assignment dates progress: %{percent}%'
+  assignment_dates_saved_successfully_78e0f355: Assignment dates saved successfully.
+  there_was_an_error_retrieving_assignment_dates_39320c15: There was an error retrieving assignment dates.
+  error_starting_save_operation_81bcb99: 'Error starting save operation:'
+  there_were_errors_saving_the_assignment_dates_3b39571b: 'There were errors saving the assignment dates:'
+  loading_assignments_b3b248be: Loading assignments
+  assignments_loaded_72ee472c: Assignments loaded
   due_at_5d7d2fa: Due At
-  lock_at_76afa49c: Lock At
+  available_from_587ce92f: Available From
+  available_until_f3b9c4ed: Available Until
+  default_dates_a0a2ae26: default dates
+  this_assignment_has_no_default_dates_ae314295: This assignment has no default dates.
+  in_closed_grading_period_dc717846: In closed grading period
+  only_the_moderator_can_edit_this_assignment_a162b20d: Only the moderator can edit this assignment
+  you_do_not_have_permission_to_edit_this_assignment_59b53274: You do not have permission to edit this assignment
+  assignment_dates_dccc98de: Assignment Dates
+  notes_c42e0fd5: Notes
+  there_was_an_error_retrieving_job_progress_266523f9: There was an error retrieving job progress
+  there_was_an_error_starting_the_save_assignment_da_22ffb6a8: There was an error starting the save assignment dates job
   select_group_to_grade_6df28d80: Select Group to Grade
   must_select_a_student_group_first_15c6a3cb: Must select a student group first
   no_content_5dbc9acf: No Content
@@ -15985,10 +16036,6 @@ en:
   add_existing_content_7e36da66: Add existing content
   failed_to_update_course_notification_settings_cbf0eb18: Failed to update course notification settings
   course_notification_settings_updated_f6726d7e: Course notification settings updated
-  enable_notifications_10a4bf44: Enable Notifications
-  you_are_currently_receiving_notifications_for_this_9646b09d: You are currently receiving notifications for this course. To disable course notifications, use the toggle above.
-  you_will_not_receive_any_course_notifications_at_t_7d9ce24f: You will not receive any course notifications at this time. To enable course notifications, use the toggle above.
-  granular_course_notification_settings_will_be_conf_68f122db: Granular course notification settings will be configurable here in the future.
   course_notification_settings_initial_query_error_6dfb24ef: Course Notification Settings initial query error
   course_notification_settings_error_page_c0512c17: Course Notification Settings Error Page
   complete_registration_by_clicking_the_finish_the_r_fcd13ac8: Complete registration by clicking the “finish the registration process” link sent to your email.
@@ -16363,6 +16410,7 @@ en:
   assignments_index_menu_4088a035: Assignments Index Menu
   assignments_group_menu_c2522316: Assignments Group Menu
   collaboration_71c024f4: Collaboration
+  conference_selection_ea4050bb: Conference Selection
   course_assignments_menu_fa6aeb23: Course Assignments Menu
   course_home_sub_navigation_b1ee6b03: Course Home Sub Navigation
   course_navigation_dd035109: Course Navigation
@@ -16442,6 +16490,9 @@ en:
   change_name_to_568374c8: Change "%{name}" to
   change_name_c8cce76c: Change Name
   replace_e61834a7: Replace
+  skip_bcb86160: Skip
+  drop_files_here_to_upload_ce0f50f9: Drop files here to upload
+  or_choose_files_b795006d: or choose files
   show_and_hide_courses_menu_9e09d1d0: Show and hide courses menu
   folder_browsing_tree_1f00a3ae: Folder Browsing Tree
   file_list_350d08df: File List
@@ -16459,9 +16510,7 @@ en:
   unpublish_9f2d730b: Unpublish
   only_available_to_students_with_link_107e2468: Only available to students with link
   schedule_student_availability_332154a: Schedule student availability
-  available_from_587ce92f: Available From
   available_from_date_43b5e11d: Available From Date
-  available_until_f3b9c4ed: Available Until
   your_search_encountered_the_following_errors_fc3e5e7f:
     one: 'Your search encountered the following error:'
     other: 'Your search encountered the following errors:'
@@ -16596,7 +16645,6 @@ en:
   re_upload_submissions_125e415d: Re-Upload Submissions
   grade_posting_policy_42c8a94b: Grade Posting Policy
   weight_of_grade_dff535d9: "%{weight} of grade"
-  notes_c42e0fd5: Notes
   order_301c3ac1: Order
   a_z_243c3301: A–Z
   z_a_be2ab67c: Z–A
@@ -16644,7 +16692,6 @@ en:
   individual_view_d60b9132: Individual View…
   gradebook_history_b03f8524: Gradebook History…
   learning_mastery_6ed4fd63: Learning Mastery…
-  learning_mastery_5fc34276: Learning Mastery
   an_error_occurred_while_saving_your_settings_b503a31c: An error occurred while saving your settings
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: An error occurred while saving the course post policy
   gradebook_settings_updated_fef63d60: Gradebook Settings updated
@@ -17006,7 +17053,7 @@ en:
   we_know_getting_your_courses_online_quickly_during_40424e8: 'We know getting your courses online quickly during this time is priority. This quick tour will show you how to:'
   set_up_your_notifications_9c005279: Set up your Notifications
   get_your_content_online_9546ecff: Get your Content online
-  access_canvas_resources_and_guides_c179db68: Access Canvas Resources and Guides
+  learn_more_about_video_conferencing_5f0e76e4: Learn more about Video Conferencing
   set_up_your_notifications_568ecf91: Set Up Your Notifications
   click_on_the_account_navigation_button_to_access_n_fbe82181: Click on the account navigation button to access notification preferences.
   don_t_miss_notifications_from_your_students_900e9e30: Don't miss notifications from your students.
@@ -17015,7 +17062,7 @@ en:
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: Click on the courses navigation button to access your courses.
   set_up_your_canvas_course_in_30_minutes_or_less_94817b6d: Set up your Canvas course in 30 minutes or less.
   canvas_course_tutorial_video_5205c1c1: Canvas Course Tutorial Video
-  visit_the_help_section_any_time_for_new_tips_and_g_4dcf2a28: Visit the Help section any time for new tips and guides.
+  more_video_conferencing_tools_f55088d5: More Video Conferencing Tools
   logout_a9312e35: Logout
   disabled_not_visible_to_students_2c9d693f: Disabled. Not visible to students.
   no_content_not_visible_to_students_905f8996: No content. Not visible to students.
@@ -17039,11 +17086,6 @@ en:
   count_unread_cff5855: "%{count} unread."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.
   user_profile_picture_46bffbc7: User profile picture
-  waiting_for_your_qr_code_to_load_809299e5: Waiting for your QR Code to load
-  this_code_expires_in_timefromnow_ec7ccef4: This code expires in %{timeFromNow}.
-  this_code_has_expired_41f76642: This code has expired.
-  an_error_occurred_while_retrieving_your_qr_code_5392e2da: An error occurred while retrieving your QR Code
-  to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.
   end_course_set_up_tutorial_f358b85d: End Course Set-up Tutorial
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Options in your User Settings.
   expand_tutorial_tray_22630c49: Expand tutorial tray
@@ -17158,6 +17200,27 @@ en:
           Add files, discussions, assignments, quizzes, and other learning materials.
           Require prerequisites to be completed before moving to a module or next
           module item, or lock an entire module until a specific date.
+  new_analytics_f6147886: New Analytics
+  track_student_performance_and_activity_a92a2a8b: Track student performance and activity
+  how_do_i_send_a_message_to_all_students_based_on_s_59d186d1: How do I send a message to all students based on specific course criteria in New Analytics?
+  how_do_i_send_a_message_to_an_individual_student_i_92c7fb: How do I send a message to an individual student in New Analytics?
+  how_do_i_view_analytics_for_an_individual_student_724134ed: How do I view analytics for an individual student?
+  new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
+    New Analytics is an interactive tool that helps you and your students better
+        track performance and activity within the course. Learn which students have viewed
+        pages and resources and participated in assignments—and which students may need a
+        little more encouragement.
+  observe_student_mastery_a1f01a: Observe student mastery
+  how_do_i_use_the_outcomes_page_in_a_course_a37e0231: How do I use the outcomes page in a course?
+  how_do_i_create_an_outcome_for_a_course_cf0ea2b3: How do I create an outcome for a course?
+  how_do_i_create_outcome_groups_for_a_course_362429a0: How do I create outcome groups for a course?
+  how_do_i_import_outcomes_for_a_course_8eced1a: How do I import outcomes for a course?
+  how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: How do I use the Learning Mastery Gradebook to view outcome results in a course from the Gradebook?
+  set_up_outcomes_in_your_course_as_measured_by_peda_34237d17: |-
+    Set up outcomes in your course as measured by pedagogical goals or desired objectives.
+          Help students learn skills and activities, rather than just focusing on grades as a measure of their success.
+          Assess student progress through calculation methods, and measure progress directly in the Learning Mastery Gradebook.
+          Import existing account, state, and Common Core Standards outcomes to your course. You can also align outcomes in course rubrics.
   create_interactive_course_content_76665336: Create interactive course content
   how_do_i_create_a_new_page_in_a_course_37a87285: How do I create a new page in a course?
   how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: How do I publish or unpublish a page as an instructor?
@@ -17191,6 +17254,18 @@ en:
           of course material. The New Quizzes assessment engine allows you to create up to
           13 types of question types and content. If New Quizzes isn't enabled for your institution,
           Classic Quizzes are still available to help you achieve your objectives.
+  communicate_grading_expectations_484a1f01: Communicate grading expectations
+  how_do_i_add_a_rubric_in_a_course_a4c7a40: How do I add a rubric in a course?
+  how_do_i_manage_rubrics_in_a_course_a5441fb7: How do I manage rubrics in a course?
+  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: How do I align an outcome with a rubric in a course?
+  how_do_i_add_a_rubric_to_an_assignment_46fd097e: How do I add a rubric to an assignment?
+  rubrics_can_show_students_your_expectations_for_as_3382da64: |-
+    Rubrics can show students your expectations for assignment quality
+        and how they'll be scored accordingly. Rubrics can be associated with
+        assignments, discussions, and quizzes. Use a rubric solely for grading,
+        or create a non-scoring rubric specifically for assessment-based and
+        outcome-based grading without points. Outcomes can be added as criteria
+        items in rubrics.
   customize_course_details_26fd4afe: Customize course details
   how_do_i_use_course_settings_1e8467e6: How do I use course settings?
   how_do_i_set_details_for_a_course_52cfbeff: How do I set details for a course?
@@ -17210,6 +17285,21 @@ en:
           Syllabus. The Syllabus page can also display all assignments and events
           within the course.
   don_t_show_again_8c7b7297: Don't Show Again
+  enable_face_to_face_connection_9df19b76: Enable face-to-face connection
+  how_do_i_add_zoom_to_a_course_31300d74: How do I add Zoom to a course?
+  how_do_i_schedule_a_zoom_video_meeting_5986f068: How do I schedule a Zoom video meeting?
+  how_do_i_start_a_meeting_e8a9e67b: How do I start a meeting?
+  how_do_i_record_a_meeting_ae3a0d4e: How do I record a meeting?
+  how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: How do I know if students have joined the meeting?
+  how_do_i_mute_and_unmute_all_participants_a7a2115b: How do I mute and unmute all participants?
+  how_do_i_turn_my_camera_on_or_off_and_use_zoom_con_8a96538b: How do I turn my camera on or off and use Zoom controls?
+  how_do_i_share_my_screen_c280e585: How do I share my screen?
+  how_do_i_manage_and_share_the_recording_52fc2993: How do I manage and share the recording?
+  zoom_is_a_real_time_video_conferencing_tool_that_b_97dd23ec: |-
+    Zoom is a real-time video conferencing tool that brings
+        teachers and students together. You can schedule and run
+        video meetings directly within Canvas by adding a Zoom link
+        in a Canvas Course, Course Announcement, Module, or via Calendar.
   modules_tutorial_tray_d58ac3cb: Modules Tutorial Tray
   pages_tutorial_tray_169464a9: Pages Tutorial Tray
   syllabus_tutorial_tray_97e8ef82: Syllabus Tutorial Tray
@@ -17224,9 +17314,25 @@ en:
   collaborations_tutorial_tray_9219d9d: Collaborations Tutorial Tray
   import_tutorial_tray_8b92e956: Import Tutorial Tray
   conferences_tutorial_tray_6f071ce2: Conferences Tutorial Tray
+  outcomes_tutorial_tray_ebfce995: Outcomes Tutorial Tray
+  rubrics_tutorial_tray_be65d10d: Rubrics Tutorial Tray
+  zoom_tutorial_tray_5dcb7fc: Zoom Tutorial Tray
+  new_analytics_tutorial_tray_2511a34a: New Analytics Tutorial Tray
   home_tutorial_tray_66826983: Home Tutorial Tray
   woops_looks_like_nothing_is_here_ce69ad5: Woops... Looks like nothing is here!
   we_couldn_t_find_that_page_34068c1d: We couldn't find that page!
+  game_over_104baa: GAME OVER
+  press_space_to_start_over_d4b8a2da: Press 'space' to start over
+  contexttype_notification_settings_d72acd58: "%{contextType} Notification Settings"
+  enable_notifications_10a4bf44: Enable Notifications
+  you_are_currently_receiving_notifications_for_this_4f542bb2: You are currently receiving notifications for this %{contextType}. To disable %{contextType} notifications, use the toggle above.
+  you_will_not_receive_any_contexttype_notifications_da7a58f1: You will not receive any %{contextType} notifications at this time. To enable %{contextType} notifications, use the toggle above.
+  granular_contexttype_notification_settings_will_be_c5dfc901: Granular %{contextType} notification settings will be configurable here in the future.
+  course_activities_21c83bd3: Course Activities
+  scheduling_5a3327e7: Scheduling
+  alerts_6b871b71: Alerts
+  categoryname_notification_preferences_cd64e4a0: "%{categoryName} notification preferences"
+  pathtype_93f80de1: "%{pathType}"
   confirm_edit_outcome_a9746c99: Confirm Edit Outcome
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: This will update all rubrics using this outcome that have not yet been assessed
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: You’ve updated the scoring criteria; this will affect all students previously assessed using this outcome
@@ -17297,8 +17403,6 @@ en:
   partially_enabled_cd506819: Partially enabled
   partially_enabled_and_locked_9a39d38a: Partially enabled and Locked
   disabled_and_locked_d14dc6c2: Disabled and Locked
-  enable_and_lock_e6099cc2: Enable and Lock
-  disable_and_lock_7d0ef0e8: Disable and Lock
   use_default_890939b7: Use Default
   assigned_roles_ace6c950: Assigned Roles
   unassigned_roles_cb9e95ec: Unassigned Roles
@@ -17329,6 +17433,7 @@ en:
   expand_permission_c61d5958: Expand permission
   what_it_does_d4debc07: What it Does
   additional_considerations_3ee46e5b: Additional Considerations
+  create_delete_update_pages_be209769: Create / Delete / Update Pages
   account_settings_fe083453: Account Settings
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: Allows user to view and manage the Settings and Notifications tabs in Account Settings.
   authentication_1b518c38: Authentication
@@ -17469,6 +17574,9 @@ en:
   allows_user_to_edit_assignment_details_on_individu_3e50993a: 'Allows user to edit assignment details on individual discussions. Modules: Allows user to add new assignments to a module.'
   to_differentiate_assignments_to_individual_student_6cc40fde: To differentiate assignments to individual students, Users - view list ​must also be enabled.
   disabling_this_permission_will_override_if_enabled_6481b015: Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment. However, if Learning Outcomes - add / edit / delete is enabled, user can still add rubrics via Outcomes (Manage Rubrics button).
+  insights_b514ad8d: Insights
+  allows_user_to_view_canvas_insights_f4f7ba8b: Allows user to view Canvas Insights.
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: This permission is only supported when Canvas Insights is enabled for an account. Please contact your Customer Success Manager for details.
   allows_user_to_send_a_message_to_all_in_course_nam_29ffb3b1: Allows user to send a message to “All in [course name]”. Allows user to send a message to “All in [course group]”.
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: Allows user to send a message to “All in [course name],” or “All in [course group].”
   allows_user_to_send_messages_to_individual_course__9347e1e2: Allows user to send messages to individual course members.
@@ -17484,7 +17592,7 @@ en:
   allows_user_to_share_course_items_directly_with_ot_b5a68ecc: Allows user to share course items directly with other users. Allows user to copy individual course items to another course.
   attendance_ca433183: Attendance
   allows_user_to_access_the_attendance_tool_72ef0b68: Allows user to access the Attendance tool.
-  allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: 'Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox. '
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox.
   allows_user_to_access_the_chat_tool_48d5f5c4: Allows user to access the Chat tool.
   allows_user_to_view_previously_created_collaborati_bb4b86f1: Allows user to view previously created collaborations. Allows user to edit title, description, or remove collaborators on all collaborations.
   allows_user_to_import_resources_from_commons_into__6e9d32e6: Allows user to import resources from Commons into a course. Allows user to share assignments to Commons or edit previously shared content.
@@ -17501,6 +17609,7 @@ en:
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: To share a Discussion to Commons, Discussions - view must also be enabled.
   the_course_status_buttons_unpublished_and_publishe_e2dca595: The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.
   to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: To publish and unpublish module content, Courses - add / edit / delete and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.
+  allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: 'Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox. '
   to_publish_and_unpublish_module_content_courses_ad_ae996413: To publish and unpublish module content, Courses - add / edit / delete and Course Content - view must also be enabled.
   allows_user_to_view_published_and_unpublished_cour_25a5dcc0: Allows user to view published and unpublished course content.
   new_gradebook_297f7e2d: New Gradebook
@@ -17735,6 +17844,12 @@ en:
   pair_with_observer_b1541895: Pair with Observer
   generating_pairing_code_d480ccf4: Generating pairing code
   generating_pairing_code_251b7fc8: Generating pairing code...
+  qr_code_image_2b3a89b5: QR Code Image
+  waiting_for_your_qr_code_to_load_809299e5: Waiting for your QR Code to load
+  this_code_expires_in_timefromnow_ec7ccef4: This code expires in %{timeFromNow}.
+  this_code_has_expired_41f76642: This code has expired.
+  an_error_occurred_while_retrieving_your_qr_code_5392e2da: An error occurred while retrieving your QR Code
+  to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.
   learn_more_about_the_differences_a1217479: Learn more about the differences.
   new_quizzes_dbda7e0a: New Quizzes
   classic_quizzes_dee3c7b7: Classic Quizzes
@@ -17750,6 +17865,7 @@ en:
     Canvas now has two quiz engines. Please choose which
             you'd like to use.
   choose_a_quiz_engine_8820d521: Choose a Quiz Engine
+  remember_my_choice_for_this_course_5a3b7206: Remember my choice for this course
   student_extensions_d35a907: Student Extensions
   add_bank:
     default_name: No Name
@@ -18757,6 +18873,7 @@ en:
       update_question_without_regrading: Update question without regrading
   add_quiz_cebfa28b: Add Quiz
   quiz_settings_4e17f005: Quiz Settings
+  reset_quiz_engine_choice_323a40e6: Reset quiz engine choice
   view_question_banks_188a9e0f: View Question Banks
   making_a_copy_of_original_assignment_name_8f029a9b: Making a copy of "%{original_assignment_name}"
   oops_something_went_wrong_with_making_a_copy_of_or_22787360: Oops! Something went wrong with making a copy of "%{original_assignment_name}"

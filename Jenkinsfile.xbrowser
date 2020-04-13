@@ -73,7 +73,7 @@ pipeline {
     }
 
     cleanup {
-      sh 'rm -rf ./tmp/spec_failures'
+      sh 'rm -vrf ./tmp/spec_failures'
       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }

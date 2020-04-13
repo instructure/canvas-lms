@@ -17,55 +17,223 @@
  */
 
 import I18n from 'i18n!assignments_bulk_edit'
-import React, {useState} from 'react'
-// import {func, string} from 'prop-types'
-import tz from 'timezone'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import React from 'react'
+import {arrayOf, func} from 'prop-types'
 import {Table} from '@instructure/ui-table'
-import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Responsive} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {View} from '@instructure/ui-view'
+import {IconWarningLine} from '@instructure/ui-icons'
+import BulkDateInput from './BulkDateInput'
+import {AssignmentShape} from './BulkAssignmentShape'
 
-export default function BulkEditTable({assignments}) {
-  // Temporary so we can test the behavior of the new CanvasDateInput
-  const [selectedDate, setSelectedDate] = useState(tz.parse(assignments[0].due_at))
+const DATE_INPUT_META = {
+  due_at: {
+    label: I18n.t('Due At'),
+    fancyMidnight: true
+  },
+  unlock_at: {
+    label: I18n.t('Available From'),
+    fancyMidnight: false
+  },
+  lock_at: {
+    label: I18n.t('Available Until'),
+    fancyMidnight: true
+  }
+}
 
-  function renderDateInput(dateStr) {
-    const date = tz.parse(dateStr)
-    return tz.format(date, 'date.formats.medium_with_weekday')
+BulkEditTable.propTypes = {
+  assignments: arrayOf(AssignmentShape),
+
+  // ({
+  //   dateKey: one of null, "due_at", "lock_at", or "unlock_at"
+  //   newDate: iso8601 date string
+  //   assignmentId: assignment id string
+  //
+  //   overrideId: override id string, if this is an override.
+  //   - or -
+  //   base: true if this is the base assignment dates
+  // }) => {...}
+  updateAssignmentDate: func
+}
+
+export default function BulkEditTable({assignments, updateAssignmentDate}) {
+  const DATE_COLUMN_WIDTH_REMS = 14
+  const NOTE_COLUMN_WIDTH_REMS = 3
+
+  function renderDateInput(assignmentId, dateKey, dates, overrideId = null) {
+    const label = DATE_INPUT_META[dateKey].label
+    return (
+      <BulkDateInput
+        label={label}
+        selectedDateString={dates[dateKey]}
+        dateKey={dateKey}
+        assignmentId={assignmentId}
+        overrideId={overrideId}
+        updateAssignmentDate={updateAssignmentDate}
+        fancyMidnight={DATE_INPUT_META[dateKey].fancyMidnight}
+        interaction={dates.can_edit ? 'enabled' : 'disabled'}
+      />
+    )
   }
 
-  function renderTableRows() {
-    return assignments.map((assignment, index) => (
-      <Table.Row key={assignment.id}>
-        <Table.Cell>{assignment.name}</Table.Cell>
-        <Table.Cell>
-          {index === 0 ? (
-            <CanvasDateInput
-              selectedDate={selectedDate}
-              onSelectedDateChange={setSelectedDate}
-              renderLabel={<ScreenReaderContent>{I18n.t('Choose a due date')}</ScreenReaderContent>}
-              formatDate={date => tz.format(date, 'date.formats.medium_with_weekday')}
-            />
-          ) : (
-            renderDateInput(assignment.due_at)
-          )}
-        </Table.Cell>
-        <Table.Cell>{renderDateInput(assignment.unlock_at)}</Table.Cell>
-        <Table.Cell>{renderDateInput(assignment.lock_at)}</Table.Cell>
-      </Table.Row>
-    ))
+  function renderAssignmentTitle(assignment) {
+    return (
+      <Tooltip renderTip={assignment.name}>
+        <Text as="div" size="large">
+          <PresentationContent>
+            <div className="ellipsis">{assignment.name}</div>
+          </PresentationContent>
+          <ScreenReaderContent>
+            {`${assignment.name}: ${I18n.t('default dates')}`}
+          </ScreenReaderContent>
+        </Text>
+      </Tooltip>
+    )
   }
 
-  return (
-    <Table caption={I18n.t('Assignment Dates')}>
-      <Table.Head>
-        <Table.Row>
-          <Table.ColHeader id="title">{I18n.t('Title')}</Table.ColHeader>
-          <Table.ColHeader id="due">{I18n.t('Due At')}</Table.ColHeader>
-          <Table.ColHeader id="unlock">{I18n.t('Unlock At')}</Table.ColHeader>
-          <Table.ColHeader id="lock">{I18n.t('Lock At')}</Table.ColHeader>
+  function renderNoDefaultDates() {
+    // The goal here is to create a cell that spans multiple columns. You can't do that with InstUI
+    // yet, so we're going to fake it with a View that's as wide as the three date columns and
+    // depend on the cell overflow as being visible. I think that's pretty safe since that's the
+    // default overflow.
+    return (
+      <View as="div" minWidth={`${DATE_COLUMN_WIDTH_REMS * 3 + NOTE_COLUMN_WIDTH_REMS}rem`}>
+        <Text size="medium" fontStyle="italic">
+          {I18n.t('This assignment has no default dates.')}
+        </Text>
+      </View>
+    )
+  }
+
+  function renderNote(assignment, dateSet) {
+    if (!dateSet.can_edit) {
+      let explanation
+      if (dateSet.in_closed_grading_period) {
+        explanation = I18n.t('In closed grading period')
+      } else if (assignment.moderated_grading) {
+        explanation = I18n.t('Only the moderator can edit this assignment')
+      } else {
+        explanation = I18n.t('You do not have permission to edit this assignment')
+      }
+      return (
+        <Tooltip renderTip={explanation}>
+          <IconWarningLine color="warning" title={explanation} />
+        </Tooltip>
+      )
+    } else {
+      return null
+    }
+  }
+
+  function renderBaseRow(assignment) {
+    const baseDates = assignment.all_dates.find(dates => dates.base === true)
+    // It's a bit repetitive this way, but Table.Row borks if it has anything but Table.Cell children.
+    if (baseDates) {
+      return (
+        <Table.Row key={`assignment_${assignment.id}`}>
+          <Table.Cell>{renderAssignmentTitle(assignment)}</Table.Cell>
+          <Table.Cell>{renderDateInput(assignment.id, 'due_at', baseDates)}</Table.Cell>
+          <Table.Cell>{renderDateInput(assignment.id, 'unlock_at', baseDates)}</Table.Cell>
+          <Table.Cell>{renderDateInput(assignment.id, 'lock_at', baseDates)}</Table.Cell>
+          <Table.Cell>{renderNote(assignment, baseDates)}</Table.Cell>
         </Table.Row>
-      </Table.Head>
-      <Table.Body>{renderTableRows()}</Table.Body>
-    </Table>
-  )
+      )
+    } else {
+      // Need all Table.Cells or you get weird borders on this row
+      return (
+        <Table.Row key={`assignment_${assignment.id}`}>
+          <Table.Cell>{renderAssignmentTitle(assignment)}</Table.Cell>
+          <Table.Cell>{renderNoDefaultDates()}</Table.Cell>
+          <Table.Cell />
+          <Table.Cell />
+          <Table.Cell />
+        </Table.Row>
+      )
+    }
+  }
+
+  function renderOverrideRows(assignment) {
+    const overrides = assignment.all_dates.filter(dates => !dates.base)
+    return overrides.map(override => {
+      return (
+        <Table.Row key={`override_${override.id}`}>
+          <Table.Cell>
+            <View as="div" padding="0 0 0 xx-large">
+              <Tooltip renderTip={override.title}>
+                <Text as="div" size="medium">
+                  <PresentationContent>
+                    <div className="ellipsis">{override.title}</div>
+                  </PresentationContent>
+                  <ScreenReaderContent>
+                    {`${assignment.name}: ${override.title}`}
+                  </ScreenReaderContent>
+                </Text>
+              </Tooltip>
+            </View>
+          </Table.Cell>
+          <Table.Cell>{renderDateInput(assignment.id, 'due_at', override, override.id)}</Table.Cell>
+          <Table.Cell>
+            {renderDateInput(assignment.id, 'unlock_at', override, override.id)}
+          </Table.Cell>
+          <Table.Cell>
+            {renderDateInput(assignment.id, 'lock_at', override, override.id)}
+          </Table.Cell>
+          <Table.Cell>{renderNote(assignment, override)}</Table.Cell>
+        </Table.Row>
+      )
+    })
+  }
+
+  function renderAssignments() {
+    const rows = []
+    assignments.forEach(assignment => {
+      rows.push(renderBaseRow(assignment))
+      rows.push(...renderOverrideRows(assignment))
+    })
+    return rows
+  }
+
+  function renderTable(_props = {}, matches = []) {
+    const widthProp = `${DATE_COLUMN_WIDTH_REMS}rem`
+    const noteWidthProp = `${NOTE_COLUMN_WIDTH_REMS}rem`
+    const layoutProp = matches.includes('small') ? 'stacked' : 'fixed'
+    return (
+      <Table caption={I18n.t('Assignment Dates')} hover layout={layoutProp}>
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="title">{I18n.t('Title')}</Table.ColHeader>
+            <Table.ColHeader width={widthProp} id="due">
+              {DATE_INPUT_META.due_at.label}
+            </Table.ColHeader>
+            <Table.ColHeader width={widthProp} id="unlock">
+              {DATE_INPUT_META.unlock_at.label}
+            </Table.ColHeader>
+            <Table.ColHeader width={widthProp} id="lock">
+              {DATE_INPUT_META.lock_at.label}
+            </Table.ColHeader>
+            <Table.ColHeader id="note" width={noteWidthProp}>
+              <ScreenReaderContent>{I18n.t('Notes')}</ScreenReaderContent>
+            </Table.ColHeader>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>{renderAssignments()}</Table.Body>
+      </Table>
+    )
+  }
+
+  // For test environments that don't have matchMedia
+  if (window.matchMedia) {
+    return (
+      <Responsive
+        match="media"
+        query={{small: {maxWidth: `${5 * DATE_COLUMN_WIDTH_REMS + NOTE_COLUMN_WIDTH_REMS}rem`}}}
+        render={renderTable}
+      />
+    )
+  } else {
+    return renderTable()
+  }
 }

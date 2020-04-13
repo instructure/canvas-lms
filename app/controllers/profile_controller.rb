@@ -138,7 +138,7 @@
 #
 class ProfileController < ApplicationController
   before_action :require_registered_user, :except => [:show, :settings, :communication, :communication_update]
-  before_action :require_user, :only => [:settings, :communication, :communication_update]
+  before_action :require_user, :only => [:settings, :communication, :communication_update, :qr_mobile_login]
   before_action :require_user_for_private_profile, :only => :show
   before_action :reject_student_view_student
   before_action :require_password_session, :only => [:communication, :communication_update, :update]
@@ -489,5 +489,20 @@ class ProfileController < ApplicationController
       COMMON_CARTRIDGE_VIEWER_URL: ccv_settings['base_url']
     })
     render :content_shares
+  end
+
+  def qr_mobile_login
+    raise not_found unless @domain_root_account&.feature_enabled?(:mobile_qr_login)
+
+    @user ||= @current_user
+    set_active_tab 'qr_mobile_login'
+    @context = @user.profile if @user == @current_user
+
+    add_crumb(@user.short_name, profile_path)
+    add_crumb(t('crumbs.mobile_qr_login', "QR for Mobile Login"))
+
+    js_bundle :qr_mobile_login
+
+    render html: '', layout: true
   end
 end

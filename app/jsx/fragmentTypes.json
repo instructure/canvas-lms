@@ -45,6 +45,9 @@
             "name": "AssignmentOverride"
           },
           {
+            "name": "CommunicationChannel"
+          },
+          {
             "name": "Course"
           },
           {
@@ -85,6 +88,15 @@
           },
           {
             "name": "ModuleItem"
+          },
+          {
+            "name": "Notification"
+          },
+          {
+            "name": "NotificationPolicy"
+          },
+          {
+            "name": "NotificationPreferences"
           },
           {
             "name": "Outcome"
@@ -210,6 +222,9 @@
             "name": "AssignmentOverride"
           },
           {
+            "name": "CommunicationChannel"
+          },
+          {
             "name": "Course"
           },
           {
@@ -238,6 +253,12 @@
           },
           {
             "name": "ModuleItem"
+          },
+          {
+            "name": "Notification"
+          },
+          {
+            "name": "NotificationPolicy"
           },
           {
             "name": "Page"
@@ -315,6 +336,9 @@
             "name": "AssignmentOverride"
           },
           {
+            "name": "CommunicationChannel"
+          },
+          {
             "name": "Course"
           },
           {
@@ -349,6 +373,15 @@
           },
           {
             "name": "ModuleItem"
+          },
+          {
+            "name": "Notification"
+          },
+          {
+            "name": "NotificationPolicy"
+          },
+          {
+            "name": "NotificationPreferences"
           },
           {
             "name": "Page"

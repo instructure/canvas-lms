@@ -21,10 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe GradebooksHelper do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   before do
     FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible, :anonymous_grading) do
       def anonymous_grading?

@@ -44,5 +44,10 @@ describe('contentInsertionUtils', () => {
       const output = contentInsertionUtils.cleanUrl(url)
       assert.equal(output, url)
     })
+
+    it('doesnt blow up with a missing url', () => {
+      const output = contentInsertionUtils.cleanUrl(undefined)
+      assert.equal(output, undefined)
+    })
   })
 })

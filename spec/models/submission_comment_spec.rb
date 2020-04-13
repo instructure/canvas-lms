@@ -20,8 +20,6 @@ require_relative '../spec_helper'
 
 RSpec.describe SubmissionComment do
   before(:once) do
-    PostPolicy.enable_feature!
-
     course_with_teacher(active_all: true)
     course_with_observer(active_all: true)
     student_in_course(active_all: true)

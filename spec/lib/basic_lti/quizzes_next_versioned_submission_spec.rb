@@ -330,10 +330,6 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     end
 
     describe "submission posting" do
-      before(:each) do
-        PostPolicy.enable_feature!
-      end
-
       it "posts the submission when the assignment is automatically posted" do
         subject.commit_history('url', '77', -1)
         expect(submission.reload).to be_posted
