@@ -739,6 +739,22 @@ describe UserLearningObjectScopes do
         end
       end
 
+      it "should work when submissions course ids are populated" do
+        Setting.set('course_id_populated_on_submissions', 'true')
+        expect(@teacher.course_id_populated_on_submissions?).to eq true
+        [Shard.default, @shard1, @shard2].each do |shard|
+          shard.activate do
+            expect(@teacher.assignments_needing_grading.sort_by(&:id)).to eq(
+              [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+            )
+            Setting.set('assignments_needing_grading_b', 'false')
+            expect(@teacher.assignments_needing_grading.sort_by(&:id)).to eq(
+              [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+            )
+          end
+        end
+      end
+
       it "should honor ignores for a separate shard" do
         @teacher.ignore_item!(@assignment3, 'grading')
         expect(@teacher.assignments_needing_grading.sort_by(&:id)).to eq(
