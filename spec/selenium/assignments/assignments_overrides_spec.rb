@@ -23,7 +23,6 @@ describe "assignment groups" do
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
-
     let(:due_at) { Time.zone.now }
     let(:unlock_at) { Time.zone.now - 1.day }
     let(:lock_at) { Time.zone.now + 4.days }
@@ -87,7 +86,7 @@ describe "assignment groups" do
 
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(:name => "other section")
-      default_section_due = Time.zone.now + 1.days
+      default_section_due = Time.zone.now + 1.day
       other_section_due = Time.zone.now + 2.days
 
       assign = create_assignment!

@@ -81,6 +81,38 @@ module AssignmentsIndexPage
     ff("ul[role='menu'] li")
   end
 
+  def bulk_edit_dates_menu
+    fj("li:contains('Edit Assignment Dates')")
+  end
+
+  def bulk_edit_root
+    f('#bulkEditRoot')
+  end
+
+  def bulk_edit_tr_rows
+    ff('#bulkEditRoot tbody tr')
+  end
+
+  def bulk_edit_loading_spinner
+    fj("#bulkEditRoot:contains('Loading')")
+  end
+
+  def bulk_edit_assignment_row(assignment_name)
+    fj("tr:contains('#{assignment_name}')")
+  end
+
+  def assignment_dates_inputs(assignment_name)
+    ff("input", bulk_edit_assignment_row(assignment_name))
+  end
+
+  def bulk_edit_save_button
+    fj("button:contains('Save')", bulk_edit_root)
+  end
+
+  def saving_dates_button
+    fj("button:contains('Saving...')")
+  end
+
   #------------------------------ Actions --------------------------------
 
   def visit_assignments_index_page(course_id)
@@ -88,4 +120,15 @@ module AssignmentsIndexPage
     wait_for(method: nil, timeout: 1) { assignment_group_loading_spinner.displayed? == false}
   end
 
+  def goto_bulk_edit_view
+    course_assignments_settings_button.click
+    bulk_edit_dates_menu.click
+    wait_for(method: nil, timeout: 5) { bulk_edit_loading_spinner.displayed? == false}
+  end
+
+  def save_bulk_edited_dates
+    bulk_edit_save_button.click
+    run_jobs
+    wait_for(method: nil, timeout: 5) { saving_dates_button.displayed? == false}
+  end
 end
