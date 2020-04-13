@@ -28,7 +28,7 @@ export default function AlertMessageArea({messages, afterDismiss, liveRegion}) {
       {messages.map(message => (
         <Alert
           key={message.id}
-          variant={message.variant || 'info'}
+          variant={message.variant || message.type || 'info'}
           timeout={10000}
           liveRegion={liveRegion}
           onDismiss={() => afterDismiss(message.id)}

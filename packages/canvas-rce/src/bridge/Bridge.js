@@ -170,6 +170,15 @@ export default class Bridge {
     }
   }
 
+  showError(err) {
+    if (this.focusedEditor) {
+      this.focusedEditor.addAlert({
+        text: err.toString(),
+        type: 'error'
+      })
+    }
+  }
+
   embedImage = image => {
     if (this.existingContentToLink() && !this.existingContentToLinkIsImg()) {
       this.insertLink({
