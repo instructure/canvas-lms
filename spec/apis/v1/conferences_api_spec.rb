@@ -121,6 +121,11 @@ describe "Conferences API", type: :request do
         group
       end
 
+      it "returns an empty array if conferences are not configured" do
+        @plugin.update_attribute(:disabled, true)
+        expect(conference_json_ids).to be_empty
+      end
+
       describe "course conferences" do
         let(:conference) { course.web_conferences.create!(conference_type: "Wimba", user: teacher) }
 
