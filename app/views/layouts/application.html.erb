@@ -18,6 +18,7 @@
 <%-
   css_bundle(:instructure_eportfolio) if @eportfolio_view === true
   css_bundle(:new_user_tutorials) if tutorials_enabled?
+  css_bundle(:k6_theme) if @context.try(:feature_enabled?, :canvas_k6_theme)
   js_bundle(:navigation_header) unless @headers == false
 
   load_blueprint_courses_ui
