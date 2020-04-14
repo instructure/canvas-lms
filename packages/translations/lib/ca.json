@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "Afegeix"
     },
+    "add_another_f4e50d57": {
+        "message": "Afegeix-ne un altre"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "Afegeix CC/subtítols"
     },
@@ -113,6 +116,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Reproductor de so per a { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Existeix contingut desat automàticament. Voleu carregar el contingut desat automàticament al seu lloc?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Obre automàticament una visualització prèvia en línia. (La visualització prèvia només es mostra després de desar)"
     },
@@ -143,14 +149,23 @@
     "clear_selected_file_82388e50": {
         "message": "Esborra el fitxer seleccionat"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Esborra el fitxer seleccionat: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Feu clic a qualsevol pàgina per inserir un enllaç a la pàgina en qüestió."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Feu clic per integrar { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Feu clic per amagar la visualització prèvia"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Feu clic per inserir un enllaç en l''editor."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Feu clic per mostrar la visualització prèvia"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Tanca un menú o un quadre de diàleg També us torna a l''àrea d''editor"
@@ -299,6 +314,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Mostra l''enllaç al text (s''obre en una pestanya nova)"
     },
+    "document_678cd7bf": {
+        "message": "Document"
+    },
     "documents_81393201": {
         "message": "Documents"
     },
@@ -364,6 +382,12 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Integra el codi del vídeo"
+    },
+    "embedded_content_aaeb4d3d": {
+        "message": "contingut incrustat"
+    },
+    "equation_1c5ac93c": {
+        "message": "Equació"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "S''ha produït un error en carregar les qualificacions"
@@ -434,6 +458,9 @@
     "formatting_5b143aa8": {
         "message": "S''està formatant"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "S''ha trobat contingut desat automàticament"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "S''han trobat { count, plural,\n     =0 {# resultats}\n    one {# resultat}\n  other {# resultats}\n}"
     },
@@ -479,6 +506,9 @@
     "height_69b03e15": {
         "message": "Altura"
     },
+    "image_8ad06": {
+        "message": "Imatge"
+    },
     "image_options_5412d02c": {
         "message": "Opcions d''imatge"
     },
@@ -490,6 +520,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Augmenta la sagnia"
+    },
+    "insert_593145ef": {
+        "message": "Insereix"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Insereix enllaços a Equella"
@@ -647,6 +680,12 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "No hi ha cap data de venciment assignada"
     },
+    "no_e16d9132": {
+        "message": "No"
+    },
+    "no_file_chosen_9a880793": {
+        "message": "No s''ha triat cap fitxer"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Sense qualificació"
     },
@@ -749,6 +788,9 @@
     "preformatted_d0670862": {
         "message": "Amb format previ"
     },
+    "preview_53003fd2": {
+        "message": "Visualització prèvia"
+    },
     "preview_a3f8f854": {
         "message": "VISUALITZACIÓ PRÈVIA"
     },
@@ -790,6 +832,9 @@
     },
     "replies_4a8577c8": {
         "message": "Respostes"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Voleu restaurar el contingut desat automàticament?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de contingut enriquit"
@@ -901,6 +946,9 @@
     },
     "superscript_8cb349a2": {
         "message": "Superíndex"
+    },
+    "supported_file_types_srt_or_webvtt_7d827ed": {
+        "message": "Tipus de fitxer admesos: SRT o WebVTT"
     },
     "switch_to_raw_html_editor_4c9ac7de": {
         "message": "Canvia a un editor de dades HTML sense processar"
@@ -1072,6 +1120,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Pàgina d''inici de Wiki"
+    },
+    "yes_dde87d5": {
+        "message": "Sí"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Ahir a les { date }"
