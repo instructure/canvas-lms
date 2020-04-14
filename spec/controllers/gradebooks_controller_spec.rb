@@ -1219,10 +1219,28 @@ describe GradebooksController do
         })
       end
 
+      def update_preferred_gradebook_version!(version)
+        @teacher.preferences[:gradebook_version] = version
+        @teacher.save!
+        user_session(@teacher)
+      end
+
       context "when the user has no preferred view" do
         it "renders 'gradebook' when no view is requested" do
           get "show", params: {course_id: @course.id}
           expect(response).to render_template("gradebooks/gradebook")
+        end
+
+        it "renders 'gradebook' when the user uses default view" do
+          update_preferred_gradebook_version!("2")
+          get "show", params: {course_id: @course.id}
+          expect(response).to render_template("gradebooks/gradebook")
+        end
+
+        it "renders 'individual' when the user uses individual view" do
+          update_preferred_gradebook_version!("individual")
+          get "show", params: {course_id: @course.id}
+          expect(response).to render_template("gradebooks/individual")
         end
 
         it "updates the user's preference when the requested view is 'gradebook'" do
@@ -1258,6 +1276,18 @@ describe GradebooksController do
           expect(response).to render_template("gradebooks/gradebook")
         end
 
+        it "renders 'gradebook' when the user uses default view" do
+          update_preferred_gradebook_version!("2")
+          get "show", params: {course_id: @course.id}
+          expect(response).to render_template("gradebooks/gradebook")
+        end
+
+        it "renders 'individual' when the user uses individual view" do
+          update_preferred_gradebook_version!("individual")
+          get "show", params: {course_id: @course.id}
+          expect(response).to render_template("gradebooks/individual")
+        end
+
         it "redirects to the gradebook when requesting the preferred view" do
           get "show", params: {course_id: @course.id, view: "gradebook"}
           expect(response).to redirect_to(action: "show")
@@ -1283,6 +1313,18 @@ describe GradebooksController do
         it "renders 'learning_mastery' when no view is requested" do
           get "show", params: {course_id: @course.id}
           expect(response).to render_template("gradebooks/learning_mastery")
+        end
+
+        it "renders 'learning_mastery' when the user uses default view" do
+          update_preferred_gradebook_version!("2")
+          get "show", params: {course_id: @course.id}
+          expect(response).to render_template("gradebooks/learning_mastery")
+        end
+
+        it "renders 'individual' when the user uses individual view" do
+          update_preferred_gradebook_version!("individual")
+          get "show", params: {course_id: @course.id}
+          expect(response).to render_template("gradebooks/individual")
         end
 
         it "redirects to the gradebook when requesting the preferred view" do
