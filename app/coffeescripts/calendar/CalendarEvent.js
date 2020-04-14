@@ -43,7 +43,8 @@ export default class CalendarEvent extends Backbone.Model {
       'location_name',
       'location_address',
       'duplicate',
-      'comments'
+      'comments',
+      'web_conference'
     )
     if (obj.use_section_dates && obj.child_event_data) {
       filtered.child_event_data = _.chain(obj.child_event_data)

@@ -17,6 +17,9 @@
 #
 
 class CalendarsController < ApplicationController
+  include Api::V1::Conferences
+  include CalendarConferencesHelper
+
   before_action :require_user
 
   def show
@@ -106,5 +109,10 @@ class CalendarsController < ApplicationController
     StringifyIds.recursively_stringify_ids(@contexts_json)
     content_for_head helpers.auto_discovery_link_tag(:atom, @feed_url + '.atom', {:title => t(:feed_title, "Course Calendar Atom Feed")})
     js_env(@hash) if @hash
+
+    if Account.site_admin.feature_enabled?(:calendar_conferences)
+      calendar_contexts = (@contexts + [@domain_root_account]).uniq
+      add_conference_types_to_js_env(calendar_contexts)
+    end
   end
 end

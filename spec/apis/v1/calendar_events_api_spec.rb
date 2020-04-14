@@ -1338,29 +1338,91 @@ describe CalendarEventsApiController, type: :request do
         expect(json['web_conference']['id']).to eq conference.id
       end
 
-      it "should create with web_conference_id" do
+      it "should create with existing web_conference" do
         json = api_call(:post, "/api/v1/calendar_events.json", {
           :controller => 'calendar_events_api', :action => 'create', :format => 'json'
         }, {
           :calendar_event => {
             :context_code => "course_#{@course.id}",
             :title => "API Test",
-            web_conference_id: conference.id
+            web_conference: { id: conference.id }
           }
         })
         expect(CalendarEvent.find(json['id']).web_conference_id).to eq conference.id
       end
 
-      it "should update with web_conference_id" do
+      it "should create with new web_conference" do
+        json = api_call(:post, "/api/v1/calendar_events.json", {
+          :controller => 'calendar_events_api', :action => 'create', :format => 'json'
+        }, {
+          :calendar_event => {
+            :context_code => "course_#{@course.id}",
+            :title => "API Test",
+            web_conference: { conference_type: 'BigBlueButton', title: 'My BBB Conference' }
+          }
+        })
+        expect(CalendarEvent.find(json['id']).web_conference).to have_attributes(conference_type: 'BigBlueButton', title: 'My BBB Conference')
+      end
+
+      it "should fail to create with invald web_conference" do
+        json = api_call(:post, "/api/v1/calendar_events.json", {
+          :controller => 'calendar_events_api', :action => 'create', :format => 'json'
+        }, {
+          :calendar_event => {
+            :context_code => "course_#{@course.id}",
+            :title => "API Test",
+            web_conference: { title: 'My BBB Conference' }
+          }
+        })
+        expect(json['errors']).to have_key('web_conference.conference_type')
+      end
+
+      it "should update with existing web_conference" do
         event = @course.calendar_events.create(title: 'to update', workflow_state: 'active')
         api_call(:put, "/api/v1/calendar_events/#{event.id}", {
           :controller => 'calendar_events_api', :action => 'update', :format => 'json', id: event.id
         }, {
           :calendar_event => {
-            web_conference_id: conference.id
+            web_conference: {id: conference.id}
           }
         })
         expect(event.reload.web_conference_id).to eq conference.id
+      end
+
+      it "should update with new web conference" do
+        event = @course.calendar_events.create(title: 'to update', workflow_state: 'active', web_conference: conference)
+        api_call(:put, "/api/v1/calendar_events/#{event.id}", {
+          :controller => 'calendar_events_api', :action => 'update', :format => 'json', id: event.id
+        }, {
+          :calendar_event => {
+            web_conference: { conference_type: 'BigBlueButton', title: 'My Other BBB Conference' }
+          }
+        })
+        expect(event.reload.web_conference).to have_attributes(conference_type: 'BigBlueButton', title: 'My Other BBB Conference')
+      end
+
+      it "should fail to update with invalid web_conference" do
+        event = @course.calendar_events.create(title: 'to update', workflow_state: 'active')
+        json = api_call(:put, "/api/v1/calendar_events/#{event.id}", {
+          :controller => 'calendar_events_api', :action => 'update', :format => 'json', id: event.id
+        }, {
+          :calendar_event => {
+            web_conference: { title: 'Bad' }
+          }
+        })
+        expect(json['errors']).to have_key('web_conference.conference_type')
+      end
+
+      it "should remove a web conference if empty argument provided" do
+        event = @course.calendar_events.create(title: 'to update', workflow_state: 'active', web_conference: conference)
+        api_call(:put, "/api/v1/calendar_events/#{event.id}", {
+          :controller => 'calendar_events_api', :action => 'update', :format => 'json', id: event.id
+        }, {
+          :calendar_event => {
+            web_conference: ''
+          }
+        })
+        expect(event.reload.web_conference).to be nil
       end
     end
   end

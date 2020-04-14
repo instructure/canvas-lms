@@ -41,7 +41,7 @@ class CalendarEvent < ActiveRecord::Base
 
   PERMITTED_ATTRIBUTES = [:title, :description, :start_at, :end_at, :location_name,
     :location_address, :time_zone_edited, :cancel_reason, :participants_per_appointment,
-    :remove_child_events, :all_day, :comments, :web_conference_id].freeze
+    :remove_child_events, :all_day, :comments].freeze
   def self.permitted_attributes
     PERMITTED_ATTRIBUTES
   end
@@ -51,7 +51,7 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :user
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
   has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
-  belongs_to :web_conference
+  belongs_to :web_conference, autosave: true
 
   validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
@@ -738,6 +738,7 @@ class CalendarEvent < ActiveRecord::Base
 
   def validate_conference_visibility
     return unless web_conference_id_changed?
+    return if web_conference_id.nil?
     unless user.blank? || web_conference.grants_right?(user, :read)
       errors.add(:web_conference_id, 'cannot add web conference without read access for user')
       return

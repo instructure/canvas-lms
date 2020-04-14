@@ -18,7 +18,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Modal from 'react-modal'
+import {Modal} from '@instructure/ui-modal'
 import IndexMenu from 'jsx/assignments/IndexMenu'
 import Actions from 'jsx/assignments/actions/IndexMenuActions'
 import createFakeStore from './createFakeStore'
@@ -117,7 +117,7 @@ testCase('renders a LTI tool modal', () => {
 testCase('Modal visibility agrees with state modalIsOpen', () => {
   const component1 = renderComponent(generateProps({}, {modalIsOpen: true}))
   const modal1 = TestUtils.findRenderedComponentWithType(component1, Modal)
-  equal(modal1.props.isOpen, true)
+  equal(modal1.props.open, true)
 
   const component2 = renderComponent(generateProps({}, {modalIsOpen: false}))
   equal(TestUtils.scryRenderedComponentsWithType(component2, Modal).length, 0)
@@ -129,7 +129,8 @@ testCase('Modal visibility agrees with state modalIsOpen', () => {
 
 testCase('renders no iframe when there is no selectedTool in state', () => {
   const component = renderComponent(generateProps({}, {selectedTool: null}))
-  const iframes = TestUtils.scryRenderedDOMComponentsWithTag(component, 'iframe')
+
+  const iframes = component.node.ownerDocument.body.querySelectorAll('iframe')
   equal(iframes.length, 0)
   component.closeModal()
   ReactDOM.unmountComponentAtNode(component.node.parentElement)
@@ -148,11 +149,7 @@ testCase('renders iframe when there is a selectedTool in state', () => {
       }
     )
   )
-
-  const modal = TestUtils.findRenderedComponentWithType(component, Modal)
-  const modalPortal = modal.portal
-
-  const iframes = TestUtils.scryRenderedDOMComponentsWithTag(modalPortal, 'iframe')
+  const iframes = component.node.ownerDocument.body.querySelectorAll('iframe')
   equal(iframes.length, 1)
   component.closeModal()
   ReactDOM.unmountComponentAtNode(component.node.parentElement)

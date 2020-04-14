@@ -265,6 +265,7 @@ require 'atom'
 #
 class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
+  include CalendarConferencesHelper
 
   before_action :require_user, :except => %w(public_feed index)
   before_action :get_calendar_context, :only => :create
@@ -468,6 +469,11 @@ class CalendarEventsApiController < ApplicationController
     if params_for_create[:description].present?
       params_for_create[:description] = process_incoming_html_content(params_for_create[:description])
     end
+    if Account.site_admin.feature_enabled?(:calendar_conferences)
+      web_conference = find_or_initialize_conference(@context, params_for_create[:web_conference])
+      return unless authorize_user_for_conference(@current_user, web_conference)
+      params_for_create[:web_conference] = web_conference
+    end
 
     @event = @context.calendar_events.build(params_for_create)
     @event.updating_user = @current_user
@@ -493,7 +499,6 @@ class CalendarEventsApiController < ApplicationController
 
       CalendarEvent.transaction do
         error = events.detect { |event| !event.save }
-
         if error
           render :json => error.errors, :status => :bad_request
           raise ActiveRecord::Rollback
@@ -502,7 +507,7 @@ class CalendarEventsApiController < ApplicationController
           render :json => event_json(
             original_event,
             @current_user,
-            session, { :duplicates => events }), :status => :created
+            session, { :duplicates => events, include: includes('web_conference') }), :status => :created
         end
       end
     end
@@ -515,7 +520,7 @@ class CalendarEventsApiController < ApplicationController
   def show
     get_event(true)
     if authorized_action(@event, @current_user, :read)
-      render :json => event_json(@event, @current_user, session, include: includes)
+      render :json => event_json(@event, @current_user, session, include: includes + [:web_conference])
     end
   end
 
@@ -651,8 +656,14 @@ class CalendarEventsApiController < ApplicationController
       if params_for_update[:description].present?
         params_for_update[:description] = process_incoming_html_content(params_for_update[:description])
       end
+      if Account.site_admin.feature_enabled?(:calendar_conferences)
+        web_conference = find_or_initialize_conference(@event.context, params_for_update[:web_conference])
+        return unless authorize_user_for_conference(@current_user, web_conference)
+        params_for_update[:web_conference] = web_conference
+      end
+
       if @event.update(params_for_update)
-        render :json => event_json(@event, @current_user, session)
+        render :json => event_json(@event, @current_user, session, include: includes('web_conference'))
       else
         render :json => @event.errors, :status => :bad_request
       end
@@ -1403,7 +1414,7 @@ class CalendarEventsApiController < ApplicationController
 
   def calendar_event_params
     params.require(:calendar_event).
-      permit(CalendarEvent.permitted_attributes + [:child_event_data => strong_anything])
+      permit(CalendarEvent.permitted_attributes + [:child_event_data => strong_anything, web_conference: strong_anything])
   end
 
   def check_for_past_signup(event)
@@ -1416,7 +1427,7 @@ class CalendarEventsApiController < ApplicationController
     true
   end
 
-  def includes
-    (Array(params[:include]) + DEFAULT_INCLUDES).uniq
+  def includes(keys = params[:include])
+    (Array(keys) + DEFAULT_INCLUDES).uniq
   end
 end
