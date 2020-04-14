@@ -40,6 +40,7 @@ def computeTestCount() {
   sh """
     docker run --volume \$WORKSPACE/.git:/usr/src/app/.git \
                --volume \$WORKSPACE/tmp:/usr/src/app/tmp \
+               --env FSC_IGNORE_FILES \
                \$PATCHSET_TAG \
         bundle exec flakey_spec_catcher --use-parent --dry-run-quiet > tmp/test_list
   """
@@ -129,6 +130,9 @@ pipeline {
     // if someone is trying to update more than these amount of tests, then just fail.
     // that will be at DISTRIBUTED_CUT_OFF / DISTRIBUTED_FACTOR nodes.
     DISTRIBUTED_CUT_OFF = '300'
+    // fsc errors when running specs from gems.
+    // until we figure out how to run them, we should ignore them
+    FSC_IGNORE_FILES = "gems/.*/spec/"
   }
 
   stages {
