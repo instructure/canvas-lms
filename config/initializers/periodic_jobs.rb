@@ -153,6 +153,10 @@ Rails.configuration.after_initialize do
     )
   end
 
+  Delayed::Periodic.cron 'Auditors::ActiveRecord::Partitioner', '0 0 * * *' do
+    with_each_shard_by_database(Auditors::ActiveRecord::Partitioner, :process)
+  end
+
   Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
     with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process)
   end
