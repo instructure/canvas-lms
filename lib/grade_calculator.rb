@@ -91,6 +91,9 @@ class GradeCalculator
     user_ids.sort.in_groups_of(100, false) do |user_ids_group|
       GradeCalculator.new(user_ids_group, course, opts).compute_and_save_scores
     end
+
+    # Touch the course to naively expire the cache
+    Course.where(id: course_id).not_recently_touched.update_all(updated_at: Time.now.utc)
   end
 
   def submissions
@@ -514,8 +517,6 @@ class GradeCalculator
     return if @current_updates.empty? && @final_updates.empty?
     return if joined_enrollment_ids.blank?
     return if @grading_period && @grading_period.deleted?
-
-    @course.touch
 
     save_scores_in_transaction
   end
