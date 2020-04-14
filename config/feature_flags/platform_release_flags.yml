@@ -32,3 +32,13 @@ process_multiple_content_items_modules_index:
     If enabled, Canvas will allow tools to return multiple content items
     in a single request at the course modules page
   applies_to: SiteAdmin
+site_admin_keys_only:
+  state: hidden
+  display_name: Only show site admin keys in the site admin UI
+  description: |-
+    If enabled, the site admin developer key UI will only show
+    site admin developer keys. Note that this only affects
+    Canvas instances where root accounts are on the same shard
+    as the site admin account. Behavior in other instances
+    already behaved in this way.
+  applies_to: SiteAdmin

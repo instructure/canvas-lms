@@ -41,6 +41,15 @@ describe DeveloperKey do
     )
   end
 
+  describe 'site_admin' do
+    subject { DeveloperKey.site_admin }
+
+    let!(:site_admin_key) { DeveloperKey.create! }
+    let!(:root_account_key) { DeveloperKey.create!(account: Account.default) }
+
+    it { is_expected.to match_array [site_admin_key] }
+  end
+
   describe 'default values for is_lti_key' do
     let(:public_jwk) do
       key_hash = Lti::RSAKeyPair.new.public_jwk.to_h

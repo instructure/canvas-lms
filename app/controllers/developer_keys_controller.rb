@@ -88,14 +88,21 @@ class DeveloperKeysController < ApplicationController
 
   def index_scope
     scope = if params[:inherited].present?
+      # Return site admin keys that have been made
+      # visible to inheriting accounts
       return DeveloperKey.none if @context.site_admin?
       Account.site_admin.shard.activate do
-        # site_admin keys have a nil account_id
-        DeveloperKey.visible.where(account_id: nil)
+        DeveloperKey.visible.site_admin
       end
     elsif @context.site_admin?
-      DeveloperKey
+      # Return all siteadmin keys
+      if Account.site_admin.feature_enabled?(:site_admin_keys_only)
+        DeveloperKey.site_admin
+      else
+        DeveloperKey
+      end
     else
+      # Only return keys that belong to the current account
       DeveloperKey.where(account_id: @context.id)
     end
     scope = scope.eager_load(:tool_configuration) unless params[:inherited]

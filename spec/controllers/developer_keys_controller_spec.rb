@@ -66,6 +66,17 @@ describe DeveloperKeysController do
           expect(expected_id).to eq(dk.global_id)
         end
 
+        it 'should not include non-siteadmin keys' do
+          Account.site_admin.enable_feature!(:site_admin_keys_only)
+
+          site_admin_key = DeveloperKey.create!
+          root_account_key = DeveloperKey.create!(account: Account.default)
+
+          get 'index', params: { account_id: Account.site_admin.id }, format: :json
+
+          expect(json_parse.map { |dk| dk['id'] }).to match_array [site_admin_key.global_id]
+        end
+
         it 'includes valid LTI scopes in js env' do
           get 'index', params: { account_id: Account.site_admin.id }
           expect(assigns[:js_env][:validLtiScopes]).to eq TokenScopes::LTI_SCOPES
