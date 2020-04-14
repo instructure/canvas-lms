@@ -568,6 +568,37 @@ describe ContextExternalTool do
     end
   end
 
+  describe "from_content_tag" do
+    subject { ContextExternalTool.from_content_tag(*arguments) }
+
+    let(:arguments) { [content_tag, tool.context] }
+    let(:tool) { external_tool_model }
+    let(:content_tag_opts) { { url: tool.url, content_type: 'ContextExternalTool' } }
+    let(:content_tag) { ContentTag.new(content_tag_opts) }
+
+    it { is_expected.to eq tool }
+
+    context 'when the tool is linked to the tag by id (hard association)' do
+      let(:content_tag_opts) { super().merge({ content_id: tool.id }) }
+
+      it { is_expected.to eq tool }
+    end
+
+    context 'when there are blank arguments' do
+      context 'when the content tag argument is blank' do
+        let(:arguments) { [nil, tool.context] }
+
+        it { is_expected.to eq nil }
+      end
+
+      context 'when the context argument is blank' do
+        let(:arguments) { [nil, tool.context] }
+
+        it { is_expected.to eq nil }
+      end
+    end
+  end
+
   describe "find_external_tool" do
     it "should match on the same domain" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')

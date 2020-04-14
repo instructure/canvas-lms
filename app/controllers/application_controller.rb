@@ -704,6 +704,19 @@ class ApplicationController < ActionController::Base
     true
   end
 
+  # Render a general error page with the given details.
+  # Arguments of this method must be translated
+  def render_error_with_details(title:, summary: nil, directions: nil)
+    render(
+      'shared/errors/error_with_details',
+      locals: {
+        title: title,
+        summary: summary,
+        directions: directions
+      }
+    )
+  end
+
   def render_unauthorized_action
     respond_to do |format|
       @show_left_side = false
@@ -1772,7 +1785,15 @@ class ApplicationController < ActionController::Base
           add_crumb(@resource_title)
           @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
           @prepend_template = 'assignments/lti_header' unless render_external_tool_full_width?
-          @lti_launch.params = lti_launch_params(adapter)
+          begin
+            @lti_launch.params = lti_launch_params(adapter)
+          rescue Lti::Ims::AdvantageErrors::InvalidLaunchError
+            return render_error_with_details(
+              title: t('LTI Launch Error'),
+              summary: t('There was an error launching to the configured tool.'),
+              directions: t('Please try re-establishing the connection to the tool by re-selecting the tool in the assignment or module item interface and saving.')
+            )
+          end
         else
           @lti_launch.params = adapter.generate_post_payload
         end
