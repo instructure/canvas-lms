@@ -574,6 +574,48 @@ describe AssignmentsController do
       expect(assigns[:can_direct_share]).to eq true
     end
 
+    context 'when the assignment is an external tool' do
+      subject { get 'show', params: {course_id: assignment.course.id, id: assignment.id} }
+
+      let(:assignment) { assignment_model }
+
+      before { user_session(assignment.course.teachers.first) }
+
+      context 'and a default line item was never created' do
+        let(:launch_url) { 'https://www.my-tool.com/login' }
+        let(:content_tag) do
+          ContentTag.create!(
+            context: assignment,
+            content_type: 'ContextExternalTool',
+            url: launch_url
+          )
+        end
+        let(:external_tool) do
+          tool = external_tool_model(
+            context: assignment.course,
+            opts: { url: launch_url }
+          )
+          tool.settings[:use_1_3] = true
+          tool.save!
+          tool
+        end
+
+        before do
+          # For this context, the assignment and tag must
+          # be created before the tool
+          assignment.update!(
+            external_tool_tag: content_tag,
+            submission_types: 'external_tool'
+          )
+          external_tool
+        end
+
+        it 'renders a helpful error to the user' do
+          expect(subject).to render_template 'shared/errors/error_with_details'
+        end
+      end
+    end
+
     context 'when the assignment uses the plagiarism platform' do
       include_context 'lti2_spec_helper'
 
