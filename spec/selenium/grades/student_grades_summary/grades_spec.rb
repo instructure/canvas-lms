@@ -354,7 +354,7 @@ describe "grades" do
         @first_assignment.grade_student(@s, grade: 4, grader: @teacher)
       end
 
-      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
+      ScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       StudentGradesPage.visit_as_student(@course)
       f('.toggle_score_details_link').click

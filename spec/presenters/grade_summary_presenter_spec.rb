@@ -185,7 +185,7 @@ describe GradeSummaryPresenter do
       a.grade_student s4, grade: 99, grader: @teacher
       s4.enrollments.each(&:destroy)
 
-      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
+      ScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
@@ -213,7 +213,7 @@ describe GradeSummaryPresenter do
         enrollment.save!
       end
 
-      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
+      ScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
@@ -231,7 +231,7 @@ describe GradeSummaryPresenter do
       a.grade_student s3, grade: 10, grader: @teacher
       a.grade_student s4, grade: nil, grader: @teacher
 
-      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
+      ScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
@@ -261,7 +261,7 @@ describe GradeSummaryPresenter do
         enrollment.save!
       end
 
-      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
+      ScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       expect(p.assignment_stats.values.first.count).to eq 3

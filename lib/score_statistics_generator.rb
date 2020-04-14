@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssignmentScoreStatisticsGenerator
+class ScoreStatisticsGenerator
   def self.update_score_statistics_in_singleton(course_id)
     # The delay below is in case lots of little grade calculator
     # updates come close together. Since we're a singleton, they won't
@@ -29,7 +29,7 @@ class AssignmentScoreStatisticsGenerator
     send_later_if_production_enqueue_args(
       :update_score_statistics,
       {
-        singleton: "AssignmentScoreStatisticsGenerator:#{course_id}",
+        singleton: "ScoreStatisticsGenerator:#{course_id}",
         run_at: rand(min..max).seconds.from_now,
         on_conflict: :loose
       },
@@ -38,9 +38,11 @@ class AssignmentScoreStatisticsGenerator
   end
 
   def self.update_score_statistics(course_id)
-    # performance note: There is an overlap between
-    # Submission.not_placeholder and the submission where clause.
-    #
+    self.update_assignment_score_statistics(course_id)
+    self.update_course_score_statistic(course_id)
+  end
+
+  def self.update_assignment_score_statistics(course_id)
     # note: because a score is needed for max/min/ave we are not filtering
     # by assignment_student_visibilities, if a stat is added that doesn't
     # require score then add a filter when the DA feature is on
@@ -110,4 +112,58 @@ SQL
       SQL
     end
   end
+
+  def self.update_course_score_statistic(course_id)
+    current_scores = []
+    enrollment_ids = []
+    Shackles.activate(:slave) do
+      StudentEnrollment.select(:id, :user_id).not_fake.where(course_id: course_id, workflow_state: [:active, :invited]).
+        find_in_batches { |batch| enrollment_ids.concat(batch) }
+      # The grade calculator ensures all enrollments for the same user have the same score, so we only need one
+      # enrollment_id for our later score query
+      enrollment_ids = enrollment_ids.uniq(&:user_id).map(&:id)
+
+      enrollment_ids.each_slice(1000) do |enrollment_slice|
+        current_scores.concat(Score.where(enrollment_id: enrollment_slice, course_score: true).pluck(:current_score).compact)
+      end
+    end
+
+    score_count = current_scores.length
+
+    if score_count.zero?
+      CourseScoreStatistic.where(course_id: course_id).delete_all
+      return
+    end
+
+    average = current_scores.map(&:to_d).sum / BigDecimal.new(score_count)
+
+    # This is a safeguard to avoid blowing up due to database storage which is set to be a decimal with a precision of 8
+    # and a scale of 2. And really, what are you even doing awarding 1,000,000% or over in a course?
+    return if average > 999_999.99.to_d || average < -999_999.99.to_d
+
+    connection = CourseScoreStatistic.connection
+    now = connection.quote(Time.now.utc)
+    values = [
+      connection.quote(course_id),
+      connection.quote(average&.round(2)),
+      connection.quote(score_count),
+      now,
+      now
+    ].join(",")
+
+    CourseScoreStatistic.connection.execute(<<~SQL)
+      INSERT INTO #{CourseScoreStatistic.quoted_table_name}
+        (course_id, average, score_count, created_at, updated_at)
+      VALUES (#{values})
+      ON CONFLICT (course_id)
+      DO UPDATE SET
+        average = excluded.average,
+        score_count = excluded.score_count,
+        updated_at = excluded.updated_at
+    SQL
+  end
 end
+
+# TODO: remove this a release after it hits prod. We're keeping there here now as the class in this file was renamed and
+# we don't want any pending Delayed Jobs to fail
+AssignmentScoreStatisticsGenerator = ScoreStatisticsGenerator

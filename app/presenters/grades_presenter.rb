@@ -38,17 +38,19 @@ class GradesPresenter
 
   def course_grade_summaries
     @course_grade_summaries ||= begin
-      teacher_enrollments.each_with_object({}) do |e, hash|
-        hash[e.course_id] = e.shard.activate do
-          Rails.cache.fetch(['computed_avg_grade_for', e.course].cache_key) do
-            student_enrollments = e.course.student_enrollments.not_fake.preload(:scores)
-            current_scores = student_enrollments.group_by(&:user_id).map do |_, enrollments|
-              enrollments.map(&:computed_current_score).compact.max
-            end.compact
-            score = (current_scores.sum.to_f * 100.0 / current_scores.length.to_f).round.to_f / 100.0 rescue nil
-            {:score => score, :students => current_scores.length }
-          end
-        end
+      summaries = {}
+      Shard.partition_by_shard(teacher_enrollments) do |sharded_enrollments|
+        # This should probably be rewritten to index by the courses' global_id, but that would require changes else
+        # where in the presenter as well.
+        summaries.merge!(
+          CourseScoreStatistic.where(course_id: sharded_enrollments.map(&:course_id)).index_by(&:course_id)
+        )
+      end
+      # The erb that uses this expects a value for all course ids in the hash. Since they aren't interesting enough to
+      # store, we'll make them the empty case default value for the hash. Since its only used in a read only capacity
+      # they can be all the exact same object.
+      summaries.each_with_object(Hash.new({ score: nil, students: 0 })) do |(key, value), memo|
+        memo[key] = value.grades_presenter_hash
       end
     end
   end
