@@ -70,6 +70,7 @@ class SubmissionCommentsApiController < ApplicationController
         user = api_find(@context.all_current_users, params[:user_id])
         submission = assignment.submissions.where(user_id: user).take
         return render json: {error: "Couldn't find Submission for user with API id #{params[:user_id]}"}, status: :bad_request unless submission
+        return render json: {}, status: 200 unless submission.posted?
         if submission.group_id
           submissions_by_user_id = Submission.where(user_id: submission.group.users.select(:id)).index_by(&:user_id)
         else
@@ -81,7 +82,7 @@ class SubmissionCommentsApiController < ApplicationController
           broadcast_annotation_notification(submission: submission, to_list: instructors, data: broadcast_data(author))
           # if the user is the author and it is not a group_assignment,
           # just send a notification to the instructors.
-          return render json: { status: 'queued' } if author == user
+          return render json: {}, status: 200 if author == user
         end
 
         # either the teacher made the annotation, and it should go to users and observers,
@@ -93,7 +94,7 @@ class SubmissionCommentsApiController < ApplicationController
           broadcast_annotation_notification(submission: sub, to_list: to_list, data: broadcast_data(author), teacher: false)
         end
 
-        render json: { status: 'queued' }
+        render json: {}, status: 200
       end
 
     end

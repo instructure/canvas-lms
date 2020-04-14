@@ -69,13 +69,14 @@ describe 'Submissions Comment API', type: :request do
       Notification.create!(name: 'Annotation Notification', category: "TestImmediately")
       student_in_course(active_all: true)
       site_admin_user(active_all: true)
+      @assignment = @course.assignments.create! name: "blah", submission_types: "online_upload"
+      @assignment.post_submissions
     end
 
-    let(:assignment) { @course.assignments.create! name: "blah", submission_types: "online_upload" }
     let(:teacher_notification) { BroadcastPolicy.notification_finder.by_name("Annotation Teacher Notification") }
     let(:notification) { BroadcastPolicy.notification_finder.by_name("Annotation Notification") }
 
-    def annotation_notification_call(author_id: @student.to_param, assignment_id: assignment.to_param)
+    def annotation_notification_call(author_id: @student.to_param, assignment_id: @assignment.to_param)
       raw_api_call(:post,
                    "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}/submissions/#{@student.to_param}/annotation_notification",
                    {controller: "submission_comments_api", action: "annotation_notification",
@@ -93,7 +94,6 @@ describe 'Submissions Comment API', type: :request do
       )
       annotation_notification_call(author_id: @student.to_param)
       expect(response.status).to eq 200
-      expect(JSON.parse(response.body)).to eq({"status"=>"queued"})
     end
 
     it 'sends notification to student for teacher annotation' do
@@ -105,7 +105,6 @@ describe 'Submissions Comment API', type: :request do
       )
       annotation_notification_call(author_id: @teacher.to_param)
       expect(response.status).to eq 200
-      expect(JSON.parse(response.body)).to eq({"status"=>"queued"})
     end
 
     it 'works for group submission annotation' do
@@ -117,6 +116,7 @@ describe 'Submissions Comment API', type: :request do
       g1.add_user(@student)
       assignment = @course.assignments.create!(grade_group_students_individually: false, group_category: all_groups, name: "group assignment")
       assignment.submit_homework(@student, body: 'hello')
+      assignment.post_submissions
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
         instance_of(Submission),
         "Annotation Notification",
@@ -126,7 +126,6 @@ describe 'Submissions Comment API', type: :request do
       @user = @admin
       annotation_notification_call(author_id: @teacher.to_param, assignment_id: assignment.to_param)
       expect(response.status).to eq 200
-      expect(JSON.parse(response.body)).to eq({"status"=>"queued"})
     end
 
     it 'does not send to other teachers for teacher annotation' do
@@ -142,7 +141,19 @@ describe 'Submissions Comment API', type: :request do
       @user = admin
       annotation_notification_call(author_id: teacher1.to_param)
       expect(response.status).to eq 200
-      expect(JSON.parse(response.body)).to eq({"status"=>"queued"})
+    end
+
+    it 'does not send unless submission is posted' do
+      assignment = @course.assignments.create!(name: "unposted assignment")
+      assignment.submit_homework(@student, body: 'hello')
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
+        instance_of(Submission),
+        "Annotation Teacher Notification",
+        teacher_notification,
+        any_args
+      ).never
+      annotation_notification_call(author_id: @teacher.to_param, assignment_id: assignment.to_param)
+      expect(response.status).to eq 200
     end
 
     it 'checks permission of caller' do
