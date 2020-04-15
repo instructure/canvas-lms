@@ -22,5 +22,22 @@ module Auditors::ActiveRecord
     self.partitioning_interval = :months
     self.partitioning_field = 'created_at'
     self.table_name = 'auditor_course_records'
+
+    class << self
+      include Auditors::ActiveRecord::Model
+
+      def ar_attributes_from_event_stream(record)
+        attrs_hash = record.attributes.except('id')
+        attrs_hash['request_id'] ||= "MISSING"
+        attrs_hash['uuid'] = record.id
+        attrs_hash['course_id'] = record.course.id
+        attrs_hash['account_id'] = record.course.account_id
+        attrs_hash['user_id'] = record.user.id
+        if record.sis_batch_id.present?
+          attrs_hash['sis_batch_id'] = record.sis_batch.id
+        end
+        attrs_hash
+      end
+    end
   end
 end

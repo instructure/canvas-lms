@@ -19,12 +19,14 @@
 class EventStream::Stream
   include EventStream::AttrConfig
 
-  attr_config :database, :default => nil
+  attr_config :database, :default => nil # only needed if backend_strategy is :cassandra
   attr_config :table, :type => String
   attr_config :id_column, :type => String, :default => 'id'
   attr_config :record_type, :default => EventStream::Record
-  attr_config :time_to_live, :type => Integer, :default => 1.year
-  attr_config :read_consistency_level, :default => nil
+  attr_config :time_to_live, :type => Integer, :default => 1.year # only honored for cassandra strategy
+  attr_config :read_consistency_level, :default => nil # only honored for cassandra strategy
+  attr_config :backend_strategy, default: :cassandra # one of [:cassandra, :active_record]
+  attr_config :active_record_type, default: nil # only needed if backend_strategy is :active_record
 
   attr_accessor :raise_on_error
 
@@ -45,8 +47,9 @@ class EventStream::Stream
     add_callback(:insert, callback)
   end
 
-  def insert(record)
-    execute(:insert, record)
+  def insert(record, options={})
+    backend = backend_for(options.fetch(:backend_strategy, backend_strategy))
+    backend.execute(:insert, record)
     record
   end
 
@@ -54,8 +57,9 @@ class EventStream::Stream
     add_callback(:update, callback)
   end
 
-  def update(record)
-    execute(:update, record)
+  def update(record, options={})
+    backend = backend_for(options.fetch(:backend_strategy, backend_strategy))
+    backend.execute(:update, record)
     record
   end
 
@@ -116,40 +120,26 @@ class EventStream::Stream
     "SELECT * FROM #{table} %CONSISTENCY% WHERE #{id_column} IN (?)"
   end
 
+  def run_callbacks(operation, *args)
+    callbacks_for(operation).each do |callback|
+      instance_exec(*args, &callback)
+    end
+  end
+
   private
+
+  def backend_for(strategy)
+    @backends ||= {}
+    @backends[strategy] ||= EventStream::Backend.for_strategy(self, strategy)
+  end
 
   def callbacks_for(operation)
     @callbacks ||= {}
     @callbacks[operation] ||= []
   end
 
-  class Unavailable < Exception; end
-
-  def execute(operation, record)
-    unless available?
-      run_callbacks(:error, operation, record, Unavailable.new)
-      return
-    end
-
-    ttl_seconds = self.ttl_seconds(record.created_at)
-    return if ttl_seconds < 0
-
-    database.batch do
-      database.send(:"#{operation}_record", table, {id_column => record.id}, operation_payload(operation, record), ttl_seconds)
-      run_callbacks(operation, record)
-    end
-  rescue Exception => exception
-    run_callbacks(:error, operation, record, exception)
-    raise if raise_on_error
-  end
-
   def add_callback(operation, callback)
     callbacks_for(operation) << callback
   end
 
-  def run_callbacks(operation, *args)
-    callbacks_for(operation).each do |callback|
-      instance_exec(*args, &callback)
-    end
-  end
 end

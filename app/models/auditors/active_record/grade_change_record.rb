@@ -22,5 +22,25 @@ module Auditors::ActiveRecord
     self.partitioning_interval = :months
     self.partitioning_field = 'created_at'
     self.table_name = 'auditor_grade_change_records'
+
+    class << self
+      include Auditors::ActiveRecord::Model
+
+      def ar_attributes_from_event_stream(record)
+        attrs_hash = record.attributes.except('id', 'version_number')
+        attrs_hash['request_id'] ||= "MISSING"
+        attrs_hash['uuid'] = record.id
+        attrs_hash['account_id'] = record.account.id
+        attrs_hash['root_account_id'] = record.root_account.id
+        attrs_hash['assignment_id'] = record.assignment.id
+        attrs_hash['context_id'] = record.context.id
+        attrs_hash['grader_id'] = record.grader&.id
+        attrs_hash['graded_anonymously'] ||= false
+        attrs_hash['student_id'] = record.student.id
+        attrs_hash['submission_id'] = record.submission.id
+        attrs_hash['submission_version_number'] = record.submission.version_number
+        attrs_hash
+      end
+    end
   end
 end
