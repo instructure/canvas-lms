@@ -1871,6 +1871,7 @@ sv-x-k12:
       Gör det möjligt för användaren att lägga till uppgiftsgrupper i en kurs.
       Gör det möjligt för användaren att aktivera och redigera viktning för uppgiftsgrupper i en kurs.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Låter användare lägga till händelser i Listvyöversikten via kryssrutan Lägg till i elevens att-göra-lista. "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Låter användare lägga till händelser i Listvyöversikten via kryssrutan Lägg till i elevens att-göra-lista."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Gör det möjligt för användaren att lägga till nya uppgifter till en modul."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Låter användare lägga till diskussioner som inte bedömts till Listvyöversikten via kryssrutan Lägg till i elevens att-göra-lista."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Låter användare lägga till sidor i Listvyöversikten via kryssrutan Lägg till i elevens att-göra-lista."
@@ -2044,6 +2045,7 @@ sv-x-k12:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Gör det möjligt för användaren att se och hantera underkonton i kontot."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Gör det möjligt för användaren att se och hantera villkoren för kontot."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Gör det möjligt för användaren att se och hantera flikarna Inställningar och Aviseringar i kontoinställningarna."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "Låter användare se Canvas Insights"
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Gör det möjligt för användaren att se knapparna Välj startsida och Checklista för kursinställningar på startsidan."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Gör att användare kan se kursanalyser via kursöversikten. Gör att användare kan se elevanalyser."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Gör det möjligt för användaren att se kurs- och elevanalyser från kursens startsida eller sidan Personer."
@@ -4289,6 +4291,7 @@ sv-x-k12:
   check_to_select_all_98e484f1: "Markera för att välja alla"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Markera för att hoppa över att lägga till en användare för %{loginid}"
   checked_883b93fd: kontrollerad
+  cheerful_panda_holding_a_map_17ba47ee: "Glad panda håller i en karta"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Underkurser måste tillhöra samma rotkonto som huvudkursen"
   child_s_username_dde3aa9: "Barnets användarnamn"
   chile_56_88238b47: "Chile (+56)"
@@ -7671,6 +7674,7 @@ sv-x-k12:
   enable_dashboard_images_for_courses_5af458b0: "Aktivera översiktsbilder för kurserna"
   enable_extra_filter_options_b52c23e6: "aktivera extra filteralternativ"
   enable_feature_title_987d8e9a: "Aktivera funktion: %{title}"
+  enable_fullstory_5c673a06: "Aktivera Fullstory"
   enable_gradebook_list_students_by_sortable_name: "Räkna upp elever efter deras sortering av namn i bedömningsöversikten. Standardinställning för sortering av namn är ”Efternamn, förnamn” och kan ändras i inställningarna."
   enable_gravatar_8a865b41: "Aktivera Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Aktivera i18n-funktioner i lärandemålexporter"
@@ -8313,10 +8317,12 @@ sv-x-k12:
       no_features_available: "Inga funktioner är för närvarande tillgängliga."
   feature_flags_52141c74: Funktionsflaggor
   feature_flags_enable_disable_32e8f1ab: "Funktionsflaggor - aktivera / avaktivera"
+  feature_headline_3f0daf4: "Rubrik för visning"
   feature_options_account_settings_294a39f8: "Funktionsalternativ (Kontoinställningar)"
   feature_options_enable_disable_7e748054: "Funktionsalternativ – aktivera/inaktivera"
   feature_options_view_a170e80c: "Funktionsalternativ – visa"
   feature_preview_5e1216a0: "Förhandsvisning av funktion"
+  featured_83f6041d: Visas
   featured_help_links_d805fe44: Hjälplänkar
   features: 
     allow_opt_out_of_inbox: "Tillåt användare att avregistrera sig från inkorgen"
@@ -9946,6 +9952,7 @@ sv-x-k12:
   include_course_settings_c4c08764: "Inkludera kursinställningar"
   include_deleted_enrollments_1c87684a: "Inkludera raderade registreringar"
   include_deleted_objects_3cced3b5: "Inkludera raderade objekt;"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "Inkludera FullStory-inspelning av användarsessionen"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Inkludera Integrations-ID:n i export av bedömningsböcker."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkludera resultat vid notifiering om omdömen.
@@ -9998,6 +10005,7 @@ sv-x-k12:
   insert_math_equation_57c6e767: "För in en matematisk ekvation"
   insert_row_below_25187f89: "Lägg till en rad under"
   insert_row_below_name_a5b3bd41: "Infoga rad nedan %{name}"
+  insights_b514ad8d: Insikter
   install_c54fad9b: Installera
   installed_7b284a91: Installerad
   institution_14179014: Institution
@@ -10563,6 +10571,7 @@ sv-x-k12:
   list_expanded_efec2d0: "Listan utökades."
   list_view_430aecce: Listvy
   lithuanian_5adcbe24: Litauiska
+  little_lost_try_here_first_9e24e575: "Lite vilsen? Prova här först!"
   live_event_subscription_webhooks_1dae83bb: "Webhooks för prenumerationer på livehändelser"
   live_event_tool_documentation_f6dcc3d7: "Dokumentation för livehändelseverktyg"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Prenumerationstjänsten för live evenemang har inte konfigurerats"
@@ -10877,6 +10886,7 @@ sv-x-k12:
   max_users_groups_per_appointment_867c505b: "Max användare/grupper per bokat möte"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maximalt antal bokade möten en deltagare kan delta i"
   maximum_number_of_communication_channels_reached_70c4d2f9: "Max. antal kommunikationskanaler har uppnåtts"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Kan ha en visad länk och en ny länk samtidigt)"
   media_af190855: Media
   media_comment_dialog_manager: 
     messages: 
@@ -12927,6 +12937,7 @@ sv-x-k12:
   negative_points_fda45730: "Negativa poäng"
   netherlands_31_63e4f1b9: "Nederländerna (+31)"
   never_df100b49: Aldrig
+  new_13daf639: Ny
   new_account_role_6e5c4964: "Ny kontoroll"
   new_analytics_api_access_7eec1ead: "API-åtkomst för New Analytics"
   new_annotations_66932016: "Nya annoteringar"
@@ -12940,6 +12951,7 @@ sv-x-k12:
   new_assignment_2a984756: "Ny uppgift"
   new_assignment_for_course_name_f71dd337: "Ny uppgift för %{course_name}"
   new_attempt_57eae3d9: "Nytt försök"
+  new_bd30f253: NY
   new_canvas_message_from_user_name_94cc720: "Nytt Canvas-meddelande från %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "Ny kommentar av %{author_name} för %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "Ny kommentar: %{discussion_topic} av %{user_name}"
@@ -13634,6 +13646,7 @@ sv-x-k12:
   other_ddacb37d: övriga
   other_incorrect_match_options_c1418af5: "Andra felaktiga matchningsalternativ:"
   other_options_d25f199c: "Andra alternativ"
+  other_resources_fee3ddda: "ANDRA RESURSER"
   out_of_formattedoutof_e08e90d5: "av %{formattedOutOf}"
   out_of_n_assignment_points_possible_3b026ea9: "av %{n_assignment.points_possible}"
   out_of_points_37a749d7: "(av %{points})"
@@ -18818,6 +18831,7 @@ sv-x-k12:
                 är klar.
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Motorn som behandlar importer av studentinformation har omstrukturerats så att den kan hantera stabiliteten med stora importer av studentinformation. Funktionaliteten i import av studentinformation har inte ändrats."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Fel-stackspåret, om det finns"
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Den befintliga länken flyttades längst upp i listan."
   the_field_field_is_required_56512820: "Fältet ”%{field}” är obligatoriskt"
   the_field_field_must_have_no_spaces_d1c2fc37: "Fältet ”%{field}” får inte innehålla några mellanslag"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Under menyn Filer delar du föreläsningsbilder, exempeldokument, studievägledning – allt som dina elever kommer att vilja ladda ner.  Att ladda upp och organisera dina filer är enkelt i Canvas.  Vi kommer att visa dig hur."
@@ -19109,6 +19123,7 @@ sv-x-k12:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Den här behörigheten påverkar inte funktionen för hantering av frågebanker på kursnivå i Quizzes. Hantera frågebankar är istället beroende av behörigheten Uppgifter och Quiz – lägg till/redigera/ta bort. Både den här behörigheten och Uppgifter och Quiz – lägg till/redigera/ta bort måste aktiveras för full hantering av kursfrågebanker."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Den här behörigheten påverkar inte funktionen för hantering av frågebanker på kursnivå i Quizzes. Hantera frågebankar är istället beroende av behörigheten Uppgifter och Quiz – lägg till/redigera/ta bort. Både den här behörigheten och Uppgifter och Quiz – lägg till/redigera/ta bort måste aktiveras för full hantering av kursfrågebanker."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Den här behörigheten är tillgänglig för alla Canvas-konton men används endast av institutioner som är kopplade till ett Canvas-katalogkonto. Behörigheten har för närvarande ingen klienteffekt, men våra ingenjörer rekommenderar att låta den vara aktiverad för admin. För andra roller kan behörigheten inaktiveras."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "Den här behörigheten stöds endast om Canvas Insights har aktiverats för ett konto. Kontakta din kundrepresentant för detaljerad information."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Den här behörigheten påverkar endast anslag. Globala anslag – lägg till/redigera/ta bort måste aktiveras för hantering av globala anslag."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Den här behörigheten reglerar endast tillägg av användare på kontonivå. För att lägga till användare till kurser måste även Användare – lägg till/ta bort elever från kurser eller Användare – lägg till/ta bort lärare, kursdesigners eller TA:er från kurser aktiveras."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -21052,6 +21067,7 @@ sv-x-k12:
   your_name_7665e1d8: "Ditt namn"
   your_outcomes_were_successfully_imported_c5de884: "Dina resultat importerades."
   your_password_has_been_changed_df0e72aa: "Ditt lösenord har ändrats."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Återställningsinstruktioner för ditt lösenord kommer att skickas till *%{email_address}*. Detta kan ta upp till 30 minuter. Se till att kontrollera din skräppostmapp."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Din profilbild kunde inte uppdateras. Du kan ha överskridit din uppladdningsgräns."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Ditt val av quizmotor har återställts!"
   your_score_a1fc2fcf: "Ditt resultat"

@@ -238,7 +238,7 @@ class GradebooksController < ApplicationController
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
 
-      if preferred_gradebook_view == "learning_mastery" && outcome_gradebook_enabled?
+      if preferred_gradebook_view == "learning_mastery" && outcome_gradebook_enabled? && !["srgb", "individual"].include?(gradebook_version)
         set_learning_mastery_env
         render "gradebooks/learning_mastery"
       else

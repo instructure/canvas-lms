@@ -1874,6 +1874,7 @@ da-x-k12:
       Gør det muligt for en bruger at tilføje opgavegrupper i et fag.
       Gør det muligt for en bruger at aktivere og redigere vægtning af opgavegruppe i et fag.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Lader brugeren tilføje begivenheder til Listevisning-oversigten via afkrydsningsfeltet Tilføj til elevens opgaveliste. "
+  allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Lader brugeren tilføje begivenheder til Listevisning-oversigten via afkrydsningsfeltet Tilføj til elevens opgaveliste."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Gør det muligt for en bruger at føje nye opgaver til et forløb."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Lader brugeren tilføje diskussioner uden vurdering til Listevisnings-oversigten via afkrydsningsfeltet Tilføj til elevens opgaveliste."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Lader brugeren tilføje sider til Listevisnings-oversigten via afkrydsningsfeltet Tilføj til elevens opgaveliste."
@@ -2047,6 +2048,7 @@ da-x-k12:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Gør det muligt for en bruger at få vist og administrere underkonto for kontoen."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Gør det muligt for en bruger at få vist og administrere skoleår for kontoen."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Gør det muligt for en bruger at få vist og administrere fanerne Indstillinger og Meddelelser i Kontoindstillinger."
+  allows_user_to_view_canvas_insights_f4f7ba8b: "Gør det muligt for en bruger at få vist Canvas Insights."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Gør det muligt for en bruger at få vist knapperne Vælg hjemmeside og Tjekliste til oprettelse af fag på hjemmesiden."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Gør det muligt for en bruger at få vist faganalyse via fagets oversigt. Gør det muligt for en bruger at få vist analyse af elever."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Gør det muligt for en bruger at få vist analyse af fag og elever fra startside eller siden Deltagere."
@@ -4292,6 +4294,7 @@ da-x-k12:
   check_to_select_all_98e484f1: "Marker for at vælge alle"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Afkryds for at springe tilføjelse af en bruger over til %{loginid}"
   checked_883b93fd: afkrydset
+  cheerful_panda_holding_a_map_17ba47ee: "Sød panda med et kort"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Underordnede fag skal tilhøre den samme rodkonto som hovedfag"
   child_s_username_dde3aa9: "Barnets brugernavn"
   chile_56_88238b47: "Chile (+56)"
@@ -7674,6 +7677,7 @@ da-x-k12:
   enable_dashboard_images_for_courses_5af458b0: "Aktivér oversigtsbilleder til fag"
   enable_extra_filter_options_b52c23e6: "aktiver ekstra filterindstillinger"
   enable_feature_title_987d8e9a: "Aktivér funktion: %{title}"
+  enable_fullstory_5c673a06: "Aktivér hel historie"
   enable_gradebook_list_students_by_sortable_name: "Brug elevernes sorterbare navne i vurderingsoversigten. Sorterbart navn er som standard 'Efternavn, Fornavn' og kan ændres i indstillinger."
   enable_gravatar_8a865b41: "Aktiver Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Aktivér i18n-funktioner i eksport af læringsudbytte"
@@ -8316,10 +8320,12 @@ da-x-k12:
       no_features_available: "Ingen funktioner tilgængelige på nuværende tidspunkt."
   feature_flags_52141c74: Funktionsflag
   feature_flags_enable_disable_32e8f1ab: "Funktionsflag - aktiver / deaktiver"
+  feature_headline_3f0daf4: "Fremhævelsens overskrift"
   feature_options_account_settings_294a39f8: "Funktionsindstillinger (kontoindstillinger)"
   feature_options_enable_disable_7e748054: "Funktionsindstillinger - aktivér/deaktivér"
   feature_options_view_a170e80c: "Funktionsindstillinger - vis"
   feature_preview_5e1216a0: "Forhåndsvisning af funktion"
+  featured_83f6041d: Fremhævet
   featured_help_links_d805fe44: "Fremhævede hjælpelinks"
   features: 
     allow_opt_out_of_inbox: "Tillad, at brugere melder sig fra indbakken"
@@ -9949,6 +9955,7 @@ da-x-k12:
   include_course_settings_c4c08764: "Inkluder fag-indstillinger"
   include_deleted_enrollments_1c87684a: "Inkluder slettede tilmeldinger"
   include_deleted_objects_3cced3b5: "Inkluder slettede objekter;"
+  include_fullstory_recording_of_the_user_s_session_656d131e: "Inkluder FullStory optagelse af brugerens session"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Inkluder integrations-ID'er i vurderingsoversigt-eksporten."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkluder resultater, når der gives besked om vurderinger.
@@ -10001,6 +10008,7 @@ da-x-k12:
   insert_math_equation_57c6e767: "Indsæt matematikregnestykke"
   insert_row_below_25187f89: "Indsæt række nedenfor"
   insert_row_below_name_a5b3bd41: "Indsæt række nedenfor %{name}"
+  insights_b514ad8d: Insights
   install_c54fad9b: Installer
   installed_7b284a91: Installeret
   institution_14179014: Institution
@@ -10566,6 +10574,7 @@ da-x-k12:
   list_expanded_efec2d0: "Liste udvidet."
   list_view_430aecce: Listevisning
   lithuanian_5adcbe24: Litauisk
+  little_lost_try_here_first_9e24e575: "Faret lidt vild? Prøv her først!"
   live_event_subscription_webhooks_1dae83bb: "Abonnementer til live-begivenhed-webhooks"
   live_event_tool_documentation_f6dcc3d7: "Dokumentation af live-begivenhed-værktøj"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Abonnementer til tjenesten for live-begivenheder er ikke konfigureret"
@@ -10880,6 +10889,7 @@ da-x-k12:
   max_users_groups_per_appointment_867c505b: "Maks. brugere/grupper pr. aftale"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maksimalt antal aftaler, som en deltager kan deltage i"
   maximum_number_of_communication_channels_reached_70c4d2f9: "Maksimalt antal nåede kommunikationskanaler"
+  may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Må have et Fremhævet og et Nyt link ad gangen)"
   media_af190855: Medier
   media_comment_dialog_manager: 
     messages: 
@@ -12963,6 +12973,7 @@ da-x-k12:
   negative_points_fda45730: "Negative point"
   netherlands_31_63e4f1b9: "Holland (+31)"
   never_df100b49: Aldrig
+  new_13daf639: Ny
   new_account_role_6e5c4964: "Ny kontorolle"
   new_analytics_api_access_7eec1ead: "Ny Analytics API-adgang"
   new_annotations_66932016: "Nye anmærkninger"
@@ -12976,6 +12987,7 @@ da-x-k12:
   new_assignment_2a984756: "Ny opgave"
   new_assignment_for_course_name_f71dd337: "Ny opgave til %{course_name}"
   new_attempt_57eae3d9: "Nyt forsøg"
+  new_bd30f253: NYT
   new_canvas_message_from_user_name_94cc720: "Ny Canvas-meddelelse fra %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "Ny kommentar fra %{author_name} til %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "Ny kommentar: %{discussion_topic} af %{user_name}"
@@ -13670,6 +13682,7 @@ da-x-k12:
   other_ddacb37d: andet
   other_incorrect_match_options_c1418af5: "Andre ukorrekte match-muligheder:"
   other_options_d25f199c: "Andre muligheder"
+  other_resources_fee3ddda: "ANDRE RESSOURCER"
   out_of_formattedoutof_e08e90d5: "ud af %{formattedOutOf}"
   out_of_n_assignment_points_possible_3b026ea9: "ud af %{n_assignment.points_possible}"
   out_of_points_37a749d7: "(ud af %{points})"
@@ -18860,6 +18873,7 @@ da-x-k12:
       Motoren, som behandler SIS-importerne, er blevet omstruktureret for bedre at kunne håndtere
       stabiliteten af store SIS-importer. SIS-importens funktionalitet er ikke blevet ændret.
   the_error_stack_trace_if_there_is_one_b7e008a1: "Fejlstakspor, hvis det findes"
+  the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Det fremhævede link blev flyttet til toppen af listen."
   the_field_field_is_required_56512820: "Feltet \"%{field}\" er påkrævet"
   the_field_field_must_have_no_spaces_d1c2fc37: "Feltet \"%{field}\" må ikke have mellemrum"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Fanen Filer er stedet til at dele forelæsninger, prøvedokumenter, studiehjælp -- alt som dine elever kunne få brug for at downloade. Med Canvas er det nemt at uploade og organisere dine filer. Vi viser dig hvordan."
@@ -19151,6 +19165,7 @@ da-x-k12:
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Denne tilladelse påvirker ikke evnen til at administrere spørgsmålsbanker på fagniveau i Quizzer. Administrér spørgsmålsbanker afhænger i stedet af tilladelsen Opgaver og quizzer - tilføj/redigér/slet. For at kunne administrere et fags spørgsmålsbanker fuldstændigt skal både denne tilladelse og Opgaver og quizzer - tilføj/redigér/slet være aktiveret."
   this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Denne tilladelse påvirker ikke muligheden for at administrere spørgsmålsbanker på fagniveau i quizzer. Administrér spørgsmålsbanker afhænger i stedet af tilladelsen Opgaver og quizzer - tilføj/redigér/slet. For at kunne administrere et fags spørgsmålsbanker fuldstændigt skal både denne tilladelse og Opgaver og quizzer - tilføj/redigér/slet være aktiveret."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Denne tilladelse er tilgængelig for alle Canvas-konti, men den bruges kun for institutioner, der er knyttet til en Canvas-katalogkonto. Tilladelsen har i øjeblikket ingen umiddelbare virkninger, men teknikken foreslå, at tilladelsen forbliver aktiveret for admins. Tilladelsen kan deaktiveres for andre roller."
+  this_permission_is_only_supported_when_canvas_insi_85cc2938: "Denne tilladelse understøttes kun, når Canvas Insights er aktiveret for en konto. Kontakt din kundesucceschef for yderligere detaljer."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Denne tilladelse påvirker kun fagbeskeder. For at administrere globale beskeder skal Globale beskeder - tilføj/redigér/slet være aktiveret."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Denne tilladelse styrer kun tilføjelse af brugere på kontoniveauet. For at tilføje brugere til et fag skal Brugere - tilføj/fjern elever til/fra fag eller Brugere - tilføj/fjern lærere, fagdesignere eller undervisningsassistenter til/fra faget også være aktiveret."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -21096,6 +21111,7 @@ da-x-k12:
   your_name_7665e1d8: "Dit navn"
   your_outcomes_were_successfully_imported_c5de884: "Dine læringsudbytter blev importeret."
   your_password_has_been_changed_df0e72aa: "Dit kodeord er blevet ændret."
+  your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Dine instruktioner til gendannelse af adgangskode sendes til *%{email_address}*. Dette kan tage op til 30 minutter. Sørg for at tjekke i din uønskede post."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Dit profilbillede kunne ikke uploades. Du har muligvis overskredet grænsen for upload."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Dit valg af quizprogram er nulstillet!"
   your_score_a1fc2fcf: "Dit resultat"
