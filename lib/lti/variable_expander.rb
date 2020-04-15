@@ -576,6 +576,15 @@ module Lti
                        -> { @context.sis_source_id },
                        COURSE_GUARD
 
+    # returns the current course integration id.
+    # @example
+    #   ```
+    #   1234
+    #   ```
+    register_expansion 'com.instructure.Course.integrationId', [],
+                       -> { @context.integration_id },
+                       COURSE_GUARD
+
     # returns the current course start date.
     # @example
     #   ```
