@@ -410,7 +410,7 @@ class Enrollment < ActiveRecord::Base
       enrollment = restore ? linked_enrollment_for(observer) : active_linked_enrollment_for(observer)
       if enrollment
         enrollment.update_from(self)
-      elsif restore || (self.saved_change_to_workflow_state? && self.workflow_state_before_last_save == 'inactive')
+      elsif restore || (self.saved_change_to_workflow_state? && ['inactive', 'deleted'].include?(self.workflow_state_before_last_save))
         create_linked_enrollment_for(observer)
       end
     end
