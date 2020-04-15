@@ -39,9 +39,21 @@ bundle exec ruby script/rlint
 bundle exec ruby script/eslint
 bundle exec ruby script/lint_commit_message
 
+plugins_list=\$(cat config/plugins_list)
+for gem in \$plugins_list
+do
+  echo \$gem
+  rm -r gems/plugins/\$gem
+done
+yarn install
+if ! git diff --exit-code yarn.lock; then
+  message="yarn.lock changes need to be checked in. Make sure you run 'yarn install' without private canvas-lms plugins installed."
+  gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
+fi
+
 git status
 gergich status
-if [[ "$GERGICH_PUBLISH" == "1" ]]; then
+if [[ "\$GERGICH_PUBLISH" == "1" ]]; then
   # we need to do this because it forces gergich to not use git (because no git repo is there).
   # and being that we rebased, the commit hash changes, so this will make it use the variables passed in
   export GERGICH_GIT_PATH=".."
