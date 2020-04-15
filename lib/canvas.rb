@@ -327,4 +327,8 @@ module Canvas
       @error_count = error_count
     end
   end
+
+  def self.cluster
+    nil
+  end
 end

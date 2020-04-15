@@ -2523,10 +2523,6 @@ class ApplicationController < ActionController::Base
     nil
   end
 
-  def self.cluster
-    nil
-  end
-
   def self.test_cluster_name
     nil
   end
