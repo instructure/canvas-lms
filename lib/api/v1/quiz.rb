@@ -47,6 +47,7 @@ module Api::V1::Quiz
       show_correct_answers_last_attempt
       shuffle_answers
       time_limit
+      disable_timer_autosubmission
       title
       unlock_at
     ) + [{'hide_results' => ArbitraryStrongishParams::ANYTHING}] # because sometimes this is a hash :/
