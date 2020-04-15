@@ -86,7 +86,8 @@ def _runRspecTestSuite(
       "EXCLUDE_TESTS=$exclude_regex",
       "CI_NODE_TOTAL=$total",
       "DOCKER_PROCESSES=$docker_processes",
-      "FORCE_FAILURE=$force_failure"
+      "FORCE_FAILURE=$force_failure",
+      "POSTGRES_PASSWORD=sekret",
   ]) {
     try {
       sh 'rm -rf ./tmp'

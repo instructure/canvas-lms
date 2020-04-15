@@ -25,6 +25,7 @@ pipeline {
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
     PACT_BROKER = credentials('PACT_BROKER')
+    POSTGRES_PASSWORD = 'sekret'
   }
 
   stages {

@@ -2,16 +2,16 @@
 
 set -x -o errexit -o errtrace -o nounset -o pipefail
 
-cat <<SQL | psql -v ON_ERROR_STOP=1 --username postgres
-  CREATE DATABASE canvas_test;
-  \connect canvas_test;
-  CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;
-  CREATE EXTENSION IF NOT EXISTS postgis SCHEMA public;
-  CREATE EXTENSION IF NOT EXISTS pg_collkey SCHEMA public;
-
-  CREATE DATABASE canvas;
-  \connect canvas;
+# setup extensions on template1 so future databases
+# all get the same extensions
+psql -v ON_ERROR_STOP=1 --username postgres -d template1 <<SQL
   CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;
   CREATE EXTENSION IF NOT EXISTS postgis SCHEMA public;
   CREATE EXTENSION IF NOT EXISTS pg_collkey SCHEMA public;
 SQL
+
+for environment in test development produciton; do
+  psql -v ON_ERROR_STOP=1 --username postgres <<SQL
+    CREATE DATABASE canvas_${environment};
+SQL
+done

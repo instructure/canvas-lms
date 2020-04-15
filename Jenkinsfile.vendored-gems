@@ -28,7 +28,10 @@ pipeline {
   options { ansiColor('xterm') }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
+    DISABLE_SPRING = 'true'
+    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins.vendored-gems.yml'
+
+    POSTGRES_PASSWORD = 'sekret'
   }
 
   stages {

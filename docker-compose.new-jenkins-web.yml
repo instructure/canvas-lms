@@ -2,7 +2,8 @@
 version: "2.1"
 services:
   web:
-    # use master if NAME is unavailable
     image: "${PATCHSET_TAG}"
     volumes:
       - ".git:/usr/src/app/.git"
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/${DATABASE_NAME}?encoding=utf8&timeout=5000&shard_name=public&schema_search_path=''&use_qualified_names=true&shard1=${DATABASE_NAME}_shard_1&shard2=${DATABASE_NAME}_shard_2&test_shard_1=${DATABASE_NAME}_shard_1&test_shard_2=${DATABASE_NAME}_shard_2

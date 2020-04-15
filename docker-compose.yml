@@ -7,6 +7,10 @@ services:
     links:
       - postgres
       - redis
+    environment:
+      # by default, app runs in production mode unless docker-compose.override.yml
+      # is also present, then DATABASE_URL is overwriten there.
+      DATABASE_URL: postgres://postgres:sekret@postgres/canvas_production
 
   jobs:
     <<: *WEB
@@ -14,6 +18,8 @@ services:
 
   postgres:
     build: ./docker-compose/postgres
+    environment:
+      POSTGRES_PASSWORD: sekret
 
   redis:
     image: redis:alpine

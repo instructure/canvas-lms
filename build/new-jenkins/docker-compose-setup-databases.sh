@@ -2,6 +2,8 @@
 
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
+export DATABASE_NAME=canvas_test0
+
 docker-compose exec -T web ./build/new-jenkins/wait-for-it cassandra:9160
 create_cmd=""
 for keyspace in auditors global_lookups page_views; do
