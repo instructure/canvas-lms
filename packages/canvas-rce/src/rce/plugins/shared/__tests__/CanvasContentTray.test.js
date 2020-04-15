@@ -23,7 +23,7 @@ import Bridge from '../../../../bridge/Bridge'
 import * as fakeSource from '../../../../sidebar/sources/fake'
 import CanvasContentTray from '../CanvasContentTray'
 
-jest.mock('../../../../../../../app/jsx/shared/rce/FileBrowser', () => {
+jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {
   return jest.fn(() => 'Files Browser')
 })
 
