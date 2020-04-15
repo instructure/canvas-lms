@@ -1128,6 +1128,12 @@ describe DiscussionTopic do
       expect(@student.stream_item_instances.count).to eq 0
     end
 
+    it "should not attempt to clear stream items if a discussion topic was not secton specific before last save" do
+      topic = @course.discussion_topics.create!(title: "Ben Loves Panda", user: @teacher)
+      expect(topic.stream_item).to receive(:stream_item_instances).never
+      topic.update!(title: "Lemon Loves Panda")
+    end
+
     it "should not send stream items to students if the topic isn't published" do
       topic = nil
       expect { topic = @course.discussion_topics.create!(:title => "secret topic", :user => @teacher, :workflow_state => 'unpublished') }.to change { @student.stream_item_instances.count }.by(0)
