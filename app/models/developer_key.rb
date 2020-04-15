@@ -24,6 +24,7 @@ class DeveloperKey < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :account
+  belongs_to :root_account, class_name: 'Account'
 
   has_many :page_views
   has_many :access_tokens, -> { where(:workflow_state => "active") }
@@ -42,6 +43,7 @@ class DeveloperKey < ActiveRecord::Base
   before_save :nullify_empty_icon_url
   before_save :protect_default_key
   before_save :set_require_scopes
+  before_save :set_root_account
   after_save :clear_cache
   after_update :invalidate_access_tokens_if_scopes_removed!
   after_update :destroy_external_tools!, if: :destroy_external_tools?
@@ -207,6 +209,10 @@ class DeveloperKey < ActiveRecord::Base
   def clear_cache
     MultiCache.delete("developer_key/#{global_id}")
     MultiCache.delete("developer_keys/#{vendor_code}") if vendor_code.present?
+  end
+
+  def set_root_account
+    self.root_account_id ||= account&.resolved_root_account_id
   end
 
   def authorized_for_account?(target_account)
