@@ -154,7 +154,7 @@ const blueprintCoursePermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'Blueprint Courses is an account-level feature option. Course roles can only manage Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role. To access the Blueprint Courses sidebar, Courses - add / edit / delete courses must be enabled. To add an associated course, Courses - view list a​nd Courses - add / edit / delete must also be enabled. To edit lock settings on any blueprint object type, Courses - add / edit / delete must be enabled.'
+        'Course roles can only manage Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role. To access the Blueprint Courses sidebar, Courses - add / edit / delete courses must be enabled. To add an associated course, Courses - view list a​nd Courses - add / edit / delete must also be enabled. To edit lock settings on any blueprint object type, Courses - add / edit / delete must be enabled.'
       )
     },
     {
@@ -190,7 +190,7 @@ const courseAddDeletePermissions = generateActionTemplates(
     {
       title: I18n.t('Course Settings (Course Details tab)'),
       description: I18n.t(
-        'Course Settings (Course Details tab): Allows user to access the Navigation tab in Course Settings. Allows user to access Student View (test student), Copy this Course, Reset Course Content, and Permanently Delete Course buttons. Allows user to edit course image, name, course code, time zone, subaccount, term, and other options in Course Details tab.'
+        'Allows user to access the Navigation tab in Course Settings. Allows user to access Student View (test student), Copy this Course, Reset Course Content, and Permanently Delete Course buttons. Allows user to edit course image, name, course code, time zone, subaccount, term, and other options in Course Details tab.'
       )
     },
     {
@@ -228,13 +228,13 @@ const courseAddDeletePermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'Blueprint Courses is an account-level feature option. To edit Blueprint course settings in Course Settings, Blueprint Courses - add / edit / associate / delete​ - must also be enabled. To add an associated course, Blueprint Courses - add / edit / associate / delete - and Courses - view list must also be enabled. To edit lock settings on any blueprint object, this permission must be enabled. To edit lock settings on files, Course Files - add / edit / delete must also be enabled. To edit lock settings on quizzes, Assignments and Quizzes - add / edit / delete must also be enabled.'
+        'To edit Blueprint course settings in Course Settings, Blueprint Courses - add / edit / associate / delete​ - must also be enabled. To add an associated course, Blueprint Courses - add / edit / associate / delete - and Courses - view list must also be enabled. To edit lock settings on any blueprint object, this permission must be enabled. To edit lock settings on files, Course Files - add / edit / delete must also be enabled. To edit lock settings on quizzes, Assignments and Quizzes - add / edit / delete must also be enabled.'
       )
     },
     {
       title: I18n.t('Courses (Account Navigation)'),
       description: I18n.t(
-        'To cross-list a section, Course Sections - add / edit / delete ​must also be enabled. To edit the course SIS ID, SIS Data - manage​ must also be enabled. To allow an account-level user to delete a course, Course State - manage​ must also be enabled.'
+        'To access the Courses link in Account Navigation, Courses - view list must be enabled.'
       )
     },
     {
@@ -290,7 +290,7 @@ const courseListViewPermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        `Blueprint Courses is an account-level feature option. To add associated courses, Blueprint Courses - add / edit / associate / delete and Courses - add / edit / delete must also be enabled.`
+        `To add associated courses, Blueprint Courses - add / edit / associate / delete and Courses - add / edit / delete must also be enabled.`
       )
     },
     {
@@ -424,7 +424,7 @@ const sisDataImportPermissions = generateActionTemplates(
     {
       title: I18n.t('Account Navigation'),
       description: I18n.t(
-        `Determines visibility and management of SIS Import tab in account navigation.`
+        `Determines visibility and management of SIS Import link in Account Navigation.`
       )
     },
     {
@@ -452,7 +452,7 @@ const sisDataManagePermissions = generateActionTemplates(
     {
       title: I18n.t('Account Navigation'),
       description: I18n.t(
-        `Determines visibility of SIS Import tab in account navigation. Allows user to view the previous SIS import dates, errors, and imported items.`
+        `Determines visibility of SIS Import link in Account Navigation. Allows user to view the previous SIS import dates, errors, and imported items.`
       )
     },
     {
@@ -540,7 +540,7 @@ const storageQuotasPermissions = generateActionTemplates(
     {
       title: I18n.t('Quotas (Account Settings)'),
       description: I18n.t(
-        `Allows user to view and manage Quotas tab in account settings. User can set default course, user, and group storage quotes.`
+        `Allows user to view and manage Quotas tab in Account Settings. User can set default course, user, and group storage quotes.`
       )
     }
   ],
@@ -901,7 +901,7 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     {
       title: I18n.t('Question Banks (Account Navigation)'),
       description: I18n.t(
-        `Determines visibility and management of the Question Banks account navigation link.`
+        `Determines visibility and management of the Question Banks link in Account Navigation.`
       )
     },
     {
@@ -919,7 +919,7 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        `Blueprint courses is an account-level feature option. To edit blueprint lock settings from the Assignments index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page. To edit blueprint lock settings on an individual quiz, or on the Quizzes index page, Courses - add / edit / delete must also be enabled.`
+        `To edit blueprint lock settings from the Assignments index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page. To edit blueprint lock settings on an individual quiz, or on the Quizzes index page, Courses - add / edit / delete must also be enabled.`
       )
     },
     {
@@ -941,7 +941,7 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        `Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment. However, if Learning Outcomes - add / edit / delete is enabled, user can still add rubrics via user can still add rubrics via Outcomes (Manage Rubrics button).`
+        `Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment.`
       )
     }
   ],
@@ -987,7 +987,7 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        `Blueprint courses is an account-level feature option. To edit blueprint lock settings from the Assignments index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page. To edit blueprint lock settings on an individual quiz, or on the Quizzes index page, Courses - add / edit / delete must also be enabled.`
+        `To edit blueprint lock settings from the Assignments index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page. To edit blueprint lock settings on an individual quiz, or on the Quizzes index page, Courses - add / edit / delete must also be enabled.`
       )
     },
     {
@@ -1009,7 +1009,7 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        `Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment. However, if Learning Outcomes - add / edit / delete is enabled, user can still add rubrics via Outcomes (Manage Rubrics button).`
+        `Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment.`
       )
     }
   ]
@@ -1698,7 +1698,7 @@ const discussionsModerateManagePermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        `Blueprint Courses is an account-level feature option. To edit blueprint lock settings on the Discussions index page, Courses - add / edit / delete and Discussions - view must also be enabled. If this permission is not enabled, and Courses - add / edit / delete and Discussions - view are enabled, blueprint lock settings can be edited on individual discussions.`
+        `To edit blueprint lock settings on the Discussions index page, Courses - add / edit / delete and Discussions - view must also be enabled. If this permission is not enabled, and Courses - add / edit / delete and Discussions - view is enabled, blueprint lock settings can be edited on individual discussions.`
       )
     },
     {
@@ -2355,7 +2355,7 @@ const gradesViewAllPermissions = generateActionTemplates(
     {
       title: I18n.t('Gradebook'),
       description: I18n.t(
-        `If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from the course navigation.`
+        `If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation.`
       )
     },
     {
@@ -2537,21 +2537,7 @@ const learningOutcomesAddEditDeletePermissions = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        `Determines visibility and management of Outcomes tab in account navigation. Allows user to create, import, edit, and delete outcomes and outcome groups at the account and course levels.`
-      )
-    },
-    {
-      title: I18n.t('Rubrics'),
-      description: I18n.t(
-        `Determines visibility and management of Rubrics tab in the account navigation. Allows user to manage rubrics.`
-      )
-    }
-  ],
-  [
-    {
-      title: I18n.t('Outcomes and Rubrics'),
-      description: I18n.t(
-        `To view the Outcomes page as read-only, Course content - view must be enabled. Users can access individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add / edit / delete is also enabled.`
+        `Determines visibility and management of Outcomes in Account Navigation. Allows user to create, edit, and delete outcomes and outcome groups at the account and course levels.`
       )
     }
   ],
@@ -2559,19 +2545,23 @@ const learningOutcomesAddEditDeletePermissions = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        `Allows user to create, import, edit, and delete outcomes and outcome groups at the course level.`
+        `To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled. To import learning outcomes, Learning Outcomes - import must also be enabled.`
       )
-    },
-    {
-      title: I18n.t('Rubrics'),
-      description: I18n.t(`Allows user to manage rubrics.`)
     }
   ],
   [
     {
-      title: I18n.t('Outcomes and Rubrics'),
+      title: I18n.t('Outcomes'),
       description: I18n.t(
-        `If disabled, the Outcomes page becomes read-only and hides the Manage Rubrics button. User can still access individual assignment rubrics through Assignments.`
+        `Allows user to create, edit, and delete outcomes and outcome groups at the course level.`
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('Outcomes'),
+      description: I18n.t(
+        `To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled. To import learning outcomes, Learning Outcomes - import must also be enabled.`
       )
     }
   ]
@@ -2581,25 +2571,18 @@ const learningOutcomesImportPermissions = generateActionTemplates(
   'import_outcomes',
   [
     {
-      title: I18n.t('Outcomes and Rubrics (Account, Course)'),
-      description: I18n.t(`Allows user to import learning outcomes.`)
+      title: I18n.t('Outcomes'),
+      description: I18n.t(`Allows user to import account learning outcomes.`)
     }
   ],
   [],
   [
     {
-      title: I18n.t('Outcomes and Rubrics'),
-      description: I18n.t(`Allows user to import learning outcomes to rubrics.`)
+      title: I18n.t('Outcomes'),
+      description: I18n.t(`Allows user to import course learning outcomes.`)
     }
   ],
-  [
-    {
-      title: I18n.t('Outcomes and Rubrics'),
-      description: I18n.t(
-        `To view a Course Outcomes page as read-only, Course Content - view must be enabled. To import learning outcomes from the Outcomes page, Rubrics - add / edit / delete must also be enabled. Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add / edit / delete are enabled.`
-      )
-    }
-  ]
+  []
 )
 
 const pagesAddRemovePermissions = generateActionTemplates(
@@ -2622,7 +2605,7 @@ const pagesAddRemovePermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        `Blueprint Courses is an account-level feature option. To edit blueprint lock settings on the Pages index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings can be edited on individual pages.`
+        `To edit blueprint lock settings on the Pages index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings can be edited on individual pages.`
       )
     },
     {
@@ -2727,14 +2710,16 @@ const rubricsAddPermissions = generateActionTemplates(
   [
     {
       title: I18n.t('Rubrics'),
-      description: I18n.t(`Allows user to create, edit, and delete rubrics.`)
+      description: I18n.t(
+        `Determines visibility and management of the Rubrics link in Account Navigation. Allows user to create, edit, and delete rubrics.`
+      )
     }
   ],
   [
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        `If this permission is disabled, users can still create or add rubrics to assignments if Assignments and Quizzes - add / edit / delete is enabled.`
+        `Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add / edit / delete are enabled.`
       )
     }
   ],
@@ -2742,7 +2727,7 @@ const rubricsAddPermissions = generateActionTemplates(
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        `Allows user to create, edit, and delete course rubrics in the Rubrics link.`
+        `Allows user to view the Rubrics link in Course Navigation. Allows user to create, edit, and delete course rubrics.`
       )
     }
   ],
@@ -2750,7 +2735,7 @@ const rubricsAddPermissions = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        `If this permission is disabled, users can still create or add rubrics to assignments if Assignments and Quizzes - add / edit / delete is enabled.`
+        `Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add / edit / delete are enabled.`
       )
     }
   ]
