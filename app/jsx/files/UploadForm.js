@@ -125,7 +125,7 @@ class UploadForm extends React.Component {
     FileOptionsCollection.onChange = null
   }
 
-  setStateFromOptions() {
+  setStateFromOptions = () => {
     this.setState(FileOptionsCollection.getState())
   }
 
