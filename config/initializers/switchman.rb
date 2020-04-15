@@ -43,10 +43,6 @@ Rails.application.config.after_initialize do
       def settings
         return {} unless self.class.columns_hash.key?('settings')
         s = super
-        s = YAML.load(s) if s.is_a?(String) # no idea. it seems that sometimes rails forgets this column is serialized
-        unless s.is_a?(Hash) || s.nil?
-          s = s.unserialize(s.value)
-        end
         if s.nil?
           self.settings = s = {}
         end
@@ -84,14 +80,6 @@ Rails.application.config.after_initialize do
   Switchman::Shard.class_eval do
     self.primary_key = "id"
     reset_column_information if connected? # make sure that the id column object knows it is the primary key
-
-    serialize :settings, Hash
-
-    # the default shard was already loaded, but didn't deserialize it
-    if connected? && default.is_a?(self) && default.instance_variable_get(:@attributes)['settings'].is_a?(String)
-      settings = serialized_attributes['settings'].load(default.read_attribute('settings'))
-      default.settings = settings
-    end
 
     before_save :encrypt_settings
 
