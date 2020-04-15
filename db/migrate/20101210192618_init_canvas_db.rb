@@ -67,8 +67,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :token_hint
       t.text :scopes
       t.boolean :remember_access
+      t.string :crypted_refresh_token
     end
     add_index :access_tokens, [:crypted_token], :unique => true
+    add_index :access_tokens, [:crypted_refresh_token], :unique => true
 
     create_table "account_authorization_configs", :force => true do |t|
       t.integer  "account_id", :limit => 8, :null => false
@@ -470,6 +472,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "integration_data"
       t.integer  "turnitin_id", limit: 8
       t.boolean  "moderated_grading"
+      t.datetime "grades_published_at"
     end
 
     add_index "assignments", ["assignment_group_id"], :name => "index_assignments_on_assignment_group_id"
@@ -574,6 +577,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "effective_context_code"
       t.integer  "participants_per_appointment"
       t.boolean  "override_participants_per_appointment"
+      t.text     "comments"
     end
 
     create_table :bookmarks_bookmarks do |t|
@@ -617,6 +621,16 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :canvadocs, :document_id, :unique => true
     add_index :canvadocs, :attachment_id
     add_index :canvadocs, :process_state
+
+    create_table :canvadocs_submissions do |t|
+      t.integer :canvadoc_id, limit: 8
+      t.integer :crocodoc_document_id, limit: 8
+      t.integer :submission_id, limit: 8, null: false
+    end
+
+    add_index :canvadocs_submissions, :canvadoc_id, where: "canvadoc_id IS NOT NULL"
+    add_index :canvadocs_submissions, :crocodoc_document_id, where: "crocodoc_document_id IS NOT NULL"
+    add_index :canvadocs_submissions, :submission_id
 
     create_table "cloned_items", :force => true do |t|
       t.integer  "original_item_id", :limit => 8
@@ -677,6 +691,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       # it was typoed as "length" instead of "limit" so it did not apply
       t.text     "last_bounce_details"
       t.datetime "last_suppression_bounce_at"
+      t.datetime "last_transient_bounce_at"
+      # last_transient_bounce_details was originally intended to have limit:
+      # 32768, but it was typoed as "length" instead of "limit" so it did not apply
+      t.text     "last_transient_bounce_details"
     end
 
     add_index "communication_channels", ["pseudonym_id", "position"]
@@ -835,6 +853,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "current"
       t.integer  "lock_version", :default => 0, :null => false
       t.datetime "evaluated_at"
+      t.text     "incomplete_requirements"
     end
 
     add_index "context_module_progressions", ["context_module_id"], :name => "index_context_module_progressions_on_context_module_id"
@@ -1656,8 +1675,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "context_type", :null => false
       t.string   "category"
       t.integer  "max_membership"
-      t.string   "hashtag"
-      t.boolean  "show_public_context_messages"
       t.boolean  "is_public"
       t.integer  "account_id", :limit => 8, :null => false
       t.string   "default_wiki_editing_roles"
@@ -2036,17 +2053,37 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string     :grade
       t.float      :score
       t.timestamp  :graded_at
-      t.integer    :position,   null: false, limit: 8
       t.references :scorer,     null: false, limit: 8
       t.references :submission, null: false, limit: 8
 
       t.timestamps null: true
+      t.boolean    :final,      null: false, default: false
     end
     add_index :moderated_grading_provisional_grades, :submission_id
     add_index :moderated_grading_provisional_grades,
-              [:submission_id, :position],
+      [:submission_id],
+      :unique => true,
+      :where => "final = TRUE",
+      :name => :idx_mg_provisional_grades_unique_submission_when_final
+    add_index :moderated_grading_provisional_grades,
+      [:submission_id, :scorer_id],
+      :unique => true,
+      :name => :idx_mg_provisional_grades_unique_sub_scorer_when_not_final,
+      :where => "final = FALSE"
+
+    create_table :moderated_grading_selections do |t|
+      t.integer :assignment_id,                 limit: 8, null: false
+      t.integer :student_id,                    limit: 8, null: false
+      t.integer :selected_provisional_grade_id, limit: 8, null: true
+
+      t.timestamps null: false
+    end
+    add_index :moderated_grading_selections, :assignment_id
+    add_index :moderated_grading_selections,
+              [:assignment_id, :student_id],
               unique: true,
-              name: :idx_mg_provisional_grades_unique_submission_position
+              name: :idx_mg_selections_unique_on_assignment_and_student
+
     create_table :notification_endpoints do |t|
       t.integer :access_token_id, limit: 8, null: false
       t.string :token, null: false
@@ -2505,6 +2542,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "rubric_association_id", :limit => 8
       t.float    "score"
       t.text     "data"
+      # TODO: we have previously attempted to drop the comments field, but the
+      # migration to do so was malformed.
       t.text     "comments"
       t.datetime "created_at"
       t.datetime "updated_at"
@@ -3176,6 +3215,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :calendar_events, :cloned_items
     add_foreign_key :calendar_events, :users
     add_foreign_key :canvadocs, :attachments
+    add_foreign_key :canvadocs_submissions, :canvadocs
+    add_foreign_key :canvadocs_submissions, :crocodoc_documents
+    add_foreign_key :canvadocs_submissions, :submissions
     add_foreign_key :collaborations, :users
     add_foreign_key :collaborators, :collaborations
     add_foreign_key :collaborators, :groups
@@ -3307,6 +3349,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :migration_issues, :content_migrations
     add_foreign_key :moderated_grading_provisional_grades, :submissions
     add_foreign_key :moderated_grading_provisional_grades, :users, column: :scorer_id
+    add_foreign_key :moderated_grading_selections, :assignments
+    add_foreign_key :moderated_grading_selections, :users, column: :student_id
+    add_foreign_key :moderated_grading_selections, :moderated_grading_provisional_grades, column: :selected_provisional_grade_id
     add_foreign_key :notification_endpoints, :access_tokens
     add_foreign_key :notification_policies, :communication_channels
     add_foreign_key :oauth_requests, :users
