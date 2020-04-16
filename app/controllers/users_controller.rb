@@ -1465,6 +1465,14 @@ class UsersController < ApplicationController
   #   match the domain this request is directed to, and be for a well-formed path that Canvas
   #   can recognize.
   #
+  # @argument initial_enrollment_type [String]
+  #   `observer` if doing a self-registration with a pairing code. This allows setting the
+  #   password during user creation.
+  #
+  # @argument pairing_code[code] [String]
+  #   If provided and valid, will link the new user as an observer to the student's whose
+  #   pairing code is given.
+  #
   # @returns User
   def create
     create_user
