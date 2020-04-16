@@ -45,30 +45,35 @@ def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
 }
 
 def appendFailMessageReport(message, link) {
+  if (!env.GERRIT_CHANGE_NUMBER || !env.GERRIT_PATCHSET_NUMBER) {
+    echo "build not associated with a PS... not sending message"
+  }
   dir ("_buildmeta") {
-    if (!fileExists("failure_messages.txt")) {
-      sh "echo 'failure links:' >> failure_messages.txt"
+    def message_file = "failure-messages-${BUILD_NUMBER}.txt"
+    if (!fileExists(message_file)) {
+      sh "echo 'failure links:' >> $message_file"
     }
-    sh "echo '$message' >> failure_messages.txt"
-    sh "echo '$link' >> failure_messages.txt"
+    sh "echo '$message' >> $message_file"
+    sh "echo '$link' >> $message_file"
   }
   archiveArtifacts(artifacts: '_buildmeta/*')
 }
 
 def sendFailureMessageIfPresent() {
-  if (fileExists("_buildmeta/failure_messages.txt")) {
+  def message_file = "_buildmeta/failure-messages-${BUILD_NUMBER}.txt"
+  if (fileExists(message_file)) {
     echo "sending failure message"
-    sh "cat _buildmeta/failure_messages.txt"
+    sh "cat $message_file"
     if (!env.GERRIT_CHANGE_NUMBER || !env.GERRIT_PATCHSET_NUMBER) {
       echo "build not associated with a PS... not sending message"
     }
     else {
       load('build/new-jenkins/groovy/credentials.groovy').withGerritCredentials({
-        sh '''
-          gerrit_message=`cat _buildmeta/failure_messages.txt`
-          ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
-            $GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
-        '''
+        sh """
+          gerrit_message=`cat $message_file`
+          ssh -i "\$SSH_KEY_PATH" -l "\$SSH_USERNAME" -p \$GERRIT_PORT \
+            \$GERRIT_HOST gerrit review -m "'\$gerrit_message'" \$GERRIT_CHANGE_NUMBER,\$GERRIT_PATCHSET_NUMBER
+        """
       })
     }
   }
@@ -105,10 +110,7 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
   }
 
   def report_name = "spec-failure-$prefix"
-  if (htmlFiles.size() > 1) {
-    def url_name = java.net.URLEncoder.encode(report_name, "UTF-8")
-    appendFailMessageReport("$report_title:", "${BUILD_URL}${url_name}")
-  }
+  def report_url = "${BUILD_URL}${report_name}"
   archiveArtifacts(artifacts: "$working_dir/**")
   publishHTML target: [
     allowMissing: false,
@@ -120,6 +122,7 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
     reportTitles: report_title
   ]
   sh "rm -vrf ./$working_dir"
+  return report_url
 }
 
 def buildIndexPage() {
