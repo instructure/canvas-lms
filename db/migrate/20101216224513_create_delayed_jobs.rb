@@ -54,6 +54,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       table.integer  :shard_id, :limit => 8
       table.string   :source
       table.integer  :max_concurrent, :default => 1, :null => false
+      table.datetime :expires_at
     end
 
     connection.execute("CREATE INDEX get_delayed_jobs_index ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} (priority, run_at) WHERE locked_at IS NULL AND queue = 'canvas_queue' AND next_in_strand = 't'")
@@ -84,7 +85,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
                                   (get_byte(strand_md5, 6) << 8) +
                                    get_byte(strand_md5, 7);
       END;
-      $$ LANGUAGE plpgsql;
+      $$ LANGUAGE plpgsql SET search_path TO #{search_path};
     CODE
 
     # create the insert trigger
@@ -106,13 +107,16 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     # create the delete trigger
     execute(<<-CODE)
     CREATE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
+    DECLARE
+      running_count integer;
     BEGIN
       IF OLD.strand IS NOT NULL THEN
         PERFORM pg_advisory_xact_lock(half_md5_as_bigint(OLD.strand));
-        IF (SELECT COUNT(*) FROM delayed_jobs WHERE strand = OLD.strand AND next_in_strand = 't') < OLD.max_concurrent THEN
+        running_count := (SELECT COUNT(*) FROM delayed_jobs WHERE strand = OLD.strand AND next_in_strand = 't');
+        IF running_count < OLD.max_concurrent THEN
           UPDATE delayed_jobs SET next_in_strand = 't' WHERE id = (
             SELECT id FROM delayed_jobs j2 WHERE next_in_strand = 'f' AND
-            j2.strand = OLD.strand ORDER BY j2.id ASC LIMIT 1 FOR UPDATE
+            j2.strand = OLD.strand ORDER BY j2.id ASC LIMIT (OLD.max_concurrent - running_count) FOR UPDATE
           );
         END IF;
       END IF;
@@ -140,6 +144,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       t.integer  "shard_id", :limit => 8
       t.integer  "original_job_id", :limit => 8
       t.string   "source"
+      t.datetime "expires_at"
     end
   end
 
