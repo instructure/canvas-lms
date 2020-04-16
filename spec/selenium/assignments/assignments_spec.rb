@@ -483,7 +483,7 @@ describe "assignments" do
 
     context "with Responsive fix" do
       before :each do
-        Account.default.enable_feature!('responsive_2020_03')
+        Account.default.enable_feature!('responsive_misc')
       end
 
       it "should reorder assignments with drag and drop", priority: "2", test_id: 647848 do

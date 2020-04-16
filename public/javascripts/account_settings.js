@@ -36,7 +36,7 @@ import './vendor/jquery.scrollTo'
 
 let reportsTabHasLoaded = false
 
-const _settings_responsive_2020_04 = !!window.ENV?.FEATURES?.responsive_2020_04
+const responsive_admin_settings = !!window.ENV?.FEATURES?.responsive_admin_settings
 const _settings_smallTablet = window.matchMedia('(min-width: 550px)').matches
 const _settings_desktop = window.matchMedia('(min-width: 992px)').matches
 
@@ -52,7 +52,7 @@ export function openReportDescriptionLink(event) {
   const responsiveWidth = _settings_desktop ? 800 : _settings_smallTablet ? 550 : 320
   $desc.clone().dialog({
     title,
-    width: _settings_responsive_2020_04 ? responsiveWidth : 800
+    width: responsive_admin_settings ? responsiveWidth : 800
   })
 }
 
@@ -222,7 +222,7 @@ $(document).ready(function() {
                   .find('.report_dialog')
                   .dialog({
                     autoOpen: false,
-                    width: _settings_responsive_2020_04 ? responsiveWidth : 400,
+                    width: responsive_admin_settings ? responsiveWidth : 400,
                     title: I18n.t('titles.configure_report', 'Configure Report')
                   })
               }
