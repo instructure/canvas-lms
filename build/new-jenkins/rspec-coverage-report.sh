@@ -2,6 +2,9 @@
 
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
+# lets see what in this before we start working on it
+find ./coverage_nodes
+
 rm -vrf coverage_reports
 mkdir -v coverage_reports
 chmod -vv 777 coverage_reports
@@ -32,6 +35,5 @@ rm -vrf coverage
 tar -vxf coverage_reports/coverage.tar
 
 # lets see the result after
-find ./coverage_nodes
 find ./coverage
 rm -vrf coverage_reports

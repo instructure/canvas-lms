@@ -104,13 +104,12 @@ def _runRspecTestSuite(
     }
     finally {
       // copy spec failures to local
-      sh 'mkdir -p tmp/spec_failures'
-      sh 'build/new-jenkins/rspec_copy_failures.sh'
+      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures web_database_ --allow-error --clean-dir'
 
       def reports = load 'build/new-jenkins/groovy/reports.groovy'
       reports.stashSpecFailures(prefix, index)
       if (env.COVERAGE == '1') {
-        sh 'docker cp $(docker-compose ps -q web):/usr/src/app/coverage/ ./tmp/spec_coverage/'
+        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage web_database_ --clean-dir'
         reports.stashSpecCoverage(prefix, index)
       }
       sh 'rm -rf ./tmp'
@@ -119,17 +118,20 @@ def _runRspecTestSuite(
   }
 }
 
-def uploadSeleniumCoverage() {
-  _uploadCoverage('selenium', seleniumConfig().node_total, 'canvas-lms-selenium')
+def uploadSeleniumCoverageIfSuccessful() {
+  _uploadCoverageIfSuccessful('selenium', seleniumConfig().node_total, 'canvas-lms-selenium')
 }
 
-def uploadRSpecCoverage() {
-  _uploadCoverage('rspec', rspecConfig().node_total, 'canvas-lms-rspec')
+def uploadRSpecCoverageIfSuccessful() {
+  _uploadCoverageIfSuccessful('rspec', rspecConfig().node_total, 'canvas-lms-rspec')
 }
 
-def _uploadCoverage(prefix, total, coverage_name) {
-  def reports = load 'build/new-jenkins/groovy/reports.groovy'
-  reports.publishSpecCoverageToS3(prefix, total, coverage_name)
+def _uploadCoverageIfSuccessful(prefix, total, coverage_name) {
+  def successes = load 'build/new-jenkins/groovy/successes.groovy'
+  if (successes.hasSuccess(prefix, total)) {
+    def reports = load 'build/new-jenkins/groovy/reports.groovy'
+    reports.publishSpecCoverageToS3(prefix, total, coverage_name)
+  }
 }
 
 def uploadSeleniumFailures() {
