@@ -18,6 +18,7 @@
 
 import {RequestDispatch} from '../../../shared/network'
 import OldDataLoader from './OldDataLoader'
+import StudentIdsLoader from './StudentIdsLoader'
 
 export default class DataLoader {
   constructor({gradebook}) {
@@ -25,6 +26,13 @@ export default class DataLoader {
     this.dispatch = new RequestDispatch({
       activeRequestLimit: gradebook.options.activeRequestLimit
     })
+
+    const loaderConfig = {
+      dispatch: this.dispatch,
+      gradebook
+    }
+
+    this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
   }
 
   loadInitialData() {
@@ -32,8 +40,9 @@ export default class DataLoader {
     const {options} = gradebook
 
     const promises = OldDataLoader.loadGradebookData({
-      gradebook,
+      dataLoader: this,
       dispatch: this.dispatch,
+      gradebook,
 
       activeRequestLimit: options.performanceControls?.active_request_limit,
       courseId: options.context_id,
@@ -46,11 +55,6 @@ export default class DataLoader {
       loadedStudentIds: [],
 
       submissionsChunkSize: options.chunk_size
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotStudentIds.then(data => {
-      gradebook.updateStudentIds(data.user_ids)
     })
 
     if (promises.gotGradingPeriodAssignments != null) {
@@ -154,8 +158,9 @@ export default class DataLoader {
     gradebook.updateSubmissionsLoaded(false)
 
     const promises = OldDataLoader.loadGradebookData({
-      gradebook,
+      dataLoader: this,
       dispatch: this.dispatch,
+      gradebook,
 
       courseId: options.context_id,
       perPage: options.api_max_per_page,
@@ -176,11 +181,6 @@ export default class DataLoader {
         gradebook.updateGradingPeriodAssignments(data.grading_period_assignments)
       })
     }
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotStudentIds.then(data => {
-      gradebook.updateStudentIds(data.user_ids)
-    })
 
     // eslint-disable-next-line promise/catch-or-return
     promises.gotStudents.then(() => {

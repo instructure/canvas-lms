@@ -237,18 +237,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       await reloadData()
     })
 
-    QUnit.module('loading student ids', () => {
-      test('sends the request using the given course id', async () => {
-        await reloadData()
-        const requests = server.filterRequests(urls.userIds)
-        strictEqual(requests.length, 1)
-      })
-
-      test('stores the loaded student ids in the gradebook', async () => {
-        await reloadData()
-        const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
-        deepEqual(loadedStudentIds, exampleData.studentIds)
-      })
+    test('loads student ids', async () => {
+      sinon.spy(dataLoader.studentIdsLoader, 'loadStudentIds')
+      await reloadData()
+      strictEqual(dataLoader.studentIdsLoader.loadStudentIds.callCount, 1)
     })
 
     QUnit.module('loading students', contextHooks => {

@@ -18,8 +18,6 @@
 
 import sinon from 'sinon'
 
-import {clearPrefetchedXHRs, getPrefetchedXHR, setPrefetchedXHR} from '@instructure/js-utils'
-
 import waitForCondition from 'jsx/shared/__tests__/waitForCondition'
 import FakeServer, {
   paramsFromRequest,
@@ -269,49 +267,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       )
     }
 
-    QUnit.module('loading student ids', () => {
-      test('sends the request using the given course id', async () => {
-        await loadInitialData()
-        const requests = server.filterRequests(urls.userIds)
-        strictEqual(requests.length, 1)
-      })
-
-      test('stores the loaded student ids in the gradebook', async () => {
-        await loadInitialData()
-        const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
-        deepEqual(loadedStudentIds, exampleData.studentIds)
-      })
-
-      QUnit.module('when student ids have been prefetched', contextHooks => {
-        contextHooks.beforeEach(() => {
-          ENV.prefetch_gradebook_user_ids = true
-          const jsonString = JSON.stringify({user_ids: exampleData.studentIds})
-          const response = new Response(jsonString)
-          setPrefetchedXHR('user_ids', Promise.resolve(response))
-        })
-
-        contextHooks.afterEach(() => {
-          clearPrefetchedXHRs()
-          delete ENV.prefetch_gradebook_user_ids
-        })
-
-        test('does not sends the request using the given course id', async () => {
-          await loadInitialData()
-          const requests = server.filterRequests(urls.userIds)
-          strictEqual(requests.length, 0)
-        })
-
-        test('resolves .gotStudentIds with the user ids', async () => {
-          await loadInitialData()
-          const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
-          deepEqual(loadedStudentIds, exampleData.studentIds)
-        })
-
-        test('removes the prefetch request', async () => {
-          await loadInitialData()
-          strictEqual(typeof getPrefetchedXHR('user_ids'), 'undefined')
-        })
-      })
+    test('loads student ids', async () => {
+      sinon.spy(dataLoader.studentIdsLoader, 'loadStudentIds')
+      await loadInitialData()
+      strictEqual(dataLoader.studentIdsLoader.loadStudentIds.callCount, 1)
     })
 
     QUnit.module('loading grading period assignments', () => {

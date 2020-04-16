@@ -16,28 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
-
 import {deferPromise} from '../../../shared/async'
 import StudentContentDataLoader from './StudentContentDataLoader'
-
-function getStudentIds(courseId, dispatch) {
-  if (ENV.prefetch_gradebook_user_ids) {
-    /*
-     * When user ids have been prefetched, the data is only known valid for the
-     * first request. Consume it by pulling it out of the prefetch store, which
-     * will force all subsequent requests for user ids to call through the
-     * network.
-     */
-    const promise = consumePrefetchedXHR('user_ids')
-    if (promise) {
-      return asJson(promise)
-    }
-  }
-
-  const url = `/courses/${courseId}/gradebook/user_ids`
-  return dispatch.getJSON(url)
-}
 
 function getGradingPeriodAssignments(courseId, dispatch) {
   const url = `/courses/${courseId}/gradebook/grading_period_assignments`
@@ -73,9 +53,6 @@ function getCustomColumns(courseId, dispatch) {
   return dispatch.getDepaginated(url, {include_hidden: true})
 }
 
-// This function is called from showNoteColumn in Gradebook.coffee
-// when the notes column is revealed. In that case dispatch won't
-// exist so we'll create a new Dispatcher for this request.
 function getDataForColumn(courseId, columnId, options, perPageCallback, dispatch) {
   const url = `/api/v1/courses/${courseId}/custom_gradebook_columns/${columnId}/data`
   const augmentedCallback = data => perPageCallback(columnId, data)
@@ -106,12 +83,13 @@ function getCustomColumnData(options, customColumnsDfd, dispatch) {
 }
 
 function loadGradebookData(opts) {
-  const {dispatch} = opts
+  const {dataLoader, dispatch, gradebook} = opts
 
   const gotAssignmentGroups = opts.getAssignmentGroups ? getAssignmentGroups(opts, dispatch) : null
 
-  // Begin loading Students before any other data.
-  const gotStudentIds = getStudentIds(opts.courseId, dispatch)
+  // Begin loading Student IDs before any other data.
+  const gotStudentIds = dataLoader.studentIdsLoader.loadStudentIds()
+
   let gotGradingPeriodAssignments
   if (opts.getGradingPeriodAssignments) {
     gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId, dispatch)
@@ -137,8 +115,11 @@ function loadGradebookData(opts) {
   const gotStudents = deferPromise()
   const gotSubmissions = deferPromise()
 
-  Promise.resolve(gotStudentIds)
-    .then(data => studentContentDataLoader.load(data.user_ids))
+  gotStudentIds
+    .then(() => {
+      const studentIds = gradebook.courseContent.students.listStudentIds()
+      return studentContentDataLoader.load(studentIds)
+    })
     .then(() => {
       gotStudents.resolve()
       gotSubmissions.resolve()
