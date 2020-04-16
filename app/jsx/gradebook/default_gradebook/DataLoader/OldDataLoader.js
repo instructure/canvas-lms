@@ -19,11 +19,6 @@
 import {deferPromise} from '../../../shared/async'
 import StudentContentDataLoader from './StudentContentDataLoader'
 
-function getGradingPeriodAssignments(courseId, dispatch) {
-  const url = `/courses/${courseId}/gradebook/grading_period_assignments`
-  return dispatch.getJSON(url)
-}
-
 function getAssignmentGroups(options, dispatch) {
   const url = `/api/v1/courses/${options.courseId}/assignment_groups`
   const params = {
@@ -92,7 +87,7 @@ function loadGradebookData(opts) {
 
   let gotGradingPeriodAssignments
   if (opts.getGradingPeriodAssignments) {
-    gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId, dispatch)
+    gotGradingPeriodAssignments = dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
   }
 
   const gotCustomColumns = opts.getCustomColumns ? getCustomColumns(opts.courseId, dispatch) : null

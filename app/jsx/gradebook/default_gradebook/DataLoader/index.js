@@ -17,6 +17,7 @@
  */
 
 import {RequestDispatch} from '../../../shared/network'
+import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
 import OldDataLoader from './OldDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
 
@@ -32,6 +33,7 @@ export default class DataLoader {
       gradebook
     }
 
+    this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
     this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
   }
 
@@ -56,13 +58,6 @@ export default class DataLoader {
 
       submissionsChunkSize: options.chunk_size
     })
-
-    if (promises.gotGradingPeriodAssignments != null) {
-      // eslint-disable-next-line promise/catch-or-return
-      promises.gotGradingPeriodAssignments.then(data => {
-        gradebook.updateGradingPeriodAssignments(data.grading_period_assignments)
-      })
-    }
 
     // eslint-disable-next-line promise/catch-or-return
     promises.gotAssignmentGroups.then(assignmentGroups => {
@@ -174,13 +169,6 @@ export default class DataLoader {
 
       customColumnIds: gradebook.gradebookContent.customColumns.map(column => column.id)
     })
-
-    if (promises.gotGradingPeriodAssignments != null) {
-      // eslint-disable-next-line promise/catch-or-return
-      promises.gotGradingPeriodAssignments.then(data => {
-        gradebook.updateGradingPeriodAssignments(data.grading_period_assignments)
-      })
-    }
 
     // eslint-disable-next-line promise/catch-or-return
     promises.gotStudents.then(() => {

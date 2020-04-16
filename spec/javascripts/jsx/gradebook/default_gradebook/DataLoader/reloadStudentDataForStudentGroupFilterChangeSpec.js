@@ -243,6 +243,15 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       strictEqual(dataLoader.studentIdsLoader.loadStudentIds.callCount, 1)
     })
 
+    test('does not load grading period assignments', async () => {
+      sinon.spy(dataLoader.gradingPeriodAssignmentsLoader, 'loadGradingPeriodAssignments')
+      await reloadData()
+      strictEqual(
+        dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments.callCount,
+        0
+      )
+    })
+
     QUnit.module('loading students', contextHooks => {
       contextHooks.beforeEach(() => {
         server.unsetResponses(urls.students)

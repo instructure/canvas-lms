@@ -273,34 +273,23 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       strictEqual(dataLoader.studentIdsLoader.loadStudentIds.callCount, 1)
     })
 
-    QUnit.module('loading grading period assignments', () => {
-      QUnit.module('when the course uses a grading period set', () => {
-        test('sends the request using the given course id', async () => {
-          await loadInitialData()
-          const requests = server.filterRequests(urls.gradingPeriodAssignments)
-          strictEqual(requests.length, 1)
-        })
+    test('loads grading period assignments when the course uses a grading period set', async () => {
+      sinon.spy(dataLoader.gradingPeriodAssignmentsLoader, 'loadGradingPeriodAssignments')
+      await loadInitialData()
+      strictEqual(
+        dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments.callCount,
+        1
+      )
+    })
 
-        test('updates the grading period assignments in the gradebook', async () => {
-          await loadInitialData()
-          strictEqual(gradebook.updateGradingPeriodAssignments.callCount, 1)
-        })
-
-        test('includes the loaded grading period assignments when updating the gradebook', async () => {
-          await loadInitialData()
-          const [gradingPeriodAssignments] = gradebook.updateGradingPeriodAssignments.lastCall.args
-          deepEqual(gradingPeriodAssignments, exampleData.gradingPeriodAssignments)
-        })
-      })
-
-      QUnit.module('when the course does not use a grading period set', () => {
-        test('does not request grading period assignments', async () => {
-          gradebook.gradingPeriodSet = null
-          await loadInitialData()
-          const requests = server.filterRequests(urls.gradingPeriodAssignments)
-          strictEqual(requests.length, 0)
-        })
-      })
+    test('does not load grading period assignments when the course does not use a grading period set', async () => {
+      gradebook.gradingPeriodSet = null
+      sinon.spy(dataLoader.gradingPeriodAssignmentsLoader, 'loadGradingPeriodAssignments')
+      await loadInitialData()
+      strictEqual(
+        dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments.callCount,
+        0
+      )
     })
 
     QUnit.module('loading assignment groups', () => {
