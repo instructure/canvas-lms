@@ -177,8 +177,11 @@ class ApplicationController < ActionController::Base
             la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
             cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
             featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links),
-            responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03),
-            responsive_2020_04: !!@domain_root_account&.feature_enabled?(:responsive_2020_04),
+            responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03), #TODO: Romove once all references have been appropriately chaged
+            responsive_2020_04: !!@domain_root_account&.feature_enabled?(:responsive_2020_04), #TODO: Romove once all references have been appropriately chaged
+            responsive_admin_settings: !!@domain_root_account&.feature_enabled?(:responsive_admin_settings),
+            responsive_awareness: !!@domain_root_account&.feature_enabled?(:responsive_awareness),
+            responsive_misc: !!@domain_root_account&.feature_enabled?(:responsive_misc),
             product_tours: !!@domain_root_account&.feature_enabled?(:product_tours),
             module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd),
             files_dnd: !!@domain_root_account&.feature_enabled?(:files_dnd)
