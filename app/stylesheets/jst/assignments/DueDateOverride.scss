@@ -83,10 +83,10 @@ $assign-border-color: #ccc;
 
 .UnlockLockInput {
   display: inline;
-  body:not(.responsive_2020_04) & {
+  body:not(.responsive_misc) & {
     width: 107px;
   }
-  body.responsive_2020_04 & {
+  body.responsive_misc & {
     @include breakpoint(mini-tablet) {
       width: 107px;
     }
@@ -95,10 +95,10 @@ $assign-border-color: #ccc;
 
 .DueDateInput {
   display: inline;
-  body:not(.responsive_2020_04) & {
+  body:not(.responsive_misc) & {
     width: 285px;
   }
-  body.responsive_2020_04 & {
+  body.responsive_misc & {
     @include breakpoint(mini-tablet) {
       width: 285px;
     }
@@ -111,7 +111,7 @@ $assign-border-color: #ccc;
 
 .Available-from-to {
   display: flex;
-  body:not(.responsive_2020_04) & {
+  body:not(.responsive_misc) & {
     .from {
       margin-#{direction(right)}: 3px;
     }
@@ -119,7 +119,7 @@ $assign-border-color: #ccc;
       margin-#{direction(left)}: 3px;
     }
   }
-  body.responsive_2020_04 & {
+  body.responsive_misc & {
     @include breakpoint(mini-tablet) {
       .from {
         margin-#{direction(right)}: 3px;

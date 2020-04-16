@@ -165,7 +165,7 @@ body:not(.course-menu-expanded) {
     a { margin-#{direction(right)}: 0; margin-#{direction(left)}: $ic-sp; }
   }
 
-  body.responsive_2020_03 & {
+  body.responsive_misc & {
     a {
       @include mobile-only {
         display: inline-block;

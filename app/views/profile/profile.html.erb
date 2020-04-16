@@ -255,7 +255,7 @@ TEXT
 </p>
 <table role="presentation" style="width: 100%;"><tr>
   <td
-    <% if @domain_root_account.feature_enabled?(:responsive_2020_03) %>
+    <% if @domain_root_account.feature_enabled?(:responsive_misc) %>
       class="services-cell"
     <% else %>
       style="vertical-align: top; width: 50%; padding-<%= direction('right') %>: 20px;"
@@ -297,7 +297,7 @@ TEXT
     </div>
   </td>
   <td
-    <% if @domain_root_account.feature_enabled?(:responsive_2020_03) %>
+    <% if @domain_root_account.feature_enabled?(:responsive_misc) %>
       class="services-cell"
     <% else %>
       style="vertical-align: top; width: 50%; padding-<%= direction('left') %>: 20px;"

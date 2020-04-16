@@ -116,7 +116,7 @@ $discussion-dark-text: $ic-color-dark;
   }
 }
 
-body.responsive_2020_04 .span4.discussion-header__metadata {
+body.responsive_misc .span4.discussion-header__metadata {
   @include mobile-only {
     width: auto;
   }
@@ -680,12 +680,12 @@ body.responsive_2020_04 .span4.discussion-header__metadata {
     min-height: 53px;
     box-shadow: 0 2px 3px rgba(black, 0.1);
 
-    body:not(.responsive_2020_04) & {
+    body:not(.responsive_misc) & {
       margin-#{direction(left)}: $ic-header-primary-width + ($ic-sp*2);
       margin-#{direction(right)}: $ic-sp*2;
     }
 
-    body.responsive_2020_04 & {
+    body.responsive_misc & {
       @include breakpoint(tablet) {
         margin-#{direction(left)}: $ic-header-primary-width + ($ic-sp*2);
         margin-#{direction(right)}: $ic-sp*2;
