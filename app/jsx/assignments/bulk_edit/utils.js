@@ -26,3 +26,7 @@ export async function extractFetchErrorMessage(err, fallback) {
   if (errorJson?.errors?.length) return errorJson.errors[0].message
   return fallback
 }
+
+export function canEditAll(assignment) {
+  return assignment.can_edit && assignment.all_dates.every(override => override.can_edit)
+}

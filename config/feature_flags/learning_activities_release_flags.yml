@@ -32,6 +32,11 @@ assignment_bulk_edit:
   applies_to: RootAccount
   display_name: Assignment Bulk Editing
   description: Allow teachers to change the dates on a set of assignments in one step
+assignment_bulk_edit_phase_2:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Assignment Bulk Editing phase 2
+  description: Turns on phase 2 features for Assignment Bulk Editing
 bookmarking_for_enrollments_index:
   state: allowed
   applies_to: RootAccount

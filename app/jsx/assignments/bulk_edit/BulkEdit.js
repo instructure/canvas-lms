@@ -31,7 +31,7 @@ import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import BulkEditTable from './BulkEditTable'
 import useSaveAssignments from './hooks/useSaveAssignments'
 import useMonitorJobCompletion from './hooks/useMonitorJobCompletion'
-import {originalDateField} from './utils'
+import {originalDateField, canEditAll} from './utils'
 
 BulkEdit.propTypes = {
   courseId: string.isRequired,
@@ -95,14 +95,18 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     saveAssignments(assignments)
   }
 
-  const updateAssignment = useCallback(
+  const clearPreviousSave = useCallback(() => {
+    // Clear anything from the previous save operation so those elements don't show anymore and so
+    // the above effect doesn't try to clear the original dates.
+    setJobSuccess(false)
+    setProgressUrl(null)
+  }, [setJobSuccess, setProgressUrl])
+
+  const updateAssignmentDate = useCallback(
     ({dateKey, newDate, assignmentId, overrideId}) => {
       const isBaseOverride = !overrideId
 
-      // Clear anything from the previous save operation so those elements don't show anymore and so
-      // the above effect doesn't try to clear the original dates.
-      setJobSuccess(false)
-      setProgressUrl(null)
+      clearPreviousSave()
       setAssignments(currentAssignments =>
         produce(currentAssignments, draftAssignments => {
           const assignment = draftAssignments.find(a => a.id === assignmentId)
@@ -115,8 +119,27 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
         })
       )
     },
-    [setJobSuccess, setProgressUrl]
+    [clearPreviousSave]
   )
+
+  const setAssignmentSelected = useCallback((assignmentId, selected) => {
+    setAssignments(currentAssignments =>
+      produce(currentAssignments, draftAssignments => {
+        const assignment = draftAssignments.find(a => a.id === assignmentId)
+        assignment.selected = selected
+      })
+    )
+  }, [])
+
+  const selectAllAssignments = useCallback(selected => {
+    setAssignments(currentAssignments =>
+      produce(currentAssignments, draftAssignments => {
+        draftAssignments.forEach(a => {
+          if (canEditAll(a)) a.selected = selected
+        })
+      })
+    )
+  }, [])
 
   function anyAssignmentsEdited() {
     const overrides = assignments.flatMap(a => a.all_dates)
@@ -134,46 +157,52 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
   }
 
   function renderHeader() {
+    const selectedAssignmentsCount = assignments.filter(a => a.selected).length
     return (
       <Flex as="div">
         <Flex.Item shouldGrow>
           <h2>{I18n.t('Edit Assignment Dates')}</h2>
         </Flex.Item>
+        {jobRunning && (
+          <Flex.Item width="250px">
+            <ProgressBar
+              screenReaderLabel={I18n.t('Saving assignment dates progress')}
+              valueNow={jobCompletion}
+              renderValue={renderProgressValue}
+            />
+            <CanvasInlineAlert liveAlert screenReaderOnly variant="info">
+              {I18n.t('Saving assignment dates progress: %{percent}%', {
+                percent: jobCompletion
+              })}
+            </CanvasInlineAlert>
+          </Flex.Item>
+        )}
+        {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+          <Flex.Item margin="0 0 0 small">
+            <Text>
+              {I18n.t(
+                {one: '%{count} assignment selected', other: '%{count} assignments selected'},
+                {count: selectedAssignmentsCount}
+              )}
+            </Text>
+          </Flex.Item>
+        )}
         <Flex.Item>
-          {/* Inner Flex required to line up progress bar with buttons */}
-          <Flex as="div">
-            {jobRunning && (
-              <Flex.Item width="250px">
-                <ProgressBar
-                  screenReaderLabel={I18n.t('Saving assignment dates progress')}
-                  valueNow={jobCompletion}
-                  renderValue={renderProgressValue}
-                />
-                <CanvasInlineAlert liveAlert screenReaderOnly variant="info">
-                  {I18n.t('Saving assignment dates progress: %{percent}%', {
-                    percent: jobCompletion
-                  })}
-                </CanvasInlineAlert>
-              </Flex.Item>
-            )}
-            <Flex.Item>
-              <Button margin="0 0 0 small" onClick={onCancel}>
-                {jobSuccess ? I18n.t('Close') : I18n.t('Cancel')}
-              </Button>
-            </Flex.Item>
-            <Flex.Item>
-              <Button
-                margin="0 0 0 small"
-                variant="primary"
-                interaction={
-                  startingSave || jobRunning || !anyAssignmentsEdited() ? 'disabled' : 'enabled'
-                }
-                onClick={handleSave}
-              >
-                {startingSave || jobRunning ? I18n.t('Saving...') : I18n.t('Save')}
-              </Button>
-            </Flex.Item>
-          </Flex>
+          <Button margin="0 0 0 small" onClick={onCancel}>
+            {jobSuccess ? I18n.t('Close') : I18n.t('Cancel')}
+          </Button>
+        </Flex.Item>
+        <Flex.Item>
+          <Button
+            margin="0 0 0 small"
+            variant="primary"
+            interaction={
+              startingSave || jobRunning || !anyAssignmentsEdited() ? 'disabled' : 'enabled'
+            }
+            onClick={handleSave}
+          >
+            {startingSave || jobRunning ? I18n.t('Saving...') : I18n.t('Save')}
+          </Button>
         </Flex.Item>
       </Flex>
     )
@@ -237,7 +266,12 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
         <CanvasInlineAlert liveAlert screenReaderOnly>
           {I18n.t('Assignments loaded')}
         </CanvasInlineAlert>
-        <BulkEditTable assignments={assignments} updateAssignmentDate={updateAssignment} />
+        <BulkEditTable
+          assignments={assignments}
+          updateAssignmentDate={updateAssignmentDate}
+          setAssignmentSelected={setAssignmentSelected}
+          selectAllAssignments={selectAllAssignments}
+        />
       </>
     )
   }

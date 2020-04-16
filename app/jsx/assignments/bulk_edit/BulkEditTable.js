@@ -17,8 +17,9 @@
  */
 
 import I18n from 'i18n!assignments_bulk_edit'
-import React from 'react'
+import React, {useCallback} from 'react'
 import {arrayOf, func} from 'prop-types'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Responsive} from '@instructure/ui-layout'
@@ -29,6 +30,7 @@ import {IconWarningLine} from '@instructure/ui-icons'
 import BulkDateInput from './BulkDateInput'
 import BulkEditOverrideTitle from './BulkEditOverrideTitle'
 import {AssignmentShape} from './BulkAssignmentShape'
+import {canEditAll} from './utils'
 
 const DATE_INPUT_META = {
   due_at: {
@@ -57,12 +59,24 @@ BulkEditTable.propTypes = {
   //   - or -
   //   base: true if this is the base assignment dates
   // }) => {...}
-  updateAssignmentDate: func
+  updateAssignmentDate: func,
+
+  setAssignmentSelected: func // (assignmentId, selected) => {}
 }
 
-export default function BulkEditTable({assignments, updateAssignmentDate}) {
+export default function BulkEditTable({
+  assignments,
+  updateAssignmentDate,
+  setAssignmentSelected,
+  selectAllAssignments
+}) {
+  const CHECKBOX_COLUMN_WIDTH_REMS = 2
   const DATE_COLUMN_WIDTH_REMS = 14
   const NOTE_COLUMN_WIDTH_REMS = 3
+
+  const someAssignmentsSelected = assignments.some(a => a.selected)
+  const allAssignmentsSelected =
+    someAssignmentsSelected && assignments.every(a => a.selected || !canEditAll(a))
 
   function renderDateInput(assignmentId, dateKey, dates, overrideId = null) {
     const label = DATE_INPUT_META[dateKey].label
@@ -81,7 +95,13 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
   }
 
   function renderOverrideTitle(assignment, override) {
-    return <BulkEditOverrideTitle assignment={assignment} override={override} />
+    return (
+      <BulkEditOverrideTitle
+        assignmentName={assignment.name}
+        overrideTitle={override.title}
+        overrideBase={override.base}
+      />
+    )
   }
 
   function renderNoDefaultDates() {
@@ -95,6 +115,17 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
           {I18n.t('This assignment has no default dates.')}
         </Text>
       </View>
+    )
+  }
+
+  function renderAssignmentCheckbox(assignment) {
+    return (
+      <Checkbox
+        label={<ScreenReaderContent>{I18n.t('Select assignment')}</ScreenReaderContent>}
+        checked={!!assignment.selected}
+        onChange={() => setAssignmentSelected(assignment.id, !assignment.selected)}
+        disabled={!canEditAll(assignment)}
+      />
     )
   }
 
@@ -124,6 +155,9 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     if (baseOverride) {
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
+          {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+            <Table.Cell>{renderAssignmentCheckbox(assignment)}</Table.Cell>
+          )}
           <Table.Cell>{renderOverrideTitle(assignment, baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'unlock_at', baseOverride)}</Table.Cell>
@@ -135,6 +169,9 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
       // Need all Table.Cells or you get weird borders on this row
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
+          {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+            <Table.Cell>{renderAssignmentCheckbox(assignment)}</Table.Cell>
+          )}
           <Table.Cell>{renderOverrideTitle(assignment, {base: true})}</Table.Cell>
           <Table.Cell>{renderNoDefaultDates()}</Table.Cell>
           <Table.Cell />
@@ -150,6 +187,15 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     return overrides.map(override => {
       return (
         <Table.Row key={`override_${override.id}`}>
+          {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+            <Table.Cell>
+              <ScreenReaderContent>
+                {assignment.selected
+                  ? I18n.t('parent assignment is selected')
+                  : I18n.t('parent assignment is not selected')}
+              </ScreenReaderContent>
+            </Table.Cell>
+          )}
           <Table.Cell>{renderOverrideTitle(assignment, override)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', override, override.id)}</Table.Cell>
           <Table.Cell>
@@ -173,7 +219,13 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     return rows
   }
 
+  const handleSelectAllAssignments = useCallback(
+    () => selectAllAssignments(!allAssignmentsSelected),
+    [allAssignmentsSelected, selectAllAssignments]
+  )
+
   function renderTable(_props = {}, matches = []) {
+    const checkboxWidthProp = `${CHECKBOX_COLUMN_WIDTH_REMS}rem`
     const widthProp = `${DATE_COLUMN_WIDTH_REMS}rem`
     const noteWidthProp = `${NOTE_COLUMN_WIDTH_REMS}rem`
     const layoutProp = matches.includes('small') ? 'stacked' : 'fixed'
@@ -181,6 +233,18 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
       <Table caption={I18n.t('Assignment Dates')} hover layout={layoutProp}>
         <Table.Head>
           <Table.Row>
+            {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+              <Table.ColHeader id="select" width={checkboxWidthProp}>
+                <Checkbox
+                  label={
+                    <ScreenReaderContent>{I18n.t('Select all assignments')}</ScreenReaderContent>
+                  }
+                  checked={allAssignmentsSelected}
+                  indeterminate={!allAssignmentsSelected && someAssignmentsSelected}
+                  onChange={handleSelectAllAssignments}
+                />
+              </Table.ColHeader>
+            )}
             <Table.ColHeader id="title">{I18n.t('Title')}</Table.ColHeader>
             <Table.ColHeader width={widthProp} id="due">
               {DATE_INPUT_META.due_at.label}

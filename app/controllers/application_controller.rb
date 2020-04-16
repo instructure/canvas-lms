@@ -174,6 +174,7 @@ class ApplicationController < ActionController::Base
           },
           FEATURES: {
             assignment_bulk_edit: @domain_root_account&.feature_enabled?(:assignment_bulk_edit),
+            assignment_bulk_edit_phase_2: Account.site_admin.feature_enabled?(:assignment_bulk_edit_phase_2),
             la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
             cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
             featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links),

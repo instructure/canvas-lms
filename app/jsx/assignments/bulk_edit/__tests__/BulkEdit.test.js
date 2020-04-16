@@ -120,7 +120,8 @@ describe('Assignment Bulk Edit Dates', () => {
   beforeEach(() => {
     oldEnv = window.ENV
     window.ENV = {
-      TIMEZONE: 'Asia/Tokyo'
+      TIMEZONE: 'Asia/Tokyo',
+      FEATURES: {}
     }
     timezoneSnapshot = timezone.snapshot()
     timezone.changeZone(tokyo, 'Asia/Tokyo')
@@ -508,6 +509,62 @@ describe('Assignment Bulk Edit Dates', () => {
       await flushPromises()
       expect(getByText(/saved successfully/)).toBeInTheDocument()
     }, 15000)
+  })
+
+  describe('assignment selections', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.assignment_bulk_edit_phase_2 = true
+    })
+
+    it('displays checkboxes for each main assignment', async () => {
+      const {getByText, getAllByText, assignments} = await renderBulkEditAndWait()
+      expect(getAllByText('Select assignment')).toHaveLength(assignments.length)
+      expect(getByText('0 assignments selected')).toBeInTheDocument()
+    })
+
+    it('disables checkboxes for assignments that cannot be edited', async () => {
+      const {getAllByLabelText} = await renderBulkEditAndWait({}, restrictedAssignmentResponse())
+      expect(getAllByLabelText('Select assignment')[0].disabled).toBe(true)
+      expect(getAllByLabelText('Select assignment')[1].disabled).toBe(true)
+    })
+
+    it('allows assignments to be checked individually', async () => {
+      const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait()
+      const checkboxes = getAllByLabelText('Select assignment')
+      fireEvent.click(checkboxes[0])
+      expect(checkboxes[0].checked).toBe(true)
+      expect(checkboxes[1].checked).toBe(false)
+      expect(getByLabelText('Select all assignments').getAttribute('aria-checked')).toBe('mixed')
+      expect(getByText('1 assignment selected')).toBeInTheDocument()
+    })
+
+    it('selects and deselects all editable assignments with the header', async () => {
+      const assignments = restrictedAssignmentResponse()
+      assignments.push({
+        id: 'assignment_3',
+        name: 'third assignment',
+        can_edit: true,
+        all_dates: [{base: true, unlock_at: null, due_at: null, lock_at: null, can_edit: true}]
+      })
+      const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
+        {},
+        assignments
+      )
+      const allCheckbox = getByLabelText('Select all assignments')
+      fireEvent.click(allCheckbox)
+      const checkboxes = getAllByLabelText('Select assignment')
+      expect(allCheckbox.checked).toBe(true)
+      expect(checkboxes[0].checked).toBe(false)
+      expect(checkboxes[1].checked).toBe(false)
+      expect(checkboxes[2].checked).toBe(true)
+      expect(getByText('1 assignment selected')).toBeInTheDocument()
+
+      fireEvent.click(allCheckbox)
+      expect(allCheckbox.checked).toBe(false)
+      expect(checkboxes[0].checked).toBe(false)
+      expect(checkboxes[1].checked).toBe(false)
+      expect(checkboxes[2].checked).toBe(false)
+    })
   })
 
   describe('errors', () => {
