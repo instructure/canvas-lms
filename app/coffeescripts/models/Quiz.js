@@ -19,7 +19,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
 import Assignment from '../models/Assignment'
-import DateGroup from '../models/DateGroup'
+import DateGroup from './DateGroup'
 import AssignmentOverrideCollection from '../collections/AssignmentOverrideCollection'
 import DateGroupCollection from '../collections/DateGroupCollection'
 import I18n from 'i18n!modelsQuiz'
@@ -91,10 +91,6 @@ export default class Quiz extends Backbone.Model {
       this.set('edit_url', this.edit_url())
       this.set('publish_url', this.publish_url())
       this.set('unpublish_url', this.unpublish_url())
-      this.set(
-        'toggle_post_to_sis_url',
-        `${this.get('base_url')}/${this.get('id')}/toggle_post_to_sis`
-      )
     }
   }
 

@@ -369,7 +369,6 @@ CanvasRails::Application.routes.draw do
 
     post 'quizzes/publish'   => 'quizzes/quizzes#publish'
     post 'quizzes/unpublish' => 'quizzes/quizzes#unpublish'
-    post 'quizzes/:id/toggle_post_to_sis' => "quizzes/quizzes#toggle_post_to_sis"
 
     post 'assignments/publish/quiz'   => 'assignments#publish_quizzes'
     post 'assignments/unpublish/quiz' => 'assignments#unpublish_quizzes'
