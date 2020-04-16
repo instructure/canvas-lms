@@ -45,21 +45,21 @@ describe "/users/show" do
   end
 
   it "should render responsive accounts" do
-    @course.root_account.enable_feature!(:responsive_2020_04)
+    @course.root_account.enable_feature!(:responsive_awareness)
     render "users/show"
     expect(response).to have_tag("div[class='accounts'] span[class='name'][style='word-break: break-word;']")
     expect(response).to have_tag("div[class='accounts'] span[class='name'][style='word-break: break-word;']")
   end
 
   it "should render responsive groups" do
-    @course.root_account.enable_feature!(:responsive_2020_04)
+    @course.root_account.enable_feature!(:responsive_awareness)
     render "users/show"
     expect(response).to have_tag("div[class='groups'] span[class='name'][style='word-break: break-word;']")
     expect(response).to have_tag("div[class='groups'] span[class='name'][style='word-break: break-word;']")
   end
 
   it "should render responsive enrollments" do
-    @course.root_account.enable_feature!(:responsive_2020_04)
+    @course.root_account.enable_feature!(:responsive_awareness)
     render "users/show"
     expect(response).to have_tag("div[class='courses'] span[class='name'][style='word-break: break-word;']")
     expect(response).to have_tag("div[class='courses'] span[class='name'][style='word-break: break-word;']")

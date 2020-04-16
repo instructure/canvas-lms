@@ -23,7 +23,7 @@
 @import "components/ic-sortable-list.scss";
 
 @include mobile-only {
-  body.responsive_2020_03 table.narrow td {
+  body.responsive_awareness table.narrow td {
     display: block;
     max-width: 320px;
   }
@@ -39,6 +39,6 @@
   }
 }
 
-body.responsive_2020_03 .delete_filter_link {
+body.responsive_awareness .delete_filter_link {
   margin: auto 5px;
 }

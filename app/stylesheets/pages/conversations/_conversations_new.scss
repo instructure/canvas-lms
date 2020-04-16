@@ -78,7 +78,7 @@ $conversations-headerHeightPhone: 210px;
 
   @media only screen and (max-width: 576px) { height: 163px; }
 
-  body.responsive_2020_04 & {
+  body.responsive_awareness & {
     @media only screen and (max-width: 576px) {
       height: $conversations-headerHeightPhone;
     }
@@ -110,7 +110,7 @@ $conversations-headerHeightPhone: 210px;
       white-space: nowrap;
       margin-top: $ic-sp;
 
-      body.responsive_2020_04 & {
+      body.responsive_awareness & {
         @media only screen and (min-width: 1200px) {
           margin-top: 0;
         }
@@ -128,7 +128,7 @@ $conversations-headerHeightPhone: 210px;
   }
 }
 
-body.responsive_2020_04 .conversations__filter {
+body.responsive_awareness .conversations__filter {
   margin-top: $ic-sp;
 
   @media only screen and (min-width: 577px) {
@@ -231,7 +231,7 @@ body.responsive_2020_04 .conversations__filter {
   @media only screen and (min-width: 1200px) { top: 62px; }
   @media only screen and (max-width: 576px) { top: 163px; }
 
-  body.responsive_2020_04 & {
+  body.responsive_awareness & {
     width: 100%;
 
     @media only screen and (max-width: 576px) {
@@ -247,13 +247,13 @@ body.responsive_2020_04 .conversations__filter {
 .message-list-scroller {
   overflow: auto;
 
-  body:not(.responsive_2020_04) & {
+  body:not(.responsive_awareness) & {
     border-#{direction(right)}: 1px solid #bfbfbf;
     height: 100%;
     max-width: 400px;
   }
 
-  body.responsive_2020_04 & {
+  body.responsive_awareness & {
     min-width: 1px;
     flex: 0 0 34%;
     border-bottom: 1px solid #bfbfbf;
@@ -475,12 +475,12 @@ body.responsive_2020_04 .conversations__filter {
   }
 }
 
-// TODO: Delete first selector when responsive_2020_04 FF is on by default
+// TODO: Delete first selector when responsive_awareness FF is on by default
 .message-detail.span8,
 .message-detail.conversations__message-detail {
   overflow: auto;
 
-  body:not(.responsive_2020_04) & {
+  body:not(.responsive_awareness) & {
     margin-#{direction(left)}: 0;
     width: 68.08511%;
     height: 100%;
@@ -491,7 +491,7 @@ body.responsive_2020_04 .conversations__filter {
     }
   }
 
-  body.responsive_2020_04 & {
+  body.responsive_awareness & {
     min-width: 1px;
     flex: 1;
 
@@ -519,11 +519,11 @@ body.responsive_2020_04 .conversations__filter {
       text-align: center;
       width: 100%;
 
-      body:not(.responsive_2020_04) & {
+      body:not(.responsive_awareness) & {
         margin-bottom: 120px;
       }
 
-      body.responsive_2020_04 & {
+      body.responsive_awareness & {
         margin-bottom: $ic-sp;
       }
 
@@ -546,12 +546,12 @@ body.responsive_2020_04 .conversations__filter {
   }
 
   .message-detail-actions {
-    body.responsive_2020_04 & {
+    body.responsive_awareness & {
       display: flex;
       align-items: center;
     }
 
-    body:not(.responsive_2020_04) & {
+    body:not(.responsive_awareness) & {
       li {
         display: inline;
       }
@@ -583,7 +583,7 @@ body.responsive_2020_04 .conversations__filter {
   .message-info {
     margin-bottom: $ic-sp;
 
-    body.responsive_2020_04 & {
+    body.responsive_awareness & {
       @include breakpoint(desktop) {
         display: flex;
         flex-wrap: wrap;
@@ -592,7 +592,7 @@ body.responsive_2020_04 .conversations__filter {
   }
 
   .user-info {
-    body.responsive_2020_04 & {
+    body.responsive_awareness & {
       @include breakpoint(desktop) {
         flex: 1;
         padding-#{direction(right)}: $ic-sp;
@@ -617,7 +617,7 @@ body.responsive_2020_04 .conversations__filter {
   .message-metadata {
     position: relative;
 
-    body.responsive_2020_04 & {
+    body.responsive_awareness & {
       @include breakpoint(desktop) {
         text-align: direction(right);
       }
@@ -627,7 +627,7 @@ body.responsive_2020_04 .conversations__filter {
   .date {
     color: darken($ic-color-neutral, 50);
 
-    body:not(.responsive_2020_04) & {
+    body:not(.responsive_awareness) & {
       position: absolute;
       #{direction(right)}: 10px;
       top: 0;
@@ -635,7 +635,7 @@ body.responsive_2020_04 .conversations__filter {
   }
 
   .actions {
-    body:not(.responsive_2020_04) & {
+    body:not(.responsive_awareness) & {
       #{direction(right)}: 9999em;
       position: relative;
       top: 0;
@@ -647,12 +647,12 @@ body.responsive_2020_04 .conversations__filter {
     border: none;
     padding: 0;
 
-    body:not(.responsive_2020_04) & {
+    body:not(.responsive_awareness) & {
       margin: 0 0 0 8px;
       float: direction(left);
     }
 
-    body.responsive_2020_04 & {
+    body.responsive_awareness & {
       margin: 0 0 0 $ic-sp / 3;
       display: inline-block;
     }
@@ -670,7 +670,7 @@ body.responsive_2020_04 .conversations__filter {
   }
 }
 
-body.responsive_2020_04 {
+body.responsive_awareness {
   .touch .message-detail .actions {
     #{direction(right)}: -7px;
     top: 24px;
@@ -683,7 +683,7 @@ body.responsive_2020_04 {
   }
 }
 
-body:not(.responsive_2020_04) .message-item-view:hover, .message-metadata.hover {
+body:not(.responsive_awareness) .message-item-view:hover, .message-metadata.hover {
   .actions {
     display: block;
     #{direction(right)}: -7px;
