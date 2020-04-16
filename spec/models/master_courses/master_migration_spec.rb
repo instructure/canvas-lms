@@ -288,6 +288,25 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "deletes associated pages before importing new ones" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      @page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      run_master_migration
+
+      @page_to = @copy_to.wiki_pages.where(:migration_id => mig_id(@page)).first
+      Timecop.freeze(1.minute.from_now) do
+        @page.destroy
+        @page2 = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai") # same title
+      end
+
+      run_master_migration
+      expect(@page_to.reload).to be_deleted
+      @page2_to = @copy_to.wiki_pages.where(:migration_id => mig_id(@page2)).first
+      expect(@page2_to.title).to eq @page2.title
+    end
+
     it "should sync deleted quiz questions (unless changed downstream)" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
