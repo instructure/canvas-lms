@@ -55,6 +55,8 @@ var quizSubmission = (function() {
     $countdownSeconds = $('.countdown_seconds'),
     $timeRunningTimeRemaining = $('.time_running,.time_remaining'),
     $lastSaved = $('#last_saved_indicator')
+  const $timerAutosubmitDisabled = $('.timer_autosubmit_disabled'),
+    timerAutosubmitDisabledParsed = $timerAutosubmitDisabled.text() === 'true'
   // $('.time_running,.time_remaining') is probably not yet loaded at the time
   const $timeRunningFunc = function() {
     if ($timeRunningTimeRemaining.length > 0) return $timeRunningTimeRemaining
@@ -252,7 +254,7 @@ var quizSubmission = (function() {
           $countdownSeconds.text(s)
         }
 
-        if (s <= 0 && !quizSubmission.submitting) {
+        if (s <= 0 && !quizSubmission.submitting && !timerAutosubmitDisabledParsed) {
           quizSubmission.submitting = true
           quizSubmission.submitQuiz()
         }
@@ -373,7 +375,7 @@ var quizSubmission = (function() {
             opacity: 0.7
           },
           close() {
-            if (!quizSubmission.submitting) {
+            if (!quizSubmission.submitting && !timerAutosubmitDisabledParsed) {
               quizSubmission.submitting = true
               quizSubmission.submitQuiz()
             }
