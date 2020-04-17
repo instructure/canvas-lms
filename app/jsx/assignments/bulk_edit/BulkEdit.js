@@ -19,16 +19,15 @@
 import I18n from 'i18n!assignments_bulk_edit'
 import React, {useCallback, useEffect, useState} from 'react'
 import {func, string} from 'prop-types'
+import moment from 'moment-timezone'
 import produce from 'immer'
-import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
 import {List} from '@instructure/ui-elements'
-import {ProgressBar} from '@instructure/ui-progress'
-import {Text} from '@instructure/ui-text'
 import CanvasInlineAlert from 'jsx/shared/components/CanvasInlineAlert'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
+import BulkEditHeader from './BulkEditHeader'
 import BulkEditTable from './BulkEditTable'
+import MoveDatesModal from './MoveDatesModal'
 import useSaveAssignments from './hooks/useSaveAssignments'
 import useMonitorJobCompletion from './hooks/useMonitorJobCompletion'
 import {originalDateField, canEditAll} from './utils'
@@ -47,6 +46,7 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
   const [assignments, setAssignments] = useState([])
   const [loadingError, setLoadingError] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [moveDatesModalOpen, setMoveDatesModalOpen] = useState(false)
   const {
     saveAssignments,
     startingSave,
@@ -90,10 +90,26 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     if (jobSuccess) clearOriginalDates()
   }, [jobSuccess])
 
-  function handleSave() {
-    onSave()
-    saveAssignments(assignments)
-  }
+  const setDateOnOverride = useCallback((override, dateFieldName, newDate) => {
+    const originalField = originalDateField(dateFieldName)
+    if (!override.hasOwnProperty(originalField)) {
+      override[originalField] = override[dateFieldName]
+    }
+    override[dateFieldName] = newDate ? newDate.toISOString() : null
+  }, [])
+
+  const shiftDateOnOverride = useCallback(
+    (override, dateFieldName, nDays) => {
+      const currentDate = override[dateFieldName]
+      if (currentDate) {
+        const newDate = moment(currentDate)
+          .add(nDays, 'days')
+          .toDate()
+        setDateOnOverride(override, dateFieldName, newDate)
+      }
+    },
+    [setDateOnOverride]
+  )
 
   const clearPreviousSave = useCallback(() => {
     // Clear anything from the previous save operation so those elements don't show anymore and so
@@ -113,13 +129,11 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
           const override = assignment.all_dates.find(o =>
             isBaseOverride ? o.base : o.id === overrideId
           )
-          const originalField = originalDateField(dateKey)
-          if (!override.hasOwnProperty(originalField)) override[originalField] = override[dateKey]
-          override[dateKey] = newDate ? newDate.toISOString() : null
+          setDateOnOverride(override, dateKey, newDate)
         })
       )
     },
-    [clearPreviousSave]
+    [clearPreviousSave, setDateOnOverride]
   )
 
   const setAssignmentSelected = useCallback((assignmentId, selected) => {
@@ -141,71 +155,71 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     )
   }, [])
 
-  function anyAssignmentsEdited() {
-    const overrides = assignments.flatMap(a => a.all_dates)
-    return overrides.some(override =>
-      [
-        originalDateField('due_at'),
-        originalDateField('unlock_at'),
-        originalDateField('lock_at')
-      ].some(originalField => override.hasOwnProperty(originalField))
-    )
-  }
+  const handleSave = useCallback(() => {
+    onSave()
+    saveAssignments(assignments)
+  }, [assignments, onSave, saveAssignments])
 
-  function renderProgressValue({valueNow}) {
-    return <Text>{I18n.t('%{percent}%', {percent: valueNow})}</Text>
-  }
+  const handleOpenBatchEdit = useCallback((value = true) => {
+    setMoveDatesModalOpen(!!value)
+  }, [])
+
+  const handleBatchEditShift = useCallback(
+    nDays => {
+      setAssignments(currentAssignments =>
+        produce(currentAssignments, draftAssignments => {
+          draftAssignments.forEach(draftAssignment => {
+            if (draftAssignment.selected) {
+              draftAssignment.all_dates.forEach(draftOverride => {
+                shiftDateOnOverride(draftOverride, 'due_at', nDays)
+                shiftDateOnOverride(draftOverride, 'unlock_at', nDays)
+                shiftDateOnOverride(draftOverride, 'lock_at', nDays)
+              })
+            }
+          })
+        })
+      )
+      selectAllAssignments(false)
+      setMoveDatesModalOpen(false)
+    },
+    [selectAllAssignments, shiftDateOnOverride]
+  )
+  const handleBatchEditRemove = useCallback(
+    datesToRemove => {
+      setAssignments(currentAssignments =>
+        produce(currentAssignments, draftAssignments => {
+          draftAssignments.forEach(draftAssignment => {
+            if (draftAssignment.selected) {
+              draftAssignment.all_dates.forEach(draftOverride => {
+                if (datesToRemove.includes('due_at'))
+                  setDateOnOverride(draftOverride, 'due_at', null)
+                if (datesToRemove.includes('unlock_at'))
+                  setDateOnOverride(draftOverride, 'unlock_at', null)
+                if (datesToRemove.includes('lock_at'))
+                  setDateOnOverride(draftOverride, 'lock_at', null)
+              })
+            }
+          })
+        })
+      )
+      selectAllAssignments(false)
+      setMoveDatesModalOpen(false)
+    },
+    [selectAllAssignments, setDateOnOverride]
+  )
 
   function renderHeader() {
-    const selectedAssignmentsCount = assignments.filter(a => a.selected).length
-    return (
-      <Flex as="div">
-        <Flex.Item shouldGrow>
-          <h2>{I18n.t('Edit Assignment Dates')}</h2>
-        </Flex.Item>
-        {jobRunning && (
-          <Flex.Item width="250px">
-            <ProgressBar
-              screenReaderLabel={I18n.t('Saving assignment dates progress')}
-              valueNow={jobCompletion}
-              renderValue={renderProgressValue}
-            />
-            <CanvasInlineAlert liveAlert screenReaderOnly variant="info">
-              {I18n.t('Saving assignment dates progress: %{percent}%', {
-                percent: jobCompletion
-              })}
-            </CanvasInlineAlert>
-          </Flex.Item>
-        )}
-        {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-          <Flex.Item margin="0 0 0 small">
-            <Text>
-              {I18n.t(
-                {one: '%{count} assignment selected', other: '%{count} assignments selected'},
-                {count: selectedAssignmentsCount}
-              )}
-            </Text>
-          </Flex.Item>
-        )}
-        <Flex.Item>
-          <Button margin="0 0 0 small" onClick={onCancel}>
-            {jobSuccess ? I18n.t('Close') : I18n.t('Cancel')}
-          </Button>
-        </Flex.Item>
-        <Flex.Item>
-          <Button
-            margin="0 0 0 small"
-            variant="primary"
-            interaction={
-              startingSave || jobRunning || !anyAssignmentsEdited() ? 'disabled' : 'enabled'
-            }
-            onClick={handleSave}
-          >
-            {startingSave || jobRunning ? I18n.t('Saving...') : I18n.t('Save')}
-          </Button>
-        </Flex.Item>
-      </Flex>
-    )
+    const headerProps = {
+      assignments,
+      startingSave,
+      jobRunning,
+      jobCompletion,
+      jobSuccess,
+      onSave: handleSave,
+      onCancel,
+      onOpenBatchEdit: handleOpenBatchEdit
+    }
+    return <BulkEditHeader {...headerProps} />
   }
 
   function renderSaveSuccess() {
@@ -247,6 +261,17 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     }
   }
 
+  function renderMoveDatesModal() {
+    return (
+      <MoveDatesModal
+        open={moveDatesModalOpen}
+        onShiftDays={handleBatchEditShift}
+        onRemoveDates={handleBatchEditRemove}
+        onCancel={() => handleOpenBatchEdit(false)}
+      />
+    )
+  }
+
   function renderBody() {
     if (loading) {
       return (
@@ -278,6 +303,7 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
 
   return (
     <>
+      {renderMoveDatesModal()}
       {renderSaveSuccess()}
       {renderSaveError()}
       {renderHeader()}
