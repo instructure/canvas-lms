@@ -4087,6 +4087,13 @@ describe Assignment do
         @assignment.save!
         expect(@assignment.grants_right?(@student, :attach_submission_comment_files)).to be true
       end
+
+      it 'is true when an assignment is an online_quiz' do
+        @assignment.lock_at = 1.week.ago
+        @assignment.submission_types = 'online_quiz'
+        @assignment.save!
+        expect(@assignment.grants_right?(@student, :attach_submission_comment_files)).to be true
+      end
     end
 
     context "to delete" do
