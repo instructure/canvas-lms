@@ -19,6 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
+import $ from 'jquery'
 
 import {Button} from '@instructure/ui-buttons'
 import HomePagePromptContainer from '../courses/HomePagePromptContainer'
@@ -56,13 +57,18 @@ export default class PublishButton extends React.Component {
   handleClick = () => {
     const {defaultView, courseId} = this.props
     if (defaultView === 'modules') {
-      apiClient.getModules({courseId}).then(({data: modules}) => {
-        if (modules.length === 0) {
-          this.setState({showModal: true})
-        } else {
-          apiClient.publishCourse({courseId})
-        }
-      })
+      apiClient
+        .getModules({courseId})
+        .then(({data: modules}) => {
+          if (modules.length === 0) {
+            this.setState({showModal: true})
+          } else {
+            apiClient.publishCourse({courseId})
+          }
+        })
+        .catch(() =>
+          $.flashError(I18n.t('An error ocurred while fetching course details. Please try again.'))
+        )
     } else {
       apiClient.publishCourse({courseId})
     }

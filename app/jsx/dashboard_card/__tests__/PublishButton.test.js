@@ -17,6 +17,7 @@
  */
 import React from 'react'
 import {mount} from 'enzyme'
+import $ from 'jquery'
 import PublishButton from '../PublishButton'
 import * as apiClient from '../../courses/apiClient'
 
@@ -35,6 +36,7 @@ function createMockProps(opts = {}) {
 describe('PublishButton', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.spyOn($, 'flashError').mockImplementation()
     apiClient.getModules.mockReturnValue(Promise.resolve({data: []}))
   })
 
@@ -55,6 +57,18 @@ describe('PublishButton', () => {
       apiClient.getModules.mockReturnValue(Promise.resolve({data: ['module1']}))
       await wrapper.find('button').simulate('click')
       expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0'})
+    })
+
+    it('flashes an error when getModules fails', async () => {
+      apiClient.getModules.mockRejectedValue(Promise.reject())
+      const wrapper = mount(<PublishButton {...createMockProps()} />)
+      try {
+        await wrapper.find('button').simulate('click')
+      } catch (e) {
+        expect($.flashError).toHaveBeenCalledWith(
+          'An error ocurred while fetching course details. Please try again.'
+        )
+      }
     })
   })
 
