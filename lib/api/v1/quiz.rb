@@ -54,7 +54,9 @@ module Api::V1::Quiz
   }.freeze
 
   def quizzes_json(quizzes, context, user, session, options={})
-    options[:description_formatter] = description_formatter(context, user)
+    # bulk preload all description attachments to prevent N+1 query
+    preloaded_attachments = api_bulk_load_user_content_attachments(quizzes.map(&:description), context)
+    options[:description_formatter] = description_formatter(context, user, preloaded_attachments)
     if context.grants_right?(user, session, :manage_assignments)
       options[:master_course_status] = setup_master_course_restrictions(quizzes, context)
     end
@@ -84,11 +86,11 @@ module Api::V1::Quiz
     end
   end
 
-  def description_formatter(context, user)
+  def description_formatter(context, user, preloaded_attachments = {})
     # adds verifiers - lambda here (as opposed to
     # inside the serializer) to capture context
     lambda do |description|
-      api_user_content(description, context, user)
+      api_user_content(description, context, user, preloaded_attachments)
     end
   end
 
