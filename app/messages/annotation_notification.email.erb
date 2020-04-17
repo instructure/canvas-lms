@@ -1,0 +1,12 @@
+<% define_content :link do %>
+  <%= polymorphic_url([asset.assignment.context, asset.assignment, :submission], id: asset.user) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "A new annotation has been made to your submission document" %>
+<% end %>
+
+<%= t :body, "A new annotation has been made by %{author} on the assignment %{assignment_name}.",
+      author: data.author_name, assignment_name: asset.assignment.name %>
+
+<%= t("View Submission", link: content(:link)) %>

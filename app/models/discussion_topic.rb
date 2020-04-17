@@ -927,7 +927,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def clear_non_applicable_stream_items_for_sections
     # either changed sections or made section specificness
-    return unless self.is_section_specific? ? @sections_changed : !self.is_section_specific_before_last_save
+    return unless self.is_section_specific? ? @sections_changed : self.is_section_specific_before_last_save
 
     remaining_participants = participants
     user_ids = []

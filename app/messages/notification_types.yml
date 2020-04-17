@@ -12,16 +12,14 @@
 #    - name: Old Notification
 #      delay_for: <%= 3 * 60 %>
 #
+- category: Account Notification
+  notifications:
+    - name: Account Notification
+
 - category: Added To Conversation
   notifications:
     - name: Added To Conversation
       delay_for: 0
-
-- category: Conversation Created
-  notifications:
-    - name: Conversation Created
-      delay_for: 0
-
 
 - category: Alert
   notifications:
@@ -68,12 +66,28 @@
     - name: Appointment Reserved For User
       delay_for: 0
 
+- category: Blueprint
+  notifications:
+    - name: Blueprint Content Added
+      delay_for: 0
+    - name: Blueprint Sync Complete
+      delay_for: 0
+
 - category: Calendar
   notifications:
     - name: New Event Created
       delay_for: 0
     - name: Event Date Changed
       delay_for: <%= 15*60 %>
+
+- category: Content Link Error
+  notifications:
+    - name: Content Link Error
+
+- category: Conversation Created
+  notifications:
+    - name: Conversation Created
+      delay_for: 0
 
 - category: Conversation Message
   notifications:
@@ -205,6 +219,11 @@
     - name: Enrollment Accepted
       delay_for: 0
 
+- category: Recording Ready
+  notifications:
+    - name: Web Conference Recording Ready
+      delay_for: 0
+
 - category: Registration
   notifications:
     - name: Confirm Email Communication Channel
@@ -247,28 +266,12 @@
       delay_for: 0
     - name: Submission Comment For Teacher
       delay_for: 0
+    - name: Annotation Notification
+      delay_for: 0
+    - name: Annotation Teacher Notification
+      delay_for: 0
 
 - category: Summaries
   notifications:
     - name: Summaries
       delay_for: 0
-
-- category: Recording Ready
-  notifications:
-    - name: Web Conference Recording Ready
-      delay_for: 0
-
-- category: Blueprint
-  notifications:
-    - name: Blueprint Content Added
-      delay_for: 0
-    - name: Blueprint Sync Complete
-      delay_for: 0
-
-- category: Content Link Error
-  notifications:
-    - name: Content Link Error
-
-- category: Account Notification
-  notifications:
-    - name: Account Notification
