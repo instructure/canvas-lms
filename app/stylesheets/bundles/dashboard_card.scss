@@ -89,7 +89,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   // if there is not enough screen width to fit 2 whole cards (like on a phone) then just have one card fill the whole width
   @media only screen and (max-width: $ic-DashboardCard-width*2 + $ic-sp*8) {
     & { width: 100%; }
-    body.responsive_misc & {
+    body.responsive_awareness & {
       margin-#{direction(right)}: 0;
     }
   }

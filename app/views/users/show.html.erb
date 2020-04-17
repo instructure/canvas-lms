@@ -61,7 +61,7 @@
 </style>
 
 <% css_bundle :roster_user, :context_list, :pairing_code %>
-<% @responsive_awareness = @domain_root_account.feature_enabled?(:responsive_awareness) %>
+<% @responsive_misc = @domain_root_account.feature_enabled?(:responsive_misc) %>
 <div id="user-info-fieldsets">
   <%= render :partial => 'users/name' %>
   <%= render :partial => 'users/logins' %>
@@ -89,13 +89,13 @@
             <li>
               <a href="<%= url_for(account) %>">
                 <span
-                  class="name<%= @responsive_awareness ? '' : ' ellipsis' %>"
-                  style="<%= @responsive_awareness ? 'word-break: break-word;' : '' %>">
+                  class="name<%= @responsive_misc ? '' : ' ellipsis' %>"
+                  style="<%= @responsive_misc ? 'word-break: break-word;' : '' %>">
                   <%= account.name %>
                 </span>
                 <span
-                  class="subtitle<%= @responsive_awareness ? '' : ' ellipsis' %>"
-                  style="<%= @responsive_awareness ? 'word-break: break-word;' : '' %>">
+                  class="subtitle<%= @responsive_misc ? '' : ' ellipsis' %>"
+                  style="<%= @responsive_misc ? 'word-break: break-word;' : '' %>">
                 </span>
               </a>
             </li>
@@ -112,13 +112,13 @@
             <li>
               <a href="<%= group_path(membership.group) %>">
                 <span
-                  class="name<%= @responsive_awareness ? '' : ' ellipsis' %>"
-                  style="<%= @responsive_awareness ? 'word-break: break-word;' : '' %>">
+                  class="name<%= @responsive_misc ? '' : ' ellipsis' %>"
+                  style="<%= @responsive_misc ? 'word-break: break-word;' : '' %>">
                   <%= membership.group.name %>
                 </span>
                 <span
-                  class="subtitle<%= @responsive_awareness ? '' : ' ellipsis' %>"
-                  style="<%= @responsive_awareness ? 'word-break: break-word;' : '' %>">
+                  class="subtitle<%= @responsive_misc ? '' : ' ellipsis' %>"
+                  style="<%= @responsive_misc ? 'word-break: break-word;' : '' %>">
                   <%= membership.group.context.name rescue "" %>
                 </span>
               </a>

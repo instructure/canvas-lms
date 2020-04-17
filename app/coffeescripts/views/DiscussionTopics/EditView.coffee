@@ -133,7 +133,7 @@ export default class EditView extends ValidatedFormView
   canPublish: =>
     !@isAnnouncement() && !@model.get('published') && @permissions.CAN_MODERATE
 
-  isResponsive: => !!window.ENV?.FEATURES?.responsive_2020_04
+  isResponsive: => !!window.ENV?.FEATURES?.responsive_awareness
 
   toJSON: ->
     data = super

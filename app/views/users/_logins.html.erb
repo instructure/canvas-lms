@@ -22,7 +22,7 @@
   <% js_env :PASSWORD_POLICY => (@domain_root_account.try(:password_policy) || {}) %>
   <fieldset
     id="login_information"
-    <% if @domain_root_account.feature_enabled?(:responsive_admin_settings) %>
+    <% if @domain_root_account.feature_enabled?(:responsive_misc) %>
       class="responsive"
     <% end %>
   >
