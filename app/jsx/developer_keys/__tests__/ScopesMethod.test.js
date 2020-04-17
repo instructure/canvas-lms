@@ -37,7 +37,7 @@ it('renders the correct method', () => {
 
 it('allows setting a margin', () => {
   const wrapper = mount(<DeveloperKeyScopesMethod {...props} />)
-  expect(wrapper.html()).toContain('style="margin: 0.75rem 0.75rem 1.5rem 2.25rem;"')
+  expect(wrapper.html()).toContain('style="margin: 1rem 1rem 1.5rem 2.25rem;"')
 })
 
 describe('variant map', () => {

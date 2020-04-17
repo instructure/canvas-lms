@@ -55,7 +55,7 @@
     "@instructure/canvas-media": ">=1.0.0",
     "@instructure/canvas-theme": "6",
     "@instructure/k5uploader": ">=1",
-    "@instructure/media-capture": "~7.1.0",
+    "@instructure/media-capture": "^5.54.0",
     "@instructure/ui-a11y": "6",
     "@instructure/ui-alerts": "6",
     "@instructure/ui-billboard": "6",
