@@ -18,40 +18,9 @@
 
 import {difference} from 'lodash'
 
-import {deferPromise} from '../../../shared/async'
-
 function getCustomColumns(courseId, dispatch) {
   const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
   return dispatch.getDepaginated(url, {include_hidden: true})
-}
-
-function getDataForColumn(courseId, columnId, options, perPageCallback, dispatch) {
-  const url = `/api/v1/courses/${courseId}/custom_gradebook_columns/${columnId}/data`
-  const augmentedCallback = data => perPageCallback(columnId, data)
-  const params = {include_hidden: true, per_page: options.perPage}
-  return dispatch.getDepaginated(url, params, augmentedCallback)
-}
-
-function getCustomColumnData(options, customColumnsDfd, dispatch) {
-  const {courseId, gradebook} = options
-  const perPageCallback = gradebook.gotCustomColumnDataChunk
-  const customColumnDataLoaded = deferPromise()
-
-  if (options.customColumnIds) {
-    const customColumnDataDfds = options.customColumnIds.map(columnId =>
-      getDataForColumn(courseId, columnId, options, perPageCallback, dispatch)
-    )
-    Promise.all(customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
-  } else {
-    customColumnsDfd.then(customColumns => {
-      const customColumnDataDfds = customColumns.map(column =>
-        getDataForColumn(courseId, column.id, options, perPageCallback, dispatch)
-      )
-      Promise.all(customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
-    })
-  }
-
-  return customColumnDataLoaded.promise
 }
 
 function loadGradebookData(opts) {
@@ -91,7 +60,7 @@ function loadGradebookData(opts) {
        * data loading, so it waits until all students and submissions are
        * finished loading.
        */
-      getCustomColumnData(opts, gotCustomColumns, dispatch)
+      dataLoader.customColumnsDataLoader.loadCustomColumnsData()
     })
 
   return {
@@ -104,6 +73,5 @@ function loadGradebookData(opts) {
 }
 
 export default {
-  getDataForColumn,
   loadGradebookData
 }

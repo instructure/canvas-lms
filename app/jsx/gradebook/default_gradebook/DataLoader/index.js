@@ -19,6 +19,7 @@
 import {RequestDispatch} from '../../../shared/network'
 import AssignmentGroupsLoader from './AssignmentGroupsLoader'
 import ContextModulesLoader from './ContextModulesLoader'
+import CustomColumnsDataLoader from './CustomColumnsDataLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
 import OldDataLoader from './OldDataLoader'
 import StudentContentDataLoader from './StudentContentDataLoader'
@@ -38,6 +39,7 @@ export default class DataLoader {
 
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.contextModulesLoader = new ContextModulesLoader(loaderConfig)
+    this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
     this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
     this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
     this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
@@ -80,16 +82,7 @@ export default class DataLoader {
   }
 
   loadCustomColumnData(customColumnId) {
-    const gradebook = this._gradebook
-    const {options} = gradebook
-
-    OldDataLoader.getDataForColumn(
-      options.context_id,
-      customColumnId,
-      {perPage: options.api_max_per_page},
-      gradebook.gotCustomColumnDataChunk,
-      this.dispatch
-    )
+    this.customColumnsDataLoader.loadCustomColumnsData([customColumnId])
   }
 
   loadOverridesForSIS() {
@@ -142,9 +135,7 @@ export default class DataLoader {
       courseId: options.context_id,
 
       getGradingPeriodAssignments:
-        loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null,
-
-      customColumnIds: gradebook.gradebookContent.customColumns.map(column => column.id)
+        loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null
     })
   }
 }

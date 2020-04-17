@@ -19,10 +19,7 @@
 import sinon from 'sinon'
 
 import waitForCondition from 'jsx/shared/__tests__/waitForCondition'
-import FakeServer, {
-  paramsFromRequest,
-  pathFromRequest
-} from 'jsx/shared/network/__tests__/FakeServer'
+import FakeServer, {paramsFromRequest} from 'jsx/shared/network/__tests__/FakeServer'
 import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 
@@ -464,53 +461,24 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       })
     })
 
-    QUnit.module('loading custom column data', contextHooks => {
-      contextHooks.beforeEach(() => {
-        gradebook.gradebookContent.customColumns = [{id: '2401'}, {id: '2402'}, {id: '2403'}]
+    test('loads custom column data', async () => {
+      sinon.spy(dataLoader.customColumnsDataLoader, 'loadCustomColumnsData')
+      await reloadData()
+      strictEqual(dataLoader.customColumnsDataLoader.loadCustomColumnsData.callCount, 1)
+    })
+
+    test('loads custom column data after students finish loading', async () => {
+      sinon.stub(dataLoader.customColumnsDataLoader, 'loadCustomColumnsData').callsFake(() => {
+        strictEqual(gradebook.updateStudentsLoaded.withArgs(true).callCount, 1)
       })
+      await reloadData()
+    })
 
-      test('waits while students are still loading', async () => {
-        await reloadData()
-        const indexOfLastStudentRequest = server.findLastIndex(urls.students)
-        const indexOfFirstDataRequest = server.findFirstIndex(urls.customColumnData('.*'))
-        ok(indexOfFirstDataRequest > indexOfLastStudentRequest)
+    test('loads custom column data after submissions finish loading', async () => {
+      sinon.stub(dataLoader.customColumnsDataLoader, 'loadCustomColumnsData').callsFake(() => {
+        strictEqual(gradebook.updateSubmissionsLoaded.withArgs(true).callCount, 1)
       })
-
-      test('waits while submissions are still loading', async () => {
-        await reloadData()
-        const indexOfLastStudentRequest = server.findLastIndex(urls.submissions)
-        const indexOfFirstDataRequest = server.findFirstIndex(urls.customColumnData('.*'))
-        ok(indexOfFirstDataRequest > indexOfLastStudentRequest)
-      })
-
-      QUnit.module('when submissions have finished loading', () => {
-        test('requests custom column data for each loaded custom column', async () => {
-          await reloadData()
-          const requests = server.filterRequests(urls.customColumnData('.*'))
-          strictEqual(requests.length, 3)
-        })
-
-        test('requests custom column data using the custom column ids', async () => {
-          await reloadData()
-          const requestUrls = server
-            .filterRequests(urls.customColumnData('.*'))
-            .map(pathFromRequest)
-          const expectedUrls = [
-            urls.customColumnData('2401'),
-            urls.customColumnData('2402'),
-            urls.customColumnData('2403')
-          ]
-          deepEqual(requestUrls, expectedUrls)
-        })
-
-        test('includes custom column data parameters with each request', async () => {
-          await reloadData()
-          const parameterValues = server
-            .filterRequests(urls.customColumnData('.*'))
-            .map(request => paramsFromRequest(request).include_hidden)
-          deepEqual(parameterValues, ['true', 'true', 'true'])
-        })
-      })
+      await reloadData()
     })
   })
 })
