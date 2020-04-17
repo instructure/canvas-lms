@@ -19,11 +19,6 @@
 import {deferPromise} from '../../../shared/async'
 import StudentContentDataLoader from './StudentContentDataLoader'
 
-function getContextModules(courseId, dispatch) {
-  const url = `/api/v1/courses/${courseId}/modules`
-  return dispatch.getDepaginated(url)
-}
-
 function getCustomColumns(courseId, dispatch) {
   const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
   return dispatch.getDepaginated(url, {include_hidden: true})
@@ -87,7 +82,7 @@ function loadGradebookData(opts) {
   )
 
   const gotContextModules = opts.getContextModules
-    ? getContextModules(opts.courseId, dispatch)
+    ? dataLoader.contextModulesLoader.loadContextModules()
     : null
 
   const gotStudents = deferPromise()

@@ -18,6 +18,7 @@
 
 import {RequestDispatch} from '../../../shared/network'
 import AssignmentGroupsLoader from './AssignmentGroupsLoader'
+import ContextModulesLoader from './ContextModulesLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
 import OldDataLoader from './OldDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
@@ -35,6 +36,7 @@ export default class DataLoader {
     }
 
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
+    this.contextModulesLoader = new ContextModulesLoader(loaderConfig)
     this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
     this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
   }
@@ -69,11 +71,6 @@ export default class DataLoader {
     // eslint-disable-next-line promise/catch-or-return
     promises.gotStudents.then(() => {
       gradebook.updateStudentsLoaded(true)
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotContextModules.then(contextModules => {
-      gradebook.updateContextModules(contextModules)
     })
 
     // eslint-disable-next-line promise/catch-or-return

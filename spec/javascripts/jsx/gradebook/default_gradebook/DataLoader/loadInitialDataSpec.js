@@ -298,26 +298,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       strictEqual(dataLoader.assignmentGroupsLoader.loadAssignmentGroups.callCount, 1)
     })
 
-    QUnit.module('loading context modules', () => {
-      test('sends a request for each page of context modules', async () => {
-        await loadInitialData()
-        const requests = server.filterRequests(urls.contextModules)
-        strictEqual(requests.length, 2)
-      })
-
-      test('updates the context modules in the gradebook', async () => {
-        await loadInitialData()
-        strictEqual(gradebook.updateContextModules.callCount, 1)
-      })
-
-      test('includes the loaded context modules when updating the gradebook', async () => {
-        await loadInitialData()
-        const [contextModules] = gradebook.updateContextModules.lastCall.args
-        deepEqual(
-          contextModules.map(contextModule => contextModule.id),
-          exampleData.contextModules.map(contextModule => contextModule.id)
-        )
-      })
+    test('loads context modules', async () => {
+      sinon.spy(dataLoader.contextModulesLoader, 'loadContextModules')
+      await loadInitialData()
+      strictEqual(dataLoader.contextModulesLoader.loadContextModules.callCount, 1)
     })
 
     QUnit.module('loading custom columns', () => {
