@@ -196,11 +196,13 @@ export default class ItemView extends Backbone.View {
 
   renderCopyToTray(open) {
     const quizId = this.model.get('id')
+    const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
+    const contentSelection = isOldQuiz ? {quizzes: [quizId]} : {assignments: [quizId]}
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
         sourceCourseId={ENV.COURSE_ID}
-        contentSelection={{quizzes: [quizId]}}
+        contentSelection={contentSelection}
         onDismiss={() => {
           this.renderCopyToTray(false)
           return setTimeout(() => this.$settingsButton.focus(), 100)
