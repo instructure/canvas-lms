@@ -722,6 +722,59 @@ describe DiscussionTopicsController, type: :request do
 
           expect(json.count).to eq(0)
         end
+
+        describe "with multiple sections" do
+          before(:once) do
+            @section2 = @course.course_sections.create!(name: 'test section 2')
+
+            @announcement2 = @course.announcements.create!(:user => @teacher, message: 'hello section 2')
+            @announcement2.is_section_specific = true
+            @announcement2.course_sections = [@section2]
+            @announcement2.save!
+
+            student_in_section(@section2, user: @student2)
+          end
+
+          it "paginates visible items" do
+            json = api_call_as_user(
+              @student2,
+              :get,
+              api_v1_course_discussion_topics_url(@course),
+              {
+                controller: "discussion_topics",
+                action: "index",
+                format: "json",
+                course_id: @course.id.to_s,
+                per_page: "1",
+                only_announcements: 1
+              }
+            )
+            expect(!!response.headers['Link'].split(',').last.include?("&page=2&")).to eq false
+            expect(json.count).to eq 1
+            expect(json.first["id"]).to eq @announcement2.id
+          end
+
+          # rubocop:disable RSpec/NestedGroups
+          context "as a user that can view all sections" do
+            it "includes all announcements" do
+              json = api_call_as_user(
+                @teacher,
+                :get,
+                api_v1_course_discussion_topics_url(@course),
+                {
+                  controller: "discussion_topics",
+                  action: "index",
+                  format: "json",
+                  course_id: @course.id.to_s,
+                  only_announcements: 1
+                }
+              )
+              expect(json.count).to eq 2
+              expect(json.map { |i| i["id"] }).to match_array [@announcement.id, @announcement2.id]
+            end
+          end
+          # rubocop:enable RSpec/NestedGroups
+        end
       end
     end
 
