@@ -17,6 +17,7 @@
  */
 
 import {RequestDispatch} from '../../../shared/network'
+import AssignmentGroupsLoader from './AssignmentGroupsLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
 import OldDataLoader from './OldDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
@@ -33,6 +34,7 @@ export default class DataLoader {
       gradebook
     }
 
+    this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
     this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
   }
@@ -57,11 +59,6 @@ export default class DataLoader {
       loadedStudentIds: [],
 
       submissionsChunkSize: options.chunk_size
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotAssignmentGroups.then(assignmentGroups => {
-      gradebook.updateAssignmentGroups(assignmentGroups)
     })
 
     // eslint-disable-next-line promise/catch-or-return

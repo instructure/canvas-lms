@@ -19,25 +19,6 @@
 import {deferPromise} from '../../../shared/async'
 import StudentContentDataLoader from './StudentContentDataLoader'
 
-function getAssignmentGroups(options, dispatch) {
-  const url = `/api/v1/courses/${options.courseId}/assignment_groups`
-  const params = {
-    exclude_assignment_submission_types: ['wiki_page'],
-    exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
-    include: [
-      'assignment_group_id',
-      'assignment_visibility',
-      'assignments',
-      'grades_published',
-      'module_ids',
-      'post_manually'
-    ],
-    override_assignment_dates: false
-  }
-
-  return dispatch.getDepaginated(url, params)
-}
-
 function getContextModules(courseId, dispatch) {
   const url = `/api/v1/courses/${courseId}/modules`
   return dispatch.getDepaginated(url)
@@ -80,7 +61,9 @@ function getCustomColumnData(options, customColumnsDfd, dispatch) {
 function loadGradebookData(opts) {
   const {dataLoader, dispatch, gradebook} = opts
 
-  const gotAssignmentGroups = opts.getAssignmentGroups ? getAssignmentGroups(opts, dispatch) : null
+  const gotAssignmentGroups = opts.getAssignmentGroups
+    ? dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
+    : null
 
   // Begin loading Student IDs before any other data.
   const gotStudentIds = dataLoader.studentIdsLoader.loadStudentIds()

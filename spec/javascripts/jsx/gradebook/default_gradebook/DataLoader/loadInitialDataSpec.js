@@ -292,26 +292,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       )
     })
 
-    QUnit.module('loading assignment groups', () => {
-      test('sends a request for each page of assignment groups', async () => {
-        await loadInitialData()
-        const requests = server.filterRequests(urls.assignmentGroups)
-        strictEqual(requests.length, 2)
-      })
-
-      test('updates the assignment groups in the gradebook', async () => {
-        await loadInitialData()
-        strictEqual(gradebook.updateAssignmentGroups.callCount, 1)
-      })
-
-      test('includes the loaded assignment groups when updating the gradebook', async () => {
-        await loadInitialData()
-        const [assignmentGroups] = gradebook.updateAssignmentGroups.lastCall.args
-        deepEqual(
-          assignmentGroups.map(group => group.id),
-          exampleData.assignmentGroups.map(group => group.id)
-        )
-      })
+    test('loads assignment groups', async () => {
+      sinon.spy(dataLoader.assignmentGroupsLoader, 'loadAssignmentGroups')
+      await loadInitialData()
+      strictEqual(dataLoader.assignmentGroupsLoader.loadAssignmentGroups.callCount, 1)
     })
 
     QUnit.module('loading context modules', () => {

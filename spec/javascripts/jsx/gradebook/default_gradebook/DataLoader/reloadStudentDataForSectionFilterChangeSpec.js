@@ -252,6 +252,12 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       )
     })
 
+    test('does not load assignment groups', async () => {
+      sinon.spy(dataLoader.assignmentGroupsLoader, 'loadAssignmentGroups')
+      await reloadData()
+      strictEqual(dataLoader.assignmentGroupsLoader.loadAssignmentGroups.callCount, 0)
+    })
+
     QUnit.module('loading students', contextHooks => {
       contextHooks.beforeEach(() => {
         server.unsetResponses(urls.students)
