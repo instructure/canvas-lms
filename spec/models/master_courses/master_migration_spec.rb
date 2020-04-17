@@ -518,6 +518,39 @@ describe MasterCourses::MasterMigration do
       expect(@new_assmt.reload).to_not be_deleted
     end
 
+    it "shouldn't change assignment group weights and rules if changed downstream" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      ag1 = @copy_from.assignment_groups.create!(:name => "group1", :group_weight => 50)
+      a1 = @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
+      ag1.update_attribute(:rules, "drop_lowest:1\nnever_drop:#{a1.id}\n")
+
+      run_master_migration
+
+      ag1_to = @copy_to.assignment_groups.where(:migration_id => mig_id(ag1)).first
+      a1_to = ag1_to.assignments.first
+      expect(ag1_to.group_weight).to eq 50
+      expect(ag1_to.rules).to eq "drop_lowest:1\nnever_drop:#{a1_to.id}\n"
+
+      # check that syncs still work before we change downstream
+      Timecop.freeze(30.seconds.from_now) do
+        ag1.update_attributes(:rules => "drop_lowest:2\n", :group_weight => 75)
+      end
+      run_master_migration
+      expect(ag1_to.reload.group_weight).to eq 75
+      expect(ag1_to.rules).to eq "drop_lowest:2\n"
+
+      # change downstream
+      Timecop.freeze(30.seconds.from_now) do
+        ag1.touch
+        ag1_to.update_attributes(:rules => "drop_lowest:3\n", :group_weight => 25)
+      end
+      run_master_migration
+      expect(ag1_to.reload.group_weight).to eq 25 # should not have reverted from downstream change
+      expect(ag1_to.rules).to eq "drop_lowest:3\n"
+    end
+
     it "should sync unpublished quiz points possible" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)

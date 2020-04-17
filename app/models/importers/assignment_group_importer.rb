@@ -79,6 +79,7 @@ module Importers
       item ||= context.assignment_groups.temp_record
       migration.add_imported_item(item)
       item.saved_by = :migration
+      item.mark_as_importing!(migration)
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'available' if item.deleted?
       item.name = hash[:title]
