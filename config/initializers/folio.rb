@@ -16,3 +16,43 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'folio/core_ext/enumerable'
+
+module Folio::WillPaginate::ActiveRecord::Pagination
+  def paginate(options={})
+    if !options.has_key?(:total_entries)
+      scope = if ::Rails.version < '4'
+        self.scoped
+      elsif self.is_a?(::ActiveRecord::Relation)
+        self
+      elsif self < ::ActiveRecord::Base
+        self.all
+      else
+        self.scope
+      end
+      begin
+        scope.connection.transaction(requires_new: true) do
+          scope.connection.execute("SET LOCAL statement_timeout='#{Setting.get('pagination_count_timeout', '5s')}'")
+          group_values = scope.group_values
+          unless group_values.empty?
+            # total_entries left to an auto-count, but the relation being
+            # paginated has a grouping. we need to do a special count, lest
+            # self.count give us a hash instead of the integer we expect.
+            having_clause_empty = Rails.version < '5' ? scope.having_values.empty? : scope.having_clause.empty?
+            if having_clause_empty && group_values.length == 1 # multi-column distinct counts are broken right now (as of rails 4.2.5) :(
+              if Rails.version < '5'
+                options[:total_entries] = except(:group, :select).select(group_values).uniq.count
+              else
+                options[:total_entries] = except(:group, :select).select(group_values).distinct.count
+              end
+            else
+              options[:total_entries] = unscoped.from("(#{to_sql}) a").count
+            end
+          end
+        end
+      rescue ActiveRecord::QueryCanceled
+        options[:total_entries] = nil
+      end
+    end
+    super(options).to_a
+  end
+end
