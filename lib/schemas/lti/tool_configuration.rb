@@ -100,6 +100,7 @@ module Schemas::Lti
                             "assignment_selection",
                             "assignment_view",
                             "collaboration",
+                            "conference_selection",
                             "course_assignments_menu",
                             "course_home_sub_navigation",
                             "course_navigation",

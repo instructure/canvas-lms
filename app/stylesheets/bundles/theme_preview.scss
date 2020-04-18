@@ -20,9 +20,20 @@
 @import "components/ProgressBar";
 
 .theme-preview__page-header { margin-top: 0; }
+
 .ic-app-nav-toggle-and-crumbs--theme-preview {
   margin-#{direction(left)}: 0;
   margin-#{direction(right)}: 0;
+}
+
+// TODO: remove `body.responsive_2020_03` when responsive_2020_03
+// feature flag is permanently on
+body.responsive_2020_03 .theme-preview__login {
+  padding-bottom: $ic-sp * 4;
+
+  @include breakpoint(tablet) {
+    padding-bottom: 0;
+  }
 }
 
 .ic-login--theme-preview {

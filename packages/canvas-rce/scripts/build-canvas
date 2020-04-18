@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 set -e
-rm -rf lib
+
+# We make the directories if they don't exist so that the following delete commands work outside of docker.  These
+# directories are automatically created via volume mounts when using docker, so the -p flag prevents these commands
+# from failing
+mkdir -p lib
+mkdir -p canvas
+
+# We can't delete the directories themselves when inside docker because they are the volume mount points, so instead we
+# delete everything in them.
+rm -rf lib/*
+rm -rf canvas/*
+
 TRANSPILE=true ./node_modules/.bin/babel --out-dir lib src
-rm -rf canvas
-mkdir canvas
 cp -r lib locales README.md package.json canvas

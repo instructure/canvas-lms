@@ -147,7 +147,7 @@
       <div class="numerical_precision_answer answer_type" <%= hidden(true) unless number_type == 'precision' %>>
         <span class="answer_approximate">
           <%= render_score(hash_get(answer, :approximate, 0), hash_get(answer, :precision, 10)) %>
-        </span> (<%= before_label :answer_with_precision, 'with precision' %> <span class="answer_precision"><%= render_number(hash_get(answer, :precision, 0)) %></span>)
+        </span> (<%= before_label :answer_with_precision, 'with precision' %> <span class="answer_precision"><%= render_number(hash_get(answer, :precision, 10)) %></span>)
       </div>
       <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'range' %>>
         <%= t(:range_answer, "Between %{lower_bound} and %{upper_bound}",

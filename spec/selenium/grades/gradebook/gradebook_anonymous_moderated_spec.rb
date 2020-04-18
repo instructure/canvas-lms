@@ -24,8 +24,6 @@ describe 'New Gradebook' do
   include_context 'in-process server selenium tests'
 
   before(:once) do
-    PostPolicy.enable_feature!
-
     # create a course with a teacher
     @teacher1 = course_with_teacher(course_name: 'Course1', active_all: true).user
     @student1 = student_in_course(active_all: true).user

@@ -93,6 +93,19 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".conversation_created" do
+    it "should trigger a conversation live event with conversation details" do
+      user1 = user_model
+      user2 = user_model
+      conversation = conversation(user1, user2)
+      expect_event("conversation_created",
+        hash_including(
+          conversation_id: conversation.id.to_s
+        ))
+      Canvas::LiveEvents.conversation_created(conversation)
+    end
+  end
+
   describe ".enrollment_updated" do
     it "should not include associated_user_id for non-observer enrollments" do
       enrollment = course_with_student
@@ -236,6 +249,41 @@ describe Canvas::LiveEvents do
       })
 
       wiki_page_updated
+    end
+  end
+
+  describe ".conversation_forwarded" do
+    before(:each) do
+      @user1 = user_model
+      @user2 = user_model
+      @convo = Conversation.initiate([@user1, @user2], false)
+      @convo.add_message(@user1, 'Hi! You are doing great...')
+    end
+
+    it "should trigger live event if a new user is added to a conversation" do
+      @user3 = user_model
+      @convo.add_participants(@user1, [@user3])
+      expect_event('conversation_forwarded',
+        hash_including(
+          conversation_id: @convo.id.to_s
+        ), { compact_live_events: true }).once
+      Canvas::LiveEvents.conversation_forwarded(@convo)
+    end
+  end
+
+  describe ".conversation_message_created" do
+    it "should include the author id, conversation message id, and conversation id" do
+      user1 = user_model
+      user2 = user_model
+      convo = Conversation.initiate([user1, user2], false)
+      convo_message = convo.add_message(user1, 'Hi! You are doing great...')
+      expect_event('conversation_message_created',
+        hash_including(
+          author_id: convo_message.author_id.to_s,
+          conversation_id: convo_message.conversation_id.to_s,
+          message_id: convo_message.id.to_s
+        )).once
+      Canvas::LiveEvents.conversation_message_created(convo_message)
     end
   end
 
@@ -453,8 +501,6 @@ describe Canvas::LiveEvents do
 
       context "with post policies enabled" do
         before(:each) do
-          PostPolicy.enable_feature!
-
           assignment.hide_submissions
         end
 

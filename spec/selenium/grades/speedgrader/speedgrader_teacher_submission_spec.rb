@@ -22,8 +22,6 @@ describe "speed grader submissions" do
   include SpeedGraderCommon
 
   before(:each) do
-    PostPolicy.enable_feature!
-
     stub_kaltura
 
     course_with_teacher_logged_in

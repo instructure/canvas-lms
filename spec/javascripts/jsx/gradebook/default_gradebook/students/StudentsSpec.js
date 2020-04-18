@@ -43,6 +43,128 @@ QUnit.module('Gradebook > Students', suiteHooks => {
     return gradebook.gridData.rows.find(row => row.id === studentId)
   }
 
+  QUnit.module('#updateStudentIds()', hooks => {
+    let studentIds
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      studentIds = ['1101', '1102', '1103']
+    })
+
+    test('stores the loaded student ids in the Gradebook', () => {
+      gradebook.updateStudentIds(studentIds)
+      deepEqual(gradebook.courseContent.students.listStudentIds(), studentIds)
+    })
+
+    test('resets student assignment student visibility', () => {
+      gradebook.assignmentStudentVisibility = {2301: ['1101', '1102']}
+      gradebook.updateStudentIds(studentIds)
+      deepEqual(gradebook.assignmentStudentVisibility, {})
+    })
+
+    test('rebuilds grid rows', () => {
+      sinon.stub(gradebook, 'buildRows')
+      gradebook.updateStudentIds(studentIds)
+      strictEqual(gradebook.buildRows.callCount, 1)
+    })
+
+    test('rebuilds grid rows after storing the student ids', () => {
+      sinon.stub(gradebook, 'buildRows').callsFake(() => {
+        deepEqual(gradebook.courseContent.students.listStudentIds(), studentIds)
+      })
+      gradebook.updateStudentIds(studentIds)
+    })
+
+    test('rebuilds grid rows after updating assignment student visibility', () => {
+      gradebook.assignmentStudentVisibility = {2301: ['1101', '1102']}
+      sinon.stub(gradebook, 'buildRows').callsFake(() => {
+        deepEqual(gradebook.assignmentStudentVisibility, {})
+      })
+      gradebook.updateStudentIds(studentIds)
+    })
+  })
+
+  QUnit.module('#updateStudentsLoaded()', hooks => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+    })
+
+    test('optionally sets the students loaded status to true', () => {
+      gradebook.updateStudentsLoaded(true)
+      strictEqual(gradebook.contentLoadStates.studentsLoaded, true)
+    })
+
+    test('optionally sets the students loaded status to false', () => {
+      gradebook.updateStudentsLoaded(false)
+      strictEqual(gradebook.contentLoadStates.studentsLoaded, false)
+    })
+
+    test('updates column headers when the grid has rendered', () => {
+      sinon.stub(gradebook, '_gridHasRendered').returns(true)
+      sinon.spy(gradebook, 'updateColumnHeaders')
+      gradebook.updateStudentsLoaded(true)
+      strictEqual(gradebook.updateColumnHeaders.callCount, 1)
+    })
+
+    test('updates column headers after updating the students loaded status', () => {
+      sinon.stub(gradebook, '_gridHasRendered').returns(true)
+      sinon.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+        strictEqual(gradebook.contentLoadStates.studentsLoaded, true)
+      })
+      gradebook.updateStudentsLoaded(true)
+    })
+
+    test('does not update column headers when the grid has not yet rendered', () => {
+      sinon.stub(gradebook, '_gridHasRendered').returns(false)
+      sinon.spy(gradebook, 'updateColumnHeaders')
+      gradebook.updateStudentsLoaded(true)
+      strictEqual(gradebook.updateColumnHeaders.callCount, 0)
+    })
+
+    test('renders filters', () => {
+      sinon.spy(gradebook, 'renderFilters')
+      gradebook.updateStudentsLoaded(true)
+      strictEqual(gradebook.renderFilters.callCount, 1)
+    })
+
+    test('renders filters after updating the students loaded status', () => {
+      sinon.stub(gradebook, 'renderFilters').callsFake(() => {
+        strictEqual(gradebook.contentLoadStates.studentsLoaded, true)
+      })
+      gradebook.updateStudentsLoaded(true)
+    })
+
+    test('updates the total grade column when students and submissions are loaded', () => {
+      gradebook.setSubmissionsLoaded(true)
+      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      gradebook.updateStudentsLoaded(true)
+      strictEqual(gradebook.updateTotalGradeColumn.callCount, 1)
+    })
+
+    test('updates the total grade column after updating the students loaded status', () => {
+      gradebook.setSubmissionsLoaded(true)
+      sinon.stub(gradebook, 'updateTotalGradeColumn').callsFake(() => {
+        strictEqual(gradebook.contentLoadStates.studentsLoaded, true)
+      })
+      gradebook.updateStudentsLoaded(true)
+    })
+
+    test('does not update the total grade column when submissions are not loaded', () => {
+      gradebook.setSubmissionsLoaded(false)
+      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      gradebook.updateStudentsLoaded(true)
+      strictEqual(gradebook.updateTotalGradeColumn.callCount, 0)
+    })
+
+    test('does not update the total grade column when students are being reloaded', () => {
+      gradebook.setSubmissionsLoaded(true)
+      gradebook.setStudentsLoaded(true)
+      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      gradebook.updateStudentsLoaded(false)
+      strictEqual(gradebook.updateTotalGradeColumn.callCount, 0)
+    })
+  })
+
   QUnit.module('#gotChunkOfStudents()', hooks => {
     let studentData
 

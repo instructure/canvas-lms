@@ -123,9 +123,15 @@
     %></p>
     <p>
     <%= t('links.share', "Copy and share this link to give others access to your private ePortfolio:") %><br />
-    <a href="<%= eportfolio_path(@portfolio.id, :verifier => @portfolio.uuid) %>" id="eportfolio_share_link">
-      <%= eportfolio_url(@portfolio.id, :verifier => @portfolio.uuid) %>
-    </a>
+      <a
+        href="<%= eportfolio_path(@portfolio.id, :verifier => @portfolio.uuid) %>"
+        id="eportfolio_share_link"
+        <% if @domain_root_account.feature_enabled?(:responsive_2020_04) %>
+          style="overflow-wrap: break-word;"
+        <% end %>
+      >
+        <%= eportfolio_url(@portfolio.id, :verifier => @portfolio.uuid) %>
+      </a>
     </p>
   <% end %>
 

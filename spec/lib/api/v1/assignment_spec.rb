@@ -81,8 +81,7 @@ describe "Api::V1::Assignment" do
       expect(json['planner_override']['id']).to eq po.id
     end
 
-    it "includes the assignment's post policy when feature enabled" do
-      PostPolicy.enable_feature!
+    it "includes the assignment's post policy" do
       assignment.post_policy.update!(post_manually: true)
 
       json = api.assignment_json(assignment, user, session)

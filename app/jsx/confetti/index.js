@@ -20,6 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Confetti from './components/Confetti'
 
+export {Confetti}
+
 export default function renderConfettiApp(env, elt) {
   ReactDOM.render(<Confetti />, elt)
 }

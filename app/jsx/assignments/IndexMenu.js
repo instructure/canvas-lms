@@ -210,11 +210,11 @@ export default class IndexMenu extends React.Component {
                 id="requestBulkEditMenuItem"
                 className="requestBulkEditMenuItem"
                 role="button"
-                title={I18n.t('Bulk Edit')}
+                title={I18n.t('Edit Dates')}
                 onClick={this.props.requestBulkEdit}
               >
                 <i className="icon-edit" />
-                {I18n.t('Bulk Edit')}
+                {I18n.t('Edit Assignment Dates')}
               </a>
             </li>
           )}

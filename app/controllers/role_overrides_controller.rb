@@ -596,7 +596,8 @@ class RoleOverridesController < ApplicationController
     manageable_permissions.each do |permission_name, permission|
       grouped_permissions[permission_name] << {name: permission_name, disable_locking: permission.key?(:group)}
       if permission.key?(:group)
-        grouped_permissions[permission[:group]] << {name: permission_name, disable_locking: false}
+        current_override = context.role_overrides.where(:permission => permission_name, :role_id => role.id).first
+        grouped_permissions[permission[:group]] << {name: permission_name, disable_locking: false, currently: current_override&.enabled}
       end
     end
 
@@ -632,8 +633,9 @@ class RoleOverridesController < ApplicationController
         end
 
         target_permissions.each do |permission|
+          perm_override = value_to_boolean(permission_updates[:explicit]) && override.nil? ? permission[:currently] : override
           RoleOverride.manage_role_override(
-            context, role, permission[:name].to_s, override: override, locked: locked,
+            context, role, permission[:name].to_s, override: perm_override, locked: locked,
             applies_to_self: applies_to_self, applies_to_descendants: applies_to_descendants
           )
         end

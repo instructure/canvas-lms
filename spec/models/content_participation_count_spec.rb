@@ -20,8 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentParticipationCount do
   before :once do
-    PostPolicy.enable_feature!
-
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
 

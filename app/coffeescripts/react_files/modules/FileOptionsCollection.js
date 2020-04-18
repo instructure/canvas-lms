@@ -74,18 +74,20 @@ class FileOptionsCollection {
         const matchingFile = this.findMatchingFile(nameToTest)
         if (
           matchingFile &&
-          (file.dup !== 'overwrite' && (file.expandZip == null || file.expandZip === false))
+          file.dup !== 'overwrite' &&
+          (file.expandZip == null || file.expandZip === false)
         ) {
-          if (matchingFile.get('restricted_by_master_course')) {
-            file.cannotOverwrite = true
+          if (file.dup !== 'skip') {
+            if (matchingFile.get('restricted_by_master_course')) {
+              file.cannotOverwrite = true
+            }
+            collisions.push(file)
           }
-          collisions.push(file)
         } else {
           resolved.push(file)
         }
       }
     })
-
     return {collisions, resolved, zips}
   }
 

@@ -28,10 +28,6 @@ describe AssignmentsApiController, type: :request do
   include Api::V1::Submission
   include LtiSpecHelper
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   context 'locked api item' do
     include_examples 'a locked api item'
 
@@ -5322,19 +5318,6 @@ describe AssignmentsApiController, type: :request do
       api_bulk_update(@course, [], expected_status: 401)
     end
 
-    it "disallows editing moderated assignments if you're not the moderator" do
-      @course.account.role_overrides.create!(permission: :select_final_grade, enabled: false, role: ta_role)
-      ta_in_course(:active_all => true)
-
-      api_bulk_update(@course, [{'id' => @a0.id, 'all_dates' => []}])
-
-      @a0.moderated_grading = true
-      @a0.final_grader_id = @teacher
-      @a0.grader_count = 1
-      @a0.save!
-      api_bulk_update(@course, [{'id' => @a0.id, 'all_dates' => []}], expected_status: 401)
-    end
-
     it "expects an array of assignments" do
       api_bulk_update(@course, {}, expected_status: 400)
     end
@@ -5521,6 +5504,84 @@ describe AssignmentsApiController, type: :request do
           }]
         expect_any_instance_of(Course).to receive(:recompute_student_scores_without_send_later).once
         api_bulk_update(@course, data)
+      end
+
+      it "sets can_edit on each date if requested" do
+        json = api_get_assignments_index_from_course(@course, include: %w(all_dates can_edit))
+        a0_json = json.detect { |a| a['id'] == @a0.id }
+        expect(a0_json['can_edit']).to eq true
+        expect(a0_json['all_dates'].map { |d| d['can_edit'] }).to eq [true]
+        expect(a0_json['all_dates'].map { |d| d['in_closed_grading_period'] }).to eq [false]
+
+        a1_json = json.detect { |a| a['id'] == @a1.id }
+        expect(a1_json['can_edit']).to eq true
+        expect(a1_json['all_dates'].map { |d| d['can_edit'] }).to eq [false]
+        expect(a1_json['all_dates'].map { |d| d['in_closed_grading_period'] }).to eq [true]
+
+        a2_json = json.detect { |a| a['id'] == @a2.id }
+        expect(a2_json['can_edit']).to eq true
+
+        ao0_json = a2_json['all_dates'].detect { |ao| ao['id'] == @ao0.id }
+        expect(ao0_json['can_edit']).to eq false
+        expect(ao0_json['in_closed_grading_period']).to eq true
+
+        ao1_json = a2_json['all_dates'].detect { |ao| ao['id'] == @ao1.id }
+        expect(ao1_json['can_edit']).to eq true
+        expect(ao1_json['in_closed_grading_period']).to eq false
+      end
+
+      it "allows account admins to edit whatever they want" do
+        account_admin_user
+        json = api_get_assignments_index_from_course(@course, include: %w(all_dates can_edit))
+        a0_json = json.detect { |a| a['id'] == @a0.id }
+        expect(a0_json['can_edit']).to eq true
+        expect(a0_json['all_dates'].map { |d| d['can_edit'] }).to eq [true]
+        expect(a0_json['all_dates'].map { |d| d['in_closed_grading_period'] }).to eq [false]
+
+        a1_json = json.detect { |a| a['id'] == @a1.id }
+        expect(a1_json['can_edit']).to eq true
+        expect(a1_json['all_dates'].map { |d| d['can_edit'] }).to eq [true]
+        expect(a1_json['all_dates'].map { |d| d['in_closed_grading_period'] }).to eq [true]
+
+        a2_json = json.detect { |a| a['id'] == @a2.id }
+        expect(a2_json['can_edit']).to eq true
+
+        ao0_json = a2_json['all_dates'].detect { |ao| ao['id'] == @ao0.id }
+        expect(ao0_json['can_edit']).to eq true
+        expect(ao0_json['in_closed_grading_period']).to eq true
+
+        ao1_json = a2_json['all_dates'].detect { |ao| ao['id'] == @ao1.id }
+        expect(ao1_json['can_edit']).to eq true
+        expect(ao1_json['in_closed_grading_period']).to eq false
+      end
+    end
+
+    context "with moderated grading" do
+      before :once do
+        @course.account.role_overrides.create!(permission: :select_final_grade, enabled: false, role: ta_role)
+        ta_in_course(:active_all => true)
+
+        @a0.moderated_grading = true
+        @a0.final_grader_id = @teacher
+        @a0.grader_count = 1
+        @a0.save!
+      end
+
+      it "disallows editing moderated assignments if you're not the moderator" do
+        api_bulk_update(@course, [{'id' => @a0.id, 'all_dates' => []}], expected_status: 401)
+        api_bulk_update(@course, [{'id' => @a1.id, 'all_dates' => []}])
+      end
+
+      it "sets can_edit on each date if requested" do
+        json = api_get_assignments_index_from_course(@course, include: %w(all_dates can_edit))
+
+        a0_json = json.detect { |a| a['id'] == @a0.id }
+        expect(a0_json['can_edit']).to eq false
+        expect(a0_json['all_dates'].map { |d| d['can_edit'] }).to eq [false]
+
+        a1_json = json.detect { |a| a['id'] == @a1.id }
+        expect(a1_json['can_edit']).to eq true
+        expect(a1_json['all_dates'].map { |d| d['can_edit'] }).to eq [true]
       end
     end
   end

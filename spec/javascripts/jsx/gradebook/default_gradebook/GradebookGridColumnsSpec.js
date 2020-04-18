@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import DataLoader from 'jsx/gradebook/DataLoader'
 import {
   createGradebook,
   setFixtureHtml
@@ -29,7 +28,6 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
   let $fixture
   let gridSpecHelper
   let gradebook
-  let dataLoader
 
   let assignmentGroups
   let assignments
@@ -92,30 +90,23 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
   }
 
   function addStudentIds() {
-    dataLoader.gotStudentIds.resolve({
-      user_ids: ['1101']
-    })
+    gradebook.updateStudentIds(['1101'])
   }
 
   function addGradingPeriodAssignments() {
-    dataLoader.gotGradingPeriodAssignments.resolve({
-      grading_period_assignments: {
-        1401: ['2301'],
-        1402: ['2302']
-      }
-    })
+    gradebook.updateGradingPeriodAssignments({1401: ['2301'], 1402: ['2302']})
   }
 
   function addContextModules() {
-    dataLoader.gotContextModules.resolve(contextModules)
+    gradebook.updateContextModules(contextModules)
   }
 
   function addCustomColumns() {
-    dataLoader.gotCustomColumns.resolve(customColumns)
+    gradebook.gotCustomColumns(customColumns)
   }
 
   function addAssignmentGroups() {
-    dataLoader.gotAssignmentGroups.resolve(assignmentGroups)
+    gradebook.updateAssignmentGroups(assignmentGroups)
   }
 
   function addGridData() {
@@ -124,6 +115,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
     addCustomColumns()
     addAssignmentGroups()
     addGradingPeriodAssignments()
+    gradebook.finishRenderingUI()
   }
 
   function createGradebookAndAddData(options) {
@@ -144,19 +136,6 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       current_user_id: '1101'
     })
 
-    dataLoader = {
-      gotAssignmentGroups: $.Deferred(),
-      gotContextModules: $.Deferred(),
-      gotCustomColumnData: $.Deferred(),
-      gotCustomColumns: $.Deferred(),
-      gotGradingPeriodAssignments: $.Deferred(),
-      gotStudentIds: $.Deferred(),
-      gotStudents: $.Deferred(),
-      gotSubmissions: $.Deferred()
-    }
-    sinon.stub(DataLoader, 'loadGradebookData').returns(dataLoader)
-    sinon.stub(DataLoader, 'getDataForColumn')
-
     createAssignments()
     createAssignmentGroups()
     createContextModules()
@@ -165,8 +144,6 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
 
   suiteHooks.afterEach(() => {
     gradebook.destroy()
-    DataLoader.loadGradebookData.restore()
-    DataLoader.getDataForColumn.restore()
     fakeENV.teardown()
     $fixture.remove()
   })

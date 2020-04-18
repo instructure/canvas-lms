@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "Lisää"
     },
+    "add_another_f4e50d57": {
+        "message": "Lisää toinen"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "Lisää CC/alaotsikko"
     },
@@ -380,6 +383,9 @@
     "embed_video_code_703e10f2": {
         "message": "Upota videokoodi"
     },
+    "embedded_content_aaeb4d3d": {
+        "message": "upotettu sisältö"
+    },
     "equation_1c5ac93c": {
         "message": "Yhtälö"
     },
@@ -677,6 +683,9 @@
     "no_e16d9132": {
         "message": "Ei"
     },
+    "no_file_chosen_9a880793": {
+        "message": "Ei valittua tiedostoa"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Ei arvosanaa"
     },
@@ -937,6 +946,9 @@
     },
     "superscript_8cb349a2": {
         "message": "Yläindeksi"
+    },
+    "supported_file_types_srt_or_webvtt_7d827ed": {
+        "message": "Tuetut tiedostotyypit: SRT tai WebVTT"
     },
     "switch_to_raw_html_editor_4c9ac7de": {
         "message": "Vaihda html-raakaeditoriin"

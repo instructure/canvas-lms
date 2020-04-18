@@ -51,6 +51,12 @@ class SectionTabPresenter
   end
 
   def to_h
-    { css_class: tab.css_class, icon: tab.icon, hidden: hide? || unused?, path: path, label: tab.label }
+    {
+      css_class: tab.css_class,
+      icon: tab.icon,
+      hidden: hide? || unused?,
+      path: path,
+      label: tab.label
+    }
   end
 end

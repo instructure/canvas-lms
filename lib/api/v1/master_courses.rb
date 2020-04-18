@@ -99,7 +99,13 @@ module Api::V1::MasterCourses
     hash = api_json(course, @current_user, session, :only => %w{id name course_code})
     hash['sis_course_id'] = course.sis_source_id if can_read_sis
     hash['term_name'] = course.enrollment_term.name
-    hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) } if opts[:include_teachers]
+    if opts[:include_teachers]
+      if course.teacher_count
+        hash['teacher_count'] = course.teacher_count
+      else
+        hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) }
+      end
+    end
     hash
   end
 

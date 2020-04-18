@@ -45,7 +45,6 @@ describe AuditLogFieldExtension do
 
   it "creates a log for every item" do
     expect_any_instance_of(AuditLogFieldExtension::Logger).to receive(:log).twice
-    PostPolicy.enable_feature!
 
     CanvasSchema.execute(<<~MUTATION, context: {current_user: @teacher})
       mutation {

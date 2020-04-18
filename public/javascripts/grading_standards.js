@@ -372,6 +372,8 @@ $(document).ready(() => {
     $table.empty()
     $table.append($thead)
     $table.append($link.clone(true).show())
+    $table.append($row.hide())
+    $table.append($link.hide())
     for (const idx in standard.data) {
       const $row_instance = $row.clone(true)
       const row = standard.data[idx]
@@ -388,8 +390,6 @@ $(document).ready(() => {
       $table.append($link.clone(true).show())
     }
     $table.find(':text:first').blur()
-    $table.append($row.hide())
-    $table.append($link.hide())
     $standard.find('.grading_standard_row').each(function() {
       $(this)
         .find('.name')
@@ -468,6 +468,9 @@ $(document).ready(() => {
     const data = $standard.find('.standard_title,.grading_standard_row:visible').getFormData()
     Object.keys(data).forEach(key => {
       let parsedValue
+
+      data[key] = data[key].trim()
+
       if (/^grading_standard\[.*\]\[value\]$/.test(key)) {
         parsedValue = numberHelper.parse(data[key])
         if (!isNaN(parsedValue)) {

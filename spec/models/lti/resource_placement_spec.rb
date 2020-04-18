@@ -37,5 +37,15 @@ module Lti
 
     end
 
+    describe 'valid_placements' do
+      it 'does no include conference_selection when FF disabled' do
+        expect(described_class.valid_placements).not_to include(:conference_selection)
+      end
+
+      it 'includes conference_selection when FF enabled' do
+        Account.site_admin.enable_feature! :conference_selection_lti_placement
+        expect(described_class.valid_placements).to include(:conference_selection)
+      end
+    end
   end
 end

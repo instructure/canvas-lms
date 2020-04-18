@@ -40,6 +40,12 @@ export function mimeClass(file) {
     return file.mime_class
   } else {
     const contentType = getContentType(file)
+    if (/^audio(\W|$)/.test(contentType)) {
+      return 'audio'
+    }
+    if (/^video(\W|$)/.test(contentType)) {
+      return 'video'
+    }
 
     return (
       {
@@ -71,25 +77,6 @@ export function mimeClass(file) {
         'application/x-zip-compressed': 'zip',
         'application/xml': 'code',
         'application/zip': 'zip',
-        'audio/mp3': 'audio',
-        'audio/mpeg': 'audio',
-        'audio/basic': 'audio',
-        'audio/mid': 'audio',
-        'audio/3gpp': 'audio',
-        'audio/x-aiff': 'audio',
-        'audio/x-m4a': 'audio',
-        'audio/x-mpegurl': 'audio',
-        'audio/x-pn-realaudio': 'audio',
-        'audio/x-wav': 'audio',
-        'video/mpeg': 'video',
-        'video/quicktime': 'video',
-        'video/x-la-asf': 'video',
-        'video/x-ms-asf': 'video',
-        'video/x-msvideo': 'video',
-        'video/x-sgi-movie': 'video',
-        'video/3gpp': 'video',
-        'video/mp4': 'video',
-        'video/webm': 'video',
         'application/x-shockwave-flash': 'flash'
       }[contentType] ||
       file.mime_class ||

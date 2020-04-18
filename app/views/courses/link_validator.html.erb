@@ -18,7 +18,10 @@
 
 <%
    provide :page_title, join_title(t(:page_title, "Course Link Validator"), @context.name)
-   js_env :validation_api_url => api_v1_course_link_validation_url(@context)
+   js_env({
+    :validation_api_url => api_v1_course_link_validation_url(@context),
+    :VALIDATION_CONFETTI_ENABLED => @domain_root_account&.feature_enabled?(:confetti_for_valid_links)
+  })
    js_bundle :course_link_validator
    css_bundle :course_link_validator
 %>

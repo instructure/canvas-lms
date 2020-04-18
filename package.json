@@ -3,7 +3,7 @@
   "license": "AGPL-3.0",
   "version": "0.0.0",
   "engines": {
-    "node": ">=10.14.0",
+    "node": ">=10.16.0",
     "yarn": "^1.6.0"
   },
   "private": true,
@@ -65,6 +65,7 @@
     "@instructure/ui-progress": "~6.21.0",
     "@instructure/ui-radio-input": "~6.21.0",
     "@instructure/ui-react-utils": "~6.21.0",
+    "@instructure/ui-responsive": "~6.21.0",
     "@instructure/ui-select": "~6.21.0",
     "@instructure/ui-spinner": "~6.21.0",
     "@instructure/ui-svg-images": "~6.21.0",
@@ -173,6 +174,7 @@
     "@testing-library/react-hooks": "^2.0.1",
     "@types/react": ">=16.9.0",
     "@yarnpkg/lockfile": "^1.0.2",
+    "array-flat-polyfill": "^1.0.1",
     "axe-core": "~2.1.7",
     "babel-eslint": "^10",
     "babel-jest": "^24",
@@ -229,7 +231,7 @@
     "jest-canvas-mock": "^2",
     "jest-config": "^24",
     "jest-environment-jsdom-fourteen": "^0.1.0",
-    "jest-fetch-mock": "^2.1.2",
+    "jest-fetch-mock": "^3.0.3",
     "jest-junit": "^7",
     "jest-localstorage-mock": "^2",
     "jest-moxios-utils": "^1",

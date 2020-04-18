@@ -116,6 +116,12 @@ $discussion-dark-text: $ic-color-dark;
   }
 }
 
+body.responsive_2020_04 .span4.discussion-header__metadata {
+  @include mobile-only {
+    width: auto;
+  }
+}
+
 .side_comment_discussion .entry .entry .replies {
   display: none;
 }
@@ -672,12 +678,38 @@ $discussion-dark-text: $ic-color-dark;
     border-color: $ic-border-light;
     background: $lightBackground;
     min-height: 53px;
-    margin-#{direction(left)}: $ic-header-primary-width + ($ic-sp*2);
-    margin-#{direction(right)}: $ic-sp*2;
     box-shadow: 0 2px 3px rgba(black, 0.1);
+
+    body:not(.responsive_2020_04) & {
+      margin-#{direction(left)}: $ic-header-primary-width + ($ic-sp*2);
+      margin-#{direction(right)}: $ic-sp*2;
+    }
+
+    body.responsive_2020_04 & {
+      @include breakpoint(tablet) {
+        margin-#{direction(left)}: $ic-header-primary-width + ($ic-sp*2);
+        margin-#{direction(right)}: $ic-sp*2;
+      }
+    }
   }
   [disabled] {
     display: none;
+  }
+}
+
+.headerBar__layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerBar__subscribe,
+.headerBar__controls {
+  margin: $ic-sp / 3 0;
+
+  @include breakpoint(desktop) {
+    margin: 0;
   }
 }
 

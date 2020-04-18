@@ -27,8 +27,6 @@ describe "Gradebook - Assignment Column" do
   include GroupsCommon
 
   before(:once) do
-    PostPolicy.enable_feature!
-
     course_with_teacher(active_all: true)
 
     # enroll three students

@@ -51,7 +51,7 @@
       ))
     end
   %>
-  <%= browser_performance_monitor_embed %>
+  <%= render_datadog_rum_js %>
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>

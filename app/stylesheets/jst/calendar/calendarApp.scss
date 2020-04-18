@@ -255,3 +255,24 @@
 .fc-agendaWeek-view .fc-event-container a[class*="group_"] .fc-content .fc-time {
   color: $ic-font-color-dark;
 }
+
+// Prevent overflow of the "edit event" modal at narrow widths
+#edit_calendar_event_form, #edit_assignment_form {
+  body:not(.responsive_2020_03) & {
+    width: 400px;
+  }
+  body.responsive_2020_03 & {
+    width: 270px;
+    td {
+      display: block;
+      label { margin-bottom: 0; }
+    }
+    @include breakpoint(mini-tablet) {
+      width: 400px;
+      td {
+        display: table-cell;
+        label { margin-bottom: 5px; }
+      }
+    }
+  }
+}

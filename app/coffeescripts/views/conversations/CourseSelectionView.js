@@ -110,11 +110,12 @@ export default class CourseSelectionView extends View {
   }
 
   loadAll() {
-    const {all} = this.options.courses
+    const {all, groups} = this.options.courses
     if (all._loading) return
     all.fetch()
     all._loading = true
-    this.options.courses.groups.fetchAll()
+
+    groups.fetchAll()
     return this.$picker.find('> .dropdown-menu').append(
       $('<div />')
         .attr('class', 'paginatedLoadingIndicator')

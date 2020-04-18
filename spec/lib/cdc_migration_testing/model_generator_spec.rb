@@ -25,6 +25,9 @@ xdescribe ModelGenerator do
   let(:generator) { ModelGenerator.new }
 
   before :each do
+    # Unload CdcFixtures. Tests below expect to reload fixtures with different
+    # contents, so we clean them up for each test.
+    hide_const('CdcFixtures')
     allow(ActiveRecord::Base).to receive(:descendants).and_return(models)
   end
 
@@ -34,7 +37,7 @@ xdescribe ModelGenerator do
   context 'with an out-of-order model list' do
     let(:models) { [ User, EnrollmentTerm, Course, AuthenticationProvider, Account] }
 
-    it 'should populate models when run' do
+    it 'should populate models when run', custom_timeout: 45.seconds do
       models.each { |model| expect(model.any?).to be false }
 
       generator.run
@@ -48,6 +51,9 @@ xdescribe ModelGenerator do
     let(:models) { [ User, Csp::Domain, Account ] }
 
     before :each do
+      # ModelGenerator dynamically `require`s files based on model name. Remove
+      # previously required files so they can be used repeatedly in tests
+      $LOADED_FEATURES.reject! { |path| path =~ /\/lib\/cdc_migration_testing\/fixtures/ }
       stub_const('ModelGenerator::FIXTURES_BASEDIR', 'spec/lib/cdc_migration_testing/fixtures')
     end
 
@@ -64,7 +70,9 @@ xdescribe ModelGenerator do
 
   context 'with an invalid fixture file' do
     let(:models) { [ User ] }
+
     before :each do
+      $LOADED_FEATURES.reject! { |path| path =~ /\/lib\/cdc_migration_testing\/bad_fixtures/ }
       stub_const('ModelGenerator::FIXTURES_BASEDIR', 'spec/lib/cdc_migration_testing/bad_fixtures')
     end
 

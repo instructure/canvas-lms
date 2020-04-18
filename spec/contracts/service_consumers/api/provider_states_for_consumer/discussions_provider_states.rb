@@ -28,5 +28,18 @@ PactConfig::Consumers::ALL.each do |consumer|
         @course.discussion_topics.create!(title: "title", message: nil, user: @teacher, discussion_type: 'threaded')
       end
     end
+
+    # Teacher ID: 3 || Name: Teacher1
+    # Course ID: 1
+    # Discussion ID: 1
+    provider_state 'a teacher in a course with a discussion and a student reply' do
+      set_up do
+        @course = Pact::Canvas.base_state.course
+        @teacher = Pact::Canvas.base_state.teachers.first
+        @student = Pact::Canvas.base_state.students.first
+        @topic = @course.discussion_topics.create!(title: "title", message: nil, user: @teacher, discussion_type: 'threaded')
+        @entry = @topic.discussion_entries.create!(:user => @student, :message => "a comment")
+      end
+    end
   end
 end

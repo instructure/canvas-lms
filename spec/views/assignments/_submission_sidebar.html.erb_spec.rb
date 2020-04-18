@@ -27,7 +27,6 @@ describe "assignments/_submission_sidebar.html.erb" do
   let(:submission) { assignment.submissions.find_by(user: student) }
 
   before(:each) do
-    PostPolicy.enable_feature!
     course.enroll_student(student)
     course.enroll_teacher(teacher)
     view_context(course, student)

@@ -119,6 +119,18 @@ describe RoleOverridesController do
         expect(RoleOverride.pluck(:locked)).to match_array Array.new(3, true)
       end
 
+      it 'preserves granular permission states when unlocking the group' do
+        updates = {
+          @grouped_permission => { enabled: true, locked: true, explicit: true },
+          @granular_permissions[0] => { enabled: false, explicit: true },
+        }
+        update_permissions(updates)
+        expect(RoleOverride.count).to eq 3
+        update_permissions({@grouped_permission => { locked: false, explicit: true }})
+        expect(RoleOverride.pluck(:locked)).to match_array Array.new(3, false)
+        expect(RoleOverride.pluck(:enabled)).to match_array [true, true, false]
+      end
+
       it 'should allow updating an individual permissions that belongs to a group' do
         update_permissions({@granular_permissions[0] => { enabled: true, explicit: true }})
         expect(RoleOverride.count).to eq 1

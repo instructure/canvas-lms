@@ -20,10 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/show" do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   it "should render" do
     course_with_student
     view_context

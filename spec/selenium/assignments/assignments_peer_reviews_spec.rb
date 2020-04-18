@@ -20,10 +20,6 @@ require_relative '../common'
 describe "assignments" do
   include_context "in-process server selenium tests"
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   context "peer reviews" do
     it "allows deleting a peer review", priority: "2", test_id: 216382 do
       skip_if_safari(:alert)

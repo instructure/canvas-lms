@@ -302,8 +302,6 @@ describe MissingPolicyApplicator do
       let(:submission) { assignment.submissions.first }
 
       before(:each) do
-        PostPolicy.enable_feature!
-
         late_policy_missing_enabled
         create_recent_assignment
         submission.update_columns(score: nil, grade: nil)

@@ -20,10 +20,6 @@ require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::UpdateAssignment do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   before do
     @account = Account.create!
     @course = @account.courses.create!

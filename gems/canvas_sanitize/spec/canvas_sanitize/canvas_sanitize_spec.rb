@@ -19,6 +19,18 @@
 require 'spec_helper'
 
 describe CanvasSanitize do
+  describe "#clean" do
+    subject { Sanitize.clean(html_string, CanvasSanitize::SANITIZE) }
+
+    context "when the HTML string contains anchor tags" do
+      context "and the href uses the 'tel' protocol" do
+        let(:html_string) { '<a href="tel:+14123815500">Call Number</a>' }
+
+        it { is_expected.to eq html_string }
+      end
+    end
+  end
+
   it "shouldnt strip lang attributes by default" do
     cleaned = Sanitize.clean("<p lang='es'>Hola</p>", CanvasSanitize::SANITIZE)
     expect(cleaned).to eq("<p lang=\"es\">Hola</p>")

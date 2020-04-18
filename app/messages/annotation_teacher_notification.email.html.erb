@@ -1,0 +1,19 @@
+<% presenter = Messages::SubmissionCommentForTeacher::AnnotationEmailPresenter.new(self) %>
+
+<% define_content :link do %>
+  <%= presenter.link.html_safe %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= presenter.subject %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= presenter.link %>">
+    <%= t "Click here to review the submission" %>
+  </a>
+<% end %>
+
+<p>
+  <%= presenter.body %>
+</p>

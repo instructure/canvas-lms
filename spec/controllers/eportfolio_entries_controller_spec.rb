@@ -31,8 +31,6 @@ describe EportfolioEntriesController do
   end
 
   before :once do
-    PostPolicy.enable_feature!
-
     eportfolio_with_user(:active_all => true)
     @user.account_users.create!(account: Account.default, role: student_role)
     eportfolio_category

@@ -74,9 +74,9 @@
 
   </fieldset>
   <fieldset>
-    <div id="sections_autocomplete_root"></div>
+    <div id="sections_autocomplete_root" {{#if isResponsive}}style="margin-right: 80px"{{/if}}></div>
     {{#if canAttach}}
-    <div class="control-group">
+    <div class="control-group" {{#if isResponsive}}style="margin-left: -75px"{{/if}}>
       {{#if lockedItems.content}}
         <label class="control-label" {{#t "attachment"}}Attachment{{/t}}</label>
       {{else}}
@@ -114,8 +114,8 @@
   <fieldset>
 
     {{#ifAny isTopic contextIsCourse canModerate showAssignment}}
-    <legend class="control-label">{{#t "options"}}Options{{/t}}</legend>
-    <div class="control-group">
+    <legend class="control-label" {{#if isResponsive}}style="margin-left: -20px"{{/if}}>{{#t "options"}}Options{{/t}}</legend>
+    <div class="control-group" {{#if isResponsive}}style="margin-left: -60px"{{/if}}>
       <div class="controls">
         {{#if isTopic}}
           <div><label class="checkbox short-label" for="threaded">
@@ -247,14 +247,14 @@
   {{#if isTopic}}
     {{#unless isLargeRoster}}
       {{#if contextIsCourse}}
-        <div id="group_category_options" class="control-group"></div>
+        <div id="group_category_options" class="control-group" {{#if isResponsive}}style="width: 295px"{{/if}}></div>
       {{/if}}
     {{/unless}}
 
     {{#if contextIsCourse}}
       <div id="availability_options" style="{{hiddenIf set_assignment}}">
         <fieldset>
-          <div class="control-group">
+          <div class="control-group" {{#if isResponsive}}style="margin-left: -66px"{{/if}}>
             <label class="control-label" for="delayed_post_at">
               {{#t "available_from"}}Available From{{/t}}
             </label>
@@ -265,6 +265,7 @@
             <div class="controls">
               <input type="text"
                      class="datetime_field input-medium"
+                     {{#if isResponsive}}style="width: 122px"{{/if}}
                      name="delayed_post_at"
                      id="delayed_post_at"
                      aria-labelledby="discussion_topic_available_from_accessible_label"
@@ -282,7 +283,7 @@
 
         {{#if isTopic}}
           <fieldset>
-            <div class="control-group">
+            <div class="control-group" {{#if isResponsive}}style="margin-left: -66px"{{/if}}>
               <label class="control-label" for="lock_at">{{#t "until"}}Until{{/t}}</label>
               <label class="screenreader-only" id="discussion_topic_available_until_accessible_label">
                 {{#t}}Discussion Topic will be available until{{/t}}
@@ -291,6 +292,7 @@
               <div class="controls">
                 <input type="text"
                        class="datetime_field input-medium"
+                       {{#if isResponsive}}style="width: 122px"{{/if}}
                        name="lock_at"
                        id="lock_at"
                        aria-labelledby="discussion_topic_available_until_accessible_label"
@@ -363,7 +365,7 @@
 
 <div id="assignment_external_tools"></div>
 
-<div id="edit_discussion_form_buttons" class="form-actions flush">
+<div id="edit_discussion_form_buttons" class="form-actions flush" {{#if isResponsive}}style="padding-left: 0px"{{/if}}>
   <button type="button" class="btn cancel_button">
     {{#t}}Cancel{{/t}}
   </button>

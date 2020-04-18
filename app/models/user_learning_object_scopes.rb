@@ -309,14 +309,16 @@ module UserLearningObjectScopes
     end
   end
 
+  # TODO: can remove when course_id is populated
+  def course_id_populated_on_submissions?
+    Setting.get("course_id_populated_on_submissions", "false") == "true"
+  end
+
   def assignments_needing_grading_a(
     limit: ULOS_DEFAULT_LIMIT,
     scope_only: false,
     **opts # arguments that are just forwarded to objects_needing
   )
-    if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
-      return scope_only ? Assignment.none : []
-    end
     params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
     objects_needing('Assignment', 'grading', :manage_grades, params, 120.minutes, **params) do |assignment_scope|
@@ -338,10 +340,11 @@ module UserLearningObjectScopes
   end
 
   def grader_visible_submissions_sql
+    course_id_sql = course_id_populated_on_submissions? ? "submissions.course_id" : "assignments.context_id"
     "SELECT submissions.id
        FROM #{Submission.quoted_table_name}
        INNER JOIN #{Enrollment.quoted_table_name} AS student_enrollments ON student_enrollments.user_id = submissions.user_id
-                                                                        AND student_enrollments.course_id = assignments.context_id
+                                                                        AND student_enrollments.course_id = #{course_id_sql}
       WHERE submissions.assignment_id = assignments.id
         AND (enrollments.limit_privileges_to_course_section = 'f'
          OR enrollments.course_section_id = student_enrollments.course_section_id)
@@ -357,14 +360,18 @@ module UserLearningObjectScopes
     params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
     objects_needing('Assignment', 'grading', :manage_grades, params, 120.minutes, **params) do |assignment_scope|
+      enrollment_join_sql = course_id_populated_on_submissions? ?
+        "INNER JOIN #{Enrollment.quoted_table_name} AS student_enrollments ON student_enrollments.user_id = submissions.user_id
+                                                    AND student_enrollments.course_id = submissions.course_id" :
+        "INNER JOIN #{Enrollment.quoted_table_name} AS student_enrollments ON student_enrollments.user_id = submissions.user_id
+         INNER JOIN base_assignments AS assignments ON student_enrollments.course_id = assignments.context_id
+                                                    AND submissions.assignment_id = assignments.id"
       as = Assignment.from("(with base_assignments as (
           #{assignment_scope.to_sql}
         ), sub_exists as (
           SELECT submissions.assignment_id, student_enrollments.course_section_id
           FROM #{Submission.quoted_table_name}
-          INNER JOIN #{Enrollment.quoted_table_name} AS student_enrollments ON student_enrollments.user_id = submissions.user_id
-          INNER JOIN base_assignments AS assignments ON student_enrollments.course_id = assignments.context_id
-                                                    AND submissions.assignment_id = assignments.id
+          #{enrollment_join_sql}
           WHERE submissions.submission_type IS NOT NULL
             AND submissions.excused IS NOT TRUE
             AND (submissions.workflow_state = 'pending_review'

@@ -32,10 +32,6 @@ describe Messages::AssignmentSubmitted::TwitterPresenter do
     @submission.reload
   end
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   describe "Presenter instance" do
     let(:message) { Message.new(context: submission, user: teacher) }
     let(:presenter) { Messages::AssignmentSubmitted::TwitterPresenter.new(message) }

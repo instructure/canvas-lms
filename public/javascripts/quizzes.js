@@ -303,7 +303,18 @@ export const quiz = (window.quiz = {
 
     // For every float_valued input, localize the string before display
     $answer.find('input.float_value').each((idx, inputEl) => {
-      answer[inputEl.name] = I18n.n(numberHelper.parse(answer[inputEl.name]))
+      let precision
+      // if there's a related precision value, we need to know that to format this
+      const $precision_input = $(inputEl).siblings('.precision_value')
+      if ($precision_input.length && $precision_input[0].name !== inputEl.name) {
+        precision = numberHelper.parse(answer[$precision_input[0].name])
+      }
+
+      if (precision) {
+        answer[inputEl.name] = I18n.n(numberHelper.parse(answer[inputEl.name]), {precision})
+      } else {
+        answer[inputEl.name] = I18n.n(numberHelper.parse(answer[inputEl.name]))
+      }
     })
 
     if (isNaN(answer.answer_weight)) {
@@ -1240,9 +1251,13 @@ export const quiz = (window.quiz = {
           val = val.toPrecision(precision)
         }
       }
+
+      // return here so we can ensure i18n precision is used
+      return $input.val(I18n.n(val, {precision}))
     }
 
-    $input.val(I18n.n(val))
+    // return just to match the above return
+    return $input.val(I18n.n(val))
   },
 
   /** ***
@@ -3222,10 +3237,13 @@ $(document).ready(function() {
   })
 
   $findBankDialog
-    .delegate('.bank', 'click', function() {
-      $findBankDialog.find('.bank.selected').removeClass('selected')
-      $(this).addClass('selected')
-      $findBankDialog.find('.submit_button').attr('disabled', false)
+    .delegate('.bank', 'click keydown', function(e) {
+      const keyboardClick = e.type === 'keydown' && (e.keyCode === 13 || e.keyCode === 32)
+      if (e.type === 'click' || keyboardClick) {
+        $findBankDialog.find('.bank.selected').removeClass('selected')
+        $(this).addClass('selected')
+        $findBankDialog.find('.submit_button').attr('disabled', false)
+      }
     })
     .delegate('.submit_button', 'click', () => {
       const $bank = $findBankDialog.find('.bank.selected:first')
@@ -5371,7 +5389,9 @@ function numericalAnswerTypeChange($el) {
   const val = $el.val()
   const $answer = $el.parents('.numerical_answer')
   $answer.find('.numerical_answer_text').hide()
-  $answer.find('.' + val).show()
+  const $text = $answer.find('.' + val)
+  $text.show()
+  $text.find('input:first').focus()
 }
 
 // attach HTML answers but only when they click the button

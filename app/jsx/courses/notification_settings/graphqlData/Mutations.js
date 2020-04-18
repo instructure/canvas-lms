@@ -23,6 +23,7 @@ export const UPDATE_COURSE_NOTIFICATION_PREFERENCES = gql`
       input: {contextType: Course, courseId: $courseId, enabled: $enabled}
     ) {
       course {
+        _id
         notificationPreferencesEnabled
       }
       errors {

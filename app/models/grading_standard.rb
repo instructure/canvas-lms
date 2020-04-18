@@ -50,6 +50,7 @@ class GradingStandard < ActiveRecord::Base
   # 89.5 is an A-.
   serialize :data
 
+  before_save :trim_whitespace, if: :will_save_change_to_data?
   before_save :update_usage_count
   attr_accessor :default_standard
 
@@ -160,6 +161,13 @@ class GradingStandard < ActiveRecord::Base
       raise "Unknown GradingStandard data version: #{version}"
     end
   end
+
+  def trim_whitespace
+    data.each do |scheme|
+      scheme.first.strip!
+    end
+  end
+  private :trim_whitespace
 
   def update_usage_count
     self.usage_count = self.assignments.active.count

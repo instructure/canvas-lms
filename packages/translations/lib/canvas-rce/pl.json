@@ -1,6 +1,7 @@
 {
   "accessibility_checker_b3af1f6c": { "message": "Kontrola dostępności" },
   "add_8523c19b": { "message": "Dodaj" },
+  "add_another_f4e50d57": { "message": "Dodaj kolejne" },
   "add_cc_subtitles_55f0394e": { "message": "Dodaj CC/napisy" },
   "align_11050992": { "message": "Dostosuj" },
   "align_center_ca078feb": { "message": "Wyśrodkuj" },
@@ -129,6 +130,7 @@
   "embed_preview_2d741e1f": { "message": "Osadź podgląd" },
   "embed_video_a97a64af": { "message": "Osadź wideo" },
   "embed_video_code_703e10f2": { "message": "Osadź kod wideo" },
+  "embedded_content_aaeb4d3d": { "message": "osadzona zawartość" },
   "equation_1c5ac93c": { "message": "Równanie" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Błąd podczas przesyłania nagrania wideo/audio"
@@ -220,6 +222,7 @@
     "message": "Brak tekstu alt. (obraz dekoracyjny)"
   },
   "no_e16d9132": { "message": "Nie" },
+  "no_file_chosen_9a880793": { "message": "Nie wybrano pliku" },
   "no_results_940393cf": { "message": "Brak wyników." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nie znaleziono wyników dla { filterTerm }"
@@ -302,6 +305,9 @@
   "submit_a3cc6859": { "message": "Prześlij" },
   "subscript_59744f96": { "message": "Indeks dolny" },
   "superscript_8cb349a2": { "message": "Indeks górny" },
+  "supported_file_types_srt_or_webvtt_7d827ed": {
+    "message": "Obsługiwane typy plików: SRT lub WebVTT"
+  },
   "switch_to_raw_html_editor_4c9ac7de": {
     "message": "Przełącz na edytor nieprzetworzonego HTML"
   },

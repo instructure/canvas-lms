@@ -23,8 +23,10 @@ import groovy.time.*
 // We are just allowing counts for now to be simple.
 // Source https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/?tab=metrics
 def hackyMetricSend(metric, value, tags) {
+  def metric_string = "${metric}:${value}|d|1|#${tags.join(',')}"
+  echo "sending metric: $metric_string"
   def script = """#!/bin/bash
-    echo -n "${metric}:${value}|c|1|#${tags.join(',')}" > /dev/udp/localhost/8125
+    echo -n "$metric_string" > /dev/udp/localhost/8125
   """
   // exit code is captured in case we want upstream caller status correction
   return sh(script: script, returnStatus: true)
@@ -32,20 +34,24 @@ def hackyMetricSend(metric, value, tags) {
 
 def runDataDogForMetric(name, block) {
   def timeStart = new Date()
-  block.call()
-  def timeStop = new Date()
-  def duration = TimeCategory.minus(timeStop, timeStart).toMilliseconds()
-
-  hackyMetricSend("jenkins.stage.elapsedTime", duration, ["stage:${name}"])
+  try {
+    block.call()
+  }
+  finally {
+    def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
+    hackyMetricSend("jenkins.stage.elapsedTimeDist", duration, ["stage:${name}"])
+  }
 }
 
 def runDataDogForMetricWithExtraTags(name, extraTags, block) {
   def timeStart = new Date()
-  block.call()
-  def timeStop = new Date()
-  def duration = TimeCategory.minus(timeStop, timeStart).toMilliseconds()
-
-  hackyMetricSend("jenkins.stage.elapsedTime", duration, ["stage:${name}", extraTags].flatten())
+  try {
+    block.call()
+  }
+  finally {
+    def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
+    hackyMetricSend("jenkins.stage.elapsedTimeDist", duration, ["stage:${name}", extraTags].flatten())
+  }
 }
 
 return this

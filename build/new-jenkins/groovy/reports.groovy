@@ -40,8 +40,41 @@ def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
       uploadSource: "/coverage",
       uploadDest: "$coverage_type/coverage"
   ])
-  sh 'rm -rf ./coverage_nodes'
-  sh 'rm -rf ./coverage'
+  sh 'rm -vrf ./coverage_nodes'
+  sh 'rm -vrf ./coverage'
+}
+
+def appendFailMessageReport(message, link) {
+  dir ("_buildmeta") {
+    if (!fileExists("failure_messages.txt")) {
+      sh "echo 'failure links:' >> failure_messages.txt"
+    }
+    sh "echo '$message' >> failure_messages.txt"
+    sh "echo '$link' >> failure_messages.txt"
+  }
+  archiveArtifacts(artifacts: '_buildmeta/*')
+}
+
+def sendFailureMessageIfPresent() {
+  if (fileExists("_buildmeta/failure_messages.txt")) {
+    echo "sending failure message"
+    sh "cat _buildmeta/failure_messages.txt"
+    if (!env.GERRIT_CHANGE_NUMBER || !env.GERRIT_PATCHSET_NUMBER) {
+      echo "build not associated with a PS... not sending message"
+    }
+    else {
+      load('build/new-jenkins/groovy/credentials.groovy').withGerritCredentials({
+        sh '''
+          gerrit_message=`cat _buildmeta/failure_messages.txt`
+          ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
+            $GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
+        '''
+      })
+    }
+  }
+  else {
+    echo "no failure messages to send"
+  }
 }
 
 // this method is to ensure that the stashing is done in a way that
@@ -52,7 +85,7 @@ def stashSpecFailures(prefix, index) {
   }
 }
 
-def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
+def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
   def working_dir = "${prefix}_compiled_failures"
   sh "rm -vrf ./$working_dir"
   sh "mkdir $working_dir"
@@ -71,6 +104,11 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
     htmlFiles = findFiles glob: '**/index.html'
   }
 
+  def report_name = "spec-failure-$prefix"
+  if (htmlFiles.size() > 1) {
+    def url_name = java.net.URLEncoder.encode(report_name, "UTF-8")
+    appendFailMessageReport("$report_title:", "${BUILD_URL}${url_name}")
+  }
   archiveArtifacts(artifacts: "$working_dir/**")
   publishHTML target: [
     allowMissing: false,
@@ -78,7 +116,8 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_name) {
     keepAll: true,
     reportDir: working_dir,
     reportFiles: htmlFiles.join(','),
-    reportName: report_name
+    reportName: report_name,
+    reportTitles: report_title
   ]
   sh "rm -vrf ./$working_dir"
 }
@@ -114,7 +153,7 @@ def buildIndexPage() {
 
 def snykCheckDependencies(projectImage, projectDirectory) {
   def projectContainer = sh(script: "docker run -d -it -v snyk_volume:${projectDirectory} ${projectImage}", returnStdout: true).trim()
-  _runSnyk(
+  runSnyk(
     projectContainer,
     projectDirectory,
     'canvas-lms:ruby',
@@ -123,10 +162,10 @@ def snykCheckDependencies(projectImage, projectDirectory) {
     './snyk_ruby'
   )
   archiveArtifacts(artifacts: '**/snyk*')
-  sh 'rm -r ./snyk_ruby'
+  sh 'rm -vr ./snyk_ruby'
 }
 
-def _runSnyk(projectContainer, projectDirectory, projectName, snykImage, packageManagerFile, extractedReportsDirectory) {
+def runSnyk(projectContainer, projectDirectory, projectName, snykImage, packageManagerFile, extractedReportsDirectory) {
   def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
   credentials.withSnykCredentials({ ->
     def RC = sh(
@@ -139,7 +178,8 @@ def _runSnyk(projectContainer, projectDirectory, projectName, snykImage, package
            ${snykImage} test \
           --project-name=${projectName} \
           --file=${packageManagerFile}
-      """, returnStatus: true
+      """,
+      returnStatus: true
     )
     // Snyk returns a 1 if vulnerabilities are found; we don't want this to fail the build
     // If the return code is not 0 or 1, it's a build error and should throw an exception
@@ -147,10 +187,10 @@ def _runSnyk(projectContainer, projectDirectory, projectName, snykImage, package
       error "Snyk dependency check for ${projectName} failed with an unrecognized return code: $RC"
     }
   })
-  this._extractSnykReports(projectContainer, projectDirectory, extractedReportsDirectory)
+  this.extractSnykReports(projectContainer, projectDirectory, extractedReportsDirectory)
 }
 
-def _extractSnykReports(projectContainer, projectDirectory, destinationDirectory) {
+def extractSnykReports(projectContainer, projectDirectory, destinationDirectory) {
   sh """
     set -o errexit -o nounset -o xtrace
     mkdir -vp ${destinationDirectory}

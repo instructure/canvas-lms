@@ -90,13 +90,4 @@ describe PostPolicy do
       end
     end
   end
-
-  describe "post policies feature" do
-    describe ".enable_feature!" do
-      it "sets the post_policies_enabled setting to 'true'" do
-        PostPolicy.enable_feature!
-        expect(Setting.get("post_policies_enabled", false)).to eq "true"
-      end
-    end
-  end
 end

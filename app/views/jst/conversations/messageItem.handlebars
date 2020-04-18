@@ -1,5 +1,10 @@
+{{#if responsive_2020_04}}
+<div class="message-info">
+  <div class="user-info">
+{{else}}
 <div class="row-fluid message-info">
   <div class="span8 user-info">
+{{/if}}
     {{>avatar author}}
     <div class="message-author-and-participants">
       <b class="username">{{author.name}}{{#if author.pronouns}} <i>({{author.pronouns}})</i> {{/if}}</b>{{#if participants.length}},{{/if}}
@@ -28,14 +33,22 @@
 
     </div>
   </div>
-
-	<div class="span4 message-metadata">
-		<div class="date pull-right">
+  {{#if responsive_2020_04}}
+  <div class="message-metadata clearfix">
+    <div class="date">
+  {{else}}
+  <div class="span4 message-metadata">
+    <div class="date pull-right">
+  {{/if}}
 			{{tEventToString created_at "long" "tiny"}}
 		</div>
 
     {{#unless for_submission}}
+    {{#if responsive_2020_04}}
+    <ul class="actions unstyled">
+    {{else}}
     <ul class="actions pull-right unstyled">
+    {{/if}}
       {{#unless cannot_reply}}
       <li>
         <a href="#"

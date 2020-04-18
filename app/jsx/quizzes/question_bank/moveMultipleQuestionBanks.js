@@ -32,11 +32,9 @@ import 'jquery.templateData' /* fillTemplateData, getTemplateData */
 
 const moveQuestions = {
   elements: {
-    $dialog: () => {
-      return $('#move_question_dialog')
-    },
-    $loadMessage: $('<li />').append(htmlEscape(I18n.t('load_questions', 'Loading Questions...'))),
-    $questions: $('#move_question_dialog .questions')
+    $dialog: () => $('#move_question_dialog'),
+    $questions: () => $('#move_question_dialog .questions'),
+    $loadMessage: $('<li />').append(htmlEscape(I18n.t('load_questions', 'Loading Questions...')))
   },
   messages: {
     move_copy_questions: I18n.t('title.move_copy_questions', 'Move/Copy Questions'),
@@ -64,8 +62,11 @@ const moveQuestions = {
       .$dialog()
       .find('.question_text')
       .hide()
-    this.elements.$questions.show()
-    this.elements.$questions.find('.list_question:not(.blank)').remove()
+    this.elements.$questions().show()
+    this.elements
+      .$questions()
+      .find('.list_question:not(.blank)')
+      .remove()
     this.elements
       .$dialog()
       .find('.question_name')
@@ -102,7 +103,7 @@ const moveQuestions = {
     })
   },
   loadData() {
-    this.elements.$questions.append(this.elements.$loadMessage)
+    this.elements.$questions().append(this.elements.$loadMessage)
     $.ajaxJSON(
       window.location.href + '/questions?page=' + this.page,
       'GET',
@@ -113,9 +114,9 @@ const moveQuestions = {
   onData(data) {
     const html = moveQuestionTemplate(data)
     this.elements.$loadMessage.remove()
-    this.elements.$questions.append(html)
+    this.elements.$questions().append(html)
     if (this.page < data.pages) {
-      this.elements.$questions.append(this.elements.$loadMessage)
+      this.elements.$questions().append(this.elements.$loadMessage)
       this.page += 1
       this.loadData()
     } else {

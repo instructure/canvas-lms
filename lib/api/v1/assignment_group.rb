@@ -73,6 +73,7 @@ module Api::V1::AssignmentGroup
         json = assignment_json(assignment, user, session,
           include_discussion_topic: includes.include?('discussion_topic'),
           include_all_dates: includes.include?('all_dates'),
+          include_can_edit: includes.include?('can_edit'),
           include_module_ids: includes.include?('module_ids'),
           include_grades_published: includes.include?('grades_published'),
           override_dates: opts[:override_assignment_dates],

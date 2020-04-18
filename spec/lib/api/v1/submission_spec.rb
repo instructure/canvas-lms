@@ -47,10 +47,6 @@ describe Api::V1::Submission do
   let(:submission) { assignment.submissions.create!(user: user) }
   let(:provisional_grade) { submission.provisional_grades.create!(scorer: teacher) }
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   describe '#provisional_grade_json' do
     describe 'speedgrader_url' do
       it "links to the speed grader for a student's submission" do

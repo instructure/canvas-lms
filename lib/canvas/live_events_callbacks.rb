@@ -22,6 +22,10 @@ module Canvas::LiveEventsCallbacks
     case obj
     when Course
       Canvas::LiveEvents.course_created(obj)
+    when Conversation
+      Canvas::LiveEvents.conversation_created(obj)
+    when ConversationMessage
+      Canvas::LiveEvents.conversation_message_created(obj)
     when DiscussionEntry
       Canvas::LiveEvents.discussion_entry_created(obj)
     when DiscussionTopic

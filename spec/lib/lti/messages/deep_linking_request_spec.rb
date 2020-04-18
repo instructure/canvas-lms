@@ -199,5 +199,36 @@ describe Lti::Messages::DeepLinkingRequest do
         expect(subject['accept_multiple']).to eq true
       end
     end
+
+    context 'when resource type is "conference_selection"' do
+      let(:opts) {{resource_type: 'conference_selection'}}
+
+      it 'sets the correct "accept_types"' do
+        expect(subject['accept_types']).to match_array %w(
+          ltiResourceLink
+        )
+      end
+
+      it 'sets the correct "accept_presentation_document_targets"' do
+        expect(subject['accept_presentation_document_targets']).to match_array %w(
+          iframe
+          window
+        )
+      end
+
+      it 'sets the correct "accept_media_types"' do
+        expect(subject['accept_media_types']).to eq(
+          'application/vnd.ims.lti.v1.ltilink'
+        )
+      end
+
+      it 'sets the correct "auto_create"' do
+        expect(subject['auto_create']).to eq true
+      end
+
+      it 'sets "accept_multiple" to true ' do
+        expect(subject['accept_multiple']).to eq false
+      end
+    end
   end
 end

@@ -77,6 +77,22 @@ describe GradingStandard do
     end
   end
 
+  it "strips trailing whitespaces from scheme names" do
+    bad_data = GradingStandard.default_grading_standard
+    bad_data[0][0] = "   A "
+    standard = @course.grading_standards.create!(data: bad_data)
+    expect(standard.data[0][0]).to eq "A"
+  end
+
+  it "does not strip trailing whitespaces from scheme name if saving only unrelated changes" do
+    standard = @course.grading_standards.create!(data: GradingStandard.default_grading_standard)
+    bad_data = standard.data
+    bad_data[0][0] = "   A "
+    standard.update_column(:data, bad_data)
+    standard.update!(title: "updated")
+    expect(standard.data[0][0]).to eq "   A "
+  end
+
   it "should upgrade the standard scheme from v1 to v2" do
     converted = GradingStandard.upgrade_data(@default_standard_v1, 1)
     default = GradingStandard.default_grading_standard

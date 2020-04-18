@@ -224,7 +224,6 @@ module Importers
         end
 
         clear_assignment_and_quiz_caches(migration)
-        DueDateCacher.recompute_course(course, update_grades: true, executing_user: migration.user)
       end
 
       migration.trigger_live_events!
@@ -381,7 +380,10 @@ module Importers
 
     def self.clear_assignment_and_quiz_caches(migration)
       assignments = migration.imported_migration_items_by_class(Assignment).select(&:update_cached_due_dates?)
-      Assignment.clear_cache_keys(assignments, :availability) if assignments.any?
+      if assignments.any?
+        Assignment.clear_cache_keys(assignments, :availability)
+        DueDateCacher.recompute_course(migration.context, assignments: assignments, update_grades: true, executing_user: migration.user)
+      end
       quizzes = migration.imported_migration_items_by_class(Quizzes::Quiz).select(&:should_clear_availability_cache)
       Quizzes::Quiz.clear_cache_keys(quizzes, :availability) if quizzes.any?
     end

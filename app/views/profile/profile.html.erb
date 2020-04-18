@@ -254,7 +254,13 @@ TEXT
 <input type="checkbox" id="show_user_services" <%= 'checked' if @user.show_user_services %>/> <label for="show_user_services"><%= t('labels.show_user_services', "Let fellow course/group members see which services I've linked to my profile") %></label>
 </p>
 <table role="presentation" style="width: 100%;"><tr>
-  <td style="vertical-align: top; width: 50%; padding-<%= direction('right') %>: 20px;">
+  <td
+    <% if @domain_root_account.feature_enabled?(:responsive_2020_03) %>
+      class="services-cell"
+    <% else %>
+      style="vertical-align: top; width: 50%; padding-<%= direction('right') %>: 20px;"
+    <% end %>
+  >
     <h3><%= t('headers.registered_services', "Registered Services") %></h3>
     <div style="margin-<%= direction('left') %>: 20px; margin-bottom: 20px;">
     <ul id="registered_services" class="unstyled_list">
@@ -290,7 +296,13 @@ TEXT
     <%= t(:no_registered_services, "No Registered Services") if @user.user_services.empty? %>
     </div>
   </td>
-  <td style="vertical-align: top; width: 50%; padding-<%= direction('left') %>: 20px;">
+  <td
+    <% if @domain_root_account.feature_enabled?(:responsive_2020_03) %>
+      class="services-cell"
+    <% else %>
+      style="vertical-align: top; width: 50%; padding-<%= direction('left') %>: 20px;"
+    <% end %>
+  >
     <h3><%= t('headers.other_services', "Other Services") %></h3>
     <div style="margin-<%= direction('left') %>: 20px;">
     <%= before_label(:other_services, "Click any service below to register") %>

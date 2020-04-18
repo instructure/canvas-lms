@@ -102,7 +102,7 @@ $('.license_help_link').live('click', function(event) {
     $dialog.dialog({
       autoOpen: false,
       title: I18n.t('content_license_help', 'Content Licensing Help'),
-      width: 700
+      width: Math.min(window.innerWidth, 620)
     })
     $.get('/partials/_license_help.html', html =>
       $dialog

@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "إضافة"
     },
+    "add_another_f4e50d57": {
+        "message": "إضافة محتوى"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "إضافة شرح مكتوب لأحداث العرض/أشرطة الترجمة"
     },
@@ -380,6 +383,9 @@
     "embed_video_code_703e10f2": {
         "message": "رمز تضمين الفيديو"
     },
+    "embedded_content_aaeb4d3d": {
+        "message": "مضمّن آخر"
+    },
     "equation_1c5ac93c": {
         "message": "معادلة"
     },
@@ -677,6 +683,9 @@
     "no_e16d9132": {
         "message": "لا"
     },
+    "no_file_chosen_9a880793": {
+        "message": "لم يتم اختيار ملف"
+    },
     "no_grade_3b4d7f3e": {
         "message": "لا توجد أي درجة"
     },
@@ -937,6 +946,9 @@
     },
     "superscript_8cb349a2": {
         "message": "مرتفع"
+    },
+    "supported_file_types_srt_or_webvtt_7d827ed": {
+        "message": "أنواع الملفات المدعومة: SRT أو WebVTT"
     },
     "switch_to_raw_html_editor_4c9ac7de": {
         "message": "التبديل إلي محرر html أولي"

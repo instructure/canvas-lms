@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "Legg til"
     },
+    "add_another_f4e50d57": {
+        "message": "Legg til en annen"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "Legg til CC/Undertekst"
     },
@@ -380,6 +383,9 @@
     "embed_video_code_703e10f2": {
         "message": "Legg ved videokode"
     },
+    "embedded_content_aaeb4d3d": {
+        "message": "inkludert innhold"
+    },
     "equation_1c5ac93c": {
         "message": "Ligning"
     },
@@ -677,6 +683,9 @@
     "no_e16d9132": {
         "message": "Nei"
     },
+    "no_file_chosen_9a880793": {
+        "message": "Ingen fil valgt"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Ingen vurdering"
     },
@@ -937,6 +946,9 @@
     },
     "superscript_8cb349a2": {
         "message": "Hevet skrift"
+    },
+    "supported_file_types_srt_or_webvtt_7d827ed": {
+        "message": "Filtyper som støttes: SRT eller WebVTT"
     },
     "switch_to_raw_html_editor_4c9ac7de": {
         "message": "Bytt til rå html-redigering"

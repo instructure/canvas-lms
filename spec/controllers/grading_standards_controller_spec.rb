@@ -66,6 +66,75 @@ describe GradingStandardsController do
       expected_response_data = [['A', 0.61], ['F', 0.00]]
       expect(json_response).to eq(expected_response_data)
     end
+
+    it "strips out leading and trailing whitespace for scheme names when passing data" do
+      standard = {
+        title: "New Grading Standard!",
+        data: [["   A ", 0.61], ["F", 0.00]]
+      }
+      # send the request as JSON, so that the nested arrays are preserved
+      request.content_type = 'application/json'
+      post :create, params: { course_id: @course.id, grading_standard: standard }, format: :json
+      expect(json_response).to eq [["A", 0.61], ["F", 0.0]]
+    end
+
+    it "strips out leading and trailing whitespace for scheme names when passing standard_data" do
+      standard = {
+        title: "New Grading Standard!",
+        standard_data: {
+          scheme_1: { name: "   A ", value: 61 },
+          scheme_2: { name: "F", value: 0 }
+        }
+      }
+      post :create, params: { course_id: @course.id, grading_standard: standard }, format: :json
+      expect(json_response).to eq [["A", 0.61], ["F", 0.0]]
+    end
+  end
+
+  describe "POST 'update'" do
+    let(:json_response) { json_parse['grading_standard']['data'] }
+
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @standard = @course.grading_standards.create!(
+        title: "grading standard",
+        standard_data: {
+          scheme_0: {
+            name: "A", value: "95"
+          },
+          scheme_1: {
+            name: "F", value: "0"
+          }
+        }
+      )
+    end
+
+    before(:each) do
+      user_session(@teacher)
+    end
+
+    it "strips out leading and trailing whitespace for scheme names when passing data" do
+      standard = {
+        title: "New Grading Standard!",
+        data: [["   A ", 0.61], ["F", 0.00]]
+      }
+      # send the request as JSON, so that the nested arrays are preserved
+      request.content_type = 'application/json'
+      put :update, params: { course_id: @course.id, grading_standard: standard, id: @standard.id }, format: :json
+      expect(json_response).to eq [["A", 0.61], ["F", 0.0]]
+    end
+
+    it "strips out leading and trailing whitespace for scheme names when passing standard_data" do
+      standard = {
+        title: "New Grading Standard!",
+        standard_data: {
+          scheme_1: { name: "   A ", value: 61 },
+          scheme_2: { name: "F", value: 0 }
+        }
+      }
+      put :update, params: { course_id: @course.id, grading_standard: standard, id: @standard.id }, format: :json
+      expect(json_response).to eq [["A", 0.61], ["F", 0.0]]
+    end
   end
 
   describe "GET 'index'" do

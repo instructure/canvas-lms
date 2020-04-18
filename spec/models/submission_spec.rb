@@ -23,8 +23,6 @@ describe Submission do
   subject(:submission) { Submission.new }
 
   before(:once) do
-    PostPolicy.enable_feature!
-
     course_with_teacher(active_all: true)
     course_with_student(active_all: true, course: @course)
     @context = @course
@@ -2489,25 +2487,35 @@ describe Submission do
       end
 
       it 'treats attachments in submission history as valid' do
-        submission = nil
-        first_attachment = attachment
-        Timecop.freeze(10.second.ago) do
-          submission = assignment.submit_homework(test_student, submission_type: 'online_upload',
-                                     attachments: [first_attachment])
+        first_attachment = attachment_model(filename: "submission-b.doc", :context => test_student)
+        submission = Timecop.freeze(2.days.ago) do
+          assignment.submit_homework(test_student, submission_type: 'online_upload',
+            attachments: [first_attachment])
         end
+        OriginalityReport.create!(attachment: first_attachment, submission: submission, originality_score: 0.4,
+          originality_report_url: report_url)
 
         attachment = attachment_model(filename: "submission-b.doc", :context => test_student)
-        Timecop.freeze(5.second.ago) do
-          submission = assignment.submit_homework test_student, attachments: [attachment]
+        Timecop.freeze(1.day.ago) do
+          assignment.submit_homework test_student, attachments: [attachment]
         end
 
         attachment = attachment_model(filename: "submission-c.doc", :context => test_student)
-        Timecop.freeze(1.second.ago) do
-          submission = assignment.submit_homework test_student, attachments: [attachment]
+        submission = Timecop.freeze(1.second.ago) do
+          assignment.submit_homework test_student, attachments: [attachment]
         end
 
-        first_history = submission.submission_history.first
-        expect(first_history.originality_report_url(first_attachment.asset_string, test_teacher)).to eq(report_url)
+        expect(submission.originality_report_url(first_attachment.asset_string, test_teacher)).to eq(report_url)
+      end
+
+      it 'gives the correct url for multiple attachments' do
+        attachment2 = attachment_model(filename: "submission-b.doc", :context => test_student)
+        originality_report2 = OriginalityReport.create!(attachment: attachment2, submission: submission,
+          originality_score: 0.4, originality_report_url: 'http://www.another-test-score.com/')
+        assignment.submit_homework(test_student, submission_type: 'online_upload',
+          attachments: [attachment, attachment2])
+        expect(submission.originality_report_url(attachment.asset_string, test_teacher, 1)).to eq(report_url)
+        expect(submission.originality_report_url(attachment2.asset_string, test_teacher, 1)).to eq('http://www.another-test-score.com/')
       end
     end
   end

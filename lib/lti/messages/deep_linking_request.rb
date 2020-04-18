@@ -22,7 +22,8 @@ module Lti::Messages
       'editor_button' => %w(link file html ltiResourceLink image).freeze,
       'assignment_selection' => %w(ltiResourceLink).freeze,
       'homework_submission' => %w(file).freeze,
-      'link_selection' => %w(ltiResourceLink).freeze
+      'link_selection' => %w(ltiResourceLink).freeze,
+      'conference_selection' => %w(ltiResourceLink).freeze
     }.freeze
 
     DOCUMENT_TARGETS = {
@@ -31,6 +32,7 @@ module Lti::Messages
       'assignment_selection' => %w(iframe window).freeze,
       'homework_submission' => %w(iframe).freeze,
       'link_selection' => %w(iframe window).freeze,
+      'conference_selection' => %w(iframe window).freeze
     }.freeze
 
     MEDIA_TYPES = {
@@ -44,7 +46,8 @@ module Lti::Messages
       'editor_button' => %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).freeze,
       'assignment_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze,
       'homework_submission' => %w(*/*).freeze,
-      'link_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze
+      'link_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze,
+      'conference_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze
     }.freeze
 
     AUTO_CREATE = {
@@ -52,7 +55,8 @@ module Lti::Messages
       'editor_button' => false,
       'assignment_selection' => false,
       'homework_submission' => false,
-      'link_selection' => false
+      'link_selection' => false,
+      'conference_selection' => true
     }.freeze
 
     ACCEPT_MULTIPLE = {
@@ -60,7 +64,8 @@ module Lti::Messages
       'editor_button' => true,
       'assignment_selection' => false,
       'homework_submission' => false,
-      'link_selection' => true
+      'link_selection' => true,
+      'conference_selection' => false
     }.freeze
 
     MODAL_PLACEMENTS = %w(editor_button assignment_selection link_selection migration_selection).freeze

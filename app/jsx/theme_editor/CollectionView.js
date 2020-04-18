@@ -248,7 +248,9 @@ export default function CollectionView(props) {
                 }
                 placement="top center"
               >
-                <View padding="small">{explainerText}</View>
+                <View display="block" padding="small" maxWidth="15rem">
+                  {explainerText}
+                </View>
               </Popover>
             </span>
           </h2>

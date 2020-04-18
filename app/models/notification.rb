@@ -155,6 +155,10 @@ class Notification < ActiveRecord::Base
     Setting.get('allowed_sms_notification_categories', 'announcement,grading').split(',')
   end
 
+  def self.types_to_send_in_sms
+    Setting.get('allowed_sms_notification_types', 'Assignment Graded,Confirm SMS Communication Channel,New Announcement,Submission Grade Changed,Submission Graded').split(',')
+  end
+
   def show_in_feed?
     self.category == "TestImmediately" || Notification.types_to_show_in_feed.include?(self.name)
   end
@@ -291,6 +295,8 @@ class Notification < ActiveRecord::Base
     t 'names.manually_created_access_token_created', 'Manually Created Access Token Created'
     t 'names.account_user_notification', 'Account User Notification'
     t 'names.account_user_registration', 'Account User Registration'
+    t 'Annotation Notification'
+    t 'Annotation Teacher Notification'
     t 'names.assignment_changed', 'Assignment Changed'
     t 'names.assignment_created', 'Assignment Created'
     t 'names.assignment_due_date_changed', 'Assignment Due Date Changed'

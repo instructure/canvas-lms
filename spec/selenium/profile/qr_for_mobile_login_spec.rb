@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../common'
 
 describe 'QR for mobile login' do
@@ -56,19 +57,18 @@ describe 'QR for mobile login' do
     it 'should bring up modal with generated QR code' do
       get '/'
       f('#global_nav_profile_link').click
-      find_button('QR for Mobile Login').click
+      fln('QR for Mobile Login').click
       qr_code = f("img[data-testid='qr-code-image']")
       check_base64_encoded_png_image(qr_code)
     end
   end
 
-  # TODO: USERS-458 will make this available
-  # context 'from profile settings' do
-  #   it 'should bring up modal with generated QR code' do
-  #     get '/profile'
-  #     find_button('QR for Mobile Login').click
-  #     qr_code = f("img[data-testid='qr-code-image']")
-  #     check_base64_encoded_png_image(qr_code)
-  #   end
-  # end
+  context 'from user profile' do
+    it 'should bring up modal with generated QR code' do
+      get '/profile'
+      fln('QR for Mobile Login').click
+      qr_code = f("img[data-testid='qr-code-image']")
+      check_base64_encoded_png_image(qr_code)
+    end
+  end
 end

@@ -63,7 +63,7 @@ QUnit.module(
     equal(FileOptionsCollection.findMatchingFile('xyz') != null, false)
   }),
 
-  test('segregateOptionBuckets divides files into collsion and resolved buckets', () => {
+  test('segregateOptionBuckets divides files into collision and resolved buckets', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
     const one = createFileOption('file_name.txt', 'overwrite', 'option_name.txt')
     const two = createFileOption('foo')
@@ -94,7 +94,7 @@ QUnit.module(
     setupFolderWith(['foo', 'bar', 'baz'])
     const one = createFileOption('other.zip')
     one.file.type = 'application/zip'
-    const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
+    const {resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
     equal(resolved.length, 0)
     equal(zips[0].file.name, 'other.zip')
   }),
@@ -104,7 +104,7 @@ QUnit.module(
     const one = createFileOption('other.zip')
     one.file.type = 'application/zip'
     one.expandZip = false
-    const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
+    const {resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
     equal(resolved.length, 1)
     equal(zips.length, 0)
   }),
@@ -118,5 +118,13 @@ QUnit.module(
     equal(resolved.length, 1)
     equal(collisions.length, 0)
     equal(zips.length, 0)
+  }),
+
+  test('segregateOptionBuckets skips files', () => {
+    setupFolderWith(['foo', 'bar', 'baz'])
+    const one = createFileOption('foo', 'skip')
+    const {collisions, resolved} = FileOptionsCollection.segregateOptionBuckets([one])
+    equal(collisions.length, 0)
+    equal(resolved.length, 0)
   })
 )

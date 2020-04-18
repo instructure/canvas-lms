@@ -506,4 +506,15 @@ describe Types::CourseType do
       expect(course_type.resolve("imageUrl")).to eq "http://some.cool/gif.gif"
     end
   end
+
+  describe 'notificationPrefereneces' do
+    it 'returns the students notification preferences' do
+      communication_channel = @student.communication_channels.create!(path: 'test@test.com')
+      notification = notification_model(:name => 'test', :category => 'Announcement')
+
+      expect(
+        course_type.resolve('notificationPreferences { channels { notificationPolicies { notification { name } } } }')[0][0]
+      ).to eq 'test'
+    end
+  end
 end

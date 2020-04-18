@@ -1,6 +1,7 @@
 {
   "accessibility_checker_b3af1f6c": { "message": "Verifikatè Aksesibilite" },
   "add_8523c19b": { "message": "Ajoute" },
+  "add_another_f4e50d57": { "message": "Ajoute yon lòt" },
   "add_cc_subtitles_55f0394e": { "message": "Ajoute CC/Soutit" },
   "align_11050992": { "message": "Aliyen" },
   "align_center_ca078feb": { "message": "Aliyen nan mitan" },
@@ -117,6 +118,7 @@
   "embed_preview_2d741e1f": { "message": "Entegre Apèsi" },
   "embed_video_a97a64af": { "message": "Entegre Videyo a" },
   "embed_video_code_703e10f2": { "message": "Entegre Kòb Videyo" },
+  "embedded_content_aaeb4d3d": { "message": "Entegre kontni" },
   "equation_1c5ac93c": { "message": "Ekwasyon" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Erè nan transfè anrejistreman videyo/odyo"
@@ -202,6 +204,7 @@
     "message": "Pa gen Tèks Altèn (Imaj Dekoratif)"
   },
   "no_e16d9132": { "message": "Non" },
+  "no_file_chosen_9a880793": { "message": "Pa gen fichye chwazi" },
   "no_results_940393cf": { "message": "Okenn rezilta." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nou pa jwenn rezilta pou { filterTerm }"
@@ -278,6 +281,9 @@
   "submit_a3cc6859": { "message": "Soumèt" },
   "subscript_59744f96": { "message": "Endis" },
   "superscript_8cb349a2": { "message": "An Ekspozan" },
+  "supported_file_types_srt_or_webvtt_7d827ed": {
+    "message": "Tip fichye ki aksepte: SRT oswa WebVTT"
+  },
   "switch_to_raw_html_editor_4c9ac7de": { "message": "Pase a editè html brit" },
   "switch_to_rich_text_editor_35822d26": {
     "message": "Pase a editè tèks anrichi"

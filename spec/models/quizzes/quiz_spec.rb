@@ -21,8 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../lib/canvas/draft_state
 
 describe Quizzes::Quiz do
   before :once do
-    PostPolicy.enable_feature!
-
     course_factory
   end
 

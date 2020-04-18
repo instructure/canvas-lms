@@ -97,7 +97,12 @@ it('is valid when valid', () => {
   expect(wrapper.instance().valid()).toEqual(true)
 })
 
-const placements = ['editor_button', 'migration_selection', 'homework_submission']
+const placements = [
+  'editor_button',
+  'migration_selection',
+  'homework_submission',
+  'conference_selection'
+]
 
 placements.forEach(placementName => {
   it('displays alert when placement only supports deep linking', () => {

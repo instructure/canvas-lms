@@ -33,10 +33,33 @@ module Turnitin
     end
 
     def process
+      # Create an attachment for the file submitted via the TII tool.
+      # If the score is still pending, this will raise
+      # `Errors::ScoreStillPendingError`
       attachment = AttachmentManager.create_attachment(@user, @assignment, @tool, @outcomes_response_json)
+
+      # If we've made it this far, we've successfully
+      # retrieved an attachment from TII
+
       asset_string = attachment.asset_string
+
+      # Create a submission using the attachment
       submission = submit_homework(attachment)
+
+      # Set submission processing status to "pending"
       update_turnitin_data!(submission, asset_string, status: 'pending', outcome_response: @outcomes_response_json)
+
+      # Start a job that attempts to retrieve the
+      # score from TII.
+      #
+      # If no score is available yet, this job
+      # will terminate and retry up to
+      # the max_attempts limit
+      #
+      # TODO: This job does not use any kind of
+      # exponential backoff. We should add
+      # one to give TII more time to process
+      # attachments.
       self.send_later_enqueue_args(
         :update_originality_data,
         {max_attempts: self.class.max_attempts},
@@ -86,6 +109,7 @@ module Turnitin
         InstStatsd::Statsd.increment("submission_not_scored.account_#{@assignment.root_account.global_id}",
                                      short_stat: 'submission_not_scored',
                                      tags: { root_account_id: @assignment.root_account.global_id })
+        # Retry the update_originality_data job
         raise Errors::SubmissionNotScoredError
       else
         new_data = {

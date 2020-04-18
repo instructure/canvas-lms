@@ -37,14 +37,15 @@ $section_tabs_to_be_hidden_color: $ic-font-color--subdued;
 }
 
 .users-wrapper {
-  border: 1px solid #CCC;
+  border: 1px solid #ccc;
   margin-bottom: 1.4em;
-  h3, .h3 {
+  h3,
+  .h3 {
     @include fontSize(18px);
     margin: 0;
     padding: 8px;
-    background-color: #F7F7F7;
-    border-bottom: 1px solid #CCC;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ccc;
     line-height: 1em;
   }
   .pagination-loading {
@@ -52,7 +53,7 @@ $section_tabs_to_be_hidden_color: $ic-font-color--subdued;
     display: block;
     text-align: center;
     text-decoration: none;
-    background-color: #06A9EE;
+    background-color: #06a9ee;
     color: white;
   }
 }
@@ -76,7 +77,7 @@ ul.user_list li.user {
   line-height: 1em;
   padding: 8px;
   margin: 0;
-  border-bottom: 1px solid #CCC;
+  border-bottom: 1px solid #ccc;
   &:last-child {
     border-bottom: 0;
   }
@@ -86,7 +87,7 @@ ul.user_list li.user {
     padding: 0;
     margin: direction-sides((-8px) 0 0 -8px);
     border-bottom: 10px solid transparent;
-    border-#{direction(left)}: 10px solid #06A9EE;
+    border-#{direction(left)}: 10px solid #06a9ee;
     display: block;
     position: relative;
   }
@@ -154,12 +155,12 @@ ul.user_list div.enrollment_type.pending {
 }
 
 .add-course-users {
-  border: 1px solid #CCC;
+  border: 1px solid #ccc;
   margin-bottom: 1.4em;
   .header {
     padding: 8px;
-    border-bottom: 1px solid #CCC;
-    background-color: #F7F7F7;
+    border-bottom: 1px solid #ccc;
+    background-color: #f7f7f7;
     .id-holder {
       float: direction(left);
       padding-#{direction(right)}: 1em;
@@ -204,6 +205,7 @@ ul.user_list div.enrollment_type.pending {
   @include reset-list;
   border-top: 1px solid $section_tabs_border_top_color;
   width: 400px;
+  max-width: calc(100vw - 22px);
   margin: 20px 0;
   li.enabled {
     &:hover {
@@ -284,7 +286,7 @@ ul.user_list div.enrollment_type.pending {
 }
 
 .course-settings-sub-navigation-lti .new_badge {
-  background-color: #BC3AA6;
+  background-color: #bc3aa6;
   color: white;
   @include fontSize(10px);
   font-weight: normal;
@@ -295,30 +297,69 @@ ul.user_list div.enrollment_type.pending {
 // new icons need a bit more space when used with
 // a link in the right-side-bar
 .Button--course-settings {
-  i[class*=icon-], i[class^=icon-] {
-    margin-#{direction(right)}: .5rem;
+  i[class*='icon-'],
+  i[class^='icon-'] {
+    margin-#{direction(right)}: 0.5rem;
   }
 }
 
-#course_form table.coursesettings {
-  table-layout: fixed;
+#course_form div.coursesettings {
   width: 100%;
-  td:nth-of-type(1) {
-    width: 20%;
-  }
-  td:nth-of-type(2) {
-    width: 80%;
-  }
+  display: flex;
+  flex-direction: column;
 
-
-  input[type=checkbox] + label {
+  input[type='checkbox'] + label {
     vertical-align: baseline;
   }
-  input, select, td {
-    vertical-align: baseline;
-  }
+  input,
+  select,
   td {
-    padding-#{direction(right)}: 10px;
+    vertical-align: baseline;
+  }
+  .form-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-bottom: 0.25rem;
+
+    & > div:nth-of-type(1) {
+      flex: 1;
+    }
+    & > div:nth-of-type(2) {
+      flex: 4;
+    }
+    .form-label label {
+      font-weight: bold;
+    }
+    @media screen and (max-width: 900px) {
+      &.form-row > div {
+        // At smaller sizes, expand the label to be
+        // larger width, so it enacts the flex-wrap
+        flex: unset;
+        width: 100%;
+      }
+      // Re-enable wrapping on smaller screen sizes.
+      .nobr {
+        white-space: normal;
+      }
+      .syllabus-visibility {
+        display: block;
+      }
+      .panel-border {
+        width: unset;
+      }
+    }
+    .checkbox-flex-container {
+      // Because we are wrapping, we need to force the
+      // checkboxes to inline. We'll use flex to do that.
+      display: flex;
+      input {
+        margin-#{direction(right)}: 0.25rem;
+      }
+    }
+    div {
+      padding-#{direction(right)}: 10px;
+    }
   }
   .tall-row {
     padding-top: 3px;
@@ -329,11 +370,14 @@ ul.user_list div.enrollment_type.pending {
   .checklabelfix {
     vertical-align: -4px;
   }
-  .license_help_link img, #course_locale, #course_default_wiki_editing_roles {
+  .license_help_link img,
+  #course_locale,
+  #course_default_wiki_editing_roles {
     vertical-align: baseline;
   }
   #course_locale {
-    width: 360px;
+    max-width: 360px;
+    width: 100%;
   }
   .palign {
     line-height: 100%;
@@ -352,6 +396,13 @@ ul.user_list div.enrollment_type.pending {
   i.date-warning {
     padding: direction-sides(8px 0 0 8px);
     color: $btnWarningBackground;
+  }
+
+  // A few small exceptions
+  .course-visibility-row,
+  .course-conclude-at-row {
+    align-items: flex-start;
+    padding-top: 0.5rem;
   }
 }
 

@@ -19,8 +19,7 @@
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import {
   createGradebook,
-  setFixtureHtml,
-  stubDataLoader
+  setFixtureHtml
 } from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook Submissions', suiteHooks => {
@@ -31,7 +30,6 @@ QUnit.module('Gradebook Submissions', suiteHooks => {
   suiteHooks.beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
     setFixtureHtml($container)
-    stubDataLoader()
 
     gradebookOptions = {}
   })
@@ -39,6 +37,78 @@ QUnit.module('Gradebook Submissions', suiteHooks => {
   suiteHooks.afterEach(() => {
     gradebook.destroy()
     $container.remove()
+  })
+
+  QUnit.module('#updateSubmissionsLoaded()', hooks => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook(gradebookOptions)
+    })
+
+    test('optionally sets the submissions loaded status to true', () => {
+      gradebook.updateSubmissionsLoaded(true)
+      strictEqual(gradebook.contentLoadStates.submissionsLoaded, true)
+    })
+
+    test('optionally sets the submissions loaded status to false', () => {
+      gradebook.updateSubmissionsLoaded(false)
+      strictEqual(gradebook.contentLoadStates.submissionsLoaded, false)
+    })
+
+    test('updates column headers', () => {
+      sinon.spy(gradebook, 'updateColumnHeaders')
+      gradebook.updateSubmissionsLoaded(true)
+      strictEqual(gradebook.updateColumnHeaders.callCount, 1)
+    })
+
+    test('updates column headers after updating the students loaded status', () => {
+      sinon.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+        strictEqual(gradebook.contentLoadStates.submissionsLoaded, true)
+      })
+      gradebook.updateSubmissionsLoaded(true)
+    })
+
+    test('renders filters', () => {
+      sinon.spy(gradebook, 'renderFilters')
+      gradebook.updateSubmissionsLoaded(true)
+      strictEqual(gradebook.renderFilters.callCount, 1)
+    })
+
+    test('renders filters after updating the submissions loaded status', () => {
+      sinon.stub(gradebook, 'renderFilters').callsFake(() => {
+        strictEqual(gradebook.contentLoadStates.submissionsLoaded, true)
+      })
+      gradebook.updateSubmissionsLoaded(true)
+    })
+
+    test('updates the total grade column when submissions and students are loaded', () => {
+      gradebook.setStudentsLoaded(true)
+      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      gradebook.updateSubmissionsLoaded(true)
+      strictEqual(gradebook.updateTotalGradeColumn.callCount, 1)
+    })
+
+    test('updates the total grade column after updating the submissions loaded status', () => {
+      gradebook.setStudentsLoaded(true)
+      sinon.stub(gradebook, 'updateTotalGradeColumn').callsFake(() => {
+        strictEqual(gradebook.contentLoadStates.submissionsLoaded, true)
+      })
+      gradebook.updateSubmissionsLoaded(true)
+    })
+
+    test('does not update the total grade column when students are not loaded', () => {
+      gradebook.setStudentsLoaded(false)
+      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      gradebook.updateSubmissionsLoaded(true)
+      strictEqual(gradebook.updateTotalGradeColumn.callCount, 0)
+    })
+
+    test('does not update the total grade column when submissions are not loaded', () => {
+      gradebook.setStudentsLoaded(true)
+      gradebook.setSubmissionsLoaded(true)
+      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      gradebook.updateSubmissionsLoaded(false)
+      strictEqual(gradebook.updateTotalGradeColumn.callCount, 0)
+    })
   })
 
   QUnit.module('#gotSubmissionsChunk()', hooks => {
@@ -156,7 +226,10 @@ QUnit.module('Gradebook Submissions', suiteHooks => {
     test('uses the ids of the related students to set up grading', () => {
       gradebook.gotSubmissionsChunk(studentSubmissions)
       const [students] = gradebook.setupGrading.lastCall.args
-      deepEqual(students.map(student => student.id), ['1101', '1102'])
+      deepEqual(
+        students.map(student => student.id),
+        ['1101', '1102']
+      )
     })
 
     QUnit.module('when the assignment is only visible to overrides', contextHooks => {

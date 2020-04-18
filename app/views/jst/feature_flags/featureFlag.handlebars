@@ -18,9 +18,9 @@
     {{/each}}
   </div>
 
-  <div class="span5 text-right">
+  <div class="span5 text-right {{#if isResponsiveAndThreeState}}span5-responsive{{/if}}">
     {{#if threeState}}
-      <div id="ff_{{id}}" class="ui-buttonset ui-buttonset--feature-settings">
+      <div id="ff_{{id}}" class="ui-buttonset ui-buttonset--feature-settings {{#if isResponsive}}ui-buttonset--feature-settings-responsive{{/if}}">
         <div class="ff-background ff-left {{#if disableOff}}ff-disabled{{/if}}">
           <input type="radio" id="ff_off_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isOff}}checked{{/if}}
             {{#if disableOff}}disabled{{/if}} data-id="{{id}}" data-action="off">

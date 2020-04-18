@@ -30,10 +30,6 @@ class TestCourseApi
 end
 
 describe Api::V1::Course do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   describe '#course_json' do
     before :once do
       @test_api = TestCourseApi.new
@@ -4362,6 +4358,36 @@ describe CoursesController, type: :request do
           "unposted_final_score" => 60.0,
           "grading_period_id" => grading_period.id
         })
+      end
+    end
+  end
+end
+describe CoursesController, type: :request do
+  describe "/quizzes" do
+    context "as teacher" do
+
+      before :once do
+        Account.default.enable_feature!(:newquizzes_on_quiz_page)
+        @course = Course.create!
+        @user = course_with_teacher(course: @course, active_all: true).user
+        @course.enable_feature!(:quizzes_next)
+        @options = { controller: "courses", action: "new_quizzes_selection_update", format: "json", id: @course.id }
+      end
+
+      it "should update settings" do
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/quizzes", @options, {
+            newquizzes_engine_selected: true
+        })
+        engine = json.dig('engine_selected', 'user_id')
+        expect(engine).to include({
+          'newquizzes_engine_selected' => 'true'
+        })
+        @course.reload
+        user_id = @user.id
+        selection_obj = @course.settings[:engine_selected][:user_id]
+        expiration = Time.zone.today + 30.days
+        expect(selection_obj[:newquizzes_engine_selected]).to eq 'true'
+        expect(selection_obj[:expiration]).to eq expiration
       end
     end
   end

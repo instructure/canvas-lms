@@ -31,7 +31,7 @@ class DeveloperKeysController < ApplicationController
           accountEndpoint: api_v1_account_developer_keys_path(@context),
           enableTestClusterChecks: DeveloperKey.test_cluster_checks_enabled?,
           validLtiScopes: TokenScopes::LTI_SCOPES,
-          validLtiPlacements: Lti::ResourcePlacement::PLACEMENTS,
+          validLtiPlacements: Lti::ResourcePlacement.valid_placements,
           includesFeatureFlagEnabled: Account.site_admin.feature_enabled?(:developer_key_support_includes)
         )
 

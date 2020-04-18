@@ -16,6 +16,14 @@ confetti_for_assignments:
     to the set due date.
   applies_to: RootAccount
 
+confetti_for_valid_links:
+  state: hidden
+  display_name: Confetti for valid links
+  description: |-
+    Displays confetti for teachers that run the link validator on
+    a course and no issues are found.
+  applies_to: RootAccount
+
 deprecate_sms:
   state: hidden
   display_name: Restrict SMS to Select Types

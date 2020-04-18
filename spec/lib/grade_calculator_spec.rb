@@ -20,9 +20,8 @@ require_relative '../sharding_spec_helper'
 
 describe GradeCalculator do
   before :each do
+    Account.site_admin.enable_feature!(:grade_calculator_performance_improvements)
     course_with_student active_all: true
-
-    PostPolicy.enable_feature!
   end
 
   context "computing grades" do

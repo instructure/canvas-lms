@@ -30,7 +30,6 @@ describe "Gradebook" do
 
   before :once do
     gradebook_data_setup
-    PostPolicy.enable_feature!
   end
 
   before do

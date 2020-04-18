@@ -96,7 +96,7 @@
       <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings", :class => 'account_settings'} do |f| %>
         <fieldset id="account_settings">
           <legend><%= t(:account_settings_title, "Account Settings") %></legend>
-          <table class="formtable">
+          <table class="formtable narrow">
             <tr>
               <td><%= f.blabel :name, :en => "Account Name" %></td>
               <td><%= f.text_field :name, :class => 'same-width-as-select' %></td>
@@ -412,13 +412,13 @@
               "list of addresses, or an address followed by a mask " +
               "(\"192.168.217.1/24\" or \"192.168.217.1/255.255.255.0\").\"") %>
             </div>
-            <table class="formtable">
+            <table class="formtable narrow">
               <tbody id="ip_filters">
                 <% ((@account.settings[:ip_filters] || {}).sort_by(&:first) << [nil, nil]).each do |name, filter| %>
                   <tr class="ip_filter <%= raw ' blank" style="display: none;' if name.nil? %>">
                     <td> <label> <%= t("Name:") %></label> <input aria-label="<%= t("Name") %>" type="text" class="name" value="<%= name %>"/></td>
-                    <td> <label> <%= t("Filter:") %></label> <input aria-label="<%= t("Filter") %>" type="text" class="value" value="<%= filter %>" maxlength="255"/></td>
                     <td>
+                      <label> <%= t("Filter:") %></label> <input aria-label="<%= t("Filter") %>" type="text" class="value" value="<%= filter %>" maxlength="255"/>
                       <a href="#" title="<%= t(:quiz_ip_filters_delete, "Remove Filter") %>" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
                     </td>
                   </tr>
@@ -627,7 +627,7 @@
 
           <fieldset id="turnitin_settings">
             <legend><%= t("Similarity Detection Platform") %></legend>
-            <table class="formtable">
+            <table class="formtable narrow">
               <tr>
                 <td><%= f.blabel :turnitin_pledge, en: "Similarity Pledge" %></td>
                 <td>
@@ -649,7 +649,7 @@
           <% if @account.settings[:enable_turnitin] %>
             <fieldset id="turnitin_settings">
               <legend><%= t(:turnitin_settings_title, "Turnitin Settings") %></legend>
-              <table class="formtable">
+              <table class="formtable narrow">
                 <tr>
                   <td><%= f.blabel :turnitin_account_id, :en => "Turnitin Account ID" %></td>
                   <td><%= f.text_field :turnitin_account_id, :class => "turnitin_account_settings" %></td>
@@ -777,7 +777,7 @@ acknowledge that you have read and agreed to the
               <table class="formtable" style='margin-<%= direction('left') %>: 1.5em;'>
               <tr>
                 <td><%= t 'notifications.from', 'From' %></td>
-                <td><%= HostUrl.outgoing_email_default_name %> <%= '<notifications@instructure.com>' %></td>
+                <td class="long-word"><%= HostUrl.outgoing_email_default_name %> <%= '<notifications@instructure.com>' %></td>
               </tr>
               <tr>
                 <td><%= t 'notifications.subject', 'Subject' %></td>
@@ -793,7 +793,7 @@ acknowledge that you have read and agreed to the
               </tr>
               <tr>
                 <td><%= t 'notifications.email_reply_to', 'Reply-To' %></td>
-                <td><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
+                <td class="long-word"><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
               </tr>
             </table>
             </blockquote>
@@ -817,7 +817,7 @@ acknowledge that you have read and agreed to the
             <table class="formtable" style='margin-<%= direction('left') %>: 1.5em;'>
               <tr>
                 <td><%= t 'notifications.from', 'From' %></td>
-                <td><strong id='custom_default_name_display'></strong> <%= '<notifications@instructure.com>' %></td>
+                <td class="long-word"><strong id='custom_default_name_display' class="custom-text"></strong> <%= '<notifications@instructure.com>' %></td>
               </tr>
               <tr>
                 <td><%= t 'notifications.subject', 'Subject' %></td>
@@ -833,7 +833,7 @@ acknowledge that you have read and agreed to the
               </tr>
               <tr>
                 <td><%= t 'notifications.email_reply_to', 'Reply-To' %></td>
-                <td><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
+                <td class="long-word"><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
               </tr>
             </table>
             </blockquote>

@@ -18,10 +18,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe GradeSummaryPresenter do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   describe '#courses_with_grades' do
     describe 'all on one shard' do
       let(:course) { Course.create! }

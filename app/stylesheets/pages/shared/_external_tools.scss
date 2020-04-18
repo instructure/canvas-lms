@@ -343,3 +343,15 @@ fieldset.rate_app_wrapper {
     margin-bottom: 2px;
   }
 }
+
+@include mobile-only {
+  .responsive_2020_03 {
+    #external_tools {
+      .lm {
+        margin-#{direction(left)}: 5px;
+        padding-#{direction(right)}: 4px;
+        padding-#{direction(left)}: 4px;
+      }
+    }
+  }
+}

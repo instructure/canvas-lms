@@ -20,19 +20,48 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/users/show" do
-  it "should render" do
-    course_with_student
+  before do
+    enroll = course_with_student
+    account_admin_user
+    gm = GroupMembership.create!(
+      group: @course.groups.create(name: 'our group'),
+      user: @user,
+      workflow_state: "accepted"
+    )
     view_context
     assign(:user, @user)
     assign(:courses, [@course])
     assign(:topics, [])
     assign(:upcoming_events, [])
-    assign(:enrollments, [])
-    assign(:group_memberships, [])
+    assign(:enrollments, [enroll])
+    assign(:group_memberships, [gm])
     assign(:page_views, PageView.paginate(:page => 1, :per_page => 20))
+  end
 
+  it "should render" do
     render "users/show"
     expect(response).not_to be_nil
     expect(content_for(:right_side)).to include "Message #{@user.name}" # regardless of permissions
+  end
+
+  it "should render responsive accounts" do
+    @course.root_account.enable_feature!(:responsive_2020_04)
+    render "users/show"
+    expect(response).to have_tag("div[class='accounts'] span[class='name'][style='word-break: break-word;']")
+    expect(response).to have_tag("div[class='accounts'] span[class='name'][style='word-break: break-word;']")
+  end
+
+  it "should render responsive groups" do
+    @course.root_account.enable_feature!(:responsive_2020_04)
+    render "users/show"
+    expect(response).to have_tag("div[class='groups'] span[class='name'][style='word-break: break-word;']")
+    expect(response).to have_tag("div[class='groups'] span[class='name'][style='word-break: break-word;']")
+  end
+
+  it "should render responsive enrollments" do
+    @course.root_account.enable_feature!(:responsive_2020_04)
+    render "users/show"
+    expect(response).to have_tag("div[class='courses'] span[class='name'][style='word-break: break-word;']")
+    expect(response).to have_tag("div[class='courses'] span[class='name'][style='word-break: break-word;']")
   end
 end

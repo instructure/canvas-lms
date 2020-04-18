@@ -36,10 +36,6 @@ describe "Screenreader Gradebook" do
   let(:gradebook_cell_css) { '.gradebook-cell' }
   let(:view_grading_history) { f("a[href='/courses/#{@course.id}/gradebook/history']") }
 
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   def active_element
     driver.switch_to.active_element
   end

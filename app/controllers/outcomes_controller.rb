@@ -47,6 +47,8 @@ class OutcomesController < ApplicationController
              :manage_rubrics => @context.grants_right?(@current_user, session, :manage_rubrics),
              :manage_courses => @context.grants_right?(@current_user, session, :manage_courses)
            })
+
+    set_tutorial_js_env
   end
 
   def show

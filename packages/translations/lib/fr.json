@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "Ajouter"
     },
+    "add_another_f4e50d57": {
+        "message": "Ajouter un autre"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "Ajouter CC/Sous-titres"
     },
@@ -380,6 +383,9 @@
     "embed_video_code_703e10f2": {
         "message": "Intégrer le code vidéo"
     },
+    "embedded_content_aaeb4d3d": {
+        "message": "contenu intégré"
+    },
     "equation_1c5ac93c": {
         "message": "Équation"
     },
@@ -677,6 +683,9 @@
     "no_e16d9132": {
         "message": "Non"
     },
+    "no_file_chosen_9a880793": {
+        "message": "Aucun fichier sélectionné"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Aucune note"
     },
@@ -937,6 +946,9 @@
     },
     "superscript_8cb349a2": {
         "message": "En exposant"
+    },
+    "supported_file_types_srt_or_webvtt_7d827ed": {
+        "message": "Types de fichiers pris en charge : SRT ou WebVTT"
     },
     "switch_to_raw_html_editor_4c9ac7de": {
         "message": "Passer à l''éditeur html brut"

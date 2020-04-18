@@ -45,6 +45,21 @@ module Canvas::LiveEvents
     ctx
   end
 
+  def self.conversation_created(conversation)
+    post_event_stringified('conversation_created', {
+      conversation_id: conversation.id,
+      updated_at: conversation.updated_at
+    })
+  end
+
+  def self.conversation_forwarded(conversation)
+    post_event_stringified('conversation_forwarded', {
+      conversation_id: conversation.id,
+      updated_at: conversation.updated_at
+      },
+      amended_context(nil))
+  end
+
   def self.get_course_data(course)
     {
       course_id: course.global_id,
@@ -70,6 +85,15 @@ module Canvas::LiveEvents
       course_id: course.global_id,
       syllabus_body: LiveEvents.truncate(course.syllabus_body),
       old_syllabus_body: LiveEvents.truncate(old_syllabus_body)
+    })
+  end
+
+  def self.conversation_message_created(conversation_message)
+    post_event_stringified('conversation_message_created', {
+      author_id: conversation_message.author_id,
+      conversation_id: conversation_message.conversation_id,
+      created_at: conversation_message.created_at,
+      message_id: conversation_message.id
     })
   end
 

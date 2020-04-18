@@ -128,7 +128,7 @@ class Header extends React.Component {
           </Heading>
 
           {!this.state.isSticky && <AssignmentGroupModuleNav assignment={this.props.assignment} />}
-          <Flex margin={this.state.isSticky ? '0' : '0 0 medium 0'}>
+          <Flex margin={this.state.isSticky ? '0' : '0 0 medium 0'} wrap="wrap" wrapItems>
             <Flex.Item shrink>
               <DateTitle isSticky={this.state.isSticky} assignment={this.props.assignment} />
             </Flex.Item>

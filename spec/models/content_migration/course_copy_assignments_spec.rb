@@ -19,10 +19,6 @@ require File.expand_path(File.dirname(__FILE__) + '/course_copy_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper')
 
 describe ContentMigration do
-  before :once do
-    PostPolicy.enable_feature!
-  end
-
   context "course copy assignments" do
     include_examples "course copy"
 

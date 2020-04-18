@@ -48,7 +48,9 @@ function renderAndDirtyInput(inputValue, overrides = {}) {
 const oldLocale = moment.locale()
 
 beforeEach(() => {
-  MockDate.set('2020-05-19', 0) // a thursday
+  // A thursday, not directly at midnight so we can test the dates coming from this component are
+  // set to the beginning of the day and don't retain the time.
+  MockDate.set('2020-05-19T00:42:00Z', 0)
   moment.locale('en-us')
 })
 

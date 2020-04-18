@@ -13,7 +13,7 @@ if [[ $archive_path ]]; then
       while ! aws s3 ls --region "$DOCKER_CACHE_S3_REGION" "$archive_path/`basename "$dir"`"; do sleep 10; done
       echo "Finished waiting for aws s3 ls command"
       aws s3 cp --region "$DOCKER_CACHE_S3_REGION" "$archive_path/`basename "$dir"`" - | \
-        tar xzpPf - "$dir/"
+        tar vxzpPf - "$dir/"
       echo "PID is $! for aws cp on $DOCKER_CACHE_S3_REGION" "$archive_path/`basename "$dir"`"
     ) &
   done
