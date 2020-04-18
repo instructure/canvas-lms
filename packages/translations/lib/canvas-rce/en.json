@@ -16,6 +16,9 @@
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": "An error occurred generating the file preview"
   },
+  "an_error_occurred_uploading_your_media_71f1444d": {
+    "message": "An error occurred uploading your media."
+  },
   "announcement_list_da155734": { "message": "Announcement List" },
   "announcements_a4b8ed4a": {
     "description": "Title of Sidebar accordion tab containing links to announcements.",
@@ -351,7 +354,6 @@
   "unpublished_dfd8801": { "message": "unpublished" },
   "untitled_16aa4f2b": { "message": "Untitled" },
   "upload_document_253f0478": { "message": "Upload Document" },
-  "upload_error_f9c00e27": { "message": "Upload Error" },
   "upload_file_fd2361b8": { "message": "Upload File" },
   "upload_image_6120b609": { "message": "Upload Image" },
   "upload_media_ce31135a": { "message": "Upload Media" },
