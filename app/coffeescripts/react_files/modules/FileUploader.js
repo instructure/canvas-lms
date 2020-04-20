@@ -18,12 +18,11 @@
 
 import BBFile from '../../models/File'
 import BaseUploader from './BaseUploader'
-import 'jquery.ajaxJSON'
 
 export default class FileUploader extends BaseUploader {
   onUploadPosted = fileJson => {
-    const file = this.addFileToCollection(fileJson)
-    return this.deferred.resolve(file)
+    this.inFlight = false
+    this.addFileToCollection(fileJson)
   }
 
   addFileToCollection = attrs => {

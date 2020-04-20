@@ -222,7 +222,7 @@ export default class Toolbar extends React.Component {
 
           <UploadButton
             currentFolder={this.props.currentFolder}
-            showingButtons={this.showingButtons}
+            showingButtons={!!this.showingButtons}
             contextId={this.props.contextId}
             contextType={this.props.contextType}
           />

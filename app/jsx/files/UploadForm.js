@@ -60,8 +60,12 @@ class UploadForm extends React.Component {
     return FileOptionsCollection.getFolder()
   }
 
+  reset() {
+    this.formRef?.current?.reset()
+  }
+
   queueUploads() {
-    this.formRef.current.reset()
+    this.reset()
     return FileOptionsCollection.queueUploads(this.props.contextId, this.props.contextType)
   }
 

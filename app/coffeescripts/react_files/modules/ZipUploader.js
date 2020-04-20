@@ -17,7 +17,7 @@
  */
 
 // Zips that are to be expanded take a different upload workflow
-import $ from 'jquery'
+import axios from 'axios'
 import BaseUploader from './BaseUploader'
 
 export default class ZipUploader extends BaseUploader {
@@ -30,8 +30,7 @@ export default class ZipUploader extends BaseUploader {
   }
 
   createPreFlightParams() {
-    let params
-    return (params = {
+    return {
       migration_type: 'zip_file_importer',
       settings: {
         folder_id: this.folder.id
@@ -43,57 +42,79 @@ export default class ZipUploader extends BaseUploader {
         on_duplicate: this.options.dup || 'rename',
         no_redirect: true
       }
-    })
+    }
   }
 
   getPreflightUrl() {
     return `/api/v1/${this.contextType}/${this.contextId}/content_migrations`
   }
 
-  onPreflightComplete = data => {
+  onPreflightComplete = ({data}) => {
     this.uploadData = data.pre_attachment
     this.contentMigrationId = data.id
     return this._actualUpload()
   }
 
   onUploadPosted = () => {
+    // at this point the user can no longer cancel the upload
+    this._cancelToken = null
+    // will get the cancel button un-rendered
+    this.onProgress(this.progress, this.file)
     return this.getContentMigration()
   }
 
   // get the content migration when ready and use progress api to pull migration progress
   getContentMigration = () => {
-    return $.getJSON(
-      `/api/v1/${this.contextType}/${this.contextId}/content_migrations/${this.contentMigrationId}`
-    ).then(results => {
-      if (!results.progress_url) {
-        return setTimeout(() => this.getContentMigration(), 500)
+    return axios({
+      url: `/api/v1/${this.contextType}/${this.contextId}/content_migrations/${this.contentMigrationId}`,
+      method: 'GET',
+      responseType: 'json'
+    }).then(({data}) => {
+      if (!data.progress_url) {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            this.getContentMigration()
+              .then(resolve)
+              .catch(reject)
+          }, 500)
+        })
       } else {
-        return this.pullMigrationProgress(results.progress_url)
+        return this.pullMigrationProgress(data.progress_url)
       }
     })
   }
 
   pullMigrationProgress = url => {
-    return $.getJSON(url).then(results => {
-      this.trackMigrationProgress(results.completion || 0)
-      if (results.workflow_state === 'failed') {
-        return this.deferred.reject()
-      } else if (results.completion < 100) {
+    return axios({
+      url,
+      method: 'GET',
+      responseType: 'json'
+    }).then(({data}) => {
+      this.trackMigrationProgress(data.completion || 0)
+      if (data.workflow_state === 'failed') {
+        throw new Error('zip file migration failed')
+      } else if (data.completion < 100) {
         // The progress bar defaults to 50% complete to account for the actual
         // file upload. When we start polling the progress and the job hasn't
         // been worked, the completion is 0. So without this check, the progress
         // bar would start at 50%, then render to 0%, then render to 50% once
         // the job starts getting worked.
-        if (results.completion > 0) {
+        if (data.completion > 0) {
           const progress = {
-            loaded: results.completion,
+            loaded: data.completion,
             total: 100
           }
           this.trackProgress(progress)
         }
-        setTimeout(() => {
-          this.pullMigrationProgress(url)
-        }, 1000)
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            // for the sake of testing, each url has to be
+            // unique, so adding a hash that's not sent to canvas
+            this.pullMigrationProgress(`${url}#${data.completion}`)
+              .then(resolve)
+              .catch(reject)
+          }, 1000)
+        })
       } else {
         return this.onMigrationComplete()
       }
@@ -101,10 +122,11 @@ export default class ZipUploader extends BaseUploader {
   }
 
   onMigrationComplete() {
+    this.inFlight = false
     // reload to get new files to appear
     return this.folder.folders
       .fetch({reset: true})
-      .then(() => this.folder.files.fetch({reset: true}).then(() => this.deferred.resolve()))
+      .then(() => this.folder.files.fetch({reset: true}))
   }
 
   trackProgress = e => {

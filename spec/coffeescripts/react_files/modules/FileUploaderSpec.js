@@ -17,92 +17,126 @@
  */
 
 import FileUploader from 'compiled/react_files/modules/FileUploader'
-import * as uploader from 'jsx/shared/upload_file'
-import $ from 'jquery'
-import 'jquery.ajaxJSON'
+import moxios from 'moxios'
 
-const mockFileOptions = function(name, type, size) {
-  let fileOptions
-  return (fileOptions = {
-    file: {
-      name,
-      type,
-      size
+function setupMocks() {
+  moxios.stubRequest('/api/v1/folders/1/files', {
+    status: 200,
+    response: {
+      file_param: 'file',
+      upload_url: '/upload/url',
+      upload_params: {
+        Filename: 'foo',
+        success_action_status: '201',
+        'content-type': 'text/plain',
+        success_url: '/create_success'
+      }
+    }
+  })
+  moxios.stubRequest('/upload/url', {
+    status: 201,
+    response: {}
+  })
+  moxios.stubRequest('/create_success', {
+    status: 200,
+    response: {
+      id: '17',
+      'content-type': 'text/plain'
     }
   })
 }
 
+const folder = {
+  id: 1,
+  folders: {
+    fetch: () => Promise.resolve()
+  },
+  files: {
+    fetch: () => Promise.resolve()
+  }
+}
+
+const mockFileOptions = function() {
+  return {
+    file: new File(['hello world'], 'foo', {type: 'text/plain'})
+  }
+}
+
 QUnit.module('FileUploader', {
   setup() {
-    const folder = {id: 1}
-    this.uploader = new FileUploader(mockFileOptions('foo', 'bar', 1), folder)
+    moxios.install()
+    setupMocks()
   },
   teardown() {
-    delete this.uploader
+    moxios.uninstall()
   }
 })
 
-test('posts to the files endpoint to kick off upload', function() {
-  sandbox.stub($, 'ajaxJSON')
-  this.uploader.upload()
-  equal($.ajaxJSON.calledWith('/api/v1/folders/1/files'), true, 'kicks off upload')
+test('posts to the files endpoint to kick off upload', function(assert) {
+  const done = assert.async()
+  const fuploader = new FileUploader(mockFileOptions(), folder)
+  sinon.stub(fuploader, 'onPreflightComplete')
+
+  moxios.wait(() => {
+    return fuploader.upload().then(_response => {
+      equal(moxios.requests.mostRecent().url, '/api/v1/folders/1/files')
+      done()
+    })
+  })
 })
 
-test('stores params from preflight for actual upload', function() {
-  const server = sinon.fakeServer.create()
-  server.respondWith('POST', '/api/v1/folders/1/files', [
-    200,
-    {'Content-Type': 'application/json'},
-    '{"upload_url": "/upload/url", "upload_params": {"key": "value"}}'
-  ])
-  sandbox.stub(this.uploader, '_actualUpload')
-  this.uploader.upload()
-  server.respond()
-  equal(this.uploader.uploadData.upload_url, '/upload/url')
-  equal(this.uploader.uploadData.upload_params.key, 'value')
-  server.restore()
+test('stores params from preflight for actual upload', function(assert) {
+  const done = assert.async()
+  const fuploader = new FileUploader(mockFileOptions(), folder)
+  sinon.stub(fuploader, '_actualUpload')
+
+  moxios.wait(() => {
+    return fuploader.upload().then(_response => {
+      equal(fuploader.uploadData.upload_url, '/upload/url')
+      equal(fuploader.uploadData.upload_params.Filename, 'foo')
+      done()
+    })
+  })
 })
 
 test('completes upload after preflight', function(assert) {
   const done = assert.async()
-  const server = sinon.fakeServer.create()
-  server.respondWith('POST', '/api/v1/folders/1/files', [
-    200,
-    {'Content-Type': 'application/json'},
-    '{"upload_url": "/s3/upload/url", "upload_params": {"success_url": "/success/url"}}'
-  ])
-  sandbox.stub(this.uploader, 'addFileToCollection')
-  sandbox.stub(uploader, 'completeUpload').returns(Promise.resolve({id: 's3-id'}))
-  const promise = this.uploader.upload()
-  server.respond()
-  return promise.then(() => {
-    ok(this.uploader.addFileToCollection.calledWith({id: 's3-id'}), 'got metadata from success_url')
-    server.restore()
-    done()
+  const fuploader = new FileUploader(mockFileOptions(), folder)
+
+  sandbox.stub(fuploader, 'addFileToCollection')
+
+  moxios.wait(() => {
+    return fuploader.upload().then(_response => {
+      ok(
+        fuploader.addFileToCollection.calledWith({id: '17', 'content-type': 'text/plain'}),
+        'got metadata from success_url'
+      )
+      done()
+    })
   })
 })
 
 test('roundProgress returns back rounded values', function() {
-  sandbox.stub(this.uploader, 'getProgress').returns(0.18) // progress is [0 .. 1]
-  equal(this.uploader.roundProgress(), 18)
+  const fuploader = new FileUploader(mockFileOptions(), folder)
+  sandbox.stub(fuploader, 'getProgress').returns(0.18) // progress is [0 .. 1]
+  equal(fuploader.roundProgress(), 18)
 })
 
 test('roundProgress returns back values no greater than 100', function() {
-  sandbox.stub(this.uploader, 'getProgress').returns(1.1) // something greater than 100%
-  equal(this.uploader.roundProgress(), 100)
+  const fuploader = new FileUploader(mockFileOptions(), folder)
+  sandbox.stub(fuploader, 'getProgress').returns(1.1) // something greater than 100%
+  equal(fuploader.roundProgress(), 100)
 })
 
 test('getFileName returns back the option name if one exists', function() {
-  const folder = {id: 1}
-  const options = mockFileOptions('foo', 'bar', 1)
+  const options = mockFileOptions()
   options.name = 'use this one'
-  this.uploader = new FileUploader(options, folder)
-  equal(this.uploader.getFileName(), 'use this one')
+  const fuploader = new FileUploader(options, folder)
+  equal(fuploader.getFileName(), 'use this one')
 })
 
 test('getFileName returns back the actual file if no optinal name is given', function() {
-  const folder = {id: 1}
-  const options = mockFileOptions('foo', 'bar', 1)
-  this.uploader = new FileUploader(options, folder)
-  equal(this.uploader.getFileName(), 'foo')
+  const options = mockFileOptions()
+  const fuploader = new FileUploader(options, folder)
+  equal(fuploader.getFileName(), 'foo')
 })

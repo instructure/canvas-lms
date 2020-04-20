@@ -52,9 +52,7 @@ class UploadQueue {
       this.onChange()
     }
     uploader.cancel = () => {
-      if (uploader._xhr != null) {
-        uploader._xhr.abort()
-      }
+      uploader.abort()
       this._queue = _.without(this._queue, uploader)
       if (this.currentUploader === uploader) this.currentUploader = null
       return this.onChange()
@@ -70,41 +68,64 @@ class UploadQueue {
   }
 
   dequeue() {
-    const firstNonErroredUpload = _.find(this._queue, upload => !upload.error)
+    const firstNonErroredUpload = this._queue.find(upload => !upload.error)
     this._queue = _.without(this._queue, firstNonErroredUpload)
     return firstNonErroredUpload
   }
 
-  pageChangeWarning() {
-    return 'You currently have uploads in progress. If you leave this page, the uploads will stop.'
+  removeUploaderFromQueue(uploader) {
+    if (uploader.error || uploader.inFlight) return
+    const index = this._queue.findIndex(u => u === uploader)
+    if (index >= 0) {
+      this._queue.splice(index, 1)
+    }
+  }
+
+  pageChangeWarning(event) {
+    event.preventDefault()
+    event.returnValue = ''
   }
 
   attemptNextUpload() {
-    let uploader
-    this.onChange()
     if (this._uploading || this._queue.length === 0) return
-    this.currentUploader = uploader = this.dequeue()
-    if (uploader) {
-      this.onChange()
-      this._uploading = true
-      $(window).on('beforeunload', this.pageChangeWarning)
+    const uploader = this.dequeue()
+    this.attemptThisUpload(uploader)
+  }
 
-      const promise = uploader.upload()
-      promise.fail(failReason => {
+  attemptThisUpload(uploader) {
+    if (!uploader) {
+      return
+    }
+
+    uploader.reset()
+
+    if (this._uploading) {
+      return
+    }
+    // when retrying, the uploader is still queued
+    this.removeUploaderFromQueue(uploader)
+    this.currentUploader = uploader
+    this.onChange()
+    this._uploading = true
+    window.addEventListener('beforeunload', this.pageChangeWarning)
+
+    return uploader
+      .upload()
+      .catch(failReason => {
         // put it back in the queue unless the user aborted it
         if (failReason !== 'user_aborted_upload') {
           return this._queue.unshift(uploader)
         }
       })
-
-      return promise.always(() => {
+      .finally(() => {
         this._uploading = false
-        this.currentUploader = null
-        $(window).off('beforeunload', this.pageChangeWarning)
+        if (!this.currentUploader?.inFlight) {
+          this.currentUploader = null
+        }
+        window.removeEventListener('beforeunload', this.pageChangeWarning)
         this.onChange()
-        return this.attemptNextUpload()
+        this.attemptNextUpload()
       })
-    }
   }
 }
 UploadQueue.prototype._uploading = false

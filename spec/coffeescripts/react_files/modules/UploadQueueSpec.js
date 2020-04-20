@@ -18,7 +18,6 @@
 
 import UploadQueue from 'compiled/react_files/modules/UploadQueue'
 import sinon from 'sinon'
-import $ from 'jquery'
 
 const mockFileOptions = (name = 'foo', type = 'bar', expandZip = false) => ({
   file: {
@@ -28,12 +27,22 @@ const mockFileOptions = (name = 'foo', type = 'bar', expandZip = false) => ({
   },
   expandZip
 })
-const mockFileUploader = file => ({
+const mockFileUploader = (file, error) => ({
   upload() {
-    const promise = $.Deferred()
-    window.setTimeout(() => promise.resolve(), 2)
+    this.inFight = true
+    const promise = new Promise((resolve, reject) => {
+      window.setTimeout(() => {
+        this.inFlight = false
+        resolve()
+      }, 2)
+    })
     return promise
   },
+  reset() {
+    this.error = null
+  },
+  inFlight: false,
+  error,
   file
 })
 const mockAttemptNext = function() {}
@@ -113,4 +122,16 @@ test('Calls onChange', function() {
 
   uploader.onProgress()
   equal(spy.calledOnce, true)
+})
+
+test('can retry a specific uploader', function(assert) {
+  const done = assert.async()
+  const foo = mockFileUploader('foo', 'whoops')
+  const zoo = mockFileUploader('zoo', 'failed')
+  this.queue._queue.push(foo)
+  this.queue._queue.push(zoo)
+  return this.queue.attemptThisUpload(foo).then(() => {
+    equal(this.queue.length(), 1)
+    done()
+  })
 })
