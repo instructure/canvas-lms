@@ -1273,10 +1273,13 @@ describe Attachment do
     it "should not infer the namespace if it's not a new record" do
       Attachment.current_root_account = nil
       attachment_model(:context => submission_model)
+      original_namespace = @attachment.namespace
+      @attachment.context = @course
+      @attachment.save!
       expect(@attachment).not_to be_new_record
-      expect(@attachment.read_attribute(:namespace)).to be_nil
-      expect(@attachment.namespace).to be_nil
-      expect(@attachment.read_attribute(:namespace)).to be_nil
+      expect(@attachment.read_attribute(:namespace)).to eq original_namespace
+      expect(@attachment.namespace).to eq original_namespace
+      expect(@attachment.read_attribute(:namespace)).to eq original_namespace
     end
 
     context "sharding" do

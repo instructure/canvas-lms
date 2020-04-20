@@ -2669,6 +2669,18 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def root_account_id
+    # TODO this is a substitute for the root_account_id column
+    # and the root_account attribute, which will eventually be added
+    self.assignment&.root_account_id
+  end
+
+  def root_account
+    # TODO this is a substitute for the root_account attribute,
+    # which will eventually be added
+    self.assignment&.root_account
+  end
+
   private
 
   def set_anonymous_id
