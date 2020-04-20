@@ -42,6 +42,7 @@ class ContentTag < ActiveRecord::Base
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
   belongs_to :learning_outcome_content, :class_name => 'LearningOutcome', :foreign_key => :content_id
   has_many :learning_outcome_results
+  belongs_to :root_account, class_name: 'Account'
 
   # This allows bypassing loading context for validation if we have
   # context_id and context_type set, but still allows validating when
@@ -51,6 +52,7 @@ class ContentTag < ActiveRecord::Base
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   before_save :associate_external_tool
   before_save :default_values
+  before_save :set_root_account
   after_save :update_could_be_locked
   after_save :touch_context_module_after_transaction
   after_save :touch_context_if_learning_outcome
@@ -604,5 +606,16 @@ class ContentTag < ActiveRecord::Base
     # assignment.  Let's ignore any other contexts.
     return unless context_type == "Assignment"
     DueDateCacher.recompute(context) if content.try(:quiz_lti?) && (force || workflow_state != 'deleted')
+  end
+
+  def set_root_account
+    return if self.root_account_id.present?
+
+    case self.context
+    when Account
+      self.root_account_id = self.context.resolved_root_account_id
+    else
+      self.root_account_id = self.context&.root_account_id
+    end
   end
 end
