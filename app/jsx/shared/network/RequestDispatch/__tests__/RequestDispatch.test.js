@@ -365,11 +365,72 @@ describe('Shared > Network > RequestDispatch', () => {
       })
     })
 
+    describe('if the first page response lacks a pagination header', () => {
+      async function resolveFirstPage() {
+        await network.allRequestsReady()
+        const [{response}] = network.getRequests()
+        response.setJson([{example: true}])
+        response.send()
+        await network.allRequestsReady()
+      }
+
+      it('does not send additional requests', async () => {
+        const result = getDepaginated()
+        await resolveFirstPage()
+        await result
+        expect(network.getRequests()).toHaveLength(1)
+      })
+
+      it('calls the "pages enqueued" callback when provided', async () => {
+        const pagesEnqueued = sinon.spy()
+        getDepaginated(null, null, pagesEnqueued)
+        await resolveFirstPage()
+        expect(pagesEnqueued.callCount).toEqual(1)
+      })
+
+      it('resolves with the data from the first page', async () => {
+        const result = getDepaginated()
+        await resolveFirstPage()
+        expect(await result).toEqual([{example: true}])
+      })
+    })
+
     describe('if the pagination header does not include the last page', () => {
       async function resolveFirstPage() {
         await network.allRequestsReady()
         const [{response}] = network.getRequests()
         setPaginationLinkHeader(response, {next: 2})
+        response.setJson([{example: true}])
+        response.send()
+        await network.allRequestsReady()
+      }
+
+      it('does not send additional requests', async () => {
+        const result = getDepaginated()
+        await resolveFirstPage()
+        await result
+        expect(network.getRequests()).toHaveLength(1)
+      })
+
+      it('calls the "pages enqueued" callback when provided', async () => {
+        const pagesEnqueued = sinon.spy()
+        getDepaginated(null, null, pagesEnqueued)
+        await resolveFirstPage()
+        expect(pagesEnqueued.callCount).toEqual(1)
+      })
+
+      it('resolves with the data from the first page', async () => {
+        const result = getDepaginated()
+        await resolveFirstPage()
+        expect(await result).toEqual([{example: true}])
+      })
+    })
+
+    describe('if the last page pagination header link is not a number', () => {
+      async function resolveFirstPage() {
+        await network.allRequestsReady()
+        const [{response}] = network.getRequests()
+        setPaginationLinkHeader(response, {last: 'invalid'})
         response.setJson([{example: true}])
         response.send()
         await network.allRequestsReady()
