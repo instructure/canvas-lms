@@ -172,7 +172,7 @@ describe "CanvasHttp" do
       begin
         old_filters = CanvasHttp.blocked_ip_filters
         CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16']}
-        expect(CanvasHttp.insecure_host?('www.example.com')).to eq false
+        expect(CanvasHttp.insecure_host?('example.com')).to eq false
         expect(CanvasHttp.insecure_host?('localhost')).to eq true
         expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true
         expect(CanvasHttp.insecure_host?('42.42.42.42')).to eq true
