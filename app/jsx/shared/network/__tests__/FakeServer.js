@@ -116,13 +116,24 @@ class RequestStub {
     if (responseData instanceof Array) {
       responseData.forEach((responseDatum, index) => {
         const headers = {}
+
+        let separator = '?'
+        if (url.includes('?')) {
+          separator = '&'
+        }
+
+        let fullUrl = `${url}${separator}`
+        if (!url.startsWith('http')) {
+          fullUrl = `http://canvas.example.com${fullUrl}`
+        }
+
         const links = [
-          `<http://canvas.example.com${url}&page=1>; rel="first"`,
-          `<http://canvas.example.com${url}&page=${index + 1}>; rel="current"`,
-          `<http://canvas.example.com${url}&page=${responseData.length}>; rel="last"`
+          `<${fullUrl}page=1>; rel="first"`,
+          `<${fullUrl}page=${index + 1}>; rel="current"`,
+          `<${fullUrl}page=${responseData.length}>; rel="last"`
         ]
         if (index + 1 !== responseData.length) {
-          links.push(`<http://canvas.example${url}?page=${index + 2}>; rel="next"`)
+          links.push(`<${fullUrl}page=${index + 2}>; rel="next"`)
         }
         headers.Link = links.join(',')
         const params = {...queryParams}
