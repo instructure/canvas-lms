@@ -2323,9 +2323,6 @@ class Submission < ActiveRecord::Base
     res
   end
 
-  def course_id=(val)
-  end
-
   def to_param
     user_id
   end
