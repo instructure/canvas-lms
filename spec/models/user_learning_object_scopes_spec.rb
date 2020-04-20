@@ -690,10 +690,12 @@ describe UserLearningObjectScopes do
       create_records(Submission, assignment_ids.map do |id|
         {
           assignment_id: id,
+          course_id: @course1.id,
           user_id: @student_b.id,
           body: "hello",
           workflow_state: "submitted",
           submission_type: 'online_text_entry'
+
         }
       end)
       expect(@teacher.assignments_needing_grading.size).to eq 15
