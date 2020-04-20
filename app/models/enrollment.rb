@@ -1094,6 +1094,14 @@ class Enrollment < ActiveRecord::Base
     score&.override_score
   end
 
+  def computed_current_points(id_opts=nil)
+    find_score(id_opts)&.current_points
+  end
+
+  def unposted_current_points(id_opts=nil)
+    find_score(id_opts)&.unposted_current_points
+  end
+
   def unposted_current_grade(id_opts=nil)
     cached_score_or_grade(:current, :grade, :unposted, id_opts)
   end

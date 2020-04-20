@@ -267,7 +267,7 @@ module Api::V1::User
         json[:sis_import_id] = enrollment.sis_batch_id
       end
       if enrollment.student?
-        json[:grades] = grades_hash(enrollment, user, opts)
+        json[:grades] = grades_hash(enrollment, user, includes, opts)
       end
       if user_can_read_sis_data?(@current_user, enrollment.course)
         json[:sis_account_id] = enrollment.course.account.sis_source_id
@@ -298,7 +298,7 @@ module Api::V1::User
   end
 
   private
-  def grades_hash(enrollment, user, opts = {})
+  def grades_hash(enrollment, user, includes, opts = {})
     grades = {
       html_url: course_student_grades_url(enrollment.course_id, enrollment.user_id)
     }
@@ -310,6 +310,9 @@ module Api::V1::User
       score_opts = period ? { grading_period_id: period.id } : Score.params_for_course
 
       grades[:grading_period_id] = period&.id if opts[:current_grading_period_scores]
+
+      include_current_points = includes.include?("current_points")
+      grades[:current_points] = enrollment.computed_current_points(score_opts) if include_current_points
 
       if course.grants_any_right?(user, :manage_grades, :view_all_grades)
         override_grade = enrollment.override_grade(score_opts)
@@ -325,6 +328,8 @@ module Api::V1::User
         grades[:unposted_current_grade] = enrollment.unposted_current_grade(score_opts)
         grades[:unposted_final_score]   = enrollment.unposted_final_score(score_opts)
         grades[:unposted_final_grade]   = enrollment.unposted_final_grade(score_opts)
+
+        grades[:unposted_current_points] = enrollment.unposted_current_points(score_opts) if include_current_points
       else
         grades[:current_grade] = enrollment.effective_current_grade(score_opts)
         grades[:current_score] = enrollment.effective_current_score(score_opts)

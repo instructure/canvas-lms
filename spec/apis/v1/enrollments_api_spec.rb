@@ -1688,6 +1688,94 @@ describe EnrollmentsApiController, type: :request do
         end
       end
 
+      describe "current points" do
+        let_once(:course) { Course.create! }
+        let_once(:student) { User.create! }
+        let_once(:teacher) { User.create! }
+
+        let_once(:base_params) { { controller: "enrollments_api", action: "index", format: "json" } }
+
+        before(:once) do
+          course.offer!
+
+          course.enroll_teacher(teacher, enrollment_state: "active")
+          enrollment = course.enroll_student(student, enrollment_state: "active")
+          enrollment.scores.create!(current_points: 75, unposted_current_points: 99)
+        end
+
+        context "for a user who can manage grades for the enrollment's course" do
+          let_once(:api_path) { "/api/v1/courses/#{course.id}/enrollments" }
+          let_once(:params_without_points) { base_params.merge({ course_id: course.id.to_param }) }
+
+          context "when requesting current points" do
+            let(:enrollment_grades_json) do
+              params = params_without_points.merge({ include: ["current_points"] })
+              json = api_call_as_user(teacher, :get, api_path, params)
+              json.find { |enrollment| enrollment["user_id"] == student.id }["grades"]
+            end
+
+            it "includes the current_points field" do
+              expect(enrollment_grades_json["current_points"]).to eq 75
+            end
+
+            it "includes the unposted_current_points field" do
+              expect(enrollment_grades_json["unposted_current_points"]).to eq 99
+            end
+          end
+
+          context "when not requesting current points" do
+            let(:enrollment_grades_json) do
+              json = api_call_as_user(teacher, :get, api_path, params_without_points)
+              json.find { |enrollment| enrollment["user_id"] == student.id }["grades"]
+            end
+
+            it "does not include the current_points field" do
+              expect(enrollment_grades_json).not_to include("current_points")
+            end
+
+            it "does not include the unposted_current_points field" do
+              expect(enrollment_grades_json).not_to include("unposted_current_points")
+            end
+          end
+        end
+
+        context "for a student viewing their own enrollment" do
+          let_once(:api_path) { "/api/v1/users/#{student.id}/enrollments" }
+          let_once(:params_without_points) { base_params.merge({ user_id: student.id.to_param }) }
+
+          context "when requesting current points" do
+            let(:enrollment_grades_json) do
+              params = params_without_points.merge({ include: ["current_points"] })
+              json = api_call_as_user(student, :get, api_path, params)
+              json.find { |enrollment| enrollment["user_id"] == student.id }["grades"]
+            end
+
+            it "includes the current_points field" do
+              expect(enrollment_grades_json["current_points"]).to eq 75
+            end
+
+            it "does not include the unposted_current_points field" do
+              expect(enrollment_grades_json).not_to include("unposted_current_points")
+            end
+          end
+
+          context "when not requesting current points" do
+            let(:enrollment_grades_json) do
+              json = api_call_as_user(student, :get, api_path, params_without_points)
+              json.find { |enrollment| enrollment["user_id"] == student.id }["grades"]
+            end
+
+            it "does not return the current_points field" do
+              expect(enrollment_grades_json).not_to include("current_points")
+            end
+
+            it "does not return the unposted_current_points field" do
+              expect(enrollment_grades_json).not_to include("unposted_current_points")
+            end
+          end
+        end
+      end
+
       it "should not display grades when hide_final_grades is true for the course" do
         @course.hide_final_grades = true
         @course.save
