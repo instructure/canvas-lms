@@ -577,7 +577,8 @@ test('renders lockAt/unlockAt with locale-appropriate format string', function()
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
-    'date.abbr_month_names.8': 'août'
+    'date.abbr_month_names.8': 'août',
+    'date.formats.date_at_time': '%-d %b à %k:%M'
   })
   const model = buildAssignment({
     id: 1,
@@ -597,17 +598,17 @@ test('renders lockAt/unlockAt with locale-appropriate format string', function()
   const $dds = view.dateAvailableColumnView.$(`#vdd_tooltip_${this.model.id}_lock div`)
   equal(
     $('span', $dds.first())
-      .last()
+      .first()
       .text()
       .trim(),
-    '28 août'
+    '28 août à  4:00'
   )
   equal(
     $('span', $dds.last())
-      .last()
+      .first()
       .text()
       .trim(),
-    '28 août'
+    '28 août à  4:00'
   )
 })
 
@@ -615,6 +616,7 @@ test('renders lockAt/unlockAt in appropriate time zone', function() {
   tz.changeZone(juneau, 'America/Juneau')
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
+    'date.formats.date_at_time': '%b %-d at %l:%M%P',
     'date.abbr_month_names.8': 'Aug'
   })
   const model = buildAssignment({
@@ -635,17 +637,17 @@ test('renders lockAt/unlockAt in appropriate time zone', function() {
   const $dds = view.dateAvailableColumnView.$(`#vdd_tooltip_${this.model.id}_lock div`)
   equal(
     $('span', $dds.first())
-      .last()
+      .first()
       .text()
       .trim(),
-    'Aug 27'
+    'Aug 27 at  8:00pm'
   )
   equal(
     $('span', $dds.last())
-      .last()
+      .first()
       .text()
       .trim(),
-    'Aug 27'
+    'Aug 27 at  8:00pm'
   )
 })
 

@@ -107,54 +107,7 @@
         <%= assignment_submission_button(@assignment, @current_user, @current_user_submission) %>
       </div>
     </div>
-    <ul class='student-assignment-overview'>
-      <li>
-        <span class='title'><%= t :due_at, 'Due' %></span>
-        <span class='value'>
-          <span class="date_text">
-            <% if @assignment.multiple_due_dates? %>
-              <%= multiple_due_date_tooltip(@assignment, @current_user) %>
-            <% elsif @assignment.due_at %>
-              <% ot(:date_time_by, "%{date} by %{time}", :date => capture { %>
-                <span class="display_date"><%= date_string(@assignment.due_at) rescue '' %></span><% }, :time => capture { %>
-                <span class="display_time"><%= time_string(@assignment.due_at) rescue '' %></span><% }) %>
-            <% else %>
-              <%= t :no_due_date, 'No Due Date' %>
-            <% end %>
-          </span>
-        </span>
-      </li>
-      <li>
-        <span class='title'><%= t :points, 'Points' %></span>
-        <span class='value'><%= n(round_if_whole(@assignment.points_possible)) || t(:no_points, 'None') %></span>
-      </li>
-      <% if @assignment.expects_submission? || @assignment.expects_external_submission? %>
-        <% turnitin_text = turnitin_active? ? ' ' + t(:turnitin_enabled_short, '(Turnitin enabled)') : '' %>
-        <% vericite_text = vericite_active? ? ' ' + t(:vericite_enabled_short, '(VeriCite enabled)') : '' %>
-        <li>
-          <span class='title'><%= t :submitting, 'Submitting' %></span>
-          <span class='value'><%= @assignment.readable_submission_types + turnitin_text %></span>
-        </li>
-        <% if @assignment.submission_types =~ /online_upload/ && !@assignment.allowed_extensions.blank? -%>
-          <li>
-            <span class='title'><%= t :submission_types, 'File Types' %></span>
-            <span class='value'><%= @assignment.allowed_extensions.to_sentence %></span>
-          </li>
-        <% end %>
-      <% end %>
-      <% if @assignment.allowed_attempts&.> 0 %>
-        <li>
-          <span class='title'><%= t :attempts, 'Attempts' %></span>
-          <span class='value'><%= @current_user_submission&.attempt || 0 %></span>
-        </li>
-        <li>
-          <span class='title'><%= t :allowed_attempts, 'Allowed Attempts' %></span>
-          <span class='value'><%= @assignment.allowed_attempts + (@current_user_submission&.extra_attempts || 0) %></span>
-        </li>
-      <% end %>
-      <%= render :partial => "shared/available_dates", :locals => {:association => @assignment} %>
-      <div class="clear"></div>
-    </ul>
+    <%= render "student_assignment_overview" %>
   <% end %>
 
   <div class="clear"></div>
