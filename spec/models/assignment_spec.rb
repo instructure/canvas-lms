@@ -3358,6 +3358,36 @@ describe Assignment do
     end
   end
 
+  describe "dates" do
+    before :once do
+      @assignment = assignment_model(course: @course)
+    end
+
+    it "should not allow lock_at date to be before due_date" do
+      @assignment.due_at = Time.zone.today
+      @assignment.lock_at = Time.zone.today-2.days
+      expect {
+        @assignment.save!
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should not allow unlock_at date to be after due_date" do
+      @assignment.due_at = Time.zone.today
+      @assignment.unlock_at = Time.zone.today+2.days
+      expect {
+        @assignment.save!
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should not allow unlock_at date to be after lock_at date" do
+      @assignment.lock_at = Time.zone.today
+      @assignment.unlock_at = Time.zone.today+1.day
+      expect {
+        @assignment.save!
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
   it "should destroy group overrides when the group category changes" do
     @assignment = assignment_model(course: @course)
     @assignment.group_category = group_category(context: @assignment.context)
@@ -4082,13 +4112,15 @@ describe Assignment do
 
     context "to attach submission comment files" do
       it 'is true when a student can read an assignment but the assignment is locked' do
-        @assignment.lock_at = 1.week.ago
+        @assignment.due_at = 2.days.ago
+        @assignment.lock_at = 1.day.ago
         @assignment.submission_types = 'online_upload'
         @assignment.save!
         expect(@assignment.grants_right?(@student, :attach_submission_comment_files)).to be true
       end
 
       it 'is true when an assignment is an online_quiz' do
+        @assignment.due_at = 8.days.ago
         @assignment.lock_at = 1.week.ago
         @assignment.submission_types = 'online_quiz'
         @assignment.save!
@@ -5790,23 +5822,26 @@ describe Assignment do
     it "should include assignments with no locks" do
       @quiz.save!
       list = Assignment.not_locked.to_a
-      expect(list.size).to eql 1
+      expect(list.size).to be 1
       expect(list.first.title).to eql 'Test Assignment'
     end
+
     it "should include assignments with unlock_at in the past" do
       @quiz.unlock_at = 1.day.ago
       @quiz.save!
       list = Assignment.not_locked.to_a
-      expect(list.size).to eql 1
+      expect(list.size).to be 1
       expect(list.first.title).to eql 'Test Assignment'
     end
+
     it "should include assignments where lock_at is future" do
-      @quiz.lock_at = 1.day.from_now
+      @quiz.lock_at = 3.days.from_now
       @quiz.save!
       list = Assignment.not_locked.to_a
-      expect(list.size).to eql 1
+      expect(list.size).to be 1
       expect(list.first.title).to eql 'Test Assignment'
     end
+
     it "should include assignments where unlock_at is in the past and lock_at is future" do
       @quiz.unlock_at = 1.day.ago
       @quiz.due_at = 1.hour.ago
@@ -5816,15 +5851,18 @@ describe Assignment do
       expect(list.size).to be 1
       expect(list.first.title).to eql 'Test Assignment'
     end
+
     it "should not include assignments where unlock_at is in future" do
-      @quiz.unlock_at = 1.hour.from_now
+      @quiz.unlock_at = 1.day.from_now
       @quiz.save!
-      expect(Assignment.not_locked.count).to eq 0
+      expect(Assignment.not_locked.count).to be 0
     end
+
     it "should not include assignments where lock_at is in past" do
-      @quiz.lock_at = 1.hours.ago
+      @quiz.lock_at = 1.hour.ago
+      @quiz.due_at = 1.day.ago
       @quiz.save!
-      expect(Assignment.not_locked.count).to eq 0
+      expect(Assignment.not_locked.count).to be 0
     end
   end
 

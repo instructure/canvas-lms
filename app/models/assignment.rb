@@ -3499,7 +3499,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def due_date_ok?
-    if unlock_at && lock_at && due_at
+    # lock_at OR unlock_at can be empty
+    if (unlock_at || lock_at) && due_at
       unless AssignmentUtil.in_date_range?(due_at, unlock_at, lock_at)
         errors.add(:due_at, I18n.t("must be between availability dates"))
         return false

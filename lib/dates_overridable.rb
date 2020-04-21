@@ -273,6 +273,7 @@ module DatesOverridable
   module ClassMethods
     def due_date_compare_value(date)
       # due dates are considered equal if they're the same up to the minute
+      return nil if date.nil?
       date.to_i / 60
     end
 
