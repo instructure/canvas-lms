@@ -152,6 +152,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
   end
 
   it "fixes the corrupted data" do
+    skip("CCI-336")
     # Create bad data
     stream_checks = {}
     stream_checks['grade_changes'] = corrupt_grade_changes
