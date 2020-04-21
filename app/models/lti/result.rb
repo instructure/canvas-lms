@@ -41,4 +41,13 @@ class Lti::Result < ApplicationRecord
   belongs_to :submission, inverse_of: :lti_result
   belongs_to :user, inverse_of: :lti_results
   belongs_to :line_item, inverse_of: :results, foreign_key: :lti_line_item_id, class_name: 'Lti::LineItem'
+  belongs_to :root_account, class_name: 'Account'
+
+  before_save :set_root_account
+
+  private
+  
+  def set_root_account
+    self.root_account_id ||= self.submission&.root_account_id || self.line_item&.root_account_id
+  end
 end
