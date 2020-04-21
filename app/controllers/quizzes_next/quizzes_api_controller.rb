@@ -47,9 +47,12 @@ class QuizzesNext::QuizzesApiController < ApplicationController
         @quizzes = Api.paginate(all_quizzes, self, api_route)
 
         {
-          json: quizzes_next_json(@quizzes, @context, @current_user, session)
+          json: quizzes_next_json(@quizzes, @context, @current_user, session),
+          link: response.headers["Link"].to_s
         }
       end
+
+      response.headers["Link"] = value[:link] if value[:link]
 
       render json: value[:json]
     end
