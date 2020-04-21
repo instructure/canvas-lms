@@ -32,6 +32,18 @@ RSpec.describe Lti::ResourceLink, type: :model do
     end
   end
 
+  context 'after saving' do
+    it 'sets the root_account using context_external_tool' do
+      expect(resource_link.root_account).to eq tool.root_account
+    end
+
+    it 'leaves root_account_id blank if tool has none' do
+      tool.root_account = nil
+      link = Lti::ResourceLink.create!(context_external_tool: tool)
+      expect(link.root_account).to be_nil
+    end
+  end
+
   describe "#context_external_tool" do
     it 'raises an error' do
       expect { resource_link.context_external_tool }.to raise_error 'Use Lti::ResourceLink#current_external_tool to lookup associated tool'
