@@ -58,7 +58,6 @@ export default class DataLoader {
       getContextModules: true,
       getCustomColumns: true,
       getGradingPeriodAssignments: gradebook.gradingPeriodSet != null,
-      loadedStudentIds: [],
 
       submissionsChunkSize: options.chunk_size
     })
@@ -156,8 +155,6 @@ export default class DataLoader {
 
       getGradingPeriodAssignments:
         loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null,
-
-      loadedStudentIds: gradebook.courseContent.students.listStudentIds(),
 
       submissionsChunkSize: options.chunk_size,
 

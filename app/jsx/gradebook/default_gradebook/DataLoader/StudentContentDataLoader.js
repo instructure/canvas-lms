@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {chunk, difference} from 'lodash'
+import {chunk} from 'lodash'
 import I18n from 'i18n!gradebook'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
@@ -146,16 +146,13 @@ export default class StudentContentDataLoader {
   }
 
   load(studentIds) {
-    const loadedStudentIds = this.options.loadedStudentIds || []
-    const studentIdsToLoad = difference(studentIds, loadedStudentIds)
-
-    if (studentIdsToLoad.length === 0) {
+    if (studentIds.length === 0) {
       return
     }
 
     const studentRequests = []
     const submissionRequests = []
-    const studentIdChunks = chunk(studentIdsToLoad, this.options.studentsChunkSize)
+    const studentIdChunks = chunk(studentIds, this.options.studentsChunkSize)
 
     // wait for all chunk requests to have been enqueued
     return new Promise(resolve => {

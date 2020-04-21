@@ -128,11 +128,6 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         server.for(urls.students, {user_ids: ids}).respond({status: 200, body: students})
       }
 
-      function setSubmissionsResponse(ids, submissions) {
-        server.unsetResponses(urls.submissions)
-        server.for(urls.submissions, {student_ids: ids}).respond([{status: 200, body: submissions}])
-      }
-
       test('requests students using the given student ids', async () => {
         setStudentsResponse(exampleData.studentIds, exampleData.students)
         options.studentsChunkSize = 50
@@ -140,16 +135,6 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         const studentRequest = server.findRequest(urls.students)
         const params = paramsFromRequest(studentRequest)
         deepEqual(params.user_ids, exampleData.studentIds)
-      })
-
-      test('does not request students already loaded', async () => {
-        setStudentsResponse(['1102'], [{id: '1102'}])
-        setSubmissionsResponse(['1102'], [{id: '2502'}])
-        options = {...options, loadedStudentIds: ['1101', '1103'], studentsChunkSize: 50}
-        await load()
-        const studentRequest = server.findRequest(urls.students)
-        const params = paramsFromRequest(studentRequest)
-        deepEqual(params.user_ids, ['1102'])
       })
 
       test('chunks students when per page limit is less than count of student ids', async () => {
@@ -181,13 +166,6 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
       test('does not request students when given an empty list of student ids', async () => {
         await load([])
-        const requests = server.filterRequests(urls.students)
-        strictEqual(requests.length, 0)
-      })
-
-      test('does not request students when requested student ids are already loaded', async () => {
-        options = {...options, loadedStudentIds: exampleData.studentIds}
-        await load(exampleData.studentIds)
         const requests = server.filterRequests(urls.students)
         strictEqual(requests.length, 0)
       })
@@ -248,13 +226,6 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
       test('does not request submissions when given an empty list of student ids', async () => {
         await load([])
-        const requests = server.filterRequests(urls.submissions)
-        strictEqual(requests.length, 0)
-      })
-
-      test('does not request submissions when requested student ids are already loaded', async () => {
-        options = {...options, loadedStudentIds: exampleData.studentIds}
-        await load(exampleData.studentIds)
         const requests = server.filterRequests(urls.submissions)
         strictEqual(requests.length, 0)
       })

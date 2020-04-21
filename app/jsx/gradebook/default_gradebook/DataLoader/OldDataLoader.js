@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {difference} from 'lodash'
+
 import {deferPromise} from '../../../shared/async'
 import StudentContentDataLoader from './StudentContentDataLoader'
 
@@ -60,6 +62,9 @@ function loadGradebookData(opts) {
     ? dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
     : null
 
+  // Store currently-loaded student ids for diffing below.
+  const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
+
   // Begin loading Student IDs before any other data.
   const gotStudentIds = dataLoader.studentIdsLoader.loadStudentIds()
 
@@ -74,7 +79,6 @@ function loadGradebookData(opts) {
     {
       courseId: opts.courseId,
       gradebook: opts.gradebook,
-      loadedStudentIds: opts.loadedStudentIds,
       studentsChunkSize: opts.perPage,
       submissionsChunkSize: opts.submissionsChunkSize
     },
@@ -91,7 +95,9 @@ function loadGradebookData(opts) {
   gotStudentIds
     .then(() => {
       const studentIds = gradebook.courseContent.students.listStudentIds()
-      return studentContentDataLoader.load(studentIds)
+      const studentIdsToLoad = difference(studentIds, loadedStudentIds)
+
+      return studentContentDataLoader.load(studentIdsToLoad)
     })
     .then(() => {
       gotStudents.resolve()
