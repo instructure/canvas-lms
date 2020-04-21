@@ -20,6 +20,10 @@ require 'sharding_spec_helper'
 
 describe CoursesController do
   describe "GET 'index'" do
+    before(:each) do
+      controller.instance_variable_set(:@domain_root_account, Account.default)
+    end
+
     def get_index(user=nil)
       user_session(user) if user
       user ||= @user
@@ -314,6 +318,32 @@ describe CoursesController do
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
       end
+
+      describe "unpublished_courses FF" do
+        it "should list unpublished courses after published with the unpublished_courses FF enabled" do
+          @student = user_factory
+
+          # past unpublished course
+          course1 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago, name: 'A'
+          course1.offer!
+          enrollment1 = course_with_student course: course1, user: @student
+          enrollment1.accept!
+          course1.update! workflow_state: 'created'
+
+          # past published course
+          course2 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago, name: 'Z'
+          course2.offer!
+          course_with_student course: course2, user: @student, active_all: true
+
+          user_session(@student)
+          get_index
+          expect(assigns[:past_enrollments].map(&:course_id)).to eq [course1.id, course2.id] # A, then Z
+
+          Account.default.enable_feature!(:unpublished_courses)
+          get_index
+          expect(assigns[:past_enrollments].map(&:course_id)).to eq [course2.id, course1.id] # Z, then A
+        end
+      end
     end
 
     describe 'current_enrollments' do
@@ -389,6 +419,29 @@ describe CoursesController do
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to eq [enrollment]
         expect(assigns[:future_enrollments]).to be_empty
+      end
+
+      describe "unpublished_courses FF" do
+        it "should list unpublished courses after published with the unpublished_courses FF enabled" do
+          # unpublished course
+          course1 = Account.default.courses.create! name: 'A'
+          enrollment1 = course_with_student user: @student, course: course1
+          enrollment1.invite!
+          expect(course1).to be_unpublished
+
+          # published course
+          course2 = Account.default.courses.create! name: 'Z'
+          course2.offer!
+          course_with_student course: course2, user: @student, active_all: true
+
+          user_session(@student)
+          get_index
+          expect(assigns[:current_enrollments].map(&:course_id)).to eq [course1.id, course2.id]
+
+          Account.default.enable_feature!(:unpublished_courses)
+          get_index
+          expect(assigns[:current_enrollments].map(&:course_id)).to eq [course2.id, course1.id]
+        end
       end
     end
 
@@ -498,6 +551,28 @@ describe CoursesController do
         get_index
         expect(response).to be_successful
         expect(assigns[:future_enrollments]).to eq [enrollment1] # show it because it's accessible now
+      end
+
+      describe "unpublished_courses FF" do
+        it "should list unpublished courses after published with the unpublished_courses FF enabled" do
+          # unpublished course
+          course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, name: 'A'
+          expect(course1).to be_unpublished
+          course_with_student user: @student, course: course1
+
+          # published course
+          course2 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, name: 'Z'
+          course2.offer!
+          course_with_student user: @student, course: course2
+
+          user_session(@student)
+          get_index
+          expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id, course2.id] # A, then Z
+
+          Account.default.enable_feature!(:unpublished_courses)
+          get_index
+          expect(assigns[:future_enrollments].map(&:course_id)).to eq [course2.id, course1.id] # Z, then A
+        end
       end
     end
 

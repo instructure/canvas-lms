@@ -95,14 +95,15 @@ describe LiveEvents::AsyncWorker do
     end
 
     it "should time batch write" do
-      skip('PLAT-5353')
       results_double = double
       results = OpenStruct.new(records: results_double)
       allow(results_double).to receive(:each_with_index).and_return([])
       allow(stream_client).to receive(:put_records).once.and_return(results)
+
       statsd_double = double
+      expect(statsd_double).to receive(:time).once
+
       LiveEvents.statsd = statsd_double
-      expect(statsd_double).to receive(:time).and_yield
       @worker.start!
 
       4.times { @worker.push event, partition_key }

@@ -31,7 +31,7 @@ partman.create_partition(Time.now)
 partman.create_partition(1.month.from_now)
 ```
 
-That's actually all you need to get started. However, you should be aware that due to way inheritance (and by extension, partitioning) works in postgres, any indices or constraints you define on the master table **are not** inherited when we create a partition. This means our migrations can not solely deal with the master table if we're doing anything other than adding/changing/dropping columns.
+That's actually all you need to get started. However, you should be aware that due to way inheritance (and by extension, partitioning) works in postgres, any indices you define on the master table IN THE FUTURE **are not** inherited for existing partitions (though they will be inherited for future created partitions). This means our migrations can not solely deal with the master table.
 
 We'll see how to manage the partition schema in the next section.
 
@@ -57,7 +57,8 @@ rails generate partition_migration AddCreatedAtIndexToNewsletters newsletters
 > Note the `.partitions.rb` part of the generated migration filename;
 > more on this in the notes below, at the end of the section.
 
-The generator requires 1 parameter which is similar to the stock `migration` generator and that is the name of the migration. The second optional argument is a string denoting the master table for the partitions. If you leave this unspecified, you will have to manually specify it in the migration itself.
+The generator requires 1 parameter which is similar to the stock `migration` generator and that is the name of the migration. The second optional argument is a string denoting the master table for the partitions. If you leave this unspecified, you will have to manually specify it in the migration itself.  Note that this is ONLY NECESSARY if you have previously created partitions that do not yet have this index.
+Newly created partitions will inherit indexes from the master table.
 
 Let's actually write the migration. Follow the inline comments:
 
@@ -67,12 +68,7 @@ Let's actually write the migration. Follow the inline comments:
 # We must subclass from CanvasPartman::Migration
 # instead of ActiveRecord::Migration
 class AddCreatedAtIndexToNewsletters < CanvasPartman::Migration
-  self.master_table = :newsletters
-
-  # If the base class can not be infered from the master table name
-  # because, for example, it is namespaced, you may explicitly specify
-  # it here:
-  # self.base_class = MyApp::Newsletter
+  self.base_class = MyApp::Newsletter
 
   def up
     # #with_each_partition() is a helper available to the migration
@@ -97,7 +93,7 @@ Alternatively, you can define a reversible `change` runner using a `change_table
 
 ```ruby
 class AddCreatedAtIndexToNewsletters < CanvasPartman::Migration
-  self.master_table = :newsletters
+  self.base_class = MyApp::Newsletter
 
   def change
     with_each_partition do |partition|

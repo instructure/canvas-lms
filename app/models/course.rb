@@ -30,7 +30,7 @@ class Course < ActiveRecord::Base
   include Courses::ItemVisibilityHelper
   include OutcomeImportContext
 
-  attr_accessor :teacher_names, :master_course
+  attr_accessor :teacher_names, :master_course, :primary_enrollment_role
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
 
   time_zone_attribute :time_zone
@@ -741,6 +741,10 @@ class Course < ActiveRecord::Base
     current_users
   end
 
+  def potential_collaborators_for(current_user)
+    users_visible_to(current_user)
+  end
+
   def broadcast_data
     { course_id: id, root_account_id: root_account_id }
   end
@@ -951,7 +955,6 @@ class Course < ActiveRecord::Base
   end
 
   def assert_defaults
-    self.tab_configuration ||= [] unless self.tab_configuration == []
     self.name = nil if self.name && self.name.strip.empty?
     self.name ||= t('missing_name', "Unnamed Course")
     self.course_code = nil if self.course_code == ''
@@ -2637,7 +2640,12 @@ class Course < ActiveRecord::Base
   end
 
   def tab_configuration
-    super.map {|h| h.with_indifferent_access } rescue []
+    # `account_id.present?` is there to prevent a failure in `feature_enabled?`
+    # if an account hasn't been set on the course yet
+    if account_id.present? && feature_enabled?(:canvas_k6_theme) && super.nil?
+      return canvas_k6_tab_configuration.map(&:with_indifferent_access)
+    end
+    super.map(&:with_indifferent_access) rescue []
   end
 
   TAB_HOME = 0
@@ -2658,6 +2666,8 @@ class Course < ActiveRecord::Base
   TAB_COLLABORATIONS = 16
   TAB_COLLABORATIONS_NEW = 17
   TAB_RUBRICS = 18
+
+  CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
 
   def self.default_tabs
     [{
@@ -3327,8 +3337,12 @@ class Course < ActiveRecord::Base
     user.favorites.where(:context_type => 'Course', :context_id => self).exists?
   end
 
+  def preloaded_nickname?
+    !!defined?(@preloaded_nickname)
+  end
+
   def nickname_for(user, fallback = :name)
-    nickname = defined?(@preloaded_nickname) ? @preloaded_nickname : (user && user.course_nickname(self))
+    nickname = preloaded_nickname? ? @preloaded_nickname : (user && user.course_nickname(self))
     nickname ||= self.send(fallback) if fallback
     nickname
   end
@@ -3342,13 +3356,13 @@ class Course < ActiveRecord::Base
     @nickname = nickname_for(user, nil)
   end
 
-  def self.preload_menu_data_for(courses, user)
+  def self.preload_menu_data_for(courses, user, preload_favorites: false)
     ActiveRecord::Associations::Preloader.new.preload(courses, :enrollment_term)
     # preload favorites and nicknames
-    favorite_ids = user.account.feature_enabled?(:unfavorite_course_from_dashboard) ? user.favorite_context_ids("Course") : []
+    favorite_ids = preload_favorites && user.favorite_context_ids("Course")
     nicknames = user.all_course_nicknames(courses)
     courses.each do |course|
-      course.preloaded_favorite = favorite_ids.include?(course.id)
+      course.preloaded_favorite = favorite_ids.include?(course.id) if favorite_ids
       course.preloaded_nickname = nicknames[course.id]
     end
   end
@@ -3528,5 +3542,10 @@ class Course < ActiveRecord::Base
     return if default_post_policy.present?
 
     create_default_post_policy(assignment: nil, post_manually: false)
+  end
+
+  def canvas_k6_tab_configuration
+    visible, hidden = Course.default_tabs.partition {|tab| CANVAS_K6_TAB_IDS.include?(tab[:id])}
+    [*visible, *hidden.tap {|tabs| tabs.each{|t| t[:hidden]=true }}]
   end
 end

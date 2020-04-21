@@ -40,7 +40,9 @@ describe('Notification Preferences Table', () => {
     const dueDateCategory = getByTestId('due_date')
     expect(dueDateCategory).not.toBeNull()
     expect(dueDateCategory.children[category].textContent).toEqual('Due Date')
-    expect(dueDateCategory.children[commsChannel2].textContent).toEqual('disabled')
+    expect(
+      dueDateCategory.children[commsChannel2].querySelector('svg[name="IconNo"]')
+    ).toBeInTheDocument()
   })
 
   it('uses the notification policy overrides over the global policies if available', () => {
@@ -51,6 +53,8 @@ describe('Notification Preferences Table', () => {
     const dueDateCategory = getByTestId('due_date')
     expect(dueDateCategory).not.toBeNull()
     expect(dueDateCategory.children[category].textContent).toEqual('Due Date')
-    expect(dueDateCategory.children[commsChannel1].textContent).toEqual('never')
+    expect(
+      dueDateCategory.children[commsChannel1].querySelector('svg[name="IconMuted"]')
+    ).toBeInTheDocument()
   })
 })

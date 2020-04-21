@@ -75,6 +75,10 @@
           "type": "video",
           "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/capture/",
           "length": "2"
+        },
+        {
+          "type": "notes",
+          "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/notes_or_something/"
         }
       ]
     }

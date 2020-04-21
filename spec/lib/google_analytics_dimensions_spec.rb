@@ -18,36 +18,32 @@
 require_relative '../spec_helper'
 
 describe GoogleAnalyticsDimensions do
-  subject { described_class.method(:calculate) }
+  subject do
+    ->(account: Account.default, real_user: nil, user: nil) do
+      described_class.calculate(
+        domain_root_account: account,
+        real_user: real_user,
+        user: user
+      )
+    end
+  end
 
   it 'tells when someone is a student' do
-    dims = subject[
-      domain_root_account: Account.default,
-      real_user: nil,
-      user: student_in_course(active_all: true).user,
-    ]
+    dims = subject[user: student_in_course(active_all: true).user]
 
     expect(dims).to have_key(:enrollments)
     expect(dims[:enrollments]).to eq('100')
   end
 
   it 'tells when someone is a teacher' do
-    dims = subject[
-      domain_root_account: Account.default,
-      real_user: nil,
-      user: teacher_in_course(active_all: true).user,
-    ]
+    dims = subject[user: teacher_in_course(active_all: true).user]
 
     expect(dims).to have_key(:enrollments)
     expect(dims[:enrollments]).to eq('010')
   end
 
   it 'tells when someone is an observer' do
-    dims = subject[
-      domain_root_account: Account.default,
-      real_user: nil,
-      user: observer_in_course(active_all: true).user,
-    ]
+    dims = subject[user: observer_in_course(active_all: true).user]
 
     expect(dims).to have_key(:enrollments)
     expect(dims[:enrollments]).to eq('001')
@@ -55,8 +51,6 @@ describe GoogleAnalyticsDimensions do
 
   it 'tells when someone is both a teacher and an observer' do
     dims = subject[
-      domain_root_account: Account.default,
-      real_user: nil,
       user: teacher_in_course(active_all: true).user.tap do |user|
         observer_in_course(user: user)
       end
@@ -68,8 +62,6 @@ describe GoogleAnalyticsDimensions do
 
   it "it tells when someone is superman (or woman, lest i get fired)" do
     dims = subject[
-      domain_root_account: Account.default,
-      real_user: nil,
       user: teacher_in_course(active_all: true).user.tap do |user|
         student_in_course(user: user, active_all: true)
         observer_in_course(user: user, active_all: true)
@@ -81,22 +73,14 @@ describe GoogleAnalyticsDimensions do
   end
 
   it 'yields an empty set of enrollments for an anonymous session' do
-    dims = subject[
-      domain_root_account: Account.default,
-      real_user: nil,
-      user: nil,
-    ]
+    dims = subject[]
 
     expect(dims).to have_key(:enrollments)
     expect(dims[:enrollments]).to eq('000')
   end
 
   it "tells when someone is an admin" do
-    dims = subject[
-      domain_root_account: Account.default,
-      real_user: nil,
-      user: account_admin_user
-    ]
+    dims = subject[user: account_admin_user]
 
     expect(dims).to have_key(:admin)
     expect(dims[:admin]).to eq '11'
@@ -105,7 +89,6 @@ describe GoogleAnalyticsDimensions do
 
   it 'tells when someone is masquerading' do
     dims = subject[
-      domain_root_account: Account.default,
       real_user: account_admin_user,
       user: student_in_course(active_all: true).user
     ]
@@ -116,13 +99,40 @@ describe GoogleAnalyticsDimensions do
 
   it 'tells when someone is not masquerading' do
     user = user_with_pseudonym(active_all: true)
-    dims = subject[
-      domain_root_account: Account.default,
-      real_user: user,
-      user: user
-    ]
+    dims = subject[real_user: user, user: user]
 
     expect(dims).to have_key(:masquerading)
     expect(dims[:masquerading]).to eq '0'
+  end
+
+  describe 'identification' do
+    it 'provides a consistent, predictable user identifier' do
+      user = user_with_pseudonym(active_all: true)
+      dims = subject[user: user]
+      dims_again = subject[user: user]
+
+      expect(dims).to have_key(:user_id)
+      expect(dims_again).to have_key(:user_id)
+      expect(dims[:user_id]).to eq(dims_again[:user_id])
+    end
+
+    it 'provides an identifier that is unique for the user' do
+      emperor_tamarin = user_with_pseudonym(active_all: true)
+      maryjane = user_with_pseudonym(active_all: true)
+
+      expect(
+        subject[user: emperor_tamarin][:user_id]
+      ).not_to eq(
+        subject[user: maryjane][:user_id]
+      )
+    end
+
+    it 'provides an identifier that is NOT the canvas ID' do
+      user = user_with_pseudonym(active_all: true)
+      dims = subject[user: user]
+
+      expect(dims[:user_id]).to be_present
+      expect(dims[:user_id]).not_to eq(user.id)
+    end
   end
 end

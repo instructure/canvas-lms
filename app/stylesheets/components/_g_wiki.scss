@@ -93,7 +93,7 @@ $revision-button-color: $ic-color-dark;
     .header-bar-container {
       min-width: $min_main_width - 2px;
       min-height: 64px;
-      body.responsive_2020_04 & {
+      body.responsive_misc & {
         @include mobile-only {
           min-width: 100%;
         }
@@ -364,7 +364,7 @@ $revision-button-color: $ic-color-dark;
   .form-actions {
     padding-#{direction(left)}: 1em;
   }
-  &.responsive_2020_04 {
+  &.responsive_misc {
     .form-actions label {
       @include mobile-only {
         text-align: direction(left);

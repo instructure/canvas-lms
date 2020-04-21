@@ -68,3 +68,50 @@ describe('DashboardCardHeaderHero', () => {
     expect(queryByText(/observing/i)).not.toBeInTheDocument()
   })
 })
+
+describe('PublishButton', () => {
+  describe('with the unpublished FF enabled', () => {
+    beforeEach(() => {
+      window.ENV = {FEATURES: {unpublished_courses: true}}
+    })
+
+    afterEach(() => {
+      window.ENV = {}
+    })
+
+    it('renders the button for users that have the permission', () => {
+      const props = createMockProps({
+        published: false,
+        canChangeCourseState: true,
+        pagesUrl: '',
+        defaultView: ''
+      })
+      const {queryByText} = render(<DashboardCard {...props} />)
+      expect(queryByText(/Publish/i)).toBeInTheDocument()
+    })
+
+    it('does not render the button for users that do not have the permission', () => {
+      const props = createMockProps({
+        published: false,
+        canChangeCourseState: false,
+        pagesUrl: '',
+        defaultView: ''
+      })
+      const {queryByText} = render(<DashboardCard {...props} />)
+      expect(queryByText(/Publish/i)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('with the FF disabled', () => {
+    it('does not render the button for users that have the permission', () => {
+      const props = createMockProps({
+        published: false,
+        canChangeCourseState: true,
+        pagesUrl: '',
+        defaultView: ''
+      })
+      const {queryByText} = render(<DashboardCard {...props} />)
+      expect(queryByText(/Publish/i)).not.toBeInTheDocument()
+    })
+  })
+})

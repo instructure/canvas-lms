@@ -28,13 +28,13 @@ def runDatadogMetric(name, extraTags, body) {
  * @nodes: the hash of nodes to be ran later
  * @stage_count: the amount of nodes to add to the hash
  * @stage_name_prefix: the name to prefix the stages with
- * @success_mark: what to mark the success as. null/false if no marking.
+ * @test_label: specific test label used to mark the success and identify node pool. null/false if no marking.
  * @stage_block: the closure thats exectued after unstashing build scripts
  */
 def appendStagesAsBuildNodes(nodes,
                              stage_count,
                              stage_name_prefix,
-                             success_mark,
+                             test_label,
                              stage_block) {
   for(int i = 0; i < stage_count; i++) {
     // make this a local variable so when the closure resolves
@@ -43,12 +43,12 @@ def appendStagesAsBuildNodes(nodes,
     // we cant use String.format, so... yea
     def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     nodes[stage_name] = {
-      node('canvas-docker') {
+      node("canvas-$test_label-docker") {
         // make sure to unstash
         unstash name: "build-dir"
         unstash name: "build-docker-compose"
         def extraTags = ["parallelStageName:${stage_name}"]
-        runDatadogMetric(success_mark,extraTags) {
+        runDatadogMetric(test_label,extraTags) {
           stage_block(index)
         }
       }
@@ -56,9 +56,7 @@ def appendStagesAsBuildNodes(nodes,
       // mark with instance index.
       // we need to do this on the main node so we dont run into
       // concurrency issues with persisting the success
-      if (success_mark) {
-        load('build/new-jenkins/groovy/successes.groovy').saveSuccess(success_mark)
-      }
+      load('build/new-jenkins/groovy/successes.groovy').saveSuccess(test_label)
     }
   }
 }

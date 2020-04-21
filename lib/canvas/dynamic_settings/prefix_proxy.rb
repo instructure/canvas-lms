@@ -90,7 +90,7 @@ module Canvas
           result = @kv_client.get(tree_key, :recurse, :stale)
           if result&.status == 200
             populate_cache(tree_key, result.values, ttl) # only populate recursively when we missed
-            result.values
+            true # we don't actually need to save the values in the cache anymore if we're not using them
           end
         end
 

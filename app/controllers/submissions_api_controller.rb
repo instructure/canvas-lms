@@ -422,7 +422,7 @@ class SubmissionsApiController < ApplicationController
 
     includes = Array(params[:include])
 
-    assignment_scope = @context.assignments.published
+    assignment_scope = @context.assignments.published.preload(:quiz, :discussion_topic, :post_policy)
     assignment_scope = assignment_scope.where(post_to_sis: true) if value_to_boolean(params[:post_to_sis])
     requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
     if requested_assignment_ids.present?
@@ -484,7 +484,7 @@ class SubmissionsApiController < ApplicationController
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
 
-      submission_preloads = [:originality_reports, :quiz_submission]
+      submission_preloads = [:originality_reports, {:quiz_submission => :versions}]
       submission_preloads << :attachment unless params[:exclude_response_fields]&.include?("attachments")
       submissions = submissions_scope.preload(submission_preloads).to_a
 
@@ -555,7 +555,7 @@ class SubmissionsApiController < ApplicationController
       submissions = submissions.where(:workflow_state => params[:workflow_state]) if params[:workflow_state].present?
       submissions = submissions.where("submitted_at>?", submitted_since_date) if submitted_since_date
       submissions = submissions.where("graded_at>?", graded_since_date) if graded_since_date
-      submissions = submissions.preload(:user, :originality_reports, :quiz_submission)
+      submissions = submissions.preload(:user, :originality_reports, {:quiz_submission => :versions})
       submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
 
       # this will speed up pagination for large collections when order_direction is asc

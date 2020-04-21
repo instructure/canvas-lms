@@ -275,7 +275,7 @@
       </div>
       <div id="discussion-toolbar" class="toolbarView">
         <div class="headerBar" data-sticky>
-          <% if @domain_root_account.feature_enabled?(:responsive_2020_04) %>
+          <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
           <div class="form-inline headerBar__layout">
             <div class="headerBar__controls">
           <% else %>
@@ -315,7 +315,7 @@
                 <span class="screenreader-only">Expand replies</span>
               </button>
             </div>
-            <% if @domain_root_account.feature_enabled?(:responsive_2020_04) %>
+            <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
             <div class="discussion_subscribe headerBar__subscribe">
             <% else %>
             <div class="span3 right-align discussion_subscribe">

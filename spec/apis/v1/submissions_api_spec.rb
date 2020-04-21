@@ -785,6 +785,67 @@ describe 'Submissions API', type: :request do
     expect(comment_json['author']).to be_empty
   end
 
+  it "loads discussion entry data" do
+    @student = user_factory(active_all: true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(@student).accept!
+    @context = @course
+    @assignment = factory_with_protected_attributes(@course.assignments, {:title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model})
+
+    e1 = @topic.discussion_entries.create!(:message => 'main entry', :user => @user)
+    se1 = @topic.discussion_entries.create!(:message => 'sub 1', :user => @student, :parent_entry => e1)
+    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+    se2 = @topic.discussion_entries.create!(:message => 'student 1', :user => @student)
+    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+    @topic.discussion_entries.create!(:message => 'another entry', :user => @user)
+
+    json = api_call(:get,
+      "/api/v1/courses/#{@course.id}/students/submissions.json",
+      { :controller => 'submissions_api', :action => 'for_students',
+        :format => 'json', :course_id => @course.to_param },
+      { :student_ids => [@student.to_param] })
+    expect(json.first["discussion_entries"]).to be_present
+  end
+
+  it "loads quiz submission data" do
+    course_with_teacher(:active_all => true)
+    quiz_with_submission
+    @user = @teacher
+
+    #grouped
+    json = api_call(:get,
+      "/api/v1/courses/#{@course.id}/students/submissions.json",
+      { :controller => 'submissions_api', :action => 'for_students',
+        :format => 'json', :course_id => @course.to_param },
+      { :student_ids => [@student.to_param], :include => %w(submission_history), :grouped => 1 })
+    expect(json.first["submissions"].first["submission_history"]).to be_present
+
+    # ungrouped
+    json = api_call(:get,
+      "/api/v1/courses/#{@course.id}/students/submissions.json",
+      { :controller => 'submissions_api', :action => 'for_students',
+        :format => 'json', :course_id => @course.to_param },
+      { :student_ids => [@student.to_param], :include => %w(submission_history) })
+
+    expect(json.first["submission_history"]).to be_present
+  end
+
+  it "loads attachment data" do
+    @student = user_factory(active_all: true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(@student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    submit_homework(a1, @student) { |s| s.attachments = [attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @student)] }
+
+    json = api_call(:get,
+      "/api/v1/courses/#{@course.id}/students/submissions.json",
+      { :controller => 'submissions_api', :action => 'for_students',
+        :format => 'json', :course_id => @course.to_param },
+      { :student_ids => [@student.to_param] })
+    
+    expect(json.first["attachments"]).to be_present
+  end
+
   it "returns comment id along with submission comments" do
 
     submission_with_comment

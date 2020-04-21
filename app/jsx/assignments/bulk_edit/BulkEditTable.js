@@ -20,13 +20,14 @@ import I18n from 'i18n!assignments_bulk_edit'
 import React from 'react'
 import {arrayOf, func} from 'prop-types'
 import {Table} from '@instructure/ui-table'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Responsive} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {IconWarningLine} from '@instructure/ui-icons'
 import BulkDateInput from './BulkDateInput'
+import BulkEditOverrideTitle from './BulkEditOverrideTitle'
 import {AssignmentShape} from './BulkAssignmentShape'
 
 const DATE_INPUT_META = {
@@ -79,19 +80,8 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     )
   }
 
-  function renderAssignmentTitle(assignment) {
-    return (
-      <Tooltip renderTip={assignment.name}>
-        <Text as="div" size="large">
-          <PresentationContent>
-            <div className="ellipsis">{assignment.name}</div>
-          </PresentationContent>
-          <ScreenReaderContent>
-            {`${assignment.name}: ${I18n.t('default dates')}`}
-          </ScreenReaderContent>
-        </Text>
-      </Tooltip>
-    )
+  function renderOverrideTitle(assignment, override) {
+    return <BulkEditOverrideTitle assignment={assignment} override={override} />
   }
 
   function renderNoDefaultDates() {
@@ -129,23 +119,23 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
   }
 
   function renderBaseRow(assignment) {
-    const baseDates = assignment.all_dates.find(dates => dates.base === true)
+    const baseOverride = assignment.all_dates.find(dates => dates.base === true)
     // It's a bit repetitive this way, but Table.Row borks if it has anything but Table.Cell children.
-    if (baseDates) {
+    if (baseOverride) {
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
-          <Table.Cell>{renderAssignmentTitle(assignment)}</Table.Cell>
-          <Table.Cell>{renderDateInput(assignment.id, 'due_at', baseDates)}</Table.Cell>
-          <Table.Cell>{renderDateInput(assignment.id, 'unlock_at', baseDates)}</Table.Cell>
-          <Table.Cell>{renderDateInput(assignment.id, 'lock_at', baseDates)}</Table.Cell>
-          <Table.Cell>{renderNote(assignment, baseDates)}</Table.Cell>
+          <Table.Cell>{renderOverrideTitle(assignment, baseOverride)}</Table.Cell>
+          <Table.Cell>{renderDateInput(assignment.id, 'due_at', baseOverride)}</Table.Cell>
+          <Table.Cell>{renderDateInput(assignment.id, 'unlock_at', baseOverride)}</Table.Cell>
+          <Table.Cell>{renderDateInput(assignment.id, 'lock_at', baseOverride)}</Table.Cell>
+          <Table.Cell>{renderNote(assignment, baseOverride)}</Table.Cell>
         </Table.Row>
       )
     } else {
       // Need all Table.Cells or you get weird borders on this row
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
-          <Table.Cell>{renderAssignmentTitle(assignment)}</Table.Cell>
+          <Table.Cell>{renderOverrideTitle(assignment, {base: true})}</Table.Cell>
           <Table.Cell>{renderNoDefaultDates()}</Table.Cell>
           <Table.Cell />
           <Table.Cell />
@@ -160,20 +150,7 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     return overrides.map(override => {
       return (
         <Table.Row key={`override_${override.id}`}>
-          <Table.Cell>
-            <View as="div" padding="0 0 0 xx-large">
-              <Tooltip renderTip={override.title}>
-                <Text as="div" size="medium">
-                  <PresentationContent>
-                    <div className="ellipsis">{override.title}</div>
-                  </PresentationContent>
-                  <ScreenReaderContent>
-                    {`${assignment.name}: ${override.title}`}
-                  </ScreenReaderContent>
-                </Text>
-              </Tooltip>
-            </View>
-          </Table.Cell>
+          <Table.Cell>{renderOverrideTitle(assignment, override)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', override, override.id)}</Table.Cell>
           <Table.Cell>
             {renderDateInput(assignment.id, 'unlock_at', override, override.id)}

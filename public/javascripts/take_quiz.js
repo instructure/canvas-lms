@@ -465,7 +465,9 @@ var quizSubmission = (function() {
         .removeClass(removeClass)
     },
     submitQuiz() {
-      const action = $('#submit_quiz_button').data('action')
+      const button = $('#submit_quiz_button')
+      button.prop('disabled', true)
+      const action = button.data('action')
       $('#submit_quiz_form')
         .attr('action', action)
         .submit()

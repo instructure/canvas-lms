@@ -110,6 +110,8 @@ class Auditors::Course
   end
 
   Stream = Auditors.stream do
+    backend_strategy :cassandra
+    active_record_type Auditors::ActiveRecord::CourseRecord
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :courses
     record_type Auditors::Course::Record
@@ -198,10 +200,13 @@ class Auditors::Course
         data[k] = change.map{|v| v.is_a?(String) ? CanvasTextHelper.truncate_text(v, :max_length => 1000) : v}
       end
     end
+    event_record = nil
     course.shard.activate do
-      record = Auditors::Course::Record.generate(course, user, event_type, data, opts)
-      Auditors::Course::Stream.insert(record)
+      event_record = Auditors::Course::Record.generate(course, user, event_type, data, opts)
+      Auditors::Course::Stream.insert(event_record, {backend_strategy: :cassandra}) if Auditors.write_to_cassandra?
+      Auditors::Course::Stream.insert(event_record, {backend_strategy: :active_record}) if Auditors.write_to_postgres?
     end
+    event_record
   end
 
   def self.for_course(course, options={})

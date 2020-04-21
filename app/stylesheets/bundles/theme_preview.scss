@@ -26,9 +26,9 @@
   margin-#{direction(right)}: 0;
 }
 
-// TODO: remove `body.responsive_2020_03` when responsive_2020_03
+// TODO: remove `body.responsive_admin_settings` when responsive_admin_settings
 // feature flag is permanently on
-body.responsive_2020_03 .theme-preview__login {
+body.responsive_admin_settings .theme-preview__login {
   padding-bottom: $ic-sp * 4;
 
   @include breakpoint(tablet) {

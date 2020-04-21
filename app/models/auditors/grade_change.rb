@@ -147,7 +147,10 @@ class Auditors::GradeChange
     end
   end
 
+  # rubocop:disable Metrics/BlockLength
   Stream = Auditors.stream do
+    backend_strategy :cassandra
+    active_record_type Auditors::ActiveRecord::GradeChangeRecord
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :grade_changes
     record_type Auditors::GradeChange::Record
@@ -232,14 +235,20 @@ class Auditors::GradeChange
     end
 
   end
+  # rubocop:enable Metrics/BlockLength
 
   def self.record(skip_insert: false, submission:, event_type: nil)
     return unless submission
+    event_record = nil
     submission.shard.activate do
-      record = Auditors::GradeChange::Record.generate(submission, event_type)
-      Canvas::LiveEvents.grade_changed(submission, record.previous_submission, record.previous_assignment)
-      Auditors::GradeChange::Stream.insert(record) unless skip_insert
+      event_record = Auditors::GradeChange::Record.generate(submission, event_type)
+      Canvas::LiveEvents.grade_changed(submission, event_record.previous_submission, event_record.previous_assignment)
+      unless skip_insert
+        Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :cassandra}) if Auditors.write_to_cassandra?
+        Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :active_record}) if Auditors.write_to_postgres?
+      end
     end
+    event_record
   end
 
   def self.for_root_account_student(account, student, options={})

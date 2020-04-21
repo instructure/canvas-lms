@@ -32,6 +32,7 @@ export default class ModulesHomePage extends React.Component {
 
   render() {
     const importURL = window.ENV.CONTEXT_URL_ROOT + '/content_migrations'
+    const moduleDndFF = window.ENV?.FEATURES?.module_dnd
     return (
       <ul className="ic-EmptyStateList">
         <li className="ic-EmptyStateList__Item">
@@ -46,14 +47,16 @@ export default class ModulesHomePage extends React.Component {
             </button>
           </div>
         </li>
-        <li className="ic-EmptyStateList__Item">
-          <div className="ic-EmptyStateList__BillboardWrapper">
-            <a href={importURL} className="ic-EmptyStateButton">
-              <IconUploadLine className="ic-EmptyStateButton__SVG" />
-              <span className="ic-EmptyStateButton__Text">{I18n.t('Add existing content')}</span>
-            </a>
-          </div>
-        </li>
+        {!moduleDndFF && (
+          <li className="ic-EmptyStateList__Item">
+            <div className="ic-EmptyStateList__BillboardWrapper">
+              <a href={importURL} className="ic-EmptyStateButton">
+                <IconUploadLine className="ic-EmptyStateButton__SVG" />
+                <span className="ic-EmptyStateButton__Text">{I18n.t('Add existing content')}</span>
+              </a>
+            </div>
+          </li>
+        )}
       </ul>
     )
   }

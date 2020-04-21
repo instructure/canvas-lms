@@ -58,7 +58,7 @@ export default class FeatureFlag extends Backbone.Model
 
   # TODO: Remove this and all referencing code once the feature flag is no longer needed
   isResponsive: ->
-    !!window.ENV?.FEATURES?.responsive_2020_03
+    !!window.ENV?.FEATURES?.responsive_admin_settings
 
   isThreeState: ->
     @currentContextIsAccount() && !@transitionLocked('allowed')

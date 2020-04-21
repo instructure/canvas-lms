@@ -33,7 +33,7 @@ const uploadMediaTranslations = {
     LOADING_MEDIA: formatMessage('Loading...'),
     RECORD_PANEL_TITLE: formatMessage('Record'),
     SUBMIT_TEXT: formatMessage('Submit'),
-    UPLOADING_ERROR: formatMessage('Upload Error'),
+    UPLOADING_ERROR: formatMessage('An error occurred uploading your media.'),
     UPLOAD_MEDIA_LABEL: formatMessage('Upload Media'),
     MEDIA_RECORD_NOT_AVAILABLE: formatMessage('Audio and Video recording is not available.'),
     SUPPORTED_FILE_TYPES: formatMessage('Supported file types: SRT or WebVTT'),

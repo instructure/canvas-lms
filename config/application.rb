@@ -280,6 +280,7 @@ module CanvasRails
     initializer "canvas.extend_shard", before: "active_record.initialize_database" do
       # have to do this before the default shard loads
       Switchman::Shard.serialize :settings, Hash
+      Switchman.cache = -> { MultiCache.cache }
     end
 
     # we don't know what middleware to make SessionsTimeout follow until after

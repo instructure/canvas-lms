@@ -125,19 +125,18 @@ export default class UploadMedia extends React.Component {
 
   saveMediaCallback = async (err, data) => {
     if (err) {
-      // handle error
+      this.props.onUploadComplete && this.props.onUploadComplete(err, data)
     } else {
       try {
         if (this.state.selectedPanel === PANELS.COMPUTER && this.state.subtitles.length > 0) {
           await saveClosedCaptions(data.mediaObject.media_object.media_id, this.state.subtitles)
         }
         this.props.onUploadComplete && this.props.onUploadComplete(null, data)
-        this.props.onDismiss && this.props.onDismiss()
       } catch (ex) {
-        // Handle error
-        console.error(ex) // eslint-disable-line no-console
+        this.props.onUploadComplete && this.props.onUploadComplete(ex, null)
       }
     }
+    this.props.onDismiss && this.props.onDismiss()
   }
 
   renderModalBody = () => {

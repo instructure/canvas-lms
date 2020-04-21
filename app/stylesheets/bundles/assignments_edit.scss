@@ -67,7 +67,7 @@ div.form-column-left {
     margin-top: 0px;
   }
 
-  body.responsive_2020_04 & {
+  body.responsive_misc & {
     text-align: direction(left);
     padding: 5px 0px;
     label { margin-bottom: 0px }
@@ -89,11 +89,11 @@ div.form-column-left {
 div.form-column-right, div.overrides-column-right {
   display: inline-block;
 
-  body:not(.responsive_2020_04) & {
+  body:not(.responsive_misc) & {
     width: 380px;
   }
 
-  body.responsive_2020_04 & {
+  body.responsive_misc & {
     width: 100%;
     @include breakpoint(mini-tablet) {
       width: 380px;
@@ -186,7 +186,7 @@ div.form-column-right, div.overrides-column-right {
 
   .ContainerDueDate { // date inputs
     .Available-from-to {
-      body.responsive_2020_04 & {
+      body.responsive_misc & {
         flex-direction: column;
         .from {
           margin-bottom: 18px;
@@ -199,7 +199,7 @@ div.form-column-right, div.overrides-column-right {
         }
       }
     }
-    body.responsive_2020_04 & {
+    body.responsive_misc & {
       .input-append {
         display: flex;
         @include breakpoint(mini-tablet) {
@@ -340,7 +340,7 @@ div.form-column-right, div.overrides-column-right {
   .pull-left {
     min-width: 300px;
   }
-  body.responsive_2020_04 & {
+  body.responsive_misc & {
     .assignment__action-buttons {
       width: 100%;
       display: flex;

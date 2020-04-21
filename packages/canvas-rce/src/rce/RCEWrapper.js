@@ -568,11 +568,7 @@ class RCEWrapper extends React.Component {
           return
         }
 
-        if (
-          event &&
-          event.relatedTarget &&
-          event.relatedTarget.getAttribute('class').includes('tox-')
-        ) {
+        if (event?.relatedTarget?.getAttribute('class')?.includes('tox-')) {
           // a tinymce popup has focus
           return
         }

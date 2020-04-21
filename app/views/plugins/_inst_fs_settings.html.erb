@@ -17,4 +17,20 @@
 %>
 
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p><%= t(:description, <<-TEXT)
+          Hosts uploaded files with the Inst-FS service.
+          TEXT
+        %></p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :migration_rate, :en => "Chance of migrating older files into Inst-FS on access (0 to 100)" %></td>
+      <td>
+        <%= f.text_field :migration_rate %>
+      </td>
+    </tr>
+  </table>
 <% end %>

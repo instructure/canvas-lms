@@ -42,10 +42,10 @@ function addUploaderReadyEventListeners(uploader, file) {
   })
 }
 
-function addUploaderFileErrorEventListeners(uploader, done) {
+function addUploaderFileErrorEventListeners(uploader, done, file) {
   uploader.addEventListener('K5.fileError', error => {
     uploader.destroy()
-    done(error)
+    doDone(done, error, {uploadedFile: file})
   })
 }
 
@@ -69,16 +69,17 @@ function addUploaderFileCompleteEventListeners(uploader, context, file, done) {
     try {
       const canvasMediaObject = await axios.post('/api/v1/media_objects', body)
       uploader.destroy()
-      done(null, {mediaObject: canvasMediaObject.data, uploadedFile: file})
-    } catch (e) {
+      doDone(done, null, {mediaObject: canvasMediaObject.data, uploadedFile: file})
+    } catch (ex) {
       uploader.destroy()
-      done(e)
+      doDone(done, ex, {uploadedFile: file})
     }
   })
 }
 
 export default async function saveMediaRecording(file, contextId, contextType, done) {
   try {
+    window.addEventListener('beforeunload', handleUnloadWhileUploading)
     const mediaServerSession = await axios.post(
       '/api/v1/services/kaltura_session?include_upload_config=1'
     )
@@ -88,11 +89,11 @@ export default async function saveMediaRecording(file, contextId, contextType, d
     )
     const k5UploaderSession = new K5Uploader(session)
     addUploaderReadyEventListeners(k5UploaderSession, file)
-    addUploaderFileErrorEventListeners(k5UploaderSession, done)
+    addUploaderFileErrorEventListeners(k5UploaderSession, done, file)
     addUploaderFileCompleteEventListeners(k5UploaderSession, {contextId, contextType}, file, done)
     return k5UploaderSession
   } catch (err) {
-    done(err)
+    doDone(done, err, {uploadedFile: file})
   }
 }
 
@@ -117,4 +118,14 @@ export async function saveClosedCaptions(mediaId, files) {
     axiosRequests.push(p)
   })
   return Promise.all(axiosRequests)
+}
+
+function doDone(done, ...rest) {
+  window.removeEventListener('beforeunload', handleUnloadWhileUploading)
+  done(...rest)
+}
+
+function handleUnloadWhileUploading(e) {
+  e.preventDefault()
+  e.returnValue = ''
 }

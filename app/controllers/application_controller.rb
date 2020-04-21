@@ -177,11 +177,15 @@ class ApplicationController < ActionController::Base
             la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
             cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
             featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links),
-            responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03),
-            responsive_2020_04: !!@domain_root_account&.feature_enabled?(:responsive_2020_04),
+            responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03), #TODO: Romove once all references have been appropriately chaged
+            responsive_2020_04: !!@domain_root_account&.feature_enabled?(:responsive_2020_04), #TODO: Romove once all references have been appropriately chaged
+            responsive_admin_settings: !!@domain_root_account&.feature_enabled?(:responsive_admin_settings),
+            responsive_awareness: !!@domain_root_account&.feature_enabled?(:responsive_awareness),
+            responsive_misc: !!@domain_root_account&.feature_enabled?(:responsive_misc),
             product_tours: !!@domain_root_account&.feature_enabled?(:product_tours),
             module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd),
-            files_dnd: !!@domain_root_account&.feature_enabled?(:files_dnd)
+            files_dnd: !!@domain_root_account&.feature_enabled?(:files_dnd),
+            unpublished_courses: !!@domain_root_account&.feature_enabled?(:unpublished_courses)
           },
           KILL_JOY: Setting.get('kill_joy', false)
         }
@@ -1622,16 +1626,18 @@ class ApplicationController < ActionController::Base
   # Retrieving wiki pages needs to search either using the id or
   # the page title.
   def get_wiki_page
-    @wiki = @context.wiki
+    Shackles.activate(params[:action] == "edit" ? :master : :slave) do
+      @wiki = @context.wiki
 
-    @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
-    if(params[:format] && !['json', 'html'].include?(params[:format]))
-      @page_name += ".#{params[:format]}"
-      params[:format] = 'html'
+      @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
+      if(params[:format] && !['json', 'html'].include?(params[:format]))
+        @page_name += ".#{params[:format]}"
+        params[:format] = 'html'
+      end
+      return if @page || !@page_name
+
+      @page = @wiki.find_page(@page_name) if params[:action] != 'create'
     end
-    return if @page || !@page_name
-
-    @page = @wiki.find_page(@page_name) if params[:action] != 'create'
 
     unless @page
       if params[:titleize].present? && !value_to_boolean(params[:titleize])
@@ -1986,6 +1992,7 @@ class ApplicationController < ActionController::Base
     else
       return false unless authorized_action(@context, @current_user, :manage_account_settings)
     end
+    true
   end
 
   def require_root_account_management
@@ -2501,7 +2508,15 @@ class ApplicationController < ActionController::Base
   end
 
   def user_has_google_drive
-    @user_has_google_drive ||= google_drive_connection.authorized?
+    @user_has_google_drive ||= begin
+      if logged_in_user
+        Rails.cache.fetch_with_batched_keys('user_has_google_drive', batch_object: logged_in_user, batched_keys: :user_services) do
+          google_drive_connection.authorized?
+        end
+      else
+        google_drive_connection.authorized?
+      end
+    end
   end
 
   def self.instance_id
@@ -2509,10 +2524,6 @@ class ApplicationController < ActionController::Base
   end
 
   def self.region
-    nil
-  end
-
-  def self.cluster
     nil
   end
 

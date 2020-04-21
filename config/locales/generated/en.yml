@@ -773,6 +773,9 @@ en:
   module_content_import_enhancements_c00b0ea2: Module Content Import Enhancements
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: Drag and Drop files on modules and multi-file module item uploads
   april_2020_responsiveness_54028e36: April 2020 Responsiveness
+  responsive_admin_settings_4f8670d7: Responsive Admin/Settings
+  responsive_awareness_226843a: Responsive Awareness
+  responsive_misc_dc572cc0: Responsive Misc
   help_for_unpublished_courses_512a08d7: Help for Unpublished Courses
   improved_visual_reminders_to_encourage_instructors_f203c7f: Improved visual reminders to encourage instructors to publish courses
   files_drag_and_drop_enhancements_da55de57: Files Drag and Drop Enhancements
@@ -862,6 +865,13 @@ en:
   if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
     If enabled, Canvas will allow tools to return multiple content items
     in a single request at the course modules page
+  only_show_site_admin_keys_in_the_site_admin_ui_64827f33: Only show site admin keys in the site admin UI
+  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+    If enabled, the site admin developer key UI will only show
+    site admin developer keys. Note that this only affects
+    Canvas instances where root accounts are on the same shard
+    as the site admin account. Behavior in other instances
+    already behaved in this way.
   new_quizzes_migration_during_course_import_copy_e9dd124e: New Quizzes migration during course import/copy
   allow_migration_of_quizzes_during_course_copy_and__35d80756: Allow migration of quizzes during course copy and import
   new_quizzes_third_party_importing_1e1b696d: New Quizzes third party importing
@@ -1530,6 +1540,17 @@ en:
         default:
           zero_activity:
             text: This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the course since the date.
+    all_term_start_enrollment_parameters:
+      account_reports:
+        usu:
+          enrollment_type:
+            header: Enrollment Type
+      all: All Enrollments
+      students: Student Enrollments
+      teachers: Teacher Enrollments
+      ta: Ta Enrollments
+      observer: Observer Enrollments
+      designer: Designer Enrollments
     assignment_scheduling_csv_parameters:
       account_reports:
         newark:
@@ -1676,17 +1697,6 @@ en:
           parameters:
             note1: Course ID can be left blank to run the report for all courses in the term.
             note2: Courses with muted assignments may not accurately reflect scores in this report.
-    user_access_csv_parameters:
-      account_reports:
-        usu:
-          enrollment_type:
-            header: Enrollment Type
-      all: All Enrollments
-      students: Student Enrollments
-      teachers: Teacher Enrollments
-      ta: Ta Enrollments
-      observer: Observer Enrollments
-      designer: Designer Enrollments
     user_inactivity_csv_parameters:
       account_reports:
         webster:
@@ -3501,6 +3511,7 @@ en:
       headers:
         course_status: Course Status
       links:
+        import: Import Existing Content
         view_course_stream: View Course Stream
         course_setup: Course Setup Checklist
         new_announcement: New Announcement
@@ -4855,6 +4866,10 @@ en:
         wait_for_success: Wait for success notifications
         include_final_grade_overrides: Include final grade overrides
         success_timeout: Success notification timeout (in seconds)
+    inst_fs_settings:
+      description: Hosts uploaded files with the Inst-FS service.
+      labels:
+        migration_rate: Chance of migrating older files into Inst-FS on access (0 to 100)
     kaltura_settings:
       description: |-
         You will need an account either at [Kaltura.com](%{kaltura_url})
@@ -7552,6 +7567,14 @@ en:
   canvas_alert_late_anonymous_submission_assignment__bf9a6452: 'Canvas Alert - Late Anonymous Submission: %{assignment_name}'
   canvas_alert_late_submission_user_name_assignment__ee1301ac: 'Canvas Alert - Late Submission: %{user_name}, %{assignment_name}'
   reply_from_name: "%{name} via Canvas Notifications"
+  anonymous_submission_annotation_student_id_assignm_25eb88c9: 'Anonymous Submission Annotation: Student (%{id}), %{assignment_title}, %{course_name}'
+  submission_annotation_user_name_assignment_title_c_39910597: 'Submission Annotation: %{user_name}, %{assignment_title}, %{course_name}'
+  someone_just_made_a_new_annotation_on_the_anonymou_cbbe68ca: Someone just made a new annotation on the anonymous submission for Student (%{user_id}) for %{assignment_title}
+  author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "%{author_name} just made a new annotation on the submission for %{user_name} for %{assignment_title}"
+  anonymous_submission_annotation_student_user_id_as_ffca8ce9: 'Anonymous Submission annotation: Student (%{user_id}), %{assignment_title}, %{course_name}'
+  submission_annotation_user_name_assignment_title_c_80c1963e: 'Submission annotation: %{user_name}, %{assignment_title}, %{course_name}'
+  someone_just_made_a_new_comment_on_the_anonymous_s_a2e944fc: Someone just made a new comment on the anonymous submission for Student (%{user_id}) for %{assignment_title}.
+  author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} just made a new comment on the submission for %{user_name} for %{assignment_title}."
   anonymous_submission_comment_student_id_assignment_10ffe8c7: 'Anonymous Submission Comment: Student (%{id}), %{assignment_title}, %{course_name}'
   submission_comment_user_name_assignment_title_cour_d88ba875: 'Submission Comment: %{user_name}, %{assignment_title}, %{course_name}'
   student_author_id_just_made_a_new_comment_on_the_a_115d92e6: Student (%{author_id}) just made a new comment on the anonymous submission for Student (%{user_id}) for %{assignment_title}
@@ -7561,8 +7584,6 @@ en:
   new_anonymous_comment_for_assignment_title_student_d34cb28f: New anonymous comment for %{assignment_title}, Student (%{user_id}), %{course_name}.
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: New comment by %{author_name} for %{assignment_title}, %{user_name}, %{course_name}.
   anonymous_submission_comment_student_user_id_assig_96b99600: 'Anonymous Submission Comment: Student (%{user_id}), %{assignment_title}, %{course_name}'
-  someone_just_made_a_new_comment_on_the_anonymous_s_a2e944fc: Someone just made a new comment on the anonymous submission for Student (%{user_id}) for %{assignment_title}.
-  author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} just made a new comment on the submission for %{user_name} for %{assignment_title}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: 'Canvas Alert - Anonymous Comment: Student (%{author_id}) for %{assignment_title}, Student (%{user_id}), %{course_name}.'
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: 'Canvas Alert - Anonymous Comment: %{assignment_title}, Student (%{user_id}), %{course_name}.'
   canvas_alert_comment_author_name_for_assignment_ti_871fd642: 'Canvas Alert - Comment: %{author_name} for %{assignment_title}, %{user_name}, %{course_name}.'
@@ -7774,6 +7795,8 @@ en:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
     Include scores when alerting about grades.
               If your email is not an institution email this means sensitive content will be sent outside of the institution.
+  annotation_notification_685eaeb9: Annotation Notification
+  annotation_teacher_notification_c5e4db1f: Annotation Teacher Notification
   new_appointment_timeslots_are_available_for_signup_a3e3f964: New appointment timeslots are available for signup
   assignment_missing_assignment_name_in_course_code_7f940b35: 'Assignment missing: %{assignment_name} in %{course_code}'
   an_unexpected_error_has_occurred_see_error_report__f20b878d: 'An unexpected error has occurred: see error report %{id}'
@@ -8964,7 +8987,19 @@ en:
   the_beginning_date_range_for_the_courses_to_report_82353138: The beginning date range for the courses to report on
   the_ending_date_for_the_courses_to_report_on_1c417d5e: The ending date for the courses to report on
   the_ending_date_range_for_the_courses_to_report_on_99e0ea8f: The ending date range for the courses to report on
+  the_start_date_was_set_to_1_month_ago_778e3d7f: The start date was set to 1 month ago.
   the_start_date_was_set_to_the_beginning_of_last_we_39f49e1d: The start date was set to the beginning of last week.
+  term_sis_id_4613e944: term sis id
+  term_name_30eb91a: term name
+  enrollment_type_699c944: enrollment type
+  user_id_ddfbd586: user id
+  user_sis_id_c017cb14: user sis id
+  user_name_fe5887fb: user name
+  content_type_94fa7953: content type
+  content_dbfd19d7: content
+  times_viewed_40013c9b: times viewed
+  times_participated_5296451b: times participated
+  last_viewed_cfbbbc3a: last viewed
   group_id_e76ac9b5: group id
   group_sis_id_70133b7e: group sis id
   group_name_e4066daa: group name
@@ -8992,6 +9027,7 @@ en:
   orbis_report_header_date_submitted: date submitted
   created_by_sis_b590894c: Created by SIS;
   always_include_dates_74b3721d: Always Include Dates;
+  canvas_group_membership_id_3b8c7607: canvas_group_membership_id
   canvas_demo_7a005cf3: Canvas Demo
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} left in your Instant Trial *(extend now)*"
   time_left_in_your_instant_trial_5dd0392b: "%{time} left in your Instant Trial"
@@ -9160,6 +9196,7 @@ en:
   account_notifications_f3b7f01f: Account Notifications
   account_reports_eeb41194: Account Reports
   accounts_752dc365: Accounts
+  accounts_lti_546d15c7: Accounts (LTI)
   admins_3e1dce15: Admins
   announcement_external_feeds_5be3f36b: Announcement External Feeds
   announcements_a4b8ed4a: Announcements
@@ -9457,6 +9494,17 @@ en:
       twitter:
         body_student: An alert has been triggered for you
         body: An alert has been triggered for %{student}
+    annotation_notification:
+      email:
+        subject: A new annotation has been made to your submission document
+        body: A new annotation has been made by %{author} on the assignment %{assignment_name}.
+        html:
+          subject: A new annotation has been made to your submission document
+          link_text: View Submission
+          body: A new annotation has been made by %{author} on the assignment %{assignment_name}.
+      summary:
+        subject: A new annotation has been made to your submission document
+        body: A new annotation has been made by %{author} on the assignment %{assignment_name}.
     announcement_created_by_you:
       email:
         labels:
@@ -10866,6 +10914,7 @@ en:
   canvas_error_report_ff678539: Canvas Error Report
   canvas_ticketing_web_post_connector_11158897: Canvas Ticketing Web Post Connector
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: pick an endpoint, we'll post your error reports there
+  please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: Please enter a number between 0 and 100 for the migration rate
   invalid_aws_configuration_e8a6ae0f: Invalid AWS Configuration
   course_exports:
     unknown_titles:
@@ -11017,6 +11066,7 @@ en:
   can_create_and_update_submission_results_for_assig_51e7033d: Can create and update submission results for assignments associated with the tool.
   can_retrieve_user_data_associated_with_the_context_c5ec482c: Can retrieve user data associated with the context the tool is installed in.
   can_update_public_jwk_for_lti_services_26037129: Can update public jwk for LTI services.
+  can_lookup_account_information_13d69520: Can lookup Account information
   can_create_subscription_to_data_service_data_bb2874f2: Can create subscription to data service data.
   can_show_subscription_to_data_service_data_688ce3: Can show subscription to data service data.
   can_update_subscription_to_data_service_data_374a0c89: Can update subscription to data service data.
@@ -11029,6 +11079,9 @@ en:
   update_your_notification_settings_ed9564f3: Update your notification settings
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: 'You''ve been given an account role for the %{account} account at %{website}. Role type: %{role_type}.'
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} just added you to a conversation in Canvas. To view the conversation, click this link: %{link}."
+  view_submission_ff3da5d: View Submission
+  you_can_review_the_submission_details_using_this_l_c7f51917: 'You can review the submission details using this link: %{link}.'
+  click_here_to_review_the_submission_ae017c01: Click here to review the submission
   you_created_an_announcement_in_course_c49e3d70: You created an announcement in %{course}
   comment_by_replying_to_this_message_or_join_the_co_886bc612: 'Comment by replying to this message, or join the conversation using this link: %{link}.When allowed, if you need to include an attachment, please log in to Canvas and reply to the announcement.'
   join_the_conversation_using_this_link_link_9017499: 'Join the conversation using this link: %{link}.'
@@ -11113,9 +11166,7 @@ en:
   you_can_review_the_submission_details_by_clicking__9abc5515: 'You can review the submission details by clicking this link: %{link}.'
   you_can_review_the_submission_details_using_the_li_c25dd615: You can review the submission details using the link below.
   you_can_reply_to_this_comment_by_responding_to_thi_4fd1379e: 'You can reply to this comment by responding to this message, or review the submission details using this link: %{link}.  When allowed, if you need to include an attachment, please log in to Canvas and reply to the submission'
-  you_can_review_the_submission_details_using_this_l_c7f51917: 'You can review the submission details using this link: %{link}.'
   attached_files_4c1d26cf: 'Attached Files:'
-  click_here_to_review_the_submission_ae017c01: Click here to review the submission
   this_message_includes_media_comments_to_listen_or__75ea03a1: 'This message includes media comments. To listen or reply, click the link below:'
   you_can_review_the_submission_details_by_clicking__58a7753: 'You can review the submission details by clicking the link below:'
   the_grade_on_assignment_assignment_title_has_been__f2487efc: The grade on assignment %{assignment_title} has been changed for %{name}.
@@ -12624,6 +12675,8 @@ en:
   sis_del_alumno_716babc5: SIS del Alumno
   this_report_displays_teacher_engagement_activity_f_5888d45b: This report displays teacher engagement activity for each teacher enrollment.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: This report gets recent Big blue button conferences for an account.
+  this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: 'This report shows all the activity from users enrolled in all courses in a given term. The resulting csv file will have one row per student activity and will have the following headers: section id, section sis id, section name, course id, course sis id, course name, term id, term sis id, term name, user id, user sis id, user name, content type, content, times viewed, times participated, last viewed. The times viewed and times participated are counters from the beginning of time until the time the report was generated. A maximum of one month''s data will be retrieved. By default, it will return data from the beginning of the previous week.'
+  content_name_4607507c: content name
   models_to_include_9fb154ca: Models to include
   additional_options_7cefee79: Additional Options
   always_include_dates_1ae2935e: Always Include Dates
@@ -13664,6 +13717,7 @@ en:
       resubmitting: Resubmitting...
   download_assignment_submissions_41e50ee7: Download Assignment Submissions
   click_here_to_download_size_of_file_74443988: Click here to download %{size_of_file}
+  something_went_wrong_downloading_submissions_pleas_6d069a09: Something went wrong downloading submissions. Please try again later.
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: 'Q: What goes black, white, black, white?  A: A panda rolling down a hill.'
   submit_assignment:
     messages:
@@ -15327,10 +15381,10 @@ en:
   there_were_errors_saving_the_assignment_dates_3b39571b: 'There were errors saving the assignment dates:'
   loading_assignments_b3b248be: Loading assignments
   assignments_loaded_72ee472c: Assignments loaded
+  default_dates_a0a2ae26: default dates
   due_at_5d7d2fa: Due At
   available_from_587ce92f: Available From
   available_until_f3b9c4ed: Available Until
-  default_dates_a0a2ae26: default dates
   this_assignment_has_no_default_dates_ae314295: This assignment has no default dates.
   in_closed_grading_period_dc717846: In closed grading period
   only_the_moderator_can_edit_this_assignment_a162b20d: Only the moderator can edit this assignment
@@ -15888,7 +15942,6 @@ en:
   view_next_student_9fc72fef: view next student
   not_submitted_7d05fdb4: Not Submitted
   submitted_submitdate_bdd3bf09: 'Submitted: %{submitDate}'
-  view_submission_ff3da5d: View Submission
   select_student_name_caaff244: Select student %{name}
   zoom_f3e54d69: Zoom
   paste_zoom_into_calendar_events_announcements_disc_d873358e: Paste Zoom into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE).
@@ -16034,12 +16087,12 @@ en:
   before_publishing_your_course_you_must_either_publ_cdfdc78c: Before publishing your course, you must either publish a module or choose a different home page.
   create_a_new_module_6f31b0fe: Create a new Module
   add_existing_content_7e36da66: Add existing content
+  complete_registration_by_clicking_the_finish_the_r_fcd13ac8: Complete registration by clicking the “finish the registration process” link sent to your email.
+  an_error_ocurred_while_publishing_course_3760cf04: An error ocurred while publishing course
   failed_to_update_course_notification_settings_cbf0eb18: Failed to update course notification settings
   course_notification_settings_updated_f6726d7e: Course notification settings updated
   course_notification_settings_initial_query_error_6dfb24ef: Course Notification Settings initial query error
   course_notification_settings_error_page_c0512c17: Course Notification Settings Error Page
-  complete_registration_by_clicking_the_finish_the_r_fcd13ac8: Complete registration by clicking the “finish the registration process” link sent to your email.
-  an_error_ocurred_while_publishing_course_3760cf04: An error ocurred while publishing course
   choose_home_page_80cef4ee: Choose Home Page
   featured_83f6041d: Featured
   new_13daf639: New
@@ -16094,6 +16147,9 @@ en:
   course_card_color_region_for_course_c356a69c: Course card color region for %{course}
   observing_observee_d31d5fa2: 'Observing: %{observee}'
   actions_for_course_312ff446: Actions for %{course}
+  no_courses_to_display_700f94c4: No courses to display
+  published_courses_count_e7e82f3b: Published Courses (%{count})
+  unpublished_drafts_count_86e16f17: Unpublished Drafts (%{count})
   color_a363e1b0: Color
   dashboard_card_movement_menu_b65b98f5: Dashboard Card Movement Menu
   move_to_top_e0d7d66e: Move to top
@@ -16105,6 +16161,7 @@ en:
   dashboard_view_d7d85969: Dashboard View
   toggle_course_card_color_overlays_b5b8137a: Toggle course card color overlays
   color_overlay_fb5ecce7: Color Overlay
+  an_error_ocurred_while_fetching_course_details_ple_9cab7735: An error ocurred while fetching course details. Please try again.
   retrieving_content_ed0b9b33: Retrieving Content
   are_you_sure_you_want_to_delete_this_developer_key_ce246033: Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: Are you sure you want to delete this developer key?
@@ -17084,6 +17141,8 @@ en:
     one: One unread share.
     other: "%{count} unread shares."
   count_unread_cff5855: "%{count} unread."
+  published_courses_294ef14c: Published Courses
+  unpublished_drafts_bb352243: Unpublished Drafts
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.
   user_profile_picture_46bffbc7: User profile picture
   end_course_set_up_tutorial_f358b85d: End Course Set-up Tutorial
@@ -17328,6 +17387,11 @@ en:
   you_are_currently_receiving_notifications_for_this_4f542bb2: You are currently receiving notifications for this %{contextType}. To disable %{contextType} notifications, use the toggle above.
   you_will_not_receive_any_contexttype_notifications_da7a58f1: You will not receive any %{contextType} notifications at this time. To enable %{contextType} notifications, use the toggle above.
   granular_contexttype_notification_settings_will_be_c5dfc901: Granular %{contextType} notification settings will be configurable here in the future.
+  notify_immediately_d1749c07: Notify immediately
+  daily_summary_cf43f37c: Daily summary
+  weekly_summary_56cd0c95: Weekly summary
+  notifications_off_80da021c: Notifications off
+  notifications_unsupported_65f6bf65: Notifications unsupported
   course_activities_21c83bd3: Course Activities
   scheduling_5a3327e7: Scheduling
   alerts_6b871b71: Alerts
@@ -17454,7 +17518,7 @@ en:
   commons_ed0252fb: Commons
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: Allows user to access and edit the Admin settings in Commons. Allows user to create and manage Groups. Allows user to manage shared resources in the account.
   allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: Allows user to designate a course as a Blueprint Course. Allows user to manage Blueprint Course settings in Course Settings. Allows user to add associated courses.
-  blueprint_courses_is_an_account_level_feature_opti_3a0161d3: Blueprint Courses is an account-level feature option. Course roles can only manage Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role. To access the Blueprint Courses sidebar, Courses - add / edit / delete courses must be enabled. To add an associated course, Courses - view list a​nd Courses - add / edit / delete must also be enabled. To edit lock settings on any blueprint object type, Courses - add / edit / delete must be enabled.
+  course_roles_can_only_manage_blueprint_courses_if__4902d00b: Course roles can only manage Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role. To access the Blueprint Courses sidebar, Courses - add / edit / delete courses must be enabled. To add an associated course, Courses - view list a​nd Courses - add / edit / delete must also be enabled. To edit lock settings on any blueprint object type, Courses - add / edit / delete must be enabled.
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: To manage Blueprint Course settings in Course Settings, Courses - add / edit / delete must also be enabled.
   admin_tools_restore_courses_tab_b07bbfa7: Admin Tools (Restore Courses tab)
   allows_user_to_restore_a_course_not_available_at_t_3a749177: Allows user to restore a course. (Not available at the subaccount level.)
@@ -17462,7 +17526,7 @@ en:
   courses_account_navigation_f84fdec3: Courses (Account Navigation)
   allows_user_to_view_and_manage_courses_in_the_acco_12333da2: Allows user to view and manage courses in the account.
   course_settings_course_details_tab_fabf1adc: Course Settings (Course Details tab)
-  course_settings_course_details_tab_allows_user_to__2eb67ad2: 'Course Settings (Course Details tab): Allows user to access the Navigation tab in Course Settings. Allows user to access Student View (test student), Copy this Course, Reset Course Content, and Permanently Delete Course buttons. Allows user to edit course image, name, course code, time zone, subaccount, term, and other options in Course Details tab.'
+  allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: Allows user to access the Navigation tab in Course Settings. Allows user to access Student View (test student), Copy this Course, Reset Course Content, and Permanently Delete Course buttons. Allows user to edit course image, name, course code, time zone, subaccount, term, and other options in Course Details tab.
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: Allows user to view Choose Home Page and Course Setup Checklist buttons in the Home page.
   course_setup_checklist_78dcff7e: Course Setup Checklist
   determines_whether_the_course_setup_checklist_opti_fd5a8f70: Determines whether the Course Setup Checklist option is included in the Course Home page.
@@ -17470,8 +17534,8 @@ en:
   allows_user_to_view_student_context_cards_in_annou_dadef934: Allows user to view student context cards in announcement and discussion replies.
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: If this permission is enabled and Courses - view list is disabled, users can add a new course with the Add a New Course button in Account Settings.
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: To restore a deleted course, Courses - undelete​ and Course Content - view must also both be enabled.
-  blueprint_courses_is_an_account_level_feature_opti_6c9b5baf: Blueprint Courses is an account-level feature option. To edit Blueprint course settings in Course Settings, Blueprint Courses - add / edit / associate / delete​ - must also be enabled. To add an associated course, Blueprint Courses - add / edit / associate / delete - and Courses - view list must also be enabled. To edit lock settings on any blueprint object, this permission must be enabled. To edit lock settings on files, Course Files - add / edit / delete must also be enabled. To edit lock settings on quizzes, Assignments and Quizzes - add / edit / delete must also be enabled.
-  to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: To cross-list a section, Course Sections - add / edit / delete ​must also be enabled. To edit the course SIS ID, SIS Data - manage​ must also be enabled. To allow an account-level user to delete a course, Course State - manage​ must also be enabled.
+  to_edit_blueprint_course_settings_in_course_settin_59befcfa: To edit Blueprint course settings in Course Settings, Blueprint Courses - add / edit / associate / delete​ - must also be enabled. To add an associated course, Blueprint Courses - add / edit / associate / delete - and Courses - view list must also be enabled. To edit lock settings on any blueprint object, this permission must be enabled. To edit lock settings on files, Course Files - add / edit / delete must also be enabled. To edit lock settings on quizzes, Assignments and Quizzes - add / edit / delete must also be enabled.
+  to_access_the_courses_link_in_account_navigation_c_5aa3d76c: To access the Courses link in Account Navigation, Courses - view list must be enabled.
   to_manage_course_content_course_content_add_edit_d_94caa77f: To manage course content, Course Content - add / edit / delete must be enabled.
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: To cross-list a section, Course Sections - add / edit / delete must also be enabled. To edit the course SIS ID, SIS Data - manage must also be enabled. To allow an account-level user to delete a course, Course State - manage must also be enabled.
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: To view grades in a course, Grades - view all grades​ must also be enabled.
@@ -17479,7 +17543,7 @@ en:
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: Allows user to filter for blueprint courses as the account level. Allows user to add associated courses.
   allows_user_to_see_the_list_of_courses_in_the_acco_5fa0142f: Allows user to see the list of courses in the account.
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: If this permission is disabled and Courses - add / edit / delete is enabled, users can add a new course with the Add a New Course button in Account Settings.
-  blueprint_courses_is_an_account_level_feature_opti_390ed2e7: Blueprint Courses is an account-level feature option. To add associated courses, Blueprint Courses - add / edit / associate / delete and Courses - add / edit / delete must also be enabled.
+  to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: To add associated courses, Blueprint Courses - add / edit / associate / delete and Courses - add / edit / delete must also be enabled.
   statistics_4573b730: Statistics
   allows_user_to_see_the_list_of_recently_started_an_f6d3fe6: Allows user to see the list of recently started and ended courses in account statistics.
   allows_user_to_create_developer_keys_for_accounts_76bedd2b: Allows user to create developer keys for accounts.
@@ -17497,12 +17561,12 @@ en:
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: To view student analytics, Users - view list and Grades - view all grades​ must also be enabled.
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: Allows user to view course and student analytics from the Course Home Page or People page.
   allows_user_to_view_and_manage_permissions_bdc80a1d: Allows user to view and manage permissions.
-  determines_visibility_and_management_of_sis_import_a91ed255: Determines visibility and management of SIS Import tab in account navigation.
+  determines_visibility_and_management_of_sis_import_bf386823: Determines visibility and management of SIS Import link in Account Navigation.
   sis_import_14517892: SIS Import
   allows_user_to_import_sis_data_583b20a5: Allows user to import SIS data.
   to_manage_sis_data_sis_data_manage_must_also_be_en_748806e8: To manage SIS data, SIS Data - manage must also be enabled.
   not_available_at_the_subaccount_level_6ee9b41f: Not available at the subaccount level
-  determines_visibility_of_sis_import_tab_in_account_3d48272d: Determines visibility of SIS Import tab in account navigation. Allows user to view the previous SIS import dates, errors, and imported items.
+  determines_visibility_of_sis_import_link_in_accoun_6f8cecdf: Determines visibility of SIS Import link in Account Navigation. Allows user to view the previous SIS import dates, errors, and imported items.
   allows_user_to_edit_the_course_sis_id_e1eccee3: Allows user to edit the course SIS ID.
   people_account_30bbffec: People (Account)
   allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: Allows user to view and edit the SIS ID and Integration ID in a user’s Login Details
@@ -17519,7 +17583,7 @@ en:
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: If Statistics - view or Users - manage login details is enabled, the user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled.
   to_view_user_page_views_users_view_list_must_also__81cc34ed: To view user page views, Users - view list must also be enabled.
   quotas_account_settings_22c12b8d: Quotas (Account Settings)
-  allows_user_to_view_and_manage_quotas_tab_in_accou_935a7874: Allows user to view and manage Quotas tab in account settings. User can set default course, user, and group storage quotes.
+  allows_user_to_view_and_manage_quotas_tab_in_accou_aa3fea8: Allows user to view and manage Quotas tab in Account Settings. User can set default course, user, and group storage quotes.
   allows_user_to_act_as_other_users_in_the_account_195628ae: Allows user to act as other users in the account.
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: Allows a user to access the Act as User link on student context cards
   api_7bd66e19: API
@@ -17563,17 +17627,16 @@ en:
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: Allows user to edit assignment details on individual discussions.
   allows_user_to_add_new_assignments_to_a_module_51ae198c: Allows user to add new assignments to a module.
   question_banks_account_navigation_9a7ab7c2: Question Banks (Account Navigation)
-  determines_visibility_and_management_of_the_questi_fbf70ba9: Determines visibility and management of the Question Banks account navigation link.
+  determines_visibility_and_management_of_the_questi_c57c5b31: Determines visibility and management of the Question Banks link in Account Navigation.
   allows_user_to_add_edit_delete_and_publish_and_unp_5f5b97aa: Allows user to add, edit, delete, and publish and unpublish quizzes.
   to_access_the_assignments_index_page_course_conten_a5b00f98: To access the Assignments Index Page, Course Content - view must be enabled. To differentiate assignments to individual students, Users - view list ​must also be enabled.
-  blueprint_courses_is_an_account_level_feature_opti_4c34e5d3: Blueprint courses is an account-level feature option. To edit blueprint lock settings from the Assignments index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page. To edit blueprint lock settings on an individual quiz, or on the Quizzes index page, Courses - add / edit / delete must also be enabled.
+  to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: To edit blueprint lock settings from the Assignments index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page. To edit blueprint lock settings on an individual quiz, or on the Quizzes index page, Courses - add / edit / delete must also be enabled.
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: To import assignments and quizzes using the Course Import Tool, Course Content - add / edit / delete must be enabled.
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: To moderate grades, Grades - Select final grade for moderation must also be enabled.
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: To moderate a quiz, Grades - edit​ must also be enabled.
-  disabling_this_permission_will_override_if_enabled_7f2a87cc: Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment. However, if Learning Outcomes - add / edit / delete is enabled, user can still add rubrics via user can still add rubrics via Outcomes (Manage Rubrics button).
+  disabling_this_permission_will_override_if_enabled_59c2b5c9: Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment.
   allows_user_to_edit_assignment_details_on_individu_3e50993a: 'Allows user to edit assignment details on individual discussions. Modules: Allows user to add new assignments to a module.'
   to_differentiate_assignments_to_individual_student_6cc40fde: To differentiate assignments to individual students, Users - view list ​must also be enabled.
-  disabling_this_permission_will_override_if_enabled_6481b015: Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment. However, if Learning Outcomes - add / edit / delete is enabled, user can still add rubrics via Outcomes (Manage Rubrics button).
   insights_b514ad8d: Insights
   allows_user_to_view_canvas_insights_f4f7ba8b: Allows user to view Canvas Insights.
   this_permission_is_only_supported_when_canvas_insi_85cc2938: This permission is only supported when Canvas Insights is enabled for an account. Please contact your Customer Success Manager for details.
@@ -17654,7 +17717,7 @@ en:
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: Allows user to edit blueprint lock settings on the Discussions index page in a Blueprint master course.
   allows_user_to_add_discussions_in_the_discussions__3cc51c31: Allows user to add discussions in the Discussions page. Allows user to close for comments, move, pin and unpin, edit, and delete discussion topics created by other users.
   to_view_announcements_announcements_view_must_also_75f652df: To view announcements, Announcements - view must also be enabled.
-  blueprint_courses_is_an_account_level_feature_opti_c7e81929: Blueprint Courses is an account-level feature option. To edit blueprint lock settings on the Discussions index page, Courses - add / edit / delete and Discussions - view must also be enabled. If this permission is not enabled, and Courses - add / edit / delete and Discussions - view are enabled, blueprint lock settings can be edited on individual discussions.
+  to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: To edit blueprint lock settings on the Discussions index page, Courses - add / edit / delete and Discussions - view must also be enabled. If this permission is not enabled, and Courses - add / edit / delete and Discussions - view is enabled, blueprint lock settings can be edited on individual discussions.
   both_discussions_create_and_discussions_moderate_a_1c00baf0: Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page. If this permission is enabled, Discussions - create is not required. To view discussions in a course, Discussions - view must be enabled. To reply to a discussion, Discussions - post must also be enabled. To edit assignment details on a discussion, Assignments and Quizzes - add / edit / delete must also be enabled.
   blueprint_courses_must_be_enabled_for_an_account_b_4ef094f4: Blueprint courses must be enabled for an account by an admin. Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role. If this setting is disabled, and Discussions - view is enabled, the user can still adjust content lock settings on individual discussions in a Blueprint master course.
   allows_user_to_reply_to_a_discussion_post_83f43e19: Allows user to reply to a discussion post.
@@ -17721,7 +17784,6 @@ en:
   to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: To post or hide grades, Grades - edit must also be enabled.
   to_view_module_progression_grades_view_all_grades__1acc0880: To view module progression, Grades - view all grades must also be enabled.
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: Allows user to access SpeedGrader from an assignment.
-  if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from the course navigation.
   account_groups_2f301732: Account Groups
   allows_user_to_create_edit_and_delete_account_grou_abc8c12: Allows user to create, edit, and delete account groups.
   course_groups_e8239a1e: Course Groups
@@ -17741,20 +17803,14 @@ en:
   external_apps_account_course_settings_78de2b2f: External Apps (Account, Course Settings)
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). Additionally, if this permission is disabled, users cannot delete manually added external apps.
   external_apps_course_settings_1f045644: External Apps (Course Settings)
-  determines_visibility_and_management_of_outcomes_t_8a40bf86: Determines visibility and management of Outcomes tab in account navigation. Allows user to create, import, edit, and delete outcomes and outcome groups at the account and course levels.
-  determines_visibility_and_management_of_rubrics_ta_e5dad169: Determines visibility and management of Rubrics tab in the account navigation. Allows user to manage rubrics.
-  outcomes_and_rubrics_f893d141: Outcomes and Rubrics
-  to_view_the_outcomes_page_as_read_only_course_cont_50a4f201: To view the Outcomes page as read-only, Course content - view must be enabled. Users can access individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add / edit / delete is also enabled.
-  allows_user_to_create_import_edit_and_delete_outco_8eff991: Allows user to create, import, edit, and delete outcomes and outcome groups at the course level.
-  allows_user_to_manage_rubrics_326eedc2: Allows user to manage rubrics.
-  if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: If disabled, the Outcomes page becomes read-only and hides the Manage Rubrics button. User can still access individual assignment rubrics through Assignments.
-  outcomes_and_rubrics_account_course_f0d23419: Outcomes and Rubrics (Account, Course)
-  allows_user_to_import_learning_outcomes_17fce84a: Allows user to import learning outcomes.
-  allows_user_to_import_learning_outcomes_to_rubrics_45331ded: Allows user to import learning outcomes to rubrics.
-  to_view_a_course_outcomes_page_as_read_only_course_b961cbec: To view a Course Outcomes page as read-only, Course Content - view must be enabled. To import learning outcomes from the Outcomes page, Rubrics - add / edit / delete must also be enabled. Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add / edit / delete are enabled.
+  determines_visibility_and_management_of_outcomes_i_e3ab94dc: Determines visibility and management of Outcomes in Account Navigation. Allows user to create, edit, and delete outcomes and outcome groups at the account and course levels.
+  to_allow_the_outcomes_page_as_read_only_this_permi_f3c580bd: To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled. To import learning outcomes, Learning Outcomes - import must also be enabled.
+  allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: Allows user to create, edit, and delete outcomes and outcome groups at the course level.
+  allows_user_to_import_account_learning_outcomes_f6f6d0b9: Allows user to import account learning outcomes.
+  allows_user_to_import_course_learning_outcomes_2ca3f18f: Allows user to import course learning outcomes.
   allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: Allows user to edit blueprint lock settings on the Pages index page in a Blueprint master course.
   allows_user_to_view_create_edit_delete_and_publish_7e087ae8: Allows user to view, create, edit, delete, and publish and unpublish pages. Allows user to view page history and set front page.
-  blueprint_courses_is_an_account_level_feature_opti_8d968b0e: Blueprint Courses is an account-level feature option. To edit blueprint lock settings on the Pages index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings can be edited on individual pages.
+  to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: To edit blueprint lock settings on the Pages index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings can be edited on individual pages.
   students_can_edit_and_view_page_history_if_allowed_39a47edc: Students can edit and view page history if allowed in the individual page options.
   blueprint_courses_must_be_enabled_for_an_account_b_5ab5b804: Blueprint courses must be enabled for an account by an admin. Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role. If this permission is disabled, a user can still adjust content lock settings on individual pages in a Blueprint master course.
   question_banks_45bdf347: Question Banks
@@ -17766,9 +17822,9 @@ en:
   allows_user_to_view_student_quiz_logs_e1c4491: Allows user to view student quiz logs.
   grades_edit_must_also_be_enabled_c025f45d: Grades - edit must also be enabled.
   the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: The Quiz Log Auditing feature option must be enabled in Course Settings.
-  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: Allows user to create, edit, and delete rubrics.
-  if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: If this permission is disabled, users can still create or add rubrics to assignments if Assignments and Quizzes - add / edit / delete is enabled.
-  allows_user_to_create_edit_and_delete_course_rubri_92b58f29: Allows user to create, edit, and delete course rubrics in the Rubrics link.
+  determines_visibility_and_management_of_the_rubric_55b55b25: Determines visibility and management of the Rubrics link in Account Navigation. Allows user to create, edit, and delete rubrics.
+  users_can_access_and_create_but_not_edit_individua_72b88c41: Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add / edit / delete are enabled.
+  allows_user_to_view_the_rubrics_link_in_course_nav_fc5fabff: Allows user to view the Rubrics link in Course Navigation. Allows user to create, edit, and delete course rubrics.
   governs_account_related_sis_ids_i_e_subaccount_sis_b7dd0954: Governs account-related SIS IDs (i.e., subaccount SIS ID).
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: Allows user to view a course’s SIS ID.
   allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: Allows user to view the SIS ID in a user’s login details.
@@ -18434,6 +18490,24 @@ en:
   sorry_but_we_couldn_t_automatically_log_you_into_t_9e77ce17: Sorry, but we couldnʼt automatically log you into the Community.
   confused_panda_questioning_what_to_do_next_42941484: Confused Panda questioning what to do next
   powered_by_instructure_504d676d: Powered By Instructure
+  having_trouble_logging_in_if_you_have_a_canvas_acc_f9578b47: Having trouble logging in? If you have a %{canvas} account with a specific institution, we can help.
+  click_here_to_find_it_5ad1543b: Click here to find it.
+  find_your_canvas_institution_45af99af: Find your %{canvas} institution
+  an_error_occurred_while_searching_for_your_institu_16a1ace4: An error occurred while searching for your institution
+  and_many_more_not_shown_here_fb777a4c: "... and *many* more not shown here"
+  and_more_not_shown_here_7842765e: "... and more not shown here"
+  and_a_few_more_not_shown_here_28e7d713: "... and a few more not shown here"
+  waiting_for_results_to_load_4fc9da44: Waiting for results to load
+  sorry_we_couldn_t_find_anything_that_matched_91793bb7: Sorry, we couldn’t find anything that matched.
+  didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: Didn’t find what you are looking for? Keep trying!
+  make_sure_that_you_are_spelling_your_institution_c_19a8b7c6: Make sure that you are spelling your institution correctly.
+  try_adding_names_titles_that_are_specific_to_your__49285cc0: Try adding names/titles that are specific to your institution.
+  try_entering_your_institution_s_complete_name_2013abab: Try entering your institution’s complete name.
+  still_having_difficulty_get_more_help_here_3cdc8de1: 'Still having difficulty? Get more help here:'
+  canvas_guides_d65431: Canvas Guides
+  type_at_least_number_characters_to_search_5ff908c9: Type at least %{number} characters to search
+  search_for_your_school_or_institution_1eb2eeaf: Search for your school or institution
+  search_a28cbc02: Search…
   authentication_provider_2ba1abfa: Authentication Provider
   delete_name_81c1b5b2: Delete %{name}
   add_domain_lookup_825f9eb7: Add Domain Lookup

@@ -200,6 +200,25 @@ describe CollaborationsController, type: :request do
                  :format => 'json', :course_id => @course.to_param })
       expect(json.map { |user| user['id'] }).to match_array(@course.users.pluck(:id))
     end
+
+    it 'returns course members for a user who has limit_privileges_to_course_section enabled' do
+      @course.enroll_student(@user).accept!
+      second_section = @course.course_sections.create!(:name => 'Section 2')
+      student2 = user_with_pseudonym(:active_all => true)
+      ta = user_factory(:name => 'Bobby Tables')
+
+      @course.enroll_user(ta, 'TaEnrollment', :section => second_section, limit_privileges_to_course_section: true)
+      @course.enroll_user(student2, 'StudentEnrollment', :section => second_section)
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
+               { :controller => 'collaborations', :action => 'potential_collaborators',
+                 :format => 'json', :course_id => @course.to_param })
+
+      users_map = json.map { |user| user['id'] }
+
+      expect(users_map.count).to eq 2
+      expect(users_map).to match_array(second_section.users.pluck(:id))
+    end
   end
 
   context '/api/v1/groups/:group_id/potential_collaborators' do

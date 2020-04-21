@@ -55,6 +55,8 @@ class Auditors::Authentication
   end
 
   Stream = Auditors.stream do
+    backend_strategy :cassandra
+    active_record_type Auditors::ActiveRecord::AuthenticationRecord
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :authentications
     record_type Auditors::Authentication::Record
@@ -81,10 +83,13 @@ class Auditors::Authentication
 
   def self.record(pseudonym, event_type)
     return unless pseudonym
+    event_record = nil
     pseudonym.shard.activate do
-      record = Auditors::Authentication::Record.generate(pseudonym, event_type)
-      Auditors::Authentication::Stream.insert(record)
+      event_record = Auditors::Authentication::Record.generate(pseudonym, event_type)
+      Auditors::Authentication::Stream.insert(event_record, {backend_strategy: :cassandra}) if Auditors.write_to_cassandra?
+      Auditors::Authentication::Stream.insert(event_record, {backend_strategy: :active_record}) if Auditors.write_to_postgres?
     end
+    event_record
   end
 
   def self.for_account(account, options={})

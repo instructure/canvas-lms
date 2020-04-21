@@ -157,6 +157,14 @@ describe ContentSharesController do
         expect(json[1]['content_export']).to be_present
       end
 
+      it "omits content shares without content" do
+        user_session @teacher_2
+        @export.destroy_permanently!
+        get :index, params: { user_id: @teacher_2.id, list: 'received' }
+        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        expect(json.map { |share| share['name'] }).to eq(['u read me'])
+      end
+
       it "paginates received content shares" do
         Timecop.travel(1.hour.ago) do
           export2 = @course_1.content_exports.create!(settings: {"selected_content" => {"quizzes" => {'foo' => '1'}, "content_tags" => {'bar' => '1'}, "context_modules" => {'baz' => '1'}}})
@@ -213,6 +221,13 @@ describe ContentSharesController do
       it "scopes to user" do
         user_session @teacher_1
         get :show, params: { user_id: @teacher_1.id, id: @received_share.id }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 if the share has no content" do
+        @export.destroy_permanently!
+        user_session @teacher_1
+        get :show, params: { user_id: @teacher_1.id, id: @sent_share.id }
         expect(response).to have_http_status(:not_found)
       end
     end

@@ -79,7 +79,7 @@ gem 'inst-jobs', '0.15.20'
     gem 'et-orbi', '1.2.2', require: false
 gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.32.0', require: false
-gem 'inst-jobs-statsd', '1.3.2'
+gem 'inst-jobs-statsd', '1.4.0'
 gem 'json', '2.3.0'
 gem 'json_schemer', '0.2.10'
 gem 'json-jwt', '1.11.0', require: false

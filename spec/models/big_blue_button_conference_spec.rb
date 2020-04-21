@@ -164,6 +164,17 @@ describe BigBlueButtonConference do
       end
     end
 
+    it "should include whether to show to students (and be true for everything but statistics)" do
+      allow(@bbb).to receive(:conference_key).and_return('12345')
+      response = JSON.parse(get_recordings_fixture, {symbolize_names: true})
+      allow(@bbb).to receive(:send_request).and_return(response)
+      @bbb.recordings.each do |recording|
+        recording[:playback_formats].each do |format|
+          expect(format[:show_to_students]).to eq(format[:type] != "statistics")
+        end
+      end
+    end
+
     describe "looking for recordings based on user setting" do
       before(:once) do
         @bbb = BigBlueButtonConference.new(user: user_factory, context: course_factory)

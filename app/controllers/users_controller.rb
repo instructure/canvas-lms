@@ -564,7 +564,13 @@ class UsersController < ApplicationController
 
   def dashboard_cards
     dashboard_courses = map_courses_for_menu(@current_user.menu_courses, tabs: DASHBOARD_CARD_TABS)
-    Rails.cache.write(['last_known_dashboard_cards_count', @current_user.global_id].cache_key, dashboard_courses.count)
+    if @domain_root_account.feature_enabled?(:unpublished_courses)
+      published, unpublished = dashboard_courses.partition { |course| course[:published]}
+      Rails.cache.write(['last_known_dashboard_cards_published_count', @current_user.global_id].cache_key, published.count)
+      Rails.cache.write(['last_known_dashboard_cards_unpublished_count', @current_user.global_id].cache_key, unpublished.count)
+    else
+      Rails.cache.write(['last_known_dashboard_cards_count', @current_user.global_id].cache_key, dashboard_courses.count)
+    end
     render json: dashboard_courses
   end
 
@@ -1464,6 +1470,14 @@ class UsersController < ApplicationController
   #   created user automatically logged in. The URL is only valid for a short time, and must
   #   match the domain this request is directed to, and be for a well-formed path that Canvas
   #   can recognize.
+  #
+  # @argument initial_enrollment_type [String]
+  #   `observer` if doing a self-registration with a pairing code. This allows setting the
+  #   password during user creation.
+  #
+  # @argument pairing_code[code] [String]
+  #   If provided and valid, will link the new user as an observer to the student's whose
+  #   pairing code is given.
   #
   # @returns User
   def create

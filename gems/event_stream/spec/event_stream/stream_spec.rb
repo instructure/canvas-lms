@@ -437,10 +437,11 @@ describe EventStream::Stream do
         allow(@stream).to receive(:database).and_return(@database)
         @record = double(
           :id => 'id',
-          :created_at => Time.now,
+          :created_at => Time.zone.now,
           :attributes => {'attribute' => 'attribute_value'},
-          :changes => {'changed_attribute' => 'changed_value'})
-        @exception = Exception.new
+          :changes => {'changed_attribute' => 'changed_value'}
+        )
+        @exception = StandardError.new
       end
 
       shared_examples_for "error callbacks" do
@@ -463,7 +464,7 @@ describe EventStream::Stream do
           @stream.raise_on_error = true
           @stream.on_error{ spy.trigger }
           expect(spy).to receive(:trigger).once
-          expect{ @stream.insert(@record) }.to raise_exception(Exception)
+          expect{ @stream.insert(@record) }.to raise_exception(StandardError)
         end
       end
 

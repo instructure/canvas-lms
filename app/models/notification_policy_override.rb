@@ -31,7 +31,7 @@ class NotificationPolicyOverride < ActiveRecord::Base
   include NotificationPreloader
 
   belongs_to :communication_channel, inverse_of: :notification_policy_overrides
-  belongs_to :context, polymorphic: [:course]
+  belongs_to :context, polymorphic: [:account, :course]
   belongs_to :notification, inverse_of: :notification_policy_overrides
 
   def self.enable_for_context(user, context, enable: true)
@@ -70,5 +70,19 @@ class NotificationPolicyOverride < ActiveRecord::Base
 
   def self.find_all_for(user, context, channel_id = user.communication_channels)
     NotificationPolicyOverride.where(communication_channel_id: channel_id, context: context)
+  end
+
+  def self.create_or_update_for(communication_channel, notification_category, frequency, context)
+    notifications = Notification.all_cached.select { |n| n.category == notification_category }
+    communication_channel.shard.activate do
+      unique_constraint_retry do
+        notifications.each do |notification|
+          np = communication_channel.notification_policy_overrides.where(notification_id: notification, context_id: context).first
+          np ||= communication_channel.notification_policy_overrides.build(notification: notification, context_id: context.id, context_type: context.class.name)
+          np.frequency = frequency
+          np.save!
+        end
+      end
+    end
   end
 end

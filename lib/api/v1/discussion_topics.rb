@@ -65,7 +65,7 @@ module Api::V1::DiscussionTopics
       root_topics = get_root_topic_data(topics, opts[:root_topic_fields])
     end
     if opts[:include_sections_user_count] && context
-      opts[:context_user_count] = context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count
+      opts[:context_user_count] = Shackles.activate(:slave) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
     end
     ActiveRecord::Associations::Preloader.new.preload(topics, [:user, :attachment, :root_topic, :context])
     topics.inject([]) do |result, topic|
@@ -122,7 +122,7 @@ module Api::V1::DiscussionTopics
     end
 
     if opts[:include_sections_user_count] && !topic.is_section_specific
-      json[:user_count] = opts[:context_user_count] || context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count
+      json[:user_count] = opts[:context_user_count] || Shackles.activate(:slave) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
     end
 
     if opts[:include_sections] && topic.is_section_specific
