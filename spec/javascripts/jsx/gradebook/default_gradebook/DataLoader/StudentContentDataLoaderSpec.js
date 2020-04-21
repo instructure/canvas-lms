@@ -21,9 +21,8 @@ import sinon from 'sinon'
 import FakeServer, {paramsFromRequest} from 'jsx/shared/network/__tests__/FakeServer'
 import {RequestDispatch} from 'jsx/shared/network'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
+import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
-import CourseSettings from 'jsx/gradebook/default_gradebook/CourseSettings'
-import FinalGradeOverrides from 'jsx/gradebook/default_gradebook/FinalGradeOverrides'
 import StudentContentDataLoader from 'jsx/gradebook/default_gradebook/DataLoader/StudentContentDataLoader'
 
 QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => {
@@ -83,19 +82,19 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       .stub(FinalGradeOverrideApi, 'getFinalGradeOverrides')
       .returns(Promise.resolve({finalGradeOverrides: exampleData.finalGradeOverrides}))
 
-    gradebook = {
-      course: {
-        id: '1201'
+    gradebook = createGradebook({
+      context_id: '1201',
+
+      course_settings: {
+        allow_final_grade_override: true,
+        filter_speed_grader_by_student_group: false
       },
 
-      getEnrollmentFilters: sinon.stub().returns({concluded: false, inactive: false}),
-      gotChunkOfStudents: sinon.spy(),
-      gotSubmissionsChunk: sinon.spy()
-    }
+      final_grade_override_enabled: true
+    })
 
-    gradebook.finalGradeOverrides = new FinalGradeOverrides(gradebook)
-    gradebook.courseSettings = new CourseSettings(gradebook, {allowFinalGradeOverride: true})
-
+    sinon.stub(gradebook, 'gotChunkOfStudents')
+    sinon.stub(gradebook, 'gotSubmissionsChunk')
     sinon.stub(gradebook.finalGradeOverrides, 'setGrades')
 
     options = {
@@ -268,7 +267,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       })
 
       test('optionally does not request final grade overrides', async () => {
-        gradebook.courseSettings = new CourseSettings(gradebook, {allowFinalGradeOverride: false})
+        gradebook.courseSettings.setAllowFinalGradeOverride(false)
         await load()
         strictEqual(FinalGradeOverrideApi.getFinalGradeOverrides.callCount, 0)
       })
