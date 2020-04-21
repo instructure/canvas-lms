@@ -21,6 +21,7 @@ import AssignmentGroupsLoader from './AssignmentGroupsLoader'
 import ContextModulesLoader from './ContextModulesLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
 import OldDataLoader from './OldDataLoader'
+import StudentContentDataLoader from './StudentContentDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
 
 export default class DataLoader {
@@ -38,6 +39,7 @@ export default class DataLoader {
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.contextModulesLoader = new ContextModulesLoader(loaderConfig)
     this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
+    this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
     this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
   }
 
@@ -52,29 +54,16 @@ export default class DataLoader {
 
       activeRequestLimit: options.performanceControls?.active_request_limit,
       courseId: options.context_id,
-      perPage: options.api_max_per_page,
 
       getAssignmentGroups: true,
       getContextModules: true,
       getCustomColumns: true,
-      getGradingPeriodAssignments: gradebook.gradingPeriodSet != null,
-
-      submissionsChunkSize: options.chunk_size
+      getGradingPeriodAssignments: gradebook.gradingPeriodSet != null
     })
 
     // eslint-disable-next-line promise/catch-or-return
     promises.gotCustomColumns.then(customColumns => {
       gradebook.gotCustomColumns(customColumns)
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotStudents.then(() => {
-      gradebook.updateStudentsLoaded(true)
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotSubmissions.then(() => {
-      gradebook.updateSubmissionsLoaded(true)
     })
 
     // TODO: In TALLY-769, remove this entire block.
@@ -145,30 +134,17 @@ export default class DataLoader {
     gradebook.updateStudentsLoaded(false)
     gradebook.updateSubmissionsLoaded(false)
 
-    const promises = OldDataLoader.loadGradebookData({
+    OldDataLoader.loadGradebookData({
       dataLoader: this,
       dispatch: this.dispatch,
       gradebook,
 
       courseId: options.context_id,
-      perPage: options.api_max_per_page,
 
       getGradingPeriodAssignments:
         loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null,
 
-      submissionsChunkSize: options.chunk_size,
-
       customColumnIds: gradebook.gradebookContent.customColumns.map(column => column.id)
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotStudents.then(() => {
-      gradebook.updateStudentsLoaded(true)
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotSubmissions.then(() => {
-      gradebook.updateSubmissionsLoaded(true)
     })
   }
 }

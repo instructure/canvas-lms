@@ -373,6 +373,34 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
           await reloadData()
         })
       })
+
+      QUnit.module('when no students needed to be loaded', loadingHooks => {
+        loadingHooks.beforeEach(() => {
+          gradebook.updateStudentIds(['1101', '1102', '1103'])
+        })
+
+        test('updates the "students loaded" status', async () => {
+          await reloadData()
+          strictEqual(gradebook.updateStudentsLoaded.callCount, 2)
+        })
+
+        test('sets the students as loaded', async () => {
+          await reloadData()
+          const [loaded] = gradebook.updateStudentsLoaded.lastCall.args
+          strictEqual(loaded, true)
+        })
+
+        test('updates the "submissions loaded" status', async () => {
+          await reloadData()
+          strictEqual(gradebook.updateSubmissionsLoaded.callCount, 2)
+        })
+
+        test('sets the submissions as loaded', async () => {
+          await reloadData()
+          const [loaded] = gradebook.updateSubmissionsLoaded.lastCall.args
+          strictEqual(loaded, true)
+        })
+      })
     })
 
     QUnit.module('loading submissions', () => {

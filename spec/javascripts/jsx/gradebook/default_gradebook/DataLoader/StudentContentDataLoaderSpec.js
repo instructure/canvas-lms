@@ -47,7 +47,6 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
   let dataLoader
   let gradebook
-  let options
   let server
   let dispatch
 
@@ -83,6 +82,8 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       .returns(Promise.resolve({finalGradeOverrides: exampleData.finalGradeOverrides}))
 
     gradebook = createGradebook({
+      api_max_per_page: 2,
+      chunk_size: 2,
       context_id: '1201',
 
       course_settings: {
@@ -95,16 +96,9 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
     sinon.stub(gradebook, 'gotChunkOfStudents')
     sinon.stub(gradebook, 'gotSubmissionsChunk')
+    sinon.stub(gradebook, 'updateStudentsLoaded')
+    sinon.stub(gradebook, 'updateSubmissionsLoaded')
     sinon.stub(gradebook.finalGradeOverrides, 'setGrades')
-
-    options = {
-      courseId: '1201',
-      gradebook,
-      studentsChunkSize: 2,
-      studentsParams: {enrollment_state: ['active']},
-      studentsUrl: urls.students,
-      submissionsChunkSize: 2
-    }
 
     dispatch = new RequestDispatch()
   })
@@ -115,7 +109,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
   QUnit.module('.load()', () => {
     async function load(studentIds) {
-      dataLoader = new StudentContentDataLoader(options, dispatch)
+      dataLoader = new StudentContentDataLoader({dispatch, gradebook})
       await dataLoader.load(studentIds || exampleData.studentIds)
     }
 
@@ -130,7 +124,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
       test('requests students using the given student ids', async () => {
         setStudentsResponse(exampleData.studentIds, exampleData.students)
-        options.studentsChunkSize = 50
+        gradebook.options.api_max_per_page = 50
         await load()
         const studentRequest = server.findRequest(urls.students)
         const params = paramsFromRequest(studentRequest)
@@ -140,7 +134,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       test('chunks students when per page limit is less than count of student ids', async () => {
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
-        options.studentsChunkSize = 2
+        gradebook.options.api_max_per_page = 2
         await load()
         const requests = server.filterRequests(urls.students)
         strictEqual(requests.length, 2)

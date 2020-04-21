@@ -19,7 +19,6 @@
 import {difference} from 'lodash'
 
 import {deferPromise} from '../../../shared/async'
-import StudentContentDataLoader from './StudentContentDataLoader'
 
 function getCustomColumns(courseId, dispatch) {
   const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
@@ -75,46 +74,32 @@ function loadGradebookData(opts) {
 
   const gotCustomColumns = opts.getCustomColumns ? getCustomColumns(opts.courseId, dispatch) : null
 
-  const studentContentDataLoader = new StudentContentDataLoader(
-    {
-      courseId: opts.courseId,
-      gradebook: opts.gradebook,
-      studentsChunkSize: opts.perPage,
-      submissionsChunkSize: opts.submissionsChunkSize
-    },
-    dispatch
-  )
-
   const gotContextModules = opts.getContextModules
     ? dataLoader.contextModulesLoader.loadContextModules()
     : null
-
-  const gotStudents = deferPromise()
-  const gotSubmissions = deferPromise()
 
   gotStudentIds
     .then(() => {
       const studentIds = gradebook.courseContent.students.listStudentIds()
       const studentIdsToLoad = difference(studentIds, loadedStudentIds)
 
-      return studentContentDataLoader.load(studentIdsToLoad)
+      return dataLoader.studentContentDataLoader.load(studentIdsToLoad)
     })
     .then(() => {
-      gotStudents.resolve()
-      gotSubmissions.resolve()
+      /*
+       * Currently, custom columns data has the lowest priority for initial
+       * data loading, so it waits until all students and submissions are
+       * finished loading.
+       */
+      getCustomColumnData(opts, gotCustomColumns, dispatch)
     })
-
-  // Custom Column Data will load only after custom columns and all submissions.
-  gotSubmissions.promise.then(() => getCustomColumnData(opts, gotCustomColumns, dispatch))
 
   return {
     gotAssignmentGroups,
     gotContextModules,
     gotCustomColumns,
     gotGradingPeriodAssignments,
-    gotStudentIds,
-    gotStudents: gotStudents.promise,
-    gotSubmissions: gotSubmissions.promise
+    gotStudentIds
   }
 }
 

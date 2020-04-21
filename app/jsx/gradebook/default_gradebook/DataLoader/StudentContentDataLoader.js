@@ -66,17 +66,17 @@ function flashSubmissionLoadError() {
 
 function ignoreFailure() {}
 
-function getStudentsChunk(courseId, studentIds, options, dispatch) {
+function getStudentsChunk(courseId, studentIds, options) {
   const url = `/api/v1/courses/${courseId}/users`
   const params = {
     enrollment_state: ['active', 'completed', 'inactive', 'invited'],
     enrollment_type: ['student', 'student_view'],
     include: ['avatar_url', 'enrollments', 'group_ids'],
-    per_page: options.studentsChunkSize,
+    per_page: studentIds.length,
     user_ids: studentIds
   }
 
-  return dispatch.getJSON(url, params)
+  return options.dispatch.getJSON(url, params)
 }
 
 function getSubmissionsForStudents(courseId, studentIds, allEnqueued, dispatch) {
@@ -94,15 +94,15 @@ function getSubmissionsForStudents(courseId, studentIds, allEnqueued, dispatch) 
   })
 }
 
-function getContentForStudentIdChunk(studentIds, options, dispatch) {
-  const {gradebook} = options
+function getContentForStudentIdChunk(studentIds, options) {
+  const {dispatch, gradebook} = options
 
   let resolveEnqueued
   const allEnqueued = new Promise(resolve => {
     resolveEnqueued = resolve
   })
 
-  const studentRequest = getStudentsChunk(options.courseId, studentIds, options, dispatch).then(
+  const studentRequest = getStudentsChunk(options.courseId, studentIds, options).then(
     gradebook.gotChunkOfStudents
   )
 
@@ -140,30 +140,38 @@ function getContentForStudentIdChunk(studentIds, options, dispatch) {
 }
 
 export default class StudentContentDataLoader {
-  constructor(options, dispatch) {
-    this.options = options
-    this.dispatch = dispatch
+  constructor({dispatch, gradebook}) {
+    this._dispatch = dispatch
+    this._gradebook = gradebook
   }
 
   load(studentIds) {
+    const gradebook = this._gradebook
+
     if (studentIds.length === 0) {
+      gradebook.updateStudentsLoaded(true)
+      gradebook.updateSubmissionsLoaded(true)
       return
+    }
+
+    const options = {
+      courseId: gradebook.course.id,
+      dispatch: this._dispatch,
+      gradebook,
+      studentsChunkSize: gradebook.options.api_max_per_page,
+      submissionsChunkSize: gradebook.options.chunk_size
     }
 
     const studentRequests = []
     const submissionRequests = []
-    const studentIdChunks = chunk(studentIds, this.options.studentsChunkSize)
+    const studentIdChunks = chunk(studentIds, options.studentsChunkSize)
 
     // wait for all chunk requests to have been enqueued
     return new Promise(resolve => {
       const getNextChunk = () => {
         if (studentIdChunks.length) {
           const nextChunkIds = studentIdChunks.shift()
-          const chunkRequestDatum = getContentForStudentIdChunk(
-            nextChunkIds,
-            this.options,
-            this.dispatch
-          )
+          const chunkRequestDatum = getContentForStudentIdChunk(nextChunkIds, options)
 
           // when the current chunk requests are all enqueued
           chunkRequestDatum.allEnqueued.then(() => {
@@ -177,15 +185,20 @@ export default class StudentContentDataLoader {
       }
 
       getNextChunk()
-    }).then(() => {
-      const {courseSettings, finalGradeOverrides} = this.options.gradebook
-      let finalGradeOverridesRequest
-      if (courseSettings.allowFinalGradeOverride) {
-        finalGradeOverridesRequest = finalGradeOverrides.loadFinalGradeOverrides()
-      }
-
-      // wait for all student, submission, and final grade override requests to return
-      return Promise.all([...studentRequests, ...submissionRequests, finalGradeOverridesRequest])
     })
+      .then(() => {
+        const {courseSettings, finalGradeOverrides} = gradebook
+        let finalGradeOverridesRequest
+        if (courseSettings.allowFinalGradeOverride) {
+          finalGradeOverridesRequest = finalGradeOverrides.loadFinalGradeOverrides()
+        }
+
+        // wait for all student, submission, and final grade override requests to return
+        return Promise.all([...studentRequests, ...submissionRequests, finalGradeOverridesRequest])
+      })
+      .then(() => {
+        gradebook.updateStudentsLoaded(true)
+        gradebook.updateSubmissionsLoaded(true)
+      })
   }
 }
