@@ -91,16 +91,15 @@ pipeline {
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     NAME = getImageTagVersion()
     CANVAS_LMS_IMAGE = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms"
-    CANVAS_LMS_CACHE_IMAGE = "artifactory.inst-ci.net/jenkins/canvas-lms"
 
     // e.g. postgres-9.5-ruby-passenger-2.4-xenial
     TAG_SUFFIX = "postgres-$POSTGRES-ruby-passenger-$RUBY_PASSENGER"
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-passenger-2.6
-    PATCHSET_TAG = "$CANVAS_LMS_CACHE_IMAGE:$NAME-$TAG_SUFFIX"
+    PATCHSET_TAG = "$CANVAS_LMS_IMAGE:$NAME-$TAG_SUFFIX"
 
     // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-passenger-2.4-xenial
-    PUBLISHABLE_TAG = "$CANVAS_LMS_CACHE_IMAGE:$NAME-postgres-9.5-ruby-passenger-2.4-xenial"
+    PUBLISHABLE_TAG = "$CANVAS_LMS_IMAGE:$NAME-postgres-9.5-ruby-passenger-2.4-xenial"
 
     // e.g. canvas-lms:master when not on another branch
     MERGE_TAG = "$CANVAS_LMS_IMAGE:$GERRIT_BRANCH"
