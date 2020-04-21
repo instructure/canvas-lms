@@ -76,6 +76,10 @@ def isPatchsetPublishable() {
   env.PATCHSET_TAG == env.PUBLISHABLE_TAG
 }
 
+def isPatchsetSlackableOnFailure() {
+  env.SLACK_MESSAGE_ON_FAILURE == 'true' && env.GERRIT_EVENT_TYPE == 'change-merged'
+}
+
 // WARNING! total hack, being removed after covid...
 def isCovid() {
   env.GERRIT_BRANCH == 'covid'
@@ -395,7 +399,7 @@ pipeline {
   post {
     failure {
       script {
-        if (isPatchsetPublishable() && env.GERRIT_EVENT_TYPE == 'change-merged') {
+        if (isPatchsetSlackableOnFailure()) {
           def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
           def authorSegment = env.GERRIT_EVENT_ACCOUNT_NAME ? "Patchset by ${env.GERRIT_EVENT_ACCOUNT_NAME}. " : ''
           slackSend(
