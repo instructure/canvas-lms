@@ -14,6 +14,9 @@
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": " Сталася помилка під час створення попереднього перегляду файлу"
   },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "Сталася помилка при виконанні запиту мережі"
+  },
   "announcement_list_da155734": { "message": "Список оголошень" },
   "announcements_a4b8ed4a": { "message": "Оголошення" },
   "apps_54d24a47": { "message": "Застосунки" },
@@ -53,6 +56,7 @@
     "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
   },
   "course_files_62deb8f8": { "message": "Файли курсу" },
+  "course_files_a31f97fc": { "message": "Файли курсу" },
   "course_navigation_dd035109": { "message": "Навігація курсу" },
   "custom_6979cd81": { "message": "Звичай" },
   "decrease_indent_de6343ab": { "message": "Зменшити відступ" },
@@ -78,6 +82,7 @@
     "message": "Генерується попередній перегляд..."
   },
   "grades_a61eba0a": { "message": "Оцінки" },
+  "group_files_82e5dcdb": { "message": "Файли групи" },
   "group_navigation_99f191a": { "message": "Навігація групи" },
   "image_8ad06": { "message": "Зображення" },
   "images_7ce26570": { "message": "Зображення" },
@@ -102,8 +107,10 @@
   "loading_25990131": { "message": "Завантаження..." },
   "loading_bde52856": { "message": "Завантаження" },
   "loading_failed_b3524381": { "message": "Невдале завантаження..." },
+  "locked_762f138b": { "message": "Заблоковано" },
   "media_af190855": { "message": "Носій інформації" },
   "modules_c4325335": { "message": "Розділи" },
+  "my_files_2f621040": { "message": "Мої файли" },
   "next_page_d2a39853": { "message": "Наступна Сторінка" },
   "no_e16d9132": { "message": "Ні" },
   "no_results_940393cf": { "message": "Результати відсутні." },

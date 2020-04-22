@@ -1,6 +1,9 @@
 {
   "add_8523c19b": { "message": "הוספה" },
   "all_4321c3a1": { "message": "כל" },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "אירעה שגיאה ביצירת בקשת רשת"
+  },
   "announcement_list_da155734": { "message": "רשימת הכרזות" },
   "announcements_a4b8ed4a": { "message": "הכרזות" },
   "apps_54d24a47": { "message": "אפליקציות" },
@@ -24,6 +27,7 @@
     "message": "{ count, plural,\n    one {}\n    two {}\n   many {}\n  other {}\n}"
   },
   "course_files_62deb8f8": { "message": "קובצי קורס" },
+  "course_files_a31f97fc": { "message": "קבצי קורס" },
   "course_navigation_dd035109": { "message": "ניווט בקורס" },
   "custom_6979cd81": { "message": "ידני" },
   "decrease_indent_de6343ab": { "message": "הצרת עימוד" },
@@ -38,6 +42,7 @@
   "files_index_af7c662b": { "message": "אינדקס קבצים" },
   "generating_preview_45b53be0": { "message": "מכין תצוגה מקדימה..." },
   "grades_a61eba0a": { "message": "הערכות" },
+  "group_files_82e5dcdb": { "message": "קבצי קבוצה" },
   "group_navigation_99f191a": { "message": "ניווט בקבוצה" },
   "image_8ad06": { "message": "תמונה" },
   "images_7ce26570": { "message": "תמונות" },
@@ -60,8 +65,10 @@
   "loading_25990131": { "message": "בטעינה... " },
   "loading_bde52856": { "message": "טוען" },
   "loading_failed_b3524381": { "message": "טעינה נכשלה..." },
+  "locked_762f138b": { "message": "נעול" },
   "media_af190855": { "message": "מדיה" },
   "modules_c4325335": { "message": "מודולים" },
+  "my_files_2f621040": { "message": "הקבצים שלי" },
   "no_e16d9132": { "message": "לא" },
   "no_results_940393cf": { "message": "אין תוצאות" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {

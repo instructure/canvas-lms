@@ -1,6 +1,9 @@
 {
   "add_8523c19b": { "message": "افزودن" },
   "all_4321c3a1": { "message": "همه" },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "برای یک  درخواست شبکه خطا رخ داده است"
+  },
   "announcement_list_da155734": { "message": "فهرست اطلاعیه" },
   "announcements_a4b8ed4a": { "message": "اطلاعیه ها" },
   "apps_54d24a47": { "message": "برنامه ها" },
@@ -26,6 +29,7 @@
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
   },
   "course_files_62deb8f8": { "message": "فایل های درس" },
+  "course_files_a31f97fc": { "message": "فایل های درس" },
   "course_navigation_dd035109": { "message": "پیمایش درس" },
   "custom_6979cd81": { "message": "سفارشی" },
   "decrease_indent_de6343ab": { "message": "کاهش تورفتگی" },
@@ -40,6 +44,7 @@
   "files_index_af7c662b": { "message": "فهرست فایل ها" },
   "generating_preview_45b53be0": { "message": "در حال ایجاد پیش نمایش..." },
   "grades_a61eba0a": { "message": "نمره ها" },
+  "group_files_82e5dcdb": { "message": "فایل های گروه" },
   "group_navigation_99f191a": { "message": "پیمایش گروه" },
   "image_8ad06": { "message": "تصویر" },
   "images_7ce26570": { "message": "تصاویر" },
@@ -62,8 +67,10 @@
   "loading_25990131": { "message": "در حال بارگذاری..." },
   "loading_bde52856": { "message": "در حال بارگذاری" },
   "loading_failed_b3524381": { "message": "Loading failed..." },
+  "locked_762f138b": { "message": "قفل شده" },
   "media_af190855": { "message": "رسانه" },
   "modules_c4325335": { "message": "ماژول ها" },
+  "my_files_2f621040": { "message": "فایل های من" },
   "next_page_d2a39853": { "message": "صفحه بعد" },
   "no_e16d9132": { "message": "خیر" },
   "no_results_940393cf": { "message": "No results." },

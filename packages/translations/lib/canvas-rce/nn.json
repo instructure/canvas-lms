@@ -3,6 +3,7 @@
     "message": "Sjekk for universell utforming"
   },
   "add_8523c19b": { "message": "Legg til" },
+  "add_another_f4e50d57": { "message": "Legg til ei ny" },
   "add_cc_subtitles_55f0394e": { "message": "Legg til undertekstar" },
   "align_11050992": { "message": "Juster" },
   "align_center_ca078feb": { "message": "Midtstill" },
@@ -14,6 +15,12 @@
   "alt_text_611fb322": { "message": "Alternativ tekst" },
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": "Det oppstod eit problem under førehandsvising av fila"
+  },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "Det oppstod ein feil ved nettverksførespurnaden "
+  },
+  "an_error_occurred_uploading_your_media_71f1444d": {
+    "message": "Det oppstod ein feil under opplasting av media"
   },
   "announcement_list_da155734": { "message": "Kunngjeringsliste" },
   "announcements_a4b8ed4a": { "message": "Kunngjeringar" },
@@ -32,6 +39,7 @@
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Opne automatisk i integrert førehandsvising (sjå førehandsvisinga etter lagring)"
   },
+  "available_folders_694d0436": { "message": "Tilgjengelege mapper" },
   "cancel_caeb1e68": { "message": "Avbryt" },
   "canvas_plugins_705a5016": { "message": "Canvas-programtillegg" },
   "choose_caption_file_9c45bc4e": { "message": "Vel undertekstfil" },
@@ -75,6 +83,7 @@
   },
   "course_documents_104d76e0": { "message": "Emnedokument" },
   "course_files_62deb8f8": { "message": "Emnefiler" },
+  "course_files_a31f97fc": { "message": "Emnefiler" },
   "course_images_f8511d04": { "message": "Emnebilde" },
   "course_links_b56959b9": { "message": "Emnelenker" },
   "course_media_ec759ad": { "message": "Emnemedier" },
@@ -137,6 +146,8 @@
   "external_links_3d9f074e": { "message": "Eksterne lenker" },
   "extra_large_b6cdf1ff": { "message": "Ekstra stor" },
   "file_name_8fd421ff": { "message": "Filnamn" },
+  "file_upload_failed_af22dd91": { "message": "Filopplasting mislukkast" },
+  "file_uploading_56c9c0c8": { "message": "Filopplasting" },
   "file_url_c12b64be": { "message": "Fil-URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } filikon" },
   "filename_image_preview_6cef8f26": {
@@ -151,6 +162,7 @@
   "focus_the_popup_context_toolbar_7979f4f8": {
     "message": "Sentrer popup-menyen"
   },
+  "folder_tree_fbab0726": { "message": "Mappestruktur" },
   "formatting_5b143aa8": { "message": "Formatering" },
   "found_auto_saved_content_3f6e4ca5": { "message": "Fann auto-lagra innhald" },
   "generating_preview_45b53be0": { "message": "Genererer førehandsvising..." },
@@ -162,6 +174,7 @@
   },
   "grades_a61eba0a": { "message": "Vurderingar" },
   "group_files_4324f3df": { "message": "Gruppefiler" },
+  "group_files_82e5dcdb": { "message": "Gruppefiler" },
   "group_navigation_99f191a": { "message": "Gruppenavigering" },
   "heading_2_5b84eed2": { "message": "Overskrift 2" },
   "heading_3_2c83de44": { "message": "Overskrift 3" },
@@ -196,7 +209,9 @@
   "loading_bde52856": { "message": "Lastar" },
   "loading_failed_b3524381": { "message": "Opplasting mislukkast..." },
   "loading_failed_e6a9d8ef": { "message": "Opplasting mislukkast." },
+  "loading_folders_d8b5869e": { "message": "Lastar mapper" },
   "loading_media_f3455841": { "message": "Lastar media." },
+  "locked_762f138b": { "message": "Låst" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },
   "mic_a7f3d311": { "message": "Mic" },
@@ -205,6 +220,7 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Må vere minst { width } x { height }px"
   },
+  "my_files_2f621040": { "message": "Mine filer" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviger gjennom menyen eller verktøylinja"
   },
@@ -213,6 +229,7 @@
     "message": "Ingen alternativ tekst (dekorativt bilde)"
   },
   "no_e16d9132": { "message": "Nei" },
+  "no_file_chosen_9a880793": { "message": "Ingen filer er valde" },
   "no_results_940393cf": { "message": "Utan resultat. " },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultat funne for { filterTerm }"
@@ -272,6 +289,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Noko gjekk gale. Veit ikkje kva som kan visast."
   },
+  "something_went_wrong_d238c551": { "message": "Noko gjekk gale" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
     "message": "Noko gjekk gale, prøv ein gong til etter at sida er lasta inn på nytt"
   },
@@ -285,7 +303,11 @@
   "styles_2aa721ef": { "message": "Stilar" },
   "submit_a3cc6859": { "message": "Send!" },
   "subscript_59744f96": { "message": "Senka skrift" },
+  "success_file_uploaded_8174e93f": { "message": "Vellukka: fil lasta opp" },
   "superscript_8cb349a2": { "message": "Heva skrift" },
+  "supported_file_types_srt_or_webvtt_7d827ed": {
+    "message": "Støtta filtypar: SRT og WebVTT"
+  },
   "switch_to_raw_html_editor_4c9ac7de": { "message": "Bytt til html-editor" },
   "switch_to_rich_text_editor_35822d26": {
     "message": "Bytt til rikt innhald-editor"
@@ -318,6 +340,9 @@
   "upload_file_fd2361b8": { "message": "Last opp fil" },
   "upload_image_6120b609": { "message": "Last opp bilde" },
   "upload_media_ce31135a": { "message": "Last opp media" },
+  "upload_not_available_for_this_folder_8f8623c6": {
+    "message": "Opplasting er ikkje tilgjengeleg for denne mappa"
+  },
   "upload_record_media_e4207d72": { "message": "Last opp/Ta opp media" },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "alfabetisk ordna liste i store bokstavar"
