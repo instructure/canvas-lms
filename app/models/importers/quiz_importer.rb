@@ -198,6 +198,7 @@ module Importers
         allowed_attempts
         time_limit
         shuffle_answers
+        disable_timer_autosubmission
         show_correct_answers
         points_possible
         hide_results
