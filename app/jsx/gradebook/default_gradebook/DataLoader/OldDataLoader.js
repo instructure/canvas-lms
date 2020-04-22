@@ -18,13 +18,8 @@
 
 import {difference} from 'lodash'
 
-function getCustomColumns(courseId, dispatch) {
-  const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
-  return dispatch.getDepaginated(url, {include_hidden: true})
-}
-
 function loadGradebookData(opts) {
-  const {dataLoader, dispatch, gradebook} = opts
+  const {dataLoader, gradebook} = opts
 
   const gotAssignmentGroups = opts.getAssignmentGroups
     ? dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
@@ -41,7 +36,9 @@ function loadGradebookData(opts) {
     gotGradingPeriodAssignments = dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
   }
 
-  const gotCustomColumns = opts.getCustomColumns ? getCustomColumns(opts.courseId, dispatch) : null
+  const gotCustomColumns = opts.getCustomColumns
+    ? dataLoader.customColumnsLoader.loadCustomColumns()
+    : null
 
   const gotContextModules = opts.getContextModules
     ? dataLoader.contextModulesLoader.loadContextModules()

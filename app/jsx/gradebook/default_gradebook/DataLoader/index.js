@@ -20,6 +20,7 @@ import {RequestDispatch} from '../../../shared/network'
 import AssignmentGroupsLoader from './AssignmentGroupsLoader'
 import ContextModulesLoader from './ContextModulesLoader'
 import CustomColumnsDataLoader from './CustomColumnsDataLoader'
+import CustomColumnsLoader from './CustomColumnsLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
 import OldDataLoader from './OldDataLoader'
 import StudentContentDataLoader from './StudentContentDataLoader'
@@ -40,6 +41,7 @@ export default class DataLoader {
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.contextModulesLoader = new ContextModulesLoader(loaderConfig)
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
+    this.customColumnsLoader = new CustomColumnsLoader(loaderConfig)
     this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
     this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
     this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
@@ -47,25 +49,15 @@ export default class DataLoader {
 
   loadInitialData() {
     const gradebook = this._gradebook
-    const {options} = gradebook
 
     const promises = OldDataLoader.loadGradebookData({
       dataLoader: this,
-      dispatch: this.dispatch,
       gradebook,
-
-      activeRequestLimit: options.performanceControls?.active_request_limit,
-      courseId: options.context_id,
 
       getAssignmentGroups: true,
       getContextModules: true,
       getCustomColumns: true,
       getGradingPeriodAssignments: gradebook.gradingPeriodSet != null
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotCustomColumns.then(customColumns => {
-      gradebook.gotCustomColumns(customColumns)
     })
 
     // TODO: In TALLY-769, remove this entire block.
@@ -122,17 +114,13 @@ export default class DataLoader {
 
   _reloadStudentData(loadOptions) {
     const gradebook = this._gradebook
-    const {options} = gradebook
 
     gradebook.updateStudentsLoaded(false)
     gradebook.updateSubmissionsLoaded(false)
 
     OldDataLoader.loadGradebookData({
       dataLoader: this,
-      dispatch: this.dispatch,
       gradebook,
-
-      courseId: options.context_id,
 
       getGradingPeriodAssignments:
         loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null

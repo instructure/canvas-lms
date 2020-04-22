@@ -19,7 +19,7 @@
 import sinon from 'sinon'
 
 import waitForCondition from 'jsx/shared/__tests__/waitForCondition'
-import FakeServer, {paramsFromRequest} from 'jsx/shared/network/__tests__/FakeServer'
+import FakeServer from 'jsx/shared/network/__tests__/FakeServer'
 import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 
@@ -301,33 +301,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       strictEqual(dataLoader.contextModulesLoader.loadContextModules.callCount, 1)
     })
 
-    QUnit.module('loading custom columns', () => {
-      test('sends a request for each page of custom columns', async () => {
-        await loadInitialData()
-        const requests = server.filterRequests(urls.customColumns)
-        strictEqual(requests.length, 2)
-      })
-
-      test('includes hidden custom columns', async () => {
-        await loadInitialData()
-        const requests = server.filterRequests(urls.customColumns)
-        const includeHidden = requests.map(request => paramsFromRequest(request).include_hidden)
-        deepEqual(includeHidden, ['true', 'true'])
-      })
-
-      test('updates the custom columns in the gradebook', async () => {
-        await loadInitialData()
-        strictEqual(gradebook.gotCustomColumns.callCount, 1)
-      })
-
-      test('includes the loaded custom columns when updating the gradebook', async () => {
-        await loadInitialData()
-        const [customColumns] = gradebook.gotCustomColumns.lastCall.args
-        deepEqual(
-          customColumns.map(column => column.id),
-          exampleData.customColumns.map(column => column.id)
-        )
-      })
+    test('loads custom columns', async () => {
+      sinon.spy(dataLoader.customColumnsLoader, 'loadCustomColumns')
+      await loadInitialData()
+      strictEqual(dataLoader.customColumnsLoader.loadCustomColumns.callCount, 1)
     })
 
     test('loads student content', async () => {
