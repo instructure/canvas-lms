@@ -215,10 +215,9 @@ class NotificationMessageCreator
     return if channel.path_type != 'email'
     return unless notifications_enabled_for_course?(user)
 
-    policy = channel.notification_policies.where(notification_id: notification.id).first_or_create do |np|
-      np.notification = notification
-      np.frequency = notification.default_frequency(user)
-    end
+    # We use find here because the policies are already loaded and we don't want to execute a query
+    policy = channel.notification_policies.find { |np| np.notification_id == notification.id }
+    policy ||= channel.notification_policies.create!(notification_id: notification.id, frequency: notification.default_frequency(user))
     policy if ['daily', 'weekly'].include?(policy.frequency)
   end
 
