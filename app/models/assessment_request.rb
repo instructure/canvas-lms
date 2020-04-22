@@ -79,8 +79,7 @@ class AssessmentRequest < ActiveRecord::Base
   scope :for_assessor, lambda { |assessor_id| where(:assessor_id => assessor_id) }
   scope :for_asset, lambda { |asset_id| where(:asset_id => asset_id)}
   scope :for_assignment, lambda { |assignment_id| eager_load(:submission).where(:submissions => { :assignment_id => assignment_id})}
-  scope :for_course, lambda { |course_id| eager_load(:submission).where(:submissions => { :context_code => "course_#{course_id}"})}
-  scope :for_context_codes, lambda { |context_codes| eager_load(:submission).where(:submissions => { :context_code =>context_codes })}
+  scope :for_courses, lambda { |courses| eager_load(:submission).where(:submissions => { :course_id => courses})}
 
   scope :not_ignored_by, lambda { |user, purpose|
     where("NOT EXISTS (?)",

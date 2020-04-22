@@ -912,7 +912,7 @@ class UsersController < ApplicationController
       end
 
       paginated_collection = BookmarkedCollection.merge(*collections)
-      todos = Api.paginate(paginated_collection, self, api_v1_user_todo_list_items_url)  
+      todos = Api.paginate(paginated_collection, self, api_v1_user_todo_list_items_url)
       render :json => todos
     end
   end
@@ -2563,7 +2563,7 @@ class UsersController < ApplicationController
     # find all ungraded submissions in one query
     ungraded_submissions = course.submissions.
         where.not(:assignments => {:workflow_state => 'deleted'}).
-        preload(:assignment).
+        eager_load(:assignment).
         where("user_id IN (?) AND #{Submission.needs_grading_conditions}", ids).
         except(:order).
         order(:submitted_at).to_a

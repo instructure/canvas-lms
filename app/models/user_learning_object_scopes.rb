@@ -251,7 +251,7 @@ module UserLearningObjectScopes
                AND assessor_asset.assignment_id = assignments.id").
         where(assessor_id: id)
       ar_scope = ar_scope.incomplete unless scope_only
-      ar_scope = ar_scope.for_context_codes(shard_course_ids.map { |course_id| "course_#{course_id}"})
+      ar_scope = ar_scope.for_courses(shard_course_ids)
 
       # The below merging of scopes mimics a portion of the behavior for checking the access policy
       # for the submissions, ensuring that the user has access and can read & comment on them.
@@ -298,27 +298,10 @@ module UserLearningObjectScopes
                      purpose: 'grading').where('asset_id=submissions.assignment_id')).count
   end
 
-  def assignments_needing_grading(scope_only: false, **opts)
+  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, **opts)
     if ::Canvas::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
       return scope_only ? Assignment.none : []
     end
-    if Setting.get('assignments_needing_grading_b', 'true') == 'true'
-      assignments_needing_grading_b(scope_only: scope_only, **opts)
-    else
-      assignments_needing_grading_a(scope_only: scope_only, **opts)
-    end
-  end
-
-  # TODO: can remove when course_id is populated
-  def course_id_populated_on_submissions?
-    Setting.get("course_id_populated_on_submissions", "false") == "true"
-  end
-
-  def assignments_needing_grading_a(
-    limit: ULOS_DEFAULT_LIMIT,
-    scope_only: false,
-    **opts # arguments that are just forwarded to objects_needing
-  )
     params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
     objects_needing('Assignment', 'grading', :manage_grades, params, 120.minutes, **params) do |assignment_scope|
@@ -340,70 +323,15 @@ module UserLearningObjectScopes
   end
 
   def grader_visible_submissions_sql
-    course_id_sql = course_id_populated_on_submissions? ? "submissions.course_id" : "assignments.context_id"
     "SELECT submissions.id
        FROM #{Submission.quoted_table_name}
        INNER JOIN #{Enrollment.quoted_table_name} AS student_enrollments ON student_enrollments.user_id = submissions.user_id
-                                                                        AND student_enrollments.course_id = #{course_id_sql}
+                                                                        AND student_enrollments.course_id = submissions.course_id
       WHERE submissions.assignment_id = assignments.id
         AND (enrollments.limit_privileges_to_course_section = 'f'
          OR enrollments.course_section_id = student_enrollments.course_section_id)
         AND #{Submission.needs_grading_conditions}
         AND student_enrollments.workflow_state = 'active'"
-  end
-
-  def assignments_needing_grading_b(
-    limit: ULOS_DEFAULT_LIMIT,
-    scope_only: false,
-    **opts # arguments that are just forwarded to objects_needing
-  )
-    params = _params_hash(binding)
-    # not really any harm in extending the expires_in since we touch the user anyway when grades change
-    objects_needing('Assignment', 'grading', :manage_grades, params, 120.minutes, **params) do |assignment_scope|
-      enrollment_join_sql = course_id_populated_on_submissions? ?
-        "INNER JOIN #{Enrollment.quoted_table_name} AS student_enrollments ON student_enrollments.user_id = submissions.user_id
-                                                    AND student_enrollments.course_id = submissions.course_id" :
-        "INNER JOIN #{Enrollment.quoted_table_name} AS student_enrollments ON student_enrollments.user_id = submissions.user_id
-         INNER JOIN base_assignments AS assignments ON student_enrollments.course_id = assignments.context_id
-                                                    AND submissions.assignment_id = assignments.id"
-      as = Assignment.from("(with base_assignments as (
-          #{assignment_scope.to_sql}
-        ), sub_exists as (
-          SELECT submissions.assignment_id, student_enrollments.course_section_id
-          FROM #{Submission.quoted_table_name}
-          #{enrollment_join_sql}
-          WHERE submissions.submission_type IS NOT NULL
-            AND submissions.excused IS NOT TRUE
-            AND (submissions.workflow_state = 'pending_review'
-               OR (submissions.workflow_state IN ('submitted', 'graded')
-                AND (submissions.score IS NULL
-                   OR submissions.grade_matches_current_submission = 'f')))
-            AND student_enrollments.workflow_state = 'active'
-        ), filtered as (
-          SELECT distinct on (assignments.id) assignments.*
-          FROM base_assignments AS assignments
-          INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id
-          INNER JOIN sub_exists se on se.assignment_id = assignments.id
-          WHERE enrollments.user_id = '#{self.id}'
-            AND enrollments.workflow_state = 'active'
-            AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')
-            AND (
-              enrollments.limit_privileges_to_course_section IS FALSE
-              OR
-              enrollments.course_section_id = se.course_section_id
-            )
-          ORDER BY assignments.id
-        )
-        SELECT * FROM filtered ORDER BY due_at) as assignments").
-        preload(:context)
-      if scope_only
-        as # This needs the below `select` somehow to work
-      else
-        Shackles.activate(:slave) do
-          as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
-        end
-      end
-    end
   end
 
   def assignments_needing_moderation(
