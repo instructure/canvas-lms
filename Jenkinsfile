@@ -69,6 +69,27 @@ def wrapBuildExecution(jobName, parameters, urlExtra) {
   }
 }
 
+// if the build never starts or gets into a node block, then we
+// can never load a file. and a very noisy/confusing error is thrown.
+def ignoreBuildNeverStartedError(block) {
+  try {
+    block()
+  }
+  catch (org.jenkinsci.plugins.workflow.steps.MissingContextVariableException ex) {
+    if (!ex.message.startsWith('Required context class hudson.FilePath is missing')) {
+      throw ex
+    }
+    else {
+      echo "ignored MissingContextVariableException: \n${ex.message}"
+    }
+    // we can ignore this very noisy error
+  }
+}
+
+def buildRegistryFQDN() {
+  load('build/new-jenkins/groovy/configuration.groovy').buildRegistryFQDN()
+}
+
 // ignore builds where the current patchset tag doesn't match the
 // mainline publishable tag. i.e. ignore ruby-passenger-2.6/pg-12
 // upgrade builds
@@ -96,15 +117,17 @@ pipeline {
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     NAME = getImageTagVersion()
     CANVAS_LMS_IMAGE = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms"
+    BUILD_REGISTRY_FQDN = buildRegistryFQDN()
+    BUILD_IMAGE = "$BUILD_REGISTRY_FQDN/jenkins/canvas-lms"
 
     // e.g. postgres-9.5-ruby-passenger-2.4-xenial
     TAG_SUFFIX = "postgres-$POSTGRES-ruby-passenger-$RUBY_PASSENGER"
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-passenger-2.6
-    PATCHSET_TAG = "$CANVAS_LMS_IMAGE:$NAME-$TAG_SUFFIX"
+    PATCHSET_TAG = "$BUILD_IMAGE:$NAME-$TAG_SUFFIX"
 
     // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-passenger-2.4-xenial
-    PUBLISHABLE_TAG = "$CANVAS_LMS_IMAGE:$NAME-postgres-9.5-ruby-passenger-2.4-xenial"
+    PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-postgres-9.5-ruby-passenger-2.4-xenial"
 
     // e.g. canvas-lms:master when not on another branch
     MERGE_TAG = "$CANVAS_LMS_IMAGE:$GERRIT_BRANCH"
@@ -413,14 +436,18 @@ pipeline {
     }
     always {
       script {
-        def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
-        rspec.uploadSeleniumFailures()
-        rspec.uploadRSpecFailures()
-        load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
+        ignoreBuildNeverStartedError {
+          def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
+          rspec.uploadSeleniumFailures()
+          rspec.uploadRSpecFailures()
+          load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
+        }
       }
     }
     cleanup {
-      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+      ignoreBuildNeverStartedError {
+        sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+      }
     }
   }
 }
