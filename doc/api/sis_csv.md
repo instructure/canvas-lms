@@ -496,7 +496,7 @@ specified the default term for the account will be used</td>
 <td>enum</td>
 <td>✓</td>
 <td>✓</td>
-<td>active, deleted, completed</td>
+<td>active, deleted, completed, published</td>
 </tr>
 <tr>
 <td>integration_id</td>
