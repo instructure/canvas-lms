@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {difference} from 'lodash'
+
 import {RequestDispatch} from '../../../shared/network'
 import AssignmentGroupsLoader from './AssignmentGroupsLoader'
 import ContextModulesLoader from './ContextModulesLoader'
 import CustomColumnsDataLoader from './CustomColumnsDataLoader'
 import CustomColumnsLoader from './CustomColumnsLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
-import OldDataLoader from './OldDataLoader'
 import StudentContentDataLoader from './StudentContentDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
 
@@ -50,7 +51,7 @@ export default class DataLoader {
   loadInitialData() {
     const gradebook = this._gradebook
 
-    const promises = OldDataLoader.loadGradebookData({
+    const promises = this.__loadGradebookData({
       dataLoader: this,
       gradebook,
 
@@ -93,37 +94,87 @@ export default class DataLoader {
   }
 
   reloadStudentDataForEnrollmentFilterChange() {
-    this._reloadStudentData({
+    this.__reloadStudentData({
       getGradingPeriodAssignments: true
     })
   }
 
   reloadStudentDataForSectionFilterChange() {
-    this._reloadStudentData({
+    this.__reloadStudentData({
       getGradingPeriodAssignments: false
     })
   }
 
   reloadStudentDataForStudentGroupFilterChange() {
-    this._reloadStudentData({
+    this.__reloadStudentData({
       getGradingPeriodAssignments: false
     })
   }
 
   // PRIVATE
 
-  _reloadStudentData(loadOptions) {
+  __reloadStudentData(loadOptions) {
     const gradebook = this._gradebook
 
     gradebook.updateStudentsLoaded(false)
     gradebook.updateSubmissionsLoaded(false)
 
-    OldDataLoader.loadGradebookData({
+    this.__loadGradebookData({
       dataLoader: this,
       gradebook,
 
       getGradingPeriodAssignments:
         loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null
     })
+  }
+
+  __loadGradebookData(opts) {
+    const {dataLoader, gradebook} = opts
+
+    // Store currently-loaded student ids for diffing below.
+    const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
+
+    // Begin loading Student IDs before any other data.
+    const gotStudentIds = dataLoader.studentIdsLoader.loadStudentIds()
+
+    const gotAssignmentGroups = opts.getAssignmentGroups
+      ? dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
+      : null
+
+    const gotGradingPeriodAssignments = opts.getGradingPeriodAssignments
+      ? dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
+      : null
+
+    const gotCustomColumns = opts.getCustomColumns
+      ? dataLoader.customColumnsLoader.loadCustomColumns()
+      : null
+
+    const gotContextModules = opts.getContextModules
+      ? dataLoader.contextModulesLoader.loadContextModules()
+      : null
+
+    gotStudentIds
+      .then(() => {
+        const studentIds = gradebook.courseContent.students.listStudentIds()
+        const studentIdsToLoad = difference(studentIds, loadedStudentIds)
+
+        return dataLoader.studentContentDataLoader.load(studentIdsToLoad)
+      })
+      .then(() => {
+        /*
+         * Currently, custom columns data has the lowest priority for initial
+         * data loading, so it waits until all students and submissions are
+         * finished loading.
+         */
+        dataLoader.customColumnsDataLoader.loadCustomColumnsData()
+      })
+
+    return {
+      gotAssignmentGroups,
+      gotContextModules,
+      gotCustomColumns,
+      gotGradingPeriodAssignments,
+      gotStudentIds
+    }
   }
 }
