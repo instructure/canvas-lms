@@ -140,14 +140,14 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         strictEqual(requests.length, 2)
       })
 
-      test('calls the students page callback when each students page request resolves', async () => {
+      test('updates the gradebook with each chunk of loaded students', async () => {
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
         await load()
         strictEqual(gradebook.gotChunkOfStudents.callCount, 2)
       })
 
-      test('includes loaded students with each callback', async () => {
+      test('includes loaded students when updating the gradebook', async () => {
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
         const loadedStudents = []
@@ -158,10 +158,40 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         deepEqual(loadedStudents, exampleData.students)
       })
 
-      test('does not request students when given an empty list of student ids', async () => {
-        await load([])
-        const requests = server.filterRequests(urls.students)
-        strictEqual(requests.length, 0)
+      QUnit.module('when no students needed to be loaded', () => {
+        test('does not request students', async () => {
+          await load([])
+          const requests = server.filterRequests(urls.students)
+          strictEqual(requests.length, 0)
+        })
+
+        test('does not request submissions', async () => {
+          await load([])
+          const requests = server.filterRequests(urls.submissions)
+          strictEqual(requests.length, 0)
+        })
+
+        test('updates the "students loaded" status', async () => {
+          await load([])
+          strictEqual(gradebook.updateStudentsLoaded.callCount, 1)
+        })
+
+        test('sets the students as loaded', async () => {
+          await load([])
+          const [loaded] = gradebook.updateStudentsLoaded.lastCall.args
+          strictEqual(loaded, true)
+        })
+
+        test('updates the "submissions loaded" status', async () => {
+          await load([])
+          strictEqual(gradebook.updateSubmissionsLoaded.callCount, 1)
+        })
+
+        test('sets the submissions as loaded', async () => {
+          await load([])
+          const [loaded] = gradebook.updateSubmissionsLoaded.lastCall.args
+          strictEqual(loaded, true)
+        })
       })
     })
 
@@ -193,14 +223,14 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         ok(params.response_fields.includes('posted_at'))
       })
 
-      test('calls the submissions chunk callback for each chunk of submissions', async () => {
+      test('updates the gradebook with each chunk of submissions', async () => {
         const submissionChunks = []
         gradebook.gotSubmissionsChunk = submissionChunks.push.bind(submissionChunks)
         await load()
         strictEqual(submissionChunks.length, 2)
       })
 
-      test('includes loaded submissions with each callback', async () => {
+      test('includes the loaded submissions when updating the gradebook', async () => {
         const submissionChunks = []
         gradebook.gotSubmissionsChunk = submissionChunks.push.bind(submissionChunks)
         await load()
@@ -417,6 +447,56 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         ]
         const studentRequest2Index = events.indexOf('request students:1103')
         ok(Math.max(...submissionRequestIndices) < studentRequest2Index)
+      })
+    })
+
+    QUnit.module('when all students have finished loading', loadingHooks => {
+      loadingHooks.beforeEach(() => {
+        gradebook.options.api_max_per_page = 2
+        setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
+        setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
+      })
+
+      function setStudentsResponse(ids, students) {
+        server.for(urls.students, {user_ids: ids}).respond({status: 200, body: students})
+      }
+
+      test('updates the "students loaded" status', async () => {
+        await load()
+        strictEqual(gradebook.updateStudentsLoaded.callCount, 1)
+      })
+
+      test('sets the students as loaded', async () => {
+        await load()
+        const [loaded] = gradebook.updateStudentsLoaded.lastCall.args
+        strictEqual(loaded, true)
+      })
+
+      test('updates the status after storing loaded students', async () => {
+        gradebook.updateStudentsLoaded.callsFake(() => {
+          strictEqual(gradebook.gotChunkOfStudents.callCount, 2)
+        })
+        await load()
+      })
+    })
+
+    QUnit.module('when all submissions have finished loading', () => {
+      test('updates the "submissions loaded" status', async () => {
+        await load()
+        strictEqual(gradebook.updateSubmissionsLoaded.callCount, 1)
+      })
+
+      test('sets the submissions as loaded', async () => {
+        await load()
+        const [loaded] = gradebook.updateSubmissionsLoaded.lastCall.args
+        strictEqual(loaded, true)
+      })
+
+      test('updates the status after storing loaded submissions', async () => {
+        gradebook.updateSubmissionsLoaded.callsFake(() => {
+          strictEqual(gradebook.gotSubmissionsChunk.callCount, 2)
+        })
+        await load()
       })
     })
 
