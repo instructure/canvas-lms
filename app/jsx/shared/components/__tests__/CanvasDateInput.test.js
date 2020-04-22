@@ -48,8 +48,8 @@ function renderAndDirtyInput(inputValue, overrides = {}) {
 const oldLocale = moment.locale()
 
 beforeEach(() => {
-  // A thursday, not directly at midnight so we can test the dates coming from this component are
-  // set to the beginning of the day and don't retain the time.
+  // Not directly at midnight so we can test the dates coming from this component are set to the
+  // beginning of the day and don't retain the time.
   MockDate.set('2020-05-19T00:42:00Z', 0)
   moment.locale('en-us')
 })
@@ -144,48 +144,37 @@ describe('choosing a day on the calendar', () => {
   })
 })
 
-describe('typing a date into the input', () => {
-  it('changes the date when the input is parseable', () => {})
-  it('sets selected date to null when input is not parseable', () => {})
-  it('changes the rendered month when the input is parseable', () => {})
-})
-
 describe('dirty input state', () => {
-  it('keeps the input when the selectedDate changes value', () => {
+  it('resets the input when selectedDate changes to a new date', () => {
     const {props, rerender, getInput} = renderAndDirtyInput('asdf')
+    expect(getInput().value).toBe('asdf')
+    const newDate = new Date()
     props.selectedDate = new Date()
     rerender(<CanvasDateInput {...props} />)
-    expect(getInput().value).toBe('asdf')
+    expect(getInput().value).toBe(newDate.toISOString())
   })
 
-  it('keeps the input when the selectedDate changes to null', () => {
+  it('resets the input when the selectedDate changes to null', () => {
     const {props, rerender, getInput} = renderAndDirtyInput('asdf', {selectedDate: new Date()})
+    expect(getInput().value).toBe('asdf')
     props.selectedDate = null
     rerender(<CanvasDateInput {...props} />)
-    expect(getInput().value).toBe('asdf')
+    expect(getInput().value).toBe('')
   })
 
-  it('keeps the input when the selectedDate changes to non-null', () => {
-    const {props, rerender, getInput} = renderAndDirtyInput('asdf')
-    props.selectedDate = new Date()
-    rerender(<CanvasDateInput {...props} />)
-    expect(getInput().value).toBe('asdf')
-  })
-
-  it('resets the input when a date is selected from the calendar, even when dirty', () => {
-    const {getByText, getInput} = renderAndDirtyInput('asdf')
-    expect(getInput().value).toBe('asdf')
-    fireEvent.click(getByText('15').closest('button'))
-    expect(getInput().value).toBe(new Date('2020-05-15').toISOString())
-  })
-
-  it('resets the dirty input when the input blurs', () => {
-    const {props, rerender, getInput} = renderAndDirtyInput('friday') // default date is Thursday
-    // parsed date gets reported, need to rerender with that
-    props.selectedDate = props.onSelectedDateChange.mock.calls[0][0]
-    rerender(<CanvasDateInput {...props} />)
+  it('calls onSelectedDateChange with parsed date when the input blurs and sets the date input', () => {
+    const {props, getInput} = renderAndDirtyInput('May 20')
+    const newDate = new Date('2020-05-20')
     fireEvent.blur(getInput())
-    expect(getInput().value).toBe(new Date('2020-05-22').toISOString())
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(newDate)
+    expect(getInput().value).toBe(newDate.toISOString())
+  })
+
+  it('calls onSelectedDateChange with on blur and garbage input, and clears the input', () => {
+    const {props, getInput} = renderAndDirtyInput('asdf')
+    fireEvent.blur(getInput())
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(null)
+    expect(getInput().value).toBe('')
   })
 })
 
@@ -229,23 +218,42 @@ describe('rendered month', () => {
     const {getByText, getInput} = renderInput()
     fireEvent.click(getInput())
     fireEvent.click(getByText('Next month'))
-    fireEvent.change(getInput(), {target: {value: 'friday'}})
-    expect(getByText('May')).toBeInTheDocument()
+    fireEvent.change(getInput(), {target: {value: 'April 20'}})
+    expect(getByText('April')).toBeInTheDocument()
   })
 })
 
 describe('error messages', () => {
-  it('shows an error message if the input date is unparseable and the input blurs', () => {
-    const {getByText, getInput} = renderAndDirtyInput('asdf')
-    fireEvent.blur(getInput())
+  it('shows an error message if the input date is unparseable', () => {
+    const {getByText} = renderAndDirtyInput('asdf')
     expect(getByText("That's not a date!")).toBeInTheDocument()
   })
 
-  it('shows an error message if the input date is unparseable and the calendar closes', () => {
-    const {getByText, getInput} = renderAndDirtyInput('asdf')
-    // Yes, this has to be keyUp. _sigh_
-    fireEvent.keyUp(getInput(), {key: 'Escape', code: 27, keyCode: 27})
-    expect(getByText("That's not a date!")).toBeInTheDocument()
+  it('clears error messages when the selectedDate changes', () => {
+    const {props, rerender, queryByText} = renderAndDirtyInput('asdf')
+    props.selectedDate = new Date()
+    rerender(<CanvasDateInput {...props} />)
+    expect(queryByText("That's not a date!")).toBeNull()
+  })
+
+  it('clears error messages when a day is clicked', () => {
+    const date = new Date()
+    const {getByText, queryByText} = renderAndDirtyInput('asdf', {selectedDate: date})
+    fireEvent.click(getByText('15'))
+    expect(queryByText("That's not a date!")).toBeNull()
+  })
+
+  it('clears error messages even when selectedDay is clicked', () => {
+    const date = new Date()
+    const {getByText, queryByText} = renderAndDirtyInput('asdf', {selectedDate: date})
+    fireEvent.click(getByText('20'))
+    expect(queryByText("That's not a date!")).toBeNull()
+  })
+
+  it('clears error messages when the input changes to an empty string', () => {
+    const {getInput, queryByText} = renderAndDirtyInput('asdf')
+    fireEvent.change(getInput(), {target: {value: ''}})
+    expect(queryByText("That's not a date!")).toBeNull()
   })
 })
 

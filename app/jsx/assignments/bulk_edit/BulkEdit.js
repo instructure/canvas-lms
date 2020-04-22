@@ -91,11 +91,15 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
   }, [jobSuccess])
 
   const setDateOnOverride = useCallback((override, dateFieldName, newDate) => {
+    const currentDate = override[dateFieldName]
+    const newDateISO = newDate?.toISOString() || null
+    if (currentDate === newDateISO || moment(currentDate).isSame(moment(newDateISO))) return
+
     const originalField = originalDateField(dateFieldName)
     if (!override.hasOwnProperty(originalField)) {
       override[originalField] = override[dateFieldName]
     }
-    override[dateFieldName] = newDate ? newDate.toISOString() : null
+    override[dateFieldName] = newDateISO
   }, [])
 
   const shiftDateOnOverride = useCallback(
@@ -118,22 +122,42 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     setProgressUrl(null)
   }, [setJobSuccess, setProgressUrl])
 
+  const findOverride = useCallback((someAssignments, assignmentId, overrideId) => {
+    const isBaseOverride = !overrideId
+    const assignment = someAssignments.find(a => a.id === assignmentId)
+    const override = assignment.all_dates.find(o => (isBaseOverride ? o.base : o.id === overrideId))
+    return override
+  }, [])
+
   const updateAssignmentDate = useCallback(
     ({dateKey, newDate, assignmentId, overrideId}) => {
-      const isBaseOverride = !overrideId
-
       clearPreviousSave()
       setAssignments(currentAssignments =>
         produce(currentAssignments, draftAssignments => {
-          const assignment = draftAssignments.find(a => a.id === assignmentId)
-          const override = assignment.all_dates.find(o =>
-            isBaseOverride ? o.base : o.id === overrideId
-          )
+          const override = findOverride(draftAssignments, assignmentId, overrideId)
           setDateOnOverride(override, dateKey, newDate)
         })
       )
     },
-    [clearPreviousSave, setDateOnOverride]
+    [clearPreviousSave, findOverride, setDateOnOverride]
+  )
+
+  const clearOverrideEdits = useCallback(
+    ({assignmentId, overrideId}) => {
+      setAssignments(currentAssignments =>
+        produce(currentAssignments, draftAssignments => {
+          const override = findOverride(draftAssignments, assignmentId, overrideId)
+          ;['due_at', 'unlock_at', 'lock_at'].forEach(dateField => {
+            const originalField = originalDateField(dateField)
+            if (override.hasOwnProperty(originalField)) {
+              override[dateField] = override[originalField]
+              delete override[originalField]
+            }
+          })
+        })
+      )
+    },
+    [findOverride]
   )
 
   const setAssignmentSelected = useCallback((assignmentId, selected) => {
@@ -296,6 +320,7 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
           updateAssignmentDate={updateAssignmentDate}
           setAssignmentSelected={setAssignmentSelected}
           selectAllAssignments={selectAllAssignments}
+          clearOverrideEdits={clearOverrideEdits}
         />
       </>
     )

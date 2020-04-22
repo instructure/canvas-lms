@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!app_shared_components_canvas_date_time'
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useRef, useState} from 'react'
 import {arrayOf, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 import moment from 'moment-timezone'
 import tz from 'timezone'
@@ -59,34 +59,31 @@ export default function CanvasDateInput({
   const todayMoment = moment().tz(timezone)
   const selectedMoment = selectedDate && moment.tz(selectedDate, timezone)
 
-  const priorSelectedMoment = useRef(null)
-  useEffect(() => {
-    priorSelectedMoment.current = selectedMoment
-  })
-
   const [inputValue, setInputValue] = useState('')
-  const [inputDirty, setInputDirty] = useState(false)
   const [isShowingCalendar, setIsShowingCalendar] = useState(false)
   const [renderedMoment, setRenderedMoment] = useState(selectedMoment || todayMoment)
   const [errorMessages, setErrorMessages] = useState([])
 
-  const selectedMomentChangedNull =
-    (selectedMoment === null && priorSelectedMoment.current !== null) ||
-    (selectedMoment !== null && priorSelectedMoment.current === null)
-  const selectedMomentChangedValue =
-    selectedMoment && !selectedMoment.isSame(priorSelectedMoment.current)
-  if (!inputDirty && (selectedMomentChangedNull || selectedMomentChangedValue)) {
+  const priorSelectedMoment = useRef(null)
+  function isDifferentMoment(firstMoment, secondMoment) {
+    const changedNull =
+      (firstMoment === null && secondMoment !== null) ||
+      (firstMoment !== null && secondMoment == null)
+    const changedValue = firstMoment && !firstMoment.isSame(secondMoment)
+    return changedNull || changedValue
+  }
+
+  if (isDifferentMoment(selectedMoment, priorSelectedMoment.current)) {
     syncInput(selectedMoment)
   }
+  // now that we've done the check, we can update this value
+  priorSelectedMoment.current = selectedMoment
 
   function syncInput(newMoment) {
     const newInputValue = newMoment ? formatDate(newMoment.toDate()) : ''
-    if (inputValue !== newInputValue) {
-      setInputValue(newInputValue)
-      setInputDirty(false)
-      setRenderedMoment(newMoment || todayMoment)
-      setErrorMessages([])
-    }
+    setInputValue(newInputValue)
+    setErrorMessages([])
+    setRenderedMoment(newMoment || todayMoment)
   }
 
   function generateMonthMoments() {
@@ -120,10 +117,15 @@ export default function CanvasDateInput({
 
   function handleChange(_event, {value}) {
     setInputValue(value)
-    setInputDirty(true)
     const newDate = tz.parse(value)
-    if (newDate) setRenderedMoment(moment.tz(newDate, timezone))
-    onSelectedDateChange(newDate)
+    if (newDate) {
+      setRenderedMoment(moment.tz(newDate, timezone))
+      setErrorMessages([])
+    } else if (value === '') {
+      setErrorMessages([])
+    } else {
+      setErrorMessages([{type: 'error', text: I18n.t("That's not a date!")}])
+    }
   }
 
   function handleDayClick(_event, {date}) {
@@ -132,21 +134,14 @@ export default function CanvasDateInput({
     onSelectedDateChange(parsedMoment.toDate())
   }
 
-  function handleValidateDate() {
-    if (!selectedMoment && inputValue) {
-      setErrorMessages([{type: 'error', text: I18n.t("That's not a date!")}])
-    }
-  }
-
   function handleBlur() {
-    if (selectedMoment) {
-      syncInput(selectedMoment)
-    }
+    const newDate = tz.parse(inputValue)
+    syncInput(newDate ? moment.tz(newDate, timezone) : null)
+    onSelectedDateChange(newDate)
   }
 
   function handleHideCalendar() {
     setIsShowingCalendar(false)
-    if (selectedMoment) syncInput(selectedMoment)
   }
 
   function modifySelectedMoment(step, type) {
@@ -159,7 +154,6 @@ export default function CanvasDateInput({
           .startOf('day')
       : renderedMoment.clone().startOf('month')
 
-    syncInput(newMoment)
     onSelectedDateChange(newMoment.toDate())
   }
 
@@ -173,6 +167,9 @@ export default function CanvasDateInput({
   }
 
   function renderWeekdayLabels() {
+    // This is expensive, so only do it if the calendar is open
+    if (!isShowingCalendar) return []
+
     const firstOfWeek = renderedMoment.clone().startOf('week')
     return [...Array(7).keys()].map(index => {
       const thisDay = firstOfWeek.clone().add(index, 'days')
@@ -183,6 +180,8 @@ export default function CanvasDateInput({
   }
 
   function renderMonthChangeButton(direction) {
+    if (!isShowingCalendar) return null
+
     const icon =
       direction === 'prev' ? (
         <IconArrowOpenStartSolid color="primary" />
@@ -211,7 +210,6 @@ export default function CanvasDateInput({
       messages={messages.concat(errorMessages)}
       isShowingCalendar={isShowingCalendar}
       onBlur={handleBlur}
-      onRequestValidateDate={handleValidateDate}
       onRequestShowCalendar={() => setIsShowingCalendar(true)}
       onRequestHideCalendar={handleHideCalendar}
       onRequestSelectNextDay={() => modifySelectedMoment(1, 'day')}

@@ -26,11 +26,12 @@ import {Responsive} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import {IconWarningLine} from '@instructure/ui-icons'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconWarningLine, IconXSolid} from '@instructure/ui-icons'
 import BulkDateInput from './BulkDateInput'
 import BulkEditOverrideTitle from './BulkEditOverrideTitle'
 import {AssignmentShape} from './BulkAssignmentShape'
-import {canEditAll} from './utils'
+import {canEditAll, originalDateField} from './utils'
 
 const DATE_INPUT_META = {
   due_at: {
@@ -48,7 +49,7 @@ const DATE_INPUT_META = {
 }
 
 BulkEditTable.propTypes = {
-  assignments: arrayOf(AssignmentShape),
+  assignments: arrayOf(AssignmentShape).isRequired,
 
   // ({
   //   dateKey: one of null, "due_at", "lock_at", or "unlock_at"
@@ -59,19 +60,24 @@ BulkEditTable.propTypes = {
   //   - or -
   //   base: true if this is the base assignment dates
   // }) => {...}
-  updateAssignmentDate: func,
+  updateAssignmentDate: func.isRequired,
 
-  setAssignmentSelected: func // (assignmentId, selected) => {}
+  // {assignmentId, overrideId or base: true}
+  clearOverrideEdits: func.isRequired,
+
+  setAssignmentSelected: func.isRequired // (assignmentId, selected) => {}
 }
 
 export default function BulkEditTable({
   assignments,
   updateAssignmentDate,
   setAssignmentSelected,
-  selectAllAssignments
+  selectAllAssignments,
+  clearOverrideEdits
 }) {
   const CHECKBOX_COLUMN_WIDTH_REMS = 2
   const DATE_COLUMN_WIDTH_REMS = 14
+  const ACTION_COLUMN_WIDTH_REMS = 4
   const NOTE_COLUMN_WIDTH_REMS = 3
 
   const someAssignmentsSelected = assignments.some(a => a.selected)
@@ -106,11 +112,16 @@ export default function BulkEditTable({
 
   function renderNoDefaultDates() {
     // The goal here is to create a cell that spans multiple columns. You can't do that with InstUI
-    // yet, so we're going to fake it with a View that's as wide as the three date columns and
+    // yet, so we're going to fake it with a View that's as wide as all the other columns and
     // depend on the cell overflow as being visible. I think that's pretty safe since that's the
     // default overflow.
     return (
-      <View as="div" minWidth={`${DATE_COLUMN_WIDTH_REMS * 3 + NOTE_COLUMN_WIDTH_REMS}rem`}>
+      <View
+        as="div"
+        minWidth={`${DATE_COLUMN_WIDTH_REMS * 3 +
+          ACTION_COLUMN_WIDTH_REMS +
+          NOTE_COLUMN_WIDTH_REMS}rem`}
+      >
         <Text size="medium" fontStyle="italic">
           {I18n.t('This assignment has no default dates.')}
         </Text>
@@ -131,6 +142,28 @@ export default function BulkEditTable({
         disabled={!canEditAll(assignment)}
       />
     )
+  }
+
+  function renderActions(assignment, override) {
+    const overrideHasBeenEdited = ['due_at', 'unlock_at', 'lock_at']
+      .map(field => originalDateField(field))
+      .some(originalField => override.hasOwnProperty(originalField))
+
+    if (overrideHasBeenEdited) {
+      return (
+        <Tooltip renderTip={I18n.t('Revert date changes')}>
+          <IconButton
+            renderIcon={IconXSolid}
+            screenReaderLabel={I18n.t('Revert date changes')}
+            withBackground={false}
+            withBorder={false}
+            onClick={event => handleRevertClick(assignment, override, event)}
+          />
+        </Tooltip>
+      )
+    } else {
+      return null
+    }
   }
 
   function renderNote(assignment, dateSet) {
@@ -166,6 +199,7 @@ export default function BulkEditTable({
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'unlock_at', baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'lock_at', baseOverride)}</Table.Cell>
+          <Table.Cell>{renderActions(assignment, baseOverride)}</Table.Cell>
           <Table.Cell>{renderNote(assignment, baseOverride)}</Table.Cell>
         </Table.Row>
       )
@@ -178,6 +212,7 @@ export default function BulkEditTable({
           )}
           <Table.Cell>{renderOverrideTitle(assignment, {base: true})}</Table.Cell>
           <Table.Cell>{renderNoDefaultDates()}</Table.Cell>
+          <Table.Cell />
           <Table.Cell />
           <Table.Cell />
           <Table.Cell />
@@ -208,6 +243,7 @@ export default function BulkEditTable({
           <Table.Cell>
             {renderDateInput(assignment.id, 'lock_at', override, override.id)}
           </Table.Cell>
+          <Table.Cell>{renderActions(assignment, override)}</Table.Cell>
           <Table.Cell>{renderNote(assignment, override)}</Table.Cell>
         </Table.Row>
       )
@@ -228,9 +264,19 @@ export default function BulkEditTable({
     [allAssignmentsSelected, selectAllAssignments]
   )
 
+  const handleRevertClick = (assignment, override, event) => {
+    // assuming the revert button is going away, so we reset focus to the prior input before that
+    // happens.
+    const tableRow = event.target.closest('tr')
+    const rowInputs = tableRow.querySelectorAll('input')
+    if (rowInputs.length) rowInputs[rowInputs.length - 1].focus()
+    clearOverrideEdits({assignmentId: assignment.id, overrideId: override.id})
+  }
+
   function renderTable(_props = {}, matches = []) {
     const checkboxWidthProp = `${CHECKBOX_COLUMN_WIDTH_REMS}rem`
     const widthProp = `${DATE_COLUMN_WIDTH_REMS}rem`
+    const actionsWidthProp = `${ACTION_COLUMN_WIDTH_REMS}rem`
     const noteWidthProp = `${NOTE_COLUMN_WIDTH_REMS}rem`
     const layoutProp = matches.includes('small') ? 'stacked' : 'fixed'
 
@@ -282,6 +328,9 @@ export default function BulkEditTable({
               <Table.ColHeader width={widthProp} id="lock">
                 {DATE_INPUT_META.lock_at.label}
               </Table.ColHeader>
+              <Table.ColHeader id="actions" width={actionsWidthProp}>
+                <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
+              </Table.ColHeader>
               <Table.ColHeader id="note" width={noteWidthProp}>
                 <ScreenReaderContent>{I18n.t('Notes')}</ScreenReaderContent>
               </Table.ColHeader>
@@ -298,7 +347,13 @@ export default function BulkEditTable({
     return (
       <Responsive
         match="media"
-        query={{small: {maxWidth: `${5 * DATE_COLUMN_WIDTH_REMS + NOTE_COLUMN_WIDTH_REMS}rem`}}}
+        query={{
+          small: {
+            maxWidth: `${5 * DATE_COLUMN_WIDTH_REMS +
+              ACTION_COLUMN_WIDTH_REMS +
+              NOTE_COLUMN_WIDTH_REMS}rem`
+          }
+        }}
         render={renderTable}
       />
     )

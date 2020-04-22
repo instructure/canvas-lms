@@ -111,6 +111,11 @@ async function renderBulkEditAndWait(overrides = {}, assignments = standardAssig
   return result
 }
 
+function changeAndBlurInput(input, newValue) {
+  fireEvent.change(input, {target: {value: newValue}})
+  fireEvent.blur(input)
+}
+
 beforeEach(() => {
   jest.useFakeTimers()
   fetch.resetMocks()
@@ -149,10 +154,10 @@ describe('Assignment Bulk Edit Dates', () => {
 
   it('invokes onSave when the save button is clicked', async () => {
     const {getByText, getAllByLabelText, onSave} = await renderBulkEditAndWait()
-    fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: '2020-04-01'}})
+    changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-01')
     fireEvent.click(getByText('Save'))
     expect(onSave).toHaveBeenCalled()
-  }, 10000)
+  })
 
   it('disables save when nothing has been edited', async () => {
     const {getByText} = await renderBulkEditAndWait()
@@ -180,8 +185,7 @@ describe('Assignment Bulk Edit Dates', () => {
   it('modifies unlock date and enables save', async () => {
     const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
     const assignmentUnlockInput = getByDisplayValue('Thu Mar 19, 2020')
-    fireEvent.change(assignmentUnlockInput, {target: {value: '2020-01-01'}})
-    fireEvent.blur(assignmentUnlockInput)
+    changeAndBlurInput(assignmentUnlockInput, '2020-01-01')
     expect(assignmentUnlockInput.value).toBe('Wed Jan 1, 2020')
     expect(getByText('Save').closest('button').disabled).toBe(false)
   })
@@ -189,8 +193,7 @@ describe('Assignment Bulk Edit Dates', () => {
   it('modifies lock at date and enables save', async () => {
     const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
     const overrideLockInput = getByDisplayValue('Tue Mar 31, 2020')
-    fireEvent.change(overrideLockInput, {target: {value: '2020-12-31'}})
-    fireEvent.blur(overrideLockInput)
+    changeAndBlurInput(overrideLockInput, '2020-12-31')
     expect(overrideLockInput.value).toBe('Thu Dec 31, 2020')
     expect(getByText('Save').closest('button').disabled).toBe(false)
   })
@@ -198,10 +201,59 @@ describe('Assignment Bulk Edit Dates', () => {
   it('modifies due date and enables save', async () => {
     const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
     const nullDueDate = getAllByLabelText('Due At')[2]
-    fireEvent.change(nullDueDate, {target: {value: '2020-06-15'}})
-    fireEvent.blur(nullDueDate)
+    changeAndBlurInput(nullDueDate, '2020-06-15')
     expect(nullDueDate.value).toBe('Mon Jun 15, 2020')
     expect(getByText('Save').closest('button').disabled).toBe(false)
+  })
+
+  it('can blur a field without changes without revert button showing up', async () => {
+    const {queryAllByText, getByDisplayValue, getAllByDisplayValue} = await renderBulkEditAndWait()
+    const assignmentUnlockAt = getByDisplayValue('Thu Mar 19, 2020')
+    fireEvent.blur(assignmentUnlockAt)
+    let revertButtons = queryAllByText('Revert date changes').filter(elt => elt.closest('button'))
+    expect(revertButtons).toHaveLength(0)
+
+    const nullAssignmentUnlockAt = getAllByDisplayValue('')[0]
+    fireEvent.blur(nullAssignmentUnlockAt)
+    revertButtons = queryAllByText('Revert date changes').filter(elt => elt.closest('button'))
+    expect(revertButtons).toHaveLength(0)
+  })
+
+  it('can revert edited dates on a row', async () => {
+    const {getAllByText, getAllByLabelText, getByDisplayValue} = await renderBulkEditAndWait()
+
+    const assignmentUnlockAt = getByDisplayValue('Thu Mar 19, 2020')
+    changeAndBlurInput(assignmentUnlockAt, '2020-06-15')
+
+    const overrideLockInput = getByDisplayValue('Tue Mar 31, 2020')
+    changeAndBlurInput(overrideLockInput, '')
+
+    const nullDueDate = getAllByLabelText('Due At')[2]
+    changeAndBlurInput(nullDueDate, '2020-06-16')
+
+    const revertButtons = getAllByText('Revert date changes').filter(elt => elt.closest('button'))
+    expect(revertButtons).toHaveLength(3)
+
+    fireEvent.click(revertButtons[1])
+    expect(overrideLockInput.value).toBe('Tue Mar 31, 2020') // original value
+    expect(assignmentUnlockAt.value).toBe('Mon Jun 15, 2020') // not changed yet
+    expect(nullDueDate.value).toBe('Tue Jun 16, 2020') // not changed yet
+    // focus should be explicitly set to the lock at input
+    expect(document.activeElement).toBe(overrideLockInput)
+
+    fireEvent.click(revertButtons[0])
+    fireEvent.click(revertButtons[2])
+    expect(assignmentUnlockAt.value).toBe('Thu Mar 19, 2020') // original value
+    expect(nullDueDate.value).toBe('') // original value
+  })
+
+  it('can revert nonsense input on a row', async () => {
+    const {getAllByText, getByDisplayValue} = await renderBulkEditAndWait()
+    const assignmentUnlockAt = getByDisplayValue('Thu Mar 19, 2020')
+    changeAndBlurInput(assignmentUnlockAt, 'asdf')
+    const revertButton = getAllByText('Revert date changes').filter(elt => elt.closest('button'))[0]
+    fireEvent.click(revertButton)
+    expect(assignmentUnlockAt.value).toBe('Thu Mar 19, 2020') // original value
   })
 
   it('disables non-editable dates', async () => {
@@ -225,7 +277,7 @@ describe('Assignment Bulk Edit Dates', () => {
       const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const overrideDueAtInput = getAllByLabelText('Due At')[1]
       const dueAtDate = '2020-04-01'
-      fireEvent.change(overrideDueAtInput, {target: {value: dueAtDate}})
+      changeAndBlurInput(overrideDueAtInput, dueAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
       expect(fetch).toHaveBeenCalledWith(
@@ -247,15 +299,15 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 10000)
+    })
 
     it('can save multiple assignments and overrides', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const dueAtDate = '2020-04-01'
       const dueAtMoment = moment.tz(dueAtDate, 'Asia/Tokyo')
-      fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: dueAtDate}})
-      fireEvent.change(getAllByLabelText('Due At')[1], {target: {value: dueAtDate}})
-      fireEvent.change(getAllByLabelText('Due At')[2], {target: {value: dueAtDate}})
+      changeAndBlurInput(getAllByLabelText('Due At')[0], dueAtDate)
+      changeAndBlurInput(getAllByLabelText('Due At')[1], dueAtDate)
+      changeAndBlurInput(getAllByLabelText('Due At')[2], dueAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -286,24 +338,24 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 30000) // if this reaches 30 seconds we really need to have a better plan
+    })
 
     it('disables the Save button while saving', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const overrideDueAtInput = getAllByLabelText('Due At')[1]
       const dueAtDate = '2020-04-01'
-      fireEvent.change(overrideDueAtInput, {target: {value: dueAtDate}})
+      changeAndBlurInput(overrideDueAtInput, dueAtDate)
       const saveButton = getByText('Save').closest('button')
       expect(saveButton.disabled).toBe(false)
       fireEvent.click(saveButton)
       expect(saveButton.disabled).toBe(true)
       expect(getByText('Saving...')).toBeInTheDocument()
-    }, 10000)
+    })
 
     it('can clear an existing date', async () => {
       const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const dueAtInput = getAllByLabelText('Due At')[0]
-      fireEvent.change(dueAtInput, {target: {value: ''}})
+      changeAndBlurInput(dueAtInput, '')
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -320,7 +372,7 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 10000)
+    })
 
     it('invokes fancy midnight on new dates for due_at and lock_at', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
@@ -329,8 +381,8 @@ describe('Assignment Bulk Edit Dates', () => {
       const dueAtDate = '2020-04-01'
       const lockAtDate = '2020-04-02'
 
-      fireEvent.change(dueAtInput, {target: {value: dueAtDate}})
-      fireEvent.change(lockAtInput, {target: {value: lockAtDate}})
+      changeAndBlurInput(dueAtInput, dueAtDate)
+      changeAndBlurInput(lockAtInput, lockAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -353,14 +405,14 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 10000)
+    })
 
     it('invokes beginning of day on new dates for unlock_at', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const unlockAtInput = getAllByLabelText('Available From')[2]
       const unlockDate = '2020-04-01'
 
-      fireEvent.change(unlockAtInput, {target: {value: unlockDate}})
+      changeAndBlurInput(unlockAtInput, unlockDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -380,7 +432,7 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 10000)
+    })
 
     it('preserves the existing time on existing dates', async () => {
       const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
@@ -388,7 +440,7 @@ describe('Assignment Bulk Edit Dates', () => {
       const dueAtDate = '2020-04-01'
       const originalDueAtMoment = moment.tz(assignments[0].all_dates[0].due_at, 'Asia/Tokyo')
       const localTimeOffset = originalDueAtMoment.diff(originalDueAtMoment.clone().startOf('day'))
-      fireEvent.change(dueAtInput, {target: {value: dueAtDate}})
+      changeAndBlurInput(dueAtInput, dueAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -406,24 +458,24 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 10000)
+    })
 
     it('displays an error if starting the save fails', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
-      fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: '2020-04-01'}})
+      changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-01')
       fetch.mockResponseOnce(JSON.stringify({errors: [{message: 'something bad happened'}]}), {
         status: 401
       })
       fireEvent.click(getByText('Save'))
       await flushPromises()
       expect(getByText(/something bad happened/)).toBeInTheDocument()
-    }, 10000)
+    })
   })
 
   describe('save progress', () => {
     async function renderBulkEditAndSave() {
       const fns = await renderBulkEditAndWait()
-      fireEvent.change(fns.getAllByLabelText('Due At')[0], {target: {value: '2020-04-01'}})
+      changeAndBlurInput(fns.getAllByLabelText('Due At')[0], '2020-04-01')
       fetch.mockResponses(
         [JSON.stringify({url: 'progress url'})],
         [JSON.stringify({url: 'progress url', workflow_state: 'queued', completion: 0})]
@@ -457,7 +509,7 @@ describe('Assignment Bulk Edit Dates', () => {
       act(jest.runAllTimers)
       await flushPromises()
       expect(fetch).not.toHaveBeenCalled()
-    }, 10000)
+    })
 
     it('displays an error if the progress fetch fails', async () => {
       const {getByText} = await renderBulkEditAndSave()
@@ -468,7 +520,7 @@ describe('Assignment Bulk Edit Dates', () => {
       await flushPromises()
       expect(getByText(/could not get progress/)).toBeInTheDocument()
       expect(getByText('Save').closest('button').disabled).toBe(false)
-    }, 10000)
+    })
 
     it('displays an error if the job fails', async () => {
       const {getByText} = await renderBulkEditAndSave()
@@ -485,7 +537,7 @@ describe('Assignment Bulk Edit Dates', () => {
       await flushPromises()
       expect(getByText(/some bad dates/)).toBeInTheDocument()
       expect(getByText('Save').closest('button').disabled).toBe(false)
-    }, 10000)
+    })
 
     it('can start a second save operation', async () => {
       const {getByText, queryByText, getAllByLabelText} = await renderBulkEditAndSave()
@@ -497,7 +549,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(getByText(/saved successfully/)).toBeInTheDocument()
       expect(getByText('Save').closest('button').disabled).toBe(true)
 
-      fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: '2020-04-02'}})
+      changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-02')
       expect(queryByText(/saved successfully/)).toBe(null)
 
       fetch.mockResponses(
@@ -507,7 +559,7 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(getByText('Save'))
       await flushPromises()
       expect(getByText(/saved successfully/)).toBeInTheDocument()
-    }, 15000)
+    })
   })
 
   describe('assignment selections', () => {
