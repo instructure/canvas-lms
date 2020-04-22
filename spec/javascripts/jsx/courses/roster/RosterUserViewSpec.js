@@ -34,6 +34,7 @@ QUnit.module('RosterUserViewSpec', {
       manage_admin_users: true,
       manage_students: true
     }
+    window.ENV.course = {id: 1}
 
     rosterViewOne = new RosterUserView({
       model: new RosterUser({
@@ -62,10 +63,6 @@ QUnit.module('RosterUserViewSpec', {
     server.respondWith('POST', /unenroll/, [200, {'Content-Type': 'application/json'}, ''])
 
     $('#fixtures').append($('<button id="addUsers">'))
-    const $listContainer = $('<div id="lists">')
-    $listContainer.append(rosterViewOne.render().el)
-    $listContainer.append(rosterViewTwo.render().el)
-    $('#fixtures').append($listContainer)
 
     sinon.stub(window, 'confirm').returns(true)
   },
@@ -80,13 +77,35 @@ QUnit.module('RosterUserViewSpec', {
 })
 
 test('moves focus to previous user when deleting a user in the middle', () => {
+  const $listContainer = $('<div id="lists">')
+  $listContainer.append(rosterViewOne.render().el)
+  $listContainer.append(rosterViewTwo.render().el)
+  $('#fixtures').append($listContainer)
   rosterViewTwo.removeFromCourse()
   server.respond()
   equal(document.activeElement, $('.al-trigger')[0], 'focus is set to the previous cog.')
 })
 
 test('moves focus to "+ People" button when deleting the top user', () => {
+  const $listContainer = $('<div id="lists">')
+  $listContainer.append(rosterViewOne.render().el)
+  $listContainer.append(rosterViewTwo.render().el)
+  $('#fixtures').append($listContainer)
   rosterViewOne.removeFromCourse()
   server.respond()
   equal(document.activeElement, $('#addUsers')[0], 'focus is set to + People button')
+})
+
+test('does not show sections when they are hidden by the hideSectionsOnCourseUsersPage setting', () => {
+  ENV.course.hideSectionsOnCourseUsersPage = true
+  $('#fixtures').append(rosterViewOne.render().el)
+  const $cell = $('#fixtures').find('[data-test-id="section-column-cell"]')
+  strictEqual($cell.length, 0)
+})
+
+test('shows sections when they are not hidden by the hideSectionsOnCourseUsersPage setting', () => {
+  ENV.course.hideSectionsOnCourseUsersPage = false
+  $('#fixtures').append(rosterViewOne.render().el)
+  const $cell = $('#fixtures').find('[data-test-id="section-column-cell"]')
+  strictEqual($cell.length, 1)
 })

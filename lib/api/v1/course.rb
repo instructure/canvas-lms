@@ -38,6 +38,7 @@ module Api::V1::Course
     settings[:allow_student_organized_groups] = course.allow_student_organized_groups?
     settings[:hide_final_grades] = course.hide_final_grades?
     settings[:hide_distribution_graphs] = course.hide_distribution_graphs?
+    settings[:hide_sections_on_course_users_page] = course.hide_sections_on_course_users_page?
     settings[:lock_all_announcements] = course.lock_all_announcements?
     settings[:usage_rights_required] = course.usage_rights_required?
     settings[:restrict_student_past_view] = course.restrict_student_past_view?

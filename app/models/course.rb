@@ -3014,6 +3014,7 @@ class Course < ActiveRecord::Base
   # so now we pluralize it everywhere except the actual settings hash and
   # course import/export :(
   add_setting :hide_final_grade, :alias => :hide_final_grades, :boolean => true
+  add_setting :hide_sections_on_course_users_page, :boolean => true, default: false
   add_setting :hide_distribution_graphs, :boolean => true
   add_setting :allow_final_grade_override, boolean: false, default: false
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
@@ -3543,6 +3544,12 @@ class Course < ActiveRecord::Base
 
   def post_policies_enabled?
     PostPolicy.feature_enabled?
+  end
+
+  def sections_hidden_on_roster_page?(current_user:)
+    course_sections.active.many? &&
+        hide_sections_on_course_users_page? &&
+        current_user.enrollments.active.where(course: self).all?(&:student?)
   end
 
   private

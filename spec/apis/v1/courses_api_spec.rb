@@ -3715,6 +3715,7 @@ describe CoursesController, type: :request do
           'grade_passback_setting' => nil,
           'allow_student_organized_groups' => true,
           'hide_distribution_graphs' => false,
+          'hide_sections_on_course_users_page' => false,
           'hide_final_grades' => false,
           'lock_all_announcements' => false,
           'restrict_student_past_view' => false,
@@ -3748,6 +3749,7 @@ describe CoursesController, type: :request do
           :allow_student_organized_groups => false,
           :filter_speed_grader_by_student_group => true,
           :hide_distribution_graphs => true,
+          :hide_sections_on_course_users_page => true,
           :hide_final_grades => true,
           :lock_all_announcements => true,
           :usage_rights_required => true,
@@ -3768,6 +3770,7 @@ describe CoursesController, type: :request do
           'grade_passback_setting' => nil,
           'allow_student_organized_groups' => false,
           'hide_distribution_graphs' => true,
+          'hide_sections_on_course_users_page' => true,
           'hide_final_grades' => true,
           'lock_all_announcements' => true,
           'usage_rights_required' => true,
@@ -3787,12 +3790,13 @@ describe CoursesController, type: :request do
         expect(@course.allow_student_discussion_editing).to eq false
         expect(@course.allow_student_organized_groups).to eq false
         expect(@course.hide_distribution_graphs).to eq true
+        expect(@course.hide_sections_on_course_users_page).to be true
         expect(@course.hide_final_grades).to eq true
         expect(@course.usage_rights_required).to eq true
         expect(@course.lock_all_announcements).to eq true
         expect(@course.show_announcements_on_home_page).to eq false
         expect(@course.syllabus_course_summary?).to eq false
-        expect(@course.home_page_announcement_limit).to be_falsey
+        expect(@course.home_page_announcement_limit).to be nil
       end
     end
 
@@ -3819,6 +3823,7 @@ describe CoursesController, type: :request do
           'grade_passback_setting' => nil,
           'allow_student_organized_groups' => true,
           'hide_distribution_graphs' => false,
+          'hide_sections_on_course_users_page' => false,
           'hide_final_grades' => false,
           'lock_all_announcements' => false,
           'restrict_student_past_view' => false,

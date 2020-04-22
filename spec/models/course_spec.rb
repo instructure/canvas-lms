@@ -250,6 +250,33 @@ describe Course do
     end
   end
 
+  describe "#hide_sections_on_course_users_page?" do
+    before :each do
+      course_with_student
+    end
+
+    context "setting is On" do
+      before :each do
+        @course.update!(:hide_sections_on_course_users_page => true)
+      end
+
+      it "returns true when there is more than one section" do
+        @course.course_sections.create!
+        expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be true
+      end
+
+      it "returns false when there is only one section" do
+        expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be false
+      end
+    end
+
+    context "setting is off" do
+      it "returns false" do
+        expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be false
+      end
+    end
+  end
+
   describe "#filter_speed_grader_by_student_group?" do
     before :once do
       @course = Account.default.courses.create!

@@ -519,6 +519,12 @@
             <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
             <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
             </div>
+            <% if has_multiple_sections %>
+              <div class="checkbox-flex-container">
+                <%= f.check_box :hide_sections_on_course_users_page, :disabled => !can_manage %>
+                <%= f.label :hide_sections_on_course_users_page, :en => "Hide sections on the People page from students" %><br/>
+              </div>
+            <% end %>
             <div class="checkbox-flex-container">
             <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
             <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />

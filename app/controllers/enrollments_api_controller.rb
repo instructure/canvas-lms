@@ -499,8 +499,8 @@ class EnrollmentsApiController < ApplicationController
       user_json_preloads(enrollments.map(&:user), false, {group_memberships: include_group_ids})
 
       render :json => enrollments.map { |e|
-        enrollment_json(e, @current_user, session, includes,
-                        grading_period: grading_period)
+        enrollment_json(e, @current_user, session, includes: includes,
+                        opts: { grading_period: grading_period })
       }
     end
   end

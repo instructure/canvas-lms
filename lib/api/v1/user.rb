@@ -84,8 +84,8 @@ module Api::V1::User
         json[:avatar_url] = avatar_url_for_user(user)
       end
       if enrollments
-        json[:enrollments] = enrollments.map do |enrollment|
-          enrollment_json(enrollment, current_user, session, includes, enrollment_json_opts)
+        json[:enrollments] = enrollments.map do |e|
+          enrollment_json(e, current_user, session, includes: includes, excludes: excludes, opts: enrollment_json_opts)
         end
       end
       # include a permissions check here to only allow teachers and admins
@@ -252,8 +252,10 @@ module Api::V1::User
                               :type
                             ]
 
-  def enrollment_json(enrollment, user, session, includes = [], opts = {})
-    api_json(enrollment, user, session, :only => API_ENROLLMENT_JSON_OPTS).tap do |json|
+  def enrollment_json(enrollment, user, session, includes: [], opts: {}, excludes: [])
+    only = API_ENROLLMENT_JSON_OPTS.dup
+    only = only.without(:course_section_id) if excludes.include?('course_section_id')
+    api_json(enrollment, user, session, only: only).tap do |json|
       json[:enrollment_state] = json.delete('workflow_state')
       if enrollment.course.workflow_state == 'deleted' || enrollment.course_section.workflow_state == 'deleted'
         json[:enrollment_state] = 'deleted'
