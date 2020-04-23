@@ -18,6 +18,7 @@
 
 import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import CustomColumnsLoader from 'jsx/gradebook/default_gradebook/DataLoader/CustomColumnsLoader'
+import PerformanceControls from 'jsx/gradebook/default_gradebook/PerformanceControls'
 import {NetworkFake, setPaginationLinkHeader} from 'jsx/shared/network/NetworkFake'
 import {RequestDispatch} from 'jsx/shared/network'
 
@@ -25,11 +26,11 @@ import {RequestDispatch} from 'jsx/shared/network'
 QUnit.module('Gradebook > DataLoader > CustomColumnsLoader', suiteHooks => {
   const url = '/api/v1/courses/1201/custom_gradebook_columns'
 
-  let dataLoader
   let dispatch
   let exampleData
   let gradebook
   let network
+  let performanceControls
 
   suiteHooks.beforeEach(() => {
     exampleData = {
@@ -45,13 +46,12 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsLoader', suiteHooks => {
     hooks.beforeEach(() => {
       network = new NetworkFake()
       dispatch = new RequestDispatch()
+      performanceControls = new PerformanceControls()
 
       gradebook = createGradebook({
         context_id: '1201'
       })
       sinon.stub(gradebook, 'gotCustomColumns')
-
-      dataLoader = new CustomColumnsLoader({dispatch, gradebook})
     })
 
     hooks.afterEach(() => {
@@ -59,6 +59,7 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsLoader', suiteHooks => {
     })
 
     function loadCustomColumns() {
+      const dataLoader = new CustomColumnsLoader({dispatch, gradebook, performanceControls})
       return dataLoader.loadCustomColumns()
     }
 
@@ -73,11 +74,21 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsLoader', suiteHooks => {
       strictEqual(requests.length, 1)
     })
 
-    test('sets the `include_hidden` parameter to `true`', async () => {
-      loadCustomColumns()
-      await network.allRequestsReady()
-      const [{params}] = getRequests()
-      strictEqual(params.include_hidden, 'true')
+    QUnit.module('when sending the initial request', () => {
+      test('sets the `include_hidden` parameter to `true`', async () => {
+        loadCustomColumns()
+        await network.allRequestsReady()
+        const [{params}] = getRequests()
+        strictEqual(params.include_hidden, 'true')
+      })
+
+      test('sets the `per_page` parameter to the configured per page maximum', async () => {
+        performanceControls = new PerformanceControls({customColumnsPerPage: 45})
+        loadCustomColumns()
+        await network.allRequestsReady()
+        const [{params}] = getRequests()
+        strictEqual(params.per_page, '45')
+      })
     })
 
     QUnit.module('when the first page resolves', contextHooks => {

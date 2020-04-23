@@ -28,15 +28,17 @@ import StudentContentDataLoader from './StudentContentDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
 
 export default class DataLoader {
-  constructor({gradebook}) {
+  constructor({gradebook, performanceControls}) {
     this._gradebook = gradebook
+
     this.dispatch = new RequestDispatch({
-      activeRequestLimit: gradebook.options.activeRequestLimit
+      activeRequestLimit: performanceControls.activeRequestLimit
     })
 
     const loaderConfig = {
       dispatch: this.dispatch,
-      gradebook
+      gradebook,
+      performanceControls
     }
 
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)

@@ -153,7 +153,6 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
         .returns(Promise.resolve({finalGradeOverrides: exampleData.finalGradeOverrides}))
 
       gradebook = createGradebook({
-        api_max_per_page: 2, // students per page
         context_id: '1201',
 
         course_settings: {
@@ -168,6 +167,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
             {id: '701', title: 'Grading Period 1', startDate: new Date(1)},
             {id: '702', title: 'Grading Period 2', startDate: new Date(2)}
           ]
+        },
+
+        performance_controls: {
+          students_chunk_size: 2 // students per page
         }
       })
 

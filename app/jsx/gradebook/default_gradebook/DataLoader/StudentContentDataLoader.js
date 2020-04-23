@@ -79,10 +79,11 @@ function getStudentsChunk(courseId, studentIds, options) {
   return options.dispatch.getJSON(url, params)
 }
 
-function getSubmissionsForStudents(courseId, studentIds, allEnqueued, dispatch) {
+function getSubmissionsForStudents(options, studentIds, allEnqueued, dispatch) {
   return new Promise((resolve, reject) => {
+    const {courseId, submissionsPerPage} = options
     const url = `/api/v1/courses/${courseId}/students/submissions`
-    const params = {student_ids: studentIds, ...submissionsParams}
+    const params = {...submissionsParams, student_ids: studentIds, per_page: submissionsPerPage}
 
     dispatch
       .getDepaginated(url, params, undefined, allEnqueued)
@@ -95,7 +96,7 @@ function getSubmissionsForStudents(courseId, studentIds, allEnqueued, dispatch) 
 }
 
 function getContentForStudentIdChunk(studentIds, options) {
-  const {dispatch, gradebook} = options
+  const {dispatch, gradebook, submissionsChunkSize} = options
 
   let resolveEnqueued
   const allEnqueued = new Promise(resolve => {
@@ -106,14 +107,14 @@ function getContentForStudentIdChunk(studentIds, options) {
     gradebook.gotChunkOfStudents
   )
 
-  const submissionRequestChunks = chunk(studentIds, options.submissionsChunkSize)
+  const submissionRequestChunks = chunk(studentIds, submissionsChunkSize)
   const submissionRequests = []
 
   submissionRequestChunks.forEach(submissionRequestChunkIds => {
     let submissions
 
     const submissionRequest = getSubmissionsForStudents(
-      options.courseId,
+      options,
       submissionRequestChunkIds,
       resolveEnqueued,
       dispatch
@@ -140,9 +141,10 @@ function getContentForStudentIdChunk(studentIds, options) {
 }
 
 export default class StudentContentDataLoader {
-  constructor({dispatch, gradebook}) {
+  constructor({dispatch, gradebook, performanceControls}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
+    this._performanceControls = performanceControls
   }
 
   load(studentIds) {
@@ -158,13 +160,13 @@ export default class StudentContentDataLoader {
       courseId: gradebook.course.id,
       dispatch: this._dispatch,
       gradebook,
-      studentsChunkSize: gradebook.options.api_max_per_page,
-      submissionsChunkSize: gradebook.options.chunk_size
+      submissionsChunkSize: this._performanceControls.submissionsChunkSize,
+      submissionsPerPage: this._performanceControls.submissionsPerPage
     }
 
     const studentRequests = []
     const submissionRequests = []
-    const studentIdChunks = chunk(studentIds, options.studentsChunkSize)
+    const studentIdChunks = chunk(studentIds, this._performanceControls.studentsChunkSize)
 
     // wait for all chunk requests to have been enqueued
     return new Promise(resolve => {

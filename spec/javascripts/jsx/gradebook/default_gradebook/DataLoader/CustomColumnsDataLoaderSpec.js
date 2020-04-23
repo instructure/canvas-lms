@@ -18,6 +18,7 @@
 
 import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import CustomColumnsDataLoader from 'jsx/gradebook/default_gradebook/DataLoader/CustomColumnsDataLoader'
+import PerformanceControls from 'jsx/gradebook/default_gradebook/PerformanceControls'
 import {NetworkFake, setPaginationLinkHeader} from 'jsx/shared/network/NetworkFake'
 import {RequestDispatch} from 'jsx/shared/network'
 
@@ -27,11 +28,11 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsDataLoader', suiteHooks => {
     return `/api/v1/courses/1201/custom_gradebook_columns/${columnId}/data`
   }
 
-  let dataLoader
   let dispatch
   let exampleData
   let gradebook
   let network
+  let performanceControls
 
   suiteHooks.beforeEach(() => {
     exampleData = {
@@ -60,6 +61,7 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsDataLoader', suiteHooks => {
     hooks.beforeEach(() => {
       network = new NetworkFake()
       dispatch = new RequestDispatch()
+      performanceControls = new PerformanceControls()
 
       gradebook = createGradebook({
         context_id: '1201'
@@ -67,8 +69,6 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsDataLoader', suiteHooks => {
       gradebook.gotCustomColumns(exampleData.customColumns)
 
       sinon.stub(gradebook, 'gotCustomColumnDataChunk')
-
-      dataLoader = new CustomColumnsDataLoader({dispatch, gradebook})
     })
 
     hooks.afterEach(() => {
@@ -76,6 +76,7 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsDataLoader', suiteHooks => {
     })
 
     function loadCustomColumnsData() {
+      const dataLoader = new CustomColumnsDataLoader({dispatch, gradebook, performanceControls})
       return dataLoader.loadCustomColumnsData()
     }
 
@@ -109,7 +110,7 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsDataLoader', suiteHooks => {
       })
 
       test('sets the `per_page` parameter to the configured per page maximum', async () => {
-        gradebook.options.api_max_per_page = '45'
+        performanceControls = new PerformanceControls({customColumnDataPerPage: 45})
         loadCustomColumnsData()
         await network.allRequestsReady()
         const [{params}] = getRequests()

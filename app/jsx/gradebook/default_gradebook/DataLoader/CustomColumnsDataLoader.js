@@ -17,9 +17,10 @@
  */
 
 export default class CustomColumnsDataLoader {
-  constructor({dispatch, gradebook}) {
+  constructor({dispatch, gradebook, performanceControls}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
+    this._performanceControls = performanceControls
   }
 
   loadCustomColumnsData(columnIds = null) {
@@ -36,7 +37,10 @@ export default class CustomColumnsDataLoader {
   __loadDataForCustomColumn(columnId) {
     const courseId = this._gradebook.course.id
     const url = `/api/v1/courses/${courseId}/custom_gradebook_columns/${columnId}/data`
-    const params = {include_hidden: true, per_page: this._gradebook.options.api_max_per_page}
+    const params = {
+      include_hidden: true,
+      per_page: this._performanceControls.customColumnDataPerPage
+    }
 
     const perPageCallback = customColumnData => {
       this._gradebook.gotCustomColumnDataChunk(columnId, customColumnData)

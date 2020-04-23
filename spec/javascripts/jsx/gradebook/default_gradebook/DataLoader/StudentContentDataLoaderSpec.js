@@ -24,6 +24,7 @@ import * as FlashAlert from 'jsx/shared/FlashAlert'
 import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 import StudentContentDataLoader from 'jsx/gradebook/default_gradebook/DataLoader/StudentContentDataLoader'
+import PerformanceControls from 'jsx/gradebook/default_gradebook/PerformanceControls'
 
 QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => {
   const exampleData = {
@@ -45,10 +46,10 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
     submissions: '/api/v1/courses/1201/students/submissions'
   }
 
-  let dataLoader
-  let gradebook
-  let server
   let dispatch
+  let gradebook
+  let performanceControls
+  let server
 
   function latchPromise() {
     const latch = {}
@@ -82,8 +83,6 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       .returns(Promise.resolve({finalGradeOverrides: exampleData.finalGradeOverrides}))
 
     gradebook = createGradebook({
-      api_max_per_page: 2,
-      chunk_size: 2,
       context_id: '1201',
 
       course_settings: {
@@ -101,6 +100,10 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
     sinon.stub(gradebook.finalGradeOverrides, 'setGrades')
 
     dispatch = new RequestDispatch()
+    performanceControls = new PerformanceControls({
+      studentsChunkSize: 2,
+      submissionsChunkSize: 2
+    })
   })
 
   suiteHooks.afterEach(() => {
@@ -109,7 +112,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
   QUnit.module('.load()', () => {
     async function load(studentIds) {
-      dataLoader = new StudentContentDataLoader({dispatch, gradebook})
+      const dataLoader = new StudentContentDataLoader({dispatch, gradebook, performanceControls})
       await dataLoader.load(studentIds || exampleData.studentIds)
     }
 
@@ -124,7 +127,10 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
       test('requests students using the given student ids', async () => {
         setStudentsResponse(exampleData.studentIds, exampleData.students)
-        gradebook.options.api_max_per_page = 50
+        performanceControls = new PerformanceControls({
+          studentsChunkSize: 50,
+          submissionsChunkSize: 2
+        })
         await load()
         const studentRequest = server.findRequest(urls.students)
         const params = paramsFromRequest(studentRequest)
@@ -134,7 +140,6 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       test('chunks students when per page limit is less than count of student ids', async () => {
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
-        gradebook.options.api_max_per_page = 2
         await load()
         const requests = server.filterRequests(urls.students)
         strictEqual(requests.length, 2)
@@ -221,6 +226,17 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         const submissionsRequest = server.findRequest(urls.submissions)
         const params = paramsFromRequest(submissionsRequest)
         ok(params.response_fields.includes('posted_at'))
+      })
+
+      test('sets the `per_page` parameter to the configured per page maximum', async () => {
+        performanceControls = new PerformanceControls({
+          studentsChunkSize: 2,
+          submissionsPerPage: 45
+        })
+        await load()
+        const submissionsRequest = server.findRequest(urls.submissions)
+        const params = paramsFromRequest(submissionsRequest)
+        strictEqual(params.per_page, '45')
       })
 
       test('updates the gradebook with each chunk of submissions', async () => {
@@ -452,7 +468,6 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
     QUnit.module('when all students have finished loading', loadingHooks => {
       loadingHooks.beforeEach(() => {
-        gradebook.options.api_max_per_page = 2
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
       })

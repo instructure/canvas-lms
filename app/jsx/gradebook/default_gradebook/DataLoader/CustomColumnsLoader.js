@@ -17,16 +17,20 @@
  */
 
 export default class CustomColumnsLoader {
-  constructor({dispatch, gradebook}) {
+  constructor({dispatch, gradebook, performanceControls}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
+    this._performanceControls = performanceControls
   }
 
   loadCustomColumns() {
     const courseId = this._gradebook.course.id
     const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
 
-    const params = {include_hidden: true}
+    const params = {
+      include_hidden: true,
+      per_page: this._performanceControls.customColumnsPerPage
+    }
 
     return this._dispatch.getDepaginated(url, params).then(customColumns => {
       this._gradebook.gotCustomColumns(customColumns)

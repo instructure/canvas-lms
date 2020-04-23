@@ -17,16 +17,18 @@
  */
 
 export default class ContextModulesLoader {
-  constructor({dispatch, gradebook}) {
+  constructor({dispatch, gradebook, performanceControls}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
+    this._performanceControls = performanceControls
   }
 
   loadContextModules() {
     const courseId = this._gradebook.course.id
     const url = `/api/v1/courses/${courseId}/modules`
+    const params = {per_page: this._performanceControls.contextModulesPerPage}
 
-    return this._dispatch.getDepaginated(url).then(contextModules => {
+    return this._dispatch.getDepaginated(url, params).then(contextModules => {
       this._gradebook.updateContextModules(contextModules)
     })
   }

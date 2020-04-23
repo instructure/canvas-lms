@@ -17,9 +17,10 @@
  */
 
 export default class AssignmentGroupsLoader {
-  constructor({dispatch, gradebook}) {
+  constructor({dispatch, gradebook, performanceControls}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
+    this._performanceControls = performanceControls
   }
 
   loadAssignmentGroups() {
@@ -37,7 +38,8 @@ export default class AssignmentGroupsLoader {
         'module_ids',
         'post_manually'
       ],
-      override_assignment_dates: false
+      override_assignment_dates: false,
+      per_page: this._performanceControls.assignmentGroupsPerPage
     }
 
     return this._dispatch.getDepaginated(url, params).then(assignmentGroups => {

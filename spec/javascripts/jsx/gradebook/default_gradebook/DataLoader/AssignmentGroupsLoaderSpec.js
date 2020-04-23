@@ -18,6 +18,7 @@
 
 import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import AssignmentGroupsLoader from 'jsx/gradebook/default_gradebook/DataLoader/AssignmentGroupsLoader'
+import PerformanceControls from 'jsx/gradebook/default_gradebook/PerformanceControls'
 import {NetworkFake, setPaginationLinkHeader} from 'jsx/shared/network/NetworkFake'
 import {RequestDispatch} from 'jsx/shared/network'
 
@@ -25,11 +26,11 @@ import {RequestDispatch} from 'jsx/shared/network'
 QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
   const url = '/api/v1/courses/1201/assignment_groups'
 
-  let dataLoader
   let dispatch
   let exampleData
   let gradebook
   let network
+  let performanceControls
 
   suiteHooks.beforeEach(() => {
     const assignments = [
@@ -79,13 +80,12 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
     hooks.beforeEach(() => {
       network = new NetworkFake()
       dispatch = new RequestDispatch()
+      performanceControls = new PerformanceControls()
 
       gradebook = createGradebook({
         context_id: '1201'
       })
       sinon.stub(gradebook, 'updateAssignmentGroups')
-
-      dataLoader = new AssignmentGroupsLoader({dispatch, gradebook})
     })
 
     hooks.afterEach(() => {
@@ -93,6 +93,7 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
     })
 
     function loadAssignmentGroups() {
+      const dataLoader = new AssignmentGroupsLoader({dispatch, gradebook, performanceControls})
       return dataLoader.loadAssignmentGroups()
     }
 
@@ -105,6 +106,16 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
       await network.allRequestsReady()
       const requests = getRequests()
       strictEqual(requests.length, 1)
+    })
+
+    QUnit.module('when sending the initial request', () => {
+      test('sets the `per_page` parameter to the configured per page maximum', async () => {
+        performanceControls = new PerformanceControls({assignmentGroupsPerPage: 45})
+        loadAssignmentGroups()
+        await network.allRequestsReady()
+        const [{params}] = getRequests()
+        strictEqual(params.per_page, '45')
+      })
     })
 
     QUnit.module('when the first page resolves', contextHooks => {

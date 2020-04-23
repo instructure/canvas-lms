@@ -18,6 +18,7 @@
 
 import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import ContextModulesLoader from 'jsx/gradebook/default_gradebook/DataLoader/ContextModulesLoader'
+import PerformanceControls from 'jsx/gradebook/default_gradebook/PerformanceControls'
 import {NetworkFake, setPaginationLinkHeader} from 'jsx/shared/network/NetworkFake'
 import {RequestDispatch} from 'jsx/shared/network'
 
@@ -25,11 +26,11 @@ import {RequestDispatch} from 'jsx/shared/network'
 QUnit.module('Gradebook > DataLoader > ContextModulesLoader', suiteHooks => {
   const url = '/api/v1/courses/1201/modules'
 
-  let dataLoader
   let dispatch
   let exampleData
   let gradebook
   let network
+  let performanceControls
 
   suiteHooks.beforeEach(() => {
     exampleData = {
@@ -41,13 +42,12 @@ QUnit.module('Gradebook > DataLoader > ContextModulesLoader', suiteHooks => {
     hooks.beforeEach(() => {
       network = new NetworkFake()
       dispatch = new RequestDispatch()
+      performanceControls = new PerformanceControls()
 
       gradebook = createGradebook({
         context_id: '1201'
       })
       sinon.stub(gradebook, 'updateContextModules')
-
-      dataLoader = new ContextModulesLoader({dispatch, gradebook})
     })
 
     hooks.afterEach(() => {
@@ -55,6 +55,7 @@ QUnit.module('Gradebook > DataLoader > ContextModulesLoader', suiteHooks => {
     })
 
     function loadContextModules() {
+      const dataLoader = new ContextModulesLoader({dispatch, gradebook, performanceControls})
       return dataLoader.loadContextModules()
     }
 
@@ -67,6 +68,16 @@ QUnit.module('Gradebook > DataLoader > ContextModulesLoader', suiteHooks => {
       await network.allRequestsReady()
       const requests = getRequests()
       strictEqual(requests.length, 1)
+    })
+
+    QUnit.module('when sending the initial request', () => {
+      test('sets the `per_page` parameter to the configured per page maximum', async () => {
+        performanceControls = new PerformanceControls({contextModulesPerPage: 45})
+        loadContextModules()
+        await network.allRequestsReady()
+        const [{params}] = getRequests()
+        strictEqual(params.per_page, '45')
+      })
     })
 
     QUnit.module('when the first page resolves', contextHooks => {
