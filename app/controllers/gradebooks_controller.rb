@@ -1107,15 +1107,6 @@ class GradebooksController < ApplicationController
     @current_user.set_preference(:gradebook_settings, @context.global_id, context_settings)
   end
 
-  def render_gradebook
-    if ["srgb", "individual"].include?(gradebook_version)
-      render "gradebooks/individual"
-    else
-      opt_in_datadog_rum_js
-      render "gradebooks/gradebook"
-    end
-  end
-
   def percentage(weight)
     I18n.n(weight, percentage: true)
   end
