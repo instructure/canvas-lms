@@ -16,14 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Canvas::Plugins::Validators::BigBlueButtonValidator
+module Canvas::Plugins::Validators::BigBlueButtonFallbackValidator
   def self.validate(settings, plugin_setting)
     if settings.map(&:last).all?(&:blank?)
       {}
     else
       secret = settings.delete(:secret)
       has_no_secret = secret.blank? && plugin_setting.settings.try(:[], :secret).blank?
-      expected_settings = [:domain, :recording_enabled, :replace_with_alternatives, :free_trial, :use_fallback]
+      expected_settings = [:domain]
       has_nonsecret_blank = settings.map(&:last).any?(&:blank?)
       if settings.size != expected_settings.size || has_nonsecret_blank || has_no_secret
         plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
@@ -31,10 +31,6 @@ module Canvas::Plugins::Validators::BigBlueButtonValidator
       else
         settings = settings.slice(*expected_settings).to_h.with_indifferent_access
         settings[:secret] = secret if secret.present?
-        settings[:recording_enabled] = Canvas::Plugin.value_to_boolean(settings[:recording_enabled])
-        settings[:replace_with_alternatives] = Canvas::Plugin.value_to_boolean(settings[:replace_with_alternatives])
-        settings[:free_trial] = Canvas::Plugin.value_to_boolean(settings[:free_trial])
-        settings[:use_fallback] = Canvas::Plugin.value_to_boolean(settings[:use_fallback])
         settings
       end
     end

@@ -162,8 +162,8 @@ Canvas::Plugin.register('big_blue_button_fallback', nil, {
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
   :version => '1.0.0',
-  :settings_partial => 'plugins/big_blue_button_settings',
-  :validator => 'BigBlueButtonValidator',
+  :settings_partial => 'plugins/big_blue_button_fallback_settings',
+  :validator => 'BigBlueButtonFallbackValidator',
   :encrypted_settings => [:secret]
 })
 

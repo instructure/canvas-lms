@@ -115,6 +115,7 @@ describe BigBlueButtonConference do
           :domain => "bbb.instructure.com",
           :secret_dec => "secret",
           :recording_enabled => true,
+          :use_fallback => true,
         })
       ])
       @bbb = BigBlueButtonConference.new
@@ -332,6 +333,14 @@ describe BigBlueButtonConference do
   end
 
   describe "config fallback" do
+    let(:bbb_config) {
+      {
+        :domain => "bbb_new.instructure.com",
+        :secret_dec => "new_secret",
+        :use_fallback => true,
+      }
+    }
+
     before :each do
       old_config = {
         :domain => "bbb_old.instructure.com",
@@ -340,10 +349,7 @@ describe BigBlueButtonConference do
       allow(Canvas::Plugin.find(:big_blue_button_fallback)).to receive(:settings).and_return(old_config)
 
       allow(WebConference).to receive(:plugins).and_return([
-        web_conference_plugin_mock("big_blue_button", {
-          :domain => "bbb_new.instructure.com",
-          :secret_dec => "new_secret"
-        })
+        web_conference_plugin_mock("big_blue_button", bbb_config)
       ])
     end
 
@@ -371,6 +377,15 @@ describe BigBlueButtonConference do
     it "should generate a url with the fallback config if the saved domain wasn't set (i.e. old data)" do
       bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
       expect(CanvasHttp).to receive(:get).with(/bbb_old\.instructure\.com/, anything)
+      bbb.send(:send_request, :action, {:query => 1})
+    end
+
+    it "should generate a url with the current config if fallback is disabled" do
+      allow(WebConference).to receive(:plugins).and_return([
+        web_conference_plugin_mock("big_blue_button", bbb_config.merge(:use_fallback => false))
+      ])
+      bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
+      expect(CanvasHttp).to receive(:get).with(/bbb_new\.instructure\.com/, anything)
       bbb.send(:send_request, :action, {:query => 1})
     end
 

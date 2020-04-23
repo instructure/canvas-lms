@@ -20,7 +20,7 @@
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
-        <%= mt :description, "You will need access to a [BigBlueButton](%{url}) instance.", :url => "http://bigbluebutton.org" %>
+        <%= mt :description, "When you have your BigBlueButton Plugin configured to use fallback settings, these are the settings it uses. The fallback is only used to look for recordings of conferences that were not created with the configuration for your BigBlueButton Plugin." %>
       </td>
     </tr>
     <tr>
@@ -35,30 +35,6 @@
       <td>
         <%= f.password_field :secret, :autocomplete => false %><br>
         <%= mt :secret_description, "This is the %{parameter_name} parameter that can be found in the %{filename} config file.", :parameter_name => markdown_safe('**beans.dynamicConferenceService.securitySalt**'), :filename => markdown_safe('**bigbluebutton.properties**') %>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>
-        <%= f.check_box :recording_enabled %> <%= f.label :recording_enabled, :en => "Allow conferences to be recorded." %>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>
-        <%= f.check_box :free_trial %> <%= f.label :free_trial, :en => "Mark this BigBlueButton instance as a free trial" %>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>
-        <%= f.check_box :replace_with_alternatives %> <%= f.label :replace_with_alternatives, :en => "Disable BigBlueButton conferences; show a list of alternatives instead" %>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>
-        <%= f.check_box :use_fallback %> <%= f.label :use_fallback, :en => "Use BigBlueButton Fallback Plugin settings to look for recordings for conferences that weren't hosted by the currently configured BBB instance." %>
       </td>
     </tr>
   </table>
