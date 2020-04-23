@@ -27,20 +27,16 @@ export default class StudentIdLoader {
   loadStudentIds() {
     let promise
 
-    if (ENV.prefetch_gradebook_user_ids) {
-      /*
-       * When user ids have been prefetched, the data is only known valid for the
-       * first request. Consume it by pulling it out of the prefetch store, which
-       * will force all subsequent requests for user ids to call through the
-       * network.
-       */
-      promise = consumePrefetchedXHR('user_ids')
-      if (promise) {
-        promise = asJson(promise)
-      }
-    }
-
-    if (!promise) {
+    /*
+     * When user ids have been prefetched, the data is only known valid for the
+     * first request. Consume it by pulling it out of the prefetch store, which
+     * will force all subsequent requests for user ids to call through the
+     * network.
+     */
+    promise = consumePrefetchedXHR('user_ids')
+    if (promise) {
+      promise = asJson(promise)
+    } else {
       const courseId = this._gradebook.course.id
       const url = `/courses/${courseId}/gradebook/user_ids`
       promise = this._dispatch.getJSON(url)

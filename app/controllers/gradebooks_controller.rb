@@ -247,7 +247,8 @@ class GradebooksController < ApplicationController
     set_tutorial_js_env
 
     # Optimize initial data loading
-    if Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids)
+    if Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids) ||
+      Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements)
       prefetch_xhr(user_ids_course_gradebook_url(@context), id: 'user_ids')
     end
 
