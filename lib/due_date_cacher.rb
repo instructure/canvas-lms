@@ -187,7 +187,7 @@ class DueDateCacher
           anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids)
           existing_anonymous_ids << anonymous_id
           sql_ready_anonymous_id = Submission.connection.quote(anonymous_id)
-          values << [assignment_id, student_id, due_date, grading_period_id, sql_ready_anonymous_id, quiz_lti]
+          values << [assignment_id, student_id, due_date, grading_period_id, sql_ready_anonymous_id, quiz_lti, @course.root_account_id]
         end
       end
 
@@ -254,7 +254,7 @@ class DueDateCacher
               cached_quiz_lti = vals.cached_quiz_lti,
               updated_at = now() AT TIME ZONE 'UTC'
             FROM (VALUES #{batch_values.join(',')})
-              AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti)
+              AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
             WHERE submissions.user_id = vals.student_id AND
                   submissions.assignment_id = vals.assignment_id AND
                   (
@@ -268,15 +268,16 @@ class DueDateCacher
                   );
           INSERT INTO #{Submission.quoted_table_name}
             (assignment_id, user_id, workflow_state, created_at, updated_at, course_id,
-            cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti)
+            cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
             SELECT
               assignments.id, vals.student_id, 'unsubmitted',
               now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',
               assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,
               vals.anonymous_id,
-              vals.cached_quiz_lti
+              vals.cached_quiz_lti,
+              vals.root_account_id
             FROM (VALUES #{batch_values.join(',')})
-              AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti)
+              AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
             INNER JOIN #{Assignment.quoted_table_name} assignments
               ON assignments.id = vals.assignment_id
             LEFT OUTER JOIN #{Submission.quoted_table_name} submissions

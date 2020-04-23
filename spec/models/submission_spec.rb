@@ -6967,4 +6967,16 @@ describe Submission do
       end
     end
   end
+
+  describe "root account ID" do
+    let_once(:root_account) { Account.create! }
+    let_once(:subaccount) { Account.create!(root_account: root_account) }
+    let_once(:course) { Course.create!(account: subaccount) }
+    let_once(:student) { course.enroll_student(User.create!, workflow_state: "active").user }
+
+    it "is set to the root account ID of the owning course" do
+      assignment = course.assignments.create!
+      expect(assignment.submission_for_student(student).root_account_id).to eq root_account.id
+    end
+  end
 end
