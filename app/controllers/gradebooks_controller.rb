@@ -252,6 +252,10 @@ class GradebooksController < ApplicationController
       prefetch_xhr(user_ids_course_gradebook_url(@context), id: 'user_ids')
     end
 
+    if Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements) && grading_periods?
+      prefetch_xhr(grading_period_assignments_course_gradebook_url(@context), id: 'grading_period_assignments')
+    end
+
     set_default_gradebook_env
     opt_in_datadog_rum_js
     render "gradebooks/gradebook"

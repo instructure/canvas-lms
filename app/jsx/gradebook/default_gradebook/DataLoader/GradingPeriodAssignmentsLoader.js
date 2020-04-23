@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
+
 export default class GradingPeriodAssignmentsLoader {
   constructor({dispatch, gradebook}) {
     this._dispatch = dispatch
@@ -23,10 +25,24 @@ export default class GradingPeriodAssignmentsLoader {
   }
 
   loadGradingPeriodAssignments() {
-    const courseId = this._gradebook.course.id
-    const url = `/courses/${courseId}/gradebook/grading_period_assignments`
+    let promise
 
-    return this._dispatch.getJSON(url).then(data => {
+    /*
+     * When user ids have been prefetched, the data is only known valid for the
+     * first request. Consume it by pulling it out of the prefetch store, which
+     * will force all subsequent requests for user ids to call through the
+     * network.
+     */
+    promise = consumePrefetchedXHR('grading_period_assignments')
+    if (promise) {
+      promise = asJson(promise)
+    } else {
+      const courseId = this._gradebook.course.id
+      const url = `/courses/${courseId}/gradebook/grading_period_assignments`
+      promise = this._dispatch.getJSON(url)
+    }
+
+    return promise.then(data => {
       this._gradebook.updateGradingPeriodAssignments(data.grading_period_assignments)
     })
   }
