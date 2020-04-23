@@ -1544,6 +1544,7 @@ hu:
   act_as_user_77dda176: "Felhasználó nevében"
   act_as_user_d7ef0e48: "Felhasználó nevében"
   act_as_user_name_5581cdbb: "%{user_name}  nevében"
+  act_as_users_de7ee378: Felhasználóként
   actions_efcde10d: Tevékenységek
   actions_for_course_312ff446: "Tevékenységek a következő kurzusban: %{course}"
   actions_taken_6fb20fd0: "Elvégzett tevékenységek"
@@ -1773,6 +1774,7 @@ hu:
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Hiba történt a beiratkozási félév megjelenítése során"
   an_error_occured_while_fetching_grading_period_set_b4f12aa5: "Hiba történt az osztályzási időszakok megjelenítése során"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Hiba történt az osztályzási időszakok frissítése során"
+  an_error_occurred_making_a_network_request_d1bda348: "Hiba történt egy hálózati kérelem létrehozásakor"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Hiba történt*, kérjük, próbálja meg újból a válasz küldését"
   an_error_occurred_please_try_again_later_84223241: "Hiba történt. Kérem, próbálja újra később."
   an_error_occurred_publishing_grades_cfdf7631: "Hiba történt az értékelések közzététele közben. "
@@ -6949,6 +6951,8 @@ hu:
   file_c851020d: Fájl
   file_content_a99b5c6b: Fájltartalom
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "A %{filename} fájl nem került bele az ePub dokumentumba. A hozzáféréshez kérjük, tekintse meg a különálló zip fájlt."
+  file_has_no_data_213a4540: "A fájlban nincsenek adatok"
+  file_has_no_outcomes_data_1517801f: "A fájlban nincsenek eredmény adatok"
   file_list_350d08df: Fájllista
   file_list_updated_38e2a5ad: "Fájllista frissítve"
   file_menu_cc0ca54: Fájlmenü
@@ -7082,6 +7086,7 @@ hu:
   folder_705fd2d7: Mappa
   folder_browsing_tree_1f00a3ae: "Mappaböngészés fanézetben"
   folder_icon_29017021: Mappaikon
+  folder_tree_fbab0726: Könyvtárfa
   folders: 
     event_updated: "Az esemény sikeresen frissült"
     folder_created: "A mappa sikeresen létrehozva"
@@ -8287,6 +8292,7 @@ hu:
   invalid_datetime_for_graded_since_884cce5: "Érvénytelen datetime dátum a grade_since érdemjegy-attribútumhoz"
   invalid_datetime_for_submitted_since_a238f3a6: "Érvénytelen datetime dátum a submitted_since beadási attribútumhoz"
   invalid_domain_e810c1d: "Érvénytelen tartomány"
+  invalid_fields_after_ratings_fields_815ff223: "Érvénytelen mezők az értékelések után: %{fields}"
   invalid_fields_fields_8698284: "Érvénytelen mezők: %{fields}"
   invalid_file_type_881cc9b2: "Érvénytelen fájltípus"
   invalid_grade_passback_setting_a1d209d1: "Érvénytelen grade_passback_setting érdemjegyvisszaküldés-beállítás"
@@ -8842,6 +8848,7 @@ hu:
   marked_done_9fd646f: "Megjelölve elkészültként"
   mastery_paths_breakdown_6e0b5fce: "Jártassági útvonal üzemzavar"
   mastery_paths_cc4096c2: "Jártassági útvonalak"
+  mastery_points_f1672cc: "jártassági pontok"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "A jártassági szint pontszám a legmagasabb pontszámot jelenti az értékelt feladatok vagy a kvízek vonatkozásában"
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "A jártassági szint pontszám a legfrissebb pontszámot jelenti az értékelt feladatok vagy a kvízek vonatkozásában"
   matching_left_side_900f860b: "Bal oldalra illesztés"
@@ -9487,11 +9494,21 @@ hu:
         subject: "Blueprint Sync: %{name}"
     blueprint_sync_complete: 
       email: 
+        body: "Az Ön tervrajz tanfolyama, %{name}, szinkronizálta a változásokat az összes hozzárendelt tanfolyammal."
         details_link: "További információ: %{link}"
         html: 
+          body: "Az Ön tervrajz tanfolyama, %{name}, szinkronizálta a változásokat az összes hozzárendelt tanfolyammal."
           details_link: "További információ"
+          subject: "Tervrajz Szinkronizálás Befejezve: %{name}"
+        subject: "Tervrajz Szinkronizálás Befejezve: %{name}"
       sms: 
+        body: "Tervrajz tanfolyam változások szinkronizálva innen: %{name}."
         link_message: "További információ itt %{url}"
+      summary: 
+        body: "Tervrajz Szinkronizálás: Változások szinkronizálva innen: %{name}."
+        subject: "Tervrajz Szinkronizálás Befejezve: %{name}"
+      twitter: 
+        tweet: "Canvas Értesítés - Tervrajz tanfolyam változások szinkronizálva innen: %{name}."
     collaboration_invitation: 
       email: 
         body: |-
@@ -9576,6 +9593,9 @@ hu:
           link: "Az exportok megtekintéséhez kattintson ide"
           subject: "A kurzus exportálása befejeződött: %{course}"
         subject: "A kurzus exportálása befejeződött: %{course}"
+    content_link_error: 
+      summary: 
+        subject: "Tartalom Hivatkozás Hiba - %{assignment_name}"
     content_locked: "Ez a teszt jelenleg zárolva van, nem megtekinthető."
     content_locked_at: "Ezt a tartalmat ekkor zárolták: %{at}."
     content_locked_module: "Ez a feladat a/az *%{module}* modul része és a zárolás még nem lett feloldva."
@@ -9589,6 +9609,7 @@ hu:
           attached_files: "Mellékelt fájlok:"
           audio_comment: "Ez az üzenet médiatartalmat tartalmaz. A meghallgatásához vagy a válaszadáshoz kattintson az alábbi linkre:"
           download: letöltés
+          reply_to_conversation_message: "Erre az üzenetre válaszolhat a Canvas felületén, közvetlen választ küldve erre az e-mailre. Ha mellékletet kell csatolnia, kérjük, lépjen be a Canvas-ba, és válaszoljon az Inbox-on keresztül!"
           subject: "%{user_name}, Ön az imént üzenetet küldött a Canvasban."
           unknown_user: "Ismeretlen felhasználó"
           view_message: "Üzenet megtekintése az üzenetváltások között"
@@ -9611,6 +9632,7 @@ hu:
           attached_files: "Mellékelt fájlok:"
           audio_comment: "Ez az üzenet médiatartalmat tartalmaz. A meghallgatásához vagy a válaszadáshoz kattintson az alábbi linkre:"
           download: letöltés
+          reply_to_conversation_message: "Erre az üzenetre válaszolhat a Canvas felületén, közvetlen választ küldve erre az e-mailre. Ha mellékletet kell csatolnia, kérjük, lépjen be a Canvas-ba, és válaszoljon az Inbox-on keresztül!"
           subject: "%{user_name}, Ön az imént üzenetet küldött a Canvasban."
           unknown_user: "Ismeretlen felhasználó"
           view_message: "Üzenet megtekintése az üzenetváltások között"
@@ -10069,6 +10091,7 @@ hu:
         body: "%{user} új megjegyzést tett közzé a %{discussion_topic} üzenetszálban a/az %{course} kurzusban:"
         html: 
           body: "%{user} új megjegyzést tett közzé a %{discussion_topic} fórumszálban %{course} kurzusban:"
+          discussion_entry_reply_message: "Csatlakozzon a beszélgetéshez a lenti linket követve, vagy adjon hozzá megjegyzéseket erre az üzenetre válaszolva! Amikor engedélyezett, ha mellékletet kell csatolnia, kérjük, lépjen be a Canvas-ba, és válaszoljon a beszélgetésre!"
           link: "Kattintson ide az üzenetváltáshoz való csatlakozáshoz"
           subject: "Új megjegyzés itt %{discussion_topic}: %{course}"
         subject: "Új megjegyzés itt %{discussion_topic}: %{course}"
@@ -10584,6 +10607,7 @@ hu:
   missing_eaddacbd: HIÁNYZÓ
   missing_percent_94534638: "Hiányzik: %{percent}"
   missing_policies_4f195e0b: "Hiányzó szabályok"
+  missing_required_fields_fields_30e20799: "Hiányzó kötelező nezők: %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Néhány kötelező mező hiányzik. Kérjük, mindet töltse ki!"
   missing_required_ratings_9b19e66: "Hiányzó kötelező értékelések"
   missing_required_values_missing_values_f3be2ff8: "Hiányoznak a következő kötelező értékek: %{missing_values}"
@@ -10937,6 +10961,7 @@ hu:
   norwegian_53f391ec: Norvég
   not_a_number: "pozitív számnak kell lennie"
   not_a_valid_date_d3ac20ba: "Érvénytelen dátum"
+  not_a_valid_utf_8_string_string_7f6819c: "Nem egy érvényes UTF-8 karaktersorozat: %{string}"
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Nem minden szekció lesz ehhez az elemhez hozzárendelve."
   not_available_487d3648: "Nem érhető el"
   not_available_until_next_submission_2175158: "A következő beadásig nem érhető el"
@@ -11647,6 +11672,7 @@ hu:
   placements_5b5e056b: Elhelyezések
   plain_text_e3ab33aa: "Egyszerű szöveg"
   plain_text_view_7640af4c: "Egyszerű szövegnézet"
+  planner_7fd46783: Tervező
   play_1a47eaa7: Lejátszás
   play_media_comment_8614d30f: "Médiatartalom lejátszása"
   please_add_a_due_date_1d433d2: "Kérem, adjon hozzá egy határidőt"
@@ -12454,6 +12480,7 @@ hu:
     upload_file_view: 
       choose_a_picture: "Kép kiválasztása"
       crop_instructions: "A kép széleinek levágásához ragadja meg a kijelölést, majd kattintson a \"Mentés\" gombra!"
+  progress_9de4af8f: Feldolgozás
   progress_for_account_name_ef203250: " %{account_name} haladása"
   progress_loading_bar_a26b8861: "Folyamatjelző/töltő sáv"
   project_groups_1fa0320b: Projektcsoportok
@@ -15473,6 +15500,7 @@ hu:
     one: "1 hallgató fog kapni %{num} pontot"
     other: "%{studentCount} hallgató fog kapni %{num} pontot"
   students_1b8cd07b: Hallgatók
+  students_are_not_allowed_to_access_test_installati_11b9078: "A hallgatók nem jogosultak a teszt installációk elérésére."
   students_being_observed_4de3e520: "A hallgatók megfigyelés alatt állnak "
   students_can_only_participate_in_the_course_betwee_6f8595aa: "A hallgatók csak ezen dátumok között vehetnek részt a kurzusban"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "A hallgatók nem tekinthetik meg a kvízválaszokat, miután a kurzus befejeződött/lezárult"
@@ -15990,6 +16018,7 @@ hu:
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Ez az elem a könnyebben hozzáférhető az alternatív fogd és vidd módszerrel történő átrendezésére. Nyomja meg az Enter vagy a Space billentyűt, hogy elmozgassa ezt a kérdést."
   this_email_address_is_unconfirmed_f0fc8c6e: "Ez az e-mail cím nincs megerősítve"
   this_enables_users_to_generate_and_download_course_4c69c531: "Lehetővé teszi a felhasználók számára a kurzus ePub generálását és letöltését."
+  this_environment_is_currently_being_updated_with_a_235f1875: "Ez a környezet éppen frissül a legutolsó gyártói adatokkal. Kérjük, nézzen vissza később!"
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Ez a funkció lehetővé teszi az oktatók számára, hogy egyszerűen másolhassanak át egyes elemeket egyik kurzusból a másikba, illetve hogy egyes tartalmi elemeket megoszthassanak más felhasználókkal, hogy ezáltal ők is importálhassák azokat a kurzusaikba."
   this_feature_cannot_be_disabled_once_it_has_been_t_db7cc39e: "Ezt a funkciót nem lehet letiltani, ha már be lett kapcsolva."
   this_feature_creates_a_siteadmin_release_flag_tab__15215be9: "Ezzel a funkcióval egy rendszeradminisztrátori kiadási jelölő fület lehet létrehozni, aminek segítségével különböző funkciókat lehet hozzáadni a felhasználói felülethez, amikhez a felhasználók hozzáférhetnek. Ez a funkció továbbá átdolgozza a felhasználói felületet a korábbi Funkcók beállítása fülekhez."
