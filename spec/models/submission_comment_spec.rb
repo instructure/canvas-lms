@@ -38,6 +38,17 @@ RSpec.describe SubmissionComment do
     expect(@submission.submission_comments.create!(valid_attributes)).to be_persisted
   end
 
+  describe '#set_root_account_id' do
+    subject { submission_comment.root_account }
+
+    let(:submission) { @submission }
+    let(:submission_comment) { submission.submission_comments.create!(valid_attributes) }
+
+    context 'as a before_save callback' do
+      it { is_expected.to eq submission.context.root_account }
+    end
+  end
+
   describe '#body' do
     it 'aliases comment' do
       submission_comment = SubmissionComment.new(comment: 'a body')

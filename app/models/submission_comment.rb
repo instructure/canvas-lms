@@ -40,6 +40,7 @@ class SubmissionComment < ActiveRecord::Base
   attr_writer :updating_user
   attr_accessor :grade_posting_in_progress
 
+  belongs_to :root_account, class_name: 'Account'
   belongs_to :submission
   belongs_to :author, :class_name => 'User'
   belongs_to :assessment_request
@@ -62,6 +63,7 @@ class SubmissionComment < ActiveRecord::Base
   validates :workflow_state, inclusion: {in: ["active"]}, allow_nil: true
 
   before_save :infer_details
+  before_save :set_root_account_id
   before_save :set_edited_at
   after_save :update_participation
   after_save :check_for_media_object
@@ -338,6 +340,10 @@ class SubmissionComment < ActiveRecord::Base
     self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
 
     self.workflow_state ||= "active"
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= context.root_account_id
   end
 
   def force_reload_cached_attachments
