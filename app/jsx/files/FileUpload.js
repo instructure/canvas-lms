@@ -77,7 +77,7 @@ class FileUpload extends React.Component {
     if (this.shouldAcceptDrop(e.dataTransfer)) {
       e.dataTransfer.dropEffect = 'copy'
       e.preventDefault()
-      if (!this.state.isDragging) {
+      if (!(this.state.isDragging || this.state.isUploading)) {
         this.setState({isDragging: true})
       }
       return false
@@ -149,14 +149,16 @@ class FileUpload extends React.Component {
     const isEmptyFolder = this.props.currentFolder.isEmpty()
     const classes = classnames({
       FileUpload: true,
-      FileUpload__full: isEmptyFolder && !(isDragging || isUploading),
+      FileUpload__full: isEmptyFolder && !isDragging,
       FileUpload__dragging: isDragging
     })
     return (
       <>
-        <div className={classes} onDrop={this.handleParentDrop}>
-          {this.renderDropZone()}
-        </div>
+        {isUploading || (
+          <div className={classes} onDrop={this.handleParentDrop}>
+            {this.renderDropZone()}
+          </div>
+        )}
         <CurrentUploads onUploadChange={this.handleUploadChange} />
       </>
     )

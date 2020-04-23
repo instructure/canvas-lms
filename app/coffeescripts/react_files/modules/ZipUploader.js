@@ -27,6 +27,8 @@ export default class ZipUploader extends BaseUploader {
     this.contextId = contextId
     this.contextType = contextType
     this.migrationProgress = 0
+    this.onUploadPosted = this.onUploadPosted.bind(this)
+    this.onUploadCancelled = this.onUploadCancelled.bind(this)
   }
 
   createPreFlightParams() {
@@ -55,11 +57,12 @@ export default class ZipUploader extends BaseUploader {
     return this._actualUpload()
   }
 
-  onUploadPosted = () => {
+  onUploadPosted() {
     // at this point the user can no longer cancel the upload
     this._cancelToken = null
     // will get the cancel button un-rendered
     this.onProgress(this.progress, this.file)
+    super.onUploadPosted(arguments)
     return this.getContentMigration()
   }
 

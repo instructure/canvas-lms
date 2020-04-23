@@ -20,9 +20,15 @@ import BBFile from '../../models/File'
 import BaseUploader from './BaseUploader'
 
 export default class FileUploader extends BaseUploader {
-  onUploadPosted = fileJson => {
+  constructor(fileOptions, folder) {
+    super(fileOptions, folder)
+    this.onUploadPosted = this.onUploadPosted.bind(this)
+  }
+
+  onUploadPosted(fileJson) {
     this.inFlight = false
     this.addFileToCollection(fileJson)
+    super.onUploadPosted(fileJson)
   }
 
   addFileToCollection = attrs => {

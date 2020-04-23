@@ -33,19 +33,18 @@ class CurrentUploads extends React.Component {
     onUploadChange: () => {}
   }
 
-  handleUploadQueueChange = () => {
-    this.setState({currentUploads: UploadQueue.getAllUploaders()}, () => {
+  handleUploadQueueChange = upload_queue => {
+    this.setState({currentUploads: upload_queue.getAllUploaders()}, () => {
       this.props.onUploadChange(this.state.currentUploads.length)
     })
   }
 
   componentDidMount() {
-    UploadQueue.onChange = this.handleUploadQueueChange
+    UploadQueue.addChangeListener(this.handleUploadQueueChange)
   }
 
   componentWillUnmount() {
-    // noop
-    UploadQueue.onChange = function() {}
+    UploadQueue.removeChangeListener(this.handleUploadQueueChange)
   }
 
   renderUploadProgress = function() {

@@ -97,7 +97,9 @@ export default class BaseUploader {
     }).then(this.onUploadPosted)
   }
 
-  onUploadPosted = _event => {}
+  // be careful if you ever need to change this implementation there
+  // is other code that replaces BaseUploader.prototype.onUploadPosted
+  onUploadPosted() {}
 
   onUploadCancelled(_file) {
     this.inFlight = false

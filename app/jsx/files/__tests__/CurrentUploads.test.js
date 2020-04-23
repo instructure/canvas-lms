@@ -23,8 +23,6 @@ import CurrentUploads from '../CurrentUploads'
 import FileUploader from 'compiled/react_files/modules/FileUploader'
 import UploadQueue from 'compiled/react_files/modules/UploadQueue'
 
-jest.mock('compiled/react_files/modules/UploadQueue')
-
 function makeUploader(name) {
   const uploader = new FileUploader({file: new File(['foo'], name, {type: 'text/plain'})})
   return uploader
@@ -34,7 +32,7 @@ describe('CurrentUploads', () => {
   it('pulls FileUploaders from UploadQueue', () => {
     const {getByText, getAllByRole} = render(<CurrentUploads />)
     const allUploads = [makeUploader('name'), makeUploader('other')]
-    UploadQueue.getAllUploaders.mockReturnValue(allUploads)
+    UploadQueue.getAllUploaders = jest.fn().mockReturnValue(allUploads)
     UploadQueue.onChange()
     expect(getByText('name')).toBeInTheDocument()
     expect(getByText('other')).toBeInTheDocument()
@@ -44,7 +42,7 @@ describe('CurrentUploads', () => {
   it('responds to changes in progress', () => {
     const {container} = render(<CurrentUploads />)
     const uploader = makeUploader('name')
-    UploadQueue.getAllUploaders.mockReturnValue([uploader])
+    UploadQueue.getAllUploaders = jest.fn().mockReturnValue([uploader])
     UploadQueue.onChange()
 
     expect(container.querySelector('[aria-valuenow="0"]')).toBeInTheDocument()

@@ -25,6 +25,10 @@ class UploadQueue {
     return this._queue.length
   }
 
+  pendingUploads() {
+    return this._queue.length + (this.currentUploader ? 1 : 0)
+  }
+
   flush() {
     return (this._queue = [])
   }
@@ -41,8 +45,19 @@ class UploadQueue {
     return this.currentUploader
   }
 
-  onChange() {}
-  // noop, set by components who care about it
+  listeners = []
+
+  addChangeListener(callback) {
+    this.listeners.push(callback)
+  }
+
+  removeChangeListener(callback) {
+    this.listeners = this.listeners.filter(l => l !== callback)
+  }
+
+  onChange() {
+    this.listeners.forEach(l => l(this))
+  }
 
   createUploader(fileOptions, folder, contextId, contextType) {
     const uploader = fileOptions.expandZip
