@@ -29,6 +29,7 @@ function createMockProps(opts = {}) {
     pagesUrl: '',
     defaultView: 'modules',
     frontPageTitle: '',
+    courseNickname: 'nickname',
     ...opts
   }
 }
@@ -79,5 +80,11 @@ describe('PublishButton', () => {
       expect(apiClient.getModules).not.toHaveBeenCalled()
       expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0'})
     })
+  })
+
+  it('renders SR content correctly', () => {
+    const wrapper = mount(<PublishButton {...createMockProps({defaultView: 'assignments'})} />)
+    const screenReaderNode = wrapper.find('ScreenReaderContent')
+    expect(screenReaderNode.text()).toBe('nickname')
   })
 })
