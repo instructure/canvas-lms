@@ -163,6 +163,25 @@ function getGradingForm() {
       })
     },
 
+    preventInsanity() {
+      $('#update_history_form .question_input').keydown(function(event) {
+        // stop enter from submitting for on DOWN,
+        // otherwise it can actually wreck a database
+        // because of the uniqueness constraints on the versions
+        // table
+        if (event.keyCode === 13) {
+          event.preventDefault()
+          return false
+        }
+      })
+      $('#update_history_form .question_input').keyup(function(event) {
+        if (event.keyCode === 13) {
+          // still let it submit when you're done pressing enter
+          $('#update_history_form').submit()
+        }
+      })
+    },
+
     scrollToUpdatedQuestion(event, hash) {
       if (hash.indexOf('#question') === 0) {
         const id = hash.substring(10)
@@ -425,6 +444,7 @@ $(document).ready(function() {
   const quizNavBar = getQuizNavBar()
 
   gradingForm.ensureSelectEventsFire()
+  gradingForm.preventInsanity()
 
   if (ENV.GRADE_BY_QUESTION) {
     $(document).scroll(quizNavBar.onScroll)
