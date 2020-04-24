@@ -1753,6 +1753,7 @@ da:
     default_name: "Intet navn"
   add_cc_subtitle_a9ef4a66: "Tilføj undertekst"
   add_collaboration_da9665ac: "Tilføj samarbejde"
+  add_conferences_from_calendar_98cb86b1: "Tilføj konferencer fra kalender"
   add_contact_method_d2dfea03: "Tilføj kontaktmetode"
   add_content_58b4305a: "Tilføj indhold"
   add_content_to_module_name_589a8d54: "Føj indhold til %{module_name}"
@@ -1993,6 +1994,7 @@ da:
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillad bulkeksport af karakterer til SIS"
   allow_comments_a1f45d8: "Tillad kommentarer"
   allow_comments_for_title_7ac9e00: "Tillad kommentarer til %{title}"
+  allow_conference_selection_lti_placement_c020ad8d: "Tillad konferencevalg LTI-placering"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillad, at fagindhold kan hentes og ses offline"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillad fag-billeder at blive tildelt til et fag og blive benyttet i oversigt-kortene."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Gør det muligt at føje kursusbilleder til et kursus, og til brug på dashcards."
@@ -2367,6 +2369,8 @@ da:
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "Tillader brugeren at se brugerens SIS ID-kolonne i CSV-filen for testelementanalyse."
   allows_user_to_view_user_sis_ids_68a9d218: "Gør det muligt for en bruger at få vist SIS-ID’er."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Giver brugeren mulighed for at se bruger-SIS-ID'er på et fags deltager-side."
+  allows_users_to_add_conferences_from_the_calendar_f36c5008: "Lader brugere tilføje konferencer fra kalenderen"
+  allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Lader brugere tilføje LTI-værktøjer med conference_selection placeringstype"
   allows_users_to_edit_conferences_2d3c960c: "Gør det muligt for brugere at redigere konferencer."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Tillader brugere at aktivere \"Start SpeedGrader Filtreret efter studiegruppe\" i fag på siden med fagindstillinger. Når aktiveret, og en studiegruppe er valgt i Ny karakteroversigt, så vil SpeedGrader kun indlæse studerende i den valgte gruppe."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Lader brugere slå feedback fra på fagniveau."
@@ -2485,6 +2489,8 @@ da:
     file_import_fail: "Kunne ikke importere fil \"%{file_path}\""
   angel_display: "ANGEL Learning"
   angel_file_description: "Angel-eksport .zip-format"
+  annotation_notification_685eaeb9: Anmærkningsmeddelelse
+  annotation_teacher_notification_c5e4db1f: "Anmærkningsmeddelelse lærere"
   announcement: 
     no_title: "Ingen overskrift"
   announcement_creation_failed_f7d227f5: "Oprettelse af besked mislykkedes"
@@ -2572,6 +2578,8 @@ da:
   anonymous_off_7985fcaf: "Slå anonym fra"
   anonymous_on_c5fa120d: "Slå anonym til"
   anonymous_re_submission_assignment_title_d9402721: "Anonym genaflevering: %{assignment_title}"
+  anonymous_submission_annotation_student_id_assignm_25eb88c9: "Anonym afleveringsanmærkning: Studerende (%{id}), %{assignment_title}, %{course_name}"
+  anonymous_submission_annotation_student_user_id_as_ffca8ce9: "Anonym afleveringsanmærkning: Studerende (%{user_id}), %{assignment_title}, %{course_name}"
   anonymous_submission_assignment_title_896654de: "Anonym aflevering: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Anonym aflevering kommentarer: Studerende (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Anonym aflevering kommentarer: Studerende (%{user_id}), %{assignment_title}, %{course_name}"
@@ -2851,6 +2859,7 @@ da:
   assignment_created_b3ee04d7: "Opgave oprettet"
   assignment_d8387b78: opgave
   assignment_dates_dccc98de: Opgavedatoer
+  assignment_dates_saved_successfully_78e0f355: "Opgavedatoer blev gemt."
   assignment_details: 
     no_graded_submissions: "Ingen bedømte opgaver"
   assignment_details_bc488179: Opgaveoplysninger
@@ -3626,6 +3635,7 @@ da:
             gennemgå hinandens arbejde.
   assignments_index_menu_4088a035: "Indeksmenu for opgaver"
   assignments_list_fe3e54be: Opgaveliste
+  assignments_loaded_72ee472c: "Opgaver indlæst"
   assignments_settings_30613d0c: Opgaveindstillinger
   assignments_speedgrader_2fbd6df4: "Opgaver, SpeedGrader"
   assignments_tutorial_tray_4cc844b: "Opgaver selvstudiumområde"
@@ -3827,6 +3837,7 @@ da:
   authnresponse_from_idp_185037e9: "AuthnResponse fra IdP"
   author_215203d2: Forfatter
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} netop oprettet en ny kommentar til afleveringen for %{submission_submittor} til %{assignment}"
+  author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "%{author_name} har lige skrevet en anmærkning til afleveringen fra %{user_name} til %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} har lige kommenteret på afleveringen fra %{user_name} til %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} har lige kommenteret på afleveringen fra %{user_name} til %{assignment_title}."
   author_s_name_b35e905a: "Forfatterens navn"
@@ -4614,6 +4625,7 @@ da:
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan kun interagere med brugere i deres sektion"
   can_list_categorized_event_types_52596f7: "Kan oprette en liste over kategoriserede begivenhedstyper."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Kan oprette liste over abonnementer på datatjenestedata."
+  can_lookup_account_information_13d69520: "Kan slå kontooplysninger op"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Kan hente brugerdata i forbindelse med den kontekst, værktøjet er installeret i."
   can_show_subscription_to_data_service_data_688ce3: "Kan vise abonnement på datatjenestedata."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikke beregne resultat, før en opgave har mulige point"
@@ -5144,6 +5156,7 @@ da:
   common_timezones_2b00baba: "Fælles tidszoner"
   commons_ed0252fb: Commons
   communicate_course_objectives_f457158c: "Kommuniker fagets mål"
+  communicate_grading_expectations_484a1f01: "Kommuniker forventninger til karaktergivning"
   communicate_to_your_students_exactly_what_will_be__57a679c5: |-
       Kommuniker til dine elever præcis, hvad der vil blive krævet af dem gennem hele forløbet i kronologisk rækkefølge. Generer et
       indbygget pensum baseret på opgaver og begivenheder, som du har oprettet.
@@ -5250,6 +5263,7 @@ da:
                 studerende. Broadcast realtids-audio og -video, del præsentationer, giv
                 demonstrationer af applikationer og online-ressourcer
                 og mere.
+  conference_selection_ea4050bb: Konferencevalg
   conference_was_deleted_30869390: "Konferencen blev slettet"
   conferences: 
     concluded_conference: 
@@ -7719,6 +7733,7 @@ da:
   deep_purple_bb3e2907: "Dyb lilla"
   default_9db103d: Standard
   default_conference_title: "%{course_name} konference"
+  default_dates_a0a2ae26: standarddatoer
   default_email_5cb9fa04: "Standard-e-mail:"
   default_email_9efb7fbd: "Standard e-mail"
   default_grade_cannot_be_set_to_ex_723caa59: "Standard karakter kan ikke indstilles til %{ex}"
@@ -8494,6 +8509,7 @@ da:
   drag_and_drop_your_image_here_or_7fba7c14: "Træk og slip dit billede her eller "
   drag_to_rearrange_sections_637efee3: "Træk for at omorganisere sektioner"
   drag_up_or_down_to_reorder_382126ff: "Træk op eller ned for at omorganisere"
+  drop_files_here_to_upload_ce0f50f9: "Slip filer her for at uploade"
   drop_image_62a2a071: "Slip billede"
   dropdown_changed_state_to_expanded_517689c2: "dropdown ændret tilstand til %{expanded}."
   dropdown_option_1_e6ff2fc: "Dropdown-menu indstilling 1"
@@ -8601,6 +8617,7 @@ da:
   edit_and_delete_their_own_posts_f4f7cc6: "Redigere og slette deres egne opslag"
   edit_announcement_title_cce0b4e: "Rediger besked %{title}"
   edit_app_b0cc1c17: "Rediger app"
+  edit_assignment_dates_6f8c72b: "Rediger opgavedatoer"
   edit_assignment_ebf22a72: "Rediger opgave"
   edit_assignment_group_c04c4af0: "Rediger opgavegruppe"
   edit_assignment_name_8a7af80c: "Rediger opgavens navn"
@@ -8784,6 +8801,7 @@ da:
   enable_course_as_a_blueprint_course_8515ffd5: "Aktiver fag som et blueprint-fag"
   enable_dashboard_images_for_courses_5af458b0: "Aktivér oversigtsbilleder til fag"
   enable_extra_filter_options_b52c23e6: "aktiver ekstra filterindstillinger"
+  enable_face_to_face_connection_9df19b76: "Aktivér ansigt til ansigt-forbindelse"
   enable_feature_title_987d8e9a: "Aktivér funktion: %{title}"
   enable_fullstory_5c673a06: "Aktivér hel historie"
   enable_gradebook_list_students_by_sortable_name: "Brug de studerendes sorterbare navne i Karakteroversigten. Sorterbart navn er som standard 'Efternavn, Fornavn' og kan ændres i indstillinger."
@@ -9202,6 +9220,7 @@ da:
   error_sending_submission_comment_dc15d24f: "Fejl ved afsendelse af afleveringskommentar"
   error_sending_submission_d32dc075: "Fejl ved indsendelse af aflevering"
   error_starting_content_share_18fb1532: "Fejl ved påbegyndelse af indholdsdeling"
+  error_starting_save_operation_81bcb99: "Fejl ved forsøg på at gemme:"
   error_submitting_to_plagiarism_service_9b0748cb: "Fejl ved indsendelse til plagieringstjeneste"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Fejl ved indsendelse til plagieringstjeneste. Du kan indsende fra SpeedGrader igen."
   error_updating_submission_draft_1d40ade7: "Fejl ved opdatering af afleveringsudkast"
@@ -11548,12 +11567,16 @@ da:
   hours_late_989e9081: "Timer for sent"
   hover_over_me_496521b9: "Peg på mig"
   how_do_i_add_a_module_65f5bf13: "Hvordan tilføjer jeg et modul?"
+  how_do_i_add_a_rubric_in_a_course_a4c7a40: "Hvordan tilføjer jeg en rubrik i et fag?"
+  how_do_i_add_a_rubric_to_an_assignment_46fd097e: "Hvordan tilføjer jeg et vurderingskriterie til en opgave?"
   how_do_i_add_an_announcement_in_a_course_63396bb7: "Hvordan tilføjer jeg en besked i et fag?"
   how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: "Hvordan tilføjer jeg et billede til et fagkort i oversigten?"
   how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "Hvordan tilføjer jeg opgavetyper, sider og filer som modulelementer?"
   how_do_i_add_or_edit_details_in_an_assignment_fa779906: "Hvordan tilføjer eller redigerer jeg detaljer i en opgave?"
   how_do_i_add_users_to_a_course_4a88efaf: "Hvordan tilføjer jeg brugere til et fag?"
+  how_do_i_add_zoom_to_a_course_31300d74: "Hvordan tilføjer jeg Zoom til et fag?"
   how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: "Hvordan justerer jeg begivenheder og afleveringsdatoer i en fagimport?"
+  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "Hvordan justerer jeg et læringsudbytte med en rubrik i et fag?"
   how_do_i_bulk_upload_files_to_a_course_b145d8cc: "Hvordan uploader jeg flere filer til et fag?"
   how_do_i_change_a_course_name_and_course_code_23b41292: "Hvordan ændrer jeg et fags navn og kode?"
   how_do_i_change_the_course_home_page_326cee50: "Hvordan ændrer jeg fagets startside?"
@@ -11568,6 +11591,8 @@ da:
   how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: "Hvordan opretter jeg en test med individuelle spørgsmål?"
   how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Hvordan opretter jeg en vurdering ved hjælp af New Quizzes?"
   how_do_i_create_an_assignment_35532b59: "Hvordan opretter jeg en opgave?"
+  how_do_i_create_an_outcome_for_a_course_cf0ea2b3: "Hvordan opretter jeg et resultat for et fag?"
+  how_do_i_create_outcome_groups_for_a_course_362429a0: "Hvordan opretter jeg læringsudbytte-grupper for et fag?"
   how_do_i_download_the_student_app_4a4b8a63: "Hvordan downloader jeg appen til studerende?"
   how_do_i_download_the_student_app_and_get_addition_3604c207: "Hvordan downloader jeg appen til studerende? og får yderligere hjælp?"
   how_do_i_edit_an_announcement_in_a_course_815c3c60: "Hvordan redigerer jeg en besked i et fag?"
@@ -11575,20 +11600,32 @@ da:
   how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Hvordan indtaster og redigerer jeg karakterer i karakteroversigten?"
   how_do_i_find_my_courses_b826e4ce: "Hvordan finder jeg mine fag?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Hvordan importerer jeg en Canvas-eksportpakke?"
+  how_do_i_import_outcomes_for_a_course_8eced1a: "Hvordan importerer jeg læringsudbytter for et fag?"
+  how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: "Hvordan ved jeg, om studerende er tilsluttet mødet?"
+  how_do_i_manage_and_share_the_recording_52fc2993: "Hvordan administrerer og deler jeg optagelsen?"
+  how_do_i_manage_rubrics_in_a_course_a5441fb7: "Hvordan administrerer jeg rubrikker i et fag?"
   how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: "Hvordan administrerer jeg indstillinger for en vurdering i New Quizzes?"
   how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Hvordan flytter og organiserer jeg filer som instruktør?"
   how_do_i_move_or_reorder_a_module_e64a4baa: "Hvordan flytter eller omarrangerer jeg et modul?"
+  how_do_i_mute_and_unmute_all_participants_a7a2115b: "Hvordan kan jeg slå lyden fra/til for alle deltagere?"
   how_do_i_post_grades_for_an_assignment_in_the_grad_bc01018e: "Hvordan slår jeg karakterer for en opgave op i karakteroversigten?"
   how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "Hvordan offentliggør eller fjerner jeg offentliggørelse for en diskussion som instruktør?"
   how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "Hvordan offentliggør eller fjerner jeg offentliggørelse for et modul som instruktør?"
   how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Hvordan offentliggør eller fjerner jeg offentliggørelse for en side som instruktør?"
   how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "Hvordan offentliggør eller fjerner jeg offentliggørelse for en opgave som instruktør?"
   how_do_i_record_a_conference_e4845e7: "Hvordan optager jeg en konference?"
+  how_do_i_record_a_meeting_ae3a0d4e: "Hvordan optager jeg et møde?"
   how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Hvordan svarer jeg på en diskussion som instruktør?"
+  how_do_i_schedule_a_zoom_video_meeting_5986f068: "Hvordan planlægger jeg et Zoom-videomøde?"
   how_do_i_select_specific_content_as_part_of_a_cour_11fe2c8d: "Hvordan vælger jeg specifikt indhold som en del af en fagimport?"
+  how_do_i_send_a_message_to_all_students_based_on_s_59d186d1: "Hvordan sender jeg en besked til alle studerende baseret på specifikke fagkriterier i New Analytics?"
+  how_do_i_send_a_message_to_an_individual_student_i_92c7fb: "Hvordan sender jeg en besked til en individuel studerende i New Analytics?"
   how_do_i_set_a_front_page_in_a_course_a5f53cd5: "Hvordan indstiller jeg en ny forside i et fag?"
   how_do_i_set_details_for_a_course_52cfbeff: "Hvordan indstiller detaljer for et fag?"
+  how_do_i_share_my_screen_c280e585: "Hvordan deler jeg min skærm?"
   how_do_i_start_a_conference_52792795: "Hvordan starter jeg en konference?"
+  how_do_i_start_a_meeting_e8a9e67b: "Hvordan starter jeg et møde?"
+  how_do_i_turn_my_camera_on_or_off_and_use_zoom_con_8a96538b: "Hvordan tænder/slukker jeg mit kamera og bruger Zoom-kontroller?"
   how_do_i_upload_a_file_to_a_course_e8332cfe: "Hvordan uploader jeg en fil i et fag?"
   how_do_i_use_course_settings_1e8467e6: "Hvordan bruger jeg fagindstillingerne?"
   how_do_i_use_files_as_an_instructor_70a996b: "Hvordan bruger jeg Filer som instruktør?"
@@ -11597,11 +11634,14 @@ da:
   how_do_i_use_the_collaborations_index_page_68ee88b5: "Hvordan bruger jeg indekssiden for samarbejder?"
   how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "Hvordan bruger jeg fagets startside som instruktør?"
   how_do_i_use_the_gradebook_622395dc: "Hvordan bruger jeg karakteroversigten?"
+  how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: "Hvordan bruger jeg karakteroversigten for opfyldelse af læringsmål til at få vist resultater for et fag i Karakteroversigten?"
+  how_do_i_use_the_outcomes_page_in_a_course_a37e0231: "Hvordan bruger jeg siden Læringsudbytte i et fag?"
   how_do_i_use_the_pages_index_page_dafb986c: "Hvordan bruger jeg indekssiden for Sider?"
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Hvordan bruger jeg siden Deltagere i et fag som instruktør?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Hvordan bruger jeg indekssiden for Test?"
   how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Hvordan bruger jeg læseplanen som instruktør?"
   how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "Hvordan kan jeg se et kontekstkort for en studerende i et fag?"
+  how_do_i_view_analytics_for_an_individual_student_724134ed: "Hvordan kan jeg se analyser for en individuel studerende?"
   how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Hvordan ser og sorterer jeg diskussioner som instruktør?"
   how_do_i_view_assignments_or_students_individually_2b7211f8: "Hvordan kan jeg se opgaver eller studerende individuelt i karakteroversigten?"
   how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "Hvordan kan jeg se detaljerne i en aflevering for en studerende i SpeedGrader?"
@@ -12569,6 +12609,7 @@ da:
   loading_announcements_b927a86c: "Henter beskeder"
   loading_assessment_audit_trail_5cf4c10: "Indlæser vurdering af revisionssporet"
   loading_assignments_352ec769: "Opgaver indlæses"
+  loading_assignments_b3b248be: "Indlæser opgaver"
   loading_associations_2b92bcf7: "Indlæser associationer ..."
   loading_associations_9da66c4e: "Indlæser associationer"
   loading_associations_complete_b93a9c6e: "Indlæsning af associationer afsluttet"
@@ -13157,6 +13198,17 @@ da:
       twitter: 
         body: "Der er blevet udløst en varsling for %{student}"
         body_student: "Der er blevet udløst en varsling for dig"
+    annotation_notification: 
+      email: 
+        body: "Der er blevet skrevet en ny anmærkning af %{author} til opgaven %{assignment_name}."
+        html: 
+          body: "Der er blevet skrevet en ny anmærkning af %{author} til opgaven %{assignment_name}."
+          link_text: "Vis aflevering"
+          subject: "Der er blevet skrevet en ny anmærkning til dit afleveringsdokument"
+        subject: "Der er blevet skrevet en ny anmærkning til dit afleveringsdokument"
+      summary: 
+        body: "Der er blevet skrevet en ny anmærkning af %{author} til opgaven %{assignment_name}."
+        subject: "Der er blevet skrevet en ny anmærkning til dit afleveringsdokument"
     announcement_created_by_you: 
       email: 
         html: 
@@ -15336,6 +15388,13 @@ da:
   new_13daf639: Ny
   new_account_role_6e5c4964: "Ny kontorolle"
   new_analytics_api_access_7eec1ead: "Ny Analytics API-adgang"
+  new_analytics_f6147886: "New Analytics"
+  new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
+      New Analytics er et interaktivt værktøj, som hjælper dig og dine studerende med at
+          spore præstation og aktivitet inden for faget. Find ud af, hvilke studerende har set
+          sider og ressourcer og deltaget i opgaver — og hvilke studerende der kan have brug for
+          lidt mere opmuntring.
+  new_analytics_tutorial_tray_2511a34a: "Selvstudiumområde for New Analytics"
   new_annotations_66932016: "Nye anmærkninger"
   new_announcement_23af4598: "Ny besked"
   new_announcement_in_course_name_title_84607f44: "Ny besked i %{course_name}: %{title}"
@@ -15956,6 +16015,7 @@ da:
       remember_auth: "Husk autorisation"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: Objekttype
+  observe_student_mastery_a1f01a: "Se studerendes opfyldelse af læringsmål"
   observees: 
     being_observed: "Studerende der observeres"
     new_observee_pairing_code: "Parringskode for studerende"
@@ -16087,6 +16147,7 @@ da:
   options_for_title_label_17f821ff: "Valg til %{title_label}"
   or_9b70ccaa: Eller
   or_a01eec62: ELLER
+  or_choose_files_b795006d: "eller vælg filer"
   or_in_the_courses_list_6201030: "... eller i listen Fag."
   orange_81386a62: Orange
   orbis_report_header_assignment_id: opgave-id
@@ -16310,6 +16371,7 @@ da:
   outcomes_import_completed_baff5cb0: "Import af læringsudbytter afsluttet"
   outcomes_import_failed_77efcdf4: "Import af læringsudbytte mislykkedes"
   outcomes_report_8887bd49: Læringsudbytte-rapport
+  outcomes_tutorial_tray_ebfce995: "Selvstudiumområde for læringsudbytter"
   over_time_bee1a733: "over tid"
   override_3de65b2c: Tilsidesæt
   override_grade_385adf30: "tilsidesæt karakter"
@@ -16460,6 +16522,7 @@ da:
   people_tutorial_tray_a87a6c48: "Deltagere selvstudiumområde"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Deltagere vil se dette navn i diskussioner, beskeder og kommentarer."
   percent_448ea947: procent
+  percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent} afsluttet"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Procentdel af respondenter som vælger dette svar"
   percent_of_students_scored_score_53d2c4d5: "%{percent} af studerende opnåede %{score}"
@@ -19718,8 +19781,16 @@ da:
   rubrics_add_edit_delete_8299eff7: "Rubrikker - tilføj / rediger / slet"
   rubrics_and_speedgrader_ececaed4: "Rubrikker og SpeedGrader"
   rubrics_b5ef369b: Rubrikker
+  rubrics_can_show_students_your_expectations_for_as_3382da64: |-
+      Rubrikker kan vise de studerende dine forventninger til opgavekvalitet
+          og hvordan de bliver bedømt i overensstemmelse hermed. Rubrikker kan være forbundet med
+          opgaver, diskussioner og test. Brug en rubrik udelukkende til karaktergivning,
+          eller opret en ikke-bedømt rubrik specifikt til vurderingsbaseret og
+          resultatbaseret bedømmelse uden point. Læringsudbytter kan tilføjes som kriterie-
+          elementer i rubrikker.
   rubrics_in_course_navigation_539ea536: "Rubrikker i fagnavigation"
   rubrics_speedgrader_a6ebec57: "Rubrikker, SpeedGrader"
+  rubrics_tutorial_tray_be65d10d: "Selvstudiumområde for rubrikker"
   running_c5a4998d: Kører
   russia_7_87bc99d5: "Rusland (+7)"
   russian_1e3e197: Russisk
@@ -19749,6 +19820,8 @@ da:
   saved_comments_2f6ba95: "Gemte kommentarer"
   saved_discussion_settings_successfully_ebd46a57: "Diskussionsindstillinger blev gemt"
   saving_2521e616: Gemmer
+  saving_assignment_dates_progress_9856153d: "Status for lagring af opgavedatoer"
+  saving_assignment_dates_progress_percent_a5ea89a1: "Status for lagring af opgavedatoer: %{percent}%"
   saving_assignment_fb958949: "Gemmer opgave"
   saving_associations_989bd4da: "Gemmer associationer"
   saving_associations_complete_e4b9634d: "Det lykkedes at gemme associationer"
@@ -20284,6 +20357,11 @@ da:
       \x20                 Juster antallet af bedømmelser, opfyldelsesniveau, point og farver.\n\n\
       \x20               "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Opstil, hvordan dine færdighedsbedømmelser vises inden for karakteroversigten over opfyldelse af læringsmål. Juster antallet af bedømmelser, opfyldelsesniveau, point og farver."
+  set_up_outcomes_in_your_course_as_measured_by_peda_34237d17: |-
+      Indstil læringsudbytter i dit fag som målt gennem pædagogiske eller ønskede mål.
+            Hjælp de studerende med at lære færdigheder og aktiviteter i stedet for kun at fokusere på karakterer til at måle deres succes.
+            Evaluer de studerendes fremskridt gennem beregningsmetoder, og mål fremskridt direkte i karakteroversigten for opfyldelse af læringsmål.
+            Importer læringsudbytter for eksisterende konto-, status- og Common Core-standarder i dit fag. Du kan også justere læringsudbytter i fagets rubrikker.
   set_up_video_conferencing_and_other_tools_1a94a350: "konfigurerer videokonferencer og andre værktøjer"
   set_up_video_conferencing_c0049abe: "Konfigurer videokonferencer"
   set_up_your_canvas_course_in_30_minutes_or_less_94817b6d: "Opsæt dit Canvas-fag på 30 minutter eller mindre."
@@ -21236,6 +21314,7 @@ da:
   size_b30e1077: Størrelse
   size_f1873a2: ", størrelse: "
   size_size_a77bd760: "størrelse: %{size}"
+  skip_bcb86160: "Spring over"
   skip_to_content_22ad1d00: "Spring til indhold"
   skipped_file_filename_due_to_error_94f0194: "Sprang over filen %{filename} grundet fejl"
   skipping_unknown_file_type_cd1086ee: "Springer over ukendt filtype"
@@ -21269,6 +21348,7 @@ da:
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Nogle afleveringer kan ikke bedømmes; karakterændringer for disse afleveringer er blevet ignoreret."
   someone: Nogen
   someone_bbbc538b: Nogen
+  someone_just_made_a_new_annotation_on_the_anonymou_cbbe68ca: "En person har lige skrevet en anmærkning til den anonyme aflevering for den studerende (%{user_id}) til %{assignment_title}"
   someone_just_made_a_new_comment_on_the_anonymous_s_3627de61: "En person har lige kommenteret på den anonyme aflevering for studerende (%{user_id}) til %{assignment_title}"
   someone_just_made_a_new_comment_on_the_anonymous_s_a2e944fc: "En person har lige kommenteret på den anonyme aflevering for studerende (%{user_id}) til %{assignment_title}"
   something_broke_unexpectedly_6d3720ee: "Noget gik uventet i stykker."
@@ -21279,6 +21359,7 @@ da:
   something_went_wrong_creating_course_please_try_ag_5198931d: "Noget gik galt ved oprettelse af fag. Prøv igen."
   something_went_wrong_creating_the_course_please_tr_431adff5: "Der gik noget galt ved oprettelse af faget. Prøv igen."
   something_went_wrong_d238c551: "Noget gik galt"
+  something_went_wrong_downloading_submissions_pleas_6d069a09: "Der gik noget galt med at downloade afleveringerne. Prøv igen senere."
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Noget gik galt under inaktivering af bruger. Prøv venligst igen senere."
   something_went_wrong_loading_the_violations_try_re_6e2fa92: "Der gik noget galt ved indlæsning af overtrædelserne, prøv at indlæse siden igen."
   something_went_wrong_please_try_again_6d337b6c: "Noget gik galt, prøv venligst igen."
@@ -21637,6 +21718,8 @@ da:
       submitted: afleveret
       unsubmitted: "ikke afleveret"
   submission_added_title_50ebdc85: "aflevering tilføjet: %{title}"
+  submission_annotation_user_name_assignment_title_c_39910597: "Afleveringsanmærkning: %{user_name}, %{assignment_title}, %{course_name}"
+  submission_annotation_user_name_assignment_title_c_80c1963e: "Afleveringsanmærkning: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comment: 
     unknown_author: Nogen
   submission_comment_created_f9375ca2: "Afleveringskommentar oprettet"
@@ -22309,11 +22392,13 @@ da:
   there_was_an_error_removing_the_image_c83acffe: "Der opstod en fejl under fjernelsen af billedet"
   there_was_an_error_removing_the_item_f8324776: "Der opstod en fejl under fjernelsen af elementet"
   there_was_an_error_retrieving_assignment_dates_39320c15: "Der opstod en fejl under hentning af opgavedatoerne."
+  there_was_an_error_retrieving_job_progress_266523f9: "Der opstod en fejl under hentning af jobstatus"
   there_was_an_error_retrieving_the_course_image_d7ea094d: "Der var en fejl ved hentning af fagets billede"
   there_was_an_error_saving_the_assignment_dates_d31903ab: "Der opstod en fejl, mens opgavedatoerne blev gemt."
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Der opstod en fejl ved lagring af fagets ændringer"
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "Der opstod en fejl under lagring af noten. Prøv igen."
   there_was_an_error_setting_usage_rights_53739e1d: "Der opstod en fejl ved indstilling af brugsrettigheder."
+  there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Der opstod en fejl ved påbegyndelse af jobbet Gem opgavedatoerne"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Der opstod en fejl ved aflevering til lighedsafsløringstjenesten. Prøv at genindsende filen, inden du kontakter support."
   there_was_an_error_updating_this_assignment_please_59fc608d: "Der opstod en fejl under opdatering af denne opgave. Opdater venligst siden og prøv igen."
   there_was_an_error_uploading_the_image_932fc4ce: "Der var en fejl under upload of billedet"
@@ -22324,6 +22409,7 @@ da:
   there_was_an_unknown_error_registering_the_tool_b9a29954: "Der opstod en ukendt fejl ved registrering af værktøjet"
   there_were_a_total_of_count_errors_db1d89de: "Der var i alt %{count} fejl."
   there_were_a_total_of_count_warnings_6405df1e: "Der var i alt %{count} advarsler."
+  there_were_errors_saving_the_assignment_dates_3b39571b: "Der opstod fejl, mens opgavedatoerne blev gemt:"
   there_were_errors_with_the_form_errors_ab5b559a: "Der opstod fejl med formularen: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Der var flere mulige match med importen. Løs dem nedenfor."
   there_were_some_files_we_didn_t_know_what_to_do_wi_6156913f: "Der var nogle filer, vi ikke vidste, hvad vi skulle gøre med. De er ikke blevet tilføjet til nogens afleveringsside."
@@ -23144,6 +23230,7 @@ da:
     quiz_regrade: 
       got_it: "Ok, forstået"
   track_individual_student_and_class_progress_c13cf2d1: "Spor fremskridt for individuelle studerende og klasse"
+  track_student_performance_and_activity_a92a2a8b: "Spor de studerendes præstation og aktivitet"
   treat_ungraded_as_0_d38c2b41: "Tildel 0 til ikke bedømte"
   tree_browser: 
     folder_tree_instructions: "Brug op- og nedpilene for at navigere gennem træet. Tryk til højre for at udvide mapperne, venstre for at skjule og på Enter for at vælge det ønskede element."
@@ -24660,3 +24747,9 @@ da:
     zip_options: "Indstillinger til zip-fil"
   zip_no_folder_error: "Den specificerede mappe kunne ikke findes i dette fag."
   zoom_f3e54d69: Zoom
+  zoom_is_a_real_time_video_conferencing_tool_that_b_97dd23ec: |-
+      Zoom er et videokonferenceværktøj i realtid, som bringer
+          lærere og studerende sammen. Du kan planlægge og holde
+          videomøder direkte i Canvas ved at tilføje et Zoom-link
+          i et Canvas-fag, en fagbesked, et modul eller via kalenderen.
+  zoom_tutorial_tray_5dcb7fc: "Selvstudiumområde for Zoom"
