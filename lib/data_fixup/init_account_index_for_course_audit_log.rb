@@ -148,7 +148,7 @@ module DataFixup
     end
 
     def add_course_account_index(row, account_id)
-      index = Auditors::Course::Stream.account_index
+      index = ::Auditors::Course::Stream.account_index
       key = [account_id]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end

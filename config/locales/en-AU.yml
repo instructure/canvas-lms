@@ -1755,6 +1755,7 @@ en-AU:
     default_name: "No Name"
   add_cc_subtitle_a9ef4a66: "Add CC/Subtitle"
   add_collaboration_da9665ac: "Add Collaboration"
+  add_conferences_from_calendar_98cb86b1: "Add Conferences from Calendar"
   add_contact_method_d2dfea03: "Add Contact Method"
   add_content_58b4305a: "Add Content"
   add_content_to_module_name_589a8d54: "Add Content to %{module_name}"
@@ -1995,6 +1996,7 @@ en-AU:
   allow_bulk_grade_export_to_sis_e11a6e66: "Allow Bulk Grade Export to SIS"
   allow_comments_a1f45d8: "Allow Comments"
   allow_comments_for_title_7ac9e00: "Allow comments for %{title}"
+  allow_conference_selection_lti_placement_c020ad8d: "Allow Conference Selection LTI placement"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Allow course content to be downloaded and viewed offline"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Allow course images to be assigned to a course and used on the dashboard cards."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Allow course images to be assigned to a course and used on the dashcards."
@@ -2373,6 +2375,8 @@ en-AU:
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "Allows user to view the user SIS ID column in the Quiz Item Analysis CSV file."
   allows_user_to_view_user_sis_ids_68a9d218: "Allows user to view user SIS IDs."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Allows user to view user SIS IDs in a course People page."
+  allows_users_to_add_conferences_from_the_calendar_f36c5008: "Allows users to add conferences from the calendar"
+  allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Allows users to add LTI tools with conference_selection placement type"
   allows_users_to_edit_conferences_2d3c960c: "Allows users to edit Conferences."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Allows users to enable the \"Launch SpeedGrader Filtered by Student Group\" option for courses on the course settings page. When active and a student group has been selected in New Gradebook, SpeedGrader will only load students in the selected group."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Allows users to mute notifications on a course level granularity."
@@ -2491,6 +2495,8 @@ en-AU:
     file_import_fail: "Could not import file \"%{file_path}\""
   angel_display: "ANGEL Learning"
   angel_file_description: "Angel export .zip format"
+  annotation_notification_685eaeb9: "Annotation Notification"
+  annotation_teacher_notification_c5e4db1f: "Annotation Teacher Notification"
   announcement: 
     no_title: "No Title"
   announcement_creation_failed_f7d227f5: "Announcement creation failed"
@@ -2580,6 +2586,8 @@ en-AU:
   anonymous_off_7985fcaf: "Anonymous Off"
   anonymous_on_c5fa120d: "Anonymous On"
   anonymous_re_submission_assignment_title_d9402721: "Anonymous Re-Submission: %{assignment_title}"
+  anonymous_submission_annotation_student_id_assignm_25eb88c9: "Anonymous Submission Annotation: Student (%{id}), %{assignment_title}, %{course_name}"
+  anonymous_submission_annotation_student_user_id_as_ffca8ce9: "Anonymous Submission annotation: Student (%{user_id}), %{assignment_title}, %{course_name}"
   anonymous_submission_assignment_title_896654de: "Anonymous Submission: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Anonymous Submission Comment: Student (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Anonymous Submission Comment: Student (%{user_id}), %{assignment_title}, %{course_name}"
@@ -2859,6 +2867,7 @@ en-AU:
   assignment_created_b3ee04d7: "Assignment created"
   assignment_d8387b78: assignment
   assignment_dates_dccc98de: "Assignment Dates"
+  assignment_dates_saved_successfully_78e0f355: "Assignment dates saved successfully."
   assignment_details: 
     no_graded_submissions: "No marked submissions"
   assignment_details_bc488179: "Assignment Details"
@@ -3636,6 +3645,7 @@ en-AU:
             review each other's work.
   assignments_index_menu_4088a035: "Assignments Index Menu"
   assignments_list_fe3e54be: "Assignments List"
+  assignments_loaded_72ee472c: "Assignments loaded"
   assignments_settings_30613d0c: "Assignments Settings"
   assignments_speedgrader_2fbd6df4: "Assignments, SpeedGrader"
   assignments_tutorial_tray_4cc844b: "Assignments Tutorial Tray"
@@ -3837,6 +3847,7 @@ en-AU:
   authnresponse_from_idp_185037e9: "AuthnResponse from IdP"
   author_215203d2: Author
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} just made a new comment on the submission for %{submission_submittor} for %{assignment}"
+  author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "%{author_name} just made a new annotation on the submission for %{user_name} for %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} just made a new comment on the submission for %{user_name} for %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} just made a new comment on the submission for %{user_name} for %{assignment_title}."
   author_s_name_b35e905a: "Author's Name"
@@ -4626,6 +4637,7 @@ en-AU:
   can_interact_with_users_in_their_section_only_48cb8c43: "Can interact with users in their section only"
   can_list_categorized_event_types_52596f7: "Can list categorised event types."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Can list subscriptions to data service data."
+  can_lookup_account_information_13d69520: "Can lookup Account information"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Can retrieve user data associated with the context the tool is installed in."
   can_show_subscription_to_data_service_data_688ce3: "Can show subscription to data service data."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Can't compute score until an assignment has points possible"
@@ -5156,6 +5168,7 @@ en-AU:
   common_timezones_2b00baba: "Common Time Zones"
   commons_ed0252fb: Commons
   communicate_course_objectives_f457158c: "Communicate course objectives"
+  communicate_grading_expectations_484a1f01: "Communicate grading expectations"
   communicate_to_your_students_exactly_what_will_be__57a679c5: |-
       Communicate to your students exactly what will be required
       of them throughout the course in chronological order. Generate a
@@ -5267,6 +5280,7 @@ en-AU:
                 groups. Broadcast real-time audio and video, share presentation
                 slides, give demonstrations of applications and online resources,
                 and more.
+  conference_selection_ea4050bb: "Conference Selection"
   conference_was_deleted_30869390: "Conference was deleted"
   conferences: 
     concluded_conference: 
@@ -7740,6 +7754,7 @@ en-AU:
   deep_purple_bb3e2907: "Deep Purple"
   default_9db103d: Default
   default_conference_title: "%{course_name} Conference"
+  default_dates_a0a2ae26: "default dates"
   default_email_5cb9fa04: "Default Email:"
   default_email_9efb7fbd: "Default Email"
   default_grade_cannot_be_set_to_ex_723caa59: "Default grade cannot be set to %{ex}"
@@ -8517,6 +8532,7 @@ en-AU:
   drag_and_drop_your_image_here_or_7fba7c14: "Drag and drop your image here or "
   drag_to_rearrange_sections_637efee3: "Drag to rearrange sections."
   drag_up_or_down_to_reorder_382126ff: "Drag up or down to reorder"
+  drop_files_here_to_upload_ce0f50f9: "Drop files here to upload"
   drop_image_62a2a071: "Drop Image"
   dropdown_changed_state_to_expanded_517689c2: "dropdown changed state to %{expanded}."
   dropdown_option_1_e6ff2fc: "Dropdown option 1"
@@ -8624,6 +8640,7 @@ en-AU:
   edit_and_delete_their_own_posts_f4f7cc6: "Edit and delete their own posts"
   edit_announcement_title_cce0b4e: "Edit announcement %{title}"
   edit_app_b0cc1c17: "Edit App"
+  edit_assignment_dates_6f8c72b: "Edit Assignment Dates"
   edit_assignment_ebf22a72: "Edit Assignment"
   edit_assignment_group_c04c4af0: "Edit Assignment Group"
   edit_assignment_name_8a7af80c: "Edit assignment name"
@@ -8807,6 +8824,7 @@ en-AU:
   enable_course_as_a_blueprint_course_8515ffd5: "Enable course as a Blueprint Course"
   enable_dashboard_images_for_courses_5af458b0: "Enable Dashboard Images for Courses"
   enable_extra_filter_options_b52c23e6: "enable extra filter options"
+  enable_face_to_face_connection_9df19b76: "Enable face-to-face connection"
   enable_feature_title_987d8e9a: "Enable feature: %{title}"
   enable_fullstory_5c673a06: "Enable fullstory"
   enable_gradebook_list_students_by_sortable_name: "List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings."
@@ -9224,6 +9242,7 @@ en-AU:
   error_sending_submission_comment_dc15d24f: "Error sending submission comment"
   error_sending_submission_d32dc075: "Error sending submission"
   error_starting_content_share_18fb1532: "Error starting content share"
+  error_starting_save_operation_81bcb99: "Error starting save operation:"
   error_submitting_to_plagiarism_service_9b0748cb: "Error submitting to plagiarism service"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Error submitting to plagiarism service. You may resubmit from SpeedGrader."
   error_updating_submission_draft_1d40ade7: "Error updating submission draft"
@@ -11573,12 +11592,16 @@ en-AU:
   hours_late_989e9081: "Hours late"
   hover_over_me_496521b9: "Hover over me"
   how_do_i_add_a_module_65f5bf13: "How do I add a module?"
+  how_do_i_add_a_rubric_in_a_course_a4c7a40: "How do I add a rubric in a course?"
+  how_do_i_add_a_rubric_to_an_assignment_46fd097e: "How do I add a rubric to an assignment?"
   how_do_i_add_an_announcement_in_a_course_63396bb7: "How do I add an announcement in a course?"
   how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: "How do I add an image to a course card in the Dashboard?"
   how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "How do I add assignment types, pages, and files as module items?"
   how_do_i_add_or_edit_details_in_an_assignment_fa779906: "How do I add or edit details in an assignment?"
   how_do_i_add_users_to_a_course_4a88efaf: "How do I add users to a course?"
+  how_do_i_add_zoom_to_a_course_31300d74: "How do I add Zoom to a course?"
   how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: "How do I adjust events and due dates in a course import?"
+  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "How do I align an outcome with a rubric in a course?"
   how_do_i_bulk_upload_files_to_a_course_b145d8cc: "How do I bulk upload files to a course?"
   how_do_i_change_a_course_name_and_course_code_23b41292: "How do I change a course name and course code?"
   how_do_i_change_the_course_home_page_326cee50: "How do I change the Course Home Page?"
@@ -11593,6 +11616,8 @@ en-AU:
   how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: "How do I create a quiz with individual questions?"
   how_do_i_create_an_assessment_using_new_quizzes_801b0146: "How do I create an assessment using New Quizzes?"
   how_do_i_create_an_assignment_35532b59: "How do I create an assignment?"
+  how_do_i_create_an_outcome_for_a_course_cf0ea2b3: "How do I create an outcome for a course?"
+  how_do_i_create_outcome_groups_for_a_course_362429a0: "How do I create outcome groups for a course?"
   how_do_i_download_the_student_app_4a4b8a63: "How do I download the Student App?"
   how_do_i_download_the_student_app_and_get_addition_3604c207: "How do I download the Student App and get additional help?"
   how_do_i_edit_an_announcement_in_a_course_815c3c60: "How do I edit an announcement in a course?"
@@ -11600,20 +11625,32 @@ en-AU:
   how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "How do I enter and edit grades in the Gradebook?"
   how_do_i_find_my_courses_b826e4ce: "How do I find my courses?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "How do I import a Canvas course export package?"
+  how_do_i_import_outcomes_for_a_course_8eced1a: "How do I import outcomes for a course?"
+  how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: "How do I know if students have joined the meeting?"
+  how_do_i_manage_and_share_the_recording_52fc2993: "How do I manage and share the recording?"
+  how_do_i_manage_rubrics_in_a_course_a5441fb7: "How do I manage rubrics in a course?"
   how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: "How do I manage settings for an assessment in New Quizzes?"
   how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "How do I move and organise my files as an instructor?"
   how_do_i_move_or_reorder_a_module_e64a4baa: "How do I move or reorder a module?"
+  how_do_i_mute_and_unmute_all_participants_a7a2115b: "How do I mute and unmute all participants?"
   how_do_i_post_grades_for_an_assignment_in_the_grad_bc01018e: "How do I post grades for an assignment in the Gradebook?"
   how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "How do I publish or unpublish a discussion as an instructor?"
   how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "How do I publish or unpublish a module as an instructor?"
   how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "How do I publish or unpublish a page as an instructor?"
   how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "How do I publish or unpublish an assignment as an instructor?"
   how_do_i_record_a_conference_e4845e7: "How do I record a conference?"
+  how_do_i_record_a_meeting_ae3a0d4e: "How do I record a meeting?"
   how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "How do I reply to a discussion as an instructor?"
+  how_do_i_schedule_a_zoom_video_meeting_5986f068: "How do I schedule a Zoom video meeting?"
   how_do_i_select_specific_content_as_part_of_a_cour_11fe2c8d: "How do I select specific content as part of a course import?"
+  how_do_i_send_a_message_to_all_students_based_on_s_59d186d1: "How do I send a message to all students based on specific course criteria in New Analytics?"
+  how_do_i_send_a_message_to_an_individual_student_i_92c7fb: "How do I send a message to an individual student in New Analytics?"
   how_do_i_set_a_front_page_in_a_course_a5f53cd5: "How do I set a Front Page in a course?"
   how_do_i_set_details_for_a_course_52cfbeff: "How do I set details for a course?"
+  how_do_i_share_my_screen_c280e585: "How do I share my screen?"
   how_do_i_start_a_conference_52792795: "How do I start a conference?"
+  how_do_i_start_a_meeting_e8a9e67b: "How do I start a meeting?"
+  how_do_i_turn_my_camera_on_or_off_and_use_zoom_con_8a96538b: "How do I turn my camera on or off and use Zoom controls?"
   how_do_i_upload_a_file_to_a_course_e8332cfe: "How do I upload a file to a course?"
   how_do_i_use_course_settings_1e8467e6: "How do I use course settings?"
   how_do_i_use_files_as_an_instructor_70a996b: "How do I use Files as an instructor?"
@@ -11622,11 +11659,14 @@ en-AU:
   how_do_i_use_the_collaborations_index_page_68ee88b5: "How do I use the Collaborations Index Page?"
   how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "How do I use the Course Home Page as an instructor?"
   how_do_i_use_the_gradebook_622395dc: "How do I use the Gradebook?"
+  how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: "How do I use the Learning Mastery Gradebook to view outcome results in a course from the Gradebook?"
+  how_do_i_use_the_outcomes_page_in_a_course_a37e0231: "How do I use the outcomes page in a course?"
   how_do_i_use_the_pages_index_page_dafb986c: "How do I use the Pages Index Page?"
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "How do I use the People page in a course as an instructor?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "How do I use the Quizzes Index Page?"
   how_do_i_use_the_syllabus_as_an_instructor_82f00933: "How do I use the Syllabus as an instructor?"
   how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "How do I view a context card for a student in a course?"
+  how_do_i_view_analytics_for_an_individual_student_724134ed: "How do I view analytics for an individual student?"
   how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "How do I view and sort discussion replies as an instructor?"
   how_do_i_view_assignments_or_students_individually_2b7211f8: "How do I view assignments or students individually in the Gradebook?"
   how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "How do I view the details of a submission for a student in SpeedGrader?"
@@ -12611,6 +12651,7 @@ en-AU:
   loading_announcements_b927a86c: "Loading Announcements"
   loading_assessment_audit_trail_5cf4c10: "Loading assessment audit trail"
   loading_assignments_352ec769: "Loading Assignments"
+  loading_assignments_b3b248be: "Loading assignments"
   loading_associations_2b92bcf7: "Loading associations..."
   loading_associations_9da66c4e: "Loading Associations"
   loading_associations_complete_b93a9c6e: "Loading associations complete"
@@ -13200,6 +13241,17 @@ en-AU:
       twitter: 
         body: "An alert has been triggered for %{student}"
         body_student: "An alert has been triggered for you"
+    annotation_notification: 
+      email: 
+        body: "A new annotation has been made by %{author} on the assignment %{assignment_name}."
+        html: 
+          body: "A new annotation has been made by %{author} on the assignment %{assignment_name}."
+          link_text: "View Submission"
+          subject: "A new annotation has been made to your submission document"
+        subject: "A new annotation has been made to your submission document"
+      summary: 
+        body: "A new annotation has been made by %{author} on the assignment %{assignment_name}."
+        subject: "A new annotation has been made to your submission document"
     announcement_created_by_you: 
       email: 
         html: 
@@ -15379,6 +15431,13 @@ en-AU:
   new_13daf639: New
   new_account_role_6e5c4964: "New Account Role"
   new_analytics_api_access_7eec1ead: "New Analytics API Access"
+  new_analytics_f6147886: "New Analytics"
+  new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
+      New Analytics is an interactive tool that helps you and your students better
+          track performance and activity within the course. Learn which students have viewed
+          pages and resources and participated in assignments—and which students may need a
+          little more encouragement.
+  new_analytics_tutorial_tray_2511a34a: "New Analytics Tutorial Tray"
   new_annotations_66932016: "New Annotations"
   new_announcement_23af4598: "New Announcement"
   new_announcement_in_course_name_title_84607f44: "New announcement in %{course_name}: %{title}"
@@ -15999,6 +16058,7 @@ en-AU:
       remember_auth: "Remember Authorisation"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: "Object Type"
+  observe_student_mastery_a1f01a: "Observe student mastery"
   observees: 
     being_observed: "Students Being Observed"
     new_observee_pairing_code: "Student Pairing Code"
@@ -16133,6 +16193,7 @@ en-AU:
   options_for_title_label_17f821ff: "Options for %{title_label}"
   or_9b70ccaa: Or
   or_a01eec62: OR
+  or_choose_files_b795006d: "or choose files"
   or_in_the_courses_list_6201030: "...or in the Courses list."
   orange_81386a62: Orange
   orbis_report_header_assignment_id: "assignment id"
@@ -16357,6 +16418,7 @@ en-AU:
   outcomes_import_completed_baff5cb0: "Outcomes Import Completed"
   outcomes_import_failed_77efcdf4: "Outcomes Import Failed"
   outcomes_report_8887bd49: "Outcomes Report"
+  outcomes_tutorial_tray_ebfce995: "Outcomes Tutorial Tray"
   over_time_bee1a733: "over time"
   override_3de65b2c: Override
   override_grade_385adf30: "override grade"
@@ -16507,6 +16569,7 @@ en-AU:
   people_tutorial_tray_a87a6c48: "People Tutorial Tray"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "People will see this name in discussions, messages and comments."
   percent_448ea947: percent
+  percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent} complete"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Percent of respondents selecting this answer"
   percent_of_students_scored_score_53d2c4d5: "%{percent} of students scored %{score}"
@@ -19773,8 +19836,16 @@ en-AU:
   rubrics_add_edit_delete_8299eff7: "Rubrics - add / edit / delete"
   rubrics_and_speedgrader_ececaed4: "Rubrics and SpeedGrader"
   rubrics_b5ef369b: Rubrics
+  rubrics_can_show_students_your_expectations_for_as_3382da64: |-
+      Rubrics can show students your expectations for assignment quality
+          and how they'll be scored accordingly. Rubrics can be associated with
+          assignments, discussions, and quizzes. Use a rubric solely for grading,
+          or create a non-scoring rubric specifically for assessment-based and
+          outcome-based grading without points. Outcomes can be added as criteria
+          items in rubrics.
   rubrics_in_course_navigation_539ea536: "Rubrics in course navigation"
   rubrics_speedgrader_a6ebec57: "Rubrics, SpeedGrader"
+  rubrics_tutorial_tray_be65d10d: "Rubrics Tutorial Tray"
   running_c5a4998d: Running
   russia_7_87bc99d5: "Russia (+7)"
   russian_1e3e197: Russian
@@ -19804,6 +19875,8 @@ en-AU:
   saved_comments_2f6ba95: "Saved Comments"
   saved_discussion_settings_successfully_ebd46a57: "Saved discussion settings successfully"
   saving_2521e616: Saving
+  saving_assignment_dates_progress_9856153d: "Saving assignment dates progress"
+  saving_assignment_dates_progress_percent_a5ea89a1: "Saving assignment dates progress: %{percent}%"
   saving_assignment_fb958949: "Saving assignment"
   saving_associations_989bd4da: "Saving Associations"
   saving_associations_complete_e4b9634d: "Saving associations complete"
@@ -20339,6 +20412,11 @@ en-AU:
       \x20                 Adjust number of ratings, mastery level, points, and colours.\n\n\
       \x20               "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook. Adjust number of ratings, mastery level, points, and colours."
+  set_up_outcomes_in_your_course_as_measured_by_peda_34237d17: |-
+      Set up outcomes in your course as measured by pedagogical goals or desired objectives.
+            Help students learn skills and activities, rather than just focusing on grades as a measure of their success.
+            Assess student progress through calculation methods, and measure progress directly in the Learning Mastery Gradebook.
+            Import existing account, state, and Common Core Standards outcomes to your course. You can also align outcomes in course rubrics.
   set_up_video_conferencing_and_other_tools_1a94a350: "Set up Video Conferencing and Other Tools"
   set_up_video_conferencing_c0049abe: "Set up Video Conferencing"
   set_up_your_canvas_course_in_30_minutes_or_less_94817b6d: "Set up your Canvas course in 30 minutes or less."
@@ -21297,6 +21375,7 @@ en-AU:
   size_b30e1077: Size
   size_f1873a2: ", size: "
   size_size_a77bd760: "size: %{size}"
+  skip_bcb86160: Skip
   skip_to_content_22ad1d00: "Skip To Content"
   skipped_file_filename_due_to_error_94f0194: "Skipped file %{filename} due to error"
   skipping_unknown_file_type_cd1086ee: "Skipping unknown file type"
@@ -21330,6 +21409,7 @@ en-AU:
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Some submissions are not able to be graded; grade changes for those submissions have been ignored."
   someone: Someone
   someone_bbbc538b: Someone
+  someone_just_made_a_new_annotation_on_the_anonymou_cbbe68ca: "Someone just made a new annotation on the anonymous submission for Student (%{user_id}) for %{assignment_title}"
   someone_just_made_a_new_comment_on_the_anonymous_s_3627de61: "Someone just made a new comment on the anonymous submission for Student (%{user_id}) for %{assignment_title}"
   someone_just_made_a_new_comment_on_the_anonymous_s_a2e944fc: "Someone just made a new comment on the anonymous submission for Student (%{user_id}) for %{assignment_title}."
   something_broke_unexpectedly_6d3720ee: "Something broke unexpectedly."
@@ -21340,6 +21420,7 @@ en-AU:
   something_went_wrong_creating_course_please_try_ag_5198931d: "Something went wrong creating course. Please try again."
   something_went_wrong_creating_the_course_please_tr_431adff5: "Something went wrong creating the course. Please try again."
   something_went_wrong_d238c551: "Something went wrong"
+  something_went_wrong_downloading_submissions_pleas_6d069a09: "Something went wrong downloading submissions. Please try again later."
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Something went wrong inactivating the user. Please try again later."
   something_went_wrong_loading_the_violations_try_re_6e2fa92: "Something went wrong loading the violations, try reloading the page."
   something_went_wrong_please_try_again_6d337b6c: "Something went wrong; please try again."
@@ -21704,6 +21785,8 @@ en-AU:
       submitted: submitted
       unsubmitted: unsubmitted
   submission_added_title_50ebdc85: "submission added: %{title}"
+  submission_annotation_user_name_assignment_title_c_39910597: "Submission Annotation: %{user_name}, %{assignment_title}, %{course_name}"
+  submission_annotation_user_name_assignment_title_c_80c1963e: "Submission annotation: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comment: 
     unknown_author: Someone
   submission_comment_created_f9375ca2: "Submission comment created"
@@ -22378,11 +22461,13 @@ en-AU:
   there_was_an_error_removing_the_image_c83acffe: "There was an error removing the image."
   there_was_an_error_removing_the_item_f8324776: "There was an error removing the item"
   there_was_an_error_retrieving_assignment_dates_39320c15: "There was an error retrieving assignment dates."
+  there_was_an_error_retrieving_job_progress_266523f9: "There was an error retrieving job progress"
   there_was_an_error_retrieving_the_course_image_d7ea094d: "There was an error retrieving the course image."
   there_was_an_error_saving_the_assignment_dates_d31903ab: "There was an error saving the assignment dates."
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "There was an error saving the changes to the course."
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "There was an error saving the note. Please try again."
   there_was_an_error_setting_usage_rights_53739e1d: "There was an error setting usage rights."
+  there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "There was an error starting the save assignment dates job"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support."
   there_was_an_error_updating_this_assignment_please_59fc608d: "There was an error updating this assignment. Please refresh the page and try again."
   there_was_an_error_uploading_the_image_932fc4ce: "There was an error uploading the image."
@@ -22393,6 +22478,7 @@ en-AU:
   there_was_an_unknown_error_registering_the_tool_b9a29954: "There was an unknown error registering the tool"
   there_were_a_total_of_count_errors_db1d89de: "There was a total of %{count} errors."
   there_were_a_total_of_count_warnings_6405df1e: "There was a total of %{count} warnings."
+  there_were_errors_saving_the_assignment_dates_3b39571b: "There were errors saving the assignment dates:"
   there_were_errors_with_the_form_errors_ab5b559a: "There were errors with the form: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "There were several possible matches with the import. Please resolve them below."
   there_were_some_files_we_didn_t_know_what_to_do_wi_6156913f: "There were some files we didn't know what to do with. They have not been added to anyone's submission page."
@@ -23213,6 +23299,7 @@ en-AU:
     quiz_regrade: 
       got_it: "Ok, got it"
   track_individual_student_and_class_progress_c13cf2d1: "Track individual student and class progress"
+  track_student_performance_and_activity_a92a2a8b: "Track student performance and activity"
   treat_ungraded_as_0_d38c2b41: "Treat Ungraded as 0"
   tree_browser: 
     folder_tree_instructions: "Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse, and enter to choose the selected item."
@@ -24744,3 +24831,9 @@ en-AU:
     zip_options: "Zip file options"
   zip_no_folder_error: "The specified folder couldn't be found in this course."
   zoom_f3e54d69: Zoom
+  zoom_is_a_real_time_video_conferencing_tool_that_b_97dd23ec: |-
+      Zoom is a real-time video conferencing tool that brings
+          teachers and students together. You can schedule and run
+          video meetings directly within Canvas by adding a Zoom link
+          in a Canvas Course, Course Announcement, Module, or via Calendar.
+  zoom_tutorial_tray_5dcb7fc: "Zoom Tutorial Tray"
