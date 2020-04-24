@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
 import $ from 'jquery'
 
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import HomePagePromptContainer from '../courses/HomePagePromptContainer'
 import createStore from '../shared/helpers/createStore'
@@ -31,6 +32,7 @@ export default class PublishButton extends React.Component {
     defaultView: PropTypes.string.isRequired,
     pagesUrl: PropTypes.string.isRequired,
     courseId: PropTypes.string.isRequired,
+    courseNickname: PropTypes.string.isRequired,
     frontPageTitle: PropTypes.string
   }
 
@@ -75,13 +77,14 @@ export default class PublishButton extends React.Component {
   }
 
   render() {
-    const {courseId, frontPageTitle, pagesUrl} = this.props
+    const {courseId, frontPageTitle, pagesUrl, courseNickname} = this.props
     const {showModal} = this.state
 
     return (
       <div className="ic-DashboardCard__header-publish">
         <Button onClick={this.handleClick} ref={b => (this.publishButton = b)} color="secondary">
           {I18n.t('Publish')}
+          <ScreenReaderContent>{courseNickname}</ScreenReaderContent>
         </Button>
         {showModal && (
           <HomePagePromptContainer

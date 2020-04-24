@@ -45,7 +45,7 @@ describe "student planner" do
     switch_to_dashcard_view
 
     expect(dashboard_card_container).to contain_css("[aria-label='#{@course.name}']")
-    expect(dashboard_card_header_content).to contain_css("h2[title='#{@course.name}']")
+    expect(dashboard_card_header_content).to contain_css("h3[title='#{@course.name}']")
   end
 
   it "shows and navigates to announcements page from student planner", priority: "1", test_id: 3259302 do

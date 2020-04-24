@@ -351,14 +351,14 @@ export default class DashboardCard extends Component {
           />
           <a href={this.props.href} className="ic-DashboardCard__link">
             <div className="ic-DashboardCard__header_content">
-              <h2
+              <h3
                 className="ic-DashboardCard__header-title ellipsis"
                 title={this.props.originalName}
               >
                 <span style={{color: this.props.backgroundColor}}>
                   {this.state.nicknameInfo.nickname}
                 </span>
-              </h2>
+              </h3>
               <div
                 className="ic-DashboardCard__header-subtitle ellipsis"
                 title={this.props.courseCode}
@@ -379,6 +379,7 @@ export default class DashboardCard extends Component {
             !this.props.published &&
             this.props.canChangeCourseState && (
               <PublishButton
+                courseNickname={this.state.nicknameInfo.nickname}
                 defaultView={this.props.defaultView}
                 pagesUrl={this.props.pagesUrl}
                 frontPageTitle={this.props.frontPageTitle}
