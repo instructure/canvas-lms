@@ -281,4 +281,18 @@ describe LearningOutcomeGroup do
       expect(active_child_groups).to be_empty
     end
   end
+
+  describe 'before save' do
+    describe 'set_root_account_id' do
+      it 'sets root_account_id using Account context' do
+        group = LearningOutcomeGroup.create!(title: 'group', context: Account.default)
+        expect(group.root_account).to eq Account.default
+      end
+
+      it 'sets root_account_id using Course context' do
+        group = @course.learning_outcome_groups.create!(title: 'group')
+        expect(group.root_account).to eq @course.root_account
+      end
+    end
+  end
 end
