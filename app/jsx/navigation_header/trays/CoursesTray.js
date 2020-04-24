@@ -35,7 +35,7 @@ export default function CoursesTray({courses, hasLoaded}) {
     return (
       <>
         {published.length > 0 && (
-          <Heading level="h4" key="published_courses">
+          <Heading level="h4" as="h3" key="published_courses">
             {I18n.t('Published Courses')}
           </Heading>
         )}
@@ -43,7 +43,7 @@ export default function CoursesTray({courses, hasLoaded}) {
           {published.map(renderCourse)}
         </List>
         {unpublished.length > 0 && (
-          <Heading level="h4" key="unpublished_courses">
+          <Heading level="h4" as="h3" key="unpublished_courses">
             {I18n.t('Unpublished Drafts')}
           </Heading>
         )}
