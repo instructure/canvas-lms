@@ -60,7 +60,8 @@ $.initFlashContainer = () => initFlashContainer()
 function renderServerNotifications() {
   if (typeof ENV !== 'undefined' && ENV && ENV.notices) {
     ENV.notices.forEach(notice => {
-      helper.createNode(notice.type, notice.content, undefined, undefined, notice.classes)
+      const timeout = notice.content instanceof Object && notice.content.timeout
+      helper.createNode(notice.type, notice.content, timeout, undefined, notice.classes)
       createScreenreaderNodeWithDelay(notice.content, false)
     })
   }
