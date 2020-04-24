@@ -61,7 +61,7 @@
       <% end %>
       <% unless @presenter.no_calculations? %>
         <div id="only_consider_graded_assignments_wrapper" class="ic-Form-control ic-Form-control--checkbox">
-          <input type="checkbox" id="only_consider_graded_assignments" />
+          <%= check_box_tag "only_consider_graded_assignments", nil, !params[:true_grade] %>
           <label class="ic-Label" for="only_consider_graded_assignments"><%= t('labels.only_graded', "Calculate based only on graded assignments") %></label>
         </div>
       <% end %>
