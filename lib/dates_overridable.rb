@@ -214,7 +214,7 @@ module DatesOverridable
       [ due_at.present? ? CanvasSort::First : CanvasSort::Last, due_at.presence || CanvasSort::First ]
     end
 
-    dates.map { |h| h.slice(:id, :due_at, :unlock_at, :lock_at, :title, :base) }
+    dates.map { |h| h.slice(:id, :due_at, :unlock_at, :lock_at, :title, :base, :set_type, :set_id) }
   end
 
   def due_date_hash
@@ -228,6 +228,8 @@ module DatesOverridable
     if @applied_overrides && override = @applied_overrides.find { |o| o.due_at == due_at }
       hash[:override] = override
       hash[:title] = override.title
+      hash[:set_type] = override.set_type
+      hash[:set_id] = override.set_id
     end
 
     hash

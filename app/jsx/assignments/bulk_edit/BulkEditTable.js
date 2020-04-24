@@ -84,12 +84,20 @@ export default function BulkEditTable({
   const allAssignmentsSelected =
     someAssignmentsSelected && assignments.every(a => a.selected || !canEditAll(a))
 
+  function processErrors(errors, dateKey) {
+    if (!errors || !errors.hasOwnProperty(dateKey)) {
+      return []
+    }
+    return [{text: errors[dateKey], type: 'error'}]
+  }
+
   function renderDateInput(assignmentId, dateKey, dates, overrideId = null) {
     const label = DATE_INPUT_META[dateKey].label
     return (
       <BulkDateInput
         label={label}
         selectedDateString={dates[dateKey]}
+        messages={processErrors(dates.errors, dateKey)}
         dateKey={dateKey}
         assignmentId={assignmentId}
         overrideId={overrideId}

@@ -43,7 +43,7 @@ function standardAssignmentResponse() {
           base: true,
           unlock_at: '2020-03-19T00:00:00Z',
           due_at: '2020-03-20T03:00:00Z',
-          lock_at: '2020-03-21T00:00:00Z',
+          lock_at: '2020-04-11T00:00:00Z',
           can_edit: true
         },
         {
@@ -51,7 +51,7 @@ function standardAssignmentResponse() {
           title: '2 students',
           unlock_at: '2020-03-29T00:00:00Z',
           due_at: '2020-03-30T00:00:00Z',
-          lock_at: '2020-03-31T00:00:00Z',
+          lock_at: '2020-04-21T00:00:00Z',
           can_edit: true
         }
       ]
@@ -159,6 +159,57 @@ describe('Assignment Bulk Edit Dates', () => {
     expect(onSave).toHaveBeenCalled()
   })
 
+  it('disables save when local validation fails', async () => {
+    const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
+    changeAndBlurInput(getAllByLabelText('Due At')[0], '2019-04-01')
+    expect(getByText('Unlock date cannot be after due date')).toBeInTheDocument()
+    expect(getByText('Save').closest('button').disabled).toBe(true)
+  })
+
+  it('clears the validation error when a bad edit is reverted', async () => {
+    const {queryByText, getAllByText, getAllByLabelText} = await renderBulkEditAndWait()
+    const theInput = getAllByLabelText('Due At')[0]
+    changeAndBlurInput(theInput, '2019-04-01')
+    expect(queryByText('Unlock date cannot be after due date')).toBeInTheDocument()
+    const revertButtons = getAllByText('Revert date changes').filter(elt => elt.closest('button'))
+    expect(revertButtons).toHaveLength(1)
+    fireEvent.click(revertButtons[0])
+    expect(queryByText('Unlock date cannot be after due date')).not.toBeInTheDocument()
+  })
+
+  it('validates against closed grading periods', async () => {
+    ENV.HAS_GRADING_PERIODS = true
+    ENV.active_grading_periods = [
+      {
+        start_date: '1970-01-01T00:00:00-07:00',
+        end_date: '2020-03-01T23:59:59-07:00',
+        close_date: '2020-03-01T23:59:59-07:00',
+        id: '1',
+        is_closed: true,
+        is_last: false,
+        permissions: {read: true, create: false, update: false, delete: false},
+        title: 'Closed'
+      },
+      {
+        start_date: '2020-03-01T23:59:59-06:00',
+        close_date: '3000-12-31T23:59:59-07:00',
+        end_date: '3000-12-31T23:59:59-07:00',
+        id: '2',
+        is_closed: false,
+        is_last: true,
+        permissions: {read: true, create: false, update: false, delete: false},
+        title: '5ever'
+      }
+    ]
+    const {queryByText, getAllByLabelText} = await renderBulkEditAndWait()
+    changeAndBlurInput(getAllByLabelText('Available From')[0], '2020-01-01')
+    const theInput = getAllByLabelText('Due At')[0]
+    changeAndBlurInput(theInput, '2020-03-03')
+    expect(queryByText(/Please enter a due date on or after/)).not.toBeInTheDocument()
+    changeAndBlurInput(theInput, '2020-01-03')
+    expect(queryByText(/Please enter a due date on or after/)).toBeInTheDocument()
+  })
+
   it('disables save when nothing has been edited', async () => {
     const {getByText} = await renderBulkEditAndWait()
     expect(getByText('Save').closest('button').disabled).toBe(true)
@@ -171,7 +222,7 @@ describe('Assignment Bulk Edit Dates', () => {
     const unlockAtInputs = getAllByLabelText('Available From')
     expect(unlockAtInputs.map(i => i.value)).toEqual(['Thu Mar 19, 2020', 'Sun Mar 29, 2020', ''])
     const lockAtInputs = getAllByLabelText('Available Until')
-    expect(lockAtInputs.map(i => i.value)).toEqual(['Sat Mar 21, 2020', 'Tue Mar 31, 2020', ''])
+    expect(lockAtInputs.map(i => i.value)).toEqual(['Sat Apr 11, 2020', 'Tue Apr 21, 2020', ''])
   })
 
   it('shows a message and no date default date fields if an assignment does not have default dates', async () => {
@@ -192,7 +243,7 @@ describe('Assignment Bulk Edit Dates', () => {
 
   it('modifies lock at date and enables save', async () => {
     const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
-    const overrideLockInput = getByDisplayValue('Tue Mar 31, 2020')
+    const overrideLockInput = getByDisplayValue('Tue Apr 21, 2020')
     changeAndBlurInput(overrideLockInput, '2020-12-31')
     expect(overrideLockInput.value).toBe('Thu Dec 31, 2020')
     expect(getByText('Save').closest('button').disabled).toBe(false)
@@ -225,7 +276,7 @@ describe('Assignment Bulk Edit Dates', () => {
     const assignmentUnlockAt = getByDisplayValue('Thu Mar 19, 2020')
     changeAndBlurInput(assignmentUnlockAt, '2020-06-15')
 
-    const overrideLockInput = getByDisplayValue('Tue Mar 31, 2020')
+    const overrideLockInput = getByDisplayValue('Tue Apr 21, 2020')
     changeAndBlurInput(overrideLockInput, '')
 
     const nullDueDate = getAllByLabelText('Due At')[2]
@@ -235,7 +286,7 @@ describe('Assignment Bulk Edit Dates', () => {
     expect(revertButtons).toHaveLength(3)
 
     fireEvent.click(revertButtons[1])
-    expect(overrideLockInput.value).toBe('Tue Mar 31, 2020') // original value
+    expect(overrideLockInput.value).toBe('Tue Apr 21, 2020') // original value
     expect(assignmentUnlockAt.value).toBe('Mon Jun 15, 2020') // not changed yet
     expect(nullDueDate.value).toBe('Tue Jun 16, 2020') // not changed yet
     // focus should be explicitly set to the lock at input
@@ -523,7 +574,7 @@ describe('Assignment Bulk Edit Dates', () => {
     })
 
     it('displays an error if the job fails', async () => {
-      const {getByText} = await renderBulkEditAndSave()
+      const {getByText, getAllByLabelText} = await renderBulkEditAndSave()
       fetch.mockResponseOnce(
         JSON.stringify({
           completion: 42,
@@ -536,6 +587,10 @@ describe('Assignment Bulk Edit Dates', () => {
       act(jest.runAllTimers)
       await flushPromises()
       expect(getByText(/some bad dates/)).toBeInTheDocument()
+      // save button is disabled due to error
+      expect(getByText('Save').closest('button').disabled).toBe(true)
+      // fix the error and save should be re-enabled
+      changeAndBlurInput(getAllByLabelText(/Due At/)[0], '2020-04-04')
       expect(getByText('Save').closest('button').disabled).toBe(false)
     })
 
@@ -665,13 +720,13 @@ describe('Assignment Bulk Edit Dates', () => {
               base: true,
               unlock_at: '2020-03-21T00:00:00.000Z',
               due_at: '2020-03-22T03:00:00.000Z', // time preservation
-              lock_at: '2020-03-23T00:00:00.000Z'
+              lock_at: '2020-04-13T00:00:00.000Z'
             },
             {
               id: 'override_1',
               unlock_at: '2020-03-31T00:00:00.000Z',
               due_at: '2020-04-01T00:00:00.000Z',
-              lock_at: '2020-04-02T00:00:00.000Z'
+              lock_at: '2020-04-23T00:00:00.000Z'
             }
           ]
         }

@@ -63,6 +63,12 @@ export default function BulkEditHeader({
     )
   })()
 
+  const validationErrorsExist = (() => {
+    return assignments.some(assignment =>
+      assignment.all_dates.some(override => Object.keys(override.errors || {}).length > 0)
+    )
+  })()
+
   const selectedAssignmentsCount = assignments.filter(a => a.selected).length
 
   return (
@@ -114,7 +120,11 @@ export default function BulkEditHeader({
         <Button
           margin="0 0 0 small"
           variant="primary"
-          interaction={startingSave || jobRunning || !anyAssignmentsEdited ? 'disabled' : 'enabled'}
+          interaction={
+            startingSave || jobRunning || !anyAssignmentsEdited || validationErrorsExist
+              ? 'disabled'
+              : 'enabled'
+          }
           onClick={onSave}
         >
           {startingSave || jobRunning ? I18n.t('Saving...') : I18n.t('Save')}

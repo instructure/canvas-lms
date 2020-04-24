@@ -17,11 +17,10 @@
  */
 
 import I18n from 'i18n!assignments_bulk_edit'
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState, useMemo} from 'react'
 import {func, string} from 'prop-types'
 import moment from 'moment-timezone'
 import produce from 'immer'
-import {List} from '@instructure/ui-elements'
 import CanvasInlineAlert from 'jsx/shared/components/CanvasInlineAlert'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
@@ -30,6 +29,8 @@ import BulkEditTable from './BulkEditTable'
 import MoveDatesModal from './MoveDatesModal'
 import useSaveAssignments from './hooks/useSaveAssignments'
 import useMonitorJobCompletion from './hooks/useMonitorJobCompletion'
+import DateValidator from 'coffeescripts/util/DateValidator'
+import GradingPeriodsAPI from 'coffeescripts/api/gradingPeriodsApi'
 import {originalDateField, canEditAll} from './utils'
 
 BulkEdit.propTypes = {
@@ -43,6 +44,19 @@ BulkEdit.defaultProps = {
 }
 
 export default function BulkEdit({courseId, onCancel, onSave}) {
+  const dateValidator = useMemo(
+    () =>
+      new DateValidator({
+        date_range: ENV.VALID_DATE_RANGE || {
+          start_at: {date: null, date_context: 'term'},
+          end_at: {date: null, date_context: 'term'}
+        },
+        hasGradingPeriods: !!ENV.HAS_GRADING_PERIODS,
+        gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods || []),
+        userIsAdmin: (ENV.current_user_roles || []).includes('admin')
+      }),
+    []
+  )
   const [assignments, setAssignments] = useState([])
   const [loadingError, setLoadingError] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -90,17 +104,52 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     if (jobSuccess) clearOriginalDates()
   }, [jobSuccess])
 
-  const setDateOnOverride = useCallback((override, dateFieldName, newDate) => {
-    const currentDate = override[dateFieldName]
-    const newDateISO = newDate?.toISOString() || null
-    if (currentDate === newDateISO || moment(currentDate).isSame(moment(newDateISO))) return
-
-    const originalField = originalDateField(dateFieldName)
-    if (!override.hasOwnProperty(originalField)) {
-      override[originalField] = override[dateFieldName]
+  useEffect(() => {
+    function recordJobErrors(errors) {
+      setAssignments(currentAssignments =>
+        produce(currentAssignments, draftAssignments => {
+          draftAssignments.forEach(draftAssignment => {
+            draftAssignment.all_dates.forEach(draftOverride => {
+              let error
+              if (draftOverride.base) {
+                error = errors.find(
+                  e => e.assignment_id == draftAssignment.id && !e.assignment_override_id // eslint-disable-line eqeqeq
+                )
+              } else {
+                error = errors.find(e => e.assignment_override_id == draftOverride.id) // eslint-disable-line eqeqeq
+              }
+              if (error && error.errors) {
+                draftOverride.errors = {}
+                for (const dateKey in error.errors) {
+                  draftOverride.errors[dateKey] = error.errors[dateKey][0].message
+                }
+              } else {
+                delete draftOverride.errors
+              }
+            })
+          })
+        })
+      )
     }
-    override[dateFieldName] = newDateISO
-  }, [])
+    if (jobErrors && !jobErrors.hasOwnProperty('message')) recordJobErrors(jobErrors)
+  }, [jobErrors])
+
+  const setDateOnOverride = useCallback(
+    (override, dateFieldName, newDate) => {
+      const currentDate = override[dateFieldName]
+      const newDateISO = newDate?.toISOString() || null
+      if (currentDate === newDateISO || moment(currentDate).isSame(moment(newDateISO))) return
+
+      const originalField = originalDateField(dateFieldName)
+      if (!override.hasOwnProperty(originalField)) {
+        override[originalField] = override[dateFieldName]
+      }
+      override[dateFieldName] = newDateISO
+      override.persisted = false
+      override.errors = dateValidator.validateDatetimes(override)
+    },
+    [dateValidator]
+  )
 
   const shiftDateOnOverride = useCallback(
     (override, dateFieldName, nDays) => {
@@ -154,6 +203,8 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
               delete override[originalField]
             }
           })
+          delete override.errors
+          delete override.persisted
         })
       )
     },
@@ -274,12 +325,9 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     } else if (jobErrors) {
       return (
         <CanvasInlineAlert variant="error" liveAlert>
-          {I18n.t('There were errors saving the assignment dates:')}
-          <List>
-            {jobErrors.map(error => {
-              return <List.Item key={error}>{error}</List.Item>
-            })}
-          </List>
+          {jobErrors.hasOwnProperty('message')
+            ? I18n.t('Error saving assignment dates: ') + jobErrors.message
+            : I18n.t('Invalid dates were found. Please correct them and try again.')}
         </CanvasInlineAlert>
       )
     }

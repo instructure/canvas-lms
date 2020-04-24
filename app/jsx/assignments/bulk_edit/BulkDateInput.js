@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback} from 'react'
-import {bool, func, oneOf, string} from 'prop-types'
+import {bool, func, oneOf, string, arrayOf, shape} from 'prop-types'
 import tz from 'timezone'
 import moment from 'moment-timezone'
 import {DateTime} from '@instructure/ui-i18n'
@@ -33,7 +33,8 @@ BulkDateInput.propTypes = {
   updateAssignmentDate: func.isRequired,
   timezone: string,
   fancyMidnight: bool,
-  interaction: string
+  interaction: string,
+  messages: arrayOf(shape({type: string, text: string}))
 }
 
 BulkDateInput.defaultProps = {
@@ -49,6 +50,7 @@ function formatDate(date) {
 function BulkDateInput({
   label,
   selectedDateString,
+  messages,
   dateKey,
   assignmentId,
   overrideId,
@@ -98,6 +100,7 @@ function BulkDateInput({
       onSelectedDateChange={handleSelectedDateChange}
       timezone={timezone}
       interaction={interaction}
+      messages={messages}
     />
   )
 }
