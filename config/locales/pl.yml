@@ -1781,6 +1781,7 @@ pl:
     default_name: "Brak nazwy"
   add_cc_subtitle_a9ef4a66: "Dodaj CC/napisy"
   add_collaboration_da9665ac: "Dodaj projekt współpracy"
+  add_conferences_from_calendar_98cb86b1: "Dodaj konferencje z kalendarza"
   add_contact_method_d2dfea03: "Dodaj metodę kontaktu"
   add_content_58b4305a: "Dodaj zawartość"
   add_content_to_module_name_589a8d54: "Dodaj zawartość do %{module_name}"
@@ -2021,6 +2022,7 @@ pl:
   allow_bulk_grade_export_to_sis_e11a6e66: "Zezwól masowy eksport ocen do systemu SIS"
   allow_comments_a1f45d8: "Zezwalaj na komentarze"
   allow_comments_for_title_7ac9e00: "Zezwalaj na komentarze do %{title}"
+  allow_conference_selection_lti_placement_c020ad8d: "Zezwalaj na lokalizację LTI w wyborze konferencji"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Zezwalaj na pobieranie zawartości kursu i wyświetlanie offline"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Pozwól aby obrazy kursowe były przypisane do kursu i stosowane na fiszkach."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Pozwól aby obrazy kursowe były przypisane do kursu i stosowane na fiszkach."
@@ -2396,6 +2398,8 @@ pl:
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "Pozwala użytkownikowi na wyświetlanie kolumny SIS ID w pliku CSV z analizą elementów testu."
   allows_user_to_view_user_sis_ids_68a9d218: "Pozwala użytkownikowi na wyświetlanie SIS ID użytkownika."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Pozwala użytkownikowi na wyświetlanie SIS ID na stronie kursu Ludzie."
+  allows_users_to_add_conferences_from_the_calendar_f36c5008: "Pozwala użytkownikom dodawać konferencje z kalendarza"
+  allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Pozwala użytkownikom dodawać narzędzia LTI z typem lokalizacji conference_selection"
   allows_users_to_edit_conferences_2d3c960c: "Pozwala użytkownikom na edytowanie konferencji."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Zezwól użytkownikom na włączenie opcji \"Uruchom SpeedGrader filtrowane wg grupy uczestników\" dla kursów na stronie ustawień kursu. Jeśli ta opcja jest włączona, a w nowym dzienniku ocen wybrano nową grupę uczestników, SpeedGrader wczyta tylko uczestników z wybranej grupy."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Pozwala użytkownikom wyciszać powiadomienia na szczegółowym poziomie kursu."
@@ -2514,6 +2518,8 @@ pl:
     file_import_fail: "Nie można zaimportować pliku \"%{file_path}\""
   angel_display: "Nauka w systemie ANGEL"
   angel_file_description: "Eksport systemu Angel w formacie .zip"
+  annotation_notification_685eaeb9: "Powiadomienie o adnotacji"
+  annotation_teacher_notification_c5e4db1f: "Powiadomienie o adnotacji nauczyciela"
   announcement: 
     no_title: "Brak tytułu"
   announcement_creation_failed_f7d227f5: "Tworzenie ogłoszenia nie powiodło się"
@@ -2603,6 +2609,8 @@ pl:
   anonymous_off_7985fcaf: "Anonimizacja wył."
   anonymous_on_c5fa120d: "Anonimizacja wł."
   anonymous_re_submission_assignment_title_d9402721: "Anonimowa ponowna przesyłka: %{assignment_title}"
+  anonymous_submission_annotation_student_id_assignm_25eb88c9: "Adnotacja do anonimowej przesyłki: Uczestnik (%{id}), %{assignment_title}, %{course_name}"
+  anonymous_submission_annotation_student_user_id_as_ffca8ce9: "Adnotacja do anonimowej przesyłki: Uczestnik (%{user_id}), %{assignment_title}, %{course_name}"
   anonymous_submission_assignment_title_896654de: "Anonimowa przesyłka: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Komentarz do anonimowej przesyłki: Uczestnik (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Komentarz do anonimowej przesyłki: Uczestnik (%{user_id}), %{assignment_title}, %{course_name}"
@@ -2892,6 +2900,7 @@ pl:
   assignment_created_b3ee04d7: "Zadanie zostało utworzone"
   assignment_d8387b78: zadanie
   assignment_dates_dccc98de: "Terminy zadań"
+  assignment_dates_saved_successfully_78e0f355: "Zapisano daty zadań."
   assignment_details: 
     no_graded_submissions: "Brak ocenionych zadań"
   assignment_details_bc488179: "Szczegóły zadania"
@@ -3685,6 +3694,7 @@ pl:
             uczestnicy mogli wzajemnie oceniać prace.
   assignments_index_menu_4088a035: "Menu indeksu zadań"
   assignments_list_fe3e54be: "Lista zadań"
+  assignments_loaded_72ee472c: "Wczytano zadania"
   assignments_settings_30613d0c: "Ustawienia zadania"
   assignments_speedgrader_2fbd6df4: "Zadania, SpeedGrader"
   assignments_tutorial_tray_4cc844b: "Panel samouczka zadań"
@@ -3888,6 +3898,7 @@ pl:
   authnresponse_from_idp_185037e9: "AuthnResponse od IdP"
   author_215203d2: Autor
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} właśnie dodał komentarz dotyczący dostarczonego przez użytkownika %{submission_submittor} zadania %{assignment}"
+  author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "%{author_name} właśnie dodał adnotację do dostarczonego przez użytkownika zadania %{user_name} do %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} właśnie dodał komentarz dotyczący dostarczonego przez użytkownika %{user_name} zadania do %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} właśnie dodał komentarz dotyczący dostarczonego przez użytkownika %{user_name} zadania do %{assignment_title}."
   author_s_name_b35e905a: "Imię i nazwisko twórcy"
@@ -4679,6 +4690,7 @@ pl:
   can_interact_with_users_in_their_section_only_48cb8c43: "Może wchodzić w interakcje z użytkownikami tylko w ich części"
   can_list_categorized_event_types_52596f7: "Może tworzyć listę sklasyfikowanych typów zdarzeń."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Może wyszczególnić subskrypcje dla danych usługi danych."
+  can_lookup_account_information_13d69520: "Może sprawdzić informacje o koncie"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Można pobierać dane użytkownika powiązane z kontekstem instalacji narzędzia."
   can_show_subscription_to_data_service_data_688ce3: "Może wyświetlić subskrypcję dla danych usługi danych."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Wynik będzie można obliczyć, gdy zadanie będzie miało przydzielone punkty"
@@ -5210,6 +5222,7 @@ pl:
   common_timezones_2b00baba: "Powszechne strefy czasowe"
   commons_ed0252fb: Commons
   communicate_course_objectives_f457158c: "Przekazuj cele dotyczące kursu"
+  communicate_grading_expectations_484a1f01: "Przekazuj oczekiwania dot. ocen"
   communicate_to_your_students_exactly_what_will_be__57a679c5: |-
       Poinformuj uczestników o tym, co będzie dokładnie wymagane
       w trakcie kursu, w kolejności chronologicznej. Wygeneruj
@@ -5321,6 +5334,7 @@ pl:
                 Transmituj w czasie rzeczywistym materiały audio i wideo, udostępniaj prezentacje
                 slajdy, prowadź demonstracje aplikacji i zasobów online,
                 oraz wiele więcej.
+  conference_selection_ea4050bb: "Wybór konferencji"
   conference_was_deleted_30869390: "Konferencja została skasowana"
   conferences: 
     concluded_conference: 
@@ -7908,6 +7922,7 @@ pl:
   deep_purple_bb3e2907: "Głęboki fiolet"
   default_9db103d: Domyślny
   default_conference_title: "Konferencja kursu %{course_name}"
+  default_dates_a0a2ae26: "domyślne daty"
   default_email_5cb9fa04: "Domyślny adres e-mail:"
   default_email_9efb7fbd: "Domyślny adres e-mail"
   default_grade_cannot_be_set_to_ex_723caa59: "Domyślna ocena nie może zostać ustawiona na %{ex}"
@@ -8694,6 +8709,7 @@ pl:
   drag_and_drop_your_image_here_or_7fba7c14: "Przeciągnij i upuść obraz tutaj lub "
   drag_to_rearrange_sections_637efee3: "Przeciągnij, aby zmienić układ sekcji"
   drag_up_or_down_to_reorder_382126ff: "Przeciągnij w górę lub dół, aby zmienić kolejność"
+  drop_files_here_to_upload_ce0f50f9: "Upuść pliki tutaj, aby przekazać"
   drop_image_62a2a071: "Upuść obraz"
   dropdown_changed_state_to_expanded_517689c2: "lista rozwijana zmieniła stań na %{expanded}."
   dropdown_option_1_e6ff2fc: "Opcja rozwijania 1"
@@ -8801,6 +8817,7 @@ pl:
   edit_and_delete_their_own_posts_f4f7cc6: "Edytuj lub usuwaj ich posty"
   edit_announcement_title_cce0b4e: "Edytuj ogłoszenie %{title}"
   edit_app_b0cc1c17: "Edytuj aplikację"
+  edit_assignment_dates_6f8c72b: "Edytuj daty zadań"
   edit_assignment_ebf22a72: "Edytuj zadanie"
   edit_assignment_group_c04c4af0: "Edytuj grupę zadań"
   edit_assignment_name_8a7af80c: "Edytuj nazwę zadania"
@@ -8988,6 +9005,7 @@ pl:
   enable_course_as_a_blueprint_course_8515ffd5: "Włącz kurs jako kurs Blueprint"
   enable_dashboard_images_for_courses_5af458b0: "Włącz obrazy panelu nawigacyjnego dla kursów"
   enable_extra_filter_options_b52c23e6: "włącz dodatkowe opcje filtra"
+  enable_face_to_face_connection_9df19b76: "Zapewnij połączenie w cztery oczy"
   enable_feature_title_987d8e9a: "Włącz funkcję: %{title}"
   enable_fullstory_5c673a06: "Włącz Fullstory"
   enable_gradebook_list_students_by_sortable_name: "Wyświetl listę uczestników według sortowalnych nazw w dzienniczku. Wartość domyślna nazwy to „Nazwisko, Imię” i można ją zmienić w ustawieniach."
@@ -9411,6 +9429,7 @@ pl:
   error_sending_submission_comment_dc15d24f: "Błąd podczas przesyłania komentarza do przesyłki"
   error_sending_submission_d32dc075: "Błąd podczas przesyłania przesyłki"
   error_starting_content_share_18fb1532: "Błąd podczas udostępniania zawartości"
+  error_starting_save_operation_81bcb99: "Błąd podczas zapisywania:"
   error_submitting_to_plagiarism_service_9b0748cb: "Błąd podczas przesyłania do usługi kontroli plagiatów"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Błąd podczas przesyłania do usługi kontroli plagiatów. Można ponownie przesłać ze SpeedGrader."
   error_updating_submission_draft_1d40ade7: "Błąd podczas aktualizowania wersji roboczej przesyłki"
@@ -11797,12 +11816,16 @@ pl:
   hours_late_989e9081: "Godz. po terminie"
   hover_over_me_496521b9: "Unieś kursor nade mną"
   how_do_i_add_a_module_65f5bf13: "Jak dodać moduł?"
+  how_do_i_add_a_rubric_in_a_course_a4c7a40: "Jak dodać kryteria ocen do kursu?"
+  how_do_i_add_a_rubric_to_an_assignment_46fd097e: "Jak dodać kryteria ocen do zadania?"
   how_do_i_add_an_announcement_in_a_course_63396bb7: "Jak dodać ogłoszenie do kursu?"
   how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: "Jak dodać obraz do karty kursu na panelu nawigacyjnym?"
   how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "Jak dodać różne rodzaje zadań, stron i plików jako elementy modułu?"
   how_do_i_add_or_edit_details_in_an_assignment_fa779906: "Jak dodać lub edytować szczegóły zadania?"
   how_do_i_add_users_to_a_course_4a88efaf: "Jak dodać użytkowników do kursu?"
+  how_do_i_add_zoom_to_a_course_31300d74: "Jak dodać Zoom do kursu?"
   how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: "Jak dostosować wydarzenia i terminy w imporcie kursu?"
+  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "Jak dostosować wyniki do kryteriów ocen w kursie?"
   how_do_i_bulk_upload_files_to_a_course_b145d8cc: "Jak przesłać większy zbiór plików do kursu?"
   how_do_i_change_a_course_name_and_course_code_23b41292: "Jak zmienić nazwę i kod kursu?"
   how_do_i_change_the_course_home_page_326cee50: "Jak zmienić stronę główną kursu?"
@@ -11817,6 +11840,8 @@ pl:
   how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: "Jak utworzyć test z osobnymi pytaniami?"
   how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Jak tworzyć zadania za pomocą Nowych testów?"
   how_do_i_create_an_assignment_35532b59: "Jak utworzyć zadanie?"
+  how_do_i_create_an_outcome_for_a_course_cf0ea2b3: "Jak utworzyć wyniki dla kursu?"
+  how_do_i_create_outcome_groups_for_a_course_362429a0: "Jak utworzyć grupy wyników dla kursu?"
   how_do_i_download_the_student_app_4a4b8a63: "Jak pobrać aplikację Student?"
   how_do_i_download_the_student_app_and_get_addition_3604c207: "Jak pobrać aplikację Student i uzyskać dodatkową pomoc?"
   how_do_i_edit_an_announcement_in_a_course_815c3c60: "Jak edytować ogłoszenie do kursu?"
@@ -11824,20 +11849,32 @@ pl:
   how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Jak wpisywać i edytować oceny w Dzienniku ocen?"
   how_do_i_find_my_courses_b826e4ce: "Jak odnaleźć swoje kursy?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Jak zaimportować pakiet eksportowy z kursem Canvas?"
+  how_do_i_import_outcomes_for_a_course_8eced1a: "Jak zaimportować wyniki dla kursu?"
+  how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: "Jak sprawdzić, czy uczestnicy dołączyli do konferencji?"
+  how_do_i_manage_and_share_the_recording_52fc2993: "Jak udostępnić nagranie i zarządzać nim?"
+  how_do_i_manage_rubrics_in_a_course_a5441fb7: "Jak zarządzać kryteriami ocen w kursie?"
   how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: "Jak zarządzać ustawieniami testu za pomocą Nowych testów?"
   how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Jak przenosić i organizować pliki, będąc instruktorem?"
   how_do_i_move_or_reorder_a_module_e64a4baa: "Jak przenieść lub zmienić kolejność modułu?"
+  how_do_i_mute_and_unmute_all_participants_a7a2115b: "Jak wyciszyć lub anulować wyciszenie uczestników?"
   how_do_i_post_grades_for_an_assignment_in_the_grad_bc01018e: "Jak publikować oceny za zadanie w Dzienniku ocen?"
   how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "Jak opublikować lub cofnąć publikację dyskusji, będąc instruktorem?"
   how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "Jak opublikować lub cofnąć publikację modułu, będąc instruktorem?"
   how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Jak opublikować lub cofnąć publikację strony, będąc instruktorem?"
   how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "Jak opublikować lub cofnąć publikację zadania, będąc instruktorem?"
   how_do_i_record_a_conference_e4845e7: "Jak zarejestrować konferencję?"
+  how_do_i_record_a_meeting_ae3a0d4e: "Jak zarejestrować konferencję?"
   how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Jak odpowiedzieć na dyskusję, będąc instruktorem?"
+  how_do_i_schedule_a_zoom_video_meeting_5986f068: "Jak zaplanować wideokonferencję Zoom?"
   how_do_i_select_specific_content_as_part_of_a_cour_11fe2c8d: "Jak wybrać określoną zawartość jako część importu kursu?"
+  how_do_i_send_a_message_to_all_students_based_on_s_59d186d1: "Jak przesłać wiadomość do wszystkich uczestników w oparciu o konkretne kryteria kursu w New Analytics?"
+  how_do_i_send_a_message_to_an_individual_student_i_92c7fb: "Jak wysłać wiadomość do konkretnego uczestnika w New Analytics?"
   how_do_i_set_a_front_page_in_a_course_a5f53cd5: "Jak ustawić stronę startową w kursie?"
   how_do_i_set_details_for_a_course_52cfbeff: "Jak dostosować szczegóły kursu?"
+  how_do_i_share_my_screen_c280e585: "Jak udostępnić swój ekran?"
   how_do_i_start_a_conference_52792795: "Jak rozpocząć konferencję?"
+  how_do_i_start_a_meeting_e8a9e67b: "Jak rozpocząć konferencję?"
+  how_do_i_turn_my_camera_on_or_off_and_use_zoom_con_8a96538b: "Jak włączyć lub wyłączyć kamerę i obsługiwać Zoom?"
   how_do_i_upload_a_file_to_a_course_e8332cfe: "Jak przesłać plik do kursu?"
   how_do_i_use_course_settings_1e8467e6: "Jak korzystać z ustawień kursu?"
   how_do_i_use_files_as_an_instructor_70a996b: "Jak korzystać z plików, będąc instruktorem?"
@@ -11846,11 +11883,14 @@ pl:
   how_do_i_use_the_collaborations_index_page_68ee88b5: "Jak korzystać ze strony indeksu współpracy?"
   how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "Jak korzystać ze strony głównej kursu, będąc instruktorem?"
   how_do_i_use_the_gradebook_622395dc: "Jak korzystać z Dziennika ocen?"
+  how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: "Jak korzystać z Dziennika ocen LMG do wyświetlania wyników w kursie z Dziennika ocen?"
+  how_do_i_use_the_outcomes_page_in_a_course_a37e0231: "Jak korzystać ze strony wyników w kursie?"
   how_do_i_use_the_pages_index_page_dafb986c: "Jak korzystać ze strony indeksu stron?"
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Jak korzystać ze strony Ludzie w kursie, będąc instruktorem?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Jak korzystać ze strony indeksu testów?"
   how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Jak korzystać z Programu, będąc instruktorem?"
   how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "Jak wyświetlić kartę kontekstu uczestnika w kursie?"
+  how_do_i_view_analytics_for_an_individual_student_724134ed: "Jak wyświetlić analizę dla konkretnego uczestnika?"
   how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Jak wyświetlać i sortować odpowiedzi na dyskusję, będąc instruktorem?"
   how_do_i_view_assignments_or_students_individually_2b7211f8: "Jak wyświetlać poszczególne zadania lub uczestników kursu w Dzienniku ocen?"
   how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "Jak wyświetlać szczegóły przesyłki dla uczestnika w narzędziu SpeedGrader?"
@@ -12828,6 +12868,7 @@ pl:
   loading_announcements_b927a86c: "Wczytywanie ogłoszeń"
   loading_assessment_audit_trail_5cf4c10: "Wczytywanie ścieżki audytowej zadania"
   loading_assignments_352ec769: "Wczytywanie testów"
+  loading_assignments_b3b248be: "Wczytywanie zadań"
   loading_associations_2b92bcf7: "Wczytywanie powiązań..."
   loading_associations_9da66c4e: "Wczytywanie powiązań"
   loading_associations_complete_b93a9c6e: "Ukończono wczytywanie powiązań"
@@ -13438,6 +13479,17 @@ pl:
       twitter: 
         body: "Wysłano alert do uczestnika %{student}"
         body_student: "Wysłano do Ciebie alert"
+    annotation_notification: 
+      email: 
+        body: "%{author} dodał(a) do zadania %{assignment_name} nową adnotację."
+        html: 
+          body: "%{author} dodał(a) do zadania %{assignment_name} nową adnotację."
+          link_text: "Wyświetl wysłane materiały"
+          subject: "Do przesyłanego dokumentu dodano nową adnotację"
+        subject: "Do przesyłanego dokumentu dodano nową adnotację"
+      summary: 
+        body: "%{author} dodał(a) do zadania %{assignment_name} nową adnotację."
+        subject: "Do przesyłanego dokumentu dodano nową adnotację"
     announcement_created_by_you: 
       email: 
         html: 
@@ -15629,6 +15681,13 @@ pl:
   new_13daf639: Nowe
   new_account_role_6e5c4964: "Nowa rola konta"
   new_analytics_api_access_7eec1ead: "Dostęp do New Analytics API"
+  new_analytics_f6147886: "New Analytics"
+  new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
+      New Analytics to interaktywne narzędzie, które pomoże Tobie i uczestnikom szybciej śledzić
+          postępy w nauce oraz aktywność w ramach kursu. Dowiedz się, którzy uczestnicy kursu wyświetlili
+          strony i zasoby oraz brali udział w zadaniach – oraz którzy mogą potrzebować do tego
+          trochę więcej zachęty.
+  new_analytics_tutorial_tray_2511a34a: "Panel samouczka New Analytics"
   new_annotations_66932016: "Nowe adnotacje"
   new_announcement_23af4598: "Nowe ogłoszenie"
   new_announcement_in_course_name_title_84607f44: "Nowe ogłoszenie w %{course_name}: %{title}"
@@ -16257,6 +16316,7 @@ pl:
       remember_auth: "Zapamiętaj autoryzację"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: "Typ obiektu"
+  observe_student_mastery_a1f01a: "Obserwuj stopień opanowania materiału przez uczestnika"
   observees: 
     being_observed: "Obserwowani uczestnicy"
     new_observee_pairing_code: "Kod parowania uczestnika"
@@ -16390,6 +16450,7 @@ pl:
   options_for_title_label_17f821ff: "Opcje dla %{title_label}"
   or_9b70ccaa: Lub
   or_a01eec62: LUB
+  or_choose_files_b795006d: "lub wybierz pliki"
   or_in_the_courses_list_6201030: "...lub na liście kursów."
   orange_81386a62: Pomarańczowy
   orbis_report_header_assignment_id: "identyfikator zadania"
@@ -16618,6 +16679,7 @@ pl:
   outcomes_import_completed_baff5cb0: "Ukończono importowanie wyników"
   outcomes_import_failed_77efcdf4: "Nie udało się zaimportować wyników"
   outcomes_report_8887bd49: "Raport wyników"
+  outcomes_tutorial_tray_ebfce995: "Panel samouczka dot. wyników"
   over_time_bee1a733: "z okresu"
   override_3de65b2c: Nadpis
   override_grade_385adf30: "nadpisująca ocena"
@@ -16768,6 +16830,7 @@ pl:
   people_tutorial_tray_a87a6c48: "Panel samouczka osób"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Użytkownicy będą widzieć tę nazwę w dyskusjach, wiadomościach i komentarzach."
   percent_448ea947: procent
+  percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "Ukończono %{percent}"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Procent respondentów, którzy wybrali daną odpowiedź"
   percent_of_students_scored_score_53d2c4d5: "%{percent} uczestników uzyskało wynik %{score}"
@@ -20121,8 +20184,16 @@ pl:
   rubrics_add_edit_delete_8299eff7: "Rubryki - dodaj / edytuj / usuń"
   rubrics_and_speedgrader_ececaed4: "Kryteria ocen i SpeedGrader"
   rubrics_b5ef369b: "Kryteria ocen"
+  rubrics_can_show_students_your_expectations_for_as_3382da64: |-
+      Za pomocą kryteriów ocen można pokazać uczestnikom oczekiwania co do jakości zadań
+          i tego, jak zostaną one ocenione. Kryteria ocen można powiązać z
+          zadaniami, dyskusjami i testami. Używaj kryteriów ocen wyłącznie do oceniania
+          lub tworzenia kryteriów bezpunktowych, szczególnie dla oceniania w oparciu o zadanie i
+          wyniki bez punktów. Wyniki można dodać jako elementy
+          kryteriów w kryteriach ocen.
   rubrics_in_course_navigation_539ea536: "Kryteria ocen w elementach nawigacji kursu"
   rubrics_speedgrader_a6ebec57: "Kryteria ocen, SpeedGrader"
+  rubrics_tutorial_tray_be65d10d: "Panel samouczka dot. kryteriów ocen"
   running_c5a4998d: Uruchomiono
   russia_7_87bc99d5: "Rosja (+7)"
   russian_1e3e197: Rosyjski
@@ -20152,6 +20223,8 @@ pl:
   saved_comments_2f6ba95: "Zapisane komentarze"
   saved_discussion_settings_successfully_ebd46a57: "Zapisano ustawienia dyskusji"
   saving_2521e616: Zapisywanie
+  saving_assignment_dates_progress_9856153d: "Postęp zapisywania dat zadań"
+  saving_assignment_dates_progress_percent_a5ea89a1: "Postęp zapisywania dat zadań: %{percent}%"
   saving_assignment_fb958949: "Zapisywanie zadania"
   saving_associations_989bd4da: "Zapisywanie powiązań"
   saving_associations_complete_e4b9634d: "Ukończono zapisywanie powiązań"
@@ -20696,6 +20769,11 @@ pl:
       \x20                 Dostosuj liczbę ocen, poziom opanowania materiału, punkty i kolory.\n\n\
       \x20               "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Określ sposób wyświetlania ocen kompetencji w dzienniczku poziomu biegłości. Dostosuj liczbę ocen, poziom biegłości, punkty i kolory."
+  set_up_outcomes_in_your_course_as_measured_by_peda_34237d17: |-
+      Skonfiguruj wyniki w kursie zgodnie z celami pedagogicznymi lub pożądanymi celami.
+            Pomóż uczestnikom zdobywać umiejętności i angażować się w aktywności, zamiast skupiać na ocenach jako mierze sukcesu.
+            Oceniaj postępy uczestników za pomocą metod obliczeń i mierz je bezpośrednio w Dzienniku ocen LMG.
+            Zaimportuj istniejące konto, stan danych i wyniki CCS do swojego kursu. Wyniki można również dostosować w kryteriach ocen kursu.
   set_up_video_conferencing_and_other_tools_1a94a350: "Skonfigurować wideokonferencję i inne narzędzia"
   set_up_video_conferencing_c0049abe: "Skonfiguruj wideokonferencję"
   set_up_your_canvas_course_in_30_minutes_or_less_94817b6d: "Skonfiguruj kurs Canvas w niecałe 30 minut."
@@ -21652,6 +21730,7 @@ pl:
   size_b30e1077: Rozmiar
   size_f1873a2: ", rozmiar: "
   size_size_a77bd760: "rozmiar: %{size}"
+  skip_bcb86160: Pomiń
   skip_to_content_22ad1d00: "Przejdź do zawartości"
   skipped_file_filename_due_to_error_94f0194: "Plik pominięty %{filename}  z powodu błędu"
   skipping_unknown_file_type_cd1086ee: "Pomijanie nieznanego typu pliku"
@@ -21685,6 +21764,7 @@ pl:
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Niektóre przesłane materiały nie nadają się do oceny; zmiany ocen dla tych materiałów zostały zignorowane."
   someone: Gość
   someone_bbbc538b: Gość
+  someone_just_made_a_new_annotation_on_the_anonymou_cbbe68ca: "Ktoś właśnie dodał adnotację do dostarczonego przez użytkownika anonimowego zadania (%{user_id}) do %{assignment_title}."
   someone_just_made_a_new_comment_on_the_anonymous_s_3627de61: "Ktoś właśnie dodał komentarz dotyczący dostarczonego przez użytkownika (%{user_id}) anonimowego zadania %{assignment_title}"
   someone_just_made_a_new_comment_on_the_anonymous_s_a2e944fc: "Ktoś właśnie dodał komentarz dotyczący dostarczonego przez użytkownika (%{user_id}) anonimowego zadania %{assignment_title}."
   something_broke_unexpectedly_6d3720ee: "Coś nieoczekiwanie się zepsuło."
@@ -21695,6 +21775,7 @@ pl:
   something_went_wrong_creating_course_please_try_ag_5198931d: "Tworzenie kursu nie powiodło się. Spróbuj ponownie."
   something_went_wrong_creating_the_course_please_tr_431adff5: "Wystąpił problem podczas tworzenia kursu. Spróbuj ponownie."
   something_went_wrong_d238c551: "Coś poszło nie tak"
+  something_went_wrong_downloading_submissions_pleas_6d069a09: "Pobieranie przesłanego zadania nie powiodło się. Spróbuj ponownie później."
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Coś poszło nie tak podczas dezaktywacji użytkownika. Spróbuj ponownie później."
   something_went_wrong_loading_the_violations_try_re_6e2fa92: "Wystąpił błąd podczas wczytywania naruszeń, spróbuj ponownie wczytać stronę."
   something_went_wrong_please_try_again_6d337b6c: "Nie powiodło się, spróbuj ponownie."
@@ -22073,6 +22154,8 @@ pl:
       submitted: przesłano
       unsubmitted: nieprzesłane
   submission_added_title_50ebdc85: "dodane materiały: %{title}"
+  submission_annotation_user_name_assignment_title_c_39910597: "Adnotacja do przesyłki: %{user_name}, %{assignment_title}, %{course_name}"
+  submission_annotation_user_name_assignment_title_c_80c1963e: "Adnotacja do przesyłki: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comment: 
     unknown_author: Gość
   submission_comment_created_f9375ca2: "Utworzono komentarz do przesyłki"
@@ -22754,11 +22837,13 @@ pl:
   there_was_an_error_removing_the_image_c83acffe: "Wystąpił błąd podczas usuwania obrazu"
   there_was_an_error_removing_the_item_f8324776: "Wystąpił błąd podczas usuwania elementu"
   there_was_an_error_retrieving_assignment_dates_39320c15: "Wystąpił błąd podczas pobierania dat zadań."
+  there_was_an_error_retrieving_job_progress_266523f9: "Wystąpił błąd podczas pobierania postępów pracy"
   there_was_an_error_retrieving_the_course_image_d7ea094d: "Wystąpił błąd podczas odzyskiwania obrazu kursu"
   there_was_an_error_saving_the_assignment_dates_d31903ab: "Wystąpił błąd podczas zapisywania dat zadań."
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Wystąpił błąd podczas próby zapisania zmian kursu"
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "Wystąpił błąd podczas zapisywania notatki. Spróbuj ponownie."
   there_was_an_error_setting_usage_rights_53739e1d: "Wystąpił błąd podczas nadawania praw użytkowania"
+  there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Wystąpił błąd podczas operacji zapisywania dat zadań"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Wystąpił błąd podczas przesyłania danych do usługi wykrywania podobieństw. Spróbuj przesłać plik ponownie, zanim skontaktujesz się z działem pomocy technicznej."
   there_was_an_error_updating_this_assignment_please_59fc608d: "Podczas aktualizacji tego zadania wystąpił błąd. Odśwież stronę i spróbuj ponownie."
   there_was_an_error_uploading_the_image_932fc4ce: "Wystąpił błąd podczas ładowania obrazu"
@@ -22769,6 +22854,7 @@ pl:
   there_was_an_unknown_error_registering_the_tool_b9a29954: "Wystąpił nieznany błąd podczas rejestrowania narzędzia"
   there_were_a_total_of_count_errors_db1d89de: "Łączna liczba błędów: %{count}."
   there_were_a_total_of_count_warnings_6405df1e: "Łączna liczba ostrzeżeń: %{count}."
+  there_were_errors_saving_the_assignment_dates_3b39571b: "Wystąpił błąd podczas zapisywania dat zadań:"
   there_were_errors_with_the_form_errors_ab5b559a: "Wystąpiły błędy w formularzu: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Istnieje kilka potencjalnych dopasowań do importu. Rozwiąż je poniżej."
   there_were_some_files_we_didn_t_know_what_to_do_wi_6156913f: "Niektóre pliki wydawały się nieprawidłowe. Nie zostały one dodane do strony przesyłek użytkowników."
@@ -23593,6 +23679,7 @@ pl:
     quiz_regrade: 
       got_it: "Ok, otrzymano"
   track_individual_student_and_class_progress_c13cf2d1: "Śledź postępy poszczególnych uczestników i klasy"
+  track_student_performance_and_activity_a92a2a8b: "Śledź wyniki i aktywność uczestnika"
   treat_ungraded_as_0_d38c2b41: "Potraktuj nieocenione jako 0"
   tree_browser: 
     folder_tree_instructions: "Użyj strzałek do góry i w dół w celu nawigacji po drzewie. Naciśnij prawy przycisk, aby rozwinąć foldery, lewy w celu ich zwinięcia lub klawisz enter, aby wybrać zaznaczony element."
@@ -25148,3 +25235,9 @@ pl:
     zip_options: "Opcje dotyczące pliku w formacie zip"
   zip_no_folder_error: "Nie można odnaleźć określonego folderu w tym kursie."
   zoom_f3e54d69: Zoom
+  zoom_is_a_real_time_video_conferencing_tool_that_b_97dd23ec: |-
+      Zoom to narzędzie do wideokonferencji, które pozwala gromadzić ze sobą
+          nauczycieli i uczniów. Można planować i rozpoczynać
+          wideokonferencje bezpośrednio w Canvas, dodając łącze
+          Zoom do kursu Canvas, ogłoszenia o kursie, modułu lub kalendarza.
+  zoom_tutorial_tray_5dcb7fc: "Panel samouczka Zoom"
