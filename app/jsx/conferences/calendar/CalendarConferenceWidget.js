@@ -17,16 +17,22 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import AddConference from './AddConference'
 import Conference from './Conference'
 import getConferenceType from '../utils/getConferenceType'
+import webConference from 'jsx/shared/proptypes/webConference'
+import webConferenceType from 'jsx/shared/proptypes/webConferenceType'
 
 const CalendarConferenceWidget = ({context, conference, conferenceTypes, setConference}) => {
   const currentConferenceType = conference && getConferenceType(conferenceTypes, conference)
+  const showAddConference =
+    setConference && (conferenceTypes.length > 1 || (conferenceTypes.length > 0 && !conference))
+  const removeConference = setConference ? () => setConference(null) : null
   return (
     <View as="div" padding="0 0 x-small">
-      {(!conference || conferenceTypes.length > 1) && (
+      {showAddConference && (
         <AddConference
           context={context}
           currentConferenceType={currentConferenceType}
@@ -45,12 +51,24 @@ const CalendarConferenceWidget = ({context, conference, conferenceTypes, setConf
           <Conference
             conference={conference}
             conferenceType={currentConferenceType}
-            removeConference={() => setConference(null)}
+            removeConference={removeConference}
           />
         </View>
       )}
     </View>
   )
+}
+
+CalendarConferenceWidget.propTypes = {
+  context: PropTypes.string.isRequired,
+  conference: webConference,
+  conferenceTypes: PropTypes.arrayOf(webConferenceType).isRequired,
+  setConference: PropTypes.func
+}
+
+CalendarConferenceWidget.defaultProps = {
+  conference: null,
+  setConference: null
 }
 
 export default CalendarConferenceWidget

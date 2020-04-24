@@ -80,6 +80,10 @@ export default class EditCalendarEventDetails {
     this.renderConferenceWidget()
   }
 
+  canUpdateConference() {
+    return !this.event.lockedTitle
+  }
+
   setConference = conference => {
     this.conference = conference
     setTimeout(this.renderConferenceWidget, 0)
@@ -97,7 +101,8 @@ export default class EditCalendarEventDetails {
     }
     const conferenceNode = document.getElementById('calendar_event_conference_selection')
     const activeConferenceTypes = this.getActiveConferenceTypes()
-    if (activeConferenceTypes.length === 0) {
+    const setConference = this.canUpdateConference() ? this.setConference : null
+    if (!this.conference && (!this.canUpdateConference() || activeConferenceTypes.length === 0)) {
       this.conference = null
       conferenceNode.closest('tr').className = 'hide'
     } else {
@@ -106,7 +111,7 @@ export default class EditCalendarEventDetails {
         <CalendarConferenceWidget
           context={this.currentContextInfo.asset_string}
           conference={this.conference}
-          setConference={this.setConference}
+          setConference={setConference}
           conferenceTypes={activeConferenceTypes}
         />,
         conferenceNode
@@ -189,7 +194,7 @@ export default class EditCalendarEventDetails {
     if (data.end_time) params.end_time = data.end_time
     if (data.duplicate) params.duplicate = data.duplicate
 
-    if (ENV.CALENDAR?.CONFERENCES_ENABLED) {
+    if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
       if (this.conference) {
         params.web_conference = this.conference
       } else {
@@ -228,7 +233,7 @@ export default class EditCalendarEventDetails {
     }
     this.$form.find('.more_options_link').attr('href', moreOptionsHref)
 
-    if (ENV.CALENDAR?.CONFERENCES_ENABLED) {
+    if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
       // check conference is still valid in context
       if (
         this.conference &&
@@ -286,7 +291,7 @@ export default class EditCalendarEventDetails {
       'calendar_event[end_at]': data.end_at ? data.end_at.toISOString() : '',
       'calendar_event[location_name]': location_name
     }
-    if (ENV.CALENDAR?.CONFERENCES_ENABLED) {
+    if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
       if (this.conference) {
         const conferenceParams = new URLSearchParams(
           $.param({calendar_event: {web_conference: this.conference}})

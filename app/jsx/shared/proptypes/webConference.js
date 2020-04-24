@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {object, shape, string} from 'prop-types'
+import {number, object, oneOfType, shape, string} from 'prop-types'
 
 const webConference = shape({
-  id: string,
+  id: oneOfType([string, number]),
   conference_type: string.isRequired,
   context_id: string,
   context_type: string,

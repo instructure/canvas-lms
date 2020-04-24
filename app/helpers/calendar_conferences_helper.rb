@@ -17,14 +17,18 @@
 #
 
 module CalendarConferencesHelper
+  include Api::V1::Conferences
+
   def find_or_initialize_conference(context, conference_params)
     return nil if conference_params.blank?
     valid_params = conference_params.slice(:title, :description, :conference_type, :lti_settings)
 
     if conference_params[:id]
       WebConference.find(conference_params[:id]).tap do |conf|
-        conf.context = context
-        conf.assign_attributes(valid_params)
+        if conf.grants_right?(@current_user, session, :update)
+          conf.context = context
+          conf.assign_attributes(valid_params)
+        end
       end
     elsif conference_params[:title].present?
       context.web_conferences.build(valid_params.merge(user: @current_user))
@@ -38,13 +42,15 @@ module CalendarConferencesHelper
     elsif conference.changed?
       authorized_action(conference, user, :update)
     else
-      true
+      authorized_action(conference, user, :read)
     end
   end
 
   def add_conference_types_to_js_env(contexts)
+    allowed_contexts = contexts.select {|c| c.grants_right?(@current_user, session, :create_conferences)}
+
     type_to_contexts_map = {}
-    conference_types = contexts.flat_map do |context|
+    conference_types = allowed_contexts.flat_map do |context|
       WebConference.conference_types(context).map do |type|
         type_to_contexts_map[type] ||= []
         type_to_contexts_map[type] << context
@@ -56,8 +62,7 @@ module CalendarConferencesHelper
 
     js_env(
       conferences: {
-        conference_types: conference_types_json(conference_types),
-        root_context: @domain_root_account.asset_string
+        conference_types: conference_types_json(conference_types)
       }
     )
   end

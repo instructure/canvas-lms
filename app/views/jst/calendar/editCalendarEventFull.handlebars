@@ -108,6 +108,14 @@
             <input id="calendar_event_location_address" name="location_address" size="30" maxlength="255" type="text" value="{{location_address}}"/>
           </td>
         </tr>
+        {{#if include_conference_selection}}
+          <tr>
+            <td>
+              <label for="calendar_event_conference_selection">{{#t}}Conferencing:{{/t}}</label>
+              <div id="calendar_event_conference_selection"></div>
+            </td>
+          </tr>
+        {{/if}}
         {{#if recurring_calendar_events}}
           <tr class="duplicate_event_toggle_row hide">
               <td style="vertical-align: top;"><label for="duplicate_event">{{#t "repeat"}}Duplicate{{/t}}</label> <input type="checkbox" id="duplicate_event" name="duplicate" value="true" style="margin-left: 10px;" />

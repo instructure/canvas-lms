@@ -1424,6 +1424,18 @@ describe CalendarEventsApiController, type: :request do
         })
         expect(event.reload.web_conference).to be nil
       end
+
+      it "should not remove a web conference if no argument provided" do
+        event = @course.calendar_events.create(title: 'to update', workflow_state: 'active', web_conference: conference)
+        api_call(:put, "/api/v1/calendar_events/#{event.id}", {
+          :controller => 'calendar_events_api', :action => 'update', :format => 'json', id: event.id
+        }, {
+          :calendar_event => {
+            location: 'foo'
+          }
+        })
+        expect(event.reload.web_conference_id).to eq conference.id
+      end
     end
   end
 
@@ -2422,9 +2434,9 @@ describe CalendarEventsApiController, type: :request do
         plugin = PluginSetting.create!(name: 'big_blue_button')
         plugin.update_attribute(:settings, { key: 'value' })
         3.times do |idx|
-          conference = WebConference.create(context: @course, user: @user, conference_type: 'BigBlueButton')
+          conference = WebConference.create!(context: @course, user: @user, conference_type: 'BigBlueButton')
           conference.add_initiator(@user)
-          @course.calendar_events.create(title: "event #{idx}", workflow_state: 'active',
+          @course.calendar_events.create!(title: "event #{idx}", workflow_state: 'active',
             web_conference: conference)
         end
       end

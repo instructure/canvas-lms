@@ -46,12 +46,12 @@ const AddConference = ({context, currentConferenceType, conferenceTypes, setConf
   const onLtiContent = useCallback(
     ltiContent => {
       setRetrievingLTI(false)
-      const {title = '', text: description = '', ...ltiSettings} = ltiContent
+      const {title, text: description, ...ltiSettings} = ltiContent
       ltiSettings.tool_id = selectedType?.lti_settings?.tool_id
       setConference({
         conference_type: 'LtiConference',
         title: title || I18n.t('%{name} Conference', {name: selectedType.name}),
-        description,
+        description: description || '',
         lti_settings: ltiSettings
       })
     },
@@ -82,13 +82,15 @@ const AddConference = ({context, currentConferenceType, conferenceTypes, setConf
           onSelect={onSelect}
         />
       )}
-      <AddLtiConferenceDialog
-        context={context}
-        conferenceType={selectedType}
-        isOpen={isRetrievingLTI}
-        onRequestClose={onLtiClose}
-        onContent={onLtiContent}
-      />
+      {isRetrievingLTI && (
+        <AddLtiConferenceDialog
+          context={context}
+          conferenceType={selectedType}
+          isOpen
+          onRequestClose={onLtiClose}
+          onContent={onLtiContent}
+        />
+      )}
     </View>
   )
 }

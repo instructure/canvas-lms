@@ -23,7 +23,8 @@ const createConference = async (context, conferenceType) => {
   const [contextType, contextId] = context.split('_')
   const conferenceParams = {
     conference_type: conferenceType.type,
-    title: I18n.t('%{name} Conference', {name: conferenceType.name})
+    title: I18n.t('%{name} Conference', {name: conferenceType.name}),
+    description: ''
   }
   const {json} = await doFetchApi({
     path: `/api/v1/${contextType}s/${contextId}/conferences`,

@@ -17,8 +17,14 @@
  */
 
 import React from 'react'
+import 'tinymce/tinymce'
 import {render} from '@testing-library/react'
 import CalendarConferenceWidget from '../CalendarConferenceWidget'
+
+// we use RichContentEditor.preloadRemoteModule() to consolidate the import of
+// tinymce in the code, but since dynamic loading takes time during tests, we do
+// a static import here and mock out the dynamic
+jest.mock('jsx/shared/rce/RichContentEditor')
 
 describe('CalendarConferenceWidget', () => {
   const conferenceTypes = [
@@ -58,5 +64,12 @@ describe('CalendarConferenceWidget', () => {
   it('shows a selector if conference is present and multiple types are available', () => {
     const {getByText} = render(<CalendarConferenceWidget {...makeParams()} />)
     expect(getByText('Select Conference Provider')).not.toBeNull()
+  })
+
+  it('does not show a selector if setConference is not defined', () => {
+    const {queryByText} = render(
+      <CalendarConferenceWidget {...makeParams({setConference: null})} />
+    )
+    expect(queryByText('Select Conference Provider')).toBeNull()
   })
 })

@@ -205,7 +205,8 @@ describe Lti::Messages::DeepLinkingRequest do
 
       it 'sets the correct "accept_types"' do
         expect(subject['accept_types']).to match_array %w(
-          ltiResourceLink
+          html
+          link
         )
       end
 
@@ -218,7 +219,7 @@ describe Lti::Messages::DeepLinkingRequest do
 
       it 'sets the correct "accept_media_types"' do
         expect(subject['accept_media_types']).to eq(
-          'application/vnd.ims.lti.v1.ltilink'
+          'text/html,*/*'
         )
       end
 

@@ -71,12 +71,14 @@ export default class CalendarEvent extends Backbone.Model {
     return result
   }
 
-  fetch(otps = {}) {
+  fetch(opts = {}) {
     let sectionsDfd, syncDfd
 
     this.showSpinner()
 
-    const {success, error, ...options} = otps
+    const {success, error, ...options} = opts
+
+    options.url = this.url() + '?include[]=web_conference'
 
     if (this.get('id')) {
       syncDfd = (this.sync || Backbone.sync).call(this, 'read', this, options)
@@ -128,6 +130,7 @@ export default class CalendarEvent extends Backbone.Model {
 
   static mergeSectionsIntoCalendarEvent(eventData = {}, sections) {
     eventData.recurring_calendar_events = ENV.RECURRING_CALENDAR_EVENTS_ENABLED
+    eventData.include_conference_selection = ENV.CALENDAR?.CONFERENCES_ENABLED
     eventData.course_sections = sections
     eventData.use_section_dates = !!(eventData.child_events && eventData.child_events.length)
     _(eventData.child_events).each((child, index) => {

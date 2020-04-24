@@ -305,7 +305,8 @@ class CalendarEvent < ActiveRecord::Base
     :title,
     :description,
     :location_name,
-    :location_address
+    :location_address,
+    :web_conference
   ].freeze
   LOCKED_ATTRIBUTES = CASCADED_ATTRIBUTES + [
     :start_at,

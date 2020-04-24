@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {within, fireEvent} from '@testing-library/dom'
+import {within, fireEvent, getByText} from '@testing-library/dom'
 import commonEventFactory from '../commonEventFactory'
 import EditCalendarEventDetails from '../EditCalendarEventDetails'
 
@@ -36,8 +36,17 @@ describe('EditCalendarEventDetails', () => {
     window.ENV = null
   })
 
-  function render() {
-    const event = commonEventFactory({calendar_event: {id: 1, context_code: 'course_1'}}, CONTEXTS)
+  function render(overrides = {}) {
+    const event = commonEventFactory(
+      {
+        calendar_event: {
+          id: 1,
+          context_code: 'course_1',
+          ...overrides
+        }
+      },
+      CONTEXTS
+    )
     event.allPossibleContexts = CONTEXTS
 
     return new EditCalendarEventDetails(
@@ -76,59 +85,98 @@ describe('EditCalendarEventDetails', () => {
       expect(conferencingNode.closest('tr').className).not.toEqual('hide')
     })
 
-    it('does not show conferencing options when context does not support conferences', () => {
-      enableConferences(CONFERENCE_TYPES.slice(1))
-      render()
-      const conferencingNode = within(document.body).getByText('Conferencing:')
-      expect(conferencingNode.closest('tr').className).toEqual('hide')
+    describe('when context does not support conferences', () => {
+      it('does not show conferencing options when there is no current conference', () => {
+        enableConferences(CONFERENCE_TYPES.slice(1))
+        render()
+        const conferencingRow = within(document.body)
+          .getByText('Conferencing:')
+          .closest('tr')
+        expect(conferencingRow.className).toEqual('hide')
+      })
+
+      it('does show current conference when there is a current conference', () => {
+        enableConferences(CONFERENCE_TYPES.slice(1))
+        render({web_conference: {id: 1, conference_type: 'type1', title: 'FooConf'}})
+        const conferencingRow = within(document.body)
+          .getByText('Conferencing:')
+          .closest('tr')
+        expect(conferencingRow.className).not.toEqual('hide')
+        expect(getByText(conferencingRow, 'FooConf')).not.toBeNull()
+      })
     })
 
-    it('submits web_conference params for current conference', () => {
-      enableConferences()
-      const view = render()
-      view.conference = {
-        id: 1,
-        name: 'Foo',
-        conference_type: 'type1',
-        lti_settings: {a: 1, b: 2, c: 3}
-      }
-      view.event.save = jest.fn(params => {
-        ;[
-          ['calendar_event[web_conference][id]', '1'],
-          ['calendar_event[web_conference][name]', 'Foo'],
-          ['calendar_event[web_conference][conference_type]', 'type1'],
-          ['calendar_event[web_conference][lti_settings][a]', '1'],
-          ['calendar_event[web_conference][lti_settings][b]', '2'],
-          ['calendar_event[web_conference][lti_settings][c]', '3']
-        ].forEach(([key, value]) => {
-          expect(params[key]).toEqual(value)
+    describe('when event conference can be updated', () => {
+      it('submits web_conference params for current conference', () => {
+        enableConferences()
+        const view = render()
+        view.conference = {
+          id: 1,
+          name: 'Foo',
+          conference_type: 'type1',
+          lti_settings: {a: 1, b: 2, c: 3}
+        }
+        view.event.save = jest.fn(params => {
+          ;[
+            ['calendar_event[web_conference][id]', '1'],
+            ['calendar_event[web_conference][name]', 'Foo'],
+            ['calendar_event[web_conference][conference_type]', 'type1'],
+            ['calendar_event[web_conference][lti_settings][a]', '1'],
+            ['calendar_event[web_conference][lti_settings][b]', '2'],
+            ['calendar_event[web_conference][lti_settings][c]', '3']
+          ].forEach(([key, value]) => {
+            expect(params[key]).toEqual(value)
+          })
         })
+        const submit = within(document.body).getByText('Submit')
+        fireEvent.click(submit)
+        expect(view.event.save).toHaveBeenCalled()
       })
-      const submit = within(document.body).getByText('Submit')
-      fireEvent.click(submit)
-      expect(view.event.save).toHaveBeenCalled()
+
+      it('submits empty web_conference params when no current conference', () => {
+        enableConferences()
+        const view = render()
+        view.conference = null
+        view.event.save = jest.fn(params => {
+          expect(params['calendar_event[web_conference]']).toEqual('')
+        })
+        const submit = within(document.body).getByText('Submit')
+        fireEvent.click(submit)
+        expect(view.event.save).toHaveBeenCalled()
+      })
+
+      it('does not submit web_conference params when conferencing is disabled', () => {
+        const view = render()
+        view.event.save = jest.fn(params => {
+          expect(params['calendar_event[web_conference]']).toBeUndefined()
+        })
+        const submit = within(document.body).getByText('Submit')
+        fireEvent.click(submit)
+        expect(view.event.save).toHaveBeenCalled()
+      })
     })
 
-    it('submits empty web_conference params when no current conference', () => {
-      enableConferences()
-      const view = render()
-      view.conference = null
-      view.event.save = jest.fn(params => {
-        expect(params['calendar_event[web_conference]']).toEqual('')
+    describe('when event conference cannot be updated', () => {
+      it('does not show conferencing options when there is no current conference', () => {
+        enableConferences()
+        render({parent_event_id: 1000})
+        const conferencingRow = within(document.body)
+          .getByText('Conferencing:')
+          .closest('tr')
+        expect(conferencingRow.className).toEqual('hide')
       })
-      const submit = within(document.body).getByText('Submit')
-      fireEvent.click(submit)
-      expect(view.event.save).toHaveBeenCalled()
-    })
 
-    it('does not submit web_conference params when conferencing is disabled', () => {
-      const view = render()
-      view.event.save = jest.fn(params => {
-        expect(params['calendar_event[web_conference]']).toBeUndefined()
+      it('does not submit web_conference params', () => {
+        enableConferences()
+        const view = render({parent_event_id: 1000})
+        view.conference = null
+        view.event.save = jest.fn(params => {
+          expect(params['calendar_event[web_conference]']).toBeUndefined()
+        })
+        const submit = within(document.body).getByText('Submit')
+        fireEvent.click(submit)
+        expect(view.event.save).toHaveBeenCalled()
       })
-      const submit = within(document.body).getByText('Submit')
-      fireEvent.click(submit)
-      expect(view.event.save).toHaveBeenCalled()
     })
 
     describe('when an event is moved between contexts', () => {

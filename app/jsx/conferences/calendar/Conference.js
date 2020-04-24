@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconXLine} from '@instructure/ui-icons'
@@ -29,6 +30,7 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import sanitizeHtml from 'jsx/shared/sanitizeHtml'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import I18n from 'i18n!conferences'
+import webConference from 'jsx/shared/proptypes/webConference'
 
 // we use this to consolidate the import of tinymce into our environment
 // (as recommended by jsx/shared/sanitizeHTML)
@@ -99,5 +101,14 @@ const Conference = ({conference, removeConference}) =>
   ) : (
     <LinkConference conference={conference} removeConference={removeConference} />
   )
+
+Conference.propTypes = {
+  conference: webConference.isRequired,
+  removeConference: PropTypes.func
+}
+
+Conference.defaultProps = {
+  removeConference: null
+}
 
 export default Conference
