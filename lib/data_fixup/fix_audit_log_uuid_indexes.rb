@@ -26,14 +26,14 @@ module DataFixup
 
     class Migration
       INDEXES = [
-        Auditors::Authentication::Stream.pseudonym_index,
-        Auditors::Authentication::Stream.user_index,
-        Auditors::Authentication::Stream.account_index,
-        Auditors::Course::Stream.course_index,
-        Auditors::GradeChange::Stream.assignment_index,
-        Auditors::GradeChange::Stream.course_index,
-        Auditors::GradeChange::Stream.root_account_grader_index,
-        Auditors::GradeChange::Stream.root_account_student_index
+        ::Auditors::Authentication::Stream.pseudonym_index,
+        ::Auditors::Authentication::Stream.user_index,
+        ::Auditors::Authentication::Stream.account_index,
+        ::Auditors::Course::Stream.course_index,
+        ::Auditors::GradeChange::Stream.assignment_index,
+        ::Auditors::GradeChange::Stream.course_index,
+        ::Auditors::GradeChange::Stream.root_account_grader_index,
+        ::Auditors::GradeChange::Stream.root_account_student_index
       ]
 
       def self.run
