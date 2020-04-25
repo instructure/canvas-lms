@@ -13,6 +13,7 @@ services:
       RAILS_ENV: test
       DATABASE_URL: postgres://postgres:sekret@postgres:5432/canvas_test0
       RANDOMIZE_SEQUENCES: 1
+      DISABLE_SPRING: 'true'
       RERUNS_RETRY:
       MAX_FAIL:
       COVERAGE:

@@ -112,7 +112,6 @@ pipeline {
   options { ansiColor('xterm') }
 
   environment {
-    DISABLE_SPRING = 'true'
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     NAME = getImageTagVersion()
