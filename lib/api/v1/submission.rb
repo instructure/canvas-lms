@@ -34,7 +34,7 @@ module Api::V1::Submission
     # The "body" attribute is intended to store the contents of text-entry
     # submissions, but for quizzes it contains a string that includes grading
     # information. Only return it if the caller has permissions.
-    hash['body'] = nil if assignment.quiz? && !submission.grants_right?(current_user, :read_grade)
+    hash['body'] = nil if assignment.quiz? && !submission.user_can_read_grade?(current_user)
 
     if includes.include?("submission_history")
       if submission.quiz_submission && assignment.quiz && !assignment.quiz.anonymous_survey?
@@ -215,11 +215,14 @@ module Api::V1::Submission
       # group assignments will have a child topic for each group.
       # it's also possible the student posted in the main topic, as well as the
       # individual group one. so we search far and wide for all student entries.
+
       if assignment.discussion_topic.has_group_category?
-        entries = assignment.discussion_topic.child_topics.map {|t| t.discussion_entries.active.for_user(attempt.user_id) }.flatten.sort_by{|e| e.created_at}
+        entries = assignment.shard.activate { DiscussionEntry.active.where(:discussion_topic_id => assignment.discussion_topic.child_topics.select(:id)).
+          for_user(attempt.user_id).to_a.sort_by(&:created_at) }
       else
-        entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)
+        entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id).to_a
       end
+      ActiveRecord::Associations::Preloader.new.preload(entries, :discussion_entry_participants, DiscussionEntryParticipant.where(:user_id => user))
       hash['discussion_entries'] = discussion_entry_api_json(entries, assignment.discussion_topic.context, user, session)
     end
 

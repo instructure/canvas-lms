@@ -286,7 +286,7 @@ require 'csv'
 #     }
 
 class AccountsController < ApplicationController
-  before_action :require_user, :only => [:index, :terms_of_service, :help_links]
+  before_action :require_user, :only => [:index, :help_links]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]

@@ -510,6 +510,12 @@ class EnrollmentsApiController < ApplicationController
   # @API Enroll a user
   # Create a new user enrollment for a course or section.
   #
+  # @argument enrollment[start_at] [DateTime]
+  #   The start time of the enrollment, in ISO8601 format. e.g. 2012-04-18T23:08:51Z
+  #
+  # @argument enrollment[end_at] [DateTime]
+  #   The end time of the enrollment, in ISO8601 format. e.g. 2012-04-18T23:08:51Z
+  #
   # @argument enrollment[user_id] [Required, String]
   #   The ID of the user to be enrolled in the course.
   #

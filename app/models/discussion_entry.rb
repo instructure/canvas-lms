@@ -545,7 +545,9 @@ class DiscussionEntry < ActiveRecord::Base
   # to update a participant, use the #update_or_create_participant method
   # instead.
   def find_existing_participant(user)
-    participant = discussion_entry_participants.where(:user_id => user).first
+    participant = discussion_entry_participants.loaded? ?
+      discussion_entry_participants.detect{|dep| dep.user_id == user.id} :
+      discussion_entry_participants.where(:user_id => user).first
     unless participant
       # return a temporary record with default values
       participant = DiscussionEntryParticipant.new({

@@ -19,9 +19,9 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import RceFileBrowser from '../FileBrowser'
-import FileBrowser from '../../../../../../../app/jsx/shared/rce/FileBrowser'
+import FileBrowser from '../../../../canvasFileBrowser/FileBrowser'
 
-jest.mock('../../../../../../../app/jsx/shared/rce/FileBrowser', () => {
+jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {
   return jest.fn(() => 'Files Browser')
 })
 

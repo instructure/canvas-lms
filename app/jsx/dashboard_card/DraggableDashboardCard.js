@@ -25,7 +25,8 @@ const cardSource = {
   beginDrag(props) {
     return {
       assetString: props.assetString,
-      originalIndex: props.currentIndex
+      originalIndex: props.position,
+      published: props.published
     }
   },
   isDragging(props, monitor) {
@@ -45,10 +46,20 @@ const cardTarget = {
     return false
   },
   hover(props, monitor) {
-    const {assetString: draggedAssetString} = monitor.getItem()
-    const {assetString: overAssetString} = props
-    if (draggedAssetString !== overAssetString) {
-      const {currentIndex: overIndex} = props
+    const {assetString: draggedAssetString, published: draggedAssetIsPublished} = monitor.getItem()
+    const {
+      assetString: overAssetString,
+      published: overAssetIsPublished,
+      position: overIndex
+    } = props
+    if (window.ENV?.FEATURES?.unpublished_courses) {
+      if (
+        draggedAssetString !== overAssetString &&
+        draggedAssetIsPublished === overAssetIsPublished
+      ) {
+        props.moveCard(draggedAssetString, overIndex)
+      }
+    } else if (draggedAssetString !== overAssetString) {
       props.moveCard(draggedAssetString, overIndex)
     }
   }

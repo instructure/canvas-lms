@@ -28,7 +28,7 @@
   flex-wrap: wrap;
   align-items: flex-start; // keeps height in check on card when current card is selected
 
-  body.responsive_2020_03 & {
+  body.responsive_admin_settings & {
     justify-content: center;
 
     @include breakpoint(tablet) {

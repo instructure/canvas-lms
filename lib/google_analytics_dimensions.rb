@@ -44,7 +44,18 @@ module GoogleAnalyticsDimensions
       admin: _encode_admin_status(roles: user_roles),
       enrollments: _encode_enrollments(roles: user_roles),
       masquerading: _encode_masquerading_status(user: user, real_user: real_user),
+      user_id: _compute_non_compromising_user_id(user: user),
     }
+  end
+
+  # we only need some identifier that GA can utilize to track users across
+  # different devices but we don't want it to know who the users are (e.g. their
+  # canvas id)
+  #
+  # see https://support.google.com/analytics/answer/2992042?hl=en
+  # see https://developers.google.com/analytics/devguides/collection/analyticsjs/cookies-user-id
+  def self._compute_non_compromising_user_id(user:)
+    user ? Canvas::Security.hmac_sha512(user.id.to_s)[0,32] : nil
   end
 
   def self._encode_admin_status(roles:)

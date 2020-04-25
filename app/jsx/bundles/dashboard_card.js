@@ -28,9 +28,14 @@ export default function loadCardDashboard() {
   const Box = getDroppableDashboardCardBox()
   const dashboardContainer = document.getElementById('DashboardCard_Container')
 
+  // Decide which dashboard to show based on role
+  const current_roles = window.ENV.current_user_roles || []
+  const isTeacher = current_roles.includes('teacher')
+
   function render(dashboardCards) {
     ReactDOM.render(
       <Box
+        showSplitDashboardView={window.ENV?.FEATURES?.unpublished_courses && isTeacher}
         courseCards={dashboardCards}
         hideColorOverlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
       />,

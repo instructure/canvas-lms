@@ -17,22 +17,54 @@
 #
 
 module Auditors
-  def self.stream(&block)
-    ::EventStream::Stream.new(&block).tap do |stream|
-      stream.raise_on_error = Rails.env.test?
+  class << self
+    def stream(&block)
+      ::EventStream::Stream.new(&block).tap do |stream|
+        stream.raise_on_error = Rails.env.test?
 
-      stream.on_insert do |record|
-        Canvas::EventStreamLogger.info('AUDITOR', identifier, 'insert', record.to_json)
-      end
+        stream.on_insert do |record|
+          Canvas::EventStreamLogger.info('AUDITOR', identifier, 'insert', record.to_json)
+        end
 
-      stream.on_error do |operation, record, exception|
-        next unless Canvas::Cassandra::DatabaseBuilder.configured?(:auditors)
-        Canvas::EventStreamLogger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
+        stream.on_error do |operation, record, exception|
+          next unless Canvas::Cassandra::DatabaseBuilder.configured?(:auditors)
+          Canvas::EventStreamLogger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
+        end
       end
     end
-  end
 
-  def self.logger
-    Rails.logger
+    def logger
+      Rails.logger
+    end
+
+    def write_to_cassandra?
+      write_paths.include?('cassandra')
+    end
+
+    def write_to_postgres?
+      write_paths.include?('active_record')
+    end
+
+    def read_from_cassandra?
+      read_path == 'cassandra'
+    end
+
+    def read_from_postgres?
+      read_path == 'active_record'
+    end
+
+    def read_path
+      config&.[]('read_path') || 'cassandra'
+    end
+
+    def write_paths
+      paths = [config&.[]('write_paths')].flatten.compact
+      paths.empty? ? ['cassandra'] : paths
+    end
+
+    def config(shard=Shard.current)
+      settings = Canvas::DynamicSettings.find(tree: :private, cluster: shard.database_server.id)
+      YAML.safe_load(settings['auditors.yml'] || '{}')
+    end
   end
 end

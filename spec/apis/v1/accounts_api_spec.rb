@@ -665,10 +665,11 @@ describe "Accounts API", type: :request do
     it "should honor the includes[]" do
       @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
       @a1.account_users.create!(user: @user)
-      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=storage_quota_used_mb",
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=storage_quota_used_mb&include[]=account_name",
                       { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
-                        :format => 'json', :include => ['storage_quota_used_mb'] }, {})
+                        :format => 'json', :include => ['storage_quota_used_mb', 'account_name'] }, {})
       expect(json[0].has_key?("storage_quota_used_mb")).to be_truthy
+      expect(json[0]).to have_key("account_name")
     end
 
     it "should don't include fake students" do

@@ -521,8 +521,17 @@ class CoursesController < ApplicationController
       end
     end
 
-    @past_enrollments.sort_by! {|e| Canvas::ICU.collation_key(e.long_name(@current_user))}
-    [@current_enrollments, @future_enrollments].each {|list| list.sort_by! {|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name(@current_user))]}}
+    if @domain_root_account.feature_enabled?(:unpublished_courses)
+      @past_enrollments.sort_by! {|e| [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name(@current_user))]}
+      [@current_enrollments, @future_enrollments].each do |list|
+        list.sort_by! do |e|
+          [e.course.published? ? 0 : 1, e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name(@current_user))]
+        end
+      end
+    else
+      @past_enrollments.sort_by! {|e| Canvas::ICU.collation_key(e.long_name(@current_user))}
+      [@current_enrollments, @future_enrollments].each {|list| list.sort_by! {|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name(@current_user))]}}
+    end
   end
   helper_method :load_enrollments_for_index
 
@@ -3311,6 +3320,7 @@ class CoursesController < ApplicationController
     permissions_to_precalculate = [:read_sis, :manage_sis]
     permissions_to_precalculate += SectionTabHelper::PERMISSIONS_TO_PRECALCULATE if includes.include?('tabs')
     all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(courses, permissions_to_precalculate)
+    Course.preload_menu_data_for(courses, @current_user, preload_favorites: true)
 
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course

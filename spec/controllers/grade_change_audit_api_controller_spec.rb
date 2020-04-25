@@ -44,7 +44,7 @@ describe GradeChangeAuditApiController do
 
     it "returns events with the student's id included" do
       get :for_assignment, params: params
-      expect(student_ids).to include(student.id)
+      expect(student_ids).to include(student.id.to_s)
     end
 
     context "when assignment is anonymous and muted" do
@@ -80,7 +80,7 @@ describe GradeChangeAuditApiController do
 
     it "returns events with the student's id included" do
       get :for_course, params: params
-      expect(student_ids).to include(student.id)
+      expect(student_ids).to include(student.id.to_s)
     end
 
     context "when assignment is anonymous and muted" do
@@ -112,7 +112,7 @@ describe GradeChangeAuditApiController do
 
     it "returns events with the student's id included" do
       get :for_student, params: params
-      expect(student_ids).to include(student.id)
+      expect(student_ids).to include(student.id.to_s)
     end
 
     context "when assignment is anonymous and muted" do
@@ -139,7 +139,7 @@ describe GradeChangeAuditApiController do
 
     it "returns events with the student's id included" do
       get :for_grader, params: params
-      expect(student_ids).to include(student.id)
+      expect(student_ids).to include(student.id.to_s)
     end
 
     context "when assignment is anonymous and muted" do
@@ -178,7 +178,7 @@ describe GradeChangeAuditApiController do
 
     it "returns events with the student's id included" do
       get :for_course_and_other_parameters, params: params
-      expect(student_ids).to include(student.id)
+      expect(student_ids).to include(student.id.to_s)
     end
 
     context "when assignment is anonymous and muted" do

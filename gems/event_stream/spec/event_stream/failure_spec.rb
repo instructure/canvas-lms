@@ -33,7 +33,7 @@ describe EventStream::Failure do
       allow(@stream).to receive(:operation_payload).with(:insert, @record).and_return(@record.attributes)
       allow(@stream).to receive(:operation_payload).with(:update, @record).and_return(@record.changes)
 
-      @exception = Exception.new
+      @exception = StandardError.new
       allow(@exception).to receive(:message).and_return(double('exception_message', :to_s => 'exception_message_string'))
       allow(@exception).to receive(:backtrace).and_return([42])
     end

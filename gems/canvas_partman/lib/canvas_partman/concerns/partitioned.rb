@@ -63,7 +63,7 @@ module CanvasPartman::Concerns
       # @attr [Symbol] partitioning_interval
       #  A time interval to partition the table over. Only applies to
       #  :by_date partitioning_strategy
-      #  Allowed values are one of: [ :months, :years ]
+      #  Allowed values are one of: [ :weeks, :months, :years ]
       #
       #  Default value is :months.
       #

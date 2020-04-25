@@ -474,7 +474,7 @@ window.modules = (function() {
       $module.addClass('dont_remove')
       $form.find('.module_name').toggleClass('lonely_entry', isNew)
       const $toFocus = $('.ig-header-admin .al-trigger', $module)
-      const responsive_2020_04 = !!window.ENV?.FEATURES?.responsive_2020_04
+      const responsive_misc = !!window.ENV?.FEATURES?.responsive_misc
       const fullSizeModal = window.matchMedia('(min-width: 600px)').matches
       const responsiveWidth = fullSizeModal ? 600 : 320
       $form
@@ -484,7 +484,7 @@ window.modules = (function() {
           title: isNew
             ? I18n.t('titles.add', 'Add Module')
             : I18n.t('titles.edit', 'Edit Module Settings'),
-          width: responsive_2020_04 ? responsiveWidth : 600,
+          width: responsive_misc ? responsiveWidth : 600,
           height: isNew ? 400 : 600,
           close() {
             modules.hideEditModule(true)
@@ -1779,14 +1779,14 @@ modules.initModuleManagement = function() {
         .find('.name')
         .attr('title')
       const options = {for_modules: true, context_module_id: id}
-      const responsive_2020_04 = !!window.ENV?.FEATURES?.responsive_2020_04
+      const responsive_misc = !!window.ENV?.FEATURES?.responsive_misc
       const midSizeModal = window.matchMedia('(min-width: 500px)').matches
       const fullSizeModal = window.matchMedia('(min-width: 770px)').matches
       const responsiveWidth = fullSizeModal ? 770 : midSizeModal ? 500 : 320
       options.select_button_text = I18n.t('buttons.add_item', 'Add Item')
       options.holder_name = name
       options.height = 550
-      options.width = responsive_2020_04 ? responsiveWidth : 770
+      options.width = responsive_misc ? responsiveWidth : 770
       options.dialog_title = I18n.t('titles.add_item', 'Add Item to %{module}', {module: name})
       options.close = function() {
         $trigger.focus()

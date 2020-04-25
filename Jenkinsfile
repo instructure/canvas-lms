@@ -135,8 +135,9 @@ pipeline {
               if (isCovid() && env.GERRIT_PROJECT != 'canvas-lms') {
                 echo 'checking out canvas-lms covid branch'
                 credentials.withGerritCredentials {
-                  sh '''
-                    set -ex
+                  sh '''#!/bin/bash
+                    set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+
                     git branch -D covid || true
                     GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
                       git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
@@ -197,7 +198,9 @@ pipeline {
             runDatadogMetric("Rebase") {
               def credentials = load('build/new-jenkins/groovy/credentials.groovy')
               credentials.withGerritCredentials({ ->
-                sh '''
+                sh '''#!/bin/bash
+                  set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+
                   GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
                     git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
 

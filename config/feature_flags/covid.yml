@@ -23,6 +23,21 @@ responsive_2020_04:
   applies_to: RootAccount
   display_name: "April 2020 Responsiveness"
   description: "Collection of responsive improvements throughout Canvas"
+responsive_admin_settings:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Responsive Admin/Settings"
+  description: "Collection of responsive improvements throughout Canvas"
+responsive_awareness:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Responsive Awareness"
+  description: "Collection of responsive improvements throughout Canvas"
+responsive_misc:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Responsive Misc"
+  description: "Collection of responsive improvements throughout Canvas"
 unpublished_courses:
   state: hidden
   applies_to: RootAccount

@@ -28,8 +28,8 @@ module Api::V1::GradeChangeEvent
     links = {
       assignment: Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current),
       course: Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
-      student: Shard.relative_id_for(event.student_id, Shard.current, Shard.current),
-      grader: Shard.relative_id_for(event.grader_id, Shard.current, Shard.current),
+      student: Shard.relative_id_for(event.student_id, Shard.current, Shard.current)&.to_s,
+      grader: Shard.relative_id_for(event.grader_id, Shard.current, Shard.current)&.to_s,
       page_view: event.request_id && PageView.find_by_id(event.request_id).try(:id)
     }
 

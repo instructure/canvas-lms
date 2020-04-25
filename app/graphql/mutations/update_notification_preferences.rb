@@ -23,20 +23,73 @@ class NotificationPreferencesContextType < Types::BaseEnum
   value 'Account'
 end
 
+class NotificationFrequencyType < Types::BaseEnum
+  graphql_name 'NotificationFrequencyType'
+  description 'Frequency that notifications can be delivered on'
+  value 'immediately'
+  value 'daily'
+  value 'weekly'
+  value 'never'
+end
+
+class NotificationCategoryType < Types::BaseEnum
+  graphql_name 'NotificationCategoryType'
+  description 'The categories that a notification can belong to'
+  value 'Account_Notification'
+  value 'Added_To_Conversation'
+  value 'All_Submissions'
+  value 'Announcement'
+  value 'Announcement_Created_By_You'
+  value 'Appointment_Availability'
+  value 'Appointment_Cancelations'
+  value 'Appointment_Signups'
+  value 'Blueprint'
+  value 'Calendar'
+  value 'Content_Link_Error'
+  value 'Conversation_Created'
+  value 'Conversation_Message'
+  value 'Course_Content'
+  value 'Discussion'
+  value 'DiscussionEntry'
+  value 'Due_Date'
+  value 'Files'
+  value 'Grading'
+  value 'Grading_Policies'
+  value 'Invitation'
+  value 'Late_Grading'
+  value 'Membership_Update'
+  value 'Other'
+  value 'Recording_Ready'
+  value 'Student_Appointment_Signups'
+  value 'Submission_Comment'
+end
+
 class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
   graphql_name 'UpdateNotificationPreferences'
 
   argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
   argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
   argument :context_type, NotificationPreferencesContextType, required: true
-  argument :enabled, Boolean, required: true
+  argument :enabled, Boolean, required: false
+  argument :communication_channel_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('CommunicationChannel')
+  argument :notification_category, NotificationCategoryType, required: false
+  argument :frequency, NotificationFrequencyType, required: false
 
   field :account, Types::AccountType, null: true
   field :course, Types::CourseType, null: true
   def resolve(input:)
     validate_input(input)
     context = get_context(input)
-    NotificationPolicyOverride.enable_for_context(current_user, context, enable: input[:enabled])
+
+    unless input[:enabled].nil?
+      NotificationPolicyOverride.enable_for_context(current_user, context, enable: input[:enabled])
+    end
+
+    if input[:communication_channel_id] && input[:notification_category] && input[:frequency]
+      communication_channel = CommunicationChannel.find(input[:communication_channel_id])
+      NotificationPolicyOverride.create_or_update_for(communication_channel, input[:notification_category].gsub('_', ' '), input[:frequency], context)
+    end
+
     {
       account: input[:context_type] == 'Account' ? context : nil,
       course: input[:context_type] == 'Course' ? context : nil

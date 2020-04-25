@@ -107,8 +107,8 @@ describe Api::V1::GradeChangeEvent do
     expect(event[:points_possible_after]).to eq @event.points_possible_after
     expect(event[:links][:assignment]).to eq Shard.relative_id_for(@assignment, Shard.current, Shard.current)
     expect(event[:links][:course]).to eq Shard.relative_id_for(@course, Shard.current, Shard.current)
-    expect(event[:links][:student]).to eq Shard.relative_id_for(@student, Shard.current, Shard.current)
-    expect(event[:links][:grader]).to eq Shard.relative_id_for(@teacher, Shard.current, Shard.current)
+    expect(event[:links][:student]).to eq Shard.relative_id_for(@student, Shard.current, Shard.current).to_s
+    expect(event[:links][:grader]).to eq Shard.relative_id_for(@teacher, Shard.current, Shard.current).to_s
     expect(event[:links][:page_view]).to eq @page_view.id
   end
 

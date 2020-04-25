@@ -17,8 +17,15 @@
 %>
 
 <% dashboard ||= false %>
+<% is_current_term ||= false %>
+<% # only show updated css in unpublished, current enrollments with FF enabled %>
+<% unpublished_course_redesign =
+  (current_enrollment.course.created? || current_enrollment.course.claimed?) &&
+  is_current_term &&
+  @domain_root_account.feature_enabled?(:unpublished_courses)
+%>
 <% unless dashboard %>
-  <tr class="course-list-table-row">
+  <tr class="course-list-table-row <%='course-list-unpublished-course-row' if unpublished_course_redesign %>">
 <% end %>
 <% if current_enrollment.workflow_state == "invited" && !current_enrollment.inactive? %>
   <div class="<%= dashboard ? 'communication_message dashboard_notification alert alert-info' : 'reminder' %>">
@@ -89,7 +96,12 @@
 
       <td class="course-list-no-left-border course-list-published-column ">
         <% if current_enrollment.course.created? || current_enrollment.course.claimed? %>
-            <span data-tooltip title="<%= t('unpublished_course_tooltip', "This course has not been published. Students should contact the course instructor for access.") %>"><%= t('unpublished_course', "No") %></span>
+            <span
+              class="<%= 'course-list-unpublished-course' if unpublished_course_redesign %>"
+              data-tooltip
+              title="<%= t('unpublished_course_tooltip', "This course has not been published. Students should contact the course instructor for access.") %>">
+              <%= t('unpublished_course', "No") %>
+            </span>
              <span class="screenreader-only"><%= t('unpublished_course_tooltip', "This course has not been published. Students should contact the course instructor for access.") %></span>
         <% else %>
             <span data-tooltip title="<%= t('published_course_tooltip', "This course has been published.") %>"><%= t('published_course', "Yes") %></span>

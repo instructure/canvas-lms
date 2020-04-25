@@ -48,7 +48,8 @@ export default function(ed, document) {
     }
 
     const handleUpload = (error, uploadData, onUploadComplete) => {
-      onUploadComplete(error, uploadData)
+      const err_msg = error && uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
+      onUploadComplete(err_msg, uploadData)
     }
 
     const trayProps = Bridge.trayProps.get(ed)

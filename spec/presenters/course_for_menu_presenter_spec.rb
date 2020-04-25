@@ -103,6 +103,22 @@ describe CourseForMenuPresenter do
       expect(h[:isFavorited]).to eq false
     end
 
+    context 'with the `unpublished_courses` FF enabled' do
+      before(:each) do
+        course.root_account.enable_feature!(:unpublished_courses)
+      end
+
+      it 'sets additional keys' do
+        cs_presenter = CourseForMenuPresenter.new(course, user)
+        h = cs_presenter.to_h
+        expect(h.key?(:published)).to eq true
+        expect(h.key?(:canChangeCourseState)).to eq true
+        expect(h.key?(:defaultView)).to eq true
+        expect(h.key?(:pagesUrl)).to eq true
+        expect(h.key?(:frontPageTitle)).to eq true
+      end
+    end
+
     context 'Dashcard Reordering' do
       before(:each) do
         @account = Account.default
@@ -122,22 +138,5 @@ describe CourseForMenuPresenter do
       end
     end
 
-  end
-
-  describe '#role' do
-    specs_require_sharding
-    it "should retrieve the correct role for cross-shard enrollments" do
-      @shard1.activate do
-        account = Account.create
-        @role = account.roles.create :name => "1337 Student"
-        @role.base_role_type = 'StudentEnrollment'
-        @role.save!
-
-        @cs_course = account.courses.create!
-        @cs_course.primary_enrollment_role_id = @role.local_id
-      end
-      cs_presenter = CourseForMenuPresenter.new(@cs_course)
-      expect(cs_presenter.send(:role)).to eq @role
-    end
   end
 end

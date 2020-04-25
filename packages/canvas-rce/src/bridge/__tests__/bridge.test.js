@@ -78,6 +78,8 @@ describe('Editor/Sidebar bridge', () => {
         insertVideo: jest.fn(),
         insertAudio: jest.fn(),
         insertEmbedCode: jest.fn(),
+        removePlaceholders: jest.fn(),
+        addAlert: jest.fn(),
         props: {
           textareaId: 'fake_editor',
           tinymce: {
@@ -168,6 +170,23 @@ describe('Editor/Sidebar bridge', () => {
         const theCode = 'insert me'
         Bridge.insertEmbedCode(theCode)
         expect(editor.insertEmbedCode).toHaveBeenCalledWith(theCode)
+      })
+    })
+
+    describe('upload support', () => {
+      it('removes the placeholder', () => {
+        Bridge.focusEditor(editor)
+        Bridge.removePlaceholders('forfilename')
+        expect(editor.removePlaceholders).toHaveBeenCalledWith('forfilename')
+      })
+
+      it('shows an error message', () => {
+        Bridge.focusEditor(editor)
+        Bridge.showError('whoops')
+        expect(editor.addAlert).toHaveBeenCalledWith({
+          text: 'whoops',
+          type: 'error'
+        })
       })
     })
   })

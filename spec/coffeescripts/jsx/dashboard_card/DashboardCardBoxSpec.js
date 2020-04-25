@@ -66,9 +66,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
       component = ref
     }
     const Box = getDroppableDashboardCardBox(ReactDndTestBackend)
-    const CardBox = (
-      <Box connectDropTarget={el => el} courseCards={props.courseCards} ref={bindRef} />
-    )
+    const CardBox = <Box connectDropTarget={el => el} ref={bindRef} {...props} />
     ReactDOM.render(CardBox, $container)
   }
 
@@ -76,8 +74,16 @@ QUnit.module('DashboardCardBox', suiteHooks => {
     return document.querySelector('.ic-DashboardCard__box')
   }
 
+  function getSplitDashboardElement() {
+    return document.querySelector('.unpublished_courses_redesign')
+  }
+
   function getDashboardCardElements() {
     return [...getDashboardBoxElement().querySelectorAll('.ic-DashboardCard')]
+  }
+
+  function getDashboardBoxHeaders() {
+    return [...document.querySelectorAll('.ic-DashboardCard__box__header')]
   }
 
   function getPopoverButton(card) {
@@ -95,9 +101,9 @@ QUnit.module('DashboardCardBox', suiteHooks => {
   }
 
   function getUnfavoriteButton() {
-    return [...getDashboardMenu().querySelectorAll('.DashboardCardMenu__MovementItem')].find(
-      $button => $button.textContent.includes('Unfavorite')
-    )
+    return [
+      ...getDashboardMenu().querySelectorAll('.DashboardCardMenu__MovementItem')
+    ].find($button => $button.textContent.includes('Unfavorite'))
   }
 
   function getModal() {
@@ -129,6 +135,33 @@ QUnit.module('DashboardCardBox', suiteHooks => {
       mountComponent()
       const cards = getDashboardCardElements()
       strictEqual(cards.length, props.courseCards.length)
+    })
+
+    test('should render a header for both published/unpublished courses in split view', () => {
+      props.showSplitDashboardView = true
+      mountComponent()
+      const headers = getDashboardBoxHeaders()
+      strictEqual(headers.length, 2)
+    })
+
+    test('correctly splits course cards into published and unpublished in split view', () => {
+      props.courseCards = [
+        {...props.courseCards[0], published: false},
+        {...props.courseCards[1], published: true}
+      ]
+      props.showSplitDashboardView = true
+      mountComponent()
+      const headers = getDashboardBoxHeaders()
+      ok(headers[0].textContent.includes('Published Courses (1)'))
+      ok(headers[1].textContent.includes('Unpublished Drafts (1)'))
+    })
+
+    test('correctly renders empty headers in split view', () => {
+      props.courseCards = []
+      props.showSplitDashboardView = true
+      mountComponent()
+      const dashboardBox = getSplitDashboardElement()
+      ok(dashboardBox.textContent.includes('No courses to display'))
     })
   })
 

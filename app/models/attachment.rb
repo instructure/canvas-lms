@@ -75,6 +75,7 @@ class Attachment < ActiveRecord::Base
   has_one :thumbnail, -> { where(thumbnail: 'thumb') }, foreign_key: "parent_id"
   has_many :thumbnails, :foreign_key => "parent_id"
   has_many :children, foreign_key: :root_attachment_id, class_name: 'Attachment'
+  has_many :attachment_upload_statuses
   has_one :crocodoc_document
   has_one :canvadoc
   belongs_to :usage_rights
@@ -511,6 +512,14 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def root_account
+    begin
+      root_account_id && Account.find_cached(root_account_id)
+    rescue ::Canvas::AccountCacheError
+      nil
+    end
+  end
+
   def namespace
     read_attribute(:namespace) || (new_record? ? write_attribute(:namespace, infer_namespace) : nil)
   end
@@ -835,11 +844,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def url_ttl
-    settings = begin
-      root_account_id && Account.find_cached(root_account_id).settings
-    rescue ::Canvas::AccountCacheError
-    end
-    setting = settings&.[](:s3_url_ttl_seconds)
+    setting = root_account&.settings&.[](:s3_url_ttl_seconds)
     setting ||= Setting.get('attachment_url_ttl', 1.hour.to_s)
     setting.to_i.seconds
   end
@@ -1544,7 +1549,7 @@ class Attachment < ActiveRecord::Base
 
   def make_childless(preferred_child = nil)
     return if root_attachment_id
-    child = preferred_child || children.first
+    child = preferred_child || children.take
     return unless child
     raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil

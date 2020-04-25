@@ -56,6 +56,7 @@ export function failFoldersLoad(error) {
 }
 
 export function failMediaUpload(error) {
+  Bridge.showError(error)
   return {type: FAIL_MEDIA_UPLOAD, error}
 }
 
@@ -209,11 +210,11 @@ export function fetchFolders(bookmark) {
 
 // uploads handled via canvas-media
 export function mediaUploadComplete(error, uploadData) {
+  const {mediaObject, uploadedFile} = uploadData
   return (dispatch, _getState) => {
-    const {mediaObject, uploadedFile} = uploadData
     if (error) {
       dispatch(failMediaUpload(error))
-      dispatch(removePlaceholdersFor(uploadedFile.name))
+      dispatch(removePlaceholdersFor(uploadedFile?.name))
     } else {
       const embedData = {
         embedded_iframe_url: mediaObject.embedded_iframe_url,

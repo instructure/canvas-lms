@@ -549,8 +549,12 @@ describe('Upload data actions', () => {
   })
 
   describe('removePlaceholdersFor', () => {
+    let bridgeSpy
+    afterEach(() => {
+      bridgeSpy && bridgeSpy.restore()
+    })
     it('removes the placeholder through the bridge', () => {
-      const bridgeSpy = sinon.spy(Bridge, 'removePlaceholders')
+      bridgeSpy = sinon.spy(Bridge, 'removePlaceholders')
       const store = spiedStore({})
       store.dispatch(actions.removePlaceholdersFor('image1'))
       sinon.assert.calledWith(bridgeSpy, 'image1')
@@ -560,6 +564,36 @@ describe('Upload data actions', () => {
       const store = spiedStore({})
       store.dispatch(actions.removePlaceholdersFor('image1'))
       sinon.assert.calledWith(store.spy, {type: 'STOP_MEDIA_UPLOADING'})
+    })
+  })
+
+  describe('media upload failure', () => {
+    let showErrorSpy
+    let removePlaceholdersSpy
+
+    beforeEach(() => {
+      showErrorSpy = sinon.spy(Bridge, 'showError')
+      removePlaceholdersSpy = sinon.spy(Bridge, 'removePlaceholders')
+    })
+
+    afterEach(() => {
+      showErrorSpy.restore()
+      removePlaceholdersSpy.restore()
+    })
+
+    it('removes placeholders', () => {
+      const error = new Error('uh oh')
+      const action = actions.failMediaUpload(error)
+      sinon.assert.calledWith(showErrorSpy, error)
+      assert.deepEqual(action, {type: actions.FAIL_MEDIA_UPLOAD, error})
+    })
+
+    it('handles failure', () => {
+      const store = spiedStore({})
+      const error = new Error('uh oh')
+      store.dispatch(actions.mediaUploadComplete(error, {uploadedFile: {name: 'bob'}}))
+      sinon.assert.calledWith(removePlaceholdersSpy, 'bob')
+      sinon.assert.calledWith(showErrorSpy, error)
     })
   })
 })

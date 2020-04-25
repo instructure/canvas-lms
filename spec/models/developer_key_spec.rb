@@ -41,6 +41,15 @@ describe DeveloperKey do
     )
   end
 
+  describe 'site_admin' do
+    subject { DeveloperKey.site_admin }
+
+    let!(:site_admin_key) { DeveloperKey.create! }
+    let!(:root_account_key) { DeveloperKey.create!(account: Account.default) }
+
+    it { is_expected.to match_array [site_admin_key] }
+  end
+
   describe 'default values for is_lti_key' do
     let(:public_jwk) do
       key_hash = Lti::RSAKeyPair.new.public_jwk.to_h
@@ -757,6 +766,19 @@ describe DeveloperKey do
         end
       end
       let(:sa_account_binding) { sa_developer_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
+
+      context 'when the developer key and account are on different, non site-admin shards' do
+        it "doesn't return a binding for an account with the same local ID on a different shard" do
+          expect(root_account.shard.id).to_not eq(@shard2.id)
+          @shard2.activate do
+            account = Account.find_by(id: root_account.local_id)
+            account ||= Account.create!(id: root_account.local_id)
+            shard2_developer_key = DeveloperKey.create!(name: 'Shard 2 Key', account_id: account.id)
+            expect(shard2_developer_key.account_binding_for(account)).to_not be_nil
+            expect(shard2_developer_key.account_binding_for(root_account)).to be_nil
+          end
+        end
+      end
 
       context 'when developer key binding is on the site admin shard' do
         it 'finds the site admin binding if it is set to "on"' do

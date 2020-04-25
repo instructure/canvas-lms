@@ -57,6 +57,7 @@ class DeveloperKey < ActiveRecord::Base
   scope :nondeleted, -> { where("workflow_state<>'deleted'") }
   scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
   scope :visible, -> { where(visible: true) }
+  scope :site_admin, -> { where(account_id: nil) } # site_admin keys have a nil account_id
   scope :site_admin_lti, -> (key_ids) do
     # Select site admin shard developer key ids
     site_admin_key_ids = key_ids.select do |id|
@@ -253,7 +254,12 @@ class DeveloperKey < ActiveRecord::Base
     binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, self.id)
 
     # If no explicity set bindings were found check for 'allow' bindings
-    binding || DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, self.id, false)
+    binding ||= DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, self.id, false)
+
+    # Check binding not for wrong account (on different shard)
+    return nil if binding && binding.shard.id != binding_account.shard.id
+
+    binding
   end
 
   def owner_account

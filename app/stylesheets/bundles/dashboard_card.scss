@@ -31,6 +31,23 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   padding: $ic-sp 0.125rem 0;
 }
 
+.unpublished_courses_redesign .ic-DashboardCard__box {
+  padding: $ic-sp $ic-sp*2;
+}
+
+.unpublished_courses_redesign .ic-DashboardCard__box__header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  border-bottom: 1px solid $ic-border-light;
+  background: rgba($ic-color-light, 0.95);
+  box-sizing: border-box;
+  margin-bottom: $ic-sp*2;
+  @include mobile-only {
+    & { font-size: 1.5em };
+  }
+}
+
 @supports (position: sticky) or (position: -webkit-sticky) {
   .ic-DashboardCard__box {
     padding-top: $ic-sp * 2;
@@ -72,7 +89,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   // if there is not enough screen width to fit 2 whole cards (like on a phone) then just have one card fill the whole width
   @media only screen and (max-width: $ic-DashboardCard-width*2 + $ic-sp*8) {
     & { width: 100%; }
-    body.responsive_2020_03 & {
+    body.responsive_awareness & {
       margin-#{direction(right)}: 0;
     }
   }
@@ -121,6 +138,13 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 .ic-DashboardCard__header-button-bg {
   @include dashcardHeaderButton;
+}
+
+.ic-DashboardCard__header-publish {
+  position: absolute;
+  top: $ic-sp;
+  #{direction(left)}: $ic-sp;
+  height: $ic-sp*3;
 }
 
 .ic-DashboardCard_settings_icon {

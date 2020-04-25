@@ -943,6 +943,21 @@ describe "Users API", type: :request do
       end
     end
 
+    it "returns a list of users filtered by enrollment_type" do
+      @account = Account.default
+      # student enrollment created in before(:once) block
+      teacher_in_course(active_all: true, course: @course)
+      ta_in_course(active_all: true, course: @course)
+      @user = @admin
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
+        { :enrollment_type => 'student' })
+
+      expect(json.count).to eq 1
+      expect(json.map{|user| user['name']}).to eq [@student.name]
+    end
+
     it "doesn't kersplode when filtering by role and sorting" do
       @account = Account.default
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",

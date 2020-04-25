@@ -118,6 +118,12 @@ module Canvas::Security
     )
   end
 
+  def self.hmac_sha512(str, encryption_key = nil)
+    OpenSSL::HMAC.hexdigest(
+      OpenSSL::Digest.new('sha512'), (encryption_key || self.encryption_key), str
+    )
+  end
+
   def self.verify_hmac_sha1(hmac, str, options = {})
     keys = options[:keys] || []
     keys += [options[:key]] if options[:key]

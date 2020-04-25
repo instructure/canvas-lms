@@ -150,7 +150,7 @@ module DashboardHelper
   end
 
   def map_courses_for_menu(courses, opts={})
-    Course.preload_menu_data_for(courses, @current_user)
+    Course.preload_menu_data_for(courses, @current_user, preload_favorites: @domain_root_account.feature_enabled?(:unfavorite_course_from_dashboard))
     mapped = courses.map do |course|
       presenter = CourseForMenuPresenter.new(course, @current_user, @domain_root_account, session, opts)
       presenter.to_h

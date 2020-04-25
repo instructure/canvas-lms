@@ -37,9 +37,9 @@ def getImageTagVersion() {
   return env.RUN_COVERAGE == '1' ? 'master' : flags.getImageTagVersion()
 }
 
-def copyFiles(docker_name, docker_dir, host_dir) {
-  sh "mkdir -vp ./$host_dir"
-  sh "docker cp \$(docker ps -qa -f name=$docker_name):/usr/src/app/$docker_dir ./$host_dir"
+def copyFiles(dockerName, dockerPath, hostPath) {
+  sh "mkdir -vp ./$hostPath"
+  sh "docker cp \$(docker ps -qa -f name=$dockerName):/usr/src/app/$dockerPath ./$hostPath"
 }
 
 def withSentry(block) {
@@ -47,18 +47,17 @@ def withSentry(block) {
   credentials.withSentryCredentials(block)
 }
 
-def runInSeriesOrParallel(is_series, stages_map) {
-  if (is_series) {
-    echo "running tests in series: ${stages_map.keys}"
-    stages_map.each { name, block ->
+def runInSeriesOrParallel(isSeries, stagesMap) {
+  if (isSeries) {
+    echo "running tests in series: ${stagesMap.keys}"
+    stagesMap.each { name, block ->
       stage(name) {
         block()
       }
     }
-  }
-  else {
-    echo "running tests in parallel: ${stages_map.keys}"
-    parallel(stages_map)
+  } else {
+    echo "running tests in parallel: ${stagesMap.keys}"
+    parallel(stagesMap)
   }
 }
 
@@ -76,19 +75,12 @@ pipeline {
   }
 
   stages {
-    stage('Pre-Cleanup') {
+    stage('Setup') {
       steps {
-        timeout(time: 2) {
-          sh 'build/new-jenkins/docker-cleanup.sh'
+        timeout(time: 10) {
           sh 'build/new-jenkins/print-env-excluding-secrets.sh'
+          sh 'build/new-jenkins/docker-cleanup.sh'
           sh 'rm -vrf ./tmp/*'
-        }
-      }
-    }
-
-    stage('Tests Setup') {
-      steps {
-        timeout(time: 60) {
           sh 'build/new-jenkins/docker-compose-pull.sh'
           sh 'docker-compose build'
         }
@@ -97,61 +89,55 @@ pipeline {
 
     stage('Test Stage Coordinator') {
       steps {
-        script {
-          def tests = [:]
+        timeout(time: 60) {
+          script {
+            def tests = [:]
 
-          tests['Jest'] = {
-            withEnv(['CONTAINER_NAME=tests-jest']) {
-              try {
-                withSentry {
-                  sh 'build/new-jenkins/js/tests-jest.sh'
-                }
-                if (env.COVERAGE == '1') {
-                  copyFiles(env.CONTAINER_NAME, 'coverage-jest', "./tmp/${env.CONTAINER_NAME}-coverage")
-                }
-              }
-              finally {
-                copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-              }
-            }
-          }
-
-          tests['Packages'] = {
-            withEnv(['CONTAINER_NAME=tests-packages']) {
-              try {
-                withSentry {
-                  sh 'build/new-jenkins/js/tests-packages.sh'
-                }
-              }
-              finally {
-                copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
-              }
-            }
-          }
-
-          tests['canvas_quizzes'] = {
-            sh 'build/new-jenkins/js/tests-quizzes.sh'
-          }
-
-          ['coffee', 'jsa', 'jsg', 'jsh'].each { group ->
-            tests["Karma - Spec Group - ${group}"] = {
-              withEnv(["CONTAINER_NAME=tests-karma-${group}", "JSPEC_GROUP=${group}"]) {
+            tests['Jest'] = {
+              withEnv(['CONTAINER_NAME=tests-jest']) {
                 try {
-                  withSentry {
-                    sh 'build/new-jenkins/js/tests-karma.sh'
+                  withSentry { sh 'build/new-jenkins/js/tests-jest.sh'
                   }
                   if (env.COVERAGE == '1') {
-                    copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
+                    copyFiles(env.CONTAINER_NAME, 'coverage-jest', "./tmp/${env.CONTAINER_NAME}-coverage")
                   }
-                }
-                finally {
+                } finally {
                   copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
                 }
               }
             }
-          }
 
-          runInSeriesOrParallel(env.COVERAGE == '1', tests)
+            tests['Packages'] = {
+              withEnv(['CONTAINER_NAME=tests-packages']) {
+                try {
+                  withSentry { sh 'build/new-jenkins/js/tests-packages.sh' }
+                } finally {
+                  copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
+                }
+              }
+            }
+
+            tests['canvas_quizzes'] = {
+              sh 'build/new-jenkins/js/tests-quizzes.sh'
+            }
+
+            ['coffee', 'jsa', 'jsg', 'jsh'].each { group ->
+              tests["Karma - Spec Group - ${group}"] = {
+                withEnv(["CONTAINER_NAME=tests-karma-${group}", "JSPEC_GROUP=${group}"]) {
+                  try {
+                    withSentry { sh 'build/new-jenkins/js/tests-karma.sh' }
+                    if (env.COVERAGE == '1') {
+                      copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
+                    }
+                  } finally {
+                    copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+                  }
+                }
+              }
+            }
+
+            runInSeriesOrParallel(env.COVERAGE == '1', tests)
+          }
         }
       }
     }

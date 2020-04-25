@@ -127,7 +127,8 @@ test('deleteRecordings calls screenreader', () => {
           {
             type: 'presentation',
             url: 'www.blah.com',
-            length: 0
+            length: 0,
+            show_to_students: true
           }
         ],
         created_at: 1518554650000

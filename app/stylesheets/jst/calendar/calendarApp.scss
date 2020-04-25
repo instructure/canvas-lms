@@ -258,10 +258,10 @@
 
 // Prevent overflow of the "edit event" modal at narrow widths
 #edit_calendar_event_form, #edit_assignment_form {
-  body:not(.responsive_2020_03) & {
+  body:not(.responsive_awareness) & {
     width: 400px;
   }
-  body.responsive_2020_03 & {
+  body.responsive_awareness & {
     width: 270px;
     td {
       display: block;

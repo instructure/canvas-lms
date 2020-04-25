@@ -509,4 +509,15 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(getByText(/saved successfully/)).toBeInTheDocument()
     }, 15000)
   })
+
+  describe('errors', () => {
+    it('dislays error message if lock-at date is before due date', async () => {})
+    it('dislays error message if unlock-at date is after due date', async () => {})
+    it('dislays error message if any date is after course-end date', async () => {})
+    it('dislays error message if any date is before course-start date', async () => {})
+    it('dislays error message if any date is before course-term start date', async () => {})
+    it('dislays error message if any date is after course-term end date', async () => {})
+    it('dislays error message if any date is before user-role term access from', async () => {})
+    it('dislays error message if any date is after user-role term access until', async () => {})
+  })
 })

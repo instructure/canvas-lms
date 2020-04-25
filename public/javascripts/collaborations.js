@@ -71,7 +71,7 @@ CollaborationsPage.Events = {
     $('#collaboration_collaboration_type')
       .on('change', this.onTypeChange)
       .change()
-    if (document.body.classList.contains('responsive_2020_03')) {
+    if (document.body.classList.contains('responsive_misc')) {
       $('#collaboration_selection_row').css('display: block;')
       $('#collaboration_selection_label').css(['white-space: nowrap; text-align: left; display: block;'])
     }

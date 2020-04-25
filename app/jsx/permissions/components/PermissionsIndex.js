@@ -56,8 +56,8 @@ export default class PermissionsIndex extends Component {
   state = {
     permissionSearchString: '',
     contextType: COURSE,
-    // TODO: remove logic around responsive_2020_03 once the feature flag is on by default
-    responsive_2020_03: !!window.ENV?.FEATURES?.responsive_2020_03
+    // TODO: remove logic around responsive_admin_settings once the feature flag is on by default
+    responsive_admin_settings: !!window.ENV?.FEATURES?.responsive_admin_settings
   }
 
   onRoleFilterChange = (_, value) => {
@@ -120,7 +120,7 @@ export default class PermissionsIndex extends Component {
 
   renderHeader() {
     // TODO: delete this logic once the feature flag is on by default
-    const responsive = this.state.responsive_2020_03
+    const responsive = this.state.responsive_admin_settings
 
     return (
       <div className="permissions-v2__header_container">

@@ -23,6 +23,7 @@ require 'inst_statsd'
 
 module EventStream
   require 'event_stream/attr_config'
+  require 'event_stream/backend'
   require 'event_stream/record'
   require 'event_stream/failure'
   require 'event_stream/stream'

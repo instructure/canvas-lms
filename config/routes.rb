@@ -1404,9 +1404,11 @@ CanvasRails::Application.routes.draw do
       post 'users/:id/clear_cache', :action => :clear_cache, :as => 'clear_cache'
 
       scope(controller: :user_observees) do
+        get    'users/:user_id/observers', action: :observers, as: 'user_observers'
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
         post   'users/:user_id/observees', action: :create
         get    'users/:user_id/observees/:observee_id', action: :show, as: 'user_observee'
+        get    'users/:user_id/observers/:observer_id', action: :show_observer, as: 'user_observer'
         put    'users/:user_id/observees/:observee_id', action: :update
         delete 'users/:user_id/observees/:observee_id', action: :destroy
       end
@@ -2367,7 +2369,7 @@ CanvasRails::Application.routes.draw do
       get "assignments/:assignment_id/files/:file_id/originality_report", action: :show
     end
 
-    # Line Item Service
+    # Line Item Service (LTI AGS)
     scope(controller: 'lti/ims/line_items') do
       post "courses/:course_id/line_items", action: :create, as: :lti_line_item_create
       get "courses/:course_id/line_items/:id", action: :show, as: :lti_line_item_show
@@ -2376,7 +2378,7 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/line_items/:id", action: :destroy, as: :lti_line_item_delete
     end
 
-    # Scores Service
+    # Scores Service (LTI AGS)
     scope(controller: 'lti/ims/scores') do
       post "courses/:course_id/line_items/:line_item_id/scores", action: :create, as: :lti_result_create
     end
@@ -2400,6 +2402,11 @@ CanvasRails::Application.routes.draw do
       get "/accounts/:account_id/data_services", action: :index, as: :data_services_index
       get "/accounts/:account_id/event_types", action: :event_types_index, as: :data_services_event_types
       delete "/accounts/:account_id/data_services/:id", action: :destroy, as: :data_services_destroy
+    end
+
+    # Account Lookup service
+    scope(controller: 'lti/account_lookup') do
+      get "/accounts/:account_id", action: :show
     end
 
     # Names and Roles Provisioning (NRPS) v2 Service

@@ -93,15 +93,15 @@ FilesApp.render = function() {
         >
           <i className="icon-hamburger" aria-hidden="true" />
         </button>
+        <div className="ic-app-crumbs">
+          <Breadcrumbs
+            rootTillCurrentFolder={this.state.rootTillCurrentFolder}
+            showingSearchResults={this.state.showingSearchResults}
+            query={this.props.query}
+            contextAssetString={this.props.contextAssetString}
+          />
+        </div>
         <div className="TutorialToggleHolder" />
-      </div>
-      <div className="ic-app-crumbs">
-        <Breadcrumbs
-          rootTillCurrentFolder={this.state.rootTillCurrentFolder}
-          showingSearchResults={this.state.showingSearchResults}
-          query={this.props.query}
-          contextAssetString={this.props.contextAssetString}
-        />
       </div>
       <Toolbar
         currentFolder={this.state.currentFolder}

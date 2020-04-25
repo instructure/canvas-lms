@@ -37,7 +37,7 @@ def runSeleniumSuite(total, index) {
       config().selenium_reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
-      '4'
+      '6'
   )
 }
 

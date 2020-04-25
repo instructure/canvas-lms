@@ -21,7 +21,7 @@ import {func} from 'prop-types'
 import {View} from '@instructure/ui-layout'
 
 // TODO: should find a better way to share this code
-import FileBrowser from '../../../../../../app/jsx/shared/rce/FileBrowser'
+import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
 
 RceFileBrowser.propTypes = {
   onFileSelect: func.isRequired

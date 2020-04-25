@@ -13,6 +13,10 @@ development:
       address-book:
         app-host: "http://address-book.docker"
         secret: "opensesame"
+      auditors.yml: |
+        write_paths:
+          - cassandra
+        read_path: cassandra
       canvas:
         encryption-secret: "astringthatisactually32byteslong"
         signing-secret: "astringthatisactually32byteslong"
@@ -51,4 +55,6 @@ development:
         jwk-future.json: '{"kty":"RSA","e":"AQAB","n":"uX1MpfEMQCBUMcj0sBYI-iFaG5Nodp3C6OlN8uY60fa5zSBd83-iIL3n_qzZ8VCluuTLfB7rrV_tiX727XIEqQ","kid":"2018-07-18T22:33:20Z","d":"pYwR64x-LYFtA13iHIIeEvfPTws50ZutyGfpHN-kIZz3k-xVpun2Hgu0hVKZMxcZJ9DkG8UZPqD-zTDbCmCyLQ","p":"6OQ2bi_oY5fE9KfQOcxkmNhxDnIKObKb6TVYqOOz2JM","q":"y-UBef95njOrqMAxJH1QPds3ltYWr8QgGgccmcATH1M","dp":"Ol_xkL7rZgNFt_lURRiJYpJmDDPjgkDVuafIeFTS4Ic","dq":"RtzDY5wXr5TzrwWEztLCpYzfyAuF_PZj1cfs976apsM","qi":"XA5wnwIrwe5MwXpaBijZsGhKJoypZProt47aVCtWtPE"}'
   private:
     canvas:
-      datadog_apm.yml: "sample_rate: 0.0\nhost_sample_rate: 0.0"
+      datadog_apm.yml: |
+        sample_rate: 0.0
+        host_sample_rate: 0.0

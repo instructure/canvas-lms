@@ -24,6 +24,7 @@ class ContentShare < ActiveRecord::Base
   validates :read_state, inclusion: { in: %w(read unread) }
 
   scope :by_date, -> { order(created_at: :desc) }
+  scope :with_content, -> { joins(:content_export) }
 
   def clone_for(receiver)
     receiver.received_content_shares.create!(sender_id: self.user_id,

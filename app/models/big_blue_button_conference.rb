@@ -107,7 +107,10 @@ class BigBlueButtonConference < WebConference
   end
 
   def recording_formats(recording)
-    recording_formats = recording.fetch(:playback, [])
+    recording_formats = recording.fetch(:playback, []).map do |format|
+      show_to_students = !!format[:length] || format[:type] == "notes" # either is an actual recording or shared notes
+      format.merge(:show_to_students => show_to_students)
+    end
     {
       recording_id:     recording[:recordID],
       title:            recording[:name],

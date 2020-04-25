@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import I18n from 'i18n!notification_preferences'
+import NotificationPreferencesSetting from './NotificationPreferencesSetting'
 import NotificationPreferencesShape from './NotificationPreferencesShape'
 import React from 'react'
 
@@ -83,6 +84,13 @@ const formatCategoryKey = category => {
   return categoryStrings.join('_').replace(/\s/g, '')
 }
 
+const smsNotificationCategoryDeprecated = category => {
+  return (
+    ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.deprecate_sms_enabled &&
+    !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_sms_categories.includes(category)
+  )
+}
+
 const renderNotificationCategory = (
   notificationPreferences,
   notificationCategory,
@@ -143,15 +151,19 @@ const renderNotificationCategory = (
             </Table.Cell>
             {notificationPreferences.channels.map(channel => (
               <Table.Cell textAlign="center" key={category + channel.path}>
-                {channel.pathType === 'sms' &&
-                ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.deprecate_sms_enabled &&
-                !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_sms_categories.includes(
-                  formatCategoryKey(category)
-                ) ? (
-                  <Text>disabled</Text>
-                ) : (
-                  channel.categories[notificationCategory][category].frequency
-                )}
+                <NotificationPreferencesSetting
+                  selectedPreference={
+                    channel.pathType === 'sms' &&
+                    smsNotificationCategoryDeprecated(formatCategoryKey(category))
+                      ? 'disabled'
+                      : channel.categories[notificationCategory][category].frequency
+                  }
+                  preferenceOptions={
+                    channel.pathType === 'sms'
+                      ? ['immediately', 'never']
+                      : ['immediately', 'daily', 'weekly', 'never']
+                  }
+                />
               </Table.Cell>
             ))}
           </Table.Row>

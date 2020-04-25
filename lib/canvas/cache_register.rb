@@ -29,7 +29,7 @@ module Canvas
     ALLOWED_TYPES = {
       'Account' => %w{account_chain role_overrides global_navigation},
       'Course' => %w{account_associations},
-      'User' => %w{enrollments groups account_users todo_list submissions},
+      'User' => %w{enrollments groups account_users todo_list submissions user_services},
       'Assignment' => %w{availability},
       'Quizzes::Quiz' => %w{availability}
     }.freeze
@@ -47,8 +47,7 @@ module Canvas
     end
 
     def self.enabled?
-      # add a switch just in case things aren't getting cleared quite the way they should
-       !::Rails.cache.is_a?(::ActiveSupport::Cache::NullStore) && Canvas.redis_enabled? && Setting.get("revert_cache_register", "false") != "true"
+       !::Rails.cache.is_a?(::ActiveSupport::Cache::NullStore) && Canvas.redis_enabled?
     end
 
     module ActiveRecord

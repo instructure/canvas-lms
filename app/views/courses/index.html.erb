@@ -62,7 +62,7 @@
     </thead>
     <tbody>
       <% enrollments_for_index(:current).each do |enrollment| %>
-        <%= render :partial => "shared/current_enrollment", :object => enrollment %>
+        <%= render :partial => "shared/current_enrollment", :object => enrollment, :locals => { :is_current_term => true } %>
       <% end %>
     </tbody>
   </table>

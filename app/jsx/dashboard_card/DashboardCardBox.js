@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!dashcards'
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Text} from '@instructure/ui-elements'
 
 import DraggableDashboardCard from './DraggableDashboardCard'
 import DashboardCardBackgroundStore from './DashboardCardBackgroundStore'
@@ -28,13 +30,15 @@ export default class DashboardCardBox extends React.Component {
   static propTypes = {
     courseCards: PropTypes.arrayOf(PropTypes.object),
     hideColorOverlays: PropTypes.bool,
-    connectDropTarget: PropTypes.func
+    connectDropTarget: PropTypes.func,
+    showSplitDashboardView: PropTypes.bool
   }
 
   static defaultProps = {
     courseCards: [],
     hideColorOverlays: false,
-    connectDropTarget: el => el
+    connectDropTarget: el => el,
+    showSplitDashboardView: false
   }
 
   constructor(props) {
@@ -120,41 +124,84 @@ export default class DashboardCardBox extends React.Component {
     )
   }
 
+  renderCard = card => {
+    const position =
+      card.position !== null ? card.position : () => this.getOriginalIndex(card.assetString)
+    return (
+      <DraggableDashboardCard
+        key={card.id}
+        shortName={card.shortName}
+        originalName={card.originalName}
+        courseCode={card.courseCode}
+        id={card.id}
+        href={card.href}
+        links={card.links}
+        term={card.term}
+        assetString={card.assetString}
+        backgroundColor={this.colorForCard(card.assetString)}
+        handleColorChange={newColor => this.handleColorChange(card.assetString, newColor)}
+        image={card.image}
+        hideColorOverlays={this.props.hideColorOverlays}
+        onConfirmUnfavorite={this.handleRerenderCards}
+        position={position}
+        moveCard={this.moveCard}
+        totalCards={this.state.courseCards.length}
+        isFavorited={card.isFavorited}
+        enrollmentType={card.enrollmentType}
+        observee={card.observee}
+        published={!!card.published}
+        canChangeCourseState={!!card.canChangeCourseState}
+        defaultView={card.defaultView}
+        pagesUrl={card.pagesUrl}
+        frontPageTitle={card.frontPageTitle}
+      />
+    )
+  }
+
+  renderSplitDashboard = () => {
+    const {courseCards} = this.state
+    const publishedCourses = courseCards
+      .filter(card => card.published)
+      .map(card => this.renderCard(card))
+
+    const unpublishedDrafts = courseCards
+      .filter(card => !card.published)
+      .map(card => this.renderCard(card))
+
+    const emptyEl = <Text size="medium">{I18n.t('No courses to display')}</Text>
+
+    return (
+      <div className="unpublished_courses_redesign">
+        <div className="ic-DashboardCard__box">
+          <h2 size="large" className="ic-DashboardCard__box__header">
+            {I18n.t(`Published Courses (%{count})`, {
+              count: I18n.n(publishedCourses.length)
+            })}
+          </h2>
+          {publishedCourses.length > 0 ? publishedCourses : emptyEl}
+        </div>
+        <div className="ic-DashboardCard__box">
+          <h2 size="large" className="ic-DashboardCard__box__header">
+            {I18n.t(`Unpublished Drafts (%{count})`, {
+              count: I18n.n(unpublishedDrafts.length)
+            })}
+          </h2>
+          {unpublishedDrafts.length > 0 ? unpublishedDrafts : emptyEl}
+        </div>
+      </div>
+    )
+  }
+
   render() {
-    const Component = DraggableDashboardCard
-    const cards = this.state.courseCards.map((card, index) => {
-      const position =
-        card.position != null ? card.position : () => this.getOriginalIndex(card.assetString)
-      return (
-        <Component
-          key={card.id}
-          shortName={card.shortName}
-          originalName={card.originalName}
-          courseCode={card.courseCode}
-          id={card.id}
-          href={card.href}
-          links={card.links}
-          term={card.term}
-          assetString={card.assetString}
-          backgroundColor={this.colorForCard(card.assetString)}
-          handleColorChange={newColor => this.handleColorChange(card.assetString, newColor)}
-          image={card.image}
-          hideColorOverlays={this.props.hideColorOverlays}
-          onConfirmUnfavorite={this.handleRerenderCards}
-          position={position}
-          currentIndex={index}
-          moveCard={this.moveCard}
-          totalCards={this.state.courseCards.length}
-          isFavorited={card.isFavorited}
-          enrollmentType={card.enrollmentType}
-          observee={card.observee}
-        />
-      )
-    })
+    const {connectDropTarget, showSplitDashboardView} = this.props
+    let dashboardCardBox = null
+    if (!showSplitDashboardView) {
+      const cards = this.state.courseCards.map(card => this.renderCard(card))
+      dashboardCardBox = <div className="ic-DashboardCard__box">{cards}</div>
+    } else {
+      dashboardCardBox = this.renderSplitDashboard()
+    }
 
-    const dashboardCardBox = <div className="ic-DashboardCard__box">{cards}</div>
-
-    const {connectDropTarget} = this.props
     return connectDropTarget(dashboardCardBox)
   }
 }

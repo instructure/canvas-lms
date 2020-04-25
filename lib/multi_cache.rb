@@ -21,17 +21,16 @@ class MultiCache
     delegate :fetch, :delete, to: :cache
 
     def cache
-      @multi_cache ||= begin
-        ha_cache_config = YAML.load(Canvas::DynamicSettings.find(tree: :private, cluster: ApplicationController.cluster)["ha_cache.yml"] || "{}").symbolize_keys || {}
+      unless defined?(@multi_cache)
+        ha_cache_config = YAML.load(Canvas::DynamicSettings.find(tree: :private, cluster: Canvas.cluster)["ha_cache.yml"] || "{}").symbolize_keys || {}
         if (ha_cache_config[:cache_store])
           ha_cache_config[:url] = ha_cache_config[:servers] if ha_cache_config[:servers]
           store = ActiveSupport::Cache.lookup_store(ha_cache_config[:cache_store].to_sym, ha_cache_config)
           store.options.delete(:namespace)
-          store
-        else
-          Rails.cache
+          @multi_cache = store
         end
       end
+      @multi_cache || Rails.cache
     end
 
     def reset
