@@ -25,26 +25,30 @@ import ModalButtons from '../shared/modal-buttons'
 import I18n from 'i18n!file_rename_form'
 
 FileRenameForm.buildContent = function() {
+  const {onRenameFileMessage, onLockFileMessage} = this.props
   const nameToUse = this.state.fileOptions.name || this.state.fileOptions.file.name
   let buildContentToRender
   if (!this.state.isEditing && !this.state.fileOptions.cannotOverwrite) {
     buildContentToRender = (
       <div ref="bodyContent">
         <p id="renameFileMessage">
-          {I18n.t(
-            'An item named "%{name}" already exists in this location. Do you want to replace the existing file?',
-            {name: nameToUse}
-          )}
+          {onRenameFileMessage?.(nameToUse) ||
+            I18n.t(
+              'An item named "%{name}" already exists in this location. Do you want to replace the existing file?',
+              {name: nameToUse}
+            )}
         </p>
       </div>
     )
   } else {
     let renameMessage
     if (this.state.fileOptions.cannotOverwrite) {
-      renameMessage = I18n.t(
-        'A locked item named "%{name}" already exists in this location. Please enter a new name.',
-        {name: nameToUse}
-      )
+      renameMessage =
+        onLockFileMessage?.(nameToUse) ||
+        I18n.t(
+          'A locked item named "%{name}" already exists in this location. Please enter a new name.',
+          {name: nameToUse}
+        )
     } else {
       renameMessage = I18n.t('Change "%{name}" to', {name: nameToUse})
     }

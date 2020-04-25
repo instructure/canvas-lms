@@ -35,7 +35,9 @@ export const UploadFormPropTypes = {
   alwaysRename: bool, // if false offer to rename files
   alwaysUploadZips: bool, // if false offer to expand zip files
   onChange: func,
-  onEmptyOrClose: func
+  onEmptyOrClose: func,
+  onRenameFileMessage: func,
+  onLockFileMessage: func
 }
 
 class UploadForm extends React.Component {
@@ -48,7 +50,9 @@ class UploadForm extends React.Component {
     alwaysRename: false,
     alwaysUploadZips: false,
     onChange: () => {},
-    onEmptyOrClose: () => {}
+    onEmptyOrClose: () => {},
+    onRenameFileMessage: () => {},
+    onLockFileMessage: () => {}
   }
 
   constructor(props) {
@@ -176,6 +180,8 @@ class UploadForm extends React.Component {
           onNameConflictResolved={this.onNameConflictResolved}
           onClose={this.onClose}
           allowSkip={this.props.allowSkip}
+          onRenameFileMessage={this.props.onRenameFileMessage}
+          onLockFileMessage={this.props.onLockFileMessage}
         />
       )
     }
