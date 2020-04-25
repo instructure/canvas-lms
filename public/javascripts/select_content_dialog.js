@@ -833,6 +833,20 @@ function getFileUploadFolder() {
   return folder
 }
 
+const renameFileMessage = nameToUse => {
+  return I18n.t(
+    'A file named "%{name}" already exists in this folder. Do you want to replace the existing file?',
+    {name: nameToUse}
+  )
+}
+
+const lockFileMessage = nameToUse => {
+  return I18n.t(
+    'A locked file named "%{name}" already exists in this folder. Please enter a new name.',
+    {name: nameToUse}
+  )
+}
+
 function renderFileUploadForm() {
   const [contextType, contextId] = splitAssetString(ENV.context_asset_string, true)
   const folderProps = {
@@ -846,7 +860,9 @@ function renderFileUploadForm() {
     disabled: fileSelectBox.isLoading(),
     alwaysRename: false,
     alwaysUploadZips: true,
-    onChange: update_foc
+    onChange: update_foc,
+    onRenameFileMessage: renameFileMessage,
+    onLockFileMessage: lockFileMessage
   }
   // only show the choose files + folder form if [new files] is selected
   if ($('#select_context_content_dialog').val() === 'new') {

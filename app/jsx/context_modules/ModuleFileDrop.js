@@ -196,6 +196,19 @@ export default class ModuleFileDrop extends React.Component {
     this.setInteractionOnAll(true)
   }
 
+  renameFileMessage = nameToUse => {
+    return I18n.t(
+      'A file named "%{name}" already exists. Do you want to replace the existing file?',
+      {name: nameToUse}
+    )
+  }
+
+  lockFileMessage = nameToUse => {
+    return I18n.t('A locked file named "%{name}" already exists. Please enter a new name.', {
+      name: nameToUse
+    })
+  }
+
   renderUploading() {
     const {folder, contextId, contextType} = this.state
     return (
@@ -208,6 +221,8 @@ export default class ModuleFileDrop extends React.Component {
           allowSkip
           alwaysUploadZips
           onEmptyOrClose={this.handleEmptyUpload}
+          onRenameFileMessage={this.renameFileMessage}
+          onLockFileMessage={this.lockFileMessage}
         />
         <CurrentUploads onUploadChange={this.handleUploadChange} />
       </>

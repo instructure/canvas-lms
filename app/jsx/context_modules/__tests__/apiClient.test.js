@@ -41,11 +41,13 @@ it('fetches course root folder', done => {
 })
 
 it('fetches folder files across pages', done => {
-  moxios.stubRequest('/api/v1/folders/1/files', {
+  moxios.stubRequest('/api/v1/folders/1/files?only[]=names', {
     response: [{display_name: 'a.txt'}],
-    headers: {link: '<http://canvas.example.com/api/v1/folders/1/files?page=2>; rel="next"'}
+    headers: {
+      link: '<http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2>; rel="next"'
+    }
   })
-  moxios.stubRequest('http://canvas.example.com/api/v1/folders/1/files?page=2', {
+  moxios.stubRequest('http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2', {
     response: [{display_name: 'b.txt'}]
   })
   getFolderFiles('1')
