@@ -1918,7 +1918,7 @@ is:
       með HTTPS veftengingum
   allow_lor_tools: "Heimila notendum að skoða og nota ytri tæki stillt fyrir LOR."
   allow_migration_of_quizzes_during_course_copy_and__35d80756: "Leyfa flutning prófa á meðan að námskeið er afritað og innflutt"
-  allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Leyfa gæslumanni að fara yfir margar sjálfstæðar einkunnir fyrir innvaldar innsendingar"
+  allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Stjórnandi getur yfirfarið margar einkunnir í völdum verkefnum."
   allow_multiple_attempts_e67a0a37: "Heimila margar tilraunir"
   allow_opt_out_of_inbox: "Gerir notendum kleift að afþakka innhólf samtals. Þetta mun valda því að öll samtalsskilaboð og tilkynningar verða sendar sem bráðatilkynningar til aðalnetfang notanda, ólesin skilaboð merkið á innhólfi samtals verður falið og tilkynningarkjörstillingar samtalsins verða faldar."
   allow_outcome_extra_credit_57c1e84e: "Leyfa aukainnistæðu"
@@ -3780,7 +3780,7 @@ is:
       Til að breyta upplýsingum um verkefni í umræðu þarf líka að virkja verkefni og próf - bæta við / breyta / eyða.
   bottom_15a2a9be: Neðst
   bounce_count_reset_c4c2218f: "Skilatala endurstillt!"
-  bounce_reason_689ed4c6: "Ástæða skila"
+  bounce_reason_689ed4c6: "Ástæða endursendingar"
   brand_configs_b465a03f: Vörumerkjastillingar
   brazil_55_34103ffa: "Brasilía (+55)"
   breadcrumb_1_cb3c504: "Slóð að síðu 1"
@@ -5564,7 +5564,7 @@ is:
     progressions: 
       titles: 
         student_progress: "Framvinda nemanda"
-        student_progression: "Framvinda námsefni eftir nemanda"
+        student_progression: "Framvinda námsefnis eftir nemanda"
     titles: 
       add: "Bæta við einingu"
       add_item: "Bæta atriði við %{module}"
@@ -6887,7 +6887,7 @@ is:
   customize_course_details_26fd4afe: "Sérsníddu námskeiðið"
   customize_learning_mastery_ratings_4ace142a: "Sérsníða lærdómsleiknieinkunnir"
   customize_this_menu_efa72a9: "Sérsníða valmynd"
-  cutoff_score_74254c89: einkunnarmörk
+  cutoff_score_74254c89: lágmarkseinkunn
   cyan_c1d5f68a: Blágrænn
   czech_9aa2cbe4: Tékkneska
   d2l_display: Desire2Learn
@@ -6949,18 +6949,18 @@ is:
       - Lau
     abbr_month_names: 
       - ~
-      - Jan
-      - Feb
-      - Mar
-      - Apr
-      - Maí
-      - Jún
-      - Júl
-      - Ágú
-      - Sep
-      - Okt
-      - Nóv
-      - Des
+      - jan
+      - feb
+      - mar
+      - apr
+      - maí
+      - jún
+      - júl
+      - ágú
+      - sep
+      - okt
+      - nóv
+      - des
     datepicker: 
       column_headings: 
         - Sun
@@ -7000,18 +7000,18 @@ is:
       weekday: "%A"
     month_names: 
       - ~
-      - Janúar
-      - Febrúar
-      - Mars
-      - Apríl
-      - Maí
-      - Júní
-      - Júlí
-      - Ágúst
-      - September
-      - Október
-      - Nóvember
-      - Desember
+      - janúar
+      - febrúar
+      - mars
+      - apríl
+      - maí
+      - júní
+      - júlí
+      - ágúst
+      - september
+      - október
+      - nóvember
+      - desember
   date_at_time_25a04cd2: "%{date} á %{time}"
   date_created_87e265bc: Stofndagur
   date_created_b93b76fb: ", stofndagur: "
@@ -9684,7 +9684,7 @@ is:
   group_a8f5ed9c: Hópur
   group_assignment_7060989f: Hópverkefni
   group_assignments_can_t_be_anonymously_graded_2dd9be24: "Ekki er hægt að gefa hópverkefnum nafnlausa einkunn"
-  group_assignments_cannot_be_enabled_for_anonymousl_ed896b1c: "Ekki er hægt að virkja hópverkefni fyrir nafnlausar einkannir"
+  group_assignments_cannot_be_enabled_for_anonymousl_ed896b1c: "Ekki er hægt að virkja hópverkefni fyrir nafnlausar einkunnir"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Ekki er hægt að virkja hópverkefni fyrir stýrð verkefni"
   group_categories: 
     notices: 
@@ -11280,7 +11280,7 @@ is:
           otp_sent_to_phone: "Staðfestingarkóði var sendur í símann þinn. Skráðu hann hérna."
           send_to_sms: "Senda textaboð til %{phone_number}"
         labels: 
-          carrier: Flytjandi
+          carrier: Þjónustuaðili
           phone_number: Símanúmer
           remember_me: "Muna þessa tölvu"
           verification_code: Staðfestingarkóði
@@ -13317,8 +13317,8 @@ is:
       other: "%{count} verkefni eru með ómetin skil"
     continue: "Halda áfram"
     progression_module_collection: 
-      module_progress_for: "Framvinda námsefni fyrir *%{student.name}*"
-      module_progress_for_student: "Framvinda námsefni fyrir %{student.name}"
+      module_progress_for: "Framvinda námsefnis fyrir *%{student.name}*"
+      module_progress_for_student: "Framvinda námsefnis fyrir %{student.name}"
       no_modules_found: "Engar námsefni fundust"
     progression_module_view: 
       items: "Ólokin atriði"
@@ -13328,7 +13328,7 @@ is:
     progressions_index: 
       back_to_modules: "Aftur á Einingasíðu"
       no_students_found: "Engir nemendur fundust"
-      progression_header: "Framvinda námsefni"
+      progression_header: "Framvinda námsefnis"
       student_progress: "Framvinda nemanda"
     relock_modules: "Endurlæsa einingum"
     requirements_changed: "Breyttar kröfur"
@@ -14296,7 +14296,7 @@ is:
   originality_report_5d461681: Frumleikaskýrsla
   originality_reports_1e36b935: Frumleikaskýrslur
   other_1c6d9c79: Annað
-  other_carrier_45531207: "Annar flytjandi"
+  other_carrier_45531207: "Annar þjónustuaðili"
   other_ddacb37d: annað
   other_incorrect_match_options_c1418af5: "Aðrir rangir flokkunarmöguleikar:"
   other_options_d25f199c: "Aðrir valmöguleikar"
@@ -14533,7 +14533,7 @@ is:
   page_views_only_312b7577: "Aðeins síðuskoðanir"
   pages: 
     cancel_button: "Hætta við"
-    cannot_unpublish_front_page: "Get ekki afbirt forsíðu"
+    cannot_unpublish_front_page: "Get ekki falið forsíðu"
     delete_button: Eyða
     delete_confirmation: "Viltu örugglega eyða þessari síðu?"
     delete_dialog_title: "Eyða síðu"
@@ -15530,7 +15530,7 @@ is:
         other_contact: "Aðrir tengiliðir"
         ways_to_contact: Sambandsleiðir
       labels: 
-        carrier: Flytjandi
+        carrier: Þjónustuaðili
         cell_number: Farsímanúmer
         country: Land
         email_address: Netfang
@@ -15703,7 +15703,7 @@ is:
   publishing_item_name_is_disabled_8207a9e7: "Birting á %{item_name} er óvirk"
   pumpkin_904428d5: Grasker
   purple_7678a9fc: Fjólublár
-  push_notification_a6532ff3: "Þrýst tilkynning"
+  push_notification_a6532ff3: "Tilkynning í app"
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "SP: Hvað er svart, hvítt, svart, hvítt?  SV: Panda sem rúllar niður brekku."
   qatar_974_7e9684ca: "Katar (+974)"
   qr_code_image_2b3a89b5: "QR kóða mynd"
@@ -18274,7 +18274,7 @@ is:
       labels: 
         name: Nafn
         range: Svið
-        scheme_name: "Nafn einkunnamynsturs"
+        scheme_name: "Nafn einkunnakvarða"
       loading_grading_standards: "Sæki einkunnaviðmið..."
       managing_grading_standards: "Umsjón með einkunnakvarða"
       range_lower: "Lægri mörk sviðs"
@@ -18371,7 +18371,7 @@ is:
       teacher_title: "Boðið sem  kennara, smelltu til að sjá námskeiðið"
     profile: 
       add_link_field: "Bæta við öðrum tengli"
-      bio: Lífsferill
+      bio: Ágrip
       cancel: "Hætta við"
       links: Tenglar
       links_title: Titill
@@ -21754,7 +21754,7 @@ is:
     atom_author: Wiki-síða
     atom_entry_title: "Wiki síða, %{course_or_group_name}: %{page_title}"
     cannot_set_unpublished_front_page: "gat ekki sett sem forsíðu því hún er óbirt"
-    cannot_unpublish_front_page: "Get ekki afbirt forsíðu"
+    cannot_unpublish_front_page: "Get ekki falið forsíðu"
     defaults: 
       no_content: "ekkert efni"
     errors: 
