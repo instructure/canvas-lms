@@ -2,9 +2,8 @@
 set -o errexit -o errtrace -o pipefail -o xtrace
 parallel --will-cite
 
-# Clone database
-seq $((DOCKER_PROCESSES-1)) | parallel "docker-compose exec -T postgres sh -c 'createdb -U postgres -T template0 canvas_test{}'"
-seq $((DOCKER_PROCESSES-1)) | parallel "docker-compose exec -T postgres sh -c 'pg_dump -U postgres canvas_test0 | psql -o /dev/null --quiet -U postgres canvas_test{}'"
+# Clone databases from canvas_test0
+seq $((DOCKER_PROCESSES-1)) | parallel "docker-compose exec -T postgres sh -c 'createdb -U postgres -T canvas_test0 canvas_test{}'"
 seq $((DOCKER_PROCESSES-1)) | parallel "docker-compose exec -T -e DATABASE_URL=postgres://postgres:sekret@postgres:5432/canvas_test{} web bundle exec rails runner \"require 'switchman/test_helper'; Switchman::TestHelper.recreate_persistent_test_shards\""
 
 # Run each group of tests in separate docker container

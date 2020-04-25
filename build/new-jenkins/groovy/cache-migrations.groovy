@@ -62,7 +62,7 @@ def pullAndBuild() {
 
 def startAndMigrate() {
   sh 'docker-compose up -d'
-  sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+  sh 'build/new-jenkins/docker-compose-setup-databases.sh'
 }
 
 def storeMigratedImages() {

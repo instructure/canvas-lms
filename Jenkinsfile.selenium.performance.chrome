@@ -95,7 +95,7 @@ pipeline {
     stage ('Setup Databases') {
       steps {
         timeout(time: 5) {
-          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+          sh 'build/new-jenkins/docker-compose-setup-databases.sh'
         }
       }
     }

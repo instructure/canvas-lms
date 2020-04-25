@@ -39,7 +39,7 @@ pipeline {
           sh 'build/new-jenkins/print-env-excluding-secrets.sh'
           sh 'build/new-jenkins/docker-compose-pull.sh'
           sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'build/new-jenkins/docker-compose-create-database.sh'
+          sh 'build/new-jenkins/docker-compose-setup-cassandra-keyspaces.sh'
         }
       }
     }

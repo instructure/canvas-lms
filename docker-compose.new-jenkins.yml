@@ -25,20 +25,28 @@ services:
       DOCKER_PROCESSES:
       EXCLUDE_TESTS:
       TEST_PATTERN:
+    # this will stop passenger from booting so the container isn't running anything at all once up
+    command: /tini -- sleep infinity
 
   redis:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
 
   postgres:
-    image: starlord.inscloudgate.net/jenkins/postgis:$POSTGRES-2.5
+    build:
+      context: build/docker-compose/postgres/
     environment:
       POSTGRES_PASSWORD: sekret
 
+      # parallel_tests
+      DOCKER_PROCESSES:
+
   cassandra:
-    image: starlord.inscloudgate.net/jenkins/cassandra:2.2
+    build:
+      context: build/docker-compose/cassandra/
     environment:
       CASSANDRA_START_RPC: 'true'
 
   dynamodb:
-    image: starlord.inscloudgate.net/jenkins/dynamodb-local
+    build:
+      context: build/docker-compose/dynamodb/
     command: -jar DynamoDBLocal.jar #-dbPath /home/dynamodblocal

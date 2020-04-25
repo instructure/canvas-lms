@@ -97,7 +97,7 @@ def _runRspecTestSuite(
         sh 'build/new-jenkins/docker-compose-pull.sh'
         sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
         sh 'build/new-jenkins/docker-compose-build-up.sh'
-        sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+        sh 'build/new-jenkins/docker-compose-setup-databases.sh'
         sh 'build/new-jenkins/rspec_parallel_dockers.sh'
       }
     }
