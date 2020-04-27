@@ -61,6 +61,16 @@ describe Mailer do
       Mailer.deliver(mail)
     end
 
+    it 'sends stat to stat service' do
+      message = message_model(to: "someemail@example.com")
+      mail = Mailer.create_message(message)
+      expect(mail).to receive(:deliver_now)
+      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver",
+                                                             { short_stat: "message.deliver",
+                                                               tags: { path_type: "mailer_emails", notification_name: 'mailer_delivery' } })
+      Mailer.deliver(mail)
+    end
+
     it 'calls the notification service if configured' do
       Account.site_admin.enable_feature!(:notification_service)
       message = message_model(to: "someemail@example.com")

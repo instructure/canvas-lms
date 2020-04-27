@@ -321,6 +321,12 @@ class CommunicationChannel < ActiveRecord::Base
   def send_otp!(code, account = nil)
     message = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
     if Setting.get('mfa_via_sms', true) == 'true' && e164_path && account&.feature_enabled?(:notification_service)
+      InstStatsd::Statsd.increment("message.deliver.sms.one_time_password",
+                                   short_stat: 'message.deliver',
+                                   tags: { path_type: 'sms', notification_name: 'one_time_password' })
+      InstStatsd::Statsd.increment("message.deliver.sms.#{account.global_id}",
+                                   short_stat: 'message.deliver_per_account',
+                                   tags: { path_type: 'sms', root_account_id: account.global_id })
       Services::NotificationService.process(
         "otp:#{global_id}",
         message,
