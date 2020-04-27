@@ -585,7 +585,8 @@ describe CommunicationChannel do
         "otp:#{cc.global_id}",
         anything,
         'sms',
-        cc.e164_path
+        cc.e164_path,
+        true
       )
       expect(cc).to receive(:send_otp_via_sms_gateway!).never
       cc.send_otp!('123456', account)

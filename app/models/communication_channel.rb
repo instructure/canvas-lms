@@ -325,7 +325,8 @@ class CommunicationChannel < ActiveRecord::Base
         "otp:#{global_id}",
         message,
         "sms",
-        e164_path
+        e164_path,
+        true
       )
     else
       send_later_if_production_enqueue_args(
