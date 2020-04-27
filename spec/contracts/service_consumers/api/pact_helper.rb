@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-ENV["RAILS_ENV"] = ENV["RACK_ENV"]= "test"
+ENV['RAILS_ENV'] = ENV['RACK_ENV'] = 'test'
 
 require 'pact/provider/rspec'
 require_relative '../pact_config'
@@ -27,12 +27,13 @@ require_relative 'provider_states_for_consumer'
 Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
   app { PactApiConsumerProxy.new }
 
-  PactConfig::Consumers::ALL.each do |consumer|
-    pact_path = format(
-      'pacts/provider/%<provider>s/consumer/%<consumer>s',
-      provider: ERB::Util.url_encode(PactConfig::Providers::CANVAS_LMS_API),
-      consumer: ERB::Util.url_encode(consumer)
-    )
+  def provider_verification_for(consumer)
+    pact_path =
+      format(
+        'pacts/provider/%<provider>s/consumer/%<consumer>s',
+        provider: ERB::Util.url_encode(PactConfig::Providers::CANVAS_LMS_API),
+        consumer: ERB::Util.url_encode(consumer)
+      )
 
     honours_pact_with consumer do
       pact_uri PactConfig.pact_uri(pact_path: pact_path)
@@ -43,6 +44,16 @@ Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
 
       app_version PactConfig::Providers::CANVAS_API_VERSION
       publish_verification_results true
+    end
+  end
+
+  # Specify and run a single consumer
+  # or have the option to run Pact verification for all consumers
+  PactConfig::Consumers::ALL.each do |consumer|
+    if ENV['PACT_API_CONSUMER'].present? && ENV['PACT_API_CONSUMER'] == consumer
+      provider_verification_for(consumer)
+    elsif ENV['PACT_API_CONSUMER'].blank?
+      provider_verification_for(consumer)
     end
   end
 end
