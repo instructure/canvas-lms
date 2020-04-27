@@ -151,7 +151,7 @@ class ConferencesController < ApplicationController
   end
 
   before_action { |c| c.active_tab = "conferences" }
-  before_action :require_config
+  before_action :require_config, except: [:for_user]
   before_action :reject_student_view_student
   before_action :get_conference, :except => [:index, :create, :for_user]
 
@@ -223,6 +223,7 @@ class ConferencesController < ApplicationController
   # @returns [Conference]
   def for_user
     return render_unauthorized_action unless @current_user
+    return render json: api_conferences_json([], @current_user, session) unless WebConference.config
 
     log_api_asset_access(["conferences"], "conferences", "other")
 

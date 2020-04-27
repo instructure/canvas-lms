@@ -2950,6 +2950,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  attr_accessor :needs_update_cached_due_dates
   def update_cached_due_dates
     return unless update_cached_due_dates?
     self.clear_cache_key(:availability)
