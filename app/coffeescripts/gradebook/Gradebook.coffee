@@ -83,6 +83,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconSettingsSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
+import {deferPromise} from 'jsx/shared/async'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_date_and_time'
 import 'jqueryui/dialog'
@@ -204,7 +205,10 @@ export default do ->
       assignmentGroupsLoaded: false
       assignmentsLoaded: false
       contextModulesLoaded: false
+      customColumnsLoaded: false
+      gradingPeriodAssignmentsLoaded: false
       overridesColumnUpdating: false
+      studentIdsLoaded: false
       studentsLoaded: false
       submissionsLoaded: false
       teacherNotesColumnUpdating: false
@@ -326,6 +330,7 @@ export default do ->
       $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
 
       @gridReady = $.Deferred()
+      @_essentialDataLoaded = deferPromise()
 
       @setInitialState()
       @loadSettings()
@@ -425,6 +430,13 @@ export default do ->
     initialize: ->
       @dataLoader.loadInitialData()
 
+      # Until GradebookGrid is rendered reactively, it will need to be rendered
+      # once and only once. It depends on all essential data from the initial
+      # data load. When all of that data has loaded, this deferred promise will
+      # resolve and render the grid. As a promise, it only resolves once.
+      @_essentialDataLoaded.promise.then () =>
+        @finishRenderingUI()
+
       @gridReady.then () =>
         # Preload the Grade Detail Tray
         AsyncComponents.loadGradeDetailTray()
@@ -488,6 +500,8 @@ export default do ->
       columns.forEach (column) =>
         customColumn = @buildCustomColumn(column)
         @gridData.columns.definitions[customColumn.id] = customColumn
+      @setCustomColumnsLoaded(true)
+      @_updateEssentialDataLoaded()
 
     gotCustomColumnDataChunk: (customColumnId, columnData) =>
       studentIds = []
@@ -507,6 +521,7 @@ export default do ->
       @contentLoadStates.assignmentsLoaded = true
       @renderViewOptionsMenu()
       @updateColumnHeaders()
+      @_updateEssentialDataLoaded()
 
     gotAllAssignmentGroups: (assignmentGroups) =>
       @setAssignmentGroupsLoaded(true)
@@ -524,8 +539,10 @@ export default do ->
 
     updateGradingPeriodAssignments: (gradingPeriodAssignments) =>
       @gotGradingPeriodAssignments({grading_period_assignments: gradingPeriodAssignments})
+      @setGradingPeriodAssignmentsLoaded(true)
       if @_gridHasRendered()
         @updateColumns()
+      @_updateEssentialDataLoaded()
 
     gotGradingPeriodAssignments: ({ grading_period_assignments: gradingPeriodAssignments }) =>
       @courseContent.gradingPeriodAssignments = gradingPeriodAssignments
@@ -618,7 +635,9 @@ export default do ->
     updateStudentIds: (studentIds) =>
       @courseContent.students.setStudentIds(studentIds)
       @assignmentStudentVisibility = {}
+      @setStudentIdsLoaded(true)
       @buildRows()
+      @_updateEssentialDataLoaded()
 
     updateStudentsLoaded: (loaded) =>
       @setStudentsLoaded(loaded)
@@ -2465,6 +2484,18 @@ export default do ->
     setAssignmentGroupsLoaded: (loaded) =>
       @contentLoadStates.assignmentGroupsLoaded = loaded
 
+    setContextModulesLoaded: (loaded) =>
+      @contentLoadStates.contextModulesLoaded = loaded
+
+    setCustomColumnsLoaded: (loaded) =>
+      @contentLoadStates.customColumnsLoaded = loaded
+
+    setGradingPeriodAssignmentsLoaded: (loaded) =>
+      @contentLoadStates.gradingPeriodAssignmentsLoaded = loaded
+
+    setStudentIdsLoaded: (loaded) =>
+      @contentLoadStates.studentIdsLoaded = loaded
+
     setStudentsLoaded: (loaded) =>
       @contentLoadStates.studentsLoaded = loaded
 
@@ -2741,9 +2772,10 @@ export default do ->
 
     updateContextModules: (contextModules) =>
       @setContextModules(contextModules)
-      @contentLoadStates.contextModulesLoaded = true
+      @setContextModulesLoaded(true)
       @renderViewOptionsMenu()
       @renderFilters()
+      @_updateEssentialDataLoaded()
 
     setContextModules: (contextModules) =>
       @courseContent.contextModules = contextModules
@@ -2993,3 +3025,13 @@ export default do ->
 
     _gridHasRendered: () =>
       @gridReady.state() == 'resolved'
+
+    _updateEssentialDataLoaded: =>
+      if (
+        @contentLoadStates.studentIdsLoaded &&
+        @contentLoadStates.contextModulesLoaded &&
+        @contentLoadStates.customColumnsLoaded &&
+        @contentLoadStates.assignmentGroupsLoaded &&
+        (!@gradingPeriodSet || @contentLoadStates.gradingPeriodAssignmentsLoaded)
+      )
+        @_essentialDataLoaded.resolve()

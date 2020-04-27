@@ -53,7 +53,7 @@ export default class DataLoader {
   loadInitialData() {
     const gradebook = this._gradebook
 
-    const promises = this.__loadGradebookData({
+    this.__loadGradebookData({
       dataLoader: this,
       gradebook,
 
@@ -61,18 +61,6 @@ export default class DataLoader {
       getContextModules: true,
       getCustomColumns: true,
       getGradingPeriodAssignments: gradebook.gradingPeriodSet != null
-    })
-
-    // TODO: In TALLY-769, remove this entire block.
-    // eslint-disable-next-line promise/catch-or-return
-    Promise.all([
-      promises.gotStudentIds,
-      promises.gotContextModules,
-      promises.gotCustomColumns,
-      promises.gotAssignmentGroups,
-      promises.gotGradingPeriodAssignments
-    ]).then(() => {
-      gradebook.finishRenderingUI()
     })
   }
 
@@ -130,8 +118,8 @@ export default class DataLoader {
     })
   }
 
-  __loadGradebookData(opts) {
-    const {dataLoader, gradebook} = opts
+  async __loadGradebookData(options) {
+    const {dataLoader, gradebook} = options
 
     // Store currently-loaded student ids for diffing below.
     const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
@@ -139,44 +127,34 @@ export default class DataLoader {
     // Begin loading Student IDs before any other data.
     const gotStudentIds = dataLoader.studentIdsLoader.loadStudentIds()
 
-    const gotAssignmentGroups = opts.getAssignmentGroups
-      ? dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
-      : null
-
-    const gotGradingPeriodAssignments = opts.getGradingPeriodAssignments
-      ? dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
-      : null
-
-    const gotCustomColumns = opts.getCustomColumns
-      ? dataLoader.customColumnsLoader.loadCustomColumns()
-      : null
-
-    const gotContextModules = opts.getContextModules
-      ? dataLoader.contextModulesLoader.loadContextModules()
-      : null
-
-    gotStudentIds
-      .then(() => {
-        const studentIds = gradebook.courseContent.students.listStudentIds()
-        const studentIdsToLoad = difference(studentIds, loadedStudentIds)
-
-        return dataLoader.studentContentDataLoader.load(studentIdsToLoad)
-      })
-      .then(() => {
-        /*
-         * Currently, custom columns data has the lowest priority for initial
-         * data loading, so it waits until all students and submissions are
-         * finished loading.
-         */
-        dataLoader.customColumnsDataLoader.loadCustomColumnsData()
-      })
-
-    return {
-      gotAssignmentGroups,
-      gotContextModules,
-      gotCustomColumns,
-      gotGradingPeriodAssignments,
-      gotStudentIds
+    if (options.getAssignmentGroups) {
+      dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
     }
+
+    if (options.getGradingPeriodAssignments) {
+      dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
+    }
+
+    if (options.getCustomColumns) {
+      dataLoader.customColumnsLoader.loadCustomColumns()
+    }
+
+    if (options.getContextModules) {
+      dataLoader.contextModulesLoader.loadContextModules()
+    }
+
+    await gotStudentIds
+
+    const studentIds = gradebook.courseContent.students.listStudentIds()
+    const studentIdsToLoad = difference(studentIds, loadedStudentIds)
+
+    await dataLoader.studentContentDataLoader.load(studentIdsToLoad)
+
+    /*
+     * Currently, custom columns data has the lowest priority for initial
+     * data loading, so it waits until all students and submissions are
+     * finished loading.
+     */
+    dataLoader.customColumnsDataLoader.loadCustomColumnsData()
   }
 }

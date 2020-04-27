@@ -22,7 +22,7 @@ import {
   setFixtureHtml
 } from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 
-QUnit.module('Gradebook Submissions', suiteHooks => {
+QUnit.module('Gradebook > Submissions', suiteHooks => {
   let $container
   let gradebook
   let gradebookOptions
