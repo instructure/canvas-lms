@@ -596,9 +596,14 @@ $(document).ready(function() {
             } else {
               BaseUploader.prototype.onUploadPosted = attachment => {
                 // if the uploaded file replaced and existing file that already has a module item, don't create a new item
+                const adding_to_module_id = $dialog.data().context_module_id
                 if (
                   !Object.keys(ENV.MODULE_FILE_DETAILS).find(
-                    fdkey => ENV.MODULE_FILE_DETAILS[fdkey].content_id == attachment.replacingFileId // eslint-disable-line eqeqeq
+                    fdkey =>
+                      // there's module item with the id of the replaced file
+                      ENV.MODULE_FILE_DETAILS[fdkey].content_id == attachment.replacingFileId && // eslint-disable-line eqeqeq
+                      // and the module item is in the module we're working in
+                      ENV.MODULE_FILE_DETAILS[fdkey].module_id == adding_to_module_id // eslint-disable-line eqeqeq
                   )
                 ) {
                   process_upload(attachment, false)

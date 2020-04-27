@@ -421,7 +421,7 @@ describe "context modules" do
         @file2 = @course.attachments.create!(:display_name => "another.txt", :uploaded_data => default_uploaded_data)
         @file2.context = @course
         @file2.save!
-        @course.context_modules.create!(:name => "files module")
+        @mod = @course.context_modules.create!(:name => "files module")
       end
 
       it "should add multiple file items to a module" do
@@ -434,7 +434,13 @@ describe "context modules" do
       it "should upload mutiple files to add items to a module" do
         local_storage!
         get "/courses/#{@course.id}/modules"
-        add_uploaded_file_items('#attachments_select')
+
+        filename, fullpath, _data = get_file("testfile1.txt")
+
+        add_uploaded_file_items('#attachments_select', fullpath)
+
+        expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+        expect(fj(".context_module_item:contains(#{filename})")).to be_displayed
       end
 
       it "should replace an existing module item with a replacement uploaded file" do
@@ -445,10 +451,30 @@ describe "context modules" do
         file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
         file.context = @course
         file.save!
-        @course.context_modules.first.add_item({:id => file.id, :type => 'attachment'})
+        @mod.add_item({:id => file.id, :type => 'attachment'})
 
         get "/courses/#{@course.id}/modules"
-        upload_and_replace_file_item('#attachments_select', filename, fullpath)
+        upload_and_replace_file_item("div#context_module_#{@mod.id} .add_module_item_link", '#attachments_select', fullpath)
+
+        expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+        expect(ffj(".context_module_item:contains(#{filename})").length).to eq(1)
+      end
+
+      it "should create a module item with a replacement uploaded file if in a different module" do
+        local_storage!
+
+        # create the existing module item
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
+        @mod.add_item({:id => file.id, :type => 'attachment'})
+        # create a new module
+        @mod2 = @course.context_modules.create!(:name => "another module")
+
+        get "/courses/#{@course.id}/modules"
+        upload_and_replace_file_item("div#context_module_#{@mod2.id} .add_module_item_link", '#attachments_select', fullpath)
+        expect(ffj(".context_module_item:contains(#{filename})").length).to eq(2)
       end
     end
   end
