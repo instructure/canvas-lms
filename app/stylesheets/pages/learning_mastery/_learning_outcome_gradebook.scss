@@ -309,8 +309,8 @@ $page-dark: #ebeff2;
       border-bottom-color: $border-light;
       border-#{direction(right)}-color: $border-light;
       @include fontSize(15px);
-      height: 37px;
-      line-height: 37px;
+      height: 41px;
+      line-height: 41px;
       padding: 0;
     }
   }
@@ -331,7 +331,7 @@ $page-dark: #ebeff2;
 
   .outcome-student-cell-content {
     padding-#{direction(left)}: 8px;
-    margin-top: 1px;
+    margin-top: 2px;
     .avatar {
       width: 25px;
       height: 25px;

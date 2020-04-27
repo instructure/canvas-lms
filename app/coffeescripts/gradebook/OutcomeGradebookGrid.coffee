@@ -42,7 +42,7 @@ export default Grid =
 
     options:
       headerRowHeight        : 42
-      rowHeight              : 38
+      rowHeight              : 42
       syncColumnCellResize   : true
       showHeaderRow          : true
       explicitInitialization : true
