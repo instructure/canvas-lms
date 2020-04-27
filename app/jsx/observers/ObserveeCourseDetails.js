@@ -33,6 +33,16 @@ const Card = styled.div`
         color: #212329;
         font-size: 14px;
       }
+
+      &.icon-info {
+        font-size: 12px;
+        margin-right: 5px;
+
+        &:before {
+          color: #005888;
+          font-size: 12px;
+        }
+      }
     }
   }
 
@@ -60,6 +70,10 @@ const Card = styled.div`
       padding: 1rem 0;
       text-decoration: underline;
     }
+  }
+
+  .missing-assignments-placeholder {
+    height: 1px;
   }
 
   .missing-assignments {
@@ -199,12 +213,16 @@ class ObserveeCourseDetails extends React.Component {
             <i className="icon-arrow-open-left"></i>
           </a>
           <h4>{this.props.enrollment.course_name}</h4>
+          <a className="show-tooltip" href="#" title="More information about this card">
+            <i className="icon-info"></i>
+          </a>
         </section>
         <section className="course-info">
           <p className="course-teachers">
             <span className="title">Teachers: </span>
             {this.props.course_details.teachers.join(', ')}
           </p>
+          <div className="missing-assignments-placeholder" aria-hidden="true"></div>
           { this.renderMissingAssignments(this.props.course_details.missing_assignments) }
           <p className="course-score">{this.props.score}</p>
           <div className="flex-widgets">
