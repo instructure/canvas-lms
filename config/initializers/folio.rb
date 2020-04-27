@@ -33,7 +33,8 @@ module Folio::WillPaginate::ActiveRecord::Pagination
       unless group_values.empty?
         begin
           scope.connection.transaction(requires_new: true) do
-            scope.connection.execute("SET LOCAL statement_timeout='#{Setting.get('pagination_count_timeout', '5s')}'")
+            timeout = Setting.get('pagination_count_timeout', '5s')
+            scope.connection.execute("SET LOCAL statement_timeout=#{scope.connection.quote(timeout)}")
             # total_entries left to an auto-count, but the relation being
             # paginated has a grouping. we need to do a special count, lest
             # self.count give us a hash instead of the integer we expect.
@@ -56,3 +57,22 @@ module Folio::WillPaginate::ActiveRecord::Pagination
     super(options).to_a
   end
 end
+
+module FolioARPagination
+  def configure_pagination(page, options)
+    if !options.key?(:total_entries) && respond_to?(:count)
+      begin
+        connection.transaction(requires_new: true) do
+          timeout = Setting.get('pagination_count_timeout', '5s')
+          connection.execute("SET LOCAL statement_timeout=#{connection.quote(timeout)}")
+          options[:total_entries] = count(:all)
+        end
+      rescue ActiveRecord::QueryCanceled
+        options[:total_entries] = nil
+      end
+    end
+    super(page, options)
+  end
+end
+
+ActiveRecord::Relation.prepend(FolioARPagination)
