@@ -315,6 +315,14 @@ class User < ActiveRecord::Base
       group("users.id")
   }
 
+  attr_accessor :last_login
+  def self.preload_last_login(users)
+    maxes = Pseudonym.where(user_id: users).group(:user_id).maximum(:current_login_at)
+    users.each do |u|
+      u.last_login = maxes[u.id]
+    end
+  end
+
   scope :for_course_with_last_login, lambda { |course, root_account_id, enrollment_type|
     # add a field to each user that is the aggregated max from current_login_at and last_login_at from their pseudonyms
     select_clause = "MAX(current_login_at) as last_login"
