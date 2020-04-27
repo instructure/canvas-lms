@@ -381,7 +381,8 @@
 ./spec/models/quizzes/quiz_question/fill_in_multiple_blanks_question_spec.rb:0.11645442799999728
 ./spec/lib/cuty_capt_spec.rb:1.1656448430001092
 ./spec/migrations/change_enrollments_role_id_null_spec.rb:1.903141018000042
-./spec/lib/grade_calculator_spec.rb:351.8575528539999
+./spec/lib/grade_calculator_spec.rb:269.021660001
+./spec/lib/grade_calculator_coffee_spec.rb:173.0575528539009
 ./spec/lib/submittable_spec.rb:7.944104205000031
 ./spec/views/announcements/index.html.erb_spec.rb:0.5314073520000875
 ./spec/lib/utils/date_presenter_spec.rb:0.11199713400003475
