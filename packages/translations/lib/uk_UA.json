@@ -50,6 +50,9 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": " Сталася помилка під час створення попереднього перегляду файлу"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "Сталася помилка при виконанні запиту мережі"
+    },
     "announcement_fb4cb645": {
         "message": "Оголошення"
     },
@@ -174,6 +177,9 @@
         "message": "Курс"
     },
     "course_files_62deb8f8": {
+        "message": "Файли курсу"
+    },
+    "course_files_a31f97fc": {
         "message": "Файли курсу"
     },
     "course_navigation_dd035109": {
@@ -323,6 +329,9 @@
     "grades_loaded_5056277c": {
         "message": "Оцінки завантажені"
     },
+    "group_files_82e5dcdb": {
+        "message": "Файли групи"
+    },
     "group_navigation_99f191a": {
         "message": "Навігація групи"
     },
@@ -407,6 +416,9 @@
     "location_3b6ff307": {
         "message": "Місцезнаходження:"
     },
+    "locked_762f138b": {
+        "message": "Заблоковано"
+    },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Виглядає наче тут нічого немає"
     },
@@ -421,6 +433,9 @@
     },
     "modules_c4325335": {
         "message": "Розділи"
+    },
+    "my_files_2f621040": {
+        "message": "Мої файли"
     },
     "my_grades_98834476": {
         "message": "Мої оцінки"

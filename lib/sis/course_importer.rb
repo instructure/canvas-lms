@@ -65,7 +65,7 @@ module SIS
         raise ImportError, "No course_id given for a course" if course_id.blank?
         raise ImportError, "No short_name given for course #{course_id}" if short_name.blank? && abstract_course_id.blank?
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?
-        raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed|unpublished)/i
+        raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed|unpublished|published)/i
         raise ImportError, "Invalid course_format \"#{course_format}\" for course #{course_id}" unless course_format.blank? || course_format =~ /\A(online|on_campus|blended|not_set)/i
         valid_grade_passback_settings = (Setting.get('valid_grade_passback_settings', 'nightly_sync,disabled').split(',') << 'not_set')
         raise ImportError, "Invalid grade_passback_setting \"#{grade_passback_setting}\" for course #{course_id}" unless grade_passback_setting.blank? || valid_grade_passback_settings.include?(grade_passback_setting.downcase.strip)
@@ -99,17 +99,21 @@ module SIS
 
           course.integration_id = integration_id
           course.sis_source_id = course_id
+          active_state = (status.downcase == 'published') ? 'available' : 'claimed'
           if !course.stuck_sis_fields.include?(:workflow_state)
-            if status =~ /active/i || status == 'unpublished'
+            if %w(active unpublished published).include?(status.downcase)
               case course.workflow_state
               when 'completed'
+                # not using active state here, because it has always been set to available
+                # and customers have used this as a workaround to publishing courses. conclude, then restore.
                 course.workflow_state = 'available'
                 state_changes << :unconcluded
               when 'deleted'
-                course.workflow_state = 'claimed'
+                course.workflow_state = active_state
                 state_changes << :restored
               when 'created', nil
-                course.workflow_state = 'claimed'
+                course.workflow_state = active_state
+                state_changes << :published if active_state == 'published'
               end
             elsif status =~ /deleted/i
               course.workflow_state = 'deleted'

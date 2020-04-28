@@ -18,7 +18,6 @@
 
 import UploadQueue from 'compiled/react_files/modules/UploadQueue'
 import sinon from 'sinon'
-import $ from 'jquery'
 
 const mockFileOptions = (name = 'foo', type = 'bar', expandZip = false) => ({
   file: {
@@ -28,12 +27,23 @@ const mockFileOptions = (name = 'foo', type = 'bar', expandZip = false) => ({
   },
   expandZip
 })
-const mockFileUploader = file => ({
+const mockFileUploader = (file, error) => ({
   upload() {
-    const promise = $.Deferred()
-    window.setTimeout(() => promise.resolve(), 2)
+    this.inFight = true
+    // eslint-disable-next-line no-unused-vars
+    const promise = new Promise((resolve, reject) => {
+      window.setTimeout(() => {
+        this.inFlight = false
+        resolve()
+      }, 2)
+    })
     return promise
   },
+  reset() {
+    this.error = null
+  },
+  inFlight: false,
+  error,
   file
 })
 const mockAttemptNext = function() {}
@@ -96,7 +106,6 @@ test('getAllUploaders includes the current uploader', function() {
   equal(this.queue.length(), 1)
   this.queue.enqueue(mockFileOptions('zoo'))
   equal(this.queue.length(), 2)
-  equal(this.queue.length(), 2)
   const sentinel = mockFileOptions('sentinel')
   this.queue.currentUploader = sentinel
   const all = this.queue.getAllUploaders()
@@ -107,10 +116,26 @@ test('getAllUploaders includes the current uploader', function() {
 })
 
 test('Calls onChange', function() {
-  const spy = sinon.spy(this.queue, 'onChange')
+  const onChangeSpy = sinon.spy(this.queue, 'onChange')
+  const callbackSpy = sinon.spy()
+  this.queue.addChangeListener(callbackSpy)
   const foo = mockFileOptions('foo', 'bar', true)
   const uploader = this.queue.createUploader(foo)
 
   uploader.onProgress()
-  equal(spy.calledOnce, true)
+  ok(onChangeSpy.calledOnce)
+  ok(callbackSpy.calledWith(this.queue))
+  ok(callbackSpy.calledOnce)
+})
+
+test('can retry a specific uploader', function(assert) {
+  const done = assert.async()
+  const foo = mockFileUploader('foo', 'whoops')
+  const zoo = mockFileUploader('zoo', 'failed')
+  this.queue._queue.push(foo)
+  this.queue._queue.push(zoo)
+  return this.queue.attemptThisUpload(foo).then(() => {
+    equal(this.queue.length(), 1)
+    done()
+  })
 })

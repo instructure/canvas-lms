@@ -61,7 +61,9 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
         course_id             bigint,
         event_type            text,
         user_id               bigint,
-        data                  text
+        data                  text,
+        event_source          text,
+        sis_batch_id          bigint
       ) #{compression_params}}
 
     cassandra.execute %{

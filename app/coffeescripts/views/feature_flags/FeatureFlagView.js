@@ -80,7 +80,8 @@ export default class FeatureFlagView extends Backbone.View {
       deferred,
       message: warning.message,
       title: this.model.get('display_name'),
-      hasCancelButton: !warning.locked
+      hasCancelButton: !warning.locked && !warning.reload_page,
+      reloadOnConfirm: Boolean(warning.reload_page)
     })
     view.render()
     view.show()

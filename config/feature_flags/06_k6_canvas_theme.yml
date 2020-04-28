@@ -2,7 +2,10 @@
 canvas_k6_theme:
   state: allowed
   display_name: Canvas Elementary Theming
-  description: Elementary friendly theme font and limited course navigation.
+  description: |-
+    Elementary friendly theme, font, and limited course navigation.
+    The font update only applies to languages that use the Latin Alphabet.
   applies_to: Course
   root_opt_in: true
   touch_context: true
+  custom_transition_proc: k6_theme_hook

@@ -54,21 +54,32 @@ describe 'QR for mobile login' do
   before { user_logged_in }
 
   context 'from global nav account profile' do
-    it 'should bring up modal with generated QR code' do
+    it 'should bring up generated QR code when confirm modal is proceeded' do
       get '/'
       f('#global_nav_profile_link').click
       fln('QR for Mobile Login').click
+      f("button[data-testid='qr-proceed-button']").click
       qr_code = f("img[data-testid='qr-code-image']")
       check_base64_encoded_png_image(qr_code)
     end
   end
 
   context 'from user profile' do
-    it 'should bring up modal with generated QR code' do
+    it 'should bring up generated QR code when confirm modal is proceeded' do
       get '/profile'
       fln('QR for Mobile Login').click
+      f("button[data-testid='qr-proceed-button']").click
       qr_code = f("img[data-testid='qr-code-image']")
       check_base64_encoded_png_image(qr_code)
+    end
+
+    it 'should show message and no code when confirm modal is canceled' do
+      get '/profile'
+      fln('QR for Mobile Login').click
+      login_container = f('#qr_login_container')
+      f("button[data-testid='qr-cancel-button']").click
+      expect(login_container).to contain_jqcss("span:contains('code display was canceled')")
+      expect(login_container).not_to contain_css("img[data-testid='qr-code-image']")
     end
   end
 end

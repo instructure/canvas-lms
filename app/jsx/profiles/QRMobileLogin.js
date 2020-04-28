@@ -25,40 +25,93 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Img} from '@instructure/ui-img'
 import {Spinner} from '@instructure/ui-spinner'
+import {Modal} from '@instructure/ui-modal'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import moment from 'moment'
-import {object} from 'prop-types'
+import {object, bool} from 'prop-types'
 
 const REFRESH_INTERVAL = moment.duration(9.75, 'minutes') // 9 min 45 sec
 const POLL_INTERVAL = moment.duration(5, 'seconds')
 const QR_CODE_LIFETIME = moment.duration(10, 'minutes')
 
-export function QRMobileLogin({refreshInterval, pollInterval}) {
+const DISPLAY_STATE = {
+  canceled: 0,
+  warning: 1,
+  displayed: 2
+}
+
+const modalLabel = () => I18n.t('Confirm QR code display')
+
+export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
   const [imagePng, setImagePng] = useState(null)
   const [validFor, setValidFor] = useState(null)
+  const [display, setDisplay] = useState(
+    withWarning ? DISPLAY_STATE.warning : DISPLAY_STATE.displayed
+  )
 
   function renderQRCode() {
-    const body = imagePng ? (
-      <span className="fs-exclude">
-        <Img
-          alt={I18n.t('QR Code Image')}
-          constrain="contain"
-          data-testid="qr-code-image"
-          src={`data:image/png;base64, ${imagePng}`}
-        />
-      </span>
-    ) : (
-      <Spinner
-        data-testid="qr-code-spinner"
-        renderTitle={I18n.t('Waiting for your QR Code to load')}
-      />
-    )
+    let body
+
+    switch (display) {
+      case DISPLAY_STATE.canceled:
+        body = <Text size="large">{I18n.t('QR code display was canceled')}</Text>
+        break
+
+      case DISPLAY_STATE.warning:
+        body = (
+          <Spinner
+            data-testid="qr-code-spinner"
+            renderTitle={I18n.t('Waiting for confirmation to display QR code')}
+          />
+        )
+        break
+
+      case DISPLAY_STATE.displayed:
+        if (imagePng) {
+          body = (
+            <span className="fs-exclude">
+              <Img
+                alt={I18n.t('QR Code Image')}
+                constrain="contain"
+                data-testid="qr-code-image"
+                src={`data:image/png;base64, ${imagePng}`}
+              />
+            </span>
+          )
+        } else {
+          body = (
+            <Spinner
+              data-testid="qr-code-spinner"
+              renderTitle={I18n.t('Waiting for your QR Code to load')}
+            />
+          )
+        }
+    }
+
     return (
-      <View display="block" textAlign="center" padding="small xx-large">
-        {body}
-      </View>
+      <>
+        {display !== DISPLAY_STATE.canceled && (
+          <View display="block">
+            {I18n.t(
+              'To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.'
+            )}
+          </View>
+        )}
+        <View display="block" textAlign="center" padding="small xx-large">
+          {body}
+        </View>
+      </>
     )
+  }
+
+  function onModalProceed() {
+    setDisplay(DISPLAY_STATE.displayed)
+  }
+
+  function onModalCancel() {
+    setDisplay(DISPLAY_STATE.canceled)
   }
 
   function startTimedEvents() {
@@ -100,37 +153,84 @@ export function QRMobileLogin({refreshInterval, pollInterval}) {
       timerId = setTimeout(poll, pollInterval.asMilliseconds())
     }
 
-    poll()
+    if (display === DISPLAY_STATE.displayed) poll()
 
     return () => {
       if (timerId) clearTimeout(timerId)
     }
   }
 
-  useEffect(startTimedEvents, [])
+  useEffect(startTimedEvents, [display])
 
   return (
-    <Flex direction="column" justifyItems="center" margin="none medium">
-      <Flex.Item margin="xx-small" padding="xx-small">
-        <Heading level="h1">{I18n.t('QR for Mobile Login')}</Heading>
-      </Flex.Item>
-      <Flex.Item>
-        <View {...flexViewProps}>
-          <View display="block">
-            {I18n.t(
-              'To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.'
+    <>
+      <Flex direction="column" justifyItems="center" margin="none medium">
+        <Flex.Item margin="xx-small" padding="xx-small">
+          <Heading level="h1">{I18n.t('QR for Mobile Login')}</Heading>
+        </Flex.Item>
+        <Flex.Item>
+          <View {...flexViewProps}>
+            {renderQRCode()}
+            {validFor && display === DISPLAY_STATE.displayed && (
+              <Text weight="light" size="small">
+                {validFor}
+              </Text>
             )}
           </View>
-          {renderQRCode()}
-
-          {validFor && (
-            <Text weight="light" size="small">
-              {validFor}
+        </Flex.Item>
+      </Flex>
+      <Modal
+        size="small"
+        open={display === DISPLAY_STATE.warning}
+        onDismiss={onModalCancel}
+        shouldCloseOnDocumentClick={false}
+        label={modalLabel()}
+      >
+        <Modal.Header>
+          <CloseButton
+            data-testid="qr-header-close-button"
+            placement="end"
+            offset="medium"
+            onClick={onModalCancel}
+          >
+            {I18n.t('Cancel')}
+          </CloseButton>
+          <Heading>{modalLabel()}</Heading>
+        </Modal.Header>
+        <Modal.Body>
+          <View as="div" margin="medium large">
+            <Text as="div">
+              <p>
+                {I18n.t(
+                  'Sharing a QR code can give others immediate access to your account through the %{canvas} mobile applications.',
+                  {canvas: 'Canvas'}
+                )}
+              </p>
+              <p>
+                {I18n.t(
+                  'Please make sure no one is able to capture the image on your screen from your surroundings or from a screen sharing service.'
+                )}
+              </p>
+              <p>{I18n.t('Click "Proceed" to continue.')}</p>
+              <p>{I18n.t('Click "Cancel" if you donʼt want the code displayed.')}</p>
             </Text>
-          )}
-        </View>
-      </Flex.Item>
-    </Flex>
+          </View>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button data-testid="qr-cancel-button" margin="none x-small" onClick={onModalCancel}>
+            {I18n.t('Cancel')}
+          </Button>
+          <Button
+            data-testid="qr-proceed-button"
+            variant="primary"
+            margin="none x-small"
+            onClick={onModalProceed}
+          >
+            {I18n.t('Proceed')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   )
 }
 
@@ -146,10 +246,12 @@ const flexViewProps = {
 
 QRMobileLogin.propTypes = {
   refreshInterval: object,
-  pollInterval: object
+  pollInterval: object,
+  withWarning: bool
 }
 
 QRMobileLogin.defaultProps = {
   refreshInterval: REFRESH_INTERVAL,
-  pollInterval: POLL_INTERVAL
+  pollInterval: POLL_INTERVAL,
+  withWarning: false
 }

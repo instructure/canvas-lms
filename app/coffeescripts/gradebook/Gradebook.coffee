@@ -47,6 +47,7 @@ import GradebookApi from 'jsx/gradebook/default_gradebook/apis/GradebookApi'
 import SubmissionCommentApi from 'jsx/gradebook/default_gradebook/apis/SubmissionCommentApi'
 import CourseSettings from 'jsx/gradebook/default_gradebook/CourseSettings'
 import DataLoader from 'jsx/gradebook/default_gradebook/DataLoader'
+import OldDataLoader from 'jsx/gradebook/default_gradebook/OldDataLoader'
 import FinalGradeOverrides from 'jsx/gradebook/default_gradebook/FinalGradeOverrides'
 import GradebookGrid from 'jsx/gradebook/default_gradebook/GradebookGrid'
 import studentRowHeaderConstants from 'jsx/gradebook/default_gradebook/constants/studentRowHeaderConstants'
@@ -278,7 +279,12 @@ export default do ->
         allowFinalGradeOverride: @options.course_settings.allow_final_grade_override
       })
 
-      @dataLoader = new DataLoader(@)
+      if @options.dataloader_improvements
+        @dataLoader = new DataLoader({
+          gradebook: @
+        })
+      else
+        @dataLoader = new OldDataLoader(@)
 
       @gridData = {
         columns: {
@@ -2045,6 +2051,7 @@ export default do ->
       return false if @gradingPeriodSet.displayTotalsForAllGradingPeriods
       not @isFilteringColumnsByGradingPeriod()
 
+    # TODO: remove this method with TALLY-831
     studentsParams: ->
       enrollmentStates = ['invited', 'active']
 

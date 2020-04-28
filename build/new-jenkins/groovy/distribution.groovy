@@ -75,7 +75,7 @@ def stashBuildScripts() {
  * common helper for adding rspec tests to be ran
  */
 def addRSpecSuites(stages) {
-  def rspec_node_total = load('build/new-jenkins/groovy/rspec.groovy').config().rspec_node_total
+  def rspec_node_total = load('build/new-jenkins/groovy/rspec.groovy').rspecConfig().node_total
   def successes = load('build/new-jenkins/groovy/successes.groovy')
 
   if (successes.hasSuccess('rspec', rspec_node_total)) {
@@ -94,7 +94,7 @@ def addRSpecSuites(stages) {
  * common helper for adding selenium tests to be ran
  */
 def addSeleniumSuites(stages) {
-  def selenium_node_total = load('build/new-jenkins/groovy/rspec.groovy').config().selenium_node_total
+  def selenium_node_total = load('build/new-jenkins/groovy/rspec.groovy').seleniumConfig().node_total
   def successes = load('build/new-jenkins/groovy/successes.groovy')
 
   if (successes.hasSuccess('selenium', selenium_node_total)) {

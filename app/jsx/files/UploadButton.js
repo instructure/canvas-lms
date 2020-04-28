@@ -17,16 +17,32 @@
  */
 
 import I18n from 'i18n!upload_button'
-import React, {useRef} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {bool} from 'prop-types'
 import classnames from 'classnames'
 import UploadForm, {UploadFormPropTypes} from './UploadForm'
+import UploadQueue from 'compiled/react_files/modules/UploadQueue'
 
 const UploadButton = function(props) {
   const formRef = useRef(null)
+  const [disabled, setDisabled] = useState(UploadQueue.pendingUploads())
+  const handleQueueChange = useCallback(upload_queue => {
+    setDisabled(!!upload_queue.pendingUploads())
+  }, [])
+
+  useEffect(() => {
+    UploadQueue.addChangeListener(handleQueueChange)
+    return () => UploadQueue.removeChangeListener(handleQueueChange)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleUploadClick() {
+    formRef.current?.addFiles()
+  }
+
   return (
     <>
       <UploadForm
+        allowSkip={window?.ENV?.FEATURES?.files_dnd}
         ref={formRef}
         currentFolder={props.currentFolder}
         contextId={props.contextId}
@@ -35,7 +51,8 @@ const UploadButton = function(props) {
       <button
         type="button"
         className="btn btn-primary btn-upload"
-        onClick={() => formRef.current.addFiles()}
+        onClick={handleUploadClick}
+        disabled={disabled}
       >
         <i className="icon-upload" aria-hidden />
         &nbsp;

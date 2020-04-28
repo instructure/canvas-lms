@@ -141,6 +141,7 @@ FileRenameForm.render = function() {
         title={I18n.t('Copy')}
         onRequestClose={this.props.onClose}
         closeWithX={this.props.closeWithX}
+        data-testid="FileRenameForm-modal"
       >
         <ModalContent>
           {this.buildContent()}

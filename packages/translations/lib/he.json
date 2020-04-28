@@ -23,6 +23,9 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "אירעה שגיאה בעת נסיון לוותר על ההזדמנות"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "אירעה שגיאה ביצירת בקשת רשת"
+    },
     "announcement_fb4cb645": {
         "message": "הכרזה"
     },
@@ -127,6 +130,9 @@
     },
     "course_files_62deb8f8": {
         "message": "קובצי קורס"
+    },
+    "course_files_a31f97fc": {
+        "message": "קבצי קורס"
     },
     "course_navigation_dd035109": {
         "message": "ניווט בקורס"
@@ -260,6 +266,9 @@
     "grades_loaded_5056277c": {
         "message": "הציונים נטענו"
     },
+    "group_files_82e5dcdb": {
+        "message": "קבצי קבוצה"
+    },
     "group_navigation_99f191a": {
         "message": "ניווט בקבוצה"
     },
@@ -344,6 +353,9 @@
     "location_3b6ff307": {
         "message": "מיקום:"
     },
+    "locked_762f138b": {
+        "message": "נעול"
+    },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "נראה שאין פה כלום"
     },
@@ -358,6 +370,9 @@
     },
     "modules_c4325335": {
         "message": "מודולים"
+    },
+    "my_files_2f621040": {
+        "message": "הקבצים שלי"
     },
     "my_grades_98834476": {
         "message": "הציונים שלי"

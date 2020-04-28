@@ -92,20 +92,17 @@ export default class DueDateOverrideView extends Backbone.View
     # focus handling for accessibility
     @clearExistingDueDateErrors(data)
     checkedRows = []
+    dateValidator = new DateValidator({
+      date_range: _.extend({}, ENV.VALID_DATE_RANGE)
+      hasGradingPeriods: @hasGradingPeriods
+      gradingPeriods: @gradingPeriods
+      userIsAdmin: _.includes(ENV.current_user_roles, "admin"),
+      postToSIS: @postToSIS(data)
+    })
     for override in data.assignment_overrides
       # Don't validate duplicates
       continue if _.includes(checkedRows, override.rowKey)
-
-      dateValidator = new DateValidator({
-        date_range: _.extend({}, ENV.VALID_DATE_RANGE)
-        data: override
-        forIndividualStudents: override.student_ids?.length
-        hasGradingPeriods: @hasGradingPeriods
-        gradingPeriods: @gradingPeriods
-        userIsAdmin: _.includes(ENV.current_user_roles, "admin"),
-        postToSIS: @postToSIS(data)
-      })
-      rowErrors = dateValidator.validateDatetimes()
+      rowErrors = dateValidator.validateDatetimes(override)
       _.keys(rowErrors).forEach((key, val) =>
         rowErrors[key] = {message: rowErrors[key]}
       )

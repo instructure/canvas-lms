@@ -47,7 +47,7 @@ class NotificationMessageCreator
   def create_message
     to_user_channels = Hash.new([])
     @to_users.each do |user|
-      to_user_channels[user] += [user.email_channel]
+      to_user_channels[user] += user.communication_channels
     end
     @to_channels.each do |channel|
       to_user_channels[channel.user] += [channel]
@@ -75,16 +75,10 @@ class NotificationMessageCreator
       I18n.with_locale(user_locale) do
         channels.each do |default_channel|
           if @notification.registration?
-            registration_channels = if default_channel then
-                                      [default_channel]
-                                    else
-                                      immediate_channels_for(user)
-                                    end
-            immediate_messages += build_immediate_messages_for(user, registration_channels)
-          else
-            if @notification.summarizable?
-              delayed_messages += build_summaries_for(user, default_channel)
-            end
+            immediate_messages += build_immediate_messages_for(user, [default_channel])
+          elsif @notification.summarizable?
+            policy = delayed_policy_for(user, default_channel)
+            delayed_messages << build_summary_for(user, policy) if policy
           end
         end
 
@@ -147,10 +141,6 @@ class NotificationMessageCreator
     end
 
     build_summary_for(user, fallback_policy)
-  end
-
-  def build_summaries_for(user, channel=user.email_channel)
-    delayed_policies_for(user, channel).map{ |policy| build_summary_for(user, policy) }
   end
 
   def build_summary_for(user, policy)
@@ -219,31 +209,16 @@ class NotificationMessageCreator
     messages
   end
 
-  def unretired_policies_for(user)
-    user.communication_channels.select { |cc| !cc.retired? }.map(&:notification_policies).flatten
-  end
+  def delayed_policy_for(user, channel, notification: @notification)
+    return if !channel.active?
+    return if too_many_messages_for?(user)
+    return if channel.path_type != 'email'
+    return unless notifications_enabled_for_course?(user)
 
-  def delayed_policies_for(user, channel=user.email_channel)
-    # This condition is weird. Why would not throttling stop sending notifications?
-    # Why could an inactive email channel stop us here? We handle that later! And could still send
-    # notifications without it!
-    return [] if channel && !channel.active? && !too_many_messages_for?(user)
-    return [] unless notifications_enabled_for_course?(user)
-
-    # If any channel has a policy, even policy-less channels don't get the notification based on the
-    # notification default frequency. Is that right?
-    policies = unretired_policies_for(user).select { |np| np.notification_id == @notification.id }
-    if !policies.empty?
-      policies = policies.select { |np| ['daily', 'weekly'].include?(np.frequency) && np.communication_channel.path_type == 'email' }
-    elsif channel &&
-          channel.active? &&
-          channel.path_type == 'email'
-      frequency = @notification.default_frequency(user)
-      if ['daily', 'weekly'].include?(frequency)
-        policies << channel.notification_policies.create!(:notification => @notification, :frequency => frequency)
-      end
-    end
-    policies
+    # We use find here because the policies are already loaded and we don't want to execute a query
+    policy = channel.notification_policies.find { |np| np.notification_id == notification.id }
+    policy ||= channel.notification_policies.create!(notification_id: notification.id, frequency: notification.default_frequency(user))
+    policy if ['daily', 'weekly'].include?(policy.frequency)
   end
 
   def users_from_to_list(to_list)

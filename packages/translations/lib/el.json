@@ -71,6 +71,9 @@
     "course_files_62deb8f8": {
         "message": "Αρχεία Μαθήματος"
     },
+    "course_files_a31f97fc": {
+        "message": "Αρχεία μαθήματος"
+    },
     "course_navigation_dd035109": {
         "message": "Πλοήγηση στο μάθημα"
     },
@@ -133,6 +136,9 @@
     },
     "grades_a61eba0a": {
         "message": "Βαθμοί"
+    },
+    "group_files_82e5dcdb": {
+        "message": "Αρχεία ομάδας"
     },
     "group_navigation_99f191a": {
         "message": "Πλοήγηση στην Ομάδα"
@@ -200,6 +206,9 @@
     "location_3b6ff307": {
         "message": "Τοποθεσία:"
     },
+    "locked_762f138b": {
+        "message": "Κλειδωμένο"
+    },
     "media_af190855": {
         "message": "Δεδομένα"
     },
@@ -208,6 +217,9 @@
     },
     "modules_c4325335": {
         "message": "Ενότητες"
+    },
+    "my_files_2f621040": {
+        "message": "Τα αρχεία μου"
     },
     "new_13daf639": {
         "message": "Νέο"

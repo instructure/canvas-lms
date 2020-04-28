@@ -31,6 +31,6 @@ ready(() => {
   container = document.querySelector('#qr_login_container')
 
   if (container) {
-    ReactDOM.render(<QRMobileLogin />, container)
+    ReactDOM.render(<QRMobileLogin withWarning />, container)
   }
 })

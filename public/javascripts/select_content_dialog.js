@@ -22,6 +22,12 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import FileSelectBox from 'jsx/context_modules/FileSelectBox'
+import UploadForm from 'jsx/files/UploadForm'
+import CurrentUploads from 'jsx/files/CurrentUploads'
+import splitAssetString from 'coffeescripts/str/splitAssetString'
+import FilesystemObject from 'compiled/models/FilesystemObject'
+import BaseUploader from 'compiled/react_files/modules/BaseUploader'
+import UploadQueue from 'compiled/react_files/modules/UploadQueue'
 import _ from 'underscore'
 import htmlEscape from 'str/htmlEscape'
 import {uploadFile} from 'jsx/shared/upload_file'
@@ -43,6 +49,9 @@ import './jquery.templateData'
 import processMultipleContentItems from 'jsx/deep_linking/processors/processMultipleContentItems'
 
 const SelectContentDialog = {}
+
+let fileSelectBox
+let upload_form
 
 SelectContentDialog.deepLinkingListener = event => {
   if (
@@ -386,6 +395,7 @@ $(document).ready(function() {
           if (options.close) {
             options.close()
           }
+          upload_form?.onClose()
         }
       })
       .fixDialogButtons()
@@ -424,15 +434,17 @@ $(document).ready(function() {
     }
   })
   $('#select_context_content_dialog .add_item_button').click(function() {
-    const submit = function(item_data) {
+    const submit = function(item_data, close_dialog = true) {
       const submitted = $dialog.data('submitted_function')
       if (submitted && $.isFunction(submitted)) {
         submitted(item_data)
       }
-      setTimeout(() => {
-        $dialog.dialog('close')
-        $dialog.find('.alert').remove()
-      }, 0)
+      if (close_dialog) {
+        setTimeout(() => {
+          $dialog.dialog('close')
+          $dialog.find('.alert').remove()
+        }, 0)
+      }
     }
 
     const item_type = $('#add_module_item_select').val()
@@ -510,14 +522,16 @@ $(document).ready(function() {
           'item[indent]': $('#content_tag_indent').val()
         }
         if (item_data['item[id]'] == 'new') {
-          $('#select_context_content_dialog').loadingImage()
-          var url = $(
+          if (!ENV?.FEATURES?.module_dnd) {
+            $('#select_context_content_dialog').loadingImage()
+          }
+          let url = $(
             '#select_context_content_dialog .module_item_option:visible:first .new .add_item_url'
           ).attr('href')
           let data = $(
             '#select_context_content_dialog .module_item_option:visible:first'
           ).getFormData()
-          const process_upload = function(data) {
+          const process_upload = function(data, done = true) {
             let obj
 
             // discussion_topics will come from real api v1 and so wont be nested behind a `discussion_topic` or 'wiki_page' root object
@@ -551,33 +565,63 @@ $(document).ready(function() {
             $('#' + item_data['item[type]'] + 's_select')
               .find('.module_item_select option:last')
               .after($option)
-            submit(item_data)
+            submit(item_data, done)
           }
 
           if (item_data['item[type]'] == 'assignment') {
             data['assignment[post_to_sis]'] = ENV.DEFAULT_POST_TO_SIS
           }
           if (item_data['item[type]'] == 'attachment') {
-            const file = $('#module_attachment_uploaded_data')[0].files[0]
-            var url = `/api/v1/folders/${data['attachment[folder_id]']}/files`
-            data = {
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              parent_folder_id: data['attachment[folder_id]'],
-              on_duplicate: 'rename',
-              no_redirect: true
-            }
-            uploadFile(url, data, file)
-              .then(attachment => {
-                process_upload(attachment)
-              })
-              .catch(response => {
+            if (!ENV?.FEATURES?.module_dnd) {
+              const file = $('#module_attachment_uploaded_data')[0].files[0]
+              url = `/api/v1/folders/${data['attachment[folder_id]']}/files`
+              data = {
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                parent_folder_id: data['attachment[folder_id]'],
+                on_duplicate: 'rename',
+                no_redirect: true
+              }
+              uploadFile(url, data, file)
+                .then(attachment => {
+                  process_upload(attachment)
+                })
+                .catch(_err => {
+                  $('#select_context_content_dialog').loadingImage('remove')
+                  $('#select_context_content_dialog').errorBox(
+                    I18n.t('errors.failed_to_create_item', 'Failed to Create new Item')
+                  )
+                })
+            } else {
+              BaseUploader.prototype.onUploadPosted = attachment => {
+                // if the uploaded file replaced and existing file that already has a module item, don't create a new item
+                if (
+                  !Object.keys(ENV.MODULE_FILE_DETAILS).find(
+                    fdkey => ENV.MODULE_FILE_DETAILS[fdkey].content_id == attachment.replacingFileId // eslint-disable-line eqeqeq
+                  )
+                ) {
+                  process_upload(attachment, false)
+                }
+
+                if (UploadQueue.length() === 0) {
+                  renderFileUploadForm()
+                  $dialog.find('.alert').remove()
+                  $dialog.dialog('close')
+                }
+              }
+              BaseUploader.prototype.onUploadFailed = _err => {
                 $('#select_context_content_dialog').loadingImage('remove')
                 $('#select_context_content_dialog').errorBox(
                   I18n.t('errors.failed_to_create_item', 'Failed to Create new Item')
                 )
-              })
+                renderFileUploadForm()
+              }
+              UploadQueue.flush() // if there was an error uploading earlier, the queue has stuff in it we no longer want.
+              upload_form.queueUploads()
+              fileSelectBox.setDirty()
+              renderCurrentUploads()
+            }
           } else {
             $.ajaxJSON(
               url,
@@ -635,10 +679,27 @@ $(document).ready(function() {
 
     $('#select_context_content_dialog .module_item_option').hide()
     if ($(this).val() === 'attachment') {
-      ReactDOM.render(
-        React.createFactory(FileSelectBox)({contextString: ENV.context_asset_string}),
+      fileSelectBox = ReactDOM.render(
+        React.createFactory(FileSelectBox)({
+          contextString: ENV.context_asset_string
+        }),
         $('#module_item_select_file')[0]
       )
+      if (ENV?.FEATURES?.module_dnd) {
+        fileSelectBox.refresh()
+        $('#attachment_folder_id').on('change', update_foc)
+        renderFileUploadForm()
+        if (fileSelectBox.folderStore.getState().isLoading) {
+          fileSelectBox.folderStore.addChangeListener(() => {
+            renderFileUploadForm()
+          })
+        }
+        if (fileSelectBox.fileStore.getState().isLoading) {
+          fileSelectBox.fileStore.addChangeListener(() => {
+            renderFileUploadForm()
+          })
+        }
+      }
     }
     $('#' + $(this).val() + 's_select')
       .show()
@@ -690,7 +751,21 @@ $(document).ready(function() {
   })
   $('#select_context_content_dialog').on('change', '.module_item_select', function() {
     const currentSelectItem = $(this)[0]
-    if (currentSelectItem && currentSelectItem.selectedIndex > -1) {
+
+    if (ENV.FEATURES?.module_dnd) {
+      if ($('#add_module_item_select').val() === 'attachment') {
+        if (currentSelectItem) {
+          // selectedIndex==0 for [new files]
+          if (currentSelectItem.selectedIndex === 0) {
+            update_foc()
+          } else {
+            enable_disable_submit_button(currentSelectItem.selectedIndex > 0)
+          }
+        }
+      } else {
+        enable_disable_submit_button(currentSelectItem.selectedIndex > -1)
+      }
+    } else if (currentSelectItem && currentSelectItem.selectedIndex > -1) {
       $('.add_item_button')
         .removeClass('disabled')
         .attr('aria-disabled', false)
@@ -711,5 +786,89 @@ $(document).ready(function() {
     }
   })
 })
+
+if (!ENV?.FEATURES?.module_dnd) {
+  $('#module_attachment_uploaded_data').on('change', function(event) {
+    enable_disable_submit_button(event.target?.files?.length > 0)
+  })
+}
+
+function enable_disable_submit_button(enabled) {
+  if (enabled) {
+    $('.add_item_button')
+      .removeClass('disabled')
+      .attr('aria-disabled', false)
+  } else {
+    $('.add_item_button')
+      .addClass('disabled')
+      .attr('aria-disabled', true)
+  }
+}
+
+function update_foc() {
+  enable_disable_submit_button($('#module_attachment_uploaded_data')[0].files.length)
+  renderFileUploadForm()
+}
+
+function handleUploadOnChange(current_uploader_count) {
+  if (current_uploader_count === 0) {
+    upload_form.reset()
+    renderFileUploadForm()
+    enable_disable_submit_button(false)
+  }
+}
+
+function getFileUploadFolder() {
+  const selectedFolder = document.getElementById('attachment_folder_id')
+  const folderId = selectedFolder.value
+  const folder = {...fileSelectBox.getFolderById(folderId)}
+  if (folder) {
+    folder.files = (folder.files || []).map(f => new FilesystemObject(f))
+  }
+  return folder
+}
+
+function renderFileUploadForm() {
+  const [contextType, contextId] = splitAssetString(ENV.context_asset_string, true)
+  const folderProps = {
+    currentFolder: getFileUploadFolder(),
+    contextType,
+    contextId,
+    visible: true,
+    inputId: 'module_attachment_uploaded_data',
+    inputName: 'attachment[uploaded_data]',
+    autoUpload: false,
+    disabled: fileSelectBox.isLoading(),
+    alwaysRename: false,
+    alwaysUploadZips: true,
+    onChange: update_foc
+  }
+  // only show the choose files + folder form if [new files] is selected
+  if ($('#select_context_content_dialog').val() === 'new') {
+    $('#module_attachment_upload_form')
+      .parents('.module_item_option')
+      .find('.new')
+      .show()
+
+    enable_disable_submit_button($('#module_attachment_uploaded_data')[0].files.length)
+  }
+  // toggle from current uploads to the choose files button
+  $('#module_attachment_upload_form').show()
+  $('#module_attachment_upload_progress').hide()
+  upload_form = ReactDOM.render(
+    <UploadForm {...folderProps} />,
+    $('#module_attachment_upload_form')[0]
+  )
+}
+
+function renderCurrentUploads() {
+  // toggle from the choose files button tro current uploads
+  $('#module_attachment_upload_form').hide()
+  $('#module_attachment_upload_progress').show()
+  ReactDOM.render(
+    <CurrentUploads onUploadChange={handleUploadOnChange} />,
+    $('#module_attachment_upload_progress')[0]
+  )
+}
 
 export default SelectContentDialog

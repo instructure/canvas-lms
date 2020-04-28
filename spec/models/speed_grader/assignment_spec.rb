@@ -341,89 +341,66 @@ describe SpeedGrader::Assignment do
       expect(submission.fetch('grading_period_id')).to eq period.id.to_s
     end
 
-    it "creates a non-annotatable DocViewer session for Discussion attachments" do
-      skip('Fix in TALLY-790')
-      course = student_in_course(active_all: true).course
-      assignment = assignment_model(course: course)
-      assignment.anonymous_grading = true
-      topic = course.discussion_topics.create!(assignment: assignment)
-      attachment = attachment_model(
-        context: @student,
-        uploaded_data: stub_png_data,
-        filename: "homework.png"
-      )
-      entry = topic.reply_from(user: @student, text: "entry")
-      entry.attachment = attachment
-      entry.save!
-      topic.ensure_submission(@student)
+    context 'DocViewer' do
+      let(:course) { student_in_course(active_all: true).course }
+      let(:assignment) { assignment_model(course: course) }
+      let(:attachment) do
+        attachment_model(
+          context: @student,
+          uploaded_data: stub_png_data,
+          filename: "homework.png"
+        )
+      end
+      let(:json) { SpeedGrader::Assignment.new(assignment, @teacher).json }
+      let(:sub) do
+        json[:submissions].find do |submission|
+          submission[:submission_history][0][:submission][:versioned_attachments].any?
+        end
+      end
+      let(:versioned_attachments) { sub[:submission_history][0][:submission][:versioned_attachments] }
 
-      json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      sub = json[:submissions].first[:submission_history].first[:submission]
-      canvadoc_url = sub[:versioned_attachments].first.dig(:attachment, :canvadoc_url)
-      expect(canvadoc_url.include?("enable_annotations%22:false")).to eq true
-    end
+      it "creates a non-annotatable DocViewer session for Discussion attachments" do
+        assignment.anonymous_grading = true
+        topic = course.discussion_topics.create!(assignment: assignment)
+        entry = topic.reply_from(user: @student, text: "entry")
+        entry.attachment = attachment
+        entry.save!
+        topic.ensure_submission(@student)
 
-    it "creates DocViewer session anonymous instructor annotations if assignment has it set" do
-      skip('Fix in TALLY-790')
-      course = student_in_course(active_all: true).course
-      assignment = assignment_model(course: course)
-      attachment = attachment_model(
-        context: @student,
-        uploaded_data: stub_png_data,
-        filename: "homework.png"
-      )
-      assignment.anonymous_instructor_annotations = true
-      topic = course.discussion_topics.create!(assignment: assignment)
-      entry = topic.reply_from(user: @student, text: "entry")
-      entry.attachment = attachment
-      entry.save!
-      topic.ensure_submission(@student)
+        canvadoc_url = versioned_attachments.first.dig(:attachment, :canvadoc_url)
+        expect(canvadoc_url.include?("enable_annotations%22:false")).to eq true
+      end
 
-      json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      sub = json[:submissions].first[:submission_history].first[:submission]
-      canvadoc_url = sub[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
+      it "creates DocViewer session anonymous instructor annotations if assignment has it set" do
+        assignment.anonymous_instructor_annotations = true
+        topic = course.discussion_topics.create!(assignment: assignment)
+        entry = topic.reply_from(user: @student, text: "entry")
+        entry.attachment = attachment
+        entry.save!
+        topic.ensure_submission(@student)
 
-      expect(canvadoc_url.include?("anonymous_instructor_annotations%22:true")).to eq true
-    end
+        canvadoc_url = versioned_attachments.first.fetch(:attachment).fetch(:canvadoc_url)
+        expect(canvadoc_url.include?("anonymous_instructor_annotations%22:true")).to eq true
+      end
 
-    it "passes enrollment type to DocViewer" do
-      skip('Fix in TALLY-790')
-      course = student_in_course(active_all: true).course
-      assignment = assignment_model(course: course)
-      attachment = attachment_model(
-        context: @student,
-        uploaded_data: stub_png_data,
-        filename: "homework.png"
-      )
-      topic = course.discussion_topics.create!(assignment: assignment)
-      entry = topic.reply_from(user: @student, text: "entry")
-      entry.attachment = attachment
-      entry.save!
-      topic.ensure_submission(@student)
+      it "passes enrollment type to DocViewer" do
+        topic = course.discussion_topics.create!(assignment: assignment)
+        entry = topic.reply_from(user: @student, text: "entry")
+        entry.attachment = attachment
+        entry.save!
+        topic.ensure_submission(@student)
 
-      json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      sub = json[:submissions].first[:submission_history].first[:submission]
-      canvadoc_url = sub[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
+        canvadoc_url = versioned_attachments.first.fetch(:attachment).fetch(:canvadoc_url)
+        expect(canvadoc_url.include?("enrollment_type%22:%22teacher%22")).to eq true
+      end
 
-      expect(canvadoc_url.include?("enrollment_type%22:%22teacher%22")).to eq true
-    end
+      it "passes submission id to DocViewer" do
+        submission = assignment.submit_homework(@student, attachments: [attachment])
+        allow(Canvadocs).to receive(:enabled?).and_return(true)
 
-    it "passes submission id to DocViewer" do
-      skip('Fix in TALLY-790')
-      course = student_in_course(active_all: true).course
-      assignment = assignment_model(course: course)
-      attachment = attachment_model(
-        context: @student,
-        uploaded_data: stub_png_data,
-        filename: "homework.png"
-      )
-      submission = assignment.submit_homework(@student, attachments: [attachment])
-      allow(Canvadocs).to receive(:enabled?).and_return(true)
-      json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      sub_json = json[:submissions].first[:submission_history].first[:submission]
-      canvadoc_url = sub_json[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
-
-      expect(canvadoc_url.include?("%22submission_id%22:#{submission.id}")).to be true
+        canvadoc_url = versioned_attachments.first.fetch(:attachment).fetch(:canvadoc_url)
+        expect(canvadoc_url.include?("%22submission_id%22:#{submission.id}")).to be true
+      end
     end
 
     it "includes submission missing status in each submission history version" do

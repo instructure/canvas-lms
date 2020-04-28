@@ -37,7 +37,6 @@ export default class GradebookGrid {
   initialize() {
     const options = {
       autoEdit: true, // whether to go into edit-mode as soon as you tab to a cell
-      change_grade_url: this.options.change_grade_url, // used by SubmissionCell
       editable: this.options.editable,
       editorFactory: new CellEditorFactory(),
       enableCellNavigation: true,

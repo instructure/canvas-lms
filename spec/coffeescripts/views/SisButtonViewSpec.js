@@ -116,9 +116,8 @@ QuizStub.prototype.url = '/fake'
 
 QUnit.module('SisButtonView', {
   setup() {
-    this.assignment = new AssignmentStub()
-    this.quiz = new QuizStub()
-    this.quiz.set('toggle_post_to_sis_url', '/some_other_url')
+    this.assignment = new AssignmentStub({id: 1})
+    this.quiz = new QuizStub({id: 1, assignment_id: 2})
   }
 })
 
@@ -348,26 +347,37 @@ test('model saves if there are due date errors for quiz AND SIS_INTEGRATION_SETT
   ok(this.quiz.postToSIS())
 })
 
-test('does not override dates', function() {
+test('toggles post_to_sis for an assignment', function() {
   ENV.MAX_NAME_LENGTH = 256
+  ENV.COURSE_ID = 1001
   this.assignment.set('name', 'Gil Faizon')
-  const saveStub = sandbox.stub(this.assignment, 'save').callsFake(() => {})
+  this.assignment.set('post_to_sis', true)
+  const saveStub = sandbox.stub($, 'ajaxJSON')
   this.view = new SisButtonView({model: this.assignment})
   this.view.render()
   this.view.$el.click()
-  ok(saveStub.calledWith({override_dates: false}))
+  ok(
+    saveStub.calledWith('/api/v1/courses/1001/assignments/1', 'PUT', {
+      assignment: {override_dates: false, post_to_sis: false}
+    })
+  )
+  ok(!this.assignment.postToSIS())
 })
 
-test('properly saves model with a custom url if present', function() {
+test('toggles post_to_sis for a quiz', function() {
   ENV.MAX_NAME_LENGTH = 256
+  ENV.COURSE_ID = 1001
   this.quiz.set('title', 'George St. Geegland')
-  sandbox.stub(this.quiz, 'save').callsFake(function(attributes, options) {
-    ok(options.url, '/some_other_url')
-  })
   this.quiz.set('post_to_sis', false)
+  const saveStub = sandbox.stub($, 'ajaxJSON')
   this.view = new SisButtonView({model: this.quiz})
   this.view.render()
   this.view.$el.click()
+  ok(
+    saveStub.calledWith('/api/v1/courses/1001/assignments/2', 'PUT', {
+      assignment: {override_dates: false, post_to_sis: true}
+    })
+  )
   ok(this.quiz.postToSIS())
 })
 
@@ -384,6 +394,7 @@ test('properly toggles aria-pressed value based on post_to_sis', function() {
   this.view = new SisButtonView({model: this.assignment})
   this.view.render()
   equal(this.view.$label.attr('aria-pressed'), 'true')
+  sandbox.stub($, 'ajaxJSON').callsFake((url, method, data, success) => success(data.assignment))
   this.view.$el.click()
   equal(this.view.$label.attr('aria-pressed'), 'false')
 })

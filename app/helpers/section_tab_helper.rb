@@ -106,7 +106,7 @@ module SectionTabHelper
           elsif tab_is?(tab, 'TAB_COLLABORATIONS_NEW')
             !new_collaborations_enabled
           elsif tab_is?(tab, 'TAB_CONFERENCES')
-            !WebConference.config
+            !WebConference.config(context: @context)
           end
         end
       end

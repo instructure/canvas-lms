@@ -53,22 +53,24 @@ describe "/courses/_recent_feedback" do
   end
 
   it 'shows the grade' do
+    @assignment.update!(points_possible: 5782394)
     @assignment.grade_student(@user, grade: 5782394, grader: @teacher)
     @submission.reload
 
     render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
 
-    expect(response.body).to include("5,782,394 out of #{@assignment.points_possible}")
+    expect(response.body).to include("5,782,394 out of 5,782,394")
   end
 
   it 'shows the grade and the comment' do
+    @assignment.update!(points_possible: 25734)
     @assignment.grade_student(@user, grade: 25734, grader: @teacher)
     @assignment.update_submission(@user, comment: 'something different', commenter: @teacher)
     @submission.reload
 
     render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
 
-    expect(response.body).to include("25,734 out of #{@assignment.points_possible}")
+    expect(response.body).to include("25,734 out of 25,734")
     expect(response.body).to include('something different')
   end
 end

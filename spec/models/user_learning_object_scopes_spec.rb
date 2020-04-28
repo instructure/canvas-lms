@@ -160,7 +160,7 @@ describe UserLearningObjectScopes do
       end
 
       it "should include assignments with lock_at in the future" do
-        @quiz.lock_at = 1.hour.from_now
+        @quiz.lock_at = 3.days.from_now
         @quiz.save!
         DueDateCacher.recompute(@quiz.assignment)
         list = @student.assignments_for_student('submitting', contexts: [@course])
@@ -176,6 +176,7 @@ describe UserLearningObjectScopes do
       end
 
       it "should not include assignments where lock_at is in past" do
+        @quiz.due_at = 2.hours.ago
         @quiz.lock_at = 1.hour.ago
         @quiz.save!
         DueDateCacher.recompute(@quiz.assignment)
@@ -192,6 +193,7 @@ describe UserLearningObjectScopes do
         end
 
         it "should include assignments where lock_at is in past" do
+          @quiz.due_at = 2.hours.ago
           @quiz.lock_at = 1.hour.ago
           @quiz.save!
           DueDateCacher.recompute(@quiz.assignment)

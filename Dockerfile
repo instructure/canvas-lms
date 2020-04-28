@@ -78,7 +78,6 @@ RUN mkdir -p .yardoc \
              client_apps/canvas_quizzes/tmp \
              config/locales/generated \
              gems/canvas_i18nliner/node_modules \
-             gems/selinimum/node_modules \
              log \
              node_modules \
              packages/canvas-planner/lib \

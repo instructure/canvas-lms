@@ -91,9 +91,6 @@ class GradeCalculator
     user_ids.sort.in_groups_of(100, false) do |user_ids_group|
       GradeCalculator.new(user_ids_group, course, opts).compute_and_save_scores
     end
-
-    # Touch the course to naively expire the cache
-    Course.where(id: course_id).not_recently_touched.update_all(updated_at: Time.now.utc)
   end
 
   def submissions
@@ -510,7 +507,7 @@ class GradeCalculator
     return if @grading_period   # only update score statistics when calculating course scores
     return unless @ignore_muted # only update when calculating final scores
 
-    AssignmentScoreStatisticsGenerator.update_score_statistics_in_singleton(@course.id)
+    ScoreStatisticsGenerator.update_score_statistics_in_singleton(@course.id)
   end
 
   def save_scores

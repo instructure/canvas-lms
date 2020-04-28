@@ -73,7 +73,19 @@ module FeatureFlags
       # if we clear the nav cache before HAStore clears, it can be recached with stale FF data
       nav_cache = Lti::NavigationCache.new(context.root_account)
       nav_cache.send_later_if_production_enqueue_args(:invalidate_cache_key, {run_at: 1.minute.from_now, max_attempts: 1})
-      nav_cache.send_later_if_production_enqueue_args(:invalidate_cache_key, {run_at: 5.minute.from_now, max_attempts: 1})
+      nav_cache.send_later_if_production_enqueue_args(:invalidate_cache_key, {run_at: 5.minutes.from_now, max_attempts: 1})
+    end
+
+    def self.k6_theme_hook(_user, _context, _from_state, transitions)
+      transitions['on'] ||= {}
+      transitions['on']['message'] =
+        I18n.t("Enabling the Elementary Theme will change the font in the Canvas interface and simplify "\
+        "the Course Navigation Menu for all users in your course.")
+      transitions['on']['reload_page'] = true
+      transitions['off'] ||= {}
+      transitions['off']['message'] =
+        I18n.t("Disabling the Elementary Theme will change the font in the Canvas interface for all users in your course.")
+      transitions['off']['reload_page'] = true
     end
   end
 end

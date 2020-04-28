@@ -50,6 +50,11 @@
 #           "example": "",
 #           "type": "string"
 #         },
+#         "current_points": {
+#           "description": "The total points the user has earned in the class. Only included if user has permissions to view this score and 'current_points' is passed in the request's 'include' parameter.",
+#           "example": 150,
+#           "type": "integer"
+#         },
 #         "unposted_current_grade": {
 #           "description": "The user's current grade in the class including muted/unposted assignments. Only included if user has permissions to view this grade, typically teachers, TAs, and admins.",
 #           "example": "",
@@ -69,6 +74,11 @@
 #           "description": "The user's final score for the class including muted/unposted assignments. Only included if user has permissions to view this score, typically teachers, TAs, and admins..",
 #           "example": "",
 #           "type": "string"
+#         },
+#         "unposted_current_points": {
+#           "description": "The total points the user has earned in the class, including muted/unposted assignments. Only included if user has permissions to view this score (typically teachers, TAs, and admins) and 'current_points' is passed in the request's 'include' parameter.",
+#           "example": 150,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -358,9 +368,12 @@ class EnrollmentsApiController < ApplicationController
   #   querying a user's enrollments (either via user_id argument or via user
   #   enrollments endpoint): +current_and_invited+, +current_and_future+, +current_and_concluded+
   #
-  # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"|"uuid"]
+  # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"|"uuid"|"current_points"]
   #   Array of additional information to include on the enrollment or user records.
-  #   "avatar_url" and "group_ids" will be returned on the user record.
+  #   "avatar_url" and "group_ids" will be returned on the user record. If "current_points"
+  #   is specified, the fields "current_points" and (if the caller has
+  #   permissions to manage grades) "unposted_current_points" will be included
+  #   in the "grades" hash for student enrollments.
   #
   # @argument user_id [String]
   #   Filter by user_id (only valid for course or section enrollment

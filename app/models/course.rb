@@ -204,6 +204,8 @@ class Course < ActiveRecord::Base
   has_many :assignment_post_policies, -> { where.not(assignment_id: nil) }, class_name: 'PostPolicy', inverse_of: :course
   has_one :default_post_policy, -> { where(assignment_id: nil) }, class_name: 'PostPolicy', inverse_of: :course
 
+  has_one :course_score_statistic, dependent: :destroy
+
   prepend Profile::Association
 
   before_save :assign_uuid

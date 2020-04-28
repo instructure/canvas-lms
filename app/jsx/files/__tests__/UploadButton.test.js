@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {act, render} from '@testing-library/react'
 import UploadButton from '../UploadButton'
+import UploadQueue from 'compiled/react_files/modules/UploadQueue'
 
 function renderUploadButton(overrides) {
   return render(
@@ -47,5 +48,16 @@ describe('Files UploadButton', () => {
     const {container} = renderUploadButton()
     const form = container.querySelector('form')
     expect(form.classList.contains('hidden')).toBeTruthy()
+  })
+
+  it('disables the button while there are uploads in progress', () => {
+    const {getByText} = renderUploadButton()
+
+    expect(getByText('Upload').closest('button')).not.toBeDisabled()
+    act(() => {
+      UploadQueue.pendingUploads = jest.fn().mockReturnValue(1)
+      UploadQueue.onChange()
+    })
+    expect(getByText('Upload').closest('button')).toBeDisabled()
   })
 })

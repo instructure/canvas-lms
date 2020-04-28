@@ -3245,4 +3245,14 @@ describe User do
       end
     end
   end
+
+  describe "with_last_login" do
+    it "should not double the users select if select values are already present" do
+      expect(User.all.order_by_sortable_name.with_last_login.to_sql.scan(".*").count).to eq 1
+    end
+
+    it "should still include it if select values aren't present" do
+      expect(User.all.with_last_login.to_sql.scan(".*").count).to eq 1
+    end
+  end
 end

@@ -112,6 +112,7 @@ export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios) {
  */
 export function completeUpload(preflightResponse, file, options = {}) {
   const ajaxLib = options.ajaxLib || axios
+  const ajaxLibOptions = options.ajaxLibOptions || {}
 
   // account for attachments wrapped in array per JSON API format
   if (preflightResponse && preflightResponse.attachments && preflightResponse.attachments[0]) {
@@ -150,7 +151,8 @@ export function completeUpload(preflightResponse, file, options = {}) {
   const upload = ajaxLib.post(upload_url, formData, {
     responseType: isToS3 ? 'document' : 'json',
     onUploadProgress: options.onProgress,
-    withCredentials: !isToS3
+    withCredentials: !isToS3,
+    ...ajaxLibOptions
   })
 
   // finalize upload

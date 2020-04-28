@@ -1055,7 +1055,10 @@ class Assignment < ActiveRecord::Base
     # ContentTag on the currently bound tool. Presumably you always want correct data in the LineItem, regardless of
     # which Tool it's bound to.
     if lti_1_3_external_tool_tag? && line_items.empty?
-      rl = Lti::ResourceLink.create!(resource_link_id: lti_context_id, context_external_tool: external_tool_tag.content)
+      rl = Lti::ResourceLink.create!(
+        resource_link_id: lti_context_id,
+        context_external_tool: ContextExternalTool.from_content_tag(external_tool_tag, context)
+      )
       line_items.create!(label: title, score_maximum: points_possible, resource_link: rl)
     elsif saved_change_to_title? || saved_change_to_points_possible?
       line_items.
@@ -1066,7 +1069,11 @@ class Assignment < ActiveRecord::Base
   protected :update_line_items
 
   def lti_1_3_external_tool_tag?
-    external_tool? && external_tool_tag&.content_type == "ContextExternalTool" && external_tool_tag&.content&.use_1_3?
+    return false unless external_tool?
+    return false unless external_tool_tag&.content_type == "ContextExternalTool"
+
+    # Lookup the tool and check if the LTI version is 1.3
+    ContextExternalTool.from_content_tag(external_tool_tag, context)&.use_1_3?
   end
   private :lti_1_3_external_tool_tag?
 
@@ -1594,7 +1601,7 @@ class Assignment < ActiveRecord::Base
     can :submit
 
     given do |user, session|
-      (submittable_type? || submission_types == "discussion_topic") &&
+      (submittable_type? || %w(discussion_topic online_quiz).include?(submission_types)) &&
       context.grants_right?(user, session, :participate_as_student) &&
       visible_to_user?(user)
     end
@@ -3492,7 +3499,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def due_date_ok?
-    if unlock_at && lock_at && due_at
+    # lock_at OR unlock_at can be empty
+    if (unlock_at || lock_at) && due_at
       unless AssignmentUtil.in_date_range?(due_at, unlock_at, lock_at)
         errors.add(:due_at, I18n.t("must be between availability dates"))
         return false

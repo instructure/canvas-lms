@@ -53,6 +53,9 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": "Dosya ön izlemesi oluşturulurken hata oluştu"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "Ağ isteğinde bulunurken bir hata oluştu"
+    },
     "announcement_fb4cb645": {
         "message": "Duyuru"
     },
@@ -157,6 +160,9 @@
     },
     "course_files_62deb8f8": {
         "message": "Ders Dosyaları"
+    },
+    "course_files_a31f97fc": {
+        "message": "Ders dosyaları"
     },
     "course_images_f8511d04": {
         "message": "Ders Görselleri"
@@ -299,6 +305,9 @@
     "grades_a61eba0a": {
         "message": "Notlar"
     },
+    "group_files_82e5dcdb": {
+        "message": "Grup dosyaları"
+    },
     "group_navigation_99f191a": {
         "message": "Grup Gezinme Menüsü"
     },
@@ -401,6 +410,9 @@
     "location_3b6ff307": {
         "message": "Konum:"
     },
+    "locked_762f138b": {
+        "message": "Kilitli"
+    },
     "media_af190855": {
         "message": "Medya"
     },
@@ -409,6 +421,9 @@
     },
     "modules_c4325335": {
         "message": "Modüller"
+    },
+    "my_files_2f621040": {
+        "message": "Dosyalarım"
     },
     "new_13daf639": {
         "message": "Yeni"

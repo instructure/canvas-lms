@@ -32,6 +32,11 @@ FileOption:
 class FileOptionsCollection {
   constructor() {
     this.state = this.buildDefaultState()
+
+    this.uploadOptions = {
+      alwaysRename: false,
+      alwaysUploadZips: false
+    }
   }
 
   buildDefaultState() {
@@ -55,7 +60,7 @@ class FileOptionsCollection {
   }
 
   findMatchingFile(name) {
-    return _.find(this.folder.files.models, f => f.get('display_name') === name)
+    return (this.folder.files.models || this.folder.files).find(f => f.get('display_name') === name)
   }
 
   isZipFile(file) {
@@ -66,24 +71,27 @@ class FileOptionsCollection {
   segregateOptionBuckets(selectedFiles) {
     const [collisions, resolved, zips] = [[], [], []]
     selectedFiles.forEach(file => {
+      if (this.isZipFile(file.file) && this.uploadOptions.alwaysUploadZips) {
+        file.expandZip = false // treat this as a plain old file
+      }
       if (this.isZipFile(file.file) && typeof file.expandZip === 'undefined') {
         zips.push(file)
         // only mark as collision if it is a collision that hasn't been resolved, or is is a zip that will be expanded
-      } else {
+      } else if (file.dup !== 'skip') {
         const nameToTest = file.name || file.file.name
         const matchingFile = this.findMatchingFile(nameToTest)
         if (
           matchingFile &&
           file.dup !== 'overwrite' &&
-          (file.expandZip == null || file.expandZip === false)
+          (file.expandZip == null || file.expandZip === false) &&
+          !this.uploadOptions.alwaysRename
         ) {
-          if (file.dup !== 'skip') {
-            if (matchingFile.get('restricted_by_master_course')) {
-              file.cannotOverwrite = true
-            }
-            collisions.push(file)
+          if (matchingFile.get('restricted_by_master_course')) {
+            file.cannotOverwrite = true
           }
+          collisions.push(file)
         } else {
+          file.replacingFileId = matchingFile?.id
           resolved.push(file)
         }
       }
@@ -171,6 +179,11 @@ class FileOptionsCollection {
 
   resetState() {
     return (this.state = this.buildDefaultState())
+  }
+
+  setUploadOptions(options) {
+    this.uploadOptions.alwaysRename = !!options.alwaysRename
+    this.uploadOptions.alwaysUploadZips = !!options.alwaysUploadZips
   }
 
   // noop

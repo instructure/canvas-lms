@@ -24,3 +24,7 @@ RSpec.configure do |config|
 
   config.order = 'random'
 end
+
+class NullLogger
+  def warn(msg);end
+end

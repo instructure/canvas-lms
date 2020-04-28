@@ -24,6 +24,13 @@ def successFile() {
   return "_buildmeta/${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}-successes"
 }
 
+// we have a stage that marks a build as successful. this removes
+// all success marks and replaces it with the 'build' mark. this
+// causes the post hooks to be unable to read successes.
+def hasSuccessOrBuildIsSuccessful(name, required_count = 1) {
+  return hasSuccess('build') || hasSuccess(name, required_count)
+}
+
 def hasSuccess(name, required_count = 1) {
   if (!fileExists(successFile())) {
     copyArtifacts(

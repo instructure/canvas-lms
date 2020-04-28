@@ -71,6 +71,9 @@
     "course_files_62deb8f8": {
         "message": "Դասընթացի ֆայլեր"
     },
+    "course_files_a31f97fc": {
+        "message": "Դասընթացի ֆայլեր"
+    },
     "course_navigation_dd035109": {
         "message": "Նավարկում դասընթացում"
     },
@@ -134,6 +137,9 @@
     "grades_a61eba0a": {
         "message": "Գնահատականներ"
     },
+    "group_files_82e5dcdb": {
+        "message": "Խմբի ֆայլեր"
+    },
     "group_navigation_99f191a": {
         "message": "Խմբի նավարկում"
     },
@@ -194,11 +200,17 @@
     "location_3b6ff307": {
         "message": "Գտնվելու վայրը"
     },
+    "locked_762f138b": {
+        "message": "Արգելափակված է"
+    },
     "media_af190855": {
         "message": "Մուլտիմեդիա"
     },
     "modules_c4325335": {
         "message": "Մոդուլներ"
+    },
+    "my_files_2f621040": {
+        "message": "Իմ ֆայլերը"
     },
     "new_13daf639": {
         "message": "Նոր"

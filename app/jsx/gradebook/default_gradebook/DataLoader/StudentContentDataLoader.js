@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {chunk, difference} from 'lodash'
 import I18n from 'i18n!gradebook'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
 
 const submissionsParams = {
   exclude_response_fields: ['preview_url'],
+  grouped: 1,
   response_fields: [
     'assignment_id',
     'attachments',
@@ -65,50 +66,55 @@ function flashSubmissionLoadError() {
 
 function ignoreFailure() {}
 
-function getStudentsChunk(studentIds, options, dispatch) {
+function getStudentsChunk(courseId, studentIds, options, dispatch) {
+  const url = `/api/v1/courses/${courseId}/users`
   const params = {
-    ...options.studentsParams,
+    enrollment_state: ['active', 'completed', 'inactive', 'invited'],
+    enrollment_type: ['student', 'student_view'],
+    include: ['avatar_url', 'enrollments', 'group_ids'],
     per_page: options.studentsChunkSize,
     user_ids: studentIds
   }
-  return new Promise((resolve, reject) => {
-    dispatch.getJSON(options.studentsUrl, params, resolve, reject)
-  })
+
+  return dispatch.getJSON(url, params)
 }
 
-function getSubmissionsForStudents(studentIds, options, allEnqueued, dispatch) {
+function getSubmissionsForStudents(courseId, studentIds, allEnqueued, dispatch) {
   return new Promise((resolve, reject) => {
+    const url = `/api/v1/courses/${courseId}/students/submissions`
     const params = {student_ids: studentIds, ...submissionsParams}
-    /* eslint-disable promise/catch-or-return */
+
     dispatch
-      .getDepaginated(options.submissionsUrl, params, undefined, allEnqueued)
+      .getDepaginated(url, params, undefined, allEnqueued)
       .then(resolve)
-      .fail(() => {
+      .catch(() => {
         flashSubmissionLoadError()
         reject()
       })
-    /* eslint-enable promise/catch-or-return */
   })
 }
 
 function getContentForStudentIdChunk(studentIds, options, dispatch) {
+  const {gradebook} = options
+
   let resolveEnqueued
   const allEnqueued = new Promise(resolve => {
     resolveEnqueued = resolve
   })
 
-  const studentRequest = getStudentsChunk(studentIds, options, dispatch).then(
-    options.onStudentsChunkLoaded
+  const studentRequest = getStudentsChunk(options.courseId, studentIds, options, dispatch).then(
+    gradebook.gotChunkOfStudents
   )
 
-  const submissionRequestChunks = _.chunk(studentIds, options.submissionsChunkSize)
+  const submissionRequestChunks = chunk(studentIds, options.submissionsChunkSize)
   const submissionRequests = []
 
   submissionRequestChunks.forEach(submissionRequestChunkIds => {
     let submissions
+
     const submissionRequest = getSubmissionsForStudents(
+      options.courseId,
       submissionRequestChunkIds,
-      options,
       resolveEnqueued,
       dispatch
     )
@@ -119,9 +125,10 @@ function getContentForStudentIdChunk(studentIds, options, dispatch) {
       .then(() => {
         // if the student request fails, this callback will not be called
         // the failure will be caught and otherwise ignored
-        return options.onSubmissionsChunkLoaded(submissions)
+        gradebook.gotSubmissionsChunk(submissions)
       })
       .catch(ignoreFailure)
+
     submissionRequests.push(submissionRequest)
   })
 
@@ -140,7 +147,7 @@ export default class StudentContentDataLoader {
 
   load(studentIds) {
     const loadedStudentIds = this.options.loadedStudentIds || []
-    const studentIdsToLoad = _.difference(studentIds, loadedStudentIds)
+    const studentIdsToLoad = difference(studentIds, loadedStudentIds)
 
     if (studentIdsToLoad.length === 0) {
       return
@@ -148,7 +155,7 @@ export default class StudentContentDataLoader {
 
     const studentRequests = []
     const submissionRequests = []
-    const studentIdChunks = _.chunk(studentIdsToLoad, this.options.studentsChunkSize)
+    const studentIdChunks = chunk(studentIdsToLoad, this.options.studentsChunkSize)
 
     // wait for all chunk requests to have been enqueued
     return new Promise(resolve => {

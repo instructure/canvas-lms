@@ -308,14 +308,18 @@ class User < ActiveRecord::Base
   end
 
   scope :with_last_login, lambda {
-    select("users.*, MAX(current_login_at) as last_login").
+    select_clause = "MAX(current_login_at) as last_login"
+    select_clause = "users.*, #{select_clause}" if select_values.blank?
+    select(select_clause).
       joins("LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id").
       group("users.id")
   }
 
   scope :for_course_with_last_login, lambda { |course, root_account_id, enrollment_type|
     # add a field to each user that is the aggregated max from current_login_at and last_login_at from their pseudonyms
-    scope = select("users.*, MAX(current_login_at) as last_login").
+    select_clause = "MAX(current_login_at) as last_login"
+    select_clause = "users.*, #{select_clause}" if select_values.blank?
+    scope = select(select_clause).
       # left outer join ensures we get the user even if they don't have a pseudonym
       joins(sanitize_sql([<<-SQL, root_account_id])).where(:enrollments => { :course_id => course })
         LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?

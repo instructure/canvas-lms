@@ -19,6 +19,10 @@ module Api::V1::QuizzesNext::Quiz
   extend Api::V1::Quiz
 
   def quizzes_next_json(quizzes, context, user, session, options={})
+    # bulk preload all description attachments to prevent N+1 query
+    preloaded_attachments = api_bulk_load_user_content_attachments(quizzes.map(&:description), context)
+    options[:description_formatter] = description_formatter(context, user, preloaded_attachments)
+
     quizzes.map do |quiz|
       quiz_json(quiz, context, user, session, options, klass(quiz))
     end

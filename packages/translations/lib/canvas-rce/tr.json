@@ -15,6 +15,9 @@
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": "Dosya ön izlemesi oluşturulurken hata oluştu"
   },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "Ağ isteğinde bulunurken bir hata oluştu"
+  },
   "announcement_list_da155734": { "message": "Duyuru Listesi" },
   "announcements_a4b8ed4a": { "message": "Duyurular" },
   "apps_54d24a47": { "message": "Uygulamalar" },
@@ -54,6 +57,7 @@
   },
   "course_documents_104d76e0": { "message": "Ders Belgeleri" },
   "course_files_62deb8f8": { "message": "Ders Dosyaları" },
+  "course_files_a31f97fc": { "message": "Ders dosyaları" },
   "course_images_f8511d04": { "message": "Ders Görselleri" },
   "course_links_b56959b9": { "message": "Ders Bağlantıları" },
   "course_media_ec759ad": { "message": "Ders Medyası" },
@@ -62,6 +66,7 @@
   "custom_6979cd81": { "message": "Özelleştir" },
   "date_added_ed5ad465": { "message": "Eklendiği Tarih" },
   "decrease_indent_de6343ab": { "message": "İçerden başlatma sınırını azalt" },
+  "details_98a31b68": { "message": "Ayrıntılar" },
   "dimensions_45ddb7b7": { "message": "Tanımlamalar" },
   "discussions_a5f96392": { "message": "Tartışmalar" },
   "discussions_index_6c36ced": { "message": "Tartışma Başlıkları" },
@@ -89,6 +94,7 @@
   "finish_bc343002": { "message": "Tamamla" },
   "generating_preview_45b53be0": { "message": "Oluşturma önizlemesi..." },
   "grades_a61eba0a": { "message": "Notlar" },
+  "group_files_82e5dcdb": { "message": "Grup dosyaları" },
   "group_navigation_99f191a": { "message": "Grup Gezinme Menüsü" },
   "heading_2_5b84eed2": { "message": "Başlık 2" },
   "heading_3_2c83de44": { "message": "Başlık 3" },
@@ -122,8 +128,10 @@
   "loading_25990131": { "message": "Yükleniyor..." },
   "loading_bde52856": { "message": "Yükleniyor" },
   "loading_failed_b3524381": { "message": "Yükleme Başarısız..." },
+  "locked_762f138b": { "message": "Kilitli" },
   "media_af190855": { "message": "Medya" },
   "modules_c4325335": { "message": "Modüller" },
+  "my_files_2f621040": { "message": "Dosyalarım" },
   "next_page_d2a39853": { "message": "Sonraki Sayfa" },
   "no_e16d9132": { "message": "Hayır" },
   "no_results_940393cf": { "message": "Sonuç yok." },

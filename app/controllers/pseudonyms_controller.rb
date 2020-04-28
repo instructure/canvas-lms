@@ -273,7 +273,32 @@ class PseudonymsController < ApplicationController
   #   Integration ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account. The Integration ID is a secondary
   #   identifier useful for more complex SIS integrations.
-
+  #
+  # @argument login[authentication_provider_id] [String]
+  #   The authentication provider this login is associated with. Logins
+  #   associated with a specific provider can only be used with that provider.
+  #   Legacy providers (LDAP, CAS, SAML) will search for logins associated with
+  #   them, or unassociated logins. New providers will only search for logins
+  #   explicitly associated with them. This can be the integer ID of the
+  #   provider, or the type of the provider (in which case, it will find the
+  #   first matching provider).
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/accounts/:account_id/logins/:login_id \
+  #     -H "Authorization: Bearer <ACCESS-TOKEN>" \
+  #     -X PUT
+  #
+  # @example_response
+  #   {
+  #     "id": 1,
+  #     "user_id": 2,
+  #     "account_id": 3,
+  #     "unique_id": "bieber@example.com",
+  #     "created_at": "2020-01-29T19:33:35Z",
+  #     "sis_user_id": null,
+  #     "integration_id": null,
+  #     "authentication_provider_id": null
+  #   }
   def update
     if api_request?
       @pseudonym          = Pseudonym.active.find(params[:id])
@@ -287,6 +312,7 @@ class PseudonymsController < ApplicationController
     end
 
     return unless authorized_action(@pseudonym, @current_user, [:update, :change_password])
+    return unless find_authentication_provider
     return unless update_pseudonym_from_params
 
     if @pseudonym.save_without_session_maintenance
@@ -356,7 +382,13 @@ class PseudonymsController < ApplicationController
 
   def update_pseudonym_from_params
     # you have to at least attempt something recognized...
-    if params[:pseudonym].slice(:unique_id, :password, :sis_user_id, :authentication_provider, :integration_id).blank?
+    if params[:pseudonym].slice(
+      :unique_id,
+      :password,
+      :sis_user_id,
+      :authentication_provider_id,
+      :integration_id
+    ).blank?
       render json: nil, status: :bad_request
       return false
     end

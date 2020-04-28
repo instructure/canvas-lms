@@ -410,7 +410,7 @@ class Enrollment < ActiveRecord::Base
       enrollment = restore ? linked_enrollment_for(observer) : active_linked_enrollment_for(observer)
       if enrollment
         enrollment.update_from(self)
-      elsif restore || (self.saved_change_to_workflow_state? && self.workflow_state_before_last_save == 'inactive')
+      elsif restore || (self.saved_change_to_workflow_state? && ['inactive', 'deleted'].include?(self.workflow_state_before_last_save))
         create_linked_enrollment_for(observer)
       end
     end
@@ -1092,6 +1092,14 @@ class Enrollment < ActiveRecord::Base
     return nil unless course.allow_final_grade_override?
     score = find_score(id_opts)
     score&.override_score
+  end
+
+  def computed_current_points(id_opts=nil)
+    find_score(id_opts)&.current_points
+  end
+
+  def unposted_current_points(id_opts=nil)
+    find_score(id_opts)&.unposted_current_points
   end
 
   def unposted_current_grade(id_opts=nil)

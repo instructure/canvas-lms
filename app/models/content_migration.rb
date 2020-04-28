@@ -560,13 +560,15 @@ class ContentMigration < ActiveRecord::Base
       end
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
+      if self.for_master_course_import?
+        process_master_deletions(data['deletions']) if data['deletions'].present?
+      end
       import!(data)
 
       if !self.import_immediately?
         update_import_progress(100)
       end
       if self.for_master_course_import?
-        process_master_deletions(data['deletions']) if data['deletions'].present?
         self.update_master_migration('completed')
       end
     rescue => e

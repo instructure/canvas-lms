@@ -34,27 +34,44 @@ export default class FileSelectBox extends React.Component {
     folders: []
   }
 
+  isDirty = true
+
   componentWillMount() {
-    // Get a decent url partial in order to create the store.
-    const contextUrl = splitAssetString(this.props.contextString).join('/')
+    this.refresh()
+  }
 
-    // Create the stores, and add change listeners to them.
-    this.fileStore = new FileStore(contextUrl, {perPage: 50, only: ['names']})
-    this.folderStore = new FolderStore(contextUrl, {perPage: 50})
-    this.fileStore.addChangeListener(() => {
-      this.setState({
-        files: this.fileStore.getState().items
-      })
-    })
-    this.folderStore.addChangeListener(() => {
-      this.setState({
-        folders: this.folderStore.getState().items
-      })
-    })
+  setDirty() {
+    this.isDirty = true
+  }
 
-    // Fetch the data.
-    this.fileStore.fetch({fetchAll: true})
-    this.folderStore.fetch({fetchAll: true})
+  refresh() {
+    if (this.isDirty) {
+      // Get a decent url partial in order to create the store.
+      const contextUrl = splitAssetString(this.props.contextString).join('/')
+
+      // Create the stores, and add change listeners to them.
+      this.fileStore = new FileStore(contextUrl, {perPage: 50, only: ['names']})
+      this.folderStore = new FolderStore(contextUrl, {perPage: 50})
+      this.fileStore.addChangeListener(() => {
+        this.setState({
+          files: this.fileStore.getState().items
+        })
+      })
+      this.folderStore.addChangeListener(() => {
+        this.setState({
+          folders: this.folderStore.getState().items
+        })
+      })
+
+      // Fetch the data.
+      this.fileStore.fetch({fetchAll: true})
+      this.folderStore.fetch({fetchAll: true})
+      this.isDirty = false
+    }
+  }
+
+  getFolderById = id => {
+    return this.state.folders.find(folder => folder.id.toString() === id)
   }
 
   // Let's us know if the stores are still loading data.
