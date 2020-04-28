@@ -82,7 +82,7 @@ $gradebook_cell_padding_top: 8px;
 .container_0 {
   .slick-header-column:first-child {
     border-#{direction(left)}: 1px solid $grid-border-color;
-    padding-#{direction(left)}: 0px;
+    padding-#{direction(left)}: 3px;
   }
 
   .slick-cell:first-child {
@@ -201,9 +201,7 @@ $gradebook_cell_padding_top: 8px;
 
   // override jqueryUI style
   &.ui-state-default {
-    border-top: 1px solid $grid-border-color;
     border-#{direction(right)}: 1px solid $grid-border-color;
-    border-bottom: 1px solid $grid-border-color;
     border-#{direction(left)}: none;
     height: $header-content-height;
     padding-bottom: 0;

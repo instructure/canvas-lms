@@ -197,7 +197,6 @@ $page-dark: #ebeff2;
 /* slickgrid overrides */
 .outcome-gradebook-wrapper {
   .slick-viewport {
-    border-#{direction(left)}: 1px solid $border-light;
     border-top: 1px solid $border-dark;
   }
 
@@ -250,11 +249,12 @@ $page-dark: #ebeff2;
   }
 
   .slick-header-column {
-    @include fontSize(13px);
+    @include fontSize(16px);
 
     .slick-column-name {
       color: $header-font-color;
       font-weight: bold;
+      padding-#{direction(right)}: 8px;
     }
 
     &.ui-state-default {
@@ -262,10 +262,6 @@ $page-dark: #ebeff2;
       line-height: 51px;
       padding: 4px;
     }
-  }
-
-  .slick-headerrow, .slick-header {
-    border-#{direction(left)}: 1px solid transparent;
   }
 
   .slick-headerrow-column {
@@ -285,7 +281,7 @@ $page-dark: #ebeff2;
 
     &.average-filter {
       background: transparent;
-      border: none;
+      border: 1px solid $border-light;
       @include fontSize(15px);
       font-weight: bold;
       line-height: 39px;
@@ -294,10 +290,6 @@ $page-dark: #ebeff2;
 
     &.average-filter a {
       color: $font-color;
-    }
-
-    &.f1 {
-      border-#{direction(left)}: 1px solid $border-light;
     }
   }
 
