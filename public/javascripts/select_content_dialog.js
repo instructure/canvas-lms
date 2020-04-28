@@ -622,6 +622,8 @@ $(document).ready(function() {
                 )
                 renderFileUploadForm()
               }
+              // Unmount progress component to reset state
+              ReactDOM.unmountComponentAtNode($('#module_attachment_upload_progress')[0])
               UploadQueue.flush() // if there was an error uploading earlier, the queue has stuff in it we no longer want.
               upload_form.queueUploads()
               fileSelectBox.setDirty()
@@ -813,13 +815,19 @@ function enable_disable_submit_button(enabled) {
 function update_foc() {
   enable_disable_submit_button($('#module_attachment_uploaded_data')[0].files.length)
   renderFileUploadForm()
+  // Unmount progress component to reset state
+  ReactDOM.unmountComponentAtNode($('#module_attachment_upload_progress')[0])
 }
 
 function handleUploadOnChange(current_uploader_count) {
   if (current_uploader_count === 0) {
-    upload_form.reset()
+    upload_form.reset(true)
     renderFileUploadForm()
     enable_disable_submit_button(false)
+  } else {
+    // toggle from the choose files button to current uploads
+    $('#module_attachment_upload_form').hide()
+    $('#module_attachment_upload_progress').show()
   }
 }
 
@@ -854,6 +862,7 @@ function renderFileUploadForm() {
     contextType,
     contextId,
     visible: true,
+    allowSkip: true,
     inputId: 'module_attachment_uploaded_data',
     inputName: 'attachment[uploaded_data]',
     autoUpload: false,
@@ -883,9 +892,6 @@ function renderFileUploadForm() {
 }
 
 function renderCurrentUploads() {
-  // toggle from the choose files button tro current uploads
-  $('#module_attachment_upload_form').hide()
-  $('#module_attachment_upload_progress').show()
   ReactDOM.render(
     <CurrentUploads onUploadChange={handleUploadOnChange} />,
     $('#module_attachment_upload_progress')[0]

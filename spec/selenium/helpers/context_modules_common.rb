@@ -219,7 +219,7 @@ module ContextModulesCommon
     wait_for_ajaximations
   end
 
-  def upload_and_replace_file_item(add_item_selector, item_select_selector, existing_filepath)
+  def upload_file_item_with_selection(add_item_selector, item_select_selector, existing_filepath, click_button = 'Replace')
     # requires module_dnd feature to be enabled
     f(add_item_selector).click
     wait_for_ajaximations
@@ -237,11 +237,15 @@ module ContextModulesCommon
 
     f('#module_attachment_uploaded_data').send_keys(existing_filepath)
 
-    fj('button:contains("Replace")').click
-
     scroll_to(f('.add_item_button.ui-button'))
     f('.add_item_button.ui-button').click
     wait_for_ajaximations
+
+    # make a selection on the file rename dialog
+    fj("button:contains(\"#{click_button}\")").click
+    wait_for_ajaximations
+
+    folder_select
   end
 
   def select_module_item(select_element_css, item_text)
