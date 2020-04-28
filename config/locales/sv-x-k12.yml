@@ -1538,6 +1538,7 @@ sv-x-k12:
     default_name: "Inget namn"
   add_cc_subtitle_a9ef4a66: "Lägg till CC/undertext"
   add_collaboration_da9665ac: "Lägg till samarbete"
+  add_conferences_from_calendar_98cb86b1: "Lägg till konferenser från kalendern"
   add_contact_method_d2dfea03: "Lägg till kontaktmetod"
   add_content_58b4305a: "Lägg till innehåll"
   add_content_to_module_name_589a8d54: "Lägg till material i %{module_name}"
@@ -1767,6 +1768,7 @@ sv-x-k12:
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillåt massexport av omdömen till SIS"
   allow_comments_a1f45d8: "Tillåt kommentarer"
   allow_comments_for_title_7ac9e00: "Tillåt kommentarer för %{title}"
+  allow_conference_selection_lti_placement_c020ad8d: "Tillåt LTI-placering i konferensurvalet"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillåt att kursinnehåll laddas ner och visas offline."
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillåt att kursbilder tilldelas en kurs och används på översiktskorten."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Låt översiktskort registreras för varje användare."
@@ -2122,6 +2124,8 @@ sv-x-k12:
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "Gör det möjligt för användaren att se användarens SIS-ID:n i CSV-filen Analys av quizobjekt."
   allows_user_to_view_user_sis_ids_68a9d218: "Gör det möjligt för användaren att se SIS-ID:n för användare."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Gör det möjligt för användaren att se användarens SIS-ID:n på sidan Personer i en kurs."
+  allows_users_to_add_conferences_from_the_calendar_f36c5008: "Tillåt användare att lägga till konferenser från kalendern"
+  allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Tillåt att användare lägger till LTI-verktyg med placeringstyp för conference_selection"
   allows_users_to_edit_conferences_2d3c960c: "Gör det möjligt för användaren att redigera konferenser."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Tillåt användare att aktivera alternativet \"Starta SpeedGrader filtrerad efter elevgrupp\" för kurser på sidan kursinställningar. När alternativet är aktiverad och en elevgrupp har valts i nya omdömesboken, SpeedGrader läses endast elever i den valda gruppen in."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Låter användare tysta aviseringar på kursnivå."
@@ -2235,6 +2239,8 @@ sv-x-k12:
     file_import_fail: "Kund inte importera filen \"%{file_path}\""
   angel_display: "ANGEL Inlärning"
   angel_file_description: "Angel export .zip format"
+  annotation_notification_685eaeb9: "Avisering om kommentar"
+  annotation_teacher_notification_c5e4db1f: "Avisering om lärarkommentar"
   announcement: 
     no_title: "Ingen rubrik"
   announcement_creation_failed_f7d227f5: "Det gick inte att skapa anslaget"
@@ -2307,6 +2313,8 @@ sv-x-k12:
   anonymous_off_7985fcaf: "Anonym av"
   anonymous_on_c5fa120d: "Anonym på"
   anonymous_re_submission_assignment_title_d9402721: "Anonym återinlämning: %{assignment_title}"
+  anonymous_submission_annotation_student_id_assignm_25eb88c9: "Anonym inlämningsanteckning: Eleven (%{id}), %{assignment_title}, %{course_name}"
+  anonymous_submission_annotation_student_user_id_as_ffca8ce9: "Anonym inlämningsanteckning: Eleven (%{user_id}), %{assignment_title}, %{course_name}"
   anonymous_submission_assignment_title_896654de: "Anonym inlämning: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Kommentar för anonym inlämning: Eleven (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Kommentar på anonym inlämning: Eleven (%{user_id}), %{assignment_title}, %{course_name}"
@@ -2566,6 +2574,7 @@ sv-x-k12:
   assignment_created_b3ee04d7: "Uppgiften har skapats"
   assignment_d8387b78: uppgift
   assignment_dates_dccc98de: "Visa uppgiftsdatum"
+  assignment_dates_saved_successfully_78e0f355: "Uppgiftsdatumen sparades"
   assignment_details_collapsed_55b67150: "uppgiftsdetaljer stängda"
   assignment_details_dialog: 
     average_score: "Genomsnittligt resultat:"
@@ -3194,6 +3203,7 @@ sv-x-k12:
             granska varandras arbeten.
   assignments_index_menu_4088a035: "Indexmeny för uppdrag"
   assignments_list_fe3e54be: Uppgiftslista
+  assignments_loaded_72ee472c: "Uppgifter har lästs in"
   assignments_settings_30613d0c: Uppgiftsinställningar
   assignments_speedgrader_2fbd6df4: "Uppgifter, SpeedGrader"
   assignments_tutorial_tray_4cc844b: "Självstudiefack för uppgifter"
@@ -3379,6 +3389,7 @@ sv-x-k12:
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest skickad till IdP"
   authnresponse_from_idp_185037e9: "AuthnResponse från IdP"
   author_215203d2: Skapare
+  author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "%{author_name} lämnade precis en ny kommentar om inlämningen för %{user_name} för %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} kommenterade nyss inlämningen från %{user_name} för %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} kommenterade nyss inlämningen från %{user_name} för %{assignment_title}."
   author_s_name_b35e905a: "Författarens namn"
@@ -4093,6 +4104,7 @@ sv-x-k12:
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan endast integrera med användare i sin sektion"
   can_list_categorized_event_types_52596f7: "Kan lista kategoriserade händelsetyper."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Kan lista prenumeration på data från datatjänster."
+  can_lookup_account_information_13d69520: "Kan slå upp kontoinformation"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Det går att hämta användardata med det kontext som verktyget installerats i."
   can_show_subscription_to_data_service_data_688ce3: "Kan visa prenumeration på data från datatjänster."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Det går inte att beräkna resultat innan en uppgift har möjliga poäng"
@@ -4566,6 +4578,7 @@ sv-x-k12:
   common_timezones_2b00baba: "Vanliga tidszoner"
   commons_ed0252fb: Commons
   communicate_course_objectives_f457158c: "Kommunicera kursmål"
+  communicate_grading_expectations_484a1f01: "Kommunicera bedömningsförväntningar"
   communicate_to_your_students_exactly_what_will_be__7312d45d: |-
       Informera dina elever om exakt vad som kommer att krävas
                 av dem under hela kursen i kronologisk ordning. Generera en
@@ -4662,6 +4675,7 @@ sv-x-k12:
                 . Sänd ut ljud och video i realtid, dela presentationsbilder
                 , genomför demonstrationer av program och onlineresurser
                 med mera.
+  conference_selection_ea4050bb: Konferensurval
   conference_was_deleted_30869390: "Konferensen raderades"
   conferences: 
     concluded_conference: 
@@ -6765,6 +6779,7 @@ sv-x-k12:
   deep_purple_bb3e2907: "Djup lila"
   default_9db103d: Standard
   default_conference_title: "%{course_name} Konferens"
+  default_dates_a0a2ae26: standarddatum
   default_email_5cb9fa04: "Standardadress för e-post:"
   default_email_9efb7fbd: Standard-e-postadress
   default_grade_cannot_be_set_to_ex_723caa59: "Förinställd omdöme kan inte ställas in som %{ex}"
@@ -7453,6 +7468,7 @@ sv-x-k12:
   drag_and_drop_your_image_here_or_7fba7c14: "Dra och släpp din bild här eller "
   drag_to_rearrange_sections_637efee3: "Dra för att arrangera om sektioner"
   drag_up_or_down_to_reorder_382126ff: "Dra upp eller ner för att omorganisera"
+  drop_files_here_to_upload_ce0f50f9: "Släpp filerna här för uppladdning"
   drop_image_62a2a071: "Släpp bild"
   dropdown_changed_state_to_expanded_517689c2: "rullgardinsmenyn ändrade stat till %{expanded}."
   dropdown_option_1_e6ff2fc: "Rullgardinsmenyns alternativ 1"
@@ -7540,6 +7556,7 @@ sv-x-k12:
   edit_and_delete_their_own_posts_f4f7cc6: "Redigera eller radera sina egna inlägg"
   edit_announcement_title_cce0b4e: "Redigera anslag %{title}"
   edit_app_b0cc1c17: "Redigera app"
+  edit_assignment_dates_6f8c72b: "Redigera uppgiftsdatum"
   edit_assignment_ebf22a72: "Redigera uppgift"
   edit_assignment_group_c04c4af0: "Redigera uppgiftsgrupp"
   edit_assignment_name_8a7af80c: "Redigera uppgiftsnamn"
@@ -7705,6 +7722,7 @@ sv-x-k12:
   enable_course_as_a_blueprint_course_8515ffd5: "Möjliggör som valbar kursmall för andra kurser"
   enable_dashboard_images_for_courses_5af458b0: "Aktivera översiktsbilder för kurserna"
   enable_extra_filter_options_b52c23e6: "aktivera extra filteralternativ"
+  enable_face_to_face_connection_9df19b76: "Aktivera videoanslutning"
   enable_feature_title_987d8e9a: "Aktivera funktion: %{title}"
   enable_fullstory_5c673a06: "Aktivera Fullstory"
   enable_gradebook_list_students_by_sortable_name: "Räkna upp elever efter deras sortering av namn i bedömningsöversikten. Standardinställning för sortering av namn är ”Efternamn, förnamn” och kan ändras i inställningarna."
@@ -8085,6 +8103,7 @@ sv-x-k12:
   error_sending_submission_comment_dc15d24f: "Det gick inte att skicka inlämningskommentaren"
   error_sending_submission_d32dc075: "Det gick inte att skicka inlämningen"
   error_starting_content_share_18fb1532: "Fel vid start av innehållsdelning"
+  error_starting_save_operation_81bcb99: "Fel vid start av sparåtgärd:"
   error_submitting_to_plagiarism_service_9b0748cb: "Ett fel inträffade vid inlämning till plagiattjänsten"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Det gick inte att skicka in till plagiattjänsten. Du kan skicka in igen från SpeedGrader."
   error_updating_submission_draft_1d40ade7: "Fel vid uppdatering av inlämningsutkast"
@@ -9723,12 +9742,16 @@ sv-x-k12:
   hours_late_989e9081: "Timmar sent"
   hover_over_me_496521b9: "Peka på mig"
   how_do_i_add_a_module_65f5bf13: "Hur lägger jag till en modul?"
+  how_do_i_add_a_rubric_in_a_course_a4c7a40: "Hur lägger jag till en matris i en kurs?"
+  how_do_i_add_a_rubric_to_an_assignment_46fd097e: "Hur lägger jag till en matris till en uppgift?"
   how_do_i_add_an_announcement_in_a_course_63396bb7: "Hur lägger jag till ett meddelande i en kurs?"
   how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: "Hur lägger jag till en bild i en kurs i översikten?"
   how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "Hur lägger jag till uppgiftstyper, sidor och filer i modulobjekt?"
   how_do_i_add_or_edit_details_in_an_assignment_fa779906: "Hur lägger jag till eller redigerar information i en uppgift?"
   how_do_i_add_users_to_a_course_4a88efaf: "Hur lägger jag till ett användare i en kurs?"
+  how_do_i_add_zoom_to_a_course_31300d74: "Hur lägger jag till Zoom i en kurs?"
   how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: "Hur anpassar jag händelser och inlämningsdatum i en kursimport?"
+  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "Hur justerar jag ett lärandemål med en matris i en kurs?"
   how_do_i_bulk_upload_files_to_a_course_b145d8cc: "Hur laddar jag upp flera filer till en kurs?"
   how_do_i_change_a_course_name_and_course_code_23b41292: "Hur ändrar jag ett kursnamn och kurskod?"
   how_do_i_change_the_course_home_page_326cee50: "Hur gör jag ändringar på kurshemsidan?"
@@ -9743,6 +9766,8 @@ sv-x-k12:
   how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: "Hur skapar jag ett quiz med individuella frågor?"
   how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Hur skapar jag en bedömning med New Quizzes?"
   how_do_i_create_an_assignment_35532b59: "Hur skapar jag en uppgift?"
+  how_do_i_create_an_outcome_for_a_course_cf0ea2b3: "Hur skapar jag ett lärandemål för en kurs?"
+  how_do_i_create_outcome_groups_for_a_course_362429a0: "Hur skapar jag ett lärandemålsgrupper för en kurs?"
   how_do_i_download_the_student_app_4a4b8a63: "Hur laddar jag ned elevappen?"
   how_do_i_download_the_student_app_and_get_addition_3604c207: "Hur laddar jag ned elevappen och får ytterligare hjälp?"
   how_do_i_edit_an_announcement_in_a_course_815c3c60: "Hur redigerar jag ett meddelande i en kurs?"
@@ -9750,20 +9775,32 @@ sv-x-k12:
   how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Hur anger och redigerar jag bedömningar i bedömningsöversikten?"
   how_do_i_find_my_courses_b826e4ce: "Hur hittar jag mina kurser?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Hur importerar jag ett exportpaket för en Canvas-kurs?"
+  how_do_i_import_outcomes_for_a_course_8eced1a: "Hur importerar jag ett lärandemål för en kurs?"
+  how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: "Hur vet jag om eleverna har anslutit till mötet?"
+  how_do_i_manage_and_share_the_recording_52fc2993: "Hur hanterar jag och delar inspelningen?"
+  how_do_i_manage_rubrics_in_a_course_a5441fb7: "Hur hanterar jag matriser i en kurs?"
   how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: "Hur hanterar jag inställningar för en bedömning i New Quizzes?"
   how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Hur flyttar jag och ordnar mina filer som instruktör?"
   how_do_i_move_or_reorder_a_module_e64a4baa: "Hur tar jag bort eller ändrar ordning på en modul?"
+  how_do_i_mute_and_unmute_all_participants_a7a2115b: "Hur kan jag stänga av och sätta på ljudet för alla deltagarna?"
   how_do_i_post_grades_for_an_assignment_in_the_grad_bc01018e: "Hur publicerar jag bedömningar för en uppgift i bedömningsöversikten?"
   how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "Hur publicerar eller avpublicerar jag en diskussion som instruktör?"
   how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "Hur publicerar eller avpublicerar jag en modul som instruktör?"
   how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Hur publicerar eller avpublicerar jag en sida som instruktör?"
   how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "Hur publicerar eller avpublicerar jag en uppgift som instruktör?"
   how_do_i_record_a_conference_e4845e7: "Hur spelar jag in en konferens?"
+  how_do_i_record_a_meeting_ae3a0d4e: "Hur spelar jag in ett möte?"
   how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Hur svarar jag på en diskussion som instruktör?"
+  how_do_i_schedule_a_zoom_video_meeting_5986f068: "Hur lägger jag till ett videomöte i Zoom?"
   how_do_i_select_specific_content_as_part_of_a_cour_11fe2c8d: "Hur väljer jag specifikt innehåll som en del av en kursimport?"
+  how_do_i_send_a_message_to_all_students_based_on_s_59d186d1: "Hur skickar jag ett meddelande till alla elever baserat på specifika kurskriterier i New Analytics?"
+  how_do_i_send_a_message_to_an_individual_student_i_92c7fb: "Hur skickar jag ett meddelande till en enskild elev i New Analytics?"
   how_do_i_set_a_front_page_in_a_course_a5f53cd5: "Hur ställer jag in förstasidan för en kurs?"
   how_do_i_set_details_for_a_course_52cfbeff: "Hur anger jag informationen för en kurs?"
+  how_do_i_share_my_screen_c280e585: "Hur delar jag min skärm?"
   how_do_i_start_a_conference_52792795: "Hur startar jag en konferens?"
+  how_do_i_start_a_meeting_e8a9e67b: "Hur startar jag ett möte?"
+  how_do_i_turn_my_camera_on_or_off_and_use_zoom_con_8a96538b: "Hur stänger jag av och sätter på min kamera och hur använder jag Zoom-reglagen?"
   how_do_i_upload_a_file_to_a_course_e8332cfe: "Hur laddar jag upp en fil till en kurs?"
   how_do_i_use_course_settings_1e8467e6: "Hur använder jag kursinställningarna?"
   how_do_i_use_files_as_an_instructor_70a996b: "Hur använder jag filer som instruktör?"
@@ -9772,11 +9809,14 @@ sv-x-k12:
   how_do_i_use_the_collaborations_index_page_68ee88b5: "Hur använder jag indexsidan för samarbeten?"
   how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "Hur använder jag kurshemsidan som instruktör?"
   how_do_i_use_the_gradebook_622395dc: "Hur använder jag bedömningsöversikten som instruktör?"
+  how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: "Hur använder jag Elevöversikt för lärandemål för att se lärandemålsresultat i en kurs från bedömningsöversikten?"
+  how_do_i_use_the_outcomes_page_in_a_course_a37e0231: "Hur använder jag sidan Lärandemål i en kurs?"
   how_do_i_use_the_pages_index_page_dafb986c: "Hur använder jag indexsidan för sidor?"
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Hur använder jag sidan för människor i en kurs som lärare?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Hur använder jag indexsidan för quiz?"
   how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Hur använder jag kursöversikten som instruktör?"
   how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "Hur ser jag ett kontextkort för en elev i en kurs?"
+  how_do_i_view_analytics_for_an_individual_student_724134ed: "Hur visar jag analyser för en enskild elev?"
   how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Hur ser jag och sorterar diskussioner som instruktör?"
   how_do_i_view_assignments_or_students_individually_2b7211f8: "Hur ser jag uppgifter eller enskilda elever i bedömningsöversikten?"
   how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "Hur ser jag information om en inlämning för en elev i SpeedGrader?"
@@ -10648,6 +10688,7 @@ sv-x-k12:
   loading_announcements_b927a86c: "Läser in anslag"
   loading_assessment_audit_trail_5cf4c10: "Läser in redovisningsspårning för bedömningar"
   loading_assignments_352ec769: "Läser in uppgifter"
+  loading_assignments_b3b248be: "Läser in uppgifter"
   loading_associations_2b92bcf7: "Läser in kopplingar..."
   loading_associations_9da66c4e: "Läser in associationer"
   loading_associations_complete_b93a9c6e: "Inläsningen av associationer är klar"
@@ -11169,6 +11210,17 @@ sv-x-k12:
       twitter: 
         body: "En notis har utlösts för %{student}"
         body_student: "En notis har utlösts för dig"
+    annotation_notification: 
+      email: 
+        body: "En  ny kommentar har lämnats av %{author} på uppgiften %{assignment_name}."
+        html: 
+          body: "En  ny kommentar har lämnats av %{author} på uppgiften %{assignment_name}."
+          link_text: "Visa inlämning"
+          subject: "Du har fått en ny kommentar i ditt inlämningsdokument"
+        subject: "Du har fått en ny kommentar i ditt inlämningsdokument"
+      summary: 
+        body: "En  ny kommentar har lämnats av %{author} på uppgiften %{assignment_name}."
+        subject: "Du har fått en ny kommentar i ditt inlämningsdokument"
     announcement_created_by_you: 
       email: 
         html: 
@@ -12998,6 +13050,13 @@ sv-x-k12:
   new_13daf639: Ny
   new_account_role_6e5c4964: "Ny kontoroll"
   new_analytics_api_access_7eec1ead: "API-åtkomst för New Analytics"
+  new_analytics_f6147886: "New Analytics"
+  new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
+      New Analytics är ett interaktivt verktyg som hjälper dig och dina elever att bättre
+          spåra prestanda och aktivitet i kursen. Upptäck vilka elever som har öppnat
+          sidor och resurser, och deltagit i uppgifter – och vilka elever som kan behöva
+          lite mer uppmuntran.
+  new_analytics_tutorial_tray_2511a34a: "Självstudiefält för New Analytics"
   new_annotations_66932016: "Nya annoteringar"
   new_announcement_23af4598: "Nytt anslag"
   new_announcement_in_course_name_title_84607f44: "Nytt meddelande i %{course_name}: %{title}"
@@ -13567,6 +13626,7 @@ sv-x-k12:
       remember_auth: "Kom ihåg mitt godkännande"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: "Typ av objekt"
+  observe_student_mastery_a1f01a: "Observera måluppfyllese för elev"
   observees: 
     being_observed: "Elever som observeras"
     new_observee_pairing_code: "Kopplingskod för elever"
@@ -13680,6 +13740,7 @@ sv-x-k12:
   options_3ab0ea65: Alternativ
   options_for_title_label_17f821ff: "Alternativ för %{title_label}"
   or_9b70ccaa: Eller
+  or_choose_files_b795006d: "eller välj filer"
   or_in_the_courses_list_6201030: "... eller i kurslistan."
   orange_81386a62: Orange
   orbis_report_header_assignment_id: uppgifts-id
@@ -13892,6 +13953,7 @@ sv-x-k12:
   outcomes_import_completed_baff5cb0: "Resultatimport färdig"
   outcomes_import_failed_77efcdf4: "Resultatimport misslyckades"
   outcomes_report_8887bd49: Lärandemålsrapport
+  outcomes_tutorial_tray_ebfce995: "Självstudiefält för lärandemål"
   over_time_bee1a733: "med tiden"
   override_3de65b2c: Åsidosätt
   override_grade_385adf30: "åsidosatt omdöme"
@@ -14032,6 +14094,7 @@ sv-x-k12:
   people_tutorial_tray_a87a6c48: "Självstudiefack för personer"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Det här namnet kommer att visas i diskussioner, meddelanden och kommentarer."
   percent_448ea947: procent
+  percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent} färdig"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Procent av respondenter som valt detta svaret"
   percent_of_students_scored_score_53d2c4d5: "%{percent} av eleverna fick %{score}"
@@ -16850,8 +16913,16 @@ sv-x-k12:
       remove_rubric: "Ta bort den här matrisen från min lista"
   rubrics_add_edit_delete_8299eff7: "Matriser – lägg till/redigera/ta bort"
   rubrics_b5ef369b: Matriser
+  rubrics_can_show_students_your_expectations_for_as_3382da64: |-
+      Matriser kan visa elever dina förväntningar på uppgiftens kvalitet
+          och hur de poängsätts. Matriser kan kopplas till
+          uppgifter, diskussioner och quiz. Använd en matris endast för bedömning
+          eller skapa en matris utan poängsättning för bedömningsbaserad och
+          lärandemålsbaserad bedömning utan poäng. Lärandemål kan läggas till som kriterieobjekt
+          i matriser.
   rubrics_in_course_navigation_539ea536: "Matriser i kursnavigering"
   rubrics_speedgrader_a6ebec57: "Matriser, SpeedGrader"
+  rubrics_tutorial_tray_be65d10d: "Självstudiefält för matriser"
   running_c5a4998d: Körs
   russia_7_87bc99d5: "Ryssland (+7)"
   russian_1e3e197: Ryska
@@ -16879,6 +16950,8 @@ sv-x-k12:
   saved_comments_2f6ba95: "Sparade kommentarer"
   saved_discussion_settings_successfully_ebd46a57: "Diskussionsinställningarna har sparats"
   saving_2521e616: Sparar
+  saving_assignment_dates_progress_9856153d: "Förlopp för sparande av uppgiftsdatum"
+  saving_assignment_dates_progress_percent_a5ea89a1: "Förlopp för sparande av uppgiftsdatum: %{percent}%"
   saving_assignment_fb958949: "Sparar uppgift"
   saving_associations_989bd4da: "Sparar associationer"
   saving_associations_complete_e4b9634d: "Spara associationer har slutförts"
@@ -17369,6 +17442,11 @@ sv-x-k12:
       \x20           Justera antalet bedömningar, måluppfyllelsenivå, poäng och färger.\n\
       \x20         "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Konfigurera hur dina färdighetsbedömningar visas i betygsboken uppfyllande av lärandemål. Justera antalet bedömningar, färdighetsnivå, resultat och färger."
+  set_up_outcomes_in_your_course_as_measured_by_peda_34237d17: |-
+      Konfigurera lärandemål i din kurs baserat på pedagogiska mål eller föredragna mål.
+            Hjälp elever att lära sig färdigheter och aktiviteter, hellre än att fokusera på bedömningar som ett mått på deras framgångar.
+            Bedöm elevens framgång med beräkningsmetoder och mät framgång direkt i Elevöversikten för lärandemål.
+            Importera befintligt konto, tillstånd och centrala standarder för din kurs. Du kan även justera lärandemål i kursmatriser.
   set_up_video_conferencing_and_other_tools_1a94a350: "Konfigurerar videokonferenser och andra verktyg"
   set_up_video_conferencing_c0049abe: "Konfigurerar videokonferenser"
   set_up_your_canvas_course_in_30_minutes_or_less_94817b6d: "Konfigurera din Canvas-kurs på 30 minuter eller mindre."
@@ -18121,6 +18199,7 @@ sv-x-k12:
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Endast webbplatsens admin. Skicka till 1 / %{denominator} användare i aktiverade konton varje månad."
   size_b30e1077: Storlek
   size_size_a77bd760: "storlek: %{size}"
+  skip_bcb86160: "Hoppa över"
   skipped_file_filename_due_to_error_94f0194: "Hoppade över filen %{filename} på grund av ett fel"
   skipping_unknown_file_type_cd1086ee: "Hoppar över okända filtyper"
   skype_18850ba7: Skype
@@ -18142,6 +18221,7 @@ sv-x-k12:
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Vissa uppgifter kan inte bedömas, bedömningsändringar för dessa uppgifter har ignorerats."
   someone: Någon
   someone_bbbc538b: Någon
+  someone_just_made_a_new_annotation_on_the_anonymou_cbbe68ca: "Någon lämnade en ny kommentar om den anonyma inlämningen för eleven (%{user_id}) för %{assignment_title}."
   someone_just_made_a_new_comment_on_the_anonymous_s_3627de61: "Någon kommenterade nyss den anonyma inlämningen för eleven (%{user_id}) för %{assignment_title}"
   someone_just_made_a_new_comment_on_the_anonymous_s_a2e944fc: "Någon kommenterade nyss den anonyma inlämningen för eleven (%{user_id}) för %{assignment_title}."
   something_broke_unexpectedly_6d3720ee: "Något gick sönder oväntat."
@@ -18151,6 +18231,7 @@ sv-x-k12:
   something_went_wrong_creating_course_please_try_ag_5198931d: "Något gick fel vid skapande av kurs. Vänligen försök igen."
   something_went_wrong_creating_the_course_please_tr_431adff5: "Något gick fel när kursen skapades. Försök igen."
   something_went_wrong_d238c551: "Något gick fel"
+  something_went_wrong_downloading_submissions_pleas_6d069a09: "Något gick fel vid nedladdning av inlämningarna. Försök igen senare."
   something_went_wrong_loading_the_violations_try_re_6e2fa92: "Något gick fel vid inläsning av överträdelser, försök läsa in sidan igen."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Något gick fel. Försök att uppdatera sidan. Om problemet kvarstår kan du försöka läsa in en enskild elevgrupp i SpeedGrader via *inställningar för stor kurs*."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Någonting gick fel. Vänligen försök att uppdatera sidan. Om problemet kvarstår kan det finnas för många poster på ””%{assignmentTitle}” för att ladda SpeedGrader."
@@ -18476,6 +18557,8 @@ sv-x-k12:
       submitted: skickad
       unsubmitted: "inte skickad"
   submission_added_title_50ebdc85: "Inlämning tillagt: %{title}"
+  submission_annotation_user_name_assignment_title_c_39910597: "Inlämningsanteckning: %{user_name}, %{assignment_title}, %{course_name}"
+  submission_annotation_user_name_assignment_title_c_80c1963e: "Inlämningsanteckning: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comment: 
     unknown_author: Någon
   submission_comment_created_f9375ca2: "Inlämningskommentar har skapats"
@@ -19087,10 +19170,12 @@ sv-x-k12:
   there_was_an_error_removing_the_image_c83acffe: "Ett fel uppstod när bilden skulle tas bort"
   there_was_an_error_removing_the_item_f8324776: "Det gick inte att ta bort objektet"
   there_was_an_error_retrieving_assignment_dates_39320c15: "Det gick inte att hämta dina uppgiftsdatum."
+  there_was_an_error_retrieving_job_progress_266523f9: "Ett fel uppstod vid hämtning av jobbförloppet"
   there_was_an_error_retrieving_the_course_image_d7ea094d: "Ett fel uppstod när kursbilden skulle hämtas"
   there_was_an_error_saving_the_assignment_dates_d31903ab: "Det gick inte att spara dina uppgiftsdatum."
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Ett fel uppstod när kursens ändringar sparades"
   there_was_an_error_setting_usage_rights_53739e1d: "Ett fel uppstod när användningsrättigheterna skulle ställas in."
+  there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Ett fel uppstod vid start av sparåtgärd för uppgiftsdatum"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Ett fel uppstod vid skickandet av likhetsdetekteringstjänsten. Försök skicka igen innan du kontaktar support."
   there_was_an_error_updating_this_assignment_please_59fc608d: "Ett fel uppstod när uppgiften skulle uppdateras. Uppdatera sidan och försök igen."
   there_was_an_error_uploading_the_image_932fc4ce: "Ett fel uppstod när bilden skulle laddas upp"
@@ -19101,6 +19186,7 @@ sv-x-k12:
   there_was_an_unknown_error_registering_the_tool_b9a29954: "Ett okänt fel.uppstod vid registrering av verktyget"
   there_were_a_total_of_count_errors_db1d89de: "Det fanns totalt  %{count} fel."
   there_were_a_total_of_count_warnings_6405df1e: "Det var totalt  %{count} varningar."
+  there_were_errors_saving_the_assignment_dates_3b39571b: "Fel uppstod när uppgiftsdatum skulle sparas:"
   there_were_errors_with_the_form_errors_ab5b559a: "Det fanns fel i formuläret: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Det fanns flera möjliga matchningar i importen. Lös dessa nedan."
   there_were_some_files_we_didn_t_know_what_to_do_wi_6156913f: "Det fanns ett par filer vi inte visste vad vi skulle göra med. De har inte lagts till på någons inlämningssida."
@@ -19864,6 +19950,7 @@ sv-x-k12:
   total_results_outcomedetails_cnt_30ff1f8d: "Poängsumma: %{outcomeDetails.cnt}"
   totalcount_total_replies_b6988c0a: "%{totalCount} svar totalt"
   track_individual_student_and_class_progress_c13cf2d1: "Spåra individuella elevers och klassers framsteg"
+  track_student_performance_and_activity_a92a2a8b: "Spåra elevprestanda och aktivitet"
   treat_ungraded_as_0_d38c2b41: "Betrakta icke-bedömd som 0"
   tree_browser: 
     folder_tree_instructions: "Använd upp och ner pilarna för att navigera genom trädet. Tryck höger för att förstora mapparna, vänster för att minska, och enter för att välja de markerade föremålen."
@@ -21206,3 +21293,9 @@ sv-x-k12:
     zip_options: Zipfil-alternativ
   zip_no_folder_error: "Den angivna mappen hittades inte i den här kursen."
   zoom_f3e54d69: Zooma
+  zoom_is_a_real_time_video_conferencing_tool_that_b_97dd23ec: |-
+      Zoom är ett videokonferensverktyg som sammanför
+          lärare och elever. Du kan schemalägga och hålla
+          videomöten direkt i Canvas genom att lägga till en Zoom-länk
+          i en Canvas-kurs, kursmeddelande, modul eller via kalendern.
+  zoom_tutorial_tray_5dcb7fc: "Självstudiefält för Zoom"

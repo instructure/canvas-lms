@@ -500,6 +500,18 @@ describe MasterCourses::MasterMigration do
       expect(quiz_to.reload.quiz_questions.where(:migration_id => mig_id(@new_qq)).first).to_not be_nil
     end
 
+    it "should create submissions for assignments without due dates on initial sync" do
+      course_with_student(:active_all => true)
+      @copy_to = @course
+      sub = @template.add_child_course!(@copy_to)
+
+      assmt = @copy_from.assignments.create!(:title => "assmt")
+      run_master_migration
+
+      assmt_to = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
+      expect(assmt_to.submissions.where(:user_id => @student)).to be_exists
+    end
+
     it "shouldn't delete an assignment group if it's not empty downstream" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
