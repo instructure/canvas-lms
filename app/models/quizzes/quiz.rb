@@ -631,12 +631,12 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.allowed_attempts == -1
   end
 
-  def build_submission_end_at(submission)
+  def build_submission_end_at(submission, with_time_limit=true)
     course = context
     user   = submission.user
     end_at = nil
 
-    if self.time_limit
+    if self.time_limit && with_time_limit
       end_at = submission.started_at + (self.time_limit.to_f * 60.0)
     end
 

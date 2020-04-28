@@ -112,6 +112,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
             @submission.backup_submission_data(params)
             render :json => {:backup => true,
                              :end_at => @submission.end_at,
+                             :end_at_without_time_limit => @submission.end_at_without_time_limit,
                              :time_left => @submission.time_left}
             return
           end
@@ -119,8 +120,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       end
 
       render :json => {:backup => false,
-                       :end_at => @submission && @submission.end_at,
-                       :time_left => @submission && @submission.time_left}
+                       :end_at => @submission&.end_at,
+                       :end_at_without_time_limit => @submission&.end_at_without_time_limit,
+                       :time_left => @submission&.time_left}
     end
   end
 
