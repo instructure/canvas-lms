@@ -60,31 +60,63 @@ class UploadForm extends React.Component {
 
     this.formRef = React.createRef()
     this.addFileInputRef = React.createRef()
-    this.resolvedUserAction = false
-    this.state = {...FileOptionsCollection.getState()}
+    this.state = {...FileOptionsCollection.getState(), showResolveModals: this.props.autoUpload}
     this.setFolder(props.currentFolder)
     this.setUploadOptions(props)
   }
 
   setFolder(folder) {
+    const previous = FileOptionsCollection.getFolder()
     FileOptionsCollection.setFolder(folder)
+    // When auto upload is disabled, then its possible for the folder
+    // to change before upload actually occurs, so if the folder is
+    // different than before then call `setOptionsFromFiles` again
+    // to resolve any name collisions under the new folder.
+    if (!this.props.autoUpload && previous?.id && folder?.id && folder.id !== previous.id) {
+      FileOptionsCollection.setOptionsFromFiles(this.addFileInputRef.current.files)
+      this.setStateFromOptions()
+    }
   }
 
   getFolder() {
     return FileOptionsCollection.getFolder()
   }
 
-  reset() {
-    this.formRef.current?.reset()
+  reset(force = false) {
+    // Don't reset the form if we're not auto uploading,
+    // since the user may have just closed a file rename dialog,
+    // and they should return to the form with the
+    // currently selected files still chosen.
+    if (force || this.props.autoUpload) {
+      this.formRef.current?.reset()
+    }
+    this.setState({showResolveModals: this.props.autoUpload})
+  }
+
+  restore() {
+    FileOptionsCollection.setOptionsFromFiles(this.addFileInputRef.current.files)
+    this.setStateFromOptions()
+    this.setState({showResolveModals: false})
   }
 
   setUploadOptions({alwaysRename, alwaysUploadZips}) {
     FileOptionsCollection.setUploadOptions({alwaysRename, alwaysUploadZips})
   }
 
-  queueUploads() {
+  _actualQueueUploads() {
     this.reset()
     return FileOptionsCollection.queueUploads(this.props.contextId, this.props.contextType)
+  }
+
+  queueUploads() {
+    if (this.props.autoUpload) {
+      this._actualQueueUploads()
+    } else if (!this.state.showResolveModals) {
+      // When autoUpload is disabled, we don't queue uploads
+      // immediately, but instead show any modals necessary
+      // to resolve name collisions or locked files
+      this.setState({showResolveModals: true})
+    }
   }
 
   addFiles = () => {
@@ -93,14 +125,12 @@ class UploadForm extends React.Component {
 
   handleFilesInputChange = e => {
     this.props.onChange(e)
-    this.resolvedUserAction = false
     FileOptionsCollection.setOptionsFromFiles(e.target.files)
     this.setStateFromOptions()
   }
 
   onNameConflictResolved = fileNameOptions => {
     FileOptionsCollection.onNameConflictResolved(fileNameOptions)
-    this.resolvedUserAction = true
     this.setStateFromOptions(() => {
       if (
         this.state.resolvedNames.length +
@@ -116,39 +146,44 @@ class UploadForm extends React.Component {
 
   onZipOptionsResolved = fileNameOptions => {
     FileOptionsCollection.onZipOptionsResolved(fileNameOptions)
-    this.resolvedUserAction = true
     this.setStateFromOptions()
   }
 
   onClose = () => {
-    this.reset()
-    if (!this.resolvedUserAction) {
-      // user dismissed zip or name conflict modal without resolving things
-      // reset state to dump previously selected files
+    // user dismissed a zip or name conflict modal
+    if (this.props.autoUpload) {
+      // autoUpload enabled, so reset state to dump previously selected files
+      this.reset()
       FileOptionsCollection.resetState()
       this.setStateFromOptions()
+      this.props.onEmptyOrClose()
+    } else {
+      // autoUpload disabled, so restore to currently selected files
+      this.restore()
     }
-    this.resolvedUserAction = false
-    this.props.onEmptyOrClose()
   }
 
   componentDidUpdate() {
     this.setFolder(this.props.currentFolder)
     this.setUploadOptions(this.props)
-
     if (
-      this.props.autoUpload &&
       this.state.zipOptions.length === 0 &&
       this.state.nameCollisions.length === 0 &&
       FileOptionsCollection.hasNewOptions()
     ) {
-      if (this.state.resolvedNames.length > 0) {
-        this.queueUploads(this.props.contextType, this.props.contextId)
-      } else {
-        this.props.onEmptyOrClose()
+      if (this.props.autoUpload) {
+        if (this.state.resolvedNames.length > 0) {
+          this._actualQueueUploads()
+        } else {
+          this.props.onEmptyOrClose()
+        }
+      } else if (this.state.showResolveModals) {
+        if (this.state.resolvedNames.length > 0) {
+          this._actualQueueUploads()
+        } else {
+          this.restore()
+        }
       }
-    } else {
-      this.resolvedUserAction = false
     }
   }
 
@@ -176,6 +211,7 @@ class UploadForm extends React.Component {
     } else if (this.state.nameCollisions.length && !this.props.alwaysRename) {
       return (
         <FileRenameForm
+          data-testid="rename-dialog"
           fileOptions={this.state.nameCollisions[0]}
           onNameConflictResolved={this.onNameConflictResolved}
           onClose={this.onClose}
@@ -202,7 +238,7 @@ class UploadForm extends React.Component {
             disabled={this.props.disabled}
           />
         </form>
-        {this.buildPotentialModal()}
+        {this.state.showResolveModals && this.buildPotentialModal()}
       </span>
     )
   }

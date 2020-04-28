@@ -415,6 +415,10 @@ describe "context modules" do
     end
 
     describe "with module_dnd feature on" do
+      before(:each) do
+        local_storage!
+      end
+
       before(:once) do
         @course.root_account.enable_feature!(:module_dnd)
         # adding another file to course
@@ -432,7 +436,6 @@ describe "context modules" do
       end
 
       it "should upload mutiple files to add items to a module" do
-        local_storage!
         get "/courses/#{@course.id}/modules"
 
         filename, fullpath, _data = get_file("testfile1.txt")
@@ -444,8 +447,6 @@ describe "context modules" do
       end
 
       it "should replace an existing module item with a replacement uploaded file" do
-        local_storage!
-
         # create the existing module item
         filename, fullpath, _data = get_file("a_file.txt")
         file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
@@ -454,15 +455,93 @@ describe "context modules" do
         @mod.add_item({:id => file.id, :type => 'attachment'})
 
         get "/courses/#{@course.id}/modules"
-        upload_and_replace_file_item("div#context_module_#{@mod.id} .add_module_item_link", '#attachments_select', fullpath)
+        upload_file_item_with_selection("div#context_module_#{@mod.id} .add_module_item_link", '#attachments_select', fullpath)
 
         expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
         expect(ffj(".context_module_item:contains(#{filename})").length).to eq(1)
       end
 
-      it "should create a module item with a replacement uploaded file if in a different module" do
-        local_storage!
+      it "closing the rename dialog should not close the module dialog" do
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
 
+        get "/courses/#{@course.id}/modules"
+
+        # Start the upload, but click Close instead
+        upload_file_item_with_selection(
+          "div#context_module_#{@mod.id} .add_module_item_link",
+          '#attachments_select',
+          fullpath,
+          'Close'
+        )
+
+        # ...then click on the add item button again
+        scroll_to(f('.add_item_button.ui-button'))
+        f('.add_item_button.ui-button').click
+        wait_for_ajaximations
+
+        # now replace the file
+        fj('button:contains("Replace")').click
+        wait_for_ajaximations
+
+        # File should be uploaded and dialog closed
+        expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+        expect(ffj(".context_module_item:contains(#{filename})").length).to eq(1)
+      end
+
+      it "skipping the only file should not close the add item to module dialog" do
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
+
+        get "/courses/#{@course.id}/modules"
+
+        # Start the upload, but click Skip instead
+        upload_file_item_with_selection(
+          "div#context_module_#{@mod.id} .add_module_item_link",
+          '#attachments_select',
+          fullpath,
+          'Skip'
+        )
+
+        # Dialog should be not closed and not uploaded
+        expect(f('body')).to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+        expect(f('body')).not_to contain_jqcss(".context_module_item:contains(#{filename}):visible")
+      end
+
+      it "should not ask to rename upload after folder change" do
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
+
+        get "/courses/#{@course.id}/modules"
+
+        # Start the upload, but click Close instead
+        folder_select = upload_file_item_with_selection(
+          "div#context_module_#{@mod.id} .add_module_item_link",
+          '#attachments_select',
+          fullpath,
+          "Close"
+        )
+
+        # Change to a folder not containing the file
+        folder_select.options[0].click
+
+        # ...then click on the add item button again
+        scroll_to(f('.add_item_button.ui-button'))
+        f('.add_item_button.ui-button').click
+        wait_for_ajaximations
+
+        # File should be uploaded and dialog closed
+        expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+        expect(ffj(".context_module_item:contains(#{filename})").length).to eq(1)
+      end
+
+      it "should create a module item with a replacement uploaded file if in a different module" do
         # create the existing module item
         filename, fullpath, _data = get_file("a_file.txt")
         file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
@@ -473,7 +552,7 @@ describe "context modules" do
         @mod2 = @course.context_modules.create!(:name => "another module")
 
         get "/courses/#{@course.id}/modules"
-        upload_and_replace_file_item("div#context_module_#{@mod2.id} .add_module_item_link", '#attachments_select', fullpath)
+        upload_file_item_with_selection("div#context_module_#{@mod2.id} .add_module_item_link", '#attachments_select', fullpath)
         expect(ffj(".context_module_item:contains(#{filename})").length).to eq(2)
       end
     end
