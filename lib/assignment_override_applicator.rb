@@ -258,8 +258,21 @@ module AssignmentOverrideApplicator
   # assignment_or_quiz all the time?
   def self.setup_overridden_clone(assignment, overrides = [])
     assignment.instance_variable_set(:@readonly_clone, true)
+
+    # avoid dup'ing quiz_data inside here, causing a very slow
+    # serialize/deserialize cycle for a potentially very large blob. we (almost)
+    # always overrwrite our quiz object with the overridden result anyway
+    if assignment.is_a?(::Quizzes::Quiz)
+      quiz_data = assignment.instance_variable_get(:@attributes)['quiz_data']
+      assignment.quiz_data = nil
+    end
+
     clone = assignment.clone
     assignment.instance_variable_set(:@readonly_clone, false)
+    if quiz_data
+      assignment.instance_variable_get(:@attributes)['quiz_data'] = quiz_data
+      clone.instance_variable_get(:@attributes)['quiz_data'] = quiz_data
+    end
 
     # ActiveRecord::Base#clone wipes out some important crap; put it back
     [:id, :updated_at, :created_at].each { |attr|
