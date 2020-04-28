@@ -127,7 +127,7 @@ describe 'DataFixup::Auditors::Migrate' do
       start_date = Time.zone.today
       end_date = start_date - 1.year
       engine = DataFixup::Auditors::Migrate::BackfillEngine.new(start_date, end_date)
-      Setting.set(engine.queue_setting_key, 1)
+      Setting.set(engine.class.queue_setting_key, 1)
       expect(Delayed::Job.count).to eq(0)
       account = Account.default
       expect(account.workflow_state).to eq('active')
@@ -136,6 +136,11 @@ describe 'DataFixup::Auditors::Migrate' do
       # one each per table for the day, and one as the future
       # scheduler thread.
       expect(Delayed::Job.count).to eq(4)
+    end
+
+    it "succeeds in all summary queries" do
+      output = DataFixup::Auditors::Migrate::BackfillEngine.summary
+      expect(output).to_not be_empty
     end
   end
 end
