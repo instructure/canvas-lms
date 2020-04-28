@@ -24,6 +24,7 @@ import ContextModulesLoader from './ContextModulesLoader'
 import CustomColumnsDataLoader from './CustomColumnsDataLoader'
 import CustomColumnsLoader from './CustomColumnsLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
+import SisOverridesLoader from './SisOverridesLoader'
 import StudentContentDataLoader from './StudentContentDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
 
@@ -31,12 +32,12 @@ export default class DataLoader {
   constructor({gradebook, performanceControls}) {
     this._gradebook = gradebook
 
-    this.dispatch = new RequestDispatch({
+    const dispatch = new RequestDispatch({
       activeRequestLimit: performanceControls.activeRequestLimit
     })
 
     const loaderConfig = {
-      dispatch: this.dispatch,
+      dispatch,
       gradebook,
       performanceControls
     }
@@ -46,6 +47,7 @@ export default class DataLoader {
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
     this.customColumnsLoader = new CustomColumnsLoader(loaderConfig)
     this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
+    this.sisOverridesLoader = new SisOverridesLoader(loaderConfig)
     this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
     this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
   }
@@ -69,18 +71,7 @@ export default class DataLoader {
   }
 
   loadOverridesForSIS() {
-    const gradebook = this._gradebook
-    const {options} = gradebook
-
-    const url = `/api/v1/courses/${options.context_id}/assignment_groups`
-    const params = {
-      exclude_assignment_submission_types: ['wiki_page'],
-      exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
-      include: ['assignments', 'grades_published', 'overrides'],
-      override_assignment_dates: false
-    }
-
-    this.dispatch.getDepaginated(url, params).then(gradebook.addOverridesToPostGradesStore)
+    this.sisOverridesLoader.loadOverrides()
   }
 
   reloadStudentDataForEnrollmentFilterChange() {

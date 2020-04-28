@@ -16,34 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
-
-export default class StudentIdsLoader {
+export default class SisOverridesLoader {
   constructor({dispatch, gradebook}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
   }
 
-  loadStudentIds() {
-    let promise
+  loadOverrides() {
+    const courseId = this._gradebook.course.id
+    const url = `/api/v1/courses/${courseId}/assignment_groups`
 
-    /*
-     * When user ids have been prefetched, the data is only known valid for the
-     * first request. Consume it by pulling it out of the prefetch store, which
-     * will force all subsequent requests for user ids to call through the
-     * network.
-     */
-    promise = consumePrefetchedXHR('user_ids')
-    if (promise) {
-      promise = asJson(promise)
-    } else {
-      const courseId = this._gradebook.course.id
-      const url = `/courses/${courseId}/gradebook/user_ids`
-      promise = this._dispatch.getJSON(url)
+    const params = {
+      exclude_assignment_submission_types: ['wiki_page'],
+      exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
+      include: ['assignments', 'grades_published', 'overrides'],
+      override_assignment_dates: false
     }
 
-    return promise.then(data => {
-      this._gradebook.updateStudentIds(data.user_ids)
+    this._dispatch.getDepaginated(url, params).then(data => {
+      this._gradebook.addOverridesToPostGradesStore(data)
     })
   }
 }
