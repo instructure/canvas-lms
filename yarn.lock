@@ -10598,9 +10598,9 @@ graceful-fs@~2.0.3:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-2.0.3.tgz#7cd2cdb228a4a3f36e95efa6cc142de7d1a136d0"
   integrity sha1-fNLNsiiko/Nule+mzBQt59GhNtA=
 
-"graphael@https://github.com/ryankshaw/graphael.git":
+"graphael@https://github.com/instructure/graphael.git":
   version "1.2.0"
-  resolved "https://github.com/ryankshaw/graphael.git#067542642fa240925e4e3dd13153333ae1d3ad60"
+  resolved "https://github.com/instructure/graphael.git#067542642fa240925e4e3dd13153333ae1d3ad60"
   dependencies:
     raphael "^2.1.4"
 
@@ -11530,9 +11530,9 @@ i18nliner-handlebars@^0.2.2:
   dependencies:
     jsdom "~8.5.0"
 
-i18nliner@ryankshaw/i18nliner-js#babel7, i18nliner@~0.2.0:
+i18nliner@instructure/i18nliner-js#babel7, i18nliner@~0.2.0:
   version "0.2.6"
-  resolved "https://codeload.github.com/ryankshaw/i18nliner-js/tar.gz/089da4716c98dc536a8c4f79f187b37697591a03"
+  resolved "https://codeload.github.com/instructure/i18nliner-js/tar.gz/089da4716c98dc536a8c4f79f187b37697591a03"
   dependencies:
     "@babel/parser" "^7"
     "@babel/traverse" "^7"
@@ -13134,9 +13134,9 @@ jquery.elastic@1.0.0:
   dependencies:
     jquery ">=1.5"
 
-jquery@2.x, jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS":
+jquery@2.x, jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS":
   version "1.7.2"
-  resolved "https://github.com/ryankshaw/jquery.git#3a48a84c713291b790a2556d9ba036ec4d53c52f"
+  resolved "https://github.com/instructure/jquery.git#3a48a84c713291b790a2556d9ba036ec4d53c52f"
 
 js-base64@^2.1.8, js-base64@^2.1.9:
   version "2.5.1"
@@ -21917,9 +21917,9 @@ xmlhttprequest-ssl@~1.5.4:
   resolved "https://registry.yarnpkg.com/xmlhttprequest-ssl/-/xmlhttprequest-ssl-1.5.5.tgz#c2876b06168aadc40e57d97e81191ac8f4398b3e"
   integrity sha1-wodrBhaKrcQOV9l+gRkayPQ5iz4=
 
-xsslint@ryankshaw/xsslint#babel7:
+xsslint@instructure/xsslint#babel7:
   version "0.1.5"
-  resolved "https://codeload.github.com/ryankshaw/xsslint/tar.gz/2ef5f95c4eec8494b213d6c25f92615edd26ca50"
+  resolved "https://codeload.github.com/instructure/xsslint/tar.gz/2ef5f95c4eec8494b213d6c25f92615edd26ca50"
   dependencies:
     "@babel/parser" "^7"
     "@babel/traverse" "^7"
