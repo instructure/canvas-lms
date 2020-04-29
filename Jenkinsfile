@@ -52,9 +52,9 @@ def skipIfPreviouslySuccessful(name, block) {
   }
 }
 
-def wrapBuildExecution(jobName, parameters, urlExtra) {
+def wrapBuildExecution(jobName, parameters, propagate, urlExtra) {
   try {
-    build(job: jobName, parameters: parameters)
+    build(job: jobName, parameters: parameters, propagate: propagate)
   }
   catch(FlowInterruptedException ex) {
     // if its this type, then that means its a build failure.
@@ -313,21 +313,21 @@ pipeline {
           echo 'adding Vendored Gems'
           stages['Vendored Gems'] = {
             skipIfPreviouslySuccessful("vendored-gems") {
-              wrapBuildExecution('test-suites/vendored-gems', buildParameters, "")
+              wrapBuildExecution('test-suites/vendored-gems', buildParameters, true, "")
             }
           }
 
           echo 'adding Javascript'
           stages['Javascript'] = {
             skipIfPreviouslySuccessful("javascript") {
-              wrapBuildExecution('test-suites/JS', buildParameters, "testReport")
+              wrapBuildExecution('test-suites/JS', buildParameters, true, "testReport")
             }
           }
 
           echo 'adding Contract Tests'
           stages['Contract Tests'] = {
             skipIfPreviouslySuccessful("contract-tests") {
-              wrapBuildExecution('test-suites/contract-tests', buildParameters, "")
+              wrapBuildExecution('test-suites/contract-tests', buildParameters, true, "")
             }
           }
 
@@ -335,7 +335,7 @@ pipeline {
             echo 'adding Flakey Spec Catcher'
             stages['Flakey Spec Catcher'] = {
               skipIfPreviouslySuccessful("flakey-spec-catcher") {
-                wrapBuildExecution('test-suites/flakey-spec-catcher', buildParameters, "")
+                wrapBuildExecution('test-suites/flakey-spec-catcher', buildParameters, false, "")
               }
             }
           }
