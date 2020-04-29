@@ -32,6 +32,11 @@ def getImageTagVersion() {
   return flags.getImageTagVersion()
 }
 
+def getForceFailureFSC() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return flags.isForceFailureFSC() ? '1' : '0'
+}
+
 def computeTestCount() {
   // oops, probably should have added an easier way to _count_ tests...
   sh 'rm -vrf tmp'
@@ -123,6 +128,7 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml:docker-compose.new-jenkins-flakey-spec-catcher.yml'
+    FORCE_FAILURE = getForceFailureFSC()
     // there will be a node for every 10 tests
     DISTRIBUTED_FACTOR = '10'
     // this causes distribution to trigger at an offset
@@ -153,6 +159,7 @@ pipeline {
     }
 
     stage("Compute Build Distribution") {
+      when { expression { FORCE_FAILURE != '1' } }
       steps {
         script {
           computeTestCount()
@@ -163,10 +170,14 @@ pipeline {
     }
 
     stage("Run Flakey Spec Catcher") {
-      when { expression { result_test_count > 0 } }
+      when { expression { result_test_count > 0 || FORCE_FAILURE == '1' } }
       steps {
         script {
-          if (result_node_count <= 1) {
+          if (FORCE_FAILURE == '1') {
+            echo "running force failure"
+            executeFlakeySpecCatcher()
+          }
+          else if (result_node_count <= 1) {
             echo "running on this node"
             executeFlakeySpecCatcher()
           }
