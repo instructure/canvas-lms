@@ -34,7 +34,7 @@ class MultiCache
     end
 
     def reset
-      @multi_cache = nil
+      remove_instance_variable(:@multi_cache) if instance_variable_defined?(:@multi_cache)
     end
   end
 
