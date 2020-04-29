@@ -133,6 +133,7 @@ pipeline {
     // fsc errors when running specs from gems.
     // until we figure out how to run them, we should ignore them
     FSC_IGNORE_FILES = "gems/.*/spec/"
+    POSTGRES_PASSWORD = 'sekret'
   }
 
   stages {

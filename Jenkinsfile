@@ -335,7 +335,7 @@ pipeline {
             echo 'adding Flakey Spec Catcher'
             stages['Flakey Spec Catcher'] = {
               skipIfPreviouslySuccessful("flakey-spec-catcher") {
-                wrapBuildExecution('test-suites/flakey-spec-catcher', buildParameters, false, "")
+                wrapBuildExecution('test-suites/flakey-spec-catcher', buildParameters, true, "")
               }
             }
           }
