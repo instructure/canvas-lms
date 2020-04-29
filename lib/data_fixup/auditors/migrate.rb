@@ -170,7 +170,206 @@ module DataFixup::Auditors
     # It will take care of re-scheduling itself until that backfill window is covered.
     class BackfillEngine
       DEFAULT_DEPTH_THRESHOLD = 100000
+      DEFAULT_SCHEDULING_INTERVAL = 150
+      # these jobs are all low-priority,
+      # so high-ish parallelism is ok
+      # (they mostly run in a few minutes or less).
+      # we'll wind it down on clusters that are
+      # in trouble if necessary.  For clusters
+      # taking a long time, grades parallelism
+      # could actually be increased very substantially overnight
+      # as they will not try to overwrite each other.
+      DEFAULT_PARALLELISM_GRADES = 200
+      DEFAULT_PARALLELISM_COURSES = 100
+      DEFAULT_PARALLELISM_AUTHS = 50
       LOG_PREFIX = "Auditors PG Backfill - ".freeze
+      WORKER_TAGS = [
+        "DataFixup::Auditors::Migrate::CourseWorker#perform".freeze,
+        "DataFixup::Auditors::Migrate::GradeChangeWorker#perform".freeze,
+        "DataFixup::Auditors::Migrate::AuthenticationWorker#perform".freeze
+      ].freeze
+
+      class << self
+        def queue_depth
+          Delayed::Job.where("run_at < ?", Time.zone.now).count
+        end
+
+        def backfill_jobs
+          Delayed::Job.where("tag IN ('#{WORKER_TAGS.join("','")}')")
+        end
+
+        def other_jobs
+          Delayed::Job.where("tag NOT IN ('#{WORKER_TAGS.join("','")}')")
+        end
+
+        def schedular_jobs
+          Delayed::Job.where(tag: "DataFixup::Auditors::Migrate::BackfillEngine#perform")
+        end
+
+        def failed_jobs
+          backfill_jobs.failed
+        end
+
+        def running_jobs
+          backfill_jobs.where("locked_by IS NOT NULL")
+        end
+
+        def completed_cells
+          Auditors::ActiveRecord::MigrationCell.where(completed: true)
+        end
+
+        def failed_cells
+          Auditors::ActiveRecord::MigrationCell.where(failed: true, completed: false)
+        end
+
+        def jobs_id
+          shard = Shard.current
+          (shard.respond_to?(:delayed_jobs_shard_id) ? shard.delayed_jobs_shard_id : "")
+        end
+
+        def queue_setting_key
+          "auditors_backfill_queue_threshold_jobs#{jobs_id}"
+        end
+
+        def backfill_key
+          "auditors_backfill_interval_seconds_jobs#{jobs_id}"
+        end
+
+        def queue_threshold
+          Setting.get(queue_setting_key, DEFAULT_DEPTH_THRESHOLD).to_i
+        end
+
+        def backfill_interval
+          Setting.get(backfill_key, DEFAULT_SCHEDULING_INTERVAL).to_i.seconds
+        end
+
+        def cluster_name
+          Shard.current.database_server_id
+        end
+
+        def parallelism_key(auditor_type)
+          "auditors_migration_#{auditor_type}/#{cluster_name}_num_strands"
+        end
+
+        def check_parallelism
+          {
+            grade_changes: Setting.get(parallelism_key("grade_changes"), 1),
+            courses: Setting.get(parallelism_key("courses"), 1),
+            authentications: Setting.get(parallelism_key("authentications"), 1)
+          }
+        end
+
+        def longest_running(on_shard: false)
+          longest_scope = running_jobs
+          if on_shard
+            longest_scope = longest_scope.where(shard_id: Shard.current.id)
+          end
+          longest = longest_scope.order(:locked_at).first
+          return {} if longest.blank?
+          {
+            id: longest.id,
+            elapsed_seconds: (Time.now.utc - longest.locked_at),
+            locked_by: longest.locked_by
+          }
+        end
+
+        def update_parallelism!(hash)
+          hash.each do |auditor_type, parallelism_value|
+            Setting.set(parallelism_key(auditor_type), parallelism_value)
+          end
+          p_settings = check_parallelism
+          gc_tag = 'DataFixup::Auditors::Migrate::GradeChangeWorker#perform'
+          Delayed::Job.where(tag: gc_tag, locked_by: nil).update_all(max_concurrent: p_settings[:grade_changes])
+          course_tag = 'DataFixup::Auditors::Migrate::CourseWorker#perform'
+          Delayed::Job.where(tag: course_tag, locked_by: nil).update_all(max_concurrent: p_settings[:courses])
+          auth_tag = 'DataFixup::Auditors::Migrate::AuthenticationWorker#perform'
+          Delayed::Job.where(tag: auth_tag, locked_by: nil).update_all(max_concurrent: p_settings[:authentications])
+        end
+
+        # only set parallelism if it is not currently set at all.
+        # If it's already been set (either from previous preset or
+        # by manual action) it will have a > 0 value and this will
+        # just exit after checking each setting
+        def preset_parallelism!
+          if Setting.get(parallelism_key("grade_changes"), -1).to_i < 0
+            Setting.set(parallelism_key("grade_changes"), DEFAULT_PARALLELISM_GRADES)
+          end
+          if Setting.get(parallelism_key("courses"), -1).to_i < 0
+            Setting.set(parallelism_key("courses"), DEFAULT_PARALLELISM_COURSES)
+          end
+          if Setting.get(parallelism_key("authentications"), -1).to_i < 0
+            Setting.set(parallelism_key("authentications"), DEFAULT_PARALLELISM_AUTHS)
+          end
+        end
+
+        def working_dates(current_jobs_scope)
+          current_jobs_scope.pluck(:handler).map{|h| YAML.unsafe_load(h).instance_variable_get(:@date) }.uniq
+        end
+
+        def shard_summary
+          {
+            'total_depth': queue_depth,
+            'backfill': backfill_jobs.where(shard_id: Shard.current.id).count,
+            'others': other_jobs.where(shard_id: Shard.current.id).count,
+            'failed': failed_jobs.where(shard_id: Shard.current.id).count,
+            'currently_running': running_jobs.where(shard_id: Shard.current.id).count,
+            'completed_cells': completed_cells.count,
+            'dates_being_worked': working_dates(running_jobs.where(shard_id: Shard.current.id)),
+            'config': {
+              'threshold': "#{queue_threshold} jobs",
+              'interval': "#{backfill_interval} seconds",
+              'parallelism': check_parallelism
+            },
+            'longest_runner': longest_running(on_shard: true),
+            'schedular_job_ids': schedular_jobs.where(shard_id: Shard.current.id).map(&:id)
+          }
+        end
+
+        def summary
+          {
+            'total_depth': queue_depth,
+            'backfill': backfill_jobs.count,
+            'others': other_jobs.count,
+            'failed': failed_jobs.count,
+            'currently_running': running_jobs.count,
+            'completed_cells': completed_cells.count,
+            'dates_being_worked': working_dates(running_jobs),
+            'config': {
+              'threshold': "#{queue_threshold} jobs",
+              'interval': "#{backfill_interval} seconds",
+              'parallelism': check_parallelism
+            },
+            'longest_runner': longest_running,
+            'schedular_job_ids': schedular_jobs.map(&:id)
+          }
+        end
+
+        def date_summaries(start_date, end_date)
+          cur_date = start_date
+          output = {}
+          while cur_date <= end_date
+            cells = completed_cells.where(year: cur_date.year, month: cur_date.month, day: cur_date.day)
+            output[cur_date.to_s] = cells.count
+            cur_date += 1.day
+          end
+          output
+        end
+
+        def scan_for_holes(start_date, end_date)
+          summaries = date_summaries(start_date, end_date)
+          max_count = summaries.values.max
+          {
+            'max_value': max_count,
+            'holes': summaries.keep_if{|_,v| v < max_count}
+          }
+        end
+
+        def log(message)
+          Rails.logger.info("#{LOG_PREFIX} #{message}")
+        end
+
+      end
+
       def initialize(start_date, end_date)
         if start_date < end_date
           raise "You probably didn't read the comment on this job..."
@@ -179,18 +378,20 @@ module DataFixup::Auditors
         @end_date = end_date
       end
 
-      def queue_setting_key
-        shard = Shard.current
-        jobs_id = (shard.respond_to?(:delayed_jobs_shard_id) ? shard.delayed_jobs_shard_id : "")
-        "auditors_backfill_queue_threshold_jobs#{jobs_id}"
+      def log(message)
+        self.class.log(message)
       end
 
       def queue_threshold
-        Setting.get(queue_setting_key, DEFAULT_DEPTH_THRESHOLD).to_i
+        self.class.queue_threshold
+      end
+
+      def backfill_interval
+        self.class.backfill_interval
       end
 
       def queue_depth
-        Delayed::Job.where("run_at < ?", Time.zone.now).count
+        self.class.queue_depth
       end
 
       def slim_accounts
@@ -198,7 +399,7 @@ module DataFixup::Auditors
       end
 
       def cluster_name
-        Shard.current.database_server_id
+        self.class.cluster_name
       end
 
       def enqueue_one_day(current_date)
@@ -219,22 +420,30 @@ module DataFixup::Auditors
         end
       end
 
+      def singleton_tag
+        "AuditorsBackfillEngine::Shard_#{Shard.current.id}::Range_#{@start_date}_#{@end_date}"
+      end
+
       def perform
-        Rails.logger.info("#{LOG_PREFIX} Scheduling Auditors Backfill!")
+        self.class.preset_parallelism!
+        log("Scheduling Auditors Backfill!")
         current_date = @start_date
         while current_date >= @end_date
-          break if queue_depth >= queue_threshold
+          if queue_depth >= queue_threshold
+            log("Queue too deep (#{queue_depth}) for threshold (#{queue_threshold}), throttling...")
+            break
+          end
           enqueue_one_day(current_date)
-          Rails.logger.info("#{LOG_PREFIX} Scheduled Backfill for #{current_date} on #{Shard.current.id}")
+          log("Scheduled Backfill for #{current_date} on #{Shard.current.id}")
           current_date -= 1.day
         end
         if current_date >= @end_date
           schedule_worker = BackfillEngine.new(current_date, @end_date)
           next_time = Time.now.utc + 5.minutes
-          Rails.logger.info("#{LOG_PREFIX} More work to do. Scheduling another job for #{next_time}")
-          Delayed::Job.enqueue(schedule_worker, run_at: next_time, priority: Delayed::LOW_PRIORITY)
+          log("More work to do. Scheduling another job for #{next_time}")
+          Delayed::Job.enqueue(schedule_worker, run_at: next_time, priority: Delayed::LOW_PRIORITY, singleton: singleton_tag)
         else
-          Rails.logger.info("#{LOG_PREFIX} WE DID IT.  Shard #{Shard.current.id} has auditors migrated (probably, check the migration cell records to be sure)")
+          log("WE DID IT.  Shard #{Shard.current.id} has auditors migrated (probably, check the migration cell records to be sure)")
         end
       end
     end
