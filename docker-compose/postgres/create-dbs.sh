@@ -10,7 +10,7 @@ psql -v ON_ERROR_STOP=1 --username postgres -d template1 <<SQL
   CREATE EXTENSION IF NOT EXISTS pg_collkey SCHEMA public;
 SQL
 
-for environment in test development produciton; do
+for environment in test development production; do
   psql -v ON_ERROR_STOP=1 --username postgres <<SQL
     CREATE DATABASE canvas_${environment};
 SQL
