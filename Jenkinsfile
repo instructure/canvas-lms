@@ -335,7 +335,9 @@ pipeline {
             echo 'adding Flakey Spec Catcher'
             stages['Flakey Spec Catcher'] = {
               skipIfPreviouslySuccessful("flakey-spec-catcher") {
-                wrapBuildExecution('test-suites/flakey-spec-catcher', buildParameters, true, "")
+                def propagate = load('build/new-jenkins/groovy/configuration.groovy').fscPropagate()
+                echo "fsc propagation: $propagate"
+                wrapBuildExecution('test-suites/flakey-spec-catcher', buildParameters, propagate, "")
               }
             }
           }
