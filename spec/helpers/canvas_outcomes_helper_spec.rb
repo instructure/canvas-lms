@@ -36,45 +36,58 @@ describe CanvasOutcomesHelper do
   describe '#set_outcomes_alignment_js_env' do
     let(:wiki_page) { create_page title: "title text", body: "body text" }
 
-    it 'raises error on invalid artifact type' do
-      expect { subject.set_outcomes_alignment_js_env(account, account, {}) }.to raise_error('Unsupported artifact type: Account')
-    end
-
-    shared_examples_for 'valid js_env settings' do
-      it 'sets js_env values' do
-        expect(subject).to receive(:extract_domain_jwt).and_return ['domain', 'jwt']
-        expect(subject).to receive(:js_env).with({
-          canvas_outcomes: {
-            artifact_type: 'canvas.page',
-            artifact_id: wiki_page.id,
-            context_uuid: account.uuid,
-            host: expected_host,
-            jwt: 'jwt',
-            extra_key: 'extra_value'
-          }
-        })
-        subject.set_outcomes_alignment_js_env(wiki_page, account, extra_key: 'extra_value')
+    context 'without outcomes' do
+      it 'does not set JS_ENV' do
+        expect(subject).not_to receive(:js_env)
+        subject.set_outcomes_alignment_js_env(wiki_page, account, {})
       end
     end
 
-    context 'without overriding protocol' do
-      let(:expected_host) { 'http://domain' }
-
-      it_behaves_like 'valid js_env settings'
-    end
-
-    context 'overriding protocol' do
-      let(:expected_host) { 'https://domain' }
-
+    context 'with outcomes' do
       before do
-        ENV['OUTCOMES_SERVICE_PROTOCOL'] = 'https'
+        outcome_model(context: account)
       end
 
-      after do
-        ENV.delete('OUTCOMES_SERVICE_PROTOCOL')
+      it 'raises error on invalid artifact type' do
+        expect { subject.set_outcomes_alignment_js_env(account, account, {}) }.to raise_error('Unsupported artifact type: Account')
       end
 
-      it_behaves_like 'valid js_env settings'
+      shared_examples_for 'valid js_env settings' do
+        it 'sets js_env values' do
+          expect(subject).to receive(:extract_domain_jwt).and_return ['domain', 'jwt']
+          expect(subject).to receive(:js_env).with({
+            canvas_outcomes: {
+              artifact_type: 'canvas.page',
+              artifact_id: wiki_page.id,
+              context_uuid: account.uuid,
+              host: expected_host,
+              jwt: 'jwt',
+              extra_key: 'extra_value'
+            }
+          })
+          subject.set_outcomes_alignment_js_env(wiki_page, account, extra_key: 'extra_value')
+        end
+      end
+
+      context 'without overriding protocol' do
+        let(:expected_host) { 'http://domain' }
+
+        it_behaves_like 'valid js_env settings'
+      end
+
+      context 'overriding protocol' do
+        let(:expected_host) { 'https://domain' }
+
+        before do
+          ENV['OUTCOMES_SERVICE_PROTOCOL'] = 'https'
+        end
+
+        after do
+          ENV.delete('OUTCOMES_SERVICE_PROTOCOL')
+        end
+
+        it_behaves_like 'valid js_env settings'
+      end
     end
   end
 

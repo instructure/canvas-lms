@@ -25,7 +25,7 @@
     "@instructure/debounce": "~6.24.0",
     "@instructure/js-utils": ">=1",
     "@instructure/media-capture": "~7.1.0",
-    "@instructure/outcomes-ui": "^1.1.0",
+    "@instructure/outcomes-ui": "^1.1.6",
     "@instructure/react-crop": "^5.0.1",
     "@instructure/reactour": "https://github.com/instructure/reactour#master",
     "@instructure/ready": ">=1",
