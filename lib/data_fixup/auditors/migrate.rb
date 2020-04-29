@@ -183,6 +183,7 @@ module DataFixup::Auditors
       DEFAULT_PARALLELISM_COURSES = 100
       DEFAULT_PARALLELISM_AUTHS = 50
       LOG_PREFIX = "Auditors PG Backfill - ".freeze
+      SCHEDULAR_TAG = "DataFixup::Auditors::Migrate::BackfillEngine#perform"
       WORKER_TAGS = [
         "DataFixup::Auditors::Migrate::CourseWorker#perform".freeze,
         "DataFixup::Auditors::Migrate::GradeChangeWorker#perform".freeze,
@@ -190,20 +191,32 @@ module DataFixup::Auditors
       ].freeze
 
       class << self
+        def non_future_queue
+          Delayed::Job.where("run_at <= ?", Time.zone.now)
+        end
+
         def queue_depth
-          Delayed::Job.where("run_at < ?", Time.zone.now).count
+          non_future_queue.count
+        end
+
+        def queue_tag_counts
+          non_future_queue.pluck(:tag).group_by(&:itself).transform_values(&:count)
+        end
+
+        def running_tag_counts
+          Delayed::Job.where("run_at <= ?", Time.zone.now).where('locked_by IS NOT NULL').pluck(:tag).group_by(&:itself).transform_values(&:count)
         end
 
         def backfill_jobs
-          Delayed::Job.where("tag IN ('#{WORKER_TAGS.join("','")}')")
+          non_future_queue.where("tag IN ('#{WORKER_TAGS.join("','")}')")
         end
 
         def other_jobs
-          Delayed::Job.where("tag NOT IN ('#{WORKER_TAGS.join("','")}')")
+          non_future_queue.where("tag NOT IN ('#{WORKER_TAGS.join("','")}')")
         end
 
         def schedular_jobs
-          Delayed::Job.where(tag: "DataFixup::Auditors::Migrate::BackfillEngine#perform")
+          Delayed::Job.where(tag: SCHEDULAR_TAG)
         end
 
         def failed_jobs
@@ -368,6 +381,13 @@ module DataFixup::Auditors
           Rails.logger.info("#{LOG_PREFIX} #{message}")
         end
 
+        def force_run_schedulars(id)
+          d_worker = Delayed::Worker.new
+          sched_job = Delayed::Job.find(id)
+          sched_job.update(locked_by: 'force_run', locked_at: Time.now.utc)
+          d_worker.perform(sched_job)
+        end
+
       end
 
       def initialize(start_date, end_date)
@@ -420,8 +440,8 @@ module DataFixup::Auditors
         end
       end
 
-      def singleton_tag
-        "AuditorsBackfillEngine::Shard_#{Shard.current.id}::Range_#{@start_date}_#{@end_date}"
+      def schedular_strand_tag
+        "AuditorsBackfillEngine::Shard_#{Shard.current.id}"
       end
 
       def perform
@@ -439,14 +459,70 @@ module DataFixup::Auditors
         end
         if current_date >= @end_date
           schedule_worker = BackfillEngine.new(current_date, @end_date)
-          next_time = Time.now.utc + 5.minutes
+          next_time = Time.now.utc + backfill_interval
           log("More work to do. Scheduling another job for #{next_time}")
-          Delayed::Job.enqueue(schedule_worker, run_at: next_time, priority: Delayed::LOW_PRIORITY, singleton: singleton_tag)
+          Delayed::Job.enqueue(schedule_worker, run_at: next_time, priority: Delayed::LOW_PRIORITY, strand: schedular_strand_tag)
         else
           log("WE DID IT.  Shard #{Shard.current.id} has auditors migrated (probably, check the migration cell records to be sure)")
         end
       end
     end
 
+    # useful for generating cassandra records in test environments
+    # to make migration practice more real.
+    # Probably should never run in production.  Ever.
+    class DataFixtures
+      # pulled from one day on FFT
+      # as a sample size
+      AUTH_VOLUME = 275000
+      COURSE_VOLUME = 8000
+      GRADE_CHANGE_VOLUME = 175000
+
+      def generate_authentications
+        puts("generating auth records...")
+        pseudonyms = Pseudonym.active.limit(2000)
+        event_count = 0
+        while event_count < AUTH_VOLUME
+          event_record = Auditors::Authentication::Record.generate(pseudonyms.sample, 'login')
+          Auditors::Authentication::Stream.insert(event_record, {backend_strategy: :cassandra})
+          event_count += 1
+          puts("...#{event_count}") if event_count % 1000 == 0
+        end
+      end
+
+      def generate_courses
+        puts("generating course event records...")
+        courses = Course.active.limit(1000)
+        users = User.active.limit(1000)
+        event_count = 0
+        while event_count < COURSE_VOLUME
+          event_record = Auditors::Course::Record.generate(courses.sample, users.sample, 'published', {}, {})
+          Auditors::Course::Stream.insert(event_record, {backend_strategy: :cassandra}) if Auditors.write_to_cassandra?
+          event_count += 1
+          puts("...#{event_count}") if event_count % 1000 == 0
+        end
+      end
+
+      def generate_grade_changes
+        puts("generating grade change records...")
+        assignments = Assignment.active.limit(10000)
+        event_count = 0
+        while event_count < GRADE_CHANGE_VOLUME
+          assignment = assignments.sample
+          assignment.submissions.each do |sub|
+            event_record = Auditors::GradeChange::Record.generate(sub, 'graded')
+            Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :cassandra}) if Auditors.write_to_cassandra?
+            event_count += 1
+            puts("...#{event_count}") if event_count % 1000 == 0
+          end
+        end
+      end
+
+      def generate
+        generate_authentications
+        generate_courses
+        generate_grade_changes
+      end
+    end
   end
 end
