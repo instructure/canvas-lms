@@ -205,7 +205,7 @@ class ApplicationController < ActionController::Base
         end
 
         @js_env[:lolcalize] = true if ENV['LOLCALIZE']
-        @js_env[:rce_auto_save_max_age_ms] = Setting.get('rce_auto_save_max_age_ms', 1.hour.to_i * 1000).to_i if @js_env[:rce_auto_save]
+        @js_env[:rce_auto_save_max_age_ms] = Setting.get('rce_auto_save_max_age_ms', 1.day.to_i * 1000).to_i if @js_env[:rce_auto_save]
       end
     end
 
