@@ -19,6 +19,6 @@ class RemoveForeignKeyToNotification < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def up
-    remove_foreign_key_if_exists :notification_policy_override, column: :notification_id
+    remove_foreign_key_if_exists :notification_policy_overrides, column: :notification_id
   end
 end
