@@ -65,8 +65,8 @@ module CanvasRails
     # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
     config.time_zone = 'UTC'
 
-    log_config = File.exist?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[Rails.env]
-    log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
+    log_config = Rails.application.config_for(:logging) rescue {}
+    log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config)
     opts = {}
     require 'canvas_logger'
 
