@@ -410,6 +410,12 @@ describe ContextModule do
       expect(empty.content_tags.order(:position).pluck(:title)).to eq(%w(attach assign))
     end
 
+    it "sets the indent to 0" do
+      empty = @course.context_modules.create! name: 'empty'
+      empty.insert_items([@attach, @assign])
+      expect(empty.content_tags.pluck(:indent)).to eq([0, 0])
+    end
+
     it "doesn't add weird things to a module" do
       @module.insert_items([@attach, user_model, 'foo', @assign])
       expect(@module.content_tags.order(:position).pluck(:title)).to eq(
