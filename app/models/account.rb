@@ -278,6 +278,8 @@ class Account < ActiveRecord::Base
   add_setting :limit_parent_app_web_access, boolean: true, default: false
   add_setting :kill_joy, boolean: true, default: false, root_only: true
 
+  add_setting :disable_post_to_sis_when_grading_period_closed, boolean: true, root_only: true, default: false
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
@@ -1906,5 +1908,12 @@ class Account < ActiveRecord::Base
 
   def user_needs_verification?(user)
     self.require_confirmed_email? && (user.nil? || !user.cached_active_emails.any?)
+  end
+
+  def allow_disable_post_to_sis_when_grading_period_closed?
+    return false unless root_account?
+    return false unless feature_enabled?(:disable_post_to_sis_when_grading_period_closed)
+
+    Account.site_admin.feature_enabled?(:new_sis_integrations)
   end
 end

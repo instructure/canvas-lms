@@ -244,4 +244,8 @@ Rails.configuration.after_initialize do
   Delayed::Periodic.cron 'Feature.remove_obsolete_flags', '0 8 * * 0', priority: Delayed::LOWER_PRIORITY do
     with_each_shard_by_database(Feature, :remove_obsolete_flags)
   end
+
+  Delayed::Periodic.cron "Assignment.disable_post_to_sis_if_grading_period_closed", "*/5 * * * *", priority: Delayed::LOWER_PRIORITY do
+    with_each_shard_by_database(Assignment, :disable_post_to_sis_if_grading_period_closed)
+  end
 end
