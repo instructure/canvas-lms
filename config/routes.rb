@@ -2395,6 +2395,15 @@ CanvasRails::Application.routes.draw do
       put "/developer_key/update_public_jwk", action: :update, as: :public_jwk_update
     end
 
+    # Context External Tools Service
+    scope(controller: 'lti/account_external_tools') do
+      post "/accounts/:account_id/external_tools", action: :create, as: :account_external_tools_create
+      get "/accounts/:account_id/external_tools/:external_tool_id", action: :show, as: :account_external_tools_show
+      put "/accounts/:account_id/external_tools/:external_tool_id", action: :update, as: :account_external_tools_update
+      get "/accounts/:account_id/external_tools", action: :index, as: :account_external_tools_index
+      delete "/accounts/:account_id/external_tools/:external_tool_id", action: :destroy, as: :account_external_tools_destroy
+    end
+
     # Data Services Service
     scope(controller: 'lti/data_services') do
       post "/accounts/:account_id/data_services", action: :create, as: :data_services_create
