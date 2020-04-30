@@ -25,5 +25,5 @@ docker pull $REGISTRY_BASE/cassandra:2.2 || \
 
 # dynamodb-local
 docker pull $REGISTRY_BASE/dynamodb-local || \
-  (docker build -t $REGISTRY_BASE/dynamodb-local build/docker-compose/dynamodb/Dockerfile && \
+  (docker build -t $REGISTRY_BASE/dynamodb-local build/docker-compose/dynamodb && \
   docker push $REGISTRY_BASE/dynamodb-local)
