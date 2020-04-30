@@ -14181,7 +14181,7 @@ lodash@2.4.1:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-2.4.1.tgz#5b7723034dda4d262e5a46fb2c58d7cc22f71420"
   integrity sha1-W3cjA03aTSYuWkb7LFjXzCL3FCA=
 
-"lodash@4.6.1 || ^4.16.1", "lodash@>=3.5 <5", lodash@>=4.17.4, lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.4, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@x, lodash@~4.17.10:
+"lodash@4.6.1 || ^4.16.1", "lodash@>=3.5 <5", lodash@>=4.17.4, lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.10, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.4, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@x, lodash@~4.17.10:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
@@ -21099,6 +21099,13 @@ use-debounce@^3:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/use-debounce/-/use-debounce-3.1.0.tgz#05a5c8cd3c2f309699f08961d7c8bbe7f68720bb"
   integrity sha512-DEf3L/ZKkOSTARk/DHlC6KAAJKwMqpck8Zx06SM2Wr+LfU1TzhO8hZRzB/qbpSQqREYWQes24n1q9doeTMqF4g==
+
+use-media-set@^1.1:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/use-media-set/-/use-media-set-1.1.0.tgz#df55d7a6a18f34bf7d541e8c6e1f6e63d83ef192"
+  integrity sha512-AqaNq7vDwgT73LTPUyY3AumDwBeD/TqCVgQPvYMWPmyH6G4C1xuWb31JH2yaAOfdxO+ZujiTzBr9UU5OAHPLVA==
+  dependencies:
+    lodash "^4.10"
 
 use-sidecar@^1.0.1:
   version "1.0.2"
