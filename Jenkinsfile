@@ -299,9 +299,11 @@ pipeline {
             echo 'adding Linters'
             stages['Linters'] = {
               skipIfPreviouslySuccessful("linters") {
-                sh 'build/new-jenkins/linters/run-gergich.sh'
+                def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+                credentials.withGerritCredentials {
+                  sh 'build/new-jenkins/linters/run-gergich.sh'
+                }
                 if (env.MASTER_BOUNCER_RUN == '1' && env.GERRIT_EVENT_TYPE == 'patchset-created') {
-                  def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
                   credentials.withMasterBouncerCredentials {
                     sh 'build/new-jenkins/linters/run-master-bouncer.sh'
                   }
