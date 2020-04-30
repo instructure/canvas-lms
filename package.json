@@ -43,6 +43,7 @@
     "@instructure/ui-editable": "~6.24.0",
     "@instructure/ui-elements": "~6.24.0",
     "@instructure/ui-file-drop": "~6.24.0",
+    "@instructure/ui-flex": "~6.24.0",
     "@instructure/ui-focusable": "~6.24.0",
     "@instructure/ui-form-field": "~6.24.0",
     "@instructure/ui-forms": "~6.24.0",

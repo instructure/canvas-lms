@@ -1811,7 +1811,7 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-flex@6", "@instructure/ui-flex@^6.17.0", "@instructure/ui-flex@^6.24.0":
+"@instructure/ui-flex@6", "@instructure/ui-flex@^6.17.0", "@instructure/ui-flex@^6.24.0", "@instructure/ui-flex@~6.24.0":
   version "6.24.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-flex/-/ui-flex-6.24.0.tgz#ae37bb9dc4f8100f75800413d8d812a87bcf841e"
   integrity sha512-HdmEQ7wwnVfC43rNZgDB3BTFJrJMCTyqvX8eEVF4pd4dTlm3YU/cMeik7T7C/QHjFVniJzKn3xdwbnbRJ53dMQ==
