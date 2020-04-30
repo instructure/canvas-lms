@@ -32,13 +32,13 @@ module Auditors::ActiveRecord
         attrs_hash['uuid'] = record.id
         attrs_hash['account_id'] = record.account.id
         attrs_hash['root_account_id'] = record.root_account.id
-        attrs_hash['assignment_id'] = record.assignment.id
-        attrs_hash['context_id'] = record.context.id
-        attrs_hash['grader_id'] = record.grader&.id
+        attrs_hash['assignment_id'] = Shard.relative_id_for(record.assignment_id, Shard.current, Shard.current)
+        attrs_hash['context_id'] = Shard.relative_id_for(record.context_id, Shard.current, Shard.current)
+        attrs_hash['grader_id'] = Shard.relative_id_for(record.grader_id, Shard.current, Shard.current)
         attrs_hash['graded_anonymously'] ||= false
-        attrs_hash['student_id'] = record.student.id
-        attrs_hash['submission_id'] = record.submission.id
-        attrs_hash['submission_version_number'] = record.submission.version_number
+        attrs_hash['student_id'] = Shard.relative_id_for(record.student_id, Shard.current, Shard.current)
+        attrs_hash['submission_id'] = Shard.relative_id_for(record.submission_id, Shard.current, Shard.current)
+        attrs_hash['submission_version_number'] = record.version_number
         attrs_hash
       end
     end
