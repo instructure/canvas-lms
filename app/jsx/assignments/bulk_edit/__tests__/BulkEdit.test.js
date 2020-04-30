@@ -517,19 +517,19 @@ describe('Assignment Bulk Edit Dates', () => {
 
     it('displays checkboxes for each main assignment', async () => {
       const {getByText, getAllByText, assignments} = await renderBulkEditAndWait()
-      expect(getAllByText('Select assignment')).toHaveLength(assignments.length)
+      expect(getAllByText(/Select assignment:/)).toHaveLength(assignments.length)
       expect(getByText('0 assignments selected')).toBeInTheDocument()
     })
 
     it('disables checkboxes for assignments that cannot be edited', async () => {
       const {getAllByLabelText} = await renderBulkEditAndWait({}, restrictedAssignmentResponse())
-      expect(getAllByLabelText('Select assignment')[0].disabled).toBe(true)
-      expect(getAllByLabelText('Select assignment')[1].disabled).toBe(true)
+      expect(getAllByLabelText(/Select assignment:/)[0].disabled).toBe(true)
+      expect(getAllByLabelText(/Select assignment:/)[1].disabled).toBe(true)
     })
 
     it('allows assignments to be checked individually', async () => {
       const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait()
-      const checkboxes = getAllByLabelText('Select assignment')
+      const checkboxes = getAllByLabelText(/Select assignment:/)
       fireEvent.click(checkboxes[0])
       expect(checkboxes[0].checked).toBe(true)
       expect(checkboxes[1].checked).toBe(false)
@@ -551,7 +551,7 @@ describe('Assignment Bulk Edit Dates', () => {
       )
       const allCheckbox = getByLabelText('Select all assignments')
       fireEvent.click(allCheckbox)
-      const checkboxes = getAllByLabelText('Select assignment')
+      const checkboxes = getAllByLabelText(/Select assignment:/)
       expect(allCheckbox.checked).toBe(true)
       expect(checkboxes[0].checked).toBe(false)
       expect(checkboxes[1].checked).toBe(false)
@@ -570,7 +570,7 @@ describe('Assignment Bulk Edit Dates', () => {
     async function renderOpenBatchEditDialog(selectAssignments = [0]) {
       const result = await renderBulkEditAndWait()
       selectAssignments.forEach(index => {
-        fireEvent.click(result.getAllByLabelText('Select assignment')[index])
+        fireEvent.click(result.getAllByLabelText(/Select assignment:/)[index])
       })
       fireEvent.click(result.getByText('Batch Edit'))
       return result

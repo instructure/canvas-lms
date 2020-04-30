@@ -121,7 +121,11 @@ export default function BulkEditTable({
   function renderAssignmentCheckbox(assignment) {
     return (
       <Checkbox
-        label={<ScreenReaderContent>{I18n.t('Select assignment')}</ScreenReaderContent>}
+        label={
+          <ScreenReaderContent>
+            {I18n.t('Select assignment: %{title}', {title: assignment.name})}
+          </ScreenReaderContent>
+        }
         checked={!!assignment.selected}
         onChange={() => setAssignmentSelected(assignment.id, !assignment.selected)}
         disabled={!canEditAll(assignment)}
@@ -229,39 +233,63 @@ export default function BulkEditTable({
     const widthProp = `${DATE_COLUMN_WIDTH_REMS}rem`
     const noteWidthProp = `${NOTE_COLUMN_WIDTH_REMS}rem`
     const layoutProp = matches.includes('small') ? 'stacked' : 'fixed'
+
+    // The select all checkbox can't be in the table header because we don't want a SR to read it on
+    // every row, and in a stacked layout it would appear on every row. But we want it to visually
+    // be in the header in a fixed layout, so we're going to manually position it. Hard coding a
+    // visual offset like this sucks and is brittle, but I'm not sure what else to do right now.
+    const [selectAllStyles, selectAllLabel, selectedHeader] =
+      layoutProp === 'stacked'
+        ? [{}, I18n.t('Select all assignments'), I18n.t('Selected')]
+        : [
+            {
+              position: 'absolute',
+              top: '8px',
+              left: '13px'
+            },
+            <ScreenReaderContent>{I18n.t('Select all assignments')}</ScreenReaderContent>,
+            <ScreenReaderContent>{I18n.t('Selected')}</ScreenReaderContent>
+          ]
+
     return (
-      <Table caption={I18n.t('Assignment Dates')} hover layout={layoutProp}>
-        <Table.Head>
-          <Table.Row>
-            {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-              <Table.ColHeader id="select" width={checkboxWidthProp}>
-                <Checkbox
-                  label={
-                    <ScreenReaderContent>{I18n.t('Select all assignments')}</ScreenReaderContent>
-                  }
-                  checked={allAssignmentsSelected}
-                  indeterminate={!allAssignmentsSelected && someAssignmentsSelected}
-                  onChange={handleSelectAllAssignments}
-                />
+      <div style={{position: 'relative'}}>
+        {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+          <div style={selectAllStyles}>
+            <Checkbox
+              label={selectAllLabel}
+              checked={allAssignmentsSelected}
+              indeterminate={!allAssignmentsSelected && someAssignmentsSelected}
+              onChange={handleSelectAllAssignments}
+            />
+          </div>
+        )}
+
+        <Table caption={I18n.t('Assignment Dates')} hover layout={layoutProp}>
+          <Table.Head>
+            <Table.Row>
+              {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+                <Table.ColHeader id="select" width={checkboxWidthProp}>
+                  {selectedHeader}
+                </Table.ColHeader>
+              )}
+              <Table.ColHeader id="title">{I18n.t('Title')}</Table.ColHeader>
+              <Table.ColHeader width={widthProp} id="due">
+                {DATE_INPUT_META.due_at.label}
               </Table.ColHeader>
-            )}
-            <Table.ColHeader id="title">{I18n.t('Title')}</Table.ColHeader>
-            <Table.ColHeader width={widthProp} id="due">
-              {DATE_INPUT_META.due_at.label}
-            </Table.ColHeader>
-            <Table.ColHeader width={widthProp} id="unlock">
-              {DATE_INPUT_META.unlock_at.label}
-            </Table.ColHeader>
-            <Table.ColHeader width={widthProp} id="lock">
-              {DATE_INPUT_META.lock_at.label}
-            </Table.ColHeader>
-            <Table.ColHeader id="note" width={noteWidthProp}>
-              <ScreenReaderContent>{I18n.t('Notes')}</ScreenReaderContent>
-            </Table.ColHeader>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>{renderAssignments()}</Table.Body>
-      </Table>
+              <Table.ColHeader width={widthProp} id="unlock">
+                {DATE_INPUT_META.unlock_at.label}
+              </Table.ColHeader>
+              <Table.ColHeader width={widthProp} id="lock">
+                {DATE_INPUT_META.lock_at.label}
+              </Table.ColHeader>
+              <Table.ColHeader id="note" width={noteWidthProp}>
+                <ScreenReaderContent>{I18n.t('Notes')}</ScreenReaderContent>
+              </Table.ColHeader>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>{renderAssignments()}</Table.Body>
+        </Table>
+      </div>
     )
   }
 
