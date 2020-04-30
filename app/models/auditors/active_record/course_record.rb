@@ -30,12 +30,10 @@ module Auditors::ActiveRecord
         attrs_hash = record.attributes.except('id')
         attrs_hash['request_id'] ||= "MISSING"
         attrs_hash['uuid'] = record.id
-        attrs_hash['course_id'] = record.course.id
-        attrs_hash['account_id'] = record.course.account_id
-        attrs_hash['user_id'] = record.user.id
-        if record.sis_batch_id.present?
-          attrs_hash['sis_batch_id'] = record.sis_batch.id
-        end
+        attrs_hash['course_id'] = Shard.relative_id_for(record.course_id, Shard.current, Shard.current)
+        attrs_hash['account_id'] = Shard.relative_id_for(record.account_id, Shard.current, Shard.current)
+        attrs_hash['user_id'] = Shard.relative_id_for(record.user_id, Shard.current, Shard.current)
+        attrs_hash['sis_batch_id'] = Shard.relative_id_for(record.sis_batch_id, Shard.current, Shard.current)
         attrs_hash
       end
     end
