@@ -120,6 +120,7 @@ class Assignment < ActiveRecord::Base
   validate :assignment_overrides_due_date_ok?
   validate :discussion_group_ok?
   validate :positive_points_possible?
+  validate :reasonable_points_possible?
   validate :moderation_setting_ok?
   validate :assignment_name_length_ok?, :unless => :deleted?
   validates :lti_context_id, presence: true, uniqueness: true
@@ -179,6 +180,16 @@ class Assignment < ActiveRecord::Base
         "The value of possible points for this assignment must be zero or greater."
       )
     )
+  end
+
+  def reasonable_points_possible?
+    return if self.points_possible.to_i < 1000000000
+    return unless self.points_possible_changed?
+    errors.add(
+      :points_possible,
+      I18n.t(
+        "The value of possible points for this assignment cannot exceed 999999999.")
+      )
   end
 
   def get_potentially_conflicting_titles(title_base)
