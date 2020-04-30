@@ -27,7 +27,9 @@ export default {
   propType: {
     fileOptions: PropTypes.object,
     onNameConflictResolved: PropTypes.func.isRequired,
-    allowSkip: PropTypes.bool
+    allowSkip: PropTypes.bool,
+    onRenameFileMessage: PropTypes.func,
+    onLockFileMessage: PropTypes.func
   },
 
   getInitialState() {

@@ -39,6 +39,20 @@ const UploadButton = function(props) {
     formRef.current?.addFiles()
   }
 
+  const renameFileMessage = nameToUse => {
+    return I18n.t(
+      'A file named "%{name}" already exists in this folder. Do you want to replace the existing file?',
+      {name: nameToUse}
+    )
+  }
+
+  const lockFileMessage = nameToUse => {
+    return I18n.t(
+      'A locked file named "%{name}" already exists in this folder. Please enter a new name.',
+      {name: nameToUse}
+    )
+  }
+
   return (
     <>
       <UploadForm
@@ -47,6 +61,8 @@ const UploadButton = function(props) {
         currentFolder={props.currentFolder}
         contextId={props.contextId}
         contextType={props.contextType}
+        onRenameFileMessage={renameFileMessage}
+        onLockFileMessage={lockFileMessage}
       />
       <button
         type="button"

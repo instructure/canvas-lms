@@ -40,7 +40,7 @@ function fetchFiles(url) {
 }
 
 export function getFolderFiles(folderId) {
-  return fetchFiles(`/api/v1/folders/${folderId}/files`)
+  return fetchFiles(`/api/v1/folders/${folderId}/files?only[]=names`)
 }
 
 export function getCourseRootFolder(courseId) {

@@ -45,6 +45,11 @@ module Api::V1::Attachment
       'filename' => attachment.filename,
       'upload_status' => AttachmentUploadStatus.upload_status(attachment)
     }
+
+    if options[:master_course_status]
+      hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))
+    end
+
     return hash if options[:only] && options[:only].include?('names')
 
     options.reverse_merge!(skip_permission_checks: false)
@@ -149,10 +154,6 @@ module Api::V1::Attachment
       # and is not documented as a publicly available api option.
       # It may be removed at any time.
       hash['instfs_uuid'] = attachment.instfs_uuid
-    end
-
-    if options[:master_course_status]
-      hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))
     end
 
     hash

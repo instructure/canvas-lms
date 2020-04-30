@@ -142,5 +142,28 @@ describe 'DataFixup::Auditors::Migrate' do
       output = DataFixup::Auditors::Migrate::BackfillEngine.summary
       expect(output).to_not be_empty
     end
+
+    it "buckets settings by JOB cluster" do
+      pk = DataFixup::Auditors::Migrate::BackfillEngine.parallelism_key("grade_changes")
+      # because default shard has a nil job id
+      expect(pk).to eq("auditors_migration_grade_changes/_num_strands")
+    end
+
+    it "enqueues even if it made no progress" do
+      start_date = Time.zone.today
+      end_date = start_date - 1.year
+      engine = DataFixup::Auditors::Migrate::BackfillEngine.new(start_date, end_date)
+      Delayed::Job.enqueue(engine)
+      Setting.set(engine.class.queue_setting_key, -1)
+      expect(Delayed::Job.count).to eq(1)
+      expect(Delayed::Job.first.tag).to eq(DataFixup::Auditors::Migrate::BackfillEngine::SCHEDULAR_TAG)
+      d_worker = Delayed::Worker.new
+      sched_job = Delayed::Job.first
+      sched_job.update(locked_by: 'test_run', locked_at: Time.now.utc)
+      d_worker.perform(sched_job)
+      expect(Delayed::Job.count).to eq(1)
+      expect(Delayed::Job.first.tag).to eq(DataFixup::Auditors::Migrate::BackfillEngine::SCHEDULAR_TAG)
+      expect(sched_job.id).to_not eq(Delayed::Job.first.id)
+    end
   end
 end
