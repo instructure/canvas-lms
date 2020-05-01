@@ -694,7 +694,7 @@ class RCEWrapper extends React.Component {
         // the floating toolbar is open
         moreButton.click() // close the floating toolbar
         const editor = this.mceInstance() // return focus to the editor
-        editor?.focus() // eslint-disable-line no-unused-expressions
+        editor?.focus()
       }
     }
   }
