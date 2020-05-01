@@ -82,14 +82,14 @@ describe('CoursesTray', () => {
     it('does not render a split dashboard for non teachers', () => {
       const {queryByText} = render(<CoursesTray {...makeProps()} />)
       expect(queryByText('Published Courses')).not.toBeInTheDocument()
-      expect(queryByText('Unpublished Drafts')).not.toBeInTheDocument()
+      expect(queryByText('Unpublished Courses')).not.toBeInTheDocument()
     })
 
     it('does render a split dashboard for teachers with appropriate headers', () => {
       window.ENV = {...window.ENV, current_user_roles: ['teacher']}
       const {getByText} = render(<CoursesTray {...makeProps()} />)
       getByText('Published Courses')
-      getByText('Unpublished Drafts')
+      getByText('Unpublished Courses')
     })
   })
 
@@ -105,7 +105,7 @@ describe('CoursesTray', () => {
     it('does not render a split dashboard for teachers', () => {
       const {queryByText} = render(<CoursesTray {...makeProps()} />)
       expect(queryByText('Published Courses')).not.toBeInTheDocument()
-      expect(queryByText('Unpublished Drafts')).not.toBeInTheDocument()
+      expect(queryByText('Unpublished Courses')).not.toBeInTheDocument()
     })
   })
 })

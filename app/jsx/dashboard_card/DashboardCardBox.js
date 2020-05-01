@@ -164,7 +164,7 @@ export default class DashboardCardBox extends React.Component {
       .filter(card => card.published)
       .map(card => this.renderCard(card))
 
-    const unpublishedDrafts = courseCards
+    const unpublishedCourses = courseCards
       .filter(card => !card.published)
       .map(card => this.renderCard(card))
 
@@ -182,11 +182,11 @@ export default class DashboardCardBox extends React.Component {
         </div>
         <div className="ic-DashboardCard__box">
           <h2 size="large" className="ic-DashboardCard__box__header">
-            {I18n.t(`Unpublished Drafts (%{count})`, {
-              count: I18n.n(unpublishedDrafts.length)
+            {I18n.t(`Unpublished Courses (%{count})`, {
+              count: I18n.n(unpublishedCourses.length)
             })}
           </h2>
-          {unpublishedDrafts.length > 0 ? unpublishedDrafts : emptyEl}
+          {unpublishedCourses.length > 0 ? unpublishedCourses : emptyEl}
         </div>
       </div>
     )
