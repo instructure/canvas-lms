@@ -30,13 +30,13 @@ def runSeleniumSuite(total, index) {
   _runRspecTestSuite(
       total,
       index,
-      'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
+      'docker-compose.new-jenkins.multiple-processes.yml:docker-compose.new-jenkins-selenium.yml',
       'selenium',
       seleniumConfig().max_fail,
       seleniumConfig().reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
-      '6',
+      '3',
       seleniumConfig().force_failure
   )
 }
@@ -55,13 +55,13 @@ def runRSpecSuite(total, index) {
   _runRspecTestSuite(
       total,
       index,
-      'docker-compose.new-jenkins.yml',
+      'docker-compose.new-jenkins.multiple-processes.yml',
       'rspec',
       rspecConfig().max_fail,
       rspecConfig().reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/selenium',
-      '8',
+      '4',
       rspecConfig().force_failure
   )
 }
@@ -104,12 +104,12 @@ def _runRspecTestSuite(
     }
     finally {
       // copy spec failures to local
-      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures web_database_ --allow-error --clean-dir'
+      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures canvas_ --allow-error --clean-dir'
 
       def reports = load 'build/new-jenkins/groovy/reports.groovy'
       reports.stashSpecFailures(prefix, index)
       if (env.COVERAGE == '1') {
-        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage web_database_ --clean-dir'
+        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage canvas_ --clean-dir'
         reports.stashSpecCoverage(prefix, index)
       }
       sh 'rm -rf ./tmp'

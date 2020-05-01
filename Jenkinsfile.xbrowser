@@ -56,7 +56,7 @@ pipeline {
   post {
     unsuccessful {
       // copy spec failures to local
-      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
+      sh 'docker cp $(docker ps -q --filter "name=canvas_"):/usr/src/app/log/spec_failures/ ./tmp'
       script {
         def htmlFiles
         // find all results files

@@ -1,13 +1,7 @@
-# it is intended that this be used exclusive of all other docker-compose.*yml files in CI
 version: "2.3"
 services:
   canvas:
     image: $PATCHSET_TAG
-    links:
-      - postgres
-      - redis
-      - cassandra
-      - dynamodb
     environment:
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
       RAILS_ENV: test
@@ -24,8 +18,11 @@ services:
       DOCKER_PROCESSES:
       EXCLUDE_TESTS:
       TEST_PATTERN:
-    # this will stop passenger from booting so the container isn't running anything at all once up
-    command: /tini -- sleep infinity
+    depends_on:
+      - postgres
+      - cassandra
+      - redis
+      - dynamodb
 
   redis:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
@@ -34,10 +31,7 @@ services:
     build:
       context: build/docker-compose/postgres/
     environment:
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-
-      # parallel_tests
-      DOCKER_PROCESSES:
+      POSTGRES_PASSWORD: sekret
 
   cassandra:
     build:
@@ -48,4 +42,4 @@ services:
   dynamodb:
     build:
       context: build/docker-compose/dynamodb/
-    command: -jar DynamoDBLocal.jar #-dbPath /home/dynamodblocal
+    command: -jar DynamoDBLocal.jar

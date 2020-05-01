@@ -1,6 +1,6 @@
 # it is intended that this be used exclusive of all other docker-compose.*yml files in CI
 version: "2.3"
 services:
-  web:
+  canvas:
     environment:
-      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/${DATABASE_NAME}
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/canvas_test

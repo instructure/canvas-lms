@@ -122,8 +122,8 @@ pipeline {
     unsuccessful {
       // copy spec failures to local
       sh 'mkdir -vp tmp'
-      // [JIRA CCI-168]: need to handle web container never being spun up
-      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
+      // [JIRA CCI-168]: need to handle canvas container never being spun up
+      sh 'docker cp $(docker ps -q --filter "name=canvas_"):/usr/src/app/log/spec_failures/ ./tmp'
       script {
         def htmlFiles
         // find all results files

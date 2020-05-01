@@ -2,6 +2,8 @@
 version: "2.3"
 services:
   canvas:
+    image: $PATCHSET_TAG
     volumes:
-      - "./.git:/usr/src/app/.git"
-
+      - .git:/usr/src/app/.git
+    environment:
+      RAILS_ENV: test

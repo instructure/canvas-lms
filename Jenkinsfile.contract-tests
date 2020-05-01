@@ -54,7 +54,7 @@ pipeline {
       steps {
         timeout(time: 10) {
           sh """
-            docker-compose exec -T web env \
+            docker-compose --project-name canvas-lms0 exec -T canvas env \
               PACT_BROKER_HOST=inst-pact-broker.inseng.net \
               PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
               PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
@@ -69,7 +69,7 @@ pipeline {
     stage("Live Events Contract Tests") {
       steps {
         sh """
-          docker-compose exec -T web env \
+          docker-compose --project-name canvas-lms0 exec -T canvas env \
             PACT_BROKER_HOST=inst-pact-broker.inseng.net \
             PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
             PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
@@ -82,7 +82,7 @@ pipeline {
   post {
     failure {
       sh 'mkdir -vp spec_results'
-      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/. ./spec_results/'
+      sh 'docker cp $(docker ps -q --filter "name=canvas_"):/usr/src/app/log/spec_failures/. ./spec_results/'
       script {
         dir('spec_results') {
           htmlFiles = findFiles glob: '**/index.html'

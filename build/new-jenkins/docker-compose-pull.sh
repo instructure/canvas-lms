@@ -7,6 +7,9 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 REGISTRY_BASE=starlord.inscloudgate.net/jenkins
 POSTGIS=${POSTGIS:-2.5}
 
+# canvas-lms
+docker pull $PATCHSET_TAG
+
 # redis
 docker pull $REGISTRY_BASE/redis:alpine || \
   (docker pull redis:alpine && \

@@ -31,13 +31,13 @@ while true; do
 
   if [[ $reruns_started ]]; then
     if [ $1 ] && [ $1 = 'performance' ]; then
-      command="docker-compose exec -T web bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --only-failures --failure-exit-code 99";
+      command="docker-compose --project-name canvas-lms0 exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --only-failures --failure-exit-code 99";
     else
       command="build/new-jenkins/rspec-tests.sh only-failures";
     fi
   else
     if [ $1 ] && [ $1 = 'performance' ]; then
-      command="docker-compose exec -T web bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --failure-exit-code 99"
+      command="docker-compose --project-name canvas-lms0 exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --failure-exit-code 99"
     else
       command="build/new-jenkins/rspec-tests.sh"
     fi
