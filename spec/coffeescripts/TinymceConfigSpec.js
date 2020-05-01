@@ -24,7 +24,6 @@ const largeScreenWidth = 1300
 const dom_id = 'some_textarea'
 const fake_tinymce = {baseURL: '/base/url'}
 const toolbar1 =
-  // eslint-disable-next-line no-useless-concat
   'bold,italic,underline,forecolor,backcolor,removeformat,' + 'alignleft,aligncenter,alignright'
 const toolbar2 =
   'outdent,indent,superscript,subscript,bullist,numlist,table,' +
@@ -37,15 +36,9 @@ QUnit.module('EditorConfig', {
     INST = {}
     INST.editorButtons = []
     INST.maxVisibleEditorButtons = 20
-    window.ENV = {
-      FEATURES: {}
-    }
   },
   teardown() {
     INST = {}
-    window.ENV = {
-      FEATURES: {}
-    }
   }
 })
 
@@ -103,23 +96,6 @@ test('default config includes toolbar', () => {
   const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
   const schema = config.defaultConfig()
   equal(schema.toolbar[0], config.toolbar()[0])
-})
-
-test('default config includes Lato font-family', () => {
-  const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
-  const schema = config.defaultConfig()
-  const availableFonts = schema.font_formats
-  const fontIndex = availableFonts.indexOf('Lato')
-  ok(fontIndex > -1)
-})
-
-test('config includes Architects Daughter font when elemenetary theme flag is on', () => {
-  const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
-  window.ENV.FEATURES.canvas_k6_theme = true
-  const schema = config.defaultConfig()
-  const availableFonts = schema.font_formats
-  const fontIndex = availableFonts.indexOf('Architects Daughter')
-  ok(fontIndex > -1)
 })
 
 test('it builds a selector from the id', () => {

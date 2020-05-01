@@ -17,10 +17,10 @@
  */
 
  @import "base/environment";
+ @import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
 
 .ic-app-header__main-navigation,
 .ic-app-crumbs,
-.ic-app-course-menu,
-.enhanced {
+.ic-app-course-menu {
   font-family: "Architects Daughter", $ic-font-family;
 }

@@ -42,7 +42,7 @@ Any changes you make to files under `/src` will be reflected in this editor.
 
 Because this package lives in the Canvas packages workspace, you can make modifications to it without first needing to do a `yarn install` in Canvas.
 
-You can start up the watch mode of this package by running `yarn build:watch` inside the `canvas-rce` directory.  Then in Canvas proper, you can run `yarn build:js:watch` and things generally work out.  If for some reason you get errors with the watch modes, you can fallback to the regular builds `yarn build:canvas` inside of `canvas-rce` and `yarn build:js` inside of Canvas.
+You can start up the watch mode of this package by running `yarn build:watch` inside the `canvas-rce` directory.  Then in Canvas proper, you can run `yarn build:js:watch` and things generally work out.  If for some reason you get errors with the watch modes, you can fallback to the regular builds `yarn build:canvas` inside of `canvas-rce` and `yarn build:js` inside of Canvas. 
 
 ## Plugins
 
