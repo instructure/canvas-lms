@@ -153,7 +153,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
       mountComponent()
       const headers = getDashboardBoxHeaders()
       ok(headers[0].textContent.includes('Published Courses (1)'))
-      ok(headers[1].textContent.includes('Unpublished Drafts (1)'))
+      ok(headers[1].textContent.includes('Unpublished Courses (1)'))
     })
 
     test('correctly renders empty headers in split view', () => {
