@@ -20,8 +20,7 @@ development:
 
 test:
   <<: *common
-  database: canvas_test
-  database: <%= ENV.fetch('CANVAS_DATABASE_TEST', 'canvas_development') %>
+  database: <%= ENV.fetch('CANVAS_DATABASE_TEST', 'canvas_test') %>
   shard1: canvas_test_shard_1
   shard2: canvas_test_shard_2
   test_shard_1: canvas_test_shard_1
