@@ -389,6 +389,14 @@ module DataFixup::Auditors
           d_worker.perform(sched_job)
         end
 
+        def total_reset_frd!
+          conn = Auditors::ActiveRecord::GradeChangeRecord.connection
+          conn.execute("set role dba")
+          conn.truncate(Auditors::ActiveRecord::GradeChangeRecord.table_name)
+          conn.truncate(Auditors::ActiveRecord::CourseRecord.table_name)
+          conn.truncate(Auditors::ActiveRecord::AuthenticationRecord.table_name)
+          conn.truncate(Auditors::ActiveRecord::MigrationCell.table_name)
+        end
       end
 
       def initialize(start_date, end_date)
