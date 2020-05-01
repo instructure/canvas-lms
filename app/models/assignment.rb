@@ -107,14 +107,9 @@ class Assignment < ActiveRecord::Base
   scope :moderated, -> { where(moderated_grading: true) }
   scope :auditable, -> { anonymous.or(moderated) }
   scope :type_quiz_lti, -> {
-    joins(:external_tool_tag).
-      joins(<<-SQL).
-        INNER JOIN #{ContextExternalTool.quoted_table_name}
-        ON content_tags.content_type='ContextExternalTool'
-        AND context_external_tools.id = content_tags.content_id
-      SQL
-      merge(ContextExternalTool.quiz_lti).
-      distinct
+    where("EXISTS (?)",
+          ContentTag.where("content_tags.context_id=assignments.id").where(context_type: 'Assignment', content_type: 'ContextExternalTool').
+              where("EXISTS (?)", ContextExternalTool.where("context_external_tools.id=content_tags.content_id").quiz_lti))
   }
 
   validates_associated :external_tool_tag, :if => :external_tool?
@@ -2756,11 +2751,7 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :quiz_lti, -> {
-    where(:submission_types => "external_tool").joins(:external_tool_tag).
-      where(:content_tags => {:content_type => "ContextExternalTool"}).
-      where("EXISTS (?)", ContextExternalTool.quiz_lti.
-        where("context_external_tools.id=content_tags.content_id").select(:id)
-      )
+    type_quiz_lti.where(submission_types: "external_tool")
   }
 
   def overdue?
