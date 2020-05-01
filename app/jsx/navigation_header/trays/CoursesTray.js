@@ -44,7 +44,7 @@ export default function CoursesTray({courses, hasLoaded}) {
         </List>
         {unpublished.length > 0 && (
           <Heading level="h4" as="h3" key="unpublished_courses">
-            {I18n.t('Unpublished Drafts')}
+            {I18n.t('Unpublished Courses')}
           </Heading>
         )}
         <List key="unpublished" variant="unstyled" margin="small small" itemSpacing="small">
