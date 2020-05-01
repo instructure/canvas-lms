@@ -39,6 +39,19 @@ class Notification < ActiveRecord::Base
     "Show In Feed",
   ].freeze
 
+  ALLOWED_SMS_NOTIFICATION_CATEGORIES = [
+    'announcement',
+    'grading'
+  ].freeze
+
+  ALLOWED_SMS_NOTIFICATION_TYPES = [
+    'Assignment Graded',
+    'Confirm SMS Communication Channel',
+    'New Announcement',
+    'Submission Grade Changed',
+    'Submission Graded'
+  ].freeze
+
   FREQ_IMMEDIATELY = 'immediately'
   FREQ_DAILY = 'daily'
   FREQ_WEEKLY = 'weekly'
@@ -151,12 +164,12 @@ class Notification < ActiveRecord::Base
      TYPES_TO_SHOW_IN_FEED
   end
 
-  def self.categories_to_send_in_sms
-    Setting.get('allowed_sms_notification_categories', 'announcement,grading').split(',')
+  def self.categories_to_send_in_sms(root_account)
+    root_account.settings[:allowed_sms_notification_categories] || Setting.get('allowed_sms_notification_categories', ALLOWED_SMS_NOTIFICATION_CATEGORIES.join(',')).split(',')
   end
 
-  def self.types_to_send_in_sms
-    Setting.get('allowed_sms_notification_types', 'Assignment Graded,Confirm SMS Communication Channel,New Announcement,Submission Grade Changed,Submission Graded').split(',')
+  def self.types_to_send_in_sms(root_account)
+    root_account.settings[:allowed_sms_notification_types] || Setting.get('allowed_sms_notification_types', ALLOWED_SMS_NOTIFICATION_TYPES.join(',')).split(',')
   end
 
   def show_in_feed?
