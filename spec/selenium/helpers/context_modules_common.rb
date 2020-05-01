@@ -198,10 +198,9 @@ module ContextModulesCommon
     scroll_to(f('.add_item_button.ui-button'))
     f('.add_item_button.ui-button').click
     wait_for_ajaximations
-    file_names.each {|item_name| expect(fj(".context_module_item:contains(#{item_name.inspect})")).to be_displayed}
   end
 
-  def add_uploaded_file_items(item_select_selector)
+  def add_uploaded_file_items(item_select_selector, filepath)
     # requires module_dnd feature to be enabled
     # would like to test multiple file upload,
     # but it's not supported by any of the selenium webdrivers
@@ -209,25 +208,20 @@ module ContextModulesCommon
     wait_for_ajaximations
     select_module_item('#add_module_item_select', "File")
 
-    filename1, fullpath1, _data = get_file("testfile1.txt")
-
     select_module_item(item_select_selector + ' .module_item_select', '[ New File(s) ]')
     wait_for_ajaximations
 
-    f('#module_attachment_uploaded_data').send_keys(fullpath1)
+    f('#module_attachment_uploaded_data').send_keys(filepath)
     wait_for_animations
 
     scroll_to(f('.add_item_button.ui-button'))
     f('.add_item_button.ui-button').click
     wait_for_ajaximations
-
-    expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
-    fj(".context_module_item:contains(#{filename1})")
   end
 
-  def upload_and_replace_file_item(item_select_selector, existing_filename, existing_filepath)
+  def upload_and_replace_file_item(add_item_selector, item_select_selector, existing_filepath)
     # requires module_dnd feature to be enabled
-    f('.add_module_item_link').click
+    f(add_item_selector).click
     wait_for_ajaximations
     select_module_item('#add_module_item_select', "File")
 
@@ -247,9 +241,7 @@ module ContextModulesCommon
 
     scroll_to(f('.add_item_button.ui-button'))
     f('.add_item_button.ui-button').click
-
-    expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
-    expect(ffj(".context_module_item:contains(#{existing_filename})").length).to eq(1)
+    wait_for_ajaximations
   end
 
   def select_module_item(select_element_css, item_text)

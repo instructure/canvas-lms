@@ -654,4 +654,16 @@ module RCENextPage
   def switch_to_editor_view
     fj('button:contains("Switch to rich text editor")').click
   end
+
+  def tiny_rce_ifr_id
+    f('.tox-editor-container iframe')['id']
+  end
+
+  def insert_tiny_text(text = "hello")
+    in_frame tiny_rce_ifr_id do
+      tinyrce_element = f("body")
+      tinyrce_element.click
+      tinyrce_element.send_keys("#{text}\n") # newline guarantees a tinymce change event
+    end
+  end
 end

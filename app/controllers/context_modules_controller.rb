@@ -33,7 +33,8 @@ class ContextModulesController < ApplicationController
         items[file_tag.id] = {
           id: file_tag.id,
           content_id: file_tag.content_id,
-          content_details: content_details(file_tag, @current_user, :for_admin => true)
+          content_details: content_details(file_tag, @current_user, :for_admin => true),
+          module_id: file_tag.context_module_id
         }
         items
       end

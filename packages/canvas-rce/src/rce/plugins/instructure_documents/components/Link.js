@@ -48,7 +48,7 @@ export default function Link(props) {
     })
 
     const attrs = {
-      id: props.id,
+      file_id: props.id,
       href: props.href,
       target: '_blank',
       class: clazz,
