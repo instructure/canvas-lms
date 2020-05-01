@@ -1998,6 +1998,7 @@ fr-CA:
   allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "Permet à l'utilisateur d'accéder à la barre latérale des Cours modèle. Permet à l'utilisateur de gérer les paramètres des Cours modèles dans les paramètres de cours. Permet à l'utilisateur de retirer un cours associé. Permet à l'utilisateur de modifier les paramètres de verrouillage de modèle sur les tâches individuelles, les pages ou les discussions"
   allows_user_to_access_the_chat_tool_48d5f5c4: "Permet à l’utilisateur d’accéder à l’outil de clavardage."
   allows_user_to_access_the_files_tab_in_the_content_a5187929: "Permet à l'utilisateur d'accéder à l'onglet Fichiers dans le Sélecteur de contenu."
+  allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: "Permet à l’utilisateur d’accéder à l’onglet de navigation dans les paramètres du cours. Permet à l’utilisateur d’accéder aux boutons Vue Étudiant (tester étudiant), copier ce cours, réinitialiser le contenu du cours et Supprimer définitivement un cours. Permet à l’utilisateur de modifier l’image du cours, le nom, le code du cours, le fuseau horaire, le sous-compte, la durée et d’autres options dans l’onglet Détails de cours."
   allows_user_to_access_the_restore_courses_tab_in_a_397d9178: "Permet à l’utilisateur d’accéder à l’onglet Restauration de cours dans l’outil Admin"
   allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "Permet à l'utilisateur d'accéder à l'onglet Restauration de cours dans l’outil Admin"
   allows_user_to_access_the_student_progress_page_aca95197: "Permet à l'utilisateur d'accéder à la page de progrès de l’étudiant."
@@ -2090,6 +2091,7 @@ fr-CA:
       Permet à l'utilisateur de créer, de modifier et de supprimer des groupes de cours.
       Permet à l'utilisateur de créer, de modifier et de supprimer des groupes de cours créé par des étudiants.
   allows_user_to_create_edit_and_delete_course_rubri_92b58f29: "Permet à l'utilisateur de créer, de modifier et de supprimer des rubriques de cours dans le lien Rubriques."
+  allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: "Permet à l’utilisateur de créer, de modifier et de supprimer des acquis et des groupes d’acquis au niveau du cours."
   allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "Permet à l'utilisateur de créer, de modifier et de supprimer des rubriques."
   allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
       Permet à l'utilisateur de créer, d’importer, de modifier et de supprimer des résultats et des groupes de résultat au
@@ -2133,7 +2135,9 @@ fr-CA:
   allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: "Permet à l'utilisateur de générer un code de jumelage au nom d'un étudiant à partager avec un observateur."
   allows_user_to_generate_login_logout_activity_repo_bba62f2: "Permet à l’utilisateur de générer un rapport d’activité de connexion/déconnexion dans les outils d’administration."
   allows_user_to_generate_login_logout_activity_repo_e03fb94f: "Permet à l’utilisateur de générer un rapport d’activité de connexion/déconnexion dans les outils d’administration. (Non disponible au niveau sous-compte.)"
+  allows_user_to_import_account_learning_outcomes_f6f6d0b9: "Permet à l’utilisateur d’importer les acquis du compte."
   allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "Permet à l'utilisateur d'importer du contenu à l'aide de l'outil d'importation de cours."
+  allows_user_to_import_course_learning_outcomes_2ca3f18f: "Permet à l’utilisateur d’importer les acquis du cours."
   allows_user_to_import_learning_outcomes_17fce84a: "Permet à l'utilisateur d'importer les acquis."
   allows_user_to_import_learning_outcomes_to_rubrics_45331ded: "Permet à l'utilisateur d'importer les acquis aux rubriques."
   allows_user_to_import_resources_from_commons_into__255ad23: |-
@@ -2219,6 +2223,7 @@ fr-CA:
   allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "Permet à l'utilisateur de voir et gérer les cours dans le compte."
   allows_user_to_view_and_manage_permissions_bdc80a1d: "Permet à l'utilisateur de voir et de gérer les autorisations."
   allows_user_to_view_and_manage_quotas_tab_in_accou_935a7874: "Permet à l'utilisateur de voir et de gérer l’onglet des quotas dans les paramètres du compte. L'utilisateur peut définir les défauts pour : cours, utilisateur et quotas de stockage de groupe."
+  allows_user_to_view_and_manage_quotas_tab_in_accou_aa3fea8: "Permet à l’utilisateur de voir et de gérer l’onglet des quotas dans les paramètres du compte. L’utilisateur peut définir les défauts pour : cours, utilisateur et quotas de stockage de groupe."
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Permet à l'utilisateur de voir et de gérer les sous-comptes du compte."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Permet à l'utilisateur de voir et de gérer les trimestres pour le compte."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Permet à l'utilisateur de voir et de gérer l’onglet « Paramètres et Notifications » dans les paramètres du compte."
@@ -2293,6 +2298,7 @@ fr-CA:
   allows_user_to_view_the_new_announcement_button_in_d21f2922: "Permet à l’utilisateur de voir le bouton « Nouvelle annonce » dans la page d’accueil. Permet à l’utilisateur d’ajouter des Annonces dans la page Annonces."
   allows_user_to_view_the_new_gradebook_50f53ef0: "Permet à l'utilisateur de voir le nouveau carnet de notes."
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "Permet à l'utilisateur de voir le lien Personnes dans la Navigation du cours."
+  allows_user_to_view_the_rubrics_link_in_course_nav_fc5fabff: "Permet à l’utilisateur de voir le lien Rubrique dans la Navigation du cours. Permet à l’utilisateur de créer, de modifier et de supprimer des rubriques de cours."
   allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: "Permet à un utilisateur de voir l'ID SIS dans les détails de connexion d’un utilisateur."
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "Permet à l'utilisateur d'afficher la colonne ID SIS de l’utilisateur dans le fichier CSV d’analyse d'élément de questionnaire."
   allows_user_to_view_user_sis_ids_68a9d218: "Permet à l'utilisateur de voir les ID SIS."
@@ -2359,11 +2365,12 @@ fr-CA:
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Une erreur s’est produite pendant la mise à jour du statut de verrouillage des annonces."
   an_error_occurred_while_updating_late_policies_a95b707f: "Une erreur s'est produite lors de la mise à jour des dernières politiques"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Une erreur est survenue lors de la suppression d'un groupe de rendez-vous"
+  an_error_ocurred_while_fetching_course_details_ple_9cab7735: "Une erreur s’est produite lors de la récupération des détails du cours. Veuillez réessayer."
   an_error_ocurred_while_loading_announcements_32af2ce4: "Une erreur s'est produite lors du chargement des annonces"
   an_error_ocurred_while_loading_discussions_51876507: "Une erreur s'est produite lors du chargement des discussions"
   an_error_ocurred_while_loading_sync_history_ad9dc6df: "Une erreur s'est produite lors du chargement de l'historique de synchronisation"
   an_error_ocurred_while_loading_unsynced_changes_aed0d04d: "Une erreur s'est produite lors du chargement des modifications non synchronisées"
-  an_error_ocurred_while_publishing_course_3760cf04: "Une erreur s'est produite lors de la publication du cours"
+  an_error_ocurred_while_publishing_course_3760cf04: "Une erreur s’est produite lors de la publication du cours"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Une erreur est survenue pendant l'enregistrement d'un groupe de rendez-vous"
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Un utilisateur existant de Canvas avec l’ID SIS %{user_id} a déjà réclamé l’ID user_id de %{other_user_id} avec les informations de connexion demandées, sauter l’étape"
   an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "Un utilisateur Canvas existant avec l'ID SIS %{user_id} ou l’identifiant de connexion %{login} existe déjà, sauter"
@@ -2495,8 +2502,8 @@ fr-CA:
   anonymous_off_7985fcaf: "Mode Anonyme désactivé"
   anonymous_on_c5fa120d: "Mode Anonyme activé"
   anonymous_re_submission_assignment_title_d9402721: "Resoumission anonyme : %{assignment_title}"
-  anonymous_submission_annotation_student_id_assignm_25eb88c9: "Annotations pour envoi anonyme : Étudiant (%{id}), %{assignment_title}, %{course_name}"
-  anonymous_submission_annotation_student_user_id_as_ffca8ce9: "Annotations pour envoi anonyme : Étudiant (%{user_id}), %{assignment_title}, %{course_name}"
+  anonymous_submission_annotation_student_id_assignm_25eb88c9: "Annotations pour envoi anonyme : Étudiant (%{id}), %{assignment_title}, %{course_name}"
+  anonymous_submission_annotation_student_user_id_as_ffca8ce9: "Annotations pour envoi anonyme : Étudiant (%{user_id}), %{assignment_title}, %{course_name}"
   anonymous_submission_assignment_title_896654de: "Envoi anonyme : %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Commentaire pour envoi anonyme : Étudiant (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Commentaire pour envoi anonyme : Étudiant (%{user_id}), %{assignment_title}, %{course_name}"
@@ -4973,7 +4980,7 @@ fr-CA:
   complete_fd828dea: Terminer
   complete_one_item_90e5fb03: "Terminer un élément"
   complete_registration_by_clicking_the_finish_the_r_6c1c958b: "Terminer l'enregistrement en cliquant sur le lien « Terminer le processus d'enregistrement » envoyé à votre adresse courriel."
-  complete_registration_by_clicking_the_finish_the_r_fcd13ac8: "Terminer l'enregistrement en cliquant sur le lien « Terminer le processus d'enregistrement » envoyé à votre adresse courriel."
+  complete_registration_by_clicking_the_finish_the_r_fcd13ac8: "Terminer l’enregistrement en cliquant sur le lien « Terminer le processus d’enregistrement » envoyé à votre adresse courriel."
   complete_title_7482ddcf: "Terminer %{title}"
   completed_19711ce7: Terminé(e)
   completed_9b809e44: terminé
@@ -6314,6 +6321,7 @@ fr-CA:
   course_results_updated_df9d1c95: "Résultats de cours mis à jour."
   course_role_role_type_119c2f64: "Rôle de cours : %{role_type}"
   course_roles_1314f962: "Rôles du cours"
+  course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Les rôles de Cours peuvent uniquement gérer les cours modèles s’ils sont ajoutés au cours modèle comme rôle d’enseignant, d’AE ou de concepteur. Pour accéder à la barre latérale des Cours modèles, « Cours — ajouter/modifier/supprimer » doit être activé. Pour ajouter un cours associé, « Cours — voir la liste » et « Cours — ajouter/modifier/supprimer » doivent également être activés. Pour modifier les paramètres de verrouillage sur tout type d’objet de Modèle, « Cours — ajouter/modifier/supprimer » doit être activé."
   course_roles_d2d5d666: "Rôles du cours"
   course_roster_78f70e97: "Liste d'étudiants"
   course_search: 
@@ -6792,6 +6800,7 @@ fr-CA:
         choose_home_page: "Choisir la page d’accueil"
         course_setup: "Liste de vérification de la configuration du cours"
         drop_course: "Abandonner ce cours"
+        import: "Importer du contenu existant"
         join_course: "Rejoindre ce cours"
         new_announcement: "Nouvelle annonce"
         student_view: "Affichage étudiant"
@@ -7091,6 +7100,7 @@ fr-CA:
   d2l_file_description: "Format .zip d’exportation D2L"
   d2l_name: "Convertisseur D2L"
   d_b59e2d8d: d
+  daily_summary_cf43f37c: "Synthèse quotidienne"
   danish_c18cdac8: Danois
   dashboard: 
     announcements_collapse: 
@@ -7468,6 +7478,7 @@ fr-CA:
   description_61f4296: "* Description"
   details_98a31b68: Informations
   details_a6f427c3: "Détails :"
+  determines_visibility_and_management_of_outcomes_i_e3ab94dc: "Détermine la visibilité et la gestion des Acquis dans Navigation de compte. Permet à l’utilisateur de créer, de modifier et de supprimer des acquis et des groupes d’acquis au niveau du compte et cours."
   determines_visibility_and_management_of_outcomes_t_79ca45b: |-
       Détermine la visibilité et la gestion de l’onglet des Acquis dans Navigation de compte.
       Permet à l'utilisateur de créer, d’importer, de modifier et de supprimer des résultats et des groupes de résultat au niveau du compte et cours.
@@ -7477,7 +7488,11 @@ fr-CA:
       Permet à l'utilisateur de gérer les rubriques.
   determines_visibility_and_management_of_rubrics_ta_e5dad169: "Détermine la visibilité et la gestion de l’onglet des rubriques dans la Navigation du compte. Permet à l’utilisateur de gérer les rubriques."
   determines_visibility_and_management_of_sis_import_a91ed255: "Détermine la visibilité et la gestion de l’onglet des Importations SIS dans la Navigation du compte."
+  determines_visibility_and_management_of_sis_import_bf386823: "Détermine la visibilité et la gestion du lien Importations SIS dans la Navigation du compte."
+  determines_visibility_and_management_of_the_questi_c57c5b31: "Détermine la visibilité et la gestion du lien Banque de questions dans la Navigation du compte."
   determines_visibility_and_management_of_the_questi_fbf70ba9: "Détermine la visibilité et la gestion du lien de navigation de compte dans les banques de questions."
+  determines_visibility_and_management_of_the_rubric_55b55b25: "Détermine la visibilité et la gestion du lien Rubrique dans la Navigation du compte. Permet à l’utilisateur de créer, de modifier et de supprimer des rubriques."
+  determines_visibility_of_sis_import_link_in_accoun_6f8cecdf: "Détermine la visibilité du lien Importations SIS dans la Navigation de compte. Permet à l’utilisateur de voir les dates d’importation SIS précédentes, les erreurs et les éléments importés."
   determines_visibility_of_sis_import_tab_in_account_3d48272d: "Détermine la visibilité de l’onglet Importations SIS dans la Navigation de compte. Permet à l’utilisateur de voir les dates d’importation SIS précédentes, les erreurs et les éléments importés."
   determines_visibility_of_sis_import_tab_in_account_5180b8e8: |-
       Détermine la visibilité de l’onglet Importations SIS dans la Navigation de compte.
@@ -7577,6 +7592,8 @@ fr-CA:
   disabling_f594bda: "Désactivation en cours..."
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "La désactivation de « Publier à SIS » (Post to SIS) n'est pas disponible pour les cours non publiés"
   disabling_sync_to_name_failed_e7521ebb: "Échec de la désactivation de la synchronisation pour %{name}"
+  disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: "La désactivation du thème élémentaire modifiera la police de l’interface Canvas pour tous les utilisateurs de votre cours."
+  disabling_this_permission_will_override_if_enabled_59c2b5c9: "La désactivation de cette autorisation annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de créer ou de modifier les rubriques à partir d’une tâche individuelle."
   disabling_this_permission_will_override_if_enabled_6481b015: "La désactivation de cette autorisation annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de créer ou de modifier les rubriques à partir d’une tâche individuelle. Toutefois, si « Acquis - ajouter/modifier/supprimer » est activé, l’utilisateur peut encore ajouter des rubriques par l’intermédiaire d’Acquis (Bouton « Gérer les rubriques »)."
   disabling_this_permission_will_override_if_enabled_7f2a87cc: "La désactivation de cette autorisation annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de créer ou de modifier les rubriques à partir d’une tâche individuelle. Toutefois, si « Acquis - ajouter/modifier/supprimer » est activé, l’utilisateur peut encore ajouter des rubriques par l’intermédiaire d’Acquis (bouton « Gérer les rubriques »)."
   disabling_this_permission_will_override_if_enabled_8d9c42f5: |-
@@ -8249,6 +8266,9 @@ fr-CA:
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "Erreur – option `élément` manquante : un élément auquel associer TreeBrowserView doit être spécifié lorsque l’option de rendu a la valeur « vrai » pour BBTreeBrowserView."
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Police de thème conviviale élémentaire et navigation limitée sur le cours."
+  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+      Thème convivial élémentaire, police et navigation limitée sur le cours.
+      La mise à jour de police ne s’applique qu’aux langues qui utilisent l’alphabet latin.
   email: 
     default_from_name: "Instructure Canvas"
   email_22a7d52d: Courriel
@@ -8309,6 +8329,7 @@ fr-CA:
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Permet d'afficher les rapports de plagiat et les scores de similarité dans le bac d’envoi du nouveau carnet de notes."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Active les nouveaux points de terminaison d’API pour les données de cours et d’utilisateur fournies par New Analytics."
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Active le tri par ID SIS, ID d’intégration et ID de connexion dans le nouveau Carnet de notes."
+  enabling_the_elementary_theme_will_change_the_font_c944b619: "L’activation du thème élémentaire modifiera la police dans l’interface Canvas et simplifiera le menu de navigation du cours pour tous les utilisateurs de votre cours."
   encourage_class_participation_4e069479: "Encourager la participation de la classe"
   encourage_student_discourse_7836b9f7: "Encourager le discours étudiant"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Sourcedids chiffrés pour les résultats de base"
@@ -8373,6 +8394,7 @@ fr-CA:
   enrollment_term_7bfe840: "Trimestre d’inscription"
   enrollment_terms_8753ec11: "Modalités d’inscription"
   enrollments_e250c9c3: Inscriptions
+  ensures_that_users_without_the_import_outcomes_per_42dfc56d: "S’assure que les utilisateurs sans l’autorisation « Importer des acquis » ne peuvent pas voir le bouton dans l’onglet Acquis"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Préciser un triplet hexadécimal ici pour utiliser une couleur personnalisée."
   enter_a_valid_date_46d77547: "Saisir une date valide"
   enter_a_what_if_score_668c91a3: "Saisir un score de simulation What If."
@@ -8682,7 +8704,7 @@ fr-CA:
   error_sending_submission_comment_dc15d24f: "Une erreur est survenue lors de l'envoi du commentaire sur l’envoi"
   error_sending_submission_d32dc075: "Erreur lors de l'envoi"
   error_starting_content_share_18fb1532: "Une erreur est survenue lors du démarrage du partage de contenu"
-  error_starting_save_operation_81bcb99: "Une erreur est survenue lors du démarrage de l’opération d'enregistrement :"
+  error_starting_save_operation_81bcb99: "Une erreur est survenue lors du démarrage de l’opération d'enregistrement :"
   error_submitting_to_plagiarism_service_9b0748cb: "Une erreur est survenue lors de l’envoi au service de plagiat"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Une erreur est survenue lors de l’envoi au service de plagiat. Vous pouvez envoyer à nouveau à partir de SpeedGrader."
   error_updating_submission_draft_1d40ade7: "Une erreur est survenue lors de la mise à jour de l’ébauche de l’envoi"
@@ -9049,7 +9071,7 @@ fr-CA:
   filename_is_unlocked_click_to_modify_99e847be: "%{fileName}  Est déverrouillé - Cliquez pour modifier"
   filename_is_unpublished_click_to_modify_7e731102: "%{fileName} Est non publié - Cliquez pour modifier"
   filename_preview_71b2cde2: "Aperçu de %{filename}"
-  filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} pourcent téléversés"
+  filename_progress_percent_uploaded_1f465e66: "%{fileName} — %{progress} pourcent téléversés"
   filename_uploaded_successfully_edd8e825: "Téléversement de %{fileName} réussi!"
   files: 
     could_not_find_file: "Ce fichier a été supprimé."
@@ -9614,6 +9636,7 @@ fr-CA:
   gradebook_context_name_9dbae5bc: "Carnet de notes - %{context_name}"
   gradebook_csvs: 
     grades_filename: Notes
+  gradebook_data_loading_performance_improvements_421e1c93: "Améliorations des performances de chargement des données du Carnet de notes"
   gradebook_export_failed_reason_2b0f6c53: "L’exportation du carnet de notes s’est terminée en erreur : %{reason}"
   gradebook_export_sort_order_bugfix_tally_219_62bfaacb: "Correctif de bogue de l’ordre de tri à l’exportation du Carnet de notes (Tally-219)"
   gradebook_export_started_723461b9: "L’exportation du carnet de notes a commencé"
@@ -10686,6 +10709,7 @@ fr-CA:
   hide_student_names_3e59e862: "Masquer les noms des étudiants"
   hide_students_with_no_results_6a22f991: "Masquer les étudiants sans aucun résultat"
   hide_sub_accounts_for_account_name_a6de98bd: "Masquer les sous-comptes pour %{account_name}"
+  hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Masquer le bouton « Importer les acquis d’apprentissage » en fonction des autorisations de l’utilisateur"
   hiding_grades_82691e44: "Masquer les notes"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Masquer les notes n'est pas autorisé, car les notes n’ont pas été publiées pour cette tâche."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Masquer les notes actualisera votre navigateur. Cela peut prendre un peu de temps..."
@@ -10879,6 +10903,12 @@ fr-CA:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Si cette option est activée, l'historique des envois pour les questionnaires Quizzes.Next est traité séparément."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Si activée, l'option sera présentée pour avoir des rubriques sans notation."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Si cette option est activée, le formulaire d'inscription des parents exigera un code de jumelage des élèves au lieu du nom d'utilisateur et du mot de passe de l'enfant."
+  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+      Si cette option est activée, l’interface utilisateur de la clé de développement de l’administrateur du site n’affichera que
+      les clés de développement de l’administrateur du site. Notez que cela n’affecte que
+      les instances Canvas où les comptes racines sont sur le même partage
+      que le compte administrateur du site. Dans d’autres cas, le comportement s’est
+      déjà conduit de cette façon.
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(En l’absence de sélection, envoyer à toutes les personnes listées dans le compte)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(En l’absence de sélection, envoyer à toutes les personnes listées dans le sous-compte)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(En l’absence de sélection, afficher à toutes les personnes énumérées dans le sous-compte)"
@@ -11915,6 +11945,7 @@ fr-CA:
   lti_add_edit_delete_15905170: "LTI - ajouter/modifier/supprimer"
   lti_advantage_services_c1746cb4: "Services Avantage LTI"
   lti_key_14ad02b1: "Clé LTI"
+  lti_launch_error_41eac9a: "Erreur de lancement de LTI"
   lti_report_2b6193ab: "Rapport LTI"
   luxembourg_352_85f4124d: "Luxembourg (+352)"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -14271,6 +14302,7 @@ fr-CA:
   no_content_not_visible_to_students_b59f4867: "Aucun contenu. Non visible pour les étudiants"
   no_courses_favorited_4e69fd63: "Pas de cours préférés"
   no_courses_found_12d68a74: "Aucun cours trouvé"
+  no_courses_to_display_700f94c4: "Aucun cours à afficher"
   no_date_bfeb2df7: "Aucune date"
   no_description_c2554c25: "Pas de description"
   no_details_1ee29870: "Aucune information"
@@ -14658,8 +14690,11 @@ fr-CA:
       scheduling: Planification
   notification_preferences_cf47083d: "Préférences de notifications"
   notifications_cbfa7704: Notifications
+  notifications_off_80da021c: "Notifications désactivées"
   notifications_search_results_80a0b06f: "Résultats selon la recherche par Notifications"
+  notifications_unsupported_65f6bf65: "Notifications non prises en charge"
   notifications_view_f9a60770: "Notifications - Voir"
+  notify_immediately_d1749c07: "Notifier immédiatement"
   notify_users_this_quiz_has_changed_c5b05995: "Informer les utilisateurs que ce questionnaire a changé"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Maintenant que votre cours est prêt et disponible, vous n’avez probablement plus besoin de cette liste de vérification. Nous allons tout de même la conserver au cas où vous souhaiteriez essayer autre chose ou simplement besoin d’un peu d’aide si vous modifiez le contenu de votre cours."
   now_viewing_attempt_current_attempt_918e616: "Maintenant en train de regarder la tentative %{current_attempt}"
@@ -14836,6 +14871,7 @@ fr-CA:
   only_course_announcements_can_be_section_specific_eabcd6e0: "Seulement les annonces des cours peuvent être spécifiques aux sections"
   only_once_after_each_attempt_cc842738: "Une seule fois après chaque tentative"
   only_show_announcement_on_current_account_domain_fc341eea: "Afficher uniquement les annonces de domaine du compte actuel"
+  only_show_site_admin_keys_in_the_site_admin_ui_64827f33: "Afficher uniquement les clés de l’administrateur du site dans l’interface utilisateur de l’administrateur du site"
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Seuls les enseignants peuvent voir ce cours avant sa publication"
   only_the_moderator_can_edit_this_assignment_a162b20d: "Seul le modérateur peut modifier cette tâche"
   oops_something_went_wrong_importing_name_d382cac1: "Oups! Une erreur est survenue lors de l’importation de « %{name} »"
@@ -15264,6 +15300,7 @@ fr-CA:
   percentused_of_bytesavailable_used_894e2327: "%{percentUsed} % sur %{bytesAvailable} utilisés"
   percentused_of_bytesavailable_used_a859a40d: "%{percentUsed} de %{bytesAvailable} utilisé"
   performance_ac5f9e70: Rendement
+  performance_improvements_for_loading_data_into_gra_1c3a0c60: "Amélioration des performances pour le chargement des données dans le Carnet de notes."
   performance_improvements_for_the_grade_calculation_7d9b0b16: "Amélioration des performances pour le processus de calcul de la note."
   performed_by_70b3ce96: "Effectué par"
   permission_must_be_enabled_for_someone_397e1ce3: "La permission doit être activée pour quelqu'un"
@@ -15325,6 +15362,7 @@ fr-CA:
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "Veuillez ne pas répondre à ce courriel, il ne sera pas expédié."
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Veuillez saisir une date d’échéance sur ou après %{earliestDate}"
   please_enter_a_name_for_this_link_318f01a4: "Veuillez saisir un nom pour ce lien."
+  please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Veuillez saisir un nombre compris entre 0 et 100 pour le taux de migration"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Indiquez un élément à rechercher comprenant au moins trois caractères."
   please_enter_a_url_d2c868b5: "Veuillez saisir une URL"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Veuillez saisir une URL valide (par exemple http://exemple.com)"
@@ -15340,6 +15378,7 @@ fr-CA:
   please_select_a_user_role_for_this_link_9fb4e655: "Veuillez saisir un rôle d'utilisateur pour ce lien."
   please_select_an_item_30c287ef: "Veuillez sélectionner un élément"
   please_select_one_f931e883: "Veuillez sélectionner une option"
+  please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Veuillez essayer de rétablir la connexion à l’outil en sélectionnant à nouveau l’outil dans l’interface de la tâche ou d’élément de module et en l’enregistrant."
   please_upload_files_as_a_zip_5a2c799f: "Veuillez téléverser les fichiers sous forme d'un fichier .zip"
   please_wait_2b646bc2: "Veuillez attendre."
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: "Veuillez patienter pendant le téléversement et le traitement de votre fichier."
@@ -15567,6 +15606,10 @@ fr-CA:
     inst_fs: 
       description: "Service de fichiers qui sert de Proxy pour S3."
       name: Inst-FS
+    inst_fs_settings: 
+      description: "Héberge des fichiers téléversés avec le service Inst-FS."
+      labels: 
+        migration_rate: "Possibilité de migrer des fichiers plus anciens vers Inst-FS à l’accès (0 à 100)"
     kaltura: 
       description: "Enregistrement et lecture audio/vidéo Kaltura"
       name: Kaltura
@@ -16355,6 +16398,8 @@ fr-CA:
   published_click_to_unpublish_module_name_eddd07bb: "Publié. Cliquez pour annuler la publication de %{module_name}."
   published_click_to_unpublish_name_9bdd66cf: "Publié. Cliquez pour annuler la publication de %{name}"
   published_click_to_unpublish_title_358122a: "Publié  Cliquer pour enlever la publication %{title}."
+  published_courses_294ef14c: "Cours publiés"
+  published_courses_count_e7e82f3b: "Cours publiés (%{count})"
   publishing_9890d50f: "Publication en cours..."
   publishing_is_disabled_for_this_item_efa7803f: "La publication est désactivée pour cet élément."
   publishing_item_name_is_disabled_8207a9e7: "La publication de %{item_name} est désactivée"
@@ -17937,8 +17982,11 @@ fr-CA:
     plugin_settings: 
       labels: 
         enabled: "Activé (le convertisseur QTI doit être activé également)"
+  responsive_admin_settings_4f8670d7: "Réglages/administrateur réactifs"
+  responsive_awareness_226843a: "Sensibilisation réactive"
   responsive_global_nav_logo_99488e92: "Logo de navigation mondiale réactive"
   responsive_layout_54e4ca06: "Modèle réactif"
+  responsive_misc_dc572cc0: "Divers réactifs"
   restart_link_validation_b61286fc: "Redémarrer la validation de lien"
   restore_courses_182e162e: "Restaurer les cours"
   restored_course_association_course_c9e16045: "Association de cours restauré %{course}"
@@ -18229,7 +18277,7 @@ fr-CA:
   saved_discussion_settings_successfully_ebd46a57: "Paramètres de discussion enregistrés avec succès"
   saving_2521e616: "Sauvegarde en cours"
   saving_assignment_dates_progress_9856153d: "Enregistrement de la progression des dates de tâche"
-  saving_assignment_dates_progress_percent_a5ea89a1: "Enregistrement de la progression des dates de tâche : %{percent}%"
+  saving_assignment_dates_progress_percent_a5ea89a1: "Enregistrement de la progression des dates de tâche : %{percent}%"
   saving_assignment_fb958949: "Enregistrement de la tâche"
   saving_associations_989bd4da: "Enregistrement des associations"
   saving_associations_complete_e4b9634d: "L’enregistrement des associations est terminé"
@@ -19975,8 +20023,8 @@ fr-CA:
       submitted: envoyé
       unsubmitted: "non envoyé"
   submission_added_title_50ebdc85: "soumission ajoutée : %{title}"
-  submission_annotation_user_name_assignment_title_c_39910597: "Annotation de l'envoi : %{user_name}, %{assignment_title}, %{course_name}"
-  submission_annotation_user_name_assignment_title_c_80c1963e: "Annotation de l'envoi : %{user_name}, %{assignment_title}, %{course_name}"
+  submission_annotation_user_name_assignment_title_c_39910597: "Annotation de l'envoi : %{user_name}, %{assignment_title}, %{course_name}"
+  submission_annotation_user_name_assignment_title_c_80c1963e: "Annotation de l'envoi : %{user_name}, %{assignment_title}, %{course_name}"
   submission_comment: 
     unknown_author: Quelqu’un
   submission_comment_created_f9375ca2: "Commentaire d’envoi créé"
@@ -20614,6 +20662,7 @@ fr-CA:
   there_was_an_error_generating_the_pairing_code_9edd639b: "Une erreur est survenue lors de la génération du code de jumelage"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Une erreur s'est produite générant le lancement de l'outil"
   there_was_an_error_in_processing_your_request_6513a49a: "Erreur lors du traitement de votre demande"
+  there_was_an_error_launching_to_the_configured_too_f8ed5767: "Une erreur est survenue lors du lancement de l’outil configuré."
   there_was_an_error_removing_the_image_c83acffe: "Une erreur est survenue lors de la suppression de l'image"
   there_was_an_error_removing_the_item_f8324776: "Une erreur est survenue lors du retrait de l'élément"
   there_was_an_error_retrieving_assignment_dates_39320c15: "Une erreur est survenue lors de la récupération des dates des tâches."
@@ -20633,7 +20682,7 @@ fr-CA:
   there_was_an_unknown_error_registering_the_tool_b9a29954: "Une erreur inconnue s'est produite lors de l'enregistrement de l'outil"
   there_were_a_total_of_count_errors_db1d89de: "Il y avait un total de %{count} erreurs."
   there_were_a_total_of_count_warnings_6405df1e: "Il y avait un total de %{count} avertissements."
-  there_were_errors_saving_the_assignment_dates_3b39571b: "Une erreur est survenue lors de l’enregistrement.des date de tâche :"
+  there_were_errors_saving_the_assignment_dates_3b39571b: "Une erreur est survenue lors de l’enregistrement.des date de tâche :"
   there_were_errors_with_the_form_errors_ab5b559a: "Des erreurs se sont produites avec le formulaire : %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Il y avait plusieurs correspondances possibles avec l'importation. Veuillez les résoudre les ci-dessous."
   there_were_some_files_we_didn_t_know_what_to_do_wi_6156913f: "Il y avait certains fichiers dont nous ne savions pas comment les traiter. Ils n’ont été ajoutés à aucune page d’envoi."
@@ -21082,6 +21131,7 @@ fr-CA:
       « Notation - voir toutes les notes » doit également être activé.
   to_access_the_account_courses_page_courses_view_li_e1da6165: "Pour accéder à la page des Cours du compte, « Cours - voir la liste » doit être activé."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "Pour accéder à la page d'index des tâches, « Contenu du cours - voir » doit être activé. Pour différencier les tâches à des étudiants à titre individuel, « Utilisateurs - voir la liste » doit également être activé."
+  to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "Pour accéder au lien des Cours dans la Navigation de compte, « Cours - voir la liste » doit être activé."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Pour accéder à la page des Personnes et voir les groupes, « Utilisateurs - voir la liste » doit également être activé."
   to_access_the_people_page_users_view_list_must_be__1e9e5d75: "Pour accéder à la page des Personnes, « Utilisateurs — voir la liste » doit être activé. Si le paramètre d’ouverture de compte d’inscription est activé, les utilisateurs disposant de cette autorisation peuvent ajouter les étudiants à un cours par l’intermédiaire d’adresse de courriel si l’utilisateur ne dispose pas déjà d’un compte Canvas. Pour voir les ID SIS, « Données SIS — lecture » doit être activé. Pour ajouter un utilisateur à un cours par l’intermédiaire de l’ID SIS, « Données du SIS - gérer » doit également être activé. Pour modifier une section de l’étudiant, « Utilisateurs — voir la liste » et « Conversations — envoyer des messages aux membres individuels du cours » doivent également être activés. Pour lier un observateur à un étudiant, « Conversations — envoyer des messages aux membres individuels du cours » doit également être activé."
   to_access_the_people_page_users_view_list_must_be__2f01333b: "Pour accéder à la page des Personnes, « Utilisateurs - voir la liste » doit être activé. Si cette autorisation est activée, et si « Utilisateurs - voir l’adresse de courriel principale » est désactivé, les utilisateurs peuvent voir les adresses de courriel utilisées comme ID de connexion. Pour voir les ID de connexion, Utilisateur - ajouter/retirer des étudiants dans des cours et Utilisateurs - ajouter/retirer des enseignants, concepteurs de cours ou TA dans des cours doivent également être activés."
@@ -21105,6 +21155,7 @@ fr-CA:
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "Pour activer les SMS, veuillez saisir le code de confirmation de 4 caractères envoyé à %{sms_number}."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "Pour activer ce canal de communication, veuillez saisir le code de confirmation de 4 caractères envoyé à %{sms_number}."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "Pour ajouter des annonces, « Discussions - modérer » doit également être activé. Pour voir les annonces récentes sur la page d'accueil, « Afficher les annonces récentes » sur la case à cocher située sur la page d'accueil doit être sélectionné dans les paramètres de cours."
+  to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "Pour ajouter les cours associés, « Cours modèles - ajouter/modifier/associer/supprimer » et « Cours — ajouter/modifier/supprimer » doivent également être activés."
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "Pour ajouter des utilisateurs, des cours et des inscriptions en bloc, cliquez sur Importations SIS."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "Pour ajouter, modifier ou supprimer des Groupes, « Groupes - ajouter/modifier/supprimer » doit également être activé."
   to_add_individual_courses_click_courses_c5355180: "Pour ajouter des cours individuels, cliquez sur Cours."
@@ -21139,6 +21190,7 @@ fr-CA:
       Pour mettre fin à une conférence de longue durée, « Contenu de cours - ajouter/modifier/supprimer » doit être activé.
       Si « Contenu de cours - ajouter/modifier/supprimer » est activé et « Conférences Web - créer » est désactivé, l'utilisateur peut toujours gérer les conférences.
       Cette autorisation contrôle la capacité d'un utilisateur à créer des conférences dans des cours et des groupes.
+  to_allow_the_outcomes_page_as_read_only_this_permi_f3c580bd: "Pour autoriser la page d’Acquis en lecture seule, cette autorisation peut être désactivée mais « Contenu de cours - voir » doit être activé. Pour importer les acquis, « Acquis - importer » doit également être activé."
   to_allow_user_to_moderate_grades_grades_select_fin_e98c1f0e: "Pour autoriser l'utilisateur à modérer les notes, « Notation - sélectionner la note finale pour la modération » doit également être activé."
   to_allow_view_edit_and_delete_functionality_of_col_17533079: |-
       Pour permettre de voir, de modifier et de supprimer des fonctionnalités de collaborations créées par d'autres utilisateurs, « Contenu de cours - ajouter/modifier/supprimer » doit également être activé.
@@ -21194,6 +21246,10 @@ fr-CA:
   to_edit_a_student_s_section_users_add_remove_stude_f974cf: |-
       Pour modifier une section de l'étudiant, « Utilisateurs - ajouter/retirer des étudiants des cours » et « Conversations - envoyer des messages aux membres individuels du cours » doivent également être activés.
       Pour modifier une section pour un enseignant, un AE, ou un concepteur de cours, « Utilisateur  - ajouter/retirer des enseignants, des concepteurs de cours, ou des AE des cours » et « Conversations - envoyer des messages aux membres individuels du cours » doivent également être activés.
+  to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Pour modifier les paramètres de Cours modèle, « Cours modèle - ajouter/modifier/supprimer/associer » doit également être activé. Pour ajouter un cours associé, « Cours modèles - ajouter/modifier/associer/supprimer » et « Cours - voir la liste » doivent également être activés. Pour modifier les paramètres de verrouillage sur tout d’objet de Modèle, cette autorisation doit être activée. Pour modifier les paramètres de verrouillage sur les fichiers, « Fichiers de cours — ajouter/modifier/supprimer » doit également être activé. Pour modifier les paramètres de verrouillage sur les questionnaires, « Tâches et questionnaires — ajouter/modifier/supprimer » doit également être activé."
+  to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Pour modifier les paramètres de verrouillage de Modèle depuis la page d’index des tâches, « Cours — ajouter/modifier/supprimer » doit également être activé. Si cette autorisation n’est pas activée, et « Cours — ajouter/modifier/supprimer » est activé, les paramètres de verrouillage de Modèle pour une tâche peuvent être gérés à partir de la page de détails de la tâche. Pour modifier les paramètres de verrouillage de Modèle sur un questionnaire individuel ou depuis la page d’index des Questionnaires, « Cours — ajouter/modifier/supprimer » doit également être activé."
+  to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Pour modifier les paramètres de verrouillage du modèle de la page d’index de Discussions, « Cours — ajouter/modifier/supprimer » et « Discussions — voir » doivent également être activés. Si cette autorisation n’est pas activée, et « Cours — ajouter/modifier/supprimer » et « Discussions — voir » sont activés, les paramètres de verrouillage du Modèle peuvent être modifiés sur les discussions individuelles."
+  to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Pour modifier les paramètres de verrouillage de Modèle depuis la page d’index des Pages, « Cours — ajouter/modifier/supprimer » doit également être activé. Si cette autorisation n’est pas activée, et « Cours — ajouter/modifier/supprimer » est activé, les paramètres de verrouillage du Modèle peuvent être modifiés sur les pages individuelles."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "Pour modifier des systèmes de notation de cours, « Cours - ajouter/modifier/supprimer » doit également être activé."
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "Pour modifier les paramètres de cours, « Cours - ajouter/modifier/supprimer » doit également être activé."
   to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "Pour modifier les paramètres de cours, « Cours — ajouter/modifier/supprimer » doit également être activé."
@@ -21602,6 +21658,8 @@ fr-CA:
   unpublished_content_referenced_in_this_resource_865f8ef6: "Contenu non publié référencé dans cette ressource :"
   unpublished_courses_title: "Cours non publiés"
   unpublished_dfd8801: "non publié(e)(s)"
+  unpublished_drafts_bb352243: "Ébauches non publiées"
+  unpublished_drafts_count_86e16f17: "Ébauches non publiées (%{count})"
   unpublishing_1fa99dc6: "Retrait de la publication en cours..."
   unread_c14cb06f: "non-lus,"
   unread_e9c1b19c: "Non lues"
@@ -22194,6 +22252,7 @@ fr-CA:
       Les utilisateurs et les durées sont situés sur le compte, de sorte que le point d’extrémité SIS confirme toujours les autorisations de l'utilisateur en fonction du compte. Les sous-comptes disposent seulement de la propriété des cours et des sections; ils ne possèdent pas les données de l'utilisateur.
       Les administrateurs de sous-compte ne sont pas en mesure de voir l'information SIS sauf s’ils ont également un rôle d’instructeur dans un cours. Les administrateurs de sous-compte ne peuvent pas voir l'information SIS sans l’association de cours, puisque le rôle d’instructeur est également autorisé à lire les données SIS au niveau du compte.
   users_and_terms_are_located_at_the_account_so_the__6896b895: "Les utilisateurs et les durées sont situés sur le compte, de sorte que le point d’extrémité SIS confirme toujours les autorisations de l’utilisateur en fonction du compte. Les sous-comptes disposent seulement de la propriété des cours et des sections; ils ne possèdent pas les données de l’utilisateur. Les administrateurs de sous-compte ne sont pas en mesure de voir l’information SIS sauf s’ils ont également un rôle d’instructeur dans un cours. Les administrateurs de sous-compte ne peuvent pas voir l’information SIS sans l’association de cours, puisque le rôle d’instructeur est également autorisé à lire les données SIS au niveau du compte."
+  users_can_access_and_create_but_not_edit_individua_72b88c41: "Les utilisateurs peuvent accéder et créer (mais non modifier) les rubriques de tâche individuelle grâce aux Tâches lorsque « Contenu de cours - voir » et « Tâches et questionnaires — ajouter/modifier/supprimer » sont activés."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Les utilisateurs peuvent accéder au lien de gestions des banques de questions sur la page d’index des questionnaires lorsque « Contenu de cours - voir » et « Tâches et questionnaires - ajouter/modifier/supprimer » sont activés."
   users_d1b60cb0: Utilisateurs
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Utilisateurs - générer les codes de jumelage des étudiants pour l’observateur"
@@ -22367,6 +22426,7 @@ fr-CA:
   website_url_b995c5b6: "URL du site Web"
   website_url_input_1a3eab25: "Entrée de l’URL du site Web"
   week_s_cb1492ee: Semaine(s)
+  weekly_summary_56cd0c95: "Résumé hebdomadaire"
   weight_9b308e5b: Pondération
   weight_ff579a8e: "Pondération :"
   weight_final_grade_based_on_assignment_groups_3124161: "Pondérer la note finale en fonction des groupes de tâches"
@@ -22672,7 +22732,7 @@ fr-CA:
   you_can_review_the_submission_details_by_clicking__58a7753: "Vous pouvez consulter les détails de l’envoi en cliquant sur ce lien :"
   you_can_review_the_submission_details_by_clicking__9abc5515: "Vous pouvez consulter les détails de l'envoi en cliquant ce lien : %{link}."
   you_can_review_the_submission_details_using_the_li_c25dd615: "Vous pouvez examiner les détails de l’envoi en utilisant le lien ci-dessous."
-  you_can_review_the_submission_details_using_this_l_c7f51917: "Vous pouvez examiner les détails de l’envoi à l'aide de ce lien : %{link}."
+  you_can_review_the_submission_details_using_this_l_c7f51917: "Vous pouvez examiner les détails de l’envoi à l'aide de ce lien : %{link}."
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "Vous pouvez voir les détails du groupe en cliquant ce lien : %{link}."
   you_can_t_delete_a_root_account_5673c62d: "Vous ne pouvez pas supprimer un root_account."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Vous ne pouvez pas supprimer un sous-compte qui contient des cours."
