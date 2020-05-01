@@ -395,6 +395,22 @@ describe Message do
           @message.deliver
         end
 
+        it "delivers all sms when the sms_allowed override is set" do
+          @user.account.settings[:sms_allowed] = true
+          message_model(
+            dispatch_at: Time.now,
+            workflow_state: 'staged',
+            to: '+18015550100',
+            updated_at: Time.now.utc - 11.minutes,
+            path_type: 'sms',
+            notification_name: 'Conversation Message',
+            user: @user
+          )
+          expect(@message).to receive(:deliver_via_sms)
+          @message.deliver
+          @user.account.settings[:sms_allowed] = nil
+        end
+
       end
 
       it "uses Twilio for E.164 paths" do
