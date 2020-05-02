@@ -28,10 +28,11 @@ module Auditors::ActiveRecord
 
       def ar_attributes_from_event_stream(record)
         attrs_hash = record.attributes.except('id', 'version_number')
+        root_account_id = Account.where(id: record.account_id).pluck(:root_account_id).first
         attrs_hash['request_id'] ||= "MISSING"
         attrs_hash['uuid'] = record.id
-        attrs_hash['account_id'] = record.account.id
-        attrs_hash['root_account_id'] = record.root_account.id
+        attrs_hash['account_id'] = Shard.relative_id_for(record.account_id, Shard.current, Shard.current)
+        attrs_hash['root_account_id'] = (root_account_id || attrs_hash['account_id'])
         attrs_hash['assignment_id'] = Shard.relative_id_for(record.assignment_id, Shard.current, Shard.current)
         attrs_hash['context_id'] = Shard.relative_id_for(record.context_id, Shard.current, Shard.current)
         attrs_hash['grader_id'] = Shard.relative_id_for(record.grader_id, Shard.current, Shard.current)
