@@ -16,6 +16,12 @@
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": "Произошла ошибка при создании предварительного просмотра файла"
   },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "Произошла ошибка, что привело к созданию сетевого запроса"
+  },
+  "an_error_occurred_uploading_your_media_71f1444d": {
+    "message": "Произошла ошибка при отправке вашего мультимедиа."
+  },
   "announcement_list_da155734": { "message": "Список объявлений" },
   "announcements_a4b8ed4a": { "message": "Объявления" },
   "apps_54d24a47": { "message": "Приложения" },
@@ -33,6 +39,7 @@
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Автоматически открывать встроенный предварительный просмотр. (Предварительный просмотр отображается только после сохранения)"
   },
+  "available_folders_694d0436": { "message": "Доступные папки" },
   "cancel_caeb1e68": { "message": "Отменить" },
   "canvas_plugins_705a5016": { "message": "Подключаемые модули Canvas" },
   "choose_caption_file_9c45bc4e": {
@@ -82,6 +89,7 @@
   },
   "course_documents_104d76e0": { "message": "Документы курса" },
   "course_files_62deb8f8": { "message": "Файлы курса" },
+  "course_files_a31f97fc": { "message": "Файлы курса" },
   "course_images_f8511d04": { "message": "Изображения курса" },
   "course_links_b56959b9": { "message": "Ссылки курса" },
   "course_media_ec759ad": { "message": "Мультимедиа курса" },
@@ -146,6 +154,8 @@
   "external_links_3d9f074e": { "message": "Внешние ссылки" },
   "extra_large_b6cdf1ff": { "message": "Очень крупный" },
   "file_name_8fd421ff": { "message": "Имя файла" },
+  "file_upload_failed_af22dd91": { "message": "Не удалось загрузить файл" },
+  "file_uploading_56c9c0c8": { "message": "Отправка файла" },
   "file_url_c12b64be": { "message": "URL файла" },
   "filename_file_icon_602eb5de": { "message": "иконка файла { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -160,6 +170,7 @@
   "focus_the_popup_context_toolbar_7979f4f8": {
     "message": "Сконцентрироваться на всплывающей контекстной панели инструментов"
   },
+  "folder_tree_fbab0726": { "message": "Структура папки" },
   "formatting_5b143aa8": { "message": "Форматирование" },
   "found_auto_saved_content_3f6e4ca5": {
     "message": "Найдено сохраненное в автоматическом режиме содержимое"
@@ -178,6 +189,7 @@
   },
   "grades_a61eba0a": { "message": "Оценки" },
   "group_files_4324f3df": { "message": "Файлы группы" },
+  "group_files_82e5dcdb": { "message": "Файлы группы" },
   "group_navigation_99f191a": { "message": "Навигация группы" },
   "heading_2_5b84eed2": { "message": "Заголовок 2" },
   "heading_3_2c83de44": { "message": "Заголовок 3" },
@@ -216,7 +228,9 @@
     "message": "Загрузка завершилась безрезультатно..."
   },
   "loading_failed_e6a9d8ef": { "message": "Сбой загрузки." },
+  "loading_folders_d8b5869e": { "message": "Загрузка папок" },
   "loading_media_f3455841": { "message": "Загрузка носителя" },
+  "locked_762f138b": { "message": "Заблокировано" },
   "media_af190855": { "message": "Мультимедиа" },
   "medium_5a8e9ead": { "message": "Средний" },
   "mic_a7f3d311": { "message": "Микрофон" },
@@ -225,6 +239,7 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Должно быть как минимум { width } x { height }пикселов"
   },
+  "my_files_2f621040": { "message": "Мои файлы" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Навигация в меню или панели инструментов"
   },
@@ -298,6 +313,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Что-то пошло не так, и я не знаю, что вам показать."
   },
+  "something_went_wrong_d238c551": { "message": "Что-то пошло не так" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
     "message": "Что-то пошло не так, обновите страницу и попробуйте еще раз"
   },
@@ -313,6 +329,7 @@
   "styles_2aa721ef": { "message": "Стили" },
   "submit_a3cc6859": { "message": "Отправить" },
   "subscript_59744f96": { "message": "Надпись снизу" },
+  "success_file_uploaded_8174e93f": { "message": "Успешно: Файл отправлен" },
   "superscript_8cb349a2": { "message": "Надпись сверху" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Поддерживаемые типы файлов: SRT или WebVTT"
@@ -351,6 +368,9 @@
   "upload_file_fd2361b8": { "message": "Загрузить файл" },
   "upload_image_6120b609": { "message": "Загрузить изображение" },
   "upload_media_ce31135a": { "message": "Загрузить медиа" },
+  "upload_not_available_for_this_folder_8f8623c6": {
+    "message": "Отправка недоступна для этой папки"
+  },
   "upload_record_media_e4207d72": { "message": "Загрузить/записать медиа" },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "упорядоченный алфавитный список в верхнем регистре"

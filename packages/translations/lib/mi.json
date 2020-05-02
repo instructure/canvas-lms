@@ -56,6 +56,12 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": "He hapa i puta i te wā o te hanga ana i te kōnae arokite"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "I puta he hapa i te wā e hanga ana i te tono whatunga"
+    },
+    "an_error_occurred_uploading_your_media_71f1444d": {
+        "message": "He hapa i puta i te wā e tikiake ana i tō pāpāhō."
+    },
     "announcement_fb4cb645": {
         "message": "Pānui"
     },
@@ -121,6 +127,9 @@
     },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Aunoa huaki he arokite i roto i te raina. (Arokite whakātu anake i muri o te tiaki)"
+    },
+    "available_folders_694d0436": {
+        "message": "Ngā kōpaki e wātea ana"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Te timatatanga o tō hītori Hei-Mahi"
@@ -214,6 +223,9 @@
     },
     "course_files_62deb8f8": {
         "message": "Ngā Kōnae Akoranga"
+    },
+    "course_files_a31f97fc": {
+        "message": "Ngā kōnae akoranga"
     },
     "course_images_f8511d04": {
         "message": "Ngā Akoranga Āhua"
@@ -431,6 +443,12 @@
     "file_name_8fd421ff": {
         "message": "Ingoa kōnae"
     },
+    "file_upload_failed_af22dd91": {
+        "message": "Rahua te utanga kōnae"
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "E uta ana te kōnae"
+    },
     "file_url_c12b64be": {
         "message": "Kōnae URL"
     },
@@ -454,6 +472,9 @@
     },
     "focus_the_popup_context_toolbar_7979f4f8": {
         "message": "Arotahi te pakūake ihirangi paeutauta"
+    },
+    "folder_tree_fbab0726": {
+        "message": "Rakau kōpaki"
     },
     "formatting_5b143aa8": {
         "message": "Whakahōputu"
@@ -489,6 +510,9 @@
         "message": "Kua utaina ngā kōeke"
     },
     "group_files_4324f3df": {
+        "message": "Ngā kōnae rōpū"
+    },
+    "group_files_82e5dcdb": {
         "message": "Ngā kōnae rōpū"
     },
     "group_navigation_99f191a": {
@@ -608,6 +632,9 @@
     "loading_failed_e6a9d8ef": {
         "message": "I hapa te utaina."
     },
+    "loading_folders_d8b5869e": {
+        "message": "E uta ana ngā kōpaki"
+    },
     "loading_grades_c842c887": {
         "message": "E uta ana ngā kōeke"
     },
@@ -622,6 +649,9 @@
     },
     "location_3b6ff307": {
         "message": "Wāhi:"
+    },
+    "locked_762f138b": {
+        "message": "Kua rakaina"
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Titiro rite kaore tētahi i kōnei"
@@ -649,6 +679,9 @@
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Me kia i te iti rawa { width } x { height }px"
+    },
+    "my_files_2f621040": {
+        "message": "Aku kōnae"
     },
     "my_grades_98834476": {
         "message": "Aku Kōeke"
@@ -899,6 +932,9 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "I raruraru tētahi mea me taku kore e mōhio he aha te mea hei whakātu ki a koe."
     },
+    "something_went_wrong_d238c551": {
+        "message": "I raruraru tētahi mea"
+    },
     "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
         "message": "I raruraru tētahi mea, ngana anō i muri o te whakahoutanga i te whārangi"
     },
@@ -940,6 +976,9 @@
     },
     "subscript_59744f96": {
         "message": "Tuhinga"
+    },
+    "success_file_uploaded_8174e93f": {
+        "message": "Angitu: Kaore te tukuake i te wātea mo tēnei kōpaki"
     },
     "success_to_do_created_e34ed395": {
         "message": "Angitu: Hei Mahi kua hāngaia"
@@ -1048,6 +1087,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Tukuatu pāpāho"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "Kaore i te wātea te tukuake mo tēnei kōpaki"
     },
     "upload_record_media_e4207d72": {
         "message": "Tukuatu/Tāhopu Pāpāpho"

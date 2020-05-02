@@ -56,6 +56,12 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": "Gwall wrth gynhyrchu''r rhagolwg ffeil"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "Gwall wrth wneud cais ar gyfer y rhwydwaith"
+    },
+    "an_error_occurred_uploading_your_media_71f1444d": {
+        "message": "Gwall wrth lwytho eich cyfryngau i fyny."
+    },
     "announcement_fb4cb645": {
         "message": "Cyhoeddiad"
     },
@@ -121,6 +127,9 @@
     },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Agor rhagolwg mewn-llinell yn awtomatig. (Dim ond ar ôl cadw mae''r rhagolwg i''w weld)"
+    },
+    "available_folders_694d0436": {
+        "message": "Ffolderi sydd ar gael"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Dechrau’r Hanes Tasgau i’w Gwneud"
@@ -214,6 +223,9 @@
     },
     "course_files_62deb8f8": {
         "message": "Ffeiliau Cwrs"
+    },
+    "course_files_a31f97fc": {
+        "message": "Ffeiliau cwrs"
     },
     "course_images_f8511d04": {
         "message": "Delweddau Cwrs"
@@ -431,6 +443,12 @@
     "file_name_8fd421ff": {
         "message": "Enw’r Ffeil"
     },
+    "file_upload_failed_af22dd91": {
+        "message": "Wedi methu llwytho ffeil i fyny"
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "Ffeil wrthi’n llwytho i fyny"
+    },
     "file_url_c12b64be": {
         "message": "URL Ffeil"
     },
@@ -454,6 +472,9 @@
     },
     "focus_the_popup_context_toolbar_7979f4f8": {
         "message": "Canolbwyntio''r bar offer naid cyd-destun"
+    },
+    "folder_tree_fbab0726": {
+        "message": "Coeden ffolderi"
     },
     "formatting_5b143aa8": {
         "message": "Fformatio"
@@ -490,6 +511,9 @@
     },
     "group_files_4324f3df": {
         "message": "Ffeiliau Grŵp"
+    },
+    "group_files_82e5dcdb": {
+        "message": "Ffeiliau grŵp"
     },
     "group_navigation_99f191a": {
         "message": "Dewislen Crwydro Grwpiau"
@@ -608,6 +632,9 @@
     "loading_failed_e6a9d8ef": {
         "message": "Wedi methu llwytho."
     },
+    "loading_folders_d8b5869e": {
+        "message": "Wrthi’n llwytho ffolderi"
+    },
     "loading_grades_c842c887": {
         "message": "Llwytho Graddau"
     },
@@ -622,6 +649,9 @@
     },
     "location_3b6ff307": {
         "message": "Lleoliad:"
+    },
+    "locked_762f138b": {
+        "message": "Wedi Cloi"
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Does dim byd yma yn ôl pob golwg"
@@ -649,6 +679,9 @@
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Yn gorfod bod o leiaf { width } x { height }px"
+    },
+    "my_files_2f621040": {
+        "message": "Fy ffeiliau"
     },
     "my_grades_98834476": {
         "message": "Fy Ngraddau"
@@ -899,6 +932,9 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Aeth rhywbeth o''i le a dydw i ddim yn gwybod beth i''w ddangos i chi."
     },
+    "something_went_wrong_d238c551": {
+        "message": "Aeth rhywbeth o’i le"
+    },
     "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
         "message": "Aeth rhywbeth o’i le, rhowch gynnig arall arni ar ôl adnewyddu''r dudalen"
     },
@@ -940,6 +976,9 @@
     },
     "subscript_59744f96": {
         "message": "Isysgrif"
+    },
+    "success_file_uploaded_8174e93f": {
+        "message": "Wedi llwyddo: Ffeil wedi’i llwytho i fyny"
     },
     "success_to_do_created_e34ed395": {
         "message": "Wedi llwyddo: Wedi creu rhestr o dasgau i’w gwneud"
@@ -1048,6 +1087,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Llwytho Cyfryngau i fyny"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "Nid yw llwytho i fyny ar gael ar gyfer y ffolder hon"
     },
     "upload_record_media_e4207d72": {
         "message": "Llwytho i Fyny/Recordio Cyfryngau"

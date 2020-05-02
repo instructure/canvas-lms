@@ -14,6 +14,12 @@
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": "Gwall wrth gynhyrchu''r rhagolwg ffeil"
   },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "Gwall wrth wneud cais ar gyfer y rhwydwaith"
+  },
+  "an_error_occurred_uploading_your_media_71f1444d": {
+    "message": "Gwall wrth lwytho eich cyfryngau i fyny."
+  },
   "announcement_list_da155734": { "message": "Rhestr Cyhoeddiadau" },
   "announcements_a4b8ed4a": { "message": "Cyhoeddiadau" },
   "apps_54d24a47": { "message": "Apiau" },
@@ -33,6 +39,7 @@
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Agor rhagolwg mewn-llinell yn awtomatig. (Dim ond ar ôl cadw mae''r rhagolwg i''w weld)"
   },
+  "available_folders_694d0436": { "message": "Ffolderi sydd ar gael" },
   "cancel_caeb1e68": { "message": "Canslo" },
   "canvas_plugins_705a5016": { "message": "Ategion Canvas" },
   "choose_caption_file_9c45bc4e": { "message": "Dewiswch ffeil gapsiwn" },
@@ -78,6 +85,7 @@
   },
   "course_documents_104d76e0": { "message": "Dogfennau Cwrs" },
   "course_files_62deb8f8": { "message": "Ffeiliau Cwrs" },
+  "course_files_a31f97fc": { "message": "Ffeiliau cwrs" },
   "course_images_f8511d04": { "message": "Delweddau Cwrs" },
   "course_links_b56959b9": { "message": "Dolenni Cwrs" },
   "course_media_ec759ad": { "message": "Cyfryngau Cwrs" },
@@ -140,6 +148,10 @@
   "external_links_3d9f074e": { "message": "Dolenni Allanol" },
   "extra_large_b6cdf1ff": { "message": "Mawr Iawn" },
   "file_name_8fd421ff": { "message": "Enw’r Ffeil" },
+  "file_upload_failed_af22dd91": {
+    "message": "Wedi methu llwytho ffeil i fyny"
+  },
+  "file_uploading_56c9c0c8": { "message": "Ffeil wrthi’n llwytho i fyny" },
   "file_url_c12b64be": { "message": "URL Ffeil" },
   "filename_file_icon_602eb5de": { "message": "{ filename } eicon ffeil" },
   "filename_image_preview_6cef8f26": {
@@ -154,6 +166,7 @@
   "focus_the_popup_context_toolbar_7979f4f8": {
     "message": "Canolbwyntio''r bar offer naid cyd-destun"
   },
+  "folder_tree_fbab0726": { "message": "Coeden ffolderi" },
   "formatting_5b143aa8": { "message": "Fformatio" },
   "found_auto_saved_content_3f6e4ca5": {
     "message": "Wedi dod o hyd i gynnwys sydd wedi’i gadw’n awtomatig"
@@ -170,6 +183,7 @@
   },
   "grades_a61eba0a": { "message": "Graddau" },
   "group_files_4324f3df": { "message": "Ffeiliau Grŵp" },
+  "group_files_82e5dcdb": { "message": "Ffeiliau grŵp" },
   "group_navigation_99f191a": { "message": "Dewislen Crwydro Grwpiau" },
   "heading_2_5b84eed2": { "message": "Pennawd 2" },
   "heading_3_2c83de44": { "message": "Pennawd 3" },
@@ -206,7 +220,9 @@
   "loading_bde52856": { "message": "Wrthi’n llwytho" },
   "loading_failed_b3524381": { "message": "Wedi methu llwytho..." },
   "loading_failed_e6a9d8ef": { "message": "Wedi methu llwytho." },
+  "loading_folders_d8b5869e": { "message": "Wrthi’n llwytho ffolderi" },
   "loading_media_f3455841": { "message": "Llwytho cyfryngau" },
+  "locked_762f138b": { "message": "Wedi Cloi" },
   "media_af190855": { "message": "Cyfryngau" },
   "medium_5a8e9ead": { "message": "Cyfrwng" },
   "mic_a7f3d311": { "message": "Meicroffon" },
@@ -215,6 +231,7 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Yn gorfod bod o leiaf { width } x { height }px"
   },
+  "my_files_2f621040": { "message": "Fy ffeiliau" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Llywiwch trwy''r ddewislen neu''r bar offer"
   },
@@ -286,6 +303,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Aeth rhywbeth o''i le a dydw i ddim yn gwybod beth i''w ddangos i chi."
   },
+  "something_went_wrong_d238c551": { "message": "Aeth rhywbeth o’i le" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
     "message": "Aeth rhywbeth o’i le, rhowch gynnig arall arni ar ôl adnewyddu''r dudalen"
   },
@@ -301,6 +319,9 @@
   "styles_2aa721ef": { "message": "Arddulliau" },
   "submit_a3cc6859": { "message": "Cyflwyno" },
   "subscript_59744f96": { "message": "Isysgrif" },
+  "success_file_uploaded_8174e93f": {
+    "message": "Wedi llwyddo: Ffeil wedi’i llwytho i fyny"
+  },
   "superscript_8cb349a2": { "message": "Uwchysgrif" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Mathau o ffeiliau y mae modd delio â nhw: SRT neu WebVTT"
@@ -339,6 +360,9 @@
   "upload_file_fd2361b8": { "message": "Llwytho Ffeil i Fyny" },
   "upload_image_6120b609": { "message": "Llwytho Delwedd i Fyny" },
   "upload_media_ce31135a": { "message": "Llwytho Cyfryngau i fyny" },
+  "upload_not_available_for_this_folder_8f8623c6": {
+    "message": "Nid yw llwytho i fyny ar gael ar gyfer y ffolder hon"
+  },
   "upload_record_media_e4207d72": {
     "message": "Llwytho i Fyny/Recordio Cyfryngau"
   },
