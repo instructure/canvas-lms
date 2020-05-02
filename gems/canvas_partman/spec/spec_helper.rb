@@ -35,7 +35,7 @@ end
 require 'active_record'
 require 'canvas_partman'
 
-ActiveRecord::Base.establish_connection
+ActiveRecord::Base.establish_connection(ENV.fetch('DATABASE_URL', nil))
 require 'support/schema_helper'
 require 'fixtures/zoo'
 require 'fixtures/animal'

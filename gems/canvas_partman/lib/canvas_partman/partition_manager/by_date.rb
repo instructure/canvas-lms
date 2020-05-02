@@ -88,7 +88,7 @@ module CanvasPartman
 
         partition_tables.each do |table|
           partition_date = date_from_partition_name(table)
-          base_class.connection.drop_table(table) if partition_date < min_to_keep
+          drop_partition_table(table) if partition_date < min_to_keep
         end
       end
 

@@ -110,13 +110,21 @@ SQL
 
     def drop_partition(value)
       partition_table = generate_name_for_partition(value)
-
-      base_class.transaction do
-        base_class.connection.drop_table(partition_table)
-      end
+      drop_partition_table(partition_table)
     end
 
     protected
+
+    def drop_partition_constraints(table_name)
+      base_class.connection.foreign_keys(table_name).each do |fk|
+        base_class.connection.remove_foreign_key table_name, name: fk.name
+      end
+    end
+
+    def drop_partition_table(table_name)
+      drop_partition_constraints(table_name)
+      base_class.connection.drop_table(table_name)
+    end
 
     def initialize(base_class)
       raise NotImplementedError if self.class == PartitionManager
