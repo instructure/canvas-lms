@@ -947,7 +947,7 @@ ActiveRecord::Relation.class_eval do
 
             ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
             yield batch
-            break if batch.size < batch_size
+            break if rows <= 0 || batch.size < batch_size
 
             if pluck
               last_value = pluck.length == 1 ? batch.last : batch.last[pluck.index(index)]
