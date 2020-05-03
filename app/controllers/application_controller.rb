@@ -186,8 +186,8 @@ class ApplicationController < ActionController::Base
             files_dnd: !!@domain_root_account&.feature_enabled?(:files_dnd),
             unpublished_courses: !!@domain_root_account&.feature_enabled?(:unpublished_courses)
           },
-          KILL_JOY: Setting.get('kill_joy', false)
         }
+        @js_env[:KILL_JOY] = @domain_root_account.kill_joy? if @domain_root_account&.kill_joy?
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
         @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
         @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
