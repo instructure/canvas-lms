@@ -260,8 +260,8 @@ zh-Hans:
     feedback_coach_sub: "从 Canvas 专家处获得帮助"
     feedback_feature_request_sub: "有改进 Canvas 的想法？"
     manually_created_courses: 手动创建的课程
-    root_account_cant_have_sis_id: 无法对母帐户设置课程号
-    sis_id_in_use: "课程号 \"%{sis_id}\" 已在使用中"
+    root_account_cant_have_sis_id: 无法对母帐户设置学号
+    sis_id_in_use: "学号 \"%{sis_id}\" 已在使用中"
     tab_admin_tools: 管理工具
     tab_authentication: 身份验证
     tab_brand_configs: 主题
@@ -595,7 +595,7 @@ zh-Hans:
         path: 电子邮件
         send_confirmation: 以电子邮件向用户发送关于此帐户创建的消息
         short_name: 显示名称
-        sis_user_id: 课程号
+        sis_user_id: 学号
         sortable_name: 用于排序的名称
       sortable_name_help: 此名称出现在分类的列表中。
       unique_id_label_1: "%{label}:"
@@ -862,7 +862,7 @@ zh-Hans:
         other: "还有 %{count} 个"
       none: 无
       settings_link: 设置
-      sis_id_label: 课程号
+      sis_id_label: 学号
       statistics_link: 统计
       student_count: 
         one: "%{count} 个学生"
@@ -1355,7 +1355,7 @@ zh-Hans:
         sis_app_token: "SIS 代理令牌"
         sis_app_url: "SIS 应用程序的网址"
         sis_default_grade_export: 在默认情况下，“把评分输入到SIS”的复选框为作业、评分讨论和测验启用
-        sis_source_id: 课程号
+        sis_source_id: 学号
         start_at: 开始
         students_can_create_courses: 学生
         sub_account_includes: 让子账户使用主题编辑器自定义自己的品牌
@@ -1682,7 +1682,7 @@ zh-Hans:
           login: 
             day_drop: 已访问的最少课程项目：
     users_list: 
-      login_name_or_sis_id: 登录名或课程号
+      login_name_or_sis_id: 登录名或学号
       name: 姓名
       no_people_found: 找不到人员
       you_can_search_by: 您可以按此条件搜索：
@@ -7100,7 +7100,7 @@ zh-Hans:
         root_account: 母帐户
         root_account_id: 母帐户
         show_announcements_on_home_page: 显示课程主页上的最新公告
-        sis_source_id: 课程号
+        sis_source_id: 学号
         start_at: 开始
         storage_quota: 文件存储
         time_zone: 时区
@@ -7129,7 +7129,7 @@ zh-Hans:
       self_enrollment: "与学生分享私密的 URL，允许他们自行注册"
       self_enrollment_without_code: "与学生分享私密的 URL，允许他们自行注册"
       set_grading_scheme: 设置评分方案
-      sis_source_id: 课程号
+      sis_source_id: 学号
       tab_cant_disable: 此页面无法禁用，只能隐藏
       tab_disabled: 被禁用的页面将重定向至课程主页
       tab_hidden_if_disabled: 被禁用的页面将不会显示在导航中
@@ -9293,7 +9293,7 @@ zh-Hans:
       error_reported: 谢谢您的帮助！我们马上处理
     registration_incomplete: 您需要确认您的电子邮件地址，然后才能查看此页面
     required: 必需
-    sis_id_in_use: "课程号 \"%{sis_id}\" 已在使用中"
+    sis_id_in_use: "学号 \"%{sis_id}\" 已在使用中"
     unsaved_changes: 您有未保存的更改。
     wrong_file_extension: "您所选的扩展名为 \"%{extension}\" 的文件不允许进行提交"
   estonian_5e8e2fa4: 爱沙尼亚语
@@ -21245,8 +21245,8 @@ zh-Hans:
   sis_export_title: "SIS 导出"
   sis_friendly_name_52b5683d: "SIS 友好名称"
   sis_grade_export_settings_45a9f709: "SIS 评分导出设置"
-  sis_id_4495a887: 课程号
-  sis_id_70eda157: 子账户号：
+  sis_id_4495a887: 学号
+  sis_id_70eda157: 学号：
   sis_id_8c2029e1: "sis id"
   sis_import: 
     buttons: 
@@ -23914,8 +23914,8 @@ zh-Hans:
         last_request: 上次请求
         password: 密码
         password_confirmation: 确认密码
-        sis_id: 课程号
-        sis_user_id: 课程号
+        sis_id: 学号
+        sis_user_id: 学号
         unique_id: 登录
       more: 更多...
       never: 从不

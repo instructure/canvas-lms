@@ -165,6 +165,14 @@ module ActiveRecord
           User.all.find_in_batches_with_temp_table {}
         end
 
+        it "does not die with index error when table size is exactly batch size" do
+          user_count = 10
+          User.delete_all
+          user_count.times{ user_model }
+          expect(User.count).to eq(user_count)
+          User.all.find_in_batches_with_temp_table(batch_size: user_count) {}
+        end
+
         it "doesnt obfuscate the error when it dies in a transaction" do
           account = Account.create!
           course = account.courses.create!
