@@ -393,8 +393,8 @@ class StreamItem < ActiveRecord::Base
 
     Shackles.activate(:deploy) do
       Shard.current.database_server.unshackle do
-        StreamItem.connection.execute("VACUUM ANALYZE #{StreamItem.quoted_table_name}")
-        StreamItemInstance.connection.execute("VACUUM ANALYZE #{StreamItemInstance.quoted_table_name}")
+        StreamItem.vacuum
+        StreamItemInstance.vacuum
         ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
       end
     end
