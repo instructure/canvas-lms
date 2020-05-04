@@ -38,6 +38,13 @@ module PostgreSQLAdapterExtensions
                                  }
     ActiveRecord::Base.connection.clear_query_cache
     raw_connection.put_copy_end
+    result = raw_connection.get_result
+    begin
+      result.check
+    rescue => e
+      raise translate_exception(e, "COPY FROM STDIN")
+    end
+    result.cmd_tuples
   end
 
   def quote_text(value)

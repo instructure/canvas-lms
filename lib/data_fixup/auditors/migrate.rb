@@ -48,7 +48,7 @@ module DataFixup::Auditors
           end
           begin
             auditor_ar_type.bulk_insert(ar_attributes_list)
-          rescue ActiveRecord::StatementInvalid
+          rescue ActiveRecord::RecordNotUnique
             # we might have inserted some of these already, try again with only new recs
             uuids = ar_attributes_list.map{|h| h['uuid']}
             existing_uuids = auditor_ar_type.where(uuid: uuids).map(&:uuid)
