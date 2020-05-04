@@ -29,6 +29,10 @@ class MessagesController < ApplicationController
     @messages = @context.messages.order('created_at DESC').paginate(:page => params[:page], :per_page => 20)
   end
 
+  def show
+    @messages = [@context.messages.find(params[:id])]
+  end
+
   def create
     secure_id, message_id = [params[:secure_id], params[:message_id].to_i]
 

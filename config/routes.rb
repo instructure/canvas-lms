@@ -836,7 +836,7 @@ CanvasRails::Application.routes.draw do
     get 'teacher_activity/course/:course_id' => 'users#teacher_activity', as: :course_teacher_activity
     get 'teacher_activity/student/:student_id' => 'users#teacher_activity', as: :student_teacher_activity
     get :media_download
-    resources :messages, only: [:index, :create] do
+    resources :messages, only: [:index, :create, :show] do
       get :html_message
     end
   end
