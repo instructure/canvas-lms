@@ -38,6 +38,13 @@ module DataFixup::Auditors
         }
       end
 
+      def filter_for_idempotency(ar_attributes_list, auditor_ar_type)
+        # we might have inserted some of these already, try again with only new recs
+        uuids = ar_attributes_list.map{|h| h['uuid']}
+        existing_uuids = auditor_ar_type.where(uuid: uuids).pluck(:uuid)
+        ar_attributes_list.reject{|h| existing_uuids.include?(h['uuid']) }
+      end
+
       def migrate_in_pages(collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
         next_page = 1
         until next_page.nil?
@@ -48,11 +55,10 @@ module DataFixup::Auditors
           end
           begin
             auditor_ar_type.bulk_insert(ar_attributes_list)
-          rescue ActiveRecord::RecordNotUnique
-            # we might have inserted some of these already, try again with only new recs
-            uuids = ar_attributes_list.map{|h| h['uuid']}
-            existing_uuids = auditor_ar_type.where(uuid: uuids).map(&:uuid)
-            new_attrs_list = ar_attributes_list.reject{|h| existing_uuids.include?(h['uuid']) }
+          rescue ActiveRecord::RecordNotUnique, ActiveRecord::InvalidForeignKey
+            # this gets messy if we act specifically; let's just apply both remedies
+            new_attrs_list = filter_for_idempotency(ar_attributes_list, auditor_ar_type)
+            new_attrs_list = filter_dead_foreign_keys(new_attrs_list)
             auditor_ar_type.bulk_insert(new_attrs_list) if new_attrs_list.size > 0
           end
           next_page = auditor_recs.next_page
@@ -99,6 +105,10 @@ module DataFixup::Auditors
       def perform_migration
         raise "NOT IMPLEMENTED"
       end
+
+      def filter_dead_foreign_keys(_attrs_list)
+        raise "NOT IMPLEMENTED"
+      end
     end
 
     # account = Account.find(account_id)
@@ -118,6 +128,17 @@ module DataFixup::Auditors
         collection = Auditors::Authentication.for_account(account, cassandra_query_options)
         migrate_in_pages(collection, Auditors::ActiveRecord::AuthenticationRecord)
       end
+
+      def filter_dead_foreign_keys(attrs_list)
+        user_ids = attrs_list.map{|a| a['user_id'] }
+        pseudonym_ids = attrs_list.map{|a| a['pseudonym_id'] }
+        existing_user_ids = User.where(id: user_ids).pluck(:id)
+        existing_pseud_ids = Pseudonym.where(id: pseudonym_ids).pluck(:id)
+        missing_uids = user_ids - existing_user_ids
+        missing_pids = pseudonym_ids - existing_pseud_ids
+        new_attrs_list = attrs_list.reject{|h| missing_uids.include?(h['user_id']) }
+        new_attrs_list.reject{|h| missing_pids.include?(h['pseudonym_id'])}
+      end
     end
 
     class CourseWorker
@@ -130,6 +151,13 @@ module DataFixup::Auditors
       def perform_migration
         collection = Auditors::Course.for_account(account, cassandra_query_options)
         migrate_in_pages(collection, Auditors::ActiveRecord::CourseRecord)
+      end
+
+      def filter_dead_foreign_keys(attrs_list)
+        user_ids = attrs_list.map{|a| a['user_id'] }
+        existing_user_ids = User.where(id: user_ids).pluck(:id)
+        missing_uids = user_ids - existing_user_ids
+        attrs_list.reject {|h| missing_uids.include?(h['user_id']) }
       end
     end
 
@@ -147,6 +175,17 @@ module DataFixup::Auditors
             collection = Auditors::GradeChange.for_course(course, cassandra_query_options)
             migrate_in_pages(collection, Auditors::ActiveRecord::GradeChangeRecord)
           end
+        end
+      end
+
+      def filter_dead_foreign_keys(attrs_list)
+        student_ids = attrs_list.map{|a| a['student_id'] }
+        grader_ids = attrs_list.map{|a| a['grader_id'] }
+        user_ids = (student_ids + grader_ids).uniq
+        existing_user_ids = User.where(id: user_ids).pluck(:id)
+        missing_uids = user_ids - existing_user_ids
+        attrs_list.reject do |h|
+          missing_uids.include?(h['student_id']) || missing_uids.include?(h['grader_id'])
         end
       end
     end
