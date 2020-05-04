@@ -219,6 +219,13 @@ describe Canvas::CacheRegister do
           end
         end
 
+        it "should fail trying to clear things that aren't resolvable by to a global id" do
+          weird_hash = {:what => @users.first}
+          expect {
+            User.clear_cache_keys(weird_hash, :enrollments)
+          }.to raise_error("invalid argument for cache clearing #{weird_hash.to_a.first}")
+        end
+
         it "should work with a multi-shard relation" do
           User.where(:id => @users.map(&:global_id)).clear_cache_keys(:enrollments)
           Timecop.freeze(time2) do

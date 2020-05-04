@@ -55,6 +55,7 @@ module Canvas
         module ClassMethods
           def base_cache_register_key_for(id_or_record)
             id = ::Shard.global_id_for(id_or_record)
+            raise "invalid argument for cache clearing #{id}" if id && !id.is_a?(Integer)
             id && "cache_register/#{self.model_name.cache_key}/#{id}"
           end
 
