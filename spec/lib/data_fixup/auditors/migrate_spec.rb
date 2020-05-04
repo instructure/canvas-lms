@@ -37,6 +37,32 @@ describe 'DataFixup::Auditors::Migrate' do
     expect(Auditors::ActiveRecord::AuthenticationRecord.count).to eq(20)
   end
 
+  it "recovers if user has been hard deleted" do
+    # simulates when a user has been hard-deleted
+    Auditors::ActiveRecord::AuthenticationRecord.delete_all
+    u1 = user_with_pseudonym(active_all: true)
+    p1 = @pseudonym
+    Auditors::Authentication.record(p1, 'login')
+    u2 = user_with_pseudonym(active_all: true)
+    p2 = @pseudonym
+    expect(p1).to_not eq(p2)
+    Auditors::Authentication.record(p2, 'login')
+    [CommunicationChannel, UserAccountAssociation].each do |klass|
+      klass.where(user_id: u2.id).delete_all
+    end
+    Pseudonym.where(id: p2.id).delete_all
+    User.where(id: p2.user_id).delete_all
+    date = Time.zone.today
+    worker = DataFixup::Auditors::Migrate::AuthenticationWorker.new(account.id, date)
+    allow(Auditors::ActiveRecord::AuthenticationRecord).to receive(:bulk_insert) do |recs|
+      # should only migrate the existing user, so the second time is only one rec
+      if recs.find{|r| r['user_id'] == p2.user_id}
+        raise ActiveRecord::InvalidForeignKey
+      end
+    end
+    expect { worker.perform }.to_not raise_exception
+  end
+
   it "writes course data to postgres that's in cassandra" do
     Auditors::ActiveRecord::CourseRecord.delete_all
     user_with_pseudonym(active_all: true)
