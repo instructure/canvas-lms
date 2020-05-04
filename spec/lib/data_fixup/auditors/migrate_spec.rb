@@ -33,8 +33,12 @@ describe 'DataFixup::Auditors::Migrate' do
     date = Time.zone.today
     expect(Auditors::ActiveRecord::AuthenticationRecord.count).to eq(0)
     worker = DataFixup::Auditors::Migrate::AuthenticationWorker.new(account.id, date)
+    missing_uuids = worker.audit
+    expect(missing_uuids.size).to eq(20)
     worker.perform
     expect(Auditors::ActiveRecord::AuthenticationRecord.count).to eq(20)
+    missing_uuids = worker.audit
+    expect(missing_uuids.size).to eq(0)
   end
 
   it "recovers if user has been hard deleted" do
@@ -76,8 +80,12 @@ describe 'DataFixup::Auditors::Migrate' do
     date = Time.zone.today
     expect(Auditors::ActiveRecord::CourseRecord.count).to eq(0)
     worker = DataFixup::Auditors::Migrate::CourseWorker.new(sub_sub_account.id, date)
+    missing_uuids = worker.audit
+    expect(missing_uuids.size).to eq(10)
     worker.perform
     expect(Auditors::ActiveRecord::CourseRecord.count).to eq(10)
+    missing_uuids = worker.audit
+    expect(missing_uuids.size).to eq(0)
   end
 
   it "writes grade change data to postgres that's in cassandra" do
@@ -93,8 +101,12 @@ describe 'DataFixup::Auditors::Migrate' do
     expect(Auditors::ActiveRecord::GradeChangeRecord.count).to eq(0)
     expect(Auditors::GradeChange.for_assignment(assignment).paginate(per_page: 10).size).to eq(1)
     worker = DataFixup::Auditors::Migrate::GradeChangeWorker.new(sub_sub_account.id, date)
+    missing_uuids = worker.audit
+    expect(missing_uuids.size).to eq(1)
     worker.perform
     expect(Auditors::ActiveRecord::GradeChangeRecord.count).to eq(1)
+    missing_uuids = worker.audit
+    expect(missing_uuids.size).to eq(0)
   end
 
   describe "record keeping" do

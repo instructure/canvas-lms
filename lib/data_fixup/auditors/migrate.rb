@@ -65,6 +65,19 @@ module DataFixup::Auditors
         end
       end
 
+      def audit_in_pages(collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
+        @audit_failure_uuids ||= []
+        next_page = 1
+        until next_page.nil?
+          page_args = { page: next_page, per_page: batch_size }
+          auditor_recs = collection.paginate(page_args)
+          uuids = auditor_recs.map(&:id)
+          existing_uuids = auditor_ar_type.where(uuid: uuids).pluck(:uuid)
+          @audit_failure_uuids += (uuids - existing_uuids)
+          next_page = auditor_recs.next_page
+        end
+      end
+
       def cell_attributes
         {
           auditor_type: auditor_type,
@@ -98,11 +111,21 @@ module DataFixup::Auditors
         cell.update_attribute(:failed, true) unless cell.completed
       end
 
+      def audit
+        @audit_failure_uuids = []
+        perform_audit
+        @audit_failure_uuids
+      end
+
       def auditor_type
         raise "NOT IMPLEMENTED"
       end
 
       def perform_migration
+        raise "NOT IMPLEMENTED"
+      end
+
+      def perform_audit
         raise "NOT IMPLEMENTED"
       end
 
@@ -124,9 +147,16 @@ module DataFixup::Auditors
         :authentication
       end
 
+      def cassandra_collection
+        Auditors::Authentication.for_account(account, cassandra_query_options)
+      end
+
       def perform_migration
-        collection = Auditors::Authentication.for_account(account, cassandra_query_options)
-        migrate_in_pages(collection, Auditors::ActiveRecord::AuthenticationRecord)
+        migrate_in_pages(cassandra_collection, Auditors::ActiveRecord::AuthenticationRecord)
+      end
+
+      def perform_audit
+        audit_in_pages(cassandra_collection, Auditors::ActiveRecord::AuthenticationRecord)
       end
 
       def filter_dead_foreign_keys(attrs_list)
@@ -148,9 +178,16 @@ module DataFixup::Auditors
         :course
       end
 
+      def cassandra_collection
+        Auditors::Course.for_account(account, cassandra_query_options)
+      end
+
       def perform_migration
-        collection = Auditors::Course.for_account(account, cassandra_query_options)
-        migrate_in_pages(collection, Auditors::ActiveRecord::CourseRecord)
+        migrate_in_pages(cassandra_collection, Auditors::ActiveRecord::CourseRecord)
+      end
+
+      def perform_audit
+        audit_in_pages(cassandra_collection, Auditors::ActiveRecord::CourseRecord)
       end
 
       def filter_dead_foreign_keys(attrs_list)
@@ -168,12 +205,26 @@ module DataFixup::Auditors
         :grade_change
       end
 
+      def cassandra_collection_for(course)
+        Auditors::GradeChange.for_course(course, cassandra_query_options)
+      end
+
+      def migrateable_courses
+        account.courses.where("created_at <= ?", @date + 2.days)
+      end
+
       def perform_migration
-        courses_scope = account.courses.where("created_at <= ?", @date + 2.days)
-        courses_scope.find_in_batches do |course_batch|
+        migrateable_courses.find_in_batches do |course_batch|
           course_batch.each do |course|
-            collection = Auditors::GradeChange.for_course(course, cassandra_query_options)
-            migrate_in_pages(collection, Auditors::ActiveRecord::GradeChangeRecord)
+            migrate_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
+          end
+        end
+      end
+
+      def perform_audit
+        migrateable_courses.find_in_batches do |course_batch|
+          course_batch.each do |course|
+            audit_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
           end
         end
       end
