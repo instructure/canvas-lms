@@ -21,7 +21,7 @@ import {arrayOf, object, shape, string} from 'prop-types'
 const webConferenceType = shape({
   name: string.isRequired,
   type: string.isRequired,
-  contexts: arrayOf(string).isRequired,
+  contexts: arrayOf(string),
   lti_settings: object
 })
 export default webConferenceType

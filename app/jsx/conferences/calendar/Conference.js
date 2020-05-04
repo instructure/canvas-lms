@@ -25,8 +25,6 @@ import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {View} from '@instructure/ui-view'
-import {PresentationContent} from '@instructure/ui-a11y-content'
 import sanitizeHtml from 'jsx/shared/sanitizeHtml'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import I18n from 'i18n!conferences'
@@ -36,55 +34,64 @@ import webConference from 'jsx/shared/proptypes/webConference'
 // (as recommended by jsx/shared/sanitizeHTML)
 RichContentEditor.preloadRemoteModule()
 
-const HtmlConference = ({html, removeConference}) => {
+const HtmlConference = ({conference, html, removeConference, removeButtonRef}) => {
   return (
-    <View as="div" position="relative">
+    <Flex as="div" direction="row-reverse" position="relative" wrap="wrap" alignItems="center">
       {removeConference && (
-        <CloseButton
-          placement="end"
-          offset="none"
-          screenReaderLabel={I18n.t('Remove conference')}
-          onClick={() => removeConference(null)}
-        />
+        <Flex.Item padding="none none none x-small">
+          <CloseButton
+            elementRef={removeButtonRef}
+            screenReaderLabel={I18n.t('Remove conference: %{title}', {title: conference.title})}
+            onClick={() => removeConference(null)}
+          />
+        </Flex.Item>
       )}
-      <div dangerouslySetInnerHTML={{__html: sanitizeHtml(html)}} />
-    </View>
+      <Flex.Item shouldGrow>
+        <div dangerouslySetInnerHTML={{__html: sanitizeHtml(html)}} />
+      </Flex.Item>
+    </Flex>
   )
 }
 
-const LinkConference = ({conference, removeConference}) => {
-  const url = conference.lti_settings?.url || `${conference.url}/join`
+const LinkConference = ({conference, removeConference, removeButtonRef}) => {
+  let url
+  if (conference.lti_settings?.url) {
+    url = conference.lti_settings.url
+  } else if (conference.url) {
+    url = `${conference.url}/join`
+  }
   const iconURL = conference.lti_settings?.icon?.url
   const icon = iconURL && <Img src={iconURL} margin="0 x-small 0 0" height="20px" width="20px" />
+  const text = <TruncateText>{conference.title || I18n.t('Conference')}</TruncateText>
+
   return (
     <Flex direction="row">
-      <Flex.Item shouldGrow>
-        <Link
-          href={url}
-          isWithinText={false}
-          target="_blank"
-          rel="noreferrer noopener"
-          onClick={e => e.stopPropagation()}
-        >
-          <Flex direction="row">
-            <Flex.Item>
-              <PresentationContent>{icon}</PresentationContent>
-            </Flex.Item>
-            <Flex.Item shouldGrow>
-              <Text size="small">
-                <TruncateText>{conference.title || I18n.t('Conference')}</TruncateText>
-              </Text>
-            </Flex.Item>
-          </Flex>
-        </Link>
+      <Flex.Item shouldShrink shouldGrow>
+        <Text as="div" size="small">
+          {url ? (
+            <Link
+              href={url}
+              isWithinText={false}
+              target="_blank"
+              rel="noreferrer noopener"
+              renderIcon={icon}
+              onClick={e => e.stopPropagation()}
+            >
+              {text}
+            </Link>
+          ) : (
+            text
+          )}
+        </Text>
       </Flex.Item>
       {removeConference && (
         <Flex.Item padding="0 0 0 x-small">
           <IconButton
+            elementRef={removeButtonRef}
             size="small"
             withBorder={false}
             withBackground={false}
-            screenReaderLabel={I18n.t('Remove conference')}
+            screenReaderLabel={I18n.t('Remove conference: %{title}', {title: conference.title})}
             onClick={() => removeConference()}
           >
             <IconXLine />
@@ -95,20 +102,31 @@ const LinkConference = ({conference, removeConference}) => {
   )
 }
 
-const Conference = ({conference, removeConference}) =>
+const Conference = ({conference, removeConference, removeButtonRef}) =>
   conference.conference_type === 'LtiConference' && conference.lti_settings?.type === 'html' ? (
-    <HtmlConference html={conference.lti_settings.html} removeConference={removeConference} />
+    <HtmlConference
+      conference={conference}
+      html={conference.lti_settings.html}
+      removeConference={removeConference}
+      removeButtonRef={removeButtonRef}
+    />
   ) : (
-    <LinkConference conference={conference} removeConference={removeConference} />
+    <LinkConference
+      conference={conference}
+      removeConference={removeConference}
+      removeButtonRef={removeButtonRef}
+    />
   )
 
 Conference.propTypes = {
   conference: webConference.isRequired,
-  removeConference: PropTypes.func
+  removeConference: PropTypes.func,
+  removeButtonRef: PropTypes.func
 }
 
 Conference.defaultProps = {
-  removeConference: null
+  removeConference: null,
+  removeButtonRef: undefined
 }
 
 export default Conference

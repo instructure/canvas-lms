@@ -74,7 +74,7 @@ describe('Conference', () => {
       const {getByText} = render(
         <Conference conference={pluginConference} removeConference={removeConference} />
       )
-      const closeButton = getByText('Remove conference')
+      const closeButton = getByText('Remove conference: Plugin Conference')
       expect(closeButton).not.toBeNull()
     })
 
@@ -83,7 +83,7 @@ describe('Conference', () => {
       const {getByText} = render(
         <Conference conference={pluginConference} removeConference={removeConference} />
       )
-      const closeButton = getByText('Remove conference')
+      const closeButton = getByText('Remove conference: Plugin Conference')
       act(() => {
         fireEvent.click(closeButton)
       })
@@ -92,8 +92,21 @@ describe('Conference', () => {
 
     it('does not show remove button if handler not provided', () => {
       const {queryByText} = render(<Conference conference={pluginConference} />)
-      const closeButton = queryByText('Remove conference')
+      const closeButton = queryByText('Remove conference: Plugin Conference')
       expect(closeButton).toBeNull()
+    })
+
+    it('sets removeButtonRef', () => {
+      const removeConference = jest.fn()
+      const ref = jest.fn()
+      render(
+        <Conference
+          conference={pluginConference}
+          removeConference={removeConference}
+          removeButtonRef={ref}
+        />
+      )
+      expect(ref).toHaveBeenCalled()
     })
   })
 
@@ -137,7 +150,7 @@ describe('Conference', () => {
       const {getByText} = render(
         <Conference conference={htmlConference} removeConference={removeConference} />
       )
-      const closeButton = getByText('Remove conference')
+      const closeButton = getByText('Remove conference: HTML Conference')
       expect(closeButton).not.toBeNull()
     })
 
@@ -146,7 +159,7 @@ describe('Conference', () => {
       const {getByText} = render(
         <Conference conference={htmlConference} removeConference={removeConference} />
       )
-      const closeButton = getByText('Remove conference')
+      const closeButton = getByText('Remove conference: HTML Conference')
       act(() => {
         fireEvent.click(closeButton)
       })
@@ -155,8 +168,21 @@ describe('Conference', () => {
 
     it('does not show remove button if handler not provided', () => {
       const {queryByText} = render(<Conference conference={htmlConference} />)
-      const closeButton = queryByText('Remove conference')
+      const closeButton = queryByText('Remove conference: HTML Conference')
       expect(closeButton).toBeNull()
+    })
+
+    it('sets removeButtonRef', () => {
+      const removeConference = jest.fn()
+      const ref = jest.fn()
+      render(
+        <Conference
+          conference={htmlConference}
+          removeConference={removeConference}
+          removeButtonRef={ref}
+        />
+      )
+      expect(ref).toHaveBeenCalled()
     })
   })
 })

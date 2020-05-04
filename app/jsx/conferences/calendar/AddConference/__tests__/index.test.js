@@ -17,15 +17,14 @@
  */
 
 import React from 'react'
-import fetchMock from 'fetch-mock'
 import {render, fireEvent, act, within} from '@testing-library/react'
-import {wait} from '@testing-library/dom'
 import AddConference from '../index'
 import {destroyContainer} from 'jsx/shared/FlashAlert'
 
 const pluginConference = {
-  id: 1,
-  conference_type: 'SecretConference'
+  conference_type: 'SecretConference',
+  title: 'Secret Conference Conference',
+  description: ''
 }
 
 function getProps(props = {}) {
@@ -38,26 +37,8 @@ function getProps(props = {}) {
   }
 }
 
-function mockPost() {
-  let innerResponse
-  fetchMock.post(
-    '/api/v1/courses/1/conferences',
-    new Promise(resolve => {
-      innerResponse = resolve
-    })
-  )
-  const sendResponse = async value => {
-    await act(async () => {
-      innerResponse(value)
-      await fetchMock.flush(true)
-    })
-  }
-  return sendResponse
-}
-
 describe('AddConference', () => {
   afterEach(() => {
-    fetchMock.reset()
     destroyContainer()
   })
 
@@ -96,42 +77,17 @@ describe('AddConference', () => {
       }
 
       describe('success', () => {
-        const conf = JSON.stringify(pluginConference)
-
         it('creates a plugin style conference when pressed', async () => {
-          const sendResponse = mockPost()
           const setConference = jest.fn()
           await launchPlugin({setConference})
-          await sendResponse(conf)
           expect(setConference).toHaveBeenCalledWith(pluginConference)
-        })
-
-        it('shows a spinner while conference is creating', async () => {
-          const sendResponse = mockPost()
-          const {getByTitle, queryByTitle} = await launchPlugin()
-          expect(getByTitle('Creating conference')).not.toBeNull()
-          await sendResponse(conf)
-          expect(queryByTitle('Creating conference')).toBeNull()
         })
       })
 
-      describe('failure', () => {
-        it('resets if conference creation fails', async () => {
-          const sendResponse = mockPost()
-          const setConference = jest.fn()
-          const {queryByTitle} = await launchPlugin({setConference})
-          await sendResponse(400)
-          expect(queryByTitle('Creating conference')).toBeNull()
-          expect(setConference).not.toHaveBeenCalled()
-        })
-
-        it('renders an error if conference creation fails', async () => {
-          const sendResponse = mockPost()
-          await launchPlugin()
-          await sendResponse(400)
-          const alert = within(document.body).getByRole('alert')
-          expect(alert.textContent).toMatch(/An error occurred/)
-        })
+      it('sets inputRef', async () => {
+        const inputRef = jest.fn()
+        await launchPlugin({inputRef})
+        expect(inputRef).toHaveBeenCalled()
       })
     })
 
@@ -253,24 +209,6 @@ describe('AddConference', () => {
       expect(select.value).toEqual('Add Conferencing')
     })
 
-    it('creates a conference when an option is selected', async () => {
-      const sendResponse = mockPost()
-      const setConference = jest.fn()
-      const {getByRole, findByText} = render(
-        <AddConference {...getProps({conferenceTypes, setConference})} />
-      )
-      const select = getByRole('button')
-      act(() => {
-        fireEvent.click(select)
-      })
-      const option = await findByText('Secret Conference')
-      act(() => {
-        fireEvent.click(option)
-      })
-      await sendResponse({id: 1})
-      await wait(() => expect(setConference).toHaveBeenCalledWith({id: 1}))
-    })
-
     it('renders the current conference type as selected if it exists', () => {
       const currentConferenceType = conferenceTypes[1]
       const {getByRole} = render(
@@ -282,7 +220,6 @@ describe('AddConference', () => {
 
     it('creates a new conference if another conference type is selected', async () => {
       const currentConferenceType = conferenceTypes[1]
-      const sendResponse = mockPost()
       const setConference = jest.fn()
       const {getByRole, findByText} = render(
         <AddConference {...getProps({conferenceTypes, currentConferenceType, setConference})} />
@@ -295,13 +232,11 @@ describe('AddConference', () => {
       act(() => {
         fireEvent.click(option)
       })
-      await sendResponse({id: 1})
-      await wait(() => expect(setConference).toHaveBeenCalledWith({id: 1}))
+      expect(setConference).toHaveBeenCalled()
     })
 
     it('does no clear the current conference if the same type is selected', async () => {
       const currentConferenceType = conferenceTypes[1]
-      mockPost()
       const setConference = jest.fn()
       const {getByRole, findByText} = render(
         <AddConference {...getProps({conferenceTypes, currentConferenceType, setConference})} />
@@ -314,7 +249,13 @@ describe('AddConference', () => {
       act(() => {
         fireEvent.click(option)
       })
-      expect(fetchMock.calls().length).toEqual(0)
+      expect(setConference).not.toHaveBeenCalled()
+    })
+
+    it('sets inputRef', async () => {
+      const inputRef = jest.fn()
+      render(<AddConference {...getProps({conferenceTypes, inputRef})} />)
+      expect(inputRef).toHaveBeenCalled()
     })
   })
 })

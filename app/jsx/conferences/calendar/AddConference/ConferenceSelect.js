@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {Img} from '@instructure/ui-img'
 import {Select} from '@instructure/ui-select'
@@ -46,7 +46,13 @@ function getIndex(id) {
   return parseInt(id.split('_')[1], 10)
 }
 
-const ConferenceSelect = ({currentConferenceType, conferenceTypes, onSelectConferenceType}) => {
+const ConferenceSelect = ({
+  currentConferenceType,
+  conferenceTypes,
+  onSelectConferenceType,
+  inputRef
+}) => {
+  const localInputRef = useRef(null)
   const [showingOptions, setShowingOptions] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(null)
 
@@ -58,9 +64,19 @@ const ConferenceSelect = ({currentConferenceType, conferenceTypes, onSelectConfe
       onSelectConferenceType(conferenceTypes[index])
     }
   }
+  const hideOptionsAndFocus = () => {
+    if (showingOptions) {
+      setShowingOptions(false)
+      setTimeout(() => localInputRef.current?.focus(), 0)
+    }
+  }
 
   return (
     <Select
+      inputRef={el => {
+        localInputRef.current = el
+        inputRef(el)
+      }}
       size="small"
       assistiveText={I18n.t('Use arrow keys to select a conference provider')}
       renderBeforeInput={iconFor(currentConferenceType)}
@@ -71,9 +87,10 @@ const ConferenceSelect = ({currentConferenceType, conferenceTypes, onSelectConfe
       isShowingOptions={showingOptions}
       onBlur={() => setHighlightedIndex(null)}
       onRequestShowOptions={() => setShowingOptions(true)}
-      onRequestHideOptions={() => setShowingOptions(false)}
+      onRequestHideOptions={hideOptionsAndFocus}
       onRequestHighlightOption={(_e, {id}) => setHighlightedIndex(getIndex(id))}
       onRequestSelectOption={(_e, {id}) => onSelect(getIndex(id))}
+      isInline
     >
       {conferenceTypes.map((conferenceType, index) => {
         const id = makeId(index)
@@ -96,11 +113,13 @@ const ConferenceSelect = ({currentConferenceType, conferenceTypes, onSelectConfe
 ConferenceSelect.propTypes = {
   conferenceTypes: PropTypes.arrayOf(webConferenceType).isRequired,
   currentConferenceType: webConferenceType,
-  onSelectConferenceType: PropTypes.func.isRequired
+  onSelectConferenceType: PropTypes.func.isRequired,
+  inputRef: PropTypes.func
 }
 
 ConferenceSelect.defaultProps = {
-  currentConferenceType: null
+  currentConferenceType: null,
+  inputRef: null
 }
 
 export default ConferenceSelect
