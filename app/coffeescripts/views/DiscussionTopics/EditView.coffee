@@ -412,6 +412,8 @@ define [
         errors['todo_date'] = [{type: 'date_required_error', message: I18n.t('You must enter a date')}]
 
       if @isAnnouncement()
+        if data.expire_posting == "0"
+          data.post_expiration_date = null
         unless data.message?.length > 0
           unless @lockedItems.content
             errors['message'] = [{type: 'message_required_error', message: I18n.t("A message is required")}]

@@ -147,7 +147,7 @@
             {{! Expire Dates}}
             <label class="checkbox" for="expire_posting">
               {{checkbox "expire_posting"
-                checked=expire_posting
+                checked=expiration_date
                 class="element_toggler"
                 aria-controls="discussion_topic_expire_post_container"}}
               {{#t "expire_posting"}}Expire posting{{/t}}
@@ -157,7 +157,7 @@
               {{datepickerScreenreaderPrompt}}
             </label>
             <label id="discussion_topic_expire_post_container"
-                   style="{{hiddenUnless exipire_posting}}"
+                   style="{{hiddenUnless expiration_date}}"
                    class="checkbox">
               {{#t "expire_at"}}Expire At{{/t}}
               <input type="text"
