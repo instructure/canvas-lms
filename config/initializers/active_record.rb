@@ -66,6 +66,12 @@ class ActiveRecord::Base
     def default_scope(*)
       raise "please don't ever use default_scope. it may seem like a great solution, but I promise, it isn't"
     end
+
+    def vacuum
+      Shackles.activate(:deploy) do
+        connection.execute("VACUUM ANALYZE #{quoted_table_name}")
+      end
+    end
   end
 
   def read_or_initialize_attribute(attr_name, default_value)
