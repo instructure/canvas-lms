@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import groovy.json.*
-
 // https://docs.splunk.com/Documentation/Splunk/8.0.3/Data/FormateventsforHTTPEventCollector#Event_metadata
+
+import groovy.json.*
 
 def upload(events) {
   def data = events.collect { new JsonBuilder(it).toString() }.join('')
@@ -33,6 +33,10 @@ def event(name, fields) {
     "event": name,
     "fields": fields
   ]
+}
+
+def uploadEvent(name, fields) {
+  upload([event(name, fields)])
 }
 
 return this
