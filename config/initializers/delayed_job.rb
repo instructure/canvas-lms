@@ -58,7 +58,7 @@ Delayed::Settings.default_job_options = ->{
 }
 
 # load our periodic_jobs.yml (cron overrides config file)
-Delayed::Periodic.add_overrides(ConfigFile.load('periodic_jobs') || {})
+Delayed::Periodic.add_overrides(ConfigFile.load('periodic_jobs').dup || {})
 
 if ActiveRecord::Base.configurations[Rails.env]['queue']
   ActiveSupport::Deprecation.warn("A queue section in database.yml is no longer supported. Please run migrations, then remove it.")

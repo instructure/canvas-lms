@@ -89,11 +89,11 @@ class Attachment < ActiveRecord::Base
 
   def self.file_store_config
     # Return existing value, even if nil, as long as it's defined
-    @file_store_config ||= ConfigFile.load('file_store')
+    @file_store_config ||= ConfigFile.load('file_store').dup
     @file_store_config ||= { 'storage' => 'local' }
     @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
     @file_store_config['path_prefix'] = nil if @file_store_config['path_prefix'] == 'tmp/files' && @file_store_config['storage'] == 's3'
-    return @file_store_config
+    @file_store_config
   end
 
   def self.s3_config

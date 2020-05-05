@@ -31,6 +31,20 @@ describe Attachment do
 
   end
 
+  context "file_store_config" do
+    around(:each) do |example|
+      ConfigFile.unstub
+      example.run
+      ConfigFile.unstub
+    end
+
+    it "doesn't bomb on config" do
+      Attachment.instance_variable_set(:@file_store_config, nil)
+      ConfigFile.stub('file_store', { 'storage' => 'local' })
+      expect{ Attachment.file_store_config }.to_not raise_error
+    end
+  end
+
   context "default_values" do
     before :once do
       @course = course_model

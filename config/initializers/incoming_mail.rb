@@ -17,7 +17,7 @@
 
 # Initialize incoming email configuration. See config/incoming_mail.yml.example.
 
-config = ConfigFile.load("incoming_mail") || {}
+config = ConfigFile.load("incoming_mail").dup || {}
 
 Rails.configuration.to_prepare do
   IncomingMailProcessor::IncomingMessageProcessor.configure(config)
