@@ -175,7 +175,18 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
   context "course copy" do
     include_context "lti2_course_spec_helper"
-    let(:formatter) { Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, global_identifiers: true) }
+    let(:formatter) { Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com", global_identifiers: true) }
+    let(:top_level_items) do
+      [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+       {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
+       {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1, :sub_items_url=>"https://example.com?type=context_modules"},
+       {:type=>"tool_profiles", :property=>"copy[all_tool_profiles]", :title=>"Tool Profiles", :count=>1, :sub_items_url=>"https://example.com?type=tool_profiles"},
+       {:type=>"discussion_topics", :property=>"copy[all_discussion_topics]", :title=>"Discussion Topics", :count=>1, :sub_items_url=>"https://example.com?type=discussion_topics"},
+       {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Pages", :count=>1, :sub_items_url=>"https://example.com?type=wiki_pages"},
+       {:type=>"announcements", :property=>"copy[all_announcements]", :title=>"Announcements", :count=>1, :sub_items_url=>"https://example.com?type=announcements"},
+       {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>4},
+       {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1, :sub_items_url=>"https://example.com?type=attachments"}]
+    end
 
     before do
       course_model
@@ -194,20 +205,10 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
       allow(@migration).to receive(:content_export).and_return(export)
       @course_outcome = outcome_model
-      @account_outcome = outcome_model(:outcome_context => @course.account)
-    end
-
-    it "should list top-level items" do
-      #groups should not show up even though there are some
-      expect(formatter.get_content_list).to match_array [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
-                                             {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
-                                             {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1},
-                                             {:type=>"tool_profiles", :property=>"copy[all_tool_profiles]", :title=>"Tool Profiles", :count=>1},
-                                             {:type=>"discussion_topics", :property=>"copy[all_discussion_topics]", :title=>"Discussion Topics", :count=>1},
-                                             {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Pages", :count=>1},
-                                             {:type=>"announcements", :property=>"copy[all_announcements]", :title=>"Announcements", :count=>1},
-                                             {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>2},
-                                             {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1}]
+      @account_outcome = outcome_model(outcome_context: @course.account)
+      @out_group = outcome_group_model
+      @outcome1_in_group = outcome_model(outcome_group: @out_group)
+      @outcome2_in_group = outcome_model(outcome_group: @out_group)
     end
 
     it "should list individual types" do
@@ -216,7 +217,43 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(formatter.get_content_list('attachments').length).to eq 1
       expect(formatter.get_content_list('discussion_topics').length).to eq 1
       expect(formatter.get_content_list('announcements').length).to eq 1
-      expect(formatter.get_content_list('learning_outcomes').length).to eq 2
+    end
+
+    context 'with selectable_outcomes_in_course_copy disabled' do
+      before do
+        @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
+      end
+
+      it "should list top-level items" do
+        # groups should not show up even though there are some
+        expect(formatter.get_content_list).to match_array top_level_items
+      end
+
+      it "should list learning outcomes" do
+        outcomes = formatter.get_content_list('learning_outcomes')
+        expect(outcomes.length).to eq 4
+        expect(outcomes.count {|o| o[:title] == "first new outcome"}).to eq 4
+      end
+    end
+
+    context 'with selectable_outcomes_in_course_copy enabled' do
+      before do
+        @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
+      end
+
+      it "should list top-level items" do
+        # groups should not show up even though there are some
+        copy = top_level_items.clone
+        copy.find {|item| item[:type] == 'learning_outcomes' }[:sub_items_url] = "https://example.com?type=learning_outcomes"
+        expect(formatter.get_content_list).to match_array copy
+      end
+
+      it "should list individual types" do
+        outcomes = formatter.get_content_list('learning_outcomes')
+        expect(outcomes.length).to eq 3
+        expect(outcomes.count {|o| o[:title] == "first new outcome"}).to eq 2
+        expect(outcomes.count {|o| o[:title] == "new outcome group"}).to eq 1
+      end
     end
 
     it "should link resources for quizzes and submittables" do
@@ -245,6 +282,9 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @topic.destroy
         @course_outcome.destroy
         @account_outcome.destroy
+        @outcome1_in_group.destroy
+        @outcome1_in_group.destroy
+        @out_group.destroy
         tool_proxy.destroy
 
         @course.require_assignment_group
