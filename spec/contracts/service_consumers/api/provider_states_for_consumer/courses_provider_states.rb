@@ -74,5 +74,28 @@ PactConfig::Consumers::ALL.each do |consumer|
       end
     end
 
+    # provider state for mobile
+    # Student ID: 8 || Name: "Mobile Student"
+    # Group ID: 1 for Course ID: 2
+    # Group ID: 2 for Course ID: 3
+    provider_state 'mobile courses with groups' do
+      set_up do
+          # Add a group to each mobile course, and make sure that avatar_url gets populated for each
+          mcourses = Pact::Canvas.base_state.mobile_courses
+          mstudent = Pact::Canvas.base_state.mobile_student
+          
+          group1 = Group.create(:name => "group1", :context => mcourses[0], :description => "description1")
+          attachment1 = attachment_model(filename: 'avatar1.jpg', context: group1, content_type: 'image/jpg')
+          group1.avatar_attachment = attachment1
+          group1.add_user(mstudent)
+          group1.save!
+
+          group2 = Group.create(:name => "group2", :context => mcourses[1], :description => "description2")
+          group2.add_user(mstudent)
+          attachment2 = attachment_model(filename: 'avatar2.jpg', context: group2, content_type: 'image/jpg')
+          group2.avatar_attachment = attachment2
+          group2.save!
+      end
+    end
   end
 end
