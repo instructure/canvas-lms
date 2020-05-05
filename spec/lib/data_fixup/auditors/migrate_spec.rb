@@ -109,6 +109,34 @@ describe 'DataFixup::Auditors::Migrate' do
     expect(missing_uuids.size).to eq(0)
   end
 
+  it "can update the cassandra timeout" do
+    cdb = Auditors::GradeChange::Stream.database
+    expect(cdb.db.instance_variable_get(:@thrift_client_options)[:timeout]).to_not eq(360)
+    worker = DataFixup::Auditors::Migrate::GradeChangeWorker.new(Account.default.id, Time.zone.today)
+    worker.extend_cassandra_stream_timeout!
+    expect(worker.auditor_cassandra_stream).to eq(Auditors::GradeChange::Stream)
+    cdb = Auditors::GradeChange::Stream.database
+    expect(cdb.db.instance_variable_get(:@thrift_client_options)[:timeout]).to eq(360)
+    worker.clear_cassandra_stream_timeout!
+    cdb = Auditors::GradeChange::Stream.database
+    expect(cdb.db.instance_variable_get(:@thrift_client_options)[:timeout]).to_not eq(360)
+  end
+
+  it "handles transient timeouts" do
+    collection = Class.new do
+      attr_accessor :threw_already
+      def paginate(_args)
+        return ['test'] if threw_already
+        @threw_already = true
+        raise CassandraCQL::Thrift::TimedOutException
+      end
+    end.new
+    worker = DataFixup::Auditors::Migrate::GradeChangeWorker.new(Account.default.id, Time.zone.today)
+    output = worker.get_cassandra_records_resiliantly(collection, {})
+    expect(collection.threw_already).to eq(true)
+    expect(output).to eq(['test'])
+  end
+
   describe "record keeping" do
     let(:date){ Time.zone.today }
 
