@@ -35,13 +35,13 @@ module Canvas
         environment = Rails.env if environment == :current
         key = [config_name, environment]
         @connections.fetch(key) do
-          config = ConfigFile.load('cassandra', environment)
+          config = ConfigFile.load('cassandra', environment).dup
           config = config && config[config_name]
           unless config
             @connections[key] = nil
             return nil
           end
-          config.merge!(override_options) if override_options
+          config = config.merge(override_options) if override_options
           servers = Array(config['servers'])
           raise "No Cassandra servers defined for: #{config_name.inspect}" unless servers.present?
           keyspace = config['keyspace']
@@ -63,6 +63,10 @@ module Canvas
 
       def self.configs
         ConfigFile.load('cassandra') || {}
+      end
+
+      def self.reset_connections!
+        @connections = {}
       end
 
       def self.config_names
