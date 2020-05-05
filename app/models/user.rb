@@ -179,7 +179,7 @@ class User < ActiveRecord::Base
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
   include StickySisFields
-  are_sis_sticky :name, :sortable_name, :short_name
+  are_sis_sticky :name, :sortable_name, :short_name, :pronouns
 
   include FeatureFlags
 
