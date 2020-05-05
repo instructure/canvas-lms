@@ -23,8 +23,7 @@ class BackfillCachedQuizLtiOnSubmissions < ActiveRecord::Migration[5.1]
   def up
     DataFixup::BackfillNulls.run(Submission, :cached_quiz_lti, default_value: false)
     Shard.current.database_server.unshackle do
-      connection = Submission.connection
-      connection.execute("VACUUM ANALYZE #{Submission.quoted_table_name}") if connection.open_transactions == 0
+      Submission.vacuum if connection.open_transactions == 0
     end
     change_column_null(:submissions, :cached_quiz_lti, false)
   end
