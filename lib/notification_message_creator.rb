@@ -19,7 +19,7 @@
 class NotificationMessageCreator
   include LocaleSelection
 
-  attr_accessor :notification, :asset, :to_users, :to_channels, :message_data
+  attr_accessor :notification, :asset, :to_user_channels, :message_data
 
   # Options can include:
   #  :to_list - A list of Users, User IDs, and CommunicationChannels to send to
@@ -27,12 +27,8 @@ class NotificationMessageCreator
   def initialize(notification, asset, options={})
     @notification = notification
     @asset = asset
-    @to_users = []
-    @to_channels = []
-    if options[:to_list]
-      @to_users = users_from_to_list(options[:to_list])
-      @to_channels = communication_channels_from_to_list(options[:to_list])
-    end
+    @to_user_channels = user_channels(options[:to_list])
+    @user_counts = recent_messages_for_users(@to_user_channels.keys)
     @message_data = options.delete(:data)
     course_id = @message_data&.dig(:course_id)
     root_account_id = @message_data&.dig(:root_account_id)
@@ -53,24 +49,11 @@ class NotificationMessageCreator
   #
   # Returns a list of the messages dispatched immediately
   def create_message
-    to_user_channels = Hash.new([])
-    @to_users.each do |user|
-      to_user_channels[user] += user.communication_channels.select(&:active?)
-    end
-    @to_channels.each do |channel|
-      to_user_channels[channel.user] += [channel]
-    end
-    to_user_channels.each_value{ |channels| channels.uniq! }
-
-    @user_counts = recent_messages_for_users(to_user_channels.keys)
-
     dashboard_messages = []
     immediate_messages = []
     delayed_messages = []
 
-    # Looping on users and channels might be a bad thing. If you had a User and their CommunicationChannel in
-    # the to_list (which currently never happens, I think), duplicate messages could be sent.
-    to_user_channels.each do |user, channels|
+    @to_user_channels.each do |user, channels|
       # asset_filtered_by_user is used for the asset (ie assignment, announcement)
       # to filter users out that do not apply to the notification like when a due
       # date is different for a specific user when using variable due dates.
@@ -250,6 +233,23 @@ class NotificationMessageCreator
       end
     end
   end
+  
+  def user_channels(to_list)
+    to_user_channels = Hash.new([])
+    # if this method is given users we preload communication channels and they
+    # are already loaded so we are using the select :active? to not do another
+    # query to load them again.
+    users_from_to_list(to_list).each do |user|
+      to_user_channels[user] += user.communication_channels.select(&:active?)
+    end
+    # if the method gets communication channels, the user is loaded, and this
+    # allows all the methods in this file to behave the same as if it were users.
+    communication_channels_from_to_list(to_list).each do |channel|
+      to_user_channels[channel.user] += [channel]
+    end
+    to_user_channels.each_value(&:uniq!)
+    to_user_channels
+  end
 
   def users_from_to_list(to_list)
     to_list = [to_list] unless to_list.is_a? Enumerable
@@ -285,6 +285,7 @@ class NotificationMessageCreator
       :user => user,
       :context => user_asset,
     }
+
     # can't just merge these because nil values need to be overwritten in a later merge
     message_options[:delay_for] = @notification.delay_for if @notification.delay_for
     message_options[:data] = @message_data if @message_data
@@ -338,7 +339,7 @@ class NotificationMessageCreator
     Message.where(:notification_id => @notification).
       for(@asset).
       by_name(@notification.name).
-      for_user(@to_users + @to_channels).
+      for_user(@to_user_channels.keys).
       cancellable.
       where("created_at BETWEEN ? AND ?", Setting.get("pending_duplicate_message_window_hours", "6").to_i.hours.ago, Time.now.utc).
       update_all(:workflow_state => 'cancelled')
