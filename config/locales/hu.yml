@@ -1798,6 +1798,7 @@ hu:
   an_internal_error_occurred_83b8a685: "Belső hiba történt"
   an_item_named_name_already_exists_in_this_location_147b7312: "Egy \"%{name}\" nevű elem már létezik ezen a helyen. Le szeretné cserélni a létező fájlt?"
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: "Egy %{graphql_type} objektumtípus el lett rejtve, mert a hozzáférési token nem rendelkezett megfelelő hatókörrel"
+  an_outcome_group_can_only_have_one_parent_c626c13b: "Egy eredmény csoportnak csak egy szülője lehet"
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "Egy váratlan hiba történt: lásd a hibajelentést %{id}"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Ismeretlen szerverhiba történt. Kérjük, próbálja újra!"
   an_update_is_available_for_toolname_bba3fa2: "A frissítés elérhető a következő számára: %{toolName}"
@@ -3379,7 +3380,10 @@ hu:
   calendars_a756c286: Naptárak
   calendars_toggle_list_visibility_488db143: "Naptárak láthatóságának változtatása"
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "alapesetben létrehozhat, átnevezhet és szerkeszthet kurzus oldalakat"
+  can_destroy_subscription_to_data_service_data_b8dfca27: "Törölhet előfizetést az adat szolgáltatás adatokhoz."
   can_interact_with_users_in_their_section_only_48cb8c43: "Csak a saját szekciójában lévő felhasználókkal léphet kapcsolatba"
+  can_list_categorized_event_types_52596f7: "Listázhatja a kategorizált esemény típusokat."
+  can_list_subscriptions_to_data_service_data_b52d5e37: "Listázhatja az előfizetéseket az adat szolgáltatás adatokhoz."
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Nem törölheti az illesztéseket az értékelőtábla hozzárendelés alapján. A hozzárendelések eltávolításához az elem értékelési táblájából kell eltávolítani a megfelelő sort"
   can_t_enable_anonymous_grading_and_group_assignmen_9938416e: "A névtelen értékelés és a csoportos feladat nem összeférhető beállítás."
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Nem végezhető el az összehasonlítás több mint egy ugyanolyan típusú fájllal"
@@ -3410,6 +3414,7 @@ hu:
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Nem törölhető olyan fájl, amit egy feladat részeként adtak be"
   cannot_grade_at_this_time_489744b0: "Jelenleg nem lehet osztályozni"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Nem adhat hozzá hallgatókat blueprint kurzushoz"
+  cannot_modify_outcome_from_another_context_changes_a80561a4: "Nem lehet módosítani az eredményt egy másik környezetből: %{changes}; az eredményt ebben kell módosítani: %{context}"
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "A feladatot nem lehet áthelyezni, mivel az osztályzási időszak lezárult"
   cannot_save_new_assignment_3bda0792: "nem lehet elmenteni az új feladatot"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "A sis_account_id rendszer-fiókazonosító beállítása nem lehetséges root_account gyökérfiókon."
@@ -4093,6 +4098,7 @@ hu:
   content_not_available_7b2e004: "A tartalom nem elérhető"
   content_on_this_page_violates_the_security_policy__25685d8a: "Az oldal tartalma sérti a biztonsági szabályzatot, kérjen támogatást az adminisztrátortól."
   content_security_policy_3bb8d922: "Tartalom biztonsági szabályzat"
+  content_security_policy_settings_3e87fcb2: "Tartalom Biztonsági Házirend Beállítások"
   content_share_started_successfully_2c37fb79: "Tartalom megosztás sikeresen elindult"
   content_shares_e1e1: Tartalommegosztások
   content_tag: 
@@ -4717,6 +4723,7 @@ hu:
   course_announcements_76b07340: Kurzushirdetmények
   course_assignments_833b8cf1: Kurzusfeladatok
   course_atom_feed_9d95214e: "Kurzus Atom hírfolyam"
+  course_audit_log_77407457: "Tanfolyam Auditálási napló"
   course_calendar_7d3cba7b: Kurzusnaptár
   course_calendar_add_edit_delete_events_76b97c04: "Tanfolyam Naptár - események hozzáadása / szerkesztése / törlése"
   course_canvas_id_9e36b24c: "Canvas kurzusazonosító"
@@ -4781,6 +4788,7 @@ hu:
   course_files_a31f97fc: Kurzusfájlok
   course_files_add_edit_delete_24678a2f: "Tanfolyam Fájlok - hozzáadás / szerkesztés / törlés"
   course_found_f5a40cd3: Kurzustalálat
+  course_grade_grade_in_course_code_9fa854db: "Tanfolyam osztályzat: %{grade}% ebben: %{course_code}"
   course_grades_22adc27e: "Kurzus értékelések"
   course_groups_e8239a1e: Kurzuscsoportok
   course_has_no_active_instructors_with_this_id_74f1d8a: "A tanfolyamnak nincs aktív oktatója ilyen azonosítóval"
@@ -4876,6 +4884,7 @@ hu:
   course_outcomes_7dc1cbc7: "Kurzus tanulási eredményei"
   course_pages_449f1dd4: Kurzusoldalak
   course_people_3058c948: "Kurzus résztvevők"
+  course_quiz_extensions_4102f98f: "Tanfolyam Kvíz Kiegészítések"
   course_quizzes_c337653c: Kurzuskvízek
   course_restore: 
     restore_error: "Hiba történt a kurzus helyreállítása során. A kurzust nem állítottuk helyre."
@@ -6972,6 +6981,7 @@ hu:
   feed_url_8a433438: "Hírfolyam URL"
   feed_url_is_required_253fda4e: "Hírfolyam URL szükséges"
   field_cannot_be_blank_afb5b332: "A mező nem lehet üres."
+  field_must_be_either_active_or_deleted_329a42a: "\"%{field}\"-nek ezek közül az egyiknek kell lenni: \"%{active}\" vagy \"%{deleted}\""
   field_name_31fff38e: Mezőnév
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Küldjön egy hibajegyet, ha személyes visszajelzést szeretne az üzemeltetői csapattól"
   file_already_exists_bdc61895: "A fájl már létezik"
@@ -7670,6 +7680,7 @@ hu:
   group_group_name_is_full_297880d6: "A %{group_name} csoport megtelt"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "A %{group_name} csoportba csak meghívóval lehet csatlakozni"
   group_group_name_is_not_available_at_this_time_971001c1: "A %{group_name} csoport most nem elérhető"
+  group_guid_has_already_appeared_in_this_import_78f35ff3: "A \"%{guid}\" csoport már megjelent ebben az importban"
   group_is_for_a_different_section_6a843a4d: "A csoport egy másik szekciónak van fenntartva"
   group_is_full_56849d78: "A csoport megtelt"
   group_is_joined_by_invitation_only_d00f5a63: "A csoporthoz csak meghívóval lehet csatlakozni"
@@ -7694,6 +7705,7 @@ hu:
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} a/az %{group_category_name} csoportkategóriában"
   group_name_is_required_5547bc0b: "A csoportnév megadása kötelező"
   group_set_name_2aed2347: "Csoporthalmaz neve"
+  group_with_id_guid_already_exists_in_another_unrel_be1baf71: "A %{guid} azonosítójú csoport már létezik egy másik, nem kapcsolódó tanfolyamban vagy fiókban (%{name})"
   groups: 
     add_group: "Csoport hozzáadása "
     context_groups: 
@@ -8122,6 +8134,7 @@ hu:
   ignore_this_assignment_b7a71f80: "Feladat figyelmen kívül hagyása"
   ignore_until_new_mark_935e00a2: "Új érdemjegyig hagyja figyelmen kívül"
   ignore_until_new_submission_90ba19b7: "Új leadásig hagyja figyelmen kívül"
+  ilumno_grade_export_251bc4b5: "Ilumno Osztályzatexportálás"
   image_8ad06: Kép
   image_id_is_not_a_valid_id_7dd6bad6: "image_id nem érvényes azonosító"
   image_search_b0944fc2: Képkeresés
@@ -8326,8 +8339,10 @@ hu:
   invalid_datetime_for_graded_since_884cce5: "Érvénytelen datetime dátum a grade_since érdemjegy-attribútumhoz"
   invalid_datetime_for_submitted_since_a238f3a6: "Érvénytelen datetime dátum a submitted_since beadási attribútumhoz"
   invalid_domain_e810c1d: "Érvénytelen tartomány"
+  invalid_field_type_61d31870: "Érvénytelen %{field}: \"%{type}\""
   invalid_fields_after_ratings_fields_815ff223: "Érvénytelen mezők az értékelések után: %{fields}"
   invalid_fields_fields_8698284: "Érvénytelen mezők: %{fields}"
+  invalid_fields_for_a_group_invalid_f440b733: "Érvénytelen mezők egy csoporthoz: %{invalid}"
   invalid_file_type_881cc9b2: "Érvénytelen fájltípus"
   invalid_grade_passback_setting_a1d209d1: "Érvénytelen grade_passback_setting érdemjegyvisszaküldés-beállítás"
   invalid_points_possible: "Az elérhető pontok száma ehhez a feladathoz csak nulla vagy annál nagyobb lehet."
@@ -8339,6 +8354,7 @@ hu:
   invalid_url_in_xml: "Hibás url az xml-ben. Az és jeleket escapelni kell."
   invalid_username_or_password_b60aa240: "Helytelen felhasználói név vagy jelszó"
   invalid_utf_8_13c76a6: "Érvénytelen UTF-8"
+  invalid_value_for_name_i_4a7c601a: "Érvénytelen érték ehhez: %{name}: \"%{i}\""
   invalid_xml_configuration_9c3f6bcf: "Érvénytelen XML Konfiguráció"
   invalid_xml_syntax: "Érvénytelen xml szintaxis"
   invite_5b1fcbcd: Meghívás
@@ -10427,10 +10443,10 @@ hu:
         tweet: "Canvas-figyelmeztetés - Új hozzászólás %{author} részéről %{assignment}, %{user}, %{context} számára."
     submission_grade_changed: 
       email: 
-        body: "A következő feladatra kapott érdemjegye megváltozott: %{assignment_title} "
+        body: "A következő feladatára kapott érdemjegye megváltozott: %{assignment_title}."
         excused: "Ez a feladat kifogásolva lett."
         html: 
-          body: "A következő feladatra kapott érdemjegye megváltozott: %{assignment_title} "
+          body: "A következő feladatára kapott érdemjegye megváltozott: %{assignment_title}."
           excused: "Ez a feladat kifogásolva lett."
           link_message: "Itt bírálhatja a feladatot"
           no_date_set: "Nincs dátum beállítva"
@@ -10447,7 +10463,7 @@ hu:
         score_pending: "az eredmény még oktatói elbírálás alatt áll"
         subject: "Érdemjegy módosítva: %{assignment}, %{context}"
       sms: 
-        body_sms: "Az Ön jegye épp módosult a következővel kapcsolatban: %{title}, %{context}. "
+        body_sms: "Az Ön érdemjegye épp megváltozott a következőnél: %{title}, %{context}."
         more_info: "További információ itt: %{url}"
         no_date_set: "Nincs dátum beállítva"
         not_applicable: N/A
@@ -10850,6 +10866,7 @@ hu:
   name_badfe525: név
   name_count_users_ccc93c3d: "%{name}(%{count}ˇfelhasználók)"
   name_current_score_b3198dfa: "%{name} jelenlegi eredmény"
+  name_ea82c4df: "\"%{name}\""
   name_error_fee4236: "név hiba"
   name_final_score_2dce3ff8: "%{name} végső eredmény"
   name_grading_period_id_c9c8b6ae: "%{name} osztályzási időszak azonosítója"
@@ -10867,6 +10884,7 @@ hu:
   name_unposted_current_score_e98e95fd: "%{name} el nem küldött aktuális eredmény"
   name_unposted_final_score_124708d2: "%{name} el nem küldött végső eredmény"
   name_user_e44eebed: "%{name}Felhasználó"
+  names_and_role_ebff0149: "Nevek és Szerepkör"
   nav_avatar_border_3246beb1: "Nav avatar szegély"
   nav_background_fd299145: "Nav háttere"
   nav_badge_3c67de17: "Nav Kitűző"
@@ -11441,6 +11459,7 @@ hu:
     invalid_file: "Érvénytelen tanulásieredmény-csoportfájl"
   outcome_groups_api: 
     account_group_description: "Fiókszintű tanulási eredménycsoport"
+  outcome_guid_has_already_appeared_in_this_import_b9b8b34: "A \"%{guid}\" eredmény már megjelent ebben az importban"
   outcome_path_mastery_points: "%{path} jártassági pont"
   outcome_path_result: "%{path} eredmény"
   outcome_results: 
@@ -11449,6 +11468,8 @@ hu:
   outcome_results_title: Tanulásieredmény-értékek
   outcome_score_141cf00a: "tanulási eredmény pontszám"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Tanulási eredmény: %{title} a következő státuszú %{statusTooltip}"
+  outcome_with_canvas_id_id_not_found_215c5227: "Eredmény a \"%{id}\" Canvas azonosítóval nem található"
+  outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "A %{guid} azonosítójú eredmény már létezik egy másik, nem kapcsolódó tanfolyamban vagy fiókban (%{name})"
   outcomes: 
     account_standards: Fiókszabványok
     account_standards_description: "Balra találja azon szabványokat, amelyeket az intézménye hozott létre Önnek a kurzusaiban való használatra."
@@ -15993,9 +16014,12 @@ hu:
   the_ending_date_for_the_courses_to_report_on_1c417d5e: "A tanfolyamok befejező dátuma, amelyekhez a jelentés készül"
   the_ending_date_range_for_the_courses_to_report_on_99e0ea8f: "A tanfolyamok befejező dátum tartománya, amelyekhez a jelentés készül"
   the_error_stack_trace_if_there_is_one_b7e008a1: "Az error stack trace, ha létezik"
+  the_field_field_is_required_56512820: "A \"%{field}\" mező kötelező"
+  the_field_field_must_have_no_spaces_d1c2fc37: "A \"%{field}\" mező nem tartalmazhat szóközöket"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "A Fájlok menüpont arra való, hogy megosszunk előadás diákat, dokumentumokat, tanulási segédleteket - bármit, aminek letöltése hasznos lehet a hallgatók számára. A fájlok feltöltése és rendszerezése elég egyszerű a Canvasban. Megmutatjuk, hogyan."
   the_following_fields_are_invalid_fields_b3565800: "A következő mezők nem érvényesek: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "A teljes hosztnév a fiók példányhoz (pl. valami.instructure.com)"
+  the_global_context_9c3a8062: "a globális környezet"
   the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "Ennek a feladatnak az értékelése nem kerül szinkronizálásra a tanulmányi rendszerrel."
   the_grade_for_this_assignment_will_sync_to_the_stu_5d32cedb: "Erre a feladatra adott értékelés szinkronizálása a hallgatói információs rendszere felé."
   the_grade_on_assignment_assignment_title_has_been__f2487efc: "A/az %{assignment_title} feladat értékelése megváltozott a következőre: %{name}."
@@ -17041,6 +17065,7 @@ hu:
           találhat majd róluk információkat. Addig is nyugodtan iratkozzon fel további kurzusokra,
           vagy végezze el a profilbeállításokat.
       welcome_to_happiness: "Üdvözöljük a Canvasban!"
+  users_act_as_d922940: "Felhasználók - ekként"
   users_add_remove_observers_d1273d9: "Felhasználók - megfigyelők hozzáadása / eltávolítása"
   users_add_remove_students_in_courses_efe7e748: "Felhasználók - hallgatók hozzáadása/eltávolítása a kurzusba/kurzusból"
   users_d1b60cb0: Felhasználók
