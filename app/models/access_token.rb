@@ -26,7 +26,8 @@ class AccessToken < ActiveRecord::Base
   attr_reader :full_token
   attr_reader :plaintext_refresh_token
   belongs_to :developer_key, counter_cache: :access_token_count
-  belongs_to :user
+  belongs_to :user, inverse_of: :access_tokens
+  belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: 'User'
   has_one :account, through: :developer_key
 
   serialize :scopes, Array
