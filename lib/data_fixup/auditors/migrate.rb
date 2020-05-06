@@ -38,6 +38,13 @@ module DataFixup::Auditors
         }
       end
 
+      def filter_for_idempotency(ar_attributes_list, auditor_ar_type)
+        # we might have inserted some of these already, try again with only new recs
+        uuids = ar_attributes_list.map{|h| h['uuid']}
+        existing_uuids = auditor_ar_type.where(uuid: uuids).pluck(:uuid)
+        ar_attributes_list.reject{|h| existing_uuids.include?(h['uuid']) }
+      end
+
       def migrate_in_pages(collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
         next_page = 1
         until next_page.nil?
@@ -48,13 +55,25 @@ module DataFixup::Auditors
           end
           begin
             auditor_ar_type.bulk_insert(ar_attributes_list)
-          rescue ActiveRecord::StatementInvalid
-            # we might have inserted some of these already, try again with only new recs
-            uuids = ar_attributes_list.map{|h| h['uuid']}
-            existing_uuids = auditor_ar_type.where(uuid: uuids).map(&:uuid)
-            new_attrs_list = ar_attributes_list.reject{|h| existing_uuids.include?(h['uuid']) }
+          rescue ActiveRecord::RecordNotUnique, ActiveRecord::InvalidForeignKey
+            # this gets messy if we act specifically; let's just apply both remedies
+            new_attrs_list = filter_for_idempotency(ar_attributes_list, auditor_ar_type)
+            new_attrs_list = filter_dead_foreign_keys(new_attrs_list)
             auditor_ar_type.bulk_insert(new_attrs_list) if new_attrs_list.size > 0
           end
+          next_page = auditor_recs.next_page
+        end
+      end
+
+      def audit_in_pages(collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
+        @audit_failure_uuids ||= []
+        next_page = 1
+        until next_page.nil?
+          page_args = { page: next_page, per_page: batch_size }
+          auditor_recs = collection.paginate(page_args)
+          uuids = auditor_recs.map(&:id)
+          existing_uuids = auditor_ar_type.where(uuid: uuids).pluck(:uuid)
+          @audit_failure_uuids += (uuids - existing_uuids)
           next_page = auditor_recs.next_page
         end
       end
@@ -92,11 +111,25 @@ module DataFixup::Auditors
         cell.update_attribute(:failed, true) unless cell.completed
       end
 
+      def audit
+        @audit_failure_uuids = []
+        perform_audit
+        @audit_failure_uuids
+      end
+
       def auditor_type
         raise "NOT IMPLEMENTED"
       end
 
       def perform_migration
+        raise "NOT IMPLEMENTED"
+      end
+
+      def perform_audit
+        raise "NOT IMPLEMENTED"
+      end
+
+      def filter_dead_foreign_keys(_attrs_list)
         raise "NOT IMPLEMENTED"
       end
     end
@@ -114,9 +147,27 @@ module DataFixup::Auditors
         :authentication
       end
 
+      def cassandra_collection
+        Auditors::Authentication.for_account(account, cassandra_query_options)
+      end
+
       def perform_migration
-        collection = Auditors::Authentication.for_account(account, cassandra_query_options)
-        migrate_in_pages(collection, Auditors::ActiveRecord::AuthenticationRecord)
+        migrate_in_pages(cassandra_collection, Auditors::ActiveRecord::AuthenticationRecord)
+      end
+
+      def perform_audit
+        audit_in_pages(cassandra_collection, Auditors::ActiveRecord::AuthenticationRecord)
+      end
+
+      def filter_dead_foreign_keys(attrs_list)
+        user_ids = attrs_list.map{|a| a['user_id'] }
+        pseudonym_ids = attrs_list.map{|a| a['pseudonym_id'] }
+        existing_user_ids = User.where(id: user_ids).pluck(:id)
+        existing_pseud_ids = Pseudonym.where(id: pseudonym_ids).pluck(:id)
+        missing_uids = user_ids - existing_user_ids
+        missing_pids = pseudonym_ids - existing_pseud_ids
+        new_attrs_list = attrs_list.reject{|h| missing_uids.include?(h['user_id']) }
+        new_attrs_list.reject{|h| missing_pids.include?(h['pseudonym_id'])}
       end
     end
 
@@ -127,9 +178,23 @@ module DataFixup::Auditors
         :course
       end
 
+      def cassandra_collection
+        Auditors::Course.for_account(account, cassandra_query_options)
+      end
+
       def perform_migration
-        collection = Auditors::Course.for_account(account, cassandra_query_options)
-        migrate_in_pages(collection, Auditors::ActiveRecord::CourseRecord)
+        migrate_in_pages(cassandra_collection, Auditors::ActiveRecord::CourseRecord)
+      end
+
+      def perform_audit
+        audit_in_pages(cassandra_collection, Auditors::ActiveRecord::CourseRecord)
+      end
+
+      def filter_dead_foreign_keys(attrs_list)
+        user_ids = attrs_list.map{|a| a['user_id'] }
+        existing_user_ids = User.where(id: user_ids).pluck(:id)
+        missing_uids = user_ids - existing_user_ids
+        attrs_list.reject {|h| missing_uids.include?(h['user_id']) }
       end
     end
 
@@ -140,13 +205,38 @@ module DataFixup::Auditors
         :grade_change
       end
 
+      def cassandra_collection_for(course)
+        Auditors::GradeChange.for_course(course, cassandra_query_options)
+      end
+
+      def migrateable_courses
+        account.courses.where("created_at <= ?", @date + 2.days)
+      end
+
       def perform_migration
-        courses_scope = account.courses.where("created_at <= ?", @date + 2.days)
-        courses_scope.find_in_batches do |course_batch|
+        migrateable_courses.find_in_batches do |course_batch|
           course_batch.each do |course|
-            collection = Auditors::GradeChange.for_course(course, cassandra_query_options)
-            migrate_in_pages(collection, Auditors::ActiveRecord::GradeChangeRecord)
+            migrate_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
           end
+        end
+      end
+
+      def perform_audit
+        migrateable_courses.find_in_batches do |course_batch|
+          course_batch.each do |course|
+            audit_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
+          end
+        end
+      end
+
+      def filter_dead_foreign_keys(attrs_list)
+        student_ids = attrs_list.map{|a| a['student_id'] }
+        grader_ids = attrs_list.map{|a| a['grader_id'] }
+        user_ids = (student_ids + grader_ids).uniq
+        existing_user_ids = User.where(id: user_ids).pluck(:id)
+        missing_uids = user_ids - existing_user_ids
+        attrs_list.reject do |h|
+          missing_uids.include?(h['student_id']) || missing_uids.include?(h['grader_id'])
         end
       end
     end
