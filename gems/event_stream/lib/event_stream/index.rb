@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'event_stream/index_strategy/active_record'
+require 'event_stream/index_strategy/cassandra'
 
 class EventStream::Index
   include EventStream::AttrConfig
@@ -28,6 +30,7 @@ class EventStream::Index
   attr_config :scrollback_limit, :type => Integer, :default => 52.weeks
   attr_config :entry_proc, :type => Proc
   attr_config :key_proc, :type => Proc, :default => nil
+  attr_config :ar_conditions_proc, type: Proc, default: nil
 
   def initialize(event_stream, &blk)
     @event_stream = event_stream
@@ -35,150 +38,53 @@ class EventStream::Index
     attr_config_validate
   end
 
+  def find_with(args, options)
+    strategy = self.strategy_for(options[:strategy])
+    strategy.find_with(args, options)
+  end
+
+  def find_ids_with(args, options)
+    strategy = self.strategy_for(options[:strategy])
+    strategy.find_ids_with(args, options)
+  end
+
+  def strategy_for(strategy_name)
+    if strategy_name == :active_record
+      @_ar_decorator ||= EventStream::IndexStrategy::ActiveRecord.new(self)
+    elsif strategy_name == :cassandra
+      @_cass_decorator ||= EventStream::IndexStrategy::Cassandra.new(self)
+    else
+      raise "Unknown Indexing Strategy: #{strategy_name}"
+    end
+  end
+
+  # these methods are included to keep the interface with plugins
+  # until they can be updated or removed to no longer
+  # depend no a cassandra-specific implementation.
+  # --- start ---
   def database
     event_stream.database
   end
 
-  def bucket_for_time(time)
-    time.to_i - (time.to_i % bucket_size)
-  end
-
-  def bookmark_for(record)
-    prefix = record.id.to_s[0, 8]
-    bucket = bucket_for_time(record.created_at)
-    ordered_id = "#{record.created_at.to_i}/#{prefix}"
-    [bucket, ordered_id]
-  end
-
-  def insert(record, key)
-    ttl_seconds = event_stream.ttl_seconds(record.created_at)
-    return if ttl_seconds < 0
-
-    bucket, ordered_id = bookmark_for(record)
-    key = create_key(bucket, key)
-    database.update(insert_cql, key, ordered_id, record.id, ttl_seconds)
-  end
-
   def for_key(key, options={})
-    shard = EventStream.current_shard
-    bookmarker = EventStream::Index::Bookmarker.new(self)
-    BookmarkedCollection.build(bookmarker) do |pager|
-      shard.activate { history(key, pager, options) }
-    end
-  end
-
-  # does the exact same scan as "for_key",
-  # but returns  just the IDs rather than
-  # random-accessing the datastore for the attributes
-  # for each id.  Mostly for use in bulk-scan
-  # operations like transferring all data from
-  # one store to another.
-  def ids_for_key(key, options={})
-    shard = EventStream.current_shard
-    bookmarker = EventStream::Index::Bookmarker.new(self)
-    BookmarkedCollection.build(bookmarker) do |pager|
-      shard.activate { ids_only_history(key, pager, options) }
-    end
-  end
-
-  def create_key(bucket, key)
-    [*key, bucket].join('/')
-  end
-
-  class Bookmarker
-    def initialize(index)
-      @index = index
-    end
-
-    def bookmark_for(item)
-      if item.is_a?(@index.event_stream.record_type)
-        @index.bookmark_for(item)
-      else
-        [item['bucket'], item['ordered_id']]
-      end
-    end
-
-    def validate(bookmark)
-      bookmark.is_a?(Array) && bookmark.size == 2
-    end
+    self.strategy_for(:cassandra).for_key(key, options)
   end
 
   def select_cql
-    "SELECT ordered_id, #{id_column}, #{key_column} FROM #{table} %CONSISTENCY% WHERE #{key_column} = ?"
+    self.strategy_for(:cassandra).select_cql
   end
 
   def insert_cql
-    "INSERT INTO #{table} (#{key_column}, ordered_id, #{id_column}) VALUES (?, ?, ?) USING TTL ?"
+    self.strategy_for(:cassandra).insert_cql
   end
 
-  private
-
-  def ids_only_history(key, pager, options)
-    # get the bucket to start at from the bookmark
-    if pager.current_bookmark
-      bucket, ordered_id = pager.current_bookmark
-    elsif options[:newest]
-      # page 1 with explicit start time
-      bucket = bucket_for_time(options[:newest])
-      ordered_id = "#{options[:newest].to_i + 1}/"
-    else
-      # page 1 implicit start at first event in "current" bucket
-      bucket = bucket_for_time(Time.now)
-      ordered_id = nil
-    end
-
-    # where to stop ("oldest" if given, defaulting to scrollback_limit, but
-    # can't go past scrollback_limit)
-    scrollback_limit = self.scrollback_limit.seconds.ago
-    oldest = options[:oldest] || scrollback_limit
-    oldest = scrollback_limit if oldest < scrollback_limit
-    oldest_bucket = bucket_for_time(oldest)
-    lower_bound = "#{oldest.to_i}/"
-
-    if ordered_id && (pager.include_bookmark ? ordered_id < lower_bound : ordered_id <= lower_bound)
-      # no possible results
-      pager.replace []
-      return pager
-    end
-
-    # pull results from each bucket until the page is full or we go past the
-    # end bucket
-    until pager.next_bookmark || bucket < oldest_bucket
-      # build up the query based on the context, bucket, and ordered_id. fetch
-      # one extra so we can tell if there are more pages
-      limit = pager.per_page + 1 - pager.size
-      args = []
-      args << create_key(bucket, key)
-      args << lower_bound
-      if ordered_id
-        ordered_id_clause = (pager.include_bookmark ? "AND ordered_id <= ?" : "AND ordered_id < ?")
-        args << ordered_id
-      else
-        ordered_id_clause = nil
-      end
-      qs = "#{select_cql} AND ordered_id >= ? #{ordered_id_clause} ORDER BY ordered_id DESC LIMIT #{limit}"
-
-      # execute the query collecting the results. set the bookmark iff there
-      # was a result after the full page
-      database.execute(qs, *args, consistency: event_stream.read_consistency_level).fetch do |row|
-        if pager.size == pager.per_page
-          pager.has_more!
-        else
-          pager << row.to_hash.merge('bucket' => bucket)
-        end
-      end
-
-      ordered_id = nil
-      bucket -= bucket_size
-    end
-    pager
+  def insert(record, key)
+    self.strategy_for(:cassandra).insert(record, key)
   end
 
-  def history(key, pager, options)
-    pager = ids_only_history(key, pager, options)
-    ids = pager.map { |row| row[id_column] }
-    fetch_strategy = options.fetch(:fetch_strategy, :batch)
-    events = event_stream.fetch(ids, strategy: fetch_strategy)
-    pager.replace events.sort_by { |event| ids.index(event.id) }
+  def bucket_for_time(time)
+    self.strategy_for(:cassandra).bucket_for_time(time)
   end
+  # --- end ---
+
 end

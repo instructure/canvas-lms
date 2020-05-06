@@ -357,6 +357,7 @@ describe EventStream::Stream do
         expect(database).to receive(:execute).once.with(/%CONSISTENCY% WHERE/, anything, consistency: nil).and_return(@results)
         @stream.fetch([1])
 
+        @stream.reset_backend!
         @stream.read_consistency_level 'ALL'
         expect(database).to receive(:execute).once.with(/%CONSISTENCY% WHERE/, anything, consistency: "ALL").and_return(@results)
         @stream.fetch([1])
@@ -377,6 +378,7 @@ describe EventStream::Stream do
           self.table table
           self.entry_proc lambda{ |record| record.entry }
         end
+        @index_strategy = @index.strategy_for(:cassandra)
 
         @key = double('key')
         @entry = double('entry', :key => @key)
@@ -394,44 +396,32 @@ describe EventStream::Stream do
         end
 
         it "inserts the provided record into the index" do
-          expect(@index).to receive(:insert).once.with(@record, anything)
+          expect(@index_strategy).to receive(:insert).once.with(@record, anything)
           @stream.insert(@record)
         end
 
         it "translates the record through the entry_proc for the key" do
-          expect(@index).to receive(:insert).once.with(anything, @entry)
+          expect(@index_strategy).to receive(:insert).once.with(anything, @entry)
           @stream.insert(@record)
         end
 
         it "skips insert if entry_proc and_return nil" do
-          @index.entry_proc lambda{ |record| nil }
-          expect(@index).to receive(:insert).never
+          @index.entry_proc lambda{ |_record| nil }
+          expect(@index_strategy).to receive(:insert).never
           @stream.insert(@record)
         end
 
         it "translates the result of the entry_proc through the key_proc if present" do
           @index.key_proc lambda{ |entry| entry.key }
-          expect(@index).to receive(:insert).once.with(anything, @key)
+          expect(@index_strategy).to receive(:insert).once.with(anything, @key)
           @stream.insert(@record)
         end
       end
 
       describe "generated for_thing method" do
-        it "forwards argument to index's for_key" do
-          expect(@index).to receive(:for_key).once.with([@entry], {})
+        it "forwards argument to index's find_with" do
+          expect(@index).to receive(:find_with).once.with([@entry], {:strategy=>:cassandra})
           @stream.for_thing(@entry)
-        end
-
-        it "translates argument through key_proc if present" do
-          @index.key_proc lambda{ |entry| entry.key }
-          expect(@index).to receive(:for_key).once.with(@key, {})
-          @stream.for_thing(@entry)
-        end
-
-        it "permits and forwards options" do
-          options = {oldest: 1.day.ago}
-          expect(@index).to receive(:for_key).once.with([@entry], options)
-          @stream.for_thing(@entry, options)
         end
       end
     end
