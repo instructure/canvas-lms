@@ -20,6 +20,7 @@
 class SubmissionComment < ActiveRecord::Base
   include SendToStream
   include HtmlTextHelper
+  include Workflow
 
   AUDITABLE_ATTRIBUTES = %w[
     comment
@@ -58,6 +59,7 @@ class SubmissionComment < ActiveRecord::Base
       record.errors.add(attr, 'attempt must not be larger than number of submission attempts')
     end
   end
+  validates :workflow_state, inclusion: {in: ["active"]}, allow_nil: true
 
   before_save :infer_details
   before_save :set_edited_at
@@ -84,6 +86,10 @@ class SubmissionComment < ActiveRecord::Base
   scope :for_assignment_id, lambda { |assignment_id| where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
   scope :for_groups, -> { where.not(group_comment_id: nil) }
   scope :not_for_groups, -> { where(group_comment_id: nil) }
+
+  workflow do
+    state :active
+  end
 
   def delete_other_comments_in_this_group
     update_other_comments_in_this_group(&:destroy)
@@ -330,6 +336,8 @@ class SubmissionComment < ActiveRecord::Base
     self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
     self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
     self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
+
+    self.workflow_state ||= "active"
   end
 
   def force_reload_cached_attachments

@@ -745,4 +745,11 @@ This text has a http://www.google.com link in it...
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
     end
   end
+
+  describe "workflow_state" do
+    it "is set to active by default" do
+      comment = @submission.add_comment(author: @teacher, comment: ":|")
+      expect(comment).to be_active
+    end
+  end
 end
