@@ -38,6 +38,22 @@ module DataFixup::Auditors
         }
       end
 
+      # rubocop:disable Lint/NoSleep
+      def get_cassandra_records_resiliantly(collection, page_args)
+        retries = 0
+        max_retries = 10
+        begin
+          recs = collection.paginate(page_args)
+          return recs
+        rescue CassandraCQL::Thrift::TimedOutException
+          raise if retries >= max_retries
+          sleep 1.4 ** retries
+          retries += 1
+          retry
+        end
+      end
+      # rubocop:enable Lint/NoSleep
+
       def filter_for_idempotency(ar_attributes_list, auditor_ar_type)
         # we might have inserted some of these already, try again with only new recs
         uuids = ar_attributes_list.map{|h| h['uuid']}
@@ -96,7 +112,16 @@ module DataFixup::Auditors
         ::Auditors::ActiveRecord::MigrationCell.create!(cell_attributes.merge({ completed: false }))
       end
 
+      def auditors_cassandra_db_lambda
+        lambda do
+          timeout_value = Setting.get("auditors_backfill_cassandra_timeout", 360).to_i
+          opts = { override_options: { 'timeout' => timeout_value } }
+          Canvas::Cassandra::DatabaseBuilder.from_config(:auditors, opts)
+        end
+      end
+
       def perform
+        extend_cassandra_stream_timeout!
         cell = migration_cell
         return if cell&.completed
         cell = create_cell! if cell.nil?
@@ -109,12 +134,37 @@ module DataFixup::Auditors
         cell.update_attribute(:completed, true)
       ensure
         cell.update_attribute(:failed, true) unless cell.completed
+        clear_cassandra_stream_timeout!
       end
 
       def audit
+        extend_cassandra_stream_timeout!
         @audit_failure_uuids = []
         perform_audit
         @audit_failure_uuids
+      ensure
+        clear_cassandra_stream_timeout!
+      end
+
+      def extend_cassandra_stream_timeout!
+        Canvas::Cassandra::DatabaseBuilder.reset_connections!
+        @_stream_db_proc = auditor_cassandra_stream.attr_config_values[:database]
+        auditor_cassandra_stream.database(auditors_cassandra_db_lambda)
+      end
+
+      def clear_cassandra_stream_timeout!
+        raise RuntimeError("stream db never cached!") unless @_stream_db_proc
+        Canvas::Cassandra::DatabaseBuilder.reset_connections!
+        auditor_cassandra_stream.database(@_stream_db_proc)
+      end
+
+      def auditor_cassandra_stream
+        stream_map = {
+          authentication: Auditors::Authentication::Stream,
+          course: Auditors::Course::Stream,
+          grade_change: Auditors::GradeChange::Stream
+        }
+        stream_map[auditor_type]
       end
 
       def auditor_type
