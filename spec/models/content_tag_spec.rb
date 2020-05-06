@@ -763,41 +763,4 @@ describe ContentTag do
     tag.reload
     expect(tag.unpublished?).to be_truthy
   end
-
-  describe 'after_save' do
-    describe 'set_root_account' do
-      it 'should set root_account when context is Account' do
-        account = Account.default
-        tag = ContentTag.create!(context: account)
-        expect(tag.root_account).to eq account.root_account
-      end
-
-      it 'should set root_account when context is Assignment' do
-        course_factory
-        assignment = @course.assignments.create!(title: "test")
-        tag = ContentTag.create!(context: assignment)
-        expect(tag.root_account).to eq assignment.root_account
-      end
-
-      it 'should set root_account when context is Course' do
-        course_factory
-        tag = ContentTag.create!(context: @course)
-        expect(tag.root_account).to eq @course.root_account
-      end
-
-      it 'should set root_account when context is LearningOutcomeGroup' do
-        account = Account.default
-        group = LearningOutcomeGroup.create!(title: "test", context: account)
-        tag = ContentTag.create!(context: group)
-        expect(tag.root_account).to eq account.root_account
-      end
-
-      it 'should set root_account when context is Quiz' do
-        course_factory
-        quiz = @course.quizzes.create!
-        tag = ContentTag.create!(context: quiz)
-        expect(tag.root_account).to eq @course.root_account
-      end
-    end
-  end
 end
