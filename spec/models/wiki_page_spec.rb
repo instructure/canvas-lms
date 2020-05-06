@@ -200,6 +200,12 @@ describe WikiPage do
     expect(p1.url).to eql('asdf-2')
   end
 
+  it "sets root_account_id on create" do
+    course_with_teacher(:active_all => true)
+    wp = @course.wiki_pages.create!(:title => "Asdf")
+    expect(wp.root_account_id).to eql @course.root_account_id
+  end
+
   context "unpublished" do
     before :once do
       teacher_in_course(:active_all => true)
