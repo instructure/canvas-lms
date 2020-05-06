@@ -18,11 +18,4 @@ linter_options = {
   auto_correct: ENV["AUTO_CORRECT_LINTERS"]
 }
 
-user_config_file = File.expand_path("../../gems/dr_diff/config/gergich_user_config.yml", __FILE__)
-if File.exists?(user_config_file)
-  config = YAML.load_file(user_config_file) || {}
-  user_list = config['only_report_errors'] || []
-  exit 0 if user_list.include?(ENV['GERRIT_EVENT_ACCOUNT_EMAIL'])
-end
-
 Linter.new(linter_options).run

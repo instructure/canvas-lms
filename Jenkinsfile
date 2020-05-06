@@ -195,7 +195,6 @@ pipeline {
                   // end of hack (covid)
                 }
               }
-              credentials.fetchFromGerrit('gergich_user_config', '.')
               credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
 
               sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
@@ -210,7 +209,6 @@ pipeline {
               sh 'cp -v config/domain.yml.example config/domain.yml'
               sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
               sh 'cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml'
-              sh 'cp -v ./gergich_user_config/gergich_user_config.yml ./gems/dr_diff/config/gergich_user_config.yml'
             }
           }
         }
