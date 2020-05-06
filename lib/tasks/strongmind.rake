@@ -184,4 +184,27 @@ namespace :strongmind do
 
     puts "3rd party setting is #{value}"
   end
+
+  desc "Enable Identity Server 2.0"
+  task :enable_identity_server, [:key, :secret] => :environment do |task, args|
+    if !args[:key] || !args[:secret]
+      puts "Please supply a key and secret."
+    else
+      basic_auth = Base64.strict_encode64("#{args[:key]}:#{args[:secret]}")
+
+      SettingsService.update_settings(
+        id: '1',
+        setting: "identity_basic_auth",
+        value: basic_auth,
+        object: "school"
+      )
+
+      SettingsService.update_settings(
+        id: '1',
+        setting: "identity_server_enabled",
+        value: true,
+        object: "school"
+      )
+    end
+  end
 end
