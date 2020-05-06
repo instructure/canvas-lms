@@ -18,17 +18,46 @@
 module EventStream::Backend
   class Cassandra
     include Strategy
-    attr_accessor :stream, :database
+    attr_accessor :stream
 
     def initialize(stream_obj)
       @stream = stream_obj
-      @database = stream_obj.database
     end
+
+    delegate :database, :table, :id_column, :read_consistency_level, :record_type, to: :stream
 
     class Unavailable < RuntimeError; end
 
     def available?
       !!database && database.available?
+    end
+
+    def fetch_cql
+      "SELECT * FROM #{table} %CONSISTENCY% WHERE #{id_column} IN (?)"
+    end
+
+    def fetch_one_cql
+      "SELECT * FROM #{table} %CONSISTENCY% WHERE #{id_column} = ?"
+    end
+
+    def fetch(ids, strategy: :batch)
+      rows = []
+      if available? && ids.present?
+        if strategy == :batch
+          database.execute(fetch_cql, ids, consistency: read_consistency_level).fetch do |row|
+            rows << record_type.from_attributes(row.to_hash)
+          end
+        elsif strategy == :serial
+          ids.each do |record_id|
+            database.execute(fetch_one_cql, record_id, consistency: read_consistency_level).fetch do |row|
+              rows << record_type.from_attributes(row.to_hash)
+            end
+          end
+        else
+          raise "Unrecognized Fetch Strategy: #{strategy}"
+        end
+      end
+      rows
     end
 
     def execute(operation, record)
@@ -47,6 +76,25 @@ module EventStream::Backend
     rescue StandardError => exception
       stream.run_callbacks(:error, operation, record, exception)
       raise if stream.raise_on_error
+    end
+
+    def index_on_insert(index, record)
+      if (entry = index.entry_proc.call(record))
+        key = index.key_proc ? index.key_proc.call(*entry) : entry
+        index.strategy_for(:cassandra).insert(record, key)
+      end
+    end
+
+    def find_with_index(index, args)
+      options = args.extract_options!
+      options[:strategy] = :cassandra
+      index.find_with(args, options)
+    end
+
+    def find_ids_with_index(index, args)
+      options = args.extract_options!
+      options[:strategy] = :cassandra
+      index.find_ids_with(args, options)
     end
   end
 end

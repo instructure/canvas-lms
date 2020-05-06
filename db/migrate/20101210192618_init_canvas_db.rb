@@ -37,6 +37,17 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       end
     end
 
+    # everything else is alphabetical,
+    # sometimes defining classes try to access
+    # this table def and it needs to exist first
+    create_table "settings", :force => true do |t|
+      t.string   "name"
+      t.text     "value"
+      t.datetime "created_at"
+      t.datetime "updated_at"
+    end
+    add_index :settings, :name, :unique => true
+
     create_table "abstract_courses", :force => true do |t|
       t.string   "sis_source_id"
       t.integer  "sis_batch_id", :limit => 8
@@ -2630,14 +2641,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamps null: true
     end
     add_index :session_persistence_tokens, :pseudonym_id
-
-    create_table "settings", :force => true do |t|
-      t.string   "name"
-      t.text     "value"
-      t.datetime "created_at"
-      t.datetime "updated_at"
-    end
-    add_index :settings, :name, :unique => true
 
     create_table :shared_brand_configs do |t|
       t.string :name

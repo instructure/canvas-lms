@@ -18,17 +18,22 @@
 module EventStream::Backend
   class ActiveRecord
     include Strategy
-    attr_accessor :stream, :active_record_type
+    attr_accessor :stream
 
     def initialize(stream_obj)
       @stream = stream_obj
-      @active_record_type = stream_obj.active_record_type
     end
+
+    delegate :active_record_type, to: :stream
 
     class Unavailable < RuntimeError; end
 
     def available?
       active_record_type.connection.active?
+    end
+
+    def fetch(ids, strategy: :batch)
+      active_record_type.where(uuid: ids)
     end
 
     def execute(operation, record)
@@ -42,6 +47,23 @@ module EventStream::Backend
     rescue StandardError => exception
       stream.run_callbacks(:error, operation, record, exception)
       raise if stream.raise_on_error
+    end
+
+    def index_on_insert(index, record)
+      key = index.key_proc ? index.key_proc.call(*entry) : entry
+      index.strategy_for(:active_record).insert(record, key)
+    end
+
+    def find_with_index(index, args)
+      options = args.extract_options!
+      options[:strategy] = :active_record
+      index.find_with(args, options)
+    end
+
+    def find_ids_with_index(index, args)
+      options = args.extract_options!
+      options[:strategy] = :active_record
+      index.find_ids_with(args, options)
     end
 
     private

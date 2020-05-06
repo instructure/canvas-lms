@@ -149,7 +149,7 @@ class Auditors::GradeChange
 
   # rubocop:disable Metrics/BlockLength
   Stream = Auditors.stream do
-    backend_strategy :cassandra
+    backend_strategy -> { Auditors.backend_strategy }
     active_record_type Auditors::ActiveRecord::GradeChangeRecord
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :grade_changes
@@ -160,12 +160,14 @@ class Auditors::GradeChange
       table :grade_changes_by_assignment
       entry_proc lambda{ |record| record.assignment }
       key_proc lambda{ |assignment| assignment.global_id }
+      ar_conditions_proc lambda { |assignment| { assignment_id: assignment.id } }
     end
 
     add_index :course do
       table :grade_changes_by_course
       entry_proc lambda{ |record| record.course }
       key_proc lambda{ |course| course.global_id }
+      ar_conditions_proc lambda { |course| { context_id: course.id, context_type: 'Course' } }
     end
 
     add_index :root_account_grader do
@@ -174,18 +176,21 @@ class Auditors::GradeChange
       # indexing events for auto grader in cassandra.
       entry_proc lambda{ |record| [record.root_account, record.grader] if record.grader && !record.submission.autograded? }
       key_proc lambda{ |root_account, grader| [root_account.global_id, grader.global_id] }
+      ar_conditions_proc lambda { |root_account, grader| { root_account_id: root_account.id, grader_id: grader.id } }
     end
 
     add_index :root_account_student do
       table :grade_changes_by_root_account_student
       entry_proc lambda{ |record| [record.root_account, record.student] }
       key_proc lambda{ |root_account, student| [root_account.global_id, student.global_id] }
+      ar_conditions_proc lambda { |root_account, student| { root_account_id: root_account.id, student_id: student.id } }
     end
 
     add_index :course_assignment do
       table :grade_changes_by_course_assignment
       entry_proc lambda { |record| [record.course, record.assignment] }
       key_proc lambda { |course, assignment| [course.global_id, assignment.global_id] }
+      ar_conditions_proc lambda { |course, assignment| { context_id: course.id, context_type: 'Course' , assignment_id: assignment.id } }
     end
 
     add_index :course_assignment_grader do
@@ -194,6 +199,7 @@ class Auditors::GradeChange
         [record.course, record.assignment, record.grader] if record.grader && !record.submission.autograded?
       }
       key_proc lambda { |course, assignment, grader| [course.global_id, assignment.global_id, grader.global_id] }
+      ar_conditions_proc lambda { |course, assignment, grader| { context_id: course.id, context_type: 'Course' , assignment_id: assignment.id, grader_id: grader.id } }
     end
 
     add_index :course_assignment_grader_student do
@@ -206,18 +212,21 @@ class Auditors::GradeChange
       key_proc lambda { |course, assignment, grader, student|
         [course.global_id, assignment.global_id, grader.global_id, student.global_id]
       }
+      ar_conditions_proc lambda { |course, assignment, grader, student| { context_id: course.id, context_type: 'Course' , assignment_id: assignment.id, grader_id: grader.id, student_id: student.id } }
     end
 
     add_index :course_assignment_student do
       table :grade_changes_by_course_assignment_student
       entry_proc lambda { |record| [record.course, record.assignment, record.student] }
       key_proc lambda { |course, assignment, student| [course.global_id, assignment.global_id, student.global_id] }
+      ar_conditions_proc lambda { |course, assignment, student| { context_id: course.id, context_type: 'Course' , assignment_id: assignment.id, student_id: student.id } }
     end
 
     add_index :course_grader do
       table :grade_changes_by_course_grader
       entry_proc lambda { |record| [record.course, record.grader] if record.grader && !record.submission.autograded? }
       key_proc lambda { |course, grader| [course.global_id, grader.global_id] }
+      ar_conditions_proc lambda { |course, grader| { context_id: course.id, context_type: 'Course' , grader_id: grader.id } }
     end
 
     add_index :course_grader_student do
@@ -226,12 +235,14 @@ class Auditors::GradeChange
         [record.course, record.grader, record.student] if record.grader && !record.submission.autograded?
       }
       key_proc lambda { |course, grader, student| [course.global_id, grader.global_id, student.global_id] }
+      ar_conditions_proc lambda { |course, grader, student| { context_id: course.id, context_type: 'Course' , grader_id: grader.id, student_id: student.id } }
     end
 
     add_index :course_student do
       table :grade_changes_by_course_student
       entry_proc lambda { |record| [record.course, record.student] }
       key_proc lambda { |course, student| [course.global_id, student.global_id] }
+      ar_conditions_proc lambda { |course, student| { context_id: course.id, context_type: 'Course', student_id: student.id } }
     end
 
   end
@@ -253,25 +264,25 @@ class Auditors::GradeChange
 
   def self.for_root_account_student(account, student, options={})
     account.shard.activate do
-      Auditors::GradeChange::Stream.for_root_account_student(account, student, options)
+      Auditors::GradeChange::Stream.for_root_account_student(account, student, Auditors.read_stream_options(options))
     end
   end
 
   def self.for_course(course, options={})
     course.shard.activate do
-      Auditors::GradeChange::Stream.for_course(course, options)
+      Auditors::GradeChange::Stream.for_course(course, Auditors.read_stream_options(options))
     end
   end
 
   def self.for_root_account_grader(account, grader, options={})
     account.shard.activate do
-      Auditors::GradeChange::Stream.for_root_account_grader(account, grader, options)
+      Auditors::GradeChange::Stream.for_root_account_grader(account, grader, Auditors.read_stream_options(options))
     end
   end
 
   def self.for_assignment(assignment, options={})
     assignment.shard.activate do
-      Auditors::GradeChange::Stream.for_assignment(assignment, options)
+      Auditors::GradeChange::Stream.for_assignment(assignment, Auditors.read_stream_options(options))
     end
   end
 
@@ -284,6 +295,7 @@ class Auditors::GradeChange
   # course grader student
   # course student
   def self.for_course_and_other_arguments(course, arguments, options={})
+    options = Auditors.read_stream_options(options)
     course.shard.activate do
       if arguments[:assignment] && arguments[:grader] && arguments[:student]
         Auditors::GradeChange::Stream.for_course_assignment_grader_student(course,

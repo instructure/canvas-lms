@@ -150,6 +150,7 @@ class PageView < ActiveRecord::Base
   end
 
   EventStream = EventStream::Stream.new do
+    backend_strategy :cassandra
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:page_views) }
     table :page_views
     id_column :request_id
