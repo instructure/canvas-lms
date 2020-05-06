@@ -48,6 +48,9 @@ export default class ClosedCaptionCreatorRow extends Component {
     selectedLanguage: shape({id: string.isRequired, label: string.isRequired})
   }
 
+  _langSelectRef = React.createRef()
+  _deleteCCBtnRef = React.createRef()
+
   handleLanguageChange = (event, selectedLang) => {
     this.props.onLanguageSelected(this.props.languages.find(l => l.id === selectedLang))
   }
@@ -58,6 +61,14 @@ export default class ClosedCaptionCreatorRow extends Component {
 
   get isReadonly() {
     return this.props.selectedFile && this.props.selectedLanguage
+  }
+
+  focus() {
+    if (this._langSelectRef.current) {
+      this._langSelectRef.current.focus()
+    } else if (this._deleteCCBtnRef.current) {
+      this._deleteCCBtnRef.current.focus()
+    }
   }
 
   renderChoosing() {
@@ -80,6 +91,7 @@ export default class ClosedCaptionCreatorRow extends Component {
     return (
       <Flex.Item margin="0 small small 0">
         <CanvasSelect
+          ref={this._langSelectRef}
           value={this.props.selectedLanguage?.id}
           label={<ScreenReaderContent>{CLOSED_CAPTIONS_SELECT_LANGUAGE}</ScreenReaderContent>}
           liveRegion={this.props.liveRegion}
@@ -169,6 +181,7 @@ export default class ClosedCaptionCreatorRow extends Component {
               </Flex.Item>
               <Flex.Item margin="0 0 0 x-small">
                 <IconButton
+                  ref={this._deleteCCBtnRef}
                   withBackground={false}
                   withBorder={false}
                   onClick={this.handleDeleteRow}

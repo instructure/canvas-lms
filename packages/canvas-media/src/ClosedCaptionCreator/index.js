@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component} from 'react'
+import {findDOMNode} from 'react-dom'
 import {arrayOf, func, objectOf, shape, string} from 'prop-types'
 import formatMessage from 'format-message'
 
@@ -58,16 +59,25 @@ export default class ClosedCaptionPanel extends Component {
       addingNewClosedCaption: !props?.subtitles?.length, // if there are none, show the + button
       newSelectedFile: null,
       newSelectedLanguage: null,
+      lastDeletedCCIndex: -1,
       subtitles: props.subtitles || [],
       announcement: null
     }
+    this._addButtonRef = React.createRef()
+    this._newCreatorRef = React.createRef()
+    this._nextCCRef = React.createRef()
   }
 
   componentDidUpdate() {
-    if (this._addButtonRef) {
-      window.setTimeout(() => {
-        this._addButtonRef && this._addButtonRef.focus()
-      }, 100)
+    // eslint-disable-next-line react/no-find-dom-node
+    if (!findDOMNode(this).contains(document.activeElement)) {
+      if (this._newCreatorRef.current) {
+        this._newCreatorRef.current.focus()
+      } else if (this._nextCCRef.current) {
+        this._nextCCRef.current.focus()
+      } else {
+        this._addButtonRef.current?.focus()
+      }
     }
   }
 
@@ -132,7 +142,8 @@ export default class ClosedCaptionPanel extends Component {
 
   onRowDelete = locale => {
     this.setState(prevState => {
-      const deletedLang = this.props.languages.find(l => l.id === locale)
+      const deletedLang = this.props.languages.findIndex(l => l.id === locale)
+      const deletedCCIndex = prevState.subtitles.findIndex(s => s.locale === locale)
       const subtitles = prevState.subtitles.filter(s => s.locale !== locale)
       this.props.updateSubtitles(subtitles)
       return {
@@ -141,7 +152,8 @@ export default class ClosedCaptionPanel extends Component {
         announcement: formatMessage(
           this.props.uploadMediaTranslations.UploadMediaStrings.DELETED_CAPTION,
           {lang: deletedLang?.label}
-        )
+        ),
+        lastDeletedCCIndex: deletedCCIndex
       }
     })
   }
@@ -161,8 +173,9 @@ export default class ClosedCaptionPanel extends Component {
           </Alert>
         )}
         <View display="inline-block">
-          {this.state.subtitles.map(cc => (
+          {this.state.subtitles.map((cc, index) => (
             <ClosedCaptionCreatorRow
+              ref={index === this.state.lastDeletedCCIndex ? this._nextCCRef : undefined}
               key={cc.locale}
               liveRegion={this.props.liveRegion}
               uploadMediaTranslations={this.props.uploadMediaTranslations}
@@ -178,6 +191,7 @@ export default class ClosedCaptionPanel extends Component {
         {this.state.addingNewClosedCaption ? (
           <View as="div">
             <ClosedCaptionCreatorRow
+              ref={this._newCreatorRef}
               liveRegion={this.props.liveRegion}
               uploadMediaTranslations={this.props.uploadMediaTranslations}
               onDeleteRow={this.onRowDelete}
@@ -194,9 +208,7 @@ export default class ClosedCaptionPanel extends Component {
         ) : (
           <div style={{position: 'relative', textAlign: 'center'}}>
             <IconButton
-              elementRef={el => {
-                this._addButtonRef = el
-              }}
+              ref={this._addButtonRef}
               shape="circle"
               color="primary"
               screenReaderLabel={ADD_NEW_CAPTION_OR_SUBTITLE}

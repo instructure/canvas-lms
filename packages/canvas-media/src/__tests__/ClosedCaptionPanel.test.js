@@ -24,7 +24,8 @@ function makeProps(options = {}) {
   return {
     languages: [
       {id: 'en', label: 'English'},
-      {id: 'fr', label: 'French'}
+      {id: 'fr', label: 'French'},
+      {id: 'es', label: 'Spanish'}
     ],
     liveRegion: () => document.getElementById('flash_screenreader_holder'),
     uploadMediaTranslations: {
@@ -92,7 +93,7 @@ describe('ClosedCaptionPanel', () => {
     )
   })
 
-  it('adds a new row when + is clicked', () => {
+  it('adds a new row and focused language selector when + is clicked', () => {
     const {container, getByText, getByPlaceholderText, getAllByTestId} = render(
       <ClosedCaptionCreator {...makeProps()} />
     )
@@ -116,6 +117,7 @@ describe('ClosedCaptionPanel', () => {
 
     expect(getAllByTestId('CC-CreatorRow-chosen').length).toBe(1)
     expect(getAllByTestId('CC-CreatorRow-choosing').length).toBe(1)
+    expect(getByPlaceholderText('select language')).toBe(container.ownerDocument.activeElement)
   })
 
   it('deletes a row when trashcan is clicked', () => {
@@ -161,5 +163,108 @@ describe('ClosedCaptionPanel', () => {
 
     expect(getAllByTestId('CC-CreatorRow-chosen').length).toBe(1)
     expect(getByText('English')).toBeInTheDocument()
+  })
+
+  describe('focus', () => {
+    it('moves to next CC on deleting one', () => {
+      const {container, getByText, getAllByTestId} = render(
+        <ClosedCaptionCreator
+          {...makeProps({
+            subtitles: [
+              {locale: 'en', file: {name: 'en.srt'}},
+              {locale: 'es', file: {name: 'es.srt'}},
+              {locale: 'fr', file: {name: 'fr.srt'}}
+            ]
+          })}
+        />
+      )
+      expect(getByText('English')).toBeInTheDocument()
+      expect(getByText('Spanish')).toBeInTheDocument()
+      expect(getByText('add new caption')).toBeInTheDocument()
+
+      // delete the first row
+      const trashcan = getByText('Remove English closed captions').closest('button')
+      fireEvent.click(trashcan)
+
+      expect(getAllByTestId('CC-CreatorRow-chosen').length).toBe(2)
+      expect(getByText('Remove Spanish closed captions').closest('button')).toBe(
+        container.ownerDocument.activeElement
+      )
+    })
+
+    it('moves to add button on deleting last current one', () => {
+      const {container, getByText, getAllByTestId} = render(
+        <ClosedCaptionCreator
+          {...makeProps({
+            subtitles: [
+              {locale: 'en', file: {name: 'en.srt'}},
+              {locale: 'es', file: {name: 'es.srt'}},
+              {locale: 'fr', file: {name: 'fr.srt'}}
+            ]
+          })}
+        />
+      )
+      expect(getByText('English')).toBeInTheDocument()
+      expect(getByText('Spanish')).toBeInTheDocument()
+      expect(getByText('French')).toBeInTheDocument()
+      expect(getByText('add new caption')).toBeInTheDocument()
+
+      // delete the last row
+      const trashcan = getByText('Remove French closed captions').closest('button')
+      fireEvent.click(trashcan)
+
+      expect(getAllByTestId('CC-CreatorRow-chosen').length).toBe(2)
+      expect(getByText('add new caption').closest('button')).toBe(
+        container.ownerDocument.activeElement
+      )
+    })
+
+    it('moves to language select on clicking the add button', () => {
+      const {container, getByText, getByPlaceholderText} = render(
+        <ClosedCaptionCreator
+          {...makeProps({
+            subtitles: [
+              {locale: 'en', file: {name: 'en.srt'}},
+              {locale: 'es', file: {name: 'es.srt'}}
+            ]
+          })}
+        />
+      )
+      expect(getByText('English')).toBeInTheDocument()
+      expect(getByText('Spanish')).toBeInTheDocument()
+
+      const addBtn = getByText('add new caption').closest('button')
+      fireEvent.click(addBtn)
+
+      expect(getByPlaceholderText('select language')).toBe(container.ownerDocument.activeElement)
+    })
+
+    it('moves to language select on deleting one', () => {
+      // subtly different from previous cases.
+      // the user has existing captions, clicks + to start adding a new one,
+      // then jumps up and deletes one of the existing ones.
+      const {container, getByText, getByPlaceholderText} = render(
+        <ClosedCaptionCreator
+          {...makeProps({
+            subtitles: [
+              {locale: 'en', file: {name: 'en.srt'}},
+              {locale: 'es', file: {name: 'es.srt'}}
+            ]
+          })}
+        />
+      )
+      expect(getByText('English')).toBeInTheDocument()
+      expect(getByText('Spanish')).toBeInTheDocument()
+
+      const addBtn = getByText('add new caption').closest('button')
+      fireEvent.click(addBtn)
+
+      expect(getByPlaceholderText('select language')).toBe(container.ownerDocument.activeElement)
+
+      const trashcan = getByText('Remove English closed captions').closest('button')
+      fireEvent.click(trashcan)
+
+      expect(getByPlaceholderText('select language')).toBe(container.ownerDocument.activeElement)
+    })
   })
 })
