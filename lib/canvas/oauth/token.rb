@@ -78,14 +78,14 @@ module Canvas::Oauth
     end
 
     def create_access_token_if_needed(replace_tokens = false)
-      @access_token ||= self.class.find_reusable_access_token(real_user, key, scopes, purpose)
+      @access_token ||= self.class.find_reusable_access_token(user, key, scopes, purpose)
 
       if @access_token.nil?
         # Clear other tokens issued under the same developer key if requested
-        real_user.access_tokens.where(developer_key_id: key).destroy_all if replace_tokens || key.replace_tokens
+        user.access_tokens.where(developer_key_id: key).destroy_all if replace_tokens || key.replace_tokens
 
         # Then create a new one
-        @access_token = real_user.access_tokens.create!({
+        @access_token = user.access_tokens.create!({
                                                      :developer_key => key,
                                                      :remember_access => remember_access?,
                                                      :scopes => scopes,
