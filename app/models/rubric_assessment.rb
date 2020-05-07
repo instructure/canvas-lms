@@ -38,6 +38,7 @@ class RubricAssessment < ActiveRecord::Base
 
   before_save :update_artifact_parameters
   before_save :htmlify_rating_comments
+  before_create :set_root_account_id
   after_save :update_assessment_requests, :update_artifact
   after_save :track_outcomes
 
@@ -276,4 +277,7 @@ class RubricAssessment < ActiveRecord::Base
     end
   end
 
+  def set_root_account_id
+    self.root_account_id ||= self.rubric&.root_account_id
+  end
 end
