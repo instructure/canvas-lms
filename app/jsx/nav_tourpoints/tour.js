@@ -194,6 +194,7 @@ const Tour = ({roles}) => {
     teacher: I18n.t('Teacher Tour'),
     admin: I18n.t('Admin Tour')
   }
+  if (!open) return null
   return (
     <Reactour
       key={`${softClose}-${open}-${currentRole}`}
