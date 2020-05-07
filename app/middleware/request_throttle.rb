@@ -97,24 +97,21 @@ class RequestThrottle
   end
 
   def allowed?(request, bucket)
-    unless self.class.enabled?
-      return true
-    end
-
     if whitelisted?(request)
       return true
     elsif blacklisted?(request)
+      # blacklisting is useful even if throttling is disabled, this is left in intentionally
       Rails.logger.info("blocking request due to blacklist, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
       InstStatsd::Statsd.increment("request_throttling.blacklisted")
       return false
     else
       if bucket.full?
-        InstStatsd::Statsd.increment("request_throttling.throttled")
-        if Setting.get("request_throttle.enabled", "true") == "true"
+        if RequestThrottle.enabled?
+          InstStatsd::Statsd.increment("request_throttling.throttled")
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
           return false
         else
-          Rails.logger.info("would block request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
+          Rails.logger.info("WOULD HAVE blocked request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
         end
       end
       return true
@@ -179,7 +176,7 @@ class RequestThrottle
   end
 
   def self.enabled?
-    Setting.get("request_throttle.skip", "false") != 'true'
+    Setting.get("request_throttle.enabled", "true") == 'true'
   end
 
   def self.list_from_setting(key)
