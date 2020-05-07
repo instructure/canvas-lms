@@ -199,7 +199,7 @@ class BigBlueButtonConference < WebConference
 
   def join_url(user, type = :user)
     generate_request :join,
-      :fullName => user.name,
+      :fullName => user.short_name,
       :meetingID => conference_key,
       :password => settings[(type == :user ? :user_key : :admin_key)],
       :userID => user.id
