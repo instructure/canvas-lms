@@ -13849,8 +13849,8 @@ pt-BR:
         more_info: "Mais informações em %{url}"
         unknown_user: "Usuário desconhecido"
       summary: 
-        body: "%{user_name} acabou de enviá-lo uma mensagem no Canvas:"
-        subject: "%{user_name} acabou de enviá-lo uma mensagem no Canvas."
+        body: "%{user_name} acabou de enviar-lhe uma mensagem no Canvas:"
+        subject: "%{user_name} acabou de enviar-lhe uma mensagem no Canvas."
         unknown_user: "Usuário desconhecido"
       twitter: 
         tweet: "Alerta do Canvas - mensagem de %{user_name}."
@@ -23711,7 +23711,7 @@ pt-BR:
   user_name_has_just_turned_in_a_submission_for_assi_3e82d569: "%{user_name} acabou de entregar um envio para %{assignment_title} no curso %{course_name}"
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} acabou de adicioná-lo a uma conversa no Canvas. Para exibir a conversa, clique nesse link: %{link}."
   user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} acabou de enviá-lo uma mensagem no Canvas"
-  user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name} acabou de enviá-lo uma mensagem no Canvas."
+  user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name} acabou de enviar-lhe uma mensagem no Canvas."
   user_name_just_sent_you_a_message_in_canvas_do_not_16b13cf2: "%{user_name} acabou de enviar uma mensagem no Canvas - Não responda"
   user_name_just_turned_in_their_assignment_again_as_a2a0d25a: "%{user_name} acabou de entregar sua tarefa (novamente), %{assignment_title}"
   user_name_just_turned_in_their_assignment_assignme_7105fb96: "%{user_name} acabou de entregar sua tarefa, %{assignment_title}"
