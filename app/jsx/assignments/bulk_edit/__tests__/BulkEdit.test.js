@@ -618,10 +618,6 @@ describe('Assignment Bulk Edit Dates', () => {
   })
 
   describe('assignment selections', () => {
-    beforeEach(() => {
-      window.ENV.FEATURES.assignment_bulk_edit_phase_2 = true
-    })
-
     it('displays checkboxes for each main assignment', async () => {
       const {getByText, getAllByText, assignments} = await renderBulkEditAndWait()
       expect(getAllByText(/Select assignment:/)).toHaveLength(assignments.length)
@@ -674,10 +670,6 @@ describe('Assignment Bulk Edit Dates', () => {
   })
 
   describe('assignment selection by date', () => {
-    beforeEach(() => {
-      window.ENV.FEATURES.assignment_bulk_edit_phase_2 = true
-    })
-
     function assignmentListWithDates() {
       return [
         {
@@ -860,10 +852,6 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(result.getByText('Batch Edit'))
       return result
     }
-
-    beforeEach(() => {
-      window.ENV.FEATURES.assignment_bulk_edit_phase_2 = true
-    })
 
     it('has a disabled "Batch Edit" button when no assignments are selected', async () => {
       const {getByText, queryByText} = await renderBulkEditAndWait()

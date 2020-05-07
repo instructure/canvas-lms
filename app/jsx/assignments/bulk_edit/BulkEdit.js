@@ -316,11 +316,7 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
   }
 
   function renderDateSelect() {
-    return (
-      ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-        <BulkEditDateSelect selectDateRange={selectDateRange} />
-      )
-    )
+    return <BulkEditDateSelect selectDateRange={selectDateRange} />
   }
 
   function renderSaveSuccess() {

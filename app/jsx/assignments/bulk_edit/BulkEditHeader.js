@@ -93,27 +93,23 @@ export default function BulkEditHeader({
             </View>
           )}
         </Flex.Item>
-        {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-          <Flex.Item margin="0 0 0 small">
-            <Text>
-              {I18n.t(
-                {one: '%{count} assignment selected', other: '%{count} assignments selected'},
-                {count: selectedAssignmentsCount}
-              )}
-            </Text>
-          </Flex.Item>
-        )}
-        {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-          <Flex.Item>
-            <Button
-              margin="0 0 0 small"
-              onClick={onOpenBatchEdit}
-              interaction={selectedAssignmentsCount > 0 ? 'enabled' : 'disabled'}
-            >
-              {I18n.t('Batch Edit')}
-            </Button>
-          </Flex.Item>
-        )}
+        <Flex.Item margin="0 0 0 small">
+          <Text>
+            {I18n.t(
+              {one: '%{count} assignment selected', other: '%{count} assignments selected'},
+              {count: selectedAssignmentsCount}
+            )}
+          </Text>
+        </Flex.Item>
+        <Flex.Item>
+          <Button
+            margin="0 0 0 small"
+            onClick={onOpenBatchEdit}
+            interaction={selectedAssignmentsCount > 0 ? 'enabled' : 'disabled'}
+          >
+            {I18n.t('Batch Edit')}
+          </Button>
+        </Flex.Item>
         <Flex.Item>
           <Button margin="0 0 0 small" onClick={onCancel}>
             {jobSuccess ? I18n.t('Close') : I18n.t('Cancel')}

@@ -86,7 +86,6 @@ describe "assignment batch edit" do
     context "with feature on" do
       before(:each) do
         Account.site_admin.enable_feature! :assignment_bulk_edit
-        Account.site_admin.enable_feature! :assignment_bulk_edit_phase_2
         user_session(@teacher1)
         visit_assignments_index_page(@course1.id)
         goto_bulk_edit_view
