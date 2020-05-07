@@ -18,6 +18,9 @@
 class MasterCourses::ChildSubscription < ActiveRecord::Base
   belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
   belongs_to :child_course, :class_name => "Course"
+  belongs_to :root_account, :class_name => 'Account'
+
+  before_create :set_root_account_id
 
   has_many :child_content_tags, :class_name => "MasterCourses::ChildContentTag", :inverse_of => :child_subscription
 
@@ -128,5 +131,9 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
 
   def last_migration_id
     child_course.content_migrations.where(child_subscription_id: self).order('id desc').limit(1).pluck(:id).first
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.child_course.root_account_id
   end
 end
