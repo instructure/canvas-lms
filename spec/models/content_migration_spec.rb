@@ -213,6 +213,7 @@ describe ContentMigration do
 
     it "should import into a course" do
       cm = setup_zip_import(@course)
+      expect(cm.root_account).to eq @course.root_account
       test_zip_import(@course, cm)
     end
 
@@ -224,6 +225,7 @@ describe ContentMigration do
     it "should import into a group" do
       group_with_user
       cm = setup_zip_import(@group)
+      expect(cm.root_account).to eq @group.root_account
       test_zip_import(@group, cm)
     end
 
@@ -273,6 +275,7 @@ describe ContentMigration do
       qb_name = 'Import Unfiled Questions Into Me'
       cm.migration_settings['question_bank_name'] = qb_name
       cm.save!
+      expect(cm.root_account_id).to eq account.id
 
       package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_default_qb_test.zip")
       attachment = Attachment.new
