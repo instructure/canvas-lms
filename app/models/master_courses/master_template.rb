@@ -20,6 +20,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   # instead of the entire course, but for now that's what we'll roll with
 
   belongs_to :course
+  belongs_to :root_account, :class_name => 'Account'
   has_many :master_content_tags, :class_name => "MasterCourses::MasterContentTag", :inverse_of => :master_template
   has_many :child_subscriptions, :class_name => "MasterCourses::ChildSubscription", :inverse_of => :master_template
   has_many :master_migrations, :class_name => "MasterCourses::MasterMigration", :inverse_of => :master_template
@@ -41,6 +42,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   scope :for_full_course, -> { where(:full_course => true) }
 
   before_create :set_defaults
+  before_create :set_root_account_id
 
   after_save :invalidate_course_cache
   after_update :sync_default_restrictions
@@ -51,6 +53,10 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     unless self.default_restrictions.present?
       self.default_restrictions = {:content => true}
     end
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.course.root_account_id
   end
 
   def invalidate_course_cache
