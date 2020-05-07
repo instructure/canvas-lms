@@ -27,6 +27,11 @@ describe ContextModuleProgression do
     @course.enroll_student(@user).accept!
   end
 
+  it "populates root_account_id" do
+    progression = @module.evaluate_for(@user)
+    expect(progression.root_account).to eq @course.root_account
+  end
+
   def setup_modules
     @assignment = @course.assignments.create!(:title => "some assignment")
     @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
