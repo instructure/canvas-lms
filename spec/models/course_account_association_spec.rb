@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,22 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CourseAccountAssociation < ActiveRecord::Base
-  belongs_to :course
-  belongs_to :course_section
-  belongs_to :account
-  has_many :account_users, :foreign_key => 'account_id', :primary_key => 'account_id'
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-  validates_presence_of :course_id, :account_id, :depth
-
-  before_create :set_root_account_id
-
-  def set_root_account_id
-    self.root_account_id ||=
-      if account.root_account?
-        self.account.id
-      else
-        self.account&.root_account_id
-      end
+describe CourseAccountAssociation do
+  context 'create' do
+    it 'sets root account id from account' do
+      course_factory
+      association = @course.course_account_associations.first
+      expect(association.root_account_id).to eq @course.root_account_id
+    end
   end
 end
