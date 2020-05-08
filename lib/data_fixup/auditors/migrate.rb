@@ -264,20 +264,22 @@ module DataFixup::Auditors
       end
 
       def migrateable_courses
-        account.courses.where("created_at <= ?", @date + 2.days)
+        account.courses.where("EXISTS (?)",
+          Enrollment.where("course_id=courses.id").where(type: ['StudentEnrollment', 'StudentViewEnrollment']))
+          .where("courses.created_at <= ?", @date + 2.days)
       end
 
       def perform_migration
-        migrateable_courses.find_in_batches do |course_batch|
-          course_batch.each do |course|
+        migrateable_courses.find_in_batches do |courses|
+          courses.each do |course|
             migrate_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
           end
         end
       end
 
       def perform_audit
-        migrateable_courses.find_in_batches do |course_batch|
-          course_batch.each do |course|
+        migrateable_courses.find_in_batches do |courses|
+          courses.each do |course|
             audit_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
           end
         end

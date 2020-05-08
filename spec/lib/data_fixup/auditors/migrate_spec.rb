@@ -139,6 +139,18 @@ module DataFixup::Auditors::Migrate
       expect(output).to eq(['test'])
     end
 
+    describe "GradeChangeWorker" do
+      it "pulls courses for an account only if they have enrollments" do
+        course1 = course_model(account_id: Account.default.id)
+        course2 = course_model(account_id: Account.default.id)
+        enrollment1 = student_in_course(course: course1)
+        worker = GradeChangeWorker.new(Account.default.id, Time.zone.today)
+        cids = worker.migrateable_courses.map(&:id)
+        expect(cids.include?(course1.id)).to eq(true)
+        expect(cids.include?(course2.id)).to eq(false)
+      end
+    end
+
     describe "record keeping" do
       let(:date){ Time.zone.today }
 
