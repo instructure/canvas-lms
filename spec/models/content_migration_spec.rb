@@ -503,6 +503,28 @@ describe ContentMigration do
     expect(@course.quizzes.active.find_by_migration_id("blah!_#{teh_quiz.migration_id}")).not_to be_nil
   end
 
+  it "escapes html in plain text nodes into qti" do
+    skip unless Qti.qti_enabled?
+
+    cm = @cm
+    cm.migration_type = 'qti_converter'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/plaintext_qti.zip")
+    attachment = Attachment.create!(:context => cm, :uploaded_data => File.open(package_path, 'rb'), :filename => "file.zip")
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    html_text = @course.quiz_questions.where(:migration_id => "ID_5eb2ac5ba1c19_100").first.question_data[:question_text]
+    expect(html_text).to eq "This is <b>Bold</b>"
+    plain_text = @course.quiz_questions.where(:migration_id => "ID_5eb2ac5ba1c19_104").first.question_data[:question_text]
+    expect(plain_text).to eq "This is &lt;b&gt;Bold&lt;/b&gt;"
+  end
+
   it "should identify and import compressed tarball archives" do
     skip unless Qti.qti_enabled?
 

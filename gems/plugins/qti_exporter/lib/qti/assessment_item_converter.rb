@@ -121,7 +121,7 @@ class AssessmentItemConverter
         @question[:question_text] = ''
         text_nodes.each_with_index do |node, i|
           @question[:question_text] += "\n<br/>\n" if i > 0
-          if ['html', 'text'].include?(node['class'])
+          if node['class'] == 'html'
             @question[:question_text] += sanitize_html_string(node.text)
           else
             @question[:question_text] += sanitize_html!(node)
