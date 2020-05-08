@@ -108,7 +108,7 @@ const renderNotificationCategory = (
   >
     <Table.Head>
       <Table.Row>
-        <Table.ColHeader id={notificationCategory} width="16rem">
+        <Table.ColHeader id={notificationCategory} data-testid={notificationCategory} width="16rem">
           <Text size="large">{formattedCategoryNames[notificationCategory]}</Text>
         </Table.ColHeader>
         {notificationPreferences.channels.map(channel => (
@@ -180,10 +180,13 @@ const renderNotificationCategory = (
 const formatPreferencesData = preferences => {
   preferences.channels.forEach((channel, i) => {
     // copying the notificationCategories object defined above and setting it on each comms channel
-    // so that we can update and mutate the object for each channel without it effecting the others
+    // so that we can update and mutate the object for each channel without it effecting the others.
+    // We are also using the structure defined above because we care about the order that the
+    // preferences are displayed in.
     preferences.channels[i].categories = JSON.parse(JSON.stringify(notificationCategories))
     setNotificationPolicy(channel.notificationPolicies, preferences.channels[i].categories)
     setNotificationPolicy(channel.notificationPolicyOverrides, preferences.channels[i].categories)
+    dropEmptyCategories(preferences.channels[i].categories)
   })
 }
 
@@ -195,6 +198,19 @@ const setNotificationPolicy = (policies, categories) => {
         categories[key][np.notification.category] = np
       }
     })
+  })
+}
+
+const dropEmptyCategories = categories => {
+  Object.keys(categories).forEach(categoryGroup => {
+    Object.keys(categories[categoryGroup]).forEach(category => {
+      if (Object.keys(categories[categoryGroup][category]).length === 0) {
+        delete categories[categoryGroup][category]
+      }
+    })
+    if (Object.keys(categories[categoryGroup]).length === 0) {
+      delete categories[categoryGroup]
+    }
   })
 }
 

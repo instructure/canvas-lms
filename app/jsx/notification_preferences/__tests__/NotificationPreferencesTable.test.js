@@ -57,4 +57,13 @@ describe('Notification Preferences Table', () => {
       dueDateCategory.children[commsChannel1].querySelector('svg[name="IconMuted"]')
     ).toBeInTheDocument()
   })
+
+  it('only renders the category groups and categories that it is given', () => {
+    const {queryByTestId} = render(
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences} />
+    )
+
+    expect(queryByTestId('courseActivities')).not.toBeNull()
+    expect(queryByTestId('conversations')).toBeNull()
+  })
 })

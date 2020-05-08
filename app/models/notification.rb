@@ -52,6 +52,36 @@ class Notification < ActiveRecord::Base
     'Submission Graded'
   ].freeze
 
+  COURSE_TYPES = [
+    # Course Activities
+    'Due Date',
+    'Grading Policies',
+    'Course Content',
+    'Files',
+    'Announcement',
+    'Announcement Created By You',
+    'Grading',
+    'Invitation',
+    'All Submissions',
+    'Late Grading',
+    'Submission Comment',
+    'Blueprint',
+
+    # Discussions
+    'Discussion',
+    'DiscussionEntry',
+
+    # Scheduling
+    'Student Appointment Signups',
+    'Appointment Signups',
+    'Appointment Cancelations',
+    'Appointment Availability',
+    'Calendar',
+
+    # Conferences
+    'Recording Ready'
+  ].freeze
+
   FREQ_IMMEDIATELY = 'immediately'
   FREQ_DAILY = 'daily'
   FREQ_WEEKLY = 'weekly'
@@ -174,6 +204,10 @@ class Notification < ActiveRecord::Base
 
   def show_in_feed?
     self.category == "TestImmediately" || Notification.types_to_show_in_feed.include?(self.name)
+  end
+
+  def is_course_type?
+    COURSE_TYPES.include? self.category
   end
 
   def registration?

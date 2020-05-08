@@ -346,4 +346,22 @@ describe NotificationPolicy do
       end
     end
   end
+
+  context 'find_all_for' do
+    it 'should only return course type notification policies if provided a course context type' do
+      student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
+      channel = student.communication_channels.create(:path => "default@example.com")
+      channel.confirm!
+
+      course_type_notification = Notification.create!(:name => "Course Type", :subject => "Test", :category => 'Due Date')
+      notification = Notification.create!(:name => "Panda Express", :subject => "Test", :category => 'Whatever')
+
+      NotificationPolicy.create(:notification => course_type_notification, :communication_channel => channel, :frequency => "immediately")
+      NotificationPolicy.create(:notification => notification, :communication_channel => channel, :frequency => "daily")
+
+      policies = NotificationPolicy.find_all_for(channel, context_type: 'Course')
+      expect(policies.count).to eq 1
+      expect(policies.first.notification.name).to eq course_type_notification.name
+    end
+  end
 end
