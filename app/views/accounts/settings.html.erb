@@ -746,6 +746,33 @@ acknowledge that you have read and agreed to the
 
         <%= render partial: 'external_integration_keys', locals: { f: f } %>
 
+        <% if @account.root_account? && @account.root_account.feature_enabled?(:smart_alerts) %>
+          <fieldset>
+            <h2 class="screenreader-only"><%= t('Smart Alerts') %></h2>
+            <legend><%= t('Smart Alerts') %></legend>
+            <%= f.fields_for :settings do |settings| %>
+              <table class="formtable narrow">
+                <tr>
+                  <td>
+                    <label for="smart_alerts_threshold">
+                      <%= I18n.t('Threshold (in hours) to notify students within') %>
+                    </label>
+                  </td>
+                  <td>
+                    <% # TODO: read from account in KNO-443 %>
+                    <%= settings.select :smart_alerts_threshold,
+                      options_for_select(
+                        smart_alerts_threshold_options,
+                        '36h'
+                      )
+                    %>
+                  </td>
+                </tr>
+              </table>
+            <% end %>
+          </fieldset>
+        <% end %>
+
         <div class="button-container">
           <button type="submit" class="Button Button--primary"><%= t(:update_settings_button, "Update Settings") %></button>
         </div>
