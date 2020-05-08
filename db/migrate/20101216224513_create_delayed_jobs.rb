@@ -114,7 +114,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
         PERFORM pg_advisory_xact_lock(half_md5_as_bigint(OLD.strand));
         running_count := (SELECT COUNT(*) FROM delayed_jobs WHERE strand = OLD.strand AND next_in_strand = 't');
         IF running_count < OLD.max_concurrent THEN
-          UPDATE delayed_jobs SET next_in_strand = 't' WHERE id = (
+          UPDATE delayed_jobs SET next_in_strand = 't' WHERE id IN (
             SELECT id FROM delayed_jobs j2 WHERE next_in_strand = 'f' AND
             j2.strand = OLD.strand ORDER BY j2.id ASC LIMIT (OLD.max_concurrent - running_count) FOR UPDATE
           );
