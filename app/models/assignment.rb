@@ -1398,17 +1398,16 @@ class Assignment < ActiveRecord::Base
     Atom::Entry.new do |entry|
       entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", :assignment => self.title) unless opts[:include_context]
       entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", :assignment => self.title, :course => self.context.name) if opts[:include_context]
-      entry.authors  << Atom::Person.new(:name => author_name)
       entry.updated   = self.updated_at.utc
       entry.published = self.created_at.utc
-      entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/assignments/#{self.feed_code}_#{self.due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
-      entry.links    << Atom::Link.new(:rel => 'alternate',
-                                    :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/assignments/#{self.id}")
+      entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime('%Y-%m-%d')}:/assignments/#{self.feed_code}_#{self.due_at.strftime('%Y-%m-%d-%H-%M') rescue 'none'}"
       entry.content   = Atom::Content::Html.new(before_label(:due, "Due") + " #{datetime_string(self.due_at, :due_date)}<br/>#{self.description}<br/><br/>
         <div>
           #{self.description}
         </div>
       ")
+      entry.links << Atom::Link.new(:rel => 'alternate', :href => direct_link)
+      entry.authors << Atom::Person.new(:name => author_name)
     end
   end
 
@@ -1418,6 +1417,10 @@ class Assignment < ActiveRecord::Base
 
   def end_at
     due_at
+  end
+
+  def direct_link
+    "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/assignments/#{self.id}"
   end
 
   def context_prefix
