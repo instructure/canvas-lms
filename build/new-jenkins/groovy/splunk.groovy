@@ -20,6 +20,8 @@
 
 import groovy.json.*
 
+// Splunk can take one or more events:
+// the json objects are simply concatenated if there are multiple (no [] and no commas)
 def upload(events) {
   def data = events.collect { new JsonBuilder(it).toString() }.join('')
   load('build/new-jenkins/groovy/credentials.groovy').withSplunkCredentials({
@@ -37,6 +39,15 @@ def event(name, fields) {
 
 def uploadEvent(name, fields) {
   upload([event(name, fields)])
+}
+
+// Rerun category is a string describing which rerun retry this test failure was
+def eventForTestFailure(test, rerun_category) {
+  return event('jenkins.test.failure', ['test': test, 'rerun_category': rerun_category])
+}
+
+def logEvents(events) {
+  println("Uploading events: ${new JsonBuilder(events).toPrettyString()}")
 }
 
 return this
