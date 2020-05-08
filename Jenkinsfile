@@ -109,7 +109,10 @@ def isCovid() {
 
 pipeline {
   agent { label 'canvas-docker' }
-  options { ansiColor('xterm') }
+  options {
+    ansiColor('xterm')
+    timestamps()
+  }
 
   environment {
     GERRIT_PORT = '29418'

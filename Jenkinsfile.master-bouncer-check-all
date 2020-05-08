@@ -23,10 +23,11 @@ pipeline {
 
   options {
     ansiColor('xterm')
+    timestamps()
   }
 
   environment {
-    // we only use this 
+    // we only use this
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:master"
     GERRIT_BRANCH = "master"
     GERGICH_REVIEW_LABEL = "Lint-Review"
@@ -72,4 +73,3 @@ pipeline {
     }
   }
 }
-
