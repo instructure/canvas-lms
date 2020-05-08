@@ -82,7 +82,9 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
         event_type            text,
         grade_before          text,
         grade_after           text,
-        graded_anonymously    boolean
+        graded_anonymously    boolean,
+        excused_before        boolean,
+        excused_after         boolean
       ) #{compression_params}}
 
     indexes.each do |index_name|
