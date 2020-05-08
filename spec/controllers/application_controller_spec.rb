@@ -128,7 +128,7 @@ RSpec.describe ApplicationController do
 
     describe "DIRECT_SHARE_ENABLED feature flag" do
       it "sets the env var to true when FF is enabled" do
-        root_account = double(global_id: 1, open_registration?: true, settings: {})
+        root_account = double(global_id: 1, open_registration?: true, settings: {}, cache_key: "key")
         allow(root_account).to receive(:kill_joy?)
         allow(root_account).to receive(:feature_enabled?).and_return(false)
         allow(root_account).to receive(:feature_enabled?).with(:direct_share).and_return(true)
@@ -138,7 +138,7 @@ RSpec.describe ApplicationController do
       end
 
       it "sets the env var to false when the context is a group" do
-        root_account = double(global_id: 1, open_registration?: true, settings: {})
+        root_account = double(global_id: 1, open_registration?: true, settings: {}, cache_key: "key")
         allow(root_account).to receive(:kill_joy?)
         allow(root_account).to receive(:feature_enabled?).and_return(false)
         allow(root_account).to receive(:feature_enabled?).with(:direct_share).and_return(true)
@@ -149,7 +149,7 @@ RSpec.describe ApplicationController do
       end
 
       it "sets the env var to false when FF is disabled" do
-        root_account = double(global_id: 1, open_registration?: true, settings: {})
+        root_account = double(global_id: 1, open_registration?: true, settings: {}, cache_key: "key")
         allow(root_account).to receive(:kill_joy?)
         allow(root_account).to receive(:feature_enabled?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: 'files.example.com')
@@ -183,7 +183,7 @@ RSpec.describe ApplicationController do
     end
 
     it 'gets appropriate settings from the root account' do
-      root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {})
+      root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key")
       allow(root_account).to receive(:kill_joy?).and_return(false)
       allow(HostUrl).to receive_messages(file_host: 'files.example.com')
       controller.instance_variable_set(:@domain_root_account, root_account)
@@ -192,7 +192,7 @@ RSpec.describe ApplicationController do
     end
 
     it 'disables fun when set' do
-      root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {})
+      root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key")
       allow(root_account).to receive(:kill_joy?).and_return(true)
       allow(HostUrl).to receive_messages(file_host: 'files.example.com')
       controller.instance_variable_set(:@domain_root_account, root_account)
