@@ -56,3 +56,10 @@ notification_granular_course_preferences:
     Allows users to override specific notification preferences on a
     course by course basis.
   applies_to: RootAccount
+
+smart_alerts:
+  state: hidden
+  display_name: Smart alerts
+  description: |-
+    Notify students in time of assignments that require their attention.
+  applies_to: RootAccount
