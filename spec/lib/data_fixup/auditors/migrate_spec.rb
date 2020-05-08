@@ -217,6 +217,20 @@ module DataFixup::Auditors::Migrate
         expect(pk).to eq("auditors_migration_grade_changes/#{Shard.current.database_server.id}_num_strands")
       end
 
+      it "wont enqueue complete jobs" do
+        start_date = Time.zone.today
+        end_date = start_date - 1.year
+        engine = BackfillEngine.new(start_date, end_date)
+        account = Account.default
+        AuthenticationWorker.new(account.id, start_date).create_cell!.update_attribute(:completed, true)
+        CourseWorker.new(account.id, start_date).create_cell!.update_attribute(:completed, true)
+        GradeChangeWorker.new(account.id, start_date).create_cell!
+        engine.enqueue_one_day_for_account(account, start_date)
+        # only the grade change worker should be enqueued because it's
+        # not marked complete
+        expect(Delayed::Job.count).to eq(1)
+      end
+
       context "when enqueued" do
         before(:each) do
           start_date = Time.zone.today
