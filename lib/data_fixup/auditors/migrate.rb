@@ -378,7 +378,7 @@ module DataFixup::Auditors
 
         def jobs_id
           shard = Shard.current
-          (shard.respond_to?(:delayed_jobs_shard_id) ? shard.delayed_jobs_shard_id : "")
+          (shard.respond_to?(:delayed_jobs_shard_id) ? shard.delayed_jobs_shard_id : "NONE")
         end
 
         def queue_setting_key
@@ -475,7 +475,8 @@ module DataFixup::Auditors
               'parallelism': check_parallelism
             },
             'longest_runner': longest_running(on_shard: true),
-            'schedular_job_ids': schedular_jobs.where(shard_id: Shard.current.id).map(&:id)
+            'schedular_count': schedular_jobs.where(shard_id: Shard.current.id).count,
+            'schedular_job_ids': schedular_jobs.where(shard_id: Shard.current.id).limit(10).map(&:id)
           }
         end
 
@@ -494,7 +495,8 @@ module DataFixup::Auditors
               'parallelism': check_parallelism
             },
             'longest_runner': longest_running,
-            'schedular_job_ids': schedular_jobs.map(&:id)
+            'schedular_count': schedular_jobs.count,
+            'schedular_job_ids': schedular_jobs.limit(10).map(&:id)
           }
         end
 
@@ -590,7 +592,7 @@ module DataFixup::Auditors
       end
 
       def schedular_strand_tag
-        "AuditorsBackfillEngine::Shard_#{Shard.current.id}"
+        "AuditorsBackfillEngine::Job_Shard_#{self.class.jobs_id}"
       end
 
       def perform
@@ -610,7 +612,7 @@ module DataFixup::Auditors
           schedule_worker = BackfillEngine.new(current_date, @end_date)
           next_time = Time.now.utc + backfill_interval
           log("More work to do. Scheduling another job for #{next_time}")
-          Delayed::Job.enqueue(schedule_worker, run_at: next_time, priority: Delayed::LOW_PRIORITY, strand: schedular_strand_tag)
+          Delayed::Job.enqueue(schedule_worker, run_at: next_time, priority: Delayed::LOW_PRIORITY, n_strand: schedular_strand_tag)
         else
           log("WE DID IT.  Shard #{Shard.current.id} has auditors migrated (probably, check the migration cell records to be sure)")
         end
