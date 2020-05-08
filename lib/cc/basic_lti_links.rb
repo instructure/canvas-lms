@@ -96,10 +96,10 @@ module CC
             ext_node.lticm :property, tool.shared_secret, 'name' => 'shared_secret'
           end
 
-          if cm_settings = tool.settings[:content_migration]&.with_indifferent_access
+          if (cm_settings = tool.settings[:content_migration]&.with_indifferent_access)
             ext_node.lticm(:options, 'name' => 'content_migration') do |cm_node|
-              [:export_start_url, :import_start_url].each do |key|
-                cm_node.lticm(:property, cm_settings[key], 'name' => key.to_s) unless cm_settings[key].blank?
+              [:export_start_url, :import_start_url, :export_format, :import_format].each do |key|
+                cm_node.lticm(:property, cm_settings[key], 'name' => key.to_s) if cm_settings[key].present?
               end
             end
           end

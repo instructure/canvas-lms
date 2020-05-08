@@ -731,12 +731,14 @@ to the POST body.
 and may be subject to breaking changes before final release.</h3>
 
 ### Example Configuration
-```
+```xml
 <cartridge_basiclti_link xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
   <blti:extensions platform="canvas.instructure.com">
     <lticm:options name="content_migration">
       <lticm:property name="export_start_url">https://example.com/export/</lticm:property>
       <lticm:property name="import_start_url">https://example.com/import/</lticm:property>
+      <lticm:property name="export_format">json</lticm:property>
+      <lticm:property name="import_format">json</lticm:property>
     </lticm:options>
   </blti:extensions>
 </cartridge_basiclti_link>
@@ -745,6 +747,13 @@ and may be subject to breaking changes before final release.</h3>
 Inside the options block there are two properties providing urls for initiating
 imports and exports of course based content, `export_start_url` and
 `import_start_url` respectively.
+
+There are also two options for specifying the format for messages sent to these
+urls. The default format is Rack's nested query parameters [(explanation)](https://codefol.io/posts/How-Does-Rack-Parse-Query-Params-With-parse-nested-query/),
+but if your application isn't set up to parse those or you'd prefer a JSON body,
+provide the `export_format` and/or `import_format` properties, with the property
+value set to `json`. Omitting these properties or providing any other value will
+be treated as the default.
 
 ### Export process
 
