@@ -57,7 +57,12 @@ module Lti
     end
 
     def destroy
-      # Will add in seperate PS
+      tool = tools.active.find(params['external_tool_id'])
+      if tool.destroy
+        render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE
+      else
+        render json: tool.errors, status: :bad_request, content_type: MIME_TYPE
+      end
     end
 
     private
