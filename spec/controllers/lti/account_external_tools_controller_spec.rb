@@ -31,6 +31,17 @@ describe Lti::AccountExternalToolsController do
     root_account.save
   end
 
+  describe '#show' do
+    it_behaves_like 'lti services' do
+      let(:action) { :show }
+      let(:expected_mime_type) { described_class::MIME_TYPE }
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/show"}
+      let(:params_overrides) do
+        { account_id: root_account.lti_context_id, external_tool_id: tool.id }
+      end
+    end
+  end
+
   describe '#index' do
     it_behaves_like 'lti services' do
       let(:action) { :index }

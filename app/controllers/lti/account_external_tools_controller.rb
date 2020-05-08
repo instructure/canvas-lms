@@ -47,12 +47,13 @@ module Lti
     end
 
     def show
-      # Will add in seperate PS
+      tool = tools.active.find(params['external_tool_id'])
+      render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE
     end
 
     def index
-      @tools = Api.paginate(ContextExternalTool.all_tools_for(context), self, account_external_tools_index_path(params[:account_id]))
-      render json: external_tools_json(@tools, context, @current_user, session), content_type: MIME_TYPE
+      api = Api.paginate(tools, self, account_external_tools_index_path(params[:account_id]))
+      render json: external_tools_json(api, context, @current_user, session), content_type: MIME_TYPE
     end
 
     def destroy
@@ -63,6 +64,10 @@ module Lti
 
     def scopes_matcher
       ACTION_SCOPE_MATCHERS.fetch(action_name, self.class.none)
+    end
+
+    def tools
+      @tools ||= ContextExternalTool.all_tools_for(context)
     end
 
     def context
