@@ -320,12 +320,12 @@ module Canvas::Migration::Helpers
     end
 
     def add_learning_outcome_group_content(group, content_list)
-      group.child_outcome_groups.active.select('learning_outcome_groups.id,title').each do |item|
-        hash = course_item_hash('learning_outcomes', item)
+      group.child_outcome_groups.active.order_by_title.select('learning_outcome_groups.id,title').each do |item|
+        hash = course_item_hash('learning_outcome_groups', item)
         add_url!(hash, "learning_outcome_groups_#{item.id}")
         content_list << hash
       end
-      group.child_outcome_links.active.preload(:content).each do |item|
+      group.child_outcome_links.active.order_by_outcome_title.each do |item|
         content_list << course_item_hash('learning_outcomes', item.content)
       end
     end

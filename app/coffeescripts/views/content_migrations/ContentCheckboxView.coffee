@@ -97,6 +97,7 @@ export default class ContentCheckboxView extends Backbone.View
     rubrics:                      "icon-rubric"
     groups:                       "icon-group"
     learning_outcomes:            "icon-standards"
+    learning_outcome_groups:      "icon-folder"
     attachments:                  "icon-document"
     assignment_groups:            "icon-folder"
     folders:                      "icon-folder"

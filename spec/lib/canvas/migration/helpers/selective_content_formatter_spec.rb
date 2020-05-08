@@ -204,11 +204,12 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       allow(@migration).to receive(:source_course).and_return(@course)
       export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
       allow(@migration).to receive(:content_export).and_return(export)
-      @course_outcome = outcome_model
-      @account_outcome = outcome_model(outcome_context: @course.account)
-      @out_group = outcome_group_model
-      @outcome1_in_group = outcome_model(outcome_group: @out_group)
-      @outcome2_in_group = outcome_model(outcome_group: @out_group)
+      @course_outcome = outcome_model(title: 'zebra')
+      @account_outcome = outcome_model(outcome_context: @course.account, title: 'alpaca')
+      @out_group1 = outcome_group_model(title: 'striker')
+      @outcome1_in_group = outcome_model(outcome_group: @out_group1, title: 'speakeasy')
+      @outcome2_in_group = outcome_model(outcome_group: @out_group1, title: 'moonshine')
+      @out_group2 = outcome_group_model(title: 'beta')
     end
 
     it "should list individual types" do
@@ -231,8 +232,14 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
       it "should list learning outcomes" do
         outcomes = formatter.get_content_list('learning_outcomes')
-        expect(outcomes.length).to eq 4
-        expect(outcomes.count {|o| o[:title] == "first new outcome"}).to eq 4
+        expect(outcomes.map {|o| o[:title]}).to match_array(
+          [
+            'alpaca',
+            'moonshine',
+            'speakeasy',
+            'zebra'
+          ]
+        )
       end
     end
 
@@ -248,11 +255,22 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         expect(formatter.get_content_list).to match_array copy
       end
 
-      it "should list individual types" do
+      it "should list individual types in expected order" do
         outcomes = formatter.get_content_list('learning_outcomes')
-        expect(outcomes.length).to eq 3
-        expect(outcomes.count {|o| o[:title] == "first new outcome"}).to eq 2
-        expect(outcomes.count {|o| o[:title] == "new outcome group"}).to eq 1
+        expect(outcomes.map {|o| o[:title]}).to eq [
+          'beta',
+          'striker',
+          'alpaca',
+          'zebra'
+        ]
+      end
+
+      it "should list outcomes in outcome group" do
+        outcomes = formatter.get_content_list("learning_outcome_groups_#{@out_group1.id}")
+        expect(outcomes.map {|o| o[:title]}).to eq [
+          'moonshine',
+          'speakeasy'
+        ]
       end
     end
 
@@ -283,8 +301,9 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @course_outcome.destroy
         @account_outcome.destroy
         @outcome1_in_group.destroy
-        @outcome1_in_group.destroy
-        @out_group.destroy
+        @outcome2_in_group.destroy
+        @out_group1.destroy
+        @out_group2.destroy
         tool_proxy.destroy
 
         @course.require_assignment_group
