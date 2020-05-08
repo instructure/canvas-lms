@@ -397,12 +397,12 @@ module DataFixup::Auditors
           Setting.get(backfill_key, DEFAULT_SCHEDULING_INTERVAL).to_i.seconds
         end
 
-        def jobs_cluster_name
-          "jobs#{jobs_id}"
+        def cluster_name
+          Shard.current.database_server.id
         end
 
         def parallelism_key(auditor_type)
-          "auditors_migration_#{auditor_type}/#{jobs_cluster_name}_num_strands"
+          "auditors_migration_#{auditor_type}/#{cluster_name}_num_strands"
         end
 
         def check_parallelism
@@ -567,8 +567,8 @@ module DataFixup::Auditors
         @_accounts ||= Account.active.select(:id, :root_account_id)
       end
 
-      def jobs_cluster_name
-        self.class.jobs_cluster_name
+      def cluster_name
+        self.class.cluster_name
       end
 
       def enqueue_one_day(current_date)
@@ -577,15 +577,15 @@ module DataFixup::Auditors
             # auth records are stored at the root account level,
             # we only need to enqueue these jobs for root accounts
             auth_worker = AuthenticationWorker.new(account.id, current_date)
-            Delayed::Job.enqueue(auth_worker, n_strand: ["auditors_migration_authentications", jobs_cluster_name], priority: Delayed::LOW_PRIORITY)
+            Delayed::Job.enqueue(auth_worker, n_strand: ["auditors_migration_authentications", cluster_name], priority: Delayed::LOW_PRIORITY)
           end
 
           course_worker = CourseWorker.new(account.id, current_date)
           grade_change_worker = GradeChangeWorker.new(account.id, current_date)
           # I think this makes the setting for specifying the n_strand max concurrency
           # apply to the first thing, but splits the constraint by uniqueness including everything in the array?
-          Delayed::Job.enqueue(course_worker, n_strand: ["auditors_migration_courses", jobs_cluster_name], priority: Delayed::LOW_PRIORITY)
-          Delayed::Job.enqueue(grade_change_worker, n_strand: ["auditors_migration_grade_changes", jobs_cluster_name], priority: Delayed::LOW_PRIORITY)
+          Delayed::Job.enqueue(course_worker, n_strand: ["auditors_migration_courses", cluster_name], priority: Delayed::LOW_PRIORITY)
+          Delayed::Job.enqueue(grade_change_worker, n_strand: ["auditors_migration_grade_changes", cluster_name], priority: Delayed::LOW_PRIORITY)
         end
       end
 
