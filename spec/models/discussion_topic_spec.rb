@@ -2603,4 +2603,11 @@ describe DiscussionTopic do
       expect(topic.grants_right?(@teacher, :rate)).to eq true
     end
   end
+
+  describe 'create' do
+    it 'sets the root_account_id using context' do
+      discussion_topic_model(context: @course)
+      expect(@topic.root_account_id).to eq @course.root_account_id
+    end
+  end
 end

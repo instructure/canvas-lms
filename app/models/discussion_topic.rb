@@ -89,6 +89,7 @@ class DiscussionTopic < ActiveRecord::Base
   acts_as_list scope: { context: self, pinned: true }
 
   before_create :initialize_last_reply_at
+  before_create :set_root_account_id
   before_save :default_values
   before_save :set_schedule_delayed_transitions
   after_save :update_assignment
@@ -1597,5 +1598,9 @@ class DiscussionTopic < ActiveRecord::Base
     else
       GradingStandard.default_instance
     end
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= self.context&.root_account_id
   end
 end
