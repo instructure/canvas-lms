@@ -61,6 +61,13 @@ module Types
       end
     end
 
+    field :sis_id, String, null: true
+    def sis_id
+      load_association(:context).then do |course|
+        assignment_group.sis_source_id if course.grants_any_right?(current_user, :read_sis, :manage_sis)
+      end
+    end
+
     def assignments_scope(*args)
       super(*args).where(assignment_group_id: object.id)
     end

@@ -64,6 +64,20 @@ module Types
       end
     end
 
+    field :sis_id, String, null: true
+    def sis_id
+      domain_root_account = context[:domain_root_account]
+      if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+        Loaders::AssociationLoader.for(User, :pseudonyms).
+          load(object).
+          then do
+            pseudonym = SisPseudonym.for(object, domain_root_account, type: :implicit, require_sis: false,
+                root_account: domain_root_account, in_region: true)
+            pseudonym&.sis_user_id
+          end
+      end
+    end
+
     field :enrollments, [EnrollmentType], null: false do
       argument :course_id, ID,
         "only return enrollments for this course",

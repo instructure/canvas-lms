@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,25 +16,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
-  class SectionType < ApplicationObjectType
-    graphql_name "Section"
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
-    implements GraphQL::Types::Relay::Node
-    implements Interfaces::TimestampInterface
-    implements Interfaces::LegacyIDInterface
-
-    alias section object
-
-    global_id_field :id
-
-    field :name, String, null: false
-
-    field :sis_id, String, null: true
-    def sis_id
-      load_association(:course).then do |course|
-        section.sis_source_id if course.grants_any_right?(current_user, :read_sis, :manage_sis)
-      end
+describe Loaders::SISIDLoader do
+  it "works" do
+    course_with_student(active_all: true)
+    @course.update!(sis_source_id: "importedCourse")
+    GraphQL::Batch.batch do
+      course_loader = Loaders::SISIDLoader.for(Course)
+      course_loader.load("importedCourse").then { |course|
+        expect(course).to eq @course
+      }
+      course_loader.load(-1).then { |course|
+        expect(course).to be_nil
+      }
     end
   end
 end

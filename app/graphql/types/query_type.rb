@@ -32,35 +32,47 @@ module Types
     end
 
     field :account, Types::AccountType, null: true do
-      argument :id, ID, "a graphql or legacy id", required: true,
+      argument :id, ID, "a graphql or legacy id", required: false,
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
+      argument :sis_id, String, "a id from the original SIS system", required: false
     end
-    def account(id:)
-      GraphQLNodeLoader.load("Account", id, context)
+    def account(id: nil, sis_id: nil)
+      raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
+      return GraphQLNodeLoader.load("Account", id, context) if id
+      return GraphQLNodeLoader.load("AccountBySis", sis_id, context) if sis_id
     end
 
     field :course, Types::CourseType, null: true do
-      argument :id, ID, "a graphql or legacy id", required: true,
+      argument :id, ID, "a graphql or legacy id, preference for search is given to this id", required: false,
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :sis_id, String, "a id from the original SIS system", required: false
     end
-    def course(id:)
-      GraphQLNodeLoader.load("Course", id, context)
+    def course(id: nil, sis_id: nil)
+      raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
+      return GraphQLNodeLoader.load("Course", id, context) if id
+      return GraphQLNodeLoader.load("CourseBySis", sis_id, context) if sis_id
     end
 
     field :assignment, Types::AssignmentType, null: true do
-      argument :id, ID, "a graphql or legacy id", required: true,
+      argument :id, ID, "a graphql or legacy id", required: false,
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
+      argument :sis_id, String, "an id from the original SIS system", required: false
     end
-    def assignment(id:)
-      GraphQLNodeLoader.load("Assignment", id, context)
+    def assignment(id: nil, sis_id: nil)
+      raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
+      return GraphQLNodeLoader.load("Assignment", id, context) if id
+      return GraphQLNodeLoader.load("AssignmentBySis", sis_id, context) if sis_id
     end
 
     field :assignment_group, Types::AssignmentGroupType, null: true do
-      argument :id, ID, "a graphql or legacy id", required: true,
+      argument :id, ID, "a graphql or legacy id", required: false,
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("AssignmentGroup")
+      argument :sis_id, String, "an id from the original SIS system", required: false
     end
-    def assignment_group(id:)
-      GraphQLNodeLoader.load("AssignmentGroup", id, context)
+    def assignment_group(id: nil, sis_id: nil)
+      raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
+      return GraphQLNodeLoader.load("AssignmentGroup", id, context) if id
+      return GraphQLNodeLoader.load("AssignmentGroupBySis", sis_id, context) if sis_id
     end
 
     field :submission, Types::SubmissionType, null: true do
@@ -72,11 +84,14 @@ module Types
     end
 
     field :term, Types::TermType, null: true do
-      argument :id, ID, "a graphql or legacy id", required: true,
+      argument :id, ID, "a graphql or legacy id", required: false,
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Term")
+      argument :sis_id, String, "an id from the original SIS system", required: false
     end
-    def term(id:)
-      GraphQLNodeLoader.load("Term", id, context)
+    def term(id: nil, sis_id: nil)
+      raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
+      return GraphQLNodeLoader.load("Term", id, context) if id
+      return GraphQLNodeLoader.load("TermBySis", sis_id, context) if sis_id
     end
 
     field :all_courses, [CourseType],

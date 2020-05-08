@@ -91,6 +91,31 @@ describe Types::UserType do
     end
   end
 
+  context "sisId" do
+    before(:once) do
+      @student.pseudonyms.create!(
+        account: @course.account,
+        unique_id: "alex@columbia.edu",
+        workflow_state: 'active',
+        sis_user_id: "a.ham"
+      )
+    end
+
+    let(:admin) { account_admin_user }
+    let(:user_type_as_admin) do
+      GraphQLTypeTester.new(@student, current_user: admin, domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create)
+    end
+
+    it "returns the sis user id if the user has permissions to read it" do
+      expect(user_type_as_admin.resolve("sisId")).to eq "a.ham"
+    end
+
+    it "returns null if the user does not have permission to read the sis user id" do
+      expect(user_type.resolve("sisId")).to be_nil
+    end
+  end
+
 
   context "enrollments" do
     before(:once) do
