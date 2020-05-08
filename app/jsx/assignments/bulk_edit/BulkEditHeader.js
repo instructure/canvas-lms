@@ -72,7 +72,7 @@ export default function BulkEditHeader({
   const selectedAssignmentsCount = assignments.filter(a => a.selected).length
 
   return (
-    <Flex as="div">
+    <Flex as="div" padding="0 0 medium 0">
       <Flex.Item shouldGrow>
         <h2>{I18n.t('Edit Assignment Dates')}</h2>
       </Flex.Item>
