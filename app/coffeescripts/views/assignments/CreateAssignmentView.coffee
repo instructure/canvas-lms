@@ -237,13 +237,12 @@ export default class CreateAssignmentView extends DialogFormView
     data.persisted = !@_dueAtHasChanged(data.due_at)
     dateValidator = new DateValidator(
       date_range: _.extend({}, validRange)
-      data: data
       hasGradingPeriods: !!ENV.HAS_GRADING_PERIODS
       gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)
       userIsAdmin: @currentUserIsAdmin(),
       data
     )
-    errs = dateValidator.validateDatetimes()
+    errs = dateValidator.validateDatetimes(data)
 
     return errors if _.isEmpty(errs)
 

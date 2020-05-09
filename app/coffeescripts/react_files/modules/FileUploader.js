@@ -18,26 +18,36 @@
 
 import BBFile from '../../models/File'
 import BaseUploader from './BaseUploader'
-import 'jquery.ajaxJSON'
 
 export default class FileUploader extends BaseUploader {
-  onUploadPosted = fileJson => {
-    const file = this.addFileToCollection(fileJson)
-    return this.deferred.resolve(file)
+  constructor(fileOptions, folder) {
+    super(fileOptions, folder)
+    this.onUploadPosted = this.onUploadPosted.bind(this)
+  }
+
+  onUploadPosted(fileJson) {
+    this.inFlight = false
+    if (this.options.replacingFileId) {
+      fileJson.replacingFileId = this.options.replacingFileId
+    }
+    this.addFileToCollection(fileJson)
+    super.onUploadPosted(fileJson)
   }
 
   addFileToCollection = attrs => {
-    const uploadedFile = new BBFile(attrs, 'no/url/needed/') // we've already done the upload, no preflight needed
+    if (this.folder?.files?.add) {
+      // exists on the Files page, but nowhere else
+      const uploadedFile = new BBFile(attrs, 'no/url/needed/') // we've already done the upload, no preflight needed
 
-    this.folder.files.add(uploadedFile)
-    // remove old version if it was just overwritten
-    if (this.options.dup === 'overwrite') {
-      const name = this.options.name || this.file.name
-      const previous = this.folder.files.findWhere({display_name: name})
-      if (previous) {
-        this.folder.files.remove(previous)
+      this.folder.files.add(uploadedFile)
+      // remove old version if it was just overwritten
+      if (this.options.dup === 'overwrite') {
+        const name = this.options.name || this.file.name
+        const previous = this.folder.files.findWhere({display_name: name})
+        if (previous) {
+          this.folder.files.remove(previous)
+        }
       }
     }
-    return uploadedFile
   }
 }

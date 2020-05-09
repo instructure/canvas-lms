@@ -487,9 +487,11 @@ describe ConditionalRelease::Service do
 
       it 'caches the calculation of the reverse index' do
         enable_cache do
-          Service.rules_assigning(@a1, @teacher, nil)
-          allow(Service).to receive(:active_rules).and_raise 'should not refetch rules'
-          Service.rules_assigning(@a2, @teacher, nil)
+          expect do
+            Service.rules_assigning(@a1, @teacher, nil)
+            allow(Service).to receive(:active_rules).and_raise 'should not refetch rules'
+            Service.rules_assigning(@a2, @teacher, nil)
+          end.to_not raise_error
         end
       end
 

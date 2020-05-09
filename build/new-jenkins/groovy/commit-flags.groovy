@@ -50,4 +50,16 @@ def isForceFailure() {
   return hasFlag('force-failure')
 }
 
+def isForceFailureJS() {
+  return isForceFailure() || hasFlag('force-failure-js')
+}
+
+def isForceFailureRspec() {
+  return isForceFailure() || hasFlag('force-failure-rspec')
+}
+
+def isForceFailureSelenium() {
+  return isForceFailure() || hasFlag('force-failure-selenium')
+}
+
 return this

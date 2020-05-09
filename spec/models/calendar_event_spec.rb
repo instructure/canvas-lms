@@ -233,10 +233,7 @@ describe CalendarEvent do
       </p>
       HTML
         ev = @event.to_ics(in_own_calendar: false)
-        expect(ev.description).to match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.
-
-
-[link!](www.example.com)")
+        expect(ev.description).to match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.  [link!](www.example.com)")
         expect(ev.x_alt_desc.first).to eq @event.description
       end
 
@@ -1039,6 +1036,69 @@ describe CalendarEvent do
         child.destroy
         expect(@event.reload).to be_active
         expect(child.reload).to be_deleted
+      end
+    end
+  end
+
+  context "web_conference" do
+    before(:once) do
+      plugin = PluginSetting.create!(name: 'big_blue_button')
+      plugin.update_attribute(:settings, { key: 'value' })
+    end
+
+    let_once(:course) { course_model }
+    let_once(:course2) { course_model }
+    let_once(:group1) { group(context: course) }
+    let_once(:group2) { group(context: course) }
+
+    def conference(context:, user: @user)
+      WebConference.create(context: context, user: user, conference_type: 'BigBlueButton')
+    end
+
+    before do
+      @course = course
+    end
+
+    it "can have no conference" do
+      calendar_event_model
+      expect(@event).to be_valid
+    end
+
+    context 'when event has course context' do
+      it "can have a conference from the same course" do
+        event = course.calendar_events.build title: 'Foo', web_conference: conference(context: course)
+        expect(event).to be_valid
+      end
+
+      it "cannot have a conference from a different course" do
+        event = course.calendar_events.build title: 'Foo', web_conference: conference(context: course2)
+        expect(event).not_to be_valid
+      end
+    end
+
+    context "when event has group context" do
+      it "can have a conference from the same group" do
+        event = group1.calendar_events.build title: 'Foo', web_conference: conference(context: group1)
+        expect(event).to be_valid
+      end
+
+      it "cannot have a conference from a different group" do
+        event = group1.calendar_events.build title: 'Foo', web_conference: conference(context: group2)
+        expect(event).not_to be_valid
+      end
+    end
+
+    context "when event has course section context" do
+      it "can have a conference from the course" do
+        section = add_section('foo', course: course)
+        event = section.calendar_events.build title: 'Foo', web_conference: conference(context: course)
+        expect(event).to be_valid
+      end
+
+      it "can not have have a conference from a different course" do
+        section = add_section('foo', course: course)
+        event = section.calendar_events.build title: 'Foo', web_conference: conference(context: course2)
+        expect(event).not_to be_valid
       end
     end
   end

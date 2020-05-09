@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-
+import {RequestDispatch} from '../../../shared/network'
 import OldDataLoader from './OldDataLoader'
 
 export default class DataLoader {
-  constructor(gradebook) {
+  constructor({gradebook}) {
     this._gradebook = gradebook
+    this.dispatch = new RequestDispatch({
+      activeRequestLimit: gradebook.options.activeRequestLimit
+    })
   }
 
   loadInitialData() {
@@ -31,35 +33,19 @@ export default class DataLoader {
 
     const promises = OldDataLoader.loadGradebookData({
       gradebook,
+      dispatch: this.dispatch,
 
       activeRequestLimit: options.performanceControls?.active_request_limit,
       courseId: options.context_id,
       perPage: options.api_max_per_page,
 
+      getAssignmentGroups: true,
+      getContextModules: true,
+      getCustomColumns: true,
       getGradingPeriodAssignments: gradebook.gradingPeriodSet != null,
       loadedStudentIds: [],
 
-      assignmentGroupsURL: options.assignment_groups_url,
-      assignmentGroupsParams: {
-        exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
-        include: ['assignment_group_id', 'grades_published', 'module_ids', 'post_manually']
-      },
-
-      contextModulesURL: options.context_modules_url,
-      customColumnsURL: options.custom_columns_url,
-      sectionsURL: options.sections_url,
-
-      studentsURL: options.students_stateless_url,
-      studentsPageCb: gradebook.gotChunkOfStudents,
-      studentsParams: gradebook.studentsParams(),
-
-      submissionsURL: options.submissions_url,
-      submissionsChunkCb: gradebook.gotSubmissionsChunk,
-      submissionsChunkSize: options.chunk_size,
-
-      customColumnDataURL: options.custom_column_data_url,
-      customColumnDataPageCb: gradebook.gotCustomColumnDataChunk,
-      customColumnDataParams: {include_hidden: true}
+      submissionsChunkSize: options.chunk_size
     })
 
     // eslint-disable-next-line promise/catch-or-return
@@ -101,13 +87,13 @@ export default class DataLoader {
 
     // TODO: In TALLY-769, remove this entire block.
     // eslint-disable-next-line promise/catch-or-return
-    $.when(
+    Promise.all([
       promises.gotStudentIds,
       promises.gotContextModules,
       promises.gotCustomColumns,
       promises.gotAssignmentGroups,
       promises.gotGradingPeriodAssignments
-    ).then(() => {
+    ]).then(() => {
       gradebook.finishRenderingUI()
     })
   }
@@ -117,10 +103,11 @@ export default class DataLoader {
     const {options} = gradebook
 
     OldDataLoader.getDataForColumn(
+      options.context_id,
       customColumnId,
-      options.custom_column_data_url,
-      {},
-      gradebook.gotCustomColumnDataChunk
+      {perPage: options.api_max_per_page},
+      gradebook.gotCustomColumnDataChunk,
+      this.dispatch
     )
   }
 
@@ -128,23 +115,15 @@ export default class DataLoader {
     const gradebook = this._gradebook
     const {options} = gradebook
 
-    const assignmentGroupsURL = options.assignment_groups_url.replace(
-      '&include%5B%5D=assignment_visibility',
-      ''
-    )
+    const url = `/api/v1/courses/${options.context_id}/assignment_groups`
+    const params = {
+      exclude_assignment_submission_types: ['wiki_page'],
+      exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
+      include: ['assignments', 'grades_published', 'overrides'],
+      override_assignment_dates: false
+    }
 
-    const promises = OldDataLoader.loadGradebookData({
-      assignmentGroupsURL,
-
-      assignmentGroupsParams: {
-        exclude_response_fields: ['description', 'needs_grading_count', 'in_closed_grading_period'],
-        include: ['overrides']
-      },
-
-      onlyLoadAssignmentGroups: true
-    })
-
-    $.when(promises.gotAssignmentGroups).then(gradebook.addOverridesToPostGradesStore)
+    this.dispatch.getDepaginated(url, params).then(gradebook.addOverridesToPostGradesStore)
   }
 
   reloadStudentDataForEnrollmentFilterChange() {
@@ -176,6 +155,7 @@ export default class DataLoader {
 
     const promises = OldDataLoader.loadGradebookData({
       gradebook,
+      dispatch: this.dispatch,
 
       courseId: options.context_id,
       perPage: options.api_max_per_page,
@@ -184,18 +164,10 @@ export default class DataLoader {
         loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null,
 
       loadedStudentIds: gradebook.courseContent.students.listStudentIds(),
-      studentsURL: options.students_stateless_url,
-      studentsPageCb: gradebook.gotChunkOfStudents,
-      studentsParams: gradebook.studentsParams(),
 
-      submissionsURL: options.submissions_url,
-      submissionsChunkCb: gradebook.gotSubmissionsChunk,
       submissionsChunkSize: options.chunk_size,
 
-      customColumnIds: gradebook.gradebookContent.customColumns.map(column => column.id),
-      customColumnDataURL: options.custom_column_data_url,
-      customColumnDataPageCb: gradebook.gotCustomColumnDataChunk,
-      customColumnDataParams: {include_hidden: true}
+      customColumnIds: gradebook.gradebookContent.customColumns.map(column => column.id)
     })
 
     if (promises.gotGradingPeriodAssignments != null) {

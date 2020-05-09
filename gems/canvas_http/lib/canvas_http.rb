@@ -18,6 +18,8 @@
 require 'uri'
 require 'ipaddr'
 require 'resolv'
+require 'canvas_http/circuit_breaker'
+require 'logger'
 
 module CanvasHttp
   class Error < ::StandardError; end
@@ -31,6 +33,7 @@ module CanvasHttp
   end
   class RelativeUriError < CanvasHttp::Error; end
   class InsecureUriError < CanvasHttp::Error; end
+  class CircuitBreakerError < CanvasHttp::Error; end
 
   def self.put(*args, &block)
     CanvasHttp.request(Net::HTTP::Put, *args, &block)
@@ -68,11 +71,14 @@ module CanvasHttp
     streaming: false, body: nil, content_type: nil, redirect_spy: nil)
     last_scheme = nil
     last_host = nil
+    current_host = nil
 
     loop do
       raise(TooManyRedirectsError) if redirect_limit <= 0
 
       _, uri = CanvasHttp.validate_url(url_str, host: last_host, scheme: last_scheme, check_host: true) # uses the last host and scheme for relative redirects
+      current_host = uri.host
+      raise CircuitBreakerError if CircuitBreaker.tripped?(current_host)
       http = CanvasHttp.connection_for_uri(uri)
 
       request = request_class.new(uri.request_uri, other_headers)
@@ -100,6 +106,9 @@ module CanvasHttp
         end
       end
     end
+  rescue Net::ReadTimeout, Net::OpenTimeout
+    CircuitBreaker.trip_if_necessary(current_host)
+    raise
   end
 
   def self.add_form_data(request, form_data, multipart:, streaming:)
@@ -184,8 +193,16 @@ module CanvasHttp
     @blocked_ip_filters.respond_to?(:call) ? @blocked_ip_filters.call : @blocked_ip_filters
   end
 
+  def self.logger
+    (@logger.respond_to?(:call) ? @logger.call : @logger) || default_logger
+  end
+
+  def self.default_logger
+    @_default_logger ||= Logger.new(STDOUT)
+  end
+
   class << self
-    attr_writer :open_timeout, :read_timeout, :blocked_ip_filters
+    attr_writer :open_timeout, :read_timeout, :blocked_ip_filters, :logger
   end
 
   # returns a tempfile with a filename based on the uri (same extension, if

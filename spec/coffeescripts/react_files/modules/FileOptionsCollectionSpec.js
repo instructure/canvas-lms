@@ -31,6 +31,12 @@ function setupFolderWith(names) {
   return FileOptionsCollection.setFolder(folder)
 }
 
+function setupModelLessFolderWith(names) {
+  const mockFiles = names.map(name => mockFile(name))
+  const folder = {files: mockFiles}
+  return FileOptionsCollection.setFolder(folder)
+}
+
 function createFileOption(fileName, dup, optionName) {
   const options = {file: {name: fileName}}
   if (dup) {
@@ -55,6 +61,11 @@ QUnit.module(
 
   test('findMatchingFile correctly finds existing files by display_name', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
+    ok(FileOptionsCollection.findMatchingFile('foo'))
+  }),
+
+  test('findMatchingFile correctly finds existing files without model attribute', () => {
+    setupModelLessFolderWith(['foo', 'bar', 'baz'])
     ok(FileOptionsCollection.findMatchingFile('foo'))
   }),
 
@@ -126,5 +137,26 @@ QUnit.module(
     const {collisions, resolved} = FileOptionsCollection.segregateOptionBuckets([one])
     equal(collisions.length, 0)
     equal(resolved.length, 0)
+  }),
+
+  test('segregateOptionBuckets treats zip files like regular files if alwaysUploadZips is true', () => {
+    setupFolderWith(['other.zip', 'bar', 'baz'])
+    const one = createFileOption('other.zip')
+    one.file.type = 'application/zip'
+    FileOptionsCollection.setUploadOptions({alwaysUploadZips: true})
+    const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
+    equal(resolved.length, 0)
+    equal(collisions.length, 1)
+    equal(zips.length, 0)
+  }),
+
+  test('segregateOptionBuckets automaticaly renames files when alwaysRename is true', () => {
+    setupFolderWith(['foo', 'bar', 'baz'])
+    const one = createFileOption('foo')
+    FileOptionsCollection.setUploadOptions({alwaysRename: true})
+    const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
+    equal(resolved.length, 1)
+    equal(collisions.length, 0)
+    equal(zips.length, 0)
   })
 )

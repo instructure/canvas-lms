@@ -189,6 +189,65 @@ module ContextModulesCommon
     fj("#context_module_item_#{tag.id}:contains(#{item_name.inspect})")
   end
 
+  def add_existing_module_file_items(item_select_selector, file_names)
+    # requires module_dnd feature to be enabled
+    f('.add_module_item_link').click
+    wait_for_ajaximations
+    select_module_item('#add_module_item_select', "File")
+    file_names.each { |item_name| select_module_item(item_select_selector + ' .module_item_select', item_name)}
+    scroll_to(f('.add_item_button.ui-button'))
+    f('.add_item_button.ui-button').click
+    wait_for_ajaximations
+  end
+
+  def add_uploaded_file_items(item_select_selector, filepath)
+    # requires module_dnd feature to be enabled
+    # would like to test multiple file upload,
+    # but it's not supported by any of the selenium webdrivers
+    f('.add_module_item_link').click
+    wait_for_ajaximations
+    select_module_item('#add_module_item_select', "File")
+
+    select_module_item(item_select_selector + ' .module_item_select', '[ New File(s) ]')
+    wait_for_ajaximations
+
+    f('#module_attachment_uploaded_data').send_keys(filepath)
+    wait_for_animations
+
+    scroll_to(f('.add_item_button.ui-button'))
+    f('.add_item_button.ui-button').click
+    wait_for_ajaximations
+  end
+
+  def upload_file_item_with_selection(add_item_selector, item_select_selector, existing_filepath, click_button = 'Replace')
+    # requires module_dnd feature to be enabled
+    f(add_item_selector).click
+    wait_for_ajaximations
+    select_module_item('#add_module_item_select', "File")
+
+    select_module_item(item_select_selector + ' .module_item_select', '[ New File(s) ]')
+    wait_for_ajaximations
+
+    # the folder options have &nbsp; entities in them and I cannot
+    # figure out how to select by text. I know the folder where the
+    # file I want to replace is the 2nd option, so let's go with that
+    element = f("#attachment_folder_id")
+    folder_select = Selenium::WebDriver::Support::Select.new(element)
+    folder_select.options[1].click
+
+    f('#module_attachment_uploaded_data').send_keys(existing_filepath)
+
+    scroll_to(f('.add_item_button.ui-button'))
+    f('.add_item_button.ui-button').click
+    wait_for_ajaximations
+
+    # make a selection on the file rename dialog
+    fj("button:contains(\"#{click_button}\")").click
+    wait_for_ajaximations
+
+    folder_select
+  end
+
   def select_module_item(select_element_css, item_text)
     click_option(select_element_css, item_text)
   end

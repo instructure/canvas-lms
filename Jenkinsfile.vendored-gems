@@ -28,6 +28,7 @@ pipeline {
   options { ansiColor('xterm') }
 
   environment {
+    DISABLE_SPRING = 'true'
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
   }
 

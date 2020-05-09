@@ -25,7 +25,7 @@ module AssignmentUtil
     date = Assignment.due_date_compare_value date
     start_date = Assignment.due_date_compare_value start_date
     end_date = Assignment.due_date_compare_value end_date
-    date >= start_date && date <= end_date
+    (start_date.nil? || date >= start_date) && (end_date.nil? || date <= end_date)
   end
 
   def self.due_date_ok?(assignment)

@@ -298,6 +298,83 @@ describe "context modules" do
       course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
+    describe "module drag and drop" do
+      before(:once) do
+        @course.root_account.enable_feature!(:module_dnd)
+        @course.context_modules.create!(:name => "files module")
+      end
+
+      it 'should upload file via module drag and drop ' do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+
+        # empty module should have a DnD area
+        expect(f('.module_dnd input[type="file"]')).to be_displayed
+        filename1, fullpath1, _data = get_file("testfile1.txt")
+
+        f('.module_dnd input[type="file"]').send_keys(fullpath1)
+        wait_for_ajaximations
+
+        expect(fj(".context_module_item:contains(#{filename1.inspect})")).to be_displayed
+
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+
+        # non-empty module should not have a DnD area
+        expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
+      end
+
+      it 'creating a new module should display a drag and drop area' do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+
+        f('button.add_module_link').click
+        wait_for_ajaximations
+
+        replace_content(f('#context_module_name'), "New Module")
+        f('#add_context_module_form button.submit_button').click
+        wait_for_ajaximations
+
+        expect(ff('.module_dnd input[type="file"]')).to have_size(2)
+      end
+
+      describe 'with duplicate modules enabled' do
+        before(:once) do
+          @course.root_account.enable_feature!(:duplicate_modules)
+        end
+
+        it 'duplicate of an empty module should display a drag and drop area' do
+          get "/courses/#{@course.id}/modules"
+          wait_for_ajaximations
+
+          f('button.al-trigger').click
+          wait_for_ajaximations
+
+          f('a.duplicate_module_link').click
+          wait_for_ajaximations
+
+          expect(ff('.module_dnd input[type="file"]')).to have_size(2)
+        end
+
+        it 'duplicate of a non-empty module should not display a drag and drop area' do
+          pub_assignment = Assignment.create!(context: @course, title: 'Published Assignment')
+          @course.context_modules.first.add_item(type: 'assignment', id: pub_assignment.id)
+
+          get "/courses/#{@course.id}/modules"
+          wait_for_ajaximations
+
+          f('button.al-trigger').click
+          wait_for_ajaximations
+
+          f('a.duplicate_module_link').click
+          wait_for_ajaximations
+
+          # non-empty module should not have a DnD area
+          expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
+        end
+      end
+    end
+
     it "should add a file item to a module", priority: "1", test_id: 126728 do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#attachments_select', 'File', FILE_NAME)
@@ -335,6 +412,149 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#attachments_select', 'File', FILE_NAME)
       verify_edit_item_form
+    end
+
+    describe "with module_dnd feature on" do
+      before(:each) do
+        local_storage!
+      end
+
+      before(:once) do
+        @course.root_account.enable_feature!(:module_dnd)
+        # adding another file to course
+        @file2 = @course.attachments.create!(:display_name => "another.txt", :uploaded_data => default_uploaded_data)
+        @file2.context = @course
+        @file2.save!
+        @mod = @course.context_modules.create!(:name => "files module")
+      end
+
+      it "should add multiple file items to a module" do
+        file_names = [FILE_NAME, "another.txt"]
+        get "/courses/#{@course.id}/modules"
+        add_existing_module_file_items('#attachments_select', file_names)
+        file_names.each {|item_name| expect(fj(".context_module_item:contains(#{item_name.inspect})")).to be_displayed}
+      end
+
+      it "should upload mutiple files to add items to a module" do
+        get "/courses/#{@course.id}/modules"
+
+        filename, fullpath, _data = get_file("testfile1.txt")
+
+        add_uploaded_file_items('#attachments_select', fullpath)
+
+        expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+        expect(fj(".context_module_item:contains(#{filename})")).to be_displayed
+      end
+
+      it "should replace an existing module item with a replacement uploaded file" do
+        # create the existing module item
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
+        @mod.add_item({:id => file.id, :type => 'attachment'})
+
+        get "/courses/#{@course.id}/modules"
+        upload_file_item_with_selection("div#context_module_#{@mod.id} .add_module_item_link", '#attachments_select', fullpath)
+
+        expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+        expect(ffj(".context_module_item:contains(#{filename})").length).to eq(1)
+      end
+
+      it "closing the rename dialog should not close the module dialog" do
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
+
+        get "/courses/#{@course.id}/modules"
+
+        # Start the upload, but click Close instead
+        upload_file_item_with_selection(
+          "div#context_module_#{@mod.id} .add_module_item_link",
+          '#attachments_select',
+          fullpath,
+          'Close'
+        )
+
+        # ...then click on the add item button again
+        scroll_to(f('.add_item_button.ui-button'))
+        f('.add_item_button.ui-button').click
+        wait_for_ajaximations
+
+        # now replace the file
+        fj('button:contains("Replace")').click
+        wait_for_ajaximations
+
+        # File should be uploaded and dialog closed
+        expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+        expect(ffj(".context_module_item:contains(#{filename})").length).to eq(1)
+      end
+
+      it "skipping the only file should not close the add item to module dialog" do
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
+
+        get "/courses/#{@course.id}/modules"
+
+        # Start the upload, but click Skip instead
+        upload_file_item_with_selection(
+          "div#context_module_#{@mod.id} .add_module_item_link",
+          '#attachments_select',
+          fullpath,
+          'Skip'
+        )
+
+        # Dialog should be not closed and not uploaded
+        expect(f('body')).to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+        expect(f('body')).not_to contain_jqcss(".context_module_item:contains(#{filename}):visible")
+      end
+
+      it "should not ask to rename upload after folder change" do
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
+
+        get "/courses/#{@course.id}/modules"
+
+        # Start the upload, but click Close instead
+        folder_select = upload_file_item_with_selection(
+          "div#context_module_#{@mod.id} .add_module_item_link",
+          '#attachments_select',
+          fullpath,
+          "Close"
+        )
+
+        # Change to a folder not containing the file
+        folder_select.options[0].click
+
+        # ...then click on the add item button again
+        scroll_to(f('.add_item_button.ui-button'))
+        f('.add_item_button.ui-button').click
+        wait_for_ajaximations
+
+        # File should be uploaded and dialog closed
+        expect(f('body')).not_to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+        expect(ffj(".context_module_item:contains(#{filename})").length).to eq(1)
+      end
+
+      it "should create a module item with a replacement uploaded file if in a different module" do
+        # create the existing module item
+        filename, fullpath, _data = get_file("a_file.txt")
+        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file.context = @course
+        file.save!
+        @mod.add_item({:id => file.id, :type => 'attachment'})
+        # create a new module
+        @mod2 = @course.context_modules.create!(:name => "another module")
+
+        get "/courses/#{@course.id}/modules"
+        upload_file_item_with_selection("div#context_module_#{@mod2.id} .add_module_item_link", '#attachments_select', fullpath)
+        expect(ffj(".context_module_item:contains(#{filename})").length).to eq(2)
+      end
     end
   end
 

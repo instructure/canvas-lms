@@ -432,8 +432,8 @@ describe AssignmentOverride do
   end
 
   describe_override("due_at", 5.minutes.from_now, 7.minutes.from_now)
-  describe_override("unlock_at", 5.minutes.from_now, 7.minutes.from_now)
-  describe_override("lock_at", 5.minutes.from_now, 7.minutes.from_now)
+  describe_override("unlock_at", 1.minute.ago, 2.minutes.ago)
+  describe_override("lock_at", 10.minutes.from_now, 12.minutes.from_now)
 
   describe "#due_at=" do
     def fancy_midnight(opts={})

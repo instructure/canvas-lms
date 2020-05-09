@@ -23,6 +23,7 @@
   editable ||= can_do(@context, @current_user, :manage_content)
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
+  module_dnd = @context&.root_account&.feature_enabled?(:module_dnd)
 %>
 
 <% cache_if_module(context_module, editable, @is_student, @can_view_unpublished, @current_user, @context) do %>
@@ -202,6 +203,9 @@
         <% end %>
       <% end %>
     </ul>
+    <% if module_dnd && (!context_module || editable && module_data[:items]&.empty?) %>
+      <div class='module_dnd' data-context-module-id="<%= context_module&.id %>"></div>
+    <% end %>
 
     <div class="footer">
       <div class="progression_container">

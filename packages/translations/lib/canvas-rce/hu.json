@@ -16,6 +16,12 @@
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": "Hiba történt a fájl előnézetének létrehozásakor."
   },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "Hiba történt egy hálózati kérelem létrehozásakor"
+  },
+  "an_error_occurred_uploading_your_media_71f1444d": {
+    "message": "Hiba történt a médiád feltöltése során."
+  },
   "announcement_list_da155734": { "message": "Hirdetménylista" },
   "announcements_a4b8ed4a": { "message": "Hirdetmények" },
   "apps_54d24a47": { "message": "Alkalmazások" },
@@ -35,6 +41,7 @@
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Automatikusan megnyit egy beágyazott előnézetet. (Az előnézet csak mentés után jelenik meg.)"
   },
+  "available_folders_694d0436": { "message": "Elérhető mappák" },
   "cancel_caeb1e68": { "message": "Mégse" },
   "canvas_plugins_705a5016": { "message": "Canvas Pluginok" },
   "choose_caption_file_9c45bc4e": { "message": "Feliratfájl választása" },
@@ -78,6 +85,7 @@
   },
   "course_documents_104d76e0": { "message": "Kurzus dokumentumai" },
   "course_files_62deb8f8": { "message": "Kurzusfájlok" },
+  "course_files_a31f97fc": { "message": "Tanfolyam fájlok" },
   "course_images_f8511d04": { "message": "Kurzus képei" },
   "course_links_b56959b9": { "message": "Kurzus linkjei" },
   "course_media_ec759ad": { "message": "Kurzus média" },
@@ -94,6 +102,7 @@
   },
   "describe_the_image_e65d2e32": { "message": "(A kép leírása)" },
   "describe_the_video_2fe8f46a": { "message": "(A videó leírása)" },
+  "details_98a31b68": { "message": "Részletek" },
   "dimensions_45ddb7b7": { "message": "Méretek" },
   "directionality_ebcae6d0": { "message": "irányítottság" },
   "disable_in_line_preview_2a675175": {
@@ -143,6 +152,10 @@
   "external_links_3d9f074e": { "message": "Külső linkek" },
   "extra_large_b6cdf1ff": { "message": "Extra nagy" },
   "file_name_8fd421ff": { "message": "Fájlnév" },
+  "file_upload_failed_af22dd91": {
+    "message": "A fájl feltöltése nem sikerült"
+  },
+  "file_uploading_56c9c0c8": { "message": "Fájl feltöltése" },
   "file_url_c12b64be": { "message": "Fájl URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } fájl ikon" },
   "filename_image_preview_6cef8f26": { "message": "{ filename } kép előnézet" },
@@ -155,6 +168,7 @@
   "focus_the_popup_context_toolbar_7979f4f8": {
     "message": "Az előugró környezeti eszköztár fókuszba helyezése"
   },
+  "folder_tree_fbab0726": { "message": "Könyvtárfa" },
   "formatting_5b143aa8": { "message": "Formázás" },
   "found_auto_saved_content_3f6e4ca5": {
     "message": "Automatikusan mentett tartalmat találtunk"
@@ -171,6 +185,7 @@
   },
   "grades_a61eba0a": { "message": "Értékelések" },
   "group_files_4324f3df": { "message": "Csoportfájlok" },
+  "group_files_82e5dcdb": { "message": "Csoportfájlok" },
   "group_navigation_99f191a": { "message": "Csoportnavigáció" },
   "heading_2_5b84eed2": { "message": "Címsor 2" },
   "heading_3_2c83de44": { "message": "Címsor 3" },
@@ -207,7 +222,9 @@
   "loading_bde52856": { "message": "Töltődik" },
   "loading_failed_b3524381": { "message": "Sikertelen betöltés..." },
   "loading_failed_e6a9d8ef": { "message": "Sikertelen betöltés." },
+  "loading_folders_d8b5869e": { "message": "Mappák betöltése" },
   "loading_media_f3455841": { "message": "Média betöltése" },
+  "locked_762f138b": { "message": "Zárolva" },
   "media_af190855": { "message": "Média" },
   "medium_5a8e9ead": { "message": "Közepes" },
   "mic_a7f3d311": { "message": "Mikrofon" },
@@ -216,6 +233,7 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Legalább { width } x { height }px szükséges"
   },
+  "my_files_2f621040": { "message": "Fájljaim" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigáljon a menün vagy eszköztáron át"
   },
@@ -291,6 +309,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Hiba történt! Nem tudom, mint mutassak."
   },
+  "something_went_wrong_d238c551": { "message": "Valami hiba történt" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
     "message": "Hiba történt! Próbálja újra oldalfrissítés után."
   },
@@ -306,6 +325,7 @@
   "styles_2aa721ef": { "message": "Stílusok" },
   "submit_a3cc6859": { "message": "Beküldés" },
   "subscript_59744f96": { "message": "alsó index" },
+  "success_file_uploaded_8174e93f": { "message": "A fájl felöltése sikeres" },
   "superscript_8cb349a2": { "message": "felső index" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Támogatott fájltípusok: SRT vagy WebTT"
@@ -344,6 +364,9 @@
   "upload_file_fd2361b8": { "message": "Fájl feltöltése" },
   "upload_image_6120b609": { "message": "Kép feltöltése" },
   "upload_media_ce31135a": { "message": "Médiafájl feltöltése" },
+  "upload_not_available_for_this_folder_8f8623c6": {
+    "message": "A feltöltés nem elérhető erre a mappára"
+  },
   "upload_record_media_e4207d72": { "message": "Média feltöltés/rögzítés" },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "nagybetűs lista abc sorrendbe rendezve"

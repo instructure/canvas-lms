@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-
 import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
 
-import NaiveRequestDispatch from '../../../shared/network/NaiveRequestDispatch'
+import {deferPromise} from '../../../shared/async'
 import StudentContentDataLoader from './StudentContentDataLoader'
 
-function getStudentIds(courseId) {
+function getStudentIds(courseId, dispatch) {
   if (ENV.prefetch_gradebook_user_ids) {
     /*
      * When user ids have been prefetched, the data is only known valid for the
@@ -38,105 +36,106 @@ function getStudentIds(courseId) {
   }
 
   const url = `/courses/${courseId}/gradebook/user_ids`
-  return $.ajaxJSON(url, 'GET', {})
+  return dispatch.getJSON(url)
 }
 
-function getGradingPeriodAssignments(courseId) {
+function getGradingPeriodAssignments(courseId, dispatch) {
   const url = `/courses/${courseId}/gradebook/grading_period_assignments`
-  return $.ajaxJSON(url, 'GET', {})
+  return dispatch.getJSON(url)
 }
 
-function getAssignmentGroups(url, params, dispatch) {
+function getAssignmentGroups(options, dispatch) {
+  const url = `/api/v1/courses/${options.courseId}/assignment_groups`
+  const params = {
+    exclude_assignment_submission_types: ['wiki_page'],
+    exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
+    include: [
+      'assignment_group_id',
+      'assignment_visibility',
+      'assignments',
+      'grades_published',
+      'module_ids',
+      'post_manually'
+    ],
+    override_assignment_dates: false
+  }
+
   return dispatch.getDepaginated(url, params)
 }
 
-function getContextModules(url, dispatch) {
+function getContextModules(courseId, dispatch) {
+  const url = `/api/v1/courses/${courseId}/modules`
   return dispatch.getDepaginated(url)
 }
 
-function getCustomColumns(url, dispatch) {
+function getCustomColumns(courseId, dispatch) {
+  const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
   return dispatch.getDepaginated(url, {include_hidden: true})
 }
 
 // This function is called from showNoteColumn in Gradebook.coffee
 // when the notes column is revealed. In that case dispatch won't
 // exist so we'll create a new Dispatcher for this request.
-function getDataForColumn(columnId, url, params, cb, dispatch = new NaiveRequestDispatch()) {
-  const columnUrl = url.replace(/:id/, columnId)
-  const augmentedCallback = data => cb(columnId, data)
-  return dispatch.getDepaginated(columnUrl, params, augmentedCallback)
+function getDataForColumn(courseId, columnId, options, perPageCallback, dispatch) {
+  const url = `/api/v1/courses/${courseId}/custom_gradebook_columns/${columnId}/data`
+  const augmentedCallback = data => perPageCallback(columnId, data)
+  const params = {include_hidden: true, per_page: options.perPage}
+  return dispatch.getDepaginated(url, params, augmentedCallback)
 }
 
-function getCustomColumnData(options, customColumnsDfd, waitForDfds, dispatch) {
-  const url = options.customColumnDataURL
-  const params = options.customColumnDataParams
-  const cb = options.customColumnDataPageCb
-  const customColumnDataLoaded = $.Deferred()
+function getCustomColumnData(options, customColumnsDfd, dispatch) {
+  const {courseId, gradebook} = options
+  const perPageCallback = gradebook.gotCustomColumnDataChunk
+  const customColumnDataLoaded = deferPromise()
 
-  if (url) {
-    // waitForDfds ensures that custom column data is loaded *last*
-    $.when(...waitForDfds).then(() => {
-      if (options.customColumnIds) {
-        const customColumnDataDfds = options.customColumnIds.map(columnId =>
-          getDataForColumn(columnId, url, params, cb, dispatch)
-        )
-        $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
-      } else {
-        customColumnsDfd.then(customColumns => {
-          const customColumnDataDfds = customColumns.map(col =>
-            getDataForColumn(col.id, url, params, cb, dispatch)
-          )
-          $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
-        })
-      }
+  if (options.customColumnIds) {
+    const customColumnDataDfds = options.customColumnIds.map(columnId =>
+      getDataForColumn(courseId, columnId, options, perPageCallback, dispatch)
+    )
+    Promise.all(customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
+  } else {
+    customColumnsDfd.then(customColumns => {
+      const customColumnDataDfds = customColumns.map(column =>
+        getDataForColumn(courseId, column.id, options, perPageCallback, dispatch)
+      )
+      Promise.all(customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
     })
   }
 
-  return customColumnDataLoaded
+  return customColumnDataLoaded.promise
 }
 
 function loadGradebookData(opts) {
-  const dispatch = new NaiveRequestDispatch({
-    activeRequestLimit: opts.activeRequestLimit
-  })
+  const {dispatch} = opts
 
-  const gotAssignmentGroups = getAssignmentGroups(
-    opts.assignmentGroupsURL,
-    opts.assignmentGroupsParams,
-    dispatch
-  )
-  if (opts.onlyLoadAssignmentGroups) {
-    return {gotAssignmentGroups}
-  }
+  const gotAssignmentGroups = opts.getAssignmentGroups ? getAssignmentGroups(opts, dispatch) : null
 
   // Begin loading Students before any other data.
-  const gotStudentIds = getStudentIds(opts.courseId)
+  const gotStudentIds = getStudentIds(opts.courseId, dispatch)
   let gotGradingPeriodAssignments
   if (opts.getGradingPeriodAssignments) {
-    gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId)
+    gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId, dispatch)
   }
-  const gotCustomColumns = getCustomColumns(opts.customColumnsURL, dispatch)
+
+  const gotCustomColumns = opts.getCustomColumns ? getCustomColumns(opts.courseId, dispatch) : null
 
   const studentContentDataLoader = new StudentContentDataLoader(
     {
       courseId: opts.courseId,
       gradebook: opts.gradebook,
       loadedStudentIds: opts.loadedStudentIds,
-      onStudentsChunkLoaded: opts.studentsPageCb,
-      onSubmissionsChunkLoaded: opts.submissionsChunkCb,
       studentsChunkSize: opts.perPage,
-      studentsParams: opts.studentsParams,
-      studentsUrl: opts.studentsURL,
-      submissionsChunkSize: opts.submissionsChunkSize,
-      submissionsUrl: opts.submissionsURL
+      submissionsChunkSize: opts.submissionsChunkSize
     },
     dispatch
   )
 
-  const gotContextModules = getContextModules(opts.contextModulesURL, dispatch)
+  const gotContextModules = opts.getContextModules
+    ? getContextModules(opts.courseId, dispatch)
+    : null
 
-  const gotStudents = $.Deferred()
-  const gotSubmissions = $.Deferred()
+  const gotStudents = deferPromise()
+  const gotSubmissions = deferPromise()
 
   Promise.resolve(gotStudentIds)
     .then(data => studentContentDataLoader.load(data.user_ids))
@@ -146,12 +145,7 @@ function loadGradebookData(opts) {
     })
 
   // Custom Column Data will load only after custom columns and all submissions.
-  const gotCustomColumnData = getCustomColumnData(
-    opts,
-    gotCustomColumns,
-    [gotSubmissions],
-    dispatch
-  )
+  gotSubmissions.promise.then(() => getCustomColumnData(opts, gotCustomColumns, dispatch))
 
   return {
     gotAssignmentGroups,
@@ -159,9 +153,8 @@ function loadGradebookData(opts) {
     gotCustomColumns,
     gotGradingPeriodAssignments,
     gotStudentIds,
-    gotStudents,
-    gotSubmissions,
-    gotCustomColumnData
+    gotStudents: gotStudents.promise,
+    gotSubmissions: gotSubmissions.promise
   }
 }
 

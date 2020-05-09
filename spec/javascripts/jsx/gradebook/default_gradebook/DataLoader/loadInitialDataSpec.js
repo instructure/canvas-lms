@@ -30,13 +30,13 @@ import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGra
 
 QUnit.module('Gradebook > DataLoader', suiteHooks => {
   const urls = {
-    assignmentGroups: '/api/v1/assignment_groups',
-    contextModules: '/api/v1/courses/1201/context_modules',
+    assignmentGroups: '/api/v1/courses/1201/assignment_groups',
+    contextModules: '/api/v1/courses/1201/modules',
     customColumns: '/api/v1/courses/1201/custom_gradebook_columns',
-    customColumnData: columnId => `/api/v1/courses/1201/custom_gradebook_columns/${columnId}`,
+    customColumnData: columnId => `/api/v1/courses/1201/custom_gradebook_columns/${columnId}/data`,
     gradingPeriodAssignments: '/courses/1201/gradebook/grading_period_assignments',
-    students: '/courses/1201/users',
-    submissions: '/api/v1/courses/1201/submissions',
+    students: '/api/v1/courses/1201/users',
+    submissions: '/api/v1/courses/1201/students/submissions',
     userIds: '/courses/1201/gradebook/user_ids'
   }
 

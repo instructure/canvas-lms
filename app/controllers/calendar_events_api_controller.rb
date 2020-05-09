@@ -272,6 +272,9 @@ class CalendarEventsApiController < ApplicationController
   before_action :require_authorization, :only => %w(index user_index)
 
   RECURRING_EVENT_LIMIT = 200
+
+  DEFAULT_INCLUDES = %w[child_events]
+
   # @API List calendar events
   #
   # Retrieve the paginated list of calendar events or assignments for the current user
@@ -363,7 +366,6 @@ class CalendarEventsApiController < ApplicationController
       if @type == :assignment
         events = apply_assignment_overrides(events, user)
         mark_submitted_assignments(user, events)
-        includes = Array(params[:include])
         if includes.include?("submission")
           submissions = Submission.active.where(assignment_id: events, user_id: user).
             group_by(&:assignment_id)
@@ -396,7 +398,7 @@ class CalendarEventsApiController < ApplicationController
         json = events.map do |event|
           subs = submissions[event.id] if submissions
           sub = subs.sort_by(&:submitted_at).last if subs
-          event_json(event, user, session, {excludes: params[:excludes], submission: sub})
+          event_json(event, user, session, {include: includes, excludes: params[:excludes], submission: sub})
         end
         render :json => json
       else
@@ -513,7 +515,7 @@ class CalendarEventsApiController < ApplicationController
   def show
     get_event(true)
     if authorized_action(@event, @current_user, :read)
-      render :json => event_json(@event, @current_user, session)
+      render :json => event_json(@event, @current_user, session, include: includes)
     end
   end
 
@@ -1151,17 +1153,17 @@ class CalendarEventsApiController < ApplicationController
     scope = Assignment.where([sql.join(' OR ')] + conditions)
     return scope if @public_to_auth || !user
 
-    student_ids = [user.id]
-    courses_to_not_filter = []
+    student_ids = Set.new
+    student_ids << user.id
+    courses_to_not_filter = Set.new
 
     # all assignments visible to an observers students should be visible to an observer
-    user.observer_enrollments.shard(user).each do |e|
-      course_student_ids = ObserverEnrollment.observed_student_ids(e.course, user)
-      if course_student_ids.any?
-        student_ids.concat course_student_ids
+    user.observer_enrollments.shard(user).pluck(:course_id, :associated_user_id).each do |course_id, associated_user_id|
+       if associated_user_id
+        student_ids << associated_user_id
       else
         # in courses without any observed students, observers can see all published assignments
-        courses_to_not_filter << e.course_id
+        courses_to_not_filter << course_id
       end
     end
 
@@ -1173,7 +1175,7 @@ class CalendarEventsApiController < ApplicationController
       }
 
     # in courses with diff assignments on, only show the visible assignments
-    scope = scope.filter_by_visibilities_in_given_courses(student_ids, courses_to_filter_assignments.map(&:id)).group('assignments.id')
+    scope = scope.filter_by_visibilities_in_given_courses(student_ids.to_a, courses_to_filter_assignments.map(&:id)).group('assignments.id')
     scope
   end
 
@@ -1196,7 +1198,9 @@ class CalendarEventsApiController < ApplicationController
       scope = scope.for_context_codes(@context_codes)
       scope = scope.send(*date_scope_and_args) unless @all_events
     end
-
+    if includes.include?('web_conference')
+      scope = scope.preload(:web_conference)
+    end
     scope
   end
 
@@ -1410,5 +1414,9 @@ class CalendarEventsApiController < ApplicationController
       end
     end
     true
+  end
+
+  def includes
+    (Array(params[:include]) + DEFAULT_INCLUDES).uniq
   end
 end

@@ -17,25 +17,58 @@
  */
 
 import I18n from 'i18n!upload_button'
-import React, {useRef} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {bool} from 'prop-types'
 import classnames from 'classnames'
 import UploadForm, {UploadFormPropTypes} from './UploadForm'
+import UploadQueue from 'compiled/react_files/modules/UploadQueue'
 
 const UploadButton = function(props) {
   const formRef = useRef(null)
+  const [disabled, setDisabled] = useState(UploadQueue.pendingUploads())
+  const handleQueueChange = useCallback(upload_queue => {
+    setDisabled(!!upload_queue.pendingUploads())
+  }, [])
+
+  useEffect(() => {
+    UploadQueue.addChangeListener(handleQueueChange)
+    return () => UploadQueue.removeChangeListener(handleQueueChange)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleUploadClick() {
+    formRef.current?.addFiles()
+  }
+
+  const renameFileMessage = nameToUse => {
+    return I18n.t(
+      'A file named "%{name}" already exists in this folder. Do you want to replace the existing file?',
+      {name: nameToUse}
+    )
+  }
+
+  const lockFileMessage = nameToUse => {
+    return I18n.t(
+      'A locked file named "%{name}" already exists in this folder. Please enter a new name.',
+      {name: nameToUse}
+    )
+  }
+
   return (
     <>
       <UploadForm
+        allowSkip={window?.ENV?.FEATURES?.files_dnd}
         ref={formRef}
         currentFolder={props.currentFolder}
         contextId={props.contextId}
         contextType={props.contextType}
+        onRenameFileMessage={renameFileMessage}
+        onLockFileMessage={lockFileMessage}
       />
       <button
         type="button"
         className="btn btn-primary btn-upload"
-        onClick={() => formRef.current.addFiles()}
+        onClick={handleUploadClick}
+        disabled={disabled}
       >
         <i className="icon-upload" aria-hidden />
         &nbsp;

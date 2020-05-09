@@ -19,54 +19,53 @@
 import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import {bool, string} from 'prop-types'
 import I18n from 'i18n!courses'
-import {Mutation} from 'react-apollo'
+import {useMutation} from 'react-apollo'
 import NotificationPreferences from 'jsx/notification_preferences/NotificationPreferences'
 import NotificationPreferencesShape from 'jsx/notification_preferences/NotificationPreferencesShape'
-import React, {Component} from 'react'
+import React, {useContext} from 'react'
 import {UPDATE_COURSE_NOTIFICATION_PREFERENCES} from './graphqlData/Mutations'
 
-export default class CourseNotifcationSettingsManager extends Component {
-  static propTypes = {
-    courseId: string.isRequired,
-    enabled: bool.isRequired,
-    notificationPreferences: NotificationPreferencesShape
-  }
+export default function CourseNotifcationSettingsManager(props) {
+  const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)
+  const [updatePreference] = useMutation(UPDATE_COURSE_NOTIFICATION_PREFERENCES, {
+    onCompleted(data) {
+      handleUpdateComplete(data)
+    },
+    onError() {
+      setOnFailure(I18n.t('Failed to update course notification settings'))
+    }
+  })
 
-  handleUpdateComplete = data => {
+  const handleUpdateComplete = data => {
     if (data.updateNotificationPreferences.errors) {
-      this.context.setOnFailure(I18n.t('Failed to update course notification settings'))
+      setOnFailure(I18n.t('Failed to update course notification settings'))
     } else {
-      this.context.setOnSuccess(I18n.t('Course notification settings updated'))
+      setOnSuccess(I18n.t('Course notification settings updated'))
     }
   }
 
-  render() {
-    return (
-      <Mutation
-        mutation={UPDATE_COURSE_NOTIFICATION_PREFERENCES}
-        onCompleted={data => this.handleUpdateComplete(data)}
-        onError={() =>
-          this.context.setOnFailure(I18n.t('Failed to update course notification settings'))
-        }
-      >
-        {mutationFunc => (
-          <NotificationPreferences
-            contextType="course"
-            enabled={this.props.enabled}
-            enableNotifications={enabled =>
-              mutationFunc({
-                variables: {
-                  courseId: this.props.courseId,
-                  enabled
-                }
-              })
-            }
-            notificationPreferences={this.props.notificationPreferences}
-          />
-        )}
-      </Mutation>
-    )
-  }
+  return (
+    <NotificationPreferences
+      contextType="course"
+      enabled={props.enabled}
+      updatePreference={(data = {}) =>
+        updatePreference({
+          variables: {
+            courseId: props.courseId,
+            enabled: data.enabled,
+            channelId: data.channel?._id,
+            category: data.category?.split(' ').join('_'),
+            frequency: data.frequency
+          }
+        })
+      }
+      notificationPreferences={props.notificationPreferences}
+    />
+  )
 }
 
-CourseNotifcationSettingsManager.contextType = AlertManagerContext
+CourseNotifcationSettingsManager.propTypes = {
+  courseId: string.isRequired,
+  enabled: bool.isRequired,
+  notificationPreferences: NotificationPreferencesShape
+}

@@ -15,7 +15,6 @@ services:
       - log:/usr/src/app/log
       - node_modules:/usr/src/app/node_modules
       - quizzes_node_modules:/usr/src/app/client_apps/canvas_quizzes/node_modules
-      - selinimum_node_modules:/usr/src/app/gems/selinimum/node_modules
       - tmp:/usr/src/app/tmp
       - yarn-cache:/home/docker/.cache/yarn
     environment:

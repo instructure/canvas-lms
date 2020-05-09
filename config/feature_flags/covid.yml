@@ -8,21 +8,11 @@ product_tours:
   applies_to: RootAccount
   display_name: "Product Tours"
   description: "In-product training walkthrough and tourpoints for teachers"
-responsive_2020_03:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "March 2020 Responsiveness"
-  description: "Collection of responsive improvements throughout Canvas"
 module_dnd:
   state: hidden
   applies_to: RootAccount
-  display_name: "Module Content Import Enhancements"
+  display_name: "Module File Upload Enhancements"
   description: "Drag and Drop files on modules and multi-file module item uploads"
-responsive_2020_04:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "April 2020 Responsiveness"
-  description: "Collection of responsive improvements throughout Canvas"
 responsive_admin_settings:
   state: hidden
   applies_to: RootAccount
@@ -55,6 +45,6 @@ conference_selection_lti_placement:
   description: "Allows users to add LTI tools with conference_selection placement type"
 calendar_conferences:
   state: hidden
-  applies_to: RootAccount
+  applies_to: SiteAdmin
   display_name: "Add Conferences from Calendar"
   description: "Allows users to add conferences from the calendar"

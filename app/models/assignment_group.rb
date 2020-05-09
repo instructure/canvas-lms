@@ -25,6 +25,9 @@ class AssignmentGroup < ActiveRecord::Base
   workflow { state :available }
   include Canvas::SoftDeletable
 
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:group_weight, :rules]
+
   attr_readonly :context_id, :context_type
 
   attr_accessor :saved_by

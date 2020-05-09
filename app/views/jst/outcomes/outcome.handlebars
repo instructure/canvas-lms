@@ -67,15 +67,14 @@
   </div>
 </div>
 
-{{#if assessedInContext}}
-  <div id="assessed_info_banner" class="alert alert-info outcome-assessed-info-banner">
-    <span>
-      {{#t}}This outcome has been used to assess a student and some edits will affect student results.{{/t}}
-    </span>
-  </div>
-{{/if}}
-
 {{#if can_manage}}
+  {{#if assessedInContext}}
+    <div id="assessed_info_banner" class="alert alert-info outcome-assessed-info-banner">
+      <span>
+        {{#t}}This outcome has been used to assess a student and some edits will affect student results.{{/t}}
+      </span>
+    </div>
+  {{/if}}
   <div class="pull-right">
     <button class="move_button ui-button ui-widget ui-state-default ui-corner-all">
       <span aria-hidden="true">{{#t}}Move{{/t}}</span>

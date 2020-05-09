@@ -369,7 +369,6 @@ CanvasRails::Application.routes.draw do
 
     post 'quizzes/publish'   => 'quizzes/quizzes#publish'
     post 'quizzes/unpublish' => 'quizzes/quizzes#unpublish'
-    post 'quizzes/:id/toggle_post_to_sis' => "quizzes/quizzes#toggle_post_to_sis"
 
     post 'assignments/publish/quiz'   => 'assignments#publish_quizzes'
     post 'assignments/unpublish/quiz' => 'assignments#unpublish_quizzes'
@@ -2013,9 +2012,10 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :conferences) do
-      %w(course group).each do |context|
+      %w(user course group).each do |context|
         prefix = "#{context}s/:#{context}_id/conferences"
         get prefix, action: :index, as: "#{context}_conferences"
+        post "#{prefix}", action: :create
         post "#{prefix}/:conference_id/recording_ready", action: :recording_ready, as: "#{context}_conferences_recording_ready"
       end
 

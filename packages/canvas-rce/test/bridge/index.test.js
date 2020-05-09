@@ -56,7 +56,7 @@ describe('Bridge actions, embed image', () => {
     mockEditor.props = {
       textareaId: 'fake_editor',
       tinymce: {
-        get(id) {
+        get(_id) {
           return {
             selection: {
               getRng: sinon.stub().returns('some-range'),
@@ -74,6 +74,7 @@ describe('Bridge actions, embed image', () => {
   })
 
   it('inserts a image placeholder through the bridge', () => {
+    mockEditor.existingContentToLink.returns(false)
     Bridge.insertImagePlaceholder({})
     sinon.assert.called(mockEditor.insertImagePlaceholder)
   })

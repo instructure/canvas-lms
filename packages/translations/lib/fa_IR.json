@@ -11,6 +11,9 @@
     "all_day_fb42c4fc": {
         "message": "تمام روز"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "برای یک  درخواست شبکه خطا رخ داده است"
+    },
     "announcement_fb4cb645": {
         "message": "اطلاعیه"
     },
@@ -72,6 +75,9 @@
         "message": "درس"
     },
     "course_files_62deb8f8": {
+        "message": "فایل های درس"
+    },
+    "course_files_a31f97fc": {
         "message": "فایل های درس"
     },
     "course_navigation_dd035109": {
@@ -140,6 +146,9 @@
     "grades_a61eba0a": {
         "message": "نمره ها"
     },
+    "group_files_82e5dcdb": {
+        "message": "فایل های گروه"
+    },
     "group_navigation_99f191a": {
         "message": "پیمایش گروه"
     },
@@ -206,6 +215,9 @@
     "location_3b6ff307": {
         "message": "مکان:"
     },
+    "locked_762f138b": {
+        "message": "قفل شده"
+    },
     "media_af190855": {
         "message": "رسانه"
     },
@@ -214,6 +226,9 @@
     },
     "modules_c4325335": {
         "message": "ماژول ها"
+    },
+    "my_files_2f621040": {
+        "message": "فایل های من"
     },
     "new_13daf639": {
         "message": "جدید"

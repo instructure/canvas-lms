@@ -22,7 +22,7 @@ module CanvasOutcomesHelper
     domain, jwt = extract_domain_jwt(context.root_account, 'outcome_alignment_sets.create')
     return if domain.nil? || jwt.nil?
 
-    _, protocol = get_host_and_protocol_from_request()
+    protocol = ENV.fetch('OUTCOMES_SERVICE_PROTOCOL', Rails.env.production? ? 'https' : 'http')
     host_url = "#{protocol}://#{domain}" if domain.present?
 
     js_env(

@@ -61,6 +61,7 @@ class AssignmentsController < ApplicationController
 
         set_js_assignment_data
         set_tutorial_js_env
+        set_section_list_js_env if @domain_root_account.feature_enabled?(:assignment_bulk_edit)
         hash = {
           COURSE_ID: @context.id.to_s,
           WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
@@ -615,16 +616,7 @@ class AssignmentsController < ApplicationController
         ),
         POST_TO_SIS: post_to_sis,
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
-        SECTION_LIST: @context.course_sections.active.map do |section|
-          {
-            id: section.id,
-            name: section.name,
-            start_at: section.start_at,
-            end_at: section.end_at,
-            override_course_and_term_dates: section.restrict_enrollments_to_section_dates
-          }
-        end,
-        VALID_DATE_RANGE: CourseDateRange.new(@context),
+        VALID_DATE_RANGE: CourseDateRange.new(@context)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
@@ -662,6 +654,7 @@ class AssignmentsController < ApplicationController
       js_env(hash)
       conditional_release_js_env(@assignment)
       set_master_course_js_env_data(@assignment, @context)
+      set_section_list_js_env
       render :edit
     end
   end
@@ -872,5 +865,17 @@ class AssignmentsController < ApplicationController
   def on_quizzes_page?
     @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) && \
       @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?
+  end
+
+  def set_section_list_js_env
+    js_env SECTION_LIST: @context.course_sections.active.map { |section|
+      {
+        id: section.id,
+        name: section.name,
+        start_at: section.start_at,
+        end_at: section.end_at,
+        override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+      }
+    }
   end
 end

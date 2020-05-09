@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {func} from 'prop-types'
 import I18n from 'i18n!notification_preferences'
 import NotificationPreferencesSetting from './NotificationPreferencesSetting'
 import NotificationPreferencesShape from './NotificationPreferencesShape'
@@ -94,6 +95,7 @@ const smsNotificationCategoryDeprecated = category => {
 const renderNotificationCategory = (
   notificationPreferences,
   notificationCategory,
+  updatePreferenceCallback,
   renderChannelHeader
 ) => (
   <Table
@@ -163,6 +165,9 @@ const renderNotificationCategory = (
                       ? ['immediately', 'never']
                       : ['immediately', 'daily', 'weekly', 'never']
                   }
+                  updatePreference={frequency =>
+                    updatePreferenceCallback({channel, category, frequency})
+                  }
                 />
               </Table.Cell>
             ))}
@@ -199,7 +204,12 @@ const NotificationPreferencesTable = props => {
     return (
       <>
         {Object.keys(props.preferences.channels[0].categories).map((notificationCategory, i) =>
-          renderNotificationCategory(props.preferences, notificationCategory, i === 0)
+          renderNotificationCategory(
+            props.preferences,
+            notificationCategory,
+            props.updatePreference,
+            i === 0
+          )
         )}
       </>
     )
@@ -207,7 +217,8 @@ const NotificationPreferencesTable = props => {
 }
 
 NotificationPreferencesTable.propTypes = {
-  preferences: NotificationPreferencesShape
+  preferences: NotificationPreferencesShape,
+  updatePreference: func.isRequired
 }
 
 export default NotificationPreferencesTable

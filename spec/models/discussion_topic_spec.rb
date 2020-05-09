@@ -1503,7 +1503,7 @@ describe DiscussionTopic do
 
       entry_time = 1.minute.ago
       DiscussionEntry.where(:id => entry.id).update_all(:created_at => entry_time)
-      @assignment = assignment_model(:course => @course, :lock_at => 1.day.ago)
+      @assignment = assignment_model(:course => @course, :lock_at => 1.day.ago, :due_at => 2.days.ago)
       @topic.assignment = @assignment
       @topic.save
       @student.reload
@@ -1534,7 +1534,7 @@ describe DiscussionTopic do
       @student.reload
       expect(@student.submissions).to be_empty
 
-      @assignment = assignment_model(:course => @course, :lock_at => 1.day.ago)
+      @assignment = assignment_model(:course => @course, :lock_at => 1.day.ago, :due_at => 2.days.ago)
       @topic.assignment = @assignment
       @topic.save
       @student.reload
@@ -1555,7 +1555,7 @@ describe DiscussionTopic do
 
       entry_time = 1.minute.ago
       DiscussionEntry.where(:id => entry.id).update_all(:created_at => entry_time)
-      @assignment = assignment_model(:course => @course, :lock_at => 1.day.ago)
+      @assignment = assignment_model(:course => @course, :lock_at => 1.day.ago, :due_at => 2.days.ago)
       @topic.assignment = @assignment
       @topic.save
       @student.reload

@@ -737,7 +737,9 @@ en:
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: Microsoft Immersive Reader - Free Trial (Wiki Pages)
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: Makes a Microsoft Immersive Reader link option show up on wiki pages.
   canvas_elementary_theming_a42fa76f: Canvas Elementary Theming
-  elementary_friendly_theme_font_and_limited_course__4dc48217: Elementary friendly theme font and limited course navigation.
+  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+    Elementary friendly theme, font, and limited course navigation.
+    The font update only applies to languages that use the Latin Alphabet.
   new_post_policy_icons_da13a62c: New Post Policy Icons
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: Updates the display of Post Policy icons in the New Gradebook assignment column header.
   gradebook_import_reserved_names_bugfix_apg_122_32a77a18: Gradebook Import Reserved Names Bugfix (APG-122)
@@ -764,16 +766,16 @@ en:
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: Include the Datadog RUM JS Agent in the document HEAD.
   grade_calculator_performance_improvements_564af0de: Grade Calculator Performance Improvements
   performance_improvements_for_the_grade_calculation_7d9b0b16: Performance improvements for the grade calculation process.
+  gradebook_data_loading_performance_improvements_421e1c93: Gradebook Data Loading Performance Improvements
+  performance_improvements_for_loading_data_into_gra_1c3a0c60: Performance improvements for loading data into Gradebook.
   qr_for_mobile_login_1b1560ce: QR for Mobile Login
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: Include a link to show a QR code to easy mobile login on the profile page.
   product_tours_1e19eb95: Product Tours
   in_product_training_walkthrough_and_tourpoints_for_2e185119: In-product training walkthrough and tourpoints for teachers
-  march_2020_responsiveness_f810a65b: March 2020 Responsiveness
-  collection_of_responsive_improvements_throughout_c_dedfe6dc: Collection of responsive improvements throughout Canvas
-  module_content_import_enhancements_c00b0ea2: Module Content Import Enhancements
+  module_file_upload_enhancements_eecd4d37: Module File Upload Enhancements
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: Drag and Drop files on modules and multi-file module item uploads
-  april_2020_responsiveness_54028e36: April 2020 Responsiveness
   responsive_admin_settings_4f8670d7: Responsive Admin/Settings
+  collection_of_responsive_improvements_throughout_c_dedfe6dc: Collection of responsive improvements throughout Canvas
   responsive_awareness_226843a: Responsive Awareness
   responsive_misc_dc572cc0: Responsive Misc
   help_for_unpublished_courses_512a08d7: Help for Unpublished Courses
@@ -849,6 +851,8 @@ en:
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: Includes rubrics in the course sidebar navigation
   modify_permissions_for_account_rubrics_6c3aee59: Modify permissions for Account Rubrics
   change_rubrics_visibility_on_accounts_to_depend_on_967b4caa: Change Rubrics visibility on Accounts to depend on the Rubrics permission instead of the Learning Outcomes permission
+  hide_the_import_learning_outcomes_button_based_on__433d6ba7: Hide the Import Learning Outcomes button based on user permissions
+  ensures_that_users_without_the_import_outcomes_per_42dfc56d: Ensures that users without the Import Outcomes permission cannot see the button within the Outcomes tab
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_dc466585: |-
     Differentiate between system- and user-generated live events
@@ -1787,6 +1791,8 @@ en:
             default:
               users:
                 check_box: Users CSV
+              pseudonyms:
+                check_box: Pseudonyms CSV
               accounts:
                 check_box: Accounts CSV
               terms:
@@ -1956,6 +1962,9 @@ en:
   you_ll_need_to_accept_the_enrollment_invitation_be_441a617b: You'll need to *accept the enrollment invitation* before you can fully participate in this course, starting on %{date}.
   you_ll_need_to_accept_the_enrollment_invitation_be_1e962788: You'll need to *accept the enrollment invitation* before you can fully participate in this course.
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: This course hasn’t started yet. You will not be able to participate in this course until %{date}.
+  lti_launch_error_41eac9a: LTI Launch Error
+  there_was_an_error_launching_to_the_configured_too_f8ed5767: There was an error launching to the configured tool.
+  please_try_re_establishing_the_connection_to_the_t_9e7bec18: Please try re-establishing the connection to the tool by re-selecting the tool in the assignment or module item interface and saving.
   crumbs:
     site_admin: Site Admin
     assignments: Assignments
@@ -4445,6 +4454,7 @@ en:
   no_password_was_given_472222e5: No password was given
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: Too many failed login attempts. Please try again later or contact your system administrator.
   that_user_account_has_been_deleted_please_contact__350e0e0: That user account has been deleted.  Please contact your system administrator to have your account re-activated.
+  invalid_username_or_password_trouble_logging_in_ch_7699399c: Invalid username or password. Trouble logging in? *Check out our Login FAQs*.
   invalid_username_or_password_b60aa240: Invalid username or password
   failed_to_validate_cas_ticket_error_31aa4c63: 'Failed to validate CAS ticket: %{error}'
   there_was_a_problem_logging_in_at_institution_5a298155: There was a problem logging in at %{institution}
@@ -10996,6 +11006,8 @@ en:
   syllabus: Course Syllabus
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: This feature can't be enabled while autodetection of field separators is enabled
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: This feature can't be enabled while semicolons are forced to be field separators
+  enabling_the_elementary_theme_will_change_the_font_c944b619: Enabling the Elementary Theme will change the font in the Canvas interface and simplify the Course Navigation Menu for all users in your course.
+  disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: Disabling the Elementary Theme will change the font in the Canvas interface for all users in your course.
   course_grade_grade_in_course_code_9fa854db: 'Course grade: %{grade}% in %{course_code}'
   email:
     default_from_name: Instructure Canvas
@@ -13717,6 +13729,7 @@ en:
       resubmitting: Resubmitting...
   download_assignment_submissions_41e50ee7: Download Assignment Submissions
   click_here_to_download_size_of_file_74443988: Click here to download %{size_of_file}
+  no_submissions_to_zip_please_try_again_after_stude_7e0f478: No submissions to zip. Please try again after student submissions.
   something_went_wrong_downloading_submissions_pleas_6d069a09: Something went wrong downloading submissions. Please try again later.
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: 'Q: What goes black, white, black, white?  A: A panda rolling down a hill.'
   submit_assignment:
@@ -14520,8 +14533,6 @@ en:
   available_from_date_must_precede_available_until_c9f9e533: '"Available From" date must precede "Available Until"'
   an_unknown_server_error_occurred_please_try_again_f517eaf3: An unknown server error occurred.  Please try again.
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: Please enter a search term with three or more characters
-  filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} percent uploaded"
-  filename_uploaded_successfully_edd8e825: "%{fileName} uploaded successfully!"
   usage_rights_have_been_set_d1b433c7: Usage rights have been set.
   are_you_sure_you_want_to_delete_these_count_items_148e98ba:
     one: Are you sure you want to delete %{name}?
@@ -16006,6 +16017,9 @@ en:
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: Select the file you want to associate, or add a file by selecting "New File".
   new_file_s_8876bba1: "[ New File(s) ]"
   new_file_135ae520: "[ New File ]"
+  unable_to_set_up_drag_and_drop_for_modules_4d339f1d: Unable to set up drag and drop for modules
+  drop_files_here_to_add_to_module_236304f5: Drop files here to add to module
+  or_choose_files_b795006d: or choose files
   restart_link_validation_b61286fc: Restart Link Validation
   start_link_validation_dc0ac99c: Start Link Validation
   link_validation_is_running_caf08ced: Link validation is running
@@ -16549,7 +16563,6 @@ en:
   replace_e61834a7: Replace
   skip_bcb86160: Skip
   drop_files_here_to_upload_ce0f50f9: Drop files here to upload
-  or_choose_files_b795006d: or choose files
   show_and_hide_courses_menu_9e09d1d0: Show and hide courses menu
   folder_browsing_tree_1f00a3ae: Folder Browsing Tree
   file_list_350d08df: File List
@@ -16587,6 +16600,8 @@ en:
   search_for_files_7541fb28: Search for files
   upload_drop_zone:
     drop_to_upload: Drop items to upload
+  filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} percent uploaded"
+  filename_uploaded_successfully_edd8e825: "%{fileName} uploaded successfully!"
   error_uploading_file_e2d31b56: Error uploading file.
   retry_ebd5f8ba: Retry
   items_items_selected_5b55e566: "%{items} items selected"
@@ -17900,12 +17915,19 @@ en:
   pair_with_observer_b1541895: Pair with Observer
   generating_pairing_code_d480ccf4: Generating pairing code
   generating_pairing_code_251b7fc8: Generating pairing code...
+  confirm_qr_code_display_49664fa3: Confirm QR code display
+  qr_code_display_was_canceled_96234bf2: QR code display was canceled
+  waiting_for_confirmation_to_display_qr_code_6f904d63: Waiting for confirmation to display QR code
   qr_code_image_2b3a89b5: QR Code Image
   waiting_for_your_qr_code_to_load_809299e5: Waiting for your QR Code to load
+  to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.
   this_code_expires_in_timefromnow_ec7ccef4: This code expires in %{timeFromNow}.
   this_code_has_expired_41f76642: This code has expired.
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: An error occurred while retrieving your QR Code
-  to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.
+  sharing_a_qr_code_can_give_others_immediate_access_79575158: Sharing a QR code can give others immediate access to your account through the %{canvas} mobile applications.
+  please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: Please make sure no one is able to capture the image on your screen from your surroundings or from a screen sharing service.
+  click_proceed_to_continue_b6eeffc6: Click "Proceed" to continue.
+  click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: Click "Cancel" if you donʼt want the code displayed.
   learn_more_about_the_differences_a1217479: Learn more about the differences.
   new_quizzes_dbda7e0a: New Quizzes
   classic_quizzes_dee3c7b7: Classic Quizzes
@@ -18490,7 +18512,7 @@ en:
   sorry_but_we_couldn_t_automatically_log_you_into_t_9e77ce17: Sorry, but we couldnʼt automatically log you into the Community.
   confused_panda_questioning_what_to_do_next_42941484: Confused Panda questioning what to do next
   powered_by_instructure_504d676d: Powered By Instructure
-  having_trouble_logging_in_if_you_have_a_canvas_acc_f9578b47: Having trouble logging in? If you have a %{canvas} account with a specific institution, we can help.
+  if_you_have_a_canvas_account_with_a_specific_insti_daa9696e: If you have a %{canvas} account with a specific institution, we can help.
   click_here_to_find_it_5ad1543b: Click here to find it.
   find_your_canvas_institution_45af99af: Find your %{canvas} institution
   an_error_occurred_while_searching_for_your_institu_16a1ace4: An error occurred while searching for your institution

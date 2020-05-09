@@ -34,7 +34,6 @@ class CanvasSpecRunner < TestQueue::Runner::RSpec
   def after_fork(num)
     # for the runtime logger
     ENV["TEST_ENV_NUMBER"] = num > 1 ? num.to_s : ""
-    ENV["SELINIMUM_BATCH_NAME"] = "#{ENV["SERVER_NUMBER"]}.#{ENV["TEST_ENV_NUMBER"]}"
     Canvas::Reloader.reload!
     TestDatabaseUtils.reconnect!
     TestDatabaseUtils.reset_database!

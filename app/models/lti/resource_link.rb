@@ -24,6 +24,7 @@ class Lti::ResourceLink < ApplicationRecord
 
   belongs_to :context_external_tool
   alias_method :original_context_external_tool, :context_external_tool
+  belongs_to :root_account, class_name: 'Account'
 
   has_many :line_items,
             inverse_of: :resource_link,
@@ -32,6 +33,7 @@ class Lti::ResourceLink < ApplicationRecord
             foreign_key: :lti_resource_link_id
 
   before_validation :generate_resource_link_id, on: :create
+  before_save :set_root_account
 
   def context_external_tool
     # Use 'current_external_tool' to lookup the tool in a way that is safe with
@@ -51,5 +53,9 @@ class Lti::ResourceLink < ApplicationRecord
 
   def generate_resource_link_id
     self.resource_link_id ||= SecureRandom.uuid
+  end
+
+  def set_root_account
+    self.root_account_id ||= self.original_context_external_tool&.root_account_id
   end
 end

@@ -24,6 +24,7 @@ module Api::V1::CalendarEvent
   include Api::V1::User
   include Api::V1::Course
   include Api::V1::Group
+  include Api::V1::Conferences
 
   def event_json(event, user, session, options={})
     hash = if event.is_a?(::CalendarEvent)
@@ -160,6 +161,13 @@ module Api::V1::CalendarEvent
           )
         }
       end
+    end
+
+    if Account.site_admin.feature_enabled?(:calendar_conferences) &&
+      include.include?('web_conference') &&
+      event.web_conference_id.present? &&
+      event.web_conference.grants_right?(user, session, :read)
+      hash['web_conference'] = api_conference_json(event.web_conference, user, session)
     end
 
     hash['url'] = api_v1_calendar_event_url(event) if options.has_key?(:url_override) ? options[:url_override] || hash['own_reservation'] : event.grants_right?(user, session, :read)

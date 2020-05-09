@@ -20,11 +20,12 @@ module Types
   class NotificationPreferencesType < ApplicationObjectType
     graphql_name "NotificationPreferences"
 
-    implements Interfaces::TimestampInterface
-    implements Interfaces::LegacyIDInterface
-
-    global_id_field :id
-
-    field :channels, [CommunicationChannelType], null: true
+    field :channels, [CommunicationChannelType], null: true do
+      argument :channel_id, ID, required: false, default_value: nil
+    end
+    def channels(channel_id:)
+      return object[:channels] unless channel_id
+      object[:channels].select { |cc| cc.id == channel_id.to_i }
+    end
   end
 end

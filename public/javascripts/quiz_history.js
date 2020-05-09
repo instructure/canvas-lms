@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import I18n from 'i18nObj'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
+import GradingForm from './quizzes/grading_form'
 import './jquery.instructure_misc_plugins' /* fragmentChange */
 import './jquery.templateData'
 import './vendor/jquery.scrollTo'
@@ -156,89 +157,8 @@ let _gradingForm
 function getGradingForm() {
   if (_gradingForm) return _gradingForm
   const scoringSnapshot = getScoringSnapshot()
-  const gradingForm = {
-    ensureSelectEventsFire() {
-      $('input[type=text]').focus(function() {
-        $(this).select()
-      })
-    },
-
-    scrollToUpdatedQuestion(event, hash) {
-      if (hash.indexOf('#question') === 0) {
-        const id = hash.substring(10)
-        scoringSnapshot.jumpToQuestion(id)
-      }
-    },
-
-    updateSnapshotFor($question) {
-      const question_id = $question.attr('id').substring(9) || null
-      if (question_id) {
-        const data = {}
-        if (!ENV.GRADE_BY_QUESTION) {
-          $question.addClass('modified_but_not_saved')
-        }
-        data.points = numberHelper.parse($question.find('.user_points :text').val())
-        data.comments =
-          $question.find('.question_neutral_comment .question_comment_text textarea').val() || ''
-        scoringSnapshot.update(question_id, data)
-      }
-      $(document).triggerHandler('score_changed')
-    },
-
-    addFudgePoints(points) {
-      if (points || points === 0) {
-        scoringSnapshot.snapshot.fudge_points = points
-        scoringSnapshot.setSnapshot()
-      }
-      $(document).triggerHandler('score_changed')
-    },
-
-    setInitialSnapshot(data) {
-      $('#feel_free_to_toggle_message').show()
-      if (data) {
-        scoringSnapshot.setSnapshot(data)
-      } else {
-        scoringSnapshot.setSnapshot(null, true)
-      }
-    },
-
-    onScoreChanged() {
-      const $total = $('#after_fudge_points_total')
-      let total = 0
-      $('.display_question .user_points:visible').each(function() {
-        let points =
-          numberHelper.parse(
-            $(this)
-              .find('input.question_input')
-              .val()
-          ) || 0
-        points = Math.round(points * 100.0) / 100.0
-        total += points
-      })
-      let fudge = numberHelper.parse($('#fudge_points_entry').val()) || 0
-      fudge = Math.round(fudge * 100.0) / 100.0
-      total += fudge
-      $total.text(I18n.n(total) || '0')
-    },
-
-    questions() {
-      return $('.question_holder')
-        .map((index, el) => $(el).position().top - 320)
-        .toArray()
-    },
-
-    onWindowResize() {
-      // Add padding to the bottom of the last question
-      const winHeight = $(window).innerHeight()
-      const lastHeight = $('div.question_holder:last-child').outerHeight()
-      const fixedButtonHeight = $('#speed_update_scores_container').outerHeight()
-      const paddingHeight = Math.max(winHeight - lastHeight - 150, fixedButtonHeight)
-      $('#update_history_form .quiz-submission.headless').css('marginBottom', paddingHeight + 'px')
-    }
-  }
-  // end of gradingForm object
-
-  return (_gradingForm = gradingForm)
+  _gradingForm = new GradingForm(scoringSnapshot)
+  return _gradingForm
 }
 
 let _quizNavBar
@@ -425,6 +345,7 @@ $(document).ready(function() {
   const quizNavBar = getQuizNavBar()
 
   gradingForm.ensureSelectEventsFire()
+  gradingForm.preventInsanity()
 
   if (ENV.GRADE_BY_QUESTION) {
     $(document).scroll(quizNavBar.onScroll)

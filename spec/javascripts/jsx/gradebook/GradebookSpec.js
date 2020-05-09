@@ -295,6 +295,23 @@ QUnit.module('Gradebook#initialize', () => {
   })
 })
 
+QUnit.module('Gradebook', () => {
+  QUnit.module('#dataLoader', () => {
+    // TODO: remove this entire module with TALLY-831
+
+    test('is the new DataLoader when `dataloader_improvements` is true', () => {
+      // `dataloader_improvements` should default to enabled except in beta and production
+      const gradebook = createGradebook()
+      strictEqual(gradebook.dataLoader.constructor.name, 'DataLoader')
+    })
+
+    test('is the old DataLoader when `dataloader_improvements` is false', () => {
+      const gradebook = createGradebook({dataloader_improvements: false})
+      strictEqual(gradebook.dataLoader.constructor.name, 'OldDataLoader')
+    })
+  })
+})
+
 QUnit.module('Gradebook#calculateStudentGrade', {
   createGradebook(options = {}) {
     const gradebook = createGradebook({

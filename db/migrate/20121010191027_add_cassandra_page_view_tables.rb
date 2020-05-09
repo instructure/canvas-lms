@@ -41,7 +41,6 @@ class AddCassandraPageViewTables < ActiveRecord::Migration[4.2]
         asset_type            text,
         controller            text,
         action                text,
-        contributed           boolean,
         interaction_seconds   double,
         created_at            timestamp,
         updated_at            timestamp,

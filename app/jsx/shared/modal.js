@@ -26,7 +26,8 @@ import ModalButtons from './modal-buttons'
 
 const modalOverrides = {
   overlay: {
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: '2002'
   },
   content: {
     position: 'static',

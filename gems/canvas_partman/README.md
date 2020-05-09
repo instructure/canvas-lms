@@ -151,14 +151,22 @@ class MigrateVersionsToPartitions < ActiveRecord::Migration
 
     # create tables to hold the existing data
     partman.create_initial_partitions
-    
+
     # then move the data over
     partman.migrate_data_to_partitions
   end
 end
 ```
 
+### Running Specs
+to get partman specs to run locally:
+ - create a database named canvas_partman_test in an available postgres instance
+ - set your DATABASE_URL environment variable to: `postgresql://user:pass@dbhostname/canvas_partman_test"`
+ - run `bundle exec rspec spec` from the gem root directory
+
 # TODO
 
 - We need to configure postgres's constraint_exclusion to be `partition` - see: http://www.postgresql.org/docs/9.1/static/runtime-config-query.html#GUC-CONSTRAINT-EXCLUSION [**Update**: this is not necessary as it is the default setting]
 - Need to come up with a way to use regular, multiple/successive migrations for partition schemas instead of a single "snapshot" of how the latest version of the schema looks like [**Done** as of 11/15/2014]
+
+

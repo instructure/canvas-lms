@@ -26,6 +26,8 @@
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
   })
 %>
+<% js_bundle :module_dnd %>
+<% css_bundle :react_files %>
 <% if course_home %>
   <div class="screenreader-only"><%= @context.name %></div>
   <h2 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h2>

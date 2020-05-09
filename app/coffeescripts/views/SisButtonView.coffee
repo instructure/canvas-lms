@@ -53,10 +53,9 @@ export default class SisButtonView extends Backbone.View
 
   togglePostToSIS: (e) =>
     e.preventDefault()
-    sisUrl = @model.get('toggle_post_to_sis_url')
-    post_to_sis = @model.postToSIS()
+    post_to_sis = !@model.postToSIS()
     validationHelper = new SisValidationHelper({
-      postToSIS: !post_to_sis
+      postToSIS: post_to_sis
       dueDateRequired: @dueDateRequired
       dueDate: @model.dueAt()
       name: @model.name()
@@ -67,26 +66,22 @@ export default class SisButtonView extends Backbone.View
     errors = @errorsExist(validationHelper)
     if errors['has_error'] == true && @model.sisIntegrationSettingsEnabled()
       $.flashWarning(errors['message'])
-    else if sisUrl
-      @toggleAriaPressed(post_to_sis)
-      @model.postToSIS(!post_to_sis)
-      @model.save({ override_dates: false }, {
-        type: 'POST',
-        url: sisUrl,
-        success: =>
-          @setAttributes()
-      })
     else
-      @toggleAriaPressed(post_to_sis)
-      @model.postToSIS(!post_to_sis)
-      @model.save({ override_dates: false }, {
-        success: =>
+      @model.postToSIS(post_to_sis)
+      assignment_id = @model.get('assignment_id') || @model.get('id')
+      $.ajaxJSON "/api/v1/courses/#{ENV.COURSE_ID}/assignments/#{assignment_id}",
+        "PUT",
+        assignment:
+          override_dates: false
+          post_to_sis: post_to_sis
+        (data) =>
+          @model.postToSIS(data.post_to_sis)
           @setAttributes()
-      })
+          @setAriaPressed()
 
-  toggleAriaPressed: (post_to_sis) =>
+  setAriaPressed: () =>
     label = @$el.find('label')
-    label.attr 'aria-pressed', !post_to_sis
+    label.attr 'aria-pressed', @model.get('post_to_sis')
 
   errorsExist: (validationHelper) =>
     errors = {}

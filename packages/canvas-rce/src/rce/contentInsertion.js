@@ -168,22 +168,29 @@ export function insertLink(editor, link) {
 }
 
 // link edit/create logic based on tinymce/plugins/link/plugin.js
-function insertUndecoratedLink(editor, linkAttrs) {
+function insertUndecoratedLink(editor, linkProps) {
   const selectedElm = editor.selection.getNode()
   const anchorElm = getAnchorElement(editor, selectedElm)
   const selectedHtml = editor.selection.getContent({format: 'html'})
+  // only keep the props we want as attributes on the <a>
+  const linkAttrs = {
+    id: linkProps.id,
+    href: cleanUrl(linkProps.href || linkProps.url),
+    target: linkProps.target,
+    class: linkProps.class,
+    text: linkProps.text,
+    title: linkProps.title
+  }
+
   if (linkAttrs.target === '_blank') {
     linkAttrs.rel = 'noopener noreferrer'
   }
-  linkAttrs.href = cleanUrl(linkAttrs.href || linkAttrs.url)
 
   editor.focus()
-  if (anchorElm) {
-    updateLink(editor, anchorElm, linkAttrs.text, linkAttrs)
-  } else if (selectedHtml) {
+  if (anchorElm || selectedHtml) {
     editor.execCommand('mceInsertLink', null, linkAttrs)
   } else {
-    createLink(editor, selectedElm, linkAttrs.text, linkAttrs)
+    createLink(editor, selectedElm, linkProps.text, linkAttrs)
   }
   return editor.selection.getEnd() // this will be the newly created or updated content
 }
@@ -200,15 +207,7 @@ function getAnchorElement(editor, selectedElm) {
 function isImageFigure(elm) {
   return elm && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)
 }
-function updateLink(editor, anchorElm, text, linkAttrs) {
-  if (anchorElm.hasOwnProperty('innerText')) {
-    anchorElm.innerText = text
-  } else {
-    anchorElm.textContent = text
-  }
-  editor.dom.setAttribs(anchorElm, linkAttrs)
-  editor.selection.select(anchorElm)
-}
+
 function createLink(editor, selectedElm, text, linkAttrs) {
   if (isImageFigure(selectedElm)) {
     linkImageFigure(editor, selectedElm, linkAttrs)

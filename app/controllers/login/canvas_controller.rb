@@ -123,7 +123,18 @@ class Login::CanvasController < ApplicationController
         @domain_root_account.canvas_authentication_provider&.id
       successful_login(user, pseudonym)
     else
-      unsuccessful_login t("Invalid username or password")
+      link_url = Setting.get('invalid_login_faq_url', nil)
+      if link_url
+        unsuccessful_login ({
+          html: t(
+            "Invalid username or password. Trouble logging in? *Check out our Login FAQs*.",
+            wrapper: view_context.link_to('\1', link_url)
+          ),
+          timeout: 15000
+        })
+      else
+        unsuccessful_login t("Invalid username or password")
+      end
     end
   end
 

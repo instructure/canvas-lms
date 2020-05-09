@@ -86,12 +86,6 @@ if long_lines.size > 0
     (long_lines.size > 1 ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""), true
 end
 
-is_a_selinimum_test = commit_message.split("[selinimum:ignore_intermediate_commits]")
-if is_a_selinimum_test.size > 1
-  line = is_a_selinimum_test[0].count("\n") + 1
-  comment "error", line, "since you're telling selinimum to ignore intermediate commits, this commit may not be safe to merge"
-end
-
 starts_with_spec = subject =~ /\Aspec: /i
 exit if starts_with_spec # we're trusting you here, don't be evil
 

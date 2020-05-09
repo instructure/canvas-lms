@@ -21,7 +21,7 @@
     <div style="overflow: auto; max-height: 200px">
     <%= check_box :copy, :all_quizzes, :class => "copy_all", :checked => true %><%= label :copy, :all_quizzes, t('labels.all_quizzes', "All Quizzes") %>
     <ul class="unstyled_list" style="margin-<%= direction('left') %>: 20px;">
-      <%= global_ids = @context.content_exports.temp_record.can_use_global_identifiers? %>
+      <% global_ids = @context.content_exports.temp_record.can_use_global_identifiers? %>
       <% @context.quizzes.active.each do |quiz| %>
         <li>
           <%= check_box "copy[quizzes]", mig_id(quiz, global: global_ids), :class => 'quiz_item', :checked => true %>

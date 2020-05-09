@@ -177,8 +177,6 @@ class ApplicationController < ActionController::Base
             la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
             cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
             featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links),
-            responsive_2020_03: !!@domain_root_account&.feature_enabled?(:responsive_2020_03), #TODO: Romove once all references have been appropriately chaged
-            responsive_2020_04: !!@domain_root_account&.feature_enabled?(:responsive_2020_04), #TODO: Romove once all references have been appropriately chaged
             responsive_admin_settings: !!@domain_root_account&.feature_enabled?(:responsive_admin_settings),
             responsive_awareness: !!@domain_root_account&.feature_enabled?(:responsive_awareness),
             responsive_misc: !!@domain_root_account&.feature_enabled?(:responsive_misc),
@@ -704,6 +702,19 @@ class ApplicationController < ActionController::Base
       return false
     end
     true
+  end
+
+  # Render a general error page with the given details.
+  # Arguments of this method must be translated
+  def render_error_with_details(title:, summary: nil, directions: nil)
+    render(
+      'shared/errors/error_with_details',
+      locals: {
+        title: title,
+        summary: summary,
+        directions: directions
+      }
+    )
   end
 
   def render_unauthorized_action
@@ -1774,7 +1785,15 @@ class ApplicationController < ActionController::Base
           add_crumb(@resource_title)
           @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
           @prepend_template = 'assignments/lti_header' unless render_external_tool_full_width?
-          @lti_launch.params = lti_launch_params(adapter)
+          begin
+            @lti_launch.params = lti_launch_params(adapter)
+          rescue Lti::Ims::AdvantageErrors::InvalidLaunchError
+            return render_error_with_details(
+              title: t('LTI Launch Error'),
+              summary: t('There was an error launching to the configured tool.'),
+              directions: t('Please try re-establishing the connection to the tool by re-selecting the tool in the assignment or module item interface and saving.')
+            )
+          end
         else
           @lti_launch.params = adapter.generate_post_payload
         end

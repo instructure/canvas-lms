@@ -18,6 +18,7 @@
 <%-
   css_bundle(:instructure_eportfolio) if @eportfolio_view === true
   css_bundle(:new_user_tutorials) if tutorials_enabled?
+  css_bundle(:k6_theme) if @context.try(:feature_enabled?, :canvas_k6_theme)
   js_bundle(:navigation_header) unless @headers == false
 
   load_blueprint_courses_ui
@@ -74,10 +75,6 @@
   # We probably want to consider doing this everywhere, all the time.
   body_classes << 'full-width' if @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
   body_classes << "context-#{@context.asset_string}" if @context
-  #TODO: Romove once all references have been appropriately chaged
-  body_classes << "responsive_2020_03" if !!@domain_root_account&.feature_enabled?(:responsive_2020_03)
-  #TODO: Romove once all references have been appropriately chaged
-  body_classes << "responsive_2020_04" if !!@domain_root_account&.feature_enabled?(:responsive_2020_04)
   body_classes << "responsive_admin_settings" if !!@domain_root_account&.feature_enabled?(:responsive_admin_settings)
   body_classes << "responsive_awareness" if !!@domain_root_account&.feature_enabled?(:responsive_awareness)
   body_classes << "responsive_misc" if !!@domain_root_account&.feature_enabled?(:responsive_misc)

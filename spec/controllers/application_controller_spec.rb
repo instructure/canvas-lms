@@ -186,38 +186,6 @@ RSpec.describe ApplicationController do
       expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
     end
 
-    #TODO: Romove once all references have been appropriately chaged
-    context "responsive_2020_03" do
-      before(:each) do
-        controller.instance_variable_set(:@domain_root_account, Account.default)
-      end
-
-      it 'is false if the feature flag is off' do
-        expect(controller.js_env[:FEATURES][:responsive_2020_03]).to be_falsey
-      end
-
-      it 'is true if the feature flag is on' do
-        Account.default.enable_feature!(:responsive_2020_03)
-        expect(controller.js_env[:FEATURES][:responsive_2020_03]).to be_truthy
-      end
-    end
-
-    #TODO: Romove once all references have been appropriately chaged
-    context "responsive_2020_04" do
-      before(:each) do
-        controller.instance_variable_set(:@domain_root_account, Account.default)
-      end
-
-      it 'is false if the feature flag is off' do
-        expect(controller.js_env[:FEATURES][:responsive_2020_04]).to be_falsey
-      end
-
-      it 'is true if the feature flag is on' do
-        Account.default.enable_feature!(:responsive_2020_04)
-        expect(controller.js_env[:FEATURES][:responsive_2020_04]).to be_truthy
-      end
-    end
-
     context "responsive_admin_settings" do
       before(:each) do
         controller.instance_variable_set(:@domain_root_account, Account.default)

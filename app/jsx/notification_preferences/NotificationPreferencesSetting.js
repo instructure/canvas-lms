@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {arrayOf, string} from 'prop-types'
+import {arrayOf, func, string} from 'prop-types'
 import I18n from 'i18n!notification_preferences'
-import React from 'react'
+import React, {useState} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
@@ -82,19 +82,22 @@ const renderPreferenceMenuItem = preferenceConfig => (
 )
 
 const NotificationPreferencesSetting = props => {
-  const preferenceConfig = preferenceConfigs[props.selectedPreference]
+  const [selection, setSelection] = useState(props.selectedPreference)
+
+  const handleUpdate = value => {
+    setSelection(value)
+    props.updatePreference(value)
+  }
+
+  const preferenceConfig = preferenceConfigs[selection]
   return (
     <Menu
       trigger={renderPreferenceButton(preferenceConfig)}
-      disabled={props.selectedPreference === 'disabled'}
+      disabled={selection === 'disabled'}
+      onSelect={(e, value) => handleUpdate(value)}
     >
       {props.preferenceOptions.map(option => (
-        <Menu.Item
-          key={option}
-          value={option}
-          selected={option === props.selectedPreference}
-          onSelect={() => {}}
-        >
+        <Menu.Item key={option} value={option} selected={option === selection}>
           {renderPreferenceMenuItem(preferenceConfigs[option])}
         </Menu.Item>
       ))}
@@ -104,7 +107,8 @@ const NotificationPreferencesSetting = props => {
 
 NotificationPreferencesSetting.propTypes = {
   selectedPreference: string,
-  preferenceOptions: arrayOf(string)
+  preferenceOptions: arrayOf(string),
+  updatePreference: func
 }
 
 export default NotificationPreferencesSetting

@@ -75,8 +75,10 @@ module ActiveRecord
 
         it "cleans up the cursor" do
           # two cursors with the same name; if it didn't get cleaned up, it would error
-          User.all.find_each {}
-          User.all.find_each {}
+          expect do
+            User.all.find_each {}
+            User.all.find_each {}
+          end.to_not raise_error
         end
 
         it "cleans up the temp table for non-DB error" do
@@ -117,10 +119,12 @@ module ActiveRecord
         end
 
         it "should use a temp table when you select without an id" do
-          User.create!
-          User.select(:name).find_in_batches do |batch|
-            User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
-          end
+          expect do
+            User.create!
+            User.select(:name).find_in_batches do |batch|
+              User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
+            end
+          end.to_not raise_error
         end
 
         it "should not use a temp table for a plain query" do
@@ -149,8 +153,10 @@ module ActiveRecord
 
         it "cleans up the temp table" do
           # two temp tables with the same name; if it didn't get cleaned up, it would error
-          User.all.find_in_batches_with_temp_table {}
-          User.all.find_in_batches_with_temp_table {}
+          expect do
+            User.all.find_in_batches_with_temp_table {}
+            User.all.find_in_batches_with_temp_table {}
+          end.to_not raise_error
         end
 
         it "cleans up the temp table for non-DB error" do
@@ -187,6 +193,23 @@ module ActiveRecord
           end.to raise_error(ActiveRecord::InvalidForeignKey)
         end
 
+      end
+    end
+
+    describe ".bulk_insert" do
+      it "throws exception if it violates a foreign key" do
+        attrs = {
+          'request_id' => 'abcde-12345',
+          'uuid' => 'edcba-54321',
+          'account_id' => Account.default.id,
+          'user_id' => -1,
+          'pseudonym_id' => -1,
+          'event_type' => 'login',
+          'created_at' => DateTime.now.utc
+        }
+        expect do
+          Auditors::ActiveRecord::AuthenticationRecord.bulk_insert([attrs])
+        end.to raise_error(ActiveRecord::InvalidForeignKey)
       end
     end
 

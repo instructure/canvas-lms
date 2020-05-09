@@ -31,7 +31,7 @@
 
 docker-compose down
 docker-compose pull web
-docker volume rm canvaslms_bundler canvaslms_canvas-docker-gems canvaslms_node_modules canvaslms_quizzes_node_modules canvaslms_selinimum_node_modules canvaslms_yarn-cache canvaslms_generated_1 canvaslms_generated_2 canvaslms_generated_3
+docker volume rm canvaslms_bundler canvaslms_canvas-docker-gems canvaslms_node_modules canvaslms_quizzes_node_modules canvaslms_yarn-cache canvaslms_generated_1 canvaslms_generated_2 canvaslms_generated_3
 docker run --rm instructure/canvas-lms:master cat Gemfile.lock > Gemfile.lock
 docker run --rm instructure/canvas-lms:master cat yarn.lock > yarn.lock
 

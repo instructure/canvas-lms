@@ -20,21 +20,51 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import Modal from 'react-modal'
 import UploadForm from '../UploadForm'
+import FileOptionsCollection from 'compiled/react_files/modules/FileOptionsCollection'
+
+const folderWithFiles = {
+  currentFolder: {
+    id: 2,
+    files: {
+      models: [
+        {
+          display_name: 'foo.txt',
+          get: what => (what === 'display_name' ? 'foo.txt' : false)
+        }
+      ]
+    }
+  }
+}
+
+const folderWithoutFiles = {
+  currentFolder: {id: 1, files: {models: []}}
+}
 
 function formProps(overrides) {
   return {
-    currentFolder: {files: {models: []}},
+    ...folderWithoutFiles,
     contextId: '1',
     contextType: 'user',
     ...overrides
   }
 }
 
+function setFile(getByTestId) {
+  const fileInput = getByTestId('file-input')
+  const file = new File(['foo'], 'foo.txt', {type: 'text/plain'})
+  fireEvent.change(fileInput, {target: {files: [file]}})
+}
+
 describe('Files UploadForm', () => {
   beforeEach(() => {
     // we don't want any files actually queued for upload
-    const spy = jest.spyOn(UploadForm.prototype, 'queueUploads')
+    const spy = jest.spyOn(UploadForm.prototype, '_actualQueueUploads')
     spy.mockReturnValue(null)
+  })
+
+  afterEach(() => {
+    FileOptionsCollection.resetState()
+    FileOptionsCollection.setFolder(null)
   })
 
   it('renders the file input form', () => {
@@ -46,13 +76,30 @@ describe('Files UploadForm', () => {
 
   it('enqueues uploads when files are available', function() {
     const {getByTestId} = render(<UploadForm {...formProps()} />)
-    expect(UploadForm.prototype.queueUploads).toHaveBeenCalledTimes(0)
+    expect(UploadForm.prototype._actualQueueUploads).toHaveBeenCalledTimes(0)
+    setFile(getByTestId)
+    expect(UploadForm.prototype._actualQueueUploads).toHaveBeenCalledTimes(1)
+  })
 
-    const fileInput = getByTestId('file-input')
-    const file = new File(['foo'], 'foo.txt', {type: 'text/plain'})
-    fireEvent.change(fileInput, {target: {files: [file]}})
+  it('does not enqueue uploads when files are available and autoUpload disabled', () => {
+    const {getByTestId} = render(<UploadForm {...formProps({autoUpload: false})} />)
+    expect(UploadForm.prototype._actualQueueUploads).toHaveBeenCalledTimes(0)
+    setFile(getByTestId)
+    expect(UploadForm.prototype._actualQueueUploads).toHaveBeenCalledTimes(0)
+  })
 
-    expect(UploadForm.prototype.queueUploads).toHaveBeenCalledTimes(1)
+  it('does not show file rename modal when folder changes and autoUpload disabled', () => {
+    const {getByTestId, queryByTestId, rerender} = render(
+      <UploadForm
+        {...formProps({
+          autoUpload: false,
+          ...folderWithFiles
+        })}
+      />
+    )
+    setFile(getByTestId)
+    rerender(<UploadForm {...formProps()} />)
+    expect(queryByTestId('rename-dialog')).toBeNull()
   })
 
   it('shows file rename modal when necessary', () => {
