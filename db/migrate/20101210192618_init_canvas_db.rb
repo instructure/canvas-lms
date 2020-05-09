@@ -361,6 +361,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "asset_user_accesses", ["user_id", "asset_code"], :name => "index_asset_user_accesses_on_user_id_and_asset_code"
     add_index :asset_user_accesses, [:context_id, :context_type, :user_id, :updated_at], name: 'index_asset_user_accesses_on_ci_ct_ui_ua'
 
+    create_table :assignment_configuration_tool_lookups do |t|
+      t.integer :assignment_id, limit: 8, null: false
+      t.integer :tool_id, limit: 8, null: false
+      t.string :tool_type, null: false
+    end
+
+    add_index :assignment_configuration_tool_lookups, [:tool_id, :tool_type, :assignment_id], unique: true, name: 'index_tool_lookup_on_tool_assignment_id'
+    add_index :assignment_configuration_tool_lookups, :assignment_id
+
     create_table "assignment_groups", :force => true do |t|
       t.string   "name"
       t.text     "rules"
@@ -471,7 +480,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "time_zone_edited"
       t.boolean  "turnitin_enabled"
       t.string   "allowed_extensions"
-      t.integer  "needs_grading_count", :default => 0
       t.text     "turnitin_settings"
       t.boolean  "muted", :default => false
       t.integer  "group_category_id", :limit => 8
@@ -1068,6 +1076,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "time_zone"
       t.string   "lti_context_id" 
       t.integer  "turnitin_id", :limit => 8, :unique => true
+      t.boolean  "show_announcements_on_home_page"
+      t.integer  "home_page_announcement_limit"
     end
 
     add_index "courses", ["account_id"], :name => "index_courses_on_account_id"
@@ -1949,6 +1959,93 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :lti_tool_settings, [:resource_link_id, :context_type, :context_id, :tool_proxy_id],name: 'index_lti_tool_settings_on_link_context_and_tool_proxy', unique: true
 
+    create_table :master_courses_child_content_tags do |t|
+      t.integer :child_subscription_id, limit: 8, null: false # mainly for bulk loading on import
+
+      t.string :content_type, null: false
+      t.integer :content_id, limit: 8, null: false
+
+      t.text :downstream_changes
+    end
+
+    add_index :master_courses_child_content_tags, [:content_type, :content_id], :unique => true,
+      :name => "index_child_content_tags_on_content"
+    add_index :master_courses_child_content_tags, :child_subscription_id, :name => "index_child_content_tags_on_subscription"
+
+    create_table :master_courses_child_subscriptions do |t|
+      t.integer :master_template_id, limit: 8, null: false
+      t.integer :child_course_id, limit: 8, null: false
+
+      t.string :workflow_state, null: false
+
+      # we can use this to keep track of which subscriptions are new
+      # vs. which ones have been getting regular updates and we can use a selective copy for
+      t.boolean :use_selective_copy, null: false, default: false
+
+      t.timestamps null: false
+    end
+
+    add_index :master_courses_child_subscriptions, :master_template_id
+    add_index :master_courses_child_subscriptions, [:master_template_id, :child_course_id],
+      :unique => true, :where => "workflow_state <> 'deleted'",
+      :name => "index_mc_child_subscriptions_on_template_id_and_course_id"
+
+    create_table :master_courses_master_content_tags do |t|
+      t.integer :master_template_id, limit: 8, null: false
+
+      # should we add a workflow state and make this soft-deletable? 
+      # maybe someday if we decide to use these to define the template content aets
+
+      t.string :content_type, null: false
+      t.integer :content_id, limit: 8, null: false
+
+      # when we export an object for a master migration we'll set this column on the tag
+      # when we update the content we'll erase this
+      # so now we'll know what's been updated since the last successful export
+      t.integer :current_migration_id, limit: 8
+      t.text :restrictions # we might not leave this at settings/content
+      t.string :migration_id
+    end
+
+    add_index :master_courses_master_content_tags, :master_template_id
+    add_index :master_courses_master_content_tags, [:master_template_id, :content_type, :content_id], :unique => true,
+      :name => "index_master_content_tags_on_template_id_and_content"
+    add_index :master_courses_master_content_tags, :migration_id, :unique => true, :name => "index_master_content_tags_on_migration_id"
+
+    create_table :master_courses_master_migrations do |t|
+      t.integer :master_template_id, limit: 8, null: false
+      t.integer :user_id, limit: 8 # exports use a bunch of terrible user-dependent stuff
+
+      # we can just use serialized columns here to store the rest of the data
+      # instead of a million rows
+      # since we won't really be needing any of it separately
+
+      t.text :export_results # we can store the initial export details here
+      t.text :import_results # and then the statuses of each migration on the child courses
+
+      t.datetime :exports_started_at
+      t.datetime :imports_queued_at
+
+      t.string :workflow_state, null: false
+      t.timestamps null: false
+    end
+
+    add_index :master_courses_master_migrations, :master_template_id
+
+    create_table :master_courses_master_templates do |t|
+      t.integer :course_id, limit: 8, null: false
+      t.boolean :full_course, null: false, default: true # we may not ever get around to allowing selective collection sets out but just in case
+      t.string :workflow_state
+      t.timestamps null: false
+      # due to paranoia about race conditions around trying to make multiple migrations at once
+      # we'll lock the template before we create the migration
+      # and mark this column with the new migration unless there's already a currently running one, in which case we'll abort
+      t.integer :active_migration_id, limit: 8
+      t.text :default_restrictions
+    end
+
+    add_index :master_courses_master_templates, :course_id
+
     create_table "media_objects", :force => true do |t|
       t.integer  "user_id", :limit => 8
       t.integer  "context_id", :limit => 8
@@ -2132,14 +2229,18 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table :originality_reports do |t|
       t.integer :attachment_id, limit: 8, null: false
-      t.decimal :originality_score, null:false
+      t.decimal :originality_score, null: false
       t.integer :originality_report_attachment_id, limit: 8
       t.text :originality_report_url
       t.text :originality_report_lti_url
       t.timestamps null: false
+      t.integer :submission_id, limit: 8, null: false
+      t.string :workflow_state, null: false, default: 'pending'
     end
     add_index :originality_reports, :attachment_id, unique: true
     add_index :originality_reports, :originality_report_attachment_id, unique: true
+    add_index :originality_reports, :submission_id
+    add_index :originality_reports, [:workflow_state]
 
     create_table "page_comments", :force => true do |t|
       t.text     "message"
@@ -2814,6 +2915,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :submissions, :group_id, where: "group_id IS NOT NULL"
     add_index :submissions, :quiz_submission_id, where: "quiz_submission_id IS NOT NULL"
     add_index :submissions, [:assignment_id, :user_id]
+    add_index :submissions, :assignment_id, where: <<-SQL
+      submission_type IS NOT NULL
+      AND (workflow_state = 'pending_review'
+        OR (workflow_state = 'submitted'
+          AND (score IS NULL OR NOT grade_matches_current_submission)
+        )
+      )
+    SQL
 
     create_table :switchman_shards do |t|
       t.string :name
@@ -3238,6 +3347,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :assessment_requests, :submissions, column: :asset_id
     add_foreign_key :assessment_requests, :users
     add_foreign_key :assessment_requests, :users, column: :assessor_id
+    add_foreign_key :assignment_configuration_tool_lookups, :assignments
     add_foreign_key :assignment_groups, :cloned_items
     add_foreign_key :assignment_override_students, :assignment_overrides
     add_foreign_key :assignment_override_students, :assignments
@@ -3384,6 +3494,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :lti_resource_placements, :lti_message_handlers, column: :message_handler_id
     add_foreign_key :lti_tool_proxies, :lti_product_families, column: :product_family_id
     add_foreign_key :lti_tool_proxy_bindings, :lti_tool_proxies, column: :tool_proxy_id
+    add_foreign_key :master_courses_child_content_tags, :master_courses_child_subscriptions, column: "child_subscription_id"
+    add_foreign_key :master_courses_child_subscriptions, :master_courses_master_templates, column: "master_template_id"
+    # we may have to drop this foreign key at some point for cross-shard subscriptions
+    add_foreign_key :master_courses_child_subscriptions, :courses, column: "child_course_id"
+    add_foreign_key :master_courses_master_content_tags, :master_courses_master_migrations, column: "current_migration_id"
+    add_foreign_key :master_courses_master_content_tags, :master_courses_master_templates, column: "master_template_id"
+    add_foreign_key :master_courses_master_migrations, :master_courses_master_templates, column: "master_template_id"
+    add_foreign_key :master_courses_master_templates, :courses
+    add_foreign_key :master_courses_master_templates, :master_courses_master_migrations, column: "active_migration_id"
     add_foreign_key :media_objects, :accounts, :column => :root_account_id
     add_foreign_key :media_objects, :users
     add_foreign_key :migration_issues, :content_migrations
@@ -3400,6 +3519,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :one_time_passwords, :users
     add_foreign_key :originality_reports, :attachments
     add_foreign_key :originality_reports, :attachments, column: :originality_report_attachment_id
+    add_foreign_key :originality_reports, :submissions
     add_foreign_key :page_comments, :users
     add_foreign_key :page_views, :users
     add_foreign_key :page_views, :users, column: :real_user_id
