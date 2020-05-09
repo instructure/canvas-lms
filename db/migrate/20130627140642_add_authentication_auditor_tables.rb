@@ -68,23 +68,27 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
 
     cassandra.execute %{
       CREATE TABLE grade_changes (
-        id                    text PRIMARY KEY,
-        created_at            timestamp,
-        request_id            text,
-        account_id            bigint,
-        submission_id         bigint,
-        version_number        int,
-        grader_id             bigint,
-        student_id            bigint,
-        assignment_id         bigint,
-        context_id            bigint,
-        context_type          text,
-        event_type            text,
-        grade_before          text,
-        grade_after           text,
-        graded_anonymously    boolean,
-        excused_before        boolean,
-        excused_after         boolean
+        id                     text PRIMARY KEY,
+        created_at             timestamp,
+        request_id             text,
+        account_id             bigint,
+        submission_id          bigint,
+        version_number         int,
+        grader_id              bigint,
+        student_id             bigint,
+        assignment_id          bigint,
+        context_id             bigint,
+        context_type           text,
+        event_type             text,
+        grade_before           text,
+        grade_after            text,
+        graded_anonymously     boolean,
+        excused_before         boolean,
+        excused_after          boolean,
+        score_before           double,
+        score_after            double,
+        points_possible_before double,
+        points_possible_after  double
       ) #{compression_params}}
 
     indexes.each do |index_name|
