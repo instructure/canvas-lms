@@ -139,6 +139,18 @@ module DataFixup::Auditors::Migrate
       expect(output).to eq(['test'])
     end
 
+    describe "GradeChangeWorker" do
+      it "pulls courses for an account only if they have enrollments" do
+        course1 = course_model(account_id: Account.default.id)
+        course2 = course_model(account_id: Account.default.id)
+        enrollment1 = student_in_course(course: course1)
+        worker = GradeChangeWorker.new(Account.default.id, Time.zone.today)
+        cids = worker.migrateable_courses.map(&:id)
+        expect(cids.include?(course1.id)).to eq(true)
+        expect(cids.include?(course2.id)).to eq(false)
+      end
+    end
+
     describe "record keeping" do
       let(:date){ Time.zone.today }
 
@@ -215,6 +227,20 @@ module DataFixup::Auditors::Migrate
         pk = BackfillEngine.parallelism_key("grade_changes")
         # because default shard has a nil job id
         expect(pk).to eq("auditors_migration_grade_changes/#{Shard.current.database_server.id}_num_strands")
+      end
+
+      it "wont enqueue complete jobs" do
+        start_date = Time.zone.today
+        end_date = start_date - 1.year
+        engine = BackfillEngine.new(start_date, end_date)
+        account = Account.default
+        AuthenticationWorker.new(account.id, start_date).create_cell!.update_attribute(:completed, true)
+        CourseWorker.new(account.id, start_date).create_cell!.update_attribute(:completed, true)
+        GradeChangeWorker.new(account.id, start_date).create_cell!
+        engine.enqueue_one_day_for_account(account, start_date)
+        # only the grade change worker should be enqueued because it's
+        # not marked complete
+        expect(Delayed::Job.count).to eq(1)
       end
 
       context "when enqueued" do

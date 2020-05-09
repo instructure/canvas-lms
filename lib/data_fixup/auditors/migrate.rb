@@ -120,6 +120,10 @@ module DataFixup::Auditors
         end
       end
 
+      def already_complete?
+        migration_cell&.completed
+      end
+
       def perform
         extend_cassandra_stream_timeout!
         cell = migration_cell
@@ -260,20 +264,22 @@ module DataFixup::Auditors
       end
 
       def migrateable_courses
-        account.courses.where("created_at <= ?", @date + 2.days)
+        account.courses.where("EXISTS (?)",
+          Enrollment.where("course_id=courses.id").where(type: ['StudentEnrollment', 'StudentViewEnrollment']))
+          .where("courses.created_at <= ?", @date + 2.days)
       end
 
       def perform_migration
-        migrateable_courses.find_in_batches do |course_batch|
-          course_batch.each do |course|
+        migrateable_courses.find_in_batches do |courses|
+          courses.each do |course|
             migrate_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
           end
         end
       end
 
       def perform_audit
-        migrateable_courses.find_in_batches do |course_batch|
-          course_batch.each do |course|
+        migrateable_courses.find_in_batches do |courses|
+          courses.each do |course|
             audit_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
           end
         end
@@ -573,21 +579,29 @@ module DataFixup::Auditors
         self.class.cluster_name
       end
 
-      def enqueue_one_day(current_date)
-        slim_accounts.each do |account|
-          if account.root_account?
-            # auth records are stored at the root account level,
-            # we only need to enqueue these jobs for root accounts
-            auth_worker = AuthenticationWorker.new(account.id, current_date)
+      def enqueue_one_day_for_account(account, current_date)
+        if account.root_account?
+          # auth records are stored at the root account level,
+          # we only need to enqueue these jobs for root accounts
+          auth_worker = AuthenticationWorker.new(account.id, current_date)
+          unless auth_worker.already_complete?
             Delayed::Job.enqueue(auth_worker, n_strand: ["auditors_migration_authentications", cluster_name], priority: Delayed::LOW_PRIORITY)
           end
+        end
 
-          course_worker = CourseWorker.new(account.id, current_date)
-          grade_change_worker = GradeChangeWorker.new(account.id, current_date)
-          # I think this makes the setting for specifying the n_strand max concurrency
-          # apply to the first thing, but splits the constraint by uniqueness including everything in the array?
+        course_worker = CourseWorker.new(account.id, current_date)
+        unless course_worker.already_complete?
           Delayed::Job.enqueue(course_worker, n_strand: ["auditors_migration_courses", cluster_name], priority: Delayed::LOW_PRIORITY)
+        end
+        grade_change_worker = GradeChangeWorker.new(account.id, current_date)
+        unless grade_change_worker.already_complete?
           Delayed::Job.enqueue(grade_change_worker, n_strand: ["auditors_migration_grade_changes", cluster_name], priority: Delayed::LOW_PRIORITY)
+        end
+      end
+
+      def enqueue_one_day(current_date)
+        slim_accounts.each do |account|
+          enqueue_one_day_for_account(account, current_date)
         end
       end
 
