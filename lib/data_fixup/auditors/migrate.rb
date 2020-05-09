@@ -65,7 +65,7 @@ module DataFixup::Auditors
         next_page = 1
         until next_page.nil?
           page_args = { page: next_page, per_page: batch_size }
-          auditor_recs = collection.paginate(page_args)
+          auditor_recs = get_cassandra_records_resiliantly(collection, page_args)
           ar_attributes_list = auditor_recs.map do |rec|
             auditor_ar_type.ar_attributes_from_event_stream(rec)
           end
@@ -86,7 +86,7 @@ module DataFixup::Auditors
         next_page = 1
         until next_page.nil?
           page_args = { page: next_page, per_page: batch_size }
-          auditor_recs = collection.paginate(page_args)
+          auditor_recs = get_cassandra_records_resiliantly(collection, page_args)
           uuids = auditor_recs.map(&:id)
           existing_uuids = auditor_ar_type.where(uuid: uuids).pluck(:uuid)
           @audit_failure_uuids += (uuids - existing_uuids)
@@ -494,7 +494,9 @@ module DataFixup::Auditors
             'failed': failed_jobs.count,
             'currently_running': running_jobs.count,
             'completed_cells': completed_cells.count,
-            'dates_being_worked': working_dates(running_jobs),
+            # it does not work to check these with jobs from other shards
+            # because deserializing them fails to find accounts
+            'dates_being_worked': working_dates(running_jobs.where(shard_id: Shard.current.id)),
             'config': {
               'threshold': "#{queue_threshold} jobs",
               'interval': "#{backfill_interval} seconds",
