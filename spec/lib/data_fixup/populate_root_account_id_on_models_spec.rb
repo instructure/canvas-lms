@@ -31,6 +31,31 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(@cm.reload.root_account_id).to eq @course.root_account_id
     end
+
+    it 'should populate the root_account_id on DeveloperKey' do
+      dk = DeveloperKey.create!(account: @course.account)
+      dk.update_columns(root_account_id: nil)
+      expect(dk.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(dk.reload.root_account_id).to eq @course.root_account_id
+
+      account = account_model(root_account: account_model)
+      dk = DeveloperKey.create!(account: account)
+      dk.update_columns(root_account_id: nil)
+      expect(dk.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(dk.reload.root_account_id).to eq account.root_account_id
+    end
+
+    it 'should populate the root_account_id on DeveloperKeyAccountBinding' do
+      account_model
+      dk = DeveloperKey.create!(account: @course.account)
+      dkab = DeveloperKeyAccountBinding.create!(account: @account, developer_key: dk)
+      dkab.update_columns(root_account_id: nil)
+      expect(dkab.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(dkab.reload.root_account_id).to eq @account.id
+    end
   end
 
   describe '#run' do

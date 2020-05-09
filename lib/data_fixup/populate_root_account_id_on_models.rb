@@ -52,7 +52,10 @@ module DataFixup::PopulateRootAccountIdOnModels
   # NOTE: This code will NOT work with any models that need to have multiple root account ids
   # or any models that do not have a root_account_id column.
   def self.migration_tables
-    {ContextModule => :context}.freeze
+    {
+      ContextModule => :context, DeveloperKey => {account: [:root_account_id, :id]},
+      DeveloperKeyAccountBinding => {account: [:root_account_id, :id]}
+    }.freeze
   end
 
   # tables that have been filled for a while already
