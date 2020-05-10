@@ -139,6 +139,24 @@ module DataFixup::Auditors::Migrate
       expect(output).to eq(['test'])
     end
 
+    describe "worker cell state" do
+      describe "currently_queueable?" do
+        it 'is true for any non-queued state' do
+          worker = GradeChangeWorker.new(Account.default.id, Time.zone.today)
+          expect(worker.migration_cell).to be_nil
+          expect(worker.currently_queueable?).to be(true)
+          worker.create_cell!
+          expect(worker.migration_cell.failed).to eq(false)
+          expect(worker.migration_cell.completed).to eq(false)
+          expect(worker.currently_queueable?).to eq(false)
+          worker.migration_cell.update_attribute(:failed, true)
+          expect(worker.currently_queueable?).to eq(true)
+          worker.migration_cell.update_attribute(:completed, true)
+          expect(worker.currently_queueable?).to eq(false)
+        end
+      end
+    end
+
     describe "GradeChangeWorker" do
       it "pulls courses for an account only if they have enrollments" do
         course1 = course_model(account_id: Account.default.id)
@@ -188,7 +206,7 @@ module DataFixup::Auditors::Migrate
         worker.perform
         expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(10)
         # kill the cell so we can run again
-        worker.migration_cell.destroy
+        worker.reset_cell!
         3.times { ::Auditors::Authentication.record(@pseudonym, 'login') }
         # worker reconciles which ones are already in the table and which are not
         worker.perform
@@ -236,7 +254,7 @@ module DataFixup::Auditors::Migrate
         account = Account.default
         AuthenticationWorker.new(account.id, start_date).create_cell!.update_attribute(:completed, true)
         CourseWorker.new(account.id, start_date).create_cell!.update_attribute(:completed, true)
-        GradeChangeWorker.new(account.id, start_date).create_cell!
+        GradeChangeWorker.new(account.id, start_date)
         engine.enqueue_one_day_for_account(account, start_date)
         # only the grade change worker should be enqueued because it's
         # not marked complete
