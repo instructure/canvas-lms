@@ -205,6 +205,15 @@ class Course < ActiveRecord::Base
   has_one :default_post_policy, -> { where(assignment_id: nil) }, class_name: 'PostPolicy', inverse_of: :course
 
   has_one :course_score_statistic, dependent: :destroy
+  has_many :auditor_course_records,
+    class_name: "Auditors::ActiveRecord::CourseRecord",
+    dependent: :destroy,
+    inverse_of: :course
+  has_many :auditor_grade_change_records,
+    as: :context,
+    inverse_of: :course,
+    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
+    dependent: :destroy
 
   prepend Profile::Association
 

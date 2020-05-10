@@ -24,6 +24,10 @@ class Pseudonym < ActiveRecord::Base
   belongs_to :user
   has_many :communication_channels, -> { order(:position) }
   has_many :sis_enrollments, class_name: 'Enrollment', inverse_of: :sis_pseudonym
+  has_many :auditor_authentication_records,
+    class_name: "Auditors::ActiveRecord::AuthenticationRecord",
+    dependent: :destroy,
+    inverse_of: :pseudonym
   belongs_to :communication_channel
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
   belongs_to :authentication_provider
