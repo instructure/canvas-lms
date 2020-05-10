@@ -23,6 +23,14 @@ module Auditors::ActiveRecord
     self.partitioning_field = 'created_at'
     self.table_name = 'auditor_grade_change_records'
 
+    belongs_to :account, inverse_of: :auditor_grade_change_records
+    belongs_to :root_account, class_name: 'Account', inverse_of: :auditor_root_grade_change_records, foreign_key: 'root_account_id'
+    belongs_to :student, class_name: 'User', inverse_of: :auditor_student_grade_change_records, foreign_key: 'student_id'
+    belongs_to :grader, class_name: 'User', inverse_of: :auditor_grader_grade_change_records, foreign_key: 'grader_id'
+    belongs_to :submission, inverse_of: :auditor_grade_change_records
+    belongs_to :course, -> { where(context_type: 'Course') }, class_name: "::Course", foreign_key: 'context_id', inverse_of: :auditor_grade_change_records
+    belongs_to :assignment, inverse_of: :auditor_grade_change_records
+
     class << self
       include Auditors::ActiveRecord::Model
 
