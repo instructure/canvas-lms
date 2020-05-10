@@ -112,6 +112,11 @@ class Submission < ActiveRecord::Base
 
   has_many :canvadocs_submissions
 
+  has_many :auditor_grade_change_records,
+    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
+    dependent: :destroy,
+    inverse_of: :submission
+
   serialize :turnitin_data, Hash
 
   validates_presence_of :assignment_id, :user_id
