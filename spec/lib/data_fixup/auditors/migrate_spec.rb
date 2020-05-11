@@ -201,6 +201,13 @@ module DataFixup::Auditors::Migrate
         expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(0)
       end
 
+      it "recovers from multiple creates" do
+        worker = AuthenticationWorker.new(account.id, date)
+        cell1 = worker.create_cell!
+        cell2 = worker.create_cell!
+        expect(cell1.id).to eq(cell2.id)
+      end
+
       it "reconciles partial successes" do
         worker = AuthenticationWorker.new(account.id, date)
         worker.perform
