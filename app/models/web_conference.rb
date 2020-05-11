@@ -68,7 +68,11 @@ class WebConference < ActiveRecord::Base
   end
 
   def user_settings=(new_settings)
-    @user_settings = new_settings.symbolize_keys
+    new_settings = new_settings.symbolize_keys
+    if new_settings != user_settings
+      settings_will_change!
+      @user_settings = new_settings
+    end
   end
 
   def user_settings

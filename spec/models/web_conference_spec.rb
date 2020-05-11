@@ -68,6 +68,22 @@ describe WebConference do
       expect(conference.user_settings).not_to have_key(:not)
     end
 
+    it "should not mark object dirty if settings are unchanged" do
+      email = "email@email.com"
+      allow(@user).to receive(:email).and_return(email)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: {record: true})
+      user_settings = conference.user_settings.dup
+      conference.user_settings = user_settings
+      expect(conference).not_to be_changed
+    end
+
+    it "should mark object dirty if  settings are changed" do
+      email = "email@email.com"
+      allow(@user).to receive(:email).and_return(email)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: {record: true})
+      conference.user_settings = {record: false}
+      expect(conference).to be_changed
+    end
   end
 
   context "starting and ending" do
