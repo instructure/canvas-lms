@@ -176,10 +176,14 @@ en-GB:
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "A calculation value is not used with this calculation method"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "A Canvas security token was just generated for your account. If you requested a user token, no further action is necessary. If you did not request a token or would like to manage your canvas access tokens, you can do so here:"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "A file named %{itemName} already exists in this folder."
+  a_file_named_name_already_exists_do_you_want_to_re_6536980: "A file named \"%{name}\" already exists. Do you want to replace the existing file?"
+  a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "A file named \"%{name}\" already exists in this folder. Do you want to replace the existing file?"
   a_front_page_is_required_fd57b80: "A front page is required"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "A full-size logo that appears in the right sidebar on the Canvas dashboard. Ideal size is 360 x 140 pixels. Accepted formats: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "A handy key/value dump of a host of interesting environment information for reporting user"
   a_json_url_is_required_please_supply_one_ed03101c: "A json url is required, please supply one."
+  a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "A locked file named \"%{name}\" already exists in this folder. Please enter a new name."
+  a_locked_file_named_name_already_exists_please_ent_3b2e65a: "A locked file named \"%{name}\" already exists. Please enter a new name."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "A locked item named \"%{name}\" already exists in this location. Please enter a new name."
   a_message_is_required_129e1814: "A message is required"
   a_name_for_this_set_is_required_222bad23: "A name for this set is required"
@@ -1871,6 +1875,10 @@ en-GB:
   admins_3e1dce15: Admins
   admins_add_remove_26811ce5: "Admins - add / remove"
   advanced_36b35b8: Advanced
+  affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Affects viewing the Conclude Course and Permanently Delete this Course buttons. The ‘Permanently delete this course’ button only appears for manually created courses."
+  affects_viewing_the_conclude_course_and_permanentl_d943656e: "Affects viewing the Conclude Course and Permanently Delete this Course buttons. The Permanently Delete this Course button only appears for manually created courses.\n\
+      \x20       For course-level users, deleting a course is part of the Course State - manage permission. However, for an account-level user, deleting a course requires this permission and Courses - add / edit / delete. "
+  affects_viewing_the_delete_this_course_and_conclud_1ac257e: "Affects viewing the Delete this Course and Conclude Course buttons."
   affects_viewing_the_publish_course_and_conclude_co_6589f97e: "Affects viewing the Publish Course and Conclude Course buttons."
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Affects viewing the ‘Publish course’, ‘Conclude course’, and ‘Permanently delete this course’ buttons.
@@ -2208,6 +2216,7 @@ en-GB:
   allows_user_to_edit_grading_schemes_98c35117: "Allows user to edit grading schemes."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Allows user to edit the course SIS ID."
   allows_user_to_edit_the_course_syllabus_a28ff262: "Allows user to edit the course syllabus."
+  allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Allows user to export the Gradebook to a comma separated values (CSV) file. Allows user to access the Learning Mastery Gradebook (if enabled)."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Allows user to filter for blueprint courses as the account level. Allows user to add associated courses."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       Allows user to filter for blueprint courses as the account level.
@@ -2285,6 +2294,7 @@ en-GB:
   allows_user_to_view_account_analytics_98fbc6ad: "Allows user to view account analytics."
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Allows user to view all course groups, not just those they are enrolled in, in the ‘Collaborate with’ window."
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Allows user to view all student assignment submissions and add comments."
+  allows_user_to_view_analytics_link_in_the_user_set_56867782: "Allows user to view analytics link in the user settings menu."
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Allows user to view and add users in a collaboration."
   allows_user_to_view_and_configure_reports_in_accou_413e4e41: |-
       Allows user to view and configure reports in Account settings.
@@ -4912,6 +4922,7 @@ en-GB:
   clear_2084585f: Clear
   clear_selected_file_82388e50: "Clear selected file"
   clear_user_cache_ef079f7f: "Clear User Cache"
+  click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Click \"Cancel\" if you donʼt want the code displayed."
   click_for_more_details_on_this_outcome_8c018d2f: "click for more details on this outcome"
   click_here_for_an_account_9536cb36: "Click Here for an Account"
   click_here_it_s_free_eeccb9cb: "Click Here, It's Free!"
@@ -4929,6 +4940,7 @@ en-GB:
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Click on the account navigation button to access notification preferences."
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Click on the admin navigation button to access account settings."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Click on the courses navigation button to access your courses."
+  click_proceed_to_continue_b6eeffc6: "Click \"Proceed\" to continue."
   click_the_button_above_to_add_content_4c7024a: "Click the button above to add content"
   click_to_add_a_name_6cf551b0: "Click to add a name"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Click to change profile picture for %{display_name}"
@@ -5385,6 +5397,7 @@ en-GB:
   confirm_dialog_component: 
     ok: Ok
   confirm_edit_outcome_a9746c99: "Confirm edit outcome"
+  confirm_qr_code_display_49664fa3: "Confirm QR code display"
   confirm_removal_a9bb889: "Confirm removal"
   confirm_reservation_removal_e6350e7c: "Confirm reservation removal"
   confirm_unfavorite_course_fa01966d: "Confirm unfavourite course"
@@ -7955,6 +7968,7 @@ en-GB:
       Determines visibility and management of outcomes tab in account navigation.
       Allows user to create, import, edit, and delete outcomes and outcome groups at the account and course levels.
   determines_visibility_and_management_of_outcomes_t_8a40bf86: "Determines visibility and management of outcomes tab in account navigation. Allows user to create, import, edit, and delete outcomes and outcome groups at the account and course levels."
+  determines_visibility_and_management_of_rubrics_li_83a26d8e: "Determines visibility and management of Rubrics link in Account Navigation. Allows user to view the Rubrics link in Course Navigation. Allows user to create, edit, and delete course rubrics."
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       Determines visibility and management of rubrics tab in the account navigation.
       Allows user to manage rubrics.
@@ -7971,9 +7985,11 @@ en-GB:
       Allows user to view the previous SIS import dates, errors, and imported items.
   determines_visibility_of_the_course_activity_optio_2446c4b3: "Determines visibility of the course activity option in the admin tools logging tab. Allows user to view course activity information for the account."
   determines_visibility_of_the_grade_change_activity_6c23036b: "Determines visibility of the grade change activity option in the Admin tools logging tab."
+  determines_whether_a_publish_button_is_included_in_f7ad9b56: "Determines whether a Publish button is included in a course card for an unpublished course (Card View Dashboard)."
   determines_whether_a_publish_course_option_is_incl_9bf770e9: "Determines whether a publish course option is included on the Course homepage."
   determines_whether_a_publish_course_option_is_incl_ac5eed8f: "Determines whether a Publish course option is included in the Course setup checklist and in the course homepage."
   determines_whether_the_course_setup_checklist_opti_fd5a8f70: "Determines whether the course setup checklist option is included in the course homepage."
+  determines_whether_the_publish_course_and_unpublis_432a4bbc: "Determines whether the Publish Course and Unpublish Course buttons display in the Course Home Page."
   developer_key: 
     api_key: "Key: *%{api_key}*"
     created: "Created:"
@@ -8550,6 +8566,7 @@ en-GB:
   drag_and_drop_your_image_here_or_7fba7c14: "Drag and drop your image here or "
   drag_to_rearrange_sections_637efee3: "Drag to rearrange sections"
   drag_up_or_down_to_reorder_382126ff: "Drag up or down to reorder"
+  drop_files_here_to_add_to_module_236304f5: "Drop files here to add to module"
   drop_files_here_to_upload_ce0f50f9: "Drop files here to upload"
   drop_image_62a2a071: "Drop image"
   dropdown_changed_state_to_expanded_517689c2: "dropdown changed state to %{expanded}."
@@ -11757,6 +11774,7 @@ en-GB:
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from the course navigation."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "If both grades - edit and grades - view all grades are disabled, Gradebook will be hidden from course navigation."
   if_commons_is_installed_allows_importing_favorited_eff368f: "If Commons is installed, allows importing favourited content items from within Canvas."
+  if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "If Courses - add / edit / delete and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "If disabled, the outcomes page becomes read-only and hides the ‘Manage rubrics’ button. User can still access individual assignment rubrics through Assignments."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "If disabled, user can still view and download files into a zip file."
   if_disabled_user_will_still_have_access_to_course__541e130: "If disabled, user will still have access to course settings. User cannot manage individual course content without the appropriate permission for that content item. If course visibility is limited to users enrolled in the course, this permission allows a user to view course content without being enrolled in the course."
@@ -12200,6 +12218,7 @@ en-GB:
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Invalid timestamp - timestamp not parseable"
   invalid_url_in_xml: "Invalid url in xml. Ampersands must be escaped."
   invalid_username_or_password_b60aa240: "Invalid username or password"
+  invalid_username_or_password_trouble_logging_in_ch_7699399c: "Invalid username or password. Trouble logging in? *Check out our Login FAQs*."
   invalid_utf_8_13c76a6: "Invalid UTF-8"
   invalid_value_12ca12c2: "Invalid value"
   invalid_value_for_name_i_4a7c601a: "Invalid value for %{name}: \"%{i}\""
@@ -15060,6 +15079,7 @@ en-GB:
   module_90d9fd32: Module
   module_completed_50c50762: "Module completed"
   module_content_import_enhancements_c00b0ea2: "Module Content Import Enhancements"
+  module_file_upload_enhancements_eecd4d37: "Module File Upload Enhancements"
   module_filter_63b17d11: "Module Filter"
   module_first_to_last_6921f3ec: "Module - First to Last"
   module_in_progress_fa600662: "Module in progress"
@@ -15640,6 +15660,7 @@ en-GB:
   no_submission_for_assignmenttitle_243bd1f4: "No submission for %{assignmentTitle}"
   no_submissions_164cea23: "No submissions"
   no_submissions_have_been_uploaded_2fb02710: "No Submissions Have Been Uploaded"
+  no_submissions_to_zip_please_try_again_after_stude_7e0f478: "No submissions to zip. Please try again after student submissions."
   no_terms_eab5ee7b: "No terms"
   no_tls_618add1a: "No TLS"
   no_unassigned_terms_deb7b76b: "No unassigned terms"
@@ -16691,6 +16712,7 @@ en-GB:
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Please let them know which page you were viewing and link you clicked on."
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Please let them know which page you were viewing and the link you clicked on."
   please_log_in_to_view_this_content_eec6cd0: "Please Log in to view this content"
+  please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Please make sure no one is able to capture the image on your screen from your surroundings or from a screen sharing service."
   please_provide_a_field_e5a7d0b3: "Please provide a %{field}"
   please_select_a_group_set_for_this_assignment_e1da63d3: "Please select a group set for this assignment"
   please_select_a_user_role_for_this_link_9fb4e655: "Please select a user role for this link."
@@ -16737,6 +16759,13 @@ en-GB:
     big_blue_button_fallback: 
       description: "BigBlueButton previous settings to preserve recordings during migration"
       name: "BigBlueButton Fallback For Migration"
+    big_blue_button_fallback_settings: 
+      description: "When you have your BigBlueButton Plugin configured to use fallback settings, these are the settings it uses. The fallback is only used to look for recordings of conferences that were not created with the configuration for your BigBlueButton Plugin."
+      domain_description: "**hostname** or **IP address** of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)"
+      labels: 
+        domain: Domain
+        secret: Secret
+      secret_description: "This is the %{parameter_name} parameter that can be found in the %{filename} config file."
     big_blue_button_settings: 
       description: "You will need access to a [BigBlueButton](%{url}) instance."
       domain_description: "**hostname** or **ip address** of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)"
@@ -16746,6 +16775,7 @@ en-GB:
         recording_enabled: "Allow conferences to be recorded."
         replace_with_alternatives: "Disable BigBlueButton conferences; show a list of alternatives instead"
         secret: Secret
+        use_fallback: "Use BigBlueButton Fallback Plugin settings to look for recordings for conferences that weren't hosted by the currently configured BBB instance."
       secret_description: "This is the %{parameter_name} parameter that can be found in the %{filename} config file."
     buttons: 
       saving: Saving...
@@ -17791,6 +17821,7 @@ en-GB:
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Q: What goes black, white, black, white?  A: A panda rolling down a hill."
   qatar_974_7e9684ca: "Qatar (+974)"
   qatar_d52a8d27: Qatar
+  qr_code_display_was_canceled_96234bf2: "QR code display was cancelled"
   qr_code_image_2b3a89b5: "QR Code Image"
   qr_for_mobile_login_1b1560ce: "QR for Mobile Login"
   qti_display: QTI
@@ -21239,6 +21270,7 @@ en-GB:
   shared_brand_configs_e5d319d7: "Shared brand configs"
   shared_content_803ac37b: "Shared Content"
   shared_secret_892c88f2: "Shared secret"
+  sharing_a_qr_code_can_give_others_immediate_access_79575158: "Sharing a QR code can give others immediate access to your account through the %{canvas} mobile applications."
   she_her_3f459cc2: She/Her
   she_her_c8b5e3be: she/her
   short_name_42f454a1: "Short name"
@@ -23068,6 +23100,7 @@ en-GB:
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "To cross-list a section, Course sections - add / edit / delete must also be enabled. To edit the course SIS ID, SIS Data - manage must also be enabled. To allow an account-level user to delete a course, Course state - manage must also be enabled."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "To cross-list a section, Course sections - add / edit / delete ​must also be enabled. To edit the course SIS ID, SIS Data - manage​ must also be enabled. To allow an account-level user to delete a course, Course state - manage​ must also be enabled."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "To cross-list sections, Course - add / edit / delete must also be enabled."
+  to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "To cross-list sections, Courses - add / edit / delete must also be enabled."
   to_date_can_t_come_before_from_date_cf9e18aa: "\"To date\" can't come before \"From date\""
   to_date_cannot_come_before_from_date_3eeb2633: "To date cannot come before from date"
   to_differentiate_assignments_to_individual_student_6cc40fde: "To differentiate assignments to individual students, Users - view list ​must also be enabled."
@@ -23095,6 +23128,7 @@ en-GB:
       To edit a teacher, TA, or course designer’s section, Users - add / remove teachers, course designers, or TAs from courses to the course​ and Conversations - send messages to individual course members must also be enabled.
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "To edit Blueprint course settings in Course Settings, Blueprint Courses - add / edit / associate / delete​ - must also be enabled. To add an associated course, Blueprint Courses - add / edit / associate / delete - and Courses - view list must also be enabled. To edit lock settings on any blueprint object, this permission must be enabled. To edit lock settings on files, Course files - add / edit / delete must also be enabled. To edit lock settings on quizzes, Assignments and Quizzes - add / edit / delete must also be enabled."
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "To edit blueprint lock settings from the Assignments index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page. To edit blueprint lock settings on an individual quiz, or on the Quizzes index page, Courses - add / edit / delete must also be enabled."
+  to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "To edit blueprint lock settings from the Discussions index page, Courses - add / edit / delete and Discussions - moderate must also be enabled. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "To edit blueprint lock settings on the Discussions index page, Courses - add / edit / delete and Discussions - view must also be enabled. If this permission is not enabled, and Courses - add / edit / delete and Discussions - view is enabled, blueprint lock settings can be edited on individual discussions."
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "To edit blueprint lock settings on the Pages index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings can be edited on individual pages."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "To edit course grading schemes, Courses - add / edit / delete must also be enabled."
@@ -23116,6 +23150,7 @@ en-GB:
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "To generate login/logout activity in admin tools, Users - manage login details​ or Statistics - view must also be enabled.  To generate grade change logs in admin tools, grades - view change logs must also be enabled."
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "To import assignments and quizzes using the Course import tool, Course content - add / edit / delete must be enabled."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "To import files using the Course import tool, Course content - add / edit / delete must also be enabled."
+  to_import_learning_outcomes_learning_outcomes_impo_5abbd2fb: "To import learning outcomes, Learning Outcomes - import must also be enabled."
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "To import SIS data, SIS Data - import must also be enabled."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "To import SIS data, SIS Data - import​ must also be enabled."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "To link the course observer *%{name}* to a student, start typing the student's name below to find them, then click Update."
@@ -23248,6 +23283,8 @@ en-GB:
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "To view student analytics, Users - view list and Analytics - view must also be enabled."
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "To view student analytics, Users - view list and Grades - view all grades​ must also be enabled."
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "To view the account People page, Users - view list must be enabled. If this permission is disabled, and Users - view login IDs is enabled, users will still see email addresses used as login IDs."
+  to_view_the_gradebook_course_content_view_must_als_676f3e8: "To view the Gradebook, Course Content - view must also be enabled. If both grades - edit and grades - view all grades are disabled, Gradebook will be hidden from course navigation."
+  to_view_the_gradebook_grades_view_all_grades_must__7ead435: "To view the Gradebook, Grades - view all grades must also be enabled."
   to_view_the_list_of_users_in_an_account_users_view_401b8462: "To view the list of users in an account, Users - view list must be enabled."
   to_view_the_list_of_users_in_an_account_users_view_630d77a0: "To view the list of users in an account, Users - view must also be enabled."
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "To view the list of users in an account, Users - view list must be enabled."
@@ -23407,6 +23444,7 @@ en-GB:
   unable_to_remove_app_4293cb53: "Unable to remove app"
   unable_to_save_new_discussion_topic_99239f3f: "unable to save new discussion topic"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Unable to set default grade because this assignment is due in a closed grading period for at least one student"
+  unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Unable to set up drag and drop for modules"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Unable to transmit file to the storage service. The service may be down or you may need to re-login to Canvas."
   unarchive_selected_e0c4bd3d: "Unarchive Selected"
   unassigned_permissions_6a38ca95: "Unassigned permissions"
@@ -24159,6 +24197,7 @@ en-GB:
       Sub-account admins are not able to view SIS information unless they are also granted an instructor role in a course. Sub-account admins cannot view SIS information without the course association, as the instructor role has permission to read SIS data at the account level.
   users_and_terms_are_located_at_the_account_so_the__6896b895: "Users and terms are located at the account, so the SIS endpoint always confirms the user’s permissions according to account. Sub-accounts only have ownership of courses and sections; they do not own user data. Sub-account admins are not able to view SIS information unless they are also granted an instructor role in a course. Sub-account admins cannot view SIS information without the course association, as the instructor role has permission to read SIS data at the account level."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "Users can access and create (but not edit) individual assignment rubrics through assignments when course content - view and Assignments and Quizzes - add / edit / delete are enabled."
+  users_can_access_and_create_but_not_edit_individua_c8a62c74: "Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add / edit / delete is enabled."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Users can access the Manage question banks link on the Quizzes index page when Course content - view and Assignments and quizzes - add / edit / delete are enabled."
   users_d1b60cb0: Users
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Users - generate observer pairing codes for students"
@@ -24266,6 +24305,7 @@ en-GB:
   visit_group_group_name_7a816081: "Visit group %{group_name}"
   visit_zoom_14636084: "Visit Zoom"
   waiting_for_attempted_login_6d00cb49: "Waiting for attempted login"
+  waiting_for_confirmation_to_display_qr_code_6f904d63: "Waiting for confirmation to display QR code"
   waiting_for_selection_ce0398c7: "Waiting for selection"
   waiting_for_your_qr_code_to_load_809299e5: "Waiting for your QR Code to load"
   warning_6576b5b8: warning
