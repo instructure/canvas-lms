@@ -64,12 +64,16 @@ export function asLink($element, editor) {
     displayAs = DISPLAY_AS_EMBED_DISABLED
   }
 
+  const isPreviewable =
+    $link.hasAttribute('data-canvas-previewable') ||
+    $link.classList.contains('instructure_scribd_file') // needed to cover docs linked while there was a bug didn't add the data attr.
+
   return {
     $element: $link,
     displayAs,
     text: editor.selection.getContent() || $link.textContent,
     type,
-    isPreviewable: $link.hasAttribute('data-canvas-previewable'),
+    isPreviewable,
     url: $link.href
   }
 }
