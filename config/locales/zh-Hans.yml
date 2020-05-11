@@ -175,10 +175,14 @@ zh-Hans:
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: 此计算方法未使用计算值
   a_canvas_security_token_was_just_generated_for_you_efeeac68: 刚刚为您的帐户生成Canvas安全令牌。若您申请用户令牌，则无需采取进一步措施。若您未申请令牌或想要管理您的Canvas访问令牌，您可在此操作：
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "一个文件名为 %{itemName} 已存在此文件夹中。"
+  a_file_named_name_already_exists_do_you_want_to_re_6536980: "已存在名称为“%{name}”的文件。是否要替换现有文件？"
+  a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "该文件夹中已存在名称为“%{name}”的文件。是否要替换现有文件？"
   a_front_page_is_required_fd57b80: 需要首页
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "全幅的标志出现在Canvas右侧的控制面板上。理想的尺寸是 360 × 140 像素。可接受的格式：svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: 一台为报告用户创建有趣环境信息的主机中的一个方便键/定值转储
   a_json_url_is_required_please_supply_one_ed03101c: "json url 必填，请提供。"
+  a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "该文件夹中已存在名称为“%{name}”的锁定文件。请输入新名称。"
+  a_locked_file_named_name_already_exists_please_ent_3b2e65a: "已存在名称为“%{name}”的锁定文件。请输入新名称。"
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "此位置已经存在名称为“%{name}”的锁定项目。请输入新名称。"
   a_message_is_required_129e1814: 需要消息
   a_name_for_this_set_is_required_222bad23: 此集需要一个名称
@@ -1868,6 +1872,10 @@ zh-Hans:
   admins_3e1dce15: 管理员
   admins_add_remove_26811ce5: "管理员 - 添加/移除"
   advanced_36b35b8: 高级
+  affects_viewing_the_conclude_course_and_permanentl_8216fcc2: 影响“结束课程”和“永久删除此课程”按钮的显示。“永久删除此课程”按钮仅对手动创建的课程显示。
+  affects_viewing_the_conclude_course_and_permanentl_d943656e: "影响“结束课程”和“永久删除此课程”按钮的显示。“永久删除此课程”按钮仅对手动创建的课程显示。\n\
+      \x20       对于课程级别的用户，删除课程是“课程状态 - 管理权限”的一部分。但是，对于帐户级别的用户，需要此权限和“课程 - 添加/编辑/删除”才能删除课程。 "
+  affects_viewing_the_delete_this_course_and_conclud_1ac257e: 影响“删除此课程”和“结束课程”按钮的显示。
   affects_viewing_the_publish_course_and_conclude_co_6589f97e: "影响查看发布课程 (Publish Course) 按钮和结束课程 (Conclude Course) 按钮。"
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       影响查看“发布课程”、“结束课程”和“永久删除此课程”按钮。
@@ -2202,6 +2210,7 @@ zh-Hans:
   allows_user_to_edit_grading_schemes_98c35117: 允许用户编辑评分方案。
   allows_user_to_edit_the_course_sis_id_e1eccee3: "允许用户编辑课程SIS ID。"
   allows_user_to_edit_the_course_syllabus_a28ff262: 允许用户编辑课程教学大纲。
+  allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: 允许用户将评分册导出为逗号分隔值(CSV)文件。允许用户访问学习掌握程度评分册（如果已启用）。
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: 允许用户在帐户级别筛选模板课程。允许用户添加相关课程。
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       允许用户在帐户级别筛选模板课程。
@@ -2279,6 +2288,7 @@ zh-Hans:
   allows_user_to_view_account_analytics_98fbc6ad: 允许用户查看帐户分析。
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: 允许用户在“协作”窗口中查看所有课程组，而不仅仅是他们注册的课程组。
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: 允许用户查看所有学生作业提交项并添加评论。
+  allows_user_to_view_analytics_link_in_the_user_set_56867782: 允许用户查看用户设置菜单中的分析链接。
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: 允许用户在协作中查看和添加用户。
   allows_user_to_view_and_configure_reports_in_accou_413e4e41: |-
       允许用户在“帐户设置”中查看和配置报告。
@@ -4897,6 +4907,7 @@ zh-Hans:
   clear_2084585f: 清除
   clear_selected_file_82388e50: 清除所选文件
   clear_user_cache_ef079f7f: 清除用户缓存
+  click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: 如果您不想显示二维码，可以单击“取消”。
   click_for_more_details_on_this_outcome_8c018d2f: 点击此结果的详细信息
   click_here_for_an_account_9536cb36: 点击此处查看帐户
   click_here_it_s_free_eeccb9cb: 点击这里，它是免费的！
@@ -4913,6 +4924,7 @@ zh-Hans:
   click_on_the_account_navigation_button_to_access_n_fbe82181: 点击帐户导航按钮以访问通知首选项。
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: 点击域导航按钮以访问帐户设置。
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: 点击课程导航按钮以访问您的课程。
+  click_proceed_to_continue_b6eeffc6: 单击“继续”以继续。
   click_the_button_above_to_add_content_4c7024a: 点击上方的按钮以添加内容
   click_to_add_a_name_6cf551b0: 单击以添加名称
   click_to_change_profile_picture_for_display_name_6a4b41db: "单击以更改个人资料照片%{display_name}"
@@ -5362,6 +5374,7 @@ zh-Hans:
   confirm_dialog_component: 
     ok: 确定
   confirm_edit_outcome_a9746c99: 确认编辑结果
+  confirm_qr_code_display_49664fa3: 确认二维码显示
   confirm_removal_a9bb889: 确认移除
   confirm_reservation_removal_e6350e7c: 确认预订删除
   confirm_unfavorite_course_fa01966d: 确认取消收藏课程
@@ -7925,6 +7938,7 @@ zh-Hans:
       确定帐户导航中“结果”选项卡的可见性和管理。
       允许用户在帐户和课程级别创建、导入、编辑和删除结果和结果组。
   determines_visibility_and_management_of_outcomes_t_8a40bf86: 确定帐户导航中“结果”选项卡的可见性和管理。允许用户在帐户和课程级别创建、导入、编辑和删除结果和结果组。
+  determines_visibility_and_management_of_rubrics_li_83a26d8e: 确定“帐户导航”中的评价量规链接的可见性和管理。允许用户查看“课程导航”中的评价量规链接。允许用户创建、编辑和删除课程评价量规。
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       确定帐户导航中“评价量规”选项卡的可见性和管理。
       允许用户管理评价量规。
@@ -7941,9 +7955,11 @@ zh-Hans:
       允许用户查看以前的SIS导入日期、错误和导入的项目。
   determines_visibility_of_the_course_activity_optio_2446c4b3: 确定“管理员工具日志记录”选项卡中“课程活动”选项的可见性。允许用户查看帐户的课程活动信息。
   determines_visibility_of_the_grade_change_activity_6c23036b: 确定“管理员工具日志记录”选项卡中“评分更改活动”选项的可见性。
+  determines_whether_a_publish_button_is_included_in_f7ad9b56: 决定是否在课程卡中包含已取消发布的课程的“发布课程”按钮（卡片视图仪表板）。
   determines_whether_a_publish_course_option_is_incl_9bf770e9: 确定课程主页上是否包含“发布课程”选项。
   determines_whether_a_publish_course_option_is_incl_ac5eed8f: 确定“课程设置清单”和“课程主页”中是否包含“发布课程”选项。
   determines_whether_the_course_setup_checklist_opti_fd5a8f70: 确定“课程设置清单”选项是否包含在“课程主页”页面中。
+  determines_whether_the_publish_course_and_unpublis_432a4bbc: 决定是否显示“课程首页”中的“发布课程”和“取消发布课程”按钮。
   developer_key: 
     api_key: "密钥: *%{api_key}*"
     created: "创建时间:"
@@ -8518,6 +8534,7 @@ zh-Hans:
   drag_and_drop_your_image_here_or_7fba7c14: 拖放您的图像到此或
   drag_to_rearrange_sections_637efee3: 拖动重新安排的班级
   drag_up_or_down_to_reorder_382126ff: 向上或向下拖动以重新排序
+  drop_files_here_to_add_to_module_236304f5: 将文件拖到此处以添加至模块
   drop_files_here_to_upload_ce0f50f9: 将文件拖到此处以上传
   drop_image_62a2a071: 放下图像
   dropdown_changed_state_to_expanded_517689c2: "下拉菜单将状态更改为%{expanded}。"
@@ -11716,6 +11733,7 @@ zh-Hans:
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "如果同时禁用“评分 (Grades) - 编辑”和“评分 (Grades) - 查看所有评分”，则评分册将从课程导航中隐藏。"
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "如果“评分 - 编辑”和“评分 - 查看所有评分”都被禁用，则会从“课程导航”中隐藏评分册。"
   if_commons_is_installed_allows_importing_favorited_eff368f: 如果安装了Commons，则准许从Canvas内导入收藏的内容项。
+  if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "如果还启用了“课程 - 添加/编辑/删除”和“课程 - 取消删除”，则帐户级别的用户可以在管理员工具中恢复删除的课程。"
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: 如果禁用，“结果”页面将变为只读并隐藏“管理评价量规”按钮。用户仍然可以通过作业访问个别作业评价量规。
   if_disabled_user_can_still_view_and_download_files_336ffc30: 如果禁用，用户仍可以查看文件并将其下载到zip文件中。
   if_disabled_user_will_still_have_access_to_course__541e130: 如果禁用，用户仍可以访问“课程设置”。如果没有内容项的适当权限，用户无法管理单独的课程内容。如果课程仅对注册该课程的用户可见，则此权限允许没有注册课程的用户查看课程内容。
@@ -12139,6 +12157,7 @@ zh-Hans:
   invalid_timestamp_timestamp_not_parseable_dae79e92: "无效的时间戳 - 时间戳无法分析"
   invalid_url_in_xml: "xml 中的 url 无效。& 号必须转义。"
   invalid_username_or_password_b60aa240: 无效用户名或密码
+  invalid_username_or_password_trouble_logging_in_ch_7699399c: 无效的用户名或密码。登录时遇到问题？*检查我们的登录常见问题解答*。
   invalid_utf_8_13c76a6: "无效的 UTF-8"
   invalid_value_12ca12c2: 无效的值
   invalid_value_for_name_i_4a7c601a: "%{name} 的值无效：“%{i}”"
@@ -14998,6 +15017,7 @@ zh-Hans:
   module_90d9fd32: 单元
   module_completed_50c50762: 单元已完成
   module_content_import_enhancements_c00b0ea2: 模块内容导入增强
+  module_file_upload_enhancements_eecd4d37: 模块化文件上传增强
   module_filter_63b17d11: 模块筛选器
   module_first_to_last_6921f3ec: "单元 - 从第一个到最后一个"
   module_in_progress_fa600662: 单元进度
@@ -15578,6 +15598,7 @@ zh-Hans:
   no_submission_for_assignmenttitle_243bd1f4: "没有 %{assignmentTitle} 的提交项"
   no_submissions_164cea23: 无提交项
   no_submissions_have_been_uploaded_2fb02710: 未上传提交项
+  no_submissions_to_zip_please_try_again_after_stude_7e0f478: 没有要压缩的提交项。请在学生提交后重试。
   no_terms_eab5ee7b: 无学期
   no_tls_618add1a: 没有TLS
   no_unassigned_terms_deb7b76b: 未指定的学期
@@ -16623,6 +16644,7 @@ zh-Hans:
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: 请让他们知道您正在查看哪页以及您单击了哪个链接。
   please_let_them_know_which_page_you_were_viewing_a_c9816406: 请让他们知道您查看了哪些页面，以及您点击的链接。
   please_log_in_to_view_this_content_eec6cd0: 请登录以查看此内容
+  please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: 请确保没有人可以在您的附近或从屏幕共享服务捕获您的屏幕图像。
   please_provide_a_field_e5a7d0b3: "请提供%{field}"
   please_select_a_group_set_for_this_assignment_e1da63d3: 请为此作业选择小组集
   please_select_a_user_role_for_this_link_9fb4e655: 请为此链接选择一个用户角色。
@@ -16669,6 +16691,13 @@ zh-Hans:
     big_blue_button_fallback: 
       description: "BigBlueButton 以前设置为在迁移期间保存录制文件"
       name: "BigBlueButton 迁移回退"
+    big_blue_button_fallback_settings: 
+      description: "将 BigBlueButton 插件配置为使用回滚设置后，它会使用这些设置。回滚仅用于查找未使用 BigBlueButton 插件配置创建的会议的录制文件。"
+      domain_description: "BigBlueButton 安装的**主机名**或** IP 地址**（例如，bigbluebutton.mycompany.com）"
+      labels: 
+        domain: 域
+        secret: 加密
+      secret_description: "这是 %{parameter_name} 参数，可在 %{filename} 配置文件中找到。"
     big_blue_button_settings: 
       description: "您将需要访问 [BigBlueButton](%{url}) 实例。"
       domain_description: "BigBlueButton 安装的**主机名**或 **ip 地址**（例如，bigbluebutton.mycompany.com）"
@@ -16678,6 +16707,7 @@ zh-Hans:
         recording_enabled: 允许录制会议。
         replace_with_alternatives: "禁用 BigBlueButton 会议；改为显示替代选项列表"
         secret: 加密
+        use_fallback: "使用 BigBlueButton 回滚插件设置查找未使用当前配置的 BBB 实例托管的会议的录制文件。"
       secret_description: "这是 %{parameter_name} 参数，可在 %{filename} 配置文件中找到。"
     buttons: 
       saving: 正在保存...
@@ -17717,6 +17747,7 @@ zh-Hans:
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: 问：什么变成黑色、白色、黑色、白色？答：从山上滚下来的熊猫。
   qatar_974_7e9684ca: 卡塔尔(+974)
   qatar_d52a8d27: 卡塔尔
+  qr_code_display_was_canceled_96234bf2: 二维码显示已取消
   qr_code_image_2b3a89b5: 二维码图像
   qr_for_mobile_login_1b1560ce: 移动登录二维码
   qti_display: QTI
@@ -21148,6 +21179,7 @@ zh-Hans:
   shared_brand_configs_e5d319d7: 和品牌配置共享
   shared_content_803ac37b: 共享内容
   shared_secret_892c88f2: 共享密钥
+  sharing_a_qr_code_can_give_others_immediate_access_79575158: "共享二维码后，其他人可以通过 %{canvas} 移动应用程序立即访问您的帐户。"
   she_her_3f459cc2: 她
   she_her_c8b5e3be: 她
   short_name_42f454a1: 简称
@@ -22974,6 +23006,7 @@ zh-Hans:
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "要交叉列出一个班次，还必须启用“课程班次 - 添加/编辑/删除”。要编辑课程SIS ID，还必须启用“SIS数据 - 管理”。要允许帐户级用户删除课程，还必须启用“课程状态 - 管理”。"
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "要交叉列出一个班次，还必须启用“课程班次 - 添加/编辑/删除”。要编辑课程SIS ID，还必须启用“SIS数据 - 管理”。要允许帐户级用户删除课程，还必须启用“课程状态 - 管理”。"
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "要交叉列出班次，还必须启用“课程 - 添加/编辑/删除”。"
+  to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "要交叉列出分组，还必须启用“课程 - 添加/编辑/删除”。"
   to_date_can_t_come_before_from_date_cf9e18aa: “截止日期”不能早于“开始日期”
   to_date_cannot_come_before_from_date_3eeb2633: 结束日期不能早于开始日期
   to_differentiate_assignments_to_individual_student_6cc40fde: "要区分个别学生的作业，还必须启用“用户 - 查看列表”。"
@@ -23001,6 +23034,7 @@ zh-Hans:
       要编辑教师、助教或课程设计者的班次，还必须启用“用户 - 在课程中添加/删除教师、课程设计者或助教”和“对话 - 向个别课程成员发送消息”。
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "要在课程设置 (Course Settings) 中编辑模板课程 (Blueprint course) 设置，还必须启用“模板课程 (Blueprint course) - 添加/编辑/关联/删除”。要添加相关课程，还必须启用“模板课程 (Blueprint course) - 添加/编辑/关联/删除”和“课程 (Courses) - 查看列表”。要编辑任何模板对象的锁定设置，必须启用此权限。要编辑文件的锁定设置，还必须启用“课程文件 - 添加/编辑/删除”。要在测验上编辑锁定设置，还必须启用“作业和测验 - 添加/编辑/删除”。"
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "要从作业 (Assignments) 索引页面编辑模板课程锁定设置，还必须启用“课程 (Courses) - 添加/编辑/删除”。如果未启用此权限，但启用了“课程 (Courses) - 添加/编辑/删除”，则可以从作业的详细信息页面管理作业的模板课程锁定设置。要在单独的测验或“测验 (Quizzes)”索引页面上编辑模板课程锁定设置，还必须启用“课程  (Courses) - 添加/编辑/删除”。"
+  to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "要从讨论索引页面编辑模板锁定设置，还必须启用“课程 - 添加/编辑/删除”和“讨论 - 核对”。 "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "要从“讨论 (Discussions)”索引页面编辑模板课程锁定设置，还必须启用“课程 (Courses) - 添加/编辑/删除”和“讨论 (Discussions) - 查看”。如果未启用此权限，但启用了“课程 (Courses) - 添加/编辑/删除”和“讨论 (Discussions) - 查看”，则可以在单独的讨论上编辑模板课程锁定设置。"
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "要从“页面”索引页面编辑模板锁定设置，还必须启用“课程 - 添加/编辑/删除”。如果未启用此权限，但启用了“课程 (Courses) - 添加/编辑/删除”，则可以在单独的页面上编辑模板课程锁定设置。"
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "要编辑课程评分方案，还必须启用“课程 - 添加/编辑/删除”。"
@@ -23022,6 +23056,7 @@ zh-Hans:
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "要在管理员工具中生成登录/注销活动，还必须启用“用户 - 管理登录详细信息”或“统计信息 - 视图”。要在管理员工具中生成评分更改日志，还必须启用“评分 - 查看更改日志”。"
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "要使用课程导入工具导入作业和测验，必须启用“课程内容 - 添加/编辑/删除”。"
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "要使用课程导入工具导入文件，还必须启用“课程内容 - 添加/编辑/删除”。"
+  to_import_learning_outcomes_learning_outcomes_impo_5abbd2fb: "要导入学习结果，还必须启用“学习结果 (Learning Outcomes) - 导入”。"
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "要导入SIS数据，还必须启用“SIS数据 (SIS Data) - 导入”。"
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "要导入SIS数据，还必须启用“SIS数据 - 导入”。"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "要链接课程观察员*%{name}* 到学生，在下面开始输入学生名字，查找他们，然后点击更新。"
@@ -23154,6 +23189,8 @@ zh-Hans:
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "要查看学生分析，还必须启用“分析 - 查看列表”和“分析 - 查看”。"
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "要查看学生分析，还必须启用“用户 - 查看列表”和“评分 - 查看所有评分”。"
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "要查看帐户“人员”页面，必须启用“用户 - 查看列表”。如果禁用此权限，并且启用了“用户 - 查看登录ID”，则用户仍将看到用作登录ID的电子邮件地址。"
+  to_view_the_gradebook_course_content_view_must_als_676f3e8: "要查看评分册，还必须启用“课程内容 - 查看”。如果“评分 - 编辑”和“评分 - 查看所有评分”都被禁用，则会从“课程导航”中隐藏评分册。"
+  to_view_the_gradebook_grades_view_all_grades_must__7ead435: "要查看评分册，还必须启用“评分 - 查看所有评分”。"
   to_view_the_list_of_users_in_an_account_users_view_401b8462: "要查看帐户中的用户列表，必须启用“用户 - 查看列表”。"
   to_view_the_list_of_users_in_an_account_users_view_630d77a0: "要查看帐户中的用户列表，必须启用“用户 (Users) - 查看”。"
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "要查看帐户中的用户列表，必须启用“用户 (Users) - 查看列表”。"
@@ -23313,6 +23350,7 @@ zh-Hans:
   unable_to_remove_app_4293cb53: 无法删除应用程序
   unable_to_save_new_discussion_topic_99239f3f: 无法保存新的讨论主题
   unable_to_set_default_grade_because_this_assignmen_d19842a9: 无法设置默认评分，因为至少有一个学生的该作业的截止日期处在关闭评分周期内
+  unable_to_set_up_drag_and_drop_for_modules_4d339f1d: 无法设置拖放模块
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "无法将文件传输到存储服务。服务可能中断，或者您可能需要重新登录到 Canvas。"
   unarchive_selected_e0c4bd3d: 取消存档选择
   unassigned_permissions_6a38ca95: 未分配的权限
@@ -24059,6 +24097,7 @@ zh-Hans:
       子帐户管理员无法查看SIS信息，除非他们在课程中也被授予讲师角色。子帐户管理员无法在没有课程关联的情况下查看SIS信息，因为讲师角色有权在帐户级别读取SIS数据。
   users_and_terms_are_located_at_the_account_so_the__6896b895: 用户和学期位于该帐户，因此SIS端点始终根据帐户确认用户的权限。子帐户只拥有课程和分组的所有权；他们不拥有用户数据。子帐户管理员无法查看SIS信息，除非他们在课程中也被授予讲师角色。子帐户管理员无法在没有课程关联的情况下查看SIS信息，因为讲师角色有权在帐户级别读取SIS数据。
   users_can_access_and_create_but_not_edit_individua_72b88c41: "当启用“课程内容 (Course Content) - 查看”和“作业和测验 (Assignments and Quizzes) - 添加/编辑/删除”时，用户可以通过作业 (Assignments) 访问和创建（但不能编辑）单独的作业评价量规。"
+  users_can_access_and_create_but_not_edit_individua_c8a62c74: "启用“作业”和“测验 - 添加/编辑/删除”后，用户可以通过作业访问和创建（但无法编辑）个别作业评价量规。"
   users_can_access_the_manage_question_banks_link_on_e411d01: "启用“课程内容 - 查看”和“作业和测验 - 添加/编辑/删除”后，用户可以访问“测验”索引页面上的“管理题库”链接。"
   users_d1b60cb0: 用户
   users_generate_observer_pairing_codes_for_students_2c25d52a: "用户 - 为学生生成观察者配对代码"
@@ -24161,6 +24200,7 @@ zh-Hans:
   visit_group_group_name_7a816081: "访问组 %{group_name}"
   visit_zoom_14636084: "查看 Zoom"
   waiting_for_attempted_login_6d00cb49: 正等待尝试登录
+  waiting_for_confirmation_to_display_qr_code_6f904d63: 等待确认显示二维码
   waiting_for_selection_ce0398c7: 等待选择
   waiting_for_your_qr_code_to_load_809299e5: 正在等待加载二维码
   warning_6576b5b8: 警告
