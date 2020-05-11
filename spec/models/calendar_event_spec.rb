@@ -1042,8 +1042,10 @@ describe CalendarEvent do
 
   context "web_conference" do
     before(:once) do
-      plugin = PluginSetting.create!(name: 'big_blue_button')
-      plugin.update_attribute(:settings, { key: 'value' })
+      %w[big_blue_button wimba].each do |name|
+        plugin = PluginSetting.create!(name: name)
+        plugin.update_attribute(:settings, { key: 'value' })
+      end
     end
 
     let_once(:course) { course_model }
@@ -1051,8 +1053,8 @@ describe CalendarEvent do
     let_once(:group1) { group(context: course) }
     let_once(:group2) { group(context: course) }
 
-    def conference(context:, user: @user)
-      WebConference.create(context: context, user: user, conference_type: 'BigBlueButton')
+    def conference(context:, user: @user, type: 'BigBlueButton')
+      WebConference.create!(context: context, user: user, conference_type: type)
     end
 
     before do
@@ -1064,7 +1066,30 @@ describe CalendarEvent do
       expect(@event).to be_valid
     end
 
-    context 'when event has course context' do
+    context "after_save callbacks" do
+      it "keeps title of conference in sync with event" do
+        event = course.calendar_events.create! title: 'Foo', web_conference: conference(context: course)
+        event.update! title: 'updated title'
+        expect(event.web_conference.reload.title).to eq 'updated title'
+      end
+
+      it "keeps date  of conference in sync with event" do
+        event = course.calendar_events.create! title: 'Foo', web_conference: conference(context: course)
+        start_at = Time.zone.now + 3.days
+        event.reload.update! start_at: start_at
+        expect(event.web_conference.reload.user_settings[:scheduled_date]).to eq start_at
+      end
+
+      it "does not fail when conference does not support scheduled_date" do
+        event = course.calendar_events.create! title: 'Foo', web_conference: conference(context: course, type: 'Wimba')
+        start_at = Time.zone.now + 3.days
+        event.reload.update! start_at: start_at
+        expect(event.reload.start_at).to eq start_at
+        expect(event.web_conference.reload.user_settings).not_to have_key(:scheduled_date)
+      end
+    end
+
+    context "when event has course context" do
       it "can have a conference from the same course" do
         event = course.calendar_events.build title: 'Foo', web_conference: conference(context: course)
         expect(event).to be_valid

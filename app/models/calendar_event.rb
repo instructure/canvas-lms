@@ -63,6 +63,7 @@ class CalendarEvent < ActiveRecord::Base
   after_save :touch_context
   after_save :replace_child_events
   after_save :sync_parent_event
+  after_save :sync_conference
   after_update :sync_child_events
 
   # when creating/updating a calendar_event, you can give it a list of child
@@ -318,6 +319,17 @@ class CalendarEvent < ActiveRecord::Base
     cascaded_changes = CASCADED_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
     child_events.are_locked.update_all Hash[locked_changes.map{ |attr| [attr, send(attr)] }] if locked_changes.present?
     child_events.are_unlocked.update_all Hash[cascaded_changes.map{ |attr| [attr, send(attr)] }] if cascaded_changes.present?
+  end
+
+  def sync_conference
+    return if web_conference_id.blank?
+    if saved_change_to_title?
+      web_conference.title = title
+    end
+    if saved_change_to_start_at? && web_conference.user_settings.key?(:scheduled_date)
+      web_conference.user_settings[:scheduled_date] = start_at
+    end
+    web_conference.save!
   end
 
   attr_writer :skip_sync_parent_event

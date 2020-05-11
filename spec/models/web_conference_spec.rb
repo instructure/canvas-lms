@@ -65,7 +65,7 @@ describe WebConference do
       conference.settings = {:record => true, :not => :for_user}
       conference.save
       conference.reload
-      expect(conference.user_settings).to eql({:record => true})
+      expect(conference.user_settings).not_to have_key(:not)
     end
 
   end

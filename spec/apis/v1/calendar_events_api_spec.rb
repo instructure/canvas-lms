@@ -1358,10 +1358,10 @@ describe CalendarEventsApiController, type: :request do
           :calendar_event => {
             :context_code => "course_#{@course.id}",
             :title => "API Test",
-            web_conference: { conference_type: 'BigBlueButton', title: 'My BBB Conference' }
+            web_conference: { conference_type: 'BigBlueButton', title: 'BBB Conference' }
           }
         })
-        expect(CalendarEvent.find(json['id']).web_conference).to have_attributes(conference_type: 'BigBlueButton', title: 'My BBB Conference')
+        expect(CalendarEvent.find(json['id']).web_conference).to have_attributes(conference_type: 'BigBlueButton', title: 'API Test')
       end
 
       it "should set defaults for new web_conference" do

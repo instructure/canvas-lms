@@ -32,6 +32,14 @@ class BigBlueButtonConference < WebConference
     visible: ->{ WebConference.config(class_name: BigBlueButtonConference.to_s)[:recording_enabled] },
   }
 
+  user_setting_field :scheduled_date, {
+    name: ->{ t('Scheduled Date') },
+    description: ->{ t('Enable recording for this conference') },
+    type: :date,
+    default: false,
+    visible: false
+  }
+
   def initiate_conference
     return conference_key if conference_key && !retouch?
     unless self.conference_key
