@@ -82,7 +82,7 @@ describe Lti::AccountExternalToolsController do
 
       it 'returns a 401' do
         send_request
-        expect(response.code).to eq('401')
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -94,6 +94,78 @@ describe Lti::AccountExternalToolsController do
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/destroy"}
       let(:params_overrides) do
         { account_id: root_account.lti_context_id, external_tool_id: tool.id }
+      end
+    end
+  end
+
+  describe '#create' do
+    let(:params_overrides) do
+      { account_id: root_account.lti_context_id, client_id: tool_configuration.developer_key.id }
+    end
+
+    it_behaves_like 'lti services' do
+      let(:action) { :create }
+      let(:expected_mime_type) { described_class::MIME_TYPE }
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/create"}
+    end
+
+    context 'error handling' do
+      let(:action) { :create }
+
+      context 'with invalid client id' do
+        let(:params_overrides) do
+          { account_id: root_account.lti_context_id, client_id: 'bad client id' }
+        end
+
+        it 'return 404' do
+          send_request
+          expect(response).to have_http_status :not_found
+        end
+      end
+
+      context 'with inactive developer key' do
+        let(:developer_key) do
+          dev_key = super()
+          dev_key.deactivate!
+          dev_key
+        end
+
+        it 'return 401' do
+          send_request
+          expect(response).to have_http_status :unauthorized
+        end
+      end
+
+      context 'with no account binding' do
+        let(:developer_key2) do
+          dk = DeveloperKey.create!(account: root_account)
+          dk.developer_key_account_bindings.destroy_all
+          dk
+        end
+
+        let(:params_overrides) do
+          { account_id: root_account.lti_context_id, client_id: developer_key2.id }
+        end
+
+        it 'return 401' do
+          send_request
+          expect(response).to have_http_status :unauthorized
+        end
+      end
+
+      context 'with duplicate tool' do
+        let(:params_overrides) do
+          { account_id: root_account.lti_context_id, client_id: tool_configuration.developer_key.id, verify_uniqueness: true }
+        end
+
+        it 'return 400' do
+          send_request
+          expect(response).to have_http_status :ok
+          send_request
+          expect(response).to have_http_status :bad_request
+          error_message = JSON.parse(response.body).dig('errors', 'tool_currently_installed').first['message']
+          expect(error_message).to eq 'The tool is already installed in this context.'
+        end
       end
     end
   end

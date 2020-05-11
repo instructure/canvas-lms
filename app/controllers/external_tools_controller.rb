@@ -905,7 +905,7 @@ class ExternalToolsController < ApplicationController
       end
       set_tool_attributes(@tool, external_tool_params)
     end
-    check_for_duplication(@tool)
+    @tool.check_for_duplication(params.dig(:external_tool, :verify_uniqueness).present?)
     if @tool.errors.blank? && @tool.save
       invalidate_nav_tabs_cache(@tool)
       if api_request?
@@ -1027,12 +1027,6 @@ class ExternalToolsController < ApplicationController
   end
 
   private
-
-  def check_for_duplication(tool)
-    if tool.duplicated_in_context? && params.dig(:external_tool, :verify_uniqueness).present?
-      tool.errors.add(:tool_currently_installed, 'The tool is already installed in this context.')
-    end
-  end
 
   def generate_module_item_sessionless_launch
     module_item_id = params[:module_item_id]

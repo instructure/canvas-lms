@@ -597,6 +597,12 @@ end
     self.class.all_tools_for(context).where.not(id: id).where(domain: domain).present? && domain.present?
   end
 
+  def check_for_duplication(verify_uniqueness)
+    if duplicated_in_context? && verify_uniqueness
+      errors.add(:tool_currently_installed, 'The tool is already installed in this context.')
+    end
+  end
+
   def self.from_content_tag(tag, context)
     return nil if tag.blank? || context.blank?
 
