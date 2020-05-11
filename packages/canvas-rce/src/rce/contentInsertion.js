@@ -179,7 +179,8 @@ function insertUndecoratedLink(editor, linkProps) {
     target: linkProps.target,
     class: linkProps.class,
     text: linkProps.text,
-    title: linkProps.title
+    title: linkProps.title,
+    'data-canvas-previewable': linkProps['data-canvas-previewable']
   }
 
   if (linkAttrs.target === '_blank') {

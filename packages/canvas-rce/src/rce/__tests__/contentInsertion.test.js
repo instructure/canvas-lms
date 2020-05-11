@@ -116,6 +116,15 @@ describe('contentInsertion', () => {
       )
     })
 
+    it('includes attributes', () => {
+      link['data-canvas-previewable'] = true
+      link.class = 'instructure_file_link foo'
+      contentInsertion.insertLink(editor, link)
+      expect(editor.content).toEqual(
+        '<a href="/some/path" title="Here Be Links" data-canvas-previewable="true" class="instructure_file_link foo">Click On Me</a>'
+      )
+    })
+
     it('respects the current selection building the link by delegating to tinymce', () => {
       editor.execCommand = jest.fn()
       editor.selection.setContent('link me')

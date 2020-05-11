@@ -106,6 +106,18 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
         $element.removeAttribute('href')
         expect(getContentFromElement($element, editor).type).toEqual(NONE_TYPE)
       })
+
+      it('indicates the link is previewable if it contains the "data-canvas-previewable" attribute', () => {
+        expect(getContentFromElement($element, editor).isPreviewable).toEqual(false)
+        $element.setAttribute('data-canvas-previewable', true)
+        expect(getContentFromElement($element, editor).isPreviewable).toEqual(true)
+      })
+
+      it('indicates the link is previewable if it contains the "instructure_scribd_file" class name', () => {
+        expect(getContentFromElement($element, editor).isPreviewable).toEqual(false)
+        $element.classList.add('instructure_scribd_file')
+        expect(getContentFromElement($element, editor).isPreviewable).toEqual(true)
+      })
     })
 
     describe('when the given element is a video container element', () => {
