@@ -66,4 +66,14 @@ describe('Notification Preferences Table', () => {
     expect(queryByTestId('courseActivities')).not.toBeNull()
     expect(queryByTestId('conversations')).toBeNull()
   })
+
+  it('renders the category description', () => {
+    const {getByTestId, getByText} = render(
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences} />
+    )
+
+    const dueDateTooltip = getByTestId('due_date_description')
+    expect(dueDateTooltip).not.toBeNull()
+    expect(dueDateTooltip).toContainElement(getByText('Due date description'))
+  })
 })

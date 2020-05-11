@@ -23,6 +23,7 @@ import React from 'react'
 
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 
 const formattedCategoryNames = {
@@ -146,10 +147,25 @@ const renderNotificationCategory = (
         .map(category => (
           <Table.Row key={category} data-testid={formatCategoryKey(category)}>
             <Table.Cell>
-              {
-                notificationPreferences.channels[0].categories[notificationCategory][category]
-                  .notification.categoryDisplayName
-              }
+              <Tooltip
+                renderTip={
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        notificationPreferences.channels[0].categories[notificationCategory][
+                          category
+                        ].notification.categoryDescription
+                    }}
+                    data-testid={`${formatCategoryKey(category)}_description`}
+                  />
+                }
+                placement="end"
+              >
+                {
+                  notificationPreferences.channels[0].categories[notificationCategory][category]
+                    .notification.categoryDisplayName
+                }
+              </Tooltip>
             </Table.Cell>
             {notificationPreferences.channels.map(channel => (
               <Table.Cell textAlign="center" key={category + channel.path}>

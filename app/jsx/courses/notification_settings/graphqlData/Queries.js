@@ -34,6 +34,7 @@ export const COURSE_NOTIFICATIONS_QUERY = gql`
               _id
               category
               categoryDisplayName
+              categoryDescription
               name
             }
           }
@@ -44,6 +45,7 @@ export const COURSE_NOTIFICATIONS_QUERY = gql`
               _id
               category
               categoryDisplayName
+              categoryDescription
               name
             }
           }

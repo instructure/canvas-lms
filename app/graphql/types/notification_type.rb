@@ -32,6 +32,8 @@ module Types
 
     field :category_display_name, String, null: false
 
+    field :category_description, String, null: false
+
     field :workflow_state, String, null: true
   end
 end
