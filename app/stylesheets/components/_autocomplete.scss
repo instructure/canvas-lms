@@ -19,44 +19,6 @@
 // Autocomplete combo box
 // --------------------------------------------------
 
-/*
-@styleguide Autocomplete
-
-<br/>
-
-A generic, accessible autocomplete widget.
-
-<br/>
-
-```html
-<div class="ac">
-  <div class="ac-input-box">
-    <ul class="ac-token-list"></ul>
-    <input type="search"
-           class="ac-input"
-           aria-expanded="false"
-           aria-activedescendant=""
-           aria-owns="ac-result-list-1"
-           auto-autocomplete="list"
-           role="combobox" />
-
-    <span class="ac-placeholder">Search for results</span>
-  </div>
-
-  <button class="btn ac-search-btn"
-          type="button" aria-label="Search">
-    <i class="icon-address-book"></i>
-  </button>
-
-  <div class="ac-result-container" id="ac-result-list-1" aria-hidden="true">
-    <ul class="ac-result-list"></ul>
-  </div>
-</div>
-```
-
-*/
-
-
 ul[class*=ac-] {
   list-style: none;
   margin: 0;

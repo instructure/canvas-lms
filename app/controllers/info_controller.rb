@@ -21,7 +21,6 @@ class InfoController < ApplicationController
   skip_before_action :load_user, :only => [:health_check, :browserconfig]
 
   def styleguide
-    js_bundle :styleguide
     render :layout => "layouts/styleguide"
   end
 

@@ -54,37 +54,6 @@
 </table>
 ```
 
-## Row-hover table
-
-Adding **.ic-Table--hover-row** to the table element will produce a background color when the user hovers over each table row in the table body.
-
-```html
-<table class="ic-Table ic-Table--hover-row">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Email address</th>
-      <th>Section</th>
-      <th>Role</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><a href="#">Paul Howard</a></td>
-      <td>paulhowardemail@gmail.com</td>
-      <td>Advanced students</td>
-      <td>Student</td>
-    </tr>
-    <tr>
-      <td><a href="#">Paul Howard</a></td>
-      <td>paulhowardemail@gmail.com</td>
-      <td>Advanced students</td>
-      <td>Student</td>
-    </tr>
-  </tbody>
-</table>
-```
-
 ## Striped table
 
 Add **.ic-Table--striped** to the table element to produce a striped table among rows in the table body.
@@ -113,42 +82,6 @@ Add **.ic-Table--striped** to the table element to produce a striped table among
       <td>Student</td>
     </tr>
     <tr>
-      <td><a href="#">Paul Howard</a></td>
-      <td>paulhowardemail@gmail.com</td>
-      <td>Advanced students</td>
-      <td>Student</td>
-    </tr>
-  </tbody>
-</table>
-```
-## Row background color options
-
-We will reserve $ic-brand-primary (traditionally blue) for the hover state background color.
-
-```html
-<table class="ic-Table ic-Table--hover-row">
-  <thead>
-    <tr class="ic-Table__row--bg-neutral">
-      <th>Name</th>
-      <th>Email address</th>
-      <th>Section</th>
-      <th>Role</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr class="ic-Table__row--bg-success">
-      <td><a href="#">Paul Howard</a></td>
-      <td>paulhowardemail@gmail.com</td>
-      <td>Advanced students</td>
-      <td>Student</td>
-    </tr>
-    <tr class="ic-Table__row--bg-alert">
-      <td><a href="#">Paul Howard</a></td>
-      <td>paulhowardemail@gmail.com</td>
-      <td>Advanced students</td>
-      <td>Student</td>
-    </tr>
-    <tr class="ic-Table__row--bg-danger">
       <td><a href="#">Paul Howard</a></td>
       <td>paulhowardemail@gmail.com</td>
       <td>Advanced students</td>
@@ -190,49 +123,6 @@ Add **.ic-Table--condensed** to the table element to reduce the default cell pad
       <td>paulhowardemail@gmail.com</td>
       <td>Advanced students</td>
       <td>Student</td>
-    </tr>
-  </tbody>
-</table>
-```
-
-## Table with cog (admin link dropdown)
-
-Enclose our standard Cog Dropdown within a **div class="ic-Table--actions** to right-align the button and make sure the cog dropdown appears in the right place.
-
-```html
-<table class="ic-Table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Email address</th>
-      <th>Section</th>
-      <th>Role</th>
-      <th><span class="screenreader-only">Actions</span></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><a href="#">Paul Howard</a></td>
-      <td>paulhowardemail@gmail.com</td>
-      <td>Advanced students</td>
-      <td>Student</td>
-      <td>
-        <div class="ic-Table__actions">
-          <a class="al-trigger btn btn-small" role="button" href="#">
-            <i class="icon-settings"></i>
-            <i class="icon-mini-arrow-down"></i>
-            <span class="screenreader-only">Actions</span>
-          </a>
-          <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
-            <li role="presentation">
-              <a href="#" class="icon-edit" id="toolbar-2" tabindex="-1" role="menuitem">Edit student</a>
-            </li>
-            <li role="presentation">
-              <a href="#" class="icon-trash" id="toolbar-3" tabindex="-1" role="menuitem">Delete student</a>
-            </li>
-          </ul>
-        </div>
-      </td>
     </tr>
   </tbody>
 </table>

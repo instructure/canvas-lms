@@ -29,50 +29,34 @@
 
 /* @styleguide Icons
 
-Canvas uses <a href="https://instructure.design/#ui-icons">@instructure/ui-icons</a> for its icon library. There are various ways that you can bring icons into Canvas, including as a React component, or from our the icon font.
+Canvas uses <a href="https://instructure.design/#ui-icons">@instructure/ui-icons</a> for its icon library. For a complete list of Instructure icons, visit <a href="https://instructure.design/#iconography">https://instructure.design/#iconography</a>.
 
-## Comprehensive Icon Listing
+## Using icons
 
-For a complete list of Instructure Icons go to <a href="https://instructure.design/#iconography">https://instructure.design/#iconography</a>
-
-## Light vs Solid
-
-There are two weights to our icons: line or solid. Canvas defaults to solid, however, if you want to use the same icon as a line varient you can add the `icon-Line` utility class.
+You can bring icons into Canvas using CSS classes. There are two weights to our icons: Line and Solid.
 
 ```html
-<a class="icon-add icon-Line" href="whatever">Add Stuff</a>
+<i class="icon-Solid icon-trash" aria-hidden="true"></i>
+&nbsp;
+<i class="icon-Line icon-trash" aria-hidden="true"></i>
 ```
-
-## Using as a React Component
-
-```javascript
-import {IconAddLine} from '@instructure/ui-icons'
-
-function MyComponent () {
-  return <IconAddLine />
-}
-```
-
-## Using the Icon Font
 
 ### Icons in links
 
 ```html
-<a class="icon-add" href="whatever">Add Stuff</a>
+<a class="icon-Line icon-add" href="#">Add Something</a>
 ```
 
-### Icons in buttons links
+### Icons in buttons
 
 ```html
 <p>
-  <a class="icon-edit btn btn-primary">Edit</a>
+  <a class="icon-Line icon-edit btn btn-primary">Edit</a>
 </p>
 <p>
-  <button class="btn"><i class="icon-trash"></i>Delete</button>
+  <button class="btn"><i class="icon-Line icon-trash"></i> Delete</button>
 </p>
 ```
-
-Either use `<a>` with icon desired icon class added or insert `<i>` inside `<button>` and set to desired icon class
 
 */
 

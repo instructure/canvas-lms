@@ -19,9 +19,10 @@
 /*
 @styleguide Spacing
 
-## Spacing: Content Box
+## `.content-box`
 
-Content boxes automatically clear their floated children and have default margins.
+Content boxes automatically clear their floated children and have default
+top and bottom margins.
 
 ```html
 <div class="content-box border border-trbl">
@@ -32,17 +33,9 @@ Content boxes automatically clear their floated children and have default margin
 </div>
 ```
 
-## Sizes Content Box
+## `.pad-box`
 
-```html
-<div class="content-box-mini border border-trbl">Half spacing</div>
-<div class="content-box-mini border border-trbl">Third spacing</div>
-```
-## Spacing: Pad Box
-
-Use pad-box if you want to arbitrarily add some padding to an element.
-
-## Sizes Pad Box
+Use pad-box if you want to add some padding to an element.
 
 ```html
 <div class="pad-box-mega border border-trbl">Mega</div>
