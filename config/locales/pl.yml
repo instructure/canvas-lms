@@ -188,10 +188,14 @@ pl:
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Wartość obliczenia nie jest używana przy tej metodzie obliczania"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "Dla Twojego konta wygenerowano właśnie token bezpieczeństwa Canvas. Jeśli token użytkownika utworzono na Twoją prośbę, nie musisz podejmować dalszych działań. W przeciwnym razie lub w celu zarządzania tokenami dostępu Canvas przejdź tutaj:"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Folder o nazwie %{itemName} już istnieje."
+  a_file_named_name_already_exists_do_you_want_to_re_6536980: "Plik o nazwie „%{name}” już istnieje. Chcesz zastąpić istniejący plik?"
+  a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Plik o nazwie „%{name}” w tym folderze już istnieje. Chcesz zastąpić istniejący plik?"
   a_front_page_is_required_fd57b80: "Wymagana jest strona tytułowa"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Pełnowymiarowe logo, które pojawia się w prawym, bocznym panelu Canvas. Idealny rozmiar to 360 x 140 pikseli. Akceptowane formaty: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Poręczny kluczowy/wartościowy zrzut wielku ciekawych informacji środowiskowych dla zgłaszającego użytkownika"
   a_json_url_is_required_please_supply_one_ed03101c: "Wymagany jest adres JSON URL, podaj go."
+  a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "Zablokowany plik o nazwie „%{name}” w tym folderze już istnieje. Wpisz nową nazwę."
+  a_locked_file_named_name_already_exists_please_ent_3b2e65a: "Zablokowany plik o nazwie „%{name}” już istnieje. Wpisz nową nazwę."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Zablokowany element o nazwie \"%{name}\" już istnieje w tej lokalizacji. Wpisz nową nazwę."
   a_message_is_required_129e1814: "Wymagana jest wiadomość"
   a_name_for_this_set_is_required_222bad23: "Wymagana jest nazwa dla tego zbioru"
@@ -1895,6 +1899,10 @@ pl:
   admins_3e1dce15: Administratorzy
   admins_add_remove_26811ce5: "Administratorzy - dodaj / usuń"
   advanced_36b35b8: Zaawansowane
+  affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Wpływa na wyświetlanie przycisków Zakończ kurs i Trwale usuń ten kurs. Przycisk Trwale usuń ten kurs pojawia się tylko w przypadku kursów utworzonych ręcznie."
+  affects_viewing_the_conclude_course_and_permanentl_d943656e: "Wpływa na wyświetlanie przycisków Zakończ kurs i Trwale usuń ten kurs. Przycisk Trwale usuń ten kurs pojawia się tylko w przypadku kursów utworzonych ręcznie.\n\
+      \x20       Dla użytkowników na poziomie kursu, usuwanie kursu należy do uprawnienia Status kursu - Zarządzaj. W przypadku użytkownika na poziomie konta usunięcie kursu wymaga tego uprawnienia oraz opcji Kursy - Dodaj / edytuj / usuń. "
+  affects_viewing_the_delete_this_course_and_conclud_1ac257e: "Dotyczy wyświetlania przycisków Usuń ten kurs i Zakończ kurs."
   affects_viewing_the_publish_course_and_conclude_co_6589f97e: "Dotyczy wyświetlania przycisków Opublikuj kurs i Zakończ kurs."
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Wpływa na wyświetlanie przycisków Opublikuj kurs, Zakończ kurs i Trwale usuń ten kurs.
@@ -2229,6 +2237,7 @@ pl:
   allows_user_to_edit_grading_schemes_98c35117: "Pozwala użytkownikowi na edytowanie schematów oceniania."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Pozwala użytkownikowi na edytowanie SIS ID kursu."
   allows_user_to_edit_the_course_syllabus_a28ff262: "Pozwala użytkownikowi na edytowanie programu kursu."
+  allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Pozwala użytkownikowi na eksportowanie Dziennika ocen do pliku CSV. Pozwala użytkownikowi na dostęp do Dzienniczka nauki poziomu biegłości (o ile jest włączony)."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Pozwala użytkownikowi na filtrowanie kursów Blueprint z poziomu kursu. Pozwala użytkownikowi na dodawanie powiązanych kursów."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       Pozwala użytkownikowi na filtrowanie kursów Blueprint z poziomu kursu.
@@ -2306,6 +2315,7 @@ pl:
   allows_user_to_view_account_analytics_98fbc6ad: "Pozwala użytkownikowi na wyświetlanie analizy konta."
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Pozwala użytkownikowi na wyświetlanie wszystkich grup kursów, nie tylko tych, na które się zapisali, w oknie Współpraca z."
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Pozwala użytkownikowi na wyświetlanie wszystkich przesłanych zadań i dodawanie komentarzy."
+  allows_user_to_view_analytics_link_in_the_user_set_56867782: "Pozwala użytkownikowi wyświetlać łącze Analiza w menu ustawień użytkownika."
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Pozwala użytkownikowi na wyświetlanie i dodawanie użytkowników do współpracy."
   allows_user_to_view_and_configure_reports_in_accou_413e4e41: |-
       Pozwala użytkownikowi na wyświetlanie i konfigurowanie raportów w Ustawieniach konta.
@@ -4964,6 +4974,7 @@ pl:
   clear_2084585f: Wyczyść
   clear_selected_file_82388e50: "Usuń wybrany plik"
   clear_user_cache_ef079f7f: "Wyczyść pamięć podręczną użytkownika"
+  click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Jeśli nie chcesz wyświetlać kodu, kliknij Anuluj."
   click_for_more_details_on_this_outcome_8c018d2f: "kliknij aby uzyskać więcej szczegółów na temat tego wyniku"
   click_here_for_an_account_9536cb36: "Kliknij tutaj aby wybrać konto"
   click_here_it_s_free_eeccb9cb: "Kliknij tutaj, to jest darmowe!"
@@ -4981,6 +4992,7 @@ pl:
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Kliknij przycisk nawigacji w koncie, aby uzyskać dostęp do preferencji powiadomień."
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Kliknij przycisk nawigacji administratora, aby uzyskać dostęp do ustawień konta."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Kliknij przycisk nawigacji w kursach, aby uzyskać dostęp do kursów."
+  click_proceed_to_continue_b6eeffc6: "Aby kontynuować, kliknij Kontynuuj."
   click_the_button_above_to_add_content_4c7024a: "Kliknij powyższy przycisk, aby dodać zawartość"
   click_to_add_a_name_6cf551b0: "Kliknij, aby dodać imię"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Kliknij, aby zmienić zdjęcie profilowe dla %{display_name}"
@@ -5438,6 +5450,7 @@ pl:
   confirm_dialog_component: 
     ok: Ok
   confirm_edit_outcome_a9746c99: "Potwierdź edycję wyniku"
+  confirm_qr_code_display_49664fa3: "Potwierdź wyświetlanie kodu QR"
   confirm_removal_a9bb889: "Potwierdź usunięcie"
   confirm_reservation_removal_e6350e7c: "Potwierdź usunięcie rezerwacji"
   confirm_unfavorite_course_fa01966d: "Potwierdź usunięcie kursu z Ulubionych"
@@ -8122,6 +8135,7 @@ pl:
       Określa widoczność i zarządzanie kartą Wyniki w strukturze nawigacyjnej konta.
       Pozwala użytkownikowi na tworzenie, importowanie, edytowanie i usuwanie wyników i grup wyników na poziomie kursu i konta.
   determines_visibility_and_management_of_outcomes_t_8a40bf86: "Określa widoczność i zarządzanie kartą Wyniki w strukturze nawigacyjnej konta. Pozwala użytkownikowi na tworzenie, importowanie, edytowanie i usuwanie wyników i grup wyników na poziomie kursu i konta."
+  determines_visibility_and_management_of_rubrics_li_83a26d8e: "Określa widoczność i zarządzanie łączem Kryteria ocen w strukturze nawigacyjnej konta. Pozwala użytkownikowi na wyświetlanie łącza Kryteria ocen w strukturze nawigacyjnej kursu. Pozwala użytkownikowi na tworzenie, edytowanie i usuwanie kryteriów ocen kursu."
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       Określa widoczność i zarządzanie kartą Kryteria ocen w strukturze nawigacyjnej konta.
       Pozwala użytkownikowi na zarządzanie kryteriami ocen Rubric.
@@ -8138,9 +8152,11 @@ pl:
       Pozwala użytkownikom na wyświetlanie wcześniejszych dat importowania SIS, błędów i zaimportowanych elementów.
   determines_visibility_of_the_course_activity_optio_2446c4b3: "Określa widoczność opcji Aktywność kursu na karcie Rejestr w Narzędziach administratora. Pozwala użytkownikowi na wyświetlanie informacji o aktywności dotyczącej kursów na koncie."
   determines_visibility_of_the_grade_change_activity_6c23036b: "Określa widoczność opcji Aktywność zmian ocen na karcie Rejestr w Narzędziach administratora."
+  determines_whether_a_publish_button_is_included_in_f7ad9b56: "Określa, czy przycisk Opublikuj jest dostępny na karcie kursu dla nieopublikowanego kursu (pulpit nawigacyjny widoku karty)."
   determines_whether_a_publish_course_option_is_incl_9bf770e9: "Określa, czy opcja Opublikuj kurs jest dostępna na stronie głównej kursu."
   determines_whether_a_publish_course_option_is_incl_ac5eed8f: "Określa, czy opcja Opublikuj kurs jest uwzględniona na Liście kontrolnej konfiguracji kursu oraz stronie głównej kursu."
   determines_whether_the_course_setup_checklist_opti_fd5a8f70: "Określa, czy opcja Lista kontrolna konfiguracji kursu jest dostępna na stronie głównej kursu."
+  determines_whether_the_publish_course_and_unpublis_432a4bbc: "Określa, czy przyciski Opublikuj kurs i Cofnij publikację kursu są dostępne na stronie głównej kursu."
   developer_key: 
     api_key: "Klucz: *%{api_key}*"
     created: "Utworzono:"
@@ -8726,6 +8742,7 @@ pl:
   drag_and_drop_your_image_here_or_7fba7c14: "Przeciągnij i upuść obraz tutaj lub "
   drag_to_rearrange_sections_637efee3: "Przeciągnij, aby zmienić układ sekcji"
   drag_up_or_down_to_reorder_382126ff: "Przeciągnij w górę lub dół, aby zmienić kolejność"
+  drop_files_here_to_add_to_module_236304f5: "Upuść pliki tutaj, aby dodać je do modułu"
   drop_files_here_to_upload_ce0f50f9: "Upuść pliki tutaj, aby przekazać"
   drop_image_62a2a071: "Upuść obraz"
   dropdown_changed_state_to_expanded_517689c2: "lista rozwijana zmieniła stań na %{expanded}."
@@ -11982,6 +11999,7 @@ pl:
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Jeśli wyłączone są opcje Oceny - Edytuj oraz Oceny - Wyświetl wszystkie oceny, to Dziennik ocen będzie ukryty w strukturze nawigacyjnej kursu."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Jeśli wyłączone są uprawnienia Oceny - Edytuj oraz Oceny - Wyświetl wszystkie oceny, to Dziennik ocen będzie ukryty w strukturze nawigacyjnej kursu."
   if_commons_is_installed_allows_importing_favorited_eff368f: "Jeśli Commons jest zainstalowana, zezwól na importowanie ulubionych elementów zawartości z Canvas."
+  if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "Jeśli uprawnienia Kursy - Dodaj / edytuj / usuń oraz Kursy - Cofnij usunięcie są włączone, użytkownik na poziomie konta będzie mógł przywracać usunięte kursy w Narzędziach administratora."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "W przypadku wyłączenia, strona Wyniki uzyska status „tylko do odczytu” i ukryty zostanie przycisk Zarządzaj kryteriami ocen. Użytkownik nadal może uzyskać dostęp do poszczególnych kryteriów ocen zadania za pomocą sekcji Zadania."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "W przypadku wyłączenia, użytkownik nadal może wyświetlać i pobierać pliki do archiwum ZIP."
   if_disabled_user_will_still_have_access_to_course__541e130: "W przypadku wyłączenia, użytkownik nadal ma dostęp do Ustawień kursu. Użytkownik nie może zarządzać zawartością poszczególnych kursów bez odpowiedniego uprawnienia dla tego elementu zawartości. Jeśli widoczność kursu zostanie ograniczona do użytkowników zapisanych na kurs, dzięki temu uprawnieniu użytkownik może wyświetlać zawartość kursu bez zapisywania się na kurs."
@@ -12410,6 +12428,7 @@ pl:
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Nieprawidłowy znacznik czasu – nie da się analizować"
   invalid_url_in_xml: "Nieprawidłowy adres URL w XML. Należy zmienić znaki &."
   invalid_username_or_password_b60aa240: "Nieprawidłowa nazwa użytkownika lub hasło"
+  invalid_username_or_password_trouble_logging_in_ch_7699399c: "Nieprawidłowe nazwa użytkownika lub hasło. Masz problem z logowaniem? *Sprawdź często zadawane pytania dotyczące logowania*."
   invalid_utf_8_13c76a6: "Nieprawidłowe kodowanie UTF-8"
   invalid_value_12ca12c2: "Nieprawidłowa wartość"
   invalid_value_for_name_i_4a7c601a: "Nieprawidłowa wartość dla %{name}: \"%{i}\""
@@ -15306,6 +15325,7 @@ pl:
   module_90d9fd32: Moduł
   module_completed_50c50762: "Moduł ukończony"
   module_content_import_enhancements_c00b0ea2: "Ulepszenia importowania zawartości modułu"
+  module_file_upload_enhancements_eecd4d37: "Ulepszone przesyłanie plików modułu"
   module_filter_63b17d11: "Filtr modułów"
   module_first_to_last_6921f3ec: "Moduł - Od pierwszego do ostatniego"
   module_in_progress_fa600662: "Moduł w trakcie"
@@ -15892,6 +15912,7 @@ pl:
   no_submission_for_assignmenttitle_243bd1f4: "Brak przesłanych zadań dla %{assignmentTitle}"
   no_submissions_164cea23: "Brak zgłoszeń"
   no_submissions_have_been_uploaded_2fb02710: "Nie przesłano żadnych materiałów"
+  no_submissions_to_zip_please_try_again_after_stude_7e0f478: "Brak przesyłek w archiwum ZIP. Spróbuj ponownie po przesyłkach od uczestników."
   no_terms_eab5ee7b: "Brak warunków"
   no_tls_618add1a: "Brak TLS"
   no_unassigned_terms_deb7b76b: "Brak nieprzypisanych terminów"
@@ -16954,6 +16975,7 @@ pl:
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Przekaż im dane dotyczące wyświetlanej strony i klikniętego łącza."
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Przekaż im dane dotyczące wyświetlanej strony i klikniętego łącza."
   please_log_in_to_view_this_content_eec6cd0: "Zaloguj się, aby wyświetlić tę zawartość"
+  please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Upewnij się, że nikt z otoczenia nie będzie mógł zapisać obrazu Twojego ekranu, w tym za pomocą usługi udostępniania ekranu."
   please_provide_a_field_e5a7d0b3: "Podaj %{field}"
   please_select_a_group_set_for_this_assignment_e1da63d3: "Wybierz zestaw grup do tego zadania"
   please_select_a_user_role_for_this_link_9fb4e655: "Wybierz rolę użytkownika dla danego łącza."
@@ -17000,6 +17022,13 @@ pl:
     big_blue_button_fallback: 
       description: "Powrót do poprzednich ustawień BigBlueButton w celu zachowania rekordów w czasie migracji"
       name: "Cofnięcie ustawień BigBlueButton podczas migracji"
+    big_blue_button_fallback_settings: 
+      description: "Jeśli w konfiguracji dodatku BigBlueButton wybrano ustawienia awaryjne, tych ustawień będzie używać. Funkcja awaryjna jest używana tylko do wyszukania nagrań konferencji, których nie utworzono z konfiguracją dla dodatku BigBlueButton."
+      domain_description: "**nazwa hosta** lub **adres IP** do instalacji dodatku BigBlueButton (np. bigbluebutton.mycompany.com)"
+      labels: 
+        domain: Domena
+        secret: "Klucz tajny"
+      secret_description: "Jest to parametr %{parameter_name}, który można znaleźć w pliku konfiguracji %{filename}."
     big_blue_button_settings: 
       description: "Wymagany jest dostęp do wersji systemu [BigBlueButton](%{url})."
       domain_description: "**nazwa hosta**lub **adres IP** do instalacji użytkownika w systemie BigBlueButton (np. bigbluebutton.mycompany.com)"
@@ -17009,6 +17038,7 @@ pl:
         recording_enabled: "Zezwól na nagrywanie konferencji."
         replace_with_alternatives: "Wyłącz konferencje BigBlueButton; wyświetl listę alternatyw"
         secret: "Klucz tajny"
+        use_fallback: "Użyj ustawień funkcji awaryjnej dodatku BigBlueButton, aby wyszukać nagrań konferencji, które nie były hostowane przez obecnie skonfigurowaną instancję BBB."
       secret_description: "Jest to parametr %{parameter_name}, który można znaleźć w pliku konfiguracji %{filename}."
     buttons: 
       saving: "Trwa zapisywanie..."
@@ -18052,6 +18082,7 @@ pl:
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "P: Co to jest – na zmianę czarne, białe, czarne, białe?  O: Panda tocząca się po zboczu wzgórza."
   qatar_974_7e9684ca: "Katar (+974)"
   qatar_d52a8d27: Katar
+  qr_code_display_was_canceled_96234bf2: "Anulowano wyświetlanie kodu QR"
   qr_code_image_2b3a89b5: "Obraz z kodem QR"
   qr_for_mobile_login_1b1560ce: "Kod QR do logowania w smartfonie"
   qti_display: QTI
@@ -21598,6 +21629,7 @@ pl:
   shared_brand_configs_e5d319d7: "Współdzielone konfiguracje marki"
   shared_content_803ac37b: "Udostępniona zawartość"
   shared_secret_892c88f2: "Wspólny klucz"
+  sharing_a_qr_code_can_give_others_immediate_access_79575158: "Udostępnienie kodu QR zapewni innym użytkownikom natychmiastowy dostęp do Twojego konta za pomocą aplikacji mobilnych %{canvas}."
   she_her_3f459cc2: ona/jej
   she_her_c8b5e3be: ona/jej
   short_name_42f454a1: Skrót
@@ -23455,6 +23487,7 @@ pl:
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Aby powiązać ze sobą sekcje, należy także włączyć uprawnienia Sekcje kursu - Dodaj / edytuj / usuń. Aby edytować SIS ID kursu, należy także włączyć uprawnienie Dane SIS - Zarządzaj. Aby pozwolić użytkownikowi na usunięcie kursu na poziomie konta, należy także włączyć uprawnienie Status kursu - Zarządzaj."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Aby powiązać ze sobą sekcje, należy także włączyć uprawnienia Sekcje kursu - Dodaj / edytuj / usuń. Aby edytować SIS ID kursu, należy także włączyć uprawnienie Dane SIS - Zarządzaj. Aby pozwolić użytkownikowi na usunięcie kursu na poziomie konta, należy także włączyć uprawnienie Status kursu - Zarządzaj."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Aby powiązać ze sobą sekcje, należy także włączyć uprawnienia Kurs - Dodaj / edytuj / usuń."
+  to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "Aby powiązać ze sobą sekcje, należy także włączyć opcje Kursy - Dodaj / edytuj / usuń."
   to_date_can_t_come_before_from_date_cf9e18aa: "„Do dnia” nie może być wcześniejsze od „Od daty”"
   to_date_cannot_come_before_from_date_3eeb2633: "„Do dnia” nie może być wcześniejsze od „Od dnia”"
   to_differentiate_assignments_to_individual_student_6cc40fde: "Aby rozróżnić między zadania dla poszczególnych uczestników, należy włączyć także opcję Użytkownicy - Wyświetl listę."
@@ -23482,6 +23515,7 @@ pl:
       Aby edytować sekcję nauczyciela, projektanta kursów lub asystenta instruktora, należy także włączyć uprawnienia Użytkownicy - Dodaj / usuń nauczycieli, projektantów kursów lub asystentów instruktorów z kursów do kursu oraz Konwersacje - Wyślij wiadomości do poszczególnych uczestników kursu.
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Aby edytować ustawienia kursu Blueprint na stronie Ustawienia kursu, należy także włączyć opcje Kursy Blueprint - Dodaj / edytuj / powiąż / usuń. Aby dodać powiązany kurs, należy także włączyć opcje Kursy Blueprint - Dodaj / edytuj / powiąż / usuń oraz Kursy - wyświetl listę. Aby edytować ustawienia blokady dla dowolnego obiektu Blueprint, należy włączyć to uprawnienie. Aby edytować ustawienia blokady plików, należy także włączyć uprawnienia Pliki kursu - Dodaj / edytuj / usuń. Aby edytować ustawienia blokady testów, należy także włączyć uprawnienia Zadania i testy - Dodaj / edytuj / usuń."
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Aby edytować ustawienia blokady Blueprint na stronie Indeks zadań, należy także włączyć opcje Kursy - Dodaj / edytuj / usuń. Jeśli to uprawnienie nie zostanie włączone, ale uprawnienia Kursy - Dodaj / edytuj / usuń są włączone, to ustawieniami blokady Blueprint dla zadania będzie można zarządzać na stronie szczegółów zadania. Aby edytować ustawienia blokady Blueprint na stronie określonego testu lub na stronie Indeks testów, należy także włączyć opcje Kursy - Dodaj / edytuj / usuń."
+  to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "Aby edytować ustawienia blokady Blueprint na stronie Indeks dyskusji, należy także włączyć uprawnienia Kursy - Dodaj / edytuj / usuń oraz Dyskusje - Moderuj. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Aby edytować ustawienia blokady Blueprint na stronie Indeks dyskusji, należy także włączyć opcje Kursy - Dodaj / edytuj / usuń oraz Dyskusje - Wyświetl. Jeśli to uprawnienie nie zostanie włączone, ale uprawnienia Kursy - Dodaj / edytuj / usuń oraz Dyskusje - Wyświetl są włączone, ustawienia blokady Blueprint można edytować dla poszczególnych dyskusji."
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Aby edytować ustawienia blokady Blueprint na stronie Indeks stron, należy także włączyć uprawnienia Kursy - Dodaj / edytuj / usuń. Jeśli to uprawnienie nie zostanie włączone, ale opcje Kursy - Dodaj / edytuj / usuń są włączone, ustawienia blokady Blueprint będzie można edytować na poszczególnych stronach."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "Aby edytować schematy ocenienia kursów, należy także włączyć uprawnienia Kursy - Dodaj / edytuj / usuń."
@@ -23503,6 +23537,7 @@ pl:
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "Aby generować aktywność logowania/wylogowania w Narzędziach administratora, należy także włączyć uprawnienie Użytkownicy - Zarządzaj szczegółami logowania lub Statystyki - Wyświetl. Aby generować dzienniki zmian ocen w Narzędziach administratora, należy także włączyć uprawnienie Oceny - Wyświetl dzienniki zmian."
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "Aby importować zadania i testy za pomocą Narzędzia importowania kursów, należy włączyć uprawnienie Zawartość kursu - Dodaj / edytuj / usuń."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "Aby importować pliki za pomocą Narzędzia importowania kursów, należy włączyć opcję Zawartość kursu - Dodaj / edytuj / usuń."
+  to_import_learning_outcomes_learning_outcomes_impo_5abbd2fb: "Aby importować wyniki nauki, należy włączyć opcję Wyniki nauki - Importuj."
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "Aby importować dane SIS, należy włączyć opcję Dane SIS - Importuj."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "Aby importować dane SIS, należy włączyć opcję Dane SIS - Importuj."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Aby połączyć obserwatora kursu *%{name}* do ucznia, wpisz imię ucznia poniżej aby go znaleźć, następnie kliknij Aktualizuj."
@@ -23635,6 +23670,8 @@ pl:
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "Aby wyświetlać analizę uczestników, należy także włączyć uprawnienia Użytkownicy - Wyświetl listę oraz Analiza - Wyświetl."
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "Aby wyświetlać analizę uczestników, należy także włączyć uprawnienia Użytkownicy - Wyświetl listę oraz Oceny - Wyświetl wszystkie oceny."
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "Aby wyświetlać stronę konta Ludzie, należy włączyć opcję Użytkownicy - Wyświetl listę. Jeśli to uprawnienie jest wyłączone oraz włączono opcję Użytkownicy - Wyświetl loginy, użytkownicy nadal będą wyświetlać adresy e-mail używane jako loginy."
+  to_view_the_gradebook_course_content_view_must_als_676f3e8: "Aby wyświetlać Dziennik ocen, należy także włączyć opcję Zawartość kursu - Wyświetl. Jeśli wyłączone są uprawnienia Oceny - Edytuj oraz Oceny - Wyświetl wszystkie oceny, to Dziennik ocen będzie ukryty w strukturze nawigacyjnej kursu."
+  to_view_the_gradebook_grades_view_all_grades_must__7ead435: "Aby wyświetlać Dziennik ocen, należy także włączyć uprawnienie Oceny - Wyświetl wszystkie oceny."
   to_view_the_list_of_users_in_an_account_users_view_401b8462: "Aby wyświetlać listę użytkowników na koncie, należy włączyć opcję Użytkownicy - Wyświetl listę."
   to_view_the_list_of_users_in_an_account_users_view_630d77a0: "Aby wyświetlać listę użytkowników na koncie, należy włączyć opcję Użytkownicy - Wyświetl."
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "Aby wyświetlać listę użytkowników na koncie, należy włączyć opcję Użytkownicy - Wyświetl listę."
@@ -23794,6 +23831,7 @@ pl:
   unable_to_remove_app_4293cb53: "Nie można usunąć aplikacji"
   unable_to_save_new_discussion_topic_99239f3f: "Nie można zapisać nowego tematu w dyskusji"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Nie można ustawić domyślnej oceny, ponieważ termin tego zadania przypada na zamknięty okres oceniania dla co najmniej jednego uczestnika"
+  unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Nie można skonfigurować funkcji przeciągnij i upuść dla modułów"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Nie można przesłać pliku do usługi przechowywania. Usługa może być niedostępna lub wymagane jest ponowne zalogowanie w Canvas."
   unarchive_selected_e0c4bd3d: "Wybrano zdezarchywizowanie"
   unassigned_permissions_6a38ca95: "Nieprzydzielone uprawnienia"
@@ -24560,6 +24598,7 @@ pl:
       Administratorzy podkont nie mogą wyświetlać danych SIS, chyba że otrzymają rolę instruktora w kursie. Administratorzy podkont nie mogą wyświetlać danych SIS bez powiązania z kursem, ponieważ rola instruktora dysponuje uprawnieniem do odczytywania danych SIS na poziomie konta.
   users_and_terms_are_located_at_the_account_so_the__6896b895: "Użytkownicy i terminy znajdują się na koncie, dlatego punkt końcowy SIS zawsze potwierdza uprawnienia użytkownika według konta. Podkonta pozwalają zarządzać tylko kursami i sekcjami; nie należą do nich dane użytkownika. Administratorzy podkont nie mogą wyświetlać danych SIS, chyba że otrzymają rolę instruktora w kursie. Administratorzy podkont nie mogą wyświetlać danych SIS bez powiązania z kursem, ponieważ rola instruktora dysponuje uprawnieniem do odczytywania danych SIS na poziomie konta."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "Użytkownicy mogą wykorzystywać i tworzyć (bez możliwości edycji) poszczególne kryteria ocen dla zadania za pomocą sekcji Zadania, jeśli włączone są uprawnienia Zawartość kursu - Wyświetl oraz Zadania i testy - Dodaj / edytuj / usuń."
+  users_can_access_and_create_but_not_edit_individua_c8a62c74: "Użytkownicy mogą wykorzystywać i tworzyć (bez możliwości edycji) poszczególne kryteria ocen dla zadania za pomocą sekcji Zadania, jeśli włączone są uprawnienia Zadania i testy - Dodaj / edytuj / usuń."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Użytkownicy mogą korzystać z łącza Zarządzaj bankami pytań, na stronie Indeks testów, jeśli włączone są uprawnienia Zawartość kursu - Wyświetl oraz Zadania i testy - Dodaj / edytuj / usuń."
   users_d1b60cb0: Użytkownicy
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Użytkownicy - Generuj kody parowania obserwującego dla uczestników"
@@ -24667,6 +24706,7 @@ pl:
   visit_group_group_name_7a816081: "Odwiedź grupę %{group_name}"
   visit_zoom_14636084: "Odwiedź Zoom,"
   waiting_for_attempted_login_6d00cb49: "Oczekiwanie na próbę zalogowania"
+  waiting_for_confirmation_to_display_qr_code_6f904d63: "Oczekiwanie na potwierdzenie wyświetlania kodu QR"
   waiting_for_selection_ce0398c7: "Oczekiwanie na wybór"
   waiting_for_your_qr_code_to_load_809299e5: "Oczekiwanie na wczytanie kodu QR"
   warning_6576b5b8: ostrzeżenie
