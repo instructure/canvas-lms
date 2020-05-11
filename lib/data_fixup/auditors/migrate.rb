@@ -104,12 +104,20 @@ module DataFixup::Auditors
         }
       end
 
+      def find_migration_cell
+        ::Auditors::ActiveRecord::MigrationCell.find_by(cell_attributes)
+      end
+
       def migration_cell
-        @_cell ||= ::Auditors::ActiveRecord::MigrationCell.find_by(cell_attributes)
+        @_cell ||= find_migration_cell
       end
 
       def create_cell!
         @_cell = ::Auditors::ActiveRecord::MigrationCell.create!(cell_attributes.merge({ completed: false }))
+      rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation
+        @_cell = find_migration_cell
+        raise "unresolvable auditors migration state #{cell_attributes}" if @_cell.nil?
+        @_cell
       end
 
       def reset_cell!
