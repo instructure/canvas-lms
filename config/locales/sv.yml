@@ -175,10 +175,14 @@ sv:
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Ett beräkningsvärde används inte i den här beräkningsmetoden"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "En Canvas-säkerhetstoken genererades precis för ditt konto. Om du begärde en användartoken behövs ingen åtgärd. Om du inte begärde en token eller om du vill hantera din Canvas-tillgångstoken kan du göra det här:"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "En fil med namnet %{itemName} finns redan i den här mappen."
+  a_file_named_name_already_exists_do_you_want_to_re_6536980: "Det finns redan en fil med namnet \"%{name}\". Vill du ersätta den befintliga filen?"
+  a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Det finns redan en fil med namnet \"%{name}\" i den här mappen. Vill du ersätta den befintliga filen?"
   a_front_page_is_required_fd57b80: "En framsida krävs"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "En logotyp i helstorlek som visas i höger sidofält på Canvas översikt. Idealisk storlek är 360 x 140 pixlar. Godkända format: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Ett smidigt nyckel/värdeutdrag med info om en värd i en intressant miljö för den rapporterande användaren"
   a_json_url_is_required_please_supply_one_ed03101c: "En URL för JSON krävs, ange en."
+  a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "Det finns redan en låst fil med namnet \"%{name}\" i den här mappen. Ange ett nytt namn."
+  a_locked_file_named_name_already_exists_please_ent_3b2e65a: "Det finns redan en låst fil med namnet \"%{name}\". Ange ett nytt namn."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Ett låst objekt med namnet ”%{name}” finns redan på den här platsen. Ange ett nytt namn."
   a_message_is_required_129e1814: "Ett meddelande krävs"
   a_name_for_this_set_is_required_222bad23: "Det krävs ett namn för den här uppsättningen"
@@ -1871,6 +1875,10 @@ sv:
   admins_3e1dce15: Administratörer
   admins_add_remove_26811ce5: "Administratörer – lägg till/ta bort"
   advanced_36b35b8: Avancerad
+  affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Påverkar visning av knapparna Avsluta kurs och Ta bort den här kursen permanent. Knappen Ta bort den här kursen permanent visas endast för kurser som skapats manuellt."
+  affects_viewing_the_conclude_course_and_permanentl_d943656e: "Påverkar visning av knapparna Avsluta kurs och Ta bort den här kursen permanent. Knappen Ta bort den här kursen permanent visas endast för manuellt skapade kurser.\n\
+      \x20       För kursnivåanvändare är borttagning av en kurs en del av behörigheten Kurstillstånd –hantera. Men för en kontonivåanvändare krävs den här behörigheten och Kurser – lägg till/redigera/ta bort för att ta bort en kurs. "
+  affects_viewing_the_delete_this_course_and_conclud_1ac257e: "Påverkar visning av knapparna Ta bort den här kursen och Avsluta kurs."
   affects_viewing_the_publish_course_and_conclude_co_6589f97e: "Påverkar visning via knapparna Publicera kurs och Avsluta kurs."
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Påverkar visning av knapparna Publicera kurs, Avsluta kurs och Ta bort den här kursen permanent.
@@ -2205,6 +2213,7 @@ sv:
   allows_user_to_edit_grading_schemes_98c35117: "Gör det möjligt för användaren att redigera bedömningsscheman."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Gör det möjligt för användare att redigera kursens SIS-ID."
   allows_user_to_edit_the_course_syllabus_a28ff262: "Gör det möjligt för användaren att redigera kursens kursöversikt."
+  allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Gör att användare kan exportera omdömesboken till en kommaavgränsad fil (CSV). Ger användare åtkomst till Överblick för måluppfyllelse (om aktiverad)."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Gör att användare kan filtrera blueprint-kurser på kontonivå. Gör att användare kan lägga till kopplade kurser."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       Gör det möjligt för användaren att filtrera kursmallar på kontonivå.
@@ -2282,6 +2291,7 @@ sv:
   allows_user_to_view_account_analytics_98fbc6ad: "Gör det möjligt för användare att se kontoanalyser."
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Gör det möjligt för användaren att se alla kursgrupper och inte bara de som de är registrerade för, i fönstret Samarbeta med."
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Gör att användare kan se alla inlämnade studentuppgifter och lägga till kommentarer."
+  allows_user_to_view_analytics_link_in_the_user_set_56867782: "Gör att användare kan se analyslänken på menyn för användarinställningar."
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Gör det möjligt för användaren att se och lägga till användare i ett samarbete."
   allows_user_to_view_and_configure_reports_in_accou_413e4e41: |-
       Gör det möjligt för användaren att visa och konfigurera rapporter i Kontoinställningar.
@@ -4912,6 +4922,7 @@ sv:
   clear_2084585f: Rensa
   clear_selected_file_82388e50: "Rensa vald fil"
   clear_user_cache_ef079f7f: "Rensa användar-cacheminne"
+  click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Klicka på \"Avbryt\" om du inte vill visa koden."
   click_for_more_details_on_this_outcome_8c018d2f: "klicka för mer detaljer om det här lärandemålet"
   click_here_for_an_account_9536cb36: "Klicka här för ett konto"
   click_here_it_s_free_eeccb9cb: "Klicka här, det är gratis!"
@@ -4928,6 +4939,7 @@ sv:
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Klicka på navigeringsknappen för kontot för att öppna aviseringsinställningarna."
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Klicka på navigeringsknappen för administratörer för att öppna kontoinställningarna."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Klicka på navigeringsknappen för kurser för att öppna dina kurser."
+  click_proceed_to_continue_b6eeffc6: "Klicka på \"Fortsätt\" för att fortsätta."
   click_the_button_above_to_add_content_4c7024a: "Klicka på knappen ovan för att lägga till innehåll"
   click_to_add_a_name_6cf551b0: "Klicka för att lägga till ett namn"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Klicka för att ändra profilbild för %{display_name}"
@@ -5384,6 +5396,7 @@ sv:
   confirm_dialog_component: 
     ok: Ok
   confirm_edit_outcome_a9746c99: "Bekräfta redigering av lärandemål"
+  confirm_qr_code_display_49664fa3: "Bekräfta visning av QR-kod"
   confirm_removal_a9bb889: "Bekräfta borttagning"
   confirm_reservation_removal_e6350e7c: "Bekräfta borttagning av bokning"
   confirm_unfavorite_course_fa01966d: "Bekräfta borttagning av kursfavorit"
@@ -7953,6 +7966,7 @@ sv:
       Fastställer synlighet och hantering av fliken Lärandemål i kontonavigering.
       Gör det möjligt för användaren att skapa, importera, redigera och ta bort lärandemål och grupper av lärandemål på konto- och kursnivå.
   determines_visibility_and_management_of_outcomes_t_8a40bf86: "Fastställer synlighet och hantering av fliken Resultat i kontonavigering. Gör att användare kan skapa, importera, redigera och ta bort resultat och resultatgrupper på konto- och kursnivå."
+  determines_visibility_and_management_of_rubrics_li_83a26d8e: "Fastställer synlighet och hantering av matrislänken i kontonavigeringen. Gör att användare kan se matrislänken i kursnavigeringen. Gör det möjligt för användaren att skapa, redigera och ta bort kursmatriser."
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       Fastställer synlighet och hantering av fliken Kontonavigeringsmatriser.
       Gör det möjligt för användaren att hantera matriser.
@@ -7969,9 +7983,11 @@ sv:
       Gör det möjligt för användare att se tidigare datum, fel och importerade objekt för SIS-importer.
   determines_visibility_of_the_course_activity_optio_2446c4b3: "Avgör synlighet för alternativet Kursaktivitet i fliken Loggning för Administratörsverktyg. Gör det möjligt för användaren att visa information om kursaktivitet för kontot."
   determines_visibility_of_the_grade_change_activity_6c23036b: "Avgör synlighet för alternativet Ändringsaktivitet för omdömen i fliken Loggning för Administratörsverktyg."
+  determines_whether_a_publish_button_is_included_in_f7ad9b56: "Fastställer om en Publicera-knapp ska inkluderas på ett kurskort för en opublicerad kurs (kortvyöversikten)."
   determines_whether_a_publish_course_option_is_incl_9bf770e9: "Avgör om alternativet Publicera kurs är inkluderat på kursens startsida."
   determines_whether_a_publish_course_option_is_incl_ac5eed8f: "Avgör om alternativet Publicera kurs är inkluderat på checklistan för kursinställningar och på kursens startsida."
   determines_whether_the_course_setup_checklist_opti_fd5a8f70: "Avgör om alternativet Checklista för kursinställningar inkluderas på kursens startsida."
+  determines_whether_the_publish_course_and_unpublis_432a4bbc: "Avgör om knapparna Publicera kurs och Avpublicera kurs ska visas på kurshemsidan."
   developer_key: 
     api_key: "Nyckel: *%{api_key}*"
     created: "Skapad:"
@@ -8546,6 +8562,7 @@ sv:
   drag_and_drop_your_image_here_or_7fba7c14: "Dra och släpp din bild här eller "
   drag_to_rearrange_sections_637efee3: "Dra för att arrangera om sektioner"
   drag_up_or_down_to_reorder_382126ff: "Dra upp eller ner för att omorganisera"
+  drop_files_here_to_add_to_module_236304f5: "Släpp filer här för att lägga till i modulen"
   drop_files_here_to_upload_ce0f50f9: "Släpp filerna här för uppladdning"
   drop_image_62a2a071: "Släpp bild"
   dropdown_changed_state_to_expanded_517689c2: "rullgardinsmenyn ändrade stat till %{expanded}."
@@ -11750,6 +11767,7 @@ sv:
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Om Omdömen – redigera och Omdömen – visa alla omdömen är inaktiverade döljs bedömningsöversikten i kursnavigeringen."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Om både Omdömen – redigera och Omdömen – visa alla omdömen är inaktiverade, döljs bedömningsöversikten i kursnavigeringen."
   if_commons_is_installed_allows_importing_favorited_eff368f: "Om Commons är installerat kan du importera favoritinnehåll till Canvas."
+  if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "Om även Kurser – lägg till/redigera/ta bort – ångra borttagning har aktiverats kan en kontonivåanvändare återställa borttagna kurser i administratörsverktyget."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Om alternativet är inaktiverat blir sidan med lärandemål skrivskyddad och knappen Hantera matriser döljs. Användaren kan fortfarande öppna enskilda uppgiftsmatriser genom Uppgifter."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "Om funktionen är inaktiverad, kan användare ändå visa och ladda ned filer till en zip-fil."
   if_disabled_user_will_still_have_access_to_course__541e130: "Om inaktiverad, har användare ändå åtkomst till kursinställningar. Användare kan inte hantera individuellt kursinnehåll utan korrekt behörighet för det innehållsobjektet. Om kurssynligheten är begränsad till användare som registrerat sig för kusen, gör den här behörigheten att användare kan visa kursinnehåll utan att vara registrerad i kursen."
@@ -12176,6 +12194,7 @@ sv:
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Ogiltig tidsstämpel ‒ tidsstämpeln går inte att tolka"
   invalid_url_in_xml: "Ogiltig url i xml. Et-tecknet måste undvikas."
   invalid_username_or_password_b60aa240: "Ogiltigt användarnamn eller lösenord"
+  invalid_username_or_password_trouble_logging_in_ch_7699399c: "Ogiltigt användarnamn eller lösenord. Har du problem att logga in? *Läs våra vanliga frågor och svar om inloggning*."
   invalid_utf_8_13c76a6: "Ogiltig UTF-8"
   invalid_value_12ca12c2: "Ogiltigt värde"
   invalid_value_for_name_i_4a7c601a: "Ogiltigt värde för %{name}: ”%{i}\""
@@ -15039,6 +15058,7 @@ sv:
   module_90d9fd32: Modul
   module_completed_50c50762: "Modul slutförd"
   module_content_import_enhancements_c00b0ea2: "Förbättringar i importen av modulinnehåll"
+  module_file_upload_enhancements_eecd4d37: "Förbättrad filuppladdning för moduler"
   module_filter_63b17d11: Modulfilter
   module_first_to_last_6921f3ec: "Modul – Första till sista"
   module_in_progress_fa600662: "Modul pågår"
@@ -15619,6 +15639,7 @@ sv:
   no_submission_for_assignmenttitle_243bd1f4: "Ingen inlämning för %{assignmentTitle}"
   no_submissions_164cea23: "Inga inlämningar"
   no_submissions_have_been_uploaded_2fb02710: "Inga inlämningar har laddats upp"
+  no_submissions_to_zip_please_try_again_after_stude_7e0f478: "Inga inlämningar till komprimering. Försök igen efter studentinlämningar."
   no_terms_eab5ee7b: "Inga villkor"
   no_tls_618add1a: "Ingen TLS"
   no_unassigned_terms_deb7b76b: "Inga ej tilldelade terminer"
@@ -16667,6 +16688,7 @@ sv:
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Vänligen berätta vilken sida du tittade på och vilken länk du klickade på."
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Tala om för dem vilken sida du tittade på och vilken länk du klickade på."
   please_log_in_to_view_this_content_eec6cd0: "Logga in för att visa detta innehåll"
+  please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Se till att ingen i omgivningen kan kopiera bilden på din skärm eller från en delningstjänst."
   please_provide_a_field_e5a7d0b3: "Uppge en %{field}"
   please_select_a_group_set_for_this_assignment_e1da63d3: "Välj en gruppuppsättning för den här uppgiften"
   please_select_a_user_role_for_this_link_9fb4e655: "Välj en användarroll för den här länken."
@@ -16713,6 +16735,13 @@ sv:
     big_blue_button_fallback: 
       description: "Tidigare inställningar för BigBlueButton för att bibehålla inspelningar under migrering"
       name: "BigBlueButton-reservlösning för migrering"
+    big_blue_button_fallback_settings: 
+      description: "När du har konfigurerat ditt BigBlueButton-pluginprogram för användning av reservinställningar är det dessa inställningar som används. Reservinställningarna används endast för att söka efter inspelade konferenser som inte skapats med konfigurationen för ditt BigBlueButton-pluginprogram."
+      domain_description: "**värdnamn** eller **ip-adress** för din BigBlueButton-installation (t.ex bigbluebutton.mycompany.com)"
+      labels: 
+        domain: Domän
+        secret: Hemlighet
+      secret_description: "Det här är den %{parameter_name} parameter som finns i %{filename} konfig-filen."
     big_blue_button_settings: 
       description: "Du behöver åtkomst till en [BigBlueButton](%{url})-instans."
       domain_description: "**värdnamn** eller **ip-adress** för din BigBlueButton-installation (t.ex bigbluebutton.mycompany.com)"
@@ -16722,6 +16751,7 @@ sv:
         recording_enabled: "Tillåt att konferenser spelas in."
         replace_with_alternatives: "Inaktivera BigBlueButton-konferenser, visar istället en lista med alternativ"
         secret: Hemlighet
+        use_fallback: "Använd reservinställningarna för BigBlueButton-pluginprogram för att söka efter konferenser som inte körts i den konfigurerade BBB-instansen."
       secret_description: "Det här är den %{parameter_name} parameter som finns i %{filename} konfig-filen."
     buttons: 
       saving: "Sparar ..."
@@ -17757,6 +17787,7 @@ sv:
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Fråga: Vad blir svart, vit, svart, vit?  Svar: En panda som rullar ner för en backe."
   qatar_974_7e9684ca: "Qatar (+974)"
   qatar_d52a8d27: Qatar
+  qr_code_display_was_canceled_96234bf2: "Visning av QR-koden avbröts"
   qr_code_image_2b3a89b5: "Bild på QR-kod"
   qr_for_mobile_login_1b1560ce: "QR-kod för mobil inloggning"
   qti_display: QTI
@@ -21189,6 +21220,7 @@ sv:
   shared_brand_configs_e5d319d7: "Delade varumärkeskonfigurationer"
   shared_content_803ac37b: "Delat innehåll"
   shared_secret_892c88f2: "Delad hemlighet"
+  sharing_a_qr_code_can_give_others_immediate_access_79575158: "Delning av en QR-kod kan ge andra omedelbar åtkomst till ditt konto via %{canvas}-mobilapparna."
   she_her_3f459cc2: Hon/henne
   she_her_c8b5e3be: hon/henne
   short_name_42f454a1: "Kort namn"
@@ -23018,6 +23050,7 @@ sv:
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "För att korsreferera till en sektion måste även Kurssektioner – lägg till/redigera/ta bort vara aktiverat. För att redigera SIS-ID måste även SIS-data – hantera vara aktiverat. För att tillåta att en användare på kontonivå ska kunna ta bort en kurs måste även Kurstillstånd – hantera vara aktiverat."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "För att korsreferera till en sektion måste även Kurssektioner – lägg till/redigera/ta bort vara aktiverat. För att redigera kursens SIS-ID måste även SIS-data – hantera vara aktiverat. För att tillåta att en användare på kontonivå ska kunna ta bort en kurs måste även Kurstillstånd – hantera vara aktiverat."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Om du vill korsreferera till en sektion måste även Kurs – lägg till/redigera/ta bort vara aktiverat."
+  to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "För att korslista sektioner måste även Kurser – lägg till/redigera/ta bort aktiveras."
   to_date_can_t_come_before_from_date_cf9e18aa: "\"Till datum\" kan inte komma före \"Från datum\""
   to_date_cannot_come_before_from_date_3eeb2633: "Till datum kan inte komma före Från datum"
   to_differentiate_assignments_to_individual_student_6cc40fde: "För att särskilja uppgifter för individuella studenter måste Användare – visa lista vara aktiverat."
@@ -23045,6 +23078,7 @@ sv:
       För att redigera en sektion för en lärare, kursdesigner eller lärarassistent måste även Användare – lägg till/ta bort lärare, kursdesigner eller lärarassistenter från kurser för kursen och Konversationer – skicka meddelanden till enskilda kursdeltagare vara aktiverade.
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "För att redigera Blueprint-kursinställningar i Kursinställningar måste även Blueprint-kurser – lägg till/redigera/koppla/ta bort aktiveras. För att lägga till en kopplad kurs måste även Blueprint-kurser – lägg till/redigera/koppla/ta bort samt Kurser – visa lista aktiveras. För att redigera låsinställningar på modellobjekttyper måste den här behörigheten aktiveras. För att redigera låsinställningarna på filer måste även Kursfiler – lägg till/redigera/ta bort aktiveras. För att redigera låsinställningarna för quiz måste även Uppgifter och Quiz – lägg till/redigera/ta bort aktiveras."
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "För att redigera Blueprint-låsinställningar från indexsidan för uppgifter måste även Kurser – lägg till/redigera/ta bort aktiveras. Om den här behörigheten inte är aktiverad och Kurser – lägg till/redigera/ta bort är aktiverad, kan Blueprint-låsinställningar för en uppgift hanteras från informationssidan för uppgiften. För att redigera Blueprint-låsinställningar i ett individuellt quiz, eller på indexsidan för quiz måste även Kurser – lägg till/redigera/ta bort aktiveras."
+  to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "För att redigera Blueprint-låsinställningar från indexsidan för Diskussioner måste även Kurser – lägg till/redigera/ta bort och Diskussioner – moderera aktiveras. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "För att redigera Blueprint-låsinställningar från indexsidan Diskussioner måste även Kurs – lägg till/redigera/ta bort och Diskussioner – visa aktiveras. Om den här behörigheten inte är aktiverad och Kurser – lägg till/redigera/ta bort samt Diskussioner – visa är aktiverad kan Blueprint-låsinställningar redigeras på enskilda diskussioner."
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "För att redigera låsinställningarna från indexsidan Sidor måste även Kurser – lägg till/redigera/ta bort aktiveras. Om den här behörigheten inte är aktiverad och Kurser – lägg till/redigera/ta bort är aktiverad kan Blueprint-låsinställningar redigeras på enskilda sidor."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "För att redigera bedömningsscheman för en kurs måste även Kurser – lägg till/redigera/ta bort vara aktiverat."
@@ -23066,6 +23100,7 @@ sv:
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "För att generera in-/utloggningsaktivitet i Administratörsverktyg måste även behörigheterna Användare – hantera inloggningsuppgifter eller Statistik – visa vara aktiverade. För att generera ändringsloggar för omdömen i Administratörsverktyg måste även Omdömen – visa ändringsloggar vara aktiverat."
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "För att importera uppgifter och quiz med kursimportverktyget måste Kursinnehåll – lägg till/redigera/ta bort vara aktiverat."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "För att importera filer med kursimportverktyget måste även Kursinnehåll – lägg till/redigera/ta bort vara aktiverat."
+  to_import_learning_outcomes_learning_outcomes_impo_5abbd2fb: "För att importera lärandemål måste även Lärandemål – importera vara aktiverad."
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "För att importera SIS-data måste även SIS-Data – importera aktiveras."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "För att importera SIS-data måste även SIS-data – importera vara aktiverat."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "För att länka kursobservatören *%{name}* till en student skriver du in studentens namn nedan för att söka efter studenten och klickar därefter på Uppdatera."
@@ -23198,6 +23233,8 @@ sv:
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "För att visa studentanalyser måste även Användare – visa lista och Analytics – visa aktiveras."
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "Om du vill se studentanalyser måste även Användare – visa lista och Omdömen – visa alla omdömen vara aktiverade."
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "För att visa sidan Personer för kontot måste Användare – visa lista vara aktiverat. Om den här behörigheten är inaktiverad och om Användare – visa inloggnings-ID:n är aktiverat kommer användare fortfarande att se e-postadresser som används som inloggnings-ID:n."
+  to_view_the_gradebook_course_content_view_must_als_676f3e8: "För att visa bedömningsöversikten måste även Innehåll – visa aktiveras. Om både Omdömen – redigera och Omdömen – visa alla omdömen är inaktiverade, döljs bedömningsöversikten i kursnavigeringen."
+  to_view_the_gradebook_grades_view_all_grades_must__7ead435: "För att visa bedömningsöversikten måste även Omdömen – visa alla omdömen aktiveras."
   to_view_the_list_of_users_in_an_account_users_view_401b8462: "För att visa en lista över användare i ett konto måste Användare – visa lista vara aktiverat."
   to_view_the_list_of_users_in_an_account_users_view_630d77a0: "För att visa en lista över användare i ett konto måste även Användare – visa aktiveras."
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "För att visa en lista över användare i ett konto måste även Användare – visa lista aktiveras."
@@ -23357,6 +23394,7 @@ sv:
   unable_to_remove_app_4293cb53: "Kunde inte ta bort appen"
   unable_to_save_new_discussion_topic_99239f3f: "det går inte att spara nytt diskussionsämne"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Det går inte att ställa in standardbedömning eftersom denna uppgifts inlämningsdatum infaller i en stängd bedömningsperiod för minst en student"
+  unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Det gick inte att dra och släppa moduler"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Det går inte att överföra filen till lagringstjänsten. Tjänsten kan ligga nere, eller kan du behöva logga in till Canvas på nytt."
   unarchive_selected_e0c4bd3d: "Avarkivering vald"
   unassigned_permissions_6a38ca95: "Ej tilldelade behörigheter"
@@ -24110,6 +24148,7 @@ sv:
       Administratörer för underkonton kan inte se SIS-information om de inte även har tilldelats en lärarroll för en kurs. Administratörer för underkonton kan inte se SIS-information utan kurskoppling, eftersom lärarrollen har behörigheten att läsa SIS-data på kontonivå.
   users_and_terms_are_located_at_the_account_so_the__6896b895: "Användare och terminer finns i kontot, så SIS-slutpunkten kontrollerar alltid användarens behörigheter i enlighet med kontot. Underkonton kan endast äga kurser och avsnitt. De kan inte äga användardata. Administratörer för underkonton kan inte se SIS-information om de inte även har tilldelats en instruktörsroll i kursen. Administratörer för underkonton kan inte se SIS-information utan kurskoppling, eftersom instruktörsrollen har behörigheten att läsa SIS-data på kontonivå."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "Användare kan komma åt och skapa (men inte redigera) enskilda uppgiftsmatriser via Uppgifter om Kursinnehåll – visa och Uppgifter och quiz – lägg till/redigera/ta bort är aktiverade."
+  users_can_access_and_create_but_not_edit_individua_c8a62c74: "Användare kan komma åt och skapa (men inte redigera) individuella matriser via Uppgifter och Quiz om Uppgifter och Quiz – lägg till/redigera/ta bort har aktiverats."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Användare kan komma åt länken Hantera frågebanker på indexeringssidan för quiz om Kursinnehåll – visa och Uppgifter och quiz – lägg till/redigera/ta bort är aktiverade."
   users_d1b60cb0: Användare
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Användare – generera observatörens parningskoder för studenter"
@@ -24212,6 +24251,7 @@ sv:
   visit_group_group_name_7a816081: "Besök gruppen %{group_name}"
   visit_zoom_14636084: "Besök Zoom"
   waiting_for_attempted_login_6d00cb49: "Väntar på inloggningsförsök"
+  waiting_for_confirmation_to_display_qr_code_6f904d63: "Väntar på bekräftelse för att visa QR-kod"
   waiting_for_selection_ce0398c7: "Väntar på val"
   waiting_for_your_qr_code_to_load_809299e5: "Väntar på att din QR-kod ska läsas in"
   warning_6576b5b8: varning
