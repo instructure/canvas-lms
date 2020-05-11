@@ -673,6 +673,184 @@ describe('Assignment Bulk Edit Dates', () => {
     })
   })
 
+  describe('assignment selection by date', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.assignment_bulk_edit_phase_2 = true
+    })
+
+    function assignmentListWithDates() {
+      return [
+        {
+          id: 'assignment_1',
+          name: 'First Assignment',
+          can_edit: true,
+          all_dates: [
+            {
+              base: true,
+              unlock_at: moment.tz('2020-03-19T00:00:00', 'Asia/Tokyo').toISOString(),
+              due_at: moment.tz('2020-03-20T11:59:59', 'Asia/Tokyo').toISOString(),
+              lock_at: moment.tz('2020-04-11T11:59:59', 'Asia/Tokyo').toISOString(),
+              can_edit: true
+            },
+            {
+              id: 'override_1',
+              title: '2 students',
+              unlock_at: moment.tz('2020-03-29T00:00:00', 'Asia/Tokyo').toISOString(),
+              due_at: moment.tz('2020-03-30T11:59:59', 'Asia/Tokyo').toISOString(),
+              lock_at: moment.tz('2020-04-21T11:59:59', 'Asia/Tokyo').toISOString(),
+              can_edit: true
+            }
+          ]
+        },
+        {
+          id: 'assignment_2',
+          name: 'second assignment',
+          can_edit: true,
+          all_dates: [
+            {
+              id: 'override_2',
+              unlock_at: moment.tz('2020-03-22T00:00:00', 'Asia/Tokyo').toISOString(),
+              due_at: moment.tz('2020-03-23T11:59:59', 'Asia/Tokyo').toISOString(),
+              lock_at: null,
+              can_edit: true
+            }
+          ]
+        },
+        {
+          id: 'assignment_3',
+          name: 'third assignment',
+          can_edit: true,
+          all_dates: [
+            {
+              base: true,
+              unlock_at: moment.tz('2020-03-24T00:00:00', 'Asia/Tokyo').toISOString(),
+              due_at: moment.tz('2020-03-25T11:59:59', 'Asia/Tokyo').toISOString(),
+              lock_at: null,
+              can_edit: true
+            }
+          ]
+        },
+        {
+          id: 'assignment_4',
+          name: 'fourth assignment',
+          can_edit: true,
+          all_dates: [
+            {
+              base: true,
+              unlock_at: null,
+              due_at: null,
+              lock_at: null,
+              can_edit: true
+            }
+          ]
+        }
+      ]
+    }
+
+    it('apply button is initially disabled when both fields are blank', async () => {
+      const {getByText} = await renderBulkEditAndWait()
+      expect(getByText(/Apply date range selection/).closest('button').disabled).toBe(true)
+    })
+
+    it('apply button is enabled if either field is filled', async () => {
+      const {getByText, getByLabelText} = await renderBulkEditAndWait()
+      const applyButton = getByText(/Apply date range selection/)
+      const startInput = getByLabelText('Selection start date')
+      changeAndBlurInput(startInput, '2020-03-18')
+      expect(applyButton.closest('button').disabled).toBe(false)
+      changeAndBlurInput(startInput, '')
+      expect(applyButton.closest('button').disabled).toBe(true)
+      const endInput = getByLabelText('Selection end date')
+      changeAndBlurInput(endInput, '2020-03-18')
+      expect(applyButton.closest('button').disabled).toBe(false)
+    })
+
+    it('selects some assignments between two dates', async () => {
+      const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
+        {},
+        assignmentListWithDates()
+      )
+      const checkboxes = getAllByLabelText(/Select assignment:/)
+      changeAndBlurInput(getByLabelText('Selection start date'), '2020-03-20')
+      changeAndBlurInput(getByLabelText('Selection end date'), '2020-03-23')
+      fireEvent.click(getByText(/^Apply$/))
+      expect(checkboxes.map(cb => cb.checked)).toEqual([true, true, false, false])
+    })
+
+    it('deselects assignments outside of the dates', async () => {
+      const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
+        {},
+        assignmentListWithDates()
+      )
+      const checkboxes = getAllByLabelText(/Select assignment:/)
+      checkboxes.forEach(cb => fireEvent.click(cb))
+      expect(checkboxes.map(cb => cb.checked)).toEqual([true, true, true, true])
+      changeAndBlurInput(getByLabelText('Selection start date'), '2020-03-20')
+      changeAndBlurInput(getByLabelText('Selection end date'), '2020-03-20')
+      fireEvent.click(getByText(/^Apply$/))
+      expect(checkboxes.map(cb => cb.checked)).toEqual([true, false, false, false])
+    })
+
+    it('selects some assignments from start date to end of time', async () => {
+      const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
+        {},
+        assignmentListWithDates()
+      )
+      changeAndBlurInput(getByLabelText('Selection start date'), '2020-03-24') // catches the unlock dates
+      fireEvent.click(getByText(/^Apply$/))
+      const checkboxes = getAllByLabelText(/Select assignment:/)
+      expect(checkboxes.map(cb => cb.checked)).toEqual([true, false, true, false])
+    })
+
+    it('selects some assignments from beginning of time to end date', async () => {
+      const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
+        {},
+        assignmentListWithDates()
+      )
+      changeAndBlurInput(getByLabelText('Selection end date'), '2020-03-22')
+      fireEvent.click(getByText(/^Apply$/))
+      const checkboxes = getAllByLabelText(/Select assignment:/)
+      expect(checkboxes.map(cb => cb.checked)).toEqual([true, true, false, false])
+    })
+
+    it('checks unlock date for selection', async () => {
+      const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
+        {},
+        assignmentListWithDates()
+      )
+      changeAndBlurInput(getByLabelText('Selection start date'), '2020-03-29')
+      changeAndBlurInput(getByLabelText('Selection end date'), '2020-03-29')
+      fireEvent.click(getByText(/^Apply$/))
+      const checkboxes = getAllByLabelText(/Select assignment:/)
+      expect(checkboxes.map(cb => cb.checked)).toEqual([true, false, false, false])
+    })
+
+    it('checks lock date for selection', async () => {
+      const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
+        {},
+        assignmentListWithDates()
+      )
+      changeAndBlurInput(getByLabelText('Selection start date'), '2020-04-21')
+      changeAndBlurInput(getByLabelText('Selection end date'), '2020-04-21')
+      fireEvent.click(getByText(/^Apply$/))
+      const checkboxes = getAllByLabelText(/Select assignment:/)
+      expect(checkboxes.map(cb => cb.checked)).toEqual([true, false, false, false])
+    })
+
+    it('shows an error and disables apply if end date is before start date', async () => {
+      const {getByText, getByLabelText, getAllByText} = await renderBulkEditAndWait(
+        {},
+        assignmentListWithDates()
+      )
+      changeAndBlurInput(getByLabelText('Selection start date'), '2020-05-15')
+      changeAndBlurInput(getByLabelText('Selection end date'), '2020-05-14')
+      expect(
+        getAllByText('The end date must be after the start date').length
+      ).toBeGreaterThanOrEqual(1)
+      expect(getByText(/^Apply$/).closest('button')).toBeDisabled()
+    })
+  })
+
   describe('batch edit dialog', () => {
     async function renderOpenBatchEditDialog(selectAssignments = [0]) {
       const result = await renderBulkEditAndWait()
@@ -847,16 +1025,5 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(getByLabelText('Due Dates'))
       expect(getByText('Ok').closest('button').disabled).toBe(true)
     })
-  })
-
-  describe('errors', () => {
-    it('dislays error message if lock-at date is before due date', async () => {})
-    it('dislays error message if unlock-at date is after due date', async () => {})
-    it('dislays error message if any date is after course-end date', async () => {})
-    it('dislays error message if any date is before course-start date', async () => {})
-    it('dislays error message if any date is before course-term start date', async () => {})
-    it('dislays error message if any date is after course-term end date', async () => {})
-    it('dislays error message if any date is before user-role term access from', async () => {})
-    it('dislays error message if any date is after user-role term access until', async () => {})
   })
 })
