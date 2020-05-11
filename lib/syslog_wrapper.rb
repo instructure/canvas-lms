@@ -23,6 +23,8 @@ class SyslogWrapper
 
   attr_accessor :level, :datetime_format
 
+  def formatter; nil; end
+
   @@silencer = true
   def self.silencer; @@silencer; end
   def silencer; @@silencer; end

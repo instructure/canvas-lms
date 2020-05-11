@@ -56,6 +56,12 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": "S''ha produït un error en generar la visualització prèvia del fitxer"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "S''ha produït un error en realitzar una sol·licitud de xarxa"
+    },
+    "an_error_occurred_uploading_your_media_71f1444d": {
+        "message": "S''ha produït un error en carregar l''element multimèdia."
+    },
     "announcement_fb4cb645": {
         "message": "Anunci"
     },
@@ -121,6 +127,9 @@
     },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Obre automàticament una visualització prèvia en línia. (La visualització prèvia només es mostra després de desar)"
+    },
+    "available_folders_694d0436": {
+        "message": "Carpetes disponibles"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Principi de l''historial de tasques pendents"
@@ -213,6 +222,9 @@
         "message": "Documents del curs"
     },
     "course_files_62deb8f8": {
+        "message": "Fitxers del curs"
+    },
+    "course_files_a31f97fc": {
         "message": "Fitxers del curs"
     },
     "course_images_f8511d04": {
@@ -431,6 +443,12 @@
     "file_name_8fd421ff": {
         "message": "Nom del fitxer"
     },
+    "file_upload_failed_af22dd91": {
+        "message": "No s''ha pogut carregar el fitxer"
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "S''està carregant el fitxer"
+    },
     "file_url_c12b64be": {
         "message": "URL del fitxer"
     },
@@ -454,6 +472,9 @@
     },
     "focus_the_popup_context_toolbar_7979f4f8": {
         "message": "Centreu-vos en la barra d''eines de context que es mostra en una finestra emergent"
+    },
+    "folder_tree_fbab0726": {
+        "message": "Arbre de carpetes"
     },
     "formatting_5b143aa8": {
         "message": "S''està formatant"
@@ -489,6 +510,9 @@
         "message": "S''han carregat les qualificacions"
     },
     "group_files_4324f3df": {
+        "message": "Fitxers del grup"
+    },
+    "group_files_82e5dcdb": {
         "message": "Fitxers del grup"
     },
     "group_navigation_99f191a": {
@@ -608,6 +632,9 @@
     "loading_failed_e6a9d8ef": {
         "message": "No s''ha pogut carregar."
     },
+    "loading_folders_d8b5869e": {
+        "message": "S''estan carregant les carpetes"
+    },
     "loading_grades_c842c887": {
         "message": "S''estan carregant les qualificacions"
     },
@@ -622,6 +649,9 @@
     },
     "location_3b6ff307": {
         "message": "Ubicació:"
+    },
+    "locked_762f138b": {
+        "message": "Bloquejat"
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Sembla que no hi ha res aquí"
@@ -649,6 +679,9 @@
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Ha de ser de { width } × { height }píxels com a mínim"
+    },
+    "my_files_2f621040": {
+        "message": "Els meus fitxers"
     },
     "my_grades_98834476": {
         "message": "Les meves qualificacions"
@@ -899,6 +932,9 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Alguna cosa no ha anat bé i no sé què puc mostrar-te."
     },
+    "something_went_wrong_d238c551": {
+        "message": "Alguna cosa no ha anat bé"
+    },
     "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
         "message": "Alguna cosa no ha anat bé; torneu a provar-ho després d''actualitzar la pàgina"
     },
@@ -940,6 +976,9 @@
     },
     "subscript_59744f96": {
         "message": "Subíndex"
+    },
+    "success_file_uploaded_8174e93f": {
+        "message": "Operació correcta: S''ha carregat el fitxer"
     },
     "success_to_do_created_e34ed395": {
         "message": "Operació correcta: S''han creat tasques pendents"
@@ -1048,6 +1087,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Penja l''element multimèdia"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "La càrrega no està disponible per a aquesta carpeta"
     },
     "upload_record_media_e4207d72": {
         "message": "Penja o enregistra l''element multimèdia"

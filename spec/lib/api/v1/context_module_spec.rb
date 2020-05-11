@@ -86,5 +86,10 @@ describe Api::V1::ContextModule do
       json = subject.module_item_json(@tg, @user, @session, @cm)
       expect(json[:url]).to eq "http://www.tagurl.com?id=#{@tool.id}&url=http%3A%2F%2Fwww.tagurl.com"
     end
+
+    it "infers an indent value of 0" do
+      json = subject.module_item_json(@tg, @user, @session, @cm)
+      expect(json[:indent]).to eq 0
+    end
   end
 end

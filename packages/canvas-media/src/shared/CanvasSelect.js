@@ -113,6 +113,12 @@ export default class CanvasSelect extends React.Component {
       selectedOptionId: option ? option.props.id : null,
       announcement: null
     }
+
+    this._selectRef = React.createRef()
+  }
+
+  focus() {
+    this._selectRef.current?.focus()
   }
 
   componentDidUpdate(prevProps) {
@@ -132,6 +138,7 @@ export default class CanvasSelect extends React.Component {
     return (
       <>
         <Select
+          ref={this._selectRef}
           id={id}
           renderLabel={() => label}
           assistiveText={this.props.translatedStrings.USE_ARROWS}

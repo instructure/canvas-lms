@@ -502,6 +502,7 @@
             <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
             <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
             <xs:element name="is_global_outcome" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="vendor_guid" type="xs:string" minOccurs="0"/>
             <xs:element name="alignments" minOccurs="0">
               <xs:complexType>
                 <xs:sequence>
@@ -530,6 +531,7 @@
             <xs:element name="title" type="xs:string" minOccurs="0"/>
             <xs:element name="description" type="xs:string" minOccurs="0"/>
             <xs:element name="learningOutcomes" type="learningOutcomesType" minOccurs="0"/>
+            <xs:element name="vendor_guid" type="xs:string" minOccurs="0"/>
           </xs:all>
           <xs:attribute name="identifier" type="xs:ID" use="required"/>
         </xs:complexType>

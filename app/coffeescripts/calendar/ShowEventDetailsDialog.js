@@ -17,6 +17,8 @@
  */
 
 import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import I18n from 'i18n!calendar'
 import htmlEscape from 'str/htmlEscape'
 import Popover from '../util/Popover'
@@ -34,6 +36,8 @@ import {publish} from 'vendor/jquery.ba-tinypubsub'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_misc_helpers'
 import 'jquery.instructure_misc_plugins'
+import Conference from 'jsx/conferences/calendar/Conference'
+import getConferenceType from 'jsx/conferences/utils/getConferenceType'
 
 const destroyArguments = fn =>
   function() {
@@ -394,6 +398,20 @@ export default class ShowEventDetailsDialog {
         new MessageParticipantsDialog({timeslot: this.event.calendarEvent}).show()
       })
     )
+
+    if (ENV.CALENDAR?.CONFERENCES_ENABLED && params.webConference) {
+      const conferenceNode = this.popover.el.find('.conferencing')[0]
+      ReactDOM.render(
+        <Conference
+          conference={params.webConference}
+          conferenceTypes={getConferenceType(
+            ENV.conferences.conference_types,
+            params.webConference
+          )}
+        />,
+        conferenceNode
+      )
+    }
 
     publish('userContent/change')
   }

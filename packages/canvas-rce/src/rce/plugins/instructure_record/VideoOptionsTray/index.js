@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import {bool, func, number, shape, string} from 'prop-types'
+import {arrayOf, bool, func, node, number, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-elements'
@@ -53,6 +53,7 @@ export default function VideoOptionsTray(props) {
   const [videoSize, setVideoSize] = useState(videoOptions.videoSize)
   const [videoHeight, setVideoHeight] = useState(currentHeight)
   const [videoWidth, setVideoWidth] = useState(currentWidth)
+  const [subtitles, setSubtitles] = useState(props.videoOptions.tracks || [])
   const {trayProps} = props
   const dimensionsState = useDimensionsState(videoOptions, {
     minHeight: MIN_HEIGHT,
@@ -76,6 +77,11 @@ export default function VideoOptionsTray(props) {
       setVideoWidth(width)
     }
   }
+
+  function handleUpdateSubtitles(new_subtitles) {
+    setSubtitles(new_subtitles)
+  }
+
   function handleSave(event, updateMediaObject) {
     event.preventDefault()
     let appliedHeight = videoHeight
@@ -90,6 +96,7 @@ export default function VideoOptionsTray(props) {
       appliedHeight,
       appliedWidth,
       displayAs,
+      subtitles,
       updateMediaObject
     })
   }
@@ -217,9 +224,13 @@ export default function VideoOptionsTray(props) {
                       <Flex.Item padding="small">
                         <FormField label="Closed Captions/Subtitles" id="closedcaptionfield">
                           <ClosedCaptionPanel
+                            subtitles={subtitles.map(st => ({
+                              locale: st.locale,
+                              file: {name: st.language} // this is an artifact of ClosedCaptionCreatorRow's inards
+                            }))}
                             uploadMediaTranslations={uploadMediaTranslations}
                             languages={Bridge.languages}
-                            updateSubtitles={() => {}}
+                            updateSubtitles={handleUpdateSubtitles}
                             liveRegion={getLiveRegion}
                           />
                         </FormField>
@@ -255,7 +266,9 @@ VideoOptionsTray.propTypes = {
     appliedHeight: number,
     appliedWidth: number,
     naturalHeight: number.isRequired,
-    naturalWidth: number.isRequired
+    naturalWidth: number.isRequired,
+    source: node,
+    tracks: arrayOf(shape({locale: string.isRequired}))
   }).isRequired,
   onEntered: func,
   onExited: func,

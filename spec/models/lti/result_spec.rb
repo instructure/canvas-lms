@@ -152,4 +152,19 @@ RSpec.describe Lti::Result, type: :model do
       subject { Lti::Result }
     end
   end
+
+  context 'after saving' do
+    let(:result) { lti_result_model assignment: assignment }
+
+    it 'sets root_account_id using submission' do
+      expect(result.root_account_id).to eq assignment.root_account_id
+    end
+
+    it 'sets root_account_id using line_item' do
+      submission = graded_submission_model({ assignment: assignment_model, user: user_model })
+      submission.assignment.root_account_id = nil
+      result = Lti::Result.create!(line_item: line_item_model, user: user_model, created_at: Time.zone.now, updated_at: Time.zone.now, submission: submission)
+      expect(result.root_account_id).to eq result.line_item.root_account_id
+    end
+  end
 end

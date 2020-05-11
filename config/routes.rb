@@ -836,7 +836,7 @@ CanvasRails::Application.routes.draw do
     get 'teacher_activity/course/:course_id' => 'users#teacher_activity', as: :course_teacher_activity
     get 'teacher_activity/student/:student_id' => 'users#teacher_activity', as: :student_teacher_activity
     get :media_download
-    resources :messages, only: [:index, :create] do
+    resources :messages, only: [:index, :create, :show] do
       get :html_message
     end
   end
@@ -1458,6 +1458,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'
       get 'accounts/:account_id/permissions', action: :permissions
       delete 'accounts/:account_id/users/:user_id', action: :remove_user
+      put 'accounts/:account_id/users/:user_id/restore', action: :restore_user
     end
 
     scope(controller: :sub_accounts) do
@@ -2392,6 +2393,15 @@ CanvasRails::Application.routes.draw do
     # Public JWK Service
     scope(controller: 'lti/public_jwk') do
       put "/developer_key/update_public_jwk", action: :update, as: :public_jwk_update
+    end
+
+    # Context External Tools Service
+    scope(controller: 'lti/account_external_tools') do
+      post "/accounts/:account_id/external_tools", action: :create, as: :account_external_tools_create
+      get "/accounts/:account_id/external_tools/:external_tool_id", action: :show, as: :account_external_tools_show
+      put "/accounts/:account_id/external_tools/:external_tool_id", action: :update, as: :account_external_tools_update
+      get "/accounts/:account_id/external_tools", action: :index, as: :account_external_tools_index
+      delete "/accounts/:account_id/external_tools/:external_tool_id", action: :destroy, as: :account_external_tools_destroy
     end
 
     # Data Services Service

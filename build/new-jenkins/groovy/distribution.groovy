@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import groovy.time.*
+
 def runDatadogMetric(name, extraTags, body) {
   def dd = load('build/new-jenkins/groovy/datadog.groovy')
   dd.runDataDogForMetricWithExtraTags(name,extraTags,body)
@@ -42,11 +44,14 @@ def appendStagesAsBuildNodes(nodes,
     def index = i;
     // we cant use String.format, so... yea
     def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
+    def timeStart = new Date()
     nodes[stage_name] = {
       node("canvas-$test_label-docker") {
+        def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
         // make sure to unstash
         unstash name: "build-dir"
         unstash name: "build-docker-compose"
+        load('build/new-jenkins/groovy/splunk.groovy').uploadEvent('jenkins.node.wait', ['duration': duration, 'node': stage_name])
         def extraTags = ["parallelStageName:${stage_name}"]
         runDatadogMetric(test_label,extraTags) {
           stage_block(index)

@@ -16,5 +16,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Diigo::Connection.config = Proc.new do
-  Canvas::Plugin.find(:diigo).try(:settings) || ConfigFile.load('diigo')
+  Canvas::Plugin.find(:diigo).try(:settings) || ConfigFile.load('diigo').dup
 end

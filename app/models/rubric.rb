@@ -33,6 +33,7 @@ class Rubric < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
 
   before_validation :default_values
+  before_create :set_root_account_id
   after_save :update_alignments
   after_save :touch_associations
 
@@ -332,5 +333,14 @@ class Rubric < ActiveRecord::Base
     else
       criteria
     end
+  end
+
+  def set_root_account_id
+    self.root_account_id ||=
+      if context_type == 'Account' && context.root_account?
+        self.context.id
+      else
+        self.context&.root_account_id
+      end
   end
 end

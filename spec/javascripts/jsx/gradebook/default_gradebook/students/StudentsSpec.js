@@ -56,6 +56,11 @@ QUnit.module('Gradebook > Students', suiteHooks => {
       deepEqual(gradebook.courseContent.students.listStudentIds(), studentIds)
     })
 
+    test('sets the student ids loaded status to true', () => {
+      gradebook.updateStudentIds(studentIds)
+      strictEqual(gradebook.contentLoadStates.studentIdsLoaded, true)
+    })
+
     test('resets student assignment student visibility', () => {
       gradebook.assignmentStudentVisibility = {2301: ['1101', '1102']}
       gradebook.updateStudentIds(studentIds)
@@ -79,6 +84,28 @@ QUnit.module('Gradebook > Students', suiteHooks => {
       gradebook.assignmentStudentVisibility = {2301: ['1101', '1102']}
       sinon.stub(gradebook, 'buildRows').callsFake(() => {
         deepEqual(gradebook.assignmentStudentVisibility, {})
+      })
+      gradebook.updateStudentIds(studentIds)
+    })
+
+    test('updates essential data load status', () => {
+      sinon.spy(gradebook, '_updateEssentialDataLoaded')
+      gradebook.updateStudentIds(studentIds)
+      strictEqual(gradebook._updateEssentialDataLoaded.callCount, 1)
+    })
+
+    test('updates essential data load status after updating student ids loaded status', () => {
+      sinon.spy(gradebook, 'renderFilters')
+      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
+        strictEqual(gradebook.contentLoadStates.studentIdsLoaded, true)
+      })
+      gradebook.updateStudentIds(studentIds)
+    })
+
+    test('updates essential data load status after building rows', () => {
+      sinon.spy(gradebook, 'buildRows')
+      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
+        strictEqual(gradebook.buildRows.callCount, 1)
       })
       gradebook.updateStudentIds(studentIds)
     })

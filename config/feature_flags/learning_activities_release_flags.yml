@@ -32,6 +32,11 @@ assignment_bulk_edit:
   applies_to: RootAccount
   display_name: Assignment Bulk Editing
   description: Allow teachers to change the dates on a set of assignments in one step
+assignment_bulk_edit_phase_2:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Assignment Bulk Editing phase 2
+  description: Turns on phase 2 features for Assignment Bulk Editing
 bookmarking_for_enrollments_index:
   state: allowed
   applies_to: RootAccount
@@ -42,14 +47,6 @@ syllabus_course_summary_option:
   applies_to: SiteAdmin
   display_name: Syllabus Course Summary Option
   description: Make the Course Summary (list of assignments and events) optional in the syllabus
-la_620_old_rce_init_fix:
-  state: hidden
-  display_name: RCE Initialization Fix
-  description: |-
-    Under some conditions, the legacy RCE fails to initialize because tinymce hasn't added the
-    editor instance to its internal list when the RCE requires it.
-  applies_to: SiteAdmin
-  root_opt_in: true
 uxs_4_omg_a_scary_blueprint_checkbox:
   state: hidden
   display_name: Allow Blueprint Publishing After Association

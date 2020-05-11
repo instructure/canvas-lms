@@ -8,10 +8,10 @@ if [[ -z "${MASTER_BOUNCER_KEY-}" ]]; then
   exit 1
 fi
 
-docker-compose --file $WORKSPACE/docker-compose.new-jenkins-web.yml run \
+docker-compose --file $WORKSPACE/docker-compose.new-jenkins.canvas.yml run \
   -e MASTER_BOUNCER_KEY=$MASTER_BOUNCER_KEY \
   -e GERRIT_HOST=$GERRIT_HOST \
   -e GERRIT_PROJECT=canvas-lms \
   -e GERGICH_REVIEW_LABEL=Lint-Review \
   --name linter-master-bouncer \
-  --rm web master_bouncer check
+  --rm canvas master_bouncer check

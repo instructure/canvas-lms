@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {chunk, difference} from 'lodash'
+import {chunk} from 'lodash'
 import I18n from 'i18n!gradebook'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
@@ -66,23 +66,24 @@ function flashSubmissionLoadError() {
 
 function ignoreFailure() {}
 
-function getStudentsChunk(courseId, studentIds, options, dispatch) {
+function getStudentsChunk(courseId, studentIds, options) {
   const url = `/api/v1/courses/${courseId}/users`
   const params = {
     enrollment_state: ['active', 'completed', 'inactive', 'invited'],
     enrollment_type: ['student', 'student_view'],
     include: ['avatar_url', 'enrollments', 'group_ids'],
-    per_page: options.studentsChunkSize,
+    per_page: studentIds.length,
     user_ids: studentIds
   }
 
-  return dispatch.getJSON(url, params)
+  return options.dispatch.getJSON(url, params)
 }
 
-function getSubmissionsForStudents(courseId, studentIds, allEnqueued, dispatch) {
+function getSubmissionsForStudents(options, studentIds, allEnqueued, dispatch) {
   return new Promise((resolve, reject) => {
+    const {courseId, submissionsPerPage} = options
     const url = `/api/v1/courses/${courseId}/students/submissions`
-    const params = {student_ids: studentIds, ...submissionsParams}
+    const params = {...submissionsParams, student_ids: studentIds, per_page: submissionsPerPage}
 
     dispatch
       .getDepaginated(url, params, undefined, allEnqueued)
@@ -94,26 +95,26 @@ function getSubmissionsForStudents(courseId, studentIds, allEnqueued, dispatch) 
   })
 }
 
-function getContentForStudentIdChunk(studentIds, options, dispatch) {
-  const {gradebook} = options
+function getContentForStudentIdChunk(studentIds, options) {
+  const {dispatch, gradebook, submissionsChunkSize} = options
 
   let resolveEnqueued
   const allEnqueued = new Promise(resolve => {
     resolveEnqueued = resolve
   })
 
-  const studentRequest = getStudentsChunk(options.courseId, studentIds, options, dispatch).then(
+  const studentRequest = getStudentsChunk(options.courseId, studentIds, options).then(
     gradebook.gotChunkOfStudents
   )
 
-  const submissionRequestChunks = chunk(studentIds, options.submissionsChunkSize)
+  const submissionRequestChunks = chunk(studentIds, submissionsChunkSize)
   const submissionRequests = []
 
   submissionRequestChunks.forEach(submissionRequestChunkIds => {
     let submissions
 
     const submissionRequest = getSubmissionsForStudents(
-      options.courseId,
+      options,
       submissionRequestChunkIds,
       resolveEnqueued,
       dispatch
@@ -140,33 +141,39 @@ function getContentForStudentIdChunk(studentIds, options, dispatch) {
 }
 
 export default class StudentContentDataLoader {
-  constructor(options, dispatch) {
-    this.options = options
-    this.dispatch = dispatch
+  constructor({dispatch, gradebook, performanceControls}) {
+    this._dispatch = dispatch
+    this._gradebook = gradebook
+    this._performanceControls = performanceControls
   }
 
   load(studentIds) {
-    const loadedStudentIds = this.options.loadedStudentIds || []
-    const studentIdsToLoad = difference(studentIds, loadedStudentIds)
+    const gradebook = this._gradebook
 
-    if (studentIdsToLoad.length === 0) {
+    if (studentIds.length === 0) {
+      gradebook.updateStudentsLoaded(true)
+      gradebook.updateSubmissionsLoaded(true)
       return
+    }
+
+    const options = {
+      courseId: gradebook.course.id,
+      dispatch: this._dispatch,
+      gradebook,
+      submissionsChunkSize: this._performanceControls.submissionsChunkSize,
+      submissionsPerPage: this._performanceControls.submissionsPerPage
     }
 
     const studentRequests = []
     const submissionRequests = []
-    const studentIdChunks = chunk(studentIdsToLoad, this.options.studentsChunkSize)
+    const studentIdChunks = chunk(studentIds, this._performanceControls.studentsChunkSize)
 
     // wait for all chunk requests to have been enqueued
     return new Promise(resolve => {
       const getNextChunk = () => {
         if (studentIdChunks.length) {
           const nextChunkIds = studentIdChunks.shift()
-          const chunkRequestDatum = getContentForStudentIdChunk(
-            nextChunkIds,
-            this.options,
-            this.dispatch
-          )
+          const chunkRequestDatum = getContentForStudentIdChunk(nextChunkIds, options)
 
           // when the current chunk requests are all enqueued
           chunkRequestDatum.allEnqueued.then(() => {
@@ -180,15 +187,20 @@ export default class StudentContentDataLoader {
       }
 
       getNextChunk()
-    }).then(() => {
-      const {courseSettings, finalGradeOverrides} = this.options.gradebook
-      let finalGradeOverridesRequest
-      if (courseSettings.allowFinalGradeOverride) {
-        finalGradeOverridesRequest = finalGradeOverrides.loadFinalGradeOverrides()
-      }
-
-      // wait for all student, submission, and final grade override requests to return
-      return Promise.all([...studentRequests, ...submissionRequests, finalGradeOverridesRequest])
     })
+      .then(() => {
+        const {courseSettings, finalGradeOverrides} = gradebook
+        let finalGradeOverridesRequest
+        if (courseSettings.allowFinalGradeOverride) {
+          finalGradeOverridesRequest = finalGradeOverrides.loadFinalGradeOverrides()
+        }
+
+        // wait for all student, submission, and final grade override requests to return
+        return Promise.all([...studentRequests, ...submissionRequests, finalGradeOverridesRequest])
+      })
+      .then(() => {
+        gradebook.updateStudentsLoaded(true)
+        gradebook.updateSubmissionsLoaded(true)
+      })
   }
 }

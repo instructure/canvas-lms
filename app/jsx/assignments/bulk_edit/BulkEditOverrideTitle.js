@@ -23,10 +23,10 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
-function BulkEditOverrideTitle({assignment, override}) {
-  const [visibleTitle, srSubTitle, size, indent] = override.base
-    ? [assignment.name, I18n.t('default dates'), 'large', '0']
-    : [override.title, override.title, 'medium', 'xx-large']
+function BulkEditOverrideTitle({assignmentName, overrideTitle, overrideBase}) {
+  const [visibleTitle, srSubTitle, size, indent] = overrideBase
+    ? [assignmentName, I18n.t('default dates'), 'large', '0']
+    : [overrideTitle, overrideTitle, 'medium', 'xx-large']
 
   return (
     <View as="div" padding={`0 0 0 ${indent}`}>
@@ -35,7 +35,7 @@ function BulkEditOverrideTitle({assignment, override}) {
           <PresentationContent>
             <div className="ellipsis">{visibleTitle}</div>
           </PresentationContent>
-          <ScreenReaderContent>{`${assignment.name}: ${srSubTitle}`}</ScreenReaderContent>
+          <ScreenReaderContent>{`${assignmentName}: ${srSubTitle}`}</ScreenReaderContent>
         </Text>
       </Tooltip>
     </View>

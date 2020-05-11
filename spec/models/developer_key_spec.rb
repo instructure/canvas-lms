@@ -647,6 +647,37 @@ describe DeveloperKey do
         end
       end
     end
+
+    describe 'after_save' do
+      describe 'set_root_account' do
+        context 'when account is not root account' do
+          let(:account) {
+            a = account_model
+            a.root_account = Account.create!
+            a.save!
+            a
+          }
+
+          it 'sets root account equal to account\'s root account' do
+            expect(developer_key_not_saved.root_account).to be_nil
+            developer_key_not_saved.account = account
+            developer_key_not_saved.save!
+            expect(developer_key_not_saved.root_account).to eq account.root_account
+          end
+        end
+
+        context 'when account is root account' do
+          let(:account) { account_model }
+
+          it 'set root account equal to account' do
+            expect(developer_key_not_saved.root_account).to be_nil
+            developer_key_not_saved.account = account
+            developer_key_not_saved.save!
+            expect(developer_key_not_saved.root_account).to eq account
+          end
+        end
+      end
+    end
   end
 
   describe 'associations' do

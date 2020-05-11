@@ -23,7 +23,7 @@ module Lti::Messages
       'assignment_selection' => %w(ltiResourceLink).freeze,
       'homework_submission' => %w(file).freeze,
       'link_selection' => %w(ltiResourceLink).freeze,
-      'conference_selection' => %w(ltiResourceLink).freeze
+      'conference_selection' => %w(link html).freeze
     }.freeze
 
     DOCUMENT_TARGETS = {
@@ -47,7 +47,7 @@ module Lti::Messages
       'assignment_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze,
       'homework_submission' => %w(*/*).freeze,
       'link_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze,
-      'conference_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze
+      'conference_selection' => %w(text/html */*).freeze
     }.freeze
 
     AUTO_CREATE = {

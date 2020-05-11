@@ -42,7 +42,7 @@ export default Grid =
 
     options:
       headerRowHeight        : 42
-      rowHeight              : 38
+      rowHeight              : 42
       syncColumnCellResize   : true
       showHeaderRow          : true
       explicitInitialization : true
@@ -109,7 +109,7 @@ export default Grid =
       #
       # Returns an object.
       _studentColumn: ->
-        studentOptions = { width: 228 }
+        studentOptions = { width: 231 }
 
         _.extend({
           id: 'student',

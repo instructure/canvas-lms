@@ -27,7 +27,8 @@ module.exports = {
     '^jsx/(.*)$': '<rootDir>/app/jsx/$1',
     '^jst/(.*)$': '<rootDir>/app/views/jst/$1',
     '^timezone$': '<rootDir>/public/javascripts/timezone_core.js',
-    'node_modules-version-of-backbone': require.resolve('backbone')
+    'node_modules-version-of-backbone': require.resolve('backbone'),
+    Backbone: '<rootDir>/public/javascripts/Backbone.js'
   },
   roots: ['app/jsx', 'app/coffeescripts', 'public/javascripts', 'gems/plugins'],
   moduleDirectories: ['node_modules', 'public/javascripts', 'public/javascripts/vendor'],

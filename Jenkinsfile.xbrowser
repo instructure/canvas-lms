@@ -20,7 +20,10 @@
 
 pipeline {
   agent { label 'canvas-docker' }
-  options { ansiColor('xterm') }
+  options {
+    ansiColor('xterm')
+    timestamps()
+  }
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
@@ -36,7 +39,7 @@ pipeline {
           sh 'build/new-jenkins/docker-compose-pull.sh'
           sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
           sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+          sh 'build/new-jenkins/docker-compose-setup-databases.sh'
         }
       }
     }
@@ -53,7 +56,7 @@ pipeline {
   post {
     unsuccessful {
       // copy spec failures to local
-      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
+      sh 'docker cp $(docker ps -q --filter "name=canvas_"):/usr/src/app/log/spec_failures/ ./tmp'
       script {
         def htmlFiles
         // find all results files

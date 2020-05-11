@@ -131,7 +131,12 @@ module Importers
       if options[:external_feed_migration_id].present?
         item.external_feed = context.external_feeds.where(migration_id: options[:external_feed_migration_id]).first
       end
-      item.assignment = fetch_assignment
+      skip_assignment = migration.for_master_course_import? &&
+        migration.master_course_subscription.content_tag_for(item)&.downstream_changes&.include?("assignment_id") &&
+        !item.editing_restricted?(:settings)
+      unless skip_assignment
+        item.assignment = fetch_assignment
+      end
 
       if options[:attachment_ids].present?
         item.message += Attachment.attachment_list_from_migration(context, options[:attachment_ids])

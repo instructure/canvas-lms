@@ -14,6 +14,12 @@
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": "Wystąpił błąd podczas generowania podglądu plików"
   },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "Wystąpił błąd podczas przesyłania żądania sieciowego"
+  },
+  "an_error_occurred_uploading_your_media_71f1444d": {
+    "message": "Podczas wysyłania multimediów wystąpił błąd."
+  },
   "announcement_list_da155734": { "message": "Lista ogłoszeń" },
   "announcements_a4b8ed4a": { "message": "Ogłoszenia" },
   "apps_54d24a47": { "message": "Aplikacje" },
@@ -33,6 +39,7 @@
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Automatycznie otwórz pogląd w wierszu. (podgląd zostanie wyświetlony po zapisaniu)"
   },
+  "available_folders_694d0436": { "message": "Dostępne foldery" },
   "cancel_caeb1e68": { "message": "Anuluj" },
   "canvas_plugins_705a5016": { "message": "Wtyczki systemu Canvas" },
   "choose_caption_file_9c45bc4e": { "message": "Wybierz plik z napisami" },
@@ -78,6 +85,7 @@
   },
   "course_documents_104d76e0": { "message": "Dokumenty kursu" },
   "course_files_62deb8f8": { "message": "Pliki kursu" },
+  "course_files_a31f97fc": { "message": "Pliki kursu" },
   "course_images_f8511d04": { "message": "Obrazy kursu" },
   "course_links_b56959b9": { "message": "Łącza kursu" },
   "course_media_ec759ad": { "message": "Multimedia kursu" },
@@ -142,6 +150,10 @@
   "external_links_3d9f074e": { "message": "Łącza zewnętrzne" },
   "extra_large_b6cdf1ff": { "message": "Wyjątkowo duże" },
   "file_name_8fd421ff": { "message": "Nazwa pliku" },
+  "file_upload_failed_af22dd91": {
+    "message": "Niepowodzenie przesyłania pliku."
+  },
+  "file_uploading_56c9c0c8": { "message": "Przesyłanie pliku" },
   "file_url_c12b64be": { "message": "Adres URL pliku" },
   "filename_file_icon_602eb5de": { "message": "Ikona pliku { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -156,6 +168,7 @@
   "focus_the_popup_context_toolbar_7979f4f8": {
     "message": "Wyśrodkuj widok paska narzędzi okienka wyskakującego"
   },
+  "folder_tree_fbab0726": { "message": "Drzewo folderów" },
   "formatting_5b143aa8": { "message": "Formatowanie" },
   "found_auto_saved_content_3f6e4ca5": {
     "message": "Odnaleziono automatycznie zapisaną zawartość"
@@ -172,6 +185,7 @@
   },
   "grades_a61eba0a": { "message": "Oceny" },
   "group_files_4324f3df": { "message": "Pliki grupy" },
+  "group_files_82e5dcdb": { "message": "Pliki grupy" },
   "group_navigation_99f191a": { "message": "Nawigowanie po grupach" },
   "heading_2_5b84eed2": { "message": "Nagłówek 2" },
   "heading_3_2c83de44": { "message": "Nagłówek 3" },
@@ -206,7 +220,9 @@
   "loading_bde52856": { "message": "Wczytywanie" },
   "loading_failed_b3524381": { "message": "Niepowodzenie wczytywania..." },
   "loading_failed_e6a9d8ef": { "message": "Niepowodzenie wczytywania." },
+  "loading_folders_d8b5869e": { "message": "Wczytywanie folderów" },
   "loading_media_f3455841": { "message": "Wczytywanie danych" },
+  "locked_762f138b": { "message": "Zablokowany" },
   "media_af190855": { "message": "Multimedia" },
   "medium_5a8e9ead": { "message": "Średni" },
   "mic_a7f3d311": { "message": "Mikrofon" },
@@ -215,6 +231,7 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Wymagane co najmniej { width } x { height } px"
   },
+  "my_files_2f621040": { "message": "Moje pliki" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Przejdź w menu lub na pasku narzędzi"
   },
@@ -290,6 +307,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Wystąpił błąd i nie wiadomo, co wyświetlić."
   },
+  "something_went_wrong_d238c551": { "message": "Coś poszło nie tak" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
     "message": "Wystąpił problem, spróbuj ponownie po odświeżeniu strony"
   },
@@ -305,6 +323,9 @@
   "styles_2aa721ef": { "message": "Style" },
   "submit_a3cc6859": { "message": "Prześlij" },
   "subscript_59744f96": { "message": "Indeks dolny" },
+  "success_file_uploaded_8174e93f": {
+    "message": "Zakończono powodzeniem: Przesłane pliki"
+  },
   "superscript_8cb349a2": { "message": "Indeks górny" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Obsługiwane typy plików: SRT lub WebVTT"
@@ -343,6 +364,9 @@
   "upload_file_fd2361b8": { "message": "Prześlij plik" },
   "upload_image_6120b609": { "message": "Prześlij obraz" },
   "upload_media_ce31135a": { "message": "Przekaż pliki multimedialne" },
+  "upload_not_available_for_this_folder_8f8623c6": {
+    "message": "Przesyłanie nie jest dostępne dla danego zadania."
+  },
   "upload_record_media_e4207d72": {
     "message": "Przekaż/zapisz pliki multimedialne"
   },

@@ -1,0 +1,9 @@
+# it is intended that this be used exclusive of all other docker-compose.*yml files in CI
+version: "2.3"
+services:
+  canvas:
+    image: $PATCHSET_TAG
+    volumes:
+      - .git:/usr/src/app/.git
+    environment:
+      RAILS_ENV: test

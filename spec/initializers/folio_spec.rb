@@ -26,4 +26,13 @@ describe Folio do
     expect(result.length).to eq 1
     expect(result.total_entries).to be_nil
   end
+
+  it "skips the count for a regular query that takes a long time" do
+    User.create!
+    User.create!
+    Setting.set('pagination_count_timeout', '5ms')
+    result = User.where("pg_sleep(0.1) IS NOT NULL").paginate(per_page: 1)
+    expect(result.length).to eq 1
+    expect(result.total_entries).to be_nil
+  end
 end

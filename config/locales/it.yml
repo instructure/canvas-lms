@@ -172,10 +172,14 @@ it:
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Con questo metodo di calcolo non viene utilizzato alcun valore di calcolo"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "Un token di sicurezza Canvas è stato appena creato per il tuo account. Se hai richiesto un token utente, non è necessaria alcun’altra azione. Se non hai richiesto un token o desideri gestire i tuoi token di accesso Canvas, è possibile farlo qui:"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Un file chiamato %{itemName} esiste già in questa cartella."
+  a_file_named_name_already_exists_do_you_want_to_re_6536980: "Un file chiamato “%{name}” esiste già. Desideri sostituire il file esistente?"
+  a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Un file chiamato “%{name}” esiste già in questa cartella. Desideri sostituire il file esistente?"
   a_front_page_is_required_fd57b80: "Una pagina iniziale è obbligatoria"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Viene visualizzato un logo di dimensioni intere nella balla laterale di destra della dashboard Canvas. La dimensione ideale è 360 x 140 pixel. Formati accettati: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Un pratico dump chiave/valore di una serie di informazioni interessanti sull'ambiente per l'utente segnalante"
   a_json_url_is_required_please_supply_one_ed03101c: "È necessario fornire una url json."
+  a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "Un file bloccato chiamato “%{name}” esiste già in questa cartella. Inserisci un nuovo nome."
+  a_locked_file_named_name_already_exists_please_ent_3b2e65a: "Un file bloccato chiamato “%{name}” esiste già. Inserisci un nuovo nome."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Un elemento bloccato chiamato \"%{name}\" esiste già in questa posizione. Inserisci un nuovo nome."
   a_message_is_required_129e1814: "Messaggio obbligatorio"
   a_name_for_this_set_is_required_222bad23: "È necessario inserire un nome per questo set"
@@ -1722,6 +1726,10 @@ it:
   admins_3e1dce15: Amministratori
   admins_add_remove_26811ce5: "Amministratori - aggiungi/rimuovi"
   advanced_36b35b8: Avanzate
+  affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Influisce sulla visualizzazione dei pulsanti Conclusi corso ed Elimina definitivamente questo corso. Il pulsante Elimina definitivamente questo corso viene visualizzato solo per i corsi creati manualmente."
+  affects_viewing_the_conclude_course_and_permanentl_d943656e: "Influisce sulla visualizzazione dei pulsanti Conclusi corso ed Elimina definitivamente questo corso. Il pulsante Elimina definitivamente questo corso viene visualizzato solo per i corsi creati manualmente.\n\
+      \x20       Per gli utenti di livello corso, l'eliminazione di un corso fa parte dell'autorizzazione Stato corso - Gestisci. Tuttavia, per un utente di livello account, l'eliminazione di un corso richiede questa autorizzazione e l'autorizzazione Corsi - Aggiungi/Modifica/Elimina. "
+  affects_viewing_the_delete_this_course_and_conclud_1ac257e: "Influisce sulla visualizzazione dei pulsanti Elimina questo corso e Concludi corso."
   affects_viewing_the_publish_course_and_conclude_co_6589f97e: "Influisce sulla visualizzazione dei pulsanti Pubblica corso e Concludi corso."
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Influisce sulla visualizzazione dei pulsanti Pubblica corso, Chiudi corso ed Elimina definitivamente questo corso.
@@ -2051,6 +2059,7 @@ it:
   allows_user_to_edit_grading_schemes_98c35117: "Consente all'utente di modificare gli schemi dei voti."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Consente all'utente di modificare l'ID SIS del corso."
   allows_user_to_edit_the_course_syllabus_a28ff262: "Consente all'utente di modificare il piano di studio del corso."
+  allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Consente all’utente di esportare il registro dei voti in un file di valori separati da virgola (CSV). Consente all’utente di accedere alla formazione sull’utilizzo del registro dei voti (se abilitato)."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Consente all'utente di filtrare i modelli di corso di base come livello account. Consente all'utente di aggiungere corsi associati."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       Consente all'utente di filtrare i modelli di corso di base come livello account.
@@ -2128,6 +2137,7 @@ it:
   allows_user_to_view_account_analytics_98fbc6ad: "Consente all'utente di visualizzare le analisi dell'account."
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Consente all'utente di visualizzare tutti i gruppi di corsi, non solo quelli a cui è iscritto, nella finestra Collabora con."
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Consente all'utente di visualizzare tutte le consegne dei compiti degli studenti e di aggiungere commenti."
+  allows_user_to_view_analytics_link_in_the_user_set_56867782: "Consente all’utente di visualizzare il link di analisi nel menu delle impostazioni utente."
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Consente all'utente di visualizzare e aggiungere utenti in una collaborazione."
   allows_user_to_view_and_configure_reports_in_accou_413e4e41: |-
       Consente all'utente di visualizzare e configurare report nelle impostazioni account.
@@ -4513,6 +4523,7 @@ it:
   clear_2084585f: Cancella
   clear_selected_file_82388e50: "Cancella file selezionato"
   clear_user_cache_ef079f7f: "Cancella cache utente"
+  click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Fai clic su \"Annulla\" se non vuoi visualizzare il codice."
   click_for_more_details_on_this_outcome_8c018d2f: "fai clic per maggiori dettagli su questo esito"
   click_here_for_an_account_9536cb36: "Fai clic qui per un account"
   click_here_it_s_free_eeccb9cb: "Fai clic qui, è gratis."
@@ -4529,6 +4540,7 @@ it:
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Fai clic sul pulsante di navigazione account per accedere alle preferenze di notifica."
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Fai clic sul pulsante di navigazione amministratore per accedere alle impostazioni account."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Fai clic sul pulsante di navigazione corsi per accedere ai corsi."
+  click_proceed_to_continue_b6eeffc6: "Fai clic su \"Procedi\" per continuare."
   click_the_button_above_to_add_content_4c7024a: "Clicca sul pulsante qui sopra per aggiungere contenuti"
   click_to_add_a_name_6cf551b0: "Fai clic per aggiungere un nome"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Fai clic per modificare l'immagine del profilo per %{display_name}"
@@ -4934,6 +4946,7 @@ it:
   confirm_delete_discussions_1fb0d053: "Conferma eliminazione discussioni"
   confirm_deletion_b2efe7d4: "Conferma eliminazione"
   confirm_edit_outcome_a9746c99: "Conferma modifica esito"
+  confirm_qr_code_display_49664fa3: "Conferma visualizzazione codice QR"
   confirm_removal_a9bb889: "Conferma rimozione"
   confirm_reservation_removal_e6350e7c: "Conferma rimozione prenotazione"
   confirm_unfavorite_course_fa01966d: "Conferma la rimozione del corso dai preferiti"
@@ -7188,6 +7201,7 @@ it:
       Determina visibilità e gestione della scheda Esiti in Navigazione account.
       Consente all'utente di creare, importare, modificare ed eliminare gli esiti e i gruppi di esiti a livello di account e di corso.
   determines_visibility_and_management_of_outcomes_t_8a40bf86: "Determina visibilità e gestione della scheda Esiti in Navigazione account. Consente all'utente di creare, importare, modificare ed eliminare gli esiti e i gruppi di esiti a livello di account e di corso."
+  determines_visibility_and_management_of_rubrics_li_83a26d8e: "Determina visibilità e gestione del link Rubriche in Navigazione account. Consente all'utente di visualizzare il link Rubrica in Esplorazione corso. Consente all'utente di creare, modificare ed eliminare le rubriche del corso."
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       Determina visibilità e gestione della scheda Rubriche in Navigazione account.
       Consente agli utenti di gestire le rubriche.
@@ -7204,9 +7218,11 @@ it:
       Consente all'utente di visualizzare le date, gli errori e gli elementi importati dell'importazione SIS precedente.
   determines_visibility_of_the_course_activity_optio_2446c4b3: "Determina la visibilità dell'opzione Attività corso nella scheda Registrazione degli Strumenti di amministrazione. Consente all'utente di visualizzare le informazioni relative alle attività del corso per l'account."
   determines_visibility_of_the_grade_change_activity_6c23036b: "Determina la visibilità dell'opzione Attività di modifica dei voti nella scheda Registrazione degli Strumenti di amministrazione."
+  determines_whether_a_publish_button_is_included_in_f7ad9b56: "Determina se il pulsante Pubblica viene incluso in una scheda corso per un corso non pubblicato (dashboard Visualizzazione schede)."
   determines_whether_a_publish_course_option_is_incl_9bf770e9: "Determina se un'opzione Pubblica corso è inclusa nella home page del corso."
   determines_whether_a_publish_course_option_is_incl_ac5eed8f: "Determina se un'opzione Pubblica corso è inclusa nell'Elenco di controllo configurazione corso e nella home page del corso."
   determines_whether_the_course_setup_checklist_opti_fd5a8f70: "Determina se l'opzione Elenco di controllo configurazione corso è inclusa nella home page del corso."
+  determines_whether_the_publish_course_and_unpublis_432a4bbc: "Determina se i pulsanti Pubblica corso e Annulla pubblicazione corso sono visualizzati nella Home page corso."
   developer_key: 
     edit_key: "Modifica questa chiave"
   developer_key_921ddbae: "Chiave sviluppatore"
@@ -7717,6 +7733,7 @@ it:
   drag_and_drop_your_image_here_or_7fba7c14: "Trascina qui la tua immagine o "
   drag_to_rearrange_sections_637efee3: "Trascina per riorganizzare le sezioni"
   drag_up_or_down_to_reorder_382126ff: "Trascina su e giù per riordinare"
+  drop_files_here_to_add_to_module_236304f5: "Trascina i file qui per aggiungerli al modulo"
   drop_files_here_to_upload_ce0f50f9: "Rilascia i file qui per il caricamento"
   drop_image_62a2a071: "Rilascia immagine"
   dropdown_changed_state_to_expanded_517689c2: "stato elenco a discesa modificato in %{expanded}."
@@ -10196,6 +10213,7 @@ it:
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Se entrambe le opzioni Voti - Modifica e Voti - Visualizza tutti i voti sono disattivate, il registro dei voti verrà nascosto in Esplorazione corso."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Se entrambe le autorizzazioni Voti - Modifica e Voti - Visualizza tutti i voti sono disattivate, il registro dei voti verrà nascosto in Esplorazione corso."
   if_commons_is_installed_allows_importing_favorited_eff368f: "Se Commons è installato, permette di importare gli elementi di contenuto preferiti da Canvas."
+  if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "Se sono abilitate anche le opzioni Corsi - Aggiungi/Modifica/Elimina e Corsi - Annulla eliminazione, un utente di livello account potrà ripristinare i corsi eliminati in Strumenti di amministrazione."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Se l'opzione è disattivata, la pagina Esiti diventa di sola lettura e nasconde il pulsante Gestisci rubriche. L'utente può comunque accedere alle singole rubriche dei compiti tramite Compiti."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "Se l'opzione è disattivata, l'utente può comunque visualizzare e scaricare i file in un file zip."
   if_disabled_user_will_still_have_access_to_course__541e130: "Se l'opzione è disattivata, l'utente avrà comunque accesso alle impostazioni dei corsi. L'utente non può gestire il contenuto dei singoli corsi senza l'autorizzazione appropriata per quell'elemento del contenuto. Se la visibilità del corso è limitata agli utenti iscritti al corso, questa autorizzazione consente a un utente di visualizzare il contenuto del corso senza essere iscritto al corso."
@@ -10583,6 +10601,7 @@ it:
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Timestamp non valido - timestamp non analizzabile"
   invalid_url_in_xml: "URL in XML non valido. Le e commerciali devono essere precedute da sequenze di escape."
   invalid_username_or_password_b60aa240: "Nome utente o password non valida"
+  invalid_username_or_password_trouble_logging_in_ch_7699399c: "Nome utente o password non validi. Problemi durante l’accesso? *Dai un’occhiata alle nostre domande frequenti sul login*."
   invalid_utf_8_13c76a6: "UTF-8 non valido"
   invalid_value_12ca12c2: "Valore non valido"
   invalid_value_for_name_i_4a7c601a: "Valore non valido per %{name}: \"%{i}\""
@@ -13198,6 +13217,7 @@ it:
   module_90d9fd32: Modulo
   module_completed_50c50762: "Modulo completato"
   module_content_import_enhancements_c00b0ea2: "Miglioramenti dell’importazione del contenuto del modulo"
+  module_file_upload_enhancements_eecd4d37: "Miglioramenti di caricamento file del modulo"
   module_filter_63b17d11: "Filtro modulo"
   module_first_to_last_6921f3ec: "Modulo - Dal primo all'ultimo"
   module_in_progress_fa600662: "Modulo in corso"
@@ -13624,6 +13644,7 @@ it:
   no_submission_for_assignmenttitle_243bd1f4: "Nessuna consegna per %{assignmentTitle}"
   no_submissions_164cea23: "Nessun invio"
   no_submissions_have_been_uploaded_2fb02710: "Non è stata caricata alcuna consegna"
+  no_submissions_to_zip_please_try_again_after_stude_7e0f478: "Nessuna consegna da comprimere in file .zip. Riprova dopo le consegne degli studenti."
   no_terms_eab5ee7b: "Nessun trimestre"
   no_tls_618add1a: "Nessun TLS"
   no_unassigned_terms_deb7b76b: "Nessun trimestre non assegnato"
@@ -14607,6 +14628,7 @@ it:
   please_have_the_student_submit_the_file_again_dba514b7: "Lo studente deve inviare nuovamente il file"
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Indica la pagina che stavi visualizzando e il link su cui hai fatto clic."
   please_log_in_to_view_this_content_eec6cd0: "Accedere per visualizzare questo contenuto"
+  please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Verificare che nessuno riesca ad acquisire l’immagine del tuo schermo dai dintorni o da un servizio di condivisione schermo."
   please_provide_a_field_e5a7d0b3: "Fornisci un %{field}"
   please_select_a_group_set_for_this_assignment_e1da63d3: "Seleziona un set di gruppi per questo compito"
   please_select_a_user_role_for_this_link_9fb4e655: "Seleziona un ruolo utente per questo link."
@@ -14651,6 +14673,13 @@ it:
     big_blue_button_fallback: 
       description: "Impostazioni precedenti BigBlueButton per preservare le registrazioni durante la migrazione"
       name: "Fallback BigBlueButton per la migrazione"
+    big_blue_button_fallback_settings: 
+      description: "Quando hai configurato il tuo BigBlueButton Plugin per l’uso delle impostazioni di fallback, queste saranno le impostazioni che utilizza. Il fallback viene usato solo per cercare le registrazioni di conferenze che non sono state create con la configurazione per il tuo BigBlueButton Plugin."
+      domain_description: "**nome host** o **indirizzo ip**  della tua installazione BigBlueButton (ad es. bigbluebutton.mycompany.com)"
+      labels: 
+        domain: Dominio
+        secret: Segreto
+      secret_description: "Questo è il parametro %{parameter_name} che puoi trovare nel file di configurazione %{filename}."
     big_blue_button_settings: 
       description: "Devi accedere a una istanza [BigBlueButton](%{url})."
       domain_description: "**nome host** o **indirizzo ip** della tua installazione BigBlueButton (es. bigbluebutton.mycompany.com)"
@@ -14660,6 +14689,7 @@ it:
         recording_enabled: "Consenti registrazione conferenze."
         replace_with_alternatives: "Disabilita le conferenze BigBlueButton; mostra invece un elenco di alternative"
         secret: Segreto
+        use_fallback: "Usa le impostazioni BigBlueButton Fallback Plugin per cercare le registrazioni per le conferenze che non sono state ospitate dall’istanza BBB attualmente configurata."
       secret_description: "Questo è il parametro %{parameter_name} che puoi trovare nel file di configurazione %{filename}."
     buttons: 
       saving: "Salvataggio in corso..."
@@ -15598,6 +15628,7 @@ it:
   push_notification_a6532ff3: "Notifica push"
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "D: Cosa diventa nero, bianco, nero, bianco?  R: Un panda che rotola giù dalla collina."
   qatar_974_7e9684ca: "Qatar (+974)"
+  qr_code_display_was_canceled_96234bf2: "La visualizzazione del codice QR è stata annullata"
   qr_code_image_2b3a89b5: "Immagine codice QR"
   qr_for_mobile_login_1b1560ce: "QR per login da dispositivo mobile"
   qti_display: QTI
@@ -18584,6 +18615,7 @@ it:
   shared_brand_configs_e5d319d7: "Configurazioni brand condivise"
   shared_content_803ac37b: "Contenuto condiviso"
   shared_secret_892c88f2: "Segreto condiviso"
+  sharing_a_qr_code_can_give_others_immediate_access_79575158: "La condivisione di un codice QR può fornisce alle altre persone un accesso immediato al tuo account attraverso le applicazioni per dispositivi mobile %{canvas}."
   she_her_3f459cc2: Lei
   she_her_c8b5e3be: "Lei/a lei"
   short_name_42f454a1: "Nome breve"
@@ -20280,6 +20312,7 @@ it:
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Per eseguire il cross-listing di una sezione, è necessario abilitare anche l'autorizzazione Sezione corsi - Aggiungi/Modifica/Elimina. Per modificare l'ID SIS corso, è necessario abilitare anche l'autorizzazione Dati SIS - Gestisci. Per consentire a un utente a livello di account di eliminare un corso, è necessario abilitare anche l'autorizzazione Stato corso - Gestisci."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Per eseguire il cross-listing di una sezione, è necessario abilitare anche l'autorizzazione Sezione corsi - Aggiungi/Modifica/Elimina. Per modificare l'ID SIS corso, è necessario abilitare anche l'autorizzazione Dati SIS - Gestisci. Per consentire a un utente a livello di account di eliminare un corso, è necessario abilitare anche l'autorizzazione Stato corso - Gestisci."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Per eseguire il cross-listing delle sezioni, è necessario abilitare anche l'autorizzazione Corso - Aggiungi/Modifica/Elimina."
+  to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "Per eseguire il cross-listing delle sezioni, è necessario abilitare anche l'opzione Corsi - Aggiungi/Modifica/Elimina."
   to_date_can_t_come_before_from_date_cf9e18aa: "La \"Data di fine\" non può essere precedente alla \"Data di inizio\""
   to_date_cannot_come_before_from_date_3eeb2633: "La Data di fine non può essere precedente alla Data di inizio"
   to_differentiate_assignments_to_individual_student_6cc40fde: "Per differenziare i compiti per i singoli studenti, è necessario abilitare anche l'autorizzazione Utenti - Visualizza elenco."
@@ -20307,6 +20340,7 @@ it:
       Per modificare la sezione di un insegnante, un assistente o un progettista del corso, è necessario abilitare anche le autorizzazioni Utenti - Aggiungi/Rimuovi insegnanti, progettisti del corso e assistenti dai corsi e Conversazioni - Invia messaggi ai singoli membri del corso.
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Per modificare le impostazioni del modello di corso di base in Impostazioni corso, è necessario abilitare anche Modelli di corso di base - Aggiungi/Modifica/Associa/Elimina. Per aggiungere un corso associato, è necessario abilitare anche Modelli di corso di base - Aggiungi/Modifica/Associa/Elimina - e Corsi - Visualizza elenco. Per modificare le impostazioni di blocco su tutti gli oggetti del modello di base, questa autorizzazione deve essere abilitata. Per modificare le impostazioni di blocco nei file, è necessario abilitare anche File corso - Aggiungi/Modifica/Elimina. Per modificare le impostazioni di blocco nei quiz, è necessario abilitare anche Compiti e quiz - Aggiungi/Modifica/Elimina."
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Per modificare le impostazioni di blocco del modello di base nella pagina Indice compiti, è necessario abilitare anche Corsi - Aggiungi/Modifica/Elimina. Se questa autorizzazione non è abilitata e l'opzione Corsi - Aggiungi/Modifica/Elimina è abilitata, è possibile gestire le impostazioni di blocco del modello di base per un compito dalla pagina dei dettagli dei compiti. Per modificare le impostazioni di blocco del modello di base in un singolo quiz o nella pagina Indice quiz, è necessario abilitare anche Corsi - Aggiungi/Modifica/Elimina."
+  to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "Per modificare le impostazioni di blocco del modello di base dalla pagina Indice discussioni, è necessario abilitare anche Corsi - Aggiungi/Modifica/Elimina e Discussioni - Modera. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Per modificare le impostazioni di blocco del modello di base nella pagina Indice discussioni, è necessario anche abilitare le opzioni Corsi - Aggiungi/Modifica/Elimina e Discussioni - Visualizza. Se questa autorizzazione non è abilitata e le opzioni Corsi - Aggiungi/Modifica/Elimina e Discussioni - Visualizza sono abilitate, è possibile modificare le impostazioni di blocco del modello di base nelle singole discussioni."
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Per modificare le impostazioni di blocco del modello di base nella pagina Indice pagine, è necessario abilitare anche Corsi - Aggiungi/Modifica/Elimina. Se questa autorizzazione non è abilitata e l'opzione Corsi - Aggiungi/Modifica/Elimina è abilitata, è possibile modificare le impostazioni di blocco del modello di base nelle singole pagine."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "Per modificare gli schemi di valutazione del corso, è necessario abilitare anche l'autorizzazione Corsi - Aggiungi/Modifica/Elimina."
@@ -20328,6 +20362,7 @@ it:
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "Per generare l'attività di accesso/disconnessione negli Strumenti di amministrazione, è necessario abilitare anche l'autorizzazione Utenti - Gestisci dettagli accesso o Statistiche - Visualizza. Per generare i log delle modifiche dei voti negli Strumenti di amministrazione, è necessario abilitare anche l'autorizzazione Voti - Visualizza log modifiche."
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "Per importare compiti e quiz utilizzando lo strumento Importa corso, è necessario abilitare anche l'autorizzazione Contenuto corso - Aggiungi/Modifica/Elimina."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "Per importare file utilizzando lo strumento Importa corso, è necessario abilitare anche l'autorizzazione Contenuto corso - Aggiungi/Modifica/Elimina."
+  to_import_learning_outcomes_learning_outcomes_impo_5abbd2fb: "Per importare gli esiti apprendimento, è necessario abilitare anche Esiti apprendimento - Importa."
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "Per importare i dati SIS, è necessario abilitare anche l'opzione Dati SIS - Importa."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "Per importare i dati SIS, è necessario abilitare anche l'autorizzazione Dati SIS - Importa."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Per collegare l'osservatore del corso *%{name}* a uno studente, inizia a digitare il nome dello studente di seguito per trovarlo, quindi fai clic su Aggiorna."
@@ -20459,6 +20494,8 @@ it:
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "Per visualizzare le analisi degli studenti, è necessario abilitare anche le autorizzazioni Utenti - Visualizza elenco e Analisi - Visualizza."
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "Per visualizzare le analisi degli studenti, è necessario abilitare anche le autorizzazioni Utenti - Visualizza elenco e Voti - Visualizza tutti i voti."
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "Per visualizzare la pagina Persone dell'account, è necessario abilitare l'autorizzazione Utenti - Visualizza elenco. Se questa autorizzazione è disattivata e l'opzione Utenti - Visualizza ID accesso è abilitata, gli utenti visualizzeranno comunque gli indirizzi email utilizzati come ID accesso."
+  to_view_the_gradebook_course_content_view_must_als_676f3e8: "Per visualizzare il Registro dei voti, è necessario abilitare anche l’opzione Contenuto corso - Visualizza. Se entrambe le autorizzazioni Voti - Modifica e Voti - Visualizza tutti i voti sono disattivate, il registro dei voti verrà nascosto in Esplorazione corso."
+  to_view_the_gradebook_grades_view_all_grades_must__7ead435: "Per visualizzare il Registro dei voti, è necessario abilitare anche l’opzione Voti - Visualizza tutti i voti."
   to_view_the_list_of_users_in_an_account_users_view_401b8462: "Per visualizzare l'elenco degli utenti in un account, è necessario abilitare l'autorizzazione Utenti - Visualizza elenco."
   to_view_the_list_of_users_in_an_account_users_view_630d77a0: "Per visualizzare l'elenco degli utenti in un account, è necessario abilitare l’opzione Utenti - Visualizza."
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "Per visualizzare l'elenco degli utenti in un account, è necessario abilitare l'opzione Utenti - Visualizza elenco."
@@ -20609,6 +20646,7 @@ it:
   unable_to_remove_app_4293cb53: "Impossibile rimuovere l'app"
   unable_to_save_new_discussion_topic_99239f3f: "impossibile salvare il nuovo argomento di discussione"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Impossibile impostare il voto predefinito perché questo compito è in scadenza in un periodo di valutazione chiuso per almeno uno studente"
+  unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Impossibile impostare la selezione e il trascinamento per i moduli"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Impossibile trasmettere il file al servizio di archiviazione. Il servizio potrebbe essere inattivo o potrebbe essere necessario effettuare nuovamente l'accesso a Canvas."
   unarchive_selected_e0c4bd3d: "Annulla archiviazione elemento selezionato"
   unassigned_permissions_6a38ca95: "Autorizzazioni non assegnate"
@@ -21270,6 +21308,7 @@ it:
       Gli amministratori dei subaccount non possono visualizzare le informazioni SIS a meno che non abbiano anche il ruolo di istruttore in un corso. Gli amministratori dei subaccount non possono visualizzare le informazioni SIS senza l'associazione del corso, poiché il ruolo di istruttore ha l'autorizzazione per leggere i dati SIS a livello di account.
   users_and_terms_are_located_at_the_account_so_the__6896b895: "Utenti e trimestri si trovano a livello di account, pertanto l'endpoint SIS conferma sempre le autorizzazioni dell'utente in base all'account. I subaccount hanno solo la proprietà di corsi e sezioni; non possiedono i dati dell'utente. Gli amministratori dei subaccount non possono visualizzare le informazioni SIS a meno che non abbiano anche il ruolo di istruttore in un corso. Gli amministratori dei subaccount non possono visualizzare le informazioni SIS senza l'associazione del corso, poiché il ruolo di istruttore ha l'autorizzazione per leggere i dati SIS a livello di account."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "Gli utenti possono accedere e creare (ma non modificare) singole rubriche di compiti tramite Compiti quando le autorizzazioni Contenuto corso - Visualizza e Compiti e quiz - Aggiungi/Modifica/Elimina."
+  users_can_access_and_create_but_not_edit_individua_c8a62c74: "Gli utenti possono accedere e creare (ma non modificare) singole rubriche di compiti tramite Compiti quando l’autorizzazione Compiti e quiz - Aggiungi/Modifica/Elimina è abilitata."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Gli utenti possono accedere al link Gestisci banche di domande nella pagina Indice quiz quando le autorizzazioni Contenuto corso - Visualizza e Compiti e quiz - Aggiungi/Modifica/Elimina sono abilitate."
   users_d1b60cb0: Utenti
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Utenti - Genera codici di associazione osservatore per studenti"
@@ -21366,6 +21405,7 @@ it:
   visit_group_group_name_7a816081: "Visita gruppo %{group_name}"
   visit_zoom_14636084: "Visita Zoom"
   waiting_for_attempted_login_6d00cb49: "In attesa del tentativo di accesso"
+  waiting_for_confirmation_to_display_qr_code_6f904d63: "In attesa di conferma della visualizzazione codice QR"
   waiting_for_selection_ce0398c7: "In attesa della selezione"
   waiting_for_your_qr_code_to_load_809299e5: "In attesa del caricamento del tuo codice QR"
   warning_6576b5b8: avviso

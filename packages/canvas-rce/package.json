@@ -95,7 +95,7 @@
     "i18n-js": "^3",
     "i18nliner": "~0.2.0",
     "isomorphic-fetch": "2.2.1",
-    "jquery": "https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS",
+    "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS",
     "lodash": "^4",
     "minimatch": "~3.0.4",
     "prop-types": "^15",

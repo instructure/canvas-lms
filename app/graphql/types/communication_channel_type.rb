@@ -49,7 +49,7 @@ module Types
     end
     def notification_policy_overrides(account_id: nil, course_id: nil, context_type: nil)
       overrides_for = ->(context) do
-        NotificationPolicyOverride.find_all_for(current_user, context, object.id)
+        NotificationPolicyOverride.find_all_for(current_user, context, channel: object)
       end
 
       case context_type

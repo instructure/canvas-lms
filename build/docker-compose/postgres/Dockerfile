@@ -7,9 +7,6 @@ RUN echo "max_locks_per_transaction = 640" >> /usr/share/postgresql/$PG_MAJOR/po
  && echo "shared_buffers = 256MB" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample \
  && echo "effective_cache_size = 256MB" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample
 
-COPY /create-dbs.sh /docker-entrypoint-initdb.d/
-COPY /wait-for-it /
-
 ENV PG_COLLKEY_VERSION 0.5.1
 
 RUN apt-get update --quiet=2 \
@@ -39,3 +36,5 @@ RUN apt-get update --quiet=2 \
     /var/lib/apt/lists/* \
     /tmp/* \
     /var/tmp/*
+
+COPY /create-dbs.sh /docker-entrypoint-initdb.d/

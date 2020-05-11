@@ -14,6 +14,12 @@
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": "ファイルプレビューの作成中にエラーが発生しました"
   },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "ネットワーク要求の作成中にエラーが発生しました"
+  },
+  "an_error_occurred_uploading_your_media_71f1444d": {
+    "message": "あなたのメディアをアップロードする際にエラーが発生しました。"
+  },
   "announcement_list_da155734": { "message": "アナウンス リスト" },
   "announcements_a4b8ed4a": { "message": "発表" },
   "apps_54d24a47": { "message": "アプリ" },
@@ -33,6 +39,7 @@
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "インラインプレビューが自動的に開きます。(プレビューが表示されるのは保存後のみです)"
   },
+  "available_folders_694d0436": { "message": "使用可能なフォルダ" },
   "cancel_caeb1e68": { "message": "キャンセル" },
   "canvas_plugins_705a5016": { "message": "Canvas プラグイン" },
   "choose_caption_file_9c45bc4e": {
@@ -80,6 +87,7 @@
   },
   "course_documents_104d76e0": { "message": "コースドキュメント" },
   "course_files_62deb8f8": { "message": "コースファイル" },
+  "course_files_a31f97fc": { "message": "コース ファイル" },
   "course_images_f8511d04": { "message": "コース画像" },
   "course_links_b56959b9": { "message": "コースリンク" },
   "course_media_ec759ad": { "message": "コースメディア" },
@@ -142,6 +150,10 @@
   "external_links_3d9f074e": { "message": "外部リンク" },
   "extra_large_b6cdf1ff": { "message": "特大" },
   "file_name_8fd421ff": { "message": "ファイル名" },
+  "file_upload_failed_af22dd91": {
+    "message": "ファイルのアップロードに失敗しました"
+  },
+  "file_uploading_56c9c0c8": { "message": "ファイルをアップロード中" },
   "file_url_c12b64be": { "message": "ファイル URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } ファイルアイコン" },
   "filename_image_preview_6cef8f26": {
@@ -156,6 +168,7 @@
   "focus_the_popup_context_toolbar_7979f4f8": {
     "message": "ポップアップコンテキストツールバーに注目する"
   },
+  "folder_tree_fbab0726": { "message": "フォルダツリー" },
   "formatting_5b143aa8": { "message": "フォーマット" },
   "found_auto_saved_content_3f6e4ca5": {
     "message": "自動保存されたコンテンツが見つかりました"
@@ -172,6 +185,7 @@
   },
   "grades_a61eba0a": { "message": "成績" },
   "group_files_4324f3df": { "message": "グループファイル" },
+  "group_files_82e5dcdb": { "message": "グループ ファイル" },
   "group_navigation_99f191a": { "message": "グループ ナビゲーション" },
   "heading_2_5b84eed2": { "message": "見出し2" },
   "heading_3_2c83de44": { "message": "見出し3" },
@@ -208,7 +222,9 @@
   "loading_bde52856": { "message": "読み込み中" },
   "loading_failed_b3524381": { "message": "読み込みに失敗しました..." },
   "loading_failed_e6a9d8ef": { "message": "読込みに失敗しました。" },
+  "loading_folders_d8b5869e": { "message": "フォルダを読み込み中..." },
   "loading_media_f3455841": { "message": "メディアの読込み" },
+  "locked_762f138b": { "message": "ロックされています" },
   "media_af190855": { "message": "メディア" },
   "medium_5a8e9ead": { "message": "中" },
   "mic_a7f3d311": { "message": "マイク" },
@@ -217,6 +233,7 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "少なくとも { width } x { height }px でなければなりません"
   },
+  "my_files_2f621040": { "message": "マイ ファイル" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "メニューまたはツールバーを移動する"
   },
@@ -288,6 +305,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "何かがうまくいきませんでした。何を見せればいいのかわかりません。"
   },
+  "something_went_wrong_d238c551": { "message": "なにかが失敗しました" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
     "message": "問題が発生しました。ページを最新に更新してからもう一度お試しください"
   },
@@ -301,6 +319,9 @@
   "styles_2aa721ef": { "message": "スタイル" },
   "submit_a3cc6859": { "message": "提出" },
   "subscript_59744f96": { "message": "下付き" },
+  "success_file_uploaded_8174e93f": {
+    "message": "成功：ファイルをアップロードしました"
+  },
   "superscript_8cb349a2": { "message": "上付き" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "サポートされるファイルタイプ：SRT または WebVTT"
@@ -339,6 +360,9 @@
   "upload_file_fd2361b8": { "message": "ファイルアップロード" },
   "upload_image_6120b609": { "message": "イメージのアップロード" },
   "upload_media_ce31135a": { "message": "メディアを読み込む" },
+  "upload_not_available_for_this_folder_8f8623c6": {
+    "message": "このフォルダにはアップロードできません"
+  },
   "upload_record_media_e4207d72": {
     "message": "メディアをアップロード/記録する"
   },

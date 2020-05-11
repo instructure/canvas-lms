@@ -17,11 +17,24 @@
  */
 
 export default function deferPromise() {
-  const deferred = {}
+  const deferred = {
+    state: 'pending'
+  }
 
   deferred.promise = new Promise((resolve, reject) => {
-    deferred.resolve = resolve
-    deferred.reject = reject
+    deferred.resolve = value => {
+      if (deferred.state === 'pending') {
+        deferred.state = 'resolved'
+        resolve(value)
+      }
+    }
+
+    deferred.reject = error => {
+      if (deferred.state === 'pending') {
+        deferred.state = 'rejected'
+        reject(error)
+      }
+    }
   })
 
   return deferred

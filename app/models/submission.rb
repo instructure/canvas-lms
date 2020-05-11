@@ -548,6 +548,7 @@ class Submission < ActiveRecord::Base
   end
 
   def can_read_submission_user_name?(user, session)
+    return false if self.assignment.anonymize_students?
     !self.assignment.anonymous_peer_reviews? ||
         self.user_id == user.id ||
         self.assignment.context.grants_right?(user, session, :view_all_grades)
@@ -2278,14 +2279,13 @@ class Submission < ActiveRecord::Base
     prefix = self.assignment.context_prefix || ""
     author_name = self.assignment.present? && self.assignment.context.present? ? self.assignment.context.name : t('atom_no_author', "No Author")
     Atom::Entry.new do |entry|
-      entry.title     = "#{self.user && self.user.name} -- #{self.assignment && self.assignment.title}#{", " + self.assignment.context.name if opts[:include_context]}"
-      entry.authors  << Atom::Person.new(:name => author_name)
+      entry.title     = "#{self&.user.name} -- #{self&.assignment.title}#{', ' + self.assignment.context.name if opts[:include_context]}"
       entry.updated   = self.updated_at
       entry.published = self.created_at
-      entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/submissions/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"
-      entry.links    << Atom::Link.new(:rel => 'alternate',
-                                    :href => "http://#{HostUrl.context_host(self.assignment.context)}/#{prefix}/assignments/#{self.assignment_id}/submissions/#{self.id}")
+      entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime('%Y-%m-%d')}:/submissions/#{self.feed_code}_#{self.updated_at.strftime('%Y-%m-%d')}"
       entry.content   = Atom::Content::Html.new(self.body || "")
+      entry.links << Atom::Link.new(:rel => 'alternate', :href => "#{self.assignment.direct_link}/submissions/#{self.id}")
+      entry.authors << Atom::Person.new(:name => author_name)
       # entry.author    = Atom::Person.new(self.user)
     end
   end
@@ -2667,6 +2667,18 @@ class Submission < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  def root_account_id
+    # TODO this is a substitute for the root_account_id column
+    # and the root_account attribute, which will eventually be added
+    self.assignment&.root_account_id
+  end
+
+  def root_account
+    # TODO this is a substitute for the root_account attribute,
+    # which will eventually be added
+    self.assignment&.root_account
   end
 
   private

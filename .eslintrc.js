@@ -38,7 +38,8 @@ module.exports = {
     'jsx-a11y',
     'lodash',
     'react',
-    'react-hooks'
+    'react-hooks',
+    'babel'
   ],
   rules: {
     'no-cond-assign': ['error', 'except-parens'],
@@ -87,10 +88,7 @@ module.exports = {
     'react/no-typos': 'off',
     'react/sort-comp': 'off',
     'react/require-default-props': 'off',
-    'react/prop-types': [
-      'error',
-      {'skipUndeclared': true}
-    ],
+    'react/prop-types': ['error', {skipUndeclared: true}],
     'react/default-props-match-prop-types': ['error', {allowRequiredDefaults: true}], // add the `allowRequiredDefaults: true` option to allow specifying something as a required prop (so you get propType error messages), but in case it's not present at runtime, I'll use `[]` as the default (so it is resilient)".
     'react/forbid-foreign-prop-types': 'off', // You can refer to proptypes within proptypes, but you shouldn't use proptypes in actual app code of the component
     'react/jsx-no-bind': 'off',
@@ -120,12 +118,15 @@ module.exports = {
 
     // These are things we care about
     'react/jsx-filename-extension': ['error', {extensions: ['.js']}],
-    'no-unused-vars': ['error', {
-      argsIgnorePattern: '^_',
+    'no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
 
-      // allows `const {propIUse, propIDontUseButDontWantToPassOn, ...propsToPassOn} = this.props`
-      ignoreRestSiblings: true
-    }],
+        // allows `const {propIUse, propIDontUseButDontWantToPassOn, ...propsToPassOn} = this.props`
+        ignoreRestSiblings: true
+      }
+    ],
     'eslint-comments/no-unused-disable': 'error',
     'import/extensions': ['error', 'ignorePackages', {js: 'never'}],
     'import/no-commonjs': 'off', // This is overridden where it counts
@@ -144,7 +145,8 @@ module.exports = {
         mustMatch: 'Copyright '
       }
     ],
-    'no-unused-expressions': ['error', {'allowShortCircuit': true}]
+    'no-unused-expressions': 'off', // the babel version allows optional chaining a?.b
+    'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}]
   },
   settings: {
     react: {

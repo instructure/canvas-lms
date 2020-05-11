@@ -126,8 +126,8 @@ test('shows solid quiz icon for new.quizzes', () => {
   equal(view.$('i.icon-quiz.icon-Solid').length, 1)
 })
 
-test('shows a non-student a line quiz icon for old quizzes', () => {
-  Object.assign(window.ENV, {current_user_roles: ['teacher']})
+test('shows a teacher a line quiz icon for old quizzes', () => {
+  Object.assign(window.ENV, {current_user_roles: ['teacher', 'student']})
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})
   equal(view.$('i.icon-quiz').length, 1)
@@ -137,7 +137,7 @@ test('shows a non-student a line quiz icon for old quizzes', () => {
 test('shows a student a solid quiz icon for old quizzes', () => {
   Object.assign(window.ENV, {current_user_roles: ['student']})
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})
+  const view = createView(quiz, {canManage: false, migrate_quiz_enabled: false})
   equal(view.$('i.icon-quiz.icon-Solid').length, 1)
 })
 

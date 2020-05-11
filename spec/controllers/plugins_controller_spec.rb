@@ -41,7 +41,7 @@ describe PluginsController do
       allow(controller).to receive(:require_setting_site_admin).and_return(true)
       # The 'all' parameter is necessary for this test to pass when the
       # multiple root acoounts plugin is installed
-      put 'update', params: {id: 'big_blue_button', settings: { domain: ' abc ', secret: 'secret', recording_enabled: '0', free_trial: true, replace_with_alternatives: false }, all: 1}
+      put 'update', params: {id: 'big_blue_button', settings: { domain: ' abc ', secret: 'secret', recording_enabled: '0', free_trial: true, replace_with_alternatives: false, use_fallback: false }, all: 1}
       expect(response).to be_redirect
       ps.reload
       expect(ps.settings[:domain]).to eq 'abc'

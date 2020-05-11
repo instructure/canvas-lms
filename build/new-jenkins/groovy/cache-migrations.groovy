@@ -40,13 +40,13 @@ def cacheLoadFailed() {
 
 def commitMigratedImages() {
   def postgresMessage = "Postgres migrated image for patchset $NAME"
-  sh "docker commit -m \"${postgresMessage}\" \$(docker-compose ps -q postgres) ${postgresImage()}"
+  sh "docker commit -m \"${postgresMessage}\" \$(docker ps -q --filter 'name=postgres_') ${postgresImage()}"
 
   def cassandraMessage = "Cassandra migrated image for patchset $NAME"
-  sh "docker commit -m \"${cassandraMessage}\" \$(docker-compose ps -q cassandra) ${cassandraImage()}"
+  sh "docker commit -m \"${cassandraMessage}\" \$(docker ps -q --filter 'name=cassandra_') ${cassandraImage()}"
 
   def dynamodbMessage = "Dynamodb migrated image for patchset $NAME"
-  sh "docker commit -m \"${dynamodbMessage}\" \$(docker-compose ps -q dynamodb) ${dynamodbImage()}"
+  sh "docker commit -m \"${dynamodbMessage}\" \$(docker ps -q --filter 'name=dynamodb_') ${dynamodbImage()}"
 }
 
 def loadMigratedImages() {
@@ -62,7 +62,7 @@ def pullAndBuild() {
 
 def startAndMigrate() {
   sh 'docker-compose up -d'
-  sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+  sh 'build/new-jenkins/docker-compose-setup-databases.sh'
 }
 
 def storeMigratedImages() {

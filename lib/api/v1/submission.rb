@@ -95,14 +95,16 @@ module Api::V1::Submission
     end
 
     if includes.include?("html_url")
-      hash['html_url'] = course_assignment_submission_url(submission.context.id, assignment.id, submission.user.id)
+      hash['html_url'] = assignment.anonymize_students? ?
+        speed_grader_course_gradebook_url(assignment.context, assignment_id: assignment.id, anonymous_id: submission.anonymous_id) :
+        course_assignment_submission_url(submission.context.id, assignment.id, submission.user.id)
     end
 
-    if includes.include?("user")
+    if includes.include?("user") && submission.can_read_submission_user_name?(current_user, session)
       hash['user'] = user_json(submission.user, current_user, session, ['avatar_url'], submission.context, nil)
     end
 
-    if assignment && includes.include?('user_summary')
+    if assignment && includes.include?('user_summary') && submission.can_read_submission_user_name?(current_user, session)
       hash['user'] = user_display_json(submission.user, assignment.context)
     end
 
@@ -161,7 +163,7 @@ module Api::V1::Submission
       hash['grade_matches_current_submission'] = hash['grade_matches_current_submission'] != false
     end
 
-    unless params[:exclude_response_fields] && params[:exclude_response_fields].include?('preview_url')
+    unless (params[:exclude_response_fields] && params[:exclude_response_fields].include?('preview_url')) || assignment.anonymize_students?
       preview_args = { 'preview' => '1' }
       preview_args['version'] = quiz_submission_version || attempt.quiz_submission_version || attempt.version_number
       hash['preview_url'] = course_assignment_submission_url(context, assignment, attempt[:user_id], preview_args)

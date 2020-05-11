@@ -186,6 +186,16 @@ RSpec.describe ApplicationController do
       expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
     end
 
+    context "canvas_k6_theme" do
+      before(:each) do
+        controller.instance_variable_set(:@context, @course)
+      end
+
+      it 'should populate js_env with elementary theme setting' do
+        expect(controller.js_env[:FEATURES]).to include(:canvas_k6_theme)
+      end
+    end
+
     context "responsive_admin_settings" do
       before(:each) do
         controller.instance_variable_set(:@domain_root_account, Account.default)

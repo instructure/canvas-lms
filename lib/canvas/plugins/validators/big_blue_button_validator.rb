@@ -22,8 +22,8 @@ module Canvas::Plugins::Validators::BigBlueButtonValidator
       {}
     else
       secret = settings.delete(:secret)
-      has_no_secret = secret.blank? && plugin_setting.settings[:secret].blank?
-      expected_settings = [:domain, :recording_enabled, :replace_with_alternatives, :free_trial]
+      has_no_secret = secret.blank? && plugin_setting.settings.try(:[], :secret).blank?
+      expected_settings = [:domain, :recording_enabled, :replace_with_alternatives, :free_trial, :use_fallback]
       has_nonsecret_blank = settings.map(&:last).any?(&:blank?)
       if settings.size != expected_settings.size || has_nonsecret_blank || has_no_secret
         plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
@@ -34,6 +34,7 @@ module Canvas::Plugins::Validators::BigBlueButtonValidator
         settings[:recording_enabled] = Canvas::Plugin.value_to_boolean(settings[:recording_enabled])
         settings[:replace_with_alternatives] = Canvas::Plugin.value_to_boolean(settings[:replace_with_alternatives])
         settings[:free_trial] = Canvas::Plugin.value_to_boolean(settings[:free_trial])
+        settings[:use_fallback] = Canvas::Plugin.value_to_boolean(settings[:use_fallback])
         settings
       end
     end

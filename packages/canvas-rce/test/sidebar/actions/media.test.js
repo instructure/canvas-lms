@@ -21,7 +21,8 @@ import * as actions from '../../../src/sidebar/actions/media'
 import {
   fetchMedia,
   updateMediaObject,
-  updateMediaObjectFailure
+  updateMediaObjectFailure,
+  updateClosedCaptions
 } from '../../../src/sidebar/sources/fake'
 import alertHandler from '../../../src/rce/alertHandler'
 
@@ -40,6 +41,15 @@ function getInitialState() {
     contextType: 'course'
   }
 }
+
+beforeEach(() => {
+  global.ENV = {
+    FEATURES: {
+      cc_in_rce_video_tray: true
+    }
+  }
+})
+
 describe('Media actions', () => {
   afterEach(() => {
     sinon.restore()
@@ -161,24 +171,34 @@ describe('Media actions', () => {
     })
     it('calls the api', async () => {
       const updateSpy = sinon.spy(updateMediaObject)
+      const updateCCSpy = sinon.spy()
       const dispatch = () => {}
       const getState = () => {
         const state = getInitialState()
-        state.source = {updateMediaObject: updateSpy}
+        state.source = {updateMediaObject: updateSpy, updateClosedCaptions: updateCCSpy}
         return state
       }
-      await actions.updateMediaObject({media_object_id: 'moid', title: 'title'})(dispatch, getState)
+      await actions.updateMediaObject({
+        media_object_id: 'moid',
+        title: 'title',
+        subtitles: {en: 'whatever'}
+      })(dispatch, getState)
       assert(updateSpy.called)
       assert.deepEqual(updateSpy.getCalls()[0].args[1], {
         media_object_id: 'moid',
         title: 'title'
+      })
+      assert(updateCCSpy.called)
+      assert.deepEqual(updateCCSpy.getCalls()[0].args[1], {
+        media_object_id: 'moid',
+        subtitles: {en: 'whatever'}
       })
     })
     it('handles failure', async () => {
       const dispatch = () => {}
       const getState = () => {
         const state = getInitialState()
-        state.source = {updateMediaObject: updateMediaObjectFailure}
+        state.source = {updateMediaObject: updateMediaObjectFailure, updateClosedCaptions}
         return state
       }
       try {

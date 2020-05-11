@@ -1,0 +1,45 @@
+version: "2.3"
+services:
+  canvas:
+    image: $PATCHSET_TAG
+    environment:
+      ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+      RAILS_ENV: test
+      RANDOMIZE_SEQUENCES: 1
+      DISABLE_SPRING: 'true'
+      RERUNS_RETRY:
+      MAX_FAIL:
+      COVERAGE:
+      FORCE_FAILURE:
+
+      # parallel_tests
+      CI_NODE_TOTAL:
+      CI_NODE_INDEX:
+      DOCKER_PROCESSES:
+      EXCLUDE_TESTS:
+      TEST_PATTERN:
+    depends_on:
+      - postgres
+      - cassandra
+      - redis
+      - dynamodb
+
+  redis:
+    image: starlord.inscloudgate.net/jenkins/redis:alpine
+
+  postgres:
+    build:
+      context: build/docker-compose/postgres/
+    environment:
+      POSTGRES_PASSWORD: sekret
+
+  cassandra:
+    build:
+      context: build/docker-compose/cassandra/
+    environment:
+      CASSANDRA_START_RPC: 'true'
+
+  dynamodb:
+    build:
+      context: build/docker-compose/dynamodb/
+    command: -jar DynamoDBLocal.jar

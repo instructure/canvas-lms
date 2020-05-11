@@ -17,6 +17,7 @@
  */
 
 import DateValidator from 'compiled/util/DateValidator'
+import fakeENV from 'helpers/fakeENV'
 
 const DATE_IN_CLOSED_PERIOD = '2015-07-23T03:59:59Z'
 const DATE_IN_OPEN_PERIOD = '2015-09-23T03:59:59Z'
@@ -240,6 +241,18 @@ QUnit.module('when applied to one or more individual students', hooks => {
     ok(isValid(validator, data))
   })
 
+  test('accepts all_dates format for student overrides', () => {
+    const data = generateData({
+      due_at: '2014-01-23T03:59:59Z',
+      student_ids: null,
+      set_type: 'ADHOC',
+      set_id: null
+    })
+
+    const validator = makeIndividualValidator()
+    ok(isValid(validator, data))
+  })
+
   test('allows an unlock date before the prescribed start date', () => {
     const data = generateData({
       unlock_at: '2014-01-23T03:59:59Z'
@@ -273,6 +286,180 @@ QUnit.module('when applied to one or more individual students', hooks => {
 
     const gradingPeriods = generateGradingPeriods()
     const validator = makeIndividualValidator({hasGradingPeriods: true, gradingPeriods})
+    notOk(isValid(validator, data))
+  })
+})
+
+QUnit.module('term dates', hooks => {
+  let makeIndividualValidator
+
+  hooks.beforeEach(() => {
+    makeIndividualValidator = (params = {}) =>
+      createValidator({
+        dueDateRequiredForAccount: false,
+        gradingPeriods: null,
+        hasGradingPeriods: false,
+        postToSIS: true,
+        userIsAdmin: false,
+        ...params
+      })
+  })
+
+  test('allows dates that are in range', () => {
+    const data = generateData({
+      unlock_at: '2015-03-03T03:59:59Z',
+      due_at: '2015-03-04T03:59:59Z',
+      lock_at: '2015-03-05T03:59:59Z',
+      student_ids: null
+    })
+    const validator = makeIndividualValidator()
+    ok(isValid(validator, data))
+  })
+
+  test('disallows a due date before the prescribed start date', () => {
+    const data = generateData({
+      due_at: '2014-01-23T03:59:59Z',
+      student_ids: null
+    })
+
+    const validator = makeIndividualValidator()
+    notOk(isValid(validator, data))
+  })
+
+  test('disallows an unlock date before the prescribed start date', () => {
+    const data = generateData({
+      unlock_at: '2014-01-23T03:59:59Z',
+      student_ids: null
+    })
+
+    const validator = makeIndividualValidator()
+    notOk(isValid(validator, data))
+  })
+
+  test('disallows a due date after the prescribed end date', () => {
+    const data = generateData({
+      due_at: '2017-01-23T03:59:59Z',
+      student_ids: null
+    })
+    const validator = makeIndividualValidator()
+    notOk(isValid(validator, data))
+  })
+
+  test('disallows a lock date after the prescribed end date', () => {
+    const data = generateData({
+      lock_at: '2017-01-23T03:59:59Z',
+      student_ids: null
+    })
+    const validator = makeIndividualValidator()
+    notOk(isValid(validator, data))
+  })
+})
+
+QUnit.module('section dates', hooks => {
+  let makeIndividualValidator
+
+  hooks.beforeEach(() => {
+    makeIndividualValidator = (params = {}) =>
+      createValidator({
+        dueDateRequiredForAccount: false,
+        gradingPeriods: null,
+        hasGradingPeriods: false,
+        postToSIS: true,
+        userIsAdmin: false,
+        ...params
+      })
+    fakeENV.setup({
+      SECTION_LIST: [
+        {
+          id: 123,
+          start_at: '2020-03-01T00:00:00Z',
+          end_at: '2020-07-01T00:00:00Z',
+          override_course_and_term_dates: true
+        }
+      ]
+    })
+  })
+
+  hooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('allows dates that are in range', () => {
+    const data = generateData({
+      unlock_at: '2020-03-03T00:00:00Z',
+      due_at: '2020-03-04T00:00:00Z',
+      lock_at: '2020-03-05T00:00:00Z',
+      student_ids: null,
+      course_section_id: 123
+    })
+    const validator = makeIndividualValidator()
+    ok(isValid(validator, data))
+  })
+
+  test('accepts all_dates format for section overrides', () => {
+    const data = generateData({
+      unlock_at: '2020-03-03T00:00:00Z',
+      due_at: '2020-03-04T00:00:00Z',
+      lock_at: '2020-03-05T00:00:00Z',
+      student_ids: null,
+      set_type: 'CourseSection',
+      set_id: 123
+    })
+    const validator = makeIndividualValidator()
+    ok(isValid(validator, data))
+  })
+
+  test('matches the section id', () => {
+    const data = generateData({
+      unlock_at: '2020-03-03T00:00:00Z',
+      due_at: '2020-03-04T00:00:00Z',
+      lock_at: '2020-03-05T00:00:00Z',
+      student_ids: null,
+      course_section_id: 456
+    })
+    const validator = makeIndividualValidator()
+    notOk(isValid(validator, data))
+  })
+
+  test('disallows a due date before the prescribed start date', () => {
+    const data = generateData({
+      due_at: '2020-01-01T00:00:00Z',
+      student_ids: null,
+      course_section_id: 123
+    })
+
+    const validator = makeIndividualValidator()
+    notOk(isValid(validator, data))
+  })
+
+  test('disallows an unlock date before the prescribed start date', () => {
+    const data = generateData({
+      unlock_at: '2020-01-01T00:00:00Z',
+      student_ids: null,
+      course_section_id: 123
+    })
+
+    const validator = makeIndividualValidator()
+    notOk(isValid(validator, data))
+  })
+
+  test('disallows a due date after the prescribed end date', () => {
+    const data = generateData({
+      due_at: '2020-12-25T00:00:00Z',
+      student_ids: null,
+      course_section_id: 123
+    })
+    const validator = makeIndividualValidator()
+    notOk(isValid(validator, data))
+  })
+
+  test('disallows a lock date after the prescribed end date', () => {
+    const data = generateData({
+      lock_at: '2020-12-25T00:00:00Z',
+      student_ids: null,
+      course_section_id: 123
+    })
+    const validator = makeIndividualValidator()
     notOk(isValid(validator, data))
   })
 })

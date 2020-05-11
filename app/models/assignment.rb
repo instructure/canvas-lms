@@ -120,6 +120,7 @@ class Assignment < ActiveRecord::Base
   validate :assignment_overrides_due_date_ok?
   validate :discussion_group_ok?
   validate :positive_points_possible?
+  validate :reasonable_points_possible?
   validate :moderation_setting_ok?
   validate :assignment_name_length_ok?, :unless => :deleted?
   validates :lti_context_id, presence: true, uniqueness: true
@@ -179,6 +180,16 @@ class Assignment < ActiveRecord::Base
         "The value of possible points for this assignment must be zero or greater."
       )
     )
+  end
+
+  def reasonable_points_possible?
+    return if self.points_possible.to_i < 1000000000
+    return unless self.points_possible_changed?
+    errors.add(
+      :points_possible,
+      I18n.t(
+        "The value of possible points for this assignment cannot exceed 999999999.")
+      )
   end
 
   def get_potentially_conflicting_titles(title_base)
@@ -1387,17 +1398,16 @@ class Assignment < ActiveRecord::Base
     Atom::Entry.new do |entry|
       entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", :assignment => self.title) unless opts[:include_context]
       entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", :assignment => self.title, :course => self.context.name) if opts[:include_context]
-      entry.authors  << Atom::Person.new(:name => author_name)
       entry.updated   = self.updated_at.utc
       entry.published = self.created_at.utc
-      entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/assignments/#{self.feed_code}_#{self.due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
-      entry.links    << Atom::Link.new(:rel => 'alternate',
-                                    :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/assignments/#{self.id}")
+      entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime('%Y-%m-%d')}:/assignments/#{self.feed_code}_#{self.due_at.strftime('%Y-%m-%d-%H-%M') rescue 'none'}"
       entry.content   = Atom::Content::Html.new(before_label(:due, "Due") + " #{datetime_string(self.due_at, :due_date)}<br/>#{self.description}<br/><br/>
         <div>
           #{self.description}
         </div>
       ")
+      entry.links << Atom::Link.new(:rel => 'alternate', :href => direct_link)
+      entry.authors << Atom::Person.new(:name => author_name)
     end
   end
 
@@ -1407,6 +1417,10 @@ class Assignment < ActiveRecord::Base
 
   def end_at
     due_at
+  end
+
+  def direct_link
+    "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/assignments/#{self.id}"
   end
 
   def context_prefix

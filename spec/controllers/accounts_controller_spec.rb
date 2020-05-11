@@ -128,6 +128,59 @@ describe AccountsController do
     end
   end
 
+  context "restore_user" do
+    before(:once) do
+      @site_admin = site_admin_user
+      account_with_admin
+      @deleted_user = user_with_pseudonym(account: @account)
+      @deleted_user.destroy
+    end
+
+    before(:each) {user_session(@site_admin)}
+
+    it 'allows site-admins to restore deleted users' do
+      put 'restore_user', params: {account_id: @account.id, user_id: @deleted_user.id}
+      expect(@deleted_user.reload.workflow_state).to eq 'registered'
+      expect(@deleted_user.pseudonyms.take.workflow_state).to eq 'active'
+      expect(@deleted_user.user_account_associations.find_by(account: @account)).not_to be_nil
+    end
+
+    it 'does not allow standard admins to restore deleted users' do
+      # probably fine if someone wants to allow regular admins to do this at some point
+      user_session(@admin)
+      put 'restore_user', params: {account_id: @account.id, user_id: @deleted_user.id}, format: 'json'
+      expect(response).to be_unauthorized
+    end
+
+    it 'should 404 for non-existent users' do
+      put 'restore_user', params: {account_id: @account.id, user_id: 0}
+      expect(response).to be_not_found
+
+      # user without a pseudonym in the account
+      @missing_user = user_factory
+      @missing_user.destroy
+      put 'restore_user', params: {account_id: @account.id, user_id: @missing_user.id}
+      expect(response).to be_not_found
+    end
+
+    it 'should not change the state of users who were only removed from the account' do
+      @doomed_user = user_with_pseudonym(account: @account, user_state: 'pre_registered')
+      @doomed_user.remove_from_root_account(@account)
+
+      put 'restore_user', params: {account_id: @account.id, user_id: @doomed_user.id}
+      expect(@doomed_user.reload.workflow_state).to eq 'pre_registered'
+      expect(@doomed_user.pseudonyms.take.workflow_state).to eq 'active'
+      expect(@doomed_user.user_account_associations.find_by(account: @account)).not_to be_nil
+    end
+
+    it 'should 400 for non-deleted users' do
+      @active_user = user_with_pseudonym(account: @account)
+
+      put 'restore_user', params: {account_id: @account.id, user_id: @active_user.id}
+      expect(response).to be_bad_request
+    end
+  end
+
   describe "add_account_user" do
     before(:once) {account_with_admin}
     before(:each) {user_session(@admin)}

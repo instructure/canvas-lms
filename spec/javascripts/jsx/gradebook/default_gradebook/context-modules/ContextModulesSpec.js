@@ -21,7 +21,7 @@ import {
   setFixtureHtml
 } from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 
-QUnit.module('Gradebook > Students', suiteHooks => {
+QUnit.module('Gradebook > Context Modules', suiteHooks => {
   let $container
   let gradebook
 
@@ -99,6 +99,27 @@ QUnit.module('Gradebook > Students', suiteHooks => {
     test('renders filters after updating the context modules loaded status', () => {
       sinon.stub(gradebook, 'renderFilters').callsFake(() => {
         strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true)
+      })
+      gradebook.updateContextModules(contextModules)
+    })
+
+    test('updates essential data load status', () => {
+      sinon.spy(gradebook, '_updateEssentialDataLoaded')
+      gradebook.updateContextModules(contextModules)
+      strictEqual(gradebook._updateEssentialDataLoaded.callCount, 1)
+    })
+
+    test('updates essential data load status after updating the context modules loaded status', () => {
+      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
+        strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true)
+      })
+      gradebook.updateContextModules(contextModules)
+    })
+
+    test('updates essential data load status after rendering filters', () => {
+      sinon.spy(gradebook, 'renderFilters')
+      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
+        strictEqual(gradebook.renderFilters.callCount, 1)
       })
       gradebook.updateContextModules(contextModules)
     })

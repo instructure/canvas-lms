@@ -28,6 +28,7 @@ pipeline {
   agent { label 'canvas-docker' }
   options {
     ansiColor('xterm')
+    timestamps()
   }
 
   environment {

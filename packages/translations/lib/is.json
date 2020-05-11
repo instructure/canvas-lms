@@ -56,6 +56,12 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": "Villa kom upp við að mynda forskoðun skrárinnar"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "Villa kom upp við netbeiðni"
+    },
+    "an_error_occurred_uploading_your_media_71f1444d": {
+        "message": "Villa kom upp við að hlaða upp margmiðlunarefninu."
+    },
     "announcement_fb4cb645": {
         "message": "Tilkynning"
     },
@@ -121,6 +127,9 @@
     },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Opna sjálfkrafa forskoðun í línu. (Forskoðun sést ekki fyrr en búið er að vista)"
+    },
+    "available_folders_694d0436": {
+        "message": "Tiltækar möppur"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Upphaf verkefnasögu þinnar"
@@ -213,6 +222,9 @@
         "message": "Skjöl námskeiðs"
     },
     "course_files_62deb8f8": {
+        "message": "Námskeiðsskrár"
+    },
+    "course_files_a31f97fc": {
         "message": "Námskeiðsskrár"
     },
     "course_images_f8511d04": {
@@ -431,6 +443,12 @@
     "file_name_8fd421ff": {
         "message": "Skráarheiti"
     },
+    "file_upload_failed_af22dd91": {
+        "message": "Upphleðsla skrár mistókst"
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "Skrá er að hlaðast upp"
+    },
     "file_url_c12b64be": {
         "message": "Skráar-URL"
     },
@@ -454,6 +472,9 @@
     },
     "focus_the_popup_context_toolbar_7979f4f8": {
         "message": "Fókusa verkfæraslá sprettigluggasamhengis"
+    },
+    "folder_tree_fbab0726": {
+        "message": "Möpputré"
     },
     "formatting_5b143aa8": {
         "message": "Forsníð"
@@ -489,6 +510,9 @@
         "message": "Einkunnir eru hlaðnar inn"
     },
     "group_files_4324f3df": {
+        "message": "Hópskrár"
+    },
+    "group_files_82e5dcdb": {
         "message": "Hópskrár"
     },
     "group_navigation_99f191a": {
@@ -608,6 +632,9 @@
     "loading_failed_e6a9d8ef": {
         "message": "Hleðsla mistókst."
     },
+    "loading_folders_d8b5869e": {
+        "message": "Hleð möppum"
+    },
     "loading_grades_c842c887": {
         "message": "Hleð inn einkunnum"
     },
@@ -622,6 +649,9 @@
     },
     "location_3b6ff307": {
         "message": "Staðsetning:"
+    },
+    "locked_762f138b": {
+        "message": "Læst"
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Lítur út fyrir að vera autt"
@@ -649,6 +679,9 @@
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Verður að vera að minnsta kosti { width } x { height }pt"
+    },
+    "my_files_2f621040": {
+        "message": "Mínar skrár"
     },
     "my_grades_98834476": {
         "message": "Einkunnir mínar"
@@ -899,6 +932,9 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Eitthvað mistókst og ég veit ekki hvað ég á að sýna þér."
     },
+    "something_went_wrong_d238c551": {
+        "message": "Eitthvað mistókst"
+    },
     "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
         "message": "Eitthvað fór úrskeiðis, endurglæddu síðuna og reyndu aftur"
     },
@@ -940,6 +976,9 @@
     },
     "subscript_59744f96": {
         "message": "Undirskrift"
+    },
+    "success_file_uploaded_8174e93f": {
+        "message": "Árangur: Skrá var hlaðið upp"
     },
     "success_to_do_created_e34ed395": {
         "message": "Árangur: Verkefni búið til"
@@ -1048,6 +1087,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Hlaða upp miðli"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "Upphleðsla ekki tiltæk fyrir þessa möppu"
     },
     "upload_record_media_e4207d72": {
         "message": "Hlaða/taka upp margmiðlunarefni"

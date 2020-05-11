@@ -491,6 +491,10 @@ class Account < ActiveRecord::Base
     super
   end
 
+  def resolved_root_account_id
+    root_account_id || id
+  end
+
   def sub_accounts_as_options(indent = 0, preloaded_accounts = nil)
     unless preloaded_accounts
       preloaded_accounts = {}

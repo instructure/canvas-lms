@@ -169,7 +169,8 @@ class BigBlueButtonConference < WebConference
 
   def use_fallback_config?
     # use the fallback config (if possible) if it wasn't created with the current config
-    self.settings[:domain] != self.class.config[:domain]
+    self.class.config[:use_fallback] &&
+      self.settings[:domain] != self.class.config[:domain]
   end
 
   private

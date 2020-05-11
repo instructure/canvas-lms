@@ -21,21 +21,6 @@ import {useEffect, useRef, useState} from 'react'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
 import {extractFetchErrorMessage} from '../utils'
 
-function pushFieldErrors(err, fieldName, acc) {
-  if (err[fieldName]) acc.push(...err[fieldName].map(e => e.message))
-}
-
-function extractJobErrorMessages(json) {
-  return json.results
-    .map(result => result.errors)
-    .reduce((acc, error) => {
-      pushFieldErrors(error, 'due_at', acc)
-      pushFieldErrors(error, 'unlock_at', acc)
-      pushFieldErrors(error, 'lock_at', acc)
-      return acc
-    }, [])
-}
-
 export default function useMonitorJobCompletion({progressUrl, pollingInterval = 2000}) {
   const [jobCompletion, setJobCompletion] = useState(0)
   const [jobRunning, setJobRunning] = useState(false)
@@ -52,14 +37,18 @@ export default function useMonitorJobCompletion({progressUrl, pollingInterval = 
 
     function reportJobErrors(json) {
       setJobRunning(false)
-      setJobErrors(extractJobErrorMessages(json))
+      setJobErrors(json.results)
     }
 
     async function reportFetchError(err) {
       setJobRunning(false)
-      setJobErrors([
-        await extractFetchErrorMessage(err, I18n.t('There was an error retrieving job progress'))
-      ])
+      // this is also the results format if the job fails due to an exception
+      setJobErrors({
+        message: await extractFetchErrorMessage(
+          err,
+          I18n.t('There was an error retrieving job progress')
+        )
+      })
     }
 
     function interpretCompletionResponse({json}) {

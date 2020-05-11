@@ -43,7 +43,7 @@ module Canvas::Migration::Helpers
     end
 
     def valid_type?(type=nil)
-      type.nil? || SELECTIVE_CONTENT_TYPES.any?{|t|t[0] == type} || type.start_with?("submodules_")
+      type.nil? || SELECTIVE_CONTENT_TYPES.any?{|t|t[0] == type} || type.start_with?("submodules_") || type.start_with?("learning_outcome_groups_")
     end
 
     def get_content_list(type=nil, source=nil)
@@ -218,6 +218,7 @@ module Canvas::Migration::Helpers
       source ||= @migration.source_course || Course.find(@migration.migration_settings[:source_course_id]) if @migration
       return [] unless source
 
+      selectable_outcomes = source.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
       content_list = []
       source.shard.activate do
         if type
@@ -235,8 +236,15 @@ module Canvas::Migration::Helpers
                 content_list << course_item_hash(type, item)
               end
             when 'learning_outcomes'
-              source.linked_learning_outcomes.active.select('learning_outcomes.id,short_description').each do |item|
-                content_list << course_item_hash(type, item)
+              if selectable_outcomes
+                root = source.root_outcome_group(false)
+                if root
+                  add_learning_outcome_group_content(root, content_list)
+                end
+              else
+                source.linked_learning_outcomes.active.select('learning_outcomes.id,short_description').each do |item|
+                  content_list << course_item_hash(type, item)
+                end
               end
             when 'tool_profiles'
               source.tool_proxies.active.select("id, name").each do |item|
@@ -264,6 +272,9 @@ module Canvas::Migration::Helpers
                 scope.each do |item|
                   content_list << course_item_hash(type, item)
                 end
+              elsif selectable_outcomes && (match_data = type.match(/learning_outcome_groups_(.*)/))
+                group = source.learning_outcome_groups.find(match_data[1])
+                add_learning_outcome_group_content(group, content_list)
               end
           end
         else
@@ -292,7 +303,7 @@ module Canvas::Migration::Helpers
 
             next if count == 0
             hash = {type: type, property: "#{property_prefix}[all_#{type}]", title: title.call, count: count}
-            add_url!(hash, type)
+            add_url!(hash, type, selectable_outcomes)
             content_list << hash
           end
         end
@@ -301,10 +312,21 @@ module Canvas::Migration::Helpers
       content_list
     end
 
-    def add_url!(hash, type)
-      return if type == 'learning_outcomes' # TODO: remove this when learning outcomes selection ui is finished
+    def add_url!(hash, type, selectable_outcomes = false)
+      return if !selectable_outcomes && type == 'learning_outcomes' # TODO: remove this when learning outcomes selection ui is finished
       if @base_url
         hash[:sub_items_url] = @base_url + "?type=#{type}"
+      end
+    end
+
+    def add_learning_outcome_group_content(group, content_list)
+      group.child_outcome_groups.active.select('learning_outcome_groups.id,title').each do |item|
+        hash = course_item_hash('learning_outcomes', item)
+        add_url!(hash, "learning_outcome_groups_#{item.id}")
+        content_list << hash
+      end
+      group.child_outcome_links.active.preload(:content).each do |item|
+        content_list << course_item_hash('learning_outcomes', item.content)
       end
     end
 

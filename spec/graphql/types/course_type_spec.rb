@@ -507,8 +507,9 @@ describe Types::CourseType do
     end
   end
 
-  describe 'notificationPrefereneces' do
+  describe 'notificationPreferences' do
     it 'returns the students notification preferences' do
+      Notification.delete_all
       communication_channel = @student.communication_channels.create!(path: 'test@test.com')
       notification = notification_model(:name => 'test', :category => 'Announcement')
 

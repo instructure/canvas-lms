@@ -11,7 +11,7 @@ set -e
 if [ -f config/consul.yml ]; then # canvas is running in docker
   docker-compose run --rm --no-deps \
     -e RAILS_ENV=test  \
-    web bundle exec pact-broker publish pacts/generic_consumer-canvas_lms_api.json \
+    canvas bundle exec pact-broker publish pacts/generic_consumer-canvas_lms_api.json \
     -u $PACT_BROKER_USERNAME \
     -p $PACT_BROKER_PASSWORD \
     -b https://inst-pact-broker.inseng.net \

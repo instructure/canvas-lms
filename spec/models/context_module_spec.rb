@@ -39,6 +39,15 @@ describe ContextModule do
     end
   end
 
+  describe "#set_root_account_id" do
+    subject { context_module.root_account }
+
+    let(:course) { course_factory }
+    let(:context_module) { course.context_modules.create! }
+
+    it { is_expected.to eq course.root_account }
+  end
+
   describe "publish_items!" do
     before :once do
       course_module
@@ -408,6 +417,12 @@ describe ContextModule do
       empty = @course.context_modules.create! name: 'empty'
       empty.insert_items([@attach, @assign])
       expect(empty.content_tags.order(:position).pluck(:title)).to eq(%w(attach assign))
+    end
+
+    it "sets the indent to 0" do
+      empty = @course.context_modules.create! name: 'empty'
+      empty.insert_items([@attach, @assign])
+      expect(empty.content_tags.pluck(:indent)).to eq([0, 0])
     end
 
     it "doesn't add weird things to a module" do

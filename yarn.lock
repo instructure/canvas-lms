@@ -1811,7 +1811,7 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-flex@6", "@instructure/ui-flex@^6.17.0", "@instructure/ui-flex@^6.24.0":
+"@instructure/ui-flex@6", "@instructure/ui-flex@^6.17.0", "@instructure/ui-flex@^6.24.0", "@instructure/ui-flex@~6.24.0":
   version "6.24.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-flex/-/ui-flex-6.24.0.tgz#ae37bb9dc4f8100f75800413d8d812a87bcf841e"
   integrity sha512-HdmEQ7wwnVfC43rNZgDB3BTFJrJMCTyqvX8eEVF4pd4dTlm3YU/cMeik7T7C/QHjFVniJzKn3xdwbnbRJ53dMQ==
@@ -8717,6 +8717,13 @@ eslint-module-utils@^2.4.0:
     debug "^2.6.8"
     pkg-dir "^2.0.0"
 
+eslint-plugin-babel@^5:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-babel/-/eslint-plugin-babel-5.3.0.tgz#2e7f251ccc249326da760c1a4c948a91c32d0023"
+  integrity sha512-HPuNzSPE75O+SnxHIafbW5QB45r2w78fxqwK3HmjqIUoPfPzVrq6rD+CINU3yzoDSzEhUkX07VUphbF73Lth/w==
+  dependencies:
+    eslint-rule-composer "^0.3.0"
+
 eslint-plugin-eslint-comments@^3.0.1:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/eslint-plugin-eslint-comments/-/eslint-plugin-eslint-comments-3.1.2.tgz#4ef6c488dbe06aa1627fea107b3e5d059fc8a395"
@@ -8839,6 +8846,11 @@ eslint-plugin-testcafe@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-testcafe/-/eslint-plugin-testcafe-0.2.1.tgz#4089f646dadb69b1376a01d7e608184907e6036b"
   integrity sha1-QIn2RtrbabE3agHX5ggYSQfmA2s=
+
+eslint-rule-composer@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/eslint-rule-composer/-/eslint-rule-composer-0.3.0.tgz#79320c927b0c5c0d3d3d2b76c8b4a488f25bbaf9"
+  integrity sha512-bt+Sh8CtDmn2OajxvNO+BX7Wn4CIWMpTRm3MaiKPCQcnnlm0CS2mhui6QaoeQugs+3Kj2ESKEEGJUdVafwhiCg==
 
 eslint-scope@^4.0.0, eslint-scope@^4.0.3:
   version "4.0.3"
@@ -10598,9 +10610,9 @@ graceful-fs@~2.0.3:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-2.0.3.tgz#7cd2cdb228a4a3f36e95efa6cc142de7d1a136d0"
   integrity sha1-fNLNsiiko/Nule+mzBQt59GhNtA=
 
-"graphael@https://github.com/ryankshaw/graphael.git":
+"graphael@https://github.com/instructure/graphael.git":
   version "1.2.0"
-  resolved "https://github.com/ryankshaw/graphael.git#067542642fa240925e4e3dd13153333ae1d3ad60"
+  resolved "https://github.com/instructure/graphael.git#067542642fa240925e4e3dd13153333ae1d3ad60"
   dependencies:
     raphael "^2.1.4"
 
@@ -11530,9 +11542,9 @@ i18nliner-handlebars@^0.2.2:
   dependencies:
     jsdom "~8.5.0"
 
-i18nliner@ryankshaw/i18nliner-js#babel7, i18nliner@~0.2.0:
+i18nliner@instructure/i18nliner-js#babel7, i18nliner@~0.2.0:
   version "0.2.6"
-  resolved "https://codeload.github.com/ryankshaw/i18nliner-js/tar.gz/089da4716c98dc536a8c4f79f187b37697591a03"
+  resolved "https://codeload.github.com/instructure/i18nliner-js/tar.gz/089da4716c98dc536a8c4f79f187b37697591a03"
   dependencies:
     "@babel/parser" "^7"
     "@babel/traverse" "^7"
@@ -13134,9 +13146,9 @@ jquery.elastic@1.0.0:
   dependencies:
     jquery ">=1.5"
 
-jquery@2.x, jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS":
+jquery@2.x, jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS":
   version "1.7.2"
-  resolved "https://github.com/ryankshaw/jquery.git#3a48a84c713291b790a2556d9ba036ec4d53c52f"
+  resolved "https://github.com/instructure/jquery.git#3a48a84c713291b790a2556d9ba036ec4d53c52f"
 
 js-base64@^2.1.8, js-base64@^2.1.9:
   version "2.5.1"
@@ -14181,7 +14193,7 @@ lodash@2.4.1:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-2.4.1.tgz#5b7723034dda4d262e5a46fb2c58d7cc22f71420"
   integrity sha1-W3cjA03aTSYuWkb7LFjXzCL3FCA=
 
-"lodash@4.6.1 || ^4.16.1", "lodash@>=3.5 <5", lodash@>=4.17.4, lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.4, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@x, lodash@~4.17.10:
+"lodash@4.6.1 || ^4.16.1", "lodash@>=3.5 <5", lodash@>=4.17.4, lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.10, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.4, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@x, lodash@~4.17.10:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
@@ -21100,6 +21112,13 @@ use-debounce@^3:
   resolved "https://registry.yarnpkg.com/use-debounce/-/use-debounce-3.1.0.tgz#05a5c8cd3c2f309699f08961d7c8bbe7f68720bb"
   integrity sha512-DEf3L/ZKkOSTARk/DHlC6KAAJKwMqpck8Zx06SM2Wr+LfU1TzhO8hZRzB/qbpSQqREYWQes24n1q9doeTMqF4g==
 
+use-media-set@^1.1:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/use-media-set/-/use-media-set-1.1.0.tgz#df55d7a6a18f34bf7d541e8c6e1f6e63d83ef192"
+  integrity sha512-AqaNq7vDwgT73LTPUyY3AumDwBeD/TqCVgQPvYMWPmyH6G4C1xuWb31JH2yaAOfdxO+ZujiTzBr9UU5OAHPLVA==
+  dependencies:
+    lodash "^4.10"
+
 use-sidecar@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/use-sidecar/-/use-sidecar-1.0.2.tgz#e72f582a75842f7de4ef8becd6235a4720ad8af6"
@@ -21917,9 +21936,9 @@ xmlhttprequest-ssl@~1.5.4:
   resolved "https://registry.yarnpkg.com/xmlhttprequest-ssl/-/xmlhttprequest-ssl-1.5.5.tgz#c2876b06168aadc40e57d97e81191ac8f4398b3e"
   integrity sha1-wodrBhaKrcQOV9l+gRkayPQ5iz4=
 
-xsslint@ryankshaw/xsslint#babel7:
+xsslint@instructure/xsslint#babel7:
   version "0.1.5"
-  resolved "https://codeload.github.com/ryankshaw/xsslint/tar.gz/2ef5f95c4eec8494b213d6c25f92615edd26ca50"
+  resolved "https://codeload.github.com/instructure/xsslint/tar.gz/2ef5f95c4eec8494b213d6c25f92615edd26ca50"
   dependencies:
     "@babel/parser" "^7"
     "@babel/traverse" "^7"

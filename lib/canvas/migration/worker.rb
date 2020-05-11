@@ -77,7 +77,7 @@ module Canvas::Migration::Worker
 
     att
   end
-  
+
   def self.clear_exported_data(folder)
     begin
       config = ConfigFile.load('external_migration')

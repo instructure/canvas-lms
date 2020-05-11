@@ -30,13 +30,13 @@ def runSeleniumSuite(total, index) {
   _runRspecTestSuite(
       total,
       index,
-      'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
+      'docker-compose.new-jenkins.multiple-processes.yml:docker-compose.new-jenkins-selenium.yml',
       'selenium',
       seleniumConfig().max_fail,
       seleniumConfig().reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
-      '6',
+      '3',
       seleniumConfig().force_failure
   )
 }
@@ -55,13 +55,13 @@ def runRSpecSuite(total, index) {
   _runRspecTestSuite(
       total,
       index,
-      'docker-compose.new-jenkins.yml',
+      'docker-compose.new-jenkins.multiple-processes.yml',
       'rspec',
       rspecConfig().max_fail,
       rspecConfig().reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/selenium',
-      '8',
+      '4',
       rspecConfig().force_failure
   )
 }
@@ -86,7 +86,8 @@ def _runRspecTestSuite(
       "EXCLUDE_TESTS=$exclude_regex",
       "CI_NODE_TOTAL=$total",
       "DOCKER_PROCESSES=$docker_processes",
-      "FORCE_FAILURE=$force_failure"
+      "FORCE_FAILURE=$force_failure",
+      "POSTGRES_PASSWORD=sekret",
   ]) {
     try {
       sh 'rm -rf ./tmp'
@@ -97,19 +98,18 @@ def _runRspecTestSuite(
         sh 'build/new-jenkins/docker-compose-pull.sh'
         sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
         sh 'build/new-jenkins/docker-compose-build-up.sh'
-        sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+        sh 'build/new-jenkins/docker-compose-setup-databases.sh'
         sh 'build/new-jenkins/rspec_parallel_dockers.sh'
       }
     }
     finally {
       // copy spec failures to local
-      sh 'mkdir -p tmp/spec_failures'
-      sh 'build/new-jenkins/rspec_copy_failures.sh'
+      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures canvas_ --allow-error --clean-dir'
 
       def reports = load 'build/new-jenkins/groovy/reports.groovy'
       reports.stashSpecFailures(prefix, index)
       if (env.COVERAGE == '1') {
-        sh 'docker cp $(docker-compose ps -q web):/usr/src/app/coverage/ ./tmp/spec_coverage/'
+        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage canvas_ --clean-dir'
         reports.stashSpecCoverage(prefix, index)
       }
       sh 'rm -rf ./tmp'
@@ -118,17 +118,20 @@ def _runRspecTestSuite(
   }
 }
 
-def uploadSeleniumCoverage() {
-  _uploadCoverage('selenium', seleniumConfig().node_total, 'canvas-lms-selenium')
+def uploadSeleniumCoverageIfSuccessful() {
+  _uploadCoverageIfSuccessful('selenium', seleniumConfig().node_total, 'canvas-lms-selenium')
 }
 
-def uploadRSpecCoverage() {
-  _uploadCoverage('rspec', rspecConfig().node_total, 'canvas-lms-rspec')
+def uploadRSpecCoverageIfSuccessful() {
+  _uploadCoverageIfSuccessful('rspec', rspecConfig().node_total, 'canvas-lms-rspec')
 }
 
-def _uploadCoverage(prefix, total, coverage_name) {
-  def reports = load 'build/new-jenkins/groovy/reports.groovy'
-  reports.publishSpecCoverageToS3(prefix, total, coverage_name)
+def _uploadCoverageIfSuccessful(prefix, total, coverage_name) {
+  def successes = load 'build/new-jenkins/groovy/successes.groovy'
+  if (successes.hasSuccess(prefix, total)) {
+    def reports = load 'build/new-jenkins/groovy/reports.groovy'
+    reports.publishSpecCoverageToS3(prefix, total, coverage_name)
+  }
 }
 
 def uploadSeleniumFailures() {

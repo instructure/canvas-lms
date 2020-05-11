@@ -19,14 +19,55 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CalendarEventsController do
-  before :once do
-    course_with_teacher(active_all: true)
-    student_in_course(active_all: true)
-    course_event
+  def stub_conference_plugins
+    allow(WebConference).to receive(:plugins).and_return(
+      [web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"})]
+    )
   end
 
-  def course_event
-    @event = @course.calendar_events.create(:title => "some assignment")
+  let_once(:teacher_enrollment) { course_with_teacher(active_all: true) }
+  let_once(:course) { teacher_enrollment.course }
+  let_once(:student_enrollment) { student_in_course(course: course) }
+  let_once(:course_event) { course.calendar_events.create(:title => "some assignment") }
+  let_once(:other_teacher_enrollment) { course_with_teacher(active_all: true) }
+
+  before do
+    @course = course
+    @teacher = teacher_enrollment.user
+    @student = student_enrollment.user
+    @event = course_event
+    stub_conference_plugins
+  end
+  let(:conference_params) do
+    { conference_type: 'BigBlueButton', title: 'a conference', user: teacher_enrollment.user }
+  end
+  let(:other_teacher_conference) { other_teacher_enrollment.course.web_conferences.create!(**conference_params, user: other_teacher_enrollment.user) }
+
+  shared_examples "accepts web_conference" do
+    before(:once) do
+      Account.site_admin.enable_feature! 'calendar_conferences'
+    end
+
+    it "accepts a new conference" do
+      user_session(@teacher)
+      make_request.call(conference_params)
+      expect(response.status).to be < 400
+      expect(get_event.call.web_conference).not_to be nil
+    end
+
+    it "accepts an existing conference" do
+      user_session(@teacher)
+      conference = @course.web_conferences.create!(conference_params)
+      make_request.call(id: conference.id, **conference_params)
+      expect(response.status).to be < 400
+      expect(get_event.call.web_conference_id).to eq conference.id
+    end
+
+    it "does not accept an existing conference the user doesn't have permission for" do
+      user_session(@teacher)
+      make_request.call(id: other_teacher_conference.id)
+      assert_unauthorized
+    end
   end
 
   describe "GET 'show'" do
@@ -92,6 +133,27 @@ describe CalendarEventsController do
       get 'new', params: {user_id: @teacher.id}
       expect(@controller.js_env[:use_rce_enhancements]).to be(true)
     end
+
+    context "with web conferences" do
+      before(:once) do
+        Account.site_admin.enable_feature! 'calendar_conferences'
+      end
+
+      it "includes conference environment" do
+        user_session(@teacher)
+        get 'new', params: {course_id: @course.id}
+        expect(@controller.js_env.dig(:conferences, :conference_types).length).to eq 1
+      end
+
+      include_examples 'accepts web_conference' do
+        let(:make_request) do
+          ->(params) { get 'new', params: {course_id: @course.id, web_conference: params} }
+        end
+        let(:get_event) do
+          ->{ @controller.instance_variable_get(:@event) }
+        end
+      end
+    end
   end
 
   describe "POST 'create'" do
@@ -113,6 +175,15 @@ describe CalendarEventsController do
       expect(assigns[:event]).not_to be_nil
       expect(assigns[:event].title).to eql("some event")
     end
+
+    include_examples 'accepts web_conference' do
+      let(:make_request) do
+        ->(params) { post 'create', params: {course_id: @course.id, calendar_event: {title: 'some event', web_conference: params}} }
+      end
+      let(:get_event) do
+        ->{ assigns[:event] }
+      end
+    end
   end
 
   describe "GET 'edit'" do
@@ -126,6 +197,41 @@ describe CalendarEventsController do
       get 'edit', params: {:course_id => @course.id, :id => @event.id}
       assert_unauthorized
     end
+
+    include_examples 'accepts web_conference' do
+      let(:make_request) do
+        ->(params) { get 'edit', params: {course_id: @course.id, id: @event.id, web_conference: params} }
+      end
+      let(:get_event) do
+        ->{ @event.reload }
+      end
+    end
+
+    # context "with web conferences" do
+    #   before(:once) do
+    #     Account.site_admin.enable_feature! 'calendar_conferences'
+    #   end
+
+    #   it "can update with a new conference" do
+    #     user_session(@teacher)
+    #     get 'edit', params: {course_id: @course.id, id: @event.id, web_conference: conference_params}
+    #     expect(response).to be_successful
+    #     expect(@event.reload.web_conference_id).not_to be nil
+    #   end
+
+    #   it "can update with an existing conference" do
+    #     user_session(@teacher)
+    #     conference = @course.web_conferences.create!(conference_params)
+    #     get 'edit', params: {course_id: @course.id, id: @event.id, web_conference: {id: conference.id, **conference_params}}
+    #     expect(@event.reload.web_conference_id).to eq conference.id
+    #   end
+
+    #   it "cannot create with an existing conference the user doesn't have permission for" do
+    #     user_session(@teacher)
+    #     get 'edit', params: {course_id: @course.id, id: @event.id, web_conference: {id: other_teacher_conference.id}}
+    #     assert_unauthorized
+    #   end
+    # end
   end
 
   describe "PUT 'update'" do
@@ -147,6 +253,15 @@ describe CalendarEventsController do
       expect(assigns[:event]).not_to be_nil
       expect(assigns[:event]).to eql(@event)
       expect(assigns[:event].title).to eql("new title")
+    end
+
+    include_examples 'accepts web_conference' do
+      let(:make_request) do
+        ->(params) { put 'update', params: {course_id: @course.id, id: @event.id, calendar_event: {web_conference: params}} }
+      end
+      let(:get_event) do
+        ->{ assigns[:event] }
+      end
     end
   end
 

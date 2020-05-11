@@ -161,7 +161,7 @@ class UserProfile < ActiveRecord::Base
   end
 
   def insert_qr_mobile_login_tab(tabs, user, opts)
-    if user && opts[:root_account]&.feature_enabled?(:mobile_qr_login)
+    if user && instructure_misc_plugin_available? && opts[:root_account]&.feature_enabled?(:mobile_qr_login)
       tabs <<
         {
           id: TAB_QR_MOBILE_LOGIN,
@@ -173,3 +173,8 @@ class UserProfile < ActiveRecord::Base
     end
   end
 end
+
+def instructure_misc_plugin_available?
+  Object.const_defined?("InstructureMiscPlugin")
+end
+private :instructure_misc_plugin_available?

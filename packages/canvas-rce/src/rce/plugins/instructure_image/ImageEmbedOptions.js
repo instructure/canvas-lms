@@ -107,6 +107,12 @@ export function fromVideoEmbed($element) {
     naturalWidth,
     source: $videoElem && $videoElem.querySelector('source')
   }
+  videoOptions.tracks =
+    $videoElem &&
+    Array.prototype.map.call($videoElem.querySelectorAll('track'), t => ({
+      locale: t.getAttribute('srclang'),
+      language: t.getAttribute('label')
+    }))
 
   videoOptions.videoSize = imageSizeFromKnownOptions(videoOptions)
 

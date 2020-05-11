@@ -17,21 +17,21 @@
  */
 
 import I18n from 'i18n!assignments_bulk_edit'
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState, useMemo} from 'react'
 import {func, string} from 'prop-types'
+import moment from 'moment-timezone'
 import produce from 'immer'
-import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
-import {List} from '@instructure/ui-elements'
-import {ProgressBar} from '@instructure/ui-progress'
-import {Text} from '@instructure/ui-text'
 import CanvasInlineAlert from 'jsx/shared/components/CanvasInlineAlert'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
+import BulkEditHeader from './BulkEditHeader'
 import BulkEditTable from './BulkEditTable'
+import MoveDatesModal from './MoveDatesModal'
 import useSaveAssignments from './hooks/useSaveAssignments'
 import useMonitorJobCompletion from './hooks/useMonitorJobCompletion'
-import {originalDateField} from './utils'
+import DateValidator from 'coffeescripts/util/DateValidator'
+import GradingPeriodsAPI from 'coffeescripts/api/gradingPeriodsApi'
+import {originalDateField, canEditAll} from './utils'
 
 BulkEdit.propTypes = {
   courseId: string.isRequired,
@@ -44,9 +44,23 @@ BulkEdit.defaultProps = {
 }
 
 export default function BulkEdit({courseId, onCancel, onSave}) {
+  const dateValidator = useMemo(
+    () =>
+      new DateValidator({
+        date_range: ENV.VALID_DATE_RANGE || {
+          start_at: {date: null, date_context: 'term'},
+          end_at: {date: null, date_context: 'term'}
+        },
+        hasGradingPeriods: !!ENV.HAS_GRADING_PERIODS,
+        gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods || []),
+        userIsAdmin: (ENV.current_user_roles || []).includes('admin')
+      }),
+    []
+  )
   const [assignments, setAssignments] = useState([])
   const [loadingError, setLoadingError] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [moveDatesModalOpen, setMoveDatesModalOpen] = useState(false)
   const {
     saveAssignments,
     startingSave,
@@ -90,93 +104,197 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     if (jobSuccess) clearOriginalDates()
   }, [jobSuccess])
 
-  function handleSave() {
-    onSave()
-    saveAssignments(assignments)
-  }
-
-  const updateAssignment = useCallback(
-    ({dateKey, newDate, assignmentId, overrideId}) => {
-      const isBaseOverride = !overrideId
-
-      // Clear anything from the previous save operation so those elements don't show anymore and so
-      // the above effect doesn't try to clear the original dates.
-      setJobSuccess(false)
-      setProgressUrl(null)
+  useEffect(() => {
+    function recordJobErrors(errors) {
       setAssignments(currentAssignments =>
         produce(currentAssignments, draftAssignments => {
-          const assignment = draftAssignments.find(a => a.id === assignmentId)
-          const override = assignment.all_dates.find(o =>
-            isBaseOverride ? o.base : o.id === overrideId
-          )
-          const originalField = originalDateField(dateKey)
-          if (!override.hasOwnProperty(originalField)) override[originalField] = override[dateKey]
-          override[dateKey] = newDate ? newDate.toISOString() : null
+          draftAssignments.forEach(draftAssignment => {
+            draftAssignment.all_dates.forEach(draftOverride => {
+              let error
+              if (draftOverride.base) {
+                error = errors.find(
+                  e => e.assignment_id == draftAssignment.id && !e.assignment_override_id // eslint-disable-line eqeqeq
+                )
+              } else {
+                error = errors.find(e => e.assignment_override_id == draftOverride.id) // eslint-disable-line eqeqeq
+              }
+              if (error && error.errors) {
+                draftOverride.errors = {}
+                for (const dateKey in error.errors) {
+                  draftOverride.errors[dateKey] = error.errors[dateKey][0].message
+                }
+              } else {
+                delete draftOverride.errors
+              }
+            })
+          })
+        })
+      )
+    }
+    if (jobErrors && !jobErrors.hasOwnProperty('message')) recordJobErrors(jobErrors)
+  }, [jobErrors])
+
+  const setDateOnOverride = useCallback(
+    (override, dateFieldName, newDate) => {
+      const currentDate = override[dateFieldName]
+      const newDateISO = newDate?.toISOString() || null
+      if (currentDate === newDateISO || moment(currentDate).isSame(moment(newDateISO))) return
+
+      const originalField = originalDateField(dateFieldName)
+      if (!override.hasOwnProperty(originalField)) {
+        override[originalField] = override[dateFieldName]
+      }
+      override[dateFieldName] = newDateISO
+      override.persisted = false
+      override.errors = dateValidator.validateDatetimes(override)
+    },
+    [dateValidator]
+  )
+
+  const shiftDateOnOverride = useCallback(
+    (override, dateFieldName, nDays) => {
+      const currentDate = override[dateFieldName]
+      if (currentDate) {
+        const newDate = moment(currentDate)
+          .add(nDays, 'days')
+          .toDate()
+        setDateOnOverride(override, dateFieldName, newDate)
+      }
+    },
+    [setDateOnOverride]
+  )
+
+  const clearPreviousSave = useCallback(() => {
+    // Clear anything from the previous save operation so those elements don't show anymore and so
+    // the above effect doesn't try to clear the original dates.
+    setJobSuccess(false)
+    setProgressUrl(null)
+  }, [setJobSuccess, setProgressUrl])
+
+  const findOverride = useCallback((someAssignments, assignmentId, overrideId) => {
+    const isBaseOverride = !overrideId
+    const assignment = someAssignments.find(a => a.id === assignmentId)
+    const override = assignment.all_dates.find(o => (isBaseOverride ? o.base : o.id === overrideId))
+    return override
+  }, [])
+
+  const updateAssignmentDate = useCallback(
+    ({dateKey, newDate, assignmentId, overrideId}) => {
+      clearPreviousSave()
+      setAssignments(currentAssignments =>
+        produce(currentAssignments, draftAssignments => {
+          const override = findOverride(draftAssignments, assignmentId, overrideId)
+          setDateOnOverride(override, dateKey, newDate)
         })
       )
     },
-    [setJobSuccess, setProgressUrl]
+    [clearPreviousSave, findOverride, setDateOnOverride]
   )
 
-  function anyAssignmentsEdited() {
-    const overrides = assignments.flatMap(a => a.all_dates)
-    return overrides.some(override =>
-      [
-        originalDateField('due_at'),
-        originalDateField('unlock_at'),
-        originalDateField('lock_at')
-      ].some(originalField => override.hasOwnProperty(originalField))
-    )
-  }
+  const clearOverrideEdits = useCallback(
+    ({assignmentId, overrideId}) => {
+      setAssignments(currentAssignments =>
+        produce(currentAssignments, draftAssignments => {
+          const override = findOverride(draftAssignments, assignmentId, overrideId)
+          ;['due_at', 'unlock_at', 'lock_at'].forEach(dateField => {
+            const originalField = originalDateField(dateField)
+            if (override.hasOwnProperty(originalField)) {
+              override[dateField] = override[originalField]
+              delete override[originalField]
+            }
+          })
+          delete override.errors
+          delete override.persisted
+        })
+      )
+    },
+    [findOverride]
+  )
 
-  function renderProgressValue({valueNow}) {
-    return <Text>{I18n.t('%{percent}%', {percent: valueNow})}</Text>
-  }
+  const setAssignmentSelected = useCallback((assignmentId, selected) => {
+    setAssignments(currentAssignments =>
+      produce(currentAssignments, draftAssignments => {
+        const assignment = draftAssignments.find(a => a.id === assignmentId)
+        assignment.selected = selected
+      })
+    )
+  }, [])
+
+  const selectAllAssignments = useCallback(selected => {
+    setAssignments(currentAssignments =>
+      produce(currentAssignments, draftAssignments => {
+        draftAssignments.forEach(a => {
+          if (canEditAll(a)) a.selected = selected
+        })
+      })
+    )
+  }, [])
+
+  const handleSave = useCallback(() => {
+    onSave()
+    saveAssignments(assignments)
+  }, [assignments, onSave, saveAssignments])
+
+  const handleOpenBatchEdit = useCallback((value = true) => {
+    setMoveDatesModalOpen(!!value)
+  }, [])
+
+  const handleBatchEditShift = useCallback(
+    nDays => {
+      setAssignments(currentAssignments =>
+        produce(currentAssignments, draftAssignments => {
+          draftAssignments.forEach(draftAssignment => {
+            if (draftAssignment.selected) {
+              draftAssignment.all_dates.forEach(draftOverride => {
+                shiftDateOnOverride(draftOverride, 'due_at', nDays)
+                shiftDateOnOverride(draftOverride, 'unlock_at', nDays)
+                shiftDateOnOverride(draftOverride, 'lock_at', nDays)
+              })
+            }
+          })
+        })
+      )
+      selectAllAssignments(false)
+      setMoveDatesModalOpen(false)
+    },
+    [selectAllAssignments, shiftDateOnOverride]
+  )
+  const handleBatchEditRemove = useCallback(
+    datesToRemove => {
+      setAssignments(currentAssignments =>
+        produce(currentAssignments, draftAssignments => {
+          draftAssignments.forEach(draftAssignment => {
+            if (draftAssignment.selected) {
+              draftAssignment.all_dates.forEach(draftOverride => {
+                if (datesToRemove.includes('due_at'))
+                  setDateOnOverride(draftOverride, 'due_at', null)
+                if (datesToRemove.includes('unlock_at'))
+                  setDateOnOverride(draftOverride, 'unlock_at', null)
+                if (datesToRemove.includes('lock_at'))
+                  setDateOnOverride(draftOverride, 'lock_at', null)
+              })
+            }
+          })
+        })
+      )
+      selectAllAssignments(false)
+      setMoveDatesModalOpen(false)
+    },
+    [selectAllAssignments, setDateOnOverride]
+  )
 
   function renderHeader() {
-    return (
-      <Flex as="div">
-        <Flex.Item shouldGrow>
-          <h2>{I18n.t('Edit Assignment Dates')}</h2>
-        </Flex.Item>
-        <Flex.Item>
-          {/* Inner Flex required to line up progress bar with buttons */}
-          <Flex as="div">
-            {jobRunning && (
-              <Flex.Item width="250px">
-                <ProgressBar
-                  screenReaderLabel={I18n.t('Saving assignment dates progress')}
-                  valueNow={jobCompletion}
-                  renderValue={renderProgressValue}
-                />
-                <CanvasInlineAlert liveAlert screenReaderOnly variant="info">
-                  {I18n.t('Saving assignment dates progress: %{percent}%', {
-                    percent: jobCompletion
-                  })}
-                </CanvasInlineAlert>
-              </Flex.Item>
-            )}
-            <Flex.Item>
-              <Button margin="0 0 0 small" onClick={onCancel}>
-                {jobSuccess ? I18n.t('Close') : I18n.t('Cancel')}
-              </Button>
-            </Flex.Item>
-            <Flex.Item>
-              <Button
-                margin="0 0 0 small"
-                variant="primary"
-                interaction={
-                  startingSave || jobRunning || !anyAssignmentsEdited() ? 'disabled' : 'enabled'
-                }
-                onClick={handleSave}
-              >
-                {startingSave || jobRunning ? I18n.t('Saving...') : I18n.t('Save')}
-              </Button>
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
-      </Flex>
-    )
+    const headerProps = {
+      assignments,
+      startingSave,
+      jobRunning,
+      jobCompletion,
+      jobSuccess,
+      onSave: handleSave,
+      onCancel,
+      onOpenBatchEdit: handleOpenBatchEdit
+    }
+    return <BulkEditHeader {...headerProps} />
   }
 
   function renderSaveSuccess() {
@@ -207,15 +325,23 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     } else if (jobErrors) {
       return (
         <CanvasInlineAlert variant="error" liveAlert>
-          {I18n.t('There were errors saving the assignment dates:')}
-          <List>
-            {jobErrors.map(error => {
-              return <List.Item key={error}>{error}</List.Item>
-            })}
-          </List>
+          {jobErrors.hasOwnProperty('message')
+            ? I18n.t('Error saving assignment dates: ') + jobErrors.message
+            : I18n.t('Invalid dates were found. Please correct them and try again.')}
         </CanvasInlineAlert>
       )
     }
+  }
+
+  function renderMoveDatesModal() {
+    return (
+      <MoveDatesModal
+        open={moveDatesModalOpen}
+        onShiftDays={handleBatchEditShift}
+        onRemoveDates={handleBatchEditRemove}
+        onCancel={() => handleOpenBatchEdit(false)}
+      />
+    )
   }
 
   function renderBody() {
@@ -237,13 +363,20 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
         <CanvasInlineAlert liveAlert screenReaderOnly>
           {I18n.t('Assignments loaded')}
         </CanvasInlineAlert>
-        <BulkEditTable assignments={assignments} updateAssignmentDate={updateAssignment} />
+        <BulkEditTable
+          assignments={assignments}
+          updateAssignmentDate={updateAssignmentDate}
+          setAssignmentSelected={setAssignmentSelected}
+          selectAllAssignments={selectAllAssignments}
+          clearOverrideEdits={clearOverrideEdits}
+        />
       </>
     )
   }
 
   return (
     <>
+      {renderMoveDatesModal()}
       {renderSaveSuccess()}
       {renderSaveError()}
       {renderHeader()}

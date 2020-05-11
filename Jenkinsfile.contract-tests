@@ -20,11 +20,15 @@
 
 pipeline {
   agent { label 'canvas-docker' }
-  options { ansiColor('xterm') }
+  options {
+    ansiColor('xterm')
+    timestamps()
+  }
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
     PACT_BROKER = credentials('PACT_BROKER')
+    POSTGRES_PASSWORD = 'sekret'
   }
 
   stages {
@@ -41,7 +45,7 @@ pipeline {
         timeout(time: 10) {
           sh 'build/new-jenkins/docker-compose-pull.sh'
           sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+          sh 'build/new-jenkins/docker-compose-setup-databases.sh'
         }
       }
     }
@@ -50,7 +54,7 @@ pipeline {
       steps {
         timeout(time: 10) {
           sh """
-            docker-compose exec -T web env \
+            docker-compose --project-name canvas-lms0 exec -T canvas env \
               PACT_BROKER_HOST=inst-pact-broker.inseng.net \
               PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
               PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
@@ -65,7 +69,7 @@ pipeline {
     stage("Live Events Contract Tests") {
       steps {
         sh """
-          docker-compose exec -T web env \
+          docker-compose --project-name canvas-lms0 exec -T canvas env \
             PACT_BROKER_HOST=inst-pact-broker.inseng.net \
             PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
             PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
@@ -78,7 +82,7 @@ pipeline {
   post {
     failure {
       sh 'mkdir -vp spec_results'
-      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/. ./spec_results/'
+      sh 'docker cp $(docker ps -q --filter "name=canvas_"):/usr/src/app/log/spec_failures/. ./spec_results/'
       script {
         dir('spec_results') {
           htmlFiles = findFiles glob: '**/index.html'

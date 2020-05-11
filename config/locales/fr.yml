@@ -175,10 +175,14 @@ fr:
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Une valeur de calcul n’est pas utilisée avec cette méthode de calcul"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "Un jeton de sécurité Canvas vient d’être généré pour votre compte. Si vous avez demandé un jeton utilisateur, vous n’avez rien à faire. Si vous n’avez pas demandé de jeton ou que vous souhaitez gérer les jetons d'accès Canvas, vous pouvez le faire ici :"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Un fichier nommé %{itemName} existe déjà dans ce dossier."
+  a_file_named_name_already_exists_do_you_want_to_re_6536980: "Il existe déjà un fichier nommé « %{name} ». Voulez-vous remplacer le fichier existant ?"
+  a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Il existe déjà un fichier nommé « %{name} » dans ce dossier. Voulez-vous remplacer le fichier existant ?"
   a_front_page_is_required_fd57b80: "Une page d'accueil est requise"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Un logo de taille réelle qui apparait dans la barre latérale droite du tableau de bord de Canvas. La taille idéale est de 360 x 140 pixels. Le formats acceptés sont : SVG, PNG, JPEG et GIF"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Un dépôt de valeur/clé pratique d'un serveur d'information intéressante sur l'environnement de l'utilisateur effectuant une observation"
   a_json_url_is_required_please_supply_one_ed03101c: "Une url json est requise, veuillez fournir une telle url."
+  a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "Il existe déjà un fichier verrouillé nommé « %{name} » dans ce dossier. Veuillez entrer un nouveau nom."
+  a_locked_file_named_name_already_exists_please_ent_3b2e65a: "Il existe déjà un fichier verrouillé nommé « %{name} ». Veuillez entrer un nouveau nom."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Un élément verrouillé portant le nom « %{name} » existe déjà à cet endroit. Veuillez entrer un nouveau nom."
   a_message_is_required_129e1814: "Message obligatoire"
   a_name_for_this_set_is_required_222bad23: "Un nom pour cet ensemble est requis"
@@ -1868,6 +1872,10 @@ fr:
   admins_3e1dce15: Administrateurs
   admins_add_remove_26811ce5: "Admins - ajouter / supprimer"
   advanced_36b35b8: Avancé
+  affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Affecte l’affichage des boutons « Conclure le cours » et « Supprimer définitivement ce cours ». Le bouton « Supprimer définitivement ce cours » n'apparaît que pour les cours créés manuellement."
+  affects_viewing_the_conclude_course_and_permanentl_d943656e: "Affecte l’affichage des boutons « Conclure le cours » et « Supprimer définitivement ce cours ». Le bouton « Supprimer définitivement ce cours » n'apparaît que pour les cours créés manuellement.\n\
+      \x20       Pour les utilisateurs de niveau cours, la suppression d'un cours fait partie de l'autorisation « État du cours - Gérer ». Cependant, pour un utilisateur de niveau compte, la suppression d'un cours impose de disposer de cette autorisation ainsi que de l’autorisation « Cours – ajouter / modifier / supprimer ». "
+  affects_viewing_the_delete_this_course_and_conclud_1ac257e: "Affecte l'affichage des boutons « Supprimer ce cours » et « Conclure ce cours »."
   affects_viewing_the_publish_course_and_conclude_co_6589f97e: "Affecte l'affichage des boutons Publier le cours et Terminer le cours."
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Affecte l'affichage des boutons Publier le cours, Terminer le cours et Supprimer définitivement ce cours.
@@ -2202,6 +2210,7 @@ fr:
   allows_user_to_edit_grading_schemes_98c35117: "Permet à l'utilisateur de modifier les systèmes de notations."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Permet à l'utilisateur de modifier l'ID SIS du cours."
   allows_user_to_edit_the_course_syllabus_a28ff262: "Permet à l'utilisateur de modifier le programme du cours."
+  allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Permet à l'utilisateur d'exporter le Relevé de notes vers un fichier de valeurs séparées par des virgules (CSV). Permet à l'utilisateur d'accéder au Relevé de notes pour la maîtrise de l'apprentissage (si activé)."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Permet à l'utilisateur de filtrer les cours Blueprint comme niveau de compte. Permet à l'utilisateur d'ajouter des cours associés."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       Permet à l'utilisateur de filtrer les cours Blueprint comme niveau de compte.
@@ -2279,6 +2288,7 @@ fr:
   allows_user_to_view_account_analytics_98fbc6ad: "Permet à l'utilisateur d'afficher les analyses de compte."
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Permet à l'utilisateur d'afficher tous les groupes de cours, et pas seulement ceux auxquels il est inscrit, dans la fenêtre Collaborer avec."
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Permet à l'utilisateur de voir toutes les soumissions de travaux d'élèves et d'ajouter des commentaires."
+  allows_user_to_view_analytics_link_in_the_user_set_56867782: "Autoriser l’utilisateur à voir un lien d'analyse dans le menu des paramètres utilisateur."
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Permet à l'utilisateur d'afficher et d'ajouter des utilisateurs dans une collaboration."
   allows_user_to_view_and_configure_reports_in_accou_413e4e41: |-
       Permet à l'utilisateur d'afficher et de configurer les rapports dans les Paramètres du compte.
@@ -4901,6 +4911,7 @@ fr:
   clear_2084585f: Effacer
   clear_selected_file_82388e50: "Effacer le fichier sélectionné"
   clear_user_cache_ef079f7f: "Vider le cache utilisateur"
+  click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Cliquez sur « Annuler » si vous ne souhaitez pas afficher le code."
   click_for_more_details_on_this_outcome_8c018d2f: "cliquer pour plus de détails sur cet acquis"
   click_here_for_an_account_9536cb36: "Cliquez ici pour avoir un compte"
   click_here_it_s_free_eeccb9cb: "Cliquez ici, c'est gratuit !"
@@ -4917,6 +4928,7 @@ fr:
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Cliquez sur le bouton de navigation de compte pour accéder aux paramètres des notifications."
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Cliquez sur le bouton de navigation de l’administrateur pour accéder aux paramètres de compte."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Cliquez sur le bouton de navigation de cours pour accéder à vos cours."
+  click_proceed_to_continue_b6eeffc6: "Cliquez sur « Continuer » quand vous êtes prêt."
   click_the_button_above_to_add_content_4c7024a: "Cliquez sur le bouton ci-dessus pour ajouter du contenu"
   click_to_add_a_name_6cf551b0: "Cliquez pour ajouter un nom"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Cliquez pour changer la photo de profil de %{display_name}"
@@ -5247,7 +5259,7 @@ fr:
   complete_icon_7455be93: "terminer l'icône"
   complete_one_item_90e5fb03: "Terminer un élément"
   complete_registration_by_clicking_the_finish_the_r_6c1c958b: "Terminez l’inscription en cliquant sur le lien « Terminer la procédure d’inscription » (Finish the registration process) qui vous a été envoyé par e-mail."
-  complete_registration_by_clicking_the_finish_the_r_fcd13ac8: "Terminez votre inscription en cliquant sur le lien « Terminer le processus d’inscription » qui vous a été envoyé par e-mail."
+  complete_registration_by_clicking_the_finish_the_r_fcd13ac8: "Terminez votre inscription en cliquant sur le lien « Terminer le processus d’inscription » qui vous a été envoyé par e-mail."
   complete_title_7482ddcf: "Terminer %{title}"
   completed_19711ce7: Terminé(e)
   completed_9b809e44: terminé
@@ -5373,6 +5385,7 @@ fr:
   confirm_dialog_component: 
     ok: OK
   confirm_edit_outcome_a9746c99: "Confirmer la modification du résultat"
+  confirm_qr_code_display_49664fa3: "Affichage Confirmation du code QR"
   confirm_removal_a9bb889: "Confirmer le retrait"
   confirm_reservation_removal_e6350e7c: "Confirmer le retrait de la réservation"
   confirm_unfavorite_course_fa01966d: "Confirmer le retrait du cours des favoris"
@@ -6690,7 +6703,7 @@ fr:
   course_results_updated_df9d1c95: "Mise à jour des résultats du cours."
   course_role_role_type_119c2f64: "Rôle de cours : %{role_type}"
   course_roles_1314f962: "Rôles du cours"
-  course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Les rôles de cours ne peuvent gérer les projets de cours que s'ils sont ajoutés au projet de cours en tant qu'enseignant, AE ou concepteur. Pour accéder à la barre latérale Projet de cours, Cours - ajouter / modifier / supprimer des cours doit être activé. Pour ajouter un cours associé, Cours - afficher la liste et les cours - ajouter / modifier / supprimer doit également être activé. Pour modifier les paramètres de verrouillage sur n'importe quel type d'objet « projet », Cours - ajouter / modifier / supprimer doit être activé."
+  course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Les rôles de cours ne peuvent gérer les projets de cours que s'ils sont ajoutés au projet de cours en tant qu'enseignant, AE ou concepteur. Pour accéder à la barre latérale Projet de cours, Cours - ajouter / modifier / supprimer des cours doit être activé. Pour ajouter un cours associé, Cours - afficher la liste et les cours - ajouter / modifier / supprimer doit également être activé. Pour modifier les paramètres de verrouillage sur n'importe quel type d'objet « projet », Cours - ajouter / modifier / supprimer doit être activé."
   course_roles_d2d5d666: "Rôles du cours"
   course_roster_78f70e97: "Liste des cours"
   course_search: 
@@ -7941,6 +7954,7 @@ fr:
       Détermine la visibilité et la gestion de l'onglet Résultats dans la navigation des comptes.
       Permet à l'utilisateur de créer, importer, modifier et supprimer des résultats et des groupes de résultats au niveau du compte et du cours.
   determines_visibility_and_management_of_outcomes_t_8a40bf86: "Détermine la visibilité et la gestion de l'onglet Résultats dans la navigation des comptes. Permet à l'utilisateur de créer, importer, modifier et supprimer des résultats et des groupes de résultats au niveau du compte et du cours."
+  determines_visibility_and_management_of_rubrics_li_83a26d8e: "Détermine la visibilité et la gestion du lien Barèmes dans Navigation de cours. Autorise l’utilisateur à voir le lien Barèmes dans la Navigation de Cours. Permet à l'utilisateur de créer, modifier et supprimer des barèmes de cours."
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       Détermine la visibilité et la gestion de l'onglet Rubriques dans la navigation du compte.
       Permet à l'utilisateur de gérer les barèmes.
@@ -7957,9 +7971,11 @@ fr:
       Permet à l'utilisateur d'afficher les dates d'importation précédentes du SIS, les erreurs et les éléments importés.
   determines_visibility_of_the_course_activity_optio_2446c4b3: "Détermine la visibilité de l'option Activité du cours dans l'onglet Connexion aux outils d'administration. Permet à l'utilisateur d'afficher les informations sur l'activité du cours pour le compte."
   determines_visibility_of_the_grade_change_activity_6c23036b: "Détermine la visibilité de l'option Activité de modification de note dans l'onglet Connexion aux outils d'administration."
+  determines_whether_a_publish_button_is_included_in_f7ad9b56: "Détermine si un bouton « Publier » est inclus à une carte de cours non publié (Tableau de bord de la vue des cartes)."
   determines_whether_a_publish_course_option_is_incl_9bf770e9: "Détermine si une option Publier un cours est incluse sur la Page d'accueil du cours."
   determines_whether_a_publish_course_option_is_incl_ac5eed8f: "Détermine si une option Publier le cours est incluse dans la Liste de vérification de la configuration du cours et dans la Page d'accueil du cours."
   determines_whether_the_course_setup_checklist_opti_fd5a8f70: "Détermine si l'option Liste de vérification de la configuration du cours est incluse dans la Page d'accueil du cours."
+  determines_whether_the_publish_course_and_unpublis_432a4bbc: "Détermine si les boutons « Publier le cours » et « Dépublier le cours » s'affichent sur la page d'accueil du cours."
   developer_key: 
     api_key: "Clé : *%{api_key}*"
     created: "Création :"
@@ -8056,7 +8072,7 @@ fr:
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "La désactivation de la fonction Poster vers SIS n'est pas disponible pour les cours non publiés."
   disabling_sync_to_name_failed_e7521ebb: "La désactivation de la synchro vers %{name} a échoué"
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: "La désactivation du thème pour l'école élémentaire modifiera la police de l’interface Canvas pour tous les utilisateurs de votre cours."
-  disabling_this_permission_will_override_if_enabled_59c2b5c9: "La désactivation de cette autorisation écrasera (si elle est activée) les barèmes - ajouter / éditer / supprimer la autorisation, empêchant l'utilisateur de créer ou de modifier des barèmes à partir d'un travail individuel."
+  disabling_this_permission_will_override_if_enabled_59c2b5c9: "La désactivation de cette autorisation écrasera (si elle est activée) les barèmes - ajouter / éditer / supprimer la autorisation, empêchant l'utilisateur de créer ou de modifier des barèmes à partir d'un travail individuel."
   disabling_this_permission_will_override_if_enabled_6481b015: "La désactivation de cette autorisation écrasera (si elle est activée) les barèmes - ajouter / éditer / supprimer la autorisation, empêchant l'utilisateur de créer ou de modifier des barèmes à partir d'un travail individuel. Cependant, si la fonction Résultats d'apprentissage - ajouter / modifier / supprimer est activée, l'utilisateur peut quand même ajouter des barèmes via Résultats (bouton Gérer les barèmes)."
   disabling_this_permission_will_override_if_enabled_7f2a87cc: "La désactivation de cette autorisation écrasera (si elle est activée) les barèmes - ajouter / éditer / supprimer la autorisation, empêchant l'utilisateur de créer ou de modifier des barèmes à partir d'un"
   disabling_this_permission_will_override_if_enabled_8d9c42f5: |-
@@ -8536,6 +8552,7 @@ fr:
   drag_and_drop_your_image_here_or_7fba7c14: "Faire glisser et déposer votre image ici ou "
   drag_to_rearrange_sections_637efee3: "Faire glisser pour réarranger les sections"
   drag_up_or_down_to_reorder_382126ff: "Faites glisser vers le haut ou vers le bas pour réorganiser"
+  drop_files_here_to_add_to_module_236304f5: "Déposez des fichiers ici pour les ajouter au module"
   drop_files_here_to_upload_ce0f50f9: "Déposez des fichiers ici pour les envoyer"
   drop_image_62a2a071: "Déposer une image"
   dropdown_changed_state_to_expanded_517689c2: "état du menu déroulant changé pour %{expanded}."
@@ -9743,7 +9760,7 @@ fr:
   filename_is_unpublished_click_to_modify_7e731102: "%{fileName} n’est pas publié – Cliquez pour modifier"
   filename_preview_71b2cde2: "%{filename} prévisualisation"
   filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} pour cent envoyés"
-  filename_uploaded_successfully_edd8e825: "%{fileName} envoyé avec succès !"
+  filename_uploaded_successfully_edd8e825: "%{fileName} envoyé avec succès !"
   files: 
     content_folder: 
       titles: 
@@ -11561,7 +11578,7 @@ fr:
   hide_student_names_3e59e862: "Masquer le nom des étudiants"
   hide_students_with_no_results_6a22f991: "Masquer les élèves qui n'ont pas de résultats"
   hide_sub_accounts_for_account_name_a6de98bd: "Masquer les sous-comptes pour %{account_name}"
-  hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Masquer le bouton « Importer les résultats d'apprentissage » en fonction des autorisations de l’utilisateur."
+  hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Masquer le bouton « Importer les résultats d'apprentissage » en fonction des autorisations de l’utilisateur."
   hiding_grades_82691e44: "Masquage des notes"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Le masquage des notes n’est pas autorisé car les notes n'ont pas été rendues disponibles pour ce devoir."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Masquer les notes rafraîchira votre navigateur. Cela peut prendre un moment."
@@ -11730,6 +11747,7 @@ fr:
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Si Notes - modifier et Notes - afficher toutes les notes sont désactivés, le Relevé de notes sera caché de la navigation du cours."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Si Notes - modifier et Notes - afficher toutes les notes sont désactivés, le Relevé de notes sera caché de Navigation du cours."
   if_commons_is_installed_allows_importing_favorited_eff368f: "Si Commons est installé, permet d'importer des éléments de contenu favoris depuis Canvas."
+  if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "Si « Cours - ajouter / modifier supprimer » et « Cours - annuler la suppression » sont aussi activés, un utilisateur de niveau compte pourra également restaurer les cours supprimés dans les outils pour administrateur."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Si elle est désactivée, la page Résultats passe en lecture seule et cache le bouton Gérer les barèmes. L'utilisateur peut toujours accéder aux barèmes des travaux individuels par le biais de Travaux."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "S'il est désactivé, l'utilisateur peut toujours afficher et télécharger des fichiers dans un fichier zip"
   if_disabled_user_will_still_have_access_to_course__541e130: "S'il est désactivé, l'utilisateur aura toujours accès aux Paramètres du cours. L'utilisateur ne peut pas gérer le contenu d'un cours individuel sans l'autorisation appropriée pour cet élément de contenu. Si la visibilité du cours est limitée aux utilisateurs inscrits au cours, cette autorisation permet à un utilisateur d'afficher le contenu d'un cours sans être inscrit au cours."
@@ -12156,6 +12174,7 @@ fr:
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Horodatage invalide - Horodatage non parseable"
   invalid_url_in_xml: "URL non valide dans le XML. Les signes & doivent être précédés d’un  caractère d’échappement."
   invalid_username_or_password_b60aa240: "Identifiant ou mot de passe incorrect"
+  invalid_username_or_password_trouble_logging_in_ch_7699399c: "Nom d’utilisateur ou mot de passe invalide Problème de connexion ? *Consultez la FAQ sur la connexion*."
   invalid_utf_8_13c76a6: "UTF-8 non valide"
   invalid_value_12ca12c2: "Valeur non valide"
   invalid_value_for_name_i_4a7c601a: "Valeur non valide pour %{name}: « %{i} »"
@@ -15015,6 +15034,7 @@ fr:
   module_90d9fd32: Module
   module_completed_50c50762: "Module terminé"
   module_content_import_enhancements_c00b0ea2: "Amélioration de l'importation des contenus de module"
+  module_file_upload_enhancements_eecd4d37: "Améliorations du module d’envoi de fichiers"
   module_filter_63b17d11: "Filtre de modules"
   module_first_to_last_6921f3ec: "Module – Du premier au dernier"
   module_in_progress_fa600662: "Module en cours"
@@ -15595,6 +15615,7 @@ fr:
   no_submission_for_assignmenttitle_243bd1f4: "Aucune soumission pour %{assignmentTitle}"
   no_submissions_164cea23: "Aucune soumission"
   no_submissions_have_been_uploaded_2fb02710: "Aucune soumission n’a été envoyée"
+  no_submissions_to_zip_please_try_again_after_stude_7e0f478: "Aucune soumission à compresser. Veuillez réessayer lorsque les élèves auront envoyé des soumissions."
   no_terms_eab5ee7b: "Aucun terme"
   no_tls_618add1a: "Pas de TLS"
   no_unassigned_terms_deb7b76b: "Aucune période non-assignée"
@@ -16643,6 +16664,7 @@ fr:
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Donnez-leur une indication sur la page que vous étiez en train de consulter et le lien sur lequel vous avez cliqué."
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Veuillez leur faire savoir quelle page vous visualisiez et le lien sur lequel vous avez cliqué."
   please_log_in_to_view_this_content_eec6cd0: "Veuillez vous connecter pour afficher ce contenu"
+  please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Assurez-vous que personne d'autre que vous n’est en état de capturer l’image sur votre écran, que ce soit autour de vous ou via un système de partage d'écran."
   please_provide_a_field_e5a7d0b3: "Veuillez fournir un %{field}"
   please_select_a_group_set_for_this_assignment_e1da63d3: "Sélectionnez un ensemble de groupes pour cette tâche"
   please_select_a_user_role_for_this_link_9fb4e655: "Veuillez saisir un rôle d'utilisateur pour ce lien."
@@ -16689,6 +16711,13 @@ fr:
     big_blue_button_fallback: 
       description: "Paramètres BigBlueButton précédents pour préserver les enregistrements durant la migration"
       name: "Paramètres de secours BigBlueButton pour la migration"
+    big_blue_button_fallback_settings: 
+      description: "Lorsque le plugin BigBlueButton est configuré de manière à utiliser les paramètres de secours, voici les paramètres utilisés. Le mode de secours n’est utilisé que pour consulter des enregistrements de conférence qui n’ont pas été créés avec la configuration choisie pour votre plugin BigBlueButton."
+      domain_description: "**nom d’hôte** ou **adresse IP** de votre instance BigBlueButton (par ex. bigbluebutton.monentreprise.com)"
+      labels: 
+        domain: Domaine
+        secret: Secret
+      secret_description: "Il s'agit du paramètre %{parameter_name}, qui se trouve dans le fichier de configuration %{filename}."
     big_blue_button_settings: 
       description: "Vous devrez avoir accès à une instance de [BigBlueButton](%{url})."
       domain_description: "**nom de l’hôte** ou **adresse IP** de votre installation BigBlueButton (ex., bigbluebutton.masociété.com)"
@@ -16698,6 +16727,7 @@ fr:
         recording_enabled: "Autoriser l‘enregistrement des conférences"
         replace_with_alternatives: "Désactive les conférences BigBlue Button ; affiche une liste d'alternatives à la place"
         secret: Secret
+        use_fallback: "Utilisez les paramètres de secours pour le plugin BigBlueButton pour consulter des enregistrements de conférences qui n’étaient pas hébergées par l’instance BBB actuellement configurée."
       secret_description: "Paramètre %{parameter_name} qui se trouve dans le fichier de configuration %{filename}."
     buttons: 
       saving: "Enregistrement en cours..."
@@ -17738,6 +17768,7 @@ fr:
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Q : Qu’est-ce qui est vert, qui monte et qui descend ?  R : Un petit pois dans un ascenseur."
   qatar_974_7e9684ca: "Qatar (+974)"
   qatar_d52a8d27: Qatar
+  qr_code_display_was_canceled_96234bf2: "Affichage du code QR annulé"
   qr_code_image_2b3a89b5: "Image QR Code"
   qr_for_mobile_login_1b1560ce: "QR pour connexion mobile"
   qti_display: QTI
@@ -21174,6 +21205,7 @@ fr:
   shared_brand_configs_e5d319d7: "Configs de marque partagée"
   shared_content_803ac37b: "Contenu partagé"
   shared_secret_892c88f2: "Secret partagé"
+  sharing_a_qr_code_can_give_others_immediate_access_79575158: "Le partage d'un code QR peut donner un accès immédiat à votre compte à d'autres personnes via %{canvas}les applications mobiles."
   she_her_3f459cc2: Elle/Elle
   she_her_c8b5e3be: elle
   short_name_42f454a1: "Nom abrégé"
@@ -22910,7 +22942,7 @@ fr:
       Notes - afficher toutes les notes doit également être activé.
   to_access_the_account_courses_page_courses_view_li_e1da6165: "Pour accéder à la page des cours du compte, Cours - afficher la liste doit être activé."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "Pour accéder à la page d'index des Travaux, Contenu du cours - afficher doit être activé. Pour différencier les travaux des élèves individuels, Utilisateurs - afficher la liste doit également être activé."
-  to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "Pour accéder au lien « Cours » dans la navigation de compte, Cours - afficher la liste doit également être activé."
+  to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "Pour accéder au lien « Cours » dans la navigation de compte, Cours - afficher la liste doit également être activé."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Pour accéder à la page Personnes et afficher les Groupes, Utilisateurs - afficher la liste doit également être activé."
   to_access_the_people_page_users_view_list_must_be__1e9e5d75: "Pour accéder à la page Personnes, Utilisateurs - afficher la liste doit être activé. Si le paramètre de compte Ouvrir un enregistrement est activé, les utilisateurs ayant cette autorisation peuvent ajouter des élèves à un cours en utilisant une adresse mail si l'utilisateur ne dispose pas déjà d'un compte Canvas. Pour visualiser les ID SIS, Données SIS - lire doit être activé. Pour ajouter un utilisateur à un cours via l'ID SIS, Données SIS - gérer doit également être activé. Pour modifier la section d'un élève, Utilisateurs - afficher la liste et Conversations - envoyer des messages aux différents membres du cours doivent également être activés. Pour lier un observateur à un élève, Conversations - envoyer des messages à des membres individuels du cours doit également être activé."
   to_access_the_people_page_users_view_list_must_be__2f01333b: "Pour accéder à la page Personnes, Utilisateurs - afficher la liste doit être activé. Si cette permission est activée, et si Utilisateurs - afficher l'adresse mail principale est désactivé, les utilisateurs verront les adresses mail utilisées comme identifiants de connexion. Pour afficher les identifiants de connexion, Utilisateurs - ajouter / supprimer des élèves dans les cours et Utilisateurs - ajouter / supprimer des enseignants, des concepteurs de cours ou des aides-enseignants dans les cours doivent également être activés."
@@ -22934,7 +22966,7 @@ fr:
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "Pour activer les SMS, veuillez saisir le code de confirmation de 4 caractères envoyé à %{sms_number}."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "Pour activer ce canal de communication, saisissez le code de confirmation à 4 caractères envoyé à %{sms_number}."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "Pour ajouter des annonces, Discussions - modérer doit également être activé. Pour afficher les annonces récentes sur la page d'accueil, la case Afficher les annonces récentes sur la page d'accueil du cours doit être sélectionnée dans Paramètres du cours."
-  to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "Pour ajouter des cours associés, Cours Blueprint - ajouter / éditer / associer / supprimer et Cours - ajouter / éditer / supprimer doivent également être activés."
+  to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "Pour ajouter des cours associés, Cours Blueprint - ajouter / éditer / associer / supprimer et Cours - ajouter / éditer / supprimer doivent également être activés."
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "Pour ajouter en masse des utilisateurs, des cours et des inscriptions, cliquez sur Importations SIS."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "Pour ajouter, modifier ou supprimer des groupes, Groupes - ajouter / modifier / supprimer doit également être activé."
   to_add_individual_courses_click_courses_c5355180: "Pour ajouter des cours individuels, cliquez sur Cours."
@@ -23000,6 +23032,7 @@ fr:
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Pour faire la liste croisée d'une section, Sections de cours - ajouter / modifier / supprimer doit également être activé. Pour modifier l'ID SIS du cours, Données SIS - gérer doit également être activé. Pour permettre à un utilisateur au niveau du compte de supprimer un cours, État du cours - gérer doit également être activé."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Pour faire la liste croisée d'une section, Sections de cours - ajouter / modifier / supprimer doit également être activé. Pour modifier l'ID SIS du cours, Données SIS - gérer doit également être activé. Pour permettre à un utilisateur au niveau du compte de supprimer un cours, État du cours - gérer doit également être activé."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Pour faire la liste croisée de sections, Cours - ajouter / modifier / supprimer doit également être activé."
+  to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "Pour transférer des sections, « Cours - ajouter / modifier / supprimer » doit également être activé."
   to_date_can_t_come_before_from_date_cf9e18aa: "« Jusqu’à cette date » ne peut être fixé à une date antérieure à « À partir de la date »"
   to_date_cannot_come_before_from_date_3eeb2633: "La date de fin ne peut être antérieure à la date de début."
   to_differentiate_assignments_to_individual_student_6cc40fde: "Pour différencier les travaux des élèves individuels, Utilisateurs - afficher la liste doit également être activé."
@@ -23025,10 +23058,11 @@ fr:
   to_edit_a_student_s_section_users_add_remove_stude_f974cf: |-
       Pour modifier la section d'un élève, Utilisateurs - ajouter / supprimer des élèves des cours et Envoyer des messages à des membres individuels du cours doivent également être activés.
       Pour modifier la section des enseignants, des AE ou des concepteurs de cours, Utilisateurs - ajouter / supprimer des enseignants, des concepteurs de cours ou des AE depuis les cours dans le cours et Conversations - envoyer des messages à des membres individuels du cours doivent également être activés.
-  to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Pour modifier les paramètres du cours Blueprint dans les Paramètres du cours, Cours Blueprint - ajouter / modifier / associer / supprimer doit également être activé. Pour ajouter un cours associé, Cours Blueprint - ajouter / modifier / associer / supprimer - afficher la liste doit également être activé. Pour modifier les paramètres de verrouillage sur n'importe quel objet Blueprint, cette autorisation doit être activée. Pour modifier les paramètres de verrouillage des fichiers, Fichiers du cours - ajouter / modifier / supprimer doit également être activé. Pour modifier les paramètres de verrouillage des questionnaires, Travaux et Questionnaires - ajouter / modifier / supprimer doit également être activé."
-  to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Pour modifier les paramètres de verrouillage de Blueprint à partir de la page d'index Travaux, Cours - ajouter / modifier / supprimer doit également être activé. Si cette autorisation n'est pas activée et que Cours - ajouter / modifier / supprimer est activé, les paramètres de verrouillage de Blueprint pour un travail peuvent être gérés à partir de la page de détails du travail. Pour modifier les paramètres de verrouillage de Blueprint sur un questionnaire individuel ou sur la page d'index des questionnaires, Cours - ajouter / modifier / supprimer doit également être activé."
-  to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Pour modifier les paramètres de verrouillage de Blueprint sur la page d'index Discussions, Cours - ajouter / modifier / supprimer et Discussions - afficher doit également être activé. Si cette autorisation n'est pas activée et que Cours - ajouter / modifier / supprimer et Discussions - afficher sont activés, les paramètres de verrouillage des projets de cours peuvent être modifiés sur les discussions individuelles."
-  to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Pour modifier les paramètres de verrouillage de Projet de cours sur la page d'index Pages, Cours - ajouter / modifier / supprimer doit également être activé. Si cette autorisation n'est pas activée et que Cours - ajouter / modifier / supprimer est activé, les paramètres de verrouillage de Projet de cours peuvent être modifiés sur des pages individuelles."
+  to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Pour modifier les paramètres du cours Blueprint dans les Paramètres du cours, Cours Blueprint - ajouter / modifier / associer / supprimer doit également être activé. Pour ajouter un cours associé, Cours Blueprint - ajouter / modifier / associer / supprimer - afficher la liste doit également être activé. Pour modifier les paramètres de verrouillage sur n'importe quel objet Blueprint, cette autorisation doit être activée. Pour modifier les paramètres de verrouillage des fichiers, Fichiers du cours - ajouter / modifier / supprimer doit également être activé. Pour modifier les paramètres de verrouillage des questionnaires, Travaux et Questionnaires - ajouter / modifier / supprimer doit également être activé."
+  to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Pour modifier les paramètres de verrouillage de Blueprint à partir de la page d'index Travaux, Cours - ajouter / modifier / supprimer doit également être activé. Si cette autorisation n'est pas activée et que Cours - ajouter / modifier / supprimer est activé, les paramètres de verrouillage de Blueprint pour un travail peuvent être gérés à partir de la page de détails du travail. Pour modifier les paramètres de verrouillage de Blueprint sur un questionnaire individuel ou sur la page d'index des questionnaires, Cours - ajouter / modifier / supprimer doit également être activé."
+  to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "Pour modifier les paramètres verrouille de Projet de cours sur la page d'index des discussions, « Cours - ajouter / modifier / supprimer » doit également être activé. "
+  to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Pour modifier les paramètres de verrouillage de Blueprint sur la page d'index Discussions, Cours - ajouter / modifier / supprimer et Discussions - afficher doit également être activé. Si cette autorisation n'est pas activée et que Cours - ajouter / modifier / supprimer et Discussions - afficher sont activés, les paramètres de verrouillage des projets de cours peuvent être modifiés sur les discussions individuelles."
+  to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Pour modifier les paramètres de verrouillage de Projet de cours sur la page d'index Pages, Cours - ajouter / modifier / supprimer doit également être activé. Si cette autorisation n'est pas activée et que Cours - ajouter / modifier / supprimer est activé, les paramètres de verrouillage de Projet de cours peuvent être modifiés sur des pages individuelles."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "Pour modifier les systèmes de notation des cours, Cours - ajouter / modifier / supprimer doit également être activé."
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "Pour modifier les paramètres du cours, Cours - ajouter / modifier / supprimer doit être activé."
   to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "Pour modifier les paramètres du cours, Cours - ajouter / modifier / supprimer doit être activé."
@@ -23048,6 +23082,7 @@ fr:
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "Pour générer une activité de connexion / déconnexion dans Outils d'administration, Utilisateurs - gérer les détails de connexion ou Statistiques - afficher doivent également être activés. Pour générer des journaux des modifications de note dans Outils d'administration, Notes - afficher les journaux des modifications doit également être activé."
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "Pour importer des travaux et des questionnaires à l'aide de l'outil d'importation de cours, Contenu du cours - ajouter / modifier / supprimer doit être activé."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "Pour importer des fichiers à l'aide de l'outil d'importation de cours, Contenu du cours - ajouter / modifier / supprimer doit également être activé."
+  to_import_learning_outcomes_learning_outcomes_impo_5abbd2fb: "Pour importer des résultats d'apprentissage, Résultats d'apprentissage - Import doit également être activé."
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "Pour importer des données SIS, Données SIS - importation doit également être activé."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "Pour importer des données SIS, Données SIS - importation doit également être activé."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Pour lier l'observateur du cours *%{name}* à un étudiant, commencez par indiquer le nom de l'étudiant ci-dessous, pour les trouver, puis cliquez 'Mettre à jour'."
@@ -23180,6 +23215,8 @@ fr:
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "Pour visualiser les analyses des élèves, Utilisateurs - afficher la liste et Analyses - afficher doivent également être activés."
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "Pour visualiser les analyses des élèves, Utilisateurs - afficher la liste et Notes - afficher toutes les notes doivent également être activés."
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "Pour afficher la page Personnes du compte, Utilisateurs - afficher la liste doit être activé. Si cette autorisation est désactivée et que l'option Utilisateurs - afficher les identifiants de connexion est activée, les utilisateurs verront toujours les adresses mail utilisées comme identifiants de connexion."
+  to_view_the_gradebook_course_content_view_must_als_676f3e8: "Pour afficher le relevé de notes, « Contenu de cours – afficher » doit également être activé. Si Notes - modifier et Notes - afficher toutes les notes sont désactivés, le Relevé de notes sera caché de Navigation du cours."
+  to_view_the_gradebook_grades_view_all_grades_must__7ead435: "Pour afficher le carnet de notes, « Notes – voir toutes les notes » doit également être activé."
   to_view_the_list_of_users_in_an_account_users_view_401b8462: "Pour afficher la liste des utilisateurs d'un compte, Utilisateurs - afficher la liste doit être activé."
   to_view_the_list_of_users_in_an_account_users_view_630d77a0: "Pour afficher la liste des utilisateurs d'un compte, Utilisateurs - afficher la liste doit égalment être activé."
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "Pour afficher la liste des utilisateurs d'un compte, Utilisateurs - afficher la liste doit être activé."
@@ -23339,6 +23376,7 @@ fr:
   unable_to_remove_app_4293cb53: "Impossible de supprimer l’application"
   unable_to_save_new_discussion_topic_99239f3f: "impossible d'enregistrer un nouveau sujet de discussion"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Impossible de fixer la note par défaut car ce travail doit être rendu lors d'une période non ouverte à la notation pour au moins un élève"
+  unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Impossible de paramétrer le glisser-déposer pour les modules."
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Impossible de transmettre le fichier au service de stockage. Le service peut être en panne ou vous devez peut-être vous reconnecter à Canvas."
   unarchive_selected_e0c4bd3d: "Désarchiver la sélection"
   unassigned_permissions_6a38ca95: "Autorisations attribuées"
@@ -24088,7 +24126,8 @@ fr:
       Les utilisateurs et les conditions sont localisés sur le compte, de sorte que le point final du SIS confirme toujours les autorisations de l'utilisateur en fonction du compte. Les sous-comptes ne possèdent que des cours et des sections ; ils ne possèdent pas de données d'utilisateur.
       Les administrateurs de sous-compte ne sont pas en mesure de visualiser les informations SIS à moins de se voir attribuer un rôle d'instructeur dans un cours. Les administrateurs de sous-compte ne peuvent pas visualiser les informations SIS sans l'association de cours, car le rôle d'instructeur est autorisé à lire les données SIS au niveau du compte.
   users_and_terms_are_located_at_the_account_so_the__6896b895: "Les utilisateurs et les conditions sont localisés sur le compte, de sorte que le point final du SIS confirme toujours les autorisations de l'utilisateur en fonction du compte. Les sous-comptes ne possèdent que des cours et des sections ; ils ne possèdent pas de données d'utilisateur. Les administrateurs de sous-compte ne sont pas en mesure de visualiser les informations SIS à moins de se voir attribuer un rôle d'instructeur dans un cours. Les administrateurs de sous-compte ne peuvent pas visualiser les informations SIS sans l'association de cours, car le rôle d'instructeur est autorisé à lire les données SIS au niveau du compte."
-  users_can_access_and_create_but_not_edit_individua_72b88c41: "Les utilisateurs peuvent accéder et créer (mais pas modifier) des barèmes de travail individuel par le biais de Travaux lorsque Contenu du cours - afficher et Travaux et Questionnaires - ajouter / modifier / supprimer sont activés."
+  users_can_access_and_create_but_not_edit_individua_72b88c41: "Les utilisateurs peuvent accéder et créer (mais pas modifier) des barèmes de travail individuel par le biais de Travaux lorsque Contenu du cours - afficher et Travaux et Questionnaires - ajouter / modifier / supprimer sont activés."
+  users_can_access_and_create_but_not_edit_individua_c8a62c74: "Les utilisateurs peuvent accéder à et créer (mais pas modifier) des barèmes de travaux individuels via les Travaux lorsque « Travaux » et « Quiz – ajouter / modifier / supprimer » est activé."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Les utilisateurs peuvent accéder au lien Gérer les banques de questions sur la page d'index des questionnaires lorsque Contenu du cours - afficher et Travaux et Questionnaires - ajouter / modifier / supprimer sont activés."
   users_d1b60cb0: Utilisateurs
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Utilisateurs – générer des codes d’association observateur pour les élèves"
@@ -24191,6 +24230,7 @@ fr:
   visit_group_group_name_7a816081: "Visiter le groupe %{group_name}"
   visit_zoom_14636084: "Visiter Zoom"
   waiting_for_attempted_login_6d00cb49: "En attente d’identification"
+  waiting_for_confirmation_to_display_qr_code_6f904d63: "En attente de confirmation de l’affichage du code QR"
   waiting_for_selection_ce0398c7: "En attente de sélection"
   waiting_for_your_qr_code_to_load_809299e5: "En attente du chargement du code QR"
   warning_6576b5b8: avertissement

@@ -31,18 +31,13 @@ module PactConfig
   # Add new API consumers to this module
   module Consumers
     my_broker_host = ENV.fetch('PACT_BROKER_HOST', 'pact-broker.docker')
+    # common consumer
+    GENERIC_CONSUMER = 'Generic Consumer'.freeze
     if my_broker_host.include?(EXTERNAL_BROKER_HOST)
       # external consumers
-      GENERIC_CONSUMER = 'Generic Consumer'.freeze
       FIU = 'lmsAPI'.freeze
     else
       # internal consumers
-      # These first 3 are legacy android consumers.  ANDROID, below, represents our latest pact
-      # testing effort.
-      ANDROID_STUDENT = 'Android Student'.freeze
-      ANDROID_TEACHER = 'Android Teacher'.freeze
-      ANDROID_PARENT = 'Android Parent'.freeze
-      GENERIC_CONSUMER = 'Generic Consumer'.freeze
       QUIZ_LTI = 'Quiz LTI'.freeze
       SISTEMIC = 'Sistemic'.freeze
       ANDROID = 'android'.freeze

@@ -158,7 +158,7 @@ Simple/CoffeeLinter:
   Precondition:
     Include:
     - "**/*[^Gradebook,Assignment].coffee"
-  Message: Your commit modifies CoffeeScript. You should probably decaffeinate 
+  Message: Your commit modifies CoffeeScript. You should probably decaffeinate
     (https://decaffeinate-project.org/repl/) it then make your changes in the JS file instead.
     CoffeeScript is deprecated in canvas and we eventually want to get rid of all of it.
     If you've given that honest thought and your team still feels it makes sense leave this file
@@ -227,14 +227,3 @@ Simple/NewErbLinter:
         css_bundle :any_css_bundles_you_want
         js_env({whatever: 'you need to put in window.ENV'})
         render :html => "".html_safe, :layout => true
-
-Simple/NewQunitLinter:
-  Severity: "warn"
-  Precondition:
-    Include:
-    - "spec/coffeescripts/**"
-    - "spec/javascripts/**"
-    Statuses:
-    - added
-  Message: |-
-    Your commit adds new qUnit files but all new tests should be in Jest.

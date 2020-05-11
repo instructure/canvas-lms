@@ -40,11 +40,34 @@ module Canvas
       end
 
       def upload!
+        return if (local_files - previous_manifest).empty? # nothing to change
         opts = {in_threads: 16, progress: 'uploading to S3'}
         if block_given?
           opts[:finish] = -> (_, i, _) { yield (100.0 * i / local_files.count) }
         end
         Parallel.each(local_files, opts) { |file| upload_file(file) }
+        # success - we can push the manifest
+        push_manifest
+      end
+
+      # tl;dr store a list of assets for a given tag on the bucket itself
+      # so we don't have to make 10,000 s3 get calls every time to make sure they're all still there
+      def manifest_path
+        tag = ENV['MANIFEST_TAG']
+        tag && "manifests/#{tag}.json"
+      end
+
+      def previous_manifest
+        return [] unless manifest_path
+        @manifest ||= begin
+          s3_obj = bucket.object(manifest_path)
+          s3_obj.exists? ? JSON.parse(s3_obj.get.body.read) : []
+        end
+      end
+
+      def push_manifest
+        return unless manifest_path
+        bucket.object(manifest_path).put(body: JSON.dump(local_files))
       end
 
       def fingerprinted?(path)
@@ -71,6 +94,8 @@ module Canvas
       end
 
       def upload_file(remote_path)
+        return if previous_manifest.include?(remote_path)
+
         local_path = Pathname.new("#{Rails.public_path}/#{remote_path}")
         return if (local_path.extname == '.gz') || local_path.directory?
         options = options_for(local_path)

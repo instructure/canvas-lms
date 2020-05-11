@@ -174,7 +174,8 @@ class ApplicationController < ActionController::Base
           },
           FEATURES: {
             assignment_bulk_edit: @domain_root_account&.feature_enabled?(:assignment_bulk_edit),
-            la_620_old_rce_init_fix: Account.site_admin.feature_enabled?(:la_620_old_rce_init_fix),
+            assignment_bulk_edit_phase_2: Account.site_admin.feature_enabled?(:assignment_bulk_edit_phase_2),
+            canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme),
             cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
             featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links),
             responsive_admin_settings: !!@domain_root_account&.feature_enabled?(:responsive_admin_settings),
@@ -203,7 +204,7 @@ class ApplicationController < ActionController::Base
         end
 
         @js_env[:lolcalize] = true if ENV['LOLCALIZE']
-        @js_env[:rce_auto_save_max_age_ms] = Setting.get('rce_auto_save_max_age_ms', 1.hour.to_i * 1000).to_i if @js_env[:rce_auto_save]
+        @js_env[:rce_auto_save_max_age_ms] = Setting.get('rce_auto_save_max_age_ms', 1.day.to_i * 1000).to_i if @js_env[:rce_auto_save]
       end
     end
 

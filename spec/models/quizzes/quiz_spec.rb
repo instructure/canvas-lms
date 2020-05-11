@@ -2516,4 +2516,19 @@ describe Quizzes::Quiz do
       expect(quiz.anonymous_grading?).to be true
     end
   end
+
+  describe 'before save' do
+    describe 'set_root_account_id' do
+      it 'sets root_account_id using context' do
+        quiz = @course.quizzes.create!(title: 'hello')
+        expect(quiz.root_account).to eq @course.root_account
+      end
+
+      it 'leaves root_account_id nil if no context' do
+        @course.root_account_id = nil
+        quiz = @course.quizzes.create!(title: 'hello')
+        expect(quiz.root_account).to be_nil
+      end
+    end
+  end
 end

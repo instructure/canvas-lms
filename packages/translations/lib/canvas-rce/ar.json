@@ -18,6 +18,12 @@
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": "حدث خطأ أثناء إنشاء معاينة للملف"
   },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "حدث خطأ أثناء إجراء طلب شبكة"
+  },
+  "an_error_occurred_uploading_your_media_71f1444d": {
+    "message": "حدث خطأ أثناء تحميل الوسائط."
+  },
   "announcement_list_da155734": { "message": "قائمة الإعلانات" },
   "announcements_a4b8ed4a": { "message": "الإعلانات" },
   "apps_54d24a47": { "message": "التطبيق" },
@@ -35,6 +41,7 @@
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "افتح تلقائيًا معاينة داخلية. (لا تظهر المعاينة إلا بعد الحفظ)"
   },
+  "available_folders_694d0436": { "message": "المجلدات المتاحة" },
   "cancel_caeb1e68": { "message": "إلغاء" },
   "canvas_plugins_705a5016": { "message": "المكونات الإضافية لـ Canvas" },
   "choose_caption_file_9c45bc4e": { "message": "اختر ملف تسميات توضيحية" },
@@ -74,6 +81,7 @@
   },
   "course_documents_104d76e0": { "message": "مستندات المساق" },
   "course_files_62deb8f8": { "message": "ملفات المساق" },
+  "course_files_a31f97fc": { "message": "ملفات المساق" },
   "course_images_f8511d04": { "message": "صور المساق" },
   "course_links_b56959b9": { "message": "روابط المساق" },
   "course_media_ec759ad": { "message": "وسائط المساق" },
@@ -136,6 +144,8 @@
   "external_links_3d9f074e": { "message": "الارتباطات الخارجية" },
   "extra_large_b6cdf1ff": { "message": "كبير جداً" },
   "file_name_8fd421ff": { "message": "اسم الملف" },
+  "file_upload_failed_af22dd91": { "message": "فشل تحميل الملف" },
+  "file_uploading_56c9c0c8": { "message": "جارٍ تحميل الملف" },
   "file_url_c12b64be": { "message": "عنوان URL للملف" },
   "filename_file_icon_602eb5de": { "message": "أيقونة الملف { filename }" },
   "filename_image_preview_6cef8f26": {
@@ -148,6 +158,7 @@
   "focus_the_popup_context_toolbar_7979f4f8": {
     "message": "التركيز على شريط أدوات مساق النافذة المنبثقة"
   },
+  "folder_tree_fbab0726": { "message": "شجرة المجلد" },
   "formatting_5b143aa8": { "message": "التنسيق" },
   "found_auto_saved_content_3f6e4ca5": {
     "message": "تم العثور على محتوى محفوظ تلقائياً"
@@ -164,6 +175,7 @@
   },
   "grades_a61eba0a": { "message": "الدرجات" },
   "group_files_4324f3df": { "message": "ملفات المجموعة" },
+  "group_files_82e5dcdb": { "message": "ملفات المجموعة" },
   "group_navigation_99f191a": { "message": "التنقل عبر المجموعة" },
   "heading_2_5b84eed2": { "message": "العنوان 2" },
   "heading_3_2c83de44": { "message": "العنوان 3" },
@@ -198,7 +210,9 @@
   "loading_bde52856": { "message": "جارٍ التحميل" },
   "loading_failed_b3524381": { "message": "فشل التحميل..." },
   "loading_failed_e6a9d8ef": { "message": "فشل التحميل." },
+  "loading_folders_d8b5869e": { "message": "جارٍ تحميل المجلدات" },
   "loading_media_f3455841": { "message": "جارٍ تحميل الوسائط" },
+  "locked_762f138b": { "message": "مؤمّن" },
   "media_af190855": { "message": "الوسائط" },
   "medium_5a8e9ead": { "message": "متوسط" },
   "mic_a7f3d311": { "message": "الميكروفون" },
@@ -207,6 +221,7 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "يجب أن تكون { width } x { height } بكسل على الأقل."
   },
+  "my_files_2f621040": { "message": "ملفاتي" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "تنقل من خلال القائمة أو شريط الأدوات"
   },
@@ -276,6 +291,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "حدثت مشكلة ولا أعلم ماذا أعرض لك."
   },
+  "something_went_wrong_d238c551": { "message": "حدث خطأ ما" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
     "message": "حدث خطأ ما، حاول مجدداً بعد تحديث الصفحة"
   },
@@ -289,6 +305,7 @@
   "styles_2aa721ef": { "message": "الأنماط" },
   "submit_a3cc6859": { "message": "إرسال" },
   "subscript_59744f96": { "message": "منخفض" },
+  "success_file_uploaded_8174e93f": { "message": "نجاح: تم تحميل الملف" },
   "superscript_8cb349a2": { "message": "مرتفع" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "أنواع الملفات المدعومة: SRT أو WebVTT"
@@ -327,6 +344,9 @@
   "upload_file_fd2361b8": { "message": "تحميل ملف" },
   "upload_image_6120b609": { "message": "تحميل صورة" },
   "upload_media_ce31135a": { "message": "تحميل الوسائط" },
+  "upload_not_available_for_this_folder_8f8623c6": {
+    "message": "التحميل غير متاح لهذا المجلد"
+  },
   "upload_record_media_e4207d72": { "message": "تحميل/تسجيل الوسائط" },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "قائمة أبجدية مرتبة بأحرف كبيرة"

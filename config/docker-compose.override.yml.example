@@ -44,8 +44,8 @@ services:
       - yardoc:/usr/src/app/.yardoc
       - yarn-cache:/home/docker/.cache/yarn
     environment: &BASE-ENV
-      RAILS_ENV: development
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+      RAILS_ENV: development
 
   webpack:
     <<: *BASE

@@ -785,6 +785,38 @@ describe 'Submissions API', type: :request do
     expect(comment_json['author']).to be_empty
   end
 
+  it 'does not return submitter info when anonymous grading is on' do
+    submitter = student_in_course({ :active_all => true }).user
+
+    assignment = assignment_model(course: @course)
+    assignment.update_attribute(:anonymous_grading, true)
+    expect(assignment.reload.anonymous_grading?).to be_truthy
+
+    submission = assignment.submit_homework(submitter, body: "Anon Submission")
+    submission_comment = submission.add_comment({
+      author: submitter,
+      comment: "Anon Comment"
+    })
+
+    @user = teacher_in_course({ :active_all => true }).user
+    url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions"
+    json = api_call(:get, url, {
+      :controller => 'submissions_api',
+      :action => 'index',
+      :format => 'json',
+      :course_id => @course.to_param,
+      :assignment_id => assignment.to_param
+    }, {
+      :include => %w(user, submission_comments)
+    })
+
+    expect(json.first['user']).to be_nil
+    comment_json = json.first['submission_comments'].first
+    expect(comment_json['author_id']).to be_nil
+    expect(comment_json['author_name']).to match(/Anonymous/)
+    expect(comment_json['author']).to be_empty
+  end
+
   it "loads discussion entry data" do
     @student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)

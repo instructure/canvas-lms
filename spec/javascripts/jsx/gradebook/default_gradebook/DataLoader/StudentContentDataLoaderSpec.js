@@ -21,10 +21,10 @@ import sinon from 'sinon'
 import FakeServer, {paramsFromRequest} from 'jsx/shared/network/__tests__/FakeServer'
 import {RequestDispatch} from 'jsx/shared/network'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
+import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
-import CourseSettings from 'jsx/gradebook/default_gradebook/CourseSettings'
-import FinalGradeOverrides from 'jsx/gradebook/default_gradebook/FinalGradeOverrides'
 import StudentContentDataLoader from 'jsx/gradebook/default_gradebook/DataLoader/StudentContentDataLoader'
+import PerformanceControls from 'jsx/gradebook/default_gradebook/PerformanceControls'
 
 QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => {
   const exampleData = {
@@ -46,11 +46,10 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
     submissions: '/api/v1/courses/1201/students/submissions'
   }
 
-  let dataLoader
-  let gradebook
-  let options
-  let server
   let dispatch
+  let gradebook
+  let performanceControls
+  let server
 
   function latchPromise() {
     const latch = {}
@@ -83,31 +82,28 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       .stub(FinalGradeOverrideApi, 'getFinalGradeOverrides')
       .returns(Promise.resolve({finalGradeOverrides: exampleData.finalGradeOverrides}))
 
-    gradebook = {
-      course: {
-        id: '1201'
+    gradebook = createGradebook({
+      context_id: '1201',
+
+      course_settings: {
+        allow_final_grade_override: true,
+        filter_speed_grader_by_student_group: false
       },
 
-      getEnrollmentFilters: sinon.stub().returns({concluded: false, inactive: false}),
-      gotChunkOfStudents: sinon.spy(),
-      gotSubmissionsChunk: sinon.spy()
-    }
+      final_grade_override_enabled: true
+    })
 
-    gradebook.finalGradeOverrides = new FinalGradeOverrides(gradebook)
-    gradebook.courseSettings = new CourseSettings(gradebook, {allowFinalGradeOverride: true})
-
+    sinon.stub(gradebook, 'gotChunkOfStudents')
+    sinon.stub(gradebook, 'gotSubmissionsChunk')
+    sinon.stub(gradebook, 'updateStudentsLoaded')
+    sinon.stub(gradebook, 'updateSubmissionsLoaded')
     sinon.stub(gradebook.finalGradeOverrides, 'setGrades')
 
-    options = {
-      courseId: '1201',
-      gradebook,
-      studentsChunkSize: 2,
-      studentsParams: {enrollment_state: ['active']},
-      studentsUrl: urls.students,
-      submissionsChunkSize: 2
-    }
-
     dispatch = new RequestDispatch()
+    performanceControls = new PerformanceControls({
+      studentsChunkSize: 2,
+      submissionsChunkSize: 2
+    })
   })
 
   suiteHooks.afterEach(() => {
@@ -116,7 +112,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
   QUnit.module('.load()', () => {
     async function load(studentIds) {
-      dataLoader = new StudentContentDataLoader(options, dispatch)
+      const dataLoader = new StudentContentDataLoader({dispatch, gradebook, performanceControls})
       await dataLoader.load(studentIds || exampleData.studentIds)
     }
 
@@ -129,47 +125,34 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         server.for(urls.students, {user_ids: ids}).respond({status: 200, body: students})
       }
 
-      function setSubmissionsResponse(ids, submissions) {
-        server.unsetResponses(urls.submissions)
-        server.for(urls.submissions, {student_ids: ids}).respond([{status: 200, body: submissions}])
-      }
-
       test('requests students using the given student ids', async () => {
         setStudentsResponse(exampleData.studentIds, exampleData.students)
-        options.studentsChunkSize = 50
+        performanceControls = new PerformanceControls({
+          studentsChunkSize: 50,
+          submissionsChunkSize: 2
+        })
         await load()
         const studentRequest = server.findRequest(urls.students)
         const params = paramsFromRequest(studentRequest)
         deepEqual(params.user_ids, exampleData.studentIds)
       })
 
-      test('does not request students already loaded', async () => {
-        setStudentsResponse(['1102'], [{id: '1102'}])
-        setSubmissionsResponse(['1102'], [{id: '2502'}])
-        options = {...options, loadedStudentIds: ['1101', '1103'], studentsChunkSize: 50}
-        await load()
-        const studentRequest = server.findRequest(urls.students)
-        const params = paramsFromRequest(studentRequest)
-        deepEqual(params.user_ids, ['1102'])
-      })
-
       test('chunks students when per page limit is less than count of student ids', async () => {
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
-        options.studentsChunkSize = 2
         await load()
         const requests = server.filterRequests(urls.students)
         strictEqual(requests.length, 2)
       })
 
-      test('calls the students page callback when each students page request resolves', async () => {
+      test('updates the gradebook with each chunk of loaded students', async () => {
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
         await load()
         strictEqual(gradebook.gotChunkOfStudents.callCount, 2)
       })
 
-      test('includes loaded students with each callback', async () => {
+      test('includes loaded students when updating the gradebook', async () => {
         setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
         setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
         const loadedStudents = []
@@ -180,17 +163,40 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         deepEqual(loadedStudents, exampleData.students)
       })
 
-      test('does not request students when given an empty list of student ids', async () => {
-        await load([])
-        const requests = server.filterRequests(urls.students)
-        strictEqual(requests.length, 0)
-      })
+      QUnit.module('when no students needed to be loaded', () => {
+        test('does not request students', async () => {
+          await load([])
+          const requests = server.filterRequests(urls.students)
+          strictEqual(requests.length, 0)
+        })
 
-      test('does not request students when requested student ids are already loaded', async () => {
-        options = {...options, loadedStudentIds: exampleData.studentIds}
-        await load(exampleData.studentIds)
-        const requests = server.filterRequests(urls.students)
-        strictEqual(requests.length, 0)
+        test('does not request submissions', async () => {
+          await load([])
+          const requests = server.filterRequests(urls.submissions)
+          strictEqual(requests.length, 0)
+        })
+
+        test('updates the "students loaded" status', async () => {
+          await load([])
+          strictEqual(gradebook.updateStudentsLoaded.callCount, 1)
+        })
+
+        test('sets the students as loaded', async () => {
+          await load([])
+          const [loaded] = gradebook.updateStudentsLoaded.lastCall.args
+          strictEqual(loaded, true)
+        })
+
+        test('updates the "submissions loaded" status', async () => {
+          await load([])
+          strictEqual(gradebook.updateSubmissionsLoaded.callCount, 1)
+        })
+
+        test('sets the submissions as loaded', async () => {
+          await load([])
+          const [loaded] = gradebook.updateSubmissionsLoaded.lastCall.args
+          strictEqual(loaded, true)
+        })
       })
     })
 
@@ -222,14 +228,25 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         ok(params.response_fields.includes('posted_at'))
       })
 
-      test('calls the submissions chunk callback for each chunk of submissions', async () => {
+      test('sets the `per_page` parameter to the configured per page maximum', async () => {
+        performanceControls = new PerformanceControls({
+          studentsChunkSize: 2,
+          submissionsPerPage: 45
+        })
+        await load()
+        const submissionsRequest = server.findRequest(urls.submissions)
+        const params = paramsFromRequest(submissionsRequest)
+        strictEqual(params.per_page, '45')
+      })
+
+      test('updates the gradebook with each chunk of submissions', async () => {
         const submissionChunks = []
         gradebook.gotSubmissionsChunk = submissionChunks.push.bind(submissionChunks)
         await load()
         strictEqual(submissionChunks.length, 2)
       })
 
-      test('includes loaded submissions with each callback', async () => {
+      test('includes the loaded submissions when updating the gradebook', async () => {
         const submissionChunks = []
         gradebook.gotSubmissionsChunk = submissionChunks.push.bind(submissionChunks)
         await load()
@@ -252,13 +269,6 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         const requests = server.filterRequests(urls.submissions)
         strictEqual(requests.length, 0)
       })
-
-      test('does not request submissions when requested student ids are already loaded', async () => {
-        options = {...options, loadedStudentIds: exampleData.studentIds}
-        await load(exampleData.studentIds)
-        const requests = server.filterRequests(urls.submissions)
-        strictEqual(requests.length, 0)
-      })
     })
 
     QUnit.module('loading final grade overrides', () => {
@@ -268,7 +278,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       })
 
       test('optionally does not request final grade overrides', async () => {
-        gradebook.courseSettings = new CourseSettings(gradebook, {allowFinalGradeOverride: false})
+        gradebook.courseSettings.setAllowFinalGradeOverride(false)
         await load()
         strictEqual(FinalGradeOverrideApi.getFinalGradeOverrides.callCount, 0)
       })
@@ -453,6 +463,55 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         ]
         const studentRequest2Index = events.indexOf('request students:1103')
         ok(Math.max(...submissionRequestIndices) < studentRequest2Index)
+      })
+    })
+
+    QUnit.module('when all students have finished loading', loadingHooks => {
+      loadingHooks.beforeEach(() => {
+        setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
+        setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
+      })
+
+      function setStudentsResponse(ids, students) {
+        server.for(urls.students, {user_ids: ids}).respond({status: 200, body: students})
+      }
+
+      test('updates the "students loaded" status', async () => {
+        await load()
+        strictEqual(gradebook.updateStudentsLoaded.callCount, 1)
+      })
+
+      test('sets the students as loaded', async () => {
+        await load()
+        const [loaded] = gradebook.updateStudentsLoaded.lastCall.args
+        strictEqual(loaded, true)
+      })
+
+      test('updates the status after storing loaded students', async () => {
+        gradebook.updateStudentsLoaded.callsFake(() => {
+          strictEqual(gradebook.gotChunkOfStudents.callCount, 2)
+        })
+        await load()
+      })
+    })
+
+    QUnit.module('when all submissions have finished loading', () => {
+      test('updates the "submissions loaded" status', async () => {
+        await load()
+        strictEqual(gradebook.updateSubmissionsLoaded.callCount, 1)
+      })
+
+      test('sets the submissions as loaded', async () => {
+        await load()
+        const [loaded] = gradebook.updateSubmissionsLoaded.lastCall.args
+        strictEqual(loaded, true)
+      })
+
+      test('updates the status after storing loaded submissions', async () => {
+        gradebook.updateSubmissionsLoaded.callsFake(() => {
+          strictEqual(gradebook.gotSubmissionsChunk.callCount, 2)
+        })
+        await load()
       })
     })
 

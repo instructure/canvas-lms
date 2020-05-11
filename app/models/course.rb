@@ -790,34 +790,36 @@ class Course < ActiveRecord::Base
   end
 
   def instructors_in_charge_of(user_id, require_grade_permissions: true)
-    scope = current_enrollments.
-      where(:course_id => self, :user_id => user_id).
-      where("course_section_id IS NOT NULL")
-    section_ids = scope.distinct.pluck(:course_section_id)
+    Shackles.activate(:slave) do
+      scope = current_enrollments.
+        where(:course_id => self, :user_id => user_id).
+        where("course_section_id IS NOT NULL")
+      section_ids = scope.distinct.pluck(:course_section_id)
 
-    instructor_enrollment_scope = self.instructor_enrollments.active_by_date
-    if section_ids.any?
-      instructor_enrollment_scope = instructor_enrollment_scope.where("enrollments.limit_privileges_to_course_section IS NULL OR
-        enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)", true, section_ids)
-    end
+      instructor_enrollment_scope = self.instructor_enrollments.active_by_date
+      if section_ids.any?
+        instructor_enrollment_scope = instructor_enrollment_scope.where("enrollments.limit_privileges_to_course_section IS NULL OR
+          enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)", true, section_ids)
+      end
 
-    if require_grade_permissions
-      # filter to users with view_all_grades or manage_grades permission
-      role_user_ids = instructor_enrollment_scope.pluck(:role_id, :user_id)
-      return [] unless role_user_ids.any?
-      role_ids = role_user_ids.map(&:first).uniq
+      if require_grade_permissions
+        # filter to users with view_all_grades or manage_grades permission
+        role_user_ids = instructor_enrollment_scope.pluck(:role_id, :user_id)
+        return [] unless role_user_ids.any?
+        role_ids = role_user_ids.map(&:first).uniq
 
-      roles = Role.where(:id => role_ids).to_a
-      allowed_role_ids = roles.select{|role|
-        [:view_all_grades, :manage_grades].any?{|permission| RoleOverride.enabled_for?(self, permission, role, self).include?(:self) }
-      }.map(&:id)
-      return [] unless allowed_role_ids.any?
+        roles = Role.where(:id => role_ids).to_a
+        allowed_role_ids = roles.select{|role|
+          [:view_all_grades, :manage_grades].any?{|permission| RoleOverride.enabled_for?(self, permission, role, self).include?(:self) }
+        }.map(&:id)
+        return [] unless allowed_role_ids.any?
 
-      allowed_user_ids = Set.new
-      role_user_ids.each{|role_id, user_id| allowed_user_ids << user_id if allowed_role_ids.include?(role_id)}
-      User.where(:id => allowed_user_ids).to_a
-    else
-      User.where(:id => instructor_enrollment_scope.select(:id)).to_a
+        allowed_user_ids = Set.new
+        role_user_ids.each{|role_id, user_id| allowed_user_ids << user_id if allowed_role_ids.include?(role_id)}
+        User.where(:id => allowed_user_ids).to_a
+      else
+        User.where(:id => instructor_enrollment_scope.select(:id)).to_a
+      end
     end
   end
 

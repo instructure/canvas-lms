@@ -46,6 +46,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   belongs_to :assignment
   belongs_to :assignment_group
+  belongs_to :root_account, class_name: 'Account'
   has_many :ignores, :as => :asset
 
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -66,6 +67,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   before_save :generate_quiz_data_on_publish, :if => :workflow_state_changed?
   before_save :build_assignment
   before_save :set_defaults
+  before_save :set_root_account_id
   after_save :update_assignment
   before_save :check_if_needs_availability_cache_clear
   after_save :clear_availability_cache
@@ -151,6 +153,10 @@ class Quizzes::Quiz < ActiveRecord::Base
       :only_visible_to_overrides, :one_time_results, :show_correct_answers_last_attempt
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self[:show_correct_answers] = true if self[:show_correct_answers].nil?
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= self.context&.root_account_id
   end
 
   # quizzes differ from other publishable objects in that they require we

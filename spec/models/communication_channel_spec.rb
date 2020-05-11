@@ -581,12 +581,21 @@ describe CommunicationChannel do
       expect(cc.e164_path).to eq '+18015555555'
       account = double()
       allow(account).to receive(:feature_enabled?).and_return(true)
+      allow(account).to receive(:global_id).and_return('totes_an_ID')
       expect(Services::NotificationService).to receive(:process).with(
         "otp:#{cc.global_id}",
         anything,
         'sms',
-        cc.e164_path
+        cc.e164_path,
+        true
       )
+      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.sms.one_time_password",
+                                                             { short_stat: "message.deliver",
+                                                               tags: { path_type: "sms", notification_name: 'one_time_password' } })
+
+      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.sms.totes_an_ID",
+                                                             { short_stat: "message.deliver_per_account",
+                                                               tags: { path_type: "sms", root_account_id: 'totes_an_ID' } })
       expect(cc).to receive(:send_otp_via_sms_gateway!).never
       cc.send_otp!('123456', account)
     end

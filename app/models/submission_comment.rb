@@ -268,6 +268,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def can_read_author?(user, session)
     RequestCache.cache('user_can_read_author', self, user, session) do
+      return false if self.submission.assignment.anonymize_students?
       (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
           self.author == user ||
           self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
