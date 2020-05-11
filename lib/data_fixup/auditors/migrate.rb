@@ -65,7 +65,7 @@ module DataFixup::Auditors
         next_page = 1
         until next_page.nil?
           page_args = { page: next_page, per_page: batch_size }
-          auditor_recs = collection.paginate(page_args)
+          auditor_recs = get_cassandra_records_resiliantly(collection, page_args)
           ar_attributes_list = auditor_recs.map do |rec|
             auditor_ar_type.ar_attributes_from_event_stream(rec)
           end
@@ -86,7 +86,7 @@ module DataFixup::Auditors
         next_page = 1
         until next_page.nil?
           page_args = { page: next_page, per_page: batch_size }
-          auditor_recs = collection.paginate(page_args)
+          auditor_recs = get_cassandra_records_resiliantly(collection, page_args)
           uuids = auditor_recs.map(&:id)
           existing_uuids = auditor_ar_type.where(uuid: uuids).pluck(:uuid)
           @audit_failure_uuids += (uuids - existing_uuids)
@@ -105,11 +105,21 @@ module DataFixup::Auditors
       end
 
       def migration_cell
-        ::Auditors::ActiveRecord::MigrationCell.find_by(cell_attributes)
+        @_cell ||= ::Auditors::ActiveRecord::MigrationCell.find_by(cell_attributes)
       end
 
       def create_cell!
-        ::Auditors::ActiveRecord::MigrationCell.create!(cell_attributes.merge({ completed: false }))
+        @_cell = ::Auditors::ActiveRecord::MigrationCell.create!(cell_attributes.merge({ completed: false }))
+      end
+
+      def reset_cell!
+        migration_cell&.destroy
+        @_cell = nil
+      end
+
+      def mark_cell_queued!
+        create_cell! if migration_cell.nil?
+        migration_cell.update_attribute(:failed, false) if migration_cell.failed
       end
 
       def auditors_cassandra_db_lambda
@@ -122,6 +132,11 @@ module DataFixup::Auditors
 
       def already_complete?
         migration_cell&.completed
+      end
+
+      def currently_queueable?
+        return false if migration_cell&.completed
+        (migration_cell.nil? || migration_cell.failed)
       end
 
       def perform
@@ -367,7 +382,11 @@ module DataFixup::Auditors
         end
 
         def failed_jobs
-          backfill_jobs.failed
+          Delayed::Job::Failed.where("tag IN ('#{WORKER_TAGS.join("','")}')")
+        end
+
+        def failed_schedulars
+          Delayed::Job::Failed.where(tag: SCHEDULAR_TAG)
         end
 
         def running_jobs
@@ -494,7 +513,9 @@ module DataFixup::Auditors
             'failed': failed_jobs.count,
             'currently_running': running_jobs.count,
             'completed_cells': completed_cells.count,
-            'dates_being_worked': working_dates(running_jobs),
+            # it does not work to check these with jobs from other shards
+            # because deserializing them fails to find accounts
+            'dates_being_worked': working_dates(running_jobs.where(shard_id: Shard.current.id)),
             'config': {
               'threshold': "#{queue_threshold} jobs",
               'interval': "#{backfill_interval} seconds",
@@ -579,24 +600,25 @@ module DataFixup::Auditors
         self.class.cluster_name
       end
 
+      def conditionally_enqueue_worker(worker, n_strand)
+        if worker.currently_queueable?
+          Delayed::Job.enqueue(worker, n_strand: n_strand, priority: Delayed::LOW_PRIORITY)
+          worker.mark_cell_queued!
+        end
+      end
+
       def enqueue_one_day_for_account(account, current_date)
         if account.root_account?
           # auth records are stored at the root account level,
           # we only need to enqueue these jobs for root accounts
           auth_worker = AuthenticationWorker.new(account.id, current_date)
-          unless auth_worker.already_complete?
-            Delayed::Job.enqueue(auth_worker, n_strand: ["auditors_migration_authentications", cluster_name], priority: Delayed::LOW_PRIORITY)
-          end
+          conditionally_enqueue_worker(auth_worker, ["auditors_migration_authentications", cluster_name])
         end
 
         course_worker = CourseWorker.new(account.id, current_date)
-        unless course_worker.already_complete?
-          Delayed::Job.enqueue(course_worker, n_strand: ["auditors_migration_courses", cluster_name], priority: Delayed::LOW_PRIORITY)
-        end
+        conditionally_enqueue_worker(course_worker, ["auditors_migration_courses", cluster_name])
         grade_change_worker = GradeChangeWorker.new(account.id, current_date)
-        unless grade_change_worker.already_complete?
-          Delayed::Job.enqueue(grade_change_worker, n_strand: ["auditors_migration_grade_changes", cluster_name], priority: Delayed::LOW_PRIORITY)
-        end
+        conditionally_enqueue_worker(grade_change_worker, ["auditors_migration_grade_changes", cluster_name])
       end
 
       def enqueue_one_day(current_date)
@@ -626,7 +648,7 @@ module DataFixup::Auditors
           schedule_worker = BackfillEngine.new(current_date, @end_date)
           next_time = Time.now.utc + backfill_interval
           log("More work to do. Scheduling another job for #{next_time}")
-          Delayed::Job.enqueue(schedule_worker, run_at: next_time, priority: Delayed::LOW_PRIORITY, n_strand: schedular_strand_tag)
+          Delayed::Job.enqueue(schedule_worker, run_at: next_time, priority: Delayed::LOW_PRIORITY, n_strand: schedular_strand_tag, max_attempts: 5)
         else
           log("WE DID IT.  Shard #{Shard.current.id} has auditors migrated (probably, check the migration cell records to be sure)")
         end
