@@ -15,12 +15,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AddNotificationPolicyOverideToDelayedMessage < ActiveRecord::Migration[5.2]
+class ChangeDelayedMessageIndexToIgnoreNullValues < ActiveRecord::Migration[5.2]
   tag :predeploy
   disable_ddl_transaction!
-  include MigrationHelpers::AddColumnAndFk
 
   def change
-    add_column_and_fk :delayed_messages, :notification_policy_override_id, :notification_policy_overrides
+    add_index :delayed_messages, :notification_policy_override_id,
+              algorithm: :concurrently,
+              name: 'index_delayed_messages_with_notification_policy_override_id',
+              where: "notification_policy_override_id IS NOT NULL"
+
+    if index_name_exists?(:delayed_messages, 'index_delayed_messages_on_notification_policy_override_id')
+      remove_index :delayed_messages, :notification_policy_override_id
+    end
   end
 end
