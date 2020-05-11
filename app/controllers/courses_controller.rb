@@ -1502,6 +1502,9 @@ class CoursesController < ApplicationController
   # @argument home_page_announcement_limit [Integer]
   #   Limit the number of announcements on the home page if enabled via show_announcements_on_home_page
   #
+  # @argument syllabus_course_summary [Boolean]
+  #   Show the course summary (list of assignments and calendar events) on the syllabus page. Default is true.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
   #     -X PUT \
@@ -1528,6 +1531,7 @@ class CoursesController < ApplicationController
       :restrict_student_past_view,
       :restrict_student_future_view,
       :show_announcements_on_home_page,
+      :syllabus_course_summary,
       :home_page_announcement_limit
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)

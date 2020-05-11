@@ -3722,6 +3722,7 @@ describe CoursesController, type: :request do
           'show_announcements_on_home_page' => false,
           'usage_rights_required' => false,
           'home_page_announcement_limit' => nil,
+          'syllabus_course_summary' => true,
           'image_url' => nil,
           'image_id' => nil,
           'image' => nil
@@ -3753,6 +3754,7 @@ describe CoursesController, type: :request do
           :restrict_student_past_view => true,
           :restrict_student_future_view => true,
           :show_announcements_on_home_page => false,
+          :syllabus_course_summary => false,
           :home_page_announcement_limit => nil
         })
         expect(json).to eq({
@@ -3773,6 +3775,7 @@ describe CoursesController, type: :request do
           'restrict_student_future_view' => true,
           'show_announcements_on_home_page' => false,
           'home_page_announcement_limit' => nil,
+          'syllabus_course_summary' => false,
           'image_url' => nil,
           'image_id' => nil,
           'image' => nil
@@ -3788,6 +3791,7 @@ describe CoursesController, type: :request do
         expect(@course.usage_rights_required).to eq true
         expect(@course.lock_all_announcements).to eq true
         expect(@course.show_announcements_on_home_page).to eq false
+        expect(@course.syllabus_course_summary?).to eq false
         expect(@course.home_page_announcement_limit).to be_falsey
       end
     end
@@ -3822,6 +3826,7 @@ describe CoursesController, type: :request do
           'show_announcements_on_home_page' => false,
           'usage_rights_required' => false,
           'home_page_announcement_limit' => nil,
+          'syllabus_course_summary' => true,
           'image_url' => nil,
           'image_id' => nil,
           'image' => nil
