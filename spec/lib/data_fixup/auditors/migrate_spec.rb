@@ -163,7 +163,7 @@ module DataFixup::Auditors::Migrate
         course2 = course_model(account_id: Account.default.id)
         enrollment1 = student_in_course(course: course1)
         worker = GradeChangeWorker.new(Account.default.id, Time.zone.today)
-        cids = worker.migrateable_courses.map(&:id)
+        cids = worker.migrateable_course_ids
         expect(cids.include?(course1.id)).to eq(true)
         expect(cids.include?(course2.id)).to eq(false)
       end
