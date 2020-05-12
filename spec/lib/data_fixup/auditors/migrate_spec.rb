@@ -163,7 +163,7 @@ module DataFixup::Auditors::Migrate
         course2 = course_model(account_id: Account.default.id)
         enrollment1 = student_in_course(course: course1)
         worker = GradeChangeWorker.new(Account.default.id, Time.zone.today)
-        cids = worker.migrateable_courses.map(&:id)
+        cids = worker.migrateable_course_ids
         expect(cids.include?(course1.id)).to eq(true)
         expect(cids.include?(course2.id)).to eq(false)
       end
@@ -199,6 +199,13 @@ module DataFixup::Auditors::Migrate
         worker.perform
         # no records get transfered because it's already "complete"
         expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(0)
+      end
+
+      it "recovers from multiple creates" do
+        worker = AuthenticationWorker.new(account.id, date)
+        cell1 = worker.create_cell!
+        cell2 = worker.create_cell!
+        expect(cell1.id).to eq(cell2.id)
       end
 
       it "reconciles partial successes" do

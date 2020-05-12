@@ -104,12 +104,20 @@ module DataFixup::Auditors
         }
       end
 
+      def find_migration_cell
+        ::Auditors::ActiveRecord::MigrationCell.find_by(cell_attributes)
+      end
+
       def migration_cell
-        @_cell ||= ::Auditors::ActiveRecord::MigrationCell.find_by(cell_attributes)
+        @_cell ||= find_migration_cell
       end
 
       def create_cell!
         @_cell = ::Auditors::ActiveRecord::MigrationCell.create!(cell_attributes.merge({ completed: false }))
+      rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation
+        @_cell = find_migration_cell
+        raise "unresolvable auditors migration state #{cell_attributes}" if @_cell.nil?
+        @_cell
       end
 
       def reset_cell!
@@ -278,23 +286,25 @@ module DataFixup::Auditors
         Auditors::GradeChange.for_course(course, cassandra_query_options)
       end
 
-      def migrateable_courses
+      def migrateable_course_ids
         account.courses.where("EXISTS (?)",
           Enrollment.where("course_id=courses.id").where(type: ['StudentEnrollment', 'StudentViewEnrollment']))
-          .where("courses.created_at <= ?", @date + 2.days)
+          .where("courses.created_at <= ?", @date + 2.days).pluck(:id)
       end
 
       def perform_migration
-        migrateable_courses.find_in_batches do |courses|
-          courses.each do |course|
+        all_course_ids = migrateable_course_ids.to_a
+        all_course_ids.in_groups_of(1000) do |course_ids|
+          Course.where(id: course_ids).each do |course|
             migrate_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
           end
         end
       end
 
       def perform_audit
-        migrateable_courses.find_in_batches do |courses|
-          courses.each do |course|
+        all_course_ids = migrateable_course_ids.to_a
+        all_course_ids.in_groups_of(1000) do |course_ids|
+          Course.where(id: course_ids).each do |course|
             audit_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
           end
         end
@@ -341,9 +351,9 @@ module DataFixup::Auditors
       # taking a long time, grades parallelism
       # could actually be increased very substantially overnight
       # as they will not try to overwrite each other.
-      DEFAULT_PARALLELISM_GRADES = 200
-      DEFAULT_PARALLELISM_COURSES = 100
-      DEFAULT_PARALLELISM_AUTHS = 50
+      DEFAULT_PARALLELISM_GRADES = 20
+      DEFAULT_PARALLELISM_COURSES = 10
+      DEFAULT_PARALLELISM_AUTHS = 5
       LOG_PREFIX = "Auditors PG Backfill - ".freeze
       SCHEDULAR_TAG = "DataFixup::Auditors::Migrate::BackfillEngine#perform"
       WORKER_TAGS = [
