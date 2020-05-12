@@ -416,6 +416,7 @@ Canvas::Plugin.register('inst_fs', nil, {
   :version => '0.0.1',
   :settings => {
     :migration_rate => 0,
+    :service_worker => false,
   },
   :settings_partial => 'plugins/inst_fs_settings',
   :validator => 'InstFsValidator'

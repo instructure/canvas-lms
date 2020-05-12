@@ -51,6 +51,13 @@ class FileAuthenticator
     Digest::MD5.hexdigest("#{@user&.global_id}|#{@acting_as&.global_id}|#{@oauth_host}")
   end
 
+  def instfs_bearer_token
+    InstFS.bearer_token({
+      user: @user,
+      acting_as: @acting_as
+    })
+  end
+
   def download_url(attachment)
     return nil unless attachment
     migrate_legacy_attachment_to_instfs(attachment)
