@@ -332,8 +332,9 @@
             rails_env:       '<%= Rails.env %>',
         }
 
+        // This Pendo account ID uses the LTI consumer key from Maven
         let account = {
-            id:  '<%= ENV["CANVAS_DOMAIN"] %>'
+            id:  '<%= SettingsService.get_settings(object: 'school', id: 1)['pendo_account_id'] || ENV['CANVAS_DOMAIN'] %>'
         }
 
         pendo.initialize({ visitor: visitor, account: account }); })('18d9cdc9-0b28-4f89-7c87-e4d3802e665f');
