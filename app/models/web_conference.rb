@@ -474,12 +474,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.active_conference_type_names
-    plugin_names = WebConference.plugins.map{|p| p.id.classify}
-    if Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
-      plugin_names + ['LtiConference']
-    else
-      plugin_names
-    end
+    WebConference.plugins.map{|p| p.id.classify}
   end
 
   scope :active, -> { where(:conference_type => WebConference.active_conference_type_names) }

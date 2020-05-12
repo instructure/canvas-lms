@@ -383,13 +383,13 @@ describe WebConference do
       end
 
       context ".active scope" do
-        it "should include LTI conferences" do
+        it "should not include LTI conferences" do
           conference = course.web_conferences.create! do |c|
             c.user = user
             c.conference_type = 'LtiConference'
             c.lti_settings = { tool_id: tool.id }
           end
-          expect(WebConference.active.pluck(:id)).to include conference.id
+          expect(WebConference.active.pluck(:id)).not_to include conference.id
         end
       end
 

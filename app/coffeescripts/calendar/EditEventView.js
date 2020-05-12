@@ -287,7 +287,15 @@ export default class EditCalendarEventView extends Backbone.View {
     if (ENV.CALENDAR?.CONFERENCES_ENABLED) {
       const conference = this.model.get('web_conference')
       if (conference) {
-        eventData.web_conference = conference
+        eventData.web_conference = {
+          ...conference,
+          title:
+            conference.conference_type === 'LtiConference' ? eventData.title : conference.title,
+          user_settings: {
+            ...conference.user_settings,
+            scheduled_date: eventData.start_at ? eventData.start_at.toISOString() : null
+          }
+        }
       } else {
         eventData.web_conference = ''
       }

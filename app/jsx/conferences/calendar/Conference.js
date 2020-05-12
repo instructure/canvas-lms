@@ -29,6 +29,7 @@ import sanitizeHtml from 'jsx/shared/sanitizeHtml'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import I18n from 'i18n!conferences'
 import webConference from 'jsx/shared/proptypes/webConference'
+import webConferenceType from 'jsx/shared/proptypes/webConferenceType'
 
 // we use this to consolidate the import of tinymce into our environment
 // (as recommended by jsx/shared/sanitizeHTML)
@@ -53,16 +54,24 @@ const HtmlConference = ({conference, html, removeConference, removeButtonRef}) =
   )
 }
 
-const LinkConference = ({conference, removeConference, removeButtonRef}) => {
+const LinkConference = ({conference, conferenceType, removeConference, removeButtonRef}) => {
   let url
   if (conference.lti_settings?.url) {
     url = conference.lti_settings.url
   } else if (conference.url) {
     url = `${conference.url}/join`
   }
+  let title = I18n.t('%{name} Conference', {
+    name: (conferenceType && conferenceType.name) || ''
+  })
+
+  if (conference.conference_type === 'LtiConference') {
+    title = conference.title || I18n.t('Conference')
+  }
+
   const iconURL = conference.lti_settings?.icon?.url
   const icon = iconURL && <Img src={iconURL} margin="0 x-small 0 0" height="20px" width="20px" />
-  const text = <TruncateText>{conference.title || I18n.t('Conference')}</TruncateText>
+  const text = <TruncateText>{title}</TruncateText>
 
   return (
     <Flex direction="row">
@@ -91,7 +100,7 @@ const LinkConference = ({conference, removeConference, removeButtonRef}) => {
             size="small"
             withBorder={false}
             withBackground={false}
-            screenReaderLabel={I18n.t('Remove conference: %{title}', {title: conference.title})}
+            screenReaderLabel={I18n.t('Remove conference: %{title}', {title})}
             onClick={() => removeConference()}
           >
             <IconXLine />
@@ -102,10 +111,11 @@ const LinkConference = ({conference, removeConference, removeButtonRef}) => {
   )
 }
 
-const Conference = ({conference, removeConference, removeButtonRef}) =>
+const Conference = ({conference, conferenceType, removeConference, removeButtonRef}) =>
   conference.conference_type === 'LtiConference' && conference.lti_settings?.type === 'html' ? (
     <HtmlConference
       conference={conference}
+      conferenceType={conferenceType}
       html={conference.lti_settings.html}
       removeConference={removeConference}
       removeButtonRef={removeButtonRef}
@@ -113,6 +123,7 @@ const Conference = ({conference, removeConference, removeButtonRef}) =>
   ) : (
     <LinkConference
       conference={conference}
+      conferenceType={conferenceType}
       removeConference={removeConference}
       removeButtonRef={removeButtonRef}
     />
@@ -120,6 +131,7 @@ const Conference = ({conference, removeConference, removeButtonRef}) =>
 
 Conference.propTypes = {
   conference: webConference.isRequired,
+  conferenceType: webConferenceType,
   removeConference: PropTypes.func,
   removeButtonRef: PropTypes.func
 }

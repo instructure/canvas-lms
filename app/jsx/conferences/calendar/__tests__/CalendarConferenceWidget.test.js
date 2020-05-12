@@ -32,7 +32,7 @@ describe('CalendarConferenceWidget', () => {
     {type: 'bar', name: 'Bar', contexts: ['course_1']}
   ]
 
-  const conference = {title: 'Meet Today!', conference_type: 'foo'}
+  const conference = {title: 'Meet Today!', conference_type: 'LtiConference'}
 
   function makeParams(overrides = {}) {
     return {
