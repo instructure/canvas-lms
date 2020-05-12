@@ -162,16 +162,25 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     view = []
     user_ids = Set.new
     Shackles.activate(use_master ? :master : :slave) do
-      all_entries.find_each do |entry|
-        json = discussion_entry_api_json([entry], discussion_topic.context, nil, nil, []).first
-        entry_lookup[entry.id] = json
-        user_ids << entry.user_id
-        user_ids << entry.editor_id if entry.editor_id
-        if parent = entry_lookup[entry.parent_id]
-          parent['replies'] ||= []
-          parent['replies'] << json
-        else
-          view << json
+      # this process can take some time, and doing the "find_each"
+      # approach holds the connection open the whole time, which
+      # is a problem if the bouncer pool is small.  By grabbing
+      # ids and querying in batches, the connection gets recycled
+      # properly in between postgres queries.
+      entry_ids = all_entries.pluck(:id)
+      entry_ids.in_groups_of(1000) do |entry_id_batch|
+        entry_batch = DiscussionEntry.where(id: entry_id_batch).order(all_entries.order_values)
+        entry_batch.each do |entry|
+          json = discussion_entry_api_json([entry], discussion_topic.context, nil, nil, []).first
+          entry_lookup[entry.id] = json
+          user_ids << entry.user_id
+          user_ids << entry.editor_id if entry.editor_id
+          if parent = entry_lookup[entry.parent_id]
+            parent['replies'] ||= []
+            parent['replies'] << json
+          else
+            view << json
+          end
         end
       end
     end
