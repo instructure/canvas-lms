@@ -242,6 +242,20 @@ module DataFixup::Auditors::Migrate
         Delayed::Job.delete_all
       end
 
+      it "only uses accounts with an active root account" do
+        a1 = account_model(root_account_id: nil, workflow_state: 'active')
+        a2 = account_model(root_account_id: nil, workflow_state: 'deleted')
+        a3 = account_model(root_account_id: a1.id, workflow_state: 'active')
+        a4 = account_model(root_account_id: a2.id, workflow_state: 'active')
+        start_date = Time.zone.today
+        end_date = start_date - 1.day
+        ids = BackfillEngine.new(start_date, end_date).slim_accounts.map(&:id)
+        expect(ids).to include(a1.id)
+        expect(ids).to include(a3.id)
+        expect(ids).to_not include(a2.id)
+        expect(ids).to_not include(a4.id)
+      end
+
       it "stops enqueueing after one day with a low threshold" do
         start_date = Time.zone.today
         end_date = start_date - 1.year
