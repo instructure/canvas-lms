@@ -810,25 +810,13 @@ class GradebooksController < ApplicationController
       return
     end
 
-    if Account.site_admin.feature_enabled?(:submissions_reupload_status_page)
-      submission_zip_params = {uploaded_data: params[:submissions_zip]}
-      assignment.generate_comments_from_files_later(submission_zip_params, @current_user)
+    submission_zip_params = {uploaded_data: params[:submissions_zip]}
+    assignment.generate_comments_from_files_later(submission_zip_params, @current_user)
 
-      redirect_to named_context_url(@context, :submissions_upload_context_gradebook_url, assignment.id)
-      return
-    end
-
-    @assignment = assignment
-    @comments, @failures = @assignment.generate_comments_from_files_legacy(params[:submissions_zip].path, @current_user)
-    flash[:notice] = t('notices.uploaded',
-                       { :one => "Files and comments created for 1 submission",
-                         :other => "Files and comments created for %{count} submissions" },
-                       :count => @comments.length)
+    redirect_to named_context_url(@context, :submissions_upload_context_gradebook_url, assignment.id)
   end
 
   def show_submissions_upload
-    return render status: :not_found unless Account.site_admin.feature_enabled?(:submissions_reupload_status_page)
-
     return unless authorized_action(@context, @current_user, :manage_grades)
 
     @assignment = @context.assignments.active.find(params[:assignment_id])

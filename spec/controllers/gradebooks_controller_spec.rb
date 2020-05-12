@@ -1699,7 +1699,6 @@ describe GradebooksController do
     end
 
     before :each do
-      Account.site_admin.enable_feature!(:submissions_reupload_status_page)
       user_session(@teacher)
     end
 
@@ -1736,13 +1735,6 @@ describe GradebooksController do
       user_session(@student)
       get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
       assert_unauthorized
-    end
-
-    it "returns not_found when the 'submissions_reupload_status_page' feature is off" do
-      Account.site_admin.disable_feature!(:submissions_reupload_status_page)
-      assert_page_not_found do
-        get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
-      end
     end
   end
 
