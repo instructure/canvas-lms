@@ -69,6 +69,20 @@ module DataFixup::Auditors::Migrate
       expect { worker.perform }.to_not raise_exception
     end
 
+    it "handles missing submissions" do
+      submission = submission_model
+      user = user_model
+      expect(submission.id).to_not be_nil
+      expect(user.id).to_not be_nil
+      worker = GradeChangeWorker.new(account.id, Time.now.utc)
+      filtered = worker.filter_dead_foreign_keys([
+        {'student_id' => user.id, 'grader_id' => user.id, 'submission_id' => 0},
+        {'student_id' => user.id, 'grader_id' => user.id, 'submission_id' => submission.id},
+      ])
+      expect(filtered.size).to eq(1)
+      expect(filtered[0]['submission_id']).to eq(submission.id)
+    end
+
     it "writes course data to postgres that's in cassandra" do
       ::Auditors::ActiveRecord::CourseRecord.delete_all
       user_with_pseudonym(active_all: true)
