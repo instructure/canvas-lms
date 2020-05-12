@@ -26,12 +26,18 @@ class ErrorReport < ActiveRecord::Base
   serialize :data, Hash
 
   before_save :guess_email
+  before_save :truncate_enormous_fields
 
   # Define a custom callback for external notification of an error report.
   define_callbacks :on_send_to_external
 
   def send_to_external
     run_callbacks(:on_send_to_external)
+  end
+
+  def truncate_enormous_fields
+    self.message = message.truncate(1024, omission: '...<truncated>') if message
+    data['exception_message'] = data['exception_message'].truncate(1024, omission: '...<truncated>') if data['exception_message']
   end
 
   class Reporter
