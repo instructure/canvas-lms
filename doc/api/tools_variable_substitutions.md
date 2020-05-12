@@ -160,6 +160,20 @@ particular placement:
    </cartridge_basiclti_link>
 ```
 # Supported Substitutions
+## com.instructure.User.observees
+If the current user is an observer in the launch
+context, this substitution returns a comma-separated
+list of user IDs linked to the current user for
+observing.
+
+Returns an empty string otherwise.
+
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *com_instructure_user_observees*  
+
+```
+ "86157096483e6b3a50bfedc6bac902c0b20a824f","c0ddd6c90cbe1ef0f32fbce5c3bf654204be186c"
+```
 ## Context.title
 The title of the context.
 
