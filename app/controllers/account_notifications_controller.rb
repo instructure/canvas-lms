@@ -80,7 +80,11 @@ class AccountNotificationsController < ApplicationController
 
   # @API Index of active global notification for the user
   # Returns a list of all global notifications in the account for the current user
-  # Any notifications that have been closed by the user will not be returned
+  # Any notifications that have been closed by the user will not be returned, unless
+  # a include_past parameter is passed in as true.
+  #
+  # @argument include_past [Boolean]
+  #   Include past and dismissed global announcements.
   #
   # @example_request
   #   curl -H 'Authorization: Bearer <token>' \
@@ -88,7 +92,8 @@ class AccountNotificationsController < ApplicationController
   #
   # @returns [AccountNotification]
   def user_index
-    notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
+    include_past = value_to_boolean(params[:include_past]) && @domain_root_account.feature_enabled?('past_announcements')
+    notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_past: include_past)
     render :json => account_notifications_json(notifications, @current_user, session)
   end
 

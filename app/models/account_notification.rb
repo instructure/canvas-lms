@@ -66,10 +66,10 @@ class AccountNotification < ActiveRecord::Base
     end
   end
 
-  def self.for_user_and_account(user, root_account)
+  def self.for_user_and_account(user, root_account, include_past: false)
     Shackles.activate(:slave) do
       if root_account.site_admin?
-        current = self.for_account(root_account)
+        current = self.for_account(root_account, include_past: include_past)
       else
         course_ids = user.enrollments.active_or_pending.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
         # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
@@ -79,7 +79,7 @@ class AccountNotification < ActiveRecord::Base
           joins(:account).where(accounts: {workflow_state: 'active'}).
           distinct.pluck(:account_id).uniq
         all_account_ids = Account.multi_account_chain_ids(all_account_ids) # get all parent sub-accounts too
-        current = self.for_account(root_account, all_account_ids)
+        current = self.for_account(root_account, all_account_ids, include_past: include_past)
       end
 
       user_role_ids = {}
@@ -123,16 +123,18 @@ class AccountNotification < ActiveRecord::Base
       end
 
       user.shard.activate do
-        closed_ids = user.get_preference(:closed_notifications) || []
-        # If there are ids marked as 'closed' that are no longer
-        # applicable, they probably need to be cleared out.
-        current_ids = current.map(&:id)
-        if !(closed_ids - current_ids).empty?
-          Shackles.activate(:master) do
-            user.set_preference(:closed_notifications, closed_ids & current_ids)
+        unless include_past
+          closed_ids = user.get_preference(:closed_notifications) || []
+          # If there are ids marked as 'closed' that are no longer
+          # applicable, they probably need to be cleared out.
+          current_ids = current.map(&:id)
+          unless (closed_ids - current_ids).empty?
+            Shackles.activate(:master) do
+              user.set_preference(:closed_notifications, closed_ids & current_ids)
+            end
           end
+          current.reject! { |announcement| closed_ids.include?(announcement.id) }
         end
-        current.reject! { |announcement| closed_ids.include?(announcement.id) }
 
         # filter out announcements that have a periodic cycle of display,
         # and the user isn't in the set of users to display it to this month (based
@@ -154,11 +156,14 @@ class AccountNotification < ActiveRecord::Base
     end
   end
 
-  def self.for_account(root_account, all_visible_account_ids=nil)
+  def self.for_account(root_account, all_visible_account_ids=nil, include_past: false)
     # Refreshes every 10 minutes at the longest
     all_account_ids_hash = Digest::MD5.hexdigest all_visible_account_ids.try(:sort).to_s
     Rails.cache.fetch(['account_notifications4', root_account, all_account_ids_hash].cache_key, expires_in: 10.minutes) do
       now = Time.now.utc
+      end_at = now - 4.months if include_past
+      end_at ||= now
+
       # we always check the given account for the flag, even if the announcement is from the site_admin account
       # this allows us to make a global announcement that is filtered to only accounts with this flag
       enabled_flags = ACCOUNT_SERVICE_NOTIFICATION_FLAGS & root_account.allowed_services_hash.keys.map(&:to_s)
@@ -169,7 +174,7 @@ class AccountNotification < ActiveRecord::Base
       end
 
       Shard.partition_by_shard(account_ids) do |sharded_account_ids|
-        scope = AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", sharded_account_ids, now, now).
+        scope = AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", sharded_account_ids, now, end_at).
           where("required_account_service IS NULL OR required_account_service IN (?)", enabled_flags).
           order('start_at DESC').
           preload({:account => :root_account}, account_notification_roles: :role)
