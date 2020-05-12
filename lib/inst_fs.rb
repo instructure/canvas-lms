@@ -26,6 +26,10 @@ module InstFS
       rand < Canvas::Plugin.find('inst_fs').settings[:migration_rate].to_f / 100.0
     end
 
+    def service_worker_enabled?
+      Canvas::Plugin.value_to_boolean(Canvas::Plugin.find('inst_fs').settings[:service_worker])
+    end
+
     def migrate_attachment?(attachment)
       enabled? && !attachment.instfs_hosted? && Attachment.s3_storage? && check_migration_rate?
     end
@@ -45,6 +49,15 @@ module InstFS
       CanvasHttp.delete(logout_url(user))
     rescue CanvasHttp::Error => e
       Canvas::Errors.capture_exception(:page_view, e)
+    end
+
+    def bearer_token(options)
+      expires_in = options[:expires_in] || Setting.get('instfs.session_token.expiration_minutes', '5').to_i.minutes
+      claims = {
+        iat: Time.now.utc.to_i,
+        user_id: options[:user]&.global_id&.to_s
+      }
+      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret, :HS512)
     end
 
     def authenticated_url(attachment, options={})
