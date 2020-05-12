@@ -193,4 +193,76 @@ describe AssignmentUtil do
       expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
     end
   end
+
+  describe 'process_due_date_reminder' do
+    it 'alerts students who have not submitted' do
+      expect(described_class).to receive(:alert_unaware_student) \
+        .with(assignment: assignment, student: @student)
+
+      described_class.process_due_date_reminder('Assignment', assignment.id)
+    end
+
+    it 'does not alert students who have seen the assignment within the last 3 days' do
+      expect(described_class).not_to receive(:alert_unaware_student)
+
+      AssetUserAccess.create!({
+        asset_category: 'assignments',
+        asset_code: assignment.asset_string,
+        context: @course,
+        last_access: 1.day.ago,
+        user_id: @student,
+      })
+
+      described_class.process_due_date_reminder('Assignment', assignment.id)
+    end
+
+    it 'alerts students who have not submitted, even if they have seen the assignment sometime in the past' do
+      expect(described_class).to receive(:alert_unaware_student)
+
+      AssetUserAccess.create!({
+        asset_category: 'assignments',
+        asset_code: assignment.asset_string,
+        context: @course,
+        last_access: 4.days.ago,
+        user_id: @student,
+      })
+
+      described_class.process_due_date_reminder('Assignment', assignment.id)
+    end
+
+    it 'does not notify students in other sections' do
+      section_a = @course.course_sections.create!
+      section_a_user_1 = student_in_course(active_all: true, section: section_a).student
+      section_a_user_2 = student_in_course(active_all: true, section: section_a).student
+      section_a_ao = create_section_override_for_assignment(assignment, course_section: section_a)
+
+      section_b = @course.course_sections.create!
+      section_b_user_1 = student_in_course(active_all: true, section: section_b).student
+      section_b_ao = create_section_override_for_assignment(assignment, course_section: section_b)
+
+      expect(described_class).to receive(:alert_unaware_student) \
+        .with(assignment: assignment, student: section_a_user_1)
+
+      expect(described_class).to receive(:alert_unaware_student) \
+        .with(assignment: assignment, student: section_a_user_2)
+
+      described_class.process_due_date_reminder(section_a_ao.class.name, section_a_ao.id)
+    end
+
+    it 'does nothing if assignment could not be found' do
+      expect(described_class).not_to receive(:alert_unaware_student)
+      described_class.process_due_date_reminder('Assignment', 'asdfasdf')
+    end
+
+    it 'does nothing if assignment override could not be found' do
+      expect(described_class).not_to receive(:alert_unaware_student)
+      described_class.process_due_date_reminder('AssignmentOverride', 'asdfasdf')
+    end
+
+    it 'does nothing if assignment has no due date' do
+      expect(described_class).not_to receive(:alert_unaware_student)
+      assignment.update_attribute(:due_at, nil)
+      described_class.process_due_date_reminder('Assignment', assignment.id)
+    end
+  end
 end
