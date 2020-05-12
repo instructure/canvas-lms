@@ -460,7 +460,8 @@ pipeline {
           rspec.uploadSeleniumFailures()
           rspec.uploadRSpecFailures()
           load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
-          load('build/new-jenkins/groovy/splunk.groovy').uploadEvent('jenkins.build.duration', ['duration': "$currentBuild.duration"])
+          def splunk = load 'build/new-jenkins/groovy/splunk.groovy'
+          splunk.upload([splunk.eventForBuildDuration(currentBuild.duration)])
         }
       }
     }

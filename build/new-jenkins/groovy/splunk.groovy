@@ -23,9 +23,9 @@ import groovy.json.*
 // Splunk can take one or more events:
 // the json objects are simply concatenated if there are multiple (no [] and no commas)
 def upload(events) {
-  def data = events.collect { new JsonBuilder(it).toString() }.join('')
+  logEvents(events)
   load('build/new-jenkins/groovy/credentials.groovy').withSplunkCredentials({
-    sh "build/new-jenkins/splunk_event.sh '$data'"
+    sh "build/new-jenkins/splunk_event.sh '${new JsonBuilder(events).toString()}'"
   })
 }
 
@@ -37,17 +37,27 @@ def event(name, fields) {
   ]
 }
 
-def uploadEvent(name, fields) {
-  upload([event(name, fields)])
-}
-
 // Rerun category is a string describing which rerun retry this test failure was
 def eventForTestFailure(test, rerun_category) {
   return event('jenkins.test.failure', ['test': test, 'rerun_category': rerun_category])
 }
 
+def eventForBuildDuration(duration) {
+  return event('jenkins.build.duration', ['duration': duration])
+}
+
+def eventForStageDuration(name, duration) {
+  return event('jenkins.stage.duration', ['stage': name, 'duration': duration])
+}
+
+def eventForNodeWait(node, duration) {
+  return event('jenkins.node.wait', ['node': node, 'duration': duration])
+}
+
 def logEvents(events) {
-  println("Uploading events: ${new JsonBuilder(events).toPrettyString()}")
+  def displaySize = 10
+  def displayEventsString = new JsonBuilder(events.take(displaySize)).toPrettyString()
+  println("Uploading ${events.size()} events to splunk (showing ${displaySize} events): ${displayEventsString}")
 }
 
 return this

@@ -152,12 +152,10 @@ def buildFailureCategories(htmlFiles) {
   if (htmlFiles.size() > 0) {
     htmlFiles.each { file ->
       def category = file.getPath().split("/")[3]
-      if (failureCategories.containsKey("${category}")) {
-        failureCategories.get("${category}").add("${file}")
-      } else {
-        failureCategories.put("${category}", [])
-        failureCategories.get("${category}").add("${file}")
+      if (!failureCategories.containsKey(category)) {
+        failureCategories[category] = []
       }
+      failureCategories[category] += file
     }
   }
   return failureCategories
@@ -189,7 +187,6 @@ def uploadSplunkFailures(failureCategories) {
       splunkFailureEvents.add(splunk.eventForTestFailure(spec, category))
     }
   }
-  splunk.logEvents(splunkFailureEvents)
   splunk.upload(splunkFailureEvents)
 }
 
