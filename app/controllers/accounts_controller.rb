@@ -1549,7 +1549,8 @@ class AccountsController < ApplicationController
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
                                    {:usage_rights_required => [:value, :locked] }.freeze,
-                                   :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view].freeze
+                                   :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
+                                   :smart_alerts_threshold].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,

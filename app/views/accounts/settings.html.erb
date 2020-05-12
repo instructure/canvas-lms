@@ -751,24 +751,27 @@ acknowledge that you have read and agreed to the
 
         <%= render partial: 'external_integration_keys', locals: { f: f } %>
 
-        <% if @account.root_account? && @account.root_account.feature_enabled?(:smart_alerts) %>
+        <% if @account.root_account &&
+              @account.root_account.feature_enabled?(:smart_alerts) &&
+              can_do(@account, @current_user, :manage_alerts)
+        %>
           <fieldset>
-            <h2 class="screenreader-only"><%= t('Smart Alerts') %></h2>
-            <legend><%= t('Smart Alerts') %></legend>
+            <h2 class="screenreader-only"><%= t('Smart Assignment Alerts') %></h2>
+            <legend><%= t('Smart Assignment Alerts') %></legend>
             <%= f.fields_for :settings do |settings| %>
               <table class="formtable narrow">
                 <tr>
                   <td>
                     <label for="smart_alerts_threshold">
-                      <%= I18n.t('Threshold (in hours) to notify students within') %>
+                      <%= I18n.t('Hours (from due date) before students are alerted') %>
                     </label>
                   </td>
                   <td>
-                    <% # TODO: read from account in KNO-443 %>
                     <%= settings.select :smart_alerts_threshold,
                       options_for_select(
-                        smart_alerts_threshold_options,
-                        '36h'
+                        # ref: KNO-231
+                        %w[ 12 24 36 48 ].map { |x| [ x, x ] },
+                        @account.settings.fetch(:smart_alerts_threshold, '36')
                       )
                     %>
                   </td>
