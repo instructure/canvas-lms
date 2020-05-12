@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative '../common'
+require_relative 'page_objects/content_migration_page'
+require_relative 'page_objects/select_content_page'
 
 def visit_page
   @course.reload
@@ -83,11 +85,7 @@ def test_selective_content(source_course=nil)
   wait_for_ajaximations
 
 
-  if source_course
-    run_migration
-  else
-    import
-  end
+  source_course ? run_migration : import
 
   visit_page
 
@@ -218,7 +216,7 @@ describe "content migrations", :non_parallel do
       Account.clear_special_account_cache!(true)
       @copy_from = course_factory
       @copy_from.update_attribute(:name, 'copy from me')
-      data = File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip')
+      data = File.read(File.dirname(__FILE__) + '/../../fixtures/migration/cc_full_test.zip')
 
       cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
       cm.migration_settings = {:import_immediately => true,
@@ -388,6 +386,75 @@ describe "content migrations", :non_parallel do
       submit
 
       test_selective_content(@copy_from)
+    end
+
+    context "with selectable_outcomes_in_course_copy enabled" do
+      before do
+        @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
+        root = @copy_from.root_outcome_group(true)
+        outcome_model(context: @copy_from, title: 'root1')
+
+        group = root.child_outcome_groups.create!(context: @copy_from, title: 'group1')
+        outcome_model(context: @copy_from, outcome_group: group, title: 'non-root1')
+
+        subgroup = group.child_outcome_groups.create!(context: @copy_from, title: 'subgroup1')
+        outcome_model(context: @copy_from, outcome_group: subgroup, title: 'non-root2')
+        outcome_model(context: @copy_from, outcome_group: subgroup, title: 'non-root3')
+      end
+
+      after do
+        @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
+      end
+
+      def test_selective_outcome(source_course=nil)
+        visit_page
+
+        # Open selective dialog
+        ContentMigrationPage.selective_content
+
+        # Expand learning outcomes
+        SelectContentPage.outcome_options(0)
+
+        # Expand first group
+        SelectContentPage.outcome_options(1)
+
+        # Select subgroup
+        SelectContentPage.outcome_checkboxes(2)
+
+        # Submit selection
+        SelectContentPage.submit_button
+
+        source_course ? run_migration : import
+
+        visit_page
+
+        # root + subgroup1
+        expect(@course.learning_outcome_groups.count).to eq 2
+        groups = @course.root_outcome_group.child_outcome_groups
+        expect(groups.count).to eq 1
+        subgroup1 = groups.first
+        expect(subgroup1.title).to eq 'subgroup1'
+
+        # non-root2 + non-root3
+        expect(@course.created_learning_outcomes.count).to eq 2
+        outcome_links = subgroup1.child_outcome_links
+        expect(outcome_links.map(&:learning_outcome_content).map(&:short_description)).to match_array([
+          'non-root2', 'non-root3'
+        ])
+      end
+
+      it "should selectively copy outcomes" do
+        visit_page
+
+        select_migration_type
+        wait_for_ajaximations
+
+        click_option('#courseSelect', @copy_from.id.to_s, :value)
+        ContentMigrationPage.selective_imports(1)
+        submit
+
+        test_selective_outcome(@copy_from)
+      end
     end
 
     it "should set day substitution and date adjustment settings", priority: "1", test_id: 2891737 do
@@ -612,7 +679,7 @@ describe "content migrations", :non_parallel do
     cm.migration_type = 'common_cartridge_importer'
     cm.save!
 
-    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_full_test.zip")
+    package_path = File.join(File.dirname(__FILE__) + "/../../fixtures/migration/cc_full_test.zip")
     attachment = Attachment.new
     attachment.context = cm
     attachment.filename = "file.zip"
