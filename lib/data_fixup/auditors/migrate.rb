@@ -316,9 +316,13 @@ module DataFixup::Auditors
         user_ids = (student_ids + grader_ids).uniq
         existing_user_ids = User.where(id: user_ids).pluck(:id)
         missing_uids = user_ids - existing_user_ids
-        attrs_list.reject do |h|
+        filtered_attrs_list = attrs_list.reject do |h|
           missing_uids.include?(h['student_id']) || missing_uids.include?(h['grader_id'])
         end
+        submission_ids = filtered_attrs_list.map{|a| a['submission_id'] }
+        existing_submission_ids = Submission.where(id: submission_ids).pluck(:id)
+        missing_sids = submission_ids - existing_submission_ids
+        filtered_attrs_list.reject {|h| missing_sids.include?(h['submission_id']) }
       end
     end
 
@@ -603,7 +607,11 @@ module DataFixup::Auditors
       end
 
       def slim_accounts
-        @_accounts ||= Account.active.select(:id, :root_account_id)
+        return @_accounts if @_accounts
+        root_account_ids = Account.root_accounts.active.pluck(:id)
+        @_accounts = Account.active.where(
+          "root_account_id IS NULL OR root_account_id IN (?)", root_account_ids
+        ).select(:id, :root_account_id)
       end
 
       def cluster_name
