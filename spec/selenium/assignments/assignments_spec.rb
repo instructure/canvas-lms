@@ -186,6 +186,7 @@ describe "assignments" do
         wait_for_new_page_load { f(".new_assignment").click }
         f('#assignment_name').send_keys(assignment_name)
         f('#assignment_points_possible').send_keys('10')
+        click_option('#assignment_submission_type', 'Online')
         ['#assignment_text_entry', '#assignment_online_url', '#assignment_online_upload'].each do |element|
           f(element).click
         end
