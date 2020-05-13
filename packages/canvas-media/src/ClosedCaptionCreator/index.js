@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component} from 'react'
-import {findDOMNode} from 'react-dom'
 import {arrayOf, func, objectOf, shape, string} from 'prop-types'
 import formatMessage from 'format-message'
 
@@ -69,8 +68,8 @@ export default class ClosedCaptionPanel extends Component {
   }
 
   componentDidUpdate() {
-    // eslint-disable-next-line react/no-find-dom-node
-    if (!findDOMNode(this).contains(document.activeElement)) {
+    if (document.activeElement === document.body) {
+      // where focus goes when it's lost
       if (this._newCreatorRef.current) {
         this._newCreatorRef.current.focus()
       } else if (this._nextCCRef.current) {
@@ -78,6 +77,16 @@ export default class ClosedCaptionPanel extends Component {
       } else {
         this._addButtonRef.current?.focus()
       }
+      // setState in componentDidUpdate is generally bad form,
+      // but in this case it makes sense to clear lastDeletedCCIndex
+      // here in the place where it's just been used to help direct focus.
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState(state => {
+        if (state.lastDeletedCCIndex !== -1) {
+          return {lastDeletedCCIndex: -1}
+        }
+        return null
+      })
     }
   }
 

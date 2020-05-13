@@ -64,6 +64,7 @@ export default function VideoOptionsTray(props) {
     setTitleText(event.target.value)
   }
   function handleDisplayAsChange(event) {
+    event.target.focus()
     setDisplayAs(event.target.value)
   }
   function handleVideoSizeChange(event, selectedOption) {
