@@ -96,6 +96,70 @@ end
 describe "content migrations", :non_parallel do
   include_context "in-process server selenium tests"
 
+  def test_selective_outcome(source_course=nil)
+    visit_page
+
+    # Open selective dialog
+    ContentMigrationPage.selective_content
+
+    # Expand learning outcomes
+    SelectContentPage.outcome_options(0)
+
+    # Expand first group
+    SelectContentPage.outcome_options(1)
+
+    # Select subgroup
+    SelectContentPage.outcome_checkboxes(2)
+
+    # Submit selection
+    SelectContentPage.submit_button
+
+    source_course ? run_migration : import
+
+    visit_page
+
+    # root + subgroup1
+    expect(@course.learning_outcome_groups.count).to eq 2
+    groups = @course.root_outcome_group.child_outcome_groups
+    expect(groups.count).to eq 1
+    subgroup1 = groups.first
+    expect(subgroup1.title).to eq 'subgroup1'
+
+    # non-root2 + non-root3
+    expect(@course.created_learning_outcomes.count).to eq 2
+    outcome_links = subgroup1.child_outcome_links
+    expect(outcome_links.map(&:learning_outcome_content).map(&:short_description)).to match_array([
+      'non-root2', 'non-root3'
+    ])
+  end
+
+  context "canvas cartridge importing" do
+    before :each do
+      course_with_teacher_logged_in
+      @type = 'canvas_cartridge_importer'
+      @filename = 'cc_outcomes.imscc'
+    end
+
+    context "with selectable_outcomes_in_course_copy enabled" do
+      before do
+        @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
+      end
+
+      it "should selectively copy outcomes" do
+        visit_page
+
+        fill_migration_form
+        wait_for_ajaximations
+
+        ContentMigrationPage.selective_imports(1)
+        submit
+        run_migration
+
+        test_selective_outcome
+      end
+    end
+  end
+
   context "common cartridge importing" do
     before :each do
       course_with_teacher_logged_in
@@ -404,43 +468,6 @@ describe "content migrations", :non_parallel do
 
       after do
         @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
-      end
-
-      def test_selective_outcome(source_course=nil)
-        visit_page
-
-        # Open selective dialog
-        ContentMigrationPage.selective_content
-
-        # Expand learning outcomes
-        SelectContentPage.outcome_options(0)
-
-        # Expand first group
-        SelectContentPage.outcome_options(1)
-
-        # Select subgroup
-        SelectContentPage.outcome_checkboxes(2)
-
-        # Submit selection
-        SelectContentPage.submit_button
-
-        source_course ? run_migration : import
-
-        visit_page
-
-        # root + subgroup1
-        expect(@course.learning_outcome_groups.count).to eq 2
-        groups = @course.root_outcome_group.child_outcome_groups
-        expect(groups.count).to eq 1
-        subgroup1 = groups.first
-        expect(subgroup1.title).to eq 'subgroup1'
-
-        # non-root2 + non-root3
-        expect(@course.created_learning_outcomes.count).to eq 2
-        outcome_links = subgroup1.child_outcome_links
-        expect(outcome_links.map(&:learning_outcome_content).map(&:short_description)).to match_array([
-          'non-root2', 'non-root3'
-        ])
       end
 
       it "should selectively copy outcomes" do

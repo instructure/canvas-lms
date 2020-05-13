@@ -88,6 +88,8 @@ module Canvas::Migration::Helpers
         data
       end
 
+      selectable_outcomes = @migration.context.respond_to?(:root_account) &&
+                            @migration.context.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
       content_list = []
       if type
         if match_data = type.match(/submodules_(.*)/)
@@ -101,8 +103,14 @@ module Canvas::Migration::Helpers
           when 'attachments'
             attachment_data(content_list, course_data)
           else
-            course_data[type].each do |item|
-              content_list << item_hash(type, item)
+            processed = false
+            if type == 'learning_outcomes' && selectable_outcomes
+              processed = !outcome_data(content_list, course_data).nil?
+            end
+            unless processed
+              course_data[type].each do |item|
+                content_list << item_hash(type, item)
+              end
             end
           end
         end
@@ -116,13 +124,37 @@ module Canvas::Migration::Helpers
         SELECTIVE_CONTENT_TYPES.each do |type, title|
           if course_data[type] && course_data[type].count > 0
             hash = {type: type, property: "#{property_prefix}[all_#{type}]", title: title.call, count: course_data[type].count}
-            add_url!(hash, type)
+            add_url!(hash, type, selectable_outcomes)
             content_list << hash
           end
         end
       end
 
       content_list
+    end
+
+    # Build learning outcome hierarchy
+    def outcome_data(content_list, course_data)
+      # Earlier exports may not have groups in course data
+      return unless course_data['learning_outcome_groups']
+      outcomes = course_data['learning_outcomes']
+      course_data['learning_outcome_groups'].each do |group|
+        content_list << process_group(group, outcomes)
+      end
+      content_list.concat(
+        outcomes.select {|outcome| outcome['parent_migration_id'] == nil}.map {|outcome| item_hash('learning_outcomes', outcome)}
+      )
+    end
+
+    def process_group(group, outcomes)
+      item = item_hash('learning_outcome_groups', group)
+      item[:sub_items] = group['child_groups'].map do |subgroup|
+        process_group(subgroup, outcomes)
+      end
+      item[:sub_items].concat(
+        outcomes.select {|outcome| outcome['parent_migration_id'] == group['migration_id']}.map {|outcome| item_hash('learning_outcomes', outcome)}
+      )
+      item
     end
 
     # Returns all the assignments in their assignment groups
@@ -313,7 +345,7 @@ module Canvas::Migration::Helpers
     end
 
     def add_url!(hash, type, selectable_outcomes = false)
-      return if !selectable_outcomes && type == 'learning_outcomes' # TODO: remove this when learning outcomes selection ui is finished
+      return if !selectable_outcomes && type == 'learning_outcomes'
       if @base_url
         hash[:sub_items_url] = @base_url + "?type=#{type}"
       end
