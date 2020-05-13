@@ -14,7 +14,7 @@ services:
       SASS_STYLE: 'compressed'
 
   selenium-chrome:
-    image: starlord.inscloudgate.net/jenkins/selenium-chrome:3.141.59-zirconium
+    image: starlord.inscloudgate.net/jenkins/selenium-chrome:3.141.59-20200409
     environment:
       SCREEN_WIDTH: 1680
       SCREEN_HEIGHT: 1050
