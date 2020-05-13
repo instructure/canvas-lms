@@ -172,10 +172,11 @@ module DataFixup::Auditors::Migrate
     end
 
     describe "GradeChangeWorker" do
-      it "pulls courses for an account only if they have enrollments" do
+      it "pulls courses for an account only if they have enrollments and assignments" do
         course1 = course_model(account_id: Account.default.id)
         course2 = course_model(account_id: Account.default.id)
-        enrollment1 = student_in_course(course: course1)
+        student_in_course(course: course1)
+        assignment_model(course: course1)
         worker = GradeChangeWorker.new(Account.default.id, Time.zone.today)
         cids = worker.migrateable_course_ids
         expect(cids.include?(course1.id)).to eq(true)
