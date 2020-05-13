@@ -161,7 +161,7 @@ module CC
     def self.create_canvas_assignment(node, assignment, manifest = nil)
       key_generator = manifest || CCHelper
       node.title assignment.title
-      node.due_at CCHelper::ims_datetime(assignment.due_at, nil)
+      node.due_at nil
       node.lock_at CCHelper::ims_datetime(assignment.lock_at, nil)
       node.unlock_at CCHelper::ims_datetime(assignment.unlock_at, nil)
       if assignment.migration_id.present?
