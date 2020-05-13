@@ -111,7 +111,8 @@ module Canvas
       end
 
       def log(msg)
-        Rails.logger.debug "#{self.class} - #{msg}"
+        full_msg = "#{self.class} - #{msg}"
+        Rails.logger ? Rails.logger.debug(full_msg) : puts(full_msg)
       end
 
       def handle_compression(file, options, compression_algorithm='gzip')
