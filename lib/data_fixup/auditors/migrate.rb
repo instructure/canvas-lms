@@ -287,9 +287,10 @@ module DataFixup::Auditors
       end
 
       def migrateable_course_ids
-        account.courses.where("EXISTS (?)",
-          Enrollment.where("course_id=courses.id").where(type: ['StudentEnrollment', 'StudentViewEnrollment']))
-          .where("courses.created_at <= ?", @date + 2.days).pluck(:id)
+        s_scope = Submission.where("course_id=courses.id").where("updated_at > ?", @date - 7.days)
+        account.courses.active.where(
+          "EXISTS (?)", s_scope).where(
+          "courses.created_at <= ?", @date + 2.days).pluck(:id)
       end
 
       def perform_migration
