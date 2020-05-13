@@ -226,6 +226,10 @@ module SIS
                     raise ImportError, pseudo.errors.first.join(" ")
                   end
                 end
+
+                if SettingsService.get_settings(object: 'school', id: 1)['identity_server_enabled']
+                  user.save_with_identity_server_create!(user_row.email)
+                end
               end
             rescue => e
               Canvas::Errors.capture_exception(:sis_import, e)

@@ -2133,6 +2133,8 @@ class UsersController < ApplicationController
          {:address => address, :user_id => user_id, :user_name => user_name, :account_id => account_id, :account_name => account_name}
         end
         errored_users << user_hash.merge(:errors => [{:message => "Matching user(s) already exist"}], :existing_users => existing_users)
+      elsif SettingsService.get_settings(object: 'school', id: 1)['identity_server_enabled'] && user.save_with_identity_server_create!(user_hash[:email])
+        invited_users << user_hash.merge(:id => user.id)
       elsif user.save
         invited_users << user_hash.merge(:id => user.id)
       else
@@ -2470,10 +2472,10 @@ class UsersController < ApplicationController
       end
 
       if SettingsService.get_settings(object: 'school', id: 1)["identity_server_enabled"]
-        @user.run_identity_validations = true
+        @user.save_with_identity_server_create!(@pseudonym.unique_id)
+      else
+        @user.save!
       end
-
-      @user.save!
 
       if @observee && !@user.user_observees.where(user_id: @observee).exists?
         @user.user_observees << @user.user_observees.create_or_restore(user_id: @observee)
