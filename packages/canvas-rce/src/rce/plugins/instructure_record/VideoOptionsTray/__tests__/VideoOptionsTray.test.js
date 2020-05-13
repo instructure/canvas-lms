@@ -144,6 +144,13 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       expect(tray.$closedCaptionPanel).toBeInTheDocument()
     })
 
+    it('does not steal focus when changing other parts of the tray', () => {
+      renderComponent()
+      tray.$titleTextField.focus()
+      tray.setTitleText('hello')
+      expect(tray.$titleTextField).toBe(document.activeElement)
+    })
+
     it('is not displayed when feature flag is false', () => {
       window.ENV.FEATURES.cc_in_rce_video_tray = false
       renderComponent()
