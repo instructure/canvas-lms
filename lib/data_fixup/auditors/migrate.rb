@@ -442,7 +442,7 @@ module DataFixup::Auditors
         end
 
         def parallelism_key(auditor_type)
-          "auditors_migration_#{auditor_type}/#{cluster_name}_num_strands"
+          "auditors_migration_#{auditor_type}_num_strands"
         end
 
         def check_parallelism
@@ -631,13 +631,13 @@ module DataFixup::Auditors
           # auth records are stored at the root account level,
           # we only need to enqueue these jobs for root accounts
           auth_worker = AuthenticationWorker.new(account.id, current_date)
-          conditionally_enqueue_worker(auth_worker, ["auditors_migration_authentications", cluster_name])
+          conditionally_enqueue_worker(auth_worker, "auditors_migration_authentications")
         end
 
         course_worker = CourseWorker.new(account.id, current_date)
-        conditionally_enqueue_worker(course_worker, ["auditors_migration_courses", cluster_name])
+        conditionally_enqueue_worker(course_worker, "auditors_migration_courses")
         grade_change_worker = GradeChangeWorker.new(account.id, current_date)
-        conditionally_enqueue_worker(grade_change_worker, ["auditors_migration_grade_changes", cluster_name])
+        conditionally_enqueue_worker(grade_change_worker, "auditors_migration_grade_changes")
       end
 
       def enqueue_one_day(current_date)
