@@ -2015,6 +2015,13 @@ $(document).ready(function() {
     .change()
 
   $quiz_options_form
+    .find('#time_limit_option')
+    .change(function() {
+      $('label[for="quiz_disable_timer_autosubmission"]').showIf($(this).attr('checked'))
+    })
+    .change()
+
+  $quiz_options_form
     .find('#multiple_attempts_option')
     .change(function(event) {
       $('#multiple_attempts_suboptions').showIf($(this).attr('checked'))

@@ -430,6 +430,7 @@ describe ContentMigration do
         :shuffle_answers => true,
         :show_correct_answers => true,
         :time_limit => 20,
+        :disable_timer_autosubmission => true,
         :allowed_attempts => 4,
         :scoring_policy => 'keep_highest',
         :quiz_type => 'survey',

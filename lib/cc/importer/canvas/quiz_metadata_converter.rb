@@ -59,6 +59,7 @@ module CC::Importer::Canvas
         require_lockdown_browser
         require_lockdown_browser_for_results
         shuffle_answers
+        disable_timer_autosubmission
         available
         cant_go_back
         one_question_at_a_time
