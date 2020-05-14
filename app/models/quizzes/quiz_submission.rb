@@ -899,4 +899,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     # or Submission objects, and so results should always be shown to the student.
     quiz.ungraded? || !!submission&.posted?
   end
+
+  def end_at_without_time_limit
+    quiz.build_submission_end_at(self, false)
+  end
 end
