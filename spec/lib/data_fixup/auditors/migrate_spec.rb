@@ -279,8 +279,7 @@ module DataFixup::Auditors::Migrate
 
       it "buckets settings by JOB cluster" do
         pk = BackfillEngine.parallelism_key("grade_changes")
-        # because default shard has a nil job id
-        expect(pk).to eq("auditors_migration_grade_changes/#{Shard.current.database_server.id}_num_strands")
+        expect(pk).to eq("auditors_migration_grade_changes_num_strands")
       end
 
       it "wont enqueue complete jobs" do
