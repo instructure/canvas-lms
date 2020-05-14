@@ -856,6 +856,8 @@ CanvasRails::Application.routes.draw do
     end
   end
 
+  get 'account_notifications' => 'account_notifications#render_past_global_announcements'
+
   scope '/profile' do
     post 'toggle_disable_inbox' => 'profile#toggle_disable_inbox'
     get 'profile_pictures' => 'profile#profile_pics', as: :profile_pics

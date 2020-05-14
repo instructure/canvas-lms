@@ -211,6 +211,23 @@ describe UserProfile do
       end
     end
 
+    describe "past_announcements flag" do
+      it "should show announcements tab" do
+        student_in_course(active_all: true)
+        account.enable_feature!(:past_announcements)
+        tabs = @student.profile.
+          tabs_available(@student, root_account: account)
+        expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_PAST_GLOBAL_ANNOUNCEMENTS
+      end
+      it "should not show announcements tab when disabled" do
+        student_in_course(:active_all => true)
+        account.disable_feature!(:past_announcements)
+        tabs = @student.profile.
+          tabs_available(@student, root_account: account)
+        expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_PAST_GLOBAL_ANNOUNCEMENTS
+      end
+    end
+
     describe "QR mobile login" do
       before :once do
         user_factory(active_all: true)

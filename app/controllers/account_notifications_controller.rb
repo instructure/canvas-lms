@@ -101,6 +101,30 @@ class AccountNotificationsController < ApplicationController
     user_index
   end
 
+  def render_past_global_announcements
+    add_crumb(@current_user.short_name, profile_path)
+    add_crumb(t("Global Announcements"))
+    js_env(global_notifications: html_to_string)
+    @show_left_side = true
+    @context = @current_user.profile
+    set_active_tab('past_global_announcements')
+    js_bundle :past_global_notifications
+    render html: '', layout: true
+  end
+
+  def html_to_string
+    @for_display = true
+    coll = AccountNotification.for_user_and_account(@current_user, @domain_root_account, :include_past => true)
+
+    coll_active = render_to_string(:partial => 'shared/account_notification',
+      :collection => coll.select { |item| item.end_at > Time.now.utc })
+
+    coll_past = render_to_string(:partial => 'shared/account_notification',
+      :collection => coll.select { |item| item.end_at < Time.now.utc })
+
+      {active: coll_active, past: coll_past}
+  end
+
   # @API Show a global notification
   # Returns a global notification for the current user
   # A notification that has been closed by the user will not be returned
