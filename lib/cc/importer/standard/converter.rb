@@ -94,6 +94,7 @@ module CC::Importer::Standard
     end
 
     def find_file_migration_id(path)
+      return unless path.present?
       mig_id = @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
         @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
 
@@ -167,6 +168,10 @@ module CC::Importer::Standard
                 val.gsub!(FILEBASE_REGEX, '')
                 if new_url = get_canvas_att_replacement_url(val, resource_dir)
                   node[attr] = URI::escape(new_url)
+
+                  if node.text.strip.blank? && !node.at_css("img") # add in the filename if the link is blank and doesn't have something visible like an image
+                    node.inner_html = HtmlTextHelper.escape_html(File.basename(val)) + (node.inner_html || "")
+                  end
                 end
               else
                 if ImportedHtmlConverter.relative_url?(val)

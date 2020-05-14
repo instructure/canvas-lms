@@ -717,4 +717,16 @@ describe "other cc files" do
       expect(@course.reload.syllabus_body).to include("<p>beep beep</p>")
     end
   end
+
+  describe "empty file link name inference" do
+    it "should add the file name to empty links in html content" do
+      import_cc_file("cc_empty_link.zip")
+      assmt = @course.assignments.where(:migration_id => "assignment1").first
+      file = @course.attachments.where(:migration_id => "file1").first
+      doc = Nokogiri::HTML::DocumentFragment.parse(assmt.description)
+      link = doc.at_css("a")
+      expect(link.attr('href')).to include("courses/#{@course.id}/files/#{file.id}")
+      expect(link.text.strip).to eq file.display_name
+    end
+  end
 end
