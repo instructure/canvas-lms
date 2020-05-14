@@ -25,6 +25,7 @@ import {Checkbox, TextInput} from '@instructure/ui-forms'
 import {Grid} from '@instructure/ui-layout'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import CanvasSelect from '../../shared/components/CanvasSelect'
+import SearchableSelect from 'jsx/shared/components/SearchableSelect'
 import I18n from 'i18n!account_course_user_search'
 import preventDefault from 'compiled/fn/preventDefault'
 import {propType as termsPropType} from '../store/TermsStore'
@@ -43,16 +44,11 @@ const termGroups = {
 }
 
 const allTermsGroup = (
-  <CanvasSelect.Group key="allGroup" id="allGroup" label={I18n.t('Show courses from')}>
-    <CanvasSelect.Option key="all" id="all" value="">
+  <SearchableSelect.Group key="allGroup" id="allGroup" label={I18n.t('Show courses from')}>
+    <SearchableSelect.Option key="all" id="all" value="">
       {I18n.t('All Terms')}
-    </CanvasSelect.Option>
-  </CanvasSelect.Group>
-)
-const loadingTermsOption = (
-  <CanvasSelect.Option key="loading" id="loading" value="loading" disabled>
-    {I18n.t('Loading more terms...')}
-  </CanvasSelect.Option>
+    </SearchableSelect.Option>
+  </SearchableSelect.Group>
 )
 
 export default function CoursesToolbar({
@@ -80,20 +76,17 @@ export default function CoursesToolbar({
         termGroups,
         (label, key) =>
           groupedTerms[key] && (
-            <CanvasSelect.Group key={key} id={key} label={label}>
+            <SearchableSelect.Group key={key} id={key} label={label}>
               {groupedTerms[key].map(term => (
-                <CanvasSelect.Option key={term.id} id={term.id} value={term.id}>
+                <SearchableSelect.Option key={term.id} id={term.id} value={term.id}>
                   {term.name}
-                </CanvasSelect.Option>
+                </SearchableSelect.Option>
               ))}
-            </CanvasSelect.Group>
+            </SearchableSelect.Group>
           )
       )
     )
   )
-  if (terms.loading) {
-    termOptions.push(loadingTermsOption)
-  }
 
   return (
     <div>
@@ -104,14 +97,16 @@ export default function CoursesToolbar({
               <Grid colSpacing="small" rowSpacing="small" startAt="large">
                 <Grid.Row>
                   <Grid.Col width={4}>
-                    <CanvasSelect
+                    <SearchableSelect
                       id="termFilter"
+                      placeholder="Filter by term"
+                      isLoading={terms.loading}
                       label={<ScreenReaderContent>{I18n.t('Filter by term')}</ScreenReaderContent>}
                       value={draftFilters.enrollment_term_id}
-                      onChange={(e, value) => onUpdateFilters({enrollment_term_id: value})}
+                      onChange={(e, {value}) => onUpdateFilters({enrollment_term_id: value})}
                     >
                       {termOptions}
-                    </CanvasSelect>
+                    </SearchableSelect>
                   </Grid.Col>
                   <Grid.Col width={2}>
                     <CanvasSelect
