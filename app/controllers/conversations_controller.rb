@@ -1094,7 +1094,7 @@ class ConversationsController < ApplicationController
       when 'unread'
         @current_user.conversations.unread
       when 'starred'
-        @current_user.conversations.starred
+        @current_user.starred_conversations
       when 'sent'
         @current_user.all_conversations.sent
       when 'archived'

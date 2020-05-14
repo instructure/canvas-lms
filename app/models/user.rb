@@ -188,6 +188,10 @@ class User < ActiveRecord::Base
     all_conversations.visible.order("last_message_at DESC, conversation_id DESC")
   end
 
+  def starred_conversations
+    all_conversations.order("updated_at DESC, conversation_id DESC").starred
+  end
+
   def page_views(options={})
     PageView.for_user(self, options)
   end
