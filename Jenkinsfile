@@ -40,6 +40,10 @@ def getImageTagVersion() {
   flags.getImageTagVersion()
 }
 
+def getPublishableTagSuffix() {
+  load('build/new-jenkins/groovy/configuration.groovy').publishableTagSuffix()
+}
+
 def runDatadogMetric(name, body) {
   def dd = load('build/new-jenkins/groovy/datadog.groovy')
   dd.runDataDogForMetric(name,body)
@@ -122,14 +126,17 @@ pipeline {
     BUILD_REGISTRY_FQDN = buildRegistryFQDN()
     BUILD_IMAGE = "$BUILD_REGISTRY_FQDN/jenkins/canvas-lms"
 
-    // e.g. postgres-9.5-ruby-passenger-2.4-xenial
+    // e.g. postgres-9.5-ruby-passenger-2.6
     TAG_SUFFIX = "postgres-$POSTGRES-ruby-passenger-$RUBY_PASSENGER"
+
+    // this is found in the PUBLISHABLE_TAG_SUFFIX config file on jenkins
+    PUBLISHABLE_TAG_SUFFIX = getPublishableTagSuffix()
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-passenger-2.6
     PATCHSET_TAG = "$BUILD_IMAGE:$NAME-$TAG_SUFFIX"
 
-    // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-passenger-2.4-xenial
-    PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-postgres-9.5-ruby-passenger-2.4-xenial"
+    // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-passenger-2.6
+    PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-$PUBLISHABLE_TAG_SUFFIX"
 
     // e.g. canvas-lms:master when not on another branch
     MERGE_TAG = "$CANVAS_LMS_IMAGE:$GERRIT_BRANCH"

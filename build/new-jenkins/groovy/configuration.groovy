@@ -25,6 +25,10 @@ def fscPropagate() {
   return raw != null && raw == '1'
 }
 
+def publishableTagSuffix() {
+  return findVariable('PUBLISHABLE_TAG_SUFFIX', true)
+}
+
 /**
  * this is a standard way of finding configuration from different places.
  * the checks happen in this order:
