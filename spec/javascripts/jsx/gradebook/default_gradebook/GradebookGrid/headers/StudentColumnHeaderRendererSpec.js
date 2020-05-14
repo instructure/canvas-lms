@@ -49,7 +49,6 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
     setFixtureHtml($container)
 
     gradebook = createGradebook({
-      additional_sort_options_enabled: false,
       login_handle_name: 'a_jones',
       sis_name: 'Example SIS'
     })
@@ -94,17 +93,6 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
     test('includes the login handle name from Gradebook', () => {
       render()
       equal(component.props.loginHandleName, 'a_jones')
-    })
-
-    test('sets includeAdditionalSortOptions to true if Gradebook enables additional sort options', () => {
-      gradebook.options.additional_sort_options_enabled = true
-      render()
-      strictEqual(component.props.includeAdditionalSortOptions, true)
-    })
-
-    test('sets includeAdditionalSortOptions to false if Gradebook does not enable additional sort options', () => {
-      render()
-      strictEqual(component.props.includeAdditionalSortOptions, false)
     })
 
     test('includes a callback for keyDown events', () => {

@@ -141,7 +141,6 @@ export default do ->
 
   getCourseFeaturesFromOptions = (options) ->
     {
-      additionalSortOptionsEnabled: options.additional_sort_options_enabled,
       finalGradeOverrideEnabled: options.final_grade_override_enabled
     }
 

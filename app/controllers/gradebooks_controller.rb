@@ -383,7 +383,6 @@ class GradebooksController < ApplicationController
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
-      additional_sort_options_enabled: @context.feature_enabled?(:new_gradebook_sort_options),
       # TODO: remove `api_max_per_page` with TALLY-831
       api_max_per_page: per_page,
 
