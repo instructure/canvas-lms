@@ -1363,7 +1363,15 @@ describe CommunicationChannelsController do
 
     context 'has a push communication channel' do
 
-      let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
+      let(:second_sns_developer_key) do
+        allow(DeveloperKey).to receive(:sns).and_return(sns_developer_key_sns_field)
+        dk = DeveloperKey.default
+        dk.sns_arn = 'secondapparn'
+        dk.save!
+        dk
+      end
+
+      let(:second_sns_access_token) { @user.access_tokens.create!(developer_key: second_sns_developer_key) }
       let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: 'push') }
       before(:each) { sns_channel }
 
@@ -1390,7 +1398,7 @@ describe CommunicationChannelsController do
 
         it 'should only delete specified endpoint', type: :request do
           another_token = 'another'
-          another_endpoint = sns_access_token.notification_endpoints.create!(token: another_token)
+          another_endpoint = second_sns_access_token.notification_endpoints.create!(token: another_token)
 
           api_call(:delete, "/api/v1/users/self/communication_channels/push",
                             {controller: 'communication_channels', action: 'delete_push_token', format: 'json',
@@ -1407,7 +1415,7 @@ describe CommunicationChannelsController do
         end
 
         it 'should delete all endpoints for the given token', type: :request do
-          sns_access_token.notification_endpoints.create!(token: fake_token)
+          second_sns_access_token.notification_endpoints.create!(token: fake_token)
           api_call(:delete, "/api/v1/users/self/communication_channels/push",
                    {controller: 'communication_channels', action: 'delete_push_token', format: 'json',
                     push_token: fake_token}, {push_token: fake_token})

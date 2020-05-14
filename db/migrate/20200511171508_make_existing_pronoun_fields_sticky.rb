@@ -15,13 +15,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AddUniqueIndexToNotificationEndoint < ActiveRecord::Migration[4.2]
+class MakeExistingPronounFieldsSticky < ActiveRecord::Migration[5.2]
   tag :postdeploy
   disable_ddl_transaction!
 
   def up
-    DataFixup::DeleteDuplicateNotificationEndpoints.run
-    add_index :notification_endpoints, [:access_token_id, :arn], algorithm: :concurrently,
-              where: "workflow_state='active'"
+    User.where.not(pronouns: nil).find_each do |u|
+      u.add_sis_stickiness(:pronouns)
+      u.set_sis_stickiness
+      User.where(id: u).update_all(stuck_sis_fields: u.stuck_sis_fields)
+    end
+  end
+
+  def down
+    raise ActiveRecord::IrreversibleMigration
   end
 end
