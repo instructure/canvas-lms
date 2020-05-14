@@ -152,6 +152,8 @@ describe Quizzes::QuizSubmissionsController do
 
       expect(json).to have_key('time_left')
       expect(json['time_left']).to be_within(5.0).of(60 * 60)
+      expect(json).to have_key('end_at')
+      expect(json).to have_key('end_at_without_time_limit')
     end
 
     it "should not backup if no submission can be found" do

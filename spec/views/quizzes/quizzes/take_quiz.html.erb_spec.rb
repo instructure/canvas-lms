@@ -69,4 +69,20 @@ describe '/quizzes/quizzes/take_quiz' do
 
     expect(response).to include 'preview of the published version'
   end
+
+  it 'should render timer_autosubmit_disabled value in template' do
+    course_with_student
+    view_context
+    quiz = assign(:quiz, @course.quizzes.create!(description: 'Hello'))
+    sub = assign(:submission, quiz.generate_submission(@user))
+    assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(
+      quiz,
+      sub,
+      params
+    ))
+    render 'quizzes/quizzes/take_quiz'
+    doc = Nokogiri::HTML(response.body)
+    expect(doc.css('.timer_autosubmit_disabled').first.content.strip).not_to be_nil
+    expect(response).not_to be_nil
+  end
 end

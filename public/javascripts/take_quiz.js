@@ -55,6 +55,11 @@ var quizSubmission = (function() {
     $countdownSeconds = $('.countdown_seconds'),
     $timeRunningTimeRemaining = $('.time_running,.time_remaining'),
     $lastSaved = $('#last_saved_indicator')
+  const $timerAutosubmitDisabled = $('.timer_autosubmit_disabled'),
+    timerAutosubmitDisabledParsed = $timerAutosubmitDisabled.text() === 'true',
+    $endAtWithoutTimeLimit = $('.end_at_without_time_limit'),
+    endAtWithoutTimeLimitParsed =
+      $endAtWithoutTimeLimit.text() && new Date($endAtWithoutTimeLimit.text())
   // $('.time_running,.time_remaining') is probably not yet loaded at the time
   const $timeRunningFunc = function() {
     if ($timeRunningTimeRemaining.length > 0) return $timeRunningTimeRemaining
@@ -73,6 +78,10 @@ var quizSubmission = (function() {
     currentlyBackingUp: false,
     endAt,
     endAtParsed,
+    timerAutosubmitDisabledParsed,
+    endAtWithoutTimeLimitParsed,
+    timeToEndWithoutTimeLimit:
+      endAtWithoutTimeLimitParsed && endAtWithoutTimeLimitParsed - new Date(),
     startedAt,
     hasTimeLimit: !!ENV.QUIZ.time_limit,
     timeLeft: parseInt($('.time_left').text()) * 1000,
@@ -177,6 +186,12 @@ var quizSubmission = (function() {
                 quizSubmission.endAtParsed = endAtFromServer
               }
             }
+            // if timer autosubmission is disabled, we need to know when the fallback autosubmission time is
+            if (data && data.end_at_without_time_limit) {
+              quizSubmission.endAtWithoutTimeLimitParsed = Date.parse(
+                data.end_at_without_time_limit
+              )
+            }
           },
           // Error callback
           (resp, ec) => {
@@ -252,7 +267,7 @@ var quizSubmission = (function() {
           $countdownSeconds.text(s)
         }
 
-        if (s <= 0 && !quizSubmission.submitting) {
+        if (s <= 0 && !quizSubmission.submitting && quizSubmission.shouldSubmitAtEndAt()) {
           quizSubmission.submitting = true
           quizSubmission.submitQuiz()
         }
@@ -269,6 +284,31 @@ var quizSubmission = (function() {
         quizSubmission.showWarnings(currentTimeLeft)
       }
       quizSubmission.updateTimeDisplay(currentTimeLeft)
+
+      // if timer autosubmission is disabled, as a fallback we still autosubmit at the next end_at time
+      if (quizSubmission.endAtWithoutTimeLimitParsed) {
+        quizSubmission.timeToEndWithoutTimeLimit -= quizSubmission.clockInterval
+      }
+      if (
+        quizSubmission.timerAutosubmitDisabledParsed &&
+        !!quizSubmission.endAtWithoutTimeLimitParsed &&
+        quizSubmission.endAtWithoutTimeLimitParsed.getTime() !==
+          quizSubmission.endAtParsed.getTime() &&
+        quizSubmission.timeToEndWithoutTimeLimit < 1000 &&
+        !quizSubmission.submitting
+      ) {
+        quizSubmission.submitting = true
+        quizSubmission.submitQuiz()
+      }
+    },
+
+    shouldSubmitAtEndAt() {
+      return (
+        !quizSubmission.timerAutosubmitDisabledParsed ||
+        (!!quizSubmission.endAtWithoutTimeLimitParsed &&
+          quizSubmission.endAtWithoutTimeLimitParsed.getTime() ===
+            quizSubmission.endAtParsed.getTime())
+      )
     },
 
     floorTimeLeft(timeLeft) {
@@ -373,7 +413,7 @@ var quizSubmission = (function() {
             opacity: 0.7
           },
           close() {
-            if (!quizSubmission.submitting) {
+            if (!quizSubmission.submitting && quizSubmission.shouldSubmitAtEndAt()) {
               quizSubmission.submitting = true
               quizSubmission.submitQuiz()
             }

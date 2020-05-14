@@ -115,6 +115,13 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
               </label>
             </div>
 
+            <% if @context.root_account.feature_enabled?(:timer_without_autosubmission) %>
+              <label class="checkbox" for="quiz_disable_timer_autosubmission" style="margin-left:12px;<%= hidden if @quiz.time_limit.blank? %>">
+                <%= check_box :quiz, :disable_timer_autosubmission %>
+                <%= t("Disable Automatic Submission") %>
+              </label>
+            <% end %>
+
             <div class="quiz_survey_setting" style="<%= hidden unless @quiz.survey? %>">
               <label class="checkbox" for="quiz_anonymous_submissions">
                 <%= check_box :quiz, :anonymous_submissions %>
