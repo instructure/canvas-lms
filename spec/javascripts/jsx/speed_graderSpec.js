@@ -6930,12 +6930,12 @@ QUnit.module('SpeedGrader', rootHooks => {
 
             permissionsHooks.beforeEach(() => {
               originalConcluded = window.jsonData.context.concluded
-              originalWorflowState = SpeedGrader.EG.currentStudent.submission.workflow_state
+              originalWorkflowState = SpeedGrader.EG.currentStudent.submission.workflow_state
               SpeedGrader.EG.currentStudent.submission.workflow_state = 'graded'
             })
 
             permissionsHooks.afterEach(() => {
-              SpeedGrader.EG.currentStudent.submission.workflow_state = originalWorflowState
+              SpeedGrader.EG.currentStudent.submission.workflow_state = originalWorkflowState
               window.jsonData.context.concluded = originalConcluded
             })
 
