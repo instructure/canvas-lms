@@ -32,7 +32,7 @@ import PandaPubPoller from '../util/PandaPubPoller'
 import { matchingToolUrls } from './LtiAssignmentHelpers'
 
 canManage = () ->
-  ENV.PERMISSIONS.manage
+  ENV.PERMISSIONS?.manage
 
 isAdmin = () ->
   _.includes(ENV.current_user_roles, 'admin')
