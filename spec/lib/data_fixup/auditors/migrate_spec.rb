@@ -171,6 +171,17 @@ module DataFixup::Auditors::Migrate
       end
     end
 
+    describe "AuditorWorker" do
+      it "selects a date range of a week around target date" do
+        # aligns sunday to sunday
+        date = Date.civil(2020, 5, 15)
+        worker = AuthenticationWorker.new(Account.default.id, date)
+        cassandra_args = worker.cassandra_query_options
+        expect(cassandra_args[:oldest].strftime("%Y-%m-%d %H:%M:%S")).to eq("2020-05-10 00:00:00")
+        expect(cassandra_args[:newest].strftime("%Y-%m-%d %H:%M:%S")).to eq("2020-05-17 00:00:00")
+      end
+    end
+
     describe "GradeChangeWorker" do
       it "pulls courses for an account only if they have enrollments and assignments" do
         course1 = course_model(account_id: Account.default.id)
@@ -199,6 +210,9 @@ module DataFixup::Auditors::Migrate
         cell = worker.migration_cell
         expect(cell).to be_nil
         worker.perform
+        expect(::Auditors::ActiveRecord::MigrationCell.count).to eq(7)
+        expect(::Auditors::ActiveRecord::MigrationCell.all.pluck(:completed)).to eq([true] * 7)
+        expect(::Auditors::ActiveRecord::MigrationCell.all.pluck(:failed)).to eq([false] * 7)
         cell = worker.migration_cell
         expect(cell.id).to_not be_nil
         expect(cell.auditor_type).to eq("authentication")
@@ -297,10 +311,12 @@ module DataFixup::Auditors::Migrate
       end
 
       context "when enqueued" do
+        let(:start_date) { Time.zone.today }
+        let(:end_date) { start_date - 1.year }
+        let(:engine) { BackfillEngine.new(start_date, end_date) }
+        let(:sched_job){ Delayed::Job.first }
+
         before(:each) do
-          start_date = Time.zone.today
-          end_date = start_date - 1.year
-          engine = BackfillEngine.new(start_date, end_date)
           Delayed::Job.enqueue(engine)
           Setting.set(engine.class.queue_setting_key, -1)
         end
@@ -310,9 +326,22 @@ module DataFixup::Auditors::Migrate
           expect(Delayed::Job.first.tag).to eq(BackfillEngine::SCHEDULAR_TAG)
         end
 
-        context "rescheduling" do
-          let(:sched_job){ Delayed::Job.first }
+        context "filling queue" do
+          it "schedules multiple jobs a week apart" do
+            Setting.set(engine.class.queue_setting_key, 10)
+            Delayed::Job.first.update(locked_by: 'test_run', locked_at: Time.now.utc)
+            d_worker = Delayed::Worker.new
+            d_worker.perform(sched_job)
+            expect(Delayed::Job.count).to eq(10)
+            dates = engine.class.backfill_jobs.pluck(:handler).map{|h| YAML.unsafe_load(h).instance_variable_get(:@date) }.uniq
+            sorted = dates.sort
+            expect(sorted.size).to eq(3)
+            expect((sorted[1] - sorted[0]).to_i.days).to eq(7.days)
+            expect((sorted[2] - sorted[1]).to_i.days).to eq(7.days)
+          end
+        end
 
+        context "rescheduling" do
           before(:each) do
             d_worker = Delayed::Worker.new
             sched_job.update(locked_by: 'test_run', locked_at: Time.now.utc)
