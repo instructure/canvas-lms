@@ -1757,7 +1757,9 @@ da:
     default_name: "Intet navn"
   add_cc_subtitle_a9ef4a66: "Tilføj undertekst"
   add_collaboration_da9665ac: "Tilføj samarbejde"
+  add_conference_7bcc625b: "Tilføj konference"
   add_conferences_from_calendar_98cb86b1: "Tilføj konferencer fra kalender"
+  add_conferencing_9f4ccded: "Tilføj konferencer"
   add_contact_method_d2dfea03: "Tilføj kontaktmetode"
   add_content_58b4305a: "Tilføj indhold"
   add_content_to_module_name_589a8d54: "Føj indhold til %{module_name}"
@@ -1795,6 +1797,7 @@ da:
     add_quiz_to: "Tilføj quizzer til %{module}"
     add_topic_to: "Tilføj diskussionsemner til %{module}"
   add_more_e1ffaa65: "Tilføj flere"
+  add_name_db699e72: "Tilføj %{name}"
   add_new_announcement_ddacd624: "Tilføj ny besked"
   add_new_domain_e097d4a0: "Tilføj nyt domæne"
   add_new_group_7ac49f31: "Tilføj ny gruppe"
@@ -1830,6 +1833,7 @@ da:
   add_to_course_481a51c4: "Tilføj til fag ..."
   add_to_student_to_do_58e66b4b: "Tilføj til studerendes opgaveliste"
   add_to_whitelist_24f3f1ba: "Føj til hvidliste"
+  add_toolname_4e17dc90: "Tilføj %{toolName}"
   add_trigger_bc1a0fae: "Tilføj udløser"
   add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Tilføj bruger med e-mailadresse, login-ID, eller SIS-ID."
   add_user_e73e8e50: "Tilføj bruger"
@@ -2065,6 +2069,7 @@ da:
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillader duplikering af moduler i Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Tillader duplikering af objekter i Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillader duplikering af kalenderbegivenheder"
+  allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Tillader, at den manglende politik-applikator udsender submission_updated live-begivenheder for hver aflevering, der markeres som manglende."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillad planlægning af tilbagevendende kalenderbegivenheder"
   allows_the_user_to_navigate_away_while_submission__276d73b7: "Lader brugeren navigere væk, mens afleveringen bliver genindsendt"
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Gør det muligt for en bruger at få adgang til og redigere admin-indstillinger i Commons. Gør det muligt for en bruger at oprette og administrere grupper. Gør det muligt for en bruger at administrere delte ressourcer på kontoen."
@@ -2415,6 +2420,7 @@ da:
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "Der opstod en fejl under forsøg på at finde LTI-konfigurationen"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "En fejl opstod under opdatering af karakterperiodesæt."
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Der opstod en fejl under ændring af låsestatus for \"%{fileName}\""
+  an_error_occurred_creating_the_conference_fcad5f6f: "Der opstod en fejl under oprettelse af ​​konferencen"
   an_error_occurred_loading_outcomes_data_cfd18b61: "Der opstod en fejl ved indlæsning af læringsudbyttedata."
   an_error_occurred_making_a_network_request_d1bda348: "Der opstod en fejl under oprettelse af en netværksanmodning"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Der opstod en fejl*, læg dit svar ud igen senere"
@@ -2869,6 +2875,7 @@ da:
   assignment_assignment_submission_paper_view_8a4c9776: "Opgave %{assignment} indsendelse papirvisning"
   assignment_assignment_submission_plain_text_view_b217d372: "Opgave %{assignment} indsendelse almindelig tekstvisning"
   assignment_bulk_editing_37248ca4: "Redigering af flere opgaver"
+  assignment_bulk_editing_phase_2_fde6f7d3: "Redigering af flere opgaver - fase 2"
   assignment_comments_e43ed898: Opgavekommentarer
   assignment_configuration_4153cb88: Opgave-konfigurering
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} er blevet bedømt for %{name}."
@@ -3417,6 +3424,18 @@ da:
       locked: Låst
     status: 
       deleting_group: "Sletter gruppe..."
+    student_assignment_overview: 
+      allowed_attempts: "Tilladte forsøg"
+      attempts: Forsøg
+      date_time_by: "%{date} af %{time}"
+      due_at: Forfalder
+      no_due_date: "Ingen afleveringsdato"
+      no_points: Ingen
+      points: Point
+      submission_types: Filtyper
+      submitting: Afleverer
+      turnitin_enabled_short: "(Turnitin aktiveret)"
+      vericite_enabled_short: "(VeriCite aktiveret)"
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -3921,6 +3940,8 @@ da:
   base_url_for_mathman_service_bdd4b10b: "Grundlæggende url for MathMan service"
   based_on_basedon_d6e4f4d7: "Baseret på: %{basedOn}"
   based_on_what_if_scores_the_new_total_is_now_grade_d223be10: "Baseret på hvad-nu-hvis-resultater, bliver det nye samlede resultat %{grade}"
+  batch_edit_6d41d0d7: "Redigering af flere"
+  batch_edit_dates_f1ec3df2: "Redigering af flere datoer"
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 eksporter .zip-fil"
   bb_name: "Blackboard Converter"
@@ -5282,6 +5303,7 @@ da:
                 studerende. Broadcast realtids-audio og -video, del præsentationer, giv
                 demonstrationer af applikationer og online-ressourcer
                 og mere.
+  conference_36b50fda: Konference
   conference_selection_ea4050bb: Konferencevalg
   conference_was_deleted_30869390: "Konferencen blev slettet"
   conferences: 
@@ -5355,6 +5377,8 @@ da:
               Premium BigBlueButton, eller brug en af følgende videokonferenceudbydere.  Kontakt din lokale
               admin for yderligere vejledning.
   conferences_tutorial_tray_6f071ce2: "Selvstudiumområde for konferencer"
+  conferencing_6a6d9b55: Konferencer
+  conferencing_b69e2537: "Konferencer:"
   confetti_for_on_time_submissions_394e16ce: "Konfetti for rettidige indsendelser"
   confetti_for_valid_links_7506df83: "Konfetti for gyldige links"
   config_url_e96ceaf3: "Konfig URL"
@@ -6292,6 +6316,9 @@ da:
     one: "1 opgave fundet"
     other: "%{count} opgaver fundet"
     zero: "Der er ikke fundet matchende opgaver."
+  count_assignments_selected_b03891ea: 
+    one: "%{count} opgave valgt"
+    other: "%{count} opgaver valgt"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 opgave med fejl"
     other: "%{count} opgaver med fejl"
@@ -7393,6 +7420,7 @@ da:
   created_group_group_name_2097306b: "Oprettet gruppe %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Oprettelse af en gruppe anvendes endnu ikke i det nye opgave-flow. Gå til den ældre Opgave-side?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Oprettelse af en afleveringseksport giver dig mulighed for at downloade en fil med alle dine opgaveafleveringer i alle dine nuværende og tidligere fag. Dette kan være en stor fil, så det kan tage lidt tid. Du kan navigere væk fra siden og vende tilbage senere."
+  creating_conference_95b59116: "Opretter en konference"
   creating_key_8a026e61: "Opretter nøgle"
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons licens:"
@@ -8937,6 +8965,7 @@ da:
   enrollment_term_7bfe840: Tilmeldingssemester
   enrollment_terms_8753ec11: Tilmeldingssemestre
   enrollments_e250c9c3: Tilmeldinger
+  ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Sørger for, at læringsudbytter, der allerede er blevet importeret til et fag, ikke duplikeres, hvis de importeres igen"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Sørger for, at brugere uden tilladelsen Importer læringsudbytter ikke kan se knappen under fanen Læringsudbytter"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Indtast en farvekode her for at bruge en brugerdefineret farve."
   enter_a_valid_date_46d77547: "Indtast en gyldig dato"
@@ -13109,6 +13138,7 @@ da:
   message_actions_for_conversation_subject_fdb54c88: "Meddelelseshandlinger for diskussion %{subject}"
   message_actions_for_text_27eead86: "Meddelelseshandlinger for %{text}"
   message_body_1f782712: Beskedtekst
+  message_for_name_648f5765: "Besked til %{name}"
   message_groups_who_1ba736f: "Send besked til grupper, der ..."
   message_reply_failed_subject_5d27a0c9: "Beskedsvar mislykkedes: %{subject}"
   message_sent_5e328899: "Besked sendt!"
@@ -14969,6 +14999,7 @@ da:
   missing_eaddacbd: MANGLER
   missing_percent_94534638: "Mangler: %{percent}"
   missing_policies_4f195e0b: "Manglende politikker"
+  missing_policy_applicator_emits_live_events_88b47396: "Manglende politik-applikator udsender live-begivenheder"
   missing_required_description_99a99ff: "Mangler påkrævet beskrivelse"
   missing_required_fields_fields_30e20799: "Mangler påkrævede felter: %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Mangler påkrævede felter. Udfyld alle obligatoriske felter."
@@ -15380,6 +15411,7 @@ da:
   name_4dee4600: ", navn: "
   name_app_has_been_deleted_fb2d9426: "%{name} app er blevet slettet"
   name_badfe525: navn
+  name_conference_8e042dd2: "%{name} konference"
   name_count_users_ccc93c3d: "%{name} (%{count} brugere)"
   name_current_grade_d8da149f: "%{name} nuværende karakter"
   name_current_score_b3198dfa: "%{name} nuværende resultat"
@@ -15549,6 +15581,7 @@ da:
   no_broken_links_found_38d951e3: "Ingen brudte links fundet"
   no_cancel_installation_db8d12d7: "Nej, annuller installation"
   no_collaboration_apps_3bbd30ce: "Ingen samarbejds-apps"
+  no_conferencing_options_enabled_fc00e371: "Ingen konferenceindstillinger aktiveret"
   no_content_5dbc9acf: "Intet indhold"
   no_content_has_been_added_f36bab43: "* Der er ikke blevet tilføjet indhold"
   no_content_has_been_shared_with_you_667fde6c: "Intet indhold er blevet delt med dig."
@@ -15628,6 +15661,7 @@ da:
   no_user_98e6ccc4: "Ingen bruger"
   no_users_found_64a043ff: "Ikke fundet nogen brugere"
   no_users_were_selected_to_add_to_the_course_a51c6083: "Ingen brugere blev valgt til at tilføje til faget"
+  no_valid_lti_resource_was_returned_11f7f91f: "Ingen gyldig LTI-ressource blev returneret"
   no_video_1ed00b26: "Ingen video"
   no_violations_have_been_reported_977a08d1: "Der er ikke rapporteret om overtrædelser."
   no_way_to_export_gradebooks_provided_b4c2939d: "Der gives ingen måde at eksportere karakterbøger på!"
@@ -16530,6 +16564,8 @@ da:
   paraguay_181a5029: Paraguay
   paraguay_595_ca58b83a: "Paraguay (+595)"
   parameters_a13374ec: Parametre
+  parent_assignment_is_not_selected_9efb4ac1: "overordnet opgave er ikke valgt"
+  parent_assignment_is_selected_6a2fbca8: "overordnet opgave er valgt"
   parent_of_a_canvas_user_afba1624: "Forælder til en Canvas-bruger?"
   parent_references_not_found_prior_to_this_row_miss_31723438: "Overordnede henvisninger findes ikke før denne række: %{missing}"
   parent_signup_b7c6bf0a: Forældretilmelding
@@ -19400,6 +19436,7 @@ da:
   redirect_uris_79534b60: "* Omdirigerings-URI'er:"
   redirect_uris_a54bd82f: "Omrediger URI'er:"
   redirected_to_identity_provider_6c4e17d2: "Omdirigeret til identitetsudbyder"
+  reduce_outcome_duplication_on_course_import_26431b40: "Reducer duplikat af læringsudbytter ved fagimport"
   reference_code_3e8355dd: Referencekode
   reference_code_is_required_c32c757f: "Referencekode er påkrævet"
   regardless_of_whether_this_permission_is_enabled_o_437ee269: "Uanset om denne tilladelse er aktiveret eller deaktiveret, kan brugeren stadig administrere begivenheder på sin personlige kalender."
@@ -19478,9 +19515,12 @@ da:
   remove_attribute_59a4aa64: "Fjern egenskab"
   remove_c_name_section_d8eabd3a: "Slet %{c.name} sektion"
   remove_collaborationtitle_c3e81adb: "Fjern \"%{collaborationTitle}\"?"
+  remove_conference_69b9e0d0: "Fjern konference"
   remove_contact_method_ca890ba3: "Fjern kontaktmetode"
   remove_course_association_name_b760c502: "Fjern fag-associationer %{name}"
+  remove_dates_9b9ba2f6: "Fjern datoer"
   remove_domain_from_the_whitelist_14c7d5e9: "Fjern %{domain} fra hvidlisten"
+  remove_due_dates_and_assignment_availability_dates_608cd97b: "Fjern opgavens afleverings- og tilgængelighedsdatoer."
   remove_email_address_b1820820: "Fjern e-mailadresse"
   remove_empty_attachment_b2aea632: "fjern tom vedhæftet fil"
   remove_f47dc62a: Fjern
@@ -20234,13 +20274,17 @@ da:
   select_a_module_optional_7edb5cb0: "Vælg et modul (valgfrit)"
   select_a_predefined_color_c77ab2f5: "Vælg en foruddefineret farve."
   select_a_provisional_grade_7106e3d5: "Vælg en foreløbig karakter"
+  select_all_assignments_bd07b919: "Vælg alle opgaver"
   select_all_count_9ad54aa1: "Vælg alle (%{count})"
   select_all_count_courses_4fc63811: 
     one: "Vælg (%{count}) fag"
     other: "Vælg alle (%{count}) fag"
   select_all_students_7c2c34b3: "Vælg alle studerende"
+  select_an_edit_operation_ec1467d: "Vælg en redigeringshandling"
+  select_assignment_title_4571ffcb: "Vælg opgave: %{title}"
   select_audio_file_7d905cce: "Vælg lydfil"
   select_calendars_d5fa50b6: "Vælg kalendere"
+  select_conference_provider_58c7f7fe: "Vælg konferenceudbyder"
   select_content: "Vælg indhold"
   select_content_checkbox: 
     select_content_error: "Du skal vælge en indholdsmulighed"
@@ -20266,6 +20310,7 @@ da:
   select_course_or_group_ddb2185d: "Vælg fag eller gruppe"
   select_courses_or_groups_1a8b8f66: "Vælg fag eller grupper"
   select_d70f31da: Vælg
+  select_dates_to_remove_be55b14c: "Vælg datoer at fjerne"
   select_embedded_content_type_966f048a: "Vælg indlejret indholdstype"
   select_final_grade_for_moderation_b76a0baf: "Vælg endelig karakter til bedømmelse"
   select_for_list_of_users_who_responded_791ce930: "Vælg for at se liste over brugere, der har svaret."
@@ -21216,6 +21261,8 @@ da:
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "Deling af en QR-kode kan give andre øjeblikkelig adgang til din konto gennem de %{canvas} mobile applikationer."
   she_her_3f459cc2: "Hun / hende"
   she_her_c8b5e3be: "hun / hende"
+  shift_dates_b5a7b7a1: "Skift datoer"
+  shift_due_dates_and_assignment_availability_dates__c5ad272: "Skift opgavens afleverings- og tilgængelighedsdatoer fremad med et antal dage."
   short_name_42f454a1: "Kort navn"
   short_name_ad9bf84f: "kort navn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "skal være selvindlysende, den rapporterende brugers canvas-id"
@@ -22469,6 +22516,7 @@ da:
   there_was_an_error_generating_the_pairing_code_9edd639b: "Der opstod en fejl, da parringskoden skulle genereres"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Der opstod en fejl ved start af værktøj"
   there_was_an_error_in_processing_your_request_6513a49a: "Der opstod en fejl ved behandling af din anmodning"
+  there_was_an_error_joining_the_conference_d2c3e4b0: "Der opstod en fejl under tilslutning til konferencen."
   there_was_an_error_launching_to_the_configured_too_f8ed5767: "Der opstod en fejl ved opstart af det konfigurerede værktøj."
   there_was_an_error_removing_the_image_c83acffe: "Der opstod en fejl under fjernelsen af billedet"
   there_was_an_error_removing_the_item_f8324776: "Der opstod en fejl under fjernelsen af elementet"
@@ -23355,6 +23403,7 @@ da:
     originality_report_visible_after_grading: "Efter opgaven er bedømt"
     originality_report_visible_immediately: Straks
   turnitin_similarity_score_more_information_e2571be8: "Turnitin similarity score -- yderligere oplysninger"
+  turns_on_phase_2_features_for_assignment_bulk_edit_20245881: "Tænder fase 2-funktioner til redigering af flere opgaver"
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: "Indtast en dato, eller brug piletasterne til at navigere datovælgeren."
@@ -23431,6 +23480,7 @@ da:
   unknown_account_74d30b82: "Ukendt konto"
   unknown_answers_9688a2bc: "Ukendte svar"
   unknown_compression_method_b6a850b5: "ukendt komprimeringsmetode"
+  unknown_conference_c4f13ad0: "Ukendt konference"
   unknown_content_type_ae6d08e8: "Ukendt indholdstype"
   unknown_event_7a0bcda3: "Ukendt begivenhed"
   unknown_external_tool_c918e9b2: "Ukendt eksternt værktøj"
@@ -23489,6 +23539,8 @@ da:
   unpublished_click_to_publish_name_10104b5c: "Ikke offentliggjort. Klik for at offentliggøre %{name}"
   unpublished_click_to_publish_title_7c57293f: "Offentliggørelse fjernet.  Klik for at offentliggøre %{title}."
   unpublished_content_referenced_in_this_resource_865f8ef6: "Der refereres til ikke offentliggjort indhold i denne ressource:"
+  unpublished_courses_4299148e: "Ikke offentliggjorte fag"
+  unpublished_courses_count_d35672f0: "Ikke offentliggjorte fag (%{count})"
   unpublished_courses_title: "Ikke offentliggjorte fag"
   unpublished_dfd8801: "Ikke offentliggjort"
   unpublished_drafts_bb352243: "Ikke offentliggjorte kladder"
@@ -23609,6 +23661,7 @@ da:
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Brugsrettighederne indstilles for alle filerne i:"
   use_a_or_new_line_between_for_adding_multiple_user_e7c43ba9: "Brug et \",\" eller en ny linje mellem for at tilføje flere brugere."
   use_arrow_keys_to_navigate_options_2021cc50: "Brug piletasterne til at navigere indstillinger."
+  use_arrow_keys_to_select_a_conference_provider_c5b456a6: "Brug piletasterne til at vælge en konferenceudbyder"
   use_as_front_page_274a488b: "Brug som forside"
   use_between_for_adding_multiple_users_26bff207: "Brug \",\" mellem for at tilføje flere brugere."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Brug bogmærkning til API-sideinddeling i Tilmeldingsindekset"
