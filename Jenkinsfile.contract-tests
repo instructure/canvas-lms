@@ -29,7 +29,6 @@ pipeline {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
     DOCKER_PROCESSES = '6'
     POSTGRES_PASSWORD = 'sekret'
-    JENKINS = 'true'
     PACT_BROKER = credentials('PACT_BROKER')
     PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}"
     PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}"
