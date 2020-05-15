@@ -602,13 +602,18 @@ class GradebooksController < ApplicationController
 
   def set_learning_mastery_env
     set_student_context_cards_js_env
+    visible_sections = if @context.root_account.feature_enabled?(:limit_section_visibility_in_lmgb)
+      @context.sections_visible_to(@current_user)
+    else
+      @context.active_course_sections
+    end
 
     js_env({
       GRADEBOOK_OPTIONS: {
         context_id: @context.id.to_s,
         context_url: named_context_url(@context, :context_url),
         outcome_proficiency: outcome_proficiency,
-        sections: sections_json(@context.active_course_sections, @current_user, session, [], allow_sis_ids: true),
+        sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
         settings: gradebook_settings(@context.global_id),
         settings_update_url: api_v1_course_gradebook_settings_update_url(@context)
       }

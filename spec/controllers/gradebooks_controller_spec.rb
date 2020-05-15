@@ -1487,19 +1487,48 @@ describe GradebooksController do
 
       describe "ENV" do
         before do
-          user_session(@teacher)
-          @proficiency = outcome_proficiency_model(@course.account)
-          @course.root_account.enable_feature! :non_scoring_rubrics
-
           update_preferred_gradebook_view!("learning_mastery")
-          get 'show', params: {course_id: @course.id}
-
-          @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
         end
 
         describe ".outcome_proficiency" do
+          before do
+            @proficiency = outcome_proficiency_model(@course.account)
+            @course.root_account.enable_feature! :non_scoring_rubrics
+
+            get 'show', params: {course_id: @course.id}
+
+            @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+          end
+
           it "is set to the outcome proficiency on the course" do
             expect(@gradebook_env[:outcome_proficiency]).to eq(@proficiency.as_json)
+          end
+        end
+
+        describe ".sections" do
+          before do
+            @section_2 = @course.course_sections.create!
+            teacher_in_section(@section_2, user: @teacher, :limit_privileges_to_course_section => true)
+          end
+
+          let(:returned_section_ids) { gradebook_options.fetch(:sections).pluck(:id) }
+
+          describe "with the :limit_section_visibility_in_lmgb FF enabled" do
+            before do
+              @course.root_account.enable_feature!(:limit_section_visibility_in_lmgb)
+            end
+
+            it "only includes course sections visible to the user" do
+              get :show, params: {course_id: @course.id}
+              expect(returned_section_ids).to contain_exactly(@section_2.id)
+            end
+          end
+
+          describe "with the :limit_section_visibility_in_lmgb FF disabled" do
+            it "includes all course sections" do
+              get :show, params: {course_id: @course.id}
+              expect(returned_section_ids).to match_array([@section_2.id, @course.default_section.id])
+            end
           end
         end
       end
