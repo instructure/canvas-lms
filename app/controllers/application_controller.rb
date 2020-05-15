@@ -316,7 +316,7 @@ class ApplicationController < ActionController::Base
     hash = {
       :id => tool.id,
       :title => tool.label_for(type, I18n.locale),
-      :base_url =>  polymorphic_url([context, :external_tool], url_params)
+      :base_url =>  polymorphic_url([context, :external_tool], url_params),
     }
     hash.merge!(:tool_id => tool.tool_id) if tool.tool_id.present?
 
@@ -324,6 +324,8 @@ class ApplicationController < ActionController::Base
     extension_settings.each do |setting|
       hash[setting] = tool.extension_setting(type, setting)
     end
+    hash[:base_title] = tool.default_label(I18n.locale) if custom_settings.include?(:base_title)
+    hash[:external_url] = tool.url if custom_settings.include?(:external_url)
     hash
   end
   helper_method :external_tool_display_hash

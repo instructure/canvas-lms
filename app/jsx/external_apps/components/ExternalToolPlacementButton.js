@@ -106,6 +106,7 @@ export default class ExternalToolPlacementButton extends React.Component {
       post_grades: I18n.t('Sync Grades'),
       quiz_menu: I18n.t('Quiz Menu'),
       quiz_index_menu: I18n.t('Quizzes Index Menu'),
+      submission_type_selection: I18n.t('Submission Type Selection'),
       student_context_card: I18n.t('Student Context Card'),
       tool_configuration: I18n.t('Tool Configuration'),
       user_navigation: I18n.t('User Navigation'),

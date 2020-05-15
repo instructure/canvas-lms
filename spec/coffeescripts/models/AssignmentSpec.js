@@ -163,7 +163,7 @@ test('returns true if submissionType is "external_tool" and default tool is sele
   equal(assignment.isDefaultTool(), true)
 })
 
-QUnit.module('Assignment#isNonDefaultExternalTool', {
+QUnit.module('Assignment#isGenericExternalTool', {
   setup() {
     fakeENV.setup({
       DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool',
@@ -189,13 +189,13 @@ test('returns true when submissionType is "external_tool" and non default tool i
     }
   })
   assignment.submissionTypes(['external_tool'])
-  equal(assignment.isNonDefaultExternalTool(), true)
+  equal(assignment.isGenericExternalTool(), true)
 })
 
 test('returns true when submissionType is "external_tool"', () => {
   const assignment = new Assignment({name: 'foo'})
   assignment.submissionTypes(['external_tool'])
-  equal(assignment.isNonDefaultExternalTool(), true)
+  equal(assignment.isGenericExternalTool(), true)
 })
 
 QUnit.module('Assignment#isExternalTool')

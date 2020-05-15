@@ -195,7 +195,7 @@ describe "Wiki Pages" do
       file.context = @course
       file.save!
       get "/courses/#{@course.id}/pages/bar/edit"
-      insert_file_from_rce
+      insert_file_from_rce(:wiki_page)
     end
   end
 

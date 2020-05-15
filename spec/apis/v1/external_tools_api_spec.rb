@@ -21,6 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require 'nokogiri'
 
 describe ExternalToolsController, type: :request do
+  before(:once) do
+    Account.default.enable_feature!(:submission_type_tool_placement)
+  end
 
   describe "in a course" do
     before(:once) do
@@ -553,6 +556,7 @@ describe ExternalToolsController, type: :request do
     et.module_group_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "modules group menu", display_type: 'full_width', visibility: 'admins'}
     et.quiz_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz menu", display_type: 'full_width', visibility: 'admins'}
     et.quiz_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz index menu", display_type: 'full_width', visibility: 'admins'}
+    et.submission_type_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "submission type selection", display_type: 'full_width', visibility: 'admins'}
     et.wiki_page_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki page menu", display_type: 'full_width', visibility: 'admins'}
     et.wiki_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki index menu", display_type: 'full_width', visibility: 'admins'}
     et.student_context_card = {:url=>"http://www.example.com/ims/lti/resource", :text => "context card link", display_type: 'full_width', visibility: 'admins'}
@@ -811,6 +815,15 @@ describe ExternalToolsController, type: :request do
       "quiz_index_menu"=> {
         "text"=>"quiz index menu",
         "label"=>"quiz index menu",
+        "url"=>"http://www.example.com/ims/lti/resource",
+        "visibility"=>'admins',
+        "display_type"=>'full_width',
+        "selection_height"=>400,
+        "selection_width"=>800,
+      },
+      "submission_type_selection"=> {
+        "text"=>"submission type selection",
+        "label"=>"submission type selection",
         "url"=>"http://www.example.com/ims/lti/resource",
         "visibility"=>'admins',
         "display_type"=>'full_width',
