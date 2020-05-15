@@ -92,7 +92,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
   restrict_columns :settings, [
-    :quiz_type, :assignment_group_id, :shuffle_answers, :time_limit,
+    :quiz_type, :assignment_group_id, :shuffle_answers, :time_limit, :disable_timer_autosubmission,
     :anonymous_submissions, :scoring_policy, :allowed_attempts, :hide_results,
     :one_time_results, :show_correct_answers, :show_correct_answers_last_attempt,
     :show_correct_answers_at, :hide_correct_answers_at, :one_question_at_a_time,
@@ -147,7 +147,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     @stored_questions = nil
 
     [
-      :shuffle_answers, :could_be_locked, :anonymous_submissions,
+      :shuffle_answers, :disable_timer_autosubmission, :could_be_locked, :anonymous_submissions,
       :require_lockdown_browser, :require_lockdown_browser_for_results,
       :one_question_at_a_time, :cant_go_back, :require_lockdown_browser_monitor,
       :only_visible_to_overrides, :one_time_results, :show_correct_answers_last_attempt
@@ -638,12 +638,12 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.allowed_attempts == -1
   end
 
-  def build_submission_end_at(submission)
+  def build_submission_end_at(submission, with_time_limit=true)
     course = context
     user   = submission.user
     end_at = nil
 
-    if self.time_limit
+    if self.time_limit && with_time_limit
       end_at = submission.started_at + (self.time_limit.to_f * 60.0)
     end
 
@@ -1223,6 +1223,10 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def shuffle_answers_for_user?(user)
     self.shuffle_answers? && !self.grants_right?(user, :manage)
+  end
+
+  def timer_autosubmit_disabled?
+    self.context&.root_account&.feature_enabled?(:timer_without_autosubmission) && self.disable_timer_autosubmission
   end
 
   def access_code_key_for_user(user)
