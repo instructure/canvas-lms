@@ -1673,7 +1673,9 @@ is:
     default_name: "Ekkert nafn"
   add_cc_subtitle_a9ef4a66: "Bæta við skjátexta"
   add_collaboration_da9665ac: "Bæta við samvinnutóli"
+  add_conference_7bcc625b: "Bæta við ráðstefnu"
   add_conferences_from_calendar_98cb86b1: "Bæta við ráðstefnum úr dagatali"
+  add_conferencing_9f4ccded: "Bæti við ráðstefnu"
   add_contact_method_d2dfea03: "Bæta við tengiaðferð"
   add_content_58b4305a: "Bæta við efni"
   add_content_to_module_name_589a8d54: "Bæta efni við %{module_name}"
@@ -1705,6 +1707,7 @@ is:
   add_moderator_review_copy_2nd_e80d458f: "Bæta við mati prófdómara (afrita 2.)"
   add_moderator_review_new_3c183cea: "Bæta við mati prófdómara (nýtt)"
   add_more_e1ffaa65: "Bæta meira við"
+  add_name_db699e72: "Bæta við %{name}"
   add_new_announcement_ddacd624: "Bæta við nýrri tilkynningu"
   add_new_domain_e097d4a0: "Bæta við nýju léni"
   add_new_group_7ac49f31: "Bæta við nýjum hópi"
@@ -1740,6 +1743,7 @@ is:
   add_to_course_481a51c4: "Bæti við námskeiðið..."
   add_to_student_to_do_58e66b4b: "Bæta á verkalista nemanda"
   add_to_whitelist_24f3f1ba: "Bæta við hvítlista"
+  add_toolname_4e17dc90: "Bæta við %{toolName}"
   add_trigger_bc1a0fae: "Bæta við kveikju"
   add_user_e73e8e50: "Bæta við notanda"
   add_user_s_by_b2549f89: "Bæta við notanda(notendum) eftir"
@@ -1973,6 +1977,7 @@ is:
   allows_teacherta_based_roles_to_access_the_attenda_c452f87b: "Gerir kennara/aðstoðarkennara kleift að fá aðgang að mætingu."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Heimilar afritun eininga í Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Gerir mögulega afritun á dagatalaatburðum"
+  allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Gerir vantar stefnustjökum kleift að gefa frá sér submission_updated rauntíma viðburði fyrir hver skil sem merkt eru vantar."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Leyfir áætlunargerð fyrir endurtekna dagatalsviðburði"
   allows_the_user_to_navigate_away_while_submission__276d73b7: "Gerir notanda kleift að fara annað á meðan endurupphleðsla skila er í vinnslu"
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Gerir notanda kleift að fá aðgang að og breyta kerfisstjórastillingum í almenningi. Gerir notanda kleift að búa til og halda utan um hópa. Gerir notanda kleift að halda utan um deild hjálpargögn á reikningnum."
@@ -2320,6 +2325,7 @@ is:
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "Villa kom upp við að reyna að finna LTI stillinguna"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Villa kom upp við uppfærslu á ákveðna einkunnatímabilinu."
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Villa kom upp við breytingu á læstri stöðu \"%{fileName}\""
+  an_error_occurred_creating_the_conference_fcad5f6f: "Villa kom upp við búa til ráðstefnu"
   an_error_occurred_loading_outcomes_data_cfd18b61: "Villa kom upp við upphleðslu niðurstöðugagna."
   an_error_occurred_making_a_network_request_d1bda348: "Villa kom upp við netbeiðni"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Villa kom upp* Birtu svarið þitt síðar."
@@ -2755,6 +2761,7 @@ is:
   assignment_assignment_submission_paper_view_8a4c9776: "Innsending verkefnis %{assignment} pappírssýn"
   assignment_assignment_submission_plain_text_view_b217d372: "Innsending verkefnis %{assignment} einfaldur textahamur"
   assignment_bulk_editing_37248ca4: "Fjölbreyting verkefna"
+  assignment_bulk_editing_phase_2_fde6f7d3: "Fjölbreyting verkefna stig 2"
   assignment_comments_e43ed898: "Athugasemdir með verkefni"
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} var gefin einkunn fyrir %{name}."
   assignment_created_assignment_name_course_name_324a5639: "Verkefni stofnað - %{assignment_name}, %{course_name}"
@@ -3188,6 +3195,18 @@ is:
       vericite: VeriCite
       vericite_enabled: "VeriCite hefur verið heimilað fyrir þetta verkefni."
       vericite_enabled_short: "(VeriCite heimilað)"
+    student_assignment_overview: 
+      allowed_attempts: "Heimilaðar tilraunir"
+      attempts: Tilraunir
+      date_time_by: "%{date} fyrir %{time}"
+      due_at: Skilafrestur
+      no_due_date: "Enginn skiladagur"
+      no_points: Ekkert
+      points: Punktar
+      submission_types: Skráartegundir
+      submitting: "Legg fram"
+      turnitin_enabled_short: "(Turnitin heimilt)"
+      vericite_enabled_short: "(VeriCite heimilt)"
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -3669,6 +3688,8 @@ is:
   base_type_e2840170: Grunngerð
   based_on_basedon_d6e4f4d7: "Byggt á: %{basedOn}"
   based_on_what_if_scores_the_new_total_is_now_grade_d223be10: "Á grunni spáðra einkunna, er nýja samtalan %{grade}"
+  batch_edit_6d41d0d7: Fjölbreyting
+  batch_edit_dates_f1ec3df2: "Fjölbreyta dagsetningum"
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip skrá"
   bb_name: Blackboard-breytir
@@ -4944,6 +4965,7 @@ is:
                 nemendahópum. Útvarpaðu hljóðskrám og myndskrám í
                 rauntíma, miðlaðu kynningarglærum, kenndu á forrit
                 og nettól og fleira.
+  conference_36b50fda: Ráðstefna
   conference_selection_ea4050bb: Ráðstefnuval
   conference_was_deleted_30869390: "Ráðstefnu var eytt"
   conferences: 
@@ -5016,6 +5038,8 @@ is:
               Premium BigBlueButton eða nota eitthvað af eftirfarandi ráðstefnuveitum.  Ráðfærðu þig við næsta
               kerfisstjóra til að fá frekari leiðbeiningar.
   conferences_tutorial_tray_6f071ce2: "Leiðbeiningar með ráðstefnum"
+  conferencing_6a6d9b55: Ráðstefna
+  conferencing_b69e2537: "Ráðstefna:"
   confetti_for_on_time_submissions_394e16ce: "Glitpappír fyrir skil sem koma fyrir settan tíma"
   confetti_for_valid_links_7506df83: "Konfettí fyrir gilda tengla"
   config_url_e96ceaf3: Stillingarvefslóð
@@ -5853,6 +5877,9 @@ is:
     one: "1 verkefni fannst."
     other: "%{count} verkefni fundust."
     zero: "Engin verkefni fundust sem eiga við leit."
+  count_assignments_selected_b03891ea: 
+    one: "%{count} verkefni valið"
+    other: "%{count} verkefni valin"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 verkefni með villum"
     other: "%{count} verkefni með villum"
@@ -6768,6 +6795,7 @@ is:
   created_group_group_name_2097306b: "Stofnaði hópinn %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Að búa til hóp er ekki enn meðhöndlað í nýja verkefnaflæðinu. Fara í Legacy verkefnasíðuna?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Stofnun á útflutningi skila gerir þér kleift að hlaða niður zip-skrá með öllum skiluðum verkefnum þínum í námskeiðum fyrr og síðar. Þetta getur orðið stór skrá og tekið tíma í niðurhali. Þú getur farið af síðunni og komið aftur síðar."
+  creating_conference_95b59116: "Stofna ráðstefnu"
   creating_key_8a026e61: "Bý til lykil"
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons leyfi:"
@@ -8182,6 +8210,7 @@ is:
   enrollment_term_7bfe840: Innritunarönn
   enrollment_terms_8753ec11: Innritunarskilmálar
   enrollments_e250c9c3: "Innritaðir nemendur"
+  ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Tryggir að niðurstöður sem hafa þegar verið fluttar inn í námskeið séu ekki í tvíriti ef þær eru fluttar inn aftur"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Tryggir að notendur án flytja inn niðurstöður leyfis geta ekki séð hnappinn innan niðurstöðu flipans"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Ritaðu hexkóða hérna til að nota sérsniðinn lit."
   enter_a_valid_date_46d77547: "Settu inn gilda dagsetningu"
@@ -11605,6 +11634,7 @@ is:
   message_actions_for_conversation_subject_fdb54c88: "Skilaboðaaðgerðir fyrir samtal %{subject}"
   message_actions_for_text_27eead86: "Skilaboðaaðgerðir fyrir %{text}"
   message_body_1f782712: "Stofn skilaboða"
+  message_for_name_648f5765: "Skilaboð fyrir %{name}"
   message_groups_who_1ba736f: "Senda skilaboð til hópa sem..."
   message_sent_5e328899: "Skilaboð send!"
   message_sent_9ff3a79d: "Skilaboð send!"
@@ -13280,6 +13310,7 @@ is:
   missing_eaddacbd: VANTAR
   missing_percent_94534638: "Vantar: %{percent}"
   missing_policies_4f195e0b: "Vantar stefnur"
+  missing_policy_applicator_emits_live_events_88b47396: "Vantar stefnustjakar gefa frá sér rauntíma viðburði"
   missing_required_description_99a99ff: "Nauðsynlega lýsingu vantar"
   missing_required_fields_fields_30e20799: "Nauðsynlega reiti vantar. %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Nauðsynlega reiti vantar. Fylltu inn í alla nauðsynlega reiti."
@@ -13553,6 +13584,7 @@ is:
   name_4dee4600: ", nafn: "
   name_app_has_been_deleted_fb2d9426: "Forritinu %{name} var eytt"
   name_badfe525: nafn
+  name_conference_8e042dd2: "%{name} Ráðstefna"
   name_count_users_ccc93c3d: "%{name} (%{count} Notendur)"
   name_current_grade_d8da149f: "%{name}núverandi einkunn"
   name_current_score_b3198dfa: "%{name} núverandi einkunn"
@@ -13715,6 +13747,7 @@ is:
   no_broken_links_found_38d951e3: "Engir brotnir tenglar fundust"
   no_cancel_installation_db8d12d7: "Nei, hætta við að hlaða inn"
   no_collaboration_apps_3bbd30ce: "Engin samvinnusmáforrit"
+  no_conferencing_options_enabled_fc00e371: "Engir ráðstefnu valkostir virkjaðir"
   no_content_5dbc9acf: "Ekkert efni"
   no_content_has_been_added_f36bab43: "* Engu efni hefur verið bætt við"
   no_content_has_been_shared_with_you_667fde6c: "Engu efni hefur verið deilt með þér."
@@ -13789,6 +13822,7 @@ is:
   no_user_98e6ccc4: "Enginn notandi"
   no_users_found_64a043ff: "Engir notendur fundust"
   no_users_were_selected_to_add_to_the_course_a51c6083: "Engir notendur valdir til að bæta við námskeiðið"
+  no_valid_lti_resource_was_returned_11f7f91f: "Engu gildu LTI hjálparefni var skilað"
   no_video_1ed00b26: "Ekkert myndband"
   no_violations_have_been_reported_977a08d1: "Engin brot hafa verið tilkynnt."
   no_way_to_export_gradebooks_provided_b4c2939d: "Ekki hægt að flytja út þessar einkunnabækur!"
@@ -14644,6 +14678,8 @@ is:
   paper_view_7405eeab: Pappírssýn
   paraguay_595_ca58b83a: "Paragvæ (+595)"
   parameters_a13374ec: Notendabreytur
+  parent_assignment_is_not_selected_9efb4ac1: "Foreldraverkefni er ekki valið"
+  parent_assignment_is_selected_6a2fbca8: "Foreldraverkefni er valið"
   parent_of_a_canvas_user_afba1624: "Foreldri Canvas notanda?"
   parent_references_not_found_prior_to_this_row_miss_31723438: "Foreldravísanir fundust ekki fyrir þessa röð %{missing}"
   parent_signup_b7c6bf0a: "Skráning foreldris"
@@ -17172,6 +17208,7 @@ is:
   redirect_uris_79534b60: "* Áframsendingar URI:"
   redirect_uris_a54bd82f: "Endurbeindar vefslóðir:"
   redirected_to_identity_provider_6c4e17d2: "Áframsent til auðkennisveitu"
+  reduce_outcome_duplication_on_course_import_26431b40: "Dregur úr tvítekningu niðurstaðna við innflutning námskeiðs"
   reference_code_3e8355dd: Tilvísunarkóði
   reference_code_is_required_c32c757f: "Þarf tilvísunarkóða"
   regardless_of_whether_this_permission_is_enabled_o_437ee269: "Hvort sem þetta leyfi er virkt eða óvirkt getur notandi ennþá stjórnað atburðum á sínu persónulega dagatali."
@@ -17247,9 +17284,12 @@ is:
   remove_attendee_name_55165070: "Fjarlægja þátttakanda %{name}"
   remove_attribute_59a4aa64: "Fjarlægja eiginleika"
   remove_collaborationtitle_c3e81adb: "Fjarlægja \"%{collaborationTitle}\"?"
+  remove_conference_69b9e0d0: "Fjarlægja ráðstefnu"
   remove_contact_method_ca890ba3: "Fjarlægja tengiaðferð"
   remove_course_association_name_b760c502: "Fjarlægja námskeiðstengingu %{name}"
+  remove_dates_9b9ba2f6: "Fjarlægja dagsetningar"
   remove_domain_from_the_whitelist_14c7d5e9: "Fjarlægja %{domain} af hvítlista"
+  remove_due_dates_and_assignment_availability_dates_608cd97b: "Fjarlægja skiladaga og tiltæka daga verkefna."
   remove_email_address_b1820820: "Fjarlægja netfang"
   remove_empty_attachment_b2aea632: "fjarlægja autt viðhengi"
   remove_f47dc62a: Fjarlægja
@@ -17949,12 +17989,16 @@ is:
   select_a_module_optional_7edb5cb0: "Veldu einingu (valkvætt)"
   select_a_predefined_color_c77ab2f5: "Velja forskilgreindan lit."
   select_a_provisional_grade_7106e3d5: "Veldu bráðabirgðaeinkunn"
+  select_all_assignments_bd07b919: "Veldu öll verkefni"
   select_all_count_courses_4fc63811: 
     one: "Velja (%{count}) námskeið"
     other: "Velja öll (%{count}) námskeið"
   select_all_students_7c2c34b3: "Velja alla nemendur"
+  select_an_edit_operation_ec1467d: "Veldu breytingaaðgerð"
+  select_assignment_title_4571ffcb: "Velja verkefni: %{title}"
   select_audio_file_7d905cce: "Velja hljóðskrá"
   select_calendars_d5fa50b6: "Velja dagatöl"
+  select_conference_provider_58c7f7fe: "Veldu ráðstefnuveitu"
   select_content: "Velja efni"
   select_content_checkbox: 
     select_content_error: "Þú verður að velja efniskost"
@@ -17980,6 +18024,7 @@ is:
   select_course_or_group_ddb2185d: "Veldu námskeið eða hóp"
   select_courses_or_groups_1a8b8f66: "Veldu námskeið eða hópa"
   select_d70f31da: Velja
+  select_dates_to_remove_be55b14c: "Veldu dagsetningu til að fjarlægja"
   select_embedded_content_type_966f048a: "Veldu innfellda efnisgerð"
   select_final_grade_for_moderation_b76a0baf: "Veldu lokaeinkannir til þess að meðhöndla"
   select_from_saved_comments_dd398cd4: "Velja úr vistuðum athugasemdum"
@@ -18797,6 +18842,8 @@ is:
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "Deiling á QR kóða getur gefið öðrum samstundis aðgang að reikningi þínum í gegnum %{canvas} farsímaöpp."
   she_her_3f459cc2: Hún/hennar
   she_her_c8b5e3be: hún/hana/henni/hennar
+  shift_dates_b5a7b7a1: "Færa dagsetningar"
+  shift_due_dates_and_assignment_availability_dates__c5ad272: "Færa skiladaga og tiltækidaga verkefna fram um visst marga daga."
   short_name_42f454a1: Stuttnefni
   short_name_ad9bf84f: stuttnefni
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "á að vera augljóst, Canvas-auðkenni þess sem tilkynnir"
@@ -19947,6 +19994,7 @@ is:
   there_was_an_error_generating_the_pairing_code_9edd639b: "Villa kom upp við sköpun pörunarkóða"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Villa varð við að búa til tólræsinguna"
   there_was_an_error_in_processing_your_request_6513a49a: "Villa varð við vinnslu beiðnar"
+  there_was_an_error_joining_the_conference_d2c3e4b0: "Villa kom upp við að mæta á ráðstefnuna."
   there_was_an_error_launching_to_the_configured_too_f8ed5767: "Villa kom upp við að ræsa innstillt verkfæri."
   there_was_an_error_removing_the_image_c83acffe: "Villa varð við að eyða myndinni"
   there_was_an_error_removing_the_item_f8324776: "Það var villa við að fjarlægja aðgang"
@@ -20814,6 +20862,7 @@ is:
     originality_report_visible_after_due_date: "Eftir skiladag"
     originality_report_visible_after_grading: "Að lokinni einkunnagjöf fyrir verkefnið"
     originality_report_visible_immediately: Tafarlaust
+  turns_on_phase_2_features_for_assignment_bulk_edit_20245881: "Kveikt á stig 2 eiginleikum fyrir fjölbreytingu verkefna"
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: "Sláðu inn dagsetningu eða notaðu örvalyklana til að fara á milli valmöguleika."
@@ -20885,6 +20934,7 @@ is:
   unknown_account_74d30b82: "Óþekktur reikningur"
   unknown_answers_9688a2bc: "Óþekkt svör"
   unknown_compression_method_b6a850b5: "óþekkt þjöppunaraðferð"
+  unknown_conference_c4f13ad0: "Óþekkt ráðstefna"
   unknown_content_type_ae6d08e8: "Óþekkt efnistegund"
   unknown_event_7a0bcda3: "Óþekktur atburður"
   unknown_external_tool_c918e9b2: "Óþekkt ytra verkfæri"
@@ -20941,6 +20991,8 @@ is:
   unpublished_click_to_publish_name_10104b5c: "Óbirt. Smelltu til að birta %{name}"
   unpublished_click_to_publish_title_7c57293f: "Óbirt  Smelltu til að birta %{title}."
   unpublished_content_referenced_in_this_resource_865f8ef6: "Vísað er til óbirts efnis í þessu hjálparefni:"
+  unpublished_courses_4299148e: "Falin námskeið"
+  unpublished_courses_count_d35672f0: "Falin námskeið (%{count})"
   unpublished_courses_title: "Óbirt námskeið"
   unpublished_dfd8801: óbirt
   unpublished_drafts_bb352243: "Fela drög"
@@ -21048,6 +21100,7 @@ is:
   usage_rights_have_been_set_d1b433c7: "Notkunarréttindi hafa verið ákveðin."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Notkunarréttindi verða ákveðin fyrir allar skrá í:"
   use_arrow_keys_to_navigate_options_2021cc50: "Notaðu örvalyklana til að fara á milli valmöguleika."
+  use_arrow_keys_to_select_a_conference_provider_c5b456a6: "Notaðu örvalykla til að velja ráðstefnuveitu"
   use_as_front_page_274a488b: "Nota sem forsíðu"
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Notaðu bókamerki fyrir API síðuskiptingar í innritunaratriðaskrá"
   use_default_890939b7: "Nota sjálfgildi"
