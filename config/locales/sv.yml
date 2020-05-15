@@ -1761,7 +1761,9 @@ sv:
     default_name: "Inget namn"
   add_cc_subtitle_a9ef4a66: "Lägg till CC/undertext"
   add_collaboration_da9665ac: "Lägg till samarbete"
+  add_conference_7bcc625b: "Lägg till konferens"
   add_conferences_from_calendar_98cb86b1: "Lägg till konferenser från kalendern"
+  add_conferencing_9f4ccded: "Lägg till konferens"
   add_contact_method_d2dfea03: "Lägg till kontaktmetod"
   add_content_58b4305a: "Lägg till innehåll"
   add_content_to_module_name_589a8d54: "Lägg till material i %{module_name}"
@@ -1799,6 +1801,7 @@ sv:
     add_quiz_to: "Lägg till en quiz till %{module}"
     add_topic_to: "Lägg till diskussionsämnen till %{module}"
   add_more_e1ffaa65: "Lägg till mer"
+  add_name_db699e72: "Lägg till %{name}"
   add_new_announcement_ddacd624: "Lägg till nytt anslag"
   add_new_domain_e097d4a0: "Lägg till ny domän"
   add_new_group_7ac49f31: "Lägg till en ny grupp"
@@ -1834,6 +1837,7 @@ sv:
   add_to_course_481a51c4: "Lägg till kurs..."
   add_to_student_to_do_58e66b4b: "Lägg till i att-göra för studenter"
   add_to_whitelist_24f3f1ba: "Lägg till i vitlista"
+  add_toolname_4e17dc90: "Lägg till %{toolName}"
   add_trigger_bc1a0fae: "Lägg till Trigger"
   add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Lägg till användare via e-postadresser, Inloggnings ID, eller SIS ID"
   add_user_e73e8e50: "Lägg till användare"
@@ -2070,6 +2074,7 @@ sv:
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillåter kopiering av moduler i Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Tillåter duplicering av föremål i Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillåt kopiering av kalenderhändelser"
+  allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Tillåter policyverktyget för saknad inlämning att sända submission_updated livehändelser för varje inlämning som markeras som saknad."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillåt schemaläggning av återkommande kalender-event"
   allows_the_user_to_navigate_away_while_submission__276d73b7: "Låter användaren navigera bort under återuppladdningen av inlämningar"
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Gör det möjligt för användaren att komma åt och redigera administrationsinställningarna i Commons. Gör det möjligt för användaren att skapa och hantera grupper. Gör det möjligt för användaren att hantera delade resurser i kontot."
@@ -2420,6 +2425,7 @@ sv:
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "Ett fel uppstod vid försök att hitta LTI-konfigurationen"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Ett fel uppstod när uppsättningen bedömningsperioder skulle uppdateras"
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Ett fel uppstod vid ändring av låsstatusen för \"%{fileName}\""
+  an_error_occurred_creating_the_conference_fcad5f6f: "Ett fel inträffade när konferensen skapades"
   an_error_occurred_loading_outcomes_data_cfd18b61: "Ett fel uppstod vid inläsning av lärandemålsdata."
   an_error_occurred_making_a_network_request_d1bda348: "Ett fel uppstod vid försök att göra en nätverksförfrågan"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Ett fel uppstod*, skicka in ditt svar igen senare."
@@ -2874,6 +2880,7 @@ sv:
   assignment_assignment_submission_paper_view_8a4c9776: "Pappersvy för inlämning av uppgiften %{assignment}"
   assignment_assignment_submission_plain_text_view_b217d372: "Vanlig text-vy för inlämning av uppgiften %{assignment}"
   assignment_bulk_editing_37248ca4: "Massredigeringar av uppgifter"
+  assignment_bulk_editing_phase_2_fde6f7d3: "Fas 2 av massredigering av uppgifter"
   assignment_comments_e43ed898: Uppgiftskommentarer
   assignment_configuration_4153cb88: Uppgiftskonfigurering
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} har bedömts för %{name}."
@@ -3423,6 +3430,18 @@ sv:
       locked: Låst
     status: 
       deleting_group: "Raderar grupp..."
+    student_assignment_overview: 
+      allowed_attempts: "Tillåtna försök"
+      attempts: Försök
+      date_time_by: "%{date} av %{time}"
+      due_at: Inlämningsdatum
+      no_due_date: "Inget inlämningsdatum"
+      no_points: Ingen
+      points: Poäng
+      submission_types: Filtyper
+      submitting: "Lämnar in"
+      turnitin_enabled_short: "(Turnitin aktiverad)"
+      vericite_enabled_short: "(VeriCite aktiverad)"
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -3927,6 +3946,8 @@ sv:
   base_url_for_mathman_service_bdd4b10b: "Bas-url för MathMan-service"
   based_on_basedon_d6e4f4d7: "Baserad på: %{basedOn}"
   based_on_what_if_scores_the_new_total_is_now_grade_d223be10: "Baserad på tänk om-resultat, är den nya totalsumman nu %{grade}"
+  batch_edit_6d41d0d7: Massredigera
+  batch_edit_dates_f1ec3df2: "Massredigera datum"
   bb_display: "Lära från Svarta tavlan"
   bb_file_description: "Svart tavlan 6/7/8/9 export .zip fil"
   bb_name: "Svart tavlan konverterare"
@@ -5299,6 +5320,7 @@ sv:
                 . Sänd ut ljud och video i realtid, dela presentationsbilder
                 , genomför demonstrationer av program och onlineresurser
                 med mera.
+  conference_36b50fda: Konferens
   conference_selection_ea4050bb: Konferensurval
   conference_was_deleted_30869390: "Konferensen raderades"
   conferences: 
@@ -5372,6 +5394,8 @@ sv:
               Premium BigBlueButton eller använd en av följande videokonferensleverantörer.  Kontakta din lokala
               administratör om du behöver ytterligare hjälp.
   conferences_tutorial_tray_6f071ce2: "Självstudiefack för konferenser"
+  conferencing_6a6d9b55: Konferens
+  conferencing_b69e2537: "Konferens:"
   confetti_for_on_time_submissions_394e16ce: "Konfetti för tidsmässiga inlämningar"
   confetti_for_valid_links_7506df83: "Konfetti för giltiga länkar"
   config_url_e96ceaf3: "Konfigurera URL"
@@ -6309,6 +6333,9 @@ sv:
     one: "1 uppgift hittades."
     other: "%{count} uppgifter hittades."
     zero: "Inga matchande uppgifter hittades."
+  count_assignments_selected_b03891ea: 
+    one: "%{count} uppgift har valts"
+    other: "%{count} uppgifter har valts"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 uppgift med fel"
     other: "%{count} uppgifter med fel"
@@ -7413,6 +7440,7 @@ sv:
   created_group_group_name_2097306b: "Skapade gruppen %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Skapande av grupper hanteras ännu inte i det nya uppgiftsflödet. Öppna den äldre versionen av sidan för att skapa grupper?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Att skapa en Inlämningsexport gör att du kan ladda ner en zipfil med alla dina uppgiftsinlämningar från alla dina nuvarande och tidigare kurser. Det kan vara en stor fil så det kan ta en stund. Du kan lämna sidan och komma tillbaka senare."
+  creating_conference_95b59116: "Skapar konferensen"
   creating_key_8a026e61: "Skapar nyckel"
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons-licens:"
@@ -8956,6 +8984,7 @@ sv:
   enrollment_term_7bfe840: Registreringstermin
   enrollment_terms_8753ec11: Registreringsperioder
   enrollments_e250c9c3: Registreringar
+  ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Ser till att lärandemål som redan importerats i en kurs inte dupliceras om de importeras igen."
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Ser till att användare utan behörigheter för Importera lärandemål inte kan se knappen på fliken Lärandemål"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Ange en hexkod här för att använda en anpassad färg."
   enter_a_valid_date_46d77547: "Ange ett giltigt datum"
@@ -13125,6 +13154,7 @@ sv:
   message_actions_for_conversation_subject_fdb54c88: "Meddelandeåtgärder för konversation %{subject}"
   message_actions_for_text_27eead86: "Meddelandeåtgärder för %{text}"
   message_body_1f782712: "Meddelande brödtext"
+  message_for_name_648f5765: "Meddelande till %{name}"
   message_groups_who_1ba736f: "Meddela grupper som ..."
   message_reply_failed_subject_5d27a0c9: "Meddelandesvar misslyckades: %{subject}"
   message_sent_5e328899: "Meddelandet har skickats!"
@@ -14989,6 +15019,7 @@ sv:
   missing_eaddacbd: SAKNAS
   missing_percent_94534638: "Saknas: %{percent}"
   missing_policies_4f195e0b: "Policyer för inlämningar som saknas"
+  missing_policy_applicator_emits_live_events_88b47396: "Policyverktyget för saknad inlämning sänder livehändelse"
   missing_required_description_99a99ff: "Saknar obligatorisk beskrivning"
   missing_required_fields_fields_30e20799: "Obligatoriska fält saknas: %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Saknar obligatoriska fält. Fyll i alla obligatoriska fält."
@@ -15400,6 +15431,7 @@ sv:
   name_4dee4600: ", namn: "
   name_app_has_been_deleted_fb2d9426: "%{name}-appen har raderats"
   name_badfe525: namn
+  name_conference_8e042dd2: "%{name} Konferens"
   name_count_users_ccc93c3d: "%{name} (%{count} användare)"
   name_current_grade_d8da149f: "%{name} aktuell omdöme"
   name_current_score_b3198dfa: "%{name} nuvarande resultat"
@@ -15569,6 +15601,7 @@ sv:
   no_broken_links_found_38d951e3: "Inga brutna länkar hittades"
   no_cancel_installation_db8d12d7: "Nej, avbryt installation"
   no_collaboration_apps_3bbd30ce: "Inga samarbetsappar"
+  no_conferencing_options_enabled_fc00e371: "Inget konferensalternativ har aktiverats"
   no_content_5dbc9acf: "Inget innehåll"
   no_content_has_been_added_f36bab43: "* Inget innehåll har lagts till"
   no_content_has_been_shared_with_you_667fde6c: "Inget innehåll har delats med dig."
@@ -15648,6 +15681,7 @@ sv:
   no_user_98e6ccc4: "Ingen användare"
   no_users_found_64a043ff: "Inga användare hittades"
   no_users_were_selected_to_add_to_the_course_a51c6083: "Inga användare har valts för att lägga till kursen"
+  no_valid_lti_resource_was_returned_11f7f91f: "Ingen giltig LTI-resurs returnerades"
   no_video_1ed00b26: "Ingen video"
   no_violations_have_been_reported_977a08d1: "Inga överträdelser har rapporterats."
   no_way_to_export_gradebooks_provided_b4c2939d: "Inget sätt att exportera bedömningsöversikten angivet!"
@@ -16551,6 +16585,8 @@ sv:
   paraguay_181a5029: Paraguay
   paraguay_595_ca58b83a: "Paraguay (+595)"
   parameters_a13374ec: Parametrar
+  parent_assignment_is_not_selected_9efb4ac1: "överordnad uppgift har inte valts"
+  parent_assignment_is_selected_6a2fbca8: "överordnad uppgift har valts"
   parent_of_a_canvas_user_afba1624: "Förälder av en Canvas användare?"
   parent_references_not_found_prior_to_this_row_miss_31723438: "Inga överordnade referenser hittades före denna rad: %{missing}"
   parent_signup_b7c6bf0a: "Registrering för förälder"
@@ -19415,6 +19451,7 @@ sv:
   redirect_uris_79534b60: "* Omdirigerings-URI:er"
   redirect_uris_a54bd82f: "Omdirigering-URI:er:"
   redirected_to_identity_provider_6c4e17d2: "Omdirigerad till identifieringsleverantör"
+  reduce_outcome_duplication_on_course_import_26431b40: "Minskar duplicering av lärandemål i kursimport"
   reference_code_3e8355dd: Referenskod
   reference_code_is_required_c32c757f: "Referenskod krävs"
   regardless_of_whether_this_permission_is_enabled_o_437ee269: "Oavsett om den här behörigheten är aktiverad eller inaktiverad kommer användaren ändå att kunna hantera händelser i sina personliga kalendrar."
@@ -19493,9 +19530,12 @@ sv:
   remove_attribute_59a4aa64: "Ta bort attribut"
   remove_c_name_section_d8eabd3a: "Ta bort %{c.name} sektionen"
   remove_collaborationtitle_c3e81adb: "Ta bort \"%{collaborationTitle}\"?"
+  remove_conference_69b9e0d0: "Tar bort konferensen"
   remove_contact_method_ca890ba3: "Ta bort kontaktmetod"
   remove_course_association_name_b760c502: "Ta bort kursassociation %{name}"
+  remove_dates_9b9ba2f6: "Ta bort datum"
   remove_domain_from_the_whitelist_14c7d5e9: "Ta bort %{domain} från vitlistan"
+  remove_due_dates_and_assignment_availability_dates_608cd97b: "Ta bort inlämningsdatum och tillgänglighetsdatum för uppgiften."
   remove_email_address_b1820820: "Ta bort e-postadress"
   remove_empty_attachment_b2aea632: "ta bort tom bilaga"
   remove_f47dc62a: "Ta bort"
@@ -20249,13 +20289,17 @@ sv:
   select_a_module_optional_7edb5cb0: "Välj en modul (valfritt)"
   select_a_predefined_color_c77ab2f5: "Välj en fördefinierad färg."
   select_a_provisional_grade_7106e3d5: "Välj en provisorisk omdöme"
+  select_all_assignments_bd07b919: "Välj alla uppgifter"
   select_all_count_9ad54aa1: "Välj alla (%{count})"
   select_all_count_courses_4fc63811: 
     one: "Välj (%{count}) kurs"
     other: "Välj alla (%{count}) kurser"
   select_all_students_7c2c34b3: "Välj alla studenter"
+  select_an_edit_operation_ec1467d: "Välj en redigeringsåtgärd"
+  select_assignment_title_4571ffcb: "Välj uppgift: %{title}"
   select_audio_file_7d905cce: "Välj ljudfil"
   select_calendars_d5fa50b6: "Välj kalendrar"
+  select_conference_provider_58c7f7fe: "Välj konferensleverantör"
   select_content: "Välj innehåll"
   select_content_checkbox: 
     select_content_error: "Du måste välja ett innehållsalternativ"
@@ -20281,6 +20325,7 @@ sv:
   select_course_or_group_ddb2185d: "Välj kurs eller grupp"
   select_courses_or_groups_1a8b8f66: "Välj kurser eller grupper"
   select_d70f31da: Välj
+  select_dates_to_remove_be55b14c: "Välj datum för borttagning"
   select_embedded_content_type_966f048a: "Välj inbäddad innehållstyp"
   select_final_grade_for_moderation_b76a0baf: "Välj slutgiltigt omdöme för moderering"
   select_for_list_of_users_who_responded_791ce930: "Välj för lista av användare som svarade."
@@ -21223,6 +21268,8 @@ sv:
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "Delning av en QR-kod kan ge andra omedelbar åtkomst till ditt konto via %{canvas}-mobilapparna."
   she_her_3f459cc2: Hon/henne
   she_her_c8b5e3be: hon/henne
+  shift_dates_b5a7b7a1: "Ändra datum"
+  shift_due_dates_and_assignment_availability_dates__c5ad272: "Flytta fram inlämningsdatum och uppgiftens tillgänglighetsdatum ett antal dagar."
   short_name_42f454a1: "Kort namn"
   short_name_ad9bf84f: "kort namn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "bör vara självklar, den rapporterande användarens canvas ID"
@@ -22481,6 +22528,7 @@ sv:
   there_was_an_error_generating_the_pairing_code_9edd639b: "Det gick inte att generera kopplingskoden"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Ett fel uppstod när verktyget skulle startas"
   there_was_an_error_in_processing_your_request_6513a49a: "Ett fel uppstod när din begäran bearbetades"
+  there_was_an_error_joining_the_conference_d2c3e4b0: "Ett fel uppstod när du gick med i konferensen."
   there_was_an_error_launching_to_the_configured_too_f8ed5767: "Det gick inte att starta det konfigurerade verktyget."
   there_was_an_error_removing_the_image_c83acffe: "Ett fel uppstod när bilden skulle tas bort"
   there_was_an_error_removing_the_item_f8324776: "Det gick inte att ta bort objektet"
@@ -23367,6 +23415,7 @@ sv:
     originality_report_visible_after_grading: "Efter att uppgiften är bedömd"
     originality_report_visible_immediately: Omedelbart
   turnitin_similarity_score_more_information_e2571be8: "Turnitin liknande poäng - mer information"
+  turns_on_phase_2_features_for_assignment_bulk_edit_20245881: "Aktiverar fas 2-funktioner för massredigering av uppgifter"
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: "Ange ett datum eller använd piltangenter för att välja ett datum."
@@ -23443,6 +23492,7 @@ sv:
   unknown_account_74d30b82: "Okänt konto"
   unknown_answers_9688a2bc: "Okända svar"
   unknown_compression_method_b6a850b5: "okänd komprimeringsmetod"
+  unknown_conference_c4f13ad0: "Okänd konferens"
   unknown_content_type_ae6d08e8: "Okänd innehållstyp"
   unknown_event_7a0bcda3: "Okänd händelse"
   unknown_external_tool_c918e9b2: "Okänt externt verktyg"
@@ -23501,6 +23551,8 @@ sv:
   unpublished_click_to_publish_name_10104b5c: "Avpublicerad. Klicka för att publicera %{name}"
   unpublished_click_to_publish_title_7c57293f: "Opublicerad.  Klicka för att publicera %{title}."
   unpublished_content_referenced_in_this_resource_865f8ef6: "Den här resursen har referenser till opublicerat innehåll:"
+  unpublished_courses_4299148e: "Opublicerade kurser"
+  unpublished_courses_count_d35672f0: "Opublicerade kurser (%{count})"
   unpublished_courses_title: "Avpublicerade kurser"
   unpublished_dfd8801: avpublicerad
   unpublished_drafts_bb352243: "Opublicerade utkast"
@@ -23623,6 +23675,7 @@ sv:
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Användningsrättigheter kommer inte att ställas in för alla filerna i:"
   use_a_or_new_line_between_for_adding_multiple_user_e7c43ba9: "Använd en \",\" eller ny linje mellan för att lägga till flera användare."
   use_arrow_keys_to_navigate_options_2021cc50: "Använd piltangenterna för att navigera bland alternativen."
+  use_arrow_keys_to_select_a_conference_provider_c5b456a6: "Använd piltangenterna för att välja en konferensleverantör"
   use_as_front_page_274a488b: "Använd som framsida"
   use_between_for_adding_multiple_users_26bff207: "Använda ”,” mellan för att lägga till flera användare."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Använd bokmärkning för API-sidnumrering i registreringsindex"
