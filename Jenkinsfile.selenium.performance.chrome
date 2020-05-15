@@ -18,6 +18,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def getRubyPassenger() {
+  load('build/new-jenkins/groovy/configuration.groovy').rubyPassenger()
+}
+
+def getPostgres() {
+  load('build/new-jenkins/groovy/configuration.groovy').postgres()
+}
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -29,6 +37,8 @@ pipeline {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
+    POSTGRES = getPostgres()
+    RUBY_PASSENGER = getRubyPassenger()
     MAX_FAIL = 5
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:master"
     RERUNS_RETRY = 0 // no reruns

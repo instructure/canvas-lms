@@ -44,6 +44,14 @@ def getPublishableTagSuffix() {
   load('build/new-jenkins/groovy/configuration.groovy').publishableTagSuffix()
 }
 
+def getRubyPassenger() {
+  load('build/new-jenkins/groovy/configuration.groovy').rubyPassenger()
+}
+
+def getPostgres() {
+  load('build/new-jenkins/groovy/configuration.groovy').postgres()
+}
+
 def runDatadogMetric(name, body) {
   def dd = load('build/new-jenkins/groovy/datadog.groovy')
   dd.runDataDogForMetric(name,body)
@@ -125,6 +133,8 @@ pipeline {
     CANVAS_LMS_IMAGE = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms"
     BUILD_REGISTRY_FQDN = buildRegistryFQDN()
     BUILD_IMAGE = "$BUILD_REGISTRY_FQDN/jenkins/canvas-lms"
+    POSTGRES = getPostgres()
+    RUBY_PASSENGER = getRubyPassenger()
 
     // e.g. postgres-9.5-ruby-passenger-2.6
     TAG_SUFFIX = "postgres-$POSTGRES-ruby-passenger-$RUBY_PASSENGER"
