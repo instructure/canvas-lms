@@ -19,7 +19,7 @@ require 'set'
 
 module DataFixup::Auditors
   module Migrate
-    DEFAULT_BATCH_SIZE = 1000
+    DEFAULT_BATCH_SIZE = 100
 
     module AuditorWorker
       def initialize(account_id, date)
@@ -31,10 +31,28 @@ module DataFixup::Auditors
         @_account ||= Account.find(@account_id)
       end
 
+      def previous_sunday
+        date_time - date_time.wday.days
+      end
+
+      def next_sunday
+        previous_sunday + 7.days
+      end
+
+      def date_time
+        @_dt ||= CanvasTime.try_parse("#{@date.strftime('%Y-%m-%d')} 00:00:00 -0000")
+      end
+
       def cassandra_query_options
+        # auditors cassandra partitions span one week.
+        # querying a week at a time is more efficient
+        # than separately for each day.
+        # this query will usually span 2 partitions
+        # because the alignment of the partitions is
+        # to number of second from epoch % seconds_in_week
         {
-          oldest: CanvasTime.try_parse("#{@date.strftime('%Y-%m-%d')} 00:00:00 -0000"),
-          newest: CanvasTime.try_parse("#{(@date + 1.day).strftime('%Y-%m-%d')} 00:00:00 -0000")
+          oldest: previous_sunday,
+          newest: next_sunday
         }
       end
 
@@ -94,30 +112,33 @@ module DataFixup::Auditors
         end
       end
 
-      def cell_attributes
+      def cell_attributes(target_date: nil)
+        target_date = @date if target_date.nil?
         {
           auditor_type: auditor_type,
           account_id: account.id,
-          year: @date.year,
-          month: @date.month,
-          day: @date.day
+          year: target_date.year,
+          month: target_date.month,
+          day: target_date.day
         }
       end
 
-      def find_migration_cell
-        ::Auditors::ActiveRecord::MigrationCell.find_by(cell_attributes)
+      def find_migration_cell(attributes: cell_attributes)
+        attributes = cell_attributes if attributes.nil?
+        ::Auditors::ActiveRecord::MigrationCell.find_by(attributes)
       end
 
       def migration_cell
         @_cell ||= find_migration_cell
       end
 
-      def create_cell!
-        @_cell = ::Auditors::ActiveRecord::MigrationCell.create!(cell_attributes.merge({ completed: false }))
+      def create_cell!(attributes: nil)
+        attributes = cell_attributes if attributes.nil?
+        ::Auditors::ActiveRecord::MigrationCell.create!(attributes.merge({ completed: false }))
       rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation
-        @_cell = find_migration_cell
-        raise "unresolvable auditors migration state #{cell_attributes}" if @_cell.nil?
-        @_cell
+        created_cell = find_migration_cell(attributes: attributes)
+        raise "unresolvable auditors migration state #{attributes}" if created_cell.nil?
+        created_cell
       end
 
       def reset_cell!
@@ -126,7 +147,7 @@ module DataFixup::Auditors
       end
 
       def mark_cell_queued!
-        create_cell! if migration_cell.nil?
+        (@_cell = create_cell!) if migration_cell.nil?
         migration_cell.update_attribute(:failed, false) if migration_cell.failed
       end
 
@@ -147,6 +168,17 @@ module DataFixup::Auditors
         (migration_cell.nil? || migration_cell.failed)
       end
 
+      def mark_week_complete!
+        current_date = previous_sunday
+        while current_date < next_sunday do
+          cur_cell_attrs =  cell_attributes(target_date: current_date)
+          current_cell = find_migration_cell(attributes: cur_cell_attrs)
+          current_cell = create_cell!(attributes: cur_cell_attrs) if current_cell.nil?
+          current_cell.update(completed: true, failed: false)
+          current_date += 1.day
+        end
+      end
+
       def perform
         extend_cassandra_stream_timeout!
         cell = migration_cell
@@ -158,9 +190,20 @@ module DataFixup::Auditors
           return cell.update_attribute(:completed, true)
         end
         perform_migration
-        cell.update_attribute(:completed, true)
+        # the reason this works is the rescheduling plan.
+        # if the job passes, the whole week gets marked "complete".
+        # If it fails, the target cell for this one job will get rescheduled
+        # later in the reconciliation pass.
+        # at that time it will again run for this whole week.
+        # any failed day results in a job spanning a week.
+        # If a job for another day in the SAME week runs,
+        # and this one is done already, it will quickly short circuit because this
+        # day is marked complete.
+        # If two jobs from the same week happened to run at the same time,
+        # they would contend over Uniqueness violations, which we catch and handle.
+        mark_week_complete!
       ensure
-        cell.update_attribute(:failed, true) unless cell.completed
+        cell.update_attribute(:failed, true) unless cell.reload.completed
         clear_cassandra_stream_timeout!
       end
 
@@ -661,7 +704,8 @@ module DataFixup::Auditors
           end
           enqueue_one_day(current_date)
           log("Scheduled Backfill for #{current_date} on #{Shard.current.id}")
-          current_date -= 1.day
+          # jobs span a week now, we can schedule them at week intervals arbitrarily
+          current_date -= 7.days
         end
         if current_date >= @end_date
           schedule_worker = BackfillEngine.new(current_date, @end_date)
