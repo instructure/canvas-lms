@@ -42,6 +42,7 @@ pipeline {
     MAX_FAIL = 5
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:master"
     RERUNS_RETRY = 0 // no reruns
+    POSTGRES_PASSWORD = 'sekret'
   }
 
   stages {
@@ -133,7 +134,7 @@ pipeline {
       // copy spec failures to local
       sh 'mkdir -vp tmp'
       // [JIRA CCI-168]: need to handle canvas container never being spun up
-      sh 'docker cp $(docker ps -q --filter "name=canvas_"):/usr/src/app/log/spec_failures/ ./tmp'
+      sh 'docker cp $(docker ps -q --filter "name=canvas_"):/usr/src/app/log/spec_failures/ ./tmp' || true
       script {
         def htmlFiles
         // find all results files
