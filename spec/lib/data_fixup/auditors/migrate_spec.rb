@@ -291,9 +291,9 @@ module DataFixup::Auditors::Migrate
         expect(output).to_not be_empty
       end
 
-      it "buckets settings by JOB cluster" do
+      it "buckets settings uniformly" do
         pk = BackfillEngine.parallelism_key("grade_changes")
-        expect(pk).to eq("auditors_migration_grade_changes_num_strands")
+        expect(pk).to eq("auditors_migration_num_strands")
       end
 
       it "wont enqueue complete jobs" do
