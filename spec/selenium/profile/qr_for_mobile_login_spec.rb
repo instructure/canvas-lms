@@ -35,7 +35,6 @@ describe 'QR for mobile login' do
 
   before :once do
     @account = Account.default
-    @account.enable_feature! :mobile_qr_login
 
     dev_key =
       DeveloperKey.create!(
@@ -46,6 +45,7 @@ describe 'QR for mobile login' do
       )
 
     @account.settings[:ios_mobile_sso_developer_key_id] = dev_key.global_id
+    @account.settings[:mobile_qr_login_is_enabled] = true
     @account.save!
     account_domain = @account.account_domains.new(host: 'sso.canvaslms.com')
     account_domain.save!(validate: false)

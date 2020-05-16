@@ -216,19 +216,19 @@ describe UserProfile do
         user_factory(active_all: true)
       end
 
-      context "IMP present and mobile_qr_login flag is enabled" do
+      context "IMP is present and mobile_qr_login setting is enabled" do
         it "should show the QR mobile login tab" do
-          account.enable_feature! :mobile_qr_login
+          account.settings[:mobile_qr_login_is_enabled] = true
           allow_any_instance_of(UserProfile).to receive(:instructure_misc_plugin_available?).and_return(true)
           tabs = @user.profile.tabs_available(@user, :root_account => account)
           expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_QR_MOBILE_LOGIN
         end
       end
 
-      context "mobile_qr_login flag is disabled" do
+      context "mobile_qr_login setting is disabled" do
         it "should not show the QR mobile login tab" do
           allow_any_instance_of(UserProfile).to receive(:instructure_misc_plugin_available?).and_return(true)
-          account.disable_feature! :mobile_qr_login
+          account.settings[:mobile_qr_login_is_enabled] = false
           tabs = @user.profile.tabs_available(@user, :root_account => account)
           expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_QR_MOBILE_LOGIN
         end
@@ -237,7 +237,7 @@ describe UserProfile do
       context "IMP is not present" do
         it "should not show the QR mobile login tab" do
           allow_any_instance_of(UserProfile).to receive(:instructure_misc_plugin_available?).and_return(false)
-          account.enable_feature! :mobile_qr_login
+          account.settings[:mobile_qr_login_is_enabled] = true
           tabs = @user.profile.tabs_available(@user, :root_account => account)
           expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_QR_MOBILE_LOGIN
         end

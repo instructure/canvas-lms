@@ -492,7 +492,7 @@ class ProfileController < ApplicationController
   end
 
   def qr_mobile_login
-    unless instructure_misc_plugin_available? && !!@domain_root_account&.feature_enabled?(:mobile_qr_login)
+    unless instructure_misc_plugin_available? && !!@domain_root_account&.mobile_qr_login_is_enabled?
       head 404
       return
     end

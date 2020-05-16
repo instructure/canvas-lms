@@ -302,9 +302,10 @@ describe ProfileController do
   end
 
   describe "GET #qr_mobile_login" do
-    context "mobile_qr_login flag is enabled" do
+    context "mobile_qr_login setting is enabled" do
       before :once do
-        Account.default.enable_feature! :mobile_qr_login
+        Account.default.settings[:mobile_qr_login_is_enabled] = true
+        Account.default.save
       end
 
       it "should render empty html layout" do
@@ -327,9 +328,10 @@ describe ProfileController do
       end
     end
 
-    context "mobile_qr_login flag is disabled" do
+    context "mobile_qr_login setting is disabled" do
       before :once do
-        Account.default.disable_feature! :mobile_qr_login
+        Account.default.settings[:mobile_qr_login_is_enabled] = false
+        Account.default.save
       end
 
       it "should 404" do

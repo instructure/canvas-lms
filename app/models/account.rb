@@ -218,6 +218,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :enable_turnitin, :boolean => true, :default => false
   add_setting :mfa_settings, :root_only => true
+  add_setting :mobile_qr_login_is_enabled, :boolean => true, :root_only => true, :default => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
   add_setting :canvadocs_prefer_office_online, :boolean => true, :root_only => true, :default => false
