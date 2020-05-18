@@ -72,16 +72,27 @@ module AccountReports::ReportHelper
     end
   end
 
-  def start_at
-    if @account_report.value_for_param("start_at")
-      @start ||= account_time_parse(@account_report.parameters["start_at"])
+  def datetime_from_param(param)
+    if @account_report.value_for_param(param)
+      account_time_parse(@account_report.parameters[param])
     end
   end
 
+  def restricted_datetime_from_param(param, earliest: nil, latest: nil, fallback: nil)
+    time = datetime_from_param(param)
+    return fallback if time.nil? && fallback
+    return unless time
+    time = earliest if earliest&.> time
+    time = latest if latest&.< time
+    time
+  end
+
+  def start_at
+    @start ||= datetime_from_param('start_at')
+  end
+
   def end_at
-    if @account_report.value_for_param("end_at")
-      @end ||= account_time_parse(@account_report.parameters["end_at"])
-    end
+    @end ||= datetime_from_param('end_at')
   end
 
   def course
