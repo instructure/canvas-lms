@@ -248,6 +248,45 @@ module DataFixup::Auditors::Migrate
         worker.perform
         expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(13)
       end
+
+      it "writes to multiple partitions smoothly" do
+        events = [
+          {
+            "account_id"=>@pseudonym.account_id,
+            "created_at"=>DateTime.civil(2020,5,2,13,1),
+            "event_type"=>"login",
+            "pseudonym_id"=>@pseudonym.id,
+            "request_id"=>"MISSING",
+            "user_id"=>@pseudonym.user_id,
+            "uuid"=>"5b7b58dc-0629-4e3f-81e9-4d2a98f2541d"
+          },{
+            "account_id"=>@pseudonym.account_id,
+            "created_at"=>DateTime.civil(2020,4,29,13,1),
+            "event_type"=>"login",
+            "pseudonym_id"=>@pseudonym.id,
+            "request_id"=>"MISSING",
+            "user_id"=>@pseudonym.user_id,
+            "uuid"=>"522e2e1f-59b7-4973-8064-fc988bb45f39"
+          }
+        ]
+        worker = AuthenticationWorker.new(account.id, date)
+        p1_name = Auditors::ActiveRecord::AuthenticationRecord.quoted_table_name.gsub(/"$/, "_2020_5\"")
+        p2_name = Auditors::ActiveRecord::AuthenticationRecord.quoted_table_name.gsub(/"$/, "_2020_4\"")
+        p3_name = Auditors::ActiveRecord::AuthenticationRecord.quoted_table_name.gsub(/"$/, "_2020_3\"")
+        p1_count = User.connection.execute("SELECT count(*) from #{p1_name}")
+        p2_count = User.connection.execute("SELECT count(*) from #{p2_name}")
+        p3_count = User.connection.execute("SELECT count(*) from #{p3_name}")
+        expect(p1_count[0]["count"]).to eq(0)
+        expect(p2_count[0]["count"]).to eq(0)
+        expect(p3_count[0]["count"]).to eq(0)
+        worker.bulk_insert_auditor_recs(Auditors::ActiveRecord::AuthenticationRecord, events)
+        p1_count = User.connection.execute("SELECT count(*) from #{p1_name}")
+        p2_count = User.connection.execute("SELECT count(*) from #{p2_name}")
+        p3_count = User.connection.execute("SELECT count(*) from #{p3_name}")
+        expect(p1_count[0]["count"]).to eq(1)
+        expect(p2_count[0]["count"]).to eq(1)
+        expect(p3_count[0]["count"]).to eq(0)
+      end
     end
 
     describe "BackfillEngine" do
