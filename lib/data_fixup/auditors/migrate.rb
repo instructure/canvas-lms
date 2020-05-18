@@ -79,6 +79,15 @@ module DataFixup::Auditors
         ar_attributes_list.reject{|h| existing_uuids.include?(h['uuid']) }
       end
 
+      def bulk_insert_auditor_recs(auditor_ar_type, attrs_lists)
+        partition_groups = attrs_lists.group_by{|a| auditor_ar_type.infer_partition_table_name(a) }
+        partition_groups.each do |partition_name, partition_attrs|
+          auditor_ar_type.transaction do
+            auditor_ar_type.connection.bulk_insert(partition_name, partition_attrs)
+          end
+        end
+      end
+
       def migrate_in_pages(collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
         next_page = 1
         until next_page.nil?
@@ -88,12 +97,12 @@ module DataFixup::Auditors
             auditor_ar_type.ar_attributes_from_event_stream(rec)
           end
           begin
-            auditor_ar_type.bulk_insert(ar_attributes_list)
+            bulk_insert_auditor_recs(auditor_ar_type, ar_attributes_list)
           rescue ActiveRecord::RecordNotUnique, ActiveRecord::InvalidForeignKey
             # this gets messy if we act specifically; let's just apply both remedies
             new_attrs_list = filter_for_idempotency(ar_attributes_list, auditor_ar_type)
             new_attrs_list = filter_dead_foreign_keys(new_attrs_list)
-            auditor_ar_type.bulk_insert(new_attrs_list) if new_attrs_list.size > 0
+            bulk_insert_auditor_recs(auditor_ar_type, new_attrs_list) if new_attrs_list.size > 0
           end
           next_page = auditor_recs.next_page
         end
