@@ -186,11 +186,13 @@ namespace :strongmind do
   end
 
   desc "Enable Identity Server 2.0"
-  task :enable_identity_server, [:key, :secret] => :environment do |task, args|
+  task :enable_identity_server, [:key, :secret, :identity_domain] => :environment do |task, args|
     if !args[:key] || !args[:secret]
       puts "Please supply a key and secret."
     else
       basic_auth = Base64.strict_encode64("#{args[:key]}:#{args[:secret]}")
+
+      identity_domain = args[:identity_domain] || "login.strongmind.com"
 
       SettingsService.update_settings(
         id: '1',
@@ -203,6 +205,13 @@ namespace :strongmind do
         id: '1',
         setting: "identity_server_enabled",
         value: true,
+        object: "school"
+      )
+
+      SettingsService.update_settings(
+        id: '1',
+        setting: "identity_domain",
+        value: identity_domain,
         object: "school"
       )
     end
