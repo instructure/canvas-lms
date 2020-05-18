@@ -510,12 +510,28 @@ describe Types::CourseType do
   describe 'notificationPreferences' do
     it 'returns the students notification preferences' do
       Notification.delete_all
-      communication_channel = @student.communication_channels.create!(path: 'test@test.com')
-      notification = notification_model(:name => 'test', :category => 'Announcement')
+      @student.communication_channels.create!(path: 'test@test.com').confirm!
+      notification_model(:name => 'test', :category => 'Announcement')
 
       expect(
         course_type.resolve('notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }')[0][0]
       ).to eq 'test'
+    end
+
+    it 'only returns active communication channels' do
+      Notification.delete_all
+      communication_channel = @student.communication_channels.create!(path: 'test@test.com')
+      communication_channel.confirm!
+      notification_model(:name => 'test', :category => 'Announcement')
+
+      expect(
+        course_type.resolve('notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }')[0][0]
+      ).to eq 'test'
+
+      communication_channel.destroy
+      expect(
+        course_type.resolve('notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }').count
+      ).to eq 0
     end
   end
 end
