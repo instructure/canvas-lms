@@ -18,11 +18,11 @@
 # Note: Indented gems are meant to indicate transient dependencies of parent gems
 
 if CANVAS_RAILS5_2
-  gem 'rails', '5.2.3'
+  gem 'rails', '5.2.4.3'
     gem 'loofah', '2.3.0'
     gem 'sprockets', '3.7.2' # 4.0 requires ruby 2.5
 else
-  gem 'rails', '6.0.2.1'
+  gem 'rails', '6.0.3.1'
 end
 
 gem 'academic_benchmarks', '0.0.11', require: false
@@ -54,7 +54,7 @@ gem 'canvas_connect', '0.3.11'
 gem 'canvas_webex', '0.17'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'ddtrace', '0.33.1', require: false
-gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.2.10', require: 'encrypted_cookie_store'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.12.2', require: false
 gem 'gepub', '1.0.11'
