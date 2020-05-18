@@ -142,6 +142,52 @@ describe "report helper" do
       formatted = report.timezone_strftime(time_zone.to_s, '%d-%b')
       expect(formatted).to eq "13-Sep"
     end
+
+    it 'should parse time' do
+      og_time = 1.day.ago.iso8601
+      account_report.parameters = {'start_at' => og_time }
+      time = report.restricted_datetime_from_param('start_at')
+      expect(time).to eq og_time
+    end
+
+    it 'should parse and restrict time' do
+      og_time = 2.days.ago.iso8601
+      account_report.parameters = {'start_at' => og_time}
+      restricted_time = 1.day.ago.iso8601
+      time = report.restricted_datetime_from_param('start_at', earliest: restricted_time)
+      expect(time).to eq restricted_time
+    end
+
+    it 'should parse and not change to restrict time' do
+      og_time = 2.days.ago.iso8601
+      account_report.parameters = {'start_at' => og_time}
+      restricted_time = 3.days.ago.iso8601
+      time = report.restricted_datetime_from_param('start_at', earliest: restricted_time)
+      expect(time).to eq og_time
+    end
+
+    it 'should parse and restrict latest times' do
+      og_time = 2.days.ago.iso8601
+      account_report.parameters = {'end_at' => og_time}
+      restricted_time = 3.days.ago.iso8601
+      time = report.restricted_datetime_from_param('end_at', latest: restricted_time)
+      expect(time).to eq restricted_time
+    end
+
+    it 'should fallback to a time' do
+      og_time = 1.day.ago.iso8601
+      account_report.parameters = {}
+      time = report.restricted_datetime_from_param('start_at', fallback: og_time)
+      expect(time).to eq og_time
+    end
+
+    it 'should only fallback to a time when one is not provided' do
+      og_time = 1.day.ago.iso8601
+      account_report.parameters = {'start_at' => og_time}
+      other_time = 3.days.ago.iso8601
+      time = report.restricted_datetime_from_param('start_at', fallback: other_time)
+      expect(time).to eq og_time
+    end
   end
 
   describe "#generate_and_run_report" do
