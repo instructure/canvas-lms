@@ -29,8 +29,10 @@ class ExternalToolsController < ApplicationController
   before_action :require_user, only: [:generate_sessionless_launch]
   before_action :get_context, :only => [:retrieve, :show, :resource_selection]
   skip_before_action :verify_authenticity_token, only: :resource_selection
+
   include Api::V1::ExternalTools
   include Lti::RedisMessageClient
+  include Lti::Concerns::SessionlessLaunches
 
   WHITELISTED_QUERY_PARAMS = [
     :platform
@@ -1113,20 +1115,19 @@ class ExternalToolsController < ApplicationController
     end
 
     if @tool.use_1_3?
-      # generate URL to log in user and launch LTI 1.3 tool in one go
-      # only allow from API, and not from files domain, as /login/session_token does
-      return render_unauthorized_action unless @access_token
-      return render_unauthorized_action if HostUrl.is_file_host?(request.host_with_port)
-
-      login_pseudonym = @real_current_pseudonym || @current_pseudonym
-      session_token = SessionToken.new(
-        login_pseudonym.global_id,
-        current_user_id: @real_current_user ? @current_user.global_id : nil,
-        used_remember_me_token: true
-      ).to_s
-
-      context_path = "#{@context.is_a?(Account) ? account_external_tools_url(@context) : course_external_tools_url(@context)}/#{@tool.id}"
-      render :json => { id: @tool.id, name: @tool.name, url: "#{context_path}?display=borderless&session_token=#{session_token}" }
+      # Create a launch URL that uses a session token to
+      # initialize a Canvas session and launch the tool.
+      begin
+        launch_url = sessionless_launch_url(
+          options,
+          @context,
+          @tool,
+          generate_session_token
+        )
+        render :json => { id: @tool.id, name: @tool.name, url: launch_url }
+      rescue UnauthorizedClient
+        render_unauthorized_action
+      end
     else
       # generate the launch
       opts = {

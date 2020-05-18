@@ -1761,6 +1761,7 @@ describe ExternalToolsController do
       end
 
       let(:account) { @course.account }
+
 		  before do
         @backup_controller_access_token = controller.instance_variable_get(:@access_token)
       end
@@ -1782,6 +1783,58 @@ describe ExternalToolsController do
         get :generate_sessionless_launch, params: params
         expect(response).to_not be_successful
         expect(response.code.to_i).to eq(401)
+      end
+
+      context 'when the developer key requires scopes' do
+        before { DeveloperKey.default.update!(require_scopes: true) }
+
+        it 'responds with "unauthorized" if developer key requires scopes' do
+          controller.instance_variable_set(
+            :@access_token,
+            login_pseudonym.user.access_tokens.create(purpose: 'test')
+          )
+          get :generate_sessionless_launch, params: params
+          expect(response).to be_unauthorized
+        end
+      end
+
+      context 'with an assignment launch' do
+        before do
+          controller.instance_variable_set(
+            :@access_token,
+            login_pseudonym.user.access_tokens.create(purpose: 'test')
+          )
+          assignment.update!(
+            external_tool_tag: content_tag,
+            submission_types: 'external_tool'
+          )
+          external_tool
+        end
+
+        let(:assignment) { assignment_model(course: @course) }
+        let(:launch_url) { 'https://www.my-tool.com/login' }
+        let(:params) { {course_id: @course.id, launch_type: :assessment, assignment_id: assignment.id} }
+        let(:content_tag) do
+          ContentTag.create!(
+            context: assignment,
+            content_type: 'ContextExternalTool',
+            url: launch_url
+          )
+        end
+        let(:external_tool) do
+          tool = external_tool_model(
+            context: assignment.course,
+            opts: { url: launch_url }
+          )
+          tool.settings[:use_1_3] = true
+          tool.save!
+          tool
+        end
+
+        it 'returns an assignment launch URL' do
+          get :generate_sessionless_launch, params: params
+          expect(json_parse["url"]).to include "http://test.host/courses/#{@course.id}/assignments/#{assignment.id}?display=borderless&session_token="
+        end
       end
     end
   end
