@@ -211,7 +211,7 @@ module SIS
               User.transaction(:requires_new => true) do
                 if user.changed?
                   user_touched = true
-                  if !user.save && user.errors.size > 0
+                  if !user.save_with_or_without_identity_create(user_row.email) && user.errors.size > 0
                     add_user_warning(user.errors.first.join(" "), user_row.user_id, user_row.login_id)
                     raise ImportError, user.errors.first.join(" ")
                   end
@@ -225,10 +225,6 @@ module SIS
                     add_user_warning(pseudo.errors.first.join(" "), user_row.user_id, user_row.login_id)
                     raise ImportError, pseudo.errors.first.join(" ")
                   end
-                end
-
-                if SettingsService.get_settings(object: 'school', id: 1)['identity_server_enabled']
-                  user.save_with_identity_server_create!(user_row.email)
                 end
               end
             rescue => e

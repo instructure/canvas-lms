@@ -2133,9 +2133,7 @@ class UsersController < ApplicationController
          {:address => address, :user_id => user_id, :user_name => user_name, :account_id => account_id, :account_name => account_name}
         end
         errored_users << user_hash.merge(:errors => [{:message => "Matching user(s) already exist"}], :existing_users => existing_users)
-      elsif SettingsService.get_settings(object: 'school', id: 1)['identity_server_enabled'] && user.save_with_identity_server_create!(user_hash[:email])
-        invited_users << user_hash.merge(:id => user.id)
-      elsif user.save
+      elsif user.save_with_or_without_identity_create(user_hash[:email])
         invited_users << user_hash.merge(:id => user.id)
       else
         errored_users << user_hash.merge(user.errors.as_json)
@@ -2471,10 +2469,17 @@ class UsersController < ApplicationController
         @pseudonym.send(:skip_session_maintenance=, true)
       end
 
-      if SettingsService.get_settings(object: 'school', id: 1)["identity_server_enabled"]
-        @user.save_with_identity_server_create!(@pseudonym.unique_id)
-      else
-        @user.save!
+      begin
+        @user.save_with_or_without_identity_create(@pseudonym.unique_id, force: true)
+      rescue ActiveRecord::RecordInvalid => e
+        errors = {
+          :errors => {
+            :user => @user.errors.as_json[:errors],
+            :pseudonym => {},
+            :observee => {}
+          }
+        }
+        return render :json => errors, :status => :bad_request
       end
 
       if @observee && !@user.user_observees.where(user_id: @observee).exists?
@@ -2485,7 +2490,7 @@ class UsersController < ApplicationController
         registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
         @user.new_registration(registration_params)
       end
-      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc
+      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc && !@user.identity_enabled
 
       data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?

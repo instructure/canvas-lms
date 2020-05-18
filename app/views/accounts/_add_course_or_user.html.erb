@@ -20,6 +20,7 @@
   hide_add_course ||= false; hide_add_user ||= false
   show_course = !hide_add_course && can_do(@account, @current_user, :manage_courses)
   show_user = !hide_add_user && @account.root_account? && can_do(@account, @current_user, :manage_user_logins)
+  identity_server_enabled = SettingsService.get_settings(object: 'school', id: 1)['identity_server_enabled']
 %>
 
 <div class="rs-margin-bottom">
@@ -67,16 +68,19 @@
           <div class="hint-text"><%= t(:sortable_name_help, "This name appears in sorted lists.") %></div>
         </td>
       </tr>
-      <% if @root_account.login_handle_name_is_customized? || @root_account.delegated_authentication? %>
-        <tr>
-          <td><%= blabel :pseudonym, :path, :en => "Email" %></td>
-          <td><%= text_field :pseudonym, :path %></td>
-        </tr>
+      <% unless identity_server_enabled %>
+        <% if @root_account.login_handle_name_is_customized? || @root_account.delegated_authentication? %>
+          <tr>
+            <td><%= blabel :pseudonym, :path, :en => "Email" %></td>
+            <td><%= text_field :pseudonym, :path %></td>
+          </tr>
+        <% end %>
       <% end %>
       <tr>
         <td>
           <label for="pseudonym_unique_id">
-            <%= t(:unique_id_label_1, "%{label}:", label: @root_account.login_handle_name_with_inference) %>
+            <%= t(:unique_id_label_1, "%{label}:",
+                label: (identity_server_enabled ? "Email" : @root_account.login_handle_name_with_inference)) %>
           </label>
         </td>
         <td><%= text_field :pseudonym, :unique_id %></td>
@@ -87,12 +91,14 @@
           <td><%= text_field :pseudonym, :sis_user_id %></td>
         </tr>
       <% end %>
-      <tr>
-        <td colspan="2">
-          <%= check_box :pseudonym, :send_confirmation, :checked => true %>
-          &nbsp;<%= label :pseudonym, :send_confirmation, :en => "Email the user about this account creation" %>
-        </td>
-      </tr>
+      <% unless identity_server_enabled %>
+        <tr>
+          <td colspan="2">
+            <%= check_box :pseudonym, :send_confirmation, :checked => true %>
+            &nbsp;<%= label :pseudonym, :send_confirmation, :en => "Email the user about this account creation" %>
+          </td>
+        </tr>
+      <% end %>
       <tr>
         <td colspan="2">
           <div class="button-container">
