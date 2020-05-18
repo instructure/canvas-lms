@@ -23,6 +23,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :user
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
 
+  before_create :set_root_account_id
   after_save :destroy_override_if_needed
   after_create :update_cached_due_dates
   after_destroy :update_cached_due_dates
@@ -121,5 +122,9 @@ class AssignmentOverrideStudent < ActiveRecord::Base
       DueDateCacher.recompute_users_for_course(user_id, assignment.context, [assignment])
     end
     self.quiz.clear_cache_key(:availability) if self.quiz
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= assignment&.root_account_id
   end
 end
