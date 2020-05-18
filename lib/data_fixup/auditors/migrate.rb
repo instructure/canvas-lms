@@ -52,7 +52,8 @@ module DataFixup::Auditors
         # to number of second from epoch % seconds_in_week
         {
           oldest: previous_sunday,
-          newest: next_sunday
+          newest: next_sunday,
+          fetch_strategy: :serial
         }
       end
 
@@ -91,7 +92,7 @@ module DataFixup::Auditors
       def migrate_in_pages(collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
         next_page = 1
         until next_page.nil?
-          page_args = { page: next_page, per_page: batch_size }
+          page_args = { page: next_page, per_page: batch_size}
           auditor_recs = get_cassandra_records_resiliantly(collection, page_args)
           ar_attributes_list = auditor_recs.map do |rec|
             auditor_ar_type.ar_attributes_from_event_stream(rec)
@@ -112,7 +113,7 @@ module DataFixup::Auditors
         @audit_failure_uuids ||= []
         next_page = 1
         until next_page.nil?
-          page_args = { page: next_page, per_page: batch_size }
+          page_args = { page: next_page, per_page: batch_size}
           auditor_recs = get_cassandra_records_resiliantly(collection, page_args)
           uuids = auditor_recs.map(&:id)
           existing_uuids = auditor_ar_type.where(uuid: uuids).pluck(:uuid)
