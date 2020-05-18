@@ -71,7 +71,7 @@ class AccountNotification < ActiveRecord::Base
       if root_account.site_admin?
         current = self.for_account(root_account, include_past: include_past)
       else
-        course_ids = user.enrollments.active_or_pending.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
+        course_ids = user.enrollments.active_or_pending_by_date.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
         # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
         all_account_ids = Course.where(:id => course_ids).not_deleted.
           distinct.pluck(:account_id, :root_account_id).flatten.uniq
@@ -95,13 +95,13 @@ class AccountNotification < ActiveRecord::Base
         unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
           # choose enrollments and account users to inspect
           if announcement.account.site_admin?
-            enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending.distinct.select(:role_id).to_a
+            enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending_by_date.distinct.select(:role_id).to_a
             account_users = user.account_users.shard(user.in_region_associated_shards).distinct.select(:role_id).to_a
           else
             announcement.shard.activate do
               sub_account_ids_map[announcement.account_id] ||=
                 Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
-              enrollments = Enrollment.where(user_id: user).active_or_pending.joins(:course).
+              enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course).
                 where(:courses => {:account_id => sub_account_ids_map[announcement.account_id]}).select(:role_id).to_a
               account_users = announcement.account.root_account.cached_all_account_users_for(user)
             end
@@ -145,7 +145,7 @@ class AccountNotification < ActiveRecord::Base
           end
         end
 
-        roles = user.enrollments.shard(user.in_region_associated_shards).active_or_pending.distinct.pluck(:type)
+        roles = user.enrollments.shard(user.in_region_associated_shards).active_or_pending_by_date.distinct.pluck(:type)
 
         if roles == ['StudentEnrollment'] && !root_account.include_students_in_global_survey?
           current.reject! { |announcement| announcement.required_account_service == 'account_survey_notifications' }
@@ -278,7 +278,7 @@ class AccountNotification < ActiveRecord::Base
           course_ids = Course.active.where(:id => min_id..max_id, :account_id => all_account_ids).pluck(:id)
           next unless course_ids.any?
           course_ids.each_slice(50) do |sliced_course_ids|
-            scope = Enrollment.active_or_pending.where(:course_id => sliced_course_ids)
+            scope = Enrollment.active_or_pending_by_date.where(:course_id => sliced_course_ids)
             scope = scope.where(:role_id => course_roles) unless get_everybody
             user_ids += scope.distinct.pluck(:user_id)
           end
