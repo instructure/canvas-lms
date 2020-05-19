@@ -67,11 +67,21 @@ class EventStream::Stream
     add_callback(:error, callback)
   end
 
-  def fetch(ids)
+  def fetch(ids, strategy: :batch)
     rows = []
     if available? && ids.present?
-      database.execute(fetch_cql, ids, consistency: read_consistency_level).fetch do |row|
-        rows << record_type.from_attributes(row.to_hash)
+      if strategy == :batch
+        database.execute(fetch_cql, ids, consistency: read_consistency_level).fetch do |row|
+          rows << record_type.from_attributes(row.to_hash)
+        end
+      elsif strategy == :serial
+        ids.each do |record_id|
+          database.execute(fetch_one_cql, record_id, consistency: read_consistency_level).fetch do |row|
+            rows << record_type.from_attributes(row.to_hash)
+          end
+        end
+      else
+        raise "Unrecognized Fetch Strategy: #{strategy}"
       end
     end
     rows
@@ -118,6 +128,10 @@ class EventStream::Stream
 
   def fetch_cql
     "SELECT * FROM #{table} %CONSISTENCY% WHERE #{id_column} IN (?)"
+  end
+
+  def fetch_one_cql
+    "SELECT * FROM #{table} %CONSISTENCY% WHERE #{id_column} = ?"
   end
 
   def run_callbacks(operation, *args)

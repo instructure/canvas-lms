@@ -76,5 +76,4 @@ describe Auditors do
     end
   end
 
-  
 end

@@ -176,6 +176,25 @@ class User < ActiveRecord::Base
   has_many :past_lti_ids, class_name: 'UserPastLtiId', inverse_of: :user
   has_many :user_preference_values, inverse_of: :user
 
+  has_many :auditor_authentication_records,
+    class_name: "Auditors::ActiveRecord::AuthenticationRecord",
+    dependent: :destroy,
+    inverse_of: :user
+  has_many :auditor_course_records,
+    class_name: "Auditors::ActiveRecord::CourseRecord",
+    dependent: :destroy,
+    inverse_of: :user
+  has_many :auditor_student_grade_change_records,
+    foreign_key: 'student_id',
+    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
+    dependent: :destroy,
+    inverse_of: :student
+  has_many :auditor_grader_grade_change_records,
+    foreign_key: 'grader_id',
+    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
+    dependent: :destroy,
+    inverse_of: :grader
+
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
   include StickySisFields

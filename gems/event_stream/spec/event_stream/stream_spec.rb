@@ -361,6 +361,12 @@ describe EventStream::Stream do
         expect(database).to receive(:execute).once.with(/%CONSISTENCY% WHERE/, anything, consistency: "ALL").and_return(@results)
         @stream.fetch([1])
       end
+
+      it "can fetch batch one-by-one" do
+        expect(database).to receive(:execute).exactly(3).times.and_return(@results)
+        @stream.fetch(['asdf', 'sdfg', 'dfgh'], strategy: :serial)
+      end
+
     end
 
     describe "add_index" do
