@@ -40,28 +40,41 @@ import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray
 const lockManager = new LockManager()
 lockManager.init({itemType: 'assignment', page: 'show'})
 
+let studentGroupSelectionRequestTrackers = []
+
 function onStudentGroupSelected(selectedStudentGroupId) {
   if (selectedStudentGroupId !== '0') {
-    axios.put(
-      `/api/v1/courses/${ENV.COURSE_ID}/gradebook_settings`,
-      qs.stringify({
-        gradebook_settings: {
-          filter_rows_by: {
-            student_group_id: selectedStudentGroupId
-          }
-        }
-      })
-    )
+    const tracker = {selectedStudentGroupId}
+    studentGroupSelectionRequestTrackers.push(tracker)
 
     ENV.selected_student_group_id = selectedStudentGroupId
     renderStudentGroupFilter()
     renderSpeedGraderLink()
+
+    axios
+      .put(
+        `/api/v1/courses/${ENV.COURSE_ID}/gradebook_settings`,
+        qs.stringify({
+          gradebook_settings: {
+            filter_rows_by: {
+              student_group_id: selectedStudentGroupId
+            }
+          }
+        })
+      )
+      .finally(() => {
+        studentGroupSelectionRequestTrackers = studentGroupSelectionRequestTrackers.filter(
+          item => item !== tracker
+        )
+        renderSpeedGraderLink()
+      })
   }
 }
 
 function renderSpeedGraderLink() {
   const disabled =
-    ENV.SETTINGS.filter_speed_grader_by_student_group && !ENV.selected_student_group_id
+    ENV.SETTINGS.filter_speed_grader_by_student_group &&
+    (!ENV.selected_student_group_id || studentGroupSelectionRequestTrackers.length > 0)
   const $mountPoint = document.getElementById('speed_grader_link_mount_point')
 
   if ($mountPoint) {
