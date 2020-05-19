@@ -101,14 +101,6 @@ class CanvasFiles extends React.Component {
         opts
       )
 
-      // load course folders
-      this.loadFolderContents(
-        this.ROOT_FOLDER_ID,
-        this.FOLDER_TYPE,
-        `/api/v1/courses/${this.props.courseID}/folders/root`,
-        opts
-      )
-
       // load group folders
       this.props.userGroups.forEach(group => {
         this.loadFolderContents(

@@ -2917,6 +2917,15 @@ class User < ActiveRecord::Base
     end
   end
 
+  def submittable_attachments
+    self.attachments.active.or(
+      Attachment.active.where(
+        context_type: 'Group',
+        context_id: self.current_group_memberships.active.select(:group_id)
+      )
+    )
+  end
+
   def authenticate_one_time_password(code)
     result = one_time_passwords.where(code: code, used: false).take
     return unless result

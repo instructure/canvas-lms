@@ -77,7 +77,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     when 'online_upload'
       file_ids = (input[:file_ids] || []).compact.uniq
 
-      attachments = current_user.attachments.active.where(id: file_ids)
+      attachments = current_user.submittable_attachments.active.where(id: file_ids)
       unless file_ids.size == attachments.size
         attachment_ids = attachments.map(&:id)
         return validation_error(
