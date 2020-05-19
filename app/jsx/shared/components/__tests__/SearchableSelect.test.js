@@ -48,13 +48,6 @@ function makeProps(isLoading) {
   }
 }
 
-function renderSubject(isLoading = false) {
-  const subjectProps = makeProps(isLoading)
-  const results = render(<Subject {...subjectProps}>{options}</Subject>)
-  const input = results.getByLabelText(LABEL)
-  return {subjectProps, input, ...results}
-}
-
 describe('SearchableSelect', () => {
   let ariaLive
 
@@ -68,6 +61,13 @@ describe('SearchableSelect', () => {
   afterAll(() => {
     if (ariaLive) ariaLive.remove()
   })
+
+  function renderSubject(isLoading = false) {
+    const subjectProps = makeProps(isLoading)
+    const results = render(<Subject {...subjectProps}>{options}</Subject>)
+    const input = results.getByLabelText(LABEL)
+    return {subjectProps, input, ...results}
+  }
 
   it('renders a Select with the proper label', () => {
     const {getByText} = renderSubject()
@@ -176,5 +176,95 @@ describe('SearchableSelect', () => {
     fireEvent.click(input)
     fireEvent.input(input, {target: {value: 'four score'}})
     expect(getByText('four score and seven')).toBeInTheDocument()
+  })
+})
+
+const groupOptions = [
+  <Subject.Group key="g1" id="g1" label="group1">
+    <Subject.Option id="g1o1" value="g1o1">
+      grp 1 option 1
+    </Subject.Option>
+    <Subject.Option id="g1o2" value="g1o2">
+      grp 1 option 2
+    </Subject.Option>
+  </Subject.Group>,
+  <Subject.Group key="g2" id="g2" label="group2">
+    <Subject.Option id="g2o1" value="g2o1">
+      grp 2 option 1
+    </Subject.Option>
+    <Subject.Option id="g2o2" value="g2o2">
+      grp 2 option 2
+    </Subject.Option>
+  </Subject.Group>
+]
+
+describe('SearchableSelect::Groups', () => {
+  let ariaLive
+
+  beforeAll(() => {
+    ariaLive = document.createElement('div')
+    ariaLive.id = 'flash_screenreader_holder'
+    ariaLive.setAttribute('role', 'alert')
+    document.body.appendChild(ariaLive)
+  })
+
+  afterAll(() => {
+    if (ariaLive) ariaLive.remove()
+  })
+
+  function renderSubject(otherProps = {}) {
+    const subjectProps = makeProps(false)
+    const results = render(
+      <Subject {...subjectProps} {...otherProps}>
+        {groupOptions}
+      </Subject>
+    )
+    const input = results.getByLabelText(LABEL)
+    return {subjectProps, input, ...results}
+  }
+
+  it('renders both groups and options', () => {
+    const {input, getByText} = renderSubject()
+    fireEvent.click(input)
+    expect(getByText('group1')).toBeInTheDocument()
+    expect(getByText('group2')).toBeInTheDocument()
+    expect(getByText('grp 1 option 1')).toBeInTheDocument()
+    expect(getByText('grp 1 option 2')).toBeInTheDocument()
+    expect(getByText('grp 2 option 1')).toBeInTheDocument()
+    expect(getByText('grp 2 option 2')).toBeInTheDocument()
+  })
+
+  it('always renders the group headings even on a search', () => {
+    const {input, getByText} = renderSubject()
+    fireEvent.click(input)
+    fireEvent.input(input, {target: {value: 'grp 1 option 1'}})
+    expect(getByText('group1')).toBeInTheDocument()
+    expect(getByText('group2')).toBeInTheDocument()
+  })
+
+  it('renders error message and no option list on failed search', () => {
+    const {input, getByText, queryByText} = renderSubject()
+    fireEvent.click(input)
+    fireEvent.input(input, {target: {value: 'xxx'}})
+    expect(queryByText('xxx')).toBeNull() // do not show that placeholder!
+    expect(getByText('No matches to your search')).toBeInTheDocument()
+  })
+
+  it('clears an error message and restores old search result after blurring', () => {
+    const {input, queryByText} = renderSubject({value: 'g1o1'})
+    fireEvent.click(input)
+    fireEvent.input(input, {target: {value: 'xxx'}})
+    fireEvent.blur(input)
+    expect(queryByText('No matches to your search')).toBeNull()
+    expect(input.value).toBe('grp 1 option 1')
+  })
+
+  it('does not misbehave when clicking back in after blurring', () => {
+    const {input} = renderSubject({value: 'g1o1'})
+    fireEvent.click(input)
+    fireEvent.input(input, {target: {value: 'xxx'}})
+    fireEvent.blur(input)
+    fireEvent.click(input)
+    expect(input.value).toBe('grp 1 option 1')
   })
 })

@@ -106,8 +106,10 @@ function SearchableSelect(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, React.Children.count(children)])
 
+  const matcherFor = v => new RegExp('^(\\s*)' + reEscape(v), 'i')
+
   function onInputChange(e) {
-    const newMatcher = new RegExp('^(\\s*)' + reEscape(e.target.value), 'i')
+    const newMatcher = matcherFor(e.target.value)
     const doesAnythingMatch = options.some(i => i.name.match(newMatcher))
     setInputValue(e.target.value)
     setMatcher(newMatcher)
@@ -150,7 +152,10 @@ function SearchableSelect(props) {
       onRequestSelectOption(e, matchingOptions[0])
     } else {
       const resetValue = options.find(i => i.value === value)
-      if (resetValue) setInputValue(resetValue.name)
+      if (resetValue) {
+        setInputValue(resetValue.name)
+        setMatcher(matcherFor(resetValue.name))
+      }
     }
     setSearchResultMessage(true)
   }
@@ -210,7 +215,7 @@ function SearchableSelect(props) {
       )
     }
 
-    if (messages) {
+    if (messages || matchingOptions.length === 0) {
       return (
         <Select.Option isDisabled id={NO_OPTIONS_OPTION_ID}>
           xxx
