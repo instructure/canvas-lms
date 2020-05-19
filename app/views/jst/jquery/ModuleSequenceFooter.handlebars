@@ -26,9 +26,9 @@
           <div class="sm-module-footer">
             <ul class="sm-module-footer__nav">
               {{#each items}}
-                <li id="{{id}}" aria-label="{{title}}">
+                <li id="{{id}}">
                   <div class="sm-footer-progress-container">
-                    <a href="{{html_url}}" data-tooltip="top"
+                    <a href="{{html_url}}" data-tooltip="top" aria-label="{{title}}"
                   data-html-tooltip-title="{{title}}" class="{{#ifEqual id ../currentItem.id }}current{{/ifEqual}}">
                     </a>
                     {{#unless @last }}

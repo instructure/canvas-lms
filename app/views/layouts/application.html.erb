@@ -116,7 +116,7 @@
              <%= @current_user.name %>
           </div>
           <div class="dropdown">
-            <a id="sm-profile-dropdown" href="/profile" type="button" aria-haspopup="true" data-toggle="dropdown" data-id="profile-dropdown" aria-owns="sm-profile-dropdown" aria-labelledby="type-filter-description" aria-expanded="false">
+            <a id="sm-profile-dropdown" href="/profile" type="button" aria-haspopup="true" data-toggle="dropdown" data-id="profile-dropdown" aria-owns="sm-profile-dropdown" aria-expanded="false" aria-label="profile dropdown menu">
               <div class="sm-menu-item-icon-container" aria-hidden="true">
 
                 <div class="ic-avatar <% if @real_current_user && @real_current_user != @current_user %>ic-avatar--fake-student<% end %>">
@@ -213,7 +213,7 @@
             <% end %>
             <% if !@distraction_free && defined? @context.grants_any_right? && !can_do(@context, @current_user, :participate_as_student) %>
               <div class="sm-teacher-tools-container" style="display: none">
-                <a href="#" type="button" aria-haspopup="true" class="sm-left-nav-toggler" data-toggle="dropdown" data-id="teacher-tools" aria-owns="sm-teacher-tools" aria-labelledby="type-filter-description" aria-expanded="false">
+                <a href="#" type="button" aria-haspopup="true" class="sm-left-nav-toggler" data-toggle="dropdown" data-id="teacher-tools" aria-owns="sm-teacher-tools" aria-expanded="false">
                   <div class="filter-option pull-left"><%= t("Teacher Tools")%></div>
                   <i class="icon-arrow-open-down"></i>
                 </a>
