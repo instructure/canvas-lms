@@ -53,10 +53,6 @@ module Lti
       end
     end
 
-    def update
-      # Will add in seperate PS
-    end
-
     def show
       tool = tools.active.find(params['external_tool_id'])
       render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE

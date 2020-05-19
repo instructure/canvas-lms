@@ -49,7 +49,7 @@ module Schemas::Lti
           "type" => "array",
           "items" => {
             "type" => "string",
-            "enum" => TokenScopes::LTI_SCOPES.keys.freeze
+            "enum" => [*TokenScopes::LTI_SCOPES.keys, *TokenScopes::LTI_HIDDEN_SCOPES.keys].freeze
           }
         }.freeze,
         "extensions" => {
