@@ -120,6 +120,12 @@ describe AvatarHelper do
         user_with_avatar = user_model(avatar_image_url: 'http://somedomain/avatar-frd.png')
         expect(AvatarHelper.avatar_url_for_user(user_with_avatar, request, use_fallback: false)).to eq 'http://somedomain/avatar-frd.png'
       end
+
+      it "does not prepend the request base if avatar url is an empty string" do
+        request = OpenObject.new(:host => "somedomain", :protocol => "http://", :base_url => "http://somedomain")
+        user = user_model(avatar_image_url: '')
+        expect(AvatarHelper.avatar_url_for_user(user, request)).to eq ""
+      end
     end
 
     context "with avatar service off" do
