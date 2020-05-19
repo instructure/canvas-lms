@@ -127,6 +127,20 @@ describe NotificationMessageCreator do
       expect(channels).to include(a)
     end
 
+    it 'only sends notifications to active channels' do
+      assignment_model
+      @user = user_model(:workflow_state => 'registered')
+      a = @user.communication_channels.create(:path => "a@example.com", :path_type => 'email')
+      a.confirm!
+      b = @user.communication_channels.create(:path => "b@example.com", :path_type => 'email')
+      @n = Notification.create!(:name => "New notification", :category => 'TestImmediately')
+
+      messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
+      channels = messages.collect(&:communication_channel)
+      expect(channels).to include(a)
+      expect(channels).not_to include(b)
+    end
+
     it 'does not send a notification when policy override is disabled for a course' do
       notification_set(notification_opts: { :category => "Announcement" })
       @course.root_account.enable_feature!(:mute_notifications_by_course)
