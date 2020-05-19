@@ -269,7 +269,7 @@ user's name, but you can customize it here.</td>
 still be provided.</td>
 </tr>
 <tr>
-<td>Pronoun</td>
+<td>pronouns</td>
 <td>text</td>
 <td></td>
 <td>✓</td>
