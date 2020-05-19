@@ -166,7 +166,8 @@ class EventStream::Index
     # this once the data fixup has completed for all indexes.
     ids = EventStream.get_index_ids(self, pager)
 
-    events = event_stream.fetch(ids)
+    fetch_strategy = options.fetch(:fetch_strategy, :batch)
+    events = event_stream.fetch(ids, strategy: fetch_strategy)
     pager.replace events.sort_by { |event| ids.index(event.id) }
   end
 end

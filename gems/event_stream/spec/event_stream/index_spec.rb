@@ -247,7 +247,7 @@ describe EventStream::Index do
 
         allow(@raw_results).to stub_with_multiple_yields
 
-        expect(@stream).to receive(:fetch).once.with(@ids[start, requested]).and_return(@typed_results[start, requested])
+        expect(@stream).to receive(:fetch).once.with(@ids[start, requested], {:strategy=>:batch}).and_return(@typed_results[start, requested])
       end
 
       def setup_execute(start, requested)

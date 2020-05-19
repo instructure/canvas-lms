@@ -154,7 +154,7 @@ shared_context "in-process server selenium tests" do
 
   # synchronize db connection methods for a modicum of thread safety
   module SynchronizeConnection
-    %w{execute exec_cache exec_no_cache query transaction}.each do |method|
+    %w{cache_sql execute exec_cache exec_no_cache query transaction}.each do |method|
       class_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{method}(*)
           SeleniumDriverSetup.request_mutex.synchronize { super }

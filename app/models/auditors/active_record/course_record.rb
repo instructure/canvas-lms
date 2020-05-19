@@ -23,6 +23,11 @@ module Auditors::ActiveRecord
     self.partitioning_field = 'created_at'
     self.table_name = 'auditor_course_records'
 
+    belongs_to :course, class_name: '::Course', inverse_of: :auditor_course_records
+    belongs_to :user, inverse_of: :auditor_course_records
+    belongs_to :account, inverse_of: :auditor_course_records
+    belongs_to :sis_batch, inverse_of: :auditor_course_records
+
     class << self
       include Auditors::ActiveRecord::Model
 

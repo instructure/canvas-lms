@@ -2735,16 +2735,21 @@ describe CoursesController do
     end
 
     it "removes submissions created by the test student" do
+      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
       user_session(@teacher)
       post 'student_view', params: {course_id: @course.id}
       test_student = @course.student_view_student
       assignment = @course.assignments.create!(:workflow_state => 'published')
       assignment.grade_student test_student, { :grade => 1, :grader => @teacher }
       expect(test_student.submissions.size).not_to be_zero
+      submission = test_student.submissions.first
+      auditor_rec = submission.auditor_grade_change_records.first
+      expect(auditor_rec).to_not be_nil
       OriginalityReport.create!(attachment: attachment_model, originality_score: '1', submission: test_student.submissions.first)
       delete 'reset_test_student', params: {course_id: @course.id}
       test_student.reload
       expect(test_student.submissions.size).to be_zero
+      expect(Auditors::ActiveRecord::GradeChangeRecord.where(id: auditor_rec.id).count).to be_zero
     end
 
     it "removes provisional grades for by the test student" do
