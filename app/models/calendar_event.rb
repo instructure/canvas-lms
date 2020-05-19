@@ -329,6 +329,10 @@ class CalendarEvent < ActiveRecord::Base
     if saved_change_to_start_at? && web_conference.user_settings.key?(:scheduled_date)
       web_conference.user_settings[:scheduled_date] = start_at
     end
+    unless web_conference.lti?
+      web_conference.invite_users_from_context
+    end
+
     web_conference.save!
   end
 

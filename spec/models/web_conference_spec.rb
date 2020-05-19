@@ -188,6 +188,32 @@ describe WebConference do
     end
   end
 
+  context "invite users" do
+    it "invites users from a specified set of user ids" do
+      user1 = user_factory(active_all: true)
+      user2 = user_factory(active_all: true)
+      course = course_factory(active_all: true)
+      course.enroll_student(user1).accept!
+      course.enroll_student(user2).accept!
+      conference = BigBlueButtonConference.new(:title => "my conference", :user => user1, :context => course)
+      conference.save
+      conference.invite_users_from_context([user2.id])
+      expect(conference.invitees.pluck(:user_id)).to match_array([user2.id])
+    end
+
+    it "invites all users from context" do
+      user1 = user_factory(active_all: true)
+      user2 = user_factory(active_all: true)
+      course = course_factory(active_all: true)
+      course.enroll_student(user1).accept!
+      course.enroll_student(user2).accept!
+      conference = BigBlueButtonConference.new(:title => "my conference", :user => user1, :context => course)
+      conference.save
+      conference.invite_users_from_context
+      expect(conference.invitees.pluck(:user_id)).to match_array(course.user_ids)
+    end
+  end
+
   context "notifications" do
     before do
       Notification.create!(:name => 'Web Conference Invitation',
@@ -332,6 +358,7 @@ describe WebConference do
       course_with_teacher(active_all: true)
       conference = WimbaConference.create!(title: "my conference", user: @user, context: @course)
       event = calendar_event_model web_conference: conference
+      conference.web_conference_participants.scope.delete_all
       conference.destroy!
       expect(event.reload.web_conference).to be nil
     end

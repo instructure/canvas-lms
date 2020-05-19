@@ -83,6 +83,10 @@ class WebConference < ActiveRecord::Base
       }
   end
 
+  def lti?
+    false
+  end
+
   def lti_settings=(new_settings)
     settings[:lti_settings] = new_settings
   end
@@ -240,6 +244,14 @@ class WebConference < ActiveRecord::Base
       self.save
     end
     p.save
+  end
+
+  def invite_users_from_context(user_ids = context.user_ids)
+    members = context.is_a?(Course) ? context.participating_users(user_ids) : context.participating_users_in_context(user_ids)
+    new_invitees = members.to_a - invitees
+    new_invitees.uniq.each do |u|
+      add_invitee(u)
+    end
   end
 
   def recording_ready!
