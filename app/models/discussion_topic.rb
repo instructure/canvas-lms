@@ -1124,7 +1124,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     given do |user, session|
       self.allow_rating && (!self.only_graders_can_rate ||
-                            self.context.grants_right?(user, session, :manage_grades))
+                            self.course.grants_right?(user, session, :manage_grades))
     end
     can :rate
   end

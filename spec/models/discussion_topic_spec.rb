@@ -2595,4 +2595,12 @@ describe DiscussionTopic do
       expect(users.map(&:id).to_set).to eq([@teacher.id, @student2.id].to_set)
     end
   end
+
+  context "only_graders_can_rate" do
+    it "should check permissions on the course level for group level discussions" do
+      group = @course.groups.create!
+      topic = group.discussion_topics.create!(:allow_rating => true, :only_graders_can_rate => true)
+      expect(topic.grants_right?(@teacher, :rate)).to eq true
+    end
+  end
 end
