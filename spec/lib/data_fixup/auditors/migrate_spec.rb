@@ -388,6 +388,17 @@ module DataFixup::Auditors::Migrate
         expect(Delayed::Job.count).to eq(1)
       end
 
+      it "defaults to the :schedule operation and offsets by a week" do
+        start_date = Time.zone.today
+        end_date = start_date - 1.year
+        engine = BackfillEngine.new(start_date, end_date, operation_type: nil)
+        expect(engine.operation).to eq(:schedule)
+        expect(engine.next_schedule_date(start_date)).to eq(start_date - 7.days)
+        engine = BackfillEngine.new(start_date, end_date, operation_type: :repair)
+        expect(engine.operation).to eq(:repair)
+        expect(engine.next_schedule_date(start_date)).to eq(start_date - 1.day)
+      end
+
       context "when enqueued" do
         let(:start_date) { Time.zone.today }
         let(:end_date) { start_date - 1.year }
