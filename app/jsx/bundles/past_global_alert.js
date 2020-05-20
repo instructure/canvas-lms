@@ -16,24 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import React from 'react'
-import {Heading} from '@instructure/ui-heading/lib/Heading'
-import I18n from 'i18n!past_global_announcements'
+import ReactDOM from 'react-dom'
+import PastGlobalAlert from '../past_global_announcements/PastGlobalAlert'
 
-const PastGlobalAnnouncements = () => {
-  return (
-    <>
-      <Heading border="bottom" margin="medium">
-        {I18n.t('Current')}
-      </Heading>
-      <div dangerouslySetInnerHTML={{__html: ENV.global_notifications.active}}/>
-
-      <Heading border="bottom" margin="medium">
-        {I18n.t('Past')}
-      </Heading>
-      <div dangerouslySetInnerHTML={{__html: ENV.global_notifications.past}}/>
-    </>
-  )
-}
-
-export default PastGlobalAnnouncements
+$(() => {
+  ReactDOM.render(<PastGlobalAlert />, $('<div/>').appendTo('#announcementWrapper')[0])
+})

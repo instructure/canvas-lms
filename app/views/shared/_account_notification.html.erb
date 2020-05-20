@@ -42,11 +42,17 @@
     </div>
     <% unless @for_display %>
     <div class="ic-notification__actions">
-      <a href="#" class="Button Button--icon-action" data-url="<%= dashboard_close_notification_path(notification.id) %>" data-remove=".ic-notification" title="<%= t :close, 'close' %>" role="button">
+      <a href="#" class="Button Button--icon-action" onClick='showGlobalAlert()' data-url="<%= dashboard_close_notification_path(notification.id) %>" data-remove=".ic-notification" title="<%= t :close, 'close' %>" role="button">
         <i class="icon-x"></i>
         <span class="screenreader-only"><%= t :close, 'close' %></span>
       </a>
     </div>
+    <script>
+      function showGlobalAlert() {
+        const event = new Event('globalAlertShouldRender')
+        document.dispatchEvent(event)
+      }
+    </script>
     <% end %>
   </div>
   <span class="notification_account_content_text">
