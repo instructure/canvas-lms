@@ -105,9 +105,10 @@ def _runRspecTestSuite(
     finally {
       // copy spec failures to local
       sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures canvas_ --allow-error --clean-dir'
-
+      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/rspec_results canvas_ --allow-error --clean-dir'
       def reports = load 'build/new-jenkins/groovy/reports.groovy'
       reports.stashSpecFailures(prefix, index)
+      reports.stashSpecResults(prefix, index)
       if (env.COVERAGE == '1') {
         sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage canvas_ --clean-dir'
         reports.stashSpecCoverage(prefix, index)
@@ -147,6 +148,27 @@ def _uploadSpecFailures(prefix, total, test_name) {
   def report_url = reports.publishSpecFailuresAsHTML(prefix, total, test_name)
   if (!load('build/new-jenkins/groovy/successes.groovy').hasSuccessOrBuildIsSuccessful(prefix, total)) {
     reports.appendFailMessageReport("Spec Failure For $prefix", report_url)
+  }
+}
+
+def uploadSeleniumJunit() {
+  def reports = load('build/new-jenkins/groovy/reports.groovy')
+  reports.publishJunitReport('selenium', seleniumConfig().node_total)
+}
+
+def uploadRspecJunit() {
+  def reports = load('build/new-jenkins/groovy/reports.groovy')
+  reports.publishJunitReport('rspec', rspecConfig().node_total)
+}
+
+def uploadJunitReports() {
+  uploadSeleniumJunit()
+  uploadRspecJunit()
+  def preStatus = currentBuild.getResult()
+  junit allowEmptyResults: true, testResults: 'spec_results/**/*.xml'
+  // junit publishing will set build status to unstable if failed tests found, if so set it back to SUCCESS
+  if (currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
+    currentBuild.rawBuild.@result = hudson.model.Result.SUCCESS
   }
 }
 

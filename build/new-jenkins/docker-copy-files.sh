@@ -79,5 +79,6 @@ ids=( $(docker ps -aq --filter "name=$search_name") )
 # actually do the copy
 for i in "${ids[@]}"
 do
-  docker cp $i:$container_dir $host_dir/${search_name}_$i || $allow_error
+  mkdir -p $host_dir/${search_name}_$i
+  docker cp $i:$container_dir $host_dir/${search_name}_$i/ || $allow_error
 done
