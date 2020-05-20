@@ -636,12 +636,17 @@ module DataFixup::Auditors
         end
       end
 
-      def initialize(start_date, end_date)
+      def initialize(start_date, end_date, operation_type: :schedule)
         if start_date < end_date
           raise "You probably didn't read the comment on this job..."
         end
         @start_date = start_date
         @end_date = end_date
+        @_operation = operation_type
+      end
+
+      def operation
+        @_operation ||= :schedule
       end
 
       def log(message)
@@ -703,6 +708,26 @@ module DataFixup::Auditors
         "AuditorsBackfillEngine::Job_Shard_#{self.class.jobs_id}"
       end
 
+      def next_schedule_date(current_date)
+        # each job spans a week, so when we're scheduling
+        # the initial job we can schedule one week at a time.
+        # In a repair pass, we want to make sure we hit every
+        # cell that failed, or that never got queued (just in case),
+        # so we actually line up jobs for each day that is
+        # missing/failed.  It's possible to schedule multiple jobs
+        # for the same week.  If one completes before the next one starts,
+        # they will bail immediately.  If two from the same week are running
+        # at the same time the uniqueness-constraint-and-conflict-handling
+        # prevents them from creating duplicates
+        if operation == :schedule
+          current_date - 7.days
+        elsif operation == :repair
+          current_date - 1.day
+        else
+          raise "Unknown backfill operation: #{operation}"
+        end
+      end
+
       def perform
         self.class.preset_parallelism!
         log("Scheduling Auditors Backfill!")
@@ -715,7 +740,7 @@ module DataFixup::Auditors
           enqueue_one_day(current_date)
           log("Scheduled Backfill for #{current_date} on #{Shard.current.id}")
           # jobs span a week now, we can schedule them at week intervals arbitrarily
-          current_date -= 7.days
+          current_date = next_schedule_date(current_date)
         end
         if current_date >= @end_date
           schedule_worker = BackfillEngine.new(current_date, @end_date)
