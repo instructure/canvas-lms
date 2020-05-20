@@ -96,7 +96,7 @@ export default class ContentCheckboxView extends Backbone.View
     calendar_events:              "icon-calendar-days"
     rubrics:                      "icon-rubric"
     groups:                       "icon-group"
-    learning_outcomes:            "icon-standards"
+    learning_outcomes:            if (ENV.SHOW_SELECTABLE_OUTCOMES_IN_IMPORT) then 'icon-outcomes' else 'icon-standards'
     learning_outcome_groups:      "icon-folder"
     attachments:                  "icon-document"
     assignment_groups:            "icon-folder"
