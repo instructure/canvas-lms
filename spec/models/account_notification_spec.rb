@@ -71,6 +71,28 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@unenrolled, Account.site_admin).map(&:id).sort).to eq [@a5.id, @a6.id]
   end
 
+  it 'should sort' do
+    @announcement.destroy
+    role_ids = ["TeacherEnrollment", "AccountAdmin"].map{|name| Role.get_built_in_role(name).id}
+    account_notification(:role_ids => role_ids, :message => "Announcement 1")
+    @a1 = @announcement
+    account_notification(:account => @account, :role_ids => [nil], :message => "Announcement 2") #students not currently taking a course
+    @a2 = @announcement
+    account_notification(:account => @account, :message => "Announcement 3") # no roles, should go to all
+    @announcement[:end_at] = @announcement[:end_at] + 1.month
+    @a3 = @announcement
+
+    @unenrolled = @user
+    course_with_teacher(:account => @account)
+    @teacher = @user
+    account_admin_user(:account => @account)
+    @admin = @user
+    course_with_student(:course => @course).accept(true)
+    @student = @user
+
+    expect(AccountNotification.for_user_and_account(@teacher, @account)).to eq [@a3, @a1]
+  end
+
   it "should allow closing an announcement" do
     @user.close_announcement(@announcement)
     expect(@user.get_preference(:closed_notifications)).to eq [@announcement.id]

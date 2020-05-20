@@ -152,7 +152,7 @@ class AccountNotification < ActiveRecord::Base
         end
       end
 
-      current
+      current.sort_by {|item| item[:end_at]}.reverse
     end
   end
 
