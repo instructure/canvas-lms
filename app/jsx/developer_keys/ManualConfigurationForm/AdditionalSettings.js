@@ -35,11 +35,23 @@ export default class AdditionalSettings extends React.Component {
         ...omit(props.additionalSettings, ['settings']),
         ...props.additionalSettings.settings
       },
-      custom_fields: Object.keys(props.custom_fields)
-        .map(k => `${k}=${props.custom_fields[k]}`)
-        .join('\n')
+      custom_fields: this.customFieldsToString(props.custom_fields)
     }
   }
+
+  customFieldsToString = customFields =>
+    Object.keys(customFields)
+      .map(k => `${k}=${customFields[k]}`)
+      .join('\n')
+
+  customFieldsToObject = customFields =>
+    customFields.split('\n').reduce((obj, field) => {
+      const [key, value] = field.split('=')
+      if (key && value) {
+        obj[key] = value
+      }
+      return obj
+    }, {})
 
   generateToolConfigurationPart = () => {
     const {custom_fields, additionalSettings} = this.state
@@ -58,7 +70,7 @@ export default class AdditionalSettings extends React.Component {
     extension.privacy_level = additionalSettings.privacy_level || 'anonymous'
     return {
       extensions: [extension],
-      custom_fields
+      custom_fields: this.customFieldsToObject(custom_fields)
     }
   }
 

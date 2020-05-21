@@ -54,11 +54,12 @@ const checkToolConfigPart = (toolConfig, path, value) => {
   expect(get(toolConfig, path)).toEqual(value)
 }
 
-const checkChange = (path, funcName, value) => {
+const checkChange = (path, funcName, in_value, out_value) => {
+  out_value = out_value || in_value
   const wrapper = mount(<AdditionalSettings {...props()} />)
 
-  wrapper.instance()[funcName]({target: {value}})
-  checkToolConfigPart(wrapper.instance().generateToolConfigurationPart(), path, value)
+  wrapper.instance()[funcName]({target: {value: in_value}})
+  checkToolConfigPart(wrapper.instance().generateToolConfigurationPart(), path, out_value)
 }
 
 it('changes the output when domain changes', () => {
@@ -94,5 +95,5 @@ it('changes the output when selection_width changes', () => {
 })
 
 it('changes the output when custom_fields changes', () => {
-  checkChange(['custom_fields'], 'handleCustomFieldsChange', 'foo=bar')
+  checkChange(['custom_fields'], 'handleCustomFieldsChange', 'foo=bar', {foo: 'bar'})
 })
