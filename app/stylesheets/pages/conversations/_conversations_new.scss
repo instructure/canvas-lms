@@ -683,7 +683,7 @@ body.responsive_awareness {
   }
 }
 
-body:not(.responsive_awareness) .message-item-view:hover, .message-metadata.hover {
+body:not(.responsive_awareness) .message-item-view:hover, body:not(.responsive_awareness) .message-item-view:focus-within, .message-metadata.hover {
   .actions {
     display: block;
     #{direction(right)}: -7px;
