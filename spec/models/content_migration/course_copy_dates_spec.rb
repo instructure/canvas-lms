@@ -533,5 +533,32 @@ describe ContentMigration do
       expect(new_event.all_day?).to be_truthy
       expect(new_event.all_day_date).to be_nil
     end
+
+    it "should trigger cached_due_date changes" do
+      assmt = @copy_from.assignments.create!(title: "an event", :due_at => 1.day.from_now)
+
+      run_course_copy
+
+      assmt_to = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
+      student_in_course(:active_all => true, :course => @copy_to)
+      sub_to = assmt_to.reload.submissions.first
+      expect(sub_to.cached_due_date.to_i).to eq assmt.due_at.to_i
+
+      opts = {
+        everything: true,
+        shift_dates: true,
+        old_start_date: 1.week.ago.to_date,
+        old_end_date: 1.week.from_now.to_date,
+        new_start_date: 2.weeks.from_now.to_date,
+        new_end_date: 4.weeks.from_now.to_date
+      }
+      @cm.copy_options = opts
+      @cm.save!
+
+      run_course_copy
+
+      expect(assmt_to.reload.due_at.to_i).to_not eq assmt.due_at.to_i # shifted the date on the assignment
+      expect(sub_to.reload.cached_due_date.to_i).to_not eq assmt.due_at.to_i # shifted the cached date too
+    end
   end
 end

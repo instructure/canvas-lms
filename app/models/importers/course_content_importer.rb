@@ -291,6 +291,7 @@ module Importers
               event.lock_at = shift_date(event.lock_at, shift_options)
               event.unlock_at = shift_date(event.unlock_at, shift_options)
               event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
+              event.needs_update_cached_due_dates = true if event.update_cached_due_dates?
               event.save_without_broadcasting
               if event.errors.any?
                 migration.add_warning(t("Couldn't adjust dates on assignment %{name} (ID %{id})", name: event.name, id: event.id.to_s))
