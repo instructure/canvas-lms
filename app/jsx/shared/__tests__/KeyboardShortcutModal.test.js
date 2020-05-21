@@ -42,17 +42,6 @@ describe(KeyboardShortcutModal, () => {
     component.unmount()
   })
 
-  test('appears when comma key is pressed', async () => {
-    expect(document.querySelector('.keyboard_navigation')).toBeNull()
-    const e = new Event('keydown')
-    e.which = 188
-    document.dispatchEvent(e)
-
-    await waitForInstUIModalCssTransitions()
-
-    expect(document.querySelector('.keyboard_navigation')).toBeTruthy()
-  })
-
   test('appears when shift + ? is pressed', async () => {
     expect(document.querySelector('.keyboard_navigation')).toBeNull()
     const e = new Event('keydown')
@@ -68,7 +57,8 @@ describe(KeyboardShortcutModal, () => {
   describe('shortcuts', () => {
     beforeEach(() => {
       const e = new Event('keydown')
-      e.which = 188
+      e.which = 191
+      e.shiftKey = true
       document.dispatchEvent(e)
       return waitForInstUIModalCssTransitions()
     })

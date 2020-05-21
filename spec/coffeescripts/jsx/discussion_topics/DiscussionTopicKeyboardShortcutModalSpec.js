@@ -54,7 +54,8 @@ test('renders shortcuts', async function() {
 
   // open the modal by pressing ";"
   const e = new Event('keydown')
-  e.which = 188
+  e.which = 191
+  e.shiftKey = true
   document.dispatchEvent(e)
 
   // have to wait for instUI modal css transitions
