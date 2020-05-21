@@ -36,7 +36,7 @@ const NotificationPreferences = props => {
   return (
     <Flex direction="column">
       <Flex.Item overflowY="visible">
-        <Heading>
+        <Heading level="h2" as="h1">
           {I18n.t('%{contextType} Notification Settings', {
             contextType: capitalizedContextType
           })}
