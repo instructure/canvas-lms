@@ -1673,6 +1673,7 @@ describe Quizzes::QuizzesController do
                 title: "overrides",
                 assignment_overrides: [{
                   course_section_id: @section.id,
+                  due_at: nil
                 }]
               },
               post_to_sis: '1'

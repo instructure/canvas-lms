@@ -3505,7 +3505,7 @@ class Assignment < ActiveRecord::Base
 
     if AssignmentUtil.due_date_required?(self)
       overrides = gather_override_data(overrides)
-      if overrides.select{|o| o[:due_at].nil? && o[:workflow_state] != 'deleted'}.length > 0
+      if overrides.select{|o| !!o[:due_at_overridden] && o[:due_at].blank? && o[:workflow_state] != 'deleted'}.length > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
         return false
       end
@@ -3515,6 +3515,13 @@ class Assignment < ActiveRecord::Base
 
   def gather_override_data(overrides)
     overrides = overrides.values.reject(&:empty?).flatten if overrides.is_a?(Hash)
+    overrides = overrides.map do |o|
+      o = o.to_unsafe_h if o.is_a?(ActionController::Parameters)
+      if o.is_a?(Hash) && o.has_key?(:due_at) && !o.has_key?(:due_at_overridden)
+        o = o.merge(:due_at_overridden => true) # default to true if provided by api
+      end
+      o
+    end
     override_ids = overrides.map{|ele| ele[:id]}.to_set
     self.assignment_overrides.reject{|o| override_ids.include? o[:id]} + overrides
   end
