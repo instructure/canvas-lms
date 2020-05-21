@@ -32,6 +32,13 @@ deprecate_sms:
     grade changes.
   applies_to: RootAccount
 
+hide_course_sections_from_students:
+  state: hidden
+  display_name: Hide Course Sections from Students
+  description: |-
+    Allows teachers to hide course sections from students on the People page when there is more than one section in the course.
+  applies_to: RootAccount
+
 mute_notifications_by_course:
   state: hidden
   display_name: Mute notifications by course

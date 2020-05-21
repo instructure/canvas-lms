@@ -251,26 +251,44 @@ describe Course do
   end
 
   describe "#hide_sections_on_course_users_page?" do
-    before :each do
-      course_with_student
+    context "FF is On" do
+      before :once do
+        course_with_student
+        @course.root_account.enable_feature!(:hide_course_sections_from_students)
+      end
+
+      context "Setting is set to On" do
+        before :each do
+          @course.update!(:hide_sections_on_course_users_page => true)
+        end
+
+        it "returns true when there is more than one section" do
+          @course.course_sections.create!
+          expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be true
+        end
+
+        it "returns false when there is only one section" do
+          expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be false
+        end
+      end
+
+      context "Setting is set to Off" do
+        before :each do
+          @course.update!(:hide_sections_on_course_users_page => false)
+        end
+
+        it "returns false" do
+          expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be false
+        end
+      end
     end
 
-    context "setting is On" do
-      before :each do
-        @course.update!(:hide_sections_on_course_users_page => true)
+    context "FF is off" do
+      before :once do
+        course_with_student
+        @course.root_account.disable_feature!(:hide_course_sections_from_students)
       end
 
-      it "returns true when there is more than one section" do
-        @course.course_sections.create!
-        expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be true
-      end
-
-      it "returns false when there is only one section" do
-        expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be false
-      end
-    end
-
-    context "setting is off" do
       it "returns false" do
         expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be false
       end
