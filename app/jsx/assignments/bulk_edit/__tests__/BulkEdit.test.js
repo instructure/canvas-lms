@@ -83,6 +83,14 @@ function restrictedAssignmentResponse() {
   return data
 }
 
+function tooManyDatesResponse() {
+  const data = standardAssignmentResponse()
+  delete data[1].all_dates
+  data[1].all_dates_count = 51
+
+  return data
+}
+
 function mockAssignmentsResponse(assignments) {
   fetch.mockResponse(JSON.stringify(assignments))
   return assignments
@@ -321,6 +329,14 @@ describe('Assignment Bulk Edit Dates', () => {
     expect(getByTitle('In closed grading period')).toBeInTheDocument()
     expect(getByTitle('Only the moderator can edit this assignment')).toBeInTheDocument()
     expect(getByTitle('You do not have permission to edit this assignment')).toBeInTheDocument()
+  })
+
+  it('deals with too many dates', async () => {
+    const {getByText, getAllByLabelText} = await renderBulkEditAndWait({}, tooManyDatesResponse())
+    const dueDateInputs = getAllByLabelText('Due At')
+    expect(dueDateInputs.length).toEqual(2)
+
+    expect(getByText('This assignment has too many dates to display.')).toBeInTheDocument()
   })
 
   describe('saving data', () => {
