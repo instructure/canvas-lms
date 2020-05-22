@@ -67,6 +67,20 @@ class EventStream::Index
     end
   end
 
+  # does the exact same scan as "for_key",
+  # but returns  just the IDs rather than
+  # random-accessing the datastore for the attributes
+  # for each id.  Mostly for use in bulk-scan
+  # operations like transferring all data from
+  # one store to another.
+  def ids_for_key(key, options={})
+    shard = EventStream.current_shard
+    bookmarker = EventStream::Index::Bookmarker.new(self)
+    BookmarkedCollection.build(bookmarker) do |pager|
+      shard.activate { ids_only_history(key, pager, options) }
+    end
+  end
+
   def create_key(bucket, key)
     [*key, bucket].join('/')
   end
@@ -99,7 +113,7 @@ class EventStream::Index
 
   private
 
-  def history(key, pager, options)
+  def ids_only_history(key, pager, options)
     # get the bucket to start at from the bookmark
     if pager.current_bookmark
       bucket, ordered_id = pager.current_bookmark
@@ -157,15 +171,12 @@ class EventStream::Index
       ordered_id = nil
       bucket -= bucket_size
     end
+    pager
+  end
 
-    # now that the bookmark's been set, convert the ids to rows from the
-    # related event stream, preserving the order
-    # ids = pager.map { |row| row[id_column] }
-
-    # Temporarily run the data fixup on the ids to clean them.  We can remove
-    # this once the data fixup has completed for all indexes.
-    ids = EventStream.get_index_ids(self, pager)
-
+  def history(key, pager, options)
+    pager = ids_only_history(key, pager, options)
+    ids = pager.map { |row| row[id_column] }
     fetch_strategy = options.fetch(:fetch_strategy, :batch)
     events = event_stream.fetch(ids, strategy: fetch_strategy)
     pager.replace events.sort_by { |event| ids.index(event.id) }

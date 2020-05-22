@@ -410,5 +410,93 @@ describe EventStream::Index do
         end
       end
     end
+
+    describe "ids_for_key" do
+      before(:each) do
+        shard_class = Class.new {
+          define_method(:activate) { |&b| b.call }
+        }
+
+        EventStream.current_shard_lookup = lambda {
+          shard_class.new
+        }
+
+        # force just one bucket
+        @index.bucket_size Time.now + 1.minute
+        @index.scrollback_limit 10.minutes
+        @pager = @index.ids_for_key('key')
+
+        @ids = (1..4).to_a
+        @typed_results = @ids.map { |id| @stream.record_type.new('id' => id, 'created_at' => id.minutes.ago) }
+        @raw_results = @typed_results.map { |record| {'id' => record.id, 'ordered_id' => "#{record.created_at.to_i}/#{record.id}", 'bucket' => 0} }
+      end
+
+      def setup_fetch(start, requested)
+        returned = [@raw_results.size - start, requested + 1].min
+
+        stub_with_multiple_yields = receive(:fetch).tap do |exp|
+          @raw_results[start, returned].each do |row|
+            exp.and_yield(*[row])
+          end
+        end
+
+        allow(@raw_results).to stub_with_multiple_yields
+        expect(@database).to receive(:execute).once.and_return(@raw_results)
+      end
+
+      it "is able to get bookmark from a typed item" do
+        setup_fetch(0, 2)
+        page = @pager.paginate(per_page: 2)
+        expect(page.bookmark_for(page.last)).to eq page.next_bookmark
+      end
+
+      context "one page of results" do
+        before do
+          setup_fetch(0, 4)
+          @page = @pager.paginate(per_page: 4)
+        end
+
+        it "gets all results" do
+          expect(@page).to eq @raw_results
+        end
+
+        it "does not have a next page" do
+          expect(@page.next_page).to be_nil
+        end
+      end
+
+      context "first of multiple pages of results" do
+        before do
+          setup_fetch(0, 2)
+          @page = @pager.paginate(:per_page => 2)
+        end
+
+        it "returns just the results for the page" do
+          expect(@page).to eq @raw_results[0, 2]
+        end
+
+        it "has another page" do
+          expect(@page.next_page).to_not be_nil
+        end
+      end
+
+      context "last of multiple pages of results" do
+        before do
+          setup_fetch(0, 2)
+          page = @pager.paginate(:per_page => 2)
+
+          setup_fetch(2, 2)
+          @page = @pager.paginate(:per_page => 2, :page => page.next_page)
+        end
+
+        it "returns just the results for the page" do
+          expect(@page).to eq @raw_results[2, 2]
+        end
+
+        it "does not have another page" do
+          expect(@page.next_page).to be_nil
+        end
+      end
+    end
   end
 end
