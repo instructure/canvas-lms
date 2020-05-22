@@ -3673,6 +3673,29 @@ describe Assignment do
         expect(res.length).to be 0
       end
 
+      it "disabling intra group peer review shouldn't gum things up if some people don't have a group" do
+        # i.e. people with no group shouldn't be considered by the selection algorithm to be in the same group
+        @submissions = []
+        gc = @course.group_categories.create! name: "Groupy McGroupface"
+        @a.update group_category_id: gc.id,
+          grade_group_students_individually: false
+        users = create_users_in_course(@course, 12.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
+
+        ["group_1", "group_2"].each do |group_name|
+          group = gc.groups.create! name: group_name, context: @course
+          users.pop(3).each{|user| group.add_user(user)} # only put half of the class in a group
+          @a.submit_homework(group.users.first, :submission_type => "online_url", :url => "http://www.google.com")
+        end
+        users.each do |u| # submit for each of the remaining groupless
+          @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
+        end
+
+        @a.peer_review_count = 2
+        srand(1) # this isn't really necessary but given the random nature i wanted to make it fail consistently without the code fix
+        res = @a.assign_peer_reviews
+        expect(res.group_by(&:user_id).map{|k, v| v.count}.uniq).to eq [2] # everybody should get 2 reviews
+      end
+
       it "should assign peer reviews to members of the same group when enabled" do
         @submissions = []
         gc = @course.group_categories.create! name: "Groupy McGroupface"

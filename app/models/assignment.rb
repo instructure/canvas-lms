@@ -2498,14 +2498,16 @@ class Assignment < ActiveRecord::Base
 
   def current_candidate_set(peer_review_params, current_submission, existing)
     candidate_set = peer_review_params[:submission_ids] - existing.map(&:asset_id)
-    if self.group_category_id && !self.intra_group_peer_reviews
-      # don't assign to our group partners
-      group_ids = peer_review_params[:submissions].select{|s| candidate_set.include?(s.id) && current_submission.group_id == s.group_id}.map(&:id)
-      candidate_set -= group_ids
-    else
-      # don't assign to ourselves
-      candidate_set.delete(current_submission.id)
+    # don't assign to ourselves
+    candidate_set.delete(current_submission.id)
 
+    if self.group_category_id && !self.intra_group_peer_reviews
+      if current_submission.group_id
+        # don't assign to our group partners (assuming we have a group)
+        group_ids = peer_review_params[:submissions].select{|s| candidate_set.include?(s.id) && current_submission.group_id == s.group_id}.map(&:id)
+        candidate_set -= group_ids
+      end
+    else
       if self.discussion_topic? && self.discussion_topic.group_category_id
         # only assign to other members in the group discussion
         child_topic = self.discussion_topic.child_topic_for(current_submission.user)
