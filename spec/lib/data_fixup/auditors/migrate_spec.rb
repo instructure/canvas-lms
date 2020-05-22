@@ -51,6 +51,18 @@ module DataFixup::Auditors::Migrate
           expect(missing_uuids.size).to eq(0)
         end
 
+        it "gets the same OUTCOME with a repair pass" do
+          date = Time.zone.today
+          expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(0)
+          worker = AuthenticationWorker.new(account.id, date, operation_type: :repair)
+          missing_uuids = worker.audit
+          expect(missing_uuids.size).to eq(20)
+          worker.perform
+          expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(20)
+          missing_uuids = worker.audit
+          expect(missing_uuids.size).to eq(0)
+        end
+
         it "depends on paginated data from cassandra being the same by ID" do
           pseud_collection = ::Auditors::Authentication.for_pseudonym(@pseudonym)
           pseud_ids_collection = ::Auditors::Authentication::Stream.ids_for_pseudonym(@pseudonym)
@@ -122,6 +134,27 @@ module DataFixup::Auditors::Migrate
       expect(missing_uuids.size).to eq(0)
     end
 
+    it "writes the same result for courses from a REPAIR pass" do
+      ::Auditors::ActiveRecord::CourseRecord.delete_all
+      user_with_pseudonym(active_all: true)
+      sub_account = Account.create!(parent_account: account)
+      sub_sub_account = Account.create!(parent_account: sub_account)
+      course_with_teacher(course_name: "Course 1", account: sub_sub_account)
+      @course.name = "Course 2"
+      @course.start_at = Time.zone.today
+      @course.conclude_at = Time.zone.today + 7.days
+      10.times { ::Auditors::Course.record_updated(@course, @teacher, @course.changes) }
+      date = Time.zone.today
+      expect(::Auditors::ActiveRecord::CourseRecord.count).to eq(0)
+      worker = CourseWorker.new(sub_sub_account.id, date, operation_type: :repair)
+      missing_uuids = worker.audit
+      expect(missing_uuids.size).to eq(10)
+      worker.perform
+      expect(::Auditors::ActiveRecord::CourseRecord.count).to eq(10)
+      missing_uuids = worker.audit
+      expect(missing_uuids.size).to eq(0)
+    end
+
     it "writes grade change data to postgres that's in cassandra" do
       ::Auditors::ActiveRecord::GradeChangeRecord.delete_all
       sub_account = Account.create!(parent_account: account)
@@ -135,6 +168,27 @@ module DataFixup::Auditors::Migrate
       expect(::Auditors::ActiveRecord::GradeChangeRecord.count).to eq(0)
       expect(::Auditors::GradeChange.for_assignment(assignment).paginate(per_page: 10).size).to eq(1)
       worker = GradeChangeWorker.new(sub_sub_account.id, date)
+      missing_uuids = worker.audit
+      expect(missing_uuids.size).to eq(1)
+      worker.perform
+      expect(::Auditors::ActiveRecord::GradeChangeRecord.count).to eq(1)
+      missing_uuids = worker.audit
+      expect(missing_uuids.size).to eq(0)
+    end
+
+    it "writes grade change data to postgres that's in cassandra from a REPAIR operation" do
+      ::Auditors::ActiveRecord::GradeChangeRecord.delete_all
+      sub_account = Account.create!(parent_account: account)
+      sub_sub_account = Account.create!(parent_account: sub_account)
+      course_with_teacher(account: sub_sub_account)
+      student_in_course
+      assignment = @course.assignments.create!(title: 'Assignment', points_possible: 10)
+      assignment.grade_student(@student, grade: 8, grader: @teacher).first
+      # no need to call anything, THIS invokes an auditor record^
+      date = Time.zone.today
+      expect(::Auditors::ActiveRecord::GradeChangeRecord.count).to eq(0)
+      expect(::Auditors::GradeChange.for_assignment(assignment).paginate(per_page: 10).size).to eq(1)
+      worker = GradeChangeWorker.new(sub_sub_account.id, date, operation_type: :repair)
       missing_uuids = worker.audit
       expect(missing_uuids.size).to eq(1)
       worker.perform
@@ -185,6 +239,24 @@ module DataFixup::Auditors::Migrate
           expect(worker.currently_queueable?).to eq(true)
           worker.migration_cell.update_attribute(:completed, true)
           expect(worker.currently_queueable?).to eq(false)
+          worker.migration_cell.update_attribute(:failed, false)
+          worker.migration_cell.update_attribute(:completed, false)
+          id = worker.migration_cell.id
+          ::Auditors::ActiveRecord::MigrationCell.connection.execute("""
+          UPDATE #{::Auditors::ActiveRecord::MigrationCell.quoted_table_name}
+            SET updated_at = now() - interval '10 days'
+            WHERE id = #{id};
+          """)
+          worker.migration_cell.reload
+          expect(worker.currently_queueable?).to eq(true)
+        end
+      end
+
+      describe "mark_cell_queued!" do
+        it "holds state for the whole week it will traverse" do
+          worker = GradeChangeWorker.new(Account.default.id, Time.zone.today)
+          worker.mark_cell_queued!
+          expect(::Auditors::ActiveRecord::MigrationCell.count).to eq(7)
         end
       end
     end
@@ -412,9 +484,13 @@ module DataFixup::Auditors::Migrate
         engine = BackfillEngine.new(start_date, end_date, operation_type: nil)
         expect(engine.operation).to eq(:schedule)
         expect(engine.next_schedule_date(start_date)).to eq(start_date - 7.days)
+        worker = engine.generate_worker(AuthenticationWorker, Account.default, start_date)
+        expect(worker.operation).to eq(:backfill)
         engine = BackfillEngine.new(start_date, end_date, operation_type: :repair)
         expect(engine.operation).to eq(:repair)
         expect(engine.next_schedule_date(start_date)).to eq(start_date - 1.day)
+        worker = engine.generate_worker(AuthenticationWorker, Account.default, start_date)
+        expect(worker.operation).to eq(:repair)
       end
 
       context "when enqueued" do
