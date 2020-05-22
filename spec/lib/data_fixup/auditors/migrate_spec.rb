@@ -28,45 +28,63 @@ module DataFixup::Auditors::Migrate
 
     let(:account){ Account.default }
 
-    it "writes authentication data to postgres that's in cassandra" do
-      ::Auditors::ActiveRecord::AuthenticationRecord.delete_all
-      user_with_pseudonym(active_all: true)
-      20.times { ::Auditors::Authentication.record(@pseudonym, 'login') }
-      date = Time.zone.today
-      expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(0)
-      worker = AuthenticationWorker.new(account.id, date)
-      missing_uuids = worker.audit
-      expect(missing_uuids.size).to eq(20)
-      worker.perform
-      expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(20)
-      missing_uuids = worker.audit
-      expect(missing_uuids.size).to eq(0)
-    end
-
-    it "recovers if user has been hard deleted" do
-      # simulates when a user has been hard-deleted
-      ::Auditors::ActiveRecord::AuthenticationRecord.delete_all
-      u1 = user_with_pseudonym(active_all: true)
-      p1 = @pseudonym
-      ::Auditors::Authentication.record(p1, 'login')
-      u2 = user_with_pseudonym(active_all: true)
-      p2 = @pseudonym
-      expect(p1).to_not eq(p2)
-      ::Auditors::Authentication.record(p2, 'login')
-      [CommunicationChannel, UserAccountAssociation].each do |klass|
-        klass.where(user_id: u2.id).delete_all
+    context "authentication data" do
+      before(:each) do
+        ::Auditors::ActiveRecord::AuthenticationRecord.delete_all
       end
-      Pseudonym.where(id: p2.id).delete_all
-      User.where(id: p2.user_id).delete_all
-      date = Time.zone.today
-      worker = AuthenticationWorker.new(account.id, date)
-      allow(::Auditors::ActiveRecord::AuthenticationRecord).to receive(:bulk_insert) do |recs|
-        # should only migrate the existing user, so the second time is only one rec
-        if recs.find{|r| r['user_id'] == p2.user_id}
-          raise ActiveRecord::InvalidForeignKey
+
+      context "with 20 auth records" do
+        before(:each) do
+          user_with_pseudonym(active_all: true)
+          20.times { ::Auditors::Authentication.record(@pseudonym, 'login') }
+        end
+
+        it "writes authentication data to postgres that's in cassandra" do
+          date = Time.zone.today
+          expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(0)
+          worker = AuthenticationWorker.new(account.id, date)
+          missing_uuids = worker.audit
+          expect(missing_uuids.size).to eq(20)
+          worker.perform
+          expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(20)
+          missing_uuids = worker.audit
+          expect(missing_uuids.size).to eq(0)
+        end
+
+        it "depends on paginated data from cassandra being the same by ID" do
+          pseud_collection = ::Auditors::Authentication.for_pseudonym(@pseudonym)
+          pseud_ids_collection = ::Auditors::Authentication::Stream.ids_for_pseudonym(@pseudonym)
+          records = pseud_collection.paginate(per_page: 3)
+          ids = pseud_ids_collection.paginate(per_page: 3)
+          rec_ids = records.map(&:id)
+          ids.each{|id| expect(rec_ids).to include(id['id'])}
         end
       end
-      expect { worker.perform }.to_not raise_exception
+
+      it "recovers if user has been hard deleted" do
+        # simulates when a user has been hard-deleted
+        u1 = user_with_pseudonym(active_all: true)
+        p1 = @pseudonym
+        ::Auditors::Authentication.record(p1, 'login')
+        u2 = user_with_pseudonym(active_all: true)
+        p2 = @pseudonym
+        expect(p1).to_not eq(p2)
+        ::Auditors::Authentication.record(p2, 'login')
+        [CommunicationChannel, UserAccountAssociation].each do |klass|
+          klass.where(user_id: u2.id).delete_all
+        end
+        Pseudonym.where(id: p2.id).delete_all
+        User.where(id: p2.user_id).delete_all
+        date = Time.zone.today
+        worker = AuthenticationWorker.new(account.id, date)
+        allow(::Auditors::ActiveRecord::AuthenticationRecord).to receive(:bulk_insert) do |recs|
+          # should only migrate the existing user, so the second time is only one rec
+          if recs.find{|r| r['user_id'] == p2.user_id}
+            raise ActiveRecord::InvalidForeignKey
+          end
+        end
+        expect { worker.perform }.to_not raise_exception
+      end
     end
 
     it "handles missing submissions" do
