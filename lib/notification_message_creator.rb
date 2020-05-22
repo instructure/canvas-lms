@@ -47,7 +47,7 @@ class NotificationMessageCreator
   def create_message
     to_user_channels = Hash.new([])
     @to_users.each do |user|
-      to_user_channels[user] += user.communication_channels
+      to_user_channels[user] += user.communication_channels.active
     end
     @to_channels.each do |channel|
       to_user_channels[channel.user] += [channel]
