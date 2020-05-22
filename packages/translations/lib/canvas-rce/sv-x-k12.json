@@ -277,6 +277,9 @@
   "published_c944a23d": { "message": "publicerad" },
   "published_when_302d8e23": { "message": "Publicerad: { when }" },
   "quizzes_7e598f57": { "message": "Quiz" },
+  "reading_a_media_track_file_failed_aborting_be051b20": {
+    "message": "Det gick inte att läsa en mediespårsfil. Avbryter."
+  },
   "record_7c9448b": { "message": "Spela in" },
   "record_upload_media_5fdce166": { "message": "Spela in/ladda upp media" },
   "recording_98da6bda": { "message": "Inspelning" },
@@ -306,6 +309,9 @@
   },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Något gick fel och jag vet inte vad jag ska visa dig."
+  },
+  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+    "message": "Något gick fel. Kontrollera din anslutning och försök igen."
   },
   "something_went_wrong_d238c551": { "message": "Något gick fel" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {

@@ -243,6 +243,9 @@
   "published_c944a23d": { "message": "已發佈" },
   "published_when_302d8e23": { "message": "已發佈：{ when }" },
   "quizzes_7e598f57": { "message": "測驗" },
+  "reading_a_media_track_file_failed_aborting_be051b20": {
+    "message": "讀取媒體音軌文件失敗。正在中止。"
+  },
   "record_7c9448b": { "message": "錄製" },
   "record_upload_media_5fdce166": { "message": "錄製/上傳媒體" },
   "recording_98da6bda": { "message": "正在錄製" },
@@ -268,6 +271,9 @@
   },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "出現問題；我不知道應該展示什麼內容。"
+  },
+  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+    "message": "出現了問題，請檢查您的連線然後重試。"
   },
   "something_went_wrong_d238c551": { "message": "似乎出問題了" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {

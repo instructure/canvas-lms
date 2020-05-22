@@ -848,6 +848,9 @@
     "quizzes_7e598f57": {
         "message": "Тесты"
     },
+    "reading_a_media_track_file_failed_aborting_be051b20": {
+        "message": "Сбой чтения файла мультимедийного трека. Прерывание."
+    },
     "record_7c9448b": {
         "message": "Запись"
     },
@@ -931,6 +934,9 @@
     },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Что-то пошло не так, и я не знаю, что вам показать."
+    },
+    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+        "message": "Что-то пошло не так, проверьте подключение и попробуйте еще раз."
     },
     "something_went_wrong_d238c551": {
         "message": "Что-то пошло не так"

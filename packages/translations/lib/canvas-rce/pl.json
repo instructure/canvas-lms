@@ -275,6 +275,9 @@
   "published_c944a23d": { "message": "opublikowane" },
   "published_when_302d8e23": { "message": "Opublikowane: { when }" },
   "quizzes_7e598f57": { "message": "Testy" },
+  "reading_a_media_track_file_failed_aborting_be051b20": {
+    "message": "Nie udało się odczytać pliku multimediów. Przerywanie..."
+  },
   "record_7c9448b": { "message": "Nagraj" },
   "record_upload_media_5fdce166": {
     "message": "Utwórz/prześlij pliki multimedialne"
@@ -306,6 +309,9 @@
   },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Wystąpił błąd i nie wiadomo, co wyświetlić."
+  },
+  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+    "message": "Wystąpił problem, sprawdź połączenie i spróbuj ponownie."
   },
   "something_went_wrong_d238c551": { "message": "Coś poszło nie tak" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {

@@ -263,6 +263,9 @@
   "published_c944a23d": { "message": "published" },
   "published_when_302d8e23": { "message": "Published: { when }" },
   "quizzes_7e598f57": { "message": "Quizzes" },
+  "reading_a_media_track_file_failed_aborting_be051b20": {
+    "message": "Reading a media track file failed. Aborting."
+  },
   "record_7c9448b": { "message": "Record" },
   "record_upload_media_5fdce166": { "message": "Record/upload media" },
   "recording_98da6bda": { "message": "Recording" },
@@ -288,6 +291,9 @@
   },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Something went wrong and I don''t know what to show you."
+  },
+  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+    "message": "Something went wrong, check your connection and try again."
   },
   "something_went_wrong_d238c551": { "message": "Something went wrong" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {

@@ -848,6 +848,9 @@
     "quizzes_7e598f57": {
         "message": "Kvizi"
     },
+    "reading_a_media_track_file_failed_aborting_be051b20": {
+        "message": "Branje datoteke z zapisi na mediju ni uspelo. Prekinjam."
+    },
     "record_7c9448b": {
         "message": "Posnemi"
     },
@@ -931,6 +934,9 @@
     },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Prišlo je do težav in ne vem, kaj vam naj prikažem."
+    },
+    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+        "message": "Prišlo je do težave; preverite svojo povezavo in poskusite znova."
     },
     "something_went_wrong_d238c551": {
         "message": "Prišlo je do težav"

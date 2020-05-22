@@ -279,6 +279,9 @@
   "published_c944a23d": { "message": "julkaistu" },
   "published_when_302d8e23": { "message": "Julkaistu: { when }" },
   "quizzes_7e598f57": { "message": "Tietovisat" },
+  "reading_a_media_track_file_failed_aborting_be051b20": {
+    "message": "Mediaraidan luku epäonnistui. Keskeytetään."
+  },
   "record_7c9448b": { "message": "Nauhoita" },
   "record_upload_media_5fdce166": { "message": "Nauhoita/lataa mediaa" },
   "recording_98da6bda": { "message": "Nauhoitetaan" },
@@ -306,6 +309,9 @@
   },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Jotakin meni pieleen enkä tiedä, mitä näyttää sinulle,"
+  },
+  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+    "message": "Jotakin meni pieleen, tarkista yhteytesi ja yritä uudelleen."
   },
   "something_went_wrong_d238c551": { "message": "Jotakin meni pieleen." },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
