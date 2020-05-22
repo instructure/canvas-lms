@@ -17,6 +17,7 @@
  */
 
 @import url('https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&subset=latin-ext&display=swap'); //  This needs to be the same as what's in the <link> in _head.html.erb
+@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
 
 @import 'base/environment';
@@ -31,7 +32,7 @@ body {
 }
 
 body.elementary-theme {
-  font-family: 'Architects Daughter', $ic-font-family;
+  font-family: 'Balsamiq Sans', $ic-font-family;
 }
 
 body.default-theme {

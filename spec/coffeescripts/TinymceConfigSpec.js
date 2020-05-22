@@ -113,12 +113,20 @@ test('default config includes Lato font-family', () => {
   ok(fontIndex > -1)
 })
 
-test('config includes Architects Daughter font when elemenetary theme flag is on', () => {
+test('default config includes Architects Daughter font-family', () => {
+  const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
+  const schema = config.defaultConfig()
+  const availableFonts = schema.font_formats
+  const fontIndex = availableFonts.indexOf('Architects Daughter')
+  ok(fontIndex > -1)
+})
+
+test('config includes Balsamiq Sans font when elemenetary theme flag is on', () => {
   const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
   window.ENV.FEATURES.canvas_k6_theme = true
   const schema = config.defaultConfig()
   const availableFonts = schema.font_formats
-  const fontIndex = availableFonts.indexOf('Architects Daughter')
+  const fontIndex = availableFonts.indexOf('Balsamiq Sans')
   ok(fontIndex > -1)
 })
 
