@@ -38,3 +38,23 @@ describe('render announcements', () => {
     expect(getByText('This is a past announcement')).toBeVisible()
   })
 })
+
+describe('render image if there are no announcements', () => {
+  it('checks that the document contains an image in the active announcement section', async () => {
+    window.ENV.global_notifications = {
+      active: ' ',
+      past: ' '
+    }
+    const {findByTestId} = render(<PastGlobalAnnouncements />)
+    expect(await findByTestId('NoGlobalAnnouncementImageActive')).toBeVisible()
+  })
+
+  it('checks that the document contains an image in the past announcement section', async () => {
+    window.ENV.global_notifications = {
+      active: ' ',
+      past: ' '
+    }
+    const {findByTestId} = render(<PastGlobalAnnouncements />)
+    expect(await findByTestId('NoGlobalAnnouncementImagePast')).toBeVisible()
+  })
+})
