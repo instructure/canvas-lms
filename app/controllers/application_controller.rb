@@ -2478,6 +2478,7 @@ class ApplicationController < ActionController::Base
     ), id: 'assignment_groups_url')
 
     js_env({
+      :COURSE_ID => @context.id.to_s,
       :URLS => {
         :new_assignment_url => new_polymorphic_url([@context, :assignment]),
         :new_quiz_url => context_url(@context, :context_quizzes_new_url),
