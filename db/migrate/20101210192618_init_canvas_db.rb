@@ -1049,7 +1049,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "wiki_id", :limit => 8
       t.boolean  "allow_student_organized_groups",                      :default => true
       t.string   "course_code", limit: 255
-      t.string   "default_view",                                        :default => "feed", limit: 255
+      t.string   "default_view", limit: 255
       t.integer  "abstract_course_id", :limit => 8
       t.integer  "root_account_id", :limit => 8, :null => false
       t.integer  "enrollment_term_id", :limit => 8, :null => false
@@ -1452,6 +1452,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :content_export_id, :course_id, :user_id, limit: 8
       t.string :workflow_state, default: "created", limit: 255
       t.timestamps null: true
+      t.string :type, limit: 255
     end
     add_index :epub_exports, :user_id
     add_index :epub_exports, :course_id
@@ -1612,18 +1613,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :gradebook_uploads, [:course_id, :user_id], unique: true
     add_index :gradebook_uploads, :progress_id
 
-    create_table :grading_period_grades do |t|
-      t.integer :enrollment_id, :limit => 8
-      t.integer :grading_period_id, :limit => 8
-      t.float :current_grade
-      t.float :final_grade
-      t.timestamps null: true
-      t.string :workflow_state, default: "active", null: false, limit: 255
-    end
-    add_index :grading_period_grades, :enrollment_id
-    add_index :grading_period_grades, :grading_period_id
-    add_index :grading_period_grades, :workflow_state
-
     create_table :grading_period_groups do |t|
       t.integer :course_id, :limit => 8
       t.integer :account_id, :limit => 8
@@ -1762,11 +1751,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "vendor_guid", limit: 255
       t.string   "low_grade", limit: 255
       t.string   "high_grade", limit: 255
+      t.string   "vendor_guid_2", limit: 255
+      t.string   "migration_id_2", limit: 255
     end
     add_index :learning_outcome_groups, :vendor_guid, :name => "index_learning_outcome_groups_on_vendor_guid"
     add_index :learning_outcome_groups, :learning_outcome_group_id, :where => "learning_outcome_group_id IS NOT NULL"
     add_index :learning_outcome_groups, [:context_id, :context_type]
     add_index :learning_outcome_groups, :root_learning_outcome_group_id, where: "root_learning_outcome_group_id IS NOT NULL"
+    add_index :learning_outcome_groups, :vendor_guid_2, :name => "index_learning_outcome_groups_on_vendor_guid_2"
 
     create_table :learning_outcome_question_results do |t|
       t.integer :learning_outcome_result_id, limit: 8
@@ -1846,9 +1838,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "display_name", limit: 255
       t.string   "calculation_method", limit: 255
       t.integer  "calculation_int", :limit => 2
+      t.string   "vendor_guid_2", limit: 255
+      t.string   "migration_id_2", limit: 255
     end
     add_index :learning_outcomes, [ :context_id, :context_type ]
     add_index :learning_outcomes, :vendor_guid, :name => "index_learning_outcomes_on_vendor_guid"
+    add_index :learning_outcomes, :vendor_guid_2, :name => "index_learning_outcomes_on_vendor_guid_2"
 
     create_table :live_assessments_assessments do |t|
       t.string :key, null: false, limit: 255
@@ -2028,6 +2023,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
       t.string :workflow_state, null: false, limit: 255
       t.timestamps null: false
+      t.datetime :imports_completed_at
     end
 
     add_index :master_courses_master_migrations, :master_template_id
@@ -2229,7 +2225,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table :originality_reports do |t|
       t.integer :attachment_id, limit: 8, null: false
-      t.decimal :originality_score, null: false
+      t.float :originality_score, null: false
       t.integer :originality_report_attachment_id, limit: 8
       t.text :originality_report_url
       t.text :originality_report_lti_url
@@ -2718,6 +2714,17 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "rubrics", ["context_id", "context_type"], :name => "index_rubrics_on_context_id_and_context_type"
     add_index "rubrics", ["user_id"], :name => "index_rubrics_on_user_id"
 
+    create_table :scores do |t|
+      t.integer :enrollment_id, limit: 8, null: false
+      t.integer :grading_period_id, limit: 8
+      t.string  :workflow_state, default: :active, null: false, limit: 255
+      t.float   :current_score
+      t.float   :final_score
+      t.timestamps null: true
+    end
+
+    add_index :scores, [:enrollment_id, :grading_period_id], unique: true
+
     create_table "scribd_mime_types", :force => true do |t|
       t.string   "extension", limit: 255
       t.string   "name", limit: 255
@@ -2925,8 +2932,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     SQL
 
     create_table :switchman_shards do |t|
-      t.string :name
-      t.string :database_server_id
+      t.string :name, limit: 255
+      t.string :database_server_id, limit: 255
       t.boolean :default, :default => false, :null => false
       t.text :settings
       t.integer :delayed_jobs_shard_id, :limit => 8
@@ -3465,8 +3472,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :gradebook_uploads, :courses
     add_foreign_key :gradebook_uploads, :users
     add_foreign_key :gradebook_uploads, :progresses
-    add_foreign_key :grading_period_grades, :enrollments
-    add_foreign_key :grading_period_grades, :grading_periods
     add_foreign_key :grading_period_groups, :accounts
     add_foreign_key :grading_period_groups, :courses
     add_foreign_key :grading_periods, :grading_period_groups
@@ -3561,6 +3566,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :rubric_associations, :rubrics
     add_foreign_key :rubrics, :rubrics
     add_foreign_key :rubrics, :users
+    add_foreign_key :scores, :enrollments
+    add_foreign_key :scores, :grading_periods
     add_foreign_key :session_persistence_tokens, :pseudonyms
     add_foreign_key :shared_brand_configs, :brand_configs, column: 'brand_config_md5', primary_key: 'md5'
     add_foreign_key :sis_batches, :enrollment_terms, :column => :batch_mode_term_id

@@ -34,7 +34,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       # reason for last failure (See Note below)
       table.text     :last_error
       # The queue that this job is in
-      table.string   :queue, :default => nil
+      table.string   :queue, limit: 255
       # When to run.
       # Could be Time.zone.now for immediately, or sometime in the future.
       table.datetime :run_at
@@ -43,16 +43,16 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       # Set when all retries have failed
       table.datetime :failed_at
       # Who is working on this object (if locked)
-      table.string   :locked_by
+      table.string   :locked_by, limit: 255
 
       table.timestamps null: true
 
-      table.string   :tag
+      table.string   :tag, limit: 255
       table.integer  :max_attempts
-      table.string   :strand
+      table.string   :strand, limit: 255
       table.boolean  :next_in_strand, :default => true, :null => false
       table.integer  :shard_id, :limit => 8
-      table.string   :source
+      table.string   :source, limit: 255
       table.integer  :max_concurrent, :default => 1, :null => false
       table.datetime :expires_at
     end
@@ -131,19 +131,19 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       t.integer  "attempts",    :default => 0
       t.string   "handler",     :limit => 512000
       t.text     "last_error"
-      t.string   "queue"
+      t.string   "queue", limit: 255
       t.datetime "run_at"
       t.datetime "locked_at"
       t.datetime "failed_at"
-      t.string   "locked_by"
+      t.string   "locked_by", limit: 255
       t.datetime "created_at"
       t.datetime "updated_at"
-      t.string   "tag"
+      t.string   "tag", limit: 255
       t.integer  "max_attempts"
-      t.string   "strand"
+      t.string   "strand", limit: 255
       t.integer  "shard_id", :limit => 8
       t.integer  "original_job_id", :limit => 8
-      t.string   "source"
+      t.string   "source", limit: 255
       t.datetime "expires_at"
     end
   end
