@@ -9524,6 +9524,14 @@ QUnit.module('Gradebook', suiteHooks => {
       strictEqual(gradebook.finishRenderingUI.callCount, 1)
     })
 
+    test('does not finish rendering the UI when dataloader performance improvements is disabled', async () => {
+      options.dataloader_improvements = false
+      createInitializedGradebook()
+      gradebook._updateEssentialDataLoaded()
+      await waitForTick()
+      strictEqual(gradebook.finishRenderingUI.callCount, 0)
+    })
+
     test('does not finish rendering the UI when student ids are not loaded', async () => {
       createInitializedGradebook()
       gradebook.setStudentIdsLoaded(false)
