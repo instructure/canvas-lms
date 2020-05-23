@@ -3027,6 +3027,9 @@ export default do ->
       @gridReady.state() == 'resolved'
 
     _updateEssentialDataLoaded: =>
+      # TODO: remove this early return with TALLY-831
+      return unless @options.dataloader_improvements
+
       if (
         @contentLoadStates.studentIdsLoaded &&
         @contentLoadStates.contextModulesLoaded &&
