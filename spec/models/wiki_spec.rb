@@ -187,4 +187,12 @@ describe Wiki do
       end
     end
   end
+
+  context 'before save' do
+    describe 'set_root_account_id' do
+      it 'sets root_account_id using context' do
+        expect(@wiki.root_account_id).to eq @course.root_account_id
+      end
+    end
+  end
 end

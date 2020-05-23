@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 
-import subprocess
 import json
 import os
-import shutil
+import glob
 
 def fp(message):
     print(message, flush=True)
 
 def main():
     results = {}
-    for node in os.listdir("./coverage_nodes"):
-        if not os.path.isdir('./coverage_nodes/{}'.format(node)):
-            continue
-        with open('./coverage_nodes/{}/spec_coverage/.resultset.json'.format(node)) as json_file:
+    for file in glob.glob('./**/.resultset.json', recursive=True):
+        fp("copying results file: {}".format(file))
+        with open(file) as json_file:
             resultset = json.load(json_file)
-        fp(node)
         for process in resultset:
+            node = file.split("/")[-2]
             key = "{}:{}".format(node, process)
+            fp(" > found key: {}".format(key))
             results[key] = resultset[process]
     for process in results:
         fp(process)

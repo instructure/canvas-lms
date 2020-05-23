@@ -110,9 +110,11 @@ class CommMessagesApiController < ApplicationController
   #
   # @argument start_time [DateTime]
   #   The beginning of the time range you want to retrieve message from.
+  #   Up to a year prior to the current date is available.
   #
   # @argument end_time [DateTime]
   #   The end of the time range you want to retrieve messages for.
+  #   Up to a year prior to the current date is available.
   #
   # @returns [CommMessage]
   def index

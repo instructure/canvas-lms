@@ -56,6 +56,12 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": "Fehler beim Generieren der Dateivorschau"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "Fehler beim einer Netzwerkanforderung"
+    },
+    "an_error_occurred_uploading_your_media_71f1444d": {
+        "message": "Fehler beim Hochladen der Medien."
+    },
     "announcement_fb4cb645": {
         "message": "Ankündigung"
     },
@@ -121,6 +127,9 @@
     },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Eine Inline-Vorschau automatisch öffnen. (Vorschau wird erst nach dem Speichern angezeigt)"
+    },
+    "available_folders_694d0436": {
+        "message": "Verfügbare Ordner"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Beginn Ihrer Aufgabenhistorie"
@@ -213,6 +222,9 @@
         "message": "Kursunterlagen"
     },
     "course_files_62deb8f8": {
+        "message": "Kursdateien"
+    },
+    "course_files_a31f97fc": {
         "message": "Kursdateien"
     },
     "course_images_f8511d04": {
@@ -431,6 +443,12 @@
     "file_name_8fd421ff": {
         "message": "Dateiname"
     },
+    "file_upload_failed_af22dd91": {
+        "message": "Hochladen der Datei fehlgeschlagen."
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "Datei wird hochgeladen"
+    },
     "file_url_c12b64be": {
         "message": "Datei-URL"
     },
@@ -454,6 +472,9 @@
     },
     "focus_the_popup_context_toolbar_7979f4f8": {
         "message": "Fokus auf die eingeblendete Kontext-Symbolleiste"
+    },
+    "folder_tree_fbab0726": {
+        "message": "Ordnerstruktur"
     },
     "formatting_5b143aa8": {
         "message": "Formatierung"
@@ -489,6 +510,9 @@
         "message": "Noten geladen"
     },
     "group_files_4324f3df": {
+        "message": "Gruppendateien"
+    },
+    "group_files_82e5dcdb": {
         "message": "Gruppendateien"
     },
     "group_navigation_99f191a": {
@@ -608,6 +632,9 @@
     "loading_failed_e6a9d8ef": {
         "message": "Ladevorgang fehlgeschlagen"
     },
+    "loading_folders_d8b5869e": {
+        "message": "Ordner werden geladen"
+    },
     "loading_grades_c842c887": {
         "message": "Benoter werden geladen"
     },
@@ -622,6 +649,9 @@
     },
     "location_3b6ff307": {
         "message": "Standort:"
+    },
+    "locked_762f138b": {
+        "message": "Gesperrt"
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Sieht so aus, als wäre hier nichts."
@@ -649,6 +679,9 @@
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Mindestgröße ist { width } x { height } px."
+    },
+    "my_files_2f621040": {
+        "message": "Meine Dateien"
     },
     "my_grades_98834476": {
         "message": "Meine Noten"
@@ -899,6 +932,9 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Etwas ist schiefgelaufen und ich weiß nicht, was ich anzeigen soll."
     },
+    "something_went_wrong_d238c551": {
+        "message": "Etwas ging schief."
+    },
     "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
         "message": "Etwas ging schief. Versuchen Sie es erneut nach dem Aktualisieren der Seite."
     },
@@ -940,6 +976,9 @@
     },
     "subscript_59744f96": {
         "message": "Abonnieren"
+    },
+    "success_file_uploaded_8174e93f": {
+        "message": "Erfolg: Datei hochgeladen"
     },
     "success_to_do_created_e34ed395": {
         "message": "Erfolg: Aufgabenliste erstellt"
@@ -1048,6 +1087,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Medien hochladen"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "Hochladen ist für diesen Ordner nicht verfügbar"
     },
     "upload_record_media_e4207d72": {
         "message": "Medien hochladen/aufzeichnen"

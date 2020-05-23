@@ -60,6 +60,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     add_index :delayed_jobs, %w(strand id), :name => 'index_delayed_jobs_on_strand'
     add_index :delayed_jobs, :locked_by, :where => "locked_by IS NOT NULL"
     add_index :delayed_jobs, %w[run_at tag]
+    add_index :delayed_jobs, :shard_id
 
     # use an advisory lock based on the name of the strand, instead of locking the whole table
     # note that we're using half of the md5, so collisions are possible, but we don't really

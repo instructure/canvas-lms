@@ -56,6 +56,12 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": "生成文件预览时发生错误"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "发出网络请求时出错"
+    },
+    "an_error_occurred_uploading_your_media_71f1444d": {
+        "message": "上传媒体时出错。"
+    },
     "announcement_fb4cb645": {
         "message": "公告"
     },
@@ -121,6 +127,9 @@
     },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "自动打开在线预览。（预览仅在保存后显示）"
+    },
+    "available_folders_694d0436": {
+        "message": "可用文件夹"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "您的待办事项历史记录的开始"
@@ -213,6 +222,9 @@
         "message": "课程文件"
     },
     "course_files_62deb8f8": {
+        "message": "课程文件"
+    },
+    "course_files_a31f97fc": {
         "message": "课程文件"
     },
     "course_images_f8511d04": {
@@ -431,6 +443,12 @@
     "file_name_8fd421ff": {
         "message": "文件名称"
     },
+    "file_upload_failed_af22dd91": {
+        "message": "文件上传失败"
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "正在上传文件"
+    },
     "file_url_c12b64be": {
         "message": "文件URL"
     },
@@ -454,6 +472,9 @@
     },
     "focus_the_popup_context_toolbar_7979f4f8": {
         "message": "聚焦弹出窗口内容工具栏"
+    },
+    "folder_tree_fbab0726": {
+        "message": "文件夹树"
     },
     "formatting_5b143aa8": {
         "message": "格式化"
@@ -490,6 +511,9 @@
     },
     "group_files_4324f3df": {
         "message": "小组文件"
+    },
+    "group_files_82e5dcdb": {
+        "message": "组文件"
     },
     "group_navigation_99f191a": {
         "message": "小组导航"
@@ -608,6 +632,9 @@
     "loading_failed_e6a9d8ef": {
         "message": "加载失败。"
     },
+    "loading_folders_d8b5869e": {
+        "message": "正在加载文件夹"
+    },
     "loading_grades_c842c887": {
         "message": "正在加载评分"
     },
@@ -622,6 +649,9 @@
     },
     "location_3b6ff307": {
         "message": "位置："
+    },
+    "locked_762f138b": {
+        "message": "已锁定"
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "此处似乎没有任何内容"
@@ -649,6 +679,9 @@
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "必须至少为 { width } x { height }px"
+    },
+    "my_files_2f621040": {
+        "message": "我的文件"
     },
     "my_grades_98834476": {
         "message": "我的评分"
@@ -899,6 +932,9 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "出错了，我不知道该给您看些什么。"
     },
+    "something_went_wrong_d238c551": {
+        "message": "出了些问题"
+    },
     "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
         "message": "出现错误，请刷新页面后重试"
     },
@@ -940,6 +976,9 @@
     },
     "subscript_59744f96": {
         "message": "下标"
+    },
+    "success_file_uploaded_8174e93f": {
+        "message": "成功：文件已上传"
     },
     "success_to_do_created_e34ed395": {
         "message": "成功：创建的待办列表"
@@ -1048,6 +1087,9 @@
     },
     "upload_media_ce31135a": {
         "message": "上传媒体"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "无法上传此文件"
     },
     "upload_record_media_e4207d72": {
         "message": "上传/录制媒体"

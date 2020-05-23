@@ -23,6 +23,11 @@ const requestFullWindowLaunchMessage = {
   data: 'http://localhost/test'
 }
 
+const reactDevToolsBridge = {
+  data: 'http://localhost/test',
+  source: 'react-devtools-bridge'
+}
+
 function postMessageEvent(data, origin, source) {
   return {
     data,
@@ -43,6 +48,13 @@ describe('handleLtiPostMessage', () => {
   describe('when a non-whitelisted event is processed', () => {
     it('does not attempt to call the message handler', async () => {
       const wasCalled = await handleLtiPostMessage(postMessageEvent({messageType: 'notSupported'}))
+      expect(wasCalled).toBeFalsy()
+    })
+  })
+
+  describe('when source is react-dev-tools', () => {
+    it('does not attempt to call the message handler', async () => {
+      const wasCalled = await handleLtiPostMessage(postMessageEvent(reactDevToolsBridge))
       expect(wasCalled).toBeFalsy()
     })
   })

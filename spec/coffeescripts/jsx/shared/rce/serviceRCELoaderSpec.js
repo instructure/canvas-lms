@@ -168,17 +168,6 @@ test('yields editor to callback,', function(assert) {
   RCELoader.loadOnTarget(this.$div, {}, cb)
 })
 
-test('yields editor to callback, la_620_old_rce_init_fix feature enabled', function(assert) {
-  ENV.FEATURES.la_620_old_rce_init_fix = true
-  const done = assert.async()
-  const cb = (textarea, rce) => {
-    equal(textarea, this.$textarea.get(0))
-    equal(rce, this.editor)
-    done()
-  }
-  RCELoader.loadOnTarget(this.$div, {}, cb)
-})
-
 test('ensures yielded editor has call and focus methods', function(assert) {
   const done = assert.async()
   const cb = (textarea, rce) => {

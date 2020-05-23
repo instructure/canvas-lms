@@ -1,11 +1,13 @@
 #!/bin/bash
 
-set -x -o errexit -o errtrace -o nounset -o pipefail
+set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-cat <<SQL | psql -v ON_ERROR_STOP=1 --username postgres
-  CREATE DATABASE canvas_test;
-  \connect canvas_test;
+# install extension on template1 which every new database is built from,
+# so we don't have to run this more than once
+psql -v ON_ERROR_STOP=1 --username postgres <<SQL
+  \connect template1;
   CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;
   CREATE EXTENSION IF NOT EXISTS postgis SCHEMA public;
   CREATE EXTENSION IF NOT EXISTS pg_collkey SCHEMA public;
+  CREATE DATABASE canvas_test
 SQL

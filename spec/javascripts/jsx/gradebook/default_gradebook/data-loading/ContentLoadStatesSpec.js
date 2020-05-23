@@ -42,12 +42,28 @@ QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {
       gradebook.initialize()
     })
 
+    test('sets assignments as "not loaded"', () => {
+      strictEqual(gradebook.contentLoadStates.assignmentsLoaded, false)
+    })
+
     test('sets assignment groups as "not loaded"', () => {
       strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
     })
 
     test('sets context modules as "not loaded"', () => {
       strictEqual(gradebook.contentLoadStates.contextModulesLoaded, false)
+    })
+
+    test('sets custom columns as "not loaded"', () => {
+      strictEqual(gradebook.contentLoadStates.customColumnsLoaded, false)
+    })
+
+    test('sets grading period assignments as "not loaded"', () => {
+      strictEqual(gradebook.contentLoadStates.gradingPeriodAssignmentsLoaded, false)
+    })
+
+    test('sets student ids as "not loaded"', () => {
+      strictEqual(gradebook.contentLoadStates.studentIdsLoaded, false)
     })
 
     test('sets students as "not loaded"', () => {
@@ -82,6 +98,58 @@ QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {
       gradebook.setAssignmentGroupsLoaded(true)
       gradebook.setAssignmentGroupsLoaded(false)
       strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
+    })
+  })
+
+  QUnit.module('#setContextModulesLoaded()', () => {
+    test('optionally sets context modules as "loaded"', () => {
+      gradebook.setContextModulesLoaded(true)
+      strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true)
+    })
+
+    test('optionally sets context modules as "not loaded"', () => {
+      gradebook.setContextModulesLoaded(true)
+      gradebook.setContextModulesLoaded(false)
+      strictEqual(gradebook.contentLoadStates.contextModulesLoaded, false)
+    })
+  })
+
+  QUnit.module('#setCustomColumnsLoaded()', () => {
+    test('optionally sets custom columns as "loaded"', () => {
+      gradebook.setCustomColumnsLoaded(true)
+      strictEqual(gradebook.contentLoadStates.customColumnsLoaded, true)
+    })
+
+    test('optionally sets custom columns as "not loaded"', () => {
+      gradebook.setCustomColumnsLoaded(true)
+      gradebook.setCustomColumnsLoaded(false)
+      strictEqual(gradebook.contentLoadStates.customColumnsLoaded, false)
+    })
+  })
+
+  QUnit.module('#setGradingPeriodAssignmentsLoaded()', () => {
+    test('optionally sets grading period assignments as "loaded"', () => {
+      gradebook.setGradingPeriodAssignmentsLoaded(true)
+      strictEqual(gradebook.contentLoadStates.gradingPeriodAssignmentsLoaded, true)
+    })
+
+    test('optionally sets grading period assignments as "not loaded"', () => {
+      gradebook.setGradingPeriodAssignmentsLoaded(true)
+      gradebook.setGradingPeriodAssignmentsLoaded(false)
+      strictEqual(gradebook.contentLoadStates.gradingPeriodAssignmentsLoaded, false)
+    })
+  })
+
+  QUnit.module('#setStudentIdsLoaded()', () => {
+    test('optionally sets student ids as "loaded"', () => {
+      gradebook.setStudentIdsLoaded(true)
+      strictEqual(gradebook.contentLoadStates.studentIdsLoaded, true)
+    })
+
+    test('optionally sets student ids as "not loaded"', () => {
+      gradebook.setStudentIdsLoaded(true)
+      gradebook.setStudentIdsLoaded(false)
+      strictEqual(gradebook.contentLoadStates.studentIdsLoaded, false)
     })
   })
 

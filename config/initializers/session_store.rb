@@ -26,7 +26,7 @@ config = {
   :secret        => (Setting.get("session_secret_key", SecureRandom.hex(64), set_if_nx: true) rescue SecureRandom.hex(64)),
   legacy_key: '_legacy_normandy_session',
   same_site: :none
-}.merge((ConfigFile.load("session_store") || {}).symbolize_keys)
+}.merge((ConfigFile.load("session_store").dup || {}).symbolize_keys)
 
 # :expire_after is the "true" option, and :expires is a legacy option, but is applied
 # to the cookie after :expire_after is, so by setting it to nil, we force the lesser

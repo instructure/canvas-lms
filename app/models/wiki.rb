@@ -20,14 +20,13 @@ require 'atom'
 
 class Wiki < ActiveRecord::Base
   has_many :wiki_pages, :dependent => :destroy
+  has_one :course
+  has_one :group
+  belongs_to :root_account, :class_name => 'Account'
 
   before_save :set_has_no_front_page_default
   after_update :set_downstream_change_for_master_courses
-
   after_save :update_contexts
-
-  has_one :course
-  has_one :group
 
   DEFAULT_FRONT_PAGE_URL = 'front-page'
 
@@ -206,7 +205,7 @@ class Wiki < ActiveRecord::Base
         self.extend TextHelper
         name = CanvasTextHelper.truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
 
-        context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki")
+        context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki", :root_account_id => context.root_account_id)
         context.save!
         wiki
       end
@@ -243,4 +242,5 @@ class Wiki < ActiveRecord::Base
     # was a shim for draft state, can be removed
     'pages'
   end
+
 end

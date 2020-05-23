@@ -25,7 +25,10 @@ def getImageTagVersion() {
 
 pipeline {
   agent { label 'canvas-docker' }
-  options { ansiColor('xterm') }
+  options {
+    ansiColor('xterm')
+    timestamps()
+  }
 
   stages {
     stage('Print Env Variables') {

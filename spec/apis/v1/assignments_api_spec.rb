@@ -5356,6 +5356,19 @@ describe AssignmentsApiController, type: :request do
       expect(@a1.lock_at.to_i).to eq @new_dates[2].to_i
     end
 
+    context "cache register" do
+      specs_require_cache(:redis_cache_store)
+
+      it "should clear the cache register values correctly" do
+        old_key = Timecop.freeze(1.minute.ago) { @a0.cache_key(:availability) }
+        api_bulk_update(@course, [{
+          'id' => @a0.id,
+          'all_dates' => [{'base' => true, 'due_at' => @new_dates[1].iso8601}]
+        }])
+        expect(@a0.cache_key(:availability)).to_not eq old_key
+      end
+    end
+
     it "validates assignment dates" do
       json = api_bulk_update(@course, [{
                                          'id' => @a0.id,

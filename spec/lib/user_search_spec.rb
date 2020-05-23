@@ -200,7 +200,7 @@ describe UserSearch do
 
           it 'returns the last_login column when searching and sorting' do
             results = UserSearch.for_user_in_context("UNIQUE_ID", course, user, nil, sort: 'last_login')
-            expect(results.first.last_login).to eq(Time.utc(2019,11,11))
+            expect(results.first.read_attribute('last_login')).to eq(Time.utc(2019,11,11))
           end
 
           it 'can match an SIS id and a user name in the same query' do

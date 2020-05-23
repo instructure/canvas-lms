@@ -103,6 +103,12 @@ class EventStream::Stream
       index.for_key(key, options)
     end
 
+    singleton_class.send(:define_method, "ids_for_#{name}") do |*args|
+      options = args.extract_options!
+      key = index.key_proc ? index.key_proc.call(*args) : args
+      index.ids_for_key(key, options)
+    end
+
     singleton_class.send(:define_method, "#{name}_index") do
       index
     end

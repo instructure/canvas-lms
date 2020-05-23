@@ -6926,6 +6926,12 @@ describe Assignment do
         expect(assignment.errors.keys.include?(:points_possible)).to be_truthy
       end
 
+      it "does not allow a 1000000000 value" do
+        assignment = Assignment.new(points_possible: 1000000000)
+        expect(assignment).not_to be_valid
+        expect(assignment.errors.keys.include?(:points_possible)).to be_truthy
+      end
+
       it "allows a nil value" do
         assignment = Assignment.new(points_possible: nil)
         assignment.valid?

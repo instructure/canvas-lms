@@ -56,6 +56,12 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": "Tiedoston esikatselun luonnissa ilmeni virhe"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "Ilmeni virhe tehtäessä verkkopyyntöä"
+    },
+    "an_error_occurred_uploading_your_media_71f1444d": {
+        "message": "Ilmeni virhe mediaasi ladatessa."
+    },
     "announcement_fb4cb645": {
         "message": "Ilmoitus"
     },
@@ -121,6 +127,9 @@
     },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Avaa automaattisesti tekstiin sidottu esikatselu. (Esikatselu näkyy vain tallentamisen jälkeen)"
+    },
+    "available_folders_694d0436": {
+        "message": "Saatavissa olevat kansiot"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Tehtävähistoriasi alku"
@@ -213,6 +222,9 @@
         "message": "Kurssiasiakirjat"
     },
     "course_files_62deb8f8": {
+        "message": "Kurssitiedostot"
+    },
+    "course_files_a31f97fc": {
         "message": "Kurssitiedostot"
     },
     "course_images_f8511d04": {
@@ -431,6 +443,12 @@
     "file_name_8fd421ff": {
         "message": "Tiedoston nimi"
     },
+    "file_upload_failed_af22dd91": {
+        "message": "Tiedoston lataus epäonnistui"
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "Tiedostoa ladataan"
+    },
     "file_url_c12b64be": {
         "message": "Tiedoston URL"
     },
@@ -454,6 +472,9 @@
     },
     "focus_the_popup_context_toolbar_7979f4f8": {
         "message": "Kohdista ponnahdussisällön työkalupalkki"
+    },
+    "folder_tree_fbab0726": {
+        "message": "Kansiopuu"
     },
     "formatting_5b143aa8": {
         "message": "Muotoillaan"
@@ -489,6 +510,9 @@
         "message": "Arvosanat ladattu"
     },
     "group_files_4324f3df": {
+        "message": "Ryhmän tiedostot"
+    },
+    "group_files_82e5dcdb": {
         "message": "Ryhmän tiedostot"
     },
     "group_navigation_99f191a": {
@@ -608,6 +632,9 @@
     "loading_failed_e6a9d8ef": {
         "message": "Lataus epäonnistui."
     },
+    "loading_folders_d8b5869e": {
+        "message": "Ladataan kansioita"
+    },
     "loading_grades_c842c887": {
         "message": "Ladataan arvosanoja"
     },
@@ -622,6 +649,9 @@
     },
     "location_3b6ff307": {
         "message": "Sijainti:"
+    },
+    "locked_762f138b": {
+        "message": "Lukittu"
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Näyttää siltä kuin täällä ei olisi mitään"
@@ -649,6 +679,9 @@
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Täytyy olla vähintään { width } x { height }px."
+    },
+    "my_files_2f621040": {
+        "message": "Omat tiedostot"
     },
     "my_grades_98834476": {
         "message": "Omat arvosanat"
@@ -899,6 +932,9 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Jotakin meni pieleen enkä tiedä, mitä näyttää sinulle,"
     },
+    "something_went_wrong_d238c551": {
+        "message": "Jotakin meni pieleen."
+    },
     "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
         "message": "Jotakin meni pieleen, yritä uudelleen sivun päivittämisen jälkeen"
     },
@@ -940,6 +976,9 @@
     },
     "subscript_59744f96": {
         "message": "Alaindeksi"
+    },
+    "success_file_uploaded_8174e93f": {
+        "message": "Onnistuminen: Tiedoston ladattu"
     },
     "success_to_do_created_e34ed395": {
         "message": "Onnistuminen: Tehtävä luotu"
@@ -1048,6 +1087,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Lataa mediaa"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "Lataus ei ole saatavissa tälle kansiolle"
     },
     "upload_record_media_e4207d72": {
         "message": "Lataa/Tallennusväline"

@@ -47,16 +47,6 @@ Developer key management features allow root account administrators to turn glob
 ### What management features are available?
 Root account administrators may enable or disable global developer keys for their specific account. This means that vendors who wish to have integrations that work in any Canvas account may request a global developer key from Instructure allowing account administrators enable the key for their account.
 
-To request a global developer key please contact: partnersupport@instructure.com
-Please include:
-- A list of Redirect URI’s that your app uses
-- An Icon URL. This will be shown on the authorization screen.
-- The scopes the key requires access to and how the data will be used (ex: We need access to `url:GET|/api/v1/courses/:course_id/rubrics` since we return this data in a custom analytics dashboard). Ideally, this information would be already contained within your integration documentation and a link to the documentation should suffice.
-- Describe the security policy surrounding how developer keys and tokens will be stored.
-- A point of contact (email address) at the company. Ideally, this will be an account that is accessible even if the requester leaves the company.
-- Links to any relevant documentation for your integration.
-
-
 ### How do management features function?
 When a client uses the [OAuth2 Auth endpoint](file.oauth_endpoints.html#get-login-oauth2-auth) as part of the flow to retrieve an access token canvas will check the developer key associated with the `client_id`. If the developer key is not enabled in the requested account, Canvas will respond with `unauthorized_client`.
 

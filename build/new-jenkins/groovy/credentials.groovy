@@ -53,4 +53,10 @@ def withSnykCredentials(block) {
   ]) { block.call() }
 }
 
+def withSplunkCredentials(block) {
+  withCredentials([
+    string(credentialsId: 'SPLUNK_HEC_KEY', variable: 'SPLUNK_HEC_KEY')
+  ]) { block.call() }
+}
+
 return this

@@ -33,7 +33,7 @@ export default class DashboardView extends View {
       'click .stream-details': 'handleDetailsClick',
       'click .close_conference_link': 'closeConference',
       'focus .todo-tooltip': 'handleTooltipFocus',
-      beforeremove: 'updateCategoryCounts' // ujsLinks event
+      'beforeremove .stream-category': 'updateCategoryCounts' // ujsLinks event
     }
   }
 

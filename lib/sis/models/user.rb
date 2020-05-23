@@ -20,12 +20,12 @@ module SIS
     class User
       attr_accessor :user_id, :login_id, :status, :first_name, :last_name,
                     :email, :password, :ssha_password, :integration_id, :row,
-                    :short_name, :full_name, :sortable_name, :lineno, :csv,
+                    :short_name, :full_name, :sortable_name, :lineno, :csv, :pronouns,
                     :authentication_provider_id, :sis_batch_id, :existing_user_id,
                     :existing_integration_id, :existing_canvas_user_id, :root_account_id
 
       def initialize(user_id:, login_id:, status:, first_name: nil, last_name: nil,
-                     email: nil, password: nil, ssha_password: nil,
+                     email: nil, password: nil, ssha_password: nil, pronouns: nil,
                      integration_id: nil, short_name: nil, full_name: nil,
                      sortable_name: nil, authentication_provider_id: nil,
                      sis_batch_id: nil, lineno: nil, csv: nil, existing_user_id: nil,
@@ -37,6 +37,7 @@ module SIS
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
+        self.pronouns = pronouns
         self.password = password
         self.ssha_password = ssha_password
         self.integration_id = integration_id

@@ -201,6 +201,18 @@ module SIS
           should_add_account_associations = false
           should_update_account_associations = false
 
+          if user_row.pronouns.present? &&
+            @root_account.feature_enabled?(:account_pronouns) &&
+            @root_account.pronouns.include?(user_row.pronouns)
+            unless user.stuck_sis_fields.include?(:pronouns)
+              user.pronouns = user_row.pronouns
+            end
+          elsif user_row.pronouns.present?
+            message = I18n.t("Pronoun does not match account pronoun or pronouns are not enabled for this account, %{user_id}, skipping", user_id: user_row.user_id)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+            next
+          end
+
           if !status_is_active && !user.new_record?
             if user.id == @batch&.user_id
               message = "Can't remove yourself user_id '#{user_row.user_id}'"

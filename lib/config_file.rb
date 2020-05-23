@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency 'canvas/reloader'
+
 module ConfigFile
   class << self
     def unstub
@@ -29,8 +31,9 @@ module ConfigFile
 
     def stub(config_name, value)
       raise "config settings can only be set via config file" unless Rails.env.test?
-      @yaml_cache[config_name] ||= {}
-      @yaml_cache[config_name][Rails.env] = value
+      existing_cache = @yaml_cache[config_name].dup || {}
+      existing_cache[Rails.env] = value
+      @yaml_cache[config_name] = deep_freeze_cached_value(existing_cache)
     end
 
     def load(config_name, with_rails_env = ::Rails.env)
@@ -43,13 +46,12 @@ module ConfigFile
       if File.exist?(path)
         config_string = ERB.new(File.read(path))
         config = YAML.load(config_string.result)
-
-        config = if config.respond_to?(:with_indifferent_access)
-                   config.with_indifferent_access
-                 end
+        config = config.with_indifferent_access if config.respond_to?(:with_indifferent_access)
       end
-      @yaml_cache[config_name] = config
-      config = config[with_rails_env] if config && with_rails_env
+      if config
+        @yaml_cache[config_name] = deep_freeze_cached_value(config)
+        config = config[with_rails_env] if with_rails_env
+      end
       config
     end
 
@@ -60,6 +62,29 @@ module ConfigFile
       return object_cache[with_rails_env] if object_cache.key?(with_rails_env)
       config = load(config_name, with_rails_env)
       object_cache[with_rails_env] = config && yield(config)
+    end
+
+    def deep_freeze_cached_value(input)
+      return nil if input.nil?
+      return deep_freeze_enumerable(input) if needs_deep_freeze?(input)
+      input.freeze
+      input
+    end
+
+    def deep_freeze_enumerable(input)
+      return nil if input.nil?
+      input.each do |key, value|
+        if input.is_a?(Array)
+          needs_deep_freeze?(key) ? deep_freeze_enumerable(key) : key.freeze
+        end
+        needs_deep_freeze?(value) ? deep_freeze_enumerable(value) : value.freeze
+      end
+      input.freeze
+      input
+    end
+
+    def needs_deep_freeze?(value)
+      value.is_a?(Enumerable) && !value.is_a?(String)
     end
   end
   unstub

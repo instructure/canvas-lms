@@ -138,5 +138,27 @@ QUnit.module('Gradebook > Assignment Groups', suiteHooks => {
       })
       gradebook.updateAssignmentGroups(assignmentGroups)
     })
+
+    test('updates essential data load status', () => {
+      sinon.spy(gradebook, '_updateEssentialDataLoaded')
+      gradebook.updateAssignmentGroups(assignmentGroups)
+      strictEqual(gradebook._updateEssentialDataLoaded.callCount, 1)
+    })
+
+    test('updates essential data load status after updating the assignment groups loaded status', () => {
+      sinon.spy(gradebook, 'updateColumnHeaders')
+      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
+        strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, true)
+      })
+      gradebook.updateAssignmentGroups(assignmentGroups)
+    })
+
+    test('updates essential data load status after rendering filters', () => {
+      sinon.spy(gradebook, 'updateColumnHeaders')
+      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
+        strictEqual(gradebook.updateColumnHeaders.callCount, 1)
+      })
+      gradebook.updateAssignmentGroups(assignmentGroups)
+    })
   })
 })

@@ -48,6 +48,7 @@ class WikiPage < ActiveRecord::Base
   belongs_to :user
 
   belongs_to :context, polymorphic: [:course, :group]
+  belongs_to :root_account, :class_name => 'Account'
 
   acts_as_url :title, :sync_url => true
 
@@ -58,6 +59,7 @@ class WikiPage < ActiveRecord::Base
   before_save :set_revised_at
   before_validation :ensure_wiki_and_context
   before_validation :ensure_unique_title
+  before_create :set_root_account_id
 
   after_save  :touch_context
   after_save  :update_assignment,
@@ -477,5 +479,9 @@ class WikiPage < ActiveRecord::Base
           revised_at: self.revised_at
         })
     end
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.context&.root_account_id unless self.root_account_id
   end
 end

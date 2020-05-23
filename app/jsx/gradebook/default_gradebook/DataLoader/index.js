@@ -16,180 +16,136 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {difference} from 'lodash'
+
 import {RequestDispatch} from '../../../shared/network'
-import OldDataLoader from './OldDataLoader'
+import AssignmentGroupsLoader from './AssignmentGroupsLoader'
+import ContextModulesLoader from './ContextModulesLoader'
+import CustomColumnsDataLoader from './CustomColumnsDataLoader'
+import CustomColumnsLoader from './CustomColumnsLoader'
+import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
+import SisOverridesLoader from './SisOverridesLoader'
+import StudentContentDataLoader from './StudentContentDataLoader'
+import StudentIdsLoader from './StudentIdsLoader'
 
 export default class DataLoader {
-  constructor({gradebook}) {
+  constructor({gradebook, performanceControls}) {
     this._gradebook = gradebook
-    this.dispatch = new RequestDispatch({
-      activeRequestLimit: gradebook.options.activeRequestLimit
+
+    const dispatch = new RequestDispatch({
+      activeRequestLimit: performanceControls.activeRequestLimit
     })
+
+    const loaderConfig = {
+      dispatch,
+      gradebook,
+      performanceControls
+    }
+
+    this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
+    this.contextModulesLoader = new ContextModulesLoader(loaderConfig)
+    this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
+    this.customColumnsLoader = new CustomColumnsLoader(loaderConfig)
+    this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
+    this.sisOverridesLoader = new SisOverridesLoader(loaderConfig)
+    this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
+    this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
   }
 
   loadInitialData() {
     const gradebook = this._gradebook
-    const {options} = gradebook
 
-    const promises = OldDataLoader.loadGradebookData({
+    this.__loadGradebookData({
+      dataLoader: this,
       gradebook,
-      dispatch: this.dispatch,
-
-      activeRequestLimit: options.performanceControls?.active_request_limit,
-      courseId: options.context_id,
-      perPage: options.api_max_per_page,
 
       getAssignmentGroups: true,
       getContextModules: true,
       getCustomColumns: true,
-      getGradingPeriodAssignments: gradebook.gradingPeriodSet != null,
-      loadedStudentIds: [],
-
-      submissionsChunkSize: options.chunk_size
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotStudentIds.then(data => {
-      gradebook.updateStudentIds(data.user_ids)
-    })
-
-    if (promises.gotGradingPeriodAssignments != null) {
-      // eslint-disable-next-line promise/catch-or-return
-      promises.gotGradingPeriodAssignments.then(data => {
-        gradebook.updateGradingPeriodAssignments(data.grading_period_assignments)
-      })
-    }
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotAssignmentGroups.then(assignmentGroups => {
-      gradebook.updateAssignmentGroups(assignmentGroups)
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotCustomColumns.then(customColumns => {
-      gradebook.gotCustomColumns(customColumns)
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotStudents.then(() => {
-      gradebook.updateStudentsLoaded(true)
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotContextModules.then(contextModules => {
-      gradebook.updateContextModules(contextModules)
-    })
-
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotSubmissions.then(() => {
-      gradebook.updateSubmissionsLoaded(true)
-    })
-
-    // TODO: In TALLY-769, remove this entire block.
-    // eslint-disable-next-line promise/catch-or-return
-    Promise.all([
-      promises.gotStudentIds,
-      promises.gotContextModules,
-      promises.gotCustomColumns,
-      promises.gotAssignmentGroups,
-      promises.gotGradingPeriodAssignments
-    ]).then(() => {
-      gradebook.finishRenderingUI()
+      getGradingPeriodAssignments: gradebook.gradingPeriodSet != null
     })
   }
 
   loadCustomColumnData(customColumnId) {
-    const gradebook = this._gradebook
-    const {options} = gradebook
-
-    OldDataLoader.getDataForColumn(
-      options.context_id,
-      customColumnId,
-      {perPage: options.api_max_per_page},
-      gradebook.gotCustomColumnDataChunk,
-      this.dispatch
-    )
+    this.customColumnsDataLoader.loadCustomColumnsData([customColumnId])
   }
 
   loadOverridesForSIS() {
-    const gradebook = this._gradebook
-    const {options} = gradebook
-
-    const url = `/api/v1/courses/${options.context_id}/assignment_groups`
-    const params = {
-      exclude_assignment_submission_types: ['wiki_page'],
-      exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
-      include: ['assignments', 'grades_published', 'overrides'],
-      override_assignment_dates: false
-    }
-
-    this.dispatch.getDepaginated(url, params).then(gradebook.addOverridesToPostGradesStore)
+    this.sisOverridesLoader.loadOverrides()
   }
 
   reloadStudentDataForEnrollmentFilterChange() {
-    this._reloadStudentData({
+    this.__reloadStudentData({
       getGradingPeriodAssignments: true
     })
   }
 
   reloadStudentDataForSectionFilterChange() {
-    this._reloadStudentData({
+    this.__reloadStudentData({
       getGradingPeriodAssignments: false
     })
   }
 
   reloadStudentDataForStudentGroupFilterChange() {
-    this._reloadStudentData({
+    this.__reloadStudentData({
       getGradingPeriodAssignments: false
     })
   }
 
   // PRIVATE
 
-  _reloadStudentData(loadOptions) {
+  __reloadStudentData(loadOptions) {
     const gradebook = this._gradebook
-    const {options} = gradebook
 
     gradebook.updateStudentsLoaded(false)
     gradebook.updateSubmissionsLoaded(false)
 
-    const promises = OldDataLoader.loadGradebookData({
+    this.__loadGradebookData({
+      dataLoader: this,
       gradebook,
-      dispatch: this.dispatch,
-
-      courseId: options.context_id,
-      perPage: options.api_max_per_page,
 
       getGradingPeriodAssignments:
-        loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null,
-
-      loadedStudentIds: gradebook.courseContent.students.listStudentIds(),
-
-      submissionsChunkSize: options.chunk_size,
-
-      customColumnIds: gradebook.gradebookContent.customColumns.map(column => column.id)
+        loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null
     })
+  }
 
-    if (promises.gotGradingPeriodAssignments != null) {
-      // eslint-disable-next-line promise/catch-or-return
-      promises.gotGradingPeriodAssignments.then(data => {
-        gradebook.updateGradingPeriodAssignments(data.grading_period_assignments)
-      })
+  async __loadGradebookData(options) {
+    const {dataLoader, gradebook} = options
+
+    // Store currently-loaded student ids for diffing below.
+    const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
+
+    // Begin loading Student IDs before any other data.
+    const gotStudentIds = dataLoader.studentIdsLoader.loadStudentIds()
+
+    if (options.getAssignmentGroups) {
+      dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
     }
 
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotStudentIds.then(data => {
-      gradebook.updateStudentIds(data.user_ids)
-    })
+    if (options.getGradingPeriodAssignments) {
+      dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
+    }
 
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotStudents.then(() => {
-      gradebook.updateStudentsLoaded(true)
-    })
+    if (options.getCustomColumns) {
+      dataLoader.customColumnsLoader.loadCustomColumns()
+    }
 
-    // eslint-disable-next-line promise/catch-or-return
-    promises.gotSubmissions.then(() => {
-      gradebook.updateSubmissionsLoaded(true)
-    })
+    if (options.getContextModules) {
+      dataLoader.contextModulesLoader.loadContextModules()
+    }
+
+    await gotStudentIds
+
+    const studentIds = gradebook.courseContent.students.listStudentIds()
+    const studentIdsToLoad = difference(studentIds, loadedStudentIds)
+
+    await dataLoader.studentContentDataLoader.load(studentIdsToLoad)
+
+    /*
+     * Currently, custom columns data has the lowest priority for initial
+     * data loading, so it waits until all students and submissions are
+     * finished loading.
+     */
+    dataLoader.customColumnsDataLoader.loadCustomColumnsData()
   }
 }

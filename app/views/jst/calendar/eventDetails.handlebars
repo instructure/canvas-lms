@@ -41,6 +41,12 @@
                 <td>{{location_address}}</td>
               </tr>
             {{/if}}
+      {{#if webConference}}
+              <tr>
+                <th scope="row">{{#t}}Conferencing{{/t}}</th>
+                <td><div class="conferencing"></div></td>
+              </tr>
+            {{/if}}
       {{#if description}}
         <tr>
           <th scope="row">{{#t "details"}}Details{{/t}}</th>
@@ -52,7 +58,8 @@
       {{#unless isPlannerNote}}
             <tr id='reservations'>
               {{#if reservations}}
-              <th id='attendees_header_text' scope="row">{{#t "attendees"}}Attendees{{/t}}</th>
+              <th id='attendees_header_text'
+               scope="row">{{#t "attendees"}}Attendees{{/t}}</th>
               <td>
                 {{#if can_edit}}
                   <ul id="attendees">

@@ -22,8 +22,19 @@ def stashSpecCoverage(prefix, index) {
   }
 }
 
-def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
+def cleanupCoverage(prefix) {
   sh 'rm -vrf ./coverage_nodes'
+  sh 'rm -vrf ./coverage'
+  sh "rm -vrf coverage_nodes ${prefix}_coverage_nodes"
+  sh "rm -vrf coverage ${prefix}_coverage"
+}
+
+def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
+  echo "publishing coverage for $coverage_type: $ci_node_total for $prefix"
+
+  cleanupCoverage(prefix)
+
+  // get all the data for the report
   dir('coverage_nodes') {
     for(int index = 0; index < ci_node_total; index++) {
       dir("node_${index}") {
@@ -32,16 +43,22 @@ def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
     }
   }
 
+  // build the report
   sh './build/new-jenkins/rspec-coverage-report.sh'
 
-  archiveArtifacts(artifacts: 'coverage_nodes/**')
-  archiveArtifacts(artifacts: 'coverage/**')
+  // upload to s3
   uploadCoverage([
       uploadSource: "/coverage",
       uploadDest: "$coverage_type/coverage"
   ])
-  sh 'rm -vrf ./coverage_nodes'
-  sh 'rm -vrf ./coverage'
+
+  // archive for debugging
+  sh "mv coverage_nodes ${prefix}_coverage_nodes"
+  sh "mv coverage ${prefix}_coverage"
+  archiveArtifacts(artifacts: "${prefix}_coverage_nodes/**")
+  archiveArtifacts(artifacts: "${prefix}_coverage/**")
+  
+  cleanupCoverage(prefix)
 }
 
 def appendFailMessageReport(message, link) {

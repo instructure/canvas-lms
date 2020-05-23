@@ -69,6 +69,7 @@ Object.assign(CalendarEvent.prototype, {
       }
       this.editable = false
     }
+    this.webConference = data.web_conference
     return CalendarEvent.__super__.copyDataFromObject.apply(this, arguments)
   },
 
@@ -153,7 +154,8 @@ Object.assign(CalendarEvent.prototype, {
     }
     if (
       this.calendarEvent.available_slots > 0 &&
-      (this.calendarEvent.child_events && this.calendarEvent.child_events.length)
+      this.calendarEvent.child_events &&
+      this.calendarEvent.child_events.length
     ) {
       status = I18n.t('%{availableSlots} more available', {
         availableSlots: I18n.n(this.calendarEvent.available_slots)

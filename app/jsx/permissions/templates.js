@@ -735,12 +735,7 @@ const courseViewChangePermissions = generateActionTemplates(
       )
     }
   ],
-  [
-    {
-      title: I18n.t('Subaccounts'),
-      description: I18n.t('Not available at the subaccount level.')
-    }
-  ],
+  [],
   [],
   []
 )
@@ -761,10 +756,6 @@ const gradesViewChangeLogPermissions = generateActionTemplates(
       description: I18n.t(
         `To search by grader or student ID, Users - view must also be enabled. To search by course ID or assignment ID, Grades - edit must also be enabled. To search by assignment ID only, Grades - view all grades must also be enabled.`
       )
-    },
-    {
-      title: I18n.t('Subaccounts'),
-      description: I18n.t('Not available at the subaccount level.')
     }
   ],
   [],
@@ -1376,17 +1367,13 @@ const courseContentViewPermissions = generateActionTemplates(
     {
       title: I18n.t('Courses'),
       description: I18n.t('Allows user to view published and unpublished course content.')
-    },
-    {
-      title: I18n.t('New Gradebook'),
-      description: I18n.t('Allows user to view the New Gradebook.')
     }
   ],
   [
     {
       title: I18n.t('Admin Tools (Undelete Courses)'),
       description: I18n.t(
-        'Regardless of whether this permission is enabled or disabled, the user will still be able to manage events on their personal calendar.'
+        'If Courses - add / edit / delete and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools.'
       )
     },
     {
@@ -1394,6 +1381,10 @@ const courseContentViewPermissions = generateActionTemplates(
       description: I18n.t(
         `If disabled, user will still have access to Course Settings. User cannot manage individual course content without the appropriate permission for that content item. If course visibility is limited to users enrolled in the course, this permission allows the user to view course content without being enrolled in the course.`
       )
+    },
+    {
+      title: I18n.t('Gradebook'),
+      description: I18n.t(`To view the Gradebook, Grades - view all grades must also be enabled.`)
     }
   ],
   [],
@@ -1490,7 +1481,7 @@ const courseSectionsViewPermissions = generateActionTemplates(
     {
       title: I18n.t('Course Settings (Sections tab)'),
       description: I18n.t(
-        `To cross-list sections, Course - add / edit / delete must also be enabled.`
+        `To cross-list sections, Courses - add / edit / delete must also be enabled.`
       )
     }
   ],
@@ -1518,19 +1509,26 @@ const courseStateManagePermissions = generateActionTemplates(
     {
       title: I18n.t('Course Home Page'),
       description: I18n.t(
-        `Determines whether a Publish Course option is included on the Course Home Page.`
+        `Determines whether the Publish Course and Unpublish Course buttons display in the Course Home Page.`
       )
     },
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t(`Affects viewing the Publish Course and Conclude Course buttons.`)
+      description: I18n.t(`Affects viewing the Delete this Course and Conclude Course buttons.`)
+    },
+    {
+      title: I18n.t('Dashboard'),
+      description: I18n.t(
+        `Determines whether a Publish button is included in a course card for an unpublished course (Card View Dashboard).`
+      )
     }
   ],
   [
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        `For course-level users, deleting a course is part of the Course State - manage permission. However, for an account-level user, deleting a course requires this permission and Course - add / edit / delete. `
+        `Affects viewing the Conclude Course and Permanently Delete this Course buttons. The Permanently Delete this Course button only appears for manually created courses.
+        For course-level users, deleting a course is part of the Course State - manage permission. However, for an account-level user, deleting a course requires this permission and Courses - add / edit / delete. `
       )
     },
     {
@@ -1548,13 +1546,21 @@ const courseStateManagePermissions = generateActionTemplates(
   ],
   [
     {
-      title: I18n.t('Course'),
-      description: I18n.t(`Allows user to publish, conclude, and delete courses.`)
+      title: I18n.t('Course Settings'),
+      description: I18n.t(
+        `Determines whether the Publish Course and Unpublish Course buttons display in the Course Home Page.`
+      )
     },
     {
       title: I18n.t('Course Setup Checklist, Course Home Page'),
       description: I18n.t(
         `Determines whether a Publish Course option is included in the Course Setup Checklist and in the Course Home Page.`
+      )
+    },
+    {
+      title: I18n.t('Dashboard'),
+      description: I18n.t(
+        `Determines whether a Publish button is included in a course card for an unpublished course (Card View Dashboard).`
       )
     }
   ],
@@ -1562,7 +1568,7 @@ const courseStateManagePermissions = generateActionTemplates(
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        `Affects viewing the Publish Course, Conclude Course, and Permanently Delete this Course buttons. The Permanently Delete this Course button only appears for manually created courses.`
+        `Affects viewing the Conclude Course and Permanently Delete this Course buttons. The Permanently Delete this Course button only appears for manually created courses.`
       )
     },
     {
@@ -1800,7 +1806,7 @@ const discussionViewPermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        `Blueprint Courses are an account-level feature option. To edit blueprint lock settings from the Discussions index page, Course - add / edit / delete and Discussions - moderate must also be enabled. `
+        `To edit blueprint lock settings from the Discussions index page, Courses - add / edit / delete and Discussions - moderate must also be enabled. `
       )
     },
     {
@@ -2237,7 +2243,7 @@ const gradesViewAllPermissions = generateActionTemplates(
     {
       title: I18n.t('Gradebook'),
       description: I18n.t(
-        `Allows user to view Gradebook. Allows user to export the Gradebook to a comma separated values (CSV) file. Allows user to access the Learning Mastery Gradebook (if enabled).`
+        `Allows user to export the Gradebook to a comma separated values (CSV) file. Allows user to access the Learning Mastery Gradebook (if enabled).`
       )
     },
     {
@@ -2250,7 +2256,7 @@ const gradesViewAllPermissions = generateActionTemplates(
     },
     {
       title: I18n.t('People (Course)'),
-      description: I18n.t(`Adds analytics link on the user settings menu.`)
+      description: I18n.t(`Allows user to view analytics link in the user settings menu.`)
     },
     {
       title: I18n.t('Quizzes'),
@@ -2281,7 +2287,7 @@ const gradesViewAllPermissions = generateActionTemplates(
     {
       title: I18n.t('Gradebook'),
       description: I18n.t(
-        `If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation.`
+        `To view the Gradebook, Course Content - view must also be enabled. If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation.`
       )
     },
     {
@@ -2561,7 +2567,7 @@ const learningOutcomesAddEditDeletePermissions = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        `To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled. To import learning outcomes, Learning Outcomes - import must also be enabled.`
+        `To import learning outcomes, Learning Outcomes - import must also be enabled.`
       )
     }
   ]
@@ -2727,7 +2733,7 @@ const rubricsAddPermissions = generateActionTemplates(
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        `Allows user to view the Rubrics link in Course Navigation. Allows user to create, edit, and delete course rubrics.`
+        `Determines visibility and management of Rubrics link in Account Navigation. Allows user to view the Rubrics link in Course Navigation. Allows user to create, edit, and delete course rubrics.`
       )
     }
   ],
@@ -2735,7 +2741,7 @@ const rubricsAddPermissions = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        `Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add / edit / delete are enabled.`
+        `Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add / edit / delete is enabled.`
       )
     }
   ]

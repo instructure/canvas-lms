@@ -51,6 +51,11 @@ QUnit.module('Gradebook > Students', suiteHooks => {
       deepEqual(gradebook.courseContent.gradingPeriodAssignments, gradingPeriodAssignments)
     })
 
+    test('sets the grading period assignments loaded status to true', () => {
+      gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
+      strictEqual(gradebook.contentLoadStates.gradingPeriodAssignmentsLoaded, true)
+    })
+
     test('updates columns when the grid has rendered', () => {
       sinon.stub(gradebook, '_gridHasRendered').returns(true)
       sinon.stub(gradebook, 'updateColumns')
@@ -71,6 +76,19 @@ QUnit.module('Gradebook > Students', suiteHooks => {
       sinon.stub(gradebook, 'updateColumns')
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
       strictEqual(gradebook.updateColumns.callCount, 0)
+    })
+
+    test('updates essential data load status', () => {
+      sinon.spy(gradebook, '_updateEssentialDataLoaded')
+      gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
+      strictEqual(gradebook._updateEssentialDataLoaded.callCount, 1)
+    })
+
+    test('updates essential data load status after updating the grading period assignments loaded status', () => {
+      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
+        strictEqual(gradebook.contentLoadStates.gradingPeriodAssignmentsLoaded, true)
+      })
+      gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
     })
   })
 })

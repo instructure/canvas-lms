@@ -55,5 +55,11 @@
         <%= f.check_box :replace_with_alternatives %> <%= f.label :replace_with_alternatives, :en => "Disable BigBlueButton conferences; show a list of alternatives instead" %>
       </td>
     </tr>
+    <tr>
+      <td></td>
+      <td>
+        <%= f.check_box :use_fallback %> <%= f.label :use_fallback, :en => "Use BigBlueButton Fallback Plugin settings to look for recordings for conferences that weren't hosted by the currently configured BBB instance." %>
+      </td>
+    </tr>
   </table>
 <% end %>

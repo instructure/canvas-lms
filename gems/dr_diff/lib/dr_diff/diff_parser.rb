@@ -28,11 +28,7 @@ module DrDiff
 
     def relevant?(path, line_number, severe=false)
       return false unless diff[path]
-      if UserConfig.only_report_errors?
-        if severe
-          diff[path][:change].include?(line_number)
-        end
-      elsif campsite && severe
+      if campsite && severe
         diff[path][:context].any?{|range| range.include?(line_number)}
       else
         diff[path][:change].include?(line_number)

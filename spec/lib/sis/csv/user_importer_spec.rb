@@ -216,6 +216,63 @@ describe SIS::CSV::UserImporter do
     expect(user.last_name).to eq 'St. Clair'
   end
 
+  describe 'pronouns' do
+    before(:once) do
+      @account = account_model
+      @account.settings[:can_add_pronouns] = true
+      @account.save!
+      @account.enable_feature!(:account_pronouns)
+    end
+
+    it "should add pronouns to users" do
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,He/Him"
+      )
+      user = Pseudonym.by_unique_id('user1').first.user
+      expect(user.pronouns).to eq 'He/Him'
+    end
+
+    it "should add custom pronouns to users" do
+      @account.pronouns = ['mr/man']
+      @account.save!
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,mr/man"
+      )
+      user = Pseudonym.by_unique_id('user1').first.user
+      expect(user.pronouns).to eq 'mr/man'
+    end
+
+    it "should throw an error when pronouns don't match" do
+      importer = process_csv_data(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,mr/man"
+      )
+      error = "Pronoun does not match account pronoun or pronouns are not enabled for this account, user_1, skipping"
+      expect(importer.errors.map(&:last).first).to eq error
+    end
+
+    it "respects users set pronouns cause it's sticky" do
+      @account.pronouns = ['mr/man', 'he/him']
+      @account.save!
+
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,mr/man"
+      )
+      user = Pseudonym.by_unique_id('user1').first.user
+
+      user.pronouns = 'he/him'
+      user.save!
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,mr/man"
+      )
+      expect(user.pronouns).to eq 'he/him'
+    end
+  end
+
   it "uses sortable_name if none of first_name/last_name/full_name is given" do
     process_csv_data_cleanly(
         "user_id,login_id,sortable_name,short_name,email,status",

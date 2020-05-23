@@ -38,6 +38,7 @@ class Attachments::S3Storage
     # copying rather than moving to avoid unhappy accidents
     # note that GC of the S3 bucket isn't yet implemented,
     # so there's a bit of a cost here
+    return if attachment.instfs_hosted?
     if !exists?
       if !attachment.size
         attachment.size = bucket.object(old_full_filename).content_length

@@ -36,6 +36,11 @@ class TokenScopes
   LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/destroy".freeze
   LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/list_event_types".freeze
   LTI_SHOW_FEATURE_FLAG_SCOPE = "https://canvas.instructure.com/lti/feature_flags/scope/show".freeze
+  LTI_CREATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/create".freeze
+  LTI_DESTROY_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/destroy".freeze
+  LTI_LIST_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/list".freeze
+  LTI_SHOW_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/show".freeze
+  LTI_UPDATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/update".freeze
   LTI_SCOPES = {
     LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
     LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the gradebook associated with the tool."),
@@ -53,6 +58,13 @@ class TokenScopes
     LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t('Can view feature flags')
   }.freeze
   LTI_AGS_SCOPES = [ LTI_AGS_LINE_ITEM_SCOPE, LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE, LTI_AGS_RESULT_READ_ONLY_SCOPE, LTI_AGS_SCORE_SCOPE ].freeze
+  LTI_HIDDEN_SCOPES = {
+    LTI_CREATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can create external tools."),
+    LTI_DESTROY_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can destroy external tools."),
+    LTI_LIST_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can list external tools."),
+    LTI_SHOW_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can show external tools."),
+    LTI_UPDATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can update external tools."),
+  }.freeze
 
   def self.named_scopes
     return @_named_scopes if @_named_scopes
@@ -68,7 +80,7 @@ class TokenScopes
   end
 
   def self.all_scopes
-    @_all_scopes ||= [USER_INFO_SCOPE[:scope], *api_routes.map {|route| route[:scope]}, *LTI_SCOPES.keys].freeze
+    @_all_scopes ||= [USER_INFO_SCOPE[:scope], *api_routes.map {|route| route[:scope]}, *LTI_SCOPES.keys, *LTI_HIDDEN_SCOPES.keys].freeze
   end
 
   def self.detailed_scopes

@@ -466,4 +466,24 @@ describe Rubric do
       end
     end
   end
+
+  describe 'create' do
+    let(:root_account) { Account.default }
+    it 'sets the root_account_id using course' do
+      course_model
+      rubric_for_course
+      expect(@rubric.root_account_id).to eq @course.root_account_id
+    end
+
+    it 'sets the root_account_id using root account' do
+      rubric_model
+      expect(@rubric.root_account_id).to eq root_account.id
+    end
+
+    it 'sets the root_account_id using sub account' do
+      sub_account = root_account.sub_accounts.create!
+      rubric_model({context: sub_account})
+      expect(@rubric.root_account_id).to eq sub_account.root_account_id
+    end
+  end
 end

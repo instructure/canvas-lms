@@ -492,7 +492,10 @@ class ProfileController < ApplicationController
   end
 
   def qr_mobile_login
-    raise not_found unless @domain_root_account&.feature_enabled?(:mobile_qr_login)
+    unless instructure_misc_plugin_available? && !!@domain_root_account&.feature_enabled?(:mobile_qr_login)
+      head 404
+      return
+    end
 
     @user ||= @current_user
     set_active_tab 'qr_mobile_login'
@@ -506,3 +509,8 @@ class ProfileController < ApplicationController
     render html: '', layout: true
   end
 end
+
+def instructure_misc_plugin_available?
+  Object.const_defined?("InstructureMiscPlugin")
+end
+private :instructure_misc_plugin_available?

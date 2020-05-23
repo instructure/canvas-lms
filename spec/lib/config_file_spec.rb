@@ -66,5 +66,40 @@ describe ConfigFile do
       expect(hit_block).to eq 2
       expect(result3).to be_nil
     end
+
+    it "does not give you the ability to mess with the cached data" do
+      ConfigFile.load("database", "test")
+      v2 = ConfigFile.load("database", "test")
+      expect { v2['foo'] = 'bar' }.to raise_error(RuntimeError)
+    end
+
+    describe "deep freezing" do
+      it "can deep freeze arrays" do
+        array = ["asdf","sdfg","dfgh","fghj"]
+        out = ConfigFile.deep_freeze_cached_value(array)
+        expect(out).to be_frozen
+        expect(out.class).to eq(Array)
+        expect(out[0]).to eq("asdf")
+        expect(out[0]).to be_frozen
+      end
+
+      it "can deep freeze hashes" do
+        hash = { "asdf" => "sdfg","dfgh" => "fghj" }
+        out = ConfigFile.deep_freeze_cached_value(hash)
+        expect(out).to be_frozen
+        expect(out.class).to eq(Hash)
+        expect(out["asdf"]).to be_frozen
+        expect(out["asdf"]).to eq("sdfg")
+      end
+
+      it "handles integers ok" do
+        array = [1,2,3,4]
+        out = ConfigFile.deep_freeze_cached_value(array)
+        expect(out).to be_frozen
+        expect(out.class).to eq(Array)
+        expect(out[0]).to eq(1)
+        expect(out[0]).to be_frozen
+      end
+    end
   end
 end

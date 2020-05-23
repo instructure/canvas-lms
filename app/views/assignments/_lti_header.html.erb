@@ -30,6 +30,9 @@
       </span>
     </div>
   </div>
+  <% if can_do(@context, @current_user, :participate_as_student) %>
+    <%=  render "student_assignment_overview"  %>
+  <%  end %>
 </div>
 <% if @assignment && @assignment.description.present? %>
   <div class="description user_content" style="margin: 20px">

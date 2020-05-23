@@ -56,6 +56,12 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": "Si è verificato un errore durante la generazione dell’anteprima file"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "Si è verificato un errore durante la creazione di una richiesta di rete"
+    },
+    "an_error_occurred_uploading_your_media_71f1444d": {
+        "message": "Si è verificato un errore durante il caricamento dei file multimediali."
+    },
     "announcement_fb4cb645": {
         "message": "Annuncio"
     },
@@ -121,6 +127,9 @@
     },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Aprire automaticamente un’anteprima in linea. (L’anteprima viene visualizzata solo dopo il salvataggio)"
+    },
+    "available_folders_694d0436": {
+        "message": "Cartelle disponibili"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Inizio della cronologia delle cose da fare"
@@ -214,6 +223,9 @@
     },
     "course_files_62deb8f8": {
         "message": "File del corso"
+    },
+    "course_files_a31f97fc": {
+        "message": "File corso"
     },
     "course_images_f8511d04": {
         "message": "Immagini del corso"
@@ -431,6 +443,12 @@
     "file_name_8fd421ff": {
         "message": "Nome file"
     },
+    "file_upload_failed_af22dd91": {
+        "message": "Errore caricamento file"
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "Caricamento file"
+    },
     "file_url_c12b64be": {
         "message": "URL file"
     },
@@ -454,6 +472,9 @@
     },
     "focus_the_popup_context_toolbar_7979f4f8": {
         "message": "Focalizza barra degli strumenti di contesto a comparsa"
+    },
+    "folder_tree_fbab0726": {
+        "message": "Struttura ad albero delle cartelle"
     },
     "formatting_5b143aa8": {
         "message": "Formattazione in corso"
@@ -490,6 +511,9 @@
     },
     "group_files_4324f3df": {
         "message": "File di gruppo"
+    },
+    "group_files_82e5dcdb": {
+        "message": "File gruppo"
     },
     "group_navigation_99f191a": {
         "message": "Esplorazione gruppo"
@@ -608,6 +632,9 @@
     "loading_failed_e6a9d8ef": {
         "message": "Caricamento non riuscito."
     },
+    "loading_folders_d8b5869e": {
+        "message": "Caricamento cartelle"
+    },
     "loading_grades_c842c887": {
         "message": "Caricamento voti"
     },
@@ -622,6 +649,9 @@
     },
     "location_3b6ff307": {
         "message": "Posizione:"
+    },
+    "locked_762f138b": {
+        "message": "Bloccato"
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Sembra non ci sia nulla qui"
@@ -649,6 +679,9 @@
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Deve essere almeno { width } x { height }px"
+    },
+    "my_files_2f621040": {
+        "message": "I miei file"
     },
     "my_grades_98834476": {
         "message": "I miei voti"
@@ -899,6 +932,9 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Qualcosa è andato storto e non so cosa mostrarti."
     },
+    "something_went_wrong_d238c551": {
+        "message": "Si è verificato un problema"
+    },
     "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
         "message": "Qualcosa è andato storto, riprova dopo aver aggiornato la pagina"
     },
@@ -940,6 +976,9 @@
     },
     "subscript_59744f96": {
         "message": "Pedice"
+    },
+    "success_file_uploaded_8174e93f": {
+        "message": "Operazione riuscita: File caricato"
     },
     "success_to_do_created_e34ed395": {
         "message": "Operazione riuscita: Cose da fare create"
@@ -1048,6 +1087,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Carica file multimediali"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "Caricamento non disponibile per questa cartella"
     },
     "upload_record_media_e4207d72": {
         "message": "Carica/Registra file multimediali"

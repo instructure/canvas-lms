@@ -319,5 +319,43 @@ describe MissingPolicyApplicator do
         expect(submission.reload).not_to be_posted
       end
     end
+
+    describe "sending live events" do
+      let_once(:assignment) { create_recent_assignment }
+      before(:once) do
+        late_policy_missing_enabled
+      end
+
+      context "when the missing_policy_applicator_emits_live_events flag is enabled" do
+        before(:each) do
+          @course.root_account.enable_feature!(:missing_policy_applicator_emits_live_events)
+        end
+
+        it "queues a delayed job if the applicator marks any submissions as missing" do
+          assignment.submissions.update_all(score: nil, grade: nil)
+          expect(Canvas::LiveEvents).to receive(:send_later_if_production).
+            with(:submissions_bulk_updated, assignment.submissions.to_a)
+
+          applicator.apply_missing_deductions
+        end
+
+        it "does not queue a delayed job if the applicator marks no submissions as missing" do
+          expect(Canvas::LiveEvents).not_to receive(:send_later_if_production).
+            with(:submissions_bulk_updated, any_args)
+
+          applicator.apply_missing_deductions
+        end
+      end
+
+      context "when the missing_policy_applicator_emits_live_events flag is not enabled" do
+        it "does not queue a delayed job when the applicator marks submissions as missing" do
+          assignment.submissions.update_all(score: nil, grade: nil)
+          expect(Canvas::LiveEvents).not_to receive(:send_later_if_production).
+            with(:submissions_bulk_updated, any_args)
+
+          applicator.apply_missing_deductions
+        end
+      end
+    end
   end
 end

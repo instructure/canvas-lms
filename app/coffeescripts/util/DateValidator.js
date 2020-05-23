@@ -101,10 +101,11 @@ export default class DateValidator {
     const lockAt = data.lock_at
     const unlockAt = data.unlock_at
     const dueAt = data.due_at
-    const section = _.find(ENV.SECTION_LIST, {id: data.course_section_id})
+    const section_id = data.set_type === 'CourseSection' ? data.set_id : data.course_section_id
+    const section = _.find(ENV.SECTION_LIST, {id: section_id})
     const currentDateRange = section ? this.getSectionRange(section) : this.dateRange
     const datetimesToValidate = []
-    const forIndividualStudents = data.student_ids?.length
+    const forIndividualStudents = data.student_ids?.length || data.set_type === 'ADHOC'
 
     if (currentDateRange.start_at && currentDateRange.start_at.date && !forIndividualStudents) {
       datetimesToValidate.push({

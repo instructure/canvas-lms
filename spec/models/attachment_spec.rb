@@ -31,6 +31,20 @@ describe Attachment do
 
   end
 
+  context "file_store_config" do
+    around(:each) do |example|
+      ConfigFile.unstub
+      example.run
+      ConfigFile.unstub
+    end
+
+    it "doesn't bomb on config" do
+      Attachment.instance_variable_set(:@file_store_config, nil)
+      ConfigFile.stub('file_store', { 'storage' => 'local' })
+      expect{ Attachment.file_store_config }.to_not raise_error
+    end
+  end
+
   context "default_values" do
     before :once do
       @course = course_model
@@ -1273,10 +1287,13 @@ describe Attachment do
     it "should not infer the namespace if it's not a new record" do
       Attachment.current_root_account = nil
       attachment_model(:context => submission_model)
+      original_namespace = @attachment.namespace
+      @attachment.context = @course
+      @attachment.save!
       expect(@attachment).not_to be_new_record
-      expect(@attachment.read_attribute(:namespace)).to be_nil
-      expect(@attachment.namespace).to be_nil
-      expect(@attachment.read_attribute(:namespace)).to be_nil
+      expect(@attachment.read_attribute(:namespace)).to eq original_namespace
+      expect(@attachment.namespace).to eq original_namespace
+      expect(@attachment.read_attribute(:namespace)).to eq original_namespace
     end
 
     context "sharding" do

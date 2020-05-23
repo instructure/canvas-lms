@@ -49,8 +49,16 @@ describe TokenScopes do
       expect(TokenScopes.all_scopes).to include TokenScopes::USER_INFO_SCOPE[:scope]
     end
 
+    it "includes the hidden scope" do
+      expect(TokenScopes.all_scopes).to include(*TokenScopes::LTI_HIDDEN_SCOPES.keys)
+    end
+
     describe "generated_scopes" do
-      let!(:generated_scopes) {TokenScopes.all_scopes.reject {|s| s == TokenScopes::USER_INFO_SCOPE[:scope] || TokenScopes::LTI_SCOPES.keys.include?(s) }}
+      let!(:generated_scopes) {
+        TokenScopes.all_scopes.reject do |s|
+          s == TokenScopes::USER_INFO_SCOPE[:scope] || TokenScopes::LTI_SCOPES.keys.include?(s) || TokenScopes::LTI_HIDDEN_SCOPES.keys.include?(s)
+        end
+      }
 
       it "formats the scopes with url:http_verb|api_path" do
         generated_scopes.each do |scope|

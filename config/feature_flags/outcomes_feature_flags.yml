@@ -24,3 +24,14 @@ import_outcomes_permission_fix:
   display_name: "Hide the Import Learning Outcomes button based on user permissions"
   description: "Ensures that users without the Import Outcomes permission cannot see
     the button within the Outcomes tab"
+outcome_guid_course_exports:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Reduce outcome duplication on course import"
+  description: "Ensures that outcomes that have already been imported
+    into a course are not duplicated if they are imported again"
+selectable_outcomes_in_course_copy:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Selectable outcomes during course content migration"
+  description: "Allows learning outcomes to be selectable when migrating course content"

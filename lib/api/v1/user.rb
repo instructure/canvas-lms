@@ -117,7 +117,7 @@ module Api::V1::User
       json[:confirmation_url] = user.communication_channels.email.first.try(:confirmation_url) if includes.include?('confirmation_url')
 
       if includes.include?('last_login')
-        last_login = user.read_attribute(:last_login)
+        last_login = user.last_login || user.read_attribute(:last_login)
         if last_login.is_a?(String)
           Time.use_zone('UTC') { last_login = Time.zone.parse(last_login) }
         end

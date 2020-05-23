@@ -17,18 +17,21 @@
  */
 
 import I18n from 'i18n!assignments_bulk_edit'
-import React from 'react'
+import React, {useCallback} from 'react'
 import {arrayOf, func} from 'prop-types'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Responsive} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import {IconWarningLine} from '@instructure/ui-icons'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconWarningLine, IconXSolid} from '@instructure/ui-icons'
 import BulkDateInput from './BulkDateInput'
 import BulkEditOverrideTitle from './BulkEditOverrideTitle'
 import {AssignmentShape} from './BulkAssignmentShape'
+import {canEditAll, originalDateField} from './utils'
 
 const DATE_INPUT_META = {
   due_at: {
@@ -46,7 +49,7 @@ const DATE_INPUT_META = {
 }
 
 BulkEditTable.propTypes = {
-  assignments: arrayOf(AssignmentShape),
+  assignments: arrayOf(AssignmentShape).isRequired,
 
   // ({
   //   dateKey: one of null, "due_at", "lock_at", or "unlock_at"
@@ -57,12 +60,36 @@ BulkEditTable.propTypes = {
   //   - or -
   //   base: true if this is the base assignment dates
   // }) => {...}
-  updateAssignmentDate: func
+  updateAssignmentDate: func.isRequired,
+
+  // {assignmentId, overrideId or base: true}
+  clearOverrideEdits: func.isRequired,
+
+  setAssignmentSelected: func.isRequired // (assignmentId, selected) => {}
 }
 
-export default function BulkEditTable({assignments, updateAssignmentDate}) {
+export default function BulkEditTable({
+  assignments,
+  updateAssignmentDate,
+  setAssignmentSelected,
+  selectAllAssignments,
+  clearOverrideEdits
+}) {
+  const CHECKBOX_COLUMN_WIDTH_REMS = 2
   const DATE_COLUMN_WIDTH_REMS = 14
+  const ACTION_COLUMN_WIDTH_REMS = 4
   const NOTE_COLUMN_WIDTH_REMS = 3
+
+  const someAssignmentsSelected = assignments.some(a => a.selected)
+  const allAssignmentsSelected =
+    someAssignmentsSelected && assignments.every(a => a.selected || !canEditAll(a))
+
+  function processErrors(errors, dateKey) {
+    if (!errors || !errors.hasOwnProperty(dateKey)) {
+      return []
+    }
+    return [{text: errors[dateKey], type: 'error'}]
+  }
 
   function renderDateInput(assignmentId, dateKey, dates, overrideId = null) {
     const label = DATE_INPUT_META[dateKey].label
@@ -70,6 +97,7 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
       <BulkDateInput
         label={label}
         selectedDateString={dates[dateKey]}
+        messages={processErrors(dates.errors, dateKey)}
         dateKey={dateKey}
         assignmentId={assignmentId}
         overrideId={overrideId}
@@ -81,21 +109,69 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
   }
 
   function renderOverrideTitle(assignment, override) {
-    return <BulkEditOverrideTitle assignment={assignment} override={override} />
+    return (
+      <BulkEditOverrideTitle
+        assignmentName={assignment.name}
+        overrideTitle={override.title}
+        overrideBase={override.base}
+      />
+    )
   }
 
   function renderNoDefaultDates() {
     // The goal here is to create a cell that spans multiple columns. You can't do that with InstUI
-    // yet, so we're going to fake it with a View that's as wide as the three date columns and
+    // yet, so we're going to fake it with a View that's as wide as all the other columns and
     // depend on the cell overflow as being visible. I think that's pretty safe since that's the
     // default overflow.
     return (
-      <View as="div" minWidth={`${DATE_COLUMN_WIDTH_REMS * 3 + NOTE_COLUMN_WIDTH_REMS}rem`}>
+      <View
+        as="div"
+        minWidth={`${DATE_COLUMN_WIDTH_REMS * 3 +
+          ACTION_COLUMN_WIDTH_REMS +
+          NOTE_COLUMN_WIDTH_REMS}rem`}
+      >
         <Text size="medium" fontStyle="italic">
           {I18n.t('This assignment has no default dates.')}
         </Text>
       </View>
     )
+  }
+
+  function renderAssignmentCheckbox(assignment) {
+    return (
+      <Checkbox
+        label={
+          <ScreenReaderContent>
+            {I18n.t('Select assignment: %{title}', {title: assignment.name})}
+          </ScreenReaderContent>
+        }
+        checked={!!assignment.selected}
+        onChange={() => setAssignmentSelected(assignment.id, !assignment.selected)}
+        disabled={!canEditAll(assignment)}
+      />
+    )
+  }
+
+  function renderActions(assignment, override) {
+    const overrideHasBeenEdited = ['due_at', 'unlock_at', 'lock_at']
+      .map(field => originalDateField(field))
+      .some(originalField => override.hasOwnProperty(originalField))
+
+    if (overrideHasBeenEdited) {
+      return (
+        <Tooltip renderTip={I18n.t('Revert date changes')}>
+          <IconButton
+            renderIcon={IconXSolid}
+            screenReaderLabel={I18n.t('Revert date changes')}
+            withBackground={false}
+            withBorder={false}
+            onClick={event => handleRevertClick(assignment, override, event)}
+          />
+        </Tooltip>
+      )
+    } else {
+      return null
+    }
   }
 
   function renderNote(assignment, dateSet) {
@@ -124,10 +200,14 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     if (baseOverride) {
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
+          {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+            <Table.Cell>{renderAssignmentCheckbox(assignment)}</Table.Cell>
+          )}
           <Table.Cell>{renderOverrideTitle(assignment, baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'unlock_at', baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'lock_at', baseOverride)}</Table.Cell>
+          <Table.Cell>{renderActions(assignment, baseOverride)}</Table.Cell>
           <Table.Cell>{renderNote(assignment, baseOverride)}</Table.Cell>
         </Table.Row>
       )
@@ -135,8 +215,12 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
       // Need all Table.Cells or you get weird borders on this row
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
+          {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+            <Table.Cell>{renderAssignmentCheckbox(assignment)}</Table.Cell>
+          )}
           <Table.Cell>{renderOverrideTitle(assignment, {base: true})}</Table.Cell>
           <Table.Cell>{renderNoDefaultDates()}</Table.Cell>
+          <Table.Cell />
           <Table.Cell />
           <Table.Cell />
           <Table.Cell />
@@ -150,6 +234,15 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     return overrides.map(override => {
       return (
         <Table.Row key={`override_${override.id}`}>
+          {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+            <Table.Cell>
+              <ScreenReaderContent>
+                {assignment.selected
+                  ? I18n.t('parent assignment is selected')
+                  : I18n.t('parent assignment is not selected')}
+              </ScreenReaderContent>
+            </Table.Cell>
+          )}
           <Table.Cell>{renderOverrideTitle(assignment, override)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', override, override.id)}</Table.Cell>
           <Table.Cell>
@@ -158,6 +251,7 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
           <Table.Cell>
             {renderDateInput(assignment.id, 'lock_at', override, override.id)}
           </Table.Cell>
+          <Table.Cell>{renderActions(assignment, override)}</Table.Cell>
           <Table.Cell>{renderNote(assignment, override)}</Table.Cell>
         </Table.Row>
       )
@@ -173,31 +267,86 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     return rows
   }
 
+  const handleSelectAllAssignments = useCallback(
+    () => selectAllAssignments(!allAssignmentsSelected),
+    [allAssignmentsSelected, selectAllAssignments]
+  )
+
+  const handleRevertClick = (assignment, override, event) => {
+    // assuming the revert button is going away, so we reset focus to the prior input before that
+    // happens.
+    const tableRow = event.target.closest('tr')
+    const rowInputs = tableRow.querySelectorAll('input')
+    if (rowInputs.length) rowInputs[rowInputs.length - 1].focus()
+    clearOverrideEdits({assignmentId: assignment.id, overrideId: override.id})
+  }
+
   function renderTable(_props = {}, matches = []) {
+    const checkboxWidthProp = `${CHECKBOX_COLUMN_WIDTH_REMS}rem`
     const widthProp = `${DATE_COLUMN_WIDTH_REMS}rem`
+    const actionsWidthProp = `${ACTION_COLUMN_WIDTH_REMS}rem`
     const noteWidthProp = `${NOTE_COLUMN_WIDTH_REMS}rem`
     const layoutProp = matches.includes('small') ? 'stacked' : 'fixed'
+
+    // The select all checkbox can't be in the table header because we don't want a SR to read it on
+    // every row, and in a stacked layout it would appear on every row. But we want it to visually
+    // be in the header in a fixed layout, so we're going to manually position it. Hard coding a
+    // visual offset like this sucks and is brittle, but I'm not sure what else to do right now.
+    const [selectAllStyles, selectAllLabel, selectedHeader] =
+      layoutProp === 'stacked'
+        ? [{}, I18n.t('Select all assignments'), I18n.t('Selected')]
+        : [
+            {
+              position: 'absolute',
+              top: '8px',
+              left: '13px'
+            },
+            <ScreenReaderContent>{I18n.t('Select all assignments')}</ScreenReaderContent>,
+            <ScreenReaderContent>{I18n.t('Selected')}</ScreenReaderContent>
+          ]
+
     return (
-      <Table caption={I18n.t('Assignment Dates')} hover layout={layoutProp}>
-        <Table.Head>
-          <Table.Row>
-            <Table.ColHeader id="title">{I18n.t('Title')}</Table.ColHeader>
-            <Table.ColHeader width={widthProp} id="due">
-              {DATE_INPUT_META.due_at.label}
-            </Table.ColHeader>
-            <Table.ColHeader width={widthProp} id="unlock">
-              {DATE_INPUT_META.unlock_at.label}
-            </Table.ColHeader>
-            <Table.ColHeader width={widthProp} id="lock">
-              {DATE_INPUT_META.lock_at.label}
-            </Table.ColHeader>
-            <Table.ColHeader id="note" width={noteWidthProp}>
-              <ScreenReaderContent>{I18n.t('Notes')}</ScreenReaderContent>
-            </Table.ColHeader>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>{renderAssignments()}</Table.Body>
-      </Table>
+      <div style={{position: 'relative'}}>
+        {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+          <div style={selectAllStyles}>
+            <Checkbox
+              label={selectAllLabel}
+              checked={allAssignmentsSelected}
+              indeterminate={!allAssignmentsSelected && someAssignmentsSelected}
+              onChange={handleSelectAllAssignments}
+            />
+          </div>
+        )}
+
+        <Table caption={I18n.t('Assignment Dates')} hover layout={layoutProp}>
+          <Table.Head>
+            <Table.Row>
+              {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+                <Table.ColHeader id="select" width={checkboxWidthProp}>
+                  {selectedHeader}
+                </Table.ColHeader>
+              )}
+              <Table.ColHeader id="title">{I18n.t('Title')}</Table.ColHeader>
+              <Table.ColHeader width={widthProp} id="due">
+                {DATE_INPUT_META.due_at.label}
+              </Table.ColHeader>
+              <Table.ColHeader width={widthProp} id="unlock">
+                {DATE_INPUT_META.unlock_at.label}
+              </Table.ColHeader>
+              <Table.ColHeader width={widthProp} id="lock">
+                {DATE_INPUT_META.lock_at.label}
+              </Table.ColHeader>
+              <Table.ColHeader id="actions" width={actionsWidthProp}>
+                <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
+              </Table.ColHeader>
+              <Table.ColHeader id="note" width={noteWidthProp}>
+                <ScreenReaderContent>{I18n.t('Notes')}</ScreenReaderContent>
+              </Table.ColHeader>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>{renderAssignments()}</Table.Body>
+        </Table>
+      </div>
     )
   }
 
@@ -206,7 +355,13 @@ export default function BulkEditTable({assignments, updateAssignmentDate}) {
     return (
       <Responsive
         match="media"
-        query={{small: {maxWidth: `${5 * DATE_COLUMN_WIDTH_REMS + NOTE_COLUMN_WIDTH_REMS}rem`}}}
+        query={{
+          small: {
+            maxWidth: `${5 * DATE_COLUMN_WIDTH_REMS +
+              ACTION_COLUMN_WIDTH_REMS +
+              NOTE_COLUMN_WIDTH_REMS}rem`
+          }
+        }}
         render={renderTable}
       />
     )

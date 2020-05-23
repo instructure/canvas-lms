@@ -37,6 +37,7 @@ class RubricAssociation < ActiveRecord::Base
 
   validates_presence_of :purpose, :rubric_id, :association_id, :association_type, :context_id, :context_type
 
+  before_create :set_root_account_id
   before_save :update_assignment_points
   before_save :update_values
   after_create :update_rubric
@@ -401,5 +402,14 @@ class RubricAssociation < ActiveRecord::Base
       payload: {id: rubric_id},
       user: @updating_user
     )
+  end
+
+  def set_root_account_id
+    self.root_account_id ||=
+      if context_type == 'Account' && context.root_account?
+        self.context.id
+      else
+        self.context&.root_account_id
+      end
   end
 end

@@ -310,6 +310,17 @@ describe WebConference do
     end
   end
 
+  context "calendar events" do
+
+    it "nullifies event conference when a conference is destroyed" do
+      course_with_teacher(active_all: true)
+      conference = WimbaConference.create!(title: "my conference", user: @user, context: @course)
+      event = calendar_event_model web_conference: conference
+      conference.destroy!
+      expect(event.reload.web_conference).to be nil
+    end
+  end
+
   context "LTI conferences" do
     let_once(:course) { course_model }
     let_once(:tool) do

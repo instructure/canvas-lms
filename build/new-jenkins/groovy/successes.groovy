@@ -20,6 +20,10 @@ def log(message) {
   echo "[successes.groovy]: ${message}"
 }
 
+def canSaveSucceses() {
+  return env.GERRIT_CHANGE_NUMBER && env.GERRIT_PATCHSET_NUMBER
+}
+
 def successFile() {
   return "_buildmeta/${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}-successes"
 }
@@ -32,12 +36,12 @@ def hasSuccessOrBuildIsSuccessful(name, required_count = 1) {
 }
 
 def hasSuccess(name, required_count = 1) {
-  if (!fileExists(successFile())) {
+  if (!fileExists(successFile()) && canSaveSucceses()) {
     copyArtifacts(
       filter: '_buildmeta/*',
       optional: true,
       projectName: env.JOB_NAME,
-      parameters: "GERRIT_CHANGE_NUMBER=${env.GERRIT_CHANGE_NUMBER},GERRIT_PATCHSET_NUMBER=${GERRIT_PATCHSET_NUMBER}",
+      parameters: "GERRIT_CHANGE_NUMBER=${env.GERRIT_CHANGE_NUMBER},GERRIT_PATCHSET_NUMBER=${env.GERRIT_PATCHSET_NUMBER}",
       selector: lastCompleted()
     )
     archiveArtifacts(artifacts: '_buildmeta/*', allowEmptyArchive: true)

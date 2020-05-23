@@ -37,7 +37,6 @@ import GradebookApi from 'jsx/gradebook/default_gradebook/apis/GradebookApi'
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
 import SubmissionCommentApi from 'jsx/gradebook/default_gradebook/apis/SubmissionCommentApi'
 import SubmissionStateMap from 'jsx/gradebook/SubmissionStateMap'
-import PostPolicies from 'jsx/gradebook/default_gradebook/PostPolicies'
 import studentRowHeaderConstants from 'jsx/gradebook/default_gradebook/constants/studentRowHeaderConstants'
 import {darken, statusColors, defaultColors} from 'jsx/gradebook/default_gradebook/constants/colors'
 import ViewOptionsMenu from 'jsx/gradebook/default_gradebook/components/ViewOptionsMenu'
@@ -9484,33 +9483,105 @@ QUnit.module('Gradebook#getSubmission', hooks => {
   })
 })
 
-QUnit.module('Gradebook', () => {
-  QUnit.module('Post Policies', hooks => {
-    let $container
-    let gradebook
-    let options
+QUnit.module('Gradebook', suiteHooks => {
+  let $container
+  let gradebook
+  let options
 
-    hooks.beforeEach(() => {
-      $container = document.body.appendChild(document.createElement('div'))
-      setFixtureHtml($container)
+  suiteHooks.beforeEach(() => {
+    $container = document.body.appendChild(document.createElement('div'))
+    setFixtureHtml($container)
 
-      options = {
-        post_policies_enabled: true
-      }
+    options = {}
+  })
+
+  suiteHooks.afterEach(() => {
+    gradebook.destroy()
+    $container.remove()
+  })
+
+  QUnit.module('#_updateEssentialDataLoaded()', () => {
+    function createInitializedGradebook() {
+      gradebook = createGradebook(options)
+      sinon.stub(gradebook.dataLoader, 'loadInitialData')
+      sinon.stub(gradebook, 'finishRenderingUI')
+      gradebook.initialize()
+
+      gradebook.setStudentIdsLoaded(true)
+      gradebook.setAssignmentGroupsLoaded(true)
+      gradebook.setContextModulesLoaded(true)
+      gradebook.setCustomColumnsLoaded(true)
+    }
+
+    function waitForTick() {
+      return new Promise(resolve => setTimeout(resolve, 0))
+    }
+
+    test('finishes rendering the UI when all essential data is loaded', async () => {
+      createInitializedGradebook()
+      gradebook._updateEssentialDataLoaded()
+      await waitForTick()
+      strictEqual(gradebook.finishRenderingUI.callCount, 1)
     })
 
-    hooks.afterEach(() => {
-      gradebook.destroy()
-      $container.remove()
+    test('does not finish rendering the UI when student ids are not loaded', async () => {
+      createInitializedGradebook()
+      gradebook.setStudentIdsLoaded(false)
+      gradebook._updateEssentialDataLoaded()
+      await waitForTick()
+      strictEqual(gradebook.finishRenderingUI.callCount, 0)
     })
 
-    QUnit.module('when Post Policies is enabled', contextHooks => {
+    test('does not finish rendering the UI when context modules are not loaded', async () => {
+      createInitializedGradebook()
+      gradebook.setContextModulesLoaded(false)
+      gradebook._updateEssentialDataLoaded()
+      await waitForTick()
+      strictEqual(gradebook.finishRenderingUI.callCount, 0)
+    })
+
+    test('does not finish rendering the UI when custom columns are not loaded', async () => {
+      createInitializedGradebook()
+      gradebook.setCustomColumnsLoaded(false)
+      gradebook._updateEssentialDataLoaded()
+      await waitForTick()
+      strictEqual(gradebook.finishRenderingUI.callCount, 0)
+    })
+
+    test('does not finish rendering the UI when assignment groups are not loaded', async () => {
+      createInitializedGradebook()
+      gradebook.setAssignmentGroupsLoaded(false)
+      gradebook._updateEssentialDataLoaded()
+      await waitForTick()
+      strictEqual(gradebook.finishRenderingUI.callCount, 0)
+    })
+
+    QUnit.module('when the course uses grading periods', contextHooks => {
       contextHooks.beforeEach(() => {
-        gradebook = createGradebook(options)
+        options = {
+          grading_period_set: {
+            grading_periods: [
+              {id: '1501', weight: 50},
+              {id: '1502', weight: 50}
+            ],
+            id: '1401',
+            weighted: true
+          }
+        }
+        createInitializedGradebook()
       })
 
-      test('attaches the Post Policies feature module to Gradebook', () => {
-        ok(gradebook.postPolicies instanceof PostPolicies)
+      test('finishes rendering the UI when all essential data is loaded', async () => {
+        gradebook.setGradingPeriodAssignmentsLoaded(true)
+        gradebook._updateEssentialDataLoaded()
+        await waitForTick()
+        strictEqual(gradebook.finishRenderingUI.callCount, 1)
+      })
+
+      test('does not finish rendering the UI when grading period assignments are not loaded', async () => {
+        gradebook._updateEssentialDataLoaded()
+        await waitForTick()
+        strictEqual(gradebook.finishRenderingUI.callCount, 0)
       })
     })
   })

@@ -1609,7 +1609,9 @@ nb-x-k12:
     default_name: "Uten navn"
   add_cc_subtitle_a9ef4a66: "Legg til CC/Undertekst"
   add_collaboration_da9665ac: "Legg til samarbeid"
+  add_conference_7bcc625b: "Legg til konferanse"
   add_conferences_from_calendar_98cb86b1: "Legg til Konferanser fra Kalender"
+  add_conferencing_9f4ccded: "Legg til konferanse"
   add_contact_method_d2dfea03: "Legg til kontaktmetode"
   add_content_58b4305a: "Legg til innhold"
   add_content_to_module_name_589a8d54: "Legg innhold til %{module_name}"
@@ -1641,6 +1643,7 @@ nb-x-k12:
   add_moderator_review_copy_2nd_e80d458f: "Legg til vurdering fra moderator (2. kopi)"
   add_moderator_review_new_3c183cea: "Legg til vurdering fra moderator (ny)"
   add_more_e1ffaa65: "Legg til flere"
+  add_name_db699e72: "Legg til %{name}"
   add_new_announcement_ddacd624: "Legg til ny beskjed"
   add_new_domain_e097d4a0: "Legg til nytt domene"
   add_new_group_7ac49f31: "Legg til ny gruppe"
@@ -1676,6 +1679,7 @@ nb-x-k12:
   add_to_course_481a51c4: "Legg til valgt fag ..."
   add_to_student_to_do_58e66b4b: "Legg til elevoppgave"
   add_to_whitelist_24f3f1ba: "Legg til hvitliste"
+  add_toolname_4e17dc90: "Legg til %{toolName}"
   add_trigger_bc1a0fae: "Legg til utløser"
   add_user_e73e8e50: "Legg til bruker"
   add_user_s_by_b2549f89: "Legg til bruker(e) med"
@@ -1901,6 +1905,7 @@ nb-x-k12:
   allows_teacherta_based_roles_to_access_the_attenda_c452f87b: "Lar lærer / designer / LA-baserte roller bruke oppmøte-verktøyet."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillater duplisering av moduler i Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillater duplisering av kalenderbegivenheter"
+  allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Lar den manglende policy-applikatoren sende ut submission_updated live-arrangementer for hver innsending merket som manglende."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillater planlegging av gjentagende kalenderhendelser"
   allows_the_user_to_navigate_away_while_submission__276d73b7: "Tillater brukeren å forlate siden mens innlevering lastes opp på nytt"
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Lar en bruker bruke og endre admin-innstillinger i Commons. Lar en bruker opprette og administrere grupper. Lar en bruker administrere delte ressurser i kontoen."
@@ -2237,6 +2242,7 @@ nb-x-k12:
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "Det oppsto et avvik da den prøvde å finne LTI-konfigurasjonen"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Det oppsto et avvik ved oppdatering av sett med vurderingsperiode."
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Det oppstod en feil ved endring av låsestatus for \"%{fileName}\""
+  an_error_occurred_creating_the_conference_fcad5f6f: "Det oppsto et avvik under oppretting av konferansen"
   an_error_occurred_loading_outcomes_data_cfd18b61: "En feil oppstod ved lasting av resultatdata."
   an_error_occurred_making_a_network_request_d1bda348: "Det oppstod en feil ved utførelse av en nettverksforespørsel"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod et avvik*, vennligst publiser svaret ditt senere"
@@ -2658,6 +2664,7 @@ nb-x-k12:
   assignment_assignment_submission_paper_view_8a4c9776: "Oppgaver %{assignment} innlevering Papirvisning"
   assignment_assignment_submission_plain_text_view_b217d372: "Oppgaver %{assignment} innlevering ren tekstvisning"
   assignment_bulk_editing_37248ca4: "Mengderedigering av oppgaver"
+  assignment_bulk_editing_phase_2_fde6f7d3: "Mengderedigering av oppgaver fase 2"
   assignment_comments_e43ed898: "Kommentarer til oppgaven"
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} har blitt karaktersatt for %{name}."
   assignment_created_assignment_name_course_name_324a5639: "Ny oppgave - %{assignment_name}, %{course_name}"
@@ -3079,6 +3086,18 @@ nb-x-k12:
       vericite: VeriCite
       vericite_enabled: "VeriCite har blitt aktivert for denne oppgaven."
       vericite_enabled_short: "(VeriCite aktivert)"
+    student_assignment_overview: 
+      allowed_attempts: "Tillatte forsøk"
+      attempts: Forsøk
+      date_time_by: "%{date} av %{time}"
+      due_at: Forfall
+      no_due_date: "Ingen forfallsdato"
+      no_points: Ingen
+      points: Poeng
+      submission_types: Filtyper
+      submitting: "Må leveres"
+      turnitin_enabled_short: "(Turnitin slått på)"
+      vericite_enabled_short: "(VeriCite slått på)"
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -3543,6 +3562,8 @@ nb-x-k12:
   base_type_e2840170: "Base Type"
   based_on_basedon_d6e4f4d7: "Basert på:  %{basedOn}"
   based_on_what_if_scores_the_new_total_is_now_grade_d223be10: "Basert på What-If-resultater, er den nye totalen nå %{grade}"
+  batch_edit_6d41d0d7: Partiredigering
+  batch_edit_dates_f1ec3df2: "Datoer for partiredigering"
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip file"
   bb_name: Blackboard-konvertør
@@ -4772,6 +4793,7 @@ nb-x-k12:
                 og elevgrupper. Send lyd og video i sanntid, del
                 presentasjonslysbilder, gi demonstrasjoner av
                 applikasjoner og ressurser på nett og mer.
+  conference_36b50fda: Konferanse
   conference_selection_ea4050bb: Konferansevalg
   conference_was_deleted_30869390: "Konferanse ble slettet"
   conferences: 
@@ -4844,6 +4866,8 @@ nb-x-k12:
               Premium BigBlueButton eller bruk en av følgende video konferanse-leverandører.  Ta kontakt med din lokale
               admin  for mer veiledning.
   conferences_tutorial_tray_6f071ce2: "Konferanser Tutorial Tray"
+  conferencing_6a6d9b55: Konferanse
+  conferencing_b69e2537: "Konferanse:"
   confetti_for_on_time_submissions_394e16ce: "Konfetti for rett-tidig innleveringer"
   confetti_for_valid_links_7506df83: "Konfetti for gyldige koblinger"
   config_url_e96ceaf3: "Konfig URL"
@@ -5647,6 +5671,9 @@ nb-x-k12:
     one: "1 oppgave funnet"
     other: "%{count} oppgaver funnet."
     zero: "Ingen matchende oppgaver funnet."
+  count_assignments_selected_b03891ea: 
+    one: "%{count} oppgave valgt"
+    other: "%{count} oppgaver valgt"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 Oppdrag med avvik"
     other: "%{count} Oppdrag med avvik"
@@ -6539,6 +6566,7 @@ nb-x-k12:
   created_group_group_name_2097306b: "Gruppe Opprettet %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Opprette en gruppe håndteres ikke i den nye oppgaveflyten enda. Gå til den gamle siden for oppgaver?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Ved å opprette Innleveringseksport kan du laste ned en ZIP-fil med alle dine oppgaveinnleveringer i nåværende og tidligere fag. Dette kan være en stor fil, så det kan ta en stund. Du kan navigere bort fra siden og komme tilbake senere."
+  creating_conference_95b59116: "Oppretter konferanse"
   creating_key_8a026e61: "Opprette en nøkkel"
   creative_commons_714a065f: "Kreative Allmenninger"
   creative_commons_license_725584ae: "Kreative Allmenninger Lisens:"
@@ -7929,6 +7957,7 @@ nb-x-k12:
   enrollment_term_7bfe840: Påmeldingstermin
   enrollment_terms_8753ec11: Påmeldingsterminer
   enrollments_e250c9c3: Påmeldinger
+  ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Sørger for at utfallene som allerede er importert i et emne ikke dupliseres hvis de importeres igjen"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Sikrer at brukere uten tillatelsen Importerer mål ikke kan se knappen i Mål-fanen."
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Oppgi en hexkode her for å bruke en tilpasset farge."
   enter_a_valid_date_46d77547: "Angi en gyldig dato"
@@ -11223,6 +11252,7 @@ nb-x-k12:
   message_actions_for_conversation_subject_fdb54c88: "Svaralternativer for samtale %{subject}"
   message_actions_for_text_27eead86: "Svaralternativer for %{text}"
   message_body_1f782712: Meldingsinnhold
+  message_for_name_648f5765: "Melding til %{name}"
   message_groups_who_1ba736f: "Send melding til grupper som..."
   message_sent_5e328899: "Melding sendt!"
   message_sent_9ff3a79d: "Melding sendt!"
@@ -12919,6 +12949,7 @@ nb-x-k12:
   missing_eaddacbd: MANGLER
   missing_percent_94534638: "Mangler: %{percent}"
   missing_policies_4f195e0b: "Manglende regler"
+  missing_policy_applicator_emits_live_events_88b47396: "Manglende policy-applikator sender ut live-arrangementer"
   missing_required_description_99a99ff: "Manglende obligatorisk beskrivelse"
   missing_required_fields_fields_30e20799: "Manglende obligatoriske felt: %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Mangler nødvendig felt. Skriv i alle nødvendige felt."
@@ -13174,6 +13205,7 @@ nb-x-k12:
   name_3806192d: "Navn:"
   name_app_has_been_deleted_fb2d9426: "%{name} app har blitt slettet"
   name_badfe525: navn
+  name_conference_8e042dd2: "%{name}-konferanse"
   name_count_users_ccc93c3d: "%{name} (%{count} Brukere)"
   name_current_grade_d8da149f: "%{name} gjeldende vurdering"
   name_current_score_b3198dfa: "%{name} gjeldende resultat"
@@ -13329,6 +13361,7 @@ nb-x-k12:
   no_broken_links_found_38d951e3: "Ingen ødelagte lenker funnet"
   no_cancel_installation_db8d12d7: "Nei, avbryt installering"
   no_collaboration_apps_3bbd30ce: "Ingen samarbeids-app"
+  no_conferencing_options_enabled_fc00e371: "Ingen konferansealternativer ble aktivert"
   no_content_5dbc9acf: "Uten innhold"
   no_content_has_been_added_f36bab43: "* Ingen innhold er lagt"
   no_content_has_been_shared_with_you_667fde6c: "Det er ikke delt noe innhold med deg."
@@ -13400,6 +13433,7 @@ nb-x-k12:
   no_usage_rights_object_supplied_304b8d40: "Ingen 'usage_rights' objekt som følger"
   no_users_found_64a043ff: "Finner ingen brukere"
   no_users_were_selected_to_add_to_the_course_a51c6083: "Ingen brukere ble valgt for å legges til faget"
+  no_valid_lti_resource_was_returned_11f7f91f: "Ingen gyldige LTI-ressurs ble returnert."
   no_video_1ed00b26: "Ingen video"
   no_violations_have_been_reported_977a08d1: "Ingen brudd ble rapportert."
   no_way_to_export_gradebooks_provided_b4c2939d: "Kan ikke eksportere valgte vurderingsoversikter!"
@@ -14239,6 +14273,8 @@ nb-x-k12:
   paper_view_7405eeab: Papirvisning
   paraguay_595_ca58b83a: "Paraguay (+595)"
   parameters_a13374ec: Parameter
+  parent_assignment_is_not_selected_9efb4ac1: "foreldrevurdering er ikke valgt"
+  parent_assignment_is_selected_6a2fbca8: "foreldrevurdering er valgt"
   parent_of_a_canvas_user_afba1624: "Forelder til en Canvas bruker?"
   parent_references_not_found_prior_to_this_row_miss_31723438: "Forelder-referanse ikke funnet før denne rade: %{missing}"
   parent_signup_b7c6bf0a: "Påmelding for foreldre"
@@ -16721,6 +16757,7 @@ nb-x-k12:
   redirect_uris_79534b60: "* URIer for videresendelse:"
   redirect_uris_a54bd82f: "Omdirigere URI'er:"
   redirected_to_identity_provider_6c4e17d2: "Videresendt til identitetsutgiver"
+  reduce_outcome_duplication_on_course_import_26431b40: "Reduser duplisering av mål på fagimport"
   reference_code_3e8355dd: Referansekode
   reference_code_is_required_c32c757f: "Referansekode er påkrevd"
   regardless_of_whether_this_permission_is_enabled_o_437ee269: "Uavhengig av hvorvidt denne tillatelsen er aktivert eller deaktivert vil brukeren ha muligheten til å administrere hendelser på den personlige kalenderen deres."
@@ -16795,9 +16832,12 @@ nb-x-k12:
   remove_attendee_name_55165070: "Fjern deltaker %{name}"
   remove_attribute_59a4aa64: "Fjern attributt"
   remove_collaborationtitle_c3e81adb: "Fjern «%{collaborationTitle}»?"
+  remove_conference_69b9e0d0: "Fjerner konferanse"
   remove_contact_method_ca890ba3: "Fjerne kontaktmetode"
   remove_course_association_name_b760c502: "Fjern fagassosiasjon %{name}"
+  remove_dates_9b9ba2f6: "Fjern Datoer"
   remove_domain_from_the_whitelist_14c7d5e9: "Fjern %{domain} fra hvitlisten"
+  remove_due_dates_and_assignment_availability_dates_608cd97b: "Fjern forfallsdatoer og datoer for tilgjengelighet for oppgaven."
   remove_email_address_b1820820: "Fjern e-postadresse"
   remove_empty_attachment_b2aea632: "fjerne tomt vedlegg"
   remove_f47dc62a: Fjern
@@ -17482,12 +17522,16 @@ nb-x-k12:
   select_a_module_optional_7edb5cb0: "Velg en modul (frivillig)"
   select_a_predefined_color_c77ab2f5: "Velg en forhåndsdefinert farge"
   select_a_provisional_grade_7106e3d5: "Velg en provisorisk vurdering"
+  select_all_assignments_bd07b919: "Velg alle oppgaver"
   select_all_count_courses_4fc63811: 
     one: "Velg (%{count}) fag"
     other: "Velge alle (%{count}) fag"
   select_all_students_7c2c34b3: "Velg alle elever"
+  select_an_edit_operation_ec1467d: "Velg en redigeringsoperasjon"
+  select_assignment_title_4571ffcb: "Velg oppgave: %{title}"
   select_audio_file_7d905cce: "Velg Lydfil"
   select_calendars_d5fa50b6: "Velg kalendere"
+  select_conference_provider_58c7f7fe: "Velg konferanseleverandør"
   select_content: "Velg innhold"
   select_content_checkbox: 
     select_content_error: "Du må velge relevant innhold"
@@ -17513,6 +17557,7 @@ nb-x-k12:
   select_course_or_group_ddb2185d: "Velg emne eller gruppe"
   select_courses_or_groups_1a8b8f66: "Velg emner eller grupper"
   select_d70f31da: Velg
+  select_dates_to_remove_be55b14c: "Velg datoer du vil fjerne"
   select_embedded_content_type_966f048a: "Velg innebygd innholdstype"
   select_final_grade_for_moderation_b76a0baf: "Velg siste vurdering for moderasjon"
   select_from_saved_comments_dd398cd4: "Velg fra lagrede kommentarer"
@@ -18281,6 +18326,8 @@ nb-x-k12:
   shared_secret_892c88f2: "Delt hemmelighet"
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "Å dele en QR-kode kan gi andre umiddelbar tilgang til kontoen din gjennom %{canvas} mobilapplikasjonene."
   she_her_3f459cc2: Hun/hennes
+  shift_dates_b5a7b7a1: "Skift datoer"
+  shift_due_dates_and_assignment_availability_dates__c5ad272: "Skift forfallsdatoer og datoer for tilgjengelighet for oppgaven med et antall dager."
   short_name_42f454a1: Kortnavn
   short_name_ad9bf84f: "kort navn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "bør være selvforklarende, Canvas ID til rapporterende bruker"
@@ -19396,6 +19443,7 @@ nb-x-k12:
   there_was_an_error_generating_the_pairing_code_9edd639b: "Det oppsto en feil under generering av parings-kode"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Verktøyet lot seg ikke starte"
   there_was_an_error_in_processing_your_request_6513a49a: "En feil oppsto under behandling av forespørselen din"
+  there_was_an_error_joining_the_conference_d2c3e4b0: "Det oppstod et avvik ved forsøk på å koble deg til konferansen."
   there_was_an_error_launching_to_the_configured_too_f8ed5767: "Det oppsto en feil ved oppstart av det konfigurerte verktøyet."
   there_was_an_error_removing_the_image_c83acffe: "Det oppsto en feil ved fjerning av bildet"
   there_was_an_error_removing_the_item_f8324776: "Det oppsto en feil ved fjerning av elementet"
@@ -20228,6 +20276,7 @@ nb-x-k12:
     originality_report_visible_after_due_date: "Etter forfallsdato"
     originality_report_visible_after_grading: "Etter at oppgaven er rettet"
     originality_report_visible_immediately: Umiddelbart
+  turns_on_phase_2_features_for_assignment_bulk_edit_20245881: "Slår på fase 2-funksjonene for Mengderedigering av oppgaver"
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: "Skriv en dato eller bruk piltastene til å navigere datovelgeren."
@@ -20297,6 +20346,7 @@ nb-x-k12:
   unknown_account_74d30b82: "ukjent konto"
   unknown_answers_9688a2bc: "Ukjente svar"
   unknown_compression_method_b6a850b5: "ukjent kompresjons-metode"
+  unknown_conference_c4f13ad0: "Ukjent konferanse"
   unknown_content_type_ae6d08e8: "Ukjent innholdstype"
   unknown_event_7a0bcda3: "Ukjent handling"
   unknown_external_tool_c918e9b2: "Ukjent eksternt verktøy"
@@ -20349,6 +20399,8 @@ nb-x-k12:
   unpublished_click_to_publish_c073631a: "Ikke publisert. Klikk for å publisere."
   unpublished_click_to_publish_title_7c57293f: "Upublisert.  Trykk her for å publisere %{title}."
   unpublished_content_referenced_in_this_resource_865f8ef6: "Ikke publisert innhold referert i denne ressursen:"
+  unpublished_courses_4299148e: "Ikke publiserte fag"
+  unpublished_courses_count_d35672f0: "Ikke publiserte emner (%{count})"
   unpublished_courses_title: "Ikke publiserte fag"
   unpublished_dfd8801: "ikke publisert"
   unpublished_drafts_bb352243: "Upubliserte maler"
@@ -20445,6 +20497,7 @@ nb-x-k12:
   usage_rights_have_been_set_d1b433c7: "Brukerrettigheter har blitt satt."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Brukerrettigheter vil bli satt for alle filene som er inneholdt i:"
   use_arrow_keys_to_navigate_options_2021cc50: "Bruk piltaster for å navigere i valgene."
+  use_arrow_keys_to_select_a_conference_provider_c5b456a6: "Bruk piltastene for å velge en konferanseleverandør"
   use_as_front_page_274a488b: "Bruk som forside"
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Bruke bokmerke for API-sideinndeling i påmeldingsindeks"
   use_default_890939b7: "Bruk standard"

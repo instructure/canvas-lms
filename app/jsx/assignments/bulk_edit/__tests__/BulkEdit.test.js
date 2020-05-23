@@ -26,8 +26,10 @@ import BulkEdit from '../BulkEdit'
 // Because node 10 is dumb and doesn't have this yet
 import 'array-flat-polyfill'
 
+// grab this before fake timers replace it
+const realSetImmediate = setImmediate
 async function flushPromises() {
-  await act(() => Promise.resolve())
+  await act(() => new Promise(realSetImmediate))
 }
 
 function standardAssignmentResponse() {
@@ -39,17 +41,17 @@ function standardAssignmentResponse() {
       all_dates: [
         {
           base: true,
-          unlock_at: '2020-03-19',
+          unlock_at: '2020-03-19T00:00:00Z',
           due_at: '2020-03-20T03:00:00Z',
-          lock_at: '2020-03-21',
+          lock_at: '2020-04-11T00:00:00Z',
           can_edit: true
         },
         {
           id: 'override_1',
           title: '2 students',
-          unlock_at: '2020-03-29',
-          due_at: '2020-03-30',
-          lock_at: '2020-03-31',
+          unlock_at: '2020-03-29T00:00:00Z',
+          due_at: '2020-03-30T00:00:00Z',
+          lock_at: '2020-04-21T00:00:00Z',
           can_edit: true
         }
       ]
@@ -70,9 +72,9 @@ function restrictedAssignmentResponse() {
   data[0].all_dates.push({
     id: 'override_2',
     title: 'blah',
-    unlock_at: '2020-03-20',
-    due_at: '2020-03-21',
-    lock_at: '2020-03-22',
+    unlock_at: '2020-03-20T00:00:00Z',
+    due_at: '2020-03-21T00:00:00Z',
+    lock_at: '2020-03-22T00:00:00Z',
     can_edit: false
   })
   data[1].can_edit = false
@@ -109,6 +111,11 @@ async function renderBulkEditAndWait(overrides = {}, assignments = standardAssig
   return result
 }
 
+function changeAndBlurInput(input, newValue) {
+  fireEvent.change(input, {target: {value: newValue}})
+  fireEvent.blur(input)
+}
+
 beforeEach(() => {
   jest.useFakeTimers()
   fetch.resetMocks()
@@ -120,7 +127,8 @@ describe('Assignment Bulk Edit Dates', () => {
   beforeEach(() => {
     oldEnv = window.ENV
     window.ENV = {
-      TIMEZONE: 'Asia/Tokyo'
+      TIMEZONE: 'Asia/Tokyo',
+      FEATURES: {}
     }
     timezoneSnapshot = timezone.snapshot()
     timezone.changeZone(tokyo, 'Asia/Tokyo')
@@ -146,10 +154,61 @@ describe('Assignment Bulk Edit Dates', () => {
 
   it('invokes onSave when the save button is clicked', async () => {
     const {getByText, getAllByLabelText, onSave} = await renderBulkEditAndWait()
-    fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: '2020-04-01'}})
+    changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-01')
     fireEvent.click(getByText('Save'))
     expect(onSave).toHaveBeenCalled()
-  }, 10000)
+  })
+
+  it('disables save when local validation fails', async () => {
+    const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
+    changeAndBlurInput(getAllByLabelText('Due At')[0], '2019-04-01')
+    expect(getByText('Unlock date cannot be after due date')).toBeInTheDocument()
+    expect(getByText('Save').closest('button').disabled).toBe(true)
+  })
+
+  it('clears the validation error when a bad edit is reverted', async () => {
+    const {queryByText, getAllByText, getAllByLabelText} = await renderBulkEditAndWait()
+    const theInput = getAllByLabelText('Due At')[0]
+    changeAndBlurInput(theInput, '2019-04-01')
+    expect(queryByText('Unlock date cannot be after due date')).toBeInTheDocument()
+    const revertButtons = getAllByText('Revert date changes').filter(elt => elt.closest('button'))
+    expect(revertButtons).toHaveLength(1)
+    fireEvent.click(revertButtons[0])
+    expect(queryByText('Unlock date cannot be after due date')).not.toBeInTheDocument()
+  })
+
+  it('validates against closed grading periods', async () => {
+    ENV.HAS_GRADING_PERIODS = true
+    ENV.active_grading_periods = [
+      {
+        start_date: '1970-01-01T00:00:00-07:00',
+        end_date: '2020-03-01T23:59:59-07:00',
+        close_date: '2020-03-01T23:59:59-07:00',
+        id: '1',
+        is_closed: true,
+        is_last: false,
+        permissions: {read: true, create: false, update: false, delete: false},
+        title: 'Closed'
+      },
+      {
+        start_date: '2020-03-01T23:59:59-06:00',
+        close_date: '3000-12-31T23:59:59-07:00',
+        end_date: '3000-12-31T23:59:59-07:00',
+        id: '2',
+        is_closed: false,
+        is_last: true,
+        permissions: {read: true, create: false, update: false, delete: false},
+        title: '5ever'
+      }
+    ]
+    const {queryByText, getAllByLabelText} = await renderBulkEditAndWait()
+    changeAndBlurInput(getAllByLabelText('Available From')[0], '2020-01-01')
+    const theInput = getAllByLabelText('Due At')[0]
+    changeAndBlurInput(theInput, '2020-03-03')
+    expect(queryByText(/Please enter a due date on or after/)).not.toBeInTheDocument()
+    changeAndBlurInput(theInput, '2020-01-03')
+    expect(queryByText(/Please enter a due date on or after/)).toBeInTheDocument()
+  })
 
   it('disables save when nothing has been edited', async () => {
     const {getByText} = await renderBulkEditAndWait()
@@ -163,7 +222,7 @@ describe('Assignment Bulk Edit Dates', () => {
     const unlockAtInputs = getAllByLabelText('Available From')
     expect(unlockAtInputs.map(i => i.value)).toEqual(['Thu Mar 19, 2020', 'Sun Mar 29, 2020', ''])
     const lockAtInputs = getAllByLabelText('Available Until')
-    expect(lockAtInputs.map(i => i.value)).toEqual(['Sat Mar 21, 2020', 'Tue Mar 31, 2020', ''])
+    expect(lockAtInputs.map(i => i.value)).toEqual(['Sat Apr 11, 2020', 'Tue Apr 21, 2020', ''])
   })
 
   it('shows a message and no date default date fields if an assignment does not have default dates', async () => {
@@ -177,17 +236,15 @@ describe('Assignment Bulk Edit Dates', () => {
   it('modifies unlock date and enables save', async () => {
     const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
     const assignmentUnlockInput = getByDisplayValue('Thu Mar 19, 2020')
-    fireEvent.change(assignmentUnlockInput, {target: {value: '2020-01-01'}})
-    fireEvent.blur(assignmentUnlockInput)
+    changeAndBlurInput(assignmentUnlockInput, '2020-01-01')
     expect(assignmentUnlockInput.value).toBe('Wed Jan 1, 2020')
     expect(getByText('Save').closest('button').disabled).toBe(false)
   })
 
   it('modifies lock at date and enables save', async () => {
     const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
-    const overrideLockInput = getByDisplayValue('Tue Mar 31, 2020')
-    fireEvent.change(overrideLockInput, {target: {value: '2020-12-31'}})
-    fireEvent.blur(overrideLockInput)
+    const overrideLockInput = getByDisplayValue('Tue Apr 21, 2020')
+    changeAndBlurInput(overrideLockInput, '2020-12-31')
     expect(overrideLockInput.value).toBe('Thu Dec 31, 2020')
     expect(getByText('Save').closest('button').disabled).toBe(false)
   })
@@ -195,10 +252,59 @@ describe('Assignment Bulk Edit Dates', () => {
   it('modifies due date and enables save', async () => {
     const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
     const nullDueDate = getAllByLabelText('Due At')[2]
-    fireEvent.change(nullDueDate, {target: {value: '2020-06-15'}})
-    fireEvent.blur(nullDueDate)
+    changeAndBlurInput(nullDueDate, '2020-06-15')
     expect(nullDueDate.value).toBe('Mon Jun 15, 2020')
     expect(getByText('Save').closest('button').disabled).toBe(false)
+  })
+
+  it('can blur a field without changes without revert button showing up', async () => {
+    const {queryAllByText, getByDisplayValue, getAllByDisplayValue} = await renderBulkEditAndWait()
+    const assignmentUnlockAt = getByDisplayValue('Thu Mar 19, 2020')
+    fireEvent.blur(assignmentUnlockAt)
+    let revertButtons = queryAllByText('Revert date changes').filter(elt => elt.closest('button'))
+    expect(revertButtons).toHaveLength(0)
+
+    const nullAssignmentUnlockAt = getAllByDisplayValue('')[0]
+    fireEvent.blur(nullAssignmentUnlockAt)
+    revertButtons = queryAllByText('Revert date changes').filter(elt => elt.closest('button'))
+    expect(revertButtons).toHaveLength(0)
+  })
+
+  it('can revert edited dates on a row', async () => {
+    const {getAllByText, getAllByLabelText, getByDisplayValue} = await renderBulkEditAndWait()
+
+    const assignmentUnlockAt = getByDisplayValue('Thu Mar 19, 2020')
+    changeAndBlurInput(assignmentUnlockAt, '2020-06-15')
+
+    const overrideLockInput = getByDisplayValue('Tue Apr 21, 2020')
+    changeAndBlurInput(overrideLockInput, '')
+
+    const nullDueDate = getAllByLabelText('Due At')[2]
+    changeAndBlurInput(nullDueDate, '2020-06-16')
+
+    const revertButtons = getAllByText('Revert date changes').filter(elt => elt.closest('button'))
+    expect(revertButtons).toHaveLength(3)
+
+    fireEvent.click(revertButtons[1])
+    expect(overrideLockInput.value).toBe('Tue Apr 21, 2020') // original value
+    expect(assignmentUnlockAt.value).toBe('Mon Jun 15, 2020') // not changed yet
+    expect(nullDueDate.value).toBe('Tue Jun 16, 2020') // not changed yet
+    // focus should be explicitly set to the lock at input
+    expect(document.activeElement).toBe(overrideLockInput)
+
+    fireEvent.click(revertButtons[0])
+    fireEvent.click(revertButtons[2])
+    expect(assignmentUnlockAt.value).toBe('Thu Mar 19, 2020') // original value
+    expect(nullDueDate.value).toBe('') // original value
+  })
+
+  it('can revert nonsense input on a row', async () => {
+    const {getAllByText, getByDisplayValue} = await renderBulkEditAndWait()
+    const assignmentUnlockAt = getByDisplayValue('Thu Mar 19, 2020')
+    changeAndBlurInput(assignmentUnlockAt, 'asdf')
+    const revertButton = getAllByText('Revert date changes').filter(elt => elt.closest('button'))[0]
+    fireEvent.click(revertButton)
+    expect(assignmentUnlockAt.value).toBe('Thu Mar 19, 2020') // original value
   })
 
   it('disables non-editable dates', async () => {
@@ -222,7 +328,7 @@ describe('Assignment Bulk Edit Dates', () => {
       const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const overrideDueAtInput = getAllByLabelText('Due At')[1]
       const dueAtDate = '2020-04-01'
-      fireEvent.change(overrideDueAtInput, {target: {value: dueAtDate}})
+      changeAndBlurInput(overrideDueAtInput, dueAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
       expect(fetch).toHaveBeenCalledWith(
@@ -237,22 +343,22 @@ describe('Assignment Bulk Edit Dates', () => {
           id: 'assignment_1',
           all_dates: [
             {
-              due_at: moment.tz(dueAtDate, 'Asia/Tokyo').toISOString(),
+              due_at: '2020-04-01T00:00:00.000Z', // Time of day was preserved, which was UTC 00:00:00
               unlock_at: assignments[0].all_dates[1].unlock_at,
               lock_at: assignments[0].all_dates[1].lock_at
             }
           ]
         }
       ])
-    }, 10000)
+    })
 
     it('can save multiple assignments and overrides', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const dueAtDate = '2020-04-01'
       const dueAtMoment = moment.tz(dueAtDate, 'Asia/Tokyo')
-      fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: dueAtDate}})
-      fireEvent.change(getAllByLabelText('Due At')[1], {target: {value: dueAtDate}})
-      fireEvent.change(getAllByLabelText('Due At')[2], {target: {value: dueAtDate}})
+      changeAndBlurInput(getAllByLabelText('Due At')[0], dueAtDate)
+      changeAndBlurInput(getAllByLabelText('Due At')[1], dueAtDate)
+      changeAndBlurInput(getAllByLabelText('Due At')[2], dueAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -262,14 +368,11 @@ describe('Assignment Bulk Edit Dates', () => {
           all_dates: [
             {
               base: true,
-              due_at: dueAtMoment
-                .clone()
-                .add(12, 'hours') // time preservation
-                .toISOString()
+              due_at: '2020-04-01T03:00:00.000Z' // The UTC time of day was preserved
             },
             {
               id: 'override_1',
-              due_at: dueAtMoment.toISOString()
+              due_at: '2020-04-01T00:00:00.000Z'
             }
           ]
         },
@@ -280,30 +383,30 @@ describe('Assignment Bulk Edit Dates', () => {
               base: true,
               due_at: dueAtMoment
                 .clone()
-                .endOf('day') // new due date
+                .endOf('day') // new due date gets end of day in the specified TZ
                 .toISOString()
             }
           ]
         }
       ])
-    }, 30000) // if this reaches 30 seconds we really need to have a better plan
+    })
 
     it('disables the Save button while saving', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const overrideDueAtInput = getAllByLabelText('Due At')[1]
       const dueAtDate = '2020-04-01'
-      fireEvent.change(overrideDueAtInput, {target: {value: dueAtDate}})
+      changeAndBlurInput(overrideDueAtInput, dueAtDate)
       const saveButton = getByText('Save').closest('button')
       expect(saveButton.disabled).toBe(false)
       fireEvent.click(saveButton)
       expect(saveButton.disabled).toBe(true)
       expect(getByText('Saving...')).toBeInTheDocument()
-    }, 10000)
+    })
 
     it('can clear an existing date', async () => {
       const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const dueAtInput = getAllByLabelText('Due At')[0]
-      fireEvent.change(dueAtInput, {target: {value: ''}})
+      changeAndBlurInput(dueAtInput, '')
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -320,7 +423,7 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 10000)
+    })
 
     it('invokes fancy midnight on new dates for due_at and lock_at', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
@@ -329,8 +432,8 @@ describe('Assignment Bulk Edit Dates', () => {
       const dueAtDate = '2020-04-01'
       const lockAtDate = '2020-04-02'
 
-      fireEvent.change(dueAtInput, {target: {value: dueAtDate}})
-      fireEvent.change(lockAtInput, {target: {value: lockAtDate}})
+      changeAndBlurInput(dueAtInput, dueAtDate)
+      changeAndBlurInput(lockAtInput, lockAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -353,14 +456,14 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 10000)
+    })
 
     it('invokes beginning of day on new dates for unlock_at', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const unlockAtInput = getAllByLabelText('Available From')[2]
       const unlockDate = '2020-04-01'
 
-      fireEvent.change(unlockAtInput, {target: {value: unlockDate}})
+      changeAndBlurInput(unlockAtInput, unlockDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -380,7 +483,7 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 10000)
+    })
 
     it('preserves the existing time on existing dates', async () => {
       const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
@@ -388,7 +491,7 @@ describe('Assignment Bulk Edit Dates', () => {
       const dueAtDate = '2020-04-01'
       const originalDueAtMoment = moment.tz(assignments[0].all_dates[0].due_at, 'Asia/Tokyo')
       const localTimeOffset = originalDueAtMoment.diff(originalDueAtMoment.clone().startOf('day'))
-      fireEvent.change(dueAtInput, {target: {value: dueAtDate}})
+      changeAndBlurInput(dueAtInput, dueAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -406,24 +509,24 @@ describe('Assignment Bulk Edit Dates', () => {
           ]
         }
       ])
-    }, 10000)
+    })
 
     it('displays an error if starting the save fails', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
-      fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: '2020-04-01'}})
+      changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-01')
       fetch.mockResponseOnce(JSON.stringify({errors: [{message: 'something bad happened'}]}), {
         status: 401
       })
       fireEvent.click(getByText('Save'))
       await flushPromises()
       expect(getByText(/something bad happened/)).toBeInTheDocument()
-    }, 10000)
+    })
   })
 
   describe('save progress', () => {
     async function renderBulkEditAndSave() {
       const fns = await renderBulkEditAndWait()
-      fireEvent.change(fns.getAllByLabelText('Due At')[0], {target: {value: '2020-04-01'}})
+      changeAndBlurInput(fns.getAllByLabelText('Due At')[0], '2020-04-01')
       fetch.mockResponses(
         [JSON.stringify({url: 'progress url'})],
         [JSON.stringify({url: 'progress url', workflow_state: 'queued', completion: 0})]
@@ -457,7 +560,7 @@ describe('Assignment Bulk Edit Dates', () => {
       act(jest.runAllTimers)
       await flushPromises()
       expect(fetch).not.toHaveBeenCalled()
-    }, 10000)
+    })
 
     it('displays an error if the progress fetch fails', async () => {
       const {getByText} = await renderBulkEditAndSave()
@@ -468,10 +571,10 @@ describe('Assignment Bulk Edit Dates', () => {
       await flushPromises()
       expect(getByText(/could not get progress/)).toBeInTheDocument()
       expect(getByText('Save').closest('button').disabled).toBe(false)
-    }, 10000)
+    })
 
     it('displays an error if the job fails', async () => {
-      const {getByText} = await renderBulkEditAndSave()
+      const {getByText, getAllByLabelText} = await renderBulkEditAndSave()
       fetch.mockResponseOnce(
         JSON.stringify({
           completion: 42,
@@ -484,8 +587,12 @@ describe('Assignment Bulk Edit Dates', () => {
       act(jest.runAllTimers)
       await flushPromises()
       expect(getByText(/some bad dates/)).toBeInTheDocument()
+      // save button is disabled due to error
+      expect(getByText('Save').closest('button').disabled).toBe(true)
+      // fix the error and save should be re-enabled
+      changeAndBlurInput(getAllByLabelText(/Due At/)[0], '2020-04-04')
       expect(getByText('Save').closest('button').disabled).toBe(false)
-    }, 10000)
+    })
 
     it('can start a second save operation', async () => {
       const {getByText, queryByText, getAllByLabelText} = await renderBulkEditAndSave()
@@ -497,7 +604,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(getByText(/saved successfully/)).toBeInTheDocument()
       expect(getByText('Save').closest('button').disabled).toBe(true)
 
-      fireEvent.change(getAllByLabelText('Due At')[0], {target: {value: '2020-04-02'}})
+      changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-02')
       expect(queryByText(/saved successfully/)).toBe(null)
 
       fetch.mockResponses(
@@ -507,7 +614,239 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(getByText('Save'))
       await flushPromises()
       expect(getByText(/saved successfully/)).toBeInTheDocument()
-    }, 15000)
+    })
+  })
+
+  describe('assignment selections', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.assignment_bulk_edit_phase_2 = true
+    })
+
+    it('displays checkboxes for each main assignment', async () => {
+      const {getByText, getAllByText, assignments} = await renderBulkEditAndWait()
+      expect(getAllByText(/Select assignment:/)).toHaveLength(assignments.length)
+      expect(getByText('0 assignments selected')).toBeInTheDocument()
+    })
+
+    it('disables checkboxes for assignments that cannot be edited', async () => {
+      const {getAllByLabelText} = await renderBulkEditAndWait({}, restrictedAssignmentResponse())
+      expect(getAllByLabelText(/Select assignment:/)[0].disabled).toBe(true)
+      expect(getAllByLabelText(/Select assignment:/)[1].disabled).toBe(true)
+    })
+
+    it('allows assignments to be checked individually', async () => {
+      const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait()
+      const checkboxes = getAllByLabelText(/Select assignment:/)
+      fireEvent.click(checkboxes[0])
+      expect(checkboxes[0].checked).toBe(true)
+      expect(checkboxes[1].checked).toBe(false)
+      expect(getByLabelText('Select all assignments').getAttribute('aria-checked')).toBe('mixed')
+      expect(getByText('1 assignment selected')).toBeInTheDocument()
+    })
+
+    it('selects and deselects all editable assignments with the header', async () => {
+      const assignments = restrictedAssignmentResponse()
+      assignments.push({
+        id: 'assignment_3',
+        name: 'third assignment',
+        can_edit: true,
+        all_dates: [{base: true, unlock_at: null, due_at: null, lock_at: null, can_edit: true}]
+      })
+      const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
+        {},
+        assignments
+      )
+      const allCheckbox = getByLabelText('Select all assignments')
+      fireEvent.click(allCheckbox)
+      const checkboxes = getAllByLabelText(/Select assignment:/)
+      expect(allCheckbox.checked).toBe(true)
+      expect(checkboxes[0].checked).toBe(false)
+      expect(checkboxes[1].checked).toBe(false)
+      expect(checkboxes[2].checked).toBe(true)
+      expect(getByText('1 assignment selected')).toBeInTheDocument()
+
+      fireEvent.click(allCheckbox)
+      expect(allCheckbox.checked).toBe(false)
+      expect(checkboxes[0].checked).toBe(false)
+      expect(checkboxes[1].checked).toBe(false)
+      expect(checkboxes[2].checked).toBe(false)
+    })
+  })
+
+  describe('batch edit dialog', () => {
+    async function renderOpenBatchEditDialog(selectAssignments = [0]) {
+      const result = await renderBulkEditAndWait()
+      selectAssignments.forEach(index => {
+        fireEvent.click(result.getAllByLabelText(/Select assignment:/)[index])
+      })
+      fireEvent.click(result.getByText('Batch Edit'))
+      return result
+    }
+
+    beforeEach(() => {
+      window.ENV.FEATURES.assignment_bulk_edit_phase_2 = true
+    })
+
+    it('has a disabled "Batch Edit" button when no assignments are selected', async () => {
+      const {getByText, queryByText} = await renderBulkEditAndWait()
+      expect(getByText('Batch Edit').closest('button').disabled).toBe(true)
+      expect(queryByText('Batch Edit Dates')).toBeNull()
+    })
+
+    it('can be canceled with no effects', async () => {
+      const {getByText, queryByText, getByTestId} = await renderOpenBatchEditDialog()
+      expect(getByText('Batch Edit Dates')).toBeInTheDocument()
+      fireEvent.click(getByTestId('cancel-batch-edit'))
+      jest.runAllTimers() // required for modal to actually close
+      expect(queryByText('Batch Edit Dates')).toBeNull()
+      // check no dates edited by disabled save button
+      expect(getByText('Save').closest('button').disabled).toBe(true)
+    })
+
+    it('shifts dates for all selected assignments forward N days, including overrides', async () => {
+      const {getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
+      fireEvent.change(getByLabelText('Days'), {target: {value: '2'}})
+      fireEvent.click(getByText('Ok'))
+      jest.runAllTimers() // required for modal to actually close
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(body.length).toBe(1) // second assignment was not selected
+      expect(body).toMatchObject([
+        {
+          id: 'assignment_1',
+          all_dates: [
+            {
+              base: true,
+              unlock_at: '2020-03-21T00:00:00.000Z',
+              due_at: '2020-03-22T03:00:00.000Z', // time preservation
+              lock_at: '2020-04-13T00:00:00.000Z'
+            },
+            {
+              id: 'override_1',
+              unlock_at: '2020-03-31T00:00:00.000Z',
+              due_at: '2020-04-01T00:00:00.000Z',
+              lock_at: '2020-04-23T00:00:00.000Z'
+            }
+          ]
+        }
+      ])
+    })
+
+    it('ignores blank date fields', async () => {
+      const {getByText, getByLabelText} = await renderOpenBatchEditDialog([1])
+      fireEvent.change(getByLabelText('Days'), {target: {value: '2'}})
+      fireEvent.click(getByText('Ok'))
+      jest.runAllTimers() // required for modal to actually close
+      // all dates in the assignment are null, so nothing should change
+      expect(getByText('Save').closest('button').disabled).toBe(true)
+    })
+
+    it('disables "Ok" when N days input is blank', async () => {
+      const {getByText, getByLabelText} = await renderOpenBatchEditDialog([1])
+      fireEvent.change(getByLabelText('Days'), {target: {value: ''}})
+      expect(getByText('Ok').closest('button').disabled).toBe(true)
+    })
+
+    it('removes due dates from assignments', async () => {
+      const {assignments, getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
+      fireEvent.click(getByLabelText('Remove Dates'))
+      fireEvent.click(getByText('Ok'))
+      jest.runAllTimers() // required for modal to actually close
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(body.length).toBe(1) // second assignment was not selected
+      expect(body).toMatchObject([
+        {
+          id: 'assignment_1',
+          all_dates: [
+            {
+              base: true,
+              unlock_at: assignments[0].all_dates[0].unlock_at,
+              due_at: null,
+              lock_at: assignments[0].all_dates[0].lock_at
+            },
+            {
+              id: 'override_1',
+              unlock_at: assignments[0].all_dates[1].unlock_at,
+              due_at: null,
+              lock_at: assignments[0].all_dates[1].lock_at
+            }
+          ]
+        }
+      ])
+    })
+
+    it('removes availability dates from assignments', async () => {
+      const {assignments, getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
+      fireEvent.click(getByLabelText('Remove Dates'))
+      fireEvent.click(getByLabelText('Due Dates'))
+      fireEvent.click(getByLabelText('Availability Dates'))
+      fireEvent.click(getByText('Ok'))
+      jest.runAllTimers() // required for modal to actually close
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(body.length).toBe(1) // second assignment was not selected
+      expect(body).toMatchObject([
+        {
+          id: 'assignment_1',
+          all_dates: [
+            {
+              base: true,
+              unlock_at: null,
+              due_at: assignments[0].all_dates[0].due_at,
+              lock_at: null
+            },
+            {
+              id: 'override_1',
+              unlock_at: null,
+              due_at: assignments[0].all_dates[1].due_at,
+              lock_at: null
+            }
+          ]
+        }
+      ])
+    })
+
+    it('removes all dates from assignments', async () => {
+      const {getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
+      fireEvent.click(getByLabelText('Remove Dates'))
+      fireEvent.click(getByLabelText('Availability Dates'))
+      fireEvent.click(getByText('Ok'))
+      jest.runAllTimers() // required for modal to actually close
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(body.length).toBe(1) // second assignment was not selected
+      expect(body).toMatchObject([
+        {
+          id: 'assignment_1',
+          all_dates: [
+            {
+              base: true,
+              unlock_at: null,
+              due_at: null,
+              lock_at: null
+            },
+            {
+              id: 'override_1',
+              unlock_at: null,
+              due_at: null,
+              lock_at: null
+            }
+          ]
+        }
+      ])
+    })
+
+    it('disables "Ok" when neither checkbox is selected', async () => {
+      const {getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
+      fireEvent.click(getByLabelText('Remove Dates'))
+      fireEvent.click(getByLabelText('Due Dates'))
+      expect(getByText('Ok').closest('button').disabled).toBe(true)
+    })
   })
 
   describe('errors', () => {

@@ -455,3 +455,8 @@ featured_help_links:
   display_name: Featured Help Links
   description: Allows Help Links to be tagged as Featured or New and
     prominently displays the Featured Help Link in the Help Menu.
+timer_without_autosubmission:
+  display_name: Classic Quizzes Option for Timed Quizzes without Submission
+  description: Presents the quiz setting to avoid automatic submission of a timed quiz when the available time has ended.
+  applies_to: RootAccount
+  state: hidden

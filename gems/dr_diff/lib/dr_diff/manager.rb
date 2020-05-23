@@ -78,11 +78,7 @@ module DrDiff
     private
 
     def severe?(level, severe_levels)
-      if UserConfig.only_report_errors?
-        level == 'error'
-      else
-        severe_levels.include?(level)
-      end
+      severe_levels.include?(level)
     end
   end
 end

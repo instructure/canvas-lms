@@ -92,6 +92,10 @@ describe 'RequestThrottle' do
   end
 
   describe "#call" do
+    after(:each) do
+      Setting.remove("request_throttle.enabled")
+    end
+
     def set_blacklist(val)
       Setting.set('request_throttle.blacklist', val)
       RequestThrottle.reload!
@@ -123,6 +127,14 @@ describe 'RequestThrottle' do
     end
 
     it "should blacklist based on user id" do
+      set_blacklist('user:2')
+      expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
+      expect(throttler.call(request_user_2)).to eq rate_limit_exceeded
+    end
+
+    it "still gets blacklisted if throttling disabled" do
+      Setting.set("request_throttle.enabled", "false")
+      expect(RequestThrottle.enabled?).to eq(false)
       set_blacklist('user:2')
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
       expect(throttler.call(request_user_2)).to eq rate_limit_exceeded

@@ -928,3 +928,11 @@ export function updateMediaObjectFailure() {
     }, FAKE_TIMEOUT)
   })
 }
+
+export function updateClosedCaptions(/* apiProps, {media_object_id, subtitles} */) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve([])
+    }, FAKE_TIMEOUT)
+  })
+}

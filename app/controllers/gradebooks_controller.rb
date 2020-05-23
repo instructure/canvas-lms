@@ -247,8 +247,13 @@ class GradebooksController < ApplicationController
     set_tutorial_js_env
 
     # Optimize initial data loading
-    if Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids)
+    if Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids) ||
+      Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements)
       prefetch_xhr(user_ids_course_gradebook_url(@context), id: 'user_ids')
+    end
+
+    if Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements) && grading_periods?
+      prefetch_xhr(grading_period_assignments_course_gradebook_url(@context), id: 'grading_period_assignments')
     end
 
     set_default_gradebook_env
@@ -379,6 +384,7 @@ class GradebooksController < ApplicationController
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
       additional_sort_options_enabled: @context.feature_enabled?(:new_gradebook_sort_options),
+      # TODO: remove `api_max_per_page` with TALLY-831
       api_max_per_page: per_page,
 
       # TODO: remove `assignment_groups_url` with TALLY-831
@@ -392,6 +398,7 @@ class GradebooksController < ApplicationController
       attachment: last_exported_attachment,
       attachment_url: authenticated_download_url(last_exported_attachment),
       change_gradebook_version_url: context_url(@context, :change_gradebook_version_context_gradebook_url, version: 2),
+      # TODO: remove `chunk_size` with TALLY-831
       chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
       colors: gradebook_settings(:colors),
       context_allows_gradebook_uploads: @context.allows_gradebook_uploads?,
@@ -442,6 +449,7 @@ class GradebooksController < ApplicationController
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       new_post_policy_icons_enabled: @context.root_account.feature_enabled?(:new_post_policy_icons),
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
+      performance_controls: gradebook_performance_controls,
       post_grades_feature: post_grades_feature?,
       post_grades_ltis: post_grades_ltis,
       post_manually: @context.post_manually?,
@@ -475,8 +483,10 @@ class GradebooksController < ApplicationController
 
     js_env({
       GRADEBOOK_OPTIONS: gradebook_options,
+      # TODO: remove `prefetch_gradebook_user_ids` with TALLY-831
       prefetch_gradebook_user_ids: Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids),
 
+      # TODO: remove `performance_controls` with TALLY-831
       performance_controls: {
         active_request_limit: Setting.get('gradebook.active_request_limit', '12').to_i,
       }
@@ -1102,14 +1112,22 @@ class GradebooksController < ApplicationController
     @current_user.set_preference(:gradebook_settings, @context.global_id, context_settings)
   end
 
-  def render_gradebook
-    if ["srgb", "individual"].include?(gradebook_version)
-      render "gradebooks/individual"
-    else
-      opt_in_datadog_rum_js
-      render "gradebooks/gradebook"
-    end
+  def gradebook_performance_controls
+    per_page = Api.max_per_page
+
+    {
+      active_request_limit: Setting.get('gradebook.active_request_limit', '12').to_i,
+      api_max_per_page: per_page,
+      assignment_groups_per_page: Setting.get('gradebook.assignment_groups_per_page', per_page).to_i,
+      context_modules_per_page: Setting.get('gradebook.context_modules_per_page', per_page).to_i,
+      custom_column_data_per_page: Setting.get('gradebook.custom_column_data_per_page', per_page).to_i,
+      custom_columns_per_page: Setting.get('gradebook.custom_columns_per_page', per_page).to_i,
+      students_chunk_size: Setting.get('gradebook.students_chunk_size', per_page).to_i,
+      submissions_chunk_size: Setting.get('gradebook.submissions_chunk_size', '10').to_i,
+      submissions_per_page: Setting.get('gradebook.submissions_per_page', per_page).to_i
+    }
   end
+  private :gradebook_performance_controls
 
   def percentage(weight)
     I18n.n(weight, percentage: true)

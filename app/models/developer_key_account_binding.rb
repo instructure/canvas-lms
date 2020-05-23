@@ -24,6 +24,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
 
   belongs_to :account
   belongs_to :developer_key
+  belongs_to :root_account, class_name: 'Account'
 
   validates :account, :developer_key, presence: true
   validates :workflow_state, inclusion: { in: [OFF_STATE, ALLOW_STATE, ON_STATE] }
@@ -31,6 +32,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   before_validation :infer_workflow_state
   after_update :clear_cache_if_site_admin
   after_update :update_tools!
+  before_save :set_root_account
 
   scope :active_in_account, -> (account) do
     where(account_id: account.account_chain_ids).
@@ -118,6 +120,10 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   end
 
   private
+
+  def set_root_account
+    self.root_account_id ||= account&.resolved_root_account_id
+  end
 
   def update_tools!
     if disable_tools?

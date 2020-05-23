@@ -66,7 +66,7 @@ pipeline {
   options { ansiColor('xterm') }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
+    COMPOSE_FILE = 'docker-compose.new-jenkins.canvas.yml:docker-compose.new-jenkins-karma.yml'
     COVERAGE = runCoverage()
     FORCE_FAILURE = isForceFailure()
     SENTRY_URL="https://sentry.insops.net"

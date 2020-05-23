@@ -52,9 +52,9 @@ def skipIfPreviouslySuccessful(name, block) {
   }
 }
 
-def wrapBuildExecution(jobName, parameters, urlExtra) {
+def wrapBuildExecution(jobName, parameters, propagate, urlExtra) {
   try {
-    build(job: jobName, parameters: parameters)
+    build(job: jobName, parameters: parameters, propagate: propagate)
   }
   catch(FlowInterruptedException ex) {
     // if its this type, then that means its a build failure.
@@ -109,10 +109,12 @@ def isCovid() {
 
 pipeline {
   agent { label 'canvas-docker' }
-  options { ansiColor('xterm') }
+  options {
+    ansiColor('xterm')
+    timestamps()
+  }
 
   environment {
-    DISABLE_SPRING = 'true'
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     NAME = getImageTagVersion()
@@ -196,7 +198,6 @@ pipeline {
                   // end of hack (covid)
                 }
               }
-              credentials.fetchFromGerrit('gergich_user_config', '.')
               credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
 
               sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
@@ -211,7 +212,6 @@ pipeline {
               sh 'cp -v config/domain.yml.example config/domain.yml'
               sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
               sh 'cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml'
-              sh 'cp -v ./gergich_user_config/gergich_user_config.yml ./gems/dr_diff/config/gergich_user_config.yml'
             }
           }
         }
@@ -300,9 +300,11 @@ pipeline {
             echo 'adding Linters'
             stages['Linters'] = {
               skipIfPreviouslySuccessful("linters") {
-                sh 'build/new-jenkins/linters/run-gergich.sh'
+                def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+                credentials.withGerritCredentials {
+                  sh 'build/new-jenkins/linters/run-gergich.sh'
+                }
                 if (env.MASTER_BOUNCER_RUN == '1' && env.GERRIT_EVENT_TYPE == 'patchset-created') {
-                  def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
                   credentials.withMasterBouncerCredentials {
                     sh 'build/new-jenkins/linters/run-master-bouncer.sh'
                   }
@@ -314,21 +316,21 @@ pipeline {
           echo 'adding Vendored Gems'
           stages['Vendored Gems'] = {
             skipIfPreviouslySuccessful("vendored-gems") {
-              wrapBuildExecution('test-suites/vendored-gems', buildParameters, "")
+              wrapBuildExecution('test-suites/vendored-gems', buildParameters, true, "")
             }
           }
 
           echo 'adding Javascript'
           stages['Javascript'] = {
             skipIfPreviouslySuccessful("javascript") {
-              wrapBuildExecution('test-suites/JS', buildParameters, "testReport")
+              wrapBuildExecution('test-suites/JS', buildParameters, true, "testReport")
             }
           }
 
           echo 'adding Contract Tests'
           stages['Contract Tests'] = {
             skipIfPreviouslySuccessful("contract-tests") {
-              wrapBuildExecution('test-suites/contract-tests', buildParameters, "")
+              wrapBuildExecution('test-suites/contract-tests', buildParameters, true, "")
             }
           }
 
@@ -336,7 +338,9 @@ pipeline {
             echo 'adding Flakey Spec Catcher'
             stages['Flakey Spec Catcher'] = {
               skipIfPreviouslySuccessful("flakey-spec-catcher") {
-                wrapBuildExecution('test-suites/flakey-spec-catcher', buildParameters, "")
+                def propagate = load('build/new-jenkins/groovy/configuration.groovy').fscPropagate()
+                echo "fsc propagation: $propagate"
+                wrapBuildExecution('test-suites/flakey-spec-catcher', buildParameters, propagate, "")
               }
             }
           }
@@ -441,6 +445,7 @@ pipeline {
           rspec.uploadSeleniumFailures()
           rspec.uploadRSpecFailures()
           load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
+          load('build/new-jenkins/groovy/splunk.groovy').uploadEvent('jenkins.build.duration', ['duration': "$currentBuild.duration"])
         }
       }
     }

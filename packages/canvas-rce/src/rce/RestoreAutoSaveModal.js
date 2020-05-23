@@ -40,7 +40,7 @@ export default function RestoreAutoSaveModal(props) {
       data-mce-component
       label={formatMessage('Restore auto-save?')}
       open={props.open}
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={false}
       shouldReturnFocus
       size="medium"
       onDismiss={props.onNo}

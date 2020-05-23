@@ -39,7 +39,7 @@ module Canvas
     end
     @redis ||= begin
       Canvas::Redis.patch
-      settings = ConfigFile.load('redis')
+      settings = ConfigFile.load('redis').dup
       settings['url'] = settings['servers'] if settings['servers']
       ActiveSupport::Cache::RedisCacheStore.build_redis(settings.to_h.symbolize_keys)
     end

@@ -2,6 +2,9 @@
 
 set -x -o errexit -o errtrace -o nounset -o pipefail
 
+GIT_SSH_COMMAND='ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME"' \
+    git fetch --no-tags origin "$GERRIT_BRANCH":"$GERRIT_BRANCH"
+
 inputs=()
 inputs+=("--volume $WORKSPACE/.git:/usr/src/app/.git")
 inputs+=("--env GERGICH_PUBLISH=$GERGICH_PUBLISH")
@@ -19,15 +22,21 @@ inputs+=("--env GERRIT_CHANGE_NUMBER=$GERRIT_CHANGE_NUMBER")
 # send things to gergich
 inputs+=("--env GERRIT_REFSPEC=$GERRIT_REFSPEC")
 
-cat <<EOF | docker run --interactive ${inputs[@]} $PATCHSET_TAG /bin/bash -
+cat <<EOF | docker run --interactive ${inputs[@]} "$PATCHSET_TAG" /bin/bash -
 set -ex
 
 # ensure we run the gergich comments with the Lint-Review label
 export GERGICH_REVIEW_LABEL="Lint-Review"
 
+# when parent is not in \$GERRIT_BRANCH (i.e. master)
+if ! git merge-base --is-ancestor HEAD~1 \$GERRIT_BRANCH; then
+  message="This commit is built upon commits not currently merged in \$GERRIT_BRANCH. Ensure that your dependent patchsets are merged first!\\n"
+  gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
+fi
+
 # we need to remove the hooks because compile_assets calls yarn install which will
 # try to create the .git commit hooks
-echo "" > ./script/install_hooks
+> ./script/install_hooks
 gergich capture custom:./build/gergich/compile_assets:Gergich::CompileAssets "rake canvas:compile_assets"
 
 gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint "node script/xsslint.js"

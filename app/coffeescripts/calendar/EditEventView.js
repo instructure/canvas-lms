@@ -22,6 +22,9 @@ import I18n from 'i18n!calendar.edit'
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 import tz from 'timezone'
 import Backbone from 'Backbone'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import 'jquery.instructure_forms'
 import editCalendarEventFullTemplate from 'jst/calendar/editCalendarEventFull'
 import MissingDateDialogView from '../views/calendar/MissingDateDialogView'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
@@ -30,6 +33,8 @@ import deparam from '../util/deparam'
 import KeyboardShortcuts from '../views/editor/KeyboardShortcuts'
 import coupleTimeFields from '../util/coupleTimeFields'
 import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
+import CalendarConferenceWidget from 'jsx/conferences/calendar/CalendarConferenceWidget'
+import filterConferenceTypes from 'jsx/conferences/utils/filterConferenceTypes'
 
 RichContentEditor.preloadRemoteModule()
 
@@ -46,6 +51,7 @@ export default class EditCalendarEventView extends Backbone.View {
     this.toggleUseSectionDates = this.toggleUseSectionDates.bind(this)
     this.enableDuplicateFields = this.enableDuplicateFields.bind(this)
     this.duplicateCheckboxChanged = this.duplicateCheckboxChanged.bind(this)
+    this.renderConferenceWidget = this.renderConferenceWidget.bind(this)
 
     super.initialize(...arguments)
     this.model.fetch().done(() => {
@@ -59,7 +65,8 @@ export default class EditCalendarEventView extends Backbone.View {
         'description',
         'location_name',
         'location_address',
-        'duplicate'
+        'duplicate',
+        'web_conference'
       )
       if (picked_params.start_at) {
         picked_params.start_date = tz.format(
@@ -115,7 +122,7 @@ export default class EditCalendarEventView extends Backbone.View {
       datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
     })
     this.$('.time_field').time_field()
-    this.$('.date_start_end_row').each((_, row) => {
+    this.$('.date_start_end_row').each((_unused, row) => {
       const date = $('.start_date', row).first()
       const start = $('.start_time', row).first()
       const end = $('.end_time', row).first()
@@ -128,7 +135,42 @@ export default class EditCalendarEventView extends Backbone.View {
 
     _.defer(this.attachKeyboardShortcuts)
     _.defer(this.toggleDuplicateOptions)
+    _.defer(this.renderConferenceWidget)
+
     return this
+  }
+
+  setConference = conference => {
+    this.model.set('web_conference', conference)
+    setTimeout(this.renderConferenceWidget, 0)
+  }
+
+  getActiveConferenceTypes() {
+    const conferenceTypes = ENV.conferences?.conference_types || []
+    const context = this.model.get('context_code')
+    return filterConferenceTypes(conferenceTypes, context)
+  }
+
+  renderConferenceWidget() {
+    if (!ENV.CALENDAR?.CONFERENCES_ENABLED) {
+      return
+    }
+    const conferenceNode = document.getElementById('calendar_event_conference_selection')
+    const activeConferenceTypes = this.getActiveConferenceTypes()
+    if (!this.model.get('web_conference') && activeConferenceTypes.length === 0) {
+      conferenceNode.closest('tr').className = 'hide'
+    } else {
+      conferenceNode.closest('tr').className = ''
+      ReactDOM.render(
+        <CalendarConferenceWidget
+          context={this.model.get('context_code')}
+          conference={this.model.get('web_conference')}
+          setConference={this.setConference}
+          conferenceTypes={activeConferenceTypes}
+        />,
+        conferenceNode
+      )
+    }
   }
 
   attachKeyboardShortcuts() {
@@ -242,6 +284,15 @@ export default class EditCalendarEventView extends Backbone.View {
       if (dialog.render()) return
     }
 
+    if (ENV.CALENDAR?.CONFERENCES_ENABLED) {
+      const conference = this.model.get('web_conference')
+      if (conference) {
+        eventData.web_conference = conference
+      } else {
+        eventData.web_conference = ''
+      }
+    }
+
     return this.saveEvent(eventData)
   }
 
@@ -249,7 +300,7 @@ export default class EditCalendarEventView extends Backbone.View {
     return this.$el.disableWhileLoading(
       this.model.save(eventData, {
         success: () => this.redirectWithMessage(I18n.t('event_saved', 'Event Saved Successfully')),
-        error: (model, response, options) =>
+        error: (_model, response, _options) =>
           showFlashAlert({
             message: response.responseText,
             err: null,
@@ -305,7 +356,6 @@ export default class EditCalendarEventView extends Backbone.View {
         append_iterator: this.$el.find('#append_iterator').is(':checked')
       }
     }
-
     return data
   }
 
@@ -320,7 +370,7 @@ export default class EditCalendarEventView extends Backbone.View {
     return this.$el.find('.duplicate_event_row').toggle(!disableValue)
   }
 
-  duplicateCheckboxChanged(jsEvent, propagate) {
+  duplicateCheckboxChanged(jsEvent, _propagate) {
     return this.enableDuplicateFields(jsEvent.target.checked)
   }
 }

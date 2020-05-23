@@ -65,7 +65,7 @@ module Services
       end
 
       def config
-        ConfigFile.load('notification_service') || {}
+        ConfigFile.load('notification_service').dup || {}
       end
     end
   end

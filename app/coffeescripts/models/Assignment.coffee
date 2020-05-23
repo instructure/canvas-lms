@@ -31,11 +31,15 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import PandaPubPoller from '../util/PandaPubPoller'
 import { matchingToolUrls } from './LtiAssignmentHelpers'
 
+canManage = () ->
+  ENV.PERMISSIONS?.manage
+
 isAdmin = () ->
   _.includes(ENV.current_user_roles, 'admin')
 
 isStudent = () ->
-  _.includes(ENV.current_user_roles, 'student')
+  # must check canManage because current_user_roles will include roles from other enrolled courses
+  _.includes(ENV.current_user_roles, 'student') && !canManage()
 
 export default class Assignment extends Model
   @mixin DefaultUrlMixin

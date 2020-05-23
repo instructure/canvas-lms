@@ -78,7 +78,7 @@ class DelayedNotification < ActiveRecord::Base
 
     lookups.each do |klass, ids|
       includes = []
-      includes = [ :notification_policies, { user: [:pseudonyms, :notification_policy_overrides] } ] if klass == CommunicationChannel
+      includes = [ :notification_policies, :notification_policy_overrides, { user: :pseudonyms } ] if klass == CommunicationChannel
       includes = [ :pseudonyms, { communication_channels: [:notification_policies, :notification_policy_overrides] } ] if klass == User
 
       ids.each_slice(100) do |slice|

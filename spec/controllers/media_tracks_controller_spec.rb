@@ -45,8 +45,10 @@ describe MediaTracksController do
       content = "one track mind"
       post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => content}
       expect(response).to be_successful
+      expect(json_parse(response.body)["media_id"]).to eq @mo.media_id
       track = @mo.media_tracks.last
       expect(track.content).to eq content
+
     end
 
     it "should disallow TTML" do
@@ -62,6 +64,16 @@ describe MediaTracksController do
     it "should validate :locale" do
       post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => '<img src="lolcats.gif">', :content => '1'}
       expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it "respects the exclude[] option" do
+      expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+      content = "one track mind"
+      post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => content, :exclude => ["tracks"]}
+      expect(response).to be_successful
+      rbody = json_parse(response.body)
+      expect(rbody["media_id"]).to eq @mo.media_id
+      expect(rbody["media_tracks"]).to be_nil
     end
   end
 

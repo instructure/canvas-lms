@@ -56,6 +56,12 @@
     "an_error_occurred_generating_the_file_preview_cf259955": {
         "message": "Произошла ошибка при создании предварительного просмотра файла"
     },
+    "an_error_occurred_making_a_network_request_d1bda348": {
+        "message": "Произошла ошибка, что привело к созданию сетевого запроса"
+    },
+    "an_error_occurred_uploading_your_media_71f1444d": {
+        "message": "Произошла ошибка при отправке вашего мультимедиа."
+    },
     "announcement_fb4cb645": {
         "message": "Объявление"
     },
@@ -121,6 +127,9 @@
     },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Автоматически открывать встроенный предварительный просмотр. (Предварительный просмотр отображается только после сохранения)"
+    },
+    "available_folders_694d0436": {
+        "message": "Доступные папки"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Начало вашей истории задач"
@@ -213,6 +222,9 @@
         "message": "Документы курса"
     },
     "course_files_62deb8f8": {
+        "message": "Файлы курса"
+    },
+    "course_files_a31f97fc": {
         "message": "Файлы курса"
     },
     "course_images_f8511d04": {
@@ -431,6 +443,12 @@
     "file_name_8fd421ff": {
         "message": "Имя файла"
     },
+    "file_upload_failed_af22dd91": {
+        "message": "Не удалось загрузить файл"
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "Отправка файла"
+    },
     "file_url_c12b64be": {
         "message": "URL файла"
     },
@@ -454,6 +472,9 @@
     },
     "focus_the_popup_context_toolbar_7979f4f8": {
         "message": "Сконцентрироваться на всплывающей контекстной панели инструментов"
+    },
+    "folder_tree_fbab0726": {
+        "message": "Структура папки"
     },
     "formatting_5b143aa8": {
         "message": "Форматирование"
@@ -489,6 +510,9 @@
         "message": "Оценки загружены"
     },
     "group_files_4324f3df": {
+        "message": "Файлы группы"
+    },
+    "group_files_82e5dcdb": {
         "message": "Файлы группы"
     },
     "group_navigation_99f191a": {
@@ -608,6 +632,9 @@
     "loading_failed_e6a9d8ef": {
         "message": "Сбой загрузки."
     },
+    "loading_folders_d8b5869e": {
+        "message": "Загрузка папок"
+    },
     "loading_grades_c842c887": {
         "message": "Загрузка оценок"
     },
@@ -622,6 +649,9 @@
     },
     "location_3b6ff307": {
         "message": "Местоположение:"
+    },
+    "locked_762f138b": {
+        "message": "Заблокировано"
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Похоже, здесь ничего нет"
@@ -649,6 +679,9 @@
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Должно быть как минимум { width } x { height }пикселов"
+    },
+    "my_files_2f621040": {
+        "message": "Мои файлы"
     },
     "my_grades_98834476": {
         "message": "Мои оценки"
@@ -899,6 +932,9 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Что-то пошло не так, и я не знаю, что вам показать."
     },
+    "something_went_wrong_d238c551": {
+        "message": "Что-то пошло не так"
+    },
     "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
         "message": "Что-то пошло не так, обновите страницу и попробуйте еще раз"
     },
@@ -940,6 +976,9 @@
     },
     "subscript_59744f96": {
         "message": "Надпись снизу"
+    },
+    "success_file_uploaded_8174e93f": {
+        "message": "Успешно: Файл отправлен"
     },
     "success_to_do_created_e34ed395": {
         "message": "Успешно: Задание создано"
@@ -1048,6 +1087,9 @@
     },
     "upload_media_ce31135a": {
         "message": "Загрузить медиа"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "Отправка недоступна для этой папки"
     },
     "upload_record_media_e4207d72": {
         "message": "Загрузить/записать медиа"

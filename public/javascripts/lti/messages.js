@@ -52,6 +52,10 @@ function findDomForWindow(sourceWindow) {
 }
 
 export function ltiMessageHandler(e) {
+  if (e.data.source && e.data.source === 'react-devtools-bridge') {
+    return
+  }
+
   if (e.data.messageType) {
     handleLtiPostMessage(e)
     return

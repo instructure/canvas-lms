@@ -17,6 +17,7 @@
  */
 
 import {find, isArray} from 'lodash'
+import parseLinkHeader from 'parse-link-header'
 
 import {deferPromise} from '../../async'
 
@@ -81,15 +82,15 @@ function cheaterDepaginate(url, params, pageCallback, pagesEnqueuedCallback = ()
       orderedPageCallback(firstPageResponse, 1)
 
       const paginationLinks = xhr.getResponseHeader('Link')
-      const lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
-      if (lastLink === null) {
+      const lastLink = parseLinkHeader(paginationLinks)?.last
+      if (lastLink == null) {
         pagesEnqueuedCallback([])
         gotAllPagesDeferred.resolve(data)
         return
       }
 
-      const lastPage = parseInt(lastLink[0].match(/page=(\d+)/)[1], 10)
-      if (lastPage === 1) {
+      const lastPage = parseInt(lastLink.page, 10)
+      if (!(lastPage > 1)) {
         pagesEnqueuedCallback([])
         gotAllPagesDeferred.resolve(data)
         return

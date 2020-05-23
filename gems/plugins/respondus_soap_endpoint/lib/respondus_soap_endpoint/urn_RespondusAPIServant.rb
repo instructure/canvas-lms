@@ -259,7 +259,7 @@ Implemented for: Canvas LMS}]
     else
       raise OtherError, "Invalid item type"
     end
-    raise(OtherError, "No items found") if list.item.empty?
+    raise(OtherError, "No items found") if list.item.empty? && !["quiz", "qdb"].include?(itemType)
     return [list]
   end
 

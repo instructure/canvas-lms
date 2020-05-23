@@ -255,7 +255,8 @@ export default class ItemView extends Backbone.View {
   }
 
   isStudent() {
-    return ENV.current_user_roles && ENV.current_user_roles.includes('student')
+    // must check canManage because current_user_roles will include roles from other enrolled courses
+    return ENV.current_user_roles?.includes('student') && !this.canManage()
   }
 
   canDuplicate() {

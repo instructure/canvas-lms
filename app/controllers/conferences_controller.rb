@@ -387,7 +387,8 @@ class ConferencesController < ApplicationController
       end
     end
   rescue StandardError => e
-    flash[:error] = t(:general_error_with_message, "There was an error joining the conference. Message: '%{message}'", :message => e.message)
+    Canvas::Errors.capture(e)
+    flash[:error] = t("There was an error joining the conference.")
     redirect_to named_context_url(@context, :context_conferences_url)
   end
 

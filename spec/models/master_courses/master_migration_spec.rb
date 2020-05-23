@@ -1336,8 +1336,6 @@ describe MasterCourses::MasterMigration do
 
     it "allows a minion course's change of the graded status of a discussion topic to stick" do
       @copy_to = course_factory
-      deleted_sub = MasterCourses::MasterTemplate.set_as_master_course(course_factory).add_child_course!(@copy_to)
-      deleted_sub.destroy
       sub = @template.add_child_course!(@copy_to)
 
       topic = @copy_from.discussion_topics.new
@@ -1364,6 +1362,31 @@ describe MasterCourses::MasterMigration do
 
       expect(topic_to.reload.assignment).to be_nil
       expect(assignment_to.reload).to be_deleted
+    end
+
+    it "allows a minion course's change of the graded status of a discussion topic to stick in the opposite direction too" do
+      # should be able to make it graded downstream
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      topic = @copy_from.discussion_topics.create!
+      run_master_migration
+
+      topic_to = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).take
+      topic_to.assignment = @copy_to.assignments.build(:due_at => 1.month.from_now)
+      topic_to.save!
+
+      topic_tag = MasterCourses::ChildContentTag.where(content_type: 'DiscussionTopic', content_id: topic_to.id).take
+      expect(topic_tag.downstream_changes).to include 'assignment_id'
+
+      Timecop.travel(1.hour.from_now) do
+        topic.message = 'content updated'
+        topic.save!
+      end
+      run_master_migration
+
+      expect(topic_to.reload.assignment).to_not be_nil
+      expect(topic_to.assignment).to_not be_deleted
     end
 
     it "should ignore course settings on selective export unless requested" do

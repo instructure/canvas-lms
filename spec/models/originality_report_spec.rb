@@ -111,6 +111,10 @@ describe OriginalityReport do
     expect(subject.state).to eq 'acceptable'
   end
 
+  it 'sets root_account using assignment' do
+    expect(subject.root_account).to eq submission.assignment.root_account
+  end
+
   describe 'accepts nested attributes for lti link' do
     let(:lti_link_attributes) do
       {

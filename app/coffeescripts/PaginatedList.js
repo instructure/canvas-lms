@@ -35,6 +35,7 @@ import $ from 'jquery'
 import I18n from 'i18n!paginated_list'
 import Spinner from 'spin.js'
 import htmlEscape from 'str/htmlEscape'
+import parseLinkHeader from 'parse-link-header'
 
 export default class PaginatedList {
   // #
@@ -171,8 +172,11 @@ export default class PaginatedList {
   // has been loaded, remove the 'view more' link.
   // @api private
   updatePaging() {
-    if (this.hasNextPage()) {
-      this.options.requestParams.page++
+    let linkHeader = parseLinkHeader(
+      this.currentRequest.getResponseHeader('Link')
+    )
+    if (linkHeader && linkHeader.next) {
+      this.options.requestParams.page = linkHeader.next.page
       if (!this.pageLinkPresent) {
         this.el.wrapper.append(this.viewMoreLinkHtml())
         this.pageLinkPresent = true
@@ -180,14 +184,6 @@ export default class PaginatedList {
     } else {
       this.el.wrapper.find('.view-more-link').remove()
     }
-  }
-
-  // #
-  // given a response, check the headers to see if there's another page.
-  // @return boolean
-  // @api private
-  hasNextPage() {
-    return this.currentRequest.getAllResponseHeaders().match(/rel="next"/)
   }
 
   // #

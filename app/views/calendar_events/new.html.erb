@@ -29,7 +29,7 @@
     event_attrs[:sections_url] = context_url(@context, :api_v1_context_sections_url)
   end
   js_env :CALENDAR_EVENT => event_attrs
-
+  js_env CALENDAR: { CONFERENCES_ENABLED: Account.site_admin.feature_enabled?(:calendar_conferences) }
   js_bundle :edit_calendar_event
   css_bundle :tinymce, :edit_calendar_event_full
   provide :right_side, render(:partial => 'shared/wiki_sidebar')

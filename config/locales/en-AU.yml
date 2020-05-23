@@ -1759,7 +1759,9 @@ en-AU:
     default_name: "No Name"
   add_cc_subtitle_a9ef4a66: "Add CC/Subtitle"
   add_collaboration_da9665ac: "Add Collaboration"
+  add_conference_7bcc625b: "Add Conference"
   add_conferences_from_calendar_98cb86b1: "Add Conferences from Calendar"
+  add_conferencing_9f4ccded: "Add Conferencing"
   add_contact_method_d2dfea03: "Add Contact Method"
   add_content_58b4305a: "Add Content"
   add_content_to_module_name_589a8d54: "Add Content to %{module_name}"
@@ -1797,6 +1799,7 @@ en-AU:
     add_quiz_to: "Add a quizzes to %{module}"
     add_topic_to: "Add discussion topics to %{module}"
   add_more_e1ffaa65: "Add More"
+  add_name_db699e72: "Add %{name}"
   add_new_announcement_ddacd624: "Add New Announcement"
   add_new_domain_e097d4a0: "Add new domain"
   add_new_group_7ac49f31: "Add new group"
@@ -1832,6 +1835,7 @@ en-AU:
   add_to_course_481a51c4: "Add to course..."
   add_to_student_to_do_58e66b4b: "Add to student to-do"
   add_to_whitelist_24f3f1ba: "Add to Whitelist"
+  add_toolname_4e17dc90: "Add %{toolName}"
   add_trigger_bc1a0fae: "Add Trigger"
   add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Add user by Email Address, Login ID, or SIS ID."
   add_user_e73e8e50: "Add User"
@@ -2071,6 +2075,7 @@ en-AU:
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Allows the duplicating of modules in Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Allows the duplicating of objects in Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Allows the duplication of Calendar Events"
+  allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Allows the missing policy applicator to emit submission_updated live events for each submission marked as missing."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Allows the scheduling of recurring calendar events"
   allows_the_user_to_navigate_away_while_submission__276d73b7: "Allows the user to navigate away while submission re-uploads are processing"
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Allows user to access and edit the Admin settings in Commons. Allows user to create and manage Groups. Allows user to manage shared resources in the account."
@@ -2421,6 +2426,7 @@ en-AU:
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "An error occurred while trying to find the LTI configuration"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "An error occured while updating the grading period set."
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "An error occurred changing the lock state for \"%{fileName}\""
+  an_error_occurred_creating_the_conference_fcad5f6f: "An error occurred creating the conference"
   an_error_occurred_loading_outcomes_data_cfd18b61: "An error occurred loading outcomes data."
   an_error_occurred_making_a_network_request_d1bda348: "An error occurred making a network request"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*An error occurred.* Please post your reply again later."
@@ -2877,6 +2883,7 @@ en-AU:
   assignment_assignment_submission_paper_view_8a4c9776: "Assignment %{assignment} submission Paper View"
   assignment_assignment_submission_plain_text_view_b217d372: "Assignment %{assignment} submission Plain Text View"
   assignment_bulk_editing_37248ca4: "Assignment Bulk Editing"
+  assignment_bulk_editing_phase_2_fde6f7d3: "Assignment Bulk Editing phase 2"
   assignment_comments_e43ed898: "Assignment Comments"
   assignment_configuration_4153cb88: "Assignment Configuration"
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} has been graded for %{name}."
@@ -3426,6 +3433,18 @@ en-AU:
       locked: Locked
     status: 
       deleting_group: "Deleting Group..."
+    student_assignment_overview: 
+      allowed_attempts: "Allowed Attempts"
+      attempts: Attempts
+      date_time_by: "%{date} by %{time}"
+      due_at: Due
+      no_due_date: "No Due Date"
+      no_points: None
+      points: Points
+      submission_types: "File Types"
+      submitting: Submitting
+      turnitin_enabled_short: "(Turnitin enabled)"
+      vericite_enabled_short: "(VeriCite enabled)"
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
@@ -3931,6 +3950,8 @@ en-AU:
   base_url_for_mathman_service_bdd4b10b: "Base URL for MathMan service"
   based_on_basedon_d6e4f4d7: "Based on: %{basedOn}"
   based_on_what_if_scores_the_new_total_is_now_grade_d223be10: "Based on What-If scores, the new total is now %{grade}"
+  batch_edit_6d41d0d7: "Batch Edit"
+  batch_edit_dates_f1ec3df2: "Batch Edit Dates"
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip file"
   bb_name: "Blackboard Converter"
@@ -5299,6 +5320,7 @@ en-AU:
                 groups. Broadcast real-time audio and video, share presentation
                 slides, give demonstrations of applications and online resources,
                 and more.
+  conference_36b50fda: Conference
   conference_selection_ea4050bb: "Conference Selection"
   conference_was_deleted_30869390: "Conference was deleted"
   conferences: 
@@ -5372,6 +5394,8 @@ en-AU:
               Premium BigBlueButton or use one of the following video conferencing providers.  Please talk to your local
               admin for additional guidance.
   conferences_tutorial_tray_6f071ce2: "Conferences Tutorial Tray"
+  conferencing_6a6d9b55: Conferencing
+  conferencing_b69e2537: "Conferencing:"
   confetti_for_on_time_submissions_394e16ce: "Confetti for On-Time Submissions"
   confetti_for_valid_links_7506df83: "Confetti for valid links"
   config_url_e96ceaf3: "Config URL"
@@ -6309,6 +6333,9 @@ en-AU:
     one: "1 assignment found."
     other: "%{count} assignments found."
     zero: "No matching assignments found."
+  count_assignments_selected_b03891ea: 
+    one: "%{count} assignment selected"
+    other: "%{count} assignments selected"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 Assignment with Errors"
     other: "%{count} Assignments with Errors"
@@ -7414,6 +7441,7 @@ en-AU:
   created_group_group_name_2097306b: "Created Group %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Creating a group is not yet handled by the new assignments flow. Head to the legacy assignments page?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Creating a Submission Export will allow you to download a zip file of all your assignment submissions in all of your present and past courses. This could be a big file, so it may take a while. You can navigate away from the page and come back later."
+  creating_conference_95b59116: "Creating conference"
   creating_key_8a026e61: "Creating Key"
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons License:"
@@ -8959,6 +8987,7 @@ en-AU:
   enrollment_term_7bfe840: "Enrolment Term"
   enrollment_terms_8753ec11: "Enrolment Terms"
   enrollments_e250c9c3: Enrolments
+  ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Ensures that outcomes that have already been imported into a course are not duplicated if they are imported again"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Ensures that users without the Import Outcomes permission cannot see the button within the Outcomes tab"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Enter a hexcode here to use a custom colour."
   enter_a_valid_date_46d77547: "Enter a valid date"
@@ -13152,6 +13181,7 @@ en-AU:
   message_actions_for_conversation_subject_fdb54c88: "Message actions for conversation %{subject}"
   message_actions_for_text_27eead86: "Message actions for %{text}"
   message_body_1f782712: "Message Body"
+  message_for_name_648f5765: "Message for %{name}"
   message_groups_who_1ba736f: "Message Groups Who..."
   message_reply_failed_subject_5d27a0c9: "Message Reply Failed: %{subject}"
   message_sent_5e328899: "Message Sent!"
@@ -15012,6 +15042,7 @@ en-AU:
   missing_eaddacbd: MISSING
   missing_percent_94534638: "Missing: %{percent}"
   missing_policies_4f195e0b: "Missing policies"
+  missing_policy_applicator_emits_live_events_88b47396: "Missing Policy Applicator Emits Live Events"
   missing_required_description_99a99ff: "Missing required description"
   missing_required_fields_fields_30e20799: "Missing required fields: %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Missing required fields. Please fill in all required fields."
@@ -15423,6 +15454,7 @@ en-AU:
   name_4dee4600: ", name: "
   name_app_has_been_deleted_fb2d9426: "%{name} app has been deleted"
   name_badfe525: name
+  name_conference_8e042dd2: "%{name} Conference"
   name_count_users_ccc93c3d: "%{name} (%{count} Users)"
   name_current_grade_d8da149f: "%{name} current grade"
   name_current_score_b3198dfa: "%{name} current score"
@@ -15592,6 +15624,7 @@ en-AU:
   no_broken_links_found_38d951e3: "No broken links found"
   no_cancel_installation_db8d12d7: "No, Cancel Installation"
   no_collaboration_apps_3bbd30ce: "No Collaboration Apps"
+  no_conferencing_options_enabled_fc00e371: "No conferencing options enabled"
   no_content_5dbc9acf: "No Content"
   no_content_has_been_added_f36bab43: "* No content has been added"
   no_content_has_been_shared_with_you_667fde6c: "No content has been shared with you."
@@ -15671,6 +15704,7 @@ en-AU:
   no_user_98e6ccc4: "No User"
   no_users_found_64a043ff: "No users found"
   no_users_were_selected_to_add_to_the_course_a51c6083: "No users were selected to add to the course"
+  no_valid_lti_resource_was_returned_11f7f91f: "No valid LTI resource was returned"
   no_video_1ed00b26: "No Video"
   no_violations_have_been_reported_977a08d1: "No violations have been reported."
   no_way_to_export_gradebooks_provided_b4c2939d: "No way to export gradebooks provided!"
@@ -16577,6 +16611,8 @@ en-AU:
   paraguay_181a5029: Paraguay
   paraguay_595_ca58b83a: "Paraguay (+595)"
   parameters_a13374ec: Parameters
+  parent_assignment_is_not_selected_9efb4ac1: "parent assignment is not selected"
+  parent_assignment_is_selected_6a2fbca8: "parent assignment is selected"
   parent_of_a_canvas_user_afba1624: "Parent of a Canvas User?"
   parent_references_not_found_prior_to_this_row_miss_31723438: "Parent references not found prior to this row: %{missing}"
   parent_signup_b7c6bf0a: "Parent Signup"
@@ -19454,6 +19490,7 @@ en-AU:
   redirect_uris_79534b60: "* Redirect URIs:"
   redirect_uris_a54bd82f: "Redirect URIs:"
   redirected_to_identity_provider_6c4e17d2: "Redirected to identity provider"
+  reduce_outcome_duplication_on_course_import_26431b40: "Reduce outcome duplication on course import"
   reference_code_3e8355dd: "Reference Code"
   reference_code_is_required_c32c757f: "Reference code is required"
   regardless_of_whether_this_permission_is_enabled_o_437ee269: "Regardless of whether this permission is enabled or disabled, the user will still be able to manage events on their personal calendar."
@@ -19532,9 +19569,12 @@ en-AU:
   remove_attribute_59a4aa64: "Remove Attribute"
   remove_c_name_section_d8eabd3a: "Remove %{c.name} Section"
   remove_collaborationtitle_c3e81adb: "Remove \"%{collaborationTitle}\"?"
+  remove_conference_69b9e0d0: "Remove conference"
   remove_contact_method_ca890ba3: "Remove contact method"
   remove_course_association_name_b760c502: "Remove course association %{name}"
+  remove_dates_9b9ba2f6: "Remove Dates"
   remove_domain_from_the_whitelist_14c7d5e9: "Remove %{domain} from the whitelist"
+  remove_due_dates_and_assignment_availability_dates_608cd97b: "Remove due dates and assignment availability dates."
   remove_email_address_b1820820: "Remove email address"
   remove_empty_attachment_b2aea632: "remove empty attachment"
   remove_f47dc62a: Remove
@@ -20289,13 +20329,17 @@ en-AU:
   select_a_module_optional_7edb5cb0: "Select a Module (optional)"
   select_a_predefined_color_c77ab2f5: "Select a predefined colour."
   select_a_provisional_grade_7106e3d5: "Select a provisional grade"
+  select_all_assignments_bd07b919: "Select all assignments"
   select_all_count_9ad54aa1: "Select All (%{count})"
   select_all_count_courses_4fc63811: 
     one: "Select (%{count}) Course"
     other: "Select All (%{count}) Courses"
   select_all_students_7c2c34b3: "Select all students"
+  select_an_edit_operation_ec1467d: "Select an edit operation"
+  select_assignment_title_4571ffcb: "Select assignment: %{title}"
   select_audio_file_7d905cce: "Select Audio File"
   select_calendars_d5fa50b6: "Select Calendars"
+  select_conference_provider_58c7f7fe: "Select Conference Provider"
   select_content: "Select Content"
   select_content_checkbox: 
     select_content_error: "You must choose a content option"
@@ -20321,6 +20365,7 @@ en-AU:
   select_course_or_group_ddb2185d: "Select course or group"
   select_courses_or_groups_1a8b8f66: "Select courses or groups"
   select_d70f31da: Select
+  select_dates_to_remove_be55b14c: "Select dates to remove"
   select_embedded_content_type_966f048a: "Select embedded content type"
   select_final_grade_for_moderation_b76a0baf: "Select final grade for moderation"
   select_for_list_of_users_who_responded_791ce930: "Select for list of users who responded."
@@ -21277,6 +21322,8 @@ en-AU:
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "Sharing a QR code can give others immediate access to your account through the %{canvas} mobile applications."
   she_her_3f459cc2: She/Her
   she_her_c8b5e3be: she/her
+  shift_dates_b5a7b7a1: "Shift Dates"
+  shift_due_dates_and_assignment_availability_dates__c5ad272: "Shift due dates and assignment availability dates forward by a number of days."
   short_name_42f454a1: "Short Name"
   short_name_ad9bf84f: "short name"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "Should be self-evident, the canvas ID of the reporting user"
@@ -22538,6 +22585,7 @@ en-AU:
   there_was_an_error_generating_the_pairing_code_9edd639b: "There was an error generating the pairing code"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "There was an error generating the tool launch."
   there_was_an_error_in_processing_your_request_6513a49a: "There was an error in processing your request"
+  there_was_an_error_joining_the_conference_d2c3e4b0: "There was an error joining the conference."
   there_was_an_error_launching_to_the_configured_too_f8ed5767: "There was an error launching to the configured tool."
   there_was_an_error_removing_the_image_c83acffe: "There was an error removing the image."
   there_was_an_error_removing_the_item_f8324776: "There was an error removing the item"
@@ -23424,6 +23472,7 @@ en-AU:
     originality_report_visible_after_grading: "After the assignment is marked"
     originality_report_visible_immediately: Immediately
   turnitin_similarity_score_more_information_e2571be8: "Turnitin similarity score -- more information"
+  turns_on_phase_2_features_for_assignment_bulk_edit_20245881: "Turns on phase 2 features for Assignment Bulk Editing"
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: "Type a date or use arrow keys to navigate date picker."
@@ -23500,6 +23549,7 @@ en-AU:
   unknown_account_74d30b82: "Unknown Account"
   unknown_answers_9688a2bc: "Unknown answers"
   unknown_compression_method_b6a850b5: "unknown compression method"
+  unknown_conference_c4f13ad0: "Unknown Conference"
   unknown_content_type_ae6d08e8: "Unknown Content Type"
   unknown_event_7a0bcda3: "Unknown event"
   unknown_external_tool_c918e9b2: "Unknown External Tool"
@@ -23558,6 +23608,8 @@ en-AU:
   unpublished_click_to_publish_name_10104b5c: "Unpublished. Click to publish %{name}"
   unpublished_click_to_publish_title_7c57293f: "Unpublished.  Click to publish %{title}."
   unpublished_content_referenced_in_this_resource_865f8ef6: "Unpublished content referenced in this resource:"
+  unpublished_courses_4299148e: "Unpublished Courses"
+  unpublished_courses_count_d35672f0: "Unpublished Courses (%{count})"
   unpublished_courses_title: "Unpublished Courses"
   unpublished_dfd8801: unpublished
   unpublished_drafts_bb352243: "Unpublished Drafts"
@@ -23681,6 +23733,7 @@ en-AU:
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Usage rights will be set for all of the files contained in:"
   use_a_or_new_line_between_for_adding_multiple_user_e7c43ba9: "Use a \",\" or new line between for adding multiple users."
   use_arrow_keys_to_navigate_options_2021cc50: "Use arrow keys to navigate options."
+  use_arrow_keys_to_select_a_conference_provider_c5b456a6: "Use arrow keys to select a conference provider"
   use_as_front_page_274a488b: "Use as Front Page"
   use_between_for_adding_multiple_users_26bff207: "Use \",\" between for adding multiple users."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Use bookmarking for API pagination in Enrolments Index"

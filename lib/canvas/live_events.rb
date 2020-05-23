@@ -273,6 +273,10 @@ module Canvas::LiveEvents
     Assignment.where(:id => assignment_ids).each{|a| assignment_updated(a)}
   end
 
+  def self.submissions_bulk_updated(submissions)
+    Submission.where(id: submissions).preload(:assignment).find_each { |submission| submission_updated(submission) }
+  end
+
   def self.get_assignment_override_data(override)
     data_hash = {
       assignment_override_id: override.id,

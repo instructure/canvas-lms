@@ -19,10 +19,7 @@
 import sinon from 'sinon'
 
 import waitForCondition from 'jsx/shared/__tests__/waitForCondition'
-import FakeServer, {
-  paramsFromRequest,
-  pathFromRequest
-} from 'jsx/shared/network/__tests__/FakeServer'
+import FakeServer from 'jsx/shared/network/__tests__/FakeServer'
 import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 
@@ -163,7 +160,6 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
         .returns(Promise.resolve({finalGradeOverrides: exampleData.finalGradeOverrides}))
 
       gradebook = createGradebook({
-        api_max_per_page: 2, // students per page
         context_id: '1201',
 
         course_settings: {
@@ -178,6 +174,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
             {id: '701', title: 'Grading Period 1', startDate: new Date(1)},
             {id: '702', title: 'Grading Period 2', startDate: new Date(2)}
           ]
+        },
+
+        performance_controls: {
+          students_chunk_size: 2 // students per page
         }
       })
 
@@ -244,280 +244,91 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       await reloadData()
     })
 
-    QUnit.module('loading student ids', () => {
-      test('sends the request using the given course id', async () => {
-        await reloadData()
-        const requests = server.filterRequests(urls.userIds)
-        strictEqual(requests.length, 1)
-      })
-
-      test('stores the loaded student ids in the gradebook', async () => {
-        await reloadData()
-        const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
-        deepEqual(loadedStudentIds, exampleData.studentIds)
-      })
+    test('loads student ids', async () => {
+      sinon.spy(dataLoader.studentIdsLoader, 'loadStudentIds')
+      await reloadData()
+      strictEqual(dataLoader.studentIdsLoader.loadStudentIds.callCount, 1)
     })
 
-    QUnit.module('loading grading period assignments', () => {
-      QUnit.module('when the course uses a grading period set', () => {
-        test('sends the request using the given course id', async () => {
-          await reloadData()
-          const requests = server.filterRequests(urls.gradingPeriodAssignments)
-          strictEqual(requests.length, 1)
-        })
-
-        test('updates the grading period assignments in the gradebook', async () => {
-          await reloadData()
-          strictEqual(gradebook.updateGradingPeriodAssignments.callCount, 1)
-        })
-
-        test('includes the loaded grading period assignments when updating the gradebook', async () => {
-          await reloadData()
-          const [gradingPeriodAssignments] = gradebook.updateGradingPeriodAssignments.lastCall.args
-          deepEqual(gradingPeriodAssignments, exampleData.gradingPeriodAssignments)
-        })
-      })
-
-      QUnit.module('when the course does not use a grading period set', () => {
-        test('does not request grading period assignments', async () => {
-          gradebook.gradingPeriodSet = null
-          await reloadData()
-          const requests = server.filterRequests(urls.gradingPeriodAssignments)
-          strictEqual(requests.length, 0)
-        })
-      })
+    test('loads grading period assignments when the course uses a grading period set', async () => {
+      sinon.spy(dataLoader.gradingPeriodAssignmentsLoader, 'loadGradingPeriodAssignments')
+      await reloadData()
+      strictEqual(
+        dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments.callCount,
+        1
+      )
     })
 
-    QUnit.module('loading students', contextHooks => {
-      contextHooks.beforeEach(() => {
-        server.unsetResponses(urls.students)
-        gradebook.options.api_max_per_page = 50
-      })
-
-      function setStudentsResponse(ids, students) {
-        server.for(urls.students, {user_ids: ids}).respond({status: 200, body: students})
-      }
-
-      function setSubmissionsResponse(ids, submissions) {
-        server.unsetResponses(urls.submissions)
-        server.for(urls.submissions, {student_ids: ids}).respond([{status: 200, body: submissions}])
-      }
-
-      test('requests students using the retrieved student ids', async () => {
-        setStudentsResponse(exampleData.studentIds, exampleData.students)
-        setSubmissionsResponse(exampleData.studentIds, exampleData.submissions)
-        await reloadData()
-        const studentRequest = server.findRequest(urls.students)
-        const params = paramsFromRequest(studentRequest)
-        deepEqual(params.user_ids, exampleData.studentIds)
-      })
-
-      test('does not request students already loaded', async () => {
-        // This will not be sufficient when interruptable reloads are implemented
-        gradebook.updateStudentIds(['1101', '1103'])
-        setStudentsResponse(['1102'], [{id: '1102'}])
-        setSubmissionsResponse(['1102'], [{id: '2502'}])
-        await reloadData()
-        const studentRequest = server.findRequest(urls.students)
-        const params = paramsFromRequest(studentRequest)
-        deepEqual(params.user_ids, ['1102'])
-      })
-
-      test('chunks students when per page limit is less than count of student ids', async () => {
-        gradebook.options.api_max_per_page = 2
-        setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
-        setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
-        await reloadData()
-        const studentsRequests = server.filterRequests(urls.students)
-        strictEqual(studentsRequests.length, 2)
-      })
-
-      test('updates the gradebook with each chunk of loaded students', async () => {
-        gradebook.options.api_max_per_page = 2
-        setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
-        setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
-        await reloadData()
-        strictEqual(gradebook.gotChunkOfStudents.callCount, 2)
-      })
-
-      test('includes loaded students when updating the gradebook', async () => {
-        gradebook.options.api_max_per_page = 2
-        setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
-        setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
-        await reloadData()
-        const loadedStudentIds = []
-        gradebook.gotChunkOfStudents.getCalls().forEach(call => {
-          loadedStudentIds.push(...call.args[0].map(student => student.id))
-        })
-        deepEqual(
-          loadedStudentIds,
-          exampleData.students.map(student => student.id)
-        )
-      })
-
-      QUnit.module('when all students have finished loading', loadingHooks => {
-        loadingHooks.beforeEach(() => {
-          gradebook.options.api_max_per_page = 2
-          setStudentsResponse(exampleData.studentIds.slice(0, 2), exampleData.students.slice(0, 2))
-          setStudentsResponse(exampleData.studentIds.slice(2, 3), exampleData.students.slice(2, 3))
-        })
-
-        test('updates the "students loaded" status', async () => {
-          await reloadData()
-          strictEqual(gradebook.updateStudentsLoaded.callCount, 2)
-        })
-
-        test('sets the students as loaded', async () => {
-          await reloadData()
-          const [loaded] = gradebook.updateStudentsLoaded.lastCall.args
-          strictEqual(loaded, true)
-        })
-
-        test('updates the status after storing loaded students', async () => {
-          gradebook.updateStudentsLoaded.onSecondCall().callsFake(() => {
-            strictEqual(gradebook.gotChunkOfStudents.callCount, 2)
-          })
-          await reloadData()
-        })
-      })
+    test('does not load grading period assignments when the course does not use a grading period set', async () => {
+      gradebook.gradingPeriodSet = null
+      sinon.spy(dataLoader.gradingPeriodAssignmentsLoader, 'loadGradingPeriodAssignments')
+      await reloadData()
+      strictEqual(
+        dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments.callCount,
+        0
+      )
     })
 
-    QUnit.module('loading submissions', () => {
-      test('requests submissions for each page of students', async () => {
-        await reloadData()
-        const submissionsRequests = server.filterRequests(urls.submissions)
-        strictEqual(submissionsRequests.length, 2)
-      })
-
-      test('includes "points_deducted" in response fields', async () => {
-        await reloadData()
-        const submissionsRequest = server.findRequest(urls.submissions)
-        const params = paramsFromRequest(submissionsRequest)
-        ok(params.response_fields.includes('points_deducted'))
-      })
-
-      test('includes "cached_due_date" in response fields', async () => {
-        await reloadData()
-        const submissionsRequest = server.findRequest(urls.submissions)
-        const params = paramsFromRequest(submissionsRequest)
-        ok(params.response_fields.includes('cached_due_date'))
-      })
-
-      test('updates the gradebook with each page of submissions', async () => {
-        await reloadData()
-        strictEqual(gradebook.gotSubmissionsChunk.callCount, 2)
-      })
-
-      test('includes the loaded submissions when updating the gradebook', async () => {
-        await reloadData()
-        const loadedSubmissionIds = []
-        gradebook.gotSubmissionsChunk.getCalls().forEach(call => {
-          loadedSubmissionIds.push(...call.args[0].map(submission => submission.id))
-        })
-        deepEqual(
-          loadedSubmissionIds,
-          exampleData.submissions.map(submission => submission.id)
-        )
-      })
-
-      QUnit.module('when all submissions have finished loading', () => {
-        test('updates the "submissions loaded" status', async () => {
-          await reloadData()
-          strictEqual(gradebook.updateSubmissionsLoaded.callCount, 2)
-        })
-
-        test('sets the submissions as loaded', async () => {
-          await reloadData()
-          const [loaded] = gradebook.updateSubmissionsLoaded.lastCall.args
-          strictEqual(loaded, true)
-        })
-
-        test('updates the status after storing loaded submissions', async () => {
-          gradebook.updateSubmissionsLoaded.onSecondCall().callsFake(() => {
-            strictEqual(gradebook.gotSubmissionsChunk.callCount, 2)
-          })
-          await reloadData()
-        })
-      })
+    test('does not load assignment groups', async () => {
+      sinon.spy(dataLoader.assignmentGroupsLoader, 'loadAssignmentGroups')
+      await reloadData()
+      strictEqual(dataLoader.assignmentGroupsLoader.loadAssignmentGroups.callCount, 0)
     })
 
-    QUnit.module('loading final grade overrides', () => {
-      test('requests overrides when "allow final grade overrides" is enabled', async () => {
-        await reloadData()
-        strictEqual(FinalGradeOverrideApi.getFinalGradeOverrides.callCount, 1)
-      })
-
-      test('does not request overrides when "allow final grade overrides" is disabled', async () => {
-        gradebook.courseSettings.setAllowFinalGradeOverride(false)
-        await reloadData()
-        strictEqual(FinalGradeOverrideApi.getFinalGradeOverrides.callCount, 0)
-      })
-
-      test('uses the given course id when loading final grade overrides', async () => {
-        await reloadData()
-        const [courseId] = FinalGradeOverrideApi.getFinalGradeOverrides.lastCall.args
-        strictEqual(courseId, '1201')
-      })
-
-      test('updates Gradebook when the final grade overrides have loaded', async () => {
-        await reloadData()
-        strictEqual(gradebook.finalGradeOverrides.setGrades.callCount, 1)
-      })
-
-      test('updates Gradebook with the loaded final grade overrides', async () => {
-        await reloadData()
-        const [finalGradeOverrides] = gradebook.finalGradeOverrides.setGrades.lastCall.args
-        deepEqual(finalGradeOverrides, exampleData.finalGradeOverrides)
-      })
+    test('does not load context modules', async () => {
+      sinon.spy(dataLoader.contextModulesLoader, 'loadContextModules')
+      await reloadData()
+      strictEqual(dataLoader.contextModulesLoader.loadContextModules.callCount, 0)
     })
 
-    QUnit.module('loading custom column data', contextHooks => {
-      contextHooks.beforeEach(() => {
-        gradebook.gradebookContent.customColumns = [{id: '2401'}, {id: '2402'}, {id: '2403'}]
+    test('does not load custom columns', async () => {
+      sinon.spy(dataLoader.customColumnsLoader, 'loadCustomColumns')
+      await reloadData()
+      strictEqual(dataLoader.customColumnsLoader.loadCustomColumns.callCount, 0)
+    })
+
+    test('loads student content', async () => {
+      sinon.spy(dataLoader.studentContentDataLoader, 'load')
+      await reloadData()
+      strictEqual(dataLoader.studentContentDataLoader.load.callCount, 1)
+    })
+
+    test('excludes students already loaded when loading student content', async () => {
+      // This will not be sufficient when interruptable reloads are implemented
+      gradebook.updateStudentIds(['1101', '1103'])
+      sinon.spy(dataLoader.studentContentDataLoader, 'load')
+
+      server
+        .for(urls.students, {user_ids: ['1102']})
+        .respond({status: 200, body: exampleData.students.slice(1, 2)})
+      server.unsetResponses(urls.submissions)
+      server
+        .for(urls.submissions, {student_ids: ['1102']})
+        .respond([{status: 200, body: exampleData.submissions.slice(2, 3)}])
+
+      await reloadData()
+      const [studentIds] = dataLoader.studentContentDataLoader.load.lastCall.args
+      deepEqual(studentIds, ['1102'])
+    })
+
+    test('loads custom column data', async () => {
+      sinon.spy(dataLoader.customColumnsDataLoader, 'loadCustomColumnsData')
+      await reloadData()
+      strictEqual(dataLoader.customColumnsDataLoader.loadCustomColumnsData.callCount, 1)
+    })
+
+    test('loads custom column data after students finish loading', async () => {
+      sinon.stub(dataLoader.customColumnsDataLoader, 'loadCustomColumnsData').callsFake(() => {
+        strictEqual(gradebook.updateStudentsLoaded.withArgs(true).callCount, 1)
       })
+      await reloadData()
+    })
 
-      test('waits while students are still loading', async () => {
-        await reloadData()
-        const indexOfLastStudentRequest = server.findLastIndex(urls.students)
-        const indexOfFirstDataRequest = server.findFirstIndex(urls.customColumnData('.*'))
-        ok(indexOfFirstDataRequest > indexOfLastStudentRequest)
+    test('loads custom column data after submissions finish loading', async () => {
+      sinon.stub(dataLoader.customColumnsDataLoader, 'loadCustomColumnsData').callsFake(() => {
+        strictEqual(gradebook.updateSubmissionsLoaded.withArgs(true).callCount, 1)
       })
-
-      test('waits while submissions are still loading', async () => {
-        await reloadData()
-        const indexOfLastStudentRequest = server.findLastIndex(urls.submissions)
-        const indexOfFirstDataRequest = server.findFirstIndex(urls.customColumnData('.*'))
-        ok(indexOfFirstDataRequest > indexOfLastStudentRequest)
-      })
-
-      QUnit.module('when submissions have finished loading', () => {
-        test('requests custom column data for each loaded custom column', async () => {
-          await reloadData()
-          const requests = server.filterRequests(urls.customColumnData('.*'))
-          strictEqual(requests.length, 3)
-        })
-
-        test('requests custom column data using the custom column ids', async () => {
-          await reloadData()
-          const requestUrls = server
-            .filterRequests(urls.customColumnData('.*'))
-            .map(pathFromRequest)
-          const expectedUrls = [
-            urls.customColumnData('2401'),
-            urls.customColumnData('2402'),
-            urls.customColumnData('2403')
-          ]
-          deepEqual(requestUrls, expectedUrls)
-        })
-
-        test('includes custom column data parameters with each request', async () => {
-          await reloadData()
-          const parameterValues = server
-            .filterRequests(urls.customColumnData('.*'))
-            .map(request => paramsFromRequest(request).include_hidden)
-          deepEqual(parameterValues, ['true', 'true', 'true'])
-        })
-      })
+      await reloadData()
     })
   })
 })

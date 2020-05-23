@@ -62,4 +62,8 @@ def isForceFailureSelenium() {
   return isForceFailure() || hasFlag('force-failure-selenium')
 }
 
+def isForceFailureFSC() {
+  return isForceFailure() || hasFlag('force-failure-fsc')
+}
+
 return this

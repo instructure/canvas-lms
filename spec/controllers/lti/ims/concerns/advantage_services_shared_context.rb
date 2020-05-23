@@ -41,7 +41,12 @@ shared_context 'advantage services context' do
        https://canvas.instructure.com/lti/data_services/scope/list_event_types
        https://canvas.instructure.com/lti/account_lookup/scope/show
        https://canvas.instructure.com/lti/feature_flags/scope/show
-      ).join(' ')
+       https://canvas.instructure.com/lti/account_external_tools/scope/create
+       https://canvas.instructure.com/lti/account_external_tools/scope/update
+       https://canvas.instructure.com/lti/account_external_tools/scope/list
+       https://canvas.instructure.com/lti/account_external_tools/scope/show
+       https://canvas.instructure.com/lti/account_external_tools/scope/destroy
+    ).join(' ')
   end
   let(:access_token_signing_key) { Canvas::Security.encryption_key }
   let(:test_request_host) { 'test.host' }

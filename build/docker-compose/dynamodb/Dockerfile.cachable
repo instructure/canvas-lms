@@ -1,4 +1,0 @@
-FROM starlord.inscloudgate.net/jenkins/dynamodb-local
-USER root
-RUN mkdir -p /data
-CMD ["-jar", "DynamoDBLocal.jar", "-dbPath", "/data"]

@@ -28,7 +28,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   def index
-    if params[:zip] && authorized_action(@quiz, @current_user, :grade)
+    if params[:zip] && authorized_action(@quiz, @current_user, :review_grades)
       generate_submission_zip(@quiz, @context)
     else
       redirect_to named_context_url(@context, :context_quiz_url, @quiz.id)
@@ -112,6 +112,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
             @submission.backup_submission_data(params)
             render :json => {:backup => true,
                              :end_at => @submission.end_at,
+                             :end_at_without_time_limit => @submission.end_at_without_time_limit,
                              :time_left => @submission.time_left}
             return
           end
@@ -119,8 +120,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       end
 
       render :json => {:backup => false,
-                       :end_at => @submission && @submission.end_at,
-                       :time_left => @submission && @submission.time_left}
+                       :end_at => @submission&.end_at,
+                       :end_at_without_time_limit => @submission&.end_at_without_time_limit,
+                       :time_left => @submission&.time_left}
     end
   end
 

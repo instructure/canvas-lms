@@ -702,6 +702,87 @@ describe GradebooksController do
       end
     end
 
+    describe "prefetching" do
+      render_views
+
+      before :each do
+        user_session(@teacher)
+      end
+
+      it "prefetches user ids" do
+        get :show, params: { course_id: @course.id }
+
+        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+        expect(scripts).to include a_string_matching(/\bprefetched_xhrs\b.*\buser_ids\b/)
+      end
+
+      it "prefetches user ids when only 'prefetch_gradebook_user_ids' is enabled" do
+        # TODO: remove this with TALLY-831
+        Account.site_admin.enable_feature!(:prefetch_gradebook_user_ids)
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_dataloader_improvements).and_return(false)
+        get :show, params: { course_id: @course.id }
+
+        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+        expect(scripts).to include a_string_matching(/\bprefetched_xhrs\b.*\buser_ids\b/)
+      end
+
+      it "prefetches grading period assignments when the course uses grading periods" do
+        group_helper = Factories::GradingPeriodGroupHelper.new
+        period_helper = Factories::GradingPeriodHelper.new
+
+        grading_period_group = group_helper.create_for_account(@course.root_account)
+        term = @course.enrollment_term
+        term.grading_period_group = grading_period_group
+        term.save!
+        period_helper.create_presets_for_group(grading_period_group, :past, :current, :future)
+
+        get :show, params: { course_id: @course.id }
+
+        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+        expect(scripts).to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
+      end
+
+      it "does not prefetch grading period assignments when the course has no grading periods" do
+        get :show, params: { course_id: @course.id }
+
+        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+        expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
+      end
+
+      context "when 'gradebook_dataloader_improvements' is disabled" do
+        # TODO: remove this entire block with TALLY-831
+
+        before :each do
+          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_dataloader_improvements).and_return(false)
+        end
+
+        it "does not prefetch user ids" do
+          get :show, params: { course_id: @course.id }
+
+          scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+          expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\buser_ids\b/)
+        end
+
+        it "does not prefetch grading period assignments" do
+          group_helper = Factories::GradingPeriodGroupHelper.new
+          period_helper = Factories::GradingPeriodHelper.new
+
+          grading_period_group = group_helper.create_for_account(@course.root_account)
+          term = @course.enrollment_term
+          term.grading_period_group = grading_period_group
+          term.save!
+          period_helper.create_presets_for_group(grading_period_group, :past, :current, :future)
+
+          get :show, params: { course_id: @course.id }
+
+          scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+          expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
+        end
+      end
+    end
+
     describe 'js_env' do
       before :each do
         user_session(@teacher)
@@ -836,11 +917,112 @@ describe GradebooksController do
         expect(gradebook_options[:show_similarity_score]).to be(false)
       end
 
-      it 'includes api_max_per_page' do
-        Setting.set('api_max_per_page', 50)
+      it "includes api_max_per_page" do
+        Setting.set("api_max_per_page", 50)
         get :show, params: {course_id: @course.id}
         api_max_per_page = assigns[:js_env][:GRADEBOOK_OPTIONS][:api_max_per_page]
         expect(api_max_per_page).to eq(50)
+      end
+
+      describe "performance_controls" do
+        let(:performance_controls) { assigns[:js_env][:GRADEBOOK_OPTIONS][:performance_controls] }
+
+        before(:once) do
+          Setting.set("api_max_per_page", 100)
+        end
+
+        it "includes active_request_limit" do
+          Setting.set("gradebook.active_request_limit", 20)
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:active_request_limit]).to eq(20)
+        end
+
+        it "defaults active_request_limit to 12" do
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:active_request_limit]).to eq(12)
+        end
+
+        it "includes api_max_per_page" do
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:api_max_per_page]).to eq(100)
+        end
+
+        it "includes assignment_groups_per_page" do
+          Setting.set("gradebook.assignment_groups_per_page", 200)
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:assignment_groups_per_page]).to eq(200)
+        end
+
+        it "defaults assignment_groups_per_page to the api_max_per_page setting" do
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:assignment_groups_per_page]).to eq(100)
+        end
+
+        it "includes context_modules_per_page" do
+          Setting.set("gradebook.context_modules_per_page", 200)
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:context_modules_per_page]).to eq(200)
+        end
+
+        it "defaults context_modules_per_page to the api_max_per_page setting" do
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:context_modules_per_page]).to eq(100)
+        end
+
+        it "includes custom_column_data_per_page" do
+          Setting.set("gradebook.custom_column_data_per_page", 200)
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:custom_column_data_per_page]).to eq(200)
+        end
+
+        it "defaults custom_column_data_per_page to the api_max_per_page setting" do
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:custom_column_data_per_page]).to eq(100)
+        end
+
+        it "includes custom_columns_per_page" do
+          Setting.set("gradebook.custom_columns_per_page", 200)
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:custom_columns_per_page]).to eq(200)
+        end
+
+        it "defaults custom_columns_per_page to the api_max_per_page setting" do
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:custom_columns_per_page]).to eq(100)
+        end
+
+        it "includes students_chunk_size" do
+          Setting.set("gradebook.students_chunk_size", 200)
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:students_chunk_size]).to eq(200)
+        end
+
+        it "defaults students_chunk_size to the api_max_per_page setting" do
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:students_chunk_size]).to eq(100)
+        end
+
+        it "includes submissions_chunk_size" do
+          Setting.set("gradebook.submissions_chunk_size", 20)
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:submissions_chunk_size]).to eq(20)
+        end
+
+        it "defaults submissions_chunk_size to 10" do
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:submissions_chunk_size]).to eq(10)
+        end
+
+        it "includes submissions_per_page" do
+          Setting.set("gradebook.submissions_per_page", 200)
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:submissions_per_page]).to eq(200)
+        end
+
+        it "defaults submissions_per_page to the api_max_per_page setting" do
+          get :show, params: {course_id: @course.id}
+          expect(performance_controls[:submissions_per_page]).to eq(100)
+        end
       end
 
       describe "new_post_policy_icons_enabled" do

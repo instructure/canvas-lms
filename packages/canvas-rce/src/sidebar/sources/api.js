@@ -197,12 +197,73 @@ class RceApiSource {
     return this.apiPost(this.baseUri('media_objects'), headerFor(this.jwt), body)
   }
 
-  updateMediaObject(props, {media_object_id, title}) {
+  updateMediaObject(apiProps, {media_object_id, title}) {
     const uri = `${this.baseUri(
       'media_objects',
-      props.host
+      apiProps.host
     )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
     return this.apiPost(uri, headerFor(this.jwt), null, 'PUT')
+  }
+
+  // PUT to //RCS/api/media_objects/:mediaId/media_tracks [{locale, content}, ...]
+  // receive back a 200 with the new subtitles, or a 4xx error
+  updateClosedCaptions(apiProps, {media_object_id, subtitles}) {
+    // read all the subtitle files' contents
+    const file_promises = []
+    subtitles.forEach(st => {
+      if (st.isNew) {
+        const p = new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = function(e) {
+            resolve({locale: st.locale, content: e.target.result})
+          }
+          reader.onerror = function(e) {
+            e.target.abort()
+            reject(e)
+          }
+          reader.readAsText(st.file)
+        })
+        file_promises.push(p)
+      } else {
+        file_promises.push(Promise.resolve({locale: st.locale}))
+      }
+    })
+
+    // once all the promises from reading the subtitles' files
+    // have resolved, PUT the resulting subtitle objects to the RCS
+    // when that completes, the update_promise will resolve
+    const update_promise = new Promise((resolve, reject) => {
+      Promise.all(file_promises)
+        .then(closed_captions => {
+          const uri = `${this.baseUri(
+            'media_objects',
+            apiProps.host
+          )}/${media_object_id}/media_tracks`
+          return this.apiPost(uri, headerFor(this.jwt), closed_captions, 'PUT')
+            .then(resolve)
+            .catch(e => {
+              console.error('failed updating media_tracks') // eslint-disable-line no-console
+              reject(e)
+            })
+        })
+        .catch(e => {
+          console.error('reading a media track file failed', e)
+          this.alertFunc({
+            text: formatMessage('Reading a media track file failed. Aborting.'),
+            variant: 'error'
+          })
+        })
+    })
+    return update_promise
+  }
+
+  // GET /media_objects/:mediaId/media_tracks
+  // receive back the current list of media_tracks
+  fetchClosedCaptions(_mediaId) {
+    return Promise.resolve([
+      {locale: 'af', content: '1\r\n00:00:00,000 --> 00:00:01,251\r\nThis is the content\r\n'},
+      {locale: 'es', content: '1\r\n00:00:00,000 --> 00:00:01,251\r\nThis is the content\r\n'}
+    ])
   }
 
   // fetches folders for the given context to upload files to
@@ -382,8 +443,12 @@ class RceApiSource {
     headers = {...headers, 'Content-Type': 'application/json'}
     const fetchOptions = {
       method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined
+      headers
+    }
+    if (body) {
+      fetchOptions.body = JSON.stringify(body)
+    } else {
+      fetchOptions.form = body
     }
     uri = this.normalizeUriProtocol(uri)
     return fetch(uri, fetchOptions)
@@ -402,14 +467,12 @@ class RceApiSource {
       .then(parseResponse)
       .catch(throwConnectionError)
       .catch(e => {
+        console.error(e) // eslint-disable-line no-console
         this.alertFunc({
-          text: formatMessage(
-            'Something went wrong uploading, check your connection and try again.'
-          ),
+          text: formatMessage('Something went wrong, check your connection and try again.'),
           variant: 'error'
         })
         throw e
-        // console.error(e) // eslint-disable-line no-console
       })
   }
 

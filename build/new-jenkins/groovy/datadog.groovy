@@ -40,6 +40,7 @@ def runDataDogForMetric(name, block) {
   finally {
     def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
     hackyMetricSend("jenkins.stage.elapsedTimeDist", duration, ["stage:${name}"])
+    load('build/new-jenkins/groovy/splunk.groovy').uploadEvent('jenkins.stage.duration', ["duration": duration, "stage": name])
   }
 }
 

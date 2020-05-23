@@ -20,6 +20,11 @@ def buildRegistryFQDN() {
   return findVariable('BUILD_REGISTRY_FQDN', true)
 }
 
+def fscPropagate() {
+  def raw = findVariable('FSC_PROPAGATE', false)
+  return raw != null && raw == '1'
+}
+
 /**
  * this is a standard way of finding configuration from different places.
  * the checks happen in this order:

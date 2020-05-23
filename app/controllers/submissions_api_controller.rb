@@ -429,10 +429,12 @@ class SubmissionsApiController < ApplicationController
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
     end
 
-    if params[:grading_period_id].present?
-      assignments = GradingPeriod.active.find(params[:grading_period_id]).assignments(assignment_scope)
-    else
-      assignments = assignment_scope.to_a
+    assignments = Shackles.activate(:slave) do
+      if params[:grading_period_id].present?
+        GradingPeriod.active.find(params[:grading_period_id]).assignments(assignment_scope)
+      else
+        assignment_scope.to_a
+      end
     end
 
     if requested_assignment_ids.present? && (requested_assignment_ids - assignments.map(&:id)).present?

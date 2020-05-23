@@ -1,0 +1,41 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <%= mt :description, "When you have your BigBlueButton Plugin configured to use fallback settings, these are the settings it uses. The fallback is only used to look for recordings of conferences that were not created with the configuration for your BigBlueButton Plugin." %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :domain, :en => "Domain" %></td>
+      <td>
+        <%= f.text_field :domain %><br>
+        <%= mt :domain_description, "**hostname** or **ip address** of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)" %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :secret, :en => "Secret" %></td>
+      <td>
+        <%= f.password_field :secret, :autocomplete => false %><br>
+        <%= mt :secret_description, "This is the %{parameter_name} parameter that can be found in the %{filename} config file.", :parameter_name => markdown_safe('**beans.dynamicConferenceService.securitySalt**'), :filename => markdown_safe('**bigbluebutton.properties**') %>
+      </td>
+    </tr>
+  </table>
+<% end %>
