@@ -341,8 +341,9 @@ class User < ActiveRecord::Base
   }
 
   attr_accessor :last_login
-  def self.preload_last_login(users)
-    maxes = Pseudonym.where(user_id: users).group(:user_id).maximum(:current_login_at)
+  def self.preload_last_login(users, account_id)
+    maxes = Pseudonym.active.where(user_id: users).group(:user_id).where(account_id: account_id).
+      maximum(:current_login_at)
     users.each do |u|
       u.last_login = maxes[u.id]
     end
