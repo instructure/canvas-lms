@@ -973,28 +973,53 @@ describe "Users API", type: :request do
       expect(json.map{|r| r['id']}).to eq [@student.id]
     end
 
-    it "includes last login info" do
-      @account = Account.default
-      u = User.create!(name: 'test user')
-      p = u.pseudonyms.create!(account: @account, unique_id: 'user')
-      p.current_login_at = Time.now.utc
-      p.save!
+    context "includes last login info" do
+      before :once do
+        @account = Account.default
+        @u = User.create!(name: 'test user')
+        @p = @u.pseudonyms.create!(account: @account, unique_id: 'user')
+        @p.current_login_at = 2.minutes.ago
+        @p.save!
+      end
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: u.id.to_s })
-      expect(json.count).to eq 1
-      expect(json.first['last_login']).to eq p.current_login_at.iso8601
+      it 'should include last login' do
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: @u.id.to_s })
+        expect(json.count).to eq 1
+        expect(json.first['last_login']).to eq @p.current_login_at.iso8601
+      end
 
-      # it should sort too
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
-        { include: ['last_login'], sort: "last_login", order: 'desc'})
-      expect(json.first['last_login']).to eq p.current_login_at.iso8601
+      it 'should sort too' do
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+          { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
+          { include: ['last_login'], sort: "last_login", order: 'desc'})
+        expect(json.first['last_login']).to eq @p.current_login_at.iso8601
+      end
 
-      # it should include automatically when sorting by
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
-        { sort: "last_login", order: 'desc'})
-      expect(json.first['last_login']).to eq p.current_login_at.iso8601
+      it 'should include automatically when sorting by last login' do
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+          { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
+          { sort: "last_login", order: 'desc'})
+        expect(json.first['last_login']).to eq @p.current_login_at.iso8601
+      end
+
+      it 'should work with search terms' do
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+          { controller: 'users', action: 'api_index', format: 'json', account_id: @account.id.to_param },
+          { sort: 'last_login', order: 'desc', search_term: 'test'})
+        expect(json.first['last_login']).to eq @p.current_login_at.iso8601
+      end
+
+      it "shouldn't include last_logins from a different account" do
+        account = @account
+        p2 = @u.pseudonyms.create!(account: account_model, unique_id: 'user')
+        p2.current_login_at = Time.now.utc
+        p2.save!
+
+        json = api_call(:get, "/api/v1/accounts/#{account.id}/users",
+          { controller: 'users', action: 'api_index', format: 'json', account_id: account.id.to_param },
+          { include: ['last_login'], order: 'desc', search_term: 'test'})
+        expect(json.first['last_login']).to eq @p.current_login_at.iso8601
+      end
     end
 
     it "does return a next header on the last page" do

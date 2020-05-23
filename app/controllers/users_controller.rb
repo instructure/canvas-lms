@@ -446,15 +446,15 @@ class UsersController < ApplicationController
       users = UserSearch.scope_for(@context, @current_user,
         {order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
           enrollment_type: params[:enrollment_type]})
+      users = users.with_last_login if params[:sort] == 'last_login'
     end
 
     includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
     includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
-    users = users.with_last_login if params[:sort] == 'last_login'
     Shackles.activate(:slave) do
       users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
       user_json_preloads(users, includes.include?('email'))
-      User.preload_last_login(users) if includes.include?('last_login') && !(params[:sort] == 'last_login')
+      User.preload_last_login(users, @context.resolved_root_account_id) if includes.include?('last_login') && !(params[:sort] == 'last_login')
       render :json => users.map { |u| user_json(u, @current_user, session, includes)}
     end
   end
