@@ -2086,6 +2086,7 @@ ru:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Позволяет создавать объявления для конкретного раздела"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Разрешить создавать дискуссии по отдельным разделам"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Позволяет отмечать ссылки для вызова справки как выбранные или новые и постоянно отображать ссылку для вызова выбранной функции справки в меню справки"
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Позволяет выбирать результаты обучения во время миграции содержимого курса"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Позволяет ролям преподавателя, разработчика, ассистента преподавателя получать доступ к инструменту «Чат»."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Позволяет ролям преподавателя / разработчика / ассистента преподавателя получать доступ к инструменту «Чат»."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Позволяет ролям преподавателя / ассистента преподавателя получать доступ к инструменту «Посещаемость»."
@@ -4725,15 +4726,19 @@ ru:
   calendars_toggle_list_visibility_488db143: "Переключить видимость списка календарей"
   can_create_and_update_submission_results_for_assig_51e7033d: "Может создавать и обновлять результаты отправки для назначений, связанных с инструментом."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Может создавать и просматривать данные заданий в журнале оценок, связанном с инструментом."
+  can_create_external_tools_4c293044: "Можно создавать внешние инструменты."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "по умолчанию разрешено создавать, переименовывать и редактировать страницы курса"
   can_create_subscription_to_data_service_data_bb2874f2: "Можно создавать подписки на сервисы данных."
+  can_destroy_external_tools_cdb0e734: "Можно удалять внешние инструменты."
   can_destroy_subscription_to_data_service_data_b8dfca27: "Можно удалять подписки на сервисы данных."
   can_edit_this_page_role_selection_6ccec3c7: "Возможно редактирование выбора роли на этой странице"
   can_interact_with_users_in_their_section_only_48cb8c43: "Можно взаимодействовать с пользователями только в их разделах"
   can_list_categorized_event_types_52596f7: "Можно включать в список классифицированные типы событий."
+  can_list_external_tools_9132ad0f: "Можно вносить в список внешние инструменты."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Можно создавать списки подписок на сервисы данных."
   can_lookup_account_information_13d69520: "Можно искать сведения учетной записи"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Может извлекать пользовательские данные, связанные с контекстом, в котором установлен инструмент."
+  can_show_external_tools_bb4988c5: "Можно показывать внешние инструменты."
   can_show_subscription_to_data_service_data_688ce3: "Можно отображать подписки на сервисы данных."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Невозможно рассчитать оценку, пока у задания есть возможные баллы"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
@@ -4746,6 +4751,7 @@ ru:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Невозможно отменить публикацию, если есть отправленные студентами задания"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Невозможно отменить публикацию %{item_name}, если есть отправленные студентами задания"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Невозможно отменить публикацию %{name}, если есть отправленные студентами задания"
+  can_update_external_tools_168c1abe: "Можно обновлять внешние инструменты."
   can_update_public_jwk_for_lti_services_26037129: "Может обновлять публичный jwk для служб LTI."
   can_update_subscription_to_data_service_data_374a0c89: "Можно обновлять подписки на сервисы данных."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Может просматривать данные заданий в журнале оценок, связанном с инструментом."
@@ -5373,6 +5379,8 @@ ru:
                 проводите демонстрационные показы приложений и онлайновых ресурсов
                 и многое другое.
   conference_36b50fda: Конференция
+  conference_has_been_removed_f771cb11: "Конференция удалена"
+  conference_has_been_updated_title_2bacc5fa: "Конференция обновлена: %{title}"
   conference_selection_ea4050bb: "Выбор конференции"
   conference_was_deleted_30869390: "Конференция была удалена"
   conferences: 
@@ -9496,6 +9504,7 @@ ru:
   error_retrieving_content_c07ee76b: "Ошибка при получении контента"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Ошибка при считывании инструментов обнаружения сходства"
   error_running_quizzes_2_export_cfecedba: "При запуске экспорта Quizzes 2 возникла ошибка."
+  error_saving_assignment_dates_2af5e800: "Ошибка при сохранении дат задания: "
   error_saving_discussion_settings_3360661d: "Ошибка при сохранении настроек обсуждения"
   error_sending_messages_13c874eb: "Ошибка при отправке сообщений"
   error_sending_submission_comment_dc15d24f: "Ошибка отправки комментария к отправке"
@@ -12458,6 +12467,7 @@ ru:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Недействительная дата или недействительный параметр datetime для %{attr}"
   invalid_date_or_time_333acd43: "Неверная дата или время"
   invalid_date_time_3ae423f5: "Неверная дата и время"
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: "Обнаружены неверные даты. Исправьте их и повторите попытку."
   invalid_datetime_for_graded_since_884cce5: "Недопустимая дата-время для graded_since"
   invalid_datetime_for_submitted_since_a238f3a6: "Недопустимая дата-время для submitted_since"
   invalid_domain_e810c1d: "Неверный домен"
@@ -16309,6 +16319,7 @@ ru:
   notifications_unsupported_65f6bf65: "Уведомления не поддерживаются"
   notifications_view_f9a60770: "Уведомления - просмотр"
   notify_immediately_d1749c07: "Немедленно уведомить"
+  notify_students_in_time_of_assignments_that_requir_332ef10e: "Оповещаться студентов при появлении объявлений, которые требуют их внимания."
   notify_users_this_quiz_has_changed_c5b05995: "Уведомить пользователей об изменениях в тесте"
   now_click_the_agenda_button_607fb40e: "Теперь нажмите кнопку *Повестка дня*"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Теперь, после того как ваш курс настроен и доступен, возможно, эта памятка вам больше не нужна. Но мы сохраним ее на случай, если позднее вы решите, что хотите попробовать что-то новое, или если вам потребуется небольшая помощь при внесении изменений в содержимое вашего курса."
@@ -17992,6 +18003,7 @@ ru:
   progress_for_account_name_ef203250: "Прогресс для %{account_name}"
   progress_loading_bar_a26b8861: "Полоса загрузки/прогресса"
   project_groups_1fa0320b: "Группы проекта"
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "Местоимение не совпадает с местоимением или местоимениями учетной записи, не активированными для этой учетной записи, %{user_id}, пропуск"
   pronouns_d1cd8dd0: Местоимения
   pronouns_for_users_da46fb5: "Местоимения для пользователей"
   pronouns_users_can_show_after_their_name_e80821c7: "Местоимения, которые могут быть показаны пользователями после их имени"
@@ -19944,6 +19956,7 @@ ru:
   remove_c_name_section_d8eabd3a: "Удалить раздел %{c.name}"
   remove_collaborationtitle_c3e81adb: "Удалить «%{collaborationTitle}»?"
   remove_conference_69b9e0d0: "Удалить конференцию"
+  remove_conference_title_207d32c0: "Удалить конференцию: %{title}"
   remove_contact_method_ca890ba3: "Удалить способ связи"
   remove_course_association_name_b760c502: "Удалить ассоциацию курса %{name}"
   remove_dates_9b9ba2f6: "Удалить даты"
@@ -20093,6 +20106,7 @@ ru:
   retry_ebd5f8ba: "Повторите попытку"
   retry_migrating_name_bdc802ef: "Повторить перенос \"%{name}\""
   return_to_parent_folder_4ece2184: "возврат в родительский каталог"
+  revert_date_changes_5105ce5: "Отменить изменения дат"
   revert_to_actual_score_f665eea9: "Вернуться к фактической оценке"
   revert_to_old_ui_3211da41: "Вернуться к старому пользовательскому интерфейсу"
   review_now_318a6a3e: "Просмотреть сейчас"
@@ -20794,6 +20808,7 @@ ru:
   select_video_file_35b61d4e: "Выбрать видеофайл"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Выберите элементы для отображения на домашней странице."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "Выберите, нужно ли публиковать для всех отправок или только для тех, по которым выставлены оценки."
+  selectable_outcomes_during_course_content_migratio_3f108a1a: "Выбираемые результаты во время миграции содержимого курса"
   selected_274ce24f: Выбрано
   selected_all_courses_9cfef57f: "Выбраны все курсы"
   selected_answer: "Вы выбрали этот ответ."
@@ -21775,6 +21790,10 @@ ru:
   show_only_blueprint_courses_9fb37b41: "Показать только концептуальные курсы"
   show_originality_report_to_students_be22f5ee: "Показать отчет подлинности студентам"
   show_params_3401895b: "Показать параметры"
+  show_past_account_level_announcements_to_users_3b8208e2: "Показать пользователям прошлые объявления уровня учетной записи"
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      Показать пользователям прошлые объявления уровня учетной записи. Позволяет
+       пользователю просматривать объявления, срок действия которых истек или которые были удалены.
   show_question_details_b059df00: "Показать сведения о вопросе"
   show_recent_activity_stream_2be4abc1: "Показать недавний поток активности"
   show_report_to_students_a07888a6: "Показать отчет учащимся"
@@ -21916,6 +21935,12 @@ ru:
       forward: Переслать
   slovak_69f48e1b: Словацкий
   slovenian_30ae5208: Словенский
+  smart_alerts_43776718: "Умные оповещения"
+  smart_alerts_44db622e: "Умные оповещения"
+  smart_alerts_settings: 
+    threshold_12h: 12h
+    threshold_24h: 24h
+    threshold_36h: 36h
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "В Google Play"
@@ -22925,6 +22950,7 @@ ru:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "Гиперссылка, которую достаточно привилегироваяный пользователь может использовать для маскировки под отчетного пользователя, расположена на той же странице, чтобы попытаться воспроизвести проблему"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "Адрес страницы, на которой был пользователь, когда он сообщил об ошибке"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "Пользователи также должны быть зачислены в качестве преподавателя на курсы, которые они пытаются включить в перекрестные списки."
+  the_value_of_possible_points_for_this_assignment_c_42396e3: "Значение возможного количества баллов для этого задания не может превышать 999999999."
   their_grade_for_the_assignment_c36a60ef: "Их оценка за это задание"
   theme_52404e51: Тема
   theme_editor_b7b00f6b: "Редактор тем"
@@ -23226,6 +23252,7 @@ ru:
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Эти изменения будут применены для всей учетной записи. Хотите продолжить?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Эта тему будет применена для всей вашей учетной записи. Хотите продолжить?"
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Использование данного результата, который еще не был оценен, приведет к обновлению всех рубрик"
+  threshold_in_hours_to_notify_students_within_f33820aa: "Порог (в часах) для оповещения студентов в течение"
   threshold_pts_45f0e5d8: "порог: %{pts}"
   ticket_successfully_submitted_f6254460: "Заявка успешно отправлена."
   ticketing_system_52205bff: "Система отслеживания ошибок"
@@ -23379,6 +23406,7 @@ ru:
     port_moresby: Порт-Морсби
     prague: Прага
     pretoria: Претория
+    puerto_rico: Пуэрто-Рико
     quito: Кито
     rangoon: Рангун
     riga: Рига
