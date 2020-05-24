@@ -70,6 +70,8 @@ module ActiveSupport
           entry = nil
           frd_key = nil
           base_obj_key = batch_object.class.base_cache_register_key_for(batch_object)
+          return yield unless base_obj_key
+
           redis = Canvas::CacheRegister.redis(base_obj_key, batch_object.shard)
 
           instrument(:read, name, options) do |payload|

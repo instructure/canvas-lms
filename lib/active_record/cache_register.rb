@@ -22,6 +22,8 @@ module ActiveRecord
     module Base
       module ClassMethods
         def base_cache_register_key_for(id_or_record)
+          return nil if id_or_record.respond_to?(:id) && id_or_record.id.nil?
+
           id = ::Shard.global_id_for(id_or_record)
           raise "invalid argument for cache clearing #{id}" if id && !id.is_a?(Integer) && !Rails.env.production?
 
@@ -99,6 +101,8 @@ module ActiveRecord
           return nil unless skip_check || (global_id && valid_cache_key_type?(key_type) && Canvas::CacheRegister.enabled?)
 
           base_key = base_cache_register_key_for(global_id)
+          return nil unless base_key
+
           prefer_multi_cache = prefer_multi_cache_for_key_type?(key_type)
           redis = Canvas::CacheRegister.redis(base_key, ::Shard.shard_for(global_id), prefer_multi_cache: prefer_multi_cache)
           full_key = "#{base_key}/#{key_type}"
