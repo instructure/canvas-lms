@@ -2059,6 +2059,7 @@ ja:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: 特定のセクションのアナウンスメント作成を許可します
   allows_creating_discussions_for_a_specific_section_6bf44036: 特定のセクションのディスカッションの作成を許可します
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 注目のリンク、または新しいリンクとしてヘルプリンクをタグ付けして、ヘルプメニューで注目のヘルプリンクを人目に付くように表示できるようにします。
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: コースコンテンツの移行時に学習結果を選択できるようにします
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: 講師、デザイナー、TAベースの役割がチャットツールにアクセスできるようにします。
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: 講師/デザイナー/TAベースの役割がチャットツールにアクセスできるようにします。
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: 講師/TAベースの役割が出席ツールにアクセスできるようにします。
@@ -4661,15 +4662,19 @@ ja:
   calendars_toggle_list_visibility_488db143: "カレンダー: リストの表示/非表示の切り替え"
   can_create_and_update_submission_results_for_assig_51e7033d: ツールに関連付けられている課題の提出結果を作成し更新します。
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: ツールに関連付けられた成績表に課題データを作成して表示できます。
+  can_create_external_tools_4c293044: 外部ツールを作成できます。
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: 初期設定でコースページを作成、名前変更、編集できます
   can_create_subscription_to_data_service_data_bb2874f2: データサービスデータへのサブスクリプションを作成できます。
+  can_destroy_external_tools_cdb0e734: 外部ツールを破棄できます。
   can_destroy_subscription_to_data_service_data_b8dfca27: データサービスデータへのサブスクリプションを廃棄ことができます。
   can_edit_this_page_role_selection_6ccec3c7: このページの役割の選択を編集できます
   can_interact_with_users_in_their_section_only_48cb8c43: セクション内のユーザーのみと対話することができます
   can_list_categorized_event_types_52596f7: イベントタイプを分類して記載できます。
+  can_list_external_tools_9132ad0f: 外部ツールを記載できます。
   can_list_subscriptions_to_data_service_data_b52d5e37: データサービスデータへのサブスクリプションをリストアップできます。
   can_lookup_account_information_13d69520: アカウント情報を検索できます
   can_retrieve_user_data_associated_with_the_context_c5ec482c: インストールされているツールのコンテキストに関連付けられているユーザーデータを取得できます。
+  can_show_external_tools_bb4988c5: 外部ツールを表示できます。
   can_show_subscription_to_data_service_data_688ce3: データサービスデータへのサブスクリプションを表示できます。
   can_t_compute_score_until_an_assignment_has_points_f34dd600: 課題に配点を設定するまで、スコアは計算できません
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
@@ -4682,6 +4687,7 @@ ja:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: 受講生の提出物がある場合は、未公開にできません
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "受講生の提出物がある場合は、%{item_name} を未公開にできません"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "受講生の提出物がある場合は、%{name}を未公開にできません"
+  can_update_external_tools_168c1abe: 外部ツールを更新できます。
   can_update_public_jwk_for_lti_services_26037129: "LTI サービスのパブリック jwk を更新できます。"
   can_update_subscription_to_data_service_data_374a0c89: データサービスデータへのサブスクリプションを更新できます。
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: ツールに関連付けられている成績表の課題データを表示できます。
@@ -5306,6 +5312,8 @@ ja:
                 プレゼンテーションスライドの共有、アプリケーションやオ
                 ンラインリソースのデモンストレーションなどを行います。
   conference_36b50fda: 会議
+  conference_has_been_removed_f771cb11: 会議が削除されました
+  conference_has_been_updated_title_2bacc5fa: "会議が更新されました：%{title}"
   conference_selection_ea4050bb: 会議の選択
   conference_was_deleted_30869390: カンファレンスが削除されました
   conferences: 
@@ -9285,6 +9293,7 @@ ja:
   error_retrieving_content_c07ee76b: コンテンツを取得中にエラー
   error_retrieving_similarity_detection_tools_d6d4f9e9: 類似性検知ツールの取得中にエラーが発生しました
   error_running_quizzes_2_export_cfecedba: クイズ2のエクスポートを実行中にエラーが発生しました。
+  error_saving_assignment_dates_2af5e800: "課題日保存中エラー： "
   error_saving_discussion_settings_3360661d: ディスカッション設定保存宙にエラー
   error_sending_messages_13c874eb: メッセージ送付中にエラー
   error_sending_submission_comment_dc15d24f: 送信コメントの送信エラー
@@ -12179,6 +12188,7 @@ ja:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "無効な日付または無効な日時%{attr}"
   invalid_date_or_time_333acd43: 無効な日時です
   invalid_date_time_3ae423f5: 無効な日時です
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: 無効な日付が見つかりました。修正して再試行してください。
   invalid_datetime_for_graded_since_884cce5: （）の無効な日付graded_since
   invalid_datetime_for_submitted_since_a238f3a6: （）の無効な日付submitted_since
   invalid_domain_e810c1d: 無効なドメイン
@@ -15988,6 +15998,7 @@ ja:
   notifications_unsupported_65f6bf65: サポートされていない通知
   notifications_view_f9a60770: "通知 - 表示"
   notify_immediately_d1749c07: すぐに通知する
+  notify_students_in_time_of_assignments_that_requir_332ef10e: 注意が必要な課題に間に合うよう、受講生に通知します。
   notify_users_this_quiz_has_changed_c5b05995: この問題が変更されたことをユーザに通知します
   now_click_the_agenda_button_607fb40e: "*アジェンダ* ボタンをクリックします"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: コースが設定され、利用可能になりました。このチェックリストはもう必要ないかもしれませんが、後で新しいことをする場合や、コースのコンテンツを変更する際に参考情報として役に立つ可能性があるので、保存しておきます。
@@ -17648,6 +17659,7 @@ ja:
   progress_for_account_name_ef203250: "%{account_name}の進歩"
   progress_loading_bar_a26b8861: プログレス/ローディングバー
   project_groups_1fa0320b: "プロジェクト グループ"
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "代名詞がアカウントの代名詞と一致しないか、代名詞がこのアカウントで有効になっていません。%{user_id}はスキップします。"
   pronouns_d1cd8dd0: 代名詞
   pronouns_for_users_da46fb5: ユーザーの代名詞
   pronouns_users_can_show_after_their_name_e80821c7: 代名詞のユーザーは名前の後に表示できます
@@ -19500,6 +19512,7 @@ ja:
   remove_c_name_section_d8eabd3a: " %{c.name} セクションを削除"
   remove_collaborationtitle_c3e81adb: "\"%{collaborationTitle}\"を削除しますか？"
   remove_conference_69b9e0d0: 会議を削除する
+  remove_conference_title_207d32c0: "会議を削除する：%{title}"
   remove_contact_method_ca890ba3: 連絡方法を削除する
   remove_course_association_name_b760c502: "コース関連付けを削除%{name}"
   remove_dates_9b9ba2f6: 日付を削除
@@ -19648,6 +19661,7 @@ ja:
   retry_ebd5f8ba: 再試行
   retry_migrating_name_bdc802ef: "\"%{name}\"の移行を再試行する"
   return_to_parent_folder_4ece2184: 親フォルダーに戻る
+  revert_date_changes_5105ce5: 日付の変更を元に戻す
   revert_to_actual_score_f665eea9: 実際のスコアに戻す
   revert_to_old_ui_3211da41: "古い UI に戻る"
   review_now_318a6a3e: 今すぐレビューする
@@ -20332,6 +20346,7 @@ ja:
   select_video_file_35b61d4e: ビデオファイルを選択
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "ホーム ページに表示する内容を選択します。"
   select_whether_to_post_for_all_submissions_or_only_b18d681f: すべての提出に対して掲示するか、採点済みの掲示のみを掲示するかを選択します。
+  selectable_outcomes_during_course_content_migratio_3f108a1a: コースコンテンツの移行中に選択可能な結果
   selected_274ce24f: 選択されました
   selected_all_courses_9cfef57f: "すべての コースを選択しました"
   selected_answer: この解答が選択されました。
@@ -21295,6 +21310,10 @@ ja:
   show_only_blueprint_courses_9fb37b41: 青写真コースのみを表示する
   show_originality_report_to_students_be22f5ee: 受講生に独創性レポートを表示する
   show_params_3401895b: パラメータを表示する
+  show_past_account_level_announcements_to_users_3b8208e2: 過去のアカウントレベルのお知らせをユーザーに表示します
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      過去のアカウントレベルのお知らせをユーザーに表示します。
+      ユーザーに、終了した、または却下されたアナウンスを表示できるようにします。
   show_question_details_b059df00: 問題の詳細情報の表示
   show_recent_activity_stream_2be4abc1: 最近のアクティビティストリームを表示
   show_report_to_students_a07888a6: 受講生にレポートを表示する
@@ -21436,6 +21455,12 @@ ja:
       forward: 早送り
   slovak_69f48e1b: スロバキア語
   slovenian_30ae5208: スロベニア語
+  smart_alerts_43776718: スマートアラート
+  smart_alerts_44db622e: スマートアラート
+  smart_alerts_settings: 
+    threshold_12h: 12時間
+    threshold_24h: 24h
+    threshold_36h: 36h
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "Google Play"
@@ -22425,6 +22450,7 @@ ja:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: 十分にユーザに特権を与えたURLは、問題を試し、再現するために、同じページにいるレポーティングユーザになり切ることに使用することができます。
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: ユーザがエラーを報告したときにいたURLのページ
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: ユーザーはまた、相互リストを作成しようとしているコースに講師として登録されていなければなりません。
+  the_value_of_possible_points_for_this_assignment_c_42396e3: この課題に割り当て可能なポイントの値は、999999999を超えることはできません。
   their_grade_for_the_assignment_c36a60ef: 課題に対する成績
   theme_52404e51: テーマ
   theme_editor_b7b00f6b: テーマエディター
@@ -22720,6 +22746,7 @@ ja:
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: これは、あなたのアカウント全体にこれらの変更を適用します。続行しますか？
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: これは、アカウント全体にこのテーマを適用します。続行しますか？
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: これにより、まだ評価されていないこの成果を使用して、すべてのルーブリックが更新されます
+  threshold_in_hours_to_notify_students_within_f33820aa: 受講生に通知するしきい値（時間単位）
   threshold_pts_45f0e5d8: "域値：%{pts}"
   ticket_successfully_submitted_f6254460: チケットの提出が完了しました。
   ticketing_system_52205bff: チケットシステム
@@ -22869,6 +22896,7 @@ ja:
     port_moresby: ポートモレスビー
     prague: プラハ
     pretoria: プレトリア
+    puerto_rico: プエルトリコ
     quito: キト
     rangoon: ヤンゴン
     riga: リガ
