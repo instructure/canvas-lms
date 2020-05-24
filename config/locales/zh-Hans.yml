@@ -2059,6 +2059,7 @@ zh-Hans:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: 允许为特定分组创建公告
   allows_creating_discussions_for_a_specific_section_6bf44036: 允许为特定分组创建讨论
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 允许将帮助链接标记为“特色”或“新”，并且在帮助菜单中突出显示特色帮助链接。
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: 允许在迁移课程内容时可选择学习结果
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "允许基于教师、设计者、助教身份访问聊天 (Chat) 工具。"
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: 允许基于教师/设计者/助教的角色访问聊天工具。
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: 允许基于教师/助教的角色访问考勤工具。
@@ -4654,15 +4655,19 @@ zh-Hans:
   calendars_toggle_list_visibility_488db143: 日历切换可视列表
   can_create_and_update_submission_results_for_assig_51e7033d: 可以创建和更新与工具相关的作业的提交结果。
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: 可以在评分册中创建和查看与工具相关的作业数据。
+  can_create_external_tools_4c293044: 可以创建外部工具。
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: 按照默认设置，可用创建、重命名、编辑课程页面
   can_create_subscription_to_data_service_data_bb2874f2: 可以创建数据服务数据订阅。
+  can_destroy_external_tools_cdb0e734: 可以销毁外部工具。
   can_destroy_subscription_to_data_service_data_b8dfca27: 可以销毁数据服务数据订阅。
   can_edit_this_page_role_selection_6ccec3c7: 可以编辑此页面角色选择
   can_interact_with_users_in_their_section_only_48cb8c43: 只可在他们的班级内与用户互动
   can_list_categorized_event_types_52596f7: 可以列出类别事件类型。
+  can_list_external_tools_9132ad0f: 可以列出外部工具。
   can_list_subscriptions_to_data_service_data_b52d5e37: 可以列出数据服务数据订阅。
   can_lookup_account_information_13d69520: 可以查找帐户信息
   can_retrieve_user_data_associated_with_the_context_c5ec482c: 可以提取与安装了工具的上下文相关的用户数据。
+  can_show_external_tools_bb4988c5: 可以显示外部工具。
   can_show_subscription_to_data_service_data_688ce3: 可以显示数据服务数据订阅。
   can_t_compute_score_until_an_assignment_has_points_f34dd600: 作业具有可能的得分时，方可计算得分
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
@@ -4675,6 +4680,7 @@ zh-Hans:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: 如果有学生提交，则无法取消发布。
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "如果有学生提交，则无法取消发布的 %{item_name}。"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "如果有学生提交，则无法取消发布的%{name}"
+  can_update_external_tools_168c1abe: 可以更新外部工具。
   can_update_public_jwk_for_lti_services_26037129: 可以更新LTI服务的公共jwk。
   can_update_subscription_to_data_service_data_374a0c89: 可以更新数据服务数据订阅。
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: 可以在评分册中查看与工具相关的作业数据。
@@ -5299,6 +5305,8 @@ zh-Hans:
       分享演示幻灯片、演示应用
       和在线资源等。
   conference_36b50fda: 会议
+  conference_has_been_removed_f771cb11: 会议已删除
+  conference_has_been_updated_title_2bacc5fa: "会议已更新：%{title}"
   conference_selection_ea4050bb: 会议选择
   conference_was_deleted_30869390: 会议被删除
   conferences: 
@@ -9274,6 +9282,7 @@ zh-Hans:
   error_retrieving_content_c07ee76b: 提取内容时出错
   error_retrieving_similarity_detection_tools_d6d4f9e9: 检索相似性检测工具时发生错误
   error_running_quizzes_2_export_cfecedba: "运行测验 2 导出时出现错误。"
+  error_saving_assignment_dates_2af5e800: "保存作业日期时发生错误： "
   error_saving_discussion_settings_3360661d: 保存讨论设置时出错
   error_sending_messages_13c874eb: 发送消息时出现错误
   error_sending_submission_comment_dc15d24f: 发送提交项评论时出错
@@ -12165,6 +12174,7 @@ zh-Hans:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "无效的日期或无效的日期时间%{attr}"
   invalid_date_or_time_333acd43: 日期或时间无效
   invalid_date_time_3ae423f5: 日期-时间无效
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: 找到无效的日期。请更正并重试。
   invalid_datetime_for_graded_since_884cce5: 无效的日期时间graded_since
   invalid_datetime_for_submitted_since_a238f3a6: 无效的日期时间submitted_since
   invalid_domain_e810c1d: 域无效
@@ -15974,6 +15984,7 @@ zh-Hans:
   notifications_unsupported_65f6bf65: 不支持通知
   notifications_view_f9a60770: "通知 - 查看"
   notify_immediately_d1749c07: 立即通知
+  notify_students_in_time_of_assignments_that_requir_332ef10e: 在有需要学生注意的作业时通知学生。
   notify_users_this_quiz_has_changed_c5b05995: 通知用户此测验已经改变
   now_click_the_agenda_button_607fb40e: "现在请单击 *议程* 按钮"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: 现在，您的课程已设置就绪并可供使用，您可能不再需要这份清单。但我们会保留它，以便您在今后想尝试一些新操作或对课程内容进行更改时，能够为您提供一些额外帮助。
@@ -17639,6 +17650,7 @@ zh-Hans:
   progress_for_account_name_ef203250: "取得进展 %{account_name}"
   progress_loading_bar_a26b8861: 进展/加载条码
   project_groups_1fa0320b: 工程组
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "代词与帐户代表不匹配或未对此帐户启用代词，%{user_id}，跳过"
   pronouns_d1cd8dd0: 代词
   pronouns_for_users_da46fb5: 用户代词
   pronouns_users_can_show_after_their_name_e80821c7: 用户可以在其姓名之后显示代词
@@ -19492,6 +19504,7 @@ zh-Hans:
   remove_c_name_section_d8eabd3a: "删除%{c.name} 部分"
   remove_collaborationtitle_c3e81adb: "删除“%{collaborationTitle}”？"
   remove_conference_69b9e0d0: 删除会议
+  remove_conference_title_207d32c0: "删除会议：%{title}"
   remove_contact_method_ca890ba3: 移除联系方式
   remove_course_association_name_b760c502: "移除课程关联%{name}"
   remove_dates_9b9ba2f6: 删除日期
@@ -19640,6 +19653,7 @@ zh-Hans:
   retry_ebd5f8ba: 重试
   retry_migrating_name_bdc802ef: "重新尝试迁移\"%{name}\""
   return_to_parent_folder_4ece2184: 返回至父文件夹
+  revert_date_changes_5105ce5: 撤回日期更改
   revert_to_actual_score_f665eea9: 还原到实际得分
   revert_to_old_ui_3211da41: 复原成旧用户界面
   review_now_318a6a3e: 立即查看
@@ -20324,6 +20338,7 @@ zh-Hans:
   select_video_file_35b61d4e: 选择视频文件
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: 选择您要在主页上显示的内容。
   select_whether_to_post_for_all_submissions_or_only_b18d681f: 选择是否发布所有提交项，或只发布已评分的提交项。
+  selectable_outcomes_during_course_content_migratio_3f108a1a: 在课程内容迁移期间的可选择结果
   selected_274ce24f: 已选择
   selected_all_courses_9cfef57f: 已选择所有课程
   selected_answer: 您已选择此答案。
@@ -21282,6 +21297,10 @@ zh-Hans:
   show_only_blueprint_courses_9fb37b41: 仅显示蓝图课程
   show_originality_report_to_students_be22f5ee: 向学生显示原创性报告
   show_params_3401895b: 显示参数
+  show_past_account_level_announcements_to_users_3b8208e2: 向用户显示过去的帐户级别通知
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      向用户显示过去的帐户级别通知。允许
+      用户查看已结束或被拒绝的通知。
   show_question_details_b059df00: 显示问题的详细信息
   show_recent_activity_stream_2be4abc1: 显示最近的活动流
   show_report_to_students_a07888a6: 向学生显示报告
@@ -21423,6 +21442,12 @@ zh-Hans:
       forward: 转发
   slovak_69f48e1b: 斯洛伐克语
   slovenian_30ae5208: 斯洛文尼亚语
+  smart_alerts_43776718: 智能提醒
+  smart_alerts_44db622e: 智能提醒
+  smart_alerts_settings: 
+    threshold_12h: "12 小时"
+    threshold_24h: "24 小时"
+    threshold_36h: "36 小时"
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "在 Google Play 中"
@@ -22410,6 +22435,7 @@ zh-Hans:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: 一个有足够优越用户的网站可以用来伪装成同一个页面上的用户报告，以尝试重现该问题。
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: 当用户报告错误时使用的网站
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: 用户还必须在他们试图交叉列出的课程中注册为讲师。
+  the_value_of_possible_points_for_this_assignment_c_42396e3: "该作业的最高分值不得超过 999999999。"
   their_grade_for_the_assignment_c36a60ef: 其作业的评分
   theme_52404e51: 主题、话题
   theme_editor_b7b00f6b: 主题编辑器
@@ -22705,6 +22731,7 @@ zh-Hans:
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "这将适用于改变您的整个账户。 您还想继续吗？"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: 这将应用此主题到您的整个帐户。您想继续吗？
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: 这将使用此结果更新所有未评估的评价量规
+  threshold_in_hours_to_notify_students_within_f33820aa: 向学生发出通知的时限（小时）
   threshold_pts_45f0e5d8: "阈值：%{pts}"
   ticket_successfully_submitted_f6254460: 任务单成功提交
   ticketing_system_52205bff: 票务系统
@@ -22854,6 +22881,7 @@ zh-Hans:
     port_moresby: 莫尔兹比港
     prague: 布拉格
     pretoria: 比勒陀利亚
+    puerto_rico: 波多黎各
     quito: 基多
     rangoon: 仰光
     riga: 里加
