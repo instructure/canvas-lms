@@ -2111,6 +2111,7 @@ ar:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "يسمح بإنشاء إعلانات لقسم محدد."
   allows_creating_discussions_for_a_specific_section_6bf44036: "يسمح بإنشاء نقاشات لقسم محدد"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "تسمح بتمييز روابط التعليمات كروابط بارزة أو جديدة وتعرض رابط التعليمات البارزة بشكل واضح في قائمة التعليمات."
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "السماح بإمكانية تحديد نتائج التعليم عند ترحيل محتوى المساق"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "يسمح للأدوار القائمة على المعلم، المصمم، المعلم المساعد بالوصول إلى أداة الدردشة."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "يسمح للأدوار القائمة على المعلم/المصمم/المعلم المساعد بالوصول إلى أداة الدردشة."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "يسمح للأدوار القائمة على المعلم/المعلم المساعد على TA بالوصول إلى أداة الدردشة."
@@ -4780,15 +4781,19 @@ ar:
   calendars_toggle_list_visibility_488db143: "تقوم التقييمات بتبديل رؤية القائمة"
   can_create_and_update_submission_results_for_assig_51e7033d: "يمكن إنشاء وتحديث نتائج الإرسال للمهام المقترنة بالأداة."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "يمكن إنشاء وعرض بيانات المهمة في دفتر الدرجات المقترن بالأداة."
+  can_create_external_tools_4c293044: "يمكن إنشاء أدوات خارجية."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "يستطيع إنشاء صفحات المساق وإعادة تسميتها وتحريرها بشكل افتراضي"
   can_create_subscription_to_data_service_data_bb2874f2: "يمكن إنشاء اشتراك لبيانات خدمة البيانات."
+  can_destroy_external_tools_cdb0e734: "يمكن تدمير أدوات خارجية."
   can_destroy_subscription_to_data_service_data_b8dfca27: "يمكن إلغاء اشتراك بيانات خدمة البيانات."
   can_edit_this_page_role_selection_6ccec3c7: "يمكن تحرير تحديد دور هذه الصفحة"
   can_interact_with_users_in_their_section_only_48cb8c43: "يمكن التفاعل مع المستخدمين في القسم الخاص بهم فقط"
   can_list_categorized_event_types_52596f7: "يمكن إدراج أنواع أحداث قابلة للتصنيف."
+  can_list_external_tools_9132ad0f: "يمكن إدراج أدوات خارجية."
   can_list_subscriptions_to_data_service_data_b52d5e37: "يمكن إدراج اشتراكات بيانات خدمة البيانات."
   can_lookup_account_information_13d69520: "يمكن البحث عن معلومات الحساب"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "يمكن استرداد بيانات المستخدم المقترنة بالسياق المثبت فيها الأداة."
+  can_show_external_tools_bb4988c5: "يمكن إظهار أدوات خارجية."
   can_show_subscription_to_data_service_data_688ce3: "يمكن إظهار اشتراك بيانات خدمة البيانات."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "لا يمكن حساب مجموع الدرجات إلا أن تكون للمهمة نقاط ممكنة"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
@@ -4801,6 +4806,7 @@ ar:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "لا يمكن إلغاء النشر في حال وجود عمليات إرسال لطالب"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "لا يمكن إلغاء نشر %{item_name} في حال وجود عمليات إرسال لطالب"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "لا يمكن إلغاء نشر %{name} في حال وجود عمليات إرسال لطالب"
+  can_update_external_tools_168c1abe: "يمكن تحديث أدوات خارجية."
   can_update_public_jwk_for_lti_services_26037129: "يمكن تحديث jwk العام لخدمات LTI."
   can_update_subscription_to_data_service_data_374a0c89: "يمكن تحديث اشتراك بيانات خدمة البيانات."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "يمكن عرض بيانات المهمة في دفتر الدرجات المقترن بالأداة."
@@ -5429,6 +5435,8 @@ ar:
       وتقديم عروض توضيحية للتطبيقات والموارد عبر الإنترنت
       والمزيد.
   conference_36b50fda: مؤتمر
+  conference_has_been_removed_f771cb11: "تمت إزالة المؤتمر"
+  conference_has_been_updated_title_2bacc5fa: "تم تحديث المؤتمر: %{title}"
   conference_selection_ea4050bb: "تحديد المؤتمر"
   conference_was_deleted_30869390: "تم حذف المؤتمر"
   conferences: 
@@ -9696,6 +9704,7 @@ ar:
   error_retrieving_content_c07ee76b: "حدث خطأ في استعادة المحتوى"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "خطأ أثناء استعادة أدوات اكتشاف التشابه"
   error_running_quizzes_2_export_cfecedba: "خطأ أثناء تشغيل تصدير اختبارات موجزة 2."
+  error_saving_assignment_dates_2af5e800: "حدث خطأ أثناء حفظ تواريخ المهمة: "
   error_saving_discussion_settings_3360661d: "خطأ أثناء حفظ إعدادات المناقشة"
   error_sending_messages_13c874eb: "خطأ في إرسال الرسائل"
   error_sending_submission_comment_dc15d24f: "خطأ أثناء إرسال محتوى الإرسال"
@@ -12695,6 +12704,7 @@ ar:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "تاريخ غير صالح أو تاريخ/وقت غير صالح لـ %{attr}"
   invalid_date_or_time_333acd43: "التاريخ أو الوقت غير صالحين"
   invalid_date_time_3ae423f5: "التاريخ-الوقت غير صالحين"
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: "تم العثور على تواريخ غير صالحة. يُرجى تصحيحها والمحاولة مجددًا."
   invalid_datetime_for_graded_since_884cce5: "تاريخ/وقت غير صالح لـ graded_since"
   invalid_datetime_for_submitted_since_a238f3a6: "تاريخ/وقت غير صالح لـ submitted_since"
   invalid_domain_e810c1d: "مجال غير صالح"
@@ -16584,6 +16594,7 @@ ar:
   notifications_unsupported_65f6bf65: "الإعلامات غير مدعومة"
   notifications_view_f9a60770: "الإعلامات - عرض"
   notify_immediately_d1749c07: "الإعلام الفوري"
+  notify_students_in_time_of_assignments_that_requir_332ef10e: "إعلام الطلاب في وقت المهام التي تستدعي اهتمامهم."
   notify_users_this_quiz_has_changed_c5b05995: "إعلام المستخدمين بأن هذا الاختبار قد تغير"
   now_click_the_agenda_button_607fb40e: "انقر فوق زر *جدول الأعمال*"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "تم الآن إعداد المساق الخاص بك وأصبح متاحًا، ربما لا تعد في حاجة إلى قائمة التحقق هذه ولكننا سنحتفظ بها لترجع إليها إذا رأيت فيما بعد أنك في حاجة إلى تجربة شيء جديد أو إن احتجت إلى مساعدة إضافية أثناء إجرائك تغييرات على محتوى المساق."
@@ -18270,6 +18281,7 @@ ar:
   progress_for_account_name_ef203250: "تقدم %{account_name}"
   progress_loading_bar_a26b8861: "شريط التقدم/التحميل"
   project_groups_1fa0320b: "مجموعات المشروع"
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "الضمير لا يطابق ضمير الحساب أو الضمائر ليست ممكنة لهذا الحساب، %{user_id}، جارٍ التجاوز"
   pronouns_d1cd8dd0: الضمائر
   pronouns_for_users_da46fb5: "الضمائر للمستخدمين"
   pronouns_users_can_show_after_their_name_e80821c7: "يمكن إظهار مستخدمين الضمائر بعد أسمائهم"
@@ -20313,6 +20325,7 @@ ar:
   remove_c_name_section_d8eabd3a: "إزالة القسم %{c.name}"
   remove_collaborationtitle_c3e81adb: "إزالة \"%{collaborationTitle}\"؟"
   remove_conference_69b9e0d0: "إزالة مؤتمر"
+  remove_conference_title_207d32c0: "إزالة المؤتمر: %{title}"
   remove_contact_method_ca890ba3: "إزالة طريقة الاتصال"
   remove_course_association_name_b760c502: "إزالة اقتران المساق %{name}"
   remove_dates_9b9ba2f6: "إزالة التواريخ"
@@ -20461,6 +20474,7 @@ ar:
   retry_ebd5f8ba: "إعادة المحاولة"
   retry_migrating_name_bdc802ef: "أعد محاولة ترحيل \"%{name}\""
   return_to_parent_folder_4ece2184: "العودة للمجلد الأصلي"
+  revert_date_changes_5105ce5: "الرجوع عن تغييرات التاريخ"
   revert_to_actual_score_f665eea9: "العودة إلى الدرجة الفعلية"
   revert_to_old_ui_3211da41: "الرجوع إلى واجهة المستخدم القديمة"
   review_now_318a6a3e: "قم بالمراجعة الآن"
@@ -21178,6 +21192,7 @@ ar:
   select_video_file_35b61d4e: "تحديد ملف الفيديو"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "تحديد ما ترغب في عرضه بالصفحة الرئيسية."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "حدد ما إذا كنت تريد نشر جميع الإرسالات أم التي تم وضع درجة لها فقط."
+  selectable_outcomes_during_course_content_migratio_3f108a1a: "نتائج يمكن تحديدها أثناء ترحيل محتوى المساق"
   selected_274ce24f: "تم التحديد"
   selected_all_courses_9cfef57f: "جميع المساقات المحددة"
   selected_answer: "لقد حددت هذه الإجابة."
@@ -22169,6 +22184,10 @@ ar:
   show_only_blueprint_courses_9fb37b41: "إظهار مساقات مخططة فقط"
   show_originality_report_to_students_be22f5ee: "إظهار تقرير الأصالة للطلاب"
   show_params_3401895b: "إظهار المعلمات"
+  show_past_account_level_announcements_to_users_3b8208e2: "إظهار إعلانات مستوى الحساب السابقة للمستخدمين"
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      إظهار إعلانات مستوى الحساب السابقة للمستخدمين السماح
+      للمستخدم بمشاهدة الإعلانات التي انتهت أو تم تجاهلها.
   show_question_details_b059df00: "عرض تفاصيل السؤال"
   show_recent_activity_stream_2be4abc1: "عرض تدفق آخر أنشطة"
   show_report_to_students_a07888a6: "إظهار تقرير للطلاب"
@@ -22310,6 +22329,12 @@ ar:
       forward: "إعادة توجيه"
   slovak_69f48e1b: السلوفاكية
   slovenian_30ae5208: السلوفينية
+  smart_alerts_43776718: "تنبيهات ذكية"
+  smart_alerts_44db622e: "تنبيهات ذكية"
+  smart_alerts_settings: 
+    threshold_12h: "12 ساعة"
+    threshold_24h: "24 ساعة"
+    threshold_36h: "36 ساعة"
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "في Google Play"
@@ -23333,6 +23358,7 @@ ar:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "عنوان URL الذي يمكن أن يستعمله مستخدم يتمتع بما يكفي من الامتيازات لانتحال شخصية المستخدم الذي يقوم بالإبلاغ في نفس الصفحة من أجل تجريب المشكلة وإعادة إنشائها"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "عنوان URL الخاص بالصفحة التي كان يستعملها المستخدم أثناء قيامه بالإبلاغ عن الخطأ"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "يجب أيضًا تسجيل المستخدم في صورة معلم في المساقات التي يحاولون إدراجها بشكل متعدد."
+  the_value_of_possible_points_for_this_assignment_c_42396e3: "لا يمكن أن تتجاوز قيمة النقاط المحتملة لهذه المهمة 999999999."
   their_grade_for_the_assignment_c36a60ef: "الدرجة الخاصة بالمهمة"
   theme_52404e51: النسق
   theme_editor_b7b00f6b: "محرر النسق"
@@ -23640,6 +23666,7 @@ ar:
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "سيُدخل ذلك على حسابك بأكمله تلك الغييرات. هل تريد المتابعة؟"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "سيطبق ذلك هذا النسق على حسابك بأكمله. هل تريد المتابعة؟"
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "سيؤدي هذا إلى تحديث كل المعايير التي تستخدم هذا الناتج التي لم يتم تقييمها بعد"
+  threshold_in_hours_to_notify_students_within_f33820aa: "الحد (في الساعات) لإعلام الطلاب خلال"
   threshold_pts_45f0e5d8: "الحد %{pts}"
   ticket_successfully_submitted_f6254460: "تم إرسال البطاقة بنجاح."
   ticketing_system_52205bff: "نظام التذاكر"
@@ -23797,6 +23824,7 @@ ar:
     port_moresby: "بورت مورسبي"
     prague: براغ
     pretoria: بريتوريا
+    puerto_rico: بورتوريكو
     quito: كيتو
     rangoon: رانغون
     riga: ريغا
