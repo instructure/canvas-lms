@@ -2062,6 +2062,7 @@ en-GB:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Allows creating announcements for a specific section"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Allows creating discussions for a specific section"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu."
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Allows learning outcomes to be selectable when migrating course content"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Allows teacher, designer, TA-based roles to access the Chat tool."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Allows teacher/designer/TA-based roles to access the Chat tool."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Allows teacher/TA-based roles to access the Attendance tool."
@@ -4669,15 +4670,19 @@ en-GB:
   calendars_toggle_list_visibility_488db143: "Calendars toggle list visibility"
   can_create_and_update_submission_results_for_assig_51e7033d: "Can create and update submission results for assignments associated with the tool."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Can create and view assignment data in the gradebook associated with the tool."
+  can_create_external_tools_4c293044: "Can create external tools."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "can create, rename, and edit course pages by default"
   can_create_subscription_to_data_service_data_bb2874f2: "Can create subscription to data service data."
+  can_destroy_external_tools_cdb0e734: "Can destroy external tools."
   can_destroy_subscription_to_data_service_data_b8dfca27: "Can destroy subscription to data service data."
   can_edit_this_page_role_selection_6ccec3c7: "Can edit this page role selection"
   can_interact_with_users_in_their_section_only_48cb8c43: "Can interact with users in their section only"
   can_list_categorized_event_types_52596f7: "Can list categorized event types."
+  can_list_external_tools_9132ad0f: "Can list external tools."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Can list subscriptions to data service data."
   can_lookup_account_information_13d69520: "Can lookup Account information"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Can retrieve user data associated with the context the tool is installed in."
+  can_show_external_tools_bb4988c5: "Can show external tools."
   can_show_subscription_to_data_service_data_688ce3: "Can show subscription to data service data."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Can't compute score until an assignment has points possible"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
@@ -4690,6 +4695,7 @@ en-GB:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Cannot unpublish if there are student submissions"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Cannot unpublish %{item_name} if there are student submissions"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Cannot unpublish %{name} if there are student submissions"
+  can_update_external_tools_168c1abe: "Can update external tools."
   can_update_public_jwk_for_lti_services_26037129: "Can update public jwk for LTI services."
   can_update_subscription_to_data_service_data_374a0c89: "Can update subscription to data service data."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Can view assignment data in the gradebook associated with the tool."
@@ -5322,6 +5328,8 @@ en-GB:
                 slides, give demonstrations of applications and online resources,
                 and more.
   conference_36b50fda: Conference
+  conference_has_been_removed_f771cb11: "Conference has been removed"
+  conference_has_been_updated_title_2bacc5fa: "Conference has been updated: %{title}"
   conference_selection_ea4050bb: "Conference Selection"
   conference_was_deleted_30869390: "Conference was deleted"
   conferences: 
@@ -9306,6 +9314,7 @@ en-GB:
   error_retrieving_content_c07ee76b: "Error retrieving content"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Error retrieving similarity detection tools"
   error_running_quizzes_2_export_cfecedba: "Error running Quizzes 2 export."
+  error_saving_assignment_dates_2af5e800: "Error saving assignment dates: "
   error_saving_discussion_settings_3360661d: "Error saving discussion settings"
   error_sending_messages_13c874eb: "Error sending messages"
   error_sending_submission_comment_dc15d24f: "Error sending submission comment"
@@ -12226,6 +12235,7 @@ en-GB:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Invalid date or invalid datetime for %{attr}"
   invalid_date_or_time_333acd43: "Invalid date or time"
   invalid_date_time_3ae423f5: "Invalid date-time"
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: "Invalid dates were found. Please correct them and try again."
   invalid_datetime_for_graded_since_884cce5: "Invalid date/time for graded_since"
   invalid_datetime_for_submitted_since_a238f3a6: "Invalid date/time for submitted_since"
   invalid_domain_e810c1d: "Invalid domain"
@@ -16036,6 +16046,7 @@ en-GB:
   notifications_unsupported_65f6bf65: "Notifications unsupported"
   notifications_view_f9a60770: "Notifications - view"
   notify_immediately_d1749c07: "Notify immediately"
+  notify_students_in_time_of_assignments_that_requir_332ef10e: "Notify students in time of assignments that require their attention."
   notify_users_this_quiz_has_changed_c5b05995: "Notify users this quiz has changed"
   now_click_the_agenda_button_607fb40e: "Now click the *Agenda* button"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Now that your course is set up and available, you probably won't need this checklist anymore. But we'll keep it around in case you realise later you want to try something new, or you just want a little extra help as you make changes to your course content."
@@ -17708,6 +17719,7 @@ en-GB:
   progress_for_account_name_ef203250: "Progress for %{account_name}"
   progress_loading_bar_a26b8861: "Progress/loading bar"
   project_groups_1fa0320b: "Project groups"
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "Pronoun does not match account pronoun or pronouns are not enabled for this account, %{user_id}, skipping"
   pronouns_d1cd8dd0: Pronouns
   pronouns_for_users_da46fb5: "Pronouns for users"
   pronouns_users_can_show_after_their_name_e80821c7: "Pronouns users can show after their name"
@@ -19568,6 +19580,7 @@ en-GB:
   remove_c_name_section_d8eabd3a: "Remove %{c.name} section"
   remove_collaborationtitle_c3e81adb: "Remove \"%{collaborationTitle}\"?"
   remove_conference_69b9e0d0: "Remove conference"
+  remove_conference_title_207d32c0: "Remove conference: %{title}"
   remove_contact_method_ca890ba3: "Remove contact method"
   remove_course_association_name_b760c502: "Remove course association %{name}"
   remove_dates_9b9ba2f6: "Remove Dates"
@@ -19717,6 +19730,7 @@ en-GB:
   retry_ebd5f8ba: Retry
   retry_migrating_name_bdc802ef: "Retry migrating \"%{name}\""
   return_to_parent_folder_4ece2184: "return to parent folder"
+  revert_date_changes_5105ce5: "Revert date changes"
   revert_to_actual_score_f665eea9: "Revert to actual score"
   revert_to_old_ui_3211da41: "Revert to old UI"
   review_now_318a6a3e: "Review now"
@@ -20402,6 +20416,7 @@ en-GB:
   select_video_file_35b61d4e: "Select Video File"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Select what you'd like to display on the home page."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "Select whether to post for all submissions, or only graded ones."
+  selectable_outcomes_during_course_content_migratio_3f108a1a: "Selectable outcomes during course content migration"
   selected_274ce24f: Selected
   selected_all_courses_9cfef57f: "Selected all courses"
   selected_answer: "You selected this answer."
@@ -21373,6 +21388,10 @@ en-GB:
   show_only_blueprint_courses_9fb37b41: "Show only blueprint courses"
   show_originality_report_to_students_be22f5ee: "Show originality report to students"
   show_params_3401895b: "Show params"
+  show_past_account_level_announcements_to_users_3b8208e2: "Show past account level announcements to users"
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      Show past account level announcements to users. Allows
+      a user to view announcements that have ended or been dismissed.
   show_question_details_b059df00: "Show question details"
   show_recent_activity_stream_2be4abc1: "Show recent activity stream"
   show_report_to_students_a07888a6: "Show report to students"
@@ -21514,6 +21533,12 @@ en-GB:
       forward: Forward
   slovak_69f48e1b: Slovak
   slovenian_30ae5208: Slovenian
+  smart_alerts_43776718: "Smart Alerts"
+  smart_alerts_44db622e: "Smart alerts"
+  smart_alerts_settings: 
+    threshold_12h: 12h
+    threshold_24h: 24h
+    threshold_36h: 36h
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "In Google Play"
@@ -22504,6 +22529,7 @@ en-GB:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL a sufficiently priviledged user could use to masquerade as reporting user on the same page to try and reproduce stated problem"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL of the page user was on when s/he reported the error"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "The user must also be enrolled as an instructor in the courses they are trying to cross-list."
+  the_value_of_possible_points_for_this_assignment_c_42396e3: "The value of possible points for this assignment cannot exceed 999999999."
   their_grade_for_the_assignment_c36a60ef: "Their grade for the assignment"
   theme_52404e51: Theme
   theme_editor_b7b00f6b: "Theme editor"
@@ -22799,6 +22825,7 @@ en-GB:
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "This will apply these changes to your entire account. Would you like to proceed?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "This will apply this theme to your entire account. Would you like to proceed?"
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "This will update all rubrics using this outcome that have not yet been assessed"
+  threshold_in_hours_to_notify_students_within_f33820aa: "Threshold (in hours) to notify students within"
   threshold_pts_45f0e5d8: "threshold: %{pts}"
   ticket_successfully_submitted_f6254460: "Ticket successfully submitted."
   ticketing_system_52205bff: "Ticketing System"
@@ -22948,6 +22975,7 @@ en-GB:
     port_moresby: "Port Moresby"
     prague: Prague
     pretoria: Pretoria
+    puerto_rico: "Puerto Rico"
     quito: Quito
     rangoon: Rangoon
     riga: Riga
