@@ -72,6 +72,7 @@ const Card = styled.div`
       border-bottom: 1px solid #e4e4e4;
 
       .course-list-item {
+        font-family: 'Open Sans', sans-serif;
         font-size: 12px;
         box-sizing: border-box;
         display: flex;
@@ -81,18 +82,23 @@ const Card = styled.div`
         padding: 0.7rem 1rem;
         width: 100%;
         cursor: pointer;
+
+        &:hover {
+          text-decoration: none;
+
+          .course-name {
+            text-decoration: underline;
+          }
+        }
   
         .course-name {
           color: #005888;
           text-align: left;
           word-break: break-word;
-  
-          &:hover {
-            text-decoration: underline;
-          }
         }
   
         .course-score {
+          color: #005888;
           font-weight: bold;
           text-align: right;
           flex-basis: 40%;
@@ -178,7 +184,12 @@ class ObserveeCard extends React.Component {
 
   renderAttendanceLockout(status) {
     if (status) {
-      return <div className="attendance-lockout"><i className="icon-lock"></i><p>Student locked out of courses</p></div>;
+      return (
+        <div className="attendance-lockout">
+          <i className="icon-lock" aria-hidden="true"></i>
+          <p>Student locked out of courses</p>
+        </div>
+      );
     }
   }
 
@@ -187,7 +198,7 @@ class ObserveeCard extends React.Component {
       <Card avatar_image={this.state.user.avatar_image_url}>
         <div className="observee-info">
           <div className={`avatar ${this.state.user.is_online ? 'online-now' : ''}`}></div>
-          <p>{this.state.user.name}</p>
+          <p aria-label="Student Name">{this.state.user.name}</p>
           {this.renderAttendanceLockout(this.state.user.locked_out)}
         </div>
         <div className="observee-courses">
@@ -196,13 +207,13 @@ class ObserveeCard extends React.Component {
                 return (
                   <div>
                     { this.state.showDetails === enr.id ? this.renderCourseDetails(enr, this.getCustomColor(enr), this.formatScore(enr.score), this.state.courseDetails) : undefined }
-                    <p className="course-list-item" onClick={this.showCourseInfo.bind(this, enr)}>
-                      <span className="course-name">{enr.course_name}</span>
-                      <span className="course-score">
+                    <a className="course-list-item" onClick={this.showCourseInfo.bind(this, enr)} href="#">
+                      <span className="course-name" aria-label={enr.course_name}>{enr.course_name}</span>
+                      <span className="course-score" aria-label={this.formatScore(enr.score)}>
                         {this.formatScore(enr.score)}
-                        <i className="icon-arrow-open-right"></i>
+                        <i className="icon-arrow-open-right" aria-hidden="true"></i>
                       </span>
-                    </p>
+                    </a>
                   </div>
                 )
               })

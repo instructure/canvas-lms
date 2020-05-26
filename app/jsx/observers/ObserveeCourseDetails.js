@@ -201,7 +201,11 @@ class ObserveeCourseDetails extends React.Component {
   renderMissingAssignments(num) {
     // only render this element if there are missing assignments
     if (num > 0) {
-      return <div><span className="missing-assignments">{this.props.course_details.missing_assignments} missing assignments</span></div>;
+      return (
+        <div>
+          <span className="missing-assignments">{this.props.course_details.missing_assignments} missing assignments</span>
+        </div>
+      );
     }
   }
 
@@ -209,11 +213,11 @@ class ObserveeCourseDetails extends React.Component {
     return (
       <Card course_color={this.props.color} className={this.props.is_showing ? 'animate-card' : ''} assignment_color={this.missingAssignmentColor(this.props.course_details.missing_assignments, this.props.course_details.total_assignment_count)}>
         <section className="course-title">
-          <a className="back-button" href="#" onClick={this.props.reset_action}>
+          <a className="back-button" href="#" onClick={this.props.reset_action} alt="Back to courses">
             <i className="icon-arrow-open-left"></i>
           </a>
           <h4>{this.props.enrollment.course_name}</h4>
-          <a className="show-tooltip" href="#" title="More information about this card">
+          <a className="show-tooltip" href="#" alt="More information about this card">
             <i className="icon-info"></i>
           </a>
         </section>
@@ -224,7 +228,7 @@ class ObserveeCourseDetails extends React.Component {
           </p>
           <div className="missing-assignments-placeholder" aria-hidden="true"></div>
           { this.renderMissingAssignments(this.props.course_details.missing_assignments) }
-          <p className="course-score">{this.props.score}</p>
+          <p className="course-score" aria-label="Course Grade">{this.props.score}</p>
           <div className="flex-widgets">
             <div>
               <p className="last-active">
@@ -241,7 +245,7 @@ class ObserveeCourseDetails extends React.Component {
           </div>
           <a className="gradebook-link"
             href={`/courses/${this.props.enrollment.course_id}/grades?true_grade=true`}
-            title={`${this.props.enrollment.course_name} grades`}>
+            alt={`${this.props.enrollment.course_name} grades`}>
               View Grades
           </a>
         </section>
