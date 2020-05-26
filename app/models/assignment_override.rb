@@ -82,6 +82,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   after_save :touch_assignment, :if => :assignment
   after_save :update_grading_period_grades
+  after_save :update_due_date_smart_alerts, if: :update_cached_due_dates?
   after_commit :update_cached_due_dates
 
   def set_not_empty?
@@ -146,6 +147,20 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
+  def update_due_date_smart_alerts
+    if self.due_at.nil? || self.due_at < Time.zone.now
+      ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: self.id, alert_type: :due_date_reminder)&.destroy
+    else
+      ScheduledSmartAlert.upsert(
+        context_type: self.class.name,
+        context_id: self.id,
+        alert_type: :due_date_reminder,
+        due_at: self.due_at,
+        root_account_id: root_account_id
+      )
+    end
+  end
+
   def touch_assignment
     return true if assignment.nil? || dont_touch_assignment
     assignment.touch
@@ -169,6 +184,8 @@ class AssignmentOverride < ActiveRecord::Base
       self.default_values
       self.save!(validate: false)
     end
+
+    ScheduledSmartAlert.where(context_type: self.class.name, context_id: self.id).destroy_all
   end
 
   scope :active, -> { where(:workflow_state => 'active') }

@@ -1018,6 +1018,39 @@ describe AssignmentOverride do
     end
   end
 
+  describe 'update_due_date_smart_alerts' do
+    it 'creates a ScheduledSmartAlert on save with due date' do
+      override = assignment_override_model(course: @course)
+      expect(ScheduledSmartAlert).to receive(:upsert)
+
+      override.update!(due_at: 1.day.from_now, due_at_overridden: true)
+    end
+
+    it 'deletes the ScheduledSmartAlert if the due date is removed' do
+      override = assignment_override_model(course: @course)
+      override.update!(due_at: 1.day.from_now, due_at_overridden: true)
+      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      override.update!(due_at: nil)
+      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+    end
+
+    it 'deletes the ScheduledSmartAlert if the due date is changed to the past' do
+      override = assignment_override_model(course: @course)
+      override.update!(due_at: 1.day.from_now, due_at_overridden: true)
+      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      override.update!(due_at: 1.day.ago)
+      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+    end
+
+    it 'deletes associated ScheduledSmartAlerts when the override is deleted' do
+      override = assignment_override_model(course: @course)
+      override.update!(due_at: 1.day.from_now, due_at_overridden: true)
+      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      override.destroy
+      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+    end
+  end
+
   describe 'create' do
     it 'sets the root_account_id using assignment' do
       override = assignment_override_model(course: @course)

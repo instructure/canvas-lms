@@ -542,6 +542,8 @@ class Assignment < ActiveRecord::Base
               :ensure_manual_posting_if_moderated,
               :create_default_post_policy
 
+  after_save  :update_due_date_smart_alerts, if: :update_cached_due_dates?
+
   after_commit :schedule_do_auto_peer_review_job_if_automatic_peer_review
 
   with_options if: -> { auditable? && @updating_user.present? } do
@@ -1212,6 +1214,9 @@ class Assignment < ActiveRecord::Base
 
     each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
     refresh_course_content_participation_counts
+
+    ScheduledSmartAlert.where(context_type: 'Assignment', context_id: self.id).destroy_all
+    ScheduledSmartAlert.where(context_type: 'AssignmentOverride', context_id: self.assignment_override_ids).destroy_all
   end
 
   def refresh_course_content_participation_counts
@@ -2967,6 +2972,22 @@ class Assignment < ActiveRecord::Base
       will_save_change_to_only_visible_to_overrides? ||
       saved_change_to_only_visible_to_overrides? ||
       will_save_change_to_moderated_grading? || saved_change_to_moderated_grading?
+  end
+
+  def update_due_date_smart_alerts
+    unless self.saved_by == :migration
+      if self.due_at.nil? || self.due_at < Time.zone.now
+        ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: self.id, alert_type: :due_date_reminder)&.destroy
+      else
+        ScheduledSmartAlert.upsert(
+          context_type: self.class.name,
+          context_id: self.id,
+          alert_type: :due_date_reminder,
+          due_at: self.due_at,
+          root_account_id: root_account.id
+        )
+      end
+    end
   end
 
   def apply_late_policy

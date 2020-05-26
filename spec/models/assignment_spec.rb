@@ -227,6 +227,42 @@ describe Assignment do
       end
     end
 
+    describe 'update_due_date_smart_alerts' do
+      it 'creates a ScheduledSmartAlert on save with due date' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        expect(ScheduledSmartAlert).to receive(:upsert)
+
+        assignment.update!(due_at: 1.day.from_now)
+      end
+
+      it 'deletes the ScheduledSmartAlert if the due date is removed' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        assignment.update!(due_at: 1.day.from_now)
+        expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+        assignment.update!(due_at: nil)
+        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+      end
+
+      it 'deletes the ScheduledSmartAlert if the due date is changed to the past' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        assignment.update!(due_at: 1.day.from_now)
+        expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+        assignment.update!(due_at: 1.day.ago)
+        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+      end
+
+      it 'deletes associated ScheduledSmartAlerts when the Assignment is deleted' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        override = create_section_override_for_assignment(assignment, {due_at: 2.days.from_now})
+        assignment.update!(due_at: 1.day.from_now)
+        expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+        expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+        assignment.destroy
+        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      end
+    end
+
     describe "automatic setting of post policies" do
       let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
 
