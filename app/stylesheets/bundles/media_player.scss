@@ -16,19 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UploadMedia from './UploadMedia'
-import ClosedCaptionPanel from './ClosedCaptionCreator'
-import RocketSVG from './RocketSVG'
-import useComputerPanelFocus from './useComputerPanelFocus'
-import {isAudio, sizeMediaPlayer} from './shared/utils'
-import LoadingIndicator from './shared/LoadingIndicator'
+@import 'base/environment';
 
-export {
-  UploadMedia as default,
-  ClosedCaptionPanel,
-  RocketSVG,
-  useComputerPanelFocus,
-  isAudio,
-  sizeMediaPlayer,
-  LoadingIndicator
+.audio-player {
+  background-color: $lightBackground;
+  background-repeat: no-repeat;
+  background-position: 50% 30%;
+  background-image: url('/images/mimeClassIcons/audio.svg');
+  background-size: auto 30%;
 }

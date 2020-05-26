@@ -31,8 +31,7 @@ import {ClosedCaptionPanel} from '@instructure/canvas-media'
 import uploadMediaTranslations from '../mediaTranslations'
 import {
   CUSTOM,
-  MIN_HEIGHT,
-  MIN_WIDTH,
+  MIN_WIDTH_VIDEO,
   videoSizes,
   labelForImageSize,
   scaleToSize
@@ -42,7 +41,6 @@ import formatMessage from '../../../../format-message'
 import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
-
 export default function VideoOptionsTray(props) {
   const {videoOptions, onRequestClose, open} = props
   const {naturalHeight, naturalWidth} = videoOptions
@@ -55,10 +53,10 @@ export default function VideoOptionsTray(props) {
   const [videoWidth, setVideoWidth] = useState(currentWidth)
   const [subtitles, setSubtitles] = useState(props.videoOptions.tracks || [])
   const {trayProps} = props
-  const dimensionsState = useDimensionsState(videoOptions, {
-    minHeight: MIN_HEIGHT,
-    minWidth: MIN_WIDTH
-  })
+  const [minWidth] = useState(MIN_WIDTH_VIDEO)
+  const [minHeight] = useState(Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO))
+
+  const dimensionsState = useDimensionsState(videoOptions, {minHeight, minWidth})
   const videoSizeOption = {label: labelForImageSize(videoSize), value: videoSize}
   function handleTitleTextChange(event) {
     setTitleText(event.target.value)
@@ -78,11 +76,9 @@ export default function VideoOptionsTray(props) {
       setVideoWidth(width)
     }
   }
-
   function handleUpdateSubtitles(new_subtitles) {
     setSubtitles(new_subtitles)
   }
-
   function handleSave(event, updateMediaObject) {
     event.preventDefault()
     let appliedHeight = videoHeight
@@ -215,8 +211,8 @@ export default function VideoOptionsTray(props) {
                           <DimensionsInput
                             dimensionsState={dimensionsState}
                             disabled={displayAs !== 'embed'}
-                            minHeight={MIN_HEIGHT}
-                            minWidth={MIN_WIDTH}
+                            minHeight={minHeight}
+                            minWidth={minWidth}
                           />
                         </View>
                       )}

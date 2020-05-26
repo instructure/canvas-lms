@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useEffect, useRef, useState} from 'react'
-import {arrayOf, bool, func, instanceOf, oneOfType, shape, string} from 'prop-types'
+import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
+import {arrayOf, bool, func, instanceOf, number, oneOfType, shape, string} from 'prop-types'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
@@ -26,13 +26,14 @@ import {Flex, View} from '@instructure/ui-layout'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
+import {px} from '@instructure/ui-utils'
 import {VideoPlayer} from '@instructure/ui-media-player'
 
 import LoadingIndicator from './shared/LoadingIndicator'
 import RocketSVG from './RocketSVG'
 import translationShape from './translationShape'
 import useComputerPanelFocus from './useComputerPanelFocus'
-import useSizeVideoPlayer from './useSizeVideoPlayer'
+import {isAudio, isVideo, sizeMediaPlayer} from './shared/utils'
 
 const ClosedCaptionPanel = React.lazy(() => import('./ClosedCaptionCreator'))
 
@@ -46,7 +47,8 @@ export default function ComputerPanel({
   setHasUploadedFile,
   theFile,
   uploadMediaTranslations,
-  updateSubtitles
+  updateSubtitles,
+  bounds
 }) {
   const {
     ADD_CLOSED_CAPTIONS_OR_SUBTITLES,
@@ -54,20 +56,55 @@ export default function ComputerPanel({
   } = uploadMediaTranslations.UploadMediaStrings
   const [messages, setMessages] = useState([])
   const [mediaTracksCheckbox, setMediaTracksCheckbox] = useState(false)
+  const height = 0.8 * (bounds?.height - 38 - px('1.5rem')) // the trashcan is 38px tall and the 1.5rem margin-bottom
+  const width = 0.8 * bounds?.width
 
-  // right-size the video player
   const previewPanelRef = useRef(null)
-  const {playerWidth, playerHeight} = useSizeVideoPlayer(theFile, previewPanelRef)
-
   const clearButtonRef = useRef(null)
   const panelRef = useRef(null)
   useComputerPanelFocus(theFile, panelRef, clearButtonRef)
 
   useEffect(() => {
-    if (previewPanelRef?.current && mediaTracksCheckbox) {
+    if (previewPanelRef.current && mediaTracksCheckbox) {
       previewPanelRef.current.scrollIntoView(false)
     }
   }, [mediaTracksCheckbox])
+
+  const handlePlayerSize = useCallback(
+    player => {
+      const sz = sizeMediaPlayer(player, theFile.type, {width, height})
+      player.style.width = sz.width
+      player.style.height = sz.height
+      // from this sub-package, I don't have a URL to use as the
+      // audio player's poster image. We can give it a background image though
+      player.classList.add(isAudio(theFile.type) ? 'audio-player' : 'video-player')
+    },
+    [theFile, width, height]
+  )
+
+  const handleLoadedMetadata = useCallback(
+    event => {
+      const player = event.target
+      handlePlayerSize(player)
+    },
+    [handlePlayerSize]
+  )
+
+  // when we go to ui-media-player v7, <MediaPlayer> can listen for onLoadedMetedata
+  // but for now, it doesn't.
+  useEffect(() => {
+    const player = previewPanelRef?.current?.querySelector('video')
+    if (player) {
+      if (player.loadedmetadata || player.readyState >= 1) {
+        handlePlayerSize()
+      } else {
+        player.addEventListener('loadedmetadata', handleLoadedMetadata)
+        return () => {
+          player.removeEventListener('loadedmetadata', handleLoadedMetadata)
+        }
+      }
+    }
+  }, [handlePlayerSize, handleLoadedMetadata, hasUploadedFile])
 
   if (hasUploadedFile) {
     const src = URL.createObjectURL(theFile)
@@ -96,7 +133,7 @@ export default function ComputerPanel({
             </PresentationContent>
           </Flex.Item>
         </Flex>
-        <View as="div" width={playerWidth} height={playerHeight} textAlign="center" margin="0 auto">
+        <View as="div" textAlign="center" margin="0 auto">
           <VideoPlayer sources={[{label: theFile.name, src}]} controls={renderControls} />
         </View>
         {isVideo(theFile.type) && (
@@ -182,14 +219,6 @@ export default function ComputerPanel({
   }
 }
 
-function isVideo(type) {
-  return /^video/.test(type)
-}
-
-function isAudio(type) {
-  return /^audio/.test(type)
-}
-
 ComputerPanel.propTypes = {
   accept: oneOfType([string, arrayOf(string)]),
   hasUploadedFile: bool,
@@ -205,5 +234,9 @@ ComputerPanel.propTypes = {
   setHasUploadedFile: func.isRequired,
   theFile: instanceOf(File),
   uploadMediaTranslations: translationShape,
-  updateSubtitles: func.isRequired
+  updateSubtitles: func.isRequired,
+  bounds: shape({
+    width: number.isRequired,
+    height: number.isRequired
+  })
 }

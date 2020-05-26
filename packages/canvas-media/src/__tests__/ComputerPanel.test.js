@@ -129,9 +129,9 @@ describe('UploadMedia: ComputerPanel', () => {
       const aFile = new File(['foo'], 'foo.mp4', {
         type: 'video/mp4'
       })
-      const {getByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
-      const playButton = await waitForElement(() => getByText('Play'))
-      expect(playButton).toBeInTheDocument()
+      const {getAllByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
+      const playButton = await waitForElement(() => getAllByText('Play'))
+      expect(playButton[0].closest('button')).toBeInTheDocument()
     })
 
     it('clicking the trash button removes the file preview', async () => {

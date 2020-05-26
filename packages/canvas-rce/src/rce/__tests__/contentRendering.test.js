@@ -215,7 +215,7 @@ describe('contentRendering', () => {
       const audio = audioFromTray()
       const rendered = contentRendering.renderAudio(audio)
       expect(rendered).toEqual(
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&amp;type=audio" style="width:300px;height:2.813rem;display:inline-block" title="Audio player for filename.mp3"></iframe>'
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&amp;type=audio" style="width:320px;height:14.25rem;display:inline-block" title="Audio player for filename.mp3"></iframe>'
       )
     })
 
@@ -223,7 +223,7 @@ describe('contentRendering', () => {
       const audio = audioFromUpload()
       const rendered = contentRendering.renderAudio(audio)
       expect(rendered).toEqual(
-        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:300px;height:2.813rem;display:inline-block" title="Audio player for filename.mp3"></iframe>'
+        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block" title="Audio player for filename.mp3"></iframe>'
       )
     })
   })

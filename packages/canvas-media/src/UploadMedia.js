@@ -17,11 +17,13 @@
  */
 import {arrayOf, bool, func, instanceOf, shape, string} from 'prop-types'
 import React, {Suspense} from 'react'
+import ReactDOM from 'react-dom'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-overlays'
 import {Tabs} from '@instructure/ui-tabs'
+import {px} from '@instructure/ui-utils'
 
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import LoadingIndicator from './shared/LoadingIndicator'
@@ -83,8 +85,11 @@ export default class UploadMedia extends React.Component {
       selectedPanel: defaultSelectedPanel,
       computerFile: props.computerFile || null,
       subtitles: [],
-      recordedFile: null
+      recordedFile: null,
+      modalBodySize: {width: undefined, height: undefined}
     }
+
+    this.modalBodyRef = React.createRef()
   }
 
   isReady = () => {
@@ -139,6 +144,22 @@ export default class UploadMedia extends React.Component {
     this.props.onDismiss && this.props.onDismiss()
   }
 
+  componentDidUpdate(_prevProps, prevState) {
+    if (this.modalBodyRef.current) {
+      // eslint-disable-next-line react/no-find-dom-node
+      const thebody = ReactDOM.findDOMNode(this.modalBodyRef.current)
+      const modalBodySize = thebody.getBoundingClientRect()
+      modalBodySize.height -= px('3rem') // leave room for the tabs
+      if (
+        modalBodySize.width !== prevState.modalBodySize.width ||
+        modalBodySize.height !== prevState.modalBodySize.height
+      ) {
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState({modalBodySize})
+      }
+    }
+  }
+
   renderModalBody = () => {
     const {
       COMPUTER_PANEL_TITLE,
@@ -179,6 +200,7 @@ export default class UploadMedia extends React.Component {
                 updateSubtitles={subtitles => {
                   this.setState({subtitles})
                 }}
+                bounds={this.state.modalBodySize}
               />
             </Suspense>
           </Tabs.Panel>
@@ -270,7 +292,7 @@ export default class UploadMedia extends React.Component {
           </CloseButton>
           <Heading>{UPLOAD_MEDIA_LABEL}</Heading>
         </Modal.Header>
-        <Modal.Body>{this.renderModalBody()}</Modal.Body>
+        <Modal.Body ref={this.modalBodyRef}>{this.renderModalBody()}</Modal.Body>
         {this.renderModalFooter()}
       </Modal>
     )

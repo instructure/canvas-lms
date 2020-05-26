@@ -50,6 +50,7 @@
     "@instructure/ui-text-input": "6",
     "@instructure/ui-themeable": "6",
     "@instructure/ui-themes": "6",
+    "@instructure/ui-utils": "6",
     "@instructure/ui-view": "6",
     "@instructure/ui-toggle-details": "6",
     "@instructure/uid": "6",

@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {oneOf, string} from 'prop-types'
 import I18n from 'i18n!CanvasMediaPlayer'
-import {LoadingIndicator} from '@instructure/canvas-media'
+import {LoadingIndicator, isAudio, sizeMediaPlayer} from '@instructure/canvas-media'
 import {VideoPlayer} from '@instructure/ui-media-player'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-layout'
@@ -26,6 +26,14 @@ import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 const byBitrate = (a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
 const MAX_ATTEMPTS = 5
+
+// !!!!
+// ALERT: The resize handling code here assumes CanvasMediaPlayer fills 100% of its
+// parent window, which is true when rendered from media_player_iframe_content.js
+// The reason we need to handle resize is to letterbox vertical videos, or the bar
+// of controls get clipped. When @instructure/ui-media-player supports letterboxing
+// videos (which is in their work play), the resizing code here can probably be removed.
+// !!!
 
 export default function CanvasMediaPlayer(props) {
   const sorted_sources = Array.isArray(props.media_sources)
@@ -36,6 +44,23 @@ export default function CanvasMediaPlayer(props) {
   const [retryAttempt, setRetryAttempt] = useState(0)
   const containerRef = useRef(null)
   const myIframeRef = useRef(null)
+  const mediaPlayerRef = useRef(null)
+
+  const handleLoadedMetadata = useCallback(
+    event => {
+      const player = event.target
+      setPlayerSize(player, props.type, {width: window.innerWidth, height: window.innerHeight})
+    },
+    [props.type]
+  )
+
+  const handlePlayerSize = useCallback(
+    _event => {
+      const player = window.document.body.querySelector('video')
+      setPlayerSize(player, props.type, {width: window.innerWidth, height: window.innerHeight})
+    },
+    [props.type]
+  )
 
   useEffect(() => {
     myIframeRef.current = [...window.parent.document.getElementsByTagName('iframe')].find(
@@ -56,19 +81,31 @@ export default function CanvasMediaPlayer(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [retryAttempt])
 
+  // when we go to ui-media-player v7, <MediaPlayer> can listen for onLoadedMetedata
+  // but for now, it doesn't.
   useEffect(() => {
     const player = containerRef.current.querySelector('video')
     if (player) {
       if (player.loadedmetadata || player.readyState >= 1) {
-        setMediaPlayerSize(player)
+        handlePlayerSize()
       } else {
-        player.addEventListener('loadedmetadata', () => setMediaPlayerSize(player))
+        player.addEventListener('loadedmetadata', handleLoadedMetadata)
+        return () => {
+          player.removeEventListener('loadedmetadata', handleLoadedMetadata)
+        }
       }
     }
-    // The way this function is setup seems to break things when more exhaustive
-    // deps are put in here.  We should investigate more in the future.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [media_sources.length])
+  }, [handlePlayerSize, handleLoadedMetadata])
+
+  useEffect(() => {
+    // what I wanted to do was listen for fullscreenchange on the MediaPlayer's div,
+    // but it doesn't have it's new size at the time the event is fired. It also
+    // doesn't get a resize event when transitioning to/from fullscreen.
+    window.addEventListener('resize', handlePlayerSize)
+    return () => {
+      window.removeEventListener('resize', handlePlayerSize)
+    }
+  }, [handlePlayerSize])
 
   async function fetchSources() {
     const url = `/media_objects/${props.media_id}/info`
@@ -92,29 +129,6 @@ export default function CanvasMediaPlayer(props) {
         setRetryAttempt(nextAttempt)
       }
       setRetryTimerId(tid)
-    }
-  }
-
-  function setMediaPlayerSize(player) {
-    const playerContainer = myIframeRef.current
-    if (playerContainer) {
-      const {width, height} = sizeMediaPlayer(player, props.type, playerContainer)
-      playerContainer.style.width = width
-      playerContainer.style.height = height
-      if (props.type === 'audio') {
-        player.style.height = height
-      }
-
-      const playerContainerContainer = playerContainer.parentElement // tinymce adds this
-      if (
-        playerContainerContainer &&
-        playerContainerContainer.classList.contains('mce-preview-object') &&
-        playerContainerContainer.classList.contains('mce-object-iframe')
-      ) {
-        // we're in the RCE
-        playerContainerContainer.style.width = width
-        playerContainerContainer.style.height = height
-      }
     }
   }
 
@@ -175,6 +189,7 @@ export default function CanvasMediaPlayer(props) {
     <div ref={containerRef}>
       {media_sources.length ? (
         <VideoPlayer
+          ref={mediaPlayerRef}
           sources={media_sources}
           tracks={props.media_tracks}
           controls={renderControls}
@@ -186,22 +201,12 @@ export default function CanvasMediaPlayer(props) {
   )
 }
 
-export function sizeMediaPlayer(player, type, playerContainer) {
-  if (type === 'audio') {
-    return {width: '300px', height: '3rem'}
-  }
-
-  const width = player.videoWidth
-  const height = player.videoHeight
-  if (width > 0) {
-    // key off width, because we know it's initially layed out landscape
-    // just wide enough for the controls to fit
-    const minSideLength = playerContainer.clientWidth
-    const w = Math.min(width, minSideLength)
-
-    return {width: `${w}px`, height: `${Math.round((w / width) * height)}px`}
-  }
-  return {}
+function setPlayerSize(player, type, boundingBox) {
+  const {width, height} = sizeMediaPlayer(player, type, boundingBox)
+  player.style.width = width
+  player.style.height = height
+  player.style.margin = '0 auto' // TODO: remove with player v7
+  player.classList.add(isAudio(type) ? 'audio-player' : 'video-player')
 }
 
 CanvasMediaPlayer.propTypes = {

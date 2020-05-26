@@ -194,7 +194,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       trayController._applyVideoOptions({
         displayAs: 'embed',
         appliedHeight: '101',
-        appliedWidth: '201',
+        appliedWidth: '321',
         titleText: 'new title',
         updateMediaObject
       })
@@ -204,7 +204,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(videoContainer.getAttribute('data-mce-p-title')).toBe('new title')
       expect(videoIframe.getAttribute('title')).toBe('new title')
       expect(videoContainer.style.height).toBe('101px')
-      expect(videoContainer.style.width).toBe('201px')
+      expect(videoContainer.style.width).toBe('321px')
       expect(updateMediaObject).toHaveBeenCalled()
     })
 

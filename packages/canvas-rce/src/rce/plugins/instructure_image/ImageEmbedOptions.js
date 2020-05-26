@@ -21,6 +21,7 @@ import {scaleForHeight, scaleForWidth} from '../shared/DimensionUtils'
 
 export const MIN_HEIGHT = 10
 export const MIN_WIDTH = 10
+export const MIN_WIDTH_VIDEO = 320
 
 export const SMALL = 'small'
 export const MEDIUM = 'medium'

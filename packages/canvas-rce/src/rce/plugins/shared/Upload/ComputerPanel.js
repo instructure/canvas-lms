@@ -16,20 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
-import {arrayOf, bool, func, instanceOf, oneOfType, string} from 'prop-types'
+// NOTE: if you're looking in here for the ComputerPanel that's used for
+// the RCE's Media > Upload/Record Media function, it's not this one
+// (though this panel can handle video with the right "accept" prop).
+// See @instructure/canvas-media/src/ComputerPanel.js
+// On the other hand, becuase the VideoPlayer v5 doesn't forward onLoadedMetadata
+// to the underlying <video>, the sizing of the video preview is wrong.
+// This isn't a big issue because (1) this isn't the panel being used to upload
+// video, and (2) it will be fixed with MediaPlayer v7
+
+import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {arrayOf, bool, func, instanceOf, number, oneOfType, shape, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 
 import {FileDrop} from '@instructure/ui-forms'
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
+import {px} from '@instructure/ui-utils'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Img, Text, TruncateText} from '@instructure/ui-elements'
 import {Flex, View} from '@instructure/ui-layout'
 import {VideoPlayer} from '@instructure/ui-media-player'
 
-import {RocketSVG, useComputerPanelFocus, useSizeVideoPlayer} from '@instructure/canvas-media'
+import {RocketSVG, useComputerPanelFocus, isAudio, sizeMediaPlayer} from '@instructure/canvas-media'
 
 import formatMessage from '../../../../format-message'
 import {getIconFromType, isAudioOrVideo, isImage, isText} from '../fileTypeUtils'
@@ -53,7 +63,7 @@ function readFile(theFile) {
       reader.readAsText(theFile)
     } else if (isAudioOrVideo(theFile.type)) {
       const sources = [{label: theFile.name, src: URL.createObjectURL(theFile)}]
-      resolve(<VideoPlayer sources={sources} />)
+      resolve(sources)
     } else {
       const icon = getIconFromType(theFile.type)
       resolve(icon)
@@ -68,10 +78,13 @@ export default function ComputerPanel({
   hasUploadedFile,
   setHasUploadedFile,
   accept,
-  label
+  label,
+  bounds
 }) {
   const [messages, setMessages] = useState([])
   const [preview, setPreview] = useState({preview: null, isLoading: false})
+  const height = 0.8 * (bounds.height - 38 - px('1.5rem')) // the trashcan is 38px tall and the 1.5rem margin-bottom
+  const width = 0.8 * bounds.width
 
   useEffect(() => {
     if (!theFile || preview.isLoading || preview.preview || preview.error) return
@@ -79,11 +92,11 @@ export default function ComputerPanel({
     async function getPreview() {
       setPreview({preview: null, isLoading: true})
       try {
-        const preview = await readFile(theFile)
-        setPreview({preview, isLoading: false})
+        const previewer = await readFile(theFile)
+        setPreview({preview: previewer, isLoading: false})
         if (isImage(theFile.type)) {
           // we need the preview to know the image size to show the placeholder
-          theFile.preview = preview
+          theFile.preview = previewer
           setFile(theFile)
         }
       } catch (ex) {
@@ -97,13 +110,20 @@ export default function ComputerPanel({
     getPreview()
   })
 
-  const previewPanelRef = useRef(null)
-  const {playerWidth, playerHeight} = useSizeVideoPlayer(
-    theFile,
-    previewPanelRef,
-    preview.isLoading
+  const handleLoadedMetadata = useCallback(
+    event => {
+      const player = event.target
+      const sz = sizeMediaPlayer(player, theFile.type, {width, height})
+      player.style.width = sz.width
+      player.style.height = sz.height
+      // from this sub-package, I don't have a URL to use as the
+      // audio player's poster image. We can give it a background image though
+      player.classList.add(isAudio(theFile.type) ? 'audio-player' : 'video-player')
+    },
+    [theFile, width, height]
   )
 
+  const previewPanelRef = useRef(null)
   const clearButtonRef = useRef(null)
   const panelRef = useRef(null)
   useComputerPanelFocus(theFile, panelRef, clearButtonRef)
@@ -137,13 +157,14 @@ export default function ComputerPanel({
             as="pre"
             display="block"
             padding="x-small"
+            textAlign="start"
             aria-label={formatMessage('{filename} text preview', {filename: theFile.name})}
           >
             <TruncateText maxLines={21}>{preview.preview}</TruncateText>
           </View>
         )
       } else if (isAudioOrVideo(theFile.type)) {
-        return preview.preview
+        return <VideoPlayer sources={preview.preview} onLoadedMetadata={handleLoadedMetadata} />
       } else {
         return (
           <div
@@ -186,21 +207,15 @@ export default function ComputerPanel({
             </PresentationContent>
           </Flex.Item>
         </Flex>
-        {isAudioOrVideo(theFile.type) ? (
-          <View
-            as="div"
-            height={playerHeight}
-            width={playerWidth}
-            textAlign="center"
-            margin="0 auto"
-          >
-            {renderPreview()}
-          </View>
-        ) : (
-          <View as="div" height="300px" width="300px" margin="0 auto">
-            {renderPreview()}
-          </View>
-        )}
+        <View
+          as="div"
+          width={`${width}px`}
+          height={`${height}px`}
+          textAlign="center"
+          margin="0 auto"
+        >
+          {renderPreview()}
+        </View>
       </div>
     )
   }
@@ -242,7 +257,15 @@ ComputerPanel.propTypes = {
   hasUploadedFile: bool,
   setHasUploadedFile: func.isRequired,
   accept: oneOfType([string, arrayOf(string)]),
-  label: string.isRequired
+  label: string.isRequired,
+  bounds: shape({
+    width: number,
+    height: number
+  })
+}
+
+ComputerPanel.defaultProps = {
+  bounds: {}
 }
 
 export const styles = StyleSheet.create({

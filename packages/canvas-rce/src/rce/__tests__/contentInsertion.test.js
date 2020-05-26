@@ -373,7 +373,7 @@ describe('contentInsertion', () => {
       const audio = audioFromUpload()
       const result = contentInsertion.insertAudio(editor, audio)
       expect(editor.insertContent).toHaveBeenCalledWith(
-        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:300px;height:2.813rem;display:inline-block" title="Audio player for filename.mp3"></iframe>'
+        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block" title="Audio player for filename.mp3"></iframe>'
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -383,7 +383,7 @@ describe('contentInsertion', () => {
       const audio = audioFromTray()
       const result = contentInsertion.insertAudio(editor, audio)
       expect(editor.insertContent).toHaveBeenCalledWith(
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&amp;type=audio" style="width:300px;height:2.813rem;display:inline-block" title="Audio player for filename.mp3"></iframe>'
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&amp;type=audio" style="width:320px;height:14.25rem;display:inline-block" title="Audio player for filename.mp3"></iframe>'
       )
       expect(result).toEqual('the inserted iframe')
     })

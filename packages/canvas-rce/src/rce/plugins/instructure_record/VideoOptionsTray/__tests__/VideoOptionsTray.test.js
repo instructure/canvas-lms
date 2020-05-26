@@ -136,6 +136,15 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       await tray.setSize('Custom')
       expect(tray.size).toEqual('Custom')
     })
+
+    it('requires 320px custom width', () => {
+      props.videoOptions.videoSize = 'custom'
+      props.videoOptions.appliedWidth = 310
+      renderComponent()
+      // I don't know why, but getByText does not find the string,
+      // though I can prove it's there
+      expect(/Must be at least 320/.test(tray.$element.textContent)).toBeTruthy()
+    })
   })
 
   describe('"Closed Captions Panel"', () => {
