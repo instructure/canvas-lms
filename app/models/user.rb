@@ -20,6 +20,8 @@ require 'atom'
 
 class User < ActiveRecord::Base
   GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//
+  MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
+
   include TurnitinID
   include Pronouns
 
@@ -429,6 +431,33 @@ class User < ActiveRecord::Base
   end
   def self.skip_updating_account_associations?
     !!@skip_updating_account_associations
+  end
+
+  def update_root_account_ids
+    # See User#associated_shards in MRA for an explanation of
+    # shard association levels
+    shards = associated_shards(:strong) + associated_shards(:weak)
+    refreshed_root_account_ids = Set.new
+
+    Shard.with_each_shard(shards) do
+      UserAccountAssociation.joins(:account).
+        where(user: self, accounts: { parent_account_id: nil }).
+        preload(:account).
+        find_each do |association|
+          refreshed_root_account_ids << association.global_account_id
+        end
+    end
+
+    self.update!(root_account_ids: refreshed_root_account_ids.to_a)
+  end
+
+  def update_root_account_ids_later
+    send_later_enqueue_args(
+      :update_root_account_ids,
+      {
+        max_attempts: MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS
+      }
+    )
   end
 
   def update_account_associations_later

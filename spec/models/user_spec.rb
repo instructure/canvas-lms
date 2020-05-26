@@ -400,6 +400,63 @@ describe User do
     expect(user.associated_root_accounts.to_a).to eql [account2]
   end
 
+  describe 'update_root_account_ids' do
+    let_once(:root_account) { Account.default }
+    let_once(:sub_account) { Account.create(parent_account: root_account, name: 'sub') }
+
+    let(:user) { user_model }
+
+    let(:root_account_association) do
+      user.user_account_associations.create!(account: root_account)
+      user.user_account_associations.find_by(account: root_account)
+    end
+
+    let(:sub_account_association) do
+      user.user_account_associations.create!(account: sub_account)
+      user.user_account_associations.find_by(account: sub_account)
+    end
+
+    before do
+      root_account_association
+      sub_account_association
+    end
+
+    context 'when there is a single root account association' do
+      it 'updates root_account_ids with the root account' do
+        expect {
+          user.update_root_account_ids
+        }.to change {
+          user.root_account_ids
+        }.from(nil).to([root_account.global_id])
+      end
+    end
+
+    context 'when there cross-shard root account associations' do
+      specs_require_sharding
+
+      let(:shard_two_root_account) { account_model }
+
+      before do
+        @shard2.activate do
+          user.user_account_associations.create!(
+            account: shard_two_root_account
+          )
+          user.associate_with_shard(@shard2)
+        end
+      end
+
+      it 'updates root_account_ids with all root accounts' do
+        expect {
+          user.update_root_account_ids
+        }.to change {
+          user.root_account_ids&.sort
+        }.from(nil).to(
+          [root_account.global_id, shard_two_root_account.global_id].sort
+        )
+      end
+    end
+  end
+
   describe "update_account_associations" do
     it "should support incrementally adding to account associations" do
       user = User.create!
