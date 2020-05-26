@@ -93,9 +93,23 @@ class FileAuthenticator
     # typically), but it's only a POST of the metadata to inst-fs, so should be
     # quick, which we enforce with a timeout; inst-fs will "naturalize" the
     # object contents later out-of-band
+    #
+    # switching to master if not already there is necessary for the update; a
+    # common ancestor call site is FilesController#show which switches to the
+    # slave. there's a potential race condition where the attachment was loaded
+    # from the slave which didn't have a novel instfs_uuid yet while the master
+    # did. since we don't reload, we'll import the attachment again; this isn't
+    # ideal, but is safe and rare enough that paying that accidental cost is
+    # preferrable to paying a reload cost every check
+    #
+    # (the inverse race, where the slave knows of an instfs_uuid that would be
+    # nil on a reload from master _shouldn't_ occur, and if it does just means
+    # we delay re-importing until next time)
     return unless InstFS.migrate_attachment?(attachment)
-    attachment.instfs_uuid = InstFS.export_reference(attachment)
-    attachment.save!
+    Shackles.activate(:master) do
+      attachment.instfs_uuid = InstFS.export_reference(attachment)
+      attachment.save!
+    end
   rescue InstFS::ExportReferenceError
     # in the case of a recognized error exporting reference, just ignore,
     # acting as if we didn't intend to migrate in the first place, rather than
