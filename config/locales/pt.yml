@@ -2061,6 +2061,7 @@ pt:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Permite criar anúncios para uma seção específica"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Permite criar discussões para uma seção específica"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permite que as Ligações de Ajuda sejam marcadas como Destacadas ou Novas e exibe de forma proeminente a Ligação de Ajuda Destacado no Menu Ajuda."
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permite que os resultados da aprendizagem sejam selecionáveis aquando da migração dos conteúdos da disciplina"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Permite que funções de professor/designer/TA acedam a ferramenta Bate-papo."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permite que funções de professor/designer/TA acedam a ferramenta Bate-papo."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permite que funções baseadas em professores/TA acedam a ferramenta de Atendimento."
@@ -4664,15 +4665,19 @@ pt:
   calendars_toggle_list_visibility_488db143: "Alternar visibilidade da lista de Calendários"
   can_create_and_update_submission_results_for_assig_51e7033d: "Pode criar e atualizar resultados de envio para tarefas associadas à ferramenta."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Pode criar e visualizar dados de tarefa no livro de classificações associado à ferramenta."
+  can_create_external_tools_4c293044: "Pode criar ferramentas externas."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "pode criar, renomear e editar páginas do curso por defeito"
   can_create_subscription_to_data_service_data_bb2874f2: "Pode criar assinatura para dados do serviço de dados."
+  can_destroy_external_tools_cdb0e734: "Pode destruir as ferramentas externas."
   can_destroy_subscription_to_data_service_data_b8dfca27: "Pode destruir a assinatura dos dados do serviço de dados."
   can_edit_this_page_role_selection_6ccec3c7: "É possível editar esta seleção de função de página"
   can_interact_with_users_in_their_section_only_48cb8c43: "Pode interagir com os utilizadores apenas na sua secção"
   can_list_categorized_event_types_52596f7: "Pode listar tipos de eventos categorizados."
+  can_list_external_tools_9132ad0f: "É capaz de listar ferramentas externas."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Pode listar assinaturas para dados de serviço de dados."
   can_lookup_account_information_13d69520: "Pode consultar a informação da conta"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Pode recuperar dados do utilizador associados ao contexto em que a ferramenta está instalada."
+  can_show_external_tools_bb4988c5: "É capaz de mostrar ferramentas externas."
   can_show_subscription_to_data_service_data_688ce3: "Pode mostrar a assinatura dos dados do serviço de dados."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Não é possível calcular a pontuação até uma tarefa ter pontos possíveis"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
@@ -4685,6 +4690,7 @@ pt:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Não pode apagar a publicação se existirem entregas dos alunos"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Não pode apagar a publicação %{item_name} se existirem entregas dos alunos"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Não é possível publicar%{name} se existirem envios de alunos"
+  can_update_external_tools_168c1abe: "É capaz de atualizar ferramentas externas."
   can_update_public_jwk_for_lti_services_26037129: "Pode atualizar o jwk público para serviços LTI."
   can_update_subscription_to_data_service_data_374a0c89: "Pode atualizar a assinatura dos dados do serviço de dados."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Pode visualizar dados de atribuição no livro de classificações associado à ferramenta."
@@ -5317,6 +5323,8 @@ pt:
       slides, dar demonstrações de aplicações e recursos on-line,
       e mais.
   conference_36b50fda: Conferência
+  conference_has_been_removed_f771cb11: "A conferência foi retirada"
+  conference_has_been_updated_title_2bacc5fa: "A conferência foi atualizada: %{title}"
   conference_selection_ea4050bb: "Seleção da Conferência"
   conference_was_deleted_30869390: "A conferência foi apagada"
   conferences: 
@@ -9297,6 +9305,7 @@ pt:
   error_retrieving_content_c07ee76b: "Erro ao recuperar o conteúdo"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Erro ao recuperar ferramentas de detecção de similaridade"
   error_running_quizzes_2_export_cfecedba: "Erro ao exportar os Quizzes 2."
+  error_saving_assignment_dates_2af5e800: "Datas de atribuição para guardar erros: "
   error_saving_discussion_settings_3360661d: "Erro ao salvar as configurações de discussão"
   error_sending_messages_13c874eb: "Erro ao enviar mensagens"
   error_sending_submission_comment_dc15d24f: "Erro ao enviar comentário de submissão"
@@ -12199,6 +12208,7 @@ pt:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Data inválida ou data-limite inválida para %{attr}"
   invalid_date_or_time_333acd43: "Data ou hora inválida"
   invalid_date_time_3ae423f5: "Data/hora inválida"
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: "Foram encontradas datas inválidas. Por favor, corrija-as e tente novamente."
   invalid_datetime_for_graded_since_884cce5: "Data-prazo inválido para graded_since"
   invalid_datetime_for_submitted_since_a238f3a6: "Data-prazo inválido para submitted_since"
   invalid_domain_e810c1d: "Domínio inválido"
@@ -16008,6 +16018,7 @@ pt:
   notifications_unsupported_65f6bf65: "Notificações não apoiadas"
   notifications_view_f9a60770: "Notificações - ver"
   notify_immediately_d1749c07: "Notificar imediatamente"
+  notify_students_in_time_of_assignments_that_requir_332ef10e: "Notificar os alunos em tempo útil sobre os trabalhos que requerem a sua atenção."
   notify_users_this_quiz_has_changed_c5b05995: "Notificar os utilizadores de que este teste foi alterado"
   now_click_the_agenda_button_607fb40e: "Agora clique no botão *Agenda*"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Agora que a sua disciplina está configurada e disponível, é provável que já não precise desta lista de verificação. Contudo, vamos guardá-la para o caso de querer experimentar algo novo mais tarde ou querer simplesmente alguma ajuda adicional quando pretender fazer alterações no conteúdo da disciplina."
@@ -17678,6 +17689,7 @@ pt:
   progress_for_account_name_ef203250: "Progresso para %{account_name}"
   progress_loading_bar_a26b8861: "Barra de Progresso/Carregamento"
   project_groups_1fa0320b: "Grupos de projeto"
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "O pronome não corresponde ao pronome da conta ou os pronomes não estão ativados para esta conta, %{user_id}, saltando"
   pronouns_d1cd8dd0: Pronomes
   pronouns_for_users_da46fb5: "Pronomes para utilizadores"
   pronouns_users_can_show_after_their_name_e80821c7: "Os utilizadores do Pronouns podem mostrar após o nome"
@@ -19535,6 +19547,7 @@ pt:
   remove_c_name_section_d8eabd3a: "Remover a Seção %{c.name}"
   remove_collaborationtitle_c3e81adb: "Eliminar \"%{collaborationTitle}\"?"
   remove_conference_69b9e0d0: "Remover conferência"
+  remove_conference_title_207d32c0: "Retire a conferência: %{title}"
   remove_contact_method_ca890ba3: "Remover método de contato"
   remove_course_association_name_b760c502: "Remover associação da disciplina %{name}"
   remove_dates_9b9ba2f6: "Remover Datas"
@@ -19683,6 +19696,7 @@ pt:
   retry_ebd5f8ba: "Tentar novamente"
   retry_migrating_name_bdc802ef: "Tente migrar novamente \"%{name}\""
   return_to_parent_folder_4ece2184: "retornar à pasta pai"
+  revert_date_changes_5105ce5: "Mudanças de datas de reversão"
   revert_to_actual_score_f665eea9: "Reverter para pontuação atual"
   revert_to_old_ui_3211da41: "Reverter para a interface antiga"
   review_now_318a6a3e: "Revisar agora"
@@ -20368,6 +20382,7 @@ pt:
   select_video_file_35b61d4e: "Selecionar Ficheiro de Vídeo"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Selecione o que pretende mostrar na página inicial."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "Selecionar se deseja publicar para todas as submissões ou apenas para as classificações."
+  selectable_outcomes_during_course_content_migratio_3f108a1a: "Resultados selecionáveis durante a migração dos conteúdos da disciplina"
   selected_274ce24f: Selecionado
   selected_all_courses_9cfef57f: "Todas as disciplinas selecionadas"
   selected_answer: "Escolheu esta resposta."
@@ -21341,6 +21356,10 @@ pt:
   show_only_blueprint_courses_9fb37b41: "Mostrar apenas cursos blueprint"
   show_originality_report_to_students_be22f5ee: "Mostrar relatório de originalidade para estudantes"
   show_params_3401895b: "Mostrar parâmetros"
+  show_past_account_level_announcements_to_users_3b8208e2: "Mostrar anúncios de nível de conta passada aos utilizadores"
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      Mostrar anúncios de nível de conta passada aos utilizadores. Permitir
+      que os utilizadores vejam os anúncios que terminaram ou foram rejeitados.
   show_question_details_b059df00: "Exibir detalhes da pergunta"
   show_recent_activity_stream_2be4abc1: "Mostrar fluxo de atividade recente"
   show_report_to_students_a07888a6: "Mostrar relatório aos alunos"
@@ -21482,6 +21501,12 @@ pt:
       forward: Encaminhar
   slovak_69f48e1b: Eslovaco
   slovenian_30ae5208: Esloveno
+  smart_alerts_43776718: "Alertas Inteligentes"
+  smart_alerts_44db622e: "Alertas inteligentes"
+  smart_alerts_settings: 
+    threshold_12h: 12h
+    threshold_24h: 24h
+    threshold_36h: 36h
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "No Google Play"
@@ -22475,6 +22500,7 @@ pt:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "O url de um utilizador suficientemente priveligiado pode ser utilizado para substituir o utilizador do relatório na mesma página para tentar e reproduzir o problema"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "O URL da página que o utilizador estava a usar quando reportou o erro"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "O utilizador também deve estar inscrito como instrutor nos disciplinas que está tentando fazer uma lista cruzada."
+  the_value_of_possible_points_for_this_assignment_c_42396e3: "O valor de possíveis pontos para esta tarefa não pode exceder 999999999."
   their_grade_for_the_assignment_c36a60ef: "Sua nota para a tarefa"
   theme_52404e51: Tema
   theme_editor_b7b00f6b: "Editor de Tema"
@@ -22770,6 +22796,7 @@ pt:
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Isto vai aplicar estas alterações a toda a conta. Gostaria de continuar?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Isto vai aplicar este tema a toda a conta. Gostaria de continuar?"
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Isso atualizará todas as rubricas usando esse resultado que ainda não foi avaliado"
+  threshold_in_hours_to_notify_students_within_f33820aa: "Limiar (em horas) para notificar os alunos no prazo de"
   threshold_pts_45f0e5d8: "limite: %{pts}"
   ticket_successfully_submitted_f6254460: "Mensagem entregue com sucesso."
   ticketing_system_52205bff: "Sistema de Notas"
@@ -22919,6 +22946,7 @@ pt:
     port_moresby: "Port Moresby"
     prague: Praga
     pretoria: Pretória
+    puerto_rico: "Porto Rico"
     quito: Quito
     rangoon: Rangoon
     riga: Riga

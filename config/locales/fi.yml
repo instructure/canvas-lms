@@ -1416,6 +1416,7 @@ fi:
       GraphQL-mutaatioista
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Sallii tulosten linjauksen ei-pisteytettävään sisältöön"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Salli ohjelinkit merkittäviksi esiteltyinä tai uutena ja näyttää huomattavasti  esitelty ohjelinkki ohjevalikossa"
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Sallii oppimistulosten olevan valittavissa, kun kurssin sisältöä siirretään"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Sallii opettaja-, suunnittelija-, apuopettajapohjaisten roolien käyttävän Chatti-työkalua."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Sallii opettaja-/suunnittelija-/apuopettajapohjaisten roolien käyttävän Chatti-työkalua."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Sallii opettaja-/apuopettajapohjaisten roolien käyttävän osallistujatyökalua."
@@ -3483,15 +3484,19 @@ fi:
   calendars_toggle_list_visibility_488db143: "Kalentereiden vaihtoluettelon näkyvyys"
   can_create_and_update_submission_results_for_assig_51e7033d: "Voi luoda ja päivittää lähetyksen tuloksia työkaluun liitetyissä tehtävissä."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Voi luoda ja tarkastella tehtävän tietoja työkaluun liitetyssä arvosanakirjassa"
+  can_create_external_tools_4c293044: "Voi luoda ulkoisia työkaluja."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "Voi luoda, nimetä uudelleen ja muokata kurssin sivuja oletuksena"
   can_create_subscription_to_data_service_data_bb2874f2: "Voit luoda tilauksen tietopalvelun tietoihin."
+  can_destroy_external_tools_cdb0e734: "Voi tuhota ulkoisia työkaluja."
   can_destroy_subscription_to_data_service_data_b8dfca27: "Voit poistaa tilauksen tietopalvelun tietoihin."
   can_edit_this_page_role_selection_6ccec3c7: "Tämän sivun roolivalintaa voi muokata"
   can_interact_with_users_in_their_section_only_48cb8c43: "Voi toimia vuorovaikutuksessa käyttäjien kanssa vain niiden osassa"
   can_list_categorized_event_types_52596f7: "Voit luetteloida luokitellut tapahtumatyypit."
+  can_list_external_tools_9132ad0f: "Voi listata ulkoisia työkaluja."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Voit listata tilaukset tietopalvelun tietoihin."
   can_lookup_account_information_13d69520: "Voi etsiä tilitietoja"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Voi palauttaa käyttäjän tietoja, jotka liittyvät yhteyteen, johon työkalu on asennettu."
+  can_show_external_tools_bb4988c5: "Voi näyttää ulkoisia työkaluja."
   can_show_subscription_to_data_service_data_688ce3: "Voit näyttää tilauksen tietopalvelun tietoihin."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Ei voida laskea pistemäärää, kunnes tehtävälle voi antaa pisteitä"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\
@@ -3503,6 +3508,7 @@ fi:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Julkaisua ei voida peruuttaa, jos on opiskelijalähetyksiä."
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Julkaisua %{item_name} ei voida peruuttaa, jos on opiskelijalähetyksiä."
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Julkaisua %{name} ei voida peruuttaa, jos on opiskelijalähetyksiä."
+  can_update_external_tools_168c1abe: "Voi päivittää ulkoisia työkaluja."
   can_update_public_jwk_for_lti_services_26037129: "Voi päivittää julkisen jwk:n LTI-palveluille."
   can_update_subscription_to_data_service_data_374a0c89: "Voit päivittää tilauksen tietopalvelun tietoihin."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Voi tarkastella tehtävän tietoja työkaluun liitetyssä arvosanakirjassa."
@@ -4040,6 +4046,8 @@ fi:
                diat, anna sovellusten esitykset ja verkkoresurssit,
                 jne.
   conference_36b50fda: Konferenssi
+  conference_has_been_removed_f771cb11: "Konferenssi on poistettu"
+  conference_has_been_updated_title_2bacc5fa: "Konferenssi on päivitetty: %{title}"
   conference_selection_ea4050bb: "Konferenssin valinta"
   conference_was_deleted_30869390: "Konferenssi poistettiin"
   conferences: 
@@ -7171,6 +7179,7 @@ fi:
   error_retrieving_content_c07ee76b: "Virhe sisällön palauttamisessa"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Virhe noudettaessa samanlaisuuden havaintotyökaluja"
   error_running_quizzes_2_export_cfecedba: "Virhe ajettaessa kyselyiden 2 vientiä."
+  error_saving_assignment_dates_2af5e800: "Virhe tehtävän päivämäärien tallentamisessa: "
   error_saving_discussion_settings_3360661d: "Keskusteluasetusten tallennusvirhe"
   error_sending_messages_13c874eb: "Virhe viestejä lähetettäessä"
   error_sending_submission_comment_dc15d24f: "Virhe lähetyksen kommenttia lähetettäessä"
@@ -9178,6 +9187,7 @@ fi:
   invalid_date_or_datetime_for_field_b38fe386: "Virheellinen päivämäärä tai päivämäärä ja aika kohteelle %{field}"
   invalid_date_or_time_333acd43: "Virheellinen päivämäärä tai aika."
   invalid_date_time_3ae423f5: "Virheellinen päivämäärä/aika"
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: "Löytyi virheellisiä päivämääriä. Korjaa ne ja yritä uudelleen."
   invalid_datetime_for_graded_since_884cce5: "Virheellinen päivämäärä ja aika arvostelluille_lähtien"
   invalid_datetime_for_submitted_since_a238f3a6: "Virheellinen päivämäärä ja aika lähetetty_lähtien"
   invalid_domain_e810c1d: "Virheellinen verkkotunnus"
@@ -12335,6 +12345,7 @@ fi:
   notifications_unsupported_65f6bf65: "Ilmoituksia ei tueta"
   notifications_view_f9a60770: "Ilmoitukset - tarkastele"
   notify_immediately_d1749c07: "Ilmoita välittömästi"
+  notify_students_in_time_of_assignments_that_requir_332ef10e: "Ilmoita opiskelijoille ajoissa tehtävistä, jotka vaativat heidän huomiotaan."
   notify_users_this_quiz_has_changed_c5b05995: "Ilmoita käyttäjille, että tämä kysely on muuttunut"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Nyt kun kurssisi on määritetty ja saatavissa, et todennäköisesti tarvitse enää tätä tarkistuslistaa. Mutta pidämme sen saatavilla, jos huomaat myöhemmin, että haluat yrittää jotakin uutta tai haluat vain vähän lisäapua, kun teet muutoksia kurssin sisältöön."
   now_viewing_attempt_current_attempt_918e616: "Nyt tarkastellaan yritystä %{current_attempt}"
@@ -13680,6 +13691,7 @@ fi:
   progress_for_account_name_ef203250: "Eteneneminen kohteelle %{account_name}"
   progress_loading_bar_a26b8861: "Edistymis- tai latauspalkki"
   project_groups_1fa0320b: "Projektin ryhmät"
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "Pronomini ei täsmää tilin pronominin kanssa tai prononimejä ei ole käytössä tälle tilille, %{user_id}, ohitetaan."
   pronouns_d1cd8dd0: Pronominit
   pronouns_for_users_da46fb5: "Käyttäjien pronominit"
   pronouns_users_can_show_after_their_name_e80821c7: "Pronominikäyttäjät voidaan näyttää niiden nimen jälkeen"
@@ -15103,6 +15115,7 @@ fi:
   remove_attribute_59a4aa64: "Poista attribuutti"
   remove_collaborationtitle_c3e81adb: "Poista ”%{collaborationTitle}”"
   remove_conference_69b9e0d0: "Poista konferenssi"
+  remove_conference_title_207d32c0: "Poista konferenssi: %{title}"
   remove_contact_method_ca890ba3: "Poista yhteydenottotapa"
   remove_course_association_name_b760c502: "Poista kurssin liitos %{name}"
   remove_dates_9b9ba2f6: "Poista päivämääriä"
@@ -15228,6 +15241,7 @@ fi:
   retry_ebd5f8ba: "Yritä uudelleen"
   retry_migrating_name_bdc802ef: "Yritä siirtää uudelleen kohdetta \"%{name}\""
   return_to_parent_folder_4ece2184: "palaa yläkansioon"
+  revert_date_changes_5105ce5: "Palauta päivämäärämuutokset"
   revert_to_actual_score_f665eea9: "Palaa todelliseen pistemäärään"
   revert_to_old_ui_3211da41: "Palaa vanhaan käyttöliittymään"
   review_now_318a6a3e: "Tarkasta nyt"
@@ -15796,6 +15810,7 @@ fi:
   select_video_file_35b61d4e: "Valitse videotiedosto"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Valitse, mitä haluat näyttää aloitussivulla."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "Valitse, lähetetäänkö kaikki lähetykset vai vain arvostellut."
+  selectable_outcomes_during_course_content_migratio_3f108a1a: "Valittavat tulokset kurssin sisällön siirtämisessä"
   selected_274ce24f: Valittu
   selected_all_courses_9cfef57f: "Valittiin kaikki kurssit"
   selected_answer: "Valitsit tämän vastauksen."
@@ -16517,6 +16532,10 @@ fi:
   show_one_question_at_a_time_271e346d: "Näytä yksi kysymys kerrallaan"
   show_only_blueprint_courses_9fb37b41: "Näytä vain blueprint-kurssit"
   show_params_3401895b: "Näytä muuttujat"
+  show_past_account_level_announcements_to_users_3b8208e2: "Näytä menneen tilin tason ilmoituksen käyttäjille"
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      Näytä menneen tilin tason ilmoituksen käyttäjille. Sallii
+      käyttäjän tarkastelevan ilmoituksia, jotka ovat päättyneet tai jotka on ohitettu.
   show_question_details_b059df00: "Näytä kysymyksen tiedot"
   show_report_to_students_a07888a6: "Näytä raportti opiskelijoille"
   show_rubric_dca783f2: "Näytä rubriikki"
@@ -16607,6 +16626,12 @@ fi:
   slack_notifications_3a0288e6: Slack-huomautukset
   slovak_69f48e1b: slovakia
   slovenian_30ae5208: slovenia
+  smart_alerts_43776718: "Älykkäät hälytykset"
+  smart_alerts_44db622e: "Älykkäät hälytykset"
+  smart_alerts_settings: 
+    threshold_12h: 12h
+    threshold_24h: 24h
+    threshold_36h: 36h
   sms_f0ddceeb: tekstiviesti
   some_assignments_could_not_be_created_because_they_d91f2f21: "Joitakin tehtäviä ei voitu luoda, koska ne osuisivat suljetulle arvosanojen antojaksolle."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Jotkut konferenssit tällä sivulla kätketty niiden tilan palauttamisessa ilmenneiden virheiden vuoksi."
@@ -17454,6 +17479,7 @@ fi:
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "Seuraavan kysymyspankin otsikko katkaistiin: \"%{title}\""
   the_tool_is_not_installed_in_the_course_or_account_1be7230b: "Työkalua ei ole asennettu kurssille tai tilille."
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "Käyttäjän täytyy myös olla ilmoittautunut ohjaajaksi kurssilla, jota tämä yrittää ristiluetteloida."
+  the_value_of_possible_points_for_this_assignment_c_42396e3: "Mahdollisten pisteiden arvo tälle tehtävälle täytyy olla pienempi kuin 999999999."
   their_grade_for_the_assignment_c36a60ef: "Heidän arvosanansa tehtävässä"
   theme_52404e51: Teema
   theme_editor_b7b00f6b: Teemaeditori
@@ -17701,6 +17727,7 @@ fi:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Tämän avulla voit todentaa Canvasin arvosanojen lähettämiseksi SIS:ään"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Tämä koskee tätä teemaa koko tililläsi. Haluaisitko edetä?"
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Tämä päivittää kaikki sellaista tulosta käyttävät rubriikit, joita ei vielä ole arvioitu"
+  threshold_in_hours_to_notify_students_within_f33820aa: "Kynnys (tunneissa), jonka sisällä opiskelijoille ilmoitetaan"
   threshold_pts_45f0e5d8: "kynnys: %{pts}"
   ticket_successfully_submitted_f6254460: "Lipun lähetys onnistui."
   ticketing_system_52205bff: Tukipyyntöjärjestelmä
@@ -17848,6 +17875,7 @@ fi:
     port_moresby: "Port Moresby"
     prague: Praha
     pretoria: Pretoria
+    puerto_rico: "Puerto Rico"
     quito: Quito
     rangoon: Rangoon
     riga: Riika

@@ -286,7 +286,7 @@ module Types
     field :notification_preferences, NotificationPreferencesType, null: true
     def notification_preferences
       Loaders::AssociationLoader.for(User, :communication_channels).load(current_user).then do |comm_channels|
-        {channels: comm_channels}
+        {channels: comm_channels.unretired}
       end
     end
   end

@@ -1985,6 +1985,7 @@ fr-CA:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Permet de créer des annonces pour une section spécifique"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Permet de créer des discussions pour une section spécifique"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permet de marquer les liens d’aide comme « Principaux » ou « Nouveau » et affiche bien en évidence le lien d’aide principal dans le menu d’aide."
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permet de sélectionner les acquis lors de la migration du contenu du cours"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Permet aux rôles d’enseignant/concepteur/AE d’accéder à l’outil de clavardage."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permet aux rôles d’enseignant/concepteur/AE d’accéder à l’outil de clavardage."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permet aux rôles d’enseignant/AE d’accéder à l’outil de Participation."
@@ -4422,15 +4423,19 @@ fr-CA:
   calendars_toggle_list_visibility_488db143: "Les calendriers permutent la visibilité de la liste"
   can_create_and_update_submission_results_for_assig_51e7033d: "Peut créer et mettre à jour des résultats des envois pour les tâches associées à l'outil."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Peut créer et voir des données des tâches dans le Carnet de notes associé à l'outil."
+  can_create_external_tools_4c293044: "Peut créer des outils externes."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "peut créer, renommer et éditer les pages de cours par défaut"
   can_create_subscription_to_data_service_data_bb2874f2: "Peut créer un abonnement aux données du service de données."
+  can_destroy_external_tools_cdb0e734: "Peut détruire des outils externes."
   can_destroy_subscription_to_data_service_data_b8dfca27: "Peut détruire l'abonnement aux données du service de données."
   can_edit_this_page_role_selection_6ccec3c7: "Peut éditer cette sélection de rôle de page"
   can_interact_with_users_in_their_section_only_48cb8c43: "Interaction avec les utilisateurs possible dans leur section uniquement"
   can_list_categorized_event_types_52596f7: "Peut énumérer les types d'événements catégorisés."
+  can_list_external_tools_9132ad0f: "Peut énumérer les outils externes."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Peut énumérer les abonnements aux données du service de données."
   can_lookup_account_information_13d69520: "Peut consulter l’information concernant le compte"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Peut récupérer les données utilisateur associées au contexte dans lequel l'outil est installé."
+  can_show_external_tools_bb4988c5: "Peut voir les outils externes."
   can_show_subscription_to_data_service_data_688ce3: "Peut afficher l'abonnement aux données du service de données."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Ne peut calculer le résultat tant qu'une évaluation n'a pas de points possibles"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
@@ -4443,6 +4448,7 @@ fr-CA:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Ne peut être retiré de la publication si des étudiants ont envois"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Ne peut retirer %{item_name} de la publication si des étudiants ont envois"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Ne peut retirer %{name} de la publication si des étudiants ont envois"
+  can_update_external_tools_168c1abe: "Peut mettre à jour des outils externes."
   can_update_public_jwk_for_lti_services_26037129: "Peut mettre à jour jwk public pour les services LTI."
   can_update_subscription_to_data_service_data_374a0c89: "Peut mettre à jour l'abonnement aux données du service de données."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Peut voir des données des tâches dans le Carnet de notes associé à l'outil."
@@ -5035,6 +5041,8 @@ fr-CA:
                 présentation, donner des démonstrations d'applications et de ressources en ligne,
                 et plus.
   conference_36b50fda: Conférence
+  conference_has_been_removed_f771cb11: "La Conférences a été retirée"
+  conference_has_been_updated_title_2bacc5fa: "La Conférences a été mise à jour : %{title}"
   conference_selection_ea4050bb: "Sélection de conférence"
   conference_was_deleted_30869390: "La conférence a été supprimée"
   conferences: 
@@ -5108,7 +5116,7 @@ fr-CA:
               administrateur local pour obtenir des conseils supplémentaires.
   conferences_tutorial_tray_6f071ce2: "Tutoriel volant des conférences"
   conferencing_6a6d9b55: Conférence
-  conferencing_b69e2537: "Conférence :"
+  conferencing_b69e2537: "Conférence :"
   confetti_for_on_time_submissions_394e16ce: "Confettis pour les envois à temps"
   confetti_for_valid_links_7506df83: "Confettis pour liens valides"
   config_url_e96ceaf3: "Configurer l’URL"
@@ -8745,6 +8753,7 @@ fr-CA:
   error_retrieving_content_c07ee76b: "Une erreur est survenue lors de l’extraction de contenu"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Erreur lors de la récupération des outils de détection de similarité"
   error_running_quizzes_2_export_cfecedba: "Erreur lors de l’exportation des questionnaires 2."
+  error_saving_assignment_dates_2af5e800: "Une erreur est survenue lors de l'enregistrement des dates de tâche : "
   error_saving_discussion_settings_3360661d: "Une erreur est survenue lors de la sauvegarde des paramètres de discussion"
   error_sending_messages_13c874eb: "Erreur lors de l’envoi des messages"
   error_sending_submission_comment_dc15d24f: "Une erreur est survenue lors de l'envoi du commentaire sur l’envoi"
@@ -11303,6 +11312,7 @@ fr-CA:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Date non valide ou horodatage non valide pour %{attr}"
   invalid_date_or_time_333acd43: "Format de date/heure non valide"
   invalid_date_time_3ae423f5: "Format de date/heure non valide"
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: "Dates non valides détectées. Veuillez les corriger et réessayer."
   invalid_datetime_for_graded_since_884cce5: "Horodatage non valide pour graded_since"
   invalid_datetime_for_submitted_since_a238f3a6: "Horodatage non valide pour submitted_since"
   invalid_domain_e810c1d: "Domaine non valide"
@@ -14750,6 +14760,7 @@ fr-CA:
   notifications_unsupported_65f6bf65: "Notifications non prises en charge"
   notifications_view_f9a60770: "Notifications - Voir"
   notify_immediately_d1749c07: "Notifier immédiatement"
+  notify_students_in_time_of_assignments_that_requir_332ef10e: "Informer les étudiants à temps des tâches qui nécessitent leur attention."
   notify_users_this_quiz_has_changed_c5b05995: "Informer les utilisateurs que ce questionnaire a changé"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Maintenant que votre cours est prêt et disponible, vous n’avez probablement plus besoin de cette liste de vérification. Nous allons tout de même la conserver au cas où vous souhaiteriez essayer autre chose ou simplement besoin d’un peu d’aide si vous modifiez le contenu de votre cours."
   now_viewing_attempt_current_attempt_918e616: "Maintenant en train de regarder la tentative %{current_attempt}"
@@ -16351,6 +16362,7 @@ fr-CA:
   progress_for_account_name_ef203250: "Progression de %{account_name}"
   progress_loading_bar_a26b8861: "Barre de progrès/de chargement"
   project_groups_1fa0320b: "Groupes de projets"
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "Le pronom ne correspond pas au pronom du compte ou les pronoms ne sont pas autorisés pour ce compte, %{user_id}, ignoré"
   pronouns_d1cd8dd0: Pronoms
   pronouns_for_users_da46fb5: "Pronoms pour utilisateurs"
   provide_a_space_for_users_to_work_on_a_single_docu_9e4fc18c: "Fournir un espace afin que les utilisateurs puissent travailler sur un seul document\n\
@@ -17950,6 +17962,7 @@ fr-CA:
   remove_c_name_section_d8eabd3a: "Retirer la section %{c.name}"
   remove_collaborationtitle_c3e81adb: "Retirer « %{collaborationTitle} »?"
   remove_conference_69b9e0d0: "Retirer la conférence"
+  remove_conference_title_207d32c0: "Retirer la conférence : %{title}"
   remove_contact_method_ca890ba3: "Retirer le mode de contact"
   remove_course_association_name_b760c502: "Retirer l'association du cours %{name}"
   remove_dates_9b9ba2f6: "Retirer des dates"
@@ -18081,6 +18094,7 @@ fr-CA:
   retry_ebd5f8ba: Réessayer
   retry_migrating_name_bdc802ef: "Réessayer la migration de « %{name} »"
   return_to_parent_folder_4ece2184: "remonter au dossier parent"
+  revert_date_changes_5105ce5: "Invertir les changements de date"
   revert_to_actual_score_f665eea9: "Rétablir la note actuelle"
   revert_to_old_ui_3211da41: "Revenir à l’ancienne interface utilisateur"
   review_now_318a6a3e: "Réviser maintenant"
@@ -18348,7 +18362,7 @@ fr-CA:
   saved_discussion_settings_successfully_ebd46a57: "Paramètres de discussion enregistrés avec succès"
   saving_2521e616: "Sauvegarde en cours"
   saving_assignment_dates_progress_9856153d: "Enregistrement de la progression des dates de tâche"
-  saving_assignment_dates_progress_percent_a5ea89a1: "Enregistrement de la progression des dates de tâche : %{percent}%"
+  saving_assignment_dates_progress_percent_a5ea89a1: "Enregistrement de la progression des dates de tâche : %{percent}%"
   saving_assignment_fb958949: "Enregistrement de la tâche"
   saving_associations_989bd4da: "Enregistrement des associations"
   saving_associations_complete_e4b9634d: "L’enregistrement des associations est terminé"
@@ -18683,7 +18697,7 @@ fr-CA:
     other: "Sélectionner tous les cours (%{count})"
   select_all_students_7c2c34b3: "Sélectionner tous les étudiants"
   select_an_edit_operation_ec1467d: "Choisir une opération de modification"
-  select_assignment_title_4571ffcb: "Sélectionner une tâche : %{title}"
+  select_assignment_title_4571ffcb: "Sélectionner une tâche : %{title}"
   select_audio_file_7d905cce: "Sélectionner un fichier audio"
   select_calendars_d5fa50b6: "Sélectionner des calendriers"
   select_conference_provider_58c7f7fe: "Sélectionner un fournisseur de conférence"
@@ -18750,6 +18764,7 @@ fr-CA:
   select_video_file_35b61d4e: "Sélectionner un fichier vidéo"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Sélectionnez ce que vous souhaiteriez afficher sur la page d’accueil."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "Sélectionner s'il faut publier pour tous les envois, ou seulement ceux notés."
+  selectable_outcomes_during_course_content_migratio_3f108a1a: "Acquis sélectionnables pendant la migration du contenu du cours"
   selected_274ce24f: Sélectionné
   selected_all_courses_9cfef57f: "Sélectionner tous les cours"
   selected_answer: "Vous avez sélectionné cette réponse."
@@ -19615,6 +19630,10 @@ fr-CA:
   show_only_blueprint_courses_9fb37b41: "Afficher uniquement les cours modèles"
   show_originality_report_to_students_be22f5ee: "Afficher le rapport d’originalité aux étudiants"
   show_params_3401895b: "Afficher les paramètres"
+  show_past_account_level_announcements_to_users_3b8208e2: "Afficher les annonces passées au niveau du compte aux utilisateurs"
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      Afficher les annonces passées au niveau du compte aux utilisateurs. Permet
+      à un utilisateur de voir les annonces qui ont pris fin ou ont été rejetées.
   show_question_details_b059df00: "Afficher les informations de la questions"
   show_recent_activity_stream_2be4abc1: "Afficher le flux d'activité récente"
   show_report_to_students_a07888a6: "Afficher le rapport d’ aux étudiants"
@@ -19737,6 +19756,12 @@ fr-CA:
       forward: Transférer
   slovak_69f48e1b: Slovaque
   slovenian_30ae5208: Slovène
+  smart_alerts_43776718: "Alertes intelligentes"
+  smart_alerts_44db622e: "Alertes intelligentes"
+  smart_alerts_settings: 
+    threshold_12h: 12h
+    threshold_24h: 24h
+    threshold_36h: 36h
   sms_f0ddceeb: SMS
   snapshots_6e1806b4: Instantané
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Les instantanés sont des sauvegardes de votre essai Canvas. Prendre un instantané créera une « version » unique, qui représente un enregistrement parfait de l'état de votre essai au moment de l'instantané."
@@ -20669,6 +20694,7 @@ fr-CA:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "L'URL qu'un utilisateur possédant suffisamment de privilèges pourrait utiliser pour se faire passer pour l'utilisateur effectuant une observation sur la même page, pour essayer et reproduire le problème"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "L'URL de la page sur laquelle l'utilisateur se trouvait lorsqu'il a signalé l'erreur"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "L'utilisateur doit également être inscrit à titre d'instructeur dans les cours qu'il essaie de transférer."
+  the_value_of_possible_points_for_this_assignment_c_42396e3: "La valeur des points possibles pour cette tâche ne peut pas dépasser 999999999"
   their_grade_for_the_assignment_c36a60ef: "Leur note pour la tâche"
   theme_52404e51: Thème
   theme_editor_b7b00f6b: "Éditeur de thème"
@@ -20953,6 +20979,7 @@ fr-CA:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Cela vous permettra d’authentifier Canvas pour publier les notes sur SIS."
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Ceci appliquera ce thème sur l'intégralité de votre compte. Désirez-vous procéder?"
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Cela permettra de mettre à jour toutes les rubriques utilisant ce résultat qui n'ont pas encore été évaluées."
+  threshold_in_hours_to_notify_students_within_f33820aa: "Seuil (en heures) pour avertir les étudiants au sein de"
   threshold_pts_45f0e5d8: "seuil : %{pts}"
   ticket_successfully_submitted_f6254460: "Le billet a bien été soumis."
   ticketing_system_52205bff: "Système de billetterie"
@@ -21102,6 +21129,7 @@ fr-CA:
     port_moresby: "Port Moresby"
     prague: Prague
     pretoria: Pretoria
+    puerto_rico: "Puerto Rico"
     quito: Quito
     rangoon: Rangoun
     riga: Riga
