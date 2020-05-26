@@ -43,24 +43,24 @@ module DataFixup::Auditors::Migrate
           date = Time.zone.today
           expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(0)
           worker = AuthenticationWorker.new(account.id, date)
-          missing_uuids = worker.audit
-          expect(missing_uuids.size).to eq(20)
+          audit_results = worker.audit
+          expect(audit_results['missed_ids'].size).to eq(20)
           worker.perform
           expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(20)
-          missing_uuids = worker.audit
-          expect(missing_uuids.size).to eq(0)
+          audit_results = worker.audit
+          expect(audit_results['missed_ids'].size).to eq(0)
         end
 
         it "gets the same OUTCOME with a repair pass" do
           date = Time.zone.today
           expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(0)
           worker = AuthenticationWorker.new(account.id, date, operation_type: :repair)
-          missing_uuids = worker.audit
-          expect(missing_uuids.size).to eq(20)
+          audit_results = worker.audit
+          expect(audit_results['missed_ids'].size).to eq(20)
           worker.perform
           expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(20)
-          missing_uuids = worker.audit
-          expect(missing_uuids.size).to eq(0)
+          audit_results = worker.audit
+          expect(audit_results['missed_ids'].size).to eq(0)
         end
 
         it "depends on paginated data from cassandra being the same by ID" do
@@ -126,12 +126,12 @@ module DataFixup::Auditors::Migrate
       date = Time.zone.today
       expect(::Auditors::ActiveRecord::CourseRecord.count).to eq(0)
       worker = CourseWorker.new(sub_sub_account.id, date)
-      missing_uuids = worker.audit
-      expect(missing_uuids.size).to eq(10)
+      audit_results = worker.audit
+      expect(audit_results['missed_ids'].size).to eq(10)
       worker.perform
       expect(::Auditors::ActiveRecord::CourseRecord.count).to eq(10)
-      missing_uuids = worker.audit
-      expect(missing_uuids.size).to eq(0)
+      audit_results = worker.audit
+      expect(audit_results['missed_ids'].size).to eq(0)
     end
 
     it "writes the same result for courses from a REPAIR pass" do
@@ -147,12 +147,12 @@ module DataFixup::Auditors::Migrate
       date = Time.zone.today
       expect(::Auditors::ActiveRecord::CourseRecord.count).to eq(0)
       worker = CourseWorker.new(sub_sub_account.id, date, operation_type: :repair)
-      missing_uuids = worker.audit
-      expect(missing_uuids.size).to eq(10)
+      audit_results = worker.audit
+      expect(audit_results['missed_ids'].size).to eq(10)
       worker.perform
       expect(::Auditors::ActiveRecord::CourseRecord.count).to eq(10)
-      missing_uuids = worker.audit
-      expect(missing_uuids.size).to eq(0)
+      audit_results = worker.audit
+      expect(audit_results['missed_ids'].size).to eq(0)
     end
 
     it "writes grade change data to postgres that's in cassandra" do
@@ -168,12 +168,12 @@ module DataFixup::Auditors::Migrate
       expect(::Auditors::ActiveRecord::GradeChangeRecord.count).to eq(0)
       expect(::Auditors::GradeChange.for_assignment(assignment).paginate(per_page: 10).size).to eq(1)
       worker = GradeChangeWorker.new(sub_sub_account.id, date)
-      missing_uuids = worker.audit
-      expect(missing_uuids.size).to eq(1)
+      audit_results = worker.audit
+      expect(audit_results['missed_ids'].size).to eq(1)
       worker.perform
       expect(::Auditors::ActiveRecord::GradeChangeRecord.count).to eq(1)
-      missing_uuids = worker.audit
-      expect(missing_uuids.size).to eq(0)
+      audit_results = worker.audit
+      expect(audit_results['missed_ids'].size).to eq(0)
     end
 
     it "writes grade change data to postgres that's in cassandra from a REPAIR operation" do
@@ -189,12 +189,12 @@ module DataFixup::Auditors::Migrate
       expect(::Auditors::ActiveRecord::GradeChangeRecord.count).to eq(0)
       expect(::Auditors::GradeChange.for_assignment(assignment).paginate(per_page: 10).size).to eq(1)
       worker = GradeChangeWorker.new(sub_sub_account.id, date, operation_type: :repair)
-      missing_uuids = worker.audit
-      expect(missing_uuids.size).to eq(1)
+      audit_results = worker.audit
+      expect(audit_results['missed_ids'].size).to eq(1)
       worker.perform
       expect(::Auditors::ActiveRecord::GradeChangeRecord.count).to eq(1)
-      missing_uuids = worker.audit
-      expect(missing_uuids.size).to eq(0)
+      audit_results = worker.audit
+      expect(audit_results['missed_ids'].size).to eq(0)
     end
 
     it "can update the cassandra timeout" do
