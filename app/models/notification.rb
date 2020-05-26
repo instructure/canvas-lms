@@ -416,6 +416,7 @@ class Notification < ActiveRecord::Base
     t 'names.blueprint_content_added', 'Blueprint Content Added'
     t 'names.content_link_error', 'Content Link Error'
     t 'names.account_notification', 'Account Notification'
+    t 'names.upcoming_assignment_alert', 'Upcoming Assignment Alert'
   end
 
   # TODO: i18n ... show these anywhere we show the category today

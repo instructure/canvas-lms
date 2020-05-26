@@ -69,17 +69,26 @@ module AssignmentUtil
 
   def self.process_due_date_reminder(context_type, context_id)
     analyzer = StudentAwarenessAnalyzer.new(context_type, context_id)
+    notification = BroadcastPolicy.notification_finder.by_name('Upcoming Assignment Alert')
 
     # in the rather unlikely case where the due date gets reset *while* we're
     # scheduled to do this work, we don't want to end up alerting students for
     # something that's no longer due...
     unless analyzer.assignment&.due_at.nil?
-      analyzer.apply(&method(:alert_unaware_student))
+      analyzer.apply do |**kwargs|
+        alert_unaware_student(notification, **kwargs)
+      end
     end
   end
 
-  # TODO
-  def self.alert_unaware_student(assignment:, student:)
+  def self.alert_unaware_student(notification, assignment:, submission:)
+    BroadcastPolicy.notifier.send_notification(
+      assignment,
+      notification.name,
+      notification,
+      [submission.student],
+      assignment_due_date: submission.cached_due_date
+    )
   end
 
   class StudentAwarenessAnalyzer
@@ -104,7 +113,7 @@ module AssignmentUtil
     def apply(&block)
       submissions.find_each do |submission|
         unless seen_assignment_recently?(submission.student)
-          yield assignment: assignment, student: submission.student
+          yield assignment: assignment, submission: submission
         end
       end
     end

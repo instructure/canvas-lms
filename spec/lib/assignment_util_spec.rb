@@ -195,9 +195,14 @@ describe AssignmentUtil do
   end
 
   describe 'process_due_date_reminder' do
+    let(:submission_for) do
+      ->(user) {
+        Submission.find_by(assignment_id: assignment.id, user_id: user.id)
+      }
+    end
+
     it 'alerts students who have not submitted' do
-      expect(described_class).to receive(:alert_unaware_student) \
-        .with(assignment: assignment, student: @student)
+      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment: assignment, submission: submission_for[@student])
 
       described_class.process_due_date_reminder('Assignment', assignment.id)
     end
@@ -240,11 +245,9 @@ describe AssignmentUtil do
       section_b_user_1 = student_in_course(active_all: true, section: section_b).student
       section_b_ao = create_section_override_for_assignment(assignment, course_section: section_b)
 
-      expect(described_class).to receive(:alert_unaware_student) \
-        .with(assignment: assignment, student: section_a_user_1)
+      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment: assignment, submission: submission_for[section_a_user_1])
 
-      expect(described_class).to receive(:alert_unaware_student) \
-        .with(assignment: assignment, student: section_a_user_2)
+      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment: assignment, submission: submission_for[section_a_user_2])
 
       described_class.process_due_date_reminder(section_a_ao.class.name, section_a_ao.id)
     end
@@ -262,6 +265,25 @@ describe AssignmentUtil do
     it 'does nothing if assignment has no due date' do
       expect(described_class).not_to receive(:alert_unaware_student)
       assignment.update_attribute(:due_at, nil)
+      described_class.process_due_date_reminder('Assignment', assignment.id)
+    end
+
+    it 'actually alerts the student' do
+      notification = Notification.create!(name: 'Upcoming Assignment Alert', category: 'TestImmediately')
+
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
+        assignment,
+        notification.name,
+        notification,
+        [ @student ],
+        hash_including(
+          assignment_due_date: Submission.find_by(
+            assignment_id: assignment.id,
+            user_id: @student.id
+          ).cached_due_date
+        )
+      )
+
       described_class.process_due_date_reminder('Assignment', assignment.id)
     end
   end
