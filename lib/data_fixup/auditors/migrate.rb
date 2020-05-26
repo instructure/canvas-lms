@@ -149,17 +149,27 @@ module DataFixup::Auditors
         end
       end
 
-      def audit_in_pages(collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
-        @audit_failure_uuids ||= []
+      def audit_in_pages(ids_collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
+        @audit_results ||= {
+          'uuid_count' => 0,
+          'failure_count' => 0,
+          'missed_ids' => []
+        }
+        audit_failure_uuids = []
+        audit_uuid_count = 0
         next_page = 1
         until next_page.nil?
           page_args = { page: next_page, per_page: batch_size}
-          auditor_recs = get_cassandra_records_resiliantly(collection, page_args)
-          uuids = auditor_recs.map(&:id)
+          auditor_id_recs = get_cassandra_records_resiliantly(ids_collection, page_args)
+          uuids = auditor_id_recs.map{|rec| rec['id']}
+          audit_uuid_count += uuids.size
           existing_uuids = auditor_ar_type.where(uuid: uuids).pluck(:uuid)
-          @audit_failure_uuids += (uuids - existing_uuids)
-          next_page = auditor_recs.next_page
+          audit_failure_uuids += (uuids - existing_uuids)
+          next_page = auditor_id_recs.next_page
         end
+        @audit_results['uuid_count'] += audit_uuid_count
+        @audit_results['failure_count'] += audit_failure_uuids.size
+        @audit_results['missed_ids'] += audit_failure_uuids
       end
 
       def cell_attributes(target_date: nil)
@@ -284,9 +294,13 @@ module DataFixup::Auditors
 
       def audit
         extend_cassandra_stream_timeout!
-        @audit_failure_uuids = []
+        @audit_results = {
+          'uuid_count' => 0,
+          'failure_count' => 0,
+          'missed_ids' => []
+        }
         perform_audit
-        @audit_failure_uuids
+        return @audit_results
       ensure
         clear_cassandra_stream_timeout!
       end
@@ -363,7 +377,7 @@ module DataFixup::Auditors
       end
 
       def perform_audit
-        audit_in_pages(cassandra_collection, Auditors::ActiveRecord::AuthenticationRecord)
+        audit_in_pages(cassandra_id_collection, Auditors::ActiveRecord::AuthenticationRecord)
       end
 
       def filter_dead_foreign_keys(attrs_list)
@@ -402,7 +416,7 @@ module DataFixup::Auditors
       end
 
       def perform_audit
-        audit_in_pages(cassandra_collection, Auditors::ActiveRecord::CourseRecord)
+        audit_in_pages(cassandra_id_collection, Auditors::ActiveRecord::CourseRecord)
       end
 
       def filter_dead_foreign_keys(attrs_list)
@@ -457,7 +471,7 @@ module DataFixup::Auditors
         all_course_ids = migrateable_course_ids.to_a
         all_course_ids.in_groups_of(1000) do |course_ids|
           Course.where(id: course_ids).each do |course|
-            audit_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
+            audit_in_pages(cassandra_id_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
           end
         end
       end
