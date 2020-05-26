@@ -626,6 +626,24 @@ module CustomSeleniumActions
     end
   end
 
+  # Scroll To Element (without executing Javascript)
+  #
+  # Moves the mouse to the middle of the given element. The element is scrolled
+  # into view and its location is calculated using getBoundingClientRect.
+  # Then the mouse is moved to optional offset coordinates from the element.
+  #
+  # Note that when using offsets, both coordinates need to be passed.
+  #
+  # element (Selenium::WebDriver::Element) — to move to.
+  # right_by (Integer) (defaults to: nil) — Optional offset from the top-left corner.
+  #   A negative value means coordinates right from the element.
+  # down_by (Integer) (defaults to: nil) — Optional offset from the top-left corner.
+  #   A negative value means coordinates above the element.
+  def scroll_to_element(element, right_by = nil, down_by = nil)
+    driver.action.move_to(element, right_by, down_by).perform
+    wait_for_ajaximations
+  end
+
   def scroll_into_view(selector)
     driver.execute_script("$(#{selector.to_json})[0].scrollIntoView()")
   end
