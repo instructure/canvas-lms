@@ -527,6 +527,7 @@ class RCEWrapper extends React.Component {
     if (!this.state.focused) {
       this.setState({focused: true})
       Bridge.focusEditor(this)
+      this._forceCloseFloatingToolbar()
       this.props.onFocus && this.props.onFocus(this)
     }
   }
@@ -591,8 +592,6 @@ class RCEWrapper extends React.Component {
   }
 
   handleBlurRCE = event => {
-    this._forceCloseFloatingToolbar()
-
     if (event.relatedTarget === null) {
       // focus might be moving to tinymce
       this.handleBlur(event)
@@ -675,7 +674,6 @@ class RCEWrapper extends React.Component {
     this.getTextarea().style.resize = 'none'
     editor.on('Change', this.doAutoResize)
 
-    editor.on('blur', this._forceCloseFloatingToolbar)
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
 
     this.announceContextToolbars(editor)
@@ -931,6 +929,9 @@ class RCEWrapper extends React.Component {
       event.preventDefault()
       event.stopPropagation()
       this.openKBShortcutModal()
+    } else if (event.keyCode === 27) {
+      // ESC
+      this._forceCloseFloatingToolbar()
     }
   }
 
