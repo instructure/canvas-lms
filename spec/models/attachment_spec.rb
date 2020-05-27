@@ -2234,4 +2234,17 @@ describe Attachment do
       expect(dup.display_name).not_to eq 'test.txt'
     end
   end
+
+  context 'create' do
+    it 'sets the root_account_id using course context' do
+      attachment_model filename: 'test.txt'
+      expect(@attachment.root_account_id).to eq @course.root_account_id
+    end
+
+    it 'sets the root_account_id using account context' do
+      account_model
+      attachment_model filename: 'test.txt', context: @account
+      expect(@attachment.root_account_id).to eq @account.id
+    end
+  end
 end
