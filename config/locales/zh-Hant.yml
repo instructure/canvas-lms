@@ -2059,6 +2059,7 @@ zh-Hant:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: 允許為特定的分班創建通告
   allows_creating_discussions_for_a_specific_section_6bf44036: 允許為特定的分班創建討論區
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 允許支援連結標籤為精選或全新，並在支援選單中顯示為精選支援連結。
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: 遷移課程內容期間允許選取各學習成果
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: 允許以教師/設計者/助教為基礎的身份存取「聊天」工具。
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: 允許以教師/設計者/助教為基礎的身份存取聊天工具。
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: 允許以教師/助教為基礎的身份存取出席記錄工具。
@@ -4658,15 +4659,19 @@ zh-Hant:
   calendars_toggle_list_visibility_488db143: 月曆切換清單可見性
   can_create_and_update_submission_results_for_assig_51e7033d: 可以建立和更新與工具關聯的作業的提交項目結果。
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: 可以在與工具關聯的成績單中建立和檢視作業資料。
+  can_create_external_tools_4c293044: 可以創建外部工具。
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: 可創建，重新命名和編輯默認的課程頁面
   can_create_subscription_to_data_service_data_bb2874f2: 可以建立數據服務數據的訂閱。
+  can_destroy_external_tools_cdb0e734: 可以銷毀外部工具。
   can_destroy_subscription_to_data_service_data_b8dfca27: 可以銷毀數據服務數據的訂閱。
   can_edit_this_page_role_selection_6ccec3c7: 可編輯此頁面角色選擇
   can_interact_with_users_in_their_section_only_48cb8c43: 僅可在其班別內與使用者互動
   can_list_categorized_event_types_52596f7: 可列出分類的事件類型。
+  can_list_external_tools_9132ad0f: 可以列出外部工具。
   can_list_subscriptions_to_data_service_data_b52d5e37: 可以列出數據服務數據的訂閱。
   can_lookup_account_information_13d69520: 可以查詢帳戶資訊
   can_retrieve_user_data_associated_with_the_context_c5ec482c: 可以擷取與安裝工具所在的內容關聯的使用者資料。
+  can_show_external_tools_bb4988c5: 可以顯示外部工具。
   can_show_subscription_to_data_service_data_688ce3: 可以顯示數據服務數據的訂閱。
   can_t_compute_score_until_an_assignment_has_points_f34dd600: 在作業有可能得分之前，無法計算分數
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
@@ -4679,6 +4684,7 @@ zh-Hant:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: 如有學生提交文件，則無法取消發佈。
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "如果有學生提交件，則無法取消發佈 %{item_name}"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "如果有學生提交件，則無法取消發佈 %{name}"
+  can_update_external_tools_168c1abe: 可以更新外部工具。
   can_update_public_jwk_for_lti_services_26037129: "可以更新 LTI 服務的公開 jwk。"
   can_update_subscription_to_data_service_data_374a0c89: 可以更新數據服務數據的訂閱。
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: 可以在與工具關聯的成績單中檢視作業資料。
@@ -5310,6 +5316,8 @@ zh-Hant:
       投影片、展示應用程式和線上資源
       和更多。
   conference_36b50fda: 會議
+  conference_has_been_removed_f771cb11: 已移除會議
+  conference_has_been_updated_title_2bacc5fa: "已更新會議：%{title}"
   conference_selection_ea4050bb: 會議選取
   conference_was_deleted_30869390: 會議已刪除
   conferences: 
@@ -9286,6 +9294,7 @@ zh-Hant:
   error_retrieving_content_c07ee76b: 取回內容時發生錯誤
   error_retrieving_similarity_detection_tools_d6d4f9e9: 檢索相似性檢測工具錯誤
   error_running_quizzes_2_export_cfecedba: "運行測驗 2 導出時出錯。"
+  error_saving_assignment_dates_2af5e800: "儲存作業日期時發生錯誤： "
   error_saving_discussion_settings_3360661d: 保存討論區設定時出現錯誤
   error_sending_messages_13c874eb: 發送訊息時出錯
   error_sending_submission_comment_dc15d24f: 發送提交項目評分時發生錯誤
@@ -12175,6 +12184,7 @@ zh-Hant:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "的無效日期或無效日期時間%{attr}"
   invalid_date_or_time_333acd43: 無效的日期或時間
   invalid_date_time_3ae423f5: 無效的日期時間
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: 找到無效日期。請更正日期並重試。
   invalid_datetime_for_graded_since_884cce5: 的無效日期時間graded_since
   invalid_datetime_for_submitted_since_a238f3a6: " 的無效日期時間submitted_since"
   invalid_domain_e810c1d: 無效的網域
@@ -15982,6 +15992,7 @@ zh-Hant:
   notifications_unsupported_65f6bf65: 不支援通知
   notifications_view_f9a60770: "通知 - 查看"
   notify_immediately_d1749c07: 立即通知
+  notify_students_in_time_of_assignments_that_requir_332ef10e: 適時提醒學生需要注意的作業。
   notify_users_this_quiz_has_changed_c5b05995: 通知使用者此測驗已更改
   now_click_the_agenda_button_607fb40e: "現在請點擊 *議程* 按鈕"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: 現在您的課程已設置好并可使用，您也許不再需要此檢查清單。但我們將繼續保留它，以防萬一日後您意識到，您還想嘗試某些新的課程；或當您變更您的課程內容時，您或許還需要一點額外的支援。
@@ -17645,6 +17656,7 @@ zh-Hant:
   progress_for_account_name_ef203250: "%{account_name} 的進度"
   progress_loading_bar_a26b8861: 進度/載入條
   project_groups_1fa0320b: 專案群組
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "代詞與帳戶代詞不符，或是此帳戶未啟用代詞，%{user_id}，跳過"
   pronouns_d1cd8dd0: 代詞
   pronouns_for_users_da46fb5: 使用者的代詞
   pronouns_users_can_show_after_their_name_e80821c7: 可以顯示在使用者姓名後的代詞
@@ -19499,6 +19511,7 @@ zh-Hant:
   remove_c_name_section_d8eabd3a: "刪除 %{c.name} 章節"
   remove_collaborationtitle_c3e81adb: "確定要刪除 \"%{collaborationTitle}\"？"
   remove_conference_69b9e0d0: 移除會議
+  remove_conference_title_207d32c0: "移除會議：%{title}"
   remove_contact_method_ca890ba3: 刪除聯絡方式
   remove_course_association_name_b760c502: "移除課程關聯%{name}"
   remove_dates_9b9ba2f6: 移除日期
@@ -19647,6 +19660,7 @@ zh-Hant:
   retry_ebd5f8ba: 重試
   retry_migrating_name_bdc802ef: "重新嘗試遷移 \"%{name}\""
   return_to_parent_folder_4ece2184: 返回至母檔案夾
+  revert_date_changes_5105ce5: 取消日期變更
   revert_to_actual_score_f665eea9: 還原至實際分數
   revert_to_old_ui_3211da41: "回覆成舊 UI"
   review_now_318a6a3e: 立即查看
@@ -20331,6 +20345,7 @@ zh-Hant:
   select_video_file_35b61d4e: 選擇視訊文檔
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: 選擇您希望在首頁上顯示的內容。
   select_whether_to_post_for_all_submissions_or_only_b18d681f: 選擇是否公佈所有提交項目，或只公佈已評分的提交項目。
+  selectable_outcomes_during_course_content_migratio_3f108a1a: 課程內容遷移期間的可選取成果
   selected_274ce24f: 已選擇
   selected_all_courses_9cfef57f: 選擇所有課程
   selected_answer: 您選擇了此答案。
@@ -21290,6 +21305,10 @@ zh-Hant:
   show_only_blueprint_courses_9fb37b41: 只顯示計劃課程
   show_originality_report_to_students_be22f5ee: 向學生展示原創檢測報告
   show_params_3401895b: 顯示參數
+  show_past_account_level_announcements_to_users_3b8208e2: 向使用者顯示過去的帳戶等級通告
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      向使用者顯示過去的帳戶等級通告。允許
+      使用者檢視已結束或已忽略的通告。
   show_question_details_b059df00: 顯示問題詳細資料
   show_recent_activity_stream_2be4abc1: 顯示最近活動流
   show_report_to_students_a07888a6: 向學生展示報告
@@ -21431,6 +21450,12 @@ zh-Hant:
       forward: 轉發
   slovak_69f48e1b: 斯洛伐克語
   slovenian_30ae5208: 斯洛維尼亞文
+  smart_alerts_43776718: 智慧提醒
+  smart_alerts_44db622e: 智慧提醒
+  smart_alerts_settings: 
+    threshold_12h: 12h
+    threshold_24h: 24h
+    threshold_36h: 36h
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "在 Google Play 中"
@@ -22416,6 +22441,7 @@ zh-Hant:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "一個 URL，以供擁有充分權限使用者能夠用來在同一頁面上偽裝成報告使用者以嘗試重現該問題"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "使用者報告該錯誤時使用者所在頁面的 URL"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: 該使用者必須同時在嘗試跨列表選擇的課程中以導師身份註冊。
+  the_value_of_possible_points_for_this_assignment_c_42396e3: "該任務可能的分值不可超過 999999999。"
   their_grade_for_the_assignment_c36a60ef: 他們對作業的評分
   theme_52404e51: 主題
   theme_editor_b7b00f6b: 主題編輯器
@@ -22711,6 +22737,7 @@ zh-Hant:
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: 將要把上述設置應用于您的整個賬戶。您確定要繼續嗎？
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: 這將會在您整個帳戶中套用該主題。您確定要繼續嗎？
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: 這將使用此尚未評估的成果更新所有評分標準
+  threshold_in_hours_to_notify_students_within_f33820aa: 距離通知學生的臨界點（小時）尚有
   threshold_pts_45f0e5d8: "臨界值：%{pts}"
   ticket_successfully_submitted_f6254460: 票證已成功提交。
   ticketing_system_52205bff: 票務系統
@@ -22860,6 +22887,7 @@ zh-Hant:
     port_moresby: 莫爾斯貝港
     prague: 布拉格
     pretoria: 皮托里
+    puerto_rico: 波多黎各
     quito: 基多
     rangoon: 仰光
     riga: 里加

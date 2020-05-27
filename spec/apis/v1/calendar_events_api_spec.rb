@@ -30,7 +30,7 @@ describe CalendarEventsApiController, type: :request do
       'all_context_codes', 'all_day', 'all_day_date', 'child_events', 'child_events_count', 'comments',
       'context_code', 'created_at', 'description', 'duplicates', 'end_at', 'hidden', 'html_url',
       'id', 'location_address', 'location_name', 'parent_event_id', 'start_at',
-      'title', 'type', 'updated_at', 'url', 'workflow_state'
+      'title', 'type', 'updated_at', 'url', 'workflow_state', 'context_name'
     ]
     expected_slot_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'can_manage_appointment_group', 'available_slots', 'participants_per_appointment', 'reserve_url', 'participant_type', 'effective_context_code'])
     expected_reservation_event_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'can_manage_appointment_group', 'effective_context_code', 'participant_type'])
@@ -1358,10 +1358,25 @@ describe CalendarEventsApiController, type: :request do
           :calendar_event => {
             :context_code => "course_#{@course.id}",
             :title => "API Test",
+            web_conference: { conference_type: 'BigBlueButton', title: 'BBB Conference' }
+          }
+        })
+        expect(CalendarEvent.find(json['id']).web_conference).to have_attributes(conference_type: 'BigBlueButton', title: 'API Test')
+      end
+
+      it "should set defaults for new web_conference" do
+        json = api_call(:post, "/api/v1/calendar_events.json", {
+          :controller => 'calendar_events_api', :action => 'create', :format => 'json'
+        }, {
+          :calendar_event => {
+            :context_code => "course_#{@course.id}",
+            :title => "API Test",
             web_conference: { conference_type: 'BigBlueButton', title: 'My BBB Conference' }
           }
         })
-        expect(CalendarEvent.find(json['id']).web_conference).to have_attributes(conference_type: 'BigBlueButton', title: 'My BBB Conference')
+        conference = CalendarEvent.find(json['id']).web_conference
+        expect(conference.settings[:default_return_url]).to match(/\/courses\/#{@course.id}$/)
+        expect(conference.user).to eq @user
       end
 
       it "should fail to create with invald web_conference" do
@@ -1443,7 +1458,7 @@ describe CalendarEventsApiController, type: :request do
     expected_fields = [
       'all_day', 'all_day_date', 'assignment', 'context_code', 'created_at',
       'description', 'end_at', 'html_url', 'id', 'start_at', 'title', 'type', 'updated_at',
-      'url', 'workflow_state'
+      'url', 'workflow_state', 'context_name'
     ]
 
     it 'should return assignments within the given date range' do

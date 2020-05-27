@@ -66,12 +66,12 @@ class AccountNotification < ActiveRecord::Base
     end
   end
 
-  def self.for_user_and_account(user, root_account)
+  def self.for_user_and_account(user, root_account, include_past: false)
     Shackles.activate(:slave) do
       if root_account.site_admin?
-        current = self.for_account(root_account)
+        current = self.for_account(root_account, include_past: include_past)
       else
-        course_ids = user.enrollments.active_or_pending.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
+        course_ids = user.enrollments.active_or_pending_by_date.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
         # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
         all_account_ids = Course.where(:id => course_ids).not_deleted.
           distinct.pluck(:account_id, :root_account_id).flatten.uniq
@@ -79,7 +79,7 @@ class AccountNotification < ActiveRecord::Base
           joins(:account).where(accounts: {workflow_state: 'active'}).
           distinct.pluck(:account_id).uniq
         all_account_ids = Account.multi_account_chain_ids(all_account_ids) # get all parent sub-accounts too
-        current = self.for_account(root_account, all_account_ids)
+        current = self.for_account(root_account, all_account_ids, include_past: include_past)
       end
 
       user_role_ids = {}
@@ -95,13 +95,13 @@ class AccountNotification < ActiveRecord::Base
         unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
           # choose enrollments and account users to inspect
           if announcement.account.site_admin?
-            enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending.distinct.select(:role_id).to_a
+            enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending_by_date.distinct.select(:role_id).to_a
             account_users = user.account_users.shard(user.in_region_associated_shards).distinct.select(:role_id).to_a
           else
             announcement.shard.activate do
               sub_account_ids_map[announcement.account_id] ||=
                 Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
-              enrollments = Enrollment.where(user_id: user).active_or_pending.joins(:course).
+              enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course).
                 where(:courses => {:account_id => sub_account_ids_map[announcement.account_id]}).select(:role_id).to_a
               account_users = announcement.account.root_account.cached_all_account_users_for(user)
             end
@@ -123,16 +123,18 @@ class AccountNotification < ActiveRecord::Base
       end
 
       user.shard.activate do
-        closed_ids = user.get_preference(:closed_notifications) || []
-        # If there are ids marked as 'closed' that are no longer
-        # applicable, they probably need to be cleared out.
-        current_ids = current.map(&:id)
-        if !(closed_ids - current_ids).empty?
-          Shackles.activate(:master) do
-            user.set_preference(:closed_notifications, closed_ids & current_ids)
+        unless include_past
+          closed_ids = user.get_preference(:closed_notifications) || []
+          # If there are ids marked as 'closed' that are no longer
+          # applicable, they probably need to be cleared out.
+          current_ids = current.map(&:id)
+          unless (closed_ids - current_ids).empty?
+            Shackles.activate(:master) do
+              user.set_preference(:closed_notifications, closed_ids & current_ids)
+            end
           end
+          current.reject! { |announcement| closed_ids.include?(announcement.id) }
         end
-        current.reject! { |announcement| closed_ids.include?(announcement.id) }
 
         # filter out announcements that have a periodic cycle of display,
         # and the user isn't in the set of users to display it to this month (based
@@ -143,22 +145,25 @@ class AccountNotification < ActiveRecord::Base
           end
         end
 
-        roles = user.enrollments.shard(user.in_region_associated_shards).active_or_pending.distinct.pluck(:type)
+        roles = user.enrollments.shard(user.in_region_associated_shards).active_or_pending_by_date.distinct.pluck(:type)
 
         if roles == ['StudentEnrollment'] && !root_account.include_students_in_global_survey?
           current.reject! { |announcement| announcement.required_account_service == 'account_survey_notifications' }
         end
       end
 
-      current
+      current.sort_by {|item| item[:end_at]}.reverse
     end
   end
 
-  def self.for_account(root_account, all_visible_account_ids=nil)
+  def self.for_account(root_account, all_visible_account_ids=nil, include_past: false)
     # Refreshes every 10 minutes at the longest
     all_account_ids_hash = Digest::MD5.hexdigest all_visible_account_ids.try(:sort).to_s
     Rails.cache.fetch(['account_notifications4', root_account, all_account_ids_hash].cache_key, expires_in: 10.minutes) do
       now = Time.now.utc
+      end_at = now - 4.months if include_past
+      end_at ||= now
+
       # we always check the given account for the flag, even if the announcement is from the site_admin account
       # this allows us to make a global announcement that is filtered to only accounts with this flag
       enabled_flags = ACCOUNT_SERVICE_NOTIFICATION_FLAGS & root_account.allowed_services_hash.keys.map(&:to_s)
@@ -169,7 +174,7 @@ class AccountNotification < ActiveRecord::Base
       end
 
       Shard.partition_by_shard(account_ids) do |sharded_account_ids|
-        scope = AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", sharded_account_ids, now, now).
+        scope = AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", sharded_account_ids, now, end_at).
           where("required_account_service IS NULL OR required_account_service IN (?)", enabled_flags).
           order('start_at DESC').
           preload({:account => :root_account}, account_notification_roles: :role)
@@ -273,7 +278,7 @@ class AccountNotification < ActiveRecord::Base
           course_ids = Course.active.where(:id => min_id..max_id, :account_id => all_account_ids).pluck(:id)
           next unless course_ids.any?
           course_ids.each_slice(50) do |sliced_course_ids|
-            scope = Enrollment.active_or_pending.where(:course_id => sliced_course_ids)
+            scope = Enrollment.active_or_pending_by_date.where(:course_id => sliced_course_ids)
             scope = scope.where(:role_id => course_roles) unless get_everybody
             user_ids += scope.distinct.pluck(:user_id)
           end

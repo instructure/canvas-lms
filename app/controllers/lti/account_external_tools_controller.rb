@@ -28,6 +28,8 @@ module Lti
     include Ims::Concerns::AdvantageServices
     include Api::V1::ExternalTools
 
+    before_action :verify_target_developer_key, only: [:create, :update]
+
     MIME_TYPE = 'application/vnd.canvas.contextexternaltools+json'.freeze
 
     ACTION_SCOPE_MATCHERS = {
@@ -39,11 +41,16 @@ module Lti
     }.freeze.with_indifferent_access
 
     def create
-      # Will add in seperate PS
-    end
+      tool = target_developer_key.tool_configuration.new_external_tool(context)
+      tool.check_for_duplication(params.dig(:verify_uniqueness).present?)
 
-    def update
-      # Will add in seperate PS
+      if tool.errors.blank? && tool.save
+        invalidate_nav_tabs_cache(tool)
+        render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE
+      else
+        tool.destroy if tool.persisted?
+        render :json => tool.errors, :status => :bad_request, content_type: MIME_TYPE
+      end
     end
 
     def show
@@ -67,6 +74,14 @@ module Lti
 
     private
 
+    def verify_target_developer_key
+      head :unauthorized unless target_developer_key.usable_in_context?(context)
+    end
+
+    def target_developer_key
+      DeveloperKey.nondeleted.find_cached(params[:client_id])
+    end
+
     def scopes_matcher
       ACTION_SCOPE_MATCHERS.fetch(action_name, self.class.none)
     end
@@ -81,6 +96,12 @@ module Lti
 
     def message_type
       params[:message_type] || 'live-event'
+    end
+
+    def invalidate_nav_tabs_cache(tool)
+      if tool.has_placement?(:user_navigation) || tool.has_placement?(:course_navigation) || tool.has_placement?(:account_navigation)
+        Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
+      end
     end
   end
 end

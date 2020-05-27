@@ -21,7 +21,8 @@ module Lti
       FAILED_STATUS = 'failed'.freeze
       JWT_LIFETIME = 30.seconds
       SUCCESSFUL_STATUS = 'completed'.freeze
-      private_constant :FAILED_STATUS, :JWT_LIFETIME, :SUCCESSFUL_STATUS
+      JSON_FORMAT = 'json'.freeze
+      private_constant :FAILED_STATUS, :JWT_LIFETIME, :SUCCESSFUL_STATUS, :JSON_FORMAT
 
       private
 

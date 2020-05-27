@@ -848,6 +848,9 @@
     "quizzes_7e598f57": {
         "message": "Ngā Quizzes"
     },
+    "reading_a_media_track_file_failed_aborting_be051b20": {
+        "message": "I hapa te pānui i te ara pāpāho kōnae Whakakore"
+    },
     "record_7c9448b": {
         "message": "Tāhopu"
     },
@@ -931,6 +934,9 @@
     },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "I raruraru tētahi mea me taku kore e mōhio he aha te mea hei whakātu ki a koe."
+    },
+    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+        "message": "I raruraru tētahi mea, tīpakotia tō hononga ka ngana anō."
     },
     "something_went_wrong_d238c551": {
         "message": "I raruraru tētahi mea"

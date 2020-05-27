@@ -32,6 +32,37 @@ Enzyme.configure({adapter: new Adapter()})
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element
 document.documentElement.setAttribute('dir', 'ltr')
 
+// because everyone implements `flat()` and `flatMap()` except JSDOM 🤦🏼‍♂️
+if (!Array.prototype.flat) {
+  // eslint-disable-next-line no-extend-native
+  Object.defineProperty(Array.prototype, 'flat', {
+    configurable: true,
+    value: function flat(depth = 1) {
+      if (depth === 0) return this.slice()
+      return this.reduce(function(acc, cur) {
+        if (Array.isArray(cur)) {
+          acc.push(...flat.call(cur, depth - 1))
+        } else {
+          acc.push(cur)
+        }
+        return acc
+      }, [])
+    },
+    writable: true
+  })
+}
+
+if (!Array.prototype.flatMap) {
+  // eslint-disable-next-line no-extend-native
+  Object.defineProperty(Array.prototype, 'flatMap', {
+    configurable: true,
+    value: function flatMap(_cb) {
+      return Array.prototype.map.apply(this, arguments).flat()
+    },
+    writable: true
+  })
+}
+
 require('@instructure/ui-themes')
 
 if (process.env.DEPRECATION_SENTRY_DSN) {

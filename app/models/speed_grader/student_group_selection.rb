@@ -55,7 +55,7 @@ module SpeedGrader
             :student_not_in_selected_group
           end
         end
-      elsif initial_group.blank? || initial_group.group_memberships.active.where(moderator: false).none?
+      elsif initial_group.blank? || initial_group.group_memberships.active.where(moderator: [false, nil]).none?
         # We weren't given a specific student, but either we didn't previously
         # select a group or we've selected an empty one. Get the first group for
         # the course with at least one student.

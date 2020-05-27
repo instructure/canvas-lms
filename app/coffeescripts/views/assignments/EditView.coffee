@@ -41,7 +41,7 @@ import SisValidationHelper from '../../util/SisValidationHelper'
 import SimilarityDetectionTools from 'jsx/assignments/AssignmentConfigurationTools'
 import ModeratedGradingFormFieldGroup from 'jsx/assignments/ModeratedGradingFormFieldGroup'
 import AllowedAttemptsWithState from 'jsx/assignments/allowed_attempts/AllowedAttemptsWithState'
-import DefaultToolForm, { toolSubmissionType } from 'jsx/assignments/DefaultToolForm'
+import DefaultToolForm from 'jsx/assignments/DefaultToolForm'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 import * as returnToHelper from '../../../jsx/shared/helpers/returnToHelper'
 import 'jqueryui/dialog'
@@ -78,6 +78,8 @@ export default class EditView extends ValidatedFormView
   GRADED_ASSIGNMENT_FIELDS = '#graded_assignment_fields'
   EXTERNAL_TOOL_SETTINGS = '#assignment_external_tool_settings'
   DEFAULT_EXTERNAL_TOOL_CONTAINER = '#default_external_tool_container'
+  EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER = '#assignment_submission_type_selection_tool_launch_container'
+  EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON = '#assignment_submission_type_selection_launch_button'
   ALLOWED_ATTEMPTS_CONTAINER = '#allowed_attempts_fields'
   GROUP_CATEGORY_SELECTOR = '#group_category_selector'
   PEER_REVIEWS_FIELDS = '#assignment_peer_reviews_fields'
@@ -121,6 +123,8 @@ export default class EditView extends ValidatedFormView
     els["#{EXTERNAL_TOOLS_CONTENT_TYPE}"] = '$externalToolsContentType'
     els["#{EXTERNAL_TOOLS_CONTENT_ID}"] = '$externalToolsContentId'
     els["#{DEFAULT_EXTERNAL_TOOL_CONTAINER}"] = '$defaultExternalToolContainer'
+    els["#{EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER}"] = '$externalToolPlacementLaunchContainer'
+    els["#{EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON}"] = '$externalToolPlacementLaunchButton'
     els["#{ALLOWED_ATTEMPTS_CONTAINER}"] = '$allowedAttemptsContainer'
     els["#{ASSIGNMENT_POINTS_POSSIBLE}"] = '$assignmentPointsPossible'
     els["#{ASSIGNMENT_POINTS_CHANGE_WARN}"] = '$pointsChangeWarning'
@@ -344,13 +348,28 @@ export default class EditView extends ValidatedFormView
     subVal = @$submissionType.val()
     @$onlineSubmissionTypes.toggleAccessibly subVal == 'online'
     @$externalToolSettings.toggleAccessibly subVal == 'external_tool'
-    @$groupCategorySelector.toggleAccessibly subVal != 'external_tool'
-    @$peerReviewsFields.toggleAccessibly subVal != 'external_tool'
+
+    isPlacementTool = subVal.includes("external_tool_placement")
+    @$externalToolPlacementLaunchContainer.toggleAccessibly(isPlacementTool)
+    @handlePlacementExternalToolSelect(subVal) if isPlacementTool
+
+    @$groupCategorySelector.toggleAccessibly subVal != 'external_tool' && !isPlacementTool
+    @$peerReviewsFields.toggleAccessibly subVal != 'external_tool' && !isPlacementTool
     @$similarityDetectionTools.toggleAccessibly subVal == 'online' && ENV.PLAGIARISM_DETECTION_PLATFORM
     @$defaultExternalToolContainer.toggleAccessibly subVal == 'default_external_tool'
-    @$allowedAttemptsContainer.toggleAccessibly subVal == 'online' || subVal == 'external_tool'
+    @$allowedAttemptsContainer.toggleAccessibly subVal == 'online' || subVal == 'external_tool' || isPlacementTool
     if subVal == 'online'
       @handleOnlineSubmissionTypeChange()
+
+  handlePlacementExternalToolSelect: (selection) =>
+    toolId = selection.replace("external_tool_placement_", "")
+    # set the hidden inputs so we'll save the tool on the content tag the way we would normally
+    @$externalToolsContentId.val(toolId)
+    @$externalToolsContentType.val('context_external_tool')
+
+    selectedTool = _.find(@model.submissionTypeSelectionTools(), (tool) -> toolId == tool.id)
+    @$externalToolsUrl.val(selectedTool.external_url)
+    @$externalToolPlacementLaunchButton.text(selectedTool.title)
 
   handleOnlineSubmissionTypeChange: (env) =>
     showConfigTools = @$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).attr('checked') ||
@@ -513,7 +532,7 @@ export default class EditView extends ValidatedFormView
     @cacheAssignmentSettings()
 
     # Get the submission type if an alias type is used (e.g. default_external_tool)
-    $(SUBMISSION_TYPE).val(toolSubmissionType($(SUBMISSION_TYPE).val()))
+    $(SUBMISSION_TYPE).val(@toolSubmissionType($(SUBMISSION_TYPE).val()))
 
     if @dueDateOverrideView.containsSectionsWithoutOverrides()
       sections = @dueDateOverrideView.sectionsWithoutOverrides()
@@ -529,6 +548,12 @@ export default class EditView extends ValidatedFormView
       missingDateDialog.render()
     else
       super
+
+  toolSubmissionType: (submissionType) ->
+    if (submissionType == 'default_external_tool' || submissionType.includes("external_tool_placement"))
+      'external_tool'
+    else
+      submissionType
 
   saveAndPublish: (event) ->
     @shouldPublish = true

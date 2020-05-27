@@ -848,6 +848,9 @@
     "quizzes_7e598f57": {
         "message": "Tester"
     },
+    "reading_a_media_track_file_failed_aborting_be051b20": {
+        "message": "Lesing av mediasporingsfil feilet. Avbryter."
+    },
     "record_7c9448b": {
         "message": "Registrering"
     },
@@ -931,6 +934,9 @@
     },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Noe gikk galt og jeg vet ikke hva jeg skal vise deg."
+    },
+    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+        "message": "Noe gikk galt, sjekk forbindelsen din og forsøk igjen."
     },
     "something_went_wrong_d238c551": {
         "message": "Noe gikk galt"

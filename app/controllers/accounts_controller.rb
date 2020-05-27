@@ -1531,6 +1531,7 @@ class AccountsController < ApplicationController
                                    :include_students_in_global_survey, :license_type,
                                    {:lock_all_announcements => [:value, :locked]}.freeze,
                                    :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
+                                   :mobile_qr_login_is_enabled,
                                    :open_registration, :outgoing_email_default_name,
                                    :prevent_course_renaming_by_teachers, :restrict_quiz_questions,
                                    {:restrict_student_future_listing => [:value, :locked]}.freeze,

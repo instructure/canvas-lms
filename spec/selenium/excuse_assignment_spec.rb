@@ -127,7 +127,7 @@ describe 'Excuse an Assignment' do
       a2.grade_student(@student, grade: 5, grader: @teacher)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{a2.id}"
-      replace_content f('#grading-box-extended'), "EX\n"
+      replace_content f('#grading-box-extended'), "EX", press_return: true
 
       get "/courses/#{@course.id}/grades"
 
@@ -241,7 +241,7 @@ describe 'Excuse an Assignment' do
         get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
         click_option f('#assignment_select'), assignment.title
         click_option f('#student_select'), @student.name
-        replace_content f('#student_and_assignment_grade'), "EX\t"
+        replace_content f('#student_and_assignment_grade'), "EX", tab_out: true
         wait_for_ajaximations
       else
         assignment.grade_student(@student, excuse: true, grader: @teacher)
@@ -283,7 +283,7 @@ describe 'Excuse an Assignment' do
           expect(total).to eq '83%'
 
           click_option f('#assignment_select'), a1.title
-          replace_content f('#student_and_assignment_grade'), "EX\t"
+          replace_content f('#student_and_assignment_grade'), "EX", tab_out: true
           wait_for_ajaximations
           total = f('span.total-grade').text[/\d+(\.\d+)?%/]
         else
@@ -310,7 +310,7 @@ describe 'Excuse an Assignment' do
       Gradebook.click_assignment_header_menu_element(assignment.id, 'set default grade')
 
       ['EX', 'eX', 'Ex', 'ex'].each_with_index do |ex, i|
-        replace_content f("#student_grading_#{assignment.id}"), "#{ex}\n"
+        replace_content f("#student_grading_#{assignment.id}"), ex, press_return: true
         wait_for_ajaximations
         expect(ff('.ic-flash-error').length).to be i + 1
         expect(f('.ic-flash-error').text).to include 'Default grade cannot be set to EX'

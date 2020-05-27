@@ -848,6 +848,9 @@
     "quizzes_7e598f57": {
         "message": "Cwisiau"
     },
+    "reading_a_media_track_file_failed_aborting_be051b20": {
+        "message": "Wedi methu darllen ffeil trac cyfryngau. Wrthi’n terfynu"
+    },
     "record_7c9448b": {
         "message": "Recordio"
     },
@@ -931,6 +934,9 @@
     },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Aeth rhywbeth o''i le a dydw i ddim yn gwybod beth i''w ddangos i chi."
+    },
+    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+        "message": "Aeth rhywbeth o''i le, edrychwch ar eich cysylltiad â''r a rhoi cynnig arall arni."
     },
     "something_went_wrong_d238c551": {
         "message": "Aeth rhywbeth o’i le"

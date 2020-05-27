@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
+import I18n from 'i18n!conferences'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
 import AddConference from './AddConference'
 import Conference from './Conference'
 import getConferenceType from '../utils/getConferenceType'
@@ -26,18 +28,36 @@ import webConference from 'jsx/shared/proptypes/webConference'
 import webConferenceType from 'jsx/shared/proptypes/webConferenceType'
 
 const CalendarConferenceWidget = ({context, conference, conferenceTypes, setConference}) => {
+  const addConferenceRef = useRef(null)
+  const removeConferenceRef = useRef(null)
   const currentConferenceType = conference && getConferenceType(conferenceTypes, conference)
   const showAddConference =
     setConference && (conferenceTypes.length > 1 || (conferenceTypes.length > 0 && !conference))
-  const removeConference = setConference ? () => setConference(null) : null
+  const setConferenceWithAlert = c => {
+    setConference(c)
+    showFlashAlert({
+      message: I18n.t('Conference has been updated: %{title}', {title: c.title}),
+      srOnly: true
+    })
+    setTimeout(() => removeConferenceRef.current?.focus(), 250)
+  }
+  const removeConference = () => {
+    setConference(null)
+    showFlashAlert({message: I18n.t('Conference has been removed'), srOnly: true})
+    setTimeout(() => addConferenceRef.current?.focus(), 250)
+  }
+
   return (
     <View as="div" padding="0 0 x-small">
       {showAddConference && (
         <AddConference
+          inputRef={el => {
+            addConferenceRef.current = el
+          }}
           context={context}
           currentConferenceType={currentConferenceType}
           conferenceTypes={conferenceTypes}
-          setConference={setConference}
+          setConference={setConferenceWithAlert}
         />
       )}
       {conference && (
@@ -46,12 +66,15 @@ const CalendarConferenceWidget = ({context, conference, conferenceTypes, setConf
           background="secondary"
           borderWidth="small"
           borderRadius="medium"
-          padding="xxx-small x-small"
+          padding="xx-small x-small"
         >
           <Conference
             conference={conference}
             conferenceType={currentConferenceType}
             removeConference={removeConference}
+            removeButtonRef={el => {
+              removeConferenceRef.current = el
+            }}
           />
         </View>
       )}

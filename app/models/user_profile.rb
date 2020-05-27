@@ -36,6 +36,7 @@ class UserProfile < ActiveRecord::Base
   TAB_PROFILE_SETTINGS,
   TAB_OBSERVEES,
   TAB_QR_MOBILE_LOGIN,
+  TAB_PAST_GLOBAL_ANNOUNCEMENTS,
   TAB_CONTENT_SHARES =
     *0..10
 
@@ -88,6 +89,7 @@ class UserProfile < ActiveRecord::Base
         tabs = tabs.slice(0, 2) if user&.fake_student?
         insert_observer_tabs(tabs, user)
         insert_qr_mobile_login_tab(tabs, user, opts)
+        insert_past_global_announcements(tabs, user, opts)
         tabs
       end
   end
@@ -161,7 +163,7 @@ class UserProfile < ActiveRecord::Base
   end
 
   def insert_qr_mobile_login_tab(tabs, user, opts)
-    if user && instructure_misc_plugin_available? && opts[:root_account]&.feature_enabled?(:mobile_qr_login)
+    if user && instructure_misc_plugin_available? && opts[:root_account]&.mobile_qr_login_is_enabled?
       tabs <<
         {
           id: TAB_QR_MOBILE_LOGIN,
@@ -169,6 +171,19 @@ class UserProfile < ActiveRecord::Base
           css_class: 'qr_mobile_login',
           href: :qr_mobile_login_path,
           no_args: true
+        }
+    end
+  end
+
+  def insert_past_global_announcements(tabs, user, opts)
+    if user && opts[:root_account]&.feature_enabled?(:past_announcements)
+      tabs <<
+        {
+          id: TAB_PAST_GLOBAL_ANNOUNCEMENTS,
+          label: I18n.t('#tabs.past_global_announcements', 'Global Announcements'),
+          css_class: 'past_global_announcements',
+          href: :account_notifications_path,
+          no_args: {include_past: true}
         }
     end
   end

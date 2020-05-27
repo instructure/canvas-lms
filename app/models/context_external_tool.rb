@@ -175,6 +175,12 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
+  def can_be_rce_favorite?
+    self.context.respond_to?(:root_account?) &&
+    self.context.root_account? &&
+    !self.editor_button.nil?
+  end
+
   def sync_placements!(placements)
     old_placements = self.context_external_tool_placements.pluck(:placement_type)
     placements_to_delete = Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) - placements
@@ -465,7 +471,7 @@ class ContextExternalTool < ActiveRecord::Base
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
     self.root_account ||= context.root_account
-
+    self.is_rce_favorite &&= self.can_be_rce_favorite?
     ContextExternalTool.normalize_sizes!(self.settings)
 
     Lti::ResourcePlacement::PLACEMENTS.each do |type|
@@ -595,6 +601,12 @@ end
 
     # If tool with same domain is found in the context
     self.class.all_tools_for(context).where.not(id: id).where(domain: domain).present? && domain.present?
+  end
+
+  def check_for_duplication(verify_uniqueness)
+    if duplicated_in_context? && verify_uniqueness
+      errors.add(:tool_currently_installed, 'The tool is already installed in this context.')
+    end
   end
 
   def self.from_content_tag(tag, context)

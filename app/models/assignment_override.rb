@@ -44,6 +44,8 @@ class AssignmentOverride < ActiveRecord::Base
   validates_uniqueness_of :set_id, :scope => [:quiz_id, :set_type, :workflow_state],
     :if => lambda{ |override| override.quiz? && override.active? && concrete_set.call(override) }
 
+  before_create :set_root_account_id
+
   validate :if => concrete_set do |record|
     if record.set && record.assignment && record.active?
       case record.set
@@ -393,5 +395,9 @@ class AssignmentOverride < ActiveRecord::Base
     p.to { applies_to_admins }
     p.whenever { |record| record.notify_change? }
     p.data { course_broadcast_data }
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= assignment&.root_account_id
   end
 end

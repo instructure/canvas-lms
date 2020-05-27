@@ -172,45 +172,7 @@ describe "Gradebook" do
   end
 
   context "downloading and uploading submissions" do
-    it "updates the dropdown menu after downloading and processes submission uploads", test_id: 3253285, priority: "1" do
-      # Given I have a student with an uploaded submission
-      a = attachment_model(context: @student_2, content_type:'text/plain')
-      @first_assignment.submit_homework(@student_2, submission_type: 'online_upload', attachments: [a])
-
-      # When I go to the gradebook
-      Gradebook.visit(@course)
-
-      # chrome fails to find the download submissions link because it does not fit normal screen
-
-
-      # And I click the download submissions button
-      Gradebook.click_assignment_header_menu_element(@first_assignment.id,"download submissions")
-
-      # And I close the download submissions dialog
-      fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
-
-      # And I click the dropdown menu on the assignment again
-      Gradebook.click_assignment_header_menu(@first_assignment.id)
-
-      # And I click the re-upload submissions link
-      f('[data-menu-item-id="reupload-submissions"]').click
-
-      # When I attach a submissions zip file
-      fixture_file = Rails.root.join('spec', 'fixtures', 'files', 'submissions.zip')
-      f('input[name=submissions_zip]').send_keys(fixture_file)
-
-      # And I upload it
-      expect_new_page_load do
-        fj('button:contains("Upload Files")').click
-      end
-
-      # Then I should see a message indicating the file was processed
-      expect(f('#content h3')).to include_text 'Attached files to the following user submissions'
-    end
-
     it "redirects to the submissions upload page after uploading submissions" do
-      Account.site_admin.enable_feature!(:submissions_reupload_status_page)
-
       # Given I have a student with an uploaded submission
       a = attachment_model(context: @student_2, content_type:'text/plain')
       @first_assignment.submit_homework(@student_2, submission_type: 'online_upload', attachments: [a])

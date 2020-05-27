@@ -195,6 +195,18 @@ describe ConversationsController do
         expect(@user.unread_conversations_count).to eq 0
       end
     end
+
+    context "starred conversations" do
+      it "returns starred conversations with no received messages" do
+        course_with_student_logged_in(:active_all => true)
+        conv = @user.initiate_conversation([])
+        conv.update_attributes(starred: true, message_count: 1)
+
+        get 'index', params: {:scope => 'starred'}, :format => 'json'
+        expect(response).to be_successful
+        expect(assigns[:conversations_json].size).to be 1
+      end
+    end
   end
 
   describe "GET 'show'" do

@@ -1831,6 +1831,7 @@ da-x-k12:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillader oprettelse af beskeder for en bestemt sektion"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Tillader oprettelse af diskussioner for en bestemt sektion"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Tillader, at hjælpelinks kan markeres som Fremhævede eller Nye og viser tydeligt det fremhævede hjælpelink i hjælpemenuen."
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Gør, at læringsudbytter kan vælges, når man overfører fagindhold"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Gør det muligt for roller, der er baseret på lærer, designer, undervisningsassistent, at få adgang til værktøjet Chat."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gør det muligt for roller, der er baseret på lærer/designer/undervisningsassistent, at få adgang til værktøjet Chat."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Gør det muligt for roller, der er baseret på lærer/undervisningsassistent, at få adgang til værktøjet Tilstedeværelse."
@@ -4138,15 +4139,19 @@ da-x-k12:
   calendars_toggle_list_visibility_488db143: "Synlighed for liste til kalenderskift"
   can_create_and_update_submission_results_for_assig_51e7033d: "Kan oprette og opdatere afleveringsresultater for opgaver, der er knyttet til værktøjet."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Kan oprette og vise opgavedata i den vurderingsoversigt, der er knyttet til værktøjet."
+  can_create_external_tools_4c293044: "Kan oprette eksterne værktøjer."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "kan som standard oprette, omdøbe og redigere fagsider"
   can_create_subscription_to_data_service_data_bb2874f2: "Kan oprette abonnement på datatjenestedata."
+  can_destroy_external_tools_cdb0e734: "Kan ødelægge eksterne værktøjer."
   can_destroy_subscription_to_data_service_data_b8dfca27: "Kan destruere abonnement på datatjenestedata."
   can_edit_this_page_role_selection_6ccec3c7: "Kan redigere denne side rollevalg"
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan kun interagere med brugere i deres sektion"
   can_list_categorized_event_types_52596f7: "Kan oprette en liste over kategoriserede begivenhedstyper."
+  can_list_external_tools_9132ad0f: "Kan liste eksterne værktøjer."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Kan oprette liste over abonnementer på datatjenestedata."
   can_lookup_account_information_13d69520: "Kan slå kontooplysninger op"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Kan hente brugerdata i forbindelse med den kontekst, værktøjet er installeret i."
+  can_show_external_tools_bb4988c5: "Kan vise eksterne værktøjer."
   can_show_subscription_to_data_service_data_688ce3: "Kan vise abonnement på datatjenestedata."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikke beregne resultat, før en opgave har mulige point"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
@@ -4159,6 +4164,7 @@ da-x-k12:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Kan ikke annullere offentliggørelsen, hvis der findes afleveringer fra elever"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Kan ikke annullere offentliggørelse af %{item_name}, hvis det indeholder afleveringer fra elever"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Kan ikke annullere offentliggørelse af %{name}, hvis det indeholder afleveringer fra elever"
+  can_update_external_tools_168c1abe: "Kan opdatere eksterne værktøjer."
   can_update_public_jwk_for_lti_services_26037129: "Kan opdatere offentlig jwk for LTI-tjenester."
   can_update_subscription_to_data_service_data_374a0c89: "Kan opdatere abonnement på datatjenestedata."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Kan se opgavedata i den vurderingsoversigt, der er knyttet til værktøjet."
@@ -4719,6 +4725,8 @@ da-x-k12:
                 demonstrationer af applikationer og online-ressourcer og meget
                 mere.
   conference_36b50fda: Konference
+  conference_has_been_removed_f771cb11: "Konference er blevet fjernet"
+  conference_has_been_updated_title_2bacc5fa: "Konference er blevet opdateret: %{title}"
   conference_selection_ea4050bb: Konferencevalg
   conference_was_deleted_30869390: "Konferencen blev slettet"
   conferences: 
@@ -8169,6 +8177,7 @@ da-x-k12:
   error_retrieving_content_c07ee76b: "Fejl ved hentning af indhold"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Fejl ved hentning af ligheds-detektionsværktøjer"
   error_running_quizzes_2_export_cfecedba: "Fejl ved kørsel af quizzer til eksport."
+  error_saving_assignment_dates_2af5e800: "Fejl ved lagring af opgavedatoer: "
   error_saving_discussion_settings_3360661d: "Fejl ved at gemme diskussionsindstillinger"
   error_sending_messages_13c874eb: "Fejl ved afsendelse af beskeder"
   error_sending_submission_comment_dc15d24f: "Fejl ved afsendelse af afleveringskommentar"
@@ -10305,6 +10314,7 @@ da-x-k12:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Ugyldig dato eller ugyldig dato og klokkeslæt for %{attr}"
   invalid_date_or_time_333acd43: "Ugyldig dato eller klokkeslæt"
   invalid_date_time_3ae423f5: "Ugyldig dato-tid"
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: "Der blev fundet ugyldige datoer. Ret dem, og prøv igen."
   invalid_datetime_for_graded_since_884cce5: "Ugyldig datetime for graded_since"
   invalid_datetime_for_submitted_since_a238f3a6: "Ugyldig datetime for submitted_since"
   invalid_domain_e810c1d: "Ugyldigt domæne"
@@ -13665,6 +13675,7 @@ da-x-k12:
   notifications_unsupported_65f6bf65: "Meddelelser understøttes ikke"
   notifications_view_f9a60770: "Meddelelser - vis"
   notify_immediately_d1749c07: "Underret straks"
+  notify_students_in_time_of_assignments_that_requir_332ef10e: "Underret de eleverne i tide om opgaver, der kræver deres opmærksomhed."
   notify_users_this_quiz_has_changed_c5b05995: "Informer brugere om, at denne quiz er blevet ændret"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Nu hvor dit fag er konfigureret og tilgængeligt, har du sikkert ikke længere brug for denne tjekliste. Men vi lader den stå i tilfælde af, at du senere vil prøve noget nyt, eller blot leder efter lidt ekstra hjælp, når du foretager ændringer i dit fags indhold."
   now_viewing_attempt_current_attempt_918e616: "Viser nu forsøg %{current_attempt}"
@@ -15169,6 +15180,7 @@ da-x-k12:
   progress_for_account_name_ef203250: "Fremskridt for %{account_name}"
   progress_loading_bar_a26b8861: "Linje til fremskridt/indlæsning"
   project_groups_1fa0320b: Projektgrupper
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "Pronomen stemmer ikke overens med kontoens pronomen, eller pronomener er ikke aktiveret for denne konto, %{user_id}, springer over"
   pronouns_d1cd8dd0: Pronomener
   pronouns_for_users_da46fb5: "Pronomen for brugere"
   provide_a_space_for_users_to_work_on_a_single_docu_9e4fc18c: |-
@@ -16730,6 +16742,7 @@ da-x-k12:
   remove_attribute_59a4aa64: "Fjern egenskab"
   remove_collaborationtitle_c3e81adb: "Fjern \"%{collaborationTitle}\"?"
   remove_conference_69b9e0d0: "Fjern konference"
+  remove_conference_title_207d32c0: "Fjern konference: %{title}"
   remove_contact_method_ca890ba3: "Fjern kontaktmetode"
   remove_course_association_name_b760c502: "Fjern fag-associationer %{name}"
   remove_dates_9b9ba2f6: "Fjern datoer"
@@ -16858,6 +16871,7 @@ da-x-k12:
   retry_ebd5f8ba: "Prøv igen"
   retry_migrating_name_bdc802ef: "Prøv at overføre \"%{name}\" igen\""
   return_to_parent_folder_4ece2184: "vend tilbage til overordnet mappe"
+  revert_date_changes_5105ce5: "Genindlæs datoændringer"
   revert_to_actual_score_f665eea9: "Vend tilbage til faktiske resultat"
   revert_to_old_ui_3211da41: "Tilbage til gammel grænseflade"
   review_now_318a6a3e: "Gennemgå nu"
@@ -17489,6 +17503,7 @@ da-x-k12:
   select_video_file_35b61d4e: "Vælg videofil"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Vælg, hvad du vil vise på hjemmesiden."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "Vælg, om du vil slå dem op for alle afleveringer, eller kun dem med vurdering."
+  selectable_outcomes_during_course_content_migratio_3f108a1a: "Valgbare læringsudbytter under overførsel af fagindhold"
   selected_274ce24f: Valgt
   selected_all_courses_9cfef57f: "Vælg alle fag"
   selected_answer: "Du valgte dette svar."
@@ -18264,6 +18279,10 @@ da-x-k12:
   show_only_blueprint_courses_9fb37b41: "Vis kun blueprint-fag"
   show_originality_report_to_students_be22f5ee: "Vis originalitetsrapport til eleverne"
   show_params_3401895b: "Vis parametre"
+  show_past_account_level_announcements_to_users_3b8208e2: "Vis tidligere beskeder på kontoniveau til brugere"
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      Vis tidligere beskeder på kontoniveau til brugere. Lader
+      en bruger se beskeder, der er afsluttet eller afvist.
   show_question_details_b059df00: "Vis spørgsmålsoplysninger"
   show_report_to_students_a07888a6: "Vis de elev rapporten"
   show_rubric_dca783f2: "Vis vurderingskriterium"
@@ -18376,6 +18395,12 @@ da-x-k12:
   slack_notifications_3a0288e6: Slack-meddelelser
   slovak_69f48e1b: Slovakisk
   slovenian_30ae5208: Slovensk
+  smart_alerts_43776718: "Smarte varslinger"
+  smart_alerts_44db622e: "Smarte varslinger"
+  smart_alerts_settings: 
+    threshold_12h: 12h
+    threshold_24h: 24h
+    threshold_36h: 36h
   sms_f0ddceeb: sms
   snapshots_6e1806b4: Øjebliksbilleder
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Øjebliksbilleder er sikkerhedskopier af din Canvas-prøveversion. Når du tager et øjebliksbillede skaber du en unik \"version\", hvilket er en perfekt registrering af tilstanden af ​​din prøveperiode på tidspunktet for øjebliksbilledet."
@@ -19267,6 +19292,7 @@ da-x-k12:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "Den url, som en bruger med tilstrækkelige privilegier kan bruge til at kunne anvende den rapporterende brugers identitet på samme side for at forsøge at gengive problemet."
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL for den side, som brugeren befandt sig på, da de indberettede fejlen"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "Brugeren skal også være tilmeldt som instruktør i de fag, som brugeren forsøger at krydsliste."
+  the_value_of_possible_points_for_this_assignment_c_42396e3: "Værdien af mulige point til denne opgave må ikke være større end 999999999."
   their_grade_for_the_assignment_c36a60ef: "Deres vurdering for opgaven"
   theme_52404e51: Tema
   theme_editor_b7b00f6b: "Theme Editor"
@@ -19521,6 +19547,7 @@ da-x-k12:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette giver dig mulighed for at godkende Canvas til at lægge vurderinger ud på SIS"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Dette vil anvende dette tema for hele din konto. Ønsker du at fortsætte?"
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Dette vil opdatere alle vurderingskriterier, der bruger dette læringsudbytte, der endnu ikke er vurderet"
+  threshold_in_hours_to_notify_students_within_f33820aa: "Tærskel (i timer) til at underrette eleverne"
   threshold_pts_45f0e5d8: "tærskel: %{pts}"
   ticket_successfully_submitted_f6254460: "Supportsag indsendt."
   ticketing_system_52205bff: "Supportsag system"
@@ -19670,6 +19697,7 @@ da-x-k12:
     port_moresby: "Port Moresby"
     prague: Prag
     pretoria: Pretoria
+    puerto_rico: "Puerto Rico"
     quito: Quito
     rangoon: Rangoon
     riga: Riga

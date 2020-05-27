@@ -36,8 +36,10 @@ describe 'Account Notification API', type: :request do
                      account_id: @admin.account.id.to_s}
     end
 
+    let(:second_announcement) { account_notification(message: 'second') }
+
     it "should list notifications" do
-      account_notification(message: 'second')
+      second_announcement
       json = api_call(:get, @path, @api_params,)
       expect(json.length).to eq 2
       expect(json.map{|r| r["message"]}).to match_array(%w{default second})
@@ -61,6 +63,20 @@ describe 'Account Notification API', type: :request do
         format: 'json',
         user_id: other_user.id.to_s,
         account_id: @admin.account.id.to_s}, {}, {:expected_status => 404})
+    end
+
+    it "should include dismissed past announcements" do
+      @user.close_announcement(second_announcement)
+      @account.enable_feature!(:past_announcements)
+      json = api_call(:get, @path, @api_params.merge(include_past: true),)
+      expect(json.length).to eq 2
+    end
+
+    it "should not include dismissed past announcements by default" do
+      @user.close_announcement(second_announcement)
+      @account.enable_feature!(:past_announcements)
+      json = api_call(:get, @path, @api_params,)
+      expect(json.length).to eq 1
     end
   end
 

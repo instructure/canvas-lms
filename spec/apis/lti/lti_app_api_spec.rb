@@ -266,5 +266,32 @@ module Lti
         end
       end
     end
+
+    describe '#index on root account' do
+      let(:tool) { new_valid_external_tool(account, true) }
+      let(:params) do
+        {
+          controller: 'lti/lti_apps',
+          action: 'index',
+          format: 'json',
+          account_id: account.id
+        }
+      end
+      subject { api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps", params) }
+
+      it "includes is_rce_favorite when applicable" do
+        account_admin_user(account: account)
+        tool.editor_button = {url: "http://example.com", icon_url: "http://example.com"}
+        tool.is_rce_favorite = true
+        tool.save!
+        expect(subject[0]["is_rce_favorite"]).to be true
+      end
+
+      it "does not include is_rce_favorite when not applicable" do
+        account_admin_user(account: account)
+        tool
+        expect(subject[0].has_key?("is_rce_favorite")).to be false
+      end
+    end
   end
 end

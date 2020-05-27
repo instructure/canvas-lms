@@ -35,3 +35,9 @@ selectable_outcomes_in_course_copy:
   applies_to: RootAccount
   display_name: "Selectable outcomes during course content migration"
   description: "Allows learning outcomes to be selectable when migrating course content"
+limit_section_visibility_in_lmgb:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Restricted view for teachers in LMGB
+  description: Hides certain students and sections in the LMGB if the teacher only
+    has access to a particular section

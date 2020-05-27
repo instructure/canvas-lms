@@ -68,7 +68,11 @@ class WebConference < ActiveRecord::Base
   end
 
   def user_settings=(new_settings)
-    @user_settings = new_settings.symbolize_keys
+    new_settings = new_settings.symbolize_keys
+    if new_settings != user_settings
+      settings_will_change!
+      @user_settings = new_settings
+    end
   end
 
   def user_settings
@@ -77,6 +81,10 @@ class WebConference < ActiveRecord::Base
         hash[key] = settings[key]
         hash
       }
+  end
+
+  def lti?
+    false
   end
 
   def lti_settings=(new_settings)
@@ -236,6 +244,14 @@ class WebConference < ActiveRecord::Base
       self.save
     end
     p.save
+  end
+
+  def invite_users_from_context(user_ids = context.user_ids)
+    members = context.is_a?(Course) ? context.participating_users(user_ids) : context.participating_users_in_context(user_ids)
+    new_invitees = members.to_a - invitees
+    new_invitees.uniq.each do |u|
+      add_invitee(u)
+    end
   end
 
   def recording_ready!
@@ -474,12 +490,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.active_conference_type_names
-    plugin_names = WebConference.plugins.map{|p| p.id.classify}
-    if Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
-      plugin_names + ['LtiConference']
-    else
-      plugin_names
-    end
+    WebConference.plugins.map{|p| p.id.classify}
   end
 
   scope :active, -> { where(:conference_type => WebConference.active_conference_type_names) }

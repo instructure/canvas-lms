@@ -273,6 +273,7 @@ module Pact::Canvas
       mteacher.pseudonyms.create!(unique_id: mteacher_email, password: 'password', password_confirmation: 'password', sis_user_id: "SIS_#{mteacher_name}")
       mteacher.email = mteacher_email
       mteacher.accept_terms
+      mteacher.update(pronouns: "She/Her")
       
       # The logic below will stomp @course and perhaps a few other things.  
       # We'll save them so that we can restore them later to their original value.

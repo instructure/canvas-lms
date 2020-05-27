@@ -21,7 +21,10 @@ class ContextModuleProgression < ActiveRecord::Base
 
   belongs_to :context_module
   belongs_to :user
+  belongs_to :root_account, class_name: 'Account'
+
   before_save :set_completed_at
+  before_create :set_root_account_id
 
   after_save :touch_user
 
@@ -41,6 +44,10 @@ class ContextModuleProgression < ActiveRecord::Base
     else
       self.completed_at = nil
     end
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.context_module.root_account_id
   end
 
   def finished_item?(item)

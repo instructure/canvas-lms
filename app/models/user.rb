@@ -100,9 +100,11 @@ class User < ActiveRecord::Base
   has_many :current_groups, :through => :current_group_memberships, :source => :group
   has_many :user_account_associations
   has_many :associated_accounts, -> { order("user_account_associations.depth") }, source: :account, through: :user_account_associations
-  has_many :associated_root_accounts, -> { order("user_account_associations.depth").where(accounts: { parent_account_id: nil }) }, source: :account, through: :user_account_associations
+  has_many :associated_root_accounts, -> { order("user_account_associations.depth").
+    where(accounts: { parent_account_id: nil }) }, source: :account, through: :user_account_associations
   has_many :developer_keys
-  has_many :access_tokens, -> { where(:workflow_state => "active").preload(:developer_key) }
+  has_many :access_tokens, -> { where(:workflow_state => "active").preload(:developer_key) }, inverse_of: :user
+  has_many :masquerade_tokens, -> { where(:workflow_state => "active").preload(:developer_key) }, class_name: 'AccessToken', inverse_of: :real_user
   has_many :notification_endpoints, :through => :access_tokens
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :lti_results, inverse_of: :user, class_name: 'Lti::Result', dependent: :destroy
@@ -205,6 +207,10 @@ class User < ActiveRecord::Base
   def conversations
     # i.e. exclude any where the user has deleted all the messages
     all_conversations.visible.order("last_message_at DESC, conversation_id DESC")
+  end
+
+  def starred_conversations
+    all_conversations.order("updated_at DESC, conversation_id DESC").starred
   end
 
   def page_views(options={})
@@ -335,8 +341,9 @@ class User < ActiveRecord::Base
   }
 
   attr_accessor :last_login
-  def self.preload_last_login(users)
-    maxes = Pseudonym.where(user_id: users).group(:user_id).maximum(:current_login_at)
+  def self.preload_last_login(users, account_id)
+    maxes = Pseudonym.active.where(user_id: users).group(:user_id).where(account_id: account_id).
+      maximum(:current_login_at)
     users.each do |u|
       u.last_login = maxes[u.id]
     end
@@ -2911,6 +2918,15 @@ class User < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def submittable_attachments
+    self.attachments.active.or(
+      Attachment.active.where(
+        context_type: 'Group',
+        context_id: self.current_group_memberships.active.select(:group_id)
+      )
+    )
   end
 
   def authenticate_one_time_password(code)

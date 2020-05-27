@@ -73,6 +73,7 @@ module OtherHelperMethods
       "attachments.zip" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/attachments.zip')),
       "graded.png" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../../public/images/graded.png')),
       "cc_full_test.zip" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/migration/cc_full_test.zip')),
+      "cc_outcomes.imscc" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/migration/cc_outcomes.imscc')),
       "cc_ark_test.zip" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/migration/cc_ark_test.zip')),
       "canvas_cc_minimum.zip" => File.read(File.dirname(__FILE__) + '/../../../fixtures/migration/canvas_cc_minimum.zip'),
       "canvas_cc_only_questions.zip" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/migration/canvas_cc_only_questions.zip')),

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,6 +18,41 @@
 
 module Messages::SubmissionCommentForTeacher
   class AnnotationPresenter < Presenter
+
+    def subject
+      if anonymous?
+        I18n.t(
+          "Anonymous Submission Annotation: Student (%{id}), %{assignment_title}, %{course_name}",
+          assignment_title: assignment.title,
+          course_name: course.name,
+          id: submission.anonymous_id
+        )
+      else
+        I18n.t(
+          "Submission Annotation: %{user_name}, %{assignment_title}, %{course_name}",
+          assignment_title: assignment.title,
+          course_name: course.name,
+          user_name: submission.user.short_name
+        )
+      end
+    end
+
+    def body
+      if anonymous?
+        I18n.t(
+          "Someone just made a new annotation on the anonymous submission for Student (%{user_id}) for %{assignment_title}",
+          assignment_title: assignment.title,
+          user_id: submission.anonymous_id
+        )
+      else
+        I18n.t(
+          "%{author_name} just made a new annotation on the submission for %{user_name} for %{assignment_title}",
+          assignment_title: assignment.title,
+          author_name: @data.dig(:author_name),
+          user_name: submission.user.short_name
+        )
+      end
+    end
 
     protected
 

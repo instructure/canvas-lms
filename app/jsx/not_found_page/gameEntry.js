@@ -24,7 +24,7 @@ import SpaceInvaders from './space_invaders/SpaceInvaders'
 export const renderGameApp = domElement => {
   const AppRootElement = document.getElementById(domElement)
   const rng = Math.random()
-  if (ENV.KILL_JOY === 'true' || rng < 0.25) {
+  if (rng < 0.25) {
     ReactDOM.render(<OfficialNotFoundGame />, AppRootElement)
   } else {
     ReactDOM.render(<SpaceInvaders />, AppRootElement)

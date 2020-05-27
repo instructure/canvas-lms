@@ -79,7 +79,7 @@ module CC::Exporter::WebZip
     def filter_and_clean_files(files)
       export_files = filter_for_export_safe_items(files, :attachments)
       cleanup_files = files - export_files
-      cleanup_files.each {|file_data| file_data[:exists] && File.delete(file_data[:path_to_file])}
+      cleanup_files.select{|file_data| file_data[:exists]}.map{|file_data| file_data[:path_to_file]}.uniq.each{|path| File.delete(path)}
       export_files
     end
 

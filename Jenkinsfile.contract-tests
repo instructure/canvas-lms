@@ -27,8 +27,11 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
-    PACT_BROKER = credentials('PACT_BROKER')
+    DOCKER_PROCESSES = '6'
     POSTGRES_PASSWORD = 'sekret'
+    PACT_BROKER = credentials('PACT_BROKER')
+    PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}"
+    PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}"
   }
 
   stages {
@@ -44,37 +47,80 @@ pipeline {
       steps {
         timeout(time: 10) {
           sh 'build/new-jenkins/docker-compose-pull.sh'
-          sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'build/new-jenkins/docker-compose-setup-databases.sh'
+          sh 'build/new-jenkins/pact/docker-compose-pact-setup.sh'
         }
       }
     }
 
-    stage ('API Contract Tests') {
-      steps {
-        timeout(time: 10) {
-          sh """
-            docker-compose --project-name canvas-lms0 exec -T canvas env \
-              PACT_BROKER_HOST=inst-pact-broker.inseng.net \
-              PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
-              PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
-              JENKINS_URL="this silliness is necessary." \
-              DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true \
-              bin/contracts-verify-api
-          """
+    stage('Provider Verification for API and Live Event Consumers') {
+      parallel {
+        stage ('Android') {
+          environment {
+            DATABASE_NAME = 'pact_test1'
+            PACT_API_CONSUMER = 'android'
+          }
+          steps {
+            timeout(time: 10) {
+              sh 'build/new-jenkins/pact/contracts-verify-api.sh'
+            }
+          }
         }
-      }
-    }
 
-    stage("Live Events Contract Tests") {
-      steps {
-        sh """
-          docker-compose --project-name canvas-lms0 exec -T canvas env \
-            PACT_BROKER_HOST=inst-pact-broker.inseng.net \
-            PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
-            PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
-            bin/contracts-verify-live-events
-        """
+        stage ('Canvas iOS') {
+          environment {
+            DATABASE_NAME = 'pact_test2'
+            PACT_API_CONSUMER = 'canvas-ios'
+          }
+          steps {
+            timeout(time: 10) {
+              sh 'build/new-jenkins/pact/contracts-verify-api.sh'
+            }
+          }
+        }
+
+        stage ('Generic') {
+          environment {
+            DATABASE_NAME = 'pact_test3'
+            PACT_API_CONSUMER = 'Generic Consumer'
+          }
+          steps {
+            timeout(time: 10) {
+              sh 'build/new-jenkins/pact/contracts-verify-api.sh'
+            }
+          }
+        }
+
+        stage ('Quiz LTI') {
+          environment {
+            DATABASE_NAME = 'pact_test4'
+            PACT_API_CONSUMER = 'Quiz LTI'
+          }
+          steps {
+            timeout(time: 10) {
+              sh 'build/new-jenkins/pact/contracts-verify-api.sh'
+            }
+          }
+        }
+
+        stage ('Sistemic') {
+          environment {
+            DATABASE_NAME = 'pact_test5'
+            PACT_API_CONSUMER = 'Sistemic'
+          }
+          steps {
+            timeout(time: 10) {
+              sh 'build/new-jenkins/pact/contracts-verify-api.sh'
+            }
+          }
+        }
+
+        stage("Live Events") {
+          steps {
+            timeout(time: 5) {
+              sh 'build/new-jenkins/pact/contracts-verify-live-events.sh'
+            }
+          }
+        }
       }
     }
   }
@@ -82,7 +128,7 @@ pipeline {
   post {
     failure {
       sh 'mkdir -vp spec_results'
-      sh 'docker cp $(docker ps -q --filter "name=canvas_"):/usr/src/app/log/spec_failures/. ./spec_results/'
+      sh 'docker cp $(docker-compose ps -q canvas):/usr/src/app/log/spec_failures/. ./spec_results/'
       script {
         dir('spec_results') {
           htmlFiles = findFiles glob: '**/index.html'

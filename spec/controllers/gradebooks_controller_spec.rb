@@ -886,21 +886,6 @@ describe GradebooksController do
         expect(gradebook_options).to have_key :grading_schemes
       end
 
-      describe "additional_sort_options_enabled" do
-        before(:once) { @course.root_account.allow_feature!(:new_gradebook_sort_options) }
-
-        it "is set to true when the new_gradebook_sort_options feature is enabled" do
-          @course.enable_feature!(:new_gradebook_sort_options)
-          get :show, params: { course_id: @course.id }
-          expect(gradebook_options[:additional_sort_options_enabled]).to be true
-        end
-
-        it "is set to false when the new_gradebook_sort_options feature is not enabled" do
-          get :show, params: { course_id: @course.id }
-          expect(gradebook_options[:additional_sort_options_enabled]).to be false
-        end
-      end
-
       it "sets post_policies_enabled to true" do
         get :show, params: { course_id: @course.id }
         expect(gradebook_options[:post_policies_enabled]).to be(true)
@@ -1502,19 +1487,48 @@ describe GradebooksController do
 
       describe "ENV" do
         before do
-          user_session(@teacher)
-          @proficiency = outcome_proficiency_model(@course.account)
-          @course.root_account.enable_feature! :non_scoring_rubrics
-
           update_preferred_gradebook_view!("learning_mastery")
-          get 'show', params: {course_id: @course.id}
-
-          @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
         end
 
         describe ".outcome_proficiency" do
+          before do
+            @proficiency = outcome_proficiency_model(@course.account)
+            @course.root_account.enable_feature! :non_scoring_rubrics
+
+            get 'show', params: {course_id: @course.id}
+
+            @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+          end
+
           it "is set to the outcome proficiency on the course" do
             expect(@gradebook_env[:outcome_proficiency]).to eq(@proficiency.as_json)
+          end
+        end
+
+        describe ".sections" do
+          before do
+            @section_2 = @course.course_sections.create!
+            teacher_in_section(@section_2, user: @teacher, :limit_privileges_to_course_section => true)
+          end
+
+          let(:returned_section_ids) { gradebook_options.fetch(:sections).pluck(:id) }
+
+          describe "with the :limit_section_visibility_in_lmgb FF enabled" do
+            before do
+              @course.root_account.enable_feature!(:limit_section_visibility_in_lmgb)
+            end
+
+            it "only includes course sections visible to the user" do
+              get :show, params: {course_id: @course.id}
+              expect(returned_section_ids).to contain_exactly(@section_2.id)
+            end
+          end
+
+          describe "with the :limit_section_visibility_in_lmgb FF disabled" do
+            it "includes all course sections" do
+              get :show, params: {course_id: @course.id}
+              expect(returned_section_ids).to match_array([@section_2.id, @course.default_section.id])
+            end
           end
         end
       end
@@ -1699,7 +1713,6 @@ describe GradebooksController do
     end
 
     before :each do
-      Account.site_admin.enable_feature!(:submissions_reupload_status_page)
       user_session(@teacher)
     end
 
@@ -1736,13 +1749,6 @@ describe GradebooksController do
       user_session(@student)
       get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
       assert_unauthorized
-    end
-
-    it "returns not_found when the 'submissions_reupload_status_page' feature is off" do
-      Account.site_admin.disable_feature!(:submissions_reupload_status_page)
-      assert_page_not_found do
-        get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
-      end
     end
   end
 

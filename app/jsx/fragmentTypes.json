@@ -36,6 +36,12 @@
             "name": "Account"
           },
           {
+            "name": "AccountDomain"
+          },
+          {
+            "name": "AccountDomainLookup"
+          },
+          {
             "name": "Assignment"
           },
           {
@@ -94,9 +100,6 @@
           },
           {
             "name": "NotificationPolicy"
-          },
-          {
-            "name": "NotificationPreferences"
           },
           {
             "name": "Outcome"
@@ -327,6 +330,12 @@
         "name": "Timestamped",
         "possibleTypes": [
           {
+            "name": "AccountDomain"
+          },
+          {
+            "name": "AccountDomainLookup"
+          },
+          {
             "name": "Assignment"
           },
           {
@@ -379,9 +388,6 @@
           },
           {
             "name": "NotificationPolicy"
-          },
-          {
-            "name": "NotificationPreferences"
           },
           {
             "name": "Page"

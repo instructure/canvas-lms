@@ -517,6 +517,13 @@ describe AssignmentGroup do
       expect { @group.restore }.not_to change { student_score.reload.state }
     end
   end
+
+  describe '#create' do
+    it 'sets the root_account_id using context' do
+      group = @course.assignment_groups.create!(@valid_attributes)
+      expect(group.root_account_id).to eq @course.root_account_id
+    end
+  end
 end
 
 def assignment_group_model(opts={})

@@ -75,5 +75,28 @@ describe Api::V1::ExternalTools do
       json = controller.external_tool_json(tool, @course, @student, nil)
       json['homework_submission']['label'] = 'Hi'
     end
+
+    describe "is_rce_favorite" do
+      let(:root_account_tool) do
+        tool.context = @course.root_account
+        tool.save!
+        tool
+      end
+
+      it "includes is_rce_favorite when can_be_rce_favorite?" do
+        root_account_tool.editor_button = {url: 'http://example.com'}
+        root_account_tool.is_rce_favorite = true
+        root_account_tool.save!
+        json = controller.external_tool_json(tool, @course.root_account, account_admin_user, nil)
+        expect(json[:is_rce_favorite]).to be true
+      end
+
+      it "excludes is_rce_favorite when not can_be_rce_favorite?" do
+        root_account_tool.is_rce_favorite = true
+        root_account_tool.save!
+        json = controller.external_tool_json(tool, @course.root_account, account_admin_user, nil)
+        expect(json.has_key?(:is_rce_favorite)).to be false
+      end
+    end
   end
 end

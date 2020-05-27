@@ -21,8 +21,10 @@ import React from 'react'
 import {arrayOf, bool, func, number} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import CanvasInlineAlert from 'jsx/shared/components/CanvasInlineAlert'
 import {originalDateField} from './utils'
 import {AssignmentShape} from './BulkAssignmentShape'
@@ -72,64 +74,66 @@ export default function BulkEditHeader({
   const selectedAssignmentsCount = assignments.filter(a => a.selected).length
 
   return (
-    <Flex as="div">
-      <Flex.Item shouldGrow>
-        <h2>{I18n.t('Edit Assignment Dates')}</h2>
-      </Flex.Item>
-      {jobRunning && (
-        <Flex.Item width="250px">
-          <ProgressBar
-            screenReaderLabel={I18n.t('Saving assignment dates progress')}
-            valueNow={jobCompletion}
-            renderValue={renderProgressValue}
-          />
-          <CanvasInlineAlert liveAlert screenReaderOnly variant="info">
-            {I18n.t('Saving assignment dates progress: %{percent}%', {
-              percent: jobCompletion
-            })}
-          </CanvasInlineAlert>
+    <>
+      <Heading level="h2">{I18n.t('Edit Assignment Dates')}</Heading>
+      <Flex as="div" padding="0 0 medium 0">
+        <Flex.Item shouldGrow>
+          {jobRunning && (
+            <View as="div" maxWidth="500px">
+              <ProgressBar
+                screenReaderLabel={I18n.t('Saving assignment dates progress')}
+                valueNow={jobCompletion}
+                renderValue={renderProgressValue}
+              />
+              <CanvasInlineAlert liveAlert screenReaderOnly variant="info">
+                {I18n.t('Saving assignment dates progress: %{percent}%', {
+                  percent: jobCompletion
+                })}
+              </CanvasInlineAlert>
+            </View>
+          )}
         </Flex.Item>
-      )}
-      {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-        <Flex.Item margin="0 0 0 small">
-          <Text>
-            {I18n.t(
-              {one: '%{count} assignment selected', other: '%{count} assignments selected'},
-              {count: selectedAssignmentsCount}
-            )}
-          </Text>
+        {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+          <Flex.Item margin="0 0 0 small">
+            <Text>
+              {I18n.t(
+                {one: '%{count} assignment selected', other: '%{count} assignments selected'},
+                {count: selectedAssignmentsCount}
+              )}
+            </Text>
+          </Flex.Item>
+        )}
+        {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+          <Flex.Item>
+            <Button
+              margin="0 0 0 small"
+              onClick={onOpenBatchEdit}
+              interaction={selectedAssignmentsCount > 0 ? 'enabled' : 'disabled'}
+            >
+              {I18n.t('Batch Edit')}
+            </Button>
+          </Flex.Item>
+        )}
+        <Flex.Item>
+          <Button margin="0 0 0 small" onClick={onCancel}>
+            {jobSuccess ? I18n.t('Close') : I18n.t('Cancel')}
+          </Button>
         </Flex.Item>
-      )}
-      {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
         <Flex.Item>
           <Button
             margin="0 0 0 small"
-            onClick={onOpenBatchEdit}
-            interaction={selectedAssignmentsCount > 0 ? 'enabled' : 'disabled'}
+            variant="primary"
+            interaction={
+              startingSave || jobRunning || !anyAssignmentsEdited || validationErrorsExist
+                ? 'disabled'
+                : 'enabled'
+            }
+            onClick={onSave}
           >
-            {I18n.t('Batch Edit')}
+            {startingSave || jobRunning ? I18n.t('Saving...') : I18n.t('Save')}
           </Button>
         </Flex.Item>
-      )}
-      <Flex.Item>
-        <Button margin="0 0 0 small" onClick={onCancel}>
-          {jobSuccess ? I18n.t('Close') : I18n.t('Cancel')}
-        </Button>
-      </Flex.Item>
-      <Flex.Item>
-        <Button
-          margin="0 0 0 small"
-          variant="primary"
-          interaction={
-            startingSave || jobRunning || !anyAssignmentsEdited || validationErrorsExist
-              ? 'disabled'
-              : 'enabled'
-          }
-          onClick={onSave}
-        >
-          {startingSave || jobRunning ? I18n.t('Saving...') : I18n.t('Save')}
-        </Button>
-      </Flex.Item>
-    </Flex>
+      </Flex>
+    </>
   )
 }

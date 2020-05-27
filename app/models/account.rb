@@ -236,6 +236,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :enable_turnitin, :boolean => true, :default => false
   add_setting :mfa_settings, :root_only => true
+  add_setting :mobile_qr_login_is_enabled, :boolean => true, :root_only => true, :default => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
   add_setting :canvadocs_prefer_office_online, :boolean => true, :root_only => true, :default => false
@@ -275,7 +276,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_course_catalog, :boolean => true, :root_only => true, :default => false
   add_setting :usage_rights_required, :boolean => true, :default => false, :inheritable => true
   add_setting :limit_parent_app_web_access, boolean: true, default: false
-
+  add_setting :kill_joy, boolean: true, default: false, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -356,7 +357,7 @@ class Account < ActiveRecord::Base
   def enable_canvas_authentication
     return unless root_account?
     # for migrations creating a new db
-    return unless AuthenticationProvider::Canvas.columns_hash.key?('workflow_state')
+    return unless Account.connection.data_source_exists?("authentication_providers")
     return if authentication_providers.active.where(auth_type: 'canvas').exists?
     authentication_providers.create!(auth_type: 'canvas')
   end

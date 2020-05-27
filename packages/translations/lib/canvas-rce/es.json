@@ -279,6 +279,9 @@
   "published_c944a23d": { "message": "publicado" },
   "published_when_302d8e23": { "message": "Publicado: { when }" },
   "quizzes_7e598f57": { "message": "Exámenes" },
+  "reading_a_media_track_file_failed_aborting_be051b20": {
+    "message": "Ocurrió un error al leer un archivo de seguimiento multimedia. Abortando."
+  },
   "record_7c9448b": { "message": "Grabar" },
   "record_upload_media_5fdce166": { "message": "Grabar/cargar multimedia" },
   "recording_98da6bda": { "message": "Grabación" },
@@ -310,6 +313,9 @@
   },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Algo salió mal y no sé qué mostrarle."
+  },
+  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+    "message": "Algo salió mal; verifique su conexión y vuelva a intentarlo."
   },
   "something_went_wrong_d238c551": { "message": "Se produjo un error." },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {

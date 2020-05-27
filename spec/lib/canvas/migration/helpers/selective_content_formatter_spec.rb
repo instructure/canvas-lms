@@ -47,6 +47,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       allow(@migration).to receive(:cache_key).and_return('1')
       allow(@migration).to receive(:close)
       allow(@migration).to receive(:read).and_return(@overview.to_json)
+      allow(@migration).to receive(:context).and_return(course_model)
       @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com", global_identifiers: true)
     end
 
@@ -70,6 +71,49 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(@formatter.get_content_list('context_external_tools').length).to eq 1
       expect(@formatter.get_content_list('learning_outcomes').length).to eq 1
       expect(@formatter.get_content_list('attachments').length).to eq 1
+    end
+
+    context 'selectable_outcomes_in_course_copy enabled' do
+      before(:example) do
+        @migration.context.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
+      end
+
+      after(:example) do
+        @migration.context.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
+      end
+
+      context 'with learning_outcome_groups course data' do
+        before do
+          @overview['learning_outcome_groups'] = [{
+            'title' => 'my group',
+            'migration_id' => 'g1',
+            'child_groups' => []
+          }]
+          @overview['outcomes'].first['parent_migration_id'] = 'g1'
+          allow(@migration).to receive(:read).and_return(@overview.to_json)
+        end
+
+        it 'should arrange an outcome hiearchy' do
+          expect(@formatter.get_content_list('learning_outcomes')).to eq [
+            {
+              type: 'learning_outcome_groups',
+              property: 'copy[learning_outcome_groups][id_g1]',
+              title: 'my group',
+              migration_id: 'g1',
+              sub_items: [{
+                type: 'learning_outcomes',
+                property: 'copy[learning_outcomes][id_a1]',
+                title: 'a1',
+                migration_id: 'a1'
+              }]
+            }
+          ]
+        end
+      end
+
+      it 'should return standard outcomes without learning_outcome_groups course data' do
+        expect(@formatter.get_content_list('learning_outcomes').length).to eq 1
+      end
     end
 
     it "should group assignments into assignment groups" do
@@ -204,11 +248,12 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       allow(@migration).to receive(:source_course).and_return(@course)
       export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
       allow(@migration).to receive(:content_export).and_return(export)
-      @course_outcome = outcome_model
-      @account_outcome = outcome_model(outcome_context: @course.account)
-      @out_group = outcome_group_model
-      @outcome1_in_group = outcome_model(outcome_group: @out_group)
-      @outcome2_in_group = outcome_model(outcome_group: @out_group)
+      @course_outcome = outcome_model(title: 'zebra')
+      @account_outcome = outcome_model(outcome_context: @course.account, title: 'alpaca')
+      @out_group1 = outcome_group_model(title: 'striker')
+      @outcome1_in_group = outcome_model(outcome_group: @out_group1, title: 'speakeasy')
+      @outcome2_in_group = outcome_model(outcome_group: @out_group1, title: 'moonshine')
+      @out_group2 = outcome_group_model(title: 'beta')
     end
 
     it "should list individual types" do
@@ -231,8 +276,14 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
       it "should list learning outcomes" do
         outcomes = formatter.get_content_list('learning_outcomes')
-        expect(outcomes.length).to eq 4
-        expect(outcomes.count {|o| o[:title] == "first new outcome"}).to eq 4
+        expect(outcomes.map {|o| o[:title]}).to match_array(
+          [
+            'alpaca',
+            'moonshine',
+            'speakeasy',
+            'zebra'
+          ]
+        )
       end
     end
 
@@ -248,11 +299,22 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         expect(formatter.get_content_list).to match_array copy
       end
 
-      it "should list individual types" do
+      it "should list individual types in expected order" do
         outcomes = formatter.get_content_list('learning_outcomes')
-        expect(outcomes.length).to eq 3
-        expect(outcomes.count {|o| o[:title] == "first new outcome"}).to eq 2
-        expect(outcomes.count {|o| o[:title] == "new outcome group"}).to eq 1
+        expect(outcomes.map {|o| o[:title]}).to eq [
+          'beta',
+          'striker',
+          'alpaca',
+          'zebra'
+        ]
+      end
+
+      it "should list outcomes in outcome group" do
+        outcomes = formatter.get_content_list("learning_outcome_groups_#{@out_group1.id}")
+        expect(outcomes.map {|o| o[:title]}).to eq [
+          'moonshine',
+          'speakeasy'
+        ]
       end
     end
 
@@ -283,8 +345,9 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @course_outcome.destroy
         @account_outcome.destroy
         @outcome1_in_group.destroy
-        @outcome1_in_group.destroy
-        @out_group.destroy
+        @outcome2_in_group.destroy
+        @out_group1.destroy
+        @out_group2.destroy
         tool_proxy.destroy
 
         @course.require_assignment_group
@@ -339,6 +402,5 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(res[3][:title]).to eq 'course files/a/b/c'
       expect(res[3][:sub_items][0][:title]).to eq 'a4.html'
     end
-
   end
 end

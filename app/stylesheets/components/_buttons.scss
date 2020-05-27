@@ -112,38 +112,22 @@ If you need to change a button's size, you can do so by adding the appropriate c
   <tbody>
     <tr>
       <td>default</td>
-      <td><button class="Button" type="button">.Button</button></td>
+      <td><button class="Button" type="button">Default</button></td>
     </tr>
     <tr>
       <td>.Button.Button--large</td>
-      <td><button class="Button Button--large" type="button">.Button-large</button></td>
+      <td><button class="Button Button--large" type="button">Large</button></td>
     </tr>
     <tr>
       <td>.Button.Button--small</td>
-      <td><button class="Button Button--small" type="button">.Button-small</button></td>
+      <td><button class="Button Button--small" type="button">Small</button></td>
     </tr>
     <tr>
       <td>.Button.Button--mini</td>
-      <td><button class="Button Button--mini" type="button">.Button-mini</button></td>
+      <td><button class="Button Button--mini" type="button">Mini</button></td>
     </tr>
   </tbody>
 </table>
-
-```html
-<button class="Button Button--large" type="button">This is a massive button!</button>
-```
-
-
-## Artificial button
-
-To create something that acts like a button when you can't use a button element,
-
-listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="button"`
-
-```html
-<div class="btn" tabindex="0" role="button">Activate me</div>
-```
-
 */
 
 .btn,       // <-- deprecated- do not use

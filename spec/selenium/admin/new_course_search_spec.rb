@@ -94,6 +94,27 @@ describe "new account course search" do
     expect(rows.first).to include_text(term_course.name)
   end
 
+  it "should filter terms by search string" do
+    %w[Summer Fall Winter Spring].each do |term|
+      enrollment_term = @account.enrollment_terms.create!(name: term)
+      course = course_factory(account: @account, course_name: "#{term} Course")
+      course.enrollment_term = enrollment_term
+      course.save!
+    end
+
+    visit_courses(@account)
+    term_filter = f('#termFilter')
+    set_value(term_filter, 's')
+    option_list_id = term_filter.attribute('aria-controls')
+    expect(ff("##{option_list_id} [role='option']").count).to eq 2
+    set_value(term_filter, 'spring')
+    term = @account.enrollment_terms.where(name: 'Spring').first
+    fj("##{option_list_id} [role='option']:contains(#{term.name})").click
+    wait_for_spinner
+    expect(rows.count).to eq 1
+    expect(rows.first).to include_text(term.name)
+  end
+
   it "should search by name" do
     match_course = course_factory(:account => @account, :course_name => "course_factory with a search term")
     course_factory(:account => @account, :course_name => "diffrient cuorse")

@@ -75,10 +75,6 @@ describe '_grade_assignment' do
   describe "View Uploads Status link" do
     let(:progress) { Progress.new(context: @assignment, completion: 100) }
 
-    before :each do
-      Account.site_admin.enable_feature!(:submissions_reupload_status_page)
-    end
-
     it "is displayed when the user can manage grades" do
       allow(@assignment).to receive(:submission_reupload_progress).and_return(progress)
       assign(:can_grade, true)
@@ -94,14 +90,6 @@ describe '_grade_assignment' do
     end
 
     it "is not displayed when no submissions have been uploaded" do
-      assign(:can_grade, true)
-      render partial: "assignments/grade_assignment"
-      expect(response.body).not_to include "View Uploads Status"
-    end
-
-    it "is not displayed when the 'submissions_reupload_status_page' feature flag is off" do
-      Account.site_admin.disable_feature!(:submissions_reupload_status_page)
-      allow(@assignment).to receive(:submission_reupload_progress).and_return(progress)
       assign(:can_grade, true)
       render partial: "assignments/grade_assignment"
       expect(response.body).not_to include "View Uploads Status"

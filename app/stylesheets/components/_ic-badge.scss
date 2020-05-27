@@ -16,37 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-@styleguide Badges
-
-## Badges
-
-You can easily create notification badges in two ways:
-
-### Use the .ic-badge class
-
-```html
-<span class="ic-badge">9</span>
-<span class="ic-badge ic-badge--success">99+</span>
-<span class="ic-badge ic-badge--alert">25</span>
-<span class="ic-badge ic-badge--danger">8</span>
-```
-
-### Use the ic-badge-maker mixin with your own class. It takes four arguments, detailed below.
-
-```css
-.my-awesome-badge {
-  @include ic-badge-maker(
-    22px, // how large should the badge be? Default is 20px.
-    $ic-color-success, // background color
-    $ic-color-light, // text color
-    12px // font-size
-    );
-}
-```
-*/
-
-
 @mixin ic-badge-maker(
   $circle-size: 20px,
   $background-color: var(--ic-brand-primary),

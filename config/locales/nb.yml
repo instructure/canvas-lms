@@ -2059,6 +2059,7 @@ nb:
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillater opprettelse av kunngjøringer for en bestemt seksjon"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Lar deg opprette diskusjoner for en spesifikk seksjon"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Tillater Hjelp-lenker å bli festet som Viste eller Nye og viser fremtredende Viste Hjelp-lenker i menyen «Hjelp»."
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Lar læringsresultatet være valgbart under migrering av kursinnhold"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Lar lærer / designer / LA-baserte roller bruke chat-verktøyet."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Lar lærer/designer/LA-baserte roller bruke chat-verktøyet."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Lar lærer/designer/LA-baserte roller bruke oppmøte-verktøyet."
@@ -4654,15 +4655,19 @@ nb:
   calendars_toggle_list_visibility_488db143: "Synligheten av vekslelisten på kalendre"
   can_create_and_update_submission_results_for_assig_51e7033d: "Kan lage og oppdatere informasjon om innleveringer for oppgaver assosiert med verktøyet."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Kan lage og vise oppgaveinformasjon i karakteroversikten assosiert med verktøyet."
+  can_create_external_tools_4c293044: "Kan opprette eksterne verktøy."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "Kan opprette, endre navn på og redigere sider for emne som standard"
   can_create_subscription_to_data_service_data_bb2874f2: "Kan opprette abonnement på datatjeneste-data."
+  can_destroy_external_tools_cdb0e734: "Kan ødelegge eksterne verktøy."
   can_destroy_subscription_to_data_service_data_b8dfca27: "Kan ødelegge abonnement på datatjeneste-data."
   can_edit_this_page_role_selection_6ccec3c7: "Kan ikke redigere dette siderollevalget"
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan kun samhandle med brukere i sin seksjon"
   can_list_categorized_event_types_52596f7: "Kan liste kategoriserte hendelsestyper."
+  can_list_external_tools_9132ad0f: "Kan liste eksterne verktøy."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Kan liste opp abonnement på datatjeneste-data."
   can_lookup_account_information_13d69520: "Kan slå opp Kontoinformasjon"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Kan hente brukerdata assosiert med sammenheng med verktøyet det er installert i."
+  can_show_external_tools_bb4988c5: "Kan vise eksterne verktøy."
   can_show_subscription_to_data_service_data_688ce3: "Kan vise abonnement på datatjeneste-data."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikke regne ut resultat før en oppgave har oppnåelige poeng"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
@@ -4675,6 +4680,7 @@ nb:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Kan ikke avpublisere om det er student innleveringer"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Kan ikke avpublisere %{item_name} hvis det er innleveringer fra student"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Kan ikke avpublisere %{name} hvis det er innleveringer fra student"
+  can_update_external_tools_168c1abe: "Kan oppdatere eksterne verktøy."
   can_update_public_jwk_for_lti_services_26037129: "Kan oppdatere offentlig jwk for LTI-tjenester."
   can_update_subscription_to_data_service_data_374a0c89: "Kan oppdatere abonnement på datatjeneste-data."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Kan vise oppgaveinformasjon i karakteroversikten assosiert med verktøyet."
@@ -5306,6 +5312,8 @@ nb:
                 gi demonstrasjoner av applikasjoner og ressurser på nett
                 og mer.
   conference_36b50fda: Konferanse
+  conference_has_been_removed_f771cb11: "Konferansen er fjernet"
+  conference_has_been_updated_title_2bacc5fa: "Konferansen er oppdatert: %{title}"
   conference_selection_ea4050bb: Konferansevalg
   conference_was_deleted_30869390: "Konferanse ble slettet"
   conferences: 
@@ -9289,6 +9297,7 @@ nb:
   error_retrieving_content_c07ee76b: "Avvik ved henting av innhold"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Feil ved henting av verktøy for likhetsgjenkjenning"
   error_running_quizzes_2_export_cfecedba: "Det oppstod en feil under Quizzes 2-eksport"
+  error_saving_assignment_dates_2af5e800: "Feil ved lagring av oppgavedatoer: "
   error_saving_discussion_settings_3360661d: "Kunne ikke klare diskusjonsinnstillinger"
   error_sending_messages_13c874eb: "Feil ved sending av meldinger"
   error_sending_submission_comment_dc15d24f: "Avvik ved sending av kommentarer til innlevering"
@@ -12191,6 +12200,7 @@ nb:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Ugyldig dato eller ugyldig tid for %{attr}"
   invalid_date_or_time_333acd43: "Ugyldig dato eller tid"
   invalid_date_time_3ae423f5: "Ugyldig tid-dato"
+  invalid_dates_were_found_please_correct_them_and_t_4140b318: "Ugyldige datoer oppdaget. Rett dem og prøv igjen."
   invalid_datetime_for_graded_since_884cce5: "Ugyldig datotid for graded_since"
   invalid_datetime_for_submitted_since_a238f3a6: "Ugyldig datotid for submitted_since"
   invalid_domain_e810c1d: "Ugyldig domene"
@@ -15995,6 +16005,7 @@ nb:
   notifications_unsupported_65f6bf65: "Varslinger støttes ikke"
   notifications_view_f9a60770: "Varslinger - vis"
   notify_immediately_d1749c07: "Varsle umiddelbart"
+  notify_students_in_time_of_assignments_that_requir_332ef10e: "Gi beskjed til studentene om oppgaver som krever deres oppmerksomhet."
   notify_users_this_quiz_has_changed_c5b05995: "Varsle brukerne om at testen er endret"
   now_click_the_agenda_button_607fb40e: "Nå klikk på *Agenda*  knappen"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Siden emnet ditt er satt opp og tilgjengelig, vil du sannsynligvis ikke  trenge denne sjekklisten lenger. Men vi vil fortsette å ha det tilgjengelig i tilfelle du senere ønsker å prøve noe nytt, eller du bare ønsker litt ekstra hjelp når du gjør endringer i emneinnhold."
@@ -17660,6 +17671,7 @@ nb:
   progress_for_account_name_ef203250: "fremgang for %{account_name}"
   progress_loading_bar_a26b8861: Fremdriftsviser
   project_groups_1fa0320b: Prosjektgrupper
+  pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "Pronomen samsvarer ikke med kontopronomen eller pronomener som ikke er aktivert for denne kontoen, %{user_id}, hopper over"
   pronouns_d1cd8dd0: Pronomen
   pronouns_for_users_da46fb5: "Pronomen for brukere"
   pronouns_users_can_show_after_their_name_e80821c7: "Pronomen brukere kan vise etter navnet"
@@ -19516,6 +19528,7 @@ nb:
   remove_c_name_section_d8eabd3a: "Fjerne %{c.name} seksjonen"
   remove_collaborationtitle_c3e81adb: "Fjern «%{collaborationTitle}»?"
   remove_conference_69b9e0d0: "Fjerner konferanse"
+  remove_conference_title_207d32c0: "Fjern konferanse: %{title}"
   remove_contact_method_ca890ba3: "Fjerne kontaktmetode"
   remove_course_association_name_b760c502: "Fjern emneassosiasjon %{name}"
   remove_dates_9b9ba2f6: "Fjern Datoer"
@@ -19664,6 +19677,7 @@ nb:
   retry_ebd5f8ba: "Forsøk igjen"
   retry_migrating_name_bdc802ef: "Prøv å flytte på nytt \"%{name}\""
   return_to_parent_folder_4ece2184: "returner til hovedmappe"
+  revert_date_changes_5105ce5: "Tilbakestill datoendringer"
   revert_to_actual_score_f665eea9: "Tilbake til faktisk resultat"
   revert_to_old_ui_3211da41: "Gå tilbake til gammelt brukergrensesnitt."
   review_now_318a6a3e: "Se gjennom nå"
@@ -20349,6 +20363,7 @@ nb:
   select_video_file_35b61d4e: "Velg videofil"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Velg det du vil vise på hjemmesiden."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "Velg om du ønsker å sette inn for alle innleveringer, eller kun de som er vurderte."
+  selectable_outcomes_during_course_content_migratio_3f108a1a: "Valgbare utfall under migrering av kursinnhold"
   selected_274ce24f: Valgt
   selected_all_courses_9cfef57f: "Alle emner valgt"
   selected_answer: "Du valgte dette svaret."
@@ -21321,6 +21336,10 @@ nb:
   show_only_blueprint_courses_9fb37b41: "Vis kun blueprint emner"
   show_originality_report_to_students_be22f5ee: "Vis originalitetsrapport til elevene"
   show_params_3401895b: "Vis parameter"
+  show_past_account_level_announcements_to_users_3b8208e2: "Vis tidligere kunngjøringer på kontonivå til brukere"
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+      Vis tidligere kunngjøringen på kontonivå til brukere. Tillater
+      en bruker å se kunngjøringer som er avsluttet eller ignorert.
   show_question_details_b059df00: "Vis spørsmålsdetaljer"
   show_recent_activity_stream_2be4abc1: "Vis nylig aktivitetsstrømming"
   show_report_to_students_a07888a6: "Vis rapport til studentene"
@@ -21462,6 +21481,12 @@ nb:
       forward: Videresend
   slovak_69f48e1b: Slovensk
   slovenian_30ae5208: Slovensk
+  smart_alerts_43776718: Smart-varsler
+  smart_alerts_44db622e: Smart-varsler
+  smart_alerts_settings: 
+    threshold_12h: 12h
+    threshold_24h: 24h
+    threshold_36h: 36h
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "I Google Play"
@@ -22448,6 +22473,7 @@ nb:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL-adressen som en bruker med riktige rettigheter kan bruke for å maskerade seg som rapporteringsbrukeren på den samme siden for å reprodusere problemet"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL-adressen til siden brukeren var på da den rapporterte feilen"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "Brukeren må også registreres som en instruktør i emnene de forsøker å kryssliste."
+  the_value_of_possible_points_for_this_assignment_c_42396e3: "Verdien for mulige poeng for denne oppgaven kan ikke overstige 999999999."
   their_grade_for_the_assignment_c36a60ef: "Deres karakter for oppgaven"
   theme_52404e51: Tema
   theme_editor_b7b00f6b: "Theme Editor"
@@ -22743,6 +22769,7 @@ nb:
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Disse endringer blir nå brukt på hele kontoen. Vil du fortsette?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Dette vil legge til dette temaet på hele kontoen din. Ønsker du å fortsette?"
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Dette oppdaterer alle rubrikkene med dette resultatet som ikke har blitt vurdert enda"
+  threshold_in_hours_to_notify_students_within_f33820aa: "Terskel (i timer) å varsle studenter innen"
   threshold_pts_45f0e5d8: "terskel: %{pts}"
   ticket_successfully_submitted_f6254460: "Feilmelding innsendt."
   ticketing_system_52205bff: Ticketingsystem
@@ -22892,6 +22919,7 @@ nb:
     port_moresby: "Port Moresby"
     prague: Praha
     pretoria: Pretoria
+    puerto_rico: "Puerto Rico"
     quito: Quito
     rangoon: Rangoon
     riga: Riga

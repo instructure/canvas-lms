@@ -21,6 +21,7 @@ module CC
       return nil unless @course.has_outcomes?
       root_group = @course.root_outcome_group(false)
       return nil unless root_group
+      @selectable_outcomes = @course.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
 
       if document
         outcomes_file = nil
@@ -55,7 +56,7 @@ module CC
       rel_path
     end
 
-    def process_outcome_group(node, group)
+    def process_outcome_group(node, group, force_export = false)
       migration_id = create_key(group)
       node.learningOutcomeGroup(:identifier=>migration_id) do |group_node|
         group_node.title group.title unless group.title.blank?
@@ -64,19 +65,25 @@ module CC
           group_node.vendor_guid group.vendor_guid if group.vendor_guid.present?
         end
         group_node.learningOutcomes do |lo_node|
-          process_outcome_group_content(lo_node, group)
+          process_outcome_group_content(lo_node, group, force_export)
         end
       end
     end
 
-    def process_outcome_group_content(node, group)
+    def process_outcome_group_content(node, group, force_export = false)
       group.child_outcome_groups.active.each do |item|
-        next unless export_object?(item, 'learning_outcomes') || export_object?(item, 'learning_outcome_groups')
-        process_outcome_group(node, item)
+        export_group = export_object?(item, 'learning_outcomes') || export_object?(item, 'learning_outcome_groups')
+        export_group ||= force_export if @selectable_outcomes
+        if export_group
+          process_outcome_group(node, item, @selectable_outcomes)
+        elsif @selectable_outcomes
+          # Skip importing this group, but continue with its contents
+          process_outcome_group_content(node, item, force_export)
+        end
       end
       group.child_outcome_links.active.each do |item|
         item = item.content
-        next unless export_object?(item, 'learning_outcomes')
+        next unless force_export || export_object?(item, 'learning_outcomes')
         process_learning_outcome(node, item)
       end
     end

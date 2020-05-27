@@ -17,73 +17,75 @@
  */
 
 /*
-@styleguide Border Classes
+@styleguide Borders
 
-<br/>
-
-The `.border` class defines the border style and color with no width.
-
-Additional variations of this define the side(s) and radius(s) of the element. Examples are combined with `.content-box` and `.pad-box-mini`.
-
-<br/>
+The basic `.border` class defines the border's appearance. Use the `.border-` classes to specify where you want the border to appear.
 
 ## Full Border
 
 ```html
 
-<div class="content-box pad-box-mini border border-trbl">
-  <p>some content here</p>
+<div class="border border-trbl">
+  some content here
 </div>
 ```
 
 ## Partial Borders
 
 ```html
-<div class="content-box pad-box-mini border border-rbl">
-  <p>The Content</p>
+<div class="border border-rbl">
+  right, bottom, left border
 </div>
-
-<div class="content-box pad-box-mini border border-tbl">
-  <p>The Content</p>
+<br />
+<br />
+<div class="border border-tbl">
+  top, bottom, left border
 </div>
-
-<div class="content-box pad-box-mini border border-bl">
-  <p>The Content</p>
+<br />
+<br />
+<div class="border border-bl">
+  bottom, left border
 </div>
-
-<div class="content-box pad-box-mini border border-tl">
-  <p>The Content</p>
+<br />
+<br />
+<div class="border border-tl">
+  top, left border
 </div>
-
-<div class="content-box pad-box-mini border border-b">
-  <p>The Content</p>
+<br />
+<br />
+<div class="border border-b">
+  bottom border
 </div>
-
-<div class="content-box pad-box-mini border border-t">
-  <p>The Content</p>
+<br />
+<br />
+<div class="border border-t">
+  top border
 </div>
 ```
 
 ## Border Radius
 
-Combines with `.border` and `.border-trbl`
+Add rounded corners with `.border-round-` classes.
 
 ```html
 
-<div class="content-box pad-box-mini border border-trbl border-round">
-  <p>some content here</p>
+<div class="border border-trbl border-round">
+  all corners rounded
 </div>
-
-<div class="content-box pad-box-mini border border-trbl border-round-b">
-  <p>some content here</p>
+<br />
+<br />
+<div class="border border-trbl border-round-b">
+  bottom corners rounded
 </div>
-
-<div class="content-box pad-box-mini border border-trbl border-round-t">
-  <p>some content here</p>
+<br />
+<br />
+<div class="border border-trbl border-round-t">
+  top corners rounded
 </div>
-
-<div class="content-box pad-box-mini border border-trbl border-round-tl">
-  <p>some content here</p>
+<br />
+<br />
+<div class="border border-trbl border-round-tl">
+  top-left corner rounded
 </div>
 ```
 
@@ -111,8 +113,8 @@ Combines with `.border` and `.border-trbl`
 }
 
 .border-bl {
-  border-bottom-size: 1px;
-  border-#{direction(left)}-size: 1px;
+  border-bottom-width: 1px;
+  border-#{direction(left)}-width: 1px;
 }
 
 .border-tl {
@@ -148,4 +150,3 @@ Combines with `.border` and `.border-trbl`
 .border-round {
   border-radius: $borderRadius;
 }
-

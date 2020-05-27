@@ -141,7 +141,6 @@ export default do ->
 
   getCourseFeaturesFromOptions = (options) ->
     {
-      additionalSortOptionsEnabled: options.additional_sort_options_enabled,
       finalGradeOverrideEnabled: options.final_grade_override_enabled
     }
 
@@ -3027,6 +3026,9 @@ export default do ->
       @gridReady.state() == 'resolved'
 
     _updateEssentialDataLoaded: =>
+      # TODO: remove this early return with TALLY-831
+      return unless @options.dataloader_improvements
+
       if (
         @contentLoadStates.studentIdsLoaded &&
         @contentLoadStates.contextModulesLoaded &&

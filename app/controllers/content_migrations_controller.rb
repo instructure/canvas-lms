@@ -180,6 +180,7 @@ class ContentMigrationsController < ApplicationController
       js_env(:NEW_QUIZZES_MIGRATION => new_quizzes_migration_enabled?)
       js_env(:NEW_QUIZZES_IMPORT_THIRD => new_quizzes_import_third_party?)
       js_env(:NEW_QUIZZES_MIGRATION_DEFAULT => new_quizzes_migration_default)
+      js_env(:SHOW_SELECTABLE_OUTCOMES_IN_IMPORT => @domain_root_account.feature_enabled?('selectable_outcomes_in_course_copy'))
       set_tutorial_js_env
     end
   end

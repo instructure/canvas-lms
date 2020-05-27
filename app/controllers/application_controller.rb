@@ -159,7 +159,6 @@ class ApplicationController < ActionController::Base
           use_responsive_layout: use_responsive_layout?,
           use_rce_enhancements: (@context.is_a?(User) ? @domain_root_account : @context).try(:feature_enabled?, :rce_enhancements),
           rce_auto_save: @context.try(:feature_enabled?, :rce_auto_save),
-          DIRECT_SHARE_ENABLED: !@context.is_a?(Group) && @domain_root_account.try(:feature_enabled?, :direct_share),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
           use_high_contrast: @current_user.try(:prefers_high_contrast?),
@@ -172,22 +171,14 @@ class ApplicationController < ActionController::Base
             collapse_global_nav: @current_user.try(:collapse_global_nav?),
             show_feedback_link: show_feedback_link?
           },
-          FEATURES: {
-            assignment_bulk_edit: @domain_root_account&.feature_enabled?(:assignment_bulk_edit),
-            assignment_bulk_edit_phase_2: Account.site_admin.feature_enabled?(:assignment_bulk_edit_phase_2),
-            canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme),
-            cc_in_rce_video_tray: Account.site_admin.feature_enabled?(:cc_in_rce_video_tray),
-            featured_help_links: Account.site_admin.feature_enabled?(:featured_help_links),
-            responsive_admin_settings: !!@domain_root_account&.feature_enabled?(:responsive_admin_settings),
-            responsive_awareness: !!@domain_root_account&.feature_enabled?(:responsive_awareness),
-            responsive_misc: !!@domain_root_account&.feature_enabled?(:responsive_misc),
-            product_tours: !!@domain_root_account&.feature_enabled?(:product_tours),
-            module_dnd: !!@domain_root_account&.feature_enabled?(:module_dnd),
-            files_dnd: !!@domain_root_account&.feature_enabled?(:files_dnd),
-            unpublished_courses: !!@domain_root_account&.feature_enabled?(:unpublished_courses)
-          },
-          KILL_JOY: Setting.get('kill_joy', false)
         }
+        @js_env[:KILL_JOY] = @domain_root_account.kill_joy? if @domain_root_account&.kill_joy?
+
+        cached_features = cached_js_env_account_features
+        @js_env[:DIRECT_SHARE_ENABLED] = cached_features.delete(:direct_share) && !@context.is_a?(Group)
+        @js_env[:FEATURES] = cached_features.merge(
+          canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme)
+        )
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
         @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
         @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
@@ -213,6 +204,29 @@ class ApplicationController < ActionController::Base
     @js_env
   end
   helper_method :js_env
+
+  # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
+  # so altogether we can get them faster the vast majority of the time
+  JS_ENV_SITE_ADMIN_FEATURES = [:assignment_bulk_edit_phase_2, :cc_in_rce_video_tray, :featured_help_links].freeze
+  JS_ENV_ROOT_ACCOUNT_FEATURES = [
+    :direct_share, :assignment_bulk_edit, :responsive_admin_settings, :responsive_awareness,
+    :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses
+  ].freeze
+  JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
+  def cached_js_env_account_features
+    # can be invalidated by a flag change on either site admin or the domain root account
+    Rails.cache.fetch(["js_env_account_features", JS_ENV_FEATURES_HASH,
+        Account.site_admin.cache_key(:feature_flags), @domain_root_account&.cache_key(:feature_flags)].cache_key) do
+      results = {}
+      JS_ENV_SITE_ADMIN_FEATURES.each do |f|
+        results[f] = Account.site_admin.feature_enabled?(f)
+      end
+      JS_ENV_ROOT_ACCOUNT_FEATURES.each do |f|
+        results[f] = !!@domain_root_account&.feature_enabled?(f)
+      end
+      results
+    end
+  end
 
   def add_to_js_env(hash, jsenv, overwrite)
     hash.each do |k,v|
@@ -302,7 +316,7 @@ class ApplicationController < ActionController::Base
     hash = {
       :id => tool.id,
       :title => tool.label_for(type, I18n.locale),
-      :base_url =>  polymorphic_url([context, :external_tool], url_params)
+      :base_url =>  polymorphic_url([context, :external_tool], url_params),
     }
     hash.merge!(:tool_id => tool.tool_id) if tool.tool_id.present?
 
@@ -310,6 +324,8 @@ class ApplicationController < ActionController::Base
     extension_settings.each do |setting|
       hash[setting] = tool.extension_setting(type, setting)
     end
+    hash[:base_title] = tool.default_label(I18n.locale) if custom_settings.include?(:base_title)
+    hash[:external_url] = tool.url if custom_settings.include?(:external_url)
     hash
   end
   helper_method :external_tool_display_hash

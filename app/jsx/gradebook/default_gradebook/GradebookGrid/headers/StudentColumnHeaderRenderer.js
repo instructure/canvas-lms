@@ -32,7 +32,6 @@ function getProps(gradebook, options) {
     addGradebookElement: gradebook.keyboardNav.addGradebookElement,
     disabled: !gradebook.contentLoadStates.studentsLoaded,
     loginHandleName: gradebook.options.login_handle_name,
-    includeAdditionalSortOptions: gradebook.options.additional_sort_options_enabled,
     onHeaderKeyDown: event => {
       gradebook.handleHeaderKeyDown(event, columnId)
     },

@@ -1,6 +1,6 @@
 <% p = asset.is_a?(Pseudonym) ? asset : (asset.pseudonym || asset.user.pseudonym) %>
-<% a = p.account %>
-<% product_name = a.product_name %>
+<% a = p&.account %>
+<% product_name = a&.product_name || I18n.t('Canvas') %>
 <% cc = asset.is_a?(CommunicationChannel) ? asset : (p.communication_channel || p.user.communication_channel) %>
 <% define_content :link do %>
   <%= registration_confirmation_url(cc.confirmation_code) %>
@@ -14,7 +14,7 @@
       "Thank you for registering with %{product_name}!  This email is confirmation that the user %{user} is registering for a new account at %{website}.",
       :product_name => product_name,
       :user => asset.user.short_name,
-      :website => (HostUrl.context_host((p.account rescue nil)) || HostUrl.default_host) %>
+      :website => (HostUrl.context_host(p&.account) || HostUrl.default_host) %>
 
 <%= t :details, "To finish the registration process, please visit the following url:" %>
 <%= content :link %>

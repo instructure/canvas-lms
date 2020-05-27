@@ -42,6 +42,8 @@ export const handleGameStartClick = event => {
   }
 }
 
-document.body.addEventListener('keydown', handleGameStartClick)
+if (!ENV.KILL_JOY) {
+  document.body.addEventListener('keydown', handleGameStartClick)
+}
 
 renderNotFoundApp('not_found_root')

@@ -26,7 +26,7 @@ import I18n from 'i18n!conferences'
 import ConferenceSelect from './ConferenceSelect'
 import webConferenceType from 'jsx/shared/proptypes/webConferenceType'
 
-const ConferenceButton = ({conferenceTypes, currentConferenceType, onSelect}) => {
+const ConferenceButton = ({conferenceTypes, currentConferenceType, onSelect, inputRef}) => {
   if (!conferenceTypes || conferenceTypes.length === 0) {
     return (
       <Text size="small" color="danger">
@@ -38,7 +38,12 @@ const ConferenceButton = ({conferenceTypes, currentConferenceType, onSelect}) =>
     const icon = conferenceType.lti_settings?.icon_url
     const name = conferenceType.lti_settings?.text || conferenceType.name
     return (
-      <Button color="primary-inverse" size="small" onClick={() => onSelect(conferenceType)}>
+      <Button
+        elementRef={inputRef}
+        color="primary-inverse"
+        size="small"
+        onClick={() => onSelect(conferenceType)}
+      >
         {icon && (
           <PresentationContent>
             <Img src={icon} margin="0 x-small 0 0" height="20px" width="20px" />
@@ -50,6 +55,7 @@ const ConferenceButton = ({conferenceTypes, currentConferenceType, onSelect}) =>
   } else {
     return (
       <ConferenceSelect
+        inputRef={inputRef}
         currentConferenceType={currentConferenceType}
         conferenceTypes={conferenceTypes}
         onSelectConferenceType={onSelect}
@@ -61,11 +67,13 @@ const ConferenceButton = ({conferenceTypes, currentConferenceType, onSelect}) =>
 ConferenceButton.propTypes = {
   conferenceTypes: PropTypes.arrayOf(webConferenceType).isRequired,
   currentConferenceType: webConferenceType,
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
+  inputRef: PropTypes.func
 }
 
 ConferenceButton.defaultProps = {
-  currentConferenceType: null
+  currentConferenceType: null,
+  inputRef: null
 }
 
 export default ConferenceButton

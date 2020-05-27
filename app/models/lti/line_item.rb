@@ -75,10 +75,17 @@ class Lti::LineItem < ApplicationRecord
         end
       end
 
-      a = assignment.presence || Assignment.create!(assignment_attr)
-      opts = {assignment: a, root_account_id: a.root_account_id}.merge(params)
-      opts[:client_id] = tool.developer_key.global_id
-      self.create!(opts)
+      line_item = nil
+      if assignment.blank?
+        # Creating a new assignment of submission type external_tool creates a "default"
+        # LineItem (and associated ResourceLink) which we can just modify & use
+        assignment = Assignment.create!(assignment_attr)
+        line_item = assignment.line_items.first
+      end
+
+      line_item ||= self.new(assignment: assignment, root_account_id: assignment.root_account_id)
+      line_item.update_attributes!(params.to_h.merge(client_id: tool.developer_key.global_id).compact)
+      line_item
     end
   end
 

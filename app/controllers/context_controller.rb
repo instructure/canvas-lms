@@ -157,10 +157,10 @@ class ContextController < ApplicationController
           :concluded => @context.concluded?,
           :teacherless => @context.teacherless?,
           :available => @context.available?,
-          :pendingInvitationsCount => @context.invited_count_visible_to(@current_user)
+          :pendingInvitationsCount => @context.invited_count_visible_to(@current_user),
+          hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
         }
       })
-
       set_tutorial_js_env
 
       if manage_students || manage_admins
@@ -269,7 +269,12 @@ class ContextController < ApplicationController
           @enrollments = scope.to_a
           js_env(COURSE_ID: @context.id,
                  USER_ID: user_id,
-                 LAST_ATTENDED_DATE: @enrollments.first.last_attended_at)
+                 LAST_ATTENDED_DATE: @enrollments.first.last_attended_at,
+                 :course => {
+                     id: @context.id,
+                     hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
+                 })
+
           log_asset_access(@membership, "roster", "roster")
         end
       elsif @context.is_a?(Group)

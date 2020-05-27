@@ -120,6 +120,62 @@ RSpec.describe Lti::ContentMigrationService::Importer do
           body: hash_including(data: content)
         })
       end
+
+      it 'must format request body as nested query' do
+        assert_requested(:post, import_url, {
+          body: Rack::Utils.build_nested_query({
+            context_id: Lti::Asset.opaque_identifier_for(@course),
+            data: content,
+            tool_consumer_instance_guid: root_account.lti_guid,
+            custom_course_id: @course.id.to_s
+          })
+        })
+      end
+
+      it 'must post with correct content-type' do
+        assert_requested(:post, import_url, {
+          headers: {'Content-Type' => 'application/x-www-form-urlencoded'}
+        })
+      end
+    end
+
+    context 'using the json import_format' do
+      before do
+        tool.settings = Importers::ContextExternalToolImporter.create_tool_settings({
+          settings: {
+            'content_migration' => {
+              'export_start_url' => 'https://lti.example.com/begin_export',
+              'import_start_url' => import_url,
+              'import_format' => 'json'
+            },
+          }
+        })
+        tool.save!
+
+        response_body = {
+          status_url: 'https://lti.example.com/imports/42/status',
+        }.to_json
+        stub_request(:post, import_url).
+          to_return(:status => 200, :body => response_body, :headers => {})
+
+        @response = importer.send_imported_content(course, content_migration, content)
+      end
+
+      it 'must format request body as json' do
+        assert_requested(:post, import_url, {
+          body: {
+            tool_consumer_instance_guid: root_account.lti_guid,
+            context_id: Lti::Asset.opaque_identifier_for(course),
+            data: content
+          }
+        })
+      end
+
+      it 'must post with correct content-type' do
+        assert_requested(:post, import_url, {
+          headers: {'Content-Type' => 'application/json'}
+        })
+      end
     end
 
     it 'must start the import using the replacement tool when it is active and fully configured' do

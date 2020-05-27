@@ -217,11 +217,13 @@ module Api::V1::Assignment
 
     if assignment.external_tool? && assignment.external_tool_tag.present?
       external_tool_tag = assignment.external_tool_tag
-      hash['external_tool_tag_attributes'] = {
+      tool_attributes = {
         'url' => external_tool_tag.url,
         'new_tab' => external_tool_tag.new_tab,
-        'resource_link_id' => assignment.lti_resource_link_id
+        'resource_link_id' => assignment.lti_resource_link_id,
       }
+      tool_attributes.merge!(external_tool_tag.attributes.slice('content_type', 'content_id')) if external_tool_tag.content_id
+      hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
                                            :assignment_id => assignment.id)

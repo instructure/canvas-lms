@@ -51,7 +51,8 @@ def appendStagesAsBuildNodes(nodes,
         // make sure to unstash
         unstash name: "build-dir"
         unstash name: "build-docker-compose"
-        load('build/new-jenkins/groovy/splunk.groovy').uploadEvent('jenkins.node.wait', ['duration': duration, 'node': stage_name])
+        def splunk = load 'build/new-jenkins/groovy/splunk.groovy'
+        splunk.upload([splunk.eventForNodeWait(stage_name, duration)])
         def extraTags = ["parallelStageName:${stage_name}"]
         runDatadogMetric(test_label,extraTags) {
           stage_block(index)

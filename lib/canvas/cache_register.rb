@@ -27,7 +27,7 @@ module Canvas
     # (which is far less often than the many times per day users are currently being touched)
 
     ALLOWED_TYPES = {
-      'Account' => %w{account_chain role_overrides global_navigation},
+      'Account' => %w{account_chain role_overrides global_navigation feature_flags},
       'Course' => %w{account_associations},
       'User' => %w{enrollments groups account_users todo_list submissions user_services},
       'Assignment' => %w{availability},

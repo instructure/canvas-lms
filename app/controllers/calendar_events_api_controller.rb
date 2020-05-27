@@ -71,6 +71,11 @@ require 'atom'
 #           "description": "if specified, it indicates which calendar this event should be displayed on. for example, a section-level event would have the course's context code here, while the section's context code would be returned above)",
 #           "type": "string"
 #         },
+#         "context_name": {
+#           "description": "the context name of the calendar this event belongs to (course, user or group)",
+#           "example": "Chemistry 101",
+#           "type": "string"
+#         },
 #         "all_context_codes": {
 #           "description": "a comma-separated list of all calendar contexts this event is part of",
 #           "example": "course_123,course_456",

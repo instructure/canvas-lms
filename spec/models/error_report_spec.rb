@@ -118,6 +118,15 @@ describe ErrorReport do
     expect(report.data["id"]).to eq 1
   end
 
+  it "should truncate absurdly long messages" do
+    report = described_class.new
+    long_message = (0...100000).map { 'a' }.join
+    report.assign_data(message: long_message)
+    expect(report.message.length).to eq long_message.length
+    report.save!
+    expect(report.message.length).to be < long_message.length
+  end
+
   describe "#safe_url?" do
     it "allows a 'normal' URL" do
       report = described_class.new

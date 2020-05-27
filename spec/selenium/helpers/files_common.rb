@@ -190,8 +190,10 @@ module FilesCommon
       f(".save_quiz_button").click
     elsif insert_into == :discussion
       f("#edit_discussion_form_buttons .btn-primary").click
+    elsif insert_into == :wiki_page
+      f('.btn-primary.submit').click
     else
-      f(".btn-primary").click
+      f('.btn-primary[type=submit]').click
     end
     expect(fln("some test file")).to be_displayed
   end

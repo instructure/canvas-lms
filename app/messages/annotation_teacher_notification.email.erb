@@ -1,4 +1,4 @@
-<% presenter = Messages::SubmissionCommentForTeacher::AnnotationEmailPresenter.new(self) %>
+<% presenter = Messages::SubmissionCommentForTeacher::AnnotationPresenter.new(self, data: data) %>
 
 <% define_content :link do %>
   <%= presenter.link %>

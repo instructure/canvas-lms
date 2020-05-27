@@ -848,6 +848,9 @@
     "quizzes_7e598f57": {
         "message": "Tietovisat"
     },
+    "reading_a_media_track_file_failed_aborting_be051b20": {
+        "message": "Mediaraidan luku epäonnistui. Keskeytetään."
+    },
     "record_7c9448b": {
         "message": "Nauhoita"
     },
@@ -931,6 +934,9 @@
     },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Jotakin meni pieleen enkä tiedä, mitä näyttää sinulle,"
+    },
+    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+        "message": "Jotakin meni pieleen, tarkista yhteytesi ja yritä uudelleen."
     },
     "something_went_wrong_d238c551": {
         "message": "Jotakin meni pieleen."

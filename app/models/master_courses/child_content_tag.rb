@@ -36,13 +36,20 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
                                      :wiki_page,
                                      quiz: 'Quizzes::Quiz'
   ]
+  belongs_to :root_account, :class_name => 'Account'
+
   validates_with MasterCourses::TagValidator
 
   serialize :downstream_changes, Array # an array of changed columns
 
   before_create :set_migration_id
+  before_create :set_root_account_id
 
   def set_migration_id
     self.migration_id ||= content.migration_id if content.respond_to?(:migration_id)
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= self.child_subscription.root_account_id
   end
 end

@@ -95,13 +95,3 @@ describe('DefaultToolForm', () => {
     })
   })
 })
-
-describe('toolSubmissionType', () => {
-  it('returns "external_tool" if the submission type is "default_external_tool"', () => {
-    expect(toolSubmissionType('default_external_tool')).toEqual('external_tool')
-  })
-
-  it('returns the submission type if it is not a tool submission type', () => {
-    expect(toolSubmissionType('online')).toEqual('online')
-  })
-})

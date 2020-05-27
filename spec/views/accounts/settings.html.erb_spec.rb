@@ -385,4 +385,38 @@ describe "accounts/settings.html.erb" do
       expect(response).to include("Let sub-accounts use the Theme Editor")
     end
   end
+
+  context "smart alerts" do
+    let(:account) { Account.default }
+    let(:admin) { account_admin_user }
+
+    before(:each) do
+      assign(:context, account)
+      assign(:account, account)
+      assign(:root_account, account)
+      assign(:current_user, admin)
+      assign(:account_users, [])
+      assign(:associated_courses_count, 0)
+      assign(:announcements, AccountNotification.none.paginate)
+
+      view_context(account, admin)
+    end
+
+    it "should show a threshold control" do
+      account.enable_feature!(:smart_alerts)
+
+      render
+
+      expect(response).to include('Smart Alerts')
+      expect(response).to include('Threshold (in hours) to notify students within')
+    end
+
+    it "does not show if the feature flag is turned off" do
+      account.disable_feature!(:smart_alerts)
+
+      render
+
+      expect(response).not_to include('Smart Alerts')
+    end
+  end
 end

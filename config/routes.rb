@@ -856,6 +856,8 @@ CanvasRails::Application.routes.draw do
     end
   end
 
+  get 'account_notifications' => 'account_notifications#render_past_global_announcements'
+
   scope '/profile' do
     post 'toggle_disable_inbox' => 'profile#toggle_disable_inbox'
     get 'profile_pictures' => 'profile#profile_pics', as: :profile_pics
@@ -2399,7 +2401,6 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/account_external_tools') do
       post "/accounts/:account_id/external_tools", action: :create, as: :account_external_tools_create
       get "/accounts/:account_id/external_tools/:external_tool_id", action: :show, as: :account_external_tools_show
-      put "/accounts/:account_id/external_tools/:external_tool_id", action: :update, as: :account_external_tools_update
       get "/accounts/:account_id/external_tools", action: :index, as: :account_external_tools_index
       delete "/accounts/:account_id/external_tools/:external_tool_id", action: :destroy, as: :account_external_tools_destroy
     end

@@ -95,6 +95,8 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
   end
 
   describe '#start!' do
+    let(:export_url) { 'https://lti.example.com/begin_export' }
+
     before do
       # creates @course :-(
       course_model
@@ -113,7 +115,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
             'course_id'=>'$Canvas.course.id',
           },
           'content_migration' => {
-            'export_start_url'=>'https://lti.example.com/begin_export',
+            'export_start_url'=>export_url,
             'import_start_url'=>'https://lti.example.com/begin_import'
           },
         }
@@ -124,7 +126,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
         status_url: 'https://lti.example.com/export/42/status',
         fetch_url: 'https://lti.example.com/export/42',
       }.to_json
-      stub_request(:post, 'https://lti.example.com/begin_export').
+      stub_request(:post, export_url).
         to_return(:status => 200, :body => response_body, :headers => {})
       @options = {}
       @migrator = Lti::ContentMigrationService::Exporter.new(@course, @tool, @options)
@@ -135,37 +137,88 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
         @migrator.start!
       end
       it 'must post the context_id to the configured tools' do
-        assert_requested(:post, 'https://lti.example.com/begin_export', {
+        assert_requested(:post, export_url, {
           body: hash_including(context_id: Lti::Asset.opaque_identifier_for(@course))
         })
       end
 
       it 'must post the tool_consumer_instance_guid to the configured tools' do
-        assert_requested(:post, 'https://lti.example.com/begin_export', {
+        assert_requested(:post, export_url, {
           body: hash_including(tool_consumer_instance_guid: @root_account.lti_guid)
         })
       end
 
       it 'must include a JWT as the Authorization header for each request' do
-        assert_requested(:post, 'https://lti.example.com/begin_export', {
+        assert_requested(:post, export_url, {
           headers: {'Authorization' => /^Bearer [a-zA-Z0-9\-_]{36,}\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]{43}$/}
         })
       end
 
       it 'must include any variable expansions requested by the tool' do
-        assert_requested(:post, 'https://lti.example.com/begin_export', {
+        assert_requested(:post, export_url, {
           body: hash_including('custom_course_id' => @course.id.to_s)
         })
       end
 
       it 'must not include the exported assets key' do
-        assert_not_requested(:post, 'https://lti.example.com/begin_export', {
+        assert_not_requested(:post, export_url, {
           body: hash_including('custom_exported_assets' => anything)
         })
       end
 
       it 'must mark the migration as successfully started' do
         expect(@migrator).to be_successfully_started
+      end
+
+      context 'for the default body format' do
+        it 'must format request body as nested query' do
+          assert_requested(:post, export_url, {
+            body: Rack::Utils.build_nested_query({
+              context_id: Lti::Asset.opaque_identifier_for(@course),
+              tool_consumer_instance_guid: @root_account.lti_guid,
+              custom_course_id: @course.id.to_s
+            })
+          })
+        end
+  
+        it 'must post with correct content-type' do
+          assert_requested(:post, export_url, {
+            headers: {'Content-Type' => 'application/x-www-form-urlencoded'}
+          })
+        end
+      end
+  
+      context 'for json body format' do
+
+        before do
+          @tool.settings = Importers::ContextExternalToolImporter.create_tool_settings({
+            settings: {
+              'content_migration' => {
+                'export_start_url'=>export_url,
+                'import_start_url'=>'https://lti.example.com/begin_import',
+                'export_format'=>'json'
+              },
+            }
+          })
+          @tool.save!
+          @migrator = Lti::ContentMigrationService::Exporter.new(@course, @tool, @options)
+          @migrator.start!
+        end
+
+        it 'must format request body as json' do
+          assert_requested(:post, export_url, {
+            body: {
+              context_id: Lti::Asset.opaque_identifier_for(@course),
+              tool_consumer_instance_guid: @root_account.lti_guid,
+            }
+          })
+        end
+  
+        it 'must post with correct content-type' do
+          assert_requested(:post, export_url, {
+            headers: {'Content-Type' => 'application/json'}
+          })
+        end
       end
     end
 
@@ -177,7 +230,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
       end
 
       it 'must include the exported assets in the request to the tool' do
-        assert_requested(:post, 'https://lti.example.com/begin_export', {
+        assert_requested(:post, export_url, {
           body: hash_including('custom_exported_assets' => @exports)
         })
       end

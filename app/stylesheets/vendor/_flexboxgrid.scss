@@ -1,8 +1,6 @@
 /*
 @styleguide Grid
 
-<br/>
-
 We use a slightly modified version of [Flexbox Grid](http://flexboxgrid.com) as Canvas' grid.
 
 *Important!* Flexbox Grid's default `.row` class has been changed to `*.grid-row*` due to previous usage of Bootstrap 2.x grid in small parts of the application.
@@ -11,11 +9,8 @@ Flexbox Grid is a lot like Bootstrap 3's 12-column grid, with different column w
 
 To create vertical space between grid rows, consider using the `.content-box` and its variants.
 
-
 ## Basic usage
 
-*"Just tell me how to make 2 columns."*
-
 ```html
 <div class="content-box">
   <div class="grid-row">
@@ -24,138 +19,6 @@ To create vertical space between grid rows, consider using the `.content-box` an
       </div>
       <div class="col-xs-6">
           <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-  </div>
-</div>
-```
-## Get all fancypants responsive
-
-*"I want two columns, but only when the screen is wide enough"*
-
-```html
-<div class="content-box">
-  <div class="grid-row">
-      <div class="col-xs-12 col-md-6">
-          <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-      <div class="col-xs-12 col-md-6">
-          <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-  </div>
-</div>
-```
-
-## Give your UI some room to breathe by adding alignment classes (.start, .center-, .end-) to the .grid-row element
-
-*"Once the screen is wide enough, limit my content to 8 columns and center it horizontally"*
-
-```html
-<div class="content-box">
-  <div class="grid-row center-md">
-      <div class="col-xs-12 col-md-8">
-          <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-  </div>
-</div>
-```
-
-## Align UI elements on a horizontal axis like it's 2014 (or later).
-
-Because it is, and you can use flexbox.
-
-```html
-<div class="content-box">
-  <div class="grid-row middle-xs">
-      <div class="col-xs-4">
-          <div class="styleguide-section__grid-demo-element" style="height: 100px;">Look, ma &hellip;</div>
-      </div>
-      <div class="col-xs-8">
-          <div class="styleguide-section__grid-demo-element">&hellip; we're horizontally centered!</div>
-      </div>
-  </div>
-</div>
-<div class="content-box">
-  <div class="grid-row top-xs">
-      <div class="col-xs-4">
-          <div class="styleguide-section__grid-demo-element" style="height: 100px;">Look, ma &hellip;</div>
-      </div>
-      <div class="col-xs-8">
-          <div class="styleguide-section__grid-demo-element">&hellip; we're aligned to the top of our container!</div>
-      </div>
-  </div>
-</div>
-<div class="content-box">
-  <div class="grid-row bottom-xs">
-      <div class="col-xs-4">
-          <div class="styleguide-section__grid-demo-element" style="height: 100px;">Look, ma &hellip;</div>
-      </div>
-      <div class="col-xs-8">
-          <div class="styleguide-section__grid-demo-element">&hellip; we're aligned to the bottom of our container!</div>
-      </div>
-  </div>
-</div>
-```
-
-## Use the power of flexbox to perfectly add space *.around-* or *.between-* UI elements
-
-```html
-<div class="content-box">
-  <div class="grid-row between-md">
-      <div class="col-xs-1">
-          <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-      <div class="col-xs-1">
-          <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-      <div class="col-xs-1">
-          <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-  </div>
-</div>
-<div class="content-box">
-  <div class="grid-row around-md">
-      <div class="col-xs-1">
-          <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-      <div class="col-xs-1">
-          <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-      <div class="col-xs-1">
-          <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-  </div>
-</div>
-```
-
-## Offset grid columns
-
-"When the screen gets wide enough, offset this 2-column box by 3 grid columns."
-
-```html
-<div class="content-box">
-  <div class="grid-row">
-      <div class="col-xs-2 off-md-3">
-          <div class="styleguide-section__grid-demo-element"></div>
-      </div>
-  </div>
-</div>
-```
-
-## Be completely lazy
-
-"Never miss another game of foosball. Just let the grid evenly distribute your elements."
-
-```html
-<div class="content-box">
-  <div class="grid-row">
-      <div class="col-xs">
-          <div class="styleguide-section__grid-demo-element">I'm lazy</div>
-      </div>
-      <div class="col-xs">
-          <div class="styleguide-section__grid-demo-element">Me, too</div>
-      </div>
-      <div class="col-xs">
-          <div class="styleguide-section__grid-demo-element">I can't believe this works</div>
       </div>
   </div>
 </div>

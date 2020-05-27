@@ -163,7 +163,7 @@ export default class ShowEventDetailsDialog {
         ) {
           results.push(publish('CommonEvent/eventDeleted', v))
         } else {
-          results.push(void 0)
+          results.push(undefined)
         }
       }
       return results
@@ -404,10 +404,7 @@ export default class ShowEventDetailsDialog {
       ReactDOM.render(
         <Conference
           conference={params.webConference}
-          conferenceTypes={getConferenceType(
-            ENV.conferences.conference_types,
-            params.webConference
-          )}
+          conferenceType={getConferenceType(ENV.conferences.conference_types, params.webConference)}
         />,
         conferenceNode
       )

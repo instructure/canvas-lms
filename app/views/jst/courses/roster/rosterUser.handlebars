@@ -24,11 +24,13 @@
   {{/if}}
 </td>
 {{/if}}
-<td>
+{{#unless hideSectionsOnCourseUsersPage}}
+<td data-test-id="section-column-cell">
   {{#each sections}}
   <div class="section">{{name}}</div>
   {{/each}}
 </td>
+{{/unless}}
 <td>
   {{#each enrollments}}
   <div>{{enrollmentName role}}</div>

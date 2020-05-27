@@ -473,19 +473,24 @@ module CustomSeleniumActions
       el.send_keys [(driver.browser == :safari ? :command : :control), 'a']
       el.send_keys(value)
     else
-      case driver.browser
-      when :firefox, :safari, :internet_explorer
-        keys = [[MODIFIER_KEY, "a"], :backspace]
-      when :chrome
-        driver.execute_script("arguments[0].select();", el)
-        keys = value.to_s.empty? ? [:backspace] : []
-      end
+      driver.execute_script("arguments[0].select();", el)
+      keys = value.to_s.empty? ? [:backspace] : []
       keys << value
       el.send_keys(*keys)
+      count = 0
+      until el['value'] == value.to_s
+        break if count > 1
+        count += 1
+        driver.execute_script("arguments[0].select();", el)
+        el.send_keys(*keys)
+      end
     end
 
     if options[:tab_out]
       el.send_keys(:tab)
+    end
+    if options[:press_return]
+      el.send_keys(:return)
     end
   end
 
