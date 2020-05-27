@@ -31,6 +31,9 @@ import {initialize as initializeAlerts} from './utilities/alertUtils'
 import {initializeContent} from './utilities/contentUtils'
 import {initializeDateTimeFormatters} from './utilities/dateUtils'
 import {DynamicUiManager, DynamicUiProvider, specialFallbackFocusId} from './dynamic-ui'
+import responsiviser from './components/responsiviser'
+
+export {responsiviser}
 
 let externalPlannerActive
 const plannerActive = () => (externalPlannerActive ? externalPlannerActive() : false)

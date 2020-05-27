@@ -27,7 +27,7 @@ import {FormField} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
 import {Tooltip, Tray} from '@instructure/ui-overlays'
 import {StoreProvider} from '../../shared/StoreContext'
-import ClosedCaptionPanel from '@instructure/canvas-media/lib/ClosedCaptionCreator'
+import {ClosedCaptionPanel} from '@instructure/canvas-media'
 import uploadMediaTranslations from '../mediaTranslations'
 import {
   CUSTOM,

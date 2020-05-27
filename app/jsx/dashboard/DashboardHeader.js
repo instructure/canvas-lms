@@ -21,8 +21,12 @@ import I18n from 'i18n!dashboard'
 import axios from 'axios'
 import classnames from 'classnames'
 import {bool, func, string, object, oneOf} from 'prop-types'
-import {initializePlanner, loadPlannerDashboard, renderToDoSidebar} from 'canvas-planner'
-import responsiviser from 'canvas-planner/lib/components/responsiviser'
+import {
+  initializePlanner,
+  loadPlannerDashboard,
+  renderToDoSidebar,
+  responsiviser
+} from '@instructure/canvas-planner'
 import {showFlashAlert, showFlashError} from '../shared/FlashAlert'
 import apiUserContent from 'compiled/str/apiUserContent'
 import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu'
@@ -44,7 +48,7 @@ class DashboardHeader extends React.Component {
     dashboard_view: string,
     planner_enabled: bool.isRequired,
     screenReaderFlashMessage: func,
-    env: object, // eslint-disable-line react/forbid-prop-types
+    env: object,
     showTodoList: func,
     responsiveSize: oneOf(['small', 'medium', 'large'])
   }
@@ -145,7 +149,9 @@ class DashboardHeader extends React.Component {
       this.sidebarHasLoaded = true
     }
 
-    this.setState({loadedViews: this.state.loadedViews.concat(newView)})
+    this.setState((state, _props) => {
+      return {loadedViews: state.loadedViews.concat(newView)}
+    })
   }
 
   saveDashboardView(newView) {

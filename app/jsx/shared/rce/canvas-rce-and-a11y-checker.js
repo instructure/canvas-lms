@@ -16,6 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from 'canvas-rce/lib/async'
+export * from '@instructure/canvas-rce'
 // eslint-disable-next-line import/first
 import './initA11yChecker'

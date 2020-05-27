@@ -96,7 +96,6 @@
     "backbone": "1.1.1",
     "big.js": "^5.0.3",
     "brandable_css": "0.1.0",
-    "canvas-planner": ">=1.0.16",
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0",
     "classnames": "^2.2.5",
     "color-slicer": "0.8.0",
@@ -326,7 +325,9 @@
     "jspec-watch": "./spec/jspec.sh --watch",
     "a11y-report": "./spec/jspec.sh --a11y",
     "upgrade-and-dedupe": "rm -rf yarn.lock node_modules && yes 1 | yarn install --flat --production --ignore-scripts && git checkout package.json && yarn install && git add yarn.lock",
-    "upgrade-instructure-ui": "script/upgrade-instructure-ui"
+    "upgrade-instructure-ui": "script/upgrade-instructure-ui",
+    "dedupe-yarn": "npx yarn-deduplicate",
+    "clean": "yarn workspace-run-serial clean"
   },
   "resolutions": {
     "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS",

@@ -29,9 +29,7 @@ import {Img, Text, TruncateText} from '@instructure/ui-elements'
 import {Flex, View} from '@instructure/ui-layout'
 import {VideoPlayer} from '@instructure/ui-media-player'
 
-import RocketSVG from '@instructure/canvas-media/lib/RocketSVG'
-import useComputerPanelFocus from '@instructure/canvas-media/lib/useComputerPanelFocus'
-import useSizeVideoPlayer from '@instructure/canvas-media/lib/useSizeVideoPlayer'
+import {RocketSVG, useComputerPanelFocus, useSizeVideoPlayer} from '@instructure/canvas-media'
 
 import formatMessage from '../../../../format-message'
 import {getIconFromType, isAudioOrVideo, isImage, isText} from '../fileTypeUtils'

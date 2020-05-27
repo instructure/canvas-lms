@@ -1,9 +1,9 @@
 {
-  "name": "canvas-rce",
+  "name": "@instructure/canvas-rce",
   "version": "5.0.3",
   "description": "A component wrapping canvas's common tinymce usage",
   "main": "lib/index.js",
-  "module": "lib/modules/index.js",
+  "module": "es/index.js",
   "scripts": {
     "i18n:extract": "format-message extract \"src*/**/*.js\" -g underscored_crc32 -o locales/en.json",
     "integration-test": "nightwatch --env integration",
@@ -27,11 +27,12 @@
     "dev": "webpack-dev-server -d --content-base github-pages/",
     "build:all": "scripts/build.js",
     "build:canvas": "scripts/build-canvas",
-    "build:watch": "rm -rf lib && TRANSPILE=true ./node_modules/.bin/babel --out-dir lib src --watch",
+    "build:watch": "rm -rf es &&  ./node_modules/.bin/babel --out-dir es src --watch",
     "build:cafe": "webpack --config webpack.testcafe.config.js",
     "prepublishOnly": "yarn test && yarn build:all",
     "fmt:check": "prettier -l '**/*.js'",
-    "fmt:fix": "prettier --write '**/*.js'"
+    "fmt:fix": "prettier --write '**/*.js'",
+    "clean": "rm -rf lib && rm -rf es && rm -rf coverage"
   },
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",

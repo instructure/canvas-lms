@@ -18,7 +18,7 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {oneOf, string} from 'prop-types'
 import I18n from 'i18n!CanvasMediaPlayer'
-import LoadingIndicator from '@instructure/canvas-media/lib/shared/LoadingIndicator'
+import {LoadingIndicator} from '@instructure/canvas-media'
 import {VideoPlayer} from '@instructure/ui-media-player'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-layout'
