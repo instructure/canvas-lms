@@ -43,6 +43,7 @@ describe "google analytics" do
         admin: { key: 'dimension2', default: '00' },
         enrollments: { key: 'dimension1', default: '000' },
         masquerading: { key: 'dimension3', default: '0' },
+        org_type: { key: 'dimension4', default: nil }
       }
     end
 
@@ -132,6 +133,17 @@ describe "google analytics" do
       expect(ga_script).to include(
         "ga('set', 'userId', #{alternative_user_id.to_json})"
       )
+    end
+
+    it "should report the org type as a dimension" do
+      start_with do
+        Account.default.external_integration_keys.create!(
+          key_type: 'salesforce_org_type',
+          key_value: 'K12'
+        )
+      end
+
+      expect_dimensions_to_include(org_type: 'K12')
     end
   end
 end
