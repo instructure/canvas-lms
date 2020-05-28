@@ -194,7 +194,7 @@ module DataFixup::Auditors
 
       def create_cell!(attributes: nil)
         attributes = cell_attributes if attributes.nil?
-        ::Auditors::ActiveRecord::MigrationCell.create!(attributes.merge({ completed: false }))
+        ::Auditors::ActiveRecord::MigrationCell.create!(attributes.merge({ completed: false, repaired: false }))
       rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation
         created_cell = find_migration_cell(attributes: attributes)
         raise "unresolvable auditors migration state #{attributes}" if created_cell.nil?
@@ -206,7 +206,7 @@ module DataFixup::Auditors
         @_cell = nil
       end
 
-      def mark_cell_queued!
+      def mark_cell_queued!(delayed_job_id: nil)
         (@_cell = create_cell!) if migration_cell.nil?
         migration_cell.update_attribute(:failed, false) if migration_cell.failed
         # queueing will take care of a week, so let's make sure we don't get
@@ -216,9 +216,10 @@ module DataFixup::Auditors
           cur_cell_attrs =  cell_attributes(target_date: current_date)
           current_cell = find_migration_cell(attributes: cur_cell_attrs)
           current_cell = create_cell!(attributes: cur_cell_attrs) if current_cell.nil?
-          current_cell.update(completed: false, failed: false)
+          current_cell.update(completed: false, failed: false, job_id: delayed_job_id, queued: true)
           current_date += 1.day
         end
+        @_cell.reload
       end
 
       def auditors_cassandra_db_lambda
@@ -234,11 +235,15 @@ module DataFixup::Auditors
       end
 
       def currently_queueable?
-        return false if migration_cell&.completed
         return true if migration_cell.nil?
         return true if migration_cell.failed
-        # this cell is not failed, but also not complete.
-        # that means it was queued, but not updated later.
+        if operation == :repair
+          return false if migration_cell.repaired
+        else
+          return false if migration_cell.completed
+        end
+        return true unless migration_cell.queued
+        # this cell is currently in the queue (maybe)
         # If that update happened more than a few
         # days ago, it's likely dead, and should
         # get rescheduled.  Worst case
@@ -253,7 +258,20 @@ module DataFixup::Auditors
           cur_cell_attrs =  cell_attributes(target_date: current_date)
           current_cell = find_migration_cell(attributes: cur_cell_attrs)
           current_cell = create_cell!(attributes: cur_cell_attrs) if current_cell.nil?
-          current_cell.update(completed: true, failed: false)
+          repaired = (operation == :repair)
+          current_cell.update(completed: true, failed: false, repaired: repaired)
+          current_date += 1.day
+        end
+      end
+
+      def mark_week_audited!(results)
+        current_date = previous_sunday
+        failed_count = results['failure_count']
+        while current_date < next_sunday do
+          cur_cell_attrs =  cell_attributes(target_date: current_date)
+          current_cell = find_migration_cell(attributes: cur_cell_attrs)
+          current_cell = create_cell!(attributes: cur_cell_attrs) if current_cell.nil?
+          current_cell.update(audited: true, missing_count: failed_count)
           current_date += 1.day
         end
       end
@@ -289,6 +307,7 @@ module DataFixup::Auditors
         mark_week_complete!
       ensure
         cell.update_attribute(:failed, true) unless cell.reload.completed
+        cell.update_attribute(:queued, false)
         clear_cassandra_stream_timeout!
       end
 
@@ -300,6 +319,7 @@ module DataFixup::Auditors
           'missed_ids' => []
         }
         perform_audit
+        mark_week_audited!(@audit_results)
         return @audit_results
       ensure
         clear_cassandra_stream_timeout!
@@ -791,8 +811,8 @@ module DataFixup::Auditors
 
       def conditionally_enqueue_worker(worker, n_strand)
         if worker.currently_queueable?
-          Delayed::Job.enqueue(worker, n_strand: n_strand, priority: Delayed::LOW_PRIORITY)
-          worker.mark_cell_queued!
+          job = Delayed::Job.enqueue(worker, n_strand: n_strand, priority: Delayed::LOW_PRIORITY)
+          worker.mark_cell_queued!(delayed_job_id: job.id)
         end
       end
 
