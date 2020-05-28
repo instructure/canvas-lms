@@ -428,9 +428,9 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  insertLink(link) {
+  insertLink(link, isNew) {
     const editor = this.mceInstance()
-    const element = contentInsertion.insertLink(editor, link)
+    const element = contentInsertion.insertLink(editor, link, isNew)
     this.contentInserted(element)
   }
 

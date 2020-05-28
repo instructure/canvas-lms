@@ -59,6 +59,18 @@ describe('contentInsertion', () => {
         decode: input => {
           return input
         },
+        encode: input => input,
+        setAttribs: (elem, attrs) => {
+          if (elem?.nodeType === 1) {
+            // this is an HTMLElement
+            Object.keys(attrs).forEach(a => {
+              if (attrs[a]) {
+                elem.setAttribute(a, attrs[a])
+              }
+            })
+          }
+          return elem
+        },
         $: () => {
           return {
             is: () => {
@@ -67,9 +79,16 @@ describe('contentInsertion', () => {
           }
         }
       },
+      undoManager: {
+        add: () => {}
+      },
       focus: () => {},
       insertContent: content => {
-        editor.content += content
+        if (editor.selection.getContent()) {
+          editor.content = editor.content.replace(editor.selection.getContent(), content)
+        } else {
+          editor.content += content
+        }
       },
       iframeElement: {
         getBoundingClientRect: () => {
@@ -126,13 +145,9 @@ describe('contentInsertion', () => {
     })
 
     it('respects the current selection building the link by delegating to tinymce', () => {
-      editor.execCommand = jest.fn()
       editor.selection.setContent('link me')
       contentInsertion.insertLink(editor, link)
-      expect(editor.execCommand).toHaveBeenCalled()
-      expect(editor.execCommand.mock.calls[0][0]).toBe('mceInsertLink')
-      // this isn't really a very good test, but w/o a real tinymce editor
-      // it's the best we can do. Will cover this case with a selenium spec
+      expect(editor.content).toEqual('<a href="/some/path" title="Here Be Links">link me</a>')
     })
 
     it('cleans a url with no protocol when linking the current selection', () => {
@@ -140,27 +155,26 @@ describe('contentInsertion', () => {
       editor.selection.setContent('link me')
       link.href = 'www.google.com'
       contentInsertion.insertLink(editor, link)
-      expect(editor.execCommand).toHaveBeenCalled()
-      expect(editor.execCommand.mock.calls[0][0]).toBe('mceInsertLink')
-      expect(editor.execCommand.mock.calls[0][2].href).toBe('http://www.google.com')
+      expect(editor.content).toEqual(
+        '<a href="http://www.google.com" title="Here Be Links">link me</a>'
+      )
     })
 
-    it('cleans a url with no protocol when editing an existing link', () => {
+    it('cleans a url with no protocol when editing an existing, selected link', () => {
       link.href = 'www.google.com'
       editor.selection.setContent('link me')
-      const anchor = document.createElement('div')
+      const anchor = document.createElement('a')
       anchor.setAttribute('href', 'http://example.com')
-      const textNode = document.createTextNode('edit me')
+      const textNode = document.createTextNode('link me')
       anchor.appendChild(textNode)
       editor.selection.getNode = () => textNode
       editor.dom.getParent = () => anchor
       editor.selection.select = () => {}
-      contentInsertion.insertLink(editor, link)
-      expect(editor.execCommand).toHaveBeenCalledWith(
-        'mceInsertLink',
-        null,
-        expect.objectContaining({href: 'http://www.google.com'})
-      )
+      contentInsertion.insertLink(editor, link, 'Click On Me')
+      // insertLink edits the <a> in-place, so
+      // check that the anchor has been updated as expected
+      expect(anchor.getAttribute('href')).toEqual('http://www.google.com')
+      expect(anchor.innerText).toEqual('Click On Me')
     })
 
     it('can use url if no href', () => {
