@@ -239,19 +239,37 @@ class AuthenticationProvidersController < ApplicationController
   # @API Add authentication provider
   #
   # Add external authentication provider(s) for the account.
-  # Services may be CAS, Facebook, GitHub, Google, LDAP, LinkedIn,
+  # Services may be Apple, CAS, Facebook, GitHub, Google, LDAP, LinkedIn,
   # Microsoft, OpenID Connect, SAML, or Twitter.
   #
   # Each authentication provider is specified as a set of parameters as
   # described below. A provider specification must include an 'auth_type'
-  # parameter with a value of 'canvas', 'cas', 'clever', 'facebook', 'github', 'google',
-  # 'ldap', 'linkedin', 'microsoft', 'openid_connect', 'saml', or 'twitter'. The other
-  # recognized parameters depend on this auth_type; unrecognized parameters are discarded.
-  # Provider specifications not specifying a valid auth_type are ignored.
+  # parameter with a value of 'apple', 'canvas', 'cas', 'clever', 'facebook',
+  # 'github', 'google', 'ldap', 'linkedin', 'microsoft', 'openid_connect',
+  # 'saml', or 'twitter'. The other recognized parameters depend on this
+  # auth_type; unrecognized parameters are discarded. Provider specifications
+  # not specifying a valid auth_type are ignored.
   #
   # You can set the 'position' for any configuration. The config in the 1st position
   # is considered the default. You can set 'jit_provisioning' for any configuration
   # besides Canvas.
+  #
+  # For Apple, the additional recognized parameters are:
+  #
+  # - client_id [Required]
+  #
+  #   The developer’s client identifier, as provided by WWDR. Not available if
+  #   configured globally for Canvas.
+  #
+  # - login_attribute [Optional]
+  #
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'sub' (the default), or 'email'
+  #
+  # - federated_attributes [Optional]
+  #
+  #   See FederatedAttributesConfig. Valid provider attributes are 'email',
+  #   'firstName', 'lastName', and 'sub'.
   #
   # For Canvas, the additional recognized parameter is:
   #
