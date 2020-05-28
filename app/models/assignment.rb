@@ -1070,7 +1070,7 @@ class Assignment < ActiveRecord::Base
         resource_link_id: lti_context_id,
         context_external_tool: ContextExternalTool.from_content_tag(external_tool_tag, context)
       )
-      line_items.create!(label: title, score_maximum: points_possible, resource_link: rl)
+      line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true)
     elsif saved_change_to_title? || saved_change_to_points_possible?
       line_items.
         find(&:assignment_line_item?)&.

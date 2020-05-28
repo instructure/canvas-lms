@@ -115,6 +115,11 @@ module Lti
             end.to change(Lti::LineItem, :count).by(1)
           end
 
+          it 'sets coupled to false on the new line item' do
+            send_request
+            expect(Lti::LineItem.last.coupled).to eq(false)
+          end
+
           it 'responds with 404 if course is concluded' do
             course.update!(workflow_state: 'completed')
             send_request
@@ -701,7 +706,8 @@ module Lti
           let(:coupled_line_item) do
             assignment.line_items.first.update!(
               tag: tag,
-              resource_id: resource_id
+              resource_id: resource_id,
+              coupled: true
             )
             assignment.line_items.first
           end
@@ -711,7 +717,8 @@ module Lti
               assignment: assignment,
               resource_link: resource_link,
               tag: tag,
-              resource_id: resource_id
+              resource_id: resource_id,
+              coupled: false
             )
           end
           let(:line_item) do
@@ -726,6 +733,7 @@ module Lti
             it 'does not allow destroying default line items' do
               send_request
               expect(response).to be_unauthorized
+              expect(Lti::LineItem.active.find_by(id: line_item_id)).not_to be_nil
             end
           end
         end
@@ -736,13 +744,42 @@ module Lti
               course: course,
               tag: tag,
               resource_id: resource_id,
-              client_id: developer_key.global_id
+              client_id: developer_key.global_id,
+              coupled: false
             )
           end
 
-          it 'deletes the correct line item' do
+          it 'deletes the correct line item but not the assignment' do
             send_request
             expect(Lti::LineItem.active.find_by(id: line_item_id)).to be_nil
+            expect(line_item.assignment).to be_active
+          end
+
+          it 'responds with no content' do
+            send_request
+            expect(response).to be_no_content
+          end
+        end
+
+        context 'when the line item is a tool-created (uncoupled) assignment line item' do
+          let(:line_item) do
+            assignment.line_items.first.update!(
+              tag: tag,
+              resource_id: resource_id,
+              coupled: false
+            )
+            assignment.line_items.first
+          end
+
+          it_behaves_like 'the line item destroy endpoint'
+
+          it 'deletes the resource link and assignment' do
+            assignment_id = line_item.assignment_id
+            resource_link_id = line_item.lti_resource_link_id
+            send_request
+            expect(Lti::LineItem.active.find_by(id: line_item_id)).to be_nil
+            expect(Lti::ResourceLink.active.find_by(id: resource_link_id)).to be_nil
+            expect(Assignment.active.find_by(id: assignment_id)).to be_nil
           end
 
           it 'responds with no content' do

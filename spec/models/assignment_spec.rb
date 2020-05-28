@@ -8691,6 +8691,7 @@ describe Assignment do
           expect(assignment.line_items.length).to eq 1
           expect(assignment.line_items.first.label).to eq assignment.title
           expect(assignment.line_items.first.score_maximum).to eq assignment.points_possible
+          expect(assignment.line_items.first.coupled).to eq true
           expect(assignment.line_items.first.resource_link).not_to be_nil
           expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id
           expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool

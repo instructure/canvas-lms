@@ -44,12 +44,12 @@ class Lti::LineItem < ApplicationRecord
 
   before_create :set_root_account_id
   before_destroy :destroy_resource_link, if: :assignment_line_item? # assignment will destroy all the other line_items of a resourceLink
+  before_destroy :destroy_assignment
 
   AGS_EXT_SUBMISSION_TYPE = 'https://canvas.instructure.com/lti/submission_type'.freeze
 
   def assignment_line_item?
-    return true if resource_link.blank?
-    resource_link.line_items.order(:created_at).first.id == self.id
+    assignment.line_items.order(:created_at).first.id == self.id
   end
 
   def self.create_line_item!(assignment, context, tool, params)
@@ -84,7 +84,8 @@ class Lti::LineItem < ApplicationRecord
       end
 
       line_item ||= self.new(assignment: assignment, root_account_id: assignment.root_account_id)
-      line_item.update_attributes!(params.to_h.merge(client_id: tool.developer_key.global_id).compact)
+      attrs = params.to_h.merge(client_id: tool.developer_key.global_id, coupled: false).compact
+      line_item.update_attributes!(attrs)
       line_item
     end
   end
@@ -119,6 +120,13 @@ class Lti::LineItem < ApplicationRecord
   # this is to prevent orphaned (ie undeleted state) line_items when an assignment is destroyed
   def destroy_resource_link
     self.resource_link&.destroy
+  end
+
+  # This is to delete assignments that were created with the line items API
+  # the API
+  def destroy_assignment
+    return unless assignment_line_item? && !coupled
+    self.assignment.destroy
   end
 
   def set_root_account_id

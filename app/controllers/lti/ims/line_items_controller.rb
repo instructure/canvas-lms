@@ -209,7 +209,7 @@ module Lti
       #
       # @returns LineItem
       def destroy
-        head :unauthorized and return if line_item.assignment_line_item? && line_item.resource_link.present?
+        head :unauthorized and return if line_item.coupled
         line_item.destroy!
         head :no_content
       end
