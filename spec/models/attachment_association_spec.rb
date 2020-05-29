@@ -1,3 +1,4 @@
+# coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,13 +17,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AttachmentAssociation < ActiveRecord::Base
-  belongs_to :attachment
-  belongs_to :context, polymorphic: [:conversation_message, :submission, :course, :group]
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
-  before_create :set_root_account_id
+describe AttachmentAssociation do
+  context 'create' do
 
-  def set_root_account_id
-    self.root_account_id ||= context.root_account_id if context.respond_to?(:root_account_id)
+    it 'sets the root_account_id using course context' do
+      attachment_model filename: 'test.txt'
+      association = @attachment.attachment_associations.create!(context: @course)
+
+      expect(association.root_account_id).to eq @course.root_account_id
+    end
   end
 end
