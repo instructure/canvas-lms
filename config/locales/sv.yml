@@ -1339,6 +1339,7 @@ sv:
         login_handle_name: Inloggningsetikett
         message: Meddelande
         mfa_settings: Multifaktorautentisering
+        mobile_qr_login_is_enabled: "Tillåt inloggning till mobilapparna med hjälp av QR-koder"
         name: Kontonamn
         new_sub_account_includes: "Låt underkonton använda Temaredigeraren för att göra sin branding"
         no_enrollments_can_create_courses: "Användare utan registreringar"
@@ -2704,6 +2705,7 @@ sv:
   applied_cc7be774: Tillämpad
   apply_781a2546: Tillämpa
   apply_changes_b1dffc70: "Tillämpa ändringar"
+  apply_date_range_selection_cc4351ed: "Tillämpa urval med datumintervall"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Använd filter. Obs! Om du klickar på den här knappen kommer sidan att laddas om."
   apply_theme_7af08387: "Tillämpa tema"
   applying_new_styles_to_subaccounts_e8aeeef2: "Lägger till nya stilar för underkonton"
@@ -4946,6 +4948,7 @@ sv:
   choose_usage_rights_33683854: "Välj användningsrättigheter ..."
   chosencolor_is_not_a_valid_color_5d542cc: "\"%{chosenColor}\" är inte en giltig färg."
   classic_quizzes_dee3c7b7: "Classic Quizzes"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Alternativ för klassisk Quizzes för tidsinställda quiz utan inlämning"
   clear_2084585f: Rensa
   clear_selected_file_82388e50: "Rensa vald fil"
   clear_user_cache_ef079f7f: "Rensa användar-cacheminne"
@@ -8098,6 +8101,7 @@ sv:
   disable_a5c05db3: Inaktivera
   disable_all_read_only_scopes_f9ffdd28: "Inaktivera alla skrivskyddade omfattningar"
   disable_and_lock_7d0ef0e8: "Inaktivera och lås"
+  disable_automatic_submission_8e1d8676: "Inaktivera automatisk inlämning"
   disable_celebrations_description: "Om du inaktiverar den här funktionen döljs alla gratulationsanimeringar."
   disable_content_security_policy_8660a787: "Inaktivera säkerhetspolicyn för innehåll"
   disable_extra_filter_options_1d1cdc02: "inaktivera extra filteralternativ"
@@ -8910,6 +8914,7 @@ sv:
   enable_new_sis_integration_settings_ab6780a4: "Aktivera nya SIS integreringsinställningar"
   enable_notifications_10a4bf44: "Aktivera aviseringar"
   enable_or_condition_for_modules_a16f02d8: "Aktivera \"ELLER\" skick för moduler"
+  enable_recording_for_this_conference_b8adff6: "Aktivera inspelning för den här konferensen"
   enable_reregistration_for_lti_2_b2a10444: "Aktivera omregistrering för LTI 2"
   enable_scope_ac28b832: "Aktivera omfattning"
   enable_student_context_card_links_eba2f2c5: "Aktivera länkar på kontextuellt studentkort"
@@ -11635,6 +11640,7 @@ sv:
   hide_students_with_no_results_6a22f991: "Dölj studenter utan resultat"
   hide_sub_accounts_for_account_name_a6de98bd: "Göm underkonto för %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Dölj knappen Importera lärandemål baserat på användarbehörigheter"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Dölj vissa studenter och sektioner i LMGB om läraren endast har åtkomst till en viss sektion"
   hiding_grades_82691e44: "Dölja omdömen"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Det är inte tillåtet att dölja omdömen eftersom omdömen inte har släppts for den här uppgiften."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Om omdömen döljs uppdateras din webbläsare. Detta kan ta en stund"
@@ -11801,6 +11807,9 @@ sv:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Om ett attribut är markerat som endast tillhandahållande används det bara när Just in Time-tillhandahållande skapar en ny användare och uppdateras inte varje gång användaren loggar in."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      Om ett LTI-verktyg som konfigurerats med placeringen installeras visas en ny post i rullgardinsmenyn för
+      uppgiftens inlämningstyp för snabb konfiguration av verktygets uppgift.
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Om både Omdömen – redigera och Omdömen – visa alla omdömen är inaktiverade, döljs bedömningsöversikten i kursnavigeringen."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Om Omdömen – redigera och Omdömen – visa alla omdömen är inaktiverade döljs bedömningsöversikten i kursnavigeringen."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Om både Omdömen – redigera och Omdömen – visa alla omdömen är inaktiverade, döljs bedömningsöversikten i kursnavigeringen."
@@ -12683,6 +12692,7 @@ sv:
     other: 
       one: "1 annan"
       other: "%{count} andra"
+  list_collapsed_381ef1b6: "Listan komprimerades. "
   list_collapsed_5f19f5bb: "Listan komprimerades"
   list_collapsed_9ac35920: "Listan komprimerades."
   list_collapsed_dde87718: "Listan komprimerades"
@@ -17314,6 +17324,7 @@ sv:
     labels: 
       requirements_must_be_completed: "Följande krav måste uppfyllas innan den här sidan låses upp"
   presentation_2d9387ca: Presentation
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Visar quizinställning för att undvika automatisk inlämning av ett tidsinställt quiz när tiden har gått ut."
   press_space_to_start_over_d4b8a2da: "Tryck på mellanslagstangenten för att börja om"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Tryck på kommatecken eller shift + frågetecken för att visa en lista över kortkommandon"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Tryck på kommatecken eller shift +? för att visa en lista över kortkommandon"
@@ -19677,6 +19688,7 @@ sv:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Begränsa studenternas åtkomst till kurser före startdatum"
   restrict_students_from_annotating_6c28ab9b: "Förhindra att studenter kan kommentera"
   restricted_access_d3e99a39: "Begränsad tillgång"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Begränsad vy för lärare i LMGB."
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Skicka in till det associerade verktyget för plagiatanalys."
   resubmit_to_tool_name_1cf02a31: "Skicka igen till %{tool_name}"
   resubmitted_2080646f: "Inlämnad på nytt"
@@ -19980,6 +19992,7 @@ sv:
   saving_recording_e111cb05: "Sparar inspelning ..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Det gick inte att spara CSP-status, försök igen."
   schedule_student_availability_332154a: "Schemalägg studentens tillgänglighet"
+  scheduled_date_5b0aedb6: "Schemalagt datum"
   scheduler_65b5ac91: Schemabokare
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Schemabokaren måste aktiveras av din Canvas-admin."
   scheduler_must_be_enabled_for_your_account_e6e53972: "Schemabokaren måste aktiveras för ditt konto."
@@ -20312,6 +20325,7 @@ sv:
   select_an_edit_operation_ec1467d: "Välj en redigeringsåtgärd"
   select_assignment_title_4571ffcb: "Välj uppgift: %{title}"
   select_audio_file_7d905cce: "Välj ljudfil"
+  select_by_date_range_c3af0101: "Välj efter datumintervall"
   select_calendars_d5fa50b6: "Välj kalendrar"
   select_conference_provider_58c7f7fe: "Välj konferensleverantör"
   select_content: "Välj innehåll"
@@ -20390,7 +20404,9 @@ sv:
   selected_grade_942f40ba: "Vald omdöme"
   selected_item_35bed33a: "valt föremål"
   selected_subtree_a7693937: "Markerade %{subtree}"
+  selection_end_date_10fcc8c6: "Slutdatum för urval"
   selection_height_9d57ec24: Markeringshöjd
+  selection_start_date_2e4a4dca: "Startdatum för urval"
   selection_width_183acd79: Markeringsbredd
   self_enrollments: 
     already_enrolled: 
@@ -21935,6 +21951,8 @@ sv:
   submission_status_3079e730: Inlämningsstatus
   submission_tray_429ac3df: Inlämningsfack
   submission_type_a925fc5f: Inlämningstyp
+  submission_type_lti_placement_b448d5d0: "LTI-placering för inlämningstyp"
+  submission_type_selection_72ce19f: "Urval för inlämningstyp"
   submission_updated_8897f3b7: "Inlämningen har uppdaterats"
   submission_user_name_assignment_title_2cf5e3e9: "Inlämning: %{user_name}, %{assignment_title}"
   submissions: 
@@ -22206,6 +22224,7 @@ sv:
     observees: Observerar
     outcomes: Lärandemål
     pages: Sidor
+    past_global_announcements: "Globala anslag"
     people: Personer
     profile: Profil
     qr_mobile_login: "QR-kod för mobil inloggning"
@@ -22373,6 +22392,7 @@ sv:
                 kan ta en stund för större kurser. Du kan lämna den här
                 sidan och kommer att få en avisering när nedladdningen
                 är klar.
+  the_end_date_must_be_after_the_start_date_2a273107: "Slutdatumet måste infalla efter startdatumet"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Motorn som behandlar SIS-importer har blivit omstrukturerad för att bättre kunna hantera stabiliteten vid stora SIS-importer. Funktionaliteten för SIS-importer har inte ändrats."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Fel-stackspåret, om det finns"
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Den befintliga länken flyttades längst upp i listan."
@@ -23456,6 +23476,7 @@ sv:
   type_of_change_1cb24a0e: "Typ av ändring"
   type_of_item_8a37f69d: "Typ av objekt"
   type_to_search_de63ad38: "Skriv för att söka"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Ange text för att söka och använd piltangenter för att välja bland alternativen."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Åh nej! Kontakta din vänliga Canvasutvecklare. Felmeddelande: %{message}"
   ukrainian_945b00b7: Ukrainska
   unable_to_accept_update_fd53a7e2: "Kunde inte acceptera uppdateringen"

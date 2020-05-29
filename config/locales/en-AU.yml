@@ -1339,6 +1339,7 @@ en-AU:
         login_handle_name: "Login Label"
         message: Message
         mfa_settings: "Multi-Factor Authentication"
+        mobile_qr_login_is_enabled: "Allow logins to the mobile apps via the use of QR codes"
         name: "Account Name"
         new_sub_account_includes: "Let sub-accounts use the Theme Editor to customise their own branding."
         no_enrollments_can_create_courses: "Users with no enrolments"
@@ -2707,6 +2708,7 @@ en-AU:
   applied_cc7be774: Applied
   apply_781a2546: Apply
   apply_changes_b1dffc70: "Apply Changes"
+  apply_date_range_selection_cc4351ed: "Apply date range selection"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Apply filters. Note: clicking this button will cause the page to reload."
   apply_theme_7af08387: "Apply theme"
   applying_new_styles_to_subaccounts_e8aeeef2: "Applying new styles to sub-accounts"
@@ -4945,6 +4947,7 @@ en-AU:
   choose_usage_rights_33683854: "Choose usage rights..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' is not a valid colour."
   classic_quizzes_dee3c7b7: "Classic Quizzes"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Classic Quizzes Option for Timed Quizzes without Submission"
   clear_2084585f: Clear
   clear_selected_file_82388e50: "Clear selected file"
   clear_user_cache_ef079f7f: "Clear User Cache"
@@ -8099,6 +8102,7 @@ en-AU:
   disable_a5c05db3: Disable
   disable_all_read_only_scopes_f9ffdd28: "Disable all read only scopes."
   disable_and_lock_7d0ef0e8: "Disable and Lock"
+  disable_automatic_submission_8e1d8676: "Disable Automatic Submission"
   disable_celebrations_description: "Enabling this feature hides all celebration animations."
   disable_content_security_policy_8660a787: "Disable Content Security Policy"
   disable_extra_filter_options_1d1cdc02: "disable extra filter options"
@@ -8913,6 +8917,7 @@ en-AU:
   enable_new_sis_integration_settings_ab6780a4: "Enable new SIS integration settings"
   enable_notifications_10a4bf44: "Enable Notifications"
   enable_or_condition_for_modules_a16f02d8: "Enable \"OR\" Condition for Modules"
+  enable_recording_for_this_conference_b8adff6: "Enable recording for this conference."
   enable_reregistration_for_lti_2_b2a10444: "Enable reregistration for LTI 2"
   enable_scope_ac28b832: "Enable scope"
   enable_student_context_card_links_eba2f2c5: "Enable student context card links"
@@ -11642,6 +11647,7 @@ en-AU:
   hide_students_with_no_results_6a22f991: "Hide students with no results"
   hide_sub_accounts_for_account_name_a6de98bd: "Hide Sub-Accounts for %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Hide the Import Learning Outcomes button based on user permissions"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Hides certain students and sections in the LMGB if the teacher only has access to a particular section"
   hiding_grades_82691e44: "Hiding grades"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Hiding grades is not allowed because grades have not been released for this assignment."
   hiding_grades_is_not_allowed_because_no_grades_hav_6f52fcf6: "Hiding grades is not allowed because no grades have been posted for this assignment."
@@ -11809,6 +11815,9 @@ en-AU:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "If an attribute is marked as provisioning only, then it will only be used when Just in Time Provisioning creates a new user, and will not be kept up to date each time the user logs in."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      If an LTI tool configured with the placement is installed, will show a new entry in the
+      assignment submission type dropdown to quickly configure the assignment for the tool
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "If both Grades - edit​ and Grades - view all grades are disabled, Gradebook will be hidden from the course navigation."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from the course navigation."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "If both Marks - edit and Marks - view all marks are disabled, Gradebook will be hidden from Course Navigation."
@@ -12709,6 +12718,7 @@ en-AU:
     other: 
       one: "1 other"
       other: "%{count} others"
+  list_collapsed_381ef1b6: "List collapsed. "
   list_collapsed_5f19f5bb: "List Collapsed"
   list_collapsed_9ac35920: "List collapsed."
   list_collapsed_dde87718: "List collapsed"
@@ -17342,6 +17352,7 @@ en-AU:
     labels: 
       requirements_must_be_completed: "The following requirements need to be completed before this page will be unlocked"
   presentation_2d9387ca: Presentation
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Presents the quiz setting to avoid automatic submission of a timed quiz when the available time has ended."
   press_space_to_start_over_d4b8a2da: "Press 'space' to start over"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Press the comma key or shift + question mark to see a list of keyboard shortcuts."
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Press the comma key or shift + ? to see a list of keyboard shortcuts."
@@ -19717,6 +19728,7 @@ en-AU:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Restrict students from accessing courses before start date"
   restrict_students_from_annotating_6c28ab9b: "Restrict Students from Annotating"
   restricted_access_d3e99a39: "Restricted Access"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Restricted view for teachers in LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Resubmit to the associated tool for plagiarism analysis."
   resubmit_to_tool_name_1cf02a31: "Resubmit to %{tool_name}"
   resubmitted_2080646f: Resubmitted
@@ -20020,6 +20032,7 @@ en-AU:
   saving_recording_e111cb05: "Saving Recording..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Saving the CSP status failed, please try again."
   schedule_student_availability_332154a: "Schedule student availability"
+  scheduled_date_5b0aedb6: "Scheduled Date"
   scheduler_65b5ac91: Scheduler
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Scheduler must be enabled by your Canvas admin."
   scheduler_must_be_enabled_for_your_account_e6e53972: "Scheduler must be enabled for your account."
@@ -20352,6 +20365,7 @@ en-AU:
   select_an_edit_operation_ec1467d: "Select an edit operation"
   select_assignment_title_4571ffcb: "Select assignment: %{title}"
   select_audio_file_7d905cce: "Select Audio File"
+  select_by_date_range_c3af0101: "Select by date range"
   select_calendars_d5fa50b6: "Select Calendars"
   select_conference_provider_58c7f7fe: "Select Conference Provider"
   select_content: "Select Content"
@@ -20430,7 +20444,9 @@ en-AU:
   selected_grade_942f40ba: "Selected Grade"
   selected_item_35bed33a: "selected item"
   selected_subtree_a7693937: "Selected %{subtree}"
+  selection_end_date_10fcc8c6: "Selection end date"
   selection_height_9d57ec24: "Selection Height"
+  selection_start_date_2e4a4dca: "Selection start date"
   selection_width_183acd79: "Selection Width"
   self_enrollments: 
     already_enrolled: 
@@ -21990,6 +22006,8 @@ en-AU:
   submission_status_3079e730: "Submission status"
   submission_tray_429ac3df: "Submission tray"
   submission_type_a925fc5f: "Submission Type"
+  submission_type_lti_placement_b448d5d0: "Submission Type LTI Placement"
+  submission_type_selection_72ce19f: "Submission Type Selection"
   submission_updated_8897f3b7: "Submission updated"
   submission_user_name_assignment_title_2cf5e3e9: "Submission: %{user_name}, %{assignment_title}"
   submissions: 
@@ -22261,6 +22279,7 @@ en-AU:
     observees: Observing
     outcomes: Outcomes
     pages: Pages
+    past_global_announcements: "Global Announcements"
     people: People
     profile: Profile
     qr_mobile_login: "QR for Mobile Login"
@@ -22428,6 +22447,7 @@ en-AU:
                 can take awhile for large courses. You can leave the
                 page and you'll get a notification when the download
                 is complete.
+  the_end_date_must_be_after_the_start_date_2a273107: "The end date must be after the start date"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: |-
       The engine that processes SIS imports has been refactored to better handle the
       stability of large SIS imports. The functionality of SIS imports has not changed.
@@ -23513,6 +23533,7 @@ en-AU:
   type_of_change_1cb24a0e: "Type of Change"
   type_of_item_8a37f69d: "Type of Item"
   type_to_search_de63ad38: "Type to search"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Type to search, use arrow keys to navigate options."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Uh oh! Contact your friendly Catalog Developer. Error message: %{message}"
   ukrainian_945b00b7: Ukrainian
   unable_to_accept_update_fd53a7e2: "Unable to accept update"

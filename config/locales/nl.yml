@@ -1338,6 +1338,7 @@ nl:
         login_handle_name: Aanmeldingslabel
         message: Bericht
         mfa_settings: Multi-Factor-verificatie
+        mobile_qr_login_is_enabled: "Staat inloggen op de mobiele apps toe via het gebruik van QR-codes"
         name: Accountnaam
         new_sub_account_includes: "Laat sub accounts de Themabewerker gebruiken om hun eigen merknaam aan te passen"
         no_enrollments_can_create_courses: "Gebruikers zonder inschrijvingen"
@@ -2701,6 +2702,7 @@ nl:
   applied_cc7be774: Toegepast
   apply_781a2546: Toepassen
   apply_changes_b1dffc70: "Wijzigingen toepassen"
+  apply_date_range_selection_cc4351ed: "Datumbereikselectie toepassen"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Pas filters toe. Opmerking: als je op deze knop klikt, wordt de pagina opnieuw geladen."
   apply_theme_7af08387: "Thema toepassen"
   applying_new_styles_to_subaccounts_e8aeeef2: "Nieuwe stijlen toepassen op subaccounts"
@@ -4932,6 +4934,7 @@ nl:
   choose_usage_rights_33683854: "Gebruiksrechten kiezen..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' is geen geldige kleur"
   classic_quizzes_dee3c7b7: "Klassieke toetsen"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Optie Klassieke toetsen voor Tijdgebonden toetsen zonder inlevering"
   clear_2084585f: Wissen
   clear_selected_file_82388e50: "Verwijder geselecteerd bestand"
   clear_user_cache_ef079f7f: "Gebruikerscache wissen"
@@ -8075,6 +8078,7 @@ nl:
   disable_a5c05db3: Uitschakelen
   disable_all_read_only_scopes_f9ffdd28: "Schakel alle bereiken voor alleen-lezen uit."
   disable_and_lock_7d0ef0e8: "Uitschakelen en vergrendelen"
+  disable_automatic_submission_8e1d8676: "Automatisch inleveren uitschakelen"
   disable_celebrations_description: "Door deze functie in te schakelen worden alle vieringsanimaties verborgen."
   disable_content_security_policy_8660a787: "Inhoudbeveiligingsbeleid uitschakelen"
   disable_extra_filter_options_1d1cdc02: "extra filteropties uitschakelen"
@@ -8887,6 +8891,7 @@ nl:
   enable_new_sis_integration_settings_ab6780a4: "Nieuwe instellingen voor SIS-integratie inschakelen"
   enable_notifications_10a4bf44: "Meldingen inschakelen"
   enable_or_condition_for_modules_a16f02d8: "\"OF\" Voorwaarde voor Modules inschakelen"
+  enable_recording_for_this_conference_b8adff6: "Opnemen voor deze vergadering inschakelen"
   enable_reregistration_for_lti_2_b2a10444: "Nieuwe registratie voor LTI 2 inschakelen"
   enable_scope_ac28b832: "Bereik inschakelen"
   enable_student_context_card_links_eba2f2c5: "Links naar contextkaart voor cursist inschakelen"
@@ -11607,6 +11612,7 @@ nl:
   hide_students_with_no_results_6a22f991: "Verberg cursisten zonder resultaten"
   hide_sub_accounts_for_account_name_a6de98bd: "Subaccounts verbergen voor %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Verberg de knop Leerdoelen importeren gebaseerd op gebruikersmachtigingen"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Verbergt bepaalde cursisten en secties in de LMGB als de docent alleen maar toegang heeft tot een bepaalde sectie"
   hiding_grades_82691e44: "Cijfers verbergen"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Het verbergen van cijfers is niet toegestaan omdat de cijfers niet zijn vrijgegeven voor deze opdracht."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Door de cijfers te verbergen wordt je browser vernieuwd. Dit kan enkele momenten duren."
@@ -11773,6 +11779,9 @@ nl:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Als een kenmerk gemarkeerd is als alleen voorzien, dan zal het alleen gebruikt worden als Just in Time Provisioning een nieuwe gebruiker aanmaakt, het zal niet up to date worden gehouden telkens als de gebruiker aanmeldt."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      Als een LTI-tool geconfigureerd met de plaatsing wordt geïnstalleerd, wordt een nieuwe invoer getoond in de
+      vervolgkeuzelijst voor het opdrachtinleveringstype om de opdracht snel te configureren voor de tool
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Als zowel Cijfers - bewerken als Cijfers - alle cijfers weergeven is uitgeschakeld, blijft de Cijferlijst verborgen in de cursusnavigatie."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Als zowel Cijfers - bewerken als Cijfers - alle cijfers weergeven is uitgeschakeld, blijft de Cijferlijst verborgen in de cursusnavigatie."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Als zowel Cijfers - bewerken als Cijfers - alle cijfers weergeven is uitgeschakeld, blijft de Cijferlijst verborgen in Cursusnavigatie."
@@ -12653,6 +12662,7 @@ nl:
     other: 
       one: "1 andere"
       other: "%{count} anderen"
+  list_collapsed_381ef1b6: "Lijst samengevouwen. "
   list_collapsed_5f19f5bb: "Lijst samengevouwen"
   list_collapsed_9ac35920: "Lijst samengevouwen."
   list_collapsed_dde87718: "Lijst samengevouwen"
@@ -17280,6 +17290,7 @@ nl:
     labels: 
       requirements_must_be_completed: "De volgende voorwaarden moeten voldaan zijn, voordat deze pagina ontgrendeld zal worden"
   presentation_2d9387ca: Presentatie
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Toont de toetsinstelling om automatische inlevering van een tijdgebonden toets te voorkomen wanneer de beschikbare tijd is verstreken."
   press_space_to_start_over_d4b8a2da: "Druk op 'spatiebalk' om opnieuw te beginnen"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Op komma of shift + vraagteken drukken om een lijst van sneltoetsen te zien."
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Op komma of shift + ? drukken om een lijst van sneltoetsen te zien."
@@ -17807,7 +17818,7 @@ nl:
   qatar_d52a8d27: Qatar
   qr_code_display_was_canceled_96234bf2: "Weergave van QR-code is geannuleerd"
   qr_code_image_2b3a89b5: "Afbeelding QR-code"
-  qr_for_mobile_login_1b1560ce: "QR voor mobiel aanmelden"
+  qr_for_mobile_login_1b1560ce: "QR voor mobiel inloggen"
   qti_display: QTI
   qti_export_from_date_8f018de5: "*QTI-export vanuit %{date}*"
   qti_file_description: "QTI zip-bestand"
@@ -19649,6 +19660,7 @@ nl:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Geef cursisten geen toegang tot de cursussen voor de startdatum"
   restrict_students_from_annotating_6c28ab9b: "Voorkomen dat cursisten aantekeningen kunnen maken"
   restricted_access_d3e99a39: "Beperkte toegang"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Beperkte weergave voor docenten in LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Opnieuw indienen bij de tool om te analyseren op plagiaat."
   resubmit_to_tool_name_1cf02a31: "Opnieuw inleveren bij %{tool_name}"
   resubmitted_2080646f: "Opnieuw ingezonden"
@@ -19952,6 +19964,7 @@ nl:
   saving_recording_e111cb05: "Bezig met opname opslaan..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Opslaan van de CSP-status mislukt, probeer het opnieuw."
   schedule_student_availability_332154a: "Schema met beschikbaarheid van cursist"
+  scheduled_date_5b0aedb6: "Geplande datum"
   scheduler_65b5ac91: Planner
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Planner moet worden ingeschakeld door je Canvas-beheerder."
   scheduler_must_be_enabled_for_your_account_e6e53972: "Planner moet zijn ingeschakeld voor je account."
@@ -20284,6 +20297,7 @@ nl:
   select_an_edit_operation_ec1467d: "Selecteer een bewerking"
   select_assignment_title_4571ffcb: "Opdracht selecteren: %{title}"
   select_audio_file_7d905cce: "Audiobestand selecteren"
+  select_by_date_range_c3af0101: "Selecteer op datumbereik"
   select_calendars_d5fa50b6: "Kalenders selecteren"
   select_conference_provider_58c7f7fe: "Vergaderingsprovider selecteren"
   select_content: "Inhoud selecteren"
@@ -20362,7 +20376,9 @@ nl:
   selected_grade_942f40ba: "Geselecteerd cijfer"
   selected_item_35bed33a: "geselecteerd item"
   selected_subtree_a7693937: "Geselecteerd %{subtree}"
+  selection_end_date_10fcc8c6: "Einddatum van selectie"
   selection_height_9d57ec24: Selectiehoogte
+  selection_start_date_2e4a4dca: "Begindatum van selectie"
   selection_width_183acd79: Selectiebreedte
   self_enrollments: 
     already_enrolled: 
@@ -21910,6 +21926,8 @@ nl:
   submission_status_3079e730: Inzendingsstatus
   submission_tray_429ac3df: "Menu voor inzending"
   submission_type_a925fc5f: "Type inlevering"
+  submission_type_lti_placement_b448d5d0: "Plaatsing inleveringstype LTI"
+  submission_type_selection_72ce19f: "Selectie van inleveringstype"
   submission_updated_8897f3b7: "Inlevering bijgewerkt"
   submission_user_name_assignment_title_2cf5e3e9: "Inlevering: %{user_name}, %{assignment_title}"
   submissions: 
@@ -22181,6 +22199,7 @@ nl:
     observees: "Bezig met waarnemen"
     outcomes: Leerdoelen
     pages: Pagina's
+    past_global_announcements: "Algemene aankondigingen"
     people: Personen
     profile: Profiel
     qr_mobile_login: "QR voor mobiel aanmelden"
@@ -22348,6 +22367,7 @@ nl:
                 cursussen kan dat enige tijd in beslag nemen. Je kunt
                 de pagina verlaten. Je ontvangt een melding wanneer
                 het downloaden gereed is.
+  the_end_date_must_be_after_the_start_date_2a273107: "De einddatum moet na de begindatum liggen"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "De engine voor het verwerken van SIS-importbestanden is gewijzigd om de stabiliteit van grote SIS-importbestanden te verbeteren. De functionaliteit van SIS-importbestanden verandert daardoor niet."
   the_error_stack_trace_if_there_is_one_b7e008a1: "De fout stapeltracering, als er een is"
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "De aanbevolen link is naar het begin van de lijst verplaatst."
@@ -23431,6 +23451,7 @@ nl:
   type_of_change_1cb24a0e: "Type wijziging"
   type_of_item_8a37f69d: "Type item"
   type_to_search_de63ad38: "Typ om te zoeken"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Typ om te zoeken, gebruik pijltoetsen om door de opties te navigeren."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Oh oh! Neem contact op met je vriendelijke catalogus ontwikkelaar. Foutbericht: %{message}"
   ukrainian_945b00b7: Oekraïens
   unable_to_accept_update_fd53a7e2: "Kan bijwerken niet accepteren"
