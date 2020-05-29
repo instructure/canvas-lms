@@ -919,7 +919,7 @@ class Attachment < ActiveRecord::Base
       raise FailedResponse.new("Expected 200, got #{response.code}: #{response.body}") unless response.code.to_i == 200
       response.read_body(dest, &block)
     end
-  rescue FailedResponse, Net::ReadTimeout => e
+  rescue FailedResponse, Net::ReadTimeout, Net::OpenTimeout => e
     if (retries += 1) < Setting.get(:streaming_download_retries, '5').to_i
       Canvas::Errors.capture_exception(:attachment, e)
       retry
