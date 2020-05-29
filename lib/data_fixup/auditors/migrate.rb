@@ -88,6 +88,8 @@ module DataFixup::Auditors
       def bulk_insert_auditor_recs(auditor_ar_type, attrs_lists)
         partition_groups = attrs_lists.group_by{|a| auditor_ar_type.infer_partition_table_name(a) }
         partition_groups.each do |partition_name, partition_attrs|
+          uuids = partition_attrs.map{|h| h['uuid']}
+          Rails.logger.info("INSERTING INTO #{partition_name} #{uuids.size} IDs (#{uuids.join(',')})")
           auditor_ar_type.transaction do
             auditor_ar_type.connection.bulk_insert(partition_name, partition_attrs)
           end
