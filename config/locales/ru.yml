@@ -1357,6 +1357,7 @@ ru:
         login_handle_name: "Ярлык входа в систему"
         message: Сообщение
         mfa_settings: "Многофакторная аутентификация"
+        mobile_qr_login_is_enabled: "Позволяет выполнять вход в мобильные приложения с помощью QR-кодов"
         name: "Название учетной записи"
         new_sub_account_includes: "Разрешить субаккаунтам использовать Редактор Тем, чтобы настроить свой собственный брендинг"
         no_enrollments_can_create_courses: "Пользователи без регистраций"
@@ -2735,6 +2736,7 @@ ru:
   applied_cc7be774: Применено
   apply_781a2546: Применить
   apply_changes_b1dffc70: "Применить изменения"
+  apply_date_range_selection_cc4351ed: "Применить выбор диапазона дат"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Примените фильтры. Примечание: нажатие этой кнопки приведет к перезагрузке страницы."
   apply_theme_7af08387: "Применить тему"
   applying_new_styles_to_subaccounts_e8aeeef2: "Применение новых стилей к субаккаунтам."
@@ -5002,6 +5004,7 @@ ru:
   choose_usage_rights_33683854: "Выбрать права на использование..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' не является действительным цветом."
   classic_quizzes_dee3c7b7: "Классические тестирования"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Вариант классического тестирования для тестов с привязкой ко времени без отправки"
   clear_2084585f: Очистить
   clear_selected_file_82388e50: "Очистить выбранный файл"
   clear_user_cache_ef079f7f: "Очистить кэш пользователя"
@@ -8266,6 +8269,7 @@ ru:
   disable_a5c05db3: Отключить
   disable_all_read_only_scopes_f9ffdd28: "Отключить все диапазоны «только для чтения»."
   disable_and_lock_7d0ef0e8: "Отключить и заблокировать"
+  disable_automatic_submission_8e1d8676: "Отключить автоматическую отправку"
   disable_celebrations_description: "Активация этой функции скрывает все праздничные анимации."
   disable_content_security_policy_8660a787: "Отключить политику защиты содержимого"
   disable_extra_filter_options_1d1cdc02: "отключить дополнительные параметры фильтра"
@@ -9098,6 +9102,7 @@ ru:
   enable_new_sis_integration_settings_ab6780a4: "Активировать новые настройки интеграции SIS"
   enable_notifications_10a4bf44: "Включить уведомления"
   enable_or_condition_for_modules_a16f02d8: "Включить условие\"OR\" для модулей"
+  enable_recording_for_this_conference_b8adff6: "Включить запись для этой конференции"
   enable_reregistration_for_lti_2_b2a10444: "Включить перерегистрацию для LTI 2"
   enable_scope_ac28b832: "Включить диапазон"
   enable_student_context_card_links_eba2f2c5: "Активировать ссылки на контекстные карточки учащихся"
@@ -11876,6 +11881,7 @@ ru:
   hide_students_with_no_results_6a22f991: "Скрыть студентов без результатов"
   hide_sub_accounts_for_account_name_a6de98bd: "Скрыть субучетные записи для %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Скрыть кнопку «Импорт результатов обучения», основанную на разрешениях пользователя"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Скрывает определенных студентов и разделы в LMGB, если преподаватель имеет доступ только к конкретному разделу"
   hiding_grades_82691e44: "Скрытие оценок"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Скрытие оценок не разрешено, потому что оценки не были выставлены для этого задания."
   hiding_grades_is_not_allowed_because_no_grades_hav_6f52fcf6: "Скрытие оценок не допускается, потому что по этому заданию не было выставлено никаких оценок."
@@ -12043,6 +12049,9 @@ ru:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "URL метаданных IdP"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Если атрибут помечен только инициализации, то он будет использоваться только тогда, когда Just In Time Provisioning создает нового пользователя, а не будет постоянно обновляться каждый раз, когда пользователь входит в систему."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      Если установлен сконфигурированный инструмент LTI с размещением, будет показана новая запись в
+      ниспадающем списке типов отправки заданий для быстрой конфигурации задания для инструмента
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Если отключены оба параметра «Оценки - редактировать» и «Оценки - просмотреть все оценки», журнал оценок будет скрыт в навигации курса."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Если отключены оба параметра «Оценки - редактировать» и «Оценки - просмотреть все оценки», журнал оценок будет скрыт в навигации курса."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Если отключены оба параметра «Оценки - редактировать» и «Оценки - просмотреть все оценки», журнал оценок будет скрыт в навигации курса."
@@ -12948,6 +12957,7 @@ ru:
       many: "%{count} других"
       one: "1 другой"
       other: "%{count} других"
+  list_collapsed_381ef1b6: "Список свернут. "
   list_collapsed_5f19f5bb: "Список свернут"
   list_collapsed_9ac35920: "Список свернут."
   list_collapsed_dde87718: "Список свернут"
@@ -17540,7 +17550,7 @@ ru:
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Для выбранного типа оценки возможные баллы должны быть не ниже 0"
   points_possible_must_be_greater_than_0_for_selecte_5708da1b: "Возможное количество баллов должно быть больше 0 для выбранного типа оценивания"
   points_possible_points_fda3b111: "%{points_possible} Баллы"
-  points_pts_e5596bf7: "%{points} баллы"
+  points_pts_e5596bf7: "%{points} баллов"
   points_range_rating_pts_ab9c8540: "%{points}%{range_rating} баллы"
   points_should_be_strictly_decreasing_l_r_18f26f87: "Баллы должны в строгом порядке снижаться: %{l} <= %{r}"
   points_to_endofrangepoints_pts_aad207f0: "%{points} до > %{endOfRangePoints} баллов"
@@ -17624,6 +17634,7 @@ ru:
     labels: 
       requirements_must_be_completed: "Для разблокирования этой страницы должны быть выполнены следующие требования"
   presentation_2d9387ca: Презентация
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Представляет настройку теста для исключения автоматической отправки теста с привязкой ко времени при истечении доступного периода времени."
   press_space_to_start_over_d4b8a2da: "Нажмите «пробел», чтобы начать сначала"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Нажмите клавишу запятой или Shift + знак вопроса, чтобы увидеть список горячих клавиш"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Нажмите клавишу запятой или Shift + ?, чтобы увидеть список горячих клавиш"
@@ -20091,6 +20102,7 @@ ru:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Запретить учащимся доступ к курсам до даты начала"
   restrict_students_from_annotating_6c28ab9b: "Запретить учащимся оставлять аннотации"
   restricted_access_d3e99a39: "Ограниченный доступ"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Ограниченный просмотр для преподавателей в LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Повторно отправьте в соответствующий инструмент для анализа на плагиат."
   resubmit_to_tool_name_1cf02a31: "Повторно отправить в %{tool_name}"
   resubmitted_2080646f: "Представлено повторно"
@@ -20398,6 +20410,7 @@ ru:
   saving_recording_e111cb05: "Сохранение записи..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Не удалось сохранить статус CSP, повторите попытку."
   schedule_student_availability_332154a: "График доступности студентов"
+  scheduled_date_5b0aedb6: "Запланированная дата"
   scheduler_65b5ac91: Планировщик
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Планировщик должен быть включен вашим администратором Canvas."
   scheduler_must_be_enabled_for_your_account_e6e53972: "Планировщик должен быть включен для вашей учетной записи."
@@ -20742,6 +20755,7 @@ ru:
   select_an_edit_operation_ec1467d: "Выбрать операцию редактирования"
   select_assignment_title_4571ffcb: "Выбрать задание: %{title}"
   select_audio_file_7d905cce: "Выбрать аудиофайл"
+  select_by_date_range_c3af0101: "Выбрать по диапазону дат"
   select_calendars_d5fa50b6: "Выбрать календари"
   select_conference_provider_58c7f7fe: "Выбрать организатора конференции"
   select_content: "Выбрать содержимое"
@@ -20820,7 +20834,9 @@ ru:
   selected_grade_942f40ba: "Выбранная оценка"
   selected_item_35bed33a: "выберите элемент"
   selected_subtree_a7693937: "Выбранное %{subtree}"
+  selection_end_date_10fcc8c6: "Выбор дат окончания"
   selection_height_9d57ec24: "Высота выбора"
+  selection_start_date_2e4a4dca: "Выбор даты начала"
   selection_width_183acd79: "Ширина выбора"
   self_enrollments: 
     already_enrolled: 
@@ -22402,6 +22418,8 @@ ru:
   submission_status_3079e730: "Статус отправки"
   submission_tray_429ac3df: "Лоток отправки"
   submission_type_a925fc5f: "Тип сдаваемой работы"
+  submission_type_lti_placement_b448d5d0: "Размещение LTI типа отправки"
+  submission_type_selection_72ce19f: "Выбор типа сдаваемой работы"
   submission_updated_8897f3b7: "Отправка обновлена"
   submission_user_name_assignment_title_2cf5e3e9: "Отправка: %{user_name}, %{assignment_title}"
   submissions: 
@@ -22673,6 +22691,7 @@ ru:
     observees: Наблюдение
     outcomes: Результаты
     pages: Страницы
+    past_global_announcements: "Общие объявления"
     people: Пользователи
     profile: Профиль
     qr_mobile_login: "QR для регистрации с мобильного устройства"
@@ -22844,6 +22863,7 @@ ru:
                 времени в случае объемных курсов. Вы можете покинуть
                 страницу. Когда процесс загрузки завершится, вы получите
                 уведомление.
+  the_end_date_must_be_after_the_start_date_2a273107: "Дата окончания должна быть после даты начала"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Модуль, выполняющий импорт SIS, был переработан для обеспечения более высокой стабильности при выполнении импорта больших SIS. Сама функция импорта SIS не изменилась."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Ошибка трассировки стека, если таковой имеется"
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Ссылка «Рекомендованный» была перемещена в верхнюю часть списка."
@@ -23937,6 +23957,7 @@ ru:
   type_of_change_1cb24a0e: "Тип изменения"
   type_of_item_8a37f69d: "Тип элемента"
   type_to_search_de63ad38: "Набрать для поиска"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Наберите для поиска, используйте клавиши со стрелками для навигации по параметрам."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Ой-ой-ой! Свяжитесь с дружественным разработчиком Каталога. Сообщение об ошибке: %{message}"
   ukrainian_945b00b7: Украинский
   unable_to_accept_update_fd53a7e2: "Невозможно принять обновление"
