@@ -149,17 +149,27 @@ module DataFixup::Auditors
         end
       end
 
-      def audit_in_pages(collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
-        @audit_failure_uuids ||= []
+      def audit_in_pages(ids_collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
+        @audit_results ||= {
+          'uuid_count' => 0,
+          'failure_count' => 0,
+          'missed_ids' => []
+        }
+        audit_failure_uuids = []
+        audit_uuid_count = 0
         next_page = 1
         until next_page.nil?
           page_args = { page: next_page, per_page: batch_size}
-          auditor_recs = get_cassandra_records_resiliantly(collection, page_args)
-          uuids = auditor_recs.map(&:id)
+          auditor_id_recs = get_cassandra_records_resiliantly(ids_collection, page_args)
+          uuids = auditor_id_recs.map{|rec| rec['id']}
+          audit_uuid_count += uuids.size
           existing_uuids = auditor_ar_type.where(uuid: uuids).pluck(:uuid)
-          @audit_failure_uuids += (uuids - existing_uuids)
-          next_page = auditor_recs.next_page
+          audit_failure_uuids += (uuids - existing_uuids)
+          next_page = auditor_id_recs.next_page
         end
+        @audit_results['uuid_count'] += audit_uuid_count
+        @audit_results['failure_count'] += audit_failure_uuids.size
+        @audit_results['missed_ids'] += audit_failure_uuids
       end
 
       def cell_attributes(target_date: nil)
@@ -184,7 +194,7 @@ module DataFixup::Auditors
 
       def create_cell!(attributes: nil)
         attributes = cell_attributes if attributes.nil?
-        ::Auditors::ActiveRecord::MigrationCell.create!(attributes.merge({ completed: false }))
+        ::Auditors::ActiveRecord::MigrationCell.create!(attributes.merge({ completed: false, repaired: false }))
       rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation
         created_cell = find_migration_cell(attributes: attributes)
         raise "unresolvable auditors migration state #{attributes}" if created_cell.nil?
@@ -196,7 +206,7 @@ module DataFixup::Auditors
         @_cell = nil
       end
 
-      def mark_cell_queued!
+      def mark_cell_queued!(delayed_job_id: nil)
         (@_cell = create_cell!) if migration_cell.nil?
         migration_cell.update_attribute(:failed, false) if migration_cell.failed
         # queueing will take care of a week, so let's make sure we don't get
@@ -206,9 +216,10 @@ module DataFixup::Auditors
           cur_cell_attrs =  cell_attributes(target_date: current_date)
           current_cell = find_migration_cell(attributes: cur_cell_attrs)
           current_cell = create_cell!(attributes: cur_cell_attrs) if current_cell.nil?
-          current_cell.update(completed: false, failed: false)
+          current_cell.update(completed: false, failed: false, job_id: delayed_job_id, queued: true)
           current_date += 1.day
         end
+        @_cell.reload
       end
 
       def auditors_cassandra_db_lambda
@@ -224,11 +235,15 @@ module DataFixup::Auditors
       end
 
       def currently_queueable?
-        return false if migration_cell&.completed
         return true if migration_cell.nil?
         return true if migration_cell.failed
-        # this cell is not failed, but also not complete.
-        # that means it was queued, but not updated later.
+        if operation == :repair
+          return false if migration_cell.repaired
+        else
+          return false if migration_cell.completed
+        end
+        return true unless migration_cell.queued
+        # this cell is currently in the queue (maybe)
         # If that update happened more than a few
         # days ago, it's likely dead, and should
         # get rescheduled.  Worst case
@@ -243,7 +258,20 @@ module DataFixup::Auditors
           cur_cell_attrs =  cell_attributes(target_date: current_date)
           current_cell = find_migration_cell(attributes: cur_cell_attrs)
           current_cell = create_cell!(attributes: cur_cell_attrs) if current_cell.nil?
-          current_cell.update(completed: true, failed: false)
+          repaired = (operation == :repair)
+          current_cell.update(completed: true, failed: false, repaired: repaired)
+          current_date += 1.day
+        end
+      end
+
+      def mark_week_audited!(results)
+        current_date = previous_sunday
+        failed_count = results['failure_count']
+        while current_date < next_sunday do
+          cur_cell_attrs =  cell_attributes(target_date: current_date)
+          current_cell = find_migration_cell(attributes: cur_cell_attrs)
+          current_cell = create_cell!(attributes: cur_cell_attrs) if current_cell.nil?
+          current_cell.update(audited: true, missing_count: failed_count)
           current_date += 1.day
         end
       end
@@ -279,14 +307,20 @@ module DataFixup::Auditors
         mark_week_complete!
       ensure
         cell.update_attribute(:failed, true) unless cell.reload.completed
+        cell.update_attribute(:queued, false)
         clear_cassandra_stream_timeout!
       end
 
       def audit
         extend_cassandra_stream_timeout!
-        @audit_failure_uuids = []
+        @audit_results = {
+          'uuid_count' => 0,
+          'failure_count' => 0,
+          'missed_ids' => []
+        }
         perform_audit
-        @audit_failure_uuids
+        mark_week_audited!(@audit_results)
+        return @audit_results
       ensure
         clear_cassandra_stream_timeout!
       end
@@ -363,7 +397,7 @@ module DataFixup::Auditors
       end
 
       def perform_audit
-        audit_in_pages(cassandra_collection, Auditors::ActiveRecord::AuthenticationRecord)
+        audit_in_pages(cassandra_id_collection, Auditors::ActiveRecord::AuthenticationRecord)
       end
 
       def filter_dead_foreign_keys(attrs_list)
@@ -402,7 +436,7 @@ module DataFixup::Auditors
       end
 
       def perform_audit
-        audit_in_pages(cassandra_collection, Auditors::ActiveRecord::CourseRecord)
+        audit_in_pages(cassandra_id_collection, Auditors::ActiveRecord::CourseRecord)
       end
 
       def filter_dead_foreign_keys(attrs_list)
@@ -457,7 +491,7 @@ module DataFixup::Auditors
         all_course_ids = migrateable_course_ids.to_a
         all_course_ids.in_groups_of(1000) do |course_ids|
           Course.where(id: course_ids).each do |course|
-            audit_in_pages(cassandra_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
+            audit_in_pages(cassandra_id_collection_for(course), Auditors::ActiveRecord::GradeChangeRecord)
           end
         end
       end
@@ -777,8 +811,8 @@ module DataFixup::Auditors
 
       def conditionally_enqueue_worker(worker, n_strand)
         if worker.currently_queueable?
-          Delayed::Job.enqueue(worker, n_strand: n_strand, priority: Delayed::LOW_PRIORITY)
-          worker.mark_cell_queued!
+          job = Delayed::Job.enqueue(worker, n_strand: n_strand, priority: Delayed::LOW_PRIORITY)
+          worker.mark_cell_queued!(delayed_job_id: job.id)
         end
       end
 
