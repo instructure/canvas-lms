@@ -1311,6 +1311,7 @@ de:
         login_handle_name: Anmeldungsbeschriftung
         message: Nachricht
         mfa_settings: "Mehrstufige Authentifizierung"
+        mobile_qr_login_is_enabled: "Logins über die mobile App mit Hilfe von QR-Codes erlauben"
         name: Kontoname
         new_sub_account_includes: "Unterkonten erlauben, den Themen-Editor zur Anpassung ihres eigenen Brandings zu verwenden"
         no_enrollments_can_create_courses: "Benutzer ohne Einschreibungen"
@@ -2672,6 +2673,7 @@ de:
   applied_cc7be774: Übernommen
   apply_781a2546: Anwenden
   apply_changes_b1dffc70: "Änderungen anwenden"
+  apply_date_range_selection_cc4351ed: "Auswahl des Datumsbereichs anwenden"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Filter anwenden.. Hinweis: Mit dieser Schaltfläche wird die Seite erneut geladen."
   apply_theme_7af08387: "Design anwenden"
   applying_new_styles_to_subaccounts_e8aeeef2: "Neue Styles auf Unterkonten anwende"
@@ -4902,6 +4904,7 @@ de:
   choose_usage_rights_33683854: "Nutzungsrechte auswählen ...."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' ist keine gültige Farbe."
   classic_quizzes_dee3c7b7: "Klassische Quizze"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Klassische Quiz-Option für zeitlich beschränkte Quizzes ohne Abgabe"
   clear_2084585f: Löschen
   clear_selected_file_82388e50: "Ausgewählte Datei löschen"
   clear_user_cache_ef079f7f: "Benutzer-Cache löschen"
@@ -8039,6 +8042,7 @@ de:
   disable_a5c05db3: Deaktivieren
   disable_all_read_only_scopes_f9ffdd28: "Deaktivieren Sie alle schreibgeschützten Bereiche."
   disable_and_lock_7d0ef0e8: "Deaktivieren und sperren"
+  disable_automatic_submission_8e1d8676: "Automatische Abgabe deaktivieren"
   disable_celebrations_description: "Mit dieser Funktion werden alle Feieranimationen ausgeblendet."
   disable_content_security_policy_8660a787: "Richtlinie zur Content-Sicherheit deaktivieren"
   disable_extra_filter_options_1d1cdc02: "zusätzliche Filteroptionen deaktivieren"
@@ -8847,6 +8851,7 @@ de:
   enable_new_sis_integration_settings_ab6780a4: "Neue SIS-Integrationseinstellungen aktivieren"
   enable_notifications_10a4bf44: "Benachrichtigungen aktivieren"
   enable_or_condition_for_modules_a16f02d8: "\"ODER\"-Bedingung für Module ermöglichen"
+  enable_recording_for_this_conference_b8adff6: "Aufzeichnung für diese Konferenz aktivieren"
   enable_reregistration_for_lti_2_b2a10444: "Erneute Registrierung für LTI 2 aktivieren"
   enable_scope_ac28b832: "Bereich aktivieren"
   enable_student_context_card_links_eba2f2c5: "Studentenkontextkarten-Links aktivieren"
@@ -11556,6 +11561,7 @@ de:
   hide_students_with_no_results_6a22f991: "Studenten ohne Ergebnisse ausblenden"
   hide_sub_accounts_for_account_name_a6de98bd: "Unterkonten ausblenden für %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Schaltfläche Lernziele importieren basierend auf den Benutzerberechtigungen ausblenden"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Blendet bestimmte Studenten und Abschnitte im LMGB aus, wenn der Lehrer nur Zugang zu einem bestimmten Abschnitt hat"
   hiding_grades_82691e44: "Noten ausblenden"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Das Ausblenden von Noten ist nicht zulässig, da für diese Aufgabe keine Noten vergeben wurden."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Ein Ausblenden der Noten wird zur Aktualisierung Ihres Browsers führen. Dieser Vorgang kann einen Moment dauern."
@@ -11722,6 +11728,9 @@ de:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadaten-URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Wird ein Attribut als „Nur Beschaffung“ markiert, wird es nur verwendet, wenn die „Just-in-Time“-Beschaffung einen neuen Benutzer anlegt, und wird nicht jedes Mal, wenn sich der Nutzer anmeldet, aktualisiert."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      Wenn ein mit der Platzierung konfiguriertes LTI-Werkzeug installiert ist, wird ein neuer Eintrag in der
+      Dropdown-Liste für den Zuordnungstyp angezeigt, um die Zuordnung für das Werkzeug schnell zu konfigurieren.
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
@@ -12602,6 +12611,7 @@ de:
     other: 
       one: "1 weitere/r"
       other: "%{count} weitere"
+  list_collapsed_381ef1b6: "Liste ausgeblendet. "
   list_collapsed_5f19f5bb: "Liste reduziert"
   list_collapsed_9ac35920: "Liste ausgeblendet."
   list_collapsed_dde87718: "Liste ausgeblendet"
@@ -17213,6 +17223,7 @@ de:
     labels: 
       requirements_must_be_completed: "Folgende Voraussetzungen müssen erfüllt sein, damit diese Seite freigegeben wird."
   presentation_2d9387ca: Präsentation
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Zeigt die Quiz-Einstellung an, um die automatische Einreichung eines zeitlich beschränkten Quizzes zu vermeiden, wenn die verfügbare Zeit abgelaufen ist."
   press_space_to_start_over_d4b8a2da: "Drücken Sie die Leertaste um erneut zu beginnen"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Komma-Taste oder <Umschalt>+<?> drücken, um eine Liste mit Tastenkombinationen zu sehen."
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Komma-Taste oder <Umschalt>+<?> drücken, um eine Liste mit Tastenkombinationen zu sehen."
@@ -19575,6 +19586,7 @@ de:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Schüler am Zugang zu Kursen vor dem Startdatum hindern"
   restrict_students_from_annotating_6c28ab9b: "Verhindern, dass Studenten Anmerkungen machen"
   restricted_access_d3e99a39: "Beschränkter Zugriff"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Eingeschränkte Ansicht für Lehrer im LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Erneut zur Plagiatsanalyse an das zugehörige Tool senden."
   resubmit_to_tool_name_1cf02a31: "Erneut einreichen %{tool_name}"
   resubmitted_2080646f: "Erneut abgegeben"
@@ -19878,6 +19890,7 @@ de:
   saving_recording_e111cb05: "Aufzeichnung wird gespeichert ..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Speichern des CSP-Status fehlgeschlagen. Versuchen Sie es erneut."
   schedule_student_availability_332154a: "Studentenverfügbarkeit planen"
+  scheduled_date_5b0aedb6: "Geplantes Datum"
   scheduler_65b5ac91: Terminplaner
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Der Terminplaner muss von Ihrem Canvas-Admin aktiviert werden."
   scheduler_must_be_enabled_for_your_account_e6e53972: "Der Terminplaner muss für Ihr Konto aktiviert werden."
@@ -20208,6 +20221,7 @@ de:
   select_an_edit_operation_ec1467d: "Wählen Sie einen Bearbeitungsvorgang"
   select_assignment_title_4571ffcb: "Aufgabe auswählen: %{title}"
   select_audio_file_7d905cce: "Audio-Datei auswählen"
+  select_by_date_range_c3af0101: "Einen Datumsbereich auswählen"
   select_calendars_d5fa50b6: "Kalender auswählen"
   select_conference_provider_58c7f7fe: "Anbieter von Konferenz auswählen"
   select_content: "Inhalt auswählen"
@@ -20285,7 +20299,9 @@ de:
   selected_filename_7552a8c0: "ausgewählt %{filename}"
   selected_grade_942f40ba: "Ausgewählte Note"
   selected_subtree_a7693937: "Ausgewählter %{subtree}"
+  selection_end_date_10fcc8c6: "Enddatum auswählen"
   selection_height_9d57ec24: "Auswahl der Höhe"
+  selection_start_date_2e4a4dca: "Startdatum auswählen"
   selection_width_183acd79: "Auswahl der Breite"
   self_enrollments: 
     already_enrolled: 
@@ -21826,6 +21842,8 @@ de:
   submission_sent_3f0d2ee1: "Abgabe eingereicht"
   submission_tray_429ac3df: Abgabefach
   submission_type_a925fc5f: Abgabeart
+  submission_type_lti_placement_b448d5d0: "Abgabeart LTI-Platzierung"
+  submission_type_selection_72ce19f: "Auswahl der Abgabeart"
   submission_updated_8897f3b7: "Abgabe aktualisiert."
   submission_user_name_assignment_title_2cf5e3e9: "Abgabe: %{user_name}, %{assignment_title}"
   submissions: 
@@ -22097,6 +22115,7 @@ de:
     observees: Beobachten
     outcomes: Lernziele
     pages: Seiten
+    past_global_announcements: "Globale Ankündigungen"
     people: Personen
     profile: Profil
     qr_mobile_login: "QR für die mobile Anmeldung"
@@ -22264,6 +22283,7 @@ de:
                 kann bei großen Kursen eine Weile dauern. Sie können die
                 Seite verlassen. Sie werden benachrichtigt, wenn der Download
                 abgeschlossen ist.
+  the_end_date_must_be_after_the_start_date_2a273107: "Enddatum muss größer als Startdatum sein"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Das System, das SIS-Importe verarbeitet, wurde für eine bessere Stabilität großer SIS-Importe umgestaltet. Die Funktionalität von SIS-Importen hat sich nicht geändert."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Der Fehler-Stack-Trace, sollte es einen geben."
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Der Empfohlen-Link wurde an den Anfang der Liste verschoben."
@@ -23346,6 +23366,7 @@ de:
   type_of_change_1cb24a0e: "Art der Änderung"
   type_of_item_8a37f69d: "Art des Objekts"
   type_to_search_de63ad38: "Eingabe zur Suche"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Navigieren Sie mit den Pfeiltasten in den Optionen, geben Sie einen Suchbegriff ein."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Hoppla, Wenden Sie sich an Ihren netten Katalogentwickler. Fehlermeldung: %{message}"
   ukrainian_945b00b7: Ukrainisch
   unable_to_accept_update_fd53a7e2: "Aktualisierung kann nicht akzeptiert werden."
