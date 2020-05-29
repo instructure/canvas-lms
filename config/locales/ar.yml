@@ -1374,6 +1374,7 @@ ar:
         login_handle_name: "تسمية تسجيل الدخول"
         message: الرسالة
         mfa_settings: "مصادقة متعددة العوامل"
+        mobile_qr_login_is_enabled: "السماح بتسجيل الدخول لتطبيقات الأجهزة المحمولة عبر استخدام رموز QR"
         name: "اسم الحساب"
         new_sub_account_includes: "السماح للحسابات الفرعية باستخدام محرر النسق لتخصيص علاماتها"
         no_enrollments_can_create_courses: "المستخدمون بدون تسجيلات"
@@ -2755,6 +2756,7 @@ ar:
   applied_cc7be774: "تم التطبيق"
   apply_781a2546: تطبيق
   apply_changes_b1dffc70: "تطبيق التغييرات"
+  apply_date_range_selection_cc4351ed: "تطبيق تحديد نطاق التاريخ"
   apply_filters_note_clicking_this_button_will_cause_753f04: "تطبيق عوامل تصفية. ملاحظة: سيؤدي النقر فوق هذا الزر إلى إعادة تحميل الصفحة."
   apply_theme_7af08387: "تطبيق نسق"
   applying_new_styles_to_subaccounts_e8aeeef2: "تطبيق الأنماط الجديدة على الحسابات الفرعية"
@@ -5057,6 +5059,7 @@ ar:
   choose_usage_rights_33683854: "اختيار حقوق الاستخدام..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' ليس لون صالح."
   classic_quizzes_dee3c7b7: "الاختبارات الموجزة التقليدية"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "خيار الاختبارات الموجزة التقليدية للاختبارات الموجزة محددة الوقت بدون إرسال"
   clear_2084585f: مسح
   clear_selected_file_82388e50: "مسح الملف المحدد"
   clear_user_cache_ef079f7f: "مسح ذاكرة التخزين المؤقت للمستخدم"
@@ -8444,6 +8447,7 @@ ar:
   disable_a5c05db3: تعطيل
   disable_all_read_only_scopes_f9ffdd28: "تعطيل جميع نطاقات القراءة فقط."
   disable_and_lock_7d0ef0e8: "تعطيل وتأمين"
+  disable_automatic_submission_8e1d8676: "تعطيل الإرسال التلقائي"
   disable_celebrations_description: "يؤدي تمكين هذه الميزة إلى إخفاء كافة الرسوم المتحركة للاحتفالات."
   disable_content_security_policy_8660a787: "تعطيل استيراد سياسة أمان المحتوى"
   disable_extra_filter_options_1d1cdc02: "تعطيل خيارات التصفية الإضافية"
@@ -9292,6 +9296,7 @@ ar:
   enable_new_sis_integration_settings_ab6780a4: "تمكين إعدادات تكامل نظام معلومات طلاب جديد"
   enable_notifications_10a4bf44: "تمكين الإعلامات"
   enable_or_condition_for_modules_a16f02d8: "تمكين شرط \"OR\" للوحدات"
+  enable_recording_for_this_conference_b8adff6: "تمكين التسجيل لهذا المؤتمر"
   enable_reregistration_for_lti_2_b2a10444: "تمكين إعادة التسجيل بالنسبة لـ LTI 2"
   enable_scope_ac28b832: "تمكين النطاق"
   enable_student_context_card_links_eba2f2c5: "تمكين روابط بطاقة سياق الطالب"
@@ -12128,6 +12133,7 @@ ar:
   hide_students_with_no_results_6a22f991: "إخفاء الطلاب بدون نتائج"
   hide_sub_accounts_for_account_name_a6de98bd: "إخفاء الحسابات الفرعية لـ %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "إخفاء زر استيراد مخرجات التعلم بناءً على أذونات المستخدم"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "لإخفاء طلاب محددين أو أقسام محددة في LMGB إذا لم يكن لدي المعلم حق الوصول إلا لقسم محدد"
   hiding_grades_82691e44: "إخفاء الدرجات"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "غير مسموح بإخفاء الدرجات نظرًا لعدم نشر الدرجات لهذه المهمة."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "سيؤدي إخفاء الدرجات إلى تحديث المستعرض. قد يستغرق هذا بعض الوقت."
@@ -12294,6 +12300,9 @@ ar:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "عنوان URI لبيانات تعريف موفر الهوية IdP"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "في حال وجود علامة \"التزويد فقط\" على سمة ما، فستستخدم فقط عندما يقوم \"التزويد في الوقت المناسب\" بإنشاء مستخدم جديد ولن يتم تحديثها كلما يقوم المستخدم بتسجيل الدخول."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      إذا تم تثبيت أداة LTI مكونة من خلال التعيين، فسيظهر إدخال جديدة في
+      القائمة المنسدلة لنوع إرسال المهمة لتكوين المهمة للأداة بسرعة
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "في حالة تعطيل كيل من الدرجات - تحرير والدرجات - عرض جميع الدرجات، فسيتم إخفاء دفتر الدرجات من لوحة تنقل المساق."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "في حالة تعطيل كيل من الدرجات - تحرير والدرجات - عرض جميع الدرجات، فسيتم إخفاء دفتر الدرجات من لوحة تنقل المساق."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "في حالة تعطيل كيل من الدرجات - تحرير والدرجات - عرض جميع الدرجات، فسيتم إخفاء دفتر الدرجات من لوحة تنقل المساق."
@@ -13190,6 +13199,7 @@ ar:
       other: "%{count} آخرون"
       two: "%{count} آخرون"
       zero: "%{count} آخرون"
+  list_collapsed_381ef1b6: "تم طي القائمة. "
   list_collapsed_5f19f5bb: "تم طي القائمة"
   list_collapsed_9ac35920: "تم طي القائمة."
   list_collapsed_dde87718: "تم طي القائمة"
@@ -17903,6 +17913,7 @@ ar:
     labels: 
       requirements_must_be_completed: "يلزم إكمال المتطلبات التالية قبل إلغاء تأمين هذه الصفحة"
   presentation_2d9387ca: "عرض تقديمي"
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "يعرض إعداد الاختبار الموجز لتجنب الإرسال التلقائي للاختبار الموجز محدد الوقت عند انتهاء الوقت المتاح."
   press_space_to_start_over_d4b8a2da: "اضغط على \"المسافة\" للبدء من جديد"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "اضغط على مفتاح الفاصلة أو على Shift + علامة الاستفهام لعرض قائمة اختصارات لوحة المفاتيح"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "اضغط على مفتاح الفاصلة أو على Shift + ? لعرض قائمة اختصارات لوحة المفاتيح"
@@ -18429,7 +18440,7 @@ ar:
   qatar_d52a8d27: قطر
   qr_code_display_was_canceled_96234bf2: "تم إلغاء عرض رمز QR"
   qr_code_image_2b3a89b5: "صورة رمز QR"
-  qr_for_mobile_login_1b1560ce: "رمز QR لتسجيل دخول الجوال"
+  qr_for_mobile_login_1b1560ce: "رمز QR لتسجيل الدخول عبر الأجهزة المحمولة"
   qti_display: QTI
   qti_export_from_date_8f018de5: "*تصدير QTI من %{date}*"
   qti_file_description: "ملف QTI مضغوط"
@@ -20459,6 +20470,7 @@ ar:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "منع الطلاب من الوصول إلى المساقات قبل تاريخ بدايتها"
   restrict_students_from_annotating_6c28ab9b: "تقييد الطلاب من وضع تعليقات توضيحية"
   restricted_access_d3e99a39: "وصول مقيّد"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "طريقة عرض مقيدة للمعلمين في LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "أعد الإرسال إلى الأداة المقترنة لإجراء تحليل السرقة الأدبية."
   resubmit_to_tool_name_1cf02a31: "إعادة الإرسال إلى %{tool_name}"
   resubmitted_2080646f: "تمت إعادة الإرسال"
@@ -20770,6 +20782,7 @@ ar:
   saving_recording_e111cb05: "جارِ حفظ التسجيلات..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "تعذر حفظ حالة سياسة أمان المحتوى، يرجى إعادة المحاولة."
   schedule_student_availability_332154a: "جدولة توفر الطلاب"
+  scheduled_date_5b0aedb6: "التاريخ المجدول"
   scheduler_65b5ac91: "أداة الجدولة"
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "يجب تمكين أداة الجدولة بواسطة مسؤول Canvas لديك."
   scheduler_must_be_enabled_for_your_account_e6e53972: "يجب تمكين أداة الجدولة لحسابك."
@@ -21126,6 +21139,7 @@ ar:
   select_an_edit_operation_ec1467d: "تحديد عملية تحرير"
   select_assignment_title_4571ffcb: "تحديد مهمة: %{title}"
   select_audio_file_7d905cce: "تحديد ملف الصوت"
+  select_by_date_range_c3af0101: "التحديد حسب نطاق التاريخ"
   select_calendars_d5fa50b6: "تحديد تقويمات"
   select_conference_provider_58c7f7fe: "تحديد مزود مؤتمر"
   select_content: "تحديد محتوى"
@@ -21204,7 +21218,9 @@ ar:
   selected_grade_942f40ba: "الدرجة المحددة"
   selected_item_35bed33a: "العنصر المحدد"
   selected_subtree_a7693937: "%{subtree} محددة"
+  selection_end_date_10fcc8c6: "تاريخ انتهاء التحديد"
   selection_height_9d57ec24: "ارتفاع التحديد"
+  selection_start_date_2e4a4dca: "تاريخ بدء التحديد"
   selection_width_183acd79: "عرض التحديد"
   self_enrollments: 
     already_enrolled: 
@@ -22806,6 +22822,8 @@ ar:
   submission_status_3079e730: "حالة الإرسال"
   submission_tray_429ac3df: "علبة الإرسالات"
   submission_type_a925fc5f: "نوع الإرسال"
+  submission_type_lti_placement_b448d5d0: "تعيين LTI لنوع الإرسال"
+  submission_type_selection_72ce19f: "تحديد نوع الإرسال"
   submission_updated_8897f3b7: "تم تحديث الإرسال"
   submission_user_name_assignment_title_2cf5e3e9: "الإرسال: %{user_name}، %{assignment_title}"
   submissions: 
@@ -23077,6 +23095,7 @@ ar:
     observees: ملاحظة
     outcomes: النتائج
     pages: الصفحات
+    past_global_announcements: "الإعلانات العمومية"
     people: الأشخاص
     profile: "ملف التعريف"
     qr_mobile_login: "رمز QR لتسجيل دخول الجوال"
@@ -23252,6 +23271,7 @@ ar:
                 قد تستغرق هذه العملية بعض الوقت للمساقات الكبيرة.
                 يمكنك مغادرة الصفحة وسوف تتلقى إشعارًا
                 عند اكتمال التنزيل.
+  the_end_date_must_be_after_the_start_date_2a273107: "يجب أن يكون تاريخ الانتهاء بعد تاريخ البدء"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "تم إعادة تصميم المحرك الذي يعالج عمليات استيراد SIS لتحسين معالجة استقرار عمليات استيراد SIS الكبيرة. لم يتم تغيير الأداء الوظيفي لعمليات استيراد SIS."
   the_error_stack_trace_if_there_is_one_b7e008a1: "تتبع تكدس الخطأ، إذا وُجد"
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "تم نقل الارتباط المميز إلى أعلى القائمة."
@@ -24355,6 +24375,7 @@ ar:
   type_of_change_1cb24a0e: "نوع التغيير"
   type_of_item_8a37f69d: "نوع العنصر"
   type_to_search_de63ad38: "اكتب للبحث"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "اكتب للبحث أو استخدم مفاتيح الأسهم للتنقل بين الخيارات."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "يا إلهي! اتصل بمطور كتالوج الودود. رسالة الخطأ: %{message}"
   ukrainian_945b00b7: الأوكرانية
   unable_to_accept_update_fd53a7e2: "تعذر قبول التحديث"
