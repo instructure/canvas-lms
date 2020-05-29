@@ -2658,7 +2658,7 @@ class Course < ActiveRecord::Base
     if account_id.present? && feature_enabled?(:canvas_k6_theme) && super.nil?
       return canvas_k6_tab_configuration.map(&:with_indifferent_access)
     end
-    super.map(&:with_indifferent_access) rescue []
+    super.compact.map(&:with_indifferent_access) rescue []
   end
 
   TAB_HOME = 0

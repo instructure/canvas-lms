@@ -2399,6 +2399,12 @@ describe Course, "tabs_available" do
       expect(available_tabs.length).to eq default_tabs.length
     end
 
+    it "should not blow up if somehow nils got in there" do
+      course = Course.new
+      course.tab_configuration = [{'id' => 1}, nil]
+      expect(course.tab_configuration).to eq [{'id' => 1}]
+    end
+
     it "should not omit the target attribute for an external tool tab that is part of the tab configuration list" do
       @tool = @course.context_external_tools.create!(name: "a", domain: "example.com", consumer_key: "key", shared_secret: "secret")
       @tool.course_navigation = {
