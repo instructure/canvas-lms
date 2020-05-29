@@ -1338,6 +1338,7 @@ zh-Hans:
         login_handle_name: 登录标签
         message: 消息
         mfa_settings: 多重身份验证
+        mobile_qr_login_is_enabled: 允许通过使用二维码的方式登录移动应用
         name: 帐户名
         new_sub_account_includes: 让子账户使用主题编辑器自定义自己的品牌
         no_enrollments_can_create_courses: 未注册用户
@@ -2699,8 +2700,9 @@ zh-Hans:
   application_id_2aa1640f: "应用程序 ID"
   application_secret_e6803c7e: 应用程序密钥
   applied_cc7be774: 已申请
-  apply_781a2546: 应用
+  apply_781a2546: 申请
   apply_changes_b1dffc70: 应用更改
+  apply_date_range_selection_cc4351ed: 应用日期范围选择
   apply_filters_note_clicking_this_button_will_cause_753f04: 应用筛选条件。注释：点击此按钮将重载页面。
   apply_theme_7af08387: 应用主题
   applying_new_styles_to_subaccounts_e8aeeef2: 应用新样式的子帐户
@@ -4931,6 +4933,7 @@ zh-Hans:
   choose_usage_rights_33683854: 选择使用权限...
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' 不是有效的颜色。"
   classic_quizzes_dee3c7b7: 旧测验
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: 无提交项的计时测验的典型测验选项
   clear_2084585f: 清除
   clear_selected_file_82388e50: 清除所选文件
   clear_user_cache_ef079f7f: 清除用户缓存
@@ -8070,6 +8073,7 @@ zh-Hans:
   disable_a5c05db3: 禁用
   disable_all_read_only_scopes_f9ffdd28: 禁用所有只读作用域。
   disable_and_lock_7d0ef0e8: 禁用和锁定
+  disable_automatic_submission_8e1d8676: 禁用自动提交
   disable_celebrations_description: 启用此功能后将隐藏所有庆祝动画。
   disable_content_security_policy_8660a787: 禁用内容安全策略
   disable_extra_filter_options_1d1cdc02: 禁用额外的筛选选项
@@ -8882,6 +8886,7 @@ zh-Hans:
   enable_new_sis_integration_settings_ab6780a4: "启用新的 SIS 集成环境"
   enable_notifications_10a4bf44: 启用通知
   enable_or_condition_for_modules_a16f02d8: "对单元启用 \"OR\" 条件"
+  enable_recording_for_this_conference_b8adff6: 启用记录本次会议
   enable_reregistration_for_lti_2_b2a10444: "启用重新登记 LTI 2"
   enable_scope_ac28b832: 启用作用域
   enable_student_context_card_links_eba2f2c5: 启用学生上下文卡片链接
@@ -11601,6 +11606,7 @@ zh-Hans:
   hide_students_with_no_results_6a22f991: 隐藏没有成绩的学生
   hide_sub_accounts_for_account_name_a6de98bd: "隐藏子帐户%{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: 基于用户权限隐藏“导入学习结果”按钮
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "如果教师只能访问特定分组，则隐藏 LMGB 中的特定学生和分组"
   hiding_grades_82691e44: 隐藏评分
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: 不允许隐藏评分，因为此作业尚未发布评分。
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: 隐藏评分将刷新您的浏览器。这可能需要片刻的时间。
@@ -11767,6 +11773,9 @@ zh-Hans:
   idp_logoutresponse_xml_fe65de19: IdPLogoutResponseXML
   idp_metadata_uri_dae5314a: "IdP 元数据 URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: 如果一个属性标志只能配置，那么它就仅可用作创建新用户的临时配置，且不会在用户每次登录时更新。
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      如果安装了使用位置配置的 LTI 工具，将在
+      作业提交类型下拉菜单中显示新条目，以便为该工具快速配置作业
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "如果“评分 - 编辑”和“评分 - 查看所有评分”都被禁用，则会从课程导航中隐藏评分册。"
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "如果同时禁用“评分 (Grades) - 编辑”和“评分 (Grades) - 查看所有评分”，则评分册将从课程导航中隐藏。"
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "如果“评分 - 编辑”和“评分 - 查看所有评分”都被禁用，则会从“课程导航”中隐藏评分册。"
@@ -12646,6 +12655,7 @@ zh-Hans:
     other: 
       one: "另外 %{count} 人"
       other: "另外 %{count} 人"
+  list_collapsed_381ef1b6: "列表已折叠。 "
   list_collapsed_5f19f5bb: 列表折叠
   list_collapsed_9ac35920: 列表已折叠。
   list_collapsed_dde87718: 列表已折叠
@@ -17188,7 +17198,7 @@ zh-Hans:
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "对于所选评分类型，满分值必须大于等于 0"
   points_possible_must_be_greater_than_0_for_selecte_5708da1b: "所选评分类型的满分必须高于 0 分"
   points_possible_points_fda3b111: "%{points_possible} 分"
-  points_pts_e5596bf7: "%{points} 得分"
+  points_pts_e5596bf7: "%{points} 分"
   points_range_rating_pts_ab9c8540: "%{points}%{range_rating} 得分"
   points_should_be_strictly_decreasing_l_r_18f26f87: "分数应完全下降：%{l}<=%{r}"
   points_to_endofrangepoints_pts_aad207f0: "%{points}至 >%{endOfRangePoints} 分"
@@ -17271,6 +17281,7 @@ zh-Hans:
     labels: 
       requirements_must_be_completed: 需要完成以下要求，然后才能解锁此页面
   presentation_2d9387ca: 展示
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: 显示测验设置，以避免在可用时间结束时自动提交计时测验。
   press_space_to_start_over_d4b8a2da: 按“space”重新开始
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "按逗号键或转换键 + 问号就可看到的键盘快捷键列表"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "按逗号键或转换键 + ？就可看到的键盘快捷键列表"
@@ -19638,6 +19649,7 @@ zh-Hans:
   restrict_students_from_accessing_courses_before_st_f7c22c00: 限制学生在开始日期之前访问课程
   restrict_students_from_annotating_6c28ab9b: 限制学生留下注释
   restricted_access_d3e99a39: 限制访问
+  restricted_view_for_teachers_in_lmgb_52c78a62: "LMGB 中的限制教师视图"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: 重新提交到关联的工具进行相似度分析。
   resubmit_to_tool_name_1cf02a31: "重新提交至%{tool_name}"
   resubmitted_2080646f: 已重新提交
@@ -19941,6 +19953,7 @@ zh-Hans:
   saving_recording_e111cb05: 保存录制...
   saving_the_csp_status_failed_please_try_again_8275aaa4: "保存 CSP 状态失败，请重试。"
   schedule_student_availability_332154a: 学生时间表的可用性
+  scheduled_date_5b0aedb6: 预定日期
   scheduler_65b5ac91: 评价量规
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: 必须由Canvas管理员启用评价量规。
   scheduler_must_be_enabled_for_your_account_e6e53972: 必须为您的帐户启用评价量规。
@@ -20272,6 +20285,7 @@ zh-Hans:
   select_an_edit_operation_ec1467d: 选择编辑操作
   select_assignment_title_4571ffcb: "选择作业：%{title}"
   select_audio_file_7d905cce: 选择音频文件
+  select_by_date_range_c3af0101: 按日期范围选择
   select_calendars_d5fa50b6: 选择日历
   select_conference_provider_58c7f7fe: 选择会议提供者
   select_content: 选择内容
@@ -20350,7 +20364,9 @@ zh-Hans:
   selected_grade_942f40ba: 已选择评分
   selected_item_35bed33a: 选择的项目
   selected_subtree_a7693937: "已选定 %{subtree}"
+  selection_end_date_10fcc8c6: 选择结束日期
   selection_height_9d57ec24: 选择高度
+  selection_start_date_2e4a4dca: 选择开始日期
   selection_width_183acd79: 选择宽度
   self_enrollments: 
     already_enrolled: 
@@ -21891,6 +21907,8 @@ zh-Hans:
   submission_status_3079e730: 提交状态
   submission_tray_429ac3df: 提交托盘
   submission_type_a925fc5f: 提交类型
+  submission_type_lti_placement_b448d5d0: "提交类型 LTI 位置"
+  submission_type_selection_72ce19f: 提交类型选择
   submission_updated_8897f3b7: 已更新提交项
   submission_user_name_assignment_title_2cf5e3e9: "提交项：%{user_name}，%{assignment_title}"
   submissions: 
@@ -22162,6 +22180,7 @@ zh-Hans:
     observees: 正在观察
     outcomes: 结果
     pages: 页面
+    past_global_announcements: 全局公告
     people: 人员
     profile: 个人资料
     qr_mobile_login: 移动登录二维码
@@ -22329,6 +22348,7 @@ zh-Hans:
       课程可能需要一段时间才能
       下载完成。您可以离开此页
       面，下载完成后将通知您。
+  the_end_date_must_be_after_the_start_date_2a273107: 结束日期必须迟于开始日期
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "处理 SIS 导入的引擎已重构，以更好地应对大型 SIS 导入的稳定性。SIS 导入的功能性不变。"
   the_error_stack_trace_if_there_is_one_b7e008a1: 错误堆跟踪，如果有一个
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: 精选链接已移动到列表顶部。
@@ -23412,6 +23432,7 @@ zh-Hans:
   type_of_change_1cb24a0e: 更改类型
   type_of_item_8a37f69d: 项目类型
   type_to_search_de63ad38: 键入以搜索
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: 键入以搜索，使用箭头键浏览选项。
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "嗯哦！联系您的友好目录开发人。错误信息： %{message}"
   ukrainian_945b00b7: 乌克兰语
   unable_to_accept_update_fd53a7e2: 无法接受更新
