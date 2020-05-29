@@ -1338,6 +1338,7 @@ ja:
         login_handle_name: "ログイン ラベル"
         message: メッセージ
         mfa_settings: マルチファクタ認証
+        mobile_qr_login_is_enabled: QRコードを使用してモバイルアプリへのログインを許可する
         name: アカウント名
         new_sub_account_includes: サブアカウントにテーマエディターを使用させ、ブランディングをカスタマイズする
         no_enrollments_can_create_courses: 登録のないユーザ
@@ -2701,6 +2702,7 @@ ja:
   applied_cc7be774: 適用されました
   apply_781a2546: 適用
   apply_changes_b1dffc70: 変更を適用
+  apply_date_range_selection_cc4351ed: 日付範囲選択を適用する
   apply_filters_note_clicking_this_button_will_cause_753f04: フィルターを適用する。注：このボタンをクリックすると、ページが再読み込みされます。
   apply_theme_7af08387: テーマを適用
   applying_new_styles_to_subaccounts_e8aeeef2: サブアカウントに新しいスタイルを適用
@@ -4938,6 +4940,7 @@ ja:
   choose_usage_rights_33683854: 使用権を選択...
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' は有効な色ではありません。"
   classic_quizzes_dee3c7b7: クラシッククイズ
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: 提出なしの時間指定クイズのクラシッククイズオプション
   clear_2084585f: クリア
   clear_selected_file_82388e50: 選択したファイルを消去する
   clear_user_cache_ef079f7f: ユーザーキャッシュを消去する
@@ -8079,6 +8082,7 @@ ja:
   disable_a5c05db3: 無効
   disable_all_read_only_scopes_f9ffdd28: 読み取り専用スコープをすべて無効にする。
   disable_and_lock_7d0ef0e8: 無効にしてロック
+  disable_automatic_submission_8e1d8676: 自動提出を無効にする
   disable_celebrations_description: この機能を有効化すると、すべてのお祝いアニメーションが非表示になります。
   disable_content_security_policy_8660a787: コンテンツセキュリティポリシーを無効にする
   disable_extra_filter_options_1d1cdc02: 特別フィルタオプションを無効にする
@@ -8891,6 +8895,7 @@ ja:
   enable_new_sis_integration_settings_ab6780a4: "新規 SIS 統合設定を有効化する"
   enable_notifications_10a4bf44: 通知を有効にする
   enable_or_condition_for_modules_a16f02d8: モジュールを有効"または"調整する
+  enable_recording_for_this_conference_b8adff6: この会議は録音可能です
   enable_reregistration_for_lti_2_b2a10444: LTI2の登録を有効にする
   enable_scope_ac28b832: スコープを有効にする
   enable_student_context_card_links_eba2f2c5: 受講生コンテクストカードリンクを有効にする
@@ -11612,6 +11617,7 @@ ja:
   hide_students_with_no_results_6a22f991: 結果のない受講生を非表示にする
   hide_sub_accounts_for_account_name_a6de98bd: "サブアカウントを非表示にする%{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: ユーザー権限に基づいて「学習成果のインポート」ボタンを非表示にする
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: 講師が特定のセクションにのみアクセスできる場合、LMGB内の特定の受講生とセクションを非表示にします
   hiding_grades_82691e44: 成績を非表示にする
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: この課題には成績が発表されていないため、成績を非表示にすることはできません。
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: 成績を非表示にすると、ブラウザが更新されます。これには少し時間がかかる場合があります。
@@ -11778,6 +11784,9 @@ ja:
   idp_logoutresponse_xml_fe65de19: IdPLogoutResponseXML
   idp_metadata_uri_dae5314a: "IdP メタデータ URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: 属性が「準備のみ」としてマークされている場合、「時間通りのプロビジョニング」が新規ユーザーを作成したときのみ使われます。属性はユーザーがログインする度に更新されません。
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      プレースメントで構成されたLTIツールがインストールされている場合、
+      課題提出タイプドロップダウンに新しいエントリが表示され、ツールの課題を迅速に構成できます
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "成績 - 編集と成績 - 両方の成績が表示されない場合、グレードブックはコースナビゲーションで非表示となります。"
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "成績 - 編集と成績 - 両方の成績が表示されない場合、グレードブックはコースナビゲーションで非表示となります。"
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "成績 - 編集と成績 - 両方の成績が表示されない場合、グレードブックはコースナビゲーションで非表示となります。"
@@ -12660,6 +12669,7 @@ ja:
     other: 
       one: "その他%{count}"
       other: "その他%{count}"
+  list_collapsed_381ef1b6: "リストが破損しています。 "
   list_collapsed_5f19f5bb: リスト折りたたみ
   list_collapsed_9ac35920: リストが破損しています。
   list_collapsed_dde87718: リストが破損しています
@@ -17280,6 +17290,7 @@ ja:
     labels: 
       requirements_must_be_completed: このページをロック解除するためには、次の要件が揃っていることが必要です。
   presentation_2d9387ca: プレゼンテーション
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: 制限時間が終了したときに時間指定のクイズの自動提出を回避するようにクイズ設定を表示します。
   press_space_to_start_over_d4b8a2da: 「スペース」を押して、もう一度やり直してください
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "コンマキー、またはシフト + クエスチョンマークを押して、キーボードのショートカットのリストを表示する。"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "コンマキー、またはシフト + ？を押して、キーボードのショートカットのリストを表示する。　"
@@ -19646,6 +19657,7 @@ ja:
   restrict_students_from_accessing_courses_before_st_f7c22c00: 開始日前、受講生がコースにアクセスすることが制限されます。
   restrict_students_from_annotating_6c28ab9b: 受講生が注釈を付けることを制限する
   restricted_access_d3e99a39: 制限されたアクセス
+  restricted_view_for_teachers_in_lmgb_52c78a62: LMGBの講師用制限付きビュー
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: 剽窃分析のために関連ツールに再提出してください。
   resubmit_to_tool_name_1cf02a31: "～へ再提出%{tool_name}"
   resubmitted_2080646f: 再提出
@@ -19949,6 +19961,7 @@ ja:
   saving_recording_e111cb05: 録音を保存しています...
   saving_the_csp_status_failed_please_try_again_8275aaa4: CSPステータスの保存に失敗しました。もう一度やり直してください。
   schedule_student_availability_332154a: 受講生の利用可能状況をスケジュール
+  scheduled_date_5b0aedb6: 予定日
   scheduler_65b5ac91: スケジューラ
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: スケジューラは、Canvas管理者が有効でなければなりません。
   scheduler_must_be_enabled_for_your_account_e6e53972: アカウントでスケジューラが有効でなければなりません。
@@ -20280,6 +20293,7 @@ ja:
   select_an_edit_operation_ec1467d: 編集操作を選択する
   select_assignment_title_4571ffcb: "課題を選択する：%{title}"
   select_audio_file_7d905cce: オーディオファイルを選択
+  select_by_date_range_c3af0101: 日付範囲で選択する
   select_calendars_d5fa50b6: 予定表を選択する
   select_conference_provider_58c7f7fe: 会議プロバイダーを選択する
   select_content: コンテンツの選択
@@ -20358,7 +20372,9 @@ ja:
   selected_grade_942f40ba: 選択された成績
   selected_item_35bed33a: 選択された項目
   selected_subtree_a7693937: "選択された %{subtree}"
+  selection_end_date_10fcc8c6: 終了日で選択する
   selection_height_9d57ec24: 高さ選択
+  selection_start_date_2e4a4dca: 開始日で選択する
   selection_width_183acd79: 幅選択
   self_enrollments: 
     already_enrolled: 
@@ -21904,6 +21920,8 @@ ja:
   submission_status_3079e730: 提出状態
   submission_tray_429ac3df: 提出トレイ
   submission_type_a925fc5f: 提出物のタイプ
+  submission_type_lti_placement_b448d5d0: 提出タイプLTI配置
+  submission_type_selection_72ce19f: 提出タイプ選択
   submission_updated_8897f3b7: 提出物が更新されました
   submission_user_name_assignment_title_2cf5e3e9: "提出%{user_name}, %{assignment_title}"
   submissions: 
@@ -22175,6 +22193,7 @@ ja:
     observees: 監視中
     outcomes: 成果
     pages: ページ
+    past_global_announcements: "グローバル アナウンス"
     people: メンバー
     profile: プロフィール
     qr_mobile_login: "モバイルログイン用の QR"
@@ -22342,6 +22361,7 @@ ja:
                 大規模なコースではしばらく時間がかかります。
                 ページを離れてもダウンロード完了時に通知が
                 届きます。
+  the_end_date_must_be_after_the_start_date_2a273107: 終了日は開始日より後でなければなりません。
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: SISのインポートを処理するエンジンは、大規模なSISインポートの安定性をよりよく処理できるよう、リファクタリングされています。SISのインポート機能は変更されていません。
   the_error_stack_trace_if_there_is_one_b7e008a1: 存在する場合のエラースタックトレース
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: 注目リンクがリストのトップに移動されました。
@@ -23427,6 +23447,7 @@ ja:
   type_of_change_1cb24a0e: 変更の種類
   type_of_item_8a37f69d: アイテムの種類
   type_to_search_de63ad38: タイプして検索する
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: テイプして検索、矢印キーを使用してオプションを移動します。
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "うわー！フレンドリーなCatalog開発者に連絡してください。 エラーメッセージ: %{message}"
   ukrainian_945b00b7: ウクライナ語
   unable_to_accept_update_fd53a7e2: 更新を受け入れることができません
