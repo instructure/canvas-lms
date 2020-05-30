@@ -41,3 +41,9 @@ limit_section_visibility_in_lmgb:
   display_name: Restricted view for teachers in LMGB
   description: Hides certain students and sections in the LMGB if the teacher only
     has access to a particular section
+outcome_alignments_course_migration:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Outcomes Service Alignment Migration
+  description: Includes Outcomes Service alignments when exporting and importing
+    course content
