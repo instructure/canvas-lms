@@ -8001,7 +8001,7 @@ is:
   edit_role_1e96ad20: "Breyta hlutverki"
   edit_rubric: 
     buttons: 
-      create_rubric: "Stofna matskvarði"
+      create_rubric: "Stofna matskvarða"
       update_rubric: "Uppfæra matskvarði"
     change: Breyta
     discussion_points_possible: 
@@ -8019,7 +8019,7 @@ is:
     titles: 
       criterion_long_description: "Löng lýsing á viðmiðun"
       edit_rubric_rating: "Breyta mati"
-      find_existing_rubric: "Finna matskvarði"
+      find_existing_rubric: "Finna matskvarða"
   edit_rubric_title_104d6fd2: "Breyta matskvarða: %{title}"
   edit_section_name_558cc89: "Breyta hluta „%{name}“"
   edit_survey_b0d6890d: "Breyta könnun"
@@ -17342,7 +17342,7 @@ is:
   remove_text_8e485c41: "Fjarlægja %{text}"
   remove_these_dates_48453a81: "Fjarlægja þessar dagsetningar"
   remove_this_item_from_the_module_4b2ceab7: "Fjarlægja þetta atriði úr einingunni"
-  remove_this_rubric_from_my_list_c7d80704: "Fjarlægja þetta matskvarði af listanum mínum"
+  remove_this_rubric_from_my_list_c7d80704: "Fjarlægja þennan matskvarða af listanum mínum"
   remove_user_from_section_5556f465: "Fjarlægja notanda úr hluta"
   removed_course_association_course_a233342c: "Fjarlægði námskeiðstengingu %{course}"
   removed_user_as_group_leader_bb69330f: "Fjarlægði %{user} sem hópstjóra"
@@ -17664,7 +17664,7 @@ is:
       points_possible: 
         one: "1 punktur mögulegur"
         other: "%{count} punktar mögulegir"
-      remove_rubric: "Fjarlægja þetta matskvarði af listanum mínum"
+      remove_rubric: "Fjarlægja þennan matskvarða af listanum mínum"
   rubrics_add_edit_delete_8299eff7: "Matsviðmið - bæta við / breyta / eyða"
   rubrics_and_speedgrader_ececaed4: "Matsviðmið og SpeedGrader"
   rubrics_b5ef369b: Matskvarði
@@ -18566,25 +18566,25 @@ is:
       sidebar_content: "Efni í hliðarslá"
     rubric: 
       buttons: 
-        create: "Stofna matskvarði"
+        create: "Stofna matskvarða"
       defaults: 
-        rubric_title: "Eitthvað matskvarði"
+        rubric_title: "Einhver matskvarði"
       headers: 
         criteria: Viðmiðun
         points: Punktar
         ratings: Matsstig
       labels: 
         custom_rating: "Ég skrifa lausar athugasemdir við mat á nemendum"
-        grading_rubric: "Nota þetta matskvarði fyrir einkunnagjöf verkefnis"
+        grading_rubric: "Nota þennan matskvarða fyrir einkunnagjöf verkefnis"
         total_points: Heildarpunktar
         totallying_rubric: "Fela heildareinkunn fyrir matsniðurstöður"
       links: 
         delete: "Eyða matskvarða"
         edit: "Breyta matskvarða"
-        find_a_rubric: "Finna matskvarði"
+        find_a_rubric: "Finna matskvarða"
         find_another_rubric: "Finna annað matskvarði"
         find_outcome: "Finna niðurstöðu"
-        find_rubric: "Finna matskvarði"
+        find_rubric: "Finna matskvarða"
       messages: 
         locked: "Ekki hægt að breyta matskvarða eftir að byrjað er að nota það."
         rubric_in_use: 
@@ -18633,13 +18633,13 @@ is:
         long_description: "Löng lýsing"
     rubric_dialog: 
       buttons: 
-        use_this_rubric: "Nota þetta matskvarði"
+        use_this_rubric: "Nota þennan matskvarða"
       criterion_count: "%{count} viðmið"
       links: 
         manage_rubrics: "Umsjón með matskvarða"
       points_possible: "%{points} punktar mögulegir"
       titles: 
-        find_a_rubric: "Finna matskvarði"
+        find_a_rubric: "Finna matskvarða"
     rubric_forms: 
       criteria_description_label: "Lýsing á viðmiðun"
       points: "%{points} punktar"
