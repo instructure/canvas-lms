@@ -1154,6 +1154,7 @@ da-x-k12:
         locked: "Lås denne indstilling for underkonto og fag"
         login_handle_name: Login-mærke
         mfa_settings: Multi-faktor-autentifikation
+        mobile_qr_login_is_enabled: "Tillad login til mobile apps med brug af QR-koder"
         name: Kontonavn
         no_enrollments_can_create_courses: "Brugere uden tilmeldinger"
         open_registration: "Åben registrering"
@@ -2432,6 +2433,7 @@ da-x-k12:
   application_secret_e6803c7e: Programhemmelighed
   applied_cc7be774: Anvendt
   apply_781a2546: Tildel
+  apply_date_range_selection_cc4351ed: "Anvend valg af datointerval"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Anvend filtre. Bemærk: Ved at klikke på denne knap bliver siden genindlæst."
   apply_theme_7af08387: "Benyt tema"
   applying_new_styles_to_subaccounts_e8aeeef2: "Anvender ny stil til underkonti"
@@ -4396,6 +4398,7 @@ da-x-k12:
   choose_usage_rights_33683854: "Vælg brugsrettigheder ..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' er ikke en gyldig farve."
   classic_quizzes_dee3c7b7: "Klassiske quizzer"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Classic Quizzes-indstilling til tidsindstillede quizzer uden aflevering"
   clear_2084585f: Ryd
   clear_selected_file_82388e50: "Ryd valgt fil"
   clear_user_cache_ef079f7f: "Ryd brugercache"
@@ -7102,6 +7105,7 @@ da-x-k12:
   disable_a5c05db3: Deaktiver
   disable_all_read_only_scopes_f9ffdd28: "Deaktiver alle skrivebeskyttede omfang."
   disable_and_lock_7d0ef0e8: "Deaktiver og lås"
+  disable_automatic_submission_8e1d8676: "Deaktiver automatisk aflevering"
   disable_celebrations_description: "Aktivering af denne funktion skjuler alle fejringsanimationer."
   disable_content_security_policy_8660a787: "Deaktiver politik for indholdsikkerhed"
   disable_extra_filter_options_1d1cdc02: "deaktiver ekstra filterindstillinger"
@@ -7807,6 +7811,7 @@ da-x-k12:
   enable_moderated_grading_bacd20d8: "Aktiver samlet vurdering."
   enable_new_sis_integration_settings_ab6780a4: "Aktivér nye SIS-integration indstillinger"
   enable_notifications_10a4bf44: "Aktiver meddelelser"
+  enable_recording_for_this_conference_b8adff6: "Aktivér optagelse af denne konference"
   enable_reregistration_for_lti_2_b2a10444: "Aktiver registrering til LTI 2 igen"
   enable_scope_ac28b832: "Aktiver omfang"
   enable_student_context_card_links_eba2f2c5: "Aktiver elevers links til kontekst-kort"
@@ -9798,6 +9803,7 @@ da-x-k12:
   hide_students_with_no_results_6a22f991: "Skjul elever uden resultater"
   hide_sub_accounts_for_account_name_a6de98bd: "Skjul underkonti for %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Skjul knappen Importer læringsudbytter baseret på brugertilladelser"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Skjuler visse elever og sektioner i LMGB, hvis læreren kun har adgang til en bestemt sektion"
   hiding_grades_82691e44: "Skjul vurderinger"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Skjul vurderinger er ikke tilladt, fordi vurderinger ikke er blevet udgivet for denne opgave."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Skjul vurderinger vil opdatere din browser. Det kan tage et øjeblik."
@@ -9954,6 +9960,9 @@ da-x-k12:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Hvis en egenskab er markeret som kun ved tilmelding, vil den kun blive brugt, når Just in Time-meldingen opretter en ny bruger og vil ikke blive opdateret, hver gang brugeren logger ind."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      Hvis der er installeret et LTI-værktøj, som er konfigureret med placeringen, så viser det en ny mulighed i
+      rullemenuen for opgavers afleveringsform for hurtigt at konfigurere opgaven til værktøjet
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Hvis både ’Vurderinger - redigér’ og ’Vurderinger - vis alle vurderinger’ er deaktiveret, bliver vurderingsoversigten skjult for fagnavigationen."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Hvis både Vurderinger - rediger og Vuderinger - vis alle vurderinger er deaktiveret, bliver Vurderingsoversigten skjult for fagnavigationen."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Hvis både ’Vurderinger - redigér’ og ’Vurderinger - vis alle vurderinger’ er deaktiveret, bliver vurderingsoversigten skjult for Fagnavigation."
@@ -10751,6 +10760,7 @@ da-x-k12:
     other: 
       one: "1 anden"
       other: "%{count} andre"
+  list_collapsed_381ef1b6: "Listen skjult. "
   list_collapsed_5f19f5bb: "Liste skjult"
   list_collapsed_9ac35920: "Listen skjult."
   list_collapsed_dde87718: "Listen skjult"
@@ -14843,6 +14853,7 @@ da-x-k12:
     labels: 
       requirements_must_be_completed: "Følgende betingelser skal opfyldes, inden siden oplåses"
   presentation_2d9387ca: Præsentation
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Præsenterer quizindstillingen, hvor der undgås automatisk aflevering af en tidsbestemt quiz, når den tilgængelige tid er udløbet."
   press_space_to_start_over_d4b8a2da: "Tryk på 'mellemrumstasten' for at starte forfra"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Tryk på kommatasten eller shift + spørgsmålstegn for at se en liste over genvejstaster"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Tryk på kommatasten eller shift + ? for at se en liste over genvejstaster"
@@ -16856,6 +16867,7 @@ da-x-k12:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Forhindr elever i at skaffe adgang til fag før startdatoen"
   restrict_students_from_annotating_6c28ab9b: "Begræns elever fra at skrive anmærkninger"
   restricted_access_d3e99a39: "Begrænset adgang"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Begrænset visning for lærere i LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Aflever igen til det tilknyttede værktøj for plagiatanalyse."
   resubmit_to_tool_name_1cf02a31: "Aflever igen til %{tool_name}"
   resubmitted_2080646f: "Afleveret igen"
@@ -17139,6 +17151,7 @@ da-x-k12:
   saving_recording_e111cb05: "Gemmer optagelse ..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Det lykkedes ikke at gemme CSP-status, prøv igen."
   schedule_student_availability_332154a: "Planlæg elevernes tilgængelighed"
+  scheduled_date_5b0aedb6: "Planlagt dato"
   scheduler_65b5ac91: Planlægningsværktøj
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Din Canvas-admin skal aktivere Planlægningsværktøj."
   scheduler_must_be_enabled_for_your_account_e6e53972: "Planlægningsværktøjet skal være aktiveret for din konto."
@@ -17441,6 +17454,7 @@ da-x-k12:
   select_an_edit_operation_ec1467d: "Vælg en redigeringshandling"
   select_assignment_title_4571ffcb: "Vælg opgave: %{title}"
   select_audio_file_7d905cce: "Vælg lydfil"
+  select_by_date_range_c3af0101: "Vælg efter datointerval"
   select_calendars_d5fa50b6: "Vælg kalendere"
   select_conference_provider_58c7f7fe: "Vælg konferenceudbyder"
   select_content: "Vælg indhold"
@@ -17514,7 +17528,9 @@ da-x-k12:
   selected_filename_7552a8c0: "valgt %{filename}"
   selected_grade_942f40ba: "Udvalgt vurdering"
   selected_subtree_a7693937: "Valgt %{subtree}"
+  selection_end_date_10fcc8c6: "Valgt slutdato"
   selection_height_9d57ec24: "Valg højde"
+  selection_start_date_2e4a4dca: "Valgt startdato"
   selection_width_183acd79: "Valg bredde"
   self_enrollments: 
     already_enrolled: 
@@ -18796,6 +18812,8 @@ da-x-k12:
   submission_sent_3f0d2ee1: "Aflevering sendt"
   submission_tray_429ac3df: Afleveringsbakke
   submission_type_a925fc5f: Afleveringstype
+  submission_type_lti_placement_b448d5d0: "Afleveringsform LTI-placering"
+  submission_type_selection_72ce19f: "Valg af afleveringsform"
   submission_updated_8897f3b7: "Aflevering opdateret"
   submission_user_name_assignment_title_2cf5e3e9: "Aflevering: %{user_name}, %{assignment_title}"
   submissions: 
@@ -19040,6 +19058,7 @@ da-x-k12:
     observees: Observerer
     outcomes: Læringsudbytte
     pages: Sider
+    past_global_announcements: "Generelle beskeder"
     people: Deltagere
     qr_mobile_login: "QR til mobil login"
     quizzes: Quizzer
@@ -19197,6 +19216,7 @@ da-x-k12:
                 kan tage et stykke tid for store fag. Du kan forlade
                 siden, og så får du en meddelelse, når overførslen
                 er afsluttet.
+  the_end_date_must_be_after_the_start_date_2a273107: "Slutdatoen skal være efter startdatoen"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: |-
       Motoren, som behandler SIS-importerne, er blevet omstruktureret for bedre at kunne håndtere
       stabiliteten af store SIS-importer. SIS-importens funktionalitet er ikke blevet ændret.
@@ -20205,6 +20225,7 @@ da-x-k12:
   type_of_change_1cb24a0e: Ændringstype
   type_of_item_8a37f69d: Elementtype
   type_to_search_de63ad38: "Indtast for at søge"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Indtast for at søge, brug piletasterne til at navigere mulighederne."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Åh nej! Kontakt din venlige Catalog-udvikler. Fejlbesked: %{message}"
   ukrainian_945b00b7: Ukrainsk
   unable_to_accept_update_fd53a7e2: "Kan ikke acceptere opdatering"
