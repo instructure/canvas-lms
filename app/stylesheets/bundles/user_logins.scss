@@ -37,6 +37,9 @@
       }
     }
   }
+  .unique_id, .sis_user_id, .integration_id {
+    overflow-wrap: anywhere;
+  }
   .account_name {
     line-height: 3.0;
   }
