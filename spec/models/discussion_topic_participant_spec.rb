@@ -40,4 +40,15 @@ describe DiscussionTopicParticipant do
       expect(@participant.unread_entry_count).to eq 15
     end
   end
+
+  describe 'create' do
+    before(:once) do
+      @participant = DiscussionTopicParticipant.create!(:user => user_factory,
+        :discussion_topic => discussion_topic_model)
+    end
+
+    it 'sets the root_account_id using topic' do
+      expect(@participant.root_account_id).to eq @topic.root_account_id
+    end
+  end
 end
