@@ -233,11 +233,6 @@ module Importers
             event.save_without_broadcasting
           end
 
-          migration.imported_migration_items_by_class(ContextModule).each do |event|
-            event.unlock_at = shift_date(event.unlock_at, shift_options)
-            event.save
-          end
-
           migration.imported_migration_items_by_class(WikiPage).each do |event|
             event.reload
             event.todo_date = shift_date(event.todo_date, shift_options)
