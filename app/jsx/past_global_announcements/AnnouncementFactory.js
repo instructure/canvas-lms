@@ -17,26 +17,33 @@
  */
 
 import React from 'react'
-import {Heading} from '@instructure/ui-heading/lib/Heading'
-import AnnouncementFactory from './AnnouncementFactory'
+import NoResultsDesert from './SVG/NoResultsDesert.svg'
+import {Text} from '@instructure/ui-text/lib/Text'
 import I18n from 'i18n!past_global_announcements'
 
-const PastGlobalAnnouncements = () => {
-  const activeAnnouncements = AnnouncementFactory(ENV.global_notifications.active, 'Active')
-  const pastAnnouncements = AnnouncementFactory(ENV.global_notifications.past, 'Past')
-  return (
-    <>
-      <Heading border="bottom" margin="medium">
-        {I18n.t('Current')}
-      </Heading>
-      {activeAnnouncements}
+const AnnouncementFactory = (announcements, section) => {
+  const styles = {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
 
-      <Heading border="bottom" margin="medium">
-        {I18n.t('Past')}
-      </Heading>
-      {pastAnnouncements}
-    </>
-  )
+  if (announcements === ' ') {
+    return (
+      <div style={styles}>
+        <img
+          data-testid={`NoGlobalAnnouncementImage${section}`}
+          alt=""
+          src={NoResultsDesert}
+          style={{width: '400px'}}
+        />
+        <Text size="large">{I18n.t('No announcements to display')}</Text>
+      </div>
+    )
+  }
+
+  return <div dangerouslySetInnerHTML={{__html: announcements}} />
 }
 
-export default PastGlobalAnnouncements
+export default AnnouncementFactory
