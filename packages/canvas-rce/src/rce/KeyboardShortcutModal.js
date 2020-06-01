@@ -51,7 +51,7 @@ export default function KeyboardShortcutModal(props) {
               {formatMessage('Open this keyboard shortcuts dialog')}
             </List.Item>
             <List.Item>
-              <Text weight="bold">CTRL+F9</Text> {formatMessage('Focus the popup context toolbar')}
+              <Text weight="bold">CTRL+F9</Text> {formatMessage('Focus element options toolbar')}
             </List.Item>
             <List.Item>
               <Text weight="bold">ALT+F9</Text> {formatMessage("Go to the editor's menubar")}
