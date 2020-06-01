@@ -27,27 +27,32 @@
 # passed to Delayed::Periodic.cron
 
 class PeriodicJobs
-  def self.with_each_shard_by_database_in_region(klass, method, *args)
+  def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil)
     Shard.with_each_shard(Shard.in_current_region) do
       strand = "#{klass}.#{method}:#{Shard.current.database_server.id}"
       # TODO: allow this to work with redis jobs
       next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: Shard.current.id, locked_by: nil).exists?
-      klass.send_later_enqueue_args(method, {
-          strand: strand,
-          max_attempts: 1,
-          priority: 40
-      }, *args)
+      dj_params = {
+        strand: strand,
+        max_attempts: 1,
+        priority: 40
+      }
+      if jitter.present?
+        now = Time.zone.now
+        dj_params[:run_at] = rand((now+10.seconds)..(now + jitter))
+      end
+      klass.send_later_enqueue_args(method, dj_params, *args)
     end
   end
 end
 
-def with_each_shard_by_database(klass, method, *args)
+def with_each_shard_by_database(klass, method, *args, jitter: nil)
   DatabaseServer.send_in_each_region(PeriodicJobs,
                                      :with_each_shard_by_database_in_region,
                                      {
                                        singleton: "periodic:region: #{klass}.#{method}",
                                        max_attempts: 1,
-                                     }, klass, method, *args)
+                                     }, klass, method, *args, jitter: nil)
 end
 
 Rails.configuration.after_initialize do
@@ -154,19 +159,19 @@ Rails.configuration.after_initialize do
   end
 
   Delayed::Periodic.cron 'Auditors::ActiveRecord::Partitioner', '0 0 * * *' do
-    with_each_shard_by_database(Auditors::ActiveRecord::Partitioner, :process)
+    with_each_shard_by_database(Auditors::ActiveRecord::Partitioner, :process, jitter: 6.hours)
   end
 
   Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
-    with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process)
+    with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process, jitter: 6.hours)
   end
 
   Delayed::Periodic.cron 'Version::Partitioner.process', '0 0 * * *' do
-    with_each_shard_by_database(Version::Partitioner, :process)
+    with_each_shard_by_database(Version::Partitioner, :process, jitter: 6.hours)
   end
 
   Delayed::Periodic.cron 'Messages::Partitioner.process', '0 0 * * *' do
-    with_each_shard_by_database(Messages::Partitioner, :process)
+    with_each_shard_by_database(Messages::Partitioner, :process, jitter: 6.hours)
   end
 
   if AuthenticationProvider::SAML.enabled?
