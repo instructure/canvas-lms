@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,14 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# This is duplicated in PlagiarismSubscriptionsHelper.  We'll want to dump all
-# this when that is working and all the subscriptions have been migrated
-
 module Lti
-  class AssignmentSubscriptionsHelper
-    attr_accessor :assignment, :tool_proxy
+  class PlagiarismSubscriptionsHelper
+    attr_accessor :tool_proxy, :product_family
 
-    class AssignmentSubscriptionError < StandardError
+    class PlagiarismSubscriptionError < StandardError
     end
 
     SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'.freeze
@@ -32,32 +29,33 @@ module Lti
                      assignment_updated
                      assignment_created).freeze
 
-    def initialize(tool_proxy, assignment = nil)
-      @assignment = assignment
+    def initialize(tool_proxy)
       @tool_proxy = tool_proxy
+      @product_family = tool_proxy.product_family
     end
 
     def create_subscription
-      Rails.logger.info { "in: AssignmentSubscriptionsHelper::create_subscription, assignment_id: #{assignment.id}, tool_proxy_id: #{tool_proxy.id}" }
-      if Services::LiveEventsSubscriptionService.available? && assignment.present?
-        subscription = assignment_subscription(assignment.global_id)
+      Rails.logger.info { "in: PlagiarismSubscriptionsHelper::create_subscription, tool_proxy_id: #{tool_proxy.id}" }
+      if Services::LiveEventsSubscriptionService.available?
+        subscription = plagiarism_subscription(tool_proxy, product_family)
         result = Services::LiveEventsSubscriptionService.create_tool_proxy_subscription(tool_proxy, subscription)
-        raise AssignmentSubscriptionError, error_message unless result.ok?
+        raise PlagiarismSubscriptionError, error_message unless result.ok?
         result.parsed_response['Id']
       else
-        raise AssignmentSubscriptionError, I18n.t('Live events subscriptions service is not configured')
+        raise PlagiarismSubscriptionError, I18n.t('Live events subscriptions service is not configured')
       end
     end
 
-    def assignment_subscription(context_id)
+    def plagiarism_subscription(tool_proxy, product_family)
       enabled = Account.site_admin.feature_enabled?(:system_and_user_generated_event_types)
       sub = {
         EventTypes: EVENT_TYPES,
-        ContextType: 'assignment',
-        ContextId: context_id.to_s,
+        ContextType: 'root_account',
+        ContextId: tool_proxy.context.root_account.uuid,
         Format: format,
         TransportType: transport_type,
-        TransportMetadata: transport_metadata
+        TransportMetadata: transport_metadata,
+        AssociatedIntegrationId: "#{product_family.vendor_code}-#{product_family.product_code}"
       }.with_indifferent_access
       sub[:SystemEventTypes] = EVENT_TYPES if enabled
       sub[:UserEventTypes] = EVENT_TYPES if enabled
@@ -65,7 +63,7 @@ module Lti
     end
 
     def destroy_subscription(subscription_id)
-      Rails.logger.info { "in: AssignmentSubscriptionsHelper::destroy_subscription, subscription_id: #{subscription_id}" }
+      Rails.logger.info { "in: PlagiarismSubscriptionsHelper::destroy_subscription, subscription_id: #{subscription_id}" }
       if Services::LiveEventsSubscriptionService.available?
         Services::LiveEventsSubscriptionService.destroy_tool_proxy_subscription(tool_proxy, subscription_id)
       end

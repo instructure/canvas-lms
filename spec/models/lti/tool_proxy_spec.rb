@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper.rb')
+require 'spec_helper'
+require 'lti2_spec_helper'
 require_dependency "lti/tool_proxy"
 
 module Lti
@@ -356,6 +356,7 @@ module Lti
       let(:placement) { ResourcePlacement::SIMILARITY_DETECTION_LTI2 }
 
       it 'returns true when tool proxy root contains the enabled capability' do
+        allow_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return('subscription_id')
         message_handler.update!(capabilities: [])
         tool_proxy.raw_data['enabled_capability'] = [placement]
         tool_proxy.save!
@@ -582,6 +583,79 @@ module Lti
         ]
         tool_proxy.raw_data = {'tool_profile' => { 'security_profile' => security_profiles }}
         expect(subject.security_profiles.as_json).to eq security_profiles
+      end
+    end
+
+    describe '#create_subscription' do
+      let(:placement) { ResourcePlacement::SIMILARITY_DETECTION_LTI2 }
+      let(:tool_proxy) do
+        create_tool_proxy(raw_data: {
+          'tool_profile' => {
+            'service_offered' => [
+              {
+                "endpoint" => 'endpoint',
+                "action" => ["POST", "GET"],
+                "@id" => 'id',
+                "@type" => "RestService"
+              }
+            ]
+          }
+        }, context: account_model)
+      end
+
+      it 'should create subscriptions for Plagiarism ToolProxies' do
+        expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return('subscription_id')
+        tool_proxy.raw_data['enabled_capability'] = [placement]
+        tool_proxy.save!
+        expect(tool_proxy.subscription_id).to eq 'subscription_id'
+      end
+
+      it 'should not create subscriptions if one already exists' do
+        expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:create_subscription)
+        tool_proxy.raw_data['enabled_capability'] = [placement]
+        tool_proxy.subscription_id = 'subscription_id1'
+        tool_proxy.save!
+        expect(tool_proxy.subscription_id).to eq 'subscription_id1'
+      end
+
+      it 'should not create subscriptions for non-plagiarism tools' do
+        expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:create_subscription)
+        tool_proxy.raw_data['enabled_capability'] = []
+        tool_proxy.save!
+        expect(tool_proxy.subscription_id).to be nil
+      end
+
+      it 'should delete subscriptions for tools that are soft-deleted' do
+        tool_proxy.subscription_id = 'subscription_id1'
+        tool_proxy.save!
+        expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:destroy_subscription)
+        tool_proxy.workflow_state = 'deleted'
+        tool_proxy.save!
+        expect(tool_proxy.subscription_id).to be nil
+      end
+    end
+
+    describe '#delete_subscription' do
+      let(:tool_proxy) do
+        create_tool_proxy(raw_data: {
+          'tool_profile' => {
+            'service_offered' => [
+              {
+                "endpoint" => 'endpoint',
+                "action" => ["POST", "GET"],
+                "@id" => 'id',
+                "@type" => "RestService"
+              }
+            ]
+          }
+        }, context: account_model)
+      end
+
+      it 'should delete subscriptions' do
+        expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:destroy_subscription)
+        tool_proxy.subscription_id = 'subscription_id1'
+        tool_proxy.save!
+        tool_proxy.destroy
       end
     end
   end

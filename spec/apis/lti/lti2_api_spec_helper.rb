@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper')
+require 'lti2_spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../apis/api_spec_helper')
 
 RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
