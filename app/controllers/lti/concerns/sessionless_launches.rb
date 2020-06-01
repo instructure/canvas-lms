@@ -43,9 +43,25 @@ module Lti::Concerns
 
     # Generates a URL a client may use to launch a tool without
     # an initial session in Canvas.
+    #
+    # Currently we support three launch types: Assignment, Module Item,
+    # and a General Course/Account launch.
+    #
+    # For an explanation of each type please review the documentation
+    # for the generate_sessionless_launch endpoint.
     def sessionless_launch_url(options, context, tool, session_token)
       return assignment_launch_url(options[:assignment], session_token) if options[:assignment].present?
+      return module_item_url(options[:module_item], session_token) if options[:module_item].present?
       course_or_account_launch_url(context, tool, session_token)
+    end
+
+    def module_item_url(module_item, session_token)
+      course_context_modules_item_redirect_url(
+        course_id: module_item.context.id,
+        id: module_item.id,
+        display: :borderless,
+        session_token: session_token
+      )
     end
 
     def assignment_launch_url(assignment, session_token)
