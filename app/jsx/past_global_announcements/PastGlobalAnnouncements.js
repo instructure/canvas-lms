@@ -22,7 +22,7 @@ import AnnouncementFactory from './AnnouncementFactory'
 import I18n from 'i18n!past_global_announcements'
 
 const PastGlobalAnnouncements = () => {
-  const activeAnnouncements = AnnouncementFactory(ENV.global_notifications.active, 'Active')
+  const activeAnnouncements = AnnouncementFactory(ENV.global_notifications.current, 'Current')
   const pastAnnouncements = AnnouncementFactory(ENV.global_notifications.past, 'Past')
   return (
     <>

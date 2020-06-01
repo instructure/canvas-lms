@@ -18,43 +18,70 @@
 
 import PastGlobalAnnouncements from '../PastGlobalAnnouncements'
 import {render} from '@testing-library/react'
+import {fireEvent} from '@testing-library/dom'
 import React from 'react'
 
 describe('render announcements', () => {
   beforeAll(() => {
     window.ENV.global_notifications = {
-      active: '<div><p>This is an active announcement</p></div>',
-      past: '<div><p>This is a past announcement</p></div>'
+      current: ['<div><p>This is an active announcement</p></div>'],
+      past: ['<div><p>This is a past announcement</p></div>']
     }
   })
 
   it('checks that the document contains active announcements', () => {
-    const {getByText} = render(<PastGlobalAnnouncements/>)
+    const {getByText} = render(<PastGlobalAnnouncements />)
     expect(getByText('This is an active announcement')).toBeVisible()
   })
 
   it('checks that the document contains past announcements', () => {
-    const {getByText} = render(<PastGlobalAnnouncements/>)
+    const {getByText} = render(<PastGlobalAnnouncements />)
     expect(getByText('This is a past announcement')).toBeVisible()
   })
 })
 
 describe('render image if there are no announcements', () => {
-  it('checks that the document contains an image in the active announcement section', async () => {
+  beforeAll(() => {
     window.ENV.global_notifications = {
-      active: ' ',
-      past: ' '
+      current: [],
+      past: []
     }
-    const {findByTestId} = render(<PastGlobalAnnouncements />)
-    expect(await findByTestId('NoGlobalAnnouncementImageActive')).toBeVisible()
   })
 
-  it('checks that the document contains an image in the past announcement section', async () => {
-    window.ENV.global_notifications = {
-      active: ' ',
-      past: ' '
-    }
+  it('checks that a dessert svg is rendered in the current section', async () => {
+    const {findByTestId} = render(<PastGlobalAnnouncements />)
+    expect(await findByTestId('NoGlobalAnnouncementImageCurrent')).toBeVisible()
+  })
+
+  it('checks that a dessert svg is rendered in the past section', async () => {
     const {findByTestId} = render(<PastGlobalAnnouncements />)
     expect(await findByTestId('NoGlobalAnnouncementImagePast')).toBeVisible()
+  })
+})
+
+describe('pagination', () => {
+  it('checks paging for current section is working', async () => {
+    window.ENV.global_notifications = {
+      current: [
+        '<div><p>This is current page one</p></div>',
+        '<div><p>This is current page two</p></div>'
+      ],
+      past: []
+    }
+    const {findByText} = render(<PastGlobalAnnouncements />)
+    expect(await findByText('This is current page one')).toBeVisible()
+    fireEvent.click(await findByText('2'))
+    expect(await findByText('This is current page two')).toBeVisible()
+  })
+
+  it('checks paging for past section is working', async () => {
+    window.ENV.global_notifications = {
+      current: [],
+      past: ['<div><p>This is past page one</p></div>', '<div><p>This is past page two</p></div>']
+    }
+    const {findByText} = render(<PastGlobalAnnouncements />)
+    expect(await findByText('This is past page one')).toBeVisible()
+    fireEvent.click(await findByText('2'))
+    expect(await findByText('This is past page two')).toBeVisible()
   })
 })

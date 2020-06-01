@@ -19,6 +19,7 @@
 import React from 'react'
 import NoResultsDesert from './SVG/NoResultsDesert.svg'
 import {Text} from '@instructure/ui-text/lib/Text'
+import AnnouncementsPagination from './AnnouncementPagination'
 import I18n from 'i18n!past_global_announcements'
 
 const AnnouncementFactory = (announcements, section) => {
@@ -29,21 +30,24 @@ const AnnouncementFactory = (announcements, section) => {
     alignItems: 'center'
   }
 
-  if (announcements === ' ') {
-    return (
-      <div style={styles}>
-        <img
-          data-testid={`NoGlobalAnnouncementImage${section}`}
-          alt=""
-          src={NoResultsDesert}
-          style={{width: '400px'}}
-        />
-        <Text size="large">{I18n.t('No announcements to display')}</Text>
-      </div>
-    )
+  switch (announcements.length) {
+    case 0:
+      return (
+        <div style={styles}>
+          <img
+            data-testid={`NoGlobalAnnouncementImage${section}`}
+            alt=""
+            src={NoResultsDesert}
+            style={{width: '400px'}}
+          />
+          <Text size="large">{I18n.t('No announcements to display')}</Text>
+        </div>
+      )
+    case 1:
+      return <div dangerouslySetInnerHTML={{__html: announcements[0]}} />
+    default:
+      return <AnnouncementsPagination announcements={announcements} section={section} />
   }
-
-  return <div dangerouslySetInnerHTML={{__html: announcements}} />
 }
 
 export default AnnouncementFactory

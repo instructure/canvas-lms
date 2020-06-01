@@ -66,6 +66,16 @@ class AccountNotification < ActiveRecord::Base
     end
   end
 
+  def current?
+    end_at >= Time.zone.now
+  end
+  alias current :current?
+
+  def past?
+    end_at < Time.zone.now
+  end
+  alias past :past?
+
   def self.for_user_and_account(user, root_account, include_past: false)
     Shackles.activate(:slave) do
       if root_account.site_admin?

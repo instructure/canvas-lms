@@ -71,6 +71,42 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@unenrolled, Account.site_admin).map(&:id).sort).to eq [@a5.id, @a6.id]
   end
 
+  describe 'current announcements' do
+    it 'should return true if time matches end_at' do
+      Timecop.freeze do
+        @announcement.update(start_at: Time.zone.now - 1.minute)
+        @announcement.update(end_at: Time.zone.now)
+        expect(@announcement.current).to eq true
+      end
+    end
+
+    it 'should return true if announcement is current' do
+      @announcement.update(start_at: Time.zone.now - 1.minute)
+      @announcement.update(end_at: Time.zone.now + 1.minute)
+      expect(@announcement.current).to eq true
+    end
+
+    it 'should return false if announcement is past' do
+      @announcement.update(start_at: Time.zone.now - 2.minutes)
+      @announcement.update(end_at: Time.zone.now - 1.minute)
+      expect(@announcement.current).to eq false
+    end
+  end
+
+  describe 'past announcements' do
+    it 'should return true if announcement is past' do
+      @announcement.update(start_at: Time.zone.now - 2.minutes)
+      @announcement.update(end_at: Time.zone.now - 1.minute)
+      expect(@announcement.past).to eq true
+    end
+
+    it 'should return false if announcement is current' do
+      @announcement.update(start_at: Time.zone.now - 1.minute)
+      @announcement.update(end_at: Time.zone.now + 1.minute)
+      expect(@announcement.past).to eq false
+    end
+  end
+
   it 'should sort' do
     @announcement.destroy
     role_ids = ["TeacherEnrollment", "AccountAdmin"].map{|name| Role.get_built_in_role(name).id}
