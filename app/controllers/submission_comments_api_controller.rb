@@ -88,7 +88,7 @@ class SubmissionCommentsApiController < ApplicationController
         end
 
         submissions_by_user_id = if submission.group_id
-                                   Submission.where(user_id: submission.group.users.select(:id)).index_by(&:user_id)
+                                   assignment.submissions.where(user_id: submission.group.users.select(:id)).index_by(&:user_id)
                                  else
                                    # if the user is the author there are no more people to notify.
                                    return render json: {}, status: 200 if author == user

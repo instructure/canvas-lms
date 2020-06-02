@@ -128,6 +128,11 @@ describe 'Submissions Comment API', type: :request do
     end
 
     it 'works for group submission annotation' do
+      # there was a bug where submissions were not scoped to the correct
+      # assignment and not sure of a great way to test that it getting the
+      # correct submission for a user, but if the user has two assignments it
+      # would make this a flaky spec, where this will always pass with the fix.
+      auto_post_assignment
       group_assignment_with_submission.post_submissions
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*student_args).twice
       annotation_notification_call(author_id: @teacher.to_param, assignment_id: group_assignment_with_submission.to_param)
