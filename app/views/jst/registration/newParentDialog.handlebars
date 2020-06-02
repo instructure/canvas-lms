@@ -31,6 +31,13 @@
       </label>
     </div>
     {{/if}}
+    {{#if recaptcha}}
+    <div class="control-group">
+      <div class="controls">
+        <div class="g-recaptcha"></div>
+      </div>
+    </div>
+    {{/if}}
     <div class="ic-Form-control">
       <input type="hidden" name="user[initial_enrollment_type]" value="observer" />
       <input type="hidden" name="user[skip_registration]" value="1" />

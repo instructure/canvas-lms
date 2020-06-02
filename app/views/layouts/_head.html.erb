@@ -77,4 +77,8 @@
   <% if fullstory_enabled_for_session?(session) %>
     <%= render :partial => "shared/fullstory_snippet" %>
   <% end %>
+
+  <% if @include_recaptcha %>
+  <script src="https://www.google.com/recaptcha/api.js?render=explicit&hl=<%= I18n.locale %>" async defer></script>
+  <% end %>
 </head>

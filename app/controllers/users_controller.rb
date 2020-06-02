@@ -363,6 +363,7 @@ class UsersController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
     @root_account = @context.root_account
     @query = (params[:user] && params[:user][:name]) || params[:term]
+    @include_recaptcha = recaptcha_enabled?
     js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings'])
     Shackles.activate(:slave) do
       if @context && @context.is_a?(Account) && @query
@@ -1339,6 +1340,7 @@ class UsersController < ApplicationController
   def new
     return redirect_to(root_url) if @current_user
     run_login_hooks
+    @include_recaptcha = recaptcha_enabled?
     js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
            :PASSWORD_POLICY => @domain_root_account.password_policy
     render :layout => 'bare'
@@ -1351,10 +1353,10 @@ class UsersController < ApplicationController
   # @API Create a user
   # Create and return a new user and pseudonym for an account.
   #
-  # If you don't have the "Modify login details for users" permission, but
-  # self-registration is enabled on the account, you can still use this
-  # endpoint to register new users. Certain fields will be required, and
-  # others will be ignored (see below).
+  # [DEPRECATED (for self-registration only)] If you don't have the "Modify
+  # login details for users" permission, but self-registration is enabled
+  # on the account, you can still use this endpoint to register new users.
+  # Certain fields will be required, and others will be ignored (see below).
   #
   # @argument user[name] [String]
   #   The full name of the user. This name will be used by teacher for grading.
@@ -1486,7 +1488,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  # @API Self register a user
+  # @API [DEPRECATED] Self register a user
   # Self register and return a new user and pseudonym for an account.
   #
   # If self-registration is enabled on the account, you can use this
@@ -2818,11 +2820,13 @@ class UsersController < ApplicationController
                                'pre_registered'
                              end
     end
+    @recaptcha_errors = nil
     if force_validations || !manage_user_logins
       @user.require_acceptance_of_terms = @domain_root_account.terms_required?
       @user.require_presence_of_name = true
       @user.require_self_enrollment_code = self_enrollment
       @user.validation_root_account = @domain_root_account
+      @recaptcha_errors = validate_recaptcha(params['g-recaptcha-response'])
     end
 
     @invalid_observee_creds = nil
@@ -2876,7 +2880,7 @@ class UsersController < ApplicationController
       @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
     end
 
-    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil? & @invalid_observee_code.nil?
+    if @recaptcha_errors.nil? && @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil? & @invalid_observee_code.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
       # save_without_session_maintenance directly. we don't want to auto-log-in
       # unless the user is registered/pre_registered (if the latter, he still
@@ -2933,10 +2937,37 @@ class UsersController < ApplicationController
               :user => @user.errors.as_json[:errors],
               :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
               :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {},
-              :pairing_code => @invalid_observee_code ? @invalid_observee_code.errors.as_json[:errors] : {}
+              :pairing_code => @invalid_observee_code ? @invalid_observee_code.errors.as_json[:errors] : {},
+              :recaptcha => @recaptcha_valid ? nil : @recaptcha_errors
           }
       }
       render :json => errors, :status => :bad_request
     end
+  end
+
+  def validate_recaptcha(recaptcha_response)
+    # if there is no recaptcha key or recaptcha is disabled, don't do anything
+    return nil unless recaptcha_enabled?
+    # Authenticated API requests do not require a captcha
+    return nil unless @access_token.nil?
+
+    response = CanvasHttp.post('https://www.google.com/recaptcha/api/siteverify', form_data: {
+      secret: Canvas::DynamicSettings.find(tree: :private)['recaptcha_server_key'],
+      response: recaptcha_response
+    })
+
+    if response && response.code == '200'
+      parsed = JSON.parse(response.body)
+      return { errors: parsed['error-codes'] } unless parsed['success']
+      return { errors: ['invalid-hostname'] } unless parsed['hostname'] == request.host
+
+      return nil
+    else
+      raise "Error connecting to recaptcha #{response}"
+    end
+  end
+
+  def recaptcha_enabled?
+    Canvas::DynamicSettings.find(tree: :private)['recaptcha_server_key'].present? && @domain_root_account.self_registration_captcha?
   end
 end

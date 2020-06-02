@@ -380,6 +380,10 @@ class Account < ActiveRecord::Base
     canvas_authentication_provider.try(:self_registration)
   end
 
+  def self_registration_captcha?
+    canvas_authentication_provider.try(:enable_captcha)
+  end
+
   def self_registration_allowed_for?(type)
     return false unless self_registration?
     return false if self_registration_type != 'all' && type != self_registration_type

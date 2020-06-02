@@ -26,7 +26,11 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
   end
 
   def self.recognized_params
-    [ :self_registration ].freeze
+    [ :self_registration, :enable_captcha ].freeze
+  end
+
+  def self.site_admin_params
+    [ :enable_captcha ].freeze
   end
 
   def self.login_button?
@@ -53,6 +57,19 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
 
   def self_registration
     jit_provisioning? ? auth_filter : 'none'
+  end
+
+  def enable_captcha=(val)
+    settings['enable_captcha'] = ::Canvas::Plugin.value_to_boolean(val)
+  end
+
+  def enable_captcha
+    if Account.site_admin.feature_enabled?(:default_recaptcha_registration_enable)
+      # Default to true, as nil != false
+      settings['enable_captcha'] != false
+    else
+      settings['enable_captcha'] == true
+    end
   end
 
   def user_logout_redirect(controller, _current_user)

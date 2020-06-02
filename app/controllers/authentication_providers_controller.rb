@@ -974,6 +974,7 @@ class AuthenticationProvidersController < ApplicationController
     federated_attributes = {} if federated_attributes == ""
     federated_attributes = federated_attributes.to_unsafe_h if federated_attributes.is_a?(ActionController::Parameters)
     data = data.permit(klass.recognized_params)
+    data = data.reject { |k, _| klass.site_admin_params.include?(k.to_sym) } unless @domain_root_account.grants_right?(@current_user, :manage_site_settings)
     data[:federated_attributes] = federated_attributes if federated_attributes
     data[:auth_type] = auth_type
     if data[:auth_type] == 'ldap'

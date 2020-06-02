@@ -765,6 +765,72 @@ describe UsersController do
     end
   end
 
+  describe '#validate_recaptcha' do
+    # Let's make sure we never actually hit recaptcha in specs
+    before do
+      WebMock.disable_net_connect!
+      Account.default.canvas_authentication_provider.enable_captcha = true
+      subject.instance_variable_set(:@domain_root_account, Account.default)
+
+      subject.request = ActionController::TestRequest.create(subject.class)
+      subject.request.host = 'canvas.docker'
+
+      WebMock.stub_request(:post, "https://www.google.com/recaptcha/api/siteverify").
+        with(
+          body: {"secret"=>"test-token", "response"=>"valid-submit-key"}
+        ).
+        to_return(status: 200, body: { success: true, challenge_ts: Time.zone.now.to_s, hostname: 'canvas.docker' }.to_json)
+
+      WebMock.stub_request(:post, "https://www.google.com/recaptcha/api/siteverify").
+        with(
+          body: {"secret"=>"test-token", "response"=>"invalid-submit-key"}
+        ).
+        to_return(status: 200, body: {
+          success: false,
+          challenge_ts: Time.zone.now.to_s,
+          hostname: 'canvas.docker',
+          "error-codes" => ['invalid-input-response']
+        }.to_json)
+
+      WebMock.stub_request(:post, "https://www.google.com/recaptcha/api/siteverify").
+        with(
+          body: {"secret"=>"test-token", "response"=>nil}
+        ).
+        to_return(status: 200, body: {
+          success: false,
+          challenge_ts: Time.zone.now.to_s,
+          hostname: 'canvas.docker',
+          "error-codes" => ['missing-input-response']
+        }.to_json)
+      # Fallback for any dynamicsettings call that isn't mocked below
+      allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+    end
+
+    after do
+      WebMock.enable_net_connect!
+    end
+
+    it 'should return nil if there is no token' do
+      allow(Canvas::DynamicSettings).to receive(:find).with(tree: :private).and_return({ 'recaptcha_server_key' => nil })
+      expect(subject.send(:validate_recaptcha, nil)).to be_nil
+    end
+
+    it 'should return nil for valid recaptcha submissions' do
+      allow(Canvas::DynamicSettings).to receive(:find).with(tree: :private).and_return({ 'recaptcha_server_key' => 'test-token' })
+      expect(subject.send(:validate_recaptcha, 'valid-submit-key')).to be_nil
+    end
+
+    it 'should return an error for missing recaptcha submissions' do
+      allow(Canvas::DynamicSettings).to receive(:find).with(tree: :private).and_return({ 'recaptcha_server_key' => 'test-token' })
+      expect(subject.send(:validate_recaptcha, nil)).not_to be_nil
+    end
+
+    it 'should return an error for invalid recaptcha submissions' do
+      allow(Canvas::DynamicSettings).to receive(:find).with(tree: :private).and_return({ 'recaptcha_server_key' => 'test-token' })
+      expect(subject.send(:validate_recaptcha, 'invalid-submit-key')).not_to be_nil
+    end
+  end
+
   describe "GET 'grades_for_student'" do
     let_once(:all_grading_periods_id) { 0 }
     let_once(:course) { course_factory(active_all: true) }
