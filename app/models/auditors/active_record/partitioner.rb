@@ -24,16 +24,14 @@ module Auditors::ActiveRecord
     def self.process
       Shackles.activate(:deploy) do
         AUDITOR_CLASSES.each do |auditor_cls|
-          auditor_cls.transaction do
-            log '*' * 80
-            log '-' * 80
-            partman = CanvasPartman::PartitionManager.create(auditor_cls)
-            partman.ensure_partitions
-            Shard.current.database_server.unshackle do
-              partman.prune_partitions(retention_months)
-            end
-            log '*' * 80
+          log '*' * 80
+          log '-' * 80
+          partman = CanvasPartman::PartitionManager.create(auditor_cls)
+          partman.ensure_partitions
+          Shard.current.database_server.unshackle do
+            partman.prune_partitions(retention_months)
           end
+          log '*' * 80
         end
         ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
       end
