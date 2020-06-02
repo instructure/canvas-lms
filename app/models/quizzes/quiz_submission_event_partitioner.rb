@@ -24,19 +24,17 @@ class Quizzes::QuizSubmissionEventPartitioner
 
   def self.process(in_migration=false)
     Shackles.activate(:deploy) do
-      Quizzes::QuizSubmissionEvent.transaction do
-        log '*' * 80
-        log '-' * 80
+      log '*' * 80
+      log '-' * 80
 
-        partman = CanvasPartman::PartitionManager.create(Quizzes::QuizSubmissionEvent)
+      partman = CanvasPartman::PartitionManager.create(Quizzes::QuizSubmissionEvent)
 
-        partman.ensure_partitions(precreate_tables)
+      partman.ensure_partitions(precreate_tables)
 
-        Shard.current.database_server.unshackle {partman.prune_partitions(Setting.get("quiz_events_partitions_keep_months", 6).to_i)}
+      Shard.current.database_server.unshackle {partman.prune_partitions(Setting.get("quiz_events_partitions_keep_months", 6).to_i)}
 
-        log 'Done. Bye!'
-        log '*' * 80
-      end
+      log 'Done. Bye!'
+      log '*' * 80
       ActiveRecord::Base.connection_pool.current_pool.disconnect! unless in_migration || Rails.env.test?
     end
   end

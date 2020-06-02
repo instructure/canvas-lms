@@ -1218,6 +1218,7 @@ nb-x-k12:
         locked: "Lås denne innstillingen for underkonti og fag"
         login_handle_name: "Logg inn etikett"
         mfa_settings: "Flerfaktors autentisering"
+        mobile_qr_login_is_enabled: "Tillater pålogging med mobilapper ved bruk av QR-koder"
         name: Kontonavn
         no_enrollments_can_create_courses: "Brukere uten fagpåmeldinger"
         open_registration: "Åpen registrering"
@@ -2499,7 +2500,8 @@ nb-x-k12:
   application_id_2aa1640f: Applikasjons-ID
   application_secret_e6803c7e: Applikasjonskode
   applied_cc7be774: Påført
-  apply_781a2546: Bruk
+  apply_781a2546: Søk
+  apply_date_range_selection_cc4351ed: "Bruk valg av datointervall"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Bruk filtre. Merk: Ved å klikke på denne tasten vil siden bli lastet opp på nytt."
   apply_theme_7af08387: "Bruk tema"
   applying_new_styles_to_subaccounts_e8aeeef2: "Legg til nye stiler til underkontoer"
@@ -4471,6 +4473,7 @@ nb-x-k12:
   choose_usage_rights_33683854: "Velg bruksrettigheter..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' er ikke en gyldig farge."
   classic_quizzes_dee3c7b7: "Klassisk Quizzes"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Klassiske testalternativer for tidsbestemte tester uten innlevering"
   clear_2084585f: Tøm
   clear_selected_file_82388e50: "Fjern valgt fil"
   clear_user_cache_ef079f7f: "Tøm bruker-Cache"
@@ -7179,6 +7182,7 @@ nb-x-k12:
   disable_a5c05db3: "Slå av"
   disable_all_read_only_scopes_f9ffdd28: "Deaktiver alle med omfang kun lesetilgang."
   disable_and_lock_7d0ef0e8: "Slå av og lås"
+  disable_automatic_submission_8e1d8676: "Deaktiver automatisk innlevering"
   disable_celebrations_description: "Når du aktiverer denne funksjonen, vil du skjule alle fest animasjonene."
   disable_content_security_policy_8660a787: "Deaktiver innholdssikkerhetspolikk"
   disable_extra_filter_options_1d1cdc02: "deaktiver valg for ekstra filter"
@@ -7887,6 +7891,7 @@ nb-x-k12:
   enable_moderated_grading_bacd20d8: "Aktiver moderert karaktersetting."
   enable_new_sis_integration_settings_ab6780a4: "Aktiver nye SIS-innstillinger for integrering"
   enable_notifications_10a4bf44: "Aktiver varsler"
+  enable_recording_for_this_conference_b8adff6: "Aktiver innspilling for denne konferansen"
   enable_reregistration_for_lti_2_b2a10444: "Aktivere registrering for LTI 2"
   enable_scope_ac28b832: "Aktiver omfang"
   enable_student_context_card_links_eba2f2c5: "Aktiver elevkontekstkort-linker"
@@ -9880,6 +9885,7 @@ nb-x-k12:
   hide_students_with_no_results_6a22f991: "Gjem elever med ingen resultater"
   hide_sub_accounts_for_account_name_a6de98bd: "Skjul underkontoer for %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Skjul Importer læringsmål-knappen basert på brukertillatelser"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Skjuler enkelte elever og seksjoner i LMGB hvis læreren kun har tilgang til en bestemt seksjon"
   hiding_grades_82691e44: "Skjule vurderinger"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Skjule vurderinger er ikke lov, fordi vurderinger er ikke frigitt for denne oppgaven."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Gjemming av vurderinger vil laste nettleseren igjen. Dette kan ta et øyeblikk."
@@ -10038,6 +10044,9 @@ nb-x-k12:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Hvis en attributt kun er merket som kun klargjøring, da vil den kun brukes når klargjøring i siste liten lager en ny bruker, og vil ikke holdes oppdatert hver gang brukeren logger på."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      Hvis et LTI-verktøy konfigurert med plasseringen er installert, vises en ny oppføring i
+      rullegardinmenyen for oppgaveinnleveringstype for raskt å konfigurere oppgaven for verktøyet
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Hvis både 'Vurderinger - rediger' og 'Vurderinger - vis alle vurderinger' er deaktiverte vil vurderingsoversikten være skjult fra fagnavigering."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Hvis både «Vurderinger - rediger» og «Vurderinger - vis alle vurderinger» er deaktiverte vil vurderingsoversikten være skjult fra fagnavigering."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Hvis både 'Vurderinger- rediger' og 'Vurderinger - vis alle vurderinger' er deaktiverte vil Vurderingsoversikten være skjult fra Fagnavigering."
@@ -10838,6 +10847,7 @@ nb-x-k12:
     other: 
       one: "1 annen"
       other: "%{count} andre"
+  list_collapsed_381ef1b6: "Liste sammenfoldet. "
   list_collapsed_5f19f5bb: "Liste sammenfoldet"
   list_collapsed_9ac35920: "Liste sammenfoldet."
   list_collapsed_dde87718: "Liste sammenfoldet."
@@ -14943,6 +14953,7 @@ nb-x-k12:
     labels: 
       requirements_must_be_completed: "Følgende krav må fullføres før denne siden blir låst opp"
   presentation_2d9387ca: Presentasjon
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Presenterer testinnstillingene for å unngå automatisk innlevering av en tidsbestemt test når den tilgjengelige tiden har utløpt."
   press_space_to_start_over_d4b8a2da: "Trykk på “mellomromstasten” for å begynne på nytt"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Trykk på komma-tasten eller shift + spørsmåltegn for å se listen over tastatursnarveier"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Trykk på komma-tasten eller shift + ? for å se listen over tastatursnarveier"
@@ -16959,6 +16970,7 @@ nb-x-k12:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Begrense elevene fra å få tilgang til fagene før oppstartsdato"
   restrict_students_from_annotating_6c28ab9b: "Hindrer elevene fra å kommentere"
   restricted_access_d3e99a39: "Begrenset tilgang"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Begrenset visning for lærere i LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Lever på nytt til det tilknyttede verktøyet for plagiatanalyse."
   resubmit_to_tool_name_1cf02a31: "Lever på nytt til %{tool_name}"
   resubmitted_2080646f: Rettede
@@ -17242,6 +17254,7 @@ nb-x-k12:
   saving_recording_e111cb05: "Lagrer opptak ..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Mislyktes i å lagre CSP-status, prøv igjen."
   schedule_student_availability_332154a: "Planlegg elevtilgjengelighet"
+  scheduled_date_5b0aedb6: "Planlagt dato"
   scheduler_65b5ac91: Planlegger
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Planlegger må være aktivert av Canvas-administratoren din."
   scheduler_must_be_enabled_for_your_account_e6e53972: "Planlegger må være aktivert for kontoen din."
@@ -17544,6 +17557,7 @@ nb-x-k12:
   select_an_edit_operation_ec1467d: "Velg en redigeringsoperasjon"
   select_assignment_title_4571ffcb: "Velg oppgave: %{title}"
   select_audio_file_7d905cce: "Velg Lydfil"
+  select_by_date_range_c3af0101: "Velg etter datointervall"
   select_calendars_d5fa50b6: "Velg kalendere"
   select_conference_provider_58c7f7fe: "Velg konferanseleverandør"
   select_content: "Velg innhold"
@@ -17617,7 +17631,9 @@ nb-x-k12:
   selected_filename_7552a8c0: "valgt %{filename}"
   selected_grade_942f40ba: "Velg vurdering"
   selected_subtree_a7693937: "Valgt %{subtree}"
+  selection_end_date_10fcc8c6: "Velg sluttdato"
   selection_height_9d57ec24: Høydeutvalg
+  selection_start_date_2e4a4dca: "Velg startdato"
   selection_width_183acd79: Breddeutvalg
   self_enrollments: 
     already_enrolled: 
@@ -18905,6 +18921,8 @@ nb-x-k12:
   submission_sent_3f0d2ee1: "Innlevering sendt"
   submission_tray_429ac3df: Innleveringsskuff
   submission_type_a925fc5f: Innleveringstype
+  submission_type_lti_placement_b448d5d0: "Innleveringstype LTI-plassering"
+  submission_type_selection_72ce19f: "Valg av innleveringstype"
   submission_updated_8897f3b7: "Innlevering oppdatert"
   submission_user_name_assignment_title_2cf5e3e9: "Innlevering: %{user_name}, %{assignment_title}"
   submissions: 
@@ -19149,6 +19167,7 @@ nb-x-k12:
     observees: Observere
     outcomes: Mål
     pages: Sider
+    past_global_announcements: "Globale beskjeder"
     people: Deltakere
     qr_mobile_login: "QR eller mobil-innlogging"
     quizzes: Tester
@@ -19306,6 +19325,7 @@ nb-x-k12:
                 kan ta en stund for store fag. Du kan forlate
                 siden, så får du en melding når nedlastingen er
                 fullført.
+  the_end_date_must_be_after_the_start_date_2a273107: "Sluttdatoen må være etter startdatoen"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Motoren som prosesserer SIS-importer er refraktert for å kunne håndtere stabiliteten bedre ved store SIS-importer. Funksjonaliteten ved SIS-importene er ikke endret."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Avvik stakksporing, hvis det finnes noen"
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Funksjonslenken ble flyttet til toppen av listen."
@@ -20316,6 +20336,7 @@ nb-x-k12:
   type_of_change_1cb24a0e: "Type endring"
   type_of_item_8a37f69d: "Type element"
   type_to_search_de63ad38: "Skriv inn for å lete"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Skriv for å søke, bruk piltastene for å navigere i alternativer."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "UH oh! Kontakt din vennlig Catalog Developer . Feilmelding: %{message}"
   ukrainian_945b00b7: Ukrainsk
   unable_to_accept_update_fd53a7e2: "Kan ikke akseptere oppdatering"

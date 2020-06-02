@@ -19,6 +19,8 @@ require 'set'
 
 module DataFixup::Auditors
   module Migrate
+    class MissingRecordError < StandardError; end
+
     DEFAULT_BATCH_SIZE = 100
     DEFAULT_REPAIR_BATCH_SIZE = 1000
 
@@ -78,19 +80,30 @@ module DataFixup::Auditors
         end
       end
 
-      def fetch_attributes_resiliantly(stream_type, ids)
+      def fetch_attributes_resiliantly(stream_type, ids, max_retries: 5)
         retries = 0
-        max_retries = 10
+        missing_ids = []
         begin
           recs = stream_type.fetch(ids, strategy: :serial)
           if recs.size != ids.size
             found_ids = recs.map(&:id)
             missing_ids = ids - found_ids
-            raise RuntimeError, "NOT FOUND: #{missing_ids.join(',')}"
+            raise MissingRecordError, "NOT FOUND: #{missing_ids.join(',')}"
           end
           return recs
-        rescue CassandraCQL::Thrift::TimedOutException, RuntimeError
+        rescue CassandraCQL::Thrift::TimedOutException
           raise if retries >= max_retries
+          sleep 1.4 ** retries
+          retries += 1
+          retry
+        rescue MissingRecordError
+          if retries >= max_retries
+            message = "UNABLE TO LOAD RECORD OF TYPE #{stream_type} INTO (#{missing_ids.join(',')})"
+            Rails.logger.info(message)
+            InstStatsd::Statsd.increment("auditors.migration_missing_rec")
+            ErrorReport.log_error("auditors_migration", message: message)
+            return recs
+          end
           sleep 1.4 ** retries
           retries += 1
           retry

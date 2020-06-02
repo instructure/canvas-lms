@@ -228,6 +228,17 @@ module DataFixup::Auditors::Migrate
       expect(output).to eq(['test'])
     end
 
+    it "tries to re-load missing records but will continue" do
+      user_with_pseudonym(active_all: true)
+      ::Auditors::Authentication.record(@pseudonym, 'login')
+      pseud_ids_collection = ::Auditors::Authentication::Stream.ids_for_pseudonym(@pseudonym)
+      pseud_ids = pseud_ids_collection.paginate({per_page: 10})
+      ids = pseud_ids.map{|r| r['id']} + ['asdf-12345']
+      worker = AuthenticationWorker.new(Account.default.id, Time.zone.today)
+      output = worker.fetch_attributes_resiliantly(::Auditors::Authentication::Stream, ids, max_retries: 1)
+      expect(output.size).to eq(1)
+    end
+
     describe "worker cell state" do
       describe "currently_queueable?" do
         it 'is true for any non-queued state' do
