@@ -52,9 +52,9 @@ describe "course syllabus" do
     end
 
     it "should confirm existing assignments and dates are correct", priority:"1", test_id: 237016 do
-      assignment_details = ff('td.name')
-      expect(assignment_details[0].text.strip).to eq @assignment_1.title
-      expect(assignment_details[1].text.strip).to eq @assignment_2.title
+      assignment_details = ff('.name')
+      expect(assignment_details[0].text.strip).to eq "Assignment\n" + @assignment_1.title
+      expect(assignment_details[1].text.strip).to eq "Assignment\n" + @assignment_2.title
     end
 
     it "should edit the description", priority:"1", test_id: 237017 do
