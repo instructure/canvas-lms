@@ -697,7 +697,10 @@ class ContextModule < ActiveRecord::Base
     items.each do |item|
       next unless item.is_a?(ActiveRecord::Base)
       next unless %w(Attachment Assignment WikiPage Quizzes::Quiz DiscussionTopic ContextExternalTool).include?(item.class_name)
-      new_tags << self.content_tags.create!(context: self.context, title: Context.asset_name(item), content: item, tag_type: 'context_module', indent: 0, position: next_pos)
+      state = item.respond_to?(:published?) && !item.published? ? 'unpublished' : 'active'
+      new_tags << self.content_tags.create!(context: self.context, title: Context.asset_name(item), content: item,
+                                            tag_type: 'context_module', indent: 0,
+                                            position: next_pos, workflow_state: state)
       next_pos += 1
     end
 
