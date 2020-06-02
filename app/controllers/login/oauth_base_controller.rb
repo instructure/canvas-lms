@@ -76,6 +76,12 @@ class Login::OauthBaseController < ApplicationController
     unique_ids.any? do |unique_id|
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
     end
+
+    identity_server_user = User.find_for_identity_auth(unique_ids.first)
+    if identity_server_user && identity_server_user.pseudonyms.any?
+      pseudonym = identity_server_user.pseudonyms.active.first
+    end
+
     if pseudonym
       @aac.apply_federated_attributes(pseudonym, provider_attributes)
     elsif !unique_ids.empty? && @aac.jit_provisioning?
