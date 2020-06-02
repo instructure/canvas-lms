@@ -18,9 +18,12 @@
 require_relative '../spec_helper'
 
 describe CustomGradebookColumnDatum do
+  before(:once) do
+    course_with_teacher(active_all: true)
+  end
+
   describe "process_bulk_update_custom_columns" do
-    before :once do
-      course_with_teacher(active_all: true)
+    before(:once) do
       @first_student = student_in_course(active_all: true, course: @course).user
       @second_student = student_in_course(active_all: true, course: @course).user
       @first_col = @course.custom_gradebook_columns.create!(title: "cc1", position: 1)
@@ -50,6 +53,17 @@ describe CustomGradebookColumnDatum do
       ])
     end
 
+    let(:first_student_data) do
+      @course.custom_gradebook_columns.
+        find_by!(id: @first_col.id).
+        custom_gradebook_column_data.
+        find_by(user_id: @first_student.id)
+    end
+
+    it "sets the root account id on the column datum" do
+      expect(first_student_data.root_account_id).to eq @course.root_account.id
+    end
+
     it "adds a datum for a matching student and column" do
       data = @course.custom_gradebook_columns.
         find_by!(id: @first_col.id).
@@ -59,12 +73,7 @@ describe CustomGradebookColumnDatum do
     end
 
     it "checks content exists for the first student in the first column" do
-      data = @course.custom_gradebook_columns.
-        find_by!(id: @first_col.id).
-        custom_gradebook_column_data.
-        find_by!(user_id: @first_student.id).
-        content
-      expect(data).to eql "first column, first student"
+      expect(first_student_data.content).to eql "first column, first student"
     end
 
     it "adds data for multiple students for a column" do
@@ -146,9 +155,51 @@ describe CustomGradebookColumnDatum do
         },
       ])
 
-      data = @course.custom_gradebook_columns.find_by!(id: @first_col.id).
-        custom_gradebook_column_data.find_by(user_id: @first_student.id)
-      expect(data).to be_nil
+      expect(first_student_data).to be_nil
+    end
+  end
+
+  describe "root_account_id" do
+    before(:once) do
+      @column = @course.custom_gradebook_columns.create!(title: "cc1", position: 1)
+      @student = student_in_course(active_all: true, course: @course).user
+    end
+
+    context "on create" do
+      it "sets root_account_id to the course's root_account_id if root_account_id is nil" do
+        datum = @column.custom_gradebook_column_data.create!(content: "some content", user_id: @student.id)
+        expect(datum.root_account_id).to eq @course.root_account_id
+      end
+
+      it "does not modify root_account_id if it is already set" do
+        second_account = account_model
+        datum = @column.custom_gradebook_column_data.create!(
+          content: "some content",
+          user_id: @student.id,
+          root_account_id: second_account.id
+        )
+        expect(datum.root_account_id).to eq second_account.id
+      end
+    end
+
+    context "on update" do
+      it "sets root_account_id to the course's root_account_id if root_account_id is nil" do
+        datum = @column.custom_gradebook_column_data.create!(content: "some content", user_id: @student.id)
+        datum.update_column(:root_account_id, nil)
+        datum.update!(content: "some new content")
+        expect(datum.root_account_id).to eq @course.root_account_id
+      end
+
+      it "does not modify root_account_id if it is already set" do
+        second_account = account_model
+        datum = @column.custom_gradebook_column_data.create!(
+          content: "some content",
+          user_id: @student.id,
+          root_account_id: second_account.id
+        )
+        datum.update!(content: "some new content")
+        expect(datum.root_account_id).to eq second_account.id
+      end
     end
   end
 end
