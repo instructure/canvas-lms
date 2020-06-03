@@ -17,5 +17,15 @@
 
 module ConditionalRelease
   class ScoringRangeTemplate < ActiveRecord::Base
+    include BoundsValidations
+    include Deletion
+
+    belongs_to :rule_template, required: true
+
+    delegate :context_id, :context_type, to: :rule_template
+
+    def build_scoring_range
+      ScoringRange.new upper_bound: upper_bound, lower_bound: lower_bound
+    end
   end
 end

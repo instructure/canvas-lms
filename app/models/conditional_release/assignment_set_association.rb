@@ -17,5 +17,26 @@
 
 module ConditionalRelease
   class AssignmentSetAssociation < ActiveRecord::Base
+    include Deletion
+
+    validates :assignment_id, presence: true
+    validates :assignment_id, uniqueness: { scope: :assignment_set_id, conditions: -> { active } }
+    validate :not_trigger
+
+    acts_as_list :scope => {:assignment_set => self, :deleted_at => nil}
+
+    belongs_to :assignment_set, required: true
+    belongs_to :assignment
+    has_one :scoring_range, through: :assignment_set
+    has_one :rule, through: :assignment_set
+
+    delegate :course_id, to: :rule, allow_nil: true
+
+    private
+    def not_trigger
+      if rule && assignment_id == rule.trigger_assignment_id
+        errors.add(:assignment_id, "can't match rule trigger_assignment_id")
+      end
+    end
   end
 end

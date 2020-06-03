@@ -15,18 +15,27 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# yes this isn't really any different than SoftDeletable but this preserves the db structure
+# from conditional_release and workflow_state kind of sucks anyway
 module ConditionalRelease
-  class AssignmentSet < ActiveRecord::Base
-    include Deletion
+  module Deletion
+    extend ActiveSupport::Concern
 
-    belongs_to :scoring_range, required: true
-    has_many :assignment_set_associations, -> { active.order(position: :asc) }, inverse_of: :assignment_set, dependent: :destroy
-    accepts_nested_attributes_for :assignment_set_associations, allow_destroy: true
-    acts_as_list :scope => {:scoring_range => self, :deleted_at => nil}
-    has_one :rule, through: :scoring_range
+    included do
+      scope :active, -> { where(:deleted_at => nil) }
 
-    def self.collect_associations(sets)
-      sets.map(&:assignment_set_associations).flatten.sort_by(&:id).uniq(&:assignment_id)
+      alias_method :destroy_permanently!, :destroy
+      def destroy
+        return true if deleted_at.present?
+        self.deleted_at = Time.now.utc
+        run_callbacks(:destroy) { save! }
+      end
+
+      def restore
+        self.deleted_at = nil
+        save!
+        true
+      end
     end
   end
 end

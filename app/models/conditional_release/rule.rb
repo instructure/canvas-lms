@@ -17,5 +17,29 @@
 
 module ConditionalRelease
   class Rule < ActiveRecord::Base
+    include Deletion
+
+    validates :course_id, presence: true
+    validates :trigger_assignment_id, presence: true
+    belongs_to :trigger_assignment, :class_name => "Assignment"
+
+    belongs_to :course
+    has_many :scoring_ranges, -> { active.order(position: :asc) }, inverse_of: :rule, dependent: :destroy
+    has_many :assignment_sets, -> { active }, through: :scoring_ranges
+    has_many :assignment_set_associations, -> { active.order(position: :asc) }, through: :scoring_ranges
+    accepts_nested_attributes_for :scoring_ranges, allow_destroy: true
+
+    scope :with_assignments, -> do
+      having_assignments = joins(all_includes).group(Arel.sql("conditional_release_rules.id"))
+      preload(all_includes).where(id: having_assignments.pluck(:id))
+    end
+
+    def self.all_includes
+      { scoring_ranges: { assignment_sets: :assignment_set_associations } }
+    end
+
+    def assignment_sets_for_score(score)
+      AssignmentSet.where(scoring_range: scoring_ranges.for_score(score)).preload(:assignment_set_associations)
+    end
   end
 end

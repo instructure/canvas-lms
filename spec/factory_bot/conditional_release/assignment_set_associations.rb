@@ -14,19 +14,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-module ConditionalRelease
-  class AssignmentSet < ActiveRecord::Base
-    include Deletion
-
-    belongs_to :scoring_range, required: true
-    has_many :assignment_set_associations, -> { active.order(position: :asc) }, inverse_of: :assignment_set, dependent: :destroy
-    accepts_nested_attributes_for :assignment_set_associations, allow_destroy: true
-    acts_as_list :scope => {:scoring_range => self, :deleted_at => nil}
-    has_one :rule, through: :scoring_range
-
-    def self.collect_associations(sets)
-      sets.map(&:assignment_set_associations).flatten.sort_by(&:id).uniq(&:assignment_id)
-    end
+#
+FactoryBot.define do
+  factory :assignment_set_association, class: ConditionalRelease::AssignmentSetAssociation do
+    association :assignment_set
+    assignment
+    root_account_id { Account.default.id }
   end
 end

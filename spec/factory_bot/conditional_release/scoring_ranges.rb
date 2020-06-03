@@ -14,19 +14,25 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+FactoryBot.define do
+  factory :scoring_range, aliases: [:scoring_range_with_bounds], class: ConditionalRelease::ScoringRange do
+    rule
+    lower_bound { 65 }
+    upper_bound { 95 }
+    root_account_id { Account.default.id }
 
-module ConditionalRelease
-  class AssignmentSet < ActiveRecord::Base
-    include Deletion
+    factory :scoring_range_with_assignments do
+      transient do
+        assignment_set_count { 1 }
+        assignment_count { 2 }
+      end
 
-    belongs_to :scoring_range, required: true
-    has_many :assignment_set_associations, -> { active.order(position: :asc) }, inverse_of: :assignment_set, dependent: :destroy
-    accepts_nested_attributes_for :assignment_set_associations, allow_destroy: true
-    acts_as_list :scope => {:scoring_range => self, :deleted_at => nil}
-    has_one :rule, through: :scoring_range
-
-    def self.collect_associations(sets)
-      sets.map(&:assignment_set_associations).flatten.sort_by(&:id).uniq(&:assignment_id)
+      after(:create) do |range, evaluator|
+        create_list :assignment_set_with_assignments, evaluator.assignment_set_count,
+          scoring_range: range,
+          assignment_count: evaluator.assignment_count
+      end
     end
   end
 end

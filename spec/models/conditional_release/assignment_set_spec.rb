@@ -14,19 +14,18 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require_relative '../../conditional_release_spec_helper'
+require_dependency "conditional_release/assignment_set"
 
 module ConditionalRelease
-  class AssignmentSet < ActiveRecord::Base
-    include Deletion
+  describe AssignmentSet, :type => :model do
+    it_behaves_like 'a soft-deletable model'
 
-    belongs_to :scoring_range, required: true
-    has_many :assignment_set_associations, -> { active.order(position: :asc) }, inverse_of: :assignment_set, dependent: :destroy
-    accepts_nested_attributes_for :assignment_set_associations, allow_destroy: true
-    acts_as_list :scope => {:scoring_range => self, :deleted_at => nil}
-    has_one :rule, through: :scoring_range
-
-    def self.collect_associations(sets)
-      sets.map(&:assignment_set_associations).flatten.sort_by(&:id).uniq(&:assignment_id)
+    it 'must have a scoring_range_id' do
+      assignment_set = build :assignment_set, scoring_range_id: nil
+      expect(assignment_set.valid?).to eq false
     end
   end
 end
