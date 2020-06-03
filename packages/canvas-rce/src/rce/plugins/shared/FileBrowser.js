@@ -16,20 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {func} from 'prop-types'
+import React, {useEffect, useState} from 'react'
+import {arrayOf, bool, func, objectOf, shape, string} from 'prop-types'
 import classnames from 'classnames'
 import {View} from '@instructure/ui-layout'
+import {fileShape} from './fileShape'
 
 // TODO: should find a better way to share this code
 import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
 import {isPreviewable} from './Previewable'
 
 RceFileBrowser.propTypes = {
-  onFileSelect: func.isRequired
+  onFileSelect: func.isRequired,
+  fetchInitialMedia: func.isRequired,
+  fetchNextMedia: func.isRequired,
+  media: objectOf(
+    shape({
+      files: arrayOf(shape(fileShape)).isRequired,
+      bookmark: string,
+      hasMore: bool,
+      isLoading: bool,
+      error: string
+    })
+  ).isRequired
 }
 
-export default function RceFileBrowser({onFileSelect}) {
+export default function RceFileBrowser(props) {
+  const {onFileSelect, fetchInitialMedia, fetchNextMedia} = props
+  const media = props.media.user
+  const {hasMore, isLoading, files} = media
+  const [fetchedInitial, setFetchedInitial] = useState(false)
+
+  useEffect(() => {
+    if (!fetchedInitial) {
+      fetchInitialMedia({order: 'asc', sort: 'alphabetical'})
+      setFetchedInitial(true)
+    } else if (hasMore && !isLoading) {
+      fetchNextMedia({order: 'asc', sort: 'alphabeetical'})
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMore, isLoading, fetchedInitial])
+
   function handleFileSelect(fileInfo) {
     const content_type = fileInfo.api['content-type']
     const canPreview = isPreviewable(content_type)
@@ -41,7 +68,8 @@ export default function RceFileBrowser({onFileSelect}) {
     onFileSelect({
       name: fileInfo.name,
       title: fileInfo.name,
-      href: fileInfo.api.url,
+      href: fileInfo.src,
+      embedded_file_url: fileInfo.api.embedded_file_url,
       target: '_blank',
       class: clazz,
       content_type
@@ -50,7 +78,7 @@ export default function RceFileBrowser({onFileSelect}) {
 
   return (
     <View as="div" margin="medium" data-testid="instructure_links-FilesPanel">
-      <FileBrowser allowUpload={false} selectFile={handleFileSelect} />
+      <FileBrowser allowUpload={false} selectFile={handleFileSelect} mediaFiles={files} />
     </View>
   )
 }

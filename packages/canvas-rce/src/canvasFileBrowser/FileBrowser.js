@@ -43,13 +43,15 @@ class FileBrowser extends React.Component {
     allowUpload: PropTypes.bool,
     selectFile: PropTypes.func.isRequired,
     contentTypes: PropTypes.arrayOf(PropTypes.string),
-    useContextAssets: PropTypes.bool
+    useContextAssets: PropTypes.bool,
+    mediaFiles: PropTypes.arrayOf(PropTypes.object)
   }
 
   static defaultProps = {
     allowUpload: true,
     contentTypes: ['*/*'],
-    useContextAssets: true
+    useContextAssets: true,
+    mediaFiles: []
   }
 
   constructor(props) {
@@ -66,6 +68,19 @@ class FileBrowser extends React.Component {
 
   componentDidMount() {
     this.getRootFolders()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.mediaFiles.length !== this.props.mediaFiles.length) {
+      this.populateItemsList(
+        this.props.mediaFiles.map(f => {
+          f.folder_id = 'media_folder'
+          f['content-type'] = f.content_type
+          f.display_name = f.title
+          return f
+        })
+      )
+    }
   }
 
   getContextName(contextType) {
@@ -89,6 +104,7 @@ class FileBrowser extends React.Component {
       this.getContextFolders()
     }
     this.getUserFolders()
+    this.getMediaFolder()
   }
 
   getUserFolders() {
@@ -101,6 +117,20 @@ class FileBrowser extends React.Component {
     if (contextInfo && contextInfo.type && contextInfo.id) {
       this.getRootFolderData(contextInfo.type, contextInfo.id, {name: contextInfo.name})
     }
+  }
+
+  // not a real folder, but for now mediaObjects don't exist in a folder
+  // so cook up a faux folder to put them in
+  getMediaFolder() {
+    this.populateCollectionsList([
+      {
+        id: 'media_folder',
+        name: formatMessage('My Media'),
+        context_id: 'self',
+        context_type: 'user',
+        can_upload: false
+      }
+    ])
   }
 
   increaseLoadingCount() {
@@ -243,6 +273,10 @@ class FileBrowser extends React.Component {
       }`,
       alt: apiFile.display_name,
       ...opts
+    }
+    if (apiFile.embedded_iframe_url) {
+      // it's a media_object
+      file.src = apiFile.embedded_iframe_url
     }
     return file
   }

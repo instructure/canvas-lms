@@ -205,9 +205,9 @@ export default function CanvasContentTray(props) {
     }
     setFilterSettings(newFilterSettings)
 
-    if (newFilter.contentType) {
+    if (newFilterSettings.contentType) {
       let contextType, contextId
-      switch (newFilter.contentType) {
+      switch (newFilterSettings.contentType) {
         case 'user_files':
           contextType = 'user'
           contextId = props.containingContext.userId

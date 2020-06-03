@@ -17,6 +17,7 @@
  */
 
 import K5Uploader from '@instructure/k5uploader'
+import {isAudioOrVideo, isImage, isVideo} from '../rce/plugins/shared/fileTypeUtils'
 
 /* eslint no-console: 0 */
 export default class Bridge {
@@ -139,7 +140,15 @@ export default class Bridge {
     }
   }
 
+  // insertFileLink is called from the FileBrowser when All files is chosen
+  // vs the above insertLink which is called from the other CanvasContentTray panels.
   insertFileLink = link => {
+    if (isImage(link.content_type)) {
+      return this.insertImage(link)
+    } else if (isAudioOrVideo(link.content_type)) {
+      link.embedded_iframe_url = link.href
+      return this.embedMedia(link)
+    }
     return this.insertLink(link)
   }
 
@@ -193,7 +202,7 @@ export default class Bridge {
   }
 
   embedMedia = media => {
-    if (/video/.test(media.type || media.content_type)) {
+    if (isVideo(media.type || media.content_type)) {
       this.insertVideo(media)
     } else {
       this.insertAudio(media)

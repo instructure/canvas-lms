@@ -107,7 +107,13 @@ export default function Filter(props) {
             <Select
               label={<ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>}
               onChange={(e, selection) => {
-                onChange({contentSubtype: selection.value})
+                const changed = {contentSubtype: selection.value}
+                if (changed.contentSubtype === 'all') {
+                  // when flipped to All, the context needs to be user
+                  // so we can get media_objects, which are all returned in the user context
+                  changed.contentType = 'user_files'
+                }
+                onChange(changed)
               }}
               selectedOption={contentSubtype}
             >
