@@ -43,6 +43,8 @@ class ContentTag < ActiveRecord::Base
   belongs_to :learning_outcome_content, :class_name => 'LearningOutcome', :foreign_key => :content_id
   has_many :learning_outcome_results
 
+  after_create :clear_stream_items_if_module_is_unpublished
+
   # This allows bypassing loading context for validation if we have
   # context_id and context_type set, but still allows validating when
   # context is not yet saved.
@@ -55,6 +57,8 @@ class ContentTag < ActiveRecord::Base
   after_save :touch_context_module_after_transaction
   after_save :touch_context_if_learning_outcome
   after_save :run_due_date_cacher_for_quizzes_next
+  after_save :clear_discussion_stream_items
+  after_save :send_items_to_stream
 
   include CustomValidations
   validates_as_url :url
@@ -371,6 +375,28 @@ class ContentTag < ActiveRecord::Base
 
   def available_for?(user, opts={})
     self.context_module.available_for?(user, opts.merge({:tag => self}))
+  end
+
+  def send_items_to_stream
+    if self.content_type == "DiscussionTopic" && self.saved_change_to_workflow_state? && self.workflow_state == 'active'
+      content.send_items_to_stream
+    end
+  end
+
+  def clear_discussion_stream_items
+    if self.content_type == "DiscussionTopic"
+      if self.saved_change_to_workflow_state? &&
+        ['active', nil].include?(self.workflow_state_before_last_save) &&
+        self.workflow_state == 'unpublished'
+          content.clear_stream_items
+      end
+    end
+  end
+
+  def clear_stream_items_if_module_is_unpublished
+    if self.content_type == "DiscussionTopic" && context_module.workflow_state == 'unpublished'
+      content.clear_stream_items
+    end
   end
 
   def self.update_for(asset, exclude_tag: nil)

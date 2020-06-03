@@ -41,6 +41,8 @@ class ContextModule < ActiveRecord::Base
   after_save :touch_context
   after_save :invalidate_progressions
   after_save :relock_warning_check
+  after_save :clear_discussion_stream_items
+  after_save :send_items_to_stream
   validates_presence_of :workflow_state, :context_id, :context_type
   validates_presence_of :name, :if => :require_presence_of_name
   attr_accessor :require_presence_of_name
@@ -188,6 +190,24 @@ class ContextModule < ActiveRecord::Base
   def can_be_duplicated?
     self.content_tags.none? do |content_tag|
       !content_tag.deleted? && content_tag.content_type_class == 'quiz'
+    end
+  end
+
+  def send_items_to_stream
+    if self.saved_change_to_workflow_state? && self.workflow_state == 'active'
+      self.content_tags.where(content_type: "DiscussionTopic", workflow_state: 'active').preload(:content).each do |ct|
+        ct.content.send_items_to_stream
+      end
+    end
+  end
+
+  def clear_discussion_stream_items
+    if self.saved_change_to_workflow_state? &&
+      ['active', nil].include?(self.workflow_state_before_last_save) &&
+      self.workflow_state == 'unpublished'
+      self.content_tags.where(content_type: "DiscussionTopic", workflow_state: 'active').preload(:content).each do |ct|
+        ct.content.clear_stream_items
+      end
     end
   end
 
