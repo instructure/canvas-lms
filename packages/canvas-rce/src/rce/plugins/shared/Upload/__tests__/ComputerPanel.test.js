@@ -28,14 +28,11 @@ describe('UploadFile: ComputerPanel', () => {
     const notAnImageFile = new File(['foo'], 'foo.txt', {
       type: 'text/plain'
     })
-    const handleSetFile = jest.fn()
-    const handleSetHasUploadedFile = jest.fn()
     const {getByLabelText, getByText} = render(
       <ComputerPanel
         theFile={null}
-        setFile={handleSetFile}
-        hasUploadedFile={false}
-        setHasUploadedFile={handleSetHasUploadedFile}
+        setFile={() => {}}
+        setError={() => {}}
         accept="image/*"
         label="Upload File"
       />
@@ -53,14 +50,11 @@ describe('UploadFile: ComputerPanel', () => {
     const aFile = new File(['foo'], 'foo.png', {
       type: 'image/png'
     })
-    const handleSetFile = jest.fn()
-    const handleSetHasUploadedFile = jest.fn()
     const {getByLabelText, queryByText} = render(
       <ComputerPanel
         theFile={null}
-        setFile={handleSetFile}
-        hasUploadedFile={false}
-        setHasUploadedFile={handleSetHasUploadedFile}
+        setFile={() => {}}
+        setError={() => {}}
         accept="image/*"
         label="Upload File"
       />
@@ -81,14 +75,11 @@ describe('UploadFile: ComputerPanel', () => {
     const aFile = new File(['foo'], 'foo.png', {
       type: 'image/png'
     })
-    const handleSetFile = jest.fn()
-    const handleSetHasUploadedFile = jest.fn()
     const {getByLabelText, getByText, queryByText} = render(
       <ComputerPanel
         theFile={null}
-        setFile={handleSetFile}
-        hasUploadedFile={false}
-        setHasUploadedFile={handleSetHasUploadedFile}
+        setFile={() => {}}
+        setError={() => {}}
         accept="image/*"
         label="Upload File"
       />
@@ -114,14 +105,11 @@ describe('UploadFile: ComputerPanel', () => {
       const aFile = new File(['foo'], 'foo.png', {
         type: 'image/png'
       })
-      const handleSetFile = jest.fn()
-      const handleSetHasUploadedFile = jest.fn()
       const {getByText, getByLabelText} = render(
         <ComputerPanel
           theFile={aFile}
-          setFile={handleSetFile}
-          hasUploadedFile
-          setHasUploadedFile={handleSetHasUploadedFile}
+          setFile={() => {}}
+          setError={() => {}}
           accept="image/*"
           label="Upload File"
         />
@@ -135,14 +123,11 @@ describe('UploadFile: ComputerPanel', () => {
       const aFile = new File(['foo'], 'foo.txt', {
         type: 'text/plain'
       })
-      const handleSetFile = jest.fn()
-      const handleSetHasUploadedFile = jest.fn()
       const {getByText, getByLabelText} = render(
         <ComputerPanel
           theFile={aFile}
-          setFile={handleSetFile}
-          hasUploadedFile
-          setHasUploadedFile={handleSetHasUploadedFile}
+          setFile={() => {}}
+          setError={() => {}}
           accept="text/*"
           label="Upload File"
         />
@@ -156,14 +141,11 @@ describe('UploadFile: ComputerPanel', () => {
       const aFile = new File(['foo'], 'foo.pdf', {
         type: 'application/pdf'
       })
-      const handleSetFile = jest.fn()
-      const handleSetHasUploadedFile = jest.fn()
       const {getByText, getByLabelText} = render(
         <ComputerPanel
           theFile={aFile}
-          setFile={handleSetFile}
-          hasUploadedFile
-          setHasUploadedFile={handleSetHasUploadedFile}
+          setFile={() => {}}
+          setError={() => {}}
           accept="text/*"
           label="Upload File"
         />
@@ -178,13 +160,11 @@ describe('UploadFile: ComputerPanel', () => {
         type: 'text/plain'
       })
       const handleSetFile = jest.fn()
-      const handleSetHasUploadedFile = jest.fn()
       const {getByText} = render(
         <ComputerPanel
           theFile={aFile}
           setFile={handleSetFile}
-          hasUploadedFile
-          setHasUploadedFile={handleSetHasUploadedFile}
+          setError={() => {}}
           accept="text/*"
           label="Upload File"
         />
@@ -196,7 +176,7 @@ describe('UploadFile: ComputerPanel', () => {
       act(() => {
         fireEvent.click(clearButton)
       })
-      expect(handleSetHasUploadedFile).toHaveBeenCalledWith(false)
+
       expect(handleSetFile).toHaveBeenCalledWith(null)
     })
 
@@ -204,20 +184,32 @@ describe('UploadFile: ComputerPanel', () => {
       const aFile = new File(['foo'], 'foo.mp4', {
         type: 'video/mp4'
       })
-      const handleSetFile = jest.fn()
-      const handleSetHasUploadedFile = jest.fn()
       const {getByText} = render(
         <ComputerPanel
           theFile={aFile}
-          setFile={handleSetFile}
-          hasUploadedFile
-          setHasUploadedFile={handleSetHasUploadedFile}
+          setFile={() => {}}
+          setError={() => {}}
           accept="mp4"
           label="Upload File"
         />
       )
       const playButton = await waitForElement(() => getByText('Play'))
       expect(playButton).toBeInTheDocument()
+    })
+
+    it('Renders an error message when trying to upload an empty file', async () => {
+      const aFile = new File([], 'empty')
+      const {getByText} = render(
+        <ComputerPanel
+          theFile={aFile}
+          setFile={() => {}}
+          setError={() => {}}
+          accept="text/*"
+          label="Upload File"
+        />
+      )
+      const errmsg = await waitForElement(() => getByText('You may not upload an empty file.'))
+      expect(errmsg).toBeInTheDocument()
     })
   })
 })

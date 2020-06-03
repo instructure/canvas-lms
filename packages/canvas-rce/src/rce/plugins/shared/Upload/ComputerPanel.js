@@ -26,11 +26,12 @@
 // video, and (2) it will be fixed with MediaPlayer v7
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {arrayOf, bool, func, instanceOf, number, oneOfType, shape, string} from 'prop-types'
+import {arrayOf, func, instanceOf, number, oneOfType, shape, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 
 import {FileDrop} from '@instructure/ui-forms'
 import {Billboard} from '@instructure/ui-billboard'
+import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {px} from '@instructure/ui-utils'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
@@ -55,7 +56,12 @@ function readFile(theFile) {
       resolve(result)
     }
     reader.onerror = () => {
-      reject()
+      reject(new Error(formatMessage('An error occured reading the file')))
+    }
+
+    if (theFile.size === 0) {
+      // canvas will reject uploading an empty file
+      reject(new Error(formatMessage('You may not upload an empty file.')))
     }
     if (isImage(theFile.type)) {
       reader.readAsDataURL(theFile)
@@ -72,15 +78,7 @@ function readFile(theFile) {
   return p
 }
 
-export default function ComputerPanel({
-  theFile,
-  setFile,
-  hasUploadedFile,
-  setHasUploadedFile,
-  accept,
-  label,
-  bounds
-}) {
+export default function ComputerPanel({theFile, setFile, setError, accept, label, bounds}) {
   const [messages, setMessages] = useState([])
   const [preview, setPreview] = useState({preview: null, isLoading: false})
   const height = 0.8 * (bounds.height - 38 - px('1.5rem')) // the trashcan is 38px tall and the 1.5rem margin-bottom
@@ -94,15 +92,17 @@ export default function ComputerPanel({
       try {
         const previewer = await readFile(theFile)
         setPreview({preview: previewer, isLoading: false})
+        setError(null)
         if (isImage(theFile.type)) {
           // we need the preview to know the image size to show the placeholder
           theFile.preview = previewer
           setFile(theFile)
         }
       } catch (ex) {
+        setError(ex)
         setPreview({
           preview: null,
-          error: formatMessage('An error occurred generating the file preview'),
+          error: ex.message,
           isLoading: false
         })
       }
@@ -138,7 +138,7 @@ export default function ComputerPanel({
     } else if (preview.error) {
       return (
         <div className={css(styles.previewContainer)} aria-live="polite">
-          <Text color="error">{preview.error}</Text>
+          <Alert variant="error">{preview.error}</Alert>
         </div>
       )
     } else if (preview.preview) {
@@ -179,7 +179,7 @@ export default function ComputerPanel({
     }
   }
 
-  if (hasUploadedFile) {
+  if (theFile) {
     return (
       <div style={{position: 'relative'}} ref={previewPanelRef}>
         <Flex direction="row-reverse" margin="none none medium">
@@ -191,7 +191,6 @@ export default function ComputerPanel({
               onClick={() => {
                 setFile(null)
                 setPreview({preview: null, isLoading: false, error: null})
-                setHasUploadedFile(false)
               }}
               icon={IconTrashLine}
             >
@@ -228,7 +227,6 @@ export default function ComputerPanel({
             setMessages([])
           }
           setFile(file)
-          setHasUploadedFile(true)
         }}
         onDropRejected={() => {
           setMessages(
@@ -254,8 +252,7 @@ export default function ComputerPanel({
 ComputerPanel.propTypes = {
   theFile: instanceOf(File),
   setFile: func.isRequired,
-  hasUploadedFile: bool,
-  setHasUploadedFile: func.isRequired,
+  setError: func.isRequired,
   accept: oneOfType([string, arrayOf(string)]),
   label: string.isRequired,
   bounds: shape({
