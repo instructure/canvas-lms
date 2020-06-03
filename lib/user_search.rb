@@ -39,6 +39,11 @@ module UserSearch
         context.grants_right?(searcher, session, :manage_admin_users)
       restrict_search = true
     end
+
+    if options[:assign_observers]
+      restrict_search = true
+    end
+
     context.shard.activate do
       base_scope = base_scope.where(conditions_statement(search_term, {:restrict_search => restrict_search}))
       if options[:role_filter_id] && options[:role_filter_id] != ""

@@ -57,7 +57,7 @@ module SearchTermHelper
   end
 
   def self.valid_search_term?(search_term)
-    search_term.is_a?(String) && search_term.length >= MIN_SEARCH_TERM_LENGTH
+    search_term.is_a?(String)
   end
 
   def self.validate_search_term(search_term)

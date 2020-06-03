@@ -1346,6 +1346,7 @@ class Account < ActiveRecord::Base
   TAB_ADMIN_TOOLS = 17
   TAB_SEARCH = 18
   TAB_BRAND_CONFIGS = 19
+  TAB_ASSIGN_OBSERVERS = 20
 
   # site admin tabs
   TAB_PLUGINS = 14
@@ -1399,6 +1400,7 @@ class Account < ActiveRecord::Base
       end
     end
 
+    tabs << { :id => TAB_ASSIGN_OBSERVERS, :label => t('#account.tab_assign_observers', "Assign Observers"), :css_class => 'assign_observers', :href => :account_assign_observers_path } if manage_settings && SettingsService.get_settings(object: "school", id: 1)['assign_observers_enabled']
     tabs << { :id => TAB_BRAND_CONFIGS, :label => t('#account.tab_brand_configs', "Themes"), :css_class => 'brand_configs', :href => :account_brand_configs_path } if manage_settings && branding_allowed?
     tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && self.grants_right?(user, :manage_developer_keys)
 
