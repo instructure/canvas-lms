@@ -627,15 +627,26 @@ class ActiveRecord::Base
     end
   end
 
+  def self.with_feature_support(default = nil)
+    begin
+      yield
+    rescue ActiveRecord::StatementInvalid => e
+      raise unless e.message.start_with?("PG::FeatureNotSupported:")
+      default
+    end
+  end
+
   def self.current_xlog_location
     Shard.current(shard_category).database_server.unshackle do
       Shackles.activate(:master) do
-        if Rails.env.test? ? self.in_transaction_in_test? : connection.open_transactions > 0
-          raise "don't run current_xlog_location in a transaction"
-        elsif connection.send(:postgresql_version) >= 100000
-          connection.select_value("SELECT pg_current_wal_lsn()")
-        else
-          connection.select_value("SELECT pg_current_xlog_location()")
+        with_feature_support do
+          if Rails.env.test? ? self.in_transaction_in_test? : connection.open_transactions > 0
+            raise "don't run current_xlog_location in a transaction"
+          elsif connection.send(:postgresql_version) >= 100000
+            connection.select_value("SELECT pg_current_wal_lsn()")
+          else
+            connection.select_value("SELECT pg_current_xlog_location()")
+          end
         end
       end
     end
@@ -644,25 +655,28 @@ class ActiveRecord::Base
   def self.wait_for_replication(start: nil, timeout: nil)
     return true unless Shackles.activate(:slave) { connection.readonly? }
 
-    start ||= current_xlog_location
-    Shackles.activate(:slave) do
-      diff_fn = connection.send(:postgresql_version) >= 100000 ?
-        "pg_wal_lsn_diff" :
-        "pg_xlog_location_diff"
-      fn = connection.send(:postgresql_version) >= 100000 ?
-        "pg_last_wal_replay_lsn()" :
-        "pg_last_xlog_replay_location()"
-      # positive == first value greater, negative == second value greater
-      # SELECT pg_xlog_location_diff(<START>, pg_last_xlog_replay_location())
-      start_time = Time.now
-      while connection.select_value("SELECT #{diff_fn}(#{connection.quote(start)}, #{fn})").to_i >= 0
-        return false if timeout && Time.now > start_time + timeout
-        sleep 0.1
+    loc = current_xlog_location
+    unless loc.nil?
+      start ||= loc
+      Shackles.activate(:slave) do
+        diff_fn = connection.send(:postgresql_version) >= 100000 ?
+          "pg_wal_lsn_diff" :
+          "pg_xlog_location_diff"
+        fn = connection.send(:postgresql_version) >= 100000 ?
+          "pg_last_wal_replay_lsn()" :
+          "pg_last_xlog_replay_location()"
+        # positive == first value greater, negative == second value greater
+        # SELECT pg_xlog_location_diff(<START>, pg_last_xlog_replay_location())
+        start_time = Time.now
+        while connection.select_value("SELECT #{diff_fn}(#{connection.quote(start)}, #{fn})").to_i >= 0
+          return false if timeout && Time.now > start_time + timeout
+          sleep 0.1
+        end
       end
     end
     true
   end
-
+  
   def self.bulk_insert_objects(objects, excluded_columns: ['primary_key'])
     return if objects.empty?
     hashed_objects = []
