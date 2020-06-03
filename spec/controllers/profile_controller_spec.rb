@@ -97,7 +97,6 @@ describe ProfileController do
 
     describe "personal pronouns" do
       before :once do
-        @user.account.enable_feature!(:account_pronouns)
         @user.account.settings = { :can_add_pronouns => true }
         @user.account.save!
       end

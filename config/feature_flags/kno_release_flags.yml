@@ -1,13 +1,4 @@
 ---
-account_pronouns:
-  state: hidden
-  display_name: Pronouns for users
-  description: |-
-    Allows users to pick pronouns that will be displayed after
-    their name when it is shown in the user interface.
-  applies_to: RootAccount
-  root_opt_in: true
-
 confetti_for_assignments:
   state: hidden
   display_name: Confetti for On-Time Submissions

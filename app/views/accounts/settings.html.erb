@@ -332,7 +332,7 @@
             <% end %>
           </fieldset>
         <% end %>
-        <% if !@account.site_admin? && @account.root_account? && @account.feature_enabled?(:account_pronouns) %>
+        <% if !@account.site_admin? && @account.root_account? %>
           <fieldset>
             <legend><%= t("Personal Pronouns") %></legend>
             <%= f.fields_for :settings do |settings| %>

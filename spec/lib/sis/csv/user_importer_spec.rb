@@ -221,7 +221,6 @@ describe SIS::CSV::UserImporter do
       @account = account_model
       @account.settings[:can_add_pronouns] = true
       @account.save!
-      @account.enable_feature!(:account_pronouns)
     end
 
     it "should add pronouns to users" do

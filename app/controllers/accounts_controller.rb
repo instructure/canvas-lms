@@ -891,7 +891,7 @@ class AccountsController < ApplicationController
         end
 
         pronouns = params[:account].delete :pronouns
-        if pronouns && !@account.site_admin? && @account.root_account? && @account.feature_enabled?(:account_pronouns)
+        if pronouns && !@account.site_admin? && @account.root_account?
           @account.pronouns = pronouns
         end
 
