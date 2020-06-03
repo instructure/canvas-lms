@@ -326,7 +326,7 @@ body.primary-nav-expanded {
       @if $use_high_contrast {
         color: var(--ic-link-color);
       } @else {
-        color: $ic-course-sidenav_list-item--active-font-color;
+        color: var(--ic-brand-global-nav-menu-item__text-color--active);
       }
     }
   }
