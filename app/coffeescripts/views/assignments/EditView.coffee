@@ -43,6 +43,7 @@ import ModeratedGradingFormFieldGroup from 'jsx/assignments/ModeratedGradingForm
 import AllowedAttemptsWithState from 'jsx/assignments/allowed_attempts/AllowedAttemptsWithState'
 import DefaultToolForm from 'jsx/assignments/DefaultToolForm'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
+import ExternalToolModalLauncher from 'jsx/shared/ExternalToolModalLauncher.js'
 import * as returnToHelper from '../../../jsx/shared/helpers/returnToHelper'
 import 'jqueryui/dialog'
 import 'jquery.toJSON'
@@ -80,6 +81,7 @@ export default class EditView extends ValidatedFormView
   DEFAULT_EXTERNAL_TOOL_CONTAINER = '#default_external_tool_container'
   EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER = '#assignment_submission_type_selection_tool_launch_container'
   EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON = '#assignment_submission_type_selection_launch_button'
+  EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON_TEXT = '#assignment_submission_type_selection_launch_button_text'
   ALLOWED_ATTEMPTS_CONTAINER = '#allowed_attempts_fields'
   GROUP_CATEGORY_SELECTOR = '#group_category_selector'
   PEER_REVIEWS_FIELDS = '#assignment_peer_reviews_fields'
@@ -125,6 +127,7 @@ export default class EditView extends ValidatedFormView
     els["#{DEFAULT_EXTERNAL_TOOL_CONTAINER}"] = '$defaultExternalToolContainer'
     els["#{EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER}"] = '$externalToolPlacementLaunchContainer'
     els["#{EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON}"] = '$externalToolPlacementLaunchButton'
+    els["#{EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON_TEXT}"] = '$externalToolPlacementLaunchButtonText'
     els["#{ALLOWED_ATTEMPTS_CONTAINER}"] = '$allowedAttemptsContainer'
     els["#{ASSIGNMENT_POINTS_POSSIBLE}"] = '$assignmentPointsPossible'
     els["#{ASSIGNMENT_POINTS_CHANGE_WARN}"] = '$pointsChangeWarning'
@@ -367,9 +370,35 @@ export default class EditView extends ValidatedFormView
     @$externalToolsContentId.val(toolId)
     @$externalToolsContentType.val('context_external_tool')
 
-    selectedTool = _.find(@model.submissionTypeSelectionTools(), (tool) -> toolId == tool.id)
-    @$externalToolsUrl.val(selectedTool.external_url)
-    @$externalToolPlacementLaunchButton.text(selectedTool.title)
+    @selectedTool = _.find(@model.submissionTypeSelectionTools(), (tool) -> toolId == tool.id)
+    @$externalToolsUrl.val(@selectedTool.external_url)
+    @$externalToolPlacementLaunchButtonText.text(@selectedTool.title)
+    @$externalToolPlacementLaunchButton.click(() => @handleSubmissionTypeSelectionLaunch())
+
+  handleSubmissionTypeSelectionLaunch: =>
+    @renderSubmissionTypeSelectionDialog(true)
+
+  handleSubmissionTypeSelectionDialogClose: =>
+    @renderSubmissionTypeSelectionDialog(false)
+
+  renderSubmissionTypeSelectionDialog: (open) =>
+    contextInfo = ENV.context_asset_string.split('_')
+    contextType = contextInfo[0]
+    contextId = parseInt(contextInfo[1], 10)
+
+    props = {
+      tool: {definition_id: @selectedTool.id}
+      title: @selectedTool.title
+      isOpen: open
+      onRequestClose: @handleSubmissionTypeSelectionDialogClose
+      contextType: contextType
+      contextId: contextId
+      launchType: "submission_type_selection"
+    }
+
+    mountPoint = document.querySelector('#assignment_submission_type_selection_tool_dialog')
+    dialog = React.createElement(ExternalToolModalLauncher, props)
+    ReactDOM.render(dialog, mountPoint)
 
   handleOnlineSubmissionTypeChange: (env) =>
     showConfigTools = @$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).attr('checked') ||

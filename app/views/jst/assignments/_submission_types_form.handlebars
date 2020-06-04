@@ -177,11 +177,14 @@
         {{!-- TODO make this button actually do something --}}
         <div class="pad-box">
           <div class="ic-Form-control">
-            <button class="Button icon-link btn-primary" type="button" id="assignment_submission_type_selection_launch_button">
+            <button class="Button btn-primary" type="button" id="assignment_submission_type_selection_launch_button">
+                <i class="icon-link sr-hide" />
+                <span id="assignment_submission_type_selection_launch_button_text"></span>
             </button>
           </div>
         </div>
       </div>
+      <div id="assignment_submission_type_selection_tool_dialog"></div>
 
       {{!-- Default external tool configuration --}}
       <div id="default_external_tool_container" data-component="DefaultToolForm" style="{{hiddenUnless isNonPlacementExternalTool}}">
