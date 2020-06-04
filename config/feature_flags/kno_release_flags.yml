@@ -21,7 +21,7 @@ deprecate_sms:
   description: |-
     Disables SMS notifications for all types except announcements and
     grade changes.
-  applies_to: RootAccount
+  applies_to: SiteAdmin
 
 hide_course_sections_from_students:
   state: hidden

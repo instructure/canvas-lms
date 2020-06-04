@@ -2132,7 +2132,7 @@ class CoursesController < ApplicationController
     js_env(
       NOTIFICATION_PREFERENCES_OPTIONS: {
         granular_course_preferences_enabled: @domain_root_account&.feature_enabled?(:notification_granular_course_preferences),
-        deprecate_sms_enabled: !@domain_root_account.settings[:sms_allowed] && @domain_root_account&.feature_enabled?(:deprecate_sms),
+        deprecate_sms_enabled: !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
         allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account)
       }
     )
