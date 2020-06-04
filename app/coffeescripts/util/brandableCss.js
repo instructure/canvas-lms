@@ -53,11 +53,6 @@ const brandableCss = {
     // give the person trying to track down a bug a hint on how this link tag got on the page
     linkElement.setAttribute('data-loaded-by-brandableCss', true)
     document.head.appendChild(linkElement)
-
-    // For browsers that don't support css varibles (right now only IE11), we need to pass
-    // this newly injected stylesheet to the cssVariables polyfill so that it can polyfill it.
-    // The polyfill will only exist on window in browsers that need it.
-    if (window.canvasCssVariablesPolyfill) window.canvasCssVariablesPolyfill(linkElement)
   }
 }
 export default brandableCss
