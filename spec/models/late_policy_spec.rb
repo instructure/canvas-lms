@@ -72,6 +72,44 @@ describe LatePolicy do
       policy = LatePolicy.new
       expect(policy.late_submission_minimum_percent).to be_zero
     end
+
+    describe "root_account_id" do
+      before(:once) do
+        @course = Course.create!
+      end
+
+      context "on create" do
+        it "sets root_account_id to the course's root_account_id if root_account_id is nil" do
+          policy = LatePolicy.create!(course: @course)
+          expect(policy.root_account_id).to eq @course.root_account_id
+        end
+
+        it "does not modify root_account_id if it is already set" do
+          second_account = account_model
+          policy = LatePolicy.create!(course: @course, root_account_id: second_account.id)
+          expect(policy.root_account_id).to eq second_account.id
+        end
+      end
+
+      context "on update" do
+        before(:once) do
+          @policy = LatePolicy.create!(course: @course)
+        end
+
+        it "sets root_account_id to the course's root_account_id if root_account_id is nil" do
+          @policy.update_column(:root_account_id, nil)
+          @policy.update!(late_submission_minimum_percent: 20)
+          expect(@policy.root_account_id).to eq @course.root_account_id
+        end
+
+        it "does not modify root_account_id if it is already set" do
+          second_account = account_model
+          second_course = Course.create!(root_account: second_account)
+          @policy.update!(course: second_course)
+          expect(@policy.root_account_id).to eq @course.root_account_id
+        end
+      end
+    end
   end
 
   describe 'rounding' do

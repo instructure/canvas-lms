@@ -31,6 +31,7 @@ class LatePolicy < ActiveRecord::Base
     presence: true,
     inclusion: { in: %w(day hour) }
 
+  before_save :set_root_account_id
   after_save :update_late_submissions, if: :late_policy_attributes_changed?
 
   def points_deducted(score: nil, possible: 0.0, late_for: 0.0, grading_type: nil)
@@ -55,6 +56,10 @@ class LatePolicy < ActiveRecord::Base
   end
 
   private
+
+  def set_root_account_id
+    self.root_account_id ||= course&.root_account_id
+  end
 
   def interval_seconds
     { 'hour' => 1.hour, 'day' => 1.day }[late_submission_interval].to_f
