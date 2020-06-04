@@ -497,7 +497,7 @@ describe SubmissionsController do
         it "redirects with confetti" do
           post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}}
           expect(response).to be_redirect
-          expect(response).to redirect_to(course_assignment_url(@course, @assignment, :confetti => true))
+          expect(response).to redirect_to(/[\?&]confetti=true/)
         end
 
         context "confetti_for_assignments flag is disabled" do
@@ -512,7 +512,7 @@ describe SubmissionsController do
               :submission => {:submission_type => "online_url", :url => "url"}
             }
             expect(response).to be_redirect
-            expect(response).to_not redirect_to(course_assignment_url(@course, @assignment, :confetti => true))
+            expect(response).to_not redirect_to(/[\?&]confetti=true/)
           end
         end
       end
@@ -526,7 +526,7 @@ describe SubmissionsController do
         it "redirects without confetti" do
           post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}}
           expect(response).to be_redirect
-          expect(response).to_not redirect_to(course_assignment_url(@course, @assignment, :confetti => true))
+          expect(response).to_not redirect_to(/[\?&]confetti=true/)
         end
       end
 
@@ -539,7 +539,7 @@ describe SubmissionsController do
         it "redirects with confetti" do
           post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}}
           expect(response).to be_redirect
-          expect(response).to redirect_to(course_assignment_url(@course, @assignment, :confetti => true))
+          expect(response).to redirect_to(/[\?&]confetti=true/)
         end
 
         context "confetti_for_assignments flag is disabled" do
@@ -554,9 +554,63 @@ describe SubmissionsController do
               :submission => {:submission_type => "online_url", :url => "url"}
             }
             expect(response).to be_redirect
-            expect(response).to_not redirect_to(course_assignment_url(@course, @assignment, :confetti => true))
+            expect(response).to_not redirect_to(/[\?&]confetti=true/)
           end
         end
+      end
+    end
+
+    describe "tardiness tracker" do
+      let(:course) { course_with_student_logged_in(active_all: true) && @course }
+
+      it "redirects with submitted=0 when assignment has no due date" do
+        assignment = course.assignments.create!(
+          title: "some assignment",
+          submission_types: "online_url"
+        )
+
+        post 'create', params: {
+          course_id: course.id,
+          assignment_id: assignment.id,
+          submission: { submission_type: "online_url", url: "url" }
+        }
+
+        expect(response).to be_redirect
+        expect(response).to redirect_to(/[\?&]submitted=0/)
+      end
+
+      it "redirects with submitted=1 when submission is made on time" do
+        assignment = course.assignments.create!(
+          title: "some assignment",
+          submission_types: "online_url",
+          due_at: 5.days.from_now
+        )
+
+        post 'create', params: {
+          course_id: course.id,
+          assignment_id: assignment.id,
+          submission: { submission_type: "online_url", url: "url" }
+        }
+
+        expect(response).to be_redirect
+        expect(response).to redirect_to(/[\?&]submitted=1/)
+      end
+
+      it "redirects with submitted=2 when submission is late" do
+        assignment = course.assignments.create!(
+          title: "some assignment",
+          submission_types: "online_url",
+          due_at: 1.days.ago
+        )
+
+        post 'create', params: {
+          course_id: course.id,
+          assignment_id: assignment.id,
+          submission: { submission_type: "online_url", url: "url" }
+        }
+
+        expect(response).to be_redirect
+        expect(response).to redirect_to(/[\?&]submitted=2/)
       end
     end
   end
