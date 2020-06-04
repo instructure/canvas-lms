@@ -47,7 +47,7 @@ class GraphQLController < ApplicationController
     }
     result = nil
 
-    overall_timeout = Setting.get('graphql_overall_timeout', '300').to_i.seconds
+    overall_timeout = Setting.get('graphql_overall_timeout', '60').to_i.seconds
     Timeout.timeout(overall_timeout) do
       result = CanvasSchema.execute(query, variables: variables, context: context)
     end
