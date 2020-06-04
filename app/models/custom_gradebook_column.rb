@@ -30,6 +30,8 @@ class CustomGradebookColumn < ActiveRecord::Base
   validates :title, length: { maximum: maximum_string_length },
     :allow_nil => true
 
+  before_create :set_root_account_id
+
   workflow do
     state :active
     state :hidden
@@ -69,5 +71,9 @@ class CustomGradebookColumn < ActiveRecord::Base
   def title_reserved_names_check
     return true unless Account.site_admin.feature_enabled?(:gradebook_reserved_importer_bugfix)
     errors.add(:title, "cannot use gradebook importer reserved names") if GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES.include?(title)
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= course.root_account_id
   end
 end
