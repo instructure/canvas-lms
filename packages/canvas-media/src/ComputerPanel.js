@@ -75,6 +75,7 @@ export default function ComputerPanel({
       const sz = sizeMediaPlayer(player, theFile.type, {width, height})
       player.style.width = sz.width
       player.style.height = sz.height
+      player.style.margin = '0 auto'
       // from this sub-package, I don't have a URL to use as the
       // audio player's poster image. We can give it a background image though
       player.classList.add(isAudio(theFile.type) ? 'audio-player' : 'video-player')
