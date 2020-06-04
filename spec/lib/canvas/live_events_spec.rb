@@ -1213,7 +1213,7 @@ describe Canvas::LiveEvents do
 
   describe '.course_completed' do
     it 'should trigger a course completed live event' do
-      course = course_model
+      course = course_model(sis_source_id: "abc123")
       user = user_model
       context_module = course.context_modules.create!
       context_module_progression = context_module.context_module_progressions.create!(user_id: user.id, workflow_state: 'completed')
@@ -1221,7 +1221,8 @@ describe Canvas::LiveEvents do
       expected_event_body = {
         progress: CourseProgress.new(course, user, read_only: true).to_json,
         user: { id: user.id.to_s, name: user.name, email: user.email },
-        course: { id: course.id.to_s, name: course.name }
+        course: { id: course.id.to_s, name: course.name,
+                  account_id: course.account_id.to_s, sis_source_id: "abc123" }
       }
 
       expect_event('course_completed', expected_event_body).once
@@ -1232,7 +1233,7 @@ describe Canvas::LiveEvents do
 
   describe '.course_progress' do
     it 'should trigger a course progress live event' do
-      course = course_model
+      course = course_model(sis_source_id: "abc123")
       user = user_model
       context_module = course.context_modules.create!
       # context_module_progression = context_module.context_module_progressions.create!(user_id: user.id, workflow_state: 'completed')
@@ -1241,7 +1242,8 @@ describe Canvas::LiveEvents do
       expected_event_body = {
         progress: CourseProgress.new(course, user, read_only: true).to_json,
         user: { id: user.id.to_s, name: user.name, email: user.email },
-        course: { id: course.id.to_s, name: course.name }
+        course: { id: course.id.to_s, name: course.name,
+                  account_id: course.account_id.to_s, sis_source_id: "abc123" }
       }
 
       expect_event('course_progress', expected_event_body).once
