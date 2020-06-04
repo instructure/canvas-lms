@@ -52,9 +52,9 @@ describe "speed grader - rubrics" do
     expect(rubric).to be_displayed
 
     # test rubric input
-    f('td.criterion_points input').send_keys('3')
+    f('td[data-testid="criterion-points"] input').send_keys('3')
     expand_right_pane
-    fj("span:contains('Amazing'):visible").click
+    ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Amazing" }[0].click
     f('svg[name="IconFeedback"]').find_element(:xpath, '../../parent::button').click
     f("textarea[data-selenium='criterion_comments_text']").send_keys('special rubric comment')
     wait_for_ajaximations
@@ -129,14 +129,14 @@ describe "speed grader - rubrics" do
     wait_for_ajaximations
 
     # test rubric input
-    f('td.criterion_points input').send_keys('SMRT')
+    f('td[data-testid="criterion-points"] input').send_keys('SMRT')
     scroll_into_view('button.save_rubric_button')
     f('#rubric_full .save_rubric_button').click
     wait_for_ajaximations
     scroll_into_view('.toggle_full_rubric')
     f('.toggle_full_rubric').click
     wait_for_ajaximations
-    expect(f('.rubric_container .criterion_points input')).to have_value('--')
+    expect(f('.rubric_container td[data-testid="criterion-points"] input')).to have_value('--')
   end
 
   it "ignores rubric lines for grading", priority: "1", test_id: 283989 do

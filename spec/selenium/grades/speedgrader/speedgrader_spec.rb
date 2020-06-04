@@ -229,10 +229,10 @@ describe 'Speedgrader' do
           f('a.assess_submission_link').click
           wait_for_animations
 
-          expect(ff('.criterion_points input').first).to have_value '10'
-          expect(ff('.criterion_points input').second).to have_value '5'
+          expect(ff('td[data-testid="criterion-points"] input').first).to have_value '10'
+          expect(ff('td[data-testid="criterion-points"] input').second).to have_value '5'
 
-          replace_content ff('.criterion_points input').first, '5'
+          replace_content ff('td[data-testid="criterion-points"] input').first, '5'
           scroll_into_view('button.save_rubric_button')
           f('button.save_rubric_button').click
 
@@ -296,7 +296,7 @@ describe 'Speedgrader' do
           StudentGradesPage.visit_as_teacher(@course, @students.first)
           f('.icon-rubric').click
           wait_for_ajaximations
-          expect(f('.criterions')).to be_displayed
+          expect(f('tbody[data-testid="criterions"]')).to be_displayed
 
           ratings = ff('.rating-description')
           spikes = ff('.triangle')
@@ -387,10 +387,10 @@ describe 'Speedgrader' do
         )
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students.first.id}"
         f('a.assess_submission_link').click
-        expect(ff('.rubric-criterion:nth-of-type(1) .rating-tier.selected').length).to eq 1
-        expect(f('.rubric-criterion:nth-of-type(1) .rating-tier.selected')).to include_text('3 pts')
-        expect(ff('.rubric-criterion:nth-of-type(2) .rating-tier.selected').length).to eq 1
-        expect(f('.rubric-criterion:nth-of-type(2) .rating-tier.selected')).to include_text('0 pts')
+        expect(ff('tr[data-testid="rubric-criterion"]:nth-of-type(1) .rating-tier.selected').length).to eq 1
+        expect(f('tr[data-testid="rubric-criterion"]:nth-of-type(1) .rating-tier.selected')).to include_text('3 pts')
+        expect(ff('tr[data-testid="rubric-criterion"]:nth-of-type(2) .rating-tier.selected').length).to eq 1
+        expect(f('tr[data-testid="rubric-criterion"]:nth-of-type(2) .rating-tier.selected')).to include_text('0 pts')
       end
     end
   end

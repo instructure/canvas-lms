@@ -39,20 +39,20 @@ test('show no results if no courses passed in', () => {
   const props = defaultProps()
   props.courses = []
   const tree = enzyme.shallow(<CoursePickerTable {...props} />)
-  const node = tree.find('.bca-table__no-results')
+  const node = tree.find('[data-testid="bca-table__no-results"]')
   ok(node.exists())
 })
 
 test('displays correct table data', () => {
   const props = defaultProps()
   const tree = enzyme.mount(<CoursePickerTable {...props} />)
-  const rows = tree.find('.bca-table__course-row')
+  const rows = tree.find('tr[data-testid="bca-table__course-row"]')
 
   equal(rows.length, props.courses.length)
   equal(
     rows
       .at(0)
-      .find('td')
+      .find('Cell')
       .at(1)
       .text(),
     props.courses[0].name
@@ -60,7 +60,7 @@ test('displays correct table data', () => {
   equal(
     rows
       .at(1)
-      .find('td')
+      .find('Cell')
       .at(1)
       .text(),
     props.courses[1].name
@@ -71,7 +71,7 @@ test('calls onSelectedChanged when courses are selected', () => {
   const props = defaultProps()
   props.onSelectedChanged = sinon.spy()
   const tree = enzyme.mount(<CoursePickerTable {...props} />)
-  const checkbox = tree.find('.bca-table__course-row input[type="checkbox"]')
+  const checkbox = tree.find('[data-testid="bca-table__course-row"] input[type="checkbox"]')
   checkbox.at(0).simulate('change', {target: {checked: true, value: '1'}})
 
   equal(props.onSelectedChanged.callCount, 1)
@@ -83,7 +83,7 @@ test('calls onSelectedChanged when courses are unselected', () => {
   props.selectedCourses = ['1']
   props.onSelectedChanged = sinon.spy()
   const tree = enzyme.mount(<CoursePickerTable {...props} />)
-  const checkbox = tree.find('.bca-table__course-row input[type="checkbox"]')
+  const checkbox = tree.find('[data-testid="bca-table__course-row"] input[type="checkbox"]')
   checkbox.at(0).simulate('change', {target: {checked: false, value: '1'}})
 
   equal(props.onSelectedChanged.callCount, 1)
@@ -108,7 +108,7 @@ test('handleFocusLoss focuses the next item', () => {
   const instance = tree.instance()
 
   const check = tree
-    .find('.bca-table__course-row input[type="checkbox"]')
+    .find('[data-testid="bca-table__course-row"] input[type="checkbox"]')
     .at(0)
     .instance()
   check.focus = sinon.spy()
@@ -123,7 +123,7 @@ test('handleFocusLoss focuses the previous item if called on the last item', () 
   const instance = tree.instance()
 
   const check = tree
-    .find('.bca-table__course-row input[type="checkbox"]')
+    .find('[data-testid="bca-table__course-row"] input[type="checkbox"]')
     .at(1)
     .instance()
   check.focus = sinon.spy()

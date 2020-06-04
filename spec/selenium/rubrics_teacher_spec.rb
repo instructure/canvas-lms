@@ -232,7 +232,7 @@ describe "course rubrics" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
     wait_for_ajaximations
-    expect(ff('.rubric-criterion:nth-of-type(1) .rating-tier').third).to have_class('selected')
+    expect(ff('tr[data-testid="rubric-criterion"]:nth-of-type(1) .rating-tier').third).to have_class('selected')
   end
 
   it "should not highlight a criterion level if score is nil" do
@@ -256,7 +256,7 @@ describe "course rubrics" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
     wait_for_ajaximations
-    ff('.rubric-criterion:nth-of-type(1) .rating-tier').each do |criterion|
+    ff('tr[data-testid="rubric-criterion"]:nth-of-type(1) .rating-tier').each do |criterion|
       expect(criterion).not_to have_class('selected')
     end
   end

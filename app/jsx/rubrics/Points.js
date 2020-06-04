@@ -26,8 +26,12 @@ import I18n from 'i18n!edit_rubricPoints'
 import {assessmentShape} from './types'
 
 export const roundIfWhole = n =>
-  I18n.toNumber(n, {precision: Math.floor(n) === n ? 0 : 2, strip_insignificant_zeros: true})
-const pointString = points => (points.text === null ? roundIfWhole(points.value) : points.text)
+  I18n.toNumber(n, {
+    precision: Math.floor(n) === n ? 0 : 2,
+    strip_insignificant_zeros: true
+  })
+const pointString = points =>
+  points.text === null ? roundIfWhole(points.value).toString() : points.text
 
 export const possibleString = possible =>
   I18n.t('%{possible} pts', {
@@ -64,7 +68,7 @@ const Points = props => {
           <Flex alignItems="end" wrapItems>
             <Flex.Item size="4rem" margin="none small none none">
               <TextInput
-                display='inline-block'
+                display="inline-block"
                 renderLabel={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
                 messages={[
                   ...pointError(points),
