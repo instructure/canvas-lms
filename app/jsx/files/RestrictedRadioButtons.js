@@ -24,6 +24,7 @@ import $ from 'jquery'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import Folder from 'compiled/models/Folder'
 import 'jquery.instructure_date_and_time'
+import accessibleDateFormat from '../shared/helpers/accessibleDateFormat'
 
 class RestrictedRadioButtons extends React.Component {
   static propTypes = {
@@ -166,6 +167,8 @@ class RestrictedRadioButtons extends React.Component {
             defaultValue={this.state.unlock_at ? $.datetimeString(this.state.unlock_at) : ''}
             className="form-control dateSelectInput"
             type="text"
+            title={accessibleDateFormat()}
+            data-tooltip=""
             aria-label={I18n.t('Available From Date')}
           />
         </div>
@@ -180,6 +183,8 @@ class RestrictedRadioButtons extends React.Component {
               defaultValue={this.state.lock_at ? $.datetimeString(this.state.lock_at) : ''}
               className="form-control dateSelectInput"
               type="text"
+              title={accessibleDateFormat()}
+              data-tooltip=""
               aria-label={I18n.t('Available Until Date')}
             />
           </div>
