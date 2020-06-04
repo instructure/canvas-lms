@@ -52,7 +52,7 @@
           PASSWORD_POLICY: @domain_root_account.password_policy,
           PASSWORD_POLICIES: Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}],
           PROFILE: @user_data,
-          INTERNATIONAL_SMS_ENABLED: @user.account.feature_enabled?(:international_sms)
+          INTERNATIONAL_SMS_ENABLED: Account.site_admin.feature_enabled?(:international_sms)
 %>
 <% js_bundle :profile %>
 <% css_bundle :profile_edit, :pairing_code %>

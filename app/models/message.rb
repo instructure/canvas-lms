@@ -931,7 +931,7 @@ class Message < ActiveRecord::Base
   def deliver_via_sms
     if to =~ /^\+[0-9]+$/
       begin
-        unless user.account.feature_enabled?(:international_sms)
+        unless Account.site_admin.feature_enabled?(:international_sms)
           raise "International SMS is currently disabled for this user's account"
         end
         if Canvas::Twilio.enabled?
