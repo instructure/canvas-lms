@@ -27,6 +27,7 @@ describe "CanvasHttp Configuration" do
     CanvasHttp::CircuitBreaker.redis = ->{ Canvas.redis }
     CanvasHttp::CircuitBreaker.threshold = ->(_){ 0 }
     CanvasHttp::CircuitBreaker.interval = ->(_){ 1 }
+    Setting.set('http_blocked_ip_ranges', '')
     allow(CanvasHttp).to receive(:connection_for_uri).and_raise(Net::OpenTimeout)
     begin
       CanvasHttp.get("some.url.com")
