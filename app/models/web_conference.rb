@@ -39,6 +39,7 @@ class WebConference < ActiveRecord::Base
   before_validation :infer_conference_details
 
   before_create :assign_uuid
+  before_create :set_root_account_id
   after_save :touch_context
 
   has_a_broadcast_policy
@@ -559,4 +560,13 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.serialization_excludes; [:uuid]; end
+
+  def set_root_account_id
+    case self.context
+    when Course, Group
+      self.root_account_id = self.context.root_account_id
+    when Account
+      self.root_account_id = self.context.resolved_root_account_id
+    end
+  end
 end

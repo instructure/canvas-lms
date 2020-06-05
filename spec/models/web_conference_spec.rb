@@ -483,4 +483,22 @@ describe WebConference do
       end
     end
   end
+
+  context 'record creation' do
+    it 'sets the root_account_id using course context' do
+      course_factory
+      user_factory
+      tool = new_valid_tool(@course)
+      tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+      tool.save!
+
+      conference = @course.web_conferences.build
+      conference.user = @user
+      conference.conference_type = 'LtiConference'
+      conference.lti_settings = { tool_id: tool.id }
+      conference.save!
+
+      expect(conference.root_account_id).to eq @course.root_account_id
+    end
+  end
 end
