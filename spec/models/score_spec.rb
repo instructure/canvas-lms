@@ -130,6 +130,35 @@ describe Score do
     end
   end
 
+  describe "root_account_id" do
+    context "on create" do
+      it "sets root_account_id to the enrollment's root_account_id if root_account_id is nil" do
+        score = student.scores.create!(params)
+        expect(score.root_account_id).to eq student.root_account_id
+      end
+
+      it "does not modify root_account_id if it is already set" do
+        second_account = account_model
+        score = student.scores.create!(params.merge(root_account_id: second_account.id))
+        expect(score.root_account_id).to eq second_account.id
+      end
+    end
+
+    context "on update" do
+      it "sets root_account_id to the enrollment's root_account_id if root_account_id is nil" do
+        score.update_column(:root_account_id, nil)
+        score.update!(current_score: 0)
+        expect(score.root_account_id).to eq student.root_account_id
+      end
+
+      it "does not modify root_account_id if it is already set" do
+        second_account = account_model
+        score.update!(root_account_id: second_account.id)
+        expect(score.root_account_id).to eq second_account.id
+      end
+    end
+  end
+
   describe '#destroy' do
     context 'with score metadata' do
       let(:metadata) { score.create_score_metadata!(calculation_details: { foo: :bar }) }

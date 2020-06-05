@@ -603,13 +603,14 @@ class GradeCalculator
           (
             enrollment_id, grading_period_id,
             #{columns_to_insert_or_update[:columns].join(', ')},
-            course_score, created_at, updated_at
+            course_score, root_account_id, created_at, updated_at
           )
           SELECT
             enrollments.id as enrollment_id,
             #{@grading_period.try(:id) || 'NULL'} as grading_period_id,
             #{columns_to_insert_or_update[:insert_values].join(', ')},
             #{@grading_period ? 'FALSE' : 'TRUE'} AS course_score,
+            #{@course.root_account_id} AS root_account_id,
             #{updated_at} as created_at,
             #{updated_at} as updated_at
           FROM #{Enrollment.quoted_table_name} enrollments
@@ -619,6 +620,7 @@ class GradeCalculator
       DO UPDATE SET
           #{columns_to_insert_or_update[:update_values].join(', ')},
           updated_at = excluded.updated_at,
+          root_account_id = #{@course.root_account_id},
           -- if workflow_state was previously deleted for some reason, update it to active
           workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
     ")
@@ -699,13 +701,14 @@ class GradeCalculator
       INSERT INTO #{Score.quoted_table_name} (
         enrollment_id, assignment_group_id,
         #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')},
-        course_score, created_at, updated_at
+        course_score, root_account_id, created_at, updated_at
       )
         SELECT
           val.enrollment_id AS enrollment_id,
           val.assignment_group_id as assignment_group_id,
           #{assignment_group_columns_to_insert_or_update[:insert_columns].join(', ')},
           FALSE AS course_score,
+          #{@course.root_account_id} AS root_account_id,
           #{updated_at} AS created_at,
           #{updated_at} AS updated_at
         FROM (VALUES #{score_values}) val
@@ -718,6 +721,7 @@ class GradeCalculator
       DO UPDATE SET
         #{assignment_group_columns_to_insert_or_update[:update_columns].join(', ')},
         updated_at = excluded.updated_at,
+        root_account_id = #{@course.root_account_id},
         workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
     ")
 

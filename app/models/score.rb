@@ -33,6 +33,7 @@ class Score < ActiveRecord::Base
   validate :scorable_association_check
 
   before_validation :set_course_score, unless: :course_score_changed?
+  before_save :set_root_account_id
 
   set_policy do
     given do |user, _session|
@@ -108,6 +109,10 @@ class Score < ActiveRecord::Base
   delegate :score_to_grade, to: :course
 
   private
+
+  def set_root_account_id
+    self.root_account_id ||= enrollment&.root_account_id
+  end
 
   def set_course_score
     gpid = read_attribute(:grading_period_id)
