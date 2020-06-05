@@ -22,8 +22,8 @@ module Lti
     class DeepLinkingController < ApplicationController
       protect_from_forgery except: [:deep_linking_response], with: :exception
 
-      include Concerns::DeepLinkingServices
-      include Concerns::DeepLinkingModules
+      include Lti::Ims::Concerns::DeepLinkingServices
+      include Lti::Ims::Concerns::DeepLinkingModules
 
       before_action :require_context
       before_action :validate_jwt
