@@ -53,7 +53,7 @@ notification_granular_course_preferences:
   description: |-
     Allows users to override specific notification preferences on a
     course by course basis.
-  applies_to: RootAccount
+  applies_to: SiteAdmin
 
 past_announcements:
   state: hidden
