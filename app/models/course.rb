@@ -215,6 +215,9 @@ class Course < ActiveRecord::Base
     class_name: "Auditors::ActiveRecord::GradeChangeRecord",
     dependent: :destroy
 
+  has_many :conditional_release_rules, inverse_of: :course, class_name: "ConditionalRelease::Rule", dependent: :destroy
+
+
   prepend Profile::Association
 
   before_save :assign_uuid

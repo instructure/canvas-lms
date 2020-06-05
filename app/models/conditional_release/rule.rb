@@ -21,13 +21,26 @@ module ConditionalRelease
 
     validates :course_id, presence: true
     validates :trigger_assignment_id, presence: true
+    validate :trigger_assignment_in_same_course
     belongs_to :trigger_assignment, :class_name => "Assignment"
 
     belongs_to :course
+    belongs_to :root_account, :class_name => "Account"
     has_many :scoring_ranges, -> { active.order(position: :asc) }, inverse_of: :rule, dependent: :destroy
     has_many :assignment_sets, -> { active }, through: :scoring_ranges
     has_many :assignment_set_associations, -> { active.order(position: :asc) }, through: :scoring_ranges
     accepts_nested_attributes_for :scoring_ranges, allow_destroy: true
+
+    before_create :set_root_account_id
+    def set_root_account_id
+      self.root_account_id ||= course.root_account_id
+    end
+
+    def trigger_assignment_in_same_course
+      if trigger_assignment_id_changed? && trigger_assignment&.context_id != course_id
+        errors.add(:trigger_assignment_id, "invalid trigger assignment")
+      end
+    end
 
     scope :with_assignments, -> do
       having_assignments = joins(all_includes).group(Arel.sql("conditional_release_rules.id"))

@@ -21,7 +21,10 @@ FactoryBot.define do
   factory :rule, class: ConditionalRelease::Rule do
     root_account_id { Account.default.id }
     course :factory => :course
-    trigger_assignment :factory => :assignment
+
+    before(:create) do |rule, _evaluator|
+      rule.trigger_assignment ||= rule.course.assignments.create!
+    end
 
     factory :rule_with_scoring_ranges do
       transient do
