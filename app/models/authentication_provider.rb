@@ -82,6 +82,10 @@ class AuthenticationProvider < ActiveRecord::Base
     name.try(:demodulize)
   end
 
+  def self.login_message
+    t("Login with %{provider}", provider: display_name)
+  end
+
   # Drop and recreate the authentication_providers view, if it exists.
   #
   # to be used from migrations that existed before the table rename. should
@@ -134,7 +138,7 @@ class AuthenticationProvider < ActiveRecord::Base
   SENSITIVE_PARAMS = [].freeze
 
   def self.login_button?
-    Rails.root.join("public/images/sso_buttons/sso-#{sti_name}.svg").exist?
+    Rails.root.join("app/views/shared/svg/_svg_icon_#{sti_name}.svg").exist?
   end
 
   def destroy

@@ -28,6 +28,10 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
     'Sign in with Apple'
   end
 
+  def self.login_message
+    display_name
+  end
+
   def self.sti_name
     'apple'
   end
