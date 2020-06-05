@@ -26,7 +26,7 @@ export default function register(editor) {
 
   Object.keys(superAndSub).forEach(key => {
     const oppositeKey = key === 'superscript' ? 'subscript' : 'superscript'
-    editor.ui.registry.addSplitButton(key, {
+    editor.ui.registry.addSplitButton(`inst_${key}`, {
       presets: 'listpreview',
       columns: 3,
       tooltip: superAndSub[key],

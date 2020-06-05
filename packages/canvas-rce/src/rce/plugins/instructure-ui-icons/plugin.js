@@ -17,6 +17,7 @@
  */
 
 import {
+  IconArrowOpenDownLine,
   IconAttachMediaLine,
   IconBoldLine,
   IconBulletListAlphaLine,
@@ -39,7 +40,10 @@ import {
   IconTextEndLine,
   IconTextStartLine,
   IconTextSubscriptLine,
-  IconTextSuperscriptLine
+  IconTextSuperscriptLine,
+  IconTextDirectionLtrLine,
+  IconTextDirectionRtlLine,
+  IconUnderlineLine
 } from '@instructure/ui-icons/es/svg'
 
 tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
@@ -57,6 +61,7 @@ tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
     image: IconImageLine,
     indent: IconIndentLine,
     italic: IconItalicLine,
+    underline: IconUnderlineLine,
     link: IconLinkLine,
     video: IconAttachMediaLine,
     document: IconDocumentLine,
@@ -104,7 +109,10 @@ tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
     },
 
     unlink: IconRemoveLinkLine,
-    'unordered-list': IconBulletListLine
+    'unordered-list': IconBulletListLine,
+    ltr: IconTextDirectionLtrLine,
+    rtl: IconTextDirectionRtlLine,
+    'chevron-down': IconArrowOpenDownLine
   }
   Object.keys(icons).forEach(key => {
     editor.ui.registry.addIcon(key, icons[key].src)

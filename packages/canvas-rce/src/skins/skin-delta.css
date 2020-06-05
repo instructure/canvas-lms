@@ -29,7 +29,7 @@
  * should look like.
  */
 .root {
-  background-color: var(--canvasBackgroundColor)
+  background-color: var(--canvasBackgroundColor);
 }
 
 :global {
@@ -47,7 +47,9 @@
   }
 
   /* fix RTL. tinyMCE tries to do this in its default theme but it's base style is too specific so when it does it, it isn't specific enough to override the base */
-  [dir="rtl"] .tox :not(svg) { direction: rtl }
+  [dir='rtl'] .tox :not(svg) {
+    direction: rtl;
+  }
 
   .tox-tinymce-aux {
     font-family: var(--canvasFontFamily);
@@ -78,7 +80,7 @@
     color: var(--canvasPrimaryButtonHoverColor);
   }
   .tox .tox-button:active:not(:disabled) {
-    background-color:var(--canvasPrimaryButtonBackground);
+    background-color: var(--canvasPrimaryButtonBackground);
     border-color: var(--canvasPrimaryButtonBorderColor);
     color: var(--canvasPrimaryButtonColor);
   }
@@ -173,7 +175,9 @@
     background-color: var(--activeMenuItemBackground);
     color: var(--activeMenuItemLabelColor);
   }
-  .tox .tox-collection--list .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
+  .tox
+    .tox-collection--list
+    .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
     background-color: var(--activeMenuItemBackground);
     color: var(--activeMenuItemLabelColor);
   }
@@ -494,8 +498,7 @@
   .tox .tox-tbtn:hover,
   .tox .tox-split-button:hover,
   .tox .tox-tbtn.tox-tbtn--enabled:hover,
-  .tox .tox-split-button .tox-tbtn.tox-split-button__chevron:hover
-  {
+  .tox .tox-split-button .tox-tbtn.tox-split-button__chevron:hover {
     background: var(--toolbarButtonHoverBackground);
     color: var(--canvasButtonColor);
   }
@@ -507,8 +510,8 @@
   /* styling lifted from instui Tabs */
   .tox .tox-tbtn.tox-tbtn--enabled::after {
     position: absolute;
-    top:-3px;
-    content: "\\25BC";
+    top: -3px;
+    content: '\\25BC';
     text-align: center;
     height: 8px;
     font-size: 8px;
@@ -538,10 +541,14 @@
   }
   .tox .tox-tbtn__select-chevron svg {
     fill: var(--canvasButtonColor);
+    width: 10px;
+    height: 10px;
   }
 
   .tox .tox-split-button__chevron svg {
     fill: var(--canvasButtonColor);
+    width: 10px;
+    height: 10px;
   }
   .tox .tox-split-button.tox-tbtn--disabled:hover,
   .tox .tox-split-button.tox-tbtn--disabled:focus,
@@ -599,18 +606,25 @@
   .tox-editor-container .tox-toolbar__primary {
     background-image: none;
   }
+
+  /* tinymce 5.3 picked up a border since 5.0 */
+  .tox .tox-menubar + .tox-toolbar-overlord .tox-toolbar__primary {
+    border-style: none;
+  }
+
   .tox .tox-toolbar .tox-toolbar__group,
   .tox .tox-toolbar-overlord .tox-toolbar__group,
   .tox-toolbar__overflow .tox-toolbar__group,
-  .tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type),
-  .tox[dir=rtl] .tox-toolbar__group:not(:last-of-type) {
+  .tox:not([dir='rtl']) .tox-toolbar__group:not(:last-of-type),
+  .tox[dir='rtl'] .tox-toolbar__group:not(:last-of-type) {
     border-style: none;
   }
   .tox-toolbar .tox-toolbar__group::after, /* regular toolbar */
   .tox-toolbar-overlord .tox-toolbar__group::after, /* wrapping toolbar */
   .tox-toolbar__overflow .tox-toolbar__group::after, /* floating toolbar */
-  .tox-tinymce-aux .tox-toolbar .tox-toolbar__group::after { /* popup toolbar */
-    content: "";
+  .tox-tinymce-aux .tox-toolbar .tox-toolbar__group::after {
+    /* popup toolbar */
+    content: '';
     display: inline-block;
     box-sizing: border-box;
     border-inline-end: 1px solid var(--canvasBorderColor);
@@ -631,7 +645,7 @@
     padding-inline-end: 0;
   }
 
-    .tox .tox-tbtn {
+  .tox .tox-tbtn {
     box-sizing: border-box;
   }
 
@@ -651,7 +665,7 @@
 
   .tox .tox-edit-area.active,
   .tox .tox-edit-area.active iframe {
-    border-color: var(--canvasFocusBorderColor)
+    border-color: var(--canvasFocusBorderColor);
   }
 
   .tox .tox-split-button .tox-tbtn {
@@ -665,7 +679,7 @@
   .tox .tox-split-button:hover .tox-split-button__chevron {
     background: var(--canvasBackgroundColor);
     color: var(--canvasButtonColor);
-    box-shadow: none
+    box-shadow: none;
   }
 
   .tox .tox-tbtn:hover.tox-split-button__chevron,
@@ -683,7 +697,11 @@
 
   /* MAKE INSTUI ICONS THE SAME SIZE AS THE DEFAULT TINYMCE ONES */
   /* this is because instUI icons don't have a "height" attribute like tinymce ones do, so this will make them consistent */
-  .tox .tox-icon svg:not([height]) { height: 16px }
+  .tox .tox-icon svg:not([height]) {
+    height: 16px;
+  }
   /* this is for instUI icons that that dropdown from a SplitButton like in our advlist plugin */
-  .tox .tox-collection__item-icon svg:not([height]) { height: 30px;}
+  .tox .tox-collection__item-icon svg:not([height]) {
+    height: 30px;
+  }
 }

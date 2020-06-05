@@ -104,7 +104,6 @@
     "react-dom": "^0.14.8 || ^15.0.0 || ^16",
     "react-draggable": "^3.3.0",
     "react-redux": "^5",
-    "react-tinymce": "^0.7.0",
     "react-transition-group": "^1",
     "redux": "^4",
     "redux-batch-middleware": "^0.2.0",

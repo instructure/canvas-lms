@@ -774,6 +774,7 @@ class RCEWrapper extends React.Component {
         }
       } catch (ex) {
         // log and ignore
+        // eslint-disable-next-line no-console
         console.error('Failed initializing rce autosave', ex)
       }
     }
@@ -959,10 +960,7 @@ class RCEWrapper extends React.Component {
 
   wrapOptions(options = {}) {
     const setupCallback = options.setup
-    options.toolbar = options.toolbar || []
-    const lti_tool_dropdown = options.toolbar.some(str => str.includes('lti_tool_dropdown'))
-      ? 'lti_tool_dropdown'
-      : ''
+
     return {
       ...options,
 
@@ -1007,13 +1005,13 @@ class RCEWrapper extends React.Component {
             'underline',
             'forecolor',
             'backcolor',
-            'superscript',
-            'subscript'
+            'inst_subscript',
+            'inst_superscript'
           ]
         },
         {
           name: formatMessage('Alignment and Indentation'),
-          items: ['align', 'bullist', 'outdent', 'indent', 'directionality']
+          items: ['align', 'bullist', 'inst_indent', 'inst_outdent', 'directionality']
         },
         {
           name: formatMessage('Canvas Plugins'),
@@ -1026,7 +1024,7 @@ class RCEWrapper extends React.Component {
         },
         {
           name: formatMessage('Miscellaneous and Apps'),
-          items: ['removeformat', 'table', 'instructure_equation', `${lti_tool_dropdown}`]
+          items: ['removeformat', 'table', 'instructure_equation', 'lti_tool_dropdown']
         }
       ],
       contextmenu: '', // show the browser's native context menu
