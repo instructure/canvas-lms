@@ -159,12 +159,16 @@ class ObserveeCard extends React.Component {
     }
   }
 
-  formatScore(score) {
-    if (score && score.final_score) {
-      return score.final_score + '%'
-    } else {
-      return "--";
+  formatScore(score = {}, result = '--') {
+    if (this.props.showProgressGrades) {
+      if (score.current_score) {
+        result = score.current_score + '%'
+      } 
+    } else if (score && score.final_score) {
+      result = score.final_score + '%'
     }
+
+    return result;
   }
 
   showCourseInfo(enr) {
@@ -179,7 +183,8 @@ class ObserveeCard extends React.Component {
       score={score} 
       course_details={course_details}
       reset_action={this.reset}
-      is_showing={this.state.detailClicked}></ObserveeCourseDetails>
+      is_showing={this.state.detailClicked}
+      showProgressGrades={this.props.showProgressGrades}></ObserveeCourseDetails>
   }
 
   renderAttendanceLockout(status) {
@@ -209,7 +214,7 @@ class ObserveeCard extends React.Component {
                     { this.state.showDetails === enr.id ? this.renderCourseDetails(enr, this.getCustomColor(enr), this.formatScore(enr.score), this.state.courseDetails) : undefined }
                     <a className="course-list-item" onClick={this.showCourseInfo.bind(this, enr)} href="#">
                       <span className="course-name" aria-label={enr.course_name}>{enr.course_name}</span>
-                      <span className="course-score" aria-label={this.formatScore(enr.score)}>
+                      <span className="course-score" aria-label="Grade">
                         {this.formatScore(enr.score)}
                         <i className="icon-arrow-open-right" aria-hidden="true"></i>
                       </span>

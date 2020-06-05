@@ -244,7 +244,7 @@ class ObserveeCourseDetails extends React.Component {
             </div>
           </div>
           <a className="gradebook-link"
-            href={`/courses/${this.props.enrollment.course_id}/grades?true_grade=true`}
+            href={`/courses/${this.props.enrollment.course_id}/grades${this.props.showProgressGrades ? '' : '?true_grade=true'}`}
             alt={`${this.props.enrollment.course_name} grades`}>
               View Grades
           </a>
