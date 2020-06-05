@@ -590,67 +590,77 @@ RSpec.describe ApplicationController do
   end
 
   describe 'content_tag_redirect' do
+    def create_tag(overrides)
+      ContentTag.create!(
+        {
+          id: 42,
+          content_id: 44,
+          tag_type: 'context_module',
+          context_type: 'Account',
+          context_id: 1
+        }.merge(overrides)
+      )
+    end
 
     it 'redirects for lti_message_handler' do
-      tag = double()
-      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Lti::MessageHandler')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_basic_lti_launch_request_url, 44, {:module_item_id => 42, resource_link_fragment: 'ContentTag:42'}).and_return('nil')
+      tag = create_tag(content_type: 'Lti::MessageHandler')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_basic_lti_launch_request_url, 44, {module_item_id: 42, resource_link_fragment: 'ContentTag:42'}).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for an assignment' do
-      tag = double()
-      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Assignment')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, {:module_item_id => 42}).and_return('nil')
+      tag = create_tag(content_type: 'Assignment')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, {module_item_id: 42}).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a quiz' do
-      tag = double()
-      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: true, content_type: 'Quizzes::Quiz')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_quiz_url, 44, {:module_item_id => 42}).and_return('nil')
+      tag = create_tag(content_type: 'Quizzes::Quiz')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_quiz_url, 44, {module_item_id: 42}).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a discussion topic' do
-      tag = double()
-      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'DiscussionTopic')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_discussion_topic_url, 44, {:module_item_id => 42}).and_return('nil')
+      tag = create_tag(content_type: 'DiscussionTopic')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_discussion_topic_url, 44, {module_item_id: 42}).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a wikipage' do
-      tag = double()
-      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'WikiPage', content: {})
-      expect(controller).to receive(:polymorphic_url).with([Account.default, tag.content], {:module_item_id => 42}).and_return('nil')
+      tag = create_tag(content_type: 'WikiPage')
+      expect(controller).to receive(:polymorphic_url).with([Account.default, tag.content], {module_item_id: 42}).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a rubric' do
-      tag = double()
-      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Rubric')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_rubric_url, 44, {:module_item_id => 42}).and_return('nil')
+      tag = create_tag(content_type: 'Rubric')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_rubric_url, 44, {module_item_id: 42}).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a question bank' do
-      tag = double()
-      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'AssessmentQuestionBank')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_question_bank_url, 44, {:module_item_id => 42}).and_return('nil')
+      tag = create_tag(content_type: 'AssessmentQuestionBank')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_question_bank_url, 44, {module_item_id: 42}).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for an attachment' do
-      tag = double()
-      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Attachment')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_file_url, 44, {:module_item_id => 42}).and_return('nil')
+      tag = create_tag(content_type: 'Attachment')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_file_url, 44, {module_item_id: 42}).and_return('nil')
+      allow(controller).to receive(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for an alignment' do
+      tag = create_tag(content_type: 'Assignment', tag_type: 'learning_outcome')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, {}).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
