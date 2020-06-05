@@ -1197,7 +1197,7 @@ acknowledge that you have read and agreed to the
 
         </div>
 
-        <% if !@account.site_admin? && @account.root_account.feature_enabled?(:notification_for_global_announcement) %>
+        <% if !@account.site_admin? %>
           <div class="ic-Form-control ic-Form-control--checkbox">
             <%= f.check_box :send_message %>
             <%= f.label :send_message, t("Send notification directly to users when announcement starts"), :class => "ic-Label" %>
