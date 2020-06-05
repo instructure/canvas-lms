@@ -86,30 +86,5 @@ class CreateConditionalReleaseTables < ActiveRecord::Migration[5.2]
         index: { name: 'index_cr_assignment_set_actions_on_root_account_id' }
       t.timestamps
     end
-
-    create_table :conditional_release_rule_templates do |t|
-      t.string :name
-      t.integer :context_id, limit: 8
-      t.string :context_type
-      t.datetime :deleted_at
-
-      t.references :root_account, foreign_key: { to_table: 'accounts'}, limit: 8, null: false,
-        index: { name: 'index_cr_rule_templates_on_root_account_id' }
-      t.index [:root_account_id, :context_id, :context_type], where: 'deleted_at IS NULL',
-        name: 'index_cr_rule_templates_on_account_and_context'
-      t.timestamps
-    end
-
-    create_table :conditional_release_scoring_range_templates do |t|
-      t.references :rule_template, foreign_key: { to_table: 'conditional_release_rule_templates' }, limit: 8, index: false
-      t.decimal :upper_bound
-      t.decimal :lower_bound
-      t.datetime :deleted_at
-      t.index :rule_template_id, where: 'deleted_at IS NULL', name: 'index_cr_scoring_range_templates_on_rule_template_id'
-
-      t.references :root_account, foreign_key: { to_table: 'accounts'}, limit: 8, null: false,
-        index: { name: 'index_cr_scoring_range_templates_on_root_account_id' }
-      t.timestamps
-    end
   end
 end
