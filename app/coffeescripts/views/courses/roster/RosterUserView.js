@@ -109,13 +109,14 @@ export default class RosterUserView extends Backbone.View {
 
     if (json.canViewLoginIdColumn) {
       json.canViewLoginId = true
-      json.login_id = json.login_id
     }
 
     if (json.canViewSisIdColumn) {
       json.canViewSisId = true
-      return (json.sis_id = json.sis_user_id)
+      json.sis_id = json.sis_user_id
     }
+    json.hideSectionsOnCourseUsersPage = ENV.course.hideSectionsOnCourseUsersPage
+    return json
   }
 
   observerJSON(json) {

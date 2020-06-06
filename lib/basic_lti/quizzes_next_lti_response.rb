@@ -47,10 +47,8 @@ module BasicLTI
     end
 
     def submitted_at_date
-      # we store submitted_at date in the resultData node because
-      # the IMS LTI gem does not have a method to put it elsewhere
-      return nil if submitted_at_date_text.blank?
-      @_submitted_at_date ||= Time.zone.parse(submitted_at_date_text)
+      submitted_at = submission_submitted_at
+      submitted_at.present? ? Time.zone.parse(submitted_at) : nil
     end
 
     def result_data_text_json
@@ -59,12 +57,6 @@ module BasicLTI
       json.with_indifferent_access
     rescue JSON::ParserError
       nil
-    end
-
-    def submitted_at_date_text
-      json = result_data_text_json
-      return result_data_text if json.blank?
-      json[:submitted_at]
     end
 
     def submission_reopened?

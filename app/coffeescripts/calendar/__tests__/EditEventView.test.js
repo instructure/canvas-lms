@@ -37,6 +37,8 @@ describe('EditEventView', () => {
   function render(overrides = {}) {
     const event = new CalendarEvent({
       id: 1,
+      title: 'My Event',
+      start_at: '2020-05-11T23:27:35.738Z',
       context_code: 'course_1',
       ...overrides
     })
@@ -95,7 +97,7 @@ describe('EditEventView', () => {
 
       it('does show current conference when there is a current conference', async () => {
         enableConferences(CONFERENCE_TYPES.slice(1))
-        render({web_conference: {id: 1, conference_type: 'type1', title: 'FooConf'}})
+        render({web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'}})
         const conferencingRow = within(document.body)
           .getByText('Conferencing:')
           .closest('tr')
@@ -111,7 +113,11 @@ describe('EditEventView', () => {
         id: '1',
         name: 'Foo',
         conference_type: 'type1',
-        lti_settings: {a: 1, b: 2, c: 3}
+        lti_settings: {a: 1, b: 2, c: 3},
+        title: 'My Event',
+        user_settings: {
+          scheduled_date: '2020-05-11T00:00:00.000Z'
+        }
       }
       const view = render({
         web_conference

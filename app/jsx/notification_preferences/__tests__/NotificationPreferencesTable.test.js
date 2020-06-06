@@ -57,4 +57,23 @@ describe('Notification Preferences Table', () => {
       dueDateCategory.children[commsChannel1].querySelector('svg[name="IconMuted"]')
     ).toBeInTheDocument()
   })
+
+  it('only renders the category groups and categories that it is given', () => {
+    const {queryByTestId} = render(
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences} />
+    )
+
+    expect(queryByTestId('courseActivities')).not.toBeNull()
+    expect(queryByTestId('conversations')).toBeNull()
+  })
+
+  it('renders the category description', () => {
+    const {getByTestId, getByText} = render(
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences} />
+    )
+
+    const dueDateTooltip = getByTestId('due_date_description')
+    expect(dueDateTooltip).not.toBeNull()
+    expect(dueDateTooltip).toContainElement(getByText('Due date description'))
+  })
 })

@@ -24,4 +24,8 @@ class LtiConference < WebConference
   def admin_join_url
     nil
   end
+
+  def lti?
+    true
+  end
 end

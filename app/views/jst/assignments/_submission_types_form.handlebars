@@ -25,9 +25,16 @@
         <option value="on_paper" {{selectedIf defaultToOnPaper}}>
           {{#t "submission_types.on_paper"}}On Paper{{/t}}
         </option>
-        <option value="external_tool" {{selectedIf isNonDefaultExternalTool}}>
+        <option value="external_tool" {{selectedIf isGenericExternalTool}}>
           {{#t "submission_types.external_tool"}}External Tool{{/t}}
         </option>
+        {{#if submissionTypeSelectionTools}}
+          {{#each submissionTypeSelectionTools}}
+            <option value="external_tool_placement_{{this.id}}" {{selectedIf this.id ../selectedSubmissionTypeToolId}}>
+              {{this.base_title}}
+            </option>
+          {{/each}}
+        {{/if}}
       </select>
       {{#if submissionTypesFrozen }}
         <input type="hidden" name="submission_type" value="{{submissionType}}" />
@@ -165,12 +172,23 @@
         </div>
       </div>
 
+      {{!-- LTI launch button for getting additional data for external tool assignments (when selected via placement) --}}
+      <div id="assignment_submission_type_selection_tool_launch_container" style="{{hiddenUnless selectedSubmissionTypeToolId}}">
+        {{!-- TODO make this button actually do something --}}
+        <div class="pad-box">
+          <div class="ic-Form-control">
+            <button class="Button icon-link btn-primary" type="button" id="assignment_submission_type_selection_launch_button">
+            </button>
+          </div>
+        </div>
+      </div>
+
       {{!-- Default external tool configuration --}}
-      <div id="default_external_tool_container" data-component="DefaultToolForm" style="{{hiddenUnless isExternalTool}}">
+      <div id="default_external_tool_container" data-component="DefaultToolForm" style="{{hiddenUnless isNonPlacementExternalTool}}">
       </div>
 
       {{!-- External tool submissions --}}
-      <div id="assignment_external_tool_settings" style="{{hiddenUnless isExternalTool}}">
+      <div id="assignment_external_tool_settings" style="{{hiddenUnless isNonPlacementExternalTool}}">
         <div class="subtitle">
           <strong>
             {{#t 'external_tool_options'}}External Tool Options{{/t}}

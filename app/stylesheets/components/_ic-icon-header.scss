@@ -16,32 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-@styleguide Icon-Text Combo
-
-## Add an icon to your text the right way
-
-The Icon-Text Combo is a tiny component for when you want to use an icon with a headline or sentence, and not have the text wrap around the icon in an unsightly fashion.
-
-```html
-
-<div class="ic-icon-text-combo">
-  <i class="icon-quiz"></i>
-  <div class="ic-icon-text-combo__text">
-    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam dolor sit amet.
-  </div>
-</div>
-
-<div class="ic-icon-text-combo">
-  <i class="icon-assignment"></i>
-  <h3 class="ic-icon-text-combo__text">
-    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam dolor sit amet.
-  </h3>
-</div>
-
-```
-*/
-
 .ic-icon-text-combo {
   display: flex;
   align-items: center;

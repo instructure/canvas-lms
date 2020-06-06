@@ -314,6 +314,41 @@ describe OutcomeResultsController do
           expect_user_order(json['rollups'], [@student3, @student2, @student1])
         end
 
+        context 'with teachers who have limited privilege' do
+          before do
+            @section1 = add_section 's1', course: outcome_course
+            @section2 = add_section 's2', course: outcome_course
+            @section3 = add_section 's3', course: outcome_course
+
+            student_in_section @section1, user: @student1, allow_multiple_enrollments: false
+            student_in_section @section2, user: @student2, allow_multiple_enrollments: false
+            student_in_section @section3, user: @student3, allow_multiple_enrollments: false
+            @teacher = teacher_in_section(@section2, :limit_privileges_to_course_section => true)
+            user_session(@teacher)
+          end
+
+          context 'with the .limit_section_visibility_in_lmgb FF enabled' do
+            before do
+              @course.root_account.enable_feature!(:limit_section_visibility_in_lmgb)
+            end
+
+            it 'should only return students in the teachers section' do
+              get_rollups(sort_by: 'student', sort_order: 'desc')
+              json = parse_response(response)
+              expect_user_order(json['rollups'], [@student2])
+            end
+          end
+
+          context 'with the .limit_section_visibility_in_lmgb FF disabled' do
+            it 'returns students in all sections' do
+              get_rollups(sort_by: 'student', sort_order: 'desc')
+              json = parse_response(response)
+              expect_user_order(json['rollups'], [@student3, @student2, @student1])
+            end
+          end
+        end
+
+
         context 'with pagination' do
           let(:json) { parse_response(response) }
 

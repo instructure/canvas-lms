@@ -40,12 +40,14 @@
       <%= user_content(notification.message.gsub(/(({{)|(%7B%7B))ACCOUNT_DOMAIN((}})|(%7D%7D))/,request.host_with_port).gsub(/(({{)|(%7B%7B))CANVAS_USER_ID((}})|(%7D%7D))/,@current_user.global_id.to_s)) unless notification.message.nil? %>
       </span>
     </div>
+    <% unless @for_display %>
     <div class="ic-notification__actions">
       <a href="#" class="Button Button--icon-action" data-url="<%= dashboard_close_notification_path(notification.id) %>" data-remove=".ic-notification" title="<%= t :close, 'close' %>" role="button">
         <i class="icon-x"></i>
         <span class="screenreader-only"><%= t :close, 'close' %></span>
       </a>
     </div>
+    <% end %>
   </div>
   <span class="notification_account_content_text">
     <%= t("This is a message for *%{name}*", name: notification.account.name, wrapper: '<b>\1</b>') %>

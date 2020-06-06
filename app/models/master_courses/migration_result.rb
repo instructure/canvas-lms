@@ -20,10 +20,17 @@ class MasterCourses::MigrationResult < ActiveRecord::Base
   belongs_to :master_migration, :class_name => "MasterCourses::MasterMigration"
   belongs_to :content_migration
   belongs_to :child_subscription, :class_name => "MasterCourses::ChildSubscription"
+  belongs_to :root_account, :class_name => 'Account'
+
+  before_create :set_root_account_id
 
   serialize :results, Hash
 
   def skipped_items
     results[:skipped] || []
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= self.master_migration.root_account_id
   end
 end

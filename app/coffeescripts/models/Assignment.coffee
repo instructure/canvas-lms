@@ -71,6 +71,7 @@ export default class Assignment extends Model
   isDiscussionTopic: => @_hasOnlyType 'discussion_topic'
   isPage: => @_hasOnlyType 'wiki_page'
   isExternalTool: => @_hasOnlyType 'external_tool'
+  isNonPlacementExternalTool: => @isExternalTool
 
   defaultToolName: => ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && escape(ENV.DEFAULT_ASSIGNMENT_TOOL_NAME).replace(/%20/g, ' ')
   defaultToolUrl: => ENV.DEFAULT_ASSIGNMENT_TOOL_URL
@@ -192,10 +193,22 @@ export default class Assignment extends Model
       @externalToolUrl()
     )
 
-  isNonDefaultExternalTool: =>
+  isGenericExternalTool: =>
     # The assignment is type 'external_tool' and the default tool is not selected
-    # or chosen from the "quick create" assignment index modal.
-    @submissionType() == 'external_tool' && !@isDefaultTool()
+    # or chosen from the "quick create" assignment index modal
+    # or via the submission_type_selection placement type
+    @submissionType() == 'external_tool' && !@isDefaultTool() && !@selectedSubmissionTypeToolId()
+
+  isNonPlacementExternalTool: =>
+    # The assignment is type 'external_tool' and the tool is not selected
+    # via the submission_type_selection placement type
+    @submissionType() == 'external_tool' && !@selectedSubmissionTypeToolId()
+
+  selectedSubmissionTypeToolId: =>
+    return if @submissionType() != 'external_tool'
+    tool_id = @get('external_tool_tag_attributes')?.content_id
+    if tool_id && _.find(@submissionTypeSelectionTools(), (tool) -> tool_id == tool.id)
+      return tool_id
 
   submissionType: =>
     submissionTypes = @_submissionTypes()
@@ -418,6 +431,9 @@ export default class Assignment extends Model
   dueDateRequiredForAccount: =>
     return ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
 
+  submissionTypeSelectionTools: =>
+    return ENV.SUBMISSION_TYPE_SELECTION_TOOLS || []
+
   defaultDates: =>
     group = new DateGroup
       due_at:    @get("due_at")
@@ -525,8 +541,9 @@ export default class Assignment extends Model
       'secureParams', 'inClosedGradingPeriod', 'dueDateRequired',
       'submissionTypesFrozen', 'anonymousInstructorAnnotations',
       'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox',
-      'defaultToolName', 'isDefaultTool', 'isNonDefaultExternalTool', 'defaultToNone',
-      'defaultToOnline', 'defaultToOnPaper', 'objectTypeDisplayName'
+      'defaultToolName', 'isDefaultTool', 'isGenericExternalTool', 'isNonPlacementExternalTool', 'defaultToNone',
+      'defaultToOnline', 'defaultToOnPaper', 'objectTypeDisplayName',
+      'selectedSubmissionTypeToolId', 'submissionTypeSelectionTools'
     ]
 
     hash =

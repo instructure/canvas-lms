@@ -35,7 +35,7 @@ class CourseProgress
       result = course.modules_visible_to(user)
       ActiveRecord::Associations::Preloader.new.preload(result, :content_tags)
       result
-                    end
+    end
   end
 
   def current_module
@@ -54,13 +54,13 @@ class CourseProgress
 
   def module_progressions
     @_module_progressions ||= if @preloaded_progressions
-                                module_ids = modules.pluck(:id)
-                                @preloaded_progressions[course.id]&.select { |cmp| module_ids.include?(cmp.context_module_id) } ||
-                                  ContextModuleProgression.none
-                              else
-                                course.context_module_progressions.
-                                  where(user_id: user, context_module_id: modules)
-                              end
+      module_ids = modules.pluck(:id)
+      @preloaded_progressions[course.id]&.select { |cmp| module_ids.include?(cmp.context_module_id) } ||
+        ContextModuleProgression.none
+    else
+      course.context_module_progressions.
+        where(user_id: user, context_module_id: modules)
+    end
   end
 
   def current_position
@@ -90,7 +90,7 @@ class CourseProgress
 
   def requirements
     # e.g. [{id: 1, type: 'must_view'}, {id: 2, type: 'must_view'}]
-    @_requirements ||= modules.flat_map { |m| m.completion_requirements_visible_to(@user, :is_teacher => false) }.uniq
+    @_requirements ||= modules.flat_map { |m| module_requirements(m) }.uniq
   end
 
   def requirement_count
@@ -104,11 +104,7 @@ class CourseProgress
   def requirements_completed
     # find the list of requirements that have been recorded as met for this module, then
     # select only those requirements that are current, and filter out any duplicates
-    @_requirements_completed ||= module_progressions.flat_map { |cmp|
-        (overridden_requirements_met && overridden_requirements_met[cmp.id]) || cmp.requirements_met
-      }.
-      select { |req| requirements.include?(req) }.
-      uniq
+    @_requirements_completed ||= module_progressions.flat_map { |cmp| module_requirements_completed(cmp) }.uniq
   end
 
   def requirement_completed_count
@@ -118,8 +114,8 @@ class CourseProgress
   def current_requirement_url
     return unless in_progress? && current_content_tag
     course_context_modules_item_redirect_url(:course_id => course.id,
-                                             :id => current_content_tag.id,
-                                             :host => HostUrl.context_host(course))
+      :id => current_content_tag.id,
+      :host => HostUrl.context_host(course))
   end
 
   def in_progress?
@@ -127,7 +123,7 @@ class CourseProgress
   end
 
   def completed?
-    has_requirements? && requirement_completed_count >= requirement_count
+    has_requirements? && module_progressions.all? { |prog| module_completed?(prog) }
   end
 
   def most_recent_module_completed_at
@@ -154,8 +150,33 @@ class CourseProgress
       }
     else
       { error:
-          { message: 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course' }
+        { message: 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course' }
       }
     end
   end
+
+  private
+
+  def module_requirements(mod)
+    @_module_requirements ||= {}
+    @_module_requirements[mod.id] ||= mod.completion_requirements_visible_to(@user, :is_teacher => false)
+  end
+
+  def module_requirements_completed(progression)
+    @_module_requirements_completed ||= {}
+    @_module_requirements_completed[progression.id] ||= begin
+      met = (overridden_requirements_met && overridden_requirements_met[progression.id]) || progression.requirements_met
+      met.select { |req| module_requirements(progression.context_module).include?(req) }.uniq
+    end
+  end
+
+  def module_reqs_to_complete_count(mod)
+    # this will account for modules that only need to complete one item
+    mod.requirement_count || module_requirements(mod).count
+  end
+
+  def module_completed?(progression)
+    module_requirements_completed(progression).count >= module_reqs_to_complete_count(progression.context_module)
+  end
+
 end

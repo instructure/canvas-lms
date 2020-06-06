@@ -4630,6 +4630,48 @@ QUnit.module('SpeedGrader', rootHooks => {
 
           revertFromFormSubmit.restore()
         })
+
+        test('does not submit a comment request if one is already in progress', () => {
+          $.ajaxJSON.resetHistory()
+
+          SpeedGrader.EG.addSubmissionComment('hello')
+          SpeedGrader.EG.addSubmissionComment('hello???')
+          strictEqual($.ajaxJSON.callCount, 1)
+        })
+
+        test('submits a comment request if the preceding request succeeded', () => {
+          $.ajaxJSON.resetHistory()
+          $.ajaxJSON.callsFake((_url, _method, _form, success, _error) => {
+            sinon.stub(SpeedGrader.EG, 'revertFromFormSubmit')
+            sinon.stub(window, 'setTimeout')
+
+            success([])
+
+            window.setTimeout.restore()
+            SpeedGrader.EG.revertFromFormSubmit.restore()
+          })
+
+          SpeedGrader.EG.addSubmissionComment('ok')
+          SpeedGrader.EG.addSubmissionComment('ok!')
+          strictEqual($.ajaxJSON.callCount, 2)
+        })
+
+        test('submits a comment request if the preceding request failed', () => {
+          $.ajaxJSON.resetHistory()
+          $.ajaxJSON.callsFake((_url, _method, _form, _success, error) => {
+            sinon.stub(SpeedGrader.EG, 'revertFromFormSubmit')
+            sinon.stub(SpeedGrader.EG, 'handleGradingError')
+
+            error()
+
+            SpeedGrader.EG.handleGradingError.restore()
+            SpeedGrader.EG.revertFromFormSubmit.restore()
+          })
+
+          SpeedGrader.EG.addSubmissionComment('no')
+          SpeedGrader.EG.addSubmissionComment('noooooo')
+          strictEqual($.ajaxJSON.callCount, 2)
+        })
       })
 
       QUnit.module('#handleGradeSubmit', hooks => {
@@ -6930,12 +6972,12 @@ QUnit.module('SpeedGrader', rootHooks => {
 
             permissionsHooks.beforeEach(() => {
               originalConcluded = window.jsonData.context.concluded
-              originalWorflowState = SpeedGrader.EG.currentStudent.submission.workflow_state
+              originalWorkflowState = SpeedGrader.EG.currentStudent.submission.workflow_state
               SpeedGrader.EG.currentStudent.submission.workflow_state = 'graded'
             })
 
             permissionsHooks.afterEach(() => {
-              SpeedGrader.EG.currentStudent.submission.workflow_state = originalWorflowState
+              SpeedGrader.EG.currentStudent.submission.workflow_state = originalWorkflowState
               window.jsonData.context.concluded = originalConcluded
             })
 

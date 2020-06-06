@@ -17,9 +17,12 @@
 
 class MasterCourses::MasterMigration < ActiveRecord::Base
   belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
+  belongs_to :root_account, :class_name => 'Account'
   belongs_to :user
 
   has_many :migration_results, :class_name => "MasterCourses::MigrationResult"
+
+  before_create :set_root_account_id
 
   serialize :export_results, Hash
   serialize :migration_settings, Hash
@@ -326,5 +329,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     "!/blueprint/blueprint_templates/#{master_template_id}/#{id}"
   end
 
-end
+  def set_root_account_id
+    self.root_account_id = self.master_template.root_account_id
+  end
 
+end

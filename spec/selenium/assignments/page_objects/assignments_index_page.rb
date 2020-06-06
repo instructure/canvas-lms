@@ -102,7 +102,7 @@ module AssignmentsIndexPage
   end
 
   def assignment_dates_inputs(assignment_name)
-    ff("input", bulk_edit_assignment_row(assignment_name))
+    ff("input[role='combobox']", bulk_edit_assignment_row(assignment_name))
   end
 
   def bulk_edit_save_button
@@ -113,6 +113,37 @@ module AssignmentsIndexPage
     fj("button:contains('Saving...')")
   end
 
+  def batch_edit_button
+    fj("button:contains('Batch Edit')")
+  end
+
+  def select_assignment_checkbox(assignment_name)
+    f("input[type='checkbox']", bulk_edit_assignment_row(assignment_name))
+  end
+
+  def batch_edit_dialog
+    f("span [role='dialog']")
+  end
+
+  def batch_edit_dialog_ok_button
+    fj("button:contains('Ok')")
+  end
+
+  def batch_edit_dialog_days_up_button
+    ff("button", batch_edit_dialog)[1]
+  end
+
+  def batch_edit_dialog_days_down_button
+    ff("button", batch_edit_dialog)[2]
+  end
+
+  def dialog_remove_date_radio_btn
+    ff("input[type='radio']", batch_edit_dialog)[1]
+  end
+
+  def dialog_shift_date_radio_btn
+    ff("input[type='radio']", batch_edit_dialog)[0]
+  end
   #------------------------------ Actions --------------------------------
 
   def visit_assignments_index_page(course_id)
@@ -130,5 +161,10 @@ module AssignmentsIndexPage
     bulk_edit_save_button.click
     run_jobs
     wait_for(method: nil, timeout: 5) { saving_dates_button.displayed? == false}
+  end
+
+  def open_batch_edit_dialog
+    batch_edit_button.click
+    wait_for(method: nil, timeout: 3) { batch_edit_dialog.displayed? == true}
   end
 end

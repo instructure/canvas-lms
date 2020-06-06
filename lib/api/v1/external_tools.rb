@@ -19,17 +19,18 @@
 module Api::V1::ExternalTools
   include Api::V1::Json
 
-  def external_tools_json(tools, context, user, session, extension_types = Lti::ResourcePlacement.valid_placements)
+  def external_tools_json(tools, context, user, session, extension_types = Lti::ResourcePlacement.valid_placements(@domain_root_account))
     tools.map do |topic|
       external_tool_json(topic, context, user, session, extension_types)
     end
   end
 
-  def external_tool_json(tool, context, user, session, extension_types = Lti::ResourcePlacement.valid_placements)
+  def external_tool_json(tool, context, user, session, extension_types = Lti::ResourcePlacement.valid_placements(@domain_root_account))
     methods = %w[privacy_level custom_fields workflow_state vendor_help_link]
     methods += extension_types
     only = %w(id name description url domain consumer_key created_at updated_at description)
     only << 'allow_membership_service_access' if tool.context.root_account.feature_enabled?(:membership_service_for_lti_tools)
+    only << 'is_rce_favorite' if tool.can_be_rce_favorite?
     json = api_json(tool, user, session,
                   :only => only,
                   :methods => methods

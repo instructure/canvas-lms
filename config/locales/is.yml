@@ -1274,6 +1274,7 @@ is:
         locked: "Læsa þessari stillingu fyrir undirreikninga og námskeið"
         login_handle_name: Innskráningarmerki
         mfa_settings: Fjölþáttaauðkenning
+        mobile_qr_login_is_enabled: "Leyfir innskráningar í snjallöpp með notkun QR-kóða"
         name: "Heiti reiknings"
         no_enrollments_can_create_courses: "Notendur sem eru ekki innritaðir"
         open_registration: "Opna skráningu"
@@ -2594,6 +2595,7 @@ is:
   application_secret_e6803c7e: "Aðgangslykill forrits"
   applied_cc7be774: Virkjað
   apply_781a2546: Virkja
+  apply_date_range_selection_cc4351ed: "Nota dagsetningasvið vals"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Setja upp síur. Ath: síðan endurhleðst ef smellt er á þennan hnapp."
   apply_theme_7af08387: "Virkja þema"
   applying_new_styles_to_subaccounts_e8aeeef2: "Virkja nýja stíla fyrir undirreikninga"
@@ -4628,6 +4630,7 @@ is:
   choose_usage_rights_33683854: "Velja notkunarréttindi..."
   chosencolor_is_not_a_valid_color_5d542cc: "‚%{chosenColor}' er ekki gildur litur."
   classic_quizzes_dee3c7b7: "Sígild próf"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Sígild próf valkostur fyrir tímasett próf án skila"
   clear_2084585f: Hreinsa
   clear_selected_file_82388e50: "Hreinsa valda skrá"
   clear_user_cache_ef079f7f: "Hreinsa flýtiminni notanda"
@@ -7417,6 +7420,7 @@ is:
   disable_a5c05db3: Aftengja
   disable_all_read_only_scopes_f9ffdd28: "Afvirkja öll skrifvarin umföng."
   disable_and_lock_7d0ef0e8: "Aftengja og læsa"
+  disable_automatic_submission_8e1d8676: "Óvirkja sjálfvirka innsendingu"
   disable_celebrations_description: "Virkjun þessa eiginleika felur alla fagnaðarkvikun."
   disable_content_security_policy_8660a787: "Óvirkja efnisöryggisstefnu"
   disable_extra_filter_options_1d1cdc02: "óvirkja auka síuvalkosti"
@@ -7997,7 +8001,7 @@ is:
   edit_role_1e96ad20: "Breyta hlutverki"
   edit_rubric: 
     buttons: 
-      create_rubric: "Stofna matskvarði"
+      create_rubric: "Stofna matskvarða"
       update_rubric: "Uppfæra matskvarði"
     change: Breyta
     discussion_points_possible: 
@@ -8015,7 +8019,7 @@ is:
     titles: 
       criterion_long_description: "Löng lýsing á viðmiðun"
       edit_rubric_rating: "Breyta mati"
-      find_existing_rubric: "Finna matskvarði"
+      find_existing_rubric: "Finna matskvarða"
   edit_rubric_title_104d6fd2: "Breyta matskvarða: %{title}"
   edit_section_name_558cc89: "Breyta hluta „%{name}“"
   edit_survey_b0d6890d: "Breyta könnun"
@@ -8138,6 +8142,7 @@ is:
   enable_new_gradebook_history_page_e0fd9d02: "Heimila ferilsíðu í nýrri einkunnabók."
   enable_new_sis_integration_settings_ab6780a4: "Heimila nýjar SIS samþættingarstillingar"
   enable_notifications_10a4bf44: "Virkja tilkynningar"
+  enable_recording_for_this_conference_b8adff6: "Heimila upptöku á ráðstefnunni"
   enable_reregistration_for_lti_2_b2a10444: "Heimila endurskráningu fyrir LTI 2"
   enable_scope_ac28b832: "Virkja umfang"
   enable_student_context_card_links_eba2f2c5: "Heimila tengla á samhengisspjöldum nemenda"
@@ -10209,6 +10214,7 @@ is:
   hide_students_with_no_results_6a22f991: "Fela nemendur með engar niðurstöður"
   hide_sub_accounts_for_account_name_a6de98bd: "Fela undirreikninga fyrir %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Fela mikilvægar lærdómsniðurstöðu hnappinn miðað við leyfi notenda"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Felur vissa nemendur og hluta í LMGB ef kennari hefur aðeins aðgang að vissum hlutum"
   hiding_grades_82691e44: "Fel einkunnir"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Ekki er leyft að fela einkunnir þar sem engar einkunnir hafa verið gefnar út fyrir þetta verkefni."
   hiding_grades_is_not_allowed_because_no_grades_hav_6f52fcf6: "Ekki er leyft að fela einkunnir þar sem engar einkunnir hafa verið birtar fyrir þetta verkefni."
@@ -10369,6 +10375,9 @@ is:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP metagagnaslóð"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Ef eigind er merkt eingöngu til ráðstöfunar verður hún aðeins notuð þegar Just In Time Provisioning stofnar nýjan notanda og verður ekki uppfærð í hvert sinn sem notandi skráir sig inn."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      Ef LTI verkfæri með uppstillingarstillingu er uppsett, sést ný færsla í
+      tegund skila fellilista verkefnisins til að stilla verkefnið fyrir verkfærið á skjótan hátt
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Ef bæði einkunnir - breyta og einkunnir eru óvirkar, verður einkunnabók falin frá yfirliti námskeiðs."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Ef bæði einkunnir - breyta og einkunnir eru óvirkar, verður einkunnabók falin frá yfirliti námskeiðs."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Ef bæði einkunnir - breyta og einkunnir eru óvirkar, verður einkunnabók falin frá yfirliti námskeiðs."
@@ -11210,6 +11219,7 @@ is:
     other: 
       one: "1 annar"
       other: "%{count} aðrir"
+  list_collapsed_381ef1b6: "Listi dreginn saman. "
   list_collapsed_5f19f5bb: "Listi dreginn saman"
   list_collapsed_9ac35920: "Listi dreginn saman."
   list_collapsed_dde87718: "Listi dreginn saman"
@@ -15365,6 +15375,7 @@ is:
     labels: 
       requirements_must_be_completed: "Eftirfarandi kröfur þarf að uppfylla áður en síðan verður opnuð"
   presentation_2d9387ca: Kynning
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Sýnir prófstillingar til að forðast sjálfvirk skil tímamældra prófa þegar tiltækum tíma er lokið."
   press_space_to_start_over_d4b8a2da: "Ýttu á „bil“ til að byrja aftur"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Ýttu á kommulykilinn eða Shift + spurningarmerkið til að sjá lista yfir flýtilykla"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Ýttu á kommulykilinn eða Shift + ? til að sjá lista yfir flýtilykla"
@@ -17331,7 +17342,7 @@ is:
   remove_text_8e485c41: "Fjarlægja %{text}"
   remove_these_dates_48453a81: "Fjarlægja þessar dagsetningar"
   remove_this_item_from_the_module_4b2ceab7: "Fjarlægja þetta atriði úr einingunni"
-  remove_this_rubric_from_my_list_c7d80704: "Fjarlægja þetta matskvarði af listanum mínum"
+  remove_this_rubric_from_my_list_c7d80704: "Fjarlægja þennan matskvarða af listanum mínum"
   remove_user_from_section_5556f465: "Fjarlægja notanda úr hluta"
   removed_course_association_course_a233342c: "Fjarlægði námskeiðstengingu %{course}"
   removed_user_as_group_leader_bb69330f: "Fjarlægði %{user} sem hópstjóra"
@@ -17412,6 +17423,7 @@ is:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Meina nemendum aðgang að námskeiðum fyrir upphafsdag"
   restrict_students_from_annotating_6c28ab9b: "Takmarka athugasemdir nemenda"
   restricted_access_d3e99a39: "Takmarkaður aðgangur"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Takmörkuð sýn fyrir kennara í LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Skila aftur í viðeigandi verkfæri svo hægt sé að greina ritstuld."
   resubmit_to_tool_name_1cf02a31: "Skila aftur til %{tool_name}"
   resubmitted_2080646f: "Skilað aftur"
@@ -17652,7 +17664,7 @@ is:
       points_possible: 
         one: "1 punktur mögulegur"
         other: "%{count} punktar mögulegir"
-      remove_rubric: "Fjarlægja þetta matskvarði af listanum mínum"
+      remove_rubric: "Fjarlægja þennan matskvarða af listanum mínum"
   rubrics_add_edit_delete_8299eff7: "Matsviðmið - bæta við / breyta / eyða"
   rubrics_and_speedgrader_ececaed4: "Matsviðmið og SpeedGrader"
   rubrics_b5ef369b: Matskvarði
@@ -17705,6 +17717,7 @@ is:
   saving_recording_e111cb05: "Vista upptöku..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Ekki tókst að vista CSP stöðu, reyndu aftur."
   schedule_student_availability_332154a: "Velja tiltækni nemanda"
+  scheduled_date_5b0aedb6: "Tímasett dagsetning"
   scheduler_65b5ac91: Skipuleggjari
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Canvas kerfisstjóri þinn þarf að virkja skipuleggjara."
   scheduler_must_be_enabled_for_your_account_e6e53972: "Virkja þarf skipuleggjara fyrir reikning þinn."
@@ -18011,6 +18024,7 @@ is:
   select_an_edit_operation_ec1467d: "Veldu breytingaaðgerð"
   select_assignment_title_4571ffcb: "Velja verkefni: %{title}"
   select_audio_file_7d905cce: "Velja hljóðskrá"
+  select_by_date_range_c3af0101: "Velja eftir dagsetningasviði"
   select_calendars_d5fa50b6: "Velja dagatöl"
   select_conference_provider_58c7f7fe: "Veldu ráðstefnuveitu"
   select_content: "Velja efni"
@@ -18088,7 +18102,9 @@ is:
   selected_grade_942f40ba: "Valin einkunn"
   selected_item_35bed33a: "Valið atriði"
   selected_subtree_a7693937: "Valið %{subtree}"
+  selection_end_date_10fcc8c6: "Lokadagsetning vals"
   selection_height_9d57ec24: "Hæð vals"
+  selection_start_date_2e4a4dca: "Upphafsdagsetning vals"
   selection_width_183acd79: "Breidd vals"
   self_enrollments: 
     already_enrolled: 
@@ -18550,25 +18566,25 @@ is:
       sidebar_content: "Efni í hliðarslá"
     rubric: 
       buttons: 
-        create: "Stofna matskvarði"
+        create: "Stofna matskvarða"
       defaults: 
-        rubric_title: "Eitthvað matskvarði"
+        rubric_title: "Einhver matskvarði"
       headers: 
         criteria: Viðmiðun
         points: Punktar
         ratings: Matsstig
       labels: 
         custom_rating: "Ég skrifa lausar athugasemdir við mat á nemendum"
-        grading_rubric: "Nota þetta matskvarði fyrir einkunnagjöf verkefnis"
+        grading_rubric: "Nota þennan matskvarða fyrir einkunnagjöf verkefnis"
         total_points: Heildarpunktar
         totallying_rubric: "Fela heildareinkunn fyrir matsniðurstöður"
       links: 
         delete: "Eyða matskvarða"
         edit: "Breyta matskvarða"
-        find_a_rubric: "Finna matskvarði"
+        find_a_rubric: "Finna matskvarða"
         find_another_rubric: "Finna annað matskvarði"
         find_outcome: "Finna niðurstöðu"
-        find_rubric: "Finna matskvarði"
+        find_rubric: "Finna matskvarða"
       messages: 
         locked: "Ekki hægt að breyta matskvarða eftir að byrjað er að nota það."
         rubric_in_use: 
@@ -18617,13 +18633,13 @@ is:
         long_description: "Löng lýsing"
     rubric_dialog: 
       buttons: 
-        use_this_rubric: "Nota þetta matskvarði"
+        use_this_rubric: "Nota þennan matskvarða"
       criterion_count: "%{count} viðmið"
       links: 
         manage_rubrics: "Umsjón með matskvarða"
       points_possible: "%{points} punktar mögulegir"
       titles: 
-        find_a_rubric: "Finna matskvarði"
+        find_a_rubric: "Finna matskvarða"
     rubric_forms: 
       criteria_description_label: "Lýsing á viðmiðun"
       points: "%{points} punktar"
@@ -19442,6 +19458,8 @@ is:
   submission_status_3079e730: "Staða á skilum"
   submission_tray_429ac3df: Skilabakki
   submission_type_a925fc5f: "Tegund skila"
+  submission_type_lti_placement_b448d5d0: "Tegundir skila LTI uppstillingar"
+  submission_type_selection_72ce19f: "Val á tegundum skila"
   submission_updated_8897f3b7: "Innsending uppfærð"
   submission_user_name_assignment_title_2cf5e3e9: "Skil: %{user_name}, %{assignment_title}"
   submissions: 
@@ -19694,6 +19712,7 @@ is:
     observees: "Fylgist með"
     outcomes: Niðurstöður
     pages: Síður
+    past_global_announcements: "Almennar tilkynningar"
     people: Fólk
     qr_mobile_login: "QR fyrir innskráningu með snjalltæki"
     quizzes: Próf
@@ -19852,6 +19871,7 @@ is:
                 ef námskeið eru stór. Þú getur farið af
                 síðunni og fengið tilkynningu að
                 niðurhali loknu.
+  the_end_date_must_be_after_the_start_date_2a273107: "Lokadagsetning þarf að vera á eftir upphafsdagsetningu"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Kóði kerfisins sem vinnur með SIS-innflutning var endurbættur til að það ætti auðveldara með að meðhöndla stöðugleika stórra SIS-innflutninga. Virkni SIS-innflutninga hefur ekki breyst."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Villustæðuslóð ef hún er til"
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Tengill í kynningu var færður efst í listann."
@@ -20903,6 +20923,7 @@ is:
   type_of_change_1cb24a0e: "Tegund breytingar"
   type_of_item_8a37f69d: "Tegund atriðis"
   type_to_search_de63ad38: "Sláðu inn til að leita"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Sláðu inn til að leita eða notaðu örvalyklana til að fara á milli valmöguleika."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Hafðu samband við Catalog-hönnuðinn þinn. Villuboð: %{message}"
   ukrainian_945b00b7: Úkraínska
   unable_to_accept_update_fd53a7e2: "Ekki hægt að samþykkja uppfærslu"

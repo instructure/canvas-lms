@@ -1227,6 +1227,7 @@ it:
         locked: "Blocca questa impostazione per subaccount e corsi"
         login_handle_name: "Etichetta di accesso"
         mfa_settings: "Autenticazione a più fattori"
+        mobile_qr_login_is_enabled: "Consenti login alle app per dispositivi mobile con l’uso dei codici QR"
         name: "Nome account"
         no_enrollments_can_create_courses: "Utenti senza iscrizioni"
         open_registration: "Apri registrazione"
@@ -2535,6 +2536,7 @@ it:
   application_secret_e6803c7e: "Segreto applicazione"
   applied_cc7be774: Applicato
   apply_781a2546: Applica
+  apply_date_range_selection_cc4351ed: "Applica selezione intervallo di date"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Applica filtri. Nota: se fai clic su questo pulsante, la pagina verrà ricaricata."
   apply_theme_7af08387: "Applica tema"
   applying_new_styles_to_subaccounts_e8aeeef2: "Applicazione di nuovi stile ai subaccount"
@@ -4547,6 +4549,7 @@ it:
   choose_usage_rights_33683854: "Scegli diritti di utilizzo..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' non è un colore valido."
   classic_quizzes_dee3c7b7: "Quiz classici"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Opzione quiz classici per quiz scaduti senza consegna"
   clear_2084585f: Cancella
   clear_selected_file_82388e50: "Cancella file selezionato"
   clear_user_cache_ef079f7f: "Cancella cache utente"
@@ -7323,6 +7326,7 @@ it:
   disable_a5c05db3: Disabilita
   disable_all_read_only_scopes_f9ffdd28: "Disabilita tutti gli ambiti di sola lettura."
   disable_and_lock_7d0ef0e8: "Disabilita e blocca"
+  disable_automatic_submission_8e1d8676: "Disattiva consegna automatica"
   disable_celebrations_description: "Se si abilita questa funzione, tutte le animazioni celebrazione saranno nascoste."
   disable_content_security_policy_8660a787: "Disabilita politica sulla sicurezza dei contenuti"
   disable_extra_filter_options_1d1cdc02: "disattiva opzioni extra filtro"
@@ -8045,6 +8049,7 @@ it:
   enable_moderated_grading_only_relevant_if_the_anon_1dcdc47b: "Abilitare valutazione moderata. Rilevante solo se il contrassegno Valutazione anonima moderata è abilitato."
   enable_new_sis_integration_settings_ab6780a4: "Abilita nuove impostazioni integrazione SIS"
   enable_notifications_10a4bf44: "Abilita notifiche"
+  enable_recording_for_this_conference_b8adff6: "Abilita la registrazione per questa conferenza"
   enable_reregistration_for_lti_2_b2a10444: "Abilita nuova registrazione per LTI 2"
   enable_scope_ac28b832: "Abilita ambito"
   enable_student_context_card_links_eba2f2c5: "Abilita link schede contesto studenti"
@@ -10088,6 +10093,7 @@ it:
   hide_students_with_no_results_6a22f991: "Nascondi studenti senza risultati"
   hide_sub_accounts_for_account_name_a6de98bd: "Nascondi subaccount per %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Nascondi il pulsante Importa esiti apprendimento in base alle autorizzazioni utente"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Nasconde determinati studenti e sezioni in LMGB se l’insegnante ha accesso solo ad una determinata sezione"
   hiding_grades_82691e44: "I voti verranno ora nascosti"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Non è possibile nascondere i voti perché i voti non sono stati rilasciati per questo compito."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Se si nascondono i voti, il browser si aggiorna. Il processo potrebbe richiedere un po’ di tempo."
@@ -10247,6 +10253,9 @@ it:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP URI metadati"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Se un attributo è contrassegnato come \"solo provisioning\", verrà utilizzato solo quando il provisioning Just-In-Time crea un nuovo utente e non verrà aggiornato a ogni accesso dell'utente."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      Se è installato uno strumento LTI configurato con il posizionamento, mostrerà una nuova voce nell’elenco a discesa
+      del tipo di consegna compito per configurare rapidamente il compito per lo strumento
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Se entrambe le autorizzazioni Voti - Modifica e Voti - Visualizza tutti i voti sono disattivate, il registro dei voti verrà nascosto in Esplorazione corso."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Se entrambe le opzioni Voti - Modifica e Voti - Visualizza tutti i voti sono disattivate, il registro dei voti verrà nascosto in Esplorazione corso."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Se entrambe le autorizzazioni Voti - Modifica e Voti - Visualizza tutti i voti sono disattivate, il registro dei voti verrà nascosto in Esplorazione corso."
@@ -11061,6 +11070,7 @@ it:
     other: 
       one: "1 altro"
       other: "altri %{count}"
+  list_collapsed_381ef1b6: "L’elenco si è compresso. "
   list_collapsed_5f19f5bb: "Elenco compresso"
   list_collapsed_9ac35920: "L’elenco si è chiuso."
   list_collapsed_dde87718: "L’elenco si è chiuso."
@@ -15149,7 +15159,7 @@ it:
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "I punti possibili devono essere pari a 0 o valore superiore per il tipo di valutazione selezionato"
   points_possible_must_be_greater_than_0_for_selecte_5708da1b: "I punti possibili devono essere maggiori di 0 per il tipo di valutazione selezionato"
   points_possible_points_fda3b111: "%{points_possible} Punti"
-  points_pts_e5596bf7: "%{points} pt"
+  points_pts_e5596bf7: "%{points} pt."
   points_should_be_strictly_decreasing_l_r_18f26f87: "I punti devono diminuire drasticamente: %{l} <= %{r}"
   points_to_endofrangepoints_pts_aad207f0: "%{points} in >%{endOfRangePoints} pt"
   points_total_pts_5b4cbd77: "%{points} /%{total} punti"
@@ -15220,6 +15230,7 @@ it:
     labels: 
       requirements_must_be_completed: "Per poter sbloccare questa pagina, devi completare i seguenti requisiti"
   presentation_2d9387ca: Presentazione
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Presenta l’impostazione quiz per evitare la consegna automatica di un quiz scaduto quando il tempo disponibile è terminato."
   press_space_to_start_over_d4b8a2da: "Premi “spazio” per iniziare di nuovo"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Premi il tasto virgola o MAIUSC + punto interrogativo per visualizzare un elenco di scelte rapide da tastiera"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Premi il tasto virgola o MAIUSC + ? per visualizzare un elenco di scelte rapide da tastiera"
@@ -17252,6 +17263,7 @@ it:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Limita l'accesso degli studenti ai corsi prima della data di inizio"
   restrict_students_from_annotating_6c28ab9b: "Limita le annotazioni degli studenti"
   restricted_access_d3e99a39: "Accesso limitato"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Visualizzazione limitata per insegnanti in LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Invia di nuovo allo strumento associato per l'analisi del plagio."
   resubmit_to_tool_name_1cf02a31: "Invia di nuovo a %{tool_name}"
   resubmitted_2080646f: "Inviato di nuovo"
@@ -17544,6 +17556,7 @@ it:
   saving_recording_e111cb05: "Salvataggio della registrazione in corso..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Impossibile salvare lo stato CSP, riprovare."
   schedule_student_availability_332154a: "Pianifica disponibilità studenti"
+  scheduled_date_5b0aedb6: "Data pianificata"
   scheduler_65b5ac91: "Utilità di pianificazione"
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "L'Utilità di pianificazione deve essere abilitata dall'amministratore Canvas."
   scheduler_must_be_enabled_for_your_account_e6e53972: "L'Utilità di pianificazione deve essere abilitata per l'account."
@@ -17850,6 +17863,7 @@ it:
   select_an_edit_operation_ec1467d: "Seleziona un’operazione di modifica"
   select_assignment_title_4571ffcb: "Seleziona compito: %{title}"
   select_audio_file_7d905cce: "Seleziona file audio"
+  select_by_date_range_c3af0101: "Seleziona per intervallo di date"
   select_calendars_d5fa50b6: "Seleziona calendari"
   select_conference_provider_58c7f7fe: "Seleziona provider conferenza"
   select_content: "Seleziona contenuto"
@@ -17926,7 +17940,9 @@ it:
   selected_filename_7552a8c0: "selezionato %{filename}"
   selected_grade_942f40ba: "Voto selezionato"
   selected_subtree_a7693937: "Selezionato %{subtree}"
+  selection_end_date_10fcc8c6: "Data di fine selezione"
   selection_height_9d57ec24: "Selezione altezza"
+  selection_start_date_2e4a4dca: "Data di inizio selezione"
   selection_width_183acd79: "Selezione lunghezza"
   self_enrollments: 
     already_enrolled: 
@@ -19256,6 +19272,8 @@ it:
   submission_sent_3f0d2ee1: "Consegna inviata"
   submission_tray_429ac3df: "Riquadro invio"
   submission_type_a925fc5f: "Tipo di consegna"
+  submission_type_lti_placement_b448d5d0: "Posizionamento LTI tipo di consegna"
+  submission_type_selection_72ce19f: "Selezione tipo di consegna"
   submission_updated_8897f3b7: "Consegna aggiornata"
   submission_user_name_assignment_title_2cf5e3e9: "Consegna: %{user_name}, %{assignment_title}"
   submissions: 
@@ -19502,6 +19520,7 @@ it:
     observees: Osservazione
     outcomes: Esiti
     pages: Pagine
+    past_global_announcements: "Annunci globali"
     people: Persone
     qr_mobile_login: "QR per login da dispositivo mobile"
     quizzes: Quiz
@@ -19659,6 +19678,7 @@ it:
                 può richiedere del tempo per i corsi di grandi dimensioni. Puoi lasciare la
                 pagina e riceverai una notifica al termine
                 del download.
+  the_end_date_must_be_after_the_start_date_2a273107: "La data di fine deve essere successiva alla data di inizio"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: |-
       Il motore che elabora le importazioni SIS è stato sottoposto a refactoring per gestire al meglio la
       stabilità delle importazioni SIS di grandi dimensioni. La funzionalità delle importazioni SIS non è cambiata.
@@ -20709,6 +20729,7 @@ it:
   type_of_change_1cb24a0e: "Tipo di modifica"
   type_of_item_8a37f69d: "Tipo di elemento"
   type_to_search_de63ad38: "Digita per cercare"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Digita per cercare, utilizza i tasti freccia per spostarti tra le opzioni."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Spiacenti. Contatta lo sviluppatore software. Messaggio di errore: %{message}"
   ukrainian_945b00b7: Ucraino
   unable_to_accept_update_fd53a7e2: "Impossibile accettare l'aggiornamento"

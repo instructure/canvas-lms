@@ -525,7 +525,7 @@ describe Types::CourseType do
       notification_model(:name => 'test', :category => 'Announcement')
 
       expect(
-        course_type.resolve('notificationPreferences { channels { notificationPolicies { notification { name } } } }')[0][0]
+        course_type.resolve('notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }')[0][0]
       ).to eq 'test'
 
       communication_channel.destroy

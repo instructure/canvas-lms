@@ -243,13 +243,21 @@ module MigratorHelper
     end
   end
 
-  def add_learning_outcome_to_overview(overview, outcome)
-    unless outcome[:type] == "learning_outcome_group"
-      overview[:learning_outcomes] << {:migration_id => outcome[:migration_id], :title => outcome[:title]}
+  def add_learning_outcome_to_overview(overview, outcome, parent_children=nil, parent_migration_id=nil, selectable_outcomes=false)
+    child_groups = []
+    if outcome[:type] == "learning_outcome_group"
+      if selectable_outcomes
+        log = {migration_id: outcome[:migration_id], title: outcome[:title], child_groups: child_groups}
+        (parent_children ? parent_children : overview[:learning_outcome_groups]) << log
+      end
+    else
+      lo = {migration_id: outcome[:migration_id], title: outcome[:title]}
+      lo[:parent_migration_id] = parent_migration_id if selectable_outcomes
+      overview[:learning_outcomes] << lo
     end
     if outcome[:outcomes]
       outcome[:outcomes].each do |sub_outcome|
-        overview = add_learning_outcome_to_overview(overview, sub_outcome)
+        overview = add_learning_outcome_to_overview(overview, sub_outcome, child_groups, outcome[:migration_id], selectable_outcomes)
       end
     end
     overview
@@ -448,11 +456,15 @@ module MigratorHelper
       end
     end
 
+    selectable_outcomes = content_migration.respond_to?(:root_account) &&
+                          content_migration.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
+
     if @course[:learning_outcomes]
       @overview[:learning_outcomes] = []
+      @overview[:learning_outcome_groups] = [] if selectable_outcomes
       @course[:learning_outcomes].each do |outcome|
         next unless outcome
-        add_learning_outcome_to_overview(@overview, outcome)
+        add_learning_outcome_to_overview(@overview, outcome, nil, nil, selectable_outcomes)
       end
     end
 

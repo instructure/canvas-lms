@@ -24,12 +24,6 @@ allow_postable_submission_comments:
     user will allow posting the assignment. Previously, this would have required a grade before posting could
     occur.
   applies_to: RootAccount
-new_gradebook_sort_options:
-  state: allowed
-  applies_to: Course
-  root_opt_in: true
-  display_name: Additional Sort Options for New Gradebook
-  description: Enables sorting by SIS ID, integration ID and login ID in New Gradebook.
 eportfolio_moderation:
   state: hidden
   applies_to: RootAccount
@@ -46,11 +40,6 @@ gradebook_export_sort_order_bugfix:
   applies_to: SiteAdmin
   display_name: Gradebook Export Sort Order Bugfix (Tally-219)
   description: Changes the sort order of the gradebook export to more closely match the canvas documentation
-submissions_reupload_status_page:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Submissions Re-Upload Status Page
-  description: Allows the user to navigate away while submission re-uploads are processing
 include_speed_grader_in_assignment_header_menu:
   state: hidden
   applies_to: SiteAdmin

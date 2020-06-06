@@ -16,66 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-@styleguide Highlights/Alerts
-
-
-```html
-<p>
-  <div class="ic-flash-info">
-    <div class="ic-flash__icon" aria-hidden="true">
-      <i class="icon-info"></i>
-    </div>
-    Info: Sample flash notice style.
-    <button type="button" class="Button Button--icon-action close_link">
-      <i class="icon-x" aria-hidden="true"></i>
-      <span class="screenreader-only">Close</span>
-    </button>
-  </div>
-</p>
-<p>
-  <div class="ic-flash-success">
-    <div class="ic-flash__icon" aria-hidden="true">
-      <i class="icon-check"></i>
-    </div>
-    Success: Sample flash notice style.
-    <button type="button" class="Button Button--icon-action close_link">
-      <i class="icon-x" aria-hidden="true"></i>
-      <span class="screenreader-only">Close</span>
-    </button>
-  </div>
-</p>
-<p>
-  <div class="ic-flash-warning">
-    <div class="ic-flash__icon" aria-hidden="true">
-      <i class="icon-warning"></i>
-    </div>
-    Warning: Sample flash notice style.
-    <button type="button" class="Button Button--icon-action close_link">
-      <i class="icon-x" aria-hidden="true"></i>
-      <span class="screenreader-only">Close</span>
-    </button>
-  </div>
-</p>
-<p>
-  <div class="ic-flash-error">
-    <div class="ic-flash__icon" aria-hidden="true">
-      <i class="icon-warning"></i>
-    </div>
-    Error: Sample flash notice style.
-    <button type="button" class="Button Button--icon-action close_link">
-      <i class="icon-x" aria-hidden="true"></i>
-      <span class="screenreader-only">Close</span>
-    </button>
-  </div>
-</p>
-```
-
-*/
-
 // Alerts
 ////////////////////////
-
 
 // Base styles
 

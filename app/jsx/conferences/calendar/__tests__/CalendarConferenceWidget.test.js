@@ -28,11 +28,11 @@ jest.mock('jsx/shared/rce/RichContentEditor')
 
 describe('CalendarConferenceWidget', () => {
   const conferenceTypes = [
-    {type: 'foo', name: 'Foo Conference', contexts: ['course_1', 'group_2']},
-    {type: 'bar', name: 'Bar Conference', contexts: ['course_1']}
+    {type: 'foo', name: 'Foo', contexts: ['course_1', 'group_2']},
+    {type: 'bar', name: 'Bar', contexts: ['course_1']}
   ]
 
-  const conference = {title: 'Meet Today!', conference_type: 'foo'}
+  const conference = {title: 'Meet Today!', conference_type: 'LtiConference'}
 
   function makeParams(overrides = {}) {
     return {

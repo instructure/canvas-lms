@@ -646,6 +646,10 @@ class AssignmentsController < ApplicationController
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
 
+      hash[:SUBMISSION_TYPE_SELECTION_TOOLS] =
+        @domain_root_account&.feature_enabled?(:submission_type_tool_placement) ?
+        external_tools_display_hashes(:submission_type_selection, @context, [:base_title, :external_url]) : []
+
       append_sis_data(hash)
       if context.is_a?(Course)
         hash[:allow_self_signup] = true # for group creation

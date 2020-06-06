@@ -29,8 +29,10 @@ class ExternalToolsController < ApplicationController
   before_action :require_user, only: [:generate_sessionless_launch]
   before_action :get_context, :only => [:retrieve, :show, :resource_selection]
   skip_before_action :verify_authenticity_token, only: :resource_selection
+
   include Api::V1::ExternalTools
   include Lti::RedisMessageClient
+  include Lti::Concerns::SessionlessLaunches
 
   WHITELISTED_QUERY_PARAMS = [
     :platform
@@ -62,6 +64,7 @@ class ExternalToolsController < ApplicationController
   #        "updated_at": "2037-07-28T19:38:31Z",
   #        "privacy_level": "anonymous",
   #        "custom_fields": {"key": "value"},
+  #        "is_rce_favorite": false
   #        "account_navigation": {
   #             "canvas_icon_class": "icon-lti",
   #             "icon_url": "...",
@@ -281,6 +284,7 @@ class ExternalToolsController < ApplicationController
   # @response_field updated_at Timestamp of last update
   # @response_field privacy_level What information to send to the external tool, "anonymous", "name_only", "public"
   # @response_field custom_fields Custom fields that will be sent to the tool consumer
+  # @response_field is_rce_favorite Boolean determining whether this tool should be in a preferred location in the RCE.
   # @response_field account_navigation The configuration for account navigation links (see create API for values)
   # @response_field assignment_selection The configuration for assignment selection links (see create API for values)
   # @response_field course_home_sub_navigation The configuration for course home navigation links (see create API for values)
@@ -670,6 +674,11 @@ class ExternalToolsController < ApplicationController
   #   Custom fields that will be sent to the tool consumer; can be used
   #   multiple times
   #
+  # @argument is_rce_favorite [Boolean]
+  #   Whether this tool should appear in a preferred location in the RCE.
+  #   This only applies to tools in root account contexts that have an editor
+  #   button placement.
+  #
   # @argument account_navigation[url] [String]
   #   The url of the external tool for account navigation
   #
@@ -905,7 +914,7 @@ class ExternalToolsController < ApplicationController
       end
       set_tool_attributes(@tool, external_tool_params)
     end
-    check_for_duplication(@tool)
+    @tool.check_for_duplication(params.dig(:external_tool, :verify_uniqueness).present?)
     if @tool.errors.blank? && @tool.save
       invalidate_nav_tabs_cache(@tool)
       if api_request?
@@ -1028,12 +1037,6 @@ class ExternalToolsController < ApplicationController
 
   private
 
-  def check_for_duplication(tool)
-    if tool.duplicated_in_context? && params.dig(:external_tool, :verify_uniqueness).present?
-      tool.errors.add(:tool_currently_installed, 'The tool is already installed in this context.')
-    end
-  end
-
   def generate_module_item_sessionless_launch
     module_item_id = params[:module_item_id]
 
@@ -1112,20 +1115,19 @@ class ExternalToolsController < ApplicationController
     end
 
     if @tool.use_1_3?
-      # generate URL to log in user and launch LTI 1.3 tool in one go
-      # only allow from API, and not from files domain, as /login/session_token does
-      return render_unauthorized_action unless @access_token
-      return render_unauthorized_action if HostUrl.is_file_host?(request.host_with_port)
-
-      login_pseudonym = @real_current_pseudonym || @current_pseudonym
-      session_token = SessionToken.new(
-        login_pseudonym.global_id,
-        current_user_id: @real_current_user ? @current_user.global_id : nil,
-        used_remember_me_token: true
-      ).to_s
-
-      context_path = "#{@context.is_a?(Account) ? account_external_tools_url(@context) : course_external_tools_url(@context)}/#{@tool.id}"
-      render :json => { id: @tool.id, name: @tool.name, url: "#{context_path}?display=borderless&session_token=#{session_token}" }
+      # Create a launch URL that uses a session token to
+      # initialize a Canvas session and launch the tool.
+      begin
+        launch_url = sessionless_launch_url(
+          options,
+          @context,
+          @tool,
+          generate_session_token
+        )
+        render :json => { id: @tool.id, name: @tool.name, url: launch_url }
+      rescue UnauthorizedClient
+        render_unauthorized_action
+      end
     else
       # generate the launch
       opts = {
@@ -1184,10 +1186,10 @@ class ExternalToolsController < ApplicationController
   end
 
   def set_tool_attributes(tool, params)
-    attrs = Lti::ResourcePlacement.valid_placements
+    attrs = Lti::ResourcePlacement.valid_placements(@domain_root_account)
     attrs += [:name, :description, :url, :icon_url, :canvas_icon_class, :domain, :privacy_level, :consumer_key, :shared_secret,
               :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id,
-              :oauth_compliant]
+              :oauth_compliant, :is_rce_favorite]
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
 
     attrs.each do |prop|

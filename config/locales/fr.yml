@@ -1338,6 +1338,7 @@ fr:
         login_handle_name: "Libellé de connexion"
         message: Message
         mfa_settings: "Authentification multifacteur"
+        mobile_qr_login_is_enabled: "Autorise les connexions aux applications mobiles à l’aide de QR codes"
         name: "Nom du compte"
         new_sub_account_includes: "Laisser les sous-comptes utiliser l'éditeur de thème afin de personnaliser leur propre marque"
         no_enrollments_can_create_courses: "Utilisateurs sans inscription"
@@ -2699,6 +2700,7 @@ fr:
   applied_cc7be774: Appliqué
   apply_781a2546: Appliquer
   apply_changes_b1dffc70: "Appliquer les changements"
+  apply_date_range_selection_cc4351ed: "Appliquer la sélection d'une plage de dates"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Appliquer les filtres. Note : cliquer sur ce bouton entraînera le rafraichissement de la page."
   apply_theme_7af08387: "Appliquer le thème"
   applying_new_styles_to_subaccounts_e8aeeef2: "Application de nouveaux styles aux sous-comptes"
@@ -4935,6 +4937,7 @@ fr:
   choose_usage_rights_33683854: "Choisir les droits d’utilisation..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' n'est pas une couleur valide."
   classic_quizzes_dee3c7b7: "Quiz classiques"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Option quiz chronométrés sans soumission pour quiz classiques"
   clear_2084585f: Effacer
   clear_selected_file_82388e50: "Effacer le fichier sélectionné"
   clear_user_cache_ef079f7f: "Vider le cache utilisateur"
@@ -5317,7 +5320,7 @@ fr:
                 etc.
   conference_36b50fda: Conférence
   conference_has_been_removed_f771cb11: "La conférence a été supprimée"
-  conference_has_been_updated_title_2bacc5fa: "La conférence a été mise à jour : %{title}"
+  conference_has_been_updated_title_2bacc5fa: "La conférence a été mise à jour : %{title}"
   conference_selection_ea4050bb: "Sélection de conférences"
   conference_was_deleted_30869390: "La conférence a été supprimée"
   conferences: 
@@ -8086,6 +8089,7 @@ fr:
   disable_a5c05db3: Désactiver
   disable_all_read_only_scopes_f9ffdd28: "Désactivez toutes les étendues en lecture seule."
   disable_and_lock_7d0ef0e8: "Désactiver et verrouiller"
+  disable_automatic_submission_8e1d8676: "Désactiver la soumission automatique"
   disable_celebrations_description: "L'activation de cette fonctionnalité masque toutes les animations de cérémonie"
   disable_content_security_policy_8660a787: "Désactiver la politique de sécurité du contenu"
   disable_extra_filter_options_1d1cdc02: "désactiver les options de filtre supplémentaires"
@@ -8900,6 +8904,7 @@ fr:
   enable_new_sis_integration_settings_ab6780a4: "Activer les nouveaux paramètres d'intégration SIS"
   enable_notifications_10a4bf44: "Activer les notifications"
   enable_or_condition_for_modules_a16f02d8: "Activer la condition \"OU\" pour les modules"
+  enable_recording_for_this_conference_b8adff6: "Autoriser l'enregistrement pour cette conférence"
   enable_reregistration_for_lti_2_b2a10444: "Activer la réinscription pour LTI 2"
   enable_scope_ac28b832: "Activer l'étendue"
   enable_student_context_card_links_eba2f2c5: "Activer les liens de la carte de contexte élève"
@@ -9300,7 +9305,7 @@ fr:
   error_retrieving_content_c07ee76b: "Erreur de récupération de contenu"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Erreur lors de la récupération des outils de détection de similitude."
   error_running_quizzes_2_export_cfecedba: "Erreur lors de l’exécution de l’export des Quiz 2."
-  error_saving_assignment_dates_2af5e800: "Une erreur est survenue lors de l’enregistrement des dates de travaux : "
+  error_saving_assignment_dates_2af5e800: "Une erreur est survenue lors de l’enregistrement des dates de travaux : "
   error_saving_discussion_settings_3360661d: "Erreur de sauvegarde des paramètres de discussion"
   error_sending_messages_13c874eb: "Erreur lors de l’envoi des messages"
   error_sending_submission_comment_dc15d24f: "Erreur lors de l'envoi d'un commentaire de soumission"
@@ -11617,6 +11622,7 @@ fr:
   hide_students_with_no_results_6a22f991: "Masquer les élèves qui n'ont pas de résultats"
   hide_sub_accounts_for_account_name_a6de98bd: "Masquer les sous-comptes pour %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Masquer le bouton « Importer les résultats d'apprentissage » en fonction des autorisations de l’utilisateur."
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Masque certains élèves et certaines sections dans le LMGB si l’enseignant n'a accès qu'à une section particulière."
   hiding_grades_82691e44: "Masquage des notes"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Le masquage des notes n’est pas autorisé car les notes n'ont pas été rendues disponibles pour ce devoir."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Masquer les notes rafraîchira votre navigateur. Cela peut prendre un moment."
@@ -11781,6 +11787,9 @@ fr:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "URL des Métadonnées IdP"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Lorsqu'un attribut est marqué comme 'Provisionnement uniquement', il ne sera alors utilisé que lorsque 'Just in Time Provisioning' crée un nouvel utilisateur, et ne sera pas automatiquement mis à jour à chaque connexion de l'utilisateur."
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      Si un outil LTI configuré avec le placement est installé, une nouvelle entrée s'affichera dans la
+      liste déroulante des types de soumission permettant de configurer rapidement le travail pour cet outil.
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Si Notes - modifier et Notes - afficher toutes les notes sont désactivés, le Relevé de notes sera caché de la navigation du cours."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Si Notes - modifier et Notes - afficher toutes les notes sont désactivés, le Relevé de notes sera caché de la navigation du cours."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Si Notes - modifier et Notes - afficher toutes les notes sont désactivés, le Relevé de notes sera caché de Navigation du cours."
@@ -12663,6 +12672,7 @@ fr:
     other: 
       one: "1 autre"
       other: "%{count} autres"
+  list_collapsed_381ef1b6: "Liste réduite. "
   list_collapsed_5f19f5bb: "Liste réduite"
   list_collapsed_9ac35920: "Liste réduite."
   list_collapsed_dde87718: "Liste réduite"
@@ -17291,6 +17301,7 @@ fr:
     labels: 
       requirements_must_be_completed: "Les conditions requises suivantes doivent être remplies pour déverrouiller cette page."
   presentation_2d9387ca: Présentation
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Affiche le paramètre de quiz permettant d'éviter la soumission automatique d'un quiz chronométrés lorsque le temps disponible est écoulé."
   press_space_to_start_over_d4b8a2da: "Appuyez sur « Espace » pour recommencer"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Appuyer sur la touche 'virgule' ou les touches 'Shift' + 'point d'interrogation' pour visualiser une liste de raccourcis clavier."
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Appuyer sur la touche 'virgule' ou les touches 'Shift' + '?' pour visualiser une liste de raccourcis clavier."
@@ -19524,7 +19535,7 @@ fr:
   remove_c_name_section_d8eabd3a: "Retirer la section %{c.name}"
   remove_collaborationtitle_c3e81adb: "Supprimer \"%{collaborationTitle}\"?"
   remove_conference_69b9e0d0: "Supprimer la conférence"
-  remove_conference_title_207d32c0: "Supprimer la conférence : %{title}"
+  remove_conference_title_207d32c0: "Supprimer la conférence : %{title}"
   remove_contact_method_ca890ba3: "Supprimer le mode de contact"
   remove_course_association_name_b760c502: "Supprimez l’association au cours %{name}"
   remove_dates_9b9ba2f6: "Supprimer les dates"
@@ -19658,6 +19669,7 @@ fr:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Empêcher les élèves d'accéder aux cours avant leurs dates de début"
   restrict_students_from_annotating_6c28ab9b: "Empêcher les élèves d'annoter"
   restricted_access_d3e99a39: "Accès restreint"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Vue restreinte pour les enseignants dans LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Soumettre à nouveau à l’outil associé pour une analyse de plagiat."
   resubmit_to_tool_name_1cf02a31: "Renvoyé à %{tool_name}"
   resubmitted_2080646f: Renvoyer
@@ -19961,6 +19973,7 @@ fr:
   saving_recording_e111cb05: "Sauvegarde de l'enregistrement en cours..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "La sauvegarde du statut CSP a échoué, veuillez réessayer."
   schedule_student_availability_332154a: "Calendrier de disponibilités de l'étudiant"
+  scheduled_date_5b0aedb6: "Date planifiée"
   scheduler_65b5ac91: Planificateur
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Le planificateur doit être activé par votre administrateur Canvas."
   scheduler_must_be_enabled_for_your_account_e6e53972: "Le planificateur doit être activé pour votre compte."
@@ -20292,6 +20305,7 @@ fr:
   select_an_edit_operation_ec1467d: "Sélectionner une opération de modification"
   select_assignment_title_4571ffcb: "Sélectionner un travail : %{title}"
   select_audio_file_7d905cce: "Sélectionner un fichier audio"
+  select_by_date_range_c3af0101: "Sélectionner par plage de dates"
   select_calendars_d5fa50b6: "Sélectionner des calendriers"
   select_conference_provider_58c7f7fe: "Sélectionner un fournisseur de conférences"
   select_content: "Sélectionner du contenu"
@@ -20370,7 +20384,9 @@ fr:
   selected_grade_942f40ba: "Note sélectionnée"
   selected_item_35bed33a: "élément sélectionné"
   selected_subtree_a7693937: "%{subtree} sélectionné"
+  selection_end_date_10fcc8c6: "Date de fin de la sélection"
   selection_height_9d57ec24: "Sélection Hauteur"
+  selection_start_date_2e4a4dca: "Date de début de la sélection"
   selection_width_183acd79: "Sélection Largeur"
   self_enrollments: 
     already_enrolled: 
@@ -21917,6 +21933,8 @@ fr:
   submission_status_3079e730: "Statut de l'envoi"
   submission_tray_429ac3df: "Bac des soumissions"
   submission_type_a925fc5f: "Type d’envoi"
+  submission_type_lti_placement_b448d5d0: "Type de soumission à placement LTI"
+  submission_type_selection_72ce19f: "Sélection d’un type de soumission"
   submission_updated_8897f3b7: "Soumission mise à jour"
   submission_user_name_assignment_title_2cf5e3e9: "Soumission : %{user_name}, %{assignment_title}"
   submissions: 
@@ -22188,6 +22206,7 @@ fr:
     observees: Observer
     outcomes: Acquis
     pages: Pages
+    past_global_announcements: "Annonces générales"
     people: Personnes
     profile: Profil
     qr_mobile_login: "QR pour connexion mobile"
@@ -22355,6 +22374,7 @@ fr:
                 peut prendre un certain temps pour les cours volumineux. Vous pouvez quitter
                 cette page ; vous recevrez une notification lorsque le téléchargement
                 sera terminé.
+  the_end_date_must_be_after_the_start_date_2a273107: "La date de fin de disponibilité doit être plus tardive que celle de début"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "La machine qui traite les importations de SIS a été remaniée afin de mieux gérer la stabilité des importations importantes de SIS. La fonctionnalité des importations du SIS n'a pas changée."
   the_error_stack_trace_if_there_is_one_b7e008a1: "La trace d'appels de l'erreur, s'il y en a une"
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Le lien en vedette a été déplacé en début de liste."
@@ -23438,6 +23458,7 @@ fr:
   type_of_change_1cb24a0e: "Type de changement"
   type_of_item_8a37f69d: "Type d'élément"
   type_to_search_de63ad38: "Saisir pour rechercher"
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Tapez au clavier pour rechercher, utilisez les flèches pour vous déplacer parmi les options."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Oups ! Contactez votre sympathique développeur de catalogue. Message d'erreur : %{message}"
   ukrainian_945b00b7: Ukrainien
   unable_to_accept_update_fd53a7e2: "Impossible d'accepter le mise à jour"

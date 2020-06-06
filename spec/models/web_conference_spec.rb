@@ -65,9 +65,25 @@ describe WebConference do
       conference.settings = {:record => true, :not => :for_user}
       conference.save
       conference.reload
-      expect(conference.user_settings).to eql({:record => true})
+      expect(conference.user_settings).not_to have_key(:not)
     end
 
+    it "should not mark object dirty if settings are unchanged" do
+      email = "email@email.com"
+      allow(@user).to receive(:email).and_return(email)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: {record: true})
+      user_settings = conference.user_settings.dup
+      conference.user_settings = user_settings
+      expect(conference).not_to be_changed
+    end
+
+    it "should mark object dirty if  settings are changed" do
+      email = "email@email.com"
+      allow(@user).to receive(:email).and_return(email)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: {record: true})
+      conference.user_settings = {record: false}
+      expect(conference).to be_changed
+    end
   end
 
   context "starting and ending" do
@@ -169,6 +185,32 @@ describe WebConference do
         conference.restart
         expect(conference.end_at).to be_nil
       end
+    end
+  end
+
+  context "invite users" do
+    it "invites users from a specified set of user ids" do
+      user1 = user_factory(active_all: true)
+      user2 = user_factory(active_all: true)
+      course = course_factory(active_all: true)
+      course.enroll_student(user1).accept!
+      course.enroll_student(user2).accept!
+      conference = BigBlueButtonConference.new(:title => "my conference", :user => user1, :context => course)
+      conference.save
+      conference.invite_users_from_context([user2.id])
+      expect(conference.invitees.pluck(:user_id)).to match_array([user2.id])
+    end
+
+    it "invites all users from context" do
+      user1 = user_factory(active_all: true)
+      user2 = user_factory(active_all: true)
+      course = course_factory(active_all: true)
+      course.enroll_student(user1).accept!
+      course.enroll_student(user2).accept!
+      conference = BigBlueButtonConference.new(:title => "my conference", :user => user1, :context => course)
+      conference.save
+      conference.invite_users_from_context
+      expect(conference.invitees.pluck(:user_id)).to match_array(course.user_ids)
     end
   end
 
@@ -316,6 +358,7 @@ describe WebConference do
       course_with_teacher(active_all: true)
       conference = WimbaConference.create!(title: "my conference", user: @user, context: @course)
       event = calendar_event_model web_conference: conference
+      conference.web_conference_participants.scope.delete_all
       conference.destroy!
       expect(event.reload.web_conference).to be nil
     end
@@ -383,13 +426,13 @@ describe WebConference do
       end
 
       context ".active scope" do
-        it "should include LTI conferences" do
+        it "should not include LTI conferences" do
           conference = course.web_conferences.create! do |c|
             c.user = user
             c.conference_type = 'LtiConference'
             c.lti_settings = { tool_id: tool.id }
           end
-          expect(WebConference.active.pluck(:id)).to include conference.id
+          expect(WebConference.active.pluck(:id)).not_to include conference.id
         end
       end
 

@@ -848,6 +848,9 @@
     "quizzes_7e598f57": {
         "message": "Qüestionaris"
     },
+    "reading_a_media_track_file_failed_aborting_be051b20": {
+        "message": "S''ha produït un error en llegir un fitxer de seguiment multimèdia. S''està abandonant."
+    },
     "record_7c9448b": {
         "message": "Enregistra"
     },
@@ -931,6 +934,9 @@
     },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Alguna cosa no ha anat bé i no sé què puc mostrar-te."
+    },
+    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+        "message": "Alguna cosa no ha anat bé; reviseu la connexió i torneu-ho a provar."
     },
     "something_went_wrong_d238c551": {
         "message": "Alguna cosa no ha anat bé"

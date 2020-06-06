@@ -17,6 +17,16 @@
 
 module Lti
   module ContentMigrationService
+    # Exports any external content defined by the ContextExternalTool associated
+    # with the Course being exported, as detailed in
+    # `docs/api/tools_xml.md#Content Migration support`. Export is done by POSTing
+    # to the tool's content_migration.export_start_url, and then retrieving any
+    # content from the url that is returned from that POST. The default format for
+    # this POST body is a nested query string, but is sent as JSON if the tool
+    # specifies as much in its content_migration.export_format.
+    # This code is referenced by `lib/canvas/migration/external_content/migrator.rb`,
+    # and eventually by `lib/cc/cc_exporter.rb` and `lib/canvas/migration/worker/course_copy_worker.rb`,
+    # which is called as a delayed job during a course copy or export.
     class Exporter < Lti::ContentMigrationService::Migrator
       def initialize(course, tool, options)
         @course = course
@@ -62,7 +72,12 @@ module Lti
         return if defined? @status_url
 
         response = Canvas.retriable(on: Timeout::Error) do
-          CanvasHttp.post(export_start_url, base_request_headers, form_data: start_export_post_body)
+          case export_format
+          when JSON_FORMAT
+            CanvasHttp.post(export_start_url, base_request_headers, body: start_export_post_body.to_json, content_type: 'application/json')
+          else
+            CanvasHttp.post(export_start_url, base_request_headers, form_data: Rack::Utils.build_nested_query(start_export_post_body))
+          end
         end
         case response.code.to_i
         when (200..201)
@@ -90,18 +105,21 @@ module Lti
       end
 
       def export_start_url
-        @tool.settings['content_migration']['export_start_url']
+        @tool.settings.dig(:content_migration, :export_start_url)
+      end
+
+      def export_format
+        @tool.settings.dig(:content_migration, :export_format)
       end
 
       def start_export_post_body
-        body_hash = base_post_body.
+        base_post_body.
           merge(expanded_variables).
           merge(selected_assets)
-        Rack::Utils.build_nested_query(body_hash)
       end
 
       def selected_assets
-        (@options[:selective] ? {custom_exported_assets: @options[:exported_assets]} : Hash.new)
+        (@options[:selective] ? {custom_exported_assets: @options[:exported_assets]} : {})
       end
     end
   end

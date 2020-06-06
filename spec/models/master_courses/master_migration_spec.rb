@@ -33,6 +33,7 @@ describe MasterCourses::MasterMigration do
     it "should queue a migration" do
       expect_any_instance_of(MasterCourses::MasterMigration).to receive(:queue_export_job).once
       mig = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+      expect(mig.root_account).to eq @course.root_account
       expect(mig.id).to be_present
       expect(mig.master_template).to eq @template
       expect(mig.user).to eq @user
@@ -159,6 +160,7 @@ describe MasterCourses::MasterMigration do
 
       expect(@migration).to be_completed
       expect(@migration.imports_completed_at).to be_present
+      expect(@migration.migration_results.last.root_account_id).to eq @copy_from.root_account_id
 
       expect(@template.master_content_tags.polymorphic_where(:content => assmt).first.restrictions).to be_empty # never mind
 

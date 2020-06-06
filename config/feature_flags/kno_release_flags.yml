@@ -32,6 +32,13 @@ deprecate_sms:
     grade changes.
   applies_to: RootAccount
 
+hide_course_sections_from_students:
+  state: hidden
+  display_name: Hide Course Sections from Students
+  description: |-
+    Allows teachers to hide course sections from students on the People page when there is more than one section in the course.
+  applies_to: RootAccount
+
 mute_notifications_by_course:
   state: hidden
   display_name: Mute notifications by course
@@ -55,4 +62,19 @@ notification_granular_course_preferences:
   description: |-
     Allows users to override specific notification preferences on a
     course by course basis.
+  applies_to: RootAccount
+
+past_announcements:
+  state: hidden
+  display_name: Show past account level announcements to users
+  description: |-
+    Show past account level announcements to users. Allows
+    a user to view announcemnts that have ended or been dismissed.
+  applies_to: RootAccount
+
+smart_alerts:
+  state: hidden
+  display_name: Smart alerts
+  description: |-
+    Notify students in time of assignments that require their attention.
   applies_to: RootAccount

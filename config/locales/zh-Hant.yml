@@ -1338,6 +1338,7 @@ zh-Hant:
         login_handle_name: 登入標籤
         message: 訊息
         mfa_settings: 多因素驗證
+        mobile_qr_login_is_enabled: "允許透過 QR 碼登入流動應用程式"
         name: 帳戶名稱
         new_sub_account_includes: 允許子賬戶使用主題編輯器以定制個人標識
         no_enrollments_can_create_courses: 沒有註冊的使用者
@@ -2701,6 +2702,7 @@ zh-Hant:
   applied_cc7be774: 應用
   apply_781a2546: 應用
   apply_changes_b1dffc70: 應用更改
+  apply_date_range_selection_cc4351ed: 應用日期範圍選擇
   apply_filters_note_clicking_this_button_will_cause_753f04: 應用篩選。注意：點擊此按鈕將導致內容頁重新載入。
   apply_theme_7af08387: 應用主題
   applying_new_styles_to_subaccounts_e8aeeef2: 將新風格應用到子帳戶中
@@ -4935,6 +4937,7 @@ zh-Hant:
   choose_usage_rights_33683854: 選擇使用權此…
   chosencolor_is_not_a_valid_color_5d542cc: "『%{chosenColor}』是無效的顔色"
   classic_quizzes_dee3c7b7: 傳統測驗
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: 計時測驗的經典測驗選項（不提交測驗）
   clear_2084585f: 清除
   clear_selected_file_82388e50: 清除所選擇的檔案
   clear_user_cache_ef079f7f: 清除使用者緩存
@@ -8086,6 +8089,7 @@ zh-Hant:
   disable_a5c05db3: 停用
   disable_all_read_only_scopes_f9ffdd28: 停用所有唯讀範圍。
   disable_and_lock_7d0ef0e8: 停用並鎖定
+  disable_automatic_submission_8e1d8676: 停用自動提交
   disable_celebrations_description: 啟用此功能會隱藏所有慶祝動畫。
   disable_content_security_policy_8660a787: 停用內容安全政策
   disable_extra_filter_options_1d1cdc02: 停用額外的篩選選項
@@ -8894,6 +8898,7 @@ zh-Hant:
   enable_new_sis_integration_settings_ab6780a4: "啟用新的 SIS 集成設定"
   enable_notifications_10a4bf44: 啟用通知
   enable_or_condition_for_modules_a16f02d8: "為模塊啓用\"或\"條件 "
+  enable_recording_for_this_conference_b8adff6: 啟用針對此次會議的記錄
   enable_reregistration_for_lti_2_b2a10444: "啟用 LTI 2 再註冊"
   enable_scope_ac28b832: 啟用範圍
   enable_student_context_card_links_eba2f2c5: 啟用學生群組卡連結
@@ -11610,6 +11615,7 @@ zh-Hant:
   hide_students_with_no_results_6a22f991: 隱藏無成績的學生
   hide_sub_accounts_for_account_name_a6de98bd: "隱藏子帳戶%{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: 根據使用者權限隱藏匯入學習成果按鈕
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "如果教師只有某個分班的訪問權限，則在 LMGB 內隱藏部分學生和分班"
   hiding_grades_82691e44: 隱藏成績
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: 由於未公佈此作業的成績，因此不允許隱藏成績。
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: 隱藏成績將重新整理您的瀏覽器。這可能需要一點時間。
@@ -11774,6 +11780,9 @@ zh-Hant:
   idp_logoutresponse_xml_fe65de19: IdPLogoutResponseXML
   idp_metadata_uri_dae5314a: "IdP 元數據 URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "如果某一屬性僅標記為佈建中，那麼在 JIT 佈建創建一個新使用者時，才會使用，而不會在每一次該使用者登入時都會更新。"
+  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+      如果 LTI 工具設置中包含已安裝的配置，則會在
+      作業提交類型下拉選單中顯示新項目，以便快速設置作業以配合工具
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "如果「成績 - 編輯」和「成績 -  查看所有成績」均已停用，成績單則會在課程導航中隱藏。"
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "如果「成績 - 編輯」和「成績 - 檢視所有成績」均已停用，成績單會在課程導航中隱藏。"
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "如果「成績 - 編輯」和「成績 - 查看所有成績」均已停用，成績單則會在課程導航中隱藏。"
@@ -12656,6 +12665,7 @@ zh-Hant:
     other: 
       one: "%{count} 個其他"
       other: "%{count} 個其他"
+  list_collapsed_381ef1b6: "名單收起。 "
   list_collapsed_5f19f5bb: 名單折起
   list_collapsed_9ac35920: 名單折起。
   list_collapsed_dde87718: 名單折起
@@ -17277,6 +17287,7 @@ zh-Hant:
     labels: 
       requirements_must_be_completed: 以下要求需要在此頁面解除鎖定之前完成
   presentation_2d9387ca: 簡報
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: 顯示測驗設定以避免計時測驗可用時間結束後自動提交測驗。
   press_space_to_start_over_d4b8a2da: 按下空白鍵以重新開始
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "按逗號或 Shift + 問號，以瀏覽此頁面的鍵盤快捷鍵清單"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "按逗號或 Shift + ？，以瀏覽鍵盤快捷鍵清單。"
@@ -19645,6 +19656,7 @@ zh-Hant:
   restrict_students_from_accessing_courses_before_st_f7c22c00: 限制學生在開始日期之前訪問課程
   restrict_students_from_annotating_6c28ab9b: 限制學生添加註釋
   restricted_access_d3e99a39: 訪問受限
+  restricted_view_for_teachers_in_lmgb_52c78a62: "限制教師在 LMGB 的查看權限"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: 重新提交至關聯工具作抄襲分析。
   resubmit_to_tool_name_1cf02a31: "重新提交到%{tool_name}"
   resubmitted_2080646f: 已重新提交
@@ -19948,6 +19960,7 @@ zh-Hant:
   saving_recording_e111cb05: 正在保存記錄...
   saving_the_csp_status_failed_please_try_again_8275aaa4: "儲存 CSP 狀態失敗，請重試。"
   schedule_student_availability_332154a: 排程學生可用性
+  scheduled_date_5b0aedb6: 已排程日期
   scheduler_65b5ac91: 排程工具
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "必須由您的 Canvas 管理員啟用排程工具。"
   scheduler_must_be_enabled_for_your_account_e6e53972: 必須為您的帳戶啟用排程工具。
@@ -20279,6 +20292,7 @@ zh-Hant:
   select_an_edit_operation_ec1467d: 選擇一個編輯操作
   select_assignment_title_4571ffcb: "選擇作業：%{title}"
   select_audio_file_7d905cce: 選擇音頻文檔
+  select_by_date_range_c3af0101: 按日期範圍選取
   select_calendars_d5fa50b6: 選擇日曆
   select_conference_provider_58c7f7fe: 選擇會議服務供應商
   select_content: 選擇內容
@@ -20357,7 +20371,9 @@ zh-Hant:
   selected_grade_942f40ba: 已選擇的評分
   selected_item_35bed33a: 選擇項目
   selected_subtree_a7693937: "已選定 %{subtree}"
+  selection_end_date_10fcc8c6: 選擇結束日期
   selection_height_9d57ec24: 選擇高度
+  selection_start_date_2e4a4dca: 選擇開始日期
   selection_width_183acd79: 選擇寬度
   self_enrollments: 
     already_enrolled: 
@@ -21897,6 +21913,8 @@ zh-Hant:
   submission_status_3079e730: 提交項目狀態
   submission_tray_429ac3df: 提交項目收集箱
   submission_type_a925fc5f: 提交類型
+  submission_type_lti_placement_b448d5d0: "提交項目類型 LTI 配置"
+  submission_type_selection_72ce19f: 提交類型選擇
   submission_updated_8897f3b7: 已更新提交項目
   submission_user_name_assignment_title_2cf5e3e9: "提交項目：%{user_name}，%{assignment_title}"
   submissions: 
@@ -22168,6 +22186,7 @@ zh-Hant:
     observees: 正在觀察
     outcomes: 結果
     pages: 頁面
+    past_global_announcements: 全域通告
     people: 人員
     profile: 個人檔案
     qr_mobile_login: "流動登入 QR 碼"
@@ -22335,6 +22354,7 @@ zh-Hant:
       程可能需要一段時間。 你可
       以離開頁面，當下載完成時，
       您會收到通知。
+  the_end_date_must_be_after_the_start_date_2a273107: 結束日期必須遲於開始日期
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "處理 SIS 匯入的引擎已經重構，可以更有效地處理大量 SIS 匯入的穩定性。SIS 匯入功能沒有變更。"
   the_error_stack_trace_if_there_is_one_b7e008a1: 錯誤堆疊跟蹤，若有的話
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: 精選連結已移動至列表頂部。
@@ -23418,6 +23438,7 @@ zh-Hant:
   type_of_change_1cb24a0e: 變更類型
   type_of_item_8a37f69d: 項目類型
   type_to_search_de63ad38: 輸入以搜尋
+  type_to_search_use_arrow_keys_to_navigate_options_5d538c0: 輸入以搜尋，使用箭頭鍵導航選項。
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "抱歉！請聯係您的 Catalog 開發人員。錯誤代碼：%{message}"
   ukrainian_945b00b7: 烏克蘭語
   unable_to_accept_update_fd53a7e2: 無法接受更新

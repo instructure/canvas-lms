@@ -1,0 +1,28 @@
+version: '2.3'
+services:
+  canvas:
+    image: $PATCHSET_TAG
+    links:
+      - postgres
+      - redis
+    environment:
+      RAILS_ENV: development
+    ports: 
+      - "8181:80"
+
+  jobs:
+    image: $PATCHSET_TAG
+    links:
+      - postgres
+      - redis
+    environment:
+      RAILS_ENV: development
+    command: bundle exec script/delayed_job run
+
+  postgres:
+    image: starlord.inscloudgate.net/jenkins/postgis:$POSTGRES-2.5
+    environment:
+      POSTGRES_PASSWORD: sekret
+
+  redis:
+    image: starlord.inscloudgate.net/jenkins/redis:alpine

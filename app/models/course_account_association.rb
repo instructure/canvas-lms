@@ -23,4 +23,15 @@ class CourseAccountAssociation < ActiveRecord::Base
   has_many :account_users, :foreign_key => 'account_id', :primary_key => 'account_id'
 
   validates_presence_of :course_id, :account_id, :depth
+
+  before_create :set_root_account_id
+
+  def set_root_account_id
+    self.root_account_id ||=
+      if account.root_account?
+        self.account.id
+      else
+        self.account&.root_account_id
+      end
+  end
 end

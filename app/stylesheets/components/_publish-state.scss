@@ -16,46 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-@styleguide Publish State
-
-<br/>
-The publish button has two states on click (publish and published) and a hover state of 'Unpublish' once published.
-
-```html
-
-<p>
-  <button class="btn" id="publish"></button>
-</p>
-
-<p>
-  <button class="btn" id="published"></button>
-</p>
-
-<p>
-  <button class="btn" id="published-disabled" data-tooltip></button>
-</p>
-
-<p>
-  <span class="publish-icon"></span>
-</p>
-
-<p>
-  <span class='published-status published'>
-    <i class="icon-publish"></i> Published
-  </span>
-</p>
-
-<p>
-  <span class='published-status unpublished'>
-    <i class="icon-unpublished"></i> Not Published
-  </span>
-</p>
-
-```
-
-*/
-
 /* publish buttons */
 .btn-publish,
 .btn-published,

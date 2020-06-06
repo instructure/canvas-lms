@@ -32,18 +32,24 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
                                      :wiki_page,
                                      quiz: 'Quizzes::Quiz'
   ]
+  belongs_to :root_account, :class_name => 'Account'
   validates_with MasterCourses::TagValidator
 
   serialize :restrictions, Hash
   validate :require_valid_restrictions
 
   before_create :set_migration_id
+  before_create :set_root_account_id
 
   before_save :mark_touch_content_if_restrictions_tightened
   after_save :touch_content_if_restrictions_tightened
 
   def set_migration_id
     self.migration_id = self.master_template.migration_id_for(self.content)
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.master_template.root_account_id
   end
 
   def require_valid_restrictions

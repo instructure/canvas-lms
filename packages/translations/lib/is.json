@@ -848,6 +848,9 @@
     "quizzes_7e598f57": {
         "message": "Próf"
     },
+    "reading_a_media_track_file_failed_aborting_be051b20": {
+        "message": "Ekki tókst að lesa margmiðlunarrásarskrá. Hætt við."
+    },
     "record_7c9448b": {
         "message": "Upptaka"
     },
@@ -931,6 +934,9 @@
     },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Eitthvað mistókst og ég veit ekki hvað ég á að sýna þér."
+    },
+    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+        "message": "Eitthvað fór úrskeiðis, athugaðu tenginguna og reyndu aftur."
     },
     "something_went_wrong_d238c551": {
         "message": "Eitthvað mistókst"

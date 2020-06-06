@@ -379,6 +379,7 @@ describe UsersController, type: :request do
         batch << {
           cached_due_date: a.due_date,
           assignment_id: a.id,
+          course_id: @student_course.id,
           user_id: @teacher.id,
           workflow_state: 'unsubmitted'
         }
@@ -408,6 +409,7 @@ describe UsersController, type: :request do
         batch << {
           cached_due_date: a.due_at,
           assignment_id: a.id,
+          course_id: @teacher_course.id,
           user_id: @student.id,
           workflow_state: 'submitted',
           submission_type: 'online_text_entry',
@@ -479,6 +481,7 @@ describe UsersController, type: :request do
       assignments.each do |a|
         batch << { :cached_due_date => 6.days.from_now,
                    :assignment_id => a.id,
+                   :course_id => a.context_id,
                    :user_id => @user.id,
                    :workflow_state => 'unsubmitted' }
       end

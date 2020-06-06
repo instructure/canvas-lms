@@ -148,8 +148,8 @@ describe "dashboard" do
       fj('span[role="menuitemradio"]:contains("Recent Activity")').click
       messages = ff("#dashboard .account_notification .notification_message")
       expect(messages.size).to eq 2
-      expect(messages[0].text).to eq a1.message
-      expect(messages[1].text).to eq a2.message
+      expect(messages[0].text).to eq a2.message
+      expect(messages[1].text).to eq a1.message
     end
 
     it "should interpolate the user's domain in global notifications" do

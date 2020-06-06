@@ -145,7 +145,7 @@ class Assignment < ActiveRecord::Base
   end
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
-    # only accept the url, content_tyupe, content_id, and new_tab params, the other accessible
+    # only accept the url, content_type, content_id, and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
     content = case attrs['content_type']
               when 'Lti::MessageHandler', 'lti/message_handler'
@@ -2309,30 +2309,6 @@ class Assignment < ActiveRecord::Base
       end
     end
     scope.to_a.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
-  end
-
-  def generate_comments_from_files_legacy(filename, commenter)
-    zip_extractor = ZipExtractor.new(filename)
-    # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
-    @ignored_files = []
-    file_map = zip_extractor.unzip_files.map { |f| infer_comment_context_from_filename(f) }.compact
-    files_for_user = file_map.group_by { |f| f[:user] }
-    comments = files_for_user.map do |user, files|
-      attachments = files.map { |g|
-        FileInContext.attach(self, g[:filename], g[:display_name])
-      }
-      comment = {
-        comment: t(:comment_from_files, {one: "See attached file", other: "See attached files"}, count: files.size),
-        author: commenter,
-        attachments: attachments,
-      }
-      group, students = group_students(user)
-      comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group
-      find_or_create_submissions(students).map do |submission|
-        submission.add_comment(comment.merge(hidden: submission.hide_grade_from_student?))
-      end
-    end
-    [comments.compact, @ignored_files]
   end
 
   # Takes a zipped file full of assignment comments/annotated assignments

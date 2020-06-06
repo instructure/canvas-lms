@@ -34,6 +34,7 @@ import medalUrl from '../svg/Medal.svg'
 import moonUrl from '../svg/Moon.svg'
 import ninjaUrl from '../svg/Ninja.svg'
 import panamaRocketUrl from '../svg/PanamaRocket.svg'
+import pandaUnicycle from '../svg/PandaUnicycle.svg'
 import pandaUrl from '../svg/Panda.svg'
 import pinwheelUrl from '../svg/Pinwheel.svg'
 import pizzaSliceUrl from '../svg/PizzaSlice.svg'
@@ -64,6 +65,7 @@ const confettiFlavors = [
   {type: 'svg', src: moonUrl, weight: 0.05, size: 40},
   {type: 'svg', src: ninjaUrl, weight: 0.05, size: 40},
   {type: 'svg', src: panamaRocketUrl, weight: 0.05, size: 40},
+  {type: 'svg', src: pandaUnicycle, weight: 0.05, size: 40},
   {type: 'svg', src: pandaUrl, weight: 0.05, size: 40},
   {type: 'svg', src: pinwheelUrl, weight: 0.05, size: 40},
   {type: 'svg', src: pizzaSliceUrl, weight: 0.05, size: 40},

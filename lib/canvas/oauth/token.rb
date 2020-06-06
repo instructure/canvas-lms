@@ -78,19 +78,22 @@ module Canvas::Oauth
     end
 
     def create_access_token_if_needed(replace_tokens = false)
-      @access_token ||= self.class.find_reusable_access_token(user, key, scopes, purpose)
+      @access_token ||= self.class.find_reusable_access_token(user, key, scopes, purpose, real_user: real_user)
 
       if @access_token.nil?
         # Clear other tokens issued under the same developer key if requested
         user.access_tokens.where(developer_key_id: key).destroy_all if replace_tokens || key.replace_tokens
 
         # Then create a new one
-        @access_token = user.access_tokens.create!({
-                                                     :developer_key => key,
-                                                     :remember_access => remember_access?,
-                                                     :scopes => scopes,
-                                                     :purpose => purpose
-                                                   })
+        @access_token = user.access_tokens.new({
+                                                 developer_key: key,
+                                                 remember_access: remember_access?,
+                                                 scopes: scopes,
+                                                 purpose: purpose
+                                               })
+        @access_token.real_user = real_user if real_user && real_user != user
+
+        @access_token.save!
 
         @access_token.clear_full_token! if @access_token.scoped_to?(['userinfo'])
         @access_token.clear_plaintext_refresh_token! if @access_token.scoped_to?(['userinfo'])
@@ -102,11 +105,11 @@ module Canvas::Oauth
       @access_token
     end
 
-    def self.find_reusable_access_token(user, key, scopes, purpose)
+    def self.find_reusable_access_token(user, key, scopes, purpose, real_user: nil)
       if key.force_token_reuse
-        find_access_token(user, key, scopes, purpose)
+        find_access_token(user, key, scopes, purpose, real_user: real_user)
       elsif AccessToken.scopes_match?(scopes, ["userinfo"])
-        find_userinfo_access_token(user, key, purpose)
+        find_userinfo_access_token(user, key, purpose, real_user: real_user)
       end
     end
 
@@ -138,13 +141,14 @@ module Canvas::Oauth
       json
     end
 
-    def self.find_userinfo_access_token(user, developer_key, purpose)
-      find_access_token(user, developer_key, ["userinfo"], purpose, {remember_access: true})
+    def self.find_userinfo_access_token(user, developer_key, purpose, real_user: nil)
+      find_access_token(user, developer_key, ["userinfo"], purpose, { remember_access: true }, real_user: real_user)
     end
 
-    def self.find_access_token(user, developer_key, scopes, purpose, conditions = {})
+    def self.find_access_token(user, developer_key, scopes, purpose, conditions = {}, real_user: nil)
       user.shard.activate do
-        user.access_tokens.active.where({:developer_key_id => developer_key, :purpose => purpose}.merge(conditions)).detect do |token|
+        real_user = nil if real_user == user
+        user.access_tokens.active.where({ developer_key_id: developer_key, purpose: purpose, real_user: real_user }.merge(conditions)).detect do |token|
           token.scoped_to?(scopes)
         end
       end

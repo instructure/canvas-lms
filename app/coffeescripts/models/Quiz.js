@@ -115,7 +115,9 @@ export default class Quiz extends Backbone.Model {
     const pts = this.get('points_possible')
     let text = ''
     if (pts && pts > 0 && !this.isUngradedSurvey()) {
-      text = I18n.t('assignment_points_possible', 'pt', {count: pts})
+      text = Number.isInteger(pts)
+        ? I18n.t('assignment_points_possible', 'pt', {count: pts})
+        : I18n.t('%{points} pts', {points: I18n.n(pts)})
     }
     return this.set('possible_points_label', text)
   }

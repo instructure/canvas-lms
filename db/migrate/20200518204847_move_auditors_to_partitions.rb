@@ -6,10 +6,10 @@ class MoveAuditorsToPartitions < ActiveRecord::Migration[5.2]
     DataFixup::Auditors::MigrateAuthToPartitions.send_later_if_production_enqueue_args(:run,
       priority: Delayed::LOWER_PRIORITY,
       strand: strand_name)
-    DataFixup::Auditors::MigrateAuthToPartitions.send_later_if_production_enqueue_args(:run,
+    DataFixup::Auditors::MigrateCoursesToPartitions.send_later_if_production_enqueue_args(:run,
       priority: Delayed::LOWER_PRIORITY,
       strand: strand_name)
-    DataFixup::Auditors::MigrateAuthToPartitions.send_later_if_production_enqueue_args(:run,
+    DataFixup::Auditors::MigrateGradeChangesToPartitions.send_later_if_production_enqueue_args(:run,
       priority: Delayed::LOWER_PRIORITY,
       strand: strand_name)
   end

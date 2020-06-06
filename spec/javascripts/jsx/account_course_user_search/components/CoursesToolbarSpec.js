@@ -118,18 +118,6 @@ QUnit.module('CoursesToolbar', suiteHooks => {
     ])
   })
 
-  test('shows "loading" until terms are loaded', () => {
-    const propsWithNoTerms = {
-      ...allTermsProps,
-      terms: {
-        loading: true
-      }
-    }
-    renderComponent(propsWithNoTerms)
-    clickToExpand()
-    deepEqual(getOptionLabels(), ['All Terms', 'Loading more terms...'])
-  })
-
   QUnit.module('blueprint_courses checkbox', () => {
     test('clicking it causes "onUpdateFilters" to be called', () => {
       const onUpdateFilters = sinon.stub()

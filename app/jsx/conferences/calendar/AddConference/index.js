@@ -16,31 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback} from 'react'
+import React, {useState, useCallback, useRef} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!conferences'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import ConferenceButton from './ConferenceButton'
 import AddLtiConferenceDialog from './AddLtiConferenceDialog'
-import createConference from '../../utils/createConference'
-import {showFlashError} from 'jsx/shared/FlashAlert'
 import webConferenceType from 'jsx/shared/proptypes/webConferenceType'
 
-const AddConference = ({context, currentConferenceType, conferenceTypes, setConference}) => {
-  const [isCreating, setIsCreating] = useState(false)
+const AddConference = ({
+  context,
+  currentConferenceType,
+  conferenceTypes,
+  setConference,
+  inputRef
+}) => {
+  const localInputRef = useRef(null)
   const [isRetrievingLTI, setRetrievingLTI] = useState(false)
   const [selectedType, setSelectedType] = useState(null)
 
-  const createPluginConference = async type => {
-    setIsCreating(true)
-    try {
-      const json = await createConference(context, type)
-      setConference(json)
-    } catch (err) {
-      showFlashError(I18n.t('An error occurred creating the  conference'))()
-    }
-    setIsCreating(false)
+  const createPluginConference = type => {
+    setConference({
+      conference_type: type.type,
+      title: I18n.t('%{name} Conference', {name: type.name}),
+      description: ''
+    })
   }
 
   const onLtiContent = useCallback(
@@ -60,9 +61,10 @@ const AddConference = ({context, currentConferenceType, conferenceTypes, setConf
 
   const onLtiClose = () => {
     setRetrievingLTI(false)
+    setTimeout(() => localInputRef.current?.focus(), 0)
   }
 
-  const onSelect = async type => {
+  const onSelect = type => {
     setSelectedType(type)
     if (type.type !== 'LtiConference') {
       createPluginConference(type)
@@ -73,10 +75,16 @@ const AddConference = ({context, currentConferenceType, conferenceTypes, setConf
 
   return (
     <View as="div" display="block" padding="0 0 x-small">
-      {isCreating || isRetrievingLTI ? (
+      {isRetrievingLTI ? (
         <Spinner margin="x-small" renderTitle={I18n.t('Creating conference')} size="x-small" />
       ) : (
         <ConferenceButton
+          inputRef={el => {
+            if (inputRef) {
+              inputRef(el)
+            }
+            localInputRef.current = el
+          }}
           conferenceTypes={conferenceTypes}
           currentConferenceType={currentConferenceType}
           onSelect={onSelect}
@@ -99,7 +107,13 @@ AddConference.propTypes = {
   context: PropTypes.string.isRequired,
   conferenceTypes: PropTypes.arrayOf(webConferenceType).isRequired,
   currentConferenceType: webConferenceType,
-  setConference: PropTypes.func.isRequired
+  setConference: PropTypes.func.isRequired,
+  inputRef: PropTypes.func
+}
+
+AddConference.defaultProps = {
+  currentConferenceType: null,
+  inputRef: null
 }
 
 export default AddConference

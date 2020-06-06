@@ -68,6 +68,7 @@ describe MasterCourses::MasterContentTag do
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       topic = @copy_from.discussion_topics.create!
       topic_master_tag = @template.create_content_tag_for!(topic)
+      expect(topic_master_tag.root_account).to eq @copy_from.root_account
       assmt = @copy_from.assignments.create!
       restrictions = {:all => true}
       assmt_master_tag = @template.create_content_tag_for!(assmt, {:restrictions => restrictions})

@@ -293,8 +293,23 @@ export default class EditCalendarEventDetails {
     }
     if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
       if (this.conference) {
+        const webConference = {
+          ...this.conference,
+          title:
+            this.conference.conference_type !== 'LtiConference'
+              ? params['calendar_event[title]']
+              : this.conference.title,
+          user_settings: {
+            ...this.conference.user_settings,
+            scheduled_date: params['calendar_event[start_at]']
+          }
+        }
         const conferenceParams = new URLSearchParams(
-          $.param({calendar_event: {web_conference: this.conference}})
+          $.param({
+            calendar_event: {
+              web_conference: webConference
+            }
+          })
         )
         for (const [key, value] of conferenceParams.entries()) {
           params[key] = value

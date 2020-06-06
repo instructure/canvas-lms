@@ -17,8 +17,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../../../lti_1_3_tool_configuration_spec_helper.rb')
 
 shared_context 'advantage services context' do
+  include_context 'lti_1_3_tool_configuration_spec_helper'
+
   let_once(:root_account) do
     Account.default
   end

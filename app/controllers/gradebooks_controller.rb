@@ -383,7 +383,6 @@ class GradebooksController < ApplicationController
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
-      additional_sort_options_enabled: @context.feature_enabled?(:new_gradebook_sort_options),
       # TODO: remove `api_max_per_page` with TALLY-831
       api_max_per_page: per_page,
 
@@ -603,13 +602,18 @@ class GradebooksController < ApplicationController
 
   def set_learning_mastery_env
     set_student_context_cards_js_env
+    visible_sections = if @context.root_account.feature_enabled?(:limit_section_visibility_in_lmgb)
+      @context.sections_visible_to(@current_user)
+    else
+      @context.active_course_sections
+    end
 
     js_env({
       GRADEBOOK_OPTIONS: {
         context_id: @context.id.to_s,
         context_url: named_context_url(@context, :context_url),
         outcome_proficiency: outcome_proficiency,
-        sections: sections_json(@context.active_course_sections, @current_user, session, [], allow_sis_ids: true),
+        sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
         settings: gradebook_settings(@context.global_id),
         settings_update_url: api_v1_course_gradebook_settings_update_url(@context)
       }
@@ -810,25 +814,13 @@ class GradebooksController < ApplicationController
       return
     end
 
-    if Account.site_admin.feature_enabled?(:submissions_reupload_status_page)
-      submission_zip_params = {uploaded_data: params[:submissions_zip]}
-      assignment.generate_comments_from_files_later(submission_zip_params, @current_user)
+    submission_zip_params = {uploaded_data: params[:submissions_zip]}
+    assignment.generate_comments_from_files_later(submission_zip_params, @current_user)
 
-      redirect_to named_context_url(@context, :submissions_upload_context_gradebook_url, assignment.id)
-      return
-    end
-
-    @assignment = assignment
-    @comments, @failures = @assignment.generate_comments_from_files_legacy(params[:submissions_zip].path, @current_user)
-    flash[:notice] = t('notices.uploaded',
-                       { :one => "Files and comments created for 1 submission",
-                         :other => "Files and comments created for %{count} submissions" },
-                       :count => @comments.length)
+    redirect_to named_context_url(@context, :submissions_upload_context_gradebook_url, assignment.id)
   end
 
   def show_submissions_upload
-    return render status: :not_found unless Account.site_admin.feature_enabled?(:submissions_reupload_status_page)
-
     return unless authorized_action(@context, @current_user, :manage_grades)
 
     @assignment = @context.assignments.active.find(params[:assignment_id])

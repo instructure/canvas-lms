@@ -28,6 +28,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'Due Date',
             categoryDisplayName: 'Due Date',
+            categoryDescription: 'Due date description',
             name: 'Assignment Due Date Override Changed',
             _id: '3'
           }
@@ -38,6 +39,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'Due Date',
             categoryDisplayName: 'Due Date',
+            categoryDescription: 'Due date description',
             name: 'Assignment Due Date Changed',
             _id: '36'
           }
@@ -48,6 +50,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'Due Date',
             categoryDisplayName: 'Due Date',
+            categoryDescription: 'Due date description',
             name: 'Assignment Created',
             _id: '37'
           }
@@ -58,6 +61,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'Grading',
             categoryDisplayName: 'Grading',
+            categoryDescription: 'Grading description',
             name: 'Quiz Regrade Finished',
             _id: '5'
           }
@@ -68,6 +72,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'All Submissions',
             categoryDisplayName: 'All Submissions',
+            categoryDescription: 'All submissions description',
             name: 'Submission Needs Grading',
             _id: '4'
           }
@@ -80,6 +85,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'Due Date',
             categoryDisplayName: 'Due Date',
+            categoryDescription: 'Due date description',
             name: 'Assignment Due Date Override Changed',
             _id: '3'
           }
@@ -97,6 +103,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'Due Date',
             categoryDisplayName: 'Due Date',
+            categoryDescription: 'Due date description',
             name: 'Assignment Due Date Override Changed',
             _id: '3'
           }
@@ -107,6 +114,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'Due Date',
             categoryDisplayName: 'Due Date',
+            categoryDescription: 'Due date description',
             name: 'Assignment Due Date Changed',
             _id: '36'
           }
@@ -117,6 +125,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'Due Date',
             categoryDisplayName: 'Due Date',
+            categoryDescription: 'Due date description',
             name: 'Assignment Created',
             _id: '37'
           }
@@ -127,6 +136,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'Grading',
             categoryDisplayName: 'Grading',
+            categoryDescription: 'Grading description',
             name: 'Quiz Regrade Finished',
             _id: '5'
           }
@@ -137,6 +147,7 @@ const mockedNotificationPreferences = {
           notification: {
             category: 'All Submissions',
             categoryDisplayName: 'All Submissions',
+            categoryDescription: 'All submissions description',
             name: 'Submission Needs Grading',
             _id: '4'
           }

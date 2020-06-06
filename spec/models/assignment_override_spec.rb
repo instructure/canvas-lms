@@ -1017,4 +1017,11 @@ describe AssignmentOverride do
       end
     end
   end
+
+  describe 'create' do
+    it 'sets the root_account_id using assignment' do
+      override = assignment_override_model(course: @course)
+      expect(override.root_account_id).to eq @assignment.root_account_id
+    end
+  end
 end

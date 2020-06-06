@@ -108,6 +108,8 @@ def stashSpecFailures(prefix, index) {
 }
 
 def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
+  def htmlFiles
+  def failureCategories
   def working_dir = "${prefix}_compiled_failures"
   sh "rm -vrf ./$working_dir"
   sh "mkdir $working_dir"
@@ -122,9 +124,12 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
         }
       }
     }
-    buildIndexPage();
+    htmlFiles = findFiles glob: '**/index.html'
+    failureCategories = buildFailureCategories(htmlFiles)
+    buildIndexPage(failureCategories)
     htmlFiles = findFiles glob: '**/index.html'
   }
+  uploadSplunkFailures(failureCategories)
 
   def report_name = "spec-failure-$prefix"
   def report_url = "${BUILD_URL}${report_name}"
@@ -142,33 +147,47 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
   return report_url
 }
 
-def buildIndexPage() {
+def buildFailureCategories(htmlFiles) {
+  Map<String, List<String>> failureCategories = [:]
+  if (htmlFiles.size() > 0) {
+    htmlFiles.each { file ->
+      def category = file.getPath().split("/")[3]
+      if (!failureCategories.containsKey(category)) {
+        failureCategories[category] = []
+      }
+      failureCategories[category] += file
+    }
+  }
+  return failureCategories
+}
+
+def buildIndexPage(failureCategories) {
   def indexHtml = "<body style=\"font-family:sans-serif;line-height:1.25;font-size:14px\">"
-  def htmlFiles;
-  htmlFiles = findFiles glob: '**/index.html'
-  if (htmlFiles.size()<1) {
+  if (failureCategories.size() < 1) {
     indexHtml += "\\o/ yay good job, no failures"
   } else {
-      Map<String, List<String>> failureCategory = [:]
-      htmlFiles.each { file ->
-        def category = file.getPath().split("/")[3]
-        if (failureCategory.containsKey("${category}")) {
-          failureCategory.get("${category}").add("${file}")
-        } else {
-          failureCategory.put("${category}", [])
-          failureCategory.get("${category}").add("${file}")
-        }
+    failureCategories.each {category, failures ->
+      indexHtml += "<h1>${category} Failures</h1>"
+      failures.each { failure ->
+        def spec = (failure =~ /.*spec_failures\/(.*)\/index/)[0][1]
+        indexHtml += "<a href=\"${failure}\">${spec}</a><br>"
       }
-      failureCategory.each {category, failures ->
-        indexHtml += "<h1>${category} Failures</h1>"
-        failures.each { failure ->
-          def spec = (failure =~ /.*spec_failures\/(.*)\/index/)[0][1]
-          indexHtml += "<a href=\"${failure}\">${spec}</a><br>"
-        }
-      }
+    }
   }
   indexHtml += "</body>"
   writeFile file: "index.html", text: indexHtml
+}
+
+def uploadSplunkFailures(failureCategories) {
+  def splunk = load 'build/new-jenkins/groovy/splunk.groovy'
+  def splunkFailureEvents = []
+  failureCategories.each {category, failures ->
+    failures.each { failure ->
+      def spec = (failure =~ /.*spec_failures\/(.*)\/index/)[0][1]
+      splunkFailureEvents.add(splunk.eventForTestFailure(spec, category))
+    }
+  }
+  splunk.upload(splunkFailureEvents)
 }
 
 def snykCheckDependencies(projectImage, projectDirectory) {

@@ -21,6 +21,7 @@ import React, {Component, Fragment} from 'react'
 import {arrayOf, func} from 'prop-types'
 import {connect} from 'react-redux'
 import $ from 'jquery'
+import {maxBy} from 'lodash'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
 import 'compiled/jquery.rails_flash_notifications'
 
@@ -38,6 +39,8 @@ import {GROUP_PERMISSION_DESCRIPTIONS} from '../templates'
 import {ConnectedPermissionButton} from './PermissionButton'
 import propTypes, {ENABLED_FOR_NONE} from '../propTypes'
 
+const GRANULAR_PERMISSION_TAG = 'ic-permissions__grp-tag'
+
 export default class PermissionsTable extends Component {
   static propTypes = {
     roles: arrayOf(propTypes.role).isRequired,
@@ -47,8 +50,20 @@ export default class PermissionsTable extends Component {
     setAndOpenPermissionTray: func.isRequired
   }
 
-  state = {
-    expanded: {}
+  constructor(props) {
+    super(props)
+    this.state = {
+      expanded: {}
+    }
+    this.justExpanded = null
+    this.tableRef = React.createRef()
+  }
+
+  componentDidUpdate() {
+    if (this.justExpanded) {
+      this.fixVerticalScroll()
+      this.justExpanded = null
+    }
   }
 
   // just a heads up: these likely break in RTL. the best thing would be to
@@ -56,7 +71,7 @@ export default class PermissionsTable extends Component {
   // if you do have to do this in JS, you need to use something like
   // 'normalize-scroll-left' from npm (grep for where we use it in the gradebook)
   // so that it works cross browser in RTL
-  fixScroll = e => {
+  fixHorizontalScroll = e => {
     if (!this.contentWrapper) return
     const sidebarWidth = 300
     const leftScroll = this.contentWrapper.scrollLeft
@@ -65,6 +80,34 @@ export default class PermissionsTable extends Component {
       const newScroll = Math.max(0, leftScroll - sidebarWidth)
       this.contentWrapper.scrollLeft = newScroll
     }
+  }
+
+  fixVerticalScroll = () => {
+    // All rows corrresponding to granular permissions will have a special
+    // class attached to them. Find the ones corresponding to the expand-o
+    // operation that JUST happened.
+    if (!this.tableRef.current) return
+    const newGranulars = this.tableRef.current.querySelectorAll(
+      `tr.${GRANULAR_PERMISSION_TAG}-${this.justExpanded}`
+    )
+    if (newGranulars.length === 0) return
+
+    // We now have the rows that were added as a result of expanding the group.
+    // Find the bottom-most one of those, and then if it is below the visible
+    // region of the scrolling div, scroll it into view.
+    // Note that we don't have to worry about scrolling in the other direction,
+    // because rows can only get added BELOW the group, so they can never be
+    // off the top of the scroll region when first created
+    const scrollToMe = maxBy(Array.from(newGranulars), 'offsetTop')
+    const scrollArea = scrollToMe.closest('div.ic-permissions__table-container')
+    const myBottom = scrollToMe.offsetTop + scrollToMe.offsetHeight
+    const scrollAreaBottom = scrollArea.scrollTop + scrollArea.clientHeight
+    if (myBottom > scrollAreaBottom)
+      scrollArea.scrollBy({
+        top: myBottom - scrollAreaBottom,
+        left: 0,
+        behavior: 'smooth'
+      })
   }
 
   openRoleTray(role) {
@@ -104,7 +147,7 @@ export default class PermissionsTable extends Component {
                       id={`role_${role.id}`}
                       variant="link"
                       onClick={() => this.openRoleTray(role)}
-                      onFocus={this.fixScroll}
+                      onFocus={this.fixHorizontalScroll}
                       size="small"
                       theme={{smallPadding: '0', smallHeight: 'normal'}}
                     >
@@ -142,6 +185,7 @@ export default class PermissionsTable extends Component {
           $.screenReaderFlashMessage(I18n.t('%{count} rows removed', {count}))
         }
 
+        if (expanded[name]) this.justExpanded = name
         return {expanded}
       })
     }
@@ -215,7 +259,7 @@ export default class PermissionsTable extends Component {
           checked={perms[name].enabled !== ENABLED_FOR_NONE}
           disabled={perms[name].readonly}
           label={<ScreenReaderContent>{perm.label}</ScreenReaderContent>}
-          onFocus={this.fixScroll}
+          onFocus={this.fixHorizontalScroll}
           onChange={toggle.bind(this)}
           value={perm.label}
         />
@@ -225,7 +269,10 @@ export default class PermissionsTable extends Component {
 
   renderExpandedRows(perm) {
     return perm.granular_permissions.map(permission => (
-      <tr key={permission.label}>
+      <tr
+        key={permission.label}
+        className={`${GRANULAR_PERMISSION_TAG}-${permission.granular_permission_group}`}
+      >
         {this.renderLeftHeader(permission)}
         {this.props.roles.map(role => (
           <td key={role.id}>
@@ -242,7 +289,7 @@ export default class PermissionsTable extends Component {
     return (
       <table className="ic-permissions__table">
         {this.renderTopHeader()}
-        <tbody>
+        <tbody ref={this.tableRef}>
           {this.props.permissions.map(perm => (
             <Fragment key={perm.permission_name}>
               <tr>
@@ -257,7 +304,7 @@ export default class PermissionsTable extends Component {
                         roleId={role.id}
                         roleLabel={role.label}
                         inTray={false}
-                        onFocus={this.fixScroll}
+                        onFocus={this.fixHorizontalScroll}
                       />
                     </div>
                   </td>

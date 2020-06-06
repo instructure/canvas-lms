@@ -30,11 +30,6 @@ import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 
-export function toolSubmissionType(submissionType) {
-  const toolTypes = ['default_external_tool']
-  return toolTypes.includes(submissionType) ? 'external_tool' : submissionType
-}
-
 const DefaultToolForm = props => {
   const [launchDefinitions, setLaunchDefinitions] = useState([])
   const toolMessageData = usePostMessage('defaultToolContentReady')

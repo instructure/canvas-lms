@@ -241,6 +241,9 @@
   "published_c944a23d": { "message": "已发布" },
   "published_when_302d8e23": { "message": "已发布：{ when }" },
   "quizzes_7e598f57": { "message": "测验" },
+  "reading_a_media_track_file_failed_aborting_be051b20": {
+    "message": "读取媒体跟踪文件失败。正在中止。"
+  },
   "record_7c9448b": { "message": "记录" },
   "record_upload_media_5fdce166": { "message": "记录/上传媒体" },
   "recording_98da6bda": { "message": "录制" },
@@ -266,6 +269,9 @@
   },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "出错了，我不知道该给您看些什么。"
+  },
+  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+    "message": "遇到一些问题，请检查连接并重试。"
   },
   "something_went_wrong_d238c551": { "message": "出了些问题" },
   "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {

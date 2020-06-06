@@ -113,7 +113,8 @@ module Lti
          com.instructure.Course.canvas_resource_type
          com.instructure.Course.allow_canvas_resource_selection
          com.instructure.Course.available_canvas_resources
-         com.instructure.Person.pronouns)
+         com.instructure.Person.pronouns
+         com.instructure.User.observees)
     }
 
     describe '#supported_capabilities' do

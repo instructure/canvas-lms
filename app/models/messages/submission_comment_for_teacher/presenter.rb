@@ -18,8 +18,9 @@
 
 module Messages::SubmissionCommentForTeacher
   class Presenter
-    def initialize(message)
+    def initialize(message, data: {})
       @message = message
+      @data = data
     end
 
     def link

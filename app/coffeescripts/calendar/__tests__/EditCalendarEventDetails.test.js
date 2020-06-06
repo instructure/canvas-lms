@@ -97,7 +97,7 @@ describe('EditCalendarEventDetails', () => {
 
       it('does show current conference when there is a current conference', () => {
         enableConferences(CONFERENCE_TYPES.slice(1))
-        render({web_conference: {id: 1, conference_type: 'type1', title: 'FooConf'}})
+        render({web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'}})
         const conferencingRow = within(document.body)
           .getByText('Conferencing:')
           .closest('tr')

@@ -321,13 +321,10 @@ class ConferencesController < ApplicationController
       @conference = @context.web_conferences.build(conference_params)
       @conference.settings[:default_return_url] = named_context_url(@context, :context_url, :include_host => true)
       @conference.user = @current_user
-      members = get_new_members
       respond_to do |format|
         if @conference.save
           @conference.add_initiator(@current_user)
-          members.uniq.each do |u|
-            @conference.add_invitee(u)
-          end
+          @conference.invite_users_from_context(member_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json { render :json => WebConference.find(@conference.id).as_json(:permissions => {:user => @current_user, :session => session},
@@ -343,15 +340,12 @@ class ConferencesController < ApplicationController
   def update
     if authorized_action(@conference, @current_user, :update)
       @conference.user ||= @current_user
-      members = get_new_members
       respond_to do |format|
         params[:web_conference].try(:delete, :long_running)
         params[:web_conference].try(:delete, :conference_type)
         if @conference.update(conference_params)
           # TODO: ability to dis-invite people
-          members.uniq.each do |u|
-            @conference.add_invitee(u)
-          end
+          @conference.invite_users_from_context(member_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json { render :json => @conference.as_json(:permissions => {:user => @current_user, :session => session},
@@ -475,10 +469,10 @@ class ConferencesController < ApplicationController
     end
   end
 
-  def get_new_members
-    members = [@current_user]
+  def member_ids
+    ids = [@current_user.id]
     if params[:observers] && params[:observers][:remove] == '1'
-      ids = @context.user_ids - @context.observers.pluck(:id)
+      ids += @context.user_ids - @context.observers.pluck(:id)
     elsif params[:user] && params[:user][:all] != '1'
       ids = []
       params[:user].each do |id, val|
@@ -488,13 +482,7 @@ class ConferencesController < ApplicationController
       ids = @context.user_ids
     end
 
-    if @context.is_a? Course
-      members += @context.participating_users(ids).to_a
-    else
-      members += @context.participating_users_in_context(ids).to_a
-    end
-
-    members - @conference.invitees
+    ids
   end
 
   private

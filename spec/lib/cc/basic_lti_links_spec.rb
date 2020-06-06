@@ -305,6 +305,20 @@ describe CC::BasicLTILinks do
           expect(xml_doc.at_xpath(export_xpath).text).to eq tool.settings[:content_migration][:export_start_url]
           expect(xml_doc.at_xpath(import_xpath).text).to eq tool.settings[:content_migration][:import_start_url]
         end
+
+        it "adds format settings" do
+          tool.settings[:content_migration] = {
+            export_format: "json",
+            import_format: "default"
+          }
+          subject.create_blti_link(tool, lti_doc)
+          xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+          cm_xpath = '//blti:extensions/lticm:options[@name="content_migration"]'
+          export_xpath = "#{cm_xpath}/lticm:property[@name=\"export_format\"]"
+          import_xpath = "#{cm_xpath}/lticm:property[@name=\"import_format\"]"
+          expect(xml_doc.at_xpath(export_xpath).text).to eq tool.settings[:content_migration][:export_format]
+          expect(xml_doc.at_xpath(import_xpath).text).to eq tool.settings[:content_migration][:import_format]
+        end
       end
     end
   end

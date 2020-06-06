@@ -135,6 +135,11 @@ test('#initialize sets possible points count with 2 points', function() {
   equal(this.quiz.get('possible_points_label'), '2 pts')
 })
 
+test('#initialize sets possible points count with 1.23 points', function() {
+  this.quiz = new Quiz({points_possible: 1.23})
+  equal(this.quiz.get('possible_points_label'), '1.23 pts')
+})
+
 test('#initialize points possible to null if ungraded survey', function() {
   this.quiz = new Quiz({
     points_possible: 5,

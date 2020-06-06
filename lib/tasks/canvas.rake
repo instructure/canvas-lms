@@ -208,20 +208,6 @@ namespace :db do
       ::ActiveRecord::Base.descendants.each(&:reset_column_information)
       Rake::Task['db:migrate'].invoke
     end
-
-    desc "Auto-generate models in all tables for triggering CDC events"
-    task :fill_tables => [:environment] do
-      raise "Run with RAILS_ENV=test" unless Rails.env.test?
-      require "#{Rails.root}/lib/cdc_migration_testing/model_generator"
-      model_generator = ModelGenerator.new
-      puts "Attempting to create #{model_generator.queue_length} models"
-      model_generator.run
-      puts "Results:\n"
-      puts "#{model_generator.fixture_count} models created from fixtures"
-      puts "#{model_generator.generated_count} models generated automatically"
-      puts "#{model_generator.skipped_count} models skipped (already existed or have no table)"
-      puts "Took #{model_generator.iteration_count} iterations to satisfy foreign key constraints"
-    end
   end
 end
 

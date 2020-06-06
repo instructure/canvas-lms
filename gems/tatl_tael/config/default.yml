@@ -176,7 +176,7 @@ Simple/CoffeeSpecsLinter:
     - "app/coffeescripts/**/__tests__/**"
     - "spec/coffeescripts/**"
     - "spec/javascripts/**"
-  Message: Your commit includes coffee changes, but does not include Jest
+  Message: Your commit includes coffee changes, but does not include
     specs. Please add some to verify your changes.
 
 Simple/JsxSpecsLinter:
@@ -188,7 +188,7 @@ Simple/JsxSpecsLinter:
     Include:
     - "app/jsx/**/__tests__/**"
     - "spec/javascripts/jsx/**"
-  Message: Your commit includes JavaScript changes, but does not include Jest
+  Message: Your commit includes JavaScript changes, but does not include
     specs. Please add some to verify your changes.
 
 Simple/PublicJsSpecsLinter:
@@ -207,7 +207,7 @@ Simple/PublicJsSpecsLinter:
     - "public/javascripts/**/__tests__/**"
     - "spec/javascripts/**"
   Message: Your commit includes changes to public/javascripts, but does not include
-    Jest specs. Please add some to verify your changes. Even $.fn.crazyMethods
+    specs. Please add some to verify your changes. Even $.fn.crazyMethods
     can and should be tested (and not via selenium).
 
 Simple/NewErbLinter:

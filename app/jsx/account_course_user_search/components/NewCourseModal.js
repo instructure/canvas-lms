@@ -23,7 +23,7 @@ import {Button} from '@instructure/ui-buttons'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {TextInput} from '@instructure/ui-text-input'
 import {propType as termsPropType} from '../store/TermsStore'
-import SearchableSelect from './SearchableSelect'
+import SearchableSelect from 'jsx/shared/components/SearchableSelect'
 import I18n from 'i18n!account_course_user_search'
 import CoursesStore from '../store/CoursesStore'
 import AccountsTreeStore from '../store/AccountsTreeStore'
@@ -87,7 +87,7 @@ export default function NewCourseModal({terms, children}) {
 
   function onChange(field) {
     return function(e, value) {
-      setData(oldState => ({...oldState, [field]: value}))
+      setData(oldState => ({...oldState, [field]: value.id || value}))
       setErrors({})
     }
   }
@@ -123,17 +123,30 @@ export default function NewCourseModal({terms, children}) {
             />
 
             <SearchableSelect
+              id="accountSelector"
               label={I18n.t('Subaccount')}
-              options={renderAccountOptions(accountTree.accounts)}
+              isLoading={accountTree.loading}
               onChange={onChange('account_id')}
-            />
+            >
+              {renderAccountOptions(accountTree.accounts).map(account => (
+                <SearchableSelect.Option key={account.id} id={account.id} value={account.id}>
+                  {account.name}
+                </SearchableSelect.Option>
+              ))}
+            </SearchableSelect>
 
             <SearchableSelect
+              id="termSelector"
               label={I18n.t('Enrollment Term')}
-              options={terms.data || []}
               isLoading={terms.loading}
               onChange={onChange('enrollment_term_id')}
-            />
+            >
+              {(terms.data || []).map(term => (
+                <SearchableSelect.Option key={term.id} id={term.id} value={term.id}>
+                  {term.name}
+                </SearchableSelect.Option>
+              ))}
+            </SearchableSelect>
           </FormFieldGroup>
         </Modal.Body>
         <Modal.Footer>

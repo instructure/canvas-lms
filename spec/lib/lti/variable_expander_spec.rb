@@ -1040,6 +1040,44 @@ module Lti
             end
           end
         end
+
+        describe '$com.instructure.User.observees' do
+          subject do
+            exp_hash = { test: '$com.instructure.User.observees' }
+            variable_expander.expand_variables!(exp_hash)
+            exp_hash[:test]
+          end
+
+          let(:context) do
+            c = variable_expander.context
+            c.save!
+            c
+          end
+          let(:student) { user_factory }
+          let(:observer) { user_factory }
+
+          before do
+            context.enroll_student(student)
+            variable_expander.current_user = observer
+          end
+
+          context 'when the current user is observing users in the context' do
+            before do
+              observer_enrollment = context.enroll_user(observer, 'ObserverEnrollment')
+              observer_enrollment.update!(associated_user_id: student.id)
+            end
+
+            it 'produces a comma-separated string of user UUIDs' do
+              expect(subject.split(',')).to match_array [
+                Lti::Asset.opaque_identifier_for(student)
+              ]
+            end
+          end
+
+          context 'when the current user is not observing users in the context' do
+            it { is_expected.to eq "" }
+          end
+        end
       end
 
       context 'context is a course and there is a user' do

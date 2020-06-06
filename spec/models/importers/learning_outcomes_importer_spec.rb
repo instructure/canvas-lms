@@ -41,6 +41,26 @@ describe "Importing Learning Outcomes" do
     expect(log.child_outcome_links.detect{ |link| link.content == lo2 }).not_to be_nil
   end
 
+  context 'selectable_outcomes_in_course_copy enabled' do
+    before(:example) do
+      @context.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
+    end
+
+    after(:example) do
+      @context.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
+    end
+
+    it "should import group" do
+      migration = ContentMigration.create!(:context => @context)
+      migration.migration_ids_to_import = {:copy=>{}}
+      data = [{type: 'learning_outcome_group', title: 'hey', migration_id: 'x'}.with_indifferent_access]
+      data = {'learning_outcomes'=>data}
+      expect do
+        Importers::LearningOutcomeImporter.process_migration(data, migration)
+      end.to change { LearningOutcomeGroup.count }.by 1
+    end
+  end
+
   it "should not fail when passing an outcome that already exists" do
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     identifier = existing_outcome.migration_id

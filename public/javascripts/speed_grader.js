@@ -114,6 +114,8 @@ let anonymizableStudentId
 let anonymizableAuthorId
 let isModerated
 
+let commentSubmissionInProgress
+
 let $window
 let $full_width_container
 let $left_side
@@ -2860,6 +2862,13 @@ EG = {
   },
 
   addSubmissionComment(draftComment) {
+    // Avoid submitting additional comments if a request is already in progress.
+    // This can happen if the user submits a comment and then switches students
+    // (which attempts to save a draft comment) before the request finishes.
+    if (commentSubmissionInProgress) {
+      return false
+    }
+
     // This is to continue existing behavior of creating finalized comments by default
     if (draftComment === undefined) {
       draftComment = false
@@ -2875,6 +2884,8 @@ EG = {
       // that means that they did not type a comment, attach a file or record any media. so dont do anything.
       return false
     }
+
+    commentSubmissionInProgress = true
     const url = `${assignmentUrl}/${isAnonymous ? 'anonymous_' : ''}submissions/${
       EG.currentStudent[anonymizableId]
     }`
@@ -2909,11 +2920,13 @@ EG = {
       window.setTimeout(() => {
         $rightside_inner.scrollTo($rightside_inner[0].scrollHeight, 500)
       })
+      commentSubmissionInProgress = false
     }
 
     const formError = (data, _xhr, _textStatus, _errorThrown) => {
       EG.handleGradingError(data)
       EG.revertFromFormSubmit({errorSubmitting: true})
+      commentSubmissionInProgress = false
     }
 
     if ($add_a_comment.find("input[type='file']:visible").length) {
@@ -3758,6 +3771,8 @@ export default {
       null,
       speedGraderJSONErrorFn
     )
+
+    commentSubmissionInProgress = false
 
     $.when(getGradingPeriods(), speedGraderJsonDfd).then(setupSpeedGrader)
 

@@ -21,9 +21,11 @@ import React, {useCallback, useEffect, useState, useMemo} from 'react'
 import {func, string} from 'prop-types'
 import moment from 'moment-timezone'
 import produce from 'immer'
+import {DateTime} from '@instructure/ui-i18n'
 import CanvasInlineAlert from 'jsx/shared/components/CanvasInlineAlert'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
+import BulkEditDateSelect from './BulkEditDateSelect'
 import BulkEditHeader from './BulkEditHeader'
 import BulkEditTable from './BulkEditTable'
 import MoveDatesModal from './MoveDatesModal'
@@ -230,6 +232,24 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     )
   }, [])
 
+  const selectDateRange = useCallback((startDate, endDate) => {
+    const timezone = ENV?.TIMEZONE || DateTime.browserTimeZone()
+    const startMoment = moment.tz(startDate, timezone).startOf('day')
+    const endMoment = moment.tz(endDate, timezone).endOf('day')
+    setAssignments(currentAssignments =>
+      produce(currentAssignments, draftAssignments => {
+        draftAssignments.forEach(draftAssignment => {
+          const shouldSelect = draftAssignment.all_dates.some(draftOverride =>
+            ['due_at', 'lock_at', 'unlock_at'].some(dateField =>
+              moment(draftOverride[dateField]).isBetween(startMoment, endMoment, null, '[]')
+            )
+          )
+          draftAssignment.selected = shouldSelect
+        })
+      })
+    )
+  }, [])
+
   const handleSave = useCallback(() => {
     onSave()
     saveAssignments(assignments)
@@ -254,10 +274,9 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
           })
         })
       )
-      selectAllAssignments(false)
       setMoveDatesModalOpen(false)
     },
-    [selectAllAssignments, shiftDateOnOverride]
+    [shiftDateOnOverride]
   )
   const handleBatchEditRemove = useCallback(
     datesToRemove => {
@@ -277,10 +296,9 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
           })
         })
       )
-      selectAllAssignments(false)
       setMoveDatesModalOpen(false)
     },
-    [selectAllAssignments, setDateOnOverride]
+    [setDateOnOverride]
   )
 
   function renderHeader() {
@@ -295,6 +313,14 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
       onOpenBatchEdit: handleOpenBatchEdit
     }
     return <BulkEditHeader {...headerProps} />
+  }
+
+  function renderDateSelect() {
+    return (
+      ENV.FEATURES.assignment_bulk_edit_phase_2 && (
+        <BulkEditDateSelect selectDateRange={selectDateRange} />
+      )
+    )
   }
 
   function renderSaveSuccess() {
@@ -380,6 +406,7 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
       {renderSaveSuccess()}
       {renderSaveError()}
       {renderHeader()}
+      {renderDateSelect()}
       {renderBody()}
     </>
   )

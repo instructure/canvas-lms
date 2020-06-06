@@ -45,16 +45,28 @@ describe('Conference', () => {
     }
   }
 
+  const bbbConferenceType = {
+    name: 'BigBlueButton'
+  }
+
+  const msTeamsConferenceType = {
+    name: 'MS Teams'
+  }
+
   describe('Link conferences', () => {
     it('shows plugin conferences as links', () => {
-      const {getByRole} = render(<Conference conference={pluginConference} />)
+      const {getByRole} = render(
+        <Conference conference={pluginConference} conferenceType={bbbConferenceType} />
+      )
       const link = getByRole('button')
-      expect(link.textContent).toEqual('Plugin Conference')
+      expect(link.textContent).toEqual('BigBlueButton Conference')
       expect(link.href).toEqual('invalid://foo/join')
     })
 
     it('shows lti link conferences as links', () => {
-      const {getByRole} = render(<Conference conference={ltiConference} />)
+      const {getByRole} = render(
+        <Conference conference={ltiConference} conferenceType={msTeamsConferenceType} />
+      )
       const link = getByRole('button')
       expect(link.textContent).toEqual('LTI Conference')
       expect(link.href).toEqual('invalid://bar')
@@ -63,7 +75,9 @@ describe('Conference', () => {
     it('shows icons if present in LTI conference', () => {
       const conference = {...ltiConference}
       conference.lti_settings.icon = {url: 'invalid://icon'}
-      const {getByRole} = render(<Conference conference={conference} />)
+      const {getByRole} = render(
+        <Conference conference={conference} conferenceType={msTeamsConferenceType} />
+      )
       const link = getByRole('button')
       const icon = link.querySelector('img')
       expect(icon.src).toEqual('invalid://icon')
@@ -72,18 +86,26 @@ describe('Conference', () => {
     it('shows a remove button if handler provided', () => {
       const removeConference = jest.fn()
       const {getByText} = render(
-        <Conference conference={pluginConference} removeConference={removeConference} />
+        <Conference
+          conference={pluginConference}
+          conferenceType={bbbConferenceType}
+          removeConference={removeConference}
+        />
       )
-      const closeButton = getByText('Remove conference')
+      const closeButton = getByText('Remove conference: BigBlueButton Conference')
       expect(closeButton).not.toBeNull()
     })
 
     it('calls remove handler if clicked', () => {
       const removeConference = jest.fn()
       const {getByText} = render(
-        <Conference conference={pluginConference} removeConference={removeConference} />
+        <Conference
+          conference={pluginConference}
+          conferenceType={bbbConferenceType}
+          removeConference={removeConference}
+        />
       )
-      const closeButton = getByText('Remove conference')
+      const closeButton = getByText('Remove conference: BigBlueButton Conference')
       act(() => {
         fireEvent.click(closeButton)
       })
@@ -91,9 +113,25 @@ describe('Conference', () => {
     })
 
     it('does not show remove button if handler not provided', () => {
-      const {queryByText} = render(<Conference conference={pluginConference} />)
-      const closeButton = queryByText('Remove conference')
+      const {queryByText} = render(
+        <Conference conference={pluginConference} conferenceType={bbbConferenceType} />
+      )
+      const closeButton = queryByText('Remove conference: BigBlueButton Conference')
       expect(closeButton).toBeNull()
+    })
+
+    it('sets removeButtonRef', () => {
+      const removeConference = jest.fn()
+      const ref = jest.fn()
+      render(
+        <Conference
+          conference={pluginConference}
+          conferenceType={bbbConferenceType}
+          removeConference={removeConference}
+          removeButtonRef={ref}
+        />
+      )
+      expect(ref).toHaveBeenCalled()
     })
   })
 
@@ -110,7 +148,9 @@ describe('Conference', () => {
     }
 
     it('shows lti html conferences as html', () => {
-      const {getByText} = render(<Conference conference={htmlConference} />)
+      const {getByText} = render(
+        <Conference conference={htmlConference} conferenceType={msTeamsConferenceType} />
+      )
       const link = getByText('This is some text')
       expect(link.href).toMatch(/foo$/)
     })
@@ -122,7 +162,7 @@ describe('Conference', () => {
         <script src="invalid://evil"></script>
         <img src="invalid://image" />
         <a href="invalid://link">I'm okay</a>`
-      render(<Conference conference={htmlConference} />)
+      render(<Conference conference={htmlConference} conferenceType={msTeamsConferenceType} />)
       const content = document.body.innerHTML
       expect(content).not.toMatch(/alert/)
       expect(content).not.toMatch(/script/)
@@ -135,18 +175,26 @@ describe('Conference', () => {
     it('shows a remove button if handler provided', () => {
       const removeConference = jest.fn()
       const {getByText} = render(
-        <Conference conference={htmlConference} removeConference={removeConference} />
+        <Conference
+          conference={htmlConference}
+          conferenceType={msTeamsConferenceType}
+          removeConference={removeConference}
+        />
       )
-      const closeButton = getByText('Remove conference')
+      const closeButton = getByText('Remove conference: HTML Conference')
       expect(closeButton).not.toBeNull()
     })
 
     it('calls remove handler if clicked', () => {
       const removeConference = jest.fn()
       const {getByText} = render(
-        <Conference conference={htmlConference} removeConference={removeConference} />
+        <Conference
+          conference={htmlConference}
+          conferenceType={msTeamsConferenceType}
+          removeConference={removeConference}
+        />
       )
-      const closeButton = getByText('Remove conference')
+      const closeButton = getByText('Remove conference: HTML Conference')
       act(() => {
         fireEvent.click(closeButton)
       })
@@ -154,9 +202,25 @@ describe('Conference', () => {
     })
 
     it('does not show remove button if handler not provided', () => {
-      const {queryByText} = render(<Conference conference={htmlConference} />)
-      const closeButton = queryByText('Remove conference')
+      const {queryByText} = render(
+        <Conference conference={htmlConference} conferenceType={msTeamsConferenceType} />
+      )
+      const closeButton = queryByText('Remove conference: HTML Conference')
       expect(closeButton).toBeNull()
+    })
+
+    it('sets removeButtonRef', () => {
+      const removeConference = jest.fn()
+      const ref = jest.fn()
+      render(
+        <Conference
+          conference={htmlConference}
+          conferenceType={msTeamsConferenceType}
+          removeConference={removeConference}
+          removeButtonRef={ref}
+        />
+      )
+      expect(ref).toHaveBeenCalled()
     })
   })
 })

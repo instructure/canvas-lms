@@ -67,13 +67,6 @@ beforeEach(() => {
         name: 'my files',
         created_at: '2019-08-13T16:38:42Z'
       }
-    } else if (input === '/api/v1/courses/1/folders/root') {
-      resp.data = {
-        context_type: 'course',
-        id: '2',
-        name: 'course files',
-        created_at: '2019-08-13T16:38:42Z'
-      }
     } else if (input === '/api/v1/groups/1/folders/root') {
       resp.data = {
         context_type: 'group',
@@ -173,7 +166,10 @@ describe('MoreOptions', () => {
     it('renders the external tools in tabs', async () => {
       const overrides = {
         ExternalToolConnection: {
-          nodes: [{_id: '1', name: 'Tool 1'}, {_id: '2', name: 'Tool 2'}]
+          nodes: [
+            {_id: '1', name: 'Tool 1'},
+            {_id: '2', name: 'Tool 2'}
+          ]
         }
       }
       const mocks = await createGraphqlMocks(overrides)
@@ -193,7 +189,10 @@ describe('MoreOptions', () => {
     it('closes the modal when it receives the "LtiDeepLinkingResponse" event', async () => {
       const overrides = {
         ExternalToolConnection: {
-          nodes: [{_id: '1', name: 'Tool 1'}, {_id: '2', name: 'Tool 2'}]
+          nodes: [
+            {_id: '1', name: 'Tool 1'},
+            {_id: '2', name: 'Tool 2'}
+          ]
         }
       }
       const mocks = await createGraphqlMocks(overrides)
@@ -252,7 +251,7 @@ describe('MoreOptions', () => {
       expect(tabs[0]).toContainHTML('Canvas Files')
     })
 
-    it('renders user, group, and course folders', async () => {
+    it('renders user and group folders', async () => {
       const overrides = {
         ExternalToolConnection: {
           nodes: [{}]
@@ -274,7 +273,6 @@ describe('MoreOptions', () => {
       fireEvent.click(moreOptionsButton)
 
       expect((await findAllByText('my files'))[0]).toBeInTheDocument()
-      expect((await findAllByText('course files'))[0]).toBeInTheDocument()
       expect(
         (await findAllByText(mocks[2].result.data.legacyNode.groups[0].name))[0]
       ).toBeInTheDocument()
@@ -342,7 +340,6 @@ describe('MoreOptions', () => {
       fireEvent.click(rootFolderBreadcrumbLink)
 
       expect((await findAllByText('my files'))[0]).toBeInTheDocument()
-      expect((await findAllByText('course files'))[0]).toBeInTheDocument()
       expect(
         (await findAllByText(mocks[2].result.data.legacyNode.groups[0].name))[0]
       ).toBeInTheDocument()

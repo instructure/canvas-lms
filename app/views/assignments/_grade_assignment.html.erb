@@ -61,7 +61,7 @@
     <% end %>
   <% end %>
 
-  <% if @can_grade && @assignment.submission_reupload_progress.present? && Account.site_admin.feature_enabled?(:submissions_reupload_status_page) %>
+  <% if @can_grade && @assignment.submission_reupload_progress.present? %>
     <li>
       <a href="<%= context_url(@context, :show_submissions_upload_context_gradebook_url, @assignment) %>" class="icon-clock">
         <%= t "View Uploads Status" %>

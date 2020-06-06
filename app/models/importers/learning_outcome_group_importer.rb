@@ -21,8 +21,12 @@ module Importers
   class LearningOutcomeGroupImporter < Importer
     self.item_class = LearningOutcomeGroup
 
-    def self.import_from_migration(hash, migration, item=nil)
+    def self.import_from_migration(hash, migration, item=nil, skip_import=false)
       hash = hash.with_indifferent_access
+      if skip_import
+        Importers::LearningOutcomeGroupImporter.process_children(hash, hash[:parent_group], migration, skip_import)
+        return
+      end
       if hash[:is_global_standard]
         if Account.site_admin.grants_right?(migration.user, :manage_global_outcomes)
           hash[:parent_group] ||= LearningOutcomeGroup.global_root_outcome_group
@@ -82,19 +86,30 @@ module Importers
       item.skip_parent_group_touch = true
       migration.add_imported_item(item)
 
+      Importers::LearningOutcomeGroupImporter.process_children(hash, item, migration)
+
+      item
+    end
+
+    def self.process_children(hash, item, migration, skip_import=false)
       if hash[:outcomes]
         hash[:outcomes].each do |child|
           if child[:type] == 'learning_outcome_group'
             child[:parent_group] = item
-            Importers::LearningOutcomeGroupImporter.import_from_migration(child, migration)
+            Importers::LearningOutcomeGroupImporter.import_from_migration(
+              child,
+              migration,
+              nil,
+              skip_import && !migration.import_object?('learning_outcome_groups', child['migration_id'])
+            )
           else
             child[:learning_outcome_group] = item
-            Importers::LearningOutcomeImporter.import_from_migration(child, migration)
+            if !skip_import || migration.import_object?('learning_outcomes', child['migration_id'])
+              Importers::LearningOutcomeImporter.import_from_migration(child, migration)
+            end
           end
         end
       end
-
-      item
     end
 
     def self.check_for_duplicate_guids?(context, hash)

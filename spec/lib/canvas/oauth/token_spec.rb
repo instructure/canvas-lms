@@ -199,13 +199,14 @@ module Canvas::Oauth
       end
 
       it 'puts real_user in the json when masquerading' do
-        real_user = User.new
+        real_user = User.create!
         allow(token).to receive(:real_user).and_return(real_user)
         expect(json['real_user']).to eq({
           'id' => real_user.id,
           'name' => real_user.name,
           'global_id' => real_user.global_id.to_s
         })
+        expect(user.access_tokens.where(real_user: real_user).count).to eq 1
       end
 
       it 'does not put real_user in the json when not masquerading' do
@@ -253,6 +254,13 @@ module Canvas::Oauth
         key.auto_expire_tokens = false
         key.save!
         expect(token.access_token.expires_at).to be_nil
+      end
+
+      it 'gives short expiration for real_users' do
+        real_user = User.create!
+        token2 = Token.new(key, 'real_user_code')
+        allow(token2).to receive(:real_user).and_return(real_user)
+        expect(token.access_token.expires_at).to be <= 1.hour.from_now
       end
 
       it 'Tokens wont expire if the dev key has auto_expire_tokens set to false' do

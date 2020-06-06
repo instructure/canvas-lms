@@ -67,6 +67,7 @@ const usersView = new PaginatedCollectionView({
   canViewLoginIdColumn: ENV.permissions.view_user_logins,
   canViewSisIdColumn: ENV.permissions.read_sis,
   buffer: 1000,
+  hideSectionsOnCourseUsersPage: ENV.course.hideSectionsOnCourseUsersPage,
   template: rosterUsersTemplate
 })
 const roleSelectView = new RoleSelectView({
