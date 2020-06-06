@@ -251,7 +251,12 @@ module PostgreSQLAdapterExtensions
   def change_column_null(table, column, nullness, default = nil)
     # no point in pre-warming the cache to avoid locking if we're already in a transaction
     return super if nullness != false || default || open_transactions != 0
-    execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL")
+    transaction do
+      execute("SET enable_indexscan=false")
+      execute("SET enable_bitmapscan=false")
+      execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL")
+      raise ActiveRecord::Rollback
+    end
     super
   end
 
