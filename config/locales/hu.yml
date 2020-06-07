@@ -16218,6 +16218,7 @@ hu:
   this_assignment_is_unpublished_64c0f46c: "Ez a feladat nem publikált"
   this_assignment_submission_is_my_own_original_work_e820ce4b: "Ez a feladatmegoldás saját, eredeti munkám."
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Ez a feladat többé nem számít be az osztályzatába."
+  this_canvas_installation_is_only_for_testing_and_w_12e52370: "Ez a Canvas telepítés csak tesztelésre való, és havonta alaphelyzetbe áll."
   this_conference_may_be_recorded_f76deeeb: "Felvétel készülhet erről a konferenciáról."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "A kurzust jelenleg nem lehet hozzáadni a kurzusok menühöz."
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "A kurzus még nem indult el. Nem fog tudni résztvenni a kurzuson %{date}-ig."
@@ -17249,7 +17250,7 @@ hu:
   warning_for_improved_accessibility_please_click_he_e6472c02: "Figyelem! A jobb hozzáférhetőség érdekében kérjük, kattintson ide az \"Egyedi nézetű osztálynapló\" használatához."
   warnings: 
     test_install: 
-      periodic_message: "Ez a Canvas-telepítés csak tesztelésre való, és időnként alaphelyzetbe áll. "
+      periodic_message: "Ez a Canvas telepítés csak tesztelésre való, és időnként alaphelyzetbe áll. "
       title: "Canvas Teszt Telepítés "
       weekly_message: 
         one: "Ez a Canvas-telepítés csak tesztelésre való, és hetente alaphelyzetbe áll."
