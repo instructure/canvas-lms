@@ -20,7 +20,7 @@ class AddIsRceFavoriteToContextExternalTools < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
-    add_column :context_external_tools, :is_rce_favorite, :boolean
+    add_column :context_external_tools, :is_rce_favorite, :boolean, if_not_exists: true
     change_column_default(:context_external_tools, :is_rce_favorite, false)
     DataFixup::BackfillNulls.run(ContextExternalTool, :is_rce_favorite, default_value: false)
     change_column_null(:context_external_tools, :is_rce_favorite, false)
