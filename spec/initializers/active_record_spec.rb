@@ -354,6 +354,10 @@ module ActiveRecord
         User.connection.alter_constraint(:user_services, old_name, new_name: 'test')
         expect(User.connection.find_foreign_key(:user_services, :users)).to eq 'test'
       end
+
+      it "allows if_not_exists on add_index" do
+        expect { User.connection.add_index(:enrollments, :user_id, if_not_exists: true) }.not_to raise_exception
+      end
     end
   end
 end

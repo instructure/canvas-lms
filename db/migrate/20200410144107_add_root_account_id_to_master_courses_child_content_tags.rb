@@ -23,7 +23,7 @@ class AddRootAccountIdToMasterCoursesChildContentTags < ActiveRecord::Migration[
 
   def up
     add_column_and_fk :master_courses_child_content_tags, :root_account_id, :accounts, if_not_exists: true
-    add_index :master_courses_child_content_tags, :root_account_id, algorithm: :concurrently
+    add_index :master_courses_child_content_tags, :root_account_id, algorithm: :concurrently, if_not_exists: true
   end
 
   def down

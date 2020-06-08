@@ -23,7 +23,7 @@ class AddRealUserIdToAccessToken < ActiveRecord::Migration[5.2]
 
   def up
     add_column_and_fk :access_tokens, :real_user_id, :users, if_not_exists: true
-    add_index :access_tokens, :real_user_id, algorithm: :concurrently, where: "real_user_id IS NOT NULL"
+    add_index :access_tokens, :real_user_id, algorithm: :concurrently, where: "real_user_id IS NOT NULL", if_not_exists: true
   end
 
   def down
