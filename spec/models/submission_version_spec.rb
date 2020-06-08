@@ -57,6 +57,11 @@ describe SubmissionVersion do
       index = SubmissionVersion.index_version(@version)
       expect(index.assignment_id).to eq @submission.assignment_id
     end
+
+    it "sets the index record's root_account_id" do
+      index = SubmissionVersion.index_version(@version)
+      expect(index.root_account_id).to eq @course.root_account_id
+    end
   end
 
   describe "index_versions" do
