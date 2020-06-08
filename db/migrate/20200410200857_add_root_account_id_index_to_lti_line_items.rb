@@ -20,6 +20,6 @@ class AddRootAccountIdIndexToLtiLineItems < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
-    add_index :lti_line_items, :root_account_id, algorithm: :concurrently
+    add_index :lti_line_items, :root_account_id, algorithm: :concurrently, if_not_exists: true
   end
 end

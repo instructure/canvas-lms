@@ -181,26 +181,29 @@ module PostgreSQLAdapterExtensions
 
   def add_index(table_name, column_name, options = {})
     # catch a concurrent index add that fails because it already exists, and is invalid
-    if options[:algorithm] == :concurrently
+    if options[:algorithm] == :concurrently || options[:if_not_exists]
       column_names = index_column_names(column_name)
       index_name = options[:name].to_s if options.key?(:name)
       index_name ||= index_name(table_name, column_names)
 
       schema = shard.name if use_qualified_names?
 
-      exists = exec_query(<<-SQL, 'SCHEMA').rows.first[0].to_i > 0
-            SELECT COUNT(*)
+      valid = select_value(<<-SQL, 'SCHEMA')
+            SELECT indisvalid
             FROM pg_class t
             INNER JOIN pg_index d ON t.oid = d.indrelid
             INNER JOIN pg_class i ON d.indexrelid = i.oid
             WHERE i.relkind = 'i'
               AND i.relname = '#{index_name}'
               AND t.relname = '#{table_name}'
-              AND NOT indisvalid
               AND i.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} )
+            LIMIT 1
       SQL
-      remove_index(table_name, name: index_name, algorithm: :concurrently) if exists
+      remove_index(table_name, name: index_name, algorithm: :concurrently) if valid == false && options[:algorithm] == :concurrently
+      return if options[:if_not_exists] && valid == true
     end
+    # CANVAS_RAILS6_1: can stop doing this in Rails 6.2, when it's natively supported
+    options.delete(:if_not_exists)
     super
   end
 
