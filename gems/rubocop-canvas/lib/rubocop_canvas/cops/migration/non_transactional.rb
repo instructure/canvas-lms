@@ -18,7 +18,7 @@
 module RuboCop
   module Cop
     module Migration
-      class ConcurrentIndex < Cop
+      class NonTransactional < Cop
         def on_send(node)
           _receiver, method_name, *args = *node
 
@@ -27,37 +27,44 @@ module RuboCop
             @disable_ddl_transaction = true
           when :add_index
             check_add_index(node, args)
+          when :add_column, :add_column_and_fk
+            check_add_column(node, args)
           end
         end
 
         ALGORITHM = AST::Node.new(:sym, [:algorithm])
+        IF_NOT_EXISTS = AST::Node.new(:sym, [:if_not_exists])
 
         def check_add_index(node, args)
           options = args.last
-          return unless options.hash_type?
+          options = nil unless options.hash_type?
 
-          algorithm = options.children.find do |pair|
+          algorithm = options&.children&.find do |pair|
             pair.children.first == ALGORITHM
           end
-          return unless algorithm
-          algorithm_name = algorithm.children.last.children.first
-
-          add_offenses(node, algorithm_name)
-        end
-
-        private
-
-        def add_offenses(node, algorithm_name)
-          if algorithm_name != :concurrently
-            add_offense(node,
-              message: "Unknown algorithm name `#{algorithm_name}`, did you mean `:concurrently`?",
-              severity: :warning)
-          end
+          algorithm_name = algorithm&.children&.last&.children&.first
 
           if algorithm_name == :concurrently && !@disable_ddl_transaction
             add_offense(node,
-              message: "Concurrent index adds require `disable_ddl_transaction!`",
-              severity: :warning)
+                        message: "Concurrent index adds require `disable_ddl_transaction!`",
+                        severity: :warning)
+          end
+
+          check_add_column(node, args)
+        end
+
+        def check_add_column(node, args)
+          options = args.last
+          options = nil unless options.hash_type?
+
+          if_not_exists = options&.children&.find do |pair|
+            pair.children.first == IF_NOT_EXISTS
+          end
+          value = if_not_exists&.children&.last&.type
+          if @disable_ddl_transaction && value != :true
+            add_offense(node,
+                        message: "Non-transactional migrations should be idempotent; add `if_not_exists: true`",
+                        severity: :warning)
           end
         end
       end
