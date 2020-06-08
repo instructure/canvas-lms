@@ -436,7 +436,7 @@ module DataFixup::Auditors
       def filter_dead_foreign_keys(attrs_list)
         user_ids = attrs_list.map{|a| a['user_id'] }
         pseudonym_ids = attrs_list.map{|a| a['pseudonym_id'] }
-        existing_user_ids = User.where(id: user_ids).pluck(:id)
+        existing_user_ids = User.where("id IN (#{user_ids.join(",")})").pluck(:id)
         existing_pseud_ids = Pseudonym.where(id: pseudonym_ids).pluck(:id)
         missing_uids = user_ids - existing_user_ids
         missing_pids = pseudonym_ids - existing_pseud_ids
@@ -470,7 +470,7 @@ module DataFixup::Auditors
 
       def filter_dead_foreign_keys(attrs_list)
         user_ids = attrs_list.map{|a| a['user_id'] }
-        existing_user_ids = User.where(id: user_ids).pluck(:id)
+        existing_user_ids = User.where("id IN (#{user_ids.join(",")})").pluck(:id)
         missing_uids = user_ids - existing_user_ids
         attrs_list.reject {|h| missing_uids.include?(h['user_id']) }
       end
@@ -525,7 +525,7 @@ module DataFixup::Auditors
         student_ids = attrs_list.map{|a| a['student_id'] }
         grader_ids = attrs_list.map{|a| a['grader_id'] }
         user_ids = (student_ids + grader_ids).uniq
-        existing_user_ids = User.where(id: user_ids).pluck(:id)
+        existing_user_ids = User.where("id IN (#{user_ids.join(",")})").pluck(:id)
         missing_uids = user_ids - existing_user_ids
         filtered_attrs_list = attrs_list.reject do |h|
           missing_uids.include?(h['student_id']) || missing_uids.include?(h['grader_id'])
