@@ -2449,8 +2449,8 @@ class User < ActiveRecord::Base
     messageable_user_calculator.messageable_users_in_context(asset_string)
   end
 
-  def count_messageable_users_in_context(asset_string)
-    messageable_user_calculator.count_messageable_users_in_context(asset_string)
+  def count_messageable_users_in_context(asset_string, options={})
+    messageable_user_calculator.count_messageable_users_in_context(asset_string, options)
   end
 
   def messageable_users_in_course(course_or_id)
