@@ -179,6 +179,31 @@ module PostgreSQLAdapterExtensions
     [index_name, index_type, index_columns, index_options, algorithm, using]
   end
 
+  def add_index(table_name, column_name, options = {})
+    # catch a concurrent index add that fails because it already exists, and is invalid
+    if options[:algorithm] == :concurrently
+      column_names = index_column_names(column_name)
+      index_name = options[:name].to_s if options.key?(:name)
+      index_name ||= index_name(table_name, column_names)
+
+      schema = shard.name if use_qualified_names?
+
+      exists = exec_query(<<-SQL, 'SCHEMA').rows.first[0].to_i > 0
+            SELECT COUNT(*)
+            FROM pg_class t
+            INNER JOIN pg_index d ON t.oid = d.indrelid
+            INNER JOIN pg_class i ON d.indexrelid = i.oid
+            WHERE i.relkind = 'i'
+              AND i.relname = '#{index_name}'
+              AND t.relname = '#{table_name}'
+              AND NOT indisvalid
+              AND i.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} )
+      SQL
+      remove_index(table_name, name: index_name, algorithm: :concurrently) if exists
+    end
+    super
+  end
+
   def quote(*args)
     value = args.first
     return value if value.is_a?(QuotedValue)
