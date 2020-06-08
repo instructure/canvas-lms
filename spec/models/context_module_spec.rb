@@ -388,8 +388,8 @@ describe ContextModule do
       @attach = attachment_model context: @course, display_name: 'attach'
       @assign = @course.assignments.create! title: 'assign'
       @page = @course.wiki_pages.create! title: 'page'
-      @quiz = @course.quizzes.create! title: 'quiz'
-      @topic = @course.discussion_topics.create! title: 'topic'
+      @quiz = @course.quizzes.create! title: 'quiz', quiz_type: "assignment"
+      @topic = graded_discussion_topic context: @course, title: 'topic'
       @tool = @course.context_external_tools.create! name: 'tool', consumer_key: '1', shared_secret: '1', url: 'http://example.com/'
       @module.add_item(type: 'context_module_sub_header', title: 'one')
       @module.add_item(type: 'context_module_sub_header', title: 'two')
@@ -458,6 +458,13 @@ describe ContextModule do
       expect(m.content_tags.pluck(:title, :workflow_state)).to eq(
         [['assign', 'active'], ['page', 'unpublished'], ['tool', 'active']]
       )
+    end
+
+    it "adds the submittable object when given a graded discussion topic or quiz's assignment" do
+      m = @course.context_modules.create!
+      m.insert_items([@quiz.assignment.reload, @topic.assignment.reload])
+      expect(m.content_tags.map(&:content_type)).to eq(%w(Quizzes::Quiz DiscussionTopic))
+      expect(m.content_tags.map(&:content_id)).to eq([@quiz.id, @topic.id])
     end
   end
 

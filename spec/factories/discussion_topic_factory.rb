@@ -99,5 +99,6 @@ module Factories
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment
     @topic.save
+    @topic
   end
 end
