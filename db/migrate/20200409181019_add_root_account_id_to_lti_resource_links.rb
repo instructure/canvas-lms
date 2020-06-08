@@ -21,7 +21,7 @@ class AddRootAccountIdToLtiResourceLinks < ActiveRecord::Migration[5.2]
   include MigrationHelpers::AddColumnAndFk
 
   def up
-    add_column_and_fk :lti_resource_links, :root_account_id, :accounts
+    add_column_and_fk :lti_resource_links, :root_account_id, :accounts, if_not_exists: true
     add_index :lti_resource_links, :root_account_id, algorithm: :concurrently
   end
 

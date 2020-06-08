@@ -16,8 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module MigrationHelpers::AddColumnAndFk
-  def add_column_and_fk(table_name, column_name, foreign_table_name)
+  def add_column_and_fk(table_name, column_name, foreign_table_name, if_not_exists: false)
     fk = connection.send(:foreign_key_name, table_name, :column => column_name)
+    return if if_not_exists && connection.column_exists?(table_name, column_name)
     execute("ALTER TABLE #{connection.quote_table_name(table_name)} ADD COLUMN #{column_name} bigint CONSTRAINT #{fk} REFERENCES #{connection.quote_table_name(foreign_table_name)}(id)")
   end
 end

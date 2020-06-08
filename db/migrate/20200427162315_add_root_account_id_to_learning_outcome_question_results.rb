@@ -22,7 +22,7 @@ class AddRootAccountIdToLearningOutcomeQuestionResults < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def up
-    add_column_and_fk :learning_outcome_question_results, :root_account_id, :accounts
+    add_column_and_fk :learning_outcome_question_results, :root_account_id, :accounts, if_not_exists: true
     add_index :learning_outcome_question_results, :root_account_id, algorithm: :concurrently
   end
 

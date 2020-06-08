@@ -22,7 +22,7 @@ class AddRootAccountIdToWebConferences < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_column_and_fk :web_conferences, :root_account_id, :accounts
+    add_column_and_fk :web_conferences, :root_account_id, :accounts, if_not_exists: true
     add_index :web_conferences, :root_account_id, algorithm: :concurrently
   end
 
