@@ -164,7 +164,7 @@ module Lti
       # @returns LineItem
       def update
         line_item.update!(line_item_params)
-        update_assignment_title if line_item.assignment_line_item?
+        update_assignment if line_item.assignment_line_item?
         render json: LineItemsSerializer.new(line_item, line_item_id(line_item)),
                content_type: MIME_TYPE
       end
@@ -236,9 +236,14 @@ module Lti
         )
       end
 
-      def update_assignment_title
-        return if line_item_params[:label].blank?
-        line_item.assignment.update!(name: line_item_params[:label])
+      def update_assignment
+        label = line_item_params[:label]
+        score_maximum = line_item_params[:score_maximum]
+        return if label.blank? && score_maximum.blank?
+
+        line_item.assignment.name = label if label.present?
+        line_item.assignment.points_possible = score_maximum if score_maximum.present?
+        line_item.assignment.save!
       end
 
       def resource_link

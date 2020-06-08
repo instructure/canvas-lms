@@ -420,6 +420,23 @@ module Lti
         end
 
         context do
+          let(:new_score_maximum) { 42.0 }
+          let(:params_overrides) { super().merge(scoreMaximum: new_score_maximum) }
+          let(:line_item) { assignment.line_items.first }
+
+          it 'updates the assignment points_possible if ResourceLink is absent' do
+            line_item.update!(resource_link: nil)
+            send_request
+            expect(line_item.reload.assignment.points_possible).to eq new_score_maximum
+          end
+
+          it 'updates the assignment points_possible if default line item' do
+            send_request
+            expect(line_item.reload.assignment.points_possible).to eq new_score_maximum
+          end
+        end
+
+        context do
           let(:new_resource_id) { 'resource-id' }
           let(:params_overrides) { super().merge(resourceId: new_resource_id) }
 
