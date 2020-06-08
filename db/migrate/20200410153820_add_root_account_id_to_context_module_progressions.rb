@@ -22,7 +22,7 @@ class AddRootAccountIdToContextModuleProgressions < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_column_and_fk :context_module_progressions, :root_account_id, :accounts
+    add_column_and_fk :context_module_progressions, :root_account_id, :accounts, if_not_exists: true
     add_index :context_module_progressions, :root_account_id, algorithm: :concurrently
   end
 
