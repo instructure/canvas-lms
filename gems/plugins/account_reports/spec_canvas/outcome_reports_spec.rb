@@ -212,6 +212,11 @@ describe "Outcome Reports" do
       verify_all(report, all_values)
     end
 
+    it 'should include concluded courses' do
+      @course1.update! workflow_state: 'completed'
+      verify_all(report, all_values)
+    end
+
     context 'with a term' do
       before do
         @term1 = @root_account.enrollment_terms.create!(

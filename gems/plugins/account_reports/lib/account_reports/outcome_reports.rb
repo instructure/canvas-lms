@@ -178,7 +178,7 @@ module AccountReports
             AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
 
       unless @include_deleted
-        students = students.where("pseudonyms.workflow_state<>'deleted' AND c.workflow_state='available'")
+        students = students.where("pseudonyms.workflow_state<>'deleted' AND c.workflow_state IN ('available', 'completed')")
       end
 
       students = add_course_sub_account_scope(students, 'c')
@@ -252,7 +252,7 @@ module AccountReports
         where("ct.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
 
       unless @include_deleted
-       students = students.where("p.workflow_state<>'deleted' AND c.workflow_state='available'")
+        students = students.where("p.workflow_state<>'deleted' AND c.workflow_state IN ('available', 'completed')")
       end
 
       students = join_course_sub_account_scope(account, students, 'c')
