@@ -207,6 +207,11 @@ module PostgreSQLAdapterExtensions
     super
   end
 
+  def add_column(table_name, column_name, type, if_not_exists: false, **options)
+    return if if_not_exists && column_exists?(table_name, column_name)
+    super(table_name, column_name, type, **options)
+  end
+
   def quote(*args)
     value = args.first
     return value if value.is_a?(QuotedValue)

@@ -358,6 +358,10 @@ module ActiveRecord
       it "allows if_not_exists on add_index" do
         expect { User.connection.add_index(:enrollments, :user_id, if_not_exists: true) }.not_to raise_exception
       end
+
+      it "allows if_not_exists on add_column" do
+        expect { User.connection.add_column(:enrollments, :user_id, :bigint, if_not_exists: true) }.not_to raise_exception
+      end
     end
   end
 end
