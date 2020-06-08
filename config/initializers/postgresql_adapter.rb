@@ -252,8 +252,8 @@ module PostgreSQLAdapterExtensions
     # no point in pre-warming the cache to avoid locking if we're already in a transaction
     return super if nullness != false || default || open_transactions != 0
     transaction do
-      execute("SET enable_indexscan=false")
-      execute("SET enable_bitmapscan=false")
+      execute("SET LOCAL enable_indexscan=false")
+      execute("SET LOCAL enable_bitmapscan=false")
       execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL")
       raise ActiveRecord::Rollback
     end
