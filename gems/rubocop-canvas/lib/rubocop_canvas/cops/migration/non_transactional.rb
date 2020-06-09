@@ -27,13 +27,16 @@ module RuboCop
             @disable_ddl_transaction = true
           when :add_index
             check_add_index(node, args)
-          when :add_column, :add_column_and_fk
+          when :add_column, :add_column_and_fk, :add_foreign_key
             check_add_column(node, args)
+          when :remove_foreign_key
+            check_remove_foreign_key(node, args)
           end
         end
 
         ALGORITHM = AST::Node.new(:sym, [:algorithm])
         IF_NOT_EXISTS = AST::Node.new(:sym, [:if_not_exists])
+        IF_EXISTS = AST::Node.new(:sym, [:if_exists])
 
         def check_add_index(node, args)
           options = args.last
@@ -64,6 +67,21 @@ module RuboCop
           if @disable_ddl_transaction && value != :true
             add_offense(node,
                         message: "Non-transactional migrations should be idempotent; add `if_not_exists: true`",
+                        severity: :warning)
+          end
+        end
+
+        def check_remove_foreign_key(node, args)
+          options = args.last
+          options = nil unless options.hash_type?
+
+          if_not_exists = options&.children&.find do |pair|
+            pair.children.first == IF_EXISTS
+          end
+          value = if_not_exists&.children&.last&.type
+          if @disable_ddl_transaction && value != :true
+            add_offense(node,
+                        message: "Non-transactional migrations should be idempotent; add `if_exists: true`",
                         severity: :warning)
           end
         end
