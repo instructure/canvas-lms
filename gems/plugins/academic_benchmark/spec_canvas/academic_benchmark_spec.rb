@@ -236,4 +236,19 @@ describe AcademicBenchmark::Converter do
     expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(Canvas::Migration::Error,
       "Not importing academic benchmark data because the Academic Benchmarks Partner key is not set")
   end
+
+  describe '.queue_migration_for' do
+    # rubocop:disable RSpec/AnyInstance
+    before { allow_any_instance_of(ContentMigration).to receive(:export_content) }
+    # rubocop:enable RSpec/AnyInstance
+
+    it 'sets context with user' do
+      cm = AcademicBenchmark.queue_migration_for(
+        authority: 'authority',
+        document: 'document',
+        user: @user
+      )[0]
+      expect(cm.root_account_id).to be_nil
+    end
+  end
 end
