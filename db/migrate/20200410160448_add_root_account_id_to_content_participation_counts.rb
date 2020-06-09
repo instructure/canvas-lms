@@ -18,9 +18,9 @@
 class AddRootAccountIdToContentParticipationCounts < ActiveRecord::Migration[5.2]
   tag :predeploy
   disable_ddl_transaction!
+  include MigrationHelpers::AddColumnAndFk
 
   def change
-    add_column :content_participation_counts, :root_account_id, :integer, limit: 8, if_not_exists: true
-    add_foreign_key :content_participation_counts, :accounts, column: :root_account_id, if_not_exists: true
+    add_column_and_fk :content_participation_counts, :root_account_id, :accounts, if_not_exists: true
   end
 end
