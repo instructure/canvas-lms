@@ -3,7 +3,7 @@ class RemoveCourseCopyForeignKeys < ActiveRecord::Migration[5.1]
 
   def up
     remove_foreign_key :content_migrations, :column => :source_course_id
-    remove_foreign_key_if_exists :content_migrations, :attachments
+    remove_foreign_key :content_migrations, :attachments, if_exists: true
     remove_foreign_key :content_exports, :content_migrations
     remove_foreign_key :folders, :column => :cloned_item_id
   end

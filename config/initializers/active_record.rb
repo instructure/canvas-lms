@@ -1424,9 +1424,44 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     end
   end
 
-  def remove_foreign_key_if_exists(table, options = {})
-    return unless foreign_key_exists?(table, options)
-    remove_foreign_key(table, options)
+  def foreign_key_for(from_table, options_or_to_table = {})
+    return unless supports_foreign_keys?
+    fks = foreign_keys(from_table).select { |fk| fk.defined_for? options_or_to_table }
+    # prefer a FK on a column named after the table
+    unless options_or_to_table.is_a?(Hash)
+      column = foreign_key_column_for(options_or_to_table) if options_or_to_table
+      return fks.find { |fk| fk.column == column} || fks.first
+    end
+    fks.first
+  end
+
+  def remove_foreign_key(from_table, *args)
+    return unless supports_foreign_keys?
+
+    raise ArgumentError if args.length > 2
+
+    # support remove_foreign_key :table, :table, if_exists: stuff
+    # OR
+    # remove_foreign_key :table, column: :stuff
+    # OR
+    # remove_foreign_key :table, column: :stuff, if_exists: stuff
+    options = args.last
+    options = {} unless options.is_a?(Hash)
+    options_or_to_table = args.first || {}
+
+    # have to account for if options is a hash, if_exists will just get wrapped up
+    # in it
+    if options[:if_exists]
+      fk_name_to_delete = foreign_key_for(from_table, options_or_to_table)&.name
+      return if fk_name_to_delete.nil?
+    else
+      fk_name_to_delete = foreign_key_for!(from_table, options_or_to_table).name
+    end
+
+    at = create_alter_table from_table
+    at.drop_foreign_key fk_name_to_delete
+
+    execute schema_creation.accept(at)
   end
 end
 
