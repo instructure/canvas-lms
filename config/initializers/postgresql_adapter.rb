@@ -212,6 +212,70 @@ module PostgreSQLAdapterExtensions
     super
   end
 
+  def remove_index(table_name, options = {})
+    table = ActiveRecord::ConnectionAdapters::PostgreSQL::Utils.extract_schema_qualified_name(table_name.to_s)
+
+    if options.is_a?(Hash) && options.key?(:name)
+      provided_index = ActiveRecord::ConnectionAdapters::PostgreSQL::Utils.extract_schema_qualified_name(options[:name].to_s)
+
+      options[:name] = provided_index.identifier
+      table = ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(provided_index.schema, table.identifier) unless table.schema.present?
+
+      if provided_index.schema.present? && table.schema != provided_index.schema
+        raise ArgumentError.new("Index schema '#{provided_index.schema}' does not match table schema '#{table.schema}'")
+      end
+    end
+
+    name = index_name_for_remove(table.to_s, options)
+    return if name.nil? && options[:if_exists]
+
+    index_to_remove = ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(table.schema, name)
+    algorithm =
+      if options.is_a?(Hash) && options.key?(:algorithm)
+        index_algorithms.fetch(options[:algorithm]) do
+          raise ArgumentError.new("Algorithm must be one of the following: #{index_algorithms.keys.map(&:inspect).join(', ')}")
+        end
+      end
+    algorithm = nil if open_transactions > 0
+    if_exists = " IF EXISTS" if options.is_a?(Hash) && options[:if_exists]
+    execute "DROP INDEX #{algorithm} #{if_exists} #{quote_table_name(index_to_remove)}"
+  end
+
+  def index_name_for_remove(table_name, options = {})
+    return options[:name] if can_remove_index_by_name?(options)
+
+    checks = []
+
+    if options.is_a?(Hash)
+      checks << lambda { |i| i.name == options[:name].to_s } if options.key?(:name)
+      column_names = index_column_names(options[:column])
+    else
+      column_names = index_column_names(options)
+    end
+
+    if column_names.present?
+      checks << lambda { |i| index_name(table_name, i.columns) == index_name(table_name, column_names) }
+    end
+
+    raise ArgumentError, "No name or columns specified" if checks.none?
+
+    matching_indexes = indexes(table_name).select { |i| checks.all? { |check| check[i] } }
+
+    if matching_indexes.count > 1
+      raise ArgumentError, "Multiple indexes found on #{table_name} columns #{column_names}. " \
+                                 "Specify an index name from #{matching_indexes.map(&:name).join(', ')}"
+    elsif matching_indexes.none?
+      return if options[:if_exists]
+      raise ArgumentError, "No indexes found on #{table_name} with the options provided."
+    else
+      matching_indexes.first.name
+    end
+  end
+
+  def can_remove_index_by_name?(options)
+    options.is_a?(Hash) && options.key?(:name) && options.except(:name, :algorithm, :if_exists).empty?
+  end
+
   def add_column(table_name, column_name, type, if_not_exists: false, **options)
     return if if_not_exists && column_exists?(table_name, column_name)
     super(table_name, column_name, type, **options)

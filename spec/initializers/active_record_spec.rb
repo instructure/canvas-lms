@@ -384,6 +384,15 @@ module ActiveRecord
       it "foreign_key_for prefers a 'bare' FK first" do
         expect(User.connection.foreign_key_for(:enrollments, :users).column).to eq 'user_id'
       end
+
+      it "remove_index allows if_exists" do
+        expect { User.connection.remove_index(:users, column: :non_existent, if_exists: true) }.not_to raise_exception
+      end
+
+      it "remove_index by name allows if_exists" do
+        expect { User.connection.remove_index(:users, name: :lti_id, if_exists: true) }.not_to raise_exception
+      end
+
     end
   end
 end

@@ -15,20 +15,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AddUniqueIndexToNotificationEndpoint < ActiveRecord::Migration[4.2]
+class AddUniqueIndexToNotificationEndpoint < ActiveRecord::Migration[5.2]
   tag :postdeploy
   disable_ddl_transaction!
 
   def up
     DataFixup::DeleteDuplicateNotificationEndpoints.run
-    if index_name_exists?(:notification_endpoints, 'index_notification_endpoints_on_access_token_id_and_arn')
-      remove_index :notification_endpoints, [:access_token_id, :arn]
-    end
+    remove_index :notification_endpoints, column: [:access_token_id, :arn], if_exists: true
     add_index :notification_endpoints, [:access_token_id, :arn], algorithm: :concurrently,
               where: "workflow_state='active'", unique: true, if_not_exists: true
   end
   
   def down
-    remove_index :notification_endpoints, [:access_token_id, :arn]
+    remove_index :notification_endpoints, column: [:access_token_id, :arn], if_exists: true
   end
 end
