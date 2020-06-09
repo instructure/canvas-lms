@@ -23,7 +23,6 @@ class AddRootAccountIdToDiscussionTopicParticipants < ActiveRecord::Migration[5.
 
   def up
     add_column_and_fk :discussion_topic_participants, :root_account_id, :accounts, if_not_exists: true
-    add_index :discussion_topic_participants, :root_account_id, algorithm: :concurrently, if_not_exists: true
   end
 
   def down

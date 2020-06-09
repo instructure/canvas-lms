@@ -23,7 +23,6 @@ class AddRootAccountIdToConversationMessageParticipants < ActiveRecord::Migratio
 
   def up
     add_column_and_fk :conversation_message_participants, :root_account_id, :accounts, if_not_exists: true
-    add_index :conversation_message_participants, :root_account_id, algorithm: :concurrently, if_not_exists: true
   end
 
   def down
