@@ -25,7 +25,7 @@ class AddUniqueIndexToNotificationEndpoint < ActiveRecord::Migration[4.2]
       remove_index :notification_endpoints, [:access_token_id, :arn]
     end
     add_index :notification_endpoints, [:access_token_id, :arn], algorithm: :concurrently,
-              where: "workflow_state='active'", unique: true
+              where: "workflow_state='active'", unique: true, if_not_exists: true
   end
   
   def down
