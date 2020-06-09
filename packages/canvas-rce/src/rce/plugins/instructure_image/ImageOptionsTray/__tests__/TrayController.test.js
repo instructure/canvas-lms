@@ -163,25 +163,23 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
         tray = getTray()
       })
 
-      it('clears the image element alt text', () => {
+      it('sets a role to persist the option', () => {
         tray.setIsDecorativeImage(true)
         tray.$doneButton.click()
-        expect(editors[0].$container.querySelector('img').alt).toEqual('')
-      })
-
-      it('sets a data attribute to persist the option', () => {
-        tray.setIsDecorativeImage(true)
-        tray.$doneButton.click()
+        expect(editors[0].$container.querySelector('img').getAttribute('role')).toEqual(
+          'presentation'
+        )
+        // removes the deprecated data-is-decorative attribute
         expect(
-          editors[0].$container.querySelector('img').getAttribute('data-is-decorative')
-        ).toEqual('true')
+          editors[0].$container.querySelector('img').hasAttribute('data-is-decorative')
+        ).toEqual(false)
       })
     })
 
     describe('when the image is unset as decorative', () => {
       beforeEach(() => {
         $images[0].alt = ''
-        $images[0].setAttribute('data-is-decorative', 'true')
+        $images[0].setAttribute('role', 'presentation')
         trayController.showTrayForEditor(editors[0])
         tray = getTray()
         tray.setIsDecorativeImage(false)
@@ -195,10 +193,8 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
         )
       })
 
-      it('sets a data attribute to persist the option', () => {
-        expect(
-          editors[0].$container.querySelector('img').getAttribute('data-is-decorative')
-        ).toBeNull()
+      it('sets a role attribute to persist the option', () => {
+        expect(editors[0].$container.querySelector('img').getAttribute('role')).toBeNull()
       })
     })
 

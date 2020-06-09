@@ -65,7 +65,9 @@ export function fromImageEmbed($element) {
     altText,
     appliedHeight: parsedOrNull($element, 'height'),
     appliedWidth: parsedOrNull($element, 'width'),
-    isDecorativeImage: altText === '' && $element.getAttribute('data-is-decorative') === 'true',
+    isDecorativeImage:
+      $element.getAttribute('data-is-decorative') === 'true' ||
+      $element.getAttribute('role') === 'presentation',
     naturalHeight: $element.naturalHeight,
     naturalWidth: $element.naturalWidth,
     url: $element.src

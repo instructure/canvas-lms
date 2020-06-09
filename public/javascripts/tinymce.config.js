@@ -105,7 +105,7 @@ export default class EditorConfig {
         'onkeydown|onkeyup],a[rel|rev|charset|hreflang|tabindex|accesskey|type|' +
         'name|href|target|title|class|onfocus|onblur],strong/b,em/i,strike,u,' +
         '#p,-ol[type|compact],-ul[type|compact],-li,br,img[longdesc|usemap|' +
-        'src|border|alt=|title|hspace|vspace|width|height|align],-sub,-sup,' +
+        'src|border|alt|title|hspace|vspace|width|height|align|role],-sub,-sup,' +
         '-blockquote,-table[border=0|cellspacing|cellpadding|width|frame|rules|' +
         'height|align|summary|bgcolor|background|bordercolor],-tr[rowspan|width|' +
         'height|align|valign|bgcolor|background|bordercolor],tbody,thead,tfoot,' +
