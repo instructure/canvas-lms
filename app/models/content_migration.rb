@@ -36,6 +36,7 @@ class ContentMigration < ActiveRecord::Base
   after_save :handle_import_in_progress_notice
   after_save :check_for_blocked_migration
   before_create :set_root_account_id
+  attr_accessor :skip_root_account_assignment
 
   DATE_FORMAT = "%m/%d/%Y"
 
@@ -983,6 +984,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def set_root_account_id
+    return if skip_root_account_assignment
     case self.context
     when Course, Group
       self.root_account_id = self.context.root_account_id
