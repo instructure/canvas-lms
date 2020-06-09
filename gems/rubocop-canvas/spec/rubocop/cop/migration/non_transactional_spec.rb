@@ -134,4 +134,19 @@ describe RuboCop::Cop::Migration::NonTransactional do
     })
     expect(cop.offenses.size).to eq(0)
   end
+
+  it 'complains about missing if_exists on remove_foreign_key' do
+    inspect_source(%{
+      class TestMigration < ActiveRecord::Migration
+        disable_ddl_transaction!
+
+        def up
+          remove_foreign_key :table, :column
+        end
+      end
+    })
+    expect(cop.offenses.size).to eq(1)
+    expect(cop.messages.first).to match(/if_exists/)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
+  end
 end
