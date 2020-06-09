@@ -21,6 +21,6 @@ class AddRootAccountIdToContentParticipations < ActiveRecord::Migration[5.2]
 
   def change
     add_column :content_participations, :root_account_id, :integer, limit: 8, if_not_exists: true
-    add_foreign_key :content_participations, :accounts, column: :root_account_id
+    add_foreign_key :content_participations, :accounts, column: :root_account_id, if_not_exists: true
   end
 end
