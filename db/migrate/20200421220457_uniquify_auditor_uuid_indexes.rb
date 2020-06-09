@@ -22,17 +22,17 @@ class UniquifyAuditorUuidIndexes < ActiveRecord::Migration[5.2]
     add_index :auditor_authentication_records, :uuid, name: 'index_auth_audits_on_unique_uuid', unique: true, algorithm: :concurrently, if_not_exists: true
     add_index :auditor_course_records, :uuid, name: 'index_course_audits_on_unique_uuid', unique: true, algorithm: :concurrently, if_not_exists: true
     add_index :auditor_grade_change_records, :uuid, name: 'index_grade_audits_on_unique_uuid', unique: true, algorithm: :concurrently, if_not_exists: true
-    remove_index :auditor_authentication_records, name: 'index_auditor_authentication_records_on_uuid'
-    remove_index :auditor_course_records, name: 'index_auditor_course_records_on_uuid'
-    remove_index :auditor_grade_change_records, name: 'index_auditor_grade_change_records_on_uuid'
+    remove_index :auditor_authentication_records, name: 'index_auditor_authentication_records_on_uuid', if_exists: true
+    remove_index :auditor_course_records, name: 'index_auditor_course_records_on_uuid', if_exists: true
+    remove_index :auditor_grade_change_records, name: 'index_auditor_grade_change_records_on_uuid', if_exists: true
   end
 
   def down
     add_index :auditor_authentication_records, :uuid, algorithm: :concurrently, if_not_exists: true
     add_index :auditor_course_records, :uuid, algorithm: :concurrently, if_not_exists: true
     add_index :auditor_grade_change_records, :uuid, algorithm: :concurrently, if_not_exists: true
-    remove_index :auditor_authentication_records, name: 'index_auth_audits_on_unique_uuid'
-    remove_index :auditor_course_records, name: 'index_course_audits_on_unique_uuid'
-    remove_index :auditor_grade_change_records, name: 'index_grade_audits_on_unique_uuid'
+    remove_index :auditor_authentication_records, name: 'index_auth_audits_on_unique_uuid', if_exists: true
+    remove_index :auditor_course_records, name: 'index_course_audits_on_unique_uuid', if_exists: true
+    remove_index :auditor_grade_change_records, name: 'index_grade_audits_on_unique_uuid', if_exists: true
   end
 end

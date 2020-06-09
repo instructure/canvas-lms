@@ -24,10 +24,7 @@ class ChangeDelayedMessageIndexToIgnoreNullValues < ActiveRecord::Migration[5.2]
     # added index initially in 20200420211742, then added again with condition
     # in 20200511170158 which is deleted in favor of this migration.
     # it's relatively short window, so most people will just get add_index below.
-    if index_name_exists?(:delayed_messages, 'index_delayed_messages_on_notification_policy_override_id') ||
-      index_name_exists?(:delayed_messages, 'index_delayed_messages_with_notification_policy_override_id')
-      remove_index :delayed_messages, :notification_policy_override_id
-    end
+    remove_index :delayed_messages, column: :notification_policy_override_id, if_exists: true
 
     add_index :delayed_messages, :notification_policy_override_id,
               algorithm: :concurrently,
@@ -36,6 +33,6 @@ class ChangeDelayedMessageIndexToIgnoreNullValues < ActiveRecord::Migration[5.2]
   end
 
   def down
-    remove_index :delayed_messages, :notification_policy_override_id
+    remove_index :delayed_messages, column: :notification_policy_override_id, if_exists: true
   end
 end
