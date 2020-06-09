@@ -75,7 +75,7 @@ module Auditors
       paths.empty? ? ['cassandra'] : paths
     end
 
-    def config(shard=Shard.current)
+    def config(shard=::Switchman::Shard.current)
       settings = Canvas::DynamicSettings.find(tree: :private, cluster: shard.database_server.id)
       YAML.safe_load(settings['auditors.yml'] || '{}')
     end

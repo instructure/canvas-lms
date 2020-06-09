@@ -19,6 +19,6 @@ class RemoveForeignKeyFromEnrollmentsToPseudonym < ActiveRecord::Migration[5.0]
   tag :predeploy
 
   def change
-    remove_foreign_key_if_exists :enrollments, column: :sis_pseudonym_id
+    remove_foreign_key :enrollments, column: :sis_pseudonym_id, if_exists: true
   end
 end
