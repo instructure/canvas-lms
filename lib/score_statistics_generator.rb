@@ -38,11 +38,13 @@ class ScoreStatisticsGenerator
   end
 
   def self.update_score_statistics(course_id)
-    self.update_assignment_score_statistics(course_id)
+    root_account_id = Course.find_by(id: course_id)&.root_account_id
+
+    self.update_assignment_score_statistics(course_id, root_account_id: root_account_id)
     self.update_course_score_statistic(course_id)
   end
 
-  def self.update_assignment_score_statistics(course_id)
+  def self.update_assignment_score_statistics(course_id, root_account_id:)
     # note: because a score is needed for max/min/ave we are not filtering
     # by assignment_student_visibilities, if a stat is added that doesn't
     # require score then add a filter when the DA feature is on
@@ -92,7 +94,8 @@ SQL
           assignment['avg'],
           assignment['count'],
           now,
-          now
+          now,
+          root_account_id
         ].join(',')
       "(#{values})"
     end
@@ -100,7 +103,7 @@ SQL
     bulk_values.each_slice(100) do |bulk_slice|
       connection.execute(<<~SQL)
         INSERT INTO #{ScoreStatistic.quoted_table_name}
-          (assignment_id, maximum, minimum, mean, count, created_at, updated_at)
+          (assignment_id, maximum, minimum, mean, count, created_at, updated_at, root_account_id)
         VALUES #{bulk_slice.join(',')}
         ON CONFLICT (assignment_id)
         DO UPDATE SET
@@ -108,7 +111,8 @@ SQL
            maximum = excluded.maximum,
            mean = excluded.mean,
            count = excluded.count,
-           updated_at = excluded.updated_at
+           updated_at = excluded.updated_at,
+           root_account_id = #{root_account_id}
       SQL
     end
   end
