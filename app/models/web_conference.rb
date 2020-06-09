@@ -505,6 +505,10 @@ class WebConference < ActiveRecord::Base
     result
   end
 
+  def user_ids
+    self.web_conference_participants.pluck(:user_id)
+  end
+
   def self.conference_types(context)
     plugin_types + lti_types(context)
   end

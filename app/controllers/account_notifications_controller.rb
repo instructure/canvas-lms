@@ -113,16 +113,19 @@ class AccountNotificationsController < ApplicationController
   end
 
   def html_to_string
+    # This generates an array of html strings for the global announcements page
+    # to allow for paination on the front end.
+    html_strings = { current: [], past: [] }
     @for_display = true
     coll = AccountNotification.for_user_and_account(@current_user, @domain_root_account, :include_past => true)
+    [:current, :past].each do |time|
+      coll.select(&time).in_groups_of(5, false) { |a| html_strings[time] << html_string_from_announcements(a) }
+    end
+    html_strings
+  end
 
-    coll_active = render_to_string(:partial => 'shared/account_notification',
-      :collection => coll.select { |item| item.end_at > Time.now.utc })
-
-    coll_past = render_to_string(:partial => 'shared/account_notification',
-      :collection => coll.select { |item| item.end_at < Time.now.utc })
-
-      {active: coll_active, past: coll_past}
+  def html_string_from_announcements(announcements)
+    render_to_string(partial: 'shared/account_notification', collection: announcements)
   end
 
   # @API Show a global notification

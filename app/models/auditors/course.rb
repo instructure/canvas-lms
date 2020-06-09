@@ -110,7 +110,7 @@ class Auditors::Course
   end
 
   Stream = Auditors.stream do
-    backend_strategy :cassandra
+    backend_strategy -> { Auditors.backend_strategy }
     active_record_type Auditors::ActiveRecord::CourseRecord
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :courses
@@ -121,12 +121,14 @@ class Auditors::Course
       table :courses_by_course
       entry_proc lambda{ |record| record.course }
       key_proc lambda{ |course| course.global_id }
+      ar_conditions_proc lambda { |course| { course_id: course.id } }
     end
 
     add_index :account do
       table :courses_by_account
       entry_proc lambda{ |record| record.account }
       key_proc lambda{ |account| account.global_id }
+      ar_conditions_proc lambda { |account| { account_id: account.id } }
     end
   end
 
@@ -211,13 +213,13 @@ class Auditors::Course
 
   def self.for_course(course, options={})
     course.shard.activate do
-      Auditors::Course::Stream.for_course(course, options)
+      Auditors::Course::Stream.for_course(course, Auditors.read_stream_options(options))
     end
   end
 
   def self.for_account(account, options={})
     account.shard.activate do
-      Auditors::Course::Stream.for_account(account, options)
+      Auditors::Course::Stream.for_account(account, Auditors.read_stream_options(options))
     end
   end
 end

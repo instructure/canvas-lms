@@ -2385,6 +2385,12 @@ describe GradebooksController do
         expect(js_env.fetch(:filter_speed_grader_by_student_group_feature_enabled)).to be false
       end
 
+      it "sets outcomes keys" do
+        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+        expect(js_env).to have_key :outcome_proficiency
+        expect(js_env).to have_key :outcome_extra_credit_enabled
+      end
+
       describe "student group filtering" do
         before(:each) do
           @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)

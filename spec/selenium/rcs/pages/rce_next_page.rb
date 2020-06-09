@@ -147,6 +147,22 @@ module RCENextPage
     f('[role="menuitem"][title="Course Links"]')
   end
 
+  def external_links
+    f('[role="menuitem"][title="External Links"]')
+  end
+
+  def link_options_button
+    f('button[aria-label="Show link options"]')
+  end
+
+  def link_options_tray
+    f('[role="dialog"][aria-label="Link Options"]')
+  end
+
+  def link_options_done_button
+    fj('[aria-label="Link Options"] button:contains("Done")')
+  end
+
   def images_toolbar_button
     possibly_hidden_toolbar_button('button[aria-label="Images"]')
   end
@@ -405,6 +421,20 @@ module RCENextPage
     course_item_link(title).click
   end
 
+  def click_link_for_options
+    in_frame tiny_rce_ifr_id do
+      f('a').click
+    end
+  end
+
+  def click_link_options_button
+    link_options_button.click
+  end
+
+  def click_link_options_done_button
+    link_options_done_button.click
+  end
+
   def click_new_page_link
     new_page_link.click
   end
@@ -439,6 +469,10 @@ module RCENextPage
 
   def click_course_links
     course_links.click
+  end
+
+  def click_external_links
+    external_links.click
   end
 
   def click_images_toolbar_button
@@ -665,5 +699,24 @@ module RCENextPage
       tinyrce_element.click
       tinyrce_element.send_keys("#{text}\n") # newline guarantees a tinymce change event
     end
+  end
+
+  def create_external_link(text, href)
+    click_links_toolbar_button
+    click_external_links
+    expect(fj('[role="dialog"][aria-label="Insert Link"]')).to be_displayed
+    if text
+      linktext = f('input[name="linktext')
+      # linktext.clear doesn't work because it doesn't fire any events to update
+      # the react component's state
+      linktext.send_keys(:backspace) while linktext.property('value').length > 0
+      linktext.send_keys(text) if text
+    end
+    if href
+      linklink = f('input[name="linklink"]')
+      linklink.send_keys(:backspace) while linklink.property('value').length > 0
+      linklink.send_keys(href)
+    end
+    fj('[role="dialog"] button:contains("Done")').click
   end
 end

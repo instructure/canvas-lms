@@ -1968,22 +1968,24 @@ class User < ActiveRecord::Base
     end
   end
 
-  def submissions_for_context_codes(context_codes, start_at: nil, limit: 20)
-    return [] unless context_codes.present?
+  def submissions_for_course_ids(course_ids, start_at: nil, limit: 20)
+    return [] unless course_ids.present?
 
     shard.activate do
-      Rails.cache.fetch([self, 'submissions_for_context_codes', context_codes, start_at, limit].cache_key, expires_in: 15.minutes) do
+      ids_hash = Digest::MD5.hexdigest(course_ids.sort.join(","))
+      Rails.cache.fetch_with_batched_keys(['submissions_for_course_ids', ids_hash, start_at, limit].cache_key, expires_in: 1.day, batch_object: self, batched_keys: :submissions) do
         start_at ||= 4.weeks.ago
 
         Shackles.activate(:slave) do
           submissions = []
           submissions += self.submissions.posted.where("GREATEST(submissions.submitted_at, submissions.created_at) > ?", start_at).
-            for_context_codes(context_codes).eager_load(:assignment).
+            where(:course_id => course_ids).eager_load(:assignment).
             where("submissions.score IS NOT NULL AND assignments.workflow_state=?", 'published').
             order('submissions.created_at DESC').
             limit(limit).to_a
 
-          submissions += Submission.active.posted.where(user_id: self).for_context_codes(context_codes).
+          submissions += Submission.active.posted.where(user_id: self).
+            where(:course_id => course_ids).
             joins(:assignment).
             where(assignments: {workflow_state: 'published'}).
             where('last_comment_at > ?', start_at).
@@ -2002,16 +2004,16 @@ class User < ActiveRecord::Base
 
   # This is only feedback for student contexts (unless specific contexts are passed in)
   def recent_feedback(
-    context_codes: nil,
+    course_ids: nil,
     contexts: nil,
-    **opts # forwarded to submissions_for_context_codes
+    **opts # forwarded to submissions_for_course_ids
   )
-    context_codes ||= if contexts
-        setup_context_lookups(contexts)
+    course_ids ||= if contexts
+        contexts.select{|c| c.is_a?(Course)}.map(&:id)
       else
-        self.participating_student_course_ids.map { |id| "course_#{id}" }
+        self.participating_student_course_ids
       end
-    submissions_for_context_codes(context_codes, **opts)
+    submissions_for_course_ids(course_ids, **opts)
   end
 
   def visible_stream_item_instances(opts={})

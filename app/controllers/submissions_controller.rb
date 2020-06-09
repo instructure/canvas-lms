@@ -197,7 +197,7 @@ class SubmissionsController < SubmissionsBaseController
   #
   # @argument submission[submitted_at] [DateTime]
   #   Choose the time the submission is listed as submitted at.  Requires grading permission.
-  
+
   def create
     params[:submission] ||= {}
     user_id = params[:submission].delete(:user_id)
@@ -274,10 +274,19 @@ class SubmissionsController < SubmissionsBaseController
         log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
         format.html do
           flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
-          if @submission.late? || !@domain_root_account&.feature_enabled?(:confetti_for_assignments)
-            redirect_to course_assignment_url(@context, @assignment)
+          tardiness = case
+          when @submission.late?
+            2 # late
+          when @submission.cached_due_date.nil?
+            0 # don't know
           else
-            redirect_to course_assignment_url(@context, @assignment, :confetti => true)
+            1 # on time
+          end
+
+          if @submission.late? || !@domain_root_account&.feature_enabled?(:confetti_for_assignments)
+            redirect_to course_assignment_url(@context, @assignment, submitted: tardiness)
+          else
+            redirect_to course_assignment_url(@context, @assignment, submitted: tardiness, confetti: true)
           end
         end
         format.json do

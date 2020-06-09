@@ -44,6 +44,14 @@ def getPublishableTagSuffix() {
   load('build/new-jenkins/groovy/configuration.groovy').publishableTagSuffix()
 }
 
+def getRubyPassenger() {
+  load('build/new-jenkins/groovy/configuration.groovy').rubyPassenger()
+}
+
+def getPostgres() {
+  load('build/new-jenkins/groovy/configuration.groovy').postgres()
+}
+
 def runDatadogMetric(name, body) {
   def dd = load('build/new-jenkins/groovy/datadog.groovy')
   dd.runDataDogForMetric(name,body)
@@ -125,6 +133,8 @@ pipeline {
     CANVAS_LMS_IMAGE = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms"
     BUILD_REGISTRY_FQDN = buildRegistryFQDN()
     BUILD_IMAGE = "$BUILD_REGISTRY_FQDN/jenkins/canvas-lms"
+    POSTGRES = getPostgres()
+    RUBY_PASSENGER = getRubyPassenger()
 
     // e.g. postgres-9.5-ruby-passenger-2.6
     TAG_SUFFIX = "postgres-$POSTGRES-ruby-passenger-$RUBY_PASSENGER"
@@ -331,21 +341,21 @@ pipeline {
           echo 'adding Vendored Gems'
           stages['Vendored Gems'] = {
             skipIfPreviouslySuccessful("vendored-gems") {
-              wrapBuildExecution('test-suites/vendored-gems', buildParameters, true, "")
+              wrapBuildExecution('/Canvas/test-suites/vendored-gems', buildParameters, true, "")
             }
           }
 
           echo 'adding Javascript'
           stages['Javascript'] = {
             skipIfPreviouslySuccessful("javascript") {
-              wrapBuildExecution('test-suites/JS', buildParameters, true, "testReport")
+              wrapBuildExecution('/Canvas/test-suites/JS', buildParameters, true, "testReport")
             }
           }
 
           echo 'adding Contract Tests'
           stages['Contract Tests'] = {
             skipIfPreviouslySuccessful("contract-tests") {
-              wrapBuildExecution('test-suites/contract-tests', buildParameters, true, "")
+              wrapBuildExecution('/Canvas/test-suites/contract-tests', buildParameters, true, "")
             }
           }
 
@@ -355,7 +365,7 @@ pipeline {
               skipIfPreviouslySuccessful("flakey-spec-catcher") {
                 def propagate = load('build/new-jenkins/groovy/configuration.groovy').fscPropagate()
                 echo "fsc propagation: $propagate"
-                wrapBuildExecution('test-suites/flakey-spec-catcher', buildParameters, propagate, "")
+                wrapBuildExecution('/Canvas/test-suites/flakey-spec-catcher', buildParameters, propagate, "")
               }
             }
           }
@@ -364,7 +374,7 @@ pipeline {
           // // and you have no other way to test it except by running a test build.
           // stages['Test Subbuild'] = {
           //   skipIfPreviouslySuccessful("test-subbuild") {
-          //     build(job: 'test-suites/test-subbuild', parameters: buildParameters)
+          //     build(job: '/Cavnas/test-suites/test-subbuild', parameters: buildParameters)
           //   }
           // }
 
@@ -372,7 +382,7 @@ pipeline {
           // // Uncomment stage to run when developing.
           // stages['Xbrowser'] = {
           //   skipIfPreviouslySuccessful("xbrowser") {
-          //     build(job: 'test-suites/xbrowser', propagate: false, parameters: buildParameters)
+          //     build(job: '/Canvas/test-suites/xbrowser', propagate: false, parameters: buildParameters)
           //   }
           // }
 

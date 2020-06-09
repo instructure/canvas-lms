@@ -1392,6 +1392,14 @@ describe CoursesController do
       end
     end
 
+    it "should set ENV.COURSE_ID for assignments view" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.default_view = "assignments"
+      @course.save!
+      get 'show', params: {:id => @course.id}
+      expect(assigns(:js_env)[:COURSE_ID]).to eq @course.id.to_s
+    end
+
     it "should redirect html to settings page when user can :read_as_admin, but not :read" do
       # an account user on the site admin will always have :read_as_admin
       # permission to any course, but will not have :read permission unless

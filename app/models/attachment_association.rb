@@ -19,4 +19,10 @@
 class AttachmentAssociation < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :context, polymorphic: [:conversation_message, :submission, :course, :group]
+
+  before_create :set_root_account_id
+
+  def set_root_account_id
+    self.root_account_id ||= context.root_account_id if context.respond_to?(:root_account_id)
+  end
 end

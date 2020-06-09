@@ -21,6 +21,6 @@ class AddNotificationPolicyOverideToDelayedMessage < ActiveRecord::Migration[5.2
   include MigrationHelpers::AddColumnAndFk
 
   def change
-    add_column_and_fk :delayed_messages, :notification_policy_override_id, :notification_policy_overrides
+    add_column_and_fk :delayed_messages, :notification_policy_override_id, :notification_policy_overrides, if_not_exists: true
   end
 end

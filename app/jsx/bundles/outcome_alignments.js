@@ -18,24 +18,24 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-
+import {View} from '@instructure/ui-view'
 import ready from '@instructure/ready'
 
-import {OutcomeAlignments} from '@instructure/outcomes-ui'
+import {AlignmentButton} from '@instructure/outcomes-ui'
 
 ready(() => {
   const container = document.getElementById('canvas_outcomes_alignment_widget')
   if (ENV.canvas_outcomes && ENV.canvas_outcomes.host) {
     ReactDOM.render(
-      <OutcomeAlignments
-        host={ENV.canvas_outcomes.host}
-        jwt={ENV.canvas_outcomes.jwt}
-        contextUuid={ENV.canvas_outcomes.context_uuid}
-        pickerType="tray"
-        artifactType={ENV.canvas_outcomes.artifact_type}
-        artifactId={ENV.canvas_outcomes.artifact_id}
-        emptySetHeading={ENV.canvas_outcomes.empty_set_heading}
-      />,
+      <View as="div" borderWidth="small none none none" padding="medium none">
+        <AlignmentButton
+          host={ENV.canvas_outcomes.host}
+          jwt={ENV.canvas_outcomes.jwt}
+          contextUuid={ENV.canvas_outcomes.context_uuid}
+          artifactType={ENV.canvas_outcomes.artifact_type}
+          artifactId={ENV.canvas_outcomes.artifact_id}
+        />
+      </View>,
       container
     )
   }

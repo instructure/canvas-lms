@@ -202,7 +202,6 @@ module SIS
           should_update_account_associations = false
 
           if user_row.pronouns.present? &&
-            @root_account.feature_enabled?(:account_pronouns) &&
             @root_account.pronouns.include?(user_row.pronouns)
             unless user.stuck_sis_fields.include?(:pronouns)
               user.pronouns = user_row.pronouns

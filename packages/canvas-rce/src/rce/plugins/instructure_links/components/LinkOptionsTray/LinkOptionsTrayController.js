@@ -59,7 +59,7 @@ export default class LinkOptionsTrayController {
 
   _applyLinkOptions(linkOptions) {
     this._dismissTray()
-    bridge.insertLink(linkOptions)
+    bridge.insertLink(linkOptions, linkOptions.text)
   }
 
   _dismissTray() {

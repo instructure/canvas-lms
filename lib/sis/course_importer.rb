@@ -100,7 +100,7 @@ module SIS
           course.integration_id = integration_id
           course.sis_source_id = course_id
           active_state = (status.downcase == 'published') ? 'available' : 'claimed'
-          if !course.stuck_sis_fields.include?(:workflow_state)
+          unless course.stuck_sis_fields.include?(:workflow_state)
             if %w(active unpublished published).include?(status.downcase)
               case course.workflow_state
               when 'completed'
@@ -111,9 +111,9 @@ module SIS
               when 'deleted'
                 course.workflow_state = active_state
                 state_changes << :restored
-              when 'created', nil
+              when 'created', 'claimed', nil
                 course.workflow_state = active_state
-                state_changes << :published if active_state == 'published'
+                state_changes << :published if active_state == 'available'
               end
             elsif status =~ /deleted/i
               course.workflow_state = 'deleted'

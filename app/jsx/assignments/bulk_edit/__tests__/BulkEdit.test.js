@@ -83,6 +83,14 @@ function restrictedAssignmentResponse() {
   return data
 }
 
+function tooManyDatesResponse() {
+  const data = standardAssignmentResponse()
+  delete data[1].all_dates
+  data[1].all_dates_count = 51
+
+  return data
+}
+
 function mockAssignmentsResponse(assignments) {
   fetch.mockResponse(JSON.stringify(assignments))
   return assignments
@@ -321,6 +329,14 @@ describe('Assignment Bulk Edit Dates', () => {
     expect(getByTitle('In closed grading period')).toBeInTheDocument()
     expect(getByTitle('Only the moderator can edit this assignment')).toBeInTheDocument()
     expect(getByTitle('You do not have permission to edit this assignment')).toBeInTheDocument()
+  })
+
+  it('deals with too many dates', async () => {
+    const {getByText, getAllByLabelText} = await renderBulkEditAndWait({}, tooManyDatesResponse())
+    const dueDateInputs = getAllByLabelText('Due At')
+    expect(dueDateInputs.length).toEqual(2)
+
+    expect(getByText('This assignment has too many dates to display.')).toBeInTheDocument()
   })
 
   describe('saving data', () => {
@@ -618,10 +634,6 @@ describe('Assignment Bulk Edit Dates', () => {
   })
 
   describe('assignment selections', () => {
-    beforeEach(() => {
-      window.ENV.FEATURES.assignment_bulk_edit_phase_2 = true
-    })
-
     it('displays checkboxes for each main assignment', async () => {
       const {getByText, getAllByText, assignments} = await renderBulkEditAndWait()
       expect(getAllByText(/Select assignment:/)).toHaveLength(assignments.length)
@@ -674,10 +686,6 @@ describe('Assignment Bulk Edit Dates', () => {
   })
 
   describe('assignment selection by date', () => {
-    beforeEach(() => {
-      window.ENV.FEATURES.assignment_bulk_edit_phase_2 = true
-    })
-
     function assignmentListWithDates() {
       return [
         {
@@ -860,10 +868,6 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(result.getByText('Batch Edit'))
       return result
     }
-
-    beforeEach(() => {
-      window.ENV.FEATURES.assignment_bulk_edit_phase_2 = true
-    })
 
     it('has a disabled "Batch Edit" button when no assignments are selected', async () => {
       const {getByText, queryByText} = await renderBulkEditAndWait()

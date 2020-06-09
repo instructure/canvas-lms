@@ -136,7 +136,7 @@ export default class WikiPageView extends Backbone.View {
     } else if (this.$sequenceFooter != null) {
       this.$sequenceFooter.msfAnimation(false)
     }
-    if (this.$sequenceFooter) return this.$sequenceFooter.appendTo(this.$el)
+    if (this.$sequenceFooter) return this.$sequenceFooter.appendTo($('#module_navigation_target'))
   }
 
   navigateToLinkAnchor() {

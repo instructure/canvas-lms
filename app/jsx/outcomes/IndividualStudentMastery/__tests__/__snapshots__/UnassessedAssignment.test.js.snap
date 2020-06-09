@@ -21,7 +21,7 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(Button__MTA0NDg4): Object {
+          Symbol(Button__MTEzMjky): Object {
             "fontWeight": "700",
             "linkColor": "#68777D",
           },

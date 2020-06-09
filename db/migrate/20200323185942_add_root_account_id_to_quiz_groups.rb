@@ -21,8 +21,7 @@ class AddRootAccountIdToQuizGroups < ActiveRecord::Migration[5.2]
   include MigrationHelpers::AddColumnAndFk
 
   def up
-    add_column_and_fk :quiz_groups, :root_account_id, :accounts
-    add_index :quiz_groups, :root_account_id, algorithm: :concurrently
+    add_column_and_fk :quiz_groups, :root_account_id, :accounts, if_not_exists: true
   end
 
   def down

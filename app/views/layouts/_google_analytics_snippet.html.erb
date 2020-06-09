@@ -17,6 +17,7 @@
     ga('set', 'dimension1', <%= dimensions.fetch(:enrollments).to_json.html_safe %>);
     ga('set', 'dimension2', <%= dimensions.fetch(:admin).to_json.html_safe %>);
     ga('set', 'dimension3', <%= dimensions.fetch(:masquerading).to_json.html_safe %>);
+    ga('set', 'dimension4', <%= dimensions.fetch(:org_type).to_json.html_safe %>);
     ga('send', 'pageview');
     (window.requestIdleCallback || window.setTimeout)(function(){
       var s=document.createElement('script'), m=document.getElementsByTagName('script')[0]

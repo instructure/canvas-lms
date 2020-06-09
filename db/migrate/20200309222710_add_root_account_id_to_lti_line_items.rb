@@ -19,7 +19,7 @@ class AddRootAccountIdToLtiLineItems < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def change
-    add_column :lti_line_items, :root_account_id, :integer, limit: 8
+    add_column :lti_line_items, :root_account_id, :integer, limit: 8, if_not_exists: true
     add_foreign_key :lti_line_items, :accounts, column: :root_account_id
   end
 end

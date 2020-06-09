@@ -124,7 +124,6 @@ describe "calendar2" do
         end
 
         it "should not display attendees for reservation with no participants" do
-          skip('fix in KNO-302')
           create_appointment_group(
             :contexts => [@course],
             :title => "eh",
@@ -134,14 +133,15 @@ describe "calendar2" do
             :participant_visibility => "protected"
           )
           ag1 = AppointmentGroup.first
-          # create an appointment and cancel appointment to make no participants
           ag1.appointments.first.reserve_for @student, @student
-          ag1.appointments.first.reserve_for @student, @student, cancel_existing: true
           get "/calendar2"
           # navigate to the next month for end of month
           f('.navigate_next').click unless Time.now.utc.month == (Time.now.utc + 1.day).month
           fj('.fc-event:visible').click
-          expect(f("#reservations")).not_to contain_css("#attendees_header_text")
+          f('.unreserve_event_link').click
+          fj("button:contains('Delete')").click
+          wait_for_ajaximations
+          expect(f('.fc-body')).not_to contain_css('.fc-event')
         end
       end
 

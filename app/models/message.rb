@@ -601,7 +601,7 @@ class Message < ActiveRecord::Base
     end
 
     check_acct = root_account || user&.account || Account.site_admin
-    if path_type == 'sms' && !check_acct.settings[:sms_allowed] && check_acct.feature_enabled?(:deprecate_sms)
+    if path_type == 'sms' && !check_acct.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms)
       if Notification.types_to_send_in_sms(check_acct).exclude?(notification_name)
         InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
                                      short_stat: 'message.skip',
@@ -931,7 +931,7 @@ class Message < ActiveRecord::Base
   def deliver_via_sms
     if to =~ /^\+[0-9]+$/
       begin
-        unless user.account.feature_enabled?(:international_sms)
+        unless Account.site_admin.feature_enabled?(:international_sms)
           raise "International SMS is currently disabled for this user's account"
         end
         if Canvas::Twilio.enabled?

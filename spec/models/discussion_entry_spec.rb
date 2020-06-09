@@ -35,6 +35,10 @@ describe DiscussionEntry do
       entry
       expect(discussion_topic_participant.reload.subscribed).to be_truthy
     end
+
+    it 'sets the root_account_id using topic' do
+      expect(entry.root_account_id).to eq topic.root_account_id
+    end
   end
 
   it "should not be marked as deleted when parent is deleted" do

@@ -133,6 +133,7 @@ export default class RequiredValues extends React.Component {
       return (
         <TextArea
           name="public_jwk"
+          label={I18n.t('Public JWK')}
           value={toolConfiguration.public_jwk}
           maxHeight="10rem"
           resize="vertical"
@@ -149,6 +150,7 @@ export default class RequiredValues extends React.Component {
       return (
         <TextInput
           name="public_jwk_url"
+          label={I18n.t('Public JWK URL')}
           value={toolConfiguration.public_jwk_url}
           onChange={this.handlePublicJwkUrlChange}
           messages={

@@ -18,6 +18,10 @@
 
 module CanvasOutcomesHelper
   def set_outcomes_alignment_js_env(artifact, context, props)
+    # don't show for contexts without alignmments
+    return if context.learning_outcome_links.empty?
+
+    # don't show for accounts without provisioned outcomes service
     artifact_type = artifact_type_lookup(artifact)
     domain, jwt = extract_domain_jwt(context.root_account, 'outcome_alignment_sets.create')
     return if domain.nil? || jwt.nil?

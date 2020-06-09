@@ -36,7 +36,7 @@ const NotificationPreferences = props => {
   return (
     <Flex direction="column">
       <Flex.Item overflowY="visible">
-        <Heading>
+        <Heading level="h2" as="h1">
           {I18n.t('%{contextType} Notification Settings', {
             contextType: capitalizedContextType
           })}
@@ -45,7 +45,9 @@ const NotificationPreferences = props => {
       <Flex.Item margin="large 0 small 0" padding="xx-small">
         <Checkbox
           data-testid="enable-notifications-toggle"
-          label={I18n.t('Enable Notifications')}
+          label={I18n.t('Enable Notifications for %{contextName}', {
+            contextName: props.contextName
+          })}
           size="small"
           variant="toggle"
           checked={enabled}
@@ -97,6 +99,7 @@ const NotificationPreferences = props => {
 
 NotificationPreferences.propTypes = {
   contextType: string.isRequired,
+  contextName: string.isRequired,
   enabled: bool.isRequired,
   updatePreference: func.isRequired,
   notificationPreferences: NotificationPreferencesShape

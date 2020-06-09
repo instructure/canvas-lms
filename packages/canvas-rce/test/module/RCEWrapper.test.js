@@ -435,7 +435,7 @@ describe('RCEWrapper', () => {
       alt="Loading..."
       src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="file.mp3"
-      style="width: 300px; height: 2.813rem; border: solid 1px #8B969E;"
+      style="width: 320px; height: 14.25rem; border: solid 1px #8B969E;"
     />`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)

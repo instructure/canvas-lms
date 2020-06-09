@@ -3673,6 +3673,29 @@ describe Assignment do
         expect(res.length).to be 0
       end
 
+      it "disabling intra group peer review shouldn't gum things up if some people don't have a group" do
+        # i.e. people with no group shouldn't be considered by the selection algorithm to be in the same group
+        @submissions = []
+        gc = @course.group_categories.create! name: "Groupy McGroupface"
+        @a.update group_category_id: gc.id,
+          grade_group_students_individually: false
+        users = create_users_in_course(@course, 12.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
+
+        ["group_1", "group_2"].each do |group_name|
+          group = gc.groups.create! name: group_name, context: @course
+          users.pop(3).each{|user| group.add_user(user)} # only put half of the class in a group
+          @a.submit_homework(group.users.first, :submission_type => "online_url", :url => "http://www.google.com")
+        end
+        users.each do |u| # submit for each of the remaining groupless
+          @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
+        end
+
+        @a.peer_review_count = 2
+        srand(1) # this isn't really necessary but given the random nature i wanted to make it fail consistently without the code fix
+        res = @a.assign_peer_reviews
+        expect(res.group_by(&:user_id).map{|k, v| v.count}.uniq).to eq [2] # everybody should get 2 reviews
+      end
+
       it "should assign peer reviews to members of the same group when enabled" do
         @submissions = []
         gc = @course.group_categories.create! name: "Groupy McGroupface"
@@ -6946,17 +6969,6 @@ describe Assignment do
   end
 
   describe "validate_overrides_for_sis" do
-    def api_create_assignment_in_course(course,assignment_params)
-      api_call(:post,
-               "/api/v1/courses/#{course.id}/assignments.json",
-               {
-                 :controller => 'assignments_api',
-                 :action => 'create',
-                 :format => 'json',
-                 :course_id => course.id.to_s
-               }, {:assignment => assignment_params })
-    end
-
     let(:assignment) do
       @course.assignments.new(assignment_valid_attributes)
     end
@@ -6971,8 +6983,27 @@ describe Assignment do
     it "raises an invalid record error if overrides are invalid" do
       overrides = [{
           'course_section_id' => @course.default_section.id,
-          'due_at' => nil
-      }]
+          'due_at' => nil,
+          'due_at_overridden' => true
+      }.with_indifferent_access]
+      expect{assignment.validate_overrides_for_sis(overrides)}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "does not raise an invalid record error if overrides do not override due_at" do
+      overrides = [{
+        'course_section_id' => @course.default_section.id,
+        'due_at' => nil,
+        'due_at_overridden' => false
+      }.with_indifferent_access]
+      assignment.validate_overrides_for_sis(overrides)
+      expect(assignment.errors.full_messages).to be_blank
+    end
+
+    it "raises an invalid record error if a provided override (from api) does not specify due_at_overriddenness" do
+      overrides = [{
+        'course_section_id' => @course.default_section.id,
+        'due_at' => nil
+      }.with_indifferent_access]
       expect{assignment.validate_overrides_for_sis(overrides)}.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
@@ -7016,9 +7047,14 @@ describe Assignment do
         expect{@assignment.validate_overrides_for_sis(@overrides)}.to raise_error(ActiveRecord::RecordInvalid)
       end
 
-      it "is invalid if an active existing override does not have a due date" do
-        create_section_override_for_assignment(@assignment, due_at: nil, due_at_overridden: false)
+      it "is invalid if an active existing override does not have a due date and overrides due_at" do
+        create_section_override_for_assignment(@assignment, due_at: nil, due_at_overridden: true)
         expect{@assignment.validate_overrides_for_sis(@overrides)}.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it "is valid if an active existing override does not have a due date but does not override due_at" do
+        create_section_override_for_assignment(@assignment, due_at: nil, due_at_overridden: false)
+        expect{@assignment.validate_overrides_for_sis(@overrides)}.not_to raise_error
       end
 
       it "is valid if a deleted existing override does not have a due date" do

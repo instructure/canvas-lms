@@ -37,6 +37,19 @@ module Auditors
       Rails.logger
     end
 
+    def read_stream_options(options)
+      return { backend_strategy: :cassandra }.merge(options) if Auditors.read_from_cassandra?
+      return { backend_strategy: :active_record }.merge(options) if Auditors.read_from_postgres?
+      # Assume cassandra by default until transition complete
+      { backend_strategy: :cassandra }.merge(options)
+    end
+
+    def backend_strategy
+      strategy_value = :cassandra
+      strategy_value = :active_record if read_from_postgres?
+      strategy_value
+    end
+
     def write_to_cassandra?
       write_paths.include?('cassandra')
     end

@@ -18,19 +18,23 @@
 
 import React from 'react'
 import {Heading} from '@instructure/ui-heading/lib/Heading'
+import AnnouncementFactory from './AnnouncementFactory'
+import I18n from 'i18n!past_global_announcements'
 
 const PastGlobalAnnouncements = () => {
+  const activeAnnouncements = AnnouncementFactory(ENV.global_notifications.current, 'Current')
+  const pastAnnouncements = AnnouncementFactory(ENV.global_notifications.past, 'Past')
   return (
     <>
       <Heading border="bottom" margin="medium">
-        Current
+        {I18n.t('Current')}
       </Heading>
-      <div dangerouslySetInnerHTML={{__html: ENV.global_notifications.active}}/>
+      {activeAnnouncements}
 
       <Heading border="bottom" margin="medium">
-        Past
+        {I18n.t('Past')}
       </Heading>
-      <div dangerouslySetInnerHTML={{__html: ENV.global_notifications.past}}/>
+      {pastAnnouncements}
     </>
   )
 }

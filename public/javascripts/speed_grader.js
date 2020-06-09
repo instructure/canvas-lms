@@ -564,7 +564,7 @@ function setupHeader() {
     },
 
     keyboardShortcutInfoModal() {
-      const questionMarkKeyDown = $.Event('keydown', {keyCode: 191})
+      const questionMarkKeyDown = $.Event('keydown', {keyCode: 191, shiftKey: true})
       $(document).trigger(questionMarkKeyDown)
     },
 

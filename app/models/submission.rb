@@ -20,7 +20,7 @@ require 'atom'
 require 'anonymity'
 
 class Submission < ActiveRecord::Base
-  self.ignored_columns = %w{has_admin_comment has_rubric_assessment process_attempts}
+  self.ignored_columns = %w{has_admin_comment has_rubric_assessment process_attempts context_code}
 
   include Canvas::GradeValidations
   include CustomValidations
@@ -79,6 +79,7 @@ class Submission < ActiveRecord::Base
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment, inverse_of: :submissions
+  belongs_to :course, inverse_of: :submissions
   belongs_to :user
   alias student user
   belongs_to :grader, :class_name => 'User'
@@ -147,8 +148,6 @@ class Submission < ActiveRecord::Base
   scope :submitted_after, lambda { |date| where("submitted_at>?", date) }
   scope :with_point_data, -> { where("submissions.score IS NOT NULL OR submissions.grade IS NOT NULL") }
 
-  scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
-
   scope :postable, -> {
     all.primary_shard.activate do
       graded.union(with_hidden_comments)
@@ -170,7 +169,7 @@ class Submission < ActiveRecord::Base
     limit(limit)
   }
 
-  scope :for_course, -> (course) { where(assignment: course.assignments.except(:order)) }
+  scope :for_course, -> (course) { where(course_id: course) }
   scope :for_assignment, -> (assignment) { where(assignment: assignment) }
 
   scope :missing, -> do
@@ -1338,8 +1337,11 @@ class Submission < ActiveRecord::Base
 
   def infer_values
     if assignment
-      self.context_code = assignment.context_code
-      self.course_id = assignment.context_id
+      if assignment.association(:context).loaded?
+        self.course = assignment.context # may as well not reload it
+      else
+        self.course_id = assignment.context_id
+      end
     end
 
     self.seconds_late_override = nil unless late_policy_status == 'late'
@@ -2277,7 +2279,7 @@ class Submission < ActiveRecord::Base
   end
 
   def context
-    self.assignment.context if self.assignment
+    self.course ||= self.assignment&.context
   end
 
   def to_atom(opts={})

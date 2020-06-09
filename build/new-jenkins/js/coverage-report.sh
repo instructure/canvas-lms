@@ -12,7 +12,7 @@ chmod -vvR 777 coverage-report-js
 # copy all the coverage reports and rename them so there are no
 # file name collisions
 counter=0
-for coverage_file in `find $WORKSPACE/tmp -name coverage*.json`
+for coverage_file in `find $(pwd)/tmp -name coverage*.json`
 do
   echo $coverage_file
   cp $coverage_file ./coverage-report-js/coverage-$counter.json
@@ -24,7 +24,7 @@ find ./coverage-report-js
 
 # build the reports inside the canvas-lms image because it has the required executables
 inputs=()
-inputs+=("--volume $WORKSPACE/coverage-report-js:/usr/src/app/coverage-report-js")
+inputs+=("--volume $(pwd)/coverage-report-js:/usr/src/app/coverage-report-js")
 cat <<EOF | docker run --interactive ${inputs[@]} $PATCHSET_TAG /bin/bash -
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 

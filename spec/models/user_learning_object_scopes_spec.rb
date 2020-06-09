@@ -642,7 +642,7 @@ describe UserLearningObjectScopes do
       @course2.assignments.first.grade_student(@student_a, grade: "1", grader: @teacher)
       @ta = User.find(@ta.id)
       expect(@ta.assignments_needing_grading.size).to be 1
-      expect(@ta.assignments_needing_grading(scope_only: true).size).to be 1
+      expect(@ta.assignments_needing_grading(scope_only: true).to_a.size).to be 1
       expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
 
       # but if we enroll the TA in both sections of course1, it should be accessible
@@ -650,7 +650,7 @@ describe UserLearningObjectScopes do
                           :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
       @ta = User.find(@ta.id)
       expect(@ta.assignments_needing_grading.size).to be 2
-      expect(@ta.assignments_needing_grading(scope_only: true).size).to be 2
+      expect(@ta.assignments_needing_grading(scope_only: true).to_a.size).to be 2
       expect(@ta.assignments_needing_grading).to be_include(@course1.assignments.first)
       expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
     end
@@ -721,37 +721,9 @@ describe UserLearningObjectScopes do
         end
       end
 
-      after :each do
-        [Shard.default, @shard1, @shard2].each do |shard|
-          shard.activate do
-            Setting.remove('assignments_needing_grading_b')
-          end
-        end
-      end
-
       it "should find assignments from all shards" do
         [Shard.default, @shard1, @shard2].each do |shard|
           shard.activate do
-            expect(@teacher.assignments_needing_grading.sort_by(&:id)).to eq(
-              [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
-            )
-            Setting.set('assignments_needing_grading_b', 'false')
-            expect(@teacher.assignments_needing_grading.sort_by(&:id)).to eq(
-              [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
-            )
-          end
-        end
-      end
-
-      it "should work when submissions course ids are populated" do
-        Setting.set('course_id_populated_on_submissions', 'true')
-        expect(@teacher.course_id_populated_on_submissions?).to eq true
-        [Shard.default, @shard1, @shard2].each do |shard|
-          shard.activate do
-            expect(@teacher.assignments_needing_grading.sort_by(&:id)).to eq(
-              [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
-            )
-            Setting.set('assignments_needing_grading_b', 'false')
             expect(@teacher.assignments_needing_grading.sort_by(&:id)).to eq(
               [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
             )

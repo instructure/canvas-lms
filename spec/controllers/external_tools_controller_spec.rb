@@ -1836,6 +1836,55 @@ describe ExternalToolsController do
           expect(json_parse["url"]).to include "http://test.host/courses/#{@course.id}/assignments/#{assignment.id}?display=borderless&session_token="
         end
       end
+
+      context 'with a module item launch' do
+        before do
+          controller.instance_variable_set(
+            :@access_token,
+            login_pseudonym.user.access_tokens.create(purpose: 'test')
+          )
+
+          external_tool
+        end
+
+        subject do
+          get :generate_sessionless_launch, params: params
+          json_parse['url']
+        end
+
+        let(:course) { @course }
+        let(:launch_url) { 'https://www.my-tool.com/login' }
+        let(:params) { {course_id: @course.id, launch_type: :module_item, module_item_id: module_item.id} }
+        let(:context_module) do
+          ContextModule.create!(
+            context: course,
+            name: "External Tools"
+          )
+        end
+        let(:module_item) do
+          ContentTag.create!(
+            context: course,
+            context_module: context_module,
+            content_type: 'ContextExternalTool',
+            url: launch_url
+          )
+        end
+        let(:external_tool) do
+          tool = external_tool_model(
+            context: course,
+            opts: { url: launch_url }
+          )
+          tool.settings[:use_1_3] = true
+          tool.save!
+          tool
+        end
+
+        it { is_expected.to include "http://test.host/courses/#{course.id}/modules/items/#{module_item.id}" }
+
+        it { is_expected.to include "display=borderless" }
+
+        it { is_expected.to match /session_token=\w+/ }
+      end
     end
   end
 

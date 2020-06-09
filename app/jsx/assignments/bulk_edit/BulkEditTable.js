@@ -118,7 +118,7 @@ export default function BulkEditTable({
     )
   }
 
-  function renderNoDefaultDates() {
+  function renderNoDefaultDates(hasTooManyDates) {
     // The goal here is to create a cell that spans multiple columns. You can't do that with InstUI
     // yet, so we're going to fake it with a View that's as wide as all the other columns and
     // depend on the cell overflow as being visible. I think that's pretty safe since that's the
@@ -131,13 +131,19 @@ export default function BulkEditTable({
           NOTE_COLUMN_WIDTH_REMS}rem`}
       >
         <Text size="medium" fontStyle="italic">
-          {I18n.t('This assignment has no default dates.')}
+          {hasTooManyDates
+            ? I18n.t('This assignment has too many dates to display.')
+            : I18n.t('This assignment has no default dates.')}
         </Text>
       </View>
     )
   }
 
   function renderAssignmentCheckbox(assignment) {
+    if (assignment.hasOwnProperty('all_dates_count')) {
+      return null
+    }
+
     return (
       <Checkbox
         label={
@@ -200,9 +206,9 @@ export default function BulkEditTable({
     if (baseOverride) {
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
-          {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-            <Table.Cell>{renderAssignmentCheckbox(assignment)}</Table.Cell>
-          )}
+          <Table.Cell>
+            {renderAssignmentCheckbox(assignment)}
+          </Table.Cell>
           <Table.Cell>{renderOverrideTitle(assignment, baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'unlock_at', baseOverride)}</Table.Cell>
@@ -215,11 +221,13 @@ export default function BulkEditTable({
       // Need all Table.Cells or you get weird borders on this row
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
-          {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-            <Table.Cell>{renderAssignmentCheckbox(assignment)}</Table.Cell>
-          )}
+          <Table.Cell>
+            {renderAssignmentCheckbox(assignment)}
+          </Table.Cell>
           <Table.Cell>{renderOverrideTitle(assignment, {base: true})}</Table.Cell>
-          <Table.Cell>{renderNoDefaultDates()}</Table.Cell>
+          <Table.Cell>
+            {renderNoDefaultDates(assignment.hasOwnProperty('all_dates_count'))}
+          </Table.Cell>
           <Table.Cell />
           <Table.Cell />
           <Table.Cell />
@@ -234,15 +242,13 @@ export default function BulkEditTable({
     return overrides.map(override => {
       return (
         <Table.Row key={`override_${override.id}`}>
-          {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-            <Table.Cell>
-              <ScreenReaderContent>
-                {assignment.selected
-                  ? I18n.t('parent assignment is selected')
-                  : I18n.t('parent assignment is not selected')}
-              </ScreenReaderContent>
-            </Table.Cell>
-          )}
+          <Table.Cell>
+            <ScreenReaderContent>
+              {assignment.selected
+                ? I18n.t('parent assignment is selected')
+                : I18n.t('parent assignment is not selected')}
+            </ScreenReaderContent>
+          </Table.Cell>
           <Table.Cell>{renderOverrideTitle(assignment, override)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', override, override.id)}</Table.Cell>
           <Table.Cell>
@@ -307,25 +313,20 @@ export default function BulkEditTable({
 
     return (
       <div style={{position: 'relative'}}>
-        {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-          <div style={selectAllStyles}>
-            <Checkbox
-              label={selectAllLabel}
-              checked={allAssignmentsSelected}
-              indeterminate={!allAssignmentsSelected && someAssignmentsSelected}
-              onChange={handleSelectAllAssignments}
-            />
-          </div>
-        )}
-
+        <div style={selectAllStyles}>
+          <Checkbox
+            label={selectAllLabel}
+            checked={allAssignmentsSelected}
+            indeterminate={!allAssignmentsSelected && someAssignmentsSelected}
+            onChange={handleSelectAllAssignments}
+          />
+        </div>
         <Table caption={I18n.t('Assignment Dates')} hover layout={layoutProp}>
           <Table.Head>
             <Table.Row>
-              {ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-                <Table.ColHeader id="select" width={checkboxWidthProp}>
-                  {selectedHeader}
-                </Table.ColHeader>
-              )}
+              <Table.ColHeader id="select" width={checkboxWidthProp}>
+                {selectedHeader}
+              </Table.ColHeader>
               <Table.ColHeader id="title">{I18n.t('Title')}</Table.ColHeader>
               <Table.ColHeader width={widthProp} id="due">
                 {DATE_INPUT_META.due_at.label}
