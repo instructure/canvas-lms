@@ -20,7 +20,7 @@ class AddRootAccountIdToContentParticipationCounts < ActiveRecord::Migration[5.2
   disable_ddl_transaction!
 
   def change
-    add_column :content_participation_counts, :root_account_id, :integer, limit: 8
+    add_column :content_participation_counts, :root_account_id, :integer, limit: 8, if_not_exists: true
     add_foreign_key :content_participation_counts, :accounts, column: :root_account_id
     add_index :content_participation_counts, :root_account_id, algorithm: :concurrently, if_not_exists: true
   end
