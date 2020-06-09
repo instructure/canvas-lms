@@ -394,7 +394,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def clear_stream_items_if_module_is_unpublished
-    if self.content_type == "DiscussionTopic" && context_module.workflow_state == 'unpublished'
+    if self.content_type == "DiscussionTopic" && context_module&.workflow_state == 'unpublished'
       content.clear_stream_items
     end
   end
