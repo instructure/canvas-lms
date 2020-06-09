@@ -3,5 +3,5 @@ version: "2.3"
 services:
   canvas:
     volumes:
-      - "./.git:/usr/src/app/.git"
+      - "${PWD}/${LOCAL_WORKDIR}/.git:${DOCKER_WORKDIR}/.git"
     init: true
