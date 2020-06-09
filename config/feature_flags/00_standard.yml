@@ -117,12 +117,6 @@ k12:
       Update the icons in the Global Navigation Menu that make more sense specifically in a K-12 environment.
   applies_to: RootAccount
   root_opt_in: true
-recurring_calendar_events:
-  state: hidden
-  display_name: Duplicating Calendar Events
-  description: Allows the duplication of Calendar Events
-  applies_to: Course
-  root_opt_in: true
 duplicate_modules:
   state: allowed
   display_name: Duplicate Modules

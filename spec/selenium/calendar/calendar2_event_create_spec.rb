@@ -123,8 +123,6 @@ describe "calendar2" do
       end
 
       it "should create an event that is recurring", priority: "1", test_id: 223510 do
-        Account.default.enable_feature!(:recurring_calendar_events)
-
         get '/calendar2'
         expect(f('#context-list li:nth-of-type(1)').text).to include(@teacher.name)
         expect(f('#context-list li:nth-of-type(2)').text).to include(@course.name)
@@ -151,7 +149,6 @@ describe "calendar2" do
       end
 
       it "should create recurring section-specific events" do
-        Account.default.enable_feature!(:recurring_calendar_events)
         section1 = @course.course_sections.first
         section2 = @course.course_sections.create!(:name => "other section")
 
