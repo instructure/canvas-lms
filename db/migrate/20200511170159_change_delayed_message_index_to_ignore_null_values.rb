@@ -31,7 +31,8 @@ class ChangeDelayedMessageIndexToIgnoreNullValues < ActiveRecord::Migration[5.2]
 
     add_index :delayed_messages, :notification_policy_override_id,
               algorithm: :concurrently,
-              where: "notification_policy_override_id IS NOT NULL"
+              where: "notification_policy_override_id IS NOT NULL",
+              if_not_exists: true
   end
 
   def down

@@ -20,7 +20,7 @@ class AddDisableTimerAutosubmissionToQuiz < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
-    add_column :quizzes, :disable_timer_autosubmission, :boolean
+    add_column :quizzes, :disable_timer_autosubmission, :boolean, if_not_exists: true
     change_column_default(:quizzes, :disable_timer_autosubmission, from: nil, to: false)
     DataFixup::BackfillNulls.run(Quizzes::Quiz, :disable_timer_autosubmission, default_value: false)
     change_column_null(:quizzes, :disable_timer_autosubmission, false)
