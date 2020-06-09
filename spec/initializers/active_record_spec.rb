@@ -362,6 +362,20 @@ module ActiveRecord
       it "allows if_not_exists on add_column" do
         expect { User.connection.add_column(:enrollments, :user_id, :bigint, if_not_exists: true) }.not_to raise_exception
       end
+
+      it "allows if_not_exists on add_foreign_key" do
+        expect { User.connection.add_foreign_key(:enrollments, :users, if_not_exists: true) }.not_to raise_exception
+      end
+
+      it "add_foreign_key automatically validates an invalid constraint with delay_validation" do
+        expect do
+          User.connection.remove_foreign_key(:enrollments, column: :user_id)
+          User.connection.add_foreign_key(:enrollments, :users, validate: false)
+          # so that delay_validation doesn't get ignored
+          allow(User.connection).to receive(:open_transactions).and_return(0)
+          User.connection.add_foreign_key(:enrollments, :users, delay_validation: true)
+        end.not_to raise_exception
+      end
     end
   end
 end

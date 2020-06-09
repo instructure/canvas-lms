@@ -58,18 +58,24 @@ module PostgreSQLAdapterExtensions
     end
   end
 
-  def add_foreign_key(from_table, to_table, options = {})
-    raise ArgumentError, "Cannot specify custom options with :delay_validation" if options[:options] && options[:delay_validation]
+  def add_foreign_key(from_table, to_table, delay_validation: false, if_not_exists: false, **options)
+    raise ArgumentError, "Cannot specify custom options with :delay_validation" if options[:options] && delay_validation
 
     # pointless if we're in a transaction
-    options.delete(:delay_validation) if open_transactions > 0
+    delay_validation = false if open_transactions > 0
     options[:column] ||= "#{to_table.to_s.singularize}_id"
     column = options[:column]
 
     foreign_key_name = foreign_key_name(from_table, options)
 
-    if options[:delay_validation]
-      options[:options] = 'NOT VALID'
+    if if_not_exists || delay_validation
+      schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
+      valid = select_value("SELECT convalidated FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}", "SCHEMA")
+      return if valid == true && if_not_exists
+    end
+
+    if delay_validation
+      options[:validate] = false
       # NOT VALID doesn't fully work through 9.3 at least, so prime the cache to make
       # it as fast as possible. Note that a NOT EXISTS would be faster, but this is
       # the query postgres does for the VALIDATE CONSTRAINT, so we want exactly this
@@ -77,9 +83,8 @@ module PostgreSQLAdapterExtensions
       execute("SELECT fk.#{column} FROM #{quote_table_name(from_table)} fk LEFT OUTER JOIN #{quote_table_name(to_table)} pk ON fk.#{column}=pk.id WHERE pk.id IS NULL AND fk.#{column} IS NOT NULL LIMIT 1")
     end
 
-    super(from_table, to_table, options)
-
-    execute("ALTER TABLE #{quote_table_name(from_table)} VALIDATE CONSTRAINT #{quote_column_name(foreign_key_name)}") if options[:delay_validation]
+    super(from_table, to_table, **options) unless valid == false
+    validate_constraint(from_table, foreign_key_name) if delay_validation
   end
 
   def set_standard_conforming_strings

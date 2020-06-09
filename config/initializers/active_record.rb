@@ -1400,30 +1400,6 @@ ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plug
 ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
 
 ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
-  # in anticipation of having to re-run migrations due to integrity violations or
-  # killing stuff that is holding locks too long
-  def add_foreign_key_if_not_exists(from_table, to_table, options = {})
-    options[:column] ||= "#{to_table.to_s.singularize}_id"
-    column = options[:column]
-    case self.adapter_name
-    when 'PostgreSQL'
-      foreign_key_name = foreign_key_name(from_table, options)
-      schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
-      value = select_value("SELECT convalidated FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
-      if value == 'f'
-        execute("ALTER TABLE #{quote_table_name(from_table)} DROP CONSTRAINT #{quote_table_name(foreign_key_name)}")
-      elsif value
-        return
-      end
-
-      add_foreign_key(from_table, to_table, options)
-    else
-      foreign_key_name = foreign_key_name(from_table, column, options)
-      return if foreign_keys(from_table).find { |k| k.options[:name] == foreign_key_name }
-      add_foreign_key(from_table, to_table, options)
-    end
-  end
-
   def find_foreign_key(from_table, to_table, column: nil)
     column ||= "#{to_table.to_s.singularize}_id"
     foreign_keys(from_table).find do |key|

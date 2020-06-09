@@ -22,6 +22,6 @@ class RemoveCorrectContentMigrationForeignKey < ActiveRecord::Migration[5.2]
   end
 
   def down
-    add_foreign_key_if_not_exists :content_migrations, :attachments, :column => :attachment_id, :delay_validation => true
+    add_foreign_key :content_migrations, :attachments, :column => :attachment_id, :delay_validation => true, if_not_exists: true
   end
 end
