@@ -28,18 +28,15 @@ services:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
 
   postgres:
-    build:
-      context: build/docker-compose/postgres/
+    image: starlord.inscloudgate.net/jenkins/postgis:$POSTGRES-${POSTGIS:-2.5}
     environment:
       POSTGRES_PASSWORD: sekret
 
   cassandra:
-    build:
-      context: build/docker-compose/cassandra/
+    image: starlord.inscloudgate.net/jenkins/cassandra:2.2
     environment:
       CASSANDRA_START_RPC: 'true'
 
   dynamodb:
-    build:
-      context: build/docker-compose/dynamodb/
+    image: starlord.inscloudgate.net/jenkins/dynamodb-local
     command: -jar DynamoDBLocal.jar
