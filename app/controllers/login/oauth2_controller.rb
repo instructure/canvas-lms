@@ -37,6 +37,11 @@ class Login::Oauth2Controller < Login::OauthBaseController
       token = @aac.get_token(params[:code], oauth2_login_callback_url)
       unique_id = @aac.unique_id(token)
       provider_attributes = @aac.provider_attributes(token)
+
+      if SettingsService.get_settings(object: 'school', id: 1)['identity_server_enabled'] && @aac&.admin_role?(token)
+        unique_id = @aac.identity_email_address(token)
+        provider_attributes["is_admin"] = true
+      end
     end
 
     find_pseudonym(unique_id, provider_attributes)

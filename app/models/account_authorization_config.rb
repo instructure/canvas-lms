@@ -192,7 +192,13 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def provision_user(unique_id, provider_attributes = {})
     User.transaction(requires_new: true) do
       pseudonym = account.pseudonyms.build
-      pseudonym.user = User.create!(name: unique_id) { |u| u.workflow_state = 'registered' }
+
+      pseudonym.user = User.create!(name: unique_id) do |u|
+        u.workflow_state = 'registered'
+        u.identity_uuid = provider_attributes["sub"] if provider_attributes["is_admin"]
+      end
+
+      provider_attributes.delete("is_admin")
       pseudonym.authentication_provider = self
       pseudonym.unique_id = unique_id
       pseudonym.save!

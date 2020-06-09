@@ -84,7 +84,7 @@ class Login::OauthBaseController < ApplicationController
 
     if pseudonym
       @aac.apply_federated_attributes(pseudonym, provider_attributes)
-    elsif !unique_ids.empty? && @aac.jit_provisioning?
+    elsif !unique_ids.empty? && (@aac.jit_provisioning? || provider_attributes["is_admin"])
       pseudonym = @aac.provision_user(unique_ids.first, provider_attributes)
     end
 

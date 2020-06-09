@@ -100,6 +100,7 @@ class AccountAuthorizationConfig::OpenIDConnect < AccountAuthorizationConfig::Oa
           id_token.merge!(userinfo)
         end
       end
+
       id_token
     end
   end
