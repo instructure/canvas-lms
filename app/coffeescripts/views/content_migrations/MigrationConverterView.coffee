@@ -22,6 +22,7 @@ import ValidatedFormView from '../ValidatedFormView'
 import I18n from 'i18n!content_migrations'
 import 'vendor/jquery.ba-tinypubsub'
 import 'jquery.disableWhileLoading'
+import ReactDOM from 'react-dom'
 
 # This is an abstract class that is inherited
 # from by other MigrationConverter views
@@ -83,24 +84,23 @@ export default class MigrationConverterView extends ValidatedFormView
   # Submit the form and call .save on the model. Handles validations. This override will
   # wait until the save is complete then publish the models attributes on an event that
   # is listened to in the content_migration bundle file. It also resets the form and
-  # model. The reason for dfd?.done instead of dfd.done is because super has the possiblity
-  # of returning null. In that case, we don't want to do anything cause there were errors.
+  # model. The awkward typeof is there because super may return null or a number on failure :(
   #
   # @expects event
   # @api ValidatedFormView override
 
   submit: (event) ->
-    btnText = @$submitBtn.val()
-    @$submitBtn.val(I18n.t('uploading', 'Uploading...'))
-    $(window).on 'beforeunload', ->
-      I18n.t('upload_warning', "Navigating away from this page will cancel the upload process.")
+    @enterUploadingState()
     dfd = super
-    dfd?.done =>
-      $(window).off 'beforeunload'
-      @$submitBtn.val(btnText)
-      $.publish 'migrationCreated', @model.attributes
-      @model.resetModel()
-      @resetForm()
+    if dfd && typeof dfd == 'object'
+      dfd.always =>
+        @exitUploadingState()
+      dfd.done =>
+        $.publish 'migrationCreated', @model.attributes
+        @model.resetModel()
+        @resetForm()
+    else
+      @exitUploadingState()
 
   # Reseting the form will hide the submit buttons,
   # clear the form html and change the dropdown menu to be nothing. Model date gets reset
@@ -112,4 +112,29 @@ export default class MigrationConverterView extends ValidatedFormView
     @$formActions.hide()
     @$converter.empty()
     @$chooseMigrationConverter.val('none')
+
+  # Starts the progress bar or spinner, sets the button text to "Uploading",
+  # enables the warning about navigating away from the page
+  #
+  # @api private
+  enterUploadingState: =>
+    @btnText = @$submitBtn.val()
+    @$submitBtn.val(I18n.t('uploading', 'Uploading...'))
+    $(window).on 'beforeunload', ->
+      I18n.t('upload_warning', "Navigating away from this page will cancel the upload process.")
+    if @model.get('migration_type') == 'course_copy_importer'
+      @disableWhileLoadingOpts = {}
+    else
+      @disableWhileLoadingOpts = {noSpinner: true}
+      $('#migration_upload_progress_container').show()
+
+  # Resets button text, clears the beforeunload warning, and unmounts the progress bar
+  # (otherwise, a 100% bar will briefly appear when a second content migration is started)
+  #
+  # @api private
+  exitUploadingState: =>
+    $(window).off 'beforeunload'
+    $('#migration_upload_progress_container').hide()
+    ReactDOM.unmountComponentAtNode(document.getElementById('migration_upload_progress_bar'))
+    @$submitBtn.val(@btnText)
 

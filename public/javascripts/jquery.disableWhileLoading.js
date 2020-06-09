@@ -70,13 +70,18 @@ $.fn.disableWhileLoading = function(deferred, options) {
           .andSelf()
           .filter(':input')
           .not(':disabled,[type=file]')
-        const $foundSpinHolder = $this.find('.spin_holder')
-        $spinHolder = $foundSpinHolder.length ? $foundSpinHolder : $this
-        previousSpinHolderDisplay = $spinHolder.css('display')
-
         $inputsToDisable.prop('disabled', true)
-        $spinHolder.show().spin(options)
-        $($spinHolder.data().spinner.el).css({'max-width': '100px'})
+
+        if (opts.noSpinner) {
+          $spinHolder = null
+        } else {
+          const $foundSpinHolder = $this.find('.spin_holder')
+          $spinHolder = $foundSpinHolder.length ? $foundSpinHolder : $this
+          previousSpinHolderDisplay = $spinHolder.css('display')
+          $spinHolder.show().spin(options)
+          $($spinHolder.data().spinner.el).css({'max-width': '100px'})
+        }
+
         $disabledArea.css('opacity', function(i, currentOpacity) {
           $(this).data(dataKey + 'opacityBefore', this.style.opacity || 1)
           return opts.opacity
@@ -107,7 +112,9 @@ $.fn.disableWhileLoading = function(deferred, options) {
       $.when(deferred).always(function() {
         clearTimeout(disabler)
         if (disabled) {
-          $spinHolder.css('display', previousSpinHolderDisplay).spin(false) // stop spinner
+          if ($spinHolder) {
+            $spinHolder.css('display', previousSpinHolderDisplay).spin(false) // stop spinner
+          }
           $disabledArea.css('opacity', function() {
             return $(this).data(dataKey + 'opacityBefore') || 1
           })
