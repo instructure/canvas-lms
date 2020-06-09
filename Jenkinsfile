@@ -421,7 +421,9 @@ pipeline {
       script {
         if (isPatchsetSlackableOnFailure()) {
           def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
-          def authorSegment = env.GERRIT_EVENT_ACCOUNT_NAME ? "Patchset by ${env.GERRIT_EVENT_ACCOUNT_NAME}. " : ''
+          def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
+          def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
+          def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. " : ''
           slackSend(
             channel: '#canvas_builds',
             color: 'danger',
