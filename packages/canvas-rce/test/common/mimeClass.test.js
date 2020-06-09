@@ -67,13 +67,11 @@ describe('fileEmbed', () => {
   })
 
   it('uses content-type to identify images', () => {
-    const image = fileEmbed(
-      getBaseFile({
-        'content-type': 'image/png',
-        canvadoc_session_url: 'some-url'
-      })
-    )
-    assert.equal(image.type, 'image')
+    const png = fileEmbed(getBaseFile({'content-type': 'image/png'}))
+    const svg = fileEmbed(getBaseFile({'content-type': 'image/svg+xml'}))
+
+    assert.equal(png.type, 'image')
+    assert.equal(svg.type, 'image')
   })
 })
 
@@ -85,9 +83,17 @@ describe('mimeClass', () => {
 
   it('returns value corresponding to provided `content-type`', () => {
     assert.equal(mimeClass({'content-type': 'video/mp4'}), 'video')
+    assert.equal(mimeClass({'content-type': 'audio/webm'}), 'audio')
+    assert.equal(mimeClass({'content-type': 'image/svg+xml'}), 'image')
+    assert.equal(mimeClass({'content-type': 'image/webp'}), 'file')
+    assert.equal(mimeClass({'content-type': 'application/vnd.ms-powerpoint'}), 'ppt')
   })
 
   it('returns value corresponding to provided `type`', () => {
     assert.equal(mimeClass({type: 'video/mp4'}), 'video')
+    assert.equal(mimeClass({type: 'audio/webm'}), 'audio')
+    assert.equal(mimeClass({type: 'image/svg+xml'}), 'image')
+    assert.equal(mimeClass({type: 'image/webp'}), 'file')
+    assert.equal(mimeClass({type: 'application/vnd.ms-powerpoint'}), 'ppt')
   })
 })

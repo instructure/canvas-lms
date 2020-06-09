@@ -2247,4 +2247,26 @@ describe Attachment do
       expect(@attachment.root_account_id).to eq @account.id
     end
   end
+
+  context 'mime_class' do
+    it 'handles general video types' do
+      attachment_model content_type: 'video/mp4'
+      expect(@attachment.mime_class).to eq 'video'
+    end
+
+    it 'handles general audio types' do
+      attachment_model content_type: 'audio/webm'
+      expect(@attachment.mime_class).to eq 'audio'
+    end
+
+    it 'handles general image types' do
+      attachment_model content_type: 'image/svg+xml'
+      expect(@attachment.mime_class).to eq 'image'
+    end
+
+    it 'handles specifically enumerated types' do
+      attachment_model content_type: 'application/vnd.ms-powerpoint'
+      expect(@attachment.mime_class).to eq 'ppt'
+    end
+  end
 end
