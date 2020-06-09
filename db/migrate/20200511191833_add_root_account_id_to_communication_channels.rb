@@ -23,7 +23,6 @@ class AddRootAccountIdToCommunicationChannels < ActiveRecord::Migration[5.2]
 
   def up
     add_column_and_fk :communication_channels, :root_account_id, :accounts, if_not_exists: true
-    add_index :communication_channels, :root_account_id, algorithm: :concurrently, if_not_exists: true
   end
 
   def down

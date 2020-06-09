@@ -21,9 +21,8 @@ class AddRootAccountIdToConversationParticipants < ActiveRecord::Migration[5.2]
   tag :predeploy
   disable_ddl_transaction!
 
-    def up
+  def up
     add_column_and_fk :conversation_participants, :root_account_id, :accounts, if_not_exists: true
-    add_index :conversation_participants, :root_account_id, algorithm: :concurrently, if_not_exists: true
   end
 
   def down

@@ -23,7 +23,6 @@ class AddRootAccountIdToAssetUserAccesses < ActiveRecord::Migration[5.2]
 
   def up
     add_column_and_fk :asset_user_accesses, :root_account_id, :accounts, if_not_exists: true
-    add_index :asset_user_accesses, :root_account_id, algorithm: :concurrently, if_not_exists: true
   end
 
   def down
