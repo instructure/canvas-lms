@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,21 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Favorite < ActiveRecord::Base
-  belongs_to :context, polymorphic: [:course, :group]
-  belongs_to :user
-  belongs_to :root_account, class_name: "Account", inverse_of: :favorites
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group'].freeze
-  scope :by, lambda { |type| where(:context_type => type) }
+require 'spec_helper'
 
-  before_create :populate_root_account_id
-  after_save :touch_user
-
-  def touch_user
-    self.class.connection.after_transaction_commit { user.touch }
-  end
-
-  def populate_root_account_id
-    self.root_account = self.context.root_account
+describe Favorite do
+  it 'should populate root account' do
+    student_in_course()
+    favorite = @user.favorites.create!(context: @course)
+    expect(favorite.root_account).to eq @course.root_account
   end
 end

@@ -31,6 +31,7 @@ class Account < ActiveRecord::Base
   belongs_to :root_account, :class_name => 'Account'
 
   has_many :courses
+  has_many :favorites, inverse_of: :root_account
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
   has_one :terms_of_service, :dependent => :destroy
   has_one :terms_of_service_content, :dependent => :destroy
