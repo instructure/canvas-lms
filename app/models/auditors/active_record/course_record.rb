@@ -42,5 +42,9 @@ module Auditors::ActiveRecord
         attrs_hash
       end
     end
+
+    def event_data
+      @_event_data ||= JSON.parse(self.data)
+    end
   end
 end
