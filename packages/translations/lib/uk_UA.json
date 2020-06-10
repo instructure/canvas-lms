@@ -134,9 +134,6 @@
     "clear_selected_file_82388e50": {
         "message": "Очистити вибраний файл"
     },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Натисніть на будь-яку сторінку, щоб вставити посилання на цю сторінку."
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Натисніть на вбудоване { imageName }"
     },
@@ -370,12 +367,6 @@
     },
     "link_7262adec": {
         "message": "Посилання"
-    },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Посилання на інший вміст у курсі."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Посилання на інший вміст у групі."
     },
     "links_14b70841": {
         "message": "Посилання"

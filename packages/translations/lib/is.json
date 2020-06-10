@@ -161,9 +161,6 @@
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Hreinsa valda skrá: { filename }"
     },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Smelltu á einhverja síðu til að setja inn tengil á síðuna."
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Smella til að fella inn { imageName }"
     },
@@ -580,12 +577,6 @@
     },
     "link_options_a16b758b": {
         "message": "Valkostir tengils"
-    },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Tengja við annað efni á námskeiðinu."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Tengja við annað efni í hópnum."
     },
     "links_14b70841": {
         "message": "Tenglar"

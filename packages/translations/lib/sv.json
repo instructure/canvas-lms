@@ -161,9 +161,6 @@
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Rensa vald fil: { filename }"
     },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Klicka på en sida för att infoga en länk till sidan."
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Klicka för att bädda in { imageName }"
     },
@@ -580,12 +577,6 @@
     },
     "link_options_a16b758b": {
         "message": "Länkalternativ"
-    },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Länka till annat innehåll i kursen."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Länka till annat innehåll i gruppen."
     },
     "links_14b70841": {
         "message": "Länkar"

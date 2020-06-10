@@ -161,9 +161,6 @@
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Ausgewählte Datei löschen: { filename }"
     },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Um einen Link auf einer Seite einzufügen, klicken Sie auf die entsprechende Seite."
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "{ imageName } durch Anklicken einbetten"
     },
@@ -580,12 +577,6 @@
     },
     "link_options_a16b758b": {
         "message": "Link-Optionen"
-    },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Zu anderen Kursinhalten verlinken"
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Zu anderen Inhalten der Gruppe verlinken"
     },
     "links_14b70841": {
         "message": "Links"

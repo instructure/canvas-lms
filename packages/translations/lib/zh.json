@@ -161,9 +161,6 @@
     "clear_selected_file_filename_2fe8a58e": {
         "message": "清除所选文件：{ filename }"
     },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "单击任何页面以插入指向该页面的链接。"
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "单击以嵌入{ imageName }"
     },
@@ -580,12 +577,6 @@
     },
     "link_options_a16b758b": {
         "message": "链接选项"
-    },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "链接至课程中的其它内容。"
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "链接至小组中的其它内容。"
     },
     "links_14b70841": {
         "message": "链接"

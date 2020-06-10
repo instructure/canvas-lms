@@ -161,9 +161,6 @@
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Kiválasztott fájl törlése: { filename }"
     },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Az oldalra mutató link beszúrásához kattintson a kívánt oldalra."
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Kattintson a { imageName } kép beágyazásához."
     },
@@ -580,12 +577,6 @@
     },
     "link_options_a16b758b": {
         "message": "Link beállításai"
-    },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Linkelés más kurzustartalomhoz."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Más tartalomhoz kapcsolás a csoportban."
     },
     "links_14b70841": {
         "message": "Linkek"

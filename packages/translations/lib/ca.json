@@ -161,9 +161,6 @@
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Esborra el fitxer seleccionat: { filename }"
     },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Feu clic a qualsevol pàgina per inserir un enllaç a la pàgina en qüestió."
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Feu clic per integrar { imageName }"
     },
@@ -580,12 +577,6 @@
     },
     "link_options_a16b758b": {
         "message": "Opcions d''enllaç"
-    },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Enllaceu amb un altre contingut del curs."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Enllaceu amb un altre contingut del grup."
     },
     "links_14b70841": {
         "message": "Enllaços"

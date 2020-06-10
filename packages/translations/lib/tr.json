@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "Ekle"
     },
+    "add_another_f4e50d57": {
+        "message": "Başka bir tane ekle"
+    },
     "add_cc_subtitles_55f0394e": {
         "message": "Alt yazı ekle"
     },
@@ -56,6 +59,9 @@
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Ağ isteğinde bulunurken bir hata oluştu"
     },
+    "an_error_occurred_uploading_your_media_71f1444d": {
+        "message": "Medya dosyası yüklenirken hata oluştu."
+    },
     "announcement_fb4cb645": {
         "message": "Duyuru"
     },
@@ -92,6 +98,30 @@
     "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
         "message": "{ assignmentType } { title },  { datetime } ''da { endTime } ''a kadar"
     },
+    "assignmenttype_title_due_datetime_a112d8ff": {
+        "message": "{ assignmentType } { title }, Teslim tarihi { datetime }."
+    },
+    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+        "message": "{ assignmentType } { title } şu tarihe kadar yapılmalı { datetime }."
+    },
+    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+        "message": "{ assignmentType } { title } yapıldı olarak işaretlendi."
+    },
+    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+        "message": "{ assignmentType } { title } yapıldı olarak işaretlenmedi."
+    },
+    "assignmenttype_title_posted_datetime_cab69444": {
+        "message": "{ assignmentType } { title } gönderildi { datetime }."
+    },
+    "assignmenttype_title_reminder_datetime_33fa66d5": {
+        "message": "{ assignmentType } { title }, hatırlatıcı { datetime }."
+    },
+    "audio_and_video_recording_is_not_available_c7173efc": {
+        "message": "Ses ve Görüntü kaydı kullanılamaz."
+    },
+    "audio_player_for_title_20cc70d": {
+        "message": "{ title } ses oynatıcı"
+    },
     "calendar_a8563bb2": {
         "message": "Takvim:"
     },
@@ -115,9 +145,6 @@
     },
     "clear_selected_file_82388e50": {
         "message": "Seçili dosyayı temizle"
-    },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Herhangi bir sayfaya bağlantı eklemek için ilgili sayfaya tıklayın."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "{ imageName } görselini eklemek için tıklayınız"
@@ -374,12 +401,6 @@
     "link_options_a16b758b": {
         "message": "Bağlantı Seçenekleri"
     },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Ders içindeki başka bir içeriğe bağla."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Gruptaki diğer içeriğe bağla"
-    },
     "links_14b70841": {
         "message": "Bağlantılar"
     },
@@ -548,8 +569,14 @@
     "today_76e10f9c": {
         "message": "Bugün"
     },
+    "today_at_date_8ac30d6": {
+        "message": "Bugün { date }"
+    },
     "tomorrow_9a6c9a00": {
         "message": "Yarın"
+    },
+    "tomorrow_at_date_b53f2cf1": {
+        "message": "Yarın { date }"
     },
     "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
         "message": "{ totalResults } rsonuç bulundu, { numDisplayed } sonuç halihazırda gösteriliyor"
@@ -582,7 +609,7 @@
         "message": "Görsel Yükle"
     },
     "upload_media_ce31135a": {
-        "message": "Ortama Yükle"
+        "message": "Medya Dosyası Yükle"
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "Büyük harf alfabetik sıralı liste"
