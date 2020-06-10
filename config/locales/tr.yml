@@ -2104,6 +2104,7 @@ tr:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Son teşebbüsünüzden sonra cevaplar gösterilecektir"
   any_sub_account_ec7069f2: "Herhangi bir Alt Hesap"
   any_term_d49af19f: "Herhangi bir Dönem"
+  anyone_with_the_url_9d7e5e07: "URL'ye sahip herkes"
   api_key_eeeb2167: "API Anahtarı"
   api_url_3ee7cb0a: "API URL"
   app_b157c2b3: Uygulama
@@ -3172,6 +3173,7 @@ tr:
   authnresponse_from_idp_185037e9: "IdP'den AuthnResponse"
   author_s_name_b35e905a: "Yazar Adı"
   authorize_e3f25bb4: Yetkilendir
+  authorize_url_f28167a3: "URL'yi yetkilendir"
   auto_leader_7791c30a: auto_leader
   autodetect_field_separators_in_compatible_spreadsh_768067e1: "Uyumlu e-tablo dışa aktarmalarında alan ayırıcıları otomatik algıla"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Geç gönderilere otomatik kesinti uygula"
@@ -8859,6 +8861,7 @@ tr:
   graded_date_by_grader_e8e1ff75: "%{grader} tarafından %{graded_date}"
   graded_quiz_7fabdf1f: "Notlandırılmış Kısa Sınav"
   graded_survey_c0f0c395: "Notlandırılmış Anket"
+  grader_grader_number_e92327d3: "Notlandıran %{grader_number}"
   graders_cannot_view_student_names_2e8d3ff9: "Not verenler öğrenci isimlerini göremez"
   grades_a61eba0a: Notlar
   grades_edit_773dfc24: "Notlar - düzenle"
@@ -12422,6 +12425,7 @@ tr:
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
     one: "Yeterlik en az 1 kere sağlanmış olmalı. Final puanını hesaplamak için yeterliğin üzerindeki puanların ortalaması alınacak."
     other: "Yeterlik en az %{count} kere sağlanmış olmalı. Final puanını hesaplamak için yeterliğin üzerindeki puanların ortalaması alınacak."
+  must_be_between_availability_dates_ceaca984: "kullanılabilir tarih aralığında olmalı"
   must_contribute_to_the_page_fff632c: "Sayfaya katkı sağlamalı"
   must_mark_as_done_91cff799: "Tamamlandı olarak işaretlenmeli"
   must_mark_as_done_bf6cc563: "tamamlandı olarak işaretlenmeli"
@@ -12565,6 +12569,8 @@ tr:
   not_now_97efd947: "Şimdi değil"
   not_published_73f7079: Yayınlanmadı
   not_signed_47acf472: İmzalanmamış
+  not_synced_529cbf29: Eşzamanlanmamış
+  not_synced_message_a343fe5e: "Eşzamanlanmamış:: %{message}"
   not_yet_completed_345a0bca: "Henüz tamamlanmadı"
   note_8b73ce09: Not
   note_grades_and_notes_will_be_saved_automatically__e3270872: "Not: Puanlar ve notlar alanın dışına taşındıktan sonra kaydedilecek."
@@ -17686,6 +17692,10 @@ tr:
   syllabus_f191f65b: "Ders Programı"
   sync_completed_successfully_8f68b542: "Eşzamanlama başarılı bir şekilde tamamlandı"
   sync_to_name_successfully_disabled_8045ad95: "%{name}eşleme başarılı bir şekilde devre dışı bırakıldı"
+  synced_97764882: Eşzamanlandı
+  synced_message_20469c8f: "Eşzamanlandı: %{message}"
+  syncing_e67b8a9f: Eşzamanlanıyor
+  syncing_message_416fdc58: "Eşzamanlanıyor: %{message}"
   system_default_language_28a1052d: "Sistem Varsayılanı (%{language})"
   ta_8d966626: "Asistan Öğretmen"
   tab_1_3d6b3fb: "Sekme 1"
@@ -18199,6 +18209,8 @@ tr:
   unknown_content_type_ae6d08e8: "Bilinmeyen İçerik Türü"
   unknown_question_bank: "Bilinmeyen soru bankası"
   unknown_quiz: "Bilinmeyen kısa sınav"
+  unknown_status_status_35331e1d: "Bilinmeyen durum, %{status}"
+  unknown_status_status_message_3a4ed4d5: "Bilinmeyen durum, %{status}: %{message}"
   unknown_user_1113fcaa: "Bilinmeyen Kullanıcı"
   unknown_user_url_82196ba7: "Bilinmeyen Kullanıcı URL"
   unlimited_attempts_81a37d4: "Sınırsız Hak"
@@ -18225,6 +18237,8 @@ tr:
   unstarted_932f2990: Başlamamış
   unsubscribe_from_title_c98461b3: "%{title}'den üyeliği iptal et"
   unsupported_package: "Desteklenmeyen içerik paketi"
+  unsyncable_4bf11ee6: Eşzamanlanamaz
+  unsyncable_message_95faa75d: "Eşzamanlanamaz: %{message}"
   until_4a1f8cda: "Şu zamana kadar"
   until_date_949017c4: "%{date}'e kadar"
   untitled_16aa4f2b: Başlıksız
@@ -18252,6 +18266,7 @@ tr:
   upload_successful_ca47465f: "Yükleme başarılı"
   upload_your_outcomes_bceeadbe: "Öğrenme Çıktılarınızı Aktarın!"
   uploaded_285a2bfb: Yüklendi
+  uploaded_media_bc29db35: "Yüklenmiş Medya Dosyası"
   uploading_19e8a4e7: Yükleniyor
   uploading_submission_4c8d944b: "Gönderi Yükleniyor"
   upper_limit_of_range_c454a8f2: "Aralık üst sınırı"
@@ -18432,6 +18447,7 @@ tr:
   user_successfully_removed_a366ca5f: "Kullanıcı başarılı bir şekilde silindi."
   user_vaildation_issues_panel_66b66945: "Kullanıcı doğrulama sorunları paneli"
   usercount_users_found_8c07f1f2: "%{userCount} kullanıcı bulundu."
+  userinfo_d21114ef: Kullanıcıbilgisi
   username_47bb5bbe: "Kullanıcı Adı"
   username_could_not_be_found_6c3e8383: "Kullanıcı adı bulunamadı"
   username_saved_successfully_9303974f: "*%{userName}* başarıyla kaydedildi!"
