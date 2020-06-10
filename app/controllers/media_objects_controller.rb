@@ -72,7 +72,7 @@ class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
 
   before_action :load_media_object, :except => [:index, :update_media_object]
-  before_action :require_user, :except => [:show]
+  before_action :require_user, :except => [:show, :iframe_media_player]
 
   # @{not an}API Show Media Object Details
   # This isn't an API because it needs to work for non-logged in users (video in public course)
