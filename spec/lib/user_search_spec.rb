@@ -232,7 +232,7 @@ describe UserSearch do
 
         describe 'searching on emails' do
           let(:user1) {user_with_pseudonym(user: user)}
-          let(:cc) {user1.communication_channels.create!(path: 'the.giver@example.com')}
+          let(:cc) {communication_channel(user1, {username: 'the.giver@example.com'})}
 
           before do
             cc.confirm!
@@ -265,13 +265,13 @@ describe UserSearch do
           end
 
           it 'matches unconfirmed channels', priority: 1, test_id: 3010726 do
-            user.communication_channels.create!(path: 'unconfirmed@example.com')
+            communication_channel(user, {username: 'unconfirmed@example.com'})
             expect(UserSearch.for_user_in_context("unconfirmed", course, user)).to eq [user]
           end
 
           it 'sorts by email' do
-            User.find_by(name: 'Tyler Pickett').communication_channels.create!(path: '1tyler@example.com')
-            User.find_by(name: 'Tyler Teacher').communication_channels.create!(path: '25teacher@example.com')
+            communication_channel(User.find_by(name: 'Tyler Pickett'), {username: '1tyler@example.com'})
+            communication_channel(User.find_by(name: 'Tyler Teacher'), {username: '25teacher@example.com'})
             users = UserSearch.for_user_in_context('Tyler', course, user, nil, sort: 'email')
             expect(users.map(&:name)).to eq ['Tyler Pickett', 'Tyler Teacher', 'Rose Tyler']
           end
@@ -384,7 +384,7 @@ describe UserSearch do
       end
 
       it 'does not match against emails' do
-        user.communication_channels.create!(:path => 'the.giver@example.com', :path_type => CommunicationChannel::TYPE_EMAIL)
+        communication_channel(user, {username: 'the.giver@example.com'})
         expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
       end
     end

@@ -39,8 +39,7 @@ describe UserListV2 do
 
   it "should find by SMS number" do
     user_with_pseudonym(:name => "JT", :active_all => 1)
-    cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
-    cc.confirm!
+    communication_channel(@user, {username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true})
     ul = UserListV2.new('(801) 555-5555', search_type: "cc_path")
     expect(ul.resolved_results.first[:address]).to eq '(801) 555-5555'
     expect(ul.resolved_results.first[:user_id]).to eq @user.id
@@ -55,12 +54,10 @@ describe UserListV2 do
   it "should find duplicates by SMS number" do
     user_with_pseudonym(:name => "JT", :active_all => 1)
     @user1 = @user
-    cc = @user1.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
-    cc.confirm!
+    communication_channel(@user, {username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true})
 
     user_with_pseudonym(:name => "JT2", :active_all => 1)
-    cc = @user.communication_channels.create!(:path => '8015555555@txt.fakeplace.net', :path_type => 'sms')
-    cc.confirm!
+    communication_channel(@user, {username: '8015555555@txt.fakeplace.net', path_type: 'sms', active_cc: true})
 
     ul = UserListV2.new('(801) 555-5555', search_type: "cc_path")
     expect(ul.resolved_results).to be_empty
@@ -71,10 +68,10 @@ describe UserListV2 do
   it "should include in duplicates if there is 1 active CC and 1 unconfirmed" do
     # maaaybe we want to preserve the old behavior with this... but whatevr  ¯\_(ツ)_/¯
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
-    @user.communication_channels.create!(:path => 'jt+2@instructure.com') { |cc| cc.workflow_state = 'active' }
+    communication_channel(@user, {username: 'jt+2@instructure.com', active_cc: true})
     @user1 = @user
     user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => true)
-    @user.communication_channels.create!(:path => 'jt+2@instructure.com')
+    communication_channel(@user, {username: 'jt+2@instructure.com'})
     ul = UserListV2.new('jt+2@instructure.com', search_type: 'cc_path')
     expect(ul.resolved_results).to be_empty
     expect(ul.duplicate_results.count).to eq 1
@@ -197,8 +194,7 @@ describe UserListV2 do
   it "should not find a user from a different account by SMS" do
     account = Account.create!
     user_with_pseudonym(:name => "JT", :active_all => 1, :account => account)
-    cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
-    cc.confirm!
+    communication_channel(@user, {username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true})
     ul = UserListV2.new('(801) 555-5555', search_type: 'cc_path')
     expect(ul.resolved_results).to eq []
     expect(ul.missing_results.first[:address]).to eq '(801) 555-5555'
@@ -226,7 +222,7 @@ describe UserListV2 do
         @account = Account.create!(:name => "accountnaem")
         ps = @account.pseudonyms.build(:user => @user, :unique_id => 'username', :password => 'password', :password_confirmation => 'password')
         ps.save_without_session_maintenance
-        CommunicationChannel.create!(user: @user, pseudonym: ps, path_type: 'email', path: 'jt@instructure.com')
+        @user.communication_channels.first.update!(pseudonym: ps)
       end
 
       allow(Account.default).to receive(:trusted_account_ids).and_return([@account.id])

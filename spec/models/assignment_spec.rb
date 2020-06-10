@@ -5117,7 +5117,7 @@ describe Assignment do
 
     context "varied due date notifications" do
       before :once do
-        @teacher.communication_channels.create(:path => "teacher@instructure.com").confirm!
+        communication_channel(@teacher, {username: 'teacher@instructure.com', active_cc: true})
 
         @studentA = user_with_pseudonym(:active_all => true, :name => 'StudentA', :username => 'studentA@instructure.com')
         @ta = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')

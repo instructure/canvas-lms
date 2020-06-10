@@ -1668,24 +1668,22 @@ describe Attachment do
       # create a student to receive notifications
       @student = user_model
       @student.register!
-      e = @course.enroll_student(@student).accept
-      @cc = @student.communication_channels.create(:path => "default@example.com")
-      @cc.confirm!
+      @course.enroll_student(@student).accept
+      cc = communication_channel(@student, {username: 'default@example.com', active_cc: true})
 
       @student_ended = user_model
       @student_ended.register!
       @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
       @course.enroll_student(@student_ended, :section => @section_ended).accept
-      @cc_ended = @student_ended.communication_channels.create(:path => "default2@example.com")
-      @cc_ended.confirm!
+      cc_ended = communication_channel(@student_ended, {username: 'default2@example.com', active_cc: true})
 
-      NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added'), :communication_channel => @cc, :frequency => "immediately")
-      NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added'), :communication_channel => @cc, :frequency => "immediately")
+      NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added'), :communication_channel => cc, :frequency => "immediately")
+      NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added'), :communication_channel => cc, :frequency => "immediately")
 
       NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added - ended'),
-                                :communication_channel => @cc_ended, :frequency => "immediately")
+                                :communication_channel => cc_ended, :frequency => "immediately")
       NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added - ended'),
-                                :communication_channel => @cc_ended, :frequency => "immediately")
+                                :communication_channel => cc_ended, :frequency => "immediately")
     end
 
     it "should send a single-file notification" do
@@ -1767,8 +1765,7 @@ describe Attachment do
 
     it "should not send notifications to students if the file is uploaded to a locked folder" do
       @teacher.register!
-      cc = @teacher.communication_channels.create!(:path => "default@example.com")
-      cc.confirm!
+      cc = communication_channel(@teacher, {username: 'default@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
@@ -1786,8 +1783,7 @@ describe Attachment do
 
     it "should not send notifications to students if the file is unpublished because of usage rights" do
       @teacher.register!
-      cc = @teacher.communication_channels.create!(:path => "default@example.com")
-      cc.confirm!
+      cc = communication_channel(@teacher, {username: 'default@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       @course.usage_rights_required = true
@@ -1806,8 +1802,7 @@ describe Attachment do
 
     it "should not send notifications to students if the files navigation is hidden from student view" do
       @teacher.register!
-      cc = @teacher.communication_channels.create!(:path => "default@example.com")
-      cc.confirm!
+      cc = communication_channel(@teacher, {username: 'default@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')

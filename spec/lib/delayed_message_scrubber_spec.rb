@@ -48,7 +48,7 @@ describe DelayedMessageScrubber do
       @notification = Notification.create!(name: 'Test Notification', category: 'Test')
       @recipient    = user_factory
 
-      @recipient.communication_channels.create!(path_type: 'email', path: 'user@example.com')
+      communication_channel(@recipient, {username: 'user@example.com'})
     end
 
     it 'should delete delayed messages older than 90 days' do

@@ -508,9 +508,9 @@ describe UsersController do
 
       it "should not complain about conflicting ccs, in any state" do
         user1, user2, user3 = User.create!, User.create!, User.create!
-        cc1 = user1.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email')
-        cc2 = user2.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state == 'confirmed' }
-        cc3 = user3.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state == 'retired' }
+        cc1 = communication_channel(user1, {username: 'jacob@instructure.com'})
+        cc2 = communication_channel(user2, {username: 'jacob@instructure.com', cc_state: 'confirmed'})
+        cc3 = communication_channel(user3, {username: 'jacob@instructure.com', cc_state: 'retired'})
 
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }}
         expect(response).to be_successful
@@ -752,12 +752,21 @@ describe UsersController do
         user_session(@user, @pseudonym)
         @admin = @user
 
-        u = User.create! { |u| u.workflow_state = 'registered' }
-        u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+        u = User.create! { |user| user.workflow_state = 'registered' }
+        communication_channel(u, {username: 'jacob@instructure.com', active_cc: true})
         u.pseudonyms.create!(:unique_id => 'jon@instructure.com')
         notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
 
-        post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }}, format: 'json'
+        post 'create', params: {
+          :account_id => account.id,
+          :pseudonym => {
+            :unique_id => 'jacob@instructure.com',
+            :send_confirmation => '0'
+          },
+          :user => {
+            :name => 'Jacob Fugal'
+          }
+        }, format: 'json'
         expect(response).to be_successful
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first).to be_present
@@ -772,9 +781,18 @@ describe UsersController do
         user_session(@user, @pseudonym)
         @admin = @user
 
-        u = User.create! { |u| u.workflow_state = 'registered' }
-        u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
-        post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }}, format: 'json'
+        u = User.create! { |user| user.workflow_state = 'registered' }
+        communication_channel(u, {username: 'jacob@instructure.com', active_cc: true})
+        post 'create', params: {
+          :account_id => account.id,
+          :pseudonym => {
+            :unique_id => 'jacob@instructure.com',
+            :send_confirmation => '0'
+          },
+          :user => {
+            :name => 'Jacob Fugal'
+          }
+        }, format: 'json'
         expect(response).to be_successful
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first).to be_nil

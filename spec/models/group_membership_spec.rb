@@ -99,7 +99,7 @@ describe GroupMembership do
 
       it "should send message if the first membership in a student organized group", priority: "1", test_id: 193157 do
         Notification.create(name: 'New Student Organized Group', category: 'TestImmediately')
-        @teacher.communication_channels.create(path: "test_channel_email_#{@teacher.id}", path_type: 'email').confirm
+        communication_channel(@teacher, {username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true})
 
         group_membership = @group1.group_memberships.create(user: @student1)
         expect(group_membership.messages_sent['New Student Organized Group']).not_to be_empty
@@ -108,7 +108,7 @@ describe GroupMembership do
       it "should send message when a new student is invited to group and auto-joins", priority: "1", test_id: 193155 do
         Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
         student2 = student_in_course(active_all: true).user
-        student2.communication_channels.create(path: "test_channel_email_#{student2.id}", path_type: 'email').confirm
+        communication_channel(student2, {username: "test_channel_email_#{student2.id}@test.com", active_cc: true})
         group_membership = @group1.group_memberships.create(user: @student1)
         @group1.add_user(student2)
         expect(group_membership.messages_sent['New Context Group Membership']).not_to be_empty

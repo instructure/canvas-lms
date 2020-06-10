@@ -366,7 +366,7 @@ describe Login::CanvasController do
 
   context "merging" do
     it "should redirect back to merge users" do
-      @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
+      communication_channel(@user, {username: 'jt+1@instructure.com'})
       session[:confirm] = @cc.confirmation_code
       session[:expected_user_id] = @user.id
       post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop' }}

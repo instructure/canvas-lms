@@ -33,9 +33,13 @@ module Factories
 
   def communication_channel(user, opts={})
     username = opts[:username] || "nobody-#{user.id}@example.com"
-    @cc = user.communication_channels.create!(path_type: 'email', path: username) do |cc|
+    @cc = user.communication_channels.create!(path_type: opts[:path_type] || 'email', path: username) do |cc|
       cc.workflow_state = 'active' if opts[:active_cc] || opts[:active_all]
       cc.workflow_state = opts[:cc_state] if opts[:cc_state]
+      cc.pseudonym = opts[:pseudonym] if opts[:pseudonym]
+      cc.bounce_count = opts[:bounce_count] if opts[:bounce_count]
+      cc.last_bounce_details = opts[:last_bounce_details] if opts[:last_bounce_details]
+      cc.last_transient_bounce_details = opts[:last_transient_bounce_details] if opts[:last_transient_bounce_details]
     end
     @cc
   end

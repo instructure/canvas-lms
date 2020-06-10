@@ -230,44 +230,44 @@ describe UserMerge do
 
     it "should move ccs to the new user (but only if they don't already exist)" do
       # unconfirmed => active conflict
-      user1.communication_channels.create!(:path => 'a@instructure.com')
-      user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(user1, {username: 'a@instructure.com'})
+      communication_channel(user2, {username: 'A@instructure.com', active_cc: true})
       # active => unconfirmed conflict
-      cc1 = user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
-      user2.communication_channels.create!(:path => 'B@instructure.com')
+      cc1 = communication_channel(user1, {username: 'b@instructure.com', active_cc: true})
+      communication_channel(user2, {username: 'B@instructure.com'})
       # active => active conflict
-      user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
-      user2.communication_channels.create!(:path => 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(user1, {username: 'c@instructure.com', active_cc: true})
+      communication_channel(user2, {username: 'C@instructure.com', active_cc: true})
       # unconfirmed => unconfirmed conflict
-      user1.communication_channels.create!(:path => 'd@instructure.com')
-      user2.communication_channels.create!(:path => 'D@instructure.com')
+      communication_channel(user1, {username: 'd@instructure.com'})
+      communication_channel(user2, {username: 'D@instructure.com'})
       # retired => unconfirmed conflict
-      user1.communication_channels.create!(:path => 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      user2.communication_channels.create!(:path => 'E@instructure.com')
+      communication_channel(user1, {username: 'e@instructure.com', cc_state: 'retired'})
+      communication_channel(user2, {username: 'E@instructure.com'})
       # unconfirmed => retired conflict
-      user1.communication_channels.create!(:path => 'f@instructure.com')
-      user2.communication_channels.create!(:path => 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      communication_channel(user1, {username: 'f@instructure.com'})
+      communication_channel(user2, {username: 'F@instructure.com', cc_state: 'retired'})
       # retired => active conflict
-      user1.communication_channels.create!(:path => 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      user2.communication_channels.create!(:path => 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(user1, {username: 'g@instructure.com', cc_state: 'retired'})
+      communication_channel(user2, {username: 'G@instructure.com', cc_state: 'active'})
       # active => retired conflict
-      user1.communication_channels.create!(:path => 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
-      user2.communication_channels.create!(:path => 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      communication_channel(user1, {username: 'h@instructure.com', cc_state: 'active'})
+      communication_channel(user2, {username: 'H@instructure.com', cc_state: 'retired'})
       # retired => retired conflict
-      user1.communication_channels.create!(:path => 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      user2.communication_channels.create!(:path => 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      communication_channel(user1, {username: 'i@instructure.com', cc_state: 'retired'})
+      communication_channel(user2, {username: 'I@instructure.com', cc_state: 'retired'})
       # <nothing> => active
-      user2.communication_channels.create!(:path => 'j@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(user2, {username: 'j@instructure.com', active_cc: true})
       # active => <nothing>
-      user1.communication_channels.create!(:path => 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(user1, {username: 'k@instructure.com', active_cc: true})
       # <nothing> => unconfirmed
-      user2.communication_channels.create!(:path => 'l@instructure.com')
+      communication_channel(user2, {username: 'l@instructure.com'})
       # unconfirmed => <nothing>
-      user1.communication_channels.create!(:path => 'm@instructure.com')
+      communication_channel(user1, {username: 'm@instructure.com'})
       # <nothing> => retired
-      user2.communication_channels.create!(:path => 'n@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      communication_channel(user2, {username: 'n@instructure.com', cc_state: 'retired'})
       # retired => <nothing>
-      user1.communication_channels.create!(:path => 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      communication_channel(user1, {username: 'o@instructure.com', cc_state: 'retired'})
 
       UserMerge.from(user1).into(user2)
       user1.reload
@@ -279,7 +279,7 @@ describe UserMerge do
       expect(record.previous_workflow_state).to eq 'active'
       expect(record.context_type).to eq 'CommunicationChannel'
 
-      expect(user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq [
+      expect(user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to match_array([
           ['A@instructure.com', 'active'],
           ['C@instructure.com', 'active'],
           ['D@instructure.com', 'unconfirmed'],
@@ -294,8 +294,8 @@ describe UserMerge do
           ['l@instructure.com', 'unconfirmed'],
           ['m@instructure.com', 'unconfirmed'],
           ['n@instructure.com', 'retired']
-      ]
-      expect(user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq [
+      ])
+      expect(user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to match_array([
           ['a@instructure.com', 'retired'],
           ['c@instructure.com', 'retired'],
           ['d@instructure.com', 'retired'],
@@ -303,7 +303,7 @@ describe UserMerge do
           ['g@instructure.com', 'retired'],
           ['i@instructure.com', 'retired'],
           ['o@instructure.com', 'retired']
-      ]
+      ])
       %w{B@instructure.com F@instructure.com H@instructure.com}.each do |path|
         expect(CommunicationChannel.where(user_id: [user1, user2]).by_path(path).detect { |cc| cc.path == path }).to be_nil
       end
@@ -830,44 +830,44 @@ describe UserMerge do
       end
 
       # unconfirmed => active conflict
-      user1.communication_channels.create!(:path => 'a@instructure.com')
-      @user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(user1, {username: 'a@instructure.com'})
+      communication_channel(@user2, {username: 'A@instructure.com', active_cc: true})
       # active => unconfirmed conflict
-      user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
-      @user2.communication_channels.create!(:path => 'B@instructure.com')
+      communication_channel(user1, {username: 'b@instructure.com', active_cc: true})
+      communication_channel(@user2, {username: 'B@instructure.com'})
       # active => active conflict
-      user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
-      @user2.communication_channels.create!(:path => 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(user1, {username: 'c@instructure.com', active_cc: true})
+      communication_channel(@user2, {username: 'C@instructure.com', active_cc: true})
       # unconfirmed => unconfirmed conflict
-      user1.communication_channels.create!(:path => 'd@instructure.com')
-      @user2.communication_channels.create!(:path => 'D@instructure.com')
+      communication_channel(user1, {username: 'd@instructure.com'})
+      communication_channel(@user2, {username: 'D@instructure.com'})
       # retired => unconfirmed conflict
-      user1.communication_channels.create!(:path => 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      @user2.communication_channels.create!(:path => 'E@instructure.com')
+      communication_channel(user1, {username: 'e@instructure.com', cc_state: 'retired'})
+      communication_channel(@user2, {username: 'E@instructure.com'})
       # unconfirmed => retired conflict
-      user1.communication_channels.create!(:path => 'f@instructure.com')
-      @user2.communication_channels.create!(:path => 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      communication_channel(user1, {username: 'f@instructure.com'})
+      communication_channel(@user2, {username: 'F@instructure.com', cc_state: 'retired'})
       # retired => active conflict
-      user1.communication_channels.create!(:path => 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      @user2.communication_channels.create!(:path => 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(user1, {username: 'g@instructure.com', cc_state: 'retired'})
+      communication_channel(@user2, {username: 'G@instructure.com', cc_state: 'active'})
       # active => retired conflict
-      user1.communication_channels.create!(:path => 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
-      @user2.communication_channels.create!(:path => 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      communication_channel(user1, {username: 'h@instructure.com', cc_state: 'active'})
+      communication_channel(@user2, {username: 'H@instructure.com', cc_state: 'retired'})
       # retired => retired conflict
-      user1.communication_channels.create!(:path => 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      @user2.communication_channels.create!(:path => 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      communication_channel(user1, {username: 'i@instructure.com', cc_state: 'retired'})
+      communication_channel(@user2, {username: 'I@instructure.com', cc_state: 'retired'})
       # <nothing> => active
-      @user2.communication_channels.create!(:path => 'j@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user2, {username: 'j@instructure.com', active_cc: true})
       # active => <nothing>
-      user1.communication_channels.create!(:path => 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(user1, {username: 'k@instructure.com', active_cc: true})
       # <nothing> => unconfirmed
-      @user2.communication_channels.create!(:path => 'l@instructure.com')
+      communication_channel(@user2, {username: 'l@instructure.com'})
       # unconfirmed => <nothing>
-      user1.communication_channels.create!(:path => 'm@instructure.com')
+      communication_channel(user1, {username: 'm@instructure.com'})
       # <nothing> => retired
-      @user2.communication_channels.create!(:path => 'n@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      communication_channel(@user2, {username: 'n@instructure.com', cc_state: 'retired'})
       # retired => <nothing>
-      user1.communication_channels.create!(:path => 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
+      communication_channel(user1, {username: 'o@instructure.com', cc_state: 'retired'})
 
       @shard2.activate do
         UserMerge.from(user1).into(@user2)
@@ -875,7 +875,7 @@ describe UserMerge do
 
       user1.reload
       @user2.reload
-      expect(@user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq [
+      expect(@user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to match_array([
           ['A@instructure.com', 'active'],
           ['C@instructure.com', 'active'],
           ['D@instructure.com', 'unconfirmed'],
@@ -891,10 +891,10 @@ describe UserMerge do
           ['m@instructure.com', 'unconfirmed'],
           ['n@instructure.com', 'retired'],
           ['o@instructure.com', 'retired']
-      ]
+      ])
       # on cross shard merges, the deleted user retains all CCs (pertinent ones were
       # duplicated over to the surviving shard)
-      expect(user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq [
+      expect(user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to match_array([
           ['a@instructure.com', 'retired'],
           ['b@instructure.com', 'retired'],
           ['c@instructure.com', 'retired'],
@@ -907,7 +907,7 @@ describe UserMerge do
           ['k@instructure.com', 'retired'],
           ['m@instructure.com', 'retired'],
           ['o@instructure.com', 'retired']
-      ]
+      ])
     end
 
     it "should not fail copying retired sms channels" do

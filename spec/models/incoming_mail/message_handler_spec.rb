@@ -36,8 +36,7 @@ describe IncomingMail::MessageHandler do
   end
   let_once(:user) do
     user_model
-    channel = @user.communication_channels.create!(:path => "lucy@example.com", :path_type => "email")
-    channel.confirm!
+    communication_channel(@user, {username: 'lucy@example.com', active_cc: true})
     @user
   end
   let(:context) { double("context", reply_from: nil) }

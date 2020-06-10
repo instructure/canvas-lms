@@ -2511,11 +2511,9 @@ describe MasterCourses::MasterMigration do
       n1 = Notification.create(:name => "Blueprint Content Added")
       @admin = @user
       course_with_teacher :active_all => true
-      sub = @template.add_child_course!(@course)
-      cc0 = @admin.communication_channels.create(:path => "test_#{@admin.id}@example.com", :path_type => "email")
-      cc0.confirm
-      cc1 = @user.communication_channels.create(:path => "test_#{@user.id}@example.com", :path_type => "email")
-      cc1.confirm
+      @template.add_child_course!(@course)
+      cc0 = communication_channel(@admin, {username: "test_#{@admin.id}@example.com", active_cc: true})
+      cc1 = communication_channel(@user, {username: "test_#{@user.id}@example.com", active_cc: true})
       run_master_migration :comment => "ohai eh", :send_notification => true
       expect(DelayedMessage.where(notification_id: n0, communication_channel_id: cc0).last.summary).to include "ohai eh"
       expect(DelayedMessage.where(notification_id: n1, communication_channel_id: cc1).last.summary).to include "ohai eh"

@@ -104,7 +104,7 @@ describe "communication channel selenium tests" do
     it 'resends sms confirmations properly' do
       user_with_pseudonym({active_user: true})
       create_session(@pseudonym)
-      sms_cc = @user.communication_channels.create(:path => "8011235555@example.com", :path_type => "sms")
+      sms_cc = communication_channel(@user, {username: '8011235555@example.com', path_type: 'sms'})
 
       get '/profile/settings'
       expect(f('.other_channels')).to contain_css('.unconfirmed')
@@ -121,7 +121,7 @@ describe "communication channel selenium tests" do
 
     it 'should show the bounce count reset button when a siteadmin is masquerading' do
       u = user_with_pseudonym(active_all: true)
-      u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }
+      communication_channel(u, {username: 'test@example.com', active_cc: true, bounce_count: 3})
       site_admin_logged_in
       masquerade_as(u)
 
@@ -132,7 +132,7 @@ describe "communication channel selenium tests" do
 
     it 'should not show the bounce count reset button when an account admin is masquerading' do
       u = user_with_pseudonym(active_all: true)
-      u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }
+      communication_channel(u, {username: 'test@example.com', active_cc: true, bounce_count: 3})
       admin_logged_in
       masquerade_as(u)
 
@@ -143,7 +143,7 @@ describe "communication channel selenium tests" do
 
     it 'should not show the bounce count reset button when the channel is not bouncing' do
       u = user_with_pseudonym(active_all: true)
-      u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+      communication_channel(u, {username: 'test@example.com', active_cc: true})
       site_admin_logged_in
       masquerade_as(u)
 

@@ -1584,7 +1584,7 @@ describe User do
       user_factory
       @user2 = @user
       @user2.update_attribute(:workflow_state, 'creation_pending')
-      @user2.communication_channels.create!(:path => @cc.path)
+      communication_channel(@user2, {username: @cc.path})
       course_factory(active_all: true)
       @course.enroll_user(@user2)
 
@@ -1666,7 +1666,7 @@ describe User do
       user_factory
       @user2 = @user
       @user2.update_attribute(:workflow_state, 'creation_pending')
-      @user2.communication_channels.create!(:path => @cc.path)
+      communication_channel(@user2, {username: @cc.path})
       course_factory(active_all: true)
       @enrollment = @course.enroll_user(@user2)
 
@@ -1833,9 +1833,9 @@ describe User do
   describe "email_channel" do
     it "should not return retired channels" do
       u = User.create!
-      retired = u.communication_channels.create!(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
+      communication_channel(u, {username: 'retired@example.com', cc_state: 'retired'})
       expect(u.email_channel).to be_nil
-      active = u.communication_channels.create!(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
+      active = communication_channel(u, {username: 'active@example.com', active_cc: true})
       expect(u.email_channel).to eq active
     end
   end
@@ -1857,7 +1857,7 @@ describe User do
     it "restores retired channels" do
       @user = User.create!
       path = 'john@example.com'
-      @user.communication_channels.create!(:path => path, :workflow_state => "retired")
+      communication_channel(@user, {username: path, cc_state: 'retired'})
       @user.email = path
       expect(@user.communication_channels.first).to be_unconfirmed
       expect(@user.email).to eq 'john@example.com'
