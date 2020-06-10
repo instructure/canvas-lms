@@ -361,4 +361,8 @@ module Context
          .limit(1)
          .pluck(:updated_at)&.first
   end
+
+  def resolved_root_account_id
+    self.root_account_id if self.respond_to? :root_account_id
+  end
 end
