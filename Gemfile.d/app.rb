@@ -121,7 +121,7 @@ gem 'simple_oauth', '0.3.1', require: false
 gem 'switchman', '1.14.10'
   gem 'open4', '1.3.4', require: false
 gem 'switchman-inst-jobs', '1.4.1'
-gem 'twilio-ruby', '5.31.1', require: false
+gem 'twilio-ruby', '5.36.0', require: false
 gem 'tzinfo', '1.2.5'
 gem 'vault', '0.13.0', require: false
 gem 'vericite_api', '1.5.3'
