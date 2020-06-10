@@ -53,7 +53,7 @@ class Csp::Domain < ActiveRecord::Base
     end
   end
 
-  # get explicitly whitelisted domains for the enabled account
+  # get explicitly allowed domains for the enabled account
   def self.domains_for_account(global_account_id)
     local_id, shard = Shard.local_id_for(global_account_id)
     (shard || Shard.current).activate do

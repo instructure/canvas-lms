@@ -150,8 +150,8 @@ export class Whitelist extends Component {
             <Flex.Item>
               <Heading margin="small" level="h4" as="h3">
                 {this.props.inherited
-                  ? I18n.t('Whitelist')
-                  : I18n.t('Whitelist (%{count}/%{max})', {
+                  ? I18n.t('Domains')
+                  : I18n.t('Domains (%{count}/%{max})', {
                       count: this.props.whitelistedDomains.account.length,
                       max: this.props.maxDomains
                     })}
@@ -176,7 +176,7 @@ export class Whitelist extends Component {
           {domainLimitReached && (
             <Alert variant="error" margin="small 0">
               {I18n.t(
-                `You have reached the domain limit.  You can add more domains by deleting existing domains in your whitelist.`
+                `You have reached the domain limit. You can add more domains by deleting existing domains in your allowed list.`
               )}
             </Alert>
           )}
@@ -184,7 +184,7 @@ export class Whitelist extends Component {
           {this.props.inherited && this.props.isSubAccount && (
             <Alert variant="info" margin="small 0">
               {I18n.t(
-                `Whitelist editing is disabled when security settings are inherited from a parent account.`
+                `Domain editing is disabled when security settings are inherited from a parent account.`
               )}
             </Alert>
           )}
@@ -217,18 +217,12 @@ export class Whitelist extends Component {
           </Flex>
         </form>
         {whitelistToShow.length <= 0 ? (
-          <Billboard
-            size="small"
-            heading={I18n.t('No domains whitelisted')}
-            hero={<EmptyDesert />}
-          />
+          <Billboard size="small" heading={I18n.t('No allowed domains')} hero={<EmptyDesert />} />
         ) : (
-          <Table
-            caption={<ScreenReaderContent>{I18n.t('Whitelisted Domains')}</ScreenReaderContent>}
-          >
+          <Table caption={<ScreenReaderContent>{I18n.t('Allowed Domains')}</ScreenReaderContent>}>
             <thead>
               <tr>
-                <th scope="col">Domain Name</th>
+                <th scope="col">Allowed Domains</th>
                 <th scope="col">
                   <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
                 </th>
@@ -248,7 +242,7 @@ export class Whitelist extends Component {
                       disabled={this.props.inherited && this.props.isSubAccount}
                     >
                       <ScreenReaderContent>
-                        {I18n.t('Remove %{domain} from the whitelist', {domain})}
+                        {I18n.t('Remove %{domain} as an allowed domain', {domain})}
                       </ScreenReaderContent>
                     </Button>
                   </td>
@@ -260,12 +254,11 @@ export class Whitelist extends Component {
         {toolsWhitelistKeys && toolsWhitelistKeys.length > 0 && (
           <View as="div" margin="large 0">
             <Heading level="h4" as="h3">
-              {I18n.t('Whitelisted Tool Domains')}
+              {I18n.t('Associated Tool Domains')}
             </Heading>
             <p>
               {I18n.t(
-                `The following domains have automatically been added to your
-                 whitelist from tools already existing in your account.
+                `The following domains have automatically been allowed from tools that already exist in your account.
                  To remove these domains, remove the associated tools.`
               )}
             </p>
@@ -277,7 +270,7 @@ export class Whitelist extends Component {
             </p>
             <Table
               caption={
-                <ScreenReaderContent>{I18n.t('Whitelisted Tool Domains')}</ScreenReaderContent>
+                <ScreenReaderContent>{I18n.t('Associated Tool Domains')}</ScreenReaderContent>
               }
             >
               <thead>
