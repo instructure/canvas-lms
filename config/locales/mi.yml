@@ -1339,7 +1339,7 @@ mi:
         login_handle_name: "Tapanga takiuru"
         message: Karere
         mfa_settings: "Motuhēhēnga Maha-tauwehe"
-        mobile_qr_login_is_enabled: "Tukua ngā whakauru ki te taupānga haerere ma te whakamahi ngā QR Waehere"
+        mobile_qr_login_is_enabled: "Tukua ngā whakauru ki te taupānga haerere ma te whakamahi ngā QR Waehere"
         name: "Pūkete Ingoa"
         new_sub_account_includes: "Kia iti-pūkete whakamahi te ētita Kaupapa ki te whakarite i to ratou ake waitohu"
         no_enrollments_can_create_courses: "Kaiwhakahaere kaore he whwkaurunga"
@@ -2063,6 +2063,7 @@ mi:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Ka whakāetia te kaiako/kaitātai/ngā mahi a te TA ki te uru te Chat taputapu."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Ka whakāetia te kaiako/ ngā mahi a te TA ki te uru i te Tae Mai taputapu."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Ka whakāetia te kaiako, ngā mahi a te TA ki te uru i te Tae Mai taputapu."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Tukua ngā kaiako ki te hunga akoranga wāhanga mai i ngā ākonga i runga i te whārangi Tāngata i te wā nui atu i te kotahi te wāhanga i roto i te akoranga."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Āhei ai te kaiako ki te tohu raraunga kōeke ki te kia kaweake i roto i te nuinga ki whakaurunga tātai."
   allows_teachers_to_specify_post_policies_for_this__9b9433ef: |-
       Ka tukuna nga kaiako ki te whakairi motuhake kaupapa mo tēnei akoranga mo ngā whakataunga motuhake rānei, hei whakahohe ngā kōeke ki te
@@ -4756,6 +4757,7 @@ mi:
         login_expiration_minimum: "Ko te wāhanga paunga 20 meneti nui rānei"
         need_integer: "Tēnā koa whakauru he tau tōpū mo te keteroki rārangi tākaro"
         stream_name_required: "Ko te ingoa awa kinesis hiahiatia te."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: "canvas_account_idcanvas akoranga id"
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas Matāra Koreingoa Kōrero: %{assignment_title}, Ākonga (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas Matāra Koreingoa Kōrero: Ākonga (%{author_id}) mō %{assignment_title}, Ākonga(%{user_id}), %{course_name}."
@@ -7115,6 +7117,7 @@ mi:
         grading_standard_enabled: "Whakahohe kaupapa kōeke akoranga"
         hide_distribution_graphs: "Kauwhata tohatoha Huna kōeke i ngā ākonga"
         hide_final_grades: "Huna ngā tapeke i roto i ngā kōeke ākonga whakarāpopototanga"
+        hide_sections_on_course_users_page: "Hunga ngā wāhanga i runga i te Tāngata whārangi mai i ngā ākonga"
         home_page_announcement_limit: "Te nama o ngā pānuitanga whakāturia i runga i te whārangi kainga"
         image: Āhua
         indexed: "Whakaurua tēnei akoranga i roto i te taupū akoranga tūmatanui"
@@ -8852,6 +8855,7 @@ mi:
   enable_new_gradebook_history_page_e0fd9d02: "Whakahohe Hou PukaKōeke Hītori whārangi"
   enable_new_sis_integration_settings_ab6780a4: "Whakahohea ngā SIS tautuhinga kōmitimiti hou"
   enable_notifications_10a4bf44: "Whakahohea ngā Whakamōhiotanga"
+  enable_notifications_for_contextname_b5b4440e: "WHakahohea ngā Whakamōhiotanga mō %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "Whakahohea \"OR\" Herenga mō Kōwae"
   enable_recording_for_this_conference_b8adff6: "Whakahohe ōrongo mō tēnei huinga"
   enable_reregistration_for_lti_2_b2a10444: "Whakahohe rēhitatanga re mo LTI 2"
@@ -11538,6 +11542,7 @@ mi:
   hide_correct_answers_at_2421b0aa: "Huna whakautu tika i"
   hide_correct_answers_at_b1a59408: "Huna whakautu tika I"
   hide_course_sections_for_course_name_bd1911af: "Hunga ngā akoranga wāhanga mō ia akoranga %{name}"
+  hide_course_sections_from_students_b7850d64: "Hunga Akoranga Wāhanga mai i ngā Ākonga"
   hide_courses_menu_1b8ca649: "Huna te tahua akoranga"
   hide_courses_navigation_menu_6f7c4cfd: "Huna Ngā Akoranga Whakatere Tāhua"
   hide_courses_without_enrollments_6df4dfad: "Huna akoranga kahore whakaurunga"
@@ -11559,7 +11564,7 @@ mi:
   hide_students_with_no_results_6a22f991: "Hunga ngā ākonga kaore ngā hua"
   hide_sub_accounts_for_account_name_a6de98bd: "Hunga Iti-Pūkete mō %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Huna te Kawemai ngā Putanga Ako pātene i runga i ngā whakātanga a te kaiwhakamahi"
-  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "E hunga ana ētahi ākonga me ngā wāhanga i roto i te LMGB mehemea te kaiako anake kei te whakauru i te wāhanga"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "E hunga ana ētahi ākonga me ngā wāhanga i roto i te LMGB mehemea te kaiako anake kei te whakauru i te wāhanga"
   hiding_grades_82691e44: "E huna ana i ngā kōeke"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Kaore i whakāetia te huna i ngā kōeke ngā te mea kaore anō i tukuna ngā kōeke mo tēnei tāpaetanga"
   hiding_grades_is_not_allowed_because_no_grades_hav_6f52fcf6: "Kaore e whakāetia te huna i ngā kōeke ngā te mea kaore ngā kōeke i whakairia mo tēnei whakataunga"
@@ -19594,7 +19599,7 @@ mi:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Rāhui i nga ākonga i te whakauru ai nga akoranga i mua i te rā tīmatanga"
   restrict_students_from_annotating_6c28ab9b: "Aukati ngā ākonga i te tuhi kōrero"
   restricted_access_d3e99a39: "uru rāhui"
-  restricted_view_for_teachers_in_lmgb_52c78a62: "Tirohanga aukatia mo ngā kaiako i roto i LMGB"
+  restricted_view_for_teachers_in_lmgb_52c78a62: "Tirohanga aukatia mo ngā kaiako i roto i LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "tāpaetanga anō ki te taputapu e hoahoa ana mo te tātai i te wāhi."
   resubmit_to_tool_name_1cf02a31: "Tuku anō ki %{tool_name}"
   resubmitted_2080646f: "Tuku anō"
