@@ -26,6 +26,7 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   validate :associated_with_course_or_root_account, if: :active?
 
+  before_save :set_root_account_id
   after_save :recompute_course_scores, if: :weighted_actually_changed?
   after_save :recache_grading_period, if: :saved_change_to_course_id?
   after_destroy :cleanup_associations_and_recompute_scores_later
@@ -152,5 +153,9 @@ class GradingPeriodGroup < ActiveRecord::Base
     scope.find_ids_in_ranges(batch_size: 1000) do |min_id, max_id|
       scope.where(id: min_id..max_id).update_all(updates.reverse_merge({ updated_at: Time.zone.now }))
     end
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= account_id || course&.root_account_id
   end
 end

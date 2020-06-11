@@ -533,4 +533,29 @@ describe GradingPeriodGroup do
       @grading_period_set.update!(title: 'The Best Set')
     end
   end
+
+  describe "root_account_id" do
+    before(:once) do
+      @account = Account.create!
+    end
+
+    context "when grading period group is a legacy one" do
+      before(:once) do
+        @course = @account.courses.create!
+        @set = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+        @set.save!
+      end
+
+      it "sets the root_account_id to the course's root account id" do
+        expect(@set.root_account_id).to be @account.id
+      end
+    end
+
+    context "when grading period group belongs to an account" do
+      it "sets the root_account_id to the root_account's id" do
+        grading_period_set = @account.grading_period_groups.create!(valid_attributes)
+        expect(grading_period_set.root_account_id).to be @account.id
+      end
+    end
+  end
 end
