@@ -120,7 +120,7 @@ describe Lti::Messages::DeepLinkingRequest do
       let(:opts) {{resource_type: 'homework_submission'}}
 
       it 'sets the correct "accept_types"' do
-        expect(subject['accept_types']).to match_array %w(file)
+        expect(subject['accept_types']).to match_array %w(file ltiResourceLink)
       end
 
       it 'sets the correct "accept_presentation_document_targets"' do
