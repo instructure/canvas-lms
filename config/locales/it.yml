@@ -1915,6 +1915,7 @@ it:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Consente ai ruoli di insegnante/progettista/assistente di accedere allo strumento Chat."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Consente ai ruoli di insegnante/assistente di accedere allo strumento Frequenza."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Consente ai ruoli di insegnante, assistente di accedere allo strumento Frequenza."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Permetti ai docenti di nascondere le sezioni dei corsi dagli studenti sulla pagina Persone, se nel corso c’è più di una sezione."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Consente agli insegnanti di contrassegnare i dati dei voti da esportare in blocco nelle integrazioni SIS."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Consente agli insegnanti di specificare le politiche di pubblicazione per questo corso o i compiti specifici, consentendo di pubblicare e nascondere manualmente
@@ -4376,6 +4377,7 @@ it:
         login_expiration_minimum: "La scadenza delle sessioni deve essere 20 minuti o valore superiore"
         need_integer: "Inserisci un numero intero per la cache della playlist"
         stream_name_required: "Il nome dello stream Kinesis è obbligatorio."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Avviso Canvas - Commento anonimo: %{assignment_title}, Studente (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Avviso Canvas - Commento anonimo: Studente (%{author_id}) per %{assignment_title}, Studente (%{user_id}), %{course_name}."
@@ -6470,6 +6472,7 @@ it:
         grading_standard_enabled: "Abilita schema di valutazione corso"
         hide_distribution_graphs: "Nascondi i grafici di distribuzione dei voti agli studenti"
         hide_final_grades: "Nascondi i totali nel riepilogo dei voti degli studenti"
+        hide_sections_on_course_users_page: "Nascondi le sezioni dagli studenti sulla pagina Persone"
         home_page_announcement_limit: "Numero di annunci mostrati nella home page"
         image: Immagine
         indexed: "Includi questo corso nell'indice dei corsi pubblico"
@@ -8049,6 +8052,7 @@ it:
   enable_moderated_grading_only_relevant_if_the_anon_1dcdc47b: "Abilitare valutazione moderata. Rilevante solo se il contrassegno Valutazione anonima moderata è abilitato."
   enable_new_sis_integration_settings_ab6780a4: "Abilita nuove impostazioni integrazione SIS"
   enable_notifications_10a4bf44: "Abilita notifiche"
+  enable_notifications_for_contextname_b5b4440e: "Abilita notifiche per %{contextName}"
   enable_recording_for_this_conference_b8adff6: "Abilita la registrazione per questa conferenza"
   enable_reregistration_for_lti_2_b2a10444: "Abilita nuova registrazione per LTI 2"
   enable_scope_ac28b832: "Abilita ambito"
@@ -10074,6 +10078,7 @@ it:
   hide_correct_answers_at_2421b0aa: "Nascondi risposte corrette in"
   hide_correct_answers_at_b1a59408: "Nascondi risposte corrette in"
   hide_course_sections_for_course_name_bd1911af: "Nascondi sezioni corso per il corso %{name}"
+  hide_course_sections_from_students_b7850d64: "Nascondi le sezioni del corso dagli Studenti"
   hide_courses_navigation_menu_6f7c4cfd: "Nascondi menu di navigazione corsi"
   hide_courses_without_enrollments_6df4dfad: "Nascondi corsi senza iscrizioni"
   hide_courses_without_students_fc6fc7a0: "Nascondi corsi senza studenti"
