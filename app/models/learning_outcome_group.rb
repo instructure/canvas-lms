@@ -208,13 +208,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   def set_root_account_id
     return if self.root_account_id.present?
-
-    case self.context
-    when Account
-      self.root_account_id = self.context.resolved_root_account_id
-    when Course
-      self.root_account_id = self.context.root_account_id
-    end
+    self.root_account_id = self.context&.resolved_root_account_id
   end
 
   private

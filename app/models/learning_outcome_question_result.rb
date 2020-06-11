@@ -20,6 +20,7 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
   belongs_to :learning_outcome_result
   belongs_to :learning_outcome
   belongs_to :associated_asset, polymorphic: [:assessment_question]
+  belongs_to :root_account, class_name: 'Account'
 
   simply_versioned
 
@@ -30,6 +31,7 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
   delegate :hide_points, to: :learning_outcome_result
 
   before_save :infer_defaults
+  before_save :set_root_account_id
 
   def infer_defaults
     self.original_score ||= self.score
@@ -37,6 +39,11 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
     self.original_mastery = self.mastery if self.original_mastery.nil?
     calculate_percent!
     true
+  end
+
+  def set_root_account_id
+    return if self.root_account_id.present?
+    self.root_account_id = self.learning_outcome_result.root_account_id
   end
 
   def calculate_percent!
