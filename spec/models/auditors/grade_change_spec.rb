@@ -78,6 +78,11 @@ describe Auditors::GradeChange do
     end
 
     context "nominal cases" do
+      it "has its attributes accessible as methods" do
+        expect(@event.assignment_id).to eq(@submission.assignment_id)
+        expect(@event.submission_id).to eq(@submission.id)
+      end
+
       it "should include event" do
         expect(@event.created_at).to eq @event_time
         expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
