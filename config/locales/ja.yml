@@ -2065,6 +2065,7 @@ ja:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: 講師/デザイナー/TAベースの役割がチャットツールにアクセスできるようにします。
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: 講師/TAベースの役割が出席ツールにアクセスできるようにします。
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: 講師、TAベースの役割が出席ツールにアクセスできるようにします。
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "コースに複数のセクションがある場合、講師は[人々]のページでコースセクションを受講生に表示しないようにすることができます。"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: 講師は、一括でSISの統合へエクスポートするため、グレードデータをつけることができます。
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       講師がこのコースまたは特定の課題に対する投稿方針を指定できるようにして、成績を
@@ -4762,6 +4763,7 @@ ja:
         login_expiration_minimum: "セッションの有効期間は 20 分以上にする必要があります"
         need_integer: "プレイ リスト キャッシュの整数を入力してください"
         stream_name_required: キネシス·ストリーム名が必要です。
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas アラート - 匿名コメント：%{assignment_title}、受講生 (%{user_id})、%{course_name}。"
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas アラート - 匿名コメント：受講生 (%{author_id}) の%{assignment_title}への、受講生 (%{user_id})、%{course_name}。"
@@ -7142,6 +7144,7 @@ ja:
         grading_standard_enabled: コースの採点スキームを有効にする
         hide_distribution_graphs: 採点分布グラフを受講生に表示しない
         hide_final_grades: 受講生の成績概要で合計を非表示にする
+        hide_sections_on_course_users_page: "[受講生]のページのセクションを受講生に表示しない"
         home_page_announcement_limit: ホームページに掲載されたアナウンス数
         image: 画像
         indexed: "このコースを公開コース インデックスに含める"
@@ -8894,6 +8897,7 @@ ja:
   enable_new_gradebook_history_page_e0fd9d02: 新しい成績表の履歴ページを有効にする。
   enable_new_sis_integration_settings_ab6780a4: "新規 SIS 統合設定を有効化する"
   enable_notifications_10a4bf44: 通知を有効にする
+  enable_notifications_for_contextname_b5b4440e: "%{contextName}の通知を有効にする"
   enable_or_condition_for_modules_a16f02d8: モジュールを有効"または"調整する
   enable_recording_for_this_conference_b8adff6: この会議は録音可能です
   enable_reregistration_for_lti_2_b2a10444: LTI2の登録を有効にする
@@ -11596,6 +11600,7 @@ ja:
   hide_correct_answers_at_2421b0aa: 正解を非表示にする
   hide_correct_answers_at_b1a59408: 正解を非表示にする
   hide_course_sections_for_course_name_bd1911af: "コース用コースセクションを非表示にする%{name}"
+  hide_course_sections_from_students_b7850d64: コースセクションを受講生に表示しない
   hide_courses_menu_1b8ca649: コースメニューを非表示にする
   hide_courses_navigation_menu_6f7c4cfd: コースナビゲーションメニューを非表示にする
   hide_courses_without_enrollments_6df4dfad: 登録者のいないコースを非表示にする
