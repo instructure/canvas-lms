@@ -2253,11 +2253,29 @@ class ApplicationController < ActionController::Base
   def js_bundle(*args)
     opts = (args.last.is_a?(Hash) ? args.pop : {})
     Array(args).flatten.each do |bundle|
-      js_bundles << [bundle, opts[:plugin]] unless js_bundles.include? [bundle, opts[:plugin]]
+      js_bundles << [bundle, opts[:plugin], false] unless js_bundles.include? [bundle, opts[:plugin], false]
     end
     nil
   end
   helper_method :js_bundle
+
+  # Like #js_bundle but delay the execution (not necessarily the loading) of the
+  # JS until the DOM is ready. Equivalent to doing:
+  #
+  #     $(document).ready(() => { import('path/to/bundles/profile.js') })
+  #
+  # This is useful when you suspect that the rendering of ERB/HTML can take a
+  # long enough time for the JS to execute before it's done. For example, when
+  # a page would contain a ton of DOM elements to represent DB records without
+  # pagination as seen in USERS-369.
+  def deferred_js_bundle(*args)
+    opts = (args.last.is_a?(Hash) ? args.pop : {})
+    Array(args).flatten.each do |bundle|
+      js_bundles << [bundle, opts[:plugin], true] unless js_bundles.include? [bundle, opts[:plugin], true]
+    end
+    nil
+  end
+  helper_method :deferred_js_bundle
 
   def add_body_class(*args)
     @body_classes ||= []
