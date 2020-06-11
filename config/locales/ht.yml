@@ -1980,6 +1980,7 @@ ht:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Pèmèt pwofesè/wòl ki baze sou AP gen aksè a zouti Konvèsasyon an."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Pèmèt pwofesè/wòl ki baze sou AP gen aksè a zouti Prezans lan."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Pèmèt pwofesè/wòl ki baze sou AP gen aksè a zouti Prezans lan."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Pèmèt pwofesè yo kache seksyon kou yo pou elèv yo sou paj Kontak la kote pa gen plis pase yon seksyon nan kou a."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Pèmèt pwofesè yo make done de kategori yo pou ekspòte yo an vrak nan entegrasyon SIS."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Pèmèt pwofesè yo presize politik afichaj pou kou sa a oswa devwa espesyal yo ki pèmèt nòt yo
@@ -4502,6 +4503,7 @@ ht:
         login_expiration_minimum: "Ekspirasyon sesyon an dwe 20 minit pou pi piti"
         need_integer: "Tanpri antre yon antye pou kache playlist la"
         stream_name_required: "Non kinesis stream nan obligatwa."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas Alert - Kòmantè Anonim: %{assignment_title}, Elèv (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas Alert - Kòmantè Anonim: Elèv (%{author_id}) pou %{assignment_title}, Elèv (%{user_id}), %{course_name}."
@@ -6724,6 +6726,7 @@ ht:
         grading_standard_enabled: "Aktive sistèm notasyon kou"
         hide_distribution_graphs: "Kache graf distribisyon nòt yo pou elèv yo"
         hide_final_grades: "Kache total yo nan rezime nòt elèv la"
+        hide_sections_on_course_users_page: "Kache seksyon yo nan paj Kontak la pou elèv yo"
         home_page_announcement_limit: "Kantite anons ki afiche nan paj dakèy la"
         image: Imaj
         indexed: "Enkli kou sa a nan endis kou piblik la"
@@ -8351,6 +8354,7 @@ ht:
   enable_new_gradebook_history_page_e0fd9d02: "Aktive Nouvo Paj Istoryal Gradebook"
   enable_new_sis_integration_settings_ab6780a4: "Aktive nouvo paramèt entegrasyon SIS yo"
   enable_notifications_10a4bf44: "Aktive Notifikasyon"
+  enable_notifications_for_contextname_b5b4440e: "Aktive Notifikasyon yo pou %{contextName}"
   enable_recording_for_this_conference_b8adff6: "Aktive anrejistreman pou konferans sa a"
   enable_reregistration_for_lti_2_b2a10444: "Pèmèt re enskripsyon pou LTI 2"
   enable_scope_ac28b832: "Aktive espas"
@@ -10522,6 +10526,7 @@ ht:
   hide_correct_answers_at_2421b0aa: "Kache Bon Repons yo nan"
   hide_correct_answers_at_b1a59408: "Kache Bon Repons yo Nan"
   hide_course_sections_for_course_name_bd1911af: "Kache seksyon kou yo pou kou %{name}"
+  hide_course_sections_from_students_b7850d64: "Kache Seksyon Kou yo pou Elèv yo"
   hide_courses_menu_1b8ca649: "Kache meni kou"
   hide_courses_navigation_menu_6f7c4cfd: "Kache Meni Navigasyon Kou"
   hide_courses_without_enrollments_6df4dfad: "Kache kou san enskripsyon yo"
