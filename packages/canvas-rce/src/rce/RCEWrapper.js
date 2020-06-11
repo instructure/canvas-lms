@@ -41,7 +41,6 @@ import KeyboardShortcutModal from './KeyboardShortcutModal'
 import AlertMessageArea from './AlertMessageArea'
 import alertHandler from './alertHandler'
 import {isFileLink, isImageEmbed} from './plugins/shared/ContentSelection'
-import {defaultImageSize} from './plugins/instructure_image/ImageEmbedOptions'
 import {
   VIDEO_SIZE_DEFAULT,
   AUDIO_PLAYER_SIZE
@@ -379,12 +378,11 @@ class RCEWrapper extends React.Component {
       image.src = fileMetaProps.domObject.preview
       width = image.width
       height = image.height
-      if (width > defaultImageSize && image.width > image.height) {
-        width = defaultImageSize
-        height = (image.height * width) / image.width
-      } else if (height > defaultImageSize) {
-        height = defaultImageSize
-        width = (image.width * height) / image.height
+      // we constrain the <img> to max-width: 100%, so scale the size down if necessary
+      const maxWidth = this.iframe.contentDocument.body.clientWidth
+      if (width > maxWidth) {
+        height = Math.round((maxWidth / width) * height)
+        width = maxWidth
       }
       width = `${width}px`
       height = `${height}px`

@@ -31,7 +31,6 @@ export const CUSTOM = 'custom'
 
 export const imageSizes = [SMALL, MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
 export const videoSizes = [MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
-export const defaultImageSize = 320
 
 const sizeByMaximumDimension = {
   200: SMALL,

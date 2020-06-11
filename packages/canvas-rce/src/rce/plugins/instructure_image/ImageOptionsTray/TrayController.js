@@ -74,13 +74,6 @@ export default class TrayController {
         'data-is-decorative': null // replaced by role=presentation
       })
 
-      // when the image was first added to the rce, we applied
-      // max-width and max-height. Remove them from the style now
-      editor.dom.setStyles($img, {
-        'max-height': '',
-        'max-width': ''
-      })
-
       // tell tinymce so the context toolbar resets
       editor.fire('ObjectResized', {
         target: $img,

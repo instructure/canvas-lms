@@ -26,7 +26,6 @@ import {
   mediaIframeSrcFromFile
 } from './contentRendering'
 import scroll from '../common/scroll'
-import {defaultImageSize} from './plugins/instructure_image/ImageEmbedOptions'
 import {cleanUrl} from './contentInsertionUtils'
 
 /** * generic content insertion ** */
@@ -100,8 +99,7 @@ export function insertImage(editor, image) {
   } else {
     // render the image, constraining its size on insertion
     content = renderImage({
-      ...image,
-      style: {maxWidth: `${defaultImageSize}px`, maxHeight: `${defaultImageSize}px`}
+      ...image
     })
   }
   return insertContent(editor, content)
