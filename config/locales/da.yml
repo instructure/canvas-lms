@@ -2063,6 +2063,7 @@ da:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gør det muligt for roller, der er baseret på lærer/designer/undervisningsassistent, at få adgang til værktøjet Chat."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Gør det muligt for roller, der er baseret på lærer/undervisningsassistent, at få adgang til værktøjet Tilstedeværelse."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Gør det muligt for roller, der er baseret på lærer eller undervisningsassistent, at få adgang til værktøjet Tilstedeværelse."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Lader lærere skjule fagsektioner for studerende på siden Deltagere, når der er mere end en sektion i faget."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Giver underviserne mulighed for at markere karakteroplysninger, som skal eksporteres i bulk til SIS-integrationer."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Lader lærere angive politikker for indlæg for dette fag eller specifikke opgaver, hvilket gør det muligt at få karakterer
@@ -4757,6 +4758,7 @@ da:
         login_expiration_minimum: "Sessionens udløb skal være 20 minutter eller større"
         need_integer: "Indtast et heltal for afspilningslistens cache"
         stream_name_required: "Kinesis Stream-navn er påkrævet."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas-varsling - Anonym kommentar: %{assignment_title}, studerende (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas-varsling - Anonym kommentar: Studerende (%{author_id}) til %{assignment_title}, studerende (%{user_id}), %{course_name}."
@@ -7141,6 +7143,7 @@ da:
         grading_standard_enabled: "Aktiver fagets karakterordning"
         hide_distribution_graphs: "Skjul grafer over karakterfordeling for studerende"
         hide_final_grades: "Skjul samlet antal i de studerendes karakteroversigt"
+        hide_sections_on_course_users_page: "Skjul sektioner for studerende på Deltager-siden"
         home_page_announcement_limit: "Antal beskeder vist på hjemmesiden"
         image: Billede
         indexed: "Inkluder dette fag i det offentlige fagindeks"
@@ -8894,6 +8897,7 @@ da:
   enable_new_gradebook_history_page_e0fd9d02: "Aktiver ny karakteroversigt oversigts-side."
   enable_new_sis_integration_settings_ab6780a4: "Aktivér nye SIS-integration indstillinger"
   enable_notifications_10a4bf44: "Aktiver meddelelser"
+  enable_notifications_for_contextname_b5b4440e: "Aktiver meddelelser for %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "Aktiver \"ELLER\" betingelse for moduler"
   enable_recording_for_this_conference_b8adff6: "Aktivér optagelse af denne konference"
   enable_reregistration_for_lti_2_b2a10444: "Aktiver registrering til LTI 2 igen"
@@ -11602,6 +11606,7 @@ da:
   hide_correct_answers_at_2421b0aa: "Skjul korrekte svar ved"
   hide_correct_answers_at_b1a59408: "Skjul korrekte svar ved"
   hide_course_sections_for_course_name_bd1911af: "Skjul fag-sektioner for fag %{name}"
+  hide_course_sections_from_students_b7850d64: "Skjul fagsektioner for studerende"
   hide_courses_menu_1b8ca649: "Skjul menu med fag"
   hide_courses_navigation_menu_6f7c4cfd: "Skjul fag-navigationsmenu"
   hide_courses_without_enrollments_6df4dfad: "Skjul fag med tilmeldinger"
