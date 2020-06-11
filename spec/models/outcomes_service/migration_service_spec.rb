@@ -17,7 +17,6 @@
 #
 
 require_relative '../../spec_helper'
-require_relative '../../sharding_spec_helper'
 require 'webmock/rspec'
 
 describe OutcomesService::MigrationService do
@@ -212,7 +211,10 @@ describe OutcomesService::MigrationService do
               context_type: 'course',
               context_id: course.id.to_s,
               external_migration_id: content_migration.id,
-              data: 'stuff'
+              data: 'stuff',
+              outcomes: be_an_instance_of(Array),
+              edges: be_an_instance_of(Array),
+              groups: be_an_instance_of(Array)
             },
             headers: {
               Authorization: /\+*/
