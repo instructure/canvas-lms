@@ -2037,6 +2037,7 @@ de:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Erlaubt lehrer-/designer- und TA-basierten Rollen den Zugriff auf das Chat-Tool."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Erlaubt lehrer- und TA-basierten Rollen den Zugriff auf das Anwesenheits-Tool."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Erlaubt lehrer- und TA-basierten Rollen den Zugriff auf das Anwesenheits-Tool."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Ermöglicht es Lehrern, Kursabschnitte vor den Studenten auf der Teilnehmerseite auszublenden, wenn es mehr als einen Abschnitt im Kurs gibt."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Dozenten erlauben, Notendaten für Export in großen Mengen an SIS zu markieren"
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Ermöglicht den Dozenten, geben Post-Richtlinien für diesen Kurs oder spezifische Aufgaben festzulegen, sodass es möglich ist, Noten
@@ -4726,6 +4727,7 @@ de:
         login_expiration_minimum: "Das Sitzungs-Timeout muss 20 Minuten oder mehr betragen."
         need_integer: "Geben Sie eine Ganzzahl für den Wiedergabelisten-Cache ein."
         stream_name_required: "Der Kinesis-Streamname ist erforderlich."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas-Warnung – Anonymer Kommentar: %{assignment_title}, Student (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas-Warnung – Anonymer Kommentar: Student (%{author_id}) für Aufgabe %{assignment_title}, Student (%{user_id}), %{course_name}."
@@ -7099,6 +7101,7 @@ de:
         grading_standard_enabled: "Kursbenotungssystem aktivieren"
         hide_distribution_graphs: "Notenverteilungsdiagramme für Studenten ausblenden"
         hide_final_grades: "Gesamtnoten in der Zusammenfassung der Studentenbenotung ausblenden"
+        hide_sections_on_course_users_page: "Ausblenden von Abschnitten auf der Teilnehmerseite vor Studenten"
         home_page_announcement_limit: "Anzahl der Ankündigungen auf der Homepage"
         image: Bild
         indexed: "Diesen Kurs in das öffentliche Kursverzeichnis aufnehmen"
@@ -8850,6 +8853,7 @@ de:
   enable_multiple_grading_periods: "Mehrere Benotungsperioden erlauben Lehrern und Administratoren, Benotungsperioden mit festgesetzten Stichtagen zu erstellen. Aufgaben können im Kursbuch nach diesen Benotungsperioden gefiltert werden."
   enable_new_sis_integration_settings_ab6780a4: "Neue SIS-Integrationseinstellungen aktivieren"
   enable_notifications_10a4bf44: "Benachrichtigungen aktivieren"
+  enable_notifications_for_contextname_b5b4440e: "Benachrichtigungen für %{contextName} aktivieren"
   enable_or_condition_for_modules_a16f02d8: "\"ODER\"-Bedingung für Module ermöglichen"
   enable_recording_for_this_conference_b8adff6: "Aufzeichnung für diese Konferenz aktivieren"
   enable_reregistration_for_lti_2_b2a10444: "Erneute Registrierung für LTI 2 aktivieren"
@@ -11540,6 +11544,7 @@ de:
   hide_correct_answers_at_2421b0aa: "Richtige Antworten ausblenden bei"
   hide_correct_answers_at_b1a59408: "Richtige Antworten ausblenden bei"
   hide_course_sections_for_course_name_bd1911af: "Kursabschnitte für Kurs %{name} ausblenden"
+  hide_course_sections_from_students_b7850d64: "Kursabschnitte vor Studenten ausblenden"
   hide_courses_menu_1b8ca649: "Kursmenü ausblenden"
   hide_courses_navigation_menu_6f7c4cfd: "Kurs-Navigationsmenü ausblenden"
   hide_courses_without_enrollments_6df4dfad: "Kurse ohne Einschreibungen ausblenden"
