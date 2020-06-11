@@ -1969,6 +1969,7 @@ is:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gerir kennara/hönnuði/aðstoðarkennara kleift að fá aðgang að spjalli."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Gerir kennara/aðstoðarkennara kleift að fá aðgang að mætingu."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Gerir kennara, aðstoðarkennara kleift að fá aðgang að mætingu."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Gerir kennurum kleift að fela námskeiðarhluta fyrir nemendum á síðunni Fólk þegar það eru fleiri en einn hluti á námskeiðinu."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Heimilar kennurum að merkja matsgögn til magnútflutnings í SIS samþættingu"
   allows_teachers_to_specify_post_policies_for_this__9b9433ef: |-
       Gerir kennurum kleift að skilgreina birtingarstefnur fyrir þetta námskeið eða sérstök verkefni, sem gerir mögulegt að
@@ -4456,6 +4457,7 @@ is:
         login_expiration_minimum: "Stundin þarf að vera 20 mínútur eða lengri"
         need_integer: "Skráðu heila tölu fyrir spilunarlistann í skyndiminni"
         stream_name_required: "Nefna þarf Kinesis-streymið."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas viðvörun - nafnlaus athugasemd: %{assignment_title}, Nemandi (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas viðvörun - nafnlaus athugasemd: Nemandi (%{author_id}) fyrir %{assignment_title}, Nemandi (%{user_id}), %{course_name}."
@@ -6563,6 +6565,7 @@ is:
         grading_standard_enabled: "Heimila einkunnakvarða námskeiðs"
         hide_distribution_graphs: "Fela myndræna einkunnadreifingu fyrir nemendum"
         hide_final_grades: "Fela heildartölur í einkunnasamantekt nemenda"
+        hide_sections_on_course_users_page: "Felur hluta á síðunni Fólk fyrir nemendum"
         home_page_announcement_limit: "Fjöldi tilkynninga sýndar á heimasíðu"
         image: Mynd
         indexed: "Hafa námskeiðið með í opinbera námskeiðavísinum"
@@ -8142,6 +8145,7 @@ is:
   enable_new_gradebook_history_page_e0fd9d02: "Heimila ferilsíðu í nýrri einkunnabók."
   enable_new_sis_integration_settings_ab6780a4: "Heimila nýjar SIS samþættingarstillingar"
   enable_notifications_10a4bf44: "Virkja tilkynningar"
+  enable_notifications_for_contextname_b5b4440e: "Virkja tilkynningar fyrir %{contextName}"
   enable_recording_for_this_conference_b8adff6: "Heimila upptöku á ráðstefnunni"
   enable_reregistration_for_lti_2_b2a10444: "Heimila endurskráningu fyrir LTI 2"
   enable_scope_ac28b832: "Virkja umfang"
@@ -10195,6 +10199,7 @@ is:
   hide_correct_answers_at_2421b0aa: "Fela rétt svör á"
   hide_correct_answers_at_b1a59408: "Fela rétt svör á"
   hide_course_sections_for_course_name_bd1911af: "Fela hluta námskeiðs fyrir námskeiðið %{name}"
+  hide_course_sections_from_students_b7850d64: "Fela námskeiðarhluta fyrir nemendum"
   hide_courses_navigation_menu_6f7c4cfd: "Fela leiðarstýringarvalmynd námskeiða"
   hide_courses_without_enrollments_6df4dfad: "Fela námskeið án innritana"
   hide_courses_without_students_fc6fc7a0: "Fela námskeið án nemenda"
