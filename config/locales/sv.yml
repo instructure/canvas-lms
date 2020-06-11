@@ -2068,6 +2068,7 @@ sv:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gör det möjligt för lärar-/designer-/lärarassistentbaserade roller att komma åt chattverktyget."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Gör det möjligt för lärar-/lärarassistentbaserade roller att komma åt närvaroverktyget."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Ger lärare och TA-baserade roller åtkomst till närvaroverktyget."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Ger lärare möjlighet att dölja kurssektioner från studenter på sidan Personer när det finns mer än en sektion i kursen."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Gör att lärare kan markera omdömesdata för massexport till SIS-integrationer."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Gör att lärare kan ange publiceringspolicyer för den här kursen eller för specifika uppgifter, så att omdömen kan
@@ -4770,6 +4771,7 @@ sv:
         login_expiration_minimum: "Sessionens sluttid måste vara pm minst 20 minuter"
         need_integer: "Ange ett heltal för spellistans cache"
         stream_name_required: "Namn på kinesis-ström är obligatoriskt."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas-notis – anonym kommentar: %{assignment_title}, Student (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas-notis – anonym kommentar: Studenten (%{author_id}) för %{assignment_title}, student (%{user_id}), %{course_name}."
@@ -7158,6 +7160,7 @@ sv:
         grading_standard_enabled: "Aktivera kursens bedömningsschema"
         hide_distribution_graphs: "Dölj bedömningsfördelningsdiagram för studenterna"
         hide_final_grades: "Dölj slutpoäng i studentens bedömningssammanfattning"
+        hide_sections_on_course_users_page: "Dölj sektioner för studenter på sidan Personer"
         home_page_announcement_limit: "Antal anslag som visas på startsidan"
         image: Bild
         indexed: "Inkludera den här kursen i offentligt kursindex"
@@ -8913,6 +8916,7 @@ sv:
   enable_new_gradebook_history_page_e0fd9d02: "Aktivera ny sida för betygshistorik"
   enable_new_sis_integration_settings_ab6780a4: "Aktivera nya SIS integreringsinställningar"
   enable_notifications_10a4bf44: "Aktivera aviseringar"
+  enable_notifications_for_contextname_b5b4440e: "Aktivera aviseringar för %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "Aktivera \"ELLER\" skick för moduler"
   enable_recording_for_this_conference_b8adff6: "Aktivera inspelning för den här konferensen"
   enable_reregistration_for_lti_2_b2a10444: "Aktivera omregistrering för LTI 2"
@@ -11619,6 +11623,7 @@ sv:
   hide_correct_answers_at_2421b0aa: "Dölj korrekta svar kl."
   hide_correct_answers_at_b1a59408: "Dölj korrekta svar kl."
   hide_course_sections_for_course_name_bd1911af: "Dölj kurssektioner för kursen %{name}"
+  hide_course_sections_from_students_b7850d64: "Dölj kurssektioner från studenter"
   hide_courses_menu_1b8ca649: "Dölj kursmeny"
   hide_courses_navigation_menu_6f7c4cfd: "Dölj kurs-navigeringsmeny"
   hide_courses_without_enrollments_6df4dfad: "Dölj kurser utan registreringar"
