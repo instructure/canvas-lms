@@ -2065,6 +2065,7 @@ zh-Hant:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: 允許以教師/設計者/助教為基礎的身份存取聊天工具。
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: 允許以教師/助教為基礎的身份存取出席記錄工具。
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: 允許以教師/助教為基礎的身份存取「出席記錄」工具。
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: 如果課程中有多於一個分班，則允許教師在成員頁面向學生隱藏課程分班。
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "允許教師標記成績資料，以供批量匯出到 SIS 集成。"
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       允許教師為此課程或特定作業指定發佈政策，讓成績可
@@ -4759,6 +4760,7 @@ zh-Hant:
         login_expiration_minimum: "會話有效期必須為 20 分鐘或更長"
         need_integer: 請為播放清單緩存輸入一個整數
         stream_name_required: Kinesis數據流名稱是必填項。
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas 提醒 – 匿名評論：%{assignment_title}，學生 (%{user_id})，%{course_name}。"
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas 提醒 – 匿名評論：%{assignment_title} 的學生 (%{author_id})，學生 (%{user_id})，%{course_name}。"
@@ -7146,6 +7148,7 @@ zh-Hant:
         grading_standard_enabled: 啟用課程評分方案
         hide_distribution_graphs: 隱藏成績分配圖，以使學生看不到
         hide_final_grades: 隱藏學生成績匯總總計
+        hide_sections_on_course_users_page: 在成員頁面向學生隱藏分班
         home_page_announcement_limit: 首頁顯示的通告數目
         image: 影像
         indexed: 將本課程包括在公共課程索引中
@@ -8897,6 +8900,7 @@ zh-Hant:
   enable_new_gradebook_history_page_e0fd9d02: 啟用新的成績單記錄頁面。
   enable_new_sis_integration_settings_ab6780a4: "啟用新的 SIS 集成設定"
   enable_notifications_10a4bf44: 啟用通知
+  enable_notifications_for_contextname_b5b4440e: "為 %{contextName} 啟用通知"
   enable_or_condition_for_modules_a16f02d8: "為模塊啓用\"或\"條件 "
   enable_recording_for_this_conference_b8adff6: 啟用針對此次會議的記錄
   enable_reregistration_for_lti_2_b2a10444: "啟用 LTI 2 再註冊"
@@ -11594,6 +11598,7 @@ zh-Hant:
   hide_correct_answers_at_2421b0aa: 隱藏正確答案於
   hide_correct_answers_at_b1a59408: 隱藏正確答案於
   hide_course_sections_for_course_name_bd1911af: "隱藏課程的所有課程班別%{name}"
+  hide_course_sections_from_students_b7850d64: 向學生隱藏課程分班
   hide_courses_menu_1b8ca649: 隱藏課程選項
   hide_courses_navigation_menu_6f7c4cfd: 隱藏課程導航工具選單
   hide_courses_without_enrollments_6df4dfad: 隱藏無人註冊的課程
