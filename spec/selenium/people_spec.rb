@@ -279,6 +279,7 @@ describe "people" do
       new_group_name = "new group edit name"
       create_student_group
       fj('.group-category-actions:visible a:visible').click
+      wait_for(method: nil, timeout: 2) { f('.edit-category').displayed? } # simple wait for option to be visible
       f('.edit-category').click
       edit_form = f('.group-category-edit')
       edit_form.find_element(:css, 'input[name="name"]').send_keys(new_group_name)
