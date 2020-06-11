@@ -121,9 +121,9 @@ test('renders no checkbox if selectable: false', () => {
   notOk(node.exists())
 })
 
-test('renders an avatar if showAvatar: true', () => {
+test('renders an accessible avatar if showAvatar: true', () => {
   const tree = mount(<CourseItemRow {...props} showAvatar />)
-  const node = tree.find('Avatar')
+  const node = tree.find('Avatar').find("img[alt='John Smith']")
   ok(node.exists())
 })
 
