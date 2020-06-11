@@ -2065,6 +2065,7 @@ es:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permite a quienes tengan roles basados en profesor/diseñador/profesor auxiliar acceder a la herramienta de Chat."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permite a quienes tengan roles basados en profesor/profesor auxiliar acceder a la herramienta de Asistencia."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Permite que los roles basados en profesor y profesor asistente accedan a la herramienta Asistencia."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Permite a los profesores ocultarles secciones del curso a los estudiantes en la página Personas cuando hay más de una sección en el curso."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permitir que los profesores marquen los datos de calificación para ser exportados en cantidad a las integraciones del SIS."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Permite a los profesores especificar las políticas de publicación para este curso o tareas específicas, y permite publicar las
@@ -4759,6 +4760,7 @@ es:
         login_expiration_minimum: "El vencimiento de la sesión debe producirse a los 20 minutos o más"
         need_integer: "Ingrese números enteros para la memoria de la lista de reproducción"
         stream_name_required: "El nombre del flujo de quinesis es requerido."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Alerta de Canvas: comentario anónimo: %{assignment_title}, Estudiante (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Alerta de Canvas: comentario anónimo: Estudiante (%{author_id}) para %{assignment_title}, estudiante (%{user_id}), %{course_name}."
@@ -7146,6 +7148,7 @@ es:
         grading_standard_enabled: "Activar el esquema de calificación para el curso"
         hide_distribution_graphs: "Ocultar las gráficas de distribución de calificaciones de los estudiantes"
         hide_final_grades: "Ocultar los totales en el resumen de calificaciones de los estudiantes"
+        hide_sections_on_course_users_page: "Ocultarles secciones de la página Personas a los estudiantes"
         home_page_announcement_limit: "Número de anuncios que se muestran en la página de inicio"
         image: Imagen
         indexed: "Incluir este curso en el índice público del curso"
@@ -8898,6 +8901,7 @@ es:
   enable_new_gradebook_history_page_e0fd9d02: "Habilitar nueva página en el Historial del Libro de calificaciones."
   enable_new_sis_integration_settings_ab6780a4: "Habilitar nuevas configuraciones de integración del SIS"
   enable_notifications_10a4bf44: "Activar notificaciones"
+  enable_notifications_for_contextname_b5b4440e: "Habilitar notificaciones para %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "Habilitar \"O\" Condiciones para Módulos"
   enable_recording_for_this_conference_b8adff6: "Habilitar la grabación para esta conferencia"
   enable_reregistration_for_lti_2_b2a10444: "Habilitar el proceso de registro nuevamente para LTI 2"
@@ -11598,6 +11602,7 @@ es:
   hide_correct_answers_at_2421b0aa: "Ocultar las respuestas correctas en"
   hide_correct_answers_at_b1a59408: "Ocultar las respuestas correctas en"
   hide_course_sections_for_course_name_bd1911af: "Ocultar las secciones del curso para el curso %{name}"
+  hide_course_sections_from_students_b7850d64: "Ocultarles las secciones del curso a los estudiantes"
   hide_courses_menu_1b8ca649: "Ocultar menú de los cursos"
   hide_courses_navigation_menu_6f7c4cfd: "Ocultar menú de navegación de cursos"
   hide_courses_without_enrollments_6df4dfad: "Esconder los cursos sin inscripciones"
