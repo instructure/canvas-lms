@@ -17,6 +17,7 @@
 #
 module Auditors::ActiveRecord
   class CourseRecord < ActiveRecord::Base
+    include Auditors::ActiveRecord::Attributes
     include CanvasPartman::Concerns::Partitioned
     self.partitioning_strategy = :by_date
     self.partitioning_interval = :months

@@ -41,8 +41,32 @@ module EventStream::IndexStrategy
       index_scope = index_scope.where("created_at >= ?", options[:oldest]) if options[:oldest].present?
       index_scope = index_scope.where("created_at <= ?", options[:newest]) if options[:newest].present?
       index_scope = index_scope.select(:id, :created_at) if options[:just_ids] == true
-      event_bookmarker = BookmarkedCollection::SimpleBookmarker.new(ar_type, :created_at)
-      BookmarkedCollection.wrap(event_bookmarker, index_scope)
+      event_bookmarker = EventStream::IndexStrategy::ActiveRecord::Bookmarker.new(ar_type)
+      bookmarked_collection = BookmarkedCollection.build(event_bookmarker) do |pager|
+        bookmark_scope = index_scope
+        if bookmark = pager.current_bookmark
+          bookmark_scope = bookmark_scope.where("created_at < ?", bookmark)
+        end
+        bookmark_scope = bookmark_scope.order("created_at DESC")
+        records = bookmark_scope.paginate(page: 1, per_page: pager.per_page)
+        pager.replace(records)
+        pager.has_more! if records.next_page
+        pager
+      end
+    end
+
+    class Bookmarker
+      def initialize(ar_type)
+        @ar_type = ar_type
+      end
+
+      def bookmark_for(object)
+        object.created_at
+      end
+
+      def validate(bookmark)
+        bookmark.is_a?(ActiveSupport::TimeWithZone)
+      end
     end
   end
 end
