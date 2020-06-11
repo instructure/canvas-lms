@@ -17,11 +17,14 @@
 #
 
 class OutcomeProficiencyRating < ApplicationRecord
+  extend RootAccountResolver
+
   belongs_to :outcome_proficiency, inverse_of: :outcome_proficiency_ratings
 
   validates :description, presence: true
   validates :points, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :color, presence: true, format: /\A([A-Fa-f0-9]{6})\z/i
+  resolves_root_account through: :outcome_proficiency
 
   def as_json(_options={})
     {}.tap do |h|
