@@ -795,7 +795,7 @@ class UsersController < ApplicationController
 
     # include concluded enrollments as well as active ones if requested
     include_concluded = params[:include].try(:include?, 'concluded')
-    limit = 500
+    limit = 100
     @query = params[:course].try(:[], :name) || params[:term]
     @courses = []
     Shard.with_each_shard(@context.in_region_associated_shards) do
@@ -805,6 +805,8 @@ class UsersController < ApplicationController
       @courses += scope.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key').preload(:enrollment_term).to_a
     end
     @courses = @courses.sort_by(&:sort_key)[0, limit]
+
+    @courses = @courses.select { |c| c.grants_right?(@current_user, :read_as_admin) && c.grants_right?(@current_user, :read) }
 
     cancel_cache_buster
     expires_in 30.minutes

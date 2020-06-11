@@ -271,6 +271,23 @@ describe UsersController do
       expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
     end
 
+    it "should not include courses that an admin doesn't have rights to see" do
+      @role1 = custom_account_role('subadmin', :account => Account.default)
+      account_admin_user_with_role_changes(:role => @role1, :role_changes => {})
+      user_session(@admin)
+
+      course_with_teacher(:course_name => "A", :active_all => true, :user => @admin)
+      course_with_teacher(:course_name => "B", :active_all => true)
+      course_with_teacher(:course_name => "C", :active_all => true, :user => @admin)
+      course_with_teacher(:course_name => "D", :active_all => true)
+
+      get 'manageable_courses', params: {:user_id => @admin.id}
+      expect(response).to be_successful
+
+      courses = json_parse
+      expect(courses.map { |c| c['label'] }).to eq %w(A C)
+    end
+
     context "sharding" do
       specs_require_sharding
 
