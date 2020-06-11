@@ -2092,6 +2092,7 @@ ru:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Позволяет ролям преподавателя / разработчика / ассистента преподавателя получать доступ к инструменту «Чат»."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Позволяет ролям преподавателя / ассистента преподавателя получать доступ к инструменту «Посещаемость»."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Позволяет ролям преподавателя, ассистента преподавателя получать доступ к инструменту «Посещаемость»."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Разрешить преподавателям скрывать разделы курса от студентов на странице «Люди», если в курсе имеется более одного раздела."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Разрешить учителям отмечать данные оценок для массового экспорта в интеграции SIS."
   allows_teachers_to_specify_post_policies_for_this__9b9433ef: |-
       Позволяет преподавателям задавать политику публикации для этого курса или конкретных заданий, что позволяет публиковать
@@ -4826,6 +4827,7 @@ ru:
         login_expiration_minimum: "Длительность сессии должна быть не менее 20 минут"
         need_integer: "Введите целое число для кэша списка воспроизведения"
         stream_name_required: "Требуется имя потока активности."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Предупреждение Canvas - Анонимный комментарий: %{assignment_title}, учащийся (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Предупреждение Canvas - Анонимный комментарий: Учащийся (%{author_id}) для %{assignment_title}, учащийся (%{user_id}), %{course_name}."
@@ -7290,6 +7292,7 @@ ru:
         grading_standard_enabled: "Разрешить схему оценок курса"
         hide_distribution_graphs: "Скрыть графики распределения оценок от студентов"
         hide_final_grades: "Скрыть общие числа в сводке оценок студентов"
+        hide_sections_on_course_users_page: "Скрыть разделы на странице «Люди» от студентов"
         home_page_announcement_limit: "Количество объявлений, отображаемых на начальной странице"
         image: Изображение
         indexed: "Включить этот курс в индекс общедоступных курсов"
@@ -9101,6 +9104,7 @@ ru:
   enable_new_gradebook_history_page_e0fd9d02: "Добавить новую страницу табеля успеваемости."
   enable_new_sis_integration_settings_ab6780a4: "Активировать новые настройки интеграции SIS"
   enable_notifications_10a4bf44: "Включить уведомления"
+  enable_notifications_for_contextname_b5b4440e: "Включить уведомления для %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "Включить условие\"OR\" для модулей"
   enable_recording_for_this_conference_b8adff6: "Включить запись для этой конференции"
   enable_reregistration_for_lti_2_b2a10444: "Включить перерегистрацию для LTI 2"
@@ -11860,6 +11864,7 @@ ru:
   hide_correct_answers_at_2421b0aa: "Скрыть правильные ответы с"
   hide_correct_answers_at_b1a59408: "Скрыть правильные ответы в"
   hide_course_sections_for_course_name_bd1911af: "Скрыть разделы курса %{name}"
+  hide_course_sections_from_students_b7850d64: "Скрыть разделы курса от студентов"
   hide_courses_menu_1b8ca649: "Скрыть меню курсов"
   hide_courses_navigation_menu_6f7c4cfd: "Скрыть меню навигации курсов"
   hide_courses_without_enrollments_6df4dfad: "Спрятать курсы без регистраций"

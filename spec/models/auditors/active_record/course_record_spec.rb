@@ -40,7 +40,7 @@ describe Auditors::ActiveRecord::CourseRecord do
       expect(ar_rec.user_id).to eq(user_record.id)
       expect(ar_rec.event_source).to eq("manual")
       expect(ar_rec.event_type).to eq("unconcluded")
-      expect(JSON.parse(ar_rec.data)).to eq({"data-key" => "data-val"})
+      expect(ar_rec.event_data).to eq({"data-key" => "data-val"})
       expect(ar_rec.sis_batch_id).to be_nil
       expect(ar_rec.created_at).to_not be_nil
     end

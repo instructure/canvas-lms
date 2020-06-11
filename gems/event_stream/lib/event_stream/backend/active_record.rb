@@ -50,6 +50,7 @@ module EventStream::Backend
     end
 
     def index_on_insert(index, record)
+      entry = index.entry_proc.call(record)
       key = index.key_proc ? index.key_proc.call(*entry) : entry
       index.strategy_for(:active_record).insert(record, key)
     end

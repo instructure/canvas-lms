@@ -2065,6 +2065,7 @@ zh-Hans:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: 允许基于教师/设计者/助教的角色访问聊天工具。
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: 允许基于教师/助教的角色访问考勤工具。
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "允许基于教师、助教身份访问考勤 (Attendance) 工具。"
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: 当课程中有多个分组时，允许教师在“人员”页面上对学生隐藏课程分组。
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: 允许讲师标记已批量导出到SIS整合的评分数据。
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       准许教师指定该课程或特定作业的发布政策，从而发
@@ -4755,6 +4756,7 @@ zh-Hans:
         login_expiration_minimum: "会话过期必须为 20 分钟或更长时间"
         need_integer: 请为播放列表缓存输入一个整数
         stream_name_required: Kinesis流名称是必需的。
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas 警报 - 匿名评论：%{assignment_title}，学生 (%{user_id})，%{course_name}。"
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas 警报 - 匿名评论：学生 (%{author_id}) 的 %{assignment_title}，学生 (%{user_id})，%{course_name}。"
@@ -7135,6 +7137,7 @@ zh-Hans:
         grading_standard_enabled: 启用课程评分方案
         hide_distribution_graphs: 对学生隐藏评分分布图
         hide_final_grades: 在学生评分汇总中隐藏总分
+        hide_sections_on_course_users_page: 在“人员”页面上对学生隐藏分组
         home_page_announcement_limit: 主页上显示的公告数量
         image: 图像
         indexed: 在公共课程索引中包含此课程
@@ -8885,6 +8888,7 @@ zh-Hans:
   enable_new_gradebook_history_page_e0fd9d02: 启用新成绩单历史纪录页面。
   enable_new_sis_integration_settings_ab6780a4: "启用新的 SIS 集成环境"
   enable_notifications_10a4bf44: 启用通知
+  enable_notifications_for_contextname_b5b4440e: "启用%{contextName}通知"
   enable_or_condition_for_modules_a16f02d8: "对单元启用 \"OR\" 条件"
   enable_recording_for_this_conference_b8adff6: 启用记录本次会议
   enable_reregistration_for_lti_2_b2a10444: "启用重新登记 LTI 2"
@@ -11585,6 +11589,7 @@ zh-Hans:
   hide_correct_answers_at_2421b0aa: 隐藏正确答案于
   hide_correct_answers_at_b1a59408: 隐藏正确答案在
   hide_course_sections_for_course_name_bd1911af: "对课程隐藏课程班级%{name}"
+  hide_course_sections_from_students_b7850d64: 对学生隐藏课程分组
   hide_courses_menu_1b8ca649: 隐藏课程菜单
   hide_courses_navigation_menu_6f7c4cfd: 隐藏课程导航菜单
   hide_courses_without_enrollments_6df4dfad: 隐藏没有注册的课程

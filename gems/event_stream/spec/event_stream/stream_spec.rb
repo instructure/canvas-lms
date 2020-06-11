@@ -191,6 +191,19 @@ describe EventStream::Stream do
       end
     end
 
+    describe "current_backend" do
+      it "changes at runtime with different setting" do
+        strat_value = :cassandra
+        stream = EventStream::Stream.new do
+          self.backend_strategy -> { strat_value }
+          self.table "table"
+        end
+        expect(stream.current_backend.class).to eq(EventStream::Backend::Cassandra)
+        strat_value = :active_record
+        expect(stream.current_backend.class).to eq(EventStream::Backend::ActiveRecord)
+      end
+    end
+
     describe "insert" do
       before do
         @timestamp = Time.now

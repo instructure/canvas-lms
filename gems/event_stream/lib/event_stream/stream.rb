@@ -68,23 +68,26 @@ class EventStream::Stream
   end
 
   def fetch(ids, strategy: :batch)
-    backend_for(backend_strategy).fetch(ids, strategy: strategy)
+    current_backend.fetch(ids, strategy: strategy)
+  end
+
+  def current_backend
+    backend_for(backend_strategy)
   end
 
   def add_index(name, &blk)
     index = EventStream::Index.new(self, &blk)
-    backend = backend_for(backend_strategy)
 
     on_insert do |record|
-      backend.index_on_insert(index, record)
+      current_backend.index_on_insert(index, record)
     end
 
     singleton_class.send(:define_method, "for_#{name}") do |*args|
-      backend.find_with_index(index, args)
+      current_backend.find_with_index(index, args)
     end
 
     singleton_class.send(:define_method, "ids_for_#{name}") do |*args|
-      backend.find_ids_with_index(index, args)
+      current_backend.find_ids_with_index(index, args)
     end
 
     singleton_class.send(:define_method, "#{name}_index") do

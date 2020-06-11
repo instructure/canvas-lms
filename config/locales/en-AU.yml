@@ -2066,6 +2066,7 @@ en-AU:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Allows teacher/designer/TA-based roles to access the Chat tool."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Allows teacher/TA-based roles to access the Attendance tool."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Allows teacher, TA-based roles to access the Attendance tool."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Allows teachers to hide course sections from students on the People page when there is more than one section in the course."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Allows teachers to mark grade data to be exported in bulk to SIS integrations."
   allows_teachers_to_specify_post_policies_for_this__9b9433ef: |-
       Allows teachers to specify post policies for this course or specific assignments, enabling grades to be
@@ -4769,6 +4770,7 @@ en-AU:
         login_expiration_minimum: "Session expiration must be 20 minutes or greater"
         need_integer: "Please enter an integer for the play list cache"
         stream_name_required: "The kinesis stream name is required."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas Alert - Anonymous Comment: %{assignment_title}, Student (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas Alert - Anonymous Comment: Student (%{author_id}) for %{assignment_title}, Student (%{user_id}), %{course_name}."
@@ -7158,6 +7160,7 @@ en-AU:
         grading_standard_enabled: "Enable course grading scheme"
         hide_distribution_graphs: "Hide mark distribution graphs from students"
         hide_final_grades: "Hide totals in student marks summary"
+        hide_sections_on_course_users_page: "Hide sections on the People page from students"
         home_page_announcement_limit: "Number of announcements shown on the homepage"
         image: Image
         indexed: "Include this course in the public course index"
@@ -8916,6 +8919,7 @@ en-AU:
   enable_new_gradebook_history_page_e0fd9d02: "Enable New Mark book History page."
   enable_new_sis_integration_settings_ab6780a4: "Enable new SIS integration settings"
   enable_notifications_10a4bf44: "Enable Notifications"
+  enable_notifications_for_contextname_b5b4440e: "Enable Notifications for %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "Enable \"OR\" Condition for Modules"
   enable_recording_for_this_conference_b8adff6: "Enable recording for this conference."
   enable_reregistration_for_lti_2_b2a10444: "Enable reregistration for LTI 2"
@@ -11626,6 +11630,7 @@ en-AU:
   hide_correct_answers_at_2421b0aa: "Hide Correct Answers at"
   hide_correct_answers_at_b1a59408: "Hide Correct Answers At"
   hide_course_sections_for_course_name_bd1911af: "Hide course sections for course %{name}"
+  hide_course_sections_from_students_b7850d64: "Hide Course Sections from Students"
   hide_courses_menu_1b8ca649: "Hide courses menu"
   hide_courses_navigation_menu_6f7c4cfd: "Hide Courses Navigation Menu"
   hide_courses_without_enrollments_6df4dfad: "Hide courses without enrolments"

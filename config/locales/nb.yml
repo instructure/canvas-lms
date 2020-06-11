@@ -2065,6 +2065,7 @@ nb:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Lar lærer/designer/LA-baserte roller bruke chat-verktøyet."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Lar lærer/designer/LA-baserte roller bruke oppmøte-verktøyet."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Lar lærer, LA-baserte roller bruke oppmøte-verktøyet."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Tillater lærere å skjule emneseksjoner fra studenter på Folk-siden når mer enn én seksjon er valgt for emnet."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillat lærere å markere karakterdata for bulk-eksport til SIS-integrasjoner."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Lar lærere spesifisere retningslinjer for innlegg i emnet eller spesifikke oppgaver, og tillater at karakterer
@@ -4755,6 +4756,7 @@ nb:
         login_expiration_minimum: "Utløpstid for en sesjon må være 20 minutter eller mer"
         need_integer: "Vennligst skriv inn et heltall i spillelistens hurtigbuffer"
         stream_name_required: "Kinesis strømnavnet er påkrevd."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas varsel - Anonym kommentar: %{assignment_title}, Student (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas varsel - Anonym kommentar: Student (%{author_id}) for %{assignment_title}, Student (%{user_id}), %{course_name}."
@@ -7146,6 +7148,7 @@ nb:
         grading_standard_enabled: "Slå på vurderingsskala for emne"
         hide_distribution_graphs: "Skjul karakterfordelingsgrafen for studentene"
         hide_final_grades: "Skjul totalen i studentens karakteroversikt"
+        hide_sections_on_course_users_page: "Skjul seksjoner på Folk-siden fra studentene"
         home_page_announcement_limit: "Antall kunngjøringer vist på startsiden"
         image: Bilde
         indexed: "Inkluder dette emnet i den åpne oversikten for emne"
@@ -8900,6 +8903,7 @@ nb:
   enable_new_gradebook_history_page_e0fd9d02: "Aktiver ny historieside for karakterbok."
   enable_new_sis_integration_settings_ab6780a4: "Aktiver nye SIS-innstillinger for integrering"
   enable_notifications_10a4bf44: "Aktiver varsler"
+  enable_notifications_for_contextname_b5b4440e: "Aktiver varsler for %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "Tillat \"eller\" betingelser for moduler"
   enable_recording_for_this_conference_b8adff6: "Aktiver innspilling for denne konferansen"
   enable_reregistration_for_lti_2_b2a10444: "Aktivere registrering for LTI 2"
@@ -11612,6 +11616,7 @@ nb:
   hide_correct_answers_at_2421b0aa: "Skjul riktige svar på"
   hide_correct_answers_at_b1a59408: "Skjul riktige svar på"
   hide_course_sections_for_course_name_bd1911af: "Skjul emneseksjonene for emnet %{name}"
+  hide_course_sections_from_students_b7850d64: "Skjul Emneseksjoner fra studenter"
   hide_courses_menu_1b8ca649: "Skjul emnemeny"
   hide_courses_navigation_menu_6f7c4cfd: "Skjul menyen for emnernavigering"
   hide_courses_without_enrollments_6df4dfad: "Skjul emner uten påmeldinger"

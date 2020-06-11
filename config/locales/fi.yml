@@ -1422,6 +1422,7 @@ fi:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Sallii opettaja-/suunnittelija-/apuopettajapohjaisten roolien käyttävän Chatti-työkalua."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Sallii opettaja-/apuopettajapohjaisten roolien käyttävän osallistujatyökalua."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Sallii opettaja-, apuopettajapohjaisten roolien käyttävän osallistujatyökalua."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Salli opettajien piilottaa kurssin osat opiskelijoita Ihmiset-sivulla, kun kurssissa on enemmän kuin yksi osa."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Salli opettajien merkitä arvosanatiedot vietäväksi massana SIS-integraatioihin."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Sallii opettajien määrittävän lähetyksen käytännöt tälle kurssille tai määrätyille tehtäville, mikä mahdollistaa arvosanojen
@@ -3577,6 +3578,7 @@ fi:
         login_expiration_minimum: "Istunnon vanhenemisen täytyy olla 20 minuuttia tai enemmän"
         need_integer: "Syötä kokonaisluku soittolistan välimuistille"
         stream_name_required: "Kinesis-suoratoiston nimi vaaditaan."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas-hälytys - nimetön kommentti: %{assignment_title}, opiskelija (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas-hälytys - nimetön kommentti: Opiskelija (%{author_id}) kurssilla %{assignment_title}, opiskelija (%{user_id}), %{course_name}."
@@ -5465,6 +5467,7 @@ fi:
         grading_standard_enabled: "Ota kurssinarvostelujärjestelmä käyttöön"
         hide_distribution_graphs: "Piilota arvosanan jakelukaaviot opiskelijoilta"
         hide_final_grades: "Piilota kokonaismäärät opiskelijan arvosanojen yhteenvedossa"
+        hide_sections_on_course_users_page: "Piilota osia Ihmiset-sivulla opiskelijoilta"
         home_page_announcement_limit: "Aloitussivulla näkyvien ilmoitusten määrä"
         image: Kuva
         indexed: "Sisällytä tämä kurssi julkiseen kurssi-indeksiin"
@@ -6830,6 +6833,7 @@ fi:
   enable_moderated_grading_bacd20d8: "Ota valvottu arvosanojen anto käyttöön."
   enable_new_sis_integration_settings_ab6780a4: "Ota käyttöön uudet SIS-integraatioasetukset"
   enable_notifications_10a4bf44: "Ota ilmoitukset käyttöön"
+  enable_notifications_for_contextname_b5b4440e: "Ota käyttöön ilmoitukset kohteelle %{contextName}"
   enable_recording_for_this_conference_b8adff6: "Ota nauhoitus käyttöön tälle konferenssille"
   enable_reregistration_for_lti_2_b2a10444: "Ota LTI 2:n uudelleenrekisteröinti käyttöön"
   enable_scope_ac28b832: "Ota ala käyttöön"
@@ -8674,6 +8678,7 @@ fi:
   hide_correct_answers_at_2421b0aa: "Piilota oikeat vastaukset kohteessa"
   hide_correct_answers_at_b1a59408: "Piilota oikeat vastaukset kohteessa"
   hide_course_sections_for_course_name_bd1911af: "Piilota kurssin osat kurssille %{name}"
+  hide_course_sections_from_students_b7850d64: "Piilota kurssin osat opiskelijoiltasi"
   hide_courses_navigation_menu_6f7c4cfd: "Piilota kurssien navigointivalikko"
   hide_courses_without_students_fc6fc7a0: "Kätke kurssit, joissa ei ole opiskelijoita"
   hide_details_df9ef4a2: "Piilota tiedot"
