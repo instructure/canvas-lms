@@ -125,10 +125,6 @@ test('toJSON should properly serialize results', function() {
   ok(isObject(serialized.meta), 'meta is an object')
   ok(uniq(serialized.days).length === serialized.days.length, 'does not duplicate dates')
   ok(serialized.days[0].date === 'Mon, Oct 7', 'finds the correct first day')
-  ok(
-    serialized.meta.hasOwnProperty('better_scheduler'),
-    'contains a property indicating better_scheduler is active or not'
-  )
   serialized.days.forEach(d => ok(d.events.length, 'every day has events'))
 })
 

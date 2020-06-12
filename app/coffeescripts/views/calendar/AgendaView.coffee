@@ -216,7 +216,7 @@ export default class AgendaView extends Backbone.View
     meta:
       hasMore: !!@nextPageDate
       displayAppointmentEvents: @viewingGroup
-      better_scheduler: ENV.CALENDAR.BETTER_SCHEDULER
+      use_scheduler: ENV.CALENDAR.SHOW_SCHEDULER
 
   # Public: Creates the json for the template.
   #

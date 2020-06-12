@@ -35,7 +35,7 @@ export default function calendarEventFilter(viewingGroup, events, schedulerState
     if (eventIds[event.id]) {
       keep = false
     } else if (event.isAppointmentGroupEvent()) {
-      if (!viewingGroup || ENV.CALENDAR.BETTER_SCHEDULER) {
+      if (!viewingGroup || ENV.CALENDAR.SHOW_SCHEDULER) {
         // Handle normal calendar view, not scheduler view
         if (!event.calendarEvent.reserve_url) {
           // If there is not a reserve_url set, then it is an

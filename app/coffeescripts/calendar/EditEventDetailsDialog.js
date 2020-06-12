@@ -39,9 +39,9 @@ const dialog = $('<div id="edit_event"><div /></div>')
   })
 
 export default class EditEventDetailsDialog {
-  constructor(event, betterScheduler) {
+  constructor(event, useScheduler) {
     this.event = event
-    this.betterScheduler = betterScheduler
+    this.useScheduler = useScheduler
     this.currentContextInfo = null
     dialog.on('dialogclose', this.dialogClose)
   }
@@ -158,7 +158,7 @@ export default class EditEventDetailsDialog {
 
   canManageAppointments = () => {
     if (
-      ENV.CALENDAR.BETTER_SCHEDULER &&
+      ENV.CALENDAR.SHOW_SCHEDULER &&
       _.some(this.event.allPossibleContexts, c => c.can_create_appointment_groups) &&
       (this.event.eventType.match(/appointment/) || this.event.eventType.match(/generic/))
     ) {
@@ -229,7 +229,7 @@ export default class EditEventDetailsDialog {
           _.filter(this.event.allPossibleContexts, c => c.can_create_appointment_groups),
           this.closeCB,
           this.event,
-          this.betterScheduler
+          this.useScheduler
         )
         dialog
           .find('#edit_appointment_group_form_holder')

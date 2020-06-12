@@ -34,7 +34,6 @@ import calendarAppTemplate from 'jst/calendar/calendarApp'
 import commonEventFactory from './commonEventFactory'
 import ShowEventDetailsDialog from './ShowEventDetailsDialog'
 import EditEventDetailsDialog from './EditEventDetailsDialog'
-import Scheduler from './Scheduler'
 import CalendarNavigator from '../views/calendar/CalendarNavigator'
 import AgendaView from '../views/calendar/AgendaView'
 import calendarDefaults from './CalendarDefaults'
@@ -72,7 +71,7 @@ export default class Calendar {
     this.subscribeToEvents()
     this.header = this.options.header
     this.schedulerState = {}
-    this.useBetterScheduler = !!this.options.schedulerStore
+    this.useScheduler = !!this.options.schedulerStore
     if (this.options.schedulerStore) {
       this.schedulerStore = this.options.schedulerStore
       this.schedulerState = this.schedulerStore.getState()
@@ -93,7 +92,6 @@ export default class Calendar {
       dataSource: this.dataSource,
       calendar: this
     })
-    this.scheduler = new Scheduler('.scheduler-wrapper', this)
 
     const fullCalendarParams = this.initializeFullCalendarParams()
 
@@ -155,10 +153,6 @@ export default class Calendar {
 
     this.header.selectView(this.getCurrentView())
 
-    if (data.view_name === 'scheduler' && data.appointment_group_id) {
-      this.scheduler.viewCalendarForGroupId(data.appointment_group_id)
-    }
-
     // enter find-appointment mode via sign-up-for-things notification URL
     if (data.find_appointment && this.schedulerStore) {
       const course = ENV.CALENDAR.CONTEXTS.filter(
@@ -197,7 +191,6 @@ export default class Calendar {
     this.header.on('week', () => this.loadView('week'))
     this.header.on('month', () => this.loadView('month'))
     this.header.on('agenda', () => this.loadView('agenda'))
-    this.header.on('scheduler', () => this.loadView('scheduler'))
     this.header.on('createNewEvent', this.addEventClick)
     this.header.on('refreshCalendar', this.reloadClick)
     this.header.on('done', this.schedulerSingleDoneClick)
@@ -516,7 +509,7 @@ export default class Calendar {
     // create a new dummy event
     event = commonEventFactory(null, this.activeContexts())
     event.date = this.getCurrentDate()
-    return new EditEventDetailsDialog(event, this.useBetterScheduler).show()
+    return new EditEventDetailsDialog(event, this.useScheduler).show()
   }
 
   eventClick = (event, jsEvent, view) => {
@@ -541,7 +534,7 @@ export default class Calendar {
     const event = commonEventFactory(null, this.activeContexts())
     event.date = date
     event.allDay = !date.hasTime()
-    return new EditEventDetailsDialog(event, this.useBetterScheduler).show()
+    return new EditEventDetailsDialog(event, this.useScheduler).show()
   }
 
   updateFragment(opts) {
@@ -696,9 +689,6 @@ export default class Calendar {
     }
     if (this.activeAjax === 0) {
       this.dataSource.clearCache()
-      if (this.currentView === 'scheduler') {
-        this.scheduler.loadData()
-      }
       return this.calendar.fullCalendar('refetchEvents')
     }
   }
@@ -924,33 +914,23 @@ export default class Calendar {
     this.header.showPrevNext()
     this.header.hideAgendaRecommendation()
 
-    if (view !== 'scheduler') {
-      this.updateFragment({appointment_group_id: null})
-      this.scheduler.viewingGroup = null
-      this.agenda.viewingGroup = null
-    }
+    this.updateFragment({appointment_group_id: null})
+    this.agenda.viewingGroup = null
 
-    if (view !== 'scheduler' && view !== 'agenda') {
+    if (view !== 'agenda') {
       // rerender title so agenda title doesnt stay
       const viewObj = this.calendar.fullCalendar('getView')
       this.viewRender(viewObj)
 
       this.displayAppointmentEvents = null
-      this.scheduler.hide()
       this.header.showAgendaRecommendation()
       this.calendar.show()
       this.schedulerNavigator.hide()
       this.calendar.fullCalendar('refetchEvents')
       this.calendar.fullCalendar('changeView', view === 'week' ? 'agendaWeek' : 'month')
       return this.calendar.fullCalendar('render')
-    } else if (view === 'scheduler') {
-      this.calendar.hide()
-      this.header.showSchedulerTitle()
-      this.schedulerNavigator.hide()
-      return this.scheduler.show()
     } else {
       this.calendar.hide()
-      this.scheduler.hide()
       return this.header.hidePrevNext()
     }
   }
@@ -1004,7 +984,6 @@ export default class Calendar {
 
   schedulerSingleDoneClick = () => {
     this.agenda.viewingGroup = null
-    this.scheduler.doneClick()
     this.header.showSchedulerTitle()
     return this.schedulerNavigator.hide()
   }

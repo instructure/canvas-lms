@@ -24,7 +24,7 @@ describe "calendar2" do
 
   before(:each) do
     Account.default.tap do |a|
-      a.settings[:show_scheduler]   = true
+      a.settings[:show_scheduler] = true
       a.save!
     end
   end
@@ -55,19 +55,6 @@ describe "calendar2" do
 
       it "should create an event through clicking on a calendar day", priority: "1", test_id: 138638 do
         create_middle_day_event
-      end
-
-      it "should show scheduler button if it is enabled" do
-        get "/calendar2"
-        expect(find("#scheduler")).not_to be_nil
-      end
-
-      it "should not show scheduler button if it is disabled" do
-        account = Account.default.tap { |a| a.settings[:show_scheduler] = false; a.save! }
-        get "/calendar2"
-        find_all('.calendar_view_buttons .btn').each do |button|
-          expect(button.text).not_to match(/scheduler/i)
-        end
       end
 
       it "should create an assignment by clicking on a calendar day" do
