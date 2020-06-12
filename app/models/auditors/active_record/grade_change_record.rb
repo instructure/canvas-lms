@@ -17,6 +17,7 @@
 #
 module Auditors::ActiveRecord
   class GradeChangeRecord < ActiveRecord::Base
+    include Auditors::ActiveRecord::Attributes
     include CanvasPartman::Concerns::Partitioned
     self.partitioning_strategy = :by_date
     self.partitioning_interval = :months
@@ -30,6 +31,8 @@ module Auditors::ActiveRecord
     belongs_to :submission, inverse_of: :auditor_grade_change_records
     belongs_to :course, -> { where(context_type: 'Course') }, class_name: "::Course", foreign_key: 'context_id', inverse_of: :auditor_grade_change_records
     belongs_to :assignment, inverse_of: :auditor_grade_change_records
+
+    attr_accessor :grade_current
 
     class << self
       include Auditors::ActiveRecord::Model
@@ -50,6 +53,15 @@ module Auditors::ActiveRecord
         attrs_hash['submission_version_number'] = record.version_number
         attrs_hash
       end
+    end
+
+    def course_id
+      return nil unless context_type == 'Course'
+      context_id
+    end
+
+    def version_number
+      submission_version_number
     end
   end
 end
