@@ -49,9 +49,11 @@ module LiveEvents
         LiveEvents.clear_context!
         yield block
         run_jobs
-        puts stream_client
-        puts stream_client.data.first[:data]
-        @event_message = JSON.parse(stream_client.data.first[:data])
+        @event_message = stream_client.data.map do |event|
+          JSON.parse(event[:data])
+        end.find do |msg|
+          msg.dig('attributes', 'event_name') == @event_name
+        end
       end
 
       def has_kept_the_contract?
