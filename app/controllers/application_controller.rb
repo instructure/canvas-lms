@@ -1366,7 +1366,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_page_view
-    return true if !page_views_enabled?
+    return true unless page_views_enabled?
 
     shard = (@accessed_asset && @accessed_asset[:shard]) || Shard.current
     shard.activate do
@@ -1380,7 +1380,6 @@ class ApplicationController < ActionController::Base
         else
           @page_view.destroy if @page_view && !@page_view.new_record?
         end
-
       rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
         Canvas::Errors.capture_exception(:page_view, e)
         logger.error "Pageview error!"
@@ -1392,19 +1391,22 @@ class ApplicationController < ActionController::Base
 
   def add_interaction_seconds
     updated_fields = params.slice(:interaction_seconds)
-    if request.xhr? && params[:page_view_token] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
-      RequestContextGenerator.store_interaction_seconds_update(params[:page_view_token], updated_fields[:interaction_seconds])
+    return unless (request.xhr? || request.put?) && params[:page_view_token] && !updated_fields.empty?
 
-      page_view_info = PageView.decode_token(params[:page_view_token])
-      @page_view = PageView.find_for_update(page_view_info[:request_id])
-      if @page_view
-        if @page_view.id
-          response.headers["X-Canvas-Page-View-Update-Url"] = page_view_path(
-            @page_view.id, page_view_token: @page_view.token)
-        end
-        @page_view.do_update(updated_fields)
-        @page_view_update = true
+    RequestContextGenerator.store_interaction_seconds_update(
+      params[:page_view_token],
+      updated_fields[:interaction_seconds]
+    )
+    page_view_info = PageView.decode_token(params[:page_view_token])
+    @page_view = PageView.find_for_update(page_view_info[:request_id])
+    if @page_view
+      if @page_view.id
+        response.headers["X-Canvas-Page-View-Update-Url"] = page_view_path(
+          @page_view.id, page_view_token: @page_view.token
+        )
       end
+      @page_view.do_update(updated_fields)
+      @page_view_update = true
     end
   end
 
