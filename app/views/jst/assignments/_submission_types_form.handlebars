@@ -174,13 +174,27 @@
 
       {{!-- LTI launch button for getting additional data for external tool assignments (when selected via placement) --}}
       <div id="assignment_submission_type_selection_tool_launch_container" style="{{hiddenUnless selectedSubmissionTypeToolId}}">
-        {{!-- TODO make this button actually do something --}}
         <div class="pad-box">
           <div class="ic-Form-control">
             <button class="Button btn-primary" type="button" id="assignment_submission_type_selection_launch_button">
                 <i class="icon-link sr-hide" />
                 <span id="assignment_submission_type_selection_launch_button_text"></span>
             </button>
+          </div>
+          <input type="hidden" id="assignment_submission_type_external_data" name="external_tool_tag_attributes[external_data]" value="{{externalToolData.stringify}}"/>
+          {{!-- this is very specific to Mastery Connect currently.  We could potentially make this a dynamic partial based on the type of external data --}}
+          <div>
+            <h3>
+              <span id="mc_external_data_assessment">{{name}}</span>
+            </h3>
+            <div id="mc_external_data_points">{{externalToolData.points}} {{#if externalToolData.points}} {{#t}}Points{{/t}} {{/if}}</div>
+            <div id="mc_external_data_objectives">{{externalToolData.objectives}}</div>
+            <div> </div>
+            <h4>
+              <span id="mc_external_data_tracker">{{externalToolData.trackerName}}</span>
+            </h4>
+            <div id="mc_external_data_tracker_alignment">{{externalToolData.trackerAlignment}}</div>
+            <div id="mc_external_data_students">{{externalToolData.studentCount}} {{#if externalToolData.studentCount}} {{#t}}Students{{/t}} {{/if}}</div>
           </div>
         </div>
       </div>

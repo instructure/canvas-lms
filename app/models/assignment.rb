@@ -156,7 +156,8 @@ class Assignment < ActiveRecord::Base
                 ContextExternalTool.find(attrs['content_id'].to_i)
               end
     attrs[:content] = content if content
-    attrs.slice!(:url, :new_tab, :content)
+    attrs[:external_data] = JSON.parse(attrs[:external_data]) if attrs['external_data'].present?
+    attrs.slice!(:url, :new_tab, :content, :external_data)
     false
   }
   before_validation do |assignment|

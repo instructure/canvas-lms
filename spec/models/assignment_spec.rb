@@ -6327,6 +6327,16 @@ describe Assignment do
       expect(a.external_tool_tag.url).to eq "http://example.com/launch2"
       expect(a.external_tool_tag).to eq tag
     end
+
+
+    it 'should persist tools external data when given' do
+      ext_data = {foo: 'bar'}
+      a = @course.assignments.create!(title: "test",
+        submission_types: 'external_tool',
+        external_tool_tag_attributes: {url: "http://example.com/launch", external_data: ext_data.to_json})
+      tag = a.external_tool_tag
+      expect(tag.external_data).to eq(ext_data.with_indifferent_access)
+    end
   end
 
   describe "allowed_extensions=" do

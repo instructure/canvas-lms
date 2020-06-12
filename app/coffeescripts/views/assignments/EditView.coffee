@@ -82,6 +82,7 @@ export default class EditView extends ValidatedFormView
   EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER = '#assignment_submission_type_selection_tool_launch_container'
   EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON = '#assignment_submission_type_selection_launch_button'
   EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON_TEXT = '#assignment_submission_type_selection_launch_button_text'
+  EXTERNAL_TOOL_DATA = '#assignment_submission_type_external_data'
   ALLOWED_ATTEMPTS_CONTAINER = '#allowed_attempts_fields'
   GROUP_CATEGORY_SELECTOR = '#group_category_selector'
   PEER_REVIEWS_FIELDS = '#assignment_peer_reviews_fields'
@@ -100,6 +101,8 @@ export default class EditView extends ValidatedFormView
   SIMILARITY_DETECTION_TOOLS = '#similarity_detection_tools'
   ANONYMOUS_GRADING_BOX = '#assignment_anonymous_grading'
   ASSIGNMENT_EXTERNAL_TOOLS = '#assignment_external_tools'
+
+  LTI_EXT_MASTERY_CONNECT = 'https://canvas.instructure.com/lti/mastery_connect_assessment'
 
   els: _.extend({}, @::els, do ->
     els = {}
@@ -124,6 +127,7 @@ export default class EditView extends ValidatedFormView
     els["#{EXTERNAL_TOOLS_NEW_TAB}"] = '$externalToolsNewTab'
     els["#{EXTERNAL_TOOLS_CONTENT_TYPE}"] = '$externalToolsContentType'
     els["#{EXTERNAL_TOOLS_CONTENT_ID}"] = '$externalToolsContentId'
+    els["#{EXTERNAL_TOOL_DATA}"] = '$externalToolExternalData'
     els["#{DEFAULT_EXTERNAL_TOOL_CONTAINER}"] = '$defaultExternalToolContainer'
     els["#{EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER}"] = '$externalToolPlacementLaunchContainer'
     els["#{EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON}"] = '$externalToolPlacementLaunchButton'
@@ -394,11 +398,32 @@ export default class EditView extends ValidatedFormView
       contextType: contextType
       contextId: contextId
       launchType: "submission_type_selection"
+      onExternalContentReady: @handleExternalContentReady
     }
 
     mountPoint = document.querySelector('#assignment_submission_type_selection_tool_dialog')
     dialog = React.createElement(ExternalToolModalLauncher, props)
     ReactDOM.render(dialog, mountPoint)
+
+  handleExternalContentReady: (data) =>
+    if !data.contentItems || data.contentItems.length == 0
+      return
+    item = data.contentItems[0]
+    @$externalToolsUrl.val(item.url)  # is this hidden?  Or do we need
+    if (item.title)
+      @$name.val(item.title)
+
+    mc_ext = item[LTI_EXT_MASTERY_CONNECT]
+    if mc_ext
+      mc_ext['key'] = LTI_EXT_MASTERY_CONNECT
+      @$assignmentPointsPossible.val(mc_ext.points)
+      @$externalToolExternalData.val(JSON.stringify(mc_ext))
+      $("#mc_external_data_assessment").text(item.title)
+      $("#mc_external_data_points").text(mc_ext.points + " " + I18n.t('points'))
+      $("#mc_external_data_objectives").text(mc_ext.objectives)
+      $("#mc_external_data_tracker").text(mc_ext.trackerName)
+      $("#mc_external_data_tracker_alignment").text(mc_ext.trackerAlignment)
+      $("#mc_external_data_students").text(mc_ext.studentCount + " " + I18n.t('Students'))
 
   handleOnlineSubmissionTypeChange: (env) =>
     showConfigTools = @$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).attr('checked') ||
