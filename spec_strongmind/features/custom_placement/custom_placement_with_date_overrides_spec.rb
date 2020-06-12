@@ -7,24 +7,15 @@ RSpec.describe 'As a Teacher I can force advance student module progress', type:
 
   before(:each) do
     # enable feature flags
-    Permissions.register(
-      {
-        :custom_placement => {
-          :label => lambda { "Apply Custom Placement to Courses" },
-          :available_to => [
-            'TaEnrollment',
-            'TeacherEnrollment',
-            'AccountAdmin',
-          ],
-          :true_for => [
-            'AccountAdmin',
-            'TeacherEnrollment'
-          ]
-        }
-      }
-    )
+    allow_any_instance_of(TeacherEnrollment).to receive(:has_permission_to?).and_return(true)
+    allow_any_instance_of(TaEnrollment).to receive(:has_permission_to?).and_return(true)
+    allow(SettingsService).to receive(:get_settings).and_return({
+      "auto_due_dates" => "on",
+      "auto_enrollment_due_dates" => "on",
+    })
 
     course_with_teacher_logged_in
+    @course.update_attribute :start_at, 1.month.ago
     @course.update_attribute :conclude_at, 1.month.from_now
 
   # Module 1 -------
@@ -139,7 +130,7 @@ RSpec.describe 'As a Teacher I can force advance student module progress', type:
     expect(AssignmentOverride.count).to be_zero
 
     # make enrollment date in future
-    @student.enrollments.first.update_column :created_at, late_enrollment_date
+    @student.enrollments.update_all(created_at: late_enrollment_date)
 
     service = AssignmentsService::Commands::SetEnrollmentAssignmentDueDates.new(enrollment: @student.enrollments.first)
     service.call
