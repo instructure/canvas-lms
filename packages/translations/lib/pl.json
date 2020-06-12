@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Podczas odrzucania okazji wystąpił błąd."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "Wystąpił błąd podczas generowania podglądu plików"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Wystąpił błąd podczas przesyłania żądania sieciowego"
     },
@@ -694,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Następna strona"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "Brak tekstu alt. (obraz dekoracyjny)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Brak ustawionych terminów"

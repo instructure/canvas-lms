@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "嘗試放棄機會時發生錯誤。"
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "產生檔案預覽時發生錯誤"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "發出連線請求時發生錯誤"
     },
@@ -694,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "下一頁"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "無替代文字（裝飾影像）"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "無指定截止日期"

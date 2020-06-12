@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Hiba történt, amikor megpróbálta elvetni a lehetőséget."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "Hiba történt a fájl előnézetének létrehozásakor."
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Hiba történt egy hálózati kérelem létrehozásakor"
     },
@@ -467,6 +464,9 @@
     "finish_bc343002": {
         "message": "Befejezés"
     },
+    "focus_element_options_toolbar_18d993e": {
+        "message": "Az elem opciók eszköztár fókuszba helyezése"
+    },
     "folder_tree_fbab0726": {
         "message": "Könyvtárfa"
     },
@@ -695,9 +695,6 @@
     "next_page_d2a39853": {
         "message": "Következő oldal"
     },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "Nincs leíró szöveg (Díszítő Kép)"
-    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Nincs hozzárendelve esedékességi dátum"
     },
@@ -836,6 +833,9 @@
     "quizzes_7e598f57": {
         "message": "Kvízek"
     },
+    "reading_a_media_track_file_failed_aborting_be051b20": {
+        "message": "Egy média nyomkövetés fájl olvasása sikertelen. Megszakítás."
+    },
     "record_7c9448b": {
         "message": "Felvétel"
     },
@@ -919,6 +919,9 @@
     },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Hiba történt! Nem tudom, mint mutassak."
+    },
+    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+        "message": "Valami hiba történt, ellenőrizze a kapcsolatát, és próbálja újra!"
     },
     "something_went_wrong_d238c551": {
         "message": "Valami hiba történt"

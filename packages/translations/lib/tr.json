@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Fırsatı gözardı etmeye çalışırken bir hata oluştu."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "Dosya ön izlemesi oluşturulurken hata oluştu"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Ağ isteğinde bulunurken bir hata oluştu"
     },

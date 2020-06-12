@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "案件を却下しようとした際にエラーが発生しました。"
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "ファイルプレビューの作成中にエラーが発生しました"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "ネットワーク要求の作成中にエラーが発生しました"
     },
@@ -694,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "次のページ"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "別のテキストはありません (装飾画像)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "期日指定なし"

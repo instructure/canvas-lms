@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "An error occurred attempting to dismiss the opportunity."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "An error occurred generating the file preview"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "An error occurred making a network request"
     },
@@ -694,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Next Page"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "No Alt Text (Decorative Image)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "No Due Dates Assigned"

@@ -47,9 +47,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Виникла помилка при спробі відхилити цю можливість."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": " Сталася помилка під час створення попереднього перегляду файлу"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Сталася помилка при виконанні запиту мережі"
     },

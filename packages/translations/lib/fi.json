@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Ilmeni virhe yritettäessä ohittaa tilaisuutta."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "Tiedoston esikatselun luonnissa ilmeni virhe"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Ilmeni virhe tehtäessä verkkopyyntöä"
     },
@@ -694,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Seuraava sivu"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "Ei Alt Text (Koristekuva)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Määräpäiviä ei ole kohdistettu"

@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "尝试拒绝该机会时出现错误。"
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "生成文件预览时发生错误"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "发出网络请求时出错"
     },
@@ -694,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "下一页"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "无 Alt 文字（装饰图像）"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "未指定截止日期"

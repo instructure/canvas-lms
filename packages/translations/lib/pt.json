@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Ocorreu um erro ao tentar descartar a oportunidade."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "Ocorreu um erro ao gerar a visualização do ficheiro"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Ocorreu um erro ao fazer uma solicitação de rede"
     },
@@ -694,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Próxima página"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "Nenhum texto Alt (imagem decorativa)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Nenhuma data de vencimento atribuída"

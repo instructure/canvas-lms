@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Det skjedde en feil ved forsøket på å avvise muligheten."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "En feil oppstod under generering av forhåndsvisning av fil"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Det oppstod en feil ved utførelse av en nettverksforespørsel"
     },
@@ -694,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Neste side"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "Ingen endret tekst (pyntebilder)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Ingen forfallsdatoer tildelt"

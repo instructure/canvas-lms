@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Произошла ошибка при попытке отклонить эту возможность."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "Произошла ошибка при создании предварительного просмотра файла"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Произошла ошибка, что привело к созданию сетевого запроса"
     },
@@ -694,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Следующая страница"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "Нет альтернативного текста (декоративное изображение)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Даты выполнения не заданы"
