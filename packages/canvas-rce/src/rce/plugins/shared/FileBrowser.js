@@ -20,7 +20,7 @@ import React, {useEffect, useState} from 'react'
 import {arrayOf, bool, func, objectOf, shape, string} from 'prop-types'
 import classnames from 'classnames'
 import {View} from '@instructure/ui-layout'
-import {fileShape} from './fileShape'
+import {mediaObjectShape} from './fileShape'
 
 // TODO: should find a better way to share this code
 import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
@@ -32,7 +32,7 @@ RceFileBrowser.propTypes = {
   fetchNextMedia: func.isRequired,
   media: objectOf(
     shape({
-      files: arrayOf(shape(fileShape)).isRequired,
+      files: arrayOf(shape(mediaObjectShape)).isRequired,
       bookmark: string,
       hasMore: bool,
       isLoading: bool,
