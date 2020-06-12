@@ -3,6 +3,7 @@ rvm:
 services:
   - redis-server
   - postgresql
+  - xvfb
 addons:
   postgresql: "9.6"
   chrome: stable
@@ -33,19 +34,14 @@ before_install:
   # Allow headful tests, see https://github.com/Googlechrome/puppeteer/issues/290
   # Enable user namespace cloning
   - "sudo sysctl kernel.unprivileged_userns_clone=1"
-  # Launch XVFB - for non headless test runs
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
   # grab Chromedriver for selenium
   - wget http://chromedriver.storage.googleapis.com/2.36/chromedriver_linux64.zip
   - mkdir -p /home/travis/bin
   - unzip chromedriver_linux64.zip -d /home/travis/bin/
 install:
-  - bundle install --path vendor/bundle --without production --jobs=3 --retry=1
+  - bundle _1.15.1_ install --path vendor/bundle --without production --jobs=3 --retry=1
 before_script:
   - psql -c 'create database canvas_test;' -U postgres;
   - psql -U postgres -q -d $DB_NAME -f db/structure.sql # faster than db:test:prepare
-  - bundle exec rake canvas:compile_assets_dev # skip build of styleguide, api docs, npm install
-  - rm Gemfile.lock
-  - STRONGMIND_SPEC=1 bundle install --path vendor/bundle --without production --jobs=3 --retry=1
+  - bundle _1.15.1_ exec rake canvas:compile_assets_dev # skip build of styleguide, api docs, npm install
 script: 'STRONGMIND_SPEC=1 HEADLESS=1 ./script/run-tests.sh'

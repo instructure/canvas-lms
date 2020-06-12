@@ -30,9 +30,12 @@ group :development do
 end
 
 # StrongMind Added
-group :development, :test do
+group :development do
   gem 'pry-rails'
   gem 'pry-byebug'
+end
+
+group :development, :test do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'dotenv-rails'

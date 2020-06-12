@@ -20,8 +20,15 @@ Capybara.register_driver :chrome do |app|
   #   puts page.driver.browser.manage.logs.get(:browser).map(&:inspect).join("\n")
   #
   # This will print out each log entry in the JS log
+
   capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
-    logging_prefs: { 'browser' => 'ALL' }
+    logging_prefs: { 'browser' => 'ALL' },
+    chromeOptions: {
+      args: %w[
+        headless disable-gpu no-sandbox
+        --window-size=1980,1080 --enable-features=NetworkService,NetworkServiceInProcess
+      ]
+    }
   )
 
   driver = Capybara::Selenium::Driver.new app,
@@ -119,7 +126,7 @@ end
 Capybara.configure do |config|
   config.server                = :thin # :strongmind/:puma/:webrick
   config.javascript_driver     = ENV['HEADLESS'] ? :headless_chrome : :chrome
-  config.default_max_wait_time = 7
+  config.default_max_wait_time = 15
 end
 
 # better looking screenshots (fixes relative paths when desired)

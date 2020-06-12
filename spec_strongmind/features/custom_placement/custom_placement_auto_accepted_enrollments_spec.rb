@@ -6,22 +6,8 @@ RSpec.describe 'As a Teacher using custom placement', type: :feature, js: true d
   include_context 'stubbed_network'
 
   before(:each) do
-    Permissions.register(
-      {
-        :custom_placement => {
-          :label => lambda { "Apply Custom Placement to Courses" },
-          :available_to => [
-            'TaEnrollment',
-            'TeacherEnrollment',
-            'AccountAdmin',
-          ],
-          :true_for => [
-            'AccountAdmin',
-            'TeacherEnrollment'
-          ]
-        }
-      }
-    )
+    allow_any_instance_of(TeacherEnrollment).to receive(:has_permission_to?).and_return(true)
+    allow_any_instance_of(TaEnrollment).to receive(:has_permission_to?).and_return(true)
 
     course_with_teacher_logged_in
     @student = user_with_pseudonym

@@ -45,18 +45,10 @@ RSpec.describe 'Excused assignments on Course home page', type: :feature, js: tr
     expect(page).to have_selector("#context_module_item_#{@assignment1_tag.id}", visible: true)
 
     [@assignment1_tag, @assignment2_tag].each do |tag|
-      within "#context_module_item_#{tag.id}" do
-        # Excusted text in title
-        within '.module-item-title' do
-          expect(page).to have_content('(Excused)')
-        end
-
-        # Excused test in requirements area
-        within '.ig-details .completion_requirement' do
-          expect(page).to have_selector('.excused', visible: true)
-          expect(page).to have_content('Excused')
-        end
-      end
+      expect(page).to have_selector(
+        "#context_module_item_#{tag.id} .excused-assignment-state.excused-assignment",
+        visible: true
+      )
     end
   end
 end
