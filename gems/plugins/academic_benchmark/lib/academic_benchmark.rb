@@ -146,6 +146,7 @@ module AcademicBenchmark
     cm.migration_settings[:migration_options] = options
     cm.strand = "academic_benchmark"
     cm.user = user
+    cm.skip_root_account_assignment = true
     cm.save!
     [cm, cm.export_content]
   end
