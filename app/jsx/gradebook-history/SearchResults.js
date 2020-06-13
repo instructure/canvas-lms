@@ -24,7 +24,9 @@ import 'jquery.instructure_date_and_time'
 import I18n from 'i18n!gradebook_history'
 import {View} from '@instructure/ui-layout'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Spinner, Table, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
+import {Table} from '@instructure/ui-table'
 import {getHistoryNextPage} from './actions/SearchResultsActions'
 import SearchResultsRow from './SearchResultsRow'
 
@@ -124,20 +126,18 @@ class SearchResultsComponent extends Component {
   showResults = () => (
     <div>
       <Table caption={this.props.caption}>
-        <thead>
-          <tr>
+        <Table.Head>
+          <Table.Row>
             {colHeaders.map(header => (
-              <th scope="col" key={`${header}-column`}>
-                {header}
-              </th>
+              <Table.ColHeader key={`${header}-column`}>{header}</Table.ColHeader>
             ))}
-          </tr>
-        </thead>
-        <tbody>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
           {this.props.historyItems.map(item => (
             <SearchResultsRow key={`history-items-${item.id}`} item={item} />
           ))}
-        </tbody>
+        </Table.Body>
       </Table>
     </div>
   )
@@ -185,9 +185,6 @@ const mapDispatchToProps = dispatch => ({
   }
 })
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SearchResultsComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(SearchResultsComponent)
 
 export {SearchResultsComponent}
