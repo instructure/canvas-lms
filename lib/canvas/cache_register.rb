@@ -30,7 +30,7 @@ module Canvas
       'Account' => %w{account_chain role_overrides global_navigation feature_flags},
       'Course' => %w{account_associations},
       'User' => %w{enrollments groups account_users todo_list submissions user_services},
-      'Assignment' => %w{availability},
+      'Assignment' => %w{availability conditional_release},
       'Quizzes::Quiz' => %w{availability}
     }.freeze
 

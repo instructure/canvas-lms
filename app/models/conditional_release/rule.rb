@@ -31,6 +31,8 @@ module ConditionalRelease
     has_many :assignment_set_associations, -> { active.order(position: :asc) }, through: :scoring_ranges
     accepts_nested_attributes_for :scoring_ranges, allow_destroy: true
 
+    after_save :clear_trigger_assignment_cache
+
     before_create :set_root_account_id
     def set_root_account_id
       self.root_account_id ||= course.root_account_id
@@ -52,7 +54,20 @@ module ConditionalRelease
     end
 
     def assignment_sets_for_score(score)
-      AssignmentSet.where(scoring_range: scoring_ranges.for_score(score)).preload(:assignment_set_associations)
+      AssignmentSet.active.where(scoring_range: scoring_ranges.for_score(score))
+    end
+
+    def clear_trigger_assignment_cache
+      self.trigger_assignment.clear_cache_key(:conditional_release)
+    end
+
+    def self.is_trigger_assignment?(assignment)
+      # i'm only using the cache key currently for this one case but i figure it can be extended to handle caching around all rule data fetching
+      RequestCache.cache('conditional_release_is_trigger', assignment) do
+        Rails.cache.fetch_with_batched_keys('conditional_release_is_trigger', batch_object: assignment, batched_keys: :conditional_release) do
+          assignment.shard.activate { self.active.where(:trigger_assignment_id => assignment).exists? }
+        end
+      end
     end
   end
 end

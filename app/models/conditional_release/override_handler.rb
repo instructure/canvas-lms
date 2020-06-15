@@ -1,0 +1,93 @@
+#
+# Copyright (C) 2020 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+module ConditionalRelease
+  module OverrideHandler
+    class << self
+      # handle the parts of the service that was making API calls back to canvas to create/remove assignment overrides
+
+      def handle_grade_change(submission)
+        return unless submission.graded? && submission.posted? # sanity check
+        sets_to_assign, sets_to_unassign = find_assignment_sets(submission)
+
+        set_assignment_overrides(submission.user_id, sets_to_assign, sets_to_unassign)
+        ConditionalRelease::AssignmentSetAction.create_from_sets(sets_to_assign, sets_to_unassign,
+          student_id: submission.user_id, actor_id: submission.grader_id, source: 'grade_change')
+      end
+
+      def find_assignment_sets(submission)
+        rules = submission.course.conditional_release_rules.active.where(:trigger_assignment_id => submission.assignment).preload(:assignment_sets).to_a
+        relative_score = ConditionalRelease::Stats.percent_from_points(submission.score, submission.assignment.points_possible)
+
+        sets_to_assign = []
+        excluded_sets = []
+        rules.each do |rule|
+          new_sets = relative_score ? rule.assignment_sets_for_score(relative_score).to_a : []
+          if new_sets.length == 1 # otherwise they have to choose between sets
+            sets_to_assign += new_sets
+          end
+          excluded_sets += rule.assignment_sets.to_a - new_sets
+        end
+        # see if there are any they were previously assigned to
+        sets_to_unassign = ConditionalRelease::AssignmentSetAction.current_assignments(submission.user_id, excluded_sets).preload(:assignment_set).map(&:assignment_set)
+        [sets_to_assign, sets_to_unassign]
+      end
+
+      def set_assignment_overrides(student_id, sets_to_assign, sets_to_unassign)
+        assignments_to_assign = assignments_for_sets(sets_to_assign)
+        assignments_to_unassign = assignments_for_sets(sets_to_unassign)
+
+        existing_overrides = AssignmentOverride.active.
+          where(:assignment_id => assignments_to_assign + assignments_to_unassign, :set_type => 'ADHOC').to_a
+        ActiveRecord::Associations::Preloader.new.preload(existing_overrides, :assignment_override_students,
+          AssignmentOverrideStudent.where(:user_id => student_id)) # only care about records for this student
+        existing_overrides_map = existing_overrides.group_by(&:assignment_id)
+
+        assignments_to_assign.each do |to_assign|
+          overrides = existing_overrides_map[to_assign.id]
+          if overrides
+            unless overrides.any?{|o| o.assignment_override_students.map(&:user_id).include?(student_id)}
+              override = overrides.sort_by(&:id).first # kind of arbitrary but may as well be consistent and always pick the earliest
+              # we can pass in :no_enrollment to skip some queries - i assume they have an enrollment since they have a submission
+              override.assignment_override_students.create!(:user_id => student_id, :no_enrollment => false)
+            end
+          else
+            # have to create an override
+            new_override = to_assign.assignment_overrides.create!(
+              :set_type => 'ADHOC',
+              :assignment_override_students => [
+                AssignmentOverrideStudent.new(:assignment => to_assign, :user_id => student_id, :no_enrollment => false)
+              ])
+            existing_overrides_map[to_assign.id] = [new_override]
+          end
+        end
+
+        assignments_to_unassign.each do |to_unassign|
+          overrides = existing_overrides_map[to_unassign.id] || []
+          overrides.each do |o|
+            aos = o.assignment_override_students.detect{|aos| aos.user_id == student_id}
+            aos.destroy! if aos
+          end
+        end
+      end
+
+      def assignments_for_sets(sets)
+        sets.any? ? Assignment.active.where(:id => ConditionalRelease::AssignmentSetAssociation.active.where(:assignment_set_id => sets).select(:assignment_id)).to_a : []
+      end
+    end
+  end
+end

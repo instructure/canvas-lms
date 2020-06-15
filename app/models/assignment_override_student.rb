@@ -98,6 +98,8 @@ class AssignmentOverrideStudent < ActiveRecord::Base
       .each {|aos| aos.assignment_override.skip_broadcasts = true; aos.destroy}
   end
 
+  attr_writer :no_enrollment
+
   private
 
   def clean_up_assignment_if_override_student_orphaned
