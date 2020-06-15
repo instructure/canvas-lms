@@ -100,9 +100,10 @@ module ErrorContext
 
       def note_recent_spec_run(example)
         recent_spec_runs << {
-          location: RerunArgument.for(example),
           exception: example.exception,
-          pending: example.pending
+          location: RerunArgument.for(example),
+          pending: example.pending,
+          recorded_at: Time.zone.now
         }
         self.num_failures += 1 if example.exception
       end
