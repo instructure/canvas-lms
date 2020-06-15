@@ -172,7 +172,6 @@ export default function StatusBar(props) {
       ref={statusBarRef}
       onKeyDown={handleKey}
       onFocus={handleFocus}
-      role="status"
     >
       <Flex.Item grow>{renderPath()}</Flex.Item>
 
