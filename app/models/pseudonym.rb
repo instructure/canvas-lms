@@ -51,6 +51,8 @@ class Pseudonym < ActiveRecord::Base
   after_save :update_account_associations_if_account_changed
   has_a_broadcast_policy
 
+  alias_attribute :root_account_id, :account_id
+
   alias_method :context, :account
 
   include StickySisFields
@@ -122,13 +124,9 @@ class Pseudonym < ActiveRecord::Base
     end
   end
 
-  def root_account_id
-    account.root_account_id || account.id
-  end
-
   def must_be_root_account
     if account_id_changed?
-      self.errors.add(:account_id, "must belong to a root_account") unless self.account_id == self.root_account_id
+      self.errors.add(:account_id, "must belong to a root_account") unless account.root_account?
     end
   end
 
