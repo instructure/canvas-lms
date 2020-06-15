@@ -608,6 +608,11 @@ class User < ActiveRecord::Base
         current_associations[key] = [aa.id, aa.depth]
       end
 
+      account_id_to_root_account_id = Account.where(id: precalculated_associations&.keys).pluck(:id, :root_account_id).reduce({}) do |cache, fields|
+        cache[fields[0]] = fields[1] || fields[0]
+        cache
+      end
+
       users_or_user_ids.uniq.sort_by{|u| u.try(:id) || u}.each do |user_id|
         if user_id.is_a? User
           user = user_id
@@ -628,6 +633,7 @@ class User < ActiveRecord::Base
             aa = UserAccountAssociation.new
             aa.user_id = user_id
             aa.account_id = account_id
+            aa.root_account_id = account_id_to_root_account_id[account_id]
             aa.depth = depth
             aa.shard = Shard.shard_for(account_id)
             aa.shard.activate do

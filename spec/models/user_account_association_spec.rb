@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,14 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class UserAccountAssociation < ActiveRecord::Base
-  extend RootAccountResolver
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-  belongs_to :user
-  belongs_to :account
-
-  validates_presence_of :user_id, :account_id
-
-  resolves_root_account through: ->(instance){ instance.account&.resolved_root_account_id }
-
+describe UserAccountAssociation do
+  it "infers root account id from account" do
+    account = Account.default
+    user = user_model
+    uaa = UserAccountAssociation.create(user: user, account: account)
+    expect(uaa.root_account_id).to eq(account.resolved_root_account_id)
+  end
 end
