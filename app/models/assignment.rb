@@ -687,6 +687,7 @@ class Assignment < ActiveRecord::Base
       s.assignment = self
       s.assignment_changed_not_sub = true
       s.grade_change_event_author_id = @updating_user&.id
+      s.grader = @updating_user if @updating_user
 
       # Skip the grade calculation for now. We'll do it at the end.
       s.skip_grade_calc = true
