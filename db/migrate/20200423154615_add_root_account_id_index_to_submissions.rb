@@ -15,16 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AddRootAccountIdToSubmissions < ActiveRecord::Migration[5.2]
-  include MigrationHelpers::AddColumnAndFk
+class AddRootAccountIdIndexToSubmissions < ActiveRecord::Migration[5.2]
+  tag :postdeploy
+  disable_ddl_transaction!
 
-  tag :predeploy
-
-  def up
-    add_column_and_fk :submissions, :root_account_id, :accounts, if_not_exists: true
-  end
-
-  def down
-    remove_column :submissions, :root_account_id
+  def change
+    add_index :submissions, :root_account_id, algorithm: :concurrently, if_not_exists: true
   end
 end
