@@ -20,15 +20,24 @@
 # asset_group_code is for the group
 # so, for example, the asset could be an assignment, the group would be the assignment_group
 class AssetUserAccess < ActiveRecord::Base
+  extend RootAccountResolver
+
   belongs_to :context, polymorphic: [:account, :course, :group, :user], polymorphic_prefix: true
   belongs_to :user
   has_many :page_views
   before_save :infer_defaults
 
+  resolves_root_account through: ->(instance){ instance.infer_root_account_id }
+
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :participations, -> { where(:action_level => 'participate') }
   scope :most_recent, -> { order('updated_at DESC') }
+
+  def infer_root_account_id
+    return nil if context_type == 'User'
+    context&.resolved_root_account_id
+  end
 
   def category
     self.asset_category
