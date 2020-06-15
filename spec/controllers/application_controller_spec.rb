@@ -199,106 +199,120 @@ RSpec.describe ApplicationController do
       expect(controller.js_env[:KILL_JOY]).to be_truthy
     end
 
-    context "canvas_k6_theme" do
-      before(:each) do
-        controller.instance_variable_set(:@context, @course)
+    context "feature/release flags" do
+      context "canvas_k6_theme" do
+        before(:each) do
+          controller.instance_variable_set(:@context, @course)
+        end
+
+        it 'should populate js_env with elementary theme setting' do
+          expect(controller.js_env[:FEATURES]).to include(:canvas_k6_theme)
+        end
       end
 
-      it 'should populate js_env with elementary theme setting' do
-        expect(controller.js_env[:FEATURES]).to include(:canvas_k6_theme)
-      end
-    end
+      context "responsive_admin_settings" do
+        before(:each) do
+          controller.instance_variable_set(:@domain_root_account, Account.default)
+        end
 
-    context "responsive_admin_settings" do
-      before(:each) do
-        controller.instance_variable_set(:@domain_root_account, Account.default)
-      end
+        it 'is false if the feature flag is off' do
+          expect(controller.js_env[:FEATURES][:responsive_admin_settings]).to be_falsey
+        end
 
-      it 'is false if the feature flag is off' do
-        expect(controller.js_env[:FEATURES][:responsive_admin_settings]).to be_falsey
-      end
-
-      it 'is true if the feature flag is on' do
-        Account.default.enable_feature!(:responsive_admin_settings)
-        expect(controller.js_env[:FEATURES][:responsive_admin_settings]).to be_truthy
-      end
-    end
-
-    context "responsive_awareness" do
-      before(:each) do
-        controller.instance_variable_set(:@domain_root_account, Account.default)
+        it 'is true if the feature flag is on' do
+          Account.default.enable_feature!(:responsive_admin_settings)
+          expect(controller.js_env[:FEATURES][:responsive_admin_settings]).to be_truthy
+        end
       end
 
-      it 'is false if the feature flag is off' do
-        expect(controller.js_env[:FEATURES][:responsive_awareness]).to be_falsey
+      context "responsive_awareness" do
+        before(:each) do
+          controller.instance_variable_set(:@domain_root_account, Account.default)
+        end
+
+        it 'is false if the feature flag is off' do
+          expect(controller.js_env[:FEATURES][:responsive_awareness]).to be_falsey
+        end
+
+        it 'is true if the feature flag is on' do
+          Account.default.enable_feature!(:responsive_awareness)
+          expect(controller.js_env[:FEATURES][:responsive_awareness]).to be_truthy
+        end
       end
 
-      it 'is true if the feature flag is on' do
-        Account.default.enable_feature!(:responsive_awareness)
-        expect(controller.js_env[:FEATURES][:responsive_awareness]).to be_truthy
-      end
-    end
+      context "responsive_misc" do
+        before(:each) do
+          controller.instance_variable_set(:@domain_root_account, Account.default)
+        end
 
-    context "responsive_misc" do
-      before(:each) do
-        controller.instance_variable_set(:@domain_root_account, Account.default)
-      end
+        it 'is false if the feature flag is off' do
+          expect(controller.js_env[:FEATURES][:responsive_misc]).to be_falsey
+        end
 
-      it 'is false if the feature flag is off' do
-        expect(controller.js_env[:FEATURES][:responsive_misc]).to be_falsey
-      end
-
-      it 'is true if the feature flag is on' do
-        Account.default.enable_feature!(:responsive_misc)
-        expect(controller.js_env[:FEATURES][:responsive_misc]).to be_truthy
-      end
-    end
-
-    context "module_dnd" do
-      before(:each) do
-        controller.instance_variable_set(:@domain_root_account, Account.default)
+        it 'is true if the feature flag is on' do
+          Account.default.enable_feature!(:responsive_misc)
+          expect(controller.js_env[:FEATURES][:responsive_misc]).to be_truthy
+        end
       end
 
-      it 'is false if the feature flag is off' do
-        Account.default.disable_feature!(:module_dnd)
-        expect(controller.js_env[:FEATURES][:module_dnd]).to be_falsey
+      context "module_dnd" do
+        before(:each) do
+          controller.instance_variable_set(:@domain_root_account, Account.default)
+        end
+
+        it 'is false if the feature flag is off' do
+          Account.default.disable_feature!(:module_dnd)
+          expect(controller.js_env[:FEATURES][:module_dnd]).to be_falsey
+        end
+
+        it 'is true if the feature flag is on' do
+          Account.default.enable_feature!(:module_dnd)
+          expect(controller.js_env[:FEATURES][:module_dnd]).to be_truthy
+        end
       end
 
-      it 'is true if the feature flag is on' do
-        Account.default.enable_feature!(:module_dnd)
-        expect(controller.js_env[:FEATURES][:module_dnd]).to be_truthy
-      end
-    end
+      context "files_dnd" do
+        before(:each) do
+          controller.instance_variable_set(:@domain_root_account, Account.default)
+        end
 
-    context "files_dnd" do
-      before(:each) do
-        controller.instance_variable_set(:@domain_root_account, Account.default)
-      end
+        it 'is false if the feature flag is off' do
+          Account.default.disable_feature!(:files_dnd)
+          expect(controller.js_env[:FEATURES][:files_dnd]).to be_falsey
+        end
 
-      it 'is false if the feature flag is off' do
-        Account.default.disable_feature!(:files_dnd)
-        expect(controller.js_env[:FEATURES][:files_dnd]).to be_falsey
-      end
-
-      it 'is true if the feature flag is on' do
-        Account.default.enable_feature!(:files_dnd)
-        expect(controller.js_env[:FEATURES][:files_dnd]).to be_truthy
-      end
-    end
-
-    context "unpublished_courses" do
-      before(:each) do
-        controller.instance_variable_set(:@domain_root_account, Account.default)
+        it 'is true if the feature flag is on' do
+          Account.default.enable_feature!(:files_dnd)
+          expect(controller.js_env[:FEATURES][:files_dnd]).to be_truthy
+        end
       end
 
-      it 'is false if the feature flag is off' do
-        Account.default.disable_feature!(:unpublished_courses)
-        expect(controller.js_env[:FEATURES][:unpublished_courses]).to be_falsey
+      context "unpublished_courses" do
+        before(:each) do
+          controller.instance_variable_set(:@domain_root_account, Account.default)
+        end
+
+        it 'is false if the feature flag is off' do
+          Account.default.disable_feature!(:unpublished_courses)
+          expect(controller.js_env[:FEATURES][:unpublished_courses]).to be_falsey
+        end
+
+        it 'is true if the feature flag is on' do
+          Account.default.enable_feature!(:unpublished_courses)
+          expect(controller.js_env[:FEATURES][:unpublished_courses]).to be_truthy
+        end
       end
 
-      it 'is true if the feature flag is on' do
-        Account.default.enable_feature!(:unpublished_courses)
-        expect(controller.js_env[:FEATURES][:unpublished_courses]).to be_truthy
+      context "rce_lti_favorites" do
+        it 'is false if the feature flag is off' do
+          Account.site_admin.disable_feature!(:rce_lti_favorites)
+          expect(controller.js_env[:FEATURES][:rce_lti_favorites]).to be_falsey
+        end
+
+        it 'is true if the feature flag is on' do
+          Account.site_admin.enable_feature!(:rce_lti_favorites)
+          expect(controller.js_env[:FEATURES][:rce_lti_favorites]).to be_truthy
+        end
       end
     end
 
