@@ -55,7 +55,7 @@ class NotificationMessageCreator
   def create_message
     to_user_channels = Hash.new([])
     @to_users.each do |user|
-      to_user_channels[user] += user.communication_channels.active
+      to_user_channels[user] += user.communication_channels.select(&:active?)
     end
     @to_channels.each do |channel|
       to_user_channels[channel.user] += [channel]
@@ -222,10 +222,23 @@ class NotificationMessageCreator
       policy = override_policy_for(channel, @message_data&.dig(:course_id), 'Course')
       policy ||= override_policy_for(channel, @message_data&.dig(:root_account_id), 'Account')
     end
+    if !policy && should_use_default_policy?(user, channel)
+      policy ||= channel.notification_policies.new(notification_id: @notification.id, frequency: @notification.default_frequency(user))
+    end
     # We use find here because the policies and policy overrides are already loaded and we don't want to execute a query
     policy ||= channel.notification_policies.find { |np| np.notification_id == notification.id }
-    policy ||= channel.notification_policies.create!(notification_id: notification.id, frequency: notification.default_frequency(user))
-    policy if ['daily', 'weekly'].include?(policy.frequency)
+    policy if ['daily', 'weekly'].include?(policy&.frequency)
+  end
+
+  def should_use_default_policy?(user, channel)
+    # only use new policies for default channel when there are no other policies for the notification and user.
+    # If another policy exists then it means the notification preferences page has been visited and null values
+    # show as never policies in the UI.
+    default_email?(user, channel) && (user.notification_policies.find { |np| np.notification_id == @notification.id }).nil?
+  end
+
+  def default_email?(user, channel)
+    user.email_channel == channel
   end
 
   def override_policy_for(channel, context_id, context_type, notification: @notification)
