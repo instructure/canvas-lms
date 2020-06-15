@@ -54,15 +54,11 @@ class NotificationMessageCreator
     delayed_messages = []
 
     @to_user_channels.each do |user, channels|
-      # asset_filtered_by_user is used for the asset (ie assignment, announcement)
+      # asset_applied_to is used for the asset (ie assignment, announcement)
       # to filter users out that do not apply to the notification like when a due
       # date is different for a specific user when using variable due dates.
-      next unless asset_filtered_by_user(user)
-      user_locale = infer_locale(
-        :user => user,
-        :context => user_asset_context(asset_filtered_by_user(user)),
-        :ignore_browser_locale => true
-      )
+      next unless (asset = asset_applied_to(user))
+      user_locale = infer_locale(user: user, context: user_asset_context(asset), ignore_browser_locale: true)
       I18n.with_locale(user_locale) do
         channels.each do |default_channel|
           if @notification.registration?
@@ -152,7 +148,6 @@ class NotificationMessageCreator
   end
 
   def build_immediate_messages_for(user, channels=immediate_channels_for(user).reject(&:unconfirmed?))
-    return [] unless asset_filtered_by_user(user)
     return [] unless notifications_enabled_for_context?(user, @course)
 
     messages = []
@@ -233,7 +228,7 @@ class NotificationMessageCreator
       end
     end
   end
-  
+
   def user_channels(to_list)
     to_user_channels = Hash.new([])
     # if this method is given users we preload communication channels and they
@@ -267,7 +262,7 @@ class NotificationMessageCreator
     to_list.select{ |to| to.is_a? CommunicationChannel }.uniq
   end
 
-  def asset_filtered_by_user(user)
+  def asset_applied_to(user)
     if asset.respond_to?(:filter_asset_by_recipient)
       asset.filter_asset_by_recipient(@notification, user)
     else
@@ -276,7 +271,7 @@ class NotificationMessageCreator
   end
 
   def message_options_for(user)
-    user_asset = asset_filtered_by_user(user)
+    user_asset = asset_applied_to(user)
 
     message_options = {
       :subject => @notification.subject,
