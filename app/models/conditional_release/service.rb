@@ -47,8 +47,17 @@ module ConditionalRelease
       env = {
         CONDITIONAL_RELEASE_SERVICE_ENABLED: enabled
       }
+      return env unless enabled && user
 
-      if enabled && user
+      if self.natively_enabled_for_account?(context.root_account)
+        cyoe_env = {native: true}
+        cyoe_env[:assignment] = assignment_attributes(assignment) if assignment
+        if context.is_a?(Course)
+          cyoe_env[:course_id] = context.id
+          cyoe_env[:stats_url] = "/api/v1/courses/#{context.id}/mastery_paths/stats"
+        end
+        # TODO: add rules and whatnot
+      else
         cyoe_env = {
           jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
           assignment: assignment_attributes(assignment),
@@ -61,14 +70,8 @@ module ConditionalRelease
 
         cyoe_env[:rule] = rule_triggered_by(assignment, user, session) if includes.include? :rule
         cyoe_env[:active_rules] = active_rules(context, user, session) if includes.include? :active_rules
-
-        new_env = {
-          CONDITIONAL_RELEASE_ENV: cyoe_env
-        }
-
-        env.merge!(new_env)
       end
-      env
+      env.merge(CONDITIONAL_RELEASE_ENV: cyoe_env)
     end
 
     def self.jwt_for(context, user, domain, claims: {}, session: nil, real_user: nil)
@@ -120,12 +123,23 @@ module ConditionalRelease
       @config ||= DEFAULT_CONFIG.merge(config_file)
     end
 
-    def self.configured?
+    # whether new accounts will use the ported canvas db and UI instead of provisioning onto the service
+    # can flip this setting on when canvas-side is code-complete but the migration is still pending
+    def self.prefer_native?
+      Setting.get("conditional_release_prefer_native", "false") == "true"
+    end
+
+    # TODO: can remove when all accounts are migrated
+    def self.natively_enabled_for_account?(root_account)
+      !!root_account&.settings&.[](:use_native_conditional_release)
+    end
+
+    def self.service_configured?
       !!(config[:enabled] && config[:host])
     end
 
     def self.enabled_in_context?(context)
-      !!(configured? && context&.feature_enabled?(:conditional_release))
+      !!((service_configured? || natively_enabled_for_account?(context&.root_account)) && context&.feature_enabled?(:conditional_release))
     end
 
     def self.protocol

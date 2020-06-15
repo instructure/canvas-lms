@@ -356,7 +356,7 @@ class Quizzes::QuizzesController < ApplicationController
       set_master_course_js_env_data(@quiz, @context)
 
       js_bundle :quizzes_bundle
-      css_bundle :quizzes, :tinymce
+      css_bundle :quizzes, :tinymce, :conditional_release_editor
       render :new, stream: can_stream_template?
     end
   end

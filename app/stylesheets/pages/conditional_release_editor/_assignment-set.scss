@@ -1,0 +1,95 @@
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.cr-assignment-set {
+  display: flex;
+  flex-direction: row;
+}
+
+.cr-assignment-set__inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+
+  &:not(:first-child) {
+    margin-#{direction(left)}: -1px;
+  }
+}
+
+.cr-assignment-set__empty {
+  position: relative;
+  margin: auto;
+  height: 156px;
+  width: 180px;
+  margin-#{direction(right)}: -170px;
+
+  .cr-assignment-set__can-drop {
+    box-shadow: 0 0 10px 0px var(--ic-brand-primary);
+  }
+}
+
+.cr-assignment-set__drag-over {
+  box-shadow: 0 0 10px 0 $ic-color-danger;
+}
+
+.cr-assignment-set__can-drop {
+  box-shadow: none;
+
+  .cr-assignment-set__inner__draggedOver {
+
+    // card being dragged over..
+    .cr-assignment-card {
+      border-color: var(--ic-link-color);
+      margin-#{direction(right)}: 17px;
+
+      // card dragging over itself
+      &.cr-assignment-card__dragging {
+        margin-#{direction(right)}: 0;
+
+        &:after {
+          display: none;
+        }
+      }
+
+      // blue bar after card being dragged over
+      &:after {
+        content: '';
+        display: block;
+        width: 7px;
+        position: absolute;
+        top: -6px;
+        bottom: -6px;
+        #{direction(right)}: -13px;
+        background: var(--ic-link-color);
+      }
+    }
+
+    // toggle button of card being dragged over
+    .cr-condition-toggle__and {
+      position: relative;
+      #{direction(right)}: 6px;
+
+      .cr-condition-toggle__button {
+        border-radius: 3px;
+        border: 2px solid var(--ic-link-color);
+        transition: none;
+      }
+    }
+  }
+}

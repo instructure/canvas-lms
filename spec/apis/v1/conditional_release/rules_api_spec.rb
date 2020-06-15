@@ -80,7 +80,7 @@ module ConditionalRelease
       end
 
       it 'filters based on assignment id' do
-        json = api_call(:get, @url, @base_params.merge(trigger_assignment: @assignment.id), {}, {}, {:expected_status => 200})
+        json = api_call(:get, @url, @base_params.merge(trigger_assignment_id: @assignment.id), {}, {}, {:expected_status => 200})
         expect(json.length).to eq 2
       end
 

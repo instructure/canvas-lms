@@ -108,6 +108,8 @@ class Assignment < ActiveRecord::Base
     dependent: :destroy,
     inverse_of: :assignment
 
+  has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment
+
   scope :anonymous, -> { where(anonymous_grading: true) }
   scope :moderated, -> { where(moderated_grading: true) }
   scope :auditable, -> { anonymous.or(moderated) }

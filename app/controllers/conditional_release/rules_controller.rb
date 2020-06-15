@@ -30,13 +30,13 @@ module ConditionalRelease
       rules = rules.preload(Rule.all_includes) if include_param.include?('all')
       rules = rules.with_assignments if value_to_boolean(params[:active])
 
-      render json: rules.as_json(include: json_includes, include_root: false)
+      render json: rules.as_json(include: json_includes, include_root: false, except: [:root_account_id, :deleted_at])
     end
 
     # GET /api/rules/:id
     def show
       rule = get_rule
-      render json: rule.as_json(include: json_includes, include_root: false)
+      render json: rule.as_json(include: json_includes, include_root: false, except: [:root_account_id, :deleted_at])
     end
 
     # POST /api/rules
@@ -52,7 +52,7 @@ module ConditionalRelease
       rule = Rule.new(create_params)
 
       if rule.save
-        render json: rule.as_json(include: all_includes, include_root: false)
+        render json: rule.as_json(include: all_includes, include_root: false, except: [:root_account_id, :deleted_at])
       else
         render json: rule.errors, status: :bad_request
       end
@@ -70,7 +70,7 @@ module ConditionalRelease
         :assignment_set_associations
       )
       if rule.update(update_params)
-        render json: rule.as_json(include: all_includes, include_root: false)
+        render json: rule.as_json(include: all_includes, include_root: false, except: [:root_account_id, :deleted_at])
       else
         render json: rule.errors, status: :bad_request
       end
@@ -87,7 +87,7 @@ module ConditionalRelease
 
     def get_rules
       rules = @context.conditional_release_rules.active
-      rules = rules.where(trigger_assignment_id: params[:trigger_assignment]) unless params[:trigger_assignment].blank?
+      rules = rules.where(trigger_assignment_id: params[:trigger_assignment_id]) unless params[:trigger_assignment_id].blank?
       rules
     end
 
@@ -100,7 +100,14 @@ module ConditionalRelease
     end
 
     def all_includes
-      { scoring_ranges: { include: { assignment_sets: { include: :assignment_set_associations } } } }
+      { scoring_ranges: {
+        include: {
+          assignment_sets: {
+            include: {assignment_set_associations: {except: [:root_account_id, :deleted_at]}},
+            except: [:root_account_id, :deleted_at]
+          } },
+        except: [:root_account_id, :deleted_at]
+      } }
     end
 
     def json_includes
