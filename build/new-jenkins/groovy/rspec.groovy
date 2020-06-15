@@ -26,17 +26,18 @@ def seleniumConfig() {
 }
 
 def runSeleniumSuite(total, index) {
+  def config = seleniumConfig()
   _runRspecTestSuite(
       total,
       index,
       'docker-compose.new-jenkins.multiple-processes.yml:docker-compose.new-jenkins-selenium.yml',
       'selenium',
-      seleniumConfig().max_fail,
-      seleniumConfig().reruns_retry,
+      config.max_fail,
+      config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
       '3',
-      seleniumConfig().force_failure
+      config.force_failure
   )
 }
 
@@ -50,17 +51,18 @@ def rspecConfig() {
 }
 
 def runRSpecSuite(total, index) {
+  def config = rspecConfig()
   _runRspecTestSuite(
       total,
       index,
       'docker-compose.new-jenkins.multiple-processes.yml',
       'rspec',
-      rspecConfig().max_fail,
-      rspecConfig().reruns_retry,
+      config.max_fail,
+      config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/selenium',
       '4',
-      rspecConfig().force_failure
+      config.force_failure
   )
 }
 
