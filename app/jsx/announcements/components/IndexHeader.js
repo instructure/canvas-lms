@@ -117,6 +117,7 @@ export default class IndexHeader extends Component {
                 label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}
               >
                 <select
+                  id="announcement-filter"
                   name="filter-dropdown"
                   onChange={e => this.props.searchAnnouncements({filter: e.target.value})}
                   style={{
