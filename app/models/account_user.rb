@@ -17,6 +17,8 @@
 #
 
 class AccountUser < ActiveRecord::Base
+  extend RootAccountResolver
+
   belongs_to :account
   belongs_to :user
   belongs_to :role
@@ -31,8 +33,9 @@ class AccountUser < ActiveRecord::Base
   after_destroy :update_account_associations_later
 
   validate :valid_role?, :unless => :deleted?
-
   validates_presence_of :account_id, :user_id, :role_id
+
+  resolves_root_account through: ->(instance){ instance.account&.resolved_root_account_id }
 
   alias_method :context, :account
 

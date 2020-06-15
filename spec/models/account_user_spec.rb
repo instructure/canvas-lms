@@ -181,5 +181,17 @@ describe AccountUser do
       au = AccountUser.create(user: @user, account: @sub2, role: @sub1role, workflow_state: 'deleted')
       expect(au).to be_valid
     end
+
+    describe 'root_account_id' do
+      it "uses root_account value from account" do
+        au = AccountUser.create(user: @user, account: @sub1a, role: @sub1role)
+        expect(au.root_account_id).to eq(@account.id)
+      end
+
+      it "keeps set value if it already exists" do
+        au = AccountUser.create(user: @user, account: @sub1a, role: @sub1role, root_account_id: @sub1.id)
+        expect(au.root_account_id).to eq(@sub1.id)
+      end
+    end
   end
 end
