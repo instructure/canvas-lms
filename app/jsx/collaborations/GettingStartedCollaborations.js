@@ -48,8 +48,13 @@ class GettingStartedCollaborations extends React.Component {
     } else {
       header = I18n.t('Getting started with Collaborations')
       content = I18n.t(
-        'Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by clicking on the "+ Collaboration" button.'
+        'Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Talk to your teacher to get started.'
       )
+      if (ENV.CREATE_PERMISSION) {
+        content = I18n.t(
+          'Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by clicking on the "+ Collaboration" button.'
+        )
+      }
       link = (
         <a href="https://community.canvaslms.com/docs/DOC-2627">
           {I18n.t('Learn more about collaborations')}

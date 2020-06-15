@@ -47,6 +47,7 @@ const applicationState = {
 function setEnvironment() {
   ENV.context_asset_string = 'courses_1'
   ENV.current_user_roles = 'teacher'
+  ENV.CREATE_PERMISSION = true
 }
 
 test('renders the getting started component when there are no collaborations', () => {
