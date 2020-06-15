@@ -21,6 +21,30 @@ module SeleniumExtensions
   class Error < ::RuntimeError; end
   class NestedWaitError < Error; end
 
+  module ElementNotInteractableProtection
+    def click(*args)
+      to_fail = false
+
+      begin
+        super
+      rescue Selenium::WebDriver::Error::ElementNotInteractableError => e
+        raise e if to_fail
+
+        to_fail = true
+
+        begin
+          Selenium::WebDriver::Wait.new(timeout: 2).until do
+            displayed? && enabled?
+          end
+        rescue
+          raise e
+        end
+
+        retry
+      end
+    end
+  end
+
   module StaleElementProtection
     attr_accessor :finder_proc
 
@@ -154,6 +178,7 @@ module SeleniumExtensions
   end
 end
 
+Selenium::WebDriver::Element.prepend(SeleniumExtensions::ElementNotInteractableProtection)
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::StaleElementProtection)
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::FinderWaiting)
 Selenium::WebDriver::Driver.prepend(SeleniumExtensions::PreventEarlyInteraction)
