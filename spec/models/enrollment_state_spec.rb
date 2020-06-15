@@ -18,6 +18,42 @@
 require_relative "../spec_helper"
 
 describe EnrollmentState do
+  describe "root_account_id" do
+    let(:course) { course_factory && @course }
+    let(:enrollment) { student_in_course(course: course) }
+
+    it 'assigns it on save if it is not set' do
+      enrollment.enrollment_state.root_account_id = nil
+
+      expect {
+        enrollment.enrollment_state.save!
+      }.to change {
+        enrollment.enrollment_state.root_account_id
+      }.from(nil).to(enrollment.root_account_id)
+    end
+
+    it 'preserves it on save if it was already set' do
+      expect(enrollment).not_to receive(:root_account_id)
+
+      expect {
+        enrollment.enrollment_state.save!
+      }.not_to change {
+        EnrollmentState.find_by(enrollment_id: enrollment.id).root_account_id
+      }
+    end
+
+    it 'does nothing on save if it is not set and could not be resolved' do
+      enrollment.enrollment_state.update_column(:root_account_id, nil)
+
+      expect(enrollment).to receive(:root_account_id).and_return(nil)
+
+      expect {
+        enrollment.enrollment_state.save!
+      }.not_to change {
+        EnrollmentState.find(enrollment.enrollment_state.id).root_account_id
+      }
+    end
+  end
 
   describe "#enrollments_needing_calculation" do
     it "should find enrollments that need calculation" do
