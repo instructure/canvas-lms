@@ -74,6 +74,16 @@ module DataFixup::Auditors::Migrate
           rec_ids = records.map(&:id)
           ids.each{|id| expect(rec_ids).to include(id['id'])}
         end
+
+        it "aborts cleanly if all records already inserted" do
+          date = Time.zone.today
+          expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(0)
+          worker = AuthenticationWorker.new(account.id, date)
+          worker.perform_migration
+          expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(20)
+          expect { worker.perform_migration }.to_not raise_error
+          expect(::Auditors::ActiveRecord::AuthenticationRecord.count).to eq(20)
+        end
       end
 
       it "recovers if user has been hard deleted" do
@@ -114,6 +124,22 @@ module DataFixup::Auditors::Migrate
       ])
       expect(filtered.size).to eq(1)
       expect(filtered[0]['submission_id']).to eq(submission.id)
+    end
+
+    it "handles missing users" do
+      submission = submission_model
+      other_submission = submission_model
+      user = user_model
+      expect(submission.id).to_not be_nil
+      expect(user.id).to_not be_nil
+      worker = GradeChangeWorker.new(account.id, Time.now.utc)
+      filtered = worker.filter_dead_foreign_keys([
+        {'student_id' => nil, 'grader_id' => nil, 'submission_id' => other_submission.id},
+        {'student_id' => nil, 'grader_id' => nil, 'submission_id' => submission.id},
+      ])
+      expect(filtered.size).to eq(2)
+      expect(filtered[0]['submission_id']).to eq(other_submission.id)
+      expect(filtered[1]['submission_id']).to eq(submission.id)
     end
 
     it "writes course data to postgres that's in cassandra" do
