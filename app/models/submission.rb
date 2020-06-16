@@ -470,6 +470,7 @@ class Submission < ActiveRecord::Base
 
     return false if self.assignment.muted? # if you don't have manage rights from the assignment you can't read if it's muted
     return true if user && user.id == self.user_id # this is fast, so skip the policy cache check if possible
+    return true if user_is_observer?(user)
 
     self.grants_right?(user, session, :read_grade)
   end
