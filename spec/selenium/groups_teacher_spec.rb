@@ -163,6 +163,7 @@ describe "new groups" do
       f(".message-all-unassigned").click
       replace_content(fj('textarea[name="body"]'), "blah blah blah students")
       fj(".btn-primary[data-text-when-loaded='Sent!']").click
+      wait_for_ajaximations
 
       expect(@course).to eq Conversation.last.context
     end
