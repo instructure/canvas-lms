@@ -1203,18 +1203,18 @@ class Course < ActiveRecord::Base
   end
 
   def recompute_student_scores_without_send_later(student_ids = nil, opts = {})
-    if student_ids.present?
+    visible_student_ids = if student_ids.present?
       # We were given student_ids.  Let's see how many of those students can even see this assignment
-      student_ids = admin_visible_student_enrollments.where(user_id: student_ids).pluck(:user_id)
+      admin_visible_student_enrollments.where(user_id: student_ids).pluck(:user_id)
+    else
+      # We were not given any student_ids
+      # Let's get them all!
+      admin_visible_student_enrollments.pluck(:user_id)
     end
 
-    # We were either not given any student_ids or none of those students could see this assignment.
-    # Let's get them all!
-    student_ids = admin_visible_student_enrollments.pluck(:user_id) unless student_ids.present?
-
-    Rails.logger.debug "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
+    Rails.logger.debug "GRADES: recomputing scores in course=#{global_id} students=#{visible_student_ids.inspect}"
     Enrollment.recompute_final_score(
-      student_ids,
+      visible_student_ids,
       self.id,
       grading_period_id: opts[:grading_period_id],
       update_all_grading_period_scores: opts.fetch(:update_all_grading_period_scores, true)
