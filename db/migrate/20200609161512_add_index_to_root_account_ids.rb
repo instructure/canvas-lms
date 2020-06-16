@@ -67,8 +67,6 @@ class AddIndexToRootAccountIds < ActiveRecord::Migration[5.2]
     add_index :custom_gradebook_columns, :root_account_id, algorithm: :concurrently, if_not_exists: true
     add_index :learning_outcome_groups, :root_account_id, algorithm: :concurrently, if_not_exists: true
     add_index :custom_gradebook_column_data, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    add_index :conversations, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    add_index :conversation_participants, :root_account_id, algorithm: :concurrently, if_not_exists: true
     add_index :master_courses_master_migrations, :root_account_id, algorithm: :concurrently, if_not_exists: true
     add_index :learning_outcomes, :root_account_id, algorithm: :concurrently, if_not_exists: true
     add_index :learning_outcome_question_results, :root_account_id, algorithm: :concurrently, if_not_exists: true
@@ -89,8 +87,6 @@ class AddIndexToRootAccountIds < ActiveRecord::Migration[5.2]
     add_index :calendar_events, :root_account_id, algorithm: :concurrently, if_not_exists: true
     add_index :folders, :root_account_id, algorithm: :concurrently, if_not_exists: true
     add_index :communication_channels, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    add_index :conversation_messages, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    add_index :conversation_message_participants, :root_account_id, algorithm: :concurrently, if_not_exists: true
     add_index :favorites, :root_account_id, algorithm: :concurrently, if_not_exists: true
     add_index :discussion_topics, :root_account_id, algorithm: :concurrently, if_not_exists: true
     add_index :discussion_entry_participants, :root_account_id, algorithm: :concurrently, if_not_exists: true

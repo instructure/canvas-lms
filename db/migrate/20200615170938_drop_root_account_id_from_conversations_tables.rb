@@ -14,18 +14,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-class AddRootAccountIdToConversationMessageParticipants < ActiveRecord::Migration[5.2]
-  include MigrationHelpers::AddColumnAndFk
 
-  tag :predeploy
-  disable_ddl_transaction!
+class DropRootAccountIdFromConversationsTables < ActiveRecord::Migration[5.2]
+  tag :postdeploy
 
-  def up
-    add_column_and_fk :conversation_message_participants, :root_account_id, :accounts, if_not_exists: true
-  end
-
-  def down
-    remove_column :conversation_message_participants, :root_account_id
+  def change
+    remove_column :conversations, :root_account_id if column_exists?(:conversations, :root_account_id)
+    remove_column :conversation_participants, :root_account_id if column_exists?(:conversation_participants, :root_account_id)
+    remove_column :conversation_messages, :root_account_id if column_exists?(:conversation_messages, :root_account_id)
+    remove_column :conversation_message_participants, :root_account_id if column_exists?(:conversation_message_participants, :root_account_id)
   end
 end
