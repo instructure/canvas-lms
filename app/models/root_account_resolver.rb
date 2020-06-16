@@ -20,7 +20,8 @@ module RootAccountResolver
   # Resolve the root account for this model through some available relationship.
   #
   # Pass a symbol for the relationship name whose root_account_id should be
-  # inherited, or a proc to resolve from the instance manually.
+  # inherited, or a proc to resolve from the instance manually. If your source
+  # is an Account, we will use its #resolved_root_account_id helper instead.
   #
   #     resolves_root_account through: :enrollment
   #     resolves_root_account through: ->(instance) {
@@ -30,7 +31,16 @@ module RootAccountResolver
   def resolves_root_account(through:)
     resolver = case through
     when Symbol
-      ->(instance) { instance.send(through)&.root_account_id }
+      ->(instance) do
+        source = instance.send(through)
+
+        case source
+        when Account
+          source.resolved_root_account_id
+        else
+          source&.root_account_id
+        end
+      end
     when Proc
       through
     else

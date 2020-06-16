@@ -35,7 +35,7 @@ class AccountUser < ActiveRecord::Base
   validate :valid_role?, :unless => :deleted?
   validates_presence_of :account_id, :user_id, :role_id
 
-  resolves_root_account through: ->(instance){ instance.account&.resolved_root_account_id }
+  resolves_root_account through: :account
 
   alias_method :context, :account
 

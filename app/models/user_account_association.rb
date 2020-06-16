@@ -24,6 +24,6 @@ class UserAccountAssociation < ActiveRecord::Base
 
   validates_presence_of :user_id, :account_id
 
-  resolves_root_account through: ->(instance){ instance.account&.resolved_root_account_id }
+  resolves_root_account through: :account
 
 end
