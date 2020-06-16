@@ -18,6 +18,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+library "canvas-builds-library"
+
 @groovy.transform.Field
 def result_test_count = -1
 @groovy.transform.Field
@@ -26,16 +28,6 @@ def result_node_count = -1
 def changed_tests = ''
 @groovy.transform.Field
 def fsc_timeout = false
-
-def getImageTagVersion() {
-  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
-  return flags.getImageTagVersion()
-}
-
-def getForceFailureFSC() {
-  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
-  return flags.isForceFailureFSC() ? '1' : '0'
-}
 
 def isPlugin() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "0" : "1"
@@ -170,7 +162,7 @@ pipeline {
     IS_PLUGIN = isPlugin()
     DOCKER_WORKDIR = getDockerWorkDir()
     LOCAL_WORKDIR = getLocalWorkDir()
-    FORCE_FAILURE = getForceFailureFSC()
+    FORCE_FAILURE = configuration.forceFailureFSC()
     // there will be a node for every 10 tests
     DISTRIBUTED_FACTOR = '10'
     // this causes distribution to trigger at an offset
@@ -185,18 +177,9 @@ pipeline {
   }
 
   stages {
-    stage('Checkout and clean') {
+    stage('Setup') {
       steps {
-        timeout(time: 5) {
-          sh 'build/new-jenkins/docker-cleanup.sh'
-          sh 'rm -vrf ./tmp/'
-        }
-      }
-    }
-
-    stage('Print Env Variables') {
-      steps {
-        sh 'build/new-jenkins/print-env-excluding-secrets.sh'
+        cleanAndSetup()
       }
     }
 
@@ -236,14 +219,14 @@ pipeline {
                   node('canvas-docker') {
                     stage("Running Flakey Set $node_number") {
                       try {
+                        cleanAndSetup()
                         sh 'rm -vrf ./tmp'
                         checkout scm
-                        sh 'build/new-jenkins/docker-cleanup.sh'
                         executeFlakeySpecCatcher("node$node_number")
                       }
                       finally {
                         sh 'rm -vrf ./tmp'
-                        sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+                        execute 'bash/docker-cleanup.sh --allow-failure'
                       }
                     }
                   }
@@ -268,7 +251,7 @@ pipeline {
   post {
     cleanup {
       sh 'rm -vrf ./tmp/'
-      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+      execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

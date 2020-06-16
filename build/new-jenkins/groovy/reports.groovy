@@ -85,13 +85,13 @@ def sendFailureMessageIfPresent() {
       echo "build not associated with a PS... not sending message"
     }
     else {
-      load('build/new-jenkins/groovy/credentials.groovy').withGerritCredentials({
+      credentials.withGerritCredentials {
         sh """
           gerrit_message=`cat $message_file`
           ssh -i "\$SSH_KEY_PATH" -l "\$SSH_USERNAME" -p \$GERRIT_PORT \
             \$GERRIT_HOST gerrit review -m "'\$gerrit_message'" \$GERRIT_CHANGE_NUMBER,\$GERRIT_PATCHSET_NUMBER
         """
-      })
+      }
     }
   }
   else {
@@ -213,8 +213,7 @@ def snykCheckDependencies(projectImage, projectDirectory) {
 }
 
 def runSnyk(projectContainer, projectDirectory, projectName, snykImage, packageManagerFile, extractedReportsDirectory) {
-  def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
-  credentials.withSnykCredentials({ ->
+  credentials.withSnykCredentials {
     def RC = sh(
       script: """
         set -o errexit -o nounset -o xtrace
@@ -233,7 +232,7 @@ def runSnyk(projectContainer, projectDirectory, projectName, snykImage, packageM
     if(RC != 0 && RC != 1) {
       error "Snyk dependency check for ${projectName} failed with an unrecognized return code: $RC"
     }
-  })
+  }
   this.extractSnykReports(projectContainer, projectDirectory, extractedReportsDirectory)
 }
 

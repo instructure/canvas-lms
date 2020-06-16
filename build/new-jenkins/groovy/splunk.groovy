@@ -24,7 +24,7 @@ import groovy.json.*
 // the json objects are simply concatenated if there are multiple (no [] and no commas)
 def upload(events) {
   logEvents(events)
-  load('build/new-jenkins/groovy/credentials.groovy').withSplunkCredentials({
+  credentials.withSplunkCredentials({
     sh "build/new-jenkins/splunk_event.sh '${new JsonBuilder(events).toString()}'"
   })
 }

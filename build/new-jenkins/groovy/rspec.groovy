@@ -17,12 +17,11 @@
  */
 
 def seleniumConfig() {
-  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
   [
-    node_total: (env.SELENIUM_CI_NODE_TOTAL ?: '25') as Integer,
-    max_fail: (env.SELENIUM_MAX_FAIL ?: "100") as Integer,
-    reruns_retry: (env.SELENIUM_RERUN_RETRY ?: "3") as Integer,
-    force_failure: flags.isForceFailureSelenium() ? "1" : ''
+    node_total: configuration.getInteger('selenium-ci-node-total'),
+    max_fail: configuration.getInteger('selenium-max-fail'),
+    reruns_retry: configuration.getInteger('selenium-rerun-retry'),
+    force_failure: configuration.isForceFailureSelenium() ? "1" : ''
   ]
 }
 
@@ -42,12 +41,11 @@ def runSeleniumSuite(total, index) {
 }
 
 def rspecConfig() {
-  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
   [
-    node_total: (env.RSPEC_CI_NODE_TOTAL ?: '15') as Integer,
-    max_fail: (env.RSPEC_MAX_FAIL ?: "100") as Integer,
-    reruns_retry: (env.RSPEC_RERUN_RETRY ?: "1") as Integer,
-    force_failure: flags.isForceFailureRspec() ? "1" : '',
+    node_total: configuration.getInteger('rspec-ci-node-total'),
+    max_fail: configuration.getInteger('rspec-max-fail'),
+    reruns_retry: configuration.getInteger('rspec-rerun-retry'),
+    force_failure: configuration.isForceFailureRSpec() ? "1" : ''
   ]
 }
 
@@ -90,11 +88,10 @@ def _runRspecTestSuite(
       "POSTGRES_PASSWORD=sekret",
   ]) {
     try {
+      cleanAndSetup()
       sh 'rm -rf ./tmp'
-      sh 'build/new-jenkins/docker-cleanup.sh'
       sh 'mkdir -p tmp'
       timeout(time: 60) {
-        sh 'build/new-jenkins/print-env-excluding-secrets.sh'
         sh 'build/new-jenkins/docker-compose-pull.sh'
         sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
         sh 'build/new-jenkins/docker-compose-build-up.sh'
@@ -114,7 +111,7 @@ def _runRspecTestSuite(
         reports.stashSpecCoverage(prefix, index)
       }
       sh 'rm -rf ./tmp'
-      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+      execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

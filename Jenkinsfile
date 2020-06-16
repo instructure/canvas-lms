@@ -35,22 +35,7 @@ def buildParameters = [
   string(name: 'MASTER_BOUNCER_RUN', value: "${env.MASTER_BOUNCER_RUN}")
 ]
 
-def getImageTagVersion() {
-  def flags = load('build/new-jenkins/groovy/commit-flags.groovy')
-  flags.getImageTagVersion()
-}
-
-def getPublishableTagSuffix() {
-  load('build/new-jenkins/groovy/configuration.groovy').publishableTagSuffix()
-}
-
-def getRubyPassenger() {
-  load('build/new-jenkins/groovy/configuration.groovy').rubyPassenger()
-}
-
-def getPostgres() {
-  load('build/new-jenkins/groovy/configuration.groovy').postgres()
-}
+library "canvas-builds-library"
 
 def runDatadogMetric(name, body) {
   def dd = load('build/new-jenkins/groovy/datadog.groovy')
@@ -98,10 +83,6 @@ def ignoreBuildNeverStartedError(block) {
   }
 }
 
-def buildRegistryFQDN() {
-  load('build/new-jenkins/groovy/configuration.groovy').buildRegistryFQDN()
-}
-
 // ignore builds where the current patchset tag doesn't match the
 // mainline publishable tag. i.e. ignore ruby-passenger-2.6/pg-12
 // upgrade builds
@@ -123,18 +104,18 @@ pipeline {
   environment {
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
-    NAME = getImageTagVersion()
+    NAME = imageTagVersion()
     CANVAS_LMS_IMAGE = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms"
-    BUILD_REGISTRY_FQDN = buildRegistryFQDN()
+    BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     BUILD_IMAGE = "$BUILD_REGISTRY_FQDN/jenkins/canvas-lms"
-    POSTGRES = getPostgres()
-    RUBY_PASSENGER = getRubyPassenger()
+    POSTGRES = configuration.postgres()
+    RUBY_PASSENGER = configuration.rubyPassenger()
 
     // e.g. postgres-9.5-ruby-passenger-2.6
     TAG_SUFFIX = "postgres-$POSTGRES-ruby-passenger-$RUBY_PASSENGER"
 
     // this is found in the PUBLISHABLE_TAG_SUFFIX config file on jenkins
-    PUBLISHABLE_TAG_SUFFIX = getPublishableTagSuffix()
+    PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffix()
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-passenger-2.6
     PATCHSET_TAG = "$BUILD_IMAGE:$NAME-$TAG_SUFFIX"
@@ -155,8 +136,7 @@ pipeline {
         timeout(time: 5) {
           script {
             runDatadogMetric("Setup") {
-              sh 'build/new-jenkins/print-env-excluding-secrets.sh'
-              sh 'build/new-jenkins/docker-cleanup.sh'
+              cleanAndSetup()
 
               buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
               buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
@@ -168,25 +148,23 @@ pipeline {
                 buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
               }
 
-              def credentials = load ('build/new-jenkins/groovy/credentials.groovy')
-
-              credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
+              pullGerritRepo('gerrit_builder', 'master', '.')
               gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
               echo "Plugin list: ${gems}"
               /* fetch plugins */
               gems.each { gem ->
                 if (env.GERRIT_PROJECT == gem) {
                   /* this is the commit we're testing */
-                  credentials.fetchFromGerrit(gem, 'gems/plugins', null, null, env.GERRIT_REFSPEC)
+                  pullGerritRepo(gem, env.GERRIT_REFSPEC, 'gems/plugins')
                 } else {
-                  credentials.fetchFromGerrit(gem, 'gems/plugins')
+                  pullGerritRepo(gem, 'master', 'gems/plugins')
                 }
               }
-              credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
+              pullGerritRepo("qti_migration_tool", "master", "vendor")
 
               sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
               sh 'rm -v config/cache_store.yml'
-              sh 'rmdir -p gerrit_builder/canvas-lms/config'
+              sh 'rm -vr gerrit_builder'
               sh 'rm -v config/database.yml'
               sh 'rm -v config/security.yml'
               sh 'rm -v config/selenium.yml'
@@ -209,7 +187,6 @@ pipeline {
         timeout(time: 2) {
           script {
             runDatadogMetric("Rebase") {
-              def credentials = load('build/new-jenkins/groovy/credentials.groovy')
               credentials.withGerritCredentials({ ->
                 sh '''#!/bin/bash
                   set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
@@ -249,13 +226,12 @@ pipeline {
         timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
           skipIfPreviouslySuccessful('docker-build-and-push') {
             script {
-              def flags = load('build/new-jenkins/groovy/commit-flags.groovy')
-              if (flags.hasFlag('skip-docker-build')) {
+              if (configuration.getBoolean('skip-docker-build')) {
                 sh 'docker pull $MERGE_TAG'
                 sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
               }
               else {
-                if (!flags.hasFlag('skip-cache')) {
+                if (!configuration.getBoolean('skip-cache')) {
                   sh 'docker pull $MERGE_TAG || true'
                 }
                 sh """
@@ -285,7 +261,6 @@ pipeline {
             echo 'adding Linters'
             stages['Linters'] = {
               skipIfPreviouslySuccessful("linters") {
-                def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
                 credentials.withGerritCredentials {
                   sh 'build/new-jenkins/linters/run-gergich.sh'
                 }
@@ -330,7 +305,7 @@ pipeline {
             echo 'adding Flakey Spec Catcher'
             stages['Flakey Spec Catcher'] = {
               skipIfPreviouslySuccessful("flakey-spec-catcher") {
-                def propagate = load('build/new-jenkins/groovy/configuration.groovy').fscPropagate()
+                def propagate = configuration.fscPropagate()
                 echo "fsc propagation: $propagate"
                 wrapBuildExecution('/Canvas/test-suites/flakey-spec-catcher', buildParameters, propagate, "")
               }
@@ -447,7 +422,7 @@ pipeline {
     }
     cleanup {
       ignoreBuildNeverStartedError {
-        sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+        execute 'bash/docker-cleanup.sh --allow-failure'
       }
     }
   }

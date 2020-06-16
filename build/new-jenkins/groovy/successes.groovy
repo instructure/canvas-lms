@@ -83,8 +83,7 @@ def saveSuccess(name) {
 // if you don't want the success of the body to mark the
 // given name as successful, pass in save = false.
 def skipIfPreviouslySuccessful(name, save = true, body) {
-  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
-  cacheEnabled = !flags.hasFlag('skip-cache')
+  def cacheEnabled = !configuration.getBoolean('skip-cache')
 
   if (hasSuccess(name) && cacheEnabled) {
     log "Block already successful, skipping: ${successFile()}"

@@ -73,8 +73,7 @@ def storeMigratedImages() {
 
 // use cached images if available
 def createMigrateBuildUpCached() {
-  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
-  if (flags.hasFlag('skip-cache')) {
+  if (configuration.getBoolean('skip-cache')) {
     log('Build cache is disabled! Ignoring any previously cached migrations and migrating from scratch.')
     pullAndBuild()
     startAndMigrate()
