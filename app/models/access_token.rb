@@ -18,6 +18,8 @@
 class AccessToken < ActiveRecord::Base
   include Workflow
 
+  extend RootAccountResolver
+
   workflow do
     state :active
     state :deleted
@@ -36,6 +38,8 @@ class AccessToken < ActiveRecord::Base
   has_many :notification_endpoints, -> { where(:workflow_state => "active") }, dependent: :destroy
 
   before_validation -> { self.developer_key ||= DeveloperKey.default }
+
+  resolves_root_account through: -> (instance) { instance.developer_key.root_account_id }
 
   has_a_broadcast_policy
 
