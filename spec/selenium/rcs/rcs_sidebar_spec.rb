@@ -50,7 +50,7 @@ describe "RCS sidebar tests" do
 
       in_frame wiki_page_body_ifr_id do
         wait_for(method: nil, timeout: 2) do
-          wiki_body_anchor.attribute('href').include? title
+          expect(wiki_body_anchor.attribute('href')).to include title
         end
       end
     end
