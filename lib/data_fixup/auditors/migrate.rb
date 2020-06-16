@@ -144,7 +144,7 @@ module DataFixup::Auditors
           rescue ActiveRecord::RecordNotUnique, ActiveRecord::InvalidForeignKey
             # this gets messy if we act specifically; let's just apply both remedies
             new_attrs_list = filter_for_idempotency(ar_attributes_list, auditor_ar_type)
-            new_attrs_list = filter_dead_foreign_keys(new_attrs_list)
+            new_attrs_list = filter_dead_foreign_keys(new_attrs_list) if new_attrs_list.size > 0
             bulk_insert_auditor_recs(auditor_ar_type, new_attrs_list) if new_attrs_list.size > 0
           end
           next_page = auditor_id_recs.next_page
@@ -178,7 +178,7 @@ module DataFixup::Auditors
             rescue ActiveRecord::RecordNotUnique, ActiveRecord::InvalidForeignKey
               # this gets messy if we act specifically; let's just apply both remedies
               new_attrs_list = filter_for_idempotency(ar_attributes_list, auditor_ar_type)
-              new_attrs_list = filter_dead_foreign_keys(new_attrs_list)
+              new_attrs_list = filter_dead_foreign_keys(new_attrs_list) if new_attrs_list.size > 0
               bulk_insert_auditor_recs(auditor_ar_type, new_attrs_list) if new_attrs_list.size > 0
             end
           end
@@ -383,6 +383,12 @@ module DataFixup::Auditors
         stream_map[auditor_type]
       end
 
+      def existing_user_ids_from(user_ids)
+        uids = user_ids.compact.uniq
+        return [] unless uids.size > 0
+        User.where("id IN (#{uids.join(",")})").pluck(:id)
+      end
+
       def auditor_type
         raise "NOT IMPLEMENTED"
       end
@@ -435,9 +441,10 @@ module DataFixup::Auditors
 
       def filter_dead_foreign_keys(attrs_list)
         user_ids = attrs_list.map{|a| a['user_id'] }
-        pseudonym_ids = attrs_list.map{|a| a['pseudonym_id'] }
-        existing_user_ids = User.where("id IN (#{user_ids.join(",")})").pluck(:id)
-        existing_pseud_ids = Pseudonym.where(id: pseudonym_ids).pluck(:id)
+        existing_user_ids = existing_user_ids_from(user_ids)
+        pseudonym_ids = attrs_list.map{|a| a['pseudonym_id'] }.compact.uniq
+        existing_pseud_ids = []
+        existing_pseud_ids = Pseudonym.where(id: pseudonym_ids).pluck(:id) if pseudonym_ids.size > 0
         missing_uids = user_ids - existing_user_ids
         missing_pids = pseudonym_ids - existing_pseud_ids
         new_attrs_list = attrs_list.reject{|h| missing_uids.include?(h['user_id']) }
@@ -469,8 +476,7 @@ module DataFixup::Auditors
       end
 
       def filter_dead_foreign_keys(attrs_list)
-        user_ids = attrs_list.map{|a| a['user_id'] }
-        existing_user_ids = User.where("id IN (#{user_ids.join(",")})").pluck(:id)
+        existing_user_ids = existing_user_ids_from(attrs_list.map{|a| a['user_id'] })
         missing_uids = user_ids - existing_user_ids
         attrs_list.reject {|h| missing_uids.include?(h['user_id']) }
       end
@@ -524,8 +530,8 @@ module DataFixup::Auditors
       def filter_dead_foreign_keys(attrs_list)
         student_ids = attrs_list.map{|a| a['student_id'] }
         grader_ids = attrs_list.map{|a| a['grader_id'] }
-        user_ids = (student_ids + grader_ids).uniq
-        existing_user_ids = User.where("id IN (#{user_ids.join(",")})").pluck(:id)
+        user_ids = (student_ids + grader_ids).compact
+        existing_user_ids = existing_user_ids_from(user_ids)
         missing_uids = user_ids - existing_user_ids
         filtered_attrs_list = attrs_list.reject do |h|
           missing_uids.include?(h['student_id']) || missing_uids.include?(h['grader_id'])
