@@ -49,7 +49,9 @@ describe "RCS sidebar tests" do
       wait_for_ajaximations
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include title
+        wait_for(method: nil, timeout: 2) do
+          wiki_body_anchor.attribute('href').include? title
+        end
       end
     end
 
