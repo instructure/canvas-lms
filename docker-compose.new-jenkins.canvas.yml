@@ -7,3 +7,4 @@ services:
       - .git:/usr/src/app/.git
     environment:
       RAILS_ENV: test
+    init: true

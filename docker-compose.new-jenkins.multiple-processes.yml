@@ -23,20 +23,25 @@ services:
       - cassandra
       - redis
       - dynamodb
+    init: true
 
   redis:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
+    init: true
 
   postgres:
     image: starlord.inscloudgate.net/jenkins/postgis:$POSTGRES-${POSTGIS:-2.5}
     environment:
       POSTGRES_PASSWORD: sekret
+    init: true
 
   cassandra:
     image: starlord.inscloudgate.net/jenkins/cassandra:2.2
     environment:
       CASSANDRA_START_RPC: 'true'
+    init: true
 
   dynamodb:
     image: starlord.inscloudgate.net/jenkins/dynamodb-local
     command: -jar DynamoDBLocal.jar
+    init: true

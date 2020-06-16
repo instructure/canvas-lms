@@ -4,4 +4,4 @@ services:
   canvas:
     volumes:
       - "./.git:/usr/src/app/.git"
-
+    init: true

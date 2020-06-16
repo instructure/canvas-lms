@@ -7,8 +7,9 @@ services:
       - redis
     environment:
       RAILS_ENV: development
-    ports: 
+    ports:
       - "8181:80"
+    init: true
 
   jobs:
     image: $PATCHSET_TAG
@@ -18,11 +19,14 @@ services:
     environment:
       RAILS_ENV: development
     command: bundle exec script/delayed_job run
+    init: true
 
   postgres:
     image: starlord.inscloudgate.net/jenkins/postgis:$POSTGRES-2.5
     environment:
       POSTGRES_PASSWORD: sekret
+    init: true
 
   redis:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
+    init: true
