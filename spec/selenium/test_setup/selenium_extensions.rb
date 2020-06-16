@@ -175,6 +175,13 @@ module SeleniumExtensions
     def reload!
       replace @finder_proc.call
     end
+
+    def with_stale_element_protection
+      yield(self)
+    rescue Selenium::WebDriver::Error::StaleElementReferenceError
+      reload!
+      retry
+    end
   end
 end
 
