@@ -70,7 +70,7 @@ class NotificationMessageCreator
         end
 
         unless @notification.registration?
-          if @notification.summarizable? && no_daily_messages_in(delayed_messages) && too_many_messages_for?(user)
+          if @notification.summarizable? && too_many_messages_for?(user)
             fallback = build_fallback_for(user)
             delayed_messages << fallback if fallback
           end
@@ -91,10 +91,6 @@ class NotificationMessageCreator
   end
 
   private
-
-  def no_daily_messages_in(delayed_messages)
-    !delayed_messages.any?{ |message| message.frequency == 'daily' }
-  end
 
   # Notifications are enabled for a user in a course by default, but can be
   # disabled for notifications. The broadcast_policy needs to pass both the
