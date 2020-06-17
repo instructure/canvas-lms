@@ -861,6 +861,65 @@ describe LearningOutcome do
     end
   end
 
+  context "root account ids" do
+    let_once(:root_account) { account_model }
+    let_once(:subaccount) { account_model parent_account: root_account }
+    let_once(:course) { course_model account: subaccount }
+
+    context 'sets root account ids on save' do
+      it 'when context is account' do
+        outcome = LearningOutcome.create! title:'outcome', context: subaccount
+        expect(outcome.root_account_ids).to eq [root_account.id]
+      end
+
+      it 'when context is course' do
+        outcome = LearningOutcome.create! title:'outcome', context: course
+        expect(outcome.root_account_ids).to eq [root_account.id]
+      end
+    end
+
+    it 'sets empty root account ids when context is nil' do
+      outcome = LearningOutcome.create! title:'outcome', context: nil
+      expect(outcome.root_account_ids).to eq []
+    end
+
+    it 'sets multiple root account ids based on associations' do
+      second_root_account = account_model
+      outcome = LearningOutcome.create! title: 'outcome'
+      course.root_outcome_group.add_outcome(outcome)
+      second_root_account.root_outcome_group.add_outcome(outcome)
+      outcome.update! root_account_ids: nil
+      expect(outcome.root_account_ids).to match_array [root_account.id, second_root_account.id]
+    end
+
+    context 'add_root_account_id_for_context!' do
+      it 'adds root account id for account' do
+        outcome = LearningOutcome.create! title: 'outcome'
+        outcome.add_root_account_id_for_context! subaccount
+        expect(outcome.root_account_ids).to eq [root_account.id]
+      end
+
+      it 'adds root account id for course' do
+        outcome = LearningOutcome.create! title: 'outcome'
+        outcome.add_root_account_id_for_context! course
+        expect(outcome.root_account_ids).to eq [root_account.id]
+      end
+
+      it 'does not add anything for outcome group' do
+        outcome = LearningOutcome.create! title: 'outcome'
+        outcome.add_root_account_id_for_context! LearningOutcomeGroup.global_root_outcome_group
+        expect(outcome.root_account_ids).to eq []
+      end
+
+      it 'does not add anything when root accound id already present' do
+        outcome = LearningOutcome.create! title: 'outcome', context: subaccount
+        expect(outcome).not_to receive(:save)
+        outcome.add_root_account_id_for_context! course
+        expect(outcome.root_account_ids).to eq [root_account.id]
+      end
+    end
+  end
+
   context "account level outcome" do
     let(:outcome) do
       LearningOutcome.create!(
