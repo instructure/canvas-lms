@@ -43,7 +43,7 @@ class AuthenticationProvider < ActiveRecord::Base
     case type_name
     when 'cas', 'ldap', 'saml'
       const_get(type_name.upcase)
-    when 'clever', 'facebook', 'google', 'microsoft', 'saml_idp_discovery', 'twitter'
+    when 'apple', 'clever', 'facebook', 'google', 'microsoft', 'saml_idp_discovery', 'twitter'
       const_get(type_name.classify)
     when 'canvas'
       Canvas
@@ -82,6 +82,10 @@ class AuthenticationProvider < ActiveRecord::Base
     name.try(:demodulize)
   end
 
+  def self.login_message
+    t("Login with %{provider}", provider: display_name)
+  end
+
   # Drop and recreate the authentication_providers view, if it exists.
   #
   # to be used from migrations that existed before the table rename. should
@@ -102,7 +106,7 @@ class AuthenticationProvider < ActiveRecord::Base
   acts_as_list scope: { account: self, workflow_state: [nil, 'active'] }
 
   def self.valid_auth_types
-    %w[canvas cas clever facebook github google ldap linkedin microsoft openid_connect saml saml_idp_discovery twitter].freeze
+    %w[apple canvas cas clever facebook github google ldap linkedin microsoft openid_connect saml saml_idp_discovery twitter].freeze
   end
 
   validates :auth_type,
@@ -134,7 +138,7 @@ class AuthenticationProvider < ActiveRecord::Base
   SENSITIVE_PARAMS = [].freeze
 
   def self.login_button?
-    Rails.root.join("public/images/sso_buttons/sso-#{sti_name}.svg").exist?
+    Rails.root.join("app/views/shared/svg/_svg_icon_#{sti_name}.svg").exist?
   end
 
   def destroy

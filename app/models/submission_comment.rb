@@ -185,9 +185,8 @@ class SubmissionComment < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :submission_comment
     p.to do
-      course_id = /\d+/.match(submission.context_code).to_s.to_i
       active_participant =
-        Enrollment.where(user_id: submission.user.id, :course_id => course_id).active_by_date.exists?
+        Enrollment.where(user_id: submission.user.id, :course_id => submission.course_id).active_by_date.exists?
       if active_participant
         ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author]
       end

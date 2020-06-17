@@ -76,10 +76,21 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
     }
   )
 
+  const filterAssignments = useCallback(assignments => {
+    assignments.forEach(assignment => {
+      if (!assignment.hasOwnProperty('all_dates')) {
+        assignment.all_dates = []
+      }
+    })
+
+    return assignments
+  }, [])
+
   useFetchApi({
     success: setAssignments,
     error: setLoadingError,
     loading: setLoading,
+    convert: filterAssignments,
     path: `/api/v1/courses/${courseId}/assignments/`,
     fetchAllPages: true,
     params: {
@@ -316,11 +327,7 @@ export default function BulkEdit({courseId, onCancel, onSave}) {
   }
 
   function renderDateSelect() {
-    return (
-      ENV.FEATURES.assignment_bulk_edit_phase_2 && (
-        <BulkEditDateSelect selectDateRange={selectDateRange} />
-      )
-    )
+    return <BulkEditDateSelect selectDateRange={selectDateRange} />
   }
 
   function renderSaveSuccess() {

@@ -18,6 +18,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def getRubyPassenger() {
+  load('build/new-jenkins/groovy/configuration.groovy').rubyPassenger()
+}
+
+def getPostgres() {
+  load('build/new-jenkins/groovy/configuration.groovy').postgres()
+}
 
 pipeline {
   agent { label 'canvas-docker' }
@@ -28,8 +35,8 @@ pipeline {
 
   environment {
     RUN_COVERAGE = '1'
-    POSTGRES = '9.5'
-    RUBY_PASSENGER = '2.4-xenial'
+    POSTGRES = getPostgres()
+    RUBY_PASSENGER = getRubyPassenger()
     PATCHSET_TAG = "${env.DOCKER_REGISTRY_FQDN}/jenkins/canvas-lms:$PATCHSET_TAG_VERSION"
     COVERAGE = '1'
   }

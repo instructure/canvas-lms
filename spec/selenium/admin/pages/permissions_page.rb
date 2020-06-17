@@ -148,7 +148,24 @@ class PermissionsIndex
       end
     end
 
-    # eventually add a section for the expanded permissions
+    # -------- Granular Permissions (Feature Flag) --------
+    def granular_permissions_wiki_pages
+      @account ||= Account.default
+      @account.feature_enabled?(:granular_permissions_wiki_pages)
+    end
+
+    def manage_wiki_button
+      if granular_permissions_wiki_pages
+        f("button[data-testid='expand_manage_wiki']")
+      end
+    end
+
+    def expand_manage_wiki
+      if granular_permissions_wiki_pages
+        scroll_to_element(manage_wiki_button)
+        manage_wiki_button.click
+      end
+    end
 
     # ---------------------- Actions ----------------------
     def choose_tab(tab_name)

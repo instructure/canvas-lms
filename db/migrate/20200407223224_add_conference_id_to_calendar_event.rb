@@ -21,6 +21,6 @@ class AddConferenceIdToCalendarEvent < ActiveRecord::Migration[5.2]
 
   def change
     add_reference :calendar_events, :web_conference, type: :bigint, foreign_key: true, index: false
-    add_index :calendar_events, :web_conference_id, where: 'web_conference_id IS NOT NULL', unique: false, algorithm: :concurrently
+    add_index :calendar_events, :web_conference_id, where: 'web_conference_id IS NOT NULL', unique: false, algorithm: :concurrently, if_not_exists: true
   end
 end

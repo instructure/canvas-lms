@@ -177,6 +177,10 @@ class Feature
     end
   end
 
+  def self.exists?(feature)
+    definitions.key?(feature.to_s)
+  end
+
   def self.feature_applies_to_object(feature, object)
     feature_def = definitions[feature.to_s]
     return false unless feature_def

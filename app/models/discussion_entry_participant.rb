@@ -22,6 +22,8 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   belongs_to :discussion_entry
   belongs_to :user
 
+  before_create :set_root_account_id
+
   validates_presence_of :discussion_entry_id, :user_id, :workflow_state
 
   def self.read_entry_ids(entry_ids, user)
@@ -49,4 +51,8 @@ class DiscussionEntryParticipant < ActiveRecord::Base
     select([:id, :discussion_entry_id]).
       where(user_id: user, discussion_entry_id: entry_id)
   }
+
+  def set_root_account_id
+    self.root_account_id = self.discussion_entry.root_account_id
+  end
 end

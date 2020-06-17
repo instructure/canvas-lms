@@ -21,6 +21,7 @@ import NotificationPreferencesSetting from './NotificationPreferencesSetting'
 import NotificationPreferencesShape from './NotificationPreferencesShape'
 import React from 'react'
 
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -119,7 +120,7 @@ const renderNotificationCategory = (
             key={`${notificationCategory}-${channel.path}`}
             width="8rem"
           >
-            {renderChannelHeader && (
+            {renderChannelHeader ? (
               <>
                 <div style={{display: 'block'}}>
                   <Text transform={channel.pathType === 'sms' ? 'uppercase' : 'capitalize'}>
@@ -132,6 +133,11 @@ const renderNotificationCategory = (
                   </TruncateText>
                 </div>
               </>
+            ) : (
+              <ScreenReaderContent>
+                {I18n.t('%{pathType}', {pathType: channel.pathType})}
+                {channel.path}
+              </ScreenReaderContent>
             )}
           </Table.ColHeader>
         ))}

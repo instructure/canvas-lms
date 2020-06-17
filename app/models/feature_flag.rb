@@ -68,7 +68,11 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def feature_applies
-    errors.add(:feature, "is not valid in context") unless Feature.feature_applies_to_object(feature, context)
+    if !Feature.exists?(feature)
+      errors.add(:feature, "does not exist")
+    elsif !Feature.feature_applies_to_object(feature, context)
+      errors.add(:feature, "does not apply to context")
+    end
   end
 
   def check_cache

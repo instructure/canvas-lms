@@ -13,8 +13,8 @@ python3 ./build/new-jenkins/rspec-combine-coverage-results.py
 
 # build the reports inside the canvas-lms image because it has the required executables
 inputs=()
-inputs+=("--volume $WORKSPACE/coverage_nodes:/usr/src/app/coverage_nodes")
-inputs+=("--volume $WORKSPACE/coverage_reports:/usr/src/app/coverage_reports")
+inputs+=("--volume $(pwd)/coverage_nodes:/usr/src/app/coverage_nodes")
+inputs+=("--volume $(pwd)/coverage_reports:/usr/src/app/coverage_reports")
 cat <<EOF | docker run --interactive ${inputs[@]} $PATCHSET_TAG /bin/bash -
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 

@@ -770,7 +770,7 @@ en:
   missing_policy_applicator_emits_live_events_88b47396: Missing Policy Applicator Emits Live Events
   allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: Allows the missing policy applicator to emit submission_updated live events for each submission marked as missing.
   product_tours_1e19eb95: Product Tours
-  in_product_training_walkthrough_and_tourpoints_for_2e185119: In-product training walkthrough and tourpoints for teachers
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: In-product training walkthrough and tourpoints for admins, teachers, and students
   module_file_upload_enhancements_eecd4d37: Module File Upload Enhancements
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: Drag and Drop files on modules and multi-file module item uploads
   responsive_admin_settings_4f8670d7: Responsive Admin/Settings
@@ -787,10 +787,6 @@ en:
   allows_users_to_add_conferences_from_the_calendar_f36c5008: Allows users to add conferences from the calendar
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
-  pronouns_for_users_da46fb5: Pronouns for users
-  allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
-    Allows users to pick pronouns that will be displayed after
-    their name when it is shown in the user interface.
   confetti_for_on_time_submissions_394e16ce: Confetti for On-Time Submissions
   displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
     Displays confetti for users that turn in an assignment prior
@@ -838,8 +834,6 @@ en:
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: Allow a teacher to set the number of allowed attempts on an assignment via the UI
   assignment_bulk_editing_37248ca4: Assignment Bulk Editing
   allow_teachers_to_change_the_dates_on_a_set_of_ass_4d48baec: Allow teachers to change the dates on a set of assignments in one step
-  assignment_bulk_editing_phase_2_fde6f7d3: Assignment Bulk Editing phase 2
-  turns_on_phase_2_features_for_assignment_bulk_edit_20245881: Turns on phase 2 features for Assignment Bulk Editing
   bookmarking_for_enrollments_index_api_840be156: Bookmarking for Enrollments Index API
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: Use bookmarking for API pagination in Enrollments Index
   submission_type_lti_placement_b448d5d0: Submission Type LTI Placement
@@ -868,6 +862,8 @@ en:
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: Allows learning outcomes to be selectable when migrating course content
   restricted_view_for_teachers_in_lmgb_52c78a62: Restricted view for teachers in LMGB
   hides_certain_students_and_sections_in_the_lmgb_if_47097d94: Hides certain students and sections in the LMGB if the teacher only has access to a particular section
+  outcomes_service_alignment_migration_5b4391ad: Outcomes Service Alignment Migration
+  includes_outcomes_service_alignments_when_exportin_6c578a35: Includes Outcomes Service alignments when exporting and importing course content
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_dc466585: |-
     Differentiate between system- and user-generated live events
@@ -1422,7 +1418,7 @@ en:
       account_reports:
         default:
           last_user_access:
-            text: This report shows the last login for active users.
+            text: This report shows the last login for active users. Please note, Last Access At is updated once every 10 minutes. That is our current threshold to determine activity for any given user session.
     lti_report_csv_description:
       account_reports:
         default:
@@ -1635,6 +1631,11 @@ en:
               text: Course SIS ID
           parameters:
             note1: Course ID can be left blank to run the report for all courses in the term.
+    lewisville_course_activity_report_csv_parameters:
+      account_reports:
+        default:
+          parameters:
+            header: Term
     mississippi_sis_csv_parameters:
       account_reports:
         default:
@@ -4700,6 +4701,8 @@ en:
     uuid_provisioner:
       name: UUID provisioner
       description: This enables exporting UUIDs into Quiz.Next services.
+    apple:
+      description: Sign in With Apple
     clever:
       description: Clever Login
     facebook:
@@ -4784,6 +4787,9 @@ en:
         base_url: Base URL
         apps_index_endpoint: Apps Index Endpoint
         app_reviews_endpoint: App Show Endpoint
+    apple_settings:
+      labels:
+        client_id: Service ID
     assignment_freezer_settings:
       description: |-
         This plugin allows admins to check a property on assignments that makes the configured
@@ -7123,6 +7129,7 @@ en:
     upload_error_timeout: 'The request timed out: %{url}'
     upload_error_over_quota: 'file size exceeds quota limits: %{bytes} bytes'
     upload_error_unexpected: An unknown error occurred downloading from %{url}
+  login_with_provider_3fd3998e: Login with %{provider}
   authentication_provider:
     default_login_handle_name: Email
     default_delegated_login_handle_name: Login
@@ -11507,6 +11514,9 @@ en:
   are_you_sure_26795d3c: Are you sure?
   deleting_6421031e: deleting...
   save_11a80ec3: Save
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+    You will need to create a Service ID [Apple Developer Console](%{apple_url}).
+    Enable Sign in with Apple, and add %{callback_url} as a return URL. Enter the Identifier here.
   self_registration_156392d6: Self Registration
   disabled_3b1b332a: Disabled
   all_account_types_e83c1516: All Account Types
@@ -12150,7 +12160,6 @@ en:
   need_a_canvas_account_221d18ed: Need a Canvas Account?
   click_here_it_s_free_eeccb9cb: Click Here, It's Free!
   forgot_password_f0c3fbac: Forgot Password?
-  login_with_provider_3fd3998e: Login with %{provider}
   error_logging_in_error_msg_f61efaa3: 'Error logging in: %{error_msg}'
   create_account_263ec6: Create Account
   log_out_379ba28a: Log Out
@@ -12438,7 +12447,6 @@ en:
   site:
     view_privacy_policy: View Privacy Policy
   please_enter_your_label_name_7745272d: 'Please enter your %{label_name}:'
-  login_with_auth_type_a0aaa52a: Login with *%{auth_type}*
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: This course cannot be added to the courses menu at this time.
   chat_2153c6b7: Chat
   all_terms_cd27b0fb: All Terms
@@ -12678,11 +12686,6 @@ en:
   create_132b3be1: Create
   edit_your_catalog_account_cce59310: Edit your Catalog Account
   update_4d8ee62: Update
-  wiki_page_cap_minutes_33f17a9: Wiki Page Cap (minutes)
-  discussion_cap_minutes_3d0a3846: Discussion Cap (minutes)
-  quiz_cap_minutes_fa07380: Quiz Cap (minutes)
-  assignment_cap_minutes_d9b0fe22: Assignment Cap (minutes)
-  other_cap_minutes_ad4d1428: Other Cap (minutes)
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: User ID or SIS ID (SIS ID should be prepended with sis_user_id:)
   include_deleted_enrollments_1c87684a: Include Deleted Enrollments
   this_is_a_report_of_all_students_enrolled_in_a_cou_d0137d3c: |-
@@ -12693,6 +12696,9 @@ en:
   include_unsubmitted_deleted_submissions_99fc2aad: Include Unsubmitted & Deleted Submissions
   enrolled_a6a517cd: Enrolled
   withdrawn_4c838347: Withdrawn
+  current_terms_bcf31fb2: Current Terms
+  course_start_date_on_before_a3a32883: Course Start Date On/Before
+  course_end_date_on_after_a6bbb0b7: Course End Date On/After
   all_configured_apps_a14eef0a: All Configured Apps
   course_implemented_apps_fa658f5a: Course Implemented Apps
   include_unpublished_courses_7a0e7aab: Include Unpublished Courses
@@ -15356,6 +15362,7 @@ en:
   due_at_5d7d2fa: Due At
   available_from_587ce92f: Available From
   available_until_f3b9c4ed: Available Until
+  this_assignment_has_too_many_dates_to_display_262f555f: This assignment has too many dates to display.
   this_assignment_has_no_default_dates_ae314295: This assignment has no default dates.
   select_assignment_title_4571ffcb: 'Select assignment: %{title}'
   revert_date_changes_5105ce5: Revert date changes
@@ -16228,13 +16235,13 @@ en:
   field_cannot_be_blank_afb5b332: Field cannot be blank.
   missing_required_fields_please_fill_in_all_require_1e10b2e9: Missing required fields. Please fill in all required fields.
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: Public JWK json is not valid. Please submit properly formatted json.
+  public_jwk_url_b5564c1d: Public JWK URL
   required_values_1eb5841f: Required Values
   title_f8e03596: "* Title"
   description_61f4296: "* Description"
   target_link_uri_bbed67d1: "* Target Link URI"
   openid_connect_initiation_url_d9037d30: "* OpenID Connect Initiation Url"
   jwk_method_6d5d0c84: "* JWK Method"
-  public_jwk_url_b5564c1d: Public JWK URL
   lti_advantage_services_c1746cb4: LTI Advantage Services
   services_must_be_supported_by_the_tool_in_order_to_1f194a36: Services must be supported by the tool in order to work. Check with your Tool Vendor to ensure service capabilities.
   check_services_to_enable_8877c451: Check Services to enable
@@ -17388,7 +17395,7 @@ en:
   game_over_104baa: GAME OVER
   press_space_to_start_over_d4b8a2da: Press 'space' to start over
   contexttype_notification_settings_d72acd58: "%{contextType} Notification Settings"
-  enable_notifications_10a4bf44: Enable Notifications
+  enable_notifications_for_contextname_b5b4440e: Enable Notifications for %{contextName}
   you_are_currently_receiving_notifications_for_this_4f542bb2: You are currently receiving notifications for this %{contextType}. To disable %{contextType} notifications, use the toggle above.
   you_will_not_receive_any_contexttype_notifications_da7a58f1: You will not receive any %{contextType} notifications at this time. To enable %{contextType} notifications, use the toggle above.
   granular_contexttype_notification_settings_will_be_c5dfc901: Granular %{contextType} notification settings will be configurable here in the future.
@@ -17453,6 +17460,10 @@ en:
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: Please wait as we upload and process your file.
   an_outcome_import_is_currently_in_progress_11e6cb38: An outcome import is currently in progress.
   it_s_ok_to_leave_this_page_we_ll_email_you_when_th_2dbed7fa: It's ok to leave this page, we'll email you when the import is done.
+  no_announcements_to_display_fbf9ed1e: No announcements to display
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+    You can view dismissed announcements by going to Account and selecting Global
+                Announcements from the menu.
   count_permissions_found_1a926f7d:
     one: One permission found
     other: "%{count} permissions found"
@@ -18772,7 +18783,6 @@ en:
       update_assignment_points: Change assignment points to match rubric?
     prompts:
       update_assignment_points: Leaving the assignment's total points at %{assignmentPoints} and the rubric's total points at %{rubricPoints} will result in a maximum possible score of %{toPercentage_pointRatio} for student submissions graded with the rubric.
-  remove_all_group_observer_members_af5675f3: Remove All Group Observer Members
   remove_all_course_observer_members_4622c70d: Remove All Course Observer Members
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: 'Pick the date and time for the following conference setting:'
   content_import_files_cannot_be_downloaded_after_en_7e3a2099: Content import files cannot be downloaded after %{ENV.CONTENT_MIGRATIONS_EXPIRE_DA} days.

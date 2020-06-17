@@ -253,4 +253,19 @@ describe Auditors::Authentication do
       expect(pg_record.pseudonym_id).to eq(@pseudonym.id)
     end
   end
+
+  describe "with reading from postgres" do
+    before do
+      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'active_record'})
+      @account = Account.default
+      user_with_pseudonym(active_all: true)
+      @event = Auditors::Authentication.record(@pseudonym, 'login')
+    end
+
+    it "can be read from postgres" do
+      expect(Auditors.read_from_postgres?).to eq(true)
+      pg_record = Auditors::ActiveRecord::AuthenticationRecord.where(uuid: @event.id).first
+      expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1)).to include(pg_record)
+    end
+  end
 end

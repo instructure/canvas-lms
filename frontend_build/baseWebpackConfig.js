@@ -296,6 +296,10 @@ module.exports = {
       this.plugin('done', ({compilation}) => {
         if (compilation.warnings && compilation.warnings.length) {
           console.error(compilation.warnings)
+          // If there's a bad import, webpack doesn't say where.
+          // Only if we let the compilation complete do we get
+          // the callstack where the import happenes
+          // If you're having problems, comment out the throw
           throw new Error('webpack build had warnings. Failing.')
         }
       })

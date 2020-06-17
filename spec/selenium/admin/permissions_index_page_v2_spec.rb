@@ -20,6 +20,13 @@ require_relative './pages/permissions_page'
 
 describe "permissions index" do
   include_context "in-process server selenium tests"
+
+  before :once do
+    @account = Account.default
+    @subaccount = Account.create!(name: "subaccount", parent_account_id: @account.id)
+    account_admin_user
+  end
+
   def create_role_override(permission_name, role, account, opts)
     new_role = RoleOverride.create!(:permission => permission_name, :enabled => opts[:enabled],
       :locked => opts[:locked], :context => account, :applies_to_self => true, :applies_to_descendants => true,
@@ -37,8 +44,6 @@ describe "permissions index" do
 
   describe "editing role info" do
     before :each do
-      @account = Account.default
-      account_admin_user
       user_session(@admin)
       @custom_student_role = custom_student_role("A Kitty")
       PermissionsIndex.visit(@account)
@@ -59,8 +64,6 @@ describe "permissions index" do
 
   describe "Add Role" do
     before :each do
-      @account = Account.default
-      account_admin_user
       user_session(@admin)
       PermissionsIndex.visit(@account)
     end
@@ -80,90 +83,98 @@ describe "permissions index" do
   end
 
   describe "permissions table" do
-    before :once do
-      @account = Account.default
-      @admin = User.create!(:name => "Some User", :short_name => "User")
-      @admin.accept_terms
-      @admin.register!
-      @admin_role = Role.get_built_in_role('AccountAdmin')
-      @account.account_users.create!(:user => @admin, :role => @admin_role)
+    context "root account" do
+      before :each do
+        user_session(@admin)
+      end
+
+      it "permissions enables on grid" do
+        PermissionsIndex.visit(@account)
+        permission_name = "manage_outcomes"
+        PermissionsIndex.change_permission(permission_name, ta_role.id, "enable")
+        r = RoleOverride.last
+        expect(r.role_id).to eq(ta_role.id)
+        expect(r.permission).to eq(permission_name)
+        expect(r.enabled).to eq(true)
+        expect(r.locked).to eq(false)
+      end
+
+      it "permissions disables on grid" do
+        PermissionsIndex.visit(@account)
+        permission_name = "read_announcements"
+        PermissionsIndex.change_permission(permission_name, student_role.id, "disable")
+        r = RoleOverride.last
+        expect(r.role_id).to eq(student_role.id)
+        expect(r.permission).to eq(permission_name)
+        expect(r.enabled).to eq(false)
+        expect(r.locked).to eq(false)
+      end
+
+      it "permissions locks on grid" do
+        PermissionsIndex.visit(@account)
+        permission_name = "manage_outcomes"
+        PermissionsIndex.change_permission(permission_name, ta_role.id, "lock")
+        r = RoleOverride.last
+        expect(r.role_id).to eq(ta_role.id)
+        expect(r.permission).to eq(permission_name)
+        expect(r.locked).to eq(true)
+      end
+
+      it "permissions unlocks on grid" do
+        permission_name = "read_announcements"
+        id = create_role_override(permission_name, student_role, @account, :enabled => false, :locked => true)
+        PermissionsIndex.visit(@account)
+        PermissionsIndex.change_permission(permission_name, student_role.id, "lock")
+        r = RoleOverride.find(id)
+        expect(r.role_id).to eq(student_role.id)
+        expect(r.permission).to eq(permission_name)
+        expect(r.enabled).to eq(false)
+        expect(r.locked).to eq(false)
+      end
+
+      it "permissions default on grid works" do
+        permission_name = "read_announcements"
+        create_role_override(permission_name, student_role, @account, :enabled => false, :locked => false)
+        PermissionsIndex.visit(@account)
+        PermissionsIndex.change_permission(permission_name, student_role.id, "use_default")
+        r = RoleOverride.where(:id => @account.id, :permission => permission_name, :role_id => student_role.id)
+        expect(r).to be_empty
+      end
+
+      context "with granular permissions enabled" do
+        let(:set_granular_permission) do
+          @account.enable_feature!(:granular_permissions_wiki_pages)
+        end
+
+        it "autoscrolls so expanded granular permissions are visible" do
+          set_granular_permission
+          PermissionsIndex.visit(@account)
+          PermissionsIndex.expand_manage_wiki
+          expect(PermissionsIndex.permission_link('manage_wiki_create')).to be_displayed
+          expect(PermissionsIndex.permission_link('manage_wiki_delete')).to be_displayed
+          expect(PermissionsIndex.permission_link('manage_wiki_update')).to be_displayed
+        end
+      end
     end
 
-    before :each do
-      user_session(@admin)
-    end
+    context "subaccount" do
+      before :each do
+        user_session(@admin)
+      end
 
-    it "permissions enables on grid" do
-      PermissionsIndex.visit(@account)
-      permission_name = "manage_outcomes"
-      PermissionsIndex.change_permission(permission_name, ta_role.id, "enable")
-      r = RoleOverride.last
-      expect(r.role_id).to eq(ta_role.id)
-      expect(r.permission).to eq(permission_name)
-      expect(r.enabled).to eq(true)
-      expect(r.locked).to eq(false)
-    end
-
-    it "permissions disables on grid" do
-      PermissionsIndex.visit(@account)
-      permission_name = "read_announcements"
-      PermissionsIndex.change_permission(permission_name, student_role.id, "disable")
-      r = RoleOverride.last
-      expect(r.role_id).to eq(student_role.id)
-      expect(r.permission).to eq(permission_name)
-      expect(r.enabled).to eq(false)
-      expect(r.locked).to eq(false)
-    end
-
-    it "permissions locks on grid" do
-      PermissionsIndex.visit(@account)
-      permission_name = "manage_outcomes"
-      PermissionsIndex.change_permission(permission_name, ta_role.id, "lock")
-      r = RoleOverride.last
-      expect(r.role_id).to eq(ta_role.id)
-      expect(r.permission).to eq(permission_name)
-      expect(r.locked).to eq(true)
-    end
-
-    it "permissions unlocks on grid" do
-      permission_name = "read_announcements"
-      id = create_role_override(permission_name, student_role, @account, :enabled => false, :locked => true)
-      PermissionsIndex.visit(@account)
-      PermissionsIndex.change_permission(permission_name, student_role.id, "lock")
-      r = RoleOverride.find(id)
-      expect(r.role_id).to eq(student_role.id)
-      expect(r.permission).to eq(permission_name)
-      expect(r.enabled).to eq(false)
-      expect(r.locked).to eq(false)
-    end
-
-    it "permissions default on grid works" do
-      permission_name = "read_announcements"
-      create_role_override(permission_name, student_role, @account,
-        :enabled => false, :locked => false)
-      PermissionsIndex.visit(@account)
-      PermissionsIndex.change_permission(permission_name, student_role.id, "use_default")
-      r = RoleOverride.where(:id => @account.id, :permission => permission_name,
-        :role_id => student_role.id)
-      expect(r).to be_empty
-    end
-
-    it "locked permission cannot be edited by subaccount" do
-      subaccount = Account.create!(:name => "subaccount", :parent_account_id => @account.id)
-      permission_name = "read_announcements"
-      create_role_override(permission_name, student_role, @account, :enabled => false, :locked => true)
-      PermissionsIndex.visit(subaccount)
-      expect(PermissionsIndex.permission_cell(permission_name, student_role.id).find('button')).
-        to be_disabled
+      it "locked permission cannot be edited" do
+        permission_name = "read_announcements"
+        create_role_override(permission_name, student_role, @account, :enabled => false, :locked => true)
+        PermissionsIndex.visit(@subaccount)
+        expect(PermissionsIndex.permission_cell(permission_name, student_role.id).find('button')).to be_disabled
+      end
     end
   end
 
   context "in the permissions tray" do
     before :each do
-      @account = Account.default
       admin_logged_in
       @role = custom_teacher_role('test role', account: @account)
-
       @permission_name = 'manage_students'
       PermissionsIndex.visit(@account)
     end
@@ -178,8 +189,6 @@ describe "permissions index" do
 
   context "main controls" do
     before(:each) do
-      @account = Account.default
-      account_admin_user
       user_session(@admin)
       PermissionsIndex.visit(Account.default)
     end

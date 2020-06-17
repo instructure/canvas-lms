@@ -2092,6 +2092,7 @@ pl:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Pozwala nauczycielowi/projektantowi/asystentom instruktorów uzyskiwać dostęp do narzędzia Czatu."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Pozwala nauczycielowi/asystentom instruktorów uzyskiwać dostęp do narzędzia Uczestnictwo."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Pozwala nauczycielowi/asystentom instruktorów uzyskiwać dostęp do narzędzia Uczestnictwo."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Pozwala nauczycielom ukrywać sekcje kursu przed uczestnikami na stronie Ludzie, gdy kurs zawiera więcej niż jedną sekcję."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Zezwól nauczycielom na zaznaczanie ocen, które mają być eksportowane masowo do integracji systemu SIS."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Umożliwia nauczycielom określenie zasad publikowania na potrzeby tego kursu lub określonych testów, dzięki czemu oceny mogą być ręcznie
@@ -4822,6 +4823,7 @@ pl:
         login_expiration_minimum: "Wygaśnięcie sesji powinno wynosić 20 minut lub dłużej"
         need_integer: "Wprowadź liczbę całkowitą dla buforowania listy odtwarzania"
         stream_name_required: "Wymagana jest nazwa strumienia kinesis."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Alert systemu Canvas – anonimowy komentarz: %{assignment_title}, uczestnik (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Alert systemu Canvas – anonimowy komentarz: Uczestnik (%{author_id}) do %{assignment_title}, uczestnik (%{user_id}), %{course_name}."
@@ -7289,6 +7291,7 @@ pl:
         grading_standard_enabled: "Aktywuj schemat oceniania dla kursu"
         hide_distribution_graphs: "Nie pokazuj wykresów przydziału ocen studentom"
         hide_final_grades: "Ukryj łączne wartości w podsumowaniu ocen uczestnika"
+        hide_sections_on_course_users_page: "Ukryj sekcje na stronie Ludzie przed uczestnikami"
         home_page_announcement_limit: "Liczba ogłoszeń wyświetlanych na stronie głównej"
         image: Obraz
         indexed: "Dołącz ten kurs do publicznego katalogu kursów"
@@ -9099,6 +9102,7 @@ pl:
   enable_new_gradebook_history_page_e0fd9d02: "Włącz nową stronę historii dziennika ocen."
   enable_new_sis_integration_settings_ab6780a4: "Włącz nowe ustawienia integracji SIS"
   enable_notifications_10a4bf44: "Włącz powiadomienia"
+  enable_notifications_for_contextname_b5b4440e: "Włącz powiadomienia dla %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "Włącz warunek \"LUB\" dla modułów"
   enable_recording_for_this_conference_b8adff6: "Włącz nagrywanie tej konferencji"
   enable_reregistration_for_lti_2_b2a10444: "Umożliwienie powtórnej rejestracji dla LTI 2"
@@ -11852,6 +11856,7 @@ pl:
   hide_correct_answers_at_2421b0aa: "Ukryj poprawne odpowiedzi przy"
   hide_correct_answers_at_b1a59408: "Ukryj prawidłowe odpowiedzi w"
   hide_course_sections_for_course_name_bd1911af: "Ukryj sekcje kursu dla kursu %{name}"
+  hide_course_sections_from_students_b7850d64: "Ukryj sekcje kursu przed uczestnikami"
   hide_courses_menu_1b8ca649: "Ukryj menu kursów"
   hide_courses_navigation_menu_6f7c4cfd: "Ukryj menu nawigacji w kursie"
   hide_courses_without_enrollments_6df4dfad: "Ukryj kursy bez zapisów"

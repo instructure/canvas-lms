@@ -173,7 +173,7 @@ module.exports = {
       rules: {
         // Turn off the "absolute-first" rule. Until we get rid of the `compiled/` and `jsx/`
         // stuff and use real realitive paths it will tell you to do the wrong thing
-        'import/first': ['error', {'absolute-first': false}],
+        'import/first': ['error', 'disable-absolute-first'],
 
         'import/no-amd': 'error',
         'import/no-commonjs': 'warn',

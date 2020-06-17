@@ -52,8 +52,8 @@ export default class KeyboardShortcutModal extends React.Component {
   }
 
   handleKeydown = e => {
-    // 188 is comma and 191 is forward slash
-    const keyComboPressed = e.which === 188 || (e.which === 191 && e.shiftKey)
+    // 191 is forward slash, add shift to get a question mark
+    const keyComboPressed = e.which === 191 && e.shiftKey
     if (keyComboPressed && e.target.nodeName !== 'INPUT' && e.target.nodeName !== 'TEXTAREA') {
       e.preventDefault()
       this.setState({isOpen: !this.state.isOpen})

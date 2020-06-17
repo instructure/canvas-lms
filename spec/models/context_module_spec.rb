@@ -450,6 +450,15 @@ describe ContextModule do
       @module.insert_items([@attach, @assign], 3)
       expect(@module.content_tags.not_deleted.pluck(:title)).to eq(%w(one three attach assign))
     end
+
+    it "respects the added items' published state" do
+      @page.unpublish!
+      m = @course.context_modules.create!
+      m.insert_items([@assign, @page, @tool])
+      expect(m.content_tags.pluck(:title, :workflow_state)).to eq(
+        [['assign', 'active'], ['page', 'unpublished'], ['tool', 'active']]
+      )
+    end
   end
 
   describe "completion_requirements=" do

@@ -22,8 +22,7 @@ class AddRootAccountIdToAssignmentOverrides < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_column_and_fk :assignment_overrides, :root_account_id, :accounts
-    add_index :assignment_overrides, :root_account_id, algorithm: :concurrently
+    add_column_and_fk :assignment_overrides, :root_account_id, :accounts, if_not_exists: true
   end
 
   def down

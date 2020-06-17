@@ -22,8 +22,7 @@ class AddRootAccountIdToMasterCoursesMasterTemplates < ActiveRecord::Migration[5
   disable_ddl_transaction!
 
   def up
-    add_column_and_fk :master_courses_master_templates, :root_account_id, :accounts
-    add_index :master_courses_master_templates, :root_account_id, algorithm: :concurrently
+    add_column_and_fk :master_courses_master_templates, :root_account_id, :accounts, if_not_exists: true
   end
 
   def down

@@ -2065,6 +2065,7 @@ nl:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Hiermee kunnen de rollen cursusleider/ontwerper/onderwijsassistent de Chat-tool openen."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Hiermee kunnen de rollen cursusleider/onderwijsassistent de tool Aanwezigheid openen."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Hiermee kunnen de rollen cursusleider en onderwijsassistent de tool Aanwezigheid openen."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Hiermee kunnen docenten cursussecties voor cursisten verbergen op de pagina Personen wanneer er meer dan één sectie in de cursus is."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Stelt instructeurs in staat cijfers te markeren om te exporteren naar SIS-integraties."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Hiermee kunnen cursusleiders beleidsregels voor het posten voor deze cursus of voor specifieke opdrachten instellen, zodat cijfers
@@ -4756,6 +4757,7 @@ nl:
         login_expiration_minimum: "Verlooptijd van de sessie moet 20 minuten of meer zijn"
         need_integer: "Een heel getal invoeren voor de afspeellijstcache"
         stream_name_required: "De kinese stroomnaam is vereist."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas-waarschuwing - Anonieme opmerking: %{assignment_title}, cursist (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas-waarschuwing - Anonieme opmerking: Cursist (%{author_id}) voor %{assignment_title}, cursist (%{user_id}), %{course_name}."
@@ -7138,6 +7140,7 @@ nl:
         grading_standard_enabled: "Beoordelingsschema voor de cursus inschakelen"
         hide_distribution_graphs: "Grafiek met de cijferverdeling voor cursisten verbergen"
         hide_final_grades: "Totalen in het cijferoverzicht van de cursist verbergen"
+        hide_sections_on_course_users_page: "Secties voor cursisten verbergen op de pagina Personen"
         home_page_announcement_limit: "Aantal aankondigingen weergegeven op de startpagina"
         image: Afbeelding
         indexed: "Deze cursus aan de openbare cursusindex toevoegen"
@@ -8890,6 +8893,7 @@ nl:
   enable_new_gradebook_history_page_e0fd9d02: "Nieuwe pagina met de geschiedenis van de cijferlijst inschakelen."
   enable_new_sis_integration_settings_ab6780a4: "Nieuwe instellingen voor SIS-integratie inschakelen"
   enable_notifications_10a4bf44: "Meldingen inschakelen"
+  enable_notifications_for_contextname_b5b4440e: "Meldingen inschakelen voor %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "\"OF\" Voorwaarde voor Modules inschakelen"
   enable_recording_for_this_conference_b8adff6: "Opnemen voor deze vergadering inschakelen"
   enable_reregistration_for_lti_2_b2a10444: "Nieuwe registratie voor LTI 2 inschakelen"
@@ -11591,6 +11595,7 @@ nl:
   hide_correct_answers_at_2421b0aa: "Juiste antwoorden verbergen op"
   hide_correct_answers_at_b1a59408: "Juiste antwoorden verbergen Op"
   hide_course_sections_for_course_name_bd1911af: "Cursussecties voor cursus verbergen %{name}"
+  hide_course_sections_from_students_b7850d64: "Cursussecties voor cursisten verbergen"
   hide_courses_menu_1b8ca649: "Menu met cursussen verbergen"
   hide_courses_navigation_menu_6f7c4cfd: "Menu Cursusnavigatie verbergen"
   hide_courses_without_enrollments_6df4dfad: "Cursussen zonder aanmeldingen verbergen"

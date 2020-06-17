@@ -29,6 +29,18 @@ def publishableTagSuffix() {
   return findVariable('PUBLISHABLE_TAG_SUFFIX', true)
 }
 
+def rubyPassenger() {
+  return findVariable('RUBY_PASSENGER', true)
+}
+
+def postgres() {
+  return findVariable('POSTGRES', true)
+}
+
+def node() {
+  return findVariable('NODE', true)
+}
+
 /**
  * this is a standard way of finding configuration from different places.
  * the checks happen in this order:

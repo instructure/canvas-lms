@@ -29,6 +29,10 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
     [ :self_registration ].freeze
   end
 
+  def self.login_button?
+    false
+  end
+
   # Rename db field
   def self_registration=(val)
     case val

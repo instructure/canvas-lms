@@ -25,6 +25,7 @@ import template from 'jst/conferences/editConferenceForm'
 import userSettingOptionsTemplate from 'jst/conferences/userSettingOptions'
 import authenticity_token from '../../behaviors/authenticity_token'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
+import 'jquery.instructure_forms' # formSubmit
 
 export default class EditConferenceView extends DialogBaseView
 
@@ -35,8 +36,7 @@ export default class EditConferenceView extends DialogBaseView
     close: @onClose
 
   events:
-    'click .all_users_checkbox': 'toggleAllUsers'
-    'click .remove_observers_checkbox': 'toggleRemoveObservers'
+    'change .all_users_checkbox': 'toggleAllUsers'
     'change #web_conference_long_running': 'changeLongRunning'
     'change #web_conference_conference_type': 'renderConferenceFormUserSettings'
 
@@ -189,18 +189,12 @@ export default class EditConferenceView extends DialogBaseView
     )
 
   toggleAllUsers: ->
-    $('.all_observers_checkbox').attr("checked", false);
     if(@$('.all_users_checkbox').is(':checked'))
       $("#members_list").hide()
+      @$('.remove_observers_checkbox').prop('disabled', false)
     else
       $("#members_list").slideDown()
-
-  toggleRemoveObservers: ->
-    $('.all_users_checkbox').attr("checked", false);
-    if(@$('.remove_observers_checkbox').is(':checked'))
-      $("#members_list").hide()
-    else
-      $("#members_list").slideDown()
+      @$('.remove_observers_checkbox').prop('disabled', true)
 
   markInvitedUsers: ->
     _.each(@model.get('user_ids'), (id) ->

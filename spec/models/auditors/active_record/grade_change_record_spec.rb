@@ -40,11 +40,13 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
       expect(ar_rec.assignment_id).to eq(submission_record.assignment_id)
       expect(ar_rec.event_type).to eq("grade_change")
       expect(ar_rec.context_id).to eq(course.id)
+      expect(ar_rec.course_id).to eq(course.id)
       expect(ar_rec.context_type).to eq('Course')
       expect(ar_rec.grader_id).to eq(submission_record.grader_id)
       expect(ar_rec.student_id).to eq(submission_record.user_id)
       expect(ar_rec.submission_id).to eq(submission_record.id)
       expect(ar_rec.submission_version_number).to eq(submission_record.version_number)
+      expect(ar_rec.version_number).to eq(submission_record.version_number)
       expect(ar_rec.created_at).to_not be_nil
     end
 

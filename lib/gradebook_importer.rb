@@ -151,7 +151,7 @@ class GradebookImporter
 
     @original_submissions = @context.submissions
       .preload(:grading_period, assignment: { context: :account })
-      .select(['submissions.id', :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, 'submissions.updated_at'])
+      .select(['submissions.id', :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, 'submissions.updated_at'])
       .where(assignment_id: assignment_ids, user_id: user_ids)
       .map do |submission|
         is_gradeable = gradeable?(submission: submission, is_admin: is_admin)

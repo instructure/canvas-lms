@@ -1400,30 +1400,6 @@ ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plug
 ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
 
 ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
-  # in anticipation of having to re-run migrations due to integrity violations or
-  # killing stuff that is holding locks too long
-  def add_foreign_key_if_not_exists(from_table, to_table, options = {})
-    options[:column] ||= "#{to_table.to_s.singularize}_id"
-    column = options[:column]
-    case self.adapter_name
-    when 'PostgreSQL'
-      foreign_key_name = foreign_key_name(from_table, options)
-      schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
-      value = select_value("SELECT convalidated FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
-      if value == 'f'
-        execute("ALTER TABLE #{quote_table_name(from_table)} DROP CONSTRAINT #{quote_table_name(foreign_key_name)}")
-      elsif value
-        return
-      end
-
-      add_foreign_key(from_table, to_table, options)
-    else
-      foreign_key_name = foreign_key_name(from_table, column, options)
-      return if foreign_keys(from_table).find { |k| k.options[:name] == foreign_key_name }
-      add_foreign_key(from_table, to_table, options)
-    end
-  end
-
   def find_foreign_key(from_table, to_table, column: nil)
     column ||= "#{to_table.to_s.singularize}_id"
     foreign_keys(from_table).find do |key|
@@ -1448,9 +1424,44 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     end
   end
 
-  def remove_foreign_key_if_exists(table, options = {})
-    return unless foreign_key_exists?(table, options)
-    remove_foreign_key(table, options)
+  def foreign_key_for(from_table, options_or_to_table = {})
+    return unless supports_foreign_keys?
+    fks = foreign_keys(from_table).select { |fk| fk.defined_for? options_or_to_table }
+    # prefer a FK on a column named after the table
+    unless options_or_to_table.is_a?(Hash)
+      column = foreign_key_column_for(options_or_to_table) if options_or_to_table
+      return fks.find { |fk| fk.column == column} || fks.first
+    end
+    fks.first
+  end
+
+  def remove_foreign_key(from_table, *args)
+    return unless supports_foreign_keys?
+
+    raise ArgumentError if args.length > 2
+
+    # support remove_foreign_key :table, :table, if_exists: stuff
+    # OR
+    # remove_foreign_key :table, column: :stuff
+    # OR
+    # remove_foreign_key :table, column: :stuff, if_exists: stuff
+    options = args.last
+    options = {} unless options.is_a?(Hash)
+    options_or_to_table = args.first || {}
+
+    # have to account for if options is a hash, if_exists will just get wrapped up
+    # in it
+    if options[:if_exists]
+      fk_name_to_delete = foreign_key_for(from_table, options_or_to_table)&.name
+      return if fk_name_to_delete.nil?
+    else
+      fk_name_to_delete = foreign_key_for!(from_table, options_or_to_table).name
+    end
+
+    at = create_alter_table from_table
+    at.drop_foreign_key fk_name_to_delete
+
+    execute schema_creation.accept(at)
   end
 end
 

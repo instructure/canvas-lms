@@ -44,6 +44,7 @@ export default function CourseNotificationSettingsQuery(props) {
   return (
     <CourseNotificationSettingsManager
       courseId={props.courseId}
+      courseName={data?.course?.name}
       enabled={data?.course?.notificationPreferencesEnabled}
       notificationPreferences={data?.course?.notificationPreferences}
     />

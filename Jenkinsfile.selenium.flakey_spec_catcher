@@ -43,8 +43,8 @@ def computeTestCount() {
   sh 'mkdir -v tmp'
   sh 'chmod -vv 777 tmp'
   sh """
-    docker run --volume \$WORKSPACE/.git:/usr/src/app/.git \
-               --volume \$WORKSPACE/tmp:/usr/src/app/tmp \
+    docker run --volume \$(pwd)/.git:/usr/src/app/.git \
+               --volume \$(pwd)/tmp:/usr/src/app/tmp \
                --env FSC_IGNORE_FILES \
                \$PATCHSET_TAG \
         bundle exec flakey_spec_catcher --use-parent --dry-run-quiet > tmp/test_list

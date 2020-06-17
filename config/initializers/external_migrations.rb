@@ -16,4 +16,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Canvas::Migration::ExternalContent::Migrator.register_service('conditional_release', ConditionalRelease::MigrationService)
+Canvas::Migration::ExternalContent::Migrator.register_service('outcomes_service', OutcomesService::MigrationService)
 Canvas::Migration::ExternalContent::Migrator.register_service('quizzes_next_export', QuizzesNext::ExportService)

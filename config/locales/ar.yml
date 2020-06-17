@@ -2117,6 +2117,7 @@ ar:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "يسمح للأدوار القائمة على المعلم/المصمم/المعلم المساعد بالوصول إلى أداة الدردشة."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "يسمح للأدوار القائمة على المعلم/المعلم المساعد على TA بالوصول إلى أداة الدردشة."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "يسمح للأدوار القائمة على المعلم، المعلم المساعد على TA بالوصول إلى أداة الدردشة."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "لتمكين المعلمين من إخفاء أقسام المساق من الطلاب في صفحة الأشخاص عند وجود أكثر من قسم واحد في المساق."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "السماح للمعلمين بوضع علامة على بيانات الدرجة المقرر تصديرها بشكل مجمع إلى تكاملات SIS."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       يمكّن المعلمين من تحديد نُهُج النشر لهذا المساق أو المهام المحددة، مما يمكن من
@@ -4881,6 +4882,7 @@ ar:
         login_expiration_minimum: "يجب أن تكون مدة صلاحية الجلسة 20 دقيقة أو أكثر"
         need_integer: "يُرجى إدخال عدد صحيح لذاكرة التخزين المؤقت لقائمة التشغيل"
         stream_name_required: "اسم تدفق Kinesis مطلوب."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "تنبيه Canvas - تعليق مجهول: %{assignment_title}، الطالب (%{user_id})، %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "تنبيه Canvas - تعليق مجهول: الطالب (%{author_id}) لـ %{assignment_title}، الطالب (%{user_id})، %{course_name}."
@@ -7426,6 +7428,7 @@ ar:
         grading_standard_enabled: "تمكين نظام تقييم المساق"
         hide_distribution_graphs: "إخفاء رسومات توزيع الدرجات عن الطلاب"
         hide_final_grades: "إخفاء إجماليات ملخص درجات الطالب"
+        hide_sections_on_course_users_page: "إخفاء الأقسام في صفحة الأشخاص من الطلاب"
         home_page_announcement_limit: "عدد الإعلانات الظاهرة على الصفحة الرئيسية"
         image: الصورة
         indexed: "تضمين هذا المساق في فهرس المساق العام"
@@ -9295,6 +9298,7 @@ ar:
   enable_new_gradebook_history_page_e0fd9d02: "تمكين صفحة سجل دفتر درجات جديد."
   enable_new_sis_integration_settings_ab6780a4: "تمكين إعدادات تكامل نظام معلومات طلاب جديد"
   enable_notifications_10a4bf44: "تمكين الإعلامات"
+  enable_notifications_for_contextname_b5b4440e: "تمكين الإعلامات لـ %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "تمكين شرط \"OR\" للوحدات"
   enable_recording_for_this_conference_b8adff6: "تمكين التسجيل لهذا المؤتمر"
   enable_reregistration_for_lti_2_b2a10444: "تمكين إعادة التسجيل بالنسبة لـ LTI 2"
@@ -12112,6 +12116,7 @@ ar:
   hide_correct_answers_at_2421b0aa: "إخفاء الإجابات الصحيحة في"
   hide_correct_answers_at_b1a59408: "إخفاء الإجابات الصحيحة في"
   hide_course_sections_for_course_name_bd1911af: "إخفاء أقسام المساقات للمساق %{name}"
+  hide_course_sections_from_students_b7850d64: "إخفاء أقسام المساق من الطلاب"
   hide_courses_menu_1b8ca649: "إخفاء قائمة المساقات"
   hide_courses_navigation_menu_6f7c4cfd: "إخفاء قائمة التنقل بين المساقات"
   hide_courses_without_enrollments_6df4dfad: "إخفاء المساقات بدون تسجيل"

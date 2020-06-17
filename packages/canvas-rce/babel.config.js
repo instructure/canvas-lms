@@ -21,9 +21,11 @@ module.exports = {
       '@instructure/ui-babel-preset',
       {
         coverage: process.env.BABEL_ENV === 'test-node',
-        node: true,
-        transformImports: Boolean(process.env.TRANSFORM_IMPORTS),
-        esModules: Boolean(process.env.ES_MODULES)
+        transformImports: false,
+        node: ['test-node', 'test'].includes(process.env.BABEL_ENV) || process.env.JEST_WORKER_ID,
+        esModules: !(
+          ['test-node', 'test'].includes(process.env.BABEL_ENV) || process.env.JEST_WORKER_ID
+        )
       }
     ],
     [

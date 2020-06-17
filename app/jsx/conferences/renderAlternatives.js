@@ -26,7 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {Img} from '@instructure/ui-img'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import responsiviser from 'canvas-planner/lib/components/responsiviser'
+import {responsiviser} from '@instructure/canvas-planner'
 import {Link} from '@instructure/ui-link'
 
 import ZoomIcon from './svg/zoom.svg'

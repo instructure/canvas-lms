@@ -158,27 +158,30 @@ function decorateLinkWithEmbed(link) {
   }
 }
 
-export function insertLink(editor, link) {
+export function insertLink(editor, link, textOverride) {
   const linkAttrs = {...link}
   if (linkAttrs.embed) {
     decorateLinkWithEmbed(linkAttrs)
     delete linkAttrs.embed
   }
-  return insertUndecoratedLink(editor, linkAttrs)
+  return insertUndecoratedLink(editor, linkAttrs, textOverride)
 }
 
 // link edit/create logic based on tinymce/plugins/link/plugin.js
-function insertUndecoratedLink(editor, linkProps) {
+function insertUndecoratedLink(editor, linkProps, textOverride) {
   const selectedElm = editor.selection.getNode()
   const anchorElm = getAnchorElement(editor, selectedElm)
-  const selectedHtml = editor.selection.getContent({format: 'html'})
+  const selectedHtml = editor.selection.getContent({format: 'text'})
+  const linkText =
+    (textOverride && editor.dom.encode(textOverride)) ||
+    selectedHtml ||
+    editor.dom.encode(linkProps.text)
   // only keep the props we want as attributes on the <a>
   const linkAttrs = {
     id: linkProps.id,
     href: cleanUrl(linkProps.href || linkProps.url),
     target: linkProps.target,
     class: linkProps.class,
-    text: linkProps.text,
     title: linkProps.title,
     'data-canvas-previewable': linkProps['data-canvas-previewable']
   }
@@ -188,10 +191,13 @@ function insertUndecoratedLink(editor, linkProps) {
   }
 
   editor.focus()
-  if (anchorElm || selectedHtml) {
-    editor.execCommand('mceInsertLink', null, linkAttrs)
+  if (anchorElm) {
+    anchorElm.innerText = linkText
+    editor.dom.setAttribs(anchorElm, linkAttrs)
+    editor.selection.select(anchorElm)
+    editor.undoManager.add()
   } else {
-    createLink(editor, selectedElm, linkProps.text, linkAttrs)
+    createLink(editor, selectedElm, linkText, linkAttrs)
   }
   return editor.selection.getEnd() // this will be the newly created or updated content
 }
@@ -206,7 +212,10 @@ function getAnchorElement(editor, selectedElm) {
 }
 
 function isImageFigure(elm) {
-  return elm && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)
+  return (
+    elm &&
+    ((elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)) || elm.nodeName === 'IMG')
+  )
 }
 
 function createLink(editor, selectedElm, text, linkAttrs) {
@@ -217,7 +226,7 @@ function createLink(editor, selectedElm, text, linkAttrs) {
   }
 }
 function linkImageFigure(editor, fig, attrs) {
-  const img = editor.dom.select('img', fig)[0]
+  const img = fig.tagName === 'IMG' ? fig : editor.dom.select('img', fig)[0]
   if (img) {
     const a = editor.dom.create('a', attrs)
     img.parentNode.insertBefore(a, img)

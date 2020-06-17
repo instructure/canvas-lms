@@ -2067,6 +2067,7 @@ pt:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permite que funções de professor/designer/TA acedam a ferramenta Bate-papo."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permite que funções baseadas em professores/TA acedam a ferramenta de Atendimento."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Permite que funções baseadas em professores/TA acedam a ferramenta de Atendimento."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Permite aos professores esconderem seções da disciplina dos alunos na página Pessoas quando existe mais do que uma seção na disciplina."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permitir que os professores consigam classificar notas para serem exportadas para integrações SIS."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Permite que os professores especifiquem políticas de publicação para esta disciplina ou tarefas específicas, permitindo que as classificações sejam 
@@ -4765,6 +4766,7 @@ pt:
         login_expiration_minimum: "A expiração da sessão tem de ser igual ou superior a 20 minutos"
         need_integer: "Introduza um número inteiro para a cache da lista de reprodução"
         stream_name_required: "O nome de fluxo kinesis é necessário."
+  canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Alerta do Canvas - Comentário Anónimo: %{assignment_title}, Aluno (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Alerta do Canvas - Comentário Anónimo: Aluno (%{author_id}) para %{assignment_title}, Aluno (%{user_id}), %{course_name}."
@@ -7154,6 +7156,7 @@ pt:
         grading_standard_enabled: "Ativar esquema de avaliação da disciplina"
         hide_distribution_graphs: "Ocultar gráficos de distribuição de notas dos alunos"
         hide_final_grades: "Ocultar totais no resumo de notas dos alunos"
+        hide_sections_on_course_users_page: "Esconder secções na página de Pessoas dos alunos"
         home_page_announcement_limit: "Número de anúncios mostrados na página inicial"
         image: Imagem
         indexed: "Incluir esta disciplina no índice público de disciplinas"
@@ -8908,6 +8911,7 @@ pt:
   enable_new_gradebook_history_page_e0fd9d02: "Habilite a página Novo histórico do livro de avaliação."
   enable_new_sis_integration_settings_ab6780a4: "Ativar novas configurações de integração do SIS"
   enable_notifications_10a4bf44: "Habilitar Notificações"
+  enable_notifications_for_contextname_b5b4440e: "Habilitar Notificações para %{contextName}"
   enable_or_condition_for_modules_a16f02d8: "Permitir Condição de \"Opção\" para Módulos"
   enable_recording_for_this_conference_b8adff6: "Permitir gravação para esta conferência"
   enable_reregistration_for_lti_2_b2a10444: "Permitir novo registo para LTI 2"
@@ -11613,6 +11617,7 @@ pt:
   hide_correct_answers_at_2421b0aa: "Esconder Respostas Corretas em"
   hide_correct_answers_at_b1a59408: "Esconder Respostas Corretas em"
   hide_course_sections_for_course_name_bd1911af: "Ocultar seções da disciplina %{name}"
+  hide_course_sections_from_students_b7850d64: "Ocultar seções da disciplina dos alunos"
   hide_courses_menu_1b8ca649: "Ocultar menu cursos"
   hide_courses_navigation_menu_6f7c4cfd: "Ocultar Menu de navegação das disciplinas"
   hide_courses_without_enrollments_6df4dfad: "Esconder Disciplinas sem inscrições"

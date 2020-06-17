@@ -1,8 +1,9 @@
 {
-  "name": "canvas-planner",
+  "name": "@instructure/canvas-planner",
   "version": "1.0.16",
   "description": "UI portion of planner application for canvas-lms.",
   "main": "lib/index.js",
+  "module": "es/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/instructure/canvas-planner.git"
@@ -13,9 +14,11 @@
     "lint-staged": "lint-staged",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
-    "build": "BABEL_ENV=production babel src --out-dir lib --ignore '**/__tests__' --quiet",
+    "build:es": "babel src --out-dir es --ignore '**/__tests__' --quiet",
+    "build:cjs": "JEST_WORKER_ID=true babel src --out-dir lib --ignore '**/__tests__'",
+    "build": "yarn build:es && yarn build:cjs",
     "build:canvas": "yarn build",
-    "build:dev": "NODE_ENV=development BABEL_ENV=production babel src --out-dir lib --ignore '**/__tests__' --quiet",
+    "build:dev": "NODE_ENV=development BABEL_ENV=production babel src --out-dir es --ignore '**/__tests__'",
     "build:watch": "yarn run build:dev --watch",
     "test": "jest",
     "test:coverage": "jest --coverage",
@@ -23,7 +26,7 @@
     "test:update": "jest --updateSnapshot",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "generate-themeable": "./scripts/generate-themeable",
-    "clean": "rm -rf .babel-cache && rm -rf lib && rm -rf coverage"
+    "clean": "rm -rf lib && rm -rf es && rm -rf coverage"
   },
   "files": [
     "config/",

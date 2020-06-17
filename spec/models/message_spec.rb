@@ -351,7 +351,7 @@ describe Message do
     context 'SMS' do
       before :once do
         user_model
-        @user.account.enable_feature!(:international_sms)
+        Account.site_admin.enable_feature!(:international_sms)
       end
 
       before do
@@ -360,11 +360,11 @@ describe Message do
 
       context 'with the deprecate_sms feature enabled' do
         before :each do
-          @user.account.enable_feature!(:deprecate_sms)
+         Account.site_admin.enable_feature!(:deprecate_sms)
         end
 
         after :each do
-          @user.account.disable_feature!(:deprecate_sms)
+          Account.site_admin.disable_feature!(:deprecate_sms)
         end
 
         it "allows whitelisted notification types" do

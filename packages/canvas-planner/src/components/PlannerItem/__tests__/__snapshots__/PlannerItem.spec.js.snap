@@ -3421,7 +3421,7 @@ exports[`renders Note correctly with everything 1`] = `
               immutable={false}
               theme={
                 Object {
-                  Symbol(Button__MTA0NDg4): Object {
+                  Symbol(Button__MTEzMjky): Object {
                     "iconColor": undefined,
                   },
                 }
@@ -3611,7 +3611,7 @@ exports[`renders Note correctly without Course 1`] = `
               immutable={false}
               theme={
                 Object {
-                  Symbol(Button__MTA0NDg4): Object {
+                  Symbol(Button__MTEzMjky): Object {
                     "iconColor": undefined,
                   },
                 }

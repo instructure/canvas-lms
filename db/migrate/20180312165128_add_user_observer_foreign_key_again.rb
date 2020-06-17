@@ -18,6 +18,6 @@ class AddUserObserverForeignKeyAgain < ActiveRecord::Migration[5.0]
   end
 
   def down
-    remove_foreign_key_if_exists :user_observers, :column => :observer_id
+    remove_foreign_key :user_observers, :column => :observer_id, if_exists: true
   end
 end

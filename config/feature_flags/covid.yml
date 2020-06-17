@@ -2,7 +2,7 @@ product_tours:
   state: hidden
   applies_to: RootAccount
   display_name: "Product Tours"
-  description: "In-product training walkthrough and tourpoints for teachers"
+  description: "In-product training walkthrough and tourpoints for admins, teachers, and students"
 module_dnd:
   state: hidden
   applies_to: RootAccount

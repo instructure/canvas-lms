@@ -15,7 +15,7 @@ class AddIdToUsersSortableNameIndex < ActiveRecord::Migration[5.2]
       end
     columns << ", id" if dir == :up
     execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON #{User.quoted_table_name} (#{columns})")
-    remove_index :users, name: :index_users_on_sortable_name_old
+    remove_index :users, name: :index_users_on_sortable_name_old, if_exists: true
   end
 
   # I can't use change and reversible, because I'm calling execute

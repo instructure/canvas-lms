@@ -40,6 +40,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_one :external_feed_entry, :as => :asset
 
   before_create :infer_root_entry_id
+  before_create :set_root_account_id
   after_save :update_discussion
   after_save :context_module_action_later
   after_create :create_participants
@@ -563,4 +564,7 @@ class DiscussionEntry < ActiveRecord::Base
     participant
   end
 
+  def set_root_account_id
+    self.root_account_id ||= self.discussion_topic.root_account_id
+  end
 end

@@ -15,6 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#
+# some if the specs in here include "ignore_js_errors: true". This is because
+# console errors are emitted for things that aren't really errors, like react
+# jsx attribute type warnings
+#
+
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative 'pages/rce_next_page'
 
@@ -92,28 +98,101 @@ describe "RCE next tests" do
       end
     end
 
-    it "should respect selected text when creating link in body", ignore_js_errors: true do
-      title = "test_page"
-      unpublished = false
-      edit_roles = "public"
+    context "links" do
+      it "should respect selected text when creating a course link in body", ignore_js_errors: true do
+        title = "test_page"
+        unpublished = false
+        edit_roles = "public"
 
-      create_wiki_page(title, unpublished, edit_roles)
+        create_wiki_page(title, unpublished, edit_roles)
 
-      visit_front_page_edit(@course)
-      wait_for_tiny(edit_wiki_css)
-      insert_tiny_text('select me')
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+        insert_tiny_text('select me')
 
-      select_all_in_tiny(f('#wiki_page_body'))
+        select_all_in_tiny(f('#wiki_page_body'))
 
-      click_links_toolbar_button
-      click_course_links
+        click_links_toolbar_button
+        click_course_links
 
-      click_pages_accordion
-      click_course_item_link(title)
+        click_pages_accordion
+        click_course_item_link(title)
 
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('title')).to include title
-        expect(wiki_body_anchor.text).to eq "select me"
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('title')).to include title
+          expect(wiki_body_anchor.text).to eq "select me"
+        end
+      end
+
+      it "should respect selected text when creating an external link in body", ignore_js_errors: true do
+        title = "test_page"
+        unpublished = false
+        edit_roles = "public"
+
+        create_wiki_page(title, unpublished, edit_roles)
+
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+        insert_tiny_text('select me')
+
+        select_all_in_tiny(f('#wiki_page_body'))
+
+        create_external_link(nil, "http://example.com/")
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to eq "http://example.com/"
+          expect(wiki_body_anchor.text).to eq "select me"
+        end
+      end
+
+      it "should update selected text when creating an external link in body", ignore_js_errors: true do
+        title = "test_page"
+        unpublished = false
+        edit_roles = "public"
+
+        create_wiki_page(title, unpublished, edit_roles)
+
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+        insert_tiny_text('select me')
+
+        select_all_in_tiny(f('#wiki_page_body'))
+
+        create_external_link("click me", "http://example.com/")
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to eq "http://example.com/"
+          expect(wiki_body_anchor.text).to eq "click me"
+        end
+      end
+
+      it "should update the text when editing a link" do
+        title = "test_page"
+        unpublished = false
+        edit_roles = "public"
+
+        create_wiki_page(title, unpublished, edit_roles)
+
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+
+        switch_to_html_view
+        html_view = f('textarea#wiki_page_body')
+        html_view.send_keys('<a href="http://example.com">edit me</a>')
+        switch_to_editor_view
+
+        click_link_for_options
+        click_link_options_button
+
+        expect(link_options_tray).to be_displayed
+
+        link_text_textbox = f('input[type="text"][value="edit me"]')
+        link_text_textbox.send_keys(" please")
+        click_link_options_done_button
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.text).to eq "edit me please"
+        end
       end
     end
 
@@ -315,7 +394,7 @@ describe "RCE next tests" do
       expect(upload_new_image).to be_displayed
     end
 
-    it "should click on an image in sidebar to display in body" do
+    it "should click on an image in sidebar to display in body", ignore_js_errors: true do
       title = "email.png"
       @root_folder = Folder.root_folders(@course).first
       @image = @root_folder.attachments.build(:context => @course)
@@ -680,7 +759,7 @@ describe "RCE next tests" do
         @tool.save!
       end
 
-      it "should display lti icon with a tool enabled for the course" do
+      it "should display lti icon with a tool enabled for the course", ignore_js_errors: true do
         page_title = "Page1"
         create_wiki_page_with_embedded_image(page_title)
 
@@ -689,7 +768,7 @@ describe "RCE next tests" do
         expect(lti_tools_button).to be_displayed
       end
 
-      it "should display the lti tool modal" do
+      it "should display the lti tool modal", ignore_js_errors: true do
         page_title = "Page1"
         create_wiki_page_with_embedded_image(page_title)
 

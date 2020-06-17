@@ -593,6 +593,16 @@ describe SIS::CSV::CourseImporter do
     expect(course).to be_available
   end
 
+  it "should allow publishing an existing course" do
+    course = @account.courses.create!(sis_source_id: 'test_1', workflow_state: 'claimed')
+    Course.where(id: course).update_all(stuck_sis_fields: Set.new)
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,published"
+    )
+    expect(course.reload).to be_available
+  end
+
   it 'sets and updates course_format' do
     process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,course_format",

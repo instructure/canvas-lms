@@ -253,7 +253,7 @@ international_sms:
   display_name: International SMS
   description: Allows users with international phone numbers to receive text messages
     from Canvas.
-  applies_to: RootAccount
+  applies_to: SiteAdmin
   root_opt_in: true
 course_user_search:
   state: 'on'

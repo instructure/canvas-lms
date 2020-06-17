@@ -43,6 +43,23 @@ export default class CourseSelectionView extends View {
       .on('mouseover', () => this.loadAll())
       .find('.dropdown-toggle')
       .on('focus', () => this.loadAll())
+    const dropdown = this.$el.data('selectpicker')?.$newElement
+    if (dropdown) {
+      dropdown.on('focusout', () => {
+        setTimeout(() => {
+          // fully close dropdown once focus has left the dropdown tree
+          if (
+            !dropdown[0].contains(document.activeElement) &&
+            // selenium tests fail when executing JS scripts as the web
+            // driver moves focus to the body. so let's just exclude it
+            // from the things we care to check :P
+            document.activeElement !== document.body
+          ) {
+            dropdown.removeClass('open')
+          }
+        }, 0)
+      })
+    }
     this.options.courses.favorites.on('reset', () => this.render())
     this.options.courses.all.on('reset', () => this.render())
     this.options.courses.all.on('add', () => this.render())

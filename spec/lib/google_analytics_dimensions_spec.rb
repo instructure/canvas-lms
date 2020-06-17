@@ -86,7 +86,6 @@ describe GoogleAnalyticsDimensions do
     expect(dims[:admin]).to eq '11'
   end
 
-
   it 'tells when someone is masquerading' do
     dims = subject[
       real_user: account_admin_user,
@@ -103,6 +102,15 @@ describe GoogleAnalyticsDimensions do
 
     expect(dims).to have_key(:masquerading)
     expect(dims[:masquerading]).to eq '0'
+  end
+
+  it 'reports the org type as found in Salesforce' do
+    Account.default.external_integration_keys.create!(
+      key_type: 'salesforce_org_type',
+      key_value: 'K12'
+    )
+
+    expect(subject[][:org_type]).to eq 'K12'
   end
 
   describe 'identification' do

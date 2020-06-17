@@ -55,7 +55,7 @@ class Auditors::Authentication
   end
 
   Stream = Auditors.stream do
-    backend_strategy :cassandra
+    backend_strategy -> { Auditors.backend_strategy }
     active_record_type Auditors::ActiveRecord::AuthenticationRecord
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :authentications
@@ -66,18 +66,21 @@ class Auditors::Authentication
       table :authentications_by_pseudonym
       entry_proc lambda{ |record| record.pseudonym }
       key_proc lambda{ |pseudonym| pseudonym.global_id }
+      ar_conditions_proc lambda { |pseudonym| { pseudonym_id: pseudonym.id } }
     end
 
     add_index :user do
       table :authentications_by_user
       entry_proc lambda{ |record| record.user }
       key_proc lambda{ |user| user.global_id }
+      ar_conditions_proc lambda { |user| { user_id: user.id } }
     end
 
     add_index :account do
       table :authentications_by_account
       entry_proc lambda{ |record| record.account }
       key_proc lambda{ |account| account.global_id }
+      ar_conditions_proc lambda { |account| { account_id: account.id } }
     end
   end
 
@@ -94,13 +97,13 @@ class Auditors::Authentication
 
   def self.for_account(account, options={})
     account.shard.activate do
-      Auditors::Authentication::Stream.for_account(account, options)
+      Auditors::Authentication::Stream.for_account(account, Auditors.read_stream_options(options))
     end
   end
 
   def self.for_pseudonym(pseudonym, options={})
     pseudonym.shard.activate do
-      Auditors::Authentication::Stream.for_pseudonym(pseudonym, options)
+      Auditors::Authentication::Stream.for_pseudonym(pseudonym, Auditors.read_stream_options(options))
     end
   end
 
@@ -110,7 +113,7 @@ class Auditors::Authentication
     # shard-thrashing)
     collections = Shard.partition_by_shard(pseudonyms) do |shard_pseudonyms|
       shard_pseudonyms.map do |pseudonym|
-        [pseudonym.global_id, Auditors::Authentication.for_pseudonym(pseudonym, options)]
+        [pseudonym.global_id, Auditors::Authentication.for_pseudonym(pseudonym, Auditors.read_stream_options(options))]
       end
     end
     BookmarkedCollection.merge(*collections)
@@ -130,7 +133,7 @@ class Auditors::Authentication
       # for merge
       collections << [
         db.fingerprint,
-        Auditors::Authentication::Stream.for_user(user, options)
+        Auditors::Authentication::Stream.for_user(user, Auditors.read_stream_options(options))
       ]
     end
     BookmarkedCollection.merge(*collections)

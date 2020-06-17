@@ -47,6 +47,7 @@ export default function CourseNotifcationSettingsManager(props) {
   return (
     <NotificationPreferences
       contextType="course"
+      contextName={props.courseName}
       enabled={props.enabled}
       updatePreference={(data = {}) =>
         updatePreference({
@@ -66,6 +67,7 @@ export default function CourseNotifcationSettingsManager(props) {
 
 CourseNotifcationSettingsManager.propTypes = {
   courseId: string.isRequired,
+  courseName: string.isRequired,
   enabled: bool.isRequired,
   notificationPreferences: NotificationPreferencesShape
 }

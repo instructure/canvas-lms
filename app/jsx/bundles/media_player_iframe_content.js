@@ -30,12 +30,10 @@ ready(() => {
   const media_id = window.location.pathname.split('media_objects_iframe/').pop()
   const media_href_match = window.location.search.match(/mediahref=([^&]+)/)
   const is_audio = /type=audio/.test(window.location.search)
-  let type = is_audio ? 'audio' : 'video'
   let href_source
 
   if (media_href_match) {
     if (is_audio) {
-      type = 'audio'
       href_source = decodeURIComponent(media_href_match[1])
     } else {
       href_source = [decodeURIComponent(media_href_match[1])]
@@ -61,7 +59,7 @@ ready(() => {
       media_id={media_id}
       media_sources={href_source || media_object.media_sources}
       media_tracks={mediaTracks}
-      type={type}
+      type={is_audio ? 'audio' : 'video'}
     />,
     document.body.appendChild(div)
   )

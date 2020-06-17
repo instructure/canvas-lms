@@ -184,15 +184,16 @@ class GradeSummaryPresenter
 
   def submissions
     @submissions ||= begin
-      ss = @context.submissions
-      .preload(
+      ss = @context.submissions.
+      preload(
         :visible_submission_comments,
         {:rubric_assessments => [:rubric, :rubric_association]},
         :content_participations,
         {:assignment => [:context, :post_policy]}
-      )
-      .where("assignments.workflow_state != 'deleted'")
-      .where(user_id: student).to_a
+      ).
+      joins(:assignment).
+      where("assignments.workflow_state != 'deleted'").
+      where(user_id: student).to_a
 
       if vericite_enabled? || turnitin_enabled?
         ActiveRecord::Associations::Preloader.new.preload(ss, :originality_reports)

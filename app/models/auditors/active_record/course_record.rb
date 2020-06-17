@@ -17,6 +17,7 @@
 #
 module Auditors::ActiveRecord
   class CourseRecord < ActiveRecord::Base
+    include Auditors::ActiveRecord::Attributes
     include CanvasPartman::Concerns::Partitioned
     self.partitioning_strategy = :by_date
     self.partitioning_interval = :months
@@ -41,6 +42,10 @@ module Auditors::ActiveRecord
         attrs_hash['sis_batch_id'] = Shard.relative_id_for(record.sis_batch_id, Shard.current, Shard.current)
         attrs_hash
       end
+    end
+
+    def event_data
+      @_event_data ||= JSON.parse(self.data)
     end
   end
 end

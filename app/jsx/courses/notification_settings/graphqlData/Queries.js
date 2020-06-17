@@ -21,6 +21,7 @@ export const COURSE_NOTIFICATIONS_QUERY = gql`
   query GetNotificationPreferences($courseId: ID!) {
     course(id: $courseId) {
       _id
+      name
       notificationPreferencesEnabled
       notificationPreferences {
         channels {

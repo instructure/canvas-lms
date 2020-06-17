@@ -354,6 +354,45 @@ module ActiveRecord
         User.connection.alter_constraint(:user_services, old_name, new_name: 'test')
         expect(User.connection.find_foreign_key(:user_services, :users)).to eq 'test'
       end
+
+      it "allows if_not_exists on add_index" do
+        expect { User.connection.add_index(:enrollments, :user_id, if_not_exists: true) }.not_to raise_exception
+      end
+
+      it "allows if_not_exists on add_column" do
+        expect { User.connection.add_column(:enrollments, :user_id, :bigint, if_not_exists: true) }.not_to raise_exception
+      end
+
+      it "allows if_not_exists on add_foreign_key" do
+        expect { User.connection.add_foreign_key(:enrollments, :users, if_not_exists: true) }.not_to raise_exception
+      end
+
+      it "add_foreign_key automatically validates an invalid constraint with delay_validation" do
+        expect do
+          User.connection.remove_foreign_key(:enrollments, column: :user_id)
+          User.connection.add_foreign_key(:enrollments, :users, validate: false)
+          # so that delay_validation doesn't get ignored
+          allow(User.connection).to receive(:open_transactions).and_return(0)
+          User.connection.add_foreign_key(:enrollments, :users, delay_validation: true)
+        end.not_to raise_exception
+      end
+
+      it "remove_foreign_key allows if_exists" do
+        expect { User.connection.remove_foreign_key(:discussion_topics, :conversations, if_exists: true) }.not_to raise_exception
+      end
+
+      it "foreign_key_for prefers a 'bare' FK first" do
+        expect(User.connection.foreign_key_for(:enrollments, :users).column).to eq 'user_id'
+      end
+
+      it "remove_index allows if_exists" do
+        expect { User.connection.remove_index(:users, column: :non_existent, if_exists: true) }.not_to raise_exception
+      end
+
+      it "remove_index by name allows if_exists" do
+        expect { User.connection.remove_index(:users, name: :lti_id, if_exists: true) }.not_to raise_exception
+      end
+
     end
   end
 end
