@@ -102,7 +102,7 @@ class Conversation < ActiveRecord::Base
         conversation.context_type = options[:context_type]
         conversation.context_id = options[:context_id]
         if conversation.context
-          conversation.root_account_ids |= [Shard.relative_id_for(conversation.context.root_account_id, Shard.current, Shard.birth)]
+          conversation.root_account_ids |= [Shard.relative_id_for(conversation.context.resolved_root_account_id, Shard.current, Shard.birth)]
         end
         conversation.tags = [conversation.context_string].compact
         conversation.tags += [conversation.context.context.asset_string] if conversation.context_type == "Group"
