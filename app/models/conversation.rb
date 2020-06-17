@@ -22,12 +22,15 @@ class Conversation < ActiveRecord::Base
   include SimpleTags
   include ModelCache
   include SendToStream
+  include ConversationHelper
 
   has_many :conversation_participants, :dependent => :destroy
   has_many :conversation_messages, -> { order("created_at DESC, id DESC") }, dependent: :delete_all
   has_many :conversation_message_participants, :through => :conversation_messages
   has_one :stream_item, :as => :asset
   belongs_to :context, polymorphic: [:account, :course, :group]
+
+  before_save :update_root_account_ids
 
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
@@ -72,7 +75,7 @@ class Conversation < ActiveRecord::Base
         :workflow_state => 'read',
         :has_attachments => has_attachments?,
         :has_media_objects => has_media_objects?,
-        :root_account_ids => self.root_account_ids
+        :root_account_ids => self.root_account_ids.join(',')
     }.merge(options)
     ConversationParticipant.bulk_insert(user_ids.map{ |user_id|
       options.merge({:user_id => user_id})
@@ -648,13 +651,14 @@ class Conversation < ActiveRecord::Base
     end
   end
 
-  def root_account_ids
-    (read_attribute(:root_account_ids) || '').split(',').map(&:to_i)
-  end
-
-  def root_account_ids=(ids)
-    # ids must be sorted for the scope to work
-    write_attribute(:root_account_ids, ids.sort.join(','))
+  def update_root_account_ids
+    if root_account_ids_changed?
+      latest_ids = root_account_ids.join(',')
+      %w[conversation_participants conversation_messages conversation_message_participants].each do |assoc|
+        scope = self.send(assoc).where("#{assoc}.root_account_ids IS DISTINCT FROM ?", latest_ids).limit(1_000)
+        until scope.update_all(root_account_ids: latest_ids) < 1_000; end
+      end
+    end
   end
 
   # rails' has_many-:through preloading doesn't preserve :select or :order

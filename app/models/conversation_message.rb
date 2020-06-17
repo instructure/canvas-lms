@@ -22,7 +22,7 @@ class ConversationMessage < ActiveRecord::Base
   self.ignored_columns = %i[root_account_id]
 
   include HtmlTextHelper
-
+  include ConversationHelper
   include Rails.application.routes.url_helpers
   include SendToStream
   include SimpleTags::ReaderInstanceMethods
@@ -38,6 +38,7 @@ class ConversationMessage < ActiveRecord::Base
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
 
+  before_create :set_root_account_ids
   after_create :generate_user_note!
   after_save :update_attachment_associations
 

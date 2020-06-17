@@ -388,7 +388,7 @@ describe ConversationsController do
         json.each do |conv|
           conversation = Conversation.find(conv['id'])
           conversation.conversation_participants.each do |cp|
-            expect(cp.root_account_ids).to eq @account_id.to_s
+            expect(cp.root_account_ids).to eq [@account_id]
           end
         end
       end
@@ -401,7 +401,7 @@ describe ConversationsController do
         json.each do |conv|
           conversation = Conversation.find(conv['id'])
           conversation.conversation_participants.each do |cp|
-            expect(cp.root_account_ids).to eq @account_id.to_s
+            expect(cp.root_account_ids).to eq [@account_id]
           end
         end
       end

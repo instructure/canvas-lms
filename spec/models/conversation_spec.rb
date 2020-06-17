@@ -1025,6 +1025,47 @@ describe Conversation do
       expect(conversation.root_account_ids).to eql [new_course.root_account_id]
     end
 
+    it 'should update conversation participants root account ids when changed' do
+      a1 = Account.create!
+      a2 = Account.create!
+      users = create_users(2, return_type: :record)
+      conversation = Conversation.initiate(users, false)
+
+      conversation.root_account_ids = [a1.id, a2.id]
+      conversation.save!
+      expect(
+        conversation.reload.conversation_participants.first.root_account_ids
+      ).to eq [a1.id, a2.id].sort
+    end
+
+    it 'should update conversation messages root account ids when changed' do
+      a1 = Account.create!
+      a2 = Account.create!
+      users = create_users(2, return_type: :record)
+      conversation = Conversation.initiate(users, false)
+      conversation.add_message(users[0], 'howdy partner')
+
+      conversation.root_account_ids = [a1.id, a2.id]
+      conversation.save!
+      expect(
+        conversation.reload.conversation_messages.first.root_account_ids
+      ).to eq [a1.id, a2.id].sort
+    end
+
+    it 'should update conversation message participants root account ids when changed' do
+      a1 = Account.create!
+      a2 = Account.create!
+      users = create_users(2, return_type: :record)
+      conversation = Conversation.initiate(users, false)
+      conversation.add_message(users[0], 'howdy partner')
+
+      conversation.root_account_ids = [a1.id, a2.id]
+      conversation.save!
+      expect(
+        conversation.reload.conversation_message_participants.first.root_account_ids
+      ).to eq [a1.id, a2.id].sort
+    end
+
     context "sharding" do
       specs_require_sharding
 
