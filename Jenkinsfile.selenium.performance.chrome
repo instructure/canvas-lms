@@ -40,7 +40,6 @@ pipeline {
     POSTGRES = getPostgres()
     RUBY_PASSENGER = getRubyPassenger()
     MAX_FAIL = 5
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:master"
     RERUNS_RETRY = 0 // no reruns
     POSTGRES_PASSWORD = 'sekret'
   }
