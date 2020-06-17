@@ -51,6 +51,10 @@
     direction: rtl;
   }
 
+  .tox:not(.tox-tinymce-inline) .tox-editor-header {
+    background-color: var(--canvasBackgroundColor);
+  }
+
   .tox-tinymce-aux {
     font-family: var(--canvasFontFamily);
   }

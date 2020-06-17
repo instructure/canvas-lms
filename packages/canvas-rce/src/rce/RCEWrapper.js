@@ -1030,6 +1030,7 @@ class RCEWrapper extends React.Component {
       contextmenu: '', // show the browser's native context menu
 
       toolbar_drawer: 'floating',
+      toolbar_sticky: true,
 
       // tiny's external link create/edit dialog config
       target_list: false, // don't show the target list when creating/editing links
