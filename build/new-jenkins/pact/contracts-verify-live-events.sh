@@ -2,7 +2,7 @@
 
 set -o errexit -o errtrace -o pipefail -o xtrace
 
-docker-compose run --rm --no-deps \
+docker-compose run --name live_events --no-deps \
   -e RAILS_ENV=test \
   -e PACT_BROKER_HOST=inst-pact-broker.inseng.net \
   -e PACT_BROKER_USERNAME="${PACT_BROKER_USERNAME}" \

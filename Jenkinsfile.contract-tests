@@ -62,6 +62,7 @@ pipeline {
           steps {
             timeout(time: 10) {
               sh 'build/new-jenkins/pact/contracts-verify-api.sh'
+              sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
             }
           }
         }
@@ -74,6 +75,7 @@ pipeline {
           steps {
             timeout(time: 10) {
               sh 'build/new-jenkins/pact/contracts-verify-api.sh'
+              sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
             }
           }
         }
@@ -86,6 +88,7 @@ pipeline {
           steps {
             timeout(time: 10) {
               sh 'build/new-jenkins/pact/contracts-verify-api.sh'
+              sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
             }
           }
         }
@@ -98,6 +101,7 @@ pipeline {
           steps {
             timeout(time: 10) {
               sh 'build/new-jenkins/pact/contracts-verify-api.sh'
+              sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
             }
           }
         }
@@ -110,6 +114,7 @@ pipeline {
           steps {
             timeout(time: 10) {
               sh 'build/new-jenkins/pact/contracts-verify-api.sh'
+              sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
             }
           }
         }
@@ -118,6 +123,7 @@ pipeline {
           steps {
             timeout(time: 5) {
               sh 'build/new-jenkins/pact/contracts-verify-live-events.sh'
+              sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/live_events live_events --allow-error --clean-dir'
             }
           }
         }
@@ -126,6 +132,11 @@ pipeline {
   }
 
   post {
+    always {
+      script{
+        junit allowEmptyResults: true, testResults: 'tmp/spec_results/**/*.xml'
+      }
+    }
     failure {
       sh 'mkdir -vp spec_results'
       sh 'docker cp $(docker-compose ps -q canvas):/usr/src/app/log/spec_failures/. ./spec_results/'
