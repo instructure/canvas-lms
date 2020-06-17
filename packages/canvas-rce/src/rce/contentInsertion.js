@@ -212,7 +212,10 @@ function getAnchorElement(editor, selectedElm) {
 }
 
 function isImageFigure(elm) {
-  return elm && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)
+  return (
+    elm &&
+    ((elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)) || elm.nodeName === 'IMG')
+  )
 }
 
 function createLink(editor, selectedElm, text, linkAttrs) {
@@ -223,7 +226,7 @@ function createLink(editor, selectedElm, text, linkAttrs) {
   }
 }
 function linkImageFigure(editor, fig, attrs) {
-  const img = editor.dom.select('img', fig)[0]
+  const img = fig.tagName === 'IMG' ? fig : editor.dom.select('img', fig)[0]
   if (img) {
     const a = editor.dom.create('a', attrs)
     img.parentNode.insertBefore(a, img)
