@@ -30,7 +30,7 @@ class UserNotesController < ApplicationController
     end
   end
 
-   def user_notes
+  def user_notes
     get_context
     return render_unauthorized_action unless @context.root_account.enable_user_notes
     if authorized_action(@context, @current_user, :manage_user_notes)
@@ -66,6 +66,7 @@ class UserNotesController < ApplicationController
     # entry form is replaced with the rich text editor.
     self.extend TextHelper
     user_note_params[:note] = format_message(user_note_params[:note]).first if user_note_params[:note]
+    user_note_params[:root_account_id] = @domain_root_account&.id
     @user_note = user.user_notes.new(user_note_params)
     @user_note.creator = @current_user
 

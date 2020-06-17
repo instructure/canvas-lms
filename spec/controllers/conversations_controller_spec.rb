@@ -503,6 +503,12 @@ describe ConversationsController do
         post 'create', params: { recipients: @students.map(&:id), body: "yo", subject: "greetings", user_note: '1' }
         @students.each{|x| expect(x.user_notes.size).to be(1)}
       end
+
+      it "should include the domain root account in the user note" do
+        post "create", params: { recipients: @students.map(&:id), body: "hi there", subject: "hi there", user_note: true }
+        note = UserNote.last
+        expect(note.root_account_id).to eql Account.default.id
+      end
     end
 
     describe "for recipients the sender has no relationship with" do

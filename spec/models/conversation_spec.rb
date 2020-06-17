@@ -1011,10 +1011,12 @@ describe Conversation do
     it "should be saved on the conversation when adding a message" do
       u1 = user_factory
       u2 = user_factory
+      a1 = account_model
+      a2 = account_model
       conversation = Conversation.initiate([u1, u2], true)
-      conversation.add_message(u1, 'ohai', :root_account_id => 1)
-      conversation.add_message(u2, 'ohai yourself', :root_account_id => 2)
-      expect(conversation.root_account_ids).to eql [1, 2]
+      conversation.add_message(u1, 'ohai', :root_account_id => a1.id)
+      conversation.add_message(u2, 'ohai yourself', :root_account_id => a2.id)
+      expect(conversation.root_account_ids).to eql [a1.id, a2.id]
     end
 
     it "includes the context's root account when initiating" do

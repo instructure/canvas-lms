@@ -251,7 +251,7 @@ class ConversationMessage < ActiveRecord::Base
         t(:subject, "Private message")
       end
       note = format_message(body).first
-      recipient.user_notes.create(:creator => author, :title => title, :note => note)
+      recipient.user_notes.create(creator: author, title: title, note: note, root_account_id: root_account_id)
     end
   end
 
@@ -283,7 +283,8 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def root_account_id
-    context_id if context_type == 'Account'
+    return nil unless context && context_type == 'Account'
+    context.resolved_root_account_id
   end
 
   def reply_from(opts)
