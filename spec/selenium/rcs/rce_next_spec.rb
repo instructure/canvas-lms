@@ -747,7 +747,8 @@ describe "RCE next tests" do
           :name => "Commons",
           :domain => "canvaslms.com",
           :consumer_key => '12345',
-          :shared_secret => 'secret'
+          :shared_secret => 'secret',
+          :is_rce_favorite => "true"
         })
         @tool.set_extension_setting(:editor_button, {
           :message_type => "ContentItemSelectionRequest",
@@ -755,7 +756,8 @@ describe "RCE next tests" do
           :icon_url => "https://lor.instructure.com/img/icon_commons.png",
           :text => "Commons Favorites",
           :enabled => "true",
-          :use_tray => "true"
+          :use_tray => "true",
+          :favorite => "true"
         })
         @tool.save!
       end
@@ -777,6 +779,25 @@ describe "RCE next tests" do
         lti_tools_button.click
 
         expect(lti_tools_modal).to be_displayed
+      end
+
+      it "should show favorited LTI tool icon when a tool is favorited", ignore_js_errors: true do
+        page_title = "Page1"
+        create_wiki_page_with_embedded_image(page_title)
+
+        visit_existing_wiki_edit(@course, page_title)
+
+        expect(lti_favorite_button).to be_displayed
+      end
+
+      it "should display the favorited lti tool modal", ignore_js_errors: true do
+        page_title = "Page1"
+        create_wiki_page_with_embedded_image(page_title)
+
+        visit_existing_wiki_edit(@course, page_title)
+        lti_favorite_button.click
+
+        expect(lti_favorite_modal).to be_displayed
       end
     end
   end

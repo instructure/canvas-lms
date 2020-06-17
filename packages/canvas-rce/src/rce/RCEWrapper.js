@@ -958,6 +958,13 @@ class RCEWrapper extends React.Component {
     this._elementRef.removeEventListener('keyup', this.handleShortcutKeyShortcut, true)
   }
 
+  // Get top 2 favorited LTI Tools
+  ltiToolFavorites =
+    window.INST?.editorButtons
+      .filter(e => e.favorite)
+      .map(e => `instructure_external_button_${e.id}`)
+      .slice(0, 2) || []
+
   wrapOptions(options = {}) {
     const setupCallback = options.setup
 
@@ -1019,7 +1026,8 @@ class RCEWrapper extends React.Component {
             'instructure_links',
             'instructure_image',
             'instructure_record',
-            'instructure_documents'
+            'instructure_documents',
+            ...this.ltiToolFavorites
           ]
         },
         {
@@ -1077,6 +1085,11 @@ class RCEWrapper extends React.Component {
     this._elementRef.addEventListener('keyup', this.handleShortcutKeyShortcut, true)
     // give the textarea its initial size
     this.onResize(null, {deltaY: 0})
+    // Preload the LTI Tools modal
+    // This helps with loading the favorited external tools
+    if (this.ltiToolFavorites.length > 0) {
+      import('./plugins/instructure_external_tools/components/LtiToolsModal')
+    }
   }
 
   componentDidUpdate(_prevProps, prevState) {

@@ -57,6 +57,7 @@ export default {
       config.id = button.id
       config.onAction = () => editor.execCommand(`instructureExternalButton${button.id}`)
       config.description = button.description
+      config.favorite = button.favorite
     } else {
       config.cmd = `instructureExternalButton${button.id}`
     }
