@@ -15,17 +15,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AddRootAccountIdToConversationParticipants < ActiveRecord::Migration[5.2]
-  include MigrationHelpers::AddColumnAndFk
-
+class CreateScheduledSmartAlerts < ActiveRecord::Migration[5.2]
   tag :predeploy
-  disable_ddl_transaction!
 
-  def up
-    add_column_and_fk :conversation_participants, :root_account_id, :accounts, if_not_exists: true
-  end
-
-  def down
-    remove_column :conversation_participants, :root_account_id
+  def change
+    create_table :scheduled_smart_alerts do |t|
+      t.string :context_type, null: false
+      t.string :alert_type, null: false
+      t.integer :context_id
+      t.datetime :due_at
+      t.references :root_account, index: true, foreign_key: { to_table: :accounts }
+      t.timestamps
+    end
+    add_index :scheduled_smart_alerts, :due_at
+    add_index :scheduled_smart_alerts, [:context_type, :context_id, :alert_type, :root_account_id], :name => 'index_unique_scheduled_smart_alert'
   end
 end

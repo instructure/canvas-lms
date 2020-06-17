@@ -15,17 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AddRootAccountIdToConversations < ActiveRecord::Migration[5.2]
-  include MigrationHelpers::AddColumnAndFk
-
+class AddRootAccountIdsToLearningOutcomes < ActiveRecord::Migration[5.2]
   tag :predeploy
+
   disable_ddl_transaction!
 
-  def up
-    add_column_and_fk :conversations, :root_account_id, :accounts, if_not_exists: true
-  end
-
-  def down
-    remove_column :conversations, :root_account_id
+  def change
+    add_column :learning_outcomes, :root_account_ids, :bigint, array: true, if_not_exists: true
   end
 end
