@@ -55,8 +55,10 @@ module DataFixup::PopulateRootAccountIdOnModels
   # or any models that do not have a root_account_id column.
   def self.migration_tables
     {
-      ContextModule => :context, DeveloperKey => {account: [:root_account_id, :id]},
-      DeveloperKeyAccountBinding => {account: [:root_account_id, :id]},
+      AccountUser => :account,
+      ContextModule => :context,
+      DeveloperKey => :account,
+      DeveloperKeyAccountBinding => :account,
       DiscussionTopic => :context,
       DiscussionTopicParticipant => :discussion_topic,
       MasterCourses::MasterTemplate => :course,
