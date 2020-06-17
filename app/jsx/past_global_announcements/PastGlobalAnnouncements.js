@@ -18,6 +18,8 @@
 
 import React, {useState} from 'react'
 import {Tabs} from '@instructure/ui-tabs'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import AnnouncementFactory from './AnnouncementFactory'
 import I18n from 'i18n!past_global_announcements'
 
@@ -39,6 +41,11 @@ const PastGlobalAnnouncements = () => {
           isSelected={selectedIndex === 0}
           data-testid="GlobalAnnouncementCurrentTab"
         >
+          <View margin="0 0 small 0" display="block">
+            <Text size="medium" lineHeight="double">
+              {I18n.t('Active Announcements')}
+            </Text>
+          </View>
           {activeAnnouncements}
         </Tabs.Panel>
         <Tabs.Panel
@@ -47,6 +54,11 @@ const PastGlobalAnnouncements = () => {
           isSelected={selectedIndex === 1}
           data-testid="GlobalAnnouncementPastTab"
         >
+          <View margin="0 0 small 0" display="block">
+            <Text size="medium" lineHeight="double">
+              {I18n.t('Announcements from the past four months')}
+            </Text>
+          </View>
           {pastAnnouncements}
         </Tabs.Panel>
       </Tabs>
