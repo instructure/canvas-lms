@@ -375,7 +375,11 @@ export default class EditView extends ValidatedFormView
     @$externalToolsContentType.val('context_external_tool')
 
     @selectedTool = _.find(@model.submissionTypeSelectionTools(), (tool) -> toolId == tool.id)
-    @$externalToolsUrl.val(@selectedTool.external_url)
+
+    # this will prevent overriding URL when data is already saved
+    if (!@$externalToolExternalData.val())
+      @$externalToolsUrl.val(@selectedTool.external_url)
+
     @$externalToolPlacementLaunchButtonText.text(@selectedTool.title)
     @$externalToolPlacementLaunchButton.click(() => @handleSubmissionTypeSelectionLaunch())
 
@@ -409,7 +413,7 @@ export default class EditView extends ValidatedFormView
     if !data.contentItems || data.contentItems.length == 0
       return
     item = data.contentItems[0]
-    @$externalToolsUrl.val(item.url)  # is this hidden?  Or do we need
+    @$externalToolsUrl.val(item.url)
     if (item.title)
       @$name.val(item.title)
 
