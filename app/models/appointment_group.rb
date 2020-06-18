@@ -31,7 +31,7 @@ class AppointmentGroup < ActiveRecord::Base
   has_many :appointment_group_sub_contexts, -> { preload(:sub_context) }
 
   def context
-    appointment_group_contexts.first.context
+    appointment_group_contexts.first&.context
   end
 
   def contexts

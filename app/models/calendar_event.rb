@@ -52,6 +52,7 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
   has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
   belongs_to :web_conference, autosave: true
+  belongs_to :root_account, class_name: 'Account'
 
   validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
@@ -59,6 +60,7 @@ class CalendarEvent < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comments, maximum: 255, allow_nil: true, allow_blank: true
   validate :validate_conference_visibility
+  before_create :set_root_account
   before_save :default_values
   after_save :touch_context
   after_save :replace_child_events
@@ -216,15 +218,15 @@ class CalendarEvent < ActiveRecord::Base
   end
   protected :default_values
 
-  def root_account
+  def set_root_account
     if context.respond_to?(:root_account)
-      context.root_account # course, section, group
+      self.root_account = context.root_account # course, section, group
     else
       case context
       when User
-        context.account
+        self.root_account = context.account
       when AppointmentGroup
-        context.context&.root_account
+        self.root_account = context.context&.root_account
       end
     end
   end
