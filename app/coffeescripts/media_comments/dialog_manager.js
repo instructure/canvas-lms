@@ -71,7 +71,8 @@ export default class DialogManager {
 
   setCloseOption = opts => {
     return this.dialog.dialog('option', 'close', () => {
-      ReactDOM.unmountComponentAtNode(document.getElementById('record_media_tab'))
+      const mountPoint = document.getElementById('record_media_tab')
+      if (mountPoint) ReactDOM.unmountComponentAtNode(mountPoint)
       $('#audio_record')
         .before("<div id='audio_record'/>")
         .remove()

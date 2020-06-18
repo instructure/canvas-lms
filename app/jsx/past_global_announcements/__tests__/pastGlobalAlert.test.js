@@ -17,6 +17,7 @@
  */
 
 import PastGlobalAlert from '../PastGlobalAlert'
+import {fireEvent} from '@testing-library/dom'
 import {render} from '@testing-library/react'
 import React from 'react'
 
@@ -37,5 +38,14 @@ describe('render past global announcement alert', () => {
     const event = new Event('globalAlertShouldRender')
     document.dispatchEvent(event)
     expect(await findByTestId('globalAnnouncementsButton')).toBeVisible()
+  })
+
+  it('renders close button on alert', async () => {
+    const {findByText, findByTestId, queryByText} = render(<PastGlobalAlert />)
+    const event = new Event('globalAlertShouldRender')
+    document.dispatchEvent(event)
+    expect(await findByTestId('globalAnnouncementsAlert')).toBeVisible()
+    fireEvent.click(await findByText('Close'))
+    expect(await queryByText('globalAnnouncementsAlert')).toEqual(null)
   })
 })

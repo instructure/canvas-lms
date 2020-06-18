@@ -19,6 +19,7 @@
 class SubmissionVersion < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :context, polymorphic: [:course]
+  belongs_to :root_account, class_name: "Account"
   belongs_to :version
 
   validates_presence_of :context_id, :version_id, :user_id, :assignment_id
@@ -54,7 +55,8 @@ class SubmissionVersion < ActiveRecord::Base
         :context_type => assignment.context_type,
         :user_id => model.user_id,
         :assignment_id => model.assignment_id,
-        :version_id => version.id
+        :version_id => version.id,
+        :root_account_id => assignment.root_account_id
       }
     end
   end

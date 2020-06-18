@@ -4578,7 +4578,8 @@ describe AssignmentsApiController, type: :request do
           expect(@json['external_tool_tag_attributes']).to eq({
             'url' => 'http://www.example.com',
             'new_tab' => false,
-            'resource_link_id' => ContextExternalTool.opaque_identifier_for(@tool_tag, @tool_tag.context.shard)
+            'resource_link_id' => ContextExternalTool.opaque_identifier_for(@tool_tag, @tool_tag.context.shard),
+            'external_data' => nil
           })
         end
 

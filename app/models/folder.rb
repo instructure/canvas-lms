@@ -32,7 +32,7 @@ class Folder < ActiveRecord::Base
   MY_FILES_FOLDER_NAME = "my files"
   CONVERSATION_ATTACHMENTS_FOLDER_NAME = "conversation attachments"
 
-  belongs_to :context, polymorphic: [:user, :group, :account, :course]
+  belongs_to :context, polymorphic: [:user, :group, :account, :course], optional: false
   belongs_to :cloned_item
   belongs_to :parent_folder, :class_name => "Folder"
   has_many :file_attachments, :class_name => "Attachment"
@@ -43,6 +43,7 @@ class Folder < ActiveRecord::Base
 
   acts_as_list :scope => :parent_folder
 
+  before_create :populate_root_account_id
   before_save :infer_full_name
   after_save :update_sub_folders
   after_destroy :clean_up_children
@@ -60,6 +61,10 @@ class Folder < ActiveRecord::Base
     else
       self.visible_file_attachments.not_locked
     end
+  end
+
+  def populate_root_account_id
+    self.root_account_id = self.context.root_account_id if self.context_type != "User"
   end
 
   def protect_root_folder_name

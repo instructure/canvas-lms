@@ -986,6 +986,16 @@ describe DueDateCacher do
       end
     end
 
+    describe "root_account_id" do
+      it "is set to the associated course's root account ID" do
+        new_student = user_model
+        @course.enroll_user(new_student)
+
+        submission = @assignment.submission_for_student(new_student)
+        expect(submission.root_account_id).to eq @assignment.course.root_account_id
+      end
+    end
+
     it "should add course_id" do
       cacher.recompute
       expect(submission.course_id).to eq @course.id

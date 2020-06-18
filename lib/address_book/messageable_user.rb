@@ -64,7 +64,11 @@ module AddressBook
     def count_in_contexts(contexts)
       counts = {}
       contexts.each do |context|
-        counts[context] = @sender.count_messageable_users_in_context(context)
+        counts[context] =
+          @sender.count_messageable_users_in_context(
+            context,
+            admin_context: admin_context?(context)
+          )
       end
       counts
     end

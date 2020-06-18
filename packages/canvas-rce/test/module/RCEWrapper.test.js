@@ -223,6 +223,14 @@ describe('RCEWrapper', () => {
       instance.refs = {}
       instance.refs.rce = {forceUpdate: () => 'no op'}
       instance.indicator = () => {}
+
+      sinon.stub(instance, 'iframe').value({
+        contentDocument: {
+          body: {
+            clientWidth: 500
+          }
+        }
+      })
     })
 
     afterEach(() => {
@@ -341,8 +349,8 @@ describe('RCEWrapper', () => {
         restoreImage()
       })
 
-      it('resizes the placeholder image for a large, landscape image', () => {
-        mockImage({width: 640, height: 200})
+      it('constrains the image placeholder to the width of the rce', () => {
+        mockImage({width: 1000, height: 1000})
         const greenSquare =
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
         const props = {
@@ -358,31 +366,7 @@ describe('RCEWrapper', () => {
       alt="Loading..."
       src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="green_square"
-      style="width: 320px; height: 100px; border: solid 1px #8B969E;"
-    />`
-        instance.insertImagePlaceholder(props)
-        sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
-        restoreImage()
-      })
-
-      it('resizes the placeholder image for a large, portrait image', () => {
-        mockImage({width: 200, height: 640})
-        const greenSquare =
-          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
-        const props = {
-          name: 'green_square',
-          domObject: {
-            preview: greenSquare
-          },
-          contentType: 'image/png'
-        }
-
-        const imageMarkup = `
-    <img
-      alt="Loading..."
-      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
-      data-placeholder-for="green_square"
-      style="width: 100px; height: 320px; border: solid 1px #8B969E;"
+      style="width: 500px; height: 500px; border: solid 1px #8B969E;"
     />`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)

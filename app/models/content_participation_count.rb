@@ -22,6 +22,8 @@ class ContentParticipationCount < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   belongs_to :user
 
+  before_create :set_root_account_id
+
   def self.create_or_update(opts={})
     opts = opts.with_indifferent_access
     context = opts.delete(:context)
@@ -109,6 +111,10 @@ class ContentParticipationCount < ActiveRecord::Base
   def refresh_unread_count
     self.unread_count = ContentParticipationCount.unread_count_for(content_type, context, user)
     Shackles.activate(:master) {self.save} if self.changed?
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.context&.root_account_id
   end
 
   # Things we know of that will only get updated by a refresh:

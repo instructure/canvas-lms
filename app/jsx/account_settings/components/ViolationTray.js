@@ -68,7 +68,7 @@ export default function ViolationTray({handleClose, accountId, addDomain, whitel
           {state.isLoading && <Spinner renderTitle={() => I18n.t('Loading')} />}
           {state.isError && (
             <Alert variant="error" margin="small">
-              {I18n.t('Something went wrong loading the violations, try reloading the page.')}
+              {I18n.t('Something went wrong loading the violations. Try reloading the page.')}
             </Alert>
           )}
           {!state.isLoading && !state.isError && state.violations.length === 0 && (

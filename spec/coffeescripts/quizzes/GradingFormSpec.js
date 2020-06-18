@@ -58,3 +58,29 @@ test('no suprious submits', function() {
   $('.question_input').trigger(keyupEvent)
   equal(submitCounter, 1)
 })
+
+test('handler paased in is called for key enter', function() {
+  const scoringSnapshot = {}
+  const onInputChange = sinon.stub()
+  const gradingForm = new GradingForm(scoringSnapshot)
+  gradingForm.preventInsanity(onInputChange)
+
+  const keydownEvent = $.Event('keydown')
+  keydownEvent.keyCode = 13
+  $('.question_input').trigger(keydownEvent)
+
+  ok(onInputChange.calledOnce)
+})
+
+test('handler paased in is not called for other keys', function() {
+  const scoringSnapshot = {}
+  const onInputChange = sinon.stub()
+  const gradingForm = new GradingForm(scoringSnapshot)
+  gradingForm.preventInsanity(onInputChange)
+
+  const keydownEvent = $.Event('keydown')
+  keydownEvent.keyCode = 5
+  $('.question_input').trigger(keydownEvent)
+
+  notOk(onInputChange.called)
+})

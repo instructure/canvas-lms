@@ -72,7 +72,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       end
 
       if entry.respond_to? :root_account_id
-        return entry.root_account
+        return entry.root_account if entry.root_account.present?
       end
 
       case entry

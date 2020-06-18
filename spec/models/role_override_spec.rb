@@ -114,6 +114,41 @@ describe RoleOverride do
     expect(old_updated_at).not_to eq(new_updated_at)
   end
 
+  describe "root_account_id" do
+    before :once do
+      @account = account_model(parent_account: Account.default)
+      @role = @account.roles.new(name: "SomeRole")
+      @role.base_role_type = "AccountMembership"
+      @role.save!
+    end
+
+    it "assigns root_account_id if it is not set" do
+      override = RoleOverride.create!(
+        context: @account,
+        permission: 'moderate_forum',
+        role: @role,
+        enabled: false
+        )
+
+      expect(override.root_account_id).to eq(@account.root_account_id)
+    end
+
+    it "does not try to reassign it on save if it is already set" do
+      override = RoleOverride.create!(
+        context: @account,
+        permission: 'moderate_forum',
+        role: @role,
+        enabled: false
+        )
+      altered_id = @account.root_account_id + 1
+      override.root_account_id = altered_id
+
+      override.enabled = true
+      override.save!
+      expect(override.root_account_id).to eq(altered_id) # it is not overridden
+    end
+  end
+
   describe "student view permissions" do
     it "should mirror student permissions" do
       permission = 'moderate_forum'

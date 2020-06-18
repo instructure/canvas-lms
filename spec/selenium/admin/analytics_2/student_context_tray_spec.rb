@@ -61,6 +61,7 @@ describe "analytics in Canvas" do
         end
 
         it "displays Analytics 2 button on Student Tray" do
+          skip "Flakey spec. Fix via LA-849"
           expect(student_tray_quick_links.text).to include('Analytics 2')
         end
       end
@@ -76,6 +77,7 @@ describe "analytics in Canvas" do
         end
 
         it "displays Analytics 1 button on Student Tray" do
+          skip "Flakey spec. Fix via LA-849"
           expect(student_tray_quick_links.text).to include('Analytics')
           expect(student_tray_quick_links.text).not_to include('Analytics 2')
         end

@@ -70,10 +70,7 @@
         <td colspan="2" class='button-container'>
           <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
           <button type="submit" class="btn btn-primary" id="submit_file_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-        </td>
-      </tr><tr style="display: none;">
-        <td colspan="2" style="text-align: center;">
-          <%= t 'messages.submitting', "Submitting..." %> <img src=""/>
+          <span id="progress_indicator"></span>
         </td>
       </tr>
     </table>

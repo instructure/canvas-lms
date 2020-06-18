@@ -81,6 +81,13 @@ describe ScoreStatisticsGenerator do
     }
   end
 
+  it "sets the root account ID for generated assignment score statistics" do
+    ScoreStatisticsGenerator.update_score_statistics(@course.id)
+
+    relevant_statistics = ScoreStatistic.joins(:assignment).where(assignments: {course: @course})
+    expect(relevant_statistics.pluck(:root_account_id).uniq).to eq [@course.root_account_id]
+  end
+
   context "course statistic math" do
     before(:once) do
       student2 = User.create!

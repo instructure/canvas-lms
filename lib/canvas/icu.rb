@@ -135,6 +135,9 @@ module Canvas::ICU
     end
 
   rescue LoadError
+    # in test, this will reveal system configuration problems
+    throw if Rails.env.test?
+
     def self.collator
       NaiveCollator
     end

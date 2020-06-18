@@ -30,10 +30,27 @@ describe('RceFileBrowser', () => {
 
   it('invokes onFileSelect callback with appropriate data when a file is selected', () => {
     const onFileSelect = jest.fn()
-    render(<RceFileBrowser onFileSelect={onFileSelect} />)
+    render(
+      <RceFileBrowser
+        onFileSelect={onFileSelect}
+        fetchInitialMedia={() => {}}
+        fetchNextMedia={() => {}}
+        media={{
+          user: {
+            hasMore: false,
+            isLoading: false,
+            files: []
+          }
+        }}
+      />
+    )
     // This is the selectFile prop passed to the Canvas FileBrowser that we mocked above
     const selectFile = FileBrowser.mock.calls[0][0].selectFile
-    selectFile({name: 'a file', api: {url: '/file/download', 'content-type': 'application/pdf'}})
+    selectFile({
+      name: 'a file',
+      src: '/file/download',
+      api: {url: '/file/download', 'content-type': 'application/pdf'}
+    })
     expect(onFileSelect).toHaveBeenCalledWith({
       name: 'a file',
       title: 'a file',
@@ -42,5 +59,25 @@ describe('RceFileBrowser', () => {
       target: '_blank',
       class: 'instructure_file_link instructure_scribd_file'
     })
+  })
+
+  it('fetches media', () => {
+    const fetchInitialMedia = jest.fn()
+    render(
+      <RceFileBrowser
+        onFileSelect={() => {}}
+        fetchInitialMedia={fetchInitialMedia}
+        fetchNextMedia={() => {}}
+        media={{
+          user: {
+            hasMore: true,
+            isLoading: false,
+            files: []
+          }
+        }}
+      />
+    )
+
+    expect(fetchInitialMedia).toHaveBeenCalledWith({order: 'asc', sort: 'alphabetical'})
   })
 })

@@ -595,7 +595,14 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     all_question_types = quiz_data.flat_map do |datum|
       if datum["entry_type"] == "quiz_group"
-        datum["questions"].map{|q| q["question_type"]}
+        if datum["assessment_question_bank_id"]
+          # get ALL question types possible from the bank
+          AssessmentQuestion.
+            where(assessment_question_bank_id: datum["assessment_question_bank_id"]).
+            pluck(:question_data).map{|data| data["question_type"]}
+        else
+          datum["questions"].map{|q| q["question_type"]}
+        end
       else
         datum["question_type"]
       end

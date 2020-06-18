@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "He hapa i puta i te wā e ngana ana ki te whakakore i te mea angitu."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "He hapa i puta i te wā o te hanga ana i te kōnae arokite"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "I puta he hapa i te wā e hanga ana i te tono whatunga"
     },
@@ -160,9 +157,6 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Whakawātea kōnae kua tīpakohia: { filename }"
-    },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Pāwhiri tētahi whārangi ki te kōkuhu i tētahi hono ki taua whārangi."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Pāwhiritia ki te whakaū i { imageName }"
@@ -581,12 +575,6 @@
     "link_options_a16b758b": {
         "message": "Hono Kōwhiringa"
     },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Hono atu ki tētahi atu ihirangi roto i te akoranga."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Hono atu ki tētahi atu ihirangi roto i te rōpū."
-    },
     "links_14b70841": {
         "message": "Hononga"
     },
@@ -703,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Whārangi haere ake nei"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "Kaore Alt Kuputuhi (Āhua Whakapaipai)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Kaore ngā rā tika kia whakaritea"

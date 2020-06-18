@@ -21,6 +21,9 @@ import tinymce from 'tinymce/tinymce'
 
 // load theme
 import 'tinymce/themes/silver/theme'
+// since tinymce 5.3, default icons are loaded dynamically, but
+// w/o importing, webpack doesn't have them
+import 'tinymce/icons/default'
 
 // add tinymc plugins
 import 'tinymce/plugins/autolink/plugin'

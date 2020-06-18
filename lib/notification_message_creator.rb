@@ -40,7 +40,7 @@ class NotificationMessageCreator
       @account = Account.new(id: root_account_id)
       @course = Course.new(id: course_id)
       @mute_notifications_by_course_enabled = @account.feature_enabled?(:mute_notifications_by_course)
-      @override_preferences_enabled = @account.feature_enabled?(:notification_granular_course_preferences)
+      @override_preferences_enabled = Account.site_admin.feature_enabled?(:notification_granular_course_preferences)
     end
   end
 

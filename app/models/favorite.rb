@@ -18,12 +18,18 @@
 class Favorite < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, :group]
   belongs_to :user
+  belongs_to :root_account, class_name: "Account", inverse_of: :favorites
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group'].freeze
   scope :by, lambda { |type| where(:context_type => type) }
 
+  before_create :populate_root_account_id
   after_save :touch_user
 
   def touch_user
     self.class.connection.after_transaction_commit { user.touch }
+  end
+
+  def populate_root_account_id
+    self.root_account = self.context.root_account
   end
 end

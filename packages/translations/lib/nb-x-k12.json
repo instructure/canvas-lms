@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Det skjedde en feil ved forsøket på å avvise muligheten."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "En feil oppstod under generering av forhåndsvisning av fil"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Det oppstod en feil ved utførelse av en nettverksforespørsel"
     },
@@ -160,9 +157,6 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Fjern valgt fil: { filename }"
-    },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Klikk på en side for å sette inn en lenke til den siden."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Klikk for å bygge inn { imageName }"
@@ -581,12 +575,6 @@
     "link_options_a16b758b": {
         "message": "Lenkevalg"
     },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Lenke til annet innhold i faget."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Lenke til annet innhold i gruppen."
-    },
     "links_14b70841": {
         "message": "Lenker"
     },
@@ -703,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Neste side"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "Ingen endret tekst (pyntebilder)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Ingen forfallsdatoer tildelt"

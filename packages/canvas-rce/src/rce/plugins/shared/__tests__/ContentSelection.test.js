@@ -179,26 +179,18 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       })
 
       describe('.isDecorativeImage', () => {
-        describe('when "data-is-decorative" is "true" on the image element', () => {
+        describe('when "role" is "presentation" on the image element', () => {
           beforeEach(() => {
-            $element.setAttribute('data-is-decorative', true)
+            $element.setAttribute('role', 'presentation')
           })
 
           it('is true when the image has no alt text', () => {
             $element.alt = ''
             expect(getContentFromElement($element, editor).isDecorativeImage).toEqual(true)
           })
-
-          it('is false when the image still has alt text', () => {
-            expect(getContentFromElement($element, editor).isDecorativeImage).toEqual(false)
-          })
         })
 
-        describe('when "data-is-decorative" is "false" on the image element', () => {
-          beforeEach(() => {
-            $element.setAttribute('data-is-decorative', false)
-          })
-
+        describe('when "role" is not "presentation" on the image element', () => {
           it('is false when the image has no alt text', () => {
             $element.alt = ''
             expect(getContentFromElement($element, editor).isDecorativeImage).toEqual(false)

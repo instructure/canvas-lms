@@ -31,7 +31,6 @@ export const CUSTOM = 'custom'
 
 export const imageSizes = [SMALL, MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
 export const videoSizes = [MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
-export const defaultImageSize = 320
 
 const sizeByMaximumDimension = {
   200: SMALL,
@@ -65,7 +64,9 @@ export function fromImageEmbed($element) {
     altText,
     appliedHeight: parsedOrNull($element, 'height'),
     appliedWidth: parsedOrNull($element, 'width'),
-    isDecorativeImage: altText === '' && $element.getAttribute('data-is-decorative') === 'true',
+    isDecorativeImage:
+      $element.getAttribute('data-is-decorative') === 'true' ||
+      $element.getAttribute('role') === 'presentation',
     naturalHeight: $element.naturalHeight,
     naturalWidth: $element.naturalWidth,
     url: $element.src

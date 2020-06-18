@@ -1525,3 +1525,29 @@ QUnit.module('Assignment#quizzesRespondusEnabled', hooks => {
     equal(assignment.quizzesRespondusEnabled(), true)
   })
 })
+
+QUnit.module('Assignment#externalToolData', hooks => {
+  let assignment
+  const ext_data = {key1: 'val1'}
+
+  hooks.beforeEach(() => {
+    assignment = new Assignment({
+      name: 'foo',
+      external_tool_tag_attributes: {
+        url: 'https://www.test.com/blti?foo',
+        external_data: ext_data
+      }
+    })
+    fakeENV.setup({current_user_roles: []})
+  })
+
+  hooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('returns external data from the assignments content tag', () => {
+    const data = assignment.externalToolData()
+    equal(data.key1, 'val1')
+    ok(data.stringify)
+  })
+})

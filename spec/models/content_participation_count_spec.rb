@@ -62,6 +62,11 @@ describe ContentParticipationCount do
       ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
       expect(cpc.reload.updated_at.to_i).to eq time.to_i
     end
+
+    it "should correctly set root_account_id from course" do
+      cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
+      expect(cpc.root_account_id).to eq(@course.root_account_id)
+    end
   end
 
   describe "unread_count_for" do

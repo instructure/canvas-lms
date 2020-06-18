@@ -147,6 +147,34 @@ describe('Editor/Sidebar bridge', () => {
       })
     })
 
+    describe('insertFileLink', () => {
+      it('inserts a link', () => {
+        const insertLinkSpy = jest.spyOn(Bridge, 'insertLink')
+        Bridge.insertFileLink({content_type: 'plain/text'})
+        expect(insertLinkSpy).toHaveBeenCalled()
+      })
+
+      it('embeds an image', () => {
+        const insertLinkSpy = jest.spyOn(Bridge, 'insertLink')
+        const insertImageSpy = jest.spyOn(Bridge, 'insertImage')
+        Bridge.insertFileLink({content_type: 'image/png'})
+        expect(insertLinkSpy).not.toHaveBeenCalled()
+        expect(insertImageSpy).toHaveBeenCalled()
+      })
+
+      it('embeds media', () => {
+        const insertLinkSpy = jest.spyOn(Bridge, 'insertLink')
+        const embedMediaSpy = jest.spyOn(Bridge, 'embedMedia')
+        Bridge.insertFileLink({content_type: 'video/mp4', href: 'here/i/am'})
+        expect(insertLinkSpy).not.toHaveBeenCalled()
+        expect(embedMediaSpy).toHaveBeenCalledWith({
+          content_type: 'video/mp4',
+          href: 'here/i/am',
+          embedded_iframe_url: 'here/i/am'
+        })
+      })
+    })
+
     describe('embedMedia', () => {
       let hideTray
       beforeEach(() => {

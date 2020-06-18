@@ -85,7 +85,7 @@ export default function ImageOptionsTray(props) {
 
   function handleSave(event) {
     event.preventDefault()
-    const savedAltText = isDecorativeImage ? '' : altText
+    const savedAltText = isDecorativeImage ? altText || ' ' : altText
 
     let appliedHeight = imageHeight
     let appliedWidth = imageWidth
@@ -173,7 +173,6 @@ export default function ImageOptionsTray(props) {
                 <Flex.Item padding="small">
                   <TextArea
                     aria-describedby="alt-text-label-tooltip"
-                    disabled={isDecorativeImage}
                     height="4rem"
                     label={textAreaLabel}
                     onChange={handleAltTextChange}
@@ -187,7 +186,7 @@ export default function ImageOptionsTray(props) {
                   <Checkbox
                     checked={isDecorativeImage}
                     disabled={displayAs === 'link'}
-                    label={formatMessage('No Alt Text (Decorative Image)')}
+                    label={formatMessage('Decorative Image')}
                     onChange={handleIsDecorativeChange}
                   />
                 </Flex.Item>

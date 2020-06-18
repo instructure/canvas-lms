@@ -120,13 +120,6 @@ describe CalendarEventsController do
       expect(@course.reload.calendar_events.count).to eq initial_count
     end
 
-    it "allows creating recurring calendar events on a user's calendar if the user's account allows them to" do
-      user_session(@teacher)
-      @teacher.account.enable_feature!(:recurring_calendar_events)
-      get 'new', params: {user_id: @teacher.id}
-      expect(@controller.js_env[:RECURRING_CALENDAR_EVENTS_ENABLED]).to be(true)
-    end
-
     it "allows usingrce enhancements on a user's calendar if the account allows them to" do
       Account.default.enable_feature!(:rce_enhancements)
       user_session(@teacher)

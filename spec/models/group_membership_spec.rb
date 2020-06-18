@@ -390,4 +390,47 @@ describe GroupMembership do
     membership.update_attribute(:workflow_state, 'accepted')
     expect(sub.reload).to be_submitted # back to the way it was
   end
+
+  describe "root_account_id" do
+    let(:category) { course.group_categories.create!(name: 'category 1') }
+    let(:course) { course_factory && @course }
+    let(:group) { category.groups.create!(context: course) }
+    let(:user) { user_model }
+
+    it 'assigns it on save if it is not set' do
+      membership = group.group_memberships.create!(user: user)
+      membership.root_account_id = nil
+
+      expect {
+        membership.save!
+      }.to change {
+        membership.root_account_id
+      }.from(nil).to(group.root_account_id)
+    end
+
+    it 'preserves it on save if it was already set' do
+      membership = group.group_memberships.create!(user: user)
+
+      expect(membership.group).not_to receive(:root_account_id)
+
+      expect {
+        membership.save!
+      }.not_to change {
+        GroupMembership.find(membership.id).root_account_id
+      }
+    end
+
+    it 'does nothing on save if it is not set and could not be resolved' do
+      membership = group.group_memberships.create!(user: user)
+      membership.update_column(:root_account_id, nil)
+
+      expect(membership.group).to receive(:root_account_id).and_return(nil)
+
+      expect {
+        membership.save!
+      }.not_to change {
+        GroupMembership.find(membership.id).root_account_id
+      }
+    end
+  end
 end

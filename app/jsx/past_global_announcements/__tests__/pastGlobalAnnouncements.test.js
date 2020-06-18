@@ -17,8 +17,7 @@
  */
 
 import PastGlobalAnnouncements from '../PastGlobalAnnouncements'
-import {render} from '@testing-library/react'
-import {fireEvent} from '@testing-library/dom'
+import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 
 describe('render announcements', () => {
@@ -34,9 +33,10 @@ describe('render announcements', () => {
     expect(getByText('This is an active announcement')).toBeVisible()
   })
 
-  it('checks that the document contains past announcements', () => {
-    const {getByText} = render(<PastGlobalAnnouncements />)
-    expect(getByText('This is a past announcement')).toBeVisible()
+  it('checks that the document contains past announcements', async () => {
+    const {findByText} = render(<PastGlobalAnnouncements />)
+    fireEvent.click(await findByText('Recent'))
+    expect(await findByText('This is a past announcement')).toBeVisible()
   })
 })
 
@@ -54,7 +54,8 @@ describe('render image if there are no announcements', () => {
   })
 
   it('checks that a dessert svg is rendered in the past section', async () => {
-    const {findByTestId} = render(<PastGlobalAnnouncements />)
+    const {findByTestId, findByText} = render(<PastGlobalAnnouncements />)
+    fireEvent.click(await findByText('Recent'))
     expect(await findByTestId('NoGlobalAnnouncementImagePast')).toBeVisible()
   })
 })
@@ -80,6 +81,7 @@ describe('pagination', () => {
       past: ['<div><p>This is past page one</p></div>', '<div><p>This is past page two</p></div>']
     }
     const {findByText} = render(<PastGlobalAnnouncements />)
+    fireEvent.click(await findByText('Recent'))
     expect(await findByText('This is past page one')).toBeVisible()
     fireEvent.click(await findByText('2'))
     expect(await findByText('This is past page two')).toBeVisible()

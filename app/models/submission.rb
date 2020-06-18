@@ -86,6 +86,7 @@ class Submission < ActiveRecord::Base
   belongs_to :grading_period
   belongs_to :group
   belongs_to :media_object
+  belongs_to :root_account, :class_name => 'Account'
 
   belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: 'SubmissionComment', dependent: :destroy
@@ -320,6 +321,7 @@ class Submission < ActiveRecord::Base
   before_save :prep_for_submitting_to_plagiarism
   before_save :check_url_changed
   before_save :check_reset_graded_anonymously
+  before_save :set_root_account_id
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -2676,19 +2678,11 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def root_account_id
-    # TODO this is a substitute for the root_account_id column
-    # and the root_account attribute, which will eventually be added
-    self.assignment&.root_account_id
-  end
-
-  def root_account
-    # TODO this is a substitute for the root_account attribute,
-    # which will eventually be added
-    self.assignment&.root_account
-  end
-
   private
+
+  def set_root_account_id
+    self.root_account_id ||= assignment&.course&.root_account_id
+  end
 
   def set_anonymous_id
     self.anonymous_id = Anonymity.generate_id(existing_ids: Submission.anonymous_ids_for(assignment))

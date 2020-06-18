@@ -23,7 +23,7 @@ import NewCollaborationsDropDown from './NewCollaborationsDropDown'
 
 class CollaborationsNavigation extends React.Component {
   renderNewCollaborationsDropDown() {
-    if (this.props.ltiCollaborators.ltiCollaboratorsData.length > 0) {
+    if (ENV.CREATE_PERMISSION && this.props.ltiCollaborators.ltiCollaboratorsData.length > 0) {
       return (
         <NewCollaborationsDropDown
           ltiCollaborators={this.props.ltiCollaborators.ltiCollaboratorsData}

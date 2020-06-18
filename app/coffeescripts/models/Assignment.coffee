@@ -351,6 +351,15 @@ export default class Assignment extends Model
     tagAttributes.url = url
     @set 'external_tool_tag_attributes', tagAttributes
 
+  externalToolData: =>
+    tagAttributes = @get('external_tool_tag_attributes') || {}
+    if !tagAttributes.external_data
+      return ''
+    data = tagAttributes.external_data
+    # we need to stringified version for the form input
+    data.stringify = JSON.stringify(data)
+    return data
+
   externalToolNewTab: (b) =>
     tagAttributes = @get('external_tool_tag_attributes') || {}
     return tagAttributes.new_tab unless arguments.length > 0
@@ -543,7 +552,7 @@ export default class Assignment extends Model
       'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox',
       'defaultToolName', 'isDefaultTool', 'isGenericExternalTool', 'isNonPlacementExternalTool', 'defaultToNone',
       'defaultToOnline', 'defaultToOnPaper', 'objectTypeDisplayName',
-      'selectedSubmissionTypeToolId', 'submissionTypeSelectionTools'
+      'selectedSubmissionTypeToolId', 'submissionTypeSelectionTools', 'externalToolData'
     ]
 
     hash =

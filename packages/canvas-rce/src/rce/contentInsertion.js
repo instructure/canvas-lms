@@ -26,7 +26,6 @@ import {
   mediaIframeSrcFromFile
 } from './contentRendering'
 import scroll from '../common/scroll'
-import {defaultImageSize} from './plugins/instructure_image/ImageEmbedOptions'
 import {cleanUrl} from './contentInsertionUtils'
 
 /** * generic content insertion ** */
@@ -100,8 +99,7 @@ export function insertImage(editor, image) {
   } else {
     // render the image, constraining its size on insertion
     content = renderImage({
-      ...image,
-      style: {maxWidth: `${defaultImageSize}px`, maxHeight: `${defaultImageSize}px`}
+      ...image
     })
   }
   return insertContent(editor, content)
@@ -212,10 +210,7 @@ function getAnchorElement(editor, selectedElm) {
 }
 
 function isImageFigure(elm) {
-  return (
-    elm &&
-    ((elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)) || elm.nodeName === 'IMG')
-  )
+  return elm && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)
 }
 
 function createLink(editor, selectedElm, text, linkAttrs) {
@@ -226,7 +221,7 @@ function createLink(editor, selectedElm, text, linkAttrs) {
   }
 }
 function linkImageFigure(editor, fig, attrs) {
-  const img = fig.tagName === 'IMG' ? fig : editor.dom.select('img', fig)[0]
+  const img = editor.dom.select('img', fig)[0]
   if (img) {
     const a = editor.dom.create('a', attrs)
     img.parentNode.insertBefore(a, img)

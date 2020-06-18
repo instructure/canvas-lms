@@ -41,5 +41,11 @@
         if(m[y])m[y]=function(){return g._w[y].apply(this,arguments)};
         g._v="1.1.1";
     })(window,document,window['_fs_namespace'],'script','user');
+
+    FS.identify('<%=@current_user.global_id%>')
+    FS.setUserVars({
+      accountName_str: '<%=@current_user&.account.name || '?'%>',
+      roles_str: '<%=((@current_user.try(:roles, @domain_root_account) || []) - ['user']).join(',')%>'
+    })
   </script>
 <% end %>

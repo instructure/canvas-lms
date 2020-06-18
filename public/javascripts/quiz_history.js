@@ -343,9 +343,19 @@ $(document).ready(function() {
   const scoringSnapshot = getScoringSnapshot()
   const gradingForm = getGradingForm()
   const quizNavBar = getQuizNavBar()
+  const onInputChange = function(eventObj) {
+    const $question = eventObj.parents('.display_question')
+    gradingForm.updateSnapshotFor($question)
+    if (eventObj.hasClass('question_input')) {
+      const parsed = numberHelper.parse(eventObj.val())
+      const hiddenVal = Number.isNaN(parsed) ? '' : parsed
+      $question.find('.question_input_hidden').val(hiddenVal)
+      quizNavBar.updateStatusFor(eventObj)
+    }
+  }
 
   gradingForm.ensureSelectEventsFire()
-  gradingForm.preventInsanity()
+  gradingForm.preventInsanity(onInputChange)
 
   if (ENV.GRADE_BY_QUESTION) {
     $(document).scroll(quizNavBar.onScroll)
@@ -383,14 +393,7 @@ $(document).ready(function() {
   $(
     '.question_holder .user_points .question_input,.question_holder .question_neutral_comment .question_comment_text textarea'
   ).change(function() {
-    const $question = $(this).parents('.display_question')
-    gradingForm.updateSnapshotFor($question)
-    if ($(this).hasClass('question_input')) {
-      const parsed = numberHelper.parse($(this).val())
-      const hiddenVal = Number.isNaN(parsed) ? '' : parsed
-      $question.find('.question_input_hidden').val(hiddenVal)
-      quizNavBar.updateStatusFor($(this))
-    }
+    onInputChange($(this))
   })
 
   $('#fudge_points_entry').change(function() {

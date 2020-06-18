@@ -131,6 +131,10 @@ class AuthenticationProvider < ActiveRecord::Base
     [].freeze
   end
 
+  def self.site_admin_params
+    [].freeze
+  end
+
   def self.deprecated_params
     [].freeze
   end

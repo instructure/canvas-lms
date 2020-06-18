@@ -465,7 +465,7 @@ describe NotificationMessageCreator do
       before(:each) do
         notification_set({notification_opts: {category: 'PandaExpressTime'}})
         @course.root_account.enable_feature!(:mute_notifications_by_course)
-        @course.root_account.enable_feature!(:notification_granular_course_preferences)
+        Account.site_admin.enable_feature!(:notification_granular_course_preferences)
       end
 
       it 'uses the policy override if available for immediate messages' do
@@ -541,7 +541,7 @@ describe NotificationMessageCreator do
       end
 
       it 'ignores overrides if the feature is not enabled' do
-        @course.root_account.disable_feature!(:notification_granular_course_preferences)
+        Account.site_admin.disable_feature!(:notification_granular_course_preferences)
         @notification_policy.frequency = 'immediately'
         @notification_policy.save!
         NotificationPolicyOverride.create_or_update_for(@user.email_channel, @notification.category, 'weekly', @course)

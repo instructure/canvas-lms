@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "尝试拒绝该机会时出现错误。"
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "生成文件预览时发生错误"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "发出网络请求时出错"
     },
@@ -160,9 +157,6 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "清除所选文件：{ filename }"
-    },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "单击任何页面以插入指向该页面的链接。"
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "单击以嵌入{ imageName }"
@@ -581,12 +575,6 @@
     "link_options_a16b758b": {
         "message": "链接选项"
     },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "链接至课程中的其它内容。"
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "链接至小组中的其它内容。"
-    },
     "links_14b70841": {
         "message": "链接"
     },
@@ -703,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "下一页"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "无 Alt 文字（装饰图像）"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "未指定截止日期"

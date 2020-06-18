@@ -10,4 +10,6 @@
 <% end %>
 <%= include_css_bundles %>
 <%= include_js_bundles %>
-<%= include_account_js %>
+<% unless @exclude_account_js %>
+  <%= include_account_js %>
+<% end %>

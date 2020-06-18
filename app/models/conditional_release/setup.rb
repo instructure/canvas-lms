@@ -39,7 +39,7 @@ module ConditionalRelease
     end
 
     def activate!
-      return unless ConditionalRelease::Service.configured?
+      return unless ConditionalRelease::Service.service_configured?
 
       if @pseudonym.blank? || @token.blank?
         @token = create_token!

@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Ilmeni virhe yritettäessä ohittaa tilaisuutta."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "Tiedoston esikatselun luonnissa ilmeni virhe"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Ilmeni virhe tehtäessä verkkopyyntöä"
     },
@@ -160,9 +157,6 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Tyhjennä valittu tiedosto: { filename }"
-    },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Lisää linkki tuolle sivulle napsauttamalla mitä tahansa sivua."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Upota { imageName } napsauttamalla"
@@ -581,12 +575,6 @@
     "link_options_a16b758b": {
         "message": "Linkin asetukset"
     },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Linkki toiseen sisältöön tällä kurssilla."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Linkki toiseen sisältöön tässä ryhmässä."
-    },
     "links_14b70841": {
         "message": "Linkit"
     },
@@ -703,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Seuraava sivu"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "Ei Alt Text (Koristekuva)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Määräpäiviä ei ole kohdistettu"

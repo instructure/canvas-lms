@@ -64,8 +64,15 @@ module FeatureFlags
 
     def self.conditional_release_after_state_change_hook(user, context, _old_state, new_state)
       if %w(on allowed).include?(new_state) && context.is_a?(Account)
-        @service_account = ConditionalRelease::Setup.new(context.id, user.id)
-        @service_account.activate!
+        if ConditionalRelease::Service.prefer_native?
+          context.root_account.tap do |ra|
+            ra.settings[:use_native_conditional_release] = true
+            ra.save!
+          end
+        else
+          @service_account = ConditionalRelease::Setup.new(context.id, user.id)
+          @service_account.activate!
+        end
       end
     end
 

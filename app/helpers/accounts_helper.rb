@@ -53,12 +53,4 @@ module AccountsHelper
       [I18n.t('Recent Activity'), 'activity'],
     ].tap { |opts| opts << [I18n.t('List View'), 'planner'] if account.root_account.feature_enabled?(:student_planner)}
   end
-
-  def smart_alerts_threshold_options
-    [
-      [I18n.t('#smart_alerts_settings.threshold_12h', '12h'), '12h'],
-      [I18n.t('#smart_alerts_settings.threshold_24h', '24h'), '24h'],
-      [I18n.t('#smart_alerts_settings.threshold_36h', '36h'), '36h'],
-    ]
-  end
 end

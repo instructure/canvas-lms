@@ -47,9 +47,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Виникла помилка при спробі відхилити цю можливість."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": " Сталася помилка під час створення попереднього перегляду файлу"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Сталася помилка при виконанні запиту мережі"
     },
@@ -134,9 +131,6 @@
     "clear_selected_file_82388e50": {
         "message": "Очистити вибраний файл"
     },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Натисніть на будь-яку сторінку, щоб вставити посилання на цю сторінку."
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Натисніть на вбудоване { imageName }"
     },
@@ -205,6 +199,9 @@
     },
     "date_time_d9fbf2d7": {
         "message": "Дата та час:"
+    },
+    "decorative_image_3c28aa7d": {
+        "message": "Декоративне зображення"
     },
     "decrease_indent_de6343ab": {
         "message": "Зменшити відступ"
@@ -370,12 +367,6 @@
     },
     "link_7262adec": {
         "message": "Посилання"
-    },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Посилання на інший вміст у курсі."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Посилання на інший вміст у групі."
     },
     "links_14b70841": {
         "message": "Посилання"

@@ -53,6 +53,14 @@ describe Conversation do
       expect(Conversation.initiate(users, nil, :subject => 'lunch').subject).to eq 'lunch'
     end
 
+    it 'should set the root account ids even for root accounts' do
+      account = Account.create!
+      users = create_users(2, return_type: :record)
+      expect(
+        Conversation.initiate(users, nil, context_type: 'Account', context_id: account.id).root_account_ids
+      ).to eq [account.id]
+    end
+
     context "sharding" do
       specs_require_sharding
 

@@ -24,9 +24,9 @@ export default function register(editor) {
     icon: 'indent',
     onAction: () => editor.execCommand('indent')
   }
-  editor.ui.registry.addButton('indent', baseIndentButton)
+  editor.ui.registry.addButton('inst_indent', baseIndentButton)
 
-  editor.ui.registry.addSplitButton('outdent', {
+  editor.ui.registry.addSplitButton('inst_outdent', {
     ...baseIndentButton,
     presets: 'listpreview',
     columns: 3,
@@ -57,7 +57,7 @@ export default function register(editor) {
         const canOutdent = editor.queryCommandState('outdent')
         showHideButtons(canOutdent)
       }
-      setTimeout(() => showHideButtons(false)) // hide the spitbutton by default on first render
+      setTimeout(onNodeChange) // hide one of the buttons on first render
 
       editor.on('NodeChange', onNodeChange)
       return () => editor.off('NodeChange', onNodeChange)

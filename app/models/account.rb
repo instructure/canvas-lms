@@ -31,6 +31,7 @@ class Account < ActiveRecord::Base
   belongs_to :root_account, :class_name => 'Account'
 
   has_many :courses
+  has_many :favorites, inverse_of: :root_account
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
   has_one :terms_of_service, :dependent => :destroy
   has_one :terms_of_service_content, :dependent => :destroy
@@ -277,6 +278,9 @@ class Account < ActiveRecord::Base
   add_setting :usage_rights_required, :boolean => true, :default => false, :inheritable => true
   add_setting :limit_parent_app_web_access, boolean: true, default: false
   add_setting :kill_joy, boolean: true, default: false, root_only: true
+  add_setting :smart_alerts_threshold, default: 36, root_only: true
+
+  add_setting :disable_post_to_sis_when_grading_period_closed, boolean: true, root_only: true, default: false
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -376,6 +380,10 @@ class Account < ActiveRecord::Base
 
   def self_registration_type
     canvas_authentication_provider.try(:self_registration)
+  end
+
+  def self_registration_captcha?
+    canvas_authentication_provider.try(:enable_captcha)
   end
 
   def self_registration_allowed_for?(type)
@@ -1906,5 +1914,12 @@ class Account < ActiveRecord::Base
 
   def user_needs_verification?(user)
     self.require_confirmed_email? && (user.nil? || !user.cached_active_emails.any?)
+  end
+
+  def allow_disable_post_to_sis_when_grading_period_closed?
+    return false unless root_account?
+    return false unless feature_enabled?(:disable_post_to_sis_when_grading_period_closed)
+
+    Account.site_admin.feature_enabled?(:new_sis_integrations)
   end
 end

@@ -18,7 +18,10 @@
 FactoryBot.define do
   factory :assignment_set_association, class: ConditionalRelease::AssignmentSetAssociation do
     association :assignment_set
-    assignment
     root_account_id { Account.default.id }
+
+    before(:create) do |assmt_set_assoc, _evaluator|
+      assmt_set_assoc.assignment ||= assmt_set_assoc.assignment_set.scoring_range.rule.course.assignments.create!
+    end
   end
 end

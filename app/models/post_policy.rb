@@ -22,6 +22,7 @@ class PostPolicy < ActiveRecord::Base
   validates :post_manually, inclusion: [true, false]
 
   before_validation :set_course_from_assignment
+  before_save :set_root_account_id
 
   after_update :update_owning_course, if: -> { assignment.blank? }
 
@@ -36,6 +37,10 @@ class PostPolicy < ActiveRecord::Base
   private
   def set_course_from_assignment
     self.course_id = assignment.context_id if assignment.present? && course.blank?
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= course.root_account_id
   end
 
   def update_owning_course

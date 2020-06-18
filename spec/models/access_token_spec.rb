@@ -480,14 +480,12 @@ describe AccessToken do
   end
 
   describe "#dev_key_account_id" do
-
     it "returns the developer_key account_id" do
       account = Account.create!
       dev_key = DeveloperKey.create!(account: account)
       at = AccessToken.create!(developer_key: dev_key)
       expect(at.dev_key_account_id).to eq account.id
     end
-
   end
 
   context 'broadcast policy' do
@@ -526,6 +524,32 @@ describe AccessToken do
       Account.site_admin.disable_feature!(:notify_for_manually_created_access_tokens)
       access_token = AccessToken.create!(user: @user)
       expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
+    end
+  end
+
+  describe 'root_account_id' do
+    let(:root_account) { account_model }
+    let(:sub_account) { root_account.sub_accounts.create! name: 'sub' }
+    let(:root_account_key) { DeveloperKey.create!(account: root_account) }
+    let(:site_admin_key) { DeveloperKey.create! }
+
+    it "uses root_account value from developer key association" do
+      at = AccessToken.create!(user: user_model, developer_key: root_account_key)
+      expect(at.root_account_id).to eq(root_account_key.root_account_id)
+    end
+
+    it "inherits root_account value from siteadmin context" do
+      at = AccessToken.create!(user: user_model, developer_key: site_admin_key)
+      expect(at.root_account_id).to be_nil
+    end
+
+    it "keeps set value if it already exists" do
+      at = AccessToken.create!(
+        user: user_model,
+        developer_key: root_account_key,
+        root_account_id: sub_account.id
+      )
+      expect(at.root_account_id).to eq(sub_account.id)
     end
   end
 end

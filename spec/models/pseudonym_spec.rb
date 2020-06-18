@@ -77,20 +77,6 @@ describe Pseudonym do
     Pseudonym.create!(:unique_id => 'cody@instructure.com', :user => u)
   end
 
-  it "should share a root_account_id with its account" do
-    pseudonym = Pseudonym.new
-    allow(pseudonym).to receive(:account).and_return(double(root_account_id: 1, id: 2))
-
-    expect(pseudonym.root_account_id).to eq 1
-  end
-
-  it "should use its account_id as a root_account_id if its account has no root" do
-    pseudonym = Pseudonym.new
-    allow(pseudonym).to receive(:account).and_return(double(root_account_id: nil, id: 1))
-
-    expect(pseudonym.root_account_id).to eq 1
-  end
-
   it "should find the correct pseudonym for logins" do
     user = User.create!
     p1 = Pseudonym.create!(:unique_id => 'Cody@instructure.com', :user => user)

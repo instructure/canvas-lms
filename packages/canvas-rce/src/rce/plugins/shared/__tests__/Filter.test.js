@@ -103,7 +103,7 @@ describe('RCE Plugins > Filter', () => {
       expect(currentFilterSettings.contentType).toEqual('links')
     })
 
-    it.skip('does not change content subtype when changed', () => {
+    it('does not change content subtype when changed', () => {
       selectContentType('User Files')
       selectContentSubtype('Media')
       selectContentType('Links')
@@ -185,10 +185,12 @@ describe('RCE Plugins > Filter', () => {
       expect(currentFilterSettings.contentSubtype).toEqual('media')
     })
 
-    it.skip('sets content subtype to "all" when "All" is selected', () => {
+    it('sets content subtype to "all" when "All" is selected', () => {
       selectContentSubtype('Media')
       selectContentSubtype('All')
       expect(currentFilterSettings.contentSubtype).toEqual('all')
+      // side-effect of changing the contentType to User
+      expect(currentFilterSettings.contentType).toEqual('user_files')
     })
 
     it('does not change content type when changed', () => {
@@ -238,7 +240,7 @@ describe('RCE Plugins > Filter', () => {
       expect(currentFilterSettings.contentType).toEqual('course_files')
     })
 
-    it.skip('does not change content subtype when changed', () => {
+    it('does not change content subtype when changed', () => {
       selectContentSubtype('Media')
       selectSortBy('Alphabetical')
       expect(currentFilterSettings.contentSubtype).toEqual('media')

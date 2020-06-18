@@ -1,0 +1,53 @@
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.cr-percent-input {
+  display: flex;
+  flex-direction: column;
+  align-content: flex-start;
+  margin-bottom: 0px;
+  width: 60px;
+
+  .cr-percent-input__input {
+    text-align: center;
+    margin-bottom: 0px;
+    width: 48px;
+    padding: 6px;
+  }
+
+  .cr-percent-input__error-holder {
+    height: 0;
+    width: 0;
+    overflow: visible;
+  }
+
+  .cr-percent-input__error {
+    .ic-Form-message__Layout {
+      display: flex;
+      padding: 12px 12px 12px 0px;
+
+      * {
+        flex: 0 1 auto;
+      }
+
+      span {
+        white-space: nowrap;
+      }
+    }
+  }
+}

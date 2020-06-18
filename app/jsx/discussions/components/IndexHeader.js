@@ -171,6 +171,7 @@ export default class IndexHeader extends Component {
               label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
             >
               <select
+                id="discussion-filter"
                 name="filter-dropdown"
                 onChange={this.onFilterChange}
                 style={{

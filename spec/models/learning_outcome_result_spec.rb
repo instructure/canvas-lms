@@ -260,10 +260,20 @@ describe LearningOutcomeResult do
     end
   end
 
-  describe '#ensure_user_uuid' do
-    it 'sets user uuid if one is not present' do
-      learning_outcome_result.save!
-      expect(learning_outcome_result.user_uuid).to eq(student.uuid)
+  describe 'before save' do
+    describe '#ensure_user_uuid' do
+      it 'sets user uuid if one is not present' do
+        learning_outcome_result.save!
+        expect(learning_outcome_result.user_uuid).to eq(student.uuid)
+      end
+    end
+
+    describe 'set_root_account_id' do
+      it 'sets root_account_id using course' do
+        learning_outcome_result.save!
+        expect(learning_outcome_result.root_account_id).to be_present
+        expect(learning_outcome_result.root_account_id).to eq(course.root_account_id)
+      end
     end
   end
 

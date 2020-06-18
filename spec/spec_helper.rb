@@ -323,6 +323,8 @@ end
 
 RSpec::Expectations.configuration.on_potential_false_positives = :raise
 
+require 'rspec_junit_formatter'
+
 RSpec.configure do |config|
   config.example_status_persistence_file_path = Rails.root.join('tmp', 'rspec')
   config.use_transactional_fixtures = true
@@ -342,6 +344,12 @@ RSpec.configure do |config|
   config.include Onceler::BasicHelpers
   config.include PGCollkeyHelper
   config.project_source_dirs << "gems" # so that failures here are reported properly
+
+  # DOCKER_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
+  if ENV['DOCKER_PROCESSES']
+    # if file already exists this is a rerun of a failed spec, don't generate new xml.
+    config.add_formatter "RspecJunitFormatter", "log/results.xml" unless File.file?("log/results.xml")
+  end
 
   if ENV['RAILS_LOAD_ALL_LOCALES'] && RSpec.configuration.filter.rules[:i18n]
     config.around :each do |example|

@@ -227,6 +227,42 @@ describe Assignment do
       end
     end
 
+    describe 'update_due_date_smart_alerts' do
+      it 'creates a ScheduledSmartAlert on save with due date' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        expect(ScheduledSmartAlert).to receive(:upsert)
+
+        assignment.update!(due_at: 1.day.from_now)
+      end
+
+      it 'deletes the ScheduledSmartAlert if the due date is removed' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        assignment.update!(due_at: 1.day.from_now)
+        expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+        assignment.update!(due_at: nil)
+        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+      end
+
+      it 'deletes the ScheduledSmartAlert if the due date is changed to the past' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        assignment.update!(due_at: 1.day.from_now)
+        expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+        assignment.update!(due_at: 1.day.ago)
+        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+      end
+
+      it 'deletes associated ScheduledSmartAlerts when the Assignment is deleted' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        override = create_section_override_for_assignment(assignment, {due_at: 2.days.from_now})
+        assignment.update!(due_at: 1.day.from_now)
+        expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+        expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+        assignment.destroy
+        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'Assignment', context_id: assignment.id))
+        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      end
+    end
+
     describe "automatic setting of post policies" do
       let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
 
@@ -6327,6 +6363,16 @@ describe Assignment do
       expect(a.external_tool_tag.url).to eq "http://example.com/launch2"
       expect(a.external_tool_tag).to eq tag
     end
+
+
+    it 'should persist tools external data when given' do
+      ext_data = {foo: 'bar'}
+      a = @course.assignments.create!(title: "test",
+        submission_types: 'external_tool',
+        external_tool_tag_attributes: {url: "http://example.com/launch", external_data: ext_data.to_json})
+      tag = a.external_tool_tag
+      expect(tag.external_data).to eq(ext_data.with_indifferent_access)
+    end
   end
 
   describe "allowed_extensions=" do
@@ -8691,6 +8737,7 @@ describe Assignment do
           expect(assignment.line_items.length).to eq 1
           expect(assignment.line_items.first.label).to eq assignment.title
           expect(assignment.line_items.first.score_maximum).to eq assignment.points_possible
+          expect(assignment.line_items.first.coupled).to eq true
           expect(assignment.line_items.first.resource_link).not_to be_nil
           expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id
           expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
@@ -8895,6 +8942,180 @@ describe Assignment do
       expect {
         Assignment.create!(course: @course, name: 'some assignment', sis_source_id: 'BLAH')
       }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+  end
+
+  describe ".disable_post_to_sis_if_grading_period_closed" do
+    let_once(:account) { Account.create!(root_account_id: nil) }
+    let_once(:grading_period_group) do
+      group = account.grading_period_groups.create!
+
+      now = Time.zone.now
+      group.grading_periods.create!(
+        close_date: 1.day.ago(now),
+        end_date: 1.day.ago(now),
+        start_date: 3.days.ago(now),
+        title: "1"
+      )
+      group.grading_periods.create!(
+        close_date: 10.minutes.ago(now),
+        end_date: 10.minutes.ago(now),
+        start_date: 1.day.ago(now),
+        title: "2"
+      )
+      group.grading_periods.create!(
+        close_date: 1.day.from_now(now),
+        end_date: 1.day.from_now(now),
+        start_date: 10.minutes.ago(now),
+        title: "3"
+      )
+
+      group
+    end
+    let_once(:previously_closed_grading_period) { grading_period_group.grading_periods.first }
+    let_once(:newly_closed_grading_period) { grading_period_group.grading_periods.second }
+    let_once(:open_grading_period) { grading_period_group.grading_periods.third }
+    let_once(:course) { Course.create!(account: account) }
+
+    let(:assignment) { course.assignments.create!(post_to_sis: true) }
+
+    context "when the account has SIS-related features active and the setting enabled" do
+      before(:once) do
+        Account.site_admin.enable_feature!(:new_sis_integrations)
+        account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
+        account.settings[:disable_post_to_sis_when_grading_period_closed] = true
+        account.save!
+      end
+
+      context "when an assignment is marked as due in a newly-closed grading period" do
+        it "sets post_to_sis to false for an assignment due within the newly-closed grading period" do
+          assignment.update!(due_at: 1.minute.after(newly_closed_grading_period.start_date))
+          expect {
+            Assignment.disable_post_to_sis_if_grading_period_closed
+          }.to change { assignment.reload.post_to_sis }.from(true).to(false)
+        end
+
+        it "sets updated_at for affected assignments" do
+          assignment.update!(due_at: 1.minute.after(newly_closed_grading_period.start_date), updated_at: 1.day.ago)
+          now = Time.zone.now
+
+          Timecop.freeze(now) do
+            Assignment.disable_post_to_sis_if_grading_period_closed
+          end
+          expect(assignment.reload.updated_at).to eq now
+        end
+
+        it "does not update an assignment due after the newly-closed grading period" do
+          assignment.update!(due_at: 1.minute.after(newly_closed_grading_period.end_date))
+          expect {
+            Assignment.disable_post_to_sis_if_grading_period_closed
+          }.not_to change { assignment.reload.post_to_sis }
+        end
+
+        it "does not update an assignment due prior to the newly-closed grading period" do
+          assignment.update!(due_at: 1.minute.before(newly_closed_grading_period.start_date))
+          expect {
+            Assignment.disable_post_to_sis_if_grading_period_closed
+          }.not_to change { assignment.reload.post_to_sis }
+        end
+
+        it "does not updated assignments due within the relevant timeframe that belong to an unaffected grading period" do
+          alternate_root_account = Account.create!(root_account: nil)
+          grading_period_group = alternate_root_account.grading_period_groups.create!
+          now = Time.zone.now
+          grading_period_group.grading_periods.create!(
+            close_date: 1.week.from_now(now),
+            end_date: 1.week.from_now(now),
+            start_date: 1.week.ago(now),
+            title: "0"
+          )
+
+          alternate_course = Course.create!(account: alternate_root_account)
+          alternate_assignment = alternate_course.assignments.create!(due_at: 1.day.ago(Time.zone.now), post_to_sis: true)
+
+          expect {
+            Assignment.disable_post_to_sis_if_grading_period_closed
+          }.not_to change { alternate_assignment.reload.post_to_sis }
+        end
+
+        it "does not set updated_at for assignments that are not affected" do
+          assignment.update!(due_at: 1.minute.before(newly_closed_grading_period.start_date))
+          expect {
+            Assignment.disable_post_to_sis_if_grading_period_closed
+          }.not_to change { assignment.reload.updated_at }
+        end
+      end
+
+      context "with assignment overrides" do
+        it "sets post_to_sis to false if at least one section has a due date in the closed grading period" do
+          course_section = course.course_sections.create!(name: "section")
+          assignment.update!(due_at: 1.week.after(newly_closed_grading_period.end_date))
+          assignment.assignment_overrides.create!(
+            due_at: 10.minutes.before(newly_closed_grading_period.end_date),
+            due_at_overridden: true,
+            set: course_section
+          )
+
+          expect {
+            Assignment.disable_post_to_sis_if_grading_period_closed
+          }.to change { assignment.reload.post_to_sis }.from(true).to(false)
+        end
+
+        it "ignores non-section assignment overrides" do
+          group_category = course.group_categories.create!(name: "group category")
+          group_category.create_groups(1)
+
+          assignment.update!(
+            due_at: 1.week.after(newly_closed_grading_period.end_date),
+            group_category: group_category
+          )
+          assignment.assignment_overrides.create!(
+            due_at_overridden: true,
+            due_at: 10.minutes.before(newly_closed_grading_period.end_date),
+            set: group_category.groups.first
+          )
+
+          expect {
+            Assignment.disable_post_to_sis_if_grading_period_closed
+          }.not_to change { assignment.reload.post_to_sis }
+        end
+      end
+
+      it "ignores assignments with no due date" do
+        assignment.update!(due_at: nil)
+        expect {
+          Assignment.disable_post_to_sis_if_grading_period_closed
+        }.not_to change { assignment.reload.post_to_sis }
+      end
+    end
+
+    it "does not run when the site-admin 'new_sis_integrations' flag is not enabled" do
+      account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
+      account.settings[:disable_post_to_sis_when_grading_period_closed] = true
+      account.save!
+
+      expect {
+        Assignment.disable_post_to_sis_if_grading_period_closed
+      }.not_to change { assignment.reload.post_to_sis }
+    end
+
+    it "does not run when the feature flag governing the setting is not enabled for the account" do
+      Account.site_admin.enable_feature!(:new_sis_integrations)
+      account.settings[:disable_post_to_sis_when_grading_period_closed] = true
+      account.save!
+
+      expect {
+        Assignment.disable_post_to_sis_if_grading_period_closed
+      }.not_to change { assignment.reload.post_to_sis }
+    end
+
+    it "does not run when the account does not have the setting enabled" do
+      Account.site_admin.enable_feature!(:new_sis_integrations)
+      account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
+
+      expect {
+        Assignment.disable_post_to_sis_if_grading_period_closed
+      }.not_to change { assignment.reload.post_to_sis }
     end
   end
 

@@ -21,7 +21,7 @@ class AddRootAccountIdToSubmissions < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def up
-    add_column_and_fk :submissions, :root_account_id, :accounts
+    add_column_and_fk :submissions, :root_account_id, :accounts, if_not_exists: true
   end
 
   def down

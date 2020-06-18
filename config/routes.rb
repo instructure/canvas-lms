@@ -2259,6 +2259,20 @@ CanvasRails::Application.routes.draw do
       put 'media_objects/:media_object_id/media_tracks', action: 'update', as: :update_media_tracks
     end
 
+    scope(controller: 'conditional_release/rules') do
+      # TODO: can rearrange so assignment is in path if desired once we're no longer maintaining backwards compat
+      get 'courses/:course_id/mastery_paths/rules', action: 'index'
+      get 'courses/:course_id/mastery_paths/rules/:id', action: 'show'
+      post 'courses/:course_id/mastery_paths/rules', action: 'create'
+      put 'courses/:course_id/mastery_paths/rules/:id', action: 'update'
+      delete 'courses/:course_id/mastery_paths/rules/:id', action: 'destroy'
+    end
+
+    scope(controller: 'conditional_release/stats') do
+      # TODO: can rearrange so assignment is in path if desired once we're no longer maintaining backwards compat
+      get 'courses/:course_id/mastery_paths/stats/students_per_range', action: 'students_per_range'
+      get 'courses/:course_id/mastery_paths/stats/student_details', action: 'student_details'
+    end
   end
 
     # this is not a "normal" api endpoint in the sense that it is not documented or

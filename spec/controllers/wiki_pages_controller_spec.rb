@@ -266,7 +266,7 @@ describe WikiPagesController do
 
         context "feature enabled" do
           before do
-            allow(ConditionalRelease::Service).to receive(:configured?).and_return(true)
+            allow(ConditionalRelease::Service).to receive(:service_configured?).and_return(true)
             @course.enable_feature!(:conditional_release)
           end
 
