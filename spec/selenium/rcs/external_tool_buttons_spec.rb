@@ -17,7 +17,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-describe "external tool buttons" do
+describe "external tool buttons", ignore_js_errors: true do
+  # remove ignore_js_errors in LS-1163
   include_context "in-process server selenium tests"
 
   before (:each) do
