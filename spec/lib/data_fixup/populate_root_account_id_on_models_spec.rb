@@ -188,6 +188,20 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         }
       )
     end
+
+    it 'should account for associations that have a polymorphic_prefix' do
+      expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
+        CalendarEvent, {context: [:root_account_id, :id]}
+      )).to eq(
+        {
+          :context_appointment_group => [:root_account_id, :id],
+          :context_course => [:root_account_id, :id],
+          :context_course_section => [:root_account_id, :id],
+          :context_group => [:root_account_id, :id],
+          :context_user => [:root_account_id, :id],
+        }
+      )
+    end
   end
 
   describe '#check_if_table_has_root_account' do

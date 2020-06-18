@@ -136,12 +136,24 @@ module DataFixup::PopulateRootAccountIdOnModels
   #   :account=>[:root_account_id, :id],
   #   :quiz=>[:root_account_id, :id]
   # }
+  # Also accounts for polymorphic associations that have a prefix, since the usual associations
+  # aren't present
+  # Eg: CalendarEvent with association of {context: [:root_account_id, :id]} becomes
+  # {
+  #   :context_course=>[:root_account_id, :id],
+  #   :context_learning_outcome_group=>[:root_account_id, :id],
+  #   :context_assignment=>[:root_account_id, :id],
+  #   :context_account=>[:root_account_id, :id],
+  #   :context_quiz=>[:root_account_id, :id]
+  # }
   def self.replace_polymorphic_associations(table, association_hash)
     association_hash.each_with_object({}) do |(assoc, columns), memo|
-      if table.reflections[assoc.to_s].options[:polymorphic].present?
-        table.reflections[assoc.to_s].options[:polymorphic].each do |poly_a|
+      assoc_options = table.reflections[assoc.to_s].options
+      prefix = assoc_options[:polymorphic_prefix] ? "#{assoc}_" : ""
+      if assoc_options[:polymorphic].present?
+        assoc_options[:polymorphic].each do |poly_a|
           poly_a = poly_a.keys.first if poly_a.is_a? Hash
-          memo[poly_a] = columns
+          memo[:"#{prefix}#{poly_a}"] = columns
         end
       else
         memo[assoc] = columns
