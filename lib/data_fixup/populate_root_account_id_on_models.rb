@@ -56,6 +56,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.migration_tables
     {
       AccountUser => :account,
+      AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
       ContextModule => :context,
       DeveloperKey => :account,
       DeveloperKeyAccountBinding => :account,
@@ -194,7 +195,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.populate_root_account_ids(table, associations, min, max)
     table.find_ids_in_ranges(start_at: min, end_at: max) do |batch_min, batch_max|
       associations.each do |assoc, columns|
-        account_id_column = create_column_names(assoc, columns)
+        account_id_column = create_column_names(table.reflections[assoc.to_s], columns)
         table.where(id: batch_min..batch_max, root_account_id: nil).
           joins(assoc).
           update_all("root_account_id = #{account_id_column}")
@@ -205,7 +206,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   def self.create_column_names(assoc, columns)
-    names = Array(columns).map{|column| "#{assoc.to_s.tableize}.#{column}"}
+    names = Array(columns).map{|column| "#{assoc.klass.to_s.tableize}.#{column}"}
     names.count == 1 ? names.first : "COALESCE(#{names.join(', ')})"
   end
 

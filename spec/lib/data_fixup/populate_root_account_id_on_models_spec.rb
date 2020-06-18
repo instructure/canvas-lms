@@ -22,16 +22,36 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     course_model
     @cm = @course.context_modules.create!
     @cm.update_columns(root_account_id: nil)
+    user_model
   end
 
   # add additional models here as they are calculated and added to migration_tables.
   context 'models' do
     it 'should populate the root_account_id on AccountUser' do
-      au = AccountUser.create!(account: @course.account, user: user_model)
+      au = AccountUser.create!(account: @course.account, user: @user)
       au.update_columns(root_account_id: nil)
       expect(au.reload.root_account_id).to eq nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(au.reload.root_account_id).to eq @course.root_account_id
+    end
+
+    it 'should populate the root_account_id on AssetUserAccess with non-user context' do
+      auac = AssetUserAccess.create!(context: @course, user: @user)
+      auac.update_columns(root_account_id: nil)
+      expect(auac.reload.root_account_id).to eq nil
+
+      auaa = AssetUserAccess.create!(context: @course.root_account, user: @user)
+      auaa.update_columns(root_account_id: nil)
+      expect(auaa.reload.root_account_id).to eq nil
+
+      auag = AssetUserAccess.create!(context: group_model(context: @course), user: @user)
+      auag.update_columns(root_account_id: nil)
+      expect(auag.reload.root_account_id).to eq nil
+
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(auac.reload.root_account_id).to eq @course.root_account_id
+      expect(auaa.reload.root_account_id).to eq @course.root_account_id
+      expect(auag.reload.root_account_id).to eq @course.root_account_id
     end
 
     it 'should populate the root_account_id on ContextModule' do
@@ -341,14 +361,20 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
   describe '#create_column_names' do
     it 'should create a single column name' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(:course, 'root_account_id')).to eq(
+      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(Assignment.reflections["course"], 'root_account_id')).to eq(
         'courses.root_account_id'
       )
     end
 
     it 'should coalesce multiple column names on a table' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(:account, ['root_account_id', :id])).to eq(
+      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(Course.reflections["account"], ['root_account_id', :id])).to eq(
         "COALESCE(accounts.root_account_id, accounts.id)"
+      )
+    end
+
+    it 'should use actual table names for strangely named columns' do
+      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(AssetUserAccess.reflections["context_course"], 'root_account_id')).to eq(
+        'courses.root_account_id'
       )
     end
   end
