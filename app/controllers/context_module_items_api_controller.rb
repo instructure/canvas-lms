@@ -276,7 +276,7 @@ class ContextModuleItemsApiController < ApplicationController
       # Get conditionally released objects if requested
       # TODO: Document in API when out of beta
       if includes.include?("mastery_paths")
-        opts[:conditional_release_rules] = ConditionalRelease::Service.rules_for(@context, @student, items, session)
+        opts[:conditional_release_rules] = ConditionalRelease::Service.rules_for(@context, @student, session)
       end
       render :json => items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, includes, opts) }
     end
@@ -542,18 +542,25 @@ class ContextModuleItemsApiController < ApplicationController
     assignment = @item.assignment
     return render json: { message: 'requested item is not an assignment' }, status: :bad_request unless assignment
 
-    response = ConditionalRelease::Service.select_mastery_path(
-      @context,
-      @current_user,
-      @student,
-      assignment,
-      params[:assignment_set_id],
-      session)
+    if ConditionalRelease::Service.natively_enabled_for_account?(@context.root_account)
+      assignment_ids = ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, assignment, params[:assignment_set_id])
+      request_failed = false
+    else
+      response = ConditionalRelease::Service.select_mastery_path(
+        @context,
+        @current_user,
+        @student,
+        assignment,
+        params[:assignment_set_id],
+        session)
+      request_failed = response[:code] != '200'
+      assignment_ids = response[:body]['assignments'].map {|a| a['assignment_id'].try(&:to_i) } unless request_failed
+    end
 
-    if response[:code] != '200'
+    if request_failed
       render json: response[:body], status: response[:code]
     else
-      assignment_ids = response[:body]['assignments'].map {|a| a['assignment_id'].try(&:to_i) }
+
       # assignment occurs in delayed job, may not be fully visible to user until job completes
       assignments = @context.assignments.published.where(id: assignment_ids).
         preload(Api::V1::Assignment::PRELOADS)

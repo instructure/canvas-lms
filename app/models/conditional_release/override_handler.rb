@@ -29,6 +29,24 @@ module ConditionalRelease
           student_id: submission.user_id, actor_id: submission.grader_id, source: 'grade_change')
       end
 
+      def handle_assignment_set_selection(student, trigger_assignment, assignment_set_id)
+        # just going to raise a 404 if the choice is invalid because i'm too lazy to return more specific errors
+        rule_ids = trigger_assignment.conditional_release_rules.active.pluck(:id)
+        submission = trigger_assignment.submissions.for_user(student).in_workflow_state(:graded).posted.take!
+        relative_score = ConditionalRelease::Stats.percent_from_points(submission.score, trigger_assignment.points_possible)
+        assignment_set = AssignmentSet.active.where(id: assignment_set_id,
+          scoring_range: ScoringRange.active.where(:rule_id => rule_ids).for_score(relative_score)).take!
+
+        other_assignment_sets = assignment_set.scoring_range.assignment_sets - [assignment_set]
+        previous_set_ids = AssignmentSetAction.current_assignments(student.id, other_assignment_sets).pluck(:assignment_set_id)
+        sets_to_unassign = other_assignment_sets.select{|set| previous_set_ids.include?(set.id)}
+
+        set_assignment_overrides(submission.user_id, [assignment_set], sets_to_unassign)
+        ConditionalRelease::AssignmentSetAction.create_from_sets([assignment_set], sets_to_unassign,
+          student_id: submission.user_id, source: 'select_assignment_set')
+        assignment_set.assignment_set_associations.map(&:assignment_id)
+      end
+
       def find_assignment_sets(submission)
         rules = submission.course.conditional_release_rules.active.where(:trigger_assignment_id => submission.assignment).preload(:assignment_sets).to_a
         relative_score = ConditionalRelease::Stats.percent_from_points(submission.score, submission.assignment.points_possible)

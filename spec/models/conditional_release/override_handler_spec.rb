@@ -21,43 +21,11 @@ require_dependency "conditional_release/override_handler"
 
 module ConditionalRelease
   describe OverrideHandler do
+    before :once do
+      setup_course_with_native_conditional_release
+    end
+
     context 'handle_grade_change' do
-      before :once do
-        # set up a trigger assignment with rules and whatnot
-        course_with_student(:active_all => true)
-        @trigger_assmt = @course.assignments.create!(:points_possible => 10, submission_types: "online_text_entry")
-        @sub = @trigger_assmt.submit_homework(@student, body: "hi")
-
-        @set1_assmt1 = @course.assignments.create!(:only_visible_to_overrides => true) # one in one set
-        @set2_assmt1 = @course.assignments.create!(:only_visible_to_overrides => true)
-        @set2_assmt2 = @course.assignments.create!(:only_visible_to_overrides => true) # two in one set
-        @set3a_assmt = @course.assignments.create!(:only_visible_to_overrides => true) # two sets in one range - will have to choose
-        @set3b_assmt = @course.assignments.create!(:only_visible_to_overrides => true)
-
-        ranges = [
-          ScoringRange.new(:lower_bound => 0.7, :upper_bound => 1.0, :assignment_sets => [
-            AssignmentSet.new(:assignment_set_associations => [AssignmentSetAssociation.new(:assignment_id => @set1_assmt1.id)])
-          ]),
-          ScoringRange.new(:lower_bound => 0.4, :upper_bound => 0.7, :assignment_sets => [
-            AssignmentSet.new(:assignment_set_associations => [
-              AssignmentSetAssociation.new(:assignment_id => @set2_assmt1.id),
-              AssignmentSetAssociation.new(:assignment_id => @set2_assmt2.id)
-            ])
-          ]),
-          ScoringRange.new(:lower_bound => 0, :upper_bound => 0.4, :assignment_sets => [
-            AssignmentSet.new(:assignment_set_associations => [AssignmentSetAssociation.new(:assignment_id => @set3a_assmt.id)]),
-            AssignmentSet.new(:assignment_set_associations => [AssignmentSetAssociation.new(:assignment_id => @set3b_assmt.id)])
-          ])
-        ]
-        @rule = @course.conditional_release_rules.create!(:trigger_assignment => @trigger_assmt, :scoring_ranges => ranges)
-
-        Account.default.tap do |ra|
-          ra.settings[:use_native_conditional_release] = true
-          ra.save!
-        end
-        @course.enable_feature!(:conditional_release)
-      end
-
       it "should require native conditional release" do
         expect(ConditionalRelease::Service).to receive(:natively_enabled_for_account?).and_return(false).once
         expect(ConditionalRelease::OverrideHandler).to_not receive(:handle_grade_change)
@@ -104,6 +72,66 @@ module ConditionalRelease
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to_not include(@set3a_assmt)
         expect(visible_assmts).to_not include(@set3b_assmt)
+      end
+    end
+
+    context 'handle_assignment_set_selection' do
+      before :once do
+        @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher) # set up the choice
+        @set_a = @set3a_assmt.conditional_release_associations.first.assignment_set
+        @set_b = @set3b_assmt.conditional_release_associations.first.assignment_set
+        @invalid_set = @set1_assmt1.conditional_release_associations.first.assignment_set
+      end
+
+      it "should check that a rule exists for the assignment" do
+        @rule.destroy!
+        expect {
+          ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "should check that the submission is actually graded" do
+        Submission.where(:id => @sub).update_all(:posted_at => nil)
+        expect {
+          ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "should check that the assignment set is valid for the submissions core" do
+        expect {
+          ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @invalid_set.id)
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "should create the assignment override" do
+        assignment_ids = ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
+        expect(assignment_ids).to eq [@set3a_assmt.id]
+        visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
+        expect(visible_assmts).to include(@set3a_assmt)
+        expect(visible_assmts).to_not include(@set3b_assmt)
+      end
+
+      it "should be able to switch" do
+        ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
+        ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_b.id)
+        visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
+        expect(visible_assmts).to include(@set3b_assmt)
+        expect(visible_assmts).to_not include(@set3a_assmt)
+      end
+
+      it "should reuse an existing override when assigning (and leave it be when unassigning)" do
+        old_student = @student
+        ConditionalRelease::OverrideHandler.handle_assignment_set_selection(old_student, @trigger_assmt, @set_a.id)
+        student_in_course(:course => @course, :active_all => true)
+        @trigger_assmt.grade_student(@student, grade: 3, grader: @teacher)
+        ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
+
+        expect(@set3a_assmt.assignment_overrides.count).to eq 1
+        expect(@set3a_assmt.assignment_overrides.first.assignment_override_students.count).to eq 2
+
+        ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_b.id) # now unassign
+        expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).to_not include(@set3a_assmt)
+        expect(DifferentiableAssignment.scope_filter(@course.assignments, old_student, @course).to_a).to include(@set3a_assmt)
       end
     end
   end

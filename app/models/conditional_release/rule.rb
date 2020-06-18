@@ -31,7 +31,7 @@ module ConditionalRelease
     has_many :assignment_set_associations, -> { active.order(position: :asc) }, through: :scoring_ranges
     accepts_nested_attributes_for :scoring_ranges, allow_destroy: true
 
-    after_save :clear_trigger_assignment_cache
+    after_save :clear_caches
 
     before_create :set_root_account_id
     def set_root_account_id
@@ -45,20 +45,37 @@ module ConditionalRelease
     end
 
     scope :with_assignments, -> do
-      having_assignments = joins(all_includes).group(Arel.sql("conditional_release_rules.id"))
-      preload(all_includes).where(id: having_assignments.pluck(:id))
+      having_assignments = joins(preload_associations).group(Arel.sql("conditional_release_rules.id"))
+      preload(preload_associations).where(id: having_assignments.pluck(:id))
     end
 
-    def self.all_includes
+    def self.preload_associations
       { scoring_ranges: { assignment_sets: :assignment_set_associations } }
+    end
+
+    def self.includes_for_json
+      {
+        scoring_ranges: {
+          include: {
+            assignment_sets: {
+              include: {assignment_set_associations: {except: [:root_account_id, :deleted_at]}},
+              except: [:root_account_id, :deleted_at]
+            }
+          },
+          except: [:root_account_id, :deleted_at]
+        }
+      }
     end
 
     def assignment_sets_for_score(score)
       AssignmentSet.active.where(scoring_range: scoring_ranges.for_score(score))
     end
 
-    def clear_trigger_assignment_cache
-      self.trigger_assignment.clear_cache_key(:conditional_release)
+    def clear_caches
+      self.class.connection.after_transaction_commit do
+        self.trigger_assignment.clear_cache_key(:conditional_release)
+        self.course.clear_cache_key(:conditional_release)
+      end
     end
 
     def self.is_trigger_assignment?(assignment)

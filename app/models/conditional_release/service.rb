@@ -56,7 +56,6 @@ module ConditionalRelease
           cyoe_env[:course_id] = context.id
           cyoe_env[:stats_url] = "/api/v1/courses/#{context.id}/mastery_paths/stats"
         end
-        # TODO: add rules and whatnot
       else
         cyoe_env = {
           jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
@@ -67,10 +66,10 @@ module ConditionalRelease
           base_url: base_url,
           context_id: context.id
         }
-
-        cyoe_env[:rule] = rule_triggered_by(assignment, user, session) if includes.include? :rule
-        cyoe_env[:active_rules] = active_rules(context, user, session) if includes.include? :active_rules
       end
+
+      cyoe_env[:rule] = rule_triggered_by(assignment, user, session) if includes.include? :rule
+      cyoe_env[:active_rules] = active_rules(context, user, session) if includes.include? :active_rules
       env.merge(CONDITIONAL_RELEASE_ENV: cyoe_env)
     end
 
@@ -89,9 +88,9 @@ module ConditionalRelease
       )
     end
 
-    def self.rules_for(context, student, content_tags, session)
+    def self.rules_for(context, student, session)
       return unless enabled_in_context?(context)
-      rules_data(context, student, Array.wrap(content_tags), session)
+      rules_data(context, student, session)
     end
 
     def self.clear_active_rules_cache(course)
@@ -201,36 +200,13 @@ module ConditionalRelease
       rules = active_rules(assignment.context, current_user, session)
       return nil unless rules
 
-      rules.find {|r| r['trigger_assignment'] == assignment.id.to_s}
-    end
-
-    def self.rules_assigning(assignment, current_user, session = nil)
-      reverse_lookup = Rails.cache.fetch(active_rules_reverse_cache_key(assignment.context)) do
-        all_rules = active_rules(assignment.context, current_user, session)
-        return nil unless all_rules
-
-        lookup = {}
-        all_rules.each do |rule|
-          (rule['scoring_ranges'] || []).each do |sr|
-            (sr['assignment_sets'] || []).each  do |as|
-              (as['assignments'] || []).each do |a|
-                if a['assignment_id'].present?
-                  lookup[a['assignment_id']] ||= []
-                  lookup[a['assignment_id']] << rule
-                end
-              end
-            end
-          end
-        end
-        lookup.each {|_id, rules| rules.uniq!}
-        lookup
-      end
-      reverse_lookup[assignment.id.to_s]
+      rules.find {|r| r['trigger_assignment'] == assignment.id.to_s || r['trigger_assignment_id'] == assignment.id}
     end
 
     def self.active_rules(course, current_user, session)
       return unless enabled_in_context?(course)
       return unless course.grants_any_right?(current_user, session, :read, :manage_assignments)
+      return native_active_rules(course) if natively_enabled_for_account?(course.root_account)
 
       Rails.cache.fetch(active_rules_cache_key(course)) do
         headers = headers_for(course, current_user, domain_for(course), session)
@@ -261,6 +237,25 @@ module ConditionalRelease
     rescue => e
       Canvas::Errors.capture(e, course_id: course.global_id, user_id: current_user.global_id)
       []
+    end
+
+    def self.native_active_rules(course)
+      rules_data = Rails.cache.fetch_with_batched_keys('conditional_release_active_rules', batch_object: course, batched_keys: :conditional_release) do
+        rules = course.conditional_release_rules.active.with_assignments.to_a
+        rules.as_json(include: Rule.includes_for_json, include_root: false, except: [:root_account_id, :deleted_at])
+      end
+      trigger_ids = rules_data.map { |rule| rule['trigger_assignment_id'] }
+      trigger_assgs = course.assignments.preload(:grading_standard).where(id: trigger_ids).each_with_object({}) do |a, assgs|
+        assgs[a.id] = {
+          points_possible: a.points_possible,
+          grading_type: a.grading_type,
+          grading_scheme: a.uses_grading_standard ? a.grading_scheme : nil,
+        }
+      end
+      rules_data.each do |rule|
+        rule['trigger_assignment_model'] = trigger_assgs[rule['trigger_assignment_id']]
+      end
+      rules_data
     end
 
     class << self
@@ -328,8 +323,12 @@ module ConditionalRelease
         end
       end
 
-      def rules_data(context, student, content_tags = [], session = {})
+      def rules_data(context, student, session = {})
         return [] if context.blank? || student.blank?
+        if natively_enabled_for_account?(context.root_account)
+          return native_rules_data_for_student(context, student)
+        end
+
         cached = rules_cache(context, student)
         assignments = assignments_for(cached[:rules]) if cached
         force_cache = rules_cache_expired?(context, cached)
@@ -347,6 +346,59 @@ module ConditionalRelease
                                      tags: { type: 'rules_data' })
         Canvas::Errors.capture(e, course_id: context.global_id, user_id: student.global_id)
         []
+      end
+
+      def native_rules_data_for_student(course, student)
+        rules_data =
+          ::Rails.cache.fetch(['conditional_release_rules_for_student', student.cache_key(:submissions), course.cache_key(:conditional_release)].cache_key) do
+            rules = course.conditional_release_rules.active.preload(Rule.preload_associations).to_a
+
+            trigger_assignments = course.assignments.where(:id => rules.map(&:trigger_assignment_id)).to_a.index_by(&:id)
+            trigger_submissions = course.submissions.where(:assignment_id => trigger_assignments.keys).
+              for_user(student).in_workflow_state(:graded).posted.to_a.index_by(&:assignment_id)
+
+            assigned_set_ids = ConditionalRelease::AssignmentSetAction.current_assignments(
+              student, rules.flat_map(&:scoring_ranges).flat_map(&:assignment_sets)).pluck(:assignment_set_id)
+            rules.map do |rule|
+              trigger_assignment = trigger_assignments[rule.trigger_assignment_id]
+              trigger_sub = trigger_submissions[trigger_assignment.id]
+              if trigger_sub&.score
+                relative_score = ConditionalRelease::Stats.percent_from_points(trigger_sub.score, trigger_assignment.points_possible)
+                assignment_sets = rule.scoring_ranges.select{|sr| sr.contains_score(relative_score)}.flat_map(&:assignment_sets)
+                selected_set_id =
+                  if assignment_sets.length == 1
+                    assignment_sets.first.id
+                  else
+                    (assignment_sets.map(&:id) & assigned_set_ids).first
+                  end
+              end
+              assignment_sets_data = (assignment_sets || []).as_json(
+                include_root: false, except: [:root_account_id, :deleted_at],
+                include: {assignment_set_associations: {except: [:root_account_id, :deleted_at]}}
+              ).map(&:deep_symbolize_keys)
+              rule.as_json(include_root: false, except: [:root_account_id, :deleted_at]).merge(
+                locked: relative_score.blank?,
+                selected_set_id: selected_set_id,
+                assignment_sets: assignment_sets_data
+              )
+            end
+          end
+        # TODO: do something less weird than mixing AR records into json
+        # to get the assignment data in when we're not maintaining back compat
+        referenced_assignment_ids = rules_data.map do |rule_hash|
+          rule_hash[:assignment_sets].map do |set_hash|
+            set_hash[:assignment_set_associations].map{|assoc_hash| assoc_hash[:assignment_id]}
+          end
+        end.flatten
+        referenced_assignments = course.assignments.where(:id => referenced_assignment_ids).to_a.index_by(&:id)
+        rules_data.each do |rule_hash|
+          rule_hash[:assignment_sets].each do |set_hash|
+            set_hash[:assignment_set_associations].each do |assoc_hash|
+              assoc_hash[:model] = referenced_assignments[assoc_hash[:assignment_id]]
+            end
+          end
+        end
+        rules_data
       end
 
       def rules_cache(context, student, force: false, &block)

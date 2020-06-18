@@ -47,7 +47,7 @@ class ContextModulesController < ApplicationController
           collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
         cache_key = cache_key_items.join('/')
         cache_key = add_menu_tools_to_cache_key(cache_key)
-        cache_key = add_mastery_paths_to_cache_key(cache_key, @context, @modules, @current_user)
+        cache_key = add_mastery_paths_to_cache_key(cache_key, @context, @current_user)
       end
     end
 
@@ -139,7 +139,7 @@ class ContextModulesController < ApplicationController
       item = @context.context_module_tags.not_deleted.find(params[:id])
 
       if item.present? && item.published? && item.context_module.published?
-        rules = ConditionalRelease::Service.rules_for(@context, @current_user, item, session)
+        rules = ConditionalRelease::Service.rules_for(@context, @current_user, session)
         rule = conditional_release_rule_for_module_item(item, conditional_release_rules: rules)
 
         # locked assignments always have 0 sets, so this check makes it not return 404 if locked
@@ -151,7 +151,7 @@ class ContextModulesController < ApplicationController
                 setId: set[:id]
               }
 
-              option[:assignments] = set[:assignments].map { |a|
+              option[:assignments] = (set[:assignments] || set[:assignment_set_associations]).map { |a|
                 assg = assignment_json(a[:model], @current_user, session)
                 assg[:assignmentId] = a[:assignment_id]
                 assg

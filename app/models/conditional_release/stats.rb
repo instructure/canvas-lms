@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_dependency 'conditional_release/assignment_set_action'
+
 module ConditionalRelease
   module Stats
     class << self
@@ -78,7 +80,9 @@ module ConditionalRelease
             end
           end
         end
-
+        ranges.each do |r|
+          r[:scoring_range] = r[:scoring_range].as_json(include_root: false, except: [:root_account_id, :deleted_at]) # can't rely on normal json serialization
+        end
         { rule: rule, ranges: ranges, enrolled: users_by_id.count }
       end
 
@@ -120,7 +124,7 @@ module ConditionalRelease
       def assignment_detail(assignment, submission, trend_score: nil)
         score = submission ? percent_from_points(submission.score, assignment.points_possible) : nil
         detail = {
-          assignment: {id: assignment.id, name: assignment.title, submission_types: assignment.submission_types},
+          assignment: {id: assignment.id, name: assignment.title, submission_types: assignment.submission_types_array, grading_type: assignment.grading_type},
           submission: {id: submission.id, score: submission.score, grade: submission.grade, submitted_at: submission.submitted_at},
           score: score
         }

@@ -71,7 +71,7 @@ Categories.getCategory = assg => {
       _.find(assg.submission_types, sub => cat.submissionTypes.indexOf(sub) !== -1)
     )
   })
-  return category || Categories.OTHER
+  return category || OTHER
 }
 
 export default Categories

@@ -222,15 +222,15 @@ describe ContextModulesHelper do
     it "does not affect cache keys unless mastery paths enabled" do
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
       student_in_course(course: t_course, active_all: true)
-      cache = add_mastery_paths_to_cache_key('foo', t_course, t_module, @student)
+      cache = add_mastery_paths_to_cache_key('foo', t_course, @student)
       expect(cache).to eq 'foo'
     end
 
     it "creates the same key for the same mastery paths rules for a student" do
       s1 = student_in_course(course: t_course, active_all: true)
       s2 = student_in_course(course: t_course, active_all: true)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s1.user)
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s2.user)
+      cache1 = add_mastery_paths_to_cache_key('foo', t_course, s1.user)
+      cache2 = add_mastery_paths_to_cache_key('foo', t_course, s2.user)
       expect(cache1).not_to eq 'foo'
       expect(cache1).to eq cache2
     end
@@ -238,17 +238,17 @@ describe ContextModulesHelper do
     it "creates different keys for different mastery paths rules for a student" do
       s1 = student_in_course(course: t_course, active_all: true)
       s2 = student_in_course(course: t_course, active_all: true)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s1.user)
+      cache1 = add_mastery_paths_to_cache_key('foo', t_course, s1.user)
       allow(ConditionalRelease::Service).to receive(:rules_for).and_return([3, 2, 1])
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s2.user)
+      cache2 = add_mastery_paths_to_cache_key('foo', t_course, s2.user)
       expect(cache1).not_to eq cache2
     end
 
     it "creates the same key for the same mastery paths rules for a teacher" do
       t1 = teacher_in_course(course: t_course)
       t2 = teacher_in_course(course: t_course)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t1.user)
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t2.user)
+      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t1.user)
+      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t2.user)
       expect(cache1).not_to eq 'foo'
       expect(cache1).to eq cache2
     end
@@ -256,9 +256,9 @@ describe ContextModulesHelper do
     it "creates different keys for different mastery paths rules for a teacher" do
       t1 = teacher_in_course(course: t_course)
       t2 = teacher_in_course(course: t_course)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t1.user)
+      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t1.user)
       allow(ConditionalRelease::Service).to receive(:active_rules).and_return([3, 2, 1])
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t2.user)
+      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t2.user)
       expect(cache1).not_to eq cache2
     end
   end

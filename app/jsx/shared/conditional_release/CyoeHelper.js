@@ -25,17 +25,17 @@ const parseEnvData = () => {
     (ENV.CONDITIONAL_RELEASE_ENV && ENV.CONDITIONAL_RELEASE_ENV.active_rules) || []
   return {
     triggerAssignments: activeRules.reduce((triggers, rule) => {
-      triggers[rule.trigger_assignment] = rule
+      triggers[rule.trigger_assignment || rule.trigger_assignment_id] = rule
       return triggers
     }, {}),
     releasedAssignments: activeRules.reduce((released, rule) => {
       rule.scoring_ranges.forEach(range => {
         range.assignment_sets.forEach(set => {
-          set.assignments.forEach(asg => {
+          ;(set.assignments || set.assignment_set_associations).forEach(asg => {
             const id = asg.assignment_id
             released[id] = released[id] || []
             released[id].push({
-              assignment_id: rule.trigger_assignment,
+              assignment_id: rule.trigger_assignment || rule.trigger_assignment_id,
               assignment: rule.trigger_assignment_model,
               upper_bound: range.upper_bound,
               lower_bound: range.lower_bound

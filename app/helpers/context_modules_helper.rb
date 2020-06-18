@@ -40,7 +40,7 @@ module ContextModulesHelper
         true, Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
       cache_key = cache_key_items.join('/')
       cache_key = add_menu_tools_to_cache_key(cache_key)
-      cache_key = add_mastery_paths_to_cache_key(cache_key, context, context_module, user)
+      cache_key = add_mastery_paths_to_cache_key(cache_key, context, user)
       cache(cache_key, {}, &block)
     else
       yield
@@ -55,13 +55,10 @@ module ContextModulesHelper
     cache_key
   end
 
-  def add_mastery_paths_to_cache_key(cache_key, context, module_or_modules, user)
+  def add_mastery_paths_to_cache_key(cache_key, context, user)
     if user && cyoe_enabled?(context)
       if context.user_is_student?(user)
-        items = Rails.cache.fetch("visible_content_tags_for/#{cache_key}") do
-          Array.wrap(module_or_modules).map{ |m| m.content_tags_visible_to(user, :is_teacher => false) }.flatten
-        end
-        rules = cyoe_rules(context, user, items, @session)
+        rules = cyoe_rules(context, user, @session)
       else
         rules = ConditionalRelease::Service.active_rules(context, user, @session)
       end
@@ -120,7 +117,7 @@ module ContextModulesHelper
     }
 
     if cyoe_enabled?(@context)
-      rules = cyoe_rules(@context, current_user, module_data[:items], session) || []
+      rules = cyoe_rules(@context, current_user, session) || []
     end
 
     items_data = {}
