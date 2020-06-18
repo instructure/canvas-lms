@@ -42,11 +42,11 @@ describe(KeyboardShortcutModal, () => {
     component.unmount()
   })
 
-  test('appears when shift + ? is pressed', async () => {
+  test('appears when alt + f8 is pressed', async () => {
     expect(document.querySelector('.keyboard_navigation')).toBeNull()
     const e = new Event('keydown')
-    e.which = 191
-    e.shiftKey = true
+    e.which = 119
+    e.altKey = true
     document.dispatchEvent(e)
 
     await waitForInstUIModalCssTransitions()
@@ -57,8 +57,8 @@ describe(KeyboardShortcutModal, () => {
   describe('shortcuts', () => {
     beforeEach(() => {
       const e = new Event('keydown')
-      e.which = 191
-      e.shiftKey = true
+      e.which = 119
+      e.altKey = true
       document.dispatchEvent(e)
       return waitForInstUIModalCssTransitions()
     })
