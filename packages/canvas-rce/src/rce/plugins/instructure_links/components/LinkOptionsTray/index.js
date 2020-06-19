@@ -34,8 +34,8 @@ import {
 
 export default function LinkOptionsTray(props) {
   const content = props.content || {}
-  const textToLink =
-    (content.$element?.tagName === 'A' ? content.$element?.textContent : content.text) || ''
+  const textToLink = content.text || ''
+  const showText = content.onlyTextSelected
   const [text, setText] = useState(textToLink || '')
   const [url, setUrl] = useState(content.url || '')
   const [autoOpenPreview, setAutoOpenPreview] = useState(content.displayAs === DISPLAY_AS_EMBED)
@@ -109,13 +109,15 @@ export default function LinkOptionsTray(props) {
             <Flex.Item grow padding="small" shrink>
               <input type="submit" style={{display: 'none'}} />
               <Flex direction="column">
-                <Flex.Item padding="small">
-                  <TextInput
-                    renderLabel={() => formatMessage('Text')}
-                    onChange={handleTextChange}
-                    value={text}
-                  />
-                </Flex.Item>
+                {showText && (
+                  <Flex.Item padding="small">
+                    <TextInput
+                      renderLabel={() => formatMessage('Text')}
+                      onChange={handleTextChange}
+                      value={text}
+                    />
+                  </Flex.Item>
+                )}
 
                 <Flex.Item padding="small">
                   <TextInput
@@ -156,7 +158,7 @@ export default function LinkOptionsTray(props) {
               padding="small medium"
               textAlign="end"
             >
-              <Button disabled={!text || !url} onClick={handleSave} variant="primary">
+              <Button disabled={(showText && !text) || !url} onClick={handleSave} variant="primary">
                 {formatMessage('Done')}
               </Button>
             </Flex.Item>

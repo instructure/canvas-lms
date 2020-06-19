@@ -41,7 +41,8 @@ export default function LinkOptionsDialog(props) {
     props.onSave({
       text: linkText,
       target: '_blank',
-      href: url
+      href: url,
+      userText: props.showText
     })
   }
 
@@ -79,14 +80,16 @@ export default function LinkOptionsDialog(props) {
       </Modal.Header>
 
       <Modal.Body>
-        <View as="div" margin="small">
-          <TextInput
-            renderLabel={formatMessage('Text')}
-            name="linktext"
-            onChange={handleTextChange}
-            value={text}
-          />
-        </View>
+        {props.showText && (
+          <View as="div" margin="small">
+            <TextInput
+              renderLabel={formatMessage('Text')}
+              name="linktext"
+              onChange={handleTextChange}
+              value={text}
+            />
+          </View>
+        )}
         <View as="div" margin="small">
           <TextInput
             renderLabel={formatMessage('Link')}
@@ -118,10 +121,12 @@ LinkOptionsDialog.propTypes = {
   onExited: func,
   onRequestClose: func.isRequired,
   onSave: func.isRequired,
-  open: bool.isRequired
+  open: bool.isRequired,
+  showText: bool
 }
 
 LinkOptionsDialog.defaultProps = {
   onEntered: null,
-  onExited: null
+  onExited: null,
+  showText: true
 }

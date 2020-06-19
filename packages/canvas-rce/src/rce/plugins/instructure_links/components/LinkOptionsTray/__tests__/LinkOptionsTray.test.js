@@ -29,7 +29,8 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
         displayAs: 'link',
         text: 'Syllabus.doc',
         url: 'http://example.instructure.com/files/3201/download',
-        isPreviewable: true
+        isPreviewable: true,
+        onlyTextSelected: true
       },
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
@@ -58,6 +59,12 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
     it('uses the value of .text in the given content', () => {
       renderComponent()
       expect(tray.text).toEqual(props.content.text)
+    })
+
+    it('does not show the text field if something other than text was selected', () => {
+      props.content.onlyTextSelected = false
+      renderComponent()
+      expect(tray.$textField).toBe(null)
     })
   })
   describe('"Link" field', () => {
