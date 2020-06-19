@@ -1045,6 +1045,7 @@ class User < ActiveRecord::Base
   def self.clone_communication_channel(cc, new_user, max_position)
     new_cc = cc.clone
     new_cc.shard = new_user.shard
+    new_cc.root_account_id = nil if cc.shard != new_cc.shard
     new_cc.position += max_position
     new_cc.user = new_user
     new_cc.save!
