@@ -21,7 +21,8 @@ import React from 'react'
 import {bool, func, shape, arrayOf, oneOfType} from 'prop-types'
 import {Modal} from '@instructure/ui-overlays'
 import {CloseButton, Button} from '@instructure/ui-buttons'
-import {Heading, Spinner} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {
   courseParamsShape,

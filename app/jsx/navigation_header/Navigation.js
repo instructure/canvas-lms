@@ -23,7 +23,7 @@ import {func} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import UnreadCounts from './UnreadCounts'
 import preventDefault from 'compiled/fn/preventDefault'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
@@ -395,7 +395,7 @@ export default class Navigation extends React.Component {
                     <Spinner
                       size="large"
                       margin="large auto"
-                      renderTitle={() => I18n.t('...Loading')}
+                      renderTitle={() => I18n.t('Loading')}
                     />
                   </View>
                 }

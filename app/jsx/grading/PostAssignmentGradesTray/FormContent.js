@@ -20,7 +20,8 @@ import React from 'react'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 
 import {AccessibleContent} from '@instructure/ui-a11y'
-import {Badge, Spinner, Text} from '@instructure/ui-elements'
+import {Badge, Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {Flex, View} from '@instructure/ui-layout'
 

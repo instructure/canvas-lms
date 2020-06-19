@@ -22,12 +22,13 @@ import FlickrActions from './actions/FlickrActions'
 import FlickrStore from './stores/FlickrStore'
 import FlickrImage from './FlickrImage'
 import SVGWrapper from './SVGWrapper'
-import {Spinner, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 
 export default class FlickrSearch extends React.Component {
   state = FlickrStore.getState()
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.unsubscribe = FlickrStore.subscribe(() => this.handleChange())
   }
 

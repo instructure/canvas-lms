@@ -26,7 +26,8 @@ import HTML5Backend from 'react-dnd-html5-backend'
 
 import {View} from '@instructure/ui-layout'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Spinner, Heading, Text} from '@instructure/ui-elements'
+import {Heading, Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 
 import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
@@ -326,8 +327,5 @@ const connectActions = dispatch =>
     dispatch
   )
 export const ConnectedDiscussionsIndex = DragDropContext(HTML5Backend)(
-  connect(
-    connectState,
-    connectActions
-  )(DiscussionsIndex)
+  connect(connectState, connectActions)(DiscussionsIndex)
 )

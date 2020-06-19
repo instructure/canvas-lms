@@ -22,7 +22,8 @@ import {func, bool, number} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import {Spinner, Heading, Text} from '@instructure/ui-elements'
+import {Heading, Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-layout'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Pagination} from '@instructure/ui-pagination'
@@ -208,7 +209,4 @@ const connectActions = dispatch =>
     dispatch
   )
 
-export const ConnectedAnnouncementsIndex = connect(
-  connectState,
-  connectActions
-)(AnnouncementsIndex)
+export const ConnectedAnnouncementsIndex = connect(connectState, connectActions)(AnnouncementsIndex)

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import I18n from 'i18n!cyoe_assignment_sidebar_breakdown_graphs'
 import {transformScore} from '../../shared/conditional_release/score'
 import BarGraph from './breakdown-graph-bar'

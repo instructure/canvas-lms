@@ -18,7 +18,7 @@
 
 import {getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
 import I18n from 'i18n!assignments_2'
-import LoadingIndicator from '../../../shared/LoadingIndicator'
+import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import previewUnavailable from '../../SVG/PreviewUnavailable.svg'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
