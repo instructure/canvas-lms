@@ -48,6 +48,8 @@ module DataFixup::PopulateRootAccountIdOnModels
   # For example, Group can have a context of account or course.  Account root accounts can come from
   # root_account_id or id
   # Ex: migration_tables = {Group => [:context, {account: [:root_account_id, :id]}]}
+  # (Note that this specific example is handled by the association resolver now, so Account associations will
+  # automatically have [:root_account_id, :id])
   #
   # NOTE: This code will NOT work with any models that need to have multiple root account ids
   # or any models that do not have a root_account_id column.
@@ -128,23 +130,30 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   # Replaces polymorphic associations in the association_hash with their component associations
-  # Eg: ContentTag with association of {context: [:root_account_id, :id]} becomes
+  # Eg: ContentTag with association of {context: :root_account_id} becomes
   # {
-  #   :course=>[:root_account_id, :id],
-  #   :learning_outcome_group=>[:root_account_id, :id],
-  #   :assignment=>[:root_account_id, :id],
+  #   :course=>:root_account_id,
+  #   :learning_outcome_group=>:root_account_id,
+  #   :assignment=>:root_account_id,
   #   :account=>[:root_account_id, :id],
-  #   :quiz=>[:root_account_id, :id]
+  #   :quiz=>:root_account_id
   # }
   # Also accounts for polymorphic associations that have a prefix, since the usual associations
   # aren't present
-  # Eg: CalendarEvent with association of {context: [:root_account_id, :id]} becomes
+  # Eg: CalendarEvent with association of {context: :root_account_id} becomes
   # {
-  #   :context_course=>[:root_account_id, :id],
-  #   :context_learning_outcome_group=>[:root_account_id, :id],
-  #   :context_assignment=>[:root_account_id, :id],
+  #   :context_course=>:root_account_id,
+  #   :context_learning_outcome_group=>:root_account_id,
+  #   :context_assignment=>:root_account_id,
   #   :context_account=>[:root_account_id, :id],
-  #   :context_quiz=>[:root_account_id, :id]
+  #   :context_quiz=>:root_account_id
+  # }
+  # Accounts are a special case, since subaccounts will have a root_account_id but root accounts
+  # have a nil root_account_id and will just use their id instead
+  # Eg: ContextExternalTool with association of {context: :root_account_id} becomes
+  # {
+  #   :account=>[:root_account_id, :id],
+  #   :course=>:root_account_id
   # }
   def self.replace_polymorphic_associations(table, association_hash)
     association_hash.each_with_object({}) do |(assoc, columns), memo|
@@ -153,9 +162,11 @@ module DataFixup::PopulateRootAccountIdOnModels
       if assoc_options[:polymorphic].present?
         assoc_options[:polymorphic].each do |poly_a|
           poly_a = poly_a.keys.first if poly_a.is_a? Hash
+          columns = [:root_account_id, :id] if assoc == :account
           memo[:"#{prefix}#{poly_a}"] = columns
         end
       else
+        columns = [:root_account_id, :id] if assoc == :account
         memo[assoc] = columns
       end
     end

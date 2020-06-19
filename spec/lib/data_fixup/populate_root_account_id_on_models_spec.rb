@@ -180,25 +180,39 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
     it 'should allow overwriting for a previous association included in a polymorphic association' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
-        ContextExternalTool, {context: :root_account_id, account: [:root_account_id, :id]}
+        ContentTag, {context: :root_account_id, course: [:root_account_id, :id]}
       )).to eq(
         {
-          course: :root_account_id,
-          account: [:root_account_id, :id]
+          course: [:root_account_id, :id],
+          learning_outcome_group: :root_account_id,
+          assignment: :root_account_id,
+          account: :root_account_id,
+          quiz: :root_account_id
         }
       )
     end
 
     it 'should account for associations that have a polymorphic_prefix' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
-        CalendarEvent, {context: [:root_account_id, :id]}
+        CalendarEvent, {context: :root_account_id}
       )).to eq(
         {
-          :context_appointment_group => [:root_account_id, :id],
-          :context_course => [:root_account_id, :id],
-          :context_course_section => [:root_account_id, :id],
-          :context_group => [:root_account_id, :id],
-          :context_user => [:root_account_id, :id],
+          :context_appointment_group => :root_account_id,
+          :context_course => :root_account_id,
+          :context_course_section => :root_account_id,
+          :context_group => :root_account_id,
+          :context_user => :root_account_id,
+        }
+      )
+    end
+
+    it 'should replace account association with both root_account_id and id' do
+      expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
+        ContextExternalTool, {course: :root_account_id, account: :root_account_id}
+      )).to eq(
+        {
+          :account=>[:root_account_id, :id],
+          :course=>:root_account_id
         }
       )
     end
