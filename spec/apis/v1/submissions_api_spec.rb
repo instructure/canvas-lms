@@ -874,7 +874,7 @@ describe 'Submissions API', type: :request do
       { :controller => 'submissions_api', :action => 'for_students',
         :format => 'json', :course_id => @course.to_param },
       { :student_ids => [@student.to_param] })
-    
+
     expect(json.first["attachments"]).to be_present
   end
 
@@ -4234,7 +4234,7 @@ describe 'Submissions API', type: :request do
         })
       end
 
-      it "copys files to the submissions folder if they're not there already" do
+      it "copies files to the submissions folder if they're not there already" do
         @assignment.update(:submission_types => 'online_upload')
         a1 = attachment_model(:context => @user, :folder => @user.submissions_folder)
         a2 = attachment_model(:context => @user)

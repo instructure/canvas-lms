@@ -17,12 +17,7 @@
 #
 
 class OnlineSubmissionType < Types::BaseEnum
-  VALID_SUBMISSION_TYPES = %w[
-    media_recording
-    online_text_entry
-    online_upload
-    online_url
-  ].freeze
+  VALID_SUBMISSION_TYPES = %w[media_recording online_text_entry online_upload online_url].freeze
 
   graphql_name 'OnlineSubmissionType'
   description 'Types that can be submitted online'
@@ -33,9 +28,13 @@ end
 class Mutations::CreateSubmission < Mutations::BaseMutation
   graphql_name 'CreateSubmission'
 
-  argument :assignment_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Assignment')
+  argument :assignment_id,
+           ID,
+           required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Assignment')
   argument :body, String, required: false
-  argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
+  argument :file_ids,
+           [ID],
+           required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
   argument :media_id, ID, required: false
   argument :submission_type, OnlineSubmissionType, required: true
   argument :url, String, required: false
@@ -62,13 +61,25 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     case submission_type
     when 'media_recording'
       unless input[:media_id]
-        return validation_error(
-          I18n.t('%{media_recording} submissions require a %{media_id} to submit', {media_recording: 'media_recording', media_id: 'media_id'})
+        return(
+          validation_error(
+            I18n.t(
+              '%{media_recording} submissions require a %{media_id} to submit',
+              { media_recording: 'media_recording', media_id: 'media_id' }
+            )
+          )
         )
       end
       media_object = MediaObject.by_media_id(input[:media_id]).first
       unless media_object
-        return validation_error(I18n.t('The %{media_id} does not correspond to an existing media object', {media_id: 'media_id'}))
+        return(
+          validation_error(
+            I18n.t(
+              'The %{media_id} does not correspond to an existing media object',
+              { media_id: 'media_id' }
+            )
+          )
+        )
       end
       submission_params[:media_comment_type] = media_object.media_type
       submission_params[:media_comment_id] = input[:media_id]
@@ -80,25 +91,28 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
       attachments = current_user.submittable_attachments.active.where(id: file_ids)
       unless file_ids.size == attachments.size
         attachment_ids = attachments.map(&:id)
-        return validation_error(
-          I18n.t(
-            'No attachments found for the following ids: %{ids}',
-            { ids: file_ids - attachment_ids.map(&:to_s) }
-          ),
-          attribute: 'file_ids'
+        return(
+          validation_error(
+            I18n.t(
+              'No attachments found for the following ids: %{ids}',
+              { ids: file_ids - attachment_ids.map(&:to_s) }
+            ),
+            attribute: 'file_ids'
+          )
         )
       end
 
       upload_errors = validate_online_upload(assignment, attachments)
       return upload_errors if upload_errors
 
-      submission_params[:attachments] = copy_attachments_to_submissions_folder(context, attachments)
+      submission_params[:attachments] =
+        Attachment.copy_attachments_to_submissions_folder(context, attachments)
     when 'online_url'
       submission_params[:url] = input[:url]
     end
 
     submission = assignment.submit_homework(current_user, submission_params)
-    {submission: submission}
+    { submission: submission }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   rescue ActiveRecord::RecordInvalid => invalid
@@ -110,16 +124,16 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
   # TODO: move file validation to the model
   def validate_online_upload(assignment, attachments)
     if attachments.blank?
-      return validation_error(
-        I18n.t('You must attach at least one file to this assignment'),
-        attribute: 'file_ids'
+      return(
+        validation_error(
+          I18n.t('You must attach at least one file to this assignment'),
+          attribute: 'file_ids'
+        )
       )
     end
 
     # Probably a superfluous check considering how we retrieve the attachments
-    attachments.each do |attachment|
-      verify_authorized_action!(attachment, :read)
-    end
+    attachments.each { |attachment| verify_authorized_action!(attachment, :read) }
 
     unless extensions_allowed?(assignment, attachments)
       validation_error(I18n.t('Invalid file type'), attribute: 'file_ids')
@@ -129,23 +143,13 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
   def extensions_allowed?(assignment, attachments)
     return true if assignment.allowed_extensions.blank?
 
-    return false unless attachments.all? do |attachment|
-      attachment_extension = attachment.after_extension || ''
-      assignment.allowed_extensions.include?(attachment_extension.downcase)
+    unless attachments.all? do |attachment|
+             attachment_extension = attachment.after_extension || ''
+             assignment.allowed_extensions.include?(attachment_extension.downcase)
+           end
+      return false
     end
 
     true
-  end
-
-  def copy_attachments_to_submissions_folder(assignment_context, attachments)
-    attachments.map do |attachment|
-      if attachment&.folder&.for_submissions?
-        attachment # already in a submissions folder
-      elsif attachment.context.respond_to?(:submissions_folder)
-        attachment.copy_to_folder!(attachment.context.submissions_folder(assignment_context))
-      else
-        attachment # in a weird context; leave it alone
-      end
-    end
   end
 end
