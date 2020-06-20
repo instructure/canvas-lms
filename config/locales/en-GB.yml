@@ -1051,7 +1051,7 @@ en-GB:
       account_reports: 
         default: 
           last_user_access: 
-            text: "This report shows the last login for active users."
+            text: "This report shows the last login for active users. Please note, Last Access At is updated once every 10 minutes. That is our current threshold to determine activity for any given user session."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -12016,6 +12016,7 @@ en-GB:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "In order to complete the process, you will be redirected to a log-in page where you must log in with your child's credentials."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "In order to import a large quantity of outcomes at once, or to update your existing outcomes, please *follow the CSV format*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "In-product training walkthrough and tour points for teachers"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "In-product training walkthrough and tour points for admins, teachers, and students"
   in_progress_13b9e26f: in-progress
   in_progress_646a8aef: "In progress"
   in_progress_9d1ce8b9: "In Progress"
@@ -12046,6 +12047,7 @@ en-GB:
   include_unpublished_courses_7a0e7aab: "Include unpublished courses"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Includes a link to SpeedGrader in the assignment header menu in Gradebook."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Includes grade values in the admin grade reports."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Includes Outcomes Service alignments when exporting and importing course content"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Includes rubrics in the course sidebar navigation"
   incomplete_95612d72: incomplete
   incomplete_da3c2ea2: Incomplete
@@ -12945,7 +12947,7 @@ en-GB:
   login_logo_5eecf564: "Login logo"
   login_screen_83518c07: "Login screen"
   login_with_auth_type_a0aaa52a: "Log in with *%{auth_type}*"
-  login_with_provider_3fd3998e: "Log in with %{provider}"
+  login_with_provider_3fd3998e: "Login with %{provider}"
   loginrequest_encoded_url_44c49c18: "LoginRequest encoded URL"
   loginrequest_xml_sent_to_idp_9fafd03a: "LoginRequest XML sent to IdP"
   logins_9aee0cbe: Logins
@@ -15638,6 +15640,7 @@ en-GB:
   no_74e9b590: "no"
   no_alignments_are_available_for_this_outcome_7f8346f9: "No alignments are available for this outcome."
   no_announcements_280df147: "No announcements"
+  no_announcements_to_display_fbf9ed1e: "No announcements to display"
   no_assignment_group_assigned_8f1cdb9b: "No Assignment Group Assigned"
   no_assignment_name_adbb215b: "No assignment name"
   no_assignments_with_that_name_found_1d7be1: "No assignments with that name found"
@@ -16533,6 +16536,7 @@ en-GB:
   outcomes_import_completed_baff5cb0: "Outcomes import completed"
   outcomes_import_failed_77efcdf4: "Outcomes import failed"
   outcomes_report_8887bd49: "Outcomes report"
+  outcomes_service_alignment_migration_5b4391ad: "Outcomes Service Alignment Migration"
   outcomes_tutorial_tray_ebfce995: "Outcomes Tutorial Tray"
   over_time_bee1a733: "over time"
   override_3de65b2c: Override
@@ -16803,6 +16807,11 @@ en-GB:
         apps_index_endpoint: "Apps index endpoint"
         base_url: "Base URL"
         token: "Access token"
+    apple: 
+      description: "Sign in With Apple"
+    apple_settings: 
+      labels: 
+        client_id: "Service ID"
     assignment_freezer: 
       description: "Freeze assignment properties on copy"
       name: "Assignment property freezer"
@@ -22685,6 +22694,7 @@ en-GB:
   this_assignment_has_been_excused_87f1dc13: "This assignment has been excused."
   this_assignment_has_no_default_dates_ae314295: "This assignment has no default dates."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "This assignment has no points possible and cannot be included in the grade calculation"
+  this_assignment_has_too_many_dates_to_display_262f555f: "This assignment has too many dates to display."
   this_assignment_is_currently_being_moderated_ffd280f2: "This assignment is currently being moderated"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "This assignment is currently muted. That means students cannot see their grades and feedback. Would you like to unmute now?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "This assignment has been dropped and will not be considered in the total calculation"
@@ -24819,6 +24829,9 @@ en-GB:
   you_can_try_to_log_in_again_2b23ef0f: "You may try to *log in again*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "You can update some of this user's information, but s/he can change it back if s/he chooses."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "You can use a single 16x16, 32x32, 48x48 ico file."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      You can view dismissed announcements by going to Account and selecting Global
+                  Announcements from the menu.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "You can view your grades based on What-if scores so that you know how grades will be affected by upcoming, or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "You cannot assign sections to a group discussion topic"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "You cannot assign to a group outside of the assignment's group set"
@@ -24928,6 +24941,9 @@ en-GB:
       You will need to create a [new app on Facebook](%{facebook_url}), and enable Client OAuth Login
       in Advanced Settings. You should configure %{callback_url} as the Valid OAuth redirect URI.
       After you save your app, make a note of the App ID and App Secret, and enter them here.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      You will need to create a Service ID [Apple Developer Console](%{apple_url}).
+      Enable Sign in with Apple, and add %{callback_url} as a return URL. Enter the Identifier here.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       You will need to create a web application in the [Google Developer Console](%{google_url}).
       You should add %{callback_url} as a redirect URI.
