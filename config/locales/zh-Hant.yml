@@ -1048,7 +1048,7 @@ zh-Hant:
       account_reports: 
         default: 
           last_user_access: 
-            text: 此報告顯示活躍使用者的上次登入。
+            text: "此報告顯示活躍使用者的上次登入。請注意，上次訪問時間每 10 分鐘更新一次。該項資料是我們目前用作判斷任何使用者工作階段活動的臨界值。"
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -11981,6 +11981,7 @@ zh-Hant:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: 為完成本流程，本頁將會跳轉至登陸頁面，您需要使用您孩子的密碼登入。
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "為了一次性匯入大量學習成果，或更新您現有的學習成果，請*遵循 CSV 格式*。"
   in_product_training_walkthrough_and_tourpoints_for_2e185119: 為教師而設的產品使用教程及個別說明
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: 為管理員、教師和學生而設的產品使用教程及個別說明
   in_progress_13b9e26f: 進行中
   in_progress_646a8aef: 進行中
   in_progress_9d1ce8b9: 進行中
@@ -12011,6 +12012,7 @@ zh-Hant:
   include_unpublished_courses_7a0e7aab: 包括未發佈的課程
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "納入連結到成績單中的作業標題選單中的 SpeedGrader。"
   includes_grade_values_in_the_admin_grade_reports_a28200da: 在管理員評分報告中包括評分值。
+  includes_outcomes_service_alignments_when_exportin_6c578a35: 匯出和匯入課程內容時包括學習成果服務校準項目
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: 在課程側欄導航中加入評分標準
   incomplete_95612d72: 未完成
   incomplete_da3c2ea2: 未完成
@@ -15584,6 +15586,7 @@ zh-Hant:
   no_74e9b590: 否
   no_alignments_are_available_for_this_outcome_7f8346f9: 沒有可用於此成果的校準。
   no_announcements_280df147: 沒有通告
+  no_announcements_to_display_fbf9ed1e: 沒有可顯示的通告
   no_assignment_group_assigned_8f1cdb9b: 並未獲指派任何作業小組
   no_assignment_name_adbb215b: 無作業名稱
   no_assignments_with_that_name_found_1d7be1: 找不到該作業名稱
@@ -16476,6 +16479,7 @@ zh-Hant:
   outcomes_import_completed_baff5cb0: 學習成果匯入已完成
   outcomes_import_failed_77efcdf4: 學習成果匯入失敗
   outcomes_report_8887bd49: 學習成果報告
+  outcomes_service_alignment_migration_5b4391ad: 學習成果服務校準項目遷移
   outcomes_tutorial_tray_ebfce995: 學習成果教程列表
   over_time_bee1a733: 超時
   override_3de65b2c: 重寫
@@ -16746,6 +16750,11 @@ zh-Hant:
         apps_index_endpoint: 應用程式索引端點
         base_url: "基礎 URL"
         token: 訪問令牌
+    apple: 
+      description: "透過 Apple 登入"
+    apple_settings: 
+      labels: 
+        client_id: "服務 ID"
     assignment_freezer: 
       description: 凍結複製作業屬性
       name: 作業屬性凍結程式
@@ -22597,6 +22606,7 @@ zh-Hant:
   this_assignment_has_been_excused_87f1dc13: 此作業已被免除。
   this_assignment_has_no_default_dates_ae314295: 此作業沒有預設日期。
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: 此作業沒有可能的分數，無法包含在評分計算中
+  this_assignment_has_too_many_dates_to_display_262f555f: 此作業有太多需要顯示的日期。
   this_assignment_is_currently_being_moderated_ffd280f2: 此作業目前正在調整分數
   this_assignment_is_currently_muted_that_means_stud_94d63139: 作業現已設定為靜音。意即學生無法查看成績和反饋。是否要取消靜音？
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: 該作業已被取消，不予計入總評分。
@@ -24713,6 +24723,9 @@ zh-Hant:
   you_can_try_to_log_in_again_2b23ef0f: "您可以嘗試 *稍後登入*。"
   you_can_update_some_of_this_user_s_information_but_8e99a045: 您可以更新此使用者的一些資訊，但如果他們選擇進行更改，他們可以將其改回去。
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "您可以使用單一的16x16、32x32、48x48 圖標文檔。"
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      如需查看已忽略的通告，可以前往「帳戶」，然後從選單中選取「全域
+                  通告」。
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: 你可以根據『假設分析』的分數查看成績，讓你了解分數會受即將發放的成績或重新提交的作業而影響。你可以測試已有分數的作業，或尚未評分的作業。
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: 您不能將分班分配到群組討論主題
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: 您無法為作業的群組集合之外的群組指派成員
