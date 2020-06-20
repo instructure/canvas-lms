@@ -1048,7 +1048,7 @@ es:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Este reporte muestra los últimos inicios de sesión de los usuarios activos."
+            text: "Este informe muestra los últimos inicios de sesión de los usuarios activos. Tenga en cuenta que el “Último acceso en” (Last Access At) se actualiza cada 10 minutos. Ese es nuestro umbral actual para determinar la actividad de la sesión de cualquier usuario."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -11985,6 +11985,7 @@ es:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Con el fin de completar el proceso, será redirigido a una página de inicio de sesión en el que tendrá que iniciar sesión con las credenciales de su hijo."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Para importar una gran cantidad de resultados a la vez o para actualizar sus resultados existentes, *siga el formato CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Tutoriales y puntos de recorrido de las capacitaciones sobre el producto para profesores"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Recorrido de la capacitación y puntos importantes dentro del producto para administradores, profesores y estudiantes"
   in_progress_13b9e26f: "en progreso"
   in_progress_646a8aef: "En progreso"
   in_progress_9d1ce8b9: "En progreso"
@@ -12015,6 +12016,7 @@ es:
   include_unpublished_courses_7a0e7aab: "Incluir los cursos no publicados"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Incluye un enlace a SpeedGrader en el menú del encabezado de la tarea en el Libro de calificaciones."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Incluye los valores de las calificaciones en los reportes de calificación del administrador."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Incluye las alineaciones de servicios de competencias cuando se exportan e importan los contenidos del curso"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Incluye rúbricas en la navegación del curso con la barra lateral"
   incomplete_95612d72: incompleto
   incomplete_da3c2ea2: Incompleta
@@ -12898,7 +12900,7 @@ es:
   login_logo_5eecf564: "Logotipo del inicio de sesión"
   login_screen_83518c07: "Pantalla de inicio de sesión"
   login_with_auth_type_a0aaa52a: "Ingresar con *%{auth_type}*"
-  login_with_provider_3fd3998e: "Ingresar con %{provider}"
+  login_with_provider_3fd3998e: "Iniciar sesión con %{provider}"
   loginrequest_encoded_url_44c49c18: "LoginRequest URL codificada"
   loginrequest_xml_sent_to_idp_9fafd03a: "LoginRequest XML enviado a IdP"
   logins_9aee0cbe: Ingresos
@@ -15589,6 +15591,7 @@ es:
   no_74e9b590: "no"
   no_alignments_are_available_for_this_outcome_7f8346f9: "No hay alineamientos disponibles para esta competencia."
   no_announcements_280df147: "No hay anuncios"
+  no_announcements_to_display_fbf9ed1e: "No hay anuncios para mostrar"
   no_assignment_group_assigned_8f1cdb9b: "No se asignó ningún grupo de tareas"
   no_assignment_name_adbb215b: "La tarea no tiene nombre"
   no_assignments_with_that_name_found_1d7be1: "No se encontraron tareas con ese nombre"
@@ -16481,6 +16484,7 @@ es:
   outcomes_import_completed_baff5cb0: "Importación de resultados completa"
   outcomes_import_failed_77efcdf4: "La importación de resultados ha fallado"
   outcomes_report_8887bd49: "Reporte de resultados"
+  outcomes_service_alignment_migration_5b4391ad: "Migración de la alineación de servicios de competencias"
   outcomes_tutorial_tray_ebfce995: "Bandeja de tutoriales: competencias"
   over_time_bee1a733: "durante un período"
   override_3de65b2c: Anular
@@ -16751,6 +16755,11 @@ es:
         apps_index_endpoint: "Terminal de índice de aplicaciones"
         base_url: "URL base"
         token: "Token de acceso"
+    apple: 
+      description: "Registrarse con Apple"
+    apple_settings: 
+      labels: 
+        client_id: "Identificación de servicio"
     assignment_freezer: 
       description: "Congelar las propiedades de la tarea al copiar"
       name: "Congelador de propiedades de tareas"
@@ -22602,6 +22611,7 @@ es:
   this_assignment_has_been_excused_87f1dc13: "Esta tarea ha sido justificada."
   this_assignment_has_no_default_dates_ae314295: "Esta tarea no tiene fechas predeterminadas."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Esta tarea no se pueden evaluar, por lo que no se pueden incluir en el cálculo de las calificaciones"
+  this_assignment_has_too_many_dates_to_display_262f555f: "Esta tarea tiene demasiadas fechas para mostrar."
   this_assignment_is_currently_being_moderated_ffd280f2: "Esta tarea se encuentra moderándose en este momento"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Esta tarea se encuentra actualmente silenciada. Esto significa que los estudiantes no pueden ver sus calificaciones y comentarios. ¿Desea cancelar el silencio ahora?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Esta tarea está cancelada y no será considerada en el cálculo total"
@@ -24717,6 +24727,9 @@ es:
   you_can_try_to_log_in_again_2b23ef0f: "Puede intentar *iniciar sesión nuevamente*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Puede actualizar cierta información de este usuario, pero pueden volver a cambiarla si lo deciden."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Usted puede usar un archivo ico individual de 16x16, 32x32, 48x48."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Para ver los anuncios desestimados, vaya a Cuenta (Account) y seleccione
+                  Anuncios Globales (Global Announcements) desde el menú.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Usted puede ver sus calificaciones, según las puntuaciones \"qué pasa si\", a fin de conocer cómo afectarán las próximas tareas o las tareas reenviadas. Usted puede poner a prueba los puntajes de una tarea que ya posea un puntaje o de una tarea que no se haya calificado todavía."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "No puede asignar secciones a un tema de debate grupal"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Usted no puede asignar a un grupo fuera del conjunto de grupos de la tarea"
@@ -24826,6 +24839,9 @@ es:
       Usted necesitará crear una [nueva aplicación en Facebook](%{facebook_url}) y establecer el acceso del OAuth del cliente
       en Configuraciones avanzadas.  Debe configurar %{callback_url} como la URL válida de redirección de OAuth.
       Después de que guarde la aplicación, anote el identificador de la aplicación y el secreto de la aplicación e ingréselos aquí.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Debe crear una identificación de servicio [Consola Apple Developer](%{apple_url}).
+      Habilitar Registrarse con Apple y agregar %{callback_url} como URL de retorno. Ingresar el Identificador aquí.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Usted necesitará crear una aplicación web en la [Consola desarrolladora de Google](%{google_url}).
       Debe agregar %{callback_url} como una URL de redirección.
