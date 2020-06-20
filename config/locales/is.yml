@@ -1024,7 +1024,7 @@ is:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Þessi skýrsla sýnir síðustu innskráningu virkra notenda"
+            text: "Þessi skýrsla sýnir síðustu innskráningu virkra notenda. Athugaðu að „Síðast metið“ er uppfært á tíu mínútna fresti. Það er núgildandi þröskuldur okkar til að ákvarða virkni í hverri notandalotu."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -10558,6 +10558,7 @@ is:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Til að ljúka ferlinu verður þér beint á innskráningarsíðu þar sem þú þarft að skrá þig inn með skilríkjum barns þíns."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Til að flytja inn mikið magn af niðurstöðum í einu, eða til að uppfæra fyrri niðurstöður þínar, vinsamlegast *farður eftir CSV sniðinu*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Þjálfun þar sem farið er með kennara í gegnum vöruna og hún kynnt"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Þjálfunarleiðbeiningar og ábendingar fyrir stjórnendur, kennara og nemendur"
   in_progress_13b9e26f: "í vinnslu"
   in_progress_9d1ce8b9: "Í gangi"
   inactive_cd40317f: óvirkt
@@ -10582,6 +10583,7 @@ is:
   include_unpublished_courses_7a0e7aab: "Hafa óbirt námskeið með"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Er með tengil á SpeedGrader í dálkfyrirsögn verkefna valmyndinni í einkunnabók."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Hefur einkunnagildi með í einkunnaskýrslu kerfisstjóra."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Inniheldur þjónustusamræmingu útkomu þegar námskeiðaefni er flutt inn eða út"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inniheldur matskvarði í hliðarstikuyfirliti námskeiðs"
   incomplete_95612d72: ólokið
   incomplete_da3c2ea2: Ólokið
@@ -13763,6 +13765,7 @@ is:
   no_74e9b590: nei
   no_alignments_are_available_for_this_outcome_7f8346f9: "Engar jafnanir vöru mögulegar fyrir þessa niðurstöðu."
   no_announcements_280df147: "Engar tilkynningar"
+  no_announcements_to_display_fbf9ed1e: "Engar tilkynningar til að sýna"
   no_assignment_group_assigned_8f1cdb9b: "Engum verkefnahóp úthlutað"
   no_assignment_name_adbb215b: "Ekkert heiti verkefnis"
   no_assignments_with_that_name_found_1d7be1: "Engin verkefni með þessu heiti fundust"
@@ -14604,6 +14607,7 @@ is:
   outcomes_import_completed_baff5cb0: "Innflutningur útkomna tilbúinn"
   outcomes_import_failed_77efcdf4: "Innflutningur útkomna tókst ekki"
   outcomes_report_8887bd49: Niðurstöðuskýrsla
+  outcomes_service_alignment_migration_5b4391ad: "Útkomuflutningur á þjónustusamræmingu"
   outcomes_tutorial_tray_ebfce995: "Niðurstöður kennsluefnisbakki"
   over_time_bee1a733: "yfir tíma"
   override_3de65b2c: Hnekkja
@@ -14864,6 +14868,11 @@ is:
         apps_index_endpoint: "Endapunktur forritalista"
         base_url: Grunnslóð
         token: Aðgangsmerki
+    apple: 
+      description: "Innskráning með Apple"
+    apple_settings: 
+      labels: 
+        client_id: Þjónustukenni
     assignment_freezer: 
       description: "Læsa eiginleikum verkefnis við afritun"
       name: "Læsing eiginleika verkefnis"
@@ -15808,7 +15817,7 @@ is:
   public_jwk_ee2d719d: "Opinber JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Opinber JWK json er ekki gildur. Skilaðu inn almennilega forsniðnu json."
   public_jwk_url_694edf52: "* Opinber JWK URL"
-  public_jwk_url_b5564c1d: "Opinbert JWK URL"
+  public_jwk_url_b5564c1d: "Opinber JWK-vefslóð"
   public_message_students: 
     message_student: "Senda nemendum í námskeiðinu %{course_name} skilaboð"
     send_message: "Senda skilaboð"
@@ -20098,6 +20107,7 @@ is:
   this_assignment_has_been_excused_87f1dc13: "Þetta verkefni er undanskilið"
   this_assignment_has_no_default_dates_ae314295: "Verkefnið hefur engar sjálfvaldar dagsetningar."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Þetta verkefni hefur enga mögulega punkta og er því ekki með í útreikningi á einkunn"
+  this_assignment_has_too_many_dates_to_display_262f555f: "Þetta verkefni inniheldur of margar dagsetningar til að sýna."
   this_assignment_is_currently_being_moderated_ffd280f2: "Þetta verkefni er í stjórnun."
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Þetta verkefni er leynt eins og er Það þýðir að nemendur geta ekki séð einkunnir sínar og endurgjöf. Viltu taka það úr leynum núna?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Þetta verkefni er fellt niður og verður ekki með í heildarútreikningum"
@@ -22114,6 +22124,9 @@ is:
   you_can_try_to_log_in_again_2b23ef0f: "Þú getur reynt að *innskrá þig aftur*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Þú getur uppfært sumar upplýsingar notanda en þeir geta breytt þeim aftur ef þeir ákveða það."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Þú getur notað einfalda 16x16, 32x32, 48x48 ico-skrá."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Þú getur skoðað hunsaðar tilkynningar með því að fara í „Reikningur“ og velja „Altækar
+                  tilkynningar“ úr valmyndinni.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Þú getur skoðað einkunnir þínar á grundvelli spáðra stiga þannig að þú vitir hvernig einkunnirnar geta breyst með væntanlegum verkefnum eða verkefnum sem er skilað aftur. Þú getur prófað einkunnir fyrir verkefni sem þegar hefur einkunn, eða verkefni sem á eftir að meta til einkunnar."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Þú getur ekki úthlutað fylkjum til hópumræðuefnis"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Þú getur ekki úthlutað í hóp fyrir utan skipan hópasetts verkefnisins"
@@ -22214,6 +22227,9 @@ is:
       Þú þarft að stofna [nýtt smáforrit á Facebook](%{facebook_url}), og heimila innskráningumeð  Client OAuth
       í ítarstillingum. Ákvarðaðu %{callback_url} sem gilda OAuth beiningarslóð.
       Þegar þú hefur vistað forritið, skráðu auðkenni þess og lykil og færðu það inn hérna.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Þú þarft að búa til þjónustukenni [Apple-stjórnborð þróunaraðila](%{apple_url}).
+      Virkjaðu innskráningu með Apple og bættu við %{callback_url} sem skilavefslóð. Sláðu inn auðkennið hér.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Þú þarft að stofna vefforrit í  [Google Developer Console](%{google_url}).
       Bættu %{callback_url} við sem endurbeinislóð.
