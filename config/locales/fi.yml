@@ -666,7 +666,7 @@ fi:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Tämä raportti käyttää aktiivisten käyttäjien viimeisen kirjautumisen."
+            text: "Tämä raportti käyttää aktiivisten käyttäjien viimeisen kirjautumisen. Huomaa, että Viimeinen käyttö kohteessa päivitetään 10 minuutin välein. Tämä on nykyinen kynnyksemme, jolla määritetään aktiviteetti määrätylle käyttäjäistunnolle."
     lti_report_csv_description: 
       account_reports: 
         default: 
@@ -9023,6 +9023,7 @@ fi:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Jotta voit suorittaa prosessin loppuun, sinut ohjataan uudelleen sisäänkirjautumissivulle, jossa sinun täytyy kirjautua sisään lapsesi valtuutustunnuksilla."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Jos haluat tuoda suuren määrän tuloksia kerralla päivittääksesi olemassa olevia tuloksia, *käytä CSV-muotoa*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Tuotteen läpikulku ja kiertueen pisteet opettajille"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Tuotteen läpikulku ja kiertueen kohdat järjestelmäkäyttäjille, opettajille ja opiskelijoille"
   in_progress_13b9e26f: käynnissä
   in_progress_9d1ce8b9: Käynnissä
   inactive_cd40317f: ei-aktiivinen
@@ -9044,6 +9045,7 @@ fi:
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Sisällytä tämä tehtävä arvosanoihin, kun synkronoit koulusi opiskelijan tietojärjestelmää"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Sisältää linkin SpeedGrader tehtävän otsikkovalikossa arvosanakirjassa."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Sisältää arvosanan arvot pääkäyttäjän arvosanaraporteissa."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Sisältää tulosten palvelun linjaukset, kun kurssin sisältöä viedään ja tuodaan"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Kurssin ilmoitusasetukset"
   incomplete_95612d72: keskeneräinen
   incomplete_da3c2ea2: Keskeneräinen
@@ -11962,6 +11964,7 @@ fi:
   no_74e9b590: ei
   no_alignments_are_available_for_this_outcome_7f8346f9: "Ei kohdistuksia saatavilla tälle tulokselle."
   no_announcements_280df147: "Ei ilmoituksia"
+  no_announcements_to_display_fbf9ed1e: "Ei näytettäviä ilmoituksia"
   no_assignment_group_assigned_8f1cdb9b: "Ei kohdistettu tehtäväryhmää"
   no_assignment_name_adbb215b: "Ei tehtävän nimeä"
   no_assignments_with_that_name_found_1d7be1: "Ei löytynyt tehtäviä tällä nimellä"
@@ -12737,6 +12740,7 @@ fi:
   outcomes_import_completed_baff5cb0: "Tulosten tuonti valmis"
   outcomes_import_failed_77efcdf4: "Tulosten tuonti epäonnistui"
   outcomes_report_8887bd49: "Tulosten raportti"
+  outcomes_service_alignment_migration_5b4391ad: "Tulosten palvelun linjauksen siirto"
   outcomes_tutorial_tray_ebfce995: "Tulosten opetusohjelman alue"
   over_time_bee1a733: "ajan mittaan"
   override_3de65b2c: Korvaa
@@ -12961,6 +12965,11 @@ fi:
         apps_index_endpoint: "Sovellusten indeksin päätepiste"
         base_url: Perus-URL
         token: Käyttöoikeustunnus
+    apple: 
+      description: "Kirjaudu sisään Applen avulla"
+    apple_settings: 
+      labels: 
+        client_id: Huolto-ID
     assignment_freezer: 
       description: "Jäädytä tehtäväominaisuudet kopiossa"
       name: "Tehtävän ominaisuuden pakastin"
@@ -17611,6 +17620,7 @@ fi:
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Tätä tehtävää ei oteta huomioon lopullisessa arvosanassa."
   this_assignment_has_been_excused_87f1dc13: "Tämä tehtävä on annettu anteeksi."
   this_assignment_has_no_default_dates_ae314295: "Tällä tehtävällä ei ole oletuspäivämääriä."
+  this_assignment_has_too_many_dates_to_display_262f555f: "Tällä tehtävällä on liian monta päivämäärää näytettäväksi."
   this_assignment_is_currently_being_moderated_ffd280f2: "Tätä tehtävää valvotaan parhaillaan"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Tämä tehtävä on parhaillaan mykistetty. Tämä tarkoittaa, että opiskelijat eivät voi nähdä arvosanoja ja palautetta. Haluaisitko poistaa mykistyksen nyt?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Tämä tehtävä pudotetaan eikä sitä oteta huomioon koko laskelmassa"
@@ -19472,6 +19482,9 @@ fi:
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "Et voi poistaa %{account_name}, koska siinä on kursseja."
   you_can_try_to_log_in_again_2b23ef0f: "Voit yrittää *kirjautua sisään uudelleen*."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Voit käyttää yhtä 16x16, 32x32, 48x48 kuvatiedostoa."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Voit tarkastella hylättyjä ilmoituksia siirtymällä kohtaan Tili ja valitsemalla Yleiset
+                  ilmoitukset valikosta.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Voit tarkastella arvosanojasi Mitä jos -pistemäärien avulla, niin että näet, miten tulevat tai uudelleenlähetetyt tehtävät vaikuttavat arvosanoihin. Voit testata pistemääriä tehtäville, jotka jo sisältävät pistemäärän tai tehtävää, joka täytyy vielä arvostella."
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Et voi kohdistaa ryhmälle tehtävän ryhmäjoukon ulkopuolella"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Et voi muokata teemoja tällä alatilillä."
@@ -19566,6 +19579,9 @@ fi:
       Sinun täytyy luoda [uusi sovellus Facebookissa](%{facebook_url}) ja ottaa käyttöön asiakkaan OAuth-sisäänkirjautuminen
       lisäasetuksissa.  Sinun pitäisi konfiguroida %{callback_url} voimassa olevaksi OAuth-uudelleenohjauksen URL-osoitteeksi.
       Sen jälkeen kuin tallennat sovelluksesi, tee sovellustunnuksen ja App Secret -sovelluksen huomautus ja syötä ne tähän.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Sinun täytyy luoda palvelutunnus [Apple Developer Console](%{apple_url}).
+      Ota sisäänkirjautuminen käyttöön Applen kanssa ja lisää %{callback_url} paluu-URL:ksi. Syötä tunnistin tähän.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Sinun täytyy luoda verkkosovellus [Googlen sovelluskehittäjän konsolissa](%{google_url}).
       Sinun pitäisi lisätä %{callback_url} uudelleenohjauksen URL-linkkinä.
