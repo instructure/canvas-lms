@@ -1021,7 +1021,7 @@ de:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Dieser Bericht zeigt die letzte Anmeldung für aktive Benutzer."
+            text: "Dieser Bericht zeigt die letzte Anmeldung für aktive Benutzer. Bitte beachten Sie, dass „letzter Zugriff um“ alle 10 Minuten aktualisiert wird. Das ist unsere aktuelle Schwelle zur Bestimmung der Aktivität für eine Benutzersitzung."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -11929,6 +11929,7 @@ de:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Um den Vorgang abzuschließen, werden Sie zu einer Anmeldeseite weitergeleitet, wo Sie sich mit den Anmeldedaten Ihres Kindes anmelden müssen."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Um eine größere Zahl Ergebnisse auf einmal zu importieren oder Ihre vorhandenen Ergebnisse zu aktualisieren, folgen Sie bitte *dem CSV-Format*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Produktbegleitende Schulungen und Rundgänge für Lehrer"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Produktbegleitende Schulungen und Rundgänge für Admins, Lehrer und Studenten"
   in_progress_13b9e26f: "in Bearbeitung"
   in_progress_646a8aef: "In Arbeit"
   in_progress_9d1ce8b9: "In Arbeit"
@@ -11959,6 +11960,7 @@ de:
   include_unpublished_courses_7a0e7aab: "Nicht veröffentlichte Kurse mit einbeziehen"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Nimmt einen Link auf SpeedGrader in das Aufgaben-Header-Menü im Notenbuch auf."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Fügt Notenwerte in Admin-Bewertungsberichte ein."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Umfasst Serviceausrichtungen für Lernziele beim Export und Import von Kursinhalten"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Bezieht Bewertungsschemata in die Kursnavigation auf der Seitenleiste ein"
   incomplete_95612d72: unvollständig
   incomplete_da3c2ea2: Unvollständig
@@ -15527,6 +15529,7 @@ de:
   no_74e9b590: Nein
   no_alignments_are_available_for_this_outcome_7f8346f9: "Für dieses Ergebnis gibt es keine Ausrichtungen."
   no_announcements_280df147: "Keine Ankündigungen"
+  no_announcements_to_display_fbf9ed1e: "Keine Ankündigungen anzuzeigen"
   no_assignment_group_assigned_8f1cdb9b: "Es wurde keine Aufgabengruppe zugewiesen."
   no_assignment_name_adbb215b: "Kein Aufgabenname"
   no_assignments_with_that_name_found_1d7be1: "Keine Aufgaben mit diesem Namen"
@@ -16416,6 +16419,7 @@ de:
   outcomes_import_completed_baff5cb0: "Ergebnisimport abgeschlossen"
   outcomes_import_failed_77efcdf4: "Ergebnisimport fehlgeschlagen"
   outcomes_report_8887bd49: Lernziele-Bericht
+  outcomes_service_alignment_migration_5b4391ad: "Migration für Serviceausrichtung für Lernziele"
   outcomes_tutorial_tray_ebfce995: "Fach für Lernziel-Tutorials"
   over_time_bee1a733: "im Lauf der Zeit"
   override_3de65b2c: "Außer Kraft setzen"
@@ -16679,6 +16683,11 @@ de:
         apps_index_endpoint: "Apps – Endpunkt indexieren"
         base_url: Basis-URL
         token: Zugangs-Token
+    apple: 
+      description: "Mit Apple anmelden"
+    apple_settings: 
+      labels: 
+        client_id: Service-ID
     assignment_freezer: 
       description: "Aufgabeneigenschaften beim Kopieren sperren"
       name: Aufgabeneigenschaften-Sperre
@@ -22525,6 +22534,7 @@ de:
   this_assignment_has_been_excused_87f1dc13: "Diese Aufgabe wurde entschuldigt."
   this_assignment_has_no_default_dates_ae314295: "Zu dieser Aufgabe gibt es keine voreingestellten Daten."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Für diese Aufgaben können keine Punkte vergeben werden, und sie können bei der Notenberechnung nicht berücksichtigt werden."
+  this_assignment_has_too_many_dates_to_display_262f555f: "Diese Aufgabe hat zu viele Daten zum Anzeigen."
   this_assignment_is_currently_being_moderated_ffd280f2: "Diese Aufgabe wird gerade moderiert."
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Diese Aufgabe ist derzeit deaktiviert. Das bedeutet, dass die Studenten ihre Noten und ihr Feedback nicht sehen können. Möchten Sie sie jetzt aktivieren?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Diese Aufgabe wurde gestrichen und fließt nicht in die Gesamtpunktzahl ein."
@@ -24638,6 +24648,9 @@ de:
   you_can_try_to_log_in_again_2b23ef0f: "Sie können versuchen, sich *erneut anzumelden*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Sie können bestimmte Daten des Benutzers aktualisieren, dieser kann die Änderungen jedoch rückgängig machen."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Sie können eine einzige 16x16-, 32x32-, 48x48-ICO-Datei verwenden."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Sie können verworfene Ankündigungen einsehen, indem Sie zu Konto gehen und im Menü Globale
+                  Ankündigungen auswählen.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Sie können Ihre Noten auf der Grundlage eines hypothetischen Punktestands betrachten, sodass Sie wissen, wie Ihre Noten durch kommende oder erneut übermittelte Aufgaben beeinflusst werden. Sie können die Punktestände für eine Aufgabe testen, die bereits einen Punktestand hat, oder eine, die noch nicht bewertet wurde."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Sie können einem Gruppendiskussionsthema keine Abschnitte zuweisen."
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Sie können einer Gruppe nicht außerhalb des Gruppensets der Aufgabe etwas zuweisen."
