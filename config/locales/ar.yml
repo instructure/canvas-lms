@@ -1084,7 +1084,7 @@ ar:
       account_reports: 
         default: 
           last_user_access: 
-            text: "يوضح هذا التقرير آخر عملية تسجيل دخول للمستخدمين النشطاء."
+            text: "يوضح هذا التقرير آخر عملية تسجيل دخول للمستخدمين النشطين. يرجى العلم بأن وقت آخر وصول تم تحديثه مرة واحدة كل 10 دقائق. هذا حدنا الحالي لتحديد النشاط لأي جلسة مستخدم محدد."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -12501,6 +12501,7 @@ ar:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "من أجل إتمام العملية، ستتم إعادة توجيهك إلى صفحة تسجيل الدخول أين ستحتاج لإعادة تسجيل الدخول باستخدام بيانات اعتماد طفلك."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "لكي تقوم باستيراد كمية هائلة من النواتج مرة واحدة، أو لتحديث النواتج الحالية، برجاء *اتباع تنسيق CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "نقاط جولات تدريبية داخل المنتج للمعلمين"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "نقاط جولات تدريبية داخل المنتج للمسؤولين والمعلمين والطلاب"
   in_progress_13b9e26f: "قيد التقدم"
   in_progress_646a8aef: "قيد التقدم"
   in_progress_9d1ce8b9: "قيد التقدم"
@@ -12531,6 +12532,7 @@ ar:
   include_unpublished_courses_7a0e7aab: "تضمين المساقات التي لم يتم نشرها"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "تضمين ارتباط إلى SpeedGrader في قائمة عنوان المهام في دفتر الدرجات."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "تشمل قيم الدرجات في تقارير درجات المسؤولين."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "تتضمن تنسيقات خدمة المخرجات عند تصدير واستيراد محتوى المساق"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "تشمل معايير التقييم في تنقل الشريط الجانبي للمساق"
   incomplete_95612d72: "غير مكتمل"
   incomplete_da3c2ea2: "غير مكتمل"
@@ -16188,6 +16190,7 @@ ar:
   no_74e9b590: لا
   no_alignments_are_available_for_this_outcome_7f8346f9: "لا توجد محاذاة متوفرة لهذه الحصيلة."
   no_announcements_280df147: "لا توجد إعلانات"
+  no_announcements_to_display_fbf9ed1e: "لا توجد إعلانات للعرض"
   no_assignment_group_assigned_8f1cdb9b: "لم يتم تعيين مجموعة مهام"
   no_assignment_name_adbb215b: "لا يوجد اسم مهة"
   no_assignments_with_that_name_found_1d7be1: "لم يتم العثور على مهام بذلك الاسم"
@@ -17098,6 +17101,7 @@ ar:
   outcomes_import_completed_baff5cb0: "تم إكمال استيراد النواتج"
   outcomes_import_failed_77efcdf4: "فشل استيراد النواتج"
   outcomes_report_8887bd49: "تقرير النواتج"
+  outcomes_service_alignment_migration_5b4391ad: "ترحيل تنسيق خدمة المخرجات"
   outcomes_tutorial_tray_ebfce995: "علبة البرنامج التعليمي للمخرجات"
   over_time_bee1a733: "بمرور الوقت"
   override_3de65b2c: التجاوز
@@ -17368,6 +17372,11 @@ ar:
         apps_index_endpoint: "فهرس نقطة نهاية التطبيقات"
         base_url: "URL الأساسي"
         token: "رمز الوصول المميز"
+    apple: 
+      description: "تسجيل الدخول باستخدام Apple"
+    apple_settings: 
+      labels: 
+        client_id: "معرف الخدمة"
     assignment_freezer: 
       description: "تجميد خصائص التعيين عند النسخ"
       name: "أداة تجميد خصائص التعيين"
@@ -23526,6 +23535,7 @@ ar:
   this_assignment_has_been_excused_87f1dc13: "هذه المهمة لم تعد إجبارية."
   this_assignment_has_no_default_dates_ae314295: "لا يوجد تواريخ افتراضية لهذه المهمة."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "هذه المهمة ليس بها نقاط ممكنة ولا يمكن تضمينها في حساب العلامات"
+  this_assignment_has_too_many_dates_to_display_262f555f: "تحتوي هذه المهمة على الكثير جدًا من التواريخ للعرض."
   this_assignment_is_currently_being_moderated_ffd280f2: "تخضع هذه المهمة للإشراف في الوقت الحالي"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "تم إخفاء هذه المهمة حاليًا. هذا يعني أن الطلاب لا يمكنهم رؤية درجاتهم والملاحظات الخاصة بهم. هل ترغب في إزالة الإخفاء الآن؟"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "تم حذف هذه المهمة ولن تؤخذ في الاعتبار أثناء الحساب الإجمالي"
@@ -25709,6 +25719,9 @@ ar:
   you_can_try_to_log_in_again_2b23ef0f: "يمكنك محاولة *تسجيل الدخول مرة أخرى*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "يمكنك تحديث بعض معلومات هذا المستخدم، لكن يمكنه تغييرها مرة أخرى إن أراد."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "يمكنك استخدام ملف أيقونة واحد بحجم 16x16 أو 32x32 أو 48x48."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      يمكنك عرض الإعلانات المرفوضة بالذهاب إلى الحساب وتحديد الإعلانات
+                  العالمية من القائمة.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "يمكنك عرض درجاتك بناءً على نقاط ماذا لو، بحيث يمكنك معرفة كيف تتأثر درجاتك من خلال المهام القادمة والمهام المعاد إرسالها. يمكنك اختبار النقاط لمهمة تحتوي على نقطة بالفعل أو لمهمة لم يتم بعد منحها علامة."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "لا يمكنك تعيين أقسام إلى موضوع نقاش جماعي"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "لا يمكنك القيام بتعيين لمجموعة خارج فئة مجموعات المهمة"
@@ -25818,6 +25831,9 @@ ar:
       سوف تحتاج لإنشاء [تطبيق جديد على Facebook](%{facebook_url})، وتمكين تسجيل دخول عميل OAuth
       في الإعدادات المتقدمة. عليك بتكوين %{callback_url} كعنوان URL الصالح لإعادة توجيه OAuth.
       بعد حفظ تطبيقك، قم بتدوين معرف التطبيق وكلمة سر التطبيق، ثم أدخلهما هنا.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      يجب إنشاء معرف الخدمة [Apple Developer Console](%{apple_url}).
+      قم بتمكين تسجيل الدخول باستخدام Apple وإضافة %{callback_url} كعنوان URL الخاص بالإرجاع. أدخل المعرف هنا.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       سوف تحتاج لإنشاء تطبيق ويب في [وحدة تحكم مطوّري Google](%{google_url}).
       عليك بإضافة %{callback_url} كعنوان URL لإعادة التوجيه.
