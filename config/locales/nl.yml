@@ -1048,7 +1048,7 @@ nl:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Dit rapport toont de laatste aanmelding voor actieve gebruikers."
+            text: "Dit rapport toont de laatste login voor actieve gebruikers. Het item Laatste toegang op, wordt elke 10 minuten bijgewerkt. Dit is onze huidige drempel om activiteit te bepalen voor een willekeurige gebruikerssessie."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -11981,6 +11981,7 @@ nl:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Om het proces te voltooien zul je doorgestuurd worden naar een inlogpagina waar je in moet loggen met de referenties van je kind."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "*Maak gebruik van de CSV-indeling* om in één keer een grote hoeveelheid leerdoelen te importeren of om je bestaande leerdoelen bij te werken."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "In het product opgenomen training en rondleiding voor cursusleiders"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Trainingrondleidingen van producten en tourpunten voor beheerders, docenten en cursisten"
   in_progress_13b9e26f: "in voortgang"
   in_progress_646a8aef: "In behandeling"
   in_progress_9d1ce8b9: "In voortgang"
@@ -12011,6 +12012,7 @@ nl:
   include_unpublished_courses_7a0e7aab: "Inclusief niet-gepubliceerde cursussen"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Neem een link op naar SpeedGrader in het menu van de opdrachtheader in de Cijferlijst."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Bevat cijferwaarden in de cijferrapporten voor beheerders."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Bevat Outcomes Service-uitlijningen bij exporteren en importeren van cursusinhoud"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Omvat rubrieken in de navigatie met de zijbalk van de cursus"
   incomplete_95612d72: "niet voltooid"
   incomplete_da3c2ea2: Incompleet
@@ -12891,7 +12893,7 @@ nl:
   login_logo_5eecf564: "Aanmelding logo"
   login_screen_83518c07: Aanmeldingsscherm
   login_with_auth_type_a0aaa52a: "Aanmelden met *%{auth_type}*"
-  login_with_provider_3fd3998e: "Aanmelden met %{provider}"
+  login_with_provider_3fd3998e: "Inloggen met %{provider}"
   loginrequest_encoded_url_44c49c18: "LoginRequest gecodeerde URL"
   loginrequest_xml_sent_to_idp_9fafd03a: "LoginRequest XML verzonden naar IdP"
   logins_9aee0cbe: Aanmeldingen
@@ -15583,6 +15585,7 @@ nl:
   no_74e9b590: nee
   no_alignments_are_available_for_this_outcome_7f8346f9: "Er zijn geen afstemmingen beschikbaar voor dit leerdoel."
   no_announcements_280df147: "Geen aankondigingen"
+  no_announcements_to_display_fbf9ed1e: "Geen aankondigingen om weer te geven"
   no_assignment_group_assigned_8f1cdb9b: "Geen opdrachtgroep toegewezen"
   no_assignment_name_adbb215b: "Geen opdrachtnaam"
   no_assignments_with_that_name_found_1d7be1: "Geen opdrachten met die naam gevonden"
@@ -16472,6 +16475,7 @@ nl:
   outcomes_import_completed_baff5cb0: "Importeren van leerdoelen voltooid"
   outcomes_import_failed_77efcdf4: "Importeren van leerdoelen mislukt"
   outcomes_report_8887bd49: "Rapport Leerresultaten"
+  outcomes_service_alignment_migration_5b4391ad: "Migratie van Outcomes Service-uitlijningen"
   outcomes_tutorial_tray_ebfce995: "Zelfstudiemenu Leerdoelen"
   over_time_bee1a733: "na verloop van tijd"
   override_3de65b2c: Overschrijving
@@ -16742,6 +16746,11 @@ nl:
         apps_index_endpoint: "Eindpunt app-index"
         base_url: Basis-URL
         token: Toegangstoken
+    apple: 
+      description: "Aanmelden met Apple"
+    apple_settings: 
+      labels: 
+        client_id: Service-ID
     assignment_freezer: 
       description: "Opdrachteigenschappen tijdens kopiëren blokkeren"
       name: "Eigenschap van opdracht blokkeren"
@@ -22610,6 +22619,7 @@ nl:
   this_assignment_has_been_excused_87f1dc13: "Deze opdracht is verwijderd."
   this_assignment_has_no_default_dates_ae314295: "Deze opdracht heeft geen standaarddatums."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Deze opdracht heeft geen mogelijke punten en kan niet in de cijferberekening worden opgenomen"
+  this_assignment_has_too_many_dates_to_display_262f555f: "Deze opdracht heeft te veel datums om weer te geven."
   this_assignment_is_currently_being_moderated_ffd280f2: "Deze opdracht wordt momenteel gemodereerd"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Deze opdracht is momenteel onzichtbaar. Dit betekent dat cursisten geen cijfers en feedback kunnen zien. Wil je de opdracht nu zichtbaar maken?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Deze opdracht is vervallen en wordt niet in overweging genomen voor de totale berekening"
@@ -24728,6 +24738,9 @@ nl:
   you_can_try_to_log_in_again_2b23ef0f: "Je kunt *nogmaals aanmelden* proberen."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Je kunt enkele gegevens van deze gebruiker bijwerken, maar deze gebruiker kan dit weer herstellen."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Je kunt een enkel 16x16, 32x32, 48x48 ico bestand gebruiken."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Je kunt verwijderde aankondigingen zien door naar Account te gaan en Algemene
+                  aankondigingen in het menu te selecteren.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Je kunt je cijfers bekijken op basis van wat-als-scores zodat je weet op welke manier je cijfers zullen worden beïnvloed door komende of opnieuw ingeleverde opdrachten. Je kunt scores testen voor een opdracht die al een score heeft of voor een opdracht die nog moet worden beoordeeld."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Je kunt geen secties toewijzen aan een onderwerp van een groepsdiscussie"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Je kunt niet aan een groep buiten de opdrachtgroep toewijzen."
@@ -24837,6 +24850,9 @@ nl:
       Je moet een [nieuwe app op Facebook](%{facebook_url}) maken, en Client OAuth Login inschakelen
       in Geavanceerde instellingen. Je moet %{callback_url} configureren als de Valid OAuth redirect URL.
       Na het opslaan van je app, noteer de App ID en App Geheim en voer ze hier in.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Je moet een service-ID maken [Apple Developer Console](%{apple_url}).
+      Schakel Aanmelden met Apple in en voeg %{callback_url} toe als een retour-URL. Voer hier de identifier in.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Je moet een webapplicatie in de [Google Developer Console](%{google_url}) aanmaken.
       Je moet %{callback_url} toevoegen als een redirect URI.
