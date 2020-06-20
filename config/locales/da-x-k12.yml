@@ -905,7 +905,7 @@ da-x-k12:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Rapporten viser det sidste login for aktive brugere."
+            text: "Rapporten viser det sidste login for aktive brugere. Bemærk, Sidst tilgået opdateres hvert 10. minut. Det er vores nuværende tærskel for at bestemme aktivitet for en given brugersession."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -10135,6 +10135,7 @@ da-x-k12:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "For at fuldende processen omdirigeres du til en login-side, hvor du skal logge på med dit barns brugeroplysninger."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "For at importere et stort antal læringsudbytter på én gang, eller for at opdatere dine eksisterende læringsudbytter, bedes du *følge CSV-formatet*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Træning om produkter og tour-punkter for lærere"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Træning om produkter og tour-punkter for admins, lærere og elever"
   in_progress_13b9e26f: "i gang"
   in_progress_9d1ce8b9: "I gang"
   inactive_cd40317f: Inaktiv
@@ -10159,6 +10160,7 @@ da-x-k12:
   include_unpublished_courses_7a0e7aab: "Inkluder ikke-offentliggjorte fag"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Indeholder et link til SpeedGrader i menuen Opgave-overskrift i vurderingsoversigten."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inkluderer vurderingsværdier i rapporterne om admin-vurderinger."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Inkluderer tjenestejusteringer for læringsudbytter ved eksport og import af fagindhold"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inkluderer vurderingskriterier i fagets sidelinjenavigation"
   incomplete_95612d72: ufuldstændig
   incomplete_da3c2ea2: Ufuldstændig
@@ -13286,6 +13288,7 @@ da-x-k12:
   no_74e9b590: Nej
   no_alignments_are_available_for_this_outcome_7f8346f9: "Der er ingen tilpasninger til dette læringsudbytte."
   no_announcements_280df147: "Ingen beskeder"
+  no_announcements_to_display_fbf9ed1e: "Ingen beskeder at vise"
   no_assignment_group_assigned_8f1cdb9b: "Ingen opgavegruppe tildelt"
   no_assignment_name_adbb215b: "Intet opgavenavn"
   no_assignments_with_that_name_found_1d7be1: "Ingen opgaver med dette navn fundet"
@@ -14106,6 +14109,7 @@ da-x-k12:
   outcomes_import_completed_baff5cb0: "Import af læringsudbytter afsluttet"
   outcomes_import_failed_77efcdf4: "Import af læringsudbytte mislykkedes"
   outcomes_report_8887bd49: Læringsudbytte-rapport
+  outcomes_service_alignment_migration_5b4391ad: "Overførsel af tjenestejustering for læringsudbytter"
   outcomes_tutorial_tray_ebfce995: "Selvstudiumområde for læringsudbytter"
   over_time_bee1a733: "over tid"
   override_3de65b2c: Tilsidesæt
@@ -14347,6 +14351,11 @@ da-x-k12:
         apps_index_endpoint: "Apps indeks slutpunkt"
         base_url: "Grundlæggende URL"
         token: Adgangs-token
+    apple: 
+      description: "Log ind med Apple"
+    apple_settings: 
+      labels: 
+        client_id: Tjeneste-ID
     assignment_freezer: 
       description: "Lås opgaveegenskaber på kopi"
       name: Opgavelåsning
@@ -19423,6 +19432,7 @@ da-x-k12:
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Denne opgave tæller ikke med i den endelige vurdering."
   this_assignment_has_been_excused_87f1dc13: "Denne opgave er blevet fritaget."
   this_assignment_has_no_default_dates_ae314295: "Denne opgave har ingen standarddatoer."
+  this_assignment_has_too_many_dates_to_display_262f555f: "Denne opgave har for mange datoer til at blive vist."
   this_assignment_is_currently_being_moderated_ffd280f2: "Denne opgave bliver for øjeblikket bedømt"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Denne opgave er tilbageholdt på nuværende tidspunkt. Det betyder, at eleverne ikke kan se deres vurderinger og feedback. Vil du gerne offentliggøre nu?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Opgaven blev droppet og tages ikke i betragtning i den samlede beregning"
@@ -21357,6 +21367,9 @@ da-x-k12:
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "Du kan ikke slette %{account_name} fordi den indeholder fag"
   you_can_try_to_log_in_again_2b23ef0f: "Du kan prøve at *logge på igen*."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Du kan bruge en enkel 16x16, 32x32, 48x48 ico-fil."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Du kan se afviste beskeder ved at gå til Konto og vælge Globale
+                  beskeder fra menuen.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Du kan se dine vurderinger baseret på hvad-nu-hvis-resultater, så du ved, hvordan dine vurderinger vil blive påvirket af kommende eller gen-afleverede opgaver. Du kan teste resultater af en opgave, der allerede omfatter et resultat, eller en opgave, der endnu ikke er blevet bedømt."
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Du kan ikke tildele en gruppe uden for opgavens studiegruppe"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan ikke redigere temaer på denne underkonto."
@@ -21455,6 +21468,9 @@ da-x-k12:
       Du skal oprette en [ny app på Facebook](%{facebook_url}) og aktivere Client OAuth Login
       i Avancerede indstillinger. Du skal konfigurere %{callback_url} som den gyldige OAuth omdirigerings-URI.
       Når du har gemt app'en, skal du notere dig App-id og App-hemmelighed og indtaste dem her.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Du skal oprette et tjeneste-ID [Apple Developer Console](%{apple_url}).
+      Aktivér Log ind med Apple, og tilføj %{callback_url} som retur-URL. Indtast identifikatoren her.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Du skal oprette et webprogram i [Google Developer Console](%{google_url}).
       Du skal tilføje %{callback_url} som omdirigerings-URI.
