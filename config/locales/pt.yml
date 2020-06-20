@@ -1049,7 +1049,7 @@ pt:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Este relatório mostra o último início de sessão de utilizadores ativos."
+            text: "Este relatório mostra o último início de sessão de utilizadores ativos. Por favor note que o Last Access At é atualizado uma vez a cada 10 minutos. Este é o nosso limite actual para determinar a atividade para qualquer sessão de utilizador."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -12004,6 +12004,7 @@ pt:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Para poder completar o processo, vai ser redireccionado para uma página de entrada onde precisa de registar com as credenciais do seu filho."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Para importar uma grande quantidade de resultados ao mesmo tempo, ou para atualizar os resultados existentes, *siga o formato CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Passeios e pontos turísticos de formação no produto para professores"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Passeios e pontos turísticos de formação in-product para administradores, professores e estudantes"
   in_progress_13b9e26f: "em progresso"
   in_progress_646a8aef: "Em andamento"
   in_progress_9d1ce8b9: "Em curso"
@@ -12034,6 +12035,7 @@ pt:
   include_unpublished_courses_7a0e7aab: "Incluir Disciplinas não publicadas"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inclui uma ligação para SpeedGrader no menu do cabeçalho da atribuição no livro de avaliação."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inclui valores de classificação nos relatórios de classificação administrativas."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Inclui alinhamentos de Serviços de Resultados ao exportar e importar conteúdo do curso"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inclui as rubricas da navegação da barra lateral da disciplina"
   incomplete_95612d72: incompleto
   incomplete_da3c2ea2: Incompleto
@@ -12919,7 +12921,7 @@ pt:
   login_logo_5eecf564: "Logótipo de Registo"
   login_screen_83518c07: "Ecrã de Registo"
   login_with_auth_type_a0aaa52a: "Registar com *%{auth_type}*"
-  login_with_provider_3fd3998e: "Registar com %{provider}"
+  login_with_provider_3fd3998e: "Login com %{provider}"
   loginrequest_encoded_url_44c49c18: "LoginRequest URL codificado"
   loginrequest_xml_sent_to_idp_9fafd03a: "LoginRequest XML enviado para IdP"
   logins_9aee0cbe: Logins
@@ -15610,6 +15612,7 @@ pt:
   no_74e9b590: não
   no_alignments_are_available_for_this_outcome_7f8346f9: "Nenhum alinhamento está disponível para esse resultado."
   no_announcements_280df147: "Sem anúncios"
+  no_announcements_to_display_fbf9ed1e: "Sem anúncios a exibir"
   no_assignment_group_assigned_8f1cdb9b: "Nenhum grupo de atribuições atribuído"
   no_assignment_name_adbb215b: "Nenhum nome de tarefa"
   no_assignments_with_that_name_found_1d7be1: "Nenhuma tarefa com esse nome encontrado"
@@ -16504,6 +16507,7 @@ pt:
   outcomes_import_completed_baff5cb0: "Importação de resultados concluída"
   outcomes_import_failed_77efcdf4: "Falha na Importação de Resultados"
   outcomes_report_8887bd49: "Relatório de resultados"
+  outcomes_service_alignment_migration_5b4391ad: "Migração de Alinhamento de Serviços de Resultados"
   outcomes_tutorial_tray_ebfce995: "Bandeja Tutorial de Resultados"
   over_time_bee1a733: "ao longo do tempo"
   override_3de65b2c: Sobrepor
@@ -16774,6 +16778,11 @@ pt:
         apps_index_endpoint: "Terminal de índice de aplicativos"
         base_url: "URL base"
         token: "Token de acesso"
+    apple: 
+      description: "Iniciar Sessão com a Apple"
+    apple_settings: 
+      labels: 
+        client_id: "ID do serviço"
     assignment_freezer: 
       description: "Reter propriedades de tarefas ao copiar"
       name: "Retentor de propriedades de tarefas"
@@ -22656,6 +22665,7 @@ pt:
   this_assignment_has_been_excused_87f1dc13: "Esta tarefa foi dispensada."
   this_assignment_has_no_default_dates_ae314295: "Esta atribuição não tem datas predefinidas."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Esta tarefa não tem pontos possíveis e não pode ser incluída no cálculo do classificação"
+  this_assignment_has_too_many_dates_to_display_262f555f: "Esta tarefa tem demasiadas datas para mostrar."
   this_assignment_is_currently_being_moderated_ffd280f2: "Esta tarefa está sendo moderada no momento"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Esta atribuição está atualmente desativada. Isso significa que os alunos não podem ver suas notas e feedback. Gostaria de ativar agora?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Esta tarefa foi cancelada e não será considerada no cálculo total"
@@ -24786,6 +24796,9 @@ pt:
   you_can_try_to_log_in_again_2b23ef0f: "Pode tentar *registar novamente*"
   you_can_update_some_of_this_user_s_information_but_8e99a045: "É possível atualizar algumas informações deste usuário, mas ele pode revertê-las, se quiser."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Pode utilizar um um único ficheiro ico 16x16, 32x32, 48x48."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Pode ver os anúncios rejeitados ao ir a Conta e seleccionar Anúncios
+                  Globais no menu.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Você pode ver suas notas com base nas pontuações What-If, para que você saiba como as notas serão afetadas por trabalhos futuros ou reenviados. Você pode testar pontuação para uma atribuição que já inclui uma pontuação, ou uma atribuição que ainda tem de ser classificada."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Você não pode atribuir seções a um tópico de discussão em grupo"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Não pode designar um grupo fora do conjunto de grupos de tarefas"
@@ -24895,6 +24908,9 @@ pt:
       Vai precisar de criar uma [nova aplicação no Facebook](%{facebook_url}), e permitir o Registo Cliente OAuth
       nas Definições Avançadas. Deve configurar %{callback_url} como um URL de redireção OAuth Válida.
       Depois de guardar a sua aplicação, crie uma nota da ID da App e a  Palavra Secreta da App, e insira-os aqui.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Você precisará criar um ID de Serviço [Console de Desenvolvedor Apple](%{apple_url}).
+      Permitir Entrar com Apple, e adicionar %{callback_url} como um URL de retorno. Introduza o Identificador aqui.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Vai precisar de criar uma aplicação web na [Consola de Desenvolvimento Google](%{google_url}).
       Deve adicionar %{callback_url} como um URL de redirecionamento.
