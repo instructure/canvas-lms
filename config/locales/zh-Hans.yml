@@ -1048,7 +1048,7 @@ zh-Hans:
       account_reports: 
         default: 
           last_user_access: 
-            text: 此报告显示活动用户的上次登录信息。
+            text: "此报告显示活动用户的上次登录信息。请注意，上次访问时间每 10 分钟更新一次。这是我们用于确定任意指定用户会话的活动的最新阈值。"
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -11974,6 +11974,7 @@ zh-Hans:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: 为了完成过程，您将被重新导向到要与您孩子验证登录的页面。
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: 要一次性导入大量结果，或更新现有结果，请*使用CSV格式*。
   in_product_training_walkthrough_and_tourpoints_for_2e185119: 产品内培训演示和教师导览点
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: 面向管理员、教师和学生的产品内培训介绍和导览要点
   in_progress_13b9e26f: 进行中
   in_progress_646a8aef: 进行中
   in_progress_9d1ce8b9: 进行中
@@ -12004,6 +12005,7 @@ zh-Hans:
   include_unpublished_courses_7a0e7aab: 包括未公开的课程
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: 在评分册的作业标头菜单中包含到SpeedGrader的链接。
   includes_grade_values_in_the_admin_grade_reports_a28200da: 在管理员评分报告中包含评分值。
+  includes_outcomes_service_alignments_when_exportin_6c578a35: 在导出和导入课程内容时包括结果服务对齐
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: 在课程侧栏导航中包括评价量规
   incomplete_95612d72: 未完成
   incomplete_da3c2ea2: 未完成
@@ -12884,7 +12886,7 @@ zh-Hans:
   login_logo_5eecf564: 登录标识
   login_screen_83518c07: 登录屏幕
   login_with_auth_type_a0aaa52a: "使用*%{auth_type}*登录"
-  login_with_provider_3fd3998e: "使用%{provider}登录"
+  login_with_provider_3fd3998e: "使用 %{provider} 帐户登录"
   loginrequest_encoded_url_44c49c18: "LoginRequest编码 URL"
   loginrequest_xml_sent_to_idp_9fafd03a: "LoginRequestXML 已发送到IdP"
   logins_9aee0cbe: 登录
@@ -15576,6 +15578,7 @@ zh-Hans:
   no_74e9b590: 否
   no_alignments_are_available_for_this_outcome_7f8346f9: 此成果无可用调整。
   no_announcements_280df147: 无公告
+  no_announcements_to_display_fbf9ed1e: 没有要显示的公告
   no_assignment_group_assigned_8f1cdb9b: 未分配作业组
   no_assignment_name_adbb215b: 无作业名称
   no_assignments_with_that_name_found_1d7be1: 该姓名下没有找到作业
@@ -16465,6 +16468,7 @@ zh-Hans:
   outcomes_import_completed_baff5cb0: 结果导入完成
   outcomes_import_failed_77efcdf4: 结果导入失败
   outcomes_report_8887bd49: 结果报告
+  outcomes_service_alignment_migration_5b4391ad: 结果服务对齐迁移
   outcomes_tutorial_tray_ebfce995: 结果教程托盘
   over_time_bee1a733: 随时间推移
   override_3de65b2c: 覆盖
@@ -16735,6 +16739,11 @@ zh-Hans:
         apps_index_endpoint: 应用程序索引端点
         base_url: "库 URL"
         token: 访问许可证
+    apple: 
+      description: "使用 Apple 帐户登录"
+    apple_settings: 
+      labels: 
+        client_id: "服务 ID"
     assignment_freezer: 
       description: 复制时冻结作业属性
       name: 作业属性冻结程序
@@ -22591,6 +22600,7 @@ zh-Hans:
   this_assignment_has_been_excused_87f1dc13: 这个作业已被免除。
   this_assignment_has_no_default_dates_ae314295: 此作业没有默认日期。
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: 该作业没有可能得分，无法包含在评分计算中
+  this_assignment_has_too_many_dates_to_display_262f555f: 此作业要显示的日期太多。
   this_assignment_is_currently_being_moderated_ffd280f2: 此作业目前正在核对
   this_assignment_is_currently_muted_that_means_stud_94d63139: 该作业目前已屏蔽。这意味着学生无法看到他们的评分和反馈。现在要取消屏蔽吗？
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: 这个作业被丢弃，但不会影响总计算。
@@ -24704,6 +24714,9 @@ zh-Hans:
   you_can_try_to_log_in_again_2b23ef0f: 您可以尝试*再次登录*。
   you_can_update_some_of_this_user_s_information_but_8e99a045: 您可以更新该用户的一些信息，但如果他们选择，他们可以改回来。
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "您可以使用一个16×1632×32，48×48 图标的文件。"
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      您可以通过转到“帐户”并从菜单中选择全局
+                  公告的方式查看被拒绝的公告。
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: 您可以查看基于假设分数的评分，以便您知道即将提交或重新提交的作业对评分会有怎样的影响。您可以测试已经包含分数或等待评分的作业的分数。
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: 您没有分配分组给一个小组讨论主题
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: 您不能指定一个作业小组集外的小组
@@ -24813,6 +24826,9 @@ zh-Hans:
       您将需要创建[新的Facebook应用程序](%{facebook_url})，以及在高级设置启用客户OAuth 登录
       作为有效的OAuth，您应重新定向URI配置 %{callback_url}。
       在保存您的应用程序后，您记下应用程序的ID和应用程序的密钥，并在此输入它们。
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      您需创建服务 ID [Apple 开发人员控制台](%{apple_url})。
+      启动使用 Apple 帐户登录，并且添加 %{callback_url} 为返回 URL。在这里输入标识符。
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       您将要在[谷歌开发者控制台]创建网络应用程序 [Google Developer Console](%{google_url})。
       您应该添加 %{callback_url} 作为重新定向URI。
