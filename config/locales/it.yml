@@ -978,7 +978,7 @@ it:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Questo report mostra l'ultimo accesso per gli utenti attivi."
+            text: "Questo report mostra l'ultimo accesso per gli utenti attivi. “Ultimo accesso alle” viene aggiornato ogni 10 minuti. Questa è la nostra soglia attuale per determinare l’attività di ogni sessione utente."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -10436,6 +10436,7 @@ it:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Per completare il processo, verrai reindirizzato a una pagina di accesso in cui devi effettuare l'accesso con le credenziali dell'elemento secondario."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Per importare più esiti contemporaneamente o aggiornare gli esiti esistenti, *segui il formato CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Percorso di formazione dedicato ai prodotti e tour per gli insegnanti"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Formazione guidata sul prodotto e punti di vista per amministratori, insegnanti e studenti"
   in_progress_13b9e26f: "in corso"
   in_progress_9d1ce8b9: "In corso"
   inactive_cd40317f: inattivo
@@ -10460,6 +10461,7 @@ it:
   include_unpublished_courses_7a0e7aab: "Includi corsi non pubblicati"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Include un link verso SpeedGrader nel menu dell’intestazione dei compiti del Registro dei voti."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Include i valori dei voti nei report dei voti admin"
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Include gli allineamenti del servizio dei risultati quando si esporta o importa contenuto del corso."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Include la rubrica nell’esplorazione corso con barra laterale"
   incomplete_95612d72: "non completato"
   incomplete_da3c2ea2: "Non completato"
@@ -13628,6 +13630,7 @@ it:
   no_74e9b590: "no"
   no_alignments_are_available_for_this_outcome_7f8346f9: "Nessun allineamento disponibile per questo esito."
   no_announcements_280df147: "Nessun annuncio"
+  no_announcements_to_display_fbf9ed1e: "Nessun annuncio da visualizzare"
   no_assignment_group_assigned_8f1cdb9b: "Nessun gruppo di compiti assegnato"
   no_assignment_name_adbb215b: "Nessun nome compito"
   no_assignments_with_that_name_found_1d7be1: "Non è stato trovato nessun compito con il nome specificato"
@@ -14462,6 +14465,7 @@ it:
   outcomes_import_completed_baff5cb0: "Importazione esiti completata"
   outcomes_import_failed_77efcdf4: "Importazione esiti non riuscita"
   outcomes_report_8887bd49: "Report esiti"
+  outcomes_service_alignment_migration_5b4391ad: "Migrazione allineamento del servizio dei risultati"
   outcomes_tutorial_tray_ebfce995: "Riquadro tutorial dei risultati"
   over_time_bee1a733: "nel tempo"
   override_3de65b2c: Override
@@ -14717,6 +14721,11 @@ it:
         apps_index_endpoint: "Endpoint indice app"
         base_url: "URL di base"
         token: "Token di accesso"
+    apple: 
+      description: "Accedi con Apple"
+    apple_settings: 
+      labels: 
+        client_id: "ID servizio"
     assignment_freezer: 
       description: "Blocca proprietà compito su copia"
       name: "Blocco proprietà compito"
@@ -19906,6 +19915,7 @@ it:
   this_assignment_has_been_excused_87f1dc13: "Questo compito è stato giustificato."
   this_assignment_has_no_default_dates_ae314295: "Questo compito non ha date predefinite."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Questo compito non ha punti possibili e non può essere incluso nel calcolo dei voti"
+  this_assignment_has_too_many_dates_to_display_262f555f: "Questo compito ha troppe date da visualizzare."
   this_assignment_is_currently_being_moderated_ffd280f2: "Questo compito è attualmente in fase di moderazione"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Questo compito è al momento disattivato. Questo significa che gli studenti non possono vedere i loro voti e il feedback. Vuoi eseguire l'attivazione ora?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Questo compito è stato eliminato e non verrà considerato nel calcolo totale"
@@ -21887,6 +21897,9 @@ it:
   you_can_try_to_log_in_again_2b23ef0f: "Puoi provare ad *accedere di nuovo*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Puoi aggiornare alcune informazioni di questo utente, ma quest'ultimo può modificarle se lo desidera."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Puoi utilizzare un singolo file ico 16x16, 32x32, 48x48."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Puoi visualizzare gli annunci ignorati in Account, selezionando Annunci
+                  Globali nel menù.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Puoi visualizzare i tuoi voti in base a punteggi What-If in modo da poter conoscere l'impatto che i compiti in programma o riconsegnati avranno sui voti. Puoi testare i punteggi per un compito che include già un punteggio o un compito ancora da valutare."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Non puoi assegnare sezioni a un argomento di discussione di gruppo"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Non puoi assegnare a un gruppo al di fuori del set di gruppi del compito"
@@ -21987,6 +22000,9 @@ it:
       Devi creare una [nuova app su Facebook](%{facebook_url}) e abilitare l'accesso client OAuth
       nelle Impostazioni avanzate.  Devi configurare %{callback_url} come URI di reindirizzamento OAuth valido.
       Dopo aver salvato l'app, annota l'ID e il segreto dell'app e inseriscili qui.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Devi creare un ID servizio [Console sviluppatori Apple](%{apple_url}).
+      Abilita l’accesso con Apple e aggiungi %{callback_url} come URL di ritorno. Inserisci l’Identificatore qui.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Devi creare un'applicazione web nella [Google Developer Console](%{google_url}).
       Devi aggiungere %{callback_url} come URI di reindirizzamento.
