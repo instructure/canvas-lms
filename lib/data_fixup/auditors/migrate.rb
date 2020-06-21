@@ -476,6 +476,7 @@ module DataFixup::Auditors
       end
 
       def filter_dead_foreign_keys(attrs_list)
+        user_ids = attrs_list.map{|a| a['user_id'] }
         existing_user_ids = existing_user_ids_from(attrs_list.map{|a| a['user_id'] })
         missing_uids = user_ids - existing_user_ids
         attrs_list.reject {|h| missing_uids.include?(h['user_id']) }
