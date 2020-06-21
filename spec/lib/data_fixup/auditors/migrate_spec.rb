@@ -142,6 +142,20 @@ module DataFixup::Auditors::Migrate
       expect(filtered[1]['submission_id']).to eq(submission.id)
     end
 
+    it "handles missing users in course records" do
+      course = course_model
+      user = user_model
+      expect(course.id).to_not be_nil
+      expect(user.id).to_not be_nil
+      worker = CourseWorker.new(account.id, Time.now.utc)
+      filtered = worker.filter_dead_foreign_keys([
+        {'course_id' => course.id, 'user_id' => user.id},
+        {'course_id' => course.id, 'user_id' => nil},
+      ])
+      expect(filtered.size).to eq(1)
+      expect(filtered[0]['user_id']).to eq(user.id)
+    end
+
     it "writes course data to postgres that's in cassandra" do
       ::Auditors::ActiveRecord::CourseRecord.delete_all
       user_with_pseudonym(active_all: true)
