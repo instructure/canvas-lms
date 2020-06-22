@@ -97,6 +97,11 @@ module Types
       end
     end
 
+    field :trophies, [TrophyType], null: true
+    def trophies
+      load_association(:trophies)
+    end
+
     # TODO: deprecate this
     #
     # we should probably have some kind of top-level field called `self` or
