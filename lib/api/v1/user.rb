@@ -301,7 +301,7 @@ module Api::V1::User
         json[:sis_user_id] = pseudonym.try(:sis_user_id)
       end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
-      user_includes = includes & %w[avatar_url group_ids uuid]
+      user_includes = includes & %w[avatar_url group_ids uuid email]
 
       json[:user] = user_json(enrollment.user, user, session, user_includes, @context, nil, []) if includes.include?(:user)
       if includes.include?("locked")
