@@ -1067,7 +1067,7 @@ pl:
       account_reports: 
         default: 
           last_user_access: 
-            text: "W raporcie przedstawiono ostatnie logowanie dla aktywnych użytkowników."
+            text: "W raporcie przedstawiono ostatnie logowanie dla aktywnych użytkowników. Uwaga: informacja o najnowszym dostępie jest aktualizowana co 10 minut. Za pomocą tego progu ustalamy aktywność w danej sesji użytkownika."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -12243,6 +12243,7 @@ pl:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Aby zakończyć proces, zostaniesz przekierowany do strony logowania, gdzie musisz się zalogować przy użyciu poświadczeń twojego dziecka."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Aby zaimportować dużą liczbę wyników na raz lub zaktualizować istniejące wyniki, należy *użyć formatu CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Szkolenie z zakresu produktu oraz zagadnienia dla nauczycieli"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Szkolenie z zakresu produktu oraz zagadnienia dla nauczycieli, administratorów i uczestników"
   in_progress_13b9e26f: "w toku"
   in_progress_646a8aef: "W trakcie"
   in_progress_9d1ce8b9: "W trakcie"
@@ -12273,6 +12274,7 @@ pl:
   include_unpublished_courses_7a0e7aab: "Uzwględnij nieopublikowane kursy"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Dodaj łącze do SpeedGrader w menu nagłówka zadania w Dzienniku ocen."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Uwzględnia wartości ocen w raportach ocen administratora."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Obejmuje dostosowania usługi Outcomes podczas eksportowania i importowania zawartości kursu"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Uwzględnia kryteria ocen w pasku bocznym nawigacji kursu"
   incomplete_95612d72: nieukończony
   incomplete_da3c2ea2: "Nie ukończono"
@@ -15892,6 +15894,7 @@ pl:
   no_74e9b590: nie
   no_alignments_are_available_for_this_outcome_7f8346f9: "Brak dopasowań dla tego wyniku."
   no_announcements_280df147: "Brak ogłoszeń"
+  no_announcements_to_display_fbf9ed1e: "Brak ogłoszeń do wyświetlenia"
   no_assignment_group_assigned_8f1cdb9b: "Nie znaleziono przypisanej grupy zadań"
   no_assignment_name_adbb215b: "Brak nazwy zadania"
   no_assignments_with_that_name_found_1d7be1: "Brak testów z taką nazwą"
@@ -16798,6 +16801,7 @@ pl:
   outcomes_import_completed_baff5cb0: "Ukończono importowanie wyników"
   outcomes_import_failed_77efcdf4: "Nie udało się zaimportować wyników"
   outcomes_report_8887bd49: "Raport wyników"
+  outcomes_service_alignment_migration_5b4391ad: "Migracja dostosowania usługi Outcomes"
   outcomes_tutorial_tray_ebfce995: "Panel samouczka dot. wyników"
   over_time_bee1a733: "z okresu"
   override_3de65b2c: Nadpis
@@ -17068,6 +17072,11 @@ pl:
         apps_index_endpoint: "Wykaz aplikacji, punkt końcowy"
         base_url: "Podstawowy adres URL"
         token: "Token dostępu"
+    apple: 
+      description: "Zaloguj się z Apple"
+    apple_settings: 
+      labels: 
+        client_id: "Identyfikator usługi"
     assignment_freezer: 
       description: "Zamróź właściwości zadania dla kopii"
       name: "Zamrażarka właściwości zadania"
@@ -23070,6 +23079,7 @@ pl:
   this_assignment_has_been_excused_87f1dc13: "To zadanie zostało usprawiedliwione."
   this_assignment_has_no_default_dates_ae314295: "To zadanie nie posiada domyślnych dat."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "To zadanie nie ma punktów do uzyskania, dlatego nie można go uwzględnić w obliczaniu ocen"
+  this_assignment_has_too_many_dates_to_display_262f555f: "To zadanie ma zbyt wiele dat do wyświetlenia."
   this_assignment_is_currently_being_moderated_ffd280f2: "To zadanie jest obecnie moderowane"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "To zadanie jest obecnie wyciszone. Oznacza to, że uczniowie nie mogą zobaczyć swoich ocen ani informacji zwrotnej. Czy chcesz teraz zmienić stan tego zadania?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "To zadanie zostało opuszczone i nie zostanie wliczone w ostateczny wynik"
@@ -25230,6 +25240,9 @@ pl:
   you_can_try_to_log_in_again_2b23ef0f: "Spróbuj *zalogować się ponownie*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Możesz aktualizować niektóre informacje o użytkownikach, ale oni mogą je zmienić ponownie."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Możesz użyc pojedyńczego pliku ico 16x16, 32x32, 48x48."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Można wyświetlić odrzucone ogłoszenia, przechodząc do konta i wybierając pozycję Globalne
+                  ogłoszenia z menu.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Możesz wyświetlać swoje oceny w oparciu o wyniki teoretyczne, aby dowiedzieć się, jaki wpływ na oceny będą miały najbliższe lub ponownie przesłane zadania. Możesz testować wyniki dla zadania, które zostało lub dopiero zostanie ocenione."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Nie można przydzielić sekcji do tematu dyskusji w grupie"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Nie możesz przypisywać do grupy poza ustaloną grupą przydziału"
@@ -25339,6 +25352,9 @@ pl:
       Musisz stworzyć [nową aplikację na Facebook](%{facebook_url}), i umożliwić Login Klienta OAuth
       w Ustawieniach zaawansowanych. Musisz skonfigurować %{callback_url} jako Ważne OAuth przekierowanie URL.
       Po zapisaniu swojej aplikacji,  zanotuj Identyfikator klienta i Tajny klucz klienta i wpisz je poniżej.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Wymagane jest utworzenie identyfikatora usługi [konsola programisty Apple](%{apple_url}).
+      Włącz logowanie w Apple oraz dodaj %{callback_url} jako powrotny adres URL. Wpisz tutaj identyfikator.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Musisz stworzyć aplikację internetową w [Google Developer Console](%{google_url}).
       Musisz dodać %{callback_url}  jako adres URL do przekierowania.

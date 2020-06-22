@@ -1047,7 +1047,7 @@ sv:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Rapporten visar senaste inloggningen för aktiva användare."
+            text: "Den här rapporten visar senaste inloggningen för aktiva användare. Observera att Senaste åtkomst uppdateras var 10:e minut. Detta är vårt aktuella tröskelvärde för att avgöra aktiviteten för alla användarsessioner."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -12008,6 +12008,7 @@ sv:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "För att slutföra processen kommer du att omdirigeras till en inloggningssida där du måste logga in med ditt barns inloggningsuppgifter."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "För att importera en stor mängd lärandemål på en gång, eller för att uppdatera dina befintliga lärandemål, *använd dig av CSV-formatet*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Genomgång av produkten med hållpunkter för lärare"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Genomgång av produkten med hållpunkter föradministratörer, lärare och studenter"
   in_progress_13b9e26f: pågår
   in_progress_646a8aef: Pågår
   in_progress_9d1ce8b9: Pågår
@@ -12038,6 +12039,7 @@ sv:
   include_unpublished_courses_7a0e7aab: "Inkludera avpublicerade kurser"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inkluderar en länk till SpeedGrader i rubrikmenyn för uppgiften i bedömningsöversikten."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Innehåller bedömningsvärden i administratörsomdömesrapporterna."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Innehåller tjänstjusteringar för lärandemål vid export och import av kursinnehåll"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Innehåller matriser i kursens sidofältsnavigering"
   incomplete_95612d72: "ej fullständig"
   incomplete_da3c2ea2: Ofullständig
@@ -15617,6 +15619,7 @@ sv:
   no_74e9b590: nej
   no_alignments_are_available_for_this_outcome_7f8346f9: "Det finns inga justeringar tillgängliga för det här lärandemålet."
   no_announcements_280df147: "Inga anslag"
+  no_announcements_to_display_fbf9ed1e: "Inga meddelanden att visa"
   no_assignment_group_assigned_8f1cdb9b: "Ingen uppgiftsgrupp har tilldelats"
   no_assignment_name_adbb215b: "Inget namn på uppgift"
   no_assignments_with_that_name_found_1d7be1: "Inga uppgifter med det namnet hittades"
@@ -16509,6 +16512,7 @@ sv:
   outcomes_import_completed_baff5cb0: "Resultatimport färdig"
   outcomes_import_failed_77efcdf4: "Resultatimport misslyckades"
   outcomes_report_8887bd49: Lärandemålsrapport
+  outcomes_service_alignment_migration_5b4391ad: "Migrering av tjänstjsuteringar för lärandemål"
   outcomes_tutorial_tray_ebfce995: "Självstudiefält för lärandemål"
   over_time_bee1a733: "med tiden"
   override_3de65b2c: Åsidosätt
@@ -16779,6 +16783,11 @@ sv:
         apps_index_endpoint: "Appars indexslutpunkt"
         base_url: "Bas URL"
         token: Åtkomsttoken
+    apple: 
+      description: "Logga in med Apple"
+    apple_settings: 
+      labels: 
+        client_id: Tjänst-ID
     assignment_freezer: 
       description: "Frys uppgiftsegenskap vid kopiering"
       name: "Frysning av uppgiftsegenskap"
@@ -22635,6 +22644,7 @@ sv:
   this_assignment_has_been_excused_87f1dc13: "Den här uppgiften har ursäktats: "
   this_assignment_has_no_default_dates_ae314295: "Den här uppgiften saknar standarddatum."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Denna uppgift har inga möjliga poäng och kan inte ingå i betygskalkylering"
+  this_assignment_has_too_many_dates_to_display_262f555f: "Den här uppgiften har för många datum för visning."
   this_assignment_is_currently_being_moderated_ffd280f2: "Den här uppgiften modereras för närvarande"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Den här uppgiften är för närvarande tystad. Det innebär att studenter kan se sina betyg och sin feedback. Vill du av-tysta den nu?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Den här uppgiften har utelämnats och kommer inte att räknas in i den totala uträkningen."
@@ -24755,6 +24765,9 @@ sv:
   you_can_try_to_log_in_again_2b23ef0f: "Du kan försöka att *logga in igen*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Du kan uppdatera en del av användarens information, men de kan ändra tillbaka den om de vill."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Du kan använda en enstaka 16x16, 32x32, 48x48 ico fil"
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Du kan visa avvisade meddelanden genom att gå till Konto och välja Global
+                  Meddelanden från menyn.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Du kan granska dina betyg baserat på Tänk om-resultat så att du vet hur bedömningen påverkas av kommande uppgifter eller uppgifter som inlämnats på nytt. Du kan testa resultaten för en uppgift som redan inkluderar ett resultat, eller en uppgift som ännu inte har bedömts."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Du kan inte tilldela avsnitt till ett gruppdiskussionsämne"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Du kan inte tilldela en grupp utanför uppgiftens gruppuppsättning"
@@ -24864,6 +24877,9 @@ sv:
       Du måste skapa en [ny app på Facebook](%{facebook_url}), och aktivera Client OAuth-inloggning
       i avancerade inställningar.  Du bör konfigurera %{callback_url} som giltig OAuth-omdirigeringslänk.
       När du sparat appen ska du anteckna App-ID och APP-hemlighet och ange dem här.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Du måste skapa ett tjänst-ID [Apple Developer Console](%{apple_url}).
+      Aktivera Logga in med Apple och lägg till %{callback_url} som en retur-URL. Ange identifierarna här.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Du måste skapa en webbapplikation i [Google Developer Console](%{google_url}).
       Du bör lägga till %{callback_url} som en omdirigerande URL.

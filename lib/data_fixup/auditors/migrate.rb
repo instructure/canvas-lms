@@ -476,6 +476,7 @@ module DataFixup::Auditors
       end
 
       def filter_dead_foreign_keys(attrs_list)
+        user_ids = attrs_list.map{|a| a['user_id'] }
         existing_user_ids = existing_user_ids_from(attrs_list.map{|a| a['user_id'] })
         missing_uids = user_ids - existing_user_ids
         attrs_list.reject {|h| missing_uids.include?(h['user_id']) }
@@ -830,8 +831,8 @@ module DataFixup::Auditors
 
       def slim_accounts
         return @_accounts if @_accounts
-        root_account_ids = Account.root_accounts.active.pluck(:id)
-        @_accounts = Account.active.where(
+        root_account_ids = Account.root_accounts.active.non_shadow.pluck(:id)
+        @_accounts = Account.active.non_shadow.where(
           "root_account_id IS NULL OR root_account_id IN (?)", root_account_ids
         ).select(:id, :root_account_id)
       end

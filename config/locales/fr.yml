@@ -1048,7 +1048,7 @@ fr:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Ce rapport indique la dernière connexion des utilisateurs actifs."
+            text: "Ce rapport indique la dernière connexion des utilisateurs actifs. À noter : La valeur « Accédé pour la dernière fois à » est mise à jour toutes les 10 minutes. Il s'agit du seuil actuel en matière de détermination de l’activité sur une session utilisateur."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -2065,7 +2065,7 @@ fr:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permet aux enseignants / concepteurs / AE d'accéder à l'outil de Chat."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permet aux rôles basés sur l'enseignant / AE d'accéder à l'outil Présence."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Permet aux rôles basés sur l'enseignant, AE d'accéder à l'outil Présence."
-  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Autoriser les enseignants à cacher les sections de cours aux élèves sur la page « Personnes » lorsqu’il y a plusieurs sections dans un cours."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Autoriser les enseignants à cacher les sections de cours aux élèves sur la page « Personnes » lorsqu’il y a plusieurs sections dans un cours."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permettre aux professeurs de marquer les données de notes comme prêtes à un export global pour leurs intégrations au système d'information des étudiants."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Permet aux enseignants de définir des politiques de publication pour ce cours ou pour des travaux spécifiques, permettant que les notes soient
@@ -7148,7 +7148,7 @@ fr:
         grading_standard_enabled: "Activer le système de notation de cours"
         hide_distribution_graphs: "Ne pas montrer les graphiques de répartition des notes aux étudiants"
         hide_final_grades: "Masquer les totaux dans le résumé des notes de l’étudiant"
-        hide_sections_on_course_users_page: "Cacher les sections aux élèves dans la page « Personnes »"
+        hide_sections_on_course_users_page: "Cacher les sections aux élèves dans la page « Personnes »"
         home_page_announcement_limit: "Nombre d'annonces affichées sur la page d'accueil"
         image: Image
         indexed: "Inclure ce cours dans l’index de cours public"
@@ -11988,6 +11988,7 @@ fr:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Afin de compléter la procédure, vous allez être redirigé vers une page de connexion, sur laquelle vous devrez vous connecter avec les identifiants de votre enfant."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Afin d'importer une grande quantité de résultats à la fois, ou de mettre à jour vos résultats existants, veuillez *suivre le format CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Démonstration et visites guidées au sein du produit pour les enseignants"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Démonstration et visites guidées au sein du produit pour les administrateurs, les enseignants et les élèves"
   in_progress_13b9e26f: "en cours"
   in_progress_646a8aef: "En cours"
   in_progress_9d1ce8b9: "En cours"
@@ -12018,6 +12019,7 @@ fr:
   include_unpublished_courses_7a0e7aab: "Inclure les cours non publiés"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inclut un lien vers SpeedGrader dans le menu d’en-tête des travaux du Carnet de notes."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inclut les valeurs des notes dans les rapports de notes de l'administrateur."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Inclure les alignements du service Résultats lors de l’exportation et de l’importation du contenu de cours"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inclure les barèmes dans la barre latérale de navigation de cours"
   incomplete_95612d72: incomplet
   incomplete_da3c2ea2: Incomplet
@@ -12901,7 +12903,7 @@ fr:
   login_logo_5eecf564: "Logo de connexion"
   login_screen_83518c07: "Écran de connexion"
   login_with_auth_type_a0aaa52a: "Se connecter avec *%{auth_type}*"
-  login_with_provider_3fd3998e: "Se connecter avec %{provider}"
+  login_with_provider_3fd3998e: "S’identifier avec %{provider}"
   loginrequest_encoded_url_44c49c18: "LoginRequest URL encodée"
   loginrequest_xml_sent_to_idp_9fafd03a: "LoginRequest XML envoyé à IdP"
   logins_9aee0cbe: Connexions
@@ -15593,6 +15595,7 @@ fr:
   no_74e9b590: non
   no_alignments_are_available_for_this_outcome_7f8346f9: "Aucun alignement n'est disponible pour ce résultat."
   no_announcements_280df147: "Aucune annonce"
+  no_announcements_to_display_fbf9ed1e: "Aucune annonce à afficher"
   no_assignment_group_assigned_8f1cdb9b: "Pas de groupe de travail assigné"
   no_assignment_name_adbb215b: "Pas de nom de travail"
   no_assignments_with_that_name_found_1d7be1: "Aucune attribution avec ce nom trouvé"
@@ -16485,6 +16488,7 @@ fr:
   outcomes_import_completed_baff5cb0: "Importation des résultats terminée"
   outcomes_import_failed_77efcdf4: "Échec de l'importation des résultats"
   outcomes_report_8887bd49: "Rapport de résultats"
+  outcomes_service_alignment_migration_5b4391ad: "Migration des alignements du service Résultats"
   outcomes_tutorial_tray_ebfce995: "Bac du didacticiel sur les résultats"
   over_time_bee1a733: "sur la durée"
   override_3de65b2c: remplacer
@@ -16755,6 +16759,11 @@ fr:
         apps_index_endpoint: "Terminal d’index des applications"
         base_url: "URL de base"
         token: "Jeton d’accès"
+    apple: 
+      description: "S’identifier avec Apple"
+    apple_settings: 
+      labels: 
+        client_id: "Service ID"
     assignment_freezer: 
       description: "Bloquer les propriétés de la tâche lors de la copie"
       name: "Outil de blocage des propriétés des tâches"
@@ -22617,6 +22626,7 @@ fr:
   this_assignment_has_been_excused_87f1dc13: "Ce devoir n'est plus obligatoire."
   this_assignment_has_no_default_dates_ae314295: "Ce travail n'a pas de date par défaut."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Ces devoirs ne peuvent pas recevoir de points et ne peuvent pas être inclus dans le calcul de la note."
+  this_assignment_has_too_many_dates_to_display_262f555f: "Ce travail a trop de dates à afficher."
   this_assignment_is_currently_being_moderated_ffd280f2: "Ce travail fait actuellement l'objet d'une modération."
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Cette tâche est actuellement silencieuse Cela signifie que les élèves ne peuvent accéder à leurs notes ni aux commentaires. Voulez-vous désactiver le mode silencieux ?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Ce devoir est abandonné et ne sera pas pris en compte dans le calcul du total"
@@ -24732,6 +24742,9 @@ fr:
   you_can_try_to_log_in_again_2b23ef0f: "Vous pouvez essayer de *vous connecter à nouveau*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Vous pouvez mettre certaines des informations de cet utilisateur à jour, mais il pourra à nouveau les modifier à son gré. "
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Vous pouvez utiliser un seul fichier .ico de 16x16, 32x32 ou 48x48."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Vous pouvez consulter les annonces ignorées en vous rendant dans Compte et en sélectionnant « Annonces
+                  globales » depuis le menu.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Vous pouvez voir vos notes en fonction des scores What-If, qui permettent de voir l'effet qu'auront les devoirs à venir ou soumis à nouveau sur vos notes actuelles. Vous pouvez tester les scores à partir d'un devoir possédant déjà une note, ou d'un devoir qui n'a pas encore été noté."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Vous ne pouvez pas affecter de sections à un sujet de discussion de groupe"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Vous ne pouvez pas faire d'affectation à un groupe hors de l'ensemble de groupe du travail"
@@ -24841,6 +24854,9 @@ fr:
       Vous allez devoir créer une [nouvelle application sur Facebook](%{facebook_url}), et activer la connexion OAuth client
       dans les paramètres avancés. Vous devriez configurer %{callback_url} comme URL de redirection OAuth valide.
       Après avoir sauvegardé votre application, prenez note de l'ID et du code secret de l'application, et indiquez-les ici.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Vous devrez créer un Service ID [Apple Developer Console](%{apple_url}).
+      Activer l’identification via Apple et ajouter %{callback_url} en URL de retour. Saisissez l’identifiant ici.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Vous allez devoir créer une application en ligne dans la [Console Développeur de Google](%{google_url}).
       Vous devriez ajouter %{callback_url} comme URL de redirection.

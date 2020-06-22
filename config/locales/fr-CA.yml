@@ -1034,7 +1034,7 @@ fr-CA:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Ce rapport indique la dernière connexion des utilisateurs actifs."
+            text: "Ce rapport indique la dernière connexion des utilisateurs actifs. Veuillez noter que le champ « Dernier accès à » est mis à jour une fois toutes les 10 minutes. C'est notre seuil actuel pour déterminer l'activité d'une session pour un utilisateur donné."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -11123,6 +11123,7 @@ fr-CA:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Afin de compléter la procédure, vous allez être redirigé vers une page de connexion, sur laquelle vous devrez vous connecter avec les identifiants de votre enfant."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Afin d'importer une grande quantité d’acquis à la fois, ou de mettre à jour vos acquis existants, veuillez *respecter le format CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Parcours de formation et visites guidées pour les enseignants"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Parcours de formation et visites guidées pour les administrateurs, les enseignants et les étudiants"
   in_progress_13b9e26f: "en cours"
   in_progress_9d1ce8b9: "En cours"
   inactive_cd40317f: inactif
@@ -11148,6 +11149,7 @@ fr-CA:
   include_unpublished_courses_7a0e7aab: "Inclure les cours non publiés"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inclut un lien vers SpeedGrader dans le menu d'entête des tâches dans le Carnet de notes."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Comprend les valeurs de note dans les rapports de note d'administrateur."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Inclut les alignements de service pour les acquis lors de l'exportation et de l'importation de contenu de cours"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inclut des rubriques dans la barre latérale de navigation du cours"
   incomplete_95612d72: incomplet
   incomplete_da3c2ea2: Incomplet
@@ -14363,6 +14365,7 @@ fr-CA:
   no_74e9b590: non
   no_alignments_are_available_for_this_outcome_7f8346f9: "Aucun alignement disponible pour cet acquis"
   no_announcements_280df147: "Aucune annonce"
+  no_announcements_to_display_fbf9ed1e: "Aucunes annonces à afficher"
   no_assignment_group_assigned_8f1cdb9b: "Aucun groupe de tâches attribué"
   no_assignment_name_adbb215b: "Pas de nom de tâche"
   no_assignments_with_that_name_found_1d7be1: "Aucune tâche à ce nom trouvée"
@@ -15223,6 +15226,7 @@ fr-CA:
   outcomes_import_completed_baff5cb0: "Importation des acquis terminée"
   outcomes_import_failed_77efcdf4: "Importation des acquis a échoué"
   outcomes_report_8887bd49: "Rapport sur les résultats"
+  outcomes_service_alignment_migration_5b4391ad: "Migration de l'alignement des services pour les acquis"
   outcomes_tutorial_tray_ebfce995: "Plateau du tutoriel des acquis"
   over_time_bee1a733: "sur la durée"
   override_3de65b2c: Surclasser
@@ -15485,6 +15489,11 @@ fr-CA:
         apps_index_endpoint: "Terminal d’index des applications"
         base_url: "URL de base"
         token: "Jeton d’accès"
+    apple: 
+      description: "Se connecter avec Apple"
+    apple_settings: 
+      labels: 
+        client_id: "ID Service"
     assignment_freezer: 
       description: "Bloquer les propriétés de la tâche lors de la copie"
       name: "Outil de blocage des propriétés des tâches"
@@ -20845,6 +20854,7 @@ fr-CA:
   this_assignment_has_been_excused_87f1dc13: "Cette tâche a été mis de côté."
   this_assignment_has_no_default_dates_ae314295: "Votre tâche n’a pas de date par défaut."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Cette tâche n'a aucun point possible et ne peut pas être incluse dans le calcul de la note."
+  this_assignment_has_too_many_dates_to_display_262f555f: "Cette tâche a trop de dates à afficher."
   this_assignment_is_currently_being_moderated_ffd280f2: "Cette tâche fait actuellement l'objet d'une modération."
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Cette tâche est présentement silencieuse. Cela signifie que les élèves ne peuvent pas voir leurs notes et commentaires. Souhaitez-vous arrêter la présentation silencieuse?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Cette tâche est abandonné et ne sera pas pris en compte dans le calcul du total"
@@ -22888,6 +22898,9 @@ fr-CA:
   you_can_try_to_log_in_again_2b23ef0f: "Vous pouvez essayer de *vous connecter à nouveau*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Vous pouvez mettre certaines des informations de cet utilisateur à jour, mais il pourra à nouveau les modifier à son gré."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Vous pouvez utiliser un seul fichier .ico de 16x16, 32x32 ou 48x48."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Vous pouvez afficher les annonces rejetées en accédant au Compte et en sélectionnant
+                  Annonces mondiales dans le menu.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Vous pouvez voir vos notes basées sur les scores « What If » de sorte que vous sachiez comment les notes seront affectées par les prochaines tâches ou les tâches resoumises. Vous pouvez tester des scores pour une tâche qui comprend déjà un score ou une tâche qui doit être notée."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Vous ne pouvez pas affecter de sections pour un sujet de discussion de groupe"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Vous ne pouvez pas faire d'affectation à un groupe hors de l'ensemble de groupe de la tâche"
@@ -22989,6 +23002,9 @@ fr-CA:
       Vous allez devoir créer une [nouvelle application sur Facebook](%{facebook_url}), et permettre la connexion OAuth client
       depuis les paramètres avancés. Vous devriez configurer %{callback_url} comme URL de redirection OAuth valide.
       Après avoir sauvegardé votre application, prenez note de l'ID et du code secret de l'application, et indiquez-les ici.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Il vous faudra créer un ID de service [Apple Developer Console](%{apple_url}).
+      Activez la connexion avec Apple et ajoutez %{callback_url} en tant qu'URL de retour. Saisissez l'identifiant ici.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Vous allez devoir créer une application en ligne dans la [Console Développeur de Google](%{google_url}).
       Vous devriez ajouter %{callback_url} comme URL de redirection.
