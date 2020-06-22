@@ -831,8 +831,8 @@ module DataFixup::Auditors
 
       def slim_accounts
         return @_accounts if @_accounts
-        root_account_ids = Account.root_accounts.active.pluck(:id)
-        @_accounts = Account.active.where(
+        root_account_ids = Account.root_accounts.active.non_shadow.pluck(:id)
+        @_accounts = Account.active.non_shadow.where(
           "root_account_id IS NULL OR root_account_id IN (?)", root_account_ids
         ).select(:id, :root_account_id)
       end
