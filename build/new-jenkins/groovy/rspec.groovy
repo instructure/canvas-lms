@@ -95,7 +95,11 @@ def _runRspecTestSuite(
       sh 'mkdir -p tmp'
       timeout(time: 60) {
         sh 'build/new-jenkins/docker-compose-pull.sh'
-        sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+
+        if(prefix == 'selenium') {
+          sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+        }
+
         sh 'build/new-jenkins/docker-compose-build-up.sh'
         sh 'build/new-jenkins/docker-compose-setup-databases.sh'
         sh 'build/new-jenkins/rspec_parallel_dockers.sh'
