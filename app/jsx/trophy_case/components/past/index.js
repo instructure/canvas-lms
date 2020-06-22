@@ -16,23 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import {Tabs} from '@instructure/ui-tabs'
-import I18n from 'i18n!trophy_case'
-import CurrentTrophies from './current/index'
-import PastTrophies from './past/index'
+import React from 'react'
 
-export default function TrophyCase() {
-  const [tab, setTab] = useState(0)
-
-  return (
-    <Tabs onRequestTabChange={(e, {index}) => setTab(index)}>
-      <Tabs.Panel renderTitle={I18n.t('Current')} isSelected={tab === 0}>
-        <CurrentTrophies />
-      </Tabs.Panel>
-      <Tabs.Panel renderTitle={I18n.t('Past')} isSelected={tab === 1}>
-        <PastTrophies />
-      </Tabs.Panel>
-    </Tabs>
-  )
+export default function PastTrophies() {
+  return <div>Check out my Past Trophies!!</div>
 }

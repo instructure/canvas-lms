@@ -15,24 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {render} from '@testing-library/react'
+import PastTrophies from '../index'
+import React from 'react'
 
-import React, {useState} from 'react'
-import {Tabs} from '@instructure/ui-tabs'
-import I18n from 'i18n!trophy_case'
-import CurrentTrophies from './current/index'
-import PastTrophies from './past/index'
-
-export default function TrophyCase() {
-  const [tab, setTab] = useState(0)
-
-  return (
-    <Tabs onRequestTabChange={(e, {index}) => setTab(index)}>
-      <Tabs.Panel renderTitle={I18n.t('Current')} isSelected={tab === 0}>
-        <CurrentTrophies />
-      </Tabs.Panel>
-      <Tabs.Panel renderTitle={I18n.t('Past')} isSelected={tab === 1}>
-        <PastTrophies />
-      </Tabs.Panel>
-    </Tabs>
-  )
-}
+describe('TrophyCase::past', () => {
+  it('renders', () => {
+    const {getByText} = render(<PastTrophies />)
+    expect(getByText('Check out my Past Trophies!!')).toBeVisible()
+  })
+})

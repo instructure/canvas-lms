@@ -15,13 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import TrophyCase from '../TrophyCase'
 import React from 'react'
 
 describe('TrophyCase', () => {
-  it('renders', () => {
+  it('renders current trophies', () => {
     const {getByText} = render(<TrophyCase />)
-    expect(getByText('Trophy Case!!')).toBeVisible()
+    expect(getByText('Check out my Current Trophies!!')).toBeVisible()
+  })
+
+  it('renders past trophies', async () => {
+    const {findByText} = render(<TrophyCase />)
+    fireEvent.click(await findByText('Past'))
+    expect(await findByText('Check out my Past Trophies!!')).toBeVisible()
   })
 })
