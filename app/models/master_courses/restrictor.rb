@@ -16,6 +16,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module MasterCourses::Restrictor
+  # a helper module included in various course content classes to streamline the integration for locking
+  # and preventing changes made downstream (to copies in the associated course) from being overwritten
+
+  # *** example usage: ***
+  #   include MasterCourses::Restrictor
+  #   restrict_columns :content, [:body, :title]
+
+  # will mean that the :body and :title columns of the object are part of the :content restriction class
+  # if :content is locked by the corresponding blueprint's MasterContentTag, then changes to either column
+  # will automatically throw errors
+
+  # columns can be added to restriction classes that are not exposed to the UI (e.g. :settings)
+  # and thus can never actually be locked
+  # adding the restrictor can still be useful because it will also keep track of changes to the columns
+  # and add any changed column to the :downstream_changes attribute of the corresponding ChildContentTag
+  # so if a future blueprint sync comes along and tries to overwrite the changed columns
+  # it will auto-magically ignore them (make sure to call `mark_as_importing!` in the importer)
+
   def self.included(klass)
     klass.include(CommonMethods)
     klass.send(:attr_writer, :child_content_restrictions)

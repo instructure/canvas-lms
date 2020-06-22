@@ -18,6 +18,11 @@
 class MasterCourses::MasterContentTag < ActiveRecord::Base
   # i want to get off content tag's wild ride
 
+  # stores restriction data on the blueprint side
+  # i.e. which objects are locked and what parts
+  # and makes for easy restriction lookup from the associated course side via matching migration_id columns
+  # NOTE: this fact means that locking/unlocking an object takes immediate effect (and is independent of syncs)
+
   belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
   belongs_to :content, polymorphic: [:assessment_question_bank,
                                      :assignment,
