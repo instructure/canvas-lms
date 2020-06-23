@@ -43,6 +43,10 @@ class EventStream::Stream
     database && database.keyspace
   end
 
+  def database_fingerprint
+    current_backend.database_fingerprint
+  end
+
   def on_insert(&callback)
     add_callback(:insert, callback)
   end
