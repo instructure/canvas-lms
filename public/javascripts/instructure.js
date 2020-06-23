@@ -247,6 +247,42 @@ export function enhanceUserContent() {
     frame.src = src
   })
 }
+
+export function formatTimeAgoTitle(date) {
+  const fudgedDate = $.fudgeDateForProfileTimezone(date)
+  return fudgedDate.toString('MMM d, yyyy h:mmtt')
+}
+
+export function formatTimeAgoDate(date) {
+  if (typeof date === 'string') {
+    date = Date.parse(date)
+  }
+  const diff = new Date() - date
+  if (diff < 24 * 3600 * 1000) {
+    if (diff < 3600 * 1000) {
+      if (diff < 60 * 1000) {
+        return I18n.t('#time.less_than_a_minute_ago', 'less than a minute ago')
+      } else {
+        const minutes = parseInt(diff / (60 * 1000), 10)
+        return I18n.t(
+          '#time.count_minutes_ago',
+          {one: '1 minute ago', other: '%{count} minutes ago'},
+          {count: minutes}
+        )
+      }
+    } else {
+      const hours = parseInt(diff / (3600 * 1000), 10)
+      return I18n.t(
+        '#time.count_hours_ago',
+        {one: '1 hour ago', other: '%{count} hours ago'},
+        {count: hours}
+      )
+    }
+  } else {
+    return formatTimeAgoTitle(date)
+  }
+}
+
 $(function() {
   // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)
   if (window._earlyClick) {
@@ -929,36 +965,10 @@ $(function() {
       const $event = $(eventElement),
         date = $event.data('parsed_date') || Date.parse($event.data('timestamp') || '')
       if (date) {
-        const diff = new Date() - date
         $event.data('timestamp', date.toISOString())
         $event.data('parsed_date', date)
-        const fudgedDate = $.fudgeDateForProfileTimezone(date)
-        const defaultDateString =
-          fudgedDate.toString('MMM d, yyyy') + fudgedDate.toString(' h:mmtt').toLowerCase()
-        let dateString = defaultDateString
-        if (diff < 24 * 3600 * 1000) {
-          if (diff < 3600 * 1000) {
-            if (diff < 60 * 1000) {
-              dateString = I18n.t('#time.less_than_a_minute_ago', 'less than a minute ago')
-            } else {
-              const minutes = parseInt(diff / (60 * 1000), 10)
-              dateString = I18n.t(
-                '#time.count_minutes_ago',
-                {one: '1 minute ago', other: '%{count} minutes ago'},
-                {count: minutes}
-              )
-            }
-          } else {
-            const hours = parseInt(diff / (3600 * 1000), 10)
-            dateString = I18n.t(
-              '#time.count_hours_ago',
-              {one: '1 hour ago', other: '%{count} hours ago'},
-              {count: hours}
-            )
-          }
-        }
-        $event.text(dateString)
-        $event.attr('title', defaultDateString)
+        $event.text(formatTimeAgoDate(date))
+        $event.attr('title', formatTimeAgoTitle(date))
       }
       setTimeout(processNextTimeAgoEvent, 1)
     } else {
