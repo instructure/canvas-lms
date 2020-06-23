@@ -653,7 +653,8 @@ class Conversation < ActiveRecord::Base
 
   def update_root_account_ids
     if root_account_ids_changed?
-      latest_ids = root_account_ids.join(',')
+      # ids must be sorted for the scope to work
+      latest_ids = root_account_ids.sort.join(',')
       %w[conversation_participants conversation_messages conversation_message_participants].each do |assoc|
         scope = self.send(assoc).where("#{assoc}.root_account_ids IS DISTINCT FROM ?", latest_ids).limit(1_000)
         until scope.update_all(root_account_ids: latest_ids) < 1_000; end

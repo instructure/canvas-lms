@@ -18,17 +18,17 @@
 
 module ConversationHelper
   def set_root_account_ids
-    write_attribute(:root_account_ids, conversation&.root_account_ids&.join(','))
+    write_attribute(:root_account_ids, conversation&.root_account_ids&.sort&.join(','))
   end
 
   def root_account_ids
-    (read_attribute(:root_account_ids) || '').split(',').map(&:to_i)
+    (read_attribute(:root_account_ids) || '').split(',').map(&:to_i).sort
   end
 
   def root_account_ids=(ids)
     # handle case when ids is a comma separated list
     if ids.is_a? String
-      ids = ids.split(',')
+      ids = ids.split(',').map(&:to_i)
     end
     # ids must be sorted for the scope to work
     write_attribute(:root_account_ids, ids.sort.join(','))
