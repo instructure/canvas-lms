@@ -21,7 +21,8 @@ import {connect} from 'react-redux'
 import {func, arrayOf, object, bool, string} from 'prop-types'
 import moment from 'moment-timezone'
 
-import {List, Spinner, Text} from '@instructure/ui-elements'
+import {List, Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
 import formatMessage from '../../format-message'
@@ -177,7 +178,4 @@ const mapStateToProps = state => ({
 })
 const mapDispatchToProps = {sidebarLoadInitialItems, sidebarCompleteItem}
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ToDoSidebar)
+export default connect(mapStateToProps, mapDispatchToProps)(ToDoSidebar)

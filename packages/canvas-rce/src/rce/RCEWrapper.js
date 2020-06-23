@@ -25,7 +25,7 @@ import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Alert} from '@instructure/ui-alerts'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 
 import formatMessage from '../format-message'
 import * as contentInsertion from './contentInsertion'

@@ -45,6 +45,7 @@
     "@instructure/ui-pagination": "6",
     "@instructure/ui-react-utils": "6",
     "@instructure/ui-select": "6",
+    "@instructure/ui-spinner": "6",
     "@instructure/ui-svg-images": "6",
     "@instructure/ui-tabs": "6",
     "@instructure/ui-text-input": "6",
