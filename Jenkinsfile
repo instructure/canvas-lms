@@ -347,6 +347,18 @@ pipeline {
                 }
               }
 
+              if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
+                echo 'adding CDC Schema check'
+                stages['CDC Schema Check'] = {
+                  build job: '../Canvas/cdc-event-transformer-master', parameters: [
+                    string(name: 'CANVAS_LMS_IMAGE_TAG', value: "${env.NAME}-${env.TAG_SUFFIX}")
+                  ]
+                }
+              }
+              else {
+                echo 'no migrations added, skipping CDC Schema check'
+              }
+
               if (env.GERRIT_EVENT_TYPE != 'change-merged' && (sh(script: 'build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)) {
                 echo 'adding Flakey Spec Catcher'
                 stages['Flakey Spec Catcher'] = {
