@@ -479,7 +479,12 @@ module DataFixup::Auditors
         user_ids = attrs_list.map{|a| a['user_id'] }
         existing_user_ids = existing_user_ids_from(attrs_list.map{|a| a['user_id'] })
         missing_uids = user_ids - existing_user_ids
-        attrs_list.reject {|h| missing_uids.include?(h['user_id']) }
+        new_attrs_list = attrs_list.reject {|h| missing_uids.include?(h['user_id']) }
+        course_ids = new_attrs_list.map{|a| a['course_id'] }.compact.uniq
+        existing_course_ids = []
+        existing_course_ids = Course.where(id: course_ids).pluck(:id) if course_ids.size > 0
+        missing_cids = course_ids - existing_course_ids
+        new_attrs_list.reject {|h| missing_cids.include?(h['course_id']) }
       end
     end
 
