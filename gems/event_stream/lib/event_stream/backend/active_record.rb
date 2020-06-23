@@ -32,6 +32,10 @@ module EventStream::Backend
       active_record_type.connection.active?
     end
 
+    def database_fingerprint
+      active_record_type.connection.shard.name
+    end
+
     def fetch(ids, strategy: :batch)
       active_record_type.where(uuid: ids)
     end

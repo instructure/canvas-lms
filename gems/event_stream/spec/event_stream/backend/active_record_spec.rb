@@ -39,6 +39,14 @@ describe EventStream::Backend::ActiveRecord do
           self
         end
 
+        def shard
+          self
+        end
+
+        def name
+          'fingerprint'
+        end
+
         def active?
           true
         end
@@ -65,6 +73,7 @@ describe EventStream::Backend::ActiveRecord do
 
 
   describe "executing operations" do
+    let(:backend){ EventStream::Backend::ActiveRecord.new(stream) }
     after(:each) do
       ar_type.reset!
     end
@@ -81,6 +90,10 @@ describe EventStream::Backend::ActiveRecord do
       ar_backend = EventStream::Backend::ActiveRecord.new(stream)
       expect { ar_backend.execute(:insert, event_record) }.to_not raise_error
       expect(ar_type.written_recs.first).to eq(event_record)
+    end
+
+    it "pulls db fingerprint" do
+      expect(backend.database_fingerprint).to eq('fingerprint')
     end
   end
 end
