@@ -711,6 +711,8 @@ module UsefulFindInBatches
     # see the contents of our current transaction)
     if connection.open_transactions == 0 && !start && eager_load_values.empty? && !ActiveRecord::Base.in_migration && !strategy || strategy == :copy
       self.activate { |r| r.find_in_batches_with_copy(**kwargs, &block) }
+    elsif strategy == :pluck_ids
+      self.activate { |r| r.find_in_batches_with_pluck_ids(**kwargs, &block) }
     elsif should_use_cursor? && !start && eager_load_values.empty? && !strategy || strategy == :cursor
       self.activate { |r| r.find_in_batches_with_cursor(**kwargs, &block) }
     elsif find_in_batches_needs_temp_table? && !strategy || strategy == :temp_table
@@ -866,6 +868,25 @@ ActiveRecord::Relation.class_eval do
         pool.send(:adopt_connection, conn)
         pool.checkin(conn)
       end
+    end
+  end
+
+  # in some cases we're doing a lot of work inside
+  # the yielded block, and holding open a transaction
+  # or even a connection while we do all that work can
+  # be a problem for the database, especially if a lot
+  # of these are happening at once.  This strategy
+  # makes one query to hold onto all the IDs needed for the
+  # iteration (make sure they'll fit in memory, or you could be sad)
+  # and yields the objects in batches in the same order as the scope specified
+  # so the DB connection can be fully recycled during each block.
+  def find_in_batches_with_pluck_ids(options = {})
+    batch_size = options[:batch_size] || 1000
+    all_object_ids = pluck(:id)
+    current_order_values = order_values
+    all_object_ids.in_groups_of(batch_size) do |id_batch|
+      object_batch = klass.unscoped.where(id: id_batch).order(current_order_values)
+      yield object_batch
     end
   end
 
