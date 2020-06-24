@@ -434,8 +434,28 @@ pipeline {
               }
             }
 
+            def migrations = load('build/new-jenkins/groovy/migrations.groovy')
+
+            stage ('Run Migrations') {
+              timeout(time: 10) {
+                skipIfPreviouslySuccessful('run-migrations') {
+                  withEnv([
+                    "COMPOSE_FILE=docker-compose.new-jenkins.yml",
+                    "POSTGRES_PASSWORD=sekret"
+                  ]) {
+                    migrations.runMigrations()
+                    sh 'docker-compose down --remove-orphans'
+                  }
+                }
+              }
+            }
+
             stage('Parallel Run Tests') {
-              withEnv([]) {
+              withEnv([
+                "CASSANDRA_IMAGE_TAG=${migrations.cassandraTag()}",
+                "DYNAMODB_IMAGE_TAG=${migrations.dynamodbTag()}",
+                "POSTGRES_IMAGE_TAG=${migrations.postgresTag()}"
+              ]) {
                 def stages = [:]
                 if (!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
                   echo 'adding Linters'

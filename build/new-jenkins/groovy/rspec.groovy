@@ -109,7 +109,6 @@ def _runRspecTestSuite(
         }
 
         sh 'build/new-jenkins/docker-compose-build-up.sh'
-        sh 'build/new-jenkins/docker-compose-setup-databases.sh'
         sh 'build/new-jenkins/docker-compose-rspec-parallel.sh'
       }
     }
