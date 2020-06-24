@@ -4,6 +4,11 @@
   <div class="sticky-toolbar-with-right-side" data-sticky>
     <div class="header-bar">
       <div class="header-bar-right">
+        {{#if BULK_DELETE_ENABLED}}
+          {{#if CAN.MANAGE}}
+            <a class="btn icon-trash delete_pages" tabindex="0" role="button" aria-label="{{#t}}Delete selected pages{{/t}}" disabled></a>
+          {{/if}}
+        {{/if}}
         {{#if CAN.CREATE}}
           <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">{{#t 'buttons.new_page'}}Page{{/t}}</a>
           {{#if hasWikiIndexPlacements}}
@@ -33,7 +38,12 @@
     <table class="ic-Table ic-Table--condensed ic-Table--striped ic-Table--hover-row" role="grid">
       <thead>
         <tr class="header-row" role="row">
-          <th scope="col" style="width: {{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}42%{{else}}46%{{/if}}{{else}}60%{{/if}}" role="columnheader">
+          {{#if BULK_DELETE_ENABLED}}
+            <th scope="col" width="2%" role="columnheader">
+              <span class="screenreader-only">{{#t}}Select page{{/t}}</span>
+            </th>
+          {{/if}}
+          <th scope="col" width="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}42%{{else}}46%{{/if}}{{else}}60%{{/if}}" role="columnheader">
             <a href="#" data-sort-field="title" tabindex="0" role="button" class="sort-field">{{#t 'headers.page_title'}}Page title{{/t}} <i></i></a>
           </th>
           <th scope="col" style="width: 10%" role="columnheader">
@@ -63,7 +73,7 @@
       <tbody class="collectionViewItems">
         {{#if fetched}}
           {{#unless collection.length}}
-          <tr class="no-pages{{#if CAN.CREATE}} clickable{{/if}}"><td class="no-pages-cell" colspan="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}5{{else}}4{{/if}}{{else}}3{{/if}}">{{#t 'no_pages'}}No pages created yet.{{/t}}{{#if CAN.CREATE}} <a class="new_page" href="#">{{#t 'add_page'}}Add one!{{/t}}</a>{{/if}}</td></tr>
+          <tr class="no-pages{{#if CAN.CREATE}} clickable{{/if}}"><td class="no-pages-cell" colspan="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}{{#if BULK_DELETE_ENABLED}}7{{else}}6{{/if}}{{else}}4{{/if}}{{else}}3{{/if}}">{{#t 'no_pages'}}No pages created yet.{{/t}}{{#if CAN.CREATE}} <a class="new_page" href="#">{{#t 'add_page'}}Add one!{{/t}}</a>{{/if}}</td></tr>
           {{/unless}}
         {{/if}}
       </tbody>

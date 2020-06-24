@@ -45,7 +45,8 @@ export default class WikiPageIndexItemView extends Backbone.View {
       'click .unset-as-front-page-menu-item': 'unsetAsFrontPage',
       'click .duplicate-wiki-page': 'duplicateWikiPage',
       'click .send-wiki-page-to': 'sendWikiPageTo',
-      'click .copy-wiki-page-to': 'copyWikiPageTo'
+      'click .copy-wiki-page-to': 'copyWikiPageTo',
+      'change .select-page-checkbox': 'changeSelectPageCheckbox'
     }
 
     this.optionProperty('indexView')
@@ -76,6 +77,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
       DELETE: !!this.WIKI_RIGHTS.delete_page
     }
 
+    json.BULK_DELETE_ENABLED = ENV.FEATURES?.bulk_delete_pages
     json.DIRECT_SHARE_ENABLED = ENV.DIRECT_SHARE_ENABLED
 
     if (json.is_master_course_child_content && json.restricted_by_master_course) {
@@ -131,7 +133,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
   }
 
   afterRender() {
-    return this.$el.find('td:first').redirectClickTo(this.$wikiPageLink)
+    return this.$el.find("td:not('.not_clickable'):first").redirectClickTo(this.$wikiPageLink)
   }
 
   settingsMenu(ev) {
@@ -274,6 +276,12 @@ export default class WikiPageIndexItemView extends Backbone.View {
   copyWikiPageTo(ev) {
     ev.preventDefault()
     this.indexView.setCopyToItem(this.model, this.$settingsMenu)
+  }
+
+  changeSelectPageCheckbox(ev) {
+    ev.preventDefault()
+    const selected = $('.select-page-checkbox:checked').length
+    $('.delete_pages').attr('disabled', selected === 0)
   }
 }
 WikiPageIndexItemView.initClass()

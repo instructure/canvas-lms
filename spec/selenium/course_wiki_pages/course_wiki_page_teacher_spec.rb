@@ -29,6 +29,32 @@ describe 'course wiki pages' do
       @page = @course.wiki_pages.create!(title: 'han')
     end
 
+    it "should not show the bulk delete button" do
+      @course.root_account.disable_feature!(:bulk_delete_pages)
+      visit_course_wiki_index_page(@course.id)
+
+      expect(wiki_page_body).not_to contain_css(delete_pages_btn_selector)
+    end
+
+    it "should show the bulk delete button" do
+      @course.root_account.enable_feature!(:bulk_delete_pages)
+      visit_course_wiki_index_page(@course.id)
+
+      expect(bulk_delete_btn.attribute('disabled')).to eq('true')
+      expect(bulk_delete_btn).to be_displayed
+    end
+
+    it "deletes selected page" do
+      @course.root_account.enable_feature!(:bulk_delete_pages)
+      visit_course_wiki_index_page(@course.id)
+
+      select_wiki_page_checkbox.click
+      delete_selected_pages
+
+      confirm_delete_pages
+      expect(@course.wiki_pages.first.workflow_state).to eq('deleted')
+    end
+
     it "should show immersive Reader button whether page is published or unpublished" do
       @course.root_account.enable_feature!(:immersive_reader_wiki_pages)
       visit_wiki_page_view(@course.id, @page.title)

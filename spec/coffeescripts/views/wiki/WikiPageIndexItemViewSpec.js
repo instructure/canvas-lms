@@ -192,3 +192,10 @@ testRights('CAN (update page)', {
     DELETE: false
   }
 })
+
+test('includes bulk_delete_pages feature flag', () => {
+  const model = new WikiPage()
+  const view = new WikiPageIndexItemView({model, collectionHasTodoDate: () => {}})
+  ENV.FEATURES = {bulk_delete_pages: true}
+  strictEqual(view.toJSON().BULK_DELETE_ENABLED, true)
+})

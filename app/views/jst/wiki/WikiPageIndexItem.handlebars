@@ -1,3 +1,12 @@
+{{#if BULK_DELETE_ENABLED}}
+  <td role="gridcell" class='not_clickable'>
+    {{#unless cannot_delete_by_master_course}}
+      {{#if CAN.DELETE}}
+        <input type="checkbox" class="select-page-checkbox" {{#unless deletable}}disabled{{/unless}} value="{{url}}" />
+      {{/if}}
+    {{/unless}}
+  </td>
+{{/if}}
 <td role="gridcell">
   <a href="{{html_url}}" id="wiki_page_index_item_title_{{page_id}}" class="wiki-page-link{{#if CAN.PUBLISH}} {{#unless published}}un{{/unless}}published{{/if}}">{{title}}</a>
   {{#if front_page}}

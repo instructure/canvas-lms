@@ -50,3 +50,8 @@ outcome_alignments_course_migration:
   display_name: Outcomes Service Alignment Migration
   description: Includes Outcomes Service alignments when exporting and importing
     course content
+bulk_delete_pages:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Page Bulk Deleting
+  description: Allow pages to be deleted in bulk
