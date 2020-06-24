@@ -15,28 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render} from '@testing-library/react'
-import CurrentTrophies from '../index'
+
 import React from 'react'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 
-const trophies = [
-  {
-    trophy_key: 'Foo',
-    name: 'Foo',
-    description: 'Foo',
-    unlocked_at: '2020-06-22T22:42:00+00:00'
-  },
-  {
-    trophy_key: 'Bar',
-    name: 'Bar',
-    description: 'Bar',
-    unlocked_at: null
-  }
-]
-
-describe('TrophyCase::current', () => {
-  it('renders a row for each trophy', () => {
-    const {queryAllByAltText} = render(<CurrentTrophies trophies={trophies} />)
-    expect(queryAllByAltText(/.*/)).toHaveLength(trophies.length)
-  })
-})
+export default function InfoCell(props) {
+  const options = !props.unlocked_at ? {color: 'secondary'} : {color: 'brand'}
+  return (
+    <Flex direction="column">
+      <Flex.Item margin="xxx-small">
+        <Text size="large" weight="bold" {...options}>
+          {props.name}
+        </Text>
+      </Flex.Item>
+      <Flex.Item margin="xxx-small">
+        <Text size="small">{props.description}</Text>
+      </Flex.Item>
+    </Flex>
+  )
+}

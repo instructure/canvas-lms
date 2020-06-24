@@ -16,27 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {render} from '@testing-library/react'
-import CurrentTrophies from '../index'
+import DateCell from '../DateCell'
 import React from 'react'
 
-const trophies = [
-  {
-    trophy_key: 'Foo',
-    name: 'Foo',
-    description: 'Foo',
-    unlocked_at: '2020-06-22T22:42:00+00:00'
-  },
-  {
-    trophy_key: 'Bar',
-    name: 'Bar',
-    description: 'Bar',
-    unlocked_at: null
-  }
-]
+describe('TrophyCase::current::DateCell', () => {
+  describe('discovered trophy', () => {
+    it('renders the date', () => {
+      const {getByText} = render(<DateCell unlocked_at="2020-01-01" />)
+      expect(getByText(/Earned .*/)).not.toBeNull()
+    })
+  })
 
-describe('TrophyCase::current', () => {
-  it('renders a row for each trophy', () => {
-    const {queryAllByAltText} = render(<CurrentTrophies trophies={trophies} />)
-    expect(queryAllByAltText(/.*/)).toHaveLength(trophies.length)
+  describe('undiscovered trophy', () => {
+    it('renders nothing', () => {
+      const {queryByText} = render(<DateCell />)
+      expect(queryByText(/Earned .*/)).toBeNull()
+    })
   })
 })

@@ -17,7 +17,30 @@
  */
 
 import React from 'react'
+import {Table} from '@instructure/ui-table'
+import ImageCell from './ImageCell'
+import InfoCell from './InfoCell'
+import DateCell from './DateCell'
+import I18n from 'i18n!trophy_case'
 
-export default function CurrentTrophies() {
-  return <div>Check out my Current Trophies!!</div>
+export default function CurrentTrophies(props) {
+  return (
+    <Table caption={I18n.t('List of the currently attainable trophies')}>
+      <Table.Body>
+        {props.trophies.map(t => (
+          <Table.Row key={t.trophy_key}>
+            <Table.Cell>
+              <ImageCell {...t} />
+            </Table.Cell>
+            <Table.Cell>
+              <InfoCell {...t} />
+            </Table.Cell>
+            <Table.Cell textAlign="end">
+              <DateCell {...t} />
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>
+  )
 }

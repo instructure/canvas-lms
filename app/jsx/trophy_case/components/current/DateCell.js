@@ -15,28 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render} from '@testing-library/react'
-import CurrentTrophies from '../index'
+
 import React from 'react'
+import {Text} from '@instructure/ui-text'
+import {DateTime} from '@instructure/ui-i18n'
+import I18n from 'i18n!trophy_case'
 
-const trophies = [
-  {
-    trophy_key: 'Foo',
-    name: 'Foo',
-    description: 'Foo',
-    unlocked_at: '2020-06-22T22:42:00+00:00'
-  },
-  {
-    trophy_key: 'Bar',
-    name: 'Bar',
-    description: 'Bar',
-    unlocked_at: null
-  }
-]
-
-describe('TrophyCase::current', () => {
-  it('renders a row for each trophy', () => {
-    const {queryAllByAltText} = render(<CurrentTrophies trophies={trophies} />)
-    expect(queryAllByAltText(/.*/)).toHaveLength(trophies.length)
-  })
-})
+export default function DateCell(props) {
+  return DateTime.isValid(props.unlocked_at) ? (
+    <Text size="medium" color="primary">
+      {I18n.t('Earned %{earnDate}', {
+        // TODO: need proper locale, tz, and display format
+        earnDate: DateTime.toLocaleString(
+          props.unlocked_at,
+          window.navigator.language,
+          DateTime.browserTimeZone(),
+          'LL'
+        )
+      })}
+    </Text>
+  ) : null
+}

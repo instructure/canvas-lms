@@ -22,7 +22,7 @@ import React from 'react'
 describe('TrophyCase', () => {
   it('renders current trophies', () => {
     const {getByText} = render(<TrophyCase />)
-    expect(getByText('Check out my Current Trophies!!')).toBeVisible()
+    expect(getByText('List of the currently attainable trophies')).toBeVisible()
   })
 
   it('renders past trophies', async () => {

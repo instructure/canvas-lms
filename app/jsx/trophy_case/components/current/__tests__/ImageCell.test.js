@@ -16,27 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {render} from '@testing-library/react'
-import CurrentTrophies from '../index'
+import ImageCell from '../ImageCell'
 import React from 'react'
 
-const trophies = [
-  {
-    trophy_key: 'Foo',
-    name: 'Foo',
-    description: 'Foo',
-    unlocked_at: '2020-06-22T22:42:00+00:00'
-  },
-  {
-    trophy_key: 'Bar',
-    name: 'Bar',
-    description: 'Bar',
-    unlocked_at: null
-  }
-]
+describe('TrophyCase::current::ImageCell', () => {
+  describe('discovered trophy', () => {
+    it('renders the image', () => {
+      const {getByAltText} = render(<ImageCell trophy_key="discovered" unlocked_at="2020-01-01" />)
+      const style = window.getComputedStyle(getByAltText('discovered'))
+      expect(style.filter).not.toMatch(/blur.* grayscale.*/)
+    })
+  })
 
-describe('TrophyCase::current', () => {
-  it('renders a row for each trophy', () => {
-    const {queryAllByAltText} = render(<CurrentTrophies trophies={trophies} />)
-    expect(queryAllByAltText(/.*/)).toHaveLength(trophies.length)
+  describe('undiscovered trophy', () => {
+    it('obscures the image', () => {
+      const {getByAltText} = render(<ImageCell trophy_key="undiscovered" />)
+      const style = window.getComputedStyle(getByAltText('undiscovered'))
+      expect(style.filter).toMatch(/blur.* grayscale.*/)
+    })
   })
 })
