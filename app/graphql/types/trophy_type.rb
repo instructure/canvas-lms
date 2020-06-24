@@ -26,8 +26,18 @@ module Types
 
     global_id_field :id
 
-    field :user_id, ID, null: false
+    field :user_id, ID, null: true
 
     field :name, String, null: false
+
+    field :display_name, String, null: true
+    def display_name
+      object.is_a?(Hash) ? object[:display_name] : object.display_name
+    end
+
+    field :description, String, null: true
+    def description
+      object.is_a?(Hash) ? object[:description] : object.description
+    end
   end
 end

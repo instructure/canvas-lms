@@ -99,7 +99,10 @@ module Types
 
     field :trophies, [TrophyType], null: true
     def trophies
-      load_association(:trophies)
+      Loaders::AssociationLoader.for(User, :trophies).load(object).then do |trophies|
+        locked_trophies = Trophy.trophy_names - trophies.map(&:name)
+        trophies.to_a.concat(locked_trophies.map { |name| Trophy.blank_trophy(name) })
+      end
     end
 
     # TODO: deprecate this
