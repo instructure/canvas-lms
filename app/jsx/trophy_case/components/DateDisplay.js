@@ -21,9 +21,9 @@ import {Text} from '@instructure/ui-text'
 import {DateTime} from '@instructure/ui-i18n'
 import I18n from 'i18n!trophy_case'
 
-export default function DateCell(props) {
+export default function DateDisplay(props) {
   return DateTime.isValid(props.unlocked_at) ? (
-    <Text size="medium" color="primary">
+    <Text size={props.size || 'medium'} color={props.color || 'primary'}>
       {I18n.t('Earned %{earnDate}', {
         // TODO: need proper locale, tz, and display format
         earnDate: DateTime.toLocaleString(

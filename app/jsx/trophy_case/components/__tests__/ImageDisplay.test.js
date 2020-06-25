@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {render} from '@testing-library/react'
-import ImageCell from '../ImageCell'
+import ImageDisplay from '../ImageDisplay'
 import React from 'react'
 
-describe('TrophyCase::current::ImageCell', () => {
+describe('TrophyCase::current::ImageDisplay', () => {
   describe('discovered trophy', () => {
     it('renders the image', () => {
-      const {getByAltText} = render(<ImageCell trophy_key="discovered" unlocked_at="2020-01-01" />)
+      const {getByAltText} = render(
+        <ImageDisplay trophy_key="discovered" unlocked_at="2020-01-01" />
+      )
       const style = window.getComputedStyle(getByAltText('discovered'))
       expect(style.filter).not.toMatch(/blur.* grayscale.*/)
     })
@@ -30,7 +32,7 @@ describe('TrophyCase::current::ImageCell', () => {
 
   describe('undiscovered trophy', () => {
     it('obscures the image', () => {
-      const {getByAltText} = render(<ImageCell trophy_key="undiscovered" />)
+      const {getByAltText} = render(<ImageDisplay trophy_key="undiscovered" />)
       const style = window.getComputedStyle(getByAltText('undiscovered'))
       expect(style.filter).toMatch(/blur.* grayscale.*/)
     })

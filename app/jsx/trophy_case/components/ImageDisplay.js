@@ -24,15 +24,15 @@ import {Img} from '@instructure/ui-img'
 const assetFor = key => {
   switch (key) {
     case 'Ninja':
-      return require('../../../confetti/svg/Ninja.svg')
+      return require('../../confetti/svg/Ninja.svg')
     case 'FourLeafClover':
-      return require('../../../confetti/svg/FourLeafClover.svg')
+      return require('../../confetti/svg/FourLeafClover.svg')
     default:
-      return require('../../../confetti/svg/Trophy.svg')
+      return require('../../confetti/svg/Trophy.svg')
   }
 }
 
-export default function ImageCell(props) {
+export default function ImageDisplay(props) {
   const options = !props.unlocked_at
     ? {
         withGrayscale: true,
@@ -43,8 +43,8 @@ export default function ImageCell(props) {
     // TODO: better alt text once we know what backend data looks like
     <Img
       alt={props.trophy_key}
-      height={70}
-      width={70}
+      height={props.height || 70}
+      width={props.width || 70}
       src={assetFor(props.trophy_key)}
       margin="x-small small"
       {...options}

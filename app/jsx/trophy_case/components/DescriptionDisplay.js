@@ -20,17 +20,20 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 
-export default function InfoCell(props) {
-  const options = !props.unlocked_at ? {color: 'secondary'} : {color: 'brand'}
+export default function DescriptionDisplay(props) {
+  const titleOptions = !props.unlocked_at ? {color: 'secondary'} : {color: 'brand'}
+  const descOptions = !props.unlocked_at ? {color: 'secondary'} : {color: 'primary'}
   return (
     <Flex direction="column">
       <Flex.Item margin="xxx-small">
-        <Text size="large" weight="bold" {...options}>
+        <Text size="large" weight="bold" {...titleOptions}>
           {props.name}
         </Text>
       </Flex.Item>
       <Flex.Item margin="xxx-small">
-        <Text size="small">{props.description}</Text>
+        <Text size={props.descriptionSize || 'small'} {...descOptions}>
+          {props.description}
+        </Text>
       </Flex.Item>
     </Flex>
   )

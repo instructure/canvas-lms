@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {render} from '@testing-library/react'
-import DateCell from '../DateCell'
+import DateDisplay from '../DateDisplay'
 import React from 'react'
 
-describe('TrophyCase::current::DateCell', () => {
+describe('TrophyCase::current::DateDisplay', () => {
   describe('discovered trophy', () => {
     it('renders the date', () => {
-      const {getByText} = render(<DateCell unlocked_at="2020-01-01" />)
+      const {getByText} = render(<DateDisplay unlocked_at="2020-01-01" />)
       expect(getByText(/Earned .*/)).not.toBeNull()
     })
   })
 
   describe('undiscovered trophy', () => {
     it('renders nothing', () => {
-      const {queryByText} = render(<DateCell />)
+      const {queryByText} = render(<DateDisplay />)
       expect(queryByText(/Earned .*/)).toBeNull()
     })
   })

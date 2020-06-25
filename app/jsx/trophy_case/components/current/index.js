@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {Table} from '@instructure/ui-table'
-import ImageCell from './ImageCell'
-import InfoCell from './InfoCell'
-import DateCell from './DateCell'
+import ImageDisplay from '../ImageDisplay'
+import DescriptionDisplay from '../DescriptionDisplay'
+import DateDisplay from '../DateDisplay'
 import I18n from 'i18n!trophy_case'
 
 export default function CurrentTrophies(props) {
@@ -30,13 +30,13 @@ export default function CurrentTrophies(props) {
         {props.trophies.map(t => (
           <Table.Row key={t.trophy_key}>
             <Table.Cell>
-              <ImageCell {...t} />
+              <ImageDisplay {...t} />
             </Table.Cell>
             <Table.Cell>
-              <InfoCell {...t} />
+              <DescriptionDisplay {...t} />
             </Table.Cell>
             <Table.Cell textAlign="end">
-              <DateCell {...t} />
+              <DateDisplay {...t} />
             </Table.Cell>
           </Table.Row>
         ))}
