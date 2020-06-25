@@ -124,8 +124,8 @@ module Canvas::ICU
 
         # Reference documentation (some option names differ in ruby-space)for these options is at
         # http://userguide.icu-project.org/collation/customization#TOC-Default-Options
-        # if you change these settings, also match the settings in best_unicode_collation_key
-        # and natcompare.js
+        # if you change these settings, also match the settings in best_unicode_collation_key,
+        # natcompare.js, and .icu_locale_name below
         collator.normalization_mode = false # default; other languages override as appropriate
         collator.numeric_collation = true
         collator.strength = :tertiary # default
@@ -167,5 +167,25 @@ module Canvas::ICU
 
   def self.collate_by(sortable)
     sortable.sort { |a, b| compare(yield(a), yield(b)) }
+  end
+
+  def self.untagged_locale
+    I18n.locale.to_s.sub(/-x-.+$/, '')
+  end
+
+  def self.icu_locale_name
+    I18n.set_locale_with_localizer
+    collator.rules.empty? ? 'und-u-kn-true' : "#{untagged_locale}-u-kn-true"
+  end
+
+  def self.choose_pg10_collation(available_collations)
+    schema, collation = available_collations.find { |(_schema, locale)| locale == icu_locale_name }
+    if !collation && !collator.rules.empty?
+      # we don't have the proper collation for this language, but still try to use the root locale
+      # if it exists
+      schema, collation = available_collations.find { |(_schema, locale)| locale == 'und-u-kn-true' }
+    end
+    return unless collation
+    ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(schema, collation).quoted
   end
 end

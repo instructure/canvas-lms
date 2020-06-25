@@ -421,6 +421,41 @@ module PostgreSQLAdapterExtensions
       @nested_primary_keys = false
     end
   end
+
+  def icu_collations
+    return [] if postgresql_version < 100000
+    @collations ||= select_rows <<-SQL, "SCHEMA"
+      SELECT nspname, collname
+      FROM pg_collation
+      INNER JOIN pg_namespace ON collnamespace=pg_namespace.oid
+      WHERE
+        collprovider='i' AND
+        NOT collisdeterministic AND
+        collcollate LIKE '%-u-kn-true'
+    SQL
+  end
+
+  def create_icu_collations
+    return if postgresql_version < 100000
+    original_locale = I18n.locale
+
+    collation = "und-u-kn-true"
+    unless icu_collations.find { |_schema, extant_collation| extant_collation == collation }
+      update("CREATE COLLATION #{quote_table_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
+    end
+
+    I18n.available_locales.each do |locale|
+      next if locale =~ /-x-/
+      I18n.locale = locale
+      next if Canvas::ICU.collator.rules.empty?
+      collation = "#{locale}-u-kn-true"
+      next if icu_collations.find { |_schema, extant_collation| extant_collation == collation }
+      update("CREATE COLLATION #{quote_table_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
+    end
+  ensure
+    @collations = nil
+    I18n.locale = original_locale
+  end
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)
