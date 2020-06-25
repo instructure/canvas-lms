@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import styled from 'styled-components'
 import axios from 'axios'
 import parseLinkHeader from 'jsx/shared/helpers/parseLinkHeader'
@@ -11,6 +12,8 @@ import IconCheckSolid from 'instructure-icons/lib/Solid/IconCheckSolid'
 import IconEndSolid from 'instructure-icons/lib/Solid/IconEndSolid'
 import IconArrowOpenLeftSolid from 'instructure-icons/lib/Solid/IconArrowOpenLeftSolid'
 import IconArrowOpenRightSolid from 'instructure-icons/lib/Solid/IconArrowOpenRightSolid'
+import IconDocumentSolid from 'instructure-icons/lib/Solid/IconDocumentSolid'
+import IconWarningSolid from 'instructure-icons/lib/Solid/IconWarningSolid'
 
 const Card = styled.div`
   border: 1px solid #D7D7D7;
@@ -55,6 +58,55 @@ const Card = styled.div`
 
   .font-bold {
     font-weight: bold;
+  }
+
+  .review-users {
+    border-color: #5e5e5e;
+    color: #5e5e5e;
+    font-weight: bold;
+  }
+
+  .clear-all {
+    background-color: #ae0734;
+    border-color: #ae0734;
+    color: #ffffff;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: #C8254F;
+      border-color: #C8254F;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .button-container {
+    .submit-button {
+      margin-right: 1rem;
+    }
+  }
+
+  // transitions
+  .warning-enter {
+    opacity: 0.01;
+    height: 0;
+  }
+  
+  .warning-enter.warning-enter-active {
+    opacity: 1;
+    transition: opacity 500ms ease-in;
+    height: auto;
+  }
+  
+  .warning-leave {
+    opacity: 1;
+  }
+  
+  .warning-leave.warning-leave-active {
+    opacity: 0.01;
+    transition: opacity 300ms ease-in;
   }
 `
 
@@ -109,6 +161,30 @@ const Pill = styled.div`
   align-items: center;
   padding: 0 0.5rem;
   border-radius: 25px;
+
+  &.observees-to-remove {
+    background: transparent;
+    border: 2px solid #006ba6;
+
+    > * {
+      color: #006ba6;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    &.selected {
+      background: #006ba6;
+
+      > * {
+        color: #ffffff;
+      }
+    }
+  }
 
   > * {
     color: #ffffff;
@@ -251,7 +327,7 @@ const Next = styled.a`
 `
 
 const Button = styled.button`
-  &.submit-button {
+  &:not(.traverse) {
     margin-top: 2rem;
   }
 
@@ -272,6 +348,36 @@ const Zero = styled.div`
     margin-bottom: 2rem;
   }
 `
+const ObserveeWarning = styled.div`
+  background: #eaeaea;
+  padding: 1rem;
+
+  > * {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:first-child {
+      margin-bottom: 15px;
+    }
+  }
+
+  p {
+    color: #AE0734;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    margin: 0;
+  }
+
+  svg {
+    color: #AE0734;
+    margin-right: 10px;
+  }
+
+  button:not(:last-of-type) {
+    margin-right: 10px;
+  }
+`
 
 class AssignObservers extends React.Component {
   constructor(props) {
@@ -288,9 +394,13 @@ class AssignObservers extends React.Component {
       current: collection.urls.current,
       observer: {},
       observeesToAdd: [],
+      observeesToRemove: [],
       currentObserversObservees: [],
       step: 1,
       searchTerm: '',
+      addDisabled: false,
+      removeDisabled: false,
+      removeAllDisabled: false,
     }
   }
   
@@ -302,8 +412,13 @@ class AssignObservers extends React.Component {
     this.setState({
       observer: {},
       observeesToAdd: [],
+      observeesToRemove: [],
+      currentObserversObservees: [],
       step: 1,
-      searchTerm: ''
+      searchTerm: '',
+      addDisabled: false,
+      removeDisabled: false,
+      removeAllDisabled: false,
     })
   }
 
@@ -356,6 +471,8 @@ class AssignObservers extends React.Component {
         observer: user,
         observeesToAdd: this.state.observeesToAdd.filter(obs => obs.id !== user.id),
         searchTerm: ''
+      }, () => {
+        this.getCurrentObservees()
       })
     }
   }
@@ -427,7 +544,8 @@ class AssignObservers extends React.Component {
   }
 
   decrementStep() {
-    this.setState({step: this.state.step - 1})
+    // need to go back to step 1 if on review removals step
+    this.setState({step: this.state.step === 5 ? 1 : this.state.step - 1})
   }
 
   chooseStep() {
@@ -440,6 +558,10 @@ class AssignObservers extends React.Component {
         return this.stepThree()
       case 4:
         return this.stepFour()
+      case 5:
+        return this.bulkRemove()
+      case 6:
+        return this.bulkRemoveSuccess()
       default:
         return this.stepOne()
     }
@@ -453,9 +575,43 @@ class AssignObservers extends React.Component {
         </Icon>
         <h3>Choose an Observer</h3>
         <p className="descriptive-text">This is the person that will be observing multiple students at one time.</p>
-        {this.state.observer.name &&
-          <Observer>Selected: <span className="font-bold">{this.state.observer.name}</span></Observer>
-        }
+
+        <ReactCSSTransitionGroup
+          component="div"
+          className="full-width"
+          transitionName="warning"
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={300}>
+          {this.state.observer.name &&
+            <Observer>Selected: <span className="font-bold">{this.state.observer.name}</span></Observer>
+          }
+        </ReactCSSTransitionGroup>
+
+        <ReactCSSTransitionGroup
+          component="div"
+          className="full-width"
+          transitionName="warning"
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={300}>
+          {this.state.currentObserversObservees.length > 0 && 
+            <ObserveeWarning>
+              <div>
+                <IconWarningSolid />
+                <p>
+                  <span className="font-bold">{this.state.observer.name}</span> is already observing <span className="font-bold">{this.state.currentObserversObservees.length} users</span>
+                </p>
+              </div>
+              <div>
+                <button className="btn btn-small review-users" 
+                  onClick={() => this.setState({step: 5})}
+                  disabled={this.state.removeAllDisabled}>Review Users</button>
+                <button className="btn btn-small clear-all font-bold"
+                 onClick={() => { this.setState({removeAllDisabled: true}, this.deleteAllObservees) }} 
+                 disabled={this.state.removeAllDisabled}>Clear All</button>
+              </div>
+            </ObserveeWarning>
+          }
+        </ReactCSSTransitionGroup>
         <UserSearch>
           {this.searchInput()}
         </UserSearch>
@@ -515,7 +671,9 @@ class AssignObservers extends React.Component {
             )
           })}
         </PillContainer>
-        <Button className="btn btn-primary submit-button" onClick={this.submitObserver.bind(this)} disabled={this.state.observeesToAdd.length === 0}>Submit</Button>
+        <Button className="btn btn-primary submit-button" 
+          onClick={() => { this.setState({addDisabled: true}, this.submitObserver) }} 
+          disabled={this.state.addDisabled || this.state.observeesToAdd.length === 0}>Submit</Button>
       </div>
     )
   }
@@ -542,12 +700,85 @@ class AssignObservers extends React.Component {
     )
   }
 
+  bulkRemove() {
+    return (
+      <div className="card-content">
+        <Icon role="presentation">
+          <IconDocumentSolid/>
+        </Icon>
+        <div>
+          <h3>Review Observees</h3>
+          <p className="descriptive-text">
+            These are the users that are currently being observed.
+          </p>
+          <Observer>Observer: <span className="font-bold">{this.state.observer.name}</span></Observer>
+        </div>
+        <PillContainer>
+          {this.state.currentObserversObservees.map(obs => {
+            return (
+              <Pill className={`observees-to-remove ${this.observeeAlreadyBeingRemoved(obs) ? 'selected' : ''}`}>
+                <a alt={"Remove " + obs.name}
+                   onClick={() => this.addToRemoveIfNecessary(obs)}>
+                  <p>{obs.name}</p>
+                  <IconCheckSolid/>
+                </a>
+              </Pill>
+            )
+          })}
+        </PillContainer>
+        <div className="button-container">
+          <Button className="btn btn-primary submit-button"
+            onClick={() => { this.setState({removeDisabled: true}, this.deleteObservees) }} 
+            disabled={this.state.removeDisabled || this.state.removeAllDisabled || this.state.observeesToRemove.length === 0}
+          >Remove Selected</Button>
+          <Button className="btn clear-all"
+            onClick={() => { this.setState({removeAllDisabled: true}, this.deleteAllObservees) }} 
+            disabled={this.state.removeAllDisabled}>Clear All</Button>
+        </div>
+      </div>
+    )
+  }
+
+  // Helpers for bulkremove
+  observeeAlreadyBeingRemoved(obs) {
+    return this.state.observeesToRemove.some(obj => obj.id === obs.id)
+  }
+
+  // Helpers for bulkremove
+  addToRemoveIfNecessary(obs) {
+    if (!this.observeeAlreadyBeingRemoved(obs)) {
+      this.setState({observeesToRemove: this.state.observeesToRemove.concat(obs)})
+    }
+  }
+
+  bulkRemoveSuccess() {
+    return (
+      <Zero>
+        <object type="image/svg+xml" data="../../images/svg_illustrations/sunny.svg"></object>
+        <h3>Success!</h3>
+        <p className="descriptive-text">
+          A total of <span className="font-bold">{this.state.observeesToRemove.length}</span> observees were removed from <span className="font-bold">{this.state.observer.name}:</span>
+        </p>
+        <PillContainer>
+          {this.state.observeesToRemove.map(obs => {
+            return(
+              <Pill>
+                <p>{obs.name}</p>
+              </Pill>
+            )
+          })}
+        </PillContainer>
+        <Button className="btn start-over-button btn-primary" onClick={this.restart.bind(this)}>Back</Button>
+      </Zero>
+    )
+  }
+
   setPreviousStepButton() {
-    if (this.state.step === 4) {
+    if (this.state.step === 4 || this.state.removeAllDisabled) {
       return
     } else {
       return (
-        <Button className="btn btn-secondary" alt="Previous Step" onClick={this.decrementStep.bind(this)} disabled={this.state.step === 1}>
+        <Button className={`btn btn-secondary traverse ${this.state.step === 6 ? 'invisible' : ''}`} alt="Previous Step" onClick={this.decrementStep.bind(this)} disabled={this.state.step === 1}>
           <IconArrowOpenLeftSolid/>
         </Button>
       )
@@ -555,11 +786,11 @@ class AssignObservers extends React.Component {
   }
   
   setNextStepButton() {
-    if (this.state.step === 4) {
+    if (this.state.step === 4 || this.state.removeAllDisabled) {
       return
     } else {
       return (
-        <Button className={`btn btn-primary ${this.state.step === 3 ? 'invisible' : ''}`} alt="Next Step" onClick={this.incrementStep.bind(this)} disabled={!this.state.observer.id}>
+        <Button className={`btn btn-primary traverse ${[3, 5, 6].includes(this.state.step) ? 'invisible' : ''}`} alt="Next Step" onClick={this.incrementStep.bind(this)} disabled={!this.state.observer.id}>
           <IconArrowOpenRightSolid/>
         </Button>
       )
@@ -588,8 +819,25 @@ class AssignObservers extends React.Component {
     ).then(response => {
       this.setState({step: 4})
     }).catch(error => {
-      $.flashError(I18n.t('failed_to_assign_observers', 'Request failed. Try again.'))
+      $.flashError(I18n.t('failed_to_assign_observers', 'There was a problem adding these users.  Please try again.'))
     })
+  }
+
+  deleteObservees() {
+    let observer_id = this.state.observer.id
+    if (!observer_id) { return false }
+    axios.post(
+      `${ENV.BASE_URL}/api/v1/users/${observer_id}/bulk_destroy_observees`,
+      { observee_ids: this.state.observeesToRemove.map(obs => obs.id) }
+    ).then(response => {
+      this.setState({step: 6})
+    }).catch(error => {
+      $.flashError(I18n.t('failed_to_remove_observers', 'There was a problem removing these users.  Please try again.'))
+    })
+  }
+
+  deleteAllObservees() {
+    this.setState({observeesToRemove: this.state.currentObserversObservees}, this.deleteObservees)
   }
   
   render() {
