@@ -22,7 +22,7 @@ import I18n from 'i18n!trophy_case'
 import CurrentTrophies from './current/index'
 import PastTrophies from './past/index'
 
-const currentTrophies = [
+const trophies = [
   {
     trophy_key: 'four_leaf_clover',
     name: 'Lucky One',
@@ -40,6 +40,12 @@ const currentTrophies = [
     name: 'Unknown',
     description: 'How will you earn this trophy?',
     unlocked_at: null
+  },
+  {
+    trophy_key: 'BarBaz',
+    name: 'Unknown',
+    description: 'How will you earn this trophy?',
+    unlocked_at: null
   }
 ]
 
@@ -49,10 +55,10 @@ export default function TrophyCase() {
   return (
     <Tabs onRequestTabChange={(e, {index}) => setTab(index)}>
       <Tabs.Panel renderTitle={I18n.t('Current')} isSelected={tab === 0} padding="none">
-        <CurrentTrophies trophies={currentTrophies} />
+        <CurrentTrophies trophies={trophies} />
       </Tabs.Panel>
-      <Tabs.Panel renderTitle={I18n.t('Past')} isSelected={tab === 1}>
-        <PastTrophies />
+      <Tabs.Panel renderTitle={I18n.t('Past')} isSelected={tab === 1} padding="none">
+        <PastTrophies trophies={trophies} />
       </Tabs.Panel>
     </Tabs>
   )

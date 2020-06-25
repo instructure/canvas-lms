@@ -15,28 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render} from '@testing-library/react'
-import PastTrophies from '../index'
-import React from 'react'
 
-const trophies = [
-  {
-    trophy_key: 'Foo',
-    name: 'Foo',
-    description: 'Foo',
-    unlocked_at: '2020-06-22T22:42:00+00:00'
-  },
-  {
-    trophy_key: 'Bar',
-    name: 'Bar',
-    description: 'Bar',
-    unlocked_at: null
+.image-container {
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__unlocked {
+    background-color: #d9eefb;
   }
-]
 
-describe('TrophyCase::past', () => {
-  it('renders each trophy', () => {
-    const {queryAllByAltText} = render(<PastTrophies trophies={trophies} />)
-    expect(queryAllByAltText(/.*/)).toHaveLength(trophies.length)
-  })
-})
+  &__locked {
+    border: #c7cdd1 3px dotted;
+    // shrink container to account for border on all sides
+    width: 194px;
+    height: 194px;
+  }
+}

@@ -25,6 +25,7 @@ class UserTrophiesController < ApplicationController
     @show_left_side = true
     @context = @current_user.profile
     set_active_tab('trophy_case')
+    css_bundle :trophy_case
     js_bundle :trophy_case
     render html: '', layout: true
   end

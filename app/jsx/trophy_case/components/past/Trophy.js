@@ -18,16 +18,26 @@
 
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import Trophy from './Trophy'
+import TrophyDisplay from './TrophyDisplay'
+import DateDisplay from '../DateDisplay'
+import DescriptionDisplay from '../DescriptionDisplay'
 
-export default function PastTrophies(props) {
+export default function Trophy(props) {
   return (
-    <Flex wrap="wrap">
-      {props.trophies.map(t => (
-        <Flex.Item key={t.trophy_key} margin="medium" align="start">
-          <Trophy {...t} />
-        </Flex.Item>
-      ))}
+    <Flex direction="column" width={250} alignItems="center" justifyItems="center">
+      <Flex.Item>
+        <TrophyDisplay {...props} />
+      </Flex.Item>
+      <Flex.Item shouldGrow>
+        <Flex direction="column" textAlign="center">
+          <Flex.Item>
+            <DescriptionDisplay descriptionSize="medium" {...props} />
+          </Flex.Item>
+          <Flex.Item>
+            <DateDisplay size="small" color="secondary" {...props} />
+          </Flex.Item>
+        </Flex>
+      </Flex.Item>
     </Flex>
   )
 }

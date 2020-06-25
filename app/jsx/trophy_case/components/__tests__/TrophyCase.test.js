@@ -26,8 +26,8 @@ describe('TrophyCase', () => {
   })
 
   it('renders past trophies', async () => {
-    const {findByText} = render(<TrophyCase />)
+    const {findByText, queryAllByText} = render(<TrophyCase />)
     fireEvent.click(await findByText('Past'))
-    expect(await findByText('Check out my Past Trophies!!')).toBeVisible()
+    expect(await queryAllByText('How will you earn this trophy?')[0]).toBeVisible()
   })
 })
