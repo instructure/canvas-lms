@@ -46,6 +46,7 @@ export default function ImageCell(props) {
       height={70}
       width={70}
       src={assetFor(props.trophy_key)}
+      margin="x-small small"
       {...options}
     />
   )
