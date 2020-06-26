@@ -18,17 +18,15 @@
 
 import React from 'react'
 import {Img} from '@instructure/ui-img'
+import assetFactory from 'jsx/celebrations/assetFactory'
 
-// TODO: figure out the long term strategy for rendering assets.
-// for now, just grab a few from confetti
-const assetFor = key => {
-  switch (key) {
-    case 'Ninja':
-      return require('../../confetti/svg/Ninja.svg')
-    case 'FourLeafClover':
-      return require('../../confetti/svg/FourLeafClover.svg')
-    default:
-      return require('../../confetti/svg/Trophy.svg')
+// TODO: still defaults to trophy, figure out long term
+// error handling here
+const getAsset = key => {
+  try {
+    return assetFactory(key)
+  } catch (e) {
+    return assetFactory('trophy')
   }
 }
 
@@ -45,7 +43,7 @@ export default function ImageDisplay(props) {
       alt={props.trophy_key}
       height={props.height || 70}
       width={props.width || 70}
-      src={assetFor(props.trophy_key)}
+      src={getAsset(props.trophy_key)}
       margin="x-small small"
       {...options}
     />

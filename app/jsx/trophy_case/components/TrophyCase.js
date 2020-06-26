@@ -24,13 +24,13 @@ import PastTrophies from './past/index'
 
 const currentTrophies = [
   {
-    trophy_key: 'FourLeafClover',
+    trophy_key: 'four_leaf_clover',
     name: 'Lucky One',
     description: '"Luck is what happens when preparation meets opportunity."',
     unlocked_at: '2020-06-22T22:42:00+00:00'
   },
   {
-    trophy_key: 'Ninja',
+    trophy_key: 'ninja',
     name: 'Unknown',
     description: 'How will you earn this trophy?',
     unlocked_at: null
