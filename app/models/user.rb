@@ -1272,20 +1272,6 @@ class User < ActiveRecord::Base
     contexts.uniq.select{|c| c.grants_right?(self, nil, :manage_files) }
   end
 
-  def visible_inbox_types=(val)
-    types = (val || "").split(",")
-    write_attribute(:visible_inbox_types, types.map{|t| t.classify }.join(","))
-  end
-
-  def show_in_inbox?(type)
-    if self.respond_to?(:visible_inbox_types) && self.visible_inbox_types
-      types = self.visible_inbox_types.split(",")
-      types.include?(type)
-    else
-      true
-    end
-  end
-
   def update_avatar_image(force_reload=false)
     if !self.avatar_image_url || force_reload
       if self.avatar_image_source == 'twitter'
