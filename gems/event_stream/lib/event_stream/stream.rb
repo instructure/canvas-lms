@@ -130,15 +130,6 @@ class EventStream::Stream
     @backends = {}
   end
 
-  # these methods are included to keep the interface with plugins
-  # until they can be updated or removed to no longer
-  # depend no a cassandra-specific implementation.
-  # --- start ---
-  def fetch_cql
-    backend_for(:cassandra).fetch_cql
-  end
-  # --- end ---
-
   private
 
   def backend_for(strategy)

@@ -144,7 +144,7 @@ module DataFixup
 
     def write_batch_inserts(inserts)
       return if inserts.empty?
-      database.batch { inserts.each { |r| r.index.insert(r.record, r.key) } }
+      database.batch { inserts.each { |r| r.index.strategy_for(:cassandra).insert(r.record, r.key) } }
     end
 
     def add_course_account_index(row, account_id)
