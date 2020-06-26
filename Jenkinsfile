@@ -134,6 +134,10 @@ pipeline {
     RUBY_IMAGE = "$BUILD_IMAGE-ruby"
     RUBY_MERGE_IMAGE = "$RUBY_IMAGE:$GERRIT_BRANCH"
     RUBY_PATCHSET_IMAGE = "$RUBY_IMAGE:$NAME-$TAG_SUFFIX"
+
+    CASSANDRA_IMAGE_TAG=imageTag.cassandra()
+    DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
+    POSTGRES_IMAGE_TAG=imageTag.postgres()
   }
 
   stages {
@@ -283,7 +287,11 @@ pipeline {
           echo 'adding Vendored Gems'
           stages['Vendored Gems'] = {
             skipIfPreviouslySuccessful("vendored-gems") {
-              wrapBuildExecution('/Canvas/test-suites/vendored-gems', buildParameters, true, "")
+              wrapBuildExecution('/Canvas/test-suites/vendored-gems', buildParameters + [
+                string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+              ], true, "")
             }
           }
 
@@ -308,7 +316,11 @@ pipeline {
           echo 'adding Contract Tests'
           stages['Contract Tests'] = {
             skipIfPreviouslySuccessful("contract-tests") {
-              wrapBuildExecution('/Canvas/test-suites/contract-tests', buildParameters, true, "")
+              wrapBuildExecution('/Canvas/test-suites/contract-tests', buildParameters + [
+                string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+              ], true, "")
             }
           }
 
@@ -318,7 +330,11 @@ pipeline {
               skipIfPreviouslySuccessful("flakey-spec-catcher") {
                 def propagate = configuration.fscPropagate()
                 echo "fsc propagation: $propagate"
-                wrapBuildExecution('/Canvas/test-suites/flakey-spec-catcher', buildParameters, propagate, "")
+                wrapBuildExecution('/Canvas/test-suites/flakey-spec-catcher', buildParameters  + [
+                  string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                  string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                  string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                ], propagate, "")
               }
             }
           }

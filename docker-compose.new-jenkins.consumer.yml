@@ -22,7 +22,7 @@ services:
     init: true
 
   postgres:
-    image: starlord.inscloudgate.net/jenkins/postgis:$POSTGRES-2.5
+    image: $POSTGRES_IMAGE_TAG
     environment:
       POSTGRES_PASSWORD: sekret
     init: true
