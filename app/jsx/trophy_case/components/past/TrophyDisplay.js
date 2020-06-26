@@ -17,30 +17,11 @@
  */
 
 import React from 'react'
-import {Img} from '@instructure/ui-img'
 import {Flex} from '@instructure/ui-flex'
 import cx from 'classnames'
-
-// TODO: figure out the long term strategy for rendering assets.
-// for now, just grab a few from confetti
-const assetFor = key => {
-  switch (key) {
-    case 'Ninja':
-      return require('../../../confetti/svg/Ninja.svg')
-    case 'FourLeafClover':
-      return require('../../../confetti/svg/FourLeafClover.svg')
-    default:
-      return require('../../../confetti/svg/Trophy.svg')
-  }
-}
+import ImageDisplay from '../ImageDisplay'
 
 export default function TrophyDisplay(props) {
-  const options = !props.unlocked_at
-    ? {
-        withGrayscale: true,
-        withBlur: true
-      }
-    : {}
   const containerClass = cx('image-container', {
     'image-container__unlocked': props.unlocked_at,
     'image-container__locked': !props.unlocked_at
@@ -49,13 +30,7 @@ export default function TrophyDisplay(props) {
     <div className={containerClass}>
       <Flex alignItems="center" justifyItems="center">
         <Flex.Item>
-          <Img
-            alt={props.trophy_key}
-            height={90}
-            width={90}
-            src={assetFor(props.trophy_key)}
-            {...options}
-          />
+          <ImageDisplay height={90} width={90} {...props} />
         </Flex.Item>
       </Flex>
     </div>
