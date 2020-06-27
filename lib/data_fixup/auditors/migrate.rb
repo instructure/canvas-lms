@@ -21,8 +21,7 @@ module DataFixup::Auditors
   module Migrate
     class MissingRecordError < StandardError; end
 
-    DEFAULT_BATCH_SIZE = 100
-    DEFAULT_REPAIR_BATCH_SIZE = 1000
+    DEFAULT_BATCH_SIZE = 10
 
     module AuditorWorker
       def initialize(account_id, date, operation_type: :backfill)
@@ -129,7 +128,8 @@ module DataFixup::Auditors
         end
       end
 
-      def migrate_in_pages(ids_collection, stream_type, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
+      def migrate_in_pages(ids_collection, stream_type, auditor_ar_type, batch_size=nil)
+        batch_size ||= Setting.get('auditors_migration_batch_size', DEFAULT_BATCH_SIZE).to_i
         next_page = 1
         until next_page.nil?
           page_args = { page: next_page, per_page: batch_size}
@@ -160,7 +160,8 @@ module DataFixup::Auditors
       # that subset to insert.  This makes it much faster for traversing a large dataset
       # when some or most of the records are filled in already.  Obviously it would be somewhat
       # slower than the migrate pass if there were NO records migrated.
-      def repair_in_pages(ids_collection, stream_type, auditor_ar_type, batch_size=DEFAULT_REPAIR_BATCH_SIZE)
+      def repair_in_pages(ids_collection, stream_type, auditor_ar_type, batch_size=nil)
+        batch_size ||= Setting.get('auditors_migration_batch_size', DEFAULT_BATCH_SIZE).to_i
         next_page = 1
         until next_page.nil?
           page_args = { page: next_page, per_page: batch_size}
@@ -186,7 +187,8 @@ module DataFixup::Auditors
         end
       end
 
-      def audit_in_pages(ids_collection, auditor_ar_type, batch_size=DEFAULT_BATCH_SIZE)
+      def audit_in_pages(ids_collection, auditor_ar_type, batch_size=nil)
+        batch_size ||= Setting.get('auditors_migration_batch_size', DEFAULT_BATCH_SIZE).to_i
         @audit_results ||= {
           'uuid_count' => 0,
           'failure_count' => 0,
