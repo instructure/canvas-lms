@@ -59,6 +59,7 @@ module SIS
           root_account_id: row['root_account'],
           role_id: row['role_id'],
           limit_section_privileges: row['limit_section_privileges'],
+          notify: row['notify'],
           lineno: row['lineno'],
           csv: csv
         )
