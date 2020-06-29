@@ -316,7 +316,7 @@ pipeline {
           // // and you have no other way to test it except by running a test build.
           // stages['Test Subbuild'] = {
           //   skipIfPreviouslySuccessful("test-subbuild") {
-          //     build(job: '/Cavnas/test-suites/test-subbuild', parameters: buildParameters)
+          //     build(job: '/Cavnas/proofs-of-concept/test-subbuild', parameters: buildParameters)
           //   }
           // }
 
@@ -324,7 +324,7 @@ pipeline {
           // // Uncomment stage to run when developing.
           // stages['Xbrowser'] = {
           //   skipIfPreviouslySuccessful("xbrowser") {
-          //     build(job: '/Canvas/test-suites/xbrowser', propagate: false, parameters: buildParameters)
+          //     build(job: '/Canvas/proofs-of-concept/xbrowser', propagate: false, parameters: buildParameters)
           //   }
           // }
 
