@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CreatePg10Collations < ActiveRecord::Migration[4.2]
+class CreatePg12Collations < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.runnable?
-    connection.postgresql_version >= 100000
+    connection.postgresql_version >= 120000
   end
 
   def up

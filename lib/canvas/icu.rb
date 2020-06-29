@@ -178,7 +178,7 @@ module Canvas::ICU
     collator.rules.empty? ? 'und-u-kn-true' : "#{untagged_locale}-u-kn-true"
   end
 
-  def self.choose_pg10_collation(available_collations)
+  def self.choose_pg12_collation(available_collations)
     schema, collation = available_collations.find { |(_schema, locale)| locale == icu_locale_name }
     if !collation && !collator.rules.empty?
       # we don't have the proper collation for this language, but still try to use the root locale

@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class SwitchToPg10CollationIndexes < ActiveRecord::Migration[5.2]
+class SwitchToPg12CollationIndexes < ActiveRecord::Migration[5.2]
   tag :predeploy
   disable_ddl_transaction!
 
   def self.runnable?
-    connection.postgresql_version >= 100000
+    connection.postgresql_version >= 120000
   end
 
   def up

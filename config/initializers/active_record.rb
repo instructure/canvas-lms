@@ -426,7 +426,7 @@ class ActiveRecord::Base
         @collkey ||= {}
         @collkey[Shard.current.database_server.id] = connection.extension_installed?(:pg_collkey)
       end
-      if (collation = Canvas::ICU.choose_pg10_collation(connection.icu_collations))
+      if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations))
         "(#{col} COLLATE #{collation})"
       elsif (schema = @collkey[Shard.current.database_server.id])
         # The collation level of 3 is the default, but is explicitly specified here and means that

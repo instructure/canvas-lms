@@ -20,7 +20,7 @@ class DropCollkeyCollationIndexes < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def self.runnable?
-    connection.postgresql_version >= 100000
+    connection.postgresql_version >= 120000
   end
 
   def up
