@@ -30,7 +30,7 @@ def runSeleniumSuite(total, index) {
   _runRspecTestSuite(
       total,
       index,
-      'docker-compose.new-jenkins.multiple-processes.yml:docker-compose.new-jenkins-selenium.yml',
+      'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
       'selenium',
       config.max_fail,
       config.reruns_retry,
@@ -55,7 +55,7 @@ def runRSpecSuite(total, index) {
   _runRspecTestSuite(
       total,
       index,
-      'docker-compose.new-jenkins.multiple-processes.yml',
+      'docker-compose.new-jenkins.yml',
       'rspec',
       config.max_fail,
       config.reruns_retry,
