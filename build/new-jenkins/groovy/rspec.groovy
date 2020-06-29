@@ -88,6 +88,7 @@ def _runRspecTestSuite(
       "DOCKER_PROCESSES=$docker_processes",
       "FORCE_FAILURE=$force_failure",
       "POSTGRES_PASSWORD=sekret",
+      "SELENIUM_VERSION=3.141.59-20200525"
   ]) {
     try {
       cleanAndSetup()
