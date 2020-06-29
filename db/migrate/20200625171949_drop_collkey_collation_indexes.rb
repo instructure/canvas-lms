@@ -26,5 +26,7 @@ class DropCollkeyCollationIndexes < ActiveRecord::Migration[5.2]
   def up
     remove_index :users, name: :index_users_on_sortable_name_old, algorithm: :concurrently, if_exists: true
     remove_index :attachments, name: :index_attachments_on_folder_id_and_file_state_and_display_name_old, algorithm: :concurrently, if_exists: true
+    remove_index :users, name: :index_users_on_sortable_name_old2, algorithm: :concurrently, if_exists: true
+    remove_index :attachments, name: :index_attachments_on_folder_id_and_file_state_and_display_name_old2, algorithm: :concurrently, if_exists: true
   end
 end
