@@ -316,7 +316,7 @@ pipeline {
           // // and you have no other way to test it except by running a test build.
           // stages['Test Subbuild'] = {
           //   skipIfPreviouslySuccessful("test-subbuild") {
-          //     build(job: '/Cavnas/proofs-of-concept/test-subbuild', parameters: buildParameters)
+          //     build(job: '/Canvas/proofs-of-concept/test-subbuild', parameters: buildParameters)
           //   }
           // }
 
