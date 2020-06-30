@@ -225,6 +225,12 @@ class ProfileController < ApplicationController
     @context = @user.profile
     set_active_tab 'notifications'
 
+    # Render updated UI if feature flag is enabled
+    if Account.site_admin.feature_enabled?(:notification_update_account_ui)
+      js_bundle :account_notification_settings_show
+      render html: '', layout: true
+      return
+    end
 
     # Get the list of Notification models (that are treated like categories) that make up the full list of Categories.
     full_category_list = Notification.dashboard_categories(@user)
