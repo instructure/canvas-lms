@@ -42,7 +42,7 @@ describe(KeyboardShortcutModal, () => {
     component.unmount()
   })
 
-  test('appears when alt + f8 is pressed', async () => {
+  test('appears when ALT + F8 is pressed', async () => {
     expect(document.querySelector('.keyboard_navigation')).toBeNull()
     const e = new Event('keydown')
     e.which = 119

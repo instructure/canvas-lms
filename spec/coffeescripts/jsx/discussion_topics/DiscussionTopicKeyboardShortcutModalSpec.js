@@ -52,7 +52,7 @@ QUnit.module('DiscussionTopicKeyboardShortcutModal#render')
 test('renders shortcuts', async function() {
   const wrapper = mount(<DiscussionTopicKeyboardShortcutModal />)
 
-  // open the modal by pressing "alt + f8"
+  // open the modal by pressing "ALT + f8"
   const e = new Event('keydown')
   e.which = 119
   e.altKey = true
