@@ -29,8 +29,8 @@ class SwitchToPg10CollationIndexes < ActiveRecord::Migration[5.2]
       rename_index :users, :index_users_on_sortable_name, :index_users_on_sortable_name_old2
     end
     if connection.index_name_exists?(:attachments, :index_attachments_on_folder_id_and_file_state_and_display_name) &&
-      !connection.index_name_exists?(:attachments, :index_attachments_on_folder_id_and_file_state_and_display_name_old2)
-      rename_index :attachments, :index_attachments_on_folder_id_and_file_state_and_display_name, :index_attachments_on_folder_id_and_file_state_and_display_name_old2
+      !connection.index_name_exists?(:attachments, :index_attachments_on_fi_and_fs_and_dn_temp)
+      rename_index :attachments, :index_attachments_on_folder_id_and_file_state_and_display_name, :index_attachments_on_fi_and_fs_and_dn_temp
     end
 
     add_index :users, "#{User.best_unicode_collation_key('sortable_name')}, id",
