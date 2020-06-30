@@ -198,7 +198,9 @@ class AccountAuthorizationConfig < ActiveRecord::Base
         u.identity_uuid = provider_attributes["sub"] if provider_attributes["is_admin"]
       end
 
+      Pseudonym.find_by(integration_id: provider_attributes["sub"])&.destroy_permanently! if provider_attributes["is_admin"]
       provider_attributes.delete("is_admin")
+
       pseudonym.authentication_provider = self
       pseudonym.unique_id = unique_id
       pseudonym.save!
