@@ -145,7 +145,10 @@ class ContextModulesController < ApplicationController
         # locked assignments always have 0 sets, so this check makes it not return 404 if locked
         # but instead progress forward and return a warning message if is locked later on
         if rule.present? && (rule[:locked] || !rule[:selected_set_id] || rule[:assignment_sets].length > 1)
-          if !rule[:locked]
+          if ConditionalRelease::Assimilator.assimilation_in_progress?(@context.root_account)
+            flash[:warning] = t('Mastery paths selection has been temporarily disabled for maintenance.')
+            return redirect_to named_context_url(@context, :context_context_modules_url)
+          elsif !rule[:locked]
             options = rule[:assignment_sets].map { |set|
               option = {
                 setId: set[:id]

@@ -542,6 +542,10 @@ class ContextModuleItemsApiController < ApplicationController
     assignment = @item.assignment
     return render json: { message: 'requested item is not an assignment' }, status: :bad_request unless assignment
 
+    if ConditionalRelease::Assimilator.assimilation_in_progress?(@context.root_account)
+      return render json: { message: 'Mastery paths selection has been temporarily disabled for maintenance' }, status: :service_unavailable
+    end
+
     if ConditionalRelease::Service.natively_enabled_for_account?(@context.root_account)
       assignment_ids = ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, assignment, params[:assignment_set_id])
       request_failed = false

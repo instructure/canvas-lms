@@ -31,7 +31,10 @@ module ConditionalRelease
       rules_path: 'api/rules?include[]=all&active=true',
       rules_summary_path: 'api/rules/summary',
       select_assignment_set_path: 'api/rules/select_assignment_set',
-      editor_path: 'javascripts/generated/conditional_release_editor.bundle.js'
+      editor_path: 'javascripts/generated/conditional_release_editor.bundle.js',
+      start_export_path: 'api/start_export',
+      export_status_path: 'api/export_status',
+      download_export_path: 'api/download_export',
     }.freeze
 
     DEFAULT_CONFIG = {
@@ -59,6 +62,7 @@ module ConditionalRelease
       else
         cyoe_env = {
           jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
+          disable_editing: !!ConditionalRelease::Assimilator.assimilation_in_progress?(context.root_account),
           assignment: assignment_attributes(assignment),
           stats_url: stats_url,
           locale: I18n.locale.to_s,
