@@ -10841,9 +10841,9 @@ grunt-sass@^2.1.0:
     node-sass "^4.7.2"
     object-assign "^4.0.1"
 
-"grunt-template-jasmine-requirejs@git://github.com/amireh/grunt-template-jasmine-requirejs.git#0.2.0":
+"grunt-template-jasmine-requirejs@https://github.com/amireh/grunt-template-jasmine-requirejs.git#0.2.0":
   version "0.2.0"
-  resolved "git://github.com/amireh/grunt-template-jasmine-requirejs.git#87ff8c5f607431f00f65fafdc71df67fac88773f"
+  resolved "https://github.com/amireh/grunt-template-jasmine-requirejs.git#87ff8c5f607431f00f65fafdc71df67fac88773f"
 
 grunt@0.4.5:
   version "0.4.5"
