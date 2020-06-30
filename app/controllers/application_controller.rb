@@ -2102,6 +2102,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_js_wiki_data(opts = {})
+    require_user
     hash = {}
 
     hash[:DEFAULT_EDITING_ROLES] = @context.default_wiki_editing_roles if @context.respond_to?(:default_wiki_editing_roles)
