@@ -307,7 +307,16 @@ window.modules = (function() {
               if (info.points_possible === null) {
                 $context_module_item.find('.points_possible_display').remove()
               }
+
+              if (info.mc_objectives) {
+                $context_module_item.find('.mc_objectives').text(info.mc_objectives)
+                $context_module_item.find('.icon-assignment').hide()
+                $context_module_item.find('#mc_icon').show()
+              } else {
+                $context_module_item.find('.mc_objectives').remove()
+              }
             })
+
             vddTooltip()
             if (callback) {
               callback()

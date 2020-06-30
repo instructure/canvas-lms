@@ -88,6 +88,9 @@
         <i class="icon-quiz" aria-label="<%= module_item_translated_quiz_type(module_item, @is_student) %>"></i>
         <i class="icon-quiz icon-Solid" aria-label="<%= module_item_translated_quiz_type(module_item, @is_student) %>"></i>
         <i class="icon-link" aria-label="<%= t('Item type: Link') %>"></i>
+        <img id="mc_icon" src="/images/icons/<%= module_item && module_item.published? ? 'mc_icon_pub.svg' : 'mc_icon_unpub.svg' %>"
+          alt="t('Mastery Connect')" aria-label="<%= t('Item type: Mastery Connect') %>"
+          style="display: none; width: 1rem; height: 1rem;"/>
       </span>
     </span>
 
@@ -197,6 +200,7 @@
             </span>
           </span>
         </div> <!-- requirement description end -->
+        <div class="mc_objectives ig-details__item"></div>
       </div>
     </div>
     <% if !editable %>
