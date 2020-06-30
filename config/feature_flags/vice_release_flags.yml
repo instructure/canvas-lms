@@ -45,6 +45,14 @@ notification_granular_course_preferences:
     course by course basis.
   applies_to: SiteAdmin
 
+notification_update_account_ui:
+  state: hidden
+  display_name: Account level notification preferences UI update
+  description: |-
+    Updates account notification preferences UI to be a more current
+    and updated user experience
+  applies_to: SiteAdmin
+
 past_announcements:
   state: hidden
   display_name: Show past account level announcements to users
