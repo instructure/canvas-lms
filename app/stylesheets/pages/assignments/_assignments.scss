@@ -89,6 +89,18 @@
     display: table-cell;
     width: 100%;
     vertical-align: bottom;
+    .title {
+      &.assignment-submitted {
+        &:after {
+          @include chip-appearance;
+          content: 'Turned In';
+          color: #212329;
+          background: #c3dd96;
+          margin-left: 10px;
+          vertical-align: middle;
+        }
+      }
+    }
   }
   .assignment-buttons {
     display: table-cell;
@@ -172,6 +184,9 @@
   .details {
     border: none;
     padding: 0;
+    object {
+      max-width: 100px;
+    }
     h3 {
       margin: 0;
     }
@@ -211,5 +226,59 @@
         }
       }
     }
+
+    &.assignment-submitted {
+      border: 1px solid #c3dd96;
+      border-radius: 4px;
+      text-align: center;
+      h3 {
+        background-color: #c3dd96;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        padding: 1rem;
+      }
+      object {
+        padding: 0 1rem;
+        animation: sun 3s ease-in-out 4s 1;
+      }
+      .header {
+        font-weight: 800;
+        margin: 0.5rem 0;
+        padding: 0 1rem;
+      }
+      .content {
+        padding: 0 1rem 1rem;
+      }
+    }
+  }
+}
+
+@keyframes sun {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+
+  30% {
+    transform: rotate(0deg);
+  }
+
+  40% {
+    transform: scale(1.5);
+  }
+
+  50% {
+    transform: scale(1.5) rotate(15deg);
+  }
+
+  60% {
+    transform: scale(1.5);
+  }
+
+  70% {
+    transform: rotate(0deg)
+  }
+
+  100% {
+    transform: scale(1);
   }
 }

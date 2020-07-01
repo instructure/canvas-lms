@@ -86,7 +86,7 @@
     <!--Student View-->
     <div class='assignment-title'>
       <div class='title-content'>
-        <h1 class="title">
+        <h1 class="title <% if @current_user_submission.has_submission? %>assignment-submitted<% end %>">
           <%= @assignment.title %>
         </h1>
       </div>

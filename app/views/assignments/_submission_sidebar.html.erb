@@ -23,16 +23,18 @@
   @current_user_submission.assigned_assessments.count,
   @current_user_submission.assigned_assessments.incomplete.count
 ].cache_key) do %>
-<div class="details">
+<div class="details <% if @current_user_submission.has_submission? %>assignment-submitted<% end %>">
   <h3><%= t 'titles.submission', "Submission" %></h3>
   <% if @current_user_submission.excused? %>
     <div class="header">
       <%= t "Excused!" %>
      </div>
   <% elsif @assignment.expects_submission? %>
+    <% if @current_user_submission.has_submission? %>
+      <object type="image/svg+xml" data="../../../images/svg_illustrations/sunny.svg" role="presentation"></object>
+    <% end %>
     <div class="header">
       <% if @current_user_submission.has_submission? %>
-        <i class="icon-check" aria-hidden="true"></i>
         <%= t 'titles.submission_turned_in', "Turned In!" %>
       <% else %>
         <i class="icon-x" aria-hidden="true"></i>
