@@ -395,13 +395,21 @@ export default class EditView extends ValidatedFormView
     contextId = parseInt(contextInfo[1], 10)
 
     props = {
-      tool: {definition_id: @selectedTool.id}
+      tool: {
+        definition_id: @selectedTool.id,
+        placements: {
+          submission_type_selection: {
+            launch_width: @selectedTool.selection_width,
+            launch_height: @selectedTool.selection_height
+          }
+        }
+      }
       title: @selectedTool.title
       isOpen: open
       onRequestClose: @handleSubmissionTypeSelectionDialogClose
       contextType: contextType
       contextId: contextId
-      launchType: "submission_type_selection"
+      launchType: 'submission_type_selection'
       onExternalContentReady: @handleExternalContentReady
     }
 

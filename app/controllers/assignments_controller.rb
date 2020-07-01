@@ -647,7 +647,8 @@ class AssignmentsController < ApplicationController
 
       hash[:SUBMISSION_TYPE_SELECTION_TOOLS] =
         @domain_root_account&.feature_enabled?(:submission_type_tool_placement) ?
-        external_tools_display_hashes(:submission_type_selection, @context, [:base_title, :external_url]) : []
+        external_tools_display_hashes(:submission_type_selection, @context,
+          [:base_title, :external_url, :selection_width, :selection_height]) : []
 
       append_sis_data(hash)
       if context.is_a?(Course)
