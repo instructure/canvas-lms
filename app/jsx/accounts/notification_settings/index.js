@@ -16,8 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import AlertManager from 'jsx/shared/components/AlertManager'
+import {ApolloProvider, createClient} from 'jsx/canvas-apollo'
+import AccountNotificationSettingsQuery from './AccountNotificationSettingsQuery'
 import React from 'react'
 
+const client = createClient()
+
 export default function NotificationSettings() {
-  return <div>Notification Preferences</div>
+  return (
+    <ApolloProvider client={client}>
+      <AlertManager>
+        <AccountNotificationSettingsQuery
+          accountId={ENV.DOMAIN_ROOT_ACCOUNT_ID}
+          userId={ENV.current_user_id}
+        />
+      </AlertManager>
+    </ApolloProvider>
+  )
 }
