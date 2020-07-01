@@ -708,4 +708,9 @@
   .tox .tox-collection__item-icon svg:not([height]) {
     height: 30px;
   }
+
+  .tox-selectfield__icon-js svg {
+    width: 10px;
+    height: 10px;
+  }
 }
