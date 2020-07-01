@@ -228,6 +228,7 @@ module Importers
 
       item.saved_by = :migration
       item.save!
+      recache_due_dates = item.assignment&.needs_update_cached_due_dates # quiz ends up getting reloaded by the end
       build_assignment = false
 
       self.import_questions(item, hash, context, migration, question_data, new_record)
@@ -238,7 +239,6 @@ module Importers
         end
         item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.temp_record
-
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
       elsif !item.assignment && grading = hash[:grading]
         item.quiz_type = 'assignment'
@@ -296,6 +296,9 @@ module Importers
       item.notify_of_update = false
       item.save
       item.assignment.save_without_broadcasting if item.assignment && item.assignment.changed?
+      if recache_due_dates
+        migration.find_imported_migration_item(Assignment, item.assignment.migration_id)&.needs_update_cached_due_dates = true
+      end
 
       migration.add_imported_item(item)
       item.saved_by = nil

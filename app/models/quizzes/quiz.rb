@@ -451,6 +451,9 @@ class Quizzes::Quiz < ActiveRecord::Base
         a.submission_types = "online_quiz"
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
+        if self.saved_by == :migration
+          a.needs_update_cached_due_dates = true if a.update_cached_due_dates?
+        end
         unless deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end

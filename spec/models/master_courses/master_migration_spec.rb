@@ -2358,6 +2358,28 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to2.reload).to be_available
     end
 
+    it "should update quiz assignment cached due dates" do
+      course_with_student(:active_all => true)
+      @copy_to = @course
+      @sub = @template.add_child_course!(@copy_to)
+
+      q = @copy_from.quizzes.create!(:title => "some quiz")
+      q.publish!
+
+      run_master_migration
+      q_to = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
+      sub = @student.submissions.where(:assignment_id => q_to.assignment).first
+      expect(sub.cached_due_date).to be_nil
+
+      due_at = 1.day.from_now
+      Timecop.freeze(1.minute.from_now) do
+        q.update_attribute(:due_at, due_at)
+        run_master_migration
+      end
+
+      expect(sub.reload.cached_due_date.to_i).to eq due_at.to_i
+    end
+
     context "caching" do
       specs_require_cache(:redis_cache_store)
 
