@@ -27,6 +27,20 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
   # add additional models here as they are calculated and added to migration_tables.
   context 'models' do
+    shared_examples_for 'a datafixup that populates root_account_id' do
+      let(:record) { raise 'set in examples' }
+      let(:reference_record) { raise 'set in examples' }
+
+      before { record.update_columns(root_account_id: nil) }
+
+      it 'should populate the root_account_id' do
+        expect {
+          DataFixup::PopulateRootAccountIdOnModels.run
+        }.to change { record.reload.root_account_id }.from(nil).to(reference_record.reload.root_account_id)
+        expect(reference_record.root_account_id).to be_present
+      end
+    end
+
     it 'should populate the root_account_id on AccountUser' do
       au = AccountUser.create!(account: @course.account, user: @user)
       au.update_columns(root_account_id: nil)
@@ -65,6 +79,20 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(@cm.root_account_id).to be nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(@cm.reload.root_account_id).to eq @course.root_account_id
+    end
+
+    context 'with ContextExternalTool' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { external_tool_model(context: @course) }
+        let(:reference_record) { @course }
+      end
+
+      context 'when the tool context is a root account' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { external_tool_model(context: @course.root_account) }
+          let(:reference_record) { @course }
+        end
+      end
     end
 
     it 'should populate the root_account_id on DeveloperKey' do
@@ -163,6 +191,43 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(uaa.reload.root_account_id).to eq nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(uaa.reload.root_account_id).to eq account.root_account_id
+    end
+
+    context 'with Lti::LineItem' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { line_item_model(course: @course) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with Lti::Result' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { lti_result_model(course: @course) }
+        let(:reference_record) { record.submission }
+      end
+    end
+
+    context 'with Lti::ResourceLink' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { resource_link_model(overrides: {context: @course}) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with OriginalityReport' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:submission) { submission_model }
+        let(:record) { OriginalityReport.create!(submission: submission, workflow_state: :pending) }
+        let(:reference_record) { submission }
+      end
+    end
+
+    context 'with Submission' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:submission) { submission_model }
+        let(:record) { submission }
+        let(:reference_record) { submission.assignment }
+      end
     end
   end
 
