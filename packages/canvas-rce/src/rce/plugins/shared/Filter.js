@@ -36,8 +36,8 @@ const DEFAULT_FILTER_SETTINGS = {
   sortValue: 'date_added'
 }
 
-export function useFilterSettings() {
-  const [filterSettings, setFilterSettings] = useState(DEFAULT_FILTER_SETTINGS)
+export function useFilterSettings(default_settings) {
+  const [filterSettings, setFilterSettings] = useState(default_settings || DEFAULT_FILTER_SETTINGS)
 
   function updateFilterSettings(nextSettings) {
     setFilterSettings({...filterSettings, ...nextSettings})
@@ -54,37 +54,56 @@ function fileLabelFromContext(contextType) {
       return formatMessage('Course Files')
     case 'group':
       return formatMessage('Group Files')
+    case 'files':
     default:
       return formatMessage('Files')
   }
 }
 
-function renderType(contentType, onChange, userContextType) {
+function renderTypeOptions(contentType, contentSubtype) {
+  const options = [
+    <option key="links" value="links" icon={IconLinkLine}>
+      {formatMessage('Links')}
+    </option>
+  ]
+  if (contentType !== 'links' && contentSubtype !== 'all') {
+    options.push(
+      <option key="course_files" value="course_files" icon={IconFolderLine}>
+        {fileLabelFromContext('course')}
+      </option>
+    )
+  }
+  options.push(
+    <option key="user_files" value="user_files" icon={IconFolderLine}>
+      {fileLabelFromContext(contentType === 'links' || contentSubtype === 'all' ? 'files' : 'user')}
+    </option>
+  )
+  return options
+}
+
+function renderType(contentType, contentSubtype, onChange, userContextType) {
   if (userContextType === 'course') {
     return (
       <Select
         label={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
         onChange={(e, selection) => {
-          onChange({contentType: selection.value})
+          const changed = {contentType: selection.value}
+          if (contentType === 'links') {
+            // when changing away from links, go to all user files
+            changed.contentSubtype = 'all'
+          }
+          onChange(changed)
         }}
         selectedOption={contentType}
       >
-        <option key="links" value="links" icon={IconLinkLine}>
-          {formatMessage('Links')}
-        </option>
-        <option key="course_files" value="course_files" icon={IconFolderLine}>
-          {fileLabelFromContext('course')}
-        </option>
-        <option key="user_files" value="user_files" icon={IconFolderLine}>
-          {fileLabelFromContext('user')}
-        </option>
+        {renderTypeOptions(contentType, contentSubtype)}
       </Select>
     )
   } else {
     return (
       <View as="div" borderWidth="small" padding="x-small small" borderRadius="medium" width="100%">
         <ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>
-        {fileLabelFromContext('user')}
+        {fileLabelFromContext('user', contentSubtype)}
       </View>
     )
   }
@@ -100,7 +119,7 @@ export default function Filter(props) {
 
   return (
     <View display="block" direction="column">
-      {renderType(contentType, onChange, userContextType)}
+      {renderType(contentType, contentSubtype, onChange, userContextType)}
       {contentType !== 'links' && (
         <Flex margin="small none none none">
           <Flex.Item grow shrink margin="none xx-small none none">
