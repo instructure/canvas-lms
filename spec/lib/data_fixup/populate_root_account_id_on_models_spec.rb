@@ -70,6 +70,15 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(@topic.reload.root_account_id).to eq @group.root_account_id
     end
+
+    it 'should populate the root_account_id on DiscussionTopicParticipants' do
+      discussion_topic_model
+      dtp = @topic.discussion_topic_participants.create!(user: user_model)
+      dtp.update_columns(root_account_id: nil)
+      expect(dtp.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(dtp.reload.root_account_id).to eq @topic.root_account_id
+    end
   end
 
   describe '#run' do

@@ -57,7 +57,8 @@ module DataFixup::PopulateRootAccountIdOnModels
     {
       ContextModule => :context, DeveloperKey => {account: [:root_account_id, :id]},
       DeveloperKeyAccountBinding => {account: [:root_account_id, :id]},
-      DiscussionTopic => :context
+      DiscussionTopic => :context,
+      DiscussionTopicParticipant => :discussion_topic
     }.freeze
   end
 
