@@ -57,6 +57,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     {
       AccountUser => :account,
       AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
+      ContextExternalTool => [{context: [:root_account_id, :id]}],
       ContextModule => :context,
       DeveloperKey => :account,
       DeveloperKeyAccountBinding => :account,
@@ -64,9 +65,14 @@ module DataFixup::PopulateRootAccountIdOnModels
       DiscussionEntryParticipant => :discussion_entry,
       DiscussionTopic => :context,
       DiscussionTopicParticipant => :discussion_topic,
+      Lti::LineItem => :assignment,
+      Lti::ResourceLink => :context_external_tool,
+      Lti::Result => :line_item,
       MasterCourses::MasterTemplate => :course,
+      OriginalityReport => :submission,
       Quizzes::Quiz => :course,
-      UserAccountAssociation => :account
+      Submission => :assignment,
+      UserAccountAssociation => :account,
     }.freeze
   end
 
@@ -208,7 +214,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   def self.create_column_names(assoc, columns)
-    names = Array(columns).map{|column| "#{assoc.klass.to_s.tableize}.#{column}"}
+    names = Array(columns).map{|column| "#{assoc.klass.table_name}.#{column}"}
     names.count == 1 ? names.first : "COALESCE(#{names.join(', ')})"
   end
 
