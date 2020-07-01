@@ -56,6 +56,20 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(dkab.reload.root_account_id).to eq @account.id
     end
+
+    it 'should populate the root_account_id on DiscussionTopic' do
+      discussion_topic_model(context: @course)
+      @topic.update_columns(root_account_id: nil)
+      expect(@topic.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(@topic.reload.root_account_id).to eq @course.root_account_id
+
+      discussion_topic_model(context: group_model)
+      @topic.update_columns(root_account_id: nil)
+      expect(@topic.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(@topic.reload.root_account_id).to eq @group.root_account_id
+    end
   end
 
   describe '#run' do

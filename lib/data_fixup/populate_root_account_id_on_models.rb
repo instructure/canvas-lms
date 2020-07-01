@@ -56,7 +56,8 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.migration_tables
     {
       ContextModule => :context, DeveloperKey => {account: [:root_account_id, :id]},
-      DeveloperKeyAccountBinding => {account: [:root_account_id, :id]}
+      DeveloperKeyAccountBinding => {account: [:root_account_id, :id]},
+      DiscussionTopic => :context
     }.freeze
   end
 
