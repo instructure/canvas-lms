@@ -435,8 +435,6 @@ describe 'quizzes question creation' do
     end
 
     it 'edits quiz questions', priority: "1", test_id: 140578 do
-      skip("QUIZ-7717")
-
       open_quiz_edit_form
       click_questions_tab
       driver.execute_script("$('.display_question').first().addClass('hover').addClass('active')")
