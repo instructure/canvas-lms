@@ -43,7 +43,7 @@ pipeline {
         cleanAndSetup()
         timeout(time: 10) {
           sh 'rm -vrf ./tmp/*'
-          sh 'docker pull $PATCHSET_TAG'
+          sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
           sh 'docker-compose build'
         }
       }

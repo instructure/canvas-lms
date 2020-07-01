@@ -38,8 +38,8 @@ pipeline {
     stage('Dive Analyze') {
       steps {
         timeout(time: 60) {
-          sh "docker pull ${env.IMAGE}"
-          sh 'docker pull wagoodman/dive'
+          sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull ${env.IMAGE}"
+          sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull wagoodman/dive'
           sh 'build/new-jenkins/dive.sh'
         }
       }

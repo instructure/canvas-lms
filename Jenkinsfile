@@ -227,12 +227,12 @@ pipeline {
           skipIfPreviouslySuccessful('docker-build-and-push') {
             script {
               if (configuration.getBoolean('skip-docker-build')) {
-                sh 'docker pull $MERGE_TAG'
+                sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                 sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
               }
               else {
                 if (!configuration.getBoolean('skip-cache')) {
-                  sh 'docker pull $MERGE_TAG || true'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG || true'
                 }
                 sh """
                   docker build \
@@ -242,10 +242,10 @@ pipeline {
                     .
                 """
               }
-              sh "docker push $PATCHSET_TAG"
+              sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
               if (isPatchsetPublishable()) {
                 sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
-                sh 'docker push $EXTERNAL_TAG'
+                sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
               }
             }
           }
@@ -354,13 +354,13 @@ pipeline {
               // image if doesn't exist. If image is not found it will
               // return NULL
               if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
-                sh 'docker pull $PATCHSET_TAG'
+                sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
               }
 
               // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
               sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
               // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
-              sh 'docker push $MERGE_TAG'
+              sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
             }
           }
         }
