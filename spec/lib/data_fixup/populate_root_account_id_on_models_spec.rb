@@ -80,6 +80,14 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(dtp.reload.root_account_id).to eq @topic.root_account_id
     end
 
+    it 'should populate the root_account_id on MasterCourse::MasterTemplate' do
+      mcmt = MasterCourses::MasterTemplate.create(course: @course)
+      mcmt.update_columns(root_account_id: nil)
+      expect(mcmt.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(mcmt.reload.root_account_id).to eq @course.root_account_id
+    end
+
     it 'should populate the root_account_id on Quizzes::Quiz' do
       quiz_model(course: @course)
       @quiz.update_columns(root_account_id: nil)
