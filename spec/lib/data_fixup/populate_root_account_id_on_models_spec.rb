@@ -103,6 +103,21 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(@quiz.reload.root_account_id).to eq @course.root_account_id
     end
+
+    it 'should populate the root_account_id on UserAccountAssociations' do
+      uaa = UserAccountAssociation.create!(account: @course.root_account, user: user_model)
+      uaa.update_columns(root_account_id: nil)
+      expect(uaa.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(uaa.reload.root_account_id).to eq @course.root_account_id
+
+      account = account_model(root_account: account_model)
+      uaa = UserAccountAssociation.create!(account: account, user: @user)
+      uaa.update_columns(root_account_id: nil)
+      expect(uaa.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(uaa.reload.root_account_id).to eq account.root_account_id
+    end
   end
 
   describe '#run' do
