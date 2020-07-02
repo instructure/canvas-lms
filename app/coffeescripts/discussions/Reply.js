@@ -153,6 +153,24 @@ class Reply {
   //
   // @api private
   submit() {
+    const iframes = Array.from(document.querySelectorAll('iframe'))
+    const incompleteIframe = iframes.find(item => {
+      return item.contentWindow.document.body.querySelectorAll('[data-placeholder-for]').length > 0
+    })
+
+    if (incompleteIframe) {
+      // confirm is also used in other RCE places like AssignmentEdit, and Root Discussions
+      if (
+        !window.confirm(
+          I18n.t(
+            'Content is still being uploaded, if you continue it will not be embedded properly.'
+          )
+        )
+      ) {
+        return
+      }
+    }
+
     this.hide()
     this.view.model.set(
       'notification',
