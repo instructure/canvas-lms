@@ -60,6 +60,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       ContextModule => :context,
       DeveloperKey => :account,
       DeveloperKeyAccountBinding => :account,
+      DiscussionEntry => :discussion_topic,
       DiscussionTopic => :context,
       DiscussionTopicParticipant => :discussion_topic,
       MasterCourses::MasterTemplate => :course,
