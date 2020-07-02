@@ -56,6 +56,29 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(au.reload.root_account_id).to eq account.root_account_id
     end
 
+    it 'should populate root_account_id on AssessmentQuestion' do
+      aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
+      aq.update_columns(root_account_id: nil)
+      expect(aq.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(aq.reload.root_account_id).to eq @course.root_account_id
+    end
+
+    it 'should populate root_account_id on AssessmentQuestionBank' do
+      aqb = AssessmentQuestionBank.create!(context: @course)
+      aqb.update_columns(root_account_id: nil)
+      expect(aqb.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(aqb.reload.root_account_id).to eq @course.root_account_id
+
+      account = account_model(root_account: account_model)
+      aqb = AssessmentQuestionBank.create!(context: account)
+      aqb.update_columns(root_account_id: nil)
+      expect(aqb.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(aqb.reload.root_account_id).to eq account.root_account_id
+    end
+
     it 'should populate the root_account_id on AssetUserAccess with non-user context' do
       auac = AssetUserAccess.create!(context: @course, user: @user)
       auac.update_columns(root_account_id: nil)

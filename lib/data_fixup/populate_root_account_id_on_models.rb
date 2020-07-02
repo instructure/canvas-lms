@@ -56,6 +56,8 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.migration_tables
     {
       AccountUser => :account,
+      AssessmentQuestion => :assessment_question_bank,
+      AssessmentQuestionBank => :context,
       AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
       ContextExternalTool => [{context: [:root_account_id, :id]}],
       ContextModule => :context,
