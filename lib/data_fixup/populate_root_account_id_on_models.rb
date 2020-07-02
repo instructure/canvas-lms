@@ -62,7 +62,8 @@ module DataFixup::PopulateRootAccountIdOnModels
       DiscussionTopic => :context,
       DiscussionTopicParticipant => :discussion_topic,
       MasterCourses::MasterTemplate => :course,
-      Quizzes::Quiz => :course
+      Quizzes::Quiz => :course,
+      UserAccountAssociation => :account
     }.freeze
   end
 
