@@ -24,13 +24,19 @@ import Filter, {useFilterSettings} from '../Filter'
 describe('RCE Plugins > Filter', () => {
   let currentFilterSettings
   let component
+  let default_filter_settings
 
   beforeEach(() => {
     currentFilterSettings = null
+    default_filter_settings = {
+      contentType: 'course_files',
+      contentSubtype: 'documents',
+      sortValue: 'date_added'
+    }
   })
 
   function FilterWithHooks(props = {}) {
-    const [filterSettings, setFilterSettings] = useFilterSettings()
+    const [filterSettings, setFilterSettings] = useFilterSettings(default_filter_settings)
     currentFilterSettings = filterSettings
 
     return <Filter {...filterSettings} onChange={setFilterSettings} {...props} />
@@ -70,16 +76,16 @@ describe('RCE Plugins > Filter', () => {
     beforeEach(() => {
       renderComponent()
     })
-    it('sets content type to "links"', () => {
-      expect(currentFilterSettings.contentType).toEqual('links')
+    it('sets content type to default', () => {
+      expect(currentFilterSettings.contentType).toEqual(default_filter_settings.contentType)
     })
 
-    it('sets content subtype to "all"', () => {
-      expect(currentFilterSettings.contentSubtype).toEqual('all')
+    it('sets content subtype to defualt', () => {
+      expect(currentFilterSettings.contentSubtype).toEqual(default_filter_settings.contentSubtype)
     })
 
-    it('sets sort value to "date_added"', () => {
-      expect(currentFilterSettings.sortValue).toEqual('date_added')
+    it('sets sort value to default', () => {
+      expect(currentFilterSettings.sortValue).toEqual(default_filter_settings.sortValue)
     })
   })
 
@@ -205,6 +211,33 @@ describe('RCE Plugins > Filter', () => {
       expect(currentFilterSettings.sortValue).toEqual('date_added')
       selectContentSubtype('Media')
       expect(currentFilterSettings.sortValue).toEqual('date_added')
+    })
+  })
+
+  describe('deals with switching to and from Links', () => {
+    it('changes to "all" when type changes from "Links" to "Files"', () => {
+      renderComponent({userContextType: 'course'})
+
+      // our initial state
+      expect(currentFilterSettings.contentType).toEqual('course_files')
+      expect(currentFilterSettings.contentSubtype).toEqual('documents')
+
+      // switch to Links, the subtype remains unchanged (though we don't care what it is)
+      selectContentType('Links')
+      expect(currentFilterSettings.contentType).toEqual('links')
+      expect(currentFilterSettings.contentSubtype).toEqual('documents')
+
+      // the other content type is now just "Files", and it shows all files
+      // subtype is "all" so we can query for the media, which is only returned
+      // in the user context
+      selectContentType('Files')
+      expect(currentFilterSettings.contentType).toEqual('user_files')
+      expect(currentFilterSettings.contentSubtype).toEqual('all')
+
+      // Switch from "All" to "Documents"
+      selectContentSubtype('Documents')
+      expect(currentFilterSettings.contentType).toEqual('user_files')
+      expect(currentFilterSettings.contentSubtype).toEqual('documents')
     })
   })
 
