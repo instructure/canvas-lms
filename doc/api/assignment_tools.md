@@ -165,7 +165,8 @@ Grades are passed back to Canvas from the tool's servers using the
 <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html#_Toc319560472">
 outcomes component of LTI 1.1</a>. Notably, one of the major limitations of the
 LTI 1.1 Outcomes Service is the inability of tools to return grades _before_ a
-student accesses the assignment from Cavnas. If this functionality is desirable,
+student accesses the assignment from Canvas. If this functionality is desirable,
+
 you should upgrade to LTI Advantage's Assignment and Grading Services.
 
 ## Data Return Extension
