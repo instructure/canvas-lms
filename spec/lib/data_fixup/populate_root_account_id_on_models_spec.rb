@@ -33,6 +33,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(au.reload.root_account_id).to eq nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(au.reload.root_account_id).to eq @course.root_account_id
+
+      account = account_model(root_account: account_model)
+      au = AccountUser.create!(account: account, user: @user)
+      au.update_columns(root_account_id: nil)
+      expect(au.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(au.reload.root_account_id).to eq account.root_account_id
     end
 
     it 'should populate the root_account_id on AssetUserAccess with non-user context' do
@@ -143,7 +150,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(@quiz.reload.root_account_id).to eq @course.root_account_id
     end
 
-    it 'should populate the root_account_id on UserAccountAssociations' do
+    it 'should populate the root_account_id on UserAccountAssociation' do
       uaa = UserAccountAssociation.create!(account: @course.root_account, user: user_model)
       uaa.update_columns(root_account_id: nil)
       expect(uaa.reload.root_account_id).to eq nil
