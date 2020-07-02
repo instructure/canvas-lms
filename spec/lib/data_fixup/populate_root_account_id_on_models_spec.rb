@@ -98,10 +98,32 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(auag.reload.root_account_id).to eq @course.root_account_id
     end
 
-    it 'should populate the root_account_id on ContextModule' do
-      expect(@cm.root_account_id).to be nil
+    it 'should populate the root_account_id on AssignmentGroup' do
+      ag = @course.assignment_groups.create!(name: 'AssignmentGroup!')
+      ag.update_columns(root_account_id: nil)
+      expect(ag.root_account_id).to be nil
       DataFixup::PopulateRootAccountIdOnModels.run
-      expect(@cm.reload.root_account_id).to eq @course.root_account_id
+      expect(ag.reload.root_account_id).to eq @course.root_account_id
+    end
+
+    it 'should populate the root_account_id on AssignmentOverride' do
+      assignment_model(course: @course)
+      @course.enroll_student(@user)
+      create_adhoc_override_for_assignment(@assignment, @user)
+      @override.update_columns(root_account_id: nil)
+      expect(@override.attributes["root_account_id"]).to be nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(@override.reload.root_account_id).to eq @course.root_account_id
+    end
+
+    it 'should populate the root_account_id on AssignmentOverrideStudent' do
+      assignment_model(course: @course)
+      @course.enroll_student(@user)
+      create_adhoc_override_for_assignment(@assignment, @user)
+      @override_student.update_columns(root_account_id: nil)
+      expect(@override_student.root_account_id).to be nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(@override_student.reload.root_account_id).to eq @course.root_account_id
     end
 
     context 'with ContextExternalTool' do
@@ -116,6 +138,12 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           let(:reference_record) { @course }
         end
       end
+    end
+
+    it 'should populate the root_account_id on ContextModule' do
+      expect(@cm.root_account_id).to be nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(@cm.reload.root_account_id).to eq @course.root_account_id
     end
 
     it 'should populate the root_account_id on DeveloperKey' do
@@ -185,37 +213,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(dtp.reload.root_account_id).to eq @topic.root_account_id
     end
 
-    it 'should populate the root_account_id on MasterCourse::MasterTemplate' do
-      mcmt = MasterCourses::MasterTemplate.create(course: @course)
-      mcmt.update_columns(root_account_id: nil)
-      expect(mcmt.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(mcmt.reload.root_account_id).to eq @course.root_account_id
-    end
-
-    it 'should populate the root_account_id on Quizzes::Quiz' do
-      quiz_model(course: @course)
-      @quiz.update_columns(root_account_id: nil)
-      expect(@quiz.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(@quiz.reload.root_account_id).to eq @course.root_account_id
-    end
-
-    it 'should populate the root_account_id on UserAccountAssociation' do
-      uaa = UserAccountAssociation.create!(account: @course.root_account, user: user_model)
-      uaa.update_columns(root_account_id: nil)
-      expect(uaa.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(uaa.reload.root_account_id).to eq @course.root_account_id
-
-      account = account_model(root_account: account_model)
-      uaa = UserAccountAssociation.create!(account: account, user: @user)
-      uaa.update_columns(root_account_id: nil)
-      expect(uaa.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(uaa.reload.root_account_id).to eq account.root_account_id
-    end
-
     context 'with Lti::LineItem' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { line_item_model(course: @course) }
@@ -237,6 +234,14 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    it 'should populate the root_account_id on MasterCourse::MasterTemplate' do
+      mcmt = MasterCourses::MasterTemplate.create(course: @course)
+      mcmt.update_columns(root_account_id: nil)
+      expect(mcmt.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(mcmt.reload.root_account_id).to eq @course.root_account_id
+    end
+
     context 'with OriginalityReport' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:submission) { submission_model }
@@ -245,12 +250,35 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    it 'should populate the root_account_id on Quizzes::Quiz' do
+      quiz_model(course: @course)
+      @quiz.update_columns(root_account_id: nil)
+      expect(@quiz.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(@quiz.reload.root_account_id).to eq @course.root_account_id
+    end
+
     context 'with Submission' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:submission) { submission_model }
         let(:record) { submission }
         let(:reference_record) { submission.assignment }
       end
+    end
+
+    it 'should populate the root_account_id on UserAccountAssociation' do
+      uaa = UserAccountAssociation.create!(account: @course.root_account, user: user_model)
+      uaa.update_columns(root_account_id: nil)
+      expect(uaa.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(uaa.reload.root_account_id).to eq @course.root_account_id
+
+      account = account_model(root_account: account_model)
+      uaa = UserAccountAssociation.create!(account: account, user: @user)
+      uaa.update_columns(root_account_id: nil)
+      expect(uaa.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(uaa.reload.root_account_id).to eq account.root_account_id
     end
   end
 
