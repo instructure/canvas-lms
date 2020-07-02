@@ -287,10 +287,21 @@ pipeline {
             }
           }
 
-          echo 'adding Javascript'
-          stages['Javascript'] = {
-            skipIfPreviouslySuccessful("javascript") {
-              wrapBuildExecution('/Canvas/test-suites/JS', buildParameters, true, "testReport")
+          echo 'adding Javascript (Jest)'
+          stages['Javascript (Jest)'] = {
+            skipIfPreviouslySuccessful("javascript_jest") {
+              wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
+                string(name: 'TEST_SUITE', value: "jest"),
+              ], true, "testReport")
+            }
+          }
+
+          echo 'adding Javascript (Karma)'
+          stages['Javascript (Karma)'] = {
+            skipIfPreviouslySuccessful("javascript_karma") {
+              wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
+                string(name: 'TEST_SUITE', value: "karma"),
+              ], true, "testReport")
             }
           }
 

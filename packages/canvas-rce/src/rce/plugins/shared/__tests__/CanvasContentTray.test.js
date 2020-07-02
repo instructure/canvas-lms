@@ -44,10 +44,6 @@ describe('RCE Plugins > CanvasContentTray', () => {
     return props
   }
 
-  beforeEach(() => {
-    jest.setTimeout(20000)
-  })
-
   function renderComponent(trayprops) {
     component = render(<CanvasContentTray {...getProps(trayprops)} />)
   }

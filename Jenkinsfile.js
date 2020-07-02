@@ -55,43 +55,47 @@ pipeline {
           script {
             def tests = [:]
 
-            tests['Jest'] = {
-              withEnv(['CONTAINER_NAME=tests-jest']) {
-                try {
-                  credentials.withSentryCredentials {
-                    sh 'build/new-jenkins/js/tests-jest.sh'
-                  }
-                } finally {
-                  copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-                }
-              }
-            }
-
-            tests['Packages'] = {
-              withEnv(['CONTAINER_NAME=tests-packages']) {
-                try {
-                  credentials.withSentryCredentials {
-                    sh 'build/new-jenkins/js/tests-packages.sh'
-                  }
-                } finally {
-                  copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
-                }
-              }
-            }
-
-            tests['canvas_quizzes'] = {
-              sh 'build/new-jenkins/js/tests-quizzes.sh'
-            }
-
-            ['coffee', 'jsa', 'jsg', 'jsh'].each { group ->
-              tests["Karma - Spec Group - ${group}"] = {
-                withEnv(["CONTAINER_NAME=tests-karma-${group}", "JSPEC_GROUP=${group}"]) {
+            if(env.TEST_SUITE == 'jest') {
+              tests['Jest'] = {
+                withEnv(['CONTAINER_NAME=tests-jest']) {
                   try {
                     credentials.withSentryCredentials {
-                      sh 'build/new-jenkins/js/tests-karma.sh'
+                      sh 'build/new-jenkins/js/tests-jest.sh'
                     }
                   } finally {
                     copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+                  }
+                }
+              }
+            }
+
+            if(env.TEST_SUITE == 'karma') {
+              tests['Packages'] = {
+                withEnv(['CONTAINER_NAME=tests-packages']) {
+                  try {
+                    credentials.withSentryCredentials {
+                      sh 'build/new-jenkins/js/tests-packages.sh'
+                    }
+                  } finally {
+                    copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
+                  }
+                }
+              }
+
+              tests['canvas_quizzes'] = {
+                sh 'build/new-jenkins/js/tests-quizzes.sh'
+              }
+
+              ['coffee', 'jsa', 'jsg', 'jsh'].each { group ->
+                tests["Karma - Spec Group - ${group}"] = {
+                  withEnv(["CONTAINER_NAME=tests-karma-${group}", "JSPEC_GROUP=${group}"]) {
+                    try {
+                      credentials.withSentryCredentials {
+                        sh 'build/new-jenkins/js/tests-karma.sh'
+                      }
+                    } finally {
+                      copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+                    }
                   }
                 }
               }
