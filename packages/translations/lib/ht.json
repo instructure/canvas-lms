@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Gen yon erè ki fèt pandan tantativ pou rejte opòtinite a."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "Gen yon erè ki fèt pandan apèsi fichye a ap fèt"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Gen yon erè ki fèt pandan demann rezo a"
     },
@@ -160,9 +157,6 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Efase fichye seleksyone: { filename }"
-    },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Klike sou nenpòt paj pou ensere yon lyen nan paj sa a."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Klike pou entegre { imageName }"
@@ -581,12 +575,6 @@
     "link_options_a16b758b": {
         "message": "Opsyon Lyen"
     },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Lye a lòt kontni nan kou a."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Lye a lòt kontni nan gwoup la."
-    },
     "links_14b70841": {
         "message": "Lyen"
     },
@@ -703,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Pwochen Paj"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "Pa gen Tèks Altèn (Imaj Dekoratif)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Pa gen Delè"

@@ -17,6 +17,7 @@
 #
 
 class RoleOverride < ActiveRecord::Base
+  extend RootAccountResolver
   belongs_to :context, polymorphic: [:account]
 
   belongs_to :role
@@ -28,6 +29,8 @@ class RoleOverride < ActiveRecord::Base
   validate :must_apply_to_something
 
   after_save :clear_caches
+
+  resolves_root_account through: ->(record) { record.context.resolved_root_account_id }
 
   def clear_caches
     RoleOverride.clear_caches(self.account, self.role)

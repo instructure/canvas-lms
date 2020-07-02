@@ -50,7 +50,7 @@ const HEADERS = [
   },
   {
     get name() {
-      return I18n.t('Add to Whitelist')
+      return I18n.t('Add as Allowed')
     },
     id: 3,
     apiName: 'add_to_whitelist' // This isn't really an api thing though
@@ -75,9 +75,9 @@ export default function ViolationTable({
   const [ascending, setAscending] = useState(false)
   const direction = ascending ? 'ascending' : 'descending'
 
-  // Clear out any violations that are on the whitelist
+  // Clear out any violations that are on the whitelist (allowed domain list)
   // This should only happen when a violation from the log gets added
-  // to the whitelist
+  // to the allowed list
   const filteredViolations = violations.filter(
     v => !whitelistedDomains.account.includes(getHostname(v.uri))
   )
@@ -153,7 +153,7 @@ export default function ViolationTable({
                   onClick={() => {
                     addDomain('account', accountId, hostname, () => {
                       showAlert({
-                        message: I18n.t('Success: You added %{hostname} to the whitelist.', {
+                        message: I18n.t('Success: You added %{hostname} as an allowed domain.', {
                           hostname
                         }),
                         type: 'success'
@@ -162,7 +162,7 @@ export default function ViolationTable({
                   }}
                 >
                   <ScreenReaderContent>
-                    {I18n.t('Add %{hostname} to the whitelist', {hostname})}
+                    {I18n.t('Add %{hostname} as an allowed domain', {hostname})}
                   </ScreenReaderContent>
                 </Button>
               </Table.Cell>

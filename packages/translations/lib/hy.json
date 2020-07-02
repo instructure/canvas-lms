@@ -41,9 +41,6 @@
     "canvas_plugins_705a5016": {
         "message": "Canvas  միացվող մոդուլներ"
     },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Սեղմեք ցանկացած էջ՝ այդ էջին հղում տեղադրելու համար:"
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Click to embed { imageName }"
     },
@@ -172,12 +169,6 @@
     },
     "link_7262adec": {
         "message": "Հղում"
-    },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Կապակցել դասընթացի այլ բովանդակության հետ:"
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Հղում խմբի մյուս բովանդակությանը:"
     },
     "links_14b70841": {
         "message": "Հղումներ"

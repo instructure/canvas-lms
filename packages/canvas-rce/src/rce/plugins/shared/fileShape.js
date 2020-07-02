@@ -32,3 +32,29 @@ export const fileShape = {
   locked_for_user: bool,
   published: bool
 }
+
+export const mediaObjectShape = {
+  content_type: string.isRequired,
+  date: string.isRequired,
+  embedded_iframe_url: string.isRequired,
+  id: oneOfType([number, string]).isRequired,
+  title: string.isRequired,
+  published: bool
+}
+
+export const fileOrMediaObjectShape = {
+  content_type: string.isRequired,
+  date: string.isRequired,
+  display_name: string,
+  filename: string,
+  href: string,
+  embedded_iframe_url: string,
+  id: oneOfType([number, string]).isRequired,
+  thumbnail_url: string,
+  preview_url: string,
+  hidden_to_user: bool,
+  lock_at: string,
+  unlock_at: string,
+  locked_for_user: bool,
+  published: bool
+}

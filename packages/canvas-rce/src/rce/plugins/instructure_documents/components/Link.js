@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {func, instanceOf, shape} from 'prop-types'
-import {fileShape} from '../../shared/fileShape'
+import {fileOrMediaObjectShape} from '../../shared/fileShape'
 import classnames from 'classnames'
 
 import {StyleSheet, css} from 'aphrodite'
@@ -161,7 +161,7 @@ Link.propTypes = {
   focusRef: shape({
     current: instanceOf(Element)
   }),
-  ...fileShape,
+  ...fileOrMediaObjectShape,
   onClick: func.isRequired
 }
 

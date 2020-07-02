@@ -24,6 +24,7 @@ describe "authentication_providers/index" do
 
   before do
     assign(:context, assign(:account, account))
+    assign(:domain_root_account, account)
     assign(:current_user, user_with_pseudonym)
     assign(:current_pseudonym, @pseudonym)
     assign(:saml_identifiers, [])

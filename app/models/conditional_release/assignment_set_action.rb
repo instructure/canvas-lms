@@ -25,6 +25,12 @@ module ConditionalRelease
     validates :actor_id, presence: true
     validates :assignment_set_id, presence: true
     belongs_to :assignment_set
+    belongs_to :root_account, :class_name => "Account"
+
+    before_create :set_root_account_id
+    def set_root_account_id
+      self.root_account_id ||= assignment_set.root_account_id
+    end
 
     scope :latest, -> {
       select('DISTINCT ON (assignment_set_id, student_id) id').

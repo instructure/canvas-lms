@@ -16,25 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Heading} from '@instructure/ui-heading/lib/Heading'
+import React, {useState} from 'react'
+import {Tabs} from '@instructure/ui-tabs'
 import AnnouncementFactory from './AnnouncementFactory'
 import I18n from 'i18n!past_global_announcements'
 
 const PastGlobalAnnouncements = () => {
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const activeAnnouncements = AnnouncementFactory(ENV.global_notifications.current, 'Current')
   const pastAnnouncements = AnnouncementFactory(ENV.global_notifications.past, 'Past')
+
   return (
     <>
-      <Heading border="bottom" margin="medium">
-        {I18n.t('Current')}
-      </Heading>
-      {activeAnnouncements}
-
-      <Heading border="bottom" margin="medium">
-        {I18n.t('Past')}
-      </Heading>
-      {pastAnnouncements}
+      <Tabs
+        margin="0 auto"
+        padding="medium"
+        onRequestTabChange={(event, {index}) => {setSelectedIndex(index)}}
+      >
+        <Tabs.Panel
+          id="currentTab"
+          renderTitle={I18n.t('Current')}
+          isSelected={selectedIndex === 0}
+          data-testid="GlobalAnnouncementCurrentTab"
+        >
+          {activeAnnouncements}
+        </Tabs.Panel>
+        <Tabs.Panel
+          id="pastTab"
+          renderTitle={I18n.t('Recent')}
+          isSelected={selectedIndex === 1}
+          data-testid="GlobalAnnouncementPastTab"
+        >
+          {pastAnnouncements}
+        </Tabs.Panel>
+      </Tabs>
     </>
   )
 }

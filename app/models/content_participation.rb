@@ -24,6 +24,7 @@ class ContentParticipation < ActiveRecord::Base
   belongs_to :content, polymorphic: [:submission]
   belongs_to :user
 
+  before_create :set_root_account_id
   after_save :update_participation_count
 
   validates_presence_of :content_type, :content_id, :user_id, :workflow_state
@@ -57,5 +58,9 @@ class ContentParticipation < ActiveRecord::Base
       :content_type => content_type,
       :offset => (workflow_state == "unread" ? 1 : -1),
     })
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.content.assignment.root_account_id
   end
 end

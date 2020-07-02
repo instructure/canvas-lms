@@ -60,6 +60,7 @@ module Api::V1::Account
           hash['terms_required'] = account.terms_required?
           hash['terms_of_use_url'] = terms_of_use_url
           hash['privacy_policy_url'] = privacy_policy_url
+          hash['recaptcha_key'] = account.self_registration_captcha? && Canvas::DynamicSettings.find(tree: :private)['recaptcha_client_key']
         end
       end
       if includes.include?('services') && account.grants_right?(user, session, :manage_account_settings)

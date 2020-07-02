@@ -40,13 +40,7 @@ export function mimeClass(file) {
     return file.mime_class
   } else {
     const contentType = getContentType(file)
-    if (/^audio(\W|$)/.test(contentType)) {
-      return 'audio'
-    }
-    if (/^video(\W|$)/.test(contentType)) {
-      return 'video'
-    }
-
+    // NOTE: Keep this list in sync with what's in canvas-lms/app/models/attachment.rb
     return (
       {
         'text/html': 'html',
@@ -71,12 +65,36 @@ export function mimeClass(file) {
         'image/pjpeg': 'image',
         'image/png': 'image',
         'image/gif': 'image',
+        'image/bmp': 'image',
+        'image/svg+xml': 'image',
+        // 'image/webp': 'image', not supported by safari as of Version 13.1.1
         'application/x-rar': 'zip',
         'application/x-rar-compressed': 'zip',
         'application/x-zip': 'zip',
         'application/x-zip-compressed': 'zip',
         'application/xml': 'code',
         'application/zip': 'zip',
+        'audio/mp3': 'audio',
+        'audio/mpeg': 'audio',
+        'audio/basic': 'audio',
+        'audio/mid': 'audio',
+        'audio/3gpp': 'audio',
+        'audio/x-aiff': 'audio',
+        'audio/x-m4a': 'audio',
+        'audio/x-mpegurl': 'audio',
+        'audio/x-pn-realaudio': 'audio',
+        'audio/x-wav': 'audio',
+        'audio/mp4': 'audio',
+        'audio/webm': 'audio',
+        'video/mpeg': 'video',
+        'video/quicktime': 'video',
+        'video/x-la-asf': 'video',
+        'video/x-ms-asf': 'video',
+        'video/x-msvideo': 'video',
+        'video/x-sgi-movie': 'video',
+        'video/3gpp': 'video',
+        'video/mp4': 'video',
+        'video/webm': 'video',
         'application/x-shockwave-flash': 'flash'
       }[contentType] ||
       file.mime_class ||

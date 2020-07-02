@@ -53,6 +53,7 @@ signupDialog = (id, title, path=null) ->
   html = templates[id](
     account: ENV.ACCOUNT.registration_settings
     terms_required: ENV.ACCOUNT.terms_required
+    recaptcha: ENV.ACCOUNT.recaptcha_key
     terms_html: termsHtml(ENV.ACCOUNT)
     path: path
     require_email: ENV.ACCOUNT.registration_settings.require_email
@@ -76,6 +77,9 @@ signupDialog = (id, title, path=null) ->
       else
         window.location = "/?registration_success=1"
     error: (data) =>
+      if ENV.ACCOUNT.recaptcha_key
+        grecaptcha.reset($form.attr('data-captcha-id'))
+        $node.parent().find('.button_type_submit').prop('disabled', true )
       if data.error
         error_msg = data.error.message
         $("input[name='#{htmlEscape data.error.input_name}']").
@@ -91,11 +95,22 @@ signupDialog = (id, title, path=null) ->
     open: ->
       $(this).find('a').eq(0).blur()
       $(this).find(':input').eq(0).focus()
+      if ENV.ACCOUNT.recaptcha_key
+        $captchaId = grecaptcha.render($(this).find('.g-recaptcha')[0], {
+          'sitekey': ENV.ACCOUNT.recaptcha_key,
+          'callback': -> $node.parent().find('button[type=submit], .button_type_submit').prop('disabled', false),
+          'expired-callback': -> $node.parent().find('button[type=submit], .button_type_submit').prop('disabled', true)
+        })
+        $form.attr('data-captcha-id', $captchaId)
+        $node.find('button[type=submit]').prop('disabled', true )
       signupDialog.afterRender?()
     close: ->
       signupDialog.teardown?()
       $('.error_box').filter(':visible').remove()
   $node.fixDialogButtons()
+  # re-disable after fixing
+  if ENV.ACCOUNT.recaptcha_key
+    $node.parent().find('.button_type_submit').prop('disabled', true )
   unless ENV.ACCOUNT.terms_required # term verbiage has a link to PP, so this would be redundant
     addPrivacyLinkToDialog($node)
 

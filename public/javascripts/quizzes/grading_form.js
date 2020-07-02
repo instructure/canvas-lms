@@ -30,13 +30,16 @@ export default class GradingForm {
     })
   }
 
-  preventInsanity() {
+  preventInsanity(onInputChange) {
     $('#update_history_form input.question_input').keydown(function(event) {
       // stop enter from submitting for on DOWN,
       // otherwise it can actually wreck a database
       // because of the uniqueness constraints on the versions
       // table
       if (event.keyCode === 13) {
+        if (onInputChange) {
+          onInputChange($(this))
+        }
         event.preventDefault()
         event.stopImmediatePropagation()
         return false

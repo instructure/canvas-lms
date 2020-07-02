@@ -32,7 +32,8 @@ export default class ExternalToolModalLauncher extends React.Component {
     onRequestClose: PropTypes.func.isRequired,
     contextType: PropTypes.string.isRequired,
     contextId: PropTypes.number.isRequired,
-    launchType: PropTypes.string.isRequired
+    launchType: PropTypes.string.isRequired,
+    onExternalContentReady: PropTypes.func
   }
 
   static defaultProps = {
@@ -65,7 +66,10 @@ export default class ExternalToolModalLauncher extends React.Component {
     $(window).off('externalContentCancel', this.onExternalToolCompleted)
   }
 
-  onExternalToolCompleted = () => {
+  onExternalToolCompleted = (ev, data) => {
+    if (this.props.onExternalContentReady) {
+      this.props.onExternalContentReady(data)
+    }
     this.props.onRequestClose()
   }
 
@@ -182,7 +186,6 @@ export default class ExternalToolModalLauncher extends React.Component {
           onFocus={this.handleAlertFocus}
           onBlur={this.handleAlertBlur}
           className={beforeAlertStyles}
-          tabIndex="0"
           ref={e => {
             this.beforeAlert = e
           }}
@@ -198,7 +201,6 @@ export default class ExternalToolModalLauncher extends React.Component {
           src={this.getIframeSrc()}
           style={styles.modalLaunchStyle}
           title={this.props.title}
-          tabIndex={0}
           ref={e => {
             this.iframe = e
           }}
@@ -208,7 +210,6 @@ export default class ExternalToolModalLauncher extends React.Component {
           onFocus={this.handleAlertFocus}
           onBlur={this.handleAlertBlur}
           className={afterAlertStyles}
-          tabIndex="0"
           ref={e => {
             this.afterAlert = e
           }}

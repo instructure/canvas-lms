@@ -28,7 +28,7 @@ module ConditionalRelease
       def destroy
         return true if deleted_at.present?
         self.deleted_at = Time.now.utc
-        run_callbacks(:destroy) { save! }
+        run_callbacks(:destroy) { save(validate: false) }
       end
 
       def restore

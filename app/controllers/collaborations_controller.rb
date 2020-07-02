@@ -244,13 +244,15 @@ class CollaborationsController < ApplicationController
       }
     end
 
+    js_env :CREATE_PERMISSION => @context.grants_right?(@current_user, :create_collaborations)
+
     set_tutorial_js_env
 
     render :html => "".html_safe, :layout => true
   end
 
   def create
-    return unless authorized_action(@context.collaborations.build, @current_user, :create)
+    return unless authorized_action(@context.collaborations.build, @current_user, :create) && authorized_action(@context, @current_user, :create_collaborations)
     content_item = params['contentItems'] ? JSON.parse(params['contentItems']).first : nil
     if content_item
       @collaboration = collaboration_from_content_item(content_item)

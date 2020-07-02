@@ -402,13 +402,20 @@ describe "accounts/settings.html.erb" do
       view_context(account, admin)
     end
 
+    def expect_threshold_to_be(value)
+      expect(response).to have_tag(
+        "select#account_settings_smart_alerts_threshold" +
+        "  option[value=\"#{value}\"][selected]"
+      )
+    end
+
     it "should show a threshold control" do
       account.enable_feature!(:smart_alerts)
 
       render
 
-      expect(response).to include('Smart Alerts')
-      expect(response).to include('Threshold (in hours) to notify students within')
+      expect(response).to include('Smart Assignment Alerts')
+      expect(response).to include('Hours (from due date) before students are alerted')
     end
 
     it "does not show if the feature flag is turned off" do
@@ -416,7 +423,25 @@ describe "accounts/settings.html.erb" do
 
       render
 
-      expect(response).not_to include('Smart Alerts')
+      expect(response).not_to include('Smart Assignment Alerts')
+    end
+
+    it "defaults to a 36 hour threshold" do
+      account.enable_feature!(:smart_alerts)
+
+      render
+
+      expect_threshold_to_be(36)
+    end
+
+    it "selects the current threshold" do
+      account.enable_feature!(:smart_alerts)
+      account.settings[:smart_alerts_threshold] = 24
+      account.save!
+
+      render
+
+      expect_threshold_to_be(24)
     end
   end
 end

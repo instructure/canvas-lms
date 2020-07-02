@@ -1067,7 +1067,7 @@ ru:
       account_reports: 
         default: 
           last_user_access: 
-            text: "В данном отчете содержится информация о последнем входе в систему активных пользователей."
+            text: "В данном отчете содержится информация о последнем входе в систему активных пользователей. Помните, что значение «Последний доступ в» обновляется через каждые 10 минут. Это наше текущее пороговое значение для определения работы в течении отдельной сессии пользователя."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -12251,6 +12251,7 @@ ru:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Для того, чтобы завершить процесс вы будете перенаправлены на страницу входа, где вам нужно будет войти с учетными данными вашего ребенка."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Чтобы сразу импортировать большое количество результатов или обновить ваши существующие результаты, *следуйте формату CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Пошаговое руководство к учебному курсу по продукту и основные пункты для преподавателей"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Производственное обучение, пошаговая инструкция и основные позиции для администраторов, учителей и учащихся"
   in_progress_13b9e26f: выполняется
   in_progress_646a8aef: Выполняется
   in_progress_9d1ce8b9: Выполняется
@@ -12281,6 +12282,7 @@ ru:
   include_unpublished_courses_7a0e7aab: "Включить неопубликованные курсы"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Включает ссылку в SpeedGrader в меню заголовка заданий в журнале оценок."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Включает значения оценок в административные отчеты об успеваемости."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "В том числе, результатов совмещения услуг при экспорте и импорте содержания курса"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Включает рубрики в боковую панель навигации по курсам"
   incomplete_95612d72: незавершенный
   incomplete_da3c2ea2: "Не завершено"
@@ -13188,7 +13190,7 @@ ru:
   login_logo_5eecf564: "Логотип для страницы логина"
   login_screen_83518c07: "Экран страницы логина"
   login_with_auth_type_a0aaa52a: "Войти через *%{auth_type}*"
-  login_with_provider_3fd3998e: "Войти через %{provider}"
+  login_with_provider_3fd3998e: "Зарегистрируйтесь через %{provider}"
   loginrequest_encoded_url_44c49c18: "LoginRequest закодированный URL"
   loginrequest_xml_sent_to_idp_9fafd03a: "LoginRequest XML отправлен IdP"
   logins_9aee0cbe: "Учетные данные для входа в систему"
@@ -15913,6 +15915,7 @@ ru:
   no_74e9b590: нет
   no_alignments_are_available_for_this_outcome_7f8346f9: "Для этого результата нет согласований."
   no_announcements_280df147: "Нет объявлений"
+  no_announcements_to_display_fbf9ed1e: "Отображаемые оповещения отсутствуют"
   no_assignment_group_assigned_8f1cdb9b: "Группе не назначено никакого задания"
   no_assignment_name_adbb215b: "Отсутствует имя задания"
   no_assignments_with_that_name_found_1d7be1: "Задания с таким именем не найдены"
@@ -16817,6 +16820,7 @@ ru:
   outcomes_import_completed_baff5cb0: "Импорт результатов завершен"
   outcomes_import_failed_77efcdf4: "Импорт результатов не выполнен"
   outcomes_report_8887bd49: "Отчет о результатах"
+  outcomes_service_alignment_migration_5b4391ad: "Перенос результатов совмещения услуг"
   outcomes_tutorial_tray_ebfce995: "Лоток справки о результатах"
   over_time_bee1a733: "за время"
   override_3de65b2c: Отмена
@@ -17087,6 +17091,11 @@ ru:
         apps_index_endpoint: "Конечная точка индекса приложений"
         base_url: "Базовый URL-адрес"
         token: "Маркер доступа"
+    apple: 
+      description: "Регистрация в Apple"
+    apple_settings: 
+      labels: 
+        client_id: "Идентификатор службы ID"
     assignment_freezer: 
       description: "Блокировать свойства задания после копирования"
       name: "Подключаемый модуль для блокировки Assignment Property Freezer"
@@ -23112,6 +23121,7 @@ ru:
   this_assignment_has_been_excused_87f1dc13: "Это задание нельзя пропустить по уважительной причине."
   this_assignment_has_no_default_dates_ae314295: "Данное задание не имеет дат по умолчанию."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "За это задание баллы не присваиваются, и оно не может быть учтено при оценке успеваемости"
+  this_assignment_has_too_many_dates_to_display_262f555f: "Данное назначение имеет слишком много дат, отображаемых на дисплее."
   this_assignment_is_currently_being_moderated_ffd280f2: "Это задание в настоящее время модерируется"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Это задание в настоящее время заблокировано. Это означает, что учащиеся не могут видеть свои оценки и отклики. Хотите выполнить разблокировку?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Это задание было пропущено и не будет учитываться в итоговом подсчете"
@@ -25272,6 +25282,9 @@ ru:
   you_can_try_to_log_in_again_2b23ef0f: "Вы можете попробовать *войти еще раз*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Можно обновить некоторую информацию об этом пользователе, но он сможет изменить это."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Вы можете использовать один файл 16x16, 32x32, 48x48 с расширением .ico."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Вы можете просмотреть пропущенные оповещения, перейдя к учетной записи и выбрав опцию «Глобальные
+                  Оповещения» в меню.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Вы можете просматривать свои оценки только в режиме «что, если», чтобы понимать, как на них будут влиять предстоящие или повторно сданные задания. Вы можете проверять оценки за задание, которое уже включает оценку или пока не было оценено."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Вы не можете присвоить разделы к теме дискуссии группы"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Вы не можете назначить для группы вне набора заданий группы."
@@ -25381,6 +25394,9 @@ ru:
       Вам нужно будет [зарегистрировать приложение на Facebook](%{facebook_url}), и включить Логин Клиента OAuth
       в Расширенных настройках. Вы должны настроить %{callback_url}, как Действительное перенаправление URI OAuth.
       После сохранения вашего приложения, создайте уведомление ID приложения и Секретного Вопроса приложения и и введите их здесь.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Вам необходимо создать идентификатор службы [консоль разработчика Apple](%{apple_url}).
+      Разрешите регистрацию в Apple и добавьте %{callback_url} в качестве URL для возврата. Здесь укажите идентификатор.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Вам нужно будет создать веб-приложение в [Консоль Google Developer](%{google_url}).
       Вы должны добавить %{callback_url}, как URI перенаправления.

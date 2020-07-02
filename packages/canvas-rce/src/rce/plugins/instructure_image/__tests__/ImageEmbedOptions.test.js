@@ -382,10 +382,6 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
           $image.alt = ''
           expect(getImageOptions().isDecorativeImage).toEqual(true)
         })
-
-        it('is false when the image still has alt text', () => {
-          expect(getImageOptions().isDecorativeImage).toEqual(false)
-        })
       })
 
       describe('when "data-is-decorative" is "false" on the image element', () => {
@@ -406,6 +402,17 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
       it('is blank when absent on the image', () => {
         $image.alt = ''
         expect(getImageOptions().isDecorativeImage).toEqual(false)
+      })
+
+      describe('when role="presentation"', () => {
+        beforeEach(() => {
+          $image.setAttribute('role', 'presentation')
+        })
+
+        it('is true', () => {
+          $image.alt = ''
+          expect(getImageOptions().isDecorativeImage).toEqual(true)
+        })
       })
     })
 

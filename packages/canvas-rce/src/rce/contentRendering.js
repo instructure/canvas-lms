@@ -71,8 +71,8 @@ export function constructJSXImageElement(image, opts = {}) {
   let altText = title || display_name
   if (alt_text) {
     if (alt_text.decorativeSelected) {
-      altText = ''
-      otherAttributes['data-is-decorative'] = 'true'
+      altText = alt_text.altText || ' '
+      otherAttributes.role = 'presentation'
     } else {
       altText = alt_text.altText
     }

@@ -129,7 +129,6 @@ export default class CalendarEvent extends Backbone.Model {
   }
 
   static mergeSectionsIntoCalendarEvent(eventData = {}, sections) {
-    eventData.recurring_calendar_events = ENV.RECURRING_CALENDAR_EVENTS_ENABLED
     eventData.include_conference_selection = ENV.CALENDAR?.CONFERENCES_ENABLED
     eventData.course_sections = sections
     eventData.use_section_dates = !!(eventData.child_events && eventData.child_events.length)

@@ -30,4 +30,10 @@
     <%= f.radio_button :self_registration, 'observer', id: "self_registration_observers_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'observer' %>
     <%= f.label :self_registration, t('Observer Accounts Only'), for: "self_registration_observers_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
   </div>
+  <% if @domain_root_account.grants_right?(@current_user, :manage_site_settings) && Canvas::DynamicSettings.find(tree: :private)['recaptcha_server_key'] %>
+  <div class="ic-Form-control">
+    <%= f.label :enable_captcha, t('Require Captcha for Self Registration'), class: 'ic-Label', for: "enable_captcha_#{presenter.id_suffix(aac)}" %>
+    <%= f.check_box :enable_captcha, class: 'enable_captcha_checkbox', id: "enable_captcha_#{presenter.id_suffix(aac)}" %>
+  </div>
+  <% end %>
 </div>

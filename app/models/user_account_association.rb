@@ -17,9 +17,13 @@
 #
 
 class UserAccountAssociation < ActiveRecord::Base
+  extend RootAccountResolver
+
   belongs_to :user
   belongs_to :account
 
   validates_presence_of :user_id, :account_id
+
+  resolves_root_account through: :account
 
 end

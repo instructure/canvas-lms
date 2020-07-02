@@ -107,6 +107,12 @@ def stashSpecFailures(prefix, index) {
   }
 }
 
+def stashSpecResults(prefix, index) {
+  dir("tmp") {
+    stash name: "${prefix}_spec_results_${index}", includes: 'rspec_results/**/*', allowEmpty: true
+  }
+}
+
 def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
   def htmlFiles
   def failureCategories
@@ -151,7 +157,9 @@ def buildFailureCategories(htmlFiles) {
   Map<String, List<String>> failureCategories = [:]
   if (htmlFiles.size() > 0) {
     htmlFiles.each { file ->
-      def category = file.getPath().split("/")[3]
+      // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
+      // split on the 5th to give us the rerun category (Initial, Rerun_1, Rerun_2...)
+      def category = file.getPath().split("/")[4]
       if (!failureCategories.containsKey(category)) {
         failureCategories[category] = []
       }
@@ -238,6 +246,24 @@ def extractSnykReports(projectContainer, projectDirectory, destinationDirectory)
     docker cp ${projectContainer}:${projectDirectory}/snyk_report.css ${destinationDirectory}/snyk_report.css
     docker cp ${projectContainer}:${projectDirectory}/snyk_report.html ${destinationDirectory}/snyk_report.html
   """
+}
+
+def publishJunitReport(prefix, total) {
+  def working_dir = "${prefix}_compiled_results"
+  dir("spec_results") {
+    sh "mkdir $working_dir"
+    dir("${working_dir}") {
+      for(int index = 0; index < total; index++) {
+        dir ("node_${index}") {
+          try {
+            unstash "${prefix}_spec_results_${index}"
+          } catch(err) {
+            println (err)
+          }
+        }
+      }
+    }
+  }
 }
 
 return this

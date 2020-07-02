@@ -67,17 +67,11 @@ export default class TrayController {
 
     if (imageOptions.displayAs === 'embed') {
       editor.dom.setAttribs($img, {
-        alt: imageOptions.isDecorativeImage ? '' : imageOptions.altText,
-        'data-is-decorative': imageOptions.isDecorativeImage ? 'true' : null,
+        alt: imageOptions.altText,
+        role: imageOptions.isDecorativeImage ? 'presentation' : null,
         width: imageOptions.appliedWidth,
-        height: imageOptions.appliedHeight
-      })
-
-      // when the image was first added to the rce, we applied
-      // max-width and max-height. Remove them from the style now
-      editor.dom.setStyles($img, {
-        'max-height': '',
-        'max-width': ''
+        height: imageOptions.appliedHeight,
+        'data-is-decorative': null // replaced by role=presentation
       })
 
       // tell tinymce so the context toolbar resets

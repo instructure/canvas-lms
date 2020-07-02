@@ -54,7 +54,7 @@
           PROFILE: @user_data,
           INTERNATIONAL_SMS_ENABLED: Account.site_admin.feature_enabled?(:international_sms)
 %>
-<% js_bundle :profile %>
+<% deferred_js_bundle :profile %>
 <% css_bundle :profile_edit, :pairing_code %>
 
 <% if service_enabled?(:avatars) %>

@@ -42,6 +42,9 @@ class ContentTag < ActiveRecord::Base
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
   belongs_to :learning_outcome_content, :class_name => 'LearningOutcome', :foreign_key => :content_id
   has_many :learning_outcome_results
+  belongs_to :root_account, class_name: 'Account'
+
+  after_create :clear_stream_items_if_module_is_unpublished
 
   # This allows bypassing loading context for validation if we have
   # context_id and context_type set, but still allows validating when
@@ -51,10 +54,13 @@ class ContentTag < ActiveRecord::Base
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   before_save :associate_external_tool
   before_save :default_values
+  before_save :set_root_account
   after_save :update_could_be_locked
   after_save :touch_context_module_after_transaction
   after_save :touch_context_if_learning_outcome
   after_save :run_due_date_cacher_for_quizzes_next
+  after_save :clear_discussion_stream_items
+  after_save :send_items_to_stream
 
   include CustomValidations
   validates_as_url :url
@@ -373,6 +379,28 @@ class ContentTag < ActiveRecord::Base
     self.context_module.available_for?(user, opts.merge({:tag => self}))
   end
 
+  def send_items_to_stream
+    if self.content_type == "DiscussionTopic" && self.saved_change_to_workflow_state? && self.workflow_state == 'active'
+      content.send_items_to_stream
+    end
+  end
+
+  def clear_discussion_stream_items
+    if self.content_type == "DiscussionTopic"
+      if self.saved_change_to_workflow_state? &&
+        ['active', nil].include?(self.workflow_state_before_last_save) &&
+        self.workflow_state == 'unpublished'
+          content.clear_stream_items
+      end
+    end
+  end
+
+  def clear_stream_items_if_module_is_unpublished
+    if self.content_type == "DiscussionTopic" && context_module&.workflow_state == 'unpublished'
+      content.clear_stream_items
+    end
+  end
+
   def self.update_for(asset, exclude_tag: nil)
     tags = ContentTag.where(:content_id => asset, :content_type => asset.class.to_s).not_deleted
     tags = tags.where('content_tags.id<>?', exclude_tag.id) if exclude_tag
@@ -604,5 +632,16 @@ class ContentTag < ActiveRecord::Base
     # assignment.  Let's ignore any other contexts.
     return unless context_type == "Assignment"
     DueDateCacher.recompute(context) if content.try(:quiz_lti?) && (force || workflow_state != 'deleted')
+  end
+
+  def set_root_account
+    return if self.root_account_id.present?
+
+    case self.context
+    when Account
+      self.root_account_id = self.context.resolved_root_account_id
+    else
+      self.root_account_id = self.context&.root_account_id
+    end
   end
 end

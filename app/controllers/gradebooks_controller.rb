@@ -148,7 +148,9 @@ class GradebooksController < ApplicationController
       post_policies_enabled: @context.post_policies_enabled?
     }
 
-    if @context.feature_enabled?(:final_grades_override)
+    # This really means "if the final grade override feature flag is enabled AND
+    # the context in question has enabled the setting in the gradebook"
+    if @context.allow_final_grade_override?
       total_score = if grading_periods? && !view_all_grading_periods?
                       @presenter.student_enrollment.find_score(grading_period_id: @current_grading_period_id)
                     else

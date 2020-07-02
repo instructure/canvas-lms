@@ -74,13 +74,13 @@ describe ConditionalRelease::Setup do
       'conditional_release' => Feature.new(feature: 'conditional_release', applies_to: 'Account')
     })
     @cyoe_feature = Feature.definitions['conditional_release']
-    allow(service).to receive(:configured?).and_return(true)
+    allow(service).to receive(:service_configured?).and_return(true)
     @setup = ConditionalRelease::Setup.new(@account.id, @user.id)
   end
 
   describe "#activate!" do
     it "should not run if the Conditional Release service isn't configured" do
-      allow(service).to receive(:configured?).and_return(false)
+      allow(service).to receive(:service_configured?).and_return(false)
       expect(@setup).to receive(:create_token!).never
       expect(@setup).to receive(:send_later_enqueue_args).never
       @setup.activate!

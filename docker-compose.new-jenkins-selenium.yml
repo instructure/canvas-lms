@@ -18,6 +18,7 @@ services:
     environment:
       SCREEN_WIDTH: 1680
       SCREEN_HEIGHT: 1050
+    init: true
 
   canvasrceapi:
     image: starlord.inscloudgate.net/jeremyp/canvas-rce-api_web
@@ -29,3 +30,4 @@ services:
       PASSENGER_MIN_INSTANCES: 2
       PASSENGER_MAX_POOL_SIZE: 6
       NGINX_WORKER_CONNECTIONS: 2048
+    init: true

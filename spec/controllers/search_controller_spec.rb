@@ -126,6 +126,27 @@ describe SearchController do
         expect(response.body).to include('other section')
       end
 
+      it "should return sub-contexts with user counts" do
+        account_admin_user
+        user_session(@user)
+        course_factory(active_all: true)
+        @section = @course.course_sections.create!(:name => 'Section1')
+        @section2 = @course.course_sections.create!(:name => 'Section2')
+        @student1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+        @section.enroll_user(@student1, 'StudentEnrollment', 'active')
+        @student2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+        @section2.enroll_user(@student2, 'StudentEnrollment', 'active')
+
+        get 'recipients', params: {
+          type: 'section', exclude: ["section_#{@section2.id}"],
+          synthetic_contexts: true, context: "course_#{@course.id}_sections",
+          search_all_contexts: true
+        }
+        expect(response.body).to include('Section1')
+        expect(response.body).to include('"user_count":1')
+        expect(response.body).not_to include('Section2')
+      end
+
       it "should return sub-users" do
         account_admin_user
         user_session(@user)

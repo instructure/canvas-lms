@@ -46,7 +46,7 @@ describe('Violation Table', () => {
     const {findAllByText} = render(<ViolationTable {...getProps()} />)
 
     const results = await findAllByText(
-      content => content.startsWith('Add') && content.endsWith('to the whitelist')
+      content => content.startsWith('Add') && content.endsWith('as an allowed domain')
     )
     expect(results.length).toBe(2)
   })
@@ -74,7 +74,7 @@ describe('Violation Table', () => {
     expect(dateTwo).toBeInTheDocument()
   })
 
-  it('filters out any violations that currently exist in the whitelist', () => {
+  it('filters out any violations that currently exist in the allowed domain list', () => {
     const {container, queryAllByText} = render(
       <ViolationTable {...getProps({whitelistedDomains: {account: ['clayd.dev']}})} />
     )
@@ -91,7 +91,7 @@ describe('Violation Table', () => {
     it('calls the addDomain prop when clicking the add button', async () => {
       const fakeAddDomain = jest.fn()
       const {findByText} = render(<ViolationTable {...getProps({addDomain: fakeAddDomain})} />)
-      const addButton = await findByText('Add clayd.dev to the whitelist')
+      const addButton = await findByText('Add clayd.dev as an allowed domain')
       fireEvent.click(addButton)
       expect(fakeAddDomain).toHaveBeenCalledWith(
         'account',
@@ -107,10 +107,10 @@ describe('Violation Table', () => {
       const {findByText} = render(
         <ViolationTable {...getProps({addDomain: fakeAddDomain, showAlert: fakeAlert})} />
       )
-      const addButton = await findByText('Add clayd.dev to the whitelist')
+      const addButton = await findByText('Add clayd.dev as an allowed domain')
       fireEvent.click(addButton)
       expect(fakeAlert).toHaveBeenCalledWith({
-        message: 'Success: You added clayd.dev to the whitelist.',
+        message: 'Success: You added clayd.dev as an allowed domain.',
         type: 'success'
       })
     })

@@ -901,6 +901,8 @@ class DiscussionTopic < ActiveRecord::Base
       false
     elsif self.root_topic_id && self.has_group_category?
       false
+    elsif self.in_unpublished_module?
+      false
     else
       true
     end
@@ -920,10 +922,22 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  # This is manually called for module publishing
+  def send_items_to_stream
+    if should_send_to_stream
+      queue_create_stream_items
+    end
+  end
+
   def clear_streams_if_not_published
-    if !self.published?
+    unless self.published?
       self.clear_stream_items
     end
+  end
+
+  def in_unpublished_module?
+    return true if ContentTag.where(content_type: "DiscussionTopic", content_id: self, workflow_state: "unpublished").exists?
+    ContextModule.joins(:content_tags).where(content_tags: { content_type: "DiscussionTopic", content_id: self }, workflow_state: 'unpublished').exists?
   end
 
   def clear_non_applicable_stream_items_for_sections

@@ -91,6 +91,12 @@ module OutcomesService
           context_id: course.id.to_s,
           external_migration_id: content_migration.id
         )
+        extractor = OutcomesService::MigrationExtractor.new(content_migration)
+        data = data.merge(
+          outcomes: extractor.learning_outcomes(course),
+          groups: extractor.learning_outcome_groups(course),
+          edges: extractor.learning_outcome_links
+        )
         response = CanvasHttp.post(
           content_imports_url,
           headers_for(course, 'content_migration.import', context_type: 'course', context_id: course.id.to_s),

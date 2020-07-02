@@ -100,17 +100,17 @@ class Editor extends React.Component {
     return saveObject.promise()
   }
 
-  loadEditor = () => {
+  loadOldEditor = () => {
     const url = this.props.env.editor_url
     $.ajax({
       url,
       dataType: 'script',
       cache: true,
-      success: this.createEditor
+      success: this.createOldEditor
     })
   }
 
-  createEditor = () => {
+  createOldEditor = () => {
     const env = this.props.env
     const editor = new conditional_release_module.ConditionalReleaseEditor({
       jwt: env.jwt,
@@ -131,8 +131,29 @@ class Editor extends React.Component {
     this.setState({editor})
   }
 
+  createNativeEditor = () => {
+    const env = this.props.env
+    return import('jsx/conditional_release_editor/conditional-release-editor').then(
+      ({default: ConditionalReleaseEditor}) => {
+        const editor = new ConditionalReleaseEditor({
+          assignment: env.assignment,
+          courseId: env.course_id
+        })
+        editor.attach(
+          document.getElementById('canvas-conditional-release-editor'),
+          document.getElementById('application')
+        )
+        this.setState({editor})
+      }
+    )
+  }
+
   componentDidMount() {
-    this.loadEditor()
+    if (this.props.env.native) {
+      this.createNativeEditor()
+    } else {
+      this.loadOldEditor()
+    }
   }
 
   render() {

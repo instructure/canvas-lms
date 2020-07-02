@@ -162,5 +162,31 @@ describe "external tool assignments" do
       expect(button).to be_displayed
       expect(button.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
     end
+
+    it "should display external data for mastery connect" do
+      ext_data = {
+        key: "https://canvas.instructure.com/lti/mastery_connect_assessment",
+        points: 10,
+        objectives: "6.R.P.A.1, 6.R.P.A.2",
+        trackerName: "My Tracker Name",
+        studentCount: 15,
+        trackerAlignment: "6th grade Math"
+      }
+      a = assignment_model(
+        :course => @course,
+        :title => "test1",
+        :submission_types => 'external_tool',
+        :external_tool_tag_attributes => {:content => @t1, :url => @t1.url, :external_data => ext_data.to_json}
+      )
+
+      get "/courses/#{@course.id}/assignments/#{a.id}/edit"
+
+      expect(f('#mc_external_data_assessment').text).to eq(a.name)
+      expect(f('#mc_external_data_points').text).to eq("#{ext_data[:points]} Points")
+      expect(f('#mc_external_data_objectives').text).to eq(ext_data[:objectives])
+      expect(f('#mc_external_data_tracker').text).to eq(ext_data[:trackerName])
+      expect(f('#mc_external_data_tracker_alignment').text).to eq(ext_data[:trackerAlignment])
+      expect(f('#mc_external_data_students').text).to eq("#{ext_data[:studentCount]} Students")
+    end
   end
 end

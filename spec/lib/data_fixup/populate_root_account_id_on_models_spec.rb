@@ -202,15 +202,25 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       # this is meant to be used for models like CalendarEvent or Attachment where we may
       # not populate root account if the context is User, but we still want to work under the
       # assumption that the table is completely backfilled
-      tag = ContentTag.create!(context: assignment_model)
+
+      # User-context event doesn't have root account id
+      event = CalendarEvent.create!(context: user_model)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
-        ContentTag, [:assignment]
+        CalendarEvent
       )).to be false
 
-      tag.update_columns(root_account_id: @assignment.root_account_id)
-      ContentTag.create!(context: @course).update_columns(root_account_id: nil)
+      # manually adding makes the check method think it does, though
+      event.update_columns(root_account_id: @course.root_account_id)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
-        ContentTag, [:assignment]
+        CalendarEvent
+      )).to be true
+
+      # adding another User-context event should make it return false,
+      # except we are explicitly ignoring User-context events
+      CalendarEvent.create(context: user_model)
+      CalendarEvent.create(context: @course, root_account_id: @course.root_account_id)
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
+        CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
       )).to be true
     end
   end

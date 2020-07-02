@@ -78,3 +78,9 @@ missing_policy_applicator_emits_live_events:
   display_name: Missing Policy Applicator Emits Live Events
   description: Allows the missing policy applicator to emit submission_updated live events for each submission
     marked as missing.
+disable_post_to_sis_when_grading_period_closed:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Disable Post to SIS for Assignment in Closed Grading Periods
+  description: If set, turns off post-to-SIS functionality for assignments when their grading period closes.
+    Only applies if the "Enable new SIS integration settings" feature is enabled.

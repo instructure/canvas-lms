@@ -238,17 +238,13 @@ describe('contentInsertion', () => {
 
     it('builds image html from image data', () => {
       contentInsertion.insertImage(editor, image)
-      expect(editor.content).toEqual(
-        '<img alt="Here Be Images" src="/some/path" style="max-width:320px;max-height:320px"/>'
-      )
+      expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path"/>')
     })
 
     it('uses url if no href', () => {
       image.href = undefined
       contentInsertion.insertImage(editor, image)
-      expect(editor.content).toEqual(
-        '<img alt="Here Be Images" src="/other/path" style="max-width:320px;max-height:320px"/>'
-      )
+      expect(editor.content).toEqual('<img alt="Here Be Images" src="/other/path"/>')
     })
 
     it('builds linked image html from linked image data', () => {

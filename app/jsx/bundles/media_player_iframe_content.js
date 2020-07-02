@@ -41,6 +41,9 @@ ready(() => {
   }
 
   document.body.setAttribute('style', 'margin: 0; padding: 0; border-style: none')
+  // if the user takes the video fullscreen and back, the documentElement winds up
+  // with scrollbars, even though everything is the right size.
+  document.documentElement.setAttribute('style', 'overflow: hidden;')
 
   const div = document.body.firstElementChild
   const media_object = ENV.media_object || {}

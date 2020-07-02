@@ -144,7 +144,7 @@ module Lti
         migration_selection_params
       when 'editor_button'
         editor_button_params
-      when 'resource_selection', 'link_selection', 'assignment_selection'
+      when 'resource_selection', 'link_selection', 'assignment_selection', 'submission_type_selection'
         lti_launch_selection_params
       when 'collaboration'
         collaboration_params

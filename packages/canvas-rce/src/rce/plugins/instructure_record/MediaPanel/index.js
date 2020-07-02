@@ -18,7 +18,7 @@
 
 import React, {useRef} from 'react'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
-import {fileShape} from '../../shared/fileShape'
+import {mediaObjectShape} from '../../shared/fileShape'
 import formatMessage from '../../../../format-message'
 
 import {Text} from '@instructure/ui-elements'
@@ -106,7 +106,7 @@ MediaPanel.propTypes = {
   onMediaEmbed: func.isRequired,
   media: objectOf(
     shape({
-      files: arrayOf(shape(fileShape)).isRequired,
+      files: arrayOf(shape(mediaObjectShape)).isRequired,
       bookmark: string,
       hasMore: bool,
       isLoading: bool,

@@ -1029,7 +1029,7 @@ ht:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Rapò sa a prezante dènye koneksyon pou itilizatè ki aktif yo."
+            text: "Rapò sa a prezante dènye koneksyon pou itilizatè ki aktif yo. Sonje pati \"Dènye Aksè a\" aktyalize chak 10 minit. Se limit nou pou kounye a pou nou wè aktivite nan yon sesyon itilizatè kèlkonk."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -10895,6 +10895,7 @@ ht:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Pou konplete pwosesus la y ap re dirije w sou yon paj koneksyon kote w ap bezwen konekte ak idantifyan pitit ou a."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Pou enpòte yon gwo kantite Rezilta alafwa, oswa aktyalize rezilta aktyèl ou yo, tanpri *swiv fòma CSV a*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Pakou fòmasyon ak pwen vizit pou pwofesè yo"
+  in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Pakou fòmasyon ak pwen vizit pou administratè yo, pwofesè yo ak elèv yo"
   in_progress_13b9e26f: "an pwosesis"
   in_progress_9d1ce8b9: "Ap Avanse"
   inactive_cd40317f: "pa aktif"
@@ -10920,6 +10921,7 @@ ht:
   include_unpublished_courses_7a0e7aab: "Enkli Kou ki Pa Pibliye"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Enkli yon lyen nan SpeedGrader nan meni antèt devwa a nan Bilten,"
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Enkli valè nòt yo nan rapò nòt administratè a."
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Genyen Aliyman rezilta Sèvis pandan ekspòtasyon ak enpòtasyon kontni kou yo"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Enkli ribrik nan ba navigasyon lateral kou a"
   incomplete_95612d72: enkonplè
   incomplete_da3c2ea2: Enkonplè
@@ -14138,6 +14140,7 @@ ht:
   no_74e9b590: non
   no_alignments_are_available_for_this_outcome_7f8346f9: "Pa gen aliyman disponib pou rezilta sa a."
   no_announcements_280df147: "Okenn Anons"
+  no_announcements_to_display_fbf9ed1e: "Pa gen anons pou afiche."
   no_assignment_group_assigned_8f1cdb9b: "Okenn Gwoup Afektasyon Afekte"
   no_assignment_name_adbb215b: "Pa gen Non Sesyon"
   no_assignments_with_that_name_found_1d7be1: "Nou pa jwenn okenn sesyon ak non sa a"
@@ -14999,6 +15002,7 @@ ht:
   outcomes_import_completed_baff5cb0: "Enpòtasyon Rezilta Fini"
   outcomes_import_failed_77efcdf4: "Enpòtasyon Rezilta Echwe"
   outcomes_report_8887bd49: "Rapò Rezilta"
+  outcomes_service_alignment_migration_5b4391ad: "Rezilta Sèvis Aliyman Deplasman"
   outcomes_tutorial_tray_ebfce995: "Plato Titoryèl Rezilta"
   over_time_bee1a733: pezape
   override_3de65b2c: Ranplase
@@ -15260,6 +15264,11 @@ ht:
         apps_index_endpoint: "Apps Endis Ekstremite"
         base_url: "Baz URL"
         token: "Token Aksè"
+    apple: 
+      description: "Konekte ak Apple"
+    apple_settings: 
+      labels: 
+        client_id: "ID Sèvis"
     assignment_freezer: 
       description: "Friz Propriyete Sesyon yo nan Kopi a"
       name: "Konjelatè Pwopriyete Sesyon"
@@ -20568,6 +20577,7 @@ ht:
   this_assignment_has_been_excused_87f1dc13: "Yo egzante sesyon sa a."
   this_assignment_has_no_default_dates_ae314295: "Devwa sa a pa gen dat pa defo."
   this_assignment_has_no_points_possible_and_cannot__b0b4f829: "Sesyon sa a pa gen pwen posib e ni li pa kapab enkli nan kalkil nòt yo"
+  this_assignment_has_too_many_dates_to_display_262f555f: "Devwa sa a gen twop dat pou afiche."
   this_assignment_is_currently_being_moderated_ffd280f2: "Afektasyon sa a modere pou kounye a"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Sesyon sa a sou silans pou kounye a. Ki vle di elèv yo pa ka wè nòt ak kòmantè yo. Ou vle retire sesyon an sou silans kounye a?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Yo abandone sesyon sa a ni yo pa p konsidere li nan kalkil total la."
@@ -22608,6 +22618,9 @@ ht:
   you_can_try_to_log_in_again_2b23ef0f: "Ou ka eseye *rekonekte ankò*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Ou ka aktyalize kèk nan enfòmasyon itilizatè sa a, men yon ka chanje yo ankò si yo vle."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Ou ka itilize yon fichye ico 16x16, 32x32, 48x48."
+  you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
+      Ou kapab konsilte anons yo rejte yo, pou fè sa ale sou Kont epi seleksyone Anons
+                  Global nan meni an.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Ou ka wè nòt ou daprè What-If scores pou w ka konnen kijan nòt yo ap afekte pa pwochen afektasyon yo oswa afektasyon ki re soumèt yo. Ou ka teste nòt yon sesyon ki gentan gen yon nòt, oswa yon sesyon ki poko evalye"
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Ou paka bay yon sijè diskisyon gwoup yon seksyon"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Ou paka asiyen a yob gwoup deyò ansanm gwoup sesyon an"
@@ -22709,6 +22722,9 @@ ht:
       W ap bezwen kreye yon [nouvo app sou Facebook](%{facebook_url}),  epi aktive Koneksyon Client OAuth
       nan Paramèt Avanse yo. Ou ta dwe konfigire %{callback_url} kòm URI redireksyon Oauth Valid.
       Lè w fin anrejistre app ou a, note App ID a ak App Sekrè a, epi antre yo la.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      W ap bezwen kreye yon ID Sèvis [Apple Developer Console](%{apple_url}).
+      Aktive Konekte ak Ak Apple epi ajoute %{callback_url} kòm URL repons. Antre yon idantifyan la a.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       W ap bezwen kreye yon aplikasyon web nan [Konsòl Devlopè Google](%{google_url}).
       Ou dwe ajoute %{callback_url} kòm redireksyon URI.

@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Ocurrió un error al intentar descartar la oportunidad."
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "Ocurrió un error al generar la vista previa del archivo"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Se produjo un error al realizar una solicitud de red"
     },
@@ -160,9 +157,6 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Eliminar archivo seleccionado: { filename }"
-    },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "Haga clic en cualquier página para insertar un enlace a esa página."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Haga clic para incluir { imageName }"
@@ -581,12 +575,6 @@
     "link_options_a16b758b": {
         "message": "Opciones de enlace"
     },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "Enlazar a otro contenido en el curso."
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "Vincular a otro contenido en el grupo."
-    },
     "links_14b70841": {
         "message": "Enlaces"
     },
@@ -703,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "Próxima página"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "No hay texto alternativo (imagen decorativa)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "No hay fechas de entrega asignadas"

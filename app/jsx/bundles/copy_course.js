@@ -55,6 +55,7 @@ const importQuizzesNextView = new ImportQuizzesNextView({
   questionBank: null
 })
 $('#new_quizzes_migrate').html(importQuizzesNextView.render().el)
+$('#importQuizzesNext').attr('name', 'import_quizzes_next')
 
 $('#date_shift').html(dateShiftView.render().el)
 dateShiftView.$oldStartDate.val(ENV.OLD_START_DATE).trigger('change')

@@ -95,9 +95,6 @@
     "canvas_plugins_705a5016": {
         "message": "תופסי קנבס"
     },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "הקלק/י על דף כלשהו כדי להוסיף קישור לדף זה."
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "הקש/י כדי לשלב { imageName }"
     },
@@ -307,12 +304,6 @@
     },
     "link_7262adec": {
         "message": "קישור"
-    },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "קישור לתוכן אחר בקורס"
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "קישור לתוכן אחר בקבוצה."
     },
     "links_14b70841": {
         "message": "קישורים"

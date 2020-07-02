@@ -18,6 +18,7 @@
 
 class GroupMembership < ActiveRecord::Base
   include Workflow
+  extend RootAccountResolver
 
   belongs_to :group
   belongs_to :user
@@ -48,6 +49,8 @@ class GroupMembership < ActiveRecord::Base
   scope :active_for_context_and_users, -> (context, users) {
     joins(:group).active.where(user_id: users, groups: { context_id: context, workflow_state: 'available'})
   }
+
+  resolves_root_account through: :group
 
   alias_method :context, :group
 

@@ -33,7 +33,7 @@ import {
   IconImageSolid
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import {getRootFolder, uploadFile} from './apiFileUtils'
+import {getRootFolder, uploadFile, getSVGIconFromType} from './apiFileUtils'
 import parseLinkHeader from './parseLinkHeader'
 import {showFlashSuccess, showFlashError} from './FlashAlert'
 import natcompare from './natcompare'
@@ -43,13 +43,15 @@ class FileBrowser extends React.Component {
     allowUpload: PropTypes.bool,
     selectFile: PropTypes.func.isRequired,
     contentTypes: PropTypes.arrayOf(PropTypes.string),
-    useContextAssets: PropTypes.bool
+    useContextAssets: PropTypes.bool,
+    mediaFiles: PropTypes.arrayOf(PropTypes.object)
   }
 
   static defaultProps = {
     allowUpload: true,
     contentTypes: ['*/*'],
-    useContextAssets: true
+    useContextAssets: true,
+    mediaFiles: []
   }
 
   constructor(props) {
@@ -66,6 +68,19 @@ class FileBrowser extends React.Component {
 
   componentDidMount() {
     this.getRootFolders()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.mediaFiles.length !== this.props.mediaFiles.length) {
+      this.populateItemsList(
+        this.props.mediaFiles.map(f => {
+          f.folder_id = 'media_folder'
+          f['content-type'] = f.content_type
+          f.display_name = f.title
+          return f
+        })
+      )
+    }
   }
 
   getContextName(contextType) {
@@ -89,6 +104,7 @@ class FileBrowser extends React.Component {
       this.getContextFolders()
     }
     this.getUserFolders()
+    this.getMediaFolder()
   }
 
   getUserFolders() {
@@ -101,6 +117,20 @@ class FileBrowser extends React.Component {
     if (contextInfo && contextInfo.type && contextInfo.id) {
       this.getRootFolderData(contextInfo.type, contextInfo.id, {name: contextInfo.name})
     }
+  }
+
+  // not a real folder, but for now mediaObjects don't exist in a folder
+  // so cook up a faux folder to put them in
+  getMediaFolder() {
+    this.populateCollectionsList([
+      {
+        id: 'media_folder',
+        name: formatMessage('My Media'),
+        context_id: 'self',
+        context_type: 'user',
+        can_upload: false
+      }
+    ])
   }
 
   increaseLoadingCount() {
@@ -156,21 +186,23 @@ class FileBrowser extends React.Component {
   }
 
   populateCollectionsList = (folderList, opts = {}) => {
-    const newCollections = _.cloneDeep(this.state.collections)
-    folderList.forEach(folder => {
-      const collection = this.formatFolderInfo(folder, opts)
-      newCollections[collection.id] = collection
-      const parent_id = folder.parent_folder_id || 0
-      const collectionCollections = newCollections[parent_id].collections
-      if (!collectionCollections.includes(collection.id)) {
-        collectionCollections.push(collection.id)
-        newCollections[parent_id].collections = this.orderedIdsFromList(
-          newCollections,
-          collectionCollections
-        )
-      }
+    this.setState((state, _props) => {
+      const newCollections = _.cloneDeep(state.collections)
+      folderList.forEach(folder => {
+        const collection = this.formatFolderInfo(folder, opts)
+        newCollections[collection.id] = collection
+        const parent_id = folder.parent_folder_id || 0
+        const collectionCollections = newCollections[parent_id].collections
+        if (!collectionCollections.includes(collection.id)) {
+          collectionCollections.push(collection.id)
+          newCollections[parent_id].collections = this.orderedIdsFromList(
+            newCollections,
+            collectionCollections
+          )
+        }
+      })
+      return {collections: newCollections}
     })
-    this.setState({collections: newCollections})
     folderList.forEach(folder => {
       if (this.state.openFolders.includes(folder.parent_folder_id)) {
         this.getFolderData(folder.id)
@@ -188,21 +220,23 @@ class FileBrowser extends React.Component {
   }
 
   populateItemsList = fileList => {
-    const newItems = _.cloneDeep(this.state.items)
-    const newCollections = _.cloneDeep(this.state.collections)
-    fileList.forEach(file => {
-      if (this.contentTypeIsAllowed(file['content-type'])) {
-        const item = this.formatFileInfo(file)
-        newItems[item.id] = item
-        const folder_id = file.folder_id
-        const collectionItems = newCollections[folder_id].items
-        if (!collectionItems.includes(item.id)) {
-          collectionItems.push(item.id)
-          newCollections[folder_id].items = this.orderedIdsFromList(newItems, collectionItems)
+    this.setState((state, _props) => {
+      const newItems = _.cloneDeep(state.items)
+      const newCollections = _.cloneDeep(state.collections)
+      fileList.forEach(file => {
+        if (this.contentTypeIsAllowed(file['content-type'])) {
+          const item = this.formatFileInfo(file)
+          newItems[item.id] = item
+          const folder_id = file.folder_id
+          const collectionItems = newCollections[folder_id].items
+          if (!collectionItems.includes(item.id)) {
+            collectionItems.push(item.id)
+            newCollections[folder_id].items = this.orderedIdsFromList(newItems, collectionItems)
+          }
         }
-      }
+      })
+      return {items: newItems, collections: newCollections}
     })
-    this.setState({items: newItems, collections: newCollections})
   }
 
   formatFolderInfo(apiFolder, opts = {}) {
@@ -230,6 +264,18 @@ class FileBrowser extends React.Component {
     return folder
   }
 
+  // TreeBrowser doesn't support per-item customized icons,
+  // but it does permit per-item thumbnails. Cook up an
+  // SVG data URL for the thumbnail.  This can go away
+  // when TreeBrowser is better.
+  getThumbnail(file) {
+    if (file.thumbnail_url) {
+      return file.thumbnail_url
+    }
+    const svgicon = getSVGIconFromType(file['content-type'])
+    return `data:image/svg+xml;utf8,${svgicon}`
+  }
+
   formatFileInfo(apiFile, opts = {}) {
     const {collections} = this.state
     const context = collections[apiFile.folder_id].context
@@ -237,12 +283,16 @@ class FileBrowser extends React.Component {
       api: apiFile,
       id: apiFile.id,
       name: apiFile.display_name,
-      thumbnail: apiFile.thumbnail_url,
+      thumbnail: this.getThumbnail(apiFile),
       src: `${context}/files/${apiFile.id}/preview${
         context.includes('user') ? `?verifier=${apiFile.uuid}` : ''
       }`,
       alt: apiFile.display_name,
       ...opts
+    }
+    if (apiFile.embedded_iframe_url) {
+      // it's a media_object
+      file.src = apiFile.embedded_iframe_url
     }
     return file
   }
@@ -261,18 +311,20 @@ class FileBrowser extends React.Component {
     return this.onFolderClick(folder.id, folder)
   }
 
-  onFolderClick = (folderId, folder) => {
-    const collection = this.state.collections[folderId]
-    let newFolders = []
-    const {openFolders} = this.state
-    if (!collection.locked && openFolders.includes(folderId)) {
-      newFolders = newFolders.concat(openFolders.filter(id => id !== folderId))
-    } else if (!collection.locked) {
-      newFolders = newFolders.concat(openFolders)
-      newFolders.push(folderId)
-      collection.collections.forEach(id => this.getFolderData(id))
-    }
-    return this.setState({openFolders: newFolders, uploadFolder: folderId})
+  onFolderClick = (folderId, _folder) => {
+    this.setState((state, _props) => {
+      const collection = state.collections[folderId]
+      let newFolders = []
+      const {openFolders} = state
+      if (!collection.locked && openFolders.includes(folderId)) {
+        newFolders = newFolders.concat(openFolders.filter(id => id !== folderId))
+      } else if (!collection.locked) {
+        newFolders = newFolders.concat(openFolders)
+        newFolders.push(folderId)
+        collection.collections.forEach(id => this.getFolderData(id))
+      }
+      return {openFolders: newFolders, uploadFolder: folderId}
+    })
   }
 
   onFileClick = file => {
@@ -309,7 +361,7 @@ class FileBrowser extends React.Component {
     const {collections} = this.state
     const folderKey = Object.keys(collections).find(key => {
       const items = collections[key].items
-      if (items && items.includes(file.id)) return key
+      return items && items.includes(file.id)
     })
     return collections[folderKey]
   }
@@ -435,4 +487,3 @@ class FileBrowser extends React.Component {
 }
 
 export default FileBrowser
-/* eslint-enable react/sort-comp */

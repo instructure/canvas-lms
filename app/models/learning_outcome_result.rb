@@ -34,11 +34,13 @@ class LearningOutcomeResult < ActiveRecord::Base
        { quiz: 'Quizzes::Quiz', assessment: 'LiveAssessments::Assessment' }],
       polymorphic_prefix: true
   belongs_to :context, polymorphic: [:course]
+  belongs_to :root_account, class_name: 'Account'
   has_many :learning_outcome_question_results, dependent: :destroy
   simply_versioned
 
   before_save :infer_defaults
   before_save :ensure_user_uuid
+  before_save :set_root_account_id
 
   def calculate_percent!
     scale_data = scale_params
@@ -154,6 +156,11 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   def ensure_user_uuid
     self.user_uuid = self.user&.uuid if self.user_uuid.blank?
+  end
+
+  def set_root_account_id
+    return if self.root_account_id.present?
+    self.root_account_id = self.context&.resolved_root_account_id
   end
 
   def calculate_by_scale(scale_data)

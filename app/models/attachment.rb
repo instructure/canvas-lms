@@ -1143,6 +1143,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def mime_class
+    # NOTE: keep this list in sync with what's in packages/canvas-rce/src/common/mimeClass.js
     {
       'text/html' => 'html',
       "text/x-csharp" => "code",
@@ -1167,6 +1168,8 @@ class Attachment < ActiveRecord::Base
       "image/png" => "image",
       "image/gif" => "image",
       "image/bmp" => "image",
+      "image/svg+xml" => "image",
+      # "image/webp" => "image", not supported by safari as of Version 13.1.1
       "image/vnd.microsoft.icon" => "image",
       "application/x-rar" => "zip",
       "application/x-rar-compressed" => "zip",
@@ -1183,6 +1186,8 @@ class Attachment < ActiveRecord::Base
       "audio/x-mpegurl" => "audio",
       "audio/x-pn-realaudio" => "audio",
       "audio/x-wav" => "audio",
+      "audio/mp4" => "audio",
+      "audio/webm" => "audio",
       "video/mpeg" => "video",
       "video/quicktime" => "video",
       "video/x-la-asf" => "video",
@@ -1191,6 +1196,7 @@ class Attachment < ActiveRecord::Base
       "video/x-sgi-movie" => "video",
       "video/3gpp" => "video",
       "video/mp4" => "video",
+      "video/webm": "video",
       "application/x-shockwave-flash" => "flash"
     }[content_type] || "file"
   end

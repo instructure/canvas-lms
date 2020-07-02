@@ -37,19 +37,49 @@ def getForceFailureFSC() {
   return flags.isForceFailureFSC() ? '1' : '0'
 }
 
+def isPlugin() {
+  return env.GERRIT_PROJECT == "canvas-lms" ? "0" : "1"
+}
+
+def getDockerWorkDir() {
+  return env.GERRIT_PROJECT == "canvas-lms" ? "/usr/src/app" : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
+}
+
+def getLocalWorkDir() {
+  return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
+}
+
 def computeTestCount() {
+  if (env.IS_PLUGIN == "1") {
+    dir(env.LOCAL_WORKDIR) {
+      checkout([
+        $class: 'GitSCM',
+        branches: [[name: 'FETCH_HEAD']],
+        doGenerateSubmoduleConfigurations: false,
+        extensions: [],
+        submoduleCfg: [],
+        userRemoteConfigs: [[
+          credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
+          name: 'origin',
+          refspec: "$env.GERRIT_REFSPEC",
+          url: "ssh://$GERRIT_URL/${GERRIT_PROJECT}.git"
+        ]]
+      ])
+    }
+  }
   // oops, probably should have added an easier way to _count_ tests...
-  sh 'rm -vrf tmp'
-  sh 'mkdir -v tmp'
-  sh 'chmod -vv 777 tmp'
-  sh """
-    docker run --volume \$(pwd)/.git:/usr/src/app/.git \
-               --volume \$(pwd)/tmp:/usr/src/app/tmp \
+  sh 'rm -vrf $LOCAL_WORKDIR/tmp'
+  sh 'mkdir -v $LOCAL_WORKDIR/tmp'
+  sh 'chmod -vv 777 $LOCAL_WORKDIR/tmp'
+  sh '''
+    docker run --volume $(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git \
+               --volume $(pwd)/$LOCAL_WORKDIR/tmp:$DOCKER_WORKDIR/tmp \
                --env FSC_IGNORE_FILES \
-               \$PATCHSET_TAG \
-        bundle exec flakey_spec_catcher --use-parent --dry-run-quiet > tmp/test_list
-  """
-  changed_tests = readFile('tmp/test_list').trim()
+               -w=$DOCKER_WORKDIR \
+               $PATCHSET_TAG \
+        bash -c "flakey_spec_catcher --use-parent --dry-run-quiet > $DOCKER_WORKDIR/tmp/test_list"
+  '''
+  changed_tests = readFile("$env.LOCAL_WORKDIR/tmp/test_list").trim()
   echo "raw result from catcher: \n====\n$changed_tests\n===="
   def test_count = 0
   if (changed_tests) {
@@ -67,6 +97,10 @@ def computeDistributedCount() {
     throw IllegalStateException("unable to process more than ${env.DISTRIBUTED_CUT_OFF} tests")
   if (result_test_count == 0) {
     result_node_count = 0
+  }
+  else if (env.IS_PLUGIN == "1") {
+    // lets not deal with distributing fsc for plugins unless we have to
+    result_node_count = 1
   }
   else {
     // force a round down
@@ -130,7 +164,12 @@ pipeline {
   }
 
   environment {
+    GERRIT_PORT = '29418'
+    GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml:docker-compose.new-jenkins-flakey-spec-catcher.yml'
+    IS_PLUGIN = isPlugin()
+    DOCKER_WORKDIR = getDockerWorkDir()
+    LOCAL_WORKDIR = getLocalWorkDir()
     FORCE_FAILURE = getForceFailureFSC()
     // there will be a node for every 10 tests
     DISTRIBUTED_FACTOR = '10'

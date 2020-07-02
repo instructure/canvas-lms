@@ -4,3 +4,4 @@ services:
   canvas:
     environment:
       DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/canvas_test
+    init: true

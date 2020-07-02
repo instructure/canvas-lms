@@ -53,9 +53,6 @@
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "案件を却下しようとした際にエラーが発生しました。"
     },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "ファイルプレビューの作成中にエラーが発生しました"
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "ネットワーク要求の作成中にエラーが発生しました"
     },
@@ -160,9 +157,6 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "選択されたファイルを削除：{ filename }"
-    },
-    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
-        "message": "ページをクリックして、そのページにリンクを挿入します。"
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "クリックして{ imageName }を埋め込みます"
@@ -581,12 +575,6 @@
     "link_options_a16b758b": {
         "message": "リンクオプション"
     },
-    "link_to_other_content_in_the_course_879163b5": {
-        "message": "コース内の他のコンテンツにリンクします。"
-    },
-    "link_to_other_content_in_the_group_3fe25379": {
-        "message": "グループ内の他のコンテンツにリンクします。"
-    },
     "links_14b70841": {
         "message": "リンク"
     },
@@ -703,9 +691,6 @@
     },
     "next_page_d2a39853": {
         "message": "次のページ"
-    },
-    "no_alt_text_decorative_image_f318fc0e": {
-        "message": "別のテキストはありません (装飾画像)"
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "期日指定なし"

@@ -79,7 +79,7 @@ describe Context do
       course2 = Course.create!
       group = Group.create!(context: account)
       context_codes = [account.asset_string, course.asset_string, course2.asset_string, group.asset_string, user.asset_string]
-      expect(Context.from_context_codes(context_codes)).to eq [account, course, course2, group, user]
+      expect(Context.from_context_codes(context_codes)).to match_array [account, course, course2, group, user]
     end
 
     it "should skip invalid context types" do
@@ -393,6 +393,28 @@ describe Context do
       end
 
       expect(Context.last_updated_at(Course, [@course1.id, @course2.id])).to be_nil
+    end
+  end
+
+  describe "resolved_root_account_id" do
+    it 'calls root_account_id if present' do
+      class HasRootAccountId
+        include Context
+
+        def root_account_id
+          99
+        end
+      end
+
+      expect(HasRootAccountId.new.resolved_root_account_id).to eq 99
+    end
+
+    it 'returns nil if root_account_id not present' do
+      class DoesntHaveRootAccountId
+        include Context
+      end
+
+      expect(DoesntHaveRootAccountId.new.resolved_root_account_id).to eq nil
     end
   end
 end

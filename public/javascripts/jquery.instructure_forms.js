@@ -330,7 +330,9 @@ $.ajaxJSONPreparedFiles = function(options) {
     parameters.no_redirect = true
     file = file.files[0]
     import('jsx/shared/upload_file')
-      .then(({uploadFile}) => uploadFile(uploadUrl, parameters, file))
+      .then(({uploadFile}) =>
+        uploadFile(uploadUrl, parameters, file, undefined, options.onProgress)
+      )
       .then(data => {
         attachments.push(data)
         next.call($this)

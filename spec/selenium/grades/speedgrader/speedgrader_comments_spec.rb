@@ -424,9 +424,12 @@ describe "speed grader" do
       Speedgrader.add_comment_and_submit('grader comment')
       Speedgrader.click_submissions_to_view
       Speedgrader.select_option_submission_to_view('0')
-      expect(Speedgrader.comments.length).to eq 2
-      expect(Speedgrader.comments.first).to include_text('comment0')
-      expect(Speedgrader.comments.second).to include_text('comment1')
+
+      Speedgrader.comments.with_stale_element_protection do |comments|
+        expect(comments.length).to eq 2
+        expect(comments.first).to include_text('comment0')
+        expect(comments.second).to include_text('comment1')
+      end
     end
   end
 

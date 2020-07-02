@@ -41,7 +41,7 @@ export default class PastGlobalAlert extends React.Component {
   render() {
     if (this.state.shouldRender && ENV.PAST_ANNOUNCEMENTS_ENABLED) {
       return (
-        <Alert>
+        <Alert renderCloseButtonLabel={I18n.t('Close')}>
           <div data-testid="globalAnnouncementsAlert">
             {I18n.t(`You can view dismissed announcements by going to Account and selecting Global
             Announcements from the menu.`)}

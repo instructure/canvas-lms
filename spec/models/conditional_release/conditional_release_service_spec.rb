@@ -43,17 +43,17 @@ describe ConditionalRelease::Service do
   context 'configuration' do
     it 'is not configured by default' do
       stub_config(nil)
-      expect(Service.configured?).to eq false
+      expect(Service.service_configured?).to eq false
     end
 
     it 'requires host to be configured' do
       stub_config({enabled: true})
-      expect(Service.configured?).to eq false
+      expect(Service.service_configured?).to eq false
     end
 
     it 'is configured when enabled with host' do
       stub_config({enabled: true, host: 'foo'})
-      expect(Service.configured?).to eq true
+      expect(Service.service_configured?).to eq true
     end
 
     it 'has a default config' do
@@ -106,11 +106,25 @@ describe ConditionalRelease::Service do
       expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
     end
 
-    it 'reports enabled as false if service is disabled' do
-      context = double({feature_enabled?: true})
+    it 'reports enabled as false if service is disabled (and the root account has native config disabled)' do
+      context = course_factory
+      context.enable_feature!(:conditional_release)
       stub_config({enabled: false})
       env = Service.env_for(context)
       expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
+    end
+
+    it 'reports enabled as true if service is disabled (but the root account has native config enabled)' do
+      context = course_factory
+      context.enable_feature!(:conditional_release)
+      context.root_account.tap do |a|
+        a.settings[:use_native_conditional_release] = true
+        a.save!
+      end
+      stub_config({enabled: false})
+      env = Service.env_for(context, User.new)
+      expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq true
+      expect(env[:CONDITIONAL_RELEASE_ENV][:native]).to eq true
     end
   end
 

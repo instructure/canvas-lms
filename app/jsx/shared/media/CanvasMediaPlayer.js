@@ -49,7 +49,12 @@ export default function CanvasMediaPlayer(props) {
   const handleLoadedMetadata = useCallback(
     event => {
       const player = event.target
-      setPlayerSize(player, props.type, {width: window.innerWidth, height: window.innerHeight})
+      setPlayerSize(
+        player,
+        props.type,
+        {width: window.innerWidth, height: window.innerHeight},
+        myIframeRef.current
+      )
     },
     [props.type]
   )
@@ -57,7 +62,12 @@ export default function CanvasMediaPlayer(props) {
   const handlePlayerSize = useCallback(
     _event => {
       const player = window.document.body.querySelector('video')
-      setPlayerSize(player, props.type, {width: window.innerWidth, height: window.innerHeight})
+      setPlayerSize(
+        player,
+        props.type,
+        {width: window.innerWidth, height: window.innerHeight},
+        null
+      )
     },
     [props.type]
   )
@@ -201,12 +211,29 @@ export default function CanvasMediaPlayer(props) {
   )
 }
 
-function setPlayerSize(player, type, boundingBox) {
+export function setPlayerSize(player, type, boundingBox, playerContainer) {
   const {width, height} = sizeMediaPlayer(player, type, boundingBox)
   player.style.width = width
   player.style.height = height
   player.style.margin = '0 auto' // TODO: remove with player v7
   player.classList.add(isAudio(type) ? 'audio-player' : 'video-player')
+
+  // videos that are wide-and-short portrait need to shrink the parent
+  if (playerContainer && player.videoWidth > player.videoHeight) {
+    playerContainer.style.width = width
+    playerContainer.style.height = height
+
+    const playerContainerContainer = playerContainer.parentElement // tinymce adds this
+    if (
+      playerContainerContainer &&
+      playerContainerContainer.classList.contains('mce-preview-object') &&
+      playerContainerContainer.classList.contains('mce-object-iframe')
+    ) {
+      // we're in the RCE
+      playerContainerContainer.style.width = width
+      playerContainerContainer.style.height = height
+    }
+  }
 }
 
 CanvasMediaPlayer.propTypes = {

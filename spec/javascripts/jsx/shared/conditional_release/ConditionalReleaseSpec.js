@@ -44,7 +44,7 @@ const createComponent = submitCallback => {
   component = TestUtils.renderIntoDocument(
     <ConditionalRelease.Editor env={assignmentEnv} type="foo" />
   )
-  component.createEditor()
+  component.createOldEditor()
 }
 
 const makePromise = () => {

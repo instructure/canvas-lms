@@ -19,19 +19,19 @@ import React from 'react'
 import {render, wait, waitForElement, fireEvent, act, cleanup} from '@testing-library/react'
 import {queries as domQueries} from '@testing-library/dom'
 import waitForExpect from 'wait-for-expect'
-import CanvasMediaPlayer from '../CanvasMediaPlayer'
+import CanvasMediaPlayer, {setPlayerSize} from '../CanvasMediaPlayer'
 import {uniqueId} from 'lodash'
 
 const defaultMediaObject = (overrides = {}) => ({
   bitrate: '12345',
   content_type: 'video/mp4',
   fileExt: 'mp4',
-  height: '1000',
+  height: '500',
   isOriginal: 'false',
   size: '3123123123',
   src: uniqueId('anawesomeurl-') + '.test',
   label: 'an awesome label',
-  width: '500',
+  width: '1000',
   ...overrides
 })
 describe('CanvasMediaPlayer', () => {
@@ -246,6 +246,63 @@ describe('CanvasMediaPlayer', () => {
       expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
       expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
       expect(getAllByText('Video Track')[0]).toBeInTheDocument() // AKA CC
+    })
+  })
+
+  describe('renders the right size', () => {
+    const makePlayer = (w, h) => {
+      return {
+        videoWidth: w,
+        videoHeight: h,
+        style: {},
+        classList: {
+          add: jest.fn()
+        }
+      }
+    }
+
+    it('when the media is audio', () => {
+      const container = document.createElement('div')
+      const player = makePlayer(1000, 500)
+      setPlayerSize(player, 'audio/*', {width: 400, height: 200}, container)
+      expect(player.classList.add).toHaveBeenCalledWith('audio-player')
+      expect(player.style.width).toBe('320px')
+      expect(player.style.height).toBe('14.25rem')
+      expect(container.style.width).toBe('320px')
+      expect(container.style.height).toBe('14.25rem')
+    })
+
+    it('when the video is landscape', () => {
+      const container = document.createElement('div')
+      const player = makePlayer(1000, 500)
+      setPlayerSize(player, 'video/*', {width: 400, height: 200}, container)
+      expect(player.classList.add).toHaveBeenCalledWith('video-player')
+      expect(player.style.width).toBe('400px')
+      expect(player.style.height).toBe('200px')
+      expect(container.style.width).toBe('400px')
+      expect(container.style.height).toBe('200px')
+    })
+
+    it('when the video is portrait', () => {
+      const container = document.createElement('div')
+      const player = makePlayer(500, 1000)
+      setPlayerSize(player, 'video/*', {width: 400, height: 200}, container)
+      expect(player.classList.add).toHaveBeenCalledWith('video-player')
+      expect(player.style.width).toBe('100px')
+      expect(player.style.height).toBe('200px')
+      expect(container.style.width).toBe('')
+      expect(container.style.height).toBe('')
+    })
+
+    it('shrinks the height for short and squat videos', () => {
+      const container = document.createElement('div')
+      const player = makePlayer(1000, 100)
+      setPlayerSize(player, 'video/*', {width: 400, height: 200}, container)
+      expect(player.classList.add).toHaveBeenCalledWith('video-player')
+      expect(player.style.width).toBe('400px')
+      expect(player.style.height).toBe('40px')
+      expect(container.style.width).toBe('400px')
+      expect(container.style.height).toBe('40px')
     })
   })
 })

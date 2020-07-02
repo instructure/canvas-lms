@@ -30,6 +30,8 @@ class CustomGradebookColumnDatum < ActiveRecord::Base
     can :update
   end
 
+  before_save :set_root_account_id
+
   def self.queue_bulk_update_custom_columns(context, column_data)
     progress = Progress.create!(context: context, tag: "custom_columns_submissions_update")
     progress.process_job(self, :process_bulk_update_custom_columns, {}, context, column_data)
@@ -37,7 +39,8 @@ class CustomGradebookColumnDatum < ActiveRecord::Base
   end
 
   def self.process_bulk_update_custom_columns(_, context, column_data)
-    Delayed::Batch.serial_batch(priority: Delayed::LOW_PRIORITY, n_strand: ["bulk_update_submissions", context.root_account.global_id]) do
+    root_account = context.root_account
+    Delayed::Batch.serial_batch(priority: Delayed::LOW_PRIORITY, n_strand: ["bulk_update_submissions", root_account.global_id]) do
       custom_gradebook_columns = context.custom_gradebook_columns.preload(:custom_gradebook_column_data)
       column_data.each do |data_point|
         column_id = data_point.fetch(:column_id)
@@ -49,6 +52,7 @@ class CustomGradebookColumnDatum < ActiveRecord::Base
           CustomGradebookColumnDatum.unique_constraint_retry do
             datum = custom_column.custom_gradebook_column_data.find_or_initialize_by(user_id: user_id)
             datum.content = content
+            datum.root_account_id ||= root_account.id
             datum.save!
           end
         else
@@ -56,5 +60,11 @@ class CustomGradebookColumnDatum < ActiveRecord::Base
         end
       end
     end
+  end
+
+  private
+
+  def set_root_account_id
+    self.root_account_id ||= custom_gradebook_column&.course&.root_account_id
   end
 end

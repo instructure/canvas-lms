@@ -111,6 +111,14 @@
                   </div>
                 </fieldset>
               <% end %>
+              <% if @account.allow_disable_post_to_sis_when_grading_period_closed? %>
+                <% disable_post_to_sis = @account.disable_post_to_sis_when_grading_period_closed? %>
+
+                <%= settings.check_box :disable_post_to_sis_when_grading_period_closed, checked: disable_post_to_sis %>
+                <%= settings.label :disable_post_to_sis_when_grading_period_closed,
+                  t('Automatically disable "Post to SIS" on assignments when grading period closes')
+                %>
+              <% end %>
             <% end %>
           <% end %>
         </fieldset>

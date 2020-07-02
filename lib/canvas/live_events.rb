@@ -694,8 +694,8 @@ module Canvas::LiveEvents
   def self.get_course_completed_data(course, user)
     {
       progress: CourseProgress.new(course, user, read_only: true).to_json,
-      user: { id: user.id, name: user.name, email: user.email },
-      course: { id: course.id, name: course.name }
+      user: user.slice(%i[id name email]),
+      course: course.slice(%i[id name account_id sis_source_id])
     }
   end
 
