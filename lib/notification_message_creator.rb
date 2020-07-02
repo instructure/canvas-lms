@@ -16,6 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# This file creates notification messages. I hope that was already known.
+# Users have multiple communication_channels and notification preferences at
+# different levels. This file accounts for these details.
+#
+# There are three main types of messages that are created here:
+# immediate_message, delayed_messages, and dashboard_messages.
+#
 class NotificationMessageCreator
   include LocaleSelection
 
@@ -101,6 +108,8 @@ class NotificationMessageCreator
   # A user can disable notifications for a course with a notification policy
   # override.
   def notifications_enabled_for_context?(user, context)
+    # if the message is not summarizable?, it is in a context that notifications
+    # cannot be disabled, so return true before checking.
     return true unless @notification.summarizable?
     if @mute_notifications_by_course_enabled
       return NotificationPolicyOverride.enabled_for(user, context)
@@ -117,6 +126,7 @@ class NotificationMessageCreator
       fallback_policy ||= fallback_channel.notification_policies.create!(frequency: 'daily')
     end
 
+    InstStatsd::Statsd.increment("message.fall_back_used", short_stat: 'message.fall_back_used')
     build_summary_for(user, fallback_policy)
   end
 
@@ -337,7 +347,10 @@ class NotificationMessageCreator
   end
 
   def too_many_messages_for?(user)
-    @user_counts[user.id] >= user.max_messages_per_day
+    if @user_counts[user.id] >= user.max_messages_per_day
+      InstStatsd::Statsd.increment("message.too_many_messages_for_was_true", short_stat: 'message.too_many_messages_for_was_true')
+      true
+    end
   end
 
   # Cache the count for number of messages sent to a user/user-with-category,
