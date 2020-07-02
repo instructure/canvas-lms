@@ -55,6 +55,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   # or any models that do not have a root_account_id column.
   def self.migration_tables
     {
+      AccessToken => :developer_key,
       AccountUser => :account,
       AssessmentQuestion => :assessment_question_bank,
       AssessmentQuestionBank => :context,
@@ -239,8 +240,17 @@ module DataFixup::PopulateRootAccountIdOnModels
   # thus allowing us to pretend the Attachments table has been backfilled where necessary
   def self.check_if_table_has_root_account(class_name, associations=[])
     return false if class_name.column_names.exclude?('root_account_id')
-    return class_name.where(root_account_id: nil).none? if associations.blank? 
+    if associations.blank?
+      return unfillable_tables.include?(class_name) ||
+        class_name.where(root_account_id: nil).none?
+    end
     associations.all?{|a| class_name.joins(a).where(root_account_id: nil).none?}
+  end
+
+  # In case we run into other tables that can't fully finish being filled with
+  # root account ids, and they have children who need them to pretend they're full
+  def self.unfillable_tables
+    [DeveloperKey]
   end
 
   def self.populate_root_account_ids(table, associations, min, max)

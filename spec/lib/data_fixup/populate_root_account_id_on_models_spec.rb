@@ -48,6 +48,15 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    it 'should populate root_account_id on AccessToken' do
+      dk = DeveloperKey.create!(account: @course.account)
+      at = dk.access_tokens.create!(user: user_model)
+      at.update_columns(root_account_id: nil)
+      expect(at.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(at.reload.root_account_id).to eq @course.root_account_id
+    end
+
     it 'should populate the root_account_id on AccountUser' do
       au = AccountUser.create!(account: @course.account, user: @user)
       au.update_columns(root_account_id: nil)
