@@ -68,6 +68,7 @@ class Assignment < ActiveRecord::Base
 
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
   has_many :all_submissions, class_name: 'Submission', dependent: :delete_all
+  has_many :observer_alerts, through: :all_submissions
   has_many :provisional_grades, :through => :submissions
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :assignment_student_visibilities
@@ -525,6 +526,12 @@ class Assignment < ActiveRecord::Base
               :validate_assignment_overrides,
               :mute_if_changed_to_anonymous,
               :mute_if_changed_to_moderated
+
+  before_destroy :delete_observer_alerts
+
+  def delete_observer_alerts
+    until self.observer_alerts.limit(1_000).delete_all < 1_000; end
+  end
 
   before_create :set_root_account_id, :set_muted_if_post_policies_enabled
 
