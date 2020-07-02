@@ -49,7 +49,7 @@ export default function Confetti() {
       max: 160,
       clock: 50,
       respawn: false,
-      props: ['square', getRandomConfettiFlavor()]
+      props: ['square', getRandomConfettiFlavor()].filter(p => p !== null)
     })
 
     clearConfettiOnSpaceOrEscape = event => {

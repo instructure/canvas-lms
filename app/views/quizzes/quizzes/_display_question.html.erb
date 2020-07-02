@@ -34,9 +34,22 @@
   display_correct_answers = show_correct_answers?
   correct = user_answer && hash_get(user_answer, :correct) == true
   incorrect = user_answer && hash_get(user_answer, :correct) == false
-  unanswered = (%w{multiple_choice_question true_false_question}.include?(hash_get(question, 'question_type')) && incorrect && hash_get(user_answer, 'text').blank?) ||
+  unanswered =
+    (%w{
+      multiple_choice_question
+      true_false_question
+      short_answer_question
+      numerical_question
+      calculated_question
+    }.include?(hash_get(question, 'question_type')) && incorrect && hash_get(user_answer, 'text').blank?) ||
+    (%w{
+      matching_question
+      multiple_dropdowns_question
+      fill_in_multiple_blanks_question
+    }.include?(hash_get(question, 'question_type')) && incorrect && user_answer.select{|k, v| k.to_s.match(/answer_/) && v.to_s != '' }.length == 0) ||
     (hash_get(question, 'question_type') == 'multiple_answers_question' && incorrect && user_answer.select{|k, v| k.to_s.match(/answer_/) && v.to_s != '0' }.length == 0) ||
     (hash_get(question, 'question_type') == 'file_upload_question' && hash_get(user_answer, 'attachment_ids').blank?) ||
+    (hash_get(question, 'question_type') == 'essay_question' && hash_get(user_answer, 'text').blank?) ||
     false
   partial_credit = user_answer && hash_get(user_answer, :correct) == 'partial'
   asset_string ||= (question_bank_id ? 'assessment_question' : 'quiz_question') + "_#{hash_get(question, :id)}"

@@ -21,6 +21,8 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface
 
+    alias account object
+
     global_id_field :id
 
     field :name, String, null: true
@@ -29,18 +31,18 @@ module Types
     def proficiency_ratings_connection
       # This does a recursive lookup of parent accounts, not sure how we could
       # batch load it in a reasonable way.
-      object.resolved_outcome_proficiency&.outcome_proficiency_ratings
+      account.resolved_outcome_proficiency&.outcome_proficiency_ratings
     end
 
     field :courses_connection, CourseType.connection_type, null: true
     def courses_connection
-      return unless object.grants_right?(current_user, :read_course_list)
-      object.associated_courses
+      return unless account.grants_right?(current_user, :read_course_list)
+      account.associated_courses
     end
 
     field :sub_accounts_connection, AccountType.connection_type, null: true
     def sub_accounts_connection
-      object.sub_accounts.order(:id)
+      account.sub_accounts.order(:id)
     end
 
     field :notification_preferences_enabled, Boolean, null: false
@@ -52,6 +54,14 @@ module Types
     def notification_preferences
       Loaders::AssociationLoader.for(User, :communication_channels).load(current_user).then do |comm_channels|
         {channels: comm_channels.unretired}
+      end
+    end
+
+    field :sis_id, String, null: true
+    def sis_id
+      return if account.root_account?
+      load_association(:root_account).then do |root_account|
+        account.sis_source_id if root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
       end
     end
   end

@@ -21,7 +21,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {personReadyToEnrollShape} from './shapes'
 import {Alert} from '@instructure/ui-alerts'
-import {Table} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 class PeopleReadyList extends React.Component {
@@ -52,26 +52,28 @@ class PeopleReadyList extends React.Component {
     if (this.props.nameList.length > 0) {
       userTable = (
         <Table caption={<ScreenReaderContent>{I18n.t('User list')}</ScreenReaderContent>}>
-          <thead>
-            <tr>
-              <th>{I18n.t('Name')}</th>
-              <th>{I18n.t('Email Address')}</th>
-              <th>{I18n.t('Login ID')}</th>
-              {this.props.canReadSIS ? <th>{I18n.t('SIS ID')}</th> : null}
-              <th>{I18n.t('Institution')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.props.nameList.map((n, i) => (
-              <tr key={`${n.address}_${i}`}>
-                <th scope="row">{n.user_name}</th>
-                <td>{n.email}</td>
-                <td>{n.login_id || ''}</td>
-                {this.props.canReadSIS ? <td>{n.sis_user_id || ''}</td> : null}
-                <td>{n.account_name || this.props.defaultInstitutionName}</td>
-              </tr>
+          <Table.Head>
+            <Table.Row>
+              <Table.ColHeader id="usertable-name">{I18n.t('Name')}</Table.ColHeader>
+              <Table.ColHeader id="usertable-email">{I18n.t('Email Address')}</Table.ColHeader>
+              <Table.ColHeader id="usertable-loginid">{I18n.t('Login ID')}</Table.ColHeader>
+              {this.props.canReadSIS ? (
+                <Table.ColHeader id="usertable-sisid">{I18n.t('SIS ID')}</Table.ColHeader>
+              ) : null}
+              <Table.ColHeader id="usertable-inst">{I18n.t('Institution')}</Table.ColHeader>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {this.props.nameList.map(n => (
+              <Table.Row key={n.address}>
+                <Table.RowHeader>{n.user_name}</Table.RowHeader>
+                <Table.Cell>{n.email}</Table.Cell>
+                <Table.Cell>{n.login_id || ''}</Table.Cell>
+                {this.props.canReadSIS ? <Table.Cell>{n.sis_user_id || ''}</Table.Cell> : null}
+                <Table.Cell>{n.account_name || this.props.defaultInstitutionName}</Table.Cell>
+              </Table.Row>
             ))}
-          </tbody>
+          </Table.Body>
         </Table>
       )
     }

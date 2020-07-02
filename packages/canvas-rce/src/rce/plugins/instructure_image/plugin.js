@@ -116,7 +116,7 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
         trayController.showTrayForEditor(editor)
       },
 
-      text: formatMessage('Options'),
+      text: formatMessage('Image Options'),
       tooltip: buttonAriaLabel
     })
 

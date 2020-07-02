@@ -26,6 +26,8 @@ module ConditionalRelease
     has_one :rule, through: :scoring_range
     belongs_to :root_account, :class_name => "Account"
 
+    attr_accessor :service_id # TODO: can remove after migration is complete
+
     before_create :set_root_account_id
     def set_root_account_id
       self.root_account_id ||= scoring_range.root_account_id

@@ -18,6 +18,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+library "canvas-builds-library"
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -29,18 +31,15 @@ pipeline {
   stages {
     stage('Setup') {
       steps {
-        timeout(time: 2) {
-          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
-          sh 'build/new-jenkins/docker-cleanup.sh'
-        }
+        cleanAndSetup()
       }
     }
 
     stage('Dive Analyze') {
       steps {
         timeout(time: 60) {
-          sh "docker pull ${env.IMAGE}"
-          sh 'docker pull wagoodman/dive'
+          sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull ${env.IMAGE}"
+          sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull wagoodman/dive'
           sh 'build/new-jenkins/dive.sh'
         }
       }
@@ -49,7 +48,7 @@ pipeline {
 
   post {
     cleanup {
-      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+      execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

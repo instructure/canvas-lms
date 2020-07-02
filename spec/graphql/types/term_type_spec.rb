@@ -44,4 +44,38 @@ describe Types::TermType do
   it 'should require admin privilege' do
     expect(@term_type.resolve("coursesConnection { nodes { _id } }", current_user: @student)).to be_nil
   end
+
+  context "sis field" do
+    before(:once) do
+      @term.update!(sis_source_id: "sisTerm")
+    end
+
+    let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false })}
+    let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false })}
+
+    it "returns sis_id if you have read_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: read_admin}).dig("data", "term", "sisId")
+          query { term(id: "#{@term.id}") { sisId } }
+        GQL
+      ).to eq("sisTerm")
+    end
+
+    it "returns sis_id if you have manage_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: manage_admin}).dig("data", "term", "sisId")
+          query { term(id: "#{@term.id}") { sisId } }
+        GQL
+      ).to eq("sisTerm")
+    end
+
+    it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: @teacher}).dig("data", "term", "sisId")
+          query { term(id: "#{@term.id}") { sisId } }
+        GQL
+      ).to be_nil
+    end
+  end
+
 end

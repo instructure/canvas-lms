@@ -49,6 +49,13 @@ module Types
       end
     end
 
+    field :sis_id, String, null: true
+    def sis_id
+      load_association(:root_account).then do |root_account|
+        group.sis_source_id if root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
+      end
+    end
+
     def members_scope
       group.group_memberships.where(
         workflow_state: GroupMembershipsController::ALLOWED_MEMBERSHIP_FILTER

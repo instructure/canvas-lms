@@ -58,33 +58,4 @@ class EventStream::Index
     end
   end
 
-  # these methods are included to keep the interface with plugins
-  # until they can be updated or removed to no longer
-  # depend no a cassandra-specific implementation.
-  # --- start ---
-  def database
-    event_stream.database
-  end
-
-  def for_key(key, options={})
-    self.strategy_for(:cassandra).for_key(key, options)
-  end
-
-  def select_cql
-    self.strategy_for(:cassandra).select_cql
-  end
-
-  def insert_cql
-    self.strategy_for(:cassandra).insert_cql
-  end
-
-  def insert(record, key)
-    self.strategy_for(:cassandra).insert(record, key)
-  end
-
-  def bucket_for_time(time)
-    self.strategy_for(:cassandra).bucket_for_time(time)
-  end
-  # --- end ---
-
 end

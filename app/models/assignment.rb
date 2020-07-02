@@ -108,6 +108,7 @@ class Assignment < ActiveRecord::Base
     dependent: :destroy,
     inverse_of: :assignment
 
+  has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: 'trigger_assignment_id', inverse_of: :trigger_assignment
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment
 
   scope :anonymous, -> { where(anonymous_grading: true) }
@@ -686,6 +687,7 @@ class Assignment < ActiveRecord::Base
       s.assignment = self
       s.assignment_changed_not_sub = true
       s.grade_change_event_author_id = @updating_user&.id
+      s.grader = @updating_user if @updating_user
 
       # Skip the grade calculation for now. We'll do it at the end.
       s.skip_grade_calc = true
@@ -1213,6 +1215,8 @@ class Assignment < ActiveRecord::Base
     self.save!
 
     each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
+    self.conditional_release_rules.destroy_all
+    self.conditional_release_associations.destroy_all
     refresh_course_content_participation_counts
 
     ScheduledSmartAlert.where(context_type: 'Assignment', context_id: self.id).destroy_all

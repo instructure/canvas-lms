@@ -150,6 +150,9 @@
             "name": "Term"
           },
           {
+            "name": "Trophy"
+          },
+          {
             "name": "User"
           }
         ]
@@ -288,6 +291,9 @@
             "name": "Term"
           },
           {
+            "name": "Trophy"
+          },
+          {
             "name": "User"
           }
         ]
@@ -409,6 +415,9 @@
           },
           {
             "name": "SubmissionHistory"
+          },
+          {
+            "name": "Trophy"
           },
           {
             "name": "User"

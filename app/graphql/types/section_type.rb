@@ -24,8 +24,17 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
+    alias section object
+
     global_id_field :id
 
     field :name, String, null: false
+
+    field :sis_id, String, null: true
+    def sis_id
+      load_association(:course).then do |course|
+        section.sis_source_id if course.grants_any_right?(current_user, :read_sis, :manage_sis)
+      end
+    end
   end
 end

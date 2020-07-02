@@ -23,7 +23,7 @@ import Header from './Header'
 import {Query} from 'react-apollo'
 import React, {Suspense, lazy} from 'react'
 import {shape} from 'prop-types'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import ViewManager from './ViewManager'
 

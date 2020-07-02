@@ -18,13 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def getRubyPassenger() {
-  load('build/new-jenkins/groovy/configuration.groovy').rubyPassenger()
-}
-
-def getPostgres() {
-  load('build/new-jenkins/groovy/configuration.groovy').postgres()
-}
+library "canvas-builds-library"
 
 pipeline {
   agent { label 'canvas-docker' }
@@ -37,27 +31,17 @@ pipeline {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
-    POSTGRES = getPostgres()
-    RUBY_PASSENGER = getRubyPassenger()
+    POSTGRES = configuration.postgres()
+    RUBY_PASSENGER = configuration.rubyPassenger()
     MAX_FAIL = 5
     RERUNS_RETRY = 0 // no reruns
     POSTGRES_PASSWORD = 'sekret'
   }
 
   stages {
-    stage ('Environment Variables') {
+    stage ('Setup') {
       steps {
-        timeout(time: 2) {
-          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
-        }
-      }
-    }
-
-    stage ('Pre-Cleanup') {
-      steps {
-        timeout(time: 2) {
-          sh 'build/new-jenkins/docker-cleanup.sh'
-        }
+        cleanAndSetup()
       }
     }
 
@@ -66,21 +50,20 @@ pipeline {
       steps {
         timeout(time: 10) {
           script {
-            def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
-            credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
+            pullGerritRepo('gerrit_builder', 'master', '.')
             gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
             println "Plugin list: ${gems}"
 
             /* fetch plugins */
             gems.each { gem ->
-              credentials.fetchFromGerrit(gem, 'gems/plugins')
+              pullGerritRepo(gem, 'master', 'gems/plugins')
             }
-            credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
+            pullGerritRepo("qti_migration_tool", "master", "vendor")
 
             sh '''
               mv -v gerrit_builder/canvas-lms/config/* config/
               rm -v config/cache_store.yml
-              rmdir -p gerrit_builder/canvas-lms/config
+              rm -vr gerrit_builder
               cp -v docker-compose/config/selenium.yml config/
               cp -vR docker-compose/config/new-jenkins config/new-jenkins
               cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml
@@ -99,13 +82,6 @@ pipeline {
           sh 'build/new-jenkins/docker-compose-pull.sh'
           sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
           sh 'build/new-jenkins/docker-compose-build-up.sh'
-        }
-      }
-    }
-
-    stage ('Setup Databases') {
-      steps {
-        timeout(time: 5) {
           sh 'build/new-jenkins/docker-compose-setup-databases.sh'
         }
       }
@@ -160,7 +136,7 @@ pipeline {
 
     cleanup {
       sh 'rm -vrf ./tmp/spec_failures/'
-      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+      execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

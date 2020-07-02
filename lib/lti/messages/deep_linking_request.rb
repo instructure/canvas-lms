@@ -21,7 +21,7 @@ module Lti::Messages
       'migration_selection' => %w(file).freeze,
       'editor_button' => %w(link file html ltiResourceLink image).freeze,
       'assignment_selection' => %w(ltiResourceLink).freeze,
-      'homework_submission' => %w(file).freeze,
+      'homework_submission' => %w(file ltiResourceLink).freeze,
       'link_selection' => %w(ltiResourceLink).freeze,
       'conference_selection' => %w(link html).freeze,
       'submission_type_selection' => %w(ltiResourceLink).freeze

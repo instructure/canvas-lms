@@ -56,6 +56,20 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(dkab.reload.root_account_id).to eq @account.id
     end
+
+    it 'should populate the root_account_id on DiscussionTopic' do
+      discussion_topic_model(context: @course)
+      @topic.update_columns(root_account_id: nil)
+      expect(@topic.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(@topic.reload.root_account_id).to eq @course.root_account_id
+
+      discussion_topic_model(context: group_model)
+      @topic.update_columns(root_account_id: nil)
+      expect(@topic.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(@topic.reload.root_account_id).to eq @group.root_account_id
+    end
   end
 
   describe '#run' do
@@ -180,11 +194,39 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
     it 'should allow overwriting for a previous association included in a polymorphic association' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
-        ContextExternalTool, {context: :root_account_id, account: [:root_account_id, :id]}
+        ContentTag, {context: :root_account_id, course: [:root_account_id, :id]}
       )).to eq(
         {
-          course: :root_account_id,
-          account: [:root_account_id, :id]
+          course: [:root_account_id, :id],
+          learning_outcome_group: :root_account_id,
+          assignment: :root_account_id,
+          account: :root_account_id,
+          quiz: :root_account_id
+        }
+      )
+    end
+
+    it 'should account for associations that have a polymorphic_prefix' do
+      expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
+        CalendarEvent, {context: :root_account_id}
+      )).to eq(
+        {
+          :context_appointment_group => :root_account_id,
+          :context_course => :root_account_id,
+          :context_course_section => :root_account_id,
+          :context_group => :root_account_id,
+          :context_user => :root_account_id,
+        }
+      )
+    end
+
+    it 'should replace account association with both root_account_id and id' do
+      expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
+        ContextExternalTool, {course: :root_account_id, account: :root_account_id}
+      )).to eq(
+        {
+          :account=>[:root_account_id, :id],
+          :course=>:root_account_id
         }
       )
     end
@@ -199,15 +241,15 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     end
 
     it 'should return correctly for tables where we only care about certain associations' do
-      # this is meant to be used for models like CalendarEvent or Attachment where we may
-      # not populate root account if the context is User, but we still want to work under the
-      # assumption that the table is completely backfilled
+      # this is meant to be used for models like Attachment where we may not populate root
+      # account if the context is User, but we still want to work under the assumption that
+      # the table is completely backfilled
 
-      # User-context event doesn't have root account id
+      # User-context event doesn't have root account id so we use the user's account
       event = CalendarEvent.create!(context: user_model)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
         CalendarEvent
-      )).to be false
+      )).to be true
 
       # manually adding makes the check method think it does, though
       event.update_columns(root_account_id: @course.root_account_id)

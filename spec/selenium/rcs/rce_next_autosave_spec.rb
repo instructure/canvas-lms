@@ -87,7 +87,8 @@ describe "RCE Next autosave feature" do
     end
 
     # localStorage in chrome is limitedto 5120k, and that seems to include the key
-    it "should handle quota exceeded" do
+    it "should handle quota exceeded", ignore_js_errors: true do
+      # remove ignore_js_errors in LS-1163
       get '/'
       driver.local_storage.clear
       driver.local_storage['xyzzy'] = 'x'*5119*1024 + 'x'*1000

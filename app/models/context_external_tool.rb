@@ -992,6 +992,7 @@ end
       {
           :name => tool.label_for(:editor_button, I18n.locale),
           :id => tool.id,
+          :favorite => tool.is_rce_favorite,
           :url => tool.editor_button(:url),
           :icon_url => tool.editor_button(:icon_url),
           :canvas_icon_class => tool.editor_button(:canvas_icon_class),

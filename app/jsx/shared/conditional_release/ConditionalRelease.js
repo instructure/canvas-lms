@@ -151,13 +151,18 @@ class Editor extends React.Component {
   componentDidMount() {
     if (this.props.env.native) {
       this.createNativeEditor()
-    } else {
+    } else if (!this.props.env.disable_editing) {
       this.loadOldEditor()
     }
   }
 
   render() {
-    return <div id="canvas-conditional-release-editor" />
+    return (
+      <div id="canvas-conditional-release-editor">
+        {this.props.env.disable_editing &&
+          I18n.t('Mastery Paths editing has been temporarily disabled for maintenance.')}
+      </div>
+    )
   }
 }
 

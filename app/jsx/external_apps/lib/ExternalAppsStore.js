@@ -111,6 +111,20 @@ store.save = function(configurationType, data, success, error) {
   })
 }
 
+store.setAsFavorite = function(tool, isFavorite, success, error) {
+  const url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools/' + tool.app_id
+  const method = 'PUT'
+
+  $.ajax({
+    url,
+    contentType: 'application/json',
+    data: JSON.stringify({external_tool: {is_rce_favorite: isFavorite}}),
+    type: method,
+    success: success.bind(this),
+    error: error.bind(this)
+  })
+}
+
 store.updateAccessToken = function(context_base_url, accessToken, success, error) {
   $.ajax({
     url: context_base_url,

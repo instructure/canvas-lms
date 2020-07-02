@@ -194,6 +194,27 @@ module ActiveRecord
         end
 
       end
+
+      describe "with id plucking" do
+        it "should iterate through all selected rows" do
+          users = Set.new
+          3.times { users << user_model }
+          found = Set.new
+          User.find_in_batches(strategy: :pluck_ids, batch_size: 1) do |u_batch|
+            u_batch.each{|u| found << u }
+          end
+          expect(found).to eq users
+        end
+
+        it "keeps the specified order" do
+          [ "user_F", "user_D", "user_A", "user_C", "user_B", "user_E"].map{ |name| user_model(name: name) }
+          names = []
+          User.order(:name).find_in_batches(strategy: :pluck_ids, batch_size: 3) do |u_batch|
+            names += u_batch.map(&:name)
+          end
+          expect(names).to eq(["user_A", "user_B", "user_C", "user_D", "user_E", "user_F"])
+        end
+      end
     end
 
     describe ".bulk_insert" do

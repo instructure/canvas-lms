@@ -47,7 +47,7 @@ class ContextModulesController < ApplicationController
           collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
         cache_key = cache_key_items.join('/')
         cache_key = add_menu_tools_to_cache_key(cache_key)
-        cache_key = add_mastery_paths_to_cache_key(cache_key, @context, @modules, @current_user)
+        cache_key = add_mastery_paths_to_cache_key(cache_key, @context, @current_user)
       end
     end
 
@@ -139,19 +139,22 @@ class ContextModulesController < ApplicationController
       item = @context.context_module_tags.not_deleted.find(params[:id])
 
       if item.present? && item.published? && item.context_module.published?
-        rules = ConditionalRelease::Service.rules_for(@context, @current_user, item, session)
+        rules = ConditionalRelease::Service.rules_for(@context, @current_user, session)
         rule = conditional_release_rule_for_module_item(item, conditional_release_rules: rules)
 
         # locked assignments always have 0 sets, so this check makes it not return 404 if locked
         # but instead progress forward and return a warning message if is locked later on
         if rule.present? && (rule[:locked] || !rule[:selected_set_id] || rule[:assignment_sets].length > 1)
-          if !rule[:locked]
+          if ConditionalRelease::Assimilator.assimilation_in_progress?(@context.root_account)
+            flash[:warning] = t('Mastery paths selection has been temporarily disabled for maintenance.')
+            return redirect_to named_context_url(@context, :context_context_modules_url)
+          elsif !rule[:locked]
             options = rule[:assignment_sets].map { |set|
               option = {
                 setId: set[:id]
               }
 
-              option[:assignments] = set[:assignments].map { |a|
+              option[:assignments] = (set[:assignments] || set[:assignment_set_associations]).map { |a|
                 assg = assignment_json(a[:model], @current_user, session)
                 assg[:assignmentId] = a[:assignment_id]
                 assg

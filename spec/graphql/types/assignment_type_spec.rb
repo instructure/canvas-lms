@@ -69,6 +69,36 @@ describe Types::AssignmentType do
     end
   end
 
+  context "sis field" do
+    let_once(:sis_assignment) { assignment.update!(sis_source_id: "sisAssignment"); assignment }
+
+    let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false})}
+
+    it "returns sis_id if you have read_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: teacher}).dig("data", "assignment", "sisId")
+          query { assignment(id: "#{sis_assignment.id}") { sisId } }
+        GQL
+      ).to eq("sisAssignment")
+    end
+
+    it "returns sis_id if you have manage_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: admin}).dig("data", "assignment", "sisId")
+          query { assignment(id: "#{sis_assignment.id}") { sisId } }
+        GQL
+      ).to eq("sisAssignment")
+    end
+
+    it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: student}).dig("data", "assignment", "sisId")
+          query { assignment(id: "#{sis_assignment.id}") { sisId } }
+        GQL
+      ).to be_nil
+    end
+  end
+
   it "works with rubric" do
     rubric_for_course
     rubric_association_model(context: course, rubric: @rubric, association_object: assignment, purpose: 'grading')

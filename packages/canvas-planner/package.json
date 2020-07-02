@@ -60,6 +60,7 @@
     "@instructure/ui-prop-types": "6",
     "@instructure/ui-react-utils": "6",
     "@instructure/ui-select": "6",
+    "@instructure/ui-spinner": "6",
     "@instructure/ui-tabs": "6",
     "@instructure/ui-text-area": "6",
     "@instructure/ui-text-input": "6",

@@ -21,8 +21,8 @@ import classnames from 'classnames'
 import moment from 'moment-timezone'
 import {connect} from 'react-redux'
 import {View} from '@instructure/ui-layout'
-import {Spinner} from '@instructure/ui-elements'
-import {arrayOf, oneOfType, shape, bool, object, string, number, func} from 'prop-types'
+import {Spinner} from '@instructure/ui-spinner'
+import {arrayOf, oneOfType, shape, bool, object, string, func} from 'prop-types'
 import {userShape, sizeShape} from '../plannerPropTypes'
 import Day from '../Day'
 import EmptyDays from '../EmptyDays'
@@ -456,9 +456,4 @@ const mapDispatchToProps = {
   togglePlannerItemCompletion,
   updateTodo
 }
-export default notifier(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(ResponsivePlannerApp)
-)
+export default notifier(connect(mapStateToProps, mapDispatchToProps)(ResponsivePlannerApp))

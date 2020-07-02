@@ -23,12 +23,20 @@ module GraphQLNodeLoader
     case type
     when "Account"
       Loaders::IDLoader.for(Account).load(id).then(check_read_permission)
+    when "AccountBySis"
+      Loaders::SISIDLoader.for(Account).load(id).then(check_read_permission)
     when "Course"
       Loaders::IDLoader.for(Course).load(id).then(check_read_permission)
+    when "CourseBySis"
+      Loaders::SISIDLoader.for(Course).load(id).then(check_read_permission)
     when "Assignment"
       Loaders::IDLoader.for(Assignment).load(id).then(check_read_permission)
+    when "AssignmentBySis"
+      Loaders::SISIDLoader.for(Assignment).load(id).then(check_read_permission)
     when "Section"
       Loaders::IDLoader.for(CourseSection).load(id).then(check_read_permission)
+    when "SectionBySis"
+      Loaders::SISIDLoader.for(CourseSection).load(id).then(check_read_permission)
     when "User"
       Loaders::IDLoader.for(User).load(id).then(->(user) do
         return nil unless user && ctx[:current_user]
@@ -65,11 +73,19 @@ module GraphQLNodeLoader
       end
     when "Group"
       Loaders::IDLoader.for(Group).load(id).then(check_read_permission)
+    when "GroupBySis"
+      Loaders::SISIDLoader.for(Group).load(id).then(check_read_permission)
     when "GroupSet"
       Loaders::IDLoader.for(GroupCategory).load(id).then do |category|
-        Loaders::AssociationLoader.for(GroupCategory, :context)
-          .load(category)
-          .then { check_read_permission.(category) }
+        Loaders::AssociationLoader.for(GroupCategory, :context).
+          load(category).
+          then { check_read_permission.call(category) }
+      end
+    when "GroupSetBySis"
+      Loaders::SISIDLoader.for(GroupCategory).load(id).then do |category|
+        Loaders::AssociationLoader.for(GroupCategory, :context).
+          load(category).
+          then { check_read_permission.call(category) }
       end
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
@@ -115,6 +131,8 @@ module GraphQLNodeLoader
       end
     when "AssignmentGroup"
       Loaders::IDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
+    when "AssignmentGroupBySis"
+      Loaders::SISIDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
     when "Discussion"
       Loaders::IDLoader.for(DiscussionTopic).load(id).then(check_read_permission)
     when "Quiz"
@@ -132,6 +150,13 @@ module GraphQLNodeLoader
       Loaders::IDLoader.for(Rubric).load(id).then(check_read_permission)
     when "Term"
       Loaders::IDLoader.for(EnrollmentTerm).load(id).then do |enrollment_term|
+        Loaders::AssociationLoader.for(EnrollmentTerm, :root_account).load(enrollment_term).then do
+          next nil unless enrollment_term.root_account.grants_right?(ctx[:current_user], :read)
+          enrollment_term
+        end
+      end
+    when "TermBySis"
+      Loaders::SISIDLoader.for(EnrollmentTerm).load(id).then do |enrollment_term|
         Loaders::AssociationLoader.for(EnrollmentTerm, :root_account).load(enrollment_term).then do
           next nil unless enrollment_term.root_account.grants_right?(ctx[:current_user], :read)
           enrollment_term

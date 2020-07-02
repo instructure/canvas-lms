@@ -217,7 +217,7 @@ module Canvas::LiveEvents
   end
 
   def self.get_assignment_data(assignment)
-    {
+    event = {
       assignment_id: assignment.global_id,
       context_id: assignment.global_context_id,
       context_uuid: assignment.context.uuid,
@@ -236,6 +236,9 @@ module Canvas::LiveEvents
       lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
       submission_types: assignment.submission_types
     }
+    actl = assignment.assignment_configuration_tool_lookups.take
+    event[:associated_integration_id] = "#{actl.tool_vendor_code}-#{actl.tool_product_code}" if actl
+    event
   end
 
   def self.assignment_created(assignment)
@@ -309,7 +312,7 @@ module Canvas::LiveEvents
   end
 
   def self.get_submission_data(submission)
-    {
+    event = {
       submission_id: submission.global_id,
       assignment_id: submission.global_assignment_id,
       user_id: submission.global_user_id,
@@ -326,8 +329,11 @@ module Canvas::LiveEvents
       late: submission.late?,
       missing: submission.missing?,
       lti_assignment_id: submission.assignment.lti_context_id,
-      group_id: submission.group_id
+      group_id: submission.group_id,
     }
+    actl = AssignmentConfigurationToolLookup.find_by(assignment_id: submission.assignment_id)
+    event[:associated_integration_id] = "#{actl.tool_vendor_code}-#{actl.tool_product_code}" if actl
+    event
   end
 
   def self.get_attachment_data(attachment)

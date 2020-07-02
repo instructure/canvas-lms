@@ -31,7 +31,7 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :set, polymorphic: [:group, :course_section], exhaustive: false
-  has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :dependent => :destroy, :validate => false
+  has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :inverse_of => :assignment_override, :dependent => :destroy, :validate => false
   validates_presence_of :assignment_version, :if => :assignment
   validates_presence_of :title, :workflow_state
   validates :set_type, inclusion: ['CourseSection', 'Group', 'ADHOC', SET_TYPE_NOOP]

@@ -24,7 +24,8 @@ import I18n from 'i18n!last_attended'
 
 import {View} from '@instructure/ui-layout'
 import {DateInput} from '@instructure/ui-forms'
-import {Text, Spinner} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import {showFlashError} from '../shared/FlashAlert'
@@ -114,8 +115,7 @@ export default class StudentLastAttended extends React.Component {
           <View display="block" margin="small">
             <Spinner
               margin="small 0"
-              display="block"
-              title={I18n.t('Loading last attended date')}
+              renderTitle={I18n.t('Loading last attended date')}
               size="small"
             />
           </View>

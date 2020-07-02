@@ -183,6 +183,14 @@ module RCENextPage
     f('[role="dialog"][aria-label="Apps"]')
   end
 
+  def lti_favorite_button
+    possibly_hidden_toolbar_button('button[aria-label="Commons Favorites"')
+  end
+  
+  def lti_favorite_modal
+    f('[role="dialog"][aria-label="Embed content from External Tool"]')
+  end
+  
   def course_images
     f('[role="menuitem"][title="Course Images"]')
   end

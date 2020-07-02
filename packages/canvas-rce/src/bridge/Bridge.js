@@ -123,7 +123,7 @@ export default class Bridge {
     return false
   }
 
-  insertLink = (link, textOverride) => {
+  insertLink = link => {
     if (this.focusedEditor) {
       const {selection} = this.focusedEditor.props.tinymce.get(this.focusedEditor.props.textareaId)
       link.selectionDetails = {
@@ -133,7 +133,7 @@ export default class Bridge {
       if (!link.text) {
         link.text = link.title || link.href
       }
-      this.focusedEditor.insertLink(link, textOverride)
+      this.focusedEditor.insertLink(link)
       this.controller?.hideTray()
     } else {
       console.warn('clicked sidebar link without a focused editor')

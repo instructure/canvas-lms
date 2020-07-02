@@ -18,7 +18,9 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import {Spinner, Table, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
+import {Table} from '@instructure/ui-table'
 import {SearchResultsComponent} from 'jsx/gradebook-history/SearchResults'
 
 function defaultHistoryItems() {

@@ -32,4 +32,15 @@ describe OutcomeProficiencyRating, type: :model do
     it { is_expected.not_to allow_value('').for(:color) }
     it { is_expected.not_to allow_value(nil).for(:color) }
   end
+
+  describe 'root_account_id' do
+    let(:root_account) { account_model }
+    let(:proficiency) {  outcome_proficiency_model(root_account) }
+
+    it 'sets root_account_id using outcome proficiency' do
+      rating = OutcomeProficiencyRating.create!(description: 'A', points: 4, mastery: true, color: '00ff00', outcome_proficiency: proficiency)
+      expect(rating.root_account_id).to be_present
+      expect(rating.root_account_id).to eq(proficiency.root_account_id)
+    end
+  end
 end

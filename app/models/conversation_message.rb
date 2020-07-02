@@ -22,7 +22,7 @@ class ConversationMessage < ActiveRecord::Base
   self.ignored_columns = %i[root_account_id]
 
   include HtmlTextHelper
-
+  include ConversationHelper
   include Rails.application.routes.url_helpers
   include SendToStream
   include SimpleTags::ReaderInstanceMethods
@@ -38,6 +38,7 @@ class ConversationMessage < ActiveRecord::Base
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
 
+  before_create :set_root_account_ids
   after_create :generate_user_note!
   after_save :update_attachment_associations
 
@@ -251,7 +252,7 @@ class ConversationMessage < ActiveRecord::Base
         t(:subject, "Private message")
       end
       note = format_message(body).first
-      recipient.user_notes.create(:creator => author, :title => title, :note => note)
+      recipient.user_notes.create(creator: author, title: title, note: note, root_account_id: root_account_id)
     end
   end
 
@@ -283,7 +284,8 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def root_account_id
-    context_id if context_type == 'Account'
+    return nil unless context && context_type == 'Account'
+    context.resolved_root_account_id
   end
 
   def reply_from(opts)

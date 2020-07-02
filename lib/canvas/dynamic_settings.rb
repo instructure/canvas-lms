@@ -30,6 +30,8 @@ module Canvas
     KV_NAMESPACE = "config/canvas".freeze
     CACHE_KEY_PREFIX = "dynamic_settings/".freeze
 
+    Canvas::Reloader.on_reload { @root_fallback_proxy = nil }
+
     class << self
       attr_accessor :config, :environment
       attr_reader :fallback_data

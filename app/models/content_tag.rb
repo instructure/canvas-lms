@@ -61,6 +61,7 @@ class ContentTag < ActiveRecord::Base
   after_save :run_due_date_cacher_for_quizzes_next
   after_save :clear_discussion_stream_items
   after_save :send_items_to_stream
+  after_create :update_outcome_contexts
 
   include CustomValidations
   validates_as_url :url
@@ -116,6 +117,13 @@ class ContentTag < ActiveRecord::Base
   def touch_context_if_learning_outcome
     if (self.tag_type == 'learning_outcome_association' || self.tag_type == 'learning_outcome') && skip_touch.blank?
       self.context_type.constantize.where(:id => self.context_id).update_all(:updated_at => Time.now.utc)
+    end
+  end
+
+  def update_outcome_contexts
+    return unless self.tag_type == 'learning_outcome_association'
+    if self.context_type == 'Account' || self.context_type == 'Course'
+      self.content.add_root_account_id_for_context!(self.context)
     end
   end
 

@@ -18,7 +18,7 @@
 
 import React, {useRef, useState} from 'react'
 import CanvasInlineAlert from 'jsx/shared/components/CanvasInlineAlert'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 
 export default function DirectShareOperationStatus({promise, startingMsg, successMsg, errorMsg}) {
   const [operationStatus, setOperationStatus] = useState('starting')

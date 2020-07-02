@@ -1778,6 +1778,22 @@ describe GradeCalculator do
       expect(overall_course_score.reload).to be_active
     end
 
+    it "updates root_account_id on existing scores if they do not have a root_account_id set" do
+      overall_course_score.update_column(:root_account_id, nil)
+      expect {
+        GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      }.to change {
+        overall_course_score.reload.root_account_id
+      }.from(nil).to(@course.root_account_id)
+    end
+
+    it "sets root_account_id when inserting new scores" do
+      overall_course_score.destroy_permanently!
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      inserted_score = @student.enrollments.first.scores.find_by(course_score: true)
+      expect(inserted_score.root_account_id).to eq @course.root_account_id
+    end
+
     context("assignment group scores") do
       before(:each) do
         @group1 = @course.assignment_groups.create!(name: "some group 1")
@@ -1817,17 +1833,37 @@ describe GradeCalculator do
         expect(orig_score_id).to be new_score_id
       end
 
+      it "updates root_account_id on existing scores if they do not have a root_account_id set" do
+        score = student_scores.first
+        score.update_column(:root_account_id, nil)
+        expect {
+          GradeCalculator.new(@student.id, @course).compute_and_save_scores
+        }.to change { score.reload.root_account_id }.from(nil).to(@course.root_account_id)
+      end
+
       it "activates previously soft deleted assignment group scores when updating them" do
         student_scores.update_all(workflow_state: 'deleted')
         GradeCalculator.new(@student.id, @course).compute_and_save_scores
         expect(student_scores.map(&:workflow_state).uniq).to contain_exactly('active')
       end
 
-      it "inserts score rows for assignment groups unless they already exist" do
-        expect do
-          @course.assignment_groups.create!(name: "yet another group")
+      context "assignment group score creation" do
+        before(:each) do
+          @group = @course.assignment_groups.create!(name: "yet another group")
+          @group.scores.each(&:destroy_permanently!)
+          @group.reload
+        end
+
+        it "inserts score rows for assignment groups unless they already exist" do
+          expect do
+            GradeCalculator.new(@student.id, @course).compute_and_save_scores
+          end.to change { Score.where(assignment_group: @group).count }.from(0).to(1)
+        end
+
+        it "assigns a root_account_id to the inserted assignment group score" do
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
-        end.to change{ Score.count }.by(1)
+          expect(@group.scores.first.root_account_id).to eq @course.root_account_id
+        end
       end
     end
   end

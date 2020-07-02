@@ -55,6 +55,9 @@ var SubmitAssignment = {
     const tool = $(this).data('tool')
     const url = `/courses/${ENV.COURSE_ID}/external_tools/${tool.id}/resource_selection?homework=1&assignment_id=${ENV.SUBMIT_ASSIGNMENT.ID}`
 
+    // create return view and attach postMessage listener for tools launched in dialog from the More tab
+    SubmitAssignment.homeworkSubmissionLtiContainer.embedLtiLaunch(tool.get('id'))
+
     const width = tool.get('homework_submission').selection_width || tool.get('selection_width')
     const height = tool.get('homework_submission').selection_height || tool.get('selection_height')
     const title = tool.get('display_text')
@@ -130,6 +133,9 @@ $(document).ready(function() {
   const homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer(
     '#submit_from_external_tool_form'
   )
+
+  // store for launching of tools from the More tab
+  SubmitAssignment.homeworkSubmissionLtiContainer = homeworkSubmissionLtiContainer
 
   // Add the Keyboard shortcuts info button
   if (!ENV.use_rce_enhancements) {

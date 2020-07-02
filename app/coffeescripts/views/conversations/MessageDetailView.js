@@ -23,6 +23,10 @@ import Message from '../../models/Message'
 import MessageItemView from './MessageItemView'
 import template from 'jst/conversations/messageDetail'
 import noMessage from 'jst/conversations/noMessage'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Avatar} from '@instructure/ui-avatar'
+import {nanoid} from 'nanoid'
 
 export default class MessageDetailView extends View {
   static initClass() {
@@ -59,6 +63,7 @@ export default class MessageDetailView extends View {
           : this.messages.archive
       $template = $(template(context))
       this.model.messageCollection.each(message => {
+        message.attributes.avatarContainerId = `message-item-avatar-wrapper-${nanoid()}`
         if (!message.get('conversation_id')) {
           message.set('conversation_id', context.id)
         }
@@ -67,6 +72,10 @@ export default class MessageDetailView extends View {
         }
         const childView = new MessageItemView({model: message}).render()
         $template.find('.message-content').append(childView.$el)
+        ReactDOM.render(
+          <Avatar name={ENV.current_user.display_name} src={ENV.current_user.avatar_image_url} />,
+          $template.find(`#${message.attributes.avatarContainerId}`)[0]
+        )
         this.listenTo(childView, 'reply', () =>
           this.trigger('reply', message, `.message-item-view[data-id=${message.id}] .reply-btn`)
         )

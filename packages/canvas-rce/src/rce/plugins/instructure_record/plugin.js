@@ -118,7 +118,7 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
         trayController.showTrayForEditor(ed)
       },
 
-      text: formatMessage('Options'),
+      text: formatMessage('Video Options'),
       tooltip: buttonAriaLabel
     })
 

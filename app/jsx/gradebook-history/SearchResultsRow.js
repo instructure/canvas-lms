@@ -27,7 +27,10 @@ import I18n from 'i18n!gradebook_history'
 import {IconOffLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Tooltip} from '@instructure/ui-overlays'
+import {Table} from '@instructure/ui-table'
 
+// Unclear on why that tab-index is there but not going to mess with it right now
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 function anonymouslyGraded(gradedAnonymously) {
   return gradedAnonymously ? (
     <div>
@@ -42,6 +45,7 @@ function anonymouslyGraded(gradedAnonymously) {
     <ScreenReaderContent>{I18n.t('Not anonymously graded')}</ScreenReaderContent>
   )
 }
+/* eslint-enable jsx-a11y/no-noninteractive-tabindex */
 
 function displayGrade(grade, possible, displayAsPoints) {
   // show the points possible if the assignment is set to display grades as
@@ -84,18 +88,18 @@ function SearchResultsRow(props) {
   } = props.item
 
   return (
-    <tr>
-      <td>
+    <Table.Row>
+      <Table.Cell>
         {$.datetimeString(new Date(date), {format: 'medium', timezone: environment.timezone()})}
-      </td>
-      <td>{anonymouslyGraded(gradedAnonymously)}</td>
-      <td>{displayStudentName(student, assignment)}</td>
-      <td>{grader || I18n.t('Not available')}</td>
-      <td>{assignment.name || I18n.t('Not available')}</td>
-      <td>{displayGrade(gradeBefore, pointsPossibleBefore, displayAsPoints)}</td>
-      <td>{displayGrade(gradeAfter, pointsPossibleAfter, displayAsPoints)}</td>
-      <td>{displayGrade(gradeCurrent, pointsPossibleCurrent, displayAsPoints)}</td>
-    </tr>
+      </Table.Cell>
+      <Table.Cell>{anonymouslyGraded(gradedAnonymously)}</Table.Cell>
+      <Table.Cell>{displayStudentName(student, assignment)}</Table.Cell>
+      <Table.Cell>{grader || I18n.t('Not available')}</Table.Cell>
+      <Table.Cell>{assignment.name || I18n.t('Not available')}</Table.Cell>
+      <Table.Cell>{displayGrade(gradeBefore, pointsPossibleBefore, displayAsPoints)}</Table.Cell>
+      <Table.Cell>{displayGrade(gradeAfter, pointsPossibleAfter, displayAsPoints)}</Table.Cell>
+      <Table.Cell>{displayGrade(gradeCurrent, pointsPossibleCurrent, displayAsPoints)}</Table.Cell>
+    </Table.Row>
   )
 }
 
@@ -119,5 +123,7 @@ SearchResultsRow.propTypes = {
     student: string.isRequired
   }).isRequired
 }
+
+SearchResultsRow.displayName = 'Row'
 
 export default SearchResultsRow

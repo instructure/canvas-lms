@@ -562,7 +562,8 @@ describe ApplicationHelper do
         :width=>800,
         :height=>400,
         :use_tray => false,
-        :description => "<p>the description.</p>\n"
+        :description => "<p>the description.</p>\n",
+        :favorite => false
       }])
     end
 
@@ -583,7 +584,8 @@ describe ApplicationHelper do
         :width=>800,
         :height=>400,
         :use_tray => false,
-        :description => ""
+        :description => "",
+        :favorite => false
       }])
     end
 

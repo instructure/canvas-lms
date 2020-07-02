@@ -85,8 +85,48 @@ describe Canvas::ICU do
     end
   end
 
+  shared_examples_for "ICU Collator" do
+    it "sorts several examples correctly" do
+      # English sorts ñ as just an n, but after regular n's
+      expect(collate(["ana", "aña", "añb", "anb"])).to eq(
+                                                          ["ana", "aña", "anb", "añb"])
+
+      # Spanish sorts it as a separate letter
+      begin
+        original_locale, I18n.locale = I18n.locale, :es
+        expect(collate(["ana", "aña", "añb", "anb"])). to eq(
+                                                            ["ana", "anb", "aña", "añb"])
+      ensure
+        I18n.locale = original_locale
+      end
+
+      # Punctuation is not ignored (commas separating surnames)
+      expect(collate(["Wall, Ball", "Wallart, Shmallart"])).to eq(
+                                                                 ["Wall, Ball", "Wallart, Shmallart"])
+
+      # shorter words sort first
+      expect(collate(["hatch", "hat"])).to eq(
+                                             ["hat", "hatch"])
+
+      # capitalization is a secondary sort level
+      expect(collate(["aba", "aBb", "abb", "aBa"])).to eq(
+                                                         ["aba", "aBa", "abb", "aBb"])
+
+      # numbers sort naturally
+      expect(collate(["10", "1", "2", "11"])).to eq(
+                                                   ["1", "2", "10", "11"])
+
+      # hyphenated last name is not a word separator
+      # I can't get this to pass, without breaking the Wallart case above. Either you ignore
+      # punctuation, or you don't.
+      # expect(Canvas::ICU.collator.collate(["Hoover, Lorelei", "Hoover-Mertz, Joseph"])).to eq(
+      #   ["Hoover, Lorelei", "Hoover-Mertz, Joseph"])
+    end
+  end
+
   context "ICU" do
     include_examples "Collator"
+    include_examples "ICU Collator"
 
     before do
       if (ICU::Lib.version rescue false)
@@ -94,40 +134,27 @@ describe Canvas::ICU do
           raise "ICU appears to be installed, but we didn't load it correctly"
         end
       else
-        skip if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
+        skip "ICU is not installed" if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
       end
     end
 
-    it "sorts several examples correctly" do
-      # English sorts ñ as just an n, but after regular n's
-      expect(Canvas::ICU.collator.collate(["ana", "aña", "añb", "anb"])). to eq(
-        ["ana", "aña", "anb", "añb"])
+    def collate(values)
+      Canvas::ICU.collator.collate(values)
+    end
 
-      # Spanish sorts it as a separate letter
-      expect(Canvas::ICU.collator(:es).collate(["ana", "aña", "añb", "anb"])). to eq(
-        ["ana", "anb", "aña", "añb"])
+    context "postgres" do
+      include_examples "ICU Collator"
 
-      # Punctuation is not ignored (commas separating surnames)
-      expect(Canvas::ICU.collator.collate(["Wall, Ball", "Wallart, Shmallart"])).to eq(
-        ["Wall, Ball", "Wallart, Shmallart"])
+      before do
+        skip "Postgres does not have collation support" if ActiveRecord::Base.best_unicode_collation_key('col') =~ /LOWER/
+      end
 
-      # shorter words sort first
-      expect(Canvas::ICU.collator.collate(["hatch", "hat"])).to eq(
-        ["hat", "hatch"])
-
-      # capitalization is a secondary sort level
-      expect(Canvas::ICU.collator.collate(["aba", "aBb", "abb", "aBa"])).to eq(
-        ["aba", "aBa", "abb", "aBb"])
-
-      # numbers sort naturally
-      expect(Canvas::ICU.collator.collate(["10", "1", "2", "11"])).to eq(
-        ["1", "2", "10", "11"])
-
-      # hyphenated last name is not a word separator
-      # I can't get this to pass, without breaking the Wallart case above. Either you ignore
-      # punctuation, or you don't.
-      # expect(Canvas::ICU.collator.collate(["Hoover, Lorelei", "Hoover-Mertz, Joseph"])).to eq(
-      #   ["Hoover, Lorelei", "Hoover-Mertz, Joseph"])
+      def collate(values)
+        ActiveRecord::Base.connection.select_values <<-SQL
+          SELECT col FROM ( VALUES #{values.map { |v| "(#{ActiveRecord::Base.connection.quote(v)})" }.join(", ")} ) AS s(col)
+          ORDER BY #{ActiveRecord::Base.best_unicode_collation_key('col')}
+        SQL
+      end
     end
   end
 end

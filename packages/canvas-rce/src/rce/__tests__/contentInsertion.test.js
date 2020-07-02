@@ -38,7 +38,7 @@ describe('contentInsertion', () => {
       },
       selection: {
         getNode: () => {
-          return null
+          return editor.selectionContent ? 'p' : null
         },
         getContent: () => {
           return editor.selectionContent
@@ -63,11 +63,13 @@ describe('contentInsertion', () => {
         setAttribs: (elem, attrs) => {
           if (elem?.nodeType === 1) {
             // this is an HTMLElement
-            Object.keys(attrs).forEach(a => {
-              if (attrs[a]) {
-                elem.setAttribute(a, attrs[a])
-              }
-            })
+            Object.keys(attrs)
+              .sort()
+              .forEach(a => {
+                if (attrs[a]) {
+                  elem.setAttribute(a, attrs[a])
+                }
+              })
           }
           return elem
         },
@@ -77,6 +79,12 @@ describe('contentInsertion', () => {
               return false
             }
           }
+        },
+        createHTML: (tag, attrs, text) => {
+          const elem = document.createElement(tag)
+          editor.dom.setAttribs(elem, attrs)
+          elem.innerHTML = text
+          return elem.outerHTML
         }
       },
       undoManager: {
@@ -95,7 +103,11 @@ describe('contentInsertion', () => {
           return {left: 0, top: 0, bottom: 0, right: 0}
         }
       },
-      execCommand: jest.fn()
+      execCommand: jest.fn((cmd, ui, opts) => {
+        if (cmd === 'mceInsertLink') {
+          editor.content = editor.dom.createHTML('a', opts, editor.selectionContent)
+        }
+      })
     }
   })
 
@@ -123,7 +135,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'image'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>'
+        '<a class="instructure_file_link instructure_image_thumbnail" href="/some/path" title="Here Be Links">Click On Me</a>'
       )
     })
 
@@ -131,7 +143,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'scribd'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
+        '<a class="instructure_file_link instructure_scribd_file" href="/some/path" title="Here Be Links">Click On Me</a>'
       )
     })
 
@@ -140,18 +152,17 @@ describe('contentInsertion', () => {
       link.class = 'instructure_file_link foo'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" data-canvas-previewable="true" class="instructure_file_link foo">Click On Me</a>'
+        '<a class="instructure_file_link foo" data-canvas-previewable="true" href="/some/path" title="Here Be Links">Click On Me</a>'
       )
     })
 
     it('respects the current selection building the link by delegating to tinymce', () => {
       editor.selection.setContent('link me')
       contentInsertion.insertLink(editor, link)
-      expect(editor.content).toEqual('<a href="/some/path" title="Here Be Links">link me</a>')
+      expect(editor.execCommand).toHaveBeenCalledWith('mceInsertLink', false, expect.any(Object))
     })
 
     it('cleans a url with no protocol when linking the current selection', () => {
-      editor.execCommand = jest.fn()
       editor.selection.setContent('link me')
       link.href = 'www.google.com'
       contentInsertion.insertLink(editor, link)

@@ -23,6 +23,7 @@ class ConversationParticipant < ActiveRecord::Base
   include TextHelper
   include SimpleTags
   include ModelCache
+  include ConversationHelper
 
   belongs_to :conversation
   belongs_to :user
@@ -188,6 +189,7 @@ class ConversationParticipant < ActiveRecord::Base
   delegate :context_name, :to => :conversation
   delegate :context_components, :to => :conversation
 
+  before_create :set_root_account_ids
   before_update :update_unread_count_for_update
   before_destroy :update_unread_count_for_destroy
 

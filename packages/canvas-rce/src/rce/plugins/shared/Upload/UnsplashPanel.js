@@ -20,7 +20,8 @@ import React, {useState, useEffect, useReducer, useRef, useCallback} from 'react
 import {string, func, object} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex, View} from '@instructure/ui-layout'
-import {Avatar, Img, Spinner} from '@instructure/ui-elements'
+import {Avatar, Img} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Alert} from '@instructure/ui-alerts'
 import {Pagination} from '@instructure/ui-pagination'
@@ -150,7 +151,7 @@ function renderAlert(term, hasLoaded, totalResults, results, page, liveRegion) {
   }
 }
 
-export default function UnsplashPanel({editor, source, setUnsplashData, brandColor, liveRegion}) {
+export default function UnsplashPanel({source, setUnsplashData, brandColor, liveRegion}) {
   const [page, setPage] = useState(1)
   const [term, setTerm] = useState('')
   const [selectedImage, setSelectedImage] = useState(null)
@@ -200,7 +201,7 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
           </View>
           <div className={css(styles.container)} data-testid="UnsplashResultsContainer">
             {results[page] &&
-              results[page].map((resultImage, index) => (
+              results[page].map(resultImage => (
                 <div
                   className={css(hoverStyles.imageWrapper, styles.imageWrapper)}
                   key={resultImage.id}
@@ -284,10 +285,10 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
 }
 
 UnsplashPanel.propTypes = {
-  editor: object,
+  setUnsplashData: func,
   source: object,
-  imageUrl: string,
-  setImageUrl: func
+  brandColor: string,
+  liveRegion: func
 }
 
 export const styles = StyleSheet.create({

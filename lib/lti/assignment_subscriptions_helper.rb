@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# This is duplicated in PlagiarismSubscriptionsHelper.  We'll want to dump all
+# this when that is working and all the subscriptions have been migrated
+
 module Lti
   class AssignmentSubscriptionsHelper
     attr_accessor :assignment, :tool_proxy

@@ -47,3 +47,41 @@ export function cleanUrl(input) {
   }
   return url
 }
+
+// given the current selection, find the containing anchor
+export function getAnchorElement(editor, selectedElm) {
+  selectedElm = selectedElm || editor.selection.getNode()
+  if (isImageFigure(selectedElm)) {
+    return editor.dom.select('a[href]', selectedElm)[0]
+  } else {
+    return editor.dom.getParent(selectedElm, 'a[href]')
+  }
+}
+
+// is the selection only text, or are other elements selected
+const d = document.createElement('div')
+export function isOnlyTextSelected(html) {
+  // this regex-based code is lifted from tinymce's link plugin, but I didn't like it.
+  // if (/</.test(html) && (!/^<a [^>]+>[^<]+<\/a>$/.test(html) || html.indexOf('href=') === -1)) {
+  //   return false
+  // }
+  // return true
+  d.innerHTML = html
+  return !d.querySelector('img,iframe,video,audio')
+}
+
+export function isOKToLink(html) {
+  // I know, parsing html with regexp is dangerous, but this is called way too often
+  // from the instructure_link/plugin.js to create the nodes for a better check
+  if (/<(?:iframe|audio|video)/.test(html)) {
+    return false
+  }
+  return true
+}
+
+export function isImageFigure(elm) {
+  return (
+    elm && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)
+    // (elm.nodeName === 'IMG' || (elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)))
+  )
+}

@@ -155,6 +155,20 @@ $.widget("ui.dialog", {
 				.addClass( "ui-dialog-buttonset" )
 				.appendTo( uiDialogButtonPane );
 
+			if(options.modal) {
+				$( "<div>" )
+					.addClass( "ui-dialog-focus-bumper ui-dialog-focus-bumper-top" )
+					.on("focus", (evt) => that._bumperFocus(evt, true))
+					.attr('tabIndex', 0)
+					.prependTo( uiDialog ),
+
+				$( "<div>" )
+					.addClass( "ui-dialog-focus-bumper ui-dialog-focus-bumper-bottom" )
+					.on("focus", (evt) => that._bumperFocus(evt, false))
+					.attr('tabIndex', 0)
+					.appendTo( uiDialog );
+			}
+
 		if (uiDialogContent.attr("id") === undefined) {
 			uiDialogContent.uniqueId();
 		}
@@ -326,7 +340,7 @@ $.widget("ui.dialog", {
 			// INSTRUCTURE
 			// Ensure that an element is focused after opening and closing.
 			this.oldFocus = document.activeElement;
-			$( ":tabbable:first", this.uiDialog ).focus();
+			$( ":not(.ui-dialog-focus-bumper):tabbable:first", this.uiDialog ).focus();
 
 			this._on( uiDialog, { keydown: function( event ) {
 				if ( event.keyCode !== $.ui.keyCode.TAB ) {
@@ -391,6 +405,21 @@ $.widget("ui.dialog", {
 		return this;
 	},
 
+	_bumperFocus: function(evt, goingUp) {
+		var tabbables = $( ":tabbable",  this.uiDialog );
+		if(tabbables.length < 3) {
+			return;
+		}
+		if(!goingUp) {
+			tabbables[1].focus();
+		} else {
+			tabbables[tabbables.length - 2].focus();
+		}
+
+		evt.preventDefault();
+		evt.stopPropagation();
+	},
+
 	_createButtons: function( buttons ) {
 		var uiDialogButtonPane, uiButtonSet,
 			that = this,
@@ -422,7 +451,11 @@ $.widget("ui.dialog", {
 				}
 			});
 			this.uiDialog.addClass( "ui-dialog-buttons" );
-			this.uiDialogButtonPane.appendTo( this.uiDialog );
+			if(this.options.modal) {
+				this.uiDialogButtonPane.insertBefore( this.uiDialog.find('.ui-dialog-focus-bumper-bottom') );
+			} else {
+				this.uiDialogButtonPane.append(this.uiDialog);
+			}
 		} else {
 			this.uiDialog.removeClass( "ui-dialog-buttons" );
 		}

@@ -23,7 +23,7 @@ import Header from './Header'
 import I18n from 'i18n!assignments_2_student_content'
 import MissingPrereqs from './MissingPrereqs'
 import React, {Suspense, lazy} from 'react'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '../graphqlData/Submission'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))

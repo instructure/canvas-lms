@@ -21,7 +21,7 @@ import React, {useState, useRef} from 'react'
 import {bool, func, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 
 const noOptionsId = '~~empty-option~~'
 

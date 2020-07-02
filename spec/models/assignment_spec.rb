@@ -390,6 +390,40 @@ describe Assignment do
         expect(assignment.root_account_id).to eq @course.root_account_id
       end
     end
+
+    describe "assignment changes that impact submission grades" do
+      before(:once) do
+        @assignment = @course.assignments.create!(grading_type: "points")
+        @assignment.grade_student(@student, grade: 5, grader: @teacher)
+        @assistant = User.create!
+        @course.enroll_ta(@assistant, enrollment_state: "active")
+      end
+
+      let(:submission) { @assignment.submissions.find_by(user: @student) }
+
+      it "updates the grader on submissions to the updating user" do
+        @assignment.updating_user = @assistant
+        @assignment.grading_type = "percent"
+        expect { @assignment.save! }.to change {
+          submission.reload.grader
+        }.from(@teacher).to(@assistant)
+      end
+
+      it "does not update the grader if the change does not impact grades" do
+        @assignment.updating_user = @assistant
+        @assignment.title = "This Won't Impact Grades!"
+        expect { @assignment.save! }.not_to change {
+          submission.reload.grader
+        }.from(@teacher)
+      end
+
+      it "does not update the grader if updating user is not available" do
+        @assignment.grading_type = "percent"
+        expect { @assignment.save! }.not_to change {
+          submission.reload.grader
+        }.from(@teacher)
+      end
+    end
   end
 
   describe "scope: expects_submissions" do
