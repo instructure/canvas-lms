@@ -1,7 +1,7 @@
 <h1 class="screenreader-only">{{#t "pages_title"}}Pages{{/t}}</h1>
 {{#if CAN.VIEW_TOOLBAR}}
 <div class="header-bar-outer-container">
-  <div class="header-bar-container sticky-toolbar-with-right-side" data-sticky>
+  <div class="sticky-toolbar-with-right-side" data-sticky>
     <div class="header-bar">
       <div class="header-bar-right">
         {{#if CAN.CREATE}}
@@ -33,29 +33,29 @@
     <table class="ic-Table ic-Table--condensed ic-Table--striped ic-Table--hover-row" role="grid">
       <thead>
         <tr class="header-row" role="row">
-          <th scope="col" width="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}42%{{else}}46%{{/if}}{{else}}60%{{/if}}" role="columnheader">
+          <th scope="col" style="width: {{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}42%{{else}}46%{{/if}}{{else}}60%{{/if}}" role="columnheader">
             <a href="#" data-sort-field="title" tabindex="0" role="button" class="sort-field">{{#t 'headers.page_title'}}Page title{{/t}} <i></i></a>
           </th>
-          <th scope="col" width="20%" role="columnheader">
+          <th scope="col" style="width: 10%" role="columnheader">
             <a href="#" data-sort-field="created_at" tabindex="0" role="button" class="sort-field">{{#t 'headers.creation_date'}}Creation date{{/t}} <i></i></a>
           </th>
-          <th scope="col" width="20%" role="columnheader">
+          <th scope="col" style="width: 10%" role="columnheader">
             <a href="#" data-sort-field="updated_at" tabindex="0" role="button" class="sort-field">{{#t 'headers.last_edit'}}Last edit{{/t}} <i></i></a>
           </th>
           {{#if collectionHasTodoDate}}
-            <th scope="col" width="20%" role="columnheader">
+            <th scope="col" style="width: 20%" role="columnheader">
               <a href="#" data-sort-field="todo_date" tabindex="0" role="button" class="sort-field">{{#t 'headers.todo_date'}}To-Do Date{{/t}}
                 <i></i>
               </a>
             </th>
           {{/if}}
-          <th scope="col" width="5%" role="columnheader">
+          <th scope="col" style="width: 5%" role="columnheader">
             <span class="screenreader-only">{{#t}}Master Lock{{/t}}</span>
           </th>
-          <th scope="col" width="5%" role="columnheader">
+          <th scope="col" style="width: 5%" role="columnheader">
             <span class="screenreader-only">{{#t}}Publish{{/t}}</span>
           </th>
-          <th scope="col" width="5%" role="columnheader">
+          <th scope="col" style="width: 5%" role="columnheader">
             <span class="screenreader-only">{{#t}}Manage{{/t}}</span>
           </th>
         </tr>
