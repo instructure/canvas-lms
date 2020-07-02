@@ -140,10 +140,49 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    it 'should populate the root_account_id on ContentMigration' do
+      cm = @course.content_migrations.create!(user: @user)
+      cm.update_columns(root_account_id: nil)
+      expect(cm.root_account_id).to be nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(cm.reload.root_account_id).to eq @course.root_account_id
+
+      account = account_model(root_account: account_model)
+      cm = account.content_migrations.create!(user: @user)
+      cm.update_columns(root_account_id: nil)
+      expect(cm.root_account_id).to be nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(cm.reload.root_account_id).to eq account.root_account_id
+
+      group_model
+      cm = @group.content_migrations.create!(user: @user)
+      cm.update_columns(root_account_id: nil)
+      expect(cm.root_account_id).to be nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(cm.reload.root_account_id).to eq @group.root_account_id
+    end
+
     it 'should populate the root_account_id on ContextModule' do
       expect(@cm.root_account_id).to be nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(@cm.reload.root_account_id).to eq @course.root_account_id
+    end
+
+    it 'should populate the root_account_id on ContentShare' do
+      ce = @course.content_exports.create!
+      cs = ce.received_content_shares.create!(user: user_model, read_state: 'read', name: 'test')
+      cs.update_columns(root_account_id: nil)
+      expect(cs.root_account_id).to be nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(cs.reload.root_account_id).to eq @course.root_account_id
+
+      group_model
+      ce = @group.content_exports.create!
+      cs = ce.received_content_shares.create!(user: user_model, read_state: 'read', name: 'test')
+      cs.update_columns(root_account_id: nil)
+      expect(cs.root_account_id).to be nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(cs.reload.root_account_id).to eq @group.root_account_id
     end
 
     it 'should populate the root_account_id on DeveloperKey' do
