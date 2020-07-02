@@ -79,6 +79,14 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(dtp.reload.root_account_id).to eq @topic.root_account_id
     end
+
+    it 'should populate the root_account_id on Quizzes::Quiz' do
+      quiz_model(course: @course)
+      @quiz.update_columns(root_account_id: nil)
+      expect(@quiz.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(@quiz.reload.root_account_id).to eq @course.root_account_id
+    end
   end
 
   describe '#run' do
