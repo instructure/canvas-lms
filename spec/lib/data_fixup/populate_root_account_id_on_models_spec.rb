@@ -94,6 +94,16 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(de.reload.root_account_id).to eq @course.root_account_id
     end
 
+    it 'should populate the root_account_id on DiscussionEntryParticipant' do
+      discussion_topic_model(context: @course)
+      de = @topic.discussion_entries.create!(user: user_model)
+      dep = de.discussion_entry_participants.create!(user: user_model)
+      dep.update_columns(root_account_id: nil)
+      expect(dep.reload.root_account_id).to eq nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(dep.reload.root_account_id).to eq @course.root_account_id
+    end
+
     it 'should populate the root_account_id on DiscussionTopic' do
       discussion_topic_model(context: @course)
       @topic.update_columns(root_account_id: nil)
