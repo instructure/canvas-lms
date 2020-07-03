@@ -1687,6 +1687,7 @@ de:
   activate_key_developername_cd62a4a9: "Schlüssel aktivieren %{developerName}"
   activate_key_name_a99df672: "Schlüssel aktivieren %{name}"
   activate_this_key_6cd98f4b: "Diesen Schlüssel aktivieren"
+  active_announcements_6b67f33b: "Aktive Ankündigungen"
   active_d7e32718: Aktiv
   active_terms_83df727e: "Aktive Semester"
   activerecord: 
@@ -1725,6 +1726,7 @@ de:
   add_announcement_165c3b05: "Ankündigung hinzufügen"
   add_another_assignment_fc5c908f: "Eine weitere Aufgabe hinzufügen"
   add_app_baf540f: "App hinzufügen"
+  add_as_allowed_e95540be: "Als „erlaubt“ hinzufügen"
   add_assignment_to_name_caf173b0: "Aufgabe zu %{name} hinzufügen"
   add_attachment_93868828: "Anhang hinzufügen"
   add_attribute_6d6d4a65: "Attribut hinzufügen"
@@ -1757,8 +1759,12 @@ de:
   add_group_c84f9e9d: "Gruppe hinzufügen"
   add_group_set_f9809e11: "Gruppenset hinzufügen"
   add_help_menu_links_de9fc34f: "Hilfemenü-Links hinzufügen"
+  add_hostname_as_an_allowed_domain_1f58c38d: "%{hostname} als erlaubte Domäne hinzufügen"
   add_hostname_to_the_whitelist_c808192e: "%{hostname} zur Whitelist hinzufügen"
   add_icon_567dbcaa: "Symbol hinzufügen"
+  add_items_44913315: "Elemente hinzufügen"
+  add_items_into_scoring_range_title_be08104e: "Elemente in %{scoring_range_title} hinzufügen"
+  add_items_to_score_range_297d413b: "Elemente zum Punktebereich hinzufügen"
   add_link_5c01c1e8: "Link hinzufügen"
   add_link_fc336ed6: "Link hinzufügen"
   add_media_cfa37b54: "Medien hinzufügen"
@@ -2020,6 +2026,7 @@ de:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Zulassen, dass dieses Werkzeug auf den IMS Names und den Role Provisioning Service zugreift"
   allow_users_to_comment_45b8f753: "Benutzern Kommentare erlauben"
   allowed_attempts_4e229caa: "Zulässige Versuche"
+  allowed_domains_ee7868c8: "Erlaubte Domänen."
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Erlaubt einem Benutzer, auf den Link „Handeln als Benutzer“ auf studentischen Kontextkarten zuzugreifen"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Erlaubt einem Benutzer die Anzeige der SIS-ID in den Anmeldedetails eines Benutzer."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Erlaubt einem Benutzer, Benutzer-SIS-IDs auf einer „Kurse und Teilnehmer“-Seite anzuzeigen."
@@ -2548,6 +2555,7 @@ de:
   announcements_account_4e9df626: "Ankündigungen (Konto)"
   announcements_cannot_be_duplicated_2de8824c: "Anmeldungen können nicht dupliziert werden."
   announcements_deleted_successfully_7d77e9e1: "Ankündigungen erfolgreich gelöscht"
+  announcements_from_the_past_four_months_cefbc99c: "Ankündigungen der letzen vier Monate"
   announcements_list_c75fc413: Ankündigungsliste
   announcements_loaded_e9335d5f: "Ankündigungen geladen!"
   announcements_locked_successfully_43d58107: "Ankündigungen erfolgreich gesperrt"
@@ -2950,6 +2958,7 @@ de:
   assignment_name_is_now_due_80025e91: "%{assignment_name} ist jetzt fällig:"
   assignment_name_is_now_due_no_due_date_d3127a8f: "%{assignment_name} ist jetzt fällig: Kein Abgabetermin"
   assignment_name_is_required_9d17311b: "Ein Aufgabenname ist erforderlich."
+  assignment_name_options_43b1795: "Optionen der Aufgabe %{name}"
   assignment_name_z_a_34f92f4b: "Aufgabenname Z–A"
   assignment_options_1e5b7074: Aufgabenoptionen
   assignment_override: 
@@ -2959,6 +2968,7 @@ de:
   assignment_path_selected_e80191d1: "Aufgabenpfad ausgewählt"
   assignment_preview_3833e819: "%{assignment} Vorschau"
   assignment_selection_6bff05c4: Aufgabenauswahl
+  assignment_set_set_index_28b1f973: "Aufgabenset %{set_index}"
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Abgaben hochgeladen"
   assignment_title_82b4422e: "Titel der Aufgabe:"
   assignment_title_8a707dd2: Aufgabentitel
@@ -3656,6 +3666,7 @@ de:
   associated_account_name_91854e37: "Name des verknüpften Kontos"
   associated_course_name_9b5b1945: "Name des verknüpften Kurses"
   associated_courses_1fbc6202: "Zugehörige Kurse"
+  associated_tool_domains_ba5767c5: "Verbundene Tool-Domänen"
   associations_3fd4abe8: Assoziationen
   associations_saved_successfully_48b9eae3: "Verknüpfungen wurden gespeichert."
   at_791460b3: um
@@ -3859,6 +3870,7 @@ de:
   automatically_apply_deduction_to_late_submissions_2b68166e: "Bei verspäteter Abgabe automatisch Abzüge vornehmen"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Bei fehlender Abgabe automatisch benoten"
   automatically_dff02416: Automatisch
+  automatically_disable_post_to_sis_on_assignments_w_dd7e873a: "Automatische Deaktivierung von \"Im SIS veröffentlichen\" für Aufgaben nach Abschluss der Benotungsperiode"
   automatically_post_grades_29a7eff5: "Automatisch veröffentlichte Noten"
   avaible_daec2e57: Verfügbar
   availability_dates_438d71e0: Verfügbarkeitstermine
@@ -4940,6 +4952,7 @@ de:
   click_to_expand_outcome_details_74a2a967: "Ergebnisdetails einblenden"
   click_to_hide_details_f7d353d9: "Details ausblenden"
   click_to_load_a020891b: "(zum Laden klicken)"
+  click_to_merge_sets_here_638fcac7: "Klicken, um Sets hier zu verbinden"
   click_to_modify_89fa26aa: "Zur Änderung klicken"
   click_to_report_profile_picture_370f9625: "Zum Berichten des Profilbilds klicken"
   click_to_report_profile_picture_for_display_name_9ffbcc86: "Profilbild melden für %{display_name}"
@@ -4967,8 +4980,10 @@ de:
   click_to_sort_by_term_ascending_c3ef1eb7: "Nach Begriff aufsteigend sortieren"
   click_to_sort_by_term_descending_199c48c0: "Nach Begriff absteigend sortieren"
   click_to_sort_c81ff8c8: "Zum Sortieren klicken"
+  click_to_split_set_here_9c35462a: "Klicken, um das Set hier zu teilen"
   click_to_test_a_different_score_2e0bb6f0: "Klicken, um andere Punktzahl zu testen"
   click_to_test_dropdown_b950974d: "Hier klicken, um das Dropdown zu testen"
+  click_to_view_calendar_feed_2944b4c0: "Klicken Sie hier, um den Kalender-Feed anzuzeigen"
   click_to_view_event_details_b25dc1f3: "Klicken, um die Ereignisdetails anzuzeigen"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Durch Klicken auf die Spaltenüberschriften werden die Zeilen nach dieser Spalte sortiert."
   clicking_the_checkbox_will_cause_scopes_table_to_a_fba5886a: "Anklicken, um die Geltungsbereichstabelle unten anzuzeigen"
@@ -5132,6 +5147,7 @@ de:
       delete: "Arbeitsgruppe löschen?"
   collaborations_5c56c15f: Collaborations
   collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "Collaborations sind webbasierte Tools zur gemeinsamen Erledigung von Aufgaben, wie Mitschriften oder Gruppenarbeiten. Klicken Sie zuerst auf die Schaltfläche „+ Arbeitsgruppe“."
+  collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Collaborations sind Web-basierte Tools zur gemeinsamen Bearbeitung von Aufgaben wie Notizen anfertigen oder Gruppenarbeiten erledigen. Sprechen Sie mit Ihrem Lehrer, um anzufangen"
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Collaborations sind Web-basierte Tools zur gemeinsamen Bearbeitung von Aufgaben, wie mitschreiben oder Gruppenarbeiten erledigen. Beginnen Sie damit,eine Arbeitsgruppen-App hinzuzufügen."
   collaborations_tutorial_tray_9219d9d: Collaborations-Übungsfach
   collapse_group_c2af7cad: "Gruppe minimieren"
@@ -5264,6 +5280,8 @@ de:
   concluded_enrollments_9da8da6: "Abgeschlossene Anmeldungen"
   conditional_content_7d39e313: "Vorläufiger Inhalt"
   conditional_content_b284da8f: "Vorläufiger Inhalt"
+  conditional_release: 
+    and: und
   conditional_release_d206e93b: "Vorläufige Freigabe"
   conduct_lectures_office_hours_and_student_group_me_13ec766c: |-
       Führen Sie Vorlesungen, Sprechstunden und Studentengruppensitzungen
@@ -6334,6 +6352,10 @@ de:
   count_items_deleted_successfully_a287aa53: 
     one: "%{name} erfolgreich gelöscht"
     other: "%{count} Elemente erfolgreich gelöscht"
+  count_items_found_224f86d3: 
+    one: "Ein Element gefunden"
+    other: "%{count} Elemente gefunden"
+    zero: "Keine Elemente gefunden"
   count_items_on_page_page_961fc0c7: "%{count} Elemente auf Seite %{page}"
   count_items_selected_91814713: 
     one: "%{count} Element ausgewählt"
@@ -7359,6 +7381,7 @@ de:
   create_interactive_course_content_76665336: "Interaktive Kursinhalte erstellen"
   create_item_base: 
     there_was_an_error: "Beim Speichern von \"%{title}\" ist ein Fehler aufgetreten. Versuchen Sie es erneut."
+  create_live_event_subscriptions_on_toolproxy_7c8378b1: "Erstellen von Abonnements für Live-Ereignisse auf ToolProxy"
   create_module_item: 
     assignment_name: "Name der Aufgabe"
   create_module_item_quiz: 
@@ -8050,6 +8073,7 @@ de:
   disable_content_security_policy_8660a787: "Richtlinie zur Content-Sicherheit deaktivieren"
   disable_extra_filter_options_1d1cdc02: "zusätzliche Filteroptionen deaktivieren"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Deaktivieren der Kontrollkästchen für Neues-Quiz-Import und -Migration, sodass sie standardmäßig aktiviert sind"
+  disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Veröffentlichung im SIS für Aufgabe in geschlossenen Benotungszeiträumen deaktivieren"
   disable_scope_6ba4e4d4: "Bereich deaktivieren"
   disable_sync_to_name_10c371dc: "Deaktivieren der Synchronisierung mit %{name}"
   disable_toolname_44d6397c: "Deaktivieren %{toolName}"
@@ -8476,6 +8500,7 @@ de:
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "In gleiche Fenster von %{num_minutes} Minuten aufteilen. *Los*"
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: "Aufteilen in gleiche Zeitfenster (Wert in Minuten)"
   divide_into_equal_time_slots_in_minutes_234312fa: "Aufteilen in gleiche Zeitfenster (in Minuten)"
+  division_cutoff_cutoff_value_e938bc9d: "Bereichsabschaltung %{cutoff_value}"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Diese Aufgabe nicht in die Endnote einbeziehen"
   do_nothing_9672b478: "Nichts tun"
   doc_50924b72: DOC
@@ -8503,8 +8528,11 @@ de:
   docviewer_strikeout_updated_f06aec74: "DocViewer-Durchstreichen aktualisiert"
   does_not_meet_expectations_b0736d20: "Erfüllt nicht die Erwartungen"
   domain_3b54c511: Domäne
+  domain_editing_is_disabled_when_security_settings__3feb6da0: "Das Ändern von Domänen ist deaktiviert, wenn Sicherheitseinstellungen von einem übergeordneten Konto übernommen wurden."
   domain_is_required_1d4c8b25: "Domäne ist erforderlich."
   domain_name_6c783b0: Domain-Name
+  domains_66feaf7f: Domänen
+  domains_count_max_a52b7947: "Domänen (%{count}/%{max})"
   dominican_republic_1_3cef4021: "Dominikanische Republik (+1)"
   don_t_add_this_user_for_now_32912974: "Fügen Sie diesen Benutzer jetzt nicht hinzu."
   don_t_miss_notifications_from_your_students_900e9e30: "Verpassen Sie keine Benachrichtigungen von Ihren Studenten."
@@ -8855,6 +8883,7 @@ de:
   enable_notifications_10a4bf44: "Benachrichtigungen aktivieren"
   enable_notifications_for_contextname_b5b4440e: "Benachrichtigungen für %{contextName} aktivieren"
   enable_or_condition_for_modules_a16f02d8: "\"ODER\"-Bedingung für Module ermöglichen"
+  enable_recaptcha_by_default_for_self_registration_af9d50bd: "Recaptcha standardmäßig für die Selbstregistrierung aktivieren"
   enable_recording_for_this_conference_b8adff6: "Aufzeichnung für diese Konferenz aktivieren"
   enable_reregistration_for_lti_2_b2a10444: "Erneute Registrierung für LTI 2 aktivieren"
   enable_scope_ac28b832: "Bereich aktivieren"
@@ -9810,6 +9839,7 @@ de:
   filled_5d8c39e: Ausgefüllt
   filter_9df28e5b: "Filter:"
   filter_announcements_by_unread_495eeeb3: "Ankündigungen nach „Ungelesen“ filtern"
+  filter_assignment_category_63acaed4: "Filtern nach Aufgabenkategorie"
   filter_by_ip_address_40965f66: "Nach IP-Adresse filtern"
   filter_by_name_34cbe139: "Nach Name filtern"
   filter_by_student_name_or_secondary_id_83dc524f: "Nach Studentenname oder Sekundär-ID filtern"
@@ -11592,6 +11622,7 @@ de:
   host_virtual_lectures_in_real_time_150cef95: "Virtuelle Vorlesungen in Echtzeit halten"
   hour_34d02553: Stunde
   hour_s_b6e8d238: Stunde(n)
+  hours_from_due_date_before_students_are_alerted_6584bae6: "Stunden (ab Fälligkeitsdatum), bevor die Studenten benachrichtigt werden"
   hours_late_989e9081: "Stunden zu spät"
   hover_over_me_496521b9: Mauszeigerberührung
   how_do_i_add_a_module_65f5bf13: "Wie kann ich ein Modul hinzufügen?"
@@ -11779,6 +11810,12 @@ de:
       wie das Site-Admin-Konto liegen. Das Verhalten in anderen Instanzen
       entsprach dem bereits.
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Bei Aktivierung können Benutzer LTI 2-Tools konfigurieren."
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+      Wenn diese Option aktiviert ist, wird beim Erstellen eines Lti::ToolProxy
+      das Abonnement für das Live-Ereignis direkt auf dem Tool
+      anstelle der Aufgabe erstellt. Dies führt zu einer Verdoppelung der Ereignisse,
+      es sei denn, die Abonnements für die zugehörigen Plagiats-
+      Aufgaben werden gelöscht.
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Falls keine ausgewählt sind, an jeden im gesamten Konto senden)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Falls keine ausgewählt sind, an jeden im gesamten Unterkonto senden)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Wenn keine ausgewählt sind, zeigen Sie sie allen im gesamten Unterkonto an)."
@@ -11786,6 +11823,7 @@ de:
   if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
       Falls RCE-Erweiterungen ebenfalls aktiviert sind, wird
       das RCE Ihre Arbeit automatisch speichern, wenn Sie gehen
+  if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Wenn diese Option aktiviert ist, wird die Funktion Veröffentlichen im SIS für Aufgaben deaktiviert, wenn deren Benotungszeitraum endet. Gilt nur, wenn die Funktion \"Neue SIS-Integrationseinstellungen aktivieren\" aktiviert ist."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Falls „Statistik – anzeigen“ oder „Benutzer – Anmeldedetails verwalten“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Falls „Statistik – anzeigen“ oder „Benutzer – Anmeldedetails verwalten“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Falls „Statistik – anzeigen“ oder „Benutzer – Anmeldedetails verwalten“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
@@ -12192,6 +12230,7 @@ de:
   italy_39_cfad867a: "Italien (+39)"
   italy_daec3097: Italien
   item_cannot_be_duplicated_cebf3109: "Element kann nicht dupliziert werden."
+  item_category_category_icon_for_item_name_item_nam_ff2b97f0: "%{item_category}-Kategoriesymbol für den Elementnamen %{item_name}"
   item_complete_d334fd43: "(Element vollständig)"
   item_count_3c7bae0d: "Objekt %{count}"
   item_filter_ca3987d7: Objektfilter
@@ -12325,6 +12364,7 @@ de:
   know_your_users_5c1323be: "Über die Benutzer Bescheid wissen"
   korean_da812d9: Koreanisch
   label_3c9a991: "%{label}:"
+  label_as_gradingtype_ae164bd9: "%{label}, als %{gradingType}"
   label_disabled_not_visible_to_students_da093eec: "%{label}. Deaktiviert. Für Studenten nicht sichtbar"
   label_no_content_not_visible_to_students_84345d2f: "%{label}. Kein Content. Für Studenten nicht sichtbar"
   label_values_76f4b5fa: Beschriftungswerte
@@ -12462,7 +12502,7 @@ de:
   let_students_see_their_quiz_responses_fbc07d14: "Studenten die eigenen Quiztest-Antworten anzeigen"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Die Studierenden ihre Antworten sehen lassen (Falsche Fragen werden im Studenten-Feedback gekennzeichnet)."
   letter_grade_29ff1938: Buchstaben-Note
-  letter_grade_f00fedc4: Buchstaben-Note
+  letter_grade_f00fedc4: Buchstabennote
   level_5fdf654a: Ebene
   lib: 
     angel: 
@@ -12642,6 +12682,7 @@ de:
   loaded_more_developer_keys_7ea76fbe: "Mehr Entwicklerschlüssel geladen"
   loaded_more_developer_keys_focus_moved_to_the_dele_f5b867f8: "Mehr Entwicklerschlüssel geladen. Der Fokus liegt auf der Schaltfläche „Löschen“ des zuletzt geladenen Entwicklerschlüssels in der Liste."
   loaded_more_developer_keys_focus_moved_to_the_name_6e3c3b34: "Mehr Entwicklerschlüssel geladen. Der Fokus liegt auf dem Namen des zuletzt geladenen Entwicklerschlüssels in der Liste."
+  loading_1d2ad2d7: "Wird geladen ..."
   loading_25990131: "Wird geladen ..."
   loading_6ac402e1: "Ladevorgang läuft ..."
   loading_725811ca: "Ladevorgang läuft"
@@ -12853,6 +12894,7 @@ de:
   looks_great_e4d883ed: "Sieht gut aus."
   low_eab1cadd: Niedrig
   low_score_4eeb95b2: "Niedrig: %{score}"
+  lower_bound_ed528347: "Untere Grenze"
   lower_bound_to_upper_bound_48d093c2: "%{lower_bound} bis %{upper_bound}"
   lower_limit_of_range_6ddd4983: "Untere Bereichsgrenze"
   lowerbound_to_upperbound_352a3c0b: "%{lowerBound}+ bis %{upperBound}"
@@ -15277,11 +15319,13 @@ de:
   move_to_end_fef2fa15: "Ans Ende verschieben"
   move_to_front_7eae2e90: "An den Anfang verschieben"
   move_to_front_bf6f0194: "An den Anfang verschieben"
+  move_to_lower_upper_94cb604f: "Verschieben nach %{lower}–%{upper}"
   move_to_the_beginning_636b342c: "An den Anfang verschieben"
   move_to_the_end_bc05abf6: "Ans Ende verschieben"
   move_to_top_e0d7d66e: "An den Anfang verschieben"
   move_to_using_instui_for_several_components_and_im_21898396: "Verwenden Sie InstUI für mehrere Komponenten und implementieren Sie ein Speichersystem"
   move_up_2440f707: "Nach oben verschieben"
+  moved_assignment_name_to_scoring_range_lower_upper_edd6fc4e: "Aufgabe %{name} wurde in den Punktebereich %{lower}–%{upper} verschoben."
   moving_a4d552df: "Wird verschoben ..."
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
@@ -15299,6 +15343,7 @@ de:
     other: "Das Leistungsziel muss mindestens %{count}-mal erreicht werden. Für Punktzahlen über dem Leistungsziel wird ein Mittelwert ermittelt, um die Gesamtpunktzahl zu berechnen."
   must_be_a_number_0_e6ec3e78: "Muss eine Zahl >0 sein."
   must_be_a_number_e1dfe68a: "Muss eine Zahl sein"
+  must_be_a_number_f6e09df7: "muss eine Zahl sein"
   must_be_a_valid_number_59f0069: "Muss eine gültige Zahl sein"
   must_be_after_start_date_95e251a3: "muss nach dem Beginndatum liegen"
   must_be_between_availability_dates_ceaca984: "muss innerhalb der Verfügbarkeitsdaten liegen"
@@ -15318,7 +15363,9 @@ de:
   must_mark_as_done_bf6cc563: "muss als fertig markiert werden"
   must_mark_assignment_as_done_e3e4af88: "Muss Aufgabe als fertig markieren"
   must_mark_this_module_item_done_in_order_to_comple_ca3c390f: "Muss dieses Modulelement als erledigt markieren, um es abzuschließen"
+  must_not_be_empty_80fd90b8: "darf nicht leer sein"
   must_provide_a_valid_url_26fe7e15: "Zulässige ID erforderlich."
+  must_provide_valid_letter_grade_999219e3: "muss eine zulässige Buchstabennote geben"
   must_score_at_least_a_score_3b4f813d: "Muss mindestens eine Punktzahl von %{score} erreichen"
   must_score_at_least_points_points_16a7548e: "Muss mind. %{points} Punkte erreichen"
   must_score_at_least_score_to_complete_this_module__b86b5101: "Muss mind. %{score} erreichen, um dieses Modulelement abzuschließen"
@@ -15528,6 +15575,7 @@ de:
   nickname_7df95b09: "Spitzname:"
   no_74e9b590: Nein
   no_alignments_are_available_for_this_outcome_7f8346f9: "Für dieses Ergebnis gibt es keine Ausrichtungen."
+  no_allowed_domains_b6633d12: "Keine erlaubten Domänen."
   no_announcements_280df147: "Keine Ankündigungen"
   no_announcements_to_display_fbf9ed1e: "Keine Ankündigungen anzuzeigen"
   no_assignment_group_assigned_8f1cdb9b: "Es wurde keine Aufgabengruppe zugewiesen."
@@ -15576,6 +15624,7 @@ de:
   no_grading_periods_set_up_a20a8819: "Keine Benotungszeiträume eingerichtet"
   no_grading_schemes_to_display_8b0e92e7: "Keine anzuzeigenden Benotungssysteme"
   no_icon_1f6ea5f4: "kein Icon"
+  no_items_found_870b2d0d: "Keine Elemente gefunden"
   no_items_in_module_21f111a2: "Keine Elemente im Modul"
   no_label_date_ff3a372f: "Kein %{label}-Datum"
   no_ltis_configured_f4b9bc6b: "Keine LTIs konfiguriert"
@@ -16016,6 +16065,8 @@ de:
       format: 
         delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "Zahl zwischen 1 und 16 einschließlich"
+  number_is_too_large_4da4af0a: "Die Zahl ist zu groß"
+  number_is_too_small_618a6ca7: "die Zahl ist zu klein"
   number_more_a46966: "%{number} Mehr ..."
   number_of_allowed_attempts_3d10b740: "Anzahl der zulässigen Versuche"
   number_of_attempts_b0994c2f: "Die Anzahl der Versuche"
@@ -16195,6 +16246,7 @@ de:
   or_9b70ccaa: Oder
   or_a01eec62: ODER
   or_choose_files_b795006d: "oder Dateien auswählen"
+  or_ef4e808: oder
   or_in_the_courses_list_6201030: "... oder in der Liste der Kurse."
   orange_81386a62: Orange
   orbis_report_header_assignment_id: Aufgaben-ID
@@ -16570,9 +16622,10 @@ de:
   people_options_cfb419a6: Personen-Optionen
   people_tutorial_tray_a87a6c48: "Personen Übungsfach"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Andere Benutzer werden diesen Namen in Diskussionen, Nachrichten und Kommentaren sehen."
-  percent_448ea947: Prozent
+  percent_448ea947: prozentual
   percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent} abgeschlossen"
+  percent_complete_e46b6148: "%{percent}% abgeschlossen"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Prozent der Teilnehmer wählen diese Antwort."
   percent_of_students_scored_score_53d2c4d5: "%{percent} der Studenten erreichten %{score} Punkte."
   percent_of_students_scoring_1239d948: "Prozent der Studenten erhielten Punkte"
@@ -19351,6 +19404,7 @@ de:
   received_content_53049822: "Erhaltener Content"
   recent_activity_51239235: "Aktuelle Aktivität"
   recent_announcements_8becc59c: "Neueste Ankündigungen"
+  recent_f19e8c64: Kürzlich
   recent_student: 
     last_logged_in: "letzte Anmeldung: %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} Abnehmender Durchschnitt"
@@ -19470,6 +19524,7 @@ de:
   remove_contact_method_ca890ba3: "Kontaktmöglichkeit entfernen"
   remove_course_association_name_b760c502: "Kurszugehörigkeit %{name} entfernen"
   remove_dates_9b9ba2f6: "Daten entfernen"
+  remove_domain_as_an_allowed_domain_c510a69e: "%{domain} als erlaubte Domäne entfernen"
   remove_domain_from_the_whitelist_14c7d5e9: "%{domain} aus der Whitelist entfernen"
   remove_due_dates_and_assignment_availability_dates_608cd97b: "Entfernen Sie Fälligkeitsdaten und Verfügbarkeitsdaten von Aufgaben."
   remove_email_address_b1820820: "E-Mail-Adresse entfernen"
@@ -19504,6 +19559,7 @@ de:
   remove_this_rubric_from_my_list_c7d80704: "Dieses Bewertungsschema aus meiner Liste entfernen"
   remove_this_section_9a88ca43: "Diesen Abschnitt entfernen"
   remove_user_from_section_5556f465: "Benutzer aus Kursabschnitt entfernen"
+  removed_assignment_assignment_name_835cc776: "Aufgabe %{assignment_name} entfernt"
   removed_course_association_course_a233342c: "Entfernte Kurszugehörigkeit %{course}"
   removed_user_as_group_leader_bb69330f: "%{user} wurde als Gruppenleiter entfernt."
   rename_45608f54: Umbenennen
@@ -19544,6 +19600,7 @@ de:
   requested_bbdb5b26: Angefragt
   require_an_access_code_600e06e8: "Zugriffscode anfordern"
   require_assignment_due_date_778b200d: "Aufgabenfälligkeitsdatum anfordern"
+  require_captcha_for_self_registration_b3b2ea02: "Captcha für die Selbstregistrierung erforderlich"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Festlegen, dass Gruppenmitglieder zum selben Abschnitt gehören müssen"
   require_respondus_lockdown_browser_31425b3a: "Respondus LockDown Browser erforderlich"
   require_usage_rights_for_uploaded_files_4507865b: "Nutzungsrechte für hochgeladene Dateien anfordern"
@@ -19554,6 +19611,7 @@ de:
   required_values_1eb5841f: "Erforderliche Werte"
   requirement_f5b75da1: Anforderung
   requirement_subject_7cfac6c8: "Gegenstand der Anforderung"
+  requires_recaptcha_for_self_registration_by_defaul_c1a9db63: "Erfordert standardmäßig Recaptcha für die Selbstregistrierung"
   reregister_9ab95a57: "Erneut registrieren"
   reregister_toolname_3dde0bfc: "%{toolName} erneut registrieren"
   reschedule_9f780bb8: "Termin verschieben"
@@ -19920,7 +19978,7 @@ de:
     one: "Punktestand enthält keine %{groups}, da für diese keine Punkte möglich sind"
     other: "Punktestand enthält keine %{groups}, da für diese keine Punkte möglich sind"
   score_f7ac9e08: Punktestand
-  score_letter_grade_b3bb9e52: "%{score} Buchstaben-Note"
+  score_letter_grade_b3bb9e52: "%{score} Buchstabennote"
   score_muted_82eef66: "Punktestand: (stummgeschaltet)"
   score_n_a_34dfdcda: "Punktestand: k. A."
   score_of_score_view_in_speedgrader_a7c1c954: "Punktestand von %{score}. In SpeedGrader anzeigen"
@@ -19942,6 +20000,7 @@ de:
   scored_more_than_cutoff_on_assignment_f422fec: "Punktzahl über %{cutoff} am %{assignment}"
   scored_more_than_d1646bd5: "Punktzahl über"
   scored_more_than_score_on_assignmenttitle_2afa1d32: "Punktzahl über %{score} am %{assignmentTitle}"
+  scoring_range_upperbound_to_lowerbound_c017669b: "Punktebereich %{upperBound} bis %{lowerBound}"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -20071,6 +20130,7 @@ de:
   search_23a88d5c: "Suchen    "
   search_280d00bd: Suchen
   search_announcements_by_title_407a998e: "Ankündigungen nach Titel suchen"
+  search_assignments_8c3c21bb: "Aufgaben suchen"
   search_by_99d1ba5f: "Suchen nach"
   search_by_c559efd: "Durchsuchen nach"
   search_by_student_name_26536097: "Suche nach Teilnehmername"
@@ -20445,6 +20505,8 @@ de:
   set_up_your_canvas_course_in_30_minutes_or_less_94817b6d: "Richten Sie Ihren Canvas-Kurs in höchstens 30 Minuten ein."
   set_up_your_notifications_568ecf91: "EInrichten Ihrer Benachrichtigungen"
   set_up_your_notifications_9c005279: "EInrichten Ihrer Benachrichtigungen"
+  sets_are_merged_click_to_split_fa741a5f: "Sets sind verbunden, zum Teilen klicken"
+  sets_are_split_click_to_merge_99552cdb: "Sets sind geteilt, zum Verbinden klicken"
   sets_the_default_option_for_course_copy_and_import_36147e78: "Stellt die Standardeinstellung für Kurskopien und -importe für Neue Quizze ein"
   setting_failed_to_load_try_refreshing_c24bf008: "Einstellung konnte nicht geladen werden. Versuche zu aktualisieren."
   settings: 
@@ -21418,6 +21480,7 @@ de:
     threshold_12h: 12h
     threshold_24h: 24h
     threshold_36h: 36h
+  smart_assignment_alerts_abc2224: "Intelligente Benachrichtigungen für Aufgaben"
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "In Google Play"
@@ -21450,6 +21513,7 @@ de:
   something_went_wrong_downloading_submissions_pleas_6d069a09: "Etwas ging beim Herunterladen der Abgaben schief. Versuchen Sie es später noch einmal."
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Bei der Desaktivierung des Anwenders ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
   something_went_wrong_loading_the_violations_try_re_6e2fa92: "Etwas ist beim Laden der Verstöße schief gelaufen. Versuchen Sie, die Seite neu zu laden."
+  something_went_wrong_loading_the_violations_try_re_9461d057: "Beim Laden der Verstöße ist etwas schiefgegangen. Bitte versuchen Sie die Seite zu neuzuladen."
   something_went_wrong_please_try_again_6d337b6c: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es noch einmal."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Etwas ging schief. Versuchen Sie die Seite zu aktualisieren. Falls das Problem weiterbesteht, können Sie versuchen, eine einzelne Studentengruppe in SpeedGrader unter Nutzung der *Einstellung „Großer Kurs“* zu laden."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Etwas ging schief. Versuchen Sie die Seite zu aktualisieren. Falls das Problem weiterbesteht, gibt es möglicherweise zu viele Datensätze auf „%{assignmentTitle}“, um SpeedGrader zu laden."
@@ -21550,6 +21614,8 @@ de:
   speedgrader_settings_4195099b: "SpeedGrader Einstellungen"
   speedgrader_settings_c9503705: SpeedGrader-Einstellungen
   speedgrader_tm_44688790: SpeedGrader™
+  splitting_disabled_reached_maximum_of_three_assign_716acb13: "Aufteilung deaktiviert: Die Höchstzahl von drei Aufgabengruppen in einem Bewertungsbereich ist erreicht."
+  splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "Aufsplitten deaktiviert: In jedem Punktebereich kann es maximal drei Aufgabengruppen geben."
   spreadsheet_6d622119: Tabellenblatt
   spring_grading_period_current_score_7083cf0d: "Aktuelle Punktzahl für den Benotungszeitraum im Frühling"
   spring_grading_period_final_score_386d92f7: "Gesamtpunktzahl für den Benotungszeitraum im Frühling"
@@ -22019,6 +22085,7 @@ de:
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Erfolgreich! Noten wurden %{postedTo} für %{assignmentName} gepostet."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Gratulation! Die Noten wurden im Notenheft veröffentlicht."
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Erfolgreich! Die Vergaberichtlinie für %{name} wurde aktualisiert."
+  success_you_added_hostname_as_an_allowed_domain_4713bfe8: "Erfolg: Sie haben %{hostname} als erlaubte Domäne hinzugefügt."
   success_you_added_hostname_to_the_whitelist_6061236e: "Erfolg: Sie fügten %{hostname} zur Whitelist hinzu."
   successfully_added_fb3e6008: "Erfolgreich hinzugefügt"
   successfully_created_a_set_38374719: "Ein Set wurde angelegt."
@@ -22514,6 +22581,7 @@ de:
                     Wenn Sie sie entfernen möchten, sollten Sie das zugehörige Tool entfernen.
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Diese Benotungsperioden wurden von einem Administrator für Sie erstellt."
   these_pronouns_will_appear_after_your_name_when_sh_6b7ff5b2: "Diese Pronomen werden nach Ihrem Namen angezeigt, wenn er in der Benutzeroberfläche angezeigt wird"
+  these_scores_are_out_of_order_4f0859ef: "diese Punktezahlen sind unzulässig"
   they_them_d6125799: sie/ihnen
   they_them_f4d17a04: Sie/Ihnen
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Diese Funktion wurde vom Administrator deaktiviert."
@@ -23319,6 +23387,7 @@ de:
     vdd: 
       more_message: "und %{count} weitere ..."
   top_66e0adb6: Oben
+  top_bound_282d045b: "Obere Grenze"
   top_box_background_6db383e9: "Hintergrund des obersten Kästchens"
   top_box_border_94cee4a7: "Rand des obersten Kästchens"
   topic_podcast_feed_dff98ab0: "Thema des Podcast-Feed"
@@ -23604,10 +23673,14 @@ de:
   uploaded_media_bc29db35: "Hochgeladene Medien"
   uploaded_over_time_d59abb68: "Hochgeladen im Laufe der Zeit"
   uploading_19e8a4e7: "Wird hochgeladen"
+  uploading_ee585874: "Wird hochgeladen ..."
   uploading_files_5ff8f4fd: "Dateien werden hochgeladen"
+  uploading_progress_2f5dd4bf: Upload-Fortschritt
+  uploading_progress_d62bb6e9: Upload-Fortschritt
   uploading_submission_4c8d944b: "Abgabe wird hochgeladen"
   upper_limit_of_range_c454a8f2: "Obere Bereichsgrenze"
   upper_lower_56cad16c: "%{upper} – %{lower}"
+  upper_to_lower_168f5fe7: "%{upper} bis %{lower}"
   uri_redirect_uri_d4aad2b9: "URI: %{redirect_uri}"
   url_22a5f3b8: URL
   url_8c4ff7d2: URL
@@ -24691,6 +24764,7 @@ de:
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Es liegen keine Lernziele für Sie vor. *Klicken Sie hier*, um eines zu erstellen."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Es liegen keine Lernziele für Sie vor. Klicken Sie hier, um zur Seite „Lernziele“ zu wechseln."
   you_have_reached_the_domain_limit_if_you_wish_to_a_587db18: "Sie haben die Domänenobergrenze erreicht. Falls Sie weitere zu ihrer Whitelist hinzufügen möchten, entfernen Sie bitte zuerst andere."
+  you_have_reached_the_domain_limit_you_can_add_more_1143333a: "Sie haben die Höchstzahl Domänen erreicht. Sie können weitere Domänen hinzufügen, indem Sie vorhandene Domänen aus ihrer Liste „erlaubt“ löschen."
   you_have_reached_the_domain_limit_you_can_add_more_e5ccc070: "Sie haben die Höchstzahl Domänen erreicht.  Sie können weitere Domänen hinzufügen, indem Sie vorhandene Domänen aus ihrer Whitelist löschen."
   you_have_reached_the_limit_of_len_characters_in_th_babea8fe: "Sie haben in der Nachricht den Grenzwert von %{len} Zeichen erreicht."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Sie haben die maximale Anzahl von Webhooks pro Konto erreicht (%{max})."
