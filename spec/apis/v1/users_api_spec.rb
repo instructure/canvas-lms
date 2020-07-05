@@ -377,6 +377,11 @@ describe Api::V1::User do
       UserPastLtiId.create!(user: @student, context: @course, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old_uuid')
       expect(@test_api.user_json(@student, @admin, {}, ['uuid'], @course)).to have_key("past_uuid")
     end
+
+    it 'outputs last_login in json with includes params present' do
+      expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("last_login")
+      expect(@test_api.user_json(@student, @admin, {}, ['last_login'], @course)).to have_key("last_login")
+    end
   end
 
   describe "enrollment_json" do
@@ -986,6 +991,11 @@ describe "Users API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: @u.id.to_s })
         expect(json.count).to eq 1
         expect(json.first['last_login']).to eq @p.current_login_at.iso8601
+      end
+
+      it 'should include last login for a specific user' do
+        json = api_call(:get, "/api/v1/users/#{@u.id}", { :controller => 'users', :action => "api_show", :format => 'json', :id => @u.id }, { include: ['last_login'] })
+        expect(json.fetch('last_login')).to eq @p.current_login_at.iso8601
       end
 
       it 'should sort too' do
