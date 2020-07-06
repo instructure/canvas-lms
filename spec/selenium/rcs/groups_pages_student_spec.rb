@@ -222,7 +222,7 @@ describe "groups" do
         )
         AnnouncementIndex.visit_groups_index(@testgroup.first)
         expect(ff('.ic-announcement-row').size).to eq 1
-        expect_new_page_load { ff('.ic-announcement-row')[0].click }
+        expect_new_page_load { ff('[data-testId="single-announcement-test-id"]')[0].click }
         expect(f('.discussion-title')).to include_text(@announcement.title)
       end
     end
