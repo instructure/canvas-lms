@@ -20,9 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
-describe "better_file_browsing", ignore_js_errors: true do
-  # remove ignore_js_errors in OUT-3781
-
+describe "better_file_browsing" do
   include_context "in-process server selenium tests"
   include FilesCommon
 
