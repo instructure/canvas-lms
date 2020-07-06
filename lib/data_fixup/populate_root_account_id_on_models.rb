@@ -63,6 +63,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       AssignmentGroup => :context,
       AssignmentOverride => :assignment,
       AssignmentOverrideStudent => :assignment,
+      CalendarEvent => [:context_course, :context_group, :context_course_section],
       ContentMigration => [:account, :course, :group],
       ContentParticipation => :content,
       ContentParticipationCount => :course,

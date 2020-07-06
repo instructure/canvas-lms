@@ -142,6 +142,29 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(@override_student.reload.root_account_id).to eq @course.root_account_id
     end
 
+    context 'with CalendarEvent' do
+      context 'when context is Course' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { CalendarEvent.create!(context: @course) }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'when context is Group' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { CalendarEvent.create!(context: group_model(context: @course)) }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'when context is CourseSection' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { CalendarEvent.create!(context: CourseSection.create!(course: @course)) }
+          let(:reference_record) { @course }
+        end
+      end
+    end
+
     context 'with ContextExternalTool' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { external_tool_model(context: @course) }
