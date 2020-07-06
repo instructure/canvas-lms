@@ -34,10 +34,17 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       before { record.update_columns(root_account_id: nil) }
 
       it 'should populate the root_account_id' do
+        expected_root_account_id =
+          if reference_record.reload.is_a?(Account)
+            reference_record.resolved_root_account_id
+          else
+            reference_record.root_account_id
+          end
+
         expect {
           DataFixup::PopulateRootAccountIdOnModels.run
-        }.to change { record.reload.root_account_id }.from(nil).to(reference_record.reload.root_account_id)
-        expect(reference_record.root_account_id).to be_present
+        }.to change { record.reload.root_account_id }.from(nil).to(expected_root_account_id)
+        expect(expected_root_account_id).to be_present
       end
     end
 
@@ -320,6 +327,52 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(uaa.reload.root_account_id).to eq account.root_account_id
     end
 
+    context 'with Rubric (course-context)' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { rubric_model(context: @course) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with Rubric (root account-context)' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { rubric_model(context: reference_record) }
+        let(:reference_record) { account_model(root_account: nil) }
+      end
+    end
+
+    context 'with Rubric (subaccount-context)' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { rubric_model(context: reference_record) }
+        let(:reference_record) { account_model(root_account: account_model) }
+      end
+    end
+
+    context 'with RubricAssociation (account-context)' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        # Gets it from the context, not the rubric
+        let(:rubric) { rubric_model(context: account_model(root_account: nil)) }
+        let(:record) { rubric_association_model(context: reference_record, rubric: rubric) }
+        let(:reference_record) { account_model }
+      end
+    end
+
+    context 'with RubricAssociation (course-context)' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        # Gets it from the context, not the rubric
+        let(:rubric) { rubric_model(context: account_model(root_account: nil)) }
+        let(:record) { rubric_association_model(context: reference_record, rubric: rubric) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with RubricAssessment' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { rubric_assessment_model(rubric: reference_record, user: @user) }
+        let(:reference_record) { rubric_model }
+      end
+    end
+
     context 'with WebConference*' do
       let(:conference) do
         allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
@@ -470,7 +523,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           course: [:root_account_id, :id],
           learning_outcome_group: :root_account_id,
           assignment: :root_account_id,
-          account: :root_account_id,
+          account: [:root_account_id, :id],
           quiz: :root_account_id
         }
       )

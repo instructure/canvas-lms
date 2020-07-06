@@ -78,6 +78,9 @@ module DataFixup::PopulateRootAccountIdOnModels
       MasterCourses::MasterTemplate => :course,
       OriginalityReport => :submission,
       Quizzes::Quiz => :course,
+      Rubric => :context,
+      RubricAssessment => :rubric,
+      RubricAssociation => :context,
       Submission => :assignment,
       UserAccountAssociation => :account,
       WebConferenceParticipant => :web_conference,
@@ -187,8 +190,8 @@ module DataFixup::PopulateRootAccountIdOnModels
       if assoc_options[:polymorphic].present?
         assoc_options[:polymorphic].each do |poly_a|
           poly_a = poly_a.keys.first if poly_a.is_a? Hash
-          columns = [:root_account_id, :id] if assoc == :account
-          memo[:"#{prefix}#{poly_a}"] = columns
+          account_columns = [:root_account_id, :id] if poly_a == :account
+          memo[:"#{prefix}#{poly_a}"] = account_columns || columns
         end
       else
         columns = [:root_account_id, :id] if assoc == :account
