@@ -72,7 +72,7 @@ module CanvasHttp
     last_scheme = nil
     last_host = nil
     current_host = nil
-
+    logger.info("CANVAS_HTTP START REQUEST CHAIN | method: #{request_class} | url: #{url_str}")
     loop do
       raise(TooManyRedirectsError) if redirect_limit <= 0
 
@@ -87,14 +87,17 @@ module CanvasHttp
       request.content_type = content_type if content_type
 
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      logger.info("CANVAS_HTTP INITIATE REQUEST | url: #{url_str}")
       http.request(request) do |response|
         if response.is_a?(Net::HTTPRedirection) && !response.is_a?(Net::HTTPNotModified)
           redirect_spy.call(response) if redirect_spy.is_a?(Proc)
           last_host = uri.host
           last_scheme = uri.scheme
           url_str = response['Location']
+          logger.info("CANVAS_HTTP CONSUME REDIRECT | url: #{url_str}")
           redirect_limit -= 1
         else
+          logger.info("CANVAS_HTTP RESOLVE RESPONSE | url: #{url_str}")
           if block_given?
             yield response
           else

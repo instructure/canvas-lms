@@ -25,6 +25,29 @@ describe "CanvasHttp" do
 
   include WebMock::API
 
+  around :each do |block|
+    fake_logger = Class.new do
+      attr_reader :messages
+      def initialize()
+        @messages = []
+        super
+      end
+
+      def info(message)
+        @messages << { level: "info", message: message }
+      end
+
+      def warn(message)
+        @messages << { level: "warn", message: message }
+      end
+    end
+    logger = fake_logger.new
+    real_logger = CanvasHttp.logger
+    CanvasHttp.logger = -> { logger }
+    block.call
+    CanvasHttp.logger = real_logger
+  end
+
   describe ".post" do
     before :each do
       WebMock::RequestRegistry.instance.reset!
@@ -36,6 +59,11 @@ describe "CanvasHttp" do
       stub_request(:post, url).with(body: "abc").
         to_return(status: 200)
       expect(CanvasHttp.post(url, body: body).code).to eq "200"
+      logs = CanvasHttp.logger.messages
+      expect(logs.size).to eq(3)
+      expect(logs[0][:message]).to eq("CANVAS_HTTP START REQUEST CHAIN | method: Net::HTTP::Post | url: www.example.com/a")
+      expect(logs[1][:message]).to eq("CANVAS_HTTP INITIATE REQUEST | url: www.example.com/a")
+      expect(logs[2][:message]).to eq("CANVAS_HTTP RESOLVE RESPONSE | url: www.example.com/a")
     end
 
     it "allows you to set a content_type" do
