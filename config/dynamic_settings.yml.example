@@ -47,6 +47,13 @@ development:
 
   private:
     canvas:
+      auditors.yml: |
+        write_paths:
+          - active_record
+        read_path: active_record
+      # datadog_apm.yml: |
+      #   sample_rate: 0.0
+      #   host_sample_rate: 0.0
       # use a unique subdomain per attachment, so that browsers will enforce security
       # permissions (such as microphone/camera access) per-file. You must have wildcard
       # DNS set up for this to work.
