@@ -93,13 +93,15 @@ describe "scheduler" do
 
     context "when un-reserving appointments" do
       before :once do
+        earliest_appointment_time = 30.minutes.from_now
+
         create_appointment_group(
           max_appointments_per_participant: 1,
           # if participant_visibility is 'private', the event_details popup resizes,
           # causing fragile tests in Chrome
           participant_visibility: 'protected',
           new_appointments: [
-            [ 30.minutes.from_now, 1.hour.from_now ]
+            [ earliest_appointment_time, 1.hour.from_now ]
           ]
         )
         AppointmentGroup.last.appointments.first.reserve_for(@student, @teacher)
@@ -117,6 +119,9 @@ describe "scheduler" do
       end
 
       it "should let me do so from the week view", priority: "1", test_id: 502483 do
+        # the setup creates an event 30 minutes from now, so if we're on Saturday
+        # and next Sunday is in 30 minutes, this test will fail
+        skip("too close to week rollover") if Time.now.saturday? && earliest_appointment_time.sunday?
         load_week_view
 
         scheduler_event.click
