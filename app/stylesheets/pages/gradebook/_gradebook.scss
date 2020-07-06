@@ -162,6 +162,7 @@ $gradebook_cell_padding_top: 8px;
 .student-name {
   color: #1b7eda;
   text-shadow: #fbf8f8 0 0 1px;
+  padding-#{direction(left)}: 2px;
 }
 
 .student-grades-link {
