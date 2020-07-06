@@ -80,6 +80,8 @@ module DataFixup::PopulateRootAccountIdOnModels
       Quizzes::Quiz => :course,
       Submission => :assignment,
       UserAccountAssociation => :account,
+      WebConferenceParticipant => :web_conference,
+      WebConference => :context,
     }.freeze
   end
 
