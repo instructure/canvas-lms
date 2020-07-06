@@ -319,6 +319,27 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(uaa.reload.root_account_id).to eq account.root_account_id
     end
+
+    context 'with WebConference*' do
+      let(:conference) do
+        allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
+        WimbaConference.create!(title: "my conference", user: @user, context: @course)
+      end
+
+      context 'with WebConference' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { conference }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'with WebConferenceParticipant' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { conference.web_conference_participants.create!(user: user_model) }
+          let(:reference_record) { conference }
+        end
+      end
+    end
   end
 
   describe '#run' do
