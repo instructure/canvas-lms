@@ -22,7 +22,7 @@ class AuditorApiController < ApplicationController
   private
 
   def check_configured
-    return if Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
+    return if Auditors.configured?
     render json: { message: "Auditors are not configured" }, status: :not_found
   end
 
