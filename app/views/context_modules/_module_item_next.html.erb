@@ -79,18 +79,18 @@
     </div>
     <% end %>
 
-    <span class="type_icon" title="<%= module_item_translated_content_type(module_item, @is_student) %>">
+    <span class="type_icon" title="<%= module_item_translated_content_type(module_item, @is_student) %>" role="none">
+      <span class="screenreader-only"><%= module_item_translated_content_type(module_item, @is_student) %></span>
       <span class="ig-type-icon">
-        <i class="icon-document" aria-label="<%= t('Item type: Document') %>"></i>
-        <i class="icon-paperclip" aria-label="<%= t('Item type: Download') %>"></i>
-        <i class="icon-discussion" aria-label="<%= t('Item type: Discussion') %>"></i>
-        <i class="icon-assignment" aria-label="<%= t('Item type: Assignment') %>"></i>
-        <i class="icon-quiz" aria-label="<%= module_item_translated_quiz_type(module_item, @is_student) %>"></i>
-        <i class="icon-quiz icon-Solid" aria-label="<%= module_item_translated_quiz_type(module_item, @is_student) %>"></i>
-        <i class="icon-link" aria-label="<%= t('Item type: Link') %>"></i>
+        <i class="icon-document"></i>
+        <i class="icon-paperclip"></i>
+        <i class="icon-discussion"></i>
+        <i class="icon-assignment"></i>
+        <i class="icon-quiz"></i>
+        <i class="icon-quiz icon-Solid"></i>
+        <i class="icon-link"></i>
         <img id="mc_icon" src="/images/icons/<%= module_item && module_item.published? ? 'mc_icon_pub.svg' : 'mc_icon_unpub.svg' %>"
-          alt="t('Mastery Connect')" aria-label="<%= t('Item type: Mastery Connect') %>"
-          style="display: none; width: 1rem; height: 1rem;"/>
+             alt="<%= t('Mastery Connect') %>" style="display: none; width: 1rem; height: 1rem;"/>
       </span>
     </span>
 

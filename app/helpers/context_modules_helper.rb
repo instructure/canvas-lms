@@ -150,9 +150,4 @@ module ContextModulesHelper
     end
     TRANSLATED_COMMENT_TYPE[item.content_type.to_sym] || I18n.t('Unknown Content Type')
   end
-
-  def module_item_translated_quiz_type(item, is_student=false)
-    return I18n.t('Item type: New Quiz') if item&.content_type_class == 'lti-quiz' && !is_student
-    I18n.t('Item type: Quiz')
-  end
 end
