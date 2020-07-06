@@ -57,6 +57,8 @@ module DataFixup::PopulateRootAccountIdOnModels
     {
       AccessToken => :developer_key,
       AccountUser => :account,
+      # Attachment is handled differently than other fix ups, it is triggered in the populate_overrides
+      Attachment => [],
       AssessmentQuestion => :assessment_question_bank,
       AssessmentQuestionBank => :context,
       AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
@@ -132,6 +134,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.dependencies
     {
       AssetUserAccess => [:attachment, :calendar_event],
+      Attachment => [:account, :assessment_question, :assignment, :course, :group, :submission],
       LearningOutcome => :content_tag,
     }.freeze
   end
@@ -149,6 +152,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.populate_overrides
     {
       AssetUserAccess => DataFixup::PopulateRootAccountIdOnAssetUserAccesses,
+      Attachment => DataFixup::PopulateRootAccountIdOnAttachments,
       LearningOutcome => DataFixup::PopulateRootAccountIdsOnLearningOutcomes,
     }.freeze
   end
