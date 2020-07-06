@@ -76,4 +76,29 @@ describe Auditors do
     end
   end
 
+  describe ".configured?" do
+    it "depends on cass db config for cassandra backend" do
+      inject_auditors_settings("write_paths:\n  - cassandra\nread_path: cassandra")
+      expect(Auditors.backend_strategy).to eq(:cassandra)
+      expect(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(true)
+      expect(Auditors.configured?).to eq(true)
+      expect(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(false)
+      expect(Auditors.configured?).to eq(false)
+    end
+
+    it "depends on AR connection for AR backend" do
+      inject_auditors_settings("write_paths:\n  - active_record\nread_path: active_record")
+      expect(Auditors.backend_strategy).to eq(:active_record)
+      expect(Rails.configuration).to receive(:database_configuration).and_return({'test' => {"foo" => "bar"}})
+      expect(Auditors.configured?).to eq(true)
+      expect(Rails.configuration).to receive(:database_configuration).and_return({})
+      expect(Auditors.configured?).to eq(false)
+    end
+
+    it "complains loudly under other configurations" do
+      expect(Auditors).to receive(:backend_strategy).and_return(:s3)
+      expect{ Auditors.configured? }.to raise_error(ArgumentError)
+    end
+  end
+
 end
