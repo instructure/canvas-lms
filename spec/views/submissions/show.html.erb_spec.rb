@@ -585,7 +585,7 @@ describe "/submissions/show" do
     let_once(:teacher) { course_with_user("TeacherEnrollment", course: @course, name: "Tom", active_all: true).user }
 
     before(:once) do
-      @comment = sub.add_comment(author: teacher, comment: "comment", media_comment_id: 1, media_comment_type: "video")
+      @comment = sub.add_comment(author: teacher, comment: "good job!", media_comment_id: 1, media_comment_type: "video")
     end
 
     before(:each) do
@@ -609,6 +609,23 @@ describe "/submissions/show" do
       anchor = html.at_css("div#submission_comment_#{@comment.id} div.comment_media a")
       created_at = anchor.attributes.fetch("data-created_at").value
       expect(created_at).to eq datetime_string(@comment.created_at)
+    end
+
+    it "renders the comment text" do
+      render "submissions/show"
+      html = Nokogiri::HTML.fragment(response.body)
+      comment_list = html.css('.submission-details-comments .comment_list')
+      comment_contents = comment_list.css('.comment .comment').map { |comment| comment.text.strip }
+      expect(comment_contents.find { |c| c.include?("good job!") }).not_to be nil
+    end
+
+    it "comment text includes boilerplate about being a media comment" do
+      render "submissions/show"
+      html = Nokogiri::HTML.fragment(response.body)
+      comment_list = html.css('.submission-details-comments .comment_list')
+      comment_contents = comment_list.css('.comment .comment').map { |comment| comment.text.strip }
+      comment = comment_contents.find { |c| c.include?("good job!") }
+      expect(comment.include?("This is a media comment")).to be true
     end
   end
 end
