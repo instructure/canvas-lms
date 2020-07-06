@@ -42,17 +42,14 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
       mutation {
         updateNotificationPreferences(input: {
           #{"accountId: #{account_id}" if account_id}
-          contextType: #{context_type}
+          #{"contextType: #{context_type}" if context_type}
           #{"courseId: #{course_id}" if course_id}
           #{"enabled: #{enabled}" unless enabled.nil?}
           #{"communicationChannelId: #{communication_channel_id}" if communication_channel_id}
           #{"notificationCategory: #{notification_category}" if notification_category}
           #{"frequency: #{frequency}" if frequency}
         }) {
-          account {
-            #{notification_preferences_str(account_id: account_id, course_id: course_id, context_type: context_type)}
-          }
-          course {
+          user {
             #{notification_preferences_str(account_id: account_id, course_id: course_id, context_type: context_type)}
           }
           errors {
@@ -69,10 +66,26 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     context_type: nil
   )
     <<~GQL
-      notificationPreferencesEnabled
+      #{"notificationPreferencesEnabled(
+        contextType: #{context_type},
+        #{"courseId: #{course_id}" if course_id}
+        #{"accountId: #{account_id}" if account_id}
+      )" if context_type && (course_id || account_id)}
       notificationPreferences {
         channels {
-          notificationPolicyOverrides(contextType: #{context_type}, #{"courseId: #{course_id}" if course_id} #{"accountId: #{account_id}" if account_id}) {
+          #{"notificationPolicyOverrides(
+            contextType: #{context_type},
+            #{"courseId: #{course_id}" if course_id}
+            #{"accountId: #{account_id}" if account_id}
+          ) {
+            frequency
+            notification {
+              category
+              categoryDisplayName
+              name
+            }
+          }" if context_type && (course_id || account_id)}
+          notificationPolicies#{"(contextType: #{context_type})" if context_type} {
             frequency
             notification {
               category
@@ -99,8 +112,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         enabled: true
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
-      expect(result.dig(:data, :updateNotificationPreferences, :account)).to be nil
-      expect(result.dig(:data, :updateNotificationPreferences, :course, :notificationPreferencesEnabled)).to be true
+      expect(result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferencesEnabled)).to be true
       expect(NotificationPolicyOverride.enabled_for(@teacher, @course)).to be true
     end
 
@@ -112,8 +124,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         enabled: false
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
-      expect(result.dig(:data, :updateNotificationPreferences, :account)).to be nil
-      expect(result.dig(:data, :updateNotificationPreferences, :course, :notificationPreferencesEnabled)).to be false
+      expect(result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferencesEnabled)).to be false
       expect(NotificationPolicyOverride.enabled_for(@teacher, @course)).to be false
     end
 
@@ -126,37 +137,34 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         frequency: 'daily'
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
-      expect(result.dig(:data, :updateNotificationPreferences, :account)).to be nil
       expect(
-        result.dig(:data, :updateNotificationPreferences, :course, :notificationPreferences, :channels, 0, :notificationPolicyOverrides, 0, :frequency)
+        result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferences, :channels, 0, :notificationPolicyOverrides, 0, :frequency)
       ).to eq('daily')
     end
   end
 
   context 'account' do
     it 'enables notifications' do
-      NotificationPolicyOverride.enable_for_context(@teacher, @course, enable: false)
+      NotificationPolicyOverride.enable_for_context(@teacher, @account, enable: false)
       result = run_mutation(
         context_type: 'Account',
         account_id: @account.id,
         enabled: true
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
-      expect(result.dig(:data, :updateNotificationPreferences, :account, :notificationPreferencesEnabled)).to be true
-      expect(result.dig(:data, :updateNotificationPreferences, :course)).to be nil
+      expect(result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferencesEnabled)).to be true
       expect(NotificationPolicyOverride.enabled_for(@teacher, @account)).to be true
     end
 
     it 'disables notifications' do
-      NotificationPolicyOverride.enable_for_context(@teacher, @course)
+      NotificationPolicyOverride.enable_for_context(@teacher, @account)
       result = run_mutation(
         context_type: 'Account',
         account_id: @account.id,
         enabled: false
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
-      expect(result.dig(:data, :updateNotificationPreferences, :account, :notificationPreferencesEnabled)).to be false
-      expect(result.dig(:data, :updateNotificationPreferences, :course)).to be nil
+      expect(result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferencesEnabled)).to be false
       expect(NotificationPolicyOverride.enabled_for(@teacher, @account)).to be false
     end
 
@@ -169,9 +177,37 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         frequency: 'immediately'
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
-      expect(result.dig(:data, :updateNotificationPreferences, :course)).to be nil
       expect(
-        result.dig(:data, :updateNotificationPreferences, :account, :notificationPreferences, :channels, 0, :notificationPolicyOverrides, 0, :frequency)
+        result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferences, :channels, 0, :notificationPolicyOverrides, 0, :frequency)
+      ).to eq('immediately')
+    end
+  end
+
+  context 'no context' do
+    it 'does not update enabled if not provided a context' do
+      result = run_mutation(enabled: false)
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+
+      # Enabled defaults to true when not set which is why we expect true here
+      expect(NotificationPolicyOverride.enabled_for(@teacher, @account)).to be true
+      expect(NotificationPolicyOverride.enabled_for(@teacher, @course)).to be true
+    end
+
+    it 'updates notification policies when no context is provided' do
+      result = run_mutation(
+        communication_channel_id: @teacher.communication_channels.first.id,
+        notification_category: 'Due_Date',
+        frequency: 'immediately'
+      )
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+      expect(
+        result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferences, :channels, 0, :notificationPolicies, 0, :frequency)
+      ).to eq('immediately')
+      expect(
+        NotificationPolicy.find_or_update_for_category(
+          @teacher.communication_channels.first,
+          'Due Date'
+        ).first.frequency
       ).to eq('immediately')
     end
   end

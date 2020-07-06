@@ -35,9 +35,9 @@ export const UPDATE_COURSE_NOTIFICATION_PREFERENCES = gql`
         frequency: $frequency
       }
     ) {
-      course {
+      user {
         _id
-        notificationPreferencesEnabled
+        notificationPreferencesEnabled(contextType: Course, courseId: $courseId)
         notificationPreferences {
           channels(channelId: $channelId) {
             _id

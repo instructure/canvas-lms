@@ -69,30 +69,32 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
 
   argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
   argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
-  argument :context_type, NotificationPreferencesContextType, required: true
+  argument :context_type, NotificationPreferencesContextType, required: false
   argument :enabled, Boolean, required: false
   argument :communication_channel_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('CommunicationChannel')
   argument :notification_category, NotificationCategoryType, required: false
   argument :frequency, NotificationFrequencyType, required: false
 
-  field :account, Types::AccountType, null: true
-  field :course, Types::CourseType, null: true
+  field :user, Types::UserType, null: true
   def resolve(input:)
     validate_input(input)
     context = get_context(input)
 
-    unless input[:enabled].nil?
+    if context && !input[:enabled].nil?
       NotificationPolicyOverride.enable_for_context(current_user, context, enable: input[:enabled])
     end
 
     if input[:communication_channel_id] && input[:notification_category] && input[:frequency]
       communication_channel = CommunicationChannel.find(input[:communication_channel_id])
-      NotificationPolicyOverride.create_or_update_for(communication_channel, input[:notification_category].gsub('_', ' '), input[:frequency], context)
+      if context
+        NotificationPolicyOverride.create_or_update_for(communication_channel, input[:notification_category].gsub('_', ' '), input[:frequency], context)
+      else
+        NotificationPolicy.find_or_update_for_category(communication_channel, input[:notification_category].gsub('_', ' '), input[:frequency])
+      end
     end
 
     {
-      account: input[:context_type] == 'Account' ? context : nil,
-      course: input[:context_type] == 'Course' ? context : nil
+      user: current_user
     }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
@@ -112,9 +114,9 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
 
   def get_context(input)
     if input[:context_type] == 'Course'
-      Course.find(input[:course_id])
+      Course.find(input[:course_id]) if input[:course_id]
     elsif input[:context_type] == 'Account'
-      Account.find(input[:account_id])
+      Account.find(input[:account_id]) if input[:account_id]
     end
   end
 end

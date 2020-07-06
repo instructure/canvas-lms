@@ -45,18 +45,6 @@ module Types
       account.sub_accounts.order(:id)
     end
 
-    field :notification_preferences_enabled, Boolean, null: false
-    def notification_preferences_enabled
-      NotificationPolicyOverride.enabled_for(current_user, object)
-    end
-
-    field :notification_preferences, NotificationPreferencesType, null: true
-    def notification_preferences
-      Loaders::AssociationLoader.for(User, :communication_channels).load(current_user).then do |comm_channels|
-        {channels: comm_channels.unretired}
-      end
-    end
-
     field :sis_id, String, null: true
     def sis_id
       return if account.root_account?
