@@ -27,7 +27,7 @@ module Auditors
         end
 
         stream.on_error do |operation, record, exception|
-          next unless Canvas::Cassandra::DatabaseBuilder.configured?(:auditors)
+          next unless Auditors.configured?
           Canvas::EventStreamLogger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
         end
       end
@@ -48,6 +48,16 @@ module Auditors
       strategy_value = :cassandra
       strategy_value = :active_record if read_from_postgres?
       strategy_value
+    end
+
+    def configured?
+      strategy = backend_strategy
+      if strategy == :cassandra
+        return Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
+      elsif strategy == :active_record
+        return Rails.configuration.database_configuration[Rails.env].present?
+      end
+      raise ArgumentError, "Unknown Auditors Backend Strategy: #{strategy}"
     end
 
     def write_to_cassandra?
