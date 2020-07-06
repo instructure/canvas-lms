@@ -34,7 +34,7 @@ module DataFixup::AddRoleOverridesForNewPermission
         next if new_overrides.detect{|nro| nro.context_id == ro.context_id && nro.context_type == ro.context_type && nro.role_id == ro.role_id }
         new_ro = RoleOverride.new
         new_ro.permission = new_permission
-        attrs = ro.attributes.slice(*%w{context_type context_id role_id locked enabled applies_to_self applies_to_descendants applies_to_env})
+        attrs = ro.attributes.slice(*%w{context_type context_id role_id locked enabled applies_to_self applies_to_descendants applies_to_env root_account_id})
         new_ro.assign_attributes(attrs)
         new_ro.save!
       end
