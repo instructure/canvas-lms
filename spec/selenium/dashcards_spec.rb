@@ -236,19 +236,23 @@ describe 'dashcards' do
         f('.ColorPicker__Container .ColorPicker__ColorBlock:nth-of-type(7)').click
         wait_for_ajaximations
         new_color = f('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
-        wait_for_ajaximations
 
         # make sure that we choose a new color for background
         if old_color == new_color
           f('.ColorPicker__Container .ColorPicker__ColorBlock:nth-of-type(8)').click
           wait_for_ajaximations
+          new_color = f('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
         end
 
         # Apply new color and verify it sticks
         f('.ColorPicker__Container #ColorPicker__Apply').click
         rgb = convert_hex_to_rgb_color(new_color)
-        expect(@user.reload.custom_colors.fetch("course_#{@course.id}")).to eq new_color
+        expect(old_color).not_to eq new_color
         expect(f('.ic-DashboardCard__header_hero')).to have_attribute("style", rgb)
+
+        keep_trying_until do
+          expect(@user.reload.custom_colors.fetch("course_#{@course.id}")).to eq new_color
+        end
       end
 
       it 'should customize dashcard color', priority: "1", test_id: 239991 do
