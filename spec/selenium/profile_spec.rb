@@ -110,7 +110,7 @@ describe "profile" do
     end
 
     it "should add a new email address on profile settings page" do
-      Account.site_admin.enable_feature!(:international_sms)
+      @user.account.enable_feature!(:international_sms)
       notification_model(:category => 'Grading')
       notification_policy_model(:notification_id => @notification.id)
 
@@ -191,7 +191,7 @@ describe "profile" do
     end
 
     it "should add another contact method - sms" do
-      Account.site_admin.enable_feature!(:international_sms)
+      @user.account.enable_feature!(:international_sms)
       test_cell_number = '8017121011'
       get "/profile/settings"
       f('.add_contact_link').click
