@@ -17,7 +17,7 @@
  */
 import I18n from 'i18n!permissions_role_tray'
 import {connect} from 'react-redux'
-import PropTypes from 'prop-types'
+import {arrayOf, bool, func, string} from 'prop-types'
 import React from 'react'
 import {flatten} from 'lodash'
 
@@ -90,6 +90,7 @@ export default function PermissionTray(props) {
                 permissionLabel={props.label}
                 permission={role.permissions[props.permissionName]}
                 role={role}
+                onChange={props.modifyPermissions}
               />
             ))}
           </RoleTrayTable>
@@ -105,6 +106,7 @@ export default function PermissionTray(props) {
                 permissionName={props.permissionName}
                 permissionLabel={props.label}
                 permission={role.permissions[props.permissionName]}
+                onChange={props.modifyPermissions}
                 role={role}
               />
             ))}
@@ -116,13 +118,14 @@ export default function PermissionTray(props) {
 }
 
 PermissionTray.propTypes = {
-  assignedRoles: PropTypes.arrayOf(permissionPropTypes.role).isRequired,
-  hideTray: PropTypes.func.isRequired,
-  label: PropTypes.string.isRequired,
-  open: PropTypes.bool.isRequired,
-  unassignedRoles: PropTypes.arrayOf(permissionPropTypes.role).isRequired,
-  permissionName: PropTypes.string.isRequired,
-  tab: PropTypes.string.isRequired
+  assignedRoles: arrayOf(permissionPropTypes.role).isRequired,
+  hideTray: func.isRequired,
+  modifyPermissions: func.isRequired,
+  label: string.isRequired,
+  open: bool.isRequired,
+  unassignedRoles: arrayOf(permissionPropTypes.role).isRequired,
+  permissionName: string.isRequired,
+  tab: string.isRequired
 }
 
 function mapStateToProps(state, ownProps) {
@@ -170,7 +173,8 @@ function mapStateToProps(state, ownProps) {
 }
 
 const mapDispatchToProps = {
-  hideTray: actions.hideAllTrays
+  hideTray: actions.hideAllTrays,
+  modifyPermissions: actions.modifyPermissions
 }
 
 export const ConnectedPermissionTray = connect(mapStateToProps, mapDispatchToProps)(PermissionTray)

@@ -17,17 +17,23 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {mount, shallow} from 'enzyme'
 
 import {ROLES} from '../../__tests__/examples'
 import RoleTrayTableRow from '../RoleTrayTableRow'
+import {Checkbox} from '@instructure/ui-checkbox'
+
+const MockedButton = () => <div className="mocked-permissionbutton" />
 
 function createRowProps(title, roleId) {
   const role = ROLES.find(r => r.id === roleId)
   const permissionName = Object.keys(role.permissions)[0]
   const permission = role.permissions[permissionName]
+  const permissionLabel = 'whatever'
+  const onChange = Function.prototype
+
   permission.permissionLabel = 'test'
-  return {title, role, permission, permissionName}
+  return {title, role, permission, permissionName, permissionLabel, onChange}
 }
 
 it('renders the title', () => {
@@ -74,4 +80,41 @@ it('does not render the description if not provided', () => {
   const tree = shallow(<RoleTrayTableRow {...props} />)
   const node = tree.find('Text')
   expect(node).toHaveLength(1)
+})
+
+// From here on, we're doing a full tree render to test the granular permission
+// logic, so we have to mock out the real PermissionButton component to avoid it
+// dragging in a bunch of Redux stuff that isn't going to be available in this
+// test environment. The PermissionButton itself is tested elsewhere.
+
+it('renders a Permission Button for a "regular old" permission', () => {
+  const props = createRowProps('banana', '1')
+  const tree = mount(<RoleTrayTableRow {...props} permButton={MockedButton} />)
+  const node = tree.find('div.mocked-permissionbutton')
+  expect(node).toHaveLength(1)
+})
+
+it('renders a checkbox for a granular permission', () => {
+  const props = createRowProps('banana', '1')
+  props.permission.group = 'group-permission-name'
+  const tree = mount(<RoleTrayTableRow {...props} permButton={MockedButton} />)
+  const node = tree.find(Checkbox)
+  expect(node).toHaveLength(1)
+})
+
+it('calls onChange callback when granular checkbox is clicked', () => {
+  const props = createRowProps('banana', '1')
+  props.permission.group = 'group-permission-name'
+  props.permission.readonly = false
+  const expectedChangeArgs = {
+    enabled: !props.permission.enabled,
+    explicit: true,
+    name: props.permissionName,
+    id: props.role.id
+  }
+  props.onChange = jest.fn()
+  const tree = mount(<RoleTrayTableRow {...props} permButton={MockedButton} />)
+  const node = tree.find(Checkbox).first()
+  node.find('input').simulate('change', {target: {checked: true}})
+  expect(props.onChange).toHaveBeenCalledWith(expectedChangeArgs)
 })
