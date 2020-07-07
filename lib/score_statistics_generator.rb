@@ -167,7 +167,3 @@ SQL
     SQL
   end
 end
-
-# TODO: remove this a release after it hits prod. We're keeping there here now as the class in this file was renamed and
-# we don't want any pending Delayed Jobs to fail
-AssignmentScoreStatisticsGenerator = ScoreStatisticsGenerator
