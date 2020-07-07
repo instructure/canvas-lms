@@ -2,10 +2,6 @@
   <%= polymorphic_url([asset.context, asset]) %>
 <% end %>
 
-<% define_content :subject do %>
-  <%= I18n.t("Upcoming Due Date - %{assignment_name}, %{course_name}", :assignment_name => asset.title, :course_name => asset.context.name) %>
-<% end %>
-
 <%= I18n.t("Your assignment %{assignment_name} is due on %{due_at}. Click the following link to visit your assignment and get it in on time:",
       assignment_name: asset.title, due_at: datetime_string(force_zone(data.assignment_due_date))) %>
 <%= content :link %>

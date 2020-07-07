@@ -1,1 +1,20 @@
-TODO in VICE-465
+<% define_content :link do %>
+  <%= polymorphic_url([asset.context, asset]) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= I18n.t("Upcoming Due Date - %{assignment_name}, %{course_name}", :assignment_name => asset.title, :course_name => asset.context.name) %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= I18n.t("View the assignment") %>
+  </a>
+<% end %>
+
+<p><%= I18n.t("Your assignment %{assignment_name} is due on %{due_at}.", :assignment_name => asset.title, due_at: datetime_string(force_zone(data.assignment_due_date)))%></p>
+<p>
+  <a href="<%= content(:link) %>">
+    <%= I18n.t("Click here to visit your assignment and get it in on time!") %>
+  </a>
+</p>
