@@ -259,6 +259,14 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(dtp.reload.root_account_id).to eq @topic.root_account_id
     end
 
+    context 'with LatePolicy' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        # for some reason late_policy_model doesn't save the record
+        let(:record) { late_policy_model(course: @course).tap(&:save!) }
+        let(:reference_record) { @course }
+      end
+    end
+
     context 'with Lti::LineItem' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { line_item_model(course: @course) }
@@ -351,6 +359,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         let(:submission) { submission_model }
         let(:record) { OriginalityReport.create!(submission: submission, workflow_state: :pending) }
         let(:reference_record) { submission }
+      end
+    end
+
+    context 'with PostPolicy' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { PostPolicy.create!(course: @course) }
+        let(:reference_record) { @course }
       end
     end
 
