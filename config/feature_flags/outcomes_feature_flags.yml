@@ -55,3 +55,9 @@ bulk_delete_pages:
   applies_to: RootAccount
   display_name: Page Bulk Deleting
   description: Allow pages to be deleted in bulk
+account_level_mastery_scales:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Account-level Mastery Scales
+  description: Allows Account-level mastery scales and proficiency calculations,
+    replacing per-outcome scales

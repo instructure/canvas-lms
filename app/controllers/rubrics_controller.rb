@@ -35,7 +35,8 @@ class RubricsController < ApplicationController
         manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
         manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
       },
-      :NON_SCORING_RUBRICS => @domain_root_account.feature_enabled?(:non_scoring_rubrics)
+      :NON_SCORING_RUBRICS => @domain_root_account.feature_enabled?(:non_scoring_rubrics),
+      :ACCOUNT_LEVEL_PROFICIENCIES => @domain_root_account.feature_enabled?(:account_level_mastery_scales)
 
     set_tutorial_js_env
 
