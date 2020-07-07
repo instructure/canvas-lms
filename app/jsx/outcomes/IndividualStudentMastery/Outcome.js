@@ -29,65 +29,39 @@ import UnassessedAssignment from './UnassessedAssignment'
 import OutcomePopover from './OutcomePopover'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import TruncateWithTooltip from '../../shared/components/TruncateWithTooltip'
+import WithBreakpoints, {breakpointsShape} from '../../shared/WithBreakpoints'
 import * as shapes from './shapes'
 
-export default class Outcome extends React.Component {
+class Outcome extends React.Component {
   static propTypes = {
     outcome: shapes.outcomeShape.isRequired,
     expanded: PropTypes.bool.isRequired,
     onExpansionChange: PropTypes.func.isRequired,
-    outcomeProficiency: shapes.outcomeProficiencyShape
+    outcomeProficiency: shapes.outcomeProficiencyShape,
+    breakpoints: breakpointsShape
   }
 
   static defaultProps = {
-    outcomeProficiency: null
+    outcomeProficiency: null,
+    breakpoints: {}
   }
 
   handleToggle = (_event, expanded) => {
     this.props.onExpansionChange('outcome', this.props.outcome.expansionId, expanded)
   }
 
-  renderHeader() {
-    const {outcome, outcomeProficiency} = this.props
-    const {assignments, display_name, mastered, title, score, points_possible, results} = outcome
-    const numAlignments = assignments.length
-    const pillAttributes = {margin: '0 0 0 x-small', text: I18n.t('Not mastered')}
+  renderScoreAndPill() {
+    const {outcome} = this.props
+    const {mastered, score, points_possible, results} = outcome
+    const pillAttributes = {text: I18n.t('Not mastered')}
     if (mastered) {
       Object.assign(pillAttributes, {text: I18n.t('Mastered'), variant: 'success'})
     }
 
     return (
-      <Flex direction="row" justifyItems="space-between" data-selenium="outcome">
-        <Flex.Item shrink>
-          <Flex direction="column">
-            <Flex.Item>
-              <Text size="medium">
-                <Flex>
-                  <Flex.Item>
-                    <OutcomePopover outcome={outcome} outcomeProficiency={outcomeProficiency} />
-                  </Flex.Item>
-                  <Flex.Item shrink padding="0 x-small">
-                    <TruncateWithTooltip>{display_name || title}</TruncateWithTooltip>
-                  </Flex.Item>
-                </Flex>
-              </Text>
-            </Flex.Item>
-            <Flex.Item>
-              <Text size="small">
-                {I18n.t(
-                  {
-                    zero: 'No alignments',
-                    one: '%{count} alignment',
-                    other: '%{count} alignments'
-                  },
-                  {count: I18n.n(numAlignments)}
-                )}
-              </Text>
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
-        <Flex.Item>
-          {_.isNumber(score) && !_.every(results, ['hide_points', true]) && (
+      <Flex direction="row" justifyItems="start" padding="0 0 0 x-small">
+        {_.isNumber(score) && !_.every(results, ['hide_points', true]) && (
+          <Flex.Item padding="0 x-small 0 0">
             <span>
               <PresentationContent>
                 <Text size="medium">
@@ -95,12 +69,60 @@ export default class Outcome extends React.Component {
                 </Text>
               </PresentationContent>
               <ScreenReaderContent>
-                {I18n.t('%{score} out of %{points_possible} points', {score, points_possible})}
+                {I18n.t('%{score} out of %{points_possible} points', {
+                  score,
+                  points_possible
+                })}
               </ScreenReaderContent>
             </span>
-          )}
+          </Flex.Item>
+        )}
+        <Flex.Item>
           <Pill {...pillAttributes} />
         </Flex.Item>
+      </Flex>
+    )
+  }
+
+  renderHeader() {
+    const {outcome, outcomeProficiency, breakpoints} = this.props
+    const {assignments, display_name, title} = outcome
+    const numAlignments = assignments.length
+    const verticalLayout = !breakpoints.tablet
+
+    return (
+      <Flex
+        direction={verticalLayout ? 'column' : 'row'}
+        justifyItems={verticalLayout ? null : 'space-between'}
+        alignItems={verticalLayout ? 'stretch' : null}
+        data-selenium="outcome"
+      >
+        <Flex.Item grow as="div">
+          <Text size="medium">
+            <Flex>
+              <Flex.Item>
+                <OutcomePopover outcome={outcome} outcomeProficiency={outcomeProficiency} />
+              </Flex.Item>
+              <Flex.Item shrink>
+                <TruncateWithTooltip>{display_name || title}</TruncateWithTooltip>
+              </Flex.Item>
+            </Flex>
+          </Text>
+          {verticalLayout && this.renderScoreAndPill()}
+          <View as="div" padding="0 0 0 x-small">
+            <Text size="small">
+              {I18n.t(
+                {
+                  zero: 'No alignments',
+                  one: '%{count} alignment',
+                  other: '%{count} alignments'
+                },
+                {count: I18n.n(numAlignments)}
+              )}
+            </Text>
+          </View>
+        </Flex.Item>
+        {!verticalLayout && <Flex.Item>{this.renderScoreAndPill()}</Flex.Item>}
       </Flex>
     )
   }
@@ -168,3 +190,5 @@ export default class Outcome extends React.Component {
     )
   }
 }
+
+export default WithBreakpoints(Outcome)

@@ -38,9 +38,18 @@ export const ratingShape = PropTypes.shape({
   description: PropTypes.string.isRequired
 })
 
+export const alignmentShape = PropTypes.shape({
+  assignment_id: PropTypes.string,
+  learning_outcome_id: PropTypes.number,
+  submission_types: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  title: PropTypes.string,
+  url: PropTypes.string
+})
+
 export const outcomeShape = PropTypes.shape({
   id: PropTypes.number.isRequired,
-  mastered: PropTypes.bool.isRequired,
+  mastered: PropTypes.bool,
+  assignments: PropTypes.arrayOf(alignmentShape),
   ratings: PropTypes.arrayOf(ratingShape).isRequired,
   results: PropTypes.arrayOf(outcomeResultShape).isRequired,
   title: PropTypes.string.isRequired,

@@ -22,7 +22,6 @@
 
 // print button for grades summary page
 .print-grades {
-  float: direction(right);
   @media print {
     display: none;
   }
@@ -323,12 +322,19 @@ div.rubric-toggle {
 }
 
 .outcome-toggles {
-  float: direction(right);
-  position: absolute;
-  #{direction(right)}: 1em;
-  margin-top: -2.3em;
+  text-align: #{direction(right)};
+  margin-top: 0.75rem;
+
+  @include breakpoint(mini-tablet) {
+    float: direction(right);
+    padding-top: 0;
+    position: absolute;
+    #{direction(right)}: 1em;
+    margin-top: -2.3em;
+  }
+
   .btn {
-    margin-#{direction(left)}: 0.5em;
+    margin-#{direction(left)}: 0.75em;
   }
   a[class*=icon-]:before, a[class^=icon-]:before {
     margin: 0;

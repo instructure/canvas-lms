@@ -1,59 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`properly renders the UnassessedAssignment component 1`] = `
-<ListItem
+<View
+  borderColor="default"
+  debug={false}
+  display="block"
+  focusColor="info"
+  focusPosition="offset"
+  focused={false}
   key="1"
+  overflowX="visible"
+  overflowY="visible"
+  padding="small"
+  position="static"
+  shouldAnimateFocus={true}
 >
-  <View
-    borderColor="default"
-    debug={false}
-    display="block"
-    focusColor="info"
-    focusPosition="offset"
-    focused={false}
-    overflowX="visible"
-    overflowY="visible"
-    padding="small"
-    position="static"
-    shouldAnimateFocus={true}
+  <ApplyTheme
+    immutable={false}
+    theme={
+      Object {
+        Symbol(Button__MTEzMjky): Object {
+          "fontWeight": "700",
+          "linkColor": "#68777D",
+        },
+      }
+    }
   >
-    <ApplyTheme
-      immutable={false}
+    <Button
+      as="button"
+      cursor="pointer"
+      display="inline-block"
+      elementRef={[Function]}
+      href="www.example.com"
+      icon={[Function]}
+      margin="0"
+      size="medium"
+      textAlign="center"
       theme={
         Object {
-          Symbol(Button__MTEzMjky): Object {
-            "fontWeight": "700",
-            "linkColor": "#68777D",
-          },
+          "mediumHeight": "normal",
+          "mediumPadding": "0",
         }
       }
+      type="button"
+      variant="link"
+      withBackground={true}
     >
-      <Button
-        as="button"
-        cursor="pointer"
-        display="inline-block"
-        elementRef={[Function]}
-        href="www.example.com"
-        icon={[Function]}
-        margin="0"
-        size="medium"
-        textAlign="center"
-        theme={
-          Object {
-            "mediumHeight": "normal",
-            "mediumPadding": "0",
-          }
-        }
-        type="button"
-        variant="link"
-        withBackground={true}
-      >
-        example
-         (
-        Not yet assessed
-        )
-      </Button>
-    </ApplyTheme>
-  </View>
-</ListItem>
+      example
+       (
+      Not yet assessed
+      )
+    </Button>
+  </ApplyTheme>
+</View>
 `;

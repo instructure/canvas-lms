@@ -894,6 +894,9 @@ form.ic-Form-group { margin: 0; }
 .ic-Action-header {
   margin-bottom: $ic-sp*2;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
 
   &.ic-Action-header--before-item-groups {
     margin-bottom: 0;
@@ -902,9 +905,10 @@ form.ic-Form-group { margin: 0; }
   }
 
   @include breakpoint(tablet) {
-    display: flex;
     align-items: center;
     box-sizing: border-box;
+    flex-direction: row;
+    justify-content: space-between;
 
     .ic-Action-header__Primary {
       flex-grow: 1;
