@@ -280,12 +280,70 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    it 'should populate the root_account_id on MasterCourse::MasterTemplate' do
-      mcmt = MasterCourses::MasterTemplate.create(course: @course)
-      mcmt.update_columns(root_account_id: nil)
-      expect(mcmt.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(mcmt.reload.root_account_id).to eq @course.root_account_id
+    context 'with MasterCourses::*' do
+      let(:content_migration) { @course.content_migrations.create!(user: @user) }
+      let(:child_course) { course_model(account: @course.account) }
+
+      let(:master_template) { MasterCourses::MasterTemplate.create!(course: @course) }
+      let(:master_migration) { MasterCourses::MasterMigration.create!(master_template: master_template) }
+      let(:child_subscription) do
+        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: child_course)
+      end
+
+      context 'with MasterCourses::ChildContentTag' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) do
+            MasterCourses::ChildContentTag.create!(
+              child_subscription: child_subscription, content: assignment_model
+            )
+          end
+          let(:reference_record) { child_subscription }
+        end
+      end
+
+      context 'with MasterCourses::ChildSubscription' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { child_subscription }
+          let(:reference_record) { master_template }
+        end
+      end
+
+      context 'with MasterCourses::MasterContentTag' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) do
+            MasterCourses::MasterContentTag.create!(
+              master_template: master_template, content: assignment_model
+            )
+          end
+          let(:reference_record) { master_template }
+        end
+      end
+
+      context 'with MasterCourses::MasterMigration' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { master_migration }
+          let(:reference_record) { master_template }
+        end
+      end
+
+      context 'with MasterCourses::MigrationResult' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) do
+            MasterCourses::MigrationResult.create!(
+              master_migration: master_migration, content_migration: content_migration,
+              child_subscription: child_subscription, import_type: :full, state: :queued
+            )
+          end
+          let(:reference_record) { master_migration }
+        end
+      end
+
+      context 'with MasterCourses::MasterTemplate' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { master_template }
+          let(:reference_record) { @course }
+        end
+      end
     end
 
     context 'with OriginalityReport' do
