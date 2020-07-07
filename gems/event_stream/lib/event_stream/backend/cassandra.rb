@@ -32,6 +32,10 @@ module EventStream::Backend
       !!database && database.available?
     end
 
+    def database_fingerprint
+      database && database.fingerprint
+    end
+
     def fetch_cql
       "SELECT * FROM #{table} %CONSISTENCY% WHERE #{id_column} IN (?)"
     end

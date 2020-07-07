@@ -230,6 +230,34 @@ describe Auditors::Authentication do
             to include(@event2)
         end
       end
+
+      context "different shard, db auditors" do
+        before do
+          allow(Auditors).to receive(:write_to_cassandra?).and_return(false)
+          allow(Auditors).to receive(:write_to_postgres?).and_return(true)
+          allow(Auditors).to receive(:read_from_cassandra?).and_return(false)
+          allow(Auditors).to receive(:read_from_postgres?).and_return(true)
+          @shard2.activate do
+            @account = account_model
+            user_with_pseudonym(account: @account, active_all: true)
+            @event1 = Auditors::Authentication.record(@pseudonym, 'login')
+          end
+          user_with_pseudonym(user: @user, active_all: true)
+          @event2 = Auditors::Authentication.record(@pseudonym, 'login')
+        end
+
+        it "should include events from the user's native shard" do
+          records = Auditors::Authentication.for_user(@user).paginate(:per_page => 2)
+          uuids = records.map(&:uuid)
+          expect(uuids).to include(@event1.id)
+        end
+
+        it "should include events from the other pseudonym's shard" do
+          records = Auditors::Authentication.for_user(@user).paginate(:per_page => 2)
+          uuids = records.map(&:uuid)
+          expect(uuids).to include(@event2.id)
+        end
+      end
     end
   end
 

@@ -125,14 +125,14 @@ class Auditors::Authentication
     Shard.with_each_shard(user.associated_shards) do
       # EventStream is shard-sensitive, but multiple shards may share
       # a database. if so, we only need to query from it once
-      db = Auditors::Authentication::Stream.database
-      next if dbs_seen.include?(db)
-      dbs_seen << db
+      db_fingerprint = Auditors::Authentication::Stream.database_fingerprint
+      next if dbs_seen.include?(db_fingerprint)
+      dbs_seen << db_fingerprint
 
       # query from that database, and label it with the database server's id
       # for merge
       collections << [
-        db.fingerprint,
+        db_fingerprint,
         Auditors::Authentication::Stream.for_user(user, Auditors.read_stream_options(options))
       ]
     end
