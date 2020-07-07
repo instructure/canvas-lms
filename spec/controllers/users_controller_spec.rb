@@ -1358,7 +1358,8 @@ describe UsersController do
 
     context "as an observer requesting an observed student's grades" do
       let_once(:observer) { user_with_pseudonym(active_all: true) }
-      let(:grade) { assigns[:grades][:observed_enrollments][course_1.id][student.id] }
+      let(:observed_grades) { assigns[:grades][:observed_enrollments] }
+      let(:grade) { observed_grades[course_1.id][student.id] }
 
       before(:once) do
         add_linked_observer(student, observer)
@@ -1512,6 +1513,27 @@ describe UsersController do
         it "sets the selected grading period to '0' (All Grading Periods)" do
           get_grades!
           expect(selected_period_id).to be 0
+        end
+      end
+
+      context "with cross-shard enrollments" do
+        specs_require_sharding
+
+        it "returns grades for enrollments in other shards" do
+          @shard1.activate do
+            other_account = Account.create
+            @cs_course = course_factory(active_all: true, account: other_account)
+            course_with_user("TeacherEnrollment", course: @cs_course, user: teacher, active_all: true)
+            course_with_user("StudentEnrollment", course: @cs_course, user: student, active_all: true)
+            cs_observer = course_with_observer(course: @cs_course, user: observer, active_all: true)
+            cs_observer.update!(associated_user: student)
+            assignment = @cs_course.assignments.create!(title: "Homework", points_possible: 10)
+            assignment.grade_student(student, grade: 8, grader: teacher)
+          end
+
+          get_grades!
+          cross_course_grade = observed_grades.dig(@cs_course.id, student.id)
+          expect(cross_course_grade).to eq 80.0
         end
       end
     end
