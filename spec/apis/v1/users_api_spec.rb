@@ -1297,13 +1297,6 @@ describe "Users API", type: :request do
         end
       end
 
-      it "should catch invalid dates before passing to the database" do
-        json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
-                        { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
-                        { :pseudonym => { :unique_id => "test@example.com"},
-                          :user => { :name => "Test User", :birthdate => "-3587-11-20" } }, {}, {:expected_status => 400} )
-      end
-
       it "should allow site admins to create users and auto-validate communication channel" do
         create_user_skip_cc_confirm(@site_admin)
       end
@@ -1627,7 +1620,6 @@ describe "Users API", type: :request do
           'time_zone' => "Tijuana"
         })
 
-        expect(user.birthdate.to_date).to eq birthday.getutc.to_date
         expect(user.time_zone.name).to eql 'Tijuana'
       end
 
@@ -1689,20 +1681,6 @@ describe "Users API", type: :request do
           :user => {title: another_title, bio: another_bio, email: another_email}
         })
         expect(user.profile.reload.title).to eq another_title
-      end
-
-      it "should catch invalid dates" do
-        birthday = Time.now
-        json = api_call(:put, @path, @path_options, {
-            :user => {
-                :name => 'Tobias Funke',
-                :short_name => 'Tobias',
-                :sortable_name => 'Funke, Tobias',
-                :time_zone => 'Tijuana',
-                :birthdate => "-4000-02-01 10:20",
-                :locale => 'en'
-            }
-        }, {}, {:expected_status => 400})
       end
 
       it "should allow updating without any params" do

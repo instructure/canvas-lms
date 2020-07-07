@@ -1386,9 +1386,6 @@ class UsersController < ApplicationController
   #   The user's preferred language, from the list of languages Canvas supports.
   #   This is in RFC-5646 format.
   #
-  # @argument user[birthdate] [Date]
-  #   The user's birth date.
-  #
   # @argument user[terms_of_use] [Boolean]
   #   Whether the user accepts the terms of use. Required if this is a
   #   self-registration and this canvas instance requires users to accept
@@ -1521,9 +1518,6 @@ class UsersController < ApplicationController
   # @argument user[locale] [String]
   #   The user's preferred language, from the list of languages Canvas supports.
   #   This is in RFC-5646 format.
-  #
-  # @argument user[birthdate] [Date]
-  #   The user's birth date.
   #
   # @argument user[terms_of_use] [Required, Boolean]
   #   Whether the user accepts the terms of use.
@@ -1892,9 +1886,12 @@ class UsersController < ApplicationController
 
     update_email = @user.grants_right?(@current_user, :manage_user_details) && user_params[:email]
     managed_attributes = []
-    managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, :rename)
+    managed_attributes.concat [:name, :short_name, :sortable_name] if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     managed_attributes << :email if update_email
+
+    # we dropped birthdate from user but this will allow backwards compatability and prevent errors
+    user_params.delete("birthdate")
 
     if @domain_root_account.enable_profiles?
       managed_attributes << :bio if @user.grants_right?(@current_user, :manage_user_details)
@@ -1949,12 +1946,6 @@ class UsersController < ApplicationController
 
       if session[:require_terms]
         @user.require_acceptance_of_terms = true
-      end
-
-      if user_params[:birthdate].present? && user_params[:birthdate] !~ Api::ISO8601_REGEX &&
-          params[:user][:birthdate] !~ Api::DATE_REGEX
-        return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
-          'Invalid date or invalid datetime for birthdate')}}, :status => 400)
       end
 
       @user.sortable_name_explicitly_set = user_params[:sortable_name].present?
@@ -2795,18 +2786,13 @@ class UsersController < ApplicationController
 
     if params[:user]
       user_params = params[:user].
-        permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
-          :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use,
+        permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services,
+          :avatar_image, :subscribe_to_emails, :locale, :bio, :terms_of_use,
           :self_enrollment_code, :initial_enrollment_type)
       if self_enrollment && user_params[:self_enrollment_code]
         user_params[:self_enrollment_code].strip!
       else
         user_params.delete(:self_enrollment_code)
-      end
-      if user_params[:birthdate].present? && user_params[:birthdate] !~ Api::ISO8601_REGEX &&
-          user_params[:birthdate] !~ Api::DATE_REGEX
-        return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
-                                                            'Invalid date or invalid datetime for birthdate')}}, :status => 400)
       end
 
       @user.attributes = user_params
