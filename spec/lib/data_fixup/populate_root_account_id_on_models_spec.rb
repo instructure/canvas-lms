@@ -373,6 +373,14 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    context 'with SubmissionComment' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:submission) { submission_model }
+        let(:record) { submission_comment_model(submission: submission) }
+        let(:reference_record) { submission.assignment.context }
+      end
+    end
+
     context 'with WebConference*' do
       let(:conference) do
         allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
