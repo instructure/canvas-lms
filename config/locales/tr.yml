@@ -5425,6 +5425,8 @@ tr:
   course_course_d1c78210: "Ders: %{course}"
   course_discussions_38c0b74f: "Ders Tartışmaları"
   course_ends_at_e8b166df: "Dersin bitiş tarihi"
+  course_export_from_date_f4e2a3e4: "*%{date} oluşturulan Ders Dışarı Aktarım Paketi*"
+  course_export_from_date_file_not_available_8a775e53: "%{date}: tarininde Ders Aktarımı (dosya kullanılabilir değil)"
   course_exports: 
     errors: 
       assignment: "\"%{title}\" ödevinin dışa aktarımı başarısız oldu"
@@ -12487,6 +12489,7 @@ tr:
   new_criterion_6054bc7f: "Yeni Kriter"
   new_criterion_canceled_d8c2a655: "Yeni Kriter İptal Edildi"
   new_discussion_dae4fae3: "Yeni Tartışma"
+  new_export_3ab758: "Yeni Dışa Aktarma Paketi"
   new_feature_flags_c4b70a5e: "Yeni Özellikler Etiketi"
   new_file_135ae520: "[ Yeni Dosya ]"
   new_gradebook_297f7e2d: "Yeni Not Defteri"
