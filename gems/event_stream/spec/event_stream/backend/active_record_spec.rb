@@ -44,7 +44,7 @@ describe EventStream::Backend::ActiveRecord do
         end
 
         def name
-          'fingerprint'
+          'shard_name'
         end
 
         def active?
@@ -92,8 +92,12 @@ describe EventStream::Backend::ActiveRecord do
       expect(ar_type.written_recs.first).to eq(event_record)
     end
 
-    it "pulls db fingerprint" do
-      expect(backend.database_fingerprint).to eq('fingerprint')
+    it "uses shard as fingerprint" do
+      expect(backend.database_fingerprint).to eq('shard_name')
+    end
+
+    it "uses shard as name" do
+      expect(backend.database_name).to eq('shard_name')
     end
   end
 end
