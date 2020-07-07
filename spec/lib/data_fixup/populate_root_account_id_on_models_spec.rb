@@ -1016,7 +1016,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
   describe '#run' do
     it 'should create delayed jobs to backfill root_account_ids for the table' do
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:send_later_if_production_enqueue_args)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:send_later_if_production_enqueue_args).at_least(:once)
       DataFixup::PopulateRootAccountIdOnModels.run
     end
 
@@ -1024,7 +1024,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       ContextModule.delete_all
       LearningOutcome.create!(context: @course, short_description: "test")
       LearningOutcome.update_all(root_account_ids: nil)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override).at_least(:once)
       expect(DataFixup::PopulateRootAccountIdOnModels).not_to receive(:populate_root_account_ids)
       DataFixup::PopulateRootAccountIdOnModels.run
     end
@@ -1033,8 +1033,8 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       ContextModule.delete_all
       AssetUserAccess.create!(context: @user, asset_code: @course.asset_string)
       AssetUserAccess.update_all(root_account_id: nil)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids).at_least(:once)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override).at_least(:once)
       DataFixup::PopulateRootAccountIdOnModels.run
     end
   end

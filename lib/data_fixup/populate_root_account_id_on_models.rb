@@ -123,6 +123,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       Submission => :assignment,
       SubmissionComment => :course,
       SubmissionVersion => :course,
+      User => [],
       UserAccountAssociation => :account,
       WebConference => :context,
       WebConferenceParticipant => :web_conference,
@@ -137,6 +138,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       AssetUserAccess => [:attachment, :calendar_event],
       Attachment => [:account, :assessment_question, :assignment, :course, :group, :submission],
       LearningOutcome => :content_tag,
+      User => :user_account_association,
     }.freeze
   end
 
@@ -155,6 +157,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       AssetUserAccess => DataFixup::PopulateRootAccountIdOnAssetUserAccesses,
       Attachment => DataFixup::PopulateRootAccountIdOnAttachments,
       LearningOutcome => DataFixup::PopulateRootAccountIdsOnLearningOutcomes,
+      User => DataFixup::PopulateRootAccountIdsOnUsers,
     }.freeze
   end
 
@@ -162,7 +165,8 @@ module DataFixup::PopulateRootAccountIdOnModels
   # tables listed here should override the populate method above
   def self.multiple_root_account_ids_tables
     [
-      LearningOutcome
+      LearningOutcome,
+      User
     ].freeze
   end
 
@@ -201,6 +205,9 @@ module DataFixup::PopulateRootAccountIdOnModels
         if populate_overrides.key?(table)
           # allow for one or more override methods of population
           Array(populate_overrides[table]).each do |override_module|
+            next unless override_module.respond_to?(:populate)
+            next if table.where(get_column_name(table) => nil).none?
+
             self.send_later_if_production_enqueue_args(:populate_root_account_ids_override,
             {
               priority: Delayed::MAX_PRIORITY,
@@ -210,6 +217,21 @@ module DataFixup::PopulateRootAccountIdOnModels
           end
         end
       end
+
+      if populate_overrides.key?(table)
+        Array(populate_overrides[table]).each do |override_module|
+          next unless override_module.respond_to?(:populate_table) &&
+            override_module.respond_to?(:run_populate_table?)
+          next unless override_module.run_populate_table?
+          self.send_later_if_production_enqueue_args(:populate_root_account_ids_override_table,
+           {
+             priority: Delayed::MAX_PRIORITY,
+             n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
+           },
+           table, override_module)
+        end
+      end
+
     end
   end
 
@@ -420,6 +442,12 @@ module DataFixup::PopulateRootAccountIdOnModels
 
   def self.populate_root_account_ids_override(table, override_module, min, max)
     override_module.populate(min, max)
+
+    unlock_next_backfill_job(table)
+  end
+
+  def self.populate_root_account_ids_override_table(table, override_module)
+    override_module.populate_table
 
     unlock_next_backfill_job(table)
   end
