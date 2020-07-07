@@ -259,6 +259,49 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(dtp.reload.root_account_id).to eq @topic.root_account_id
     end
 
+    context 'with learning outcomes' do
+      let(:outcome) { outcome_model }
+      let(:alignment) { outcome.align(assignment, @course) }
+      let(:assignment) { assignment_model(course: @course) }
+      let(:rubric_association) do
+        rubric = outcome_with_rubric context: @course, outcome: outcome
+        rubric.associate_with(assignment, @course, purpose: 'grading')
+      end
+      let(:outcome_result) do
+        LearningOutcomeResult.create!(
+          context: course2, association_type: 'RubricAssociation',
+          association_id: rubric_association.id,
+          learning_outcome: outcome, user: @user, alignment: alignment,
+        )
+      end
+      let(:course2) { course_model(account: account_model(root_account_id: nil)) }
+
+      context 'with LearningOutcomeGroup' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { outcome_group_model(context: @course) }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'with LearningOutcomeQuestionResult' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) do
+            loqr = outcome_result.learning_outcome_question_results.first_or_initialize
+            loqr.save!
+            loqr
+          end
+          let(:reference_record) { outcome_result }
+        end
+      end
+
+      context 'with LearningOutcomeResult' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { outcome_result }
+          let(:reference_record) { course2 }
+        end
+      end
+    end
+
     context 'with LatePolicy' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         # for some reason late_policy_model doesn't save the record
