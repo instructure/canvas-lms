@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {render, wait, waitForElement, fireEvent, act, cleanup} from '@testing-library/react'
+import {render, wait, fireEvent, act} from '@testing-library/react'
 import {queries as domQueries} from '@testing-library/dom'
-import waitForExpect from 'wait-for-expect'
 import CanvasMediaPlayer, {setPlayerSize} from '../CanvasMediaPlayer'
 import {uniqueId} from 'lodash'
 
@@ -34,7 +33,25 @@ const defaultMediaObject = (overrides = {}) => ({
   width: '1000',
   ...overrides
 })
+
 describe('CanvasMediaPlayer', () => {
+  beforeAll(() => {
+    // put the flash_screenreader_holder into the dom
+    let d = document.createElement('div')
+    d.id = 'flash_screenreader_holder'
+    d.setAttribute('role', 'alert')
+    document.body.appendChild(d)
+    // the specs looking for Alert text found
+    // 2 copies, one in the screenreader message
+    // and 1 in the component. let's give the
+    // component a place to render so the getByText
+    // queries don't look in the flash_screenreader_holder
+    d = document.createElement('div')
+    d.id = 'here'
+    d.innerHTML = '<div></div>'
+    document.body.appendChild(d)
+  })
+
   beforeEach(() => {
     fetch.resetMocks()
     jest.useFakeTimers()
@@ -53,10 +70,7 @@ describe('CanvasMediaPlayer', () => {
     expect(getAllByText('Play')[0]).toBeInTheDocument()
     expect(container.querySelector('video')).toBeInTheDocument()
   })
-  // While this test passes, including it causes jest.runAllTimers() to emit a message
-  // "Ran 100000 timers, and there are still more! Assuming we've hit an infinite recursion and bailing out..."
-  // and fail subsequent tests. I cannot figure out why.
-  it.skip('sorts sources by bitrate, ascending', () => {
+  it('sorts sources by bitrate, ascending', () => {
     const {container, getAllByText} = render(
       <CanvasMediaPlayer
         media_id="dummy_media_id"
@@ -88,20 +102,17 @@ describe('CanvasMediaPlayer', () => {
     // just make sure it doesn't blow up and renders the player
     expect(getAllByText('Play')[0]).toBeInTheDocument()
   })
+  // this spec causes react to emit " Warning: Can't perform a React state update on an unmounted component."
+  // in the next spec, and I can't figure out why. Everything still passes though.
   it('renders loading if there are no media sources', async () => {
-    let component
+    fetch.mockResponse(JSON.stringify({media_sources: []}))
     await act(async () => {
-      component = render(<CanvasMediaPlayer media_id="dummy_media_id" mediaSources={[]} />)
-      expect(component.getByText('Loading')).toBeInTheDocument()
-    })
-    await act(async () => {
-      jest.runOnlyPendingTimers()
-      await wait()
-      cleanup()
+      const {getByText} = render(<CanvasMediaPlayer media_id="dummy_media_id" mediaSources={[]} />)
+      expect(getByText('Loading')).toBeInTheDocument()
     })
   })
   it('makes ajax call if no mediaSources are provided on load', async () => {
-    fetch.mockResponseOnce(
+    fetch.mockResponse(
       JSON.stringify({media_sources: [defaultMediaObject(), defaultMediaObject()]})
     )
     await act(async () => {
@@ -111,75 +122,93 @@ describe('CanvasMediaPlayer', () => {
     })
     expect(fetch.mock.calls.length).toEqual(1)
     expect(fetch.mock.calls[0][0]).toEqual('/media_objects/dummy_media_id/info')
-    await act(async () => {
-      jest.runOnlyPendingTimers()
-      await wait()
-      cleanup()
-    })
   })
-  it('retries ajax call if no media_sources on first call', async () => {
-    fetch.mockResponses(
-      [JSON.stringify({error: 'whoops'}), {status: 503}],
-      [JSON.stringify({media_sources: [defaultMediaObject()]}), {status: 200}]
-    )
+  it('shows error message if fetch for media_sources fails', async () => {
+    fetch.mockResponses([JSON.stringify({error: 'whoops'}), {status: 503}])
+    let component
     await act(async () => {
-      render(<CanvasMediaPlayer media_id="dummy_media_id" />)
-      jest.runAllTimers()
-      await wait()
+      component = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
+        container: document.getElementById('here').firstElementChild
+      })
       jest.runAllTimers()
       await wait()
     })
-    expect(fetch.mock.calls.length).toEqual(2)
+    expect(fetch.mock.calls.length).toEqual(1)
+    expect(component.getByText('Failed retrieving media sources.')).toBeInTheDocument()
   })
-  it('tries ajax call up to 5 times if no media_sources', async () => {
+  it('tries ajax call up to MAX times if no media_sources', async () => {
     fetch.mockResponses(
       [JSON.stringify({media_sources: []}), {status: 200}],
-      [JSON.stringify({media_sources: []}), {status: 200}],
-      [JSON.stringify({media_sources: []}), {status: 200}],
-      [JSON.stringify({media_sources: []}), {status: 200}],
-      [JSON.stringify({media_sources: []}), {status: 200}],
-      [JSON.stringify({media_sources: []}), {status: 200}]
+      [JSON.stringify({media_sources: []}), {status: 304}],
+      [JSON.stringify({media_sources: []}), {status: 304}],
+      [JSON.stringify({media_sources: []}), {status: 304}],
+      [JSON.stringify({media_sources: []}), {status: 304}],
+      [JSON.stringify({media_sources: []}), {status: 304}]
     )
     let component
     await act(async () => {
-      component = render(<CanvasMediaPlayer media_id="dummy_media_id" />)
+      component = render(
+        <CanvasMediaPlayer
+          media_id="dummy_media_id"
+          MAX_RETRY_ATTEMPTS={5}
+          SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS={2}
+        />,
+        {
+          container: document.getElementById('here').firstElementChild
+        }
+      )
       expect(component.getByText('Loading')).toBeInTheDocument()
       jest.runAllTimers() // triggers useEffect
       await wait() // render
+      expect(component.getByText('Loading')).toBeInTheDocument()
+      expect(document.getElementById('flash_screenreader_holder').textContent).toMatch(/Loading/)
+      jest.runAllTimers()
+      await wait()
+      jest.runAllTimers()
+      await wait()
+      expect(
+        component.getByText('Your media has been uploaded and will appear here after processing.', {
+          exact: false
+        })
+      ).toBeInTheDocument()
+      expect(document.getElementById('flash_screenreader_holder').textContent).toMatch(
+        /Your media has been uploaded and will appear here after processing./
+      )
       jest.runAllTimers()
       await wait()
       jest.runAllTimers()
       await wait()
       jest.runAllTimers()
       await wait()
+      // add a 7th iteration just to prove the queries stopped at MAX_RETRY_ATTEMPTS
       jest.runAllTimers()
       await wait()
-    })
-    expect(fetch.mock.calls.length).toEqual(5)
-    const erralert = await waitForElement(() =>
-      component.getByText('Failed retrieving media source')
-    )
-    expect(erralert).toBeInTheDocument()
-    await act(async () => {
-      jest.runOnlyPendingTimers()
+
+      expect(fetch.mock.calls.length).toEqual(6) // initial attempt + 5 MAX_RETRY_ATTEMPTS
+      expect(
+        component.getByText(
+          'Giving up on retrieving media sources. This issue will probably resolve itself eventually.',
+          {exact: false}
+        )
+      ).toBeInTheDocument()
+      expect(document.getElementById('flash_screenreader_holder').textContent).toMatch(
+        /Giving up on retrieving media sources. This issue will probably resolve itself eventually./
+      )
+
+      jest.runAllTimers()
       await wait()
-      cleanup()
     })
   })
   it('still says "Loading" if we receive no info from backend', async () => {
     fetch.mockResponse(JSON.stringify({media_sources: []}))
-    let component
     await act(async () => {
-      component = render(<CanvasMediaPlayer media_id="dummy_media_id" />)
-    })
-    // wait for at least one request
-    await waitForExpect(() => expect(fetch.mock.calls.length).toBeGreaterThan(0))
-    // even after the server response came back, it should still say Loading
-    expect(component.getAllByText('Loading')[0]).toBeInTheDocument()
-    await act(async () => {
-      jest.runOnlyPendingTimers()
+      const {getByText} = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
+        container: document.getElementById('here').firstElementChild
+      })
+      jest.runAllTimers()
       await wait()
-      cleanup()
+
+      expect(getByText('Loading')).toBeInTheDocument()
     })
   })
   describe('renders correct set of video controls', () => {

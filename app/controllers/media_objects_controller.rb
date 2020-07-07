@@ -174,7 +174,7 @@ class MediaObjectsController < ApplicationController
     js_env media_object: media_object_api_json(@media_object, @current_user, session)
     js_bundle :media_player_iframe_content
     css_bundle :media_player
-    render html: "<div><div>#{I18n.t('Loading...')}</div></div>".html_safe, layout: 'layouts/bare'
+    render html: "<div id='player_container'>#{I18n.t('Loading...')}</div>".html_safe, layout: 'layouts/bare'
   end
 
   private

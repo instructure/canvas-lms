@@ -16,16 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {oneOf, string} from 'prop-types'
+import {number, oneOf, string} from 'prop-types'
 import I18n from 'i18n!CanvasMediaPlayer'
 import {LoadingIndicator, isAudio, sizeMediaPlayer} from '@instructure/canvas-media'
 import {VideoPlayer} from '@instructure/ui-media-player'
 import {Alert} from '@instructure/ui-alerts'
+import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-layout'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 const byBitrate = (a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
-const MAX_ATTEMPTS = 5
+
+const liveRegion = () => window.top.document.getElementById('flash_screenreader_holder')
+
+// It can take a while for notorious to process a newly uploaded video
+// Each attempt to get the media_sources is 2**n seconds after the previous attempt
+// so we'll keep at it for about an hour (2**(MAX_RETRY_ATTEMPTS+1)/60 minutes) as long as there's no network error.
+const DEFAULT_MAX_RETRY_ATTEMPTS = 11
+const DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS = 3
 
 // !!!!
 // ALERT: The resize handling code here assumes CanvasMediaPlayer fills 100% of its
@@ -42,6 +51,19 @@ export default function CanvasMediaPlayer(props) {
   const [media_sources, setMedia_sources] = useState(sorted_sources)
   const [retryTimerId, setRetryTimerId] = useState(0)
   const [retryAttempt, setRetryAttempt] = useState(0)
+  const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
+  // the ability to set these makes testing easier
+  // hint: set these values in a conditional breakpoint in
+  // media_player_iframe_content.js where the CanvasMediaPlayer is rendered
+  // for example:
+  // ENV.SHOW_MEDIA_SOURCE_BE_PATIENT_MSG_AFTER_ATTEMPTS=2, ENV.MAX_MEDIA_SOURCE_RETRY_ATTEMPTS=4, 0
+  const [MAX_RETRY_ATTEMPTS] = useState(
+    ENV.MAX_MEDIA_SOURCE_RETRY_ATTEMPTS || props.MAX_RETRY_ATTEMPTS
+  )
+  const [SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS] = useState(
+    ENV.SHOW_MEDIA_SOURCE_BE_PATIENT_MSG_AFTER_ATTEMPTS || props.SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS
+  )
+
   const containerRef = useRef(null)
   const myIframeRef = useRef(null)
   const mediaPlayerRef = useRef(null)
@@ -79,7 +101,9 @@ export default function CanvasMediaPlayer(props) {
   }, [])
 
   useEffect(() => {
-    if (!props.media_sources.length && retryAttempt < MAX_ATTEMPTS) {
+    // if we just uploaded the media, notorious may still be processing it
+    // and we don't have its media_sources yet
+    if (!props.media_sources.length && retryAttempt <= MAX_RETRY_ATTEMPTS) {
       fetchSources()
     }
 
@@ -121,9 +145,13 @@ export default function CanvasMediaPlayer(props) {
     const url = `/media_objects/${props.media_id}/info`
     let resp
     try {
+      setMediaObjNetworkErr(null)
       resp = await asJson(fetch(url, defaultFetchOptions))
     } catch (e) {
-      // if there is a network error, just ignore and retry
+      // eslint-disable-next-line no-console
+      console.warn(`Error getting ${url}`, e.message)
+      setMediaObjNetworkErr(e)
+      return
     }
     if (resp && resp.media_sources && resp.media_sources.length) {
       setMedia_sources(resp.media_sources.sort(byBitrate))
@@ -131,7 +159,7 @@ export default function CanvasMediaPlayer(props) {
       // they're not present yet, try again in a little bit
       let tid = 0
       const nextAttempt = retryAttempt + 1
-      if (nextAttempt < MAX_ATTEMPTS) {
+      if (nextAttempt < MAX_RETRY_ATTEMPTS) {
         tid = setTimeout(() => {
           setRetryAttempt(nextAttempt)
         }, 2 ** retryAttempt * 1000)
@@ -180,18 +208,47 @@ export default function CanvasMediaPlayer(props) {
   const includeFullscreen = document.fullscreenEnabled && props.type === 'video'
 
   function renderNoPlayer() {
-    if (retryAttempt < MAX_ATTEMPTS) {
+    if (mediaObjNetworkErr) {
       return (
+        <Alert key="erralert" variant="error" margin="small" liveRegion={liveRegion}>
+          {I18n.t('Failed retrieving media sources.')}
+        </Alert>
+      )
+    }
+    if (retryAttempt >= MAX_RETRY_ATTEMPTS) {
+      // this should be very rare
+      return (
+        <Alert key="giveupalert" variant="info" margin="x-small" liveRegion={liveRegion}>
+          {I18n.t(
+            'Giving up on retrieving media sources. This issue will probably resolve itself eventually.'
+          )}
+        </Alert>
+      )
+    }
+    if (retryAttempt >= SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS) {
+      return (
+        <Flex margin="xx-small" justifyItems="space-between">
+          <Flex.Item margin="0 0 x-small 0" shouldGrow shouldShrink>
+            <Alert key="bepatientalert" variant="info" margin="x-small" liveRegion={liveRegion}>
+              {I18n.t('Your media has been uploaded and will appear here after processing.')}
+            </Alert>
+          </Flex.Item>
+          <Flex.Item shouldGrow={false} shouldShrink={false} margin="0 x-small 0 0">
+            <Spinner renderTitle={() => I18n.t('Loading')} size="small" />
+          </Flex.Item>
+        </Flex>
+      )
+    }
+    return (
+      <>
+        <Alert key="loadingalert" variant="info" liveRegion={liveRegion} screenReaderOnly>
+          {I18n.t('Loading')}
+        </Alert>
         <LoadingIndicator
           translatedTitle={I18n.t('Loading')}
           size={props.type === 'audio' ? 'x-small' : 'large'}
         />
-      )
-    }
-    return (
-      <Alert variant="error" margin="small">
-        {I18n.t('Failed retrieving media source')}
-      </Alert>
+      </>
     )
   }
 
@@ -240,10 +297,14 @@ CanvasMediaPlayer.propTypes = {
   media_id: string.isRequired,
   media_sources: VideoPlayer.propTypes.sources,
   media_tracks: VideoPlayer.propTypes.tracks,
-  type: oneOf(['audio', 'video'])
+  type: oneOf(['audio', 'video']),
+  MAX_RETRY_ATTEMPTS: number,
+  SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: number
 }
 
 CanvasMediaPlayer.defaultProps = {
   media_sources: [],
-  type: 'video'
+  type: 'video',
+  MAX_RETRY_ATTEMPTS: DEFAULT_MAX_RETRY_ATTEMPTS,
+  SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS
 }

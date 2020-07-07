@@ -45,7 +45,6 @@ ready(() => {
   // with scrollbars, even though everything is the right size.
   document.documentElement.setAttribute('style', 'overflow: hidden;')
 
-  const div = document.body.firstElementChild
   const media_object = ENV.media_object || {}
 
   const mediaTracks = media_object?.media_tracks.map(track => {
@@ -64,6 +63,6 @@ ready(() => {
       media_tracks={mediaTracks}
       type={is_audio ? 'audio' : 'video'}
     />,
-    document.body.appendChild(div)
+    document.getElementById('player_container')
   )
 })
