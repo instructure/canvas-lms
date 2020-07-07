@@ -623,8 +623,14 @@ div.completion_criterion_option {
   }
 }
 
-
 .publish-icon button {
+  @include ic-focus-base;
   border: 0;
-  padding: 0;
+  border-radius: 3px;
+  outline: none;
+  padding: 4px;
+  margin-#{direction(right)}: -7px;
+  &:focus {
+    @include button-focus-light;
+  }
 }

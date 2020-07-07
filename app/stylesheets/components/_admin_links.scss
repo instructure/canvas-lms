@@ -114,7 +114,12 @@
 
 .al-trigger-gray {
   color: $ic-font-color--subdued;
+  border-radius: 3px;
+  outline: none;
   &:hover, &:focus { color: $ic-font-color-dark; }
+  &:focus {
+    @include button-focus-light;
+  }
 }
 
 .admin-link-hover-area:hover .al-trigger,

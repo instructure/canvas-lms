@@ -46,11 +46,6 @@
   display: block !important;
 }
 
-.header .publish-icon {
-  position: relative;
-  bottom: 7px;
-}
-
 .collapse_module_link, .expand_module_link {
   cursor: pointer;
 }
@@ -137,8 +132,6 @@
     .publish-icon {
       display: flex;
       align-items: center;
-      padding-#{direction(left)}: 10px;
-      padding-top: 12px;
     }
   }
 }
