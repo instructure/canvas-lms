@@ -82,6 +82,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       RubricAssessment => :rubric,
       RubricAssociation => :context,
       Submission => :assignment,
+      SubmissionComment => :course,
       UserAccountAssociation => :account,
       WebConferenceParticipant => :web_conference,
       WebConference => :context,
