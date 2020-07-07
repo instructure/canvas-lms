@@ -351,7 +351,7 @@ describe Message do
     context 'SMS' do
       before :once do
         user_model
-        Account.site_admin.enable_feature!(:international_sms)
+        @user.account.enable_feature!(:international_sms)
       end
 
       before do
