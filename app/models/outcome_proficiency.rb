@@ -26,7 +26,8 @@ class OutcomeProficiency < ApplicationRecord
   validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }
   validate :single_mastery_rating
   validate :strictly_decreasing_points
-
+  validates :context_id, :context_type, presence: true
+  before_validation :ensure_context
   before_save :set_root_account_id
 
   def as_json(_options={})
@@ -59,5 +60,12 @@ class OutcomeProficiency < ApplicationRecord
   def set_root_account_id
     return if self.root_account_id.present?
     self.root_account_id = self.account.resolved_root_account_id
+  end
+
+  # TODO: get rid of once all existing proficiencies have their context populated and creation methods can be rewritten
+  def ensure_context
+    return if self.context_type.present? && self.context_id.present?
+    self.context_type = 'Account'
+    self.context_id = self.account_id
   end
 end
