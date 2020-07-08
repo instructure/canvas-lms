@@ -87,7 +87,9 @@ module AssignmentUtil
       notification.name,
       notification,
       [submission.student],
-      assignment_due_date: submission.cached_due_date
+      assignment_due_date: submission.cached_due_date,
+      root_account_id: assignment.root_account_id,
+      course_id: assignment.context_id
     )
   end
 
