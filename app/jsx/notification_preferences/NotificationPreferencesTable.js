@@ -252,6 +252,7 @@ const NotificationPreferencesTable = props => {
       </>
     )
   }
+  return null
 }
 
 NotificationPreferencesTable.propTypes = {
