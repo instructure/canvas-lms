@@ -431,12 +431,14 @@ describe NotificationMessageCreator do
       expect(messages.map(&:to).sort).to eq ['dashboard']
     end
 
-    it "should force certain categories to send immediately" do
+    it "should not force non immediate categories to be immediate" do
       notification_set(:notification_opts => { :name => "Thing 1", :category => 'Not Migration' })
       @notification_policy.frequency = 'daily'
       @notification_policy.save!
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 1
+    end
 
+    it 'should force certain categories to send immediately' do
       notification_set(:notification_opts => { :name => "Thing 2", :category => 'Migration' })
       @notification_policy.frequency = 'daily'
       @notification_policy.save!

@@ -211,19 +211,19 @@ class Notification < ActiveRecord::Base
   end
 
   def registration?
-    return self.category == "Registration"
+    self.category == "Registration"
   end
 
   def migration?
-    return self.category == "Migration"
+    self.category == "Migration"
   end
 
   def summarizable?
-    return !self.registration? && !self.migration?
+    !self.registration? && !self.migration?
   end
 
   def dashboard?
-    return ["Migration", "Registration", "Summaries", "Alert"].include?(self.category) == false
+    ["Migration", "Registration", "Summaries", "Alert"].exclude?(self.category)
   end
 
   def category_slug
