@@ -92,6 +92,40 @@ describe CanvasPartman::Concerns::Partitioned do
       end
     end
 
+    describe '.attrs_in_partition_groups' do
+      it 'puts records from the same partition into a partition group' do
+        yield_count = 0
+        attrs = [
+          { created_at: Time.new(2020, 7, 2) },
+          { created_at: Time.new(2020, 7, 3) },
+          { created_at: Time.new(2020, 7, 4) }
+        ].map(&:with_indifferent_access)
+        Animal.attrs_in_partition_groups(attrs) do |partition_name, records|
+          yield_count += 1
+          expect(partition_name).to eq("partman_animals_2020_7")
+          expect(records.size).to eq(3)
+        end
+        expect(yield_count).to eq(1)
+      end
+
+      it 'can insert into multiple partitions simultaneously' do
+        attrs = [
+          { created_at: Time.new(2020, 7, 2) },
+          { created_at: Time.new(2020, 7, 3) },
+          { created_at: Time.new(2020, 7, 4) },
+          { created_at: Time.new(2020, 6, 28) },
+          { created_at: Time.new(2020, 6, 29) }
+        ].map(&:with_indifferent_access)
+        yield_count = 0
+
+        Animal.attrs_in_partition_groups(attrs) do |partition_name, records|
+          expect(records.size).to eq(2) if partition_name == "partman_animals_2020_6"
+          yield_count += 1
+        end
+        expect(yield_count).to eq(2)
+      end
+    end
+
     describe 'updating records' do
       before do
         subject.create_partition(Time.new(2014, 11, 1))
