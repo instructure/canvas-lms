@@ -344,7 +344,17 @@
                     <% ((@account.pronouns.presence || Pronouns.default_pronouns) + [nil]).each do |pronouns| %>
                       <tr class="pronouns_row <%= raw ' blank" style="display: none;' if pronouns.nil? %>">
                         <td> <input type="text" name="account[pronouns][]" value="<%= pronouns %>"/></td>
-                        <td> <a href="#" title="<%= t("Remove Pronouns %{pronoun}", :pronoun => pronouns) %>" role="button" class="close" data-remove=".pronouns_row"><i class="icon-end standalone-icon"></i></a> </td>
+                        <td>
+                          <button
+                            type="button"
+                            class="Button Button--icon-action"
+                            aria-label="<%= t("Remove Pronouns %{pronoun}", :pronoun => pronouns) %>"
+                            title="<%= t("Remove Pronouns %{pronoun}", :pronoun => pronouns) %>"
+                            onclick="$(this).closest('.pronouns_row').remove()"
+                          >
+                            <i class="icon-end standalone-icon"></i>
+                          </button>
+                        </td>
                       </tr>
                     <% end %>
                   </tbody>
