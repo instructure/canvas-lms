@@ -55,9 +55,47 @@ module DataFixup::PopulateRootAccountIdOnModels
   # or any models that do not have a root_account_id column.
   def self.migration_tables
     {
-      ContextModule => :context, DeveloperKey => {account: [:root_account_id, :id]},
-      DeveloperKeyAccountBinding => {account: [:root_account_id, :id]},
-      DiscussionTopic => :context
+      AccountUser => :account,
+      AssessmentQuestion => :assessment_question_bank,
+      AssessmentQuestionBank => :context,
+      AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
+      AssignmentGroup => :context,
+      AssignmentOverride => :assignment,
+      AssignmentOverrideStudent => :assignment,
+      ContextExternalTool => [{context: [:root_account_id, :id]}],
+      ContentMigration => [:account, :course, :group],
+      ContextModule => :context,
+      ContentShare => [:course, :group],
+      DeveloperKey => :account,
+      DeveloperKeyAccountBinding => :account,
+      DiscussionEntry => :discussion_topic,
+      DiscussionEntryParticipant => :discussion_entry,
+      DiscussionTopic => :context,
+      DiscussionTopicParticipant => :discussion_topic,
+      LatePolicy => :course,
+      LearningOutcomeGroup => :context,
+      LearningOutcomeQuestionResult => :learning_outcome_result,
+      LearningOutcomeResult => :context,
+      Lti::LineItem => :assignment,
+      Lti::ResourceLink => :context_external_tool,
+      Lti::Result => :line_item,
+      MasterCourses::ChildContentTag => :child_subscription,
+      MasterCourses::ChildSubscription => :child_course,
+      MasterCourses::MasterContentTag => :master_template,
+      MasterCourses::MasterMigration => :master_template,
+      MasterCourses::MigrationResult => :master_migration,
+      MasterCourses::MasterTemplate => :course,
+      OriginalityReport => :submission,
+      PostPolicy => :course,
+      Quizzes::Quiz => :course,
+      Rubric => :context,
+      RubricAssessment => :rubric,
+      RubricAssociation => :context,
+      Submission => :assignment,
+      SubmissionComment => :course,
+      UserAccountAssociation => :account,
+      WebConferenceParticipant => :web_conference,
+      WebConference => :context,
     }.freeze
   end
 
@@ -163,8 +201,8 @@ module DataFixup::PopulateRootAccountIdOnModels
       if assoc_options[:polymorphic].present?
         assoc_options[:polymorphic].each do |poly_a|
           poly_a = poly_a.keys.first if poly_a.is_a? Hash
-          columns = [:root_account_id, :id] if assoc == :account
-          memo[:"#{prefix}#{poly_a}"] = columns
+          account_columns = [:root_account_id, :id] if poly_a == :account
+          memo[:"#{prefix}#{poly_a}"] = account_columns || columns
         end
       else
         columns = [:root_account_id, :id] if assoc == :account
@@ -188,7 +226,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.populate_root_account_ids(table, associations, min, max)
     table.find_ids_in_ranges(start_at: min, end_at: max) do |batch_min, batch_max|
       associations.each do |assoc, columns|
-        account_id_column = create_column_names(assoc, columns)
+        account_id_column = create_column_names(table.reflections[assoc.to_s], columns)
         table.where(id: batch_min..batch_max, root_account_id: nil).
           joins(assoc).
           update_all("root_account_id = #{account_id_column}")
@@ -199,7 +237,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   def self.create_column_names(assoc, columns)
-    names = Array(columns).map{|column| "#{assoc.to_s.tableize}.#{column}"}
+    names = Array(columns).map{|column| "#{assoc.klass.table_name}.#{column}"}
     names.count == 1 ? names.first : "COALESCE(#{names.join(', ')})"
   end
 
