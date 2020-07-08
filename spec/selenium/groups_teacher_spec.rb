@@ -192,6 +192,12 @@ describe "new groups" do
 
       expect(f('.group-summary')).to include_text("0 / 3 students")
       f('.al-trigger.btn').click
+
+      # the randomly assign members option doesn't appear immediately and can result
+      # in selenium clicking the wrong link. wait for it to appear before clicking
+      # edit category to work around the issue
+      wait_for(method: nil, timeout: 2) { f('.randomly-assign-members').displayed? }
+
       f('.icon-edit.edit-category').click
 
       manually_set_groupset_limit("2")
