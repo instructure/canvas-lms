@@ -117,7 +117,8 @@ describe 'Developer Keys' do
       get "/accounts/#{Account.default.id}/developer_keys"
       fj("table[data-automation='devKeyAdminTable'] tbody tr button:has(svg[name='IconTrash'])").click
       accept_alert
-      expect(f("table[data-automation='devKeyAdminTable']")).not_to contain_css("tbody tr")
+      wait_for_ajaximations
+      expect(element_exists?("table[data-automation='devKeyAdminTable']")).to eq(false)
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
 
