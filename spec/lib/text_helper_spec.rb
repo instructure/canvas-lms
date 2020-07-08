@@ -158,7 +158,7 @@ describe TextHelper do
       it "should not escape MarkdownSafeBuffers" do
         expect(th.mt(:foo, "We **do** trust the following input: %{input}", :input => th.markdown_safe("`a` **b** _c_ ![d](e)\n# f\n + g\n - h"))).
           to eq <<-HTML.strip
-<p>We <strong>do</strong> trust the following input: <code>a</code> <strong>b</strong> <em>c</em> <img src="e" alt="d" /></p>
+<p>We <strong>do</strong> trust the following input: <code>a</code> <strong>b</strong> <em>c</em> <img src="e" alt="d"/></p>
 
 <h1>f</h1>
 
