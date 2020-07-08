@@ -1,0 +1,136 @@
+#!/usr/bin/env groovy
+
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+import org.jenkinsci.plugins.workflow.support.steps.build.DownstreamFailureCause
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
+
+def buildParameters = [
+  string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
+  string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
+  string(name: 'GERRIT_PROJECT', value: "${env.GERRIT_PROJECT}"),
+  string(name: 'GERRIT_BRANCH', value: "${env.GERRIT_BRANCH}"),
+  string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
+  string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
+  string(name: 'GERRIT_EVENT_ACCOUNT_NAME', value: "${env.GERRIT_EVENT_ACCOUNT_NAME}"),
+  string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}"),
+  string(name: 'GERRIT_CHANGE_COMMIT_MESSAGE', value: "${env.GERRIT_CHANGE_COMMIT_MESSAGE}"),
+  string(name: 'GERRIT_HOST', value: "${env.GERRIT_HOST}")
+]
+
+library "canvas-builds-library"
+
+// if the build never starts or gets into a node block, then we
+// can never load a file. and a very noisy/confusing error is thrown.
+def ignoreBuildNeverStartedError(block) {
+  try {
+    block()
+  }
+  catch (org.jenkinsci.plugins.workflow.steps.MissingContextVariableException ex) {
+    if (!ex.message.startsWith('Required context class hudson.FilePath is missing')) {
+      throw ex
+    }
+    else {
+      echo "ignored MissingContextVariableException: \n${ex.message}"
+    }
+    // we can ignore this very noisy error
+  }
+}
+
+pipeline {
+  agent { label 'canvas-docker' }
+  options {
+    ansiColor('xterm')
+    timestamps()
+    parallelsAlwaysFailFast()
+  }
+
+  environment {
+    BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
+    POSTGRES = configuration.postgres()
+    RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
+
+    // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
+    PATCHSET_TAG = imageTag.patchset()
+
+    CASSANDRA_IMAGE_TAG=imageTag.cassandra()
+    DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
+    POSTGRES_IMAGE_TAG=imageTag.postgres()
+  }
+
+  stages {
+    stage('Setup') {
+      steps {
+        cleanAndSetup()
+      }
+    }
+
+    stage('Parallel Run Tests') {
+      steps {
+        script {
+          def stages = [:]
+
+          def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
+          distribution.stashBuildScripts()
+
+          distribution.addRSpecSuites(stages)
+          distribution.addSeleniumSuites(stages)
+          parallel(stages)
+        }
+      }
+    }
+
+    stage('Copy Files') {
+      steps {
+        script {
+          def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
+          rspec.uploadParallelLog()
+        }
+      }
+    }
+
+    stage('Create Gerrit') {
+      steps {
+        script {
+          credentials.withGerritCredentials {
+            sh 'build/new-jenkins/push-rspec-parallel-log.sh'
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      script {
+        ignoreBuildNeverStartedError {
+          def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
+          rspec.uploadJunitReports()
+          rspec.uploadSeleniumFailures()
+          rspec.uploadRSpecFailures()
+          load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
+        }
+      }
+    }
+    cleanup {
+      ignoreBuildNeverStartedError {
+        execute 'bash/docker-cleanup.sh --allow-failure'
+      }
+    }
+  }
+}

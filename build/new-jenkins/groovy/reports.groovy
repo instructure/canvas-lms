@@ -113,6 +113,12 @@ def stashSpecResults(prefix, index) {
   }
 }
 
+def stashParallelLogs(prefix, index) {
+  dir("tmp") {
+    stash name: "${prefix}_spec_parallel_${index}", includes: 'parallel_runtime_rspec_tests/**/*.log'
+  }
+}
+
 def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
   def htmlFiles
   def failureCategories
@@ -249,6 +255,30 @@ def publishJunitReport(prefix, total) {
         }
       }
     }
+  }
+}
+
+def copyParallelLogs(rspecTotal, seleniumTotal) {
+  dir('parallel_logs') {
+    for(int index = 0; index < rspecTotal; index++) {
+      dir("rspec_node_${index}") {
+        try {
+          unstash "rspec_spec_parallel_${index}"
+        } catch(err) {
+          println (err)
+        }
+      }
+    }
+    for(int index = 0; index < seleniumTotal; index++) {
+      dir("selenium_node_${index}") {
+        try {
+          unstash "selenium_spec_parallel_${index}"
+        } catch(err) {
+          println (err)
+        }
+      }
+    }
+    sh '../build/new-jenkins/parallel-log-combine.sh'
   }
 }
 

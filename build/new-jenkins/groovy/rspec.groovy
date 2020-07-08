@@ -124,6 +124,10 @@ def _runRspecTestSuite(
         sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage canvas_ --clean-dir'
         reports.stashSpecCoverage(prefix, index)
       }
+      if (env.RSPEC_LOG == '1') {
+        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime_rspec_tests.log ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
+        reports.stashParallelLogs(prefix, index)
+      }
       sh 'rm -rf ./tmp'
       execute 'bash/docker-cleanup.sh --allow-failure'
     }
@@ -181,6 +185,12 @@ def uploadJunitReports() {
   if (currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
     currentBuild.rawBuild.@result = hudson.model.Result.SUCCESS
   }
+}
+
+def uploadParallelLog() {
+  def reports = load('build/new-jenkins/groovy/reports.groovy')
+  reports.copyParallelLogs(rspecConfig().node_total, seleniumConfig().node_total)
+  archiveArtifacts(artifacts: "parallel_logs/**")
 }
 
 return this

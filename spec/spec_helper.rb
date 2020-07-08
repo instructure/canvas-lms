@@ -353,6 +353,10 @@ RSpec.configure do |config|
     config.add_formatter "RspecJunitFormatter", "log/results.xml" unless File.file?("log/results.xml")
   end
 
+  if ENV['RSPEC_LOG']
+    config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime_rspec_tests.log"
+  end
+
   if ENV['RAILS_LOAD_ALL_LOCALES'] && RSpec.configuration.filter.rules[:i18n]
     config.around :each do |example|
       SpecMultipleLocales.run(example)
