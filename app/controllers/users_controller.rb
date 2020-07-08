@@ -1269,7 +1269,7 @@ class UsersController < ApplicationController
   #    "limit_parent_app_web_access": false // Whether the user can interact with Canvas web from the Canvas Parent app.
   #   }
   #
-  # @argument include[] [String, "uuid"]
+  # @argument include[] [String, "uuid", "last_login"]
   #   Array of additional information to include on the user record.
   #   "locale", "avatar_url", "permissions", "email", and "effective_locale"
   #   will always be returned
@@ -1284,7 +1284,14 @@ class UsersController < ApplicationController
     @user = api_find(User, params[:id])
     if @user.grants_right?(@current_user, session, :api_show_user)
       includes = %w{locale avatar_url permissions email effective_locale}
-      includes << 'uuid' if Array.wrap(params[:include]).include?('uuid')
+      includes += Array.wrap(params[:include]) & ['uuid', 'last_login']
+
+      # would've preferred to pass User.with_last_login as the collection to
+      # api_find but the implementation of that scope appears to be incompatible
+      # with what api_find does
+      if includes.include?('last_login')
+        @user.last_login = User.with_last_login.find(@user.id).read_attribute(:last_login)
+      end
 
       render :json => user_json(@user, @current_user, session, includes, @domain_root_account)
     else
