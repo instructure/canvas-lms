@@ -111,6 +111,7 @@ pipeline {
   post {
     always {
       script {
+        archiveArtifacts artifacts: 'tmp/**/*.xml'
         junit allowEmptyResults: true, testResults: 'tmp/**/*.xml'
         sh 'find ./tmp -path "*.xml"'
       }
