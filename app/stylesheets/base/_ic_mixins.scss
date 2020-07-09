@@ -158,3 +158,13 @@
     }
   }
 }
+
+@mixin button-link {
+  border: none;
+  background: none;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 3px;
+  outline: none;
+  &:focus { @include button-focus-light; }
+}
