@@ -231,6 +231,12 @@ describe "new groups" do
       wait_for_ajaximations
       f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
       wait_for_ajaximations
+
+      # the remove as leader option doesn't appear immediately and can result
+      # in selenium clicking the wrong link. wait for it to appear before clicking
+      # "Move To" to work around the issue
+      wait_for(method: nil, timeout: 2) { f('.ui-menu-item .remove-as-leader').displayed? }
+
       f(".ui-menu-item .edit-group-assignment").click
       wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
       ff(".move-select .move-select__group option").last.click
