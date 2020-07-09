@@ -2,17 +2,18 @@
 <div class='module-sequence-footer' role="navigation" aria-label="{{#t}}Module Navigation{{/t}}">
   <div class="module-sequence-footer-content">
     {{#if previous.show}}
-      <a
-        href="{{previous.url}}"
-        role="button"
-        class="Button module-sequence-footer-button--previous"
-        data-tooltip="right"
-        data-html-tooltip-title="{{previous.tooltip}}"
-        aria-describedby="msf{{instanceNumber}}-previous-desc"
-      >
-        <i class="icon-mini-arrow-left"></i>{{#t 'previous'}}Previous{{/t}}
-        <span id="msf{{instanceNumber}}-previous-desc" class="hidden" hidden>{{previous.tooltipText}}</span>
-      </a>
+      <span class="module-sequence-footer-button--previous" data-tooltip="right" data-html-tooltip-title="{{previous.tooltip}}">
+          <a
+            href="{{previous.url}}"
+            role="button"
+            class="Button"
+            aria-describedby="msf{{instanceNumber}}-previous-desc"
+            aria-label="{{#t}}Previous Module Item{{/t}}"
+          >
+            <i class="icon-mini-arrow-left"></i>{{#t 'previous'}}Previous{{/t}}
+            <span id="msf{{instanceNumber}}-previous-desc" class="hidden" hidden>{{previous.tooltipText}}</span>
+          </a>
+      </span>
     {{/if}}
 
     {{#if next.show}}
@@ -22,7 +23,8 @@
           role="button"
           class="Button"
           aria-describedby="msf{{instanceNumber}}-next-desc"
-          {{#if next.modules_tab_disabled}} aria-disabled="true" {{/if}}
+          aria-label="{{#t}}Next Module Item{{/t}}"
+            {{#if next.modules_tab_disabled}} aria-disabled="true" {{/if}}
           {{ disabledIf next.modules_tab_disabled }}
         >
           {{#t 'next'}}Next{{/t}}<i class="icon-mini-arrow-right"></i>
