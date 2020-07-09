@@ -20,10 +20,12 @@ import gql from 'graphql-tag'
 export const UPDATE_COURSE_NOTIFICATION_PREFERENCES = gql`
   mutation UpdateCourseNotificationPreferences(
     $courseId: ID!
+    $userId: ID!
     $enabled: Boolean
     $channelId: ID
     $category: NotificationCategoryType
     $frequency: NotificationFrequencyType
+    $sendScoresInEmails: Boolean
   ) {
     updateNotificationPreferences(
       input: {
@@ -33,12 +35,15 @@ export const UPDATE_COURSE_NOTIFICATION_PREFERENCES = gql`
         communicationChannelId: $channelId
         notificationCategory: $category
         frequency: $frequency
+        sendScoresInEmails: $sendScoresInEmails
+        isPolicyOverride: true
       }
     ) {
       user {
         _id
         notificationPreferencesEnabled(contextType: Course, courseId: $courseId)
         notificationPreferences {
+          sendScoresInEmails(userId: $userId)
           channels(channelId: $channelId) {
             _id
             path

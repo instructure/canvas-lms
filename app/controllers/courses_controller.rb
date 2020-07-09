@@ -2132,7 +2132,8 @@ class CoursesController < ApplicationController
       NOTIFICATION_PREFERENCES_OPTIONS: {
         granular_course_preferences_enabled: Account.site_admin.feature_enabled?(:notification_granular_course_preferences),
         deprecate_sms_enabled: !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
-        allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account)
+        allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
+        send_scores_in_emails_text: Notification.where(category: 'Grading').first&.related_user_setting(@current_user, @domain_root_account)
       }
     )
     js_bundle :course_notification_settings_show

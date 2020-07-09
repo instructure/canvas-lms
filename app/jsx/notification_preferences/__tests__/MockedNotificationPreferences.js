@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-const mockedNotificationPreferences = {
+const mockedNotificationPreferences = overrides => ({
+  sendScoresInEmails: true,
   channels: [
     {
       _id: '1',
@@ -155,7 +156,8 @@ const mockedNotificationPreferences = {
       ],
       notificationPolicyOverrides: null
     }
-  ]
-}
+  ],
+  ...overrides
+})
 
 export default mockedNotificationPreferences

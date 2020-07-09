@@ -69,34 +69,36 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
 
   argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
   argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
-  argument :context_type, NotificationPreferencesContextType, required: false
+  argument :context_type, NotificationPreferencesContextType, required: true
+
   argument :enabled, Boolean, required: false
+
+  argument :send_scores_in_emails, Boolean, required: false
+
   argument :communication_channel_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('CommunicationChannel')
   argument :notification_category, NotificationCategoryType, required: false
   argument :frequency, NotificationFrequencyType, required: false
-  argument :send_scores_in_emails, Boolean, required: false
+  argument :is_policy_override, Boolean, required: false
 
   field :user, Types::UserType, null: true
   def resolve(input:)
     validate_input(input)
     context = get_context(input)
 
-    if context && !input[:enabled].nil?
+    if !input[:enabled].nil?
       NotificationPolicyOverride.enable_for_context(current_user, context, enable: input[:enabled])
     end
 
-    if !input[:send_scores_in_emails].nil? &&
-      context &&
-      context.root_account.present? &&
-      context.root_account.settings[:allow_sending_scores_in_emails] != false
-
+    if !input[:send_scores_in_emails].nil? && context.root_account.present? && context.root_account.settings[:allow_sending_scores_in_emails] != false
       current_user.preferences[:send_scores_in_emails] = input[:send_scores_in_emails]
       current_user.save!
     end
 
-    if input[:communication_channel_id] && input[:notification_category] && input[:frequency]
+    # Because we validate the arguments for updating notification policies above we only need to
+    # check for the presence of one of the arguments needed to update notification policies
+    if input[:communication_channel_id]
       communication_channel = CommunicationChannel.find(input[:communication_channel_id])
-      if context
+      if input[:is_policy_override]
         NotificationPolicyOverride.create_or_update_for(communication_channel, input[:notification_category].tr('_', ' '), input[:frequency], context)
       else
         NotificationPolicy.find_or_update_for_category(communication_channel, input[:notification_category].tr('_', ' '), input[:frequency])
@@ -119,6 +121,21 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
       raise I18n.t('Course level notification preferences require a course_id to update') unless input[:course_id]
     elsif input[:context_type] == 'Account'
       raise I18n.t('Account level notification preferences require an account_id to update') unless input[:account_id]
+    end
+
+    validate_policy_update_input(input)
+  end
+
+  def validate_policy_update_input(input)
+    policy_update_input = [
+      input[:communication_channel_id],
+      input[:notification_category],
+      input[:frequency]
+    ]
+    # We require that the 4 arguments listed above be present in order
+    # to update notification policies or policy overrides
+    if !policy_update_input.all? && !policy_update_input.none?
+      raise I18n.t('Notification policies requires the communication channel id, the notification category, and the frequency to update')
     end
   end
 
