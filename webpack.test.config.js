@@ -18,6 +18,7 @@
 
 process.env.NODE_ENV = 'test'
 
+const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
 const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
@@ -55,7 +56,45 @@ testWebpackConfig.plugins.push(new webpack.EnvironmentPlugin({
   GIT_COMMIT: null
 }))
 
+const getAllFiles = (dirPath, arrayOfFiles, callback) => {
+  const files = fs.readdirSync(dirPath)
+
+  files.forEach(file => {
+    if (fs.statSync(dirPath + '/' + file).isDirectory()) {
+      arrayOfFiles = getAllFiles(dirPath + '/' + file, arrayOfFiles, callback)
+    } else {
+      const filePath = callback(dirPath + '/' + file)
+
+      if (filePath) {
+        arrayOfFiles.push(filePath)
+      }
+    }
+  })
+
+  return arrayOfFiles
+}
+
+const isPartitionMatch = (resource, partitions, partitionIndex) => {
+  return isNaN(partitionIndex) || partitions[partitionIndex].indexOf(resource) >= 0
+}
+
+const makeSortedPartitions = (arr, partitionCount) => {
+  const sortedArr = arr.sort()
+  const sortedArrLength = sortedArr.length
+  const chunkSize = Math.floor(sortedArrLength / partitionCount)
+  const R = []
+
+  for (let i = 0; i < sortedArrLength; i += chunkSize) {
+    R.push(sortedArr.slice(i, i + chunkSize))
+  }
+
+  return R
+}
+
 if (process.env.JSPEC_GROUP) {
+  const nodeIndex = +process.env.CI_NODE_INDEX
+  const nodeTotal = +process.env.CI_NODE_TOTAL
+
   let ignoreResource = () => {
     throw new Error(`Unknown JSPEC_GROUP ${process.env.JSPEC_GROUP}`)
   }
@@ -75,13 +114,30 @@ if (process.env.JSPEC_GROUP) {
       )
     }
   } else if (process.env.JSPEC_GROUP === 'jsg') {
+    let partitions = null
+
+    if (!isNaN(nodeIndex) && !isNaN(nodeTotal)) {
+      const allFiles = getAllFiles(CONTEXT_JSX_SPEC, [], filePath => {
+        const relativePath = filePath.replace(CONTEXT_JSX_SPEC, '.').replace(/\.js$/, '')
+
+        return RESOURCE_JSG_SPLIT_SPEC.test(relativePath) ? relativePath : null
+      })
+
+      partitions = makeSortedPartitions(allFiles, nodeTotal)
+    }
+
     ignoreResource = (resource, context) => {
       return (
         context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) ||
         context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) ||
         (context.endsWith(CONTEXT_JSX_SPEC) &&
           RESOURCE_JSX_SPEC.test(resource) &&
-          !RESOURCE_JSG_SPLIT_SPEC.test(resource))
+          !RESOURCE_JSG_SPLIT_SPEC.test(resource)) ||
+        (partitions &&
+          context.endsWith(CONTEXT_JSX_SPEC) &&
+          RESOURCE_JSX_SPEC.test(resource) &&
+          RESOURCE_JSG_SPLIT_SPEC.test(resource) &&
+          !isPartitionMatch(resource, partitions, nodeIndex))
       )
     }
   } else if (process.env.JSPEC_GROUP === 'jsh') {

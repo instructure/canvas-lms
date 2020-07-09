@@ -20,9 +20,31 @@
 
 library "canvas-builds-library"
 
+def DEFAULT_NODE_COUNT = 1
+def JSG_NODE_COUNT = 3
+
 def copyFiles(dockerName, dockerPath, hostPath) {
   sh "mkdir -vp ./$hostPath"
   sh "docker cp \$(docker ps -qa -f name=$dockerName):/usr/src/app/$dockerPath ./$hostPath"
+}
+
+def makeKarmaStage(group, ciNode, ciTotal) {
+  return {
+    withEnv([
+      "CI_NODE_INDEX=${ciNode}",
+      "CI_NODE_TOTAL=${ciTotal}",
+      "CONTAINER_NAME=tests-karma-${group}-${ciNode}",
+      "JSPEC_GROUP=${group}"
+    ]) {
+      try {
+        credentials.withSentryCredentials {
+          sh 'build/new-jenkins/js/tests-karma.sh'
+        }
+      } finally {
+        copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+      }
+    }
+  }
 }
 
 pipeline {
@@ -86,18 +108,12 @@ pipeline {
                 sh 'build/new-jenkins/js/tests-quizzes.sh'
               }
 
-              ['coffee', 'jsa', 'jsg', 'jsh'].each { group ->
-                tests["Karma - Spec Group - ${group}"] = {
-                  withEnv(["CONTAINER_NAME=tests-karma-${group}", "JSPEC_GROUP=${group}"]) {
-                    try {
-                      credentials.withSentryCredentials {
-                        sh 'build/new-jenkins/js/tests-karma.sh'
-                      }
-                    } finally {
-                      copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-                    }
-                  }
-                }
+              for(int i = 0; i < JSG_NODE_COUNT; i++) {
+                tests["Karma - Spec Group - jsg${i}"] = makeKarmaStage('jsg', i, JSG_NODE_COUNT)
+              }
+
+              ['coffee', 'jsa', 'jsh'].each { group ->
+                tests["Karma - Spec Group - ${group}"] = makeKarmaStage(group, 0, DEFAULT_NODE_COUNT)
               }
             }
 
