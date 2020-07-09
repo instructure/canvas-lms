@@ -74,6 +74,7 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
   argument :communication_channel_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('CommunicationChannel')
   argument :notification_category, NotificationCategoryType, required: false
   argument :frequency, NotificationFrequencyType, required: false
+  argument :send_scores_in_emails, Boolean, required: false
 
   field :user, Types::UserType, null: true
   def resolve(input:)
@@ -84,12 +85,21 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
       NotificationPolicyOverride.enable_for_context(current_user, context, enable: input[:enabled])
     end
 
+    if !input[:send_scores_in_emails].nil? &&
+      context &&
+      context.root_account.present? &&
+      context.root_account.settings[:allow_sending_scores_in_emails] != false
+
+      current_user.preferences[:send_scores_in_emails] = input[:send_scores_in_emails]
+      current_user.save!
+    end
+
     if input[:communication_channel_id] && input[:notification_category] && input[:frequency]
       communication_channel = CommunicationChannel.find(input[:communication_channel_id])
       if context
-        NotificationPolicyOverride.create_or_update_for(communication_channel, input[:notification_category].gsub('_', ' '), input[:frequency], context)
+        NotificationPolicyOverride.create_or_update_for(communication_channel, input[:notification_category].tr('_', ' '), input[:frequency], context)
       else
-        NotificationPolicy.find_or_update_for_category(communication_channel, input[:notification_category].gsub('_', ' '), input[:frequency])
+        NotificationPolicy.find_or_update_for_category(communication_channel, input[:notification_category].tr('_', ' '), input[:frequency])
       end
     end
 

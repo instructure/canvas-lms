@@ -36,7 +36,9 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     enabled: nil,
     communication_channel_id: nil,
     notification_category: nil,
-    frequency: nil
+    frequency: nil,
+    user_id: nil,
+    send_scores_in_emails: nil
   )
     <<~GQL
       mutation {
@@ -48,9 +50,15 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
           #{"communicationChannelId: #{communication_channel_id}" if communication_channel_id}
           #{"notificationCategory: #{notification_category}" if notification_category}
           #{"frequency: #{frequency}" if frequency}
+          #{"sendScoresInEmails: #{send_scores_in_emails}" unless send_scores_in_emails.nil?}
         }) {
           user {
-            #{notification_preferences_str(account_id: account_id, course_id: course_id, context_type: context_type)}
+            #{notification_preferences_str(
+              account_id: account_id,
+              course_id: course_id,
+              context_type: context_type,
+              user_id: user_id
+            )}
           }
           errors {
             message
@@ -63,7 +71,8 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
   def notification_preferences_str(
     account_id: nil,
     course_id: nil,
-    context_type: nil
+    context_type: nil,
+    user_id: nil
   )
     <<~GQL
       #{"notificationPreferencesEnabled(
@@ -72,6 +81,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         #{"accountId: #{account_id}" if account_id}
       )" if context_type && (course_id || account_id)}
       notificationPreferences {
+        #{"sendScoresInEmails(userId: #{user_id})" if user_id}
         channels {
           #{"notificationPolicyOverrides(
             contextType: #{context_type},
@@ -101,6 +111,30 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
   def run_mutation(opts = {}, current_user = @teacher)
     result = CanvasSchema.execute(mutation_str(opts), context: {current_user: current_user, request: ActionDispatch::TestRequest.create})
     result.to_h.with_indifferent_access
+  end
+
+  it 'sets the send_scores_in_emails setting' do
+    result = run_mutation(
+      user_id: @teacher.id,
+      account_id: @account.id,
+      context_type: 'Account',
+      send_scores_in_emails: true
+    )
+    expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+    expect(result.dig(
+      :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
+    )).to be true
+
+    result = run_mutation(
+      user_id: @teacher.id,
+      account_id: @account.id,
+      context_type: 'Account',
+      send_scores_in_emails: false
+    )
+    expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+    expect(result.dig(
+      :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
+    )).to be false
   end
 
   context 'course' do

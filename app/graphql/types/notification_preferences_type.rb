@@ -27,5 +27,14 @@ module Types
       return object[:channels] unless channel_id
       object[:channels].select { |cc| cc.id == channel_id.to_i }
     end
+
+    field :send_scores_in_emails, Boolean, null: true do
+      argument :user_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('User')
+    end
+    def send_scores_in_emails(user_id:)
+      user = User.find(user_id)
+      # send_scores_in_emails can be nil and we want the default to be false if unset
+      user.preferences[:send_scores_in_emails] == true
+    end
   end
 end
