@@ -23,6 +23,24 @@ Delayed::Backend::Base.class_eval do
   def current_shard
     @current_shard || Shard.birth
   end
+
+  def root_account_id
+    return nil if account_id.nil? || account.nil?
+    account.root_account_id.nil? ? account.id : account.root_account_id
+  end
+
+  def to_log_format
+    logged_attributes = [:tag, :strand, :priority, :attempts, :created_at, :max_attempts, :source, :account_id]
+    log_hash = attributes.with_indifferent_access.slice(*logged_attributes)
+    log_hash[:shard_id] = current_shard&.id
+    log_hash[:jobs_cluster] = "NONE"
+    if current_shard.respond_to?(:delayed_jobs_shard_id)
+      log_hash[:jobs_cluster] = current_shard&.delayed_jobs_shard&.id
+    end
+    log_hash[:db_cluster] = current_shard&.database_server&.id
+    log_hash[:root_account_id] = Shard.global_id_for(root_account_id)
+    log_hash.with_indifferent_access.to_json
+  end
 end
 
 # if the method was defined by a previous module, use the existing
@@ -39,23 +57,19 @@ end
 Delayed::Backend::ActiveRecord::Job.include(Delayed::Backend::DefaultJobAccount)
 Delayed::Backend::Redis::Job.include(Delayed::Backend::DefaultJobAccount)
 
-Delayed::Settings.max_attempts              = 1
-Delayed::Settings.queue                     = "canvas_queue"
-Delayed::Settings.sleep_delay               = ->{ Setting.get('delayed_jobs_sleep_delay', '2.0').to_f }
-Delayed::Settings.sleep_delay_stagger       = ->{ Setting.get('delayed_jobs_sleep_delay_stagger', '2.0').to_f }
-Delayed::Settings.fetch_batch_size          = ->{ Setting.get('jobs_get_next_batch_size', '5').to_i }
-Delayed::Settings.select_random_from_batch  = ->{ Setting.get('jobs_select_random', 'false') == 'true' }
-Delayed::Settings.num_strands               = ->(strand_name){ Setting.get("#{strand_name}_num_strands", nil) }
-Delayed::Settings.worker_procname_prefix    = ->{ "#{Shard.current(:delayed_jobs).id}~" }
-Delayed::Settings.pool_procname_suffix      = " (#{Canvas.revision})" if Canvas.revision
-Delayed::Settings.worker_health_check_type  = Delayed::CLI.instance&.config&.dig('health_check', 'type')&.to_sym || :none
+Delayed::Settings.default_job_options        = ->{ { current_shard: Shard.current }}
+Delayed::Settings.fetch_batch_size           = ->{ Setting.get('jobs_get_next_batch_size', '5').to_i }
+Delayed::Settings.job_detailed_log_format    = ->(job){ job.to_log_format }
+Delayed::Settings.max_attempts               = 1
+Delayed::Settings.num_strands                = ->(strand_name){ Setting.get("#{strand_name}_num_strands", nil) }
+Delayed::Settings.pool_procname_suffix       = " (#{Canvas.revision})" if Canvas.revision
+Delayed::Settings.queue                      = "canvas_queue"
+Delayed::Settings.select_random_from_batch   = ->{ Setting.get('jobs_select_random', 'false') == 'true' }
+Delayed::Settings.sleep_delay                = ->{ Setting.get('delayed_jobs_sleep_delay', '2.0').to_f }
+Delayed::Settings.sleep_delay_stagger        = ->{ Setting.get('delayed_jobs_sleep_delay_stagger', '2.0').to_f }
+Delayed::Settings.worker_procname_prefix     = ->{ "#{Shard.current(:delayed_jobs).id}~" }
+Delayed::Settings.worker_health_check_type   = Delayed::CLI.instance&.config&.dig('health_check', 'type')&.to_sym || :none
 Delayed::Settings.worker_health_check_config = Delayed::CLI.instance&.config&.[]('health_check')
-
-Delayed::Settings.default_job_options = ->{
-  {
-    current_shard: Shard.current,
-  }
-}
 
 # load our periodic_jobs.yml (cron overrides config file)
 Delayed::Periodic.add_overrides(ConfigFile.load('periodic_jobs').dup || {})
