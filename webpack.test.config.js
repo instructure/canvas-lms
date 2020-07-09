@@ -22,7 +22,30 @@ const path = require('path')
 const webpack = require('webpack')
 const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
 
+const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
+const CONTEXT_EMBER_GRADEBOOK_SPEC = 'app/coffeescripts/ember'
+const CONTEXT_JSX_SPEC = 'spec/javascripts/jsx'
+
+const RESOURCE_COFFEESCRIPT_SPEC = /Spec.(coffee|js)$/
+const RESOURCE_EMBER_GRADEBOOK_SPEC = /\.spec.js$/
+const RESOURCE_JSX_SPEC = /Spec$/
+
+const RESOURCE_JSA_SPLIT_SPEC = /^\.\/[a-f].*Spec$/
+const RESOURCE_JSG_SPLIT_SPEC = /^\.\/g.*Spec$/
+const RESOURCE_JSH_SPLIT_SPEC = /^\.\/[h-z].*Spec$/
+
 testWebpackConfig.entry = undefined
+
+testWebpackConfig.plugins.push(
+  new webpack.DefinePlugin({
+    CONTEXT_COFFEESCRIPT_SPEC: JSON.stringify(CONTEXT_COFFEESCRIPT_SPEC),
+    CONTEXT_EMBER_GRADEBOOK_SPEC: JSON.stringify(CONTEXT_EMBER_GRADEBOOK_SPEC),
+    CONTEXT_JSX_SPEC: JSON.stringify(CONTEXT_JSX_SPEC),
+    RESOURCE_COFFEESCRIPT_SPEC,
+    RESOURCE_EMBER_GRADEBOOK_SPEC,
+    RESOURCE_JSX_SPEC
+  })
+)
 
 testWebpackConfig.plugins.push(new webpack.EnvironmentPlugin({
   JSPEC_PATH: null,
@@ -31,6 +54,54 @@ testWebpackConfig.plugins.push(new webpack.EnvironmentPlugin({
   SENTRY_DSN: null,
   GIT_COMMIT: null
 }))
+
+if (process.env.JSPEC_GROUP) {
+  let ignoreResource = () => {
+    throw new Error(`Unknown JSPEC_GROUP ${process.env.JSPEC_GROUP}`)
+  }
+
+  if (process.env.JSPEC_GROUP === 'coffee') {
+    ignoreResource = (resource, context) => {
+      return context.endsWith(CONTEXT_JSX_SPEC) && RESOURCE_JSX_SPEC.test(resource)
+    }
+  } else if (process.env.JSPEC_GROUP === 'jsa') {
+    ignoreResource = (resource, context) => {
+      return (
+        context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) ||
+        context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) ||
+        (context.endsWith(CONTEXT_JSX_SPEC) &&
+          RESOURCE_JSX_SPEC.test(resource) &&
+          !RESOURCE_JSA_SPLIT_SPEC.test(resource))
+      )
+    }
+  } else if (process.env.JSPEC_GROUP === 'jsg') {
+    ignoreResource = (resource, context) => {
+      return (
+        context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) ||
+        context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) ||
+        (context.endsWith(CONTEXT_JSX_SPEC) &&
+          RESOURCE_JSX_SPEC.test(resource) &&
+          !RESOURCE_JSG_SPLIT_SPEC.test(resource))
+      )
+    }
+  } else if (process.env.JSPEC_GROUP === 'jsh') {
+    ignoreResource = (resource, context) => {
+      return (
+        context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) ||
+        context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) ||
+        (context.endsWith(CONTEXT_JSX_SPEC) &&
+          RESOURCE_JSX_SPEC.test(resource) &&
+          !RESOURCE_JSH_SPLIT_SPEC.test(resource))
+      )
+    }
+  }
+
+  testWebpackConfig.plugins.push(
+    new webpack.IgnorePlugin({
+      checkResource: ignoreResource
+    })
+  )
+}
 
 if (process.env.SENTRY_DSN) {
   const SentryCliPlugin = require('@sentry/webpack-plugin');
@@ -50,6 +121,9 @@ if (process.env.SENTRY_DSN) {
   }));
 }
 
+testWebpackConfig.resolve.alias[CONTEXT_EMBER_GRADEBOOK_SPEC] = path.resolve(__dirname, CONTEXT_EMBER_GRADEBOOK_SPEC)
+testWebpackConfig.resolve.alias[CONTEXT_COFFEESCRIPT_SPEC] = path.resolve(__dirname, CONTEXT_COFFEESCRIPT_SPEC)
+testWebpackConfig.resolve.alias[CONTEXT_JSX_SPEC] = path.resolve(__dirname, CONTEXT_JSX_SPEC)
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
 testWebpackConfig.mode = 'development'
 testWebpackConfig.module.rules.unshift({
