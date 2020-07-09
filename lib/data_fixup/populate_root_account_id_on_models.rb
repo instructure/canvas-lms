@@ -88,7 +88,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       GroupCategory => :context,
       GroupMembership => :group,
       LatePolicy => :course,
-      LearningOutcome => :content_tag, # dependency, but not association
+      LearningOutcome => [], # no associations, only dependencies
       LearningOutcomeGroup => :context,
       LearningOutcomeQuestionResult => :learning_outcome_result,
       LearningOutcomeResult => :context,
@@ -126,6 +126,14 @@ module DataFixup::PopulateRootAccountIdOnModels
     }.freeze
   end
 
+  # these are non-association dependencies
+  def self.dependencies
+    {
+      AssetUserAccess => [:attachment, :calendar_event],
+      LearningOutcome => :content_tag,
+    }.freeze
+  end
+
   # for special case tables that populate root_account_id in a different
   # way than the normal tables above, but still would like access to the
   # job cycle this backfill provides
@@ -133,11 +141,13 @@ module DataFixup::PopulateRootAccountIdOnModels
   # Each key points to a code module. This module is expected to have a
   # `populate` method that takes `(table, assoc, min, max)`.
   #
-  # Tables that are listed here may list their dependencies in the
-  # `migration_tables` hash above.
+  # Tables that are listed here must be also listed in the `migration_tables`
+  # hash above, and may list their non-association dependencies in the
+  # `dependencies` hash above.
   def self.populate_overrides
     {
-      LearningOutcome => DataFixup::PopulateRootAccountIdsOnLearningOutcomes
+      AssetUserAccess => DataFixup::PopulateRootAccountIdOnAssetUserAccesses,
+      LearningOutcome => DataFixup::PopulateRootAccountIdsOnLearningOutcomes,
     }.freeze
   end
 
@@ -154,14 +164,16 @@ module DataFixup::PopulateRootAccountIdOnModels
     clean_and_filter_tables.each do |table, assoc|
       table.find_ids_in_ranges(batch_size: 100_000) do |min, max|
         # default populate method
-        unless populate_overrides.key?(table)
+        unless assoc.empty?
           self.send_later_if_production_enqueue_args(:populate_root_account_ids,
           {
             priority: Delayed::MAX_PRIORITY,
             n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
           },
           table, assoc, min, max)
-        else
+        end
+
+        if populate_overrides.key?(table)
           # allow for one or more override methods of population
           Array(populate_overrides[table]).each do |override_module|
             self.send_later_if_production_enqueue_args(:populate_root_account_ids_override,
@@ -195,7 +207,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       association_hash = hash_association(assoc)
       direct_relation_associations = replace_polymorphic_associations(table, association_hash)
       check_if_table_has_root_account(table, direct_relation_associations.keys) ? complete_tables << table && next : incomplete_tables << table
-      prereqs_ready = direct_relation_associations.keys.all? do |a|
+      prereqs_ready = (direct_relation_associations.keys + Array(dependencies[table])).all? do |a|
         class_name = table.reflections[a.to_s]&.class_name&.constantize || a.to_s.classify.safe_constantize
         if (complete_tables + DONE_TABLES).include?(class_name)
           true
@@ -286,7 +298,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   # thus allowing us to pretend the Attachments table has been backfilled where necessary
   def self.check_if_table_has_root_account(class_name, associations=[])
     return false if class_name.column_names.exclude?(get_column_name(class_name))
-    if associations.blank?
+    if associations.blank? || dependencies.key?(class_name)
       return unfillable_tables.include?(class_name) ||
         empty_root_account_column_scope(class_name).none?
     end
