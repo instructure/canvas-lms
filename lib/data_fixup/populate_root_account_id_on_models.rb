@@ -100,11 +100,11 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   # tables that have been filled for a while already
-  DONE_TABLES = [Account, Assignment, Course, Enrollment].freeze
+  DONE_TABLES = [Account, Assignment, Course, Group, Enrollment].freeze
 
   def self.run
     clean_and_filter_tables.each do |table, assoc|
-      table.where(root_account_id: nil).find_ids_in_ranges(batch_size: 100_000) do |min, max|
+      table.find_ids_in_ranges(batch_size: 100_000) do |min, max|
         self.send_later_if_production_enqueue_args(:populate_root_account_ids,
           {
             priority: Delayed::MAX_PRIORITY,
@@ -244,7 +244,9 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.unlock_next_backfill_job(table)
     # when the current table has been fully backfilled, restart the backfill job
     # so it can check to see if any new tables can begin working based off of this table
-    if table.where(root_account_id: nil).none?
+    if table.where(root_account_id: nil).none? &&
+      Delayed::Job.where(strand: ["root_account_id_backfill_strand", Shard.current.database_server.id].to_s,
+        locked_at: nil).count <= 0
       self.send_later_if_production_enqueue_args(:run, {
         priority: Delayed::LOWER_PRIORITY,
         strand: ["root_account_id_backfill_strand", Shard.current.database_server.id]
