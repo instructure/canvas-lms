@@ -152,6 +152,7 @@ export default class PublishButton extends Backbone.View
   # render
 
   render: ->
+    @$el.attr 'role', 'button'
     @$el.attr 'tabindex', '0'
     @$el.html '<i></i><span class="publish-text"></span>'
     @cacheEls()
