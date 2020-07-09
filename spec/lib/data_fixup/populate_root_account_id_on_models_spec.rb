@@ -114,6 +114,18 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(auag.reload.root_account_id).to eq @course.root_account_id
     end
 
+    it 'should populate the root_account_id on AssetUserAccess with user context' do
+      auac = AssetUserAccess.create!(context: @course, user: @user)
+      auac.update_columns(root_account_id: nil)
+
+      aua = AssetUserAccess.create!(context: @user, user: @user, asset_code: @course.asset_string)
+      aua.update_columns(root_account_id: nil)
+      expect(aua.reload.root_account_id).to eq nil
+
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(aua.reload.root_account_id).to eq @course.root_account_id
+    end
+
     it 'should populate the root_account_id on AssignmentGroup' do
       ag = @course.assignment_groups.create!(name: 'AssignmentGroup!')
       ag.update_columns(root_account_id: nil)
@@ -846,6 +858,24 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:send_later_if_production_enqueue_args)
       DataFixup::PopulateRootAccountIdOnModels.run
     end
+
+    it 'should create delayed jobs for override methods for the table' do
+      ContextModule.delete_all
+      LearningOutcome.create!(context: @course, short_description: "test")
+      LearningOutcome.update_all(root_account_ids: nil)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override)
+      expect(DataFixup::PopulateRootAccountIdOnModels).not_to receive(:populate_root_account_ids)
+      DataFixup::PopulateRootAccountIdOnModels.run
+    end
+
+    it 'should create multiple delayed jobs for tables with default and override methods' do
+      ContextModule.delete_all
+      AssetUserAccess.create!(context: @user, asset_code: @course.asset_string)
+      AssetUserAccess.update_all(root_account_id: nil)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override)
+      DataFixup::PopulateRootAccountIdOnModels.run
+    end
   end
 
   describe '#clean_and_filter_tables' do
@@ -1075,6 +1105,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(LearningOutcome)).to be true
       LearningOutcome.update_all(root_account_ids: nil)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(LearningOutcome)).to be false
+    end
+
+    it 'should check the whole table if there are non-association dependencies' do
+      AssetUserAccess.create!(context: user_model, asset_code: @course.asset_string, root_account_id: @course.root_account_id)
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(AssetUserAccess)).to be true
+      AssetUserAccess.update_all(root_account_id: nil)
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(AssetUserAccess)).to be false
     end
   end
 
