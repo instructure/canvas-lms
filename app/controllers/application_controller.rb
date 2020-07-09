@@ -44,6 +44,7 @@ class ApplicationController < ActionController::Base
   around_action :enable_request_cache
   around_action :batch_statsd
   around_action :report_to_datadog
+  around_action :compute_http_cost
 
   helper :all
 
@@ -547,6 +548,16 @@ class ApplicationController < ActionController::Base
 
   def batch_statsd(&block)
     InstStatsd::Statsd.batch(&block)
+  end
+
+  def compute_http_cost(&block)
+    CanvasHttp.reset_cost!
+    yield
+  ensure
+    if CanvasHttp.cost > 0
+      cost_weight = Setting.get('canvas_http_cost_weight', '1.0').to_f
+      increment_request_cost(CanvasHttp.cost * cost_weight)
+    end
   end
 
   def report_to_datadog(&block)

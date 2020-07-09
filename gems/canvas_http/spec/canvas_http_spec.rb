@@ -61,9 +61,10 @@ describe "CanvasHttp" do
       expect(CanvasHttp.post(url, body: body).code).to eq "200"
       logs = CanvasHttp.logger.messages
       expect(logs.size).to eq(3)
-      expect(logs[0][:message]).to eq("CANVAS_HTTP START REQUEST CHAIN | method: Net::HTTP::Post | url: www.example.com/a")
-      expect(logs[1][:message]).to eq("CANVAS_HTTP INITIATE REQUEST | url: www.example.com/a")
-      expect(logs[2][:message]).to eq("CANVAS_HTTP RESOLVE RESPONSE | url: www.example.com/a")
+      expect(logs[0][:message] =~ /CANVAS_HTTP START REQUEST CHAIN | method: Net::HTTP::Post/).to be_truthy
+      expect(logs[0][:message] =~ /| elapsed: \d/).to be_truthy
+      expect(logs[1][:message] =~ /CANVAS_HTTP INITIATE REQUEST | url: www.example.com/).to be_truthy
+      expect(logs[2][:message] =~ /CANVAS_HTTP RESOLVE RESPONSE | url: www.example.com/).to be_truthy
     end
 
     it "allows you to set a content_type" do
@@ -109,6 +110,15 @@ describe "CanvasHttp" do
       CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
 
       assert_requested(stubbed)
+    end
+
+    it "tracks the cost" do
+      url = "www.example.com/a"
+      stub_request(:get, url).to_return(status: 200)
+      CanvasHttp.reset_cost!
+      expect(CanvasHttp.cost).to eq(0)
+      expect(CanvasHttp.get(url).code).to eq "200"
+      expect(CanvasHttp.cost > 0).to be_truthy
     end
   end
 

@@ -1983,3 +1983,44 @@ RSpec.describe ApplicationController, '#teardown_live_events_context' do
     expect(Thread.current[:live_events_ctx]).to be_nil
   end
 end
+
+RSpec.describe ApplicationController, '#compute_http_cost' do
+  include WebMock::API
+
+  controller do
+    def index
+      if params[:do_http].to_i > 0
+        CanvasHttp.get("http://www.example.com/test")
+      end
+      if params[:do_error].to_i > 0
+        raise StandardError, "Test Error Handling"
+      end
+      render json: [{}]
+    end
+  end
+
+  it "has no cost for non http actions" do
+    get :index, params: { do_http: 0, do_error: 0 }
+    expect(response).to have_http_status :success
+    expect(CanvasHttp.cost).to eq(0)
+    expect(controller.request.env['extra-request-cost']).to be_nil
+  end
+
+  it "has some cost for http actions" do
+    stub_request(:get, "http://www.example.com/test").
+      to_return(status: 200, body: "", headers: {})
+    get :index, params: { do_http: 1, do_error: 0 }
+    expect(response).to have_http_status :success
+    expect(CanvasHttp.cost > 0).to be_truthy
+    expect(controller.request.env['extra-request-cost']).to eq(CanvasHttp.cost)
+  end
+
+  it "tracks costs through errors" do
+    stub_request(:get, "http://www.example.com/test").
+      to_return(status: 200, body: "", headers: {})
+    get :index, params: { do_http: 1, do_error: 1 }
+    expect(response).to have_http_status 500
+    expect(CanvasHttp.cost > 0).to be_truthy
+    expect(controller.request.env['extra-request-cost']).to eq(CanvasHttp.cost)
+  end
+end

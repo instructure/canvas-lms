@@ -72,6 +72,7 @@ module CanvasHttp
     last_scheme = nil
     last_host = nil
     current_host = nil
+    request_cost = 0
     logger.info("CANVAS_HTTP START REQUEST CHAIN | method: #{request_class} | url: #{url_str}")
     loop do
       raise(TooManyRedirectsError) if redirect_limit <= 0
@@ -88,16 +89,20 @@ module CanvasHttp
 
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       logger.info("CANVAS_HTTP INITIATE REQUEST | url: #{url_str}")
+      start_time = Time.now
       http.request(request) do |response|
+        end_time = Time.now
+        elapsed_time = (end_time - start_time) * 1000 # milliseconds
+        request_cost += elapsed_time
         if response.is_a?(Net::HTTPRedirection) && !response.is_a?(Net::HTTPNotModified)
           redirect_spy.call(response) if redirect_spy.is_a?(Proc)
           last_host = uri.host
           last_scheme = uri.scheme
           url_str = response['Location']
-          logger.info("CANVAS_HTTP CONSUME REDIRECT | url: #{url_str}")
+          logger.info("CANVAS_HTTP CONSUME REDIRECT | url: #{url_str} | elapsed: #{elapsed_time}")
           redirect_limit -= 1
         else
-          logger.info("CANVAS_HTTP RESOLVE RESPONSE | url: #{url_str}")
+          logger.info("CANVAS_HTTP RESOLVE RESPONSE | url: #{url_str} | elapsed: #{elapsed_time}")
           if block_given?
             yield response
           else
@@ -112,6 +117,8 @@ module CanvasHttp
   rescue Net::ReadTimeout, Net::OpenTimeout
     CircuitBreaker.trip_if_necessary(current_host)
     raise
+  ensure
+    increment_cost(request_cost)
   end
 
   def self.add_form_data(request, form_data, multipart:, streaming:)
@@ -206,6 +213,16 @@ module CanvasHttp
 
   class << self
     attr_writer :open_timeout, :read_timeout, :blocked_ip_filters, :logger
+    attr_accessor :cost
+
+    def reset_cost!
+      self.cost = 0
+    end
+
+    def increment_cost(amount)
+      self.cost ||= 0
+      self.cost += amount
+    end
   end
 
   # returns a tempfile with a filename based on the uri (same extension, if
