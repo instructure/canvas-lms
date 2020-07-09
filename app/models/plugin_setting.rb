@@ -63,6 +63,7 @@ class PluginSetting < ActiveRecord::Base
     return unless settings && self.plugin
     @valid_settings = true
     if self.plugin.encrypted_settings
+      was_dirty = self.changed?
       self.plugin.encrypted_settings.each do |key|
         if settings["#{key}_enc".to_sym]
           begin
@@ -73,6 +74,8 @@ class PluginSetting < ActiveRecord::Base
           settings[key] = DUMMY_STRING
         end
       end
+      # We shouldn't consider a plugin setting to be dirty if all that changed were the decrypted/placeholder attributes
+      self.clear_changes_information unless was_dirty
     end
   end
 
