@@ -184,7 +184,14 @@ module Canvas::Redis
         host: location,
       }
       unless NON_KEY_COMMANDS.include?(command)
-        message[:key] = request.first
+        if command == :mset
+          # This is an array with a single element: an array alternating key/values
+          message[:key] = request.first { |v| v.first }.select.with_index { |_,i| (i) % 2 == 0 }
+        elsif command == :mget
+          message[:key] = request
+        else
+          message[:key] = request.first
+        end
       end
       if defined?(Marginalia)
         message[:controller] = Marginalia::Comment.controller
