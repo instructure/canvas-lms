@@ -348,7 +348,6 @@
                           <button
                             type="button"
                             class="Button Button--icon-action"
-                            aria-label="<%= t("Remove Pronouns %{pronoun}", :pronoun => pronouns) %>"
                             title="<%= t("Remove Pronouns %{pronoun}", :pronoun => pronouns) %>"
                             onclick="$(this).closest('.pronouns_row').remove()"
                           >
@@ -434,16 +433,26 @@
                     <td> <label> <%= t("Name:") %></label> <input aria-label="<%= t("Name") %>" type="text" class="name" value="<%= name %>"/></td>
                     <td>
                       <label> <%= t("Filter:") %></label> <input aria-label="<%= t("Filter") %>" type="text" class="value" value="<%= filter %>" maxlength="255"/>
-                      <a href="#" title="<%= t(:quiz_ip_filters_delete, "Remove Filter") %>" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
+                      <button
+                        type="button"
+                        class="Button Button--icon-action delete_filter_link"
+                        title="<%= t(:quiz_ip_filters_delete, "Remove Quiz IP Filter") %>"
+                      >
+                        <i class="icon-end standalone-icon"></i>
+                      </button>
                     </td>
                   </tr>
                 <% end %>
               </tbody>
             </table>
-            <a href="#" class="icon-add add_ip_filter_link">
+            <button
+              type="button"
+              class="Button add_ip_filter_link"
+              title="<%= t("Add Quiz IP Filter") %>"
+            >
+              <i class='icon-add'></i>
               <span aria-hidden="true"><%= t(:add_ip_filter_link, "Filter") %></span>
-              <span class="screenreader-only"><%= t("Add Quiz IP Filter") %></span>
-            </a>
+            </button>
           </fieldset>
         <% end %>
 
