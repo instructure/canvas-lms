@@ -1832,4 +1832,12 @@ describe Quizzes::QuizSubmission do
       expect(quiz_submission).to be_posted
     end
   end
+
+  context 'root_account_id' do
+    before(:each) { quiz_with_graded_submission([]) }
+
+    it "uses root_account value from account" do
+      expect(@quiz_submission.root_account_id).to eq Account.default.id
+    end
+  end
 end
