@@ -2,7 +2,13 @@
   <td role="gridcell" class='not_clickable'>
     {{#unless cannot_delete_by_master_course}}
       {{#if CAN.DELETE}}
-        <input type="checkbox" class="select-page-checkbox" {{#unless deletable}}disabled{{/unless}} value="{{url}}" />
+        <input
+          type="checkbox"
+          class="select-page-checkbox"
+          aria-label="{{#t}}Select {{title}} for deletion{{/t}}"
+          {{#unless deletable}}disabled{{/unless}}
+          value="{{url}}"
+        />
       {{/if}}
     {{/unless}}
   </td>
