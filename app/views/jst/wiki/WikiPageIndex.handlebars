@@ -6,7 +6,9 @@
       <div class="header-bar-right">
         {{#if BULK_DELETE_ENABLED}}
           {{#if CAN.MANAGE}}
-            <a class="btn icon-trash delete_pages" tabindex="0" role="button" aria-label="{{#t}}Delete selected pages{{/t}}" disabled></a>
+            <button class="btn delete_pages" tabindex="0" aria-label="{{#t}}Delete selected pages{{/t}}" disabled>
+              <i class="icon-trash" role="presentation" />
+            </button>
           {{/if}}
         {{/if}}
         {{#if CAN.CREATE}}
