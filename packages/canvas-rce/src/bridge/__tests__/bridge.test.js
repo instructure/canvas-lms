@@ -74,6 +74,7 @@ describe('Editor/Sidebar bridge', () => {
     beforeEach(() => {
       jest.spyOn(console, 'warn')
       editor = {
+        id: 'editor_id',
         addAlert: jest.fn(),
         insertLink: jest.fn(),
         insertVideo: jest.fn(),
@@ -124,7 +125,8 @@ describe('Editor/Sidebar bridge', () => {
 
       it('calls hideTray after inserting a link', () => {
         const hideTray = jest.fn()
-        Bridge.attachController({hideTray})
+        Bridge.focusEditor({id: 'editor_id'})
+        Bridge.attachController({hideTray}, 'editor_id')
         Bridge.focusEditor(editor)
         Bridge.insertLink({})
         expect(hideTray).toHaveBeenCalledTimes(1)
@@ -176,7 +178,7 @@ describe('Editor/Sidebar bridge', () => {
       let hideTray
       beforeEach(() => {
         hideTray = jest.fn()
-        Bridge.attachController({hideTray})
+        Bridge.attachController({hideTray}, 'editor_id')
         Bridge.focusEditor(editor)
       })
 

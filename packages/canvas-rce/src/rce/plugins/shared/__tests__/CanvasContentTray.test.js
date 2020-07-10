@@ -34,6 +34,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
   function getProps(override = {}) {
     props = {
       bridge: new Bridge(),
+      editor: {id: 'editor_id'},
       containingContext: {type: 'course', contextId: '1201', userId: '17'},
       contextId: '1201',
       contextType: 'course',
@@ -58,7 +59,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
 
   async function showTrayForPlugin(plugin) {
     act(() => {
-      props.bridge.controller.showTrayForPlugin(plugin)
+      props.bridge.showTrayForPlugin(plugin, 'editor_id')
     })
     await wait(getTray, {timeout: 19500})
   }
