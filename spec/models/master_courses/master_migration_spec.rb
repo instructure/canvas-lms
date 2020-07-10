@@ -848,6 +848,32 @@ describe MasterCourses::MasterMigration do
       expect(att2_to.reload).to be_available # should be restored because it hadn't been deleted manually
     end
 
+    it "doesn't sync new files into an old deleted folder with the same name" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      @root_folder = Folder.root_folders(@copy_from).first
+      @folder_to_delete = @root_folder.sub_folders.create!(:name => "nowyouseeme", :context => @copy_from)
+      @att1 = Attachment.create!(:filename => 'file1.txt', :uploaded_data => StringIO.new('1'),
+        :folder => @folder_to_delete, :context => @copy_from)
+
+      run_master_migration
+      @att1_to = @copy_to.attachments.where(:migration_id => mig_id(@att1)).first
+      expect(@att1_to).to be_present
+
+      Timecop.freeze(1.minute.from_now) do
+        @att1.update_attribute(:folder, @root_folder)
+        @folder_to_delete.destroy
+        @replacement_folder = @root_folder.sub_folders.create!(:name => "nowyouseeme", :context => @copy_from)
+        @att1.update_attribute(:folder, @replacement_folder)
+      end
+      run_master_migration
+
+      @att1_to.reload
+      expect(@att1_to).to_not be_deleted
+      expect(@att1_to.folder).to_not be_deleted
+    end
+
     it "limits the number of items to track" do
       Setting.set('master_courses_history_count', '2')
 
