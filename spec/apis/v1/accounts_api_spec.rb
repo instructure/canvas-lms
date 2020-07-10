@@ -600,6 +600,38 @@ describe "Accounts API", type: :request do
         expect(@a1.default_group_storage_quota_mb).to eq 42
       end
     end
+
+    describe "privacy settings" do
+      let(:account) { @a1 }
+      let(:site_admin) { site_admin_user }
+      let(:payload) {
+        {
+          account: {
+            settings: {
+              enable_fullstory: false,
+              enable_google_analytics: false,
+            }
+          }
+        }
+      }
+
+      it 'ignores changes made through the API' do
+        user_session(site_admin)
+
+        expect {
+          api_call(:put, "/api/v1/accounts/#{account.to_param}", {
+            controller: 'accounts',
+            action: 'update',
+            id: account.to_param,
+            format: 'json'
+          }, payload)
+        }.to change { response&.status }.to(200).and not_change {
+          account.reload.settings.fetch(:enable_fullstory, true)
+        }.and not_change {
+          account.reload.settings.fetch(:enable_google_analytics, true)
+        }
+      end
+    end
   end
 
   it "should find accounts by sis in only this root account" do
