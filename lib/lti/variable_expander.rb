@@ -1217,6 +1217,16 @@ module Lti
                        -> { @assignment.workflow_state == 'published' },
                        ASSIGNMENT_GUARD
 
+    # Returns true if the assignment is LDB enabled.
+    # Only available when launched as an assignment.
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion 'Canvas.assignment.lockdownEnabled', [],
+                       -> { @assignment.settings&.dig('lockdown_browser', 'require_lockdown_browser') || false },
+                       ASSIGNMENT_GUARD
+
     # Returns the endpoint url for accessing link-level tool settings
     # Only available for LTI 2.0
     # @example

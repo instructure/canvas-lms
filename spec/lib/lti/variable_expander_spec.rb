@@ -1299,6 +1299,37 @@ module Lti
           expect(exp_hash[:test]).to eq true
         end
 
+        describe '$Canvas.assignment.lockdownEnabled' do
+          it 'returns true when lockdown is enabled' do
+            allow(assignment).to receive(:settings).and_return({
+              'lockdown_browser' => {
+                'require_lockdown_browser' => true
+              }
+            })
+            exp_hash = {test: '$Canvas.assignment.lockdownEnabled'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq true
+          end
+
+          it 'returns false when lockdown is disabled' do
+            allow(assignment).to receive(:settings).and_return({
+              'lockdown_browser' => {
+                'require_lockdown_browser' => false
+              }
+            })
+            exp_hash = {test: '$Canvas.assignment.lockdownEnabled'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq false
+          end
+
+          it 'returns false as default' do
+            allow(assignment).to receive(:settings).and_return({})
+            exp_hash = {test: '$Canvas.assignment.lockdownEnabled'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq false
+          end
+        end
+
         context 'iso8601' do
           it 'has substitution for $Canvas.assignment.unlockAt.iso8601' do
             allow(assignment).to receive(:unlock_at).and_return(right_now)
