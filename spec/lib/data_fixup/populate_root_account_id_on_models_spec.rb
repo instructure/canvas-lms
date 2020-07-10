@@ -237,6 +237,15 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    context 'with CustomGradebookColumnDatum' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          reference_record.custom_gradebook_column_data.create!(content: 'hi', user_id: @user.id)
+        end
+        let(:reference_record) { CustomGradebookColumn.create!(course: @course, title: 'foo') }
+      end
+    end
+
     it 'should populate the root_account_id on DeveloperKey' do
       dk = DeveloperKey.create!(account: @course.account)
       dk.update_columns(root_account_id: nil)
@@ -329,6 +338,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { group_category(context: reference_record) }
         let(:reference_record) { account_model }
+      end
+    end
+
+    context 'with GroupMembership' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { group_membership_model(group: reference_record) }
+        let(:reference_record) { group_model }
       end
     end
 
@@ -485,6 +501,20 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    context 'with OutcomeProficiency' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { outcome_proficiency_model(reference_record) }
+        let(:reference_record) { account_model }
+      end
+    end
+
+    context 'with OutcomeProficiencyRating' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { reference_record.outcome_proficiency_ratings.first }
+        let(:reference_record) { outcome_proficiency_model(account_model) }
+      end
+    end
+
     context 'with PostPolicy' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { PostPolicy.create!(course: @course) }
@@ -500,11 +530,49 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(@quiz.reload.root_account_id).to eq @course.root_account_id
     end
 
+    context 'with RoleOverride' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { RoleOverride.create!(account: reference_record, role: Role.first) }
+        let(:reference_record) { account_model }
+      end
+    end
+
+    context 'with Score' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { reference_record.scores.create! }
+        let(:reference_record) { enrollment_model }
+      end
+    end
+
+    context 'with ScoreStatistic' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          ScoreStatistic.create!(
+            assignment: reference_record, maximum: 100, minimum: 5, mean: 60, count: 10
+          )
+        end
+        let(:reference_record) { assignment_model }
+      end
+    end
+
     context 'with Submission' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:submission) { submission_model }
         let(:record) { submission }
         let(:reference_record) { submission.assignment }
+      end
+    end
+
+    context 'with SubmissionVersion' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:assignment) { assignment_model }
+        let(:record) do
+          SubmissionVersion.create!(
+            course: @course, version: Version.create!(versionable: assignment),
+            assignment: assignment_model, user_id: @user.id
+          )
+        end
+        let(:reference_record) { @course }
       end
     end
 
@@ -595,6 +663,20 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           let(:record) { conference.web_conference_participants.create!(user: user_model) }
           let(:reference_record) { conference }
         end
+      end
+    end
+
+    context 'with Wiki (course)' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { Wiki.create!(course: @course) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with Wiki (group)' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { Wiki.create!(group: reference_record) }
+        let(:reference_record) { group_model }
       end
     end
 
