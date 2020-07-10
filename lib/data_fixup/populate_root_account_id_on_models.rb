@@ -72,6 +72,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       CourseAccountAssociation => :account,
       CustomGradebookColumn => :course,
       CustomGradebookColumnDatum => :custom_gradebook_column,
+      ContentTag => :context,
       DeveloperKey => :account,
       DeveloperKeyAccountBinding => :account,
       DiscussionEntry => :discussion_topic,
@@ -118,7 +119,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   # tables that have been filled for a while already
-  DONE_TABLES = [Account, Assignment, Course, Group, Enrollment].freeze
+  DONE_TABLES = [Account, Assignment, Course, CourseSection, Enrollment, EnrollmentDatesOverride, EnrollmentTerm, Group].freeze
 
   def self.run
     clean_and_filter_tables.each do |table, assoc|
@@ -244,7 +245,6 @@ module DataFixup::PopulateRootAccountIdOnModels
 
   def self.populate_root_account_ids(table, associations, min, max)
     primary_key_field = table.primary_key
-
     table.find_ids_in_ranges(start_at: min, end_at: max) do |batch_min, batch_max|
       associations.each do |assoc, columns|
         account_id_column = create_column_names(table.reflections[assoc.to_s], columns)
