@@ -313,6 +313,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(dtp.reload.root_account_id).to eq @topic.root_account_id
     end
 
+    context 'with EnrollmentState' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { reference_record.enrollment_state }
+        let(:reference_record) { enrollment_model }
+      end
+    end
+
     context 'with GradingStandard with course context' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { grading_standard_for(@course) }

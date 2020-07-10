@@ -78,6 +78,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       DiscussionEntryParticipant => :discussion_entry,
       DiscussionTopic => :context,
       DiscussionTopicParticipant => :discussion_topic,
+      EnrollmentState => :enrollment,
       GradingStandard => :context,
       GroupCategory => :context,
       GroupMembership => :group,
@@ -241,10 +242,12 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   def self.populate_root_account_ids(table, associations, min, max)
+    primary_key_field = table.primary_key
+
     table.find_ids_in_ranges(start_at: min, end_at: max) do |batch_min, batch_max|
       associations.each do |assoc, columns|
         account_id_column = create_column_names(table.reflections[assoc.to_s], columns)
-        table.where(id: batch_min..batch_max, root_account_id: nil).
+        table.where(primary_key_field => batch_min..batch_max, root_account_id: nil).
           joins(assoc).
           update_all("root_account_id = #{account_id_column}")
       end
