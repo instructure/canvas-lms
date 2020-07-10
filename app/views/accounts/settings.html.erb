@@ -59,6 +59,9 @@
     <% if can_do(@context, @current_user, :manage_account_settings) %>
     <li><a href="#tab-settings" id="tab-settings-link"><%= t(:tab_settings, "Settings") %></a></li>
     <% end %>
+    <% if can_do(@account, @current_user, :manage_privacy_settings) %>
+    <li><a href="#tab-privacy" id="tab-privacy-link"><%= t(:tab_privacy, "Privacy") %></a></li>
+    <% end %>
     <% if can_do(@context, @current_user, :manage_storage_quotas) %>
     <li><a href="#tab-quotas" id="tab-quotas-link"><%= t(:tab_quotas, "Quotas") %></a></li>
     <% end %>
@@ -802,6 +805,35 @@ acknowledge that you have read and agreed to the
 
         <div class="button-container">
           <button type="submit" class="Button Button--primary"><%= t(:update_settings_button, "Update Settings") %></button>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if can_do(@account, @current_user, :manage_privacy_settings) %>
+    <div id="tab-privacy">
+      <h2 class="screenreader-only"><%= t('headings.privacy', "Privacy") %></h2>
+      <%= form_for(:account, url: account_url(@account), html: {
+            method: :put,
+            id: "account_privacy_settings"
+          }) do |f|
+      %>
+        <%= f.fields_for :settings do |settings| %>
+          <div>
+            <%= settings.check_box :enable_google_analytics, checked: @account.settings.fetch(:enable_google_analytics, true) %>
+            <%= settings.label :enable_google_analytics, en: "Allow tracking with Google Analytics" %>
+          </div>
+
+          <div>
+            <%= settings.check_box :enable_fullstory, checked: @account.settings.fetch(:enable_fullstory, true) %>
+            <%= settings.label :enable_fullstory, en: "Allow tracking with FullStory" %>
+          </div>
+        <% end %>
+
+        <div class="button-container">
+          <button type="submit" class="Button Button--primary">
+            <%= t(:update_settings_button, "Update Settings") %>
+          </button>
         </div>
       <% end %>
     </div>

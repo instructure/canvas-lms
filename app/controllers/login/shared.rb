@@ -70,7 +70,7 @@ module Login::Shared
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(user)
     @current_user = user
 
-    fullstory_init(Account.site_admin, session)
+    fullstory_init(@domain_root_account, session)
 
     respond_to do |format|
       if (oauth = session[:oauth2])
