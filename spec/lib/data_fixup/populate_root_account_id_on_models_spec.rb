@@ -722,8 +722,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       DataFixup::PopulateRootAccountIdOnModels.send_later_enqueue_args(:populate_root_account_ids,
         {
           priority: Delayed::MAX_PRIORITY,
-          n_strand: ["root_account_id_backfill", Shard.current.database_server.id],
-          tag: ContentTag
+          n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
         },
         ContentTag, {course: :root_account_id}, 1, 2)
       expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
@@ -760,6 +759,30 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
         and_return({ContextModule => :course})
       expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+    end
+  end
+
+  describe 'in_progress_tables' do
+    describe 'with sharding' do
+      specs_require_sharding
+
+      it 'should only return tables that are in progress for this shard' do
+        @shard1.activate do
+          DataFixup::PopulateRootAccountIdOnModels.send_later_enqueue_args(:populate_root_account_ids,
+            {
+              priority: Delayed::MAX_PRIORITY,
+              n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
+            },
+            ContentTag, {course: :root_account_id}, 1, 2)
+        end
+        DataFixup::PopulateRootAccountIdOnModels.send_later_enqueue_args(:populate_root_account_ids,
+          {
+            priority: Delayed::MAX_PRIORITY,
+            n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
+          },
+          ContextModule, {course: :root_account_id}, 1, 2)
+        expect(DataFixup::PopulateRootAccountIdOnModels.in_progress_tables).to eq([ContextModule])
+      end
     end
   end
 

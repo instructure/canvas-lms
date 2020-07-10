@@ -165,7 +165,8 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   def self.in_progress_tables
-    Delayed::Job.where(strand: "root_account_id_backfill/#{Shard.current.database_server.id}").map do |job|
+    Delayed::Job.where(strand: "root_account_id_backfill/#{Shard.current.database_server.id}",
+      shard_id: Shard.current).map do |job|
         job.payload_object.try(:args)&.first
     end.uniq.compact
   end
@@ -264,12 +265,10 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.unlock_next_backfill_job(table)
     # when the current table has been fully backfilled, restart the backfill job
     # so it can check to see if any new tables can begin working based off of this table
-    if table.where(root_account_id: nil).none? &&
-      Delayed::Job.where(strand: ["root_account_id_backfill_strand", Shard.current.database_server.id].to_s,
-        locked_at: nil).count <= 0
+    if table.where(root_account_id: nil).none?
       self.send_later_if_production_enqueue_args(:run, {
         priority: Delayed::LOWER_PRIORITY,
-        strand: ["root_account_id_backfill_strand", Shard.current.database_server.id]
+        singleton: "root_account_id_backfill_strand_#{Shard.current.id}"
       })
     end
   end
