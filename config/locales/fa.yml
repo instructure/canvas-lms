@@ -196,6 +196,7 @@ fa:
       %{access_token_count}
   access_token_is_valid_until_d2f048cf: "نشانه دسترسی معتبر است تا"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "نشانه های دسترسی را می توان برای اجازه دادن به برنامه های دیگر برای برقراری تماس های API از جانب شما استفاده کرد. همچنین می توانید نشانه های دسترسی را ایجاد کنید و از *API باز کانواس* برای ایجاد یکپارچه سازی های خود استفاده کنید."
+  accessible_sidebar_menu_b30baf97: "منوی کناری دردسترس"
   accordion_section_1_7888782d: "بخش آکاردئون 1"
   accordion_section_2_e1812997: "بخش آکاردئون 2"
   accordion_section_3_96861901: "بخش آکاردئون 3"
@@ -952,6 +953,7 @@ fa:
       grade_export: 
         course_date_picker_parameter: 
           Optional: اختیاری
+          settings: "تنظیمات:"
     include_deleted_parameter: 
       account_reports: 
         default: 
@@ -1197,6 +1199,7 @@ fa:
       equall_endpoint_help: "این نشانی، نشانی اینترنتی سرویس Equella شماست. احتمالاً چیزی شبیه به \"%{sample_url}\" خواهد بود."
       equella_settings_title: "تنظیمات Equella"
       feature_options: "گزینه‌های ویژگی"
+      feature_preview: "پیش‌نمایش ویژگی"
       features_title: "ویژگی ها"
       global_announcements_description: "می توانید از طریق اطلاعیه های سراسری، پیام های کوتاه و مهم را روی داشبورد همه کاربران موجود در حساب خود ارسال کنید. این پیام ها برای مدت زمان معین یا تا زمانی که کاربر برای نادیده گرفتن هشدار روی پیوند «بستن»(×) کلیک کند، روی داشبورد هر کاربر ظاهر می شوند. **از این اطلاعیه ها باید به طور محدود استفاده شود.**"
       global_announcements_title: "اطلاعیه های سراسری"
@@ -1438,7 +1441,7 @@ fa:
       batch_mode_label: "یک بهنگام سازی دسته ای کامل است"
       clear_sis_stickiness_instructions: "با انتخاب این گزینه، همه جاهای خالی موجود در همه سوابق که از این ورود اطلاعات سامانه اطلاعات دانشجو متأثر هستند در ورودهای بعدی که جایگزین ورودهای قبلی نمی شوند قابل تغییر خواهند بود."
       clear_sis_stickiness_label: "پاک کردن وضعیت واسط کاربر تغییر یافته"
-      import_failed_message: "در هنگام ورود اطلاعات سامانه اطلاعات دانشجو خطایی رخ داد. هیچ سابقه ای وارد نشد."
+      import_failed_message: "خطایی در ورود داده‌های SIS وجود دارد."
       import_failed_with_messages_message: "هیچ سابقه ای از سامانه اطلاعات دانشجو وارد نشد. ورود با این پیام ها انجام نشد:"
       import_log_title: "گزارش ثبت وقایع پیشرفت ورود"
       import_started_message: "روند ورود شروع شده است! اگر تعداد زیادی ورودی وجود داشته باشد، این امر می تواند مدتی طول بکشد. می توانید صفحه را ترک کنید و به عقب بازگردید."
@@ -1687,6 +1690,7 @@ fa:
   add_course_calendar_events_146154a5: "افزودن رویداد های تقویم درس"
   add_criterion_eb9587ef: "افزودن معیار"
   add_custom_link_22059c0: "افزودن پیوند سفارشی"
+  add_domain_f15bc6c1: "افزودن دامنه"
   add_email_address_aef3b61: "افزودن نشانی پست الکترونیکی"
   add_existing_content_7e36da66: "افزودن محتوای موجود"
   add_external_feed_6d437a28: "افزودن خوراک خبری بیرونی"
@@ -1717,6 +1721,7 @@ fa:
   add_new_set_of_due_dates_e8e240f: "افزودن مجموعه جدید تاریخ های مهلت"
   add_new_term_d2217c0d: "افزودن نیمسال جدید"
   add_old_quiz_f4c546a: "افزودن امتحان قبلی"
+  add_people_7948b7da: "افزودن افراد"
   add_people_7ee4b2ec: "افزودن افراد"
   add_people_to_coursename_5ea234e1: "افزودن افراد به %{courseName}"
   add_quiz_cebfa28b: "افزودن آزمون"
@@ -2245,6 +2250,7 @@ fa:
     scores_lower_than_the_average: "نمهر های پایین تر از میانگین %{average}"
     total_graded_submissions: "کل موردهای ارسالی نمره گذاری شده:"
   assignment_details_expanded_20c6f0c7: "جزئیات تکلیف گسترش یافته است"
+  assignment_does_not_exist_74178c34: "تکلیف وجود ندارد"
   assignment_excused_eb6c08fa: "تکلیف اجرا شد"
   assignment_grades_have_already_been_published_ff2d84c6: "نمره های تکلیف منتشر شده اند."
   assignment_group: 
@@ -2429,6 +2435,7 @@ fa:
       due: مهلت
       due_date: مهلت
       multiple_dates: "چند تاریخ"
+      todo_date: "برای انجام"
     delete_group: 
       cancel: لغو
       delete: "حذف گروه"
@@ -2753,8 +2760,8 @@ fa:
         assigned_peer_reviews: "بازبینی های گروهی تخصیص داده شده"
         comments: "نظرها:"
         submission: ارسال
-        submission_not_turned_in: "تحویل داده نشد!"
-        submission_turned_in: "تحویل داده شد!"
+        submission_not_turned_in: "ارسال نشد!"
+        submission_turned_in: "ارسال شد!"
     submission_types_form: 
       advanced_turnitin_settings: "تنظیمات پیشرفته Turnitin"
       advanced_vericite_settings: "تنظیمات پیشرفته VeriCite"
@@ -2934,6 +2941,7 @@ fa:
     attempts: 
       filter: "تلاش ها"
     submission_attempts: "تلاش ها"
+  assignments_2_e88d7a26: "تکلیف‌های 2"
   assignments_api: 
     invalid_date_time: "تاریخ و زمان برای %{attribute} معتبر نیست"
     invalid_submission_types: "انواع مورد ارسالی معتبر نیست"
@@ -3740,11 +3748,13 @@ fa:
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "نمی‌توان تاریخ مهلت یک جایگزینی در دوره نمره گذاری بسته شده را تغییر داد."
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "نمی‌توان تاریخ مهلترا به یک تاریخ در دوره‌ نمره‌گذاری بسته شده تغییر داد"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "تاریخ مهلت اگر در یک دوره نمره‌گذاری بسته شده گذشته باشد، قابل تغییر نیست"
+  cannot_create_event_for_deleted_course_c800f310: "رویدادی برای درس حذف شده نمی تواند ایجاد شود"
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "امکان حذف فایلی که به عنوان بخشی از یک تکلیف ارسال شده است، وجود ندارد"
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "جایگزینی با تاریخ مهلت در یک دوره نمره گذاری بسته شده قابل حذف کردن نیست"
   cannot_grade_at_this_time_489744b0: "اکنون امکان نمره گذاری وجود ندارد"
   cannot_have_a_blueprint_course_with_students_248e3e76: "نمی‌تواند یک دوره طرح با دانشجویان داشته باشد"
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: "نمی‌تواند با توجه به بخش، محدود شود مگر اینکه گروه خالی نباشد و یا اندازه آن محدود نباشد"
+  cannot_save_new_assignment_3bda0792: "آزمون جدید نمی‌تواند ذخیره شود"
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: "اگر مهلت جایگزینی ها در یک دوره نمره گذاری بسته شده گذشته باشد، نمی توان روی فقط قابل مشاهده برای جایگزینی ها قرار داد."
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "نمی توان تاریخ مهلت جایگزینی را روی یک تاریخ در یک دوره نمره‌گذاری بسته شده قرار داد"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "نمی‌توان شناسه_حساب_سامانه اطلاعات دانشجو را در یک حساب_ریشه قرار داد."
@@ -3824,6 +3834,7 @@ fa:
   change_beginning_date_to_39dbd06e: "تغییر تاریخ شروع به"
   change_dcaa253a: "تغییر دادن"
   change_ending_date_to_d2cebd54: "تغییر تاریخ پایان به"
+  change_existing_group_2c91a32b: "تغییر دادن گروه‌ موجود"
   change_groups_4e2ab6c3: "تغییر دادن گروه ها"
   change_image_14ad465b: "تغییر دادن تصویر"
   change_image_d56c695f: "تغییر دادن تصویر"
@@ -3845,6 +3856,7 @@ fa:
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "نمودار نمره های دانشجو برای هر تکلیف"
   chat_2153c6b7: گفتگو
   check_back_in_a_little_while_17756399: "در عین حال بررسی کنید"
+  check_submission_file_type_b3dbf3fd: "کنترل نوع فایل ارسالی"
   check_to_add_a_user_for_loginid_6cd25597: "برای افزودن کاربر برای %{loginid}، انتخاب کنید"
   check_to_select_all_98e484f1: "برای انتخاب همه گزینه ها انتخاب کنید"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "برای پرش از اضافه کردن کاربر برای %{loginid} انتخاب کنید"
@@ -4468,6 +4480,9 @@ fa:
       folder_picker: 
         default_select_folder: "انتخاب پوشه"
         upload_to: "بارگذاری در"
+      import_quizzes_next_view: 
+        import_new_quizzes: "وارد کردن محتوای ارزیابی بعنوان آزمون‌های جدید"
+        import_quizzesNext_help_title: "آزمون‌های جدید"
       overwrite_assessment_content: 
         assessment_help_label: "نماد راهنمای رونویسی ارزیابی"
         assessment_help_text: "برخی از سیستم ها شناسه های خود را برای هر یک صدور جدید بازیابی می کنند. در نتیجه، اگر دو مخزن  پرسش جداگانه را صادر کنید، شناسه های یکسان خواهند داشت. برای جلوگیری از از دست رفتن داده های ارزیابی، علیرغم وجود این شناسه ها، این اشیاء را متفاوت در نظر می گیریم. انتخاب این گزینه این ویژگی ایمنی را غیر فعال می کند و امکان رونویسی داده های ارزیابی روی داده های موجود با شناسه های یکسان را فراهم می سازد."
@@ -4481,6 +4496,7 @@ fa:
         question_bank_placeholder: "نام مخزن پرسش"
         question_bank_placeholder_aria: "نام مخزن پرسش جدید را وارد کنید"
         question_bank_title: "نام مخزن جدید پرسش"
+        question_banks_disabled: "این گزینه غیرفعال شده است"
         select_question_bank: "انتخاب مخزن پرسش"
       select_content_checkbox: 
         select_all_content: "کل محتوا"
@@ -4502,6 +4518,7 @@ fa:
       no_files_help_title_icon: "اطلاعات بیشتر برای گزینه \"فایل ها بارگیری نشوند\" "
       options: گزینه‌ها
       skip_all_files: "فایل‌ها از درس بارگیری نشوند"
+  content_security_policy_3bb8d922: "سیاست امنیت محتوا"
   content_tag: 
     no_title: "عنوان موجود نیست"
   content_tags: 
@@ -5094,6 +5111,7 @@ fa:
     unstar_conversation: "برداشتن ستاره گفتگو"
   conversations_69a8dc26: گفتگوها
   copy_9748f9f: "کپی کردن"
+  copy_assignment_name_to_another_course_b62d0a54: "کپی تکلیف %{name} به درس دیگر"
   copy_page_to_another_course_405cc07c: "کپی صفحه به دوره دیگر"
   copy_quiz_to_course_74f9c8c1: "کپی امتحان به دوره"
   copy_to_folder_32ecc3c3: "کپی کردن در پوشه"
@@ -5852,6 +5870,7 @@ fa:
         storage_quota: "ذخیره فایل"
         time_zone: "منطقه زمانی"
         turnitin_comments: "نظرهای مربوط به Turnitin"
+        usage_rights_required: "حق نشر فایل"
       language_overrides_preferences: "این امر هر گونه تنظیمات دلخواه زبان سیستم/کاربر را جایگزین خواهد ساخت. فقط برای درس های زبان خارجی توصیه می شود"
       links: 
         more_options: "گزینه های بیشتر"
@@ -5953,6 +5972,7 @@ fa:
         join_course: "پیوستن به این درس"
         new_announcement: "اطلاعیه جدید"
         student_view: "نمای دانشجو"
+        view_course_calendar: "مشاهده تقویم درس"
         view_course_stream: "مشاهده جریان درس"
       re_sending: "در حال ارسال دوباره..."
       send_done: " انجام شد. ارسال پیام ممکن است چند دقیقه طول بکشد."
@@ -6068,6 +6088,7 @@ fa:
     ungrded_survey: "نظرسنجی نمره گذاری نشده"
     url: "نشانی اینترنتی"
   create_new_e0946c49: "ایجاد جدید"
+  create_new_group_set_13b1f62a: "ایجاد مجموعه گروه جدید"
   create_slots_71dbb2f8: "ایجاد بازه ها"
   create_theme_based_on_40651ed3: "ایجاد زمینه بر اساس"
   create_users_view: 
@@ -6431,6 +6452,7 @@ fa:
   delete_current_message_5da0221a: "حذف پیام فعلی"
   delete_current_module_item_21fefc54: "حذف ماژول/مورد فعلی"
   delete_custom_help_link_814f0509: "حذف پیوند راهنمای سفارشی"
+  delete_disabled_3196ce47: "حذف (غیر فعال شد)"
   delete_domain_5ba75b7c: "حذف دامنه"
   delete_entry_title_5e59727b: "حذف ورودی %{title}"
   delete_grading_period_dba36e59: "حذف دوره نمره گذاری"
@@ -6598,6 +6620,7 @@ fa:
     saving: "در حال ذخیره سازی..."
   different_course_b875770e: "درس دیگر"
   diigo_993c4646: Diigo
+  direct_share_80afd4a7: "اشتراک مستقیم"
   disableWhileLoading: 
     loading: "در حال بارگذاری..."
   disable_a5c05db3: "غیر فعال سازی"
@@ -6958,6 +6981,7 @@ fa:
   does_not_meet_expectations_b0736d20: "مطابق با انتظارات نیست"
   domain_3b54c511: دامنه
   domain_is_required_1d4c8b25: "دامنه لازم است"
+  domain_name_6c783b0: "نام دامنه"
   dominican_republic_1_3cef4021: "جمهوری دومنیک (+1)"
   don_t_add_this_user_for_now_32912974: "اکنون این کاربر را اضافه نکنید."
   don_t_move_lti_query_params_to_post_body_5c80e037: "پارامترهای جستجوی LTI به متن پست حرکت نکنند"
@@ -7040,6 +7064,7 @@ fa:
   duplicate_module_module_name_be40ad50: "تکرار ماژول %{module_name}"
   duplicate_modules_8ea35557: "تکرار ماژول ها"
   duplicate_provider_provider_d9842134: "تکرار کردن ارائه دهنده %{provider}"
+  duplicating_calendar_events_9932cd37: "دوتا کردن رویدادهای تقویم"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "برای مثال، Doe، Jon"
   e_g_http_university_edu_helpdesk_acab04d6: "به عنوان مثال، http://university.edu/helpdesk"
@@ -7065,6 +7090,7 @@ fa:
   edit_criterion_5e4dadca: "ویرایش معیار"
   edit_criterion_description_5828919: "ویرایش شرح معیار"
   edit_current_message_da650d4c: "ویرایش پیام فعلی"
+  edit_disabled_e6a5ea0a: "ویرایش (غیر فعال شد)"
   edit_grading_period_e39af45d: "ویرایش دوره نمره گذاری"
   edit_grading_period_set_c548f4df: "ویرایش مجموعه دوره نمره گذاری"
   edit_grading_scheme_53091236: "ویرایش طرح نمره گذاری"
@@ -7665,6 +7691,7 @@ fa:
   expand_tutorial_tray_22630c49: "گسترش سینی خودآموز"
   expanded_f4493860: "باز شده"
   experimental_graphql_api_75c5eb8f: "رابط برنامه نویسی برنامه GraphQL آزمایشی"
+  expires_at_6214b43f: "منقضی می‌شود در"
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "صدور یک آزمون موجود به فرمت جدید Quizzes 2"
   export_course_content_f4774b74: "صدور محتوای درس"
   export_de71cd8e: صدور
@@ -7869,6 +7896,7 @@ fa:
       feature_options: "گزینه‌های ویژگی"
       no_features_available: "هیچ ویژگی در حال حاضر در دسترس نیست."
   feature_options_37a2c317: "گزینه‌های ویژگی"
+  feature_preview_5e1216a0: "پیش‌نمایش ویژگی"
   features: 
     allow_opt_out_of_inbox: "دادن امکان انتخاب از صندوق ورودی به کاربران"
     better_file_browsing: "مرور بهتر فایل"
@@ -7890,6 +7918,8 @@ fa:
     new_quiz_statistics: "صفحه آمار آزمون جدید"
     post_grades: "ارسال نمره ها به سامانه اطلاعات دانشجو"
     quiz_log_auditing: "حسابرسی گزارش ثبت وقایع آزمون"
+    quizzes: 
+      next: "آزمون‌های جدید"
     student_groups: "صفحه جدید گروه های دانشجو"
     student_outcome_gradebook: "دفتر نمره تسلط یادگیری دانشجو"
   features_2581da: ویژگی‌ها
@@ -9566,6 +9596,7 @@ fa:
   images_documents_and_more_dccb362f: "تصاویر، اسناد و بیشتر"
   immediately_c128ede6: بلافاصله
   import_1b31507: "وارد کردن"
+  import_a_set_of_outcomes_6b782192: "مجموعه‌ای از نتایج را وارد کنید."
   import_content_b2fd6620: "وارد کردن محتوا"
   import_sis_data_428cc803: "وارد کردن داده های سامانه اطلاعات دانشجو"
   import_status_b147bd27: "وضعیت ورود"
@@ -10422,6 +10453,7 @@ fa:
   max_membership_bd0ddc68: حداکثر_عضویت
   max_users_groups_per_appointment_867c505b: "حداکثر تعداد کاربر/گروه در هر قرار ملاقات"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "حداکثر تعداد قرارهای ملاقات که یک شرکت کننده می تواند حضور یابد"
+  maximum_number_of_communication_channels_reached_70c4d2f9: "به حداکثر تعداد کانلهای ارتباطی رسیده است"
   media_af190855: رسانه
   media_comment_dialog_manager: 
     messages: 
@@ -12555,6 +12587,7 @@ fa:
   more_info_at_web_address_dba7e187: "اطلاعات بیشتر در %{web_address}"
   more_information_3dfb76b5: "اطلاعات بیشتر"
   more_options_272b4953: "گزینه های دیگر"
+  more_people_options_730e9686: "انتخاب افراد بیشتر"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "نتایج بیشتر در پایین صفحه اضافه شد."
   more_than_999_submissions_need_grading_bc087dd0: "بیش از 999 مورد ارسالی به نمره گذاری نیاز دارد"
   more_than_a19b440: "%{more_than}+"
@@ -12715,12 +12748,14 @@ fa:
   new_comment_on_announcement_discussion_topic_cours_7905b782: "نظر جدید درباره اطلاعیه %{discussion_topic}، %{course}"
   new_conference_8b483024: "کنفرانس جدید"
   new_conferences_a020a8a9: "کنفرانس های جدید"
+  new_course_and_user_analytics_ffbc508c: "تحلیل‎های جدید کاربر و درس"
   new_course_role_6a7bb75f: "نقش درس جدید"
   new_criterion_6054bc7f: "معیار جدید"
   new_criterion_canceled_d8c2a655: "معیار جدید لغو شد"
   new_discussion_dae4fae3: "بحث جدید"
   new_event_for_course_name_2ba1f734: "رویداد جدید برای %{course_name}"
   new_export_3ab758: "صدور جدید"
+  new_feature_flags_c4b70a5e: "نشانه ویژگی جدید"
   new_file_135ae520: "[ فایل جدید ]"
   new_file_added_for_name_a5ec3156: "فایل جدید برای %{name} افزوده شد"
   new_goodies_coming_soon_15d4f7fa: "خوش آمدید!"
@@ -12735,6 +12770,7 @@ fa:
   new_question_group_d9306280: "گروه پرسش جدید"
   new_quiz_34aacba6: "آزمون جدید"
   new_quiz_statistics_desc: "صفحه آمار آزمون جدید را برای یک درس فعال سازید."
+  new_quizzes_importing_c167dce0: "واردکردن آزمون‌های جدید"
   new_rating_canceled_eed3c4ff: "رتبه‌بندی جدید لغو شد"
   new_rating_created_54125331: "رتبه بندی جدید ایجاد شد"
   new_sis_integrations: "این ویژگی برای مؤسسات دارای یکپارچگی کانواس سامانه اطلاعات دانشجویی اعمال می‌شود. هر مشتری که در حال حاضر از راه حل بازگشت به عقب نمره‌گذاری در کانواس یا محصولات همراه استفاده می‌کند، باید این ویژگی را برای گردش های کاری پیشرفته اعتبارسنجی داده‌های تکلیف، فعال کند. این ویژگی بعد از فعالسازی، تنظیمات جدید یکپارچگی سامانه اطلاعات دانشجویی را برای همگام‌سازی سامانه (بازگشت به عقب نمره در سطح تکلیف) در تنظیمات حساب نمایش می‌دهد. گزینه ارسال برای سامانه اطلاعات دانشجویی با این تنظیمات جدید ترکیب شده است و به طور پیش‌فرض فعال می‌شود."
@@ -14699,6 +14735,7 @@ fa:
       some_scores_reduced: "دادن امتیاز فقط به پاسخ درست (*برخی نمره های دانشجویان ممکن است کسر شود*) "
       update_question_without_regrading: "بهنگام سازی پرسش بدون نمره گذاری دوباره"
   quiz_40ee61b1: آزمون
+  quiz_duplication_not_implemented_c1495585: "دوتاشدن آزمون پیاده‌سازی نشده است"
   quiz_e0dcce8f: آزمون
   quiz_failed_to_update_2b66fa4d: "بهنگام سازی آزمون انجام نشد"
   quiz_ip_address_filters_49a75ec8: "فیلترهای نشانی آی پی آزمون"
@@ -16205,6 +16242,7 @@ fa:
   remove_c_name_section_d8eabd3a: "حذف بخش %{c.name}"
   remove_contact_method_ca890ba3: "حذف روش تماس"
   remove_course_association_name_b760c502: "حذف انجمن درس %{name}"
+  remove_domain_from_the_whitelist_14c7d5e9: "حذف%{domain} از لیست سفید"
   remove_email_address_b1820820: "حذف نشانی پست الکترونیکی"
   remove_empty_attachment_b2aea632: "حذف پیوست خالی"
   remove_f47dc62a: حذف
@@ -16243,8 +16281,10 @@ fa:
   reply_389d6fb9: پاسخ
   reply_from_name: "%{name} از طریق اطلاعیه های کانواس "
   reply_to_comment_72d96728: "پاسخ به نظر"
+  reply_to_conversation_text_cd45c48f: "ارسال پاسخ به گفتگو%{text}"
   reply_to_current_message_55391f5b: "پاسخ به پیام فعلی"
   reply_to_main_discussion_29823888: "پاسخ به بحث اصلی"
+  reply_to_title_f227303f: "ارسال پاسخ به%{title}"
   reply_to_topic_12412b0f: "پاسخ به موضوع"
   report_has_been_aborted_2b5763ed: "گزارش انجام نشده است."
   reported_3de7086a: "گزارش شده"
@@ -16297,6 +16337,7 @@ fa:
       description: "زمان بندی در دسترس بودن دانشجو"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "محدود کردن دسترسی دانشجویان به درس بعد از تاریخ پایان"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "محدود کردن دسترسی دانشجویان به درس ها قبل از تاریخ شروع"
+  restrict_students_from_annotating_6c28ab9b: "محدودکردن حاشیه نویسی توسط دانشجویان"
   restricted_access_d3e99a39: "دسترسی محدود"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "به ابزار مربوط برای تحلیل سرقت ادبی دوباره ارسال کنید."
   resubmit_to_tool_name_1cf02a31: "ارسال دوباره به %{tool_name}"
@@ -16943,6 +16984,7 @@ fa:
   send_this_announcement_to_unenrolled_users_4ea549d7: "این اطلاعیه برای کاربران لغو ثبت نام شده ارسال شود"
   send_this_announcement_to_users_with_the_account_r_bd69c809: "این اطلاعیه برای کاربران دارای نقش حساب %{role} ارسال شود"
   send_this_announcement_to_users_with_the_course_ro_46904d40: "این اطلاعیه برای کاربران دارای نقش درس %{role} ارسال شود"
+  send_to_7881bf0e: "ارسال به"
   send_to_ce05b460: "ارسال به"
   sending_bf324366: "در حال ارسال..."
   sending_message_8ac5bc90: "در حال ارسال پیام..."
@@ -17734,6 +17776,7 @@ fa:
   show_links_to_unpublished_content_30c0450d: "نمایش پیوندهای مربوط به محتوای منتشر نشده"
   show_more_af9cbc16: "نمایش بیشتر"
   show_navigation_menu_34e7f441: "نمایش منوی پیمایش"
+  show_new_analytics_for_course_and_user_data_18e92636: "نمایش تحلیل‌های جدید برای داده درس و کاربر"
   show_notes_column_22d2b6c1: "نمایش ستون یادداشت ها"
   show_one_question_at_a_time_271e346d: "نمایش یک پرسش در هر بار"
   show_only_blueprint_courses_9fb37b41: "فقط دوره‌های طرح نمایش داده شود"
@@ -18186,6 +18229,7 @@ fa:
     update_grade: "بهنگام سازی نمره"
     view_rubric_assessment_in_the_speedgrader: "مشاهده ارزیابی با استفاده از دستورالعمل در برنامه نمره گذاری سریع"
   submission_in_another_grading_period_e754b329: "ارسال در دوره دیگر نمره گذاری"
+  submission_index_e960f9bf: "ارسال %{index} "
   submission_score_b7a291e8: "نمره مورد ارسالی"
   submission_tray_429ac3df: "سینی موارد ارسالی"
   submission_type_a925fc5f: "نوع ارسال"
@@ -18728,6 +18772,7 @@ fa:
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "اساتید از این نام برای نمره گذاری استفاده خواهند کرد."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "این نتیجه برای ارزیابی دانشجو استفاده شده است و دیگر نمی تواند بهنگام شود"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "این نتیجه برای ارزیابی دانشجو استفاده شده است و نمی تواند ویرایش یا حذف شود"
+  this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "این نتیجه برای ارزیابی دانشجو استفاده شده است و بعضی از ویرایش‌ها بر نتایج دانش آموزان تأثیر می گذارد."
   this_outcome_has_been_used_to_assess_a_student_onl_4b4c1e95: "این نتیجه برای ارزیابی دانشجو استفاده شده است، فقط قسمت های متنی می‌تواند به‌روزرسانی شود"
   this_package_includes_apip_file_s_which_are_not_co_b50b30a7: "این بسته شامل فایل(های) APIP است که با کانواس سازگار نیستند و در ورود شامل نشده‌اند."
   this_package_includes_curriculum_standards_which_a_1a137060: "این بسته شامل استانداردهای برنامه درسی است که با کانواس سازگار نیستند و در ورود شامل نشده‌اند."
@@ -19022,6 +19067,7 @@ fa:
   to_date_can_t_come_before_from_date_cf9e18aa: "\"تا تاریخ\" نمی‌تواند قبل از \"از تاریخ\" باشد"
   to_do_1d554f36: "برای اقدام"
   to_do_5526f10a: "برای اقدام:"
+  to_do_6ac7b2dc: "برای انجام"
   to_do_items_loading_d1cdfcd5: "در حال بارگزاری موارد اقدام"
   to_do_list_dashboard_d741f64e: "داشبورد فهرست اقدام"
   to_f0e90538: "گیرنده:"
@@ -19261,6 +19307,7 @@ fa:
   use_remote_version_of_rich_content_editor_52f7fc4b: "استفاده از نسخه از راه دور ویرایشگر محتوای غنی"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "استفاده از نسخه از راه دور نوار کناری و ویرایشگر محتوای غنی"
   use_remote_version_of_rich_content_editor_and_side_ebaaa986: "استفاده از نسخه از راه دور نوار کناری ویرایشگر محتوای غنی در قسمت های پر خطر مانند آزمون ها"
+  use_the_new_assignments_page_dd292b9d: "استفاده از صفحه جدید تکلیف"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "استفاده از ابزار بیرونی جدید همکاری ها که امکان گزینه های بیشتر برای ابزارها جهت استفاده برای همکاری را فراهم می کند"
   use_the_new_document_annotation_tool_2cbc98d0: "استفاده از ابزار یاددآوری سند جدید"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "استفاده از ابزار LTI آزمون جدید به جای آزمون های معمولی کانواس"
