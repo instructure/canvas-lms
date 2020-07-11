@@ -2521,6 +2521,13 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  # You must also check the assignment.can_view_score_statistics
+  def eligible_for_showing_score_statistics?
+    # This checks whether this submission meets the requirements in order
+    # for the submitter to be able to see score statistics for the assignment
+    (score.present? && !hide_grade_from_student?)
+  end
+
   def posted?
     # NOTE: This really should be a call to assignment.course.post_policies_enabled?
     # but we're going to leave it the way it is for the next few months (until
