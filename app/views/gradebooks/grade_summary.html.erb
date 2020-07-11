@@ -141,7 +141,6 @@
       <%
          submission = assignment_presenter.submission
          assignment = assignment_presenter.assignment
-         can_view_distribution = can_do(@context, @current_user, :read_as_admin) || !assignment_presenter.hide_distribution_graphs?
       %>
     <tr class="<%= assignment_presenter.classes %>"
         data-muted="<%= assignment_presenter.hide_grade_from_student? %>"
@@ -300,7 +299,7 @@
           <a href="#"
             class="toggle_score_details_link tooltip"
             aria-label="<%= t('See scoring details') %>"
-          <% if assignment_presenter.has_scoring_details? && can_view_distribution %>
+          <% if assignment_presenter.has_scoring_details? && assignment_presenter.show_distribution_graph? %>
             aria-expanded="false"
             aria-controls="grade_info_<%= assignment.id %>"
           <% else %>
@@ -440,7 +439,7 @@
       <tr id="grade_info_<%= assignment.id %>" class="comments grade_details <%= 'assignment_graded' if assignment_presenter.graded? %>" style="display: none;">
         <% if assignment_presenter.should_display_details? %>
           <td colspan="6" style="padding-bottom: 20px;">
-            <% if assignment_presenter.has_grade_distribution? && can_view_distribution %>
+            <% if assignment_presenter.has_grade_distribution? && assignment_presenter.show_distribution_graph? %>
               <table id="score_details_<%= assignment.id %>" class="ic-Table ic-Table--condensed score_details_table">
                 <thead>
                   <tr>

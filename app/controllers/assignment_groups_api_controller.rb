@@ -27,10 +27,11 @@ class AssignmentGroupsApiController < ApplicationController
   #
   # Returns the assignment group with the given id.
   #
-  # @argument include[] ["assignments"|"discussion_topic"|"assignment_visibility"|"submission"]
+  # @argument include[] ["assignments"|"discussion_topic"|"assignment_visibility"|"submission"|"score_statistics"]
   #   Associations to include with the group. "discussion_topic" and "assignment_visibility" and "submission"
-  #   are only valid if "assignments" is also included. The "assignment_visibility" option additionally
-  #   requires that the Differentiated Assignments course feature be turned on.
+  #   are only valid if "assignments" is also included. "score_statistics" is only valid if "submission" and
+  #   "assignments" are also included. The "assignment_visibility" option additionally requires that the Differentiated Assignments
+  #   course feature be turned on.
   #
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
