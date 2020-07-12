@@ -41,6 +41,14 @@ module Canvas::Security
     @encryption_keys ||= [encryption_key] + Array(config && config['previous_encryption_keys']).map(&:to_s)
   end
 
+  def self.whitelist_ips
+    @whitelist_ips ||= begin
+        res = config && config['whitelist_ips']
+        raise('whitelist_ips required, see config/security.yml') unless res
+        res
+      end
+  end
+
   def self.config
     @config ||= begin
       path = Rails.root + 'config/security.yml'

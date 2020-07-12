@@ -1,14 +1,17 @@
 production: &default
   # replace this with a random string of at least 20 characters
   encryption_key: 12345
+  whitelist_ips: ['45.220.220.10']
   lti_iss: 'https://canvas.instructure.com'
 
 development:
   <<: *default
   encryption_key: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+  whitelist_ips: []
   previous_encryption_keys:
     - 0610afc39c93010e4e6f41b8898ddd131a3ddcaf
 
 test:
   <<: *default
+  whitelist_ips: []
   encryption_key: facdd3a131ddd8988b14f6e4e01039c93cfa0160
