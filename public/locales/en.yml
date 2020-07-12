@@ -392,7 +392,7 @@ en:
       migration:
         course_settings: Course Settings
         syllabus_body: Syllabus Body
-        context_modules: Modules
+        context_modules: Units
         assignments: Assignments
         quizzes: Quizzes
         assessment_question_banks: Question Banks
@@ -628,7 +628,7 @@ en:
   k12_description: Update the icons in the Global Navigation Menu that make more sense specifically in a K-12 environment.
   duplicating_calendar_events_9932cd37: Duplicating Calendar Events
   allows_the_duplication_of_calendar_events_7bb0d6c5: Allows the duplication of Calendar Events
-  duplicate_modules_8ea35557: Duplicate Modules
+  duplicate_modules_8ea35557: Duplicate Units
   allows_the_duplicating_of_modules_in_canvas_2e15b444: Allows the duplicating of modules in Canvas
   allow_opt_out_of_inbox: Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences.
   enable_gradebook_list_students_by_sortable_name: List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings.
@@ -771,7 +771,7 @@ en:
   allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: Allows the missing policy applicator to emit submission_updated live events for each submission marked as missing.
   product_tours_1e19eb95: Product Tours
   in_product_training_walkthrough_and_tourpoints_for_2e185119: In-product training walkthrough and tourpoints for teachers
-  module_file_upload_enhancements_eecd4d37: Module File Upload Enhancements
+  module_file_upload_enhancements_eecd4d37: Unit File Upload Enhancements
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: Drag and Drop files on modules and multi-file module item uploads
   responsive_admin_settings_4f8670d7: Responsive Admin/Settings
   collection_of_responsive_improvements_throughout_c_dedfe6dc: Collection of responsive improvements throughout Canvas
@@ -1992,7 +1992,7 @@ en:
     conferences: Conferences
     people: People
     access_report: Access Report
-    modules: Modules
+    modules: Units
     settings: Settings
     developer_keys: Developer Keys
     discussions: Discussions
@@ -3089,7 +3089,7 @@ en:
   context_modules_api:
     invalid_position: Invalid position
   choose_assignment_set_415f1b3: Choose Assignment Set
-  module_item_is_locked_19fa60b4: Module Item is locked.
+  module_item_is_locked_19fa60b4: Unit Item is locked.
   context_modules:
     module_empty: There are no items in the module "%{module}"
     add_context_module_form:
@@ -3103,12 +3103,12 @@ en:
         add_requirement: Add requirement
       must_complete_prerequisites: Must complete
       buttons:
-        add_module: Add Module
+        add_module: Add Unit
     content_next:
       headings:
-        course_modules: Course Modules
+        course_modules: Course Units
         add_prerequisite: Add Prerequisite to %{name}
-      modules_keyboard_hint_updated: 'Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu.'
+      modules_keyboard_hint_updated: 'Warning: For improved accessibility in reordering Units (or Unit items), please use the Move To Dialog option found in the menu.'
       links:
         student_progress: View Progress
         title:
@@ -3130,10 +3130,10 @@ en:
           other: Indent %{count} Levels
       select_prerequisite: Select the type of prerequisite. Students cannot see a module until all prerequisites are satisfied.
       prerequisites:
-        another_module: Another Module
-      module_details: Modules are shown in sequential order, so only modules that are above %{name} can be set as prerequisites.
+        another_module: Another Unit
+      module_details: Units are shown in sequential order, so only modules that are above %{name} can be set as prerequisites.
       select_module:
-        instructions: Select Module
+        instructions: Select Unit
         name: "%{module}"
       module: module
       requirements:
@@ -3155,14 +3155,14 @@ en:
           must_submit: Students must submit this assignment before the module is considered complete
           must_contribute: Students must contribute to this item before the module is considered complete
     buttons:
-      add_module: Module
+      add_module: Unit
     context_module_next:
       reorder_modules: Drag to reorder modules
       links:
         title:
           edit_module: Edit
           delete_module: Delete this module
-          student_progress: See Student Progress for this Module
+          student_progress: See Student Progress for this Unit
         text:
           edit_module: Edit
           delete_module: Delete
@@ -3187,10 +3187,10 @@ en:
       edit_assignment_settings: Edit Assignment Settings
     index:
       titles:
-        course_modules: Course Modules
+        course_modules: Course Units
     progressions:
       titles:
-        student_progression: Module Progression by Student
+        student_progression: Unit Progression by Student
         student_progress: Student Progress
     url_show:
       new_tab: This site was opened in a new browser window.
@@ -5077,13 +5077,13 @@ en:
         default_enrollment_status: Status for deleted enrollments
     webct_scraper_settings:
       description: |-
-        If the institution does not use WebCT's "Learning Modules" (including schools who adopted WebCT
+        If the institution does not use WebCT's "Learning Units" (including schools who adopted WebCT
           prior to version 4.0, when modules were made available), course migrations can be improved by importing the "Course Content"
-          as Canvas Modules instead of the "Learning Modules". This page allows one to set the default behavior of the WebCT migrator
+          as Canvas Units instead of the "Learning Units". This page allows one to set the default behavior of the WebCT migrator
           with respect to content modules. It is important to remember that, while individual course migrations retain the ability
           to choose, the bulk migrator always utilizes the value configured here and cannot be changed per migration.
       labels:
-        allow_outline_selection: Display option to use Course Content as Modules in the migration wizard
+        allow_outline_selection: Display option to use Course Content as Units in the migration wizard
         folders_as_outline: Use WebCT "Course Content" for modules as the default
     pv4_settings:
       labels:
@@ -6398,7 +6398,7 @@ en:
     outcomes: Outcomes
     rubrics: Rubrics
     quizzes: Quizzes
-    modules: Modules
+    modules: Units
     conferences: Conferences
     collaborations: Collaborations
     settings: Settings
@@ -6801,7 +6801,7 @@ en:
   assignment_976578a8: Assignment
   attachment_deffe5a9: Attachment
   external_tool_c5a6410a: External Tool
-  context_module_sub_header_2f39e87b: Context Module Sub Header
+  context_module_sub_header_2f39e87b: Context Unit Sub Header
   discussion_topic_dc85ad4c: Discussion Topic
   external_url_e9b87215: External Url
   quiz_e0dcce8f: Quiz
@@ -7020,7 +7020,7 @@ en:
   course_files_62deb8f8: Course Files
   course_grades_22adc27e: Course Grades
   course_home_4c4c0107: Course Home
-  course_modules_795cb95e: Course Modules
+  course_modules_795cb95e: Course Units
   course_outcomes_7dc1cbc7: Course Outcomes
   course_pages_449f1dd4: Course Pages
   course_quizzes_c337653c: Course Quizzes
@@ -7501,7 +7501,7 @@ en:
     file_type: File
     calendar_event_type: Calendar Event
     external_tool_type: External Tool
-    module_type: Module
+    module_type: Unit
     announcement_type: Announcement
     discussion_topic_type: Discussion Topic
     external_feed_type: External Feed
@@ -7532,7 +7532,7 @@ en:
   importers/context_external_tool_importer:
     external_tool_attention_needed: The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.
   importers/context_module_importer:
-    migration_module_item_type: Module Item
+    migration_module_item_type: Unit Item
     foreign_lti_tool: The account External Tool for module item "%{title}" must be configured before the item can be launched
   the_announcement_title_could_not_be_linked_to_the__78c747f3: The announcement "%{title}" could not be linked to the module "%{mod_title}"
   importers/course_content_importer:
@@ -8391,7 +8391,7 @@ en:
         exit_frame: Lose the Frames
         course_home: Course Home
         files: Files
-        modules: Modules
+        modules: Units
         hide_sidebar: Hide Sidebar
     invitation:
       body_teacher: You've been invited to join %{course} as a **teacher** for the user account **%{email_address}**.
@@ -8689,7 +8689,7 @@ en:
   due_date_822625d8: Due Date
   title_ee03d132: Title
   assignment_group_1a781505: Assignment Group
-  module_90d9fd32: Module
+  module_90d9fd32: Unit
   overrides:
     everyone_else: Everyone else
     everyone: Everyone
@@ -9283,7 +9283,7 @@ en:
   liveassessments_92d9edc0: LiveAssessments
   logins_9aee0cbe: Logins
   media_objects_c2fa37cd: Media Objects
-  modules_c4325335: Modules
+  modules_c4325335: Units
   names_and_role_ebff0149: Names and Role
   notification_preferences_cf47083d: Notification Preferences
   originality_reports_1e36b935: Originality Reports
@@ -11699,7 +11699,7 @@ en:
   group_roster_1846bf84: Group Roster
   inactive_cd40317f: inactive
   completed_9b809e44: completed
-  module_name_1127ebdb: Module Name
+  module_name_1127ebdb: Unit Name
   labels:
     lock_module_until: Lock until
   unlock_module_on_date_17144fbd: Unlock module on date
@@ -11712,7 +11712,7 @@ en:
   no_items_in_module_21f111a2: No items in module
   delete_requirement_bce2d943: Delete requirement
   export_course_content_f4774b74: Export Course Content
-  modules_settings_a7066f13: Modules Settings
+  modules_settings_a7066f13: Units Settings
   last_export_899a04c5: 'Last Export:'
   select_indentation_d056bab8: Select indentation
   select_type_of_prerequisite_8d6fa902: Select type of prerequisite
@@ -11726,11 +11726,11 @@ en:
   complete_one_item_90e5fb03: Complete One Item
   complete_all_items_e1779257: Complete All Items
   completed_19711ce7: Completed
-  module_completed_50c50762: Module Completed
+  module_completed_50c50762: Unit Completed
   in_progress_9d1ce8b9: In Progress
-  module_in_progress_fa600662: Module In Progress
+  module_in_progress_fa600662: Unit In Progress
   locked_until_unlock_date_498ead5f: Locked until %{unlock_date}
-  module_locked_f6a7ea9d: Module Locked
+  module_locked_f6a7ea9d: Unit Locked
   published_c944a23d: published
   unpublished_dfd8801: unpublished
   add_content_to_module_name_589a8d54: Add Content to %{module_name}
@@ -11738,28 +11738,28 @@ en:
   move_module_contents_74fa15d5: Move module contents
   move_contents_cefe9e92: Move Contents...
   move_this_module_4a262aaf: Move this module
-  move_module_346b8112: Move Module...
+  move_module_346b8112: Move Unit...
   duplicate_module_name_ab26e5c3: Duplicate %{module_name}
   duplicate_this_module_79ca8243: Duplicate this module
   duplicate_31cec192: Duplicate
   up_c553575d: Up
-  previous_module_item_2bb5e499: Previous Module/Item
+  previous_module_item_2bb5e499: Previous Unit/Item
   down_5831a426: Down
-  next_module_item_9bb8a222: Next Module/Item
+  next_module_item_9bb8a222: Next Unit/Item
   space_ec476863: Space
-  move_module_item_77754119: Move Module/Item
+  move_module_item_77754119: Move Unit/Item
   j_5226008a: j
   k_2521301c: k
   e_c2991d1b: e
-  edit_module_item_83258f6d: Edit Module/Item
+  edit_module_item_83258f6d: Edit Unit/Item
   d_b59e2d8d: d
-  delete_current_module_item_21fefc54: Delete Current Module/Item
+  delete_current_module_item_21fefc54: Delete Current Unit/Item
   i_cb2f5130: i
   increase_indent_6af90f7c: Increase Indent
   o_224cf405: o
   decrease_indent_d9cf469d: Decrease Indent
   n_554bc493: n
-  new_module_4e9287e4: New Module
+  new_module_4e9287e4: New Unit
   locked_content_f4ef2968: Locked Content
   item_type_locked_85c560ec: 'Item type: Locked'
   locked_until_item_name_is_graded_3b8d967f: Locked until "%{item_name}" is graded
@@ -11777,19 +11777,19 @@ en:
   item_type_assignment_13a1132e: 'Item type: Assignment'
   item_type_link_5a2abed2: 'Item type: Link'
   must_score_at_least_score_to_complete_this_module__b86b5101: Must score at least %{score} to complete this module item
-  module_item_has_been_completed_by_scoring_at_least_70bcdbcc: Module item has been completed by scoring at least %{score}
+  module_item_has_been_completed_by_scoring_at_least_70bcdbcc: Unit item has been completed by scoring at least %{score}
   view_ba339f93: View
   must_view_in_order_to_complete_this_module_item_dec2e583: Must view in order to complete this module item
   viewed_6b75c21e: Viewed
-  module_item_has_been_viewed_and_is_complete_6d180117: Module item has been viewed and is complete
+  module_item_has_been_viewed_and_is_complete_6d180117: Unit item has been viewed and is complete
   mark_done_9d81bcd9: Mark done
   must_mark_this_module_item_done_in_order_to_comple_ca3c390f: Must mark this module item done in order to complete
   marked_done_9fd646f: Marked done
-  module_item_marked_as_done_and_is_complete_ad240246: Module item marked as done and is complete
+  module_item_marked_as_done_and_is_complete_ad240246: Unit item marked as done and is complete
   must_contribute_to_this_module_item_to_complete_it_84ed571c: Must contribute to this module item to complete it
   contributed_to_this_module_item_and_is_complete_2799d5c: Contributed to this module item and is complete
   must_submit_this_module_item_to_complete_it_c29d67f0: Must submit this module item to complete it
-  module_item_submitted_and_is_complete_d61a909f: Module item submitted and is complete
+  module_item_submitted_and_is_complete_d61a909f: Unit item submitted and is complete
   manage_item_name_6118d4b0: Manage %{item_name}
   decrease_indent_de6343ab: Decrease indent
   increase_indent_6d550a4a: Increase indent
@@ -13108,12 +13108,12 @@ en:
       reorder: Reorder failed, please try again.
     points_possible_short: "%{points} pts"
     buttons:
-      add: Add Module
-      update: Update Module
+      add: Add Unit
+      update: Update Unit
       add_item: Add Item
     titles:
-      add: Add Module
-      edit: Edit Module Settings
+      add: Add Unit
+      edit: Edit Unit Settings
       edit_item: Edit Item Details
       add_item: Add Item to %{module}
       add_prerequisite: Add Prerequisite to %{module}
@@ -13143,14 +13143,14 @@ en:
   prerequisites_list_62d66d12: 'Prerequisites: %{list}'
   delete_prerequisite_title_19741947: Delete prerequisite %{title}
   delete_requirement_item_type_d7453a69: Delete requirement %{item} (%{type})
-  duplicating_module_this_may_take_some_time_eef73720: Duplicating Module, this may take some time
+  duplicating_module_this_may_take_some_time_eef73720: Duplicating Unit, this may take some time
   error_rendering_duplicated_module_db821097: Error rendering duplicated module
   error_duplicating_module_4b023042: Error duplicating module
-  module_module_name_was_successfully_deleted_fc9e9d47: Module %{module_name} was successfully deleted.
+  module_module_name_was_successfully_deleted_fc9e9d47: Unit %{module_name} was successfully deleted.
   title_is_required_437f9993: Title is required
-  module_item_module_item_name_was_successfully_dele_8626d846: Module item %{module_item_name} was successfully deleted.
-  move_module_item_f525d6c8: Move Module Item
-  move_module_90e6927e: Move Module
+  module_item_module_item_name_was_successfully_dele_8626d846: Unit item %{module_item_name} was successfully deleted.
+  move_module_item_f525d6c8: Move Unit Item
+  move_module_90e6927e: Move Unit
   move_contents_into_f3e4fd9d: Move Contents Into
   some_module_items_could_not_be_published_e4be3c0: Some module items could not be published
   expanded_f4493860: Expanded
@@ -13282,8 +13282,8 @@ en:
       posting_message_failed: Post Failed, Try Again
     draft: Draft
     buttons:
-      previous_module: Previous Module
-      next_module: Next Module
+      previous_module: Previous Unit
+      next_module: Next Unit
   disableWhileLoading:
     loading: Loading...
   jquery_doc_previews:
@@ -13548,7 +13548,7 @@ en:
     buttons:
       add_item: Add Item
     titles:
-      add_item_to_module: Add Item to Module
+      add_item_to_module: Add Item to Unit
       find_links_using_service: Find links using %{service}
     errors:
       external_tool_url: An external tool can't be saved without a URL.
@@ -14210,10 +14210,10 @@ en:
     Back: Back
   sequence_footer:
     prev_module_item_desc: 'Previous: *item*'
-    prev_module: 'Previous Module:'
-    prev_module_desc: 'Previous Module: *module*'
-    next_module: 'Next Module:'
-    next_module_desc: 'Next Module: *module*'
+    prev_module: 'Previous Unit:'
+    prev_module_desc: 'Previous Unit: *module*'
+    next_module: 'Next Unit:'
+    next_module_desc: 'Next Unit: *module*'
   choose_the_next_mastery_path_b035b727: Choose the next mastery path
   next_mastery_path_is_currently_locked_a9253711: Next mastery path is currently locked
   next_mastery_path_is_still_processing_please_perio_bb0121af: Next mastery path is still processing, please periodically refresh the page
@@ -14932,14 +14932,14 @@ en:
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: Cannot restrict by section unless groups are empty and not limited in size
   modules:
     requirements_changed: Requirements Changed
-    relock_modules: Re-Lock Modules
+    relock_modules: Re-Lock Units
     continue: Continue
     assignments_to_grade:
       one: 1 assignment has ungraded submissions
       other: "%{count} assignments have ungraded submissions"
     progression_module_collection:
-      module_progress_for_student: Module Progress for %{student.name}
-      module_progress_for: Module Progress for *%{student.name}*
+      module_progress_for_student: Unit Progress for %{student.name}
+      module_progress_for: Unit Progress for *%{student.name}*
       no_modules_found: No modules were found
     progression_module_view:
       items_below: Items to complete below
@@ -14947,9 +14947,9 @@ en:
     progression_student_view:
       show_progressions_for_student: Show progressions for %{name}
     progressions_index:
-      progression_header: Module Progression
+      progression_header: Unit Progression
       student_progress: Student Progress
-      back_to_modules: Back to Modules Page
+      back_to_modules: Back to Units Page
       no_students_found: No students were found
   no_directory_is_selected_please_select_a_directory_46ded46: No directory is selected, please select a directory before clicking 'move'
   where_would_you_like_to_move_title_fabd6e8f: Where would you like to move %{title}?
@@ -15408,7 +15408,7 @@ en:
   create_new_attempt_19c96c03: Create New Attempt
   missing_1a256b3b: Missing
   late_2be42b88: Late
-  more_modules_d9a9f003: More Modules
+  more_modules_d9a9f003: More Units
   now_viewing_attempt_current_attempt_918e616: Now viewing Attempt %{current_attempt}
   attempt_current_attempt_ef626179: Attempt %{current_attempt}
   attempt_current_attempt_of_max_attempts_427ed508: Attempt %{current_attempt} of %{max_attempts}
@@ -15550,7 +15550,7 @@ en:
   label_3c9a991: "%{label}:"
   no_label_date_ff3a372f: No %{label} Date
   no_assignment_group_assigned_8f1cdb9b: No Assignment Group Assigned
-  no_module_assigned_ca183bd7: No Module Assigned
+  no_module_assigned_ca183bd7: No Unit Assigned
   modules_b8f6aa9: modules
   edit_assignment_name_8a7af80c: Edit assignment name
   assignment_name_12eadcbd: Assignment name
@@ -16084,12 +16084,12 @@ en:
   pages_front_page_9ce5188: Pages Front Page
   course_activity_stream_40091c17: Course Activity Stream
   assignments_list_fe3e54be: Assignments List
-  before_publishing_your_course_you_must_either_publ_cf84cad9: Before publishing your course, you must either publish a module in the Modules page, or choose a different home page.
+  before_publishing_your_course_you_must_either_publ_cf84cad9: Before publishing your course, you must either publish a module in the Units page, or choose a different home page.
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: Select what you'd like to display on the home page.
   choose_course_home_page_d8642f9e: Choose Course Home Page
   choose_and_publish_980812cb: Choose and Publish
   before_publishing_your_course_you_must_either_publ_cdfdc78c: Before publishing your course, you must either publish a module or choose a different home page.
-  create_a_new_module_6f31b0fe: Create a new Module
+  create_a_new_module_6f31b0fe: Create a new Unit
   add_existing_content_7e36da66: Add existing content
   complete_registration_by_clicking_the_finish_the_r_fcd13ac8: Complete registration by clicking the “finish the registration process” link sent to your email.
   an_error_ocurred_while_publishing_course_3760cf04: An error ocurred while publishing course
@@ -16484,9 +16484,9 @@ en:
   homework_submission_172e8354: Homework Submission
   link_selection_1486c5d0: Link Selection
   migration_selection_5f1c5f55: Migration Selection
-  module_menu_3201af4e: Module Menu
-  modules_index_menu_c8748e7c: Modules Index Menu
-  modules_group_menu_4aae0d5f: Modules Group Menu
+  module_menu_3201af4e: Unit Menu
+  modules_index_menu_c8748e7c: Units Index Menu
+  modules_group_menu_4aae0d5f: Units Group Menu
   sync_grades_a16622ca: Sync Grades
   quiz_menu_4fcd5e61: Quiz Menu
   quizzes_index_menu_1ce11b54: Quizzes Index Menu
@@ -16811,8 +16811,8 @@ en:
   due_date_newest_to_oldest_35cffef9: Due Date - Newest to Oldest
   points_lowest_to_highest_45089e82: Points - Lowest to Highest
   points_highest_to_lowest_87f1b143: Points - Highest to Lowest
-  module_first_to_last_6921f3ec: Module - First to Last
-  module_last_to_first_8cdb7a8e: Module - Last to First
+  module_first_to_last_6921f3ec: Unit - First to Last
+  module_last_to_first_8cdb7a8e: Unit - Last to First
   filters_92f2776f: Filters
   statuses_497dfa15: Statuses…
   columns_464bd055: Columns
@@ -16821,8 +16821,8 @@ en:
   assignment_group_filter_c03f8a1d: Assignment Group Filter
   use_arrow_keys_to_navigate_options_2021cc50: Use arrow keys to navigate options.
   grading_period_filter_e1bf635a: Grading Period Filter
-  all_modules_20c9a1c8: All Modules
-  module_filter_63b17d11: Module Filter
+  all_modules_20c9a1c8: All Units
+  module_filter_63b17d11: Unit Filter
   all_student_groups_f74cd6c3: All Student Groups
   student_group_filter_185fb085: Student Group Filter
   student_groups_863201c1: Student Groups
@@ -17068,8 +17068,8 @@ en:
   preview_a3f8f854: PREVIEW
   file_name_8fd421ff: File name
   start_recording_9a65141a: Start Recording
-  duplicating_module_ae6670b0: Duplicating Module
-  duplicating_module_9727f5e4: Duplicating Module...
+  duplicating_module_ae6670b0: Duplicating Unit
+  duplicating_module_9727f5e4: Duplicating Unit...
   move_item_failed_8e4c1db6: Move Item Failed
   close_move_tray_8609e988: close move tray
   group_select_330df8bd: Group Select
@@ -17242,7 +17242,7 @@ en:
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
     The Course Home Page is the first page students see when they open
           your course. The Home Page can display the course participation activity
-          stream, the Course Modules page, the Course Assignments list, Syllabus,
+          stream, the Course Units page, the Course Assignments list, Syllabus,
           or a page you design as the front page.
   bring_existing_content_into_your_course_c5fc7e1b: Bring existing content into your course
   how_do_i_copy_a_canvas_course_into_a_new_course_sh_1633c6c1: How do I copy a Canvas course into a new course shell?
@@ -17259,7 +17259,7 @@ en:
   how_do_i_move_or_reorder_a_module_e64a4baa: How do I move or reorder a module?
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
     Use modules to organize your content and create a linear flow for
-          what students should do in the course. Modules can be used to organize
+          what students should do in the course. Units can be used to organize
           content by weeks, units, or a different organization structure.
           Add files, discussions, assignments, quizzes, and other learning materials.
           Require prerequisites to be completed before moving to a module or next
@@ -17363,8 +17363,8 @@ en:
     Zoom is a real-time video conferencing tool that brings
         teachers and students together. You can schedule and run
         video meetings directly within Canvas by adding a Zoom link
-        in a Canvas Course, Course Announcement, Module, or via Calendar.
-  modules_tutorial_tray_d58ac3cb: Modules Tutorial Tray
+        in a Canvas Course, Course Announcement, Unit, or via Calendar.
+  modules_tutorial_tray_d58ac3cb: Units Tutorial Tray
   pages_tutorial_tray_169464a9: Pages Tutorial Tray
   syllabus_tutorial_tray_97e8ef82: Syllabus Tutorial Tray
   assignments_tutorial_tray_4cc844b: Assignments Tutorial Tray
@@ -17638,7 +17638,7 @@ en:
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: To moderate grades, Grades - Select final grade for moderation must also be enabled.
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: To moderate a quiz, Grades - edit​ must also be enabled.
   disabling_this_permission_will_override_if_enabled_59c2b5c9: Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment.
-  allows_user_to_edit_assignment_details_on_individu_3e50993a: 'Allows user to edit assignment details on individual discussions. Modules: Allows user to add new assignments to a module.'
+  allows_user_to_edit_assignment_details_on_individu_3e50993a: 'Allows user to edit assignment details on individual discussions. Units: Allows user to add new assignments to a module.'
   to_differentiate_assignments_to_individual_student_6cc40fde: To differentiate assignments to individual students, Users - view list ​must also be enabled.
   insights_b514ad8d: Insights
   allows_user_to_view_canvas_insights_f4f7ba8b: Allows user to view Canvas Insights.
@@ -17674,7 +17674,7 @@ en:
   the_chat_tool_must_be_enabled_by_your_canvas_admin_e3b26123: The Chat tool must be enabled by your Canvas admin.
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: To share a Discussion to Commons, Discussions - view must also be enabled.
   the_course_status_buttons_unpublished_and_publishe_e2dca595: The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.
-  to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: To publish and unpublish module content, Courses - add / edit / delete and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.
+  to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: To publish and unpublish module content, Courses - add / edit / delete and Course Content - view must also be enabled. Unit items cannot be unpublished if there are student submissions.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: 'Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox. '
   to_publish_and_unpublish_module_content_courses_ad_ae996413: To publish and unpublish module content, Courses - add / edit / delete and Course Content - view must also be enabled.
   allows_user_to_view_published_and_unpublished_cour_25a5dcc0: Allows user to view published and unpublished course content.
@@ -18190,7 +18190,7 @@ en:
   other_ddacb37d: other
   score_pts_adcb1af3: "%{score} pts"
   select_a_course_4710371f: Select a Course
-  select_a_module_optional_7edb5cb0: Select a Module (optional)
+  select_a_module_optional_7edb5cb0: Select a Unit (optional)
   starting_copy_operation_cc46d911: Starting copy operation
   copy_operation_started_successfully_b2f236a1: Copy operation started successfully
   there_was_a_problem_starting_the_copy_operation_dd599cdd: There was a problem starting the copy operation
@@ -18677,7 +18677,7 @@ en:
   importing_name_8f2b131d: Importing "%{name}"
   oops_something_went_wrong_importing_name_d382cac1: Oops! Something went wrong importing "%{name}"
   cancel_importing_name_a0b6f3e1: Cancel importing "%{name}"
-  multiple_modules_930713d4: Multiple Modules
+  multiple_modules_930713d4: Multiple Units
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Points Possible"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} pts"
   no_points_possible_368669d: No Points Possible
@@ -18881,7 +18881,7 @@ en:
   group_set_name_2aed2347: Group Set Name
   require_group_members_to_be_in_the_same_section_7f6c36af: Require group members to be in the same section
   add_group_c84f9e9d: Add Group
-  module_navigation_97043417: Module Navigation
+  module_navigation_97043417: Unit Navigation
   jquery:
     module_sequence_footer:
       previous: Previous

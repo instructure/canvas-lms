@@ -31,20 +31,22 @@ environment_configuration(defined?(config) && config) do |config|
   # ENV['USE_OPTIMIZED_JS']                            = 'true'
 
   # Really do care if the message wasn't sent.
-  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.raise_delivery_errors = false
+
+  config.action_mailer.perform_caching = false
 
   # allow debugging only in development environment by default
   #
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
-  unless ENV['DISABLE_RUBY_DEBUGGING']
-    require 'byebug'
-    if ENV['REMOTE_DEBUGGING_ENABLED']
-      require 'byebug/core'
-      Byebug.start_server('0.0.0.0', 0)
+  unless ENV["DISABLE_RUBY_DEBUGGING"]
+    require "byebug"
+    if ENV["REMOTE_DEBUGGING_ENABLED"]
+      require "byebug/core"
+      Byebug.start_server("0.0.0.0", 0)
       puts "Byebug listening on 0.0.0.0:#{Byebug.actual_port}" # rubocop:disable Rails/Output
-      byebug_port_file = File.join(Dir.tmpdir, 'byebug.port')
+      byebug_port_file = File.join(Dir.tmpdir, "byebug.port")
       File.write(byebug_port_file, Byebug.actual_port)
     end
   end

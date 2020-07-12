@@ -1982,7 +1982,7 @@ en-AU:
   all_image_types_allowed_9c65004d: "All Image Types Allowed"
   all_items_a49b66c7: "All Items"
   all_media_types_allowed_3c0cdce7: "All Media Types Allowed"
-  all_modules_20c9a1c8: "All Modules"
+  all_modules_20c9a1c8: "All Units"
   all_my_files_a0213441: "All My Files"
   all_my_sections_375248b3: "All my sections"
   all_roles_f3bba14d: "All Roles"
@@ -2074,7 +2074,7 @@ en-AU:
       Allows teachers to specify post policies for this course or specific assignments, enabling grades to be
       posted and hidden manually.
   allows_teacherta_based_roles_to_access_the_attenda_c452f87b: "Allows teacher TA-based roles to access the Attendance tool."
-  allows_the_duplicating_of_modules_in_canvas_2e15b444: "Allows the duplicating of modules in Canvas"
+  allows_the_duplicating_of_modules_in_canvas_2e15b444: "Allows the duplicating of units in Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Allows the duplicating of objects in Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Allows the duplication of Calendar Events"
   allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Allows the missing policy applicator to emit submission_updated live events for each submission marked as missing."
@@ -2198,7 +2198,7 @@ en-AU:
       Allows user to add associated courses.
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Allows user to differentiate assignments to individual students."
   allows_user_to_download_all_comments_in_a_student__33b36d0a: "Allows user to download all comments in a student’s submission."
-  allows_user_to_edit_assignment_details_on_individu_3e50993a: "Allows user to edit assignment details on individual discussions. Modules: Allows user to add new assignments to a module."
+  allows_user_to_edit_assignment_details_on_individu_3e50993a: "Allows user to edit assignment details on individual discussions. Units: Allows user to add new assignments to a module."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Allows user to edit assignment details on individual discussions."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Allows user to edit blueprint content lock settings on individual discussions."
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Allows user to edit blueprint content lock settings on individual settings If the user is enrolled in a Blueprint master course."
@@ -2242,9 +2242,9 @@ en-AU:
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Allows user to like discussion posts when the Only Graders Can Like checkbox is selected."
   allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Allows user to manage Feature Options in Account Settings."
   allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
-      Allows user to manage modules (create, add items, edit module settings,
+      Allows user to manage units (create, add items, edit unit settings,
       publish/unpublish, etc.).
-  allows_user_to_manage_modules_create_add_items_edi_9459e815: "Allows user to manage modules (create, add items, edit module settings, publish, unpublish, etc.)."
+  allows_user_to_manage_modules_create_add_items_edi_9459e815: "Allows user to manage units (create, add items, edit unit settings, publish, unpublish, etc.)."
   allows_user_to_manage_observers_associated_with_st_4b45f2be: "Allows user to manage observers associated with students in the account."
   allows_user_to_manage_rubrics_326eedc2: "Allows user to manage rubrics."
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Allows user to manually add an app in Account Settings."
@@ -2727,7 +2727,7 @@ en-AU:
   appointments_dcb41d23: Appointments
   approved_c3b285d4: Approved
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} with precision %{precision}"
-  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools."
+  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course units and create assignments for assessment tools."
   appt_calendar_event_dialog: 
     invalid_participants: "You must allow at least one user to attend"
     title: "Edit %{name}"
@@ -3045,9 +3045,9 @@ en-AU:
       assignment_move: "Move Assignment %{name}"
       delete: Delete
       edit: Edit
-      module: Module
+      module: Unit
       move: "Move To…"
-      multiple_modules: "Multiple Modules"
+      multiple_modules: "Multiple Units"
       no_points_possible: "No Points Possible"
       points_possible: "%{pointsPossible} pts"
       points_possible_screen_reader: "%{pointsPossible} Points Possible"
@@ -3967,8 +3967,8 @@ en-AU:
   before_label_wrapper: "%{text}:"
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Before publishing this file, you must specify usage rights."
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Before publishing, you must set usage rights on your files."
-  before_publishing_your_course_you_must_either_publ_cdfdc78c: "Before publishing your course, you must either publish a module or choose a different home page."
-  before_publishing_your_course_you_must_either_publ_cf84cad9: "Before publishing your course, you must either publish a module in the Modules page, or choose a different home page."
+  before_publishing_your_course_you_must_either_publ_cdfdc78c: "Before publishing your course, you must either publish a unit or choose a different home page."
+  before_publishing_your_course_you_must_either_publ_cf84cad9: "Before publishing your course, you must either publish a unit in the Units page, or choose a different home page."
   before_using_this_feature_we_recommend_trying_the__1dea6042: "Before using this feature, we recommend trying the **%{t_theme_editor}** to do any branding. Enabling this feature provides the ability to upload custom JavaScript and CSS files in the Theme Editor. Modifications made with this method may conflict with future changes to the Canvas DOM (e.g. element class names or HTML structure) and are therefore not supported. Those using this feature should have advanced understanding of JavaScript and CSS and must maintain their own code. *Use at your own risk!*"
   before_using_this_feature_we_recommend_trying_the__7e6f194e: "Before using this feature, we recommend trying the *********%{t_theme_editor}********* to do any branding. Enabling this feature provides the ability to upload custom JavaScript and CSS files in the Theme Editor. Modifications made with this method may conflict with future changes to the Canvas DOM (e.g. element class names or HTML structure) and are therefore not supported. Also, you need to make sure that whatever modifications you make are accessible to all, including, for example, those using *screen readers* and **those** ***relying*** on the ****high contrast feature****. Instructure disclaims any liability for any changes you make. It is your responsibility to ensure they meet *****any***** ******compliance****** *******standards******* that may be required in your jurisdiction. Those using this feature should have advanced understanding of JavaScript and CSS and must maintain their own code. ********Use at your own risk!********"
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *click to re-send the email*, and make sure to check your spam box."
@@ -5296,7 +5296,7 @@ en-AU:
   communication_channels_a9abd037: "Communication Channels"
   complete_4f4efbc: complete
   complete_all_items_e1779257: "Complete All Items"
-  complete_fd828dea: Complete
+  complete_fd828dea: Satisfactory
   complete_icon_7455be93: "complete icon"
   complete_one_item_90e5fb03: "Complete One Item"
   complete_registration_by_clicking_the_finish_the_r_6c1c958b: "Complete registration by clicking the “finish the registration process” link sent to your email."
@@ -5507,30 +5507,30 @@ en-AU:
       ok_thanks: "Ok, Thanks"
     messages: 
       assignment_locked_at: "This assignment was locked %{at}."
-      assignment_locked_module: "This assignment is part of the module *%{module}* and hasn't been unlocked yet."
+      assignment_locked_module: "This assignment is part of the unit *%{module}* and hasn't been unlocked yet."
       assignment_locked_no_reason: "This assignment is locked.  No other reason has been provided."
       assignment_locked_until: "This assignment is locked until %{date}."
       content_locked_at: "This content was locked %{at}."
-      content_locked_module: "This content is part of the module *%{module}* and hasn't been unlocked yet."
+      content_locked_module: "This content is part of the unit *%{module}* and hasn't been unlocked yet."
       content_locked_no_reason: "This content is locked.  No other reason has been provided."
       content_locked_until: "This content is locked until %{date}."
       file_locked_at: "This file was locked %{at}."
-      file_locked_module: "This file is part of the module *%{module}* and hasn't been unlocked yet."
+      file_locked_module: "This file is part of the unit *%{module}* and hasn't been unlocked yet."
       file_locked_no_reason: "This file is locked.  No other reason has been provided."
       file_locked_until: "This file is locked until %{date}."
       page_locked_at: "This page was locked %{at}."
-      page_locked_module: "This page is part of the module *%{module}* and hasn't been unlocked yet."
+      page_locked_module: "This page is part of the unit *%{module}* and hasn't been unlocked yet."
       page_locked_no_reason: "This page is locked.  No other reason has been provided."
       page_locked_until: "This page is locked until %{date}."
       quiz_locked_at: "This quiz was locked %{at}."
-      quiz_locked_module: "This quiz is part of the module *%{module}* and hasn't been unlocked yet."
+      quiz_locked_module: "This quiz is part of the unit *%{module}* and hasn't been unlocked yet."
       quiz_locked_no_reason: "This quiz is locked.  No other reason has been provided."
       quiz_locked_until: "This quiz is locked until %{date}."
       topic_locked_at: "This topic was locked %{at}."
-      topic_locked_module: "This topic is part of the module *%{module}* and hasn't been unlocked yet."
+      topic_locked_module: "This topic is part of the unit *%{module}* and hasn't been unlocked yet."
       topic_locked_no_reason: "This topic is locked.  No other reason has been provided."
       topic_locked_until: "This topic is locked until %{date}."
-      visit_modules_page_for_details: "Visit the modules page for information on how to unlock this content."
+      visit_modules_page_for_details: "Visit the units page for information on how to unlock this content."
     titles: 
       content_is_locked: "Content Is Locked"
   content_migration: 
@@ -5873,31 +5873,31 @@ en-AU:
     invalid_content: "Could not find content"
     invalid_position: "Invalid position"
     invalid_requirement_type: "Invalid completion requirement type"
-  context_module_sub_header_2f39e87b: "Context Module Subheader"
+  context_module_sub_header_2f39e87b: "Context Unit Subheader"
   context_modules: 
     add_context_module_form: 
       button: 
         delete_label: "Delete prerequisites"
         delete_title: "Delete prerequisites"
       buttons: 
-        add_module: "Add Module"
+        add_module: "Add Unit"
       labels: 
         before_viewing: Prerequisites
         module_complete_when: Requirements
-        publish_final_grade: "Publish final grade for the student when this module is completed."
+        publish_final_grade: "Publish final grade for the student when this unit is completed."
         require_sequential_progress: "Students must move through requirements in sequential order."
       links: 
         add_prerequisite: "Add prerequisite"
         add_requirement: "Add requirement"
-      module_name: "Module Name"
+      module_name: "Unit Name"
       must_complete_prerequisites: "Must complete"
       no_preprequisites: "No prerequisites defined"
     buttons: 
-      add: "Add Module"
+      add: "Add Unit"
       add_item: "Add Item"
-      add_module: Module
-      add_module_first: "Add a New Module"
-      update: "Update Module"
+      add_module: Unit
+      add_module_first: "Add a New Unit"
+      update: "Update Unit"
     confirm: 
       delete: "Are you sure you want to delete this module?"
       delete_item: "Are you sure you want to remove this item from the module?"
@@ -5909,15 +5909,15 @@ en-AU:
       criterion_for_assignment: "%{assignment} %{select_criterion}"
       headings: 
         add_prerequisite: "Add Prerequisite to %{name}"
-        course_modules: "Course Modules"
+        course_modules: "Course Units"
       help: 
         create: |-
-            Course modules let you organise your assignments, pages, files, etc. into smaller sections or units. Modules could be centred around a theme, focused on a specific topic, or even just grouped chronologically.
+            Course units let you organise your assignments, pages, files, etc. into smaller sections or units. Units could be centred around a theme, focused on a specific topic, or even just grouped chronologically.
             
-            You can also sequence modules by defining criteria and prerequisites for each module. Students won't be able to access modules until they have unlocked all their prerequisites. That way you can prevent students from accessing certain content or files until they have, say, gotten at least 75% on a review quiz.
+            You can also sequence units by defining criteria and prerequisites for each module. Students won't be able to access units until they have unlocked all their prerequisites. That way you can prevent students from accessing certain content or files until they have, say, gotten at least 75% on a review quiz.
             
             To start organising your course into modules, click the "%{button}" button to the right.
-        no_modules: "No modules have been defined for this course."
+        no_modules: "No units have been defined for this course."
       images: 
         alt: 
           min_score: "minimum score"
@@ -5925,10 +5925,10 @@ en-AU:
           must_submit: "must submit"
           must_view: "must view"
         title: 
-          min_score: "Students must get at least a %{min_score} on this item before the module is considered complete"
-          must_contribute: "Students must contribute to this item before the module is considered complete"
-          must_submit: "Students must submit this assignment before the module is considered complete"
-          must_view: "Students must view this item before the module is considered complete"
+          min_score: "Students must get at least a %{min_score} on this item before the unit is considered complete"
+          must_contribute: "Students must contribute to this item before the unit is considered complete"
+          must_submit: "Students must submit this assignment before the unit is considered complete"
+          must_view: "Students must view this item before the unit is considered complete"
       indent: 
         ? "n"
         : 
@@ -5945,8 +5945,8 @@ en-AU:
         title: 
           remove_prerequisite: "Remove this prerequisite"
       module: module
-      module_details: "Modules are shown in sequential order, so only modules that are above %{name} can be set as prerequisites."
-      modules_keyboard_hint_updated: "Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu."
+      module_details: "Modules are shown in sequential order, so only units that are above %{name} can be set as prerequisites."
+      modules_keyboard_hint_updated: "Warning: For improved accessibility in reordering Units (or Unit items), please use the Move To Dialog option found in the menu."
       move_module: 
         after: After
         before: Before
@@ -5957,16 +5957,16 @@ en-AU:
         or: OR
         place: Place
       prerequisites: 
-        another_module: "Another Module"
+        another_module: "Another Unit"
       requirements: 
         must_contribute: "contribute to the page"
         must_score_at_least: "score at least"
         must_submit: "submit the assignment"
         must_view: "view the item"
       select_module: 
-        instructions: "Select Module"
+        instructions: "Select Unit"
         name: "%{module}"
-      select_prerequisite: "Select the type of prerequisite. Students cannot see a module until all prerequisites are satisfied."
+      select_prerequisite: "Select the type of prerequisite. Students cannot see a unit until all prerequisites are satisfied."
     context_module: 
       unpublish: Unpublish
     context_module_next: 
@@ -5976,9 +5976,9 @@ en-AU:
         alt: 
           incomplete: incomplete
         title: 
-          complete: "Module Completed"
-          incomplete: "Module Incomplete"
-          locked: "Module Locked"
+          complete: "Unit Completed"
+          incomplete: "Unit Incomplete"
+          locked: "Unit Locked"
       links: 
         add_item: "Add Content"
         text: 
@@ -5989,10 +5989,10 @@ en-AU:
           delete_module: "Delete this module"
           edit_module: Edit
           move_module: "Move this module"
-          student_progress: "See Student Progress for this Module"
+          student_progress: "See Student Progress for this Unit"
       manager_module: "Manage module"
       module_will_unlock_at: "Will unlock *%{unlock_date}*"
-      modules_keyboard_drag_and_drop: "Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu."
+      modules_keyboard_drag_and_drop: "Warning: For improved accessibility in reordering Units (or Unit items), please use the Move To Dialog option found in the menu."
       progression_complete_count: "*%{count}* Complete"
       progression_started_count: "*%{count}* In Progress"
       reorder_modules: "Drag to reorder modules"
@@ -6002,9 +6002,9 @@ en-AU:
       reorder: "Reorder failed, please try again."
     index: 
       titles: 
-        course_modules: "Course Modules"
+        course_modules: "Course Units"
     module_complete: Complete
-    module_empty: "There are no items in the module \"%{module}\""
+    module_empty: "There are no items in the unit \"%{module}\""
     module_item_next: 
       drag_to_reorder: "Drag to reorder or move item to another module"
       images: 
@@ -6015,11 +6015,11 @@ en-AU:
           must_submit: "must submit"
           must_view: "must view"
         title: 
-          max_score: "Students must not exceed the maximum score on this item before the module is considered complete"
-          min_score: "Students must reach the minimum score on this item before the module is considered complete"
-          must_contribute: "Students must contribute to this item before the module is considered complete"
-          must_submit: "Students must submit this assignment before the module is considered complete"
-          must_view: "Students must view this item before the module is considered complete"
+          max_score: "Students must not exceed the maximum score on this item before the unit is considered complete"
+          min_score: "Students must reach the minimum score on this item before the unit is considered complete"
+          must_contribute: "Students must contribute to this item before the unit is considered complete"
+          must_submit: "Students must submit this assignment before the unit is considered complete"
+          must_view: "Students must view this item before the unit is considered complete"
       links: 
         edit_item: Edit
         edit_item_details: "Edit item details"
@@ -6066,12 +6066,12 @@ en-AU:
     progressions: 
       titles: 
         student_progress: "Student Progress"
-        student_progression: "Module Progression by Student"
+        student_progression: "Unit Progression by Student"
     titles: 
-      add: "Add Module"
+      add: "Add Unit"
       add_item: "Add Item to %{module}"
       add_prerequisite: "Add Prerequisite to %{module}"
-      edit: "Edit Module Settings"
+      edit: "Edit Unit Settings"
       edit_item: "Edit Item Details"
     tool_sequence_footer: 
       edit_assignment_settings: "Edit Assignment Settings"
@@ -6082,9 +6082,9 @@ en-AU:
     invalid_position: "Invalid position"
   context_modulespublic: 
     buttons: 
-      add: "Add Module"
+      add: "Add Unit"
       add_item: "Add Item"
-      update: "Update Module"
+      update: "Update Unit"
     confirm: 
       delete: "Are you sure you want to delete this module?"
       delete_item: "Are you sure you want to remove this item from the module?"
@@ -6099,10 +6099,10 @@ en-AU:
       quizzes: Quizzes
     points_possible_short: "%{points} pts"
     titles: 
-      add: "Add Module"
+      add: "Add Unit"
       add_item: "Add Item to %{module}"
       add_prerequisite: "Add Prerequisite to %{module}"
-      edit: "Edit Module Settings"
+      edit: "Edit Unit Settings"
       edit_item: "Edit Item Details"
   context_nav_link_8d15d95: "Context nav. link"
   context_nav_link_active_78adb0fa: "Context nav. link active"
@@ -6115,7 +6115,7 @@ en-AU:
   contexttype_notification_settings_d72acd58: "%{contextType} Notification Settings"
   continue_ac067716: Continue
   continue_typing_to_find_additional_sections_or_stu_49786085: "Continue typing to find additional sections or students."
-  contributed_to_this_module_item_and_is_complete_2799d5c: "Contributed to this module item and is complete"
+  contributed_to_this_module_item_and_is_complete_2799d5c: "Contributed to this unit item and is complete"
   conversation_dialog: 
     errors: 
       field_is_required: "This field is required"
@@ -6302,8 +6302,8 @@ en-AU:
   copy_operation_started_successfully_b2f236a1: "Copy operation started successfully"
   copy_page_to_another_course_405cc07c: "Copy page to another course"
   copy_quiz_to_course_74f9c8c1: "Copy Quiz to Course"
-  copy_this_module_item_to_a_course_790a0cf4: "Copy this module item to a course..."
-  copy_this_module_to_a_course_ddd12cc7: "Copy this module to a course..."
+  copy_this_module_item_to_a_course_790a0cf4: "Copy this unit item to a course..."
+  copy_this_module_to_a_course_ddd12cc7: "Copy this unit to a course..."
   copy_title_to_course_2a41a2f4: "Copy %{title} to course"
   copy_title_to_course_ac71981a: "Copy {%title} to course"
   copy_to_64f8456b: "Copy To..."
@@ -6606,7 +6606,7 @@ en-AU:
       media_file: "A media file failed to export"
       media_files: "Failed to export some media files"
       media_files_too_large: "Media files were not exported because the total file size was too large."
-      module_meta: "Failed to export module meta data"
+      module_meta: "Failed to export unit meta data"
       organization: "Failed to generate organization structure."
       question_bank: "The question bank \"%{title}\" failed to export"
       quiz: "The quiz \"%{title}\" failed to export"
@@ -6731,7 +6731,7 @@ en-AU:
       wiki_id: "Wiki Id"
       workflow_state: "Workflow State"
   course_members_are_free_to_join_9b2603d4: "Course members are free to join"
-  course_modules_795cb95e: "Course Modules"
+  course_modules_795cb95e: "Course Units"
   course_name_45175338: "course name"
   course_name_63b973d1: "Course Name"
   course_name_is_required_90919349: "Course name is required"
@@ -7261,7 +7261,7 @@ en-AU:
           assignments: "Assignments List"
           course_activity_stream: "Course Activity Stream"
           custom_page: "Pages Front Page"
-          modules: "Course Modules"
+          modules: "Course Units"
           syllabus: Syllabus
       empty_body: "No Content"
       front_page_not_set: "Front page must be set first"
@@ -7381,7 +7381,7 @@ en-AU:
   create_a_64f6f82: "Create a"
   create_a_developer_key_cabaa013: "Create a developer key"
   create_a_new_account_4cf7c0f9: "Create a New Account"
-  create_a_new_module_6f31b0fe: "Create a new Module"
+  create_a_new_module_6f31b0fe: "Create a new Unit"
   create_a_new_user_for_address_7487e9c9: "Create a new user for \"%{address}\""
   create_account_263ec6: "Create Account"
   create_an_ba36d171: "Create an"
@@ -7485,7 +7485,7 @@ en-AU:
     jobs: Jobs
     media: Media
     messages: Messages
-    modules: Modules
+    modules: Units
     outcomes: Outcomes
     people: People
     plugins: Plugins
@@ -7827,7 +7827,7 @@ en-AU:
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Default SIS Sync for assignments, quizzes, grade discussion"
   default_template_f2a759ed: "Default Template"
   default_templates_are_used_as_starting_points_for__f06f9e33: "Default templates are used as starting points for new themes and cannot be deleted."
-  default_to_modules_for_the_course_home_page_d6a951a7: "Default to modules for the course home page"
+  default_to_modules_for_the_course_home_page_d6a951a7: "Default to units for the course home page"
   default_view_for_dashboard_ea91b60f: "Default View for Dashboard"
   define_general_settings_for_locked_objects_in_this_20da2981: "Define general settings for locked objects in this course. "
   define_settings_by_type_for_locked_objects_in_this_676197bf: "Define settings by type for locked objects in this course. "
@@ -7849,7 +7849,7 @@ en-AU:
   delete_comment_commenttext_c8afe129: "Delete comment: %{commentText}"
   delete_criterion_row_80c3b3b: "Delete criterion row"
   delete_current_message_5da0221a: "Delete Current Message"
-  delete_current_module_item_21fefc54: "Delete Current Module/Item"
+  delete_current_module_item_21fefc54: "Delete Current Unit/Item"
   delete_custom_help_link_814f0509: "Delete custom help link"
   delete_disabled_3196ce47: "Delete (Disabled)"
   delete_discussion_title_a28df8b6: "Delete discussion %{title}"
@@ -8599,7 +8599,7 @@ en-AU:
   draft_92507c72: (draft)
   draft_comment_b2376ea4: "Draft comment"
   drag_a_file_here_39357b48: "Drag a File Here"
-  drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "Drag and Drop files on modules and multi-file module item uploads"
+  drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "Drag and Drop files on units and multi-file unit item uploads"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Drag and drop or click to browse your computer"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Drag and drop, or click to browse your computer"
   drag_and_drop_your_image_here_or_7fba7c14: "Drag and drop your image here or "
@@ -8672,17 +8672,17 @@ en-AU:
   duplicate_discussion_title_43b39959: "Duplicate Discussion %{title}"
   duplicate_discussion_title_6537ef4d: "Duplicate discussion %{title}"
   duplicate_item_339f54bb: "Duplicate Item"
-  duplicate_module_module_name_be40ad50: "Duplicate Module %{module_name}"
+  duplicate_module_module_name_be40ad50: "Duplicate Unit %{module_name}"
   duplicate_module_name_ab26e5c3: "Duplicate %{module_name}"
-  duplicate_modules_8ea35557: "Duplicate Modules"
+  duplicate_modules_8ea35557: "Duplicate Units"
   duplicate_objects_120eda73: "Duplicate Objects"
   duplicate_provider_provider_d9842134: "Duplicate provider %{provider}"
   duplicate_quiz_name_79fdcb3e: "Duplicate Quiz %{name}"
   duplicate_this_module_79ca8243: "Duplicate this module"
   duplicating_calendar_events_9932cd37: "Duplicating Calendar Events"
-  duplicating_module_9727f5e4: "Duplicating Module..."
-  duplicating_module_ae6670b0: "Duplicating Module"
-  duplicating_module_this_may_take_some_time_eef73720: "Duplicating Module, this may take some time"
+  duplicating_module_9727f5e4: "Duplicating Unit..."
+  duplicating_module_ae6670b0: "Duplicating Unit"
+  duplicating_module_this_may_take_some_time_eef73720: "Duplicating Unit, this may take some time"
   duplication_failed_3351ffb1: "Duplication failed"
   duplication_of_title_succeeded_2e0bd645: "Duplication of %{title} succeeded"
   duration_1_minute_29c7d5ab: "Duration: 1 minute"
@@ -8747,7 +8747,7 @@ en-AU:
   edit_mastery_paths_for_name_c9fc59f9: "Edit Mastery Paths for %{name}"
   edit_mastery_paths_for_title_3c0a15e1: "Edit Mastery Paths for %{title}"
   edit_mastery_paths_for_title_label_41d81451: "Edit Mastery Paths for %{title_label}"
-  edit_module_item_83258f6d: "Edit Module/Item"
+  edit_module_item_83258f6d: "Edit Unit/Item"
   edit_name_cbdef0c2: "Edit %{name}"
   edit_outcome_867a0381: "Edit Outcome"
   edit_outcome_group_f82e0210: "Edit Outcome Group"
@@ -8916,7 +8916,7 @@ en-AU:
   enable_new_gradebook_history_page_e0fd9d02: "Enable New Mark book History page."
   enable_new_sis_integration_settings_ab6780a4: "Enable new SIS integration settings"
   enable_notifications_10a4bf44: "Enable Notifications"
-  enable_or_condition_for_modules_a16f02d8: "Enable \"OR\" Condition for Modules"
+  enable_or_condition_for_modules_a16f02d8: "Enable \"OR\" Condition for Units"
   enable_recording_for_this_conference_b8adff6: "Enable recording for this conference."
   enable_reregistration_for_lti_2_b2a10444: "Enable reregistration for LTI 2"
   enable_scope_ac28b832: "Enable scope"
@@ -9586,7 +9586,7 @@ en-AU:
       add_new_tool: "Add New App"
       all: All
       app_headder: "External Apps"
-      external_tools_note: "Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools."
+      external_tools_note: "Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course units and create assignments for assessment tools."
       external_tools_references: "*See some LTI tools* that work great with Canvas. You can also check out the ** Canvas Community topics about LTI tools**"
       installed: Installed
       not_installed: "Not Installed"
@@ -9595,7 +9595,7 @@ en-AU:
       view_installed_tools: "View App Configurations"
     migration_selection_configured: "Migration selection configured"
     missing_stars: "You must select a star rating"
-    module_menu_configured: "Module menu configured"
+    module_menu_configured: "Unit menu configured"
     quiz_menu_configured: "Quiz menu configured"
     rate_tool_view: 
       rate_tool: "How do you rate this tool?"
@@ -9710,7 +9710,7 @@ en-AU:
         Differentiated Assignments is a feature that enables choosing which section(s) or individual student(s) an assignment applies to.
         Sections that are not given an assignment will not see it in their course content and their final grade will be
         calculated without those points.
-    ember_modules: "Ember Modules"
+    ember_modules: "Ember Units"
     google_docs_domain_restriction: "Google Docs Domain Restriction"
     gradebook_list_students_by_sortable_name: "Gradebook - List Students by Sortable Name"
     hide_celebrations: "Disable Celebration Animations"
@@ -10617,8 +10617,8 @@ en-AU:
       show_concluded_enrollments: "Show Concluded Enrollments"
       view_grading_history: "View Grading History"
     grades: 
-      complete: Complete
-      incomplete: Incomplete
+      complete: Satisfactory
+      incomplete: Unsatisfactory
     grading_box_extended: 
       labels: 
         grade: Mark
@@ -10950,8 +10950,8 @@ en-AU:
   grading_box: 
     out_of_points_possible: "out of %{assignment.points_possible}"
   grading_cell: 
-    grade_complete: Complete
-    grade_incomplete: Incomplete
+    grade_complete: Satisfactory
+    grade_incomplete: Unsatisfactory
     grade_ungraded: Unmarked
     out_of: "(out of %{points})"
     out_of_nil: "No points possible"
@@ -11681,7 +11681,7 @@ en-AU:
   how_do_i_add_a_rubric_to_an_assignment_46fd097e: "How do I add a rubric to an assignment?"
   how_do_i_add_an_announcement_in_a_course_63396bb7: "How do I add an announcement in a course?"
   how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: "How do I add an image to a course card in the Dashboard?"
-  how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "How do I add assignment types, pages, and files as module items?"
+  how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "How do I add assignment types, pages, and files as unit items?"
   how_do_i_add_or_edit_details_in_an_assignment_fa779906: "How do I add or edit details in an assignment?"
   how_do_i_add_users_to_a_course_4a88efaf: "How do I add users to a course?"
   how_do_i_add_zoom_to_a_course_31300d74: "How do I add Zoom to a course?"
@@ -11720,7 +11720,7 @@ en-AU:
   how_do_i_mute_and_unmute_all_participants_a7a2115b: "How do I mute and unmute all participants?"
   how_do_i_post_grades_for_an_assignment_in_the_grad_bc01018e: "How do I post grades for an assignment in the Gradebook?"
   how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "How do I publish or unpublish a discussion as an instructor?"
-  how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "How do I publish or unpublish a module as an instructor?"
+  how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "How do I publish or unpublish a unit as an instructor?"
   how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "How do I publish or unpublish a page as an instructor?"
   how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "How do I publish or unpublish an assignment as an instructor?"
   how_do_i_record_a_conference_e4845e7: "How do I record a conference?"
@@ -11839,12 +11839,12 @@ en-AU:
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "If enabled, allows more than the maximum possible score on an Outcome to be given on a rubric."
   if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
       If enabled, Canvas will allow tools to return multiple content items
-      in a single request at the course modules page
+      in a single request at the course units page
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "If enabled, Common Cartridge importers will convert HTML files into Pages"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "If enabled, content designers must provide copyright and license information for files before they are published. This only applies if Better File Browsing is also enabled."
   if_enabled_copyright_and_license_information_must__2a551827: "If enabled, copyright and licence information must be provided for files before they are published."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "If enabled, developer key management options and token scoping will be used."
-  if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "If enabled, modules will have the option to be marked as complete when only one of the requirements is met."
+  if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "If enabled, units will have the option to be marked as complete when only one of the requirements is met."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "If enabled, 'oauth2_access_token_url' will be sent in LTI2 registration launch"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "If enabled, OAuth 1.0a signing may be used by LTI tools to access the Membership Service API"
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "If enabled, query parameters will not be copied to the POST body during an LTI launch."
@@ -11978,8 +11978,8 @@ en-AU:
   importers/context_external_tool_importer: 
     external_tool_attention_needed: "The security parameters for the external tool \"%{tool_name}\" need to be set in Course Settings."
   importers/context_module_importer: 
-    foreign_lti_tool: "The account External Tool for module item \"%{title}\" must be configured before the item can be launched"
-    migration_module_item_type: "Module Item"
+    foreign_lti_tool: "The account External Tool for unit item \"%{title}\" must be configured before the item can be launched"
+    migration_module_item_type: "Unit Item"
   importers/course_content_importer: 
     account_grading_standard_warning: "Couldn't find account grading standard for the course."
     copied_grading_standard_warning: "Couldn't find copied grading standard for the course."
@@ -12044,7 +12044,7 @@ en-AU:
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Includes grade values in the admin grade reports."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Includes rubrics in the course sidebar navigation"
   incomplete_95612d72: incomplete
-  incomplete_da3c2ea2: Incomplete
+  incomplete_da3c2ea2: Unsatisfactory
   incompleteregistration: 
     get_started: "Get Started"
     welcome_to_canvas: "Welcome to Canvas!"
@@ -12120,8 +12120,8 @@ en-AU:
     browsers: 
       unrecognized: "Unrecognized Browser"
     buttons: 
-      next_module: "Next Module"
-      previous_module: "Previous Module"
+      next_module: "Next Unit"
+      previous_module: "Previous Unit"
       search: Search
       search_by_tag: "Search by Tag"
     confirms: 
@@ -12183,8 +12183,8 @@ en-AU:
     alerts: 
       file_previews_disabled: "File previews have been disabled for this Canvas site"
     buttons: 
-      next_module: "Next Module"
-      previous_module: "Previous Module"
+      next_module: "Next Unit"
+      previous_module: "Previous Unit"
     draft: Draft
     errors: 
       posting_message_failed: "Post Failed, Try Again"
@@ -12609,7 +12609,7 @@ en-AU:
         assignments: Assignments
         attachments: Files
         calendar_events: "Calendar Events"
-        context_modules: Modules
+        context_modules: Units
         course_settings: "Course Settings"
         discussion_topics: "Discussion Topics"
         external_tools: "External Tools"
@@ -13714,9 +13714,9 @@ en-AU:
         assignment_graded: "Canvas Alert - Marked: %{assignment_name}, %{course_name}"
     assignment_locked: "This assignment is currently locked."
     assignment_locked_at: "This assignment was locked %{at}."
-    assignment_locked_module: "This assignment is part of the module *%{module}* and hasn't been unlocked yet."
+    assignment_locked_module: "This assignment is part of the unit *%{module}* and hasn't been unlocked yet."
     assignment_locked_until: "This assignment is locked until %{date}."
-    assignment_module_time_locked: "This assignment is part of the module *%{module}*, which is locked until %{time}."
+    assignment_module_time_locked: "This assignment is part of the unit *%{module}*, which is locked until %{time}."
     assignment_resubmitted: 
       email: 
         html: 
@@ -13790,7 +13790,7 @@ en-AU:
             More info at %{website}
       summary: 
         subject: "Marks and comments released for: %{title}, %{course}"
-    assignment_unpublished_module: "This assignment is part of an unpublished module and is not available yet."
+    assignment_unpublished_module: "This assignment is part of an unpublished unit and is not available yet."
     blueprint_content_added: 
       email: 
         body: "Blueprint course changes have been synced to %{name}."
@@ -13917,10 +13917,10 @@ en-AU:
         subject: "Content Link Error - %{assignment_name}"
     content_locked: "This quiz is currently locked."
     content_locked_at: "This content was locked %{at}."
-    content_locked_module: "This content is part of the module *%{module}* and hasn't been unlocked yet."
+    content_locked_module: "This content is part of the unit *%{module}* and hasn't been unlocked yet."
     content_locked_until: "This content is locked until %{date}."
-    content_module_time_locked: "This content is part of the module *%{module}*, which is locked until %{time}."
-    content_unpublished_module: "This content is part of an unpublished module and is not available yet."
+    content_module_time_locked: "This content is part of the unit *%{module}*, which is locked until %{time}."
+    content_unpublished_module: "This content is part of an unpublished unit and is not available yet."
     conversation_created: 
       email: 
         attached_files: "Attached Files:"
@@ -14249,10 +14249,10 @@ en-AU:
         no_time_set: "No Time Set"
     file_locked: "This file is currently locked."
     file_locked_at: "This file was locked %{at}."
-    file_locked_module: "This file is part of the module *%{module}* and hasn't been unlocked yet."
+    file_locked_module: "This file is part of the unit *%{module}* and hasn't been unlocked yet."
     file_locked_until: "This file is locked until %{date}."
-    file_module_time_locked: "This file is part of the module *%{module}*, which is locked until %{time}."
-    file_unpublished_module: "This file is part of an unpublished module and is not available yet."
+    file_module_time_locked: "This file is part of the unit *%{module}*, which is locked until %{time}."
+    file_unpublished_module: "This file is part of an unpublished unit and is not available yet."
     forgot_password: 
       email: 
         associated_login: "This address is associated with the login, \"%{login_identifier}\"."
@@ -14651,10 +14651,10 @@ en-AU:
         body: "Canvas Alert - New User: %{user}, %{account}"
     page_locked: "This page is currently locked."
     page_locked_at: "This page was locked %{at}."
-    page_locked_module: "This page is part of the module *%{module}* and hasn't been unlocked yet."
+    page_locked_module: "This page is part of the unit *%{module}* and hasn't been unlocked yet."
     page_locked_until: "This page is locked until %{date}."
-    page_module_time_locked: "This page is part of the module *%{module}*, which is locked until %{time}."
-    page_unpublished_module: "This page is part of an unpublished module and is not available yet."
+    page_module_time_locked: "This page is part of the unit *%{module}*, which is locked until %{time}."
+    page_unpublished_module: "This page is part of an unpublished unit and is not available yet."
     peer_review_invitation: 
       email: 
         body: "You've been invited to peer review %{reviewee}. Follow the link below to review them!"
@@ -14705,9 +14705,9 @@ en-AU:
         body: "Canvas Alert - You have been registered for a Canvas account at %{account}!  "
     quiz_locked: "This quiz is currently locked."
     quiz_locked_at: "This quiz was locked %{at}."
-    quiz_locked_module: "This quiz is part of the module *%{module}* and hasn't been unlocked yet."
+    quiz_locked_module: "This quiz is part of the unit *%{module}* and hasn't been unlocked yet."
     quiz_locked_until: "This quiz is locked until %{date}."
-    quiz_module_time_locked: "This quiz is part of the module *%{module}*, which is locked until %{time}."
+    quiz_module_time_locked: "This quiz is part of the unit *%{module}*, which is locked until %{time}."
     quiz_regrade_finished: 
       email: 
         body: "A regrade has finished for the quiz %{quiz}"
@@ -14725,7 +14725,7 @@ en-AU:
         subject: "Quiz Regraded: %{quiz}, %{context}"
       twitter: 
         body: "Canvas Alert - Quiz Regraded : %{quiz}"
-    quiz_unpublished_module: "This quiz is part of an unpublished module and is not available yet."
+    quiz_unpublished_module: "This quiz is part of an unpublished unit and is not available yet."
     report_generated: 
       email: 
         html: 
@@ -14954,10 +14954,10 @@ en-AU:
         tweet: "Canvas Alert - %{notification_count} new notifications"
     topic_locked: "This topic is currently locked."
     topic_locked_at: "This topic was locked %{at}."
-    topic_locked_module: "This topic is part of the module *%{module}* and hasn't been unlocked yet."
+    topic_locked_module: "This topic is part of the unit *%{module}* and hasn't been unlocked yet."
     topic_locked_until: "This topic is locked until %{date}."
-    topic_module_time_locked: "This topic is part of the module *%{module}*, which is locked until %{time}."
-    topic_unpublished_module: "This topic is part of an unpublished module and is not available yet."
+    topic_module_time_locked: "This topic is part of the unit *%{module}*, which is locked until %{time}."
+    topic_unpublished_module: "This topic is part of an unpublished unit and is not available yet."
     updated_wiki_page: 
       email: 
         body: "The page %{title} has been updated."
@@ -14974,7 +14974,7 @@ en-AU:
         subject: "Updated Page: %{title}, %{user}"
       twitter: 
         tweet: "Canvas Alert - Page Updated: %{title}, %{user}."
-    visit_modules_page: "*Visit the course modules page for information on how to unlock this content.*"
+    visit_modules_page: "*Visit the course units page for information on how to unlock this content.*"
     web_conference_invitation: 
       email: 
         body: "You've been invited to participate in a web conference, %{title} for %{name}."
@@ -15038,7 +15038,7 @@ en-AU:
     grading_standard_type: "Grading Standard"
     group_type: Group
     learning_outcome_type: "Learning Outcome"
-    module_type: Module
+    module_type: Unit
     quiz_question_type: "Quiz Question"
     quiz_type: Quiz
     rubric_type: Rubric
@@ -15129,19 +15129,19 @@ en-AU:
   modified_by_c1584b3c: "Modified By"
   modified_by_user_e6c8ade3: "modified by: %{user}"
   modify_permissions_for_account_rubrics_6c3aee59: "Modify permissions for Account Rubrics"
-  module_90d9fd32: Module
-  module_completed_50c50762: "Module Completed"
-  module_content_import_enhancements_c00b0ea2: "Module Content Import Enhancements"
-  module_file_upload_enhancements_eecd4d37: "Module File Upload Enhancements"
-  module_filter_63b17d11: "Module Filter"
-  module_first_to_last_6921f3ec: "Module - First to Last"
-  module_in_progress_fa600662: "Module In Progress"
-  module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "Module item has been completed by scoring at least %{score}"
-  module_item_has_been_viewed_and_is_complete_6d180117: "Module item has been viewed and is complete"
-  module_item_is_locked_19fa60b4: "Module Item is locked."
-  module_item_marked_as_done_and_is_complete_ad240246: "Module item marked as done and is complete"
-  module_item_module_item_name_was_successfully_dele_8626d846: "Module item %{module_item_name} was successfully deleted."
-  module_item_submitted_and_is_complete_d61a909f: "Module item submitted and is complete"
+  module_90d9fd32: Unit
+  module_completed_50c50762: "Unit Completed"
+  module_content_import_enhancements_c00b0ea2: "Unit Content Import Enhancements"
+  module_file_upload_enhancements_eecd4d37: "Unit File Upload Enhancements"
+  module_filter_63b17d11: "Unit Filter"
+  module_first_to_last_6921f3ec: "Unit - First to Last"
+  module_in_progress_fa600662: "Unit In Progress"
+  module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "Unit item has been completed by scoring at least %{score}"
+  module_item_has_been_viewed_and_is_complete_6d180117: "Unit item has been viewed and is complete"
+  module_item_is_locked_19fa60b4: "Unit Item is locked."
+  module_item_marked_as_done_and_is_complete_ad240246: "Unit item marked as done and is complete"
+  module_item_module_item_name_was_successfully_dele_8626d846: "Unit item %{module_item_name} was successfully deleted."
+  module_item_submitted_and_is_complete_d61a909f: "Unit item submitted and is complete"
   module_item_types: 
     assignment: Assignment
     disuccsion: Discussion
@@ -15151,12 +15151,12 @@ en-AU:
     page: Page
     quiz: Quiz
     sub_header: "Sub Header"
-  module_last_to_first_8cdb7a8e: "Module - Last to First"
-  module_locked_f6a7ea9d: "Module Locked"
-  module_menu_3201af4e: "Module Menu"
-  module_module_name_was_successfully_deleted_fc9e9d47: "Module %{module_name} was successfully deleted."
-  module_name_1127ebdb: "Module Name"
-  module_navigation_97043417: "Module Navigation"
+  module_last_to_first_8cdb7a8e: "Unit - Last to First"
+  module_locked_f6a7ea9d: "Unit Locked"
+  module_menu_3201af4e: "Unit Menu"
+  module_module_name_was_successfully_deleted_fc9e9d47: "Unit %{module_name} was successfully deleted."
+  module_name_1127ebdb: "Unit Name"
+  module_navigation_97043417: "Unit Navigation"
   modules: 
     add: 
       assignment: 
@@ -15229,8 +15229,8 @@ en-AU:
     dialog_title: "Add item to %{moduleName}"
     item: 
       cancel: Cancel
-      edit_item: "Edit Module Item"
-      item_title: "Module Item Title"
+      edit_item: "Edit Unit Item"
+      item_title: "Unit Item Title"
       points_possible: pts
       save: Save
       saving: saving...
@@ -15242,15 +15242,15 @@ en-AU:
     module_collection_view: 
       button: 
         preview: Preview
-      course_modules: "Course Modules"
+      course_modules: "Course Units"
       header: 
-        module: Module
+        module: Unit
     module_edit: 
       Create: Create
       cancel: Cancel
-      has_unlock_date: "Lock modules until a given date"
+      has_unlock_date: "Lock units until a given date"
       lock_datea: "Lock date"
-      module_name: "Module Name"
+      module_name: "Unit Name"
       new_module: "Create new module"
     module_item_view: 
       button: 
@@ -15266,23 +15266,23 @@ en-AU:
         prerequisites: Prerequisites
         published: Published
     progression_module_collection: 
-      module_progress_for: "Module Progress for *%{student.name}*"
-      module_progress_for_student: "Module Progress for %{student.name}"
-      no_modules_found: "No modules were found"
+      module_progress_for: "Unit Progress for *%{student.name}*"
+      module_progress_for_student: "Unit Progress for %{student.name}"
+      no_modules_found: "No units were found"
     progression_module_view: 
       items: "Items to complete"
       items_below: "Items to complete below"
     progression_student_view: 
       show_progressions_for_student: "Show progressions for %{name}"
     progressions_index: 
-      back_to_modules: "Back to Modules Page"
+      back_to_modules: "Back to Units Page"
       no_students_found: "No students were found"
-      progression_header: "Module Progression"
+      progression_header: "Unit Progression"
       student_progress: "Student Progress"
-    relock_modules: "Re-Lock Modules"
+    relock_modules: "Re-Lock Units"
     requirements_changed: "Requirements Changed"
   modules_b8f6aa9: modules
-  modules_c4325335: Modules
+  modules_c4325335: Units
   modules_group_menu_4aae0d5f: "Modules Group Menu"
   modules_home_page_568c6bb9: "Modules Home Page"
   modules_index_menu_c8748e7c: "Modules Index Menu"
@@ -15313,7 +15313,7 @@ en-AU:
   more_info_at_web_address_dba7e187: "More info at %{web_address}"
   more_information_3dfb76b5: "More information"
   more_information_about_ratings_57cdd446: "More Information About Ratings"
-  more_modules_d9a9f003: "More Modules"
+  more_modules_d9a9f003: "More Units"
   more_options_272b4953: "more options"
   more_people_options_730e9686: "More people options"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "More results were added at the bottom of the page."
@@ -15351,15 +15351,15 @@ en-AU:
   move_item_e94a8103: "Move Item"
   move_item_failed_8e4c1db6: "Move Item Failed"
   move_left_8c364375: "Move Left"
-  move_module_346b8112: "Move Module..."
-  move_module_90e6927e: "Move Module"
-  move_module_after_31fc870b: "Move Module After"
-  move_module_before_32153dc8: "Move Module Before"
-  move_module_contents_74fa15d5: "Move module contents"
-  move_module_item_77754119: "Move Module/Item"
-  move_module_item_after_bbcfe2d6: "Move Module Item After"
-  move_module_item_before_13e940eb: "Move Module Item Before"
-  move_module_item_f525d6c8: "Move Module Item"
+  move_module_346b8112: "Move Unit..."
+  move_module_90e6927e: "Move Unit"
+  move_module_after_31fc870b: "Move Unit After"
+  move_module_before_32153dc8: "Move Unit Before"
+  move_module_contents_74fa15d5: "Move unit contents"
+  move_module_item_77754119: "Move Unit/Item"
+  move_module_item_after_bbcfe2d6: "Move Unit Item After"
+  move_module_item_before_13e940eb: "Move Unit Item Before"
+  move_module_item_f525d6c8: "Move Unit Item"
   move_navigation_item_f034cd8a: "Move Navigation Item"
   move_outcome_ce497e6c: "Move Outcome"
   move_outcome_group_cfa1a505: "Move Outcome Group"
@@ -15397,7 +15397,7 @@ en-AU:
   multiple_dropdowns_read_surrounding_text_f61274b3: "Multiple dropdowns, read surrounding text"
   multiple_due_dates_283dd861: "Multiple Due Dates"
   multiple_due_dates_6b0d75c6: "Multiple due dates"
-  multiple_modules_930713d4: "Multiple Modules"
+  multiple_modules_930713d4: "Multiple Units"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
     one: "Must achieve mastery at least one time. Scores above mastery will be averaged to calculate final score."
     other: "Must achieve mastery at least %{count} times. Scores above mastery will be averaged to calculate final score."
@@ -15412,7 +15412,7 @@ en-AU:
   must_belong_to_an_active_course_9711934: "must belong to an active course"
   must_belong_to_an_active_root_account_d59a05af: "must belong to an active root account"
   must_contribute_to_the_page_fff632c: "Must contribute to the page"
-  must_contribute_to_this_module_item_to_complete_it_84ed571c: "Must contribute to this module item to complete it"
+  must_contribute_to_this_module_item_to_complete_it_84ed571c: "Must contribute to this unit item to complete it"
   must_have_at_least_1_grader_d4a54e85: "Must have at least 1 grader"
   must_have_at_least_1_group_per_section_9809e708: "Must have at least 1 group per section"
   must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "Must have at least as many groups as sections to assign by section"
@@ -15421,19 +15421,19 @@ en-AU:
   must_mark_as_done_91cff799: "Must mark as done"
   must_mark_as_done_bf6cc563: "Must mark as done"
   must_mark_assignment_as_done_e3e4af88: "Must mark assignment as done"
-  must_mark_this_module_item_done_in_order_to_comple_ca3c390f: "Must mark this module item done in order to complete"
+  must_mark_this_module_item_done_in_order_to_comple_ca3c390f: "Must mark this unit item done in order to complete"
   must_provide_a_valid_url_26fe7e15: "Must provide a valid URL"
   must_score_at_least_a_score_3b4f813d: "Must score at least a %{score}"
   must_score_at_least_points_points_16a7548e: "Must score at least %{points} points"
-  must_score_at_least_score_to_complete_this_module__b86b5101: "Must score at least %{score} to complete this module item"
+  must_score_at_least_score_to_complete_this_module__b86b5101: "Must score at least %{score} to complete this unit item"
   must_select_a_student_group_first_15c6a3cb: "Must select a student group first"
   must_submit_assignment_ae38221c: "Must submit assignment"
   must_submit_new_oauth2_request_e1fb00bb: "Must submit new OAuth2 request"
   must_submit_the_assignment_782d025: "Must submit the assignment"
-  must_submit_this_module_item_to_complete_it_c29d67f0: "Must submit this module item to complete it"
+  must_submit_this_module_item_to_complete_it_c29d67f0: "Must submit this unit item to complete it"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Must supply 'file_ids' and/or 'folder_ids' parameter"
   must_view_assignment_56a31702: "Must view assignment"
-  must_view_in_order_to_complete_this_module_item_dec2e583: "Must view in order to complete this module item"
+  must_view_in_order_to_complete_this_module_item_dec2e583: "Must view in order to complete this unit item"
   must_view_the_page_67eec19e: "Must view the page"
   mutation_f0ac253f: Mutation
   mutations_on_search_e5a62790: "mutations on %{search}"
@@ -15580,7 +15580,7 @@ en-AU:
   new_gradebook_plagiarism_indicator_8dd22971: "New Gradebook Plagiarism Indicator"
   new_group_category_66be9cbd: "New Group Category"
   new_group_set_7241a581: "New Group Set"
-  new_module_4e9287e4: "New Module"
+  new_module_4e9287e4: "New Unit"
   new_outcome_7fba8c7d: "New Outcome"
   new_outcome_group_af59f145: "New Outcome Group"
   new_post_policy_icons_da13a62c: "New Post Policy Icons"
@@ -15624,7 +15624,7 @@ en-AU:
   next_mastery_path_is_currently_processing_f044d7d8: "Next mastery path is currently processing"
   next_mastery_path_is_still_processing_please_perio_bb0121af: "Next mastery path is still processing, please periodically refresh the page"
   next_message_780bcf24: "Next Message"
-  next_module_item_9bb8a222: "Next Module/Item"
+  next_module_item_9bb8a222: "Next Unit/Item"
   next_month_749b1778: "Next Month"
   next_month_b55a387c: "Next month"
   next_page_d2a39853: "Next Page"
@@ -15689,7 +15689,7 @@ en-AU:
   no_matching_users_found_83889c10: "No matching users found."
   no_message_present_e3af6358: "No message present"
   no_migration_file: "File required for content migration."
-  no_module_assigned_ca183bd7: "No Module Assigned"
+  no_module_assigned_ca183bd7: "No Unit Assigned"
   no_more_results_17c4f108: "No more results"
   no_more_results_to_load_6774fb1c: "No more results to load."
   no_outcome_file_or_authority_given_c90f9c5f: "No outcome file or authority given"
@@ -16323,11 +16323,11 @@ en-AU:
   ordered_by_recent_activity_112d33d5: "Ordered by Recent Activity"
   organize_and_segment_your_course_by_topic_unit_cha_4c38a6b9: |-
       Organise and segment your course by topic, unit, chapter,
-                        or week. Sequence select modules by defining criteria and
+                        or week. Sequence select units by defining criteria and
                         prerequisites.
   organize_and_segment_your_course_by_topic_unit_cha_6ac2de91: |-
       Organise and segment your course by topic, unit, chapter,
-      or week. Sequence select modules by defining criteria and
+      or week. Sequence select units by defining criteria and
       prerequisites.
   organize_course_content_11de8958: "Organise course content"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organise epub by content type (default is by module)."
@@ -16777,7 +16777,7 @@ en-AU:
   please_select_a_user_role_for_this_link_9fb4e655: "Please select a user role for this link."
   please_select_an_item_30c287ef: "Please select an item"
   please_select_one_f931e883: "Please select one."
-  please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Please try re-establishing the connection to the tool by re-selecting the tool in the assignment or module item interface and saving."
+  please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Please try re-establishing the connection to the tool by re-selecting the tool in the assignment or unit item interface and saving."
   please_upload_files_as_a_zip_5a2c799f: "Please upload files as a .zip"
   please_wait_2b646bc2: "Please wait."
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: "Please wait as we upload and process your file."
@@ -17202,14 +17202,14 @@ en-AU:
       pledge_description: "*Text entered here will be displayed to students when submitting for an assignment. The student will be required to check the box for the pledge before submitting. If left blank, no pledge is shown or required to submit.*"
     webct_scraper_settings: 
       description: |-
-          If the institution does not use WebCT's "Learning Modules" (including schools who adopted WebCT
-          prior to version 4.0, when modules were made available), course migrations can be improved by importing the "Course Content"
-          as Canvas Modules instead of the "Learning Modules". This page allows one to set the default behavior of the WebCT migrator
+          If the institution does not use WebCT's "Learning Units" (including schools who adopted WebCT
+          prior to version 4.0, when units were made available), course migrations can be improved by importing the "Course Content"
+          as Canvas Units instead of the "Learning Units". This page allows one to set the default behavior of the WebCT migrator
           with respect to content modules. It is important to remember that, while individual course migrations retain the ability
           to choose, the bulk migrator always utilises the value configured here and cannot be changed per migration.
       labels: 
-        allow_outline_selection: "Display option to use Course Content as Modules in the migration wizard"
-        folders_as_outline: "Use WebCT \"Course Content\" for modules as the default"
+        allow_outline_selection: "Display option to use Course Content as Units in the migration wizard"
+        folders_as_outline: "Use WebCT \"Course Content\" for units as the default"
     wimba: 
       description: "Wimba web conferencing support"
       name: Wimba
@@ -17374,7 +17374,7 @@ en-AU:
   previous_csv_timestamp_6673c69c: "Previous CSV (%{timestamp})"
   previous_export_c6a997f7: "Previous Export"
   previous_message_8804f87e: "Previous Message"
-  previous_module_item_2bb5e499: "Previous Module/Item"
+  previous_module_item_2bb5e499: "Previous Unit/Item"
   previous_month_7adf1380: "Previous month"
   previous_month_bb1e3c84: "Previous Month"
   previous_page_928fc112: "Previous Page"
@@ -17394,7 +17394,7 @@ en-AU:
   privacy_level_f0ec09a3: "Privacy Level"
   private_3883d133: Private
   proceed_f3d33864: Proceed
-  process_multiple_content_items_from_course_modules_6de90fd8: "Process multiple content items from course modules page"
+  process_multiple_content_items_from_course_modules_6de90fd8: "Process multiple content items from course units page"
   processing_2fcc9739: Processing
   product_name: Canvas
   product_tours_1e19eb95: "Product Tours"
@@ -20353,7 +20353,7 @@ en-AU:
   select_a_grading_period_aab25483: "Select a Grading Period."
   select_a_group_category_295f7a34: "Select a group category"
   select_a_log_type_to_search_247fc6b4: "Select a log type to search."
-  select_a_module_optional_7edb5cb0: "Select a Module (optional)"
+  select_a_module_optional_7edb5cb0: "Select a Unit (optional)"
   select_a_predefined_color_c77ab2f5: "Select a predefined colour."
   select_a_provisional_grade_7106e3d5: "Select a provisional grade"
   select_all_assignments_bd07b919: "Select all assignments"
@@ -20382,7 +20382,7 @@ en-AU:
     invalid_lti_resource_selection: "There was a problem retrieving a valid link from the external tool"
     link_from_external_tool: "Link Resource from External Tool"
     titles: 
-      add_item_to_module: "Add Item to Module"
+      add_item_to_module: "Add Item to Unit"
       find_links_using_service: "Find links using %{service}"
   select_conversation_subject_3f36074a: "Select Conversation %{subject}"
   select_country_d21cb85a: "Select Country"
@@ -20406,9 +20406,9 @@ en-AU:
   select_itemname_f70db487: "Select %{itemName}"
   select_language_7c93a900: "Select Language"
   select_message_type_806b2dea: "Select Message Type"
-  select_module_item_to_place_item_before_or_after_84bc26c5: "Select module item to place item before or after"
-  select_module_to_move_before_or_after_c28e8f46: "Select module to move before or after"
-  select_module_to_move_item_into_89fb2ac7: "Select module to move item into"
+  select_module_item_to_place_item_before_or_after_84bc26c5: "Select unit item to place item before or after"
+  select_module_to_move_before_or_after_c28e8f46: "Select unit to move before or after"
+  select_module_to_move_item_into_89fb2ac7: "Select unit to move item into"
   select_navigation_links_68e1e924: "Select Navigation Links"
   select_one_8e0af564: "Select One"
   select_one_b647b384: "Select one"
@@ -20515,8 +20515,8 @@ en-AU:
   send_this_announcement_to_unenrolled_users_4ea549d7: "Send this announcement to unenrolled users."
   send_this_announcement_to_users_with_the_account_r_bd69c809: "Send this announcement to users with the account role of %{role}."
   send_this_announcement_to_users_with_the_course_ro_46904d40: "Send this announcement to users with the course role of %{role}."
-  send_this_module_item_to_another_user_14d4fd60: "Send this module item to another user..."
-  send_this_module_to_another_user_50cb27c8: "Send this module to another user..."
+  send_this_module_item_to_another_user_14d4fd60: "Send this unit item to another user..."
+  send_this_module_to_another_user_50cb27c8: "Send this unit to another user..."
   send_title_to_user_526320bb: "Send {%title} to user"
   send_title_to_user_d952e233: "Send %{title} to user"
   send_to_7881bf0e: "Send to..."
@@ -20532,11 +20532,11 @@ en-AU:
   sent_f4ee89ec: Sent!
   sent_fe0a1eb4: Sent
   sequence_footer: 
-    next_module: "Next Module:"
-    next_module_desc: "Next Module: *module*"
+    next_module: "Next Unit:"
+    next_module_desc: "Next Unit: *module*"
     next_module_item_desc: "Next: *item*"
-    prev_module: "Previous Module:"
-    prev_module_desc: "Previous Module: *module*"
+    prev_module: "Previous Unit:"
+    prev_module_desc: "Previous Unit: *module*"
     prev_module_item_desc: "Previous: *item*"
   serbian_7187f1f2: Serbian
   service_cloud_ticketing_connector_889e1b7b: "Service Cloud Ticketing Connector"
@@ -20890,7 +20890,7 @@ en-AU:
         exit_frame: "Lose the Frames"
         files: Files
         hide_sidebar: "Hide Sidebar"
-        modules: Modules
+        modules: Units
     invitation: 
       accept_or_reject: "When you're ready, you can either accept or reject the invitation."
       body_designer: "You've been invited to join %{course} as a **designer** for the user account **%{email_address}**."
@@ -21272,7 +21272,7 @@ en-AU:
         files_page: "Click to insert a link to the files page"
         grades_page: "Click to insert a link to the marks page"
         modules: "Click to insert a link to this module"
-        modules_page: "Click to insert a link to the modules page"
+        modules_page: "Click to insert a link to the units page"
         quizzes: "Click to insert a link to this quiz"
         syllabus_page: "Click to insert a link to the syllabus"
         users_page: "Click to insert a link to the people page"
@@ -21291,8 +21291,8 @@ en-AU:
         files_page: Files
         find_on_flickr: "Find images on flickr creative commons"
         grades_page: Marks
-        modules: Modules
-        modules_page: Modules
+        modules: Units
+        modules_page: Units
         new_page: "Link to a New Page"
         quizzes: Quizzes
         syllabus: Syllabus
@@ -21304,7 +21304,7 @@ en-AU:
         announcements: Announcements
         assignments: Assignments
         discussions: Discussions
-        modules: Modules
+        modules: Units
         nav: 
           course: "Course Navigation"
           group: "Group Navigation"
@@ -21571,7 +21571,7 @@ en-AU:
   some_assignments_could_not_be_created_because_they_d91f2f21: "Some assignments could not be created because they would fall in a closed grading period."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Some conferences on this page are hidden because of errors while retrieving their status."
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Some custom columns could not be changed because they were read only; changes for those columns have been ignored."
-  some_module_items_could_not_be_published_e4be3c0: "Some module items could not be published"
+  some_module_items_could_not_be_published_e4be3c0: "Some unit items could not be published"
   some_settings_have_been_administratively_locked_9e3ee880: "Some settings have been administratively locked."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Some settings have been disabled because the assignment is in a closed grading period."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Some submissions are not able to be graded; grade changes for those submissions have been ignored."
@@ -22275,7 +22275,7 @@ en-AU:
     grades: Marks
     home: Home
     logout: Logout
-    modules: Modules
+    modules: Units
     observees: Observing
     outcomes: Outcomes
     pages: Pages
@@ -22410,7 +22410,7 @@ en-AU:
       The analytics feature must be enabled in Account Settings to view analytics pages.
       To see the Analytics link in the user sidebar from the People page, Profiles must be disabled in your account.
   the_analytics_feature_must_be_enabled_in_account_s_cf577263: "The analytics feature must be enabled in Account Settings to view analytics pages. To see the Analytics link in the user sidebar from the People page, Profiles must be disabled in your account."
-  the_announcement_title_could_not_be_linked_to_the__78c747f3: "The announcement \"%{title}\" could not be linked to the module \"%{mod_title}\"."
+  the_announcement_title_could_not_be_linked_to_the__78c747f3: "The announcement \"%{title}\" could not be linked to the unit \"%{mod_title}\"."
   the_announcements_tab_is_always_visible_to_admins__58df854d: "The Announcements tab is always visible to admins; however, to manage announcements, Global Announcements - add / edit / delete must also be enabled."
   the_announcements_tab_is_always_visible_to_admins__eb447785: "The Announcements tab is always visible to admins; however, to manage announcements, Global Announcements - add / edit / delete​ must also be enabled."
   the_app_was_activated_a84e055f: "The app was activated"
@@ -22433,13 +22433,13 @@ en-AU:
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       The Course Home Page is the first page students see when they open
             your course. The Home Page can display the course participation activity
-            stream, the Course Modules page, the Course Assignments list, Syllabus,
+            stream, the Course Units page, the Course Assignments list, Syllabus,
             or a page you design as the front page.
   the_course_link_validator_searches_course_content__563fa215: "The course link validator searches course content for invalid or unreachable links and images."
   the_course_link_validator_searches_through_course__76f0bc63: "The course link validator searches through course content and returns every invalid or unresponsive link that it comes across. Please note that some links flagged as unresponsive are just inaccessible from our servers and will still work for students."
-  the_course_state_manage_permission_allows_the_user_1d9da094: "The Course State - manage permission allows the user to publish courses that do not contain modules. To publish and unpublish module content, Course Content - add / edit / delete must be enabled."
-  the_course_state_manage_permission_allows_users_to_67e16652: "The Course State - manage permission allows users to publish courses that do not contain modules. To publish/unpublish module content, Course Content - add / edit / delete​ must be enabled."
-  the_course_state_manage_permission_allows_users_to_a4fe62af: "The Course State - manage permission allows users to publish courses that do not contain modules. To publish and unpublish module content, Course Content - add / edit / delete must be enabled."
+  the_course_state_manage_permission_allows_the_user_1d9da094: "The Course State - manage permission allows the user to publish courses that do not contain modules. To publish and unpublish unit content, Course Content - add / edit / delete must be enabled."
+  the_course_state_manage_permission_allows_users_to_67e16652: "The Course State - manage permission allows users to publish courses that do not contain modules. To publish/unpublish unit content, Course Content - add / edit / delete​ must be enabled."
+  the_course_state_manage_permission_allows_users_to_a4fe62af: "The Course State - manage permission allows users to publish courses that do not contain modules. To publish and unpublish unit content, Course Content - add / edit / delete must be enabled."
   the_course_status_buttons_unpublished_and_publishe_e2dca595: "The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions."
   the_date_is_not_valid_b6285fb5: "The date is not valid."
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
@@ -22517,7 +22517,7 @@ en-AU:
       
                 Thank you,
                 Canvas Support
-  the_module_item_is_locked_27fe420b: "The module item is locked."
+  the_module_item_is_locked_27fe420b: "The unit item is locked."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "The most recent scores for user %{current_user_name} and outcome %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "The next available appointment in this course is on *%{date}*"
   the_preceding_content_is_partner_provided_d753928c: "The preceding content is partner provided"
@@ -22778,8 +22778,8 @@ en-AU:
   this_message_includes_media_comments_to_listen_or__5fc98641: "This message includes media comments. To listen or reply, click this link: %{link}."
   this_message_includes_media_comments_to_listen_or__75ea03a1: "This message includes media comments. To listen or reply, click the link below:"
   this_message_includes_media_comments_to_listen_or__df72d662: "This message includes media comments. To listen or reply, click this link: %{link}.  When allowed, if you need to include an attachment, please log in to Canvas and reply to the submission."
-  this_module_is_locked_until_completing_all_of_the__ddf06070: "This module is locked until completing all of the requirements for the following modules: %{prerequisites}"
-  this_module_is_locked_until_datetime_b2486751: "This module is locked until %{datetime}."
+  this_module_is_locked_until_completing_all_of_the__ddf06070: "This unit is locked until completing all of the requirements for the following modules: %{prerequisites}"
+  this_module_is_locked_until_datetime_b2486751: "This unit is locked until %{datetime}."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "This most likely happened because you imported course content without its associated files."
   this_name_appears_in_sorted_lists_dccbd84b: "This name appears in sorted lists."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "This name will be used by teachers for marking."
@@ -23299,15 +23299,15 @@ en-AU:
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu."
   to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: "To post or hide grades, Grades - edit must also be enabled."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "To preview Theme Editor branding, you will need to *turn off High Contrast UI*."
-  to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: "To publish and unpublish module content, Courses - add / edit / delete and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions."
+  to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: "To publish and unpublish unit content, Courses - add / edit / delete and Course Content - view must also be enabled. Unit items cannot be unpublished if there are student submissions."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
-      To publish and unpublish module content, Courses - add / edit / delete and Course Content - view​ must also be enabled.
-              Module items cannot be unpublished if there are student submissions.
-  to_publish_and_unpublish_module_content_courses_ad_ae996413: "To publish and unpublish module content, Courses - add / edit / delete and Course Content - view must also be enabled."
-  to_publish_and_unpublish_module_content_courses_ad_fd53792f: "To publish and unpublish module content, Courses - add / edit / delete and Course Content - view​ must also be enabled."
+      To publish and unpublish unit content, Courses - add / edit / delete and Course Content - view​ must also be enabled.
+              Unit items cannot be unpublished if there are student submissions.
+  to_publish_and_unpublish_module_content_courses_ad_ae996413: "To publish and unpublish unit content, Courses - add / edit / delete and Course Content - view must also be enabled."
+  to_publish_and_unpublish_module_content_courses_ad_fd53792f: "To publish and unpublish unit content, Courses - add / edit / delete and Course Content - view​ must also be enabled."
   to_publish_final_grades_for_a_moderated_assignment_430368a0: "To publish final grades for a moderated assignment, Grades - edit must also be enabled. To post or hide grades for a moderated assignment, Grades - edit must also be enabled."
   to_publish_final_grades_for_a_moderated_assignment_713090cf: "To publish final grades for a moderated assignment, Grades - edit must also be enabled."
-  to_publish_unpublish_module_content_course_content_efc294d4: "To publish/unpublish module content, Course Content - add / edit / delete​ must be enabled."
+  to_publish_unpublish_module_content_course_content_efc294d4: "To publish/unpublish unit content, Course Content - add / edit / delete​ must be enabled."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "To restore a deleted course, Courses - undelete​ and Course Content - view must also both be enabled."
   to_restrict_students_from_creating_groups_deselect_6269c8cb: "To restrict students from creating groups, deselect the Let students organise their own groups checkbox in Course Settings."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "To restrict to users from a specific Clever district, enter the district's Clever ID here. This is required for Clever Instant Login to work in a multi-tenant environment."
@@ -23372,8 +23372,8 @@ en-AU:
       To view Last Activity and Total Activity information on the Course People page, Users - view list must also be enabled.
               To access a Course People page, Users - view list must also be enabled.
   to_view_last_activity_and_total_activity_informati_b24e3864: "To view Last Activity and Total Activity information on the Course People page, Users - view list must also be enabled. To access a Course People page, Users - view list must also be enabled."
-  to_view_module_progression_grades_view_all_grades__1acc0880: "To view module progression, Grades - view all grades must also be enabled."
-  to_view_module_progression_grades_view_all_grades__b9fc4d6f: "To view module progression, Grades - view all grades​ must also be enabled."
+  to_view_module_progression_grades_view_all_grades__1acc0880: "To view unit progression, Grades - view all grades must also be enabled."
+  to_view_module_progression_grades_view_all_grades__b9fc4d6f: "To view unit progression, Grades - view all grades​ must also be enabled."
   to_view_or_edit_a_user_s_sis_id_or_integration_id__76b8d055: "To view or edit a user’s SIS ID or Integration ID, Users - view list and Users - manage login details must also both be enabled."
   to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "To view or edit a user’s SIS ID or Integration ID, Users - view list​ and Users - manage login details must also both be enabled."
   to_view_recent_announcements_on_the_home_page_cour_ffc52530: "To view recent announcements on the home page, Course content - view must be enabled, and the Show recent announcements on Course home page checkbox must be selected in Course Settings. To manage course announcements, Discussions - moderate ​must also be enabled."
@@ -23440,7 +23440,7 @@ en-AU:
   toggle_course_card_color_overlays_b5b8137a: "Toggle course card colour overlays"
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Toggle dashcard view or recent activity stream"
   toggle_editing_answer_text_as_html_9a93fe6: "Toggle editing answer text as HTML"
-  toggle_module_visibility_781a2f6c: "toggle module visibility"
+  toggle_module_visibility_781a2f6c: "toggle unit visibility"
   toggle_option_cfd8b95a: "Toggle Option"
   toggle_outcomes_for_title_6994b198: "Toggle outcomes for %{title}"
   toggle_select_course_name_310fdee4: "Toggle select course %{name}"
@@ -23624,7 +23624,7 @@ en-AU:
   unlock_discussion_title_failed_42a4252f: "Unlock discussion %{title} failed"
   unlock_discussion_title_succeeded_cd97847c: "Unlock discussion %{title} succeeded"
   unlock_f6196bf5: Unlock
-  unlock_module_on_date_17144fbd: "Unlock module on date"
+  unlock_module_on_date_17144fbd: "Unlock unit on date"
   unlock_selected_announcements_37485f05: "Unlock Selected Announcements"
   unlocked_beee43de: Unlocked
   unlocked_click_to_lock_53262ce7: "Unlocked. Click to lock."
@@ -23738,11 +23738,11 @@ en-AU:
     upload: Upload
   upload_course_files_syllabi_readings_or_other_docu_21f8725f: |-
       Upload course files, syllabi, readings, or other documents.
-                Lock folders to keep them hidden from students. Add files to Modules,
+                Lock folders to keep them hidden from students. Add files to Units,
                 Assignments, Discussions, or Pages.
   upload_course_files_syllabi_readings_or_other_docu_859d8f02: |-
       Upload course files, syllabi, readings, or other documents.
-      Lock folders to keep them hidden from students. Add files to Modules,
+      Lock folders to keep them hidden from students. Add files to Units,
       Assignments, Discussions, or Pages.
   upload_css_and_javascript_files_to_include_on_all__e19117c9: "Upload CSS and JavaScript files to include on all page loads for your account."
   upload_data_dc4fa4cb: "Upload Data"
@@ -23792,12 +23792,12 @@ en-AU:
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Use MathMan to convert LaTeX to MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Use MathMan to convert LaTeX to SVG?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
-      Use modules to organise your content and create a linear flow for
-            what students should do in the course. Modules can be used to organise
+      Use units to organise your content and create a linear flow for
+            what students should do in the course. Units can be used to organise
             content by weeks, units, or a different organisation structure.
             Add files, discussions, assignments, quizzes, and other learning materials.
-            Require prerequisites to be completed before moving to a module or next
-            module item, or lock an entire module until a specific date.
+            Require prerequisites to be completed before moving to a unit or next
+            unit item, or lock an entire unit until a specific date.
   use_new_folder_tree_in_files_bc0ea09f: "Use New Folder Tree in Files"
   use_new_folder_tree_in_files_eb5a451b: "Use new folder tree in Files"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Use new rich content editor with enhanced sidebar everywhere"
@@ -24524,8 +24524,8 @@ en-AU:
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       When people visit your course, this is the first page they'll see.
-                We've set your homepage to Modules, but you have the option to change it.
-  when_people_visit_your_course_this_is_the_first_pa_af36eac3: "When people visit your course, this is the first page they'll see. We've set your home page to Modules, but you have the option to change it."
+                We've set your homepage to Units, but you have the option to change it.
+  when_people_visit_your_course_this_is_the_first_pa_af36eac3: "When people visit your course, this is the first page they'll see. We've set your home page to Units, but you have the option to change it."
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "When posting grades for anonymous assignments, grades will be posted for everyone in the course. Anonymity will be removed."
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "When scope enforcement is disabled, tokens have access to all endpoints available to the authorising user."
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "When selected, the course is in a read-only state outside these dates."
@@ -24728,7 +24728,7 @@ en-AU:
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Would you like to accept or dismiss this update?"
   would_you_like_to_enable_this_app_ccdf735d: "Would you like to enable this app?"
   would_you_like_to_go_back_to_include_1d279044: "Would you like to go back to include:"
-  would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Would you like to let students continue in the course or do you want to re-lock these modules until the new requirements are completed?"
+  would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Would you like to let students continue in the course or do you want to re-lock these units until the new requirements are completed?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "Wrap event titles in Calendar month view"
   wrong_answer_comments_14963a24: "Wrong answer comments"
   x_y_4a86b3ab: "%{x}/%{y}"
@@ -24849,7 +24849,7 @@ en-AU:
   you_don_t_have_permission_to_access_this_resource_447d3a5e: "You don't have permission to access this resource."
   you_don_t_have_permission_to_manage_grades_for_thi_a9a1be3a: "You don't have permission to manage grades for this course"
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: "You have been given extra time on this attempt."
-  you_have_changed_the_progression_requirements_for__6772bc89: "You have changed the progression requirements for an active course. There may be students who have already progressed to this module and to others that depend on it."
+  you_have_changed_the_progression_requirements_for__6772bc89: "You have changed the progression requirements for an active course. There may be students who have already progressed to this unit and to others that depend on it."
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "You have completed a peer review for %{person}. Thank you"
   you_have_count_submissions_to_grade_6c5b511a: "You have %{count} submissions to grade"
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "You have entered an invalid mark for this student. Check the value and the grading type and try again."
@@ -25037,5 +25037,5 @@ en-AU:
       Zoom is a real-time video conferencing tool that brings
           teachers and students together. You can schedule and run
           video meetings directly within Canvas by adding a Zoom link
-          in a Canvas Course, Course Announcement, Module, or via Calendar.
+          in a Canvas Course, Course Announcement, Unit, or via Calendar.
   zoom_tutorial_tray_5dcb7fc: "Zoom Tutorial Tray"

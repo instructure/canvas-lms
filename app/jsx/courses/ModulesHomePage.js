@@ -43,7 +43,7 @@ export default class ModulesHomePage extends React.Component {
               onClick={this.props.onCreateButtonClick}
             >
               <IconModuleSolid className="ic-EmptyStateButton__SVG" />
-              <span className="ic-EmptyStateButton__Text">{I18n.t('Create a new Module')}</span>
+              <span className="ic-EmptyStateButton__Text">{I18n.t('Create a new Unit')}</span>
             </button>
           </div>
         </li>

@@ -372,12 +372,12 @@ window.modules = (function() {
         $form.attr('action', $form.find('.add_context_module_url').attr('href'))
         $form.find('.completion_entry').hide()
         $form.attr('method', 'POST')
-        $form.find('.submit_button').text(I18n.t('buttons.add', 'Add Module'))
+        $form.find('.submit_button').text(I18n.t('buttons.add', 'Add Unit'))
       } else {
         $form.attr('action', $module.find('.edit_module_link').attr('href'))
         $form.find('.completion_entry').show()
         $form.attr('method', 'PUT')
-        $form.find('.submit_button').text(I18n.t('buttons.update', 'Update Module'))
+        $form.find('.submit_button').text(I18n.t('buttons.update', 'Update Unit'))
       }
       $form
         .find('#unlock_module_at')
@@ -483,8 +483,8 @@ window.modules = (function() {
           autoOpen: false,
           modal: true,
           title: isNew
-            ? I18n.t('titles.add', 'Add Module')
-            : I18n.t('titles.edit', 'Edit Module Settings'),
+            ? I18n.t('titles.add', 'Add Unit')
+            : I18n.t('titles.edit', 'Edit Unit Settings'),
           width: responsive_misc ? responsiveWidth : 600,
           height: isNew ? 400 : 600,
           close() {
@@ -1379,7 +1379,7 @@ modules.initModuleManagement = function() {
     const $tempElement = $('<div id="temporary-spinner" class="item-group-condensed"></div>')
     $tempElement.insertAfter(duplicatedModuleElement)
     ReactDOM.render(spinner, $('#temporary-spinner')[0])
-    $.screenReaderFlashMessage(I18n.t('Duplicating Module, this may take some time'))
+    $.screenReaderFlashMessage(I18n.t('Duplicating Unit, this may take some time'))
     const renderDuplicatedModule = function(response) {
       response.data.ENV_UPDATE.forEach(newAttachmentItem => {
         ENV.MODULE_FILE_DETAILS[newAttachmentItem.id] = newAttachmentItem
@@ -1650,7 +1650,7 @@ modules.initModuleManagement = function() {
     })
 
     const moveTrayProps = {
-      title: I18n.t('Move Module Item'),
+      title: I18n.t('Move Unit Item'),
       items: [
         {
           id: currentItem.getAttribute('id').substring('context_module_item_'.length),
@@ -1692,7 +1692,7 @@ modules.initModuleManagement = function() {
     })
 
     const moveTrayProps = {
-      title: I18n.t('Move Module'),
+      title: I18n.t('Move Unit'),
       items: [
         {
           id: currentModule.getAttribute('id').substring('context_module_'.length),
