@@ -188,6 +188,15 @@
     "links_14b70841": {
         "message": "پیوندها"
     },
+    "list_collapsed_9ac35920": {
+        "message": "فهرست جمع شد."
+    },
+    "list_collapsed_dde87718": {
+        "message": "فهرست جمع شد."
+    },
+    "list_expanded_efec2d0": {
+        "message": "فهرست باز شد."
+    },
     "load_more_a36f9cf9": {
         "message": "بارگذاری بیشتر"
     },
@@ -299,6 +308,9 @@
     "search_280d00bd": {
         "message": "جستجو"
     },
+    "select_language_7c93a900": {
+        "message": "انتخاب زبان"
+    },
     "selected_274ce24f": {
         "message": "انتخاب شده"
     },
@@ -322,6 +334,9 @@
     },
     "syllabus_f191f65b": {
         "message": "سرفصل"
+    },
+    "text_7f4593da": {
+        "message": "متن"
     },
     "time_2b5aac58": {
         "message": "زمان"
