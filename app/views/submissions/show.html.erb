@@ -221,9 +221,14 @@
           </a>
         <% end %>
         <% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) && @current_user == @submission.user %>
-          <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="Button Button--primary" <%= 'disabled' if @submission&.attempts_left == 0 %>>
+          <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="Button Button--primary" <%= 'disabled' if @can_not_submit || @submission&.attempts_left == 0 %>>
             <%= @submission.has_submission? ? t('links.resubmit', "Re-submit Assignment") : t('links.submit', "Submit Assignment") %>
           </a>
+          <% if @can_not_submit %>
+            <p class="alert-error">
+              <%= t('ipfiltered', "You need to be in our office in order to submit") %> 
+            </p>
+          <% end %>
         <% end %>
       </div>
     </div>

@@ -2703,4 +2703,26 @@ class ApplicationController < ActionController::Base
         Setting.get("disable_template_streaming_for_#{controller_name}/#{action_name}", "false") != "true"
     end
   end
+
+  def is_ip_whitelisted?
+    return true if ::Rails.env.dev? || ::Rails.env.test?
+    Canvas::Security.whitelist_ips.include? request.remote_ip
+  end
+
+  def check_whitelist_ips
+    return if ::Rails.env.dev? || ::Rails.env.test?
+
+    msg = "You need to be in our office in order to submit"
+    unless is_ip_whitelisted?
+      respond_to do |format|
+        format.html {
+          flash[:error] = t('errors.can_not_submit_assignment', msg)
+          render 'shared/errors/403_message', status: :forbidden, formats: [:html], locals: { message: msg }
+        }
+        format.json {
+          render :json => { :message => msg }
+        }
+      end
+    end
+  end
 end

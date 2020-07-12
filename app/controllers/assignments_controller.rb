@@ -128,6 +128,7 @@ class AssignmentsController < ApplicationController
 
   def show
     Shackles.activate(:slave) do
+      @is_ip_whitelisted = is_ip_whitelisted?
       @assignment ||= @context.assignments.find(params[:id])
 
       if @assignment.deleted?

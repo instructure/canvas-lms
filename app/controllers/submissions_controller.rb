@@ -91,6 +91,7 @@ class SubmissionsController < SubmissionsBaseController
   include Api::V1::Submission
 
   before_action :get_course_from_section, :only => :create
+  before_action :check_whitelist_ips, :only => :create
   before_action :require_context
 
   def index
@@ -125,7 +126,7 @@ class SubmissionsController < SubmissionsBaseController
     return render_unauthorized_action if @assignment.anonymous_peer_reviews? && @submission.peer_reviewer?(@current_user)
 
     @google_analytics_page_title = "#{@assignment.title} Submission Details"
-
+    @can_not_submit = !is_ip_whitelisted?
     super
   end
 
