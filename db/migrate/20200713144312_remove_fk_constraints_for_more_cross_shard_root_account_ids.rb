@@ -14,20 +14,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+class RemoveFkConstraintsForMoreCrossShardRootAccountIds < ActiveRecord::Migration[5.2]
+  tag :predeploy
 
-# We will merge this only when we're ready for a batch of backfills to start
-# otherwise, we can keep collecting. After we've merged once, when we have new models
-# to run we can just copy this with a new migration ID and run it again
-class PopulateRootAccountIdOnModels < ActiveRecord::Migration[5.2]
-  tag :postdeploy
-  disable_ddl_transaction!
-
-  def up
-    DataFixup::PopulateRootAccountIdOnModels.send_later_enqueue_args(:run,
-      {:priority => Delayed::LOWER_PRIORITY, :strand => ["root_account_id_backfill_strand", Shard.current.database_server.id]}
-    )
-  end
-
-  def down
+  def change
+    remove_foreign_key :access_tokens, :accounts, column: :root_account_id, if_exists: true
+    remove_foreign_key :rubric_associations, :accounts, column: :root_account_id, if_exists: true
   end
 end
