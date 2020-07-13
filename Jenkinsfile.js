@@ -20,6 +20,7 @@
 
 library "canvas-builds-library"
 
+def COFFEE_NODE_COUNT = 2
 def DEFAULT_NODE_COUNT = 1
 def JSG_NODE_COUNT = 3
 
@@ -108,11 +109,15 @@ pipeline {
                 sh 'build/new-jenkins/js/tests-quizzes.sh'
               }
 
+              for(int i = 0; i < COFFEE_NODE_COUNT; i++) {
+                tests["Karma - Spec Group - coffee${i}"] = makeKarmaStage('coffee', i, COFFEE_NODE_COUNT)
+              }
+
               for(int i = 0; i < JSG_NODE_COUNT; i++) {
                 tests["Karma - Spec Group - jsg${i}"] = makeKarmaStage('jsg', i, JSG_NODE_COUNT)
               }
 
-              ['coffee', 'jsa', 'jsh'].each { group ->
+              ['jsa', 'jsh'].each { group ->
                 tests["Karma - Spec Group - ${group}"] = makeKarmaStage(group, 0, DEFAULT_NODE_COUNT)
               }
             }

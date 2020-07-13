@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import _ from 'underscore'
+import RCELoader from 'jsx/shared/rce/serviceRCELoader'
 import SectionCollection from 'compiled/collections/SectionCollection'
 import Assignment from 'compiled/models/Assignment'
 import DueDateList from 'compiled/models/DueDateList'
@@ -124,6 +125,10 @@ QUnit.module('EditView', {
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
+
+    RCELoader.RCE = null
+
+    return RCELoader.loadRCE()
   },
   teardown() {
     this.server.restore()

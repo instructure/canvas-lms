@@ -28,8 +28,8 @@ const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
 const CONTEXT_EMBER_GRADEBOOK_SPEC = 'app/coffeescripts/ember'
 const CONTEXT_JSX_SPEC = 'spec/javascripts/jsx'
 
-const RESOURCE_COFFEESCRIPT_SPEC = /Spec.(coffee|js)$/
-const RESOURCE_EMBER_GRADEBOOK_SPEC = /\.spec.js$/
+const RESOURCE_COFFEESCRIPT_SPEC = /Spec$/
+const RESOURCE_EMBER_GRADEBOOK_SPEC = /\.spec$/
 const RESOURCE_JSX_SPEC = /Spec$/
 
 const RESOURCE_JSA_SPLIT_SPEC = /^\.\/[a-f].*Spec$/
@@ -103,8 +103,44 @@ if (process.env.JSPEC_GROUP) {
   }
 
   if (process.env.JSPEC_GROUP === 'coffee') {
+    let partitions = null
+
+    if (!isNaN(nodeIndex) && !isNaN(nodeTotal)) {
+      const allFiles = []
+
+      getAllFiles(CONTEXT_COFFEESCRIPT_SPEC, allFiles, filePath => {
+        const relativePath = filePath.replace(CONTEXT_COFFEESCRIPT_SPEC, '.').replace(/\.(coffee|js)$/, '')
+
+        return RESOURCE_COFFEESCRIPT_SPEC.test(relativePath) ? relativePath : null
+      })
+
+      getAllFiles(CONTEXT_EMBER_GRADEBOOK_SPEC, allFiles, filePath => {
+        const relativePath = filePath.replace(CONTEXT_EMBER_GRADEBOOK_SPEC, '.').replace(/\.(coffee|js)$/, '')
+
+        return RESOURCE_EMBER_GRADEBOOK_SPEC.test(relativePath) ? relativePath : null
+      })
+
+      partitions = makeSortedPartitions(allFiles, nodeTotal)
+    }
+
     ignoreResource = (resource, context) => {
-      return context.endsWith(CONTEXT_JSX_SPEC) && RESOURCE_JSX_SPEC.test(resource)
+      return (
+        (context.endsWith(CONTEXT_JSX_SPEC) && RESOURCE_JSX_SPEC.test(resource)) ||
+        (
+          partitions &&
+            context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) &&
+            RESOURCE_COFFEESCRIPT_SPEC.test(resource) &&
+            !isPartitionMatch(resource, partitions, nodeIndex)
+        ) ||
+        (
+          partitions &&
+            context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) &&
+            // FIXME: Unlike the other specs, webpack is including the suffix
+            (resource = resource.replace(/\.(coffee|js)$/, '')) &&
+            RESOURCE_EMBER_GRADEBOOK_SPEC.test(resource) &&
+            !isPartitionMatch(resource, partitions, nodeIndex)
+        )
+      )
     }
   } else if (process.env.JSPEC_GROUP === 'jsa') {
     ignoreResource = (resource, context) => {
@@ -184,6 +220,7 @@ testWebpackConfig.resolve.alias[CONTEXT_EMBER_GRADEBOOK_SPEC] = path.resolve(__d
 testWebpackConfig.resolve.alias[CONTEXT_COFFEESCRIPT_SPEC] = path.resolve(__dirname, CONTEXT_COFFEESCRIPT_SPEC)
 testWebpackConfig.resolve.alias[CONTEXT_JSX_SPEC] = path.resolve(__dirname, CONTEXT_JSX_SPEC)
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
+testWebpackConfig.resolve.extensions.push('.coffee')
 testWebpackConfig.mode = 'development'
 testWebpackConfig.module.rules.unshift({
   test: [
