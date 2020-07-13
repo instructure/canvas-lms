@@ -441,7 +441,7 @@ module PostgreSQLAdapterExtensions
 
     collation = "und-u-kn-true"
     unless icu_collations.find { |_schema, extant_collation| extant_collation == collation }
-      update("CREATE COLLATION #{quote_table_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
+      update("CREATE COLLATION public.#{quote_column_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
     end
 
     I18n.available_locales.each do |locale|
@@ -450,7 +450,7 @@ module PostgreSQLAdapterExtensions
       next if Canvas::ICU.collator.rules.empty?
       collation = "#{locale}-u-kn-true"
       next if icu_collations.find { |_schema, extant_collation| extant_collation == collation }
-      update("CREATE COLLATION #{quote_table_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
+      update("CREATE COLLATION public.#{quote_column_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
     end
   ensure
     @collations = nil
