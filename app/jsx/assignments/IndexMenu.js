@@ -206,6 +206,7 @@ export default class IndexMenu extends React.Component {
           {this.props.requestBulkEdit && (
             <li role="menuitem">
               <a
+                href="#"
                 tabIndex="0"
                 id="requestBulkEditMenuItem"
                 className="requestBulkEditMenuItem"
