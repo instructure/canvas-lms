@@ -92,9 +92,9 @@ describe "scheduler" do
     end
 
     context "when un-reserving appointments" do
-      before :once do
-        earliest_appointment_time = 30.minutes.from_now
+      let(:earliest_appointment_time) { 30.minutes.from_now }
 
+      before :once do
         create_appointment_group(
           max_appointments_per_participant: 1,
           # if participant_visibility is 'private', the event_details popup resizes,
