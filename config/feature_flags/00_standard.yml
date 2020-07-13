@@ -296,12 +296,6 @@ new_user_tutorial:
   description: Provide tutorial information for new users in a flyout tray.
   applies_to: RootAccount
   root_opt_in: true
-student_planner:
-  state: 'on'
-  display_name: To Do List Dashboard
-  description: Provides users with a To Do List Dashboard option.
-  applies_to: RootAccount
-  root_opt_in: true
 rubric_criterion_range:
   state: allowed
   display_name: Rubric Criterion Range

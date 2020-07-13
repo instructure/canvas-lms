@@ -1805,7 +1805,6 @@ describe Account do
     end
 
     it "should add or overwrite all account users' dashboard_view preference" do
-      @account.enable_feature!(:student_planner)
       @account.default_dashboard_view = 'planner'
       @account.save!
       @account.reload

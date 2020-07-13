@@ -73,7 +73,6 @@ describe "Api::V1::Assignment" do
     end
 
     it "includes an associated planner override when flag is passed" do
-      assignment.context.root_account.enable_feature!(:student_planner)
       po = planner_override_model(user: user, plannable: assignment)
       json = api.assignment_json(assignment, user, session,
                                  {include_planner_override: true})

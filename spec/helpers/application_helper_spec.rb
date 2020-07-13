@@ -694,7 +694,6 @@ describe ApplicationHelper do
     context "with planner enabled" do
       before(:each) do
         @account = Account.default
-        @account.enable_feature! :student_planner
       end
 
       it "returns the list of groups the user belongs to" do
@@ -742,10 +741,6 @@ describe ApplicationHelper do
     end
 
     context "with student_planner feature flag enabled" do
-      before(:each) do
-        @domain_root_account.enable_feature! :student_planner
-      end
-
       it "returns false when a user has no student enrollments" do
         course_with_teacher(:active_all => true)
         @current_user = @user

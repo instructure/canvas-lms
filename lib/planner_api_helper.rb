@@ -49,10 +49,6 @@ module PlannerApiHelper
     end
   end
 
-  def require_planner_enabled
-    render json: { message: "Feature disabled" }, status: :forbidden unless @domain_root_account.feature_enabled?(:student_planner)
-  end
-
   def sync_module_requirement_done(item, user, complete)
     return unless item.is_a?(ContextModuleItem)
     doneable = mark_doneable_tag(item)

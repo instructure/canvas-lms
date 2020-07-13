@@ -31,8 +31,7 @@
     :CONFERENCES_ENABLED => Account.site_admin.feature_enabled?(:calendar_conferences)
   }
   js_env({
-    :STUDENT_PLANNER_ENABLED => @domain_root_account&.feature_enabled?(:student_planner) && @current_user.has_student_enrollment?,
-    :PLANNER_ENABLED => @domain_root_account&.feature_enabled?(:student_planner)
+    :STUDENT_PLANNER_ENABLED => @current_user.has_student_enrollment?,
   })
 
   js_bundle :calendar2

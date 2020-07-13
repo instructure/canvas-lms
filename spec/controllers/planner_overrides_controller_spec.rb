@@ -55,7 +55,6 @@ describe PlannerOverridesController do
   context "as student" do
     before :each do
       user_session(@student)
-      @course.root_account.enable_feature!(:student_planner)
     end
 
     describe "GET #index" do

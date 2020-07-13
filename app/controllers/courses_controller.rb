@@ -2000,8 +2000,6 @@ class CoursesController < ApplicationController
         @course_home_view ||= default_view
 
         js_env({
-                 # don't check for student enrollments because we want to show course items on the teacher's  syllabus
-                 STUDENT_PLANNER_ENABLED: @domain_root_account&.feature_enabled?(:student_planner),
                  COURSE: {
                    id: @context.id.to_s,
                    pages_url: polymorphic_url([@context, :wiki_pages]),

@@ -214,8 +214,6 @@ describe "Pages API", type: :request do
         end
 
         context 'planner feature enabled' do
-          before(:once) { @course.root_account.enable_feature!(:student_planner) }
-
           it 'should create a page with a todo_date' do
             todo_date = Time.zone.local(2008, 9, 1, 12, 0, 0)
             json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
@@ -699,12 +697,11 @@ describe "Pages API", type: :request do
       end
 
       it 'should not crash updating front page if the wiki_page param is not available with student planner enabled' do
-        @course.root_account.enable_feature!(:student_planner)
-        response = api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
-                 { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param,
-                   :url => @hidden_page.url },
-                 {}, {},
-                 {:expected_status => 200})
+        api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
+          { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param,
+            :url => @hidden_page.url },
+          {}, {},
+          {:expected_status => 200})
       end
 
       it "should set as front page", priority:"3", test_id: 126813 do

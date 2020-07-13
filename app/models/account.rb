@@ -1876,7 +1876,7 @@ class Account < ActiveRecord::Base
 
   # Different views are available depending on feature flags
   def dashboard_views
-    ['activity', 'cards'].tap {|views| views << 'planner' if root_account.feature_enabled?(:student_planner)}
+    ['activity', 'cards', 'planner']
   end
 
   # Getter/Setter for default_dashboard_view account setting

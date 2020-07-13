@@ -98,11 +98,6 @@ module Pact::Canvas
       seed_users(opts)
       @mobile_courses = seed_mobile
       enable_default_developer_key!
-      enable_features
-    end
-
-    def enable_features
-     @account.enable_feature!(:student_planner)
     end
 
     def seed_course

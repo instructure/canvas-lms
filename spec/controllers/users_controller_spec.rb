@@ -2184,7 +2184,6 @@ describe UsersController do
     context "with student planner feature enabled" do
       before(:once) do
         @account = Account.default
-        @account.enable_feature! :student_planner
       end
 
       it "sets ENV.STUDENT_PLANNER_ENABLED to false when user has no student enrollments" do

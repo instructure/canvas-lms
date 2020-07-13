@@ -470,7 +470,6 @@ describe AccountsController do
     it "should overwrite account users' existing dashboard_view if specified" do
       account_with_admin_logged_in
       @subaccount = @account.sub_accounts.create!
-      @account.enable_feature! :student_planner
       @account.save!
 
       course_with_teacher(:account => @subaccount, :active_all => true)

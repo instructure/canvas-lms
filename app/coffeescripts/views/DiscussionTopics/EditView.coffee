@@ -208,7 +208,7 @@ export default class EditView extends ValidatedFormView
     this
 
   afterRender: =>
-    @renderStudentTodoAtDate() if ENV.STUDENT_PLANNER_ENABLED && @$todoDateInput.length
+    @renderStudentTodoAtDate() if @$todoDateInput.length
     [context, context_id] = ENV.context_asset_string.split("_")
     if context == 'course'
       @AssignmentExternalTools = AssignmentExternalTools.attach(
@@ -315,7 +315,7 @@ export default class EditView extends ValidatedFormView
     data.only_graders_can_rate = false unless data.allow_rating is '1'
     data.sort_by_rating = false unless data.allow_rating is '1'
     data.allow_todo_date = '0' if data.assignment?.set_assignment is '1'
-    data.todo_date = @studentTodoAtDateValue if ENV.STUDENT_PLANNER_ENABLED
+    data.todo_date = @studentTodoAtDateValue
     data.todo_date = null unless data.allow_todo_date is '1'
 
     if @groupCategorySelector && !ENV?.IS_LARGE_ROSTER

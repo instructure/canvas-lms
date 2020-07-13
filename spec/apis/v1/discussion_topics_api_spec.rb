@@ -269,7 +269,6 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "should create a topic with all the bells and whistles" do
-      @course.root_account.enable_feature!(:student_planner)
       post_at = 1.month.from_now
       lock_at = 2.months.from_now
       todo_date = 1.day.from_now.change(sec: 0)
