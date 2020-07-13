@@ -604,13 +604,14 @@ export default class Calendar {
     const now = fcUtil.now()
     const midnight = fcUtil.now()
     midnight.hours(0)
+    midnight.minutes(0)
     midnight.seconds(0)
     const seconds = moment.duration(now.diff(midnight)).asSeconds()
     this.$nowLine.toggle(this.isSameWeek(this.getCurrentDate(), now))
 
     this.$nowLine.css('width', $('.fc-body .fc-widget-content:first').css('width'))
     const secondHeight =
-      (($('.fc-time-grid').css('height') || '').replace('px', '') || 0) / 24 / 60 / 60
+      (($('.fc-time-grid .fc-slats').css('height') || '').replace('px', '') || 0) / 24 / 60 / 60
     this.$nowLine.css('top', `${seconds * secondHeight}px`)
   }
 
