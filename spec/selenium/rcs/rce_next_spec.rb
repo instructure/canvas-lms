@@ -698,7 +698,7 @@ describe "RCE next tests" do
       it "should focus the menubar with alt-f9" do
         visit_front_page_edit(@course)
         rce = f('.tox-edit-area__iframe')
-        expect(f('.tox-menubar')).not_to be_displayed
+        expect(f('.tox-menubar')).to be_displayed # always show menubar now
         rce.send_keys [:alt, :f9]
 
         expect(f('.tox-menubar')).to be_displayed

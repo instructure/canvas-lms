@@ -92,14 +92,6 @@ function injectTinySkin() {
 
 const editorWrappers = new WeakMap()
 
-function showMenubar(el, show) {
-  const $menubar = el.querySelector('.tox-menubar')
-  $menubar && ($menubar.style.display = show ? '' : 'none')
-  if (show) {
-    focusFirstMenuButton(el)
-  }
-}
-
 function focusToolbar(el) {
   const $firstToolbarButton = el.querySelector('.tox-tbtn')
   $firstToolbarButton && $firstToolbarButton.focus()
@@ -633,40 +625,29 @@ class RCEWrapper extends React.Component {
     return this[methodName](...args)
   }
 
-  initKeyboardShortcuts(el, editor) {
-    // hide the menubar
-    showMenubar(el, false)
-
-    // when typed w/in the editor's edit area
-    editor.addShortcut('Alt+F9', '', () => {
-      showMenubar(el, true)
-    })
-    // when typed somewhere else w/in RCEWrapper
-    el.addEventListener('keydown', event => {
-      if (event.altKey && event.code === 'F9') {
-        event.preventDefault()
-        event.stopPropagation()
-        showMenubar(el, true)
-      }
-    })
-
-    // toolbar help
-    el.addEventListener('keydown', event => {
-      if (event.altKey && event.code === 'F10') {
-        event.preventDefault()
-        event.stopPropagation()
-        focusToolbar(el)
-      }
-    })
-
-    editor.on('keydown', this.handleShortcutKeyShortcut)
+  handleKey = event => {
+    if (event.code === 'F9' && event.altKey) {
+      event.preventDefault()
+      event.stopPropagation()
+      focusFirstMenuButton(this._elementRef)
+    } else if (event.code === 'F10' && event.altKey) {
+      event.preventDefault()
+      event.stopPropagation()
+      focusToolbar(this._elementRef)
+    } else if ((event.code === 'F8' || event.code === 'Digit0') && event.altKey) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.openKBShortcutModal()
+    } else if (event.code === 'Escape') {
+      // ESC
+      this._forceCloseFloatingToolbar()
+    }
   }
 
   onInit = (_event, editor) => {
     editor.rceWrapper = this
     this.editor = editor
 
-    this.initKeyboardShortcuts(this._elementRef, editor)
     if (document.body.classList.contains('Underline-All-Links__enabled')) {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
     }
@@ -679,8 +660,8 @@ class RCEWrapper extends React.Component {
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
     editor.on('Change', this.doAutoResize)
-
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
+    editor.on('keydown', this.handleKey)
 
     this.announceContextToolbars(editor)
 
@@ -931,19 +912,11 @@ class RCEWrapper extends React.Component {
     this.onTinyMCEInstance('openAccessibilityChecker', {skip_focus: true})
   }
 
-  handleShortcutKeyShortcut = event => {
-    if (event.altKey && (event.keyCode === 48 || event.keyCode === 119)) {
-      event.preventDefault()
-      event.stopPropagation()
-      this.openKBShortcutModal()
-    } else if (event.keyCode === 27) {
-      // ESC
-      this._forceCloseFloatingToolbar()
-    }
-  }
-
   openKBShortcutModal = () => {
-    this.setState({KBShortcutModalOpen: true})
+    this.setState({
+      KBShortcutModalOpen: true,
+      KBShortcutFocusReturn: document.activeElement
+    })
   }
 
   closeKBShortcutModal = () => {
@@ -951,9 +924,12 @@ class RCEWrapper extends React.Component {
   }
 
   KBShortcutModalClosed = () => {
-    // when the modal is opened from the showOnFocus button, focus doesn't
-    // get automatically returned to the button like it should.
-    if (this._showOnFocusButton && document.activeElement === document.body) {
+    if (this.state.KBShortcutFocusReturn === this.iframe) {
+      // if the iframe has focus, we need to forward it on to tinymce
+      this.editor.focus(false)
+    } else if (this._showOnFocusButton && document.activeElement === document.body) {
+      // when the modal is opened from the showOnFocus button, focus doesn't
+      // get automatically returned to the button like it should.
       this._showOnFocusButton.focus()
     }
   }
@@ -963,7 +939,7 @@ class RCEWrapper extends React.Component {
     if (!this._destroyCalled) {
       this.destroy()
     }
-    this._elementRef.removeEventListener('keyup', this.handleShortcutKeyShortcut, true)
+    this._elementRef.removeEventListener('keydown', this.handleKey, true)
   }
 
   // Get top 2 favorited LTI Tools
@@ -1091,7 +1067,7 @@ class RCEWrapper extends React.Component {
 
   componentDidMount() {
     this.registerTextareaChange()
-    this._elementRef.addEventListener('keyup', this.handleShortcutKeyShortcut, true)
+    this._elementRef.addEventListener('keydown', this.handleKey, true)
     // give the textarea its initial size
     this.onResize(null, {deltaY: 0})
     // Preload the LTI Tools modal
