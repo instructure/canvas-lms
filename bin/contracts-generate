@@ -12,3 +12,22 @@ else
     bundle exec rspec pact/spec \
       --tag pact --format doc
 fi
+
+
+function print_results() {
+  exit_code=$?
+  set +e
+  if [[ "$exit_code" == "0" ]]; then
+    echo
+    echo "Success!"
+  fi
+  docker cp contracts:/usr/src/app/pacts web/
+  docker rm -f contracts &> /dev/null
+}
+trap print_results INT TERM EXIT
+set -e
+docker-compose run --no-deps --name contracts web \
+  bundle exec rspec spec/contracts/service_providers/ --format doc --tag pact
+sha="$(git rev-parse --short HEAD)"
+docker-compose run --no-deps --rm -e SHA="${sha}" \
+  web bundle exec rake broker:pact:publish:local

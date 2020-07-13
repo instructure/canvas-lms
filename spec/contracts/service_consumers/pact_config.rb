@@ -23,8 +23,9 @@ module PactConfig
   module Providers
     CANVAS_LMS_API = 'Canvas LMS API'.freeze
     sha = `git rev-parse --short HEAD`.strip
-    CANVAS_API_VERSION = '1.0' + "+#{sha}".freeze
+    CANVAS_API_VERSION = '1.0'
     CANVAS_LMS_LIVE_EVENTS = 'Canvas LMS Live Events'.freeze
+    OUTCOMES = 'Outcomes'.freeze
     ALL = Providers.constants.map { |c| Providers.const_get(c) }.freeze
   end
 
@@ -33,6 +34,8 @@ module PactConfig
     my_broker_host = ENV.fetch('PACT_BROKER_HOST', 'pact-broker.docker')
     # common consumer
     GENERIC_CONSUMER = 'Generic Consumer'.freeze
+    CANVAS_API_VERSION = '1.0'
+    CANVAS_LMS_API = 'Canvas LMS API'.freeze
     if my_broker_host.include?(EXTERNAL_BROKER_HOST)
       # external consumers
       FIU = 'lmsAPI'.freeze
@@ -75,6 +78,10 @@ module PactConfig
 
     def consumer_tag
       ENV.fetch('PACT_BROKER_TAG', 'latest')
+    end
+
+    def consumer_version
+      Consumers::CANVAS_API_VERSION
     end
 
     def broker_password
