@@ -216,7 +216,6 @@ module Importers
         lockdown_browser_monitor_data
         one_time_results
         show_correct_answers_last_attempt
-        only_visible_to_overrides
       ].each do |attr|
         attr = attr.to_sym
         if hash.key?(attr)
@@ -259,6 +258,9 @@ module Importers
           override.save!
           migration.add_imported_item(override,
             key: [item.migration_id, override.set_type, override.set_id].join('/'))
+        end
+        if hash.has_key?(:only_visible_to_overrides)
+          item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end
 

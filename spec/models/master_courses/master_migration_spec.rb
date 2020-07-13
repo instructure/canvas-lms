@@ -1362,6 +1362,20 @@ describe MasterCourses::MasterMigration do
       expect(copied_topic_assmt.reload.due_at.to_i).to eq new_master_due_at.to_i
     end
 
+    it "should not copy only_visible_to_overrides for quizzes by default" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz_assmt = @copy_from.assignments.create!(:submission_types => 'online_quiz').reload
+      quiz = quiz_assmt.quiz
+      quiz.update_attribute(:only_visible_to_overrides, true)
+
+      run_master_migration
+
+      copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      expect(copied_quiz.only_visible_to_overrides).to eq false
+    end
+
     it "allows a minion course's change of the graded status of a discussion topic to stick" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
