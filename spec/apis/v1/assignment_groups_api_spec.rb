@@ -1084,5 +1084,25 @@ describe AssignmentGroupsApiController, type: :request do
       expect(group3.assignments.count).to eq 4
       expect(@assignment_group.reload.workflow_state).to eq 'deleted'
     end
+
+    it 'should recalculate results if move_assignments_to is provided' do
+      @course.assignment_groups.create!(name: 'Another group', position: 2)
+      group3 = @course.assignment_groups.create!(name: 'Yet Another group', position: 3)
+
+      @course.assignments.create!(title: "test1", assignment_group: @assignment_group, points_possible: 10)
+      @course.assignments.create!(title: "test2", assignment_group: @assignment_group, points_possible: 12)
+
+      expect_any_instance_of(Course).to receive(:recompute_student_scores).once
+
+      api_call(:delete, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
+        {
+          controller: 'assignment_groups_api',
+          action: 'destroy',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_group_id: @assignment_group.id.to_s
+        },
+        {move_assignments_to: group3.id})
+    end
   end
 end
