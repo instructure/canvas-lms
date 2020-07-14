@@ -17,10 +17,12 @@
 #
 
 class OutcomeProficiency < ApplicationRecord
+  extend RootAccountResolver
+
   has_many :outcome_proficiency_ratings, -> { order 'points DESC, id ASC' },
     dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
   belongs_to :account, inverse_of: :outcome_proficiency
-  belongs_to :root_account, class_name: 'Account', inverse_of: :outcome_proficiency
+  belongs_to :root_account, class_name: 'Account'
 
   validates :account, uniqueness: true, presence: true
   validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }
@@ -28,7 +30,8 @@ class OutcomeProficiency < ApplicationRecord
   validate :strictly_decreasing_points
   validates :context_id, :context_type, presence: true
   before_validation :ensure_context
-  before_save :set_root_account_id
+
+  resolves_root_account through: :account
 
   def as_json(_options={})
     {
@@ -55,11 +58,6 @@ class OutcomeProficiency < ApplicationRecord
           t("Points should be strictly decreasing: %{l} <= %{r}", l: l.points, r: r.points))
       end
     end
-  end
-
-  def set_root_account_id
-    return if self.root_account_id.present?
-    self.root_account_id = self.account.resolved_root_account_id
   end
 
   # TODO: get rid of once all existing proficiencies have their context populated and creation methods can be rewritten

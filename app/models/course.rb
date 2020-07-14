@@ -216,7 +216,7 @@ class Course < ActiveRecord::Base
     dependent: :destroy
 
   has_many :conditional_release_rules, inverse_of: :course, class_name: "ConditionalRelease::Rule", dependent: :destroy
-
+  has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
 
   prepend Profile::Association
 
@@ -3551,6 +3551,10 @@ class Course < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def resolved_outcome_calculation_method
+    outcome_calculation_method || account&.resolved_outcome_calculation_method
   end
 
   private

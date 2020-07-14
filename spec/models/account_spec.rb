@@ -33,6 +33,38 @@ describe Account do
     expect(subaccount.resolved_outcome_proficiency).to eq proficiency
   end
 
+  context 'resolved_outcome_calculation_method' do
+    it "retrieves parent account's outcome calculation method" do
+      root_account = Account.create!
+      method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      subaccount = root_account.sub_accounts.create!
+      expect(root_account.outcome_calculation_method).to eq method
+      expect(subaccount.outcome_calculation_method).to eq nil
+      expect(root_account.resolved_outcome_calculation_method).to eq method
+      expect(subaccount.resolved_outcome_calculation_method).to eq method
+    end
+
+    it "can override parent account's outcome calculation method" do
+      root_account = Account.create!
+      method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      subaccount = root_account.sub_accounts.create!
+      submethod = OutcomeCalculationMethod.create! context: subaccount, calculation_method: :latest
+      expect(root_account.outcome_calculation_method).to eq method
+      expect(subaccount.outcome_calculation_method).to eq submethod
+      expect(root_account.resolved_outcome_calculation_method).to eq method
+      expect(subaccount.resolved_outcome_calculation_method).to eq submethod
+    end
+
+    it "can be nil" do
+      root_account = Account.create!
+      subaccount = root_account.sub_accounts.create!
+      expect(root_account.outcome_calculation_method).to eq nil
+      expect(subaccount.outcome_calculation_method).to eq nil
+      expect(root_account.resolved_outcome_calculation_method).to eq nil
+      expect(subaccount.resolved_outcome_calculation_method).to eq nil
+    end
+  end
+
   it "should provide a list of courses" do
     expect{ Account.new.courses }.not_to raise_error
   end

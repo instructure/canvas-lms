@@ -1566,6 +1566,41 @@ describe Course do
       expect(@course.course_section_visibility(worthless_loser)).to eq []
     end
   end
+
+  context 'resolved_outcome_calculation_method' do
+    it "retrieves account's outcome calculation method" do
+      root_account = Account.create!
+      method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      course = course_model(account: root_account)
+      expect(course.outcome_calculation_method).to eq nil
+      expect(course.resolved_outcome_calculation_method).to eq method
+    end
+
+    it "can retrieve ancestor account's outcome calculation method" do
+      root_account = Account.create!
+      subaccount = root_account.sub_accounts.create!
+      method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      course = course_model(account: subaccount)
+      expect(course.outcome_calculation_method).to eq nil
+      expect(course.resolved_outcome_calculation_method).to eq method
+    end
+
+    it "can retrieve own outcome calculation method" do
+      root_account = Account.create!
+      OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      course = course_model(account: root_account)
+      course_method = OutcomeCalculationMethod.create! context: course, calculation_method: :latest
+      expect(course.outcome_calculation_method).to eq course_method
+      expect(course.resolved_outcome_calculation_method).to eq course_method
+    end
+
+    it "can be nil" do
+      root_account = Account.create!
+      course = course_model(account: root_account)
+      expect(course.outcome_calculation_method).to eq nil
+      expect(course.resolved_outcome_calculation_method).to eq nil
+    end
+  end
 end
 
 
