@@ -1485,7 +1485,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
     # have to account for if options is a hash, if_exists will just get wrapped up
     # in it
-    if options[:if_exists]
+    if options.delete(:if_exists)
       fk_name_to_delete = foreign_key_for(from_table, options_or_to_table)&.name
       return if fk_name_to_delete.nil?
     else
