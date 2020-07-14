@@ -173,6 +173,8 @@ class ApplicationController < ActionController::Base
             show_feedback_link: show_feedback_link?
           },
         }
+
+        @js_env[:flashAlertTimeout] = 1.day.in_milliseconds if @current_user.try(:prefers_no_toast_timeout?)
         @js_env[:KILL_JOY] = @domain_root_account.kill_joy? if @domain_root_account&.kill_joy?
 
         cached_features = cached_js_env_account_features

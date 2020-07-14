@@ -27,6 +27,16 @@ high_contrast:
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
   autoexpand: true
+disable_alert_timeouts:
+  state: allowed
+  display_name:
+    features.disable_alert_timeouts: Disable Alert Notification Timeouts
+  description:
+    disable_alert_timeouts_description: |-
+      Enabling this feature gets rid of the timeout for alert notifications that pop up, giving the
+      user as much time as they need to read the notification over and dismiss it when they are finished.
+  applies_to: User
+  autoexpand: true
 disable_celebrations:
   state: hidden
   display_name:

@@ -1605,6 +1605,10 @@ class User < ActiveRecord::Base
     !!feature_enabled?(:high_contrast)
   end
 
+  def prefers_no_toast_timeout?
+    !!feature_enabled?(:disable_alert_timeouts)
+  end
+
   def prefers_no_celebrations?
     !!feature_enabled?(:disable_celebrations)
   end

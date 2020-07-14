@@ -126,6 +126,26 @@ RSpec.describe ApplicationController do
       expect(@controller.js_env[:TIMEZONE]).to eq 'America/Juneau'
     end
 
+    describe "user flags" do
+      context "eventAlertTimeout" do
+        before(:each) do
+          user_factory
+          controller.instance_variable_set(:@domain_root_account, Account.default)
+          controller.instance_variable_set(:@current_user, @user)
+          allow(controller).to receive(:user_display_json).and_return({})
+        end
+
+        it 'is not set if the feature flag is off' do
+          expect(controller.js_env[:flashAlertTimeout]).to be_nil
+        end
+
+        it 'is 86400000 (1 day in milliseconds) if the feature flag is on' do
+          @user.enable_feature!(:disable_alert_timeouts)
+          expect(controller.js_env[:flashAlertTimeout]).to eq(1.day.in_milliseconds)
+        end
+      end
+    end
+
     describe "DIRECT_SHARE_ENABLED feature flag" do
       it "sets the env var to true when FF is enabled" do
         root_account = double(global_id: 1, open_registration?: true, settings: {}, cache_key: "key")
