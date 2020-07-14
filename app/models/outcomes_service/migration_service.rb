@@ -105,7 +105,7 @@ module OutcomesService
         )
         if response.code =~ /^2/
           json = JSON.parse(response.body)
-          { import_id: json['id'], course: course }
+          { import_id: json['id'], course: course, content_migration: content_migration }
         else
           raise "Error sending import for Outcomes Service: #{response.body}"
         end
@@ -119,6 +119,17 @@ module OutcomesService
         )
         if response.code =~ /^2/
           json = JSON.parse(response.body)
+          json['missing_alignments']&.each do |missing_alignment|
+
+            page = lookup_artifact(missing_alignment["artifact_type"], missing_alignment["artifact_id"],
+                                   import_data[:course])
+            if page.nil?
+              import_data[:content_migration].add_warning(I18n.t('Unable to align some outcomes to a page'))
+            else
+              import_data[:content_migration].add_warning(I18n.t('Unable to align some outcomes to "%{title}"',
+               { title: page.title}))
+            end
+          end
           case json['state']
           when 'completed'
             true
@@ -133,6 +144,14 @@ module OutcomesService
       end
 
       private
+
+
+      def lookup_artifact(artifact_type, artifact_id, course)
+        case artifact_type
+        when 'canvas.page'
+          course.wiki_pages.where(id: artifact_id).first
+        end
+      end
 
       def headers_for(course, scope, overrides = {})
         {
