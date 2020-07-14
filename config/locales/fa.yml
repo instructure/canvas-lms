@@ -363,6 +363,7 @@ fa:
     announcement_creation_failed_notice: "ایجاد اطلاعیه انجام نشد"
     announcement_deleted_notice: "اطلاعیه با موفقیت حذف شد"
     permission_denied_notice: "نمی توانید برای این حساب، اطلاعیه ایجاد کنید"
+  account_notifications_f3b7f01f: "اطلاعیه حساب"
   account_reports: 
     default: 
       all_terms: "همه نیمسال ها"
@@ -1761,6 +1762,7 @@ fa:
   admin_4d3ba42f: مدیر
   admin_csv_f8d1b3eb: "فایل CSV مدیر"
   admin_navigation_menu_77b801a2: "منوی پیمایش مدیر"
+  admin_tools_undelete_courses_d9bd8631: "ابزارهای مدیر (لغو حذف درس ها)"
   admin_user_name_29dd115a: admin_user_name
   administrator_f325c186: مدیر
   admins_3e1dce15: مدیرها
@@ -2039,6 +2041,7 @@ fa:
   answer_correct_answer_c2c4a20c: "%{answer}، (پاسخ درست)"
   answer_description_6b353cfd: "شرح پاسخ"
   answer_distribution_2a956e3f: "توزیع پاسخ"
+  answer_field_8c4e7c46: "فیلد پاسخ"
   answer_incorrect_answer_80efe585: "%{answer}، (پاسخ نادرست)"
   answer_sequence_cfeda025: "ترتیب پاسخ"
   answer_text_909894d6: "متن پاسخ"
@@ -2119,6 +2122,7 @@ fa:
       invalid_course_section: "بخش درس معتبر نیست"
       invalid_group_category: "رده گروه معتبر نیست"
       missing_group_category: "قرارهای ملاقات گروه باید یک رده گروه داشته باشد"
+  appointment_groups_bd225e60: "گروه تکلیف"
   appointments_dcb41d23: "قرارهای ملاقات"
   approved_c3b285d4: "تأیید شده"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} با دقت %{precision}"
@@ -2185,6 +2189,7 @@ fa:
   assessment_question: 
     default_question_name: پرسش
   assessment_question_6ad1766d: "پرسش ارزیابی"
+  assessment_question_b523622f: "پرسش ارزیابی"
   assessment_question_bank: 
     default_imported_title: "پرسش های وارد شده"
     default_title: "نام موجود نیست - %{course}"
@@ -2270,6 +2275,8 @@ fa:
   assignment_details_expanded_20c6f0c7: "جزئیات تکلیف گسترش یافته است"
   assignment_does_not_exist_74178c34: "تکلیف وجود ندارد"
   assignment_excused_eb6c08fa: "تکلیف اجرا شد"
+  assignment_extensions_cac06daa: "پسوند تکلیف‌ها"
+  assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "تکلیف نمره گذاری شد: %{grade} بر %{assignment_name} در %{course_code}"
   assignment_grades_have_already_been_published_ff2d84c6: "نمره های تکلیف منتشر شده اند."
   assignment_group: 
     default_name: "تکلیف ها"
@@ -3196,6 +3203,7 @@ fa:
   bookmark_service: 
     default_title: "عنوان موجود نیست"
   bookmark_this_question_bank_dc414a82: "نشانه گذاری این مخزن پرسش"
+  bookmarks_5b5b81c9: نشانه‌ها
   bottom_15a2a9be: پایین
   bounce_count_reset_c4c2218f: "تعداد بازگشت بازنشانی شد!"
   bounce_reason_689ed4c6: "دلیل بازگشت"
@@ -4215,6 +4223,7 @@ fa:
   completed_19711ce7: "کامل شد"
   completed_9b809e44: "کامل شد"
   compose_message_8abd180a: "پیام جدید بنویسید"
+  computer_1d7dfa6f: کامپیوتر
   concluded_63150003: "خاتمه یافته"
   concluded_conferences_cdbe53f9: "کنفرانس های خاتمه یافته"
   concluded_courses_94782e21: "درس های خاتمه یافته"
@@ -6145,6 +6154,7 @@ fa:
   created_at_73839757: "ایجاد شده در"
   created_by_b39b9c8b: "ایجاد شده توسط"
   created_by_sis_93fbb66b: "ایجاد شده_توسط_سامانه اطلاعات دانشجو"
+  created_by_sis_b590894c: "ایجاد شده توسط سامانه اطلاعات دانشجو;"
   created_by_sis_e1449c31: "ایجاد شده توسط سامانه اطلاعات دانشجو"
   created_created_at_37c0ec3b: "ایجاد شد: %{created_at}"
   created_created_bf5714b8: "%{created} ایجاد شد"
@@ -6497,6 +6507,7 @@ fa:
   delete_assignment_group_7c3b01c4: "حذف تکلیف گروه"
   delete_assignment_name_deec56e3: "حذف گروه %{name}"
   delete_bank_d8f4cb64: "حذف %{bank}"
+  delete_collaboration_23035eaf: "حذف همکاری"
   delete_comment_a71040c3: "حذف نظر"
   delete_comment_comment_d32ffc85: "حذف نظر: %{comment}"
   delete_comment_commenttext_c8afe129: "حذف نظر: %{commentText}"
@@ -6511,6 +6522,7 @@ fa:
   delete_grading_period_set_b35358dd: "حذف مجموعه دوره نمره گذاری"
   delete_grading_scheme_6b308832: "حذف طرح نمره گذاری"
   delete_group_86c381ec: "حذف گروه"
+  delete_key_developername_be80e695: "حذف کلید%{developerName}"
   delete_my_account_41060aad: "حذف حساب من"
   delete_outcome_cc6546f1: "حذف نتیجه"
   delete_outcome_group_6b399d34: "حذف گروه نتیجه"
@@ -6669,6 +6681,7 @@ fa:
     no_user: "کاربر موجود نیست"
     unnamed_tool: "ابزار بدون نام"
   developer_keys_d70ba44a: "کلیدهای توسعه دهنده"
+  developers_keys_table_69ae6b7e: "جدول کلیدهای توسعه دهنده"
   dialog_form_wrapper: 
     cancel: لغو
     save_settings: "ذخیره سازی تنظیمات"
@@ -6687,6 +6700,7 @@ fa:
   disabled_by_default_7d822dcb: "به‌طور پیش فرض غیرفعال شده"
   disabled_in_course_settings_d15ee35d: "*غیر فعال شده در تنظیمات درس"
   disabled_links_b3bdea99: "پیوندهای غیر فعال شده"
+  disabled_not_visible_to_students_48d4a90d: "غیرفعال. برای دانشجویان قابل مشاهده نیست"
   disabling_f594bda: "در حال غیر فعال سازی..."
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "برای دروس منتشر نشده، غیرفعال کردن پست برای سامانه اطلاعات دانشجو، در دسترس نیست"
   disabling_sync_to_name_failed_e7521ebb: "غیرفعال کردن همگام‌سازی برای %{name} انجام نشد"
@@ -7150,6 +7164,7 @@ fa:
   edit_assignment_name_mastery_paths_40b50541: "ویرایش مسیرهای تسلط تکلیف‌ %{name}"
   edit_bank_92eb8e14: "ویرایش %{bank}"
   edit_c5fbea07: ویرایش
+  edit_collaboration_b014c18b: "ویرایش همکاری"
   edit_comment_comment_e74afa04: "ویرایش نظر: %{comment}"
   edit_conference_title_6e234815: "ویرایش \"%{conference_title}\""
   edit_course_role_3b992fc2: "ویرایش نقش درس"
@@ -7162,6 +7177,7 @@ fa:
   edit_grading_scheme_53091236: "ویرایش طرح نمره گذاری"
   edit_group_c8679dba: "ویرایش گروه"
   edit_item_details_c9a7b9c5: "ویرایش جزئیات مورد"
+  edit_key_developername_2980f240: "ویرایش کلید %{developerName}"
   edit_key_name_5c7d2f46: "ویرایش کلید %{name}"
   edit_mastery_paths_for_name_c9fc59f9: "ویرایش مسیرهای تسلط برای %{name}"
   edit_mastery_paths_for_title_3c0a15e1: "ویرایش مسیرهای تسلط برای %{title}"
@@ -8111,6 +8127,7 @@ fa:
   files_uploaded_519844ed: "فایل ها بارگذاری شد"
   filetype_not_allowed_40556acb: "نوع فایل غیرمجاز است"
   filipino_33339264: فیلیپینی
+  fill_in_the_blank_answer_d83b83bb: "پاسخ خالی را پر کن"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "جای خالی را پر کنید، متن های اطراف را بخوانید"
   filled_5d8c39e: "پر شده"
   filter_9df28e5b: فیلتر
@@ -8219,6 +8236,7 @@ fa:
   from_from_to_to_e31f6422: "از %{from} به %{to}"
   from_gravatar_58372d5a: "از گرآواتار"
   front_page_must_be_set_first_4dbbfdbe: "ابتدا باید صفحه آغازین تعیین شود"
+  front_page_must_be_set_first_c5246f7d: "ابتدا باید صفحه آغازین تعیین شود"
   full_article_9296bb6f: "مقاله کامل"
   full_name_14c958f7: "نام کامل:"
   full_name_23fdfb6d: "نام کامل"
@@ -10056,6 +10074,8 @@ fa:
   kind_7f0a88c4: نوع
   korean_da812d9: کره‌ای
   label_3c9a991: "%{label}:"
+  label_disabled_not_visible_to_students_da093eec: "%{label}.غیرفعال. برای دانشجویان قابل مشاهده نیست"
+  label_no_content_not_visible_to_students_84345d2f: "%{label}. بدون محتوا. برای دانشجویان قابل مشاهده نیست"
   label_values_76f4b5fa: "برچسب گذاری مقادیر"
   labels: 
     lock_module_until: "قفل کردن تا تاریخ"
@@ -10513,6 +10533,8 @@ fa:
   macedonian_6ed541af: مقدونی
   main_navigation_3f080c80: "پیمایش اصلی"
   main_text_color_7d65ab1b: "رنگ متن اصلی"
+  make_key_invisible_e66af89: "کلید را نامرئی کن"
+  make_key_visible_5c03fa34: "کلید را قابل مشاهده کن"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "مطمئن شوید که مناسب ترین گزینه را انتخاب می کنید، زیرا نمره های دانشجویان ممکن است تحت تاثیر قرارگیرند."
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "این درس به طور عمومی قابل مشاهده شود (اطلاعات دانشجو خصوصی خواهد ماند)"
   making_a_copy_of_originalassignmentname_b7268992: "ساخت یک کپی از %{originalAssignmentName}"
@@ -12786,6 +12808,7 @@ fa:
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
     one: "تسلط حداقل باید %{count} بار کسب شود. نمره های بالای تسلط برای محاسبه نمره نهایی میانگین گرفته می شود."
     other: "تسلط حداقل باید %{count} بار کسب شود. نمره های بالای تسلط برای محاسبه نمره نهایی میانگین گرفته می شود."
+  must_be_a_number_0_e6ec3e78: "عدد باید بزرگتر از صفر باشد"
   must_be_a_valid_number_59f0069: "باید یک عدد معتبر باشد"
   must_be_after_start_date_95e251a3: "باید بعد از تاریخ شروع باشد"
   must_be_on_or_after_end_date_e4dda631: "باید در و یا بعد از تاریخ پایان باشد"
@@ -12944,6 +12967,7 @@ fa:
   no_collaboration_apps_3bbd30ce: "برنامه همکاری موجود نیست"
   no_content_5dbc9acf: "محتوا موجود نیست"
   no_content_has_been_added_f36bab43: "* هیچ محتوایی افزوده نشده است"
+  no_content_not_visible_to_students_b59f4867: "بدون محتوا. برای دانشجویان قابل مشاهده نیست"
   no_courses_found_12d68a74: "هسچ درسی موجود نیست"
   no_date_bfeb2df7: "تاریخ موجود نیست"
   no_description_c2554c25: "شرح موجود نیست"
@@ -13347,6 +13371,7 @@ fa:
   number_of_allowed_attempts_3d10b740: "تعداد تلاش های مجاز"
   number_of_respondents_e1e7e8b: "تعداد پاسخ دهنده ها"
   number_of_scores_to_ignore_for_each_student_fb94e818: "تعداد نمرات برای نادیده گرفتن برای هر دانشجو"
+  numerical_answer_ec7120bf: "پاسخ عددی"
   numpoints_points_b1f0666a: "%{numPoints} امتیاز"
   o_224cf405: o
   oauth2_provider: 
@@ -13495,6 +13520,7 @@ fa:
   out_of_points_possible_8ab14f7: "از %{points_possible}"
   out_of_pointspossible_3fb5ee20: "از %{pointsPossible}"
   outcome_da397d20: نتیجه
+  outcome_export_89229eb4: "صدور نتیجه "
   outcome_group_39fae76f: "گروه نتیجه"
   outcome_groups: 
     invalid_file: "فایل گروه نتیجه معتبر نیست"
@@ -13671,6 +13697,7 @@ fa:
     overrides: 
       everyone: همه
   own_copyright_cc59db55: "حق نشر من"
+  owner_email_236d1b2: "نشانی پست الکترونیکی مالک"
   owner_email_4d02f795: "نشانی پست الکترونیکی مالک:"
   package_error: "خطا در شناسایی نوع بسته روی داد: %{error}"
   package_export_from_d6e2b073: "صدور بسته از"
@@ -14383,6 +14410,8 @@ fa:
       delete_login: "مطمئنید که می خواهید این ورود حذف شود؟"
       regenerate_token: "مطمئنید که می خواهید این نشانه دوباره ایجاد شود؟ هرچیزی که از این نشانه استفاده می کند باید بهنگام سازی شود."
       unregister_service: "مطمئنید که می خواهید ثبت نام این سرویس لغو شود؟"
+    content_shares: 
+      page_title: "محتوای مشترک"
     crumb: "تنظیمات %{user}"
     crumbs: 
       observees: "در حال مشاهده"
@@ -16318,6 +16347,8 @@ fa:
   read_comments_3fcc7590: "خواندن نظرها"
   ready_to_enroll_panel_46f45abb: "آماده برای ثبت نام پنل"
   recaptcha_not_configured_3a6ef9ee: "تصویر امنیتی پیکربندی نشده است"
+  received_7689640e: "دریافت شده"
+  received_content_53049822: "محتوای دریافت شده"
   recent_activity_51239235: "فعالیت اخیر"
   recent_announcements_8becc59c: "اطلاعیه‌های اخیر"
   recent_student: 
@@ -16407,6 +16438,7 @@ fa:
   remove_attendee_name_55165070: "حذف شرکت کننده %{name}"
   remove_attribute_59a4aa64: "حذف ویژگی"
   remove_c_name_section_d8eabd3a: "حذف بخش %{c.name}"
+  remove_collaborationtitle_c3e81adb: "حذف \"%{collaborationTitle}\"?"
   remove_contact_method_ca890ba3: "حذف روش تماس"
   remove_course_association_name_b760c502: "حذف انجمن درس %{name}"
   remove_domain_from_the_whitelist_14c7d5e9: "حذف%{domain} از لیست سفید"
@@ -16522,6 +16554,7 @@ fa:
   resume_survey_58dce775: "از سر گرفتن نظرسنجی"
   resync_grades_to_sis_d4dcfe12: "همگام‌سازی دوباره نمرات به سامانه اطلاعات دانشجو"
   retrieve_timeout: " پیکربندی قابل بازیابی نیست، زمان پاسخ سرور به پایان رسیده است"
+  retrieving_content_ed0b9b33: "بازیابی محتوا"
   retry_ebd5f8ba: "تلاش دوباره"
   revert_to_actual_score_f665eea9: "بازگشت به نمره واقعی"
   review_now_318a6a3e: "هم اکنون بازبینی کنید"
@@ -17938,6 +17971,7 @@ fa:
     errors: 
       no_points_possible: "بدون امتیازهای ممکن، امکان بردن روی منحنی وجود ندارد"
       none_to_update: "هیچ موردی برای بهنگام سازی موجود نیست"
+  shared_content_803ac37b: "محتوای مشترک"
   shared_secret_892c88f2: "رمز مشترک"
   short_name_42f454a1: "نام کوتاه"
   short_name_ad9bf84f: "نام کوتاه"
@@ -17947,6 +17981,7 @@ fa:
   show_admin_navigation_menu_92fb579f: "نمایش منوی پیمایش مدیر"
   show_all_artifacts_34b91a83: "نمایش همه آثار"
   show_all_details_9879980c: "نمایش همه اطلاعات"
+  show_all_keys_fa88c55c: "نمایش همه کلیدها"
   show_all_sections_190203e8: "نمایش همه بخش ها"
   show_and_hide_courses_menu_9e09d1d0: "نمایش دادن و مخفی کردن منوی درس ها"
   show_attendance_columns_4d160e16: "نمایش ستون های حضور"
@@ -18416,6 +18451,7 @@ fa:
     unknown_author: "یک نفر"
   submission_comment_created_f9375ca2: "ایجاد نظرهای مربوط به مورد ارسالی"
   submission_comment_deleted_a031a529: "حذف نظرهای مربوط به مورد ارسالی"
+  submission_comment_user_name_assignment_title_cour_d88ba875: "ارسال نظر :%{user_name}، %{assignment_title}، %{course_name}"
   submission_comments_4fa03a17: "نظرهای مربوط به مورد ارسالی"
   submission_comments_b6d65841: "نظرهای مربوط به مورد ارسالی"
   submission_date_8f659c0c: "تاریخ ارسال"
@@ -19381,8 +19417,10 @@ fa:
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "نمی توان نمرات را روی منحنی برد زیرا این تکلیف حداقل برای یک دانشجو در دوره زمانی پایان یافته نمره گذاری قرار دارد"
   unable_to_dismiss_update_df1e32eb: "قادر به رد بهنگام سازی نیست"
   unable_to_find_clever_district_district_id_61deb1cb: "قادر به یافتن Clever District %{district_id} نیست"
+  unable_to_find_extension_3fe61b3c: "قادر به یافتن افزونه ها نبودیم"
   unable_to_find_filetype_7b620f02: "قادر به پیدا کردن نوع فایل نبودیم"
   unable_to_remove_app_4293cb53: "قادر به حذف برنامه نیست"
+  unable_to_save_new_discussion_topic_99239f3f: "امکان ذخیره موضوع بحث جدید وجود ندارد"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "نمی توان نمره پیش فرض را تعیین کرد، زیرا این تکلیف حداقل برای یک دانشجو در دوره نمره گذاری پایان یافته قرار دارد"
   unarchive_selected_e0c4bd3d: "لغو بایگانی انتخاب شده"
   unauthorized: "غیر مجاز"
@@ -19534,6 +19572,7 @@ fa:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "از MathMan برای تبدیل LaTeX به SVG استفاده شود؟"
   use_new_folder_tree_in_files_bc0ea09f: "استفاده از درخت پوشه جدید در فایل ها"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "در همه جا از ویرایشگر محتوای غنی و جدید با نوار کناری پیشرفته استفاده کنید"
+  use_parent_account_setting_f25a721f: "تنظیمات حساب منشاء را استفاده کن"
   use_remote_service_for_notifications_9fe667c6: "استفاده از سرویس از راه دور برای اطلاعیه ها"
   use_remote_version_of_rich_content_editor_52f7fc4b: "استفاده از نسخه از راه دور ویرایشگر محتوای غنی"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "استفاده از نسخه از راه دور نوار کناری و ویرایشگر محتوای غنی"
@@ -20318,6 +20357,7 @@ fa:
   yes_3593c135: بله
   yes_dde87d5: بله
   yes_install_tool_f51b3278: "بله، ابزار نصب شود"
+  yes_remove_86a61759: "بله, حذف"
   yiddish_f96986df: ییدیش
   yo_e4ee15a4: Yo
   you_are_about_to_lose_any_unsaved_changes_would_yo_e255f393: |-
