@@ -138,8 +138,9 @@ describe "Importing Learning Outcomes" do
       alignment: ContentTag.create!({
         title: 'content',
         context: @course,
-        learning_outcome: existing_outcome})
-      )
+        learning_outcome: existing_outcome
+      })
+    )
     lor.save!
     lo_data[:calculation_method] = "n_mastery"
     lo_data[:calculation_int] = 5
@@ -185,6 +186,40 @@ describe "Importing Learning Outcomes" do
       lo_data[:external_identifier] = "0"
       Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration)
       expect(@context.learning_outcomes.count).to eq 3 # lo1 is duplicated
+    end
+  end
+
+  describe "with the outcome_alignments_course_migration FF enabled" do
+    before(:once) { @context.root_account.enable_feature!(:outcome_alignments_course_migration) }
+    let(:migration) do
+      ContentMigration.create!(:context => @context).tap do |m|
+        m.migration_ids_to_import = {:copy=>{}}
+      end
+    end
+
+    context "with global and account outcomes" do
+      let(:global_outcome) { LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first }
+      let(:account_outcome) { LearningOutcome.where(migration_id: "fa67b467-37c7-4fb9-aef4-21a33a06d0be").first }
+
+      before do
+        global_outcome.update(vendor_guid: 'vendor-guid-1', context: nil)
+        account_outcome.update(vendor_guid: 'vendor-guid-2', context: @context.root_account)
+      end
+
+      it "should include non-imported outcomes as imported items" do
+        @data["learning_outcomes"].find{|lo| lo["migration_id"] == global_outcome.migration_id}.tap do |data|
+          data[:vendor_guid] = "vendor-guid-1"
+          data[:external_identifier] = global_outcome.id.to_s
+          data[:is_global_outcome] = true
+        end
+        @data["learning_outcomes"].find{|lo| lo["migration_id"] == account_outcome.migration_id}.tap do |data|
+          data[:vendor_guid] = "vendor-guid-2"
+          data[:external_identifier] = account_outcome.id.to_s
+        end
+        Importers::LearningOutcomeImporter.process_migration(@data, migration)
+        outcomes = migration.imported_migration_items_hash(LearningOutcome)
+        expect(outcomes.count).to eq 2
+      end
     end
   end
 end
