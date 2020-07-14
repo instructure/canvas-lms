@@ -1106,11 +1106,17 @@ class RCEWrapper extends React.Component {
     if (prevState.isHtmlView !== this.state.isHtmlView) {
       if (this.state.isHtmlView) {
         this.getTextarea().removeAttribute('aria-hidden')
+        // Also make the label visible
+        this.getTextarea().labels?.[0]?.removeAttribute('aria-hidden')
+
         this.mceInstance().hide()
         document.getElementById(mceProps.textareaId).focus()
       } else {
         this.setCode(this.textareaValue())
         this.getTextarea().setAttribute('aria-hidden', true)
+        // Also make the label hidden
+        this.getTextarea().labels?.[0]?.setAttribute('aria-hidden', true)
+
         this.mceInstance().show()
         this.mceInstance().focus()
         this.doAutoResize()
