@@ -637,12 +637,36 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    it 'should populate the root_account_id on Quizzes::Quiz' do
-      quiz_model(course: @course)
-      @quiz.update_columns(root_account_id: nil)
-      expect(@quiz.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(@quiz.reload.root_account_id).to eq @course.root_account_id
+    context 'with Quizzes::Quiz' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { quiz_model(course: @course) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with Quizzes::QuizGroup' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          reference_record.quiz_groups.create!
+        end
+        let(:reference_record) { quiz_model }
+      end
+    end
+
+    context 'with Quizzes::QuizQuestion' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          reference_record.quiz_questions.create!(question_data: test_quiz_data.first)
+        end
+        let(:reference_record) { quiz_model }
+      end
+    end
+
+    context 'with Quizzes::QuizSubmission' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { quiz_with_submission }
+        let(:reference_record) { record.quiz }
+      end
     end
 
     context 'with RoleOverride' do
