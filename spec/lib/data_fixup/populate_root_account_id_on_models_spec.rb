@@ -401,6 +401,33 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    context 'with GradingPeriod' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { grading_periods(count: 1).first }
+        let(:reference_record) { record.grading_period_group }
+      end
+    end
+
+    context 'with GradingPeriodGroup' do
+      context 'when it is for a course' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) do
+            Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+          end
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'when it is for a (root) account' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) do
+            Factories::GradingPeriodGroupHelper.new.create_for_account(reference_record)
+          end
+          let(:reference_record) { account_model(root_account_id: nil) }
+        end
+      end
+    end
+
     context 'with GradingStandard with course context' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { grading_standard_for(@course) }
@@ -433,6 +460,14 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { group_membership_model(group: reference_record) }
         let(:reference_record) { group_model }
+      end
+    end
+
+    context 'with LatePolicy' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        # for some reason late_policy_model doesn't save the record
+        let(:record) { late_policy_model(course: @course).tap(&:save!) }
+        let(:reference_record) { @course }
       end
     end
 
@@ -483,14 +518,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           let(:record) { outcome_result }
           let(:reference_record) { course2 }
         end
-      end
-    end
-
-    context 'with LatePolicy' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        # for some reason late_policy_model doesn't save the record
-        let(:record) { late_policy_model(course: @course).tap(&:save!) }
-        let(:reference_record) { @course }
       end
     end
 
