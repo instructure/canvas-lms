@@ -1035,12 +1035,13 @@ class RCEWrapper extends React.Component {
             'instructure_image',
             'instructure_record',
             'instructure_documents',
-            ...this.ltiToolFavorites
+            ...this.ltiToolFavorites,
+            'lti_tool_dropdown'
           ]
         },
         {
           name: formatMessage('Miscellaneous and Apps'),
-          items: ['removeformat', 'table', 'instructure_equation', 'lti_tool_dropdown']
+          items: ['removeformat', 'table', 'instructure_equation']
         }
       ],
       contextmenu: '', // show the browser's native context menu
