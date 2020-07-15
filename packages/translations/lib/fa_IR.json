@@ -35,6 +35,9 @@
     "assignments_1e02582c": {
         "message": "تکلیف ها"
     },
+    "available_folders_694d0436": {
+        "message": "پوشه های موجود"
+    },
     "calendar_a8563bb2": {
         "message": "تقویم:"
     },
@@ -134,11 +137,20 @@
     "excused_cf8792eb": {
         "message": "معاف شد"
     },
+    "file_upload_failed_af22dd91": {
+        "message": "آپلود پرونده انجام نشد"
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "بارگذاری پرونده"
+    },
     "files_c300e900": {
         "message": "فایل ها"
     },
     "files_index_af7c662b": {
         "message": "فهرست فایل ها"
+    },
+    "folder_tree_fbab0726": {
+        "message": "درخت پوشه"
     },
     "generating_preview_45b53be0": {
         "message": "در حال ایجاد پیش نمایش..."
@@ -217,6 +229,9 @@
     },
     "loading_failed_b3524381": {
         "message": "Loading failed..."
+    },
+    "loading_folders_d8b5869e": {
+        "message": "بارگیری پوشه ها"
     },
     "location_3b6ff307": {
         "message": "مکان:"
@@ -323,6 +338,9 @@
     "something_went_wrong_89195131": {
         "message": "اشکالی رخ داده است."
     },
+    "something_went_wrong_d238c551": {
+        "message": "مشکلی پیش آمد"
+    },
     "sort_by_e75f9e3e": {
         "message": "مرتب کردن بر اساس"
     },
@@ -334,6 +352,9 @@
     },
     "submitted_318fad53": {
         "message": "ارسال شد"
+    },
+    "success_file_uploaded_8174e93f": {
+        "message": "موفقیت: پرونده بارگذاری شد"
     },
     "syllabus_f191f65b": {
         "message": "سرفصل"
@@ -367,6 +388,9 @@
     },
     "upload_media_ce31135a": {
         "message": "بارگذاری رسانه"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "بارگیری برای این پوشه در دسترس نیست"
     },
     "url_22a5f3b8": {
         "message": "نشانی اینترنتی"
