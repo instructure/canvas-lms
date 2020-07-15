@@ -1592,11 +1592,7 @@ class Account < ActiveRecord::Base
   end
 
   def can_see_rubrics_tab?(user)
-    if root_account.feature_enabled?(:decouple_rubrics)
-      user && self.grants_right?(user, :manage_rubrics)
-    else
-      user && self.grants_right?(user, :manage_outcomes)
-    end
+    user && self.grants_right?(user, :manage_rubrics)
   end
 
   def can_see_admin_tools_tab?(user)

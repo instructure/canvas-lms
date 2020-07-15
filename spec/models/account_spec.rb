@@ -958,23 +958,16 @@ describe Account do
       end
     end
 
-    describe "decouple_rubrics feature flag" do
+    describe "rubrics permissions" do
       let(:tab_ids) { @account.tabs_available(@admin).pluck(:id) }
 
-      it "does not return the rubrics tab if manage_outcomes is false with the FF off" do
-        account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_outcomes: false })
-        expect(tab_ids).not_to include(Account::TAB_RUBRICS)
-      end
-
-      it "returns rubrics tab if the FF is enabled/manage_outcomes is disabled" do
-        account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_outcomes: false })
-        @account.root_account.enable_feature!(:decouple_rubrics)
+      it "returns the rubrics tab for admins by default" do
+        account_admin_user(acccount: @account)
         expect(tab_ids).to include(Account::TAB_RUBRICS)
       end
 
-      it "the rubrics tab is not shown if the FF is enabled but the user lacks permission (manage_rubrics)" do
+      it "the rubrics tab is not shown if the user lacks permission (manage_rubrics)" do
         account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_rubrics: false })
-        @account.root_account.enable_feature!(:decouple_rubrics)
         expect(tab_ids).not_to include(Account::TAB_RUBRICS)
       end
     end
