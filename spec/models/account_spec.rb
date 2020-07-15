@@ -947,23 +947,13 @@ describe Account do
     describe "'ePortfolio Moderation' tab" do
       let(:tab_ids) { @account.tabs_available(@admin).pluck(:id) }
 
-      it "is shown if the release flag is enabled and the user has the moderate_user_content permission" do
+      it "is shown if the user has the moderate_user_content permission" do
         account_admin_user_with_role_changes(acccount: @account, role_changes: { moderate_user_content: true })
-        @account.root_account.enable_feature!(:eportfolio_moderation)
-
         expect(tab_ids).to include(Account::TAB_EPORTFOLIO_MODERATION)
       end
 
-      it "is not shown if the user has permission but the release flag is not enabled" do
-        account_admin_user_with_role_changes(acccount: @account, role_changes: { moderate_user_content: true })
-
-        expect(tab_ids).not_to include(Account::TAB_EPORTFOLIO_MODERATION)
-      end
-
-      it "is not shown if the release flag is enabled but the user lacks permission" do
+      it "is not shown if the user lacks the moderate_user_content permission" do
         account_admin_user_with_role_changes(acccount: @account, role_changes: { moderate_user_content: false })
-        @account.root_account.enable_feature!(:eportfolio_moderation)
-
         expect(tab_ids).not_to include(Account::TAB_EPORTFOLIO_MODERATION)
       end
     end

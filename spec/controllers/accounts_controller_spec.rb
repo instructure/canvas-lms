@@ -1329,62 +1329,53 @@ describe AccountsController do
       user
     end
 
-    it "redirects the user to the account settings URL if the eportfolio_moderation flag is not enabled" do
+    let(:returned_portfolios) { assigns[:eportfolios] }
+
+    it "returns eportfolios that have been auto-flagged as spam, or manually marked as spam/safe" do
       get "eportfolio_moderation", params: {account_id: @account.id}
-      expect(response).to redirect_to(account_settings_url(@account))
+      expect(returned_portfolios.count).to eq 3
     end
 
-    context "when the eportfolio_moderation flag is enabled" do
-      before(:each) { @account.root_account.enable_feature!(:eportfolio_moderation) }
+    it "ignores portfolios belonging to deleted users" do
+      vanished_eportfolio = Eportfolio.create!(user_id: vanished_author.id, name: "hello", spam_status: "marked_as_spam")
 
-      let(:returned_portfolios) { assigns[:eportfolios] }
+      get "eportfolio_moderation", params: {account_id: @account.id}
+      expect(returned_portfolios).not_to include(vanished_eportfolio)
+    end
 
-      it "returns eportfolios that have been auto-flagged as spam, or manually marked as spam/safe" do
-        get "eportfolio_moderation", params: {account_id: @account.id}
-        expect(returned_portfolios.count).to eq 3
+    it "returns flagged_as_possible_spam results, then marked_as_spam, then marked_as_safe" do
+      get "eportfolio_moderation", params: {account_id: @account.id}
+      expect(returned_portfolios.pluck(:name)).to eq ["maybe spam", "spam", "not spam"]
+    end
+
+    it "excludes results from authors who have no portfolios marked as possible or definitive spam" do
+      safe_user = User.create!
+      safe_user.user_account_associations.create!(account: @account)
+      safe_eportfolio = safe_user.eportfolios.create!(name: ":)")
+      safe_eportfolio.update!(spam_status: "marked_as_safe")
+
+      get "eportfolio_moderation", params: {account_id: @account.id}
+      expect(returned_portfolios.pluck(:id)).not_to include(safe_eportfolio.id)
+    end
+
+    context "pagination" do
+      before(:once) do
+        Setting.set('eportfolio_moderation_results_per_page', 2)
       end
 
-      it "ignores portfolios belonging to deleted users" do
-        vanished_eportfolio = Eportfolio.create!(user_id: vanished_author.id, name: "hello", spam_status: "marked_as_spam")
-
+      it "does not return more than the specified results per page" do
         get "eportfolio_moderation", params: {account_id: @account.id}
-        expect(returned_portfolios).not_to include(vanished_eportfolio)
+        expect(returned_portfolios.count).to eq 2
       end
 
-      it "returns flagged_as_possible_spam results, then marked_as_spam, then marked_as_safe" do
+      it "returns the first page of results if no 'page' param is given" do
         get "eportfolio_moderation", params: {account_id: @account.id}
-        expect(returned_portfolios.pluck(:name)).to eq ["maybe spam", "spam", "not spam"]
+        expect(returned_portfolios.pluck(:name)).to eq ["maybe spam", "spam"]
       end
 
-      it "excludes results from authors who have no portfolios marked as possible or definitive spam" do
-        safe_user = User.create!
-        safe_user.user_account_associations.create!(account: @account)
-        safe_eportfolio = safe_user.eportfolios.create!(name: ":)")
-        safe_eportfolio.update!(spam_status: "marked_as_safe")
-
-        get "eportfolio_moderation", params: {account_id: @account.id}
-        expect(returned_portfolios.pluck(:id)).not_to include(safe_eportfolio.id)
-      end
-
-      context "pagination" do
-        before(:once) do
-          Setting.set('eportfolio_moderation_results_per_page', 2)
-        end
-
-        it "does not return more than the specified results per page" do
-          get "eportfolio_moderation", params: {account_id: @account.id}
-          expect(returned_portfolios.count).to eq 2
-        end
-
-        it "returns the first page of results if no 'page' param is given" do
-          get "eportfolio_moderation", params: {account_id: @account.id}
-          expect(returned_portfolios.pluck(:name)).to eq ["maybe spam", "spam"]
-        end
-
-        it "paginates using the 'page' param if supplied" do
-          get "eportfolio_moderation", params: {account_id: @account.id, page: 2}
-          expect(returned_portfolios.pluck(:name)).to eq ["not spam"]
-        end
+      it "paginates using the 'page' param if supplied" do
+        get "eportfolio_moderation", params: {account_id: @account.id, page: 2}
+        expect(returned_portfolios.pluck(:name)).to eq ["not spam"]
       end
     end
   end

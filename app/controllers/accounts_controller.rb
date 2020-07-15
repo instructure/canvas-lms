@@ -1204,8 +1204,6 @@ class AccountsController < ApplicationController
 
   def eportfolio_moderation
     if authorized_action(@account, @current_user, :moderate_user_content)
-      return redirect_to account_settings_url(@account) unless @account.root_account.feature_enabled?(:eportfolio_moderation)
-
       results_per_page = Setting.get('eportfolio_moderation_results_per_page', 1000)
       spam_status_order = "CASE spam_status WHEN 'flagged_as_possible_spam' THEN 0 WHEN 'marked_as_spam' THEN 1 WHEN 'marked_as_safe' THEN 2 ELSE 3 END"
       @eportfolios = Eportfolio.active.preload(:user).

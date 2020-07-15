@@ -442,11 +442,20 @@ describe TabsController, type: :request do
           "type" => "internal"
         },
         {
+          "id" => "eportfolio_moderation",
+          "html_url" => "/accounts/#{@account.id}/eportfolio_moderation",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/eportfolio_moderation",
+          "label" => "ePortfolio Moderation",
+          "position"=>16,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
           "id" => "settings",
           "html_url" => "/accounts/#{@account.id}/settings",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/settings",
           "label" => "Settings",
-          "position"=>16,
+          "position"=>17,
           "visibility"=>"admins",
           "type" => "internal"
         }

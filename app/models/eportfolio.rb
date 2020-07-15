@@ -47,14 +47,10 @@ class Eportfolio < ActiveRecord::Base
   end
 
   def flagged_as_possible_spam?
-    return false unless user&.account&.feature_enabled?(:eportfolio_moderation)
-
     spam_status == 'flagged_as_possible_spam'
   end
 
   def spam?(include_possible_spam: true)
-    return false unless user&.account&.feature_enabled?(:eportfolio_moderation)
-
     spam_status == 'marked_as_spam' || (include_possible_spam && spam_status == 'flagged_as_possible_spam')
   end
 
@@ -121,7 +117,7 @@ class Eportfolio < ActiveRecord::Base
   end
 
   def needs_spam_review?
-    active? && spam_status.nil? && user.account.feature_enabled?(:eportfolio_moderation)
+    active? && spam_status.nil?
   end
 
   def self.spam_criteria_regexp(type: :title)

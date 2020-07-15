@@ -87,7 +87,6 @@ describe EportfolioEntriesController do
 
     context "spam eportfolios" do
       before(:once) do
-        @portfolio.user.account.enable_feature!(:eportfolio_moderation)
         @portfolio.update!(public: true)
         @category = eportfolio_category
         eportfolio_entry(@category)
@@ -116,15 +115,6 @@ describe EportfolioEntriesController do
 
           assert_unauthorized
         end
-
-        it "renders the entry when the eportfolio is spam and the release flag is disabled" do
-          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
-          @portfolio.update!(spam_status: 'marked_as_spam')
-          user_session(@other_user)
-          get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
-
-          expect(response.status).to eq(200)
-        end
       end
 
       context "when the user is an admin" do
@@ -149,18 +139,6 @@ describe EportfolioEntriesController do
 
           assert_unauthorized
         end
-
-        it "renders the entry when the eportfolio is spam and the admin does " \
-        "not have :moderate_user_content permissions and the release flag is disabled" do
-          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
-          @portfolio.update!(spam_status: 'marked_as_spam')
-          Account.default.role_overrides.create!(role: admin_role, enabled: false, permission: :moderate_user_content)
-          user_session(@admin)
-          get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
-
-          expect(response.status).to eq(200)
-        end
-
       end
     end
   end

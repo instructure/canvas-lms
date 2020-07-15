@@ -26,9 +26,8 @@ describe EportfolioCategory do
 
   describe "callbacks" do
     describe "#check_for_spam" do
-      context "when the setting has a value and the release flag is enabled" do
+      context "when the setting has a value" do
         before(:each) do
-          user.account.root_account.enable_feature!(:eportfolio_moderation)
           Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
         end
 
@@ -53,16 +52,8 @@ describe EportfolioCategory do
       end
 
       it "does not attempt to mark as spam when the setting is empty" do
-        user.account.root_account.enable_feature!(:eportfolio_moderation)
         expect {
           category.update!(name: "actually a bad category")
-        }.not_to change { spam_status }
-      end
-
-      it "does not attempt to mark as spam when the release flag is not enabled" do
-        Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
-        expect {
-          eportfolio.update!(name: "actually a bad page")
         }.not_to change { spam_status }
       end
     end
