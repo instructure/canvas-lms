@@ -495,6 +495,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
       let(:course2) { course_model(account: account_model(root_account_id: nil)) }
 
+      it 'populates root_account_ids on LearningOutcome' do
+        lo = LearningOutcome.create!(context: @course, short_description: "test")
+        lo.update_columns(root_account_ids: nil)
+        DataFixup::PopulateRootAccountIdOnModels.run
+        expect(lo.reload.root_account_ids).to eq [@course.root_account_id]
+      end
+
       context 'with LearningOutcomeGroup' do
         it_behaves_like 'a datafixup that populates root_account_id' do
           let(:record) { outcome_group_model(context: @course) }
@@ -887,6 +894,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
     end
 
+    it 'should filter tables whose prereqs are not direct assocations and are not filled' do
+      LearningOutcome.create!(context: @course, short_description: "test")
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
+        and_return({LearningOutcome => :content_tag, ContextModule => :course})
+      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+    end
+
     it 'should not filter tables whose prereqs are filled with root_account_ids' do
       expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
         and_return({ContextModule => :course})
@@ -960,6 +974,11 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     it 'should leave non-polymorphic associations alone' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(ContextModule,
         {course: :root_account_id})).to eq({course: :root_account_id})
+    end
+
+    it 'should leave non-association dependencies alone' do
+      expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(LearningOutcome,
+        {content_tag: :root_account_id})).to eq({})
     end
 
     it 'should replace polymorphic associations in the hash (in original order)' do
@@ -1050,6 +1069,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
       )).to be true
     end
+
+    it 'should return correctly for tables with root_account_ids' do
+      LearningOutcome.create!(context: @course, short_description: "test")
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(LearningOutcome)).to be true
+      LearningOutcome.update_all(root_account_ids: nil)
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(LearningOutcome)).to be false
+    end
   end
 
   describe '#populate_root_account_ids' do
@@ -1073,6 +1099,32 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
       expect(DataFixup::PopulateRootAccountIdOnModels).not_to receive(:run)
       DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, {course: :root_account_id}, cm2.id, cm2.id)
+    end
+  end
+
+  describe '#populate_root_account_ids_override' do
+    it 'should call #populate on the provided module' do
+      lo = LearningOutcome.create!(context: @course, short_description: 'test')
+
+      expect(DataFixup::PopulateRootAccountIdsOnLearningOutcomes).to receive(:populate).once
+      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids_override(LearningOutcome, DataFixup::PopulateRootAccountIdsOnLearningOutcomes, lo.id, lo.id)
+    end
+
+    it 'should restart the table fixup job if there are no other delayed jobs of this type still running' do
+      lo = LearningOutcome.create!(context: @course, short_description: 'test')
+      lo2 = LearningOutcome.create!(context: @course, short_description: 'test2')
+
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:run).once
+      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids_override(LearningOutcome, DataFixup::PopulateRootAccountIdsOnLearningOutcomes, lo.id, lo.id)
+    end
+
+    it 'should not restart the table fixup job if there are items in this table that do not have root_account_id' do
+      lo = LearningOutcome.create!(context: @course, short_description: 'test')
+      lo2 = LearningOutcome.create!(context: @course, short_description: 'test2')
+      lo2.update_columns(root_account_ids: nil)
+
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:run).once
+      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids_override(LearningOutcome, DataFixup::PopulateRootAccountIdsOnLearningOutcomes, lo2.id, lo2.id)
     end
   end
 
