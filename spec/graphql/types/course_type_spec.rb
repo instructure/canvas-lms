@@ -50,6 +50,36 @@ describe Types::CourseType do
     end
   end
 
+  context "sis fields" do
+    let_once(:sis_course) { course.update!(sis_course_id: "SIScourseID"); course }
+
+    let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false})}
+
+    it "returns sis_id if you have read_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: @teacher}).dig("data", "course", "sisId")
+          query { course(id: "#{sis_course.id}") { sisId } }
+        GQL
+      ).to eq("SIScourseID")
+    end
+
+    it "returns sis_id if you have manage_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: admin}).dig("data", "course", "sisId")
+          query { course(id: "#{sis_course.id}") { sisId } }
+        GQL
+      ).to eq("SIScourseID")
+    end
+
+    it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: @student}).dig("data", "course", "sisId")
+          query { course(id: "#{sis_course.id}") { sisId } }
+        GQL
+      ).to be_nil
+    end
+  end
+
   describe "assignmentsConnection" do
     let_once(:assignment) {
       course.assignments.create! name: "asdf", workflow_state: "unpublished"

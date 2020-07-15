@@ -21,7 +21,8 @@ import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-layout'
-import {Text, Spinner} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import axios from 'axios'
 import {string} from 'prop-types'
 

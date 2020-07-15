@@ -17,6 +17,7 @@
  */
 
 import {fromImageEmbed, fromVideoEmbed} from '../instructure_image/ImageEmbedOptions'
+import {isOnlyTextSelected} from '../../contentInsertionUtils'
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
@@ -71,7 +72,8 @@ export function asLink($element, editor) {
   return {
     $element: $link,
     displayAs,
-    text: editor.selection.getContent() || $link.textContent,
+    text: $link.textContent,
+    onlyTextSelected: isOnlyTextSelected(editor.selection.getContent()),
     type,
     isPreviewable,
     url: $link.href

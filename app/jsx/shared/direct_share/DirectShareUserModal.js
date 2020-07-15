@@ -21,7 +21,7 @@ import React, {Suspense, lazy, useState, useRef} from 'react'
 import {oneOf, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-layout'
 import CanvasModal from 'jsx/shared/components/CanvasModal'
 import {CONTENT_SHARE_TYPES} from 'jsx/shared/proptypes/contentShare'
@@ -103,7 +103,7 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
 
   const suspenseFallback = (
     <View as="div" textAlign="center">
-      <Spinner renderTitle={I18n.t('Loading...')} />
+      <Spinner renderTitle={I18n.t('Loading')} />
     </View>
   )
 

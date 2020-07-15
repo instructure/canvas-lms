@@ -18,7 +18,8 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-layout'
-import {Spinner, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 
 import ErrorAlert from '../ErrorAlert'
 import formatMessage from '../../format-message'

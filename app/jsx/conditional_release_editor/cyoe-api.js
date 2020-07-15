@@ -55,12 +55,22 @@ const CyoeApi = {
       url = `/api/v1/courses/${courseId}/mastery_paths/rules/${ruleId}`
       return axios.put(url, data)
     } else if (data.scoring_ranges) {
-      data.trigger_assignment_id = triggerId
-      data.scoring_ranges = data.scoring_ranges.map(range => {
-        delete range.id
-        return range
+      // don't create an empty rule
+      const shouldSaveRule = data.scoring_ranges.find(range => {
+        return range.assignment_sets.find(set => {
+          return set.assignment_set_associations.length > 0
+        })
       })
-      return axios.post(url, data)
+      if (shouldSaveRule) {
+        data.trigger_assignment_id = triggerId
+        data.scoring_ranges = data.scoring_ranges.map(range => {
+          delete range.id
+          return range
+        })
+        return axios.post(url, data)
+      } else {
+        return Promise.resolve({data})
+      }
     }
   },
 

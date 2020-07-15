@@ -21,7 +21,8 @@ import $ from 'jquery'
 import axios from 'axios'
 import minimatch from 'minimatch'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
-import {Text, Spinner} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {Mask} from '@instructure/ui-overlays'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -430,10 +431,7 @@ class FileBrowser extends React.Component {
     if (this.state.uploading) {
       return (
         <Mask>
-          <Spinner
-            className="file-browser__uploading"
-            renderTitle={formatMessage('File uploading')}
-          />
+          <Spinner renderTitle={formatMessage('File uploading')} />
         </Mask>
       )
     } else {
@@ -443,13 +441,7 @@ class FileBrowser extends React.Component {
 
   renderLoading() {
     if (this.state.loadingCount > 0) {
-      return (
-        <Spinner
-          className="file-browser__loading"
-          renderTitle={formatMessage('Loading folders')}
-          size="small"
-        />
-      )
+      return <Spinner renderTitle={formatMessage('Loading folders')} size="small" />
     } else {
       return null
     }

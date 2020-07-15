@@ -102,7 +102,7 @@ describe('Editor/Sidebar bridge', () => {
       it('insertLink with an active editor forwards the link to createLink', () => {
         Bridge.focusEditor(editor)
         Bridge.insertLink(link)
-        expect(editor.insertLink).toHaveBeenCalledWith(link, undefined)
+        expect(editor.insertLink).toHaveBeenCalledWith(link)
       })
 
       it('insertLink with no active editor is a no-op, but warns', () => {
@@ -114,15 +114,12 @@ describe('Editor/Sidebar bridge', () => {
       it('adds selectionDetails to links', () => {
         Bridge.focusEditor(editor)
         Bridge.insertLink({})
-        expect(editor.insertLink).toHaveBeenCalledWith(
-          {
-            selectionDetails: {
-              node: 'some-node',
-              range: 'some-range'
-            }
-          },
-          undefined
-        )
+        expect(editor.insertLink).toHaveBeenCalledWith({
+          selectionDetails: {
+            node: 'some-node',
+            range: 'some-range'
+          }
+        })
       })
 
       it('calls hideTray after inserting a link', () => {

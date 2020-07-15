@@ -787,38 +787,14 @@ en:
   allows_users_to_add_conferences_from_the_calendar_f36c5008: Allows users to add conferences from the calendar
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
-  confetti_for_on_time_submissions_394e16ce: Confetti for On-Time Submissions
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
-    Displays confetti for users that turn in an assignment prior
-    to the set due date.
-  confetti_for_valid_links_7506df83: Confetti for valid links
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
-    Displays confetti for teachers that run the link validator on
-    a course and no issues are found.
-  restrict_sms_to_select_types_9dd6399c: Restrict SMS to Select Types
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
-    Disables SMS notifications for all types except announcements and
-    grade changes.
-  hide_course_sections_from_students_b7850d64: Hide Course Sections from Students
-  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: Allows teachers to hide course sections from students on the People page when there is more than one section in the course.
-  mute_notifications_by_course_440e18be: Mute notifications by course
-  allows_users_to_mute_notifications_on_a_course_lev_775b0362: Allows users to mute notifications on a course level granularity.
-  course_level_overrides_for_notification_preference_e86d1725: Course level overrides for notification preferences
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
-    Allows users to override specific notification preferences on a
-    course by course basis.
-  show_past_account_level_announcements_to_users_3b8208e2: Show past account level announcements to users
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
-    Show past account level announcements to users. Allows
-    a user to view announcemnts that have ended or been dismissed.
-  smart_alerts_44db622e: Smart alerts
-  notify_students_in_time_of_assignments_that_requir_332ef10e: Notify students in time of assignments that require their attention.
   rce_auto_save_f004fba9: RCE Auto-Save
   if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
     If RCE Enhancements are also enabled,
     the RCE will auto-save your work as you go
   edit_closed_captions_e5fdeb79: Edit Closed Captions
   edit_closed_captions_subtitles_to_videos_from_the__288ae432: Edit closed captions/subtitles to videos from the video options tray in the RCE
+  support_favorite_lti_tools_in_the_rce_1680436d: Support favorite LTI tools in the RCE
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: Let the site administrator select up to 2 LTI apps as favorites, which will then be displayed in the RCE's toolbar
   this_is_a_siteadmin_test_feature_flag_3ab5184: This is a SiteAdmin test Feature Flag
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: This flag will not cause any change in behavior.
   assignment_enhancements_student_557372ab: Assignment Enhancements - Student
@@ -882,6 +858,13 @@ en:
     Canvas instances where root accounts are on the same shard
     as the site admin account. Behavior in other instances
     already behaved in this way.
+  create_live_event_subscriptions_on_toolproxy_7c8378b1: Create live event subscriptions on ToolProxy
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+    If enabled, when an Lti::ToolProxy is created, it will
+    create the live event subscription directly on the tool
+    instead of the assignment. This will cause events to be
+    duplicated unless the subscriptions on the associated
+    plagiarism assignments are deleted.
   new_quizzes_migration_during_course_import_copy_e9dd124e: New Quizzes migration during course import/copy
   allow_migration_of_quizzes_during_course_copy_and__35d80756: Allow migration of quizzes during course copy and import
   new_quizzes_third_party_importing_1e1b696d: New Quizzes third party importing
@@ -894,6 +877,38 @@ en:
   granular_permissions_for_managing_wiki_pages_3ed89a84: Granular permissions for managing wiki pages
   enable_recaptcha_by_default_for_self_registration_af9d50bd: Enable Recaptcha by default for self-registration
   requires_recaptcha_for_self_registration_by_defaul_c1a9db63: Requires Recaptcha for self-registration by default
+  confetti_for_on_time_submissions_394e16ce: Confetti for On-Time Submissions
+  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+    Displays confetti for users that turn in an assignment prior
+    to the set due date.
+  confetti_for_valid_links_7506df83: Confetti for valid links
+  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+    Displays confetti for teachers that run the link validator on
+    a course and no issues are found.
+  restrict_sms_to_select_types_9dd6399c: Restrict SMS to Select Types
+  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+    Disables SMS notifications for all types except announcements and
+    grade changes.
+  hide_course_sections_from_students_b7850d64: Hide Course Sections from Students
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: Allows teachers to hide course sections from students on the People page when there is more than one section in the course.
+  mute_notifications_by_course_440e18be: Mute notifications by course
+  allows_users_to_mute_notifications_on_a_course_lev_775b0362: Allows users to mute notifications on a course level granularity.
+  course_level_overrides_for_notification_preference_e86d1725: Course level overrides for notification preferences
+  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+    Allows users to override specific notification preferences on a
+    course by course basis.
+  account_level_notification_preferences_ui_update_f5e189a4: Account level notification preferences UI update
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+    Updates account notification preferences UI to be a more current
+    and updated user experience
+  show_past_account_level_announcements_to_users_3b8208e2: Show past account level announcements to users
+  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+    Show past account level announcements to users. Allows
+    a user to view announcemnts that have ended or been dismissed.
+  smart_alerts_44db622e: Smart alerts
+  notify_students_in_time_of_assignments_that_requir_332ef10e: Notify students in time of assignments that require their attention.
+  trophy_case_da3b25bb: Trophy case
+  display_historical_view_of_achievements_of_users_53db5938: Display historical view of achievements of users
   disable_smart_app_banner_on_mobile_devices_bed9bf3b: Disable Smart App Banner on Mobile Devices
   remove_safari_mobile_banner_suggesting_user_downlo_b4251078: Remove Safari mobile banner suggesting user download application from app store.
   global_announcements_a78912c8: Global Announcements
@@ -2563,8 +2578,6 @@ en:
       calendar_feed: Calendar Feed
       feed_dialog_title: Calendar Feed
       calendar_feed_instructions: Copy the link below and paste it into any calendar app that takes iCal feeds (Google Calendar, iCal, Outlook, etc.)
-      links:
-        feed: click here to view the feed
   collaborations:
     errors:
       cannot_load_collaboration: Cannot load collaboration
@@ -3084,6 +3097,7 @@ en:
   item_cannot_be_duplicated_cebf3109: Item cannot be duplicated
   context_modules_api:
     invalid_position: Invalid position
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: Mastery paths selection has been temporarily disabled for maintenance.
   choose_assignment_set_415f1b3: Choose Assignment Set
   module_item_is_locked_19fa60b4: Module Item is locked.
   context_modules:
@@ -6407,6 +6421,7 @@ en:
     observees: Observing
     qr_mobile_login: QR for Mobile Login
     past_global_announcements: Global Announcements
+    trophy_case: Trophy Case
   end_dates_cannot_be_before_start_dates_d6018daf: End dates cannot be before start dates
   terms:
     errors:
@@ -6506,6 +6521,7 @@ en:
         current_courses: Current Courses
     confirms:
       delete_journal_entry: Are you sure you want to delete this journal entry?
+  trophy_case_7a098a85: Trophy Case
   users:
     crumbs:
       grades: Grades
@@ -8176,6 +8192,57 @@ en:
   default_9db103d: Default
   custom_6979cd81: Custom
   no_terms_eab5ee7b: No Terms
+  trophy:
+    balloon_display_name: Balloon
+    bifrost_trophy_display_name: Bifrost Trophy
+    butterfly_display_name: Butterfly
+    einstein_rosen_trophy_display_name: Einstein Rosen Trophy
+    fire_display_name: Fire
+    flowers_display_name: Flower
+    four_leaf_clover_display_name: Four Leaf Clover
+    gift_display_name: Gift
+    gnome_display_name: Gnome
+    helix_rocket_display_name: Helix Rocket
+    horse_shoe_display_name: Horse Shoe
+    hot_air_balloon_display_name: Hot Air Balloon
+    magic_mystery_thumbs_up_display_name: Magic Mystery Thumbs Up
+    medal_display_name: Medal
+    moon_display_name: Moon
+    ninja_display_name: Ninja
+    panama_rocket_display_name: Panama Rocket
+    panda_display_name: Panda
+    panda_unicycle_display_name: Panda Unicycle
+    pinwheel_display_name: Pinwheel
+    pizza_slice_display_name: Pizza Slice
+    rocket_display_name: Rocket
+    star_display_name: Star
+    thumbs_up_display_name: Thumbs Up
+    trophy_display_name: Trophy
+    balloon_description: Balloon Description
+    bifrost_trophy_description: Bifrost Trophy Description
+    butterfly_description: Butterfly Description
+    einstein_rosen_trophy_description: Einstein Rosen Trophy Description
+    fire_description: Fire Description
+    flowers_description: Flower Description
+    four_leaf_clover_description: Four Leaf Clover Description
+    gift_description: Gift Description
+    gnome_description: Gnome Description
+    helix_rocket_description: Helix Rocket Description
+    horse_shoe_description: Horse Shoe Description
+    hot_air_balloon_description: Hot Air Balloon Description
+    magic_mystery_thumbs_up_description: Magic Mystery Thumbs Up Description
+    medal_description: Medal Description
+    moon_description: Moon Description
+    ninja_description: Ninja Description
+    panama_rocket_description: Panama Rocket Description
+    panda_description: Panda Description
+    panda_unicycle_description: Panda Unicycle Description
+    pinwheel_description: Pinwheel Description
+    pizza_slice_description: Pizza Slice Description
+    rocket_description: Rocket Description
+    star_description: Star Description
+    thumbs_up_description: Thumbs Up Description
+    trophy_description: Trophy Description
   user:
     default_user_name: User
     errors:
@@ -11665,6 +11732,7 @@ en:
   click_to_view_event_details_b25dc1f3: Click to view event details
   calendars_toggle_list_visibility_488db143: Calendars toggle list visibility
   undated_items_toggle_list_visibility_6219e641: Undated items toggle list visibility
+  click_to_view_calendar_feed_2944b4c0: Click to view Calendar Feed
   delete_this_collaboration_4f20b698: Delete this Collaboration
   edit_this_collaboration_393b1a9a: Edit this Collaboration
   instructions:
@@ -11683,6 +11751,7 @@ en:
   user_data_export_from_date_6ba21b89: "*User Data Export from %{date}*"
   file_export_from_date_cf867c8d: "*File Export from %{date}*"
   content_export_files_cannot_be_downloaded_after_da_2872b0e4: Content export files cannot be downloaded after %{days} days.
+  uploading_ee585874: Uploading...
   view_user_groups_538f22b4: View User Groups
   view_faculty_journals_ad0e8c8f: View Faculty Journals
   view_prior_enrollments_9b519b25: View Prior Enrollments
@@ -11885,8 +11954,7 @@ en:
   note_for_differentiated_group_topics_some_threads__90adbb21: 'Note: for differentiated group topics, some threads may not have any students assigned.'
   you_have_completed_a_peer_review_for_person_thank__1371f37e: You have completed a peer review for %{person}. Thank you
   review_now_318a6a3e: Review Now
-  press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: Press the comma key or shift + ? to see a list of keyboard shortcuts
-  press_the_comma_key_or_shift_question_mark_to_see__930af9df: Press the comma key or shift + question mark to see a list of keyboard shortcuts
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: Press ALT + F8 to see a list of keyboard shortcuts
   search_entries_or_author_63fb0a86: Search entries or author
   filter_replies_by_unread_342e8e90: Filter replies by unread
   show_deleted_replies_a2e0a36f: Show deleted replies
@@ -12681,6 +12749,7 @@ en:
   update_4d8ee62: Update
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: User ID or SIS ID (SIS ID should be prepended with sis_user_id:)
   include_deleted_enrollments_1c87684a: Include Deleted Enrollments
+  course_canvas_id_9e36b24c: Course Canvas ID
   this_is_a_report_of_all_students_enrolled_in_a_cou_d0137d3c: |-
     This is a report of all students enrolled in a course in a given term that
     have submitted an assignment. This report contains one row per student
@@ -12695,7 +12764,6 @@ en:
   all_configured_apps_a14eef0a: All Configured Apps
   course_implemented_apps_fa658f5a: Course Implemented Apps
   include_unpublished_courses_7a0e7aab: Include Unpublished Courses
-  course_canvas_id_9e36b24c: Course Canvas ID
   course_sis_id_sis_id_or_canvas_id_4d323f5c: 'Course SIS ID (SIS_ID:####) OR Canvas ID: (###)'
   start_dates_8f1c22a8: 'Start Dates:'
   start_date_from_20503757: 'Start Date From:'
@@ -14243,6 +14311,8 @@ en:
     messages:
       submitting: Submitting Media File...
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: Can't unpublish %{name} if there are student submissions
+  percent_af88d1b1: "%{percent}%"
+  uploading_progress_2f5dd4bf: Uploading progress
   models_conversations:
     cannot_be_empty: Message cannot be blank
     no_recipients_choose_another_group: No recipients are in this group. Please choose another group.
@@ -15346,7 +15416,6 @@ en:
   selection_end_date_10fcc8c6: Selection end date
   apply_date_range_selection_cc4351ed: Apply date range selection
   apply_781a2546: Apply
-  percent_af88d1b1: "%{percent}%"
   saving_assignment_dates_progress_9856153d: Saving assignment dates progress
   saving_assignment_dates_progress_percent_a5ea89a1: 'Saving assignment dates progress: %{percent}%'
   count_assignments_selected_b03891ea:
@@ -16540,11 +16609,15 @@ en:
   view_toolname_placements_4a5724d1: View %{toolName} Placements
   tool_placements_3f996c24: Tool Placements
   external_apps_f5490181: External Apps
+  add_to_rce_toolbar_e5b3e3b4: Add to RCE toolbar
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: There is a 2 app limit for placement within the RCE toolbar. This setting only applies to the enhanced RCE.
   disabled_18c33a73: "(disabled)"
   app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} was installed by Admin and is locked"
   app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} was installed by the master course and is locked"
   app_was_installed_by_the_master_course_e55ba1d7: "%{app} was installed by the master course"
   an_update_is_available_for_toolname_bba3fa2: An update is available for %{toolName}
+  favorite_d720d310: Favorite
+  na_3dbb9cfd: NA
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools.
   link_to_lti_tools_608df3b0: Link to lti tools.
   see_some_lti_tools_that_work_great_with_canvas_53e92091: See some LTI tools that work great with Canvas.
@@ -17498,7 +17571,9 @@ en:
   you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
     You can view dismissed announcements by going to Account and selecting Global
                 Announcements from the menu.
+  active_announcements_6b67f33b: Active Announcements
   recent_f19e8c64: Recent
+  announcements_from_the_past_four_months_cefbc99c: Announcements from the past four months
   count_permissions_found_1a926f7d:
     one: One permission found
     other: "%{count} permissions found"
@@ -18227,6 +18302,7 @@ en:
   unreadcount_unread_replies_509e167f: "%{unreadCount} unread replies"
   totalcount_total_replies_b6988c0a: "%{totalCount} total replies"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} in mastery paths range %{index}"
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: Mastery Paths editing has been temporarily disabled for maintenance.
   multiple_ba5220cd: Multiple
   upper_lower_56cad16c: "%{upper} - %{lower}"
   select_a_course_4710371f: Select a Course
@@ -18416,6 +18492,8 @@ en:
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: File(s) will be included when user content is displayed within the Canvas iOS or Android apps, and in third-party apps built on our API.
   mobile_app_css_file_abbf06bd: Mobile app CSS file
   mobile_app_javascript_file_faea55d5: Mobile app JavaScript file
+  earned_earndate_5f8b6c99: Earned %{earnDate}
+  list_of_the_currently_attainable_trophies_959b2518: List of the currently attainable trophies
   dashboard:
     announcements_expand:
       one: Expand %{count} announcement

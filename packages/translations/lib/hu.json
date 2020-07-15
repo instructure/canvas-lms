@@ -1,6 +1,6 @@
 {
     "accessibility_checker_b3af1f6c": {
-        "message": "Akadálymentesség ellenőrzése"
+        "message": "Akadálymentesség ellenőrző"
     },
     "add_8523c19b": {
         "message": "Hozzáadás"
@@ -49,6 +49,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alternatív szöveg"
+    },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "Hiba történt a fájl olvasásakor"
     },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Hiba történt, amikor megpróbálta elvetni a lehetőséget."
@@ -677,6 +680,9 @@
     "my_grades_98834476": {
         "message": "Az én értékeléseim"
     },
+    "my_media_82bade11": {
+        "message": "Az én médiám"
+    },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigáljon a menün vagy eszköztáron át"
     },
@@ -1165,6 +1171,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Önnek média visszajelzése van."
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "Nem tölthet fel egy üres fájlt."
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "Meg kell adni a dátumot és az időt"

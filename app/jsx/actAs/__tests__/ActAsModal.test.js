@@ -17,11 +17,13 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {shallow, mount} from 'enzyme'
 import ActAsModal from '../ActAsModal'
 import ActAsMask from '../ActAsMask'
 import ActAsPanda from '../ActAsPanda'
-import {Text, Avatar, Spinner, Table} from '@instructure/ui-elements'
+import {Text, Avatar} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
+import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 
 const props = {
@@ -68,7 +70,7 @@ describe('ActAsModal', () => {
   })
 
   test('it renders the table with correct user information', () => {
-    const wrapper = shallow(<ActAsModal {...props} />)
+    const wrapper = mount(<ActAsModal {...props} />)
     const tables = wrapper.find(Table)
 
     expect(tables).toHaveLength(3)

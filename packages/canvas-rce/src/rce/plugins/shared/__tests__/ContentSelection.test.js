@@ -68,11 +68,8 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       })
 
       it('finds the selected text', () => {
-        // a bit contrived, but proves we find the selected text
-        // if there is some w/in the link
-        editor.selection.getContent = () => 'foo'
         const content = getContentFromElement($element, editor)
-        expect(content.text).toEqual('foo')
+        expect(content.text).toEqual('Syllabus.doc')
       })
 
       it('includes the url of the link', () => {

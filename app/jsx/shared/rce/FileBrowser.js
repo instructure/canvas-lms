@@ -21,7 +21,8 @@ import $ from 'jquery'
 import axios from 'axios'
 import minimatch from 'minimatch'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
-import {Text, Spinner} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {Mask} from '@instructure/ui-overlays'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -37,7 +38,6 @@ import {getRootFolder, uploadFile} from 'jsx/files/utils/apiFileUtils'
 import parseLinkHeader from '../parseLinkHeader'
 import {showFlashSuccess, showFlashError} from '../FlashAlert'
 import natcompare from '../../../coffeescripts/util/natcompare'
-/* eslint-disable react/sort-comp */
 
 class FileBrowser extends React.Component {
   static propTypes = {
@@ -143,13 +143,21 @@ class FileBrowser extends React.Component {
   }
 
   getPaginatedData(url, callback) {
-    axios.get(url).then(response => {
-      callback(response.data)
-      const nextUrl = parseLinkHeader(response.headers.link).next
-      if (nextUrl) {
-        this.getPaginatedData(nextUrl, callback)
-      }
-    })
+    axios
+      .get(url)
+      .then(response => {
+        callback(response.data)
+        const nextUrl = parseLinkHeader(response.headers.link).next
+        if (nextUrl) {
+          this.getPaginatedData(nextUrl, callback)
+        }
+      })
+      .catch(error => {
+        /* eslint-disable no-console */
+        console.error('Error fetching data from API')
+        console.error(error)
+        /* eslint-enable no-console */
+      })
   }
 
   folderFileApiUrl(folderId, type = 'files') {
@@ -157,21 +165,24 @@ class FileBrowser extends React.Component {
   }
 
   populateCollectionsList = (folderList, opts = {}) => {
-    const newCollections = _.cloneDeep(this.state.collections)
-    folderList.forEach(folder => {
-      const collection = this.formatFolderInfo(folder, opts)
-      newCollections[collection.id] = collection
-      const parent_id = folder.parent_folder_id || 0
-      const collectionCollections = newCollections[parent_id].collections
-      if (!collectionCollections.includes(collection.id)) {
-        collectionCollections.push(collection.id)
-        newCollections[parent_id].collections = this.orderedIdsFromList(
-          newCollections,
-          collectionCollections
-        )
-      }
+    this.setState(function({collections}) {
+      const newCollections = _.cloneDeep(collections)
+      folderList.forEach(folder => {
+        const collection = this.formatFolderInfo(folder, opts)
+        newCollections[collection.id] = collection
+        const parent_id = folder.parent_folder_id || 0
+        const collectionCollections = newCollections[parent_id].collections
+        if (!collectionCollections.includes(collection.id)) {
+          collectionCollections.push(collection.id)
+          newCollections[parent_id].collections = this.orderedIdsFromList(
+            newCollections,
+            collectionCollections
+          )
+        }
+      })
+      return {collections: newCollections}
     })
-    this.setState({collections: newCollections})
+
     folderList.forEach(folder => {
       if (this.state.openFolders.includes(folder.parent_folder_id)) {
         this.getFolderData(folder.id)
@@ -189,21 +200,23 @@ class FileBrowser extends React.Component {
   }
 
   populateItemsList = fileList => {
-    const newItems = _.cloneDeep(this.state.items)
-    const newCollections = _.cloneDeep(this.state.collections)
-    fileList.forEach(file => {
-      if (this.contentTypeIsAllowed(file['content-type'])) {
-        const item = this.formatFileInfo(file)
-        newItems[item.id] = item
-        const folder_id = file.folder_id
-        const collectionItems = newCollections[folder_id].items
-        if (!collectionItems.includes(item.id)) {
-          collectionItems.push(item.id)
-          newCollections[folder_id].items = this.orderedIdsFromList(newItems, collectionItems)
+    this.setState(function({items, collections}) {
+      const newItems = _.cloneDeep(items)
+      const newCollections = _.cloneDeep(collections)
+      fileList.forEach(file => {
+        if (this.contentTypeIsAllowed(file['content-type'])) {
+          const item = this.formatFileInfo(file)
+          newItems[item.id] = item
+          const folder_id = file.folder_id
+          const collectionItems = newCollections[folder_id].items
+          if (!collectionItems.includes(item.id)) {
+            collectionItems.push(item.id)
+            newCollections[folder_id].items = this.orderedIdsFromList(newItems, collectionItems)
+          }
         }
-      }
+      })
+      return {items: newItems, collections: newCollections}
     })
-    this.setState({items: newItems, collections: newCollections})
   }
 
   formatFolderInfo(apiFolder, opts = {}) {
@@ -253,6 +266,7 @@ class FileBrowser extends React.Component {
       const sortedIds = ids.sort((a, b) => natcompare.strings(list[a].name, list[b].name))
       return sortedIds
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error)
       return ids
     }
@@ -262,7 +276,7 @@ class FileBrowser extends React.Component {
     return this.onFolderClick(folder.id, folder)
   }
 
-  onFolderClick = (folderId, folder) => {
+  onFolderClick = (folderId, _folder) => {
     const collection = this.state.collections[folderId]
     let newFolders = []
     const {openFolders} = this.state
@@ -377,7 +391,7 @@ class FileBrowser extends React.Component {
     if (this.state.uploading) {
       return (
         <Mask>
-          <Spinner className="file-browser__uploading" renderTitle={I18n.t('File uploading')} />
+          <Spinner renderTitle={I18n.t('File uploading')} />
         </Mask>
       )
     } else {
@@ -387,13 +401,7 @@ class FileBrowser extends React.Component {
 
   renderLoading() {
     if (this.state.loadingCount > 0) {
-      return (
-        <Spinner
-          className="file-browser__loading"
-          renderTitle={I18n.t('Loading folders')}
-          size="small"
-        />
-      )
+      return <Spinner renderTitle={I18n.t('Loading folders')} size="small" />
     } else {
       return null
     }
@@ -431,4 +439,3 @@ class FileBrowser extends React.Component {
 }
 
 export default FileBrowser
-/* eslint-enable react/sort-comp */

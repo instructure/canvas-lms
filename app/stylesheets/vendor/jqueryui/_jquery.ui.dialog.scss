@@ -83,6 +83,11 @@
   box-shadow: 0 1px 4px 1px rgba($ic-color-dark, 0.95);
 }
 
+.ui-dialog.ui-dialog-focus-bumper {
+  pointerEvents: 'none';
+  position: 'fixed';
+}
+
 // note that these styles are shared in both .ui-dialog and .ui-datepicker
 
 .ui-datepicker .ui-datepicker-time,

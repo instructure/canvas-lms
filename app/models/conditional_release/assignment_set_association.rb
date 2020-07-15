@@ -32,9 +32,20 @@ module ConditionalRelease
     has_one :rule, through: :assignment_set
     belongs_to :root_account, :class_name => "Account"
 
+    after_save :clear_caches
+
     before_create :set_root_account_id
     def set_root_account_id
       self.root_account_id ||= assignment_set.root_account_id
+    end
+
+    def clear_caches
+      if self.saved_change_to_deleted_at? && self.assignment.deleted?
+        # normally this will be cleared by the rule, but not after assignment deletion
+        self.class.connection.after_transaction_commit do
+          self.assignment.context.clear_cache_key(:conditional_release)
+        end
+      end
     end
 
     delegate :course_id, to: :rule, allow_nil: true

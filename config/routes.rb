@@ -861,6 +861,8 @@ CanvasRails::Application.routes.draw do
 
   get 'account_notifications' => 'account_notifications#render_past_global_announcements'
 
+  resource :trophy_case, controller: :user_trophies, only: [:show]
+
   scope '/profile' do
     post 'toggle_disable_inbox' => 'profile#toggle_disable_inbox'
     get 'profile_pictures' => 'profile#profile_pics', as: :profile_pics
@@ -919,6 +921,7 @@ CanvasRails::Application.routes.draw do
 
   get 'health_check' => 'info#health_check'
   get 'health_prognosis' => 'info#health_prognosis'
+  get 'web-app-manifest/manifest.json' => 'info#mobile_manifest'
 
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
 

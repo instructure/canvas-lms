@@ -20,6 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import bridge from '../../../../../bridge'
 import {getLinkContentFromEditor} from '../../../shared/ContentSelection'
+import {getAnchorElement} from '../../../../contentInsertionUtils'
 import LinkOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-link-options-tray-container'
@@ -48,6 +49,15 @@ export default class LinkOptionsTrayController {
   showTrayForEditor(editor) {
     this._editor = editor
     this._shouldOpen = true
+    const selectedElm = editor.selection.getNode()
+
+    if (editor.selection.isCollapsed() && selectedElm.nodeName === 'A') {
+      // expand the selection to include the whole <a>
+      editor.selection.select(editor.selection.getNode())
+    } else {
+      const anchorElm = getAnchorElement(editor, selectedElm)
+      editor.selection.select(anchorElm)
+    }
     this._renderTray()
   }
 
@@ -59,7 +69,7 @@ export default class LinkOptionsTrayController {
 
   _applyLinkOptions(linkOptions) {
     this._dismissTray()
-    bridge.insertLink(linkOptions, linkOptions.text)
+    bridge.insertLink({...linkOptions, userText: true})
   }
 
   _dismissTray() {
@@ -69,8 +79,9 @@ export default class LinkOptionsTrayController {
   }
 
   _renderTray() {
-    const content = getLinkContentFromEditor(this._editor)
+    let content
     if (this._shouldOpen) {
+      content = getLinkContentFromEditor(this._editor)
       /*
        * When the tray is being opened again, it should be rendered fresh
        * (clearing the internal state) so that the currently-selected content

@@ -42,3 +42,16 @@ site_admin_keys_only:
     as the site admin account. Behavior in other instances
     already behaved in this way.
   applies_to: SiteAdmin
+plagiarism_tool_subscriptions:
+  state: hidden
+  display_name: Create live event subscriptions on ToolProxy
+  description: |-
+    If enabled, when an Lti::ToolProxy is created, it will
+    create the live event subscription directly on the tool
+    instead of the assignment. This will cause events to be
+    duplicated unless the subscriptions on the associated
+    plagiarism assignments are deleted.
+  applies_to: RootAccount
+  environments:
+    ci:
+      state: on

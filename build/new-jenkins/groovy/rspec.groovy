@@ -17,52 +17,52 @@
  */
 
 def seleniumConfig() {
-  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
   [
-    node_total: (env.SELENIUM_CI_NODE_TOTAL ?: '25') as Integer,
-    max_fail: (env.SELENIUM_MAX_FAIL ?: "100") as Integer,
-    reruns_retry: (env.SELENIUM_RERUN_RETRY ?: "3") as Integer,
-    force_failure: flags.isForceFailureSelenium() ? "1" : ''
+    node_total: configuration.getInteger('selenium-ci-node-total'),
+    max_fail: configuration.getInteger('selenium-max-fail'),
+    reruns_retry: configuration.getInteger('selenium-rerun-retry'),
+    force_failure: configuration.isForceFailureSelenium() ? "1" : ''
   ]
 }
 
 def runSeleniumSuite(total, index) {
+  def config = seleniumConfig()
   _runRspecTestSuite(
       total,
       index,
-      'docker-compose.new-jenkins.multiple-processes.yml:docker-compose.new-jenkins-selenium.yml',
+      'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
       'selenium',
-      seleniumConfig().max_fail,
-      seleniumConfig().reruns_retry,
+      config.max_fail,
+      config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
       '3',
-      seleniumConfig().force_failure
+      config.force_failure
   )
 }
 
 def rspecConfig() {
-  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
   [
-    node_total: (env.RSPEC_CI_NODE_TOTAL ?: '15') as Integer,
-    max_fail: (env.RSPEC_MAX_FAIL ?: "100") as Integer,
-    reruns_retry: (env.RSPEC_RERUN_RETRY ?: "1") as Integer,
-    force_failure: flags.isForceFailureRspec() ? "1" : '',
+    node_total: configuration.getInteger('rspec-ci-node-total'),
+    max_fail: configuration.getInteger('rspec-max-fail'),
+    reruns_retry: configuration.getInteger('rspec-rerun-retry'),
+    force_failure: configuration.isForceFailureRSpec() ? "1" : ''
   ]
 }
 
 def runRSpecSuite(total, index) {
+  def config = rspecConfig()
   _runRspecTestSuite(
       total,
       index,
-      'docker-compose.new-jenkins.multiple-processes.yml',
+      'docker-compose.new-jenkins.yml',
       'rspec',
-      rspecConfig().max_fail,
-      rspecConfig().reruns_retry,
+      config.max_fail,
+      config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/selenium',
       '4',
-      rspecConfig().force_failure
+      config.force_failure
   )
 }
 
@@ -88,15 +88,19 @@ def _runRspecTestSuite(
       "DOCKER_PROCESSES=$docker_processes",
       "FORCE_FAILURE=$force_failure",
       "POSTGRES_PASSWORD=sekret",
+      "SELENIUM_VERSION=3.141.59-20200525"
   ]) {
     try {
+      cleanAndSetup()
       sh 'rm -rf ./tmp'
-      sh 'build/new-jenkins/docker-cleanup.sh'
       sh 'mkdir -p tmp'
       timeout(time: 60) {
-        sh 'build/new-jenkins/print-env-excluding-secrets.sh'
         sh 'build/new-jenkins/docker-compose-pull.sh'
-        sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+
+        if(prefix == 'selenium') {
+          sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+        }
+
         sh 'build/new-jenkins/docker-compose-build-up.sh'
         sh 'build/new-jenkins/docker-compose-setup-databases.sh'
         sh 'build/new-jenkins/rspec_parallel_dockers.sh'
@@ -114,7 +118,7 @@ def _runRspecTestSuite(
         reports.stashSpecCoverage(prefix, index)
       }
       sh 'rm -rf ./tmp'
-      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+      execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

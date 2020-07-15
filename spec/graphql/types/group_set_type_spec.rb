@@ -24,7 +24,8 @@ describe Types::GroupSetType do
     course_with_student(active_all: true)
     @group_set = @course.group_categories.create! name: "asdf",
       self_signup: "restricted",
-      auto_leader: "random"
+      auto_leader: "random",
+      sis_source_id: "sisSet"
     @group = @group_set.groups.create! name: "group 1", context: @course
     @membership = @group.add_user(@student)
   end
@@ -57,5 +58,25 @@ describe Types::GroupSetType do
   it "returns 'disabled' for null self_signup" do
     @group_set.update! self_signup: nil
     expect(group_set_type.resolve("selfSignup")).to eq "disabled"
+  end
+
+  context "sis field" do
+    let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false })}
+    let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false })}
+
+    it "returns sis_id if you have read_sis permissions" do
+      tester = GraphQLTypeTester.new(@group_set, current_user: read_admin)
+      expect(tester.resolve("sisId")).to eq "sisSet"
+    end
+
+    it "returns sis_id if you have manage_sis permissions" do
+      tester = GraphQLTypeTester.new(@group_set, current_user: manage_admin)
+      expect(tester.resolve("sisId")).to eq "sisSet"
+    end
+
+    it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
+      tester = GraphQLTypeTester.new(@group_set, current_user: @student)
+      expect(tester.resolve("sisId")).to be_nil
+    end
   end
 end

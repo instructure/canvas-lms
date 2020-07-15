@@ -296,6 +296,42 @@ describe CalendarEvent do
     end
   end
 
+  context 'root account' do
+    it 'should set the root_account when the context is an appointment_group' do
+      course = Course.create!
+      ag = AppointmentGroup.create(:title => "test", :contexts => [course])
+      ag.publish!
+      appointment = ag.appointments.create(:start_at => '2012-01-01 12:00:00', :end_at => '2012-01-01 13:00:00')
+      expect(appointment.root_account_id).to eq ag.context.root_account_id
+    end
+
+    it 'should set the root_account when the context is a course' do
+      course = Course.create!
+      appointment = CalendarEvent.create!(title: 'test', context: course)
+      expect(appointment.root_account_id).to eq course.root_account_id
+    end
+
+    it 'should set the root_acocunt when the context is a user' do
+      user = User.create!
+      appointment = CalendarEvent.create!(title: 'test', context: user)
+      expect(appointment.root_account_id).to eq user.account.id
+    end
+
+    it 'should set the root_account when the context is a group' do
+      account = Account.create!
+      group = Group.create!(context: account)
+      appointment = CalendarEvent.create!(title: 'test', context: group)
+      expect(appointment.root_account_id).to eq group.root_account_id
+    end
+
+    it 'should set the root_account when the context is a course_section' do
+      course = Course.create!
+      section = course.course_sections.create!
+      appointment = CalendarEvent.create!(title: 'test', context: section)
+      expect(appointment.root_account_id).to eq section.root_account_id
+    end
+  end
+
   context "for_user_and_context_codes" do
     before :once do
       course_with_student(:active_all => true)
@@ -628,10 +664,14 @@ describe CalendarEvent do
     end
 
     it "should not let participants exceed max_appointments_per_participant" do
-      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :max_appointments_per_participant => 1,
+      ag = AppointmentGroup.create(
+        :title => "test",
+        :contexts => [@course],
+        :max_appointments_per_participant => 1,
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00'], ['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )
       ag.publish!
+
       appointment = ag.appointments.first
       appointment2 = ag.appointments.last
 

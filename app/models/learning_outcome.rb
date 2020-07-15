@@ -30,6 +30,7 @@ class LearningOutcome < ActiveRecord::Base
 
   before_validation :infer_default_calculation_method, :adjust_calculation_int
   before_save :infer_defaults
+  before_save :infer_root_account_ids
   after_save :propagate_changes_to_rubrics
 
   CALCULATION_METHODS = {
@@ -86,6 +87,35 @@ class LearningOutcome < ActiveRecord::Base
     # if we are changing the calculation_method but not the calculation_int, set the int to the default value
     if calculation_method_changed? && !calculation_int_changed?
       self.calculation_int = default_calculation_int
+    end
+  end
+
+  def infer_root_account_ids
+    return if self.root_account_ids.present?
+
+    context_root_account_id = context.try(:resolved_root_account_id)
+
+    # find linked contexts
+    links = self.new_record? ? [] :
+            ContentTag.learning_outcome_links
+              .preload(:context)
+              .where(content_id: self, context_type: ['Account', 'Course'])
+              .select(:context_type, :context_id)
+              .distinct
+    link_root_account_ids = links.map { |link| link.context.resolved_root_account_id }
+
+    self.root_account_ids = ([context_root_account_id] + link_root_account_ids).uniq.compact
+  end
+
+  def add_root_account_id_for_context!(context)
+    return if self.root_account_ids.nil? # not initialized yet
+
+    root_account_id = context.try(:resolved_root_account_id)
+    return if root_account_id.nil?
+
+    unless self.root_account_ids.include? root_account_id
+      self.root_account_ids << root_account_id
+      self.save!
     end
   end
 

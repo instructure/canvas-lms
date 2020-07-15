@@ -19,6 +19,10 @@ import _ from 'underscore'
 import $ from 'jquery'
 import Backbone from 'Backbone'
 import {completeUpload} from 'jsx/shared/upload_file'
+import I18n from 'i18n!content_migrations'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {ProgressBar} from '@instructure/ui-progress'
 import 'jquery.instructure_forms'
 
 export default class ContentMigration extends Backbone.Model
@@ -101,7 +105,7 @@ export default class ContentMigration extends Backbone.Model
     super _.omit(arguments[0], 'file'),
       error: (xhr) => reject(xhr.responseText)
       success: (model, xhr, options) =>
-        completeUpload(@get('pre_attachment'), file, ignoreResult: true)
+        completeUpload(@get('pre_attachment'), file, { ignoreResult: true, onProgress: @onProgress })
           .catch(reject)
           .then(resolve)
 
@@ -140,3 +144,19 @@ export default class ContentMigration extends Backbone.Model
         json.date_shift_options[json.adjust_dates.operation] = '1'
       delete json.adjust_dates
 
+  progressValue: (h) ->
+    I18n.t '%{percent}%',
+      percent: Math.round((h.valueNow * 100) / h.valueMax)
+
+  onProgress: (event) =>
+    if event.lengthComputable
+      mountPoint = document.getElementById('migration_upload_progress_bar')
+      if mountPoint
+        ReactDOM.render(React.createElement(ProgressBar, {
+          screenReaderLabel: I18n.t('Uploading progress')
+          valueMax: event.total
+          valueNow: event.loaded
+          renderValue: @progressValue
+          formatScreenReaderValue: @progressValue
+          tabindex: '0'
+        }), mountPoint)

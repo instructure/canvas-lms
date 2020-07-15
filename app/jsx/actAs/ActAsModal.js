@@ -25,7 +25,9 @@ import I18n from 'i18n!act_as'
 import Modal from '../shared/components/InstuiModal'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {View} from '@instructure/ui-layout'
-import {Text, Avatar, Spinner, Table} from '@instructure/ui-elements'
+import {Text, Avatar} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
+import {Table} from '@instructure/ui-table'
 import {Button} from '@instructure/ui-buttons'
 
 import ActAsMask from './ActAsMask'
@@ -61,7 +63,7 @@ export default class ActAsModal extends React.Component {
     this._button = null
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (window.location.href === document.referrer) {
       this.setState({isLoading: true})
       window.location.href = '/'
@@ -103,17 +105,17 @@ export default class ActAsModal extends React.Component {
 
   renderInfoTable(caption, renderRows) {
     return (
-      <Table caption={<ScreenReaderContent>{caption}</ScreenReaderContent>}>
-        <thead>
-          <tr>
-            <th>
+      <Table caption={caption}>
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="actasmodal-category">
               <ScreenReaderContent>{I18n.t('Category')}</ScreenReaderContent>
-            </th>
-            <th>
+            </Table.ColHeader>
+            <Table.ColHeader id="actasmodal-userinfo">
               <ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>
-            </th>
-          </tr>
-        </thead>
+            </Table.ColHeader>
+          </Table.Row>
+        </Table.Head>
         {renderRows()}
       </Table>
     )
@@ -122,42 +124,40 @@ export default class ActAsModal extends React.Component {
   renderUserInfoRows = () => {
     const user = this.props.user
     return (
-      <tbody>
+      <Table.Body>
         {this.renderUserRow(I18n.t('Full Name:'), user.name)}
         {this.renderUserRow(I18n.t('Display Name:'), user.short_name)}
         {this.renderUserRow(I18n.t('Sortable Name:'), user.sortable_name)}
         {this.renderUserRow(I18n.t('Default Email:'), user.email)}
-      </tbody>
+      </Table.Body>
     )
   }
 
   renderLoginInfoRows = pseudonym => (
-    <tbody>
+    <Table.Body>
       {this.renderUserRow(I18n.t('Login ID:'), pseudonym.login_id)}
       {this.renderUserRow(I18n.t('SIS ID:'), pseudonym.sis_id)}
       {this.renderUserRow(I18n.t('Integration ID:'), pseudonym.integration_id)}
-    </tbody>
+    </Table.Body>
   )
 
   renderUserRow(category, info) {
     return (
-      <tr>
-        <td>
+      <Table.Row>
+        <Table.Cell>
           <Text size="small">{category}</Text>
-        </td>
-        <td>
-          <View as="div" textAlign="end">
-            <Text size="small" weight="bold">
-              {info}
-            </Text>
-          </View>
-        </td>
-      </tr>
+        </Table.Cell>
+        <Table.Cell textAlign="end">
+          <Text size="small" weight="bold">
+            {info}
+          </Text>
+        </Table.Cell>
+      </Table.Row>
     )
   }
 
   render() {
-    const user = this.props.user
+    const {user} = this.props
 
     return (
       <div>

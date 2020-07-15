@@ -1036,6 +1036,16 @@ describe "Module Items API", type: :request do
         call_select_mastery_path @assignment_tag, 100, @student.id, expected_status: 404
       end
 
+      it 'should call the native selection path if configured' do
+        expect(ConditionalRelease::Service).to receive(:natively_enabled_for_account?).and_return(true)
+
+        assignment_ids = create_assignments([@course.id], 2)
+        expect(ConditionalRelease::OverrideHandler).to receive(:handle_assignment_set_selection).
+          with(@student, @assignment, "100").and_return(assignment_ids)
+        json = call_select_mastery_path @assignment_tag, "100", @student.id, expected_status: 200
+        expect(json['assignments'].map {|a| a['id']}).to eq assignment_ids
+      end
+
       context 'successful' do
         def cyoe_returns(assignment_ids)
           cyoe_ids = assignment_ids.map {|id| { 'assignment_id' => "#{id}" }} # cyoe ids in strings

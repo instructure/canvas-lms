@@ -92,6 +92,28 @@ const ExternalToolsPlugin = {
         icon: 'lti',
         tooltip: 'Apps'
       })
+      ltiButtons.forEach(button => {
+        if (!button.favorite) return
+
+        // Sanitize input against XSS
+        const svg = document.createElement('svg')
+        svg.setAttribute('viewBox', '0 0 16 16')
+        svg.setAttribute('version', '1.1')
+        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+        const image = document.createElement('image')
+        image.setAttribute('xlink:href', button.image)
+        svg.appendChild(image)
+        const div = document.createElement('div')
+        div.appendChild(svg)
+
+        ed.ui.registry.addIcon(`favorite_lti_tool_${button.id}`, div.innerHTML)
+        ed.ui.registry.addButton(`instructure_external_button_${button.id}`, {
+          onAction: () => button.onAction(),
+          tooltip: button.title,
+          icon: `favorite_lti_tool_${button.id}`,
+          title: button.title
+        })
+      })
     }
     if (clumpedButtons.length) {
       const handleClick = function() {

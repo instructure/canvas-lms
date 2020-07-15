@@ -51,4 +51,22 @@ describe OutcomeProficiency, type: :model do
       end
     end
   end
+
+  describe 'before save' do
+    it 'sets root account id' do
+      root_account = account_model
+      proficiency = outcome_proficiency_model(root_account)
+      expect(proficiency.root_account_id).to be(root_account.resolved_root_account_id)
+    end
+
+    it 'sets root account id with passed in id' do
+      root_account_1 = account_model
+      root_account_2 = account_model
+      rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00')
+      rating2 = OutcomeProficiencyRating.new(description: 'worst', points: 0, mastery: false, color: 'ff0000')
+      proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2], account: root_account_1,
+        root_account_id: root_account_2.resolved_root_account_id)
+      expect(proficiency.root_account_id).to be(root_account_2.resolved_root_account_id)
+    end
+  end
 end

@@ -23,15 +23,11 @@ import TextHelper from '../str/TextHelper'
 function parseUserAgentString(userAgent) {
   userAgent = (userAgent || '').toLowerCase()
   const data = {
-    version: (userAgent.match(/.+(?:me|ox|it|ra|ie|er|rv|dg|version)[\/: ]([\d.]+)/) || [
-      0,
-      null
-    ])[1],
+    version: (userAgent.match(/.+(?:me|ox|it|ra|er|rv|dg|version)[\/: ]([\d.]+)/) || [0, null])[1],
     edge: /edg[^e]/.test(userAgent),
     chrome: /chrome/.test(userAgent) && !/edg[^e]/.test(userAgent),
     safari: /webkit/.test(userAgent),
     opera: /opera/.test(userAgent),
-    msie: (/msie/.test(userAgent) || /trident/.test(userAgent)) && !/opera/.test(userAgent),
     firefox: /firefox/.test(userAgent),
     mozilla: /mozilla/.test(userAgent) && !/(compatible|webkit)/.test(userAgent),
     speedgrader: /speedgrader/.test(userAgent)
@@ -45,8 +41,6 @@ function parseUserAgentString(userAgent) {
     browser = 'Safari'
   } else if (data.opera) {
     browser = 'Opera'
-  } else if (data.msie) {
-    browser = 'Internet Explorer'
   } else if (data.firefox) {
     browser = 'Firefox'
   } else if (data.mozilla) {

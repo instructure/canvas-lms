@@ -19,6 +19,7 @@ require "fileutils"
 require 'webdrivers/chromedriver'
 require_relative "common_helper_methods/custom_alert_actions"
 require_relative 'common_helper_methods/custom_screen_actions'
+require_relative 'patches/selenium/webdriver/remote/w3c/bridge.rb'
 
 # WebDriver uses port 7054 (the "locking port") as a mutex to ensure
 # that we don't launch two Firefox instances at the same time. Each
@@ -314,8 +315,11 @@ module SeleniumDriverSetup
         # TODO: options for firefox driver
       when :chrome
         caps = Selenium::WebDriver::Remote::Capabilities.chrome
-        caps['chromeOptions'] = {
+        caps['goog:chromeOptions'] = {
           args: %w[disable-dev-shm-usage no-sandbox start-maximized]
+        }
+        caps['goog:loggingPrefs'] = {
+          browser: 'ALL'
         }
       when :edge
         # TODO: options for edge driver

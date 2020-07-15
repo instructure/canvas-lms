@@ -27,6 +27,9 @@ module Lti
     belongs_to :context, polymorphic: [:course, :account]
     belongs_to :product_family, class_name: 'Lti::ProductFamily'
 
+    after_save :manage_subscription
+    before_destroy :delete_subscription
+
     scope :active, -> { where("lti_tool_proxies.workflow_state = ?", 'active') }
 
     serialize :raw_data
@@ -128,18 +131,6 @@ module Lti
       }
     end
 
-    # TODO: this method is unused. remove.
-    def configured_assignments
-      message_handler = resources.preload(:message_handlers).map(&:message_handlers).flatten.find do |mh|
-        mh.capabilities&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
-      end
-      AssignmentConfigurationToolLookup.where(
-        tool_product_code: product_family.product_code,
-        tool_vendor_code: product_family.vendor_code,
-        tool_resource_type_code: message_handler&.resource_handler&.resource_type_code
-      ).preload(:assignment).map(&:assignment)
-    end
-
     def find_service(service_id, action)
       ims_tool_proxy.tool_profile&.service_offered&.find do |s|
         s.id.include?(service_id) && s.action.include?(action)
@@ -152,6 +143,29 @@ module Lti
       return false if resources.where(resource_type_code: resource_type_code).empty?
 
       true
+    end
+
+    def manage_subscription
+      return unless context.root_account.feature_enabled?(:plagiarism_tool_subscriptions)
+      # Live Event subscriptions for plagiarism tools were too bulky to keep track
+      # of when created from the individual assignments, so we are creating them at
+      # the tool level. We only want subscriptions for plagiarism tools, though.
+      if subscription_id.blank? && workflow_state == 'active' && plagiarism_tool?
+        subscription_helper = Lti::PlagiarismSubscriptionsHelper.new(self)
+        self.update_columns(subscription_id: subscription_helper.create_subscription)
+      elsif subscription_id.present? && workflow_state != 'active'
+        Lti::PlagiarismSubscriptionsHelper.new(self).destroy_subscription(self.subscription_id)
+        self.update_columns(subscription_id: nil)
+      end
+    end
+
+    def plagiarism_tool?
+      raw_data.try(:dig, 'enabled_capability')&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
+    end
+
+    def delete_subscription
+      return if subscription_id.blank?
+      Lti::PlagiarismSubscriptionsHelper.new(self).destroy_subscription(self.subscription_id)
     end
   end
 end

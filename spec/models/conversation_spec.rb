@@ -1011,16 +1011,59 @@ describe Conversation do
     it "should be saved on the conversation when adding a message" do
       u1 = user_factory
       u2 = user_factory
+      a1 = account_model
+      a2 = account_model
       conversation = Conversation.initiate([u1, u2], true)
-      conversation.add_message(u1, 'ohai', :root_account_id => 1)
-      conversation.add_message(u2, 'ohai yourself', :root_account_id => 2)
-      expect(conversation.root_account_ids).to eql [1, 2]
+      conversation.add_message(u1, 'ohai', :root_account_id => a1.id)
+      conversation.add_message(u2, 'ohai yourself', :root_account_id => a2.id)
+      expect(conversation.root_account_ids).to eql [a1.id, a2.id]
     end
 
     it "includes the context's root account when initiating" do
       new_course = course_factory
       conversation = Conversation.initiate([], false, context_type: 'Course', context_id: new_course.id)
       expect(conversation.root_account_ids).to eql [new_course.root_account_id]
+    end
+
+    it 'should update conversation participants root account ids when changed' do
+      a1 = Account.create!
+      a2 = Account.create!
+      users = create_users(2, return_type: :record)
+      conversation = Conversation.initiate(users, false)
+
+      conversation.root_account_ids = [a1.id, a2.id]
+      conversation.save!
+      expect(
+        conversation.reload.conversation_participants.first.root_account_ids
+      ).to eq [a1.id, a2.id].sort
+    end
+
+    it 'should update conversation messages root account ids when changed' do
+      a1 = Account.create!
+      a2 = Account.create!
+      users = create_users(2, return_type: :record)
+      conversation = Conversation.initiate(users, false)
+      conversation.add_message(users[0], 'howdy partner')
+
+      conversation.root_account_ids = [a1.id, a2.id]
+      conversation.save!
+      expect(
+        conversation.reload.conversation_messages.first.root_account_ids
+      ).to eq [a1.id, a2.id].sort
+    end
+
+    it 'should update conversation message participants root account ids when changed' do
+      a1 = Account.create!
+      a2 = Account.create!
+      users = create_users(2, return_type: :record)
+      conversation = Conversation.initiate(users, false)
+      conversation.add_message(users[0], 'howdy partner')
+
+      conversation.root_account_ids = [a1.id, a2.id]
+      conversation.save!
+      expect(
+        conversation.reload.conversation_message_participants.first.root_account_ids
+      ).to eq [a1.id, a2.id].sort
     end
 
     context "sharding" do

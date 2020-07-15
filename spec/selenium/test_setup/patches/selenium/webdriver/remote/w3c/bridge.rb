@@ -15,19 +15,30 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# We will merge this only when we're ready for a batch of backfills to start
-# otherwise, we can keep collecting. After we've merged once, when we have new models
-# to run we can just copy this with a new migration ID and run it again
-class PopulateRootAccountIdOnModels < ActiveRecord::Migration[5.2]
-  tag :postdeploy
-  disable_ddl_transaction!
+require 'selenium-webdriver'
 
-  def up
-    DataFixup::PopulateRootAccountIdOnModels.send_later_enqueue_args(:run,
-      {:priority => Delayed::LOWER_PRIORITY, :strand => ["root_account_id_backfill_strand", Shard.current.database_server.id]}
-    )
-  end
+module Selenium
+  module WebDriver
+    module Remote
+      module W3C
+        class Bridge
+          COMMANDS = remove_const(:COMMANDS).dup
+          COMMANDS[:get_log] = [:post, 'session/:session_id/log']
+          COMMANDS.freeze
 
-  def down
+          def log(type)
+            data = execute :get_log, {}, {type: type.to_s}
+
+            Array(data).map do |l|
+              begin
+                LogEntry.new l.fetch('level', 'UNKNOWN'), l.fetch('timestamp'), l.fetch('message')
+              rescue KeyError
+                next
+              end
+            end
+          end
+        end
+      end
+    end
   end
 end

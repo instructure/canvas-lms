@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import handleOpenTray from '../handleOpenTray'
+import assetFactory from 'jsx/celebrations/assetFactory'
 
 export default [
   {
@@ -112,7 +113,7 @@ export default [
           </li>
         </ol>
         <div className="tour-star-image" aria-hidden>
-          <img src={require('../../confetti/svg/Star.svg')} alt={I18n.t('star')} />
+          <img src={assetFactory('star')} alt={I18n.t('star')} />
         </div>
       </section>
     )

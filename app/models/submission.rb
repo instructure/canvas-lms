@@ -1889,6 +1889,27 @@ class Submission < ActiveRecord::Base
     end
     self.class.connection.after_transaction_commit do
       Auditors::GradeChange.record(skip_insert: skip_insert, submission: self)
+      queue_conditional_release_grade_change_handler if newly_graded || grade_changed
+    end
+  end
+
+  def queue_conditional_release_grade_change_handler
+    self.shard.activate do
+      return unless self.graded? && self.posted?
+      # use request caches to handle n+1's when updating a lot of submissions in the same course in one request
+      return unless RequestCache.cache('conditional_release_native', self.root_account_id) do
+        ConditionalRelease::Service.natively_enabled_for_account?(self.root_account)
+      end
+      return unless RequestCache.cache('conditional_release_feature_enabled', self.course_id) do
+        self.course.feature_enabled?(:conditional_release)
+      end
+      if ConditionalRelease::Rule.is_trigger_assignment?(self.assignment)
+        ConditionalRelease::OverrideHandler.send_later_if_production_enqueue_args(
+          :handle_grade_change,
+          {:priority => Delayed::LOW_PRIORITY, :strand => "conditional_release_grade_change:#{self.global_assignment_id}"},
+          self
+        )
+      end
     end
   end
 

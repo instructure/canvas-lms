@@ -212,11 +212,16 @@ namespace :db do
 end
 
 Switchman::Rake.filter_database_servers do |servers, block|
-  if ENV['REGION']
-    if ENV['REGION'] == 'self'
-      servers.select!(&:in_current_region?)
+  ENV['REGION']&.split(',')&.each do |region|
+    method = :"select!"
+    if region[0] == '-'
+      method = :"reject!"
+      region = region[1..-1]
+    end
+    if region == 'self'
+      servers.send(method, &:in_current_region?)
     else
-      servers.select! { |server| server.in_region?(ENV['REGION']) }
+      servers.send(method) { |server| server.in_region?(region) }
     end
   end
   block.call(servers)

@@ -549,6 +549,14 @@ describe ContentTag do
     expect(@module.reload.updated_at.to_i).to eq yesterday.to_i
   end
 
+  it "should update outcome root account ids after save" do
+    outcome = LearningOutcome.create! title: 'foo', context: nil
+    course = course_factory
+    expect(outcome.root_account_ids).to eq []
+    ContentTag.create(tag_type: "learning_outcome_association", content: outcome, context: course)
+    expect(outcome.root_account_ids).to eq [course.account.id]
+  end
+
   describe "visible_to_students_in_course_with_da" do
     before do
       course_with_student(active_all: true)

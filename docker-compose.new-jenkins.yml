@@ -3,10 +3,10 @@ version: "2.3"
 services:
   canvas:
     image: $PATCHSET_TAG
-    links:
+    depends_on:
       - postgres
-      - redis
       - cassandra
+      - redis
       - dynamodb
     environment:
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
@@ -36,9 +36,6 @@ services:
     image: starlord.inscloudgate.net/jenkins/postgis:$POSTGRES-${POSTGIS:-2.5}
     environment:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-
-      # parallel_tests
-      DOCKER_PROCESSES:
     init: true
 
   cassandra:
@@ -49,5 +46,5 @@ services:
 
   dynamodb:
     image: starlord.inscloudgate.net/jenkins/dynamodb-local
-    command: -jar DynamoDBLocal.jar #-dbPath /home/dynamodblocal
+    command: -jar DynamoDBLocal.jar
     init: true

@@ -388,7 +388,7 @@ describe ConversationsController do
         json.each do |conv|
           conversation = Conversation.find(conv['id'])
           conversation.conversation_participants.each do |cp|
-            expect(cp.root_account_ids).to eq @account_id.to_s
+            expect(cp.root_account_ids).to eq [@account_id]
           end
         end
       end
@@ -401,7 +401,7 @@ describe ConversationsController do
         json.each do |conv|
           conversation = Conversation.find(conv['id'])
           conversation.conversation_participants.each do |cp|
-            expect(cp.root_account_ids).to eq @account_id.to_s
+            expect(cp.root_account_ids).to eq [@account_id]
           end
         end
       end
@@ -502,6 +502,12 @@ describe ConversationsController do
       it "should create user notes" do
         post 'create', params: { recipients: @students.map(&:id), body: "yo", subject: "greetings", user_note: '1' }
         @students.each{|x| expect(x.user_notes.size).to be(1)}
+      end
+
+      it "should include the domain root account in the user note" do
+        post "create", params: { recipients: @students.map(&:id), body: "hi there", subject: "hi there", user_note: true }
+        note = UserNote.last
+        expect(note.root_account_id).to eql Account.default.id
       end
     end
 

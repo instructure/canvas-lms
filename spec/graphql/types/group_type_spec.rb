@@ -28,7 +28,7 @@ describe Types::GroupType do
     @student_in_group = @student
 
     @group_set = @course.group_categories.create! name: "asdf"
-    @group = @group_set.groups.create! name: "group 1", context: @course
+    @group = @group_set.groups.create! name: "group 1", context: @course, sis_source_id: "sisGroup"
     @membership = @group.add_user(@student_in_group)
   end
 
@@ -72,6 +72,26 @@ describe Types::GroupType do
         group_type.resolve(%|member(userId: "#{@student_in_group.id}") { _id }|,
                            current_user: @student_not_in_group)
       ).to be_nil
+    end
+  end
+
+  context "sis field" do
+    let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false })}
+    let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false })}
+
+    it "returns sis_id if you have read_sis permissions" do
+      tester = GraphQLTypeTester.new(@group, current_user: read_admin)
+      expect(tester.resolve("sisId")).to eq "sisGroup"
+    end
+
+    it "returns sis_id if you have manage_sis permissions" do
+      tester = GraphQLTypeTester.new(@group, current_user: manage_admin)
+      expect(tester.resolve("sisId")).to eq "sisGroup"
+    end
+
+    it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
+      tester = GraphQLTypeTester.new(@group, current_user: @student_in_group)
+      expect(tester.resolve("sisId")).to be_nil
     end
   end
 end

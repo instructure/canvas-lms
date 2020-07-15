@@ -19,6 +19,10 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
+import {IconButton} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {IconQuestionLine} from '@instructure/ui-icons'
+
 import store from '../lib/ExternalAppsStore'
 import ExternalToolsTableRow from './ExternalToolsTableRow'
 import InfiniteScroll from './InfiniteScroll'
@@ -53,7 +57,7 @@ export default class ExternalToolsTable extends React.Component {
     store.removeChangeListener(this.onChange)
   }
 
-  loadMore = page => {
+  loadMore = _page => {
     if (store.getState().hasMore && !store.getState().isLoading) {
       store.fetch()
     }
@@ -79,7 +83,12 @@ export default class ExternalToolsTable extends React.Component {
       return null
     }
     let t = null
-    return store.getState().externalTools.map(tool => {
+    const externalTools = store.getState().externalTools
+    const rceFavCount = externalTools.reduce(
+      (accum, current) => accum + (current.is_rce_favorite ? 1 : 0),
+      0
+    )
+    return externalTools.map(tool => {
       t = (
         <ExternalToolsTableRow
           key={tool.app_id}
@@ -87,7 +96,7 @@ export default class ExternalToolsTable extends React.Component {
           tool={tool}
           canAddEdit={this.props.canAddEdit}
           setFocusAbove={this.setFocusAbove(t)}
-          store={store}
+          favoriteCount={rceFavCount}
           contextType={this.assetContextType}
         />
       )
@@ -95,6 +104,7 @@ export default class ExternalToolsTable extends React.Component {
     })
   }
 
+  // Don't forget to change the tooltip text whtn the rce_enhancements flag goes away
   render() {
     return (
       <div className="ExternalToolsTable">
@@ -111,13 +121,31 @@ export default class ExternalToolsTable extends React.Component {
             <caption className="screenreader-only">{I18n.t('External Apps')}</caption>
             <thead>
               <tr>
-                <th scope="col" width="5%">
+                <th scope="col" style={{width: '2rem'}}>
                   <ScreenReaderContent>{I18n.t('Status')}</ScreenReaderContent>
                 </th>
-                <th scope="col" width="65%">
-                  {I18n.t('Name')}
-                </th>
-                <th scope="col" width="30%">
+                <th scope="col">{I18n.t('Name')}</th>
+                {!ENV.ACCOUNT?.site_admin && ENV.FEATURES?.rce_lti_favorites && (
+                  <th scope="col" style={{width: '12rem', whiteSpace: 'nowrap'}}>
+                    {I18n.t('Add to RCE toolbar')}
+                    <Tooltip
+                      renderTip={I18n.t(
+                        'There is a 2 app limit for placement within the RCE toolbar. This setting only applies to the enhanced RCE.'
+                      )}
+                      placement="top"
+                      on={['click', 'focus']}
+                    >
+                      <IconButton
+                        renderIcon={IconQuestionLine}
+                        withBackground={false}
+                        withBorder={false}
+                        screenReaderLabel={I18n.t('Help')}
+                        size="small"
+                      />
+                    </Tooltip>
+                  </th>
+                )}
+                <th scope="col" style={{width: '4rem'}}>
                   <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
                 </th>
               </tr>

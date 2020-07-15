@@ -96,6 +96,10 @@ signupDialog = (id, title, path=null) ->
       $(this).find('a').eq(0).blur()
       $(this).find(':input').eq(0).focus()
       if ENV.ACCOUNT.recaptcha_key
+        $(this).find('.g-recaptcha')[0].addEventListener('load', (evt) ->
+          # An explicit tabindex is needed for it to be tabbable in the dialog
+          evt.target.tabIndex = 0;
+        , true);
         $captchaId = grecaptcha.render($(this).find('.g-recaptcha')[0], {
           'sitekey': ENV.ACCOUNT.recaptcha_key,
           'callback': -> $node.parent().find('button[type=submit], .button_type_submit').prop('disabled', false),

@@ -18,6 +18,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+library "canvas-builds-library"
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -37,9 +39,7 @@ pipeline {
   stages {
     stage ('Pre-Cleanup') {
       steps {
-        timeout(time: 2) {
-          sh 'build/new-jenkins/docker-cleanup.sh'
-        }
+        cleanAndSetup()
       }
     }
 
@@ -157,7 +157,7 @@ pipeline {
     }
     cleanup {
       sh 'rm -vrf spec_results/'
-      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+      execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

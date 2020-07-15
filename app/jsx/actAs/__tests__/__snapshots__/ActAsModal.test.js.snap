@@ -137,38 +137,41 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
               textAlign="center"
             >
               <Table
-                caption={
-                  <ScreenReaderContent
-                    as="span"
-                  >
-                    User details
-                  </ScreenReaderContent>
-                }
+                caption="User details"
                 hover={false}
                 layout="auto"
-                size="medium"
               >
-                <thead>
-                  <tr>
-                    <th>
+                <Head>
+                  <Row>
+                    <ColHeader
+                      id="actasmodal-category"
+                      sortDirection="none"
+                      textAlign="start"
+                    >
                       <ScreenReaderContent
                         as="span"
                       >
                         Category
                       </ScreenReaderContent>
-                    </th>
-                    <th>
+                    </ColHeader>
+                    <ColHeader
+                      id="actasmodal-userinfo"
+                      sortDirection="none"
+                      textAlign="start"
+                    >
                       <ScreenReaderContent
                         as="span"
                       >
                         User information
                       </ScreenReaderContent>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
+                    </ColHeader>
+                  </Row>
+                </Head>
+                <Body>
+                  <Row>
+                    <Cell
+                      textAlign="start"
+                    >
                       <Text
                         as="span"
                         letterSpacing="normal"
@@ -177,36 +180,25 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                       >
                         Full Name:
                       </Text>
-                    </td>
-                    <td>
-                      <View
-                        as="div"
-                        borderColor="default"
-                        debug={false}
-                        display="auto"
-                        focusColor="info"
-                        focusPosition="offset"
-                        focused={false}
-                        overflowX="visible"
-                        overflowY="visible"
-                        position="static"
-                        shouldAnimateFocus={true}
-                        textAlign="end"
+                    </Cell>
+                    <Cell
+                      textAlign="end"
+                    >
+                      <Text
+                        as="span"
+                        letterSpacing="normal"
+                        size="small"
+                        weight="bold"
+                        wrap="normal"
                       >
-                        <Text
-                          as="span"
-                          letterSpacing="normal"
-                          size="small"
-                          weight="bold"
-                          wrap="normal"
-                        >
-                          test user
-                        </Text>
-                      </View>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
+                        test user
+                      </Text>
+                    </Cell>
+                  </Row>
+                  <Row>
+                    <Cell
+                      textAlign="start"
+                    >
                       <Text
                         as="span"
                         letterSpacing="normal"
@@ -215,36 +207,25 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                       >
                         Display Name:
                       </Text>
-                    </td>
-                    <td>
-                      <View
-                        as="div"
-                        borderColor="default"
-                        debug={false}
-                        display="auto"
-                        focusColor="info"
-                        focusPosition="offset"
-                        focused={false}
-                        overflowX="visible"
-                        overflowY="visible"
-                        position="static"
-                        shouldAnimateFocus={true}
-                        textAlign="end"
+                    </Cell>
+                    <Cell
+                      textAlign="end"
+                    >
+                      <Text
+                        as="span"
+                        letterSpacing="normal"
+                        size="small"
+                        weight="bold"
+                        wrap="normal"
                       >
-                        <Text
-                          as="span"
-                          letterSpacing="normal"
-                          size="small"
-                          weight="bold"
-                          wrap="normal"
-                        >
-                          foo
-                        </Text>
-                      </View>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
+                        foo
+                      </Text>
+                    </Cell>
+                  </Row>
+                  <Row>
+                    <Cell
+                      textAlign="start"
+                    >
                       <Text
                         as="span"
                         letterSpacing="normal"
@@ -253,36 +234,25 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                       >
                         Sortable Name:
                       </Text>
-                    </td>
-                    <td>
-                      <View
-                        as="div"
-                        borderColor="default"
-                        debug={false}
-                        display="auto"
-                        focusColor="info"
-                        focusPosition="offset"
-                        focused={false}
-                        overflowX="visible"
-                        overflowY="visible"
-                        position="static"
-                        shouldAnimateFocus={true}
-                        textAlign="end"
+                    </Cell>
+                    <Cell
+                      textAlign="end"
+                    >
+                      <Text
+                        as="span"
+                        letterSpacing="normal"
+                        size="small"
+                        weight="bold"
+                        wrap="normal"
                       >
-                        <Text
-                          as="span"
-                          letterSpacing="normal"
-                          size="small"
-                          weight="bold"
-                          wrap="normal"
-                        >
-                          bar, baz
-                        </Text>
-                      </View>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
+                        bar, baz
+                      </Text>
+                    </Cell>
+                  </Row>
+                  <Row>
+                    <Cell
+                      textAlign="start"
+                    >
                       <Text
                         as="span"
                         letterSpacing="normal"
@@ -291,35 +261,22 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                       >
                         Default Email:
                       </Text>
-                    </td>
-                    <td>
-                      <View
-                        as="div"
-                        borderColor="default"
-                        debug={false}
-                        display="auto"
-                        focusColor="info"
-                        focusPosition="offset"
-                        focused={false}
-                        overflowX="visible"
-                        overflowY="visible"
-                        position="static"
-                        shouldAnimateFocus={true}
-                        textAlign="end"
+                    </Cell>
+                    <Cell
+                      textAlign="end"
+                    >
+                      <Text
+                        as="span"
+                        letterSpacing="normal"
+                        size="small"
+                        weight="bold"
+                        wrap="normal"
                       >
-                        <Text
-                          as="span"
-                          letterSpacing="normal"
-                          size="small"
-                          weight="bold"
-                          wrap="normal"
-                        >
-                          testUser@test.com
-                        </Text>
-                      </View>
-                    </td>
-                  </tr>
-                </tbody>
+                        testUser@test.com
+                      </Text>
+                    </Cell>
+                  </Row>
+                </Body>
               </Table>
             </View>
             <View
@@ -339,38 +296,41 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
               textAlign="center"
             >
               <Table
-                caption={
-                  <ScreenReaderContent
-                    as="span"
-                  >
-                    Login info
-                  </ScreenReaderContent>
-                }
+                caption="Login info"
                 hover={false}
                 layout="auto"
-                size="medium"
               >
-                <thead>
-                  <tr>
-                    <th>
+                <Head>
+                  <Row>
+                    <ColHeader
+                      id="actasmodal-category"
+                      sortDirection="none"
+                      textAlign="start"
+                    >
                       <ScreenReaderContent
                         as="span"
                       >
                         Category
                       </ScreenReaderContent>
-                    </th>
-                    <th>
+                    </ColHeader>
+                    <ColHeader
+                      id="actasmodal-userinfo"
+                      sortDirection="none"
+                      textAlign="start"
+                    >
                       <ScreenReaderContent
                         as="span"
                       >
                         User information
                       </ScreenReaderContent>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
+                    </ColHeader>
+                  </Row>
+                </Head>
+                <Body>
+                  <Row>
+                    <Cell
+                      textAlign="start"
+                    >
                       <Text
                         as="span"
                         letterSpacing="normal"
@@ -379,36 +339,25 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                       >
                         Login ID:
                       </Text>
-                    </td>
-                    <td>
-                      <View
-                        as="div"
-                        borderColor="default"
-                        debug={false}
-                        display="auto"
-                        focusColor="info"
-                        focusPosition="offset"
-                        focused={false}
-                        overflowX="visible"
-                        overflowY="visible"
-                        position="static"
-                        shouldAnimateFocus={true}
-                        textAlign="end"
+                    </Cell>
+                    <Cell
+                      textAlign="end"
+                    >
+                      <Text
+                        as="span"
+                        letterSpacing="normal"
+                        size="small"
+                        weight="bold"
+                        wrap="normal"
                       >
-                        <Text
-                          as="span"
-                          letterSpacing="normal"
-                          size="small"
-                          weight="bold"
-                          wrap="normal"
-                        >
-                          qux
-                        </Text>
-                      </View>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
+                        qux
+                      </Text>
+                    </Cell>
+                  </Row>
+                  <Row>
+                    <Cell
+                      textAlign="start"
+                    >
                       <Text
                         as="span"
                         letterSpacing="normal"
@@ -417,36 +366,25 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                       >
                         SIS ID:
                       </Text>
-                    </td>
-                    <td>
-                      <View
-                        as="div"
-                        borderColor="default"
-                        debug={false}
-                        display="auto"
-                        focusColor="info"
-                        focusPosition="offset"
-                        focused={false}
-                        overflowX="visible"
-                        overflowY="visible"
-                        position="static"
-                        shouldAnimateFocus={true}
-                        textAlign="end"
+                    </Cell>
+                    <Cell
+                      textAlign="end"
+                    >
+                      <Text
+                        as="span"
+                        letterSpacing="normal"
+                        size="small"
+                        weight="bold"
+                        wrap="normal"
                       >
-                        <Text
-                          as="span"
-                          letterSpacing="normal"
-                          size="small"
-                          weight="bold"
-                          wrap="normal"
-                        >
-                          555
-                        </Text>
-                      </View>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
+                        555
+                      </Text>
+                    </Cell>
+                  </Row>
+                  <Row>
+                    <Cell
+                      textAlign="start"
+                    >
                       <Text
                         as="span"
                         letterSpacing="normal"
@@ -455,35 +393,22 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                       >
                         Integration ID:
                       </Text>
-                    </td>
-                    <td>
-                      <View
-                        as="div"
-                        borderColor="default"
-                        debug={false}
-                        display="auto"
-                        focusColor="info"
-                        focusPosition="offset"
-                        focused={false}
-                        overflowX="visible"
-                        overflowY="visible"
-                        position="static"
-                        shouldAnimateFocus={true}
-                        textAlign="end"
+                    </Cell>
+                    <Cell
+                      textAlign="end"
+                    >
+                      <Text
+                        as="span"
+                        letterSpacing="normal"
+                        size="small"
+                        weight="bold"
+                        wrap="normal"
                       >
-                        <Text
-                          as="span"
-                          letterSpacing="normal"
-                          size="small"
-                          weight="bold"
-                          wrap="normal"
-                        >
-                          222
-                        </Text>
-                      </View>
-                    </td>
-                  </tr>
-                </tbody>
+                        222
+                      </Text>
+                    </Cell>
+                  </Row>
+                </Body>
               </Table>
             </View>
             <View
@@ -503,38 +428,41 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
               textAlign="center"
             >
               <Table
-                caption={
-                  <ScreenReaderContent
-                    as="span"
-                  >
-                    Login info
-                  </ScreenReaderContent>
-                }
+                caption="Login info"
                 hover={false}
                 layout="auto"
-                size="medium"
               >
-                <thead>
-                  <tr>
-                    <th>
+                <Head>
+                  <Row>
+                    <ColHeader
+                      id="actasmodal-category"
+                      sortDirection="none"
+                      textAlign="start"
+                    >
                       <ScreenReaderContent
                         as="span"
                       >
                         Category
                       </ScreenReaderContent>
-                    </th>
-                    <th>
+                    </ColHeader>
+                    <ColHeader
+                      id="actasmodal-userinfo"
+                      sortDirection="none"
+                      textAlign="start"
+                    >
                       <ScreenReaderContent
                         as="span"
                       >
                         User information
                       </ScreenReaderContent>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
+                    </ColHeader>
+                  </Row>
+                </Head>
+                <Body>
+                  <Row>
+                    <Cell
+                      textAlign="start"
+                    >
                       <Text
                         as="span"
                         letterSpacing="normal"
@@ -543,36 +471,25 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                       >
                         Login ID:
                       </Text>
-                    </td>
-                    <td>
-                      <View
-                        as="div"
-                        borderColor="default"
-                        debug={false}
-                        display="auto"
-                        focusColor="info"
-                        focusPosition="offset"
-                        focused={false}
-                        overflowX="visible"
-                        overflowY="visible"
-                        position="static"
-                        shouldAnimateFocus={true}
-                        textAlign="end"
+                    </Cell>
+                    <Cell
+                      textAlign="end"
+                    >
+                      <Text
+                        as="span"
+                        letterSpacing="normal"
+                        size="small"
+                        weight="bold"
+                        wrap="normal"
                       >
-                        <Text
-                          as="span"
-                          letterSpacing="normal"
-                          size="small"
-                          weight="bold"
-                          wrap="normal"
-                        >
-                          tic
-                        </Text>
-                      </View>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
+                        tic
+                      </Text>
+                    </Cell>
+                  </Row>
+                  <Row>
+                    <Cell
+                      textAlign="start"
+                    >
                       <Text
                         as="span"
                         letterSpacing="normal"
@@ -581,36 +498,25 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                       >
                         SIS ID:
                       </Text>
-                    </td>
-                    <td>
-                      <View
-                        as="div"
-                        borderColor="default"
-                        debug={false}
-                        display="auto"
-                        focusColor="info"
-                        focusPosition="offset"
-                        focused={false}
-                        overflowX="visible"
-                        overflowY="visible"
-                        position="static"
-                        shouldAnimateFocus={true}
-                        textAlign="end"
+                    </Cell>
+                    <Cell
+                      textAlign="end"
+                    >
+                      <Text
+                        as="span"
+                        letterSpacing="normal"
+                        size="small"
+                        weight="bold"
+                        wrap="normal"
                       >
-                        <Text
-                          as="span"
-                          letterSpacing="normal"
-                          size="small"
-                          weight="bold"
-                          wrap="normal"
-                        >
-                          777
-                        </Text>
-                      </View>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
+                        777
+                      </Text>
+                    </Cell>
+                  </Row>
+                  <Row>
+                    <Cell
+                      textAlign="start"
+                    >
                       <Text
                         as="span"
                         letterSpacing="normal"
@@ -619,35 +525,22 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                       >
                         Integration ID:
                       </Text>
-                    </td>
-                    <td>
-                      <View
-                        as="div"
-                        borderColor="default"
-                        debug={false}
-                        display="auto"
-                        focusColor="info"
-                        focusPosition="offset"
-                        focused={false}
-                        overflowX="visible"
-                        overflowY="visible"
-                        position="static"
-                        shouldAnimateFocus={true}
-                        textAlign="end"
+                    </Cell>
+                    <Cell
+                      textAlign="end"
+                    >
+                      <Text
+                        as="span"
+                        letterSpacing="normal"
+                        size="small"
+                        weight="bold"
+                        wrap="normal"
                       >
-                        <Text
-                          as="span"
-                          letterSpacing="normal"
-                          size="small"
-                          weight="bold"
-                          wrap="normal"
-                        >
-                          888
-                        </Text>
-                      </View>
-                    </td>
-                  </tr>
-                </tbody>
+                        888
+                      </Text>
+                    </Cell>
+                  </Row>
+                </Body>
               </Table>
             </View>
             <View

@@ -85,7 +85,7 @@ module DataFixup
 
     def write_batch(batch)
       return if batch.empty?
-      database.batch { batch.each { |r| r.index.insert(r.record, r.key) } }
+      database.batch { batch.each { |r| r.index.strategy_for(:cassandra).insert(r.record, r.key) } }
     end
 
     def database

@@ -18,7 +18,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import bridge from '../../../../../bridge'
-import {getContentFromEditor} from '../../../shared/ContentSelection'
+import {isOnlyTextSelected, getAnchorElement} from '../../../../contentInsertionUtils'
 import LinkOptionsDialog from './index'
 
 export const CONTAINER_ID = 'instructure-link-options-tray-container'
@@ -59,7 +59,7 @@ export default class LinkOptionsDialogController {
 
   _applyLinkOptions(linkOptions) {
     this._dismissDialog()
-    bridge.insertLink(linkOptions, linkOptions.text)
+    bridge.insertLink(linkOptions)
   }
 
   _dismissDialog = () => {
@@ -75,8 +75,15 @@ export default class LinkOptionsDialogController {
   }
 
   _renderDialog() {
-    const content = getContentFromEditor(this._editor, this._op === EDIT_LINK)
+    let html, onlyText, anchorElm, url, text
+
     if (this._shouldOpen) {
+      html = this._editor.selection.getContent()
+      onlyText = isOnlyTextSelected(html)
+      text = onlyText && this._editor.selection.getContent({format: 'text'})
+      anchorElm = getAnchorElement(this._editor, this._editor.selection.getNode())
+      url = anchorElm?.getAttribute('href')
+
       /*
        * When the dialog is being opened again, it should be rendered fresh
        * (clearing the internal state) so that the currently-selected content
@@ -88,8 +95,9 @@ export default class LinkOptionsDialogController {
       <LinkOptionsDialog
         key={this._renderId}
         size="medium"
-        text={content.text}
-        url={content.url}
+        showText={onlyText}
+        text={text}
+        url={url}
         operation={this._op}
         onEntered={() => {
           this._isOpen = true

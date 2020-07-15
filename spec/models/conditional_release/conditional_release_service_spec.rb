@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require_relative '../../conditional_release_spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConditionalRelease::Service do
@@ -493,32 +493,6 @@ describe ConditionalRelease::Service do
         Service.rule_triggered_by(@a1, @teacher, nil)
       end
     end
-
-    describe 'rules_assigning' do
-      before(:each) do
-        allow(Service).to receive(:active_rules).and_return(default_rules)
-      end
-
-      it 'caches the calculation of the reverse index' do
-        enable_cache do
-          expect do
-            Service.rules_assigning(@a1, @teacher, nil)
-            allow(Service).to receive(:active_rules).and_raise 'should not refetch rules'
-            Service.rules_assigning(@a2, @teacher, nil)
-          end.to_not raise_error
-        end
-      end
-
-      it 'returns all rules which matched assignments' do
-        expect(Service.rules_assigning(@a2, @teacher, nil).map{|r| r['id']}).to eq [1]
-        expect(Service.rules_assigning(@a3, @teacher, nil).map{|r| r['id']}).to eq [1, 2]
-      end
-
-      it 'returns nil if no rules matched assignments' do
-        expect(Service.rules_assigning(@a1, @teacher, nil)).to eq nil
-        expect(Service.rules_assigning(@a4, @teacher, nil)).to eq nil
-      end
-    end
   end
 
   describe 'rules_for' do
@@ -550,7 +524,7 @@ describe ConditionalRelease::Service do
       expect(CanvasHttp).to receive(:post).once.and_return(response)
     end
 
-    let(:rules) { Service.rules_for(@course, @student, [], nil) }
+    let(:rules) { Service.rules_for(@course, @student, nil) }
     let(:assignments0) { rules[0][:assignment_sets][0][:assignments] }
     let(:models0) { assignments0.map{|a| a[:model]} }
 
@@ -601,55 +575,55 @@ describe ConditionalRelease::Service do
       it 'uses the cache' do
         enable_cache do
           expect_cyoe_request '200', @a1
-          Service.rules_for(@course, @student, [], nil)
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
+          Service.rules_for(@course, @student, nil)
         end
       end
 
       it 'does not use the cache if cache cleared manually' do
         enable_cache do
           expect_cyoe_request '200', @a1
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
 
           Service.clear_rules_cache_for(@course, @student)
 
           expect_cyoe_request '200', @a1
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
         end
       end
 
       it 'does not use the cache if assignments updated' do
         enable_cache do
           expect_cyoe_request '200', @a1
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
 
           @a1.title = 'updated'
           @a1.save!
 
           expect_cyoe_request '200', @a1
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
         end
       end
 
       it 'does not use the cache if assignments are saved' do
         enable_cache do
           expect_cyoe_request '200', @a1
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
 
           @a1.save!
 
           expect_cyoe_request '200', @a1
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
         end
       end
 
       it 'does not store an error response in the cache' do
         enable_cache do
           expect_cyoe_request '404'
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
 
           expect_cyoe_request '404'
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
         end
       end
     end
@@ -686,7 +660,7 @@ describe ConditionalRelease::Service do
             submission_model(course: @course, user: @student)
             @submission.assignment.grade_student(@student, grade: 10, grader: @teacher)
             expect_request_rules(@submission.reload)
-            Service.rules_for(@course, @student, [], nil)
+            Service.rules_for(@course, @student, nil)
           end
         end
       end
@@ -699,7 +673,7 @@ describe ConditionalRelease::Service do
         s2 = graded_submission_model(course: @course, user: @student)
         s2.assignment.grade_student(@student, grade: 10, grader: @teacher)
         expect_request_rules(s2.reload)
-        Service.rules_for(@course, @student, [], nil)
+        Service.rules_for(@course, @student, nil)
       end
 
       it 'includes only completely graded submissions' do
@@ -707,7 +681,7 @@ describe ConditionalRelease::Service do
         s1.assignment.grade_student(@student, grade: 10, grader: @teacher)
         _s2 = submission_model(course: @course, user: @student)
         expect_request_rules(s1.reload)
-        Service.rules_for(@course, @student, [], nil)
+        Service.rules_for(@course, @student, nil)
       end
 
       it 'includes only non-muted assignments' do
@@ -715,11 +689,11 @@ describe ConditionalRelease::Service do
         enable_cache do
           @submission.assignment.mute!
           expect_request_rules([])
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
 
           @submission.assignment.unmute!
           expect_request_rules(@submission)
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
         end
       end
 
@@ -735,7 +709,7 @@ describe ConditionalRelease::Service do
         enable_cache do
           @submission.assignment.post_submissions(submission_ids: [@submission.id])
           expect_request_rules(@submission.reload)
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
         end
       end
 
@@ -752,7 +726,110 @@ describe ConditionalRelease::Service do
           @submission.assignment.post_submissions
           @submission.assignment.hide_submissions(submission_ids: [@submission.id])
           expect_request_rules([])
-          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, nil)
+        end
+      end
+    end
+  end
+
+  context "native conditional release" do
+    before :once do
+      setup_course_with_native_conditional_release
+    end
+
+    context "active_rules" do
+      it "should show all the rules in the course to teachers" do
+        data = Service.active_rules(@course, @teacher, nil)
+        # basically it's just the same thing as returned by the api
+        expect(data.first["scoring_ranges"].first["assignment_sets"].first["assignment_set_associations"].first["assignment_id"]).to eq @set1_assmt1.id
+        expect(data.first["trigger_assignment_model"]["points_possible"]).to eq @trigger_assmt.points_possible
+      end
+
+      context "caching" do
+        specs_require_cache(:redis_cache_store)
+
+        it "should cache across admins" do
+          old_teacher = @teacher
+          teacher_in_course(:course => @course)
+          data = Service.active_rules(@course, old_teacher, nil)
+          @course.conditional_release_rules.update_all(:deleted_at => Time.now.utc) # skip callbacks
+          expect(Service.active_rules(@course, @teacher, nil)).to eq data # doesn't matter who accesses it if they have rights
+        end
+
+        it "should invalidate cache when a rule is saved" do
+          Service.active_rules(@course, @teacher, nil)
+          @rule.update_attribute(:deleted_at, Time.now.utc)
+          expect(Service.active_rules(@course, @teacher, nil)).to eq []
+        end
+
+        it "should invalidate cache when a trigger assignment is deleted" do
+          Service.active_rules(@course, @teacher, nil)
+          @trigger_assmt.destroy
+          expect(Service.active_rules(@course, @teacher, nil)).to eq []
+        end
+
+        it "should invalidate cache when a releasable assignment is deleted" do
+          old_data = Service.active_rules(@course, @teacher, nil)
+          @set1_assmt1.destroy
+          data = Service.active_rules(@course, @teacher, nil)
+          expect(data).to_not eq old_data
+          expect(data.first["scoring_ranges"].first["assignment_sets"].first["assignment_set_associations"]).to eq []
+        end
+      end
+    end
+
+    context "rules_for" do
+      it "should return no assignment set data for unreleased rules" do
+        data = Service.rules_for(@course, @student, nil)
+        expect(data.count).to eq 1
+        rule_hash = data.first
+        expect(rule_hash['trigger_assignment_id']).to eq @trigger_assmt.id
+        expect(rule_hash['locked']).to eq true
+        expect(rule_hash['selected_set_id']).to eq nil
+        expect(rule_hash['assignment_sets']).to eq []
+      end
+
+      it "should return data about released assignment sets" do
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        rule_hash = Service.rules_for(@course, @student, nil).first
+        expect(rule_hash['trigger_assignment_id']).to eq @trigger_assmt.id
+        expect(rule_hash['locked']).to eq false
+        released_set = @set1_assmt1.conditional_release_associations.first.assignment_set
+        expect(rule_hash['selected_set_id']).to eq released_set.id
+        expect(rule_hash['assignment_sets'].count).to eq 1
+        set_hash = rule_hash['assignment_sets'].first
+        expect(set_hash['assignment_set_associations'].first['model']).to eq @set1_assmt1
+      end
+
+      it "should return data about multiple assignment set choices" do
+        @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher) # has two choices now
+        rule_hash = Service.rules_for(@course, @student, nil).first
+        expect(rule_hash['trigger_assignment_id']).to eq @trigger_assmt.id
+        expect(rule_hash['locked']).to eq false
+        expect(rule_hash['selected_set_id']).to eq nil # neither one was picked yet
+        expect(rule_hash['assignment_sets'].count).to eq 2
+        expect(rule_hash['assignment_sets'].map{|s| s['assignment_set_associations'].first['model']}).to match_array([@set3a_assmt, @set3b_assmt])
+      end
+
+      context "caching" do
+        specs_require_cache(:redis_cache_store)
+
+        it "should cache" do
+          data = Service.rules_for(@course, @student, nil)
+          @course.conditional_release_rules.update_all(:deleted_at => Time.now.utc) # skip callbacks
+          expect(Service.rules_for(@course, @student, nil)).to eq data
+        end
+
+        it "should invalidate cache on rule change" do
+          data = Service.rules_for(@course, @student, nil)
+          @rule.update_attribute(:deleted_at, Time.now.utc)
+          expect(Service.rules_for(@course, @student, nil)).to eq []
+        end
+
+        it "should invalidate cache on submission change" do
+          data = Service.rules_for(@course, @student, nil)
+          @trigger_assmt.grade_student(@student, grade: 8, grader: @teacher)
+          expect(Service.rules_for(@course, @student, nil)).to_not eq data
         end
       end
     end

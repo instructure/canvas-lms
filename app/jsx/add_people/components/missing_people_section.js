@@ -19,8 +19,8 @@
 import I18n from 'i18n!add_people_missing_people_section'
 import React from 'react'
 import PropTypes from 'prop-types'
-import shapes from './shapes'
-import {Table} from '@instructure/ui-elements'
+import {missingsShape} from './shapes'
+import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextInput, Checkbox} from '@instructure/ui-forms'
 import {Button} from '@instructure/ui-buttons'
@@ -36,7 +36,7 @@ function eatEvent(event) {
 
 class MissingPeopleSection extends React.Component {
   static propTypes = {
-    missing: PropTypes.shape(shapes.missingsShape).isRequired,
+    missing: PropTypes.shape(missingsShape).isRequired,
     searchType: PropTypes.string.isRequired,
     inviteUsersURL: PropTypes.string,
     onChange: PropTypes.func.isRequired
@@ -52,10 +52,10 @@ class MissingPeopleSection extends React.Component {
     this.state = {
       selectAll: false
     }
-    this.tbodyNode = null
+    this.tbodyNode = React.createRef()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const all = Object.keys(nextProps.missing).every(m => nextProps.missing[m].createNew)
     this.setState({selectAll: all})
   }
@@ -74,7 +74,7 @@ class MissingPeopleSection extends React.Component {
     ) {
       // The link was rendered with the attribute data-address=address for this row.
       // Use it to find the checkbox with the matching value.
-      const checkbox = this.tbodyNode.querySelector(
+      const checkbox = this.tbodyNode.current.querySelector(
         `input[type="checkbox"][value="${event.currentTarget.getAttribute('data-address')}"]`
       )
       if (checkbox) {
@@ -155,14 +155,14 @@ class MissingPeopleSection extends React.Component {
       if (!this.props.inviteUsersURL) {
         // cannot create new users. Just show the missing ones
         row = (
-          <tr key={`missing_${missing.address}`}>
-            <th scope="row">{missing.address}</th>
-          </tr>
+          <Table.Row key={`missing_${missing.address}`}>
+            <Table.RowHeader>{missing.address}</Table.RowHeader>
+          </Table.Row>
         )
       } else if (missing.createNew) {
         row = (
-          <tr key={`missing_${missing.address}`}>
-            <td>
+          <Table.Row key={`missing_${missing.address}`}>
+            <Table.Cell>
               <Checkbox
                 value={missing.address}
                 checked
@@ -175,8 +175,8 @@ class MissingPeopleSection extends React.Component {
                   </ScreenReaderContent>
                 }
               />
-            </td>
-            <td>
+            </Table.Cell>
+            <Table.Cell>
               <TextInput
                 required
                 name="name"
@@ -187,8 +187,8 @@ class MissingPeopleSection extends React.Component {
                 onChange={this.onNewForMissingChange}
                 value={missing.newUserInfo.name || ''}
               />
-            </td>
-            <td>
+            </Table.Cell>
+            <Table.Cell>
               <TextInput
                 required
                 name="email"
@@ -199,14 +199,14 @@ class MissingPeopleSection extends React.Component {
                 onChange={this.onNewForMissingChange}
                 value={missing.newUserInfo.email || ''}
               />
-            </td>
-            <th scope="row">{missing.address}</th>
-          </tr>
+            </Table.Cell>
+            <Table.RowHeader>{missing.address}</Table.RowHeader>
+          </Table.Row>
         )
       } else {
         row = (
-          <tr key={`missing_${missing.address}`}>
-            <td>
+          <Table.Row key={`missing_${missing.address}`}>
+            <Table.Cell>
               <Checkbox
                 value={missing.address}
                 checked={false}
@@ -217,8 +217,8 @@ class MissingPeopleSection extends React.Component {
                   </ScreenReaderContent>
                 }
               />
-            </td>
-            <td colSpan="2">
+            </Table.Cell>
+            <Table.Cell colSpan="2">
               <Button
                 variant="link"
                 onClick={this.onSelectNewForMissing}
@@ -226,9 +226,9 @@ class MissingPeopleSection extends React.Component {
               >
                 {namePrompt}
               </Button>
-            </td>
-            <th scope="row">{missing.address}</th>
-          </tr>
+            </Table.Cell>
+            <Table.RowHeader>{missing.address}</Table.RowHeader>
+          </Table.Row>
         )
       }
       return row
@@ -246,14 +246,14 @@ class MissingPeopleSection extends React.Component {
       if (!this.props.inviteUsersURL) {
         // cannot create new users. Just show the missing ones
         row = (
-          <tr key={`missing_${missing.address}`}>
-            <th scope="row">{missing.address}</th>
-          </tr>
+          <Table.Row key={`missing_${missing.address}`}>
+            <Table.RowHeader>{missing.address}</Table.RowHeader>
+          </Table.Row>
         )
       } else if (missing.createNew) {
         row = (
-          <tr key={`missing_${missing.address}`}>
-            <td>
+          <Table.Row key={`missing_${missing.address}`}>
+            <Table.Cell>
               <Checkbox
                 value={missing.address}
                 checked
@@ -266,8 +266,8 @@ class MissingPeopleSection extends React.Component {
                   </ScreenReaderContent>
                 }
               />
-            </td>
-            <td>
+            </Table.Cell>
+            <Table.Cell>
               <TextInput
                 required
                 name="name"
@@ -278,14 +278,14 @@ class MissingPeopleSection extends React.Component {
                 onChange={this.onNewForMissingChange}
                 value={missing.newUserInfo.name || ''}
               />
-            </td>
-            <th scope="row">{missing.address}</th>
-          </tr>
+            </Table.Cell>
+            <Table.RowHeader>{missing.address}</Table.RowHeader>
+          </Table.Row>
         )
       } else {
         row = (
-          <tr key={`missing_${missing.address}`} checked={false}>
-            <td>
+          <Table.Row key={`missing_${missing.address}`}>
+            <Table.Cell>
               <Checkbox
                 value={missing.address}
                 checked={false}
@@ -296,8 +296,8 @@ class MissingPeopleSection extends React.Component {
                   </ScreenReaderContent>
                 }
               />
-            </td>
-            <td>
+            </Table.Cell>
+            <Table.Cell>
               <Button
                 variant="link"
                 onClick={this.onSelectNewForMissing}
@@ -306,9 +306,9 @@ class MissingPeopleSection extends React.Component {
               >
                 {namePrompt}
               </Button>
-            </td>
-            <th scope="row">{missing.address}</th>
-          </tr>
+            </Table.Cell>
+            <Table.RowHeader>{missing.address}</Table.RowHeader>
+          </Table.Row>
         )
       }
       return row
@@ -318,16 +318,16 @@ class MissingPeopleSection extends React.Component {
   renderTableHead() {
     let idColHeader = null
     if (this.props.searchType === 'unique_id') {
-      idColHeader = <th scope="col">{I18n.t('Login ID')}</th>
+      idColHeader = <Table.ColHeader id="login-id">{I18n.t('Login ID')}</Table.ColHeader>
     } else if (this.props.searchType === 'sis_user_id') {
-      idColHeader = <th scope="col">{I18n.t('SIS ID')}</th>
+      idColHeader = <Table.ColHeader id="sis-id">{I18n.t('SIS ID')}</Table.ColHeader>
     }
 
     if (this.props.inviteUsersURL) {
       return (
-        <thead>
-          <tr>
-            <th scope="col">
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="user-selection">
               <ScreenReaderContent>{I18n.t('User Selection')}</ScreenReaderContent>
               <Checkbox
                 id="missing_users_select_all"
@@ -336,19 +336,21 @@ class MissingPeopleSection extends React.Component {
                 onChange={this.onSelectNewForMissingAll}
                 label={<ScreenReaderContent>{I18n.t('Check to select all')}</ScreenReaderContent>}
               />
-            </th>
-            <th scope="col">{I18n.t('Name')}</th>
-            <th scope="col">{I18n.t('Email Address')}</th>
+            </Table.ColHeader>
+            <Table.ColHeader id="name">{I18n.t('Name')}</Table.ColHeader>
+            <Table.ColHeader id="email">{I18n.t('Email Address')}</Table.ColHeader>
             {idColHeader}
-          </tr>
-        </thead>
+          </Table.Row>
+        </Table.Head>
       )
     }
-    idColHeader = idColHeader || <th scope="col">{I18n.t('Email Address')}</th>
+    idColHeader = idColHeader || (
+      <Table.ColHeader id="email-id">{I18n.t('Email Address')}</Table.ColHeader>
+    )
     return (
-      <thead>
-        <tr>{idColHeader}</tr>
-      </thead>
+      <Table.Head>
+        <Table.Row>{idColHeader}</Table.Row>
+      </Table.Head>
     )
   }
 
@@ -360,15 +362,11 @@ class MissingPeopleSection extends React.Component {
           caption={<ScreenReaderContent>{I18n.t('Unmatched login list')}</ScreenReaderContent>}
         >
           {this.renderTableHead()}
-          <tbody
-            ref={n => {
-              this.tbodyNode = n
-            }}
-          >
+          <Table.Body ref={this.tbodyNode}>
             {this.props.searchType === 'cc_path'
               ? this.renderMissingEmail()
               : this.renderMissingIds()}
-          </tbody>
+          </Table.Body>
         </Table>
       </div>
     )

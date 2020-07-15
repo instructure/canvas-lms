@@ -132,10 +132,6 @@
   position: relative;
   min-height: 5px;
   max-width: 100%;
-  // firefox max-width images break the parent container
-  @-moz-document url-prefix() {
-    overflow-x: hidden;
-  }
   a:not(.btn, .Button) {
     text-decoration: underline;
   }

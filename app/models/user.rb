@@ -141,7 +141,7 @@ class User < ActiveRecord::Base
   has_many :assessment_question_bank_users
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
   has_many :learning_outcome_results
-
+  has_many :trophies, inverse_of: :user, dependent: :destroy
   has_many :collaborators
   has_many :collaborations, -> { preload(:user, :collaborators) }, through: :collaborators
   has_many :assigned_submission_assessments, -> { preload(:user, submission: :assignment) }, class_name: 'AssessmentRequest', foreign_key: 'assessor_id'
@@ -1045,6 +1045,7 @@ class User < ActiveRecord::Base
   def self.clone_communication_channel(cc, new_user, max_position)
     new_cc = cc.clone
     new_cc.shard = new_user.shard
+    new_cc.root_account_id = nil if cc.shard != new_cc.shard
     new_cc.position += max_position
     new_cc.user = new_user
     new_cc.save!

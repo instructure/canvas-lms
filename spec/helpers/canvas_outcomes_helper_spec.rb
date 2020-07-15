@@ -88,6 +88,27 @@ describe CanvasOutcomesHelper do
 
         it_behaves_like 'valid js_env settings'
       end
+
+      context 'within a Group' do
+        before do
+          outcome_model(context: @course)
+          @group = @course.groups.create(:name => "some group")
+        end
+
+        it 'sets js_env with the group.context values' do
+          expect(subject).to receive(:extract_domain_jwt).and_return ['domain', 'jwt']
+          expect(subject).to receive(:js_env).with({
+            canvas_outcomes: {
+              artifact_type: 'canvas.page',
+              artifact_id: wiki_page.id,
+              context_uuid: @course.uuid,
+              host: 'http://domain',
+              jwt: 'jwt'
+            }
+          })
+          subject.set_outcomes_alignment_js_env(wiki_page, @group, {})
+        end
+      end
     end
   end
 

@@ -51,66 +51,6 @@ class AssetUserAccess < ActiveRecord::Base
     self.asset_category = val
   end
 
-  def self.by_category(list, old_list=[])
-    res = {}.with_indifferent_access
-    res[:categories] = {}
-    res[:totals] = {}
-    res[:prior_totals] = {}
-    Rails.cache.fetch(['access_by_category', list.first, list.last, list.length].cache_key) do
-      list.each{|a|
-        a.category ||= 'unknown'
-        cat = res[:categories][a.category] || {}
-        cat[:view_tally] ||= 0
-        cat[:view_tally] += a.view_score || 0
-        cat[:participate_tally] ||= 0
-        cat[:participate_tally] += a.participate_score || 0
-        cat[:interaction_seconds] = (cat[:interaction_seconds] || 0) + ((a.interaction_seconds || 30) * a.view_score)
-        cat[:user_ids] ||= {}
-        cat[:user_ids][a.user_id] = (cat[:user_ids][a.user_id] || 0) + 1
-        cat[:membership_types] ||= {}
-        cat[:membership_types][a.membership_type || "Other"] = (cat[:membership_types][a.membership_type || "Other"] || 0) + (a.view_score || 0)
-        cat[:assets] ||= {}
-        cat[:assets][a.asset_code] ||= {}
-        cat[:assets][a.asset_code][:view_tally] ||= 0
-        cat[:assets][a.asset_code][:view_tally] += a.view_score || 0
-        cat[:assets][a.asset_code][:participate_tally] ||= 0
-        cat[:assets][a.asset_code][:participate_tally] += a.participate_score || 0
-        cat[:assets][a.asset_code][:display_name] ||= a.display_name
-        res[:categories][a.category] = cat
-        res[:totals][:view_tally] ||= 0
-        res[:totals][:view_tally] += a.view_score || 0
-        res[:totals][:participate_tally] ||= 0
-        res[:totals][:participate_tally] += a.participate_score || 0
-      }
-      (old_list || []).each{|a|
-        a.category ||= 'unknown'
-        cat = res[:categories][a.category] || {}
-        cat[:prior_view_tally] ||= 0
-        cat[:prior_view_tally] += a.view_score || 0
-        cat[:participate_tally] ||= 0
-        cat[:participate_tally] += a.participate_score || 0
-        cat[:prior_assets] ||= {}
-        cat[:prior_assets][a.asset_code] ||= {}
-        cat[:prior_assets][a.asset_code][:view_tally] ||= 0
-        cat[:prior_assets][a.asset_code][:view_tally] += a.view_score || 0
-        cat[:prior_assets][a.asset_code][:participate_tally] ||= 0
-        cat[:prior_assets][a.asset_code][:participate_tally] += a.participate_score || 0
-        cat[:prior_assets][a.asset_code][:display_name] ||= a.display_name
-        res[:categories][a.category] = cat
-        res[:prior_totals][:view_tally] ||= 0
-        res[:prior_totals][:view_tally] += a.view_score || 0
-        res[:prior_totals][:participate_tally] ||= 0
-        res[:prior_totals][:participate_tally] += a.participate_score || 0
-      }
-      res[:categories].each{|key, val|
-        res[:categories][key][:participate_average] = (res[:categories][key][:participate_tally].to_f / res[:totals][:participate_tally].to_f * 100).round / 100.0 rescue 0
-        res[:categories][key][:view_average] = (res[:categories][key][:view_tally].to_f / res[:totals][:view_tally].to_f * 100).round rescue 0
-        res[:categories][key][:interaction_seconds_average] = (res[:categories][key][:interaction_seconds].to_f / res[:categories][key][:view_tally].to_f * 100).round / 100.0 rescue 0
-      }
-      res
-    end
-  end
-
   def display_name
     # repair existing AssetUserAccesses that have bad display_names
     if read_attribute(:display_name) == asset_code

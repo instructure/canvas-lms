@@ -20,11 +20,14 @@ class OutcomeProficiency < ApplicationRecord
   has_many :outcome_proficiency_ratings, -> { order 'points DESC, id ASC' },
     dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
   belongs_to :account, inverse_of: :outcome_proficiency
+  belongs_to :root_account, class_name: 'Account', inverse_of: :outcome_proficiency
 
   validates :account, uniqueness: true, presence: true
   validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }
   validate :single_mastery_rating
   validate :strictly_decreasing_points
+
+  before_save :set_root_account_id
 
   def as_json(_options={})
     {
@@ -51,5 +54,10 @@ class OutcomeProficiency < ApplicationRecord
           t("Points should be strictly decreasing: %{l} <= %{r}", l: l.points, r: r.points))
       end
     end
+  end
+
+  def set_root_account_id
+    return if self.root_account_id.present?
+    self.root_account_id = self.account.resolved_root_account_id
   end
 end

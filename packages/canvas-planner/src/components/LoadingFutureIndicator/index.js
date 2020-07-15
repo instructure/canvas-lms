@@ -19,7 +19,8 @@ import React, {Component} from 'react'
 import {bool, func, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-layout'
-import {Spinner, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import ErrorAlert from '../ErrorAlert'
 import formatMessage from '../../format-message'
 
@@ -28,18 +29,14 @@ export default class LoadingFutureIndicator extends Component {
     loadingFuture: bool,
     allFutureItemsLoaded: bool,
     onLoadMore: func,
-    loadingError: string,
-    plannerActive: func
+    loadingError: string
   }
 
   static defaultProps = {
     loadingFuture: false,
     allFutureItemsLoaded: false,
     onLoadMore: () => {},
-    loadingError: undefined,
-    plannerActive: () => {
-      return false
-    }
+    loadingError: undefined
   }
 
   handleLoadMoreButton = () => {

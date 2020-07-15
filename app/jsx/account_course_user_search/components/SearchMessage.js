@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {Billboard} from '@instructure/ui-billboard'
 import {Pagination} from '@instructure/ui-pagination'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {array, func, string, shape, oneOf} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import {View} from '@instructure/ui-layout'

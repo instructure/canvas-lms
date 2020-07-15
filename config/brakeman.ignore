@@ -3,11 +3,31 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "39e7cf18fc30e291caf214390683dbf5b0d247b0682c18d9ec84f6c5754cbbc1",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/grade_calculator.rb",
+      "line": 703,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Score.connection.execute(\"\\n      INSERT INTO #{Score.quoted_table_name} (\\n        enrollment_id, assignment_group_id,\\n        #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")},\\n        course_score, root_account_id, created_at, updated_at\\n      )\\n        SELECT\\n          val.enrollment_id AS enrollment_id,\\n          val.assignment_group_id as assignment_group_id,\\n          #{assignment_group_columns_to_insert_or_update[:insert_columns].join(\", \")},\\n          FALSE AS course_score,\\n          #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n          #{updated_at} AS created_at,\\n          #{updated_at} AS updated_at\\n        FROM (VALUES #{score_values}) val\\n          (\\n            enrollment_id,\\n            assignment_group_id,\\n            #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")}\\n          )\\n      ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL\\n      DO UPDATE SET\\n        #{assignment_group_columns_to_insert_or_update[:update_columns].join(\", \")},\\n        updated_at = excluded.updated_at,\\n        root_account_id = #{(course or Course.find(course)).root_account_id},\\n        workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n    \")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradeCalculator",
+        "method": "save_assignment_group_scores"
+      },
+      "user_input": "assignment_group_columns_to_insert_or_update[:value_names].join(\", \")",
+      "confidence": "Medium",
+      "note": "values being inserted do not come from user input."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "6c187af95302423b293a6ee5fcc3233c199e0f82d858931c478515c5f2d22cad",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/outcome_results_controller.rb",
-      "line": 572,
+      "line": 596,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql((User.sortable_name_order_by_clause(User.quoted_table_name) or \"#{User.sortable_name_order_by_clause(User.quoted_table_name)} DESC\"))",
       "render_path": null,
@@ -23,11 +43,31 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "6cf45dc47f15a06b8f69c3df2521c24ef83016b18b2c4b9a348c98517d9fa6eb",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/grade_calculator.rb",
+      "line": 739,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ScoreMetadata.connection.execute(\"\\n        INSERT INTO #{ScoreMetadata.quoted_table_name}\\n          (score_id, calculation_details, created_at, updated_at)\\n          SELECT\\n            scores.id AS score_id,\\n            CAST(val.calculation_details as json) AS calculation_details,\\n            #{updated_at} AS created_at,\\n            #{updated_at} AS updated_at\\n          FROM (VALUES #{dropped_values}) val\\n            (enrollment_id, assignment_group_id, calculation_details)\\n          LEFT OUTER JOIN #{Score.quoted_table_name} scores ON\\n            scores.enrollment_id = val.enrollment_id AND\\n            scores.assignment_group_id = val.assignment_group_id\\n        ON CONFLICT (score_id)\\n        DO UPDATE SET\\n          calculation_details = excluded.calculation_details,\\n          updated_at = excluded.updated_at\\n        ;\\n      \")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradeCalculator",
+        "method": "save_assignment_group_scores"
+      },
+      "user_input": "updated_at",
+      "confidence": "Medium",
+      "note": "values being inserted do not come from user input."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "799a44268d5cfe1ff43bcd239e02e4dc5fc10545c370095aaed3ec7e9975df6e",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/lti/ims/providers/memberships_provider.rb",
-      "line": 81,
+      "line": 79,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Submission.active.for_assignment(assignment).where(\"#{outer_user_id_column} = submissions.user_id\")",
       "render_path": null,
@@ -41,71 +81,13 @@
       "note": "No user input is passed in"
     },
     {
-      "note": "Submission.needs_grading_conditions accepts no user input",
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "90b239bee8ac22b4c5d6c4d81572f155d3c073446542fa3bad6135b4578e2a91",
-      "message": "Possible SQL injection",
-      "file": "app/models/assignment.rb",
-      "line": 1949,
-      "link": "http://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.where(\"assignment_id=assignments.id\").where(Submission.needs_grading_conditions)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Assignment",
-        "method": "need_grading_info"
-      },
-      "user_input": "Submission.needs_grading_conditions",
-      "confidence": "High"
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "a22e7dbb90204b4b932c4ca659085a3b6c18f43610450c9c59a0a432bbe081fa",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/submission_search.rb",
-      "line": 93,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"#{User.sortable_name_order_by_clause(\"users\")} #{(\"DESC NULLS LAST\" or \"ASC\")}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "SubmissionSearch",
-        "method": "add_orders"
-      },
-      "user_input": "User.sortable_name_order_by_clause(\"users\")",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "note": "Enrollment.active_student_conditions accepts no user input",
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "aba39acd96b69d6eb24de776b3a972a2d8f68133fe89c477b5acab2cb41a99f6",
-      "message": "Possible SQL injection",
-      "file": "app/models/enrollment.rb",
-      "line": 163,
-      "link": "http://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Enrollment.where(Enrollment.active_student_conditions)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Enrollment",
-        "method": "touch_assignments"
-      },
-      "user_input": "Enrollment.active_student_conditions",
-      "confidence": "High"
-    },
-    {
       "warning_type": "Remote Code Execution",
       "warning_code": 24,
       "fingerprint": "b5ba030e599093d2a5047494736d8a61807935ee92704d7f289da07646c862e4",
       "check_name": "UnsafeReflection",
-      "message": "Unsafe reflection method const_get called with parameter value",
+      "message": "Unsafe reflection method `const_get` called with parameter value",
       "file": "app/controllers/files_controller.rb",
-      "line": 810,
+      "line": 879,
       "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
       "code": "Object.const_get(params[:context_type])",
       "render_path": null,
@@ -119,64 +101,46 @@
       "note": "Value is whitelisted"
     },
     {
-      "note": "Enrollment.active_student_conditions accepts no user input",
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "b67a9b9726298fc3e829fd40dd141316eff1c8084cdc07e15a57ecc5b0bbacb9",
-      "message": "Possible SQL injection",
-      "file": "app/models/submission.rb",
-      "line": 213,
-      "link": "http://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Enrollment.where(Enrollment.active_student_conditions)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Submission",
-        "method": "touch_assignments"
-      },
-      "user_input": "Enrollment.active_student_conditions",
-      "confidence": "High"
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "d8e0d77e896b3da629e04233f458668fff1d130a6b969287822c292af1daeaad",
+      "fingerprint": "d4f9e6a8ce7a250aada977714592207aa2f5edeed50a0c63a05fdbfa5bba54f6",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/models/account.rb",
-      "line": 486,
+      "file": "lib/grade_calculator.rb",
+      "line": 605,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "self.associated_courses(:include_crosslisted_courses => opts[:include_crosslisted_courses]).active.order(\"#{Course.best_unicode_collation_key(\"courses.name\")} ASC\")",
+      "code": "Score.connection.execute(\"\\n      INSERT INTO #{Score.quoted_table_name}\\n          (\\n            enrollment_id, grading_period_id,\\n            #{columns_to_insert_or_update[:columns].join(\", \")},\\n            course_score, root_account_id, created_at, updated_at\\n          )\\n          SELECT\\n            enrollments.id as enrollment_id,\\n            #{(opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period].id or \"NULL\")} as grading_period_id,\\n            #{columns_to_insert_or_update[:insert_values].join(\", \")},\\n            #{if opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period] then\n  \"FALSE\"\nelse\n  \"TRUE\"\nend} AS course_score,\\n            #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n            #{updated_at} as created_at,\\n            #{updated_at} as updated_at\\n          FROM #{Enrollment.quoted_table_name} enrollments\\n          WHERE\\n            enrollments.id IN (#{joined_enrollment_ids})\\n      ON CONFLICT #{(\"(enrollment_id, grading_period_id) WHERE grading_period_id IS NOT NULL\" or \"(enrollment_id) WHERE course_score\")}\\n      DO UPDATE SET\\n          #{columns_to_insert_or_update[:update_values].join(\", \")},\\n          updated_at = excluded.updated_at,\\n          root_account_id = #{(course or Course.find(course)).root_account_id},\\n          -- if workflow_state was previously deleted for some reason, update it to active\\n          workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n    \")",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Account",
-        "method": "fast_course_base"
+        "class": "GradeCalculator",
+        "method": "save_course_and_grading_period_scores"
       },
-      "user_input": "Course.best_unicode_collation_key(\"courses.name\")",
-      "confidence": "High",
-      "note": "No user input is passed in to via opts['order'] in this function (see accounts_controller:sort_order)"
+      "user_input": "columns_to_insert_or_update[:columns].join(\", \")",
+      "confidence": "Medium",
+      "note": "values being inserted do not come from user input."
     },
     {
-      "note": "Enrollment.active_student_conditions accepts no user input",
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "f4e920699a6767e36d0e54f5c1ccd7a638a3654e8bef6e3ee6fbccffba76c345",
+      "fingerprint": "d8b569ca9d9f1bc701f854f35c463b45b8c69c3e0909033ccf2fc96a9d630130",
+      "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/models/submission.rb",
-      "line": 169,
-      "link": "http://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "joins(\"INNER JOIN #{Enrollment.quoted_table_name} ON #{quoted_table_name}.user_id=#{Enrollment.quoted_table_name}.user_id\").where(needs_grading_conditions).where(Enrollment.active_student_conditions)",
+      "file": "lib/grade_calculator.rb",
+      "line": 642,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ScoreMetadata.connection.execute(\"\\n      INSERT INTO #{ScoreMetadata.quoted_table_name}\\n        (score_id, calculation_details, created_at, updated_at)\\n        SELECT\\n          scores.id AS score_id,\\n          CASE enrollments.user_id\\n            #{{ user_id => ({ :current => ({ :dropped => scores[:current][:dropped] }), :final => ({ :dropped => scores[:final][:dropped] }) }) }.map do\n \"WHEN #{user_id} THEN cast('#{dropped.to_json}' as json)\"\n end.join(\" \")}\\n            ELSE NULL\\n          END AS calculation_details,\\n          #{updated_at} AS created_at,\\n          #{updated_at} AS updated_at\\n        FROM #{Score.quoted_table_name} scores\\n        INNER JOIN #{Enrollment.quoted_table_name} enrollments ON\\n          enrollments.id = scores.enrollment_id\\n        LEFT OUTER JOIN #{ScoreMetadata.quoted_table_name} metadata ON\\n          metadata.score_id = scores.id\\n        WHERE\\n          scores.enrollment_id IN (#{joined_enrollment_ids}) AND\\n          scores.assignment_group_id IS NULL AND\\n          #{if opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period] then\n  \"scores.grading_period_id = #{opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period].id}\"\nelse\n  \"scores.course_score IS TRUE\"\nend}\\n      ON CONFLICT (score_id)\\n      DO UPDATE SET\\n        calculation_details = excluded.calculation_details,\\n        updated_at = excluded.updated_at\\n      ;\\n    \")",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Submission",
-        "method": "needs_grading"
+        "class": "GradeCalculator",
+        "method": "save_course_and_grading_period_metadata"
       },
-      "user_input": "Enrollment.active_student_conditions",
-      "confidence": "High"
+      "user_input": "{ user_id => ({ :current => ({ :dropped => scores[:current][:dropped] }), :final => ({ :dropped => scores[:final][:dropped] }) }) }.map do\n \"WHEN #{user_id} THEN cast('#{dropped.to_json}' as json)\"\n end.join(\" \")",
+      "confidence": "Medium",
+      "note": "values being inserted do not come from user input."
     }
   ],
-  "updated": "2019-03-21 16:01:17 -0600",
-  "brakeman_version": "4.5.0"
+  "updated": "2020-06-09 16:34:47 -0500",
+  "brakeman_version": "4.8.2"
 }

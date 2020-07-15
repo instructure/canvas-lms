@@ -25,7 +25,7 @@ import {getCurrentAttempt} from './Attempt'
 import GradeDisplay from './GradeDisplay'
 import I18n from 'i18n!assignments_2'
 
-import LoadingIndicator from '../../shared/LoadingIndicator'
+import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import React, {lazy, Suspense, useState} from 'react'
 import SubmissionManager from './SubmissionManager'
 import {Submission} from '../graphqlData/Submission'

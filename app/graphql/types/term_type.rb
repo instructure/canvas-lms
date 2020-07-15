@@ -41,5 +41,12 @@ module Types
         term.courses
       end
     end
+
+    field :sis_id, String, null: true
+    def sis_id
+      load_association(:root_account).then do |root_account|
+        term.sis_source_id if root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
+      end
+    end
   end
 end

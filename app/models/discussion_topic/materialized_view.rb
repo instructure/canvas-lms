@@ -165,11 +165,9 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       # this process can take some time, and doing the "find_each"
       # approach holds the connection open the whole time, which
       # is a problem if the bouncer pool is small.  By grabbing
-      # ids and querying in batches, the connection gets recycled
-      # properly in between postgres queries.
-      entry_ids = all_entries.pluck(:id)
-      entry_ids.in_groups_of(1000, false) do |entry_id_batch|
-        entry_batch = DiscussionEntry.where(id: entry_id_batch).order(all_entries.order_values)
+      # ids and querying in batches with the ":pluck_ids" strategy,
+      # the connection gets recycled properly in between postgres queries.
+      all_entries.find_in_batches(strategy: :pluck_ids) do |entry_batch|
         entry_batch.each do |entry|
           json = discussion_entry_api_json([entry], discussion_topic.context, nil, nil, []).first
           entry_lookup[entry.id] = json

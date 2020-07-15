@@ -43,7 +43,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @course.wiki_pages.first.publish!
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}/pages/front-page"
-      expect(f('a[title="Link"]')).to include_text("text_file.txt")
+      expect(fj('a:contains("text_file.txt")')).to be_displayed
     end
   end
 

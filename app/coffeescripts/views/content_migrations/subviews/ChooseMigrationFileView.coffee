@@ -66,8 +66,7 @@ export default class ChooseMigrationFile extends Backbone.View
       fileErrors.push
                   type: "required"
                   message: I18n.t("file_required", "You must select a file to import content from")
-
-    if @fileSize(fileElement) > @fileSizeLimit
+    else if @fileSize(fileElement) > @fileSizeLimit
       fileErrors.push
                   type: "upload_limit_exceeded"
                   message: I18n.t("file_too_large", "Your migration cannot exceed %{file_size}", file_size: @humanReadableSize(@fileSizeLimit))

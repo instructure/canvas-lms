@@ -18,7 +18,6 @@
 
 import classnames from 'classnames'
 import {
-  renderLink,
   renderImage,
   renderLinkedImage,
   renderVideo,
@@ -26,7 +25,12 @@ import {
   mediaIframeSrcFromFile
 } from './contentRendering'
 import scroll from '../common/scroll'
-import {cleanUrl} from './contentInsertionUtils'
+import {
+  cleanUrl,
+  getAnchorElement,
+  isOnlyTextSelected,
+  isImageFigure
+} from './contentInsertionUtils'
 
 /** * generic content insertion ** */
 
@@ -156,24 +160,28 @@ function decorateLinkWithEmbed(link) {
   }
 }
 
-export function insertLink(editor, link, textOverride) {
+export function insertLink(editor, link) {
   const linkAttrs = {...link}
   if (linkAttrs.embed) {
     decorateLinkWithEmbed(linkAttrs)
     delete linkAttrs.embed
   }
-  return insertUndecoratedLink(editor, linkAttrs, textOverride)
+  return insertUndecoratedLink(editor, linkAttrs)
 }
 
 // link edit/create logic based on tinymce/plugins/link/plugin.js
-function insertUndecoratedLink(editor, linkProps, textOverride) {
+function insertUndecoratedLink(editor, linkProps) {
   const selectedElm = editor.selection.getNode()
   const anchorElm = getAnchorElement(editor, selectedElm)
-  const selectedHtml = editor.selection.getContent({format: 'text'})
+  const selectedContent = editor.selection.getContent()
+  const selectedPlainText = editor.selection.getContent({format: 'text'})
+  const onlyText = isOnlyTextSelected(selectedContent)
+
   const linkText =
-    (textOverride && editor.dom.encode(textOverride)) ||
-    selectedHtml ||
-    editor.dom.encode(linkProps.text)
+    onlyText &&
+    ((linkProps.text && editor.dom.encode(linkProps.text)) ||
+      getAnchorText(editor.selection, anchorElm))
+
   // only keep the props we want as attributes on the <a>
   const linkAttrs = {
     id: linkProps.id,
@@ -190,39 +198,44 @@ function insertUndecoratedLink(editor, linkProps, textOverride) {
 
   editor.focus()
   if (anchorElm) {
-    anchorElm.innerText = linkText
-    editor.dom.setAttribs(anchorElm, linkAttrs)
-    editor.selection.select(anchorElm)
-    editor.undoManager.add()
+    updateLink(editor, anchorElm, linkText, linkAttrs)
+  } else if (selectedContent) {
+    if (linkProps.userText && selectedPlainText !== linkText) {
+      createLink(editor, selectedElm, linkText, linkAttrs)
+    } else {
+      createLink(editor, selectedElm, undefined, linkAttrs)
+    }
   } else {
     createLink(editor, selectedElm, linkText, linkAttrs)
   }
   return editor.selection.getEnd() // this will be the newly created or updated content
 }
 
-function getAnchorElement(editor, selectedElm) {
-  selectedElm = selectedElm || editor.selection.getNode()
-  if (isImageFigure(selectedElm)) {
-    return editor.dom.select('a[href]', selectedElm)[0]
-  } else {
-    return editor.dom.getParent(selectedElm, 'a[href]')
-  }
+function getAnchorText(selection, anchorElm) {
+  return anchorElm ? anchorElm.innerText : selection.getContent({format: 'text'})
 }
 
-function isImageFigure(elm) {
-  return (
-    elm &&
-    ((elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)) || elm.nodeName === 'IMG')
-  )
+function updateLink(editor, anchorElm, text, linkAttrs) {
+  if (text && anchorElm.innerText !== text) {
+    anchorElm.innerText = text
+  }
+  editor.dom.setAttribs(anchorElm, linkAttrs)
+  editor.selection.select(anchorElm)
+  editor.undoManager.add()
 }
 
 function createLink(editor, selectedElm, text, linkAttrs) {
   if (isImageFigure(selectedElm)) {
     linkImageFigure(editor, selectedElm, linkAttrs)
+  } else if (text) {
+    // create the whole wazoo
+    editor.insertContent(editor.dom.createHTML('a', linkAttrs, editor.dom.encode(text)))
   } else {
-    insertContent(editor, renderLink(linkAttrs, text))
+    // create a link on the selected content
+    editor.execCommand('mceInsertLink', false, linkAttrs)
   }
 }
+
 function linkImageFigure(editor, fig, attrs) {
   const img = fig.tagName === 'IMG' ? fig : editor.dom.select('img', fig)[0]
   if (img) {

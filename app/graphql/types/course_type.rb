@@ -289,5 +289,11 @@ module Types
         {channels: comm_channels.unretired}
       end
     end
+
+    field :sis_id, String, null: true
+    def sis_id
+      return nil unless course.grants_any_right?(current_user, :read_sis, :manage_sis)
+      course.sis_course_id
+    end
   end
 end
