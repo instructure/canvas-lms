@@ -488,8 +488,37 @@ describe 'RCE next tests' do
       end
     end
 
-    it 'should open tray when clicking options button on existing image' do
-      page_title = 'Page1'
+    it "should link image to selected text" do
+      title = "email.png"
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+
+      @course.wiki_pages.create!(
+        title: 'title',
+        body: "<p id='para'>select me</p>"
+      )
+      visit_existing_wiki_edit(@course, 'title')
+      wait_for_tiny(edit_wiki_css)
+
+      f("##{rce_page_body_ifr_id}").click
+      select_text_of_element_by_id("para")
+
+      click_images_toolbar_button
+      click_course_images
+
+      click_image_link(title)
+
+      in_frame tiny_rce_ifr_id do
+        expect(wiki_body).not_to contain_css('img')
+        expect(wiki_body_anchor.attribute('href')).to include course_file_id_path(@image)
+      end
+    end
+
+    it "should open tray when clicking options button on existing image" do
+      page_title = "Page1"
       create_wiki_page_with_embedded_image(page_title)
 
       visit_existing_wiki_edit(@course, page_title)

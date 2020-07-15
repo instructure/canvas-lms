@@ -28,6 +28,13 @@ export function isAudio(type) {
 
 // return the desired size of the video player in CSS units
 // constrained to the container's size
+// Note: Landscape videos are not constrained to the container's height
+//       This is because if the player is in a window, and the window
+//       resizes wider, the container div gets wider, but the height
+//       doesn't grow, so we let the video grow, which will expand its
+//       container's height. This works for the media player use-case
+//       where the player is either in an iframe with the correct aspect
+//       ratio anyway, or is in window.top
 export function sizeMediaPlayer(player, type, container) {
   if (isAudio(type)) {
     return AUDIO_PLAYER_SIZE
@@ -39,15 +46,18 @@ export function sizeMediaPlayer(player, type, container) {
   }
   // scale the player so it fills the container,
   // but does not overflow
-  const hscale = container.height / sz.height
-  sz.width *= hscale
-  sz.height *= hscale
-
   if (sz.width > container.width) {
     const wscale = container.width / sz.width
     sz.width *= wscale
     sz.height *= wscale
   }
+  // if is a portrait video, may have to scale the height
+  if (sz.height > sz.width && sz.height > container.height) {
+    const hscale = container.height / sz.height
+    sz.width *= hscale
+    sz.height *= hscale
+  }
+
   sz.width = `${Math.round(sz.width)}px`
   sz.height = `${Math.round(sz.height)}px`
   return sz

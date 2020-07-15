@@ -326,6 +326,10 @@ class RCEWrapper extends React.Component {
 
   insertEmbedCode(code) {
     const editor = this.mceInstance()
+
+    // don't replace selected text, but embed after
+    editor.selection.collapse()
+
     // tinymce treats iframes uniquely, and doesn't like adding attributes
     // once it's in the editor, and I'd rather not parse the incomming html
     // string with a regex, so let's create a temp copy, then add a title

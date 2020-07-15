@@ -36,14 +36,6 @@ const liveRegion = () => window.top.document.getElementById('flash_screenreader_
 const DEFAULT_MAX_RETRY_ATTEMPTS = 11
 const DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS = 3
 
-// !!!!
-// ALERT: The resize handling code here assumes CanvasMediaPlayer fills 100% of its
-// parent window, which is true when rendered from media_player_iframe_content.js
-// The reason we need to handle resize is to letterbox vertical videos, or the bar
-// of controls get clipped. When @instructure/ui-media-player supports letterboxing
-// videos (which is in their work play), the resizing code here can probably be removed.
-// !!!
-
 export default function CanvasMediaPlayer(props) {
   const sorted_sources = Array.isArray(props.media_sources)
     ? props.media_sources.sort(byBitrate)
@@ -65,18 +57,27 @@ export default function CanvasMediaPlayer(props) {
   )
 
   const containerRef = useRef(null)
-  const myIframeRef = useRef(null)
   const mediaPlayerRef = useRef(null)
+
+  function boundingBox() {
+    if (window.frameElement?.tagName === 'IFRAME' || !containerRef.current) {
+      return {width: window.innerWidth, height: window.innerHeight}
+    } else {
+      // media_player_iframe_content.js includes a 16px top/bottom margin
+      return {
+        width: containerRef.current.clientWidth,
+        height: Math.min(containerRef.current.clientHeight, window.innerHeight - 32)
+      }
+    }
+  }
 
   const handleLoadedMetadata = useCallback(
     event => {
       const player = event.target
-      setPlayerSize(
-        player,
-        props.type,
-        {width: window.innerWidth, height: window.innerHeight},
-        myIframeRef.current
-      )
+      const playerParent = containerRef.current
+        ? containerRef.current.parentElement
+        : window.frameElement
+      setPlayerSize(player, props.type, boundingBox(), window.frameElement || playerParent)
     },
     [props.type]
   )
@@ -84,25 +85,12 @@ export default function CanvasMediaPlayer(props) {
   const handlePlayerSize = useCallback(
     _event => {
       const player = window.document.body.querySelector('video')
-      setPlayerSize(
-        player,
-        props.type,
-        {width: window.innerWidth, height: window.innerHeight},
-        null
-      )
+      setPlayerSize(player, props.type, boundingBox(), null)
     },
     [props.type]
   )
 
   useEffect(() => {
-    myIframeRef.current = [...window.parent.document.getElementsByTagName('iframe')].find(
-      el => el.contentWindow === window
-    )
-  }, [])
-
-  useEffect(() => {
-    // if we just uploaded the media, notorious may still be processing it
-    // and we don't have its media_sources yet
     if (!props.media_sources.length && retryAttempt <= MAX_RETRY_ATTEMPTS) {
       fetchSources()
     }

@@ -18,7 +18,7 @@
 
 import * as files from './files'
 import * as images from './images'
-import Bridge from '../../bridge'
+import bridge from '../../bridge'
 import {fileEmbed} from '../../common/mimeClass'
 import {isPreviewable} from '../../rce/plugins/shared/Previewable'
 import {isImage, isAudioOrVideo} from '../../rce/plugins/shared/fileTypeUtils'
@@ -56,7 +56,7 @@ export function failFoldersLoad(error) {
 }
 
 export function failMediaUpload(error) {
-  Bridge.showError(error)
+  bridge.showError(error)
   return {type: FAIL_MEDIA_UPLOAD, error}
 }
 
@@ -99,14 +99,14 @@ export function stopMediaUploading() {
 export function activateMediaUpload(fileMetaProps) {
   return dispatch => {
     dispatch(startMediaUploading(fileMetaProps))
-    Bridge.insertImagePlaceholder(fileMetaProps)
+    bridge.insertImagePlaceholder(fileMetaProps)
   }
 }
 
 export function removePlaceholdersFor(name) {
   return dispatch => {
     dispatch(stopMediaUploading())
-    Bridge.removePlaceholders(name)
+    bridge.removePlaceholders(name)
   }
 }
 
@@ -130,17 +130,14 @@ export function allUploadCompleteActions(results, fileMetaProps, contextType) {
   return actions
 }
 
-function linkingExistingContent() {
-  return Bridge.existingContentToLink() || Bridge.existingContentToLinkIsImg()
-}
 export function embedUploadResult(results, selectedTabType) {
   const embedData = fileEmbed(results)
-  if (
-    selectedTabType === 'images' &&
-    isImage(embedData.type) &&
-    !linkingExistingContent() &&
-    results.displayAs !== 'link'
-  ) {
+  if (selectedTabType === 'images' && isImage(embedData.type) && results.displayAs !== 'link') {
+    // embed the image after any current selection rather than link to it or replace it
+    bridge
+      .activeEditor()
+      ?.mceInstance()
+      ?.selection.collapse()
     const file_props = {
       href: results.href || results.url,
       title: results.title,
@@ -152,13 +149,15 @@ export function embedUploadResult(results, selectedTabType) {
       contextId: results.contextId,
       uuid: results.uuid
     }
-    Bridge.insertImage(file_props)
-  } else if (
-    selectedTabType === 'media' &&
-    isAudioOrVideo(embedData.type) &&
-    !linkingExistingContent()
-  ) {
-    Bridge.embedMedia({
+    bridge.insertImage(file_props)
+  } else if (selectedTabType === 'media' && isAudioOrVideo(embedData.type)) {
+    // embed media after any current selection rather than link to it or replace it
+    bridge
+      .activeEditor()
+      ?.mceInstance()
+      ?.selection.collapse()
+
+    bridge.embedMedia({
       id: embedData.id,
       embedded_iframe_url: results.embedded_iframe_url,
       href: results.href || results.url,
@@ -170,7 +169,7 @@ export function embedUploadResult(results, selectedTabType) {
       uuid: results.uuid
     })
   } else {
-    Bridge.insertLink(
+    bridge.insertLink(
       {
         'data-canvas-previewable': isPreviewable(results['content-type']),
         href: results.href || results.url,
@@ -242,9 +241,9 @@ export function mediaUploadComplete(error, uploadData) {
 export function createMediaServerSession() {
   return (dispatch, getState) => {
     const {source} = getState()
-    if (!Bridge.mediaServerSession) {
+    if (!bridge.mediaServerSession) {
       return source.mediaServerSession().then(data => {
-        Bridge.setMediaServerSession(data)
+        bridge.setMediaServerSession(data)
       })
     }
   }
@@ -252,7 +251,7 @@ export function createMediaServerSession() {
 
 export function uploadToMediaFolder(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
-    const editorComponent = Bridge.activeEditor()
+    const editorComponent = bridge.activeEditor()
     const bookmark = editorComponent?.editor?.selection.getBookmark(2, true)
 
     dispatch(activateMediaUpload(fileMetaProps))
@@ -386,7 +385,7 @@ export function uploadPreflight(tabContext, fileMetaProps) {
       })
       .then(results => {
         let newBookmark
-        const editorComponent = Bridge.activeEditor()
+        const editorComponent = bridge.activeEditor()
         if (fileMetaProps.bookmark) {
           newBookmark = editorComponent.editor.selection.getBookmark(2, true)
           editorComponent.editor.selection.moveToBookmark(fileMetaProps.bookmark)

@@ -17,7 +17,6 @@
 require_relative '../../common'
 
 module RCENextPage
-
   # ---------------------- Controls ----------------------
 
   def pages_accordion_button
@@ -135,8 +134,8 @@ module RCENextPage
   def possibly_hidden_toolbar_button(selector)
     f(selector)
   rescue Selenium::WebDriver::Error::NoSuchElementError
-      more_toolbar_button.click
-      f(selector)
+    more_toolbar_button.click
+    f(selector)
   end
 
   def links_toolbar_button
@@ -272,7 +271,7 @@ module RCENextPage
   end
 
   def editor_window
-    f("form.edit-form .edit-content")
+    f('form.edit-form .edit-content')
   end
 
   def indent_toggle_button
@@ -336,7 +335,7 @@ module RCENextPage
   end
 
   def rce_next_toolbar
-    f(".tox-toolbar__primary")
+    f('.tox-toolbar__primary')
   end
 
   def a11y_checker_button
@@ -689,9 +688,13 @@ module RCENextPage
     fj('button:contains("Switch to rich text editor")').click
   end
 
-  def insert_tiny_text(text = "hello")
+  def tiny_rce_ifr_id
+    f('.tox-editor-container iframe')['id']
+  end
+
+  def insert_tiny_text(text = 'hello')
     in_frame tiny_rce_ifr_id do
-      tinyrce_element = f("body")
+      tinyrce_element = f('body')
       tinyrce_element.click
       tinyrce_element.send_keys("#{text}\n") # newline guarantees a tinymce change event
     end
@@ -701,10 +704,13 @@ module RCENextPage
     click_links_toolbar_button
     click_external_links
     expect(fj('[role="dialog"][aria-label="Insert Link"]')).to be_displayed
+
+    # linktext.clear doesn't work because it doesn't fire any events to update
+    # the react component's state
+
     if text
       linktext = f('input[name="linktext')
-      # linktext.clear doesn't work because it doesn't fire any events to update
-      # the react component's state
+
       linktext.send_keys(:backspace) while linktext.property('value').length > 0
       linktext.send_keys(text) if text
     end
@@ -726,5 +732,20 @@ module RCENextPage
     menu_item_by_name('Format').click
     menu_option_by_name('Directionality').click
     menu_option_by_name('Right-to-Left').click
+  end
+
+  def select_text_of_element_by_id(id)
+    script = <<-JS
+        const id = arguments[0]
+        const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
+        const rng = win.document.createRange()
+        rng.setStart(win.document.getElementById(id).firstChild, 0)
+        rng.setEnd(win.document.getElementById(id).firstChild, 9)
+        const sel = win.getSelection()
+        sel.removeAllRanges()
+        sel.addRange(rng)
+      JS
+
+    driver.execute_script script, id
   end
 end
