@@ -426,7 +426,7 @@ class ActiveRecord::Base
         @collkey ||= {}
         @collkey[Shard.current.database_server.id] = connection.extension_installed?(:pg_collkey)
       end
-      if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations))
+      if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations) && false)
         "(#{col} COLLATE #{collation})"
       elsif (schema = @collkey[Shard.current.database_server.id])
         # The collation level of 3 is the default, but is explicitly specified here and means that
@@ -1474,7 +1474,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
     # have to account for if options is a hash, if_exists will just get wrapped up
     # in it
-    if options[:if_exists]
+    if options.delete(:if_exists)
       fk_name_to_delete = foreign_key_for(from_table, options_or_to_table)&.name
       return if fk_name_to_delete.nil?
     else
