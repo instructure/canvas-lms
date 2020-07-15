@@ -252,7 +252,7 @@
     "karma-verbose-reporter": "^0.0.6",
     "karma-webpack": "^3",
     "lint-staged": "^9",
-    "merge-stream": "^1",
+    "merge-stream": "^2",
     "mockdate": "^2.0.2",
     "moment-timezone-data-webpack-plugin": "^1.0.3",
     "moxios": "^0.4",

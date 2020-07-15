@@ -135,13 +135,18 @@ function linkingExistingContent() {
 }
 export function embedUploadResult(results, selectedTabType) {
   const embedData = fileEmbed(results)
-
-  if (selectedTabType === 'images' && isImage(embedData.type) && !linkingExistingContent()) {
+  if (
+    selectedTabType === 'images' &&
+    isImage(embedData.type) &&
+    !linkingExistingContent() &&
+    results.displayAs !== 'link'
+  ) {
     const file_props = {
       href: results.href || results.url,
       title: results.title,
       display_name: results.display_name || results.name || results.title || results.filename,
       alt_text: results.alt_text,
+      isDecorativeImage: results.isDecorativeImage,
       content_type: results['content-type'],
       contextType: results.contextType,
       contextId: results.contextId,
@@ -169,7 +174,12 @@ export function embedUploadResult(results, selectedTabType) {
       {
         'data-canvas-previewable': isPreviewable(results['content-type']),
         href: results.href || results.url,
-        title: results.display_name || results.name || results.title || results.filename,
+        title:
+          results.alt_text ||
+          results.display_name ||
+          results.name ||
+          results.title ||
+          results.filename,
         content_type: results['content-type'],
         embed: embedData,
         target: '_blank',
@@ -356,6 +366,15 @@ export function uploadPreflight(tabContext, fileMetaProps) {
       })
       .then(results => {
         return setAltText(fileMetaProps.altText, results)
+      })
+      .then(results => {
+        if (fileMetaProps.isDecorativeImage) {
+          results.isDecorativeImage = fileMetaProps.isDecorativeImage
+        }
+        if (fileMetaProps.displayAs) {
+          results.displayAs = fileMetaProps.displayAs
+        }
+        return results
       })
       .then(results => {
         // This may or may not be necessary depending on the upload
