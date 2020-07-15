@@ -2139,7 +2139,7 @@ class UsersController < ApplicationController
          {:address => address, :user_id => user_id, :user_name => user_name, :account_id => account_id, :account_name => account_name}
         end
         errored_users << user_hash.merge(:errors => [{:message => "Matching user(s) already exist"}], :existing_users => existing_users)
-      elsif user.save_with_or_without_identity_create(user_hash[:email])
+      elsif soft_save_with_or_without_identity(user, user_hash[:email])
         invited_users << user_hash.merge(:id => user.id)
       else
         errored_users << user_hash.merge(user.errors.as_json)
@@ -2476,7 +2476,9 @@ class UsersController < ApplicationController
       end
 
       begin
-        @user.save_with_or_without_identity_create(@pseudonym.unique_id, force: true)
+        User.transaction do
+          @user.save_with_or_without_identity_create(@pseudonym.unique_id, force: true)
+        end
       rescue ActiveRecord::RecordInvalid => e
         errors = {
           :errors => {

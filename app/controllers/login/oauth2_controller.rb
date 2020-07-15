@@ -39,7 +39,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
       provider_attributes = @aac.provider_attributes(token)
 
       if SettingsService.get_settings(object: 'school', id: 1)['identity_server_enabled'] && @aac&.admin_role?(token)
-        unless User.find_for_identity_auth(unique_id)
+        unless unique_id && Pseudonym.exists?(integration_id: unique_id)
           unique_id = @aac.identity_email_address(token)
         end
         provider_attributes["is_admin"] = true

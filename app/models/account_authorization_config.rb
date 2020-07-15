@@ -195,11 +195,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
       pseudonym.user = User.create!(name: unique_id) do |u|
         u.workflow_state = 'registered'
-        u.identity_uuid = provider_attributes["sub"] if provider_attributes["is_admin"]
       end
 
-      Pseudonym.find_by(integration_id: provider_attributes["sub"])&.destroy_permanently! if provider_attributes["is_admin"]
-      provider_attributes.delete("is_admin")
+      if provider_attributes["is_admin"]
+        Pseudonym.find_by(integration_id: provider_attributes["sub"])&.destroy_permanently!
+        provider_attributes.delete("is_admin")
+      end
 
       pseudonym.authentication_provider = self
       pseudonym.unique_id = unique_id
