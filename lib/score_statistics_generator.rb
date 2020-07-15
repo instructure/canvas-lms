@@ -139,7 +139,7 @@ SQL
       return
     end
 
-    average = current_scores.map(&:to_d).sum / BigDecimal.new(score_count)
+    average = current_scores.map(&:to_d).sum / BigDecimal(score_count)
 
     # This is a safeguard to avoid blowing up due to database storage which is set to be a decimal with a precision of 8
     # and a scale of 2. And really, what are you even doing awarding 1,000,000% or over in a course?
