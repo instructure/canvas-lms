@@ -15,14 +15,7 @@
       <i class="icon-plus"></i>
       <span class="ui-button-text" aria-hidden="true">{{#t}}Group{{/t}}</span>
     </button>
-    {{#if importPermissionFF }}
-      {{#if canImportOutcomes }}
-        <button class="import_outcomes ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Import a set of Outcomes{{/t}}">
-          <i class="icon-upload"></i>
-          <span class="ui-button-text" aria-hidden="true">{{#t}}Import{{/t}}</span>
-        </button>
-      {{/if}}
-    {{else}}
+    {{#if canImportOutcomes }}
       <button class="import_outcomes ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Import a set of Outcomes{{/t}}">
         <i class="icon-upload"></i>
         <span class="ui-button-text" aria-hidden="true">{{#t}}Import{{/t}}</span>

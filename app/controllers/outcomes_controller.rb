@@ -42,7 +42,6 @@ class OutcomesController < ApplicationController
            :COMMON_CORE_GROUP_ID => common_core_group_id,
            :COMMON_CORE_GROUP_URL => common_core_group_url,
            :RUBRICS_IN_COURSE_NAV => @domain_root_account.feature_enabled?(:rubrics_in_course_navigation),
-           :IMPORT_OUTCOMES_PERMISSION_FIX => @domain_root_account.feature_enabled?(:import_outcomes_permission_fix),
            :PERMISSIONS => {
              :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes),
              :manage_rubrics => @context.grants_right?(@current_user, session, :manage_rubrics),

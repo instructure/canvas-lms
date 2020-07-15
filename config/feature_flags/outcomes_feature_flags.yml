@@ -15,12 +15,6 @@ rubrics_in_course_navigation:
   description: |-
     Includes rubrics in the course sidebar navigation
   touch_context: true
-import_outcomes_permission_fix:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Hide the Import Learning Outcomes button based on user permissions"
-  description: "Ensures that users without the Import Outcomes permission cannot see
-    the button within the Outcomes tab"
 outcome_guid_course_exports:
   state: hidden
   applies_to: RootAccount
