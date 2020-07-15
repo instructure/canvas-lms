@@ -893,7 +893,8 @@ class GradebooksController < ApplicationController
           group_comments_per_attempt: @assignment.a2_enabled?,
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
-          help_url: help_link_url
+          help_url: help_link_url,
+          update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url)
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -944,6 +945,14 @@ class GradebooksController < ApplicationController
             env[:selected_student_group] = group_json(updated_group_info.group, @current_user, session)
           end
           env[:student_group_reason_for_change] = updated_group_info.reason_for_change if updated_group_info.reason_for_change.present?
+        end
+
+        if @assignment.rubric_association
+          env[:update_rubric_assessment_url] = context_url(
+            @context,
+            :context_rubric_association_rubric_assessments_url,
+            @assignment.rubric_association
+          )
         end
 
         append_sis_data(env)
