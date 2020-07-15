@@ -277,6 +277,17 @@ module CanvasRails
       # don't care about secret_key_base
     end
 
+    initializer "canvas.init_dynamic_settings", before: "canvas.extend_shard" do
+      settings = ConfigFile.load("consul")
+      if settings.present?
+        begin
+          Canvas::DynamicSettings.config = settings_hash
+        rescue Imperium::UnableToConnectError
+          Rails.logger.warn("INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail")
+        end
+      end
+    end
+
     initializer "canvas.extend_shard", before: "active_record.initialize_database" do
       # have to do this before the default shard loads
       Switchman::Shard.serialize :settings, Hash
