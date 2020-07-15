@@ -370,8 +370,10 @@ pipeline {
 
               // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
               sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
+              sh 'docker tag $RUBY_PATCHSET_IMAGE $RUBY_MERGE_IMAGE'
               // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
               sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
+              sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_MERGE_IMAGE'
             }
           }
         }
