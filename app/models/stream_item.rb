@@ -289,9 +289,9 @@ class StreamItem < ActiveRecord::Base
             :context_id => l_context_id,
           }
         end
-        if object.is_a?(Submission) && object.assignment.muted?
-          # set the hidden flag if an assignment and muted (for the owner of the submission)
-          if owner_insert = inserts.detect{|i| i[:user_id] == object.user_id}
+        if object.is_a?(Submission) && !object.posted?
+          # set the hidden flag if this submission is not posted
+          if (owner_insert = inserts.detect{|i| i[:user_id] == object.user_id})
             owner_insert[:hidden] = true
           end
         end

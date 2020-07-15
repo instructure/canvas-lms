@@ -168,14 +168,59 @@ describe StreamItem do
     expect(StreamItem.find(si.id).data(user2.id).latest_messages_from_stream_item).to be_empty
   end
 
-    it "should return a description for a Collaboration" do
-      user_factory
-      context = Course.create!
-      collab = Collaboration.create!(:context => context, :description => "meow", :title => "kitty")
-      collab.generate_stream_items([@user])
-      si = @user.stream_item_instances.first.stream_item
-      data = si.data(@user.id)
-      expect(data).to be_a Collaboration
-      expect(data.description).to eql("meow")
+  it "should return a description for a Collaboration" do
+    user_factory
+    context = Course.create!
+    collab = Collaboration.create!(:context => context, :description => "meow", :title => "kitty")
+    collab.generate_stream_items([@user])
+    si = @user.stream_item_instances.first.stream_item
+    data = si.data(@user.id)
+    expect(data).to be_a Collaboration
+    expect(data.description).to eql("meow")
+  end
+
+  describe ".generate_all" do
+    context "when the caller is a submission" do
+      let(:student) { User.create! }
+      let(:teacher) { User.create! }
+      let(:course) do
+        course = Course.create!
+        course.enroll_student(student, enrollment_state: "active")
+        course.enroll_teacher(teacher, enrollment_state: "active")
+
+        course
+      end
+
+      let(:assignment) { course.assignments.create! }
+      let(:submission) { assignment.submission_for_student(student) }
+
+      context "when the submission is not posted" do
+        before(:each) do
+          assignment.post_policy.update!(post_manually: true)
+        end
+        let(:generated_instances) do
+          stream_items = StreamItem.generate_all(submission, [student.id, teacher.id])
+          stream_items.first.stream_item_instances
+        end
+
+        it "hides the item instance associated with the student" do
+          student_instance = generated_instances.detect { |instance| instance.user_id == student.id }
+          expect(student_instance[:hidden]).to be true
+        end
+
+        it "does not hide the item instance associated with the teacher" do
+          teacher_instance = generated_instances.detect { |instance| instance.user_id == teacher.id }
+          expect(teacher_instance[:hidden]).to be false
+        end
+      end
+
+      context "when the submission is posted" do
+        let(:generated_instances) { StreamItem.generate_all(submission, [student.id, teacher.id]) }
+
+        it "does not hide any of the generated instances" do
+          expect(generated_instances.none? { |instance| instance[:hidden] }).to be true
+        end
+      end
     end
+  end
 end
