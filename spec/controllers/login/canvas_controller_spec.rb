@@ -57,6 +57,13 @@ describe Login::CanvasController do
       confirm_mobile_layout { post 'create' }
     end
 
+    it "should render a plain text error message on mobile, not the hash" do
+      controller.js_env.clear
+      request.env['HTTP_USER_AGENT'] = mobile_agents[0]
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => ''}}
+      expect(flash[:error]).to be_a(String)
+    end
+
   end
 
   it "should show sso buttons on load" do
@@ -85,11 +92,12 @@ describe Login::CanvasController do
     expect(response).to render_template(:new)
   end
 
-  it "should re-render if no password given" do
+  it "should re-render if no password given and render a hash for the error" do
     post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => ''}}
     assert_status(400)
     expect(response).to render_template(:new)
-    expect(flash[:error]).to match(/no password/i)
+    expect(flash[:error]).to be_a(Hash)
+    expect(flash[:error][:html]).to match(/no password/i)
   end
 
   it "password auth should work" do
@@ -125,7 +133,8 @@ describe Login::CanvasController do
     assert_status(400)
     expect(session[:sentinel]).to eq true
     expect(response).to render_template(:new)
-    expect(flash[:error]).to match(/invalid authenticity token/i)
+    expect(flash[:error]).to be_a(Hash)
+    expect(flash[:error][:html]).to match(/invalid authenticity token/i)
   end
 
   it "should re-render if authenticity token is invalid and referer is trusted" do
@@ -134,7 +143,8 @@ describe Login::CanvasController do
          :authenticity_token => '42'}
     assert_status(400)
     expect(response).to render_template(:new)
-    expect(flash[:error]).to match(/invalid authenticity token/i)
+    expect(flash[:error]).to be_a(Hash)
+    expect(flash[:error][:html]).to match(/invalid authenticity token/i)
   end
 
   it "should login if authenticity token is invalid and referer is trusted" do
