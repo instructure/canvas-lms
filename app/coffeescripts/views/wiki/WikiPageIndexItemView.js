@@ -265,6 +265,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
         const cogs = $('.collectionViewItems').find('.al-trigger')
         $(cogs[curIndex]).focus()
       }
+      this.changeSelectPageCheckbox()
     })
   }
 
@@ -279,7 +280,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
   }
 
   changeSelectPageCheckbox(ev) {
-    ev.preventDefault()
+    ev?.preventDefault()
     const selected = $('.select-page-checkbox:checked').length
     $('.delete_pages').attr('disabled', selected === 0)
   }
