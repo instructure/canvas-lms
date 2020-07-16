@@ -287,6 +287,22 @@ RSpec.describe ApplicationController do
         end
       end
 
+      context "bulk_delete_pages" do
+        before(:each) do
+          controller.instance_variable_set(:@domain_root_account, Account.default)
+        end
+
+        it 'is false if the feature flag is off' do
+          Account.default.disable_feature!(:bulk_delete_pages)
+          expect(controller.js_env[:FEATURES][:bulk_delete_pages]).to be_falsey
+        end
+
+        it 'is true if the feature flag is on' do
+          Account.default.enable_feature!(:bulk_delete_pages)
+          expect(controller.js_env[:FEATURES][:bulk_delete_pages]).to be_truthy
+        end
+      end
+
       context "unpublished_courses" do
         before(:each) do
           controller.instance_variable_set(:@domain_root_account, Account.default)
@@ -1965,5 +1981,46 @@ RSpec.describe ApplicationController, '#teardown_live_events_context' do
     get :index, format: :html
 
     expect(Thread.current[:live_events_ctx]).to be_nil
+  end
+end
+
+RSpec.describe ApplicationController, '#compute_http_cost' do
+  include WebMock::API
+
+  controller do
+    def index
+      if params[:do_http].to_i > 0
+        CanvasHttp.get("http://www.example.com/test")
+      end
+      if params[:do_error].to_i > 0
+        raise StandardError, "Test Error Handling"
+      end
+      render json: [{}]
+    end
+  end
+
+  it "has no cost for non http actions" do
+    get :index, params: { do_http: 0, do_error: 0 }
+    expect(response).to have_http_status :success
+    expect(CanvasHttp.cost).to eq(0)
+    expect(controller.request.env['extra-request-cost']).to be_nil
+  end
+
+  it "has some cost for http actions" do
+    stub_request(:get, "http://www.example.com/test").
+      to_return(status: 200, body: "", headers: {})
+    get :index, params: { do_http: 1, do_error: 0 }
+    expect(response).to have_http_status :success
+    expect(CanvasHttp.cost > 0).to be_truthy
+    expect(controller.request.env['extra-request-cost']).to eq(CanvasHttp.cost)
+  end
+
+  it "tracks costs through errors" do
+    stub_request(:get, "http://www.example.com/test").
+      to_return(status: 200, body: "", headers: {})
+    get :index, params: { do_http: 1, do_error: 1 }
+    expect(response).to have_http_status 500
+    expect(CanvasHttp.cost > 0).to be_truthy
+    expect(controller.request.env['extra-request-cost']).to eq(CanvasHttp.cost)
   end
 end

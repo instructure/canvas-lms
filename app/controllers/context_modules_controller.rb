@@ -355,6 +355,10 @@ class ContextModulesController < ApplicationController
           {:points_possible => nil, :due_date => nil}
         end
         info[tag.id][:todo_date] = tag.content && tag.content[:todo_date]
+
+        if tag.try(:assignment).try(:external_tool_tag).try(:external_data).try(:[], 'key') == 'https://canvas.instructure.com/lti/mastery_connect_assessment'
+          info[tag.id][:mc_objectives] = tag.assignment.external_tool_tag.external_data['objectives']
+        end
       end
       render :json => info
     end

@@ -25,6 +25,29 @@ describe "CanvasHttp" do
 
   include WebMock::API
 
+  around :each do |block|
+    fake_logger = Class.new do
+      attr_reader :messages
+      def initialize()
+        @messages = []
+        super
+      end
+
+      def info(message)
+        @messages << { level: "info", message: message }
+      end
+
+      def warn(message)
+        @messages << { level: "warn", message: message }
+      end
+    end
+    logger = fake_logger.new
+    real_logger = CanvasHttp.logger
+    CanvasHttp.logger = -> { logger }
+    block.call
+    CanvasHttp.logger = real_logger
+  end
+
   describe ".post" do
     before :each do
       WebMock::RequestRegistry.instance.reset!
@@ -36,6 +59,12 @@ describe "CanvasHttp" do
       stub_request(:post, url).with(body: "abc").
         to_return(status: 200)
       expect(CanvasHttp.post(url, body: body).code).to eq "200"
+      logs = CanvasHttp.logger.messages
+      expect(logs.size).to eq(3)
+      expect(logs[0][:message] =~ /CANVAS_HTTP START REQUEST CHAIN | method: Net::HTTP::Post/).to be_truthy
+      expect(logs[0][:message] =~ /| elapsed: \d/).to be_truthy
+      expect(logs[1][:message] =~ /CANVAS_HTTP INITIATE REQUEST | url: www.example.com/).to be_truthy
+      expect(logs[2][:message] =~ /CANVAS_HTTP RESOLVE RESPONSE | url: www.example.com/).to be_truthy
     end
 
     it "allows you to set a content_type" do
@@ -81,6 +110,15 @@ describe "CanvasHttp" do
       CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
 
       assert_requested(stubbed)
+    end
+
+    it "tracks the cost" do
+      url = "www.example.com/a"
+      stub_request(:get, url).to_return(status: 200)
+      CanvasHttp.reset_cost!
+      expect(CanvasHttp.cost).to eq(0)
+      expect(CanvasHttp.get(url).code).to eq "200"
+      expect(CanvasHttp.cost > 0).to be_truthy
     end
   end
 

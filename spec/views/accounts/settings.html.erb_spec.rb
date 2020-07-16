@@ -444,4 +444,76 @@ describe "accounts/settings.html.erb" do
       expect_threshold_to_be(24)
     end
   end
+
+  context 'privacy' do
+    let(:account) { account_model }
+    let(:account_admin) { account_admin_user(account: account) }
+    let(:dom) { Nokogiri::HTML(response) }
+    let(:enable_fullstory) { dom.at_css('#account_settings_enable_fullstory') }
+    let(:enable_google_analytics) { dom.at_css('#account_settings_enable_google_analytics') }
+    let(:site_admin) { site_admin_user }
+    let(:sub_account) { account_model(root_account: account) }
+
+    def render_for(target_account, target_user, &block)
+      assign(:context, target_account)
+      assign(:account, target_account)
+      assign(:root_account, target_account)
+      assign(:current_user, target_user)
+      assign(:account_users, [])
+      assign(:associated_courses_count, 0)
+      assign(:announcements, AccountNotification.none.paginate)
+
+      view_context(target_account, target_user)
+      render
+      yield if block_given?
+    end
+
+    it 'is not available to account admins' do
+      render_for(account, account_admin) do
+        expect(response).not_to have_tag('#tab-privacy')
+      end
+    end
+
+    it 'is not available for the site_admin account' do
+      render_for(Account.site_admin, site_admin) do
+        expect(response).not_to have_tag('#tab-privacy')
+      end
+    end
+
+    it 'is not available for sub accounts' do
+      render_for(sub_account, site_admin) do
+        expect(response).not_to have_tag('#tab-privacy')
+      end
+    end
+
+    it 'opts in to Google Analytics by default' do
+      render_for(account, site_admin) do
+        expect(enable_google_analytics).to be_checked
+      end
+    end
+
+    it 'allows opting out of Google Analytics' do
+      account.settings[:enable_google_analytics] = false
+      account.save!
+
+      render_for(account, site_admin) do
+        expect(enable_google_analytics).not_to be_checked
+      end
+    end
+
+    it 'opts in to FullStory by default' do
+      render_for(account, site_admin) do
+        expect(enable_fullstory).to be_checked
+      end
+    end
+
+    it 'allows opting out of FullStory' do
+      account.settings[:enable_fullstory] = false
+      account.save!
+
+      render_for(account, site_admin) do
+        expect(enable_fullstory).not_to be_checked
+      end
+    end
+  end
 end

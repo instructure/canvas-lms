@@ -31,14 +31,15 @@ export default class Bridge {
 
     this.trayProps = new WeakMap()
     this._languages = []
+    this._controller = {}
   }
 
   get editorRendered() {
     return this._editorRendered
   }
 
-  get controller() {
-    return this._controller
+  controller(editorId) {
+    return this._controller[editorId]
   }
 
   activeEditor() {
@@ -97,16 +98,16 @@ export default class Bridge {
     }
   }
 
-  attachController(controller) {
-    this._controller = controller
+  attachController(controller, editorId) {
+    this._controller[editorId] = controller
   }
 
-  detachController() {
-    this._controller = null
+  detachController(editorId) {
+    delete this._controller[editorId]
   }
 
-  showTrayForPlugin(plugin) {
-    this._controller && this._controller.showTrayForPlugin(plugin)
+  showTrayForPlugin(plugin, editorId) {
+    this._controller[editorId]?.showTrayForPlugin(plugin)
   }
 
   existingContentToLink() {
@@ -134,7 +135,7 @@ export default class Bridge {
         link.text = link.title || link.href
       }
       this.focusedEditor.insertLink(link)
-      this.controller?.hideTray()
+      this.controller(this.focusedEditor.id)?.hideTray()
     } else {
       console.warn('clicked sidebar link without a focused editor')
     }
@@ -155,9 +156,7 @@ export default class Bridge {
   insertImage(image) {
     if (this.focusedEditor) {
       this.focusedEditor.insertImage(image)
-      if (this.controller) {
-        this.controller.hideTray()
-      }
+      this.controller(this.focusedEditor.id)?.hideTray()
     } else {
       console.warn('clicked sidebar image without a focused editor')
     }
@@ -216,18 +215,14 @@ export default class Bridge {
   insertVideo = video => {
     if (this.focusedEditor) {
       this.focusedEditor.insertVideo(video)
-    }
-    if (this.controller) {
-      this.controller.hideTray()
+      this.controller(this.focusedEditor.id)?.hideTray()
     }
   }
 
   insertAudio = audio => {
     if (this.focusedEditor) {
       this.focusedEditor.insertAudio(audio)
-    }
-    if (this.controller) {
-      this.controller.hideTray()
+      this.controller(this.focusedEditor.id)?.hideTray()
     }
   }
 }

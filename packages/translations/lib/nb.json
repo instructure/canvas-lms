@@ -50,6 +50,9 @@
     "alt_text_611fb322": {
         "message": "Endre tekst"
     },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "Det oppsto en feil ved lesing av filen"
+    },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Det skjedde en feil da muligheten skulle avvises."
     },
@@ -259,6 +262,9 @@
     },
     "date_time_d9fbf2d7": {
         "message": "Dato og tid:"
+    },
+    "decorative_image_3c28aa7d": {
+        "message": "Dekorativt Bilde"
     },
     "decrease_indent_de6343ab": {
         "message": "Reduser innrykk"
@@ -673,6 +679,9 @@
     },
     "my_grades_98834476": {
         "message": "Mine karakterer"
+    },
+    "my_media_82bade11": {
+        "message": "Mitt medie"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigere gjennom menyen eller verktøylinjen"
@@ -1162,6 +1171,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Du har medietilbakemeldinger."
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "Du kan ikke laste opp en tom fil."
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "Du må oppgi tidspunkt og dato."

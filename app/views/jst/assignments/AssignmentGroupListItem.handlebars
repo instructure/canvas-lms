@@ -8,18 +8,16 @@
     {{/if}}
     {{#if course_home}}
       <h3 class="ig-header-title">
-        <a
+        <button
         class="element_toggler accessible-toggler"
         aria-controls="assignment_group_{{id}}_assignments"
         aria-expanded="true"
         aria-label="{{name}} {{toggleMessage}}"
         tabindex="0"
-        href="#"
-        role="button"
         >
           <i class="icon-mini-arrow-down"></i>
           {{name}}
-        </a>
+        </button>
         {{#if hasIntegrationData}}
           <i class="icon-sis-imported" aria-hidden="true" title='{{#t}}Imported from {{postToSISName}}{{/t}}'></i>
           <span class="screenreader-only">{{#t}}Imported from {{postToSISName}}{{/t}}</span>
@@ -27,18 +25,16 @@
       </h3>
     {{else}}
       <h2 class="ig-header-title">
-        <a
+        <button
         class="element_toggler accessible-toggler"
         aria-controls="assignment_group_{{id}}_assignments"
         aria-expanded="true"
         aria-label="{{name}} {{toggleMessage}}"
         tabindex="0"
-        href="#"
-        role="button"
         >
           <i class="icon-mini-arrow-down" aria-hidden="true"></i>
           {{name}}
-        </a>
+        </button>
         {{#if hasIntegrationData}}
           <i class="icon-sis-imported" aria-hidden="true" title='{{#t}}Imported from {{postToSISName}}{{/t}}'></i>
           <span class="screenreader-only">{{#t}}Imported from {{postToSISName}}{{/t}}</span>

@@ -75,8 +75,8 @@ class NotificationPolicy < ActiveRecord::Base
       frequency = params[:frequency]
       cc = user.communication_channels.find(params[:channel_id])
 
-      # Find any existing NotificationPolicies for the category and the channel. If frequency is 'never', delete the
-      # entry. If other than that, create or update the entry.
+      # Find any existing NotificationPolicies for the category and the channel.
+      # create or update the entry.
       NotificationPolicy.transaction do
         notifications.each do |notification_id|
           scope = user.notification_policies.

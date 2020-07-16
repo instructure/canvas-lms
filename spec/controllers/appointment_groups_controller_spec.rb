@@ -65,67 +65,43 @@ describe AppointmentGroupsController do
     user_session @student
   end
 
-  context "old scheduler" do
-    describe "GET 'index'" do
-      it 'redirects to the scheduler tab index' do
-        get 'index'
-        check_redirect(response, 'view_name' => 'scheduler')
-      end
-    end
-
-    describe "GET 'show'" do
-      it 'redirects to a specific appointment group in the scheduler' do
-        get 'show', params: {:id => @ag.to_param}
-        check_redirect(response, 'view_name' => 'scheduler', 'appointment_group_id' => @ag.id)
-      end
+  describe "GET 'index'" do
+    it "redirects to the agenda, starting at the first appointment group's start_at" do
+      get 'index'
+      check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01" )
     end
   end
 
-  context "new scheduler" do
-    before :once do
-      @course.root_account.enable_feature! 'better_scheduler'
+  describe "GET 'show'" do
+    it "without appointment - redirects to the agenda on date of appt. in find_appointment mode" do
+      get 'show', params: {:id => @ag.to_param}
+      check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01",
+                     'find_appointment' => @course.asset_string)
     end
 
-    describe "GET 'index'" do
-      it "redirects to the agenda, starting at the first appointment group's start_at" do
-        get 'index'
-        check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01" )
-      end
+    it "redirects to a specific event on the month view" do
+      get 'show', params: {:id => @ag.to_param, :event_id => @ag.appointments.last.to_param}
+      check_redirect(response, 'view_name' => 'month', 'view_start' => "#{@next_year}-02-01")
     end
 
-    describe "GET 'show'" do
-      it "without appointment - redirects to the agenda on date of appt. in find_appointment mode" do
-        get 'show', params: {:id => @ag.to_param}
-        check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01",
-                       'find_appointment' => @course.asset_string)
-      end
-
-      it "redirects to a specific event on the month view" do
-        get 'show', params: {:id => @ag.to_param, :event_id => @ag.appointments.last.to_param}
-        check_redirect(response, 'view_name' => 'month', 'view_start' => "#{@next_year}-02-01")
-      end
-
-      it "with appt it redirects to the agenda, starting at the date of appt. group" do
-        get 'show', params: {:id => @ag_with_reservation.to_param}
-        check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01")
-      end
-      it "with appt it redirects to a specific event in month view" do
-        get 'show', params: {:id => @ag_with_reservation.to_param, :event_id => @reservation.to_param}
-        check_redirect(response, {'view_name' => 'month', 'view_start' => "#{@next_year}-02-01"},
-                       "event_id=#{@reservation.id}")
-      end
-      it "with appt it redirects to a specific parent event in month view if requester did not create the event." do
-        user_session @teacher
-        get 'show', params: {:id => @ag_with_reservation.to_param, :event_id => @reservation.to_param}
-        check_redirect(response, {'view_name' => 'month', 'view_start' => "#{@next_year}-02-01"},
-                       "event_id=#{@reservation.parent_event.id}")
-      end
-      it "with group appt it redirects to the agenda, starting at the date of appt. group, no find appt. mode." do
-        get 'show', params: {:id => @group_ag.to_param}
-        check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01")
-      end
-
-
+    it "with appt it redirects to the agenda, starting at the date of appt. group" do
+      get 'show', params: {:id => @ag_with_reservation.to_param}
+      check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01")
+    end
+    it "with appt it redirects to a specific event in month view" do
+      get 'show', params: {:id => @ag_with_reservation.to_param, :event_id => @reservation.to_param}
+      check_redirect(response, {'view_name' => 'month', 'view_start' => "#{@next_year}-02-01"},
+                     "event_id=#{@reservation.id}")
+    end
+    it "with appt it redirects to a specific parent event in month view if requester did not create the event." do
+      user_session @teacher
+      get 'show', params: {:id => @ag_with_reservation.to_param, :event_id => @reservation.to_param}
+      check_redirect(response, {'view_name' => 'month', 'view_start' => "#{@next_year}-02-01"},
+                     "event_id=#{@reservation.parent_event.id}")
+    end
+    it "with group appt it redirects to the agenda, starting at the date of appt. group, no find appt. mode." do
+      get 'show', params: {:id => @group_ag.to_param}
+      check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01")
     end
   end
 

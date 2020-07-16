@@ -181,7 +181,7 @@
                 <span id="assignment_submission_type_selection_launch_button_text"></span>
             </button>
           </div>
-          <input type="hidden" id="assignment_submission_type_external_data" name="external_tool_tag_attributes[external_data]" value="{{externalToolData.stringify}}"/>
+          <input type="hidden" id="assignment_submission_type_external_data" name="external_tool_tag_attributes[external_data]" value="{{externalToolDataStringified}}"/>
           {{!-- this is very specific to Mastery Connect currently.  We could potentially make this a dynamic partial based on the type of external data --}}
           <div>
             <h3>
@@ -245,16 +245,6 @@
                  style="display: none"/>
         </div>
 
-        {{#unless isQuizLTIAssignment}}
-          <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
-            {{checkbox "externalToolNewTab"
-              id="assignment_external_tool_tag_attributes_new_tab"
-              name="external_tool_tag_attributes[new_tab]"
-              disabled=submissionTypesFrozen}}
-            {{#t "label.external_tool_new_tab"}}Load This Tool In A New Tab{{/t}}
-          </label>
-        {{/unless}}
-
         {{#if groupCategoryId}}
           <div class="alert assignment-edit-external-tool-alert">
             {{#t "external_tool_group_warning"}}
@@ -264,6 +254,17 @@
           </div>
         {{/if}}
       </div>
+      {{#unless isQuizLTIAssignment}}
+        <div id="external_tool_new_tab_container" style="display: none;">
+          <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
+            {{checkbox "externalToolNewTab"
+                       id="assignment_external_tool_tag_attributes_new_tab"
+                       name="external_tool_tag_attributes[new_tab]"
+                       disabled=submissionTypesFrozen}}
+            {{#t "label.external_tool_new_tab"}}Load This Tool In A New Tab{{/t}}
+          </label>
+        </div>
+      {{/unless}}
     </div>
   </div>
 </fieldset>

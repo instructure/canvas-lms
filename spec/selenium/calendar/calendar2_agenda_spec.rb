@@ -333,6 +333,15 @@ describe "calendar2" do
           expect(f('.event-details-timestring')).to include_text(format_time_for_view(test_date))
         end
       end
+
+      it "shows all appointment groups" do
+        create_appointment_group(contexts: [@course])
+        create_appointment_group(contexts: [@course])
+
+        get "/calendar2#view_name=agenda&view_start=#{(Time.zone.today + 1.day).strftime}"
+        wait_for_ajaximations
+        expect(all_agenda_items.count).to equal(2)
+      end
     end
   end
 
@@ -358,19 +367,13 @@ describe "calendar2" do
       load_agenda_view
       expect(fj('.agenda-wrapper:visible')).to be_present
     end
-  end
 
-  context "agenda view with BETTER_SCHEDULER enabled" do
-    before(:each) do
-      account = Account.default
-      account.settings[:agenda_view] = true
-      account.save!
-      account.enable_feature! :better_scheduler
-    end
-
-    context "as a student" do
+    context "agenda view" do
       before(:each) do
-        course_with_student_logged_in
+        account = Account.default
+        account.settings[:agenda_view] = true
+        account.save!
+
         create_appointment_group(contexts: [@course])
         create_appointment_group(contexts: [@course])
       end
@@ -398,20 +401,5 @@ describe "calendar2" do
         expect(agenda_item).to include_text 'Reserved'
       end
     end
-
-    context "as a teacher" do
-      before(:each) do
-        course_with_teacher_logged_in
-        create_appointment_group(contexts: [@course])
-        create_appointment_group(contexts: [@course])
-      end
-
-      it "shows all appointment groups" do
-        get "/calendar2#view_name=agenda&view_start=#{(Time.zone.today + 1.day).strftime}"
-        wait_for_ajaximations
-        expect(all_agenda_items.count).to equal(2)
-      end
-    end
   end
-
 end

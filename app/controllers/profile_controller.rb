@@ -225,6 +225,18 @@ class ProfileController < ApplicationController
     @context = @user.profile
     set_active_tab 'notifications'
 
+    # Render updated UI if feature flag is enabled
+    if Account.site_admin.feature_enabled?(:notification_update_account_ui)
+      add_crumb(@current_user.short_name, profile_path)
+      add_crumb(t("Notification Preferences"))
+      js_env :NOTIFICATION_PREFERENCES_OPTIONS => {
+        :deprecate_sms_enabled => !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
+        :allowed_sms_categories => Notification.categories_to_send_in_sms(@domain_root_account),
+      }
+      js_bundle :account_notification_settings_show
+      render html: '', layout: true
+      return
+    end
 
     # Get the list of Notification models (that are treated like categories) that make up the full list of Categories.
     full_category_list = Notification.dashboard_categories(@user)

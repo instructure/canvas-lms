@@ -78,6 +78,7 @@ export default class EditView extends ValidatedFormView
   GRADING_TYPE_SELECTOR = '#grading_type_selector'
   GRADED_ASSIGNMENT_FIELDS = '#graded_assignment_fields'
   EXTERNAL_TOOL_SETTINGS = '#assignment_external_tool_settings'
+  EXTERNAL_TOOL_SETTINGS_NEW_TAB = '#external_tool_new_tab_container'
   DEFAULT_EXTERNAL_TOOL_CONTAINER = '#default_external_tool_container'
   EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER = '#assignment_submission_type_selection_tool_launch_container'
   EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON = '#assignment_submission_type_selection_launch_button'
@@ -128,6 +129,7 @@ export default class EditView extends ValidatedFormView
     els["#{EXTERNAL_TOOLS_CONTENT_TYPE}"] = '$externalToolsContentType'
     els["#{EXTERNAL_TOOLS_CONTENT_ID}"] = '$externalToolsContentId'
     els["#{EXTERNAL_TOOL_DATA}"] = '$externalToolExternalData'
+    els["#{EXTERNAL_TOOL_SETTINGS_NEW_TAB}"] = '$externalToolNewTabContainer'
     els["#{DEFAULT_EXTERNAL_TOOL_CONTAINER}"] = '$defaultExternalToolContainer'
     els["#{EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER}"] = '$externalToolPlacementLaunchContainer'
     els["#{EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON}"] = '$externalToolPlacementLaunchButton'
@@ -367,6 +369,7 @@ export default class EditView extends ValidatedFormView
     @$allowedAttemptsContainer.toggleAccessibly subVal == 'online' || subVal == 'external_tool' || isPlacementTool
     if subVal == 'online'
       @handleOnlineSubmissionTypeChange()
+    @$externalToolNewTabContainer.toggleAccessibly subVal.includes('external_tool')
 
   handlePlacementExternalToolSelect: (selection) =>
     toolId = selection.replace("external_tool_placement_", "")
@@ -375,7 +378,11 @@ export default class EditView extends ValidatedFormView
     @$externalToolsContentType.val('context_external_tool')
 
     @selectedTool = _.find(@model.submissionTypeSelectionTools(), (tool) -> toolId == tool.id)
-    @$externalToolsUrl.val(@selectedTool.external_url)
+
+    # this will prevent overriding URL when data is already saved
+    if (!@$externalToolExternalData.val())
+      @$externalToolsUrl.val(@selectedTool.external_url)
+
     @$externalToolPlacementLaunchButtonText.text(@selectedTool.title)
     @$externalToolPlacementLaunchButton.click(() => @handleSubmissionTypeSelectionLaunch())
 
@@ -391,13 +398,21 @@ export default class EditView extends ValidatedFormView
     contextId = parseInt(contextInfo[1], 10)
 
     props = {
-      tool: {definition_id: @selectedTool.id}
+      tool: {
+        definition_id: @selectedTool.id,
+        placements: {
+          submission_type_selection: {
+            launch_width: @selectedTool.selection_width,
+            launch_height: @selectedTool.selection_height
+          }
+        }
+      }
       title: @selectedTool.title
       isOpen: open
       onRequestClose: @handleSubmissionTypeSelectionDialogClose
       contextType: contextType
       contextId: contextId
-      launchType: "submission_type_selection"
+      launchType: 'submission_type_selection'
       onExternalContentReady: @handleExternalContentReady
     }
 
@@ -409,7 +424,7 @@ export default class EditView extends ValidatedFormView
     if !data.contentItems || data.contentItems.length == 0
       return
     item = data.contentItems[0]
-    @$externalToolsUrl.val(item.url)  # is this hidden?  Or do we need
+    @$externalToolsUrl.val(item.url)
     if (item.title)
       @$name.val(item.title)
 

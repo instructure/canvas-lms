@@ -36,9 +36,6 @@ export default class AppList extends React.Component {
   componentDidMount() {
     store.addChangeListener(this.onChange)
     store.fetch()
-    if (this.props.alreadyRendered) {
-      this.appFilters.focus()
-    }
   }
 
   componentWillUnmount() {
@@ -66,7 +63,7 @@ export default class AppList extends React.Component {
 
   apps = () => {
     if (store.getState().isLoading) {
-      return <div ref="loadingIndicator" className="loadingIndicator" />
+      return <div ref={this.loadingIndicator} className="loadingIndicator" data-testid="spinner" />
     } else {
       return store
         .filteredApps()

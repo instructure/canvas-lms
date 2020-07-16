@@ -848,6 +848,32 @@ describe MasterCourses::MasterMigration do
       expect(att2_to.reload).to be_available # should be restored because it hadn't been deleted manually
     end
 
+    it "doesn't sync new files into an old deleted folder with the same name" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      @root_folder = Folder.root_folders(@copy_from).first
+      @folder_to_delete = @root_folder.sub_folders.create!(:name => "nowyouseeme", :context => @copy_from)
+      @att1 = Attachment.create!(:filename => 'file1.txt', :uploaded_data => StringIO.new('1'),
+        :folder => @folder_to_delete, :context => @copy_from)
+
+      run_master_migration
+      @att1_to = @copy_to.attachments.where(:migration_id => mig_id(@att1)).first
+      expect(@att1_to).to be_present
+
+      Timecop.freeze(1.minute.from_now) do
+        @att1.update_attribute(:folder, @root_folder)
+        @folder_to_delete.destroy
+        @replacement_folder = @root_folder.sub_folders.create!(:name => "nowyouseeme", :context => @copy_from)
+        @att1.update_attribute(:folder, @replacement_folder)
+      end
+      run_master_migration
+
+      @att1_to.reload
+      expect(@att1_to).to_not be_deleted
+      expect(@att1_to.folder).to_not be_deleted
+    end
+
     it "limits the number of items to track" do
       Setting.set('master_courses_history_count', '2')
 
@@ -1334,6 +1360,20 @@ describe MasterCourses::MasterMigration do
 
       expect(copied_quiz_assmt.reload.due_at.to_i).to eq new_master_due_at.to_i # should have gotten overwritten
       expect(copied_topic_assmt.reload.due_at.to_i).to eq new_master_due_at.to_i
+    end
+
+    it "should not copy only_visible_to_overrides for quizzes by default" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz_assmt = @copy_from.assignments.create!(:submission_types => 'online_quiz').reload
+      quiz = quiz_assmt.quiz
+      quiz.update_attribute(:only_visible_to_overrides, true)
+
+      run_master_migration
+
+      copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      expect(copied_quiz.only_visible_to_overrides).to eq false
     end
 
     it "allows a minion course's change of the graded status of a discussion topic to stick" do
@@ -2356,6 +2396,28 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration(:publish_after_initial_sync => true)
       expect(@copy_to2.reload).to be_available
+    end
+
+    it "should update quiz assignment cached due dates" do
+      course_with_student(:active_all => true)
+      @copy_to = @course
+      @sub = @template.add_child_course!(@copy_to)
+
+      q = @copy_from.quizzes.create!(:title => "some quiz")
+      q.publish!
+
+      run_master_migration
+      q_to = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
+      sub = @student.submissions.where(:assignment_id => q_to.assignment).first
+      expect(sub.cached_due_date).to be_nil
+
+      due_at = 1.day.from_now
+      Timecop.freeze(1.minute.from_now) do
+        q.update_attribute(:due_at, due_at)
+        run_master_migration
+      end
+
+      expect(sub.reload.cached_due_date.to_i).to eq due_at.to_i
     end
 
     context "caching" do

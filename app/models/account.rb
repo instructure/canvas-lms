@@ -276,11 +276,15 @@ class Account < ActiveRecord::Base
 
   add_setting :enable_course_catalog, :boolean => true, :root_only => true, :default => false
   add_setting :usage_rights_required, :boolean => true, :default => false, :inheritable => true
-  add_setting :limit_parent_app_web_access, boolean: true, default: false
+  add_setting :limit_parent_app_web_access, boolean: true, default: false, root_only: true
   add_setting :kill_joy, boolean: true, default: false, root_only: true
   add_setting :smart_alerts_threshold, default: 36, root_only: true
 
   add_setting :disable_post_to_sis_when_grading_period_closed, boolean: true, root_only: true, default: false
+
+  # privacy settings for root accounts
+  add_setting :enable_fullstory, boolean: true, root_only: true, default: true
+  add_setting :enable_google_analytics, boolean: true, root_only: true, default: true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -1167,6 +1171,9 @@ class Account < ActiveRecord::Base
 
     given { |user| self.grants_right?(user, :lti_add_edit)}
     can :create_tool_manually
+
+    given { |user| !self.site_admin? && self.root_account? && self.grants_right?(user, :manage_site_settings) }
+    can :manage_privacy_settings
   end
 
   alias_method :destroy_permanently!, :destroy

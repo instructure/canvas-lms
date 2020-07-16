@@ -325,6 +325,7 @@
                 %>
               <div class="comment <%= 'draft' if comment.draft? %>" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">
+                  <span style="white-space: pre-wrap;"><%= comment.comment %></span>
                   <% if comment.media_comment_id %>
                     <div class="comment_media">
                       <%= t(
@@ -335,8 +336,6 @@
                       <div class="media_comment_content">
                       </div>
                     </div>
-                  <% else %>
-                    <span style="white-space: pre-wrap;"><%= comment.comment %></span>
                   <% end %>
                 </div>
                 <div class="comment_attachments" style="text-align: <%= direction('right') %>; margin-<%= direction('right') %>: 10px;">

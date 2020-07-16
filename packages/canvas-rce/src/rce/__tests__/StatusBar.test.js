@@ -46,36 +46,74 @@ describe('RCE StatusBar', () => {
     expect(onkbcallback).toHaveBeenCalled()
   })
 
-  it('cycles focus with right arrow keys', () => {
-    const {container} = renderStatusBar()
-    const buttons = container.querySelectorAll('button, *[tabindex]')
-    expect(buttons.length).toEqual(4)
+  describe('in WYSIWYG mode', () => {
+    it('cycles focus with right arrow keys', () => {
+      const {container, getByTestId} = renderStatusBar()
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('button, *[tabindex]')
+      expect(buttons.length).toEqual(4)
 
-    buttons[0].focus()
-    expect(document.activeElement === buttons[0])
+      buttons[0].focus()
+      expect(document.activeElement).toBe(buttons[0])
+      // wraps to the right
+      for (let i = 1; i <= buttons.length; ++i) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.right})
+        expect(document.activeElement).toBe(buttons[i % buttons.length])
+      }
+      expect(document.activeElement).toBe(buttons[0]) // back to the beginning
+    })
 
-    // wraps to the right
-    for (let i = 0; i === buttons.length; ++i) {
-      fireEvent.keyDown(container, {keyCode: keycode.codes.right})
-      expect(document.activeElement === buttons[i % buttons.length])
-    }
-    expect(document.activeElement === buttons[0]) // back to the beginning
+    it('cycles focus with left arrow keys', async () => {
+      const {container, getByTestId} = renderStatusBar()
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('button, *[tabindex]')
+      expect(buttons.length).toEqual(4)
+
+      buttons[3].focus()
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+      // wraps to the left
+      for (let i = 1; i <= buttons.length; ++i) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.left})
+        expect(document.activeElement).toBe(
+          buttons[(buttons.length - 1 - i + buttons.length) % buttons.length]
+        )
+      }
+    })
   })
 
-  it('cycles focus with left arrow keys', () => {
-    const {container} = renderStatusBar()
-    const buttons = container.querySelectorAll('button, *[tabindex]')
-    expect(buttons.length).toEqual(4)
+  describe('in HTML mode', () => {
+    it('cycles focus with right arrow keys', () => {
+      const {container, getByTestId} = renderStatusBar({isHtmlView: true})
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('button, *[tabindex]')
+      expect(buttons.length).toEqual(2)
 
-    buttons[3].focus()
-    expect(document.activeElement === buttons[3])
+      buttons[0].focus()
+      expect(document.activeElement).toBe(buttons[0])
+      // wraps to the right
+      for (let i = 1; i <= buttons.length; ++i) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.right})
+        expect(document.activeElement).toBe(buttons[i % buttons.length])
+      }
+      expect(document.activeElement).toBe(buttons[0]) // back to the beginning
+    })
 
-    // wraps to the left
-    for (let i = 0; i < buttons.length; ++i) {
-      fireEvent.keyDown(container, {keyCode: keycode.codes.left})
-      expect(document.activeElement === buttons[(3 - i + buttons.length) % buttons.length])
-    }
-    expect(document.activeElement === buttons[3])
+    it('cycles focus with left arrow keys', async () => {
+      const {container, getByTestId} = renderStatusBar({isHtmlView: true})
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('button, *[tabindex]')
+      expect(buttons.length).toEqual(2)
+
+      buttons[buttons.length - 1].focus()
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+      // wraps to the left
+      for (let focusedButton = buttons.length - 1; focusedButton > 0; --focusedButton) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.left})
+        expect(document.activeElement).toBe(buttons[focusedButton - 1])
+      }
+      fireEvent.keyDown(statusbar, {keyCode: keycode.codes.left})
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+    })
   })
 
   it('calls the callback when clicking the a11y checker button', () => {

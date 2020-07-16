@@ -194,12 +194,6 @@ notification_service:
   description: Allow the ability to send notifications through our dispatch queue
   applies_to: RootAccount
   root_opt_in: true
-better_scheduler:
-  state: hidden
-  display_name: Use the new scheduler
-  description: Uses the new scheduler and its functionality
-  applies_to: RootAccount
-  root_opt_in: true
 course_card_images:
   state: allowed
   display_name: Enable Dashboard Images for Courses

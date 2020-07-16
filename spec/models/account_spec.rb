@@ -547,8 +547,17 @@ describe Account do
     # site admin has access to everything everywhere
     hash.each do |k, v|
       account = v[:account]
-      expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
-      expect(account.check_policy(hash[:site_admin][:user]) - conditional_access).to match_array limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
+
+      common_siteadmin_privileges = []
+      common_siteadmin_privileges += [:read_global_outcomes] if k == :site_admin
+
+      admin_privileges = full_access + common_siteadmin_privileges
+      admin_privileges += [:manage_privacy_settings] if k == :root
+
+      user_privileges = limited_access + common_siteadmin_privileges
+
+      expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
+      expect(account.check_policy(hash[:site_admin][:user]) - conditional_access).to match_array user_privileges
     end
 
     # root admin has access to everything except site admin
@@ -589,10 +598,12 @@ describe Account do
     AdheresToPolicy::Cache.clear
     hash.each do |k, v|
       account = v[:account]
-      admin_array = full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      admin_privileges = full_access.clone
+      admin_privileges += [:read_global_outcomes] if k == :site_admin
+      admin_privileges += [:manage_privacy_settings] if k == :root
       user_array = some_access + [:reset_any_mfa] +
         (k == :site_admin ? [:read_global_outcomes] : [])
-      expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_array
+      expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
       expect(account.check_policy(hash[:site_admin][:user])).to match_array user_array
     end
 

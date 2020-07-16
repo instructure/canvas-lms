@@ -55,6 +55,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   # or any models that do not have a root_account_id column.
   def self.migration_tables
     {
+      AccessToken => :developer_key,
       AccountUser => :account,
       AssessmentQuestion => :assessment_question_bank,
       AssessmentQuestionBank => :context,
@@ -62,16 +63,30 @@ module DataFixup::PopulateRootAccountIdOnModels
       AssignmentGroup => :context,
       AssignmentOverride => :assignment,
       AssignmentOverrideStudent => :assignment,
-      ContextExternalTool => [{context: [:root_account_id, :id]}],
+      CalendarEvent => [:context_course, :context_group, :context_course_section],
       ContentMigration => [:account, :course, :group],
-      ContextModule => :context,
+      ContentParticipation => :content,
+      ContentParticipationCount => :course,
       ContentShare => [:course, :group],
+      ContextExternalTool => [{context: [:root_account_id, :id]}],
+      ContextModule => :context,
+      ContextModuleProgression => :context_module,
+      CourseAccountAssociation => :account,
+      CustomGradebookColumn => :course,
+      CustomGradebookColumnDatum => :custom_gradebook_column,
+      ContentTag => :context,
       DeveloperKey => :account,
       DeveloperKeyAccountBinding => :account,
       DiscussionEntry => :discussion_topic,
       DiscussionEntryParticipant => :discussion_entry,
       DiscussionTopic => :context,
       DiscussionTopicParticipant => :discussion_topic,
+      EnrollmentState => :enrollment,
+      GradingPeriod => :grading_period_group,
+      GradingPeriodGroup => [{root_account: [:root_account_id, :id]}, :course],
+      GradingStandard => :context,
+      GroupCategory => :context,
+      GroupMembership => :group,
       LatePolicy => :course,
       LearningOutcomeGroup => :context,
       LearningOutcomeQuestionResult => :learning_outcome_result,
@@ -83,24 +98,35 @@ module DataFixup::PopulateRootAccountIdOnModels
       MasterCourses::ChildSubscription => :child_course,
       MasterCourses::MasterContentTag => :master_template,
       MasterCourses::MasterMigration => :master_template,
-      MasterCourses::MigrationResult => :master_migration,
       MasterCourses::MasterTemplate => :course,
+      MasterCourses::MigrationResult => :master_migration,
       OriginalityReport => :submission,
+      OutcomeProficiency => :account,
+      OutcomeProficiencyRating => :outcome_proficiency,
       PostPolicy => :course,
       Quizzes::Quiz => :course,
+      Quizzes::QuizGroup => :quiz,
+      Quizzes::QuizQuestion => :quiz,
+      Quizzes::QuizSubmission => :quiz,
+      RoleOverride => :account,
       Rubric => :context,
       RubricAssessment => :rubric,
       RubricAssociation => :context,
+      Score => :enrollment,
+      ScoreStatistic => :assignment,
       Submission => :assignment,
       SubmissionComment => :course,
+      SubmissionVersion => :course,
       UserAccountAssociation => :account,
-      WebConferenceParticipant => :web_conference,
       WebConference => :context,
+      WebConferenceParticipant => :web_conference,
+      Wiki => [:course, :group],
+      WikiPage => :context,
     }.freeze
   end
 
   # tables that have been filled for a while already
-  DONE_TABLES = [Account, Assignment, Course, Group, Enrollment].freeze
+  DONE_TABLES = [Account, Assignment, Course, CourseSection, Enrollment, EnrollmentDatesOverride, EnrollmentTerm, Group].freeze
 
   def self.run
     clean_and_filter_tables.each do |table, assoc|
@@ -220,15 +246,25 @@ module DataFixup::PopulateRootAccountIdOnModels
   # thus allowing us to pretend the Attachments table has been backfilled where necessary
   def self.check_if_table_has_root_account(class_name, associations=[])
     return false if class_name.column_names.exclude?('root_account_id')
-    return class_name.where(root_account_id: nil).none? if associations.blank? 
+    if associations.blank?
+      return unfillable_tables.include?(class_name) ||
+        class_name.where(root_account_id: nil).none?
+    end
     associations.all?{|a| class_name.joins(a).where(root_account_id: nil).none?}
   end
 
+  # In case we run into other tables that can't fully finish being filled with
+  # root account ids, and they have children who need them to pretend they're full
+  def self.unfillable_tables
+    [DeveloperKey]
+  end
+
   def self.populate_root_account_ids(table, associations, min, max)
+    primary_key_field = table.primary_key
     table.find_ids_in_ranges(start_at: min, end_at: max) do |batch_min, batch_max|
       associations.each do |assoc, columns|
         account_id_column = create_column_names(table.reflections[assoc.to_s], columns)
-        table.where(id: batch_min..batch_max, root_account_id: nil).
+        table.where(primary_key_field => batch_min..batch_max, root_account_id: nil).
           joins(assoc).
           update_all("root_account_id = #{account_id_column}")
       end

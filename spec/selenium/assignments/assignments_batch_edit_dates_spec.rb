@@ -110,10 +110,12 @@ describe "assignment batch edit" do
         replace_content(date_inputs[2], format_date_for_view(@date + 5.days, :medium))
         # save
         save_bulk_edited_dates
-        visit_assignments_index_page(@course1.id)
         # the assignment should now have due and available dates
-        expect(assignment_row(@assignment2.id).text).to include 'Available until'
-        expect(assignment_row(@assignment2.id).text).to include 'Due'
+        keep_trying_until do
+          expect(@assignment2.reload.due_at).not_to be_nil
+          expect(@assignment2.lock_at).not_to be_nil
+          expect(@assignment2.unlock_at).not_to be_nil
+        end
       end
 
       it 'allows selecting and shifting dates', custom_timeout: 30 do

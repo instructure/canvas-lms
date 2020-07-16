@@ -1434,6 +1434,35 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MODERATED_GRADING_MAX_GRADER_COUNT]).to eq @assignment.moderated_grading_max_grader_count
     end
 
+    it 'js_env SUBMISSION_TYPE_SELECTION_TOOLS is correctly set for submission type tools' do
+      @course.root_account.enable_feature! :submission_type_tool_placement
+      tool_settings = {
+        base_title: 'my title',
+        external_url: 'https://tool.launch.url',
+        selection_width: 750,
+        selection_height: 480,
+        icon_url: nil,
+      }
+      @tool = factory_with_protected_attributes(@course.context_external_tools,
+        :url => "http://www.justanexamplenotarealwebsite.com/tool1",
+        :shared_secret => 'test123',
+        :consumer_key => 'test123',
+        :name => tool_settings[:base_title],
+        :settings => {
+          :submission_type_selection => tool_settings
+        }
+      )
+      user_session(@teacher)
+
+      get :edit, params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
+        base_title: tool_settings[:base_title],
+        title: tool_settings[:base_title],
+        selection_width: tool_settings[:selection_width],
+        selection_height: tool_settings[:selection_height]
+      )
+    end
+
     context 'when the root account does not have a default tool url set' do
       let(:course) { @course }
       let(:root_account) { course.root_account }

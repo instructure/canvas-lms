@@ -103,7 +103,7 @@
     <textarea id="edit-appointment-details-{{uniqid}}" name="description" class="input-block-level">{{appointment_group.description}}</textarea>
   </div>
   <div class="popover-links-holder event-details-footer pull-right scheduler-event-details-footer">
-    {{#if better_scheduler}}
+    {{#if use_scheduler}}
       <a href="#" class="event_button btn btn-secondary more_options_link cancel_btn">{{#t}}Cancel{{/t}}</a>
       <button type="submit" class="event_button btn btn-primary">{{#t}}Publish{{/t}}</button>
     {{else}}

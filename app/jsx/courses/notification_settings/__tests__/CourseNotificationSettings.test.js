@@ -29,7 +29,8 @@ async function createGraphqlMocks(queryOverrides) {
     queryOverrides = [queryOverrides]
   }
   const queryResult = await mockGraphqlQuery(COURSE_NOTIFICATIONS_QUERY, queryOverrides, {
-    courseId: 1
+    courseId: 1,
+    userId: 1
   })
 
   return [
@@ -37,7 +38,8 @@ async function createGraphqlMocks(queryOverrides) {
       request: {
         query: COURSE_NOTIFICATIONS_QUERY,
         variables: {
-          courseId: '1'
+          courseId: '1',
+          userId: '1'
         }
       },
       result: queryResult
@@ -47,16 +49,12 @@ async function createGraphqlMocks(queryOverrides) {
 
 describe('Course Notification Settings', () => {
   it('displays the correct messaging for enabled notification settings', async () => {
-    const mocks = await createGraphqlMocks({
-      Course: {
-        _id: 1,
-        notificationPreferencesEnabled: true
-      }
-    })
+    const mocks = await createGraphqlMocks({Node: {__typename: 'User'}})
+    mocks[0].result.data.legacyNode.notificationPreferencesEnabled = true
     const {findByText, findByTestId} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <AlertManager>
-          <CourseNotificationSettingsQuery courseId="1" />
+          <CourseNotificationSettingsQuery courseId="1" courseName="Super Cool Class" userId="1" />
         </AlertManager>
       </MockedProvider>
     )
@@ -70,16 +68,12 @@ describe('Course Notification Settings', () => {
   })
 
   it('displays the correct messaging for disabled notification settings', async () => {
-    const mocks = await createGraphqlMocks({
-      Course: {
-        _id: 1,
-        notificationPreferencesEnabled: false
-      }
-    })
+    const mocks = await createGraphqlMocks({Node: {__typename: 'User'}})
+    mocks[0].result.data.legacyNode.notificationPreferencesEnabled = false
     const {findByText} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <AlertManager>
-          <CourseNotificationSettingsQuery courseId="1" />
+          <CourseNotificationSettingsQuery courseId="1" courseName="Super Cool Class" userId="1" />
         </AlertManager>
       </MockedProvider>
     )

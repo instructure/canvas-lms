@@ -21,14 +21,14 @@ module SIS
       attr_accessor :course_id, :section_id, :user_id, :user_integration_id,
                     :role, :status, :associated_user_id, :root_account_id,
                     :role_id, :start_date, :end_date, :sis_batch_id,
-                    :limit_section_privileges, :lineno, :csv
+                    :limit_section_privileges, :notify, :lineno, :csv
 
       def initialize(course_id: nil, section_id: nil, user_id: nil,
                      user_integration_id: nil, role: nil, status: nil,
                      associated_user_id: nil, root_account_id: nil,
                      role_id: nil, start_date: nil, end_date: nil,
                      sis_batch_id: nil, limit_section_privileges: nil,
-                     lineno: nil, csv: nil)
+                     notify: nil, lineno: nil, csv: nil)
         self.course_id = course_id
         self.section_id = section_id
         self.user_id = user_id
@@ -39,6 +39,7 @@ module SIS
         self.root_account_id = root_account_id
         self.role_id = role_id
         self.limit_section_privileges = limit_section_privileges
+        self.notify = notify
         self.start_date = start_date
         self.end_date = end_date
         self.lineno = lineno
@@ -71,6 +72,7 @@ module SIS
          root_account_id: root_account_id,
          role_id: role_id,
          limit_section_privileges: limit_section_privileges,
+         notify: notify,
          start_date: start_date,
          end_date: end_date].to_s
       end

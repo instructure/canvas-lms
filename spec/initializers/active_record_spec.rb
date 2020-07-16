@@ -232,6 +232,35 @@ module ActiveRecord
           Auditors::ActiveRecord::AuthenticationRecord.bulk_insert([attrs])
         end.to raise_error(ActiveRecord::InvalidForeignKey)
       end
+
+      it "writes to the correct partition" do
+        user = user_with_pseudonym(active_user: true)
+        pseud = @pseudonym
+        attrs_1 = {
+          'request_id' => 'abcde-12345',
+          'uuid' => 'edcba-54321',
+          'account_id' => Account.default.id,
+          'user_id' => user.id,
+          'pseudonym_id' => pseud.id,
+          'event_type' => 'login',
+          'created_at' => DateTime.now.utc
+        }
+        attrs_2 = attrs_1.merge({
+          'created_at' => 40.days.ago
+        })
+        ar_type = Auditors::ActiveRecord::AuthenticationRecord
+        expect { ar_type.bulk_insert([attrs_1, attrs_2]) }.to_not raise_error
+        conn = ar_type.connection
+        root_partition_count = conn.execute("select count(*) from only #{ar_type.quoted_table_name};")[0]["count"]
+        expect(root_partition_count).to eq(0)
+        expect(ar_type.count).to eq(2)
+        now_partition_name = conn.quote_table_name(ar_type.infer_partition_table_name(attrs_1))
+        now_partition_count = conn.execute("select count(*) from #{now_partition_name};")[0]["count"]
+        expect(now_partition_count).to eq(1)
+        prev_partition_name = conn.quote_table_name(ar_type.infer_partition_table_name(attrs_2))
+        prev_partition_count = conn.execute("select count(*) from #{prev_partition_name};")[0]["count"]
+        expect(prev_partition_count).to eq(1)
+      end
     end
 
     describe "deconstruct_joins" do

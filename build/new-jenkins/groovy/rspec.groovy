@@ -21,7 +21,8 @@ def seleniumConfig() {
     node_total: configuration.getInteger('selenium-ci-node-total'),
     max_fail: configuration.getInteger('selenium-max-fail'),
     reruns_retry: configuration.getInteger('selenium-rerun-retry'),
-    force_failure: configuration.isForceFailureSelenium() ? "1" : ''
+    force_failure: configuration.isForceFailureSelenium() ? "1" : '',
+    patchsetTag: env.PATCHSET_TAG,
   ]
 }
 
@@ -37,7 +38,8 @@ def runSeleniumSuite(total, index) {
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
       '3',
-      config.force_failure
+      config.force_failure,
+      config.patchsetTag
   )
 }
 
@@ -46,7 +48,8 @@ def rspecConfig() {
     node_total: configuration.getInteger('rspec-ci-node-total'),
     max_fail: configuration.getInteger('rspec-max-fail'),
     reruns_retry: configuration.getInteger('rspec-rerun-retry'),
-    force_failure: configuration.isForceFailureRSpec() ? "1" : ''
+    force_failure: configuration.isForceFailureRSpec() ? "1" : '',
+    patchsetTag: env.PATCHSET_TAG,
   ]
 }
 
@@ -62,7 +65,8 @@ def runRSpecSuite(total, index) {
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/selenium',
       '4',
-      config.force_failure
+      config.force_failure,
+      config.patchsetTag
   )
 }
 
@@ -76,7 +80,9 @@ def _runRspecTestSuite(
     test_file_pattern,
     exclude_regex,
     docker_processes,
-    force_failure) {
+    force_failure,
+    patchsetTag
+) {
   withEnv([
       "CI_NODE_INDEX=$index",
       "COMPOSE_FILE=$compose",
@@ -88,7 +94,8 @@ def _runRspecTestSuite(
       "DOCKER_PROCESSES=$docker_processes",
       "FORCE_FAILURE=$force_failure",
       "POSTGRES_PASSWORD=sekret",
-      "SELENIUM_VERSION=3.141.59-20200525"
+      "SELENIUM_VERSION=3.141.59-20200525",
+      "PATCHSET_TAG=$patchsetTag",
   ]) {
     try {
       cleanAndSetup()
@@ -103,7 +110,7 @@ def _runRspecTestSuite(
 
         sh 'build/new-jenkins/docker-compose-build-up.sh'
         sh 'build/new-jenkins/docker-compose-setup-databases.sh'
-        sh 'build/new-jenkins/rspec_parallel_dockers.sh'
+        sh 'build/new-jenkins/docker-compose-rspec-parallel.sh'
       }
     }
     finally {

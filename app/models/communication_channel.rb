@@ -24,7 +24,6 @@ class CommunicationChannel < ActiveRecord::Base
   serialize :last_bounce_details
   serialize :last_transient_bounce_details
 
-  belongs_to :root_account, class_name: 'Account'
   belongs_to :pseudonym
   has_many :pseudonyms
   belongs_to :user, inverse_of: :communication_channels
@@ -33,7 +32,6 @@ class CommunicationChannel < ActiveRecord::Base
   has_many :delayed_messages, :dependent => :destroy
   has_many :messages
 
-  before_save :associate_to_account, if: lambda { |cc| cc.pseudonym.present? }
   before_save :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
   validates_presence_of :path, :path_type, :user, :workflow_state
@@ -567,13 +565,5 @@ class CommunicationChannel < ActiveRecord::Base
     return nil unless (match = path.match(/^(?<number>\d+)@(?<domain>.+)$/))
     return nil unless (carrier = CommunicationChannel.sms_carriers[match[:domain]])
     "+#{carrier['country_code']}#{match[:number]}"
-  end
-
-  def associate_to_account
-    # We've added a foreign key constraint that will need to be removed
-    # when we can update the schema VICE-572
-    if pseudonym.shard == self.shard
-      self.root_account = self.pseudonym.account
-    end
   end
 end

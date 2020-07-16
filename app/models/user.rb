@@ -20,6 +20,8 @@ require 'atom'
 
 class User < ActiveRecord::Base
   GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//
+  MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
+
   include TurnitinID
   include Pronouns
 
@@ -429,6 +431,33 @@ class User < ActiveRecord::Base
   end
   def self.skip_updating_account_associations?
     !!@skip_updating_account_associations
+  end
+
+  def update_root_account_ids
+    # See User#associated_shards in MRA for an explanation of
+    # shard association levels
+    shards = associated_shards(:strong) + associated_shards(:weak)
+    refreshed_root_account_ids = Set.new
+
+    Shard.with_each_shard(shards) do
+      UserAccountAssociation.joins(:account).
+        where(user: self, accounts: { parent_account_id: nil }).
+        preload(:account).
+        find_each do |association|
+          refreshed_root_account_ids << association.global_account_id
+        end
+    end
+
+    self.update!(root_account_ids: refreshed_root_account_ids.to_a)
+  end
+
+  def update_root_account_ids_later
+    send_later_enqueue_args(
+      :update_root_account_ids,
+      {
+        max_attempts: MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS
+      }
+    )
   end
 
   def update_account_associations_later
@@ -1045,7 +1074,6 @@ class User < ActiveRecord::Base
   def self.clone_communication_channel(cc, new_user, max_position)
     new_cc = cc.clone
     new_cc.shard = new_user.shard
-    new_cc.root_account_id = nil if cc.shard != new_cc.shard
     new_cc.position += max_position
     new_cc.user = new_user
     new_cc.save!
@@ -1270,20 +1298,6 @@ class User < ActiveRecord::Base
   def file_management_contexts
     contexts = [self] + self.courses + self.groups.active + self.all_courses
     contexts.uniq.select{|c| c.grants_right?(self, nil, :manage_files) }
-  end
-
-  def visible_inbox_types=(val)
-    types = (val || "").split(",")
-    write_attribute(:visible_inbox_types, types.map{|t| t.classify }.join(","))
-  end
-
-  def show_in_inbox?(type)
-    if self.respond_to?(:visible_inbox_types) && self.visible_inbox_types
-      types = self.visible_inbox_types.split(",")
-      types.include?(type)
-    else
-      true
-    end
   end
 
   def update_avatar_image(force_reload=false)

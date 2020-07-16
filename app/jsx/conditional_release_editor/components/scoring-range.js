@@ -144,7 +144,7 @@ class ScoringRange extends React.Component {
       .map((set, i, sets) => {
         return (
           <AssignmentSet
-            key={set.get('id')}
+            key={set.get('id') || i}
             path={path.push(i)}
             label={I18n.t('Assignment set %{set_index}', {set_index: i + 1})}
             setAssignments={set.get('assignment_set_associations', List())}

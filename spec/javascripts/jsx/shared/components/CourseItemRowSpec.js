@@ -78,7 +78,7 @@ test('renders clickable children inside content link', () => {
     />
   )
   ok(tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me').exists())
-  ok(tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me2').exists())
+  ok(tree.find('.ic-item-row__content-col .ic-item-row__content-container .find-me2').exists())
   ok(!tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me3').exists())
   ok(tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me4').exists())
 })

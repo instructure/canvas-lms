@@ -152,6 +152,41 @@ describe EventStream::Stream do
     end
   end
 
+  describe ".database_name" do
+    it "returns backend db name from AR" do
+      # can't access spec ivars inside instance_exec
+      table = @table
+      id_column = double(:to_s => double('id_column'))
+      record_type = double('record_type')
+
+      ar_type = Class.new do
+        def self.connection
+          self
+        end\
+
+        def self.shard
+          self
+        end
+
+        def self.name
+          "active_record_db"
+        end
+      end
+
+      stream = EventStream::Stream.new do
+        self.backend_strategy -> { :active_record }
+        self.database -> { nil }
+        self.table table
+        self.id_column id_column
+        self.record_type record_type
+        self.read_consistency_level 'ALL'
+        self.active_record_type ar_type
+      end
+
+      expect(stream.database_name).to eq("active_record_db")
+    end
+  end
+
   context "usage" do
     before do
       @table = double(:to_s => "expected_table")

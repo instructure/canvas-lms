@@ -11,6 +11,7 @@ services:
     environment:
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
       RAILS_ENV: test
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       RANDOMIZE_SEQUENCES: 1
       DISABLE_SPRING: 'true'
       RERUNS_RETRY:

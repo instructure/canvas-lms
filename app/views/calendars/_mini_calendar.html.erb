@@ -51,7 +51,8 @@
         <% 7.times do %>
           <td id="<%= day.strftime("mini_day_%Y_%m_%d") %>" class="mini_calendar_day day <%= day.month == current.month ? 'current_month' : "other_month #{day.month == (current.month + 1) % 12 ? 'next_month' : 'previous_month'}" %><%= day == today ? ' today' : '' %> <%= day.strftime("date_%m_%d_%Y") %>">
             <div class="day_wrapper">
-              <span class="day_number">
+              <span class="screenreader-only"><%= day.strftime("%e %B %Y") %></span>
+              <span class="day_number" aria-hidden="true">
                 <%= day.day %>
               </span>
               <span class="screenreader-only previous_month_text"><%= I18n.t 'Previous month' %></span>

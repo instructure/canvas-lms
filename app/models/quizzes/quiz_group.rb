@@ -17,6 +17,7 @@
 #
 
 class Quizzes::QuizGroup < ActiveRecord::Base
+  extend RootAccountResolver
   self.table_name = 'quiz_groups'
 
   attr_readonly :quiz_id
@@ -33,6 +34,8 @@ class Quizzes::QuizGroup < ActiveRecord::Base
   before_save :infer_position
   before_destroy :update_quiz
   after_save :update_quiz
+
+  resolves_root_account through: :quiz
 
   include MasterCourses::CollectionRestrictor
   self.collection_owner_association = :quiz

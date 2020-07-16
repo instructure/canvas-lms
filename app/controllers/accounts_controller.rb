@@ -970,6 +970,13 @@ class AccountsController < ApplicationController
           end
         end
 
+        # privacy settings
+        unless @account.grants_right?(@current_user, :manage_privacy_settings)
+          %w{enable_fullstory enable_google_analytics}.each do |setting|
+            params[:account][:settings].try(:delete, setting)
+          end
+        end
+
         # don't accidentally turn the default help link name into a custom one and thereby break i18n
         help_link_name = params.dig(:account, :settings, :help_link_name)
         params[:account][:settings][:help_link_name] = nil if help_link_name == default_help_link_name
@@ -1550,7 +1557,7 @@ class AccountsController < ApplicationController
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
                                    {:usage_rights_required => [:value, :locked] }.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
-                                   :smart_alerts_threshold].freeze
+                                   :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,

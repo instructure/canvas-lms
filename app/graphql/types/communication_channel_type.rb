@@ -38,7 +38,7 @@ module Types
     field :path_type, String, null: true
 
     field :notification_policies, [NotificationPolicyType], null: true do
-      argument :context_type, NotificationPreferencesContextType, required: true
+      argument :context_type, NotificationPreferencesContextType, required: false
     end
     def notification_policies(context_type: nil)
       NotificationPolicy.find_all_for(self.object, context_type: context_type)

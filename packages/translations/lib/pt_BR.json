@@ -50,6 +50,9 @@
     "alt_text_611fb322": {
         "message": "Texto alternativo"
     },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "Ocorreu um erro ao ler o arquivo"
+    },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Ocorreu um erro ao tentar descartar a oportunidade."
     },
@@ -259,6 +262,9 @@
     },
     "date_time_d9fbf2d7": {
         "message": "Data e Hora:"
+    },
+    "decorative_image_3c28aa7d": {
+        "message": "Imagem decorativa"
     },
     "decrease_indent_de6343ab": {
         "message": "Diminuir recuo"
@@ -673,6 +679,9 @@
     },
     "my_grades_98834476": {
         "message": "Minhas notas"
+    },
+    "my_media_82bade11": {
+        "message": "Minha mídia"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navegue no menu ou barra de ferramentas"
@@ -1162,6 +1171,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Você tem feedback de mídia."
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "Você não pode carregar um arquivo vazio."
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "Você deve fornecer uma data e hora."

@@ -19,6 +19,7 @@
 require 'sanitize'
 
 class Quizzes::QuizSubmission < ActiveRecord::Base
+  extend RootAccountResolver
   self.table_name = 'quiz_submissions'
 
   include Workflow
@@ -53,6 +54,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :events, class_name: 'Quizzes::QuizSubmissionEvent'
+
+  resolves_root_account through: :quiz
 
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
   # ensures that quiz submissions with essay questions don't show as graded in the SpeedGrader until the instructor

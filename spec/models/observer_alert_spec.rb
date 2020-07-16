@@ -245,6 +245,11 @@ describe ObserverAlert do
       expect(alert.title).to include('Assignment missing:')
     end
 
+    it 'deletes the alert if the submission is deleted' do
+      submission = ObserverAlert.active.where(student: @student1, alert_type: 'assignment_missing').first.context
+      expect { submission.destroy }.to change { ObserverAlert.count }.by(-1)
+    end
+
     it 'doesnt create another alert if one already exists' do
       alert = ObserverAlert.active.where(student: @student2, alert_type: 'assignment_missing').first
       expect(alert).to be_nil

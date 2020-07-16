@@ -327,13 +327,13 @@ describe "context modules" do
         @after2 = @module_2.add_item(:type => "external_url", :title => "url2", :url => "http://example.com/2")
         @after2.publish!
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
-        prev = f('.module-sequence-footer-button--previous')
+        prev = f('.module-sequence-footer-button--previous a')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
         nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
 
         get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
-        prev = f('.module-sequence-footer-button--previous')
+        prev = f('.module-sequence-footer-button--previous a')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_2.id}")
         nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after2.id}")
@@ -351,7 +351,7 @@ describe "context modules" do
         @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
         @after1.publish!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        prev = f('.module-sequence-footer-button--previous')
+        prev = f('.module-sequence-footer-button--previous a')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
         nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")

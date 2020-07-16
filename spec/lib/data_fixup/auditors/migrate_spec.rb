@@ -464,7 +464,7 @@ module DataFixup::Auditors::Migrate
         expect(p1_count[0]["count"]).to eq(0)
         expect(p2_count[0]["count"]).to eq(0)
         expect(p3_count[0]["count"]).to eq(0)
-        worker.bulk_insert_auditor_recs(Auditors::ActiveRecord::AuthenticationRecord, events)
+        Auditors::ActiveRecord::AuthenticationRecord.bulk_insert(events)
         p1_count = User.connection.execute("SELECT count(*) from #{p1_name}")
         p2_count = User.connection.execute("SELECT count(*) from #{p2_name}")
         p3_count = User.connection.execute("SELECT count(*) from #{p3_name}")
@@ -473,7 +473,7 @@ module DataFixup::Auditors::Migrate
         expect(p3_count[0]["count"]).to eq(0)
       end
 
-      it "can migrate partitions" do
+      it "does not need to migrate partitions" do
         events = [
           {
             "account_id"=>@pseudonym.account_id,
@@ -497,13 +497,6 @@ module DataFixup::Auditors::Migrate
         p1_name = Auditors::ActiveRecord::AuthenticationRecord.quoted_table_name.gsub(/"$/, "_2020_5\"")
         p2_name = Auditors::ActiveRecord::AuthenticationRecord.quoted_table_name.gsub(/"$/, "_2020_4\"")
         p3_name = ::Auditors::ActiveRecord::AuthenticationRecord.quoted_table_name
-        p1_count = User.connection.execute("SELECT count(*) from #{p1_name}")
-        p2_count = User.connection.execute("SELECT count(*) from #{p2_name}")
-        p3_count = User.connection.execute("SELECT count(*) from ONLY #{p3_name}")
-        expect(p1_count[0]["count"]).to eq(0)
-        expect(p2_count[0]["count"]).to eq(0)
-        expect(p3_count[0]["count"]).to eq(2)
-        ::DataFixup::Auditors::MigrateAuthToPartitions.run
         p1_count = User.connection.execute("SELECT count(*) from #{p1_name}")
         p2_count = User.connection.execute("SELECT count(*) from #{p2_name}")
         p3_count = User.connection.execute("SELECT count(*) from ONLY #{p3_name}")

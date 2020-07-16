@@ -241,4 +241,12 @@ describe AssessmentQuestion do
       expect(qq.id).to eq(smallest_id_question.id)
     end
   end
+
+  context 'root_account_id' do
+    it "uses root_account value from account" do
+      question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
+
+      expect(question.root_account_id).to eq Account.default.id
+    end
+  end
 end

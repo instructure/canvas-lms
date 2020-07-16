@@ -93,6 +93,7 @@ describe AssessmentRequest do
       @request.send_reminder!
 
       expect(@request.messages_sent.keys).to include(notification_name)
+      expect(@request.messages_sent[notification_name].count).to eq 1
       message = @request.messages_sent[notification_name].first
       expect(message.body).to include(@assignment.title)
     end

@@ -22,8 +22,30 @@ class UserAccountAssociation < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
 
+  after_commit :update_user_root_account_ids
+
   validates_presence_of :user_id, :account_id
 
   resolves_root_account through: :account
+
+  def for_root_account?
+    # TODO: Once root_account_id backfill is complete on
+    # user_account_associations, we can change this to
+    # just `account_id == root_account_id`
+    account_id == root_account_id || account.root_account?
+  end
+
+  private
+
+  def update_user_root_account_ids
+    # In some Canvas environments we may not want to populate
+    # root_account_ids due to the hight number of root account associations
+    # per user. This Setting allows us to control if root_account_ids syncing
+    # occurs.
+    return unless Setting.get('sync_root_account_ids_on_user_records', 'true') == 'true'
+
+    return unless for_root_account?
+    user.update_root_account_ids_later
+  end
 
 end

@@ -653,6 +653,8 @@ module Api::V1::Assignment
       update_params["submission_types"] = update_params["submission_types"].join(',')
     end
 
+    update_params["submission_types"] ||= "not_graded" if update_params["grading_type"] == "not_graded"
+
     if update_params.key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
       assignment.assignment_group = assignment.context.assignment_groups.where(id: ag_id).first

@@ -1170,7 +1170,6 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it 'should delete the appointment group if it has no appointments' do
-      @course.root_account.enable_feature!(:better_scheduler)
       time = Time.utc(Time.now.year, Time.now.month, Time.now.day, 4, 20)
       @appointment_group = AppointmentGroup.create!(
         :title => "appointment group", :participants_per_appointment => 4,

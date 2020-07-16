@@ -18,7 +18,12 @@
 
 <%
   fullstory_key = fullstory_app_key
-  if (fullstory_key && @current_user&.global_id) %>
+  if (
+    fullstory_key &&
+    @current_user&.global_id &&
+    @domain_root_account&.settings&.fetch(:enable_fullstory, true)
+  )
+%>
   <!-- fullstory snippet -->
   <script>
     window['_fs_debug'] = false;

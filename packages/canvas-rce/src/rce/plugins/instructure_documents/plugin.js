@@ -30,7 +30,7 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
     // Register commands
     ed.addCommand('mceInstructureDocuments', clickCallback.bind(this, ed, document))
     ed.addCommand('instructureTrayForDocuments', (ui, plugin_key) => {
-      bridge.showTrayForPlugin(plugin_key)
+      bridge.showTrayForPlugin(plugin_key, ed.id)
     })
 
     // Register menu items

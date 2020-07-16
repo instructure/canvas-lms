@@ -31,7 +31,7 @@ import formatMessage from '../format-message'
 import * as contentInsertion from './contentInsertion'
 import indicatorRegion from './indicatorRegion'
 import indicate from '../common/indicate'
-import Bridge from '../bridge'
+import bridge from '../bridge'
 import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
 import StatusBar from './StatusBar'
 import ShowOnFocusButton from './ShowOnFocusButton'
@@ -171,6 +171,7 @@ class RCEWrapper extends React.Component {
     defaultContent: PropTypes.string,
     editorOptions: PropTypes.object,
     handleUnmount: PropTypes.func,
+    id: PropTypes.string,
     language: PropTypes.string,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
@@ -222,10 +223,13 @@ class RCEWrapper extends React.Component {
       messages: [],
       announcement: null,
       confirmAutoSave: false,
-      autoSavedContent: ''
+      autoSavedContent: '',
+      id: this.props.id || this.props.textareaId || `${Date.now()}`
     }
 
     alertHandler.alertFunc = this.addAlert
+
+    this.handleContentTrayClosing = this.handleContentTrayClosing.bind(this)
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -468,7 +472,7 @@ class RCEWrapper extends React.Component {
   }
 
   onRemove = () => {
-    Bridge.detachEditor(this)
+    bridge.detachEditor(this)
     this.props.onRemove && this.props.onRemove(this)
   }
 
@@ -478,6 +482,10 @@ class RCEWrapper extends React.Component {
 
   textareaValue() {
     return this.getTextarea().value
+  }
+
+  get id() {
+    return this.state.id
   }
 
   toggle = () => {
@@ -524,7 +532,7 @@ class RCEWrapper extends React.Component {
   handleFocus(_event) {
     if (!this.state.focused) {
       this.setState({focused: true})
-      Bridge.focusEditor(this)
+      bridge.focusEditor(this)
       this._forceCloseFloatingToolbar()
       this.props.onFocus && this.props.onFocus(this)
     }
@@ -532,7 +540,7 @@ class RCEWrapper extends React.Component {
 
   contentTrayClosing = false
 
-  handleContentTrayClosing = isClosing => {
+  handleContentTrayClosing(isClosing) {
     this.contentTrayClosing = isClosing
   }
 
@@ -986,8 +994,8 @@ class RCEWrapper extends React.Component {
           brandColor: this.theme.canvasBrandColor,
           ...this.props.trayProps
         }
-        Bridge.trayProps.set(editor, trayPropsWithColor)
-        Bridge.languages = this.props.languages
+        bridge.trayProps.set(editor, trayPropsWithColor)
+        bridge.languages = this.props.languages
         if (typeof setupCallback === 'function') {
           setupCallback(editor)
         }
@@ -1141,6 +1149,7 @@ class RCEWrapper extends React.Component {
 
     return (
       <div
+        key={this.id}
         className={`${styles.root} rce-wrapper`}
         ref={el => (this._elementRef = el)}
         onFocus={this.handleFocusRCE}
@@ -1186,7 +1195,9 @@ class RCEWrapper extends React.Component {
           onA11yChecker={this.onA11yChecker}
         />
         <CanvasContentTray
-          bridge={Bridge}
+          key={this.id}
+          bridge={bridge}
+          editor={this}
           onTrayClosing={this.handleContentTrayClosing}
           {...trayProps}
         />

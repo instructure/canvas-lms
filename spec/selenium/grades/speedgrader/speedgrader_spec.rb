@@ -207,7 +207,12 @@ describe 'Speedgrader' do
 
         it 'speedgrader', priority: "1", test_id: 164016 do
           expect(Speedgrader.grade_input).to have_value '15'
-          expect(Speedgrader.rubric_total_points).to include_text '15'
+
+          keep_trying_until(2) do
+            disable_implicit_wait do
+              expect(Speedgrader.rubric_total_points).to include_text '15'
+            end
+          end
         end
 
         it 'assignment page ', priority: "1", test_id: 217611 do

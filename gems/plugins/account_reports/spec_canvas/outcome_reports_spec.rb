@@ -51,7 +51,7 @@ describe "Outcome Reports" do
     @enrollment2 = @course1.enroll_user(@user2, "StudentEnrollment", :enrollment_state => 'active')
 
     @section = @course1.course_sections.first
-    assignment_model(:course => @course1, :title => 'Engrish Assignment')
+    assignment_model(:course => @course1, :title => 'English Assignment')
     outcome_group = @root_account.root_outcome_group
     @outcome = outcome_model(context: @root_account, :short_description => 'Spelling')
     @rubric = Rubric.create!(:context => @course1)
@@ -333,7 +333,7 @@ describe "Outcome Reports" do
       end
 
       it 'includes results for all subaccounts when run from the root account' do
-        combined_values = all_values + [user1_subaccount_values, user2_subaccount_values]
+        combined_values = all_values + [user2_subaccount_values, user1_subaccount_values]
         combined_values.sort_by! { |v| v[:user].sortable_name }
 
         verify_all(report, combined_values)

@@ -211,19 +211,19 @@ class Notification < ActiveRecord::Base
   end
 
   def registration?
-    return self.category == "Registration"
+    self.category == "Registration"
   end
 
   def migration?
-    return self.category == "Migration"
+    self.category == "Migration"
   end
 
   def summarizable?
-    return !self.registration? && !self.migration?
+    !self.registration? && !self.migration?
   end
 
   def dashboard?
-    return ["Migration", "Registration", "Summaries", "Alert"].include?(self.category) == false
+    ["Migration", "Registration", "Summaries", "Alert"].exclude?(self.category)
   end
 
   def category_slug
@@ -416,6 +416,7 @@ class Notification < ActiveRecord::Base
     t 'names.blueprint_content_added', 'Blueprint Content Added'
     t 'names.content_link_error', 'Content Link Error'
     t 'names.account_notification', 'Account Notification'
+    t 'names.upcoming_assignment_alert', 'Upcoming Assignment Alert'
   end
 
   # TODO: i18n ... show these anywhere we show the category today

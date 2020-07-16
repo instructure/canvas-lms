@@ -16,10 +16,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# This file creates notification messages. I hope that was already known.
+# Users have multiple communication_channels and notification preferences at
+# different levels. This file accounts for these details.
+#
+# There are three main types of messages that are created here:
+# immediate_message, delayed_messages, and dashboard_messages.
+#
 class NotificationMessageCreator
   include LocaleSelection
 
-  attr_accessor :notification, :asset, :to_users, :to_channels, :message_data
+  attr_accessor :notification, :asset, :to_user_channels, :message_data
 
   # Options can include:
   #  :to_list - A list of Users, User IDs, and CommunicationChannels to send to
@@ -27,12 +34,8 @@ class NotificationMessageCreator
   def initialize(notification, asset, options={})
     @notification = notification
     @asset = asset
-    @to_users = []
-    @to_channels = []
-    if options[:to_list]
-      @to_users = users_from_to_list(options[:to_list])
-      @to_channels = communication_channels_from_to_list(options[:to_list])
-    end
+    @to_user_channels = user_channels(options[:to_list])
+    @user_counts = recent_messages_for_users(@to_user_channels.keys)
     @message_data = options.delete(:data)
     course_id = @message_data&.dig(:course_id)
     root_account_id = @message_data&.dig(:root_account_id)
@@ -53,33 +56,16 @@ class NotificationMessageCreator
   #
   # Returns a list of the messages dispatched immediately
   def create_message
-    to_user_channels = Hash.new([])
-    @to_users.each do |user|
-      to_user_channels[user] += user.communication_channels.select(&:active?)
-    end
-    @to_channels.each do |channel|
-      to_user_channels[channel.user] += [channel]
-    end
-    to_user_channels.each_value{ |channels| channels.uniq! }
-
-    @user_counts = recent_messages_for_users(to_user_channels.keys)
-
     dashboard_messages = []
     immediate_messages = []
     delayed_messages = []
 
-    # Looping on users and channels might be a bad thing. If you had a User and their CommunicationChannel in
-    # the to_list (which currently never happens, I think), duplicate messages could be sent.
-    to_user_channels.each do |user, channels|
-      # asset_filtered_by_user is used for the asset (ie assignment, announcement)
+    @to_user_channels.each do |user, channels|
+      # asset_applied_to is used for the asset (ie assignment, announcement)
       # to filter users out that do not apply to the notification like when a due
       # date is different for a specific user when using variable due dates.
-      next unless asset_filtered_by_user(user)
-      user_locale = infer_locale(
-        :user => user,
-        :context => user_asset_context(asset_filtered_by_user(user)),
-        :ignore_browser_locale => true
-      )
+      next unless (asset = asset_applied_to(user))
+      user_locale = infer_locale(user: user, context: user_asset_context(asset), ignore_browser_locale: true)
       I18n.with_locale(user_locale) do
         channels.each do |default_channel|
           if @notification.registration?
@@ -91,7 +77,7 @@ class NotificationMessageCreator
         end
 
         unless @notification.registration?
-          if @notification.summarizable? && no_daily_messages_in(delayed_messages) && too_many_messages_for?(user)
+          if @notification.summarizable? && too_many_messages_for?(user)
             fallback = build_fallback_for(user)
             delayed_messages << fallback if fallback
           end
@@ -113,10 +99,6 @@ class NotificationMessageCreator
 
   private
 
-  def no_daily_messages_in(delayed_messages)
-    !delayed_messages.any?{ |message| message.frequency == 'daily' }
-  end
-
   # Notifications are enabled for a user in a course by default, but can be
   # disabled for notifications. The broadcast_policy needs to pass both the
   # course_id and the root_account_id to the set_broadcast_policy block for us
@@ -126,6 +108,8 @@ class NotificationMessageCreator
   # A user can disable notifications for a course with a notification policy
   # override.
   def notifications_enabled_for_context?(user, context)
+    # if the message is not summarizable?, it is in a context that notifications
+    # cannot be disabled, so return true before checking.
     return true unless @notification.summarizable?
     if @mute_notifications_by_course_enabled
       return NotificationPolicyOverride.enabled_for(user, context)
@@ -142,6 +126,7 @@ class NotificationMessageCreator
       fallback_policy ||= fallback_channel.notification_policies.create!(frequency: 'daily')
     end
 
+    InstStatsd::Statsd.increment("message.fall_back_used", short_stat: 'message.fall_back_used')
     build_summary_for(user, fallback_policy)
   end
 
@@ -169,7 +154,6 @@ class NotificationMessageCreator
   end
 
   def build_immediate_messages_for(user, channels=immediate_channels_for(user).reject(&:unconfirmed?))
-    return [] unless asset_filtered_by_user(user)
     return [] unless notifications_enabled_for_context?(user, @course)
 
     messages = []
@@ -251,6 +235,23 @@ class NotificationMessageCreator
     end
   end
 
+  def user_channels(to_list)
+    to_user_channels = Hash.new([])
+    # if this method is given users we preload communication channels and they
+    # are already loaded so we are using the select :active? to not do another
+    # query to load them again.
+    users_from_to_list(to_list).each do |user|
+      to_user_channels[user] += user.communication_channels.select(&:active?)
+    end
+    # if the method gets communication channels, the user is loaded, and this
+    # allows all the methods in this file to behave the same as if it were users.
+    communication_channels_from_to_list(to_list).each do |channel|
+      to_user_channels[channel.user] += [channel]
+    end
+    to_user_channels.each_value(&:uniq!)
+    to_user_channels
+  end
+
   def users_from_to_list(to_list)
     to_list = [to_list] unless to_list.is_a? Enumerable
 
@@ -267,7 +268,7 @@ class NotificationMessageCreator
     to_list.select{ |to| to.is_a? CommunicationChannel }.uniq
   end
 
-  def asset_filtered_by_user(user)
+  def asset_applied_to(user)
     if asset.respond_to?(:filter_asset_by_recipient)
       asset.filter_asset_by_recipient(@notification, user)
     else
@@ -276,7 +277,7 @@ class NotificationMessageCreator
   end
 
   def message_options_for(user)
-    user_asset = asset_filtered_by_user(user)
+    user_asset = asset_applied_to(user)
 
     message_options = {
       :subject => @notification.subject,
@@ -285,6 +286,7 @@ class NotificationMessageCreator
       :user => user,
       :context => user_asset,
     }
+
     # can't just merge these because nil values need to be overwritten in a later merge
     message_options[:delay_for] = @notification.delay_for if @notification.delay_for
     message_options[:data] = @message_data if @message_data
@@ -338,14 +340,17 @@ class NotificationMessageCreator
     Message.where(:notification_id => @notification).
       for(@asset).
       by_name(@notification.name).
-      for_user(@to_users + @to_channels).
+      for_user(@to_user_channels.keys).
       cancellable.
       where("created_at BETWEEN ? AND ?", Setting.get("pending_duplicate_message_window_hours", "6").to_i.hours.ago, Time.now.utc).
       update_all(:workflow_state => 'cancelled')
   end
 
   def too_many_messages_for?(user)
-    @user_counts[user.id] >= user.max_messages_per_day
+    if @user_counts[user.id] >= user.max_messages_per_day
+      InstStatsd::Statsd.increment("message.too_many_messages_for_was_true", short_stat: 'message.too_many_messages_for_was_true')
+      true
+    end
   end
 
   # Cache the count for number of messages sent to a user/user-with-category,

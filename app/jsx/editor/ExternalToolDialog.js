@@ -22,10 +22,12 @@ import PropTypes from 'prop-types'
 import ExternalToolDialogModal from './ExternalToolDialog/Modal'
 import ExternalToolDialogTray from './ExternalToolDialog/Tray'
 import {Alert} from '@instructure/ui-alerts'
+import {Spinner} from '@instructure/ui-spinner'
 import I18n from 'i18n!ExternalToolDialog'
 import {send} from '../shared/rce/RceCommandShim'
 import TinyMCEContentItem from 'tinymce_plugins/instructure_external_tools/TinyMCEContentItem'
 import processEditorContentItems from '../deep_linking/processors/processEditorContentItems'
+import {Flex} from '@instructure/ui-flex'
 
 const EMPTY_BUTTON = {
   height: 300,
@@ -71,7 +73,8 @@ export default class ExternalToolDialog extends React.Component {
     open: false,
     button: EMPTY_BUTTON,
     infoAlert: null,
-    form: EMPTY_FORM
+    form: EMPTY_FORM,
+    iframeLoaded: false
   }
 
   open(button) {
@@ -150,7 +153,7 @@ export default class ExternalToolDialog extends React.Component {
   handleInfoAlertBlur = () => this.setState({infoAlert: null})
 
   render() {
-    const {open, button, form, infoAlert} = this.state
+    const {open, button, form, infoAlert, iframeLoaded} = this.state
     const {iframeAllowances, win} = this.props
     const label = I18n.t('embed_from_external_tool', 'Embed content from External Tool')
     const frameHeight = Math.max(Math.min(win.height - 100, 550), 100)
@@ -187,21 +190,35 @@ export default class ExternalToolDialog extends React.Component {
           >
             <Alert margin="small">{I18n.t('The following content is partner provided')}</Alert>
           </div>
+          {!iframeLoaded && (
+            <Flex alignItems="center" justifyItems="center">
+              <Flex.Item>
+                <Spinner
+                  renderTitle={I18n.t('Loading External Tool')}
+                  size="large"
+                  margin="0 0 0 medium"
+                />
+              </Flex.Item>
+            </Flex>
+          )}
+
           <iframe
             title={label}
             ref={ref => (this.iframeRef = ref)}
             name="external_tool_launch"
-            src="/images/ajax-loader-medium-444.gif"
+            src=""
             id="external_tool_button_frame"
             style={{
               width: button.use_tray ? '100%' : button.width || 800,
               height: button.use_tray ? '100%' : button.height || frameHeight,
               border: '0',
-              display: 'block'
+              display: 'block',
+              visibility: iframeLoaded ? 'visible' : 'hidden'
             }}
             allow={iframeAllowances}
             borderstyle="0"
             data-lti-launch="true"
+            onLoad={() => this.setState({iframeLoaded: true})}
           />
           <div
             ref={ref => (this.afterInfoAlertRef = ref)}

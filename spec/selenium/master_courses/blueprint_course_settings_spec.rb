@@ -112,8 +112,6 @@ describe "course settings/blueprint" do
     end
 
     it "can set granular locks" do
-      skip("QUIZ-7717")
-
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)
 
       get "/courses/#{@course.id}/settings"

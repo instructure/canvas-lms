@@ -187,6 +187,7 @@ shared_context "in-process server selenium tests" do
       # between the ajax request starting up and the middleware actually processing it
       wait_for_ajax_requests
       move_mouse_to_known_position
+      clear_local_storage
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
     ensure

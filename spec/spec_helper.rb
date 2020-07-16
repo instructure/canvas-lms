@@ -148,6 +148,16 @@ module RSpec::Rails
       !!Nokogiri::HTML(actual).at_css(expected)
     end
   end
+
+  RSpec::Matchers.define :be_checked do
+    match do |node|
+      if node.is_a?(Nokogiri::XML::Element)
+        node.attr('checked') == 'checked'
+      elsif node.respond_to?(:checked?)
+        node.checked?
+      end
+    end
+  end
 end
 
 module RenderWithHelpers
@@ -281,6 +291,8 @@ RSpec::Matchers.define :and_fragment do |expected|
     values_match?(expected_as_strings, fragment)
   end
 end
+
+RSpec::Matchers.define_negated_matcher :not_change, :change
 
 module RSpec::Matchers::Helpers
   # allows for matchers to use symbols and literals even though URIs are always strings.
@@ -879,12 +891,9 @@ RSpec.configure do |config|
       '2.4.6',
       '2.4.9',
       '2.5.1',
-      '2.5.3',
-      '2.6.0',
-      '2.6.2',
-      '2.6.5'
+      '2.5.3'
     ]
-    skip("stubbing prepended class methods is broken in this version of ruby") if versions.include?(RUBY_VERSION)
+    skip("stubbing prepended class methods is broken in this version of ruby") if versions.include?(RUBY_VERSION) || RUBY_VERSION >= "2.6"
   end
 end
 

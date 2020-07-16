@@ -1,4 +1,3 @@
-# encoding: UTF-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'nokogiri'
-require 'rdiscount'
+require 'redcarpet'
 
 module TextHelper
   def force_zone(time)
@@ -239,7 +238,7 @@ module TextHelper
 
   def markdown(string, inlinify = :auto)
     string = ERB::Util.h(string) unless string.html_safe?
-    result = RDiscount.new(string).to_html.strip
+    result = Redcarpet::Markdown.new(Redcarpet::Render::XHTML.new).render(string).strip
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
     result.strip.html_safe

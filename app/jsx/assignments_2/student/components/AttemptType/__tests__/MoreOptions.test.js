@@ -24,8 +24,6 @@ import {mockQuery} from '../../../mocks'
 import MoreOptions from '../MoreOptions'
 import React from 'react'
 
-jest.setTimeout(10000)
-
 async function createGraphqlMocks(overrides = {}) {
   const userGroupOverrides = [{Node: () => ({__typename: 'User'})}]
   userGroupOverrides.push(overrides)
