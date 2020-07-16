@@ -18,6 +18,7 @@
 
 process.env.NODE_ENV = 'test'
 
+const assert = require('assert')
 const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
@@ -81,12 +82,14 @@ const isPartitionMatch = (resource, partitions, partitionIndex) => {
 const makeSortedPartitions = (arr, partitionCount) => {
   const sortedArr = arr.sort()
   const sortedArrLength = sortedArr.length
-  const chunkSize = Math.floor(sortedArrLength / partitionCount)
+  const chunkSize = Math.ceil(sortedArrLength / partitionCount)
   const R = []
 
   for (let i = 0; i < sortedArrLength; i += chunkSize) {
     R.push(sortedArr.slice(i, i + chunkSize))
   }
+
+  assert(R.length <= partitionCount)
 
   return R
 }
