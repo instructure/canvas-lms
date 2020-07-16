@@ -2114,16 +2114,10 @@ class Course < ActiveRecord::Base
       e.sis_pseudonym_id = opts[:sis_pseudonym_id]
       if e.changed?
         e.need_touch_user = true if opts[:skip_touch_user]
-        transaction do
-          # without this, inserting/updating on enrollments will share lock the course, but then
-          # it tries to touch the course, which will deadlock with another transaction doing the
-          # same thing.
-          self.lock!(:no_key_update)
-          if opts[:no_notify]
-            e.save_without_broadcasting
-          else
-            e.save
-          end
+        if opts[:no_notify]
+          e.save_without_broadcasting
+        else
+          e.save
         end
       end
       e.user = user
