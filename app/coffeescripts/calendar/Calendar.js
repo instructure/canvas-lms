@@ -929,10 +929,17 @@ export default class Calendar {
       this.schedulerNavigator.hide()
       this.calendar.fullCalendar('refetchEvents')
       this.calendar.fullCalendar('changeView', view === 'week' ? 'agendaWeek' : 'month')
-      return this.calendar.fullCalendar('render')
+      this.calendar.fullCalendar('render')
+      // HACK: events often start out in the wrong place when the calendar view is initialized to the week view
+      // and they snap into the right place after the window is resized.  so... pretend the window gets resized
+      if (view === 'week') {
+        setTimeout(() => {
+          $(window).trigger('resize')
+        }, 200)
+      }
     } else {
       this.calendar.hide()
-      return this.header.hidePrevNext()
+      this.header.hidePrevNext()
     }
   }
 
