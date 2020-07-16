@@ -50,6 +50,9 @@
     "canvas_plugins_705a5016": {
         "message": "افزونه های کانواس"
     },
+    "clear_selected_file_82388e50": {
+        "message": "پاک کردن فایل انتخاب شده"
+    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Click to embed { imageName }"
     },
@@ -122,6 +125,9 @@
     "done_54e3d4b6": {
         "message": "انجام شد"
     },
+    "drag_a_file_here_39357b48": {
+        "message": "کشیدن فایل اینجا"
+    },
     "due_5d7267be": {
         "message": "مهلت:"
     },
@@ -131,8 +137,14 @@
     "edit_c5fbea07": {
         "message": "ویرایش"
     },
+    "embed_828fac4a": {
+        "message": "قراردادن"
+    },
     "embed_image_1080badc": {
         "message": "درج تصویر"
+    },
+    "embed_video_code_703e10f2": {
+        "message": "قراردادن کد فیلم"
     },
     "excused_cf8792eb": {
         "message": "معاف شد"
