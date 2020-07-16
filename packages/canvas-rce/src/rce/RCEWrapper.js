@@ -396,7 +396,7 @@ class RCEWrapper extends React.Component {
     <img
       alt="${formatMessage('Loading...')}"
       src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
-      data-placeholder-for="${fileMetaProps.name}"
+      data-placeholder-for="${encodeURIComponent(fileMetaProps.name)}"
       style="width: ${width}; height: ${height}; border: solid 1px #8B969E;"
     />`
 
@@ -416,7 +416,9 @@ class RCEWrapper extends React.Component {
   }
 
   removePlaceholders(name) {
-    const placeholder = this.mceInstance().dom.doc.querySelector(`[data-placeholder-for="${name}"]`)
+    const placeholder = this.mceInstance().dom.doc.querySelector(
+      `[data-placeholder-for="${encodeURIComponent(name)}"]`
+    )
     if (placeholder) {
       placeholder.remove()
     }

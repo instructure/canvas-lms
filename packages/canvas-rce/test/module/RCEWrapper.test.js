@@ -351,6 +351,30 @@ describe('RCEWrapper', () => {
         restoreImage()
       })
 
+      it('inserts a placeholder image with an encoded name to prevent nested quotes', () => {
+        mockImage()
+        const greenSquare =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'filename "with" quotes',
+          domObject: {
+            preview: greenSquare
+          },
+          contentType: 'image/png'
+        }
+
+        const imageMarkup = `
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+      data-placeholder-for="filename%20%22with%22%20quotes"
+      style="width: 10px; height: 10px; border: solid 1px #8B969E;"
+    />`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
+        restoreImage()
+      })
+
       it('constrains the image placeholder to the width of the rce', () => {
         mockImage({width: 1000, height: 1000})
         const greenSquare =
