@@ -584,6 +584,27 @@ describe MasterCourses::MasterMigration do
       expect(ag1_to.rules).to eq "drop_lowest:3\n"
     end
 
+    it "doesn't overwrite weights and rules of an assignment group with a similar name on initial sync" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      ag1 = @copy_from.assignment_groups.create!(:name => "group1", :group_weight => 50)
+      a1 = @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
+      ag1.update_attribute(:rules, "drop_lowest:1\nnever_drop:#{a1.id}\n")
+
+      ag1_assimilation_target = @copy_to.assignment_groups.create!(:name => "group1", :group_weight => 33)
+      ag1_assimilation_target.update_attribute(:rules, "drop_highest:1\n")
+
+      run_master_migration
+
+      ag1_to = @copy_to.assignment_groups.where(:migration_id => mig_id(ag1)).first
+      expect(ag1_to).to eq ag1_assimilation_target
+      expect(ag1_to.group_weight).to eq 33
+      expect(ag1_to.rules).to eq "drop_highest:1\n"
+      a1_to = ag1_to.assignments.first
+      expect(a1_to).to be
+    end
+
     it "should sync unpublished quiz points possible" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
