@@ -73,7 +73,7 @@ export default class MessageDetailView extends View {
         const childView = new MessageItemView({model: message}).render()
         $template.find('.message-content').append(childView.$el)
         ReactDOM.render(
-          <Avatar name={ENV.current_user.display_name} src={ENV.current_user.avatar_image_url} />,
+          <Avatar name={message.attributes.author.name} src={message.attributes.author.avatar_url} />,
           $template.find(`#${message.attributes.avatarContainerId}`)[0]
         )
         this.listenTo(childView, 'reply', () =>
