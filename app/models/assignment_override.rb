@@ -416,7 +416,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def root_account_id
     # Use the attribute if availible, otherwise fall back to getting it from a parent entity
-    super || assignment&.root_account_id || assignment&.root_account&.id || quiz&.root_account_id || quiz&.assignment&.root_account_id || quiz&.assignment&.root_account&.id
+    super || assignment&.root_account_id || quiz&.root_account_id || quiz&.assignment&.root_account_id
   end
 
   def set_root_account_id
