@@ -16,14 +16,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_relative "../client_credentials_provider"
+
 module Canvas::Oauth
   module GrantTypes
     class ClientCredentials < BaseType
       def initialize(opts, host, protocol = nil)
-        raise Canvas::Oauth::InvalidRequestError, 'assertion method not supported for this grant_type' if basic_auth?(opts)
-        raw_jwt = opts.fetch(:client_assertion)
-        @provider = Canvas::Oauth::ClientCredentialsProvider.new(raw_jwt, host, scopes_from_opts(opts), protocol)
-        @secret = @provider.key&.api_key
+        if opts[:client_assertion_type] == 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+          raw_jwt = opts.fetch(:client_assertion)
+          @provider = Canvas::Oauth::AsymmetricClientCredentialsProvider.new(raw_jwt, host, scopes_from_opts(opts), protocol)
+          @secret = @provider.key&.api_key
+        else
+          client_id = opts.fetch(:client_id)
+          @provider = Canvas::Oauth::SymmetricClientCredentialsProvider.new(client_id, host, scopes_from_opts(opts), protocol)
+          if @provider.key&.client_credentials_audience != "external"
+            raise Canvas::Oauth::InvalidRequestError, 'assertion method not supported for this grant_type'
+          end
+          @secret = opts.fetch(:client_secret)
+        end
       end
 
       def supported_type?

@@ -23,9 +23,9 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
 
   let(:fallback_proxy) do
     Canvas::DynamicSettings::FallbackProxy.new({
-      Lti::KeyStorage::PAST => Lti::RSAKeyPair.new.to_jwk.to_json,
-      Lti::KeyStorage::PRESENT => Lti::RSAKeyPair.new.to_jwk.to_json,
-      Lti::KeyStorage::FUTURE => Lti::RSAKeyPair.new.to_jwk.to_json
+      Canvas::Security::KeyStorage::PAST => Canvas::Security::KeyStorage.new_key,
+      Canvas::Security::KeyStorage::PRESENT => Canvas::Security::KeyStorage.new_key,
+      Canvas::Security::KeyStorage::FUTURE => Canvas::Security::KeyStorage.new_key
     })
   end
 
