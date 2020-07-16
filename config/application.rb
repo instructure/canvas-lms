@@ -281,7 +281,7 @@ module CanvasRails
       settings = ConfigFile.load("consul")
       if settings.present?
         begin
-          Canvas::DynamicSettings.config = settings_hash
+          Canvas::DynamicSettings.config = settings
         rescue Imperium::UnableToConnectError
           Rails.logger.warn("INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail")
         end
