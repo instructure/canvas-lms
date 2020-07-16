@@ -81,7 +81,9 @@ export function deleteExternalFeed({contextType, contextId}, feedId) {
 }
 
 export function addExternalFeed({contextType, contextId}, {url, verbosity, header_match}) {
-  const params = encodeQueryString([{url}, {verbosity}, {header_match: header_match || null}])
-
-  return axios.post(`/api/v1/${contextType}s/${contextId}/external_feeds?${params}`)
+  return axios.post(`/api/v1/${contextType}s/${contextId}/external_feeds`, {
+    url,
+    verbosity,
+    header_match
+  })
 }
