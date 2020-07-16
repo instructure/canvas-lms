@@ -67,7 +67,8 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #   JSON representation of the developer key fields
   #   to use when creating the developer key for the
   #   tool configuraiton. Valid fields are: "name",
-  #   "email", "notes", "test_cluster_only", "scopes".
+  #   "email", "notes", "test_cluster_only",
+  #   "client_credentials_audience", "scopes".
   #
   # @argument disabled_placements [Array]
   #   An array of strings indicating which Canvas
@@ -106,7 +107,8 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #   JSON representation of the developer key fields
   #   to use when updating the developer key for the
   #   tool configuraiton. Valid fields are: "name",
-  #   "email", "notes", "test_cluster_only", "scopes".
+  #   "email", "notes", "test_cluster_only",
+  #   "client_credentials_audience", "scopes".
   #
   # @argument disabled_placements [Array]
   #   An array of strings indicating which Canvas
@@ -197,7 +199,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   def developer_key_params
     return {} unless params.key? :developer_key
-    params.require(:developer_key).permit(:name, :email, :notes, :redirect_uris, :test_cluster_only, scopes: [])
+    params.require(:developer_key).permit(:name, :email, :notes, :redirect_uris, :test_cluster_only, :client_credentials_audience, scopes: [])
   end
 
   def developer_key_redirect_uris

@@ -2304,6 +2304,7 @@ CanvasRails::Application.routes.draw do
   post 'login/oauth2/accept' => 'oauth2_provider#accept', as: :oauth2_auth_accept
   get 'login/oauth2/deny' => 'oauth2_provider#deny', as: :oauth2_auth_deny
   delete 'login/oauth2/token' => 'oauth2_provider#destroy', as: :oauth2_logout
+  get 'login/oauth2/jwks' => 'oauth2_provider#jwks', as: :oauth2_jwks
 
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"

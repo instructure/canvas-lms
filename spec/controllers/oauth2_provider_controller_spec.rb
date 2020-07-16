@@ -633,6 +633,30 @@ describe Oauth2ProviderController do
             end
           end
         end
+
+        context "with symmetric client identification" do
+          let(:client_credentials_params) do
+            {
+              client_id: client_id,
+              client_secret: client_secret,
+              redirect_uri: 'https://example.com',
+              scope: TokenScopes::USER_INFO_SCOPE[:scope]
+            }
+          end
+
+          it 'rejects by default' do
+            is_expected.to redirect_to('https://example.com?error=invalid_request&error_description=assertion+method+not+supported+for+this+grant_type')
+          end
+
+          context "with external audience key" do
+            before do
+              key.client_credentials_audience = "external"
+              key.save!
+            end
+
+            it { is_expected.to have_http_status 200 }
+          end
+        end
       end
     end
   end
@@ -739,4 +763,24 @@ describe Oauth2ProviderController do
     end
   end
 
+  describe 'GET jwks' do
+    before :each do
+      allow(Canvas::Oauth::KeyStorage).to receive(:retrieve_keys).and_return({
+        Canvas::Security::KeyStorage::PAST => Canvas::Security::RSAKeyPair.new.to_jwk,
+        Canvas::Security::KeyStorage::PRESENT => Canvas::Security::RSAKeyPair.new.to_jwk,
+        Canvas::Security::KeyStorage::FUTURE => Canvas::Security::RSAKeyPair.new.to_jwk
+      })
+      get 'jwks'
+    end
+
+    it "provides the current jwk set" do
+      expect(response).to have_http_status :ok
+      json = JSON.parse(response.body)
+      expected_keys = %w(kid kty alg e n use)
+      expect(json['keys']).not_to be_empty
+      json['keys'].each do |key|
+        expect(key.keys - expected_keys).to be_empty
+      end
+    end
+  end
 end

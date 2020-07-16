@@ -15,22 +15,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'openssl'
 
-module Lti
-  class RSAKeyPair < JWKKeyPair
-    KTY = 'RSA'.freeze
-    ALG = 'RS256'.freeze
-    SIZE = 2048
-    def initialize(use: 'sig')
-      @alg = ALG
-      @use = use
-      @private_key = OpenSSL::PKey::RSA.new SIZE
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
+
+describe Canvas::Security::RSAKeyPair do
+  describe "initialize" do
+    it 'generates a public key of default size 2048' do
+      keys = Canvas::Security::RSAKeyPair.new
+      expect(/\d+/.match(keys.public_key.to_text())[0]).to eq "2048"
     end
 
-    def public_key
-      private_key.public_key
+    it 'generates a private key of default size 2048' do
+      keys = Canvas::Security::RSAKeyPair.new
+      expect(/\d+/.match(keys.private_key.to_text())[0]).to eq "2048"
     end
-
   end
 end

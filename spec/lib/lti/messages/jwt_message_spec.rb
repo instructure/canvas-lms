@@ -39,8 +39,7 @@ describe Lti::Messages::JwtMessage do
     JSON::JWT.decode(jws[:id_token], pub_key)
   end
   let(:pub_key) do
-    jwk = JSON::JWK.new(Lti::KeyStorage.retrieve_keys['jwk-present.json'])
-    jwk.to_key.public_key
+    Lti::KeyStorage.present_key.to_key.public_key
   end
   let_once(:course) do
     course_with_student

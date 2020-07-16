@@ -34,6 +34,12 @@ describe TokenScopes do
       expect(user_info_scope[:resource].to_s).to eq 'oauth2'
     end
 
+    it "includes a CD2 Peer Services scope" do
+      scope = TokenScopes.named_scopes.find{|s| s[:scope] == TokenScopes::CD2_SCOPE[:scope]}
+      expect(scope).not_to be_nil
+      expect(scope[:resource_name].to_s).to eq 'peer_services'
+    end
+
     it "doesn't include scopes without a name" do
       TokenScopes.instance_variable_set(:@_named_scopes, nil) # we need to make sure that we generate a new list
       allow(ApiScopeMapperLoader.load).to receive(:name_for_resource).and_return(nil)
@@ -55,9 +61,12 @@ describe TokenScopes do
 
     describe "generated_scopes" do
       let!(:generated_scopes) {
-        TokenScopes.all_scopes.reject do |s|
-          s == TokenScopes::USER_INFO_SCOPE[:scope] || TokenScopes::LTI_SCOPES.keys.include?(s) || TokenScopes::LTI_HIDDEN_SCOPES.keys.include?(s)
-        end
+        TokenScopes.all_scopes - [
+          TokenScopes::USER_INFO_SCOPE[:scope],
+          TokenScopes::CD2_SCOPE[:scope],
+          *TokenScopes::LTI_SCOPES.keys,
+          *TokenScopes::LTI_HIDDEN_SCOPES.keys
+        ]
       }
 
       it "formats the scopes with url:http_verb|api_path" do

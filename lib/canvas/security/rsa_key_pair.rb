@@ -15,7 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'openssl'
 
-module Lti
-  KeyStorage = Canvas::Security::KeyStorage.new('lti-keys')
+module Canvas::Security
+  class RSAKeyPair < JWKKeyPair
+    KTY = 'RSA'.freeze
+    ALG = 'RS256'.freeze
+    SIZE = 2048
+    def initialize(use: 'sig')
+      @alg = ALG
+      @use = use
+      @private_key = OpenSSL::PKey::RSA.new SIZE
+    end
+
+    def public_key
+      private_key.public_key
+    end
+
+  end
 end

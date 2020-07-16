@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,6 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Lti
-  KeyStorage = Canvas::Security::KeyStorage.new('lti-keys')
+module Canvas::Oauth
+  KeyStorage = Canvas::Security::KeyStorage.new('oauth2-asymmetric')
 end

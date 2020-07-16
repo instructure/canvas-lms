@@ -30,7 +30,7 @@ module Lti
         let(:expected_mime_type) { described_class::MIME_TYPE }
         let(:scope_to_remove) { "https://canvas.instructure.com/lti/public_jwk/scope/update"}
         let(:new_public_jwk) do
-          key_hash = Lti::RSAKeyPair.new.public_jwk.to_h
+          key_hash = Canvas::Security::RSAKeyPair.new.public_jwk.to_h
           key_hash['kty'] = key_hash['kty'].to_s
           key_hash
         end
@@ -45,7 +45,7 @@ module Lti
         let(:action) { :update }
         let(:old_public_jwk) { developer_key.public_jwk }
         let(:new_public_jwk) do
-          key_hash = Lti::RSAKeyPair.new.public_jwk.to_h
+          key_hash = Canvas::Security::RSAKeyPair.new.public_jwk.to_h
           key_hash['kty'] = key_hash['kty'].to_s
           key_hash
         end
