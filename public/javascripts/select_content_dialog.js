@@ -770,7 +770,9 @@ $(document).ready(function() {
           }
         }
       } else {
-        enable_disable_submit_button(currentSelectItem.selectedIndex > -1)
+        enable_disable_submit_button(
+          $(currentSelectItem).is(':hidden') || currentSelectItem.selectedIndex > -1
+        )
       }
     } else if (currentSelectItem && currentSelectItem.selectedIndex > -1) {
       $('.add_item_button')
