@@ -59,3 +59,28 @@ test('focuses the bio text area when the name input is not available and edit is
   this.view.showEditForm()
   equal(document.activeElement, $('#profile_bio')[0])
 })
+
+test('validates input length', function() {
+  const oldInnerHTML = this.fixtures.innerHTML
+  this.fixtures.innerHTML =
+    "<form id='profile_form'><input id='profile_title' name='user_profile[title]'></input><textarea id='profile_bio' name='user_profile[bio]'></textarea></form>"
+
+  // validates on good input
+  $('#profile_title').val('a'.repeat(255))
+  let event = {
+    preventDefault: sinon.spy(),
+    target: $('#profile_form')
+  }
+  this.view.validateForm(event)
+  ok(!event.preventDefault.called)
+
+  // fails on bad input
+  $('#profile_title').val('a'.repeat(256))
+  event = {
+    preventDefault: sinon.spy(),
+    target: $('#profile_form')
+  }
+  this.view.validateForm(event)
+  ok(event.preventDefault.called)
+  this.fixtures.innerHTML = oldInnerHTML
+})
