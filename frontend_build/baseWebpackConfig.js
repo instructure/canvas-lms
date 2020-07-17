@@ -62,7 +62,8 @@ module.exports = {
     // tracking them too. Then, as we work to get all chunks smaller, we should change
     // this number to the size of our biggest known asset and hopefully someday get
     // to where they are all under the default value of 250000 and then remove this
-    maxAssetSize: 1200000,
+    // TODO: decrease back to 1200000 LS-1222
+    maxAssetSize: 1400000,
     assetFilter: assetFilename => {
       const thingsWeKnowAreWayTooBig = [
         'canvas-rce-async-chunk',
