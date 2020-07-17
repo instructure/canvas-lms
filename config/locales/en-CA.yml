@@ -393,6 +393,7 @@ en-CA:
   account_id_73966078: account_id
   account_id_f6e26867: "Account Id"
   account_level_notification_preferences_require_an__66467cd7: "Account level notification preferences require an account_id to update"
+  account_level_notification_preferences_ui_update_f5e189a4: "Account level notification preferences UI update"
   account_level_settings_manage_4fca6f8e: "Account-level settings - manage"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "account name"
@@ -1697,6 +1698,7 @@ en-CA:
   add_tas_to_the_course_2aac6e02: "Add TAs to the Course"
   add_theme_32fa3d50: "Add Theme"
   add_to_course_481a51c4: "Add to course..."
+  add_to_rce_toolbar_e5b3e3b4: "Add to RCE toolbar"
   add_to_student_to_do_58e66b4b: "Add to student to-do"
   add_to_whitelist_24f3f1ba: "Add to Whitelist"
   add_toolname_4e17dc90: "Add %{toolName}"
@@ -5074,6 +5076,7 @@ en-CA:
       importing_button: "Importing... this could take a while"
     titles: 
       home_page: "Home Page"
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Content is still being uploaded, if you continue it will not be embedded properly."
   content_link_error_assignment_name_course_name_b8be789a: "Content Link Error - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -7728,6 +7731,7 @@ en-CA:
             according to your preferences. Automatically apply a grade for missing or
             late submissions, and easily hide grades until you're ready for students
             to view them. For simplified grading, use SpeedGrader to view and grade submissions.
+  display_historical_view_of_achievements_of_users_53db5938: "Display historical view of achievements of users"
   display_name_6c2cfc58: "Display Name:"
   display_name_b80c243e: "Display Name"
   display_to_students_e1301f99: "Display to Students"
@@ -7899,6 +7903,7 @@ en-CA:
   e_g_jon_doe_77233e3b: "e.g., Jon Doe"
   e_g_jondoe_example_com_98656fb5: "e.g., jondoe@example.com"
   e_mail_only_2cc5e513: "E-Mail Only"
+  earned_earndate_5f8b6c99: "Earned %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Easily import or copy content from another Canvas course into
               your course, or import content from other formats, such as Moodle or QTI.
@@ -8730,6 +8735,7 @@ en-CA:
   fall_grading_period_id_74ef68e: "Fall grading period id"
   favicon_6e658914: Favicon
   favorite_courses_fbd356f0: "Favorite Courses"
+  favorite_d720d310: Favorite
   favorites_c7e0207c: Favorites
   feature_f5526584: Feature
   feature_flags: 
@@ -10763,6 +10769,7 @@ en-CA:
   item_type_download_e949cdb6: "Item type: Download"
   item_type_link_5a2abed2: "Item type: Link"
   item_type_locked_85c560ec: "Item type: Locked"
+  item_type_mastery_connect_8f36c669: "Item type: Mastery Connect"
   item_type_new_quiz_1a1cd9a9: "Item type: New Quiz"
   item_type_quiz_c894ddb1: "Item type: Quiz"
   items_299a7626: "Items: "
@@ -11004,6 +11011,7 @@ en-CA:
   length_results_found_3afd01e5: "%{length} results found"
   let_students_see_the_correct_answers_dacc2faf: "Let Students See The Correct Answers"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Let Students See Their Quiz Responses (Incorrect Questions Will Be Marked in Student Feedback)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Let the site administrator select up to 2 LTI apps as favorites, which will then be displayed in the RCE's toolbar"
   letter_grade_29ff1938: "Letter Grade"
   letter_grade_f00fedc4: "letter grade"
   level_5fdf654a: Level
@@ -11159,6 +11167,7 @@ en-CA:
   list_collapsed_9ac35920: "List collapsed."
   list_collapsed_dde87718: "List collapsed"
   list_expanded_efec2d0: "List expanded."
+  list_of_the_currently_attainable_trophies_959b2518: "List of the currently attainable trophies"
   list_view_430aecce: "List View"
   lithuanian_5adcbe24: Lithuanian
   little_lost_try_here_first_9e24e575: "Little lost? Try here first!"
@@ -11472,6 +11481,8 @@ en-CA:
   mastery_path_processing_f4471152: "Mastery path processing"
   mastery_paths_breakdown_6e0b5fce: "Mastery Paths Breakdown"
   mastery_paths_cc4096c2: "Mastery Paths"
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "Mastery Paths editing has been temporarily disabled for maintenance."
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Mastery paths selection has been temporarily disabled for maintenance."
   mastery_points_f1672cc: "mastery points"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Mastery score reflects the highest score of a graded assignment or quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Mastery score reflects the most recent graded assignment or quiz."
@@ -13557,6 +13568,7 @@ en-CA:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Points"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Points Possible"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} pts"
+  na_3dbb9cfd: NA
   name: "Academic Benchmark Importer"
   name_1aed4a1b: Name
   name_3806192d: "Name:"
@@ -15022,6 +15034,7 @@ en-CA:
       description: "Hosts uploaded files with the Inst-FS service."
       labels: 
         migration_rate: "Chance of migrating older files into Inst-FS on access (0 to 100)"
+        service_worker: "Use service worker to authenticate file accesses in Safari 13+"
     kaltura: 
       description: "Kaltura video/audio recording and playback"
       name: Kaltura
@@ -15344,6 +15357,7 @@ en-CA:
       requirements_must_be_completed: "The following requirements need to be completed before this page will be unlocked"
   presentation_2d9387ca: Presentation
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Presents the quiz setting to avoid automatic submission of a timed quiz when the available time has ended."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Press ALT + F8 to see a list of keyboard shortcuts"
   press_space_to_start_over_d4b8a2da: "Press 'space' to start over"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Press the comma key or shift + question mark to see a list of keyboard shortcuts"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Press the comma key or shift + ? to see a list of keyboard shortcuts"
@@ -15924,6 +15938,7 @@ en-CA:
       update_question_without_regrading: "Update question without regrading"
   quiz_40ee61b1: quiz
   quiz_assignment_overrides_cec1973b: "Quiz Assignment Overrides"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Quiz availability dates that pass during an attempt will still auto-submit even if the extended time has not expired."
   quiz_duplication_not_implemented_c1495585: "quiz duplication not implemented"
   quiz_e0dcce8f: Quiz
   quiz_extensions_d2550649: "Quiz Extensions"
@@ -19606,6 +19621,7 @@ en-CA:
       networking_academy_description: "View Cisco answers to the most commonly asked questions."
       networking_academy_faqs: "Networking Academy FAQs"
       support_desk_livechat: "Support Desk Live Chat"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Support favorite LTI tools in the RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_46_55cc3620: "Sweden (+46)"
@@ -19680,6 +19696,7 @@ en-CA:
     syllabus: Syllabus
     tab_location_error: "That tab location is invalid"
     tab_unmanagable_error: "%{css_class} is not manageable"
+    trophy_case: "Trophy Case"
   tabs_5605547e: Tabs
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
@@ -19965,6 +19982,7 @@ en-CA:
   there_are_no_reports_for_you_to_view_b716717a: "There are no reports for you to view."
   there_are_no_unsaved_changes_9276e87c: "There are no unsaved changes"
   there_are_no_unsynced_changes_4e8f0838: "There are no unsynced changes"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "There is a 2 app limit for placement within the RCE toolbar. This setting only applies to the enhanced RCE."
   there_is_currently_1_available_grader_758e4a21: "There is currently 1 available grader"
   there_was_a_failure_logging_out_at_your_idp_30070527: "There was a failure logging out at your IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "There was a problem creating the teacher notes column."
@@ -20855,6 +20873,59 @@ en-CA:
   tree_browser: 
     folder_tree_instructions: "Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse, and enter to choose the selected item."
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad and Tobago (+1)"
+  trophy: 
+    balloon_description: "Balloon Description"
+    balloon_display_name: Balloon
+    bifrost_trophy_description: "Bifrost Trophy Description"
+    bifrost_trophy_display_name: "Bifrost Trophy"
+    butterfly_description: "Butterfly Description"
+    butterfly_display_name: Butterfly
+    einstein_rosen_trophy_description: "Einstein Rosen Trophy Description"
+    einstein_rosen_trophy_display_name: "Einstein Rosen Trophy"
+    fire_description: "Fire Description"
+    fire_display_name: Fire
+    flowers_description: "Flower Description"
+    flowers_display_name: Flower
+    four_leaf_clover_description: "Four Leaf Clover Description"
+    four_leaf_clover_display_name: "Four Leaf Clover"
+    gift_description: "Gift Description"
+    gift_display_name: Gift
+    gnome_description: "Gnome Description"
+    gnome_display_name: Gnome
+    helix_rocket_description: "Helix Rocket Description"
+    helix_rocket_display_name: "Helix Rocket"
+    horse_shoe_description: "Horse Shoe Description"
+    horse_shoe_display_name: "Horse Shoe"
+    hot_air_balloon_description: "Hot Air Balloon Description"
+    hot_air_balloon_display_name: "Hot Air Balloon"
+    magic_mystery_thumbs_up_description: "Magic Mystery Thumbs Up Description"
+    magic_mystery_thumbs_up_display_name: "Magic Mystery Thumbs Up"
+    medal_description: "Medal Description"
+    medal_display_name: Medal
+    moon_description: "Moon Description"
+    moon_display_name: Moon
+    ninja_description: "Ninja Description"
+    ninja_display_name: Ninja
+    panama_rocket_description: "Panama Rocket Description"
+    panama_rocket_display_name: "Panama Rocket"
+    panda_description: "Panda Description"
+    panda_display_name: Panda
+    panda_unicycle_description: "Panda Unicycle Description"
+    panda_unicycle_display_name: "Panda Unicycle"
+    pinwheel_description: "Pinwheel Description"
+    pinwheel_display_name: Pinwheel
+    pizza_slice_description: "Pizza Slice Description"
+    pizza_slice_display_name: "Pizza Slice"
+    rocket_description: "Rocket Description"
+    rocket_display_name: Rocket
+    star_description: "Star Description"
+    star_display_name: Star
+    thumbs_up_description: "Thumbs Up Description"
+    thumbs_up_display_name: "Thumbs Up"
+    trophy_description: "Trophy Description"
+    trophy_display_name: Trophy
+  trophy_case_7a098a85: "Trophy Case"
+  trophy_case_da3b25bb: "Trophy case"
   truncated_56b1a661: Truncated
   turkish_5b69578b: Turkish
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Turn on RTL Even For Non-RTL Languages"
@@ -21063,6 +21134,9 @@ en-CA:
   updated_permissions_page_f2e91060: "Updated Permissions Page"
   updated_terms_of_service_82f34148: "Updated Terms of Service"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Updated UI for searching and displaying users and courses within an account."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Updates account notification preferences UI to be a more current
+      and updated user experience
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Updates the display of Post Policy icons in the New Gradebook assignment column header."
   updating_6edbab78: Updating
   updating_discussion_failed_aadb2d35: "Updating discussion failed"
