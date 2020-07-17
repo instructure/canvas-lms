@@ -406,6 +406,7 @@ nl:
   account_id_73966078: account_id
   account_id_f6e26867: Account-id
   account_level_notification_preferences_require_an__66467cd7: "Voor meldingsvoorkeuren op accountniveau is een account_id nodig om bij te werken"
+  account_level_notification_preferences_ui_update_f5e189a4: "Udate voor accountniveau meldingsvoorkeuren UI"
   account_level_settings_manage_4fca6f8e: "Instellingen op accountniveau - beheren"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: accountnaam
@@ -1839,6 +1840,7 @@ nl:
   add_tas_to_the_course_2aac6e02: "Onderwijsassistenten aan de cursus toevoegen"
   add_theme_32fa3d50: "Thema toevoegen"
   add_to_course_481a51c4: "Aan cursus toevoegen..."
+  add_to_rce_toolbar_e5b3e3b4: "Toevoegen aan RCE-werkbalk"
   add_to_student_to_do_58e66b4b: "Toevoegen aan to-do lijst van cursist"
   add_to_whitelist_24f3f1ba: "Toevoegen aan whitelist"
   add_toolname_4e17dc90: "%{toolName} toevoegen"
@@ -5501,6 +5503,7 @@ nl:
       importing_button: "Bezig met importeren... Dit kan even duren"
     titles: 
       home_page: Startpagina
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Inhoud wordt nog steeds gedownload. Als je doorgaat, wordt deze niet goed ingesloten."
   content_link_error_assignment_name_course_name_b8be789a: "Fout met inhoudslink - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -8513,6 +8516,7 @@ nl:
             naar eigen voorkeur. Ken automatisch een cijfer toe voor ontbrekende of
             te late inleveringen en verberg cijfers totdat je zover bent dat cursisten
             deze kunnen zien. Voor een eenvoudige manier van beoordelen kun je SpeedGrader gebruiken om inleveringen te bekijken en te beoordelen.
+  display_historical_view_of_achievements_of_users_53db5938: "Toon historische weergave van de prestaties van  gebruikers"
   display_name_6c2cfc58: "Weergavenaam:"
   display_name_b80c243e: "Naam weergeven"
   display_to_students_e1301f99: "Weergeven aan cursisten"
@@ -8708,6 +8712,7 @@ nl:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Elke bar vertegenwoordigt het aantal *paginabezichtigingen* op die dag. Een oranje bar geeft aan de cursist op die dag **actie heeft ondernomen** in de cursus."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Elke bar vertegenwoordigt het aantal paginabezichtigingen met betrekking tot die categorie."
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Elke rij is een opdracht. De diamant is de vervaldatum en de bar strekt zich uit tot de datum van indiening. Groen geeft aan *op tijd ingediend*, geel een **late indiening** en rood een ***gemiste opdracht***. Grijze diamanten zijn opdrachten zonder vervaldata, geplaatst op het moment van indiening."
+  earned_earndate_5f8b6c99: "Verdiend %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Importeer of kopieer inhoud op eenvoudige wijze vanuit een andere Canvas-cursus in
               je eigen cursus of importeer inhoud vanuit andere indelingen, zoals Moodle of QTI.
@@ -9674,6 +9679,7 @@ nl:
   fall_grading_period_id_74ef68e: "Najaar beoordelingsperiode ID"
   favicon_6e658914: Favicon
   favorite_courses_fbd356f0: "Favoriete cursussen"
+  favorite_d720d310: Favoriet
   favorites_c7e0207c: Favorieten
   feature_f5526584: Functie
   feature_flags: 
@@ -12294,6 +12300,7 @@ nl:
   item_type_download_e949cdb6: "Itemtype: Download"
   item_type_link_5a2abed2: "Itemtype: Koppeling"
   item_type_locked_85c560ec: "Itemtype: Vergrendeld"
+  item_type_mastery_connect_8f36c669: "Itemtype: Vakbeheersing verbinden"
   item_type_new_quiz_1a1cd9a9: "Itemtype: Nieuwe toets"
   item_type_quiz_c894ddb1: "Itemtype: Toets"
   items_299a7626: "Items: "
@@ -12552,6 +12559,7 @@ nl:
   let_students_see_the_correct_answers_dacc2faf: "Cursisten toestaan om de juiste antwoorden weer te geven"
   let_students_see_their_quiz_responses_fbc07d14: "Cursisten toestaan hun toetsantwoorden te zien"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Laat studenten hun toetsantwoorden zien (verkeerde vragen worden gemarkeerd in de studentenfeedback)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Laat de sitebeheerder tot 2 LTI-apps als favoriet selecteren die vervolgens in de RCE-werkbalk worden weergegeven"
   letter_grade_29ff1938: "Beoordeling in lettervorm"
   letter_grade_f00fedc4: "beoordeling in lettervorm"
   level_5fdf654a: Niveau
@@ -12714,6 +12722,7 @@ nl:
   list_collapsed_9ac35920: "Lijst samengevouwen."
   list_collapsed_dde87718: "Lijst samengevouwen"
   list_expanded_efec2d0: "Lijst uitgevouwen."
+  list_of_the_currently_attainable_trophies_959b2518: "Lijst van momenteel haalbare trofeeën"
   list_view_430aecce: Lijstweergave
   lithuanian_5adcbe24: Litouws
   little_lost_try_here_first_9e24e575: "Een beetje verdwaald? Begin hier dan eens!"
@@ -13066,7 +13075,9 @@ nl:
   mastery_path_processing_f4471152: "Leertraject wordt verwerkt"
   mastery_paths_breakdown_6e0b5fce: "Uitsplitsing Mastery Paths"
   mastery_paths_cc4096c2: Meesterschapspaden
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "Bewerken van leertrajecten is tijdelijk uitgeschakeld voor onderhoud."
   mastery_paths_editor_930655bb: "Editor Meesterschapspaden"
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Selectie van leertrajecten is tijdelijk uitgeschakeld voor onderhoud."
   mastery_points_f1672cc: bekwaamheidspunten
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Meesterschap scores geven de hoogste score weer van een beoordeelde opdracht of toets."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Beheersingsscore geeft de meest recent beoordeelde opdracht of toets weer."
@@ -15465,6 +15476,7 @@ nl:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Punten"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Aantal punten mogelijk"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} punten"
+  na_3dbb9cfd: N.v.t.
   name: "Academic Benchmark Importer"
   name_1aed4a1b: Naam
   name_3806192d: "Naam:"
@@ -17026,6 +17038,7 @@ nl:
       description: "Hosts geüploade bestanden met de Inst-FS service."
       labels: 
         migration_rate: "Kans op migreren van oudere bestanden in Inst-FS bij toegang (0 t/m 100)"
+        service_worker: "Gebruik servicewerker voor verificatie van toegang tot bestanden in Safari 13+"
     kaltura: 
       description: "Kaltura-video/audio opnemen en afspelen"
       name: Kaltura
@@ -17358,6 +17371,7 @@ nl:
       requirements_must_be_completed: "De volgende voorwaarden moeten voldaan zijn, voordat deze pagina ontgrendeld zal worden"
   presentation_2d9387ca: Presentatie
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Toont de toetsinstelling om automatische inlevering van een tijdgebonden toets te voorkomen wanneer de beschikbare tijd is verstreken."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Druk op ALT + F8 om een lijst van toetsenbordsneltoetsen te zien"
   press_space_to_start_over_d4b8a2da: "Druk op 'spatiebalk' om opnieuw te beginnen"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Op komma of shift + vraagteken drukken om een lijst van sneltoetsen te zien."
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Op komma of shift + ? drukken om een lijst van sneltoetsen te zien."
@@ -18010,6 +18024,7 @@ nl:
       update_question_without_regrading: "Vraag bijwerken zonder opnieuw te beoordelen"
   quiz_40ee61b1: toets
   quiz_assignment_overrides_cec1973b: "Overschrijvingen toetsopdracht"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Voor toetsbeschikbaarheidsdatums die verstrijken tijdens een poging geldt nog steeds de automatische inlevering zelfs als de verlengtijd nog niet verstreken is."
   quiz_duplication_not_implemented_c1495585: "dupliceren van toetsen niet geïmplementeerd"
   quiz_e0dcce8f: Toets
   quiz_extensions_d2550649: Toetsextensies
@@ -22205,6 +22220,7 @@ nl:
       networking_academy_description: "Het weergeven van Cisco-antwoorden op de meest gestelde vragen."
       networking_academy_faqs: "Networking Academy-FAQ's"
       support_desk_livechat: "Helpdesk Live Chat"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Ondersteun favoriete LTI-tools in de RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Zweden
@@ -22290,6 +22306,7 @@ nl:
     syllabus: Syllabus
     tab_location_error: "Die locatie van tabblad is ongeldig"
     tab_unmanagable_error: "%{css_class} kan niet worden beheerd"
+    trophy_case: Trofeeënkast
   tabs_5605547e: Tabbladen
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
@@ -22431,6 +22448,12 @@ nl:
                      handmatig %{max_domains} domeinen aan je whitelist toevoegen. Het gebruik van jokertekens is aan te raden
                      (bijvoorbeeld *.instructure.com). Canvas- en Instructure-domeinen zijn automatisch inbegrepen
                      en worden niet meegerekend bij de limiet van 50 domeinen.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      Met het Inhoudbeveiligingsbeleid kun je aangepaste
+                     JavaScript beperken die in jouw exemplaar van Canvas wordt uitgevoerd. Je kunt handmatig
+                     tot %{max_domains} toegestane domeinen toevoegen. Het gebruik van jokertekens is aan te raden
+                        (bijvoorbeeld *.instructure.com). Canvas- en Instructure-domeinen zijn automatisch inbegrepen
+                     en worden niet meegerekend bij de limiet van 50 domeinen.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       De startpagina van de cursus is de eerste pagina die cursisten te zien krijgen wanneer ze
             je cursus openen. De startpagina van de cursus kan de activiteitenstroom van deelname aan de cursus,
@@ -22460,6 +22483,9 @@ nl:
       De volgende domeinen zijn automatisch toegevoegd aan je
                        whitelist vanuit tools die al in je account aanwezig zijn.
                        Je kunt deze domeinen verwijderen door de bijbehorende tools te verwijderen.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      De volgende domeinen zijn automatisch toegestaan vanuit tools die al in je account aanwezig zijn.
+                       Je kunt deze domeinen verwijderen door de gekoppelde tools te verwijderen.
   the_following_errors_occurred_bdec1e44: "Er hebben zich de volgende fouten voorgedaan:"
   the_following_fields_are_invalid_fields_b3565800: "De volgende velden zijn ongeldig: %{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
@@ -22585,6 +22611,7 @@ nl:
   there_are_no_unsaved_changes_9276e87c: "Er zijn geen onopgeslagen veranderingen"
   there_are_no_unsynced_changes_4e8f0838: "Er zijn geen niet-gesynchroniseerde wijzigingen"
   there_are_no_unsynched_changes_d208547c: "Er zijn geen niet-gesynchroniseerde wijzigingen"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Er is een 2-app limiet voor plaatsing binnen de RCE-werkbalk. Deze instelling geldt alleen voor de verbeterde RCE."
   there_is_currently_1_available_grader_758e4a21: "Er is momenteel 1 beoordelaar beschikbaar"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Er is een probleem opgetreden bij het afmelden van je IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Er is een probleem met het maken van de kolom voor docentaantekeningen."
@@ -23495,6 +23522,59 @@ nl:
   tree_browser: 
     folder_tree_instructions: "Gebruik het toetspijltje omhoog of het toetspijltje omlaag om door de boomstructuur te navigeren. Druk op het toetspijltje rechts om uit vouwen en druk op het toetspijltje links om in te vouwen."
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad en Tobago (+1)"
+  trophy: 
+    balloon_description: "Beschrijving van ballon"
+    balloon_display_name: Ballon
+    bifrost_trophy_description: "Beschrijving van bifrost trofee"
+    bifrost_trophy_display_name: "Bifrost trofee"
+    butterfly_description: "Beschrijving van vlinder"
+    butterfly_display_name: Vlinder
+    einstein_rosen_trophy_description: "Beschrijving van Einstein-Rosen trofee"
+    einstein_rosen_trophy_display_name: "Einstein-Rosen trofee"
+    fire_description: "Beschrijving van vuur"
+    fire_display_name: Vuur
+    flowers_description: "Beschrijving van bloem"
+    flowers_display_name: Bloem
+    four_leaf_clover_description: "Beschrijving van klavertje van vier"
+    four_leaf_clover_display_name: "Klavertje van vier"
+    gift_description: "Beschrijving van geschenk"
+    gift_display_name: Geschenk
+    gnome_description: "Beschrijving van kabouter"
+    gnome_display_name: Kabouter
+    helix_rocket_description: "Beschrijving van helix raket"
+    helix_rocket_display_name: "Helix raket"
+    horse_shoe_description: "Beschrijving van hoefijzer"
+    horse_shoe_display_name: Hoefijzer
+    hot_air_balloon_description: "Beschrijving van heteluchtballon"
+    hot_air_balloon_display_name: Heteluchtballon
+    magic_mystery_thumbs_up_description: "Beschrijving van Magic Mystery duimen omhoog"
+    magic_mystery_thumbs_up_display_name: "Magic Mystery duimen omhoog"
+    medal_description: "Beschrijving van medaille"
+    medal_display_name: Medaille
+    moon_description: "Beschrijving van maan"
+    moon_display_name: Maan
+    ninja_description: "Beschrijving van ninja"
+    ninja_display_name: Ninja
+    panama_rocket_description: "Beschrijving van Panama raket"
+    panama_rocket_display_name: "Panama raket"
+    panda_description: "Beschrijving van panda"
+    panda_display_name: Panda
+    panda_unicycle_description: "Beschrijving van panda eenwieler"
+    panda_unicycle_display_name: "Panda eenwieler"
+    pinwheel_description: "Beschrijving van windmolentje"
+    pinwheel_display_name: Windmolentje
+    pizza_slice_description: "Beschrijving van pizzastuk"
+    pizza_slice_display_name: Pizzastuk
+    rocket_description: "Beschrijving van raket"
+    rocket_display_name: Raket
+    star_description: "Beschrijving van ster"
+    star_display_name: Ster
+    thumbs_up_description: "Beschrijving van duimen omhoog"
+    thumbs_up_display_name: "Duimen omhoog"
+    trophy_description: "Beschrijving van trofee"
+    trophy_display_name: Trofee
+  trophy_case_7a098a85: Trofeeënkast
+  trophy_case_da3b25bb: Trofeeënkast
   truncated_56b1a661: Afgekapt
   turkish_5b69578b: Turks
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "RNL inschakelen, ook voor niet-RNL-talen"
@@ -23720,6 +23800,9 @@ nl:
   updated_permissions_page_f2e91060: "Bijgewerkte machtigingspagina"
   updated_terms_of_service_82f34148: "Bijgewerkte servicevoorwaarden"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Bijgewerkte UI voor zoeken en weergeven van gebruikers en cursussen binnen een account."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Updaten van accountniveau meldingsvoorkeuren UI tot een meer actuele
+      en bijgewerkte gebruikerservaring
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Hiermee wordt de weergave van pictogrammen voor Beleid voor posten bijgewerkt in de kop van de toewijzingskolom in Nieuwe cijferlijst."
   updating_6edbab78: "Bezig met bijwerken"
   updating_discussion_failed_aadb2d35: "Bijwerken van discussie mislukt"
