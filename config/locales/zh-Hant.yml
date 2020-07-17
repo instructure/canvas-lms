@@ -406,6 +406,7 @@ zh-Hant:
   account_id_73966078: account_id
   account_id_f6e26867: "帳戶 ID"
   account_level_notification_preferences_require_an__66467cd7: "帳戶級別通知偏好需要 account_id 以更新"
+  account_level_notification_preferences_ui_update_f5e189a4: "帳戶級別通知偏好 UI 更新"
   account_level_settings_manage_4fca6f8e: "帳戶級別設定 - 管理"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: 帳戶名稱
@@ -1839,6 +1840,7 @@ zh-Hant:
   add_tas_to_the_course_2aac6e02: 添加助教至課程
   add_theme_32fa3d50: 添加主題
   add_to_course_481a51c4: 添加到課程......
+  add_to_rce_toolbar_e5b3e3b4: "添加至 RCE 工具欄"
   add_to_student_to_do_58e66b4b: 添加至學生待辦事項
   add_to_whitelist_24f3f1ba: 添加到白名單
   add_toolname_4e17dc90: "添加 %{toolName}"
@@ -5416,7 +5418,7 @@ zh-Hant:
   conferences_tutorial_tray_6f071ce2: 會議教程列表
   conferencing_6a6d9b55: 會議
   conferencing_b69e2537: 會議：
-  confetti_for_on_time_submissions_394e16ce: 準時提交項目的碎紙
+  confetti_for_on_time_submissions_394e16ce: 準時提交項目的彩帶效果
   confetti_for_valid_links_7506df83: 有效連結彩帶效果
   config_url_e96ceaf3: "配置 URL"
   configurate_tool_app_5a721f2c: "要配置 %{tool} 應用程式？"
@@ -5510,6 +5512,7 @@ zh-Hant:
       importing_button: 正在導入...這可能需要一段時間
     titles: 
       home_page: 首頁
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: 內容仍在上傳中，如果您繼續將無法正確嵌入內容。
   content_link_error_assignment_name_course_name_b8be789a: "內容連結錯誤 - %{assignment_name}，%{course_name}"
   content_locks: 
     buttons: 
@@ -8524,6 +8527,7 @@ zh-Hant:
             篩選及排列成績單項目。為欠交或
             遲交項目自動給予評分，並可輕鬆隱藏評分，直至到了可讓學生
             查看的時候。如要給予簡單評分，可使用 SpeedGrader 查看及評改提交項目。
+  display_historical_view_of_achievements_of_users_53db5938: 展示使用者的過去成就
   display_name_6c2cfc58: 顯示名稱：
   display_name_b80c243e: 顯示名稱
   display_to_students_e1301f99: 向學生顯示
@@ -8717,6 +8721,7 @@ zh-Hant:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "每一條表示該天的 *頁面檢視* 數。橙色條表示該天某用戶在課程內 **進行了一項操作**。"
   each_bar_represents_the_number_of_page_views_relat_29d1e341: 每一條表示與該類別相關的頁面檢視數。
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "每一行爲一項任務。菱形爲到期日期，並且該條延長至提交日期。綠色表示 *按時提交*，黃色表示 **遲交**，而紅色表示 ***未交任務***。灰色菱形是沒有截止日期的任務，放在提交時間點上。"
+  earned_earndate_5f8b6c99: "獲得%{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       只需簡單地從另一 Canvas 課程把內容匯入或複製到
               您的課程，或從 Moodle 或 QTI 等其他格式匯入內容。
@@ -9681,6 +9686,7 @@ zh-Hant:
   fall_grading_period_id_74ef68e: "秋季評分時段 ID"
   favicon_6e658914: Favicon
   favorite_courses_fbd356f0: 最喜愛的課程
+  favorite_d720d310: 我的最愛
   favorites_c7e0207c: 我的最愛
   feature_f5526584: 功能
   feature_flags: 
@@ -12297,6 +12303,7 @@ zh-Hant:
   item_type_download_e949cdb6: 項目類型：下載
   item_type_link_5a2abed2: 項目類型：連結
   item_type_locked_85c560ec: 項目類型：已鎖定
+  item_type_mastery_connect_8f36c669: 項目類型：掌握程度連線
   item_type_new_quiz_1a1cd9a9: 項目類型：新測驗
   item_type_quiz_c894ddb1: 項目類型：測驗
   items_299a7626: "項目： "
@@ -12555,6 +12562,7 @@ zh-Hant:
   let_students_see_the_correct_answers_dacc2faf: 允許學生檢視正確答案
   let_students_see_their_quiz_responses_fbc07d14: 允許學生檢視他們的測驗回應
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "讓學生看見他們的測驗結果 ( 在學生反饋中標示不正確問題 )"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "讓網站管理員可以選擇最多 2 項最愛 LTI 應用程式，該應用程式將顯示在 RCE 工具欄"
   letter_grade_29ff1938: 字母成績
   letter_grade_f00fedc4: 字母分級
   level_5fdf654a: 等級
@@ -12717,6 +12725,7 @@ zh-Hant:
   list_collapsed_9ac35920: 名單折起。
   list_collapsed_dde87718: 名單折起
   list_expanded_efec2d0: 名單展開。
+  list_of_the_currently_attainable_trophies_959b2518: 目前可獲取的獎盃清單
   list_view_430aecce: 列表視圖
   lithuanian_5adcbe24: 立陶宛語
   little_lost_try_here_first_9e24e575: 不知如何是好？先試試這樣吧！
@@ -13069,7 +13078,9 @@ zh-Hant:
   mastery_path_processing_f4471152: 正在處理掌握歷程
   mastery_paths_breakdown_6e0b5fce: 精通路徑分解
   mastery_paths_cc4096c2: 掌握歷程
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: 已暫時停用掌握歷程編輯功能以便進行維護。
   mastery_paths_editor_930655bb: 路徑編輯器
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: 已暫時停用掌握歷程選取功能以便進行維護。
   mastery_points_f1672cc: 掌握程度分數
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: 精通得分反映了一項評分作業或測驗的最高分數。
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: 精通分數反映最近評分的任務或測驗。
@@ -15466,6 +15477,7 @@ zh-Hant:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} 分數"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} 可能的分數"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} 分數"
+  na_3dbb9cfd: 不適用
   name: 學術基準導入程式
   name_1aed4a1b: 名稱
   name_3806192d: 名稱：
@@ -17028,6 +17040,7 @@ zh-Hant:
       description: "以 Inst-FS 服務儲存已上載的檔案。"
       labels: 
         migration_rate: "存取時可遷移較舊檔案至 Inst-FS（0 至 100）"
+        service_worker: "使用服務運行內容以驗證 Safari 13+ 的檔案存取"
     kaltura: 
       description: "Kaltura 視訊/音訊記錄和播放"
       name: Kaltura
@@ -17355,6 +17368,7 @@ zh-Hant:
       requirements_must_be_completed: 以下要求需要在此頁面解除鎖定之前完成
   presentation_2d9387ca: 簡報
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: 顯示測驗設定以避免計時測驗可用時間結束後自動提交測驗。
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "按 ALT + F8，以瀏覽鍵盤快捷鍵清單"
   press_space_to_start_over_d4b8a2da: 按下空白鍵以重新開始
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "按逗號或 Shift + 問號，以瀏覽此頁面的鍵盤快捷鍵清單"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "按逗號或 Shift + ？，以瀏覽鍵盤快捷鍵清單。"
@@ -18008,6 +18022,7 @@ zh-Hant:
       update_question_without_regrading: 更新問題，而不重新評分
   quiz_40ee61b1: 測驗
   quiz_assignment_overrides_cec1973b: 測驗作業重寫
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: 遞交嘗試途中過去的測驗可用日期仍會自動提交，即使延長時效尚未逾期。
   quiz_duplication_not_implemented_c1495585: 未執行測驗重複
   quiz_e0dcce8f: 測驗
   quiz_extensions_d2550649: 測驗擴展
@@ -22192,6 +22207,7 @@ zh-Hant:
       networking_academy_description: "檢視最常見問題的 Cisco 答案。"
       networking_academy_faqs: "Networking Academy（網路技術學院）常見問題解答"
       support_desk_livechat: 支援桌面實時聊天
+  support_favorite_lti_tools_in_the_rce_1680436d: "RCE 支援最愛 LTI 工具"
   svg_d5969386: SVG
   swahili_5caeb4ba: 斯瓦希里語
   sweden_1add8e79: 瑞典
@@ -22277,6 +22293,7 @@ zh-Hant:
     syllabus: 教學大綱
     tab_location_error: 該標籤位置無效
     tab_unmanagable_error: "%{css_class} 不便於管理"
+    trophy_case: 獎盃櫃
   tabs_5605547e: 標籤
   tagalog_74906db7: 他加祿語
   taiwan_886_9a5b6bbf: "台灣 (+886)"
@@ -22418,6 +22435,12 @@ zh-Hant:
                      名單。建議使用萬用字元（如：*.instructure.com）。
                      自動包括了 Canvas 和 Instructure 的網域而且
                      不會計入您的 50 個網域限制。
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      內容安全政策允許您限制在您的 Canvas 實例中執行的自訂
+                     JavaScript。您可以手動添加
+                      最多 %{max_domains} 個獲允許網域。建議使用萬用字元
+                     （如：*.instructure.com）。自動包括了 Canvas 和 Instructure 的網域
+                     而且不會計入您的 50 個網域限制。
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       學生開啟您的課程後，
             第一個看到的頁面就是課程主頁。主頁可以顯示課程參與情況活動
@@ -22447,6 +22470,9 @@ zh-Hant:
       以下網域已自動從您的帳戶中已有的工具
                       添加到您的白名單中。
                        要移除這些網域，請移除關聯工具。
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      以下網域已透過您的帳戶中已有的工具獲自動允許。
+                       如需移除這些網域，請移除關聯工具。
   the_following_errors_occurred_bdec1e44: 發生以下錯誤：
   the_following_fields_are_invalid_fields_b3565800: "如下字段無效：%{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
@@ -22572,6 +22598,7 @@ zh-Hant:
   there_are_no_unsaved_changes_9276e87c: 沒有未保存的更改
   there_are_no_unsynced_changes_4e8f0838: 沒有未同步的變更
   there_are_no_unsynched_changes_d208547c: 沒有未同步的變更
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "RCE 工具欄的應用程式數量上限為 2。此設定僅適用於升級版 RCE。"
   there_is_currently_1_available_grader_758e4a21: "目前有 1 位可用評分員"
   there_was_a_failure_logging_out_at_your_idp_30070527: "在您的 IdP 登出時出現問題"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: 創建教師筆記欄時出現問題。
@@ -23482,6 +23509,59 @@ zh-Hant:
   tree_browser: 
     folder_tree_instructions: 使用向上和向下方向鍵來瀏覽整個文件夾樹。按向右鍵展開文件夾，按向左鍵收起文件夾，按回車選定要選擇的項目。
   trinidad_and_tobago_1_fc2d8d1c: "千里達及托巴哥 (+1)"
+  trophy: 
+    balloon_description: 氣球描述
+    balloon_display_name: 氣球
+    bifrost_trophy_description: 彩虹橋獎盃描述
+    bifrost_trophy_display_name: 彩虹橋獎盃
+    butterfly_description: 蝴蝶描述
+    butterfly_display_name: 蝴蝶
+    einstein_rosen_trophy_description: 愛因斯坦-羅森獎盃描述
+    einstein_rosen_trophy_display_name: 愛因斯坦-羅森獎盃
+    fire_description: 火焰描述
+    fire_display_name: 火焰
+    flowers_description: 花朵描述
+    flowers_display_name: 花朵
+    four_leaf_clover_description: 四葉草描述
+    four_leaf_clover_display_name: 四葉草
+    gift_description: 禮物描述
+    gift_display_name: 禮物
+    gnome_description: 地精描述
+    gnome_display_name: 地精
+    helix_rocket_description: "Helix 火箭描述"
+    helix_rocket_display_name: "Helix 火箭"
+    horse_shoe_description: 馬蹄鐵描述
+    horse_shoe_display_name: 馬蹄鐵
+    hot_air_balloon_description: 熱氣球描述
+    hot_air_balloon_display_name: 熱氣球
+    magic_mystery_thumbs_up_description: 魔法迷幻比讚描述
+    magic_mystery_thumbs_up_display_name: 魔法迷幻比讚
+    medal_description: 獎牌描述
+    medal_display_name: 獎牌
+    moon_description: 月亮描述
+    moon_display_name: 月亮
+    ninja_description: 忍者描述
+    ninja_display_name: 忍者
+    panama_rocket_description: 巴拿馬火箭描述
+    panama_rocket_display_name: 巴拿馬火箭
+    panda_description: 熊貓描述
+    panda_display_name: 熊貓
+    panda_unicycle_description: 熊貓單輪車描述
+    panda_unicycle_display_name: 熊貓單輪車
+    pinwheel_description: 紙風車描述
+    pinwheel_display_name: 紙風車
+    pizza_slice_description: 薄餅片描述
+    pizza_slice_display_name: 薄餅片
+    rocket_description: 火箭描述
+    rocket_display_name: 火箭
+    star_description: 星星描述
+    star_display_name: 添加星號
+    thumbs_up_description: 比讚描述
+    thumbs_up_display_name: 比讚
+    trophy_description: 獎盃描述
+    trophy_display_name: 將別
+  trophy_case_7a098a85: 獎盃櫃
+  trophy_case_da3b25bb: 獎盃櫃
   truncated_56b1a661: 已截斷
   turkish_5b69578b: 土耳其語
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "即使對於非 RTL 語言也開啟 RTL"
@@ -23709,6 +23789,9 @@ zh-Hant:
   updated_permissions_page_f2e91060: 已更新的權限頁面
   updated_terms_of_service_82f34148: 已更新的服務條款
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "升級 UI，以便在同一帳戶內搜尋和顯示多個使用者和課程。"
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      更新帳戶通知偏好的 UI，提供更新穎
+      的使用者體驗
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: 在新成績單作業欄目標題更新《發帖政策》圖標。
   updating_6edbab78: 正在更新
   updating_discussion_failed_aadb2d35: 更新討論區失敗
