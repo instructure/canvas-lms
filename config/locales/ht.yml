@@ -393,6 +393,7 @@ ht:
   account_id_73966078: account_id
   account_id_f6e26867: "Kont Id"
   account_level_notification_preferences_require_an__66467cd7: "Preferans notifikasyon nivo kont yo bezwen yon account_id pou li aktyalize."
+  account_level_notification_preferences_ui_update_f5e189a4: "Aktyalizasyon notifikasyon preferans entèfas nan nivo kont"
   account_level_settings_manage_4fca6f8e: "Paramèt onivo kont - Jere"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "non kont"
@@ -1757,6 +1758,7 @@ ht:
   add_tas_to_the_course_2aac6e02: "Add AP nan Kou a"
   add_theme_32fa3d50: "Ajoute Tèm"
   add_to_course_481a51c4: "Ajoute nan kou..."
+  add_to_rce_toolbar_e5b3e3b4: "Ajoute sou ba zouti RCE a"
   add_to_student_to_do_58e66b4b: "Ajoute nan lis tach elèv wi"
   add_to_whitelist_24f3f1ba: "Ajoute sou Lis Blanch"
   add_toolname_4e17dc90: "Ajoute %{toolName}"
@@ -5210,6 +5212,7 @@ ht:
       importing_button: "Enpòtasyon... sa kapab pran ti tan"
     titles: 
       home_page: "Paj Akèy"
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Kontni an ap transfere toujou, si w kontinye li pa p entegre jan li ta dwe a."
   content_link_error_assignment_name_course_name_b8be789a: "Erè Lyen Kontni -  %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -8005,6 +8008,7 @@ ht:
             selon preferans ou. Aplike otomatikman yon nòt pou soumisyon ki manke oswa
             ki fèt an reta yo, epi kache nòt o byen fasil jiskaske elèv yo
             kapab wè yo.  Pou yon notasyon senplifye, itilize SpeedGrader pou ka vizyalize epi note soumisyon yo.
+  display_historical_view_of_achievements_of_users_53db5938: "Afiche yon prezantasyon itsorik reyalizasyon itilizatè yo."
   display_name_6c2cfc58: "Non Afichaj:"
   display_name_b80c243e: "Afiche Non"
   display_to_students_e1301f99: "Afiche pou Elèv"
@@ -8180,6 +8184,7 @@ ht:
   e_g_jon_doe_77233e3b: "egzanp, Jon Doe"
   e_g_jondoe_example_com_98656fb5: "egzanp: jondoe@example.com"
   e_mail_only_2cc5e513: "Sèlman Imèl"
+  earned_earndate_5f8b6c99: "Genyen %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: "Enpòte oswa kopye kontni yon lòt kou Canvas nan\n\
       \x20       kou pa w ou byen fasil, oswa enpòte kontni lòt fòma tankou Moodle oswa QTI. "
   ecollege_file_description: Ecollege
@@ -9026,6 +9031,7 @@ ht:
   fall_grading_period_id_74ef68e: "Chit id peryòd klasman"
   favicon_6e658914: Favicon
   favorite_courses_fbd356f0: "Kou Prefere"
+  favorite_d720d310: Prefere
   favorites_c7e0207c: Prefere
   feature_f5526584: Fonksyonalite
   feature_flags: 
@@ -11195,6 +11201,7 @@ ht:
   item_type_download_e949cdb6: "Tip eleman: Telechaje"
   item_type_link_5a2abed2: "Tip eleman: Lyen"
   item_type_locked_85c560ec: "Tip eleman: Bloke"
+  item_type_mastery_connect_8f36c669: "Tip eleman: Metriz Koneksyon"
   item_type_new_quiz_1a1cd9a9: "Tip eleman: Nouvo Quiz"
   item_type_quiz_c894ddb1: "Tip eleman: Quiz"
   items_299a7626: "Eleman: "
@@ -11447,6 +11454,7 @@ ht:
   length_results_found_3afd01e5: "%{length} rezilta nou jwenn"
   let_students_see_the_correct_answers_dacc2faf: "Kite Elèv yo Wè Bon Repons yo"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Pèmèt Elèv yo Wè Repons Quiz Yo (Kesyon Enkòrèk yo Ap Make Nan Kòmantè Elèv La)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Kite administratè sit la seleksyone jiska 2 aplikasyon LTI kòm prefere, apre sa ki pral afiche nan ba zouti RCE a."
   letter_grade_29ff1938: "Notasyon an Lèt"
   letter_grade_f00fedc4: "kategori lèt"
   level_5fdf654a: Nivo
@@ -11602,6 +11610,7 @@ ht:
   list_collapsed_9ac35920: "Lis ratresi."
   list_collapsed_dde87718: "Lis ratresi"
   list_expanded_efec2d0: "Lis elaji."
+  list_of_the_currently_attainable_trophies_959b2518: "Lis koup ki aksesib pou kounye a"
   list_view_430aecce: "Afichaj an Lis"
   lithuanian_5adcbe24: Lityanyen
   little_lost_try_here_first_9e24e575: "Ou pèdi? Eseye la dabò!"
@@ -11924,6 +11933,8 @@ ht:
   mastery_path_processing_f4471152: "Pakou metris an pwosesis"
   mastery_paths_breakdown_6e0b5fce: "Repatisyon Pakou Prensipal"
   mastery_paths_cc4096c2: "Pakou Prensipal"
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "Edisyon pakou metriz la te dezaktive pou yo ti tan pou rezon mentnans"
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Seleksyon pakou metriz la te dezaktive pou yon ti tan pou rezon mentnans."
   mastery_points_f1672cc: "pwen metriz"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Nòt metriz la reflete nòt ki pi wo yon sesyon oswa yon quiz klase."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Nòt metriz la reflete sesyon oswa quiz klase ki pi resan an."
@@ -14025,6 +14036,7 @@ ht:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Pwen"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Pwen Posib"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} pts"
+  na_3dbb9cfd: NA
   name: "Enpòtatè Benchmark Akademik"
   name_1aed4a1b: Non
   name_3806192d: "Non:"
@@ -15521,6 +15533,7 @@ ht:
       description: "Ebèje fichye ki telechaje ak sèvis Inst-FS."
       labels: 
         migration_rate: "Chans pou deplase ansyen fichye nan Inst-FS pandan aksè a (0 a 100)"
+        service_worker: "Itilize yon travayè sèvis pou otantifye aksè a fichye yo nan Safari 13+"
     kaltura: 
       description: "Lekti ak anrejistreman odyo/videyo Kaltura"
       name: Kaltura
@@ -15851,6 +15864,7 @@ ht:
       requirements_must_be_completed: "Kondisyon annapre yo dwe ranpli anvan paj sa a debloke."
   presentation_2d9387ca: Prezantasyon
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Prezante reglaj quiz la pou evite souimisyon otomatik yon quiz kwonometre lè tan ki te disponib la pase."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Peze ALT + F8 pou ka wè yon lis rakusi klavye."
   press_space_to_start_over_d4b8a2da: "Peze 'space' pou ka rekòmanse"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Peze touch vigil la oswa shift + pwen enterogasyon pou wè yon lis rakousi klavye"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Peze touch vigil la oswa shift + pwen enterogasyon pou wè yon lis rakousi klavye"
@@ -16451,6 +16465,7 @@ ht:
       update_question_without_regrading: "Aktyalize kesyon san regrade"
   quiz_40ee61b1: quiz
   quiz_assignment_overrides_cec1973b: "Ranplasman Atribisyon Quiz"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Dat dispoibilite quiz ki pase nan yon tantativ yo ap toujou monte otomatikman, menm si delè pwolonje a pa ekspire."
   quiz_duplication_not_implemented_c1495585: "Diplikasyon quiz la pa enplemante"
   quiz_e0dcce8f: Quiz
   quiz_extensions_d2550649: "Ekstansyon Quiz"
@@ -20191,6 +20206,7 @@ ht:
       networking_academy_description: "Afiche repons Cisco a kesyon yo poze souvan yo."
       networking_academy_faqs: "FAQ Networking Academy"
       support_desk_livechat: "Chat An Dirèk Biwo Sipò"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Soutni zouti LTI prefere RCE yo,"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swaeli
   sweden_46_55cc3620: "Syèd (+46)"
@@ -20268,6 +20284,7 @@ ht:
     syllabus: Pwogram
     tab_location_error: "Pozisyon tab sa a envalid"
     tab_unmanagable_error: "%{css_class} pa jerab"
+    trophy_case: "Valiz Koup"
   tabs_5605547e: Onglè
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
@@ -20403,6 +20420,12 @@ ht:
                      jiska %{max_domains} domèn nan lis blanch ou an manyèlman. Yo rekòmande kat jokè yo
                      (pa egzanp *.instructure.com). Domèn Canvas ak Instructure yo enkli
                      otomatikman ni yo pa konte nan limit 50 domèn ou genyen an.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      Politik Sekirite Kontni yo pèmèt ou limite pèsonalizasyon
+                     JavaScript k ap fèt nan Canvas ou a.  Ou ka ajoute
+                     jiska %{max_domains} domèn otorize. Yo rekòmande kat yo
+                     (egzanp. *.instructure.com). Domèn Cavas ak Instructure yo genyen
+                     otomatikman ni yo pa konte nan limit 50 domèn ou an.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       Paj Prensipal Kou a se premye paj elèv yo wè a lè yo ouvri
             kou a. Paj Prensipal la ka afiche volè aktivite patisipasyon nan kou yo
@@ -20432,6 +20455,9 @@ ht:
       Domèn annapre yo te ajoute otomatikman nan
                        lis blan ou a apati de zouti ki egziste deja sou kont ou a.
                        Pou elimine domèn sa yo, ou dwe elimine zouti ki asosye yo.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      Yo otorize domèn annapre yo otomatikman apati de zouti ki egziste deja sou kont ou a.
+                       Pou elimine domèn sa yo, elimine zouti asosye a.
   the_following_errors_occurred_bdec1e44: "Erè sa yo te rive:"
   the_following_fields_are_invalid_fields_b3565800: "Chan annapre yo envalid: %{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
@@ -20546,6 +20572,7 @@ ht:
   there_are_no_unsaved_changes_9276e87c: "Pa gen chanjman ki pa anrekjistre"
   there_are_no_unsynced_changes_4e8f0838: "Pa gen chanjman ki pa senkwonize"
   there_are_no_unsynched_changes_d208547c: "Pa gen okenn chanjman ki pa senkwonize"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Gen yon limit de 2 app pou plasman nan ba zouti RCE a. Paramèt sa a aplike sèlman a RCE amelyore yo."
   there_is_currently_1_available_grader_758e4a21: "Pou kounye a gen 1 nivelez disponib"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Te gen yon fayit nan dekoneksyon IdP ou a"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Tee gen yon pwoblèm nan kreyasyon kolonn nòt pwofesè yo."
@@ -21439,6 +21466,59 @@ ht:
   tree_browser: 
     folder_tree_instructions: "Fichye yo, Itilize touch flèch anwo e anba pou navige nan meni an. Peze adwat pou ouvè dosye yo, agòch pou redwi yo, epi enter pou chwazi eleman ki seleksyone a."
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad e Tobago (+1)"
+  trophy: 
+    balloon_description: "Deskripsyon Boul"
+    balloon_display_name: Boul
+    bifrost_trophy_description: "Deskripsyon Koup Bifrost"
+    bifrost_trophy_display_name: "Koup Bifrost"
+    butterfly_description: "Deskripsyon Papiyon"
+    butterfly_display_name: Papiyon
+    einstein_rosen_trophy_description: "Deskripsyon Koup Einstein Rosen"
+    einstein_rosen_trophy_display_name: "Koup Einstein Rosen"
+    fire_description: "Deskripsyon Dife"
+    fire_display_name: Dife
+    flowers_description: "Deskripsyon Flè"
+    flowers_display_name: Flè
+    four_leaf_clover_description: "Deskripsyon Trèf a kat fèy"
+    four_leaf_clover_display_name: "Trèf a kat fèy"
+    gift_description: "Deskripsyon Kado"
+    gift_display_name: Kado
+    gnome_description: "Deskripsyon Gnome"
+    gnome_display_name: Gnome
+    helix_rocket_description: "Deskripsyon Fize Helix"
+    helix_rocket_display_name: "Fize Helix"
+    horse_shoe_description: "Deskripsyon Fè a cheval"
+    horse_shoe_display_name: "Fè a cheval"
+    hot_air_balloon_description: "Deskripsyon Mongolfyè"
+    hot_air_balloon_display_name: Mongolfyè
+    magic_mystery_thumbs_up_description: "Deskripsyon Pous Anlè Mistè majik"
+    magic_mystery_thumbs_up_display_name: "Pous Anlè Mistè majik"
+    medal_description: "Deskripsyon Meday"
+    medal_display_name: Meday
+    moon_description: "Deskripsyon Lalin"
+    moon_display_name: Lalin
+    ninja_description: "Deskripsyon Ninja"
+    ninja_display_name: Ninja
+    panama_rocket_description: "Deskripsyon Fize Panama"
+    panama_rocket_display_name: "Fize Panama"
+    panda_description: "Deskripsyon Panda"
+    panda_display_name: Panda
+    panda_unicycle_description: "Deskripsyon Monosik Panda"
+    panda_unicycle_display_name: "Monosik Panda"
+    pinwheel_description: "Deskripsyon Wou a Zegwi"
+    pinwheel_display_name: "Wou a zegwi"
+    pizza_slice_description: "Deskripsyon Tranch Pizza"
+    pizza_slice_display_name: "Tranch Pizza"
+    rocket_description: "Deskripsyon Fize"
+    rocket_display_name: Fize
+    star_description: "Deskripsyon Etwal"
+    star_display_name: Etwal
+    thumbs_up_description: "Deskripsyon Pous anlè"
+    thumbs_up_display_name: "Pous Anlè"
+    trophy_description: "Deskripsyon Koup"
+    trophy_display_name: Koup
+  trophy_case_7a098a85: "Valiz Koup"
+  trophy_case_da3b25bb: "Valiz Koup"
   truncated_56b1a661: Diminye
   turkish_5b69578b: Tik
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Aktive RTL Menm pou Lang ki pa RTL"
@@ -21662,6 +21742,9 @@ ht:
   updated_permissions_page_f2e91060: "Aktyalize Paj Pèmisyon"
   updated_terms_of_service_82f34148: "Tèm Sèvis Aktyalize"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Aktyalize UI pou rechèch ak afichaj itilizatè e kou sou yon kont."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Mizajou preferans entèfas itilizatè yon kont pou l ka pi modèn
+      epi aktyalize eksperyans itilizatè a.
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Mete Ikòn Politik Afichaj yo ajou nan antèt kolonn Nouvo Bilten an."
   updating_6edbab78: Aktyalizasyon
   updating_discussion_failed_aadb2d35: "Echèk aktyalizasyon diskisyon"

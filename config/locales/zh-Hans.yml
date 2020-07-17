@@ -406,6 +406,7 @@ zh-Hans:
   account_id_73966078: account_id
   account_id_f6e26867: "帐户 ID"
   account_level_notification_preferences_require_an__66467cd7: 课程级别通知首选项需要更新account_id
+  account_level_notification_preferences_ui_update_f5e189a4: "帐户级别通知首选项 UI 更新"
   account_level_settings_manage_4fca6f8e: "帐户级设置 - 管理"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: 账户名称
@@ -1839,6 +1840,7 @@ zh-Hans:
   add_tas_to_the_course_2aac6e02: 向课程添加助教
   add_theme_32fa3d50: 添加主题
   add_to_course_481a51c4: 添加至课程……
+  add_to_rce_toolbar_e5b3e3b4: "添加到 RCE 工具栏"
   add_to_student_to_do_58e66b4b: 添加到学生待办事项
   add_to_whitelist_24f3f1ba: 添加至白名单
   add_toolname_4e17dc90: "添加%{toolName}"
@@ -5499,6 +5501,7 @@ zh-Hans:
       importing_button: "导入中... 这可能需要一些时间"
     titles: 
       home_page: 主页
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: 内容仍在上传中，如果您继续，该内容将不会正确嵌入。
   content_link_error_assignment_name_course_name_b8be789a: "内容链接错误 - %{assignment_name}，%{course_name}"
   content_locks: 
     buttons: 
@@ -8508,6 +8511,7 @@ zh-Hans:
             筛选和整理 SpeedGrader 条目。对未交或
             迟交的作业自动评分，并且轻松隐藏评分，直到您准备让学生
             查看。要简化评分，可使用SpeedGrader查看提交文件并评分。
+  display_historical_view_of_achievements_of_users_53db5938: 显示用户成就的历史视图
   display_name_6c2cfc58: 显示名称：
   display_name_b80c243e: 显示名称
   display_to_students_e1301f99: 向学生显示
@@ -8703,6 +8707,7 @@ zh-Hans:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "每一条表示该天的 *页面查看* 数。橙色条表示该天某用户在课程内 **进行了一项操作**。"
   each_bar_represents_the_number_of_page_views_relat_29d1e341: 每一条表示与该类别相关的页面查看数。
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "每一行为一项作业。菱形为到期日期，并且该条延长至提交日期。绿色表示 *按时提交*，黄色表示 **迟交**，而红色表示 ***未交作业***。灰色菱形是没有到期日期的作业，放在提交时间点上。"
+  earned_earndate_5f8b6c99: "已赢取 %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       将其他 Canvas 课程的内容轻松导入或复制到
               您的课程，或导入其他形式的内容，例如 Moodle 或 QTI。
@@ -9669,6 +9674,7 @@ zh-Hans:
   fall_grading_period_id_74ef68e: "秋季成绩周期 id"
   favicon_6e658914: 网站图标
   favorite_courses_fbd356f0: 最喜欢的课程
+  favorite_d720d310: 收藏
   favorites_c7e0207c: 收藏夹
   feature_f5526584: 功能
   feature_flags: 
@@ -12287,6 +12293,7 @@ zh-Hans:
   item_type_download_e949cdb6: 项目类型：下载
   item_type_link_5a2abed2: 项目类型：链接
   item_type_locked_85c560ec: 题型：已锁定
+  item_type_mastery_connect_8f36c669: 题型：掌握程度连接
   item_type_new_quiz_1a1cd9a9: 题型：新测验
   item_type_quiz_c894ddb1: 题型：测验
   items_299a7626: "项目: "
@@ -12545,6 +12552,7 @@ zh-Hans:
   let_students_see_the_correct_answers_dacc2faf: 让学生们查看正确答案
   let_students_see_their_quiz_responses_fbc07d14: 让学生们查看他们的测验回应
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: 让学生看到他们在测验中的回答（学生反馈中将标记错误的问题）
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "让站点管理员选择最多 2 个 LTI 应用程序收藏，这随后会显示在 RCE 的工具栏中"
   letter_grade_29ff1938: 字母评分
   letter_grade_f00fedc4: 字母评分
   level_5fdf654a: 级别
@@ -12707,6 +12715,7 @@ zh-Hans:
   list_collapsed_9ac35920: 列表已折叠。
   list_collapsed_dde87718: 列表已折叠
   list_expanded_efec2d0: 列表已展开。
+  list_of_the_currently_attainable_trophies_959b2518: 当前可获得的奖品列表
   list_view_430aecce: 列表视图
   lithuanian_5adcbe24: 立陶宛语
   little_lost_try_here_first_9e24e575: 信息丢失？先尝试这里！
@@ -13059,7 +13068,9 @@ zh-Hans:
   mastery_path_processing_f4471152: 掌握途径处理
   mastery_paths_breakdown_6e0b5fce: 掌握途径故障
   mastery_paths_cc4096c2: 掌握路径
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: 已临时禁用掌握程度路径编辑，以进行维护。
   mastery_paths_editor_930655bb: 主路径编辑器
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: 已临时禁用掌握程度路径选择，以进行维护。
   mastery_points_f1672cc: 掌握程度分数
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: 掌握得分体现了评分作业或测验的最高得分。
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: 掌握分数反映最近评分的作业或测验。
@@ -15458,6 +15469,7 @@ zh-Hans:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} 分"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} 可能得分"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} 得分"
+  na_3dbb9cfd: 不适用
   name: 学术基准导入器
   name_1aed4a1b: 名称
   name_3806192d: 姓名：
@@ -17017,6 +17029,7 @@ zh-Hans:
       description: "使用 Inst-FS 服务托管上传的文件。"
       labels: 
         migration_rate: "在访问时将旧文件迁移至 Inst-FS 的概率（0-100）"
+        service_worker: "使用服务工作者验证 Safari 13+ 中的文件访问权限"
     kaltura: 
       description: "Kaltura 视频/音频录制和播放"
       name: Kaltura
@@ -17349,6 +17362,7 @@ zh-Hans:
       requirements_must_be_completed: 需要完成以下要求，然后才能解锁此页面
   presentation_2d9387ca: 展示
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: 显示测验设置，以避免在可用时间结束时自动提交计时测验。
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "按 ALT + F8 可查看快捷键列表"
   press_space_to_start_over_d4b8a2da: 按“space”重新开始
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "按逗号键或转换键 + 问号就可看到的键盘快捷键列表"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "按逗号键或转换键 + ？就可看到的键盘快捷键列表"
@@ -18001,6 +18015,7 @@ zh-Hans:
       update_question_without_regrading: 更新问题而不重新评分
   quiz_40ee61b1: 测验
   quiz_assignment_overrides_cec1973b: 测验作业覆盖
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: 在尝试期间过期的测验可用性日期将仍然自动提交，即使延时期限未到期也是一样。
   quiz_duplication_not_implemented_c1495585: 未实现测验复制
   quiz_e0dcce8f: 测验
   quiz_extensions_d2550649: 测验延时
@@ -22186,6 +22201,7 @@ zh-Hans:
       networking_academy_description: "查看 Cisco 对最常见问题的答案。"
       networking_academy_faqs: "Networking Academy 常见问题解答"
       support_desk_livechat: 支持桌面实时聊天
+  support_favorite_lti_tools_in_the_rce_1680436d: "RCE 中支持 LTI 工具收藏"
   svg_d5969386: SVG
   swahili_5caeb4ba: 斯瓦希里语
   sweden_1add8e79: 瑞典
@@ -22271,6 +22287,7 @@ zh-Hans:
     syllabus: 大纲
     tab_location_error: 该选项卡位置无效
     tab_unmanagable_error: "%{css_class} 不可管理"
+    trophy_case: 奖品展示区
   tabs_5605547e: 标签
   tagalog_74906db7: 塔加拉族语
   taiwan_886_9a5b6bbf: "台湾 (+886)"
@@ -22412,6 +22429,12 @@ zh-Hans:
                      最多 %{max_domains} 个域。建议使用通配符
                      （例如，*.instructure.com）。Canvas 和 Instructure 
                      域自动包括在内，不受您的 50 个域的数量限制。
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      内容安全性策略允许您限制
+                     JavaScript在 Canvas 实例中运行的自定义设置。您可以手动添加
+                     最多 %{max_domains} 个允许的域。建议使用通配符
+                     （例如，*.instructure.com）。Canvas 和 Instructure 域
+                     自动包括在内，不计入 50 个域限制数量中。
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       课程主页是学生在打开您的课程时
             最先看到的页面。主页可以显示课程参与活动
@@ -22441,6 +22464,9 @@ zh-Hans:
       下列域已经从您的账户内已有的
                       工具自动添加至您的白名单内。
                       要移除这些域名，请移除关联的工具。
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      如下来自您的帐户中的现有工具的域已自动列为允许的域。
+                       要删除这些域，请删除关联的工具。
   the_following_errors_occurred_bdec1e44: 发生以下错误：
   the_following_fields_are_invalid_fields_b3565800: "以下栏目是无效的：%{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
@@ -22566,6 +22592,7 @@ zh-Hans:
   there_are_no_unsaved_changes_9276e87c: 没有未保存的变更
   there_are_no_unsynced_changes_4e8f0838: 没有未同步的更改
   there_are_no_unsynched_changes_d208547c: 没有未同步的更改
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "在 RCE 工具栏中有最多 2 个应用程序位置。该设置仅适用于增强的 RCE。"
   there_is_currently_1_available_grader_758e4a21: "目前有 2 位空闲评分人"
   there_was_a_failure_logging_out_at_your_idp_30070527: 在您的IdP退出有故障
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: 创建老师备注列时出现问题。
@@ -23476,6 +23503,59 @@ zh-Hans:
   tree_browser: 
     folder_tree_instructions: 使用上下箭头键在树中导航。按右箭头键展开文件夹，按左箭头键折叠文件夹，进入可选择选定项。
   trinidad_and_tobago_1_fc2d8d1c: "特立尼达和多巴哥 (+1)"
+  trophy: 
+    balloon_description: 气球说明
+    balloon_display_name: 气球
+    bifrost_trophy_description: 彩虹桥奖品说明
+    bifrost_trophy_display_name: 彩虹桥奖品
+    butterfly_description: 蝴蝶说明
+    butterfly_display_name: 蝴蝶
+    einstein_rosen_trophy_description: 虫洞奖品说明
+    einstein_rosen_trophy_display_name: 虫洞奖品
+    fire_description: 火焰说明
+    fire_display_name: 火焰
+    flowers_description: 花朵说明
+    flowers_display_name: 花朵
+    four_leaf_clover_description: 四叶草说明
+    four_leaf_clover_display_name: 四叶草
+    gift_description: 礼物说明
+    gift_display_name: 礼物
+    gnome_description: 小矮人说明
+    gnome_display_name: 小矮人
+    helix_rocket_description: 螺旋火箭说明
+    helix_rocket_display_name: 螺旋火箭
+    horse_shoe_description: 马蹄铁说明
+    horse_shoe_display_name: 马蹄铁
+    hot_air_balloon_description: 热气球说明
+    hot_air_balloon_display_name: 热气球
+    magic_mystery_thumbs_up_description: 竖起大拇指的魔术师说明
+    magic_mystery_thumbs_up_display_name: 竖起大拇指的魔术师
+    medal_description: 奖章说明
+    medal_display_name: 奖章
+    moon_description: 月亮说明
+    moon_display_name: 月亮
+    ninja_description: 忍者说明
+    ninja_display_name: 忍者
+    panama_rocket_description: 巴拿马火箭说明
+    panama_rocket_display_name: 巴拿马火箭
+    panda_description: 熊猫说明
+    panda_display_name: 熊猫
+    panda_unicycle_description: 熊猫独轮车说明
+    panda_unicycle_display_name: 熊猫独轮车
+    pinwheel_description: 纸风车说明
+    pinwheel_display_name: 纸风车
+    pizza_slice_description: 一片披萨说明
+    pizza_slice_display_name: 一片披萨
+    rocket_description: 火箭说明
+    rocket_display_name: 火箭
+    star_description: 星星说明
+    star_display_name: 星星
+    thumbs_up_description: 竖起大拇指说明
+    thumbs_up_display_name: 竖起大拇指
+    trophy_description: 奖品说明
+    trophy_display_name: 奖品
+  trophy_case_7a098a85: 奖品展示区
+  trophy_case_da3b25bb: 奖杯展示区
   truncated_56b1a661: 已省略
   turkish_5b69578b: 土耳其语
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "对非 RTL 语言启用 RTL"
@@ -23701,6 +23781,7 @@ zh-Hans:
   updated_permissions_page_f2e91060: 更新的权限页面
   updated_terms_of_service_82f34148: 更新的服务条款
   updated_ui_for_searching_and_displaying_users_and__6755e08e: 更新的用户界面用于搜索和显示一个帐户内的用户和课程。
+  updates_account_notification_preferences_ui_to_be__2f1e4718: "将帐户通知首选项 UI 更新到最新"
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: 在新评分册作业列标题中更新显示帖子政策图标。
   updating_6edbab78: 正在更新
   updating_discussion_failed_aadb2d35: 更新讨论失败

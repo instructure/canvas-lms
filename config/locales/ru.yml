@@ -419,6 +419,7 @@ ru:
   account_id_73966078: account_id
   account_id_f6e26867: "Идентификатор учетной записи"
   account_level_notification_preferences_require_an__66467cd7: "Предпочтения уведомлений на уровне учетной записи требуют обновления account_id"
+  account_level_notification_preferences_ui_update_f5e189a4: "Обновление пользовательского интерфейса предпочтений уведомлений на уровне учетной записи"
   account_level_settings_manage_4fca6f8e: "Настройки уровня учетной записи - управление"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "имя аккаунта"
@@ -1866,6 +1867,7 @@ ru:
   add_tas_to_the_course_2aac6e02: "Добавить ассистентов к курсу"
   add_theme_32fa3d50: "Добавить тему"
   add_to_course_481a51c4: "Добавить к курсу..."
+  add_to_rce_toolbar_e5b3e3b4: "Добавить на панель инструментов RCE"
   add_to_student_to_do_58e66b4b: "Добавить к задаче студента"
   add_to_whitelist_24f3f1ba: "Добавить в Белый список"
   add_toolname_4e17dc90: "Добавить %{toolName}"
@@ -5573,6 +5575,7 @@ ru:
       importing_button: "Импортирование... Это может занять некоторое время"
     titles: 
       home_page: "Домашняя страница"
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Выгрузка контента еще не завершена, в случае продолжения вами данного действия он не будет внедрен правильно."
   content_link_error_assignment_name_course_name_b8be789a: "Ошибка в ссылке на содержание - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -8720,6 +8723,7 @@ ru:
             в соответствии с вашими предпочтениями. Автоматическое применение оценки для невыполненных работ или работ
             , не представленных в срок, а также возможность скрыть оценки до тех пор, пока вы не будете готовы сообщить их учащимся
             . Чтобы упростить процесс выставления оценок, воспользуйтесь SpeedGrader для просмотра и оценки представленных работ.
+  display_historical_view_of_achievements_of_users_53db5938: "Представление обзора достижений пользователей"
   display_name_6c2cfc58: "Отобразить имя:"
   display_name_b80c243e: "Отображать имя"
   display_to_students_e1301f99: "Показать студентам"
@@ -8915,6 +8919,7 @@ ru:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Каждая полоска представляет собой количество *просмотров страницы* за этот день. Оранжевая линия указывает на то, что какой-либо пользователь **выполнял какие-то действия** на курсе за этот день."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Каждая полоска представляет собой количество просмотров страницы, связанных с данной категорией."
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Каждая строка представляет собой одно задание. Ромбик обозначает дату выполнения, а полоска простирается до даты отправки. Зеленым цветом отмечаются *отправки, сделанные вовремя*, желтым цветом   **отправки с опозданием**, а красным цветом – ***отсутствующие задания***. Серыми ромбиками помечаются задания, для которых не указаны даты выполнения. Ромбики устанавливаются на момент отправки."
+  earned_earndate_5f8b6c99: "Получено %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Просто импортируйте или копируйте контент из другого учебного курса Canvas 
               в ваш курс, или импортируйте контент из других форматов, таких, как Moodle или QTI.
@@ -9897,6 +9902,7 @@ ru:
   fall_grading_period_id_74ef68e: "ID осеннего периода оценивания"
   favicon_6e658914: "Иконка веб-сайта"
   favorite_courses_fbd356f0: "Избранные курсы"
+  favorite_d720d310: Избранное
   favorites_c7e0207c: Избранное
   feature_f5526584: Функция
   feature_flags: 
@@ -12581,6 +12587,7 @@ ru:
   item_type_download_e949cdb6: "Тип элемента: Загрузка"
   item_type_link_5a2abed2: "Тип элемента: Ссылка"
   item_type_locked_85c560ec: "Тип элемента: Заблокировано"
+  item_type_mastery_connect_8f36c669: "Тип элемента: Mastery Connect"
   item_type_new_quiz_1a1cd9a9: "Тип элемента: Новое тестирование"
   item_type_quiz_c894ddb1: "Тип элемента: Тест"
   items_299a7626: "Элементы: "
@@ -12843,6 +12850,7 @@ ru:
   let_students_see_the_correct_answers_dacc2faf: "Разрешить студентам просматривать правильные ответы"
   let_students_see_their_quiz_responses_fbc07d14: "Разрешить студентам просматривать результаты контрольной работы"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Разрешить учащимся видеть выполненные ими контрольные работы (неправильные ответы будут отмечены)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Позвольте администратору сайта выбрать до двух приложений LTI в качестве избранных, которые затем будут отображаться на панели инструментов RCE"
   letter_grade_29ff1938: "Буквенная оценка"
   letter_grade_f00fedc4: "оценка по буквенной системе"
   level_5fdf654a: Уровень
@@ -13009,6 +13017,7 @@ ru:
   list_collapsed_9ac35920: "Список свернут."
   list_collapsed_dde87718: "Список свернут"
   list_expanded_efec2d0: "Список развернут."
+  list_of_the_currently_attainable_trophies_959b2518: "Список текущих достижимых наград"
   list_view_430aecce: "Представление в виде списка"
   lithuanian_5adcbe24: Литовский
   little_lost_try_here_first_9e24e575: "Потерялись? Попробуйте сначала здесь!"
@@ -13363,7 +13372,9 @@ ru:
   mastery_path_processing_f4471152: "Обработка пути усвоения"
   mastery_paths_breakdown_6e0b5fce: "Разбивка Пути усвоения"
   mastery_paths_cc4096c2: "Пути усвоения"
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "Редактирование Mastery Paths было временно отключено для обслуживания."
   mastery_paths_editor_930655bb: "Редактор путей усвоения"
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Приложение Mastery Paths было временно отключено для обслуживания."
   mastery_points_f1672cc: "баллы за усвоение навыков"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Проходной балл отражает высокий балл за оцениваемое задание или тест."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Оценка усвоения отражает самое последнее проверенное задание или контрольную работу."
@@ -15795,6 +15806,7 @@ ru:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Баллы"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Возможное количество баллов"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} баллы"
+  na_3dbb9cfd: Н/Д
   name: "Импортер Academic Benchmark"
   name_1aed4a1b: Имя
   name_3806192d: "Имя:"
@@ -17369,6 +17381,7 @@ ru:
       description: "Размещает загруженные файлы с помощью службы Inst-FS."
       labels: 
         migration_rate: "Шанс переноса старых файлов в Inst-FS при доступе (от 0 до 100)"
+        service_worker: "Используйте услуги сервисного специалиста для определения доступов к файлам в Safari 13+"
     kaltura: 
       description: "Запись и воспроизведение видео/звука Kaltura"
       name: Kaltura
@@ -17702,6 +17715,7 @@ ru:
       requirements_must_be_completed: "Для разблокирования этой страницы должны быть выполнены следующие требования"
   presentation_2d9387ca: Презентация
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Представляет настройку теста для исключения автоматической отправки теста с привязкой ко времени при истечении доступного периода времени."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Нажмите ALT + F8 для просмотра списка клавиш быстрого доступа"
   press_space_to_start_over_d4b8a2da: "Нажмите «пробел», чтобы начать сначала"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Нажмите клавишу запятой или Shift + знак вопроса, чтобы увидеть список горячих клавиш"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Нажмите клавишу запятой или Shift + ?, чтобы увидеть список горячих клавиш"
@@ -18366,6 +18380,7 @@ ru:
       update_question_without_regrading: "Обновить вопросы без повторной оценки"
   quiz_40ee61b1: тест
   quiz_assignment_overrides_cec1973b: "Отмена задания контрольной работы"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Даты доступных тестов, которые проводятся во время попытки, будут все равно отправляться автоматически, даже если продленное время не истекло."
   quiz_duplication_not_implemented_c1495585: "дублирование тестов не реализовано"
   quiz_e0dcce8f: Тестирование
   quiz_extensions_d2550649: "Расширения файлов с контрольными работами"
@@ -22697,6 +22712,7 @@ ru:
       networking_academy_description: "Просмотреть ответы Cisco на часто задаваемые вопросы."
       networking_academy_faqs: "Часто задаваемые вопросы Сетевой академии"
       support_desk_livechat: "Чат в реальном времени со службой технической поддержки"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Поддержка избранных инструментов LTI в RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Суахили
   sweden_1add8e79: Швеция
@@ -22782,6 +22798,7 @@ ru:
     syllabus: "Программа обучения"
     tab_location_error: "Неверное расположение вкладки"
     tab_unmanagable_error: "%{css_class} не подлежит управлению"
+    trophy_case: "Вид награды"
   tabs_5605547e: Вкладки
   tagalog_74906db7: Тагальский
   taiwan_886_9a5b6bbf: "Тайвань (+886)"
@@ -22927,6 +22944,12 @@ ru:
                      до %{max_domains} доменов в свой белый список. Рекомендуется использовать подстановочные символы
                      (напр., *.instructure.com). Домены Canvas и Instructure включены
                      автоматически и не учитываются в вашем лимите в 50 доменов.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      Политика защиты информации позволяет вам ограничивать пользовательский
+                     JavaScript, выполняемый в вашей копии Canvas. Вы можете вручную добавлять
+                     до %{max_domains} разрешенных домена(-ов). Рекомендуется использовать подстановочные символы
+                     (напр., *.instructure.com). Домены Canvas и Instructure включены
+                     автоматически и не учитываются в вашем лимите в 50 доменов.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       Исходная домашняя страница учебного курса - это первая страница, которую видят учащиеся, когда они открывают
             ваш учебный курс. На домашней странице может отображаться поток работ, выполняемых в ходе учебного курса
@@ -22955,6 +22978,9 @@ ru:
   the_following_domains_have_automatically_been_adde_2c7a1654: |-
       Следующие домены были автоматически добавлены в ваш белый список
                        из инструментов, уже имеющихся в вашей учетной записи.
+                       Для удаления этих доменов удалите соответствующие инструменты.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      Следующие домены были автоматически разрешены из инструментов, уже существующих в вашей учетной записи.
                        Для удаления этих доменов удалите соответствующие инструменты.
   the_following_errors_occurred_bdec1e44: "Произошли следующие ошибки:"
   the_following_fields_are_invalid_fields_b3565800: "Следующие поля являются недействительными: %{fields}"
@@ -23087,6 +23113,7 @@ ru:
   there_are_no_unsaved_changes_9276e87c: "Нет несохраненных изменений"
   there_are_no_unsynced_changes_4e8f0838: "Несинхронизированные изменения отсутствуют"
   there_are_no_unsynched_changes_d208547c: "Несинхрониз. изменения отсутствуют"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "На панель инструментов RCE можно добавить не более 2 приложений. Эта настройка применяется только к расширенному RCE."
   there_is_currently_1_available_grader_758e4a21: "В настоящее время доступен 1 оценщик"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Произошел сбой выхода из системы на вашем IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "При создании колонки учительских заметок возникла проблема."
@@ -24001,6 +24028,59 @@ ru:
   tree_browser: 
     folder_tree_instructions: "Для перемещения по дереву используйте клавиши со стрелками. Нажмите правую кнопку для развертывания папок, левую для сворачивания и ввод для выбора выбранного элемента."
   trinidad_and_tobago_1_fc2d8d1c: "Тринидад и Тобаго (+1)"
+  trophy: 
+    balloon_description: "Воздушный шарик, описание"
+    balloon_display_name: "Воздушный шарик"
+    bifrost_trophy_description: "Награда Битфрост, описание"
+    bifrost_trophy_display_name: "Награда Бифрост"
+    butterfly_description: "Бабочка, описание"
+    butterfly_display_name: Бабочка
+    einstein_rosen_trophy_description: "Награда Einstein Rosen, описание"
+    einstein_rosen_trophy_display_name: "Награда Einstein Rosen"
+    fire_description: "Огонь, описание"
+    fire_display_name: Огонь
+    flowers_description: "Цветок, описание"
+    flowers_display_name: Цветок
+    four_leaf_clover_description: "Четырёхлистный клевер, описание"
+    four_leaf_clover_display_name: "Четырёхлистный клевер"
+    gift_description: "Подарок, описание"
+    gift_display_name: Подарок
+    gnome_description: "Гном, описание"
+    gnome_display_name: Гном
+    helix_rocket_description: "Спиральная ракета, описание"
+    helix_rocket_display_name: "Спиральная ракета"
+    horse_shoe_description: "Подкова, описание"
+    horse_shoe_display_name: Подкова
+    hot_air_balloon_description: "Воздушный шар, описание"
+    hot_air_balloon_display_name: "Воздушный шар"
+    magic_mystery_thumbs_up_description: "Волшебное мистическое одобрение, описание"
+    magic_mystery_thumbs_up_display_name: "Волшебное мистическое одобрение"
+    medal_description: "Медаль, описание"
+    medal_display_name: Медаль
+    moon_description: "Луна, описание"
+    moon_display_name: Луна
+    ninja_description: "Ниндзя, описание"
+    ninja_display_name: Ниндзя
+    panama_rocket_description: "Ракета в панаме, описание"
+    panama_rocket_display_name: "Ракета в панаме"
+    panda_description: "Панда, описание"
+    panda_display_name: Панда
+    panda_unicycle_description: "Панда на велосипеде, описание"
+    panda_unicycle_display_name: "Панда на велосипеде"
+    pinwheel_description: "Вертушка на палочке, описание"
+    pinwheel_display_name: "Вертушка на палочке"
+    pizza_slice_description: "Кусок пиццы, описание"
+    pizza_slice_display_name: "Кусок пиццы"
+    rocket_description: "Ракета, описание"
+    rocket_display_name: Ракета
+    star_description: "Звезда, описание"
+    star_display_name: Звезда
+    thumbs_up_description: "Одобрение, описание"
+    thumbs_up_display_name: Браво
+    trophy_description: "Награда, описание"
+    trophy_display_name: Приз
+  trophy_case_7a098a85: "Вид награды"
+  trophy_case_da3b25bb: "Вид награды"
   truncated_56b1a661: Усеченное
   turkish_5b69578b: Турецкий
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Включение языков реального времени RTL для языков, не относящихся к языкам RTL"
@@ -24227,6 +24307,9 @@ ru:
   updated_permissions_page_f2e91060: "Обновленная страница разрешений"
   updated_terms_of_service_82f34148: "Обновлены Условия предоставления услуг"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Обновленный интерфейс для поиска и отображения пользователей и курсов в аккаунте."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Обновляет пользовательский интерфейс предпочтений уведомлений учетной записи до более актуального уровня
+      и повышенный комфорт пользователя
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Обновляет значки Политики публикации в заголовке столбца заданий Нового журнала оценок."
   updating_6edbab78: Обновление
   updating_discussion_failed_aadb2d35: "Не удалось обновить обсуждение"

@@ -406,6 +406,7 @@ ja:
   account_id_73966078: account_id
   account_id_f6e26867: "アカウント ID"
   account_level_notification_preferences_require_an__66467cd7: "アカウントレベルの通知設定を更新するには course_id が必要です。"
+  account_level_notification_preferences_ui_update_f5e189a4: アカウントレベルの通知設定UIの更新
   account_level_settings_manage_4fca6f8e: "アカウントレベルの設定 - 管理"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: アカウント名
@@ -1839,6 +1840,7 @@ ja:
   add_tas_to_the_course_2aac6e02: "TA をコースに追加"
   add_theme_32fa3d50: テーマの追加
   add_to_course_481a51c4: コースに追加...
+  add_to_rce_toolbar_e5b3e3b4: RCEツールバーに追加
   add_to_student_to_do_58e66b4b: 受講生のタスクに追加
   add_to_whitelist_24f3f1ba: ホワイトリストに追加
   add_toolname_4e17dc90: "%{toolName}を追加する"
@@ -5506,6 +5508,7 @@ ja:
       importing_button: "インポートしています...  しばらくお待ちください"
     titles: 
       home_page: "ホーム ページ"
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: コンテンツはまだアップロード中です。続行すると適切に埋め込まれません。
   content_link_error_assignment_name_course_name_b8be789a: "コンテンツリンクエラー - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -8517,6 +8520,7 @@ ja:
             好みに合わせてフィルタリングおよびアレンジします。提出されていない、または遅れている提出物に
             自動で成績を付け、受講者に表示する準備が整うまで非表示にすることも
             簡単です。シンプル化された採点には、SpeedGrader を使って提出物を表示し、採点します。
+  display_historical_view_of_achievements_of_users_53db5938: ユーザーの達成の履歴を表示する
   display_name_6c2cfc58: 表示名：
   display_name_b80c243e: 表示名
   display_to_students_e1301f99: 受講生へ表示する
@@ -8712,6 +8716,7 @@ ja:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "各バーは、その日の *ページ ビュー* の数を表しています。オレンジ色のバーは、その日にいずれかのユーザがコース内で **何らかの操作を行った** ことを示しています。"
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "各バーは、そのカテゴリに関連するページ ビューの数を表しています。"
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "各行は 1 つの課題を表します。ひし形は期日を表し、各バーは提出日まで伸びています。緑色は *期日までに提出されたこと* を、黄色は **期日を過ぎて提出された** ことを、赤は ***課題が提出されていない*** ことを示しています。灰色のひし形は、期日が設定されていない課題で、提出日に配置されています。"
+  earned_earndate_5f8b6c99: "%{earnDate}獲得数"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       簡単に別の Canvas コースからのコンテンツをコースにインポートまたはコピー、あるいは Moodle または QTI などの
               他のフォーマットからのコンテンツをインポートします。
@@ -9679,6 +9684,7 @@ ja:
   fall_grading_period_id_74ef68e: "秋期採点期間 id"
   favicon_6e658914: お気に入りアイコン
   favorite_courses_fbd356f0: お気に入りのコース
+  favorite_d720d310: お気に入り
   favorites_c7e0207c: お気に入り
   feature_f5526584: 機能
   feature_flags: 
@@ -12301,6 +12307,7 @@ ja:
   item_type_download_e949cdb6: "項目のタイプ: ダウンロード"
   item_type_link_5a2abed2: "項目のタイプ: リンク"
   item_type_locked_85c560ec: 項目の種類ロックされています
+  item_type_mastery_connect_8f36c669: 項目タイプ：習熟度コネクト
   item_type_new_quiz_1a1cd9a9: 項目タイプ：新しいクイズ
   item_type_quiz_c894ddb1: 項目タイプ：クイズ
   items_299a7626: "項目:"
@@ -12559,6 +12566,7 @@ ja:
   let_students_see_the_correct_answers_dacc2faf: 受講生に正解を表示
   let_students_see_their_quiz_responses_fbc07d14: 受講生にクイズの結果を表示
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: 受講者にクイズ回答を見せる（不正解の質問は、受講者のフィードバック内でマークされる）
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: サイト管理者が最大2つのLTIアプリをお気に入りとして選択できるようにします。これは、RCEのツールバーに表示されます。
   letter_grade_29ff1938: "レター グレード"
   letter_grade_f00fedc4: 文字による成績
   level_5fdf654a: レベル
@@ -12721,6 +12729,7 @@ ja:
   list_collapsed_9ac35920: リストが破損しています。
   list_collapsed_dde87718: リストが破損しています
   list_expanded_efec2d0: リストが拡張されました。
+  list_of_the_currently_attainable_trophies_959b2518: 現在達成可能なトロフィーのリスト
   list_view_430aecce: リストビュー
   lithuanian_5adcbe24: リトアニア語
   little_lost_try_here_first_9e24e575: 迷っておられませんか？こちらを最初にお試しください
@@ -13073,7 +13082,9 @@ ja:
   mastery_path_processing_f4471152: 習得パス処理中
   mastery_paths_breakdown_6e0b5fce: 熟達の過程の内訳
   mastery_paths_cc4096c2: 熟達の過程
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: 習熟パスの編集は、メンテナンスのため一時的に無効になっています。
   mastery_paths_editor_930655bb: マスタリーパスエディタ
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: 習熟パスの選択は、メンテナンスのため一時的に無効になっています。
   mastery_points_f1672cc: 習得ポイント
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: 熟達スコアは、採点された課題またはクイズの最高スコアを反映しています。
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: 熟達スコアは、直近に採点された課題またはクイズのスコアを反映しています。
@@ -15472,6 +15483,7 @@ ja:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} ポイント"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} 可能なポイント"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} ポイント"
+  na_3dbb9cfd: NA
   name: "Academic Benchmark インポーター"
   name_1aed4a1b: 名前
   name_3806192d: "名前:"
@@ -17031,6 +17043,7 @@ ja:
       description: Inst-FSサービスでアップロードされたファイルをホストします。
       labels: 
         migration_rate: アクセス時に古いファイルをInst-FSに移行する可能性（0〜100）
+        service_worker: "Safari 13以降でService Workerを使用してファイルアクセスを認証する"
     kaltura: 
       description: "Kaltura ビデオ/オーディオの記録と再生"
       name: Kaltura
@@ -17358,6 +17371,7 @@ ja:
       requirements_must_be_completed: このページをロック解除するためには、次の要件が揃っていることが必要です。
   presentation_2d9387ca: プレゼンテーション
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: 制限時間が終了したときに時間指定のクイズの自動提出を回避するようにクイズ設定を表示します。
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Alt + F8キーを押すと、キーボードショートカットのリストが表示されます"
   press_space_to_start_over_d4b8a2da: 「スペース」を押して、もう一度やり直してください
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "コンマキー、またはシフト + クエスチョンマークを押して、キーボードのショートカットのリストを表示する。"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "コンマキー、またはシフト + ？を押して、キーボードのショートカットのリストを表示する。　"
@@ -18009,6 +18023,7 @@ ja:
       update_question_without_regrading: 再評価せずに問題を更新する
   quiz_40ee61b1: クイズ
   quiz_assignment_overrides_cec1973b: クイズ割当の上書き
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: 試行中に過ぎたクイズの利用可能日は、延長時間が経過していなくても自動送信されます。
   quiz_duplication_not_implemented_c1495585: クイズのコピーが実装されていません
   quiz_e0dcce8f: クイズ
   quiz_extensions_d2550649: クイズの拡張
@@ -22199,6 +22214,7 @@ ja:
       networking_academy_description: "最も一般的な質問に対する Cisco の回答を表示します。"
       networking_academy_faqs: "ネットワーキング アカデミーの FAQ"
       support_desk_livechat: "サポート デスクのライブ チャット"
+  support_favorite_lti_tools_in_the_rce_1680436d: RCEでお気に入りのLTIツールをサポートする
   svg_d5969386: SVG
   swahili_5caeb4ba: スワヒリ語
   sweden_1add8e79: スウェーデン
@@ -22284,6 +22300,7 @@ ja:
     syllabus: 要綱
     tab_location_error: そのタブ位置は無効です
     tab_unmanagable_error: "%{css_class} は管理できません"
+    trophy_case: トロフィーケース
   tabs_5605547e: タブ
   tagalog_74906db7: タガログ語
   taiwan_886_9a5b6bbf: 台湾（+886）
@@ -22425,6 +22442,12 @@ ja:
                      のホワイトリストの%{max_domains}ドメインに手動で追加できます。ワイルドカードをお勧めします
                      (例．*.instructure.com).Canvas ドメインと講師ドメインは
                      自動的に含まれ、50ドメイン制限にはカウントされません。
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      コンテンツセキュルティポリシーにより、
+                     JavaScriptCanvas のインスタンスで実行されるカスタムを制限することができます。
+                     を最大%{max_domains}の許可されたドメインに手動で追加できます。ワイルドカードをお勧めします
+                     (例．*.instructure.com).Canvas ドメインと講師ドメインは
+                     自動的に含まれ、50ドメイン制限にはカウントされません。
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       コースのホームページは、受講者がコースを開くときに最初に目にする
             ページです。ホームページには、コースの参加アクティビティストリーム、
@@ -22454,6 +22477,9 @@ ja:
       次のドメインは、アカウントに既に存在するツールから自動的に
                       ホワイトリストに追加されました。
                       これらのドメインを削除するには、関連するツールを削除してください。
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      次のドメインは、アカウントに既に存在するツールから自動的に許可されました。
+                       これらのドメインを削除するには、関連するツールを削除してください。
   the_following_errors_occurred_bdec1e44: 以下のエラーが起こりました：
   the_following_fields_are_invalid_fields_b3565800: "次のフィールドは無効です: %{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
@@ -22581,6 +22607,7 @@ ja:
   there_are_no_unsaved_changes_9276e87c: 未保存の変更はありません。
   there_are_no_unsynced_changes_4e8f0838: 同期されていない変更はありません
   there_are_no_unsynched_changes_d208547c: 同期されていない変更はありません
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: RCEツールバー内の配置には、2つのアプリ制限があります。この設定は、拡張RCEにのみ適用されます。
   there_is_currently_1_available_grader_758e4a21: 現在1名の利用可能な採点者がいます
   there_was_a_failure_logging_out_at_your_idp_30070527: " IdPからのログアウトに失敗しました"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: 講師メモの列の作成中に問題が発生しました。
@@ -23491,6 +23518,59 @@ ja:
   tree_browser: 
     folder_tree_instructions: "上および下矢印キーを使用して、ツリー内を移動できます。フォルダを展開するには右方向キーを、折りたたむには左方向キーを、選択中のアイテムを選択するには Enter キーを押します。"
   trinidad_and_tobago_1_fc2d8d1c: トリニダード・トバゴ（+1）
+  trophy: 
+    balloon_description: 風船の説明
+    balloon_display_name: 風船
+    bifrost_trophy_description: "Bifrost トロフィーの説明"
+    bifrost_trophy_display_name: "Bifrost トロフィー"
+    butterfly_description: 蝶の説明
+    butterfly_display_name: 蝶
+    einstein_rosen_trophy_description: アインシュタイン・ローゼン・トロフィーの説明
+    einstein_rosen_trophy_display_name: アインシュタイン・ローゼン・トロフィー
+    fire_description: 炎の説明
+    fire_display_name: 炎
+    flowers_description: 花の説明
+    flowers_display_name: 花
+    four_leaf_clover_description: 四つ葉のクローバーの説明
+    four_leaf_clover_display_name: 四つ葉のクローバー
+    gift_description: ギフトの説明
+    gift_display_name: ギフト
+    gnome_description: 小鬼の説明
+    gnome_display_name: 小鬼
+    helix_rocket_description: らせんロケットの説明
+    helix_rocket_display_name: らせんロケット
+    horse_shoe_description: 蹄鉄の説明
+    horse_shoe_display_name: 蹄鉄
+    hot_air_balloon_description: 熱気球の説明
+    hot_air_balloon_display_name: 熱気球
+    magic_mystery_thumbs_up_description: マジックミステリーサムズアップの説明
+    magic_mystery_thumbs_up_display_name: マジックミステリーサムズアップ
+    medal_description: メダルの説明
+    medal_display_name: メダル
+    moon_description: 月の説明
+    moon_display_name: 月
+    ninja_description: 忍者の説明
+    ninja_display_name: 忍者
+    panama_rocket_description: パナマロケットの説明
+    panama_rocket_display_name: パナマロケット
+    panda_description: パンダの説明
+    panda_display_name: パンダ
+    panda_unicycle_description: パンダの一輪車の説明
+    panda_unicycle_display_name: パンダの一輪車
+    pinwheel_description: 風車の説明
+    pinwheel_display_name: 風車
+    pizza_slice_description: ピザひと切れの説明
+    pizza_slice_display_name: ピザひと切れ
+    rocket_description: ロケットの説明
+    rocket_display_name: ロケット
+    star_description: スターの説明
+    star_display_name: スター
+    thumbs_up_description: サムズアップの説明
+    thumbs_up_display_name: サムズアップ
+    trophy_description: トロフィーの説明
+    trophy_display_name: トロフィー
+  trophy_case_7a098a85: トロフィーケース
+  trophy_case_da3b25bb: トロフィーケース
   truncated_56b1a661: 概要
   turkish_5b69578b: トルコ語
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "RTL 以外の言語でも RTL を有効にする"
@@ -23718,6 +23798,9 @@ ja:
   updated_permissions_page_f2e91060: 更新された権限ページ
   updated_terms_of_service_82f34148: 更新された利用規約
   updated_ui_for_searching_and_displaying_users_and__6755e08e: アカウント内のユーザーとコースを検索、表示するためにUIを更新する。
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      アカウント通知設定UIを最新
+      かつアップデートされたユーザーエクスペリエンスに更新します
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "[新しい成績表の割り当て]列ヘッダーの投稿ポリシーアイコンの表示を更新します。"
   updating_6edbab78: 更新しています
   updating_discussion_failed_aadb2d35: ディスカッションの更新に失敗しました

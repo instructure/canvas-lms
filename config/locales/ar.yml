@@ -430,6 +430,7 @@ ar:
   account_id_73966078: account_id
   account_id_f6e26867: "معرف الحساب"
   account_level_notification_preferences_require_an__66467cd7: "تتطلب تفضيلات الإعلامات على مستوى الحساب account_id للتحديث"
+  account_level_notification_preferences_ui_update_f5e189a4: "تحديث واجهة المستخدم لتفضيلات الإعلامات على مستوى الحساب"
   account_level_settings_manage_4fca6f8e: "إعدادات على مستوى الحساب - إدارة"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "اسم الحساب"
@@ -1891,6 +1892,7 @@ ar:
   add_tas_to_the_course_2aac6e02: "إضافة مساعد معلم إلى المساق"
   add_theme_32fa3d50: "إضافة نسق"
   add_to_course_481a51c4: "إضافة إلى مساق..."
+  add_to_rce_toolbar_e5b3e3b4: "إضافة إلى شريط أدوات RCE"
   add_to_student_to_do_58e66b4b: "إضافة إلى قائمة مهام الطالب"
   add_to_whitelist_24f3f1ba: "إضافة إلى القائمة البيضاء"
   add_toolname_4e17dc90: "إضافة %{toolName}"
@@ -5629,6 +5631,7 @@ ar:
       importing_button: "يجري الاستيراد...قد يستغرق هذا لحظات"
     titles: 
       home_page: "الصفحة الرئيسية"
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "لا يزال يتم تحميل المحتوى، إذا استمرت مشكلة عدم تضمين المحتوى بشكل سليم."
   content_link_error_assignment_name_course_name_b8be789a: "خطأ ارتباط محتوى - %{assignment_name}، %{course_name}"
   content_locks: 
     buttons: 
@@ -8910,6 +8913,7 @@ ar:
             وفقاً لتفضيلاتك. طبّق درجة تلقائياً للإرسالات المفقودة
             أو المتأخرة، وقم بإخفاء الدرجات بسهولة حتى تكون مستعداً لعرضها
             على الطلاب. لتبسيط التقييم، استخدم SpeedGrader لعرض الإرسالات وتقييمها.
+  display_historical_view_of_achievements_of_users_53db5938: "إظهار طريقة عرض تاريخية لإنجازات المستخدمين"
   display_name_6c2cfc58: "اسم العرض:"
   display_name_b80c243e: "عرض الاسم"
   display_to_students_e1301f99: "العرض للطلاب"
@@ -9105,6 +9109,7 @@ ar:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "يمثل كل شريط عدد *مشاهدات الصفحة* في ذلك اليوم. يشير الشريط البرتقالي إلى أن أحد المستخدمين **اتخذ إجراءً ما** داخل المساق في ذلك اليوم."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "يمثل كل شريط عدد مشاهدات الصفحة المتعلقة بتلك الفئة."
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "يمثل كل صف مهمة واحدة. يشير شكل المعيّن إلى تاريخ الاستحقاق، ويمتد الشريط حتى تاريخ الإرسال. يشير اللون الأخضر إلى *الإرسال في الموعد المحدد*، ويشير اللون الأصفر إلى **الإرسال المتأخر**، ويشير اللون الأحمر إلى ***إرسال مفقود***. تمثل أشكال المعيّن الرمادية المهام التي لا تشتمل على تواريخ استحقاق وهي التي تم وضعها في وقت الإرسال."
+  earned_earndate_5f8b6c99: "%{earnDate} المكتسب"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       قم باستيراد المحتوى أو نسخه من مساق آخر على Canvas إلى
               المساق الخاص بك أو قم باستيراد المحتوى من تنسيقات أخرى، مثل Moodle أو QTI.
@@ -10103,6 +10108,7 @@ ar:
   fall_grading_period_id_74ef68e: "معرف فترة التقييم الخريفية"
   favicon_6e658914: "أيقونة المفضلة"
   favorite_courses_fbd356f0: "المساقات المفضلة"
+  favorite_d720d310: المفضلة
   favorites_c7e0207c: المفضلة
   feature_f5526584: الميزة
   feature_flags: 
@@ -12817,6 +12823,7 @@ ar:
   item_type_download_e949cdb6: "نوع العنصر: تنزيل"
   item_type_link_5a2abed2: "نوع العنصر: ارتباط"
   item_type_locked_85c560ec: "نوع العنصر: مؤمّن"
+  item_type_mastery_connect_8f36c669: "نوع العنصر: ربط الإجادة"
   item_type_new_quiz_1a1cd9a9: "نوع العنصر: اختبار جديد"
   item_type_quiz_c894ddb1: "نوع العنصر: الاختبار الموجز"
   items_299a7626: "العناصر: "
@@ -13083,6 +13090,7 @@ ar:
   let_students_see_the_correct_answers_dacc2faf: "السماح للطلاب بمشاهدة الإجابات الصحيحة"
   let_students_see_their_quiz_responses_fbc07d14: "السماح للطلاب بمشاهدة نتائج الاختبارات الخاصة بهم"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "اجعل الطلاب يطلعون على استجابات اختباراتهم (سيتم تعليم الأسئلة غير الصحيحة في ملاحظات الطالب)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "السماح لمسؤول الموقع بتحديد ما يصل إلى تطبيقي LTI في المفضلة، واللذان سيعرضان في شريط أدوات RCE"
   letter_grade_29ff1938: "الدرجة بالأحرف"
   letter_grade_f00fedc4: "الدرجة بالأحرف"
   level_5fdf654a: المستوى
@@ -13251,6 +13259,7 @@ ar:
   list_collapsed_9ac35920: "تم طي القائمة."
   list_collapsed_dde87718: "تم طي القائمة"
   list_expanded_efec2d0: "تم توسيع القائمة."
+  list_of_the_currently_attainable_trophies_959b2518: "قائمة الكؤوس القابلة للتحقق في الوقت الحالي"
   list_view_430aecce: "عرض القائمة"
   lithuanian_5adcbe24: الليتوانية
   little_lost_try_here_first_9e24e575: "تائه بعض الشيء؟ جرب هنا أولاً!"
@@ -13607,7 +13616,9 @@ ar:
   mastery_path_processing_f4471152: "جارٍ معالجة مسار الإتقان"
   mastery_paths_breakdown_6e0b5fce: "تصنيف مسارات الإتقان"
   mastery_paths_cc4096c2: "مسارات الإتقان"
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "تم تعطيل تحرير مسارات الإجادة مؤقتًا للصيانة."
   mastery_paths_editor_930655bb: "محرر مسارات الإتقان"
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "تم تعطيل تحديد مسارات الإجادة مؤقتًا للصيانة."
   mastery_points_f1672cc: "نقاط الإجادة"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "تعكس درجة الإتقان أعلى درجة لمهمة أو اختبار تم تقييم درجته."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "تعكس درجة الإتقان أحدث مهمة أو اختبار تم تقييم درجته."
@@ -16070,6 +16081,7 @@ ar:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} النقاط"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} النقاط الممكنة"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} نقاط"
+  na_3dbb9cfd: "لا يوجد"
   name: "مستورد القياس الأكاديمي"
   name_1aed4a1b: الاسم
   name_3806192d: "الاسم:"
@@ -17650,6 +17662,7 @@ ar:
       description: "لاستضافة الملفات المحمّلة بخدمة Inst-FS."
       labels: 
         migration_rate: "نسبة ترحيل الملفات الأقدم إلى Inst-FS على الوصول (0 إلى 100)"
+        service_worker: "استخدم الأخصائي الاجتماعي لمصادقة عمليات الوصول إلى الملف في Safari 13+"
     kaltura: 
       description: "تسجيل فيديو/صوت Kaltura وتشغيله"
       name: Kaltura
@@ -17981,6 +17994,7 @@ ar:
       requirements_must_be_completed: "يلزم إكمال المتطلبات التالية قبل إلغاء تأمين هذه الصفحة"
   presentation_2d9387ca: "عرض تقديمي"
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "يعرض إعداد الاختبار الموجز لتجنب الإرسال التلقائي للاختبار الموجز محدد الوقت عند انتهاء الوقت المتاح."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "اضغط على ALT + F8 لعرض قائمة اختصارات لوحة المفاتيح"
   press_space_to_start_over_d4b8a2da: "اضغط على \"المسافة\" للبدء من جديد"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "اضغط على مفتاح الفاصلة أو على Shift + علامة الاستفهام لعرض قائمة اختصارات لوحة المفاتيح"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "اضغط على مفتاح الفاصلة أو على Shift + ? لعرض قائمة اختصارات لوحة المفاتيح"
@@ -18652,6 +18666,7 @@ ar:
       update_question_without_regrading: "تحديث السؤال دون إعادة تقييم"
   quiz_40ee61b1: الاختبار
   quiz_assignment_overrides_cec1973b: "مرات تجاوز مهمة الاختبار الموجز"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "سيتم إرسال تواريخ توافر الاختبار الموجز التي تتخطى أثناء محاولة تلقائيًا حتى لو انتهت صلاحية الوقت الممتد."
   quiz_duplication_not_implemented_c1495585: "لم يتم تنفيذ تكرار الاختبار الموجز"
   quiz_e0dcce8f: اختبار
   quiz_extensions_d2550649: "امتدادات الاختبار الموجز"
@@ -23101,6 +23116,7 @@ ar:
       networking_academy_description: "عرض إجابات Cisco عن الأسئلة الشائعة."
       networking_academy_faqs: "الأسئلة الشائعة حول أكاديمية الشبكات"
       support_desk_livechat: "محادثة مباشرة مع مكتب الدعم"
+  support_favorite_lti_tools_in_the_rce_1680436d: "دعم أدوات LTI المفضلة في RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: السواحلية
   sweden_1add8e79: السويد
@@ -23186,6 +23202,7 @@ ar:
     syllabus: المناهج
     tab_location_error: "موقع علامة التبويب هذه غير صالح"
     tab_unmanagable_error: "%{css_class} غير قابل للإدارة"
+    trophy_case: "خزانة الجوائز"
   tabs_5605547e: "علامات التبويب"
   tagalog_74906db7: التغالوغ
   taiwan_886_9a5b6bbf: "تايوان (+886)"
@@ -23335,6 +23352,12 @@ ar:
                      يدويًا حتى %{max_domains} من المسؤولين إلى القائمة البيضاء الخاصة بك. الأحرف الخاصة موصى بها
                      (مثال: *.instructure.com). مجالات Canvas وInstructure مضمنة
                      تلقائيًا ولا تحتسب ضمن الحد البالغ 50 مجالاً.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      تسمح لك سياسة أمان المحتوى بتقييد تخصيص
+                     JavaScript الذي يعمل في مثيل Canvas الخاص بك. يمكنك إضافة
+                     يدويًا حتى %{max_domains} من المجالات المسموح بها. الأحرف الخاصة موصى بها
+                     (مثال: *.instructure.com). مجالات Canvas وInstructure مضمنة
+                     تلقائيًا ولا تحتسب ضمن الحد البالغ 50 مجالاً.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       الصفحة الرئيسية للمساق هي الصفحة الأولى التي يراها الطلاب عند فتح
             المساق الخاص بك. يمكن للصفحة الرئيسية أن تعرض مسار
@@ -23363,6 +23386,9 @@ ar:
   the_following_domains_have_automatically_been_adde_2c7a1654: |-
       تمت إضافة المجالات التالية تلقائيًا إلى
                        القائمة البيضاء الخاصة بك من الأدوات الموجودة بالفعل في حسابك.
+                       لإزالة هذه المجالات، قم بإزالة الأدوات المقترنة.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      تم السماح للمجالات التالية تلقائيًا من الأدوات الموجودة فعليًا في حسابك.
                        لإزالة هذه المجالات، قم بإزالة الأدوات المقترنة.
   the_following_errors_occurred_bdec1e44: "حدثت الأخطاء التالية:"
   the_following_fields_are_invalid_fields_b3565800: "الحقول التالية غير صالحة: %{fields}"
@@ -23501,6 +23527,7 @@ ar:
   there_are_no_unsaved_changes_9276e87c: "لا توجد أي تغييرات غير محفوظة"
   there_are_no_unsynced_changes_4e8f0838: "لا توجد أي تغييرات غير متزامنة"
   there_are_no_unsynched_changes_d208547c: "لا توجد أي تغييرات غير متزامنة"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "يوجد حد بتطبيقين للوضع داخل شريط أدوات RCE. لا يسري هذا الإعداد إلا على RCE المعزز."
   there_is_currently_1_available_grader_758e4a21: "يوجد حاليًا عدد 1 مقيّم متاح"
   there_was_a_failure_logging_out_at_your_idp_30070527: "حدث مشكل أثناء تسجيل الخروج من موفر الهوية IdP الخاص بك"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "حدثت مشكلة أثناء إنشاء عمود ملاحظات المعلم."
@@ -24419,6 +24446,59 @@ ar:
   tree_browser: 
     folder_tree_instructions: "استخدم مفتاحي السهمين لأعلى ولأسفل للتنقل عبر الشجرة. اضغط على السهم لليمين لتوسيع المجلدات، ولليسار للطي، وعلى إدخال لاختيار العنصر المحدد."
   trinidad_and_tobago_1_fc2d8d1c: "ترينيداد وتوباغو (+1)"
+  trophy: 
+    balloon_description: "وصف المنطاد"
+    balloon_display_name: منطاد
+    bifrost_trophy_description: "وصف كأس بيفروست"
+    bifrost_trophy_display_name: "كأس بيفروست"
+    butterfly_description: "وصف الفراشة"
+    butterfly_display_name: فراشة
+    einstein_rosen_trophy_description: "وصف كأس آينشتاين روزين"
+    einstein_rosen_trophy_display_name: "كأس آينشتاين روزين"
+    fire_description: "وصف النار"
+    fire_display_name: نار
+    flowers_description: "وصف الوردة"
+    flowers_display_name: وردة
+    four_leaf_clover_description: "وصف ورقة البرسيم الرباعية"
+    four_leaf_clover_display_name: "ورقة برسيم رباعية"
+    gift_description: "وصف الهدية"
+    gift_display_name: هدية
+    gnome_description: "وصف القزم"
+    gnome_display_name: قزم
+    helix_rocket_description: "وصف الصاروخ اللولبي"
+    helix_rocket_display_name: "صاروخ لولبي"
+    horse_shoe_description: "وصف حدوة الحصان"
+    horse_shoe_display_name: "حدوة حصان"
+    hot_air_balloon_description: "وصف منطاد الهواء الساخن"
+    hot_air_balloon_display_name: "منطاد هواء ساخن"
+    magic_mystery_thumbs_up_description: "وصف إبهام لأعلى لغموض سحري"
+    magic_mystery_thumbs_up_display_name: "إبهام لأعلى لغموض سحري"
+    medal_description: "وصف الميدالية"
+    medal_display_name: ميدالية
+    moon_description: "وصف القمر"
+    moon_display_name: قمر
+    ninja_description: "وصف النينجا"
+    ninja_display_name: نينجا
+    panama_rocket_description: "وصف صاروخ بنما"
+    panama_rocket_display_name: "صاروخ بنما"
+    panda_description: "وصف باندا"
+    panda_display_name: باندا
+    panda_unicycle_description: "وصف باندا بدراجة أحادية"
+    panda_unicycle_display_name: "باندا بدراجة أحادية"
+    pinwheel_description: "وصف المروحة"
+    pinwheel_display_name: مروحة
+    pizza_slice_description: "وصف شريحة البيتزا"
+    pizza_slice_display_name: "شريحة بيتزا"
+    rocket_description: "وصف الصاروخ"
+    rocket_display_name: صاروخ
+    star_description: "وصف النجمة"
+    star_display_name: نجمة
+    thumbs_up_description: "وصف إبهام لأعلى"
+    thumbs_up_display_name: "إبهام لأعلى"
+    trophy_description: "وصف الكأس"
+    trophy_display_name: كأس
+  trophy_case_7a098a85: "خزانة الجوائز"
+  trophy_case_da3b25bb: "خزانة الجوائز"
   truncated_56b1a661: مقطوع
   turkish_5b69578b: التركية
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "تشغيل واجهة من اليمين لليسار حتى للغات التي ليست ضمن لغات اليمين لليسار"
@@ -24647,6 +24727,9 @@ ar:
   updated_permissions_page_f2e91060: "صفحة أذونات محدثة"
   updated_terms_of_service_82f34148: "تحديث شروط الخدمة"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "واجهة مستخدم محدّثة للبحث عن المستخدمين والمساقات في الحساب وعرضها."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      لتحديث واجهة مستخدم تفضيلات إعلامات الحساب لتصبح أكثر حداثةt
+      وتجربة مستخدم محدثة
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "لتحديث عرض أيقونات سياسة النشر في عنوان عمود مهمة دفتر الدرجات الجديد."
   updating_6edbab78: تحديث
   updating_discussion_failed_aadb2d35: "فشل تحديث المناقشة"
