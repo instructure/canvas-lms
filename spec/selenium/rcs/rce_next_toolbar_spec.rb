@@ -20,15 +20,14 @@ require_relative 'pages/rcs_sidebar_page'
 require_relative '../test_setup/common_helper_methods/custom_selenium_actions'
 require_relative 'pages/rce_next_page'
 
-describe "RCE Next toolbar features" do
-  include_context "in-process server selenium tests"
+describe 'RCE Next toolbar features' do
+  include_context 'in-process server selenium tests'
   include WikiAndTinyCommon
   include RCSSidebarPage
   include CustomSeleniumActions
   include RCENextPage
 
-  context "WYSIWYG generic as a teacher" do
-
+  context 'WYSIWYG generic as a teacher' do
     before(:each) do
       course_with_teacher_logged_in
       Account.default.enable_feature!(:rce_enhancements)
@@ -36,10 +35,17 @@ describe "RCE Next toolbar features" do
     end
 
     def create_wiki_page_with_text(page_title)
-      @course.wiki_pages.create!(title: page_title, body: "<p>The sleeper must awaken.</p>")
+      @course.wiki_pages.create!(title: page_title, body: '<p>The sleeper must awaken.</p>')
     end
 
-    it "should add bullet lists" do
+    def assert_insert_buttons_enabled(is_enabled)
+      expect(links_toolbar_button.enabled?).to be is_enabled
+      expect(images_toolbar_button.enabled?).to be is_enabled
+      expect(media_toolbar_button.enabled?).to be is_enabled
+      expect(document_toolbar_button.enabled?).to be is_enabled
+    end
+
+    it 'should add bullet lists' do
       rce_wysiwyg_state_setup(@course)
 
       click_list_toggle_button
@@ -50,8 +56,8 @@ describe "RCE Next toolbar features" do
       end
     end
 
-    it "should remove bullet lists" do
-      text = "<ul><li>1</li><li>2</li><li>3</li></ul>"
+    it 'should remove bullet lists' do
+      text = '<ul><li>1</li><li>2</li><li>3</li></ul>'
       rce_wysiwyg_state_setup(@course, text, html: true)
 
       click_list_toggle_button
@@ -62,7 +68,7 @@ describe "RCE Next toolbar features" do
       end
     end
 
-    it "should add numbered lists", priority: "1", test_id: 307625 do
+    it 'should add numbered lists', priority: '1', test_id: 307_625 do
       skip('Unskip in CORE-2636')
       wysiwyg_state_setup(@course)
 
@@ -74,24 +80,24 @@ describe "RCE Next toolbar features" do
       end
     end
 
-    it "should remove numbered lists", priority: "1", test_id: 537619 do
+    it 'should remove numbered lists', priority: '1', test_id: 537_619 do
       skip('Unskip in CORE-2636')
-      text = "<ol><li>1</li><li>2</li><li>3</li></ol>"
+      text = '<ol><li>1</li><li>2</li><li>3</li></ol>'
       wysiwyg_state_setup(@course, text, html: true)
 
       click_list_toggle_button
       click_numbered_list_button
 
       in_frame rce_page_body_ifr_id do
-        expect(f("#tinymce")).not_to contain_css('li')
+        expect(f('#tinymce')).not_to contain_css('li')
       end
     end
 
-    it "should indent and remove indentation for embedded images" do
+    it 'should indent and remove indentation for embedded images' do
       skip('Unskip in CORE-2637')
-      title = "email.png"
+      title = 'email.png'
       @root_folder = Folder.root_folders(@course).first
-      @image = @root_folder.attachments.build(:context => @course)
+      @image = @root_folder.attachments.build(context: @course)
       path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
       @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
       @image.save!
@@ -103,28 +109,28 @@ describe "RCE Next toolbar features" do
 
       select_all_wiki
       force_click(indent_button)
-      validate_wiki_style_attrib("padding-left", "40px", "p")
+      validate_wiki_style_attrib('padding-left', '40px', 'p')
 
       force_click(indent_toggle_button)
       force_click(outdent_button)
 
-      validate_wiki_style_attrib_empty("p")
+      validate_wiki_style_attrib_empty('p')
     end
 
-    it "should indent and remove indentation for text" do
+    it 'should indent and remove indentation for text' do
       skip('Unskip in CORE-2637')
-      wysiwyg_state_setup(@course, "test")
+      wysiwyg_state_setup(@course, 'test')
 
       click_indent_button
-      validate_wiki_style_attrib("padding-left", "40px", "p")
+      validate_wiki_style_attrib('padding-left', '40px', 'p')
 
       click_indent_toggle_button
       click_outdent_button
 
-      validate_wiki_style_attrib_empty("p")
+      validate_wiki_style_attrib_empty('p')
     end
 
-    it "should make text superscript in rce" do
+    it 'should make text superscript in rce' do
       skip('Unskip in CORE-2634')
       wysiwyg_state_setup(@course)
 
@@ -135,20 +141,20 @@ describe "RCE Next toolbar features" do
       end
     end
 
-    it "should remove superscript from text in rce" do
+    it 'should remove superscript from text in rce' do
       skip('Unskip in CORE-2634')
       skip_if_chrome('fragile in chrome')
-      text = "<p><sup>This is my text</sup></p>"
+      text = '<p><sup>This is my text</sup></p>'
 
       wysiwyg_state_setup(@course, text, html: true)
       shift_click_button(superscript_button)
 
       in_frame rce_page_body_ifr_id do
-        expect(f("#tinymce")).not_to contain_css('sup')
+        expect(f('#tinymce')).not_to contain_css('sup')
       end
     end
 
-    it "should make text subscript in rce" do
+    it 'should make text subscript in rce' do
       skip('Unskip in CORE-2634')
       wysiwyg_state_setup(@course)
 
@@ -160,77 +166,77 @@ describe "RCE Next toolbar features" do
       end
     end
 
-    it "should remove subscript from text in rce" do
+    it 'should remove subscript from text in rce' do
       skip('Unskip in CORE-2634')
       skip_if_chrome('fragile in chrome')
-      text = "<p><sub>This is my text</sub></p>"
+      text = '<p><sub>This is my text</sub></p>'
       wysiwyg_state_setup(@course, text, html: true)
 
       click_super_toggle_button
       shift_click_button(subscript_button)
 
       in_frame rce_page_body_ifr_id do
-        expect(f("#tinymce")).not_to contain_css('sub')
+        expect(f('#tinymce')).not_to contain_css('sub')
       end
     end
 
-    it "should align text to the left" do
+    it 'should align text to the left' do
       skip('Unskip in CORE-2635')
-      wysiwyg_state_setup(@course, text = "left")
+      wysiwyg_state_setup(@course, text = 'left')
 
       click_align_left_button
-      validate_wiki_style_attrib("text-align", text, "p")
+      validate_wiki_style_attrib('text-align', text, 'p')
     end
 
-    it "should remove left align from text" do
+    it 'should remove left align from text' do
       skip('Unskip in CORE-2635')
-      text = "<p style=\"text-align: left;\">1</p>"
+      text = '<p style="text-align: left;">1</p>'
       wysiwyg_state_setup(@course, text, html: true)
 
       click_align_left_button
-      validate_wiki_style_attrib_empty("p")
+      validate_wiki_style_attrib_empty('p')
     end
 
-    it "should align text to the center" do
+    it 'should align text to the center' do
       skip('Unskip in CORE-2635')
-      wysiwyg_state_setup(@course, text = "center")
+      wysiwyg_state_setup(@course, text = 'center')
 
       click_align_toggle_button
       click_align_center_button
-      validate_wiki_style_attrib("text-align", text, "p")
+      validate_wiki_style_attrib('text-align', text, 'p')
     end
 
-    it "should remove center align from text" do
+    it 'should remove center align from text' do
       skip('Unskip in CORE-2635')
-      text = "<p style=\"text-align: center;\">1</p>"
+      text = '<p style="text-align: center;">1</p>'
       wysiwyg_state_setup(@course, text, html: true)
 
       click_align_toggle_button
       click_align_center_button
-      validate_wiki_style_attrib_empty("p")
+      validate_wiki_style_attrib_empty('p')
     end
 
-    it "should align text to the right" do
+    it 'should align text to the right' do
       skip('Unskip in CORE-2635')
-      wysiwyg_state_setup(@course, text = "right")
+      wysiwyg_state_setup(@course, text = 'right')
 
       click_align_toggle_button
       click_align_right_button
-      validate_wiki_style_attrib("text-align", text, "p")
+      validate_wiki_style_attrib('text-align', text, 'p')
     end
 
-    it "should remove right align from text" do
+    it 'should remove right align from text' do
       skip('Unskip in CORE-2635')
-      text = "<p style=\"text-align: right;\">1</p>"
+      text = '<p style="text-align: right;">1</p>'
       wysiwyg_state_setup(@course, text, html: true)
 
       click_align_toggle_button
       click_align_right_button
-      validate_wiki_style_attrib_empty("p")
+      validate_wiki_style_attrib_empty('p')
     end
 
-    it "should change text to right-to-left in the rce" do
-      rce_wysiwyg_state_setup(@course, text = "rtl")
+    it 'should change text to right-to-left in the rce' do
+      rce_wysiwyg_state_setup(@course, text = 'rtl')
       click_directionality_toggle_button
       click_right_to_left_option
       in_frame rce_page_body_ifr_id do
@@ -238,18 +244,18 @@ describe "RCE Next toolbar features" do
       end
     end
 
-    it "should remove right-to-left from text in the rce" do
+    it 'should remove right-to-left from text in the rce' do
       skip('Unskip in CORE-3049')
-      text = "<p dir=\"rtl\">This is my text</p>"
+      text = '<p dir="rtl">This is my text</p>'
       wysiwyg_state_setup(@course, text, html: true)
       click_directionality_toggle_button
       click_right_to_left_option
-      validate_wiki_style_attrib_empty("p")
+      validate_wiki_style_attrib_empty('p')
     end
 
-    it "should change text to left-to-right in the rce" do
+    it 'should change text to left-to-right in the rce' do
       skip('Unskip in CORE-3049')
-      wysiwyg_state_setup(@course, text = "ltr")
+      wysiwyg_state_setup(@course, text = 'ltr')
       click_directionality_toggle_button
       click_right_to_left_option
       in_frame rce_page_body_ifr_id do
@@ -257,22 +263,22 @@ describe "RCE Next toolbar features" do
       end
     end
 
-    it "should remove left-to-right from text in the rce" do
+    it 'should remove left-to-right from text in the rce' do
       skip('Unskip in CORE-3049')
-      text = "<p dir=\"ltr\">This is my text</p>"
+      text = '<p dir="ltr">This is my text</p>'
       wysiwyg_state_setup(@course, text, html: true)
       click_directionality_button
-      validate_wiki_style_attrib_empty("p")
+      validate_wiki_style_attrib_empty('p')
     end
 
-    it "should verify the rce-next toolbar is one row" do
+    it 'should verify the rce-next toolbar is one row' do
       visit_front_page_edit(@course)
 
       expect(rce_next_toolbar.size.height).to be 39
     end
 
-    it "should verify selecting Header from dropdown sets H2" do
-      page_title = "header"
+    it 'should verify selecting Header from dropdown sets H2' do
+      page_title = 'header'
       create_wiki_page_with_text(page_title)
       visit_existing_wiki_edit(@course, page_title)
 
@@ -285,8 +291,8 @@ describe "RCE Next toolbar features" do
       end
     end
 
-    it "should verify selecting subeader from dropdown sets H3" do
-      page_title = "header"
+    it 'should verify selecting subeader from dropdown sets H3' do
+      page_title = 'header'
       create_wiki_page_with_text(page_title)
       visit_existing_wiki_edit(@course, page_title)
 
@@ -299,8 +305,8 @@ describe "RCE Next toolbar features" do
       end
     end
 
-    it "should verify selecting small header from dropdown sets H4" do
-      page_title = "header"
+    it 'should verify selecting small header from dropdown sets H4' do
+      page_title = 'header'
       create_wiki_page_with_text(page_title)
       visit_existing_wiki_edit(@course, page_title)
 
@@ -313,8 +319,8 @@ describe "RCE Next toolbar features" do
       end
     end
 
-    it "should verify selecting preformatted from dropdown sets pre" do
-      page_title = "header"
+    it 'should verify selecting preformatted from dropdown sets pre' do
+      page_title = 'header'
       create_wiki_page_with_text(page_title)
       visit_existing_wiki_edit(@course, page_title)
 
@@ -331,10 +337,10 @@ describe "RCE Next toolbar features" do
       before(:each) do
         create_wiki_page_with_text('hello')
         visit_existing_wiki_edit(@course, 'hello')
-        driver.manage.window.resize_to(1000, 800)
+        driver.manage.window.resize_to(1_000, 800)
       end
 
-      it "should close on executing any command" do
+      it 'should close on executing any command' do
         more_toolbar_button.click
         expect(overflow_toolbar).to be_displayed
         click_list_toggle_button
@@ -342,8 +348,8 @@ describe "RCE Next toolbar features" do
         expect(f('body')).not_to contain_css(overflow_toolbar_selector)
       end
 
-      it "should close on losing focus" do
-        skip("Adding this test causes the previous one to fail. Go figure!?!")
+      it 'should close on losing focus' do
+        skip('Adding this test causes the previous one to fail. Go figure!?!')
         in_frame rce_page_body_ifr_id do
           f('#tinymce').send_keys('') # focus
         end
@@ -353,8 +359,43 @@ describe "RCE Next toolbar features" do
         f('#title').click
         expect(f('body')).not_to contain_css(overflow_toolbar_selector)
       end
+    end
 
+    it 'disables content insertion buttons when linking is invalid' do
+      body = <<-HTML
+      <p><span id="ok">i am OK!</span></p>
+      <p><span id="ifr">cannot link <iframe/> me</span></p>
+      <p><span id="vid">nor <video/> me</span></p>
+      HTML
+      @course.wiki_pages.create!(title: 'title', body: body)
+      visit_existing_wiki_edit(@course, 'title')
+      driver.manage.window.resize_to(1_350, 800) # wide enough to display the insert buttons
 
+      driver.execute_script(<<-JS)
+        window.selectNodeById = function(nid) {
+          const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
+          const rng = win.document.createRange()
+          rng.selectNode(win.document.getElementById(nid))
+          const rng2 = win.document.createRange()
+          rng2.setStart(win.document.getElementById(nid).firstChild, 0) // put the text cursor w/in the selection
+          const sel = win.getSelection()
+          sel.removeAllRanges()
+          sel.addRange(rng)
+          sel.addRange(rng2)
+        }
+        JS
+
+      # nothing selected, insert buttons are enabled
+      assert_insert_buttons_enabled(true)
+
+      driver.execute_script('window.selectNodeById("ok")')
+      assert_insert_buttons_enabled(true)
+
+      driver.execute_script('window.selectNodeById("ifr")')
+      assert_insert_buttons_enabled(false)
+
+      driver.execute_script('window.selectNodeById("vid")')
+      assert_insert_buttons_enabled(false)
     end
   end
 end
