@@ -199,11 +199,20 @@ namespace :strongmind do
   end
 
   desc "Enable Identity Server 2.0"
-  task :enable_identity_server, [:key, :secret, :identity_domain] => :environment do |task, args|
+  task :enable_identity_server, [:key, :secret, :auth_id, :identity_domain] => :environment do |task, args|
     if !args[:key] || !args[:secret]
       puts "Please supply a key and secret."
     else
       basic_auth = Base64.strict_encode64("#{args[:key]}:#{args[:secret]}")
+
+      auth_id = args[:auth_id] ? args[:auth_id].to_i : AccountAuthorizationConfig.last.id
+
+      SettingsService.update_settings(
+          id: '1',
+          setting: "identity_provider_id",
+          value: auth_id,
+          object: "school"
+        )
 
       identity_domain = args[:identity_domain] || "login.strongmind.com"
 
@@ -228,5 +237,19 @@ namespace :strongmind do
         object: "school"
       )
     end
+  end
+
+  desc "Set Identity Server 2.0 Auth Provider"
+  task :set_id_server_auth, [:id] => :environment do |task, args|
+    id = args[:id] ? args[:id].to_i : AccountAuthorizationConfig.last.id
+
+    SettingsService.update_settings(
+        id: '1',
+        setting: "identity_provider_id",
+        value: id,
+        object: "school"
+      )
+
+    puts "Set auth provider to id #{id}"
   end
 end

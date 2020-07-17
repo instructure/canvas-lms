@@ -77,7 +77,7 @@ class Login::OauthBaseController < ApplicationController
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
     end
 
-    if unique_ids.first && SettingsService.get_settings(object: 'school', id: 1)['identity_server_enabled']
+    if unique_ids.first && identity_v2_applicable?
       pseudonym = Pseudonym.find_by(integration_id: unique_ids.first)
     end
 
