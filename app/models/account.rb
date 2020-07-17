@@ -286,6 +286,9 @@ class Account < ActiveRecord::Base
   add_setting :enable_fullstory, boolean: true, root_only: true, default: true
   add_setting :enable_google_analytics, boolean: true, root_only: true, default: true
 
+  add_setting :lock_outcome_proficiency, boolean: true, default: false, inheritable: true
+  add_setting :lock_proficiency_calculation, boolean: true, default: false, inheritable: true
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|

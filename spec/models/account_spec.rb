@@ -1509,6 +1509,10 @@ describe Account do
   end
 
   context "inheritable settings" do
+    before do
+      @settings = [:restrict_student_future_view, :lock_all_announcements, :lock_outcome_proficiency, :lock_proficiency_calculation]
+    end
+
     before :each do
       account_model
       @sub1 = @account.sub_accounts.create!
@@ -1520,44 +1524,57 @@ describe Account do
       [@account, @sub1, @sub2].each do |a|
         expect(a.restrict_student_future_view).to eq expected
         expect(a.lock_all_announcements).to eq expected
+        expect(a.lock_outcome_proficiency).to eq expected
+        expect(a.lock_proficiency_calculation).to eq expected
       end
     end
 
     it "should be able to lock values for sub-accounts" do
-      @sub1.settings[:restrict_student_future_view] = {:locked => true, :value => true}
-      @sub1.settings[:lock_all_announcements] = {:locked => true, :value => true}
+      @settings.each do |key|
+        @sub1.settings[key] = {:locked => true, :value => true}
+      end
       @sub1.save!
       # should ignore the subaccount's wishes
-      @sub2.settings[:restrict_student_future_view] = {:locked => true, :value => false}
-      @sub2.settings[:lock_all_announcements] = {:locked => true, :value => false}
+      @settings.each do |key|
+        @sub2.settings[key] = {:locked => true, :value => false}
+      end
       @sub2.save!
 
-      expect(@account.restrict_student_future_view).to eq({:locked => false, :value => false})
-      expect(@account.lock_all_announcements).to eq({:locked => false, :value => false})
+      @settings.each do |key|
+        expect(@account.send(key)).to eq({:locked => false, :value => false})
+      end
 
-      expect(@sub1.restrict_student_future_view).to eq({:locked => true, :value => true})
-      expect(@sub1.lock_all_announcements).to eq({:locked => true, :value => true})
+      @settings.each do |key|
+        expect(@sub1.send(key)).to eq({:locked => true, :value => true})
+      end
 
-      expect(@sub2.restrict_student_future_view).to eq({:locked => true, :value => true, :inherited => true})
-      expect(@sub2.lock_all_announcements).to eq({:locked => true, :value => true, :inherited => true})
+      @settings.each do |key|
+        expect(@sub2.send(key)).to eq({:locked => true, :value => true, :inherited => true})
+      end
     end
 
     it "should grandfather old pre-hash values in" do
-      @account.settings[:restrict_student_future_view] = true
-      @account.settings[:lock_all_announcements] = true
+      @settings.each do |key|
+        @account.settings[key] = true
+      end
       @account.save!
-      @sub2.settings[:restrict_student_future_view] = false
-      @sub2.settings[:lock_all_announcements] = false
+
+      @settings.each do |key|
+        @sub2.settings[key] = false
+      end
       @sub2.save!
 
-      expect(@account.restrict_student_future_view).to eq({:locked => false, :value => true})
-      expect(@account.lock_all_announcements).to eq({:locked => false, :value => true})
+      @settings.each do |key|
+        expect(@account.send(key)).to eq({:locked => false, :value => true})
+      end
 
-      expect(@sub1.restrict_student_future_view).to eq({:locked => false, :value => true, :inherited => true})
-      expect(@sub1.lock_all_announcements).to eq({:locked => false, :value => true, :inherited => true})
+      @settings.each do |key|
+        expect(@sub1.send(key)).to eq({:locked => false, :value => true, :inherited => true})
+      end
 
-      expect(@sub2.restrict_student_future_view).to eq({:locked => false, :value => false})
-      expect(@sub2.lock_all_announcements).to eq({:locked => false, :value => false})
+      @settings.each do |key|
+        expect(@sub2.send(key)).to eq({:locked => false, :value => false})
+      end
     end
 
     it "should translate string values in mass-assignment" do
