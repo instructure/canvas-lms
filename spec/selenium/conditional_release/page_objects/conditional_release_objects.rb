@@ -84,5 +84,9 @@ class ConditionalReleaseObjects
     def conditional_release_editor_exists?
       element_exists?("#canvas-conditional-release-editor")
     end
+
+    def save_button
+      f(".assignment__action-buttons .btn-primary")
+    end
   end
 end

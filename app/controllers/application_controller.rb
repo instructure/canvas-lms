@@ -272,8 +272,6 @@ class ApplicationController < ActionController::Base
       @current_user,
       session: session,
       assignment: assignment,
-      domain: request.env['HTTP_HOST'],
-      real_user: @real_current_user,
       includes: includes
     )
     js_env(cr_env)

@@ -20,14 +20,11 @@ require_relative 'page_objects/conditional_release_objects'
 
 describe "native canvas conditional release" do
   include_context "in-process server selenium tests"
-  before(:each) do
-    Account.default.tap do |a|
-      a.settings[:use_native_conditional_release] = true
-      a.save!
-    end
+  before(:once) do
     Account.default.enable_feature! :conditional_release
-    Setting.set("conditional_release_prefer_native", "true")
+  end
 
+  before(:each) do
     course_with_teacher_logged_in
   end
 
@@ -35,10 +32,11 @@ describe "native canvas conditional release" do
     it 'shows Allow in Mastery Paths for a Page when feature enabled' do
       get "/courses/#{@course.id}/pages/new/edit"
       expect(ConditionalReleaseObjects.conditional_content_exists?).to eq(true)
+    end
 
+    it 'does not show Allow in Mastery Paths when feature disabled' do
       Account.default.disable_feature! :conditional_release
       get "/courses/#{@course.id}/pages/new/edit"
-
       expect(ConditionalReleaseObjects.conditional_content_exists?).to eq(false)
     end
 
@@ -117,7 +115,6 @@ describe "native canvas conditional release" do
       assignment = assignment_model(course: @course, points_possible: 100)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
-
       expect(ConditionalReleaseObjects.scoring_ranges.count).to eq(3)
       expect(ConditionalReleaseObjects.top_scoring_boundary.text).to eq("100 pts")
     end
@@ -133,10 +130,9 @@ describe "native canvas conditional release" do
       assignment = assignment_model(course: @course, points_possible: 100)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
-      ConditionalReleaseObjects.division_cutoff1.click
-      ConditionalReleaseObjects.division_cutoff1.send_keys [:control, "a"], "72"
-      ConditionalReleaseObjects.division_cutoff2.click
-      ConditionalReleaseObjects.division_cutoff2.send_keys [:control, "a"], "47", :tab
+      replace_content(ConditionalReleaseObjects.division_cutoff1, "72")
+      replace_content(ConditionalReleaseObjects.division_cutoff2, "47")
+      ConditionalReleaseObjects.division_cutoff2.send_keys :tab
 
       expect(ConditionalReleaseObjects.division_cutoff1.attribute("value")).to eq("72 pts")
       expect(ConditionalReleaseObjects.division_cutoff2.attribute("value")).to eq("47 pts")

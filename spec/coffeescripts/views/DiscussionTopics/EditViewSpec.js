@@ -377,8 +377,7 @@ QUnit.module('EditView - ConditionalRelease', {
     fakeENV.setup()
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     ENV.CONDITIONAL_RELEASE_ENV = {
-      assignment: {id: 1},
-      jwt: 'foo'
+      assignment: {id: 1}
     }
     $(document).on('submit', () => false)
     this.server = sinon.fakeServer.create({respondImmediately: true})

@@ -1075,7 +1075,7 @@ QUnit.module('EditView: Conditional Release', {
     fakeENV.setup({
       AVAILABLE_MODERATORS: [],
       current_user_roles: ['teacher'],
-      CONDITIONAL_RELEASE_ENV: {assignment: {id: 1}, jwt: 'foo'},
+      CONDITIONAL_RELEASE_ENV: {assignment: {id: 1}},
       CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
       HAS_GRADED_SUBMISSIONS: false,
       LOCALE: 'en',
@@ -1600,7 +1600,10 @@ QUnit.module('EditView#validateGraderCount', hooks => {
 QUnit.module('EditView#renderModeratedGradingFormFieldGroup', suiteHooks => {
   let view
   let server
-  const availableModerators = [{name: 'John Doe', id: '21'}, {name: 'Jane Doe', id: '89'}]
+  const availableModerators = [
+    {name: 'John Doe', id: '21'},
+    {name: 'Jane Doe', id: '89'}
+  ]
 
   suiteHooks.beforeEach(() => {
     fixtures.innerHTML = `

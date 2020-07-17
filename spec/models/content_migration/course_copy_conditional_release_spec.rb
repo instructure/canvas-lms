@@ -114,39 +114,5 @@ describe ContentMigration do
       released_to = @copy_to.assignments.where(:migration_id => mig_id(@set1_assmt1)).take
       expect(range_to.assignment_sets.first.assignment_set_associations.first.assignment).to eq released_to
     end
-
-    it "should translate a native export into the old service format for a yet-to-be-migrated course" do
-      old_account = Account.create!
-      @copy_to.update_attributes(:account => old_account, :root_account => old_account)
-
-      allow(ConditionalRelease::Service).to receive(:service_configured?).and_return(true)
-      allow(ConditionalRelease::MigrationService).to receive(:import_completed?).and_return(true)
-
-      received_data = nil
-      expect(ConditionalRelease::MigrationService).to receive(:send_imported_content_to_service) do |course, imported_content|
-        received_data = imported_content
-        {:mock_data => true}
-      end
-      @rule.scoring_ranges.offset(1).destroy_all # delete all but the first
-
-      run_course_copy
-
-      trigger_assmt_to = @copy_to.assignments.where(:migration_id => mig_id(@trigger_assmt)).take
-      released_to = @copy_to.assignments.where(:migration_id => mig_id(@set1_assmt1)).take
-
-      expected_old_format_data = {
-        "native" => true,
-        "rules" => [{
-          "trigger_assignment" => {"$canvas_assignment_id" => trigger_assmt_to.id},
-          "scoring_ranges" => [{
-            "lower_bound" => 0.7,
-            "upper_bound" => 1.0,
-            "assignment_sets" =>
-              [{"assignments" => [{"$canvas_assignment_id" => released_to.id}]}],
-            }]
-        }]
-      }
-      expect(received_data).to eq expected_old_format_data
-    end
   end
 end
