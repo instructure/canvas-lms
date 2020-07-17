@@ -1180,6 +1180,15 @@ describe ApplicationHelper do
         helper.add_csp_for_root
         expect(headers['Content-Security-Policy']).to eq "frame-src 'self' canvadocs.instructure.com localhost root_account.test root_account2.test"
       end
+
+      it "includes inst_fs domain if enabled" do
+        account.enable_csp!
+
+        allow(InstFS).to receive(:enabled?).and_return(true)
+        allow(InstFS).to receive(:app_host).and_return('https://inst_fs.instructure.com')
+        helper.add_csp_for_root
+        expect(headers['Content-Security-Policy']).to eq "frame-src 'self' inst_fs.instructure.com localhost root_account.test root_account2.test"
+      end
     end
   end
 end

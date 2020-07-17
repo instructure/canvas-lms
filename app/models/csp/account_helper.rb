@@ -159,7 +159,8 @@ module Csp::AccountHelper
       end
     end
     canvadocs_host = Canvadocs.enabled?.presence && URI.parse(Canvadocs.config['base_url']).host
-    [files_host, canvadocs_host].compact
+    inst_fs_host = InstFS.enabled?.presence && URI.parse(InstFS.app_host).host
+    [files_host, canvadocs_host, inst_fs_host].compact
   end
 
   def csp_logging_config
