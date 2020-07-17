@@ -140,7 +140,7 @@ module Importers
       end
 
       item.require_sequential_progress = hash[:require_sequential_progress] if hash.has_key?(:require_sequential_progress)
-      item.requirement_count = hash[:requirement_count] if hash[:requirement_count]
+      item.requirement_count = hash[:requirement_count] if hash.has_key?(:requirement_count)
 
       if hash[:prerequisites]
         preqs = []
