@@ -2047,6 +2047,7 @@ fa:
   anonymous_grading_ccb5045c: "نمره‌گذاری ناشناس"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "نمره گذاری ناشناس نام دانشجویان را ملزم به مخفی کردن در برنامه نمره گذاری سریع™ می کند"
   anonymous_instructor_annotations_2b6c822: "یادآوری های ناشناس استاد"
+  anonymous_moderated_assignments_cannot_be_unmuted__8f7b09e7: "تکالیف ناشناس تعدیل شده تا زمانی که نمره‌ها منتشر نشده باشند، نمی‌توانند فعال شوند. "
   anonymous_moderated_marking_801bbb65: "نمره گذاری نظارت شده ناشناس"
   anonymous_off_7985fcaf: "حالت ناشناس خاموش"
   anonymous_on_c5fa120d: "حالت ناشناس روشن"
@@ -6181,6 +6182,7 @@ fa:
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       هر تعداد مورد نیاز موضوع بحث، تکلیف برای نمره‌گذاری یا
       نشست برای اطلاعات و ایده های مشترک ایجاد کنید.
+  create_assessments_with_new_quizzes_and_migrate_ex_92b5f1ad: "ارزیابی‌هایی با آزمون‌های جدید ایجاد کنید و آزمون‌های کانواس موجود را انتقال دهید."
   create_assignment_68532ceb: "ایجاد تکلیف"
   create_assignments_on_the_assignments_page_organiz_90c78fdc: "تکالیف را در صفحه تکالیف ایجاد کنید. تکالیف را به گروه هایی مانند تکالیف خانه، کار در کلاس، مقالات، بحث ها و آزمون‌ها سازماندهی کنید. گروه‌های تکلیف می توانند وزن‌دار شوند."
   create_content_for_your_course_500a7032: "برای درس خود محتوا ایجاد کنید"
@@ -6349,6 +6351,7 @@ fa:
   custom_fields_fc3e55af: "جاهای خالی سفارشی"
   custom_link_details_35fd38fc: "جزئیات پیوند سفارشی"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "پیوندهای سفارشی برای درج در منوی فرعی گفتگوی راهنما"
+  custom_reports_experimental_features_40bbfe7c: "گزارش‌های سفارشی: ویژگی‌های تجربی"
   customize_configuration_69c22ef3: "شخصی سازی پیکربندی"
   customize_help_link_62cd05eb: "سفارشی کردن پیوند راهنما"
   customize_this_menu_efa72a9: "این منو را سفارشی کنید"
@@ -7386,6 +7389,7 @@ fa:
   empty_stub_for_testing_only_37aad38: "قطعه خالی (فقط برای آزمایش)"
   enable_6f5d1328: "فعال سازی"
   enable_and_lock_e6099cc2: "فعال کردن و قفل کردن"
+  enable_anonymous_grading_of_assignments_e18f75be: "نمره‌گذاری ناشناس تکالیف را فعال کنید."
   enable_course_as_a_blueprint_course_8515ffd5: "فعالسازی درس به عنوان دوره طرح"
   enable_dashboard_images_for_courses_5af458b0: "فعالسازی تصاویر داشبورد برای درس ها"
   enable_feature_title_987d8e9a: "فعالسازی ویژگی: %{title}"
@@ -9153,6 +9157,7 @@ fa:
   graph_of_the_distribution_of_grades_in_the_departm_30445777: "نمودار توزیع نمره ها در بخش"
   graph_showing_the_fraction_of_on_time_submissions__735e47db: "نمودار نشان دهنده بخشی از موردهای ارسالی به موقع برای هر تکلیف"
   graphql_api_af4deb45: "رابط برنامه نویسی برنامه GraphQL"
+  graphql_mutation_log_25acc923: "جهش لاگ GraphQL "
   graphs_89fcfeb: نمودارها
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "عالیه، یک درس در اختیار دارید. حالا باید چه کار کرد؟ قبل از اینکه اقدام به انتشار آن کنید، ممکن است بخواهید بررسی کنید و مطمئن شوید که مقدمات کار را فراهم کرده اید یا خیر. روی فهرست سمت چپ کار کنید تا مطمئن شوید که درس شما برای استفاده آماده است."
   greek_65c5b3f7: یونانی
@@ -13063,6 +13068,7 @@ fa:
   new_goodies_coming_soon_15d4f7fa: "خوش آمدید!"
   new_gradebook_297f7e2d: "دفتر  نمره جدید"
   new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "New Gradebook امکان انتشار زودهنگام ارتقاء های جدید دفتر نمره را فراهم می کند."
+  new_gradebook_plagiarism_indicator_8dd22971: "شاخص سرقت ادبی دفتر نمره‌ی جدید"
   new_group_category_66be9cbd: "رده جدید گروه"
   new_group_set_7241a581: "مجموعه گروه جدید"
   new_module_4e9287e4: "ماژول جدید"
@@ -20255,6 +20261,7 @@ fa:
   validate: 
     is_required: "تکمیل این جای خالی لازم است"
   validate_links_in_content_b1630fba: "تأیید اعتبار پیوندها در محتوا"
+  validated_service_ticket_20d1fcec: "بلیت خدمات اعتبارسنجی شده"
   validated_ticket_for_username_c6c7722f: "بلیت معتبر برای %{username}"
   validation_error_3b943100: "خطا در تأیید اعتبار"
   value_d842f16d: مقدار
