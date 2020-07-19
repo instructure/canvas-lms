@@ -244,8 +244,8 @@ pipeline {
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG || true"
                 }
                 sh 'build/new-jenkins/docker-build.sh'
+                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_PATCHSET_IMAGE"
               }
-              sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_PATCHSET_IMAGE"
               sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
               if (isPatchsetPublishable()) {
                 sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
