@@ -26,7 +26,8 @@ QUnit.module('ProfileShow', {
     this.fixtures = document.getElementById('fixtures')
     this.fixtures.innerHTML = "<div class='.profile-link'></div>"
     this.fixtures.innerHTML += "<textarea id='profile_bio'></textarea>"
-    this.fixtures.innerHTML += "<table id='profile_link_fields'></table>"
+    this.fixtures.innerHTML +=
+      "<table id='profile_link_fields'><input type='text' name='link_urls[]'></input></table>"
   },
   teardown() {
     this.fixtures.innerHTML = ''
@@ -76,6 +77,31 @@ test('validates input length', function() {
 
   // fails on bad input
   $('#profile_title').val('a'.repeat(256))
+  event = {
+    preventDefault: sinon.spy(),
+    target: $('#profile_form')
+  }
+  this.view.validateForm(event)
+  ok(event.preventDefault.called)
+  this.fixtures.innerHTML = oldInnerHTML
+})
+
+test('validates no spaces in URL', function() {
+  const oldInnerHTML = this.fixtures.innerHTML
+  this.fixtures.innerHTML =
+    "<form id='profile_form'><table id='profile_link_fields'><input id='profile_link' type='text' name='link_urls[]'></input></table></form>"
+
+  // validates on good input
+  $('#profile_link').val('yahoo')
+  let event = {
+    preventDefault: sinon.spy(),
+    target: $('#profile_form')
+  }
+  this.view.validateForm(event)
+  ok(!event.preventDefault.called)
+
+  // fails on spaces
+  $('#profile_link').val('ya hoo')
   event = {
     preventDefault: sinon.spy(),
     target: $('#profile_form')
