@@ -741,9 +741,6 @@ class RCEWrapper extends React.Component {
     if (this.storage) {
       editor.on('change', this.doAutoSave)
       editor.on('blur', this.doAutoSave)
-      window.addEventListener('unload', e => {
-        this.doAutoSave(e)
-      })
 
       this.cleanupAutoSave()
 
@@ -772,16 +769,18 @@ class RCEWrapper extends React.Component {
   // remove any autosaved value that's too old
 
   cleanupAutoSave = (deleteAll = false) => {
-    const expiry = deleteAll
-      ? Date.now()
-      : Date.now() - this.props.autosave.rce_auto_save_max_age_ms
-    let i = 0
-    let key
-    while ((key = this.storage.key(i++))) {
-      if (/^rceautosave:/.test(key)) {
-        const autosaved = this.getAutoSaved(key)
-        if (autosaved && autosaved.autosaveTimestamp < expiry) {
-          this.storage.removeItem(key)
+    if (this.storage) {
+      const expiry = deleteAll
+        ? Date.now()
+        : Date.now() - this.props.autosave.rce_auto_save_max_age_ms
+      let i = 0
+      let key
+      while ((key = this.storage.key(i++))) {
+        if (/^rceautosave:/.test(key)) {
+          const autosaved = this.getAutoSaved(key)
+          if (autosaved && autosaved.autosaveTimestamp < expiry) {
+            this.storage.removeItem(key)
+          }
         }
       }
     }
@@ -813,7 +812,7 @@ class RCEWrapper extends React.Component {
   getAutoSaved(key) {
     let autosaved = null
     try {
-      autosaved = JSON.parse(this.storage.getItem(key))
+      autosaved = this.storage && JSON.parse(this.storage.getItem(key))
     } catch (_ex) {
       this.storage.removeItem(this.autoSaveKey)
     }
@@ -836,35 +835,31 @@ class RCEWrapper extends React.Component {
   }
 
   doAutoSave = (e, retry = false) => {
-    const editor = this.mceInstance()
-    // if the editor is empty don't save
-    if (editor.dom.isEmpty(editor.getBody())) {
-      return
-    }
-    // if no changes have been made,
-    // delete and don't save
-    if (!editor.isDirty()) {
-      this.storage.removeItem(this.autoSaveKey)
-      return
-    }
+    if (this.storage) {
+      const editor = this.mceInstance()
+      // if the editor is empty don't save
+      if (editor.dom.isEmpty(editor.getBody())) {
+        return
+      }
 
-    const content = editor.getContent({no_events: true})
-    try {
-      this.storage.setItem(
-        this.autoSaveKey,
-        JSON.stringify({
-          autosaveTimestamp: Date.now(),
-          content
-        })
-      )
-    } catch (ex) {
-      if (!retry) {
-        // probably failed because there's not enough space
-        // delete up all the other entries and try again
-        this.cleanupAutoSave(true)
-        this.doAutoSave(e, true)
-      } else {
-        console.error('Autosave failed:', ex) // eslint-disable-line no-console
+      const content = editor.getContent({no_events: true})
+      try {
+        this.storage.setItem(
+          this.autoSaveKey,
+          JSON.stringify({
+            autosaveTimestamp: Date.now(),
+            content
+          })
+        )
+      } catch (ex) {
+        if (!retry) {
+          // probably failed because there's not enough space
+          // delete up all the other entries and try again
+          this.cleanupAutoSave(true)
+          this.doAutoSave(e, true)
+        } else {
+          console.error('Autosave failed:', ex) // eslint-disable-line no-console
+        }
       }
     }
   }
@@ -1040,6 +1035,7 @@ class RCEWrapper extends React.Component {
   handleTextareaChange = () => {
     if (this.isHidden()) {
       this.setCode(this.textareaValue())
+      this.doAutoSave()
     }
   }
 
