@@ -33,21 +33,6 @@ describe "account admin outcomes" do
       course_with_admin_logged_in
     end
 
-    it "should be able to manage course rubrics" do
-      get "/courses/#{@course.id}/outcomes"
-      expect_new_page_load { f('.manage_rubrics').click }
-      # this was originally added in OUT-465. It will eventually be moved over
-      # into the below popover menu, so leaving the blow code in place for
-      # when that happens
-
-      # expect_new_page_load do
-      #   f('#popoverMenu button').click
-      #   f('[data-reactid*="manage-rubrics"]').click
-      # end
-
-      expect(f('.add_rubric_link')).to be_displayed
-    end
-
     context "create/edit/delete outcomes" do
 
       it "should create a learning outcome with a new rating (root level)", priority: "1", test_id: 250229 do

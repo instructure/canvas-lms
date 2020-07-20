@@ -132,10 +132,19 @@ describe TabsController, type: :request do
           "type" => "internal"
         },
         {
+          "id" => "rubrics",
+          "html_url" => "/courses/#{@course.id}/rubrics",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/rubrics",
+          "position" => 11,
+          "visibility" => "admins",
+          "label" => "Rubrics",
+          "type" => "internal"
+        },
+        {
           "id" => "quizzes",
           "html_url" => "/courses/#{@course.id}/quizzes",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/quizzes",
-          "position" => 11,
+          "position" => 12,
           "unused" => true,
           "visibility" => "admins",
           "label" => "Quizzes",
@@ -145,7 +154,7 @@ describe TabsController, type: :request do
           "id" => "modules",
           "html_url" => "/courses/#{@course.id}/modules",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/modules",
-          "position" => 12,
+          "position" => 13,
           "unused" => true,
           "visibility" => "admins",
           "label" => "Modules",
@@ -155,7 +164,7 @@ describe TabsController, type: :request do
           "id" => "settings",
           "html_url" => "/courses/#{@course.id}/settings",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/settings",
-          "position" => 13,
+          "position" => 14,
           "visibility" => "admins",
           "label" => "Settings",
           "type" => "internal"
@@ -499,7 +508,7 @@ describe TabsController, type: :request do
     describe "teacher in a course" do
       before :once do
         course_with_teacher(active_all: true)
-        @tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
+        @tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 18, 4, 10, 13]
         @tab_lookup = {}.with_indifferent_access
         @course.tabs_available(@teacher, :api => true).each do |t|
           t = t.with_indifferent_access
@@ -509,7 +518,7 @@ describe TabsController, type: :request do
 
 
       it 'should have the correct position' do
-        tab_order = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
+        tab_order = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 18, 4, 10, 13]
         @course.tab_configuration = tab_order.map { |n| {'id' => n} }
         @course.save
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", {:controller => 'tabs', :action => 'index',
@@ -552,7 +561,7 @@ describe TabsController, type: :request do
       it 'correctly sets visibility' do
         hidden_tabs = [3, 8, 5]
         public_visibility = %w{home people syllabus}
-        admins_visibility = %w{announcements assignments pages files outcomes quizzes modules settings discussions grades}
+        admins_visibility = %w{announcements assignments pages files outcomes rubrics quizzes modules settings discussions grades}
         @course.tab_configuration = @tab_ids.map do |n|
           hash = {'id' => n}
           hash['hidden'] = true if hidden_tabs.include?(n)

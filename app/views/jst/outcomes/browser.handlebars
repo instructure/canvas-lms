@@ -26,14 +26,6 @@
       <span class="ui-button-text" aria-hidden="true">{{#t}}Find{{/t}}</span>
     </button>
     {{/if}}
-    {{#unless rubricsInCourseNav}}
-      {{#if canManageRubrics }}
-        <a href="{{contextUrlRoot}}/rubrics" class="manage_rubrics ui-button ui-widget ui-state-default ui-corner-all" role="button">
-          <i class="icon-rubric"></i>
-          <span class="ui-button-text">{{#t}}Manage Rubrics{{/t}}</span>
-        </a>
-      {{/if}}
-    {{/unless}}
   </div>
   {{/unless}}
 

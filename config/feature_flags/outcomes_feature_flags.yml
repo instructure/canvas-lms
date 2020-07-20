@@ -8,13 +8,6 @@ outcome_alignment_non_scoring_content:
   environments:
     production:
       state: disabled
-rubrics_in_course_navigation:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Rubrics in course navigation
-  description: |-
-    Includes rubrics in the course sidebar navigation
-  touch_context: true
 outcome_guid_course_exports:
   state: hidden
   applies_to: RootAccount

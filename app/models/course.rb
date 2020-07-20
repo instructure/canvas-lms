@@ -2736,9 +2736,10 @@ class Course < ActiveRecord::Base
       :href => :course_outcomes_path
     }, {
       :id => TAB_RUBRICS,
-       :label => t('#tabs.rubrics', "Rubrics"),
-       :css_class => 'rubrics',
-       :href => :course_rubrics_path
+      :label => t('#tabs.rubrics', "Rubrics"),
+      :css_class => 'rubrics',
+      :href => :course_rubrics_path,
+      :visibility => 'admins'
     }, {
       :id => TAB_QUIZZES,
       :label => t('#tabs.quizzes', "Quizzes"),
@@ -2826,12 +2827,6 @@ class Course < ActiveRecord::Base
       # Ensure that Settings is always at the bottom
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
       tabs << settings_tab
-
-      # remove rubrics tab if FF is not enabled
-      # remove conditional when FF is enabled on all root accounts
-      unless self.root_account.feature_enabled?(:rubrics_in_course_navigation)
-        tabs.delete_if {|t| t[:id] == TAB_RUBRICS}
-      end
 
       if opts[:only_check]
         tabs = tabs.select { |t| opts[:only_check].include?(t[:id]) }

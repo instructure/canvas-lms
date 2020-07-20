@@ -41,7 +41,6 @@ class OutcomesController < ApplicationController
            :STATE_STANDARDS_URL => @context.is_a?(Course) ? nil : api_v1_global_redirect_path,
            :COMMON_CORE_GROUP_ID => common_core_group_id,
            :COMMON_CORE_GROUP_URL => common_core_group_url,
-           :RUBRICS_IN_COURSE_NAV => @domain_root_account.feature_enabled?(:rubrics_in_course_navigation),
            :PERMISSIONS => {
              :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes),
              :manage_rubrics => @context.grants_right?(@current_user, session, :manage_rubrics),

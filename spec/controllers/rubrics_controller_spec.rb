@@ -67,22 +67,14 @@ describe RubricsController do
         @course.complete!
       end
 
-      it "cannot access rubrics without FF" do
+      it "can access rubrics" do
         get 'index', params: {:course_id => @course.id}
-        assert_unauthorized
+        expect(response).to be_successful
       end
 
-      describe "with FF enabled" do
-        before { @course.root_account.enable_feature!(:rubrics_in_course_navigation) }
-        it "can access rubrics" do
-          get 'index', params: {:course_id => @course.id}
-          expect(response).to be_successful
-        end
-
-        it "does not include manage_rubrics permission" do
-          get 'index', params: {:course_id => @course.id}
-          expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq false
-        end
+      it "should not allow the teacher to manage_rubrics" do
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq false
       end
     end
   end
@@ -732,7 +724,7 @@ describe RubricsController do
         expect(response).to be_successful
       end
 
-      it "should include manage_rubrics permission" do
+      it "should allow the teacher to manage_rubrics" do
         get 'show', params: {id: @r.id, course_id: @course.id}
         expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq true
       end
@@ -740,23 +732,14 @@ describe RubricsController do
       describe "after a course has concluded" do
         before { @course.complete! }
 
-        it "cannot access the rubric without the rubrics_in_course_navigation FF" do
+        it "can access the rubric" do
           get 'show', params: {id: @r.id, course_id: @course.id}
-          assert_unauthorized
+          expect(response).to be_successful
         end
 
-        describe "with rubrics_in_course_navigation FF enabled" do
-          before { @course.root_account.enable_feature!(:rubrics_in_course_navigation) }
-
-          it "can access the rubric" do
-            get 'show', params: {id: @r.id, course_id: @course.id}
-            expect(response).to be_successful
-          end
-
-          it "does not include manage_rubrics permission" do
-            get 'show', params: {id: @r.id, course_id: @course.id}
-            expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq false
-          end
+        it "should not allow the teacher to manage_rubrics" do
+          get 'show', params: {id: @r.id, course_id: @course.id}
+          expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq false
         end
       end
     end

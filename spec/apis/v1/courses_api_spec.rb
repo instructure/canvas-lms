@@ -3526,7 +3526,8 @@ describe CoursesController, type: :request do
       expect(json).to have_key 'tabs'
       expected_tabs = [
         "home", "announcements", "assignments", "discussions", "grades", "people",
-        "pages", "files", "syllabus", "outcomes", "quizzes", "modules", "settings"
+        "pages", "files", "syllabus", "outcomes", "quizzes", "modules", "settings",
+        "rubrics"
       ]
       expect(json['tabs'].map{ |tab| tab['id'] }).to match_array(expected_tabs)
     end
