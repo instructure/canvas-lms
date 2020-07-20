@@ -46,4 +46,44 @@ describe 'PeriodicJobs' do
       expect(Delayed::Job.last.run_at > Time.zone.now).to eq(true)
     end
   end
+
+  describe ".compute_run_at" do
+    it "Defaults to the current time" do
+      Timecop.freeze do
+        expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: false)).to eq(Time.zone.now)
+      end
+    end
+
+    it "Assumes database servers without a timezone are in the server timezone" do
+      Timecop.freeze do
+        expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(Time.zone.now)
+      end
+    end
+
+    it "Schedules jobs in the future when local nighttime is in the future" do
+      begin
+        old_tz = Shard.current.database_server.config[:timezone]
+        # Picked because it doesn't have DST
+        Shard.current.database_server.config[:timezone] = 'America/Phoenix'
+        Timecop.freeze do
+          expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(Time.zone.now + 7.hours)
+        end
+      ensure
+        Shard.current.database_server.config[:timezone] = old_tz
+      end
+    end
+
+    it "Schedules jobs in the future when local nighttime is in the past" do
+      begin
+        old_tz = Shard.current.database_server.config[:timezone]
+        # Picked because it doesn't have DST
+        Shard.current.database_server.config[:timezone] = 'Africa/Nairobi'
+        Timecop.freeze do
+          expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(Time.zone.now + 21.hours)
+        end
+      ensure
+        Shard.current.database_server.config[:timezone] = old_tz
+      end
+    end
+  end
 end
