@@ -571,6 +571,13 @@ describe Oauth2ProviderController do
           it { is_expected.to have_http_status 200 }
         end
 
+        context 'with a port in the aud' do
+          let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host', port: 3000) }
+
+          before { request.host = 'test.host:3000' }
+          it { is_expected.to have_http_status 200 }
+        end
+
         context 'with bad exp' do
           let(:exp) { 1.minute.ago.to_i }
 

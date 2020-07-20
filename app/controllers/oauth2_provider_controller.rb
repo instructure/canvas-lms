@@ -108,7 +108,7 @@ class Oauth2ProviderController < ApplicationController
     elsif grant_type == "refresh_token"
       Canvas::Oauth::GrantTypes::RefreshToken.new(client_id, secret, params)
     elsif grant_type == 'client_credentials'
-      Canvas::Oauth::GrantTypes::ClientCredentials.new(params, request.host, request.protocol)
+      Canvas::Oauth::GrantTypes::ClientCredentials.new(params, request.host_with_port, request.protocol)
     else
       Canvas::Oauth::GrantTypes::BaseType.new(client_id, secret, params)
     end
