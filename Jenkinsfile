@@ -380,6 +380,10 @@ pipeline {
               // Retriggers won't have an image to tag/push, pull that
               // image if doesn't exist. If image is not found it will
               // return NULL
+              if (!sh (script: 'docker images -q $RUBY_PATCHSET_IMAGE')) {
+                sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_PATCHSET_IMAGE'
+              }
+
               if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
                 sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
               }
