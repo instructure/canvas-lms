@@ -37,7 +37,7 @@ pipeline {
     MAX_FAIL = 5
     RERUNS_RETRY = 0 // no reruns
     POSTGRES_PASSWORD = 'sekret'
-    SELENIUM_VERSION = "3.141.59-20200525"
+    SELENIUM_VERSION = "3.141.59-20200719"
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()

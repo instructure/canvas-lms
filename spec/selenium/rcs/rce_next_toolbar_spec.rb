@@ -54,9 +54,6 @@ describe "RCE Next toolbar features" do
       text = "<ul><li>1</li><li>2</li><li>3</li></ul>"
       rce_wysiwyg_state_setup(@course, text, html: true)
 
-      # editor window needs focus in chrome to enable bullet list button
-      click_editor_window if driver.browser == :chrome
-
       click_list_toggle_button
       click_bullet_list_button
 
@@ -82,8 +79,6 @@ describe "RCE Next toolbar features" do
       text = "<ol><li>1</li><li>2</li><li>3</li></ol>"
       wysiwyg_state_setup(@course, text, html: true)
 
-      # editor window needs focus in chrome to enable number list button
-      click_editor_window if driver.browser == :chrome
       click_list_toggle_button
       click_numbered_list_button
 
