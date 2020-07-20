@@ -310,6 +310,9 @@ ul.user_list div.enrollment_type.pending {
   td {
     padding-right: 10px;
   }
+  p {
+    line-height: 130%;
+  }
   .tall-row {
     padding-top: 3px;
   }
@@ -326,7 +329,6 @@ ul.user_list div.enrollment_type.pending {
     width: 360px;
   }
   .palign {
-    line-height: 100%;
     margin-bottom: 10px;
   }
   select#course_locale + span {
