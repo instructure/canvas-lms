@@ -20,7 +20,7 @@
 
 <p><%= t :graded_date, "graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %></p>
 
-<% if user.try(:send_scores_in_emails?, asset.assignment.context.root_account) %>
+<% if user.try(:send_scores_in_emails?, asset.assignment.context) %>
   <% if asset.excused? %>
     <p><%= t :excused, "This assignment has been excused." %>
   <% elsif asset.score %>

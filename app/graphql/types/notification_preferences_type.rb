@@ -30,9 +30,16 @@ module Types
 
     field :send_scores_in_emails, Boolean, null: true do
       argument :user_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('User')
+      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
     end
-    def send_scores_in_emails(user_id:)
+    def send_scores_in_emails(user_id:, course_id: nil)
       user = User.find(user_id)
+
+      if course_id
+        course = Course.find(course_id)
+        return user.send_scores_in_emails?(course)
+      end
+
       # send_scores_in_emails can be nil and we want the default to be false if unset
       user.preferences[:send_scores_in_emails] == true
     end

@@ -2381,6 +2381,38 @@ describe User do
     end
   end
 
+  describe "send_scores_in_emails" do
+    before :once do
+      course_with_student(:active_all => true)
+    end
+
+    it "returns false if the root account setting is disabled" do
+      root_account = @course.root_account
+      root_account.settings[:allow_sending_scores_in_emails] = false
+      root_account.save!
+
+      expect(@student.send_scores_in_emails?(@course)).to be false
+    end
+
+    it "uses the user preference setting if no course overrides are available" do
+      @student.preferences[:send_scores_in_emails] = true
+      expect(@student.send_scores_in_emails?(@course)).to be true
+
+      @student.preferences[:send_scores_in_emails] = false
+      expect(@student.send_scores_in_emails?(@course)).to be false
+    end
+
+    it "uses course overrides if available" do
+      @student.preferences[:send_scores_in_emails] = false
+      @student.set_preference(:send_scores_in_emails_override, "course_" + @course.global_id.to_s, true)
+      expect(@student.send_scores_in_emails?(@course)).to be true
+
+      @student.preferences[:send_scores_in_emails] = true
+      @student.set_preference(:send_scores_in_emails_override, "course_" + @course.global_id.to_s, false)
+      expect(@student.send_scores_in_emails?(@course)).to be false
+    end
+  end
+
   describe "preferred_gradebook_version" do
     subject { user.preferred_gradebook_version }
 

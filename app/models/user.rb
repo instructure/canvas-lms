@@ -1584,8 +1584,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  def send_scores_in_emails?(root_account)
-    preferences[:send_scores_in_emails] == true && root_account.settings[:allow_sending_scores_in_emails] != false
+  def send_scores_in_emails?(course)
+    root_account = course.root_account
+    return false if root_account.settings[:allow_sending_scores_in_emails] == false
+    pref = get_preference(:send_scores_in_emails_override, "course_" + course.global_id.to_s)
+    pref = preferences[:send_scores_in_emails] if pref.nil?
+    !!pref
   end
 
   def send_observed_names_in_notifications?

@@ -90,8 +90,12 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
     end
 
     if !input[:send_scores_in_emails].nil? && context.root_account.present? && context.root_account.settings[:allow_sending_scores_in_emails] != false
-      current_user.preferences[:send_scores_in_emails] = input[:send_scores_in_emails]
-      current_user.save!
+      if context.is_a?(Course)
+        current_user.set_preference(:send_scores_in_emails_override, "course_" + context.global_id.to_s, input[:send_scores_in_emails])
+      else
+        current_user.preferences[:send_scores_in_emails] = input[:send_scores_in_emails]
+        current_user.save!
+      end
     end
 
     # Because we validate the arguments for updating notification policies above we only need to

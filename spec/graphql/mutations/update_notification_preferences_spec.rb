@@ -83,7 +83,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         #{"accountId: #{account_id}" if account_id}
       )" if context_type && (course_id || account_id)}
       notificationPreferences {
-        #{"sendScoresInEmails(userId: #{user_id})" if user_id}
+        #{"sendScoresInEmails(userId: #{user_id}, courseId: #{course_id})" if user_id}
         channels {
           #{"notificationPolicyOverrides(
             contextType: #{context_type},
@@ -115,28 +115,54 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     result.to_h.with_indifferent_access
   end
 
-  it 'sets the send_scores_in_emails setting' do
-    result = run_mutation(
-      user_id: @teacher.id,
-      account_id: @account.id,
-      context_type: 'Account',
-      send_scores_in_emails: true
-    )
-    expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
-    expect(result.dig(
-      :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
-    )).to be true
+  context 'send scores in emails' do
+    it 'sets the global setting' do
+      result = run_mutation(
+        user_id: @teacher.id,
+        account_id: @account.id,
+        context_type: 'Account',
+        send_scores_in_emails: true
+      )
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+      expect(result.dig(
+        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
+      )).to be true
 
-    result = run_mutation(
-      user_id: @teacher.id,
-      account_id: @account.id,
-      context_type: 'Account',
-      send_scores_in_emails: false
-    )
-    expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
-    expect(result.dig(
-      :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
-    )).to be false
+      result = run_mutation(
+        user_id: @teacher.id,
+        account_id: @account.id,
+        context_type: 'Account',
+        send_scores_in_emails: false
+      )
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+      expect(result.dig(
+        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
+      )).to be false
+    end
+
+    it 'sets the course override setting' do
+      result = run_mutation(
+        user_id: @teacher.id,
+        course_id: @course.id,
+        context_type: 'Course',
+        send_scores_in_emails: true
+      )
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+      expect(result.dig(
+        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
+      )).to be true
+
+      result = run_mutation(
+        user_id: @teacher.id,
+        course_id: @course.id,
+        context_type: 'Course',
+        send_scores_in_emails: false
+      )
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+      expect(result.dig(
+        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
+      )).to be false
+    end
   end
 
   context 'course' do
