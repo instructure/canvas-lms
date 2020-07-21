@@ -30,7 +30,7 @@ class GradebooksController < ApplicationController
   include Api::V1::RubricAssessment
 
   before_action :require_context
-  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary]
+  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary, :grading_rubrics]
 
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
@@ -205,6 +205,8 @@ class GradebooksController < ApplicationController
   end
 
   def grading_rubrics
+    return unless authorized_action(@context, @current_user, :read_rubrics)
+
     @rubric_contexts = @context.rubric_contexts(@current_user)
     if params[:context_code]
       context = @rubric_contexts.detect{|r| r[:context_code] == params[:context_code] }

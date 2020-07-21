@@ -2790,5 +2790,27 @@ describe GradebooksController do
         expect(json.first["rubric_association"]["context_code"]).to eq @cs_course.global_asset_string
       end
     end
+
+    context "access control" do
+      it "allows users with the appropriate permissions to view rubrics" do
+        user_session(@teacher)
+
+        get "grading_rubrics", params: {course_id: @course}
+        expect(response).to be_successful
+      end
+
+      it "forbids viewing if the user lacks appropriate permissions" do
+        user_session(@student)
+
+        get "grading_rubrics", params: {course_id: @course}
+        expect(response).to be_unauthorized
+      end
+
+      it "requires a logged-in user" do
+        get "grading_rubrics", params: {course_id: @course}
+
+        expect(response).to redirect_to(login_url)
+      end
+    end
   end
 end
