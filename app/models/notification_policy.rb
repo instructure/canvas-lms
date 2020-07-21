@@ -187,7 +187,7 @@ class NotificationPolicy < ActiveRecord::Base
         np ||= communication_channel.notification_policies.where(notification_id: notification).first
         policies << np
       end
-      policies = policies.select { |np| np.notification.is_course_type? } if context_type == 'Course'
+      policies = policies.select { |np| np.notification&.is_course_type? } if context_type == 'Course'
       policies
     end
   end
