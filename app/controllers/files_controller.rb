@@ -1255,9 +1255,11 @@ class FilesController < ApplicationController
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
       url = authenticated_thumbnail_url(attachment, thumb_opts)
-      instfs = attachment.instfs_hosted?
-      # only cache for half the time because of use_consistent_iat
-      Rails.cache.write(cache_key, [url, instfs], :expires_in => (attachment.url_ttl / 2)) if url
+      if url
+        instfs = attachment.instfs_hosted?
+        # only cache for half the time because of use_consistent_iat
+        Rails.cache.write(cache_key, [url, instfs], :expires_in => (attachment.url_ttl / 2))
+      end
     end
 
     if url && instfs && file_location_mode?
