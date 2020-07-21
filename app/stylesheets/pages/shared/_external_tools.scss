@@ -345,13 +345,11 @@ fieldset.rate_app_wrapper {
 }
 
 @include mobile-only {
-  .responsive_admin_settings {
-    #external_tools {
-      .lm {
-        margin-#{direction(left)}: 5px;
-        padding-#{direction(right)}: 4px;
-        padding-#{direction(left)}: 4px;
-      }
+  #external_tools {
+    .lm {
+      margin-#{direction(left)}: 5px;
+      padding-#{direction(right)}: 4px;
+      padding-#{direction(left)}: 4px;
     }
   }
 }

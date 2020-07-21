@@ -117,16 +117,6 @@ export default class ThemeEditor extends React.Component {
     }
   }
 
-  // TODO:
-  // Theme Editor loads itself into an empty document body, so need to add class for responsive FF.
-  // Can remove when the feature flag is on permanently and the CSS is no longer scoped to this class.
-  componentDidMount() {
-    const useResponsiveClass = !!window.ENV?.FEATURES?.responsive_admin_settings
-    if (useResponsiveClass) {
-      document.body.classList.add('responsive_admin_settings')
-    }
-  }
-
   onProgress = data => {
     this.setState({progress: data.completion})
   }

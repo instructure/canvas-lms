@@ -133,8 +133,6 @@ export default class EditView extends ValidatedFormView
   canPublish: =>
     !@isAnnouncement() && !@model.get('published') && @permissions.CAN_MODERATE
 
-  isResponsive: => !!window.ENV?.FEATURES?.responsive_awareness
-
   toJSON: ->
     data = super
     json = _.extend data, @options,
@@ -144,7 +142,6 @@ export default class EditView extends ValidatedFormView
       isTopic: @isTopic()
       isAnnouncement: @isAnnouncement()
       canPublish: @canPublish()
-      isResponsive: @isResponsive()
       contextIsCourse: @options.contextType is 'courses'
       canAttach: @permissions.CAN_ATTACH
       canModerate: @permissions.CAN_MODERATE
@@ -251,7 +248,6 @@ export default class EditView extends ValidatedFormView
       hideGradeIndividually: true
       sectionLabel: @messages.group_category_section_label
       fieldLabel: @messages.group_category_field_label
-      isResponsiveDiscussion: @isResponsive()
       lockedMessage: @messages.group_locked_message
       inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
       renderSectionsAutocomplete: @renderSectionsAutocomplete

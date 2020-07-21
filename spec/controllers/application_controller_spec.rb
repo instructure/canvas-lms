@@ -210,21 +210,6 @@ RSpec.describe ApplicationController do
         end
       end
 
-      context "responsive_admin_settings" do
-        before(:each) do
-          controller.instance_variable_set(:@domain_root_account, Account.default)
-        end
-
-        it 'is false if the feature flag is off' do
-          expect(controller.js_env[:FEATURES][:responsive_admin_settings]).to be_falsey
-        end
-
-        it 'is true if the feature flag is on' do
-          Account.default.enable_feature!(:responsive_admin_settings)
-          expect(controller.js_env[:FEATURES][:responsive_admin_settings]).to be_truthy
-        end
-      end
-
       context "responsive_awareness" do
         before(:each) do
           controller.instance_variable_set(:@domain_root_account, Account.default)

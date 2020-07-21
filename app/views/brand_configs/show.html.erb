@@ -36,13 +36,7 @@
 <br />
 <div class="content-box">
   <div class="grid-row">
-    <div
-      <% if @domain_root_account.feature_enabled?(:responsive_admin_settings) %>
-        class="col-xs-12 col-md-7"
-      <% else %>
-        class="col-xs-7"
-      <% end %>
-    >
+    <div class="col-xs-12 col-md-7">
       <p style="margin-top: 0;">Set Canvas' default text color using the <b>Main Text Color</b> field in Theme Editor. Check this text after you change it to see your edits.</p>
       <div class="ic-Form-group">
         <div class="ic-Form-control">
@@ -99,13 +93,7 @@
         </div>
       </div>
     </div>
-    <div
-      <% if @domain_root_account.feature_enabled?(:responsive_admin_settings) %>
-        class="col-xs-12 col-md-4 off-md-1"
-      <% else %>
-        class="col-xs-4 off-xs-1"
-      <% end %>
-    >
+    <div class="col-xs-12 col-md-4 off-md-1">
       <div>
         <button type="button" class="Button Button--primary Button--block"><%= t('Primary color button') %></button>
         <div class="content-box-mini">
@@ -265,13 +253,7 @@
   </div>
   <div class="content-box">
     <div class="grid-row">
-      <div
-        <% if @domain_root_account.feature_enabled?(:responsive_admin_settings) %>
-          class="col-xs-12 col-md-3"
-        <% else %>
-          class="col-xs-3"
-        <% end %>
-      >
+      <div class="col-xs-12 col-md-3">
         <div class="list-view">
           <nav class="theme-preview" aria-label="context" role="navigation">
             <ul>
@@ -284,13 +266,7 @@
           </nav>
         </div>
       </div>
-      <div
-        <% if @domain_root_account.feature_enabled?(:responsive_admin_settings) %>
-          class="col-xs-12 col-md-8 off-md-1"
-        <% else %>
-          class="col-xs-8 off-xs-1"
-        <% end %>
-      >
+      <div class="col-xs-12 col-md-8 off-md-1">
         <table class="ic-Table ic-Table--hover-row">
           <thead>
             <tr>
@@ -353,13 +329,7 @@
     </div>
   </div>
 </div>
-<div
-  <% if @domain_root_account.feature_enabled?(:responsive_admin_settings) %>
-    class="content-box theme-preview__login"
-  <% else %>
-    class="content-box"
-  <% end %>
->
+<div class="content-box theme-preview__login">
   <h3 id="login-preview">
     <%= t('Login') %>
   </h3>
