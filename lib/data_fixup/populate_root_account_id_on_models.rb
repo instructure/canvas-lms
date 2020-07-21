@@ -63,6 +63,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       AssignmentGroup => :context,
       AssignmentOverride => :assignment,
       AssignmentOverrideStudent => :assignment,
+      AttachmentAssociation => %i[course group submission attachment], # attachment is last, only used if context is a ConversationMessage
       CalendarEvent => [:context_course, :context_group, :context_course_section],
       ContentMigration => [:account, :course, :group],
       ContentParticipation => :content,
@@ -140,7 +141,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   # job cycle this backfill provides
   #
   # Each key points to a code module. This module is expected to have a
-  # `populate` method that takes `(table, assoc, min, max)`.
+  # `populate` method that takes `(min, max)`.
   #
   # Tables that are listed here must be also listed in the `migration_tables`
   # hash above, and may list their non-association dependencies in the
