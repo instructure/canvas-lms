@@ -238,13 +238,14 @@ const RichContentEditor = {
   },
 
   freshNode,
-  ensureID
+  ensureID,
+  node2jquery
 }
 
 // while the internals work with jquery, let's not
 // require that of our consumer
 function node2jquery(node) {
-  return node.length ? node : $(node)
+  return node && node.length ? node : $(node)
 }
 
 export default RichContentEditor
