@@ -1503,4 +1503,12 @@ describe FilesController do
       end
     end
   end
+
+  describe "GET 'image_thumbnail'" do
+    it "should return default 'no_pic' thumbnail if attachment not found" do
+      user_session @teacher
+      get "image_thumbnail", params: { uuid: "bad uuid", id: "bad id" }
+      expect(response).to be_redirect
+    end
+  end
 end
