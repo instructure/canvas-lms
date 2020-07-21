@@ -41,6 +41,27 @@ ar:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+ca:
+  bigeasy_locale: ca_ES
+  dow_offset: 1
+  locales:
+    ca: Català
+  date:
+    formats:
+      default: '%d/%m/%Y'
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  helpers:
+    accessible_date_only_format: "DD/MM/YYYY"
+    accessible_date_format: "DD/MM/YYYY hh:mm"
+  # this is for accessibleDateFormat.js
+  yyyy_mm_dd_hh_mm_a01b6081: "DD/MM/YYYY hh:mm"
 cy:
   locales:
     cy: Cymraeg
