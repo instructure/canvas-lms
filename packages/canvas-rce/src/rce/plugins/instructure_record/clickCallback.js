@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom'
 import Bridge from '../../../bridge'
 import {StoreProvider} from '../shared/StoreContext'
 import uploadMediaTranslations from './mediaTranslations'
+import formatMessage from '../../../format-message'
 
 export default function(ed, document) {
   return import('@instructure/canvas-media').then(CanvasMedia => {
@@ -48,7 +49,13 @@ export default function(ed, document) {
     }
 
     const handleUpload = (error, uploadData, onUploadComplete) => {
-      const err_msg = error && uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
+      let err_msg = error && uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
+      if (error?.file?.size > error?.maxFileSize * 1024 * 1024) {
+        err_msg = formatMessage(
+          'Size of {file} is greater than the maximum {max} MB allowed file size.',
+          {file: error.file.name, max: error.maxFileSize}
+        )
+      }
       onUploadComplete(err_msg, uploadData)
     }
 
