@@ -51,6 +51,18 @@ require 'spec_helper'
         end
       end
 
+      it 'is disabled if account setting is disabled' do
+        account = double('Account')
+
+        allow(account).to receive(:settings).and_return({ enable_fullstory: false })
+        allow(FullStoryHelper).to receive(:rand).and_return(0.5)
+
+        override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
+          fullstory_init(account, @session)
+          expect(@session[:fullstory_enabled]).to be_falsey
+        end
+      end
+
       it "doesn't explode if the dynamic settings are missing" do
         allow(FullStoryHelper).to receive(:rand).and_return(0.5)
         override_dynamic_settings(config: {canvas: { fullstory: nil } }) do

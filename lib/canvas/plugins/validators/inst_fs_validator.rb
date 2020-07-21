@@ -28,6 +28,7 @@ module Canvas::Plugins::Validators::InstFsValidator
       return false
     end
     settings[:migration] = migration_rate
-    settings.slice(:migration_rate).to_h.with_indifferent_access
+    settings[:service_worker] = Canvas::Plugin.value_to_boolean(settings[:service_worker])
+    settings.slice(:migration_rate, :service_worker).to_h.with_indifferent_access
   end
 end

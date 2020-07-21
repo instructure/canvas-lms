@@ -661,6 +661,70 @@ describe AccountsController do
       end
     end
 
+    describe "privacy settings" do
+      let(:account) { account_model }
+      let(:sub_account) { account_model(root_account: account) }
+      let(:site_admin) { site_admin_user }
+      let(:payload) {
+        {
+          account: {
+            settings: {
+              enable_fullstory: '0',
+              enable_google_analytics: '0',
+            }
+          }
+        }
+      }
+
+      it 'accepts changes made by a siteadmin to a root account' do
+        user_session(site_admin)
+
+        expect {
+          post 'update', format: 'json', params: { id: account.id, **payload }
+        }.to change {
+          account.reload.settings.fetch(:enable_fullstory, true)
+        }.from(true).to(false).and change {
+          account.reload.settings.fetch(:enable_google_analytics, true)
+        }.from(true).to(false)
+      end
+
+      it 'ignores changes made to the site_admin account' do
+        user_session(site_admin)
+
+        expect {
+          post 'update', format: 'json', params: { id: Account.site_admin.id, **payload }
+        }.to not_change {
+          account.reload.settings.fetch(:enable_fullstory, true)
+        }.and not_change {
+          account.reload.settings.fetch(:enable_google_analytics, true)
+        }
+      end
+
+      it 'ignores changes to sub accounts' do
+        user_session(site_admin)
+
+        expect {
+          post 'update', format: 'json', params: { id: sub_account.id, **payload }
+        }.to not_change {
+          account.reload.settings.fetch(:enable_fullstory, true)
+        }.and not_change {
+          account.reload.settings.fetch(:enable_google_analytics, true)
+        }
+      end
+
+      it 'ignores changes from regular admins' do
+        user_session(account_admin_user(account: account))
+
+        expect {
+          post 'update', format: 'json', params: { id: account.id, **payload }
+        }.to not_change {
+          account.reload.settings.fetch(:enable_fullstory, true)
+        }.and not_change {
+          account.reload.settings.fetch(:enable_google_analytics, true)
+        }
+      end
+    end
+
     it "should be set and unset outgoing email name" do
       account_with_admin_logged_in
       post 'update', params: {:id => @account.id, :account => {

@@ -1246,19 +1246,25 @@ class FilesController < ApplicationController
 
   def image_thumbnail
     cancel_cache_buster
+
     # include authenticator fingerprint so we don't redirect to an
     # authenticated thumbnail url for the wrong user
-    cache_key = ['thumbnail_url', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key
-    url = Rails.cache.read(cache_key)
+    cache_key = ['thumbnail_url2', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key
+    url, instfs = Rails.cache.read(cache_key)
     unless url
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
       url = authenticated_thumbnail_url(attachment, thumb_opts)
+      instfs = attachment.instfs_hosted?
       # only cache for half the time because of use_consistent_iat
-      Rails.cache.write(cache_key, url, :expires_in => (attachment.url_ttl / 2)) if url
+      Rails.cache.write(cache_key, [url, instfs], :expires_in => (attachment.url_ttl / 2)) if url
     end
-    url ||= '/images/no_pic.gif'
-    redirect_to url
+
+    if url && instfs && file_location_mode?
+      render_file_location(url)
+    else
+      redirect_to(url || '/images/no_pic.gif')
+    end
   end
 
   # when using local storage, the image_thumbnail action redirects here rather

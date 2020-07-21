@@ -1230,6 +1230,18 @@ module ApplicationHelper
     )
   end
 
+  def file_location_mode?
+    in_app? && request.headers["X-Canvas-File-Location"] == "True"
+  end
+
+  def render_file_location(location)
+    headers["X-Canvas-File-Location"] = "True"
+    render json: {
+      location: location,
+      token: file_authenticator.instfs_bearer_token
+    }
+  end
+
   def authenticated_download_url(attachment)
     file_authenticator.download_url(attachment)
   end
