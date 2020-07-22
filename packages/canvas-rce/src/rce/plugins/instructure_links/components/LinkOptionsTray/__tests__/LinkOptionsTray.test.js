@@ -72,6 +72,20 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
       renderComponent()
       expect(tray.link).toEqual(props.content.url)
     })
+
+    it('shows an error message if the url is invalid', () => {
+      props.content.url = 'xxx://example.instructure.com/files/3201/download'
+      renderComponent()
+      expect(tray.link).toEqual(props.content.url)
+      expect(tray.$errorMessage).toBeInTheDocument()
+      expect(tray.doneButtonIsDisabled).toBe(true)
+
+      // correct the URL
+      tray.setLink('//example.instructure.com/files/3201/download')
+      expect(tray.link).toEqual('//example.instructure.com/files/3201/download')
+      expect(tray.$errorMessage).toBeNull()
+      expect(tray.doneButtonIsDisabled).toBe(false)
+    })
   })
   describe('"Display Options" field', () => {
     it('is hidden if the link is not previewable', () => {

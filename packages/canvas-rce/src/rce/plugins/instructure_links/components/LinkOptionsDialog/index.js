@@ -16,16 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {bool, func, oneOf, string} from 'prop-types'
-import {Button, CloseButton} from '@instructure/ui-buttons'
 
-import {Heading} from '@instructure/ui-elements'
+import {Alert} from '@instructure/ui-alerts'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
 import {Modal} from '@instructure/ui-overlays'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 import formatMessage from '../../../../../format-message'
+import validateURL from '../../validateURL'
 
 const CREATE_LINK = 'create'
 const EDIT_LINK = 'edit'
@@ -33,6 +35,19 @@ const EDIT_LINK = 'edit'
 export default function LinkOptionsDialog(props) {
   const [text, setText] = useState(props.text || '')
   const [url, setUrl] = useState(props.url || '')
+  const [err, setErr] = useState(null)
+  const [isValidURL, setIsValidURL] = useState(false)
+
+  useEffect(() => {
+    try {
+      const v = validateURL(url)
+      setIsValidURL(v)
+      setErr(null)
+    } catch (ex) {
+      setIsValidURL(false)
+      setErr(ex.message)
+    }
+  }, [url])
 
   function handleSave(event) {
     event.preventDefault()
@@ -99,6 +114,11 @@ export default function LinkOptionsDialog(props) {
             value={url}
           />
         </View>
+        {err && (
+          <View as="div" margin="small" data-testid="url-error">
+            <Alert variant="error">{err}</Alert>
+          </View>
+        )}
       </Modal.Body>
 
       <Modal.Footer>
@@ -106,7 +126,7 @@ export default function LinkOptionsDialog(props) {
         <Button variant="default" onClick={props.onRequestClose} margin="0 small">
           {formatMessage('Close')}
         </Button>
-        <Button disabled={!url} onClick={handleSave} variant="primary">
+        <Button disabled={!(url && isValidURL)} onClick={handleSave} variant="primary">
           {formatMessage('Done')}
         </Button>
       </Modal.Footer>
