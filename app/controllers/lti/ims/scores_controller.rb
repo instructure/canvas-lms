@@ -121,7 +121,7 @@ module Lti::Ims
     #
     # @argument https://canvas.instructure.com/lti/submission [Optional, Object]
     #   (EXTENSION) Optional submission type and data.
-    #   new_submission [Boolean] flag to indicate that this is a new submission.  Defaults to true if submission_type is given.
+    #   new_submission [Boolean] flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
     #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, or online_url
     #   submission_data [String] submission data (URL or body text)
     #
@@ -277,9 +277,11 @@ module Lti::Ims
       scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submission_data)
     end
 
+    # all submissions should count as new (ie, module-progressing) unless explicitly otherwise,
+    # if new_submission flag is present and `false`, or submission_type flag is `none`
     def new_submission?
       new_flag = ActiveRecord::Type::Boolean.new.cast(scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :new_submission))
-      new_flag || (new_flag.nil? && !submission_type.nil? && submission_type != 'none')
+      (new_flag || new_flag.nil?) && submission_type != 'none'
     end
   end
 end
