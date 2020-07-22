@@ -46,7 +46,7 @@ def appendStagesAsBuildNodes(nodes,
     def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     def timeStart = new Date()
     nodes[stage_name] = {
-      node("canvas-$test_label-docker") {
+      protectedNode("canvas-$test_label-docker") {
         def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
         // make sure to unstash
         unstash name: "build-dir"
