@@ -2477,7 +2477,11 @@ class UsersController < ApplicationController
 
       begin
         User.transaction do
-          @user.save_with_or_without_identity_create(@pseudonym.unique_id, force: true)
+          @user.save_with_or_without_identity_create(
+            @pseudonym.unique_id,
+            force: true,
+            provisioned: params[:identity_user_provisioned].present?
+          )
         end
       rescue ActiveRecord::RecordInvalid => e
         errors = {
