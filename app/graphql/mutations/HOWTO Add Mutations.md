@@ -41,7 +41,7 @@ There are two classes of errors to consider when working with mutations:
 2. invalid user input: This is what the `errors` response field is for.  It
    should be considered exceedingly strange to check for validation errors in
    `resolve`  (typically you will want to get the validation errors from
-   Active Record's normal validation stuff.
+   Active Record's normal validation stuff).
 
 ## Sharing Code
 
