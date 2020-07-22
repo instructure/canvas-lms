@@ -30,13 +30,13 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
 const formattedCategoryNames = {
-  courseActivities: I18n.t('Course Activities'),
-  discussions: I18n.t('Discussions'),
-  conversations: I18n.t('Conversations'),
-  scheduling: I18n.t('Scheduling'),
-  groups: I18n.t('Groups'),
-  conferences: I18n.t('Conferences'),
-  alerts: I18n.t('Alerts')
+  courseActivities: () => I18n.t('Course Activities'),
+  discussions: () => I18n.t('Discussions'),
+  conversations: () => I18n.t('Conversations'),
+  scheduling: () => I18n.t('Scheduling'),
+  groups: () => I18n.t('Groups'),
+  conferences: () => I18n.t('Conferences'),
+  alerts: () => I18n.t('Alerts')
 }
 
 const notificationCategories = {
@@ -106,7 +106,7 @@ const renderNotificationCategory = (
 ) => (
   <Table
     caption={I18n.t('%{categoryName} notification preferences', {
-      categoryName: formattedCategoryNames[notificationCategory]
+      categoryName: formattedCategoryNames[notificationCategory]()
     })}
     margin="medium 0"
     layout="fixed"
@@ -115,7 +115,7 @@ const renderNotificationCategory = (
     <Table.Head>
       <Table.Row>
         <Table.ColHeader id={notificationCategory} data-testid={notificationCategory} width="16rem">
-          <Text size="large">{formattedCategoryNames[notificationCategory]}</Text>
+          <Text size="large">{formattedCategoryNames[notificationCategory]()}</Text>
         </Table.ColHeader>
         {notificationPreferences.channels.map(channel => (
           <Table.ColHeader
@@ -128,7 +128,7 @@ const renderNotificationCategory = (
               <>
                 <div style={{display: 'block'}}>
                   <Text transform={channel.pathType === 'sms' ? 'uppercase' : 'capitalize'}>
-                    {I18n.t('%{pathType}', {pathType: channel.pathType})}
+                    {channel.pathType}
                   </Text>
                 </div>
                 <div style={{display: 'block'}}>
@@ -139,7 +139,7 @@ const renderNotificationCategory = (
               </>
             ) : (
               <ScreenReaderContent>
-                {I18n.t('%{pathType}', {pathType: channel.pathType})}
+                {channel.pathType}
                 {channel.path}
               </ScreenReaderContent>
             )}

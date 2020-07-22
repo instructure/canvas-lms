@@ -32,7 +32,6 @@ import {View} from '@instructure/ui-view'
 
 const NotificationPreferences = props => {
   const [enabled, setEnabled] = useState(props.enabled)
-  const capitalizedContextType = props.contextType[0].toUpperCase() + props.contextType.slice(1)
 
   const renderMuteToggle = () => {
     if (props.contextType === 'course') {
@@ -57,12 +56,10 @@ const NotificationPreferences = props => {
             <Text>
               {enabled
                 ? I18n.t(
-                    'You are currently receiving notifications for this %{contextType}. To disable %{contextType} notifications, use the toggle above.',
-                    {contextType: props.contextType}
+                    'You are currently receiving notifications for this course. To disable course notifications, use the toggle above.'
                   )
                 : I18n.t(
-                    'You will not receive any %{contextType} notifications at this time. To enable %{contextType} notifications, use the toggle above.',
-                    {contextType: props.contextType}
+                    'You will not receive any course notifications at this time. To enable course notifications, use the toggle above.'
                   )}
             </Text>
           </Flex.Item>
@@ -90,8 +87,7 @@ const NotificationPreferences = props => {
           <View as="div" margin="large 0 medium 0" textAlign="center">
             <Text size="large">
               {I18n.t(
-                'Granular %{contextType} notification settings will be configurable here in the future.',
-                {contextType: props.contextType}
+                'Granular course notification settings will be configurable here in the future.'
               )}
             </Text>
           </View>
@@ -121,9 +117,9 @@ const NotificationPreferences = props => {
     <Flex direction="column">
       <Flex.Item overflowY="visible" margin="0 0 small 0">
         <Heading level="h2" as="h1">
-          {I18n.t('%{contextType} Notification Settings', {
-            contextType: capitalizedContextType
-          })}
+          {props.contextType === 'course'
+            ? I18n.t('Course Notification Settings')
+            : I18n.t('Account Notification Settings')}
         </Heading>
       </Flex.Item>
       {renderNotificationInfoAlert()}
