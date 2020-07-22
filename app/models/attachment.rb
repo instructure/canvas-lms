@@ -80,7 +80,7 @@ class Attachment < ActiveRecord::Base
   has_one :canvadoc
   belongs_to :usage_rights
 
-  before_create :set_root_account_id
+  before_save :set_root_account_id
   before_save :infer_display_name
   before_save :default_values
   before_save :set_need_notify
@@ -502,7 +502,11 @@ class Attachment < ActiveRecord::Base
   end
   protected :default_values
 
-  def root_account_id
+  def set_root_account_id
+    self.root_account_id = infer_root_account_id if namespace_changed? || new_record?
+  end
+
+  def infer_root_account_id
     # see note in infer_namespace below
     splits = namespace.try(:split, /_/)
     return nil if splits.blank?
@@ -532,8 +536,8 @@ class Attachment < ActiveRecord::Base
       # attachment's account id. Look for anybody who is accessing namespace and
       # splitting the string, etc.
       #
-      # I've added the root_account_id accessor above, but I didn't verify there
-      # isn't any code still accessing the namespace for the account id directly.
+      # The infer_root_account_id accessor is still present above, but I didn't verify there
+      # isn't any code still accessing the namespace for the account id directly. d
       ns = root_attachment.try(:namespace) if root_attachment_id
       ns ||= Attachment.current_namespace
       ns ||= self.context.root_account.file_namespace rescue nil
@@ -2094,19 +2098,6 @@ class Attachment < ActiveRecord::Base
           end
         end
       end
-    end
-  end
-
-  def set_root_account_id
-    # needed to do it this way since root_account_id is a method in this class
-    unless read_attribute(:root_account_id)
-      self.root_account_id =
-        case self.context
-        when Account
-          self.context.resolved_root_account_id
-        else
-          self.context.root_account_id if self.context.respond_to?(:root_account_id)
-        end
     end
   end
 end

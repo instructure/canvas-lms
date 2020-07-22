@@ -1280,6 +1280,7 @@ describe Attachment do
       expect(@a).to be_new_record
       expect(@a.read_attribute(:namespace)).to be_nil
       expect(@a.namespace).not_to be_nil
+      @a.set_root_account_id
       expect(@a.read_attribute(:namespace)).not_to be_nil
       expect(@a.root_account_id).to eq @account.id
     end
@@ -1303,6 +1304,7 @@ describe Attachment do
         Attachment.current_root_account = Account.default
         att = Attachment.new
         att.infer_namespace
+        att.set_root_account_id
         expect(att.namespace).to eq Account.default.asset_string
         expect(att.root_account_id).to eq Account.default.local_id
         @shard1.activate do
@@ -1318,6 +1320,7 @@ describe Attachment do
           Attachment.current_root_account = a
           att = Attachment.new
           att.infer_namespace
+          att.set_root_account_id
           expect(att.namespace).to eq a.global_asset_string
           expect(att.root_account_id).to eq a.local_id
         end
@@ -1331,6 +1334,7 @@ describe Attachment do
           a = Account.create!
           att = Attachment.new
           att.namespace = a.asset_string
+          att.set_root_account_id
           expect(att.root_account_id).to eq a.local_id
         end
         expect(att.root_account_id).to eq a.global_id
@@ -1342,6 +1346,7 @@ describe Attachment do
         @shard1.activate do
           att = Attachment.new
           att.infer_namespace
+          att.set_root_account_id
           expect(att.namespace).to eq Account.default.global_asset_string
           expect(att.root_account_id).to eq Account.default.global_id
         end
