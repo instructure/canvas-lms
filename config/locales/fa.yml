@@ -160,6 +160,7 @@ fa:
   a_problem_occurred_adding_reviewers_57b083d9: "در هنگام افزودن بازبینی کننده ها، اشکالی رخ داد."
   a_section_is_required_64103992: "یک بخش لازم است"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "یکپارچه سازی سامانه اطلاعات دانشجو پیکربندی نشده است و ویژگی تنظیمات فعالسازی سامانه جدید اطلاعات دانشجو فعال نیست."
+  a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "یک دانشجو به تازگی اقدام به ارسال مجدد %{assignment_title} در درس %{course_name}کرده است."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "یک جدول که حاوی نام طرح نمره گذاری و نمادهای ویرایش و حذف طرح است."
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "یک جدول حاوی نام طرح نمره گذاری و دکمه هایی برای ویرایش یا حذف طرح."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "یک جدول حاوی پاسخ ها و آمار مختصر در ارتباط با گزینه های پاسخ دانشجو."
@@ -13144,6 +13145,7 @@ fa:
   no_assignment_name_adbb215b: "نام تکلیف موجود نیست"
   no_assignments_with_that_name_found_1d7be1: "تکلیفی با آن نام یافت نشد"
   no_associated_terms_13bacefc: "نیمسال مرتبط موجود نیست"
+  no_attachments_found_for_the_following_ids_ids_49c9192f: "هیچ پیوستی برای شناسه‌های زیر یافت نشد: %{ids}"
   no_attributes_locked_611c5cc: "هیچ ویژگی قفل نشده"
   no_cancel_installation_db8d12d7: "خیر، نصب لغو شود"
   no_collaboration_apps_3bbd30ce: "برنامه همکاری موجود نیست"
@@ -19941,6 +19943,7 @@ fa:
     notices: 
       image_reported: "این تصویر گزارش شده است"
   user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name} یک مورد ارسالی دارای تأخیر را برای %{assignment_name} در درس %{course_name} تحویل داده است"
+  user_name_has_just_turned_in_a_re_submission_for_a_bcd6a6a5: "%{user_name} به تازگی اقدام به ارسال مجدد%{assignment_title}در درس %{course_name}کرده است."
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} شما را به یک گفتگو در کانواس افزود. برای مشاهده گفتگو، روی این پیوند: %{link} کلیک کنید."
   user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} یک پیام برای شما در کانواس ارسال کرد"
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name} یک پیام را در کانواس برای شما ارسال کرده است."
