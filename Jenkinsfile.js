@@ -48,8 +48,18 @@ def makeKarmaStage(group, ciNode, ciTotal) {
   }
 }
 
+def cleanupFn() {
+  try {
+    archiveArtifacts artifacts: 'tmp/**/*.xml'
+    junit allowEmptyResults: true, testResults: 'tmp/**/*.xml'
+    sh 'find ./tmp -path "*.xml"'
+  } finally {
+    execute 'bash/docker-cleanup.sh --allow-failure'
+  }
+}
+
 pipeline {
-  agent { label 'canvas-docker' }
+  agent none
   options { ansiColor('xterm') }
 
   environment {
@@ -61,84 +71,76 @@ pipeline {
   }
 
   stages {
-    stage('Setup') {
+    stage('Environment') {
       steps {
-        cleanAndSetup()
-        timeout(time: 10) {
-          sh 'rm -vrf ./tmp/*'
-          sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
-          sh 'docker-compose build'
-        }
-      }
-    }
-
-    stage('Test Stage Coordinator') {
-      steps {
-        timeout(time: 60) {
-          script {
-            def tests = [:]
-
-            if(env.TEST_SUITE == 'jest') {
-              tests['Jest'] = {
-                withEnv(['CONTAINER_NAME=tests-jest']) {
-                  try {
-                    credentials.withSentryCredentials {
-                      sh 'build/new-jenkins/js/tests-jest.sh'
-                    }
-                  } finally {
-                    copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-                  }
-                }
+        script {
+          protectedNode('canvas-docker', { cleanupFn() }) {
+            stage('Setup') {
+              cleanAndSetup()
+              timeout(time: 10) {
+                sh 'rm -vrf ./tmp/*'
+                checkout scm
+                sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
+                sh 'docker-compose build'
               }
             }
 
-            if(env.TEST_SUITE == 'karma') {
-              tests['Packages'] = {
-                withEnv(['CONTAINER_NAME=tests-packages']) {
-                  try {
-                    credentials.withSentryCredentials {
-                      sh 'build/new-jenkins/js/tests-packages.sh'
+            stage('Run Tests') {
+              timeout(time: 60) {
+                script {
+                  def tests = [:]
+
+                  if(env.TEST_SUITE == 'jest') {
+                    tests['Jest'] = {
+                      withEnv(['CONTAINER_NAME=tests-jest']) {
+                        try {
+                          credentials.withSentryCredentials {
+                            sh 'build/new-jenkins/js/tests-jest.sh'
+                          }
+                        } finally {
+                          copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+                        }
+                      }
                     }
-                  } finally {
-                    copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
                   }
+
+                  if(env.TEST_SUITE == 'karma') {
+                    tests['Packages'] = {
+                      withEnv(['CONTAINER_NAME=tests-packages']) {
+                        try {
+                          credentials.withSentryCredentials {
+                            sh 'build/new-jenkins/js/tests-packages.sh'
+                          }
+                        } finally {
+                          copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
+                        }
+                      }
+                    }
+
+                    tests['canvas_quizzes'] = {
+                      sh 'build/new-jenkins/js/tests-quizzes.sh'
+                    }
+
+                    for(int i = 0; i < COFFEE_NODE_COUNT; i++) {
+                      tests["Karma - Spec Group - coffee${i}"] = makeKarmaStage('coffee', i, COFFEE_NODE_COUNT)
+                    }
+
+                    for(int i = 0; i < JSG_NODE_COUNT; i++) {
+                      tests["Karma - Spec Group - jsg${i}"] = makeKarmaStage('jsg', i, JSG_NODE_COUNT)
+                    }
+
+                    ['jsa', 'jsh'].each { group ->
+                      tests["Karma - Spec Group - ${group}"] = makeKarmaStage(group, 0, DEFAULT_NODE_COUNT)
+                    }
+                  }
+
+                  parallel(tests)
                 }
               }
-
-              tests['canvas_quizzes'] = {
-                sh 'build/new-jenkins/js/tests-quizzes.sh'
-              }
-
-              for(int i = 0; i < COFFEE_NODE_COUNT; i++) {
-                tests["Karma - Spec Group - coffee${i}"] = makeKarmaStage('coffee', i, COFFEE_NODE_COUNT)
-              }
-
-              for(int i = 0; i < JSG_NODE_COUNT; i++) {
-                tests["Karma - Spec Group - jsg${i}"] = makeKarmaStage('jsg', i, JSG_NODE_COUNT)
-              }
-
-              ['jsa', 'jsh'].each { group ->
-                tests["Karma - Spec Group - ${group}"] = makeKarmaStage(group, 0, DEFAULT_NODE_COUNT)
-              }
             }
-
-            parallel(tests)
           }
         }
       }
-    }
-  }
-
-  post {
-    always {
-      script {
-        archiveArtifacts artifacts: 'tmp/**/*.xml'
-        junit allowEmptyResults: true, testResults: 'tmp/**/*.xml'
-        sh 'find ./tmp -path "*.xml"'
-      }
-    }
-    cleanup {
-      execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }
