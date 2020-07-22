@@ -90,6 +90,11 @@ module CanvasSanitize #:nodoc:
     value
   end
 
+  def self.sanitize_iframe(env)
+    node = env[:node]
+    node["sandbox"] = 'allow-scripts allow-forms'
+  end
+
   DEFAULT_PROTOCOLS = ['http', 'https', :relative].freeze
   SANITIZE = {
       :elements => [
@@ -363,6 +368,7 @@ module CanvasSanitize #:nodoc:
           /\Apadding-(?:bottom|left|right|top)\z/
       ].freeze,
       :transformers => lambda { |env|
+        CanvasSanitize.sanitize_iframe(env) if env[:node_name] == 'iframe'
         CanvasSanitize.sanitize_style(env) if env[:node]['style']
         Sanitize.clean_node!(env[:node], {:remove_contents => true}) if env[:node_name] == 'style'
       }
