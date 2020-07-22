@@ -106,18 +106,18 @@ pipeline {
     NAME = imageTagVersion()
     CANVAS_LMS_IMAGE = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms"
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
-    BUILD_IMAGE = "$BUILD_REGISTRY_FQDN/jenkins/canvas-lms"
+    BUILD_IMAGE = configuration.buildRegistryPath()
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
 
     // e.g. postgres-9.5-ruby-2.6
-    TAG_SUFFIX = "postgres-$POSTGRES-ruby-$RUBY"
+    TAG_SUFFIX = imageTag.suffix()
 
     // this is found in the PUBLISHABLE_TAG_SUFFIX config file on jenkins
     PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffixNew()
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
-    PATCHSET_TAG = "$BUILD_IMAGE:$NAME-$TAG_SUFFIX"
+    PATCHSET_TAG = imageTag.patchset()
 
     // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-2.6
     PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-$PUBLISHABLE_TAG_SUFFIX"
