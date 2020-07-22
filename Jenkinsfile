@@ -236,7 +236,7 @@ pipeline {
         timeout(time: 30) {
           skipIfPreviouslySuccessful('docker-build-and-push') {
             script {
-              if (configuration.getBoolean('skip-docker-build')) {
+              if (env.GERRIT_EVENT_TYPE != 'change-merged' && configuration.getBoolean('skip-docker-build')) {
                 sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                 sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
               } else {
