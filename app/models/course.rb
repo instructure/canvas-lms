@@ -3549,7 +3549,7 @@ class Course < ActiveRecord::Base
   end
 
   def resolved_outcome_calculation_method
-    outcome_calculation_method || account&.resolved_outcome_calculation_method
+    outcome_calculation_method&.active? ? outcome_calculation_method : account&.resolved_outcome_calculation_method
   end
 
   private

@@ -63,6 +63,15 @@ describe Account do
       expect(root_account.resolved_outcome_calculation_method).to eq nil
       expect(subaccount.resolved_outcome_calculation_method).to eq nil
     end
+
+    it "ignores soft deleted calculation methods" do
+      root_account = Account.create!
+      method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      subaccount = root_account.sub_accounts.create!
+      submethod = OutcomeCalculationMethod.create! context: subaccount, calculation_method: :latest, workflow_state: :deleted
+      expect(subaccount.outcome_calculation_method).to eq submethod
+      expect(subaccount.resolved_outcome_calculation_method).to eq method
+    end
   end
 
   it "should provide a list of courses" do

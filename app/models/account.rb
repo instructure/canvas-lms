@@ -187,7 +187,7 @@ class Account < ActiveRecord::Base
   end
 
   def resolved_outcome_calculation_method
-    outcome_calculation_method || parent_account&.resolved_outcome_calculation_method
+    outcome_calculation_method&.active? ? outcome_calculation_method : parent_account&.resolved_outcome_calculation_method
   end
 
   include ::Account::Settings

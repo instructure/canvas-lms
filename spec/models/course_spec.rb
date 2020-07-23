@@ -1600,6 +1600,15 @@ describe Course do
       expect(course.outcome_calculation_method).to eq nil
       expect(course.resolved_outcome_calculation_method).to eq nil
     end
+
+    it "ignores soft deleted calculation methods" do
+      root_account = Account.create!
+      account_method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      course = course_model(account: root_account)
+      course_method = OutcomeCalculationMethod.create! context: course, calculation_method: :latest, workflow_state: :deleted
+      expect(course.outcome_calculation_method).to eq course_method
+      expect(course.resolved_outcome_calculation_method).to eq account_method
+    end
   end
 end
 
