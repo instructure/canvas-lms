@@ -622,6 +622,31 @@ describe Group do
       group.add_user(user1)
       expect(group).to have_common_section_with_user(user2)
     end
+
+    it "should be true if one member is inactive" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      e = Enrollment.where(user_id: user1.id, course_id: @course.id)
+      e.update(workflow_state: 'inactive')
+      group.add_user(user2)
+      expect(group).to have_common_section_with_user(user2)
+    end
+
+    it "should be true if one member is completed" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      Enrollment.where(user_id: user1.id, course_id: @course.id).update(workflow_state: 'completed')
+      group.add_user(user2)
+      expect(group).to have_common_section_with_user(user2)
+    end
   end
 
   context "tabs_available" do
