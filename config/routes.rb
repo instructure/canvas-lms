@@ -449,6 +449,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    post 'collapse_all_modules' => 'context_modules#toggle_collapse_all'
     resources :content_exports, only: [:create, :index, :destroy, :show]
     get 'offline_web_exports' => 'courses#offline_web_exports'
     post 'start_offline_web_export' => 'courses#start_offline_web_export'

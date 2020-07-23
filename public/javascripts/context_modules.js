@@ -2267,6 +2267,18 @@ function itemContentKey(model) {
   }
 }
 
+const setExpandAllButton = function() {
+  let someVisible = false
+  $('.context_module').each(function() {
+    if ($(this).find('.content:visible').length > 0) {
+      someVisible = true
+    }
+  })
+  $('#expand_collapse_all').text(someVisible ? I18n.t('Collapse All') : I18n.t('Expand All'))
+  $('#expand_collapse_all').data('expand', !someVisible)
+  $('#expand_collapse_all').attr('aria-expanded', someVisible ? 'true' : 'false')
+}
+
 var toggleModuleCollapse = function(event) {
   event.preventDefault()
   const expandCallback = null
@@ -2294,6 +2306,7 @@ var toggleModuleCollapse = function(event) {
         $module.find('.expand_module_link').focus()
         $.screenReaderFlashMessage(I18n.t('Collapsed'))
       }
+      setExpandAllButton()
       if (expandCallback && $.isFunction(expandCallback)) {
         expandCallback()
       }
@@ -2332,6 +2345,37 @@ var toggleModuleCollapse = function(event) {
     toggle()
   }
 }
+
+$('#expand_collapse_all').click(function() {
+  const shouldExpand = $(this).data('expand')
+
+  $(this).text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
+  $(this).data('expand', !shouldExpand)
+  $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
+
+  $('.context_module').each(function() {
+    const $module = $(this)
+    if (
+      (shouldExpand && $module.find('.content:visible').length === 0) ||
+      (!shouldExpand && $module.find('.content:visible').length > 0)
+    ) {
+      const callback = function() {
+        $module.find('.collapse_module_link').css('display', shouldExpand ? 'inline-block' : 'none')
+        $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
+        $module.find('.footer .manage_module').css('display', '')
+        $module.toggleClass('collapsed_module', shouldExpand)
+      }
+      $module.find('.content').slideToggle({
+        queue: false,
+        done: callback()
+      })
+    }
+  })
+
+  const url = $(this).data('url')
+  const collapse = shouldExpand ? '0' : '1'
+  $.ajaxJSON(url, 'POST', {collapse})
+})
 
 // THAT IS THE END
 
@@ -2570,6 +2614,8 @@ $(document).ready(function() {
   $contextModules.each(function() {
     modules.updateProgressionState($(this))
   })
+
+  setExpandAllButton()
 
   function setExternalToolTray(tool, moduleData, selectable, returnFocusTo) {
     const handleDismiss = () => {

@@ -45,6 +45,7 @@
 <div class="header-bar">
   <div class="header-bar-right header-bar__module-layout">
     <div class="header-bar-right__buttons">
+      <button class="btn" id="expand_collapse_all" aria-expanded="false" data-expand="false" data-url="<%= context_url(@context, :context_url) %>/collapse_all_modules"><%= t('Collapse All') %></button>
       <% if @can_view_grades %>
         <a class="btn module_progressions_link" href="<%= progressions_course_context_modules_path(@context) %>"><%= t('links.student_progress', 'View Progress') %></a>
       <% end %>
