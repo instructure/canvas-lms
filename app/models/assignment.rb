@@ -449,7 +449,6 @@ class Assignment < ActiveRecord::Base
     vericite_enabled
     turnitin_settings
     allowed_extensions
-    muted
     could_be_locked
     freeze_on_copy
     copied

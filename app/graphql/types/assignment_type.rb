@@ -221,8 +221,6 @@ module Types
       "permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])",
       null: true
 
-    field :muted, Boolean, method: :muted?, null: false
-
     field :state, AssignmentStateType, method: :workflow_state, null: false
 
     field :quiz, Types::QuizType, null: true

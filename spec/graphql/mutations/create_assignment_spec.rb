@@ -49,7 +49,6 @@ describe Mutations::CreateAssignment do
             assignmentGroup { _id }
             groupSet { _id }
             allowedAttempts
-            muted
             onlyVisibleToOverrides
             submissionTypes
             gradeGroupStudentsIndividually
@@ -104,7 +103,6 @@ describe Mutations::CreateAssignment do
     ["gradingType", :grading_type, "points", "not_graded", "not_graded"],
     ["allowedExtensions", :allowed_extensions, [], '[ "docs", "blah" ]', [ "docs", "blah" ]],
     ["allowedAttempts", :allowed_attempts, nil, 10, 10],
-    ["muted", :muted?, false, true, true],
     ["onlyVisibleToOverrides", :only_visible_to_overrides, false, true, true],
     ["submissionTypes", :submission_types, "none", '[ discussion_topic, not_graded ]', [ "discussion_topic", "not_graded" ], "discussion_topic,not_graded"],
     ["gradeGroupStudentsIndividually", :grade_group_students_individually, false, true, true],
@@ -165,7 +163,7 @@ describe Mutations::CreateAssignment do
   it "creates a peer review assignment" do
     result = execute_with_input <<~GQL
       courseId: "#{@course.to_param}"
-      name: "peer review test assignment" 
+      name: "peer review test assignment"
       moderatedGrading: {
         graderCount: 1
       }

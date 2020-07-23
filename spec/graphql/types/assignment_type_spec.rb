@@ -41,7 +41,6 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("state")).to eq assignment.workflow_state
     expect(assignment_type.resolve("onlyVisibleToOverrides")).to eq assignment.only_visible_to_overrides
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.id.to_s
-    expect(assignment_type.resolve("muted")).to eq assignment.muted?
     expect(assignment_type.resolve("allowedExtensions")).to eq assignment.allowed_extensions
     expect(assignment_type.resolve("createdAt").to_datetime).to eq assignment.created_at.to_s.to_datetime
     expect(assignment_type.resolve("updatedAt").to_datetime).to eq assignment.updated_at.to_s.to_datetime

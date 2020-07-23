@@ -1007,10 +1007,6 @@ class UsersController < ApplicationController
   #         "unlock_at"=>nil,
   #         "course_id"=>12942,
   #         "submission_types"=>["none"],
-  #         // [DEPRECATED] This property is deprecated, effective 2020-06-03 (notice given 2020-02-26):
-  #         // A new attribute will be included in a future release to determine whether an assignment has feedback
-  #         // that has not been posted to students.
-  #         "muted"=>false,
   #         "needs_grading_count"=>0,
   #         "html_url"=>"http://www.example.com/courses/12942/assignments/9729"
   #       },

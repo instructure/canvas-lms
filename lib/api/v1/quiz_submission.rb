@@ -124,4 +124,3 @@ module Api::V1::QuizSubmission
     submission_zip(quiz, latest_submission)
   end
 end
-
