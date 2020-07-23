@@ -1973,7 +1973,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/outcome_results', action: :index, as: 'course_outcome_results'
     end
 
-    scope(controller: :outcomes_import_api) do
+    scope(controller: :outcomes_academic_benchmark_import_api) do
       # These can be uncommented when implemented
       # get  "global/outcomes_import",            action: :index
       # get  "global/outcomes_import/:id",        action: :show

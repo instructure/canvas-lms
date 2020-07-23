@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class OutcomesImportApiController < ApplicationController
+class OutcomesAcademicBenchmarkImportApiController < ApplicationController
   include Api::V1::Outcome
   include Api::V1::ContentMigration
 
