@@ -37,10 +37,10 @@
 
     <div class="col-xs-12 col-lg-6">
       <div class="ic-Form-control">
-        <label for="account_notification_icon" class="ic-Label">
+        <label for="<%= "account_notification_icon_#{announcement.id}" %>" class="ic-Label">
           <%= t("Announcement type") %>
         </label>
-        <select id="account_notification_icon" class="ic-Input" name="account_notification[icon]">
+        <select id="<%= "account_notification_icon_#{announcement.id}" %>" class="ic-Input" name="account_notification[icon]">
           <%= options_for_select([[t("information"), "information", {:class=>"information"}],
             [t("error"), "error", {:class=>"error"}],
             [t("warning"), "warning", {:class=>"warning"}],
