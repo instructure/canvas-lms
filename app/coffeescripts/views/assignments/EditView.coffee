@@ -438,7 +438,13 @@ export default class EditView extends ValidatedFormView
       $("#mc_external_data_objectives").text(mc_ext.objectives)
       $("#mc_external_data_tracker").text(mc_ext.trackerName)
       $("#mc_external_data_tracker_alignment").text(mc_ext.trackerAlignment)
-      $("#mc_external_data_students").text(mc_ext.studentCount + " " + I18n.t('Students'))
+
+      student_count_text = I18n.t({
+        zero: '0 Students',
+        one: '1 Student',
+        other: '%{count} Students'
+      }, {count: mc_ext.studentCount})
+      $("#mc_external_data_students").text(student_count_text)
 
   handleOnlineSubmissionTypeChange: (env) =>
     showConfigTools = @$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).attr('checked') ||
