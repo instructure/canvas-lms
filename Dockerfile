@@ -179,9 +179,11 @@ RUN set -eux; \
   && yarn cache clean
 
 FROM yarn-only AS webpack-final
+ARG JS_BUILD_NO_UGLIFY=0
+
 COPY --chown=docker:docker . ${APP_HOME}
 
 RUN set -exu; \
   \
-  COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rails canvas:compile_assets \
+  COMPILE_ASSETS_NPM_INSTALL=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets \
   && yarn cache clean

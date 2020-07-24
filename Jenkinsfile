@@ -288,7 +288,11 @@ pipeline {
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                     sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                   } else {
-                    sh 'build/new-jenkins/docker-build.sh'
+                    withEnv([
+                      "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
+                    ]) {
+                      sh 'build/new-jenkins/docker-build.sh'
+                    }
                     sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_GEMS_PATCHSET_IMAGE"
                     sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_PATCHSET_IMAGE"
                     sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_PATCHSET_IMAGE"

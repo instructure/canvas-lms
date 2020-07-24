@@ -51,6 +51,7 @@ DOCKER_BUILDKIT=1 docker build \
 DOCKER_BUILDKIT=1 docker build \
   ${commonRubyArgs[@]} \
   ${commonNodeArgs[@]} \
+  --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" \
   --tag "$PATCHSET_TAG" \
   --target webpack-final \
   "$WORKSPACE"
