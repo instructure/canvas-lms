@@ -37,16 +37,9 @@ def buildParameters = [
 
 library "canvas-builds-library"
 
-def runDatadogMetric(name, body) {
-  def dd = load('build/new-jenkins/groovy/datadog.groovy')
-  dd.runDataDogForMetric(name,body)
-}
-
 def skipIfPreviouslySuccessful(name, block) {
-   runDatadogMetric(name) {
-    def successes = load('build/new-jenkins/groovy/successes.groovy')
-    successes.skipIfPreviouslySuccessful(name, true, block)
-  }
+  def successes = load('build/new-jenkins/groovy/successes.groovy')
+  successes.skipIfPreviouslySuccessful(name, true, block)
 }
 
 def wrapBuildExecution(jobName, parameters, propagate, urlExtra) {
@@ -145,47 +138,45 @@ pipeline {
       steps {
         timeout(time: 5) {
           script {
-            runDatadogMetric("Setup") {
-              cleanAndSetup()
+            cleanAndSetup()
 
-              buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
-              buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
-              buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
-              if (env.CANVAS_LMS_REFSPEC) {
-                // the plugin builds require the canvas lms refspec to be different. so only
-                // set this refspec if the main build is requesting it to be set.
-                // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
-                buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
-              }
-
-              pullGerritRepo('gerrit_builder', 'master', '.')
-              gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
-              echo "Plugin list: ${gems}"
-              // fetch plugins
-              gems.each { gem ->
-                if (env.GERRIT_PROJECT == gem) {
-                  /* this is the commit we're testing */
-                  pullGerritRepo(gem, env.GERRIT_REFSPEC, 'gems/plugins')
-                } else {
-                  pullGerritRepo(gem, 'master', 'gems/plugins')
-                }
-              }
-              pullGerritRepo("qti_migration_tool", "master", "vendor")
-
-              sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
-              sh 'rm -v config/cache_store.yml'
-              sh 'rm -vr gerrit_builder'
-              sh 'rm -v config/database.yml'
-              sh 'rm -v config/security.yml'
-              sh 'rm -v config/selenium.yml'
-              sh 'rm -v config/file_store.yml'
-              sh 'cp -v docker-compose/config/selenium.yml config/'
-              sh 'cp -vR docker-compose/config/new-jenkins/* config/'
-              sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
-              sh 'cp -v config/domain.yml.example config/domain.yml'
-              sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
-              sh 'cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml'
+            buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
+            buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
+            buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
+            if (env.CANVAS_LMS_REFSPEC) {
+              // the plugin builds require the canvas lms refspec to be different. so only
+              // set this refspec if the main build is requesting it to be set.
+              // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
+              buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
             }
+
+            pullGerritRepo('gerrit_builder', 'master', '.')
+            gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
+            echo "Plugin list: ${gems}"
+            // fetch plugins
+            gems.each { gem ->
+              if (env.GERRIT_PROJECT == gem) {
+                /* this is the commit we're testing */
+                pullGerritRepo(gem, env.GERRIT_REFSPEC, 'gems/plugins')
+              } else {
+                pullGerritRepo(gem, 'master', 'gems/plugins')
+              }
+            }
+            pullGerritRepo("qti_migration_tool", "master", "vendor")
+
+            sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
+            sh 'rm -v config/cache_store.yml'
+            sh 'rm -vr gerrit_builder'
+            sh 'rm -v config/database.yml'
+            sh 'rm -v config/security.yml'
+            sh 'rm -v config/selenium.yml'
+            sh 'rm -v config/file_store.yml'
+            sh 'cp -v docker-compose/config/selenium.yml config/'
+            sh 'cp -vR docker-compose/config/new-jenkins/* config/'
+            sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
+            sh 'cp -v config/domain.yml.example config/domain.yml'
+            sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
+            sh 'cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml'
           }
         }
       }
@@ -196,36 +187,34 @@ pipeline {
       steps {
         timeout(time: 2) {
           script {
-            runDatadogMetric("Rebase") {
-              credentials.withGerritCredentials({ ->
-                sh '''#!/bin/bash
-                  set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+            credentials.withGerritCredentials({ ->
+              sh '''#!/bin/bash
+                set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-                  GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                    git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
+                GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                  git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
 
-                  git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
-                  git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
+                git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
+                git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
 
-                  # this helps current build issues where cleanup is needed before proceeding.
-                  # however the later git rebase --abort should be enough once this has
-                  # been on jenkins for long enough to hit all nodes, maybe a couple days?
-                  if [ -d .git/rebase-merge ]; then
-                    echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
-                    git rebase --abort
-                    git checkout $GERRIT_REFSPEC
-                  fi
+                # this helps current build issues where cleanup is needed before proceeding.
+                # however the later git rebase --abort should be enough once this has
+                # been on jenkins for long enough to hit all nodes, maybe a couple days?
+                if [ -d .git/rebase-merge ]; then
+                  echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
+                  git rebase --abort
+                  git checkout $GERRIT_REFSPEC
+                fi
 
-                  # store exit_status inline to  ensures the script doesn't exit here on failures
-                  git rebase --preserve-merges origin/$GERRIT_BRANCH; exit_status=$?
-                  if [ $exit_status != 0 ]; then
-                    echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
-                    git rebase --abort
-                    exit $exit_status
-                  fi
-                '''
-              })
-            }
+                # store exit_status inline to  ensures the script doesn't exit here on failures
+                git rebase --preserve-merges origin/$GERRIT_BRANCH; exit_status=$?
+                if [ $exit_status != 0 ]; then
+                  echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
+                  git rebase --abort
+                  exit $exit_status
+                fi
+              '''
+            })
           }
         }
       }
@@ -376,25 +365,23 @@ pipeline {
       steps {
         timeout(time: 10) {
           script {
-            runDatadogMetric("publishImageOnMerge") {
-              // Retriggers won't have an image to tag/push, pull that
-              // image if doesn't exist. If image is not found it will
-              // return NULL
-              if (!sh (script: 'docker images -q $RUBY_PATCHSET_IMAGE')) {
-                sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_PATCHSET_IMAGE'
-              }
-
-              if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
-                sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
-              }
-
-              // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
-              sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
-              sh 'docker tag $RUBY_PATCHSET_IMAGE $RUBY_MERGE_IMAGE'
-              // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
-              sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
-              sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_MERGE_IMAGE'
+            // Retriggers won't have an image to tag/push, pull that
+            // image if doesn't exist. If image is not found it will
+            // return NULL
+            if (!sh (script: 'docker images -q $RUBY_PATCHSET_IMAGE')) {
+              sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_PATCHSET_IMAGE'
             }
+
+            if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
+              sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
+            }
+
+            // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
+            sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
+            sh 'docker tag $RUBY_PATCHSET_IMAGE $RUBY_MERGE_IMAGE'
+            // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
+            sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
+            sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_MERGE_IMAGE'
           }
         }
       }
@@ -404,10 +391,8 @@ pipeline {
       when { expression { env.GERRIT_EVENT_TYPE == 'change-merged' } }
       steps {
         script {
-            runDatadogMetric("dependencyCheck") {
-              def reports = load 'build/new-jenkins/groovy/reports.groovy'
-              reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
-            }
+          def reports = load 'build/new-jenkins/groovy/reports.groovy'
+          reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
         }
       }
     }
@@ -415,10 +400,8 @@ pipeline {
     stage('Mark Build as Successful') {
       steps {
         script {
-          runDatadogMetric("markBuildAsSuccessful") {
-            def successes = load 'build/new-jenkins/groovy/successes.groovy'
-            successes.markBuildAsSuccessful()
-          }
+          def successes = load 'build/new-jenkins/groovy/successes.groovy'
+          successes.markBuildAsSuccessful()
         }
       }
     }
@@ -448,8 +431,6 @@ pipeline {
           rspec.uploadSeleniumFailures()
           rspec.uploadRSpecFailures()
           load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
-          def splunk = load 'build/new-jenkins/groovy/splunk.groovy'
-          splunk.upload([splunk.eventForBuildDuration(currentBuild.duration)])
         }
       }
     }
