@@ -124,7 +124,10 @@ export default function register(editor) {
         let svg = allIcons['list-bull-default']
         if (isInList) {
           const selected = selectedListType(Object.keys(listTypes), editor)
-          svg = allIcons[listTypes[selected].icon]
+          const icon = allIcons[listTypes[selected]?.icon]
+          if (icon !== undefined) {
+            svg = icon
+          }
         }
         $svgContainer.html(svg)
       }
