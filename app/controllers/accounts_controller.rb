@@ -1543,6 +1543,7 @@ class AccountsController < ApplicationController
                                    :edit_institution_email, :enable_alerts, :enable_eportfolios, :enable_course_catalog,
                                    :limit_parent_app_web_access,
                                    {:enable_offline_web_export => [:value]}.freeze,
+                                   {:disable_rce_media_uploads => [:value]}.freeze,
                                    :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,
                                    :equella_teaser, :external_notification_warning, :global_includes,
                                    :google_docs_domain, :help_link_icon, :help_link_name,

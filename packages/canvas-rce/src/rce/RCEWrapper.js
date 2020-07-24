@@ -949,6 +949,11 @@ class RCEWrapper extends React.Component {
   wrapOptions(options = {}) {
     const setupCallback = options.setup
 
+    const canvasPlugins = ['instructure_links', 'instructure_image', 'instructure_documents']
+    if (!ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED) {
+      canvasPlugins.splice(2, 0, 'instructure_record')
+    }
+
     return {
       ...options,
 
@@ -1003,14 +1008,7 @@ class RCEWrapper extends React.Component {
         },
         {
           name: formatMessage('Canvas Plugins'),
-          items: [
-            'instructure_links',
-            'instructure_image',
-            'instructure_record',
-            'instructure_documents',
-            ...this.ltiToolFavorites,
-            'lti_tool_dropdown'
-          ]
+          items: [...canvasPlugins, ...this.ltiToolFavorites, 'lti_tool_dropdown']
         },
         {
           name: formatMessage('Miscellaneous and Apps'),
