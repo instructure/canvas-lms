@@ -86,8 +86,36 @@ def isPatchsetSlackableOnFailure() {
   env.SLACK_MESSAGE_ON_FAILURE == 'true' && env.GERRIT_EVENT_TYPE == 'change-merged'
 }
 
+def cleanupFn(status) {
+  try {
+    ignoreBuildNeverStartedError {
+      def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
+      rspec.uploadJunitReports()
+      rspec.uploadSeleniumFailures()
+      rspec.uploadRSpecFailures()
+      load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
+    }
+
+    if(status == 'FAILURE' && isPatchsetSlackableOnFailure()) {
+      def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
+      def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
+      def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
+      def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. " : ''
+      slackSend(
+        channel: '#canvas_builds',
+        color: 'danger',
+        message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
+      )
+    }
+  } finally {
+    ignoreBuildNeverStartedError {
+      execute 'bash/docker-cleanup.sh --allow-failure'
+    }
+  }
+}
+
 pipeline {
-  agent { label 'canvas-docker' }
+  agent none
   options {
     ansiColor('xterm')
     timestamps()
@@ -134,309 +162,254 @@ pipeline {
   }
 
   stages {
-    stage('Setup') {
-      steps {
-        timeout(time: 5) {
-          script {
-            cleanAndSetup()
-
-            buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
-            buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
-            buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
-            if (env.CANVAS_LMS_REFSPEC) {
-              // the plugin builds require the canvas lms refspec to be different. so only
-              // set this refspec if the main build is requesting it to be set.
-              // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
-              buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
-            }
-
-            pullGerritRepo('gerrit_builder', 'master', '.')
-            gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
-            echo "Plugin list: ${gems}"
-            // fetch plugins
-            gems.each { gem ->
-              if (env.GERRIT_PROJECT == gem) {
-                /* this is the commit we're testing */
-                pullGerritRepo(gem, env.GERRIT_REFSPEC, 'gems/plugins')
-              } else {
-                pullGerritRepo(gem, 'master', 'gems/plugins')
-              }
-            }
-            pullGerritRepo("qti_migration_tool", "master", "vendor")
-
-            sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
-            sh 'rm -v config/cache_store.yml'
-            sh 'rm -vr gerrit_builder'
-            sh 'rm -v config/database.yml'
-            sh 'rm -v config/security.yml'
-            sh 'rm -v config/selenium.yml'
-            sh 'rm -v config/file_store.yml'
-            sh 'cp -v docker-compose/config/selenium.yml config/'
-            sh 'cp -vR docker-compose/config/new-jenkins/* config/'
-            sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
-            sh 'cp -v config/domain.yml.example config/domain.yml'
-            sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
-            sh 'cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml'
-          }
-        }
-      }
-    }
-
-    stage('Rebase') {
-      when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms' } }
-      steps {
-        timeout(time: 2) {
-          script {
-            credentials.withGerritCredentials({ ->
-              sh '''#!/bin/bash
-                set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-
-                GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                  git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
-
-                git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
-                git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
-
-                # this helps current build issues where cleanup is needed before proceeding.
-                # however the later git rebase --abort should be enough once this has
-                # been on jenkins for long enough to hit all nodes, maybe a couple days?
-                if [ -d .git/rebase-merge ]; then
-                  echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
-                  git rebase --abort
-                  git checkout $GERRIT_REFSPEC
-                fi
-
-                # store exit_status inline to  ensures the script doesn't exit here on failures
-                git rebase --preserve-merges origin/$GERRIT_BRANCH; exit_status=$?
-                if [ $exit_status != 0 ]; then
-                  echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
-                  git rebase --abort
-                  exit $exit_status
-                fi
-              '''
-            })
-          }
-        }
-      }
-    }
-
-    stage('Build Docker Image') {
-      steps {
-        timeout(time: 30) {
-          skipIfPreviouslySuccessful('docker-build-and-push') {
-            script {
-              if (env.GERRIT_EVENT_TYPE != 'change-merged' && configuration.getBoolean('skip-docker-build')) {
-                sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
-                sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
-              } else {
-                if (!configuration.getBoolean('skip-cache')) {
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG || true"
-                }
-                sh 'build/new-jenkins/docker-build.sh'
-                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_PATCHSET_IMAGE"
-              }
-              sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
-              if (isPatchsetPublishable()) {
-                sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
-                sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
-              }
-            }
-          }
-        }
-      }
-    }
-
-    stage('Parallel Run Tests') {
+    stage('Environment') {
       steps {
         script {
-          def stages = [:]
-          if (env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms') {
-            echo 'adding Linters'
-            stages['Linters'] = {
-              skipIfPreviouslySuccessful("linters") {
-                credentials.withGerritCredentials {
-                  sh 'build/new-jenkins/linters/run-gergich.sh'
+          protectedNode('canvas-docker', { status -> cleanupFn(status) }) {
+            stage('Setup') {
+              timeout(time: 5) {
+                cleanAndSetup()
+                checkout scm
+
+                buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
+                buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
+                buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
+                if (env.CANVAS_LMS_REFSPEC) {
+                  // the plugin builds require the canvas lms refspec to be different. so only
+                  // set this refspec if the main build is requesting it to be set.
+                  // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
+                  buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
                 }
-                if (env.MASTER_BOUNCER_RUN == '1' && env.GERRIT_EVENT_TYPE == 'patchset-created') {
-                  credentials.withMasterBouncerCredentials {
-                    sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+
+                pullGerritRepo('gerrit_builder', 'master', '.')
+                gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
+                echo "Plugin list: ${gems}"
+                // fetch plugins
+                gems.each { gem ->
+                  if (env.GERRIT_PROJECT == gem) {
+                    /* this is the commit we're testing */
+                    pullGerritRepo(gem, env.GERRIT_REFSPEC, 'gems/plugins')
+                  } else {
+                    pullGerritRepo(gem, 'master', 'gems/plugins')
+                  }
+                }
+                pullGerritRepo("qti_migration_tool", "master", "vendor")
+
+                sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
+                sh 'rm -v config/cache_store.yml'
+                sh 'rm -vr gerrit_builder'
+                sh 'rm -v config/database.yml'
+                sh 'rm -v config/security.yml'
+                sh 'rm -v config/selenium.yml'
+                sh 'rm -v config/file_store.yml'
+                sh 'cp -v docker-compose/config/selenium.yml config/'
+                sh 'cp -vR docker-compose/config/new-jenkins/* config/'
+                sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
+                sh 'cp -v config/domain.yml.example config/domain.yml'
+                sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
+                sh 'cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml'
+              }
+            }
+
+            if(env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms') {
+              stage('Rebase') {
+                timeout(time: 2) {
+                  credentials.withGerritCredentials({ ->
+                    sh '''#!/bin/bash
+                      set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+
+                      GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                        git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
+
+                      git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
+                      git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
+
+                      # this helps current build issues where cleanup is needed before proceeding.
+                      # however the later git rebase --abort should be enough once this has
+                      # been on jenkins for long enough to hit all nodes, maybe a couple days?
+                      if [ -d .git/rebase-merge ]; then
+                        echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
+                        git rebase --abort
+                        git checkout $GERRIT_REFSPEC
+                      fi
+
+                      # store exit_status inline to  ensures the script doesn't exit here on failures
+                      git rebase --preserve-merges origin/$GERRIT_BRANCH; exit_status=$?
+                      if [ $exit_status != 0 ]; then
+                        echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
+                        git rebase --abort
+                        exit $exit_status
+                      fi
+                    '''
+                  })
+                }
+              }
+            }
+
+            stage('Build Docker Image') {
+              timeout(time: 30) {
+                skipIfPreviouslySuccessful('docker-build-and-push') {
+                  if (env.GERRIT_EVENT_TYPE != 'change-merged' && configuration.getBoolean('skip-docker-build')) {
+                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
+                    sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
+                  } else {
+                    if (!configuration.getBoolean('skip-cache')) {
+                      sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG || true"
+                    }
+                    sh 'build/new-jenkins/docker-build.sh'
+                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_PATCHSET_IMAGE"
+                  }
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
+                  if (isPatchsetPublishable()) {
+                    sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
+                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
                   }
                 }
               }
             }
-          }
 
-          echo 'adding Consumer Smoke Test'
-          stages['Consumer Smoke Test'] = {
-            skipIfPreviouslySuccessful("consumer-smoke-test") {
-              sh 'build/new-jenkins/consumer-smoke-test.sh'
+            stage('Parallel Run Tests') {
+              def stages = [:]
+              if (env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms') {
+                echo 'adding Linters'
+                stages['Linters'] = {
+                  skipIfPreviouslySuccessful("linters") {
+                    credentials.withGerritCredentials {
+                      sh 'build/new-jenkins/linters/run-gergich.sh'
+                    }
+                    if (env.MASTER_BOUNCER_RUN == '1' && env.GERRIT_EVENT_TYPE == 'patchset-created') {
+                      credentials.withMasterBouncerCredentials {
+                        sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+                      }
+                    }
+                  }
+                }
+              }
+
+              echo 'adding Consumer Smoke Test'
+              stages['Consumer Smoke Test'] = {
+                skipIfPreviouslySuccessful("consumer-smoke-test") {
+                  sh 'build/new-jenkins/consumer-smoke-test.sh'
+                }
+              }
+
+              echo 'adding Vendored Gems'
+              stages['Vendored Gems'] = {
+                skipIfPreviouslySuccessful("vendored-gems") {
+                  wrapBuildExecution('/Canvas/test-suites/vendored-gems', buildParameters + [
+                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                  ], true, "")
+                }
+              }
+
+              echo 'adding Javascript (Jest)'
+              stages['Javascript (Jest)'] = {
+                skipIfPreviouslySuccessful("javascript_jest") {
+                  wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
+                    string(name: 'TEST_SUITE', value: "jest"),
+                  ], true, "testReport")
+                }
+              }
+
+              echo 'adding Javascript (Karma)'
+              stages['Javascript (Karma)'] = {
+                skipIfPreviouslySuccessful("javascript_karma") {
+                  wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
+                    string(name: 'TEST_SUITE', value: "karma"),
+                  ], true, "testReport")
+                }
+              }
+
+              echo 'adding Contract Tests'
+              stages['Contract Tests'] = {
+                skipIfPreviouslySuccessful("contract-tests") {
+                  wrapBuildExecution('/Canvas/test-suites/contract-tests', buildParameters + [
+                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                  ], true, "")
+                }
+              }
+
+              if (env.GERRIT_EVENT_TYPE != 'change-merged') {
+                echo 'adding Flakey Spec Catcher'
+                stages['Flakey Spec Catcher'] = {
+                  skipIfPreviouslySuccessful("flakey-spec-catcher") {
+                    def propagate = configuration.fscPropagate()
+                    echo "fsc propagation: $propagate"
+                    wrapBuildExecution('/Canvas/test-suites/flakey-spec-catcher', buildParameters  + [
+                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                    ], propagate, "")
+                  }
+                }
+              }
+
+              // // keep this around in case there is changes to the subbuilds that need to happen
+              // // and you have no other way to test it except by running a test build.
+              // stages['Test Subbuild'] = {
+              //   skipIfPreviouslySuccessful("test-subbuild") {
+              //     build(job: '/Canvas/proofs-of-concept/test-subbuild', parameters: buildParameters)
+              //   }
+              // }
+
+              // // Don't run these on all patch sets until we have them ready to report results.
+              // // Uncomment stage to run when developing.
+              // stages['Xbrowser'] = {
+              //   skipIfPreviouslySuccessful("xbrowser") {
+              //     build(job: '/Canvas/proofs-of-concept/xbrowser', propagate: false, parameters: buildParameters)
+              //   }
+              // }
+
+              def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
+              distribution.stashBuildScripts()
+
+              distribution.addRSpecSuites(stages)
+              distribution.addSeleniumSuites(stages)
+
+              parallel(stages)
             }
-          }
 
-          echo 'adding Vendored Gems'
-          stages['Vendored Gems'] = {
-            skipIfPreviouslySuccessful("vendored-gems") {
-              wrapBuildExecution('/Canvas/test-suites/vendored-gems', buildParameters + [
-                string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-              ], true, "")
-            }
-          }
+            if(env.GERRIT_EVENT_TYPE == 'change-merged' && isPatchsetPublishable()) {
+              stage('Publish Image on Merge') {
+                timeout(time: 10) {
+                  // Retriggers won't have an image to tag/push, pull that
+                  // image if doesn't exist. If image is not found it will
+                  // return NULL
+                  if (!sh (script: 'docker images -q $RUBY_PATCHSET_IMAGE')) {
+                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_PATCHSET_IMAGE'
+                  }
 
-          echo 'adding Javascript (Jest)'
-          stages['Javascript (Jest)'] = {
-            skipIfPreviouslySuccessful("javascript_jest") {
-              wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
-                string(name: 'TEST_SUITE', value: "jest"),
-              ], true, "testReport")
-            }
-          }
+                  if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
+                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
+                  }
 
-          echo 'adding Javascript (Karma)'
-          stages['Javascript (Karma)'] = {
-            skipIfPreviouslySuccessful("javascript_karma") {
-              wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
-                string(name: 'TEST_SUITE', value: "karma"),
-              ], true, "testReport")
-            }
-          }
-
-          echo 'adding Contract Tests'
-          stages['Contract Tests'] = {
-            skipIfPreviouslySuccessful("contract-tests") {
-              wrapBuildExecution('/Canvas/test-suites/contract-tests', buildParameters + [
-                string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-              ], true, "")
-            }
-          }
-
-          if (env.GERRIT_EVENT_TYPE != 'change-merged') {
-            echo 'adding Flakey Spec Catcher'
-            stages['Flakey Spec Catcher'] = {
-              skipIfPreviouslySuccessful("flakey-spec-catcher") {
-                def propagate = configuration.fscPropagate()
-                echo "fsc propagation: $propagate"
-                wrapBuildExecution('/Canvas/test-suites/flakey-spec-catcher', buildParameters  + [
-                  string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                  string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                  string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                ], propagate, "")
+                  // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
+                  sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
+                  sh 'docker tag $RUBY_PATCHSET_IMAGE $RUBY_MERGE_IMAGE'
+                  // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_MERGE_IMAGE'
+                }
               }
             }
-          }
 
-          // // keep this around in case there is changes to the subbuilds that need to happen
-          // // and you have no other way to test it except by running a test build.
-          // stages['Test Subbuild'] = {
-          //   skipIfPreviouslySuccessful("test-subbuild") {
-          //     build(job: '/Canvas/proofs-of-concept/test-subbuild', parameters: buildParameters)
-          //   }
-          // }
-
-          // // Don't run these on all patch sets until we have them ready to report results.
-          // // Uncomment stage to run when developing.
-          // stages['Xbrowser'] = {
-          //   skipIfPreviouslySuccessful("xbrowser") {
-          //     build(job: '/Canvas/proofs-of-concept/xbrowser', propagate: false, parameters: buildParameters)
-          //   }
-          // }
-
-          def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
-          distribution.stashBuildScripts()
-
-          distribution.addRSpecSuites(stages)
-          distribution.addSeleniumSuites(stages)
-
-          parallel(stages)
-        }
-      }
-    }
-
-    stage('Publish Image on Merge') {
-      when {
-        allOf {
-          expression { isPatchsetPublishable() }
-          expression { env.GERRIT_EVENT_TYPE == 'change-merged' }
-        }
-      }
-      steps {
-        timeout(time: 10) {
-          script {
-            // Retriggers won't have an image to tag/push, pull that
-            // image if doesn't exist. If image is not found it will
-            // return NULL
-            if (!sh (script: 'docker images -q $RUBY_PATCHSET_IMAGE')) {
-              sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_PATCHSET_IMAGE'
+            if(env.GERRIT_EVENT_TYPE == 'change-merged') {
+              stage('Dependency Check') {
+                def reports = load 'build/new-jenkins/groovy/reports.groovy'
+                reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
+              }
             }
 
-            if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
-              sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
+            stage('Mark Build as Successful') {
+              def successes = load 'build/new-jenkins/groovy/successes.groovy'
+              successes.markBuildAsSuccessful()
             }
-
-            // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
-            sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
-            sh 'docker tag $RUBY_PATCHSET_IMAGE $RUBY_MERGE_IMAGE'
-            // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
-            sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
-            sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_MERGE_IMAGE'
           }
         }
-      }
-    }
-
-    stage('Dependency Check') {
-      when { expression { env.GERRIT_EVENT_TYPE == 'change-merged' } }
-      steps {
-        script {
-          def reports = load 'build/new-jenkins/groovy/reports.groovy'
-          reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
-        }
-      }
-    }
-
-    stage('Mark Build as Successful') {
-      steps {
-        script {
-          def successes = load 'build/new-jenkins/groovy/successes.groovy'
-          successes.markBuildAsSuccessful()
-        }
-      }
-    }
-  }
-
-  post {
-    failure {
-      script {
-        if (isPatchsetSlackableOnFailure()) {
-          def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
-          def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
-          def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-          def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. " : ''
-          slackSend(
-            channel: '#canvas_builds',
-            color: 'danger',
-            message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
-          )
-        }
-      }
-    }
-    always {
-      script {
-        ignoreBuildNeverStartedError {
-          def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
-          rspec.uploadJunitReports()
-          rspec.uploadSeleniumFailures()
-          rspec.uploadRSpecFailures()
-          load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
-        }
-      }
-    }
-    cleanup {
-      ignoreBuildNeverStartedError {
-        execute 'bash/docker-cleanup.sh --allow-failure'
       }
     }
   }
