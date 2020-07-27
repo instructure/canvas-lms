@@ -146,6 +146,9 @@
     "embed_video_code_703e10f2": {
         "message": "قراردادن کد فیلم"
     },
+    "error_uploading_video_audio_recording_16d9730a": {
+        "message": "خطا در بارگذاری ضبط ویدیو/ ضبط صدا."
+    },
     "excused_cf8792eb": {
         "message": "معاف شد"
     },
