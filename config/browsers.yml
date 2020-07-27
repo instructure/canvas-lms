@@ -1,5 +1,5 @@
 # these browsers must also match what's available in test
 minimums:
-  chrome: 84
+  chrome: 83
   safari: 12
-  firefox: 79
+  firefox: 78
