@@ -28,6 +28,7 @@ pipeline {
   }
 
   environment {
+    BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
@@ -114,30 +115,34 @@ pipeline {
     unsuccessful {
       // copy spec failures to local
       sh 'mkdir -vp tmp'
-      // [JIRA CCI-168]: need to handle canvas container never being spun up
-      sh 'docker cp $(docker ps -q --filter "name=canvas_"):/usr/src/app/log/spec_failures/ ./tmp' || true
       script {
-        def htmlFiles
-        // find all results files
-        dir ('tmp') {
-          htmlFiles = findFiles glob: '**/index.html'
+        try {
+          // [JIRA CCI-168]: need to handle canvas container never being spun up
+          sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ ./tmp canvas_ --clean-dir'
+          script {
+            def htmlFiles
+            // find all results files
+            dir ('tmp') {
+              htmlFiles = findFiles glob: '**/index.html'
+            }
+            // publish html
+            publishHTML target: [
+              allowMissing: false,
+              alwaysLinkToLastBuild: false,
+              keepAll: true,
+              reportDir: "tmp",
+              reportFiles: htmlFiles.join(','),
+              reportName: 'Test Failures'
+            ]
+          }
+        } finally {
+          slackSend(
+            channel: env.SLACK_CHANNEL,
+            color: 'danger',
+            message: "[${env.JOB_NAME}] <${env.BUILD_URL}|${env.BUILD_DISPLAY_NAME}> was unsuccessful."
+          )
         }
-        // publish html
-        publishHTML target: [
-          allowMissing: false,
-          alwaysLinkToLastBuild: false,
-          keepAll: true,
-          reportDir: "tmp",
-          reportFiles: htmlFiles.join(','),
-          reportName: 'Test Failures'
-        ]
       }
-
-      slackSend(
-        channel: env.SLACK_CHANNEL,
-        color: 'danger',
-        message: "[${env.JOB_NAME}] <${env.BUILD_URL}|${env.BUILD_DISPLAY_NAME}> was unsuccessful."
-      )
     }
 
     cleanup {
