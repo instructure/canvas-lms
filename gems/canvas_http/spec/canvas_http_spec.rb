@@ -112,13 +112,16 @@ describe "CanvasHttp" do
       assert_requested(stubbed)
     end
 
-    it "tracks the cost" do
+    it "tracks the cost in seconds" do
       url = "www.example.com/a"
       stub_request(:get, url).to_return(status: 200)
       CanvasHttp.reset_cost!
       expect(CanvasHttp.cost).to eq(0)
+      start_time = Time.now
       expect(CanvasHttp.get(url).code).to eq "200"
+      end_time = Time.now
       expect(CanvasHttp.cost > 0).to be_truthy
+      expect(CanvasHttp.cost <= (end_time - start_time)).to be_truthy
     end
   end
 
