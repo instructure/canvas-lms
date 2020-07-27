@@ -21,42 +21,36 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe OutcomeProficiency, type: :model do
   describe 'associations' do
     it { is_expected.to have_many(:outcome_proficiency_ratings).dependent(:destroy).order('points DESC, id ASC').inverse_of(:outcome_proficiency) }
-    it { is_expected.to belong_to(:account).required.inverse_of(:outcome_proficiency) }
+    it { is_expected.to belong_to(:context).required }
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of :account }
-    it { is_expected.to validate_presence_of :context_id }
+    subject { outcome_proficiency_model(account_model) }
+
     it { is_expected.to validate_presence_of :outcome_proficiency_ratings }
-
-    describe 'uniqueness' do
-      subject { outcome_proficiency_model(account_model) }
-
-      it { is_expected.to validate_uniqueness_of(:account) }
-    end
+    it { is_expected.to validate_presence_of :context }
+    it { is_expected.to validate_uniqueness_of(:context_id).scoped_to(:context_type) }
 
     describe 'strictly descending points' do
       it 'valid proficiency' do
-        proficiency = outcome_proficiency_model(account_model)
-        expect(proficiency.valid?).to be(true)
+        expect(subject.valid?).to be(true)
       end
 
       it 'invalid proficiency' do
-        proficiency = outcome_proficiency_model(account_model)
         rating1 = OutcomeProficiencyRating.new(description: 'A', points: 4, mastery: false, color: '00ff00')
         rating2 = OutcomeProficiencyRating.new(description: 'B', points: 3, mastery: false, color: '0000ff')
         rating3 = OutcomeProficiencyRating.new(description: 'B', points: 3, mastery: false, color: '0000ff')
         rating4 = OutcomeProficiencyRating.new(description: 'C', points: 2, mastery: true, color: 'ff0000')
-        proficiency.outcome_proficiency_ratings = [rating1, rating2, rating3, rating4]
-        expect(proficiency.valid?).to be(false)
+        subject.outcome_proficiency_ratings = [rating1, rating2, rating3, rating4]
+        expect(subject.valid?).to be(false)
       end
     end
 
-    it 'sets the context_type, id from account' do
+    it 'sets the context from account' do
       account = account_model
       proficiency = outcome_proficiency_model(account)
       expect(proficiency.context_type).to eq 'Account'
-      expect(proficiency.context_id).to eq account.id
+      expect(proficiency.context).to eq account
     end
   end
 
@@ -72,7 +66,7 @@ describe OutcomeProficiency, type: :model do
       root_account_2 = account_model
       rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00')
       rating2 = OutcomeProficiencyRating.new(description: 'worst', points: 0, mastery: false, color: 'ff0000')
-      proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2], account: root_account_1,
+      proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2], context: root_account_1,
         root_account_id: root_account_2.resolved_root_account_id)
       expect(proficiency.root_account_id).to be(root_account_2.resolved_root_account_id)
     end

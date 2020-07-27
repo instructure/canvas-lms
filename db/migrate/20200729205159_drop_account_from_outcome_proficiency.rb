@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,12 +14,18 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module Factories
-  def outcome_proficiency_model(account)
-    rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00')
-    rating2 = OutcomeProficiencyRating.new(description: 'worst', points: 0, mastery: false, color: 'ff0000')
-    OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2], context: account)
+class DropAccountFromOutcomeProficiency < ActiveRecord::Migration[5.2]
+  tag :postdeploy
+
+  disable_ddl_transaction!
+
+  def up
+    remove_index :outcome_proficiencies, column: :account_id, if_exists: true
+    remove_column :outcome_proficiencies, :account_id, if_exists: true
+  end
+
+  def down
+    add_column :outcome_proficiencies, :account_id, :integer, limit: 8, if_not_exists: true
   end
 end
