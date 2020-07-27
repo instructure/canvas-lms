@@ -148,8 +148,17 @@ def sendSlack(success) {
   slackSend channel: '#flakey_spec_catcher_noisy', color: color, message: message
 }
 
+def cleanupFn(status) {
+  try {
+    sendSlack(status == 'SUCCESS')
+  } finally {
+    sh 'rm -vrf ./tmp/'
+    execute 'bash/docker-cleanup.sh --allow-failure'
+  }
+}
+
 pipeline {
-  agent { label 'canvas-docker' }
+  agent none
   options {
     ansiColor('xterm')
     timestamps()
@@ -179,81 +188,65 @@ pipeline {
   }
 
   stages {
-    stage('Setup') {
-      steps {
-        cleanAndSetup()
-      }
-    }
-
-    stage("Compute Build Distribution") {
-      when { expression { FORCE_FAILURE != '1' } }
+    stage('Environment') {
       steps {
         script {
-          computeTestCount()
-          computeDistributedCount()
-          echo "expected nodes to run on for $result_test_count tests: $result_node_count"
-        }
-      }
-    }
+          protectedNode('canvas-docker', { status -> cleanupFn(status) }) {
+            stage('Setup') {
+              cleanAndSetup()
+              checkout scm
+            }
 
-    stage("Run Flakey Spec Catcher") {
-      when { expression { result_test_count > 0 || FORCE_FAILURE == '1' } }
-      steps {
-        script {
-          if (FORCE_FAILURE == '1') {
-            echo "running force failure"
-            executeFlakeySpecCatcher()
-          }
-          else if (result_node_count <= 1) {
-            echo "running on this node"
-            executeFlakeySpecCatcher()
-          }
-          else {
-            echo "running on multiple nodes: $result_node_count"
-            def nodes = [:];
-            for(int i = 0; i < result_node_count; i++) {
-              // make sure to create a new index variable so this value gets
-              // captured by the lambda for FSC_NODE_INDEX
-              def index = i
-              def node_number = (index).toString().padLeft(2, '0')
-              nodes["flakey set $node_number"] = {
-                withEnv(["FSC_NODE_TOTAL=$result_node_count", "FSC_NODE_INDEX=$index"]) {
-                  node('canvas-docker') {
-                    stage("Running Flakey Set $node_number") {
-                      try {
-                        cleanAndSetup()
-                        sh 'rm -vrf ./tmp'
-                        checkout scm
-                        executeFlakeySpecCatcher("node$node_number")
-                      }
-                      finally {
-                        sh 'rm -vrf ./tmp'
-                        execute 'bash/docker-cleanup.sh --allow-failure'
+            if(FORCE_FAILURE != '1') {
+              stage("Compute Build Distribution") {
+                computeTestCount()
+                computeDistributedCount()
+                echo "expected nodes to run on for $result_test_count tests: $result_node_count"
+              }
+            }
+
+            if(result_test_count > 0 || FORCE_FAILURE == '1') {
+              stage("Run Flakey Spec Catcher") {
+                if (FORCE_FAILURE == '1') {
+                  echo "running force failure"
+                  executeFlakeySpecCatcher()
+                }
+                else if (result_node_count <= 1) {
+                  echo "running on this node"
+                  executeFlakeySpecCatcher()
+                }
+                else {
+                  echo "running on multiple nodes: $result_node_count"
+                  def nodes = [:];
+                  for(int i = 0; i < result_node_count; i++) {
+                    // make sure to create a new index variable so this value gets
+                    // captured by the lambda for FSC_NODE_INDEX
+                    def index = i
+                    def node_number = (index).toString().padLeft(2, '0')
+                    nodes["flakey set $node_number"] = {
+                      protectedNode('canvas-docker') {
+                        withEnv(["FSC_NODE_TOTAL=$result_node_count", "FSC_NODE_INDEX=$index"]) {
+                          try {
+                            cleanAndSetup()
+                            sh 'rm -vrf ./tmp'
+                            checkout scm
+                            executeFlakeySpecCatcher("node$node_number")
+                          }
+                          finally {
+                            sh 'rm -vrf ./tmp'
+                            execute 'bash/docker-cleanup.sh --allow-failure'
+                          }
+                        }
                       }
                     }
                   }
+                  parallel(nodes)
                 }
               }
             }
-            parallel(nodes)
           }
         }
       }
-      post {
-        success {
-          sendSlack(true)
-        }
-        failure {
-          sendSlack(false)
-        }
-      }
-    }
-  }
-
-  post {
-    cleanup {
-      sh 'rm -vrf ./tmp/'
-      execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }
