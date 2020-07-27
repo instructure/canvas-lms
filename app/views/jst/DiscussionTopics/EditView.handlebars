@@ -111,12 +111,12 @@
     {{/if}}
   </fieldset>
 
-  <fieldset>
+  <fieldset style="display:flex; flex-direction:column">
 
     {{#ifAny isTopic contextIsCourse canModerate showAssignment}}
-    <legend class="control-label" style="margin-left: -20px">{{#t "options"}}Options{{/t}}</legend>
-    <div class="control-group" style="margin-left: -60px">
-      <div class="controls">
+    <legend class="control-label" style="text-align:start; margin-bottom: 0">{{#t "options"}}Options{{/t}}</legend>
+    <div class="control-group">
+      <div class="controls" style="text-align:start; margin-left:0">
         {{#if isTopic}}
           <div><label class="checkbox short-label" for="threaded">
             {{checkbox "threaded"}}
