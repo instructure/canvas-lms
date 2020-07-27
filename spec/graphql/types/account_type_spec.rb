@@ -39,6 +39,11 @@ describe Types::AccountType do
     expect(account_type.resolve(:name, current_user: @student)).to be_nil
   end
 
+  it 'works for field outcome_proficiency' do
+    outcome_proficiency_model(account)
+    expect(account_type.resolve('outcomeProficiency { _id }')).to eq account.outcome_proficiency.id.to_s
+  end
+
   it 'works for field proficiency_ratings_connection' do
     outcome_proficiency_model(account)
     expect(

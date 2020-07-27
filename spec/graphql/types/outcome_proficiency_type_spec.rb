@@ -19,11 +19,10 @@
 require_relative '../../spec_helper'
 require_relative "../graphql_spec_helper"
 
-describe Types::ProficiencyRatingType do
+describe Types::OutcomeProficiencyType do
   before(:once) do
     teacher_in_course(active_all: true)
-    outcome_proficiency_model(account)
-    @ratings = OutcomeProficiencyRating.all
+    @outcome_proficiency = outcome_proficiency_model(account)
   end
 
   let(:account) { @course.root_account }
@@ -31,33 +30,27 @@ describe Types::ProficiencyRatingType do
 
   it 'works' do
     expect(
-      account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { _id } } }').sort
-    ).to eq @ratings.map { |r| r.id.to_s }.sort
+      account_type.resolve('outcomeProficiency { _id }')
+    ).to eq @outcome_proficiency.id.to_s
   end
 
   describe 'works for the field' do
-    it 'color' do
+    it 'proficiencyRatingsConnection' do
       expect(
-        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { color } } }').sort
-      ).to eq @ratings.map(&:color).sort
+        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { _id } } }').sort
+      ).to eq @outcome_proficiency.outcome_proficiency_ratings.map(&:id).map(&:to_s)
     end
 
-    it 'description' do
-      expect(
-        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { description } } }').sort
-      ).to eq @ratings.map(&:description).sort
-    end
+    context 'locked' do
+      it 'when unlocked' do
+        expect(account_type.resolve('outcomeProficiency { locked }')).to eq false
+      end
 
-    it 'mastery' do
-      expect(
-        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { mastery } } }')
-      ).to eq @ratings.map(&:mastery)
-    end
-
-    it 'points' do
-      expect(
-        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { points } } }').sort
-      ).to eq @ratings.map(&:points).sort
+      it 'when locked' do
+        account.settings[:lock_outcome_proficiency] = {value: true, locked: true}
+        account.save!
+        expect(account_type.resolve('outcomeProficiency { locked }')).to eq true
+      end
     end
   end
 end

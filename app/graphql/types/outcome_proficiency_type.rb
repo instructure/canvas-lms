@@ -1,3 +1,4 @@
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -15,21 +16,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 module Types
-  class ProficiencyRatingType < ApplicationObjectType
-    description 'Customized proficiency rating'
+  class OutcomeProficiencyType < ApplicationObjectType
+    description 'Customized proficiency ratings'
 
     implements Interfaces::LegacyIDInterface
 
-    field :color, String, null: true
-    field :description, String, null: true
+    field :context_type, String, null: false
+    field :context_id, Integer, null: false
 
-    field :mastery, Boolean, null: false
-    def mastery
-      !!object.mastery
+    field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: true
+    def proficiency_ratings_connection
+      object.outcome_proficiency_ratings
     end
 
-    field :points, Float, null: true
+    field :locked, Boolean, null: false
+    def locked
+      context = object.context
+      (context.is_a?(Account) ? context : context.account).lock_outcome_proficiency[:locked]
+    end
   end
 end
