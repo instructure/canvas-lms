@@ -86,6 +86,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       DiscussionTopicParticipant => :discussion_topic,
       EnrollmentState => :enrollment,
       Favorite => :context,
+      Folder => [:account, :course, :group],
       GradingPeriod => :grading_period_group,
       GradingPeriodGroup => [{root_account: [:root_account_id, :id]}, :course],
       GradingStandard => :context,
