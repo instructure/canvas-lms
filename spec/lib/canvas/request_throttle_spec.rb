@@ -194,6 +194,13 @@ describe 'RequestThrottle' do
         cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => -100})
         expect(cost).to eq(42)
       end
+
+      it "weights the cost by settings" do
+        cpu_cost = Setting.set("request_throttle.cpu_cost_weight", "2.0")
+        db_cost = Setting.set("request_throttle.db_cost_weight", "0.5")
+        cost = throttle.calculate_cost(20, 4, {})
+        expect(cost).to eq(42)
+      end
     end
 
     before do
