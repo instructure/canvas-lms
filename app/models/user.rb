@@ -434,11 +434,15 @@ class User < ActiveRecord::Base
     !!@skip_updating_account_associations
   end
 
+  # Update the root_account_ids column on the user
+  # and all associated CommunicationChannels
   def update_root_account_ids
     # See User#associated_shards in MRA for an explanation of
     # shard association levels
     shards = associated_shards(:strong) + associated_shards(:weak)
+
     refreshed_root_account_ids = Set.new
+    communication_channels_to_update = Set.new
 
     Shard.with_each_shard(shards) do
       UserAccountAssociation.joins(:account).
@@ -447,9 +451,22 @@ class User < ActiveRecord::Base
         find_each do |association|
           refreshed_root_account_ids << association.global_account_id
         end
+
+      # Users can potentially have communication_channels on
+      # any of their associated shards. Collect those communication
+      # channels here for later root_account_ids updating.
+      communication_channels_to_update.merge(
+        CommunicationChannel.where(user: self)
+      )
     end
 
+    # Update the user
     self.update!(root_account_ids: refreshed_root_account_ids.to_a)
+
+    # Update each communication channel associated with the user
+    communication_channels_to_update.each do |c|
+      c.set_root_account_ids(persist_changes: true)
+    end
   end
 
   def update_root_account_ids_later
