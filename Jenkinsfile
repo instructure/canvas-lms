@@ -130,6 +130,7 @@ pipeline {
     BUILD_IMAGE = configuration.buildRegistryPath()
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
+    SKIP_CACHE = configuration.getBoolean('skip-cache')
 
     // e.g. postgres-9.5-ruby-2.6
     TAG_SUFFIX = imageTag.suffix()
@@ -253,9 +254,6 @@ pipeline {
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                     sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                   } else {
-                    if (!configuration.getBoolean('skip-cache')) {
-                      sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG || true"
-                    }
                     sh 'build/new-jenkins/docker-build.sh'
                     sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_PATCHSET_IMAGE"
                   }
