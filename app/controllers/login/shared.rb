@@ -53,9 +53,17 @@ module Login::Shared
     # there
     session.delete(:shown_instfs_pixel)
 
-    if pseudonym.account_id != (@real_domain_root_account || @domain_root_account).id
+    if pseudonym.account_id != @domain_root_account.id
+      # they have no reason to be at this account; send them to where they belong
+      if (session[:return_to].blank? || session[:return_to] == '/') &&
+        session[:oauth2].blank? &&
+        @domain_root_account.user_account_associations.where(user_id: pseudonym.user_id).none? &&
+        !@domain_root_account.grants_right?(user, :read)
+        return redirect_to dashboard_url(host: HostUrl.context_host(pseudonym.account, request.host_with_port), cross_domain_login: request.host_with_port)
+      end
+
       flash[:notice] = t("You are logged in at %{institution1} using your credentials from %{institution2}",
-                         institution1: (@real_domain_root_account || @domain_root_account).name,
+                         institution1: @domain_root_account.name,
                          institution2: pseudonym.account.name)
     end
 
