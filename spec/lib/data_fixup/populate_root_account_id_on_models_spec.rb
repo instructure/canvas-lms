@@ -512,6 +512,49 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    context 'with Folder' do
+      context 'with course context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { Folder.create!(context: @course )}
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'with account context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { Folder.create!(context: reference_record )}
+          let(:reference_record) { account_model }
+        end
+      end
+
+      context 'with group context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { Folder.create!(context: reference_record )}
+          let(:reference_record) { group_model }
+        end
+      end
+
+      context 'with user context' do
+        it 'should ignore record' do
+          folder = Folder.create!(context: user_model)
+          folder.update_columns(root_account_id: nil)
+          expect(folder.reload.root_account_id).to eq nil
+          DataFixup::PopulateRootAccountIdOnModels.run
+          expect(folder.reload.root_account_id).to eq nil
+        end
+      end
+
+      context 'with sharding' do
+        specs_require_sharding
+
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { Folder.create!(context: @shard1.activate { course_model(account: account_model) }) }
+          let(:reference_record) { @course }
+          let(:sharded) { true }
+        end
+      end
+    end
+
     context 'with GradingPeriod' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { grading_periods(count: 1).first }
