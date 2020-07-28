@@ -87,30 +87,30 @@ def isPatchsetSlackableOnFailure() {
 }
 
 def cleanupFn(status) {
-  try {
-    ignoreBuildNeverStartedError {
+  ignoreBuildNeverStartedError {
+    try {
       def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
       rspec.uploadJunitReports()
       rspec.uploadSeleniumFailures()
       rspec.uploadRSpecFailures()
       load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
-    }
-
-    if(status == 'FAILURE' && isPatchsetSlackableOnFailure()) {
-      def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
-      def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
-      def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-      def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. " : ''
-      slackSend(
-        channel: '#canvas_builds',
-        color: 'danger',
-        message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
-      )
-    }
-  } finally {
-    ignoreBuildNeverStartedError {
+    } finally {
       execute 'bash/docker-cleanup.sh --allow-failure'
     }
+  }
+}
+
+def postFn(status) {
+  if(status == 'FAILURE' && isPatchsetSlackableOnFailure()) {
+    def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
+    def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
+    def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
+    def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. " : ''
+    slackSend(
+      channel: '#canvas_builds',
+      color: 'danger',
+      message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
+    )
   }
 }
 
@@ -166,7 +166,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { status -> cleanupFn(status) }) {
+          protectedNode('canvas-docker', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
             stage('Setup') {
               timeout(time: 5) {
                 cleanAndSetup()
