@@ -97,19 +97,21 @@ describe('MasteryScale', () => {
   describe('update outcomeProficiency', () => {
     beforeEach(() => moxios.install())
     afterEach(() => moxios.uninstall())
-    it('submits a request when ratings are updated', async done => {
-      const {findByText} = render(
+    it('submits a request when ratings are updated', async () => {
+      const {findAllByLabelText} = render(
         <MockedProvider mocks={mocks}>
           <MasteryScale contextType="Account" contextId="11" />
         </MockedProvider>
       )
-      const button = await findByText('Save Learning Mastery')
-      fireEvent.click(button)
+      const pointsInput = (await findAllByLabelText(/Change points/))[0]
+      jest.useFakeTimers()
+      fireEvent.change(pointsInput, {target: {value: '100'}})
+      jest.advanceTimersByTime(1000)
 
-      moxios.wait(() => {
+      await wait(() => {
         const request = moxios.requests.mostRecent()
+        expect(request).not.toBeUndefined()
         expect(request.config.url).toEqual('/api/v1/accounts/11/outcome_proficiency')
-        done()
       })
     })
   })

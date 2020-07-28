@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -24,6 +23,7 @@ import {IconPlusLine} from '@instructure/ui-icons'
 import I18n from 'i18n!ProficiencyTable'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Table} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
 import ProficiencyRating from './ProficiencyRating'
 import uuid from 'uuid/v1'
 import _ from 'underscore'
@@ -31,14 +31,12 @@ import {fromJS, List} from 'immutable'
 import NumberHelper from '../../shared/helpers/numberHelper'
 
 const ADD_DEFAULT_COLOR = 'EF4437'
-
 function unformatColor(color) {
   if (color[0] === '#') {
     return color.substring(1)
   }
   return color
 }
-
 const createRating = (description, points, color, mastery = false, focusField = null) => ({
   description,
   points,
@@ -47,7 +45,6 @@ const createRating = (description, points, color, mastery = false, focusField = 
   mastery,
   focusField
 })
-
 const configToState = data => {
   const rows = List(
     data.proficiencyRatingsConnection.nodes.map(rating =>
@@ -57,10 +54,10 @@ const configToState = data => {
   const masteryIndex = data.proficiencyRatingsConnection.nodes.findIndex(rating => rating.mastery)
   return {
     masteryIndex,
-    rows
+    rows,
+    locked: data.locked
   }
 }
-
 export default class ProficiencyTable extends React.Component {
   static propTypes = {
     proficiency: PropTypes.object,
@@ -88,27 +85,54 @@ export default class ProficiencyTable extends React.Component {
     this.state = configToState(props.proficiency)
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(_prevProps, prevState) {
     if (this.fieldWithFocus()) {
       // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({rows: this.state.rows.map(row => row.delete('focusField'))})
+      this.setState(({rows}) => ({rows: rows.map(row => row.delete('focusField'))}))
+    } else if (
+      this.state.masteryIndex !== prevState.masteryIndex ||
+      this.state.rows !== prevState.rows
+    ) {
+      this.validateAndSave()
     }
   }
 
   fieldWithFocus = () => this.state.rows.some(row => row.get('focusField'))
 
   addRow = () => {
-    let points = 0.0
-    const last = this.state.rows.last()
-    if (last) {
-      points = last.get('points') - 1.0
+    this.setState(
+      ({rows}) => {
+        let points = 0.0
+        const last = rows.last()
+        if (last) {
+          points = last.get('points') - 1.0
+        }
+        if (points < 0.0 || Number.isNaN(points)) {
+          points = 0.0
+        }
+        const newRow = fromJS(createRating('', points, ADD_DEFAULT_COLOR, null, 'mastery'))
+        return {rows: rows.push(newRow)}
+      },
+      () => {
+        $.screenReaderFlashMessage(I18n.t('Added new proficiency rating'))
+      }
+    )
+  }
+
+  validateAndSave = _.debounce(() => {
+    if (!this.checkForErrors()) {
+      this.props.update(this.stateToConfig()).catch(e => {
+        $.flashError(
+          I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
+            message: e.message
+          })
+        )
+      })
     }
-    if (points < 0.0 || Number.isNaN(points)) {
-      points = 0.0
-    }
-    const newRow = fromJS(createRating('', points, ADD_DEFAULT_COLOR, 'mastery'))
-    this.setState({rows: this.state.rows.push(newRow)})
-    $.screenReaderFlashMessage(I18n.t('Added new proficiency rating'))
+  }, 500)
+
+  componentWillUnmount() {
+    this.validateAndSave.cancel()
   }
 
   handleMasteryChange = _.memoize(index => () => {
@@ -116,27 +140,30 @@ export default class ProficiencyTable extends React.Component {
   })
 
   handleDescriptionChange = _.memoize(index => value => {
-    let rows = this.state.rows
-    if (!this.invalidDescription(value)) {
-      rows = rows.removeIn([index, 'descriptionError'])
-    }
-    rows = rows.setIn([index, 'description'], value)
-    this.setState({rows})
+    this.setState(({rows}) => {
+      if (!this.invalidDescription(value)) {
+        rows = rows.removeIn([index, 'descriptionError'])
+      }
+      rows = rows.setIn([index, 'description'], value)
+      return {rows}
+    })
   })
 
   handlePointsChange = _.memoize(index => value => {
-    const parsed = NumberHelper.parse(value)
-    let rows = this.state.rows
-    if (!this.invalidPoints(parsed) && parsed >= 0) {
-      rows = rows.removeIn([index, 'pointsError'])
-    }
-    rows = rows.setIn([index, 'points'], parsed)
-    this.setState({rows})
+    this.setState(({rows}) => {
+      const parsed = NumberHelper.parse(value)
+      if (!this.invalidPoints(parsed) && parsed >= 0) {
+        rows = rows.removeIn([index, 'pointsError'])
+      }
+      rows = rows.setIn([index, 'points'], parsed)
+      return {rows}
+    })
   })
 
   handleColorChange = _.memoize(index => value => {
-    const rows = this.state.rows.update(index, row => row.set('color', unformatColor(value)))
-    this.setState({rows})
+    this.setState(({rows}) => ({
+      rows: rows.update(index, row => row.set('color', unformatColor(value)))
+    }))
   })
 
   handleDelete = _.memoize(index => () => {
@@ -175,65 +202,42 @@ export default class ProficiencyTable extends React.Component {
       .toJS()
   })
 
-  handleSubmit = () => {
-    if (!this.checkForErrors()) {
-      this.props
-        .update(this.stateToConfig())
-        .then(() => {
-          $.flashMessage(I18n.t('Account proficiency ratings saved'))
-        })
-        .catch(e =>
-          $.flashError(
-            I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
-              message: e.message
-            })
-          )
-        )
-    }
-  }
-
   checkForErrors = () => {
     let previousPoints = null
-    let firstError = true
+    let hasError = false
+    let changed = false
     const rows = this.state.rows.map(row => {
       let r = row
       if (this.invalidDescription(row.get('description'))) {
+        hasError = true
         r = r.set('descriptionError', I18n.t('Missing required description'))
-        if (firstError) {
-          r = r.set('focusField', 'description')
-          firstError = false
-        }
+      } else {
+        r = r.delete('descriptionError')
       }
       if (this.invalidPoints(row.get('points'))) {
+        hasError = true
         previousPoints = null
         r = r.set('pointsError', I18n.t('Invalid points'))
-        if (firstError) {
-          r = r.set('focusField', 'points')
-          firstError = false
-        }
       } else if (row.get('points') < 0) {
+        hasError = true
         r = r.set('pointsError', I18n.t('Negative points'))
-        if (firstError) {
-          r = r.set('focusField', 'points')
-          firstError = false
-        }
       } else {
         const currentPoints = row.get('points')
         if (previousPoints !== null && previousPoints <= currentPoints) {
+          hasError = true
           r = r.set('pointsError', I18n.t('Points must be less than previous rating'))
-          if (firstError) {
-            r = r.set('focusField', 'points')
-            firstError = false
-          }
+        } else {
+          r = r.delete('pointsError')
         }
         previousPoints = currentPoints
       }
+      changed = changed || r !== row
       return r
     })
-    if (!firstError) {
+    if (changed) {
       this.setState({rows})
     }
-    return !firstError
+    return hasError
   }
 
   invalidPoints = points => Number.isNaN(points)
@@ -278,20 +282,13 @@ export default class ProficiencyTable extends React.Component {
                 onPointsChange={this.handlePointsChange(index)}
               />
             ))}
-            <tr>
-              <td colSpan="4" style={{textAlign: 'center'}}>
-                <Button onClick={this.addRow} icon={<IconPlusLine />} variant="circle-primary">
-                  <ScreenReaderContent>{I18n.t('Add proficiency rating')}</ScreenReaderContent>
-                </Button>
-              </td>
-            </tr>
           </tbody>
         </Table>
-        <div className="save">
-          <Button variant="primary" onClick={this.handleSubmit}>
-            {I18n.t('Save Learning Mastery')}
+        <View width="100%" textAlign="center" padding="small" as="div">
+          <Button onClick={this.addRow} icon={<IconPlusLine />} variant="circle-primary">
+            <ScreenReaderContent>{I18n.t('Add proficiency rating')}</ScreenReaderContent>
           </Button>
-        </div>
+        </View>
       </div>
     )
   }
