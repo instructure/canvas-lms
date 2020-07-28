@@ -11,7 +11,7 @@
 # running `bundle` and `yarn install` in your container after pulling
 #
 # ```yml
-# version: '2'
+# version: '2.3'
 # services:
 #   web: &WEB
 #     image: instructure/canvas-lms:master

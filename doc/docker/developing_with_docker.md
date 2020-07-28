@@ -52,7 +52,7 @@ echo "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose
 Setup your user-specific docker-compose override file as an empty file using the following command:
 
 ```bash
-echo "version: '2'" > docker-compose.local.`whoami`.yml
+echo "version: '2.3'" > docker-compose.local.`whoami`.yml
 ```
 
 ## Getting Started
@@ -118,7 +118,7 @@ execution. To use it, you will need to enable `REMOTE_DEBUGGING_ENABLED` in your
 this file, you will need to create it and add the following:
 
 ```
-version: '2'
+version: '2.3'
 services:
   web:
     environment:
