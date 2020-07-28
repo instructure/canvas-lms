@@ -348,7 +348,7 @@ class OutcomeResultsController < ApplicationController
   def user_rollups(opts = {})
     excludes = Api.value_to_array(params[:exclude]).uniq
     @results = find_results(opts).preload(:user)
-    outcome_results_rollups(@results, @users, excludes)
+    outcome_results_rollups(results: @results, users: @users, excludes: excludes, context: @context)
   end
 
   def remove_users_with_no_results
