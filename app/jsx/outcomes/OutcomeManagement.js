@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import I18n from 'i18n!OutcomeManagement'
 import {Tabs} from '@instructure/ui-tabs'
-import ProficiencyTable from 'jsx/outcomes/MasteryScale/ProficiencyTable'
+import MasteryScale from 'jsx/outcomes/MasteryScale'
+import {ApolloProvider, createClient} from 'jsx/canvas-apollo'
 
 export const OutcomePanel = () => {
   useEffect(() => {
@@ -43,6 +44,8 @@ const OutcomeManagement = () => {
     setSelectedIndex(index)
   }
 
+  const client = useMemo(() => createClient(), [])
+
   const contextId = ENV.context_asset_string.split('_')[1]
   return (
     <Tabs onRequestTabChange={handleTabChange}>
@@ -50,7 +53,9 @@ const OutcomeManagement = () => {
         <OutcomePanel />
       </Tabs.Panel>
       <Tabs.Panel renderTitle={I18n.t('Mastery Scale')} isSelected={selectedIndex === 1}>
-        <ProficiencyTable accountId={contextId} />
+        <ApolloProvider client={client}>
+          <MasteryScale contextType="Account" contextId={contextId} />
+        </ApolloProvider>
       </Tabs.Panel>
     </Tabs>
   )

@@ -19,20 +19,16 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {IconPlusLine} from '@instructure/ui-icons'
 import I18n from 'i18n!ProficiencyTable'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Table} from '@instructure/ui-elements'
-import {Spinner} from '@instructure/ui-spinner'
 import ProficiencyRating from './ProficiencyRating'
 import uuid from 'uuid/v1'
 import _ from 'underscore'
 import {fromJS, List} from 'immutable'
-import {fetchProficiency, saveProficiency} from './api'
 import NumberHelper from '../../shared/helpers/numberHelper'
-import SVGWrapper from '../../shared/SVGWrapper'
 
 const ADD_DEFAULT_COLOR = 'EF4437'
 
@@ -43,33 +39,53 @@ function unformatColor(color) {
   return color
 }
 
+const createRating = (description, points, color, mastery = false, focusField = null) => ({
+  description,
+  points,
+  key: uuid(),
+  color,
+  mastery,
+  focusField
+})
+
+const configToState = data => {
+  const rows = List(
+    data.proficiencyRatingsConnection.nodes.map(rating =>
+      fromJS(createRating(rating.description, rating.points, rating.color))
+    )
+  )
+  const masteryIndex = data.proficiencyRatingsConnection.nodes.findIndex(rating => rating.mastery)
+  return {
+    masteryIndex,
+    rows
+  }
+}
+
 export default class ProficiencyTable extends React.Component {
   static propTypes = {
-    accountId: PropTypes.string.isRequired,
+    proficiency: PropTypes.object,
+    update: PropTypes.func.isRequired,
     focusTab: PropTypes.func
   }
 
   static defaultProps = {
+    proficiency: {
+      proficiencyRatingsConnection: {
+        nodes: [
+          createRating(I18n.t('Exceeds Mastery'), 4, '127A1B'),
+          createRating(I18n.t('Mastery'), 3, '00AC18', true),
+          createRating(I18n.t('Near Mastery'), 2, 'FAB901'),
+          createRating(I18n.t('Below Mastery'), 1, 'FD5D10'),
+          createRating(I18n.t('Well Below Mastery'), 0, 'EE0612')
+        ]
+      }
+    },
     focusTab: null
   }
 
   constructor(props) {
     super(props)
-    this.state = {
-      loading: true,
-      masteryIndex: 1,
-      rows: List([
-        this.createRating('Exceeds Mastery', 4, '127A1B'),
-        this.createRating('Mastery', 3, '00AC18'),
-        this.createRating('Near Mastery', 2, 'FAB901'),
-        this.createRating('Below Mastery', 1, 'FD5D10'),
-        this.createRating('Well Below Mastery', 0, 'EE0612')
-      ])
-    }
-  }
-
-  componentDidMount() {
-    this.fetchRatings()
+    this.state = configToState(props.proficiency)
   }
 
   componentDidUpdate() {
@@ -79,45 +95,7 @@ export default class ProficiencyTable extends React.Component {
     }
   }
 
-  fetchRatings = () => {
-    fetchProficiency(this.props.accountId)
-      .then(response => {
-        if (response.status === 200) {
-          this.configToState(response.data)
-        } else {
-          $.flashError(I18n.t('An error occurred while loading account proficiency ratings'))
-          this.setState({loading: false})
-        }
-      })
-      .catch(e => {
-        // 404 status means no custom ratings, so use defaults without an alert
-        if (e.response && e.response.status !== 404) {
-          $.flashError(
-            I18n.t('An error occurred while loading account proficiency ratings: %{m}', {
-              m: e.response.statusText
-            })
-          )
-        }
-        this.setState({billboard: true, loading: false})
-      })
-  }
-
-  configToState = data => {
-    const rows = List(
-      data.ratings.map(rating => this.createRating(rating.description, rating.points, rating.color))
-    )
-    const masteryIndex = data.ratings.findIndex(rating => rating.mastery)
-    this.setState({
-      loading: false,
-      masteryIndex,
-      rows: fromJS(rows)
-    })
-  }
-
   fieldWithFocus = () => this.state.rows.some(row => row.get('focusField'))
-
-  createRating = (description, points, color, focusField = null) =>
-    fromJS({description, points, key: uuid(), color, focusField})
 
   addRow = () => {
     let points = 0.0
@@ -128,7 +106,7 @@ export default class ProficiencyTable extends React.Component {
     if (points < 0.0 || Number.isNaN(points)) {
       points = 0.0
     }
-    const newRow = this.createRating('', points, ADD_DEFAULT_COLOR, 'mastery')
+    const newRow = fromJS(createRating('', points, ADD_DEFAULT_COLOR, 'mastery'))
     this.setState({rows: this.state.rows.push(newRow)})
     $.screenReaderFlashMessage(I18n.t('Added new proficiency rating'))
   }
@@ -199,13 +177,18 @@ export default class ProficiencyTable extends React.Component {
 
   handleSubmit = () => {
     if (!this.checkForErrors()) {
-      saveProficiency(this.props.accountId, this.stateToConfig()).then(response => {
-        if (response.status === 200) {
+      this.props
+        .update(this.stateToConfig())
+        .then(() => {
           $.flashMessage(I18n.t('Account proficiency ratings saved'))
-        } else {
-          $.flashError(I18n.t('An error occurred while saving account proficiency ratings'))
-        }
-      })
+        })
+        .catch(e =>
+          $.flashError(
+            I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
+              message: e.message
+            })
+          )
+        )
     }
   }
 
@@ -257,57 +240,7 @@ export default class ProficiencyTable extends React.Component {
 
   invalidDescription = description => !description || description.trim().length === 0
 
-  removeBillboard = () => {
-    this.setState({billboard: false})
-  }
-
-  renderSpinner() {
-    return (
-      <div style={{textAlign: 'center'}}>
-        <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
-      </div>
-    )
-  }
-
-  renderBillboard() {
-    const styles = {
-      width: '10rem',
-      margin: '0 auto'
-    }
-    const divStyle = {
-      textAlign: 'center'
-    }
-    return (
-      <div style={divStyle}>
-        <Billboard
-          headingAs="h2"
-          headingLevel="h2"
-          ref={d => {
-            this.triggerRoot = d
-          }}
-          hero={
-            <div style={styles}>
-              <PresentationContent>
-                <SVGWrapper url="/images/trophy.svg" />
-              </PresentationContent>
-            </div>
-          }
-          heading={I18n.t('Customize Learning Mastery Ratings')}
-          message={I18n.t(
-            `
-            Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook.
-            Adjust number of ratings, mastery level, points, and colors.
-          `
-          ).trim()}
-        />
-        <Button variant="primary" onClick={this.removeBillboard}>
-          {I18n.t('Get Started')}
-        </Button>
-      </div>
-    )
-  }
-
-  renderTable() {
+  render() {
     const masteryIndex = this.state.masteryIndex
     return (
       <div>
@@ -361,16 +294,5 @@ export default class ProficiencyTable extends React.Component {
         </div>
       </div>
     )
-  }
-
-  render() {
-    const {billboard, loading} = this.state
-    if (loading) {
-      return this.renderSpinner()
-    } else if (billboard) {
-      return this.renderBillboard()
-    } else {
-      return this.renderTable()
-    }
   }
 }

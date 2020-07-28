@@ -15,51 +15,25 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash'
 import $ from 'jquery'
 import React from 'react'
-import axios from 'axios'
 import {shallow} from 'enzyme'
-import waitForExpect from 'wait-for-expect'
+import {render} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
 
 const defaultProps = {
-  accountId: '1'
+  update: Function.prototype
 }
 
-let getSpy
-
 describe('default proficiency', () => {
-  beforeEach(() => {
-    const err = _.assign(new Error(), {response: {status: 404}})
-    getSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject(err))
-  })
-
-  afterEach(() => {
-    getSpy.mockRestore()
-  })
-
   it('renders the ProficiencyRating component', () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    expect(wrapper).toMatchSnapshot()
-  })
-
-  it('renders loading at startup', () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    expect(wrapper.find('Spinner')).toHaveLength(1)
-  })
-
-  it('render billboard after loading', async () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    await waitForExpect(() => {
-      expect(wrapper.find('Billboard')).toHaveLength(1)
-    })
+    const {getByText} = render(<ProficiencyTable {...defaultProps} />)
+    expect(getByText('Proficiency Rating')).not.toBeNull()
   })
 
   it('renders five ratings', done => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
-      wrapper.instance().removeBillboard()
       expect(wrapper.find('ProficiencyRating')).toHaveLength(5)
       done()
     }, 1)
@@ -68,7 +42,6 @@ describe('default proficiency', () => {
   it('sets focusField on mastery on first rating only', done => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
-      wrapper.instance().removeBillboard()
       expect(
         wrapper
           .find('ProficiencyRating')
@@ -106,7 +79,6 @@ describe('default proficiency', () => {
   it('clicking button adds rating', done => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
-      wrapper.instance().removeBillboard()
       wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
       expect(wrapper.find('ProficiencyRating')).toHaveLength(6)
       done()
@@ -117,7 +89,6 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
     setTimeout(() => {
-      wrapper.instance().removeBillboard()
       wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
       expect(flashMock).toHaveBeenCalledTimes(1)
       flashMock.mockRestore()
@@ -129,7 +100,6 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
     setTimeout(() => {
-      wrapper.instance().removeBillboard()
       wrapper.instance().handleDelete(1)()
       expect(wrapper.find('ProficiencyRating')).toHaveLength(4)
       expect(flashMock).toHaveBeenCalledTimes(1)
@@ -141,7 +111,6 @@ describe('default proficiency', () => {
   it('setting blank description sets error', done => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
-      wrapper.instance().removeBillboard()
       wrapper.instance().handleDescriptionChange(0)('')
       wrapper
         .find('Button')
@@ -160,7 +129,6 @@ describe('default proficiency', () => {
   it('setting blank points sets error', done => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
-      wrapper.instance().removeBillboard()
       wrapper.instance().handlePointsChange(0)('')
       wrapper
         .find('Button')
@@ -179,7 +147,6 @@ describe('default proficiency', () => {
   it('setting invalid points sets error', done => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
-      wrapper.instance().removeBillboard()
       wrapper.instance().handlePointsChange(0)('1.1.1')
       wrapper
         .find('Button')
@@ -198,7 +165,6 @@ describe('default proficiency', () => {
   it('setting negative points sets error', done => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
-      wrapper.instance().removeBillboard()
       wrapper.instance().handlePointsChange(0)('-1')
       wrapper
         .find('Button')
@@ -214,21 +180,14 @@ describe('default proficiency', () => {
     }, 1)
   })
 
-  it('sends POST on submit', done => {
-    const postSpy = jest
-      .spyOn(axios, 'post')
-      .mockImplementation(() => Promise.resolve({status: 200}))
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
-      expect(axios.post).toHaveBeenCalledTimes(1)
-      postSpy.mockRestore()
-      done()
-    }, 1)
+  it('calls update on submit', () => {
+    const updateSpy = jest.fn(() => Promise.resolve())
+    const wrapper = shallow(<ProficiencyTable {...defaultProps} update={updateSpy} />)
+    wrapper
+      .find('Button')
+      .last()
+      .simulate('click')
+    expect(updateSpy).toHaveBeenCalledTimes(1)
   })
 
   it('empty rating description generates errors', () => {
@@ -263,11 +222,11 @@ describe('default proficiency', () => {
 })
 
 describe('custom proficiency', () => {
-  it('renders two ratings that are deletable', () => {
-    const promise = Promise.resolve({
-      status: 200,
-      data: {
-        ratings: [
+  const customProficiencyProps = {
+    ...defaultProps,
+    proficiency: {
+      proficiencyRatingsConnection: {
+        nodes: [
           {
             description: 'Great',
             points: 10,
@@ -282,52 +241,49 @@ describe('custom proficiency', () => {
           }
         ]
       }
-    })
-    const spy = jest.spyOn(axios, 'get').mockImplementation(() => promise)
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    return promise.then(() => {
-      spy.mockRestore()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(2)
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .first()
-          .prop('disableDelete')
-      ).toBeFalsy()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .last()
-          .prop('disableDelete')
-      ).toBeFalsy()
-    })
+    }
+  }
+
+  it('renders two ratings that are deletable', () => {
+    const wrapper = shallow(<ProficiencyTable {...customProficiencyProps} />)
+    expect(wrapper.find('ProficiencyRating')).toHaveLength(2)
+    expect(
+      wrapper
+        .find('ProficiencyRating')
+        .first()
+        .prop('disableDelete')
+    ).toBeFalsy()
+    expect(
+      wrapper
+        .find('ProficiencyRating')
+        .last()
+        .prop('disableDelete')
+    ).toBeFalsy()
   })
 
   it('renders one rating that is not deletable', () => {
-    const promise = Promise.resolve({
-      status: 200,
-      data: {
-        ratings: [
-          {
-            description: 'Uno',
-            points: 1,
-            color: '0000ff',
-            mastery: true
-          }
-        ]
+    const props = {
+      ...defaultProps,
+      proficiency: {
+        proficiencyRatingsConnection: {
+          nodes: [
+            {
+              description: 'Uno',
+              points: 1,
+              color: '0000ff',
+              mastery: true
+            }
+          ]
+        }
       }
-    })
-    const spy = jest.spyOn(axios, 'get').mockImplementation(() => promise)
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    return promise.then(() => {
-      spy.mockRestore()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(1)
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .first()
-          .prop('disableDelete')
-      ).toBeTruthy()
-    })
+    }
+    const wrapper = shallow(<ProficiencyTable {...props} />)
+    expect(wrapper.find('ProficiencyRating')).toHaveLength(1)
+    expect(
+      wrapper
+        .find('ProficiencyRating')
+        .first()
+        .prop('disableDelete')
+    ).toBeTruthy()
   })
 })
