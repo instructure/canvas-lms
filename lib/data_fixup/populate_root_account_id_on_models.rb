@@ -433,7 +433,7 @@ module DataFixup::PopulateRootAccountIdOnModels
         root_ids_with_foreign_keys.each do |attributes|
           foreign_keys = attributes.foreign_keys.map{|fk| Shard.global_id_for(fk, foreign_shard)}
           scope.where("#{foreign_key} IN (#{foreign_keys.join(',')})").
-            update_all("root_account_id = #{Shard.global_id_for(attributes.root_id, foreign_shard)}")
+            update_all("root_account_id = #{Shard.global_id_for(attributes.root_id, foreign_shard) || "null"}")
         end
       end
       min = scope.where("#{foreign_key} > ?", (min / Shard::IDS_PER_SHARD + 1) * Shard::IDS_PER_SHARD).minimum(:id)
