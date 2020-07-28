@@ -204,10 +204,12 @@ describe Mutations::UpdateAssignment do
     result_overrides = assert_no_errors_and_get_overrides(result)
     expect(result_overrides.length).to eq 3
     expect(Assignment.find(@assignment_id).active_assignment_overrides.length).to eq 3
-    # for whatever reason, the update get returned in reverse order. not going to fight it unless asked
-    group_override_id = assert_group_override(result_overrides[0], @group.id)
-    assert_section_override(result_overrides[1], section.id)
-    adhoc_override_id = assert_adhoc_override(result_overrides[2], [@student.id])
+    group_override = result_overrides.find { |ro| ro['title'] == @group.name }
+    group_override_id = assert_group_override(group_override, @group.id)
+    section_override = result_overrides.find { |ro| ro['title'] == section.name }
+    assert_section_override(section_override, section.id)
+    adhoc_override = result_overrides.find { |ro| ro['title'] == '1 student' }
+    adhoc_override_id = assert_adhoc_override(adhoc_override, [@student.id])
 
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"
