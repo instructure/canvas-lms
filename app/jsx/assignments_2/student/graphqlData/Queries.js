@@ -62,9 +62,11 @@ export const RUBRIC_QUERY = gql`
     }
     course(id: $courseID) {
       account {
-        proficiencyRatingsConnection {
-          nodes {
-            ...ProficiencyRating
+        outcomeProficiency {
+          proficiencyRatingsConnection {
+            nodes {
+              ...ProficiencyRating
+            }
           }
         }
       }
