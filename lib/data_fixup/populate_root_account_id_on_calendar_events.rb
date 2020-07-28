@@ -38,7 +38,7 @@ module DataFixup::PopulateRootAccountIdOnCalendarEvents
         CalendarEvent.where(id: batch_min..batch_max, context_type: ["AppointmentGroup", "User"]).
           where("effective_context_code like ?", "#{model.table_name.singularize}%").
           # pull id from effective context code that looks like `course_1` or `course_section_1`
-          joins("INNER JOIN #{qtn} ON #{qtn}.id = cast(reverse(split_part(reverse(calendar_events.effective_context_code), '_', 1)) as integer)").
+          joins("INNER JOIN #{qtn} ON #{qtn}.id = cast(reverse(split_part(reverse(calendar_events.effective_context_code), '_', 1)) as bigint)").
           update_all("root_account_id=#{qtn}.root_account_id")
       end
     end

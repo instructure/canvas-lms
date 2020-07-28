@@ -39,7 +39,7 @@ module DataFixup::PopulateRootAccountIdOnAssetUserAccesses
     asset_types.each do |type|
       qtn = type.classify.constantize.quoted_table_name
       to_transform.where("asset_code like ?", "%#{type}%").
-        joins("INNER JOIN #{qtn} ON #{qtn}.id = cast(reverse(split_part(reverse(asset_user_accesses.asset_code), '_', 1)) as integer)").
+        joins("INNER JOIN #{qtn} ON #{qtn}.id = cast(reverse(split_part(reverse(asset_user_accesses.asset_code), '_', 1)) as bigint)").
         in_batches.
         update_all("root_account_id=#{qtn}.root_account_id")
     end
