@@ -16,11 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-  TODO: Duplicated and modified within jsx/outcomes/MasteryScale for use there
-        Remove when feature flag account_level_mastery_scales is enabled
-*/
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
@@ -30,7 +25,7 @@ import {Popover} from '@instructure/ui-overlays'
 import {RadioInput} from '@instructure/ui-forms'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import ColorPicker, {PREDEFINED_COLORS} from '../shared/ColorPicker'
+import ColorPicker, {PREDEFINED_COLORS} from '../../shared/ColorPicker'
 
 function formatColor(color) {
   if (color[0] !== '#') {

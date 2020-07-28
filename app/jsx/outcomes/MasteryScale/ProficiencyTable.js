@@ -16,11 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-  TODO: Duplicated and modified within jsx/outcomes/MasteryScale for use there
-        Remove when feature flag account_level_mastery_scales is enabled
-*/
-
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -31,13 +26,13 @@ import I18n from 'i18n!ProficiencyTable'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Table} from '@instructure/ui-elements'
 import {Spinner} from '@instructure/ui-spinner'
-import ProficiencyRating from 'jsx/rubrics/ProficiencyRating'
+import ProficiencyRating from './ProficiencyRating'
 import uuid from 'uuid/v1'
 import _ from 'underscore'
 import {fromJS, List} from 'immutable'
 import {fetchProficiency, saveProficiency} from './api'
-import NumberHelper from '../shared/helpers/numberHelper'
-import SVGWrapper from '../shared/SVGWrapper'
+import NumberHelper from '../../shared/helpers/numberHelper'
+import SVGWrapper from '../../shared/SVGWrapper'
 
 const ADD_DEFAULT_COLOR = 'EF4437'
 

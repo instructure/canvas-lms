@@ -15,12 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/*
-  TODO: Duplicated and modified within jsx/outcomes/MasteryScale for use there
-        Remove when feature flag account_level_mastery_scales is enabled
-*/
-
 import _ from 'lodash'
 import $ from 'jquery'
 import React from 'react'
