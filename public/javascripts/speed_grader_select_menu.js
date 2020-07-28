@@ -164,6 +164,11 @@ export default function speedgraderSelectMenu(optionsArray) {
   this.appendTo = function(selector, onChange) {
     const self = this
     this.student_id_map = buildStudentIdMap(this.options_array)
+
+    $(
+      '<label class="screenreader-only" for="students_selectmenu">Select a student</label>'
+    ).appendTo(selector)
+
     this.$el = $(this.buildHtml(this.options_array))
       .appendTo(selector)
       .selectmenu({
