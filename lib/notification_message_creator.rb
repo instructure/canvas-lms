@@ -75,6 +75,7 @@ class NotificationMessageCreator
         # otherwise it will create a delayed_message. Any message can create a
         # dashboard message in addition to itself.
         channels.each do |channel|
+          next unless notifications_enabled_for_context?(user, @course)
           if immediate_policy?(user, channel)
             immediate_messages << build_immediate_message_for(user, channel)
             delayed_messages << build_fallback_for(user, channel)
@@ -123,7 +124,6 @@ class NotificationMessageCreator
     # if it's not an email we won't send a delayed_message.
     # and this is only used when there were too_many_messages for a user.
     return unless @notification.summarizable? && channel.path_type == 'email' && too_many_messages_for?(user)
-    return unless notifications_enabled_for_context?(user, @course)
     fallback_policy = nil
     NotificationPolicy.unique_constraint_retry do
       fallback_policy = channel.notification_policies.by_frequency('daily').where(:notification_id => nil).first
@@ -138,7 +138,6 @@ class NotificationMessageCreator
   def build_delayed_message_for(user, channel)
     # delayed_messages are only sent to email channels.
     return unless channel.path_type == 'email'
-    return unless notifications_enabled_for_context?(user, @course)
     # some types of notifications are only for immediate.
     return if @notification.registration? || @notification.migration?
     policy = effective_policy_for(user, channel)
@@ -177,7 +176,6 @@ class NotificationMessageCreator
     # immediate message.
     return if @notification.summarizable? && too_many_messages_for?(user) && ['email', 'sms'].include?(channel.path_type)
     return if channel.bouncing?
-    return unless notifications_enabled_for_context?(user, @course)
     message_options = message_options_for(user)
     message = user.messages.build(message_options.merge(communication_channel: channel, to: channel.path))
     message&.parse!
