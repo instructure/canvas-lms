@@ -1,5 +1,5 @@
 # See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
-version: '2'
+version: '2.3'
 services:
   jobs: &BASE
     build:

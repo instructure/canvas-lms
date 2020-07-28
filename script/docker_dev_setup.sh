@@ -208,7 +208,8 @@ function copy_docker_config {
 
 function build_images {
   message 'Building docker images...'
-  docker-compose build --pull
+  docker build --pull --file ruby.Dockerfile --tag canvas-lms-ruby .
+  docker-compose build --build-arg RUBY_PATCHSET_IMAGE=canvas-lms-ruby
 }
 
 function check_gemfile {
