@@ -1493,10 +1493,6 @@ class AccountsController < ApplicationController
     end
   end
 
-  def process_external_integration_keys(account = @account)
-    account.process_external_integration_keys(params[:account][:external_integration_keys], @current_user)
-  end
-
   def set_default_dashboard_view(new_view)
     if new_view != @account.default_dashboard_view
       if authorized_action(@account, @current_user, :manage_account_settings)
