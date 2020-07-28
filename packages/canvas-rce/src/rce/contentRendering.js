@@ -104,50 +104,40 @@ export function mediaIframeSrcFromFile(fileProps) {
   return `/media_objects_iframe?mediahref=${encodeURIComponent(fileProps.href)}&type=${type}`
 }
 
-function constructJSXVideoEmbedding(video) {
-  const src = mediaIframeSrcFromFile(video)
-  return (
-    <iframe
-      allow="fullscreen"
-      allowFullScreen
-      data-media-id={`${video.media_id || video.id || video.file_id}`}
-      data-media-type="video"
-      src={src}
-      style={{
-        width: VIDEO_SIZE_DEFAULT.width,
-        height: VIDEO_SIZE_DEFAULT.height,
-        display: 'inline-block'
-      }}
-      title={formatMessage('Video player for {title}', {
-        title: video.title || video.name || video.text
-      })}
-    />
-  )
-}
-
 export function renderVideo(video) {
-  return renderToStaticMarkup(constructJSXVideoEmbedding(video))
-}
-
-function constructJSXAudioEmbedding(audio) {
-  const src = mediaIframeSrcFromFile(audio)
-  return (
-    <iframe
-      data-media-id={`${audio.media_id || audio.id || audio.file_id}`}
-      data-media-type="audio"
-      src={src}
-      style={{
-        width: AUDIO_PLAYER_SIZE.width,
-        height: AUDIO_PLAYER_SIZE.height,
-        display: 'inline-block'
-      }}
-      title={formatMessage('Audio player for {title}', {
-        title: audio.title || audio.name || audio.text
-      })}
-    />
-  )
+  const src = mediaIframeSrcFromFile(video)
+  return `
+  <iframe
+      allow="fullscreen"
+      allowfullscreen
+      data-media-id="${video.media_id || video.id || video.file_id}"
+      data-media-type="video"
+      src="${src}"
+      style="width:${VIDEO_SIZE_DEFAULT.width};height:${
+    VIDEO_SIZE_DEFAULT.height
+  };display:inline-block;"
+      title="${formatMessage('Video player for {title}', {
+        title: video.title || video.name || video.text
+      })}"></iframe>&nbsp;
+  `
+    .trim()
+    .replace(/\s+/g, ' ')
 }
 
 export function renderAudio(audio) {
-  return renderToStaticMarkup(constructJSXAudioEmbedding(audio))
+  const src = mediaIframeSrcFromFile(audio)
+  return `
+  <iframe
+      data-media-id="${audio.media_id || audio.id || audio.file_id}"
+      data-media-type="audio"
+      src="${src}"
+      style="width:${AUDIO_PLAYER_SIZE.width};height:${
+    AUDIO_PLAYER_SIZE.height
+  };display:inline-block;"
+      title="${formatMessage('Audio player for {title}', {
+        title: audio.title || audio.name || audio.text
+      })}"></iframe>&nbsp;
+  `
+    .trim()
+    .replace(/\s+/g, ' ')
 }
