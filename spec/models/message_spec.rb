@@ -149,7 +149,8 @@ describe Message do
     it "displays a custom logo when configured" do
       account = account_model
       account.settings[:email_logo] = 'awesomelogo.jpg'
-      @au = AccountUser.create(:account => account)
+      account.save!
+      @au = AccountUser.create!(:account => account, user: user_model)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body).to include('awesomelogo.jpg')
     end
