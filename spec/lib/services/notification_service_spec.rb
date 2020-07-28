@@ -63,6 +63,8 @@ module Services
         encrypted_slack_key, salt = Canvas::Security.encrypt_password('testkey'.to_s, 'instructure_slack_encrypted_key')
         @account.settings[:encrypted_slack_key] = encrypted_slack_key
         @account.settings[:encrypted_slack_key_salt] = salt
+        @account.save!
+        @au.reload
         expect(@queue).to receive(:send_message).once
         @message.path_type = "slack"
         expect{@message.deliver}.not_to raise_error
@@ -95,6 +97,8 @@ module Services
         encrypted_slack_key, salt = Canvas::Security.encrypt_password('testkey'.to_s, 'instructure_slack_encrypted_key')
         @account.settings[:encrypted_slack_key] = encrypted_slack_key
         @account.settings[:encrypted_slack_key_salt] = salt
+        @account.save!
+        @au.reload
         expect(@queue).to receive(:send_message).once
         expect(Mailer).to receive(:create_message).never
         @message.path_type = "slack"
