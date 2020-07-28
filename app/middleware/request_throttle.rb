@@ -111,7 +111,7 @@ class RequestThrottle
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
           return false
         else
-          Rails.logger.info("WOULD HAVE blocked request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
+          Rails.logger.info("WOULD HAVE throttled request (config disabled), client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
         end
       end
       return true
@@ -308,12 +308,10 @@ class RequestThrottle
     # expecting the block to return the final cost. It then increments again,
     # subtracting the initial up_front_cost from the final cost to erase it.
     def reserve_capacity(up_front_cost = self.up_front_cost)
-      return (self.count = yield) unless RequestThrottle.enabled?
-
       increment(0, up_front_cost)
       cost = yield
     ensure
-      increment(cost || 0, -up_front_cost) if RequestThrottle.enabled?
+      increment(cost || 0, -up_front_cost)
     end
 
     def full?
