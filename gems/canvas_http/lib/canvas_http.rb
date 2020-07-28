@@ -92,17 +92,17 @@ module CanvasHttp
       start_time = Time.now
       http.request(request) do |response|
         end_time = Time.now
-        elapsed_time = (end_time - start_time) * 1000 # milliseconds
+        elapsed_time = (end_time - start_time) # seconds
         request_cost += elapsed_time
         if response.is_a?(Net::HTTPRedirection) && !response.is_a?(Net::HTTPNotModified)
           redirect_spy.call(response) if redirect_spy.is_a?(Proc)
           last_host = uri.host
           last_scheme = uri.scheme
           url_str = response['Location']
-          logger.info("CANVAS_HTTP CONSUME REDIRECT | url: #{url_str} | elapsed: #{elapsed_time}")
+          logger.info("CANVAS_HTTP CONSUME REDIRECT | url: #{url_str} | elapsed: #{elapsed_time} s")
           redirect_limit -= 1
         else
-          logger.info("CANVAS_HTTP RESOLVE RESPONSE | url: #{url_str} | elapsed: #{elapsed_time}")
+          logger.info("CANVAS_HTTP RESOLVE RESPONSE | url: #{url_str} | elapsed: #{elapsed_time} s")
           if block_given?
             yield response
           else
