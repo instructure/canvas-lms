@@ -114,8 +114,10 @@ class InfoController < ApplicationController
     render status: 404, template: "shared/errors/404_message"
   end
 
-  def mobile_manifest
-    icon = brand_variable('ic-brand-apple-touch-icon')
+  def web_app_manifest
+    # brand_variable returns a value that we expect to go through a rails
+    # asset helper, so we need to do that manually here
+    icon = helpers.image_path(brand_variable('ic-brand-apple-touch-icon'))
     render json: {
       name: "Canvas",
       short_name: "Canvas",
