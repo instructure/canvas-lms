@@ -2476,18 +2476,21 @@ class UsersController < ApplicationController
       end
 
       begin
+        identity_user_provisioned = params[:identity_user_provisioned].present?
+        @pseudonym.get_identity_username? if identity_user_provisioned
+
         User.transaction do
           @user.save_with_or_without_identity_create(
             @pseudonym.unique_id,
             force: true,
-            provisioned: params[:identity_user_provisioned].present?
+            provisioned: identity_user_provisioned
           )
         end
       rescue ActiveRecord::RecordInvalid => e
         errors = {
           :errors => {
             :user => @user.errors.as_json[:errors],
-            :pseudonym => {},
+            :pseudonym => @pseudonym.errors.as_json[:errors],
             :observee => {}
           }
         }
