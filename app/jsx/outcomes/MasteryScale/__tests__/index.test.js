@@ -17,15 +17,13 @@
  */
 
 import React from 'react'
-import {render, cleanup, wait, fireEvent} from '@testing-library/react'
+import {render, wait, fireEvent} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import moxios from 'moxios'
-import {OUTCOME_PROFICIENCY_QUERY} from '../api'
+import {OUTCOME_PROFICIENCY_QUERY, SET_OUTCOME_CALCULATION_METHOD} from '../api'
 import MasteryScale from '../index'
 
 describe('MasteryScale', () => {
-  afterEach(cleanup)
-
   const mocks = [
     {
       request: {
@@ -38,7 +36,15 @@ describe('MasteryScale', () => {
         data: {
           account: {
             __typename: 'Account',
-            outcomeCalculationMethod: null,
+            outcomeCalculationMethod: {
+              __typename: 'OutcomeCalculationMethod',
+              _id: '1',
+              contextType: 'Account',
+              contextId: 1,
+              calculationMethod: 'decaying_average',
+              calculationInt: 65,
+              locked: false
+            },
             outcomeProficiency: {
               __typename: 'OutcomeProficiency',
               _id: '1',
@@ -94,9 +100,44 @@ describe('MasteryScale', () => {
     expect(getByText(/An error occurred/)).not.toEqual(null)
   })
 
+  it('loads default data when request returns no ratings/method', async () => {
+    const emptyMocks = [
+      {
+        request: {
+          query: OUTCOME_PROFICIENCY_QUERY,
+          variables: {
+            contextId: '11'
+          }
+        },
+        result: {
+          data: {
+            account: {
+              __typename: 'Account',
+              outcomeCalculationMethod: null,
+              outcomeProficiency: null
+            }
+          }
+        }
+      }
+    ]
+    const {getByText} = render(
+      <MockedProvider mocks={emptyMocks}>
+        <MasteryScale contextType="Account" contextId="11" />
+      </MockedProvider>
+    )
+    await wait()
+    expect(getByText('Proficiency Rating')).not.toBeNull()
+    expect(getByText('Proficiency Calculation')).not.toBeNull()
+  })
+
   describe('update outcomeProficiency', () => {
-    beforeEach(() => moxios.install())
-    afterEach(() => moxios.uninstall())
+    beforeEach(() => {
+      moxios.install()
+    })
+    afterEach(() => {
+      moxios.uninstall()
+    })
+
     it('submits a request when ratings are updated', async () => {
       const {findAllByLabelText} = render(
         <MockedProvider mocks={mocks}>
@@ -104,15 +145,55 @@ describe('MasteryScale', () => {
         </MockedProvider>
       )
       const pointsInput = (await findAllByLabelText(/Change points/))[0]
-      jest.useFakeTimers()
       fireEvent.change(pointsInput, {target: {value: '100'}})
-      jest.advanceTimersByTime(1000)
 
       await wait(() => {
         const request = moxios.requests.mostRecent()
         expect(request).not.toBeUndefined()
         expect(request.config.url).toEqual('/api/v1/accounts/11/outcome_proficiency')
       })
+    })
+  })
+
+  describe('update outcomeCalculationMethod', () => {
+    const variables = {
+      contextType: 'Account',
+      contextId: '11',
+      calculationMethod: 'decaying_average',
+      calculationInt: 88
+    }
+    const updateCall = jest.fn(() => ({
+      data: {
+        createOutcomeCalculationMethod: {
+          outcomeCalculationMethod: {
+            _id: '1',
+            locked: false,
+            ...variables
+          },
+          errors: []
+        }
+      }
+    }))
+    const updateMocks = [
+      ...mocks,
+      {
+        request: {
+          query: SET_OUTCOME_CALCULATION_METHOD,
+          variables
+        },
+        result: updateCall
+      }
+    ]
+    it('submits a request when calculation method is updated', async () => {
+      const {findByLabelText} = render(
+        <MockedProvider mocks={updateMocks} addTypename={false}>
+          <MasteryScale contextType="Account" contextId="11" />
+        </MockedProvider>
+      )
+      const parameter = await findByLabelText(/Parameter/)
+      fireEvent.input(parameter, {target: {value: '88'}})
+
+      await wait(() => expect(updateCall).toHaveBeenCalled())
     })
   })
 })

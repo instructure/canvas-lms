@@ -75,11 +75,9 @@ describe('default proficiency', () => {
   })
 
   it('setting blank description sets error', async () => {
-    jest.useFakeTimers()
     const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: ''}})
-    jest.advanceTimersByTime(1000)
     const error = await within(masteryField.closest('td')).findByText(
       'Missing required description'
     )
@@ -87,46 +85,38 @@ describe('default proficiency', () => {
   })
 
   it('setting blank points sets error', async () => {
-    jest.useFakeTimers()
     const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: ''}})
-    jest.advanceTimersByTime(1000)
     const error = await within(row).findByText('Invalid points')
     expect(error).not.toBeNull()
   })
 
   it('setting invalid points sets error', async () => {
-    jest.useFakeTimers()
     const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
-    jest.advanceTimersByTime(1000)
     const error = await within(row).findByText('Invalid points')
     expect(error).not.toBeNull()
   })
 
   it('setting negative points sets error', async () => {
-    jest.useFakeTimers()
     const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: '-1'}})
-    jest.advanceTimersByTime(1000)
     const error = await within(row).findByText('Negative points')
     expect(error).not.toBeNull()
   })
 
   it('calls update on change', async () => {
-    jest.useFakeTimers()
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: 'Mastery2'}})
-    jest.advanceTimersByTime(1000)
-    expect(updateSpy).toHaveBeenCalled()
+    await wait(() => expect(updateSpy).toHaveBeenCalled())
   })
 
   it('empty rating description does not call update', () => {
@@ -142,7 +132,7 @@ describe('default proficiency', () => {
   it('empty rating points does not call update', () => {
     jest.useFakeTimers()
     const updateSpy = jest.fn(() => Promise.resolve())
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} updateSpy={updateSpy} />)
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: ''}})
@@ -153,7 +143,7 @@ describe('default proficiency', () => {
   it('invalid rating points does not call update', () => {
     jest.useFakeTimers()
     const updateSpy = jest.fn(() => Promise.resolve())
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} updateSpy={updateSpy} />)
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
@@ -164,7 +154,7 @@ describe('default proficiency', () => {
   it('increasing rating points does not call update', () => {
     jest.useFakeTimers()
     const updateSpy = jest.fn(() => Promise.resolve())
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} updateSpy={updateSpy} />)
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: '1000'}})
@@ -175,7 +165,7 @@ describe('default proficiency', () => {
   it('negative rating points does not call update', () => {
     jest.useFakeTimers()
     const updateSpy = jest.fn(() => Promise.resolve())
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} updateSpy={updateSpy} />)
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: '-10'}})

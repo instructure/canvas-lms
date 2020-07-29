@@ -26,11 +26,12 @@ import {Table} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-view'
 import ProficiencyRating from './ProficiencyRating'
 import uuid from 'uuid/v1'
-import _ from 'underscore'
+import _ from 'lodash'
 import {fromJS, List} from 'immutable'
 import NumberHelper from '../../shared/helpers/numberHelper'
 
 const ADD_DEFAULT_COLOR = 'EF4437'
+
 function unformatColor(color) {
   if (color[0] === '#') {
     return color.substring(1)
@@ -45,6 +46,7 @@ const createRating = (description, points, color, mastery = false, focusField = 
   mastery,
   focusField
 })
+
 const configToState = data => {
   const rows = List(
     data.proficiencyRatingsConnection.nodes.map(rating =>
@@ -58,6 +60,7 @@ const configToState = data => {
     locked: data.locked
   }
 }
+
 export default class ProficiencyTable extends React.Component {
   static propTypes = {
     proficiency: PropTypes.object,

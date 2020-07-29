@@ -38,7 +38,9 @@ export const OutcomePanel = () => {
 }
 
 const OutcomeManagement = () => {
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [selectedIndex, setSelectedIndex] = useState(
+    window.location.hash === '#mastery_scale' ? 1 : 0
+  )
 
   const handleTabChange = (_, {index}) => {
     setSelectedIndex(index)

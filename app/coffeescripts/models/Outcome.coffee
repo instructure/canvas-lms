@@ -36,7 +36,7 @@ export default class Outcome extends Backbone.Model
       points: 0
     ]
 
-  defaultCalculiationInt: -> {
+  defaultCalculationInt: -> {
     n_mastery: 5
     decaying_average: 65
   }[@get('calculation_method')]
@@ -44,7 +44,7 @@ export default class Outcome extends Backbone.Model
   initialize: ->
     @setDefaultCalcSettings() unless @get('calculation_method')
     @on 'change:calculation_method', (model, changedTo) =>
-      model.set calculation_int: @defaultCalculiationInt()
+      model.set calculation_int: @defaultCalculationInt()
     super
 
   setDefaultCalcSettings: ->
