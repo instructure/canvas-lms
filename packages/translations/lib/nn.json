@@ -1,6 +1,6 @@
 {
     "accessibility_checker_b3af1f6c": {
-        "message": "Sjekk for universell utforming"
+        "message": "Sjekk av universell utforming"
     },
     "add_8523c19b": {
         "message": "Legg til"
@@ -49,6 +49,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alternativ tekst"
+    },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "Det oppstod eit problem under lesing av fila"
     },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Ein feil oppstod ved forsøk på å forkaste valet."
@@ -467,6 +470,9 @@
     "finish_bc343002": {
         "message": "Fullfør"
     },
+    "focus_element_options_toolbar_18d993e": {
+        "message": "Sentrer alternativ-menyen"
+    },
     "folder_tree_fbab0726": {
         "message": "Mappestruktur"
     },
@@ -830,6 +836,9 @@
     "quizzes_7e598f57": {
         "message": "Quizar"
     },
+    "reading_a_media_track_file_failed_aborting_be051b20": {
+        "message": "Lesing av mediefil mislukkast. Avbryt."
+    },
     "record_7c9448b": {
         "message": "Spel inn"
     },
@@ -902,6 +911,9 @@
     "size_b30e1077": {
         "message": "Storleik"
     },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "Storleiken på { file } er større enn lovleg maksgrense på { max } MB."
+    },
     "small_b070434a": {
         "message": "Liten"
     },
@@ -913,6 +925,9 @@
     },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Noko gjekk gale. Veit ikkje kva som kan visast."
+    },
+    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+        "message": "Noko gjekk gale, sjekk internettforbindelsen og prøv på nytt."
     },
     "something_went_wrong_d238c551": {
         "message": "Noko gjekk gale"
@@ -1153,6 +1168,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Du har tilbakemelding. "
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "Du kan ikkje laste opp ei tom fil."
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "Du må oppgi verdi for dato og tidspunkt"
