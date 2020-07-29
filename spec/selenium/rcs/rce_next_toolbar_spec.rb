@@ -237,38 +237,19 @@ describe 'RCE Next toolbar features' do
 
     it 'should change text to right-to-left in the rce' do
       rce_wysiwyg_state_setup(@course, text = 'rtl')
-      click_directionality_toggle_button
-      click_right_to_left_option
+      click_rtl
       in_frame rce_page_body_ifr_id do
         expect(f('#tinymce p').attribute('dir')).to eq text
       end
     end
 
-    it 'should remove right-to-left from text in the rce' do
-      skip('Unskip in CORE-3049')
-      text = '<p dir="rtl">This is my text</p>'
-      wysiwyg_state_setup(@course, text, html: true)
-      click_directionality_toggle_button
-      click_right_to_left_option
-      validate_wiki_style_attrib_empty('p')
-    end
-
     it 'should change text to left-to-right in the rce' do
-      skip('Unskip in CORE-3049')
-      wysiwyg_state_setup(@course, text = 'ltr')
-      click_directionality_toggle_button
-      click_right_to_left_option
+      text = '<p dir="rtl">This is my text</p>'
+      rce_wysiwyg_state_setup(@course, text, html: true)
+      click_ltr
       in_frame rce_page_body_ifr_id do
-        expect(wiki_page_body).attribute('dir').to eq text
+        expect(f('#tinymce p').attribute('dir')).to eq "ltr"
       end
-    end
-
-    it 'should remove left-to-right from text in the rce' do
-      skip('Unskip in CORE-3049')
-      text = '<p dir="ltr">This is my text</p>'
-      wysiwyg_state_setup(@course, text, html: true)
-      click_directionality_button
-      validate_wiki_style_attrib_empty('p')
     end
 
     it 'should verify the rce-next toolbar is one row' do

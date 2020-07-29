@@ -186,11 +186,11 @@ module RCENextPage
   def lti_favorite_button
     possibly_hidden_toolbar_button('button[aria-label="Commons Favorites"')
   end
-  
+
   def lti_favorite_modal
     f('[role="dialog"][aria-label="Embed content from External Tool"]')
   end
-  
+
   def course_images
     f('[role="menuitem"][title="Course Images"]')
   end
@@ -315,18 +315,6 @@ module RCENextPage
     # put align right button locator here
   end
 
-  def directionality_button
-    f('[role="button"][title="directionality"]')
-  end
-
-  def directionality_toggle_button
-    f('[role="button"][title="directionality"] .tox-split-button__chevron')
-  end
-
-  def right_to_left_button
-    f('[role="menuitemcheckbox"][title="right to left"]')
-  end
-
   def formatting_dropdown
     f("button[aria-label='Blocks'")
   end
@@ -393,6 +381,38 @@ module RCENextPage
 
   def overflow_toolbar
     f(overflow_toolbar_selector)
+  end
+
+  def user_media_menu_item
+    fj('[role="menuitem"]:contains("User Media")')
+  end
+
+  def menu_items_by_menu_id(menu_id)
+    ffj("##{menu_id} [role='menuitem']")
+  end
+
+  def menu_item_by_menu_id(menu_id, item_label)
+    fj("##{menu_id}:contains('#{item_label}')")
+  end
+
+  def menu_item_by_name(menu_name)
+    fj("button.tox-mbtn:contains('#{menu_name}')")
+  end
+
+  def menu_option_by_name(menu_option)
+    fj("div.tox-collection__item:contains('#{menu_option}')")
+  end
+
+  def embed_code_textarea
+    f('textarea[placeholder="Embed Code"]')
+  end
+
+  def upload_media_submit_button
+    f('[aria-label="Upload Media"] button[type="submit"]')
+  end
+
+  def tiny_rce_ifr_id
+    f('.tox-editor-container iframe')['id']
   end
 
   # ---------------------- Actions ----------------------
@@ -601,14 +621,6 @@ module RCENextPage
     align_right_button.click
   end
 
-  def click_directionality_button
-    directionality_button.click
-  end
-
-  def click_directionality_toggle_button
-    directionality_toggle_button.click
-  end
-
   def click_right_to_left_option
     right_to_left_button.click
   end
@@ -669,36 +681,12 @@ module RCENextPage
     upload_media_submit_button.click
   end
 
-  def user_media_menu_item
-    fj('[role="menuitem"]:contains("User Media")')
-  end
-
-  def menu_items_by_menu_id(menu_id)
-    ffj("##{menu_id} [role='menuitem']")
-  end
-
-  def menu_item_by_menu_id(menu_id, item_label)
-    fj("##{menu_id}:contains('#{item_label}')")
-  end
-
-  def embed_code_textarea
-    f('textarea[placeholder="Embed Code"]')
-  end
-
-  def upload_media_submit_button
-    f('[aria-label="Upload Media"] button[type="submit"]')
-  end
-
   def switch_to_html_view
     fj('button:contains("Switch to raw html editor")').click
   end
 
   def switch_to_editor_view
     fj('button:contains("Switch to rich text editor")').click
-  end
-
-  def tiny_rce_ifr_id
-    f('.tox-editor-container iframe')['id']
   end
 
   def insert_tiny_text(text = "hello")
@@ -726,5 +714,17 @@ module RCENextPage
       linklink.send_keys(href)
     end
     fj('[role="dialog"] button:contains("Done")').click
+  end
+
+  def click_ltr
+    menu_item_by_name('Format').click
+    menu_option_by_name('Directionality').click
+    menu_option_by_name('Left-to-Right').click
+  end
+
+  def click_rtl
+    menu_item_by_name('Format').click
+    menu_option_by_name('Directionality').click
+    menu_option_by_name('Right-to-Left').click
   end
 end

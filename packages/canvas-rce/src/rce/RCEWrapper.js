@@ -1004,7 +1004,7 @@ class RCEWrapper extends React.Component {
         },
         {
           name: formatMessage('Alignment and Indentation'),
-          items: ['align', 'bullist', 'inst_indent', 'inst_outdent', 'directionality']
+          items: ['align', 'bullist', 'inst_indent', 'inst_outdent']
         },
         {
           name: formatMessage('Canvas Plugins'),
