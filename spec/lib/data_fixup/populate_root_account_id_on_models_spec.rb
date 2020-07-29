@@ -51,13 +51,41 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    it 'should populate root_account_id on AccessToken' do
-      dk = DeveloperKey.create!(account: @course.account)
-      at = dk.access_tokens.create!(user: user_model)
-      at.update_columns(root_account_id: nil)
-      expect(at.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(at.reload.root_account_id).to eq @course.root_account_id
+    context 'with AccessToken' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          dk = DeveloperKey.create!(account: @course.account)
+          at = dk.access_tokens.create!(user: user_model)
+        end
+        let(:reference_record) { @course }
+      end
+
+      context 'with_sharding' do
+        specs_require_sharding
+
+        context 'with DeveloperKey with root_account_id' do
+          it_behaves_like 'a datafixup that populates root_account_id' do
+            let(:account) { @shard1.activate { account_model } }
+            let(:record) do
+              dk = DeveloperKey.create!(account: account)
+              at = dk.access_tokens.create!(user: user_model)
+            end
+            let(:reference_record) { account }
+          end
+        end
+
+        context 'with DeveloperKey without root_account_id (eg SiteAdmin)' do
+          it 'sets root_account_id to null' do
+            dk = @shard1.activate { DeveloperKey.create!(account: account_model) }
+            at = AccessToken.create!(developer_key: dk, user: user_model)
+            at.update_columns(root_account_id: nil)
+            dk.update_columns(root_account_id: nil)
+            expect(at.reload.root_account_id).to eq nil
+            DataFixup::PopulateRootAccountIdOnModels.run
+            expect(at.reload.root_account_id).to eq nil
+          end
+        end
+      end
     end
 
     it 'should populate the root_account_id on AccountUser' do
