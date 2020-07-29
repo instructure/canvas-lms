@@ -143,11 +143,6 @@ module SchedulerCommon
     f('#FindAppointmentButton').click
   end
 
-  def click_scheduler_link
-    f('button#scheduler').click
-    wait_for_ajaximations
-  end
-
   def click_appointment_link
     f('.view_calendar_link').click
     fj('.agenda-wrapper.active:visible')

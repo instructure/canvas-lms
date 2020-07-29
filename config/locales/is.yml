@@ -393,6 +393,7 @@ is:
   account_id_73966078: account_id
   account_id_f6e26867: "Auðkenni reiknings"
   account_level_notification_preferences_require_an__66467cd7: "Kjörstillingar tilkynninga á reikningsgrundvelli krefjast account_id uppfærslu"
+  account_level_notification_preferences_ui_update_f5e189a4: "Uppfærsla á notendaviðmóti kjörstillinga fyrir reikningstilkynningar"
   account_level_settings_manage_4fca6f8e: "Stillingar reiknings stigs - stjórna"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "heiti reiknings"
@@ -1748,6 +1749,7 @@ is:
   add_tas_to_the_course_2aac6e02: "Bæta aðstoðarkennurum við námskeiðið"
   add_theme_32fa3d50: "Bæta við þema"
   add_to_course_481a51c4: "Bæti við námskeiðið..."
+  add_to_rce_toolbar_e5b3e3b4: "Bæta við RCE-tækjastiku"
   add_to_student_to_do_58e66b4b: "Bæta á verkalista nemanda"
   add_to_whitelist_24f3f1ba: "Bæta við hvítlista"
   add_toolname_4e17dc90: "Bæta við %{toolName}"
@@ -5151,6 +5153,7 @@ is:
       importing_button: "Er að flytja inn... þetta gæti tekið tíma"
     titles: 
       home_page: Heimasíða
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Enn er verið að hlaða upp efninu, ef þú heldur áfram verður það ekki innfellt á réttan hátt."
   content_link_error_assignment_name_course_name_b8be789a: "Efnishlekksvilla - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -7807,6 +7810,7 @@ is:
             í samræmi við kjörstillingar þínar.  Gefðu sjálfvirkt einkunn fyrir skil sem vantar eða
             eru sein, og feldu einkunnir á einfaldan hátt þangað til þú vilt að nemendur
             sjái þær. Fyrir einfaldari einkunnagjöf skaltu nota SpeedGrader til að skoða skil og gefa einkunnir fyrir þau.
+  display_historical_view_of_achievements_of_users_53db5938: "Sýna eldra yfirlit yfir afrek notenda"
   display_name_6c2cfc58: Birtingarnafn
   display_name_b80c243e: "Sýna nafn"
   display_to_students_e1301f99: "Sýna nemendum"
@@ -7978,6 +7982,7 @@ is:
   e_g_jon_doe_77233e3b: "t.d. Jón Jónsson"
   e_g_jondoe_example_com_98656fb5: "t.d. jondoe@example.com"
   e_mail_only_2cc5e513: "Aðeins tölvupóstur"
+  earned_earndate_5f8b6c99: "Áunnið %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Flyttu inn eða afritaðu efni frá öðru Canvas námskeiði inn í
               námskeiðið þitt á einfaldan hátt, eða flyttu inn efni frá öðru sniði, svo sem Moodle eða QTI.
@@ -8812,6 +8817,7 @@ is:
   fall_grading_period_id_74ef68e: "Auðkenni hausteinkunnatímabils"
   favicon_6e658914: Favicon
   favorite_courses_fbd356f0: "Uppáhalds námskeið"
+  favorite_d720d310: Eftirlæti
   favorites_c7e0207c: Eftirlæti
   feature_f5526584: Eiginleiki
   feature_flags: 
@@ -10869,6 +10875,7 @@ is:
   item_type_download_e949cdb6: "Tegund atriðis: Niðurhleðsla"
   item_type_link_5a2abed2: "Tegund atriðis: Tengill"
   item_type_locked_85c560ec: "Tegund atriðis: Læst"
+  item_type_mastery_connect_8f36c669: "Gerð atriðis: Tileinkunartenging"
   item_type_new_quiz_1a1cd9a9: "Gerð atriðis: Nýtt próf"
   item_type_quiz_c894ddb1: "Gerð atriðis: Próf"
   items_299a7626: "Atriði:"
@@ -11116,6 +11123,7 @@ is:
   length_results_found_3afd01e5: "%{length} niðurstöður fundust"
   let_students_see_the_correct_answers_dacc2faf: "Leyfa nemendum að sjá rétt svör"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Leyfa nemendum að sjá prófsvörin (röng svör verða merkt í endurgjöf til nemanda)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Fáðu kerfisstjórann til að velja allt að 2 LTI-forrit sem eftirlæti, sem síðan verða birt í RCE-tækjastikunni."
   letter_grade_29ff1938: Bókstafseinkunn
   letter_grade_f00fedc4: bókstafseinkunn
   level_5fdf654a: Stig
@@ -11271,6 +11279,7 @@ is:
   list_collapsed_9ac35920: "Listi dreginn saman."
   list_collapsed_dde87718: "Listi dreginn saman"
   list_expanded_efec2d0: "Listi víkkaður út."
+  list_of_the_currently_attainable_trophies_959b2518: "Listi yfir fáanlega bikara"
   list_view_430aecce: "Skoða lista"
   lithuanian_5adcbe24: Litháenska
   little_lost_try_here_first_9e24e575: "Ertu villt(ur)? Kíktu hingað fyrst!"
@@ -11584,6 +11593,8 @@ is:
   mastery_path_processing_f4471152: "Unnið úr lærdómsferli"
   mastery_paths_breakdown_6e0b5fce: "Sundurliðun tileinkunarslóðar"
   mastery_paths_cc4096c2: Tileinkunarslóðir
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "Breyting tileinkunarslóða hefur verið gert óvirkt tímabundið vegna viðhalds."
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Úrval tileinkunarslóða hefur verið gert óvirkt tímabundið vegna viðhalds."
   mastery_points_f1672cc: Leiknispunktar
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Tileinkunareinkunn sýnir hæstu einkunn fyrir metið verkefni eða próf."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Tileinkunareinkunn sýnir nýjasta metna verkefni eða próf."
@@ -13652,6 +13663,7 @@ is:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} punktar"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} punktar mögulegir"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} punktar"
+  na_3dbb9cfd: NA
   name: "Academic Benchmark innflytjari"
   name_1aed4a1b: Nafn
   name_3806192d: "Nafn:"
@@ -15125,6 +15137,7 @@ is:
       description: "Hýsir upphlaðnar skrár með Inst-FS þjónustu."
       labels: 
         migration_rate: "Möguleiki á að flytja eldri skrár inn í Inst-FS á aðgangi (0 til 100)"
+        service_worker: "Notaðu vinnuþjón til að auðkenna skráaraðgang í Safari 13+"
     kaltura: 
       description: "Kaltura mynd/hljóðupptaka og spilun"
       name: Kaltura
@@ -15443,6 +15456,7 @@ is:
       requirements_must_be_completed: "Eftirfarandi kröfur þarf að uppfylla áður en síðan verður opnuð"
   presentation_2d9387ca: Kynning
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Sýnir prófstillingar til að forðast sjálfvirk skil tímamældra prófa þegar tiltækum tíma er lokið."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Ýttu á ALT + F8 til að sjá lista yfir flýtileiðir á lyklaborði"
   press_space_to_start_over_d4b8a2da: "Ýttu á „bil“ til að byrja aftur"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Ýttu á kommulykilinn eða Shift + spurningarmerkið til að sjá lista yfir flýtilykla"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Ýttu á kommulykilinn eða Shift + ? til að sjá lista yfir flýtilykla"
@@ -16027,6 +16041,7 @@ is:
       update_question_without_regrading: "Uppfæra spurningu án endurmats einkunnar"
   quiz_40ee61b1: próf
   quiz_assignment_overrides_cec1973b: "Hnekkingar úthlutanna skyndiprófa"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Ráðstöfunardagsetningar prófs sem líða meðan á tilraun stendur munu engu að síður verða lagðar inn sjálfkrafa, þó að framlengdur tími hafi ekki runnið út."
   quiz_duplication_not_implemented_c1495585: "Tvöföldun á spurningaprófi ekki útfærð"
   quiz_e0dcce8f: Próf
   quiz_extensions_d2550649: Skyndiprófaviðbætur
@@ -19728,6 +19743,7 @@ is:
       networking_academy_description: "Skoða Cisco svör við algengustu spurningunum."
       networking_academy_faqs: "Algengar spurningar í Networking Academy"
       support_desk_livechat: "Spjall í rauntíma á hjálparborði"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Styðja eftirlætis LTI-verkfærin í RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_46_55cc3620: "Svíþjóð (+46)"
@@ -19805,6 +19821,7 @@ is:
     syllabus: Kennsluáætlun
     tab_location_error: "Þessi flipastaðsetning er ógild"
     tab_unmanagable_error: "Ekki hægt að stjórna %{css_class}"
+    trophy_case: Bikartaska
   tabs_5605547e: Flipar
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taívan (+886)"
@@ -19938,6 +19955,12 @@ is:
                      allt að %{max_domains} lénum handvirkt við hvítlista þinn. Mælt er með algildisstöfum
                      (t.d. *.instructure.com). Canvas og Instructure lén eru innifalin
                      sjálfvirkt og teljast ekki  með í 50 léna lénahámarki þínu.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      Öryggisregla efnis gerir þér kleift að takmarka sérsniðið
+                     JavaScript sem keyrir í Canvas-eintakinu þínu. Þú getur bætt handvirkt
+                     allt að %{max_domains} leyfðum lénum. Mælt er með algildisstöfum
+                     (t.d. *.instructure.com). Canvas og Instructure lénin eru tekin
+                     sjálfkrafa með og teljast ekki með í 50 léna hámarki þínu.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       Heimasíða námskeiðs er fyrsta síðan sem nemendur sjá þegar þeir opna
             námskeiðið. Heimasíðan getur sýnt námskeiðsþátttöku virkni
@@ -19966,6 +19989,9 @@ is:
   the_following_domains_have_automatically_been_adde_2c7a1654: |-
       Eftirfarandi lénum var bætt sjálfvirkt við
                        hvítlista úr verkfærum sem eru þegar til í reikningi þínum.
+                       Til að fjarlægja þessi lén skaltu fjarlægja tengd verkfæri.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      Eftirfarandi lén hafa verið sjálfkrafa leyfð af verkfærum sem þegar eru til á reikningnum þínum.
                        Til að fjarlægja þessi lén skaltu fjarlægja tengd verkfæri.
   the_following_errors_occurred_bdec1e44: "Eftirfarandi villur komu upp:"
   the_following_fields_are_invalid_fields_b3565800: "Eftirtaldir reitir eru ógildir: %{fields}"
@@ -20080,6 +20106,7 @@ is:
   there_are_no_reports_for_you_to_view_b716717a: "Þú hefur engar skýrslu til að fara yfir."
   there_are_no_unsaved_changes_9276e87c: "Engar óvistaðar breytingar"
   there_are_no_unsynced_changes_4e8f0838: "Engar ósamræmdar breytingar"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Það er pláss fyrir 2 forrit að hámarki á RCE-tækjastikunni. Þessi stilling gildir aðeins fyrir aukið RCE."
   there_is_currently_1_available_grader_758e4a21: "Núna eru 1 matsaðili tiltækur"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Vandamál kom upp við útskráningu úr IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Ekki tókst að stofna dálk fyrir athugasemdir kennara."
@@ -20972,6 +20999,59 @@ is:
   tree_browser: 
     folder_tree_instructions: "Notaðu örvalyklana upp og niður til að fara um tréð. Ýttu á hægri ör til að opna möppur, vinstri til að fella og Enter til að velja atriði."
   trinidad_and_tobago_1_fc2d8d1c: "Trinídad og Tóbagó. (+1)"
+  trophy: 
+    balloon_description: "Lýsing á blöðru"
+    balloon_display_name: Blaðra
+    bifrost_trophy_description: "Lýsing á Bifrastarbikar"
+    bifrost_trophy_display_name: Bifrastarbikar
+    butterfly_description: "Lýsing á fiðrildi"
+    butterfly_display_name: Fiðrildi
+    einstein_rosen_trophy_description: "Lýsing á Einstein Rosen bikar"
+    einstein_rosen_trophy_display_name: "Einstein Rosen bikar"
+    fire_description: "Lýsing á eldi"
+    fire_display_name: Eldur
+    flowers_description: "Lýsing á blómi"
+    flowers_display_name: Blóm
+    four_leaf_clover_description: "Lýsing á fjögurra laufa smári"
+    four_leaf_clover_display_name: "Fjögurra laufa smári"
+    gift_description: "Lýsing á gjöf"
+    gift_display_name: Gjöf
+    gnome_description: "Lýsing á álfi"
+    gnome_display_name: Álfur
+    helix_rocket_description: "Lýsing á Helix eldflaug"
+    helix_rocket_display_name: "Helix eldflaug"
+    horse_shoe_description: "Lýsing á skeifu"
+    horse_shoe_display_name: Skeifa
+    hot_air_balloon_description: "Lýsing á loftbelg"
+    hot_air_balloon_display_name: Loftbelgur
+    magic_mystery_thumbs_up_description: "Lýsing á Magic Mystery þumall upp"
+    magic_mystery_thumbs_up_display_name: "Magic Mystery þumall upp"
+    medal_description: "Lýsing á verðlaunapeningi"
+    medal_display_name: Verðlaunapeningur
+    moon_description: "Lýsing á tungli"
+    moon_display_name: Tungl
+    ninja_description: "Lýsing á ninja"
+    ninja_display_name: Ninja
+    panama_rocket_description: "Lýsing á Panama eldflaug"
+    panama_rocket_display_name: "Panama eldflaug"
+    panda_description: "Lýsing á pandabirni"
+    panda_display_name: Pandabjörn
+    panda_unicycle_description: "Lýsing á pandabirni á einhjóli"
+    panda_unicycle_display_name: "Pandabjörn á einhjóli"
+    pinwheel_description: "Lýsing á rellu"
+    pinwheel_display_name: Rella
+    pizza_slice_description: "Lýsing á pizzusneið"
+    pizza_slice_display_name: Pizzusneið
+    rocket_description: "Lýsing á eldflaug"
+    rocket_display_name: Eldflaug
+    star_description: "Lýsing á stjörnu"
+    star_display_name: Stjarna
+    thumbs_up_description: "Lýsing á þumall upp"
+    thumbs_up_display_name: "Þumall upp"
+    trophy_description: "Lýsing á bikar"
+    trophy_display_name: Bikar
+  trophy_case_7a098a85: Bikartaska
+  trophy_case_da3b25bb: Bikartaska
   truncated_56b1a661: Stytt
   turkish_5b69578b: Tyrkneska
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Kveikja á RTL jafnvel fyrir forritunarmál sem eru ekki RTL"
@@ -21186,6 +21266,9 @@ is:
   updated_permissions_page_f2e91060: "Uppfærð leyfissíða"
   updated_terms_of_service_82f34148: "Uppfærðir þjónustuskilmálar"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Uppfært UI fyrir að leita og sýna notendur og námskeið innan reiknings."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Uppfærir notendaviðmót kjörstillinga fyrir reikningstilkynningar svo notendaupplifunin
+      sé nýlegri
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Uppfærir sýningu birtingarstefnutákna í ný einkunnabók dálkfyrirsögn verkefna."
   updating_6edbab78: Uppfæri
   updating_discussion_failed_aadb2d35: "Uppfærsla á umræðum tókst ekki"

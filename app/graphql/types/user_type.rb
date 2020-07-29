@@ -16,6 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+class NotificationPreferencesContextType < Types::BaseEnum
+  graphql_name 'NotificationPreferencesContextType'
+  description 'Context types that can be associated with notification preferences'
+  value 'Course'
+  value 'Account'
+end
+
 module Types
   class UserType < ApplicationObjectType
     #
@@ -102,6 +109,33 @@ module Types
       Loaders::AssociationLoader.for(User, :trophies).load(object).then do |trophies|
         locked_trophies = Trophy.trophy_names - trophies.map(&:name)
         trophies.to_a.concat(locked_trophies.map { |name| Trophy.blank_trophy(name) })
+      end
+    end
+
+    field :notification_preferences_enabled, Boolean, null: false do
+      argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
+      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
+      argument :context_type, NotificationPreferencesContextType, required: true
+    end
+    def notification_preferences_enabled(account_id: nil, course_id: nil, context_type: nil)
+      enabled_for = ->(context) do
+        NotificationPolicyOverride.enabled_for(object, context)
+      end
+
+      case context_type
+      when 'Account'
+        enabled_for[Account.find(account_id)]
+      when 'Course'
+        enabled_for[Course.find(course_id)]
+      end
+    rescue ActiveRecord::RecordNotFound
+      nil
+    end
+
+    field :notification_preferences, NotificationPreferencesType, null: true
+    def notification_preferences
+      Loaders::AssociationLoader.for(User, :communication_channels).load(object).then do |comm_channels|
+        {channels: comm_channels.unretired}
       end
     end
 

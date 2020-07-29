@@ -32,6 +32,7 @@ class GradingPeriod < ActiveRecord::Base
   before_validation :adjust_close_date_for_course_period
   before_validation :ensure_close_date
 
+  before_save :set_root_account_id
   after_save :recompute_scores, if: :dates_or_weight_or_workflow_state_changed?
   after_destroy :destroy_grading_period_set, if: :last_remaining_legacy_period?
   after_destroy :destroy_scores
@@ -165,6 +166,10 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   private
+
+  def set_root_account_id
+    self.root_account_id ||= grading_period_group&.root_account_id
+  end
 
   def date_for_comparison(date)
     comparison_date = date.is_a?(String) ? Time.zone.parse(date) : date

@@ -296,7 +296,53 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         any_args
       )
 
-      subject.commit_history('url', '77', -1)
+      subject.commit_history('http://url', '77', -1)
+    end
+
+    it "sends an 'Assignment Submitted' notification for each new attempt that is submitted" do
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
+        submission,
+        "Assignment Submitted",
+        notification,
+        any_args
+      ).exactly(3).times
+
+      subject.commit_history('http://url', '77', -1)
+      subject.commit_history('http://url2', '100', -1)
+      subject.commit_history('http://url3', '90', -1)
+    end
+
+    it "does not send an 'Assignment Submitted' notification when an existing attempt is regraded" do
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
+        submission,
+        "Assignment Submitted",
+        notification,
+        any_args
+      ).exactly(1).time
+
+      subject.commit_history('http://url', '77', -1)
+      subject.commit_history('http://url', '100', -1)
+      subject.commit_history('http://url', '80', -1)
+    end
+
+    it "sends a 'Submission Graded' notification when a submission is regraded" do
+      graded_notification = Notification.create!(
+        name: "Submission Graded",
+        workflow_state: "active",
+        subject: "No Subject",
+        category: "TestImmediately"
+      )
+      subject.commit_history('http://url', '77', -1)
+
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
+        submission,
+        "Submission Graded",
+        graded_notification,
+        any_args
+      ).exactly(2).times
+
+      subject.commit_history('http://url', '100', -1)
+      subject.commit_history('http://url', '80', -1)
     end
 
     context 'when grading period is closed' do

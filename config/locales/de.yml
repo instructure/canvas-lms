@@ -405,6 +405,7 @@ de:
   account_id_73966078: account_id
   account_id_f6e26867: Konto-ID
   account_level_notification_preferences_require_an__66467cd7: "Benachrichtigungseinstellungen auf Kontoebene erfordern eine Aktualisierung des account_id-Kontos"
+  account_level_notification_preferences_ui_update_f5e189a4: "UI-Aktualisierung für Benachrichtigungseinstellungen auf Kontoebene"
   account_level_settings_manage_4fca6f8e: "Einstellungen auf Kontoebene – verwalten"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: Kontoname
@@ -1812,6 +1813,7 @@ de:
   add_tas_to_the_course_2aac6e02: "Lehrassistenten zum Kurs hinzufügen"
   add_theme_32fa3d50: "Thema hinzufügen"
   add_to_course_481a51c4: "Zum Kurs hinzufügen ..."
+  add_to_rce_toolbar_e5b3e3b4: "RCE-Symbolleiste hinzufügen"
   add_to_student_to_do_58e66b4b: "Zu Studentenaufgaben hinzufügen"
   add_to_whitelist_24f3f1ba: "Zu Whitelist hinzufügen"
   add_toolname_4e17dc90: "%{toolName} hinzufügen"
@@ -5467,6 +5469,7 @@ de:
       importing_button: "Importiere ... Dies kann eine Weile dauern."
     titles: 
       home_page: Startseite
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Der Inhalt wird noch hochgeladen, wenn Sie fortfahren, wird er nicht richtig eingebettet."
   content_link_error_assignment_name_course_name_b8be789a: "Content-Link-Fehler – %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -8477,6 +8480,7 @@ de:
             nach Ihren Präferenzen. Vergeben Sie automatisch Noten für fehlende
             oder verspätete Abgaben und blenden Sie die Noten einfach aus,
             bis die Schüler sie sehen können. Für eine vereinfachte Benotung verwenden SpeedGrader Sie die Funktion zum Anzeigen und Benoten von Abgaben.
+  display_historical_view_of_achievements_of_users_53db5938: "Historische Ansicht der Leistungen der Benutzer anzeigen"
   display_name_6c2cfc58: "Anzeigename:"
   display_name_b80c243e: Anzeigename
   display_to_students_e1301f99: "Den Studenten zeigen"
@@ -8671,6 +8675,7 @@ de:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Jeder Balken gibt die Anzahl der *Seitenansichten* an diesem Tag an. Ein oranger Balken zeigt an, dass ein Benutzer an diesem Tag im Kurs **Aktivitäten durchgeführt hat**."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Jeder Balken repräsentiert eine Anzahl von Seitenansichten, die mit dieser Kategorie in Verbindung stehen."
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Jede Zeile ist eine Aufgabe. Die Raute ist das Fälligkeitsdatum, und der Balken erstreckt sich bis zum Einsendungsdatum. Grün gibt eine *rechtzeitige Einsendung* an, Gelb eine **verspätete Einsendung** und Rot eine ***fehlende Aufgabe***. Graue Rauten sind Aufgaben ohne Fälligkeitsdatum zum Zeitpunkt der Einsendung."
+  earned_earndate_5f8b6c99: "Verdient am %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Importieren oder kopieren Sie einfach Inhalte aus einem anderen Canvas-Kurs in Ihren
               Kurs oder importieren Sie Inhalte aus anderen Formaten wie Moodle oder QTI.
@@ -9632,6 +9637,7 @@ de:
   fall_grading_period_id_74ef68e: "ID für den Benotungszeitraum im Herbst"
   favicon_6e658914: Favicon
   favorite_courses_fbd356f0: Lieblingskurse
+  favorite_d720d310: Favorit
   favorites_c7e0207c: Favoriten
   feature_f5526584: Funktion
   feature_flags: 
@@ -12245,6 +12251,7 @@ de:
   item_type_download_e949cdb6: "Art des Elements: Download"
   item_type_link_5a2abed2: "Art des Elements: Link"
   item_type_locked_85c560ec: "Elementtyp: Gesperrt"
+  item_type_mastery_connect_8f36c669: "Elementtyp: Verbindung Leistungsziel"
   item_type_new_quiz_1a1cd9a9: "Elementtyp: Neues Quiz"
   item_type_quiz_c894ddb1: "Elementtyp: Quiz"
   items_299a7626: "Elemente: "
@@ -12501,6 +12508,7 @@ de:
   let_students_see_the_correct_answers_dacc2faf: "Studenten die richtigen Antworten zeigen"
   let_students_see_their_quiz_responses_fbc07d14: "Studenten die eigenen Quiztest-Antworten anzeigen"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Die Studierenden ihre Antworten sehen lassen (Falsche Fragen werden im Studenten-Feedback gekennzeichnet)."
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Lassen Sie den Site-Administrator bis zu 2 LTI-Anwendungen als Favoriten auswählen, die dann in der Symbolleiste des RCE angezeigt werden"
   letter_grade_29ff1938: Buchstaben-Note
   letter_grade_f00fedc4: Buchstabennote
   level_5fdf654a: Ebene
@@ -12663,6 +12671,7 @@ de:
   list_collapsed_9ac35920: "Liste ausgeblendet."
   list_collapsed_dde87718: "Liste ausgeblendet"
   list_expanded_efec2d0: "Liste eingeblendet."
+  list_of_the_currently_attainable_trophies_959b2518: "Liste der derzeit erreichbaren Trophäe"
   list_view_430aecce: Listenansicht
   lithuanian_5adcbe24: Litauisch
   little_lost_try_here_first_9e24e575: "Wissen Sie nicht weiter? Versuchen Sie dies!"
@@ -12682,7 +12691,7 @@ de:
   loaded_more_developer_keys_7ea76fbe: "Mehr Entwicklerschlüssel geladen"
   loaded_more_developer_keys_focus_moved_to_the_dele_f5b867f8: "Mehr Entwicklerschlüssel geladen. Der Fokus liegt auf der Schaltfläche „Löschen“ des zuletzt geladenen Entwicklerschlüssels in der Liste."
   loaded_more_developer_keys_focus_moved_to_the_name_6e3c3b34: "Mehr Entwicklerschlüssel geladen. Der Fokus liegt auf dem Namen des zuletzt geladenen Entwicklerschlüssels in der Liste."
-  loading_1d2ad2d7: "Wird geladen ..."
+  loading_1d2ad2d7: "Wird geladen ..."
   loading_25990131: "Wird geladen ..."
   loading_6ac402e1: "Ladevorgang läuft ..."
   loading_725811ca: "Ladevorgang läuft"
@@ -13012,7 +13021,9 @@ de:
   mastery_path_processing_f4471152: "Leistungsziel-Pfad wird bearbeitet"
   mastery_paths_breakdown_6e0b5fce: "Übersicht der Leistungsziel-Pfade"
   mastery_paths_cc4096c2: Leistungsziel-Pfade
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "Die Bearbeitung der Leistungszielpfade wurde aus Wartungsgründen vorübergehend deaktiviert."
   mastery_paths_editor_930655bb: "Editor für Leistungsziel-Pfade"
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Die Auswahl der Leistungszielpfade wurde für die Wartung vorübergehend deaktiviert."
   mastery_points_f1672cc: Leistungspunkte
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Der Leistungsziel-Punktestand stellt das höchste Ergebnis einer benoteten Aufgabe oder eines Quiz dar."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Die Punktzahl für 'Leistungsziel' erreicht gibt die zuletzt benotete Aufgabe oder das zuletzt benotete Quiz wieder."
@@ -15411,6 +15422,7 @@ de:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Punkte"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Mögliche Punkte"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} Pkte."
+  na_3dbb9cfd: k. A.
   name: "Academic Benchmark Importer"
   name_1aed4a1b: Name
   name_3806192d: "Name:"
@@ -16961,6 +16973,7 @@ de:
       description: "Hostet hochgeladene Dateien mit dem Inst-FS-Dienst."
       labels: 
         migration_rate: "Chance der Migration älterer Dateien in Inst-FS bei Zugriff (0 bis 100)"
+        service_worker: "Verwenden Sie Service Worker zur Authentifizierung von Dateizugriffen in Safari 13+"
     kaltura: 
       description: "Kaltura-Video-/Audioaufzeichnung und -wiedergabe"
       name: Kaltura
@@ -17291,6 +17304,7 @@ de:
       requirements_must_be_completed: "Folgende Voraussetzungen müssen erfüllt sein, damit diese Seite freigegeben wird."
   presentation_2d9387ca: Präsentation
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Zeigt die Quiz-Einstellung an, um die automatische Einreichung eines zeitlich beschränkten Quizzes zu vermeiden, wenn die verfügbare Zeit abgelaufen ist."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "ALT + F8 drücken, um eine Liste mit Tastenkombinationen zu sehen."
   press_space_to_start_over_d4b8a2da: "Drücken Sie die Leertaste um erneut zu beginnen"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Komma-Taste oder <Umschalt>+<?> drücken, um eine Liste mit Tastenkombinationen zu sehen."
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Komma-Taste oder <Umschalt>+<?> drücken, um eine Liste mit Tastenkombinationen zu sehen."
@@ -17939,6 +17953,7 @@ de:
       update_question_without_regrading: "Frage aktualisieren, ohne eine Neubenotung durchzuführen"
   quiz_40ee61b1: Quiz
   quiz_assignment_overrides_cec1973b: "Überschreibung von Quizaufgaben"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Quiz-Verfügbarkeitsdaten, die während eines Versuchs verstreichen, werden auch dann automatisch eingereicht, wenn die Zeitzugabe noch nicht abgelaufen ist."
   quiz_duplication_not_implemented_c1495585: "Quiz-Vervielfältigung nicht implementiert"
   quiz_e0dcce8f: Quiz
   quiz_extensions_d2550649: Quizerweiterungen
@@ -22121,6 +22136,7 @@ de:
       networking_academy_description: "Schauen Sie sich die Antworten von Cisco zu den am häufigsten gestellten Fragen an."
       networking_academy_faqs: "Häufig gestellte Fragen zur Networking Academy"
       support_desk_livechat: Supportdesk-Livechat
+  support_favorite_lti_tools_in_the_rce_1680436d: "Unterstützung bevorzugter LTI-Tools im RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Schweden
@@ -22206,6 +22222,7 @@ de:
     syllabus: Kursplan
     tab_location_error: "Dieser Registerkartenspeicherort ist ungültig."
     tab_unmanagable_error: "%{css_class} ist nicht verwaltbar."
+    trophy_case: Trophäenschrank
   tabs_5605547e: Registerkarten
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
@@ -22347,6 +22364,12 @@ de:
                      bis zu %{max_domains} Domänen zu ihrer Whitelist hinzufügen. Die Verwendung von Platzhaltern wird empfohlen
                      (z. B. *.instructure.com). Die Canvas- und Instructure-Domänen sind automatisch einbezogen
                    und werden bei Ihrer Limitierung auf 50 Domänen nicht berücksichtigt.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      Die Inhaltssicherheitsrichtlinie ermöglicht es Ihnen, die benutzerdefinierte 
+                     JavaScriptAusführung in Ihrer Canvas-Instanz einzuschränken. Sie können bis zu %{max_domains} erlaubte
+                      Domänen manuell hinzufügen. Platzhalter werden empfohlen
+                      (z. B. *.instructure.com). Die Canvas- und Instructure-Domänen sind automatisch einbezogen
+                      und werden bei Ihrem Limit von 50 Domänen nicht berücksichtigt.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       Die Kurs-Startseite ist die erste Seite, die die Kursteilnehmer nach dem Öffnen
             des Kurses sehen. Die Startseite kann die Tätigkeitsliste
@@ -22376,6 +22399,9 @@ de:
       Die folgenden Domänen wurden automatisch von Tools zu Ihrer
                        Whitelist hinzugefügt, die bereits in Ihrem Konto vorhanden sind.
                        Um diese Domänen zu entfernen, müssen Sie die zugehörigen Tools entfernen.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      Die folgenden Domänen wurden automatisch von Tools zugelassen, die bereits in Ihrem Konto vorhanden sind.
+                       Um diese Domains zu entfernen, entfernen Sie die zugehörigen Tools.
   the_following_errors_occurred_bdec1e44: "Folgende Fehler sind aufgetreten:"
   the_following_fields_are_invalid_fields_b3565800: "Die folgenden Felder sind ungültig: %{fields}."
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
@@ -22500,6 +22526,7 @@ de:
   there_are_no_reports_for_you_to_view_b716717a: "Sie können keine Berichte anzeigen."
   there_are_no_unsaved_changes_9276e87c: "Es gibt keine ungespeicherten Änderungen."
   there_are_no_unsynced_changes_4e8f0838: "Es gibt keine unsynchronisierten Änderungen."
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Für die Platzierung innerhalb der RCE-Symbolleiste gibt es ein Limit von 2 Apps. Diese Einstellung gilt nur für den erweiterten RCE."
   there_is_currently_1_available_grader_758e4a21: "Es gibt zurzeit 1 verfügbaren Benoter."
   there_was_a_failure_logging_out_at_your_idp_30070527: "Die Abmeldung bei Ihrem IdP ist fehlgeschlagen."
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Es gab ein Problem beim Erstellen der Spalte für Lehrernotizen."
@@ -23410,6 +23437,59 @@ de:
   tree_browser: 
     folder_tree_instructions: "Navigieren Sie mit den Pfeilen nach oben und unten in der Baumstruktur. Verwenden Sie die Pfeile nachrechts bzw. links, um die Ordner zu erweitern, um sie zu minimieren, und die Eingabetaste, um das gewünschte Element auszuwählen."
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad und Tobago (+1)"
+  trophy: 
+    balloon_description: "Beschreibung Ballon"
+    balloon_display_name: Ballon
+    bifrost_trophy_description: "Beschreibung Bifrost-Trophäe"
+    bifrost_trophy_display_name: Bifrost-Trophäe
+    butterfly_description: "Beschreibung Schmetterling"
+    butterfly_display_name: Schmetterling
+    einstein_rosen_trophy_description: "Beschreibung Einstein-Rosen-Trophäe"
+    einstein_rosen_trophy_display_name: Einstein-Rosen-Trophäe
+    fire_description: "Beschreibung Feuer"
+    fire_display_name: Feuer
+    flowers_description: "Beschreibung Blume"
+    flowers_display_name: Blume
+    four_leaf_clover_description: "Beschreibung vierblättriges Kleeblatt"
+    four_leaf_clover_display_name: "Vierblättriges Kleeblatt"
+    gift_description: "Beschreibung Geschenk"
+    gift_display_name: Geschenk
+    gnome_description: "Beschreibung Gnom"
+    gnome_display_name: Gnom
+    helix_rocket_description: "Beschreibung Helix-Rakete"
+    helix_rocket_display_name: Helix-Rakete
+    horse_shoe_description: "Beschreibung Hufeisen"
+    horse_shoe_display_name: Hufeisen
+    hot_air_balloon_description: "Beschreibung Heißluftballon"
+    hot_air_balloon_display_name: Heißluftballon
+    magic_mystery_thumbs_up_description: "Beschreibung Magisches Mysterium Daumen hoch"
+    magic_mystery_thumbs_up_display_name: "Magisches Mysterium Daumen hoch"
+    medal_description: "Beschreibung Medaille"
+    medal_display_name: Medaille
+    moon_description: "Beschreibung Mond"
+    moon_display_name: Mond
+    ninja_description: "Beschreibung Ninja"
+    ninja_display_name: Ninja
+    panama_rocket_description: "Beschreibung Panama-Rakete"
+    panama_rocket_display_name: Panama-Rakete
+    panda_description: "Beschreibung Panda"
+    panda_display_name: Panda
+    panda_unicycle_description: "Beschreibung Panda-Einrad"
+    panda_unicycle_display_name: Panda-Einrad
+    pinwheel_description: "Beschreibung Windrad"
+    pinwheel_display_name: Windrad
+    pizza_slice_description: "Beschreibung Pizzastück"
+    pizza_slice_display_name: Pizzastück
+    rocket_description: "Beschreibung Rakete"
+    rocket_display_name: Rakete
+    star_description: "Beschreibung Stern"
+    star_display_name: Stern
+    thumbs_up_description: "Beschreibung Daumen hoch"
+    thumbs_up_display_name: "Daumen hoch"
+    trophy_description: "Beschreibung der Trophäe"
+    trophy_display_name: Trophäe
+  trophy_case_7a098a85: Trophäenschrank
+  trophy_case_da3b25bb: Trophäenschrank
   truncated_56b1a661: Abgeschnitten
   turkish_5b69578b: Türkisch
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "„RTL auch für Nicht-RTL-Sprachen“ aktivieren"
@@ -23632,6 +23712,9 @@ de:
   updated_permissions_page_f2e91060: "Aktualisierte Berechtigungsseite"
   updated_terms_of_service_82f34148: "Aktualisierte Servicebedingungen"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Aktualisierte UI zur Suche und Anzeige von Benutzern und Kursen innerhalb eines Kontos."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Aktualisiert die UI der Kontobenachrichtigungseinstellungen, um eine
+      aktuellere und aktualisierte Benutzererfahrung zu bieten
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Aktualisiert die Anzeige der Post Policy Symbole in der Notenbuch-Spaltenüberschrift Neue Aufgaben"
   updating_6edbab78: "Wird aktualisiert"
   updating_discussion_failed_aadb2d35: "Aktualisierung der Diskussion fehlgeschlagen"
@@ -23673,7 +23756,7 @@ de:
   uploaded_media_bc29db35: "Hochgeladene Medien"
   uploaded_over_time_d59abb68: "Hochgeladen im Laufe der Zeit"
   uploading_19e8a4e7: "Wird hochgeladen"
-  uploading_ee585874: "Wird hochgeladen ..."
+  uploading_ee585874: "Wird hochgeladen ..."
   uploading_files_5ff8f4fd: "Dateien werden hochgeladen"
   uploading_progress_2f5dd4bf: Upload-Fortschritt
   uploading_progress_d62bb6e9: Upload-Fortschritt

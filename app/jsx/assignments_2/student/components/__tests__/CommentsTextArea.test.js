@@ -29,8 +29,6 @@ import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
 import {mockQuery, mockAssignmentAndSubmission} from '../../mocks'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 
-jest.setTimeout(10000)
-
 async function mockSubmissionCommentQuery() {
   const variables = {submissionAttempt: 0, submissionId: '1'}
   const overrides = {

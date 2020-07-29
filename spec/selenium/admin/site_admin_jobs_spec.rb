@@ -134,8 +134,8 @@ describe "site admin jobs ui" do
 
       it "should check current popular tags" do
         filter_tags(FlavorTags::CURRENT)
-        expect(f("#tags-grid .slick-row:nth-child(1) .f0")).to include_text "String#reverse"
-        expect(f("#tags-grid .slick-row:nth-child(1) .f1")).to include_text "2"
+        expect(f("#tags-grid")).to include_text "String#reverse"
+        expect(f("#tags-grid")).to include_text "2"
       end
 
       it "should check all popular tags", priority: "2" do

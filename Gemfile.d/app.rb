@@ -74,7 +74,7 @@ gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.7.0'
-gem 'inst-jobs', '0.15.21'
+gem 'inst-jobs', '0.15.22'
   gem 'fugit', '1.3.3', require: false
     gem 'et-orbi', '1.2.2', require: false
 gem 'inst-jobs-autoscaling', '1.0.5'
@@ -103,7 +103,6 @@ gem 'rack-test', '1.1.0'
 gem 'rake', '13.0.1'
 gem 'rails-observers', '0.1.5'
 gem 'ratom-nokogiri', '0.10.8', require: false
-gem 'rdiscount', '2.2.0.1', require: false
 gem 'redcarpet', '3.5.0', require: false
 gem 'retriable', '1.4.1'
 gem 'ritex', '1.0.1', require: false
@@ -153,7 +152,6 @@ path 'gems' do
   gem 'canvas_text_helper'
   gem 'canvas_time'
   gem 'canvas_unzip'
-  gem 'csv_diff'
   gem 'diigo'
   gem 'event_stream'
   gem 'google_drive'
@@ -171,3 +169,6 @@ path 'gems' do
   gem 'utf8_cleaner'
   gem 'workflow'
 end
+
+gem 'csv_diff', path: 'gems'
+  gem 'sqlite3', '1.4.2'

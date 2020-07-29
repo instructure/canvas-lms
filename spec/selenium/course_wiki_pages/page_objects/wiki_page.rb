@@ -39,6 +39,10 @@ module CourseWikiPage
     '.delete_page'
   end
 
+  def delete_pages_btn_selector
+    '.delete_pages'
+  end
+
   #------------------------------ Elements ------------------------------
   def publish_btn
     f(publish_btn_selector)
@@ -80,10 +84,22 @@ module CourseWikiPage
     fj("li:contains('Copy To...')")
   end
 
+  def bulk_delete_btn
+    f(delete_pages_btn_selector)
+  end
+
+  def confirm_delete_wiki_pages_btn
+    f("#confirm_delete_wiki_pages")
+  end
+
+  def select_wiki_page_checkbox
+    f("tbody.collectionViewItems input[type='checkbox']")
+  end
+
   def immersive_reader_btn
     fj("[type='button']:contains('Immersive Reader')")
   end
-  
+
   def edit_page_title_input
     f('input#title')
   end
@@ -118,6 +134,16 @@ module CourseWikiPage
 
   def click_more_options_menu
     more_options_btn.click
+    wait_for_ajaximations
+  end
+
+  def delete_selected_pages
+    bulk_delete_btn.click
+    wait_for_ajaximations
+  end
+
+  def confirm_delete_pages
+    confirm_delete_wiki_pages_btn.click
     wait_for_ajaximations
   end
 end

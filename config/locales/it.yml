@@ -391,6 +391,7 @@ it:
   account_id_73966078: account_id
   account_id_f6e26867: "ID account"
   account_level_notification_preferences_require_an__66467cd7: "Le preferenze di notifica del livello di account richiedono l’aggiornamento di un account_id"
+  account_level_notification_preferences_ui_update_f5e189a4: "Aggiornamento interfaccia utente preferenze di notifica a livello di account"
   account_level_settings_manage_4fca6f8e: "Impostazioni a livello di account - gestisci"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nome account"
@@ -1695,6 +1696,7 @@ it:
   add_tas_to_the_course_2aac6e02: "Aggiungi assistenti al corso"
   add_theme_32fa3d50: "Aggiungi tema"
   add_to_course_481a51c4: "Aggiungi al corso..."
+  add_to_rce_toolbar_e5b3e3b4: "Aggiungi alla barra degli strumenti RCE"
   add_to_student_to_do_58e66b4b: "Aggiungi all'elenco di cose da fare dello studente"
   add_to_whitelist_24f3f1ba: "Aggiungi alla Whitelist"
   add_toolname_4e17dc90: "Aggiungi %{toolName}"
@@ -2257,8 +2259,8 @@ it:
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Consente agli utenti di abilitare l'opzione \"Avvia SpeedGrader Filtrato per gruppo di studenti\" per i corsi nella pagina delle impostazioni del corso. Se attivo e se è stato selezionato un gruppo di studenti in Nuovo registro dei voti, SpeedGrader caricherà solo gli studenti del gruppo selezionato."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Consente agli utenti di tacitare le notifiche sulla granularità del livello di un corso."
   allows_users_to_override_specific_notification_pre_18cf5b9e: |-
-      Consente agli utenti di sostituire le preferenze di notifica specifiche su un
-      principio corso dopo corso.
+      Consente agli utenti di sostituire preferenze di notifica specifiche 
+      corso per corso.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Consente agli utenti di scegliere i pronomi che verranno visualizzati dopo i loro nomi, quando qeusti ultimi vengono visualizzati nell'interfaccia utente."
   allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
       Consente agli utenti di scegliere i pronomi che saranno visualizzati dopo
@@ -5062,6 +5064,7 @@ it:
       importing_button: "Importazione in corso... il processo potrebbe richiedere un po' di tempo"
     titles: 
       home_page: "Home page"
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Il contenuto è ancora in fase di caricamento, se continui non sarà incorporato correttamente."
   content_link_error_assignment_name_course_name_b8be789a: "Errore link contenuto - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -7715,6 +7718,7 @@ it:
             in base alle tue preferenze. Applica automaticamente un voto per le consegne mancanti o
             tardive, e nascondi facilmente i voti finché non sei pronto a farli visualizzare
             agli studenti. Per una votazione semplificata, usa SpeedGrader per visualizzare e valutare le consegne.
+  display_historical_view_of_achievements_of_users_53db5938: "Visualizza la visione storica dei risultati ottenuti dagli utenti"
   display_name_6c2cfc58: "Nome visualizzato:"
   display_name_b80c243e: "Nome visualizzato"
   display_to_students_e1301f99: "Mostra agli studenti"
@@ -7886,6 +7890,7 @@ it:
   e_g_jon_doe_77233e3b: "es. Jon Doe"
   e_g_jondoe_example_com_98656fb5: "ad es., jondoe@example.com"
   e_mail_only_2cc5e513: "Solo email"
+  earned_earndate_5f8b6c99: "Guadagnati %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Importa o copia facilmente il contenuto da un altro corso Canvas nel
               tuo corso oppure importa il contenuto da altri formati, come Moodle o QTI.
@@ -8716,6 +8721,7 @@ it:
   fall_grading_period_id_74ef68e: "ID periodo di valutazione autunnale"
   favicon_6e658914: Favicon
   favorite_courses_fbd356f0: "Corsi preferiti"
+  favorite_d720d310: Preferito
   favorites_c7e0207c: Preferiti
   feature_f5526584: Funzione
   feature_flags: 
@@ -10727,6 +10733,7 @@ it:
   item_type_download_e949cdb6: "Tipo elemento: Download"
   item_type_link_5a2abed2: "Tipo elemento: Link"
   item_type_locked_85c560ec: "Tipo elemento: Bloccato"
+  item_type_mastery_connect_8f36c669: "Tipo elemento: Collegamento Padronanza"
   item_type_new_quiz_1a1cd9a9: "Tipo elemento: Nuovo quiz"
   item_type_quiz_c894ddb1: "Tipo elemento: Quiz"
   items_299a7626: "Elementi: "
@@ -10967,6 +10974,7 @@ it:
   length_results_found_3afd01e5: "%{length} risultati trovati"
   let_students_see_the_correct_answers_dacc2faf: "Consenti agli studenti di visualizzare le risposte corrette"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Consenti agli studenti di visualizzare le loro risposte ai quiz (le domande errate verranno contrassegnate nel feedback studenti)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Fai che l'amministratore del sito selezioni fino a 2 applicazioni LTI preferite, che saranno poi visualizzate nella barra degli strumenti di RCE"
   letter_grade_29ff1938: "Voto in lettere"
   letter_grade_f00fedc4: "voto in lettere"
   level_5fdf654a: Livello
@@ -11122,6 +11130,7 @@ it:
   list_collapsed_9ac35920: "L’elenco si è chiuso."
   list_collapsed_dde87718: "L’elenco si è chiuso."
   list_expanded_efec2d0: "L’elenco si è espanso."
+  list_of_the_currently_attainable_trophies_959b2518: "Elenco dei trofei attualmente ottenibili"
   list_view_430aecce: "Visualizzazione elenco"
   lithuanian_5adcbe24: Lituano
   little_lost_try_here_first_9e24e575: "Ti sei un po’ perso? Prima prima qui!"
@@ -11435,6 +11444,8 @@ it:
   mastery_path_processing_f4471152: "Elaborazione del percorso di padronanza"
   mastery_paths_breakdown_6e0b5fce: "Analisi percorsi di acquisizione padronanza"
   mastery_paths_cc4096c2: "Percorsi di acquisizione della padronanza"
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "La selezione dei percorsi di padronanza è stata temporaneamente disabilitata per manutenzione."
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "La selezione dei percorsi di padronanza è stata temporaneamente disabilitata per manutenzione."
   mastery_points_f1672cc: "punti padronanza"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Il punteggio del livello di padronanza riflette il punteggio più alto di un compito o un quiz valutato."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Il punteggio del livello di padronanza riflette il compito o quiz valutato più recente."
@@ -13519,6 +13530,7 @@ it:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Punti"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Punti possibili"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} pt"
+  na_3dbb9cfd: ND
   name: "Utilità di importazione Academic Benchmark"
   name_1aed4a1b: Nome
   name_3806192d: "Nome:"
@@ -14978,6 +14990,7 @@ it:
       description: "Gli host hanno caricato i file con il servizio Inst-FS."
       labels: 
         migration_rate: "Possibilità di migrare file più vecchi in Inst-FS all’accesso (da 0 a 100)"
+        service_worker: "Usa l’operatore di servizio per autenticare gli accessi ai file in Safari 13+"
     kaltura: 
       description: "Registrazione e riproduzione video/audio Kaltura"
       name: Kaltura
@@ -15298,6 +15311,7 @@ it:
       requirements_must_be_completed: "Per poter sbloccare questa pagina, devi completare i seguenti requisiti"
   presentation_2d9387ca: Presentazione
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Presenta l’impostazione quiz per evitare la consegna automatica di un quiz scaduto quando il tempo disponibile è terminato."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Premere ALT + F8 per visualizzare un elenco di scorciatoie da tastiera"
   press_space_to_start_over_d4b8a2da: "Premi “spazio” per iniziare di nuovo"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Premi il tasto virgola o MAIUSC + punto interrogativo per visualizzare un elenco di scelte rapide da tastiera"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Premi il tasto virgola o MAIUSC + ? per visualizzare un elenco di scelte rapide da tastiera"
@@ -15874,6 +15888,7 @@ it:
       update_question_without_regrading: "Aggiorna domanda senza rivalutazione"
   quiz_40ee61b1: quiz
   quiz_assignment_overrides_cec1973b: "Override compiti quiz"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Le date di disponibilità dei quiz passate durante un tentativo, vengono inviate automaticamente anche se il tempo prolungato non è scaduto."
   quiz_duplication_not_implemented_c1495585: "duplicazione quiz non implementata"
   quiz_e0dcce8f: Quiz
   quiz_extensions_d2550649: "Estensioni quiz"
@@ -19539,6 +19554,7 @@ it:
       networking_academy_description: "Visualizza le risposte Cisco alle domande più frequenti."
       networking_academy_faqs: "FAQ Networking Academy"
       support_desk_livechat: "Chat dal vivo servizio di assistenza"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Supporta gli strumenti LTI preferiti nel RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_46_55cc3620: "Svezia (+46)"
@@ -19613,6 +19629,7 @@ it:
     syllabus: "Piano di studio"
     tab_location_error: "La posizione della scheda non è valida"
     tab_unmanagable_error: "%{css_class} non è gestibile"
+    trophy_case: "Teca dei trofei"
   tabs_5605547e: Tabelle
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
@@ -19745,6 +19762,12 @@ it:
                      fino a %{max_domains} domini alla tua whitelist. I caratteri jolly sono raccomandati
                      (ad es. *.instructure.com). I domini Canvas e Instructure sono inclusi
                      automaticamente e non penalizzano il tuo limite di 50 domini.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      La policy per la sicurezza dei contenuti consente di limitare la personalizzazione 
+                     JavaScriptche viene eseguita nell’istanza Canvas. È possibile aggiungere manualmente
+                     fino a %{max_domains} domini permessi. Si consigliano i jolly
+                     (per es. *.instructure.com). I domini Canvas e Instructure sono aggiunti
+                     automaticamente e non sono inclusi nei limiti di dominio di 50.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       La homepage del corso è la prima pagina che gli studenti vedono quando aprono
             il tuo corso. La homepage può visualizzare il flusso di attività di partecipazione
@@ -19776,6 +19799,9 @@ it:
       I seguenti domini sono stati automaticamente aggiunti alla tua
                        whitelist da strumenti già esistenti nel tuo account.
                        Per rimuovere questi domini, rimuovere gli strumenti associati.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      I seguenti domini sono stati automaticamente ammessi da strumenti che già esistono nel tuo account.
+                       Per rimuovere questi domini, elimina gli strumenti associati.
   the_following_errors_occurred_bdec1e44: "Si sono verificati i seguenti errori:"
   the_following_fields_are_invalid_fields_b3565800: "I seguenti campi non sono validi: %{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
@@ -19888,6 +19914,7 @@ it:
   there_are_no_reports_for_you_to_view_b716717a: "Non c’è alcun report da visualizzare."
   there_are_no_unsaved_changes_9276e87c: "Non sono presenti modifiche non salvate"
   there_are_no_unsynced_changes_4e8f0838: "Non sono presenti modifiche non sincronizzate"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "C'è un limite di 2 app per il posizionamento all'interno della barra degli strumenti. Questa impostazione si applica solo al RCE potenziato."
   there_is_currently_1_available_grader_758e4a21: "Al momento è disponibile 1 esaminatore"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Si è verificato un problema durante la disconnessione del tuo IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Si è verificato un problema durante la creazione della colonna per le note dell'insegnante."
@@ -20778,6 +20805,59 @@ it:
   tree_browser: 
     folder_tree_instructions: "Utilizza i tasti freccia su e giù per spostarti tra la struttura ad albero. Premi a destra per espandere le cartelle, a sinistra per comprimere e Invio per scegliere l'elemento selezionato."
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad e Tobago (+1)"
+  trophy: 
+    balloon_description: "Descrizione palloncino"
+    balloon_display_name: Palloncino
+    bifrost_trophy_description: "Descrizione trofeo Bifrost"
+    bifrost_trophy_display_name: "Trofeo Bifrost"
+    butterfly_description: "Descrizione farfalla"
+    butterfly_display_name: Farfalla
+    einstein_rosen_trophy_description: "Descrizione trofeo Einstein Rosen"
+    einstein_rosen_trophy_display_name: "Trofeo Einstein Rosen"
+    fire_description: "Descrizione fuoco"
+    fire_display_name: Fuoco
+    flowers_description: "Descrizione fiore"
+    flowers_display_name: Fiore
+    four_leaf_clover_description: "Descrizione quadrifoglio"
+    four_leaf_clover_display_name: Quadrifoglio
+    gift_description: "Descrizione regalo"
+    gift_display_name: Regalo
+    gnome_description: "Descrizione gnomo"
+    gnome_display_name: Gnomo
+    helix_rocket_description: "Descrizione razzo a elica"
+    helix_rocket_display_name: "Razzo a elica"
+    horse_shoe_description: "Descrizione ferro di cavallo"
+    horse_shoe_display_name: "Ferro di cavallo"
+    hot_air_balloon_description: "Descrizione mongolfiera"
+    hot_air_balloon_display_name: Mongolfiera
+    magic_mystery_thumbs_up_description: "Descrizione pollici in su Mistero magico"
+    magic_mystery_thumbs_up_display_name: "Pollici in su di Mistero magico"
+    medal_description: "Descrizione medaglia"
+    medal_display_name: Medaglia
+    moon_description: "Descrizione luna"
+    moon_display_name: Luna
+    ninja_description: "Descrizione Ninja"
+    ninja_display_name: Ninja
+    panama_rocket_description: "Descrizione razzo Panama"
+    panama_rocket_display_name: "Razzo Panama"
+    panda_description: "Descrizione Panda"
+    panda_display_name: Panda
+    panda_unicycle_description: "Descrizione Uniciclo panda"
+    panda_unicycle_display_name: "Uniciclo Panda"
+    pinwheel_description: "Descrizione Girandola"
+    pinwheel_display_name: Girandola
+    pizza_slice_description: "Descrizione Fetta di pizza"
+    pizza_slice_display_name: "Fetta di pizza"
+    rocket_description: "Descrizione razzo"
+    rocket_display_name: Razzo
+    star_description: "Descrizione Aggiungi a speciali"
+    star_display_name: "Aggiungi a Speciali"
+    thumbs_up_description: "Descrizione Pollici in su"
+    thumbs_up_display_name: "Pollice in su"
+    trophy_description: "Descrizione trofeo"
+    trophy_display_name: Trofeo
+  trophy_case_7a098a85: "Teca dei trofei"
+  trophy_case_da3b25bb: "Teca dei trofei"
   truncated_56b1a661: Troncato
   turkish_5b69578b: Turco
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Attiva RTL anche per le lingue non RTL"
@@ -20985,6 +21065,9 @@ it:
   updated_permissions_page_f2e91060: "Pagina autorizzazioni aggiornata"
   updated_terms_of_service_82f34148: "Termini del servizio aggiornati"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "UI aggiornata per consentire la ricerca e la visualizzazione di utenti e corsi all'interno di un account."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Aggiorna le preferenze di notifica dell'IU dell’account in modo che 
+      l'esperienza utente sia più attuale e aggiornata
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Aggiorna la visualizzazione delle icone dopo l’applicazione dei criteri nell'intestazione compito della colonna Nuovo registro dei voti"
   updating_6edbab78: Aggiornamento
   updating_discussion_failed_aadb2d35: "Aggiornamento discussione non riuscito"

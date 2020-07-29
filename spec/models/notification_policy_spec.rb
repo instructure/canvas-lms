@@ -358,6 +358,7 @@ describe NotificationPolicy do
 
       NotificationPolicy.create(:notification => course_type_notification, :communication_channel => channel, :frequency => "immediately")
       NotificationPolicy.create(:notification => notification, :communication_channel => channel, :frequency => "daily")
+      NotificationPolicy.create(:communication_channel => channel, :frequency => "daily")
 
       policies = NotificationPolicy.find_all_for(channel, context_type: 'Course')
       expect(policies.count).to eq 1

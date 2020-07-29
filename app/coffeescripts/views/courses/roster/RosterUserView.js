@@ -24,6 +24,10 @@ import EditSectionsView from './EditSectionsView'
 import EditRolesView from './EditRolesView'
 import InvitationsView from './InvitationsView'
 import LinkToStudentsView from './LinkToStudentsView'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Avatar} from '@instructure/ui-avatar'
+import {nanoid} from 'nanoid'
 import '../../../jquery.kylemenu'
 import 'jquery.disableWhileLoading'
 
@@ -52,6 +56,7 @@ export default class RosterUserView extends Backbone.View {
   }
 
   initialize(options) {
+    options.model.attributes.avatarId = `user-avatar-people-page-${nanoid()}`
     super.initialize(...arguments)
     // assumes this model only has enrollments for 1 role
     this.model.currentRole = __guard__(this.model.get('enrollments')[0], x => x.role)
@@ -291,6 +296,21 @@ export default class RosterUserView extends Backbone.View {
 
   blur() {
     return this.$el.removeClass('al-hover-container-active table-hover-row')
+  }
+
+  afterRender() {
+    ReactDOM.render(
+      <a href={`users/${this.model.id}`}>
+        <Avatar
+          name={this.model.attributes.name}
+          src={this.model.attributes.avatar_url}
+          size="small"
+          alt={this.model.attributes.name}
+        />
+        <span className="screenreader-only">{this.model.attributes.name}</span>
+      </a>,
+      this.$el.find(`#${this.model.attributes.avatarId}`)[0]
+    )
   }
 }
 RosterUserView.initClass()

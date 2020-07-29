@@ -17,6 +17,7 @@
 #
 
 class AssessmentQuestion < ActiveRecord::Base
+  extend RootAccountResolver
   include Workflow
 
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion'
@@ -30,6 +31,8 @@ class AssessmentQuestion < ActiveRecord::Base
   after_save :translate_links_if_changed
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :workflow_state, :assessment_question_bank_id
+  resolves_root_account through: :context
+
 
   ALL_QUESTION_TYPES = ["multiple_answers_question", "fill_in_multiple_blanks_question",
                         "matching_question", "missing_word_question",

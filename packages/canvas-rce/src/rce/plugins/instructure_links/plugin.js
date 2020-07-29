@@ -81,7 +81,7 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
     ed.addCommand('instructureLinkCreate', clickCallback.bind(this, ed, CREATE_LINK))
     ed.addCommand('instructureLinkEdit', clickCallback.bind(this, ed, EDIT_LINK))
     ed.addCommand('instructureTrayForLinks', (ui, plugin_key) => {
-      bridge.showTrayForPlugin(plugin_key)
+      bridge.showTrayForPlugin(plugin_key, ed.id)
     })
     ed.addCommand('instructureTrayToEditLink', (ui, editor) => {
       trayController.showTrayForEditor(editor)

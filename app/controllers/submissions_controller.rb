@@ -254,8 +254,7 @@ class SubmissionsController < SubmissionsBaseController
       :attachment_ids => []
     )
     submission_params[:group_comment] = value_to_boolean(submission_params[:group_comment])
-    submission_params[:attachments] = self.class.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
-
+    submission_params[:attachments] = Attachment.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
     begin
       @submission = @assignment.submit_homework(@submission_user, submission_params)
     rescue ActiveRecord::RecordInvalid => e
@@ -387,18 +386,6 @@ class SubmissionsController < SubmissionsBaseController
     end
   end
   private :lookup_existing_attachments
-
-  def self.copy_attachments_to_submissions_folder(assignment_context, attachments)
-    attachments.map do |attachment|
-      if attachment.folder && attachment.folder.for_submissions?
-        attachment # already in a submissions folder
-      elsif attachment.context.respond_to?(:submissions_folder)
-        attachment.copy_to_folder!(attachment.context.submissions_folder(assignment_context))
-      else
-        attachment # in a weird context; leave it alone
-      end
-    end
-  end
 
   def is_media_recording?
     return params[:submission][:submission_type] == 'media_recording'

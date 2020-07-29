@@ -50,6 +50,9 @@
     "alt_text_611fb322": {
         "message": "Alt テキスト"
     },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "ファイルを読み取る際にエラーが発生しました"
+    },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "案件を却下しようとした際にエラーが発生しました。"
     },
@@ -259,6 +262,9 @@
     },
     "date_time_d9fbf2d7": {
         "message": "日付 & 時間:"
+    },
+    "decorative_image_3c28aa7d": {
+        "message": "装飾的なイメージ"
     },
     "decrease_indent_de6343ab": {
         "message": "インデントを戻す"
@@ -673,6 +679,9 @@
     },
     "my_grades_98834476": {
         "message": "私の成績"
+    },
+    "my_media_82bade11": {
+        "message": "マイメディア"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "メニューまたはツールバーを移動する"
@@ -1162,6 +1171,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "メディアフィードバックがあります。"
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "空のファイルをアップロードすることはできません。"
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "日時を指定する必要があります。"

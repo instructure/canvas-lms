@@ -55,13 +55,6 @@ describe CommunicationChannel do
     end
   end
 
-  it 'should set the root account based on the pseudonym' do
-    user_with_pseudonym(active_all: true)
-    channel = @pseudonym.communication_channel
-
-    expect(channel.root_account_id).to eq @pseudonym.account.id
-  end
-
   it "should have a decent state machine" do
     communication_channel_model
     expect(@cc.state).to eql(:unconfirmed)

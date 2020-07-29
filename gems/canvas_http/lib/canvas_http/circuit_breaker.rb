@@ -31,7 +31,7 @@ module CanvasHttp
   # CanvasHttp::CircuitBreaker.threshold = lambda do |domain|
   #  Setting.get("http_cb_#{domain}_threshold", 20).to_i
   # end
-  # 
+  #
   module CircuitBreaker
 
     DEFAULT_THRESHOLD = 10
@@ -46,7 +46,7 @@ module CanvasHttp
         return false if redis_client.nil?
         !redis_client.get(tripped_key(domain)).nil?
       end
-      
+
       def trip_if_necessary(domain)
         return if redis_client.nil?
         key = threshold_key(domain)
@@ -58,11 +58,11 @@ module CanvasHttp
           CanvasHttp.logger.warn("CANVAS_HTTP CB_TRIP ON #{domain} | interval: #{interval(domain)} | thresh: #{threshold(domain)} | window: #{window(domain)}")
         end
       end
-  
+
       def tripped_key(domain)
         "http_cb_tripped_#{domain}"
       end
-    
+
       def threshold_key(domain)
         "http_cb_counter_#{domain}"
       end
@@ -74,11 +74,11 @@ module CanvasHttp
       def threshold(domain)
         (@threshold.respond_to?(:call) ? @threshold.call(domain) : @threshold) || DEFAULT_THRESHOLD
       end
-    
+
       def interval(domain)
         (@interval.respond_to?(:call) ? @interval.call(domain) : @interval) || DEFAULT_INTERVAL
       end
-    
+
       def window(domain)
         (@window.respond_to?(:call) ? @window.call(domain) : @window) || DEFAULT_WINDOW
       end

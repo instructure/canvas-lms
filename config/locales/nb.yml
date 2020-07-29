@@ -406,6 +406,7 @@ nb:
   account_id_73966078: account_id
   account_id_f6e26867: Konto-ID
   account_level_notification_preferences_require_an__66467cd7: "Varselpreferanser for kontonivå krever en account_id for å kunne oppdateres."
+  account_level_notification_preferences_ui_update_f5e189a4: "Varselpreferanser for kontonivå brukergrensesnittoppdatering"
   account_level_settings_manage_4fca6f8e: "Kontonivå innstillinger - administrer"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonavn
@@ -1839,6 +1840,7 @@ nb:
   add_tas_to_the_course_2aac6e02: "Legg til Læringsassistenter til emnet"
   add_theme_32fa3d50: "Legg til tema"
   add_to_course_481a51c4: "Legg til valgt emne ..."
+  add_to_rce_toolbar_e5b3e3b4: "Legg til RCE-verktøyslinje"
   add_to_student_to_do_58e66b4b: "Legg til studentoppgave"
   add_to_whitelist_24f3f1ba: "Legg til hvitliste"
   add_toolname_4e17dc90: "Legg til %{toolName}"
@@ -5506,6 +5508,7 @@ nb:
       importing_button: "Importerer... dette kan ta en stund"
     titles: 
       home_page: Hjemmeside
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Innhold blir fortsatt lastet opp, fortsetter du vil ikke innholdet bli innebygd riktig."
   content_link_error_assignment_name_course_name_b8be789a: "Avvik på innholdslenke - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -8523,6 +8526,7 @@ nb:
             i samsvar med dine preferanser. Legg automatisk til en karakter for manglende eller
             for sent innleverte oppgaver til du er klar for at studenten
             kan se dem. For forenklet karaktersetting, bruk SpeedGrader for å vise og karaktersette innleveringer.
+  display_historical_view_of_achievements_of_users_53db5938: "Vis historisk visning av brukeres prestasjoner"
   display_name_6c2cfc58: "Vis navn:"
   display_name_b80c243e: "Navn som skal vises"
   display_to_students_e1301f99: "Vis til studentene"
@@ -8718,6 +8722,7 @@ nb:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Hver linjen representerer antall *sidevisninger* på den dagen. En oransje søyle viser at noen bruker **tok en handling** innenfor kurset på den dagen."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Hver linjen representerer antall sidevisninger relatert til den kategorien."
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Hver rad er en oppgave. Diamanten er forfallsdato og baren strekker seg til innleveringsdato. Grønn indikerer en *på tide innsending*, gul **sen innlevering**, og rød en ***savnet oppdrag***. Grå diamanter er oppgaver uten forfallsdatoer er lagt inn på tidspunktet for innlevering."
+  earned_earndate_5f8b6c99: "Opptjente %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Enkel import eller kopiert innhold fra et annen Canvas-emne til
               ditt emne, eller importer innhold fra et annet format, som f.eks. Moodle eller QTL.
@@ -9688,6 +9693,7 @@ nb:
   fall_grading_period_id_74ef68e: "ID for høstens vurderingsperiode"
   favicon_6e658914: Favicon
   favorite_courses_fbd356f0: Favorittemner
+  favorite_d720d310: Favoritt
   favorites_c7e0207c: Favoritter
   feature_f5526584: Funksjon
   feature_flags: 
@@ -12313,6 +12319,7 @@ nb:
   item_type_download_e949cdb6: "Elementtype: nedlasting"
   item_type_link_5a2abed2: "Elementtype: lenke"
   item_type_locked_85c560ec: "Elementtype: Låst"
+  item_type_mastery_connect_8f36c669: "Elementtype: Mastery Connect"
   item_type_new_quiz_1a1cd9a9: "Elementtype: Ny test"
   item_type_quiz_c894ddb1: "Elementtype: Test"
   items_299a7626: "Elementer: "
@@ -12571,6 +12578,7 @@ nb:
   let_students_see_the_correct_answers_dacc2faf: "Vis riktige svar"
   let_students_see_their_quiz_responses_fbc07d14: "La studentene se sine testsvar"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "La studenter se quiz-svarene sine (feil svar vil bli markert i Tilbakemeldinger fra studenter)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "La stedsadministratoren velge opptil 2 LTI-apper som favoritter, som deretter vil vises i RCEs verktøyslinje."
   letter_grade_29ff1938: Bokstavkarakter
   letter_grade_f00fedc4: Bokstavkarakter
   level_5fdf654a: Nivå
@@ -12733,6 +12741,7 @@ nb:
   list_collapsed_9ac35920: "Liste sammenfoldet."
   list_collapsed_dde87718: "Liste sammenfoldet."
   list_expanded_efec2d0: "Liste utvidet"
+  list_of_the_currently_attainable_trophies_959b2518: "Liste over for øyeblikket oppnåelige trofeer"
   list_view_430aecce: Listevisning
   lithuanian_5adcbe24: Litauisk
   little_lost_try_here_first_9e24e575: "Litt forvirret? Prøv her først!"
@@ -13085,7 +13094,9 @@ nb:
   mastery_path_processing_f4471152: Mestringsveibehandling
   mastery_paths_breakdown_6e0b5fce: "Læringsstier Sammendrag"
   mastery_paths_cc4096c2: Læringsstier
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "Læringsstierredigering har blitt midlertidig valgt for vedlikehold."
   mastery_paths_editor_930655bb: "Rediger mestringsveier"
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Læringsstiervalg har blitt midlertidig valgt for vedlikehold."
   mastery_points_f1672cc: mestringspoeng
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Ekspertiseresultat reflekterer den høyeste poengsum i den karaktersatte oppgaven eller testen."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Poengsum for mestring reflekterer den siste vurderte oppgave eller quiz."
@@ -15479,6 +15490,7 @@ nb:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Poeng"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Mulige poenger"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} poeng"
+  na_3dbb9cfd: NA
   name: "Academic Benchmark-importør"
   name_1aed4a1b: Navn
   name_3806192d: "Navn:"
@@ -17038,6 +17050,7 @@ nb:
       description: "Er vert for opplastede filer med Inst-FS-tjenesten."
       labels: 
         migration_rate: "Sjanse for å migrere eldre filer til Inst-FS ved tilgang (0 til 100)"
+        service_worker: "Bruk servicearbeider til å godkjenne filtilganger i Safari 13+"
     kaltura: 
       description: "Kaltura video- og lydinnspilling og -avspilling"
       name: Kaltura
@@ -17370,6 +17383,7 @@ nb:
       requirements_must_be_completed: "Følgende krav må imøtekommes før denne siden blir låst opp"
   presentation_2d9387ca: Presentasjon
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Presenterer testinnstillingene for å unngå automatisk innlevering av en tidsbestemt test når den tilgjengelige tiden har utløpt."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Trykk på ALT + F8 for å se listen over tastatursnarveier"
   press_space_to_start_over_d4b8a2da: "Trykk på “mellomromstasten” for å begynne på nytt"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Trykk på komma-tasten eller shift + spørsmåltegn for å se listen over tastatursnarveier"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Trykk på komma-tasten eller shift + ? for å se listen over tastatursnarveier"
@@ -18023,6 +18037,7 @@ nb:
       update_question_without_regrading: "Oppdater spørsmålet uten å sette karakter på nytt"
   quiz_40ee61b1: test
   quiz_assignment_overrides_cec1973b: "Opphev testoppgave"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Quiztilgjengelighetsdatoer som består et forsøk vil fortsatt automatisk sendes inn selv om den utvidede tiden ikke er utløpt."
   quiz_duplication_not_implemented_c1495585: "testduplisering er ikke implementert"
   quiz_e0dcce8f: Test
   quiz_extensions_d2550649: Testforlengelse
@@ -22224,6 +22239,7 @@ nb:
       networking_academy_description: "Vis Cisco sine svar på de vanligst stilte spørsmålene."
       networking_academy_faqs: "Networking Academy FAQs"
       support_desk_livechat: "Support Desk Live Chat"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Støtter foretrukne LTI-verktøy i RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Sverige
@@ -22309,6 +22325,7 @@ nb:
     syllabus: Emneoversikt
     tab_location_error: "Den faneplasseringen er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikke behandles"
+    trophy_case: Trofekasse
   tabs_5605547e: Faner
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+ 886)"
@@ -22450,6 +22467,12 @@ nb:
                    opp til %{max_domains} domenet til hvitlisten din. Det anbefales wildcard
                    (f.eks. *.instructure.com). Canvas og Instructure-domenen er inkludert
                    automatisk teller ikke mot begrensningen på 50 domener.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      The Innholdet sikkerhetspolitikk tillater deg å begrense tilpasset
+                     JavaScript som kjører i din variant av Canvas. Du kan manuelt legge til
+                     opptil %{max_domains} tillatte domener. Det anbefales wildcard
+                     (f.eks. *.instructure.com). Canvas- og Infrastructure-domener er inkludert
+                     automatisk og teller ikke mot begrensningen på 50 domener.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       Hjemmeside Emne er det første en student ser når de åpner
             emnet ditt. Hjemmesiden kan vise emne deltakeraktivitet
@@ -22479,6 +22502,9 @@ nb:
       Følgende domener er automatisk lagt til din
                        hvitliste fra verktøy som allerede eksisterer i kontoen din.
                        For å fjerne disse domene, må du fjerne assosierte verktøy.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      Følgende domener har automatisk blitt tillatt fra verktøy som allerede eksisterer på kontoen din.
+                       For å fjerne disse domenene må du fjerne assosierte verktøy.
   the_following_errors_occurred_bdec1e44: "Følgende feil oppstod:"
   the_following_fields_are_invalid_fields_b3565800: "Følgende felt er ugyldige: %{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
@@ -22604,6 +22630,7 @@ nb:
   there_are_no_unsaved_changes_9276e87c: "Det er ingen ulagrede endringer"
   there_are_no_unsynced_changes_4e8f0838: "Det er ingen usynkroniserte endringer"
   there_are_no_unsynched_changes_d208547c: "Det finnes ingen unsynkroniserte endringer"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Det er en grense på 2 apper for plassering i RCE-verktøyslinjen. Denne innstillingen gjelder kun forbedret RCE."
   there_is_currently_1_available_grader_758e4a21: "Det er 1 tilgjengelige sensorer for øyeblikket"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Det var en feil med å logge ut av din IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Det oppstod et problem under opprettelse av merknadspalten for underviser."
@@ -23513,6 +23540,59 @@ nb:
   tree_browser: 
     folder_tree_instructions: "Bruk opp og ned piltastene til å navigere gjennom treet. Trykk høyre for å utvide mapper, venstre for å kollapse, og enter for å velge de valgt element."
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad og Tobago (+1)"
+  trophy: 
+    balloon_description: Ballongbeskrivelse
+    balloon_display_name: Ballong
+    bifrost_trophy_description: Bifrost-trofebeskrivelse
+    bifrost_trophy_display_name: Bifrost-trofe
+    butterfly_description: Sommerfuglbeskrivelse
+    butterfly_display_name: Sommerfugl
+    einstein_rosen_trophy_description: "Einstein Rosen-trofebeskrivelse"
+    einstein_rosen_trophy_display_name: "Einstein Rosen-trofe"
+    fire_description: Brannbeskrivelse
+    fire_display_name: Ild
+    flowers_description: Blomsterbeskrivelse
+    flowers_display_name: Blomst
+    four_leaf_clover_description: Firkløverbeskrivelse
+    four_leaf_clover_display_name: Firkløver
+    gift_description: Gavebeskrivelse
+    gift_display_name: Gave
+    gnome_description: Gnombeskrivelse
+    gnome_display_name: Gnom
+    helix_rocket_description: Helixrakettbeskrivelse
+    helix_rocket_display_name: Helixrakett
+    horse_shoe_description: Hesteskobeskrivelse
+    horse_shoe_display_name: Hestesko
+    hot_air_balloon_description: Varmluftsballongbeskrivelse
+    hot_air_balloon_display_name: Varmluftsballong
+    magic_mystery_thumbs_up_description: "Magisk mysterium tommel opp-beskrivelse"
+    magic_mystery_thumbs_up_display_name: "Magisk mysterium tommel opp"
+    medal_description: Medaljebeskrivelse
+    medal_display_name: Medalje
+    moon_description: Månebeskrivelse
+    moon_display_name: Måne
+    ninja_description: Ninjabeskrivelse
+    ninja_display_name: Ninja
+    panama_rocket_description: Panamarakettbeskrivelse
+    panama_rocket_display_name: Panamarakett
+    panda_description: Pandabeskrivelse
+    panda_display_name: Panda
+    panda_unicycle_description: Pandaunisyklusbeskrivelse
+    panda_unicycle_display_name: Pandaunisyklus
+    pinwheel_description: Pinnehjulbeskrivelse
+    pinwheel_display_name: Pinnehjul
+    pizza_slice_description: Pizzastykkebeskrivelse
+    pizza_slice_display_name: Pizzastykke
+    rocket_description: Rakettbeskrivelse
+    rocket_display_name: Rakett
+    star_description: Stjernebeskrivelse
+    star_display_name: Stjernemerke
+    thumbs_up_description: "Tommel opp-beskrivelse"
+    thumbs_up_display_name: "Tommel opp"
+    trophy_description: Trofebeskrivelse
+    trophy_display_name: Trofe
+  trophy_case_7a098a85: Trofekasse
+  trophy_case_da3b25bb: Trofekasse
   truncated_56b1a661: Avkortet
   turkish_5b69578b: Tyrkisk
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Skru på RTL sev for ikke-RTL-språk"
@@ -23738,6 +23818,9 @@ nb:
   updated_permissions_page_f2e91060: "Oppdatert side for tillatelser"
   updated_terms_of_service_82f34148: "Oppdatert bruksavtale"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Oppdatert UI for å kunne søke og vise brukere og emner innenfor en konto."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Oppdaterer varselpreferanser brukergrensesnittoppdatering tl å være en mer
+      oppdatert brukeropplevelse
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Oppdaterer visningen av Post Personvern-ikon i kolonne-overskriften til oppgave i Ny karakteroversikt."
   updating_6edbab78: Oppdaterer
   updating_discussion_failed_aadb2d35: "Kunne ikke oppdatere diskusjon"

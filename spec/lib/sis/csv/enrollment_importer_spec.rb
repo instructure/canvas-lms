@@ -96,18 +96,18 @@ describe SIS::CSV::EnrollmentImporter do
   end
 
   it "should enroll users" do
-    #create course, users, and sections
+    # create course, users, and sections
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
     )
     importer = process_csv_data(
-      "user_id,login_id,first_name,last_name,email,status",
-      "user_1,user1,User,Uno,user@example.com,active",
-      "user_2,user2,User,Dos,user2@example.com,active",
+      "user_id,login_id,first_name,last_name,email,status,notify",
+      "user_1,user1,User,Uno,user@example.com,active,true",
+      "user_2,user2,User,Dos,user2@example.com,active,true",
       "user_3,user4,User,Tres,user3@example.com,active",
-      "user_5,user5,User,Quatro,user5@example.com,active",
-      "user_6,user6,User,Cinco,user6@example.com,active",
+      "user_5,user5,User,Quatro,user5@example.com,active,false",
+      "user_6,user6,User,Cinco,user6@example.com,active,false",
       "user_7,user7,User,Siete,user7@example.com,active",
       ",,,,,"
     )

@@ -2833,6 +2833,23 @@ describe AssignmentsApiController, type: :request do
       expect(@assignment.peer_reviews_assign_at).to be_nil
     end
 
+    it "should unset submission types if set to not_graded" do
+      # the same way it would in the UI
+      @assignment = @course.assignments.create!(
+        :name => "some assignment",
+        :points_possible => 15,
+        :submission_types => "online_text_entry",
+        :grading_type => "percent"
+      )
+
+      api_update_assignment_call(@course, @assignment, {'grading_type' => 'not_graded'})
+      expect(response).to be_successful
+      @assignment.reload
+
+      expect(@assignment.grading_type).to eq 'not_graded'
+      expect(@assignment.submission_types).to eq 'not_graded'
+    end
+
     describe 'final_grader_id' do
       before(:once) do
         course_with_teacher(active_all: true)

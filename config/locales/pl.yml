@@ -419,6 +419,7 @@ pl:
   account_id_73966078: account_id
   account_id_f6e26867: "Identyfikator konta"
   account_level_notification_preferences_require_an__66467cd7: "Preferencje dot. powiadomień o poziomie konta wymagają aktualizacji account_id"
+  account_level_notification_preferences_ui_update_f5e189a4: "Aktualizacja UI preferencji dot. powiadomień na poziomie konta"
   account_level_settings_manage_4fca6f8e: "Ustawienia na poziomie konta - zarządzaj"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nazwa konta"
@@ -1866,6 +1867,7 @@ pl:
   add_tas_to_the_course_2aac6e02: "Dodaj asystentów do kursu"
   add_theme_32fa3d50: "Dodaj motyw"
   add_to_course_481a51c4: "Dodaj do kursu..."
+  add_to_rce_toolbar_e5b3e3b4: "Dodaj do paska narzędzi RCE"
   add_to_student_to_do_58e66b4b: "Dodaj do listy zadań uczestnika"
   add_to_whitelist_24f3f1ba: "Dodaj do białej listy"
   add_toolname_4e17dc90: "Dodaj %{toolName}"
@@ -5575,6 +5577,7 @@ pl:
       importing_button: "Importowanie... to może chwilę potrwać"
     titles: 
       home_page: "Strona startowa"
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Zawartość jest nadal przesyłana; w przypadku kontynuowania obraz nie zostanie prawidłowo osadzony."
   content_link_error_assignment_name_course_name_b8be789a: "Błąd łącza do zawartości - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -8720,6 +8723,7 @@ pl:
             zgodnie z własnymi preferencjami. Automatycznie wystawiaj oceny za brakujące lub
             spóźnione przesyłki i łatwo ukrywaj oceny do chwili, w której będzie je można pokazać
             uczestnikom. Dla uproszczenia skorzystaj z SpeedGrader, aby wyświetlać i oceniać przesłane materiały.
+  display_historical_view_of_achievements_of_users_53db5938: "Wyświetla widok dotychczasowych osiągnięć użytkownika"
   display_name_6c2cfc58: "Wyświetl nazwę:"
   display_name_b80c243e: "Wyświetlana nazwa"
   display_to_students_e1301f99: "Pokaż uczestnikom"
@@ -8913,6 +8917,7 @@ pl:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Każdy pasek reprezentuje liczbę *odsłon strony* w danym dniu. Pomarańczony pasek oznacza, że jakiś użytkownik **wykonał jakąś czynność** w ramach kursu danego dnia."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Każdy pasek reprezentuje liczbę odsłon strony związanych z daną kategorią."
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Każdy wiersz to jedno zadanie. Diament reprezentuje termin dostarczenia, a pasek rozciąga się do daty przesłania zadania. Kolor zielony wskazuje zadanie *przesłane na czas*, żółty **przesłane za późno**, a czerwony ***niewykonane zadanie***. Zielone diamenty to zadania bez terminów dostarczenia, zamieszczone w chwili przesłania."
+  earned_earndate_5f8b6c99: "Zdobyto %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Z łatwością importuj lub kopiuj zawartość z innego kursu Canvas
               do swojego kursu lub importuj zawartość z innych formatów, takich jak Moodle czy QTI.
@@ -9895,6 +9900,7 @@ pl:
   fall_grading_period_id_74ef68e: "Identyfikator jesiennego okresu oceniania"
   favicon_6e658914: Favicon
   favorite_courses_fbd356f0: "Ulubione kursy"
+  favorite_d720d310: Ulubione
   favorites_c7e0207c: Ulubione
   feature_f5526584: Funkcja
   feature_flags: 
@@ -12561,6 +12567,7 @@ pl:
   item_type_download_e949cdb6: "Rodzaj pozycji: Pobieranie"
   item_type_link_5a2abed2: "Rodzaj pozycji: Link"
   item_type_locked_85c560ec: "Typ elementu: Zablokowano"
+  item_type_mastery_connect_8f36c669: "Typ elementu: Mastery Connect"
   item_type_new_quiz_1a1cd9a9: "Typ elementu: Nowy test"
   item_type_quiz_c894ddb1: "Typ elementu: Quiz"
   items_299a7626: "Pozycje: "
@@ -12823,6 +12830,7 @@ pl:
   let_students_see_the_correct_answers_dacc2faf: "Udostępniaj uczestnikom poprawne odpowiedzi"
   let_students_see_their_quiz_responses_fbc07d14: "Udostępniaj uczestnikom wyniki ich testów"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Pozwól uczestnikom zobaczyć odpowiedzi udzielone w quizie (nieprawidłowo rozwiązane zadania będą wskazane w opinii dla uczestnika)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Pozwala administratorowi witryny wybrać dwie aplikacje LTI jako ulubione, które zostaną następnie wyświetlone na pasku narzędzi RCE"
   letter_grade_29ff1938: "Ocena literowa"
   letter_grade_f00fedc4: "ocena literowa"
   level_5fdf654a: Poziom
@@ -12989,6 +12997,7 @@ pl:
   list_collapsed_9ac35920: "Lista zwinięta."
   list_collapsed_dde87718: "Lista zwinięta"
   list_expanded_efec2d0: "Rozszerzono listę."
+  list_of_the_currently_attainable_trophies_959b2518: "Lista obecnie osiągalnych trofeów"
   list_view_430aecce: "Widok listy"
   lithuanian_5adcbe24: Litewski
   little_lost_try_here_first_9e24e575: "Zgubiłeś się? Spróbuj tutaj!"
@@ -13343,7 +13352,9 @@ pl:
   mastery_path_processing_f4471152: "Przetwarzanie ścieżki nauki"
   mastery_paths_breakdown_6e0b5fce: "Podział ścieżek biegłości na grupy"
   mastery_paths_cc4096c2: "Ścieżki biegłości"
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "Edytowanie ścieżki nauki zostało tymczasowo wyłączone z powodu konserwacji."
   mastery_paths_editor_930655bb: "Edytor ścieżek mistrzowskich"
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Wybór ścieżki nauki został tymczasowo wyłączony z powodu konserwacji."
   mastery_points_f1672cc: "punkty opanowania umiejętności"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Wynik poziomu biegłości odzwierciedla najwyższy wynik ocenianego przydziału lub testu."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Wynik punktowy biegłości odzwierciedla najnowsze ocenione zadanie lub test."
@@ -15774,6 +15785,7 @@ pl:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Punkty"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Możliwe do uzyskania punkty"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} pkt"
+  na_3dbb9cfd: Nd.
   name: "Importer usługi Academic Benchmark"
   name_1aed4a1b: Nazwa
   name_3806192d: "Nazwa:"
@@ -17350,6 +17362,7 @@ pl:
       description: "Hostowanie przesłanych plików w usłudze Inst-FS."
       labels: 
         migration_rate: "Szansa migracji starszych plików do Inst-FS podczas uzyskiwania dostępu (0-100)."
+        service_worker: "Pozwala pracownikowi usługi uwierzytelniać dostęp do plików w przeglądarce Safari 13+"
     kaltura: 
       description: "Nagrywanie i odtwarzanie zawartości wideo/audio za pośrednictwem platformy Kaltura"
       name: Kaltura
@@ -17683,6 +17696,7 @@ pl:
       requirements_must_be_completed: "Strona zostanie odblokowana po spełnieniu poniższych wymogów"
   presentation_2d9387ca: Prezentacja
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Wyświetla ustawienia testów, które pozwalają uniknąć automatycznego przesyłania testu na czas, gdy dostępny czas się skończy."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Naciśnij ALT + F8, aby wyświetlić listę skrótów klawiatury"
   press_space_to_start_over_d4b8a2da: "Naciśnij spację, aby rozpocząć od nowa"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Naciśnij Przecinek  lub shift + znak zapytani na klawiaturze, aby uzyskać listę skrótów klawiszowych"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Naciśnij Przecinek lub shift + ? aby zobaczyć listę skrótów klawiszowych"
@@ -18347,6 +18361,7 @@ pl:
       update_question_without_regrading: "Aktualizuj pytanie bez ponownego oceniania"
   quiz_40ee61b1: test
   quiz_assignment_overrides_cec1973b: "Zastąpienie zadania z testu"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Terminy dostępności testu, które mijają w trakcie próby, zostaną automatycznie przesłane, nawet jeśli wydłużony czas nie dobiegł końca."
   quiz_duplication_not_implemented_c1495585: "duplikacji testu nie wdrożono"
   quiz_e0dcce8f: Test
   quiz_extensions_d2550649: "Rozszerzenia testu"
@@ -22656,6 +22671,7 @@ pl:
       networking_academy_description: "Zobacz odpowiedzi Cisco na najczęściej zadawane pytania."
       networking_academy_faqs: "Najczęściej zadawane pytania Networking Academy"
       support_desk_livechat: "Czat na żywo z działem wsparcia"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Wsparcie dla ulubionych narzędzi LTI w RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Suahili
   sweden_1add8e79: Szwecja
@@ -22741,6 +22757,7 @@ pl:
     syllabus: "Program kursu"
     tab_location_error: "Położenie tej karty jest niepoprawne"
     tab_unmanagable_error: "nie można zarządzać %{css_class}"
+    trophy_case: "Szafka z trofeami"
   tabs_5605547e: Karty
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Tajwan (+886)"
@@ -22885,6 +22902,12 @@ pl:
                      maksymalnie %{max_domains} domen do białej listy. Zaleca się użycie dzikich kart
                      (np. *.instructure.com). Domeny Canvas i Instructure są dodawane
                      automatycznie i nie wchodzą w skład limitu 50 domen.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      Polityka bezpieczeństwa treści pozwala ograniczyć niestandardowy skrypt 
+                     JavaScript, używany w instancji Canvas użytkownika. Maksymalna liczba dozwolonych domen,
+                      które można dodać ręcznie, to %{max_domains}. Zaleca się użycie dzikich kart 
+                      (np. *.instructure.com). Domeny Canvas i Instructure są dodawane 
+                      automatycznie i nie wchodzą w skład limitu 50 domen.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       Strona główna kursu jest pierwszą stroną, którą uczestnicy zobaczą, gdy otworzą
             kurs. Na stronie głównej można wyświetlać strumień aktywności w kursie
@@ -22914,6 +22937,9 @@ pl:
       Następujące domeny zostały automatycznie dodane do Twojej
                        białej listy z narzędzi istniejących już na koncie.
                        Aby usunąć te domeny, usuń powiązane narzędzia.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      Poniższe domeny zostały automatycznie dozwolone z uwagi na narzędzia, które już istnieją na Twoim koncie.
+                       Aby je usunąć, należy odinstalować powiązane narzędzia.
   the_following_errors_occurred_bdec1e44: "Wystąpiły następujące błędy:"
   the_following_fields_are_invalid_fields_b3565800: "Poniższe pola są nieprawidłowe: %{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
@@ -23045,6 +23071,7 @@ pl:
   there_are_no_unsaved_changes_9276e87c: "Brak zapisanych zmian"
   there_are_no_unsynced_changes_4e8f0838: "Brak niezsynchronizowanych zmian"
   there_are_no_unsynched_changes_d208547c: "Brak niezsynchronizowanych zmian"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Obowiązuje limit umieszczania dwóch aplikacji dla pasku narzędzi RCE. Ustawienia te dotyczą tylko ulepszonego RCE."
   there_is_currently_1_available_grader_758e4a21: "Obecnie dostępny jest 1 oceniający"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Wystąpił problem podczas wylogowania w IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Wystąpił problem podczas tworzenia kolumny notatek nauczyciela."
@@ -23959,6 +23986,59 @@ pl:
   tree_browser: 
     folder_tree_instructions: "Użyj strzałek do góry i w dół w celu nawigacji po drzewie. Naciśnij prawy przycisk, aby rozwinąć foldery, lewy w celu ich zwinięcia lub klawisz enter, aby wybrać zaznaczony element."
   trinidad_and_tobago_1_fc2d8d1c: "Trynidad i Tobago (+1)"
+  trophy: 
+    balloon_description: "Opis balona"
+    balloon_display_name: Balon
+    bifrost_trophy_description: "Opis Trofeum Bifrost"
+    bifrost_trophy_display_name: "Trofeum Bifrost"
+    butterfly_description: "Opis motyla"
+    butterfly_display_name: Motyl
+    einstein_rosen_trophy_description: "Opis Trofeum Einstein Rosen"
+    einstein_rosen_trophy_display_name: "Trofeum Einstein Rosen"
+    fire_description: "Opis ognia"
+    fire_display_name: Ogień
+    flowers_description: "Opis kwiatka"
+    flowers_display_name: Kwiatek
+    four_leaf_clover_description: "Opis czterolistnej koniczyny"
+    four_leaf_clover_display_name: "Czterolistna koniczyna"
+    gift_description: "Opis prezentu"
+    gift_display_name: Prezent
+    gnome_description: "Opis gnoma"
+    gnome_display_name: Gnom
+    helix_rocket_description: "Opis spiralnej rakiety"
+    helix_rocket_display_name: "Spiralna rakieta"
+    horse_shoe_description: "Opis podkowy"
+    horse_shoe_display_name: Podkowa
+    hot_air_balloon_description: "Opis balona z gorącym powietrzem"
+    hot_air_balloon_display_name: "Balon z gorącym powietrzem"
+    magic_mystery_thumbs_up_description: "Opis magicznych, tajemniczych kciuków w górę"
+    magic_mystery_thumbs_up_display_name: "Magiczne, tajemnicze kciuki w górę"
+    medal_description: "Opis medalu"
+    medal_display_name: Medal
+    moon_description: "Opis księżyca"
+    moon_display_name: Księżyc
+    ninja_description: "Opis nindży"
+    ninja_display_name: Nindża
+    panama_rocket_description: "Opis rakiety panamskiej"
+    panama_rocket_display_name: "Rakieta panamska"
+    panda_description: "Opis pandy"
+    panda_display_name: Panda
+    panda_unicycle_description: "Opis unicyklu pandy"
+    panda_unicycle_display_name: "Unicykl pandy"
+    pinwheel_description: "Opis wiatraczka"
+    pinwheel_display_name: Wiatraczek
+    pizza_slice_description: "Opis kawałka pizzy"
+    pizza_slice_display_name: "Kawałek pizzy"
+    rocket_description: "Opis rakiety"
+    rocket_display_name: Rakieta
+    star_description: "Opis gwiazdy"
+    star_display_name: Gwiazda
+    thumbs_up_description: "Opis kciuka w górę"
+    thumbs_up_display_name: "Kciuk w górę"
+    trophy_description: "Opis trofeum"
+    trophy_display_name: Trofeum
+  trophy_case_7a098a85: "Szafka z trofeami"
+  trophy_case_da3b25bb: "Szafka z trofeami"
   truncated_56b1a661: Ucięte
   turkish_5b69578b: Turecki
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Włącz interfejs RTL także dla języków z innej grupy"
@@ -24186,6 +24266,9 @@ pl:
   updated_permissions_page_f2e91060: "Zaktualizowana strona zezwoleń"
   updated_terms_of_service_82f34148: "Zaktualizowane Warunki korzystania z usługi"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Zaktualizowany IU do wyszukiwania i wyświetlania użytkowników i kursów w ramach konta."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Aktualizuje UI preferencji dot. powiadomień na poziomie konta, oferując bardziej
+       nowoczesną obsługę
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Aktualizuje wyświetlanie ikony Zasad publikowania w nagłówku kolumny zadań Nowego dziennika ocen."
   updating_6edbab78: "Trwa aktualizacja"
   updating_discussion_failed_aadb2d35: "Nie udało się zaktualizować dyskusji"

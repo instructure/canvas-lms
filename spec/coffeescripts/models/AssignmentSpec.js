@@ -1548,6 +1548,6 @@ QUnit.module('Assignment#externalToolData', hooks => {
   test('returns external data from the assignments content tag', () => {
     const data = assignment.externalToolData()
     equal(data.key1, 'val1')
-    ok(data.stringify)
+    ok(assignment.externalToolDataStringified())
   })
 })

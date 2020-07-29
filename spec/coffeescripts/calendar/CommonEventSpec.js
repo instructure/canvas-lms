@@ -91,7 +91,7 @@ test('commonEventFactory: finds a context for multi-context events', () => {
 
 QUnit.module('CommonEvent#iconType', {
   setup() {
-    fakeENV.setup({CALENDAR: {BETTER_SCHEDULER: true}})
+    fakeENV.setup({CALENDAR: {SHOW_SCHEDULER: true}})
   },
   teardown() {
     fakeENV.teardown()

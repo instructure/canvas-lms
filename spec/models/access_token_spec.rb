@@ -154,7 +154,9 @@ describe AccessToken do
       @at.developer_key = dk
       @at.save
 
-      expect(@at.usable?).to eq false
+      # Need to have the `cached_developer_key` instance variable cleared
+      at = AccessToken.find(@at.id)
+      expect(at.usable?).to eq false
     end
 
     it "Shouldn't be usable if dev key isn't active, even if we request with a refresh token" do
@@ -164,7 +166,9 @@ describe AccessToken do
       @at.developer_key = dk
       @at.save
 
-      expect(@at.usable?(:crypted_refresh_token)).to eq false
+      # Need to have the `cached_developer_key` instance variable cleared
+      at = AccessToken.find(@at.id)
+      expect(at.usable?(:crypted_refresh_token)).to eq false
     end
   end
 
@@ -491,7 +495,6 @@ describe AccessToken do
   context 'broadcast policy' do
     before(:once) do
       Notification.create!(name: 'Manually Created Access Token Created')
-      Account.site_admin.enable_feature!(:notify_for_manually_created_access_tokens)
       user_model
     end
 
@@ -517,12 +520,6 @@ describe AccessToken do
     it 'should not send a notification when a new non-manually created access token is created' do
       developer_key = DeveloperKey.create!
       access_token = AccessToken.create!(user: @user, developer_key: developer_key)
-      expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
-    end
-
-    it 'should not send a notification if notify_for_manually_created_access_tokens is disabled' do
-      Account.site_admin.disable_feature!(:notify_for_manually_created_access_tokens)
-      access_token = AccessToken.create!(user: @user)
       expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
     end
   end

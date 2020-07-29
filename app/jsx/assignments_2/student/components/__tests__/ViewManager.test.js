@@ -24,7 +24,6 @@ import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../../graphqlData/
 import {SubmissionMocks} from '../../graphqlData/Submission'
 import ViewManager from '../ViewManager'
 
-jest.setTimeout(10000)
 jest.mock('../Attempt')
 
 async function mockStudentViewResult(overrides = {}) {

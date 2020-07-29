@@ -649,8 +649,6 @@ en:
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: Allows teachers to mark grade data to be exported in bulk to SIS integrations.
   use_remote_service_for_notifications_9fe667c6: Use remote service for notifications
   allow_the_ability_to_send_notifications_through_ou_13cc8537: Allow the ability to send notifications through our dispatch queue
-  use_the_new_scheduler_1273b832: Use the new scheduler
-  uses_the_new_scheduler_and_its_functionality_b07e9b14: Uses the new scheduler and its functionality
   enable_dashboard_images_for_courses_5af458b0: Enable Dashboard Images for Courses
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: Allow course images to be assigned to a course and used on the dashboard cards.
   responsive_layout_54e4ca06: Responsive Layout
@@ -835,6 +833,10 @@ en:
   hides_certain_students_and_sections_in_the_lmgb_if_47097d94: Hides certain students and sections in the LMGB if the teacher only has access to a particular section
   outcomes_service_alignment_migration_5b4391ad: Outcomes Service Alignment Migration
   includes_outcomes_service_alignments_when_exportin_6c578a35: Includes Outcomes Service alignments when exporting and importing course content
+  page_bulk_deleting_74860a80: Page Bulk Deleting
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: Allow pages to be deleted in bulk
+  account_level_mastery_scales_a5bdff29: Account-level Mastery Scales
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: Allows Account-level mastery scales and proficiency calculations, replacing per-outcome scales
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_dc466585: |-
     Differentiate between system- and user-generated live events
@@ -873,7 +875,6 @@ en:
   sets_the_default_option_for_course_copy_and_import_36147e78: Sets the default option for course copy and importing to New Quizzes
   new_quizzes_migration_required_7854aa1a: New Quizzes migration required
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: Disable New Quiz importing and migration checkboxes, defaulting them to enabled
-  send_notifications_when_manually_created_access_to_a1631123: Send notifications when manually created access tokens are made
   granular_permissions_for_managing_wiki_pages_3ed89a84: Granular permissions for managing wiki pages
   enable_recaptcha_by_default_for_self_registration_af9d50bd: Enable Recaptcha by default for self-registration
   requires_recaptcha_for_self_registration_by_defaul_c1a9db63: Requires Recaptcha for self-registration by default
@@ -1167,6 +1168,7 @@ en:
       page_title: Account Settings
       page_header_title: Account Settings
       tab_settings: Settings
+      tab_privacy: Privacy
       tab_quotas: Quotas
       tab_notifications: Notifications
       tab_admins: Admins
@@ -1178,6 +1180,7 @@ en:
       feature_options: Feature Options
       headings:
         settings: Account Settings
+        privacy: Privacy
         quotas: Account Quotas
       account_settings_title: Account Settings
       labels:
@@ -1228,6 +1231,8 @@ en:
         teachers_can_create_courses: Teachers
         no_enrollments_can_create_courses: Users with no enrollments
         students_can_create_courses: Students
+        enable_google_analytics: Allow tracking with Google Analytics
+        enable_fullstory: Allow tracking with FullStory
         outgoing_email_default_name_option_default: Default Canvas Setting
         outgoing_email_default_name_option_custom: Custom "From" Name
       no_language_preference: Not set (defaults to %{language})
@@ -1248,7 +1253,7 @@ en:
         Quiz IP filters are a way to limit access to quizzes to computers in a specified IP range.
 
         Specify a set of IP address filters that teachers can use to protect access to quizzes.  Filters can be a comma-separated list of addresses, or an address followed by a mask ("192.168.217.1/24" or "192.168.217.1/255.255.255.0")."
-      quiz_ip_filters_delete: Remove Filter
+      quiz_ip_filters_delete: Remove Quiz IP Filter
       add_ip_filter_link: Filter
       features_title: Features
       open_registration_delegated_warning_tooltip: An External Identity Provider is Enabled
@@ -4920,6 +4925,7 @@ en:
       description: Hosts uploaded files with the Inst-FS service.
       labels:
         migration_rate: Chance of migrating older files into Inst-FS on access (0 to 100)
+        service_worker: Use service worker to authenticate file accesses in Safari 13+
     kaltura_settings:
       description: |-
         You will need an account either at [Kaltura.com](%{kaltura_url})
@@ -5371,6 +5377,7 @@ en:
     resending: resending...
     done_resending: Done! Message delivery may take a few minutes.
     failed_resending: Request failed. Try again.
+  notification_preferences_cf47083d: Notification Preferences
   pseudonyms:
     notices:
       email_sent: Confirmation email sent to %{email}, make sure to check your spam box
@@ -6820,8 +6827,6 @@ en:
   quiz_e0dcce8f: Quiz
   page_50c4823d: Page
   unknown_content_type_ae6d08e8: Unknown Content Type
-  item_type_new_quiz_1a1cd9a9: 'Item type: New Quiz'
-  item_type_quiz_c894ddb1: 'Item type: Quiz'
   course_is_already_associated_with_a_blueprint_4d9407cb: Course is already associated with a blueprint
   cannot_have_a_blueprint_course_with_students_248e3e76: Cannot have a blueprint course with students
   title:
@@ -7720,6 +7725,7 @@ en:
       blueprint_content_added: Blueprint Content Added
       content_link_error: Content Link Error
       account_notification: Account Notification
+      upcoming_assignment_alert: Upcoming Assignment Alert
     categories:
       all_submissions: All Submissions
       announcement: Announcement
@@ -9350,7 +9356,6 @@ en:
   media_objects_c2fa37cd: Media Objects
   modules_c4325335: Modules
   names_and_role_ebff0149: Names and Role
-  notification_preferences_cf47083d: Notification Preferences
   originality_reports_1e36b935: Originality Reports
   outcome_groups_3bc3b150: Outcome Groups
   outcome_imports_c496a81f: Outcome Imports
@@ -11314,6 +11319,10 @@ en:
     %{body_text}
 
     More info at %{url}
+  upcoming_due_date_assignment_name_course_name_ac1766c1: Upcoming Due Date - %{assignment_name}, %{course_name}
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: 'Your assignment %{assignment_name} is due on %{due_at}. Click the following link to visit your assignment and get it in on time:'
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: Your assignment %{assignment_name} is due on %{due_at}.
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: Click here to visit your assignment and get it in on time!
   wiki_page_content_is_locked_or_not_yet_available_6fdad388: Wiki page content is locked or not yet available
   user_just_updated_title_88074ab2: "%{user} just updated %{title}"
   remove_name_as_an_admin_c296cf49: Remove %{name} as an admin
@@ -11843,11 +11852,7 @@ en:
     other: "%{count} Options"
   mastery_path_processing_f4471152: Mastery path processing
   locked_until_mastery_path_is_processed_for_item_na_48766cf7: Locked until mastery path is processed for "%{item_name}"
-  item_type_document_493ac5b0: 'Item type: Document'
-  item_type_download_e949cdb6: 'Item type: Download'
-  item_type_discussion_e3ddae9b: 'Item type: Discussion'
-  item_type_assignment_13a1132e: 'Item type: Assignment'
-  item_type_link_5a2abed2: 'Item type: Link'
+  mastery_connect_64598f55: Mastery Connect
   must_score_at_least_score_to_complete_this_module__b86b5101: Must score at least %{score} to complete this module item
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: Module item has been completed by scoring at least %{score}
   view_ba339f93: View
@@ -12417,6 +12422,7 @@ en:
   logged_out_user_index_68a0edb2: Logged Out User %{index}
   search_people_4782671a: Search People
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: Quiz availability dates that pass during an attempt will still auto-submit even if the extended time has not expired.
   available_until_date_cd125c62: Available Until Date
   message_students_who_369b8488: Message Students Who...
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: This is a preview of the draft version of the quiz
@@ -13875,9 +13881,6 @@ en:
       send_message_failed: There was an error sending your message, please try again
     event_on_this_day: There is an event on this day
     open_appointment_on_this_day: There is an open appointment on this day
-    confirm_appointment_group_deletion: Are you sure you want to delete this appointment group?
-    appointment_group_deletion_details: Deleting it will also delete any appointments that have been signed up for by students.
-    confirm_deletion: Confirm Deletion
     no_dates_error: You need to specify at least one date and time
     time_block_errors: There are errors in your time block selections.
     end_before_start_error: Start time must be before end time
@@ -13915,7 +13918,6 @@ en:
         calendar_week: Week
         calendar_month: Month
         calendar_agenda: Agenda
-        calendar_scheduler: Scheduler
       my_appointment_groups: My Appointment Groups
       done_go_back_to_list: Done, Go Back To List
       loading: Loading
@@ -14083,7 +14085,6 @@ en:
   title_is_required_8bb13295: Title is required!
   date_is_required_9c6f5e83: Date is required!
   to_do_item_d76ecb78: To Do Item
-  scheduler_shown_df77ca6f: Scheduler shown
   confirm_deletion_b2efe7d4: Confirm Deletion
   do_nothing_9672b478: Do Nothing
   reschedule_9f780bb8: Reschedule
@@ -14152,6 +14153,7 @@ en:
       view_in_discussion: View in discussion
   remove_attachment_ceae0973: Remove Attachment
   failed_to_save_please_try_again_later_bb7070fb: Failed to save, please try again later
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: Content is still being uploaded, if you continue it will not be embedded properly.
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*An error occurred*, please post your reply again later"
   EditorToggle:
     done_as_in_finished: Done
@@ -15092,6 +15094,8 @@ en:
     titles:
       insert_edit_image: Insert / Edit Image
   name_is_locked_click_to_unlock_bbebf03e: "%{name} is locked. Click to unlock."
+  failed_to_delete_selected_pages_26fa87db: Failed to delete selected pages
+  selected_pages_have_been_deleted_82a7f965: Selected pages have been deleted
   recipient_input:
     context_search_placeholder: Enter a name, course, or group
     context_search_title: Name, course, or group
@@ -15222,6 +15226,10 @@ en:
     NOTE: Associated tools are only listed once, even if they have
                     been installed in multiple subaccounts.
   violation_log_tray_d4eff9f4: Violation Log Tray
+  failed_to_update_account_notification_settings_194c1cd4: Failed to update account notification settings
+  account_notification_settings_updated_dbabec35: Account notification settings updated
+  account_notification_settings_initial_query_error_f55e1cbf: Account Notification Settings initial query error
+  account_notification_settings_error_page_66c0bc61: Account Notification Settings Error Page
   user_information_6353d7e1: User information
   full_name_14c958f7: 'Full Name:'
   display_name_6c2cfc58: 'Display Name:'
@@ -16495,6 +16503,7 @@ en:
   everyone_else_6c6dc7b6: Everyone Else
   ExternalToolDialog:
     embed_from_external_tool: Embed content from External Tool
+  loading_external_tool_d839042c: Loading External Tool
   SwitchEditorControl:
     switch_editor_html: HTML Editor
     switch_editor_rich_text: Rich Content Editor
@@ -17559,6 +17568,7 @@ en:
   there_are_no_outcomes_in_the_course_1d36d9c6: There are no outcomes in the course.
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n              Can't delete alignments based on rubric associations.\n              To remove these associations you need to remove the row from the asset's rubric\"\n            "
   delete_alignment_f33c97d5: Delete alignment
+  mastery_scale_abbc3557: Mastery Scale
   there_was_an_error_uploading_your_file_please_try__ce458566: There was an error uploading your file. Please try again.
   there_was_an_error_with_your_import_please_examine_7b42f29d: There was an error with your import, please examine your file and attempt the upload again. Check your email for more details.
   there_was_a_problem_importing_some_of_the_outcomes_482bac10: There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.
@@ -18543,6 +18553,10 @@ en:
   package_export_from_d6e2b073: Package export from
   export_failed_5d615d6d: Export failed
   most_recent_export_7282b756: Most recent export
+  delete_in_progress_2d3f0e0d: Delete in progress
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2:
+    one: You are about to delete 1 page. Are you sure?
+    other: You are about to delete %{count} pages. Are you sure?
   sorted_descending_84ec84c8: sorted descending.
   col_is_sorted_descending_1cef74aa: "%{col} is sorted descending."
   sorted_ascending_3138603c: sorted ascending.
@@ -18999,10 +19013,12 @@ en:
   require_group_members_to_be_in_the_same_section_7f6c36af: Require group members to be in the same section
   add_group_c84f9e9d: Add Group
   module_navigation_97043417: Module Navigation
+  previous_module_item_a9e57348: Previous Module Item
   jquery:
     module_sequence_footer:
       previous: Previous
       next: Next
+  next_module_item_19e835f3: Next Module Item
   recipients_a69b5e55: 'Recipients:'
   sent_f4ee89ec: Sent!
   you_have_changed_the_progression_requirements_for__6772bc89: You have changed the progression requirements for an active course. There may be students who have already progressed to this module and to others that depend on it.
@@ -19150,8 +19166,11 @@ en:
       file: File
   can_edit_this_page_role_selection_6ccec3c7: Can edit this page role selection
   allow_in_mastery_paths_5332c786: Allow in mastery paths
+  delete_selected_pages_7bc50580: Delete selected pages
   pages_settings_968392a3: Pages Settings
+  select_page_e93fc123: Select page
   master_lock_590266b6: Master Lock
+  select_title_for_deletion_45b08247: Select %{title} for deletion
   remove_as_front_page_2698aa12: Remove as Front Page
   use_as_front_page_274a488b: Use as Front Page
   send_page_to_another_user_6ef5a7c1: Send page to another user

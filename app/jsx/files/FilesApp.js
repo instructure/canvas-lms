@@ -88,7 +88,7 @@ FilesApp.render = function() {
           className="Button Button--link ic-app-course-nav-toggle"
           type="button"
           id="courseMenuToggle"
-          title={I18n.t('Show and hide courses menu')}
+          aria-label={I18n.t('Show and hide courses menu')}
           aria-hidden
         >
           <i className="icon-hamburger" aria-hidden="true" />

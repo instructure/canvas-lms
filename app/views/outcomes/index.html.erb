@@ -23,5 +23,13 @@
 %>
 
 <h1 class="screenreader-only"><%= t("#titles.learning_outcomes", "Learning Outcomes") %></h1>
-
-<div id="outcomes"></div>
+<% if @domain_root_account.feature_enabled?(:account_level_mastery_scales) && @context.class.to_s == 'Account'%>
+  <%
+    js_bundle :account_outcome_management
+    css_bundle :proficiency_table
+  %>
+    <div id="outcome_management"> </div>
+    <div id="outcomes" style="display: none;"></div>
+<% else %>
+  <div id="outcomes"> </div>
+<% end %>

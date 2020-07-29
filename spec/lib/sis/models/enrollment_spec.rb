@@ -19,6 +19,32 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::Models::Enrollment do
 
+  describe '#initialize' do
+    let(:params) do
+      {
+        course_id: '1',
+        section_id: '2',
+        role: 'StudentEnrollment',
+        notify: 'true'
+      }
+    end
+    let(:subject) { described_class.new(params) }
+
+    it 'sets nil defaults to all params' do
+      expect(subject.user_integration_id).to be_nil
+      expect(subject.associated_user_id).to be_nil
+      expect(subject.status).to be_nil
+      expect(subject.limit_section_privileges).to be_nil
+    end
+
+    it 'assigns args if provided' do
+      expect(subject.notify).to eq 'true'
+      expect(subject.course_id).to eq '1'
+      expect(subject.section_id).to eq '2'
+      expect(subject.role).to eq 'StudentEnrollment'
+    end
+  end
+
   describe '#valid_context?' do
     it 'detects an invalid context' do
       expect(subject).to_not be_valid_context
@@ -34,7 +60,6 @@ describe SIS::Models::Enrollment do
       expect(subject).to be_valid_context
     end
   end
-
 
   describe '#valid_user?' do
     it 'detects an invalid user' do
@@ -80,6 +105,13 @@ describe SIS::Models::Enrollment do
     it 'accepts the inactive status' do
       subject.status = 'inactive'
       expect(subject).to be_valid_status
+    end
+  end
+
+  describe '#row_info' do
+    it 'provides row info for available attributes' do
+      subject.notify = 'true'
+      expect(subject.row_info).to include(':notify=>"true"')
     end
   end
 end

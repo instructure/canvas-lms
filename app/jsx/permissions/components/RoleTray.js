@@ -81,7 +81,7 @@ export default class RoleTray extends Component {
   // We need this so that if there is an alert displayed inside this tray
   // (such as the delete confirmation alert) it will disapear if we click
   // on a different role then we are currently operating on.
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.id !== nextProps.id) {
       this.clearState()
     }
@@ -541,7 +541,4 @@ const mapDispatchToProps = {
   deleteRole: actions.deleteRole
 }
 
-export const ConnectedRoleTray = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(RoleTray)
+export const ConnectedRoleTray = connect(mapStateToProps, mapDispatchToProps)(RoleTray)

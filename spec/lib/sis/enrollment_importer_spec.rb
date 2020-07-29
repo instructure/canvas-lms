@@ -91,6 +91,55 @@ module SIS
       end
     end
 
+    context 'notifications' do
+      let(:messages) { [] }
+      let(:enrollment) { StudentEnrollment.new }
+
+      before(:once) do
+        @course = course_model(sis_source_id: 'C001')
+        @section = @course.course_sections.create!(sis_source_id: 'S001')
+        @user = user_with_managed_pseudonym(sis_user_id: 'U001')
+        Account.default.pseudonyms << @user.pseudonym
+      end
+
+      before(:each) do
+        allow(StudentEnrollment).to receive(:new).and_return(enrollment)
+        allow(SisBatchRollBackData).to receive(:build_data).and_return(nil)
+        allow(Setting).to receive(:get).and_return(1)
+      end
+
+      it "should save without broadcasting if notify is blank" do
+        expect(enrollment).to receive(:save_without_broadcasting!).once
+
+        EnrollmentImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process(messages) do |importer|
+          sis_enrollment = SIS::Models::Enrollment.new(
+            course_id: @course.sis_source_id,
+            section_id: @section.sis_source_id,
+            user_id: @user.pseudonym.sis_user_id,
+            role: 'student',
+            status: 'active'
+          )
+          importer.add_enrollment(sis_enrollment)
+        end
+      end
+
+      it "should save with broadcasting if notify is set" do
+        expect(enrollment).to receive(:save_without_broadcasting!).never
+
+        EnrollmentImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process(messages) do |importer|
+          sis_enrollment = SIS::Models::Enrollment.new(
+            course_id: @course.sis_source_id,
+            section_id: @section.sis_source_id,
+            user_id: @user.pseudonym.sis_user_id,
+            role: 'student',
+            status: 'active',
+            notify: 'true'
+          )
+          importer.add_enrollment(sis_enrollment)
+        end
+      end
+    end
+
     it 'should skip touching courses' do
       Timecop.freeze(2.days.ago) do
         @c = course_model(sis_source_id: 'C001')

@@ -2566,4 +2566,11 @@ describe Quizzes::Quiz do
       end
     end
   end
+
+  context 'root_account_id' do
+    it "uses root_account value from account" do
+      quiz = @course.quizzes.create!(title: "hello")
+      expect(quiz.root_account_id).to eq Account.default.id
+    end
+  end
 end

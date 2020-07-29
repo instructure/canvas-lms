@@ -50,6 +50,9 @@
     "alt_text_611fb322": {
         "message": "Alt Text"
     },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "Virhe luettaessa tiedostoa"
+    },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Ilmeni virhe yritettäessä ohittaa tilaisuutta."
     },
@@ -259,6 +262,9 @@
     },
     "date_time_d9fbf2d7": {
         "message": "Pvm/aika:"
+    },
+    "decorative_image_3c28aa7d": {
+        "message": "Koristeellinen kuva"
     },
     "decrease_indent_de6343ab": {
         "message": "Pienennä sisennystä"
@@ -673,6 +679,9 @@
     },
     "my_grades_98834476": {
         "message": "Omat arvosanat"
+    },
+    "my_media_82bade11": {
+        "message": "Oma tietoväline"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Siirry valikon tai työkalupalkin läpi"
@@ -1162,6 +1171,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Sinulla on mediapalautetta."
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "Et voi ladata tyhjää tiedostoa."
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "Sinun täytyy antaa päivämäärä ja aika."

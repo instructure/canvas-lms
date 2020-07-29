@@ -33,12 +33,12 @@ import 'jquery.disableWhileLoading'
 import 'jquery.instructure_forms'
 
 export default class EditAppointmentGroupDetails {
-  constructor(selector, apptGroup, contexts, closeCB, event, useBetterScheduler) {
+  constructor(selector, apptGroup, contexts, closeCB, event, useScheduler) {
     this.apptGroup = apptGroup
     this.contexts = contexts
     this.closeCB = closeCB
     this.event = event
-    this.useBetterScheduler = useBetterScheduler
+    this.useScheduler = useScheduler
     this.currentContextInfo = null
     this.appointment_group = {
       use_group_signup: this.apptGroup.participant_type === 'Group',
@@ -47,7 +47,7 @@ export default class EditAppointmentGroupDetails {
 
     $(selector).html(
       editAppointmentGroupTemplate({
-        better_scheduler: this.useBetterScheduler,
+        use_scheduler: this.useScheduler,
         title: this.apptGroup.title,
         contexts: this.contexts,
         appointment_group: this.appointment_group,
@@ -188,7 +188,7 @@ export default class EditAppointmentGroupDetails {
     }
 
     this.form.submit(this.saveClick)
-    if (this.useBetterScheduler) {
+    if (this.useScheduler) {
       this.form.find('.cancel_btn').click(this.cancel)
     } else {
       this.form.find('.save_without_publishing_link').click(this.saveWithoutPublishingClick)
@@ -223,7 +223,10 @@ export default class EditAppointmentGroupDetails {
           apptCounts[e.user.id] += 1
         })
       })
-    return this.helpIconShowIf(checkbox, _.some(apptCounts, (count, userId) => count > apptLimit))
+    return this.helpIconShowIf(
+      checkbox,
+      _.some(apptCounts, (count, userId) => count > apptLimit)
+    )
   }
 
   // show/hide the help icon
@@ -405,7 +408,8 @@ export default class EditAppointmentGroupDetails {
     if (
       contextCodes.length === 1 &&
       sectionCodes.length === 0 &&
-      (context.group_categories && context.group_categories.length > 0)
+      context.group_categories &&
+      context.group_categories.length > 0
     ) {
       this.enableGroups(context)
       if (this.apptGroup.sub_context_codes.length > 0) {

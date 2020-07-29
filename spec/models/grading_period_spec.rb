@@ -905,6 +905,43 @@ describe GradingPeriod do
     end
   end
 
+  describe "root_account_id" do
+    context "on create" do
+      it "sets root_account_id to the grading period group's root_account_id if root_account_id is nil" do
+        period = grading_period_group.grading_periods.create!(params)
+        expect(period.root_account_id).to eq grading_period_group.root_account_id
+      end
+
+
+      it "does not modify root_account_id if it is already set" do
+        second_account = account_model
+        period = grading_period_group.grading_periods.create!(
+          params.merge(root_account_id: second_account.id)
+        )
+        expect(period.root_account_id).to eq second_account.id
+      end
+    end
+
+
+    context "on update" do
+      it "sets root_account_id to the grading period group's root_account_id if root_account_id is nil" do
+        grading_period.update_column(:root_account_id, nil)
+        grading_period.update!(title: "A New Title")
+        expect(grading_period.root_account_id).to eq grading_period_group.root_account_id
+      end
+
+      it "does not modify root_account_id if it is already set" do
+        second_account = account_model
+        period = grading_period_group.grading_periods.create!(
+          params.merge(root_account_id: second_account.id)
+        )
+
+        period.update!(title: "A New Title")
+        expect(period.root_account_id).to eq second_account.id
+      end
+    end
+  end
+
   describe 'grading period scores' do
     before do
       student_in_course(course: course, active_all: true)

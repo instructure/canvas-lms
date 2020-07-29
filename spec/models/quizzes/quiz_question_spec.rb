@@ -197,4 +197,13 @@ describe Quizzes::QuizQuestion do
       expect(question).to be_deleted
     end
   end
+
+  context 'root_account_id' do
+    before(:each) { quiz_with_graded_submission([]) }
+
+    it "uses root_account value from account" do
+      question = @quiz.quiz_questions.create!
+      expect(question.root_account_id).to eq Account.default.id
+    end
+  end
 end

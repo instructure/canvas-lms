@@ -152,7 +152,7 @@ const renderNotificationCategory = (
         )
         .map(category => (
           <Table.Row key={category} data-testid={formatCategoryKey(category)}>
-            <Table.Cell>
+            <Table.RowHeader>
               <Tooltip
                 renderTip={
                   <div
@@ -172,7 +172,7 @@ const renderNotificationCategory = (
                     .notification.categoryDisplayName
                 }
               </Tooltip>
-            </Table.Cell>
+            </Table.RowHeader>
             {notificationPreferences.channels.map(channel => (
               <Table.Cell textAlign="center" key={category + channel.path}>
                 <NotificationPreferencesSetting

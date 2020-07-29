@@ -128,6 +128,8 @@
       delay_for: 0
     - name: Assignment Due Date Override Changed
       delay_for: <%= 2*60 %>
+    - name: Upcoming Assignment Alert
+      delay_for: 0
 
 - category: Files
   notifications:

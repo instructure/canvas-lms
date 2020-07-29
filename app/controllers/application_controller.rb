@@ -44,6 +44,7 @@ class ApplicationController < ActionController::Base
   around_action :enable_request_cache
   around_action :batch_statsd
   around_action :report_to_datadog
+  around_action :compute_http_cost
 
   helper :all
 
@@ -210,7 +211,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = [:cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :direct_share, :assignment_bulk_edit, :responsive_admin_settings, :responsive_awareness,
-    :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses
+    :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses, :bulk_delete_pages
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
@@ -547,6 +548,16 @@ class ApplicationController < ActionController::Base
 
   def batch_statsd(&block)
     InstStatsd::Statsd.batch(&block)
+  end
+
+  def compute_http_cost(&block)
+    CanvasHttp.reset_cost!
+    yield
+  ensure
+    if CanvasHttp.cost > 0
+      cost_weight = Setting.get('canvas_http_cost_weight', '1.0').to_f
+      increment_request_cost(CanvasHttp.cost * cost_weight)
+    end
   end
 
   def report_to_datadog(&block)

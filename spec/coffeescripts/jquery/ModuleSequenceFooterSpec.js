@@ -231,7 +231,7 @@ test('buttons show modules tooltip when current module id != next or prev module
 
   ok(
     this.$testEl
-      .find('a')
+      .find('.module-sequence-footer-button--previous')
       .first()
       .data('html-tooltip-title')
       .match('Module C'),
@@ -284,7 +284,7 @@ test('buttons show item tooltip when current module id == next or prev module id
 
   ok(
     this.$testEl
-      .find('a')
+      .find('.module-sequence-footer-button--previous')
       .first()
       .data('html-tooltip-title')
       .match('Project 1'),

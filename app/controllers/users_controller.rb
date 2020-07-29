@@ -2641,9 +2641,7 @@ class UsersController < ApplicationController
       student_enrollments: {},
       observed_enrollments: {}
     }
-    grouped_observed_enrollments =
-      presenter.observed_enrollments.group_by { |enrollment| enrollment[:course_id] }
-
+    grouped_observed_enrollments = presenter.observed_enrollments.group_by(&:course_id)
     grouped_observed_enrollments.each do |course_id, enrollments|
       grading_period_id = generate_grading_period_id(
         grading_periods.dig(course_id, :selected_period_id)

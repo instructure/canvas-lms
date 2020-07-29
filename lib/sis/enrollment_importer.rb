@@ -175,7 +175,6 @@ module SIS
             message = "Neither course nor section existed for user enrollment "
             message << "(Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id}, User ID: #{enrollment_info.user_id})"
             @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
-
             next
           end
 
@@ -258,7 +257,6 @@ module SIS
               next
             end
           end
-
           enrollment = @section.all_enrollments.where(user_id: user,
                                                       type: type,
                                                       associated_user_id: associated_user_id,
@@ -309,7 +307,11 @@ module SIS
             enrollment.sis_batch_id = @batch.id
             enrollment.skip_touch_user = true
             begin
-              enrollment.save_without_broadcasting!
+              if Canvas::Plugin.value_to_boolean(enrollment_info.notify)
+                enrollment.save!
+              else
+                enrollment.save_without_broadcasting!
+              end
             rescue ActiveRecord::RecordInvalid
               msg = "An enrollment did not pass validation "
               msg += "(" + "course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
@@ -336,7 +338,6 @@ module SIS
           else
             @enrollments_to_update_sis_batch_ids << enrollment.id
           end
-
           @success_count += 1
         end
       end

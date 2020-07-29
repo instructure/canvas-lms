@@ -36,11 +36,11 @@ class EventStream::Stream
   end
 
   def available?
-    !!database && database.available?
+    current_backend.available?
   end
 
   def database_name
-    database && database.keyspace
+    current_backend.database_name
   end
 
   def database_fingerprint

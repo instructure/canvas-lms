@@ -48,5 +48,6 @@ module RootAccountResolver
     end
 
     before_save -> { self.root_account_id = resolver[self] }, unless: :root_account_id
+    belongs_to :root_account, class_name: 'Account'
   end
 end

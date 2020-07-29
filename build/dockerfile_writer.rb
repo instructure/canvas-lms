@@ -45,7 +45,7 @@ class DockerfileWriter
 
   def run(filename)
     File.open(filename, "w") do |f|
-      f.write eval(Erubi::Engine.new(File.read("build/Dockerfile.template")).src, nil, "build/Dockerfile.template")
+      f.write eval(Erubi::Engine.new(File.read("build/ubuntu.Dockerfile.template")).src, nil, "build/ubuntu.Dockerfile.template")
     end
   end
 
@@ -66,9 +66,9 @@ end
 DockerfileWriter.new(
   env: "development",
   compose_files: ["docker-compose.yml", "docker-compose.override.yml"]
-).run("Dockerfile")
+).run("ubuntu.development.Dockerfile")
 
 DockerfileWriter.new(
   env: "production",
   compose_files: ["docker-compose.yml"]
-).run("Dockerfile-production")
+).run("ubuntu.production.Dockerfile")

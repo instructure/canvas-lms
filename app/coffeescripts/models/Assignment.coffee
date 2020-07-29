@@ -45,6 +45,8 @@ export default class Assignment extends Model
   @mixin DefaultUrlMixin
   resourceName: 'assignments'
 
+  LTI_EXT_MASTERY_CONNECT = 'https://canvas.instructure.com/lti/mastery_connect_assessment'
+
   urlRoot: -> @_defaultUrl()
 
   defaults:
@@ -353,12 +355,17 @@ export default class Assignment extends Model
 
   externalToolData: =>
     tagAttributes = @get('external_tool_tag_attributes') || {}
-    if !tagAttributes.external_data
-      return ''
-    data = tagAttributes.external_data
-    # we need to stringified version for the form input
-    data.stringify = JSON.stringify(data)
-    return data
+    return tagAttributes.external_data
+
+  externalToolDataStringified: =>
+    data = @externalToolData()
+    if (data)
+      return JSON.stringify(data)
+    return ''
+
+  isMasteryConnectTool: =>
+    tagAttributes = @get('external_tool_tag_attributes') || {}
+    return tagAttributes?.external_data?.key == LTI_EXT_MASTERY_CONNECT
 
   externalToolNewTab: (b) =>
     tagAttributes = @get('external_tool_tag_attributes') || {}
@@ -552,7 +559,8 @@ export default class Assignment extends Model
       'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox',
       'defaultToolName', 'isDefaultTool', 'isGenericExternalTool', 'isNonPlacementExternalTool', 'defaultToNone',
       'defaultToOnline', 'defaultToOnPaper', 'objectTypeDisplayName',
-      'selectedSubmissionTypeToolId', 'submissionTypeSelectionTools', 'externalToolData'
+      'selectedSubmissionTypeToolId', 'submissionTypeSelectionTools', 'externalToolData', 'isMasteryConnectTool',
+      'externalToolDataStringified'
     ]
 
     hash =

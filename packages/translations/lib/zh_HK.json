@@ -50,6 +50,9 @@
     "alt_text_611fb322": {
         "message": "替代文字"
     },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "讀取作業時發生錯誤"
+    },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "嘗試放棄機會時發生錯誤。"
     },
@@ -259,6 +262,9 @@
     },
     "date_time_d9fbf2d7": {
         "message": "日期和時間："
+    },
+    "decorative_image_3c28aa7d": {
+        "message": "裝飾圖像"
     },
     "decrease_indent_de6343ab": {
         "message": "減少縮排"
@@ -673,6 +679,9 @@
     },
     "my_grades_98834476": {
         "message": "我的成績"
+    },
+    "my_media_82bade11": {
+        "message": "我的媒體"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "導航整個選單或工具欄"
@@ -1162,6 +1171,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "您有媒體反饋。"
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "不可上傳空白檔案。"
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "您必須提供日期和時間。"

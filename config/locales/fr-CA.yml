@@ -397,6 +397,7 @@ fr-CA:
   account_id_73966078: account_id
   account_id_f6e26867: "ID de compte"
   account_level_notification_preferences_require_an__66467cd7: "Les préférences de notification au niveau du compte nécessitent une account_id mise à jour"
+  account_level_notification_preferences_ui_update_f5e189a4: "Mise à jour de l’IU des préférences de notification au niveau du compte"
   account_level_settings_manage_4fca6f8e: "Définitions de niveau du compte - gestion"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nom du compte"
@@ -1768,6 +1769,7 @@ fr-CA:
   add_tas_to_the_course_2aac6e02: "Ajouter des AE au cours"
   add_theme_32fa3d50: "Ajouter un thème"
   add_to_course_481a51c4: "Ajouter au cours..."
+  add_to_rce_toolbar_e5b3e3b4: "Ajouter à la barre d’outils RCE"
   add_to_student_to_do_58e66b4b: "Ajouter à la liste des choses à faire de l’étudiant"
   add_to_whitelist_24f3f1ba: "Ajouter à la Liste blanche"
   add_toolname_4e17dc90: "Ajouter %{toolName}"
@@ -1998,7 +2000,7 @@ fr-CA:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permet aux rôles d’enseignant/concepteur/AE d’accéder à l’outil de clavardage."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permet aux rôles d’enseignant/AE d’accéder à l’outil de Participation."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Permet aux rôles d’enseignant/AE d’accéder à l’outil de Participation."
-  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Permet aux enseignants de masquer des sections de cours aux étudiants sur la page Personnes lorsqu'il y a plus d'une section dans le cours."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Permet aux enseignants de masquer des sections de cours aux étudiants sur la page Personnes lorsqu’il y a plus d’une section dans le cours."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permet aux enseignants de marquer les données de notes comme prêtes à une exportation globale pour leurs intégrations au système d'information des étudiants."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Permet aux enseignants de spécifier les politiques de publication pour ce cours ou des tâches spécifiques, permettant aux notes d'être
@@ -3702,7 +3704,7 @@ fr-CA:
   automatically_apply_deduction_to_late_submissions_2b68166e: "Appliquer automatiquement une déduction pour les envois tardifs"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Appliquer automatiquement une note pour les envois manquants"
   automatically_dff02416: Automatiquement
-  automatically_disable_post_to_sis_on_assignments_w_dd7e873a: "Désactiver automatiquement « Publier sur SIS » sur les tâches lorsque la période de notation se termine"
+  automatically_disable_post_to_sis_on_assignments_w_dd7e873a: "Désactiver automatiquement « Publier sur SIS » sur les tâches lorsque la période de notation se termine"
   automatically_post_grades_29a7eff5: "Publier les notes automatiquement"
   avaible_daec2e57: Disponible
   availability_dates_438d71e0: "Dates de disponibilité"
@@ -5222,6 +5224,7 @@ fr-CA:
       importing_button: "Importation en cours... Cette opération peut prendre du temps."
     titles: 
       home_page: "Page d’accueil"
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Contenu est toujours en cours de téléversement, si vous continuez, l’image ne sera pas correctement intégrée."
   content_link_error_assignment_name_course_name_b8be789a: "Erreur de lien de contenu - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -8021,6 +8024,7 @@ fr-CA:
             selon vos préférences. Appliquez automatiquement une note pour les envois manquants ou
             en retard, et masquer facilement les notes jusqu’à ce que vous soyez prêt que les étudiants
             puissent les visualisent. Pour une notation simplifiée, utilisez SpeedGrader pour voir et noter les envois.
+  display_historical_view_of_achievements_of_users_53db5938: "Afficher la vue historique des réalisations des utilisateurs"
   display_name_6c2cfc58: "Nom d’affichage :"
   display_name_b80c243e: "Nom d’affichage"
   display_to_students_e1301f99: "Afficher aux étudiants"
@@ -8035,7 +8039,7 @@ fr-CA:
       un cours et aucun problème n’est trouvé.
   displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
       Affiche des confettis pour les utilisateurs qui retournent une tâche avant
-      la date d'échéance définie.
+      la date d’échéance définie.
   district_id_6f408184: "ID du district"
   divide_into_equal_slots_of_input_value_minutes_fca83452: "Diviser en créneaux égaux de %{input_value} minutes. "
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Diviser en créneaux horaires égaux de %{num_minutes} minutes. *Go*"
@@ -8196,6 +8200,7 @@ fr-CA:
   e_g_jon_doe_77233e3b: "par ex., Jean Durand"
   e_g_jondoe_example_com_98656fb5: "Par exemple, jondoe@example.com"
   e_mail_only_2cc5e513: "Courriel uniquement"
+  earned_earndate_5f8b6c99: "Obtenu %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Importez ou copiez facilement du contenu d’un autre cours Canvas dans
               votre cours ou importez du contenu d’autres formats, tels que Moodle ou QTI.
@@ -9051,6 +9056,7 @@ fr-CA:
   fall_grading_period_id_74ef68e: "ID de la période de notation d'automne"
   favicon_6e658914: Favicône
   favorite_courses_fbd356f0: "Cours favoris"
+  favorite_d720d310: Favoris
   favorites_c7e0207c: Favoris
   feature_f5526584: Fonctions
   feature_flags: 
@@ -11023,7 +11029,7 @@ fr-CA:
   if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
       Si les améliorations RCE sont également activées,
       le RCE enregistrera automatiquement votre travail au fur et à mesure
-  if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Si cette option est activée, désactivez la fonctionnalité de publication dans SIS pour les tâches lorsque leur période de notation se termine. S’applique uniquement si la fonction « Activer nouveaux paramètres d’intégration SIS » est activée."
+  if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Si cette option est activée, désactivez la fonctionnalité de publication dans SIS pour les tâches lorsque leur période de notation se termine. S’applique uniquement si la fonction « Activer nouveaux paramètres d’intégration SIS » est activée."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Si « Statistiques — voir » ou « Utilisateurs — Gérer les détails de connexion » est activé, un utilisateur sera en mesure de générer l’activité de connexion/déconnexion dans les Outils d’administration. Pour masquer l’option de l’activité de connexion/déconnexion dans les Outils d’administration, ces autorisations doivent être désactivées."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Si « Statistiques — voir » ou « Utilisateurs — Gérer les détails de connexion » est activé, un utilisateur sera en mesure de générer l’activité de connexion/déconnexion dans les Outils d’administration. Pour masquer l’option de l’activité de connexion/déconnexion dans les Outils d’administration, ces autorisations doivent être désactivées."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Si « Statistiques - voir » ou « Utilisateurs - Gérer les détails de connexion » est activé, un utilisateur sera en mesure de générer l'activité de connexion/déconnexion dans les Outils d'administration. Pour masquer l'option de l’activité de connexion/déconnexion dans les Outils d'administration, ces autorisations doivent être désactivées."
@@ -11421,6 +11427,7 @@ fr-CA:
   item_type_download_e949cdb6: "Type d'élément : Téléchargement"
   item_type_link_5a2abed2: "Type d'élément : Lien"
   item_type_locked_85c560ec: "Type d'élément : Verrouillé"
+  item_type_mastery_connect_8f36c669: "Type d’élément : Connexion de maîtrise"
   item_type_new_quiz_1a1cd9a9: "Type d’élément : Nouveau questionnaire"
   item_type_quiz_c894ddb1: "Type d’élément : Questionnaire"
   items_299a7626: "Éléments : "
@@ -11674,6 +11681,7 @@ fr-CA:
   let_students_see_the_correct_answers_dacc2faf: "Laisser les étudiants voir les réponses correctes"
   let_students_see_their_quiz_responses_fbc07d14: "Laisser les étudiants voir leurs réponses au questionnaire"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Laisser les étudiants voir les réponses aux questionnaires (les mauvaises réponses seront marquées dans la rétroaction d'étudiant)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Laissez l’administrateur du site sélectionner jusqu’à 2 applications LTI comme favoris, qui seront ensuite affichées dans la barre d’outils du RCE"
   letter_grade_29ff1938: "Notation par lettre"
   letter_grade_f00fedc4: "notation par lettre"
   level_5fdf654a: Niveau
@@ -11829,6 +11837,7 @@ fr-CA:
   list_collapsed_9ac35920: "Liste réduite."
   list_collapsed_dde87718: "Liste réduite"
   list_expanded_efec2d0: "Liste développée."
+  list_of_the_currently_attainable_trophies_959b2518: "Liste des trophées actuellement réalisables"
   list_view_430aecce: "Vue de liste"
   lithuanian_5adcbe24: Lituanien
   little_lost_try_here_first_9e24e575: "Un peu perdu? Essayez d'abord ici!"
@@ -12150,6 +12159,8 @@ fr-CA:
   mastery_path_processing_f4471152: "Traitement du parcours de maîtrise"
   mastery_paths_breakdown_6e0b5fce: "Répartition des parcours de maîtrise"
   mastery_paths_cc4096c2: "Parcours de maîtrise"
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "La modification des parcours de maîtrise a été temporairement désactivée pour entretien."
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "La sélection des parcours de maîtrise a été temporairement désactivée pour entretien."
   mastery_points_f1672cc: "points de maîtrise"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Le score de maîtrise reflète la meilleure note obtenue sur une tâche ou un questionnaire noté."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Le niveau de maîtrise reflète le dernier tâche ou questionnaire noté."
@@ -14250,6 +14261,7 @@ fr-CA:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Points"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Points possibles"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} pts"
+  na_3dbb9cfd: S.O.
   name: "Outil d’importation Academic Benchmarks"
   name_1aed4a1b: Nom
   name_3806192d: "Nom :"
@@ -15764,6 +15776,7 @@ fr-CA:
       description: "Héberge des fichiers téléversés avec le service Inst-FS."
       labels: 
         migration_rate: "Possibilité de migrer des fichiers plus anciens vers Inst-FS à l’accès (0 à 100)"
+        service_worker: "Utiliser un technicien pour authentifier les accès aux fichiers dans Safari 13+"
     kaltura: 
       description: "Enregistrement et lecture audio/vidéo Kaltura"
       name: Kaltura
@@ -16095,6 +16108,7 @@ fr-CA:
       requirements_must_be_completed: "Les conditions requises suivantes doivent être remplies pour déverrouiller cette page."
   presentation_2d9387ca: Présentation
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Présente le réglage du questionnaire pour éviter l’envoi automatique d'un questionnaire chronométré lorsque le temps disponible est écoulé."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Appuyer sur la touche ALT + F8 pour visualiser une liste de raccourcis clavier"
   press_space_to_start_over_d4b8a2da: "Appuyez sur espace pour commencer"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Appuyer sur la touche « virgule » ou les touches « MAJ » + « point d'interrogation » pour visualiser une liste de raccourcis clavier."
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Appuyer sur la touche « virgule » ou les touches « MAJ » + « ? » pour visualiser une liste de raccourcis clavier."
@@ -16691,6 +16705,7 @@ fr-CA:
       update_question_without_regrading: "Actualiser la question sans reclassement"
   quiz_40ee61b1: questionnaire
   quiz_assignment_overrides_cec1973b: "Surpassements de tâche de questionnaire"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Les dates de disponibilité du questionnaire qui passent au cours d’une tentative continueront de s’envoyer automatiquement même si le délai prolongé n’a pas expiré."
   quiz_duplication_not_implemented_c1495585: "duplication de questionnaire non mis en œuvre"
   quiz_e0dcce8f: Questionnaire
   quiz_extensions_d2550649: "Extensions de questionnaire"
@@ -19978,8 +19993,8 @@ fr-CA:
   speedgrader_settings_4195099b: "SpeedGrader Paramètres"
   speedgrader_settings_c9503705: "Paramètres de Speedgrader"
   speedgrader_tm_44688790: SpeedGrader™
-  splitting_disabled_reached_maximum_of_three_assign_716acb13: "Fractionnement désactivé : il ne peut y avoir qu’un maximum de trois groupes de tâches assignées par échelle de notation"
-  splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "Fractionnement désactivé : il ne peut y avoir qu’un maximum de trois groupes de tâches par échelle de notation."
+  splitting_disabled_reached_maximum_of_three_assign_716acb13: "Fractionnement désactivé : il ne peut y avoir qu’un maximum de trois groupes de tâches assignées par échelle de notation"
+  splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "Fractionnement désactivé : il ne peut y avoir qu’un maximum de trois groupes de tâches par échelle de notation."
   spreadsheet_6d622119: Feuille
   spring_grading_period_current_score_7083cf0d: "Note actuelle de la période de notation du printemps"
   spring_grading_period_final_score_386d92f7: "Note finale de la période de notation du printemps"
@@ -20431,7 +20446,7 @@ fr-CA:
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Succès! Les notes ont été publiées à %{postedTo} pour %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Cela a fonctionné! Les notes ont été publiées dans le relevé de notes."
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Succès! La politique de publication pour %{name} a été mise à jour."
-  success_you_added_hostname_as_an_allowed_domain_4713bfe8: "Succès : Vous avez ajouté %{hostname} comme domaine autorisé."
+  success_you_added_hostname_as_an_allowed_domain_4713bfe8: "Succès : Vous avez ajouté %{hostname} comme domaine autorisé."
   success_you_added_hostname_to_the_whitelist_6061236e: "Succès : Vous avez ajouté %{hostname} à la liste blanche."
   successfully_added_fb3e6008: "Ajouté avec succès"
   successfully_created_a_set_38374719: "Création de l'ensemble réussie"
@@ -20467,6 +20482,7 @@ fr-CA:
       networking_academy_description: "Consultez les réponses de Cisco aux questions les plus fréquentes."
       networking_academy_faqs: "FAQ Networking Academy"
       support_desk_livechat: "Dialogue en direct avec le service d’assistance"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Prend en charge les outils LTI préférés dans le RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_46_55cc3620: "Suède (+46)"
@@ -20544,6 +20560,7 @@ fr-CA:
     syllabus: Programme
     tab_location_error: "L’emplacement de cet onglet n’est pas valide"
     tab_unmanagable_error: "%{css_class} n’est pas gérable"
+    trophy_case: Présentoir
   tabs_5605547e: Onglets
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taïwan (+886)"
@@ -20681,6 +20698,12 @@ fr-CA:
                      jusqu’à %{max_domains} domaines à votre liste blanche. Les caractères de remplacement sont recommandés
                      (ex: *.instructure.com). Les domaines Canvas et Instructure sont inclus
                      automatiquement et ne comptent pas dans votre limite de 50 domaines.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      La politique de sécurité du contenu vous permet de restreindre la personnalisation
+                     JavaScript qui s’exécute dans votre instance de Canvas. Vous pouvez ajouter manuellement
+                     jusqu’à %{max_domains} domaines autorisés. Les caractères de remplacement sont recommandés
+                     (par ex : *.instructure.com). Les domaines Canvas et Instructure sont inclus
+                     automatiquement et ne comptent pas dans votre limite de 50 domaines.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       La page d’accueil du cours est la première page que les étudiants voient lorsqu’ils ouvrent
             votre cours. La page d’accueil peut afficher le
@@ -20709,6 +20732,9 @@ fr-CA:
   the_following_domains_have_automatically_been_adde_2c7a1654: |-
       Les domaines suivants ont été automatiquement ajoutés à votre
                        liste blanche à partir d'outils déjà existants dans votre compte.
+                       Pour supprimer ces domaines, supprimez les outils associés.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      Les domaines suivants ont été automatiquement autorisés à partir d’outils déjà existants dans votre compte.
                        Pour supprimer ces domaines, supprimez les outils associés.
   the_following_errors_occurred_bdec1e44: "Les erreurs suivantes sont survenues :"
   the_following_fields_are_invalid_fields_b3565800: "Les champs suivants ne sont pas valides : %{fields}"
@@ -20824,6 +20850,7 @@ fr-CA:
   there_are_no_unsaved_changes_9276e87c: "Il n'y a aucun changement non sauvegardé"
   there_are_no_unsynced_changes_4e8f0838: "Il n'y a pas de modifications non synchronisées"
   there_are_no_unsynched_changes_d208547c: "Il n'y a pas de changement non synchronisé"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Il y a une limite de 2 applications pour le placement dans la barre d’outils RCE. Ce paramètre ne s’applique qu’au RCE amélioré."
   there_is_currently_1_available_grader_758e4a21: "Il y a présentement 1 correcteur disponible"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Il y a eu un échec de déconnexion avec votre IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Un problème est survenu lors de la création de la colonne des remarques de professeur."
@@ -21716,6 +21743,59 @@ fr-CA:
   tree_browser: 
     folder_tree_instructions: "Utilisez les flèches vers le bas et vers le haut pour vous déplacer dans l’arborescence. La flèche droite permet de développer les dossiers, la flèche gauche de les réduire et la touche Entrée de valider la sélection."
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad et Tobago (+1)"
+  trophy: 
+    balloon_description: "Description du ballon"
+    balloon_display_name: Ballon
+    bifrost_trophy_description: "Description du trophée Bifrost"
+    bifrost_trophy_display_name: "Trophée Bifrost"
+    butterfly_description: "Description du papillon"
+    butterfly_display_name: Papillon
+    einstein_rosen_trophy_description: "Description du trophée Einstein Rosen"
+    einstein_rosen_trophy_display_name: "Trophée Einstein Rosen"
+    fire_description: "Description de l’incendie"
+    fire_display_name: Incendie
+    flowers_description: "Description des fleurs"
+    flowers_display_name: Fleurs
+    four_leaf_clover_description: "Description du trèfle à quatre feuilles"
+    four_leaf_clover_display_name: "Trèfle à quatre feuilles"
+    gift_description: "Description du cadeau"
+    gift_display_name: Cadeau
+    gnome_description: "Description du gnome"
+    gnome_display_name: Gnome
+    helix_rocket_description: "Description de la fusée hélicoïdale"
+    helix_rocket_display_name: "Roquette hélicoïdale"
+    horse_shoe_description: "Description du fer à cheval"
+    horse_shoe_display_name: "Fer à cheval"
+    hot_air_balloon_description: "Description de la montgolfière"
+    hot_air_balloon_display_name: Montgolfière
+    magic_mystery_thumbs_up_description: "Description des pouces levés magiques mystérieux"
+    magic_mystery_thumbs_up_display_name: "Pouces levés magiques mystérieux"
+    medal_description: "Description de la médaille"
+    medal_display_name: Médaille
+    moon_description: "Description de la Lune"
+    moon_display_name: Lune
+    ninja_description: "Description de Ninja"
+    ninja_display_name: Ninja
+    panama_rocket_description: "Description de la fusée Panama"
+    panama_rocket_display_name: "Fusée Panama"
+    panda_description: "Description du Panda"
+    panda_display_name: Panda
+    panda_unicycle_description: "Description de l’unicycle de Panda"
+    panda_unicycle_display_name: "Unicycle de panda"
+    pinwheel_description: "Description de la roue à aubes"
+    pinwheel_display_name: Toupie
+    pizza_slice_description: "Description de la tranche de pizza"
+    pizza_slice_display_name: "Tranche de pizza"
+    rocket_description: "Description de la fusée"
+    rocket_display_name: Fusée
+    star_description: "Description de l’étoile"
+    star_display_name: "Marquer d’un astérisque"
+    thumbs_up_description: "Description du pouce levé"
+    thumbs_up_display_name: "Pouce levé"
+    trophy_description: "Description du trophée"
+    trophy_display_name: Trophée
+  trophy_case_7a098a85: Présentoir
+  trophy_case_da3b25bb: Présentoir
   truncated_56b1a661: Tronqué
   turkish_5b69578b: Turc
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Activer le RTL même pour les langues non RTL"
@@ -21936,6 +22016,9 @@ fr-CA:
   updated_permissions_page_f2e91060: "Page d’autorisations mise à jour"
   updated_terms_of_service_82f34148: "Modalités mises à jour"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Une IU mise à jour pour chercher et afficher les utilisateurs et les cours au sein-même d'un compte."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Met à jour l’interface utilisateur des préférences de notification de compte pour être une
+      expérience utilisateur mise à jour et plus actuelle
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Met à jour l'affichage des icônes de politique de publication dans l'entête de colonne d'affectation du nouveau carnet de notes."
   updating_6edbab78: "Mise à jour"
   updating_discussion_failed_aadb2d35: "La mise à jour de discussion a échouée"

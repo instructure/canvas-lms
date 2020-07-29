@@ -22,7 +22,9 @@ coverage-js/
 gems/*/node_modules/
 gems/plugins/*/node_modules/
 gems/plugins/*/.git
-log/
+/log/*
+!/log/.keep
+!/log/parallel-runtime-rspec.log
 node_modules/
 packages/*/node_modules/
 packages/canvas-planner/lib
@@ -31,10 +33,10 @@ public/doc/
 public/javascripts/client_apps/
 public/javascripts/translations/
 !public/javascripts/translations/_core_en.js
-tmp/
+tmp/*
 vendor/bundle/
 vendor/*/.git
 Dockerfile
-Dockerfile-production
+*.Dockerfile
 Gemfile.lock
 mkmf.log

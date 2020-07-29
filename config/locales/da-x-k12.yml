@@ -383,6 +383,7 @@ da-x-k12:
   account_id_73966078: account_id
   account_id_f6e26867: Konto-id
   account_level_notification_preferences_require_an__66467cd7: "Meddelelsespræferencer på kontoniveau kræver, at en account_id opdaterer"
+  account_level_notification_preferences_ui_update_f5e189a4: "Opdatering af meddelelsespræferencer på kontoniveau"
   account_level_settings_manage_4fca6f8e: "Indstillinger på kontoniveau - administrer"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonavn
@@ -1620,6 +1621,7 @@ da-x-k12:
   add_tas_to_the_course_2aac6e02: "Føj undervisningsassistenter til faget"
   add_theme_32fa3d50: "Tilføj tema"
   add_to_course_481a51c4: "Tilføj til fag ..."
+  add_to_rce_toolbar_e5b3e3b4: "Føj til RCE-værktøjslinje"
   add_to_student_to_do_58e66b4b: "Tilføj til elever opgaveliste"
   add_to_whitelist_24f3f1ba: "Føj til hvidliste"
   add_toolname_4e17dc90: "Tilføj %{toolName}"
@@ -4902,6 +4904,7 @@ da-x-k12:
       importing_button: "Importerer ... det kan tage lidt tid"
     titles: 
       home_page: Hjem
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Indhold er stadig ved at blive uploadet. Hvis du fortsætter, bliver det ikke integreret korrekt."
   content_link_error_assignment_name_course_name_b8be789a: "Indholdslinkfejl - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -7486,6 +7489,7 @@ da-x-k12:
             i henhold til dine præferencer. Anvend en automatisk vurdering for manglende eller
             sene afleveringer, og skjul let vurderinger, indtil du er klar til, at eleverne
             får dem at se. For forenklet vurdering kan du bruge SpeedGrader for at se og vurdere afleveringer.
+  display_historical_view_of_achievements_of_users_53db5938: "Vis historisk oversigt over brugernes fremskridt"
   display_name_6c2cfc58: "Vis navn:"
   display_name_b80c243e: "Vis navn"
   display_to_students_e1301f99: "Vis til elever"
@@ -7654,6 +7658,7 @@ da-x-k12:
   e_c2991d1b: e
   e_g_http_university_edu_helpdesk_acab04d6: "f.eks., http://university.edu/helpdesk"
   e_mail_only_2cc5e513: "Kun e-mail"
+  earned_earndate_5f8b6c99: "Optjent %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Importer eller kopier nemt indhold fra et andet Canvas-fag til
               dit fag, eller importer indhold fra andre formater, såsom Moodle eller QTI.
@@ -8464,6 +8469,7 @@ da-x-k12:
   fall_grading_period_id_74ef68e: "Efterårets vurderingsperiode-ID"
   favicon_6e658914: Favicon
   favorite_courses_fbd356f0: Favoritfag
+  favorite_d720d310: Favorit
   favorites_c7e0207c: Favoritter
   feature_f5526584: Funktion
   feature_flags: 
@@ -10421,6 +10427,7 @@ da-x-k12:
   item_type_download_e949cdb6: "Elementtype: Download"
   item_type_link_5a2abed2: "Elementtype: Link"
   item_type_locked_85c560ec: "Elementtype: Låst"
+  item_type_mastery_connect_8f36c669: "Element type: Mastery Connect"
   item_type_new_quiz_1a1cd9a9: "Element type: Ny quiz"
   item_type_quiz_c894ddb1: "Element type: Quiz"
   items_299a7626: "Elementer: "
@@ -10658,6 +10665,7 @@ da-x-k12:
   length_results_found_3afd01e5: "%{length} resultater fundet"
   let_students_see_the_correct_answers_dacc2faf: "Lad eleverne se de korrekte svar"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Lad eleverne se deres quizsvar (forkerte spørgsmål bliver bedømt i elevfeedback)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Lad webstedsadministratoren vælge op til 2 LTI-apps som favoritter, som derefter vises på RCEs værktøjslinje"
   letter_grade_29ff1938: Bogstavvurderinger
   letter_grade_f00fedc4: bogstavvurdering
   level_5fdf654a: Niveau
@@ -10812,6 +10820,7 @@ da-x-k12:
   list_collapsed_9ac35920: "Listen skjult."
   list_collapsed_dde87718: "Listen skjult"
   list_expanded_efec2d0: "Liste udvidet."
+  list_of_the_currently_attainable_trophies_959b2518: "Liste over de aktuelt opnåelige trofæer"
   list_view_430aecce: Listevisning
   lithuanian_5adcbe24: Litauisk
   little_lost_try_here_first_9e24e575: "Faret lidt vild? Prøv her først!"
@@ -11114,6 +11123,8 @@ da-x-k12:
   mastery_path_processing_f4471152: "Behandling af læringsstier"
   mastery_paths_breakdown_6e0b5fce: "Opdeling af læringsstier"
   mastery_paths_cc4096c2: Læringsstier
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "Redigering af læringsstier er midlertidigt deaktiveret grundet vedligeholdelse."
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Valg af læringsstier er midlertidigt deaktiveret grundet vedligeholdelse."
   mastery_points_f1672cc: "point for opfyldelse af læringsmål"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultat af opfyldelse af læringsmål afspejler det højeste resultat for en bedømt opgave eller quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultat af opfyldelse af læringsmål afspejler den nyligt bedømte opgave eller quiz."
@@ -13183,6 +13194,7 @@ da-x-k12:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Points"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Mulige point"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} point"
+  na_3dbb9cfd: NA
   name: "Academic Benchmark Importer"
   name_1aed4a1b: Navn
   name_3806192d: "Navn:"
@@ -14608,6 +14620,7 @@ da-x-k12:
       description: "Er vært for uploadede filer med Inst-FS-tjenesten."
       labels: 
         migration_rate: "Mulighed for at overføre ældre filer til Inst-FS ved adgang (0 til 100)"
+        service_worker: "Brug servicemedarbejder til autentifikation af filadgang i Safari 13+"
     kaltura: 
       description: "Kaltura video-/lydoptagelse og afspilning"
       name: Kaltura
@@ -14921,6 +14934,7 @@ da-x-k12:
       requirements_must_be_completed: "Følgende betingelser skal opfyldes, inden siden oplåses"
   presentation_2d9387ca: Præsentation
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Præsenterer quizindstillingen, hvor der undgås automatisk aflevering af en tidsbestemt quiz, når den tilgængelige tid er udløbet."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Tryk på ALT + F8 for at se en liste over genvejstaster"
   press_space_to_start_over_d4b8a2da: "Tryk på 'mellemrumstasten' for at starte forfra"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Tryk på kommatasten eller shift + spørgsmålstegn for at se en liste over genvejstaster"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Tryk på kommatasten eller shift + ? for at se en liste over genvejstaster"
@@ -15490,6 +15504,7 @@ da-x-k12:
       update_question_without_regrading: "Opdater spørgsmål uden ombedømmelse"
   quiz_40ee61b1: quiz
   quiz_assignment_overrides_cec1973b: "Tilsidesættelser af quizopgave"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Quiztilgængelighedsdatoer, der forbigår i løbet af et forsøg, indsendes stadig automatisk, selvom den forlængede tid ikke er udløbet."
   quiz_duplication_not_implemented_c1495585: "quizduplikering ikke implementeret"
   quiz_e0dcce8f: Quiz
   quiz_extensions_d2550649: Quizudvidelser
@@ -19077,6 +19092,7 @@ da-x-k12:
       networking_academy_description: "Vis Cisco-svar til de oftest stillede spørgsmål."
       networking_academy_faqs: "Networking Academy FAQ"
       support_desk_livechat: "Support Desk Live Chat"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Understøt foretrukne LTI-værktøjer i RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_46_55cc3620: "Sverige (+46)"
@@ -19151,6 +19167,7 @@ da-x-k12:
     syllabus: Fagplan
     tab_location_error: "Denne faneplacering er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikke administreres"
+    trophy_case: Trofæ-sag
   tabs_5605547e: Faner
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
@@ -19283,6 +19300,12 @@ da-x-k12:
                      op til %{max_domains} domæner til din hvidliste. Wildcards anbefales
                      (fx *.instructure.com). Canvas- og Instructure-domæner er inkluderet
                      automatisk og tæller ikke med i din domænegrænse på 50.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      Content Security Policy giver dig mulighed for at begrænse brugerdefineret
+                     JavaScript, der kører i din Canvas-forekomst. Du kan manuelt tilføje
+                     op til %{max_domains} tilladte domæner. Wildcards anbefales
+                     (fx *.instructure.com). Canvas- og Instructure-domæner inkluderes
+                     automatisk og tæller ikke med i din domænegrænse på 50.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       Fagets startside er den første side, som eleverne ser, når de åbner
             dit fag. Startsiden kan vise fagets deltagelsesaktivitet,
@@ -19314,6 +19337,9 @@ da-x-k12:
       Følgende domæner er automatisk blevet tilføjet til din
                        hvidliste fra værktøjer, der allerede findes i din konto.
                        Fjern de tilknyttede værktøjer for at fjerne disse domæner.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      Følgende domæner er automatisk blevet tilladt fra værktøjer, der allerede findes på din konto.
+                       For at fjerne disse domæner, skal du fjern de tilknyttede værktøjer.
   the_following_fields_are_invalid_fields_b3565800: "Følgende felter er ugyldige: %{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Følgende elever har ikke-gemte ændringer i deres afleverede quiz: 
@@ -19423,6 +19449,7 @@ da-x-k12:
   there_are_no_reports_for_you_to_view_b716717a: "Der er ingen rapporter, som du kan se."
   there_are_no_unsaved_changes_9276e87c: "Der er ingen ændringer, der ikke er gemt"
   there_are_no_unsynced_changes_4e8f0838: "Der er ingen usynkroniserede ændringer"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Der er en grænse på 2 apps, der kan placeres i RCE-værktøjslinjen. Denne indstilling gælder kun for den forbedrede RCE."
   there_is_currently_1_available_grader_758e4a21: "Der er i øjeblikket 1 tilgængelig bedømmer"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Der opstod et problem med at logge ud af din IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Der opstod et problem ved oprettelse af kolonnen til lærerens noter."
@@ -20275,6 +20302,59 @@ da-x-k12:
   tree_browser: 
     folder_tree_instructions: "Brug op- og nedpilene for at navigere gennem træet. Tryk til højre for at udvide mapperne, venstre for at skjule og på Enter for at vælge det ønskede element."
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad og Tobago (+1)"
+  trophy: 
+    balloon_description: Ballon-beskrivelse
+    balloon_display_name: Ballon
+    bifrost_trophy_description: Bifrost-trofæ-beskrivelse
+    bifrost_trophy_display_name: Bifrost-trofæ
+    butterfly_description: Sommerfugl-beskrivelse
+    butterfly_display_name: Sommerfugl
+    einstein_rosen_trophy_description: Einstein-Rosen-trofæ-beskrivelse
+    einstein_rosen_trophy_display_name: Einstein-Rosen-trofæ
+    fire_description: Brand-beskrivelse
+    fire_display_name: Brand
+    flowers_description: Blomster-beskrivelse
+    flowers_display_name: Blomst
+    four_leaf_clover_description: Firkløver-beskrivelse
+    four_leaf_clover_display_name: Firkløver
+    gift_description: Gave-beskrivelse
+    gift_display_name: Gave
+    gnome_description: Gnom-beskrivelse
+    gnome_display_name: Gnom
+    helix_rocket_description: Helix-raket-beskrivelse
+    helix_rocket_display_name: Helix-raket
+    horse_shoe_description: Hestesko-beskrivelse
+    horse_shoe_display_name: Hestesko
+    hot_air_balloon_description: Varmluftballon-beskrivelse
+    hot_air_balloon_display_name: Varmluftballon
+    magic_mystery_thumbs_up_description: "Magisk mysterie tommelfinger op beskrivelse"
+    magic_mystery_thumbs_up_display_name: "Magisk mysterie tommelfinger op"
+    medal_description: Medalje-beskrivelse
+    medal_display_name: Medalje
+    moon_description: Måne-beskrivelse
+    moon_display_name: Måne
+    ninja_description: Ninja-beskrivelse
+    ninja_display_name: Ninja
+    panama_rocket_description: Panama-raket-beskrivelse
+    panama_rocket_display_name: Panama-raket
+    panda_description: Panda-beskrivelse
+    panda_display_name: Panda
+    panda_unicycle_description: "Panda ethjulet cykel beskrivelse"
+    panda_unicycle_display_name: "Panda ethjulet cykel"
+    pinwheel_description: Mølle-beskrivelse
+    pinwheel_display_name: Mølle
+    pizza_slice_description: Pizzastykke-beskrivelse
+    pizza_slice_display_name: Pizzastykke
+    rocket_description: Raket-beskrivelse
+    rocket_display_name: Raket
+    star_description: Stjerne-beskrivelse
+    star_display_name: "Giv stjerne"
+    thumbs_up_description: "Tommelfinger op beskrivelse"
+    thumbs_up_display_name: "Tommelfinger op"
+    trophy_description: Trofæ-beskrivelse
+    trophy_display_name: Trofæ
+  trophy_case_7a098a85: Trofæ-sag
+  trophy_case_da3b25bb: Trofæ-sag
   truncated_56b1a661: Afbrudt
   turkish_5b69578b: Tyrkisk
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Tænd højre-til-venstre, selv for sprog, der ikke er højre-til-venstre"
@@ -20472,6 +20552,9 @@ da-x-k12:
   updated_group_group_name_727b1d98: "Opdateret gruppe %{group_name}"
   updated_permissions_page_f2e91060: "Opdateret tilladelsesside"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Opdateret UI til at søge efter og vise brugere og fag i en konto."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Opdaterer kontomeddelelsesindstillinger til at blive en mere aktuel
+      og opdateret brugeroplevelse
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Opdaterer visningen af ikoner for opslagspolitikker i kolonneoverskriften Ny vurderingsoversigt-opgave."
   updating_6edbab78: Opdaterer
   updating_discussion_failed_aadb2d35: "Opdatering af diskussion mislykkedes"

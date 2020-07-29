@@ -82,5 +82,9 @@ describe EventStream::Backend::Cassandra do
     it "pulls db fingerprint" do
       expect(backend.database_fingerprint).to eq('fingerprint')
     end
+
+    it "uses keyspace for name" do
+      expect(backend.database_name).to eq('test_db')
+    end
   end
 end

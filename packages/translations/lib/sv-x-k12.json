@@ -50,6 +50,9 @@
     "alt_text_611fb322": {
         "message": "Alternativ text"
     },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "Ett fel inträffade vid inläsning av filen"
+    },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Ett fel uppstod när möjligheten skulle avvisas."
     },
@@ -259,6 +262,9 @@
     },
     "date_time_d9fbf2d7": {
         "message": "Datum och tid:"
+    },
+    "decorative_image_3c28aa7d": {
+        "message": "Dekorativ bild"
     },
     "decrease_indent_de6343ab": {
         "message": "Minska indrag"
@@ -673,6 +679,9 @@
     },
     "my_grades_98834476": {
         "message": "Mina omdömen"
+    },
+    "my_media_82bade11": {
+        "message": "Min media"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigera via menyn eller verktygsfältet"
@@ -1162,6 +1171,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Du har medieåterkoppling."
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "Du får inte ladda upp en tom fil"
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "Du måste ange ett datum och en tid."

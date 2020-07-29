@@ -90,8 +90,9 @@ module BasicLTI
 
     def save_submission!(launch_url, grade, score, grader_id)
       initialize_version
-      with_versioning(launch_url) do
-        submit_submission
+      with_versioning(launch_url) do |is_different_attempt|
+        # Don't "resubmit" the submission if this is just a regrade
+        submit_submission if is_different_attempt
         grade_submission(launch_url, grade, score, grader_id)
       end
     end
@@ -108,8 +109,9 @@ module BasicLTI
       is_different_attempt = submission.url != launch_url
       # create a new version if the open (last) version is another attempt
       #   and the open version is not a nil version (excluding the first padding)
+
       save_with_versioning if !is_updatable_nil_version && is_different_attempt
-      yield
+      yield is_different_attempt
     end
 
     def submit_submission

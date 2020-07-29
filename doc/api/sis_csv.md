@@ -736,6 +736,14 @@ Ignored for any role other than observer</td>
 <td>Defaults to false. When true, the enrollment will only allow the user to see
  and interact with users enrolled in the section given by course_section_id. </td>
 </tr>
+<tr>
+<td>notify</td>
+<td>boolean</td>
+<td></td>
+<td></td>
+<td>If true, a notification will be sent to the enrolled user. Notifications are
+ not sent by default. </td>
+</tr>
 </table>
 
 &#42; course_id or section_id is required, role or role_id is required, and

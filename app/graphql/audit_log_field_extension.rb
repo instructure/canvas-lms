@@ -129,6 +129,8 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       next unless AuditLogFieldExtension.enabled?
 
       mutation = field.mutation
+      # TODO: figure out how to resolve root account for user and communication channels
+      next if mutation == Mutations::UpdateNotificationPreferences
 
       logger = Logger.new(mutation, context, arguments)
 

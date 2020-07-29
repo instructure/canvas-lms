@@ -24,6 +24,8 @@ import PaginatedCollectionView from '../PaginatedCollectionView'
 import WikiPageEditView from './WikiPageEditView'
 import itemView from './WikiPageIndexItemView'
 import template from 'jst/wiki/WikiPageIndex'
+import {deletePages} from 'jsx/wiki_pages/apiClient'
+import {showConfirmDelete} from 'jsx/wiki_pages/components/ConfirmDeleteModal'
 import StickyHeaderMixin from '../StickyHeaderMixin'
 import splitAssetString from '../../str/splitAssetString'
 import ContentTypeExternalToolTray from 'jsx/shared/ContentTypeExternalToolTray'
@@ -37,6 +39,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     this.mixin(StickyHeaderMixin)
     this.mixin({
       events: {
+        'click .delete_pages': 'confirmDeletePages',
         'click .new_page': 'createNewPage',
         'keyclick .new_page': 'createNewPage',
         'click .header-row a[data-sort-field]': 'sort',
@@ -164,6 +167,35 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (this.lastFocusField) {
       $(`[data-sort-field='${this.lastFocusField}']`).focus()
     }
+  }
+
+  confirmDeletePages(ev) {
+    if (ev != null) {
+      ev.preventDefault()
+    }
+
+    const pageUrls = $('.select-page-checkbox:checked')
+      .map((_i, c) => c.value)
+      .get()
+    if (pageUrls.length > 0) {
+      showConfirmDelete({
+        selectedCount: pageUrls.length,
+        onConfirm: () => deletePages(this.contextName, this.contextId, pageUrls),
+        onHide: (confirmed, error) => this.onDeleteModalHide(confirmed, error)
+      })
+    }
+  }
+
+  onDeleteModalHide(confirmed, error) {
+    if (confirmed) {
+      if (error) {
+        $.flashError(I18n.t('Failed to delete selected pages'))
+      } else {
+        $.flashMessage(I18n.t('Selected pages have been deleted'))
+        this.collection.fetch()
+      }
+    }
+    $('.delete_pages').focus()
   }
 
   createNewPage(ev) {
@@ -295,6 +327,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       PUBLISH: !!this.WIKI_RIGHTS.publish_page
     }
     json.CAN.VIEW_TOOLBAR = json.CAN.CREATE
+    json.BULK_DELETE_ENABLED = ENV.FEATURES?.bulk_delete_pages
     json.fetched = !!this.fetched
     json.fetchedLast = !!this.fetchedLast
     json.collectionHasTodoDate = this.collectionHasTodoDate()

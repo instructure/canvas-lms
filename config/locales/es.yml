@@ -406,6 +406,7 @@ es:
   account_id_73966078: account_id
   account_id_f6e26867: "ID de cuenta"
   account_level_notification_preferences_require_an__66467cd7: "Las preferencias de notificación de los niveles de las cuentas requieren una account_id para actualizarse"
+  account_level_notification_preferences_ui_update_f5e189a4: "Actualización de la IU de preferencias de notificaciones a nivel de la cuenta"
   account_level_settings_manage_4fca6f8e: "Configuraciones del nivel de la cuenta: administrar"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nombre de la cuenta"
@@ -1839,6 +1840,7 @@ es:
   add_tas_to_the_course_2aac6e02: "Agregar profesor auxiliar al curso"
   add_theme_32fa3d50: "Agregar tema"
   add_to_course_481a51c4: "Agregar al curso..."
+  add_to_rce_toolbar_e5b3e3b4: "Agregar a la barra de herramientas del RCE"
   add_to_student_to_do_58e66b4b: "Agregar al estudiante actividades por hacer"
   add_to_whitelist_24f3f1ba: "Agregar a la lista blanca"
   add_toolname_4e17dc90: "Agregar %{toolName}"
@@ -2406,7 +2408,7 @@ es:
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Permite que los usuarios agreguen herramientas LTI con tipo de ubicación conference_selection"
   allows_users_to_edit_conferences_2d3c960c: "Permite a los usuarios editar Conferencias."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Permite que los usuarios habiliten la opción \"Ejecutar SpeedGrader filtrado por Grupo de estudiantes\" para los cursos en la página de configuraciones del curso. Cuando está activo y se seleccionó un grupo de estudiantes en el Nuevo libro de calificaciones, SpeedGrader solo cargará a los estudiantes del grupo seleccionado."
-  allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Le permite a los usuarios silenciar las notificaciones en un nivel de granularidad del curso."
+  allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Les permite a los usuarios silenciar las notificaciones en un nivel de granularidad del curso."
   allows_users_to_override_specific_notification_pre_18cf5b9e: |-
       Les permite a los usuarios anular preferencias específicas de notificación
       curso por curso.
@@ -5510,6 +5512,7 @@ es:
       importing_button: "Importando... Esta acción podría tardar varios minutos"
     titles: 
       home_page: "Página de inicio"
+  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: "Todavía se está cargando el contenido; si continúa, no se incrustará correctamente."
   content_link_error_assignment_name_course_name_b8be789a: "Error de vínculo de contenido: %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -8525,6 +8528,7 @@ es:
             según sus preferencias. Califique automáticamente las entregas
             tardías o faltantes y oculte fácilmente las calificaciones hasta que esté listo para que los estudiantes
             las vean. Para simplificar las calificaciones, use SpeedGrader para ver y calificar las entregas.
+  display_historical_view_of_achievements_of_users_53db5938: "Mostrar perspectiva histórica de logros de los usuarios"
   display_name_6c2cfc58: "Nombre de exhibición:"
   display_name_b80c243e: "Nombre de exhibición"
   display_to_students_e1301f99: "Mostrarles a los alumnos"
@@ -8718,6 +8722,7 @@ es:
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Cada barra representa el número de *vistas de página* durante un día. La barra naranja indica que el alumno *realizó alguna acción* dentro del curso durante ese día."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Cada barra representa el número de *vistas de página* relacionadas con dicha categoría."
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Cada fila corresonde con una tarea. El diamante es la fecha limite y la barra se extiende hasta la fecha de entrega. El verde indica entrega *a tiempo*, el amarillo, la entrega *tarde* y el rojo ***no se ha entregado la tarea***. Los diamantes grises son tareas sin fechas de entregas, ubicadas en la posición de la fecha de entrega real."
+  earned_earndate_5f8b6c99: "Obtenido el %{earnDate}"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Importe o copie fácilmente contenido de otro curso de Canvas a
               su curso, o importe contenido de otros formatos, como Moodle o QTI.
@@ -9682,6 +9687,7 @@ es:
   fall_grading_period_id_74ef68e: "Identificador del período de calificación de otoño"
   favicon_6e658914: "Icono de página"
   favorite_courses_fbd356f0: "Cursos favoritos"
+  favorite_d720d310: Favorito
   favorites_c7e0207c: Favoritos
   feature_f5526584: Funcionalidad
   feature_flags: 
@@ -12301,6 +12307,7 @@ es:
   item_type_download_e949cdb6: "Tipo de item: Descargar"
   item_type_link_5a2abed2: "Tipo de item: Enlace"
   item_type_locked_85c560ec: "Tipo de item: Bloqueado"
+  item_type_mastery_connect_8f36c669: "Tipo de ítem: Conexión de dominio"
   item_type_new_quiz_1a1cd9a9: "Tipo de elemento: Nueva evaluación"
   item_type_quiz_c894ddb1: "Tipo de elemento: Evaluación"
   items_299a7626: "Items: "
@@ -12559,6 +12566,7 @@ es:
   let_students_see_the_correct_answers_dacc2faf: "Permitir que los estudiantes vean las respuestas correctas"
   let_students_see_their_quiz_responses_fbc07d14: "Permitir que los estudiantes vean sus respuestas en las evaluaciones"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Permitir que los estudiantes vean sus respuestas del cuestionario (las respuestas incorrectas se marcarán en la devolución del estudiante)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Permitirle al administrador del sitio seleccionar hasta 2 aplicaciones LTI favoritas, que luego se mostrarán en la barra de herramientas del RCE"
   letter_grade_29ff1938: "Calificación por letra"
   letter_grade_f00fedc4: "letra de calificación"
   level_5fdf654a: Nivel
@@ -12721,6 +12729,7 @@ es:
   list_collapsed_9ac35920: "Lista colapsada."
   list_collapsed_dde87718: "Lista colapsada"
   list_expanded_efec2d0: "Lista expandida."
+  list_of_the_currently_attainable_trophies_959b2518: "Lista de los trofeos que se pueden obtener actualmente"
   list_view_430aecce: "Vista de lista"
   lithuanian_5adcbe24: Lituano
   little_lost_try_here_first_9e24e575: "¿No sabe a dónde ir? ¡Pruebe por aquí!"
@@ -13073,7 +13082,9 @@ es:
   mastery_path_processing_f4471152: "Procesamiento del camino hacia el dominio"
   mastery_paths_breakdown_6e0b5fce: "Desglose de los caminos del dominio"
   mastery_paths_cc4096c2: "Caminos de dominio"
+  mastery_paths_editing_has_been_temporarily_disable_4816f0f: "La edición de caminos hacia el dominio se desactivó temporalmente para su mantenimiento."
   mastery_paths_editor_930655bb: "Editor de las rutas de dominio"
+  mastery_paths_selection_has_been_temporarily_disab_c40623b9: "La selección de caminos hacia el dominio se desactivó temporalmente para su mantenimiento."
   mastery_points_f1672cc: "puntos de dominio"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "El puntaje del dominio refleja el puntaje máximo de una tarea o examen calificado."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "La puntuación de dominio refleja la tarea o evaluación puntuada más recientemente."
@@ -15471,6 +15482,7 @@ es:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Puntos"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} puntos posibles"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} pts"
+  na_3dbb9cfd: "N. a."
   name: "Importador de Academic Benchmark"
   name_1aed4a1b: Nombre
   name_3806192d: "Nombre:"
@@ -17033,6 +17045,7 @@ es:
       description: "Los hosts cargaron archivos con el servicio Inst-FS."
       labels: 
         migration_rate: "Posibilidad de migrar archivos más antiguos a Inst-FS al momento del acceso (0 a 100)"
+        service_worker: "Usar un service worker para autenticar los accesos al archivo en Safari 13+"
     kaltura: 
       description: "Grabación y reproducción de video/audio en Kaltura"
       name: Kaltura
@@ -17365,6 +17378,7 @@ es:
       requirements_must_be_completed: "Los siguientes requerimientos necesitan estar completos antes de que esta página sea desbloqueada"
   presentation_2d9387ca: Presentación
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Presenta la configuración de la evaluación para evitar la presentación automática de una evaluación limitada por tiempo cuando ha finalizado el tiempo disponible."
+  press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Presione ALT + F8 para ver una lista de métodos abreviados de teclado"
   press_space_to_start_over_d4b8a2da: "Presione la barra espaciadora para volver a comenzar"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Presione la tecla de coma o shift + el signo de interrogación para ver una lista de los atajos del teclado"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Presione la tecla de coma o shift + ? para ver una lista de los atajos del teclado"
@@ -18015,6 +18029,7 @@ es:
       update_question_without_regrading: "Actualizar pregunta sin cambio de calificación"
   quiz_40ee61b1: examen
   quiz_assignment_overrides_cec1973b: "Anulaciones de tareas de evaluación"
+  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Las fechas de disponibilidad del examen que se pasan durante un intento se entregarán automáticamente incluso si la extensión del plazo no se ha vencido."
   quiz_duplication_not_implemented_c1495585: "duplicación de cuestionario no implementada"
   quiz_e0dcce8f: Examen
   quiz_extensions_d2550649: "Extensiones de evaluaciones"
@@ -21690,8 +21705,8 @@ es:
   speedgrader_settings_4195099b: "SpeedGrader Configuraciones"
   speedgrader_settings_c9503705: "Configuraciones de Speedgrader"
   speedgrader_tm_44688790: SpeedGrader™
-  splitting_disabled_reached_maximum_of_three_assign_716acb13: "División deshabilitada: se alcanzó el máximo de tres grupos de tareas en un rango de calificación"
-  splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "División deshabilitada: solo puede haber un máximo de tres grupos de tareas en un rango de puntuación."
+  splitting_disabled_reached_maximum_of_three_assign_716acb13: "División deshabilitada: se alcanzó el máximo de tres grupos de tareas en un rango de calificación"
+  splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "División deshabilitada: solo puede haber un máximo de tres grupos de tareas en un rango de puntuación."
   spreadsheet_6d622119: "Hoja de cálculo"
   spring_grading_period_current_score_7083cf0d: "Puntaje actual del período de calificación de primavera"
   spring_grading_period_final_score_386d92f7: "Puntaje final del período de calificación de primavera"
@@ -22200,6 +22215,7 @@ es:
       networking_academy_description: "Ver las respuestas de Cisco a las preguntas más frecuentes."
       networking_academy_faqs: "Preguntas más frecuentes de Networking Academy"
       support_desk_livechat: "Chat en directo con el Servicio de Ayuda"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Admitir herramientas LTI favoritas en el RCE"
   svg_d5969386: SVG
   swahili_5caeb4ba: Suajili
   sweden_1add8e79: Suecia
@@ -22285,6 +22301,7 @@ es:
     syllabus: "Programa del curso"
     tab_location_error: "La ubicación de la pestaña no es válida"
     tab_unmanagable_error: "No se puede administrar %{css_class}"
+    trophy_case: "Vitrina de trofeos"
   tabs_5605547e: Pestañas
   tagalog_74906db7: Tagalo
   taiwan_886_9a5b6bbf: "Taiwán (+886)"
@@ -22426,6 +22443,12 @@ es:
                      agregar %{max_domains} dominios a su lista blanca. Se recomiendan los comodines
                      (por ejemplo *.instructure.com). Los dominios de Canvas y de Instructure se incluyen
                      automáticamente y no cuentan en su límite de 50 dominios.
+  the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
+      La Política de seguridad del contenido le permite restringir la personalización
+                     JavaScript que se ejecuta en su instancia de Canvas. Puede agregar manualmente
+                     hasta %{max_domains} dominios permitidos. Se recomiendan los comodines
+                     (por ejemplo, *.instructure.com). Los dominios de Canvas y de Instructure se incluyen
+                     automáticamente y no cuentan en su límite de 50 dominios.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       La página de inicio del curso es la primera página que los estudiantes ven cuando abren
             su curso. La página de inicio puede mostrar el flujo de participación
@@ -22454,6 +22477,9 @@ es:
   the_following_domains_have_automatically_been_adde_2c7a1654: |-
       Los siguientes dominios se han agregado automáticamente a su
                        lista blanca de herramientas que ya existen en su cuenta.
+                       Para eliminar estos dominios, elimine las herramientas asociadas.
+  the_following_domains_have_automatically_been_allo_cea27372: |-
+      Los siguientes dominios fueron autorizados automáticamente por herramientas que ya existen en su cuenta.
                        Para eliminar estos dominios, elimine las herramientas asociadas.
   the_following_errors_occurred_bdec1e44: "Se produjeron los errores siguientes:"
   the_following_fields_are_invalid_fields_b3565800: "Los siguientes campos son inválidos: %{fields}"
@@ -22578,6 +22604,7 @@ es:
   there_are_no_unsaved_changes_9276e87c: "No hay cambios sin guardar"
   there_are_no_unsynced_changes_4e8f0838: "No hay cambios sin sincronizar"
   there_are_no_unsynched_changes_d208547c: "No hay cambios no sincronizados"
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Existe un límite de ubicación de 2 aplicaciones dentro de la barra de herramientas del RCE. Esta configuración solo se aplica al RCE mejorado."
   there_is_currently_1_available_grader_758e4a21: "Actualmente hay 1 calificador disponible"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Hubo un fallo al cerrar la sesión en su IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Hubo un problema al crear la columna de observaciones del maestro."
@@ -23487,6 +23514,59 @@ es:
   tree_browser: 
     folder_tree_instructions: "Utilice las teclas de dirección arriba y abajo para navegar por el árbol. Presione la derecha para expandir, la izquierda para replegar e Intro para elegir el elemento seleccionado."
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad y Tobago (+1)"
+  trophy: 
+    balloon_description: "Descripción del globo"
+    balloon_display_name: Globo
+    bifrost_trophy_description: "Descripción del trofeo Bifrost"
+    bifrost_trophy_display_name: "Trofeo Bifrost"
+    butterfly_description: "Descripción de la mariposa"
+    butterfly_display_name: Mariposa
+    einstein_rosen_trophy_description: "Descripción del trofeo Einstein Rosen"
+    einstein_rosen_trophy_display_name: "Trofeo Einstein Rosen"
+    fire_description: "Descripción del fuego"
+    fire_display_name: Fuego
+    flowers_description: "Descripción de la flor"
+    flowers_display_name: Flor
+    four_leaf_clover_description: "Descripción del trébol de cuatro hojas"
+    four_leaf_clover_display_name: "Trébol de cuatro hojas"
+    gift_description: "Descripción del regalo"
+    gift_display_name: Regalo
+    gnome_description: "Descripción del gnomo"
+    gnome_display_name: Gnomo
+    helix_rocket_description: "Descripción del cohete hélice"
+    helix_rocket_display_name: "Cohete hélice"
+    horse_shoe_description: "Descripción de la herradura"
+    horse_shoe_display_name: Herradura
+    hot_air_balloon_description: "Descripción del globo aerostático"
+    hot_air_balloon_display_name: "Globo aerostático"
+    magic_mystery_thumbs_up_description: "Descripción de los pulgares hacia arriba de misterio mágico"
+    magic_mystery_thumbs_up_display_name: "Pulgares hacia arriba de misterio mágico"
+    medal_description: "Descripción de la medalla"
+    medal_display_name: Medalla
+    moon_description: "Descripción de la luna"
+    moon_display_name: Luna
+    ninja_description: "Descripción del ninja"
+    ninja_display_name: Ninja
+    panama_rocket_description: "Descripción del cohete Panamá"
+    panama_rocket_display_name: "Cohete Panamá"
+    panda_description: "Descripción del panda"
+    panda_display_name: Panda
+    panda_unicycle_description: "Descripción del monociclo del panda"
+    panda_unicycle_display_name: "Monociclo del panda"
+    pinwheel_description: "Descripción del molinillo"
+    pinwheel_display_name: Molinillo
+    pizza_slice_description: "Descripción de la porción de pizza"
+    pizza_slice_display_name: "Porción de pizza"
+    rocket_description: "Descripción del cohete"
+    rocket_display_name: Cohete
+    star_description: "Descripción de la estrella"
+    star_display_name: Estrella
+    thumbs_up_description: "Descripción de los pulgares hacia arriba"
+    thumbs_up_display_name: "Pulgares hacia arriba"
+    trophy_description: "Descripción del trofeo"
+    trophy_display_name: Trofeo
+  trophy_case_7a098a85: "Vitrina de trofeos"
+  trophy_case_da3b25bb: "Vitrina de trofeos"
   truncated_56b1a661: Truncado
   turkish_5b69578b: Turco
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Activar RTL incluso para idiomas que no sean RTL"
@@ -23713,6 +23793,9 @@ es:
   updated_permissions_page_f2e91060: "Página de permisos actualizados"
   updated_terms_of_service_82f34148: "Términos de servicio actualizados"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Interfaz del usuario actualizada para la búsqueda y visualización de los usuarios y cursos dentro de una cuenta."
+  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+      Actualiza la IU de preferencias de notificaciones de la cuenta para que sea una experiencia de usuario
+      actualizada y más vigente
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Actualiza la manera en que muestran los iconos de la Política de publicación en el encabezado de la columna de tareas del Nuevo libro de calificaciones."
   updating_6edbab78: Actualizando
   updating_discussion_failed_aadb2d35: "No se ha podido actualizar el foro de discusión"

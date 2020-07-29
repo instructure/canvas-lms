@@ -35,6 +35,9 @@
     "assignments_1e02582c": {
         "message": "تکلیف ها"
     },
+    "available_folders_694d0436": {
+        "message": "پوشه های موجود"
+    },
     "calendar_a8563bb2": {
         "message": "تقویم:"
     },
@@ -47,6 +50,9 @@
     "canvas_plugins_705a5016": {
         "message": "افزونه های کانواس"
     },
+    "clear_selected_file_82388e50": {
+        "message": "پاک کردن فایل انتخاب شده"
+    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Click to embed { imageName }"
     },
@@ -58,6 +64,9 @@
     },
     "collaborations_5c56c15f": {
         "message": "همکاری ها"
+    },
+    "computer_1d7dfa6f": {
+        "message": "کامپیوتر"
     },
     "content_type_2cf90d95": {
         "message": "نوع محتوا"
@@ -116,6 +125,9 @@
     "done_54e3d4b6": {
         "message": "انجام شد"
     },
+    "drag_a_file_here_39357b48": {
+        "message": "کشیدن فایل اینجا"
+    },
     "due_5d7267be": {
         "message": "مهلت:"
     },
@@ -125,17 +137,32 @@
     "edit_c5fbea07": {
         "message": "ویرایش"
     },
+    "embed_828fac4a": {
+        "message": "قراردادن"
+    },
     "embed_image_1080badc": {
         "message": "درج تصویر"
     },
+    "embed_video_code_703e10f2": {
+        "message": "قراردادن کد فیلم"
+    },
     "excused_cf8792eb": {
         "message": "معاف شد"
+    },
+    "file_upload_failed_af22dd91": {
+        "message": "آپلود پرونده انجام نشد"
+    },
+    "file_uploading_56c9c0c8": {
+        "message": "بارگذاری پرونده"
     },
     "files_c300e900": {
         "message": "فایل ها"
     },
     "files_index_af7c662b": {
         "message": "فهرست فایل ها"
+    },
+    "folder_tree_fbab0726": {
+        "message": "درخت پوشه"
     },
     "generating_preview_45b53be0": {
         "message": "در حال ایجاد پیش نمایش..."
@@ -188,6 +215,15 @@
     "links_14b70841": {
         "message": "پیوندها"
     },
+    "list_collapsed_9ac35920": {
+        "message": "فهرست جمع شد."
+    },
+    "list_collapsed_dde87718": {
+        "message": "فهرست جمع شد."
+    },
+    "list_expanded_efec2d0": {
+        "message": "فهرست باز شد."
+    },
     "load_more_a36f9cf9": {
         "message": "بارگذاری بیشتر"
     },
@@ -205,6 +241,9 @@
     },
     "loading_failed_b3524381": {
         "message": "Loading failed..."
+    },
+    "loading_folders_d8b5869e": {
+        "message": "بارگیری پوشه ها"
     },
     "location_3b6ff307": {
         "message": "مکان:"
@@ -299,6 +338,9 @@
     "search_280d00bd": {
         "message": "جستجو"
     },
+    "select_language_7c93a900": {
+        "message": "انتخاب زبان"
+    },
     "selected_274ce24f": {
         "message": "انتخاب شده"
     },
@@ -307,6 +349,9 @@
     },
     "something_went_wrong_89195131": {
         "message": "اشکالی رخ داده است."
+    },
+    "something_went_wrong_d238c551": {
+        "message": "مشکلی پیش آمد"
     },
     "sort_by_e75f9e3e": {
         "message": "مرتب کردن بر اساس"
@@ -320,8 +365,14 @@
     "submitted_318fad53": {
         "message": "ارسال شد"
     },
+    "success_file_uploaded_8174e93f": {
+        "message": "موفقیت: پرونده بارگذاری شد"
+    },
     "syllabus_f191f65b": {
         "message": "سرفصل"
+    },
+    "text_7f4593da": {
+        "message": "متن"
     },
     "time_2b5aac58": {
         "message": "زمان"
@@ -349,6 +400,9 @@
     },
     "upload_media_ce31135a": {
         "message": "بارگذاری رسانه"
+    },
+    "upload_not_available_for_this_folder_8f8623c6": {
+        "message": "بارگیری برای این پوشه در دسترس نیست"
     },
     "url_22a5f3b8": {
         "message": "نشانی اینترنتی"

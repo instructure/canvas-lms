@@ -32,7 +32,6 @@ import React from 'react'
 import StudentViewQuery from '../components/StudentViewQuery'
 import {SubmissionMocks} from '../graphqlData/Submission'
 
-jest.setTimeout(10000) // TODO: figure out why these tests are so slow
 jest.mock('../components/Attempt')
 
 describe('student view integration tests', () => {

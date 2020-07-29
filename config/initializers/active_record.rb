@@ -690,8 +690,19 @@ class ActiveRecord::Base
       end
     end
 
-    transaction do
-      connection.bulk_insert(table_name, records)
+    if self.respond_to?(:attrs_in_partition_groups)
+      # this model is partitioned, we need to send a separate
+      # insert statement for each partition represented
+      # in the input records
+      self.attrs_in_partition_groups(records) do |partition_name, partition_records|
+        transaction do
+          connection.bulk_insert(partition_name, partition_records)
+        end
+      end
+    else
+      transaction do
+        connection.bulk_insert(table_name, records)
+      end
     end
   end
 

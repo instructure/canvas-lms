@@ -26,7 +26,7 @@ group :test do
   gem 'simplecov', '0.15.1', require: false
     gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
-  gem 'puma', '4.3.3'
+  gem 'puma', '4.3.3', require: false
 
   gem 'rspec', '3.9.0'
   gem 'rspec_around_all', '0.2.0'
@@ -45,7 +45,7 @@ group :test do
   gem 'once-ler', '0.1.4'
   gem 'sauce_whisk', '0.2.2'
 
-  gem 'selenium-webdriver', '3.142.7'
+  gem 'selenium-webdriver', '3.142.7', require: false
     gem 'childprocess', '3.0.0', require: false
   gem 'webdrivers', '4.2.0', require: false
   gem 'test-queue', github: 'instructure/test-queue', ref: 'd35166408df3a5396cd809e85dcba175136a69ba', require: false
@@ -58,7 +58,7 @@ group :test do
   gem 'headless', '2.3.1', require: false
   gem 'escape_code', '0.2', require: false
   gem 'luminosity_contrast', '0.2.1'
-  gem 'pact', '1.49.0'
+  gem 'pact', '1.49.0', require: false
     gem 'pact-mock_service', '3.5.0', require: false
   gem 'pact-messages', '0.2.0'
   gem 'pact_broker-client', '1.25.0'

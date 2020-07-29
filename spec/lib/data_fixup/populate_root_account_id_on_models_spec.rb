@@ -30,6 +30,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     shared_examples_for 'a datafixup that populates root_account_id' do
       let(:record) { raise 'set in examples' }
       let(:reference_record) { raise 'set in examples' }
+      let(:sharded) { false }
 
       before { record.update_columns(root_account_id: nil) }
 
@@ -41,10 +42,49 @@ describe DataFixup::PopulateRootAccountIdOnModels do
             reference_record.root_account_id
           end
 
+        expected_root_account_id = Account.find(expected_root_account_id).global_id if sharded
+
         expect {
           DataFixup::PopulateRootAccountIdOnModels.run
         }.to change { record.reload.root_account_id }.from(nil).to(expected_root_account_id)
         expect(expected_root_account_id).to be_present
+      end
+    end
+
+    context 'with AccessToken' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          dk = DeveloperKey.create!(account: @course.account)
+          at = dk.access_tokens.create!(user: user_model)
+        end
+        let(:reference_record) { @course }
+      end
+
+      context 'with_sharding' do
+        specs_require_sharding
+
+        context 'with DeveloperKey with root_account_id' do
+          it_behaves_like 'a datafixup that populates root_account_id' do
+            let(:account) { @shard1.activate { account_model } }
+            let(:record) do
+              dk = DeveloperKey.create!(account: account)
+              at = dk.access_tokens.create!(user: user_model)
+            end
+            let(:reference_record) { account }
+          end
+        end
+
+        context 'with DeveloperKey without root_account_id (eg SiteAdmin)' do
+          it 'sets root_account_id to null' do
+            dk = @shard1.activate { DeveloperKey.create!(account: account_model) }
+            at = AccessToken.create!(developer_key: dk, user: user_model)
+            at.update_columns(root_account_id: nil)
+            dk.update_columns(root_account_id: nil)
+            expect(at.reload.root_account_id).to eq nil
+            DataFixup::PopulateRootAccountIdOnModels.run
+            expect(at.reload.root_account_id).to eq nil
+          end
+        end
       end
     end
 
@@ -105,6 +145,18 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(auag.reload.root_account_id).to eq @course.root_account_id
     end
 
+    it 'should populate the root_account_id on AssetUserAccess with user context' do
+      auac = AssetUserAccess.create!(context: @course, user: @user)
+      auac.update_columns(root_account_id: nil)
+
+      aua = AssetUserAccess.create!(context: @user, user: @user, asset_code: @course.asset_string)
+      aua.update_columns(root_account_id: nil)
+      expect(aua.reload.root_account_id).to eq nil
+
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(aua.reload.root_account_id).to eq @course.root_account_id
+    end
+
     it 'should populate the root_account_id on AssignmentGroup' do
       ag = @course.assignment_groups.create!(name: 'AssignmentGroup!')
       ag.update_columns(root_account_id: nil)
@@ -131,6 +183,29 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(@override_student.root_account_id).to be nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(@override_student.reload.root_account_id).to eq @course.root_account_id
+    end
+
+    context 'with CalendarEvent' do
+      context 'when context is Course' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { CalendarEvent.create!(context: @course) }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'when context is Group' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { CalendarEvent.create!(context: group_model(context: @course)) }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'when context is CourseSection' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { CalendarEvent.create!(context: CourseSection.create!(course: @course)) }
+          let(:reference_record) { @course }
+        end
+      end
     end
 
     context 'with ContextExternalTool' do
@@ -169,10 +244,20 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(cm.reload.root_account_id).to eq @group.root_account_id
     end
 
-    it 'should populate the root_account_id on ContextModule' do
-      expect(@cm.root_account_id).to be nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(@cm.reload.root_account_id).to eq @course.root_account_id
+    context 'with ContentParticipation' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          ContentParticipation.create(content: reference_record, user: @user)
+        end
+        let(:reference_record) { submission_model }
+      end
+    end
+
+    context 'with ContentParticipationCount' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { @course.content_participation_counts.create! }
+        let(:reference_record) { @course }
+      end
     end
 
     it 'should populate the root_account_id on ContentShare' do
@@ -190,6 +275,99 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(cs.root_account_id).to be nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(cs.reload.root_account_id).to eq @group.root_account_id
+    end
+
+    it 'should populate the root_account_id on ContextModule' do
+      expect(@cm.root_account_id).to be nil
+      DataFixup::PopulateRootAccountIdOnModels.run
+      expect(@cm.reload.root_account_id).to eq @course.root_account_id
+    end
+
+    context 'with ContextModuleProgression' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { reference_record.context_module_progressions.create!(user: @user) }
+        let(:reference_record) { @course.context_modules.create! }
+      end
+    end
+
+    context 'with CourseAccountAssociation' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          CourseAccountAssociation.create!(
+            course: course_model(account: account_model(root_account_id: nil)),
+            account: reference_record,
+            depth: 1
+          )
+        end
+        let(:reference_record) { account_model(root_account_id: nil) }
+      end
+    end
+
+    context 'with CustomGradebookColumn' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          CustomGradebookColumn.create!(course: @course, title: 'foo')
+        end
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with CustomGradebookColumnDatum' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          reference_record.custom_gradebook_column_data.create!(content: 'hi', user_id: @user.id)
+        end
+        let(:reference_record) { CustomGradebookColumn.create!(course: @course, title: 'foo') }
+      end
+    end
+
+    context 'with ContentTag' do
+      let(:content_tag) { ContentTag.create!(context: context, content: content) }
+
+      context 'when context is a Course' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:context) { @course }
+          let(:content) { assignment_model(course: @course) }
+          let(:record) { content_tag }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'when context is a LearningOutcomeGroup' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:context) { outcome_group_model(context: @course) }
+          let(:content) { assignment_model(course: @course) }
+          let(:record) { content_tag }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'when context is an Assignment' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:context) { assignment_model(course: @course) }
+          let(:content) { attachment_model }
+          let(:record) { content_tag }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'when context is an Account' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:context) { @course.account }
+          let(:content) { attachment_model }
+          let(:record) { content_tag }
+          let(:reference_record) { @course.account }
+        end
+      end
+
+      context 'when context is a Quizzes::Quiz' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:context) { quiz_model(course: @course) }
+          let(:content) { attachment_model }
+          let(:record) { content_tag }
+          let(:reference_record) { @course }
+        end
+      end
     end
 
     it 'should populate the root_account_id on DeveloperKey' do
@@ -259,6 +437,112 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(dtp.reload.root_account_id).to eq @topic.root_account_id
     end
 
+    context 'with EnrollmentState' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { reference_record.enrollment_state }
+        let(:reference_record) { enrollment_model }
+      end
+    end
+
+    context 'with Favorite' do
+      context 'with a course context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { Favorite.create!(context: @course, user: @user) }
+          let(:reference_record) { @course }
+        end
+
+        context 'with sharding' do
+          specs_require_sharding
+
+          it_behaves_like 'a datafixup that populates root_account_id' do
+            let(:record) do
+              user = @user
+              user.favorites.create!(context: @shard1.activate { course_model(account: account_model) })
+            end
+            let(:reference_record) { @course }
+            let(:sharded) { true }
+          end
+        end
+      end
+    end
+
+    context 'with GradingPeriod' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { grading_periods(count: 1).first }
+        let(:reference_record) { record.grading_period_group }
+      end
+    end
+
+    context 'with GradingPeriodGroup' do
+      context 'when it is for a course' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) do
+            Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+          end
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'when it is for a (root) account' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) do
+            Factories::GradingPeriodGroupHelper.new.create_for_account(reference_record)
+          end
+          let(:reference_record) { account_model(root_account_id: nil) }
+        end
+      end
+    end
+
+    context 'with GradingStandard with course context' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { grading_standard_for(@course) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with GradingStandard with account context' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { grading_standard_for(reference_record) }
+        let(:reference_record) { account_model }
+      end
+    end
+
+    context 'with GroupCategory with course context' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { group_category(context: @course) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with GroupCategory with account context' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { group_category(context: reference_record) }
+        let(:reference_record) { account_model }
+      end
+    end
+
+    context 'with GroupMembership' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { group_membership_model(group: reference_record) }
+        let(:reference_record) { group_model }
+      end
+    end
+
+    context 'with LatePolicy' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        # for some reason late_policy_model doesn't save the record
+        let(:record) { late_policy_model(course: @course).tap(&:save!) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with Lti::LineItem' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { line_item_model(course: @course) }
+        let(:reference_record) { @course }
+      end
+    end
+
     context 'with learning outcomes' do
       let(:outcome) { outcome_model }
       let(:alignment) { outcome.align(assignment, @course) }
@@ -275,6 +559,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         )
       end
       let(:course2) { course_model(account: account_model(root_account_id: nil)) }
+
+      it 'populates root_account_ids on LearningOutcome' do
+        lo = LearningOutcome.create!(context: @course, short_description: "test")
+        lo.update_columns(root_account_ids: nil)
+        DataFixup::PopulateRootAccountIdOnModels.run
+        expect(lo.reload.root_account_ids).to eq [@course.root_account_id]
+      end
 
       context 'with LearningOutcomeGroup' do
         it_behaves_like 'a datafixup that populates root_account_id' do
@@ -299,14 +590,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           let(:record) { outcome_result }
           let(:reference_record) { course2 }
         end
-      end
-    end
-
-    context 'with LatePolicy' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        # for some reason late_policy_model doesn't save the record
-        let(:record) { late_policy_model(course: @course).tap(&:save!) }
-        let(:reference_record) { @course }
       end
     end
 
@@ -405,6 +688,20 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    context 'with OutcomeProficiency' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { outcome_proficiency_model(reference_record) }
+        let(:reference_record) { account_model }
+      end
+    end
+
+    context 'with OutcomeProficiencyRating' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { reference_record.outcome_proficiency_ratings.first }
+        let(:reference_record) { outcome_proficiency_model(account_model) }
+      end
+    end
+
     context 'with PostPolicy' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { PostPolicy.create!(course: @course) }
@@ -412,12 +709,61 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    it 'should populate the root_account_id on Quizzes::Quiz' do
-      quiz_model(course: @course)
-      @quiz.update_columns(root_account_id: nil)
-      expect(@quiz.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(@quiz.reload.root_account_id).to eq @course.root_account_id
+    context 'with Quizzes::Quiz' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { quiz_model(course: @course) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with Quizzes::QuizGroup' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          reference_record.quiz_groups.create!
+        end
+        let(:reference_record) { quiz_model }
+      end
+    end
+
+    context 'with Quizzes::QuizQuestion' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          reference_record.quiz_questions.create!(question_data: test_quiz_data.first)
+        end
+        let(:reference_record) { quiz_model }
+      end
+    end
+
+    context 'with Quizzes::QuizSubmission' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { quiz_with_submission }
+        let(:reference_record) { record.quiz }
+      end
+    end
+
+    context 'with RoleOverride' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { RoleOverride.create!(account: reference_record, role: Role.first) }
+        let(:reference_record) { account_model }
+      end
+    end
+
+    context 'with Score' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { reference_record.scores.create! }
+        let(:reference_record) { enrollment_model }
+      end
+    end
+
+    context 'with ScoreStatistic' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) do
+          ScoreStatistic.create!(
+            assignment: reference_record, maximum: 100, minimum: 5, mean: 60, count: 10
+          )
+        end
+        let(:reference_record) { assignment_model }
+      end
     end
 
     context 'with Submission' do
@@ -425,6 +771,19 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         let(:submission) { submission_model }
         let(:record) { submission }
         let(:reference_record) { submission.assignment }
+      end
+    end
+
+    context 'with SubmissionVersion' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:assignment) { assignment_model }
+        let(:record) do
+          SubmissionVersion.create!(
+            course: @course, version: Version.create!(versionable: assignment),
+            assignment: assignment_model, user_id: @user.id
+          )
+        end
+        let(:reference_record) { @course }
       end
     end
 
@@ -517,11 +876,57 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         end
       end
     end
+
+    context 'with Wiki (course)' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { Wiki.create!(course: @course) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with Wiki (group)' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { Wiki.create!(group: reference_record) }
+        let(:reference_record) { group_model }
+      end
+    end
+
+    context 'with WikiPage with course context' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { wiki_page_model(context: @course) }
+        let(:reference_record) { @course }
+      end
+    end
+
+    context 'with WikiPage with group context' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { wiki_page_model(context: reference_record) }
+        let(:reference_record) { group_model }
+      end
+    end
   end
 
   describe '#run' do
     it 'should create delayed jobs to backfill root_account_ids for the table' do
       expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:send_later_if_production_enqueue_args)
+      DataFixup::PopulateRootAccountIdOnModels.run
+    end
+
+    it 'should create delayed jobs for override methods for the table' do
+      ContextModule.delete_all
+      LearningOutcome.create!(context: @course, short_description: "test")
+      LearningOutcome.update_all(root_account_ids: nil)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override)
+      expect(DataFixup::PopulateRootAccountIdOnModels).not_to receive(:populate_root_account_ids)
+      DataFixup::PopulateRootAccountIdOnModels.run
+    end
+
+    it 'should create multiple delayed jobs for tables with default and override methods' do
+      ContextModule.delete_all
+      AssetUserAccess.create!(context: @user, asset_code: @course.asset_string)
+      AssetUserAccess.update_all(root_account_id: nil)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override)
       DataFixup::PopulateRootAccountIdOnModels.run
     end
   end
@@ -569,6 +974,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       OriginalityReport.create!(submission: submission_model)
       expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
         and_return({OriginalityReport => :submission, ContextModule => :course})
+      expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
+    end
+
+    it 'should filter tables whose prereqs are not direct assocations and are not filled' do
+      LearningOutcome.create!(context: @course, short_description: "test")
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
+        and_return({LearningOutcome => :content_tag, ContextModule => :course})
       expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
     end
 
@@ -647,6 +1059,11 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         {course: :root_account_id})).to eq({course: :root_account_id})
     end
 
+    it 'should leave non-association dependencies alone' do
+      expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(LearningOutcome,
+        {content_tag: :root_account_id})).to eq({})
+    end
+
     it 'should replace polymorphic associations in the hash (in original order)' do
       expect(DataFixup::PopulateRootAccountIdOnModels.replace_polymorphic_associations(
         ContentTag, {context: [:root_account_id, :id], context_module: :root_account_id}
@@ -705,9 +1122,9 @@ describe DataFixup::PopulateRootAccountIdOnModels do
   describe '#check_if_table_has_root_account' do
     it 'should return correctly for tables with root_account_id' do
       DeveloperKey.create!(account: @course.account)
-      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(DeveloperKey)).to be true
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(DeveloperKey, [:account])).to be true
 
-      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(ContextModule)).to be false
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(ContextModule, [:course])).to be false
     end
 
     it 'should return correctly for tables where we only care about certain associations' do
@@ -718,13 +1135,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       # User-context event doesn't have root account id so we use the user's account
       event = CalendarEvent.create!(context: user_model)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
-        CalendarEvent
+        CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
       )).to be true
 
       # manually adding makes the check method think it does, though
       event.update_columns(root_account_id: @course.root_account_id)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
-        CalendarEvent
+        CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
       )).to be true
 
       # adding another User-context event should make it return false,
@@ -735,6 +1152,98 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
       )).to be true
     end
+
+    it 'should return correctly for tables with root_account_ids' do
+      LearningOutcome.create!(context: @course, short_description: "test")
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(LearningOutcome, [])).to be true
+      LearningOutcome.update_all(root_account_ids: nil)
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(LearningOutcome, [])).to be false
+    end
+
+    it 'should check the whole table if there are non-association dependencies' do
+      AssetUserAccess.create!(context: user_model, asset_code: @course.asset_string, root_account_id: @course.root_account_id)
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(AssetUserAccess, [])).to be true
+      AssetUserAccess.update_all(root_account_id: nil)
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(AssetUserAccess, [])).to be false
+    end
+  end
+
+  describe '#check_if_association_has_root_account' do
+    it 'should ignore nil reflections' do
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(LearningOutcome, nil)).to be true
+    end
+
+    it 'should ignore assocations that point to unfillable tables' do
+      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(AccessToken, AccessToken.reflections['developer_key'])).to be true
+    end
+
+    context 'with_sharding' do
+      specs_require_sharding
+
+      it 'should only search current shard when there are no cross-shard foreign keys' do
+        user = @user
+        course_model(account: account_model)
+        favorite = Favorite.create!(context: @course, user: user)
+        favorite.update_columns(root_account_id: nil)
+
+        expect(Shard).to receive(:where).with(hash_including(id: [Shard.current.id])).and_call_original
+        DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])
+      end
+
+      it 'should find possible shards from cross-shard foreign keys' do
+        user = @user
+        @shard1.activate do
+          course_model(account: account_model)
+        end
+        favorite = Favorite.create!(context: @course, user: user)
+        favorite.update_columns(root_account_id: nil)
+
+        expect(Shard).to receive(:where).with(hash_including(id: [Shard.current.id, @shard1.id])).and_call_original
+        DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])
+      end
+
+      it 'should check current shard for missing root account ids' do
+        user = @user
+        course_model(account: account_model)
+        favorite = Favorite.create!(context: @course, user: user)
+        favorite.update_columns(root_account_id: nil)
+
+        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])).to be true
+      end
+
+      it 'should check other shards for missing root_account_ids' do
+        user = @user
+        @shard1.activate do
+          course_model(account: account_model)
+        end
+        favorite = Favorite.create!(context: @course, user: user)
+        favorite.update_columns(root_account_id: nil)
+
+        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])).to be true
+      end
+
+      it 'should actually find missing root account ids on current shard' do
+        discussion_topic_model(context: @course)
+        de = @topic.discussion_entries.create!(user: user_model)
+        de.update_columns(root_account_id: nil)
+        @topic.update_columns(root_account_id: nil)
+
+        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(DiscussionEntry, DiscussionEntry.reflections['discussion_topic'])).to be false
+      end
+
+      it 'should actually find missing root account ids on other shards' do
+        @shard1.activate do
+          discussion_topic_model(context: @course)
+        end
+        de = @topic.discussion_entries.create!(user: user_model)
+        de.update_columns(root_account_id: nil)
+        @topic.update_columns(root_account_id: nil)
+
+        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(DiscussionEntry, DiscussionEntry.reflections['discussion_topic'])).to be false
+      end
+    end
+
+    
   end
 
   describe '#populate_root_account_ids' do
@@ -758,6 +1267,48 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
       expect(DataFixup::PopulateRootAccountIdOnModels).not_to receive(:run)
       DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, {course: :root_account_id}, cm2.id, cm2.id)
+    end
+
+    context 'with_sharding' do
+      specs_require_sharding
+
+      it 'should fill cross-shard data' do
+        user = @user
+        @shard1.activate do
+          course_model(account: account_model)
+        end
+        favorite = Favorite.create!(context: @course, user: user)
+        favorite.update_columns(root_account_id: nil)
+
+        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {course: :root_account_id}, favorite.id, favorite.id)
+        expect(favorite.reload.root_account_id).to eq @course.root_account.global_id
+      end
+    end
+  end
+
+  describe '#populate_root_account_ids_override' do
+    it 'should call #populate on the provided module' do
+      lo = LearningOutcome.create!(context: @course, short_description: 'test')
+
+      expect(DataFixup::PopulateRootAccountIdsOnLearningOutcomes).to receive(:populate).once
+      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids_override(LearningOutcome, DataFixup::PopulateRootAccountIdsOnLearningOutcomes, lo.id, lo.id)
+    end
+
+    it 'should restart the table fixup job if there are no other delayed jobs of this type still running' do
+      lo = LearningOutcome.create!(context: @course, short_description: 'test')
+      lo2 = LearningOutcome.create!(context: @course, short_description: 'test2')
+
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:run).once
+      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids_override(LearningOutcome, DataFixup::PopulateRootAccountIdsOnLearningOutcomes, lo.id, lo.id)
+    end
+
+    it 'should not restart the table fixup job if there are items in this table that do not have root_account_id' do
+      lo = LearningOutcome.create!(context: @course, short_description: 'test')
+      lo2 = LearningOutcome.create!(context: @course, short_description: 'test2')
+      lo2.update_columns(root_account_ids: nil)
+
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:run).once
+      DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids_override(LearningOutcome, DataFixup::PopulateRootAccountIdsOnLearningOutcomes, lo2.id, lo2.id)
     end
   end
 
