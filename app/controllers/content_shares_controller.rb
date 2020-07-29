@@ -88,14 +88,6 @@
 class ContentSharesController < ApplicationController
   include ContentExportApiHelper
   include Api::V1::ContentShare
-  CONTENT_TYPES = {
-    assignment: Assignment,
-    discussion_topic: DiscussionTopic,
-    page: WikiPage,
-    quiz: Quizzes::Quiz,
-    module: ContextModule,
-    module_item: ContentTag
-  }.freeze
 
   before_action :require_direct_share_enabled
   before_action :require_user
@@ -147,7 +139,7 @@ class ContentSharesController < ApplicationController
     unless allowed_types.include?(create_params[:content_type])
       return render(json: { message: "Content type not allowed. Allowed types: #{allowed_types.join(',')}" }, status: :bad_request)
     end
-    content_type = CONTENT_TYPES[create_params[:content_type]&.to_sym]
+    content_type = ContentShare::TYPE_TO_CLASS[create_params[:content_type]]
     content = content_type&.where(id: create_params[:content_id])
     content = if content_type.respond_to? :not_deleted
                 content&.not_deleted

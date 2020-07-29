@@ -201,6 +201,18 @@ class ContentTag < ActiveRecord::Base
     end
   end
 
+  def direct_shareable?
+    content_id&.to_i > 0 && direct_share_type
+  end
+
+  def direct_share_type
+    ContentShare::CLASS_NAME_TO_TYPE[content_type]
+  end
+
+  def direct_share_select_class
+    direct_share_type.pluralize
+  end
+
   def content_type_class(is_student=false)
     if self.content_type == 'Assignment'
       if self.content && self.content.submission_types == 'online_quiz'

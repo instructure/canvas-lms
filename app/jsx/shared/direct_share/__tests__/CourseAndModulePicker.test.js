@@ -110,4 +110,29 @@ describe('CourseAndModulePicker', () => {
     fireEvent.change(selector, {target: {value: 'top'}})
     expect(setPosition).toHaveBeenLastCalledWith(1)
   })
+
+  it('hides the module selector if requested', () => {
+    useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
+      success([
+        {id: 'abc', name: 'abc'},
+        {id: 'cde', name: 'cde'}
+      ])
+    })
+    useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
+      success([
+        {id: '1', name: 'Module 1'},
+        {id: '2', name: 'Module 2'}
+      ])
+    })
+    const setModule = jest.fn()
+    const {queryByText} = render(
+      <CourseAndModulePicker
+        selectedCourseId="abc"
+        setSelectedModule={setModule}
+        disableModuleInsertion
+      />
+    )
+    const selector = queryByText(/select a module/i)
+    expect(selector).not.toBeInTheDocument()
+  })
 })

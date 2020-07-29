@@ -123,7 +123,7 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
       <div role="alert" aria-live="assertive" aria-atomic>
         {alertMessage}
       </div>
-      {postStatus === 'info' ? <Spinner renderTitle="" size="x-small" /> : null}
+      {postStatus === 'info' ? <Spinner renderTitle={alertMessage} size="x-small" /> : null}
     </Alert>
   ) : null
 

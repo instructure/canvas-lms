@@ -36,7 +36,7 @@ describe('DirectShareOperationStatus', () => {
 
   it('shows the starting message when the promise is not resolved', () => {
     const promise = new Promise(() => {})
-    const {getByText, queryByText} = render(
+    const {getAllByText, queryByText} = render(
       <DirectShareOperationStatus
         promise={promise}
         startingMsg="starting"
@@ -44,7 +44,7 @@ describe('DirectShareOperationStatus', () => {
         errorMsg="error"
       />
     )
-    expect(getByText('starting')).toBeInTheDocument()
+    expect(getAllByText('starting')).not.toHaveLength(0)
     expect(queryByText(/success|error/)).toBeNull()
   })
 
@@ -97,7 +97,7 @@ describe('DirectShareOperationStatus', () => {
 
   it('resets when it receives a new promise', async () => {
     const promise = Promise.resolve()
-    const {findByText, getByText, rerender} = render(
+    const {findByText, getAllByText, rerender} = render(
       <DirectShareOperationStatus
         promise={promise}
         startingMsg="starting"
@@ -115,6 +115,6 @@ describe('DirectShareOperationStatus', () => {
         errorMsg="error"
       />
     )
-    expect(getByText('starting')).toBeInTheDocument()
+    expect(getAllByText('starting')).not.toHaveLength(0)
   })
 })

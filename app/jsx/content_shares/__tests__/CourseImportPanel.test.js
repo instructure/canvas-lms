@@ -103,7 +103,7 @@ describe('CourseImportPanel', () => {
         {id: '2', name: 'Module 2'}
       ])
     })
-    const {getByText, getByLabelText, queryByText} = render(
+    const {getByText, getAllByText, getByLabelText, queryByText} = render(
       <CourseImportPanel contentShare={share} onImport={onImport} />
     )
     fireEvent.click(getByLabelText(/select a course/i))
@@ -119,7 +119,7 @@ describe('CourseImportPanel', () => {
       migration_type: 'canvas_cartridge_importer',
       settings: {content_export_id: share.content_export.id, insert_into_module_id: '1'}
     })
-    expect(getByText(/start/i)).toBeInTheDocument()
+    expect(getAllByText(/start/i)).not.toHaveLength(0)
     await act(() => fetchMock.flush(true))
     expect(getByText(/success/)).toBeInTheDocument()
     expect(queryByText('Import')).toBeNull()

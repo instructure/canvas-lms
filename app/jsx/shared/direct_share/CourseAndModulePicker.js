@@ -19,7 +19,7 @@
 import I18n from 'i18n!course_and_module_picker'
 
 import React from 'react'
-import {func, string} from 'prop-types'
+import {func, string, bool} from 'prop-types'
 import {View} from '@instructure/ui-view'
 
 import useManagedCourseSearchApi from '../effects/useManagedCourseSearchApi'
@@ -32,7 +32,8 @@ CourseAndModulePicker.propTypes = {
   setSelectedCourse: func,
   selectedModuleId: string,
   setSelectedModule: func,
-  setModuleItemPosition: func
+  setModuleItemPosition: func,
+  disableModuleInsertion: bool
 }
 
 export default function CourseAndModulePicker({
@@ -40,7 +41,8 @@ export default function CourseAndModulePicker({
   setSelectedCourse,
   selectedModuleId,
   setSelectedModule,
-  setModuleItemPosition
+  setModuleItemPosition,
+  disableModuleInsertion
 }) {
   return (
     <>
@@ -52,7 +54,7 @@ export default function CourseAndModulePicker({
         />
       </View>
       <View as="div" padding="0 0 small 0">
-        {selectedCourseId && (
+        {selectedCourseId && !disableModuleInsertion && (
           <SearchItemSelector
             onItemSelected={setSelectedModule}
             renderLabel={I18n.t('Select a Module (optional)')}
@@ -61,7 +63,7 @@ export default function CourseAndModulePicker({
           />
         )}
       </View>
-      {selectedCourseId && selectedModuleId && (
+      {selectedCourseId && selectedModuleId && !disableModuleInsertion && (
         <ModulePositionPicker
           courseId={selectedCourseId || null}
           moduleId={selectedModuleId || null}

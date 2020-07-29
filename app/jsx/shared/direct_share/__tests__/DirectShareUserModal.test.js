@@ -120,7 +120,7 @@ describe('DirectShareUserModal', () => {
       content_type: 'discussion_topic',
       content_id: '42'
     })
-    expect(getByText(/start/i)).toBeInTheDocument()
+    expect(getAllByText(/start/i)).not.toHaveLength(0)
     await act(() => fetchMock.flush(true))
     expect(getAllByText(/success/i)).toHaveLength(2) // visible and sr alert
     expect(onDismiss).toHaveBeenCalled()

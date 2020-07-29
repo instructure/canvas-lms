@@ -17,6 +17,16 @@
 #
 
 class ContentShare < ActiveRecord::Base
+  TYPE_TO_CLASS = {
+    'assignment' => Assignment,
+    'discussion_topic' => DiscussionTopic,
+    'page' => WikiPage,
+    'quiz' => Quizzes::Quiz,
+    'module' => ContextModule,
+    'module_item' => ContentTag
+  }.freeze
+
+  CLASS_NAME_TO_TYPE = TYPE_TO_CLASS.transform_values(&:to_s).invert.freeze
 
   belongs_to :user
   belongs_to :content_export

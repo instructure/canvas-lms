@@ -102,7 +102,7 @@ describe('DirectShareCoursePanel', () => {
       workflow_state: 'running'
     })
     fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
-    const {getByText, getByLabelText, queryByText} = render(
+    const {getByText, getAllByText, getByLabelText, queryByText} = render(
       <DirectShareCoursePanel
         sourceCourseId="42"
         contentSelection={{discussion_topics: ['1123']}}
@@ -121,7 +121,7 @@ describe('DirectShareCoursePanel', () => {
       select: {discussion_topics: ['1123']},
       settings: {source_course_id: '42'}
     })
-    expect(getByText(/start/i)).toBeInTheDocument()
+    expect(getAllByText(/start/i)).not.toHaveLength(0)
     await act(() => fetchMock.flush(true))
     expect(getByText(/success/)).toBeInTheDocument()
     expect(queryByText('Copy')).toBeNull()
