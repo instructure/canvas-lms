@@ -62,9 +62,9 @@ export default class CourseSelectionView extends View {
     }
     this.options.courses.favorites.on('reset', () => this.render())
     this.options.courses.all.on('reset', () => this.render())
-    this.options.courses.all.on('add', () => this.render())
+    this.listenTo(this.options.courses.all, 'add', _.debounce(_.bind(this.render), 200))
     this.options.courses.groups.on('reset', () => this.render())
-    this.options.courses.groups.on('add', () => this.render())
+    this.listenTo(this.options.courses.groups, 'add', _.debounce(_.bind(this.render), 200))
     this.$picker = this.$el.next()
     return this.render()
   }
