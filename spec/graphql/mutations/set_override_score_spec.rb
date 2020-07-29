@@ -152,6 +152,30 @@ describe Mutations::SetOverrideScore do
         expect(score_for_second_enrollment.override_score).to be nil
       end
     end
+
+    describe "grade change audit events" do
+      before(:each) do
+        grading_standard = course.grading_standards.create!(data: GradingStandard.default_grading_standard)
+        course.update!(default_grading_standard: grading_standard)
+        score_for_grading_period.update!(override_score: 75.0)
+      end
+
+      it "records an override grade change event for the enrollment that was updated" do
+        aggregate_failures do
+          expect(Auditors::GradeChange).to receive(:record).exactly(1).time do |args|
+            grade_change = args[:override_grade_change]
+
+            expect(grade_change).to be_a(Auditors::GradeChange::OverrideGradeChange)
+            expect(grade_change.grader).to eq teacher
+            expect(grade_change.old_grade).to eq "C"
+            expect(grade_change.old_score).to eq 75.0
+            expect(grade_change.score).to eq score_for_grading_period
+          end
+
+          CanvasSchema.execute(mutation_str(grading_period_id: grading_period.id), context: context)
+        end
+      end
+    end
   end
 
   context "when the caller does not have the manage_grades permission" do

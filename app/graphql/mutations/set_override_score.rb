@@ -54,12 +54,22 @@ class Mutations::SetOverrideScore < Mutations::BaseMutation
       verify_authorized_action!(score.course, :manage_grades)
 
       old_score = score[:override_score]
+      old_grade = score.override_grade
       new_score = input[:override_score]
       score.update(override_score: new_score)
 
       Canvas::LiveEvents.grade_override(score, old_score, enrollment, enrollment.course)
 
       next unless enrollment == requested_enrollment
+
+      # Only send a grade change event once even if there are multiple enrollments
+      override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+        grader: current_user,
+        old_grade: old_grade,
+        old_score: old_score,
+        score: score
+      )
+      Auditors::GradeChange.record(override_grade_change: override_grade_change)
 
       return_value = if score.valid?
         {grades: score}

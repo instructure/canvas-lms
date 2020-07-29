@@ -79,6 +79,28 @@ describe GradeChangeAuditApiController do
           expect(student_ids).to be_empty
         end
       end
+
+      it "excludes override grade change events from the results" do
+        # TODO: (EVAL-1068) add a separate spec to include override grade
+        # changes if the final_grade_override_in_gradebook_history feature flag
+        # is enabled
+        override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+          grader: teacher,
+          old_grade: nil,
+          old_score: nil,
+          score: student.enrollments.first.find_score
+        )
+        Auditors::GradeChange.record(override_grade_change: override_grade_change)
+
+        get :for_course, params: { course_id: course.id }
+        events = json_parse(response.body).fetch("events")
+        assignment_ids = events.map { |event| event.dig('links', 'assignment') }
+
+        # These results should contain only the assignment-level grade changes
+        # we created as part of setup, and not the override grade change we
+        # just added
+        expect(assignment_ids.uniq).to contain_exactly(assignment.id)
+      end
     end
 
     context "reading from active_record" do

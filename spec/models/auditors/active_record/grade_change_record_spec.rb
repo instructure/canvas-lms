@@ -56,6 +56,7 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
       expect(ar_rec.course_id).to eq(course.id)
       expect(ar_rec.context_type).to eq('Course')
       expect(ar_rec.grader_id).to eq(submission_record.grader_id)
+      expect(ar_rec.grading_period_id).to eq(submission_record.grading_period_id)
       expect(ar_rec.student_id).to eq(submission_record.user_id)
       expect(ar_rec.submission_id).to eq(submission_record.id)
       expect(ar_rec.submission_version_number).to eq(submission_record.version_number)
@@ -74,6 +75,54 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
       es_record.request_id = "aaa-111-bbb-222"
       Auditors::ActiveRecord::GradeChangeRecord.update_from_event_stream!(es_record)
       expect(ar_rec.reload.request_id).to eq("aaa-111-bbb-222")
+    end
+
+    describe "ID/placeholder handling" do
+      let(:override_grade_change) do
+        submission = submission_record
+
+        teacher = @course.enroll_teacher(User.create!, workflow_state: "active").user
+        submission.update!(grader: teacher)
+        score = @course.student_enrollments.first.find_score
+
+        Auditors::GradeChange::OverrideGradeChange.new(
+          grader: teacher,
+          old_grade: nil,
+          old_score: nil,
+          score: score
+        )
+      end
+
+      let(:ar_override_grade_change) do
+        override_record = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+        Auditors::ActiveRecord::GradeChangeRecord.create_from_event_stream!(override_record)
+      end
+
+      let(:ar_assignment_grade_change) do
+        Auditors::ActiveRecord::GradeChangeRecord.create_from_event_stream!(es_record)
+      end
+
+      describe "submission ID" do
+        it "is set to the relative ID if the event stream record contains a non-placeholder value" do
+          relative_id = Shard.relative_id_for(es_record.submission_id, Shard.current, Shard.current)
+          expect(ar_assignment_grade_change.submission_id).to eq relative_id
+        end
+
+        it "is set to null if the event stream record contains the placeholder value" do
+          expect(ar_override_grade_change.submission_id).to be nil
+        end
+      end
+
+      describe "assignment ID" do
+        it "is set to the relative ID if the event stream record contains a non-placeholder value" do
+          relative_id = Shard.relative_id_for(es_record.assignment_id, Shard.current, Shard.current)
+          expect(ar_assignment_grade_change.assignment_id).to eq relative_id
+        end
+
+        it "is set to null if the event stream record contains the placeholder value" do
+          expect(ar_override_grade_change.assignment_id).to be nil
+        end
+      end
     end
   end
 end

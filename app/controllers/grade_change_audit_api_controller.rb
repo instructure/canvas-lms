@@ -267,6 +267,14 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def render_events(events, route, course: nil, remove_anonymous: false)
+    # When reading from Cassandra, filter out override grades here, since it's
+    # not straightforward to do so as part of fetching the data.  (If we're
+    # reading from Postgres, the filtering was already done as part of the
+    # query.)
+    #
+    # TODO: (EVAL-1068) don't actually do this if the
+    # final_grade_override_in_gradebook_history feature flag is enabled
+    events = BookmarkedCollection.filter(events) { |event| !event.override_grade? } if Auditors.read_from_cassandra?
     events = Api.paginate(events, self, route)
 
     if params.fetch(:include, []).include?("current_grade")
