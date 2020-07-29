@@ -88,12 +88,8 @@ class NotificationMessageCreator
       end
     end
     [delayed_messages, dashboard_messages, immediate_messages].each(&:compact!)
-
     delayed_messages.each(&:save!)
-    dispatch_dashboard_messages(dashboard_messages)
-    dispatch_immediate_messages(immediate_messages)
-
-    immediate_messages + dashboard_messages
+    dispatch_immediate_messages(immediate_messages) + dispatch_dashboard_messages(dashboard_messages)
   end
 
   private
@@ -122,8 +118,10 @@ class NotificationMessageCreator
   def build_fallback_for(user, channel)
     # if the notification is summarizable? it will be picked up in delayed_messages.
     # if it's not an email we won't send a delayed_message.
-    # and this is only used when there were too_many_messages for a user.
-    return unless @notification.summarizable? && channel.path_type == 'email' && too_many_messages_for?(user)
+    return unless @notification.summarizable? && channel.path_type == 'email'
+    # we only send fallback when we did not send an immediate message, ie.
+    # when the channel is bouncing or there have been too_many_messages
+    return unless channel.bouncing? || too_many_messages_for?(user)
     fallback_policy = nil
     NotificationPolicy.unique_constraint_retry do
       fallback_policy = channel.notification_policies.by_frequency('daily').where(:notification_id => nil).first
@@ -175,10 +173,10 @@ class NotificationMessageCreator
     # if we have already created a fallback message, we don't want to make an
     # immediate message.
     return if @notification.summarizable? && too_many_messages_for?(user) && ['email', 'sms'].include?(channel.path_type)
-    return if channel.bouncing?
     message_options = message_options_for(user)
     message = user.messages.build(message_options.merge(communication_channel: channel, to: channel.path))
     message&.parse!
+    message.workflow_state = 'bounced' if channel.bouncing?
     message
   end
 
@@ -191,8 +189,9 @@ class NotificationMessageCreator
         message.save!
       end
     end
+    # we filter out bounced messages now that they have been saved.
+    messages = messages.select(&:staged?)
     MessageDispatcher.batch_dispatch(messages)
-
     messages
   end
 
@@ -332,7 +331,6 @@ class NotificationMessageCreator
   end
 
   def cancel_pending_duplicate_messages
-    # doesn't include dashboard messages. should it?
     Message.where(:notification_id => @notification).
       for(@asset).
       by_name(@notification.name).
