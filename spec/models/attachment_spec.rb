@@ -775,6 +775,24 @@ describe Attachment do
   end
 
   context "clone_for" do
+    context 'with S3 storage enabled' do
+      subject { attachment.clone_for(context, nil, {force_copy: true}) }
+
+      let(:bank) { AssessmentQuestionBank.create!(context: course_model) }
+      let(:context) { AssessmentQuestion.create!(assessment_question_bank: bank) }
+      let(:attachment) { attachment_model(:filename => "blech.ppt", context: bank.context) }
+
+      before { s3_storage! }
+
+      context 'and the context has a nil root account' do
+        before { context.update_columns(root_account_id: nil) }
+
+        it 'does not raise an error' do
+          expect { subject }.not_to raise_exception
+        end
+      end
+    end
+
     it "should clone to another context" do
       a = attachment_model(:filename => "blech.ppt")
       course_factory
