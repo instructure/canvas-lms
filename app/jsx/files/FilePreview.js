@@ -233,7 +233,7 @@ export default class FilePreview extends React.PureComponent {
           title={I18n.t('File Preview')}
           src={this.state.displayedItem.get('preview_url')}
           className={iFrameClasses}
-          sandbox="allow-scripts allow-forms"
+          sandbox="allow-scripts allow-forms allow-same-origin"
         />
       )
     } else {
