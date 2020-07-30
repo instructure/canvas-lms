@@ -92,7 +92,7 @@ module CanvasSanitize #:nodoc:
 
   def self.sanitize_iframe(env)
     node = env[:node]
-    node["sandbox"] = 'allow-scripts allow-forms'
+    node["sandbox"] = 'allow-scripts allow-forms allow-same-origin'
   end
 
   DEFAULT_PROTOCOLS = ['http', 'https', :relative].freeze
