@@ -166,7 +166,10 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
+          // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
+          // wait for the current steps to complete (even wait to spin up a node), causing
+          // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
+          protectedNode('canvas-docker-nospot', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
             stage('Setup') {
               timeout(time: 5) {
                 cleanAndSetup()
