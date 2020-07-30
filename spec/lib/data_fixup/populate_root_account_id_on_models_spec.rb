@@ -1329,6 +1329,27 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {course: :root_account_id}, favorite.id, favorite.id)
         expect(favorite.reload.root_account_id).to eq @course.root_account.global_id
       end
+
+      it 'should not collide on cross-shard data of different types' do
+        user = @user
+        @shard1.activate do
+          a1 = account_model
+          a2 = account_model
+          course_model(id: 12345, account: a1)
+          group_model(id: 12345, context: a2)
+        end
+        
+        f1 = Favorite.create!(context: @course, user: user)
+        f2 = Favorite.create(context: @group, user: user)
+        f1.update_columns(root_account_id: nil)
+        f2.update_columns(root_account_id: nil)
+
+        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {group: :root_account_id}, f1.id, f2.id)
+        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {course: :root_account_id}, f1.id, f2.id)
+
+        expect(f1.reload.root_account_id).to eq @course.root_account.global_id
+        expect(f2.reload.root_account_id).to eq @group.root_account.global_id
+      end
     end
   end
 
