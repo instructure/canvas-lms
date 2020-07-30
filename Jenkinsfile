@@ -130,7 +130,7 @@ pipeline {
     BUILD_IMAGE = configuration.buildRegistryPath()
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
-    SKIP_CACHE = configuration.getBoolean('skip-cache')
+    SKIP_CACHE = configuration.skipCache()
 
     // e.g. postgres-9.5-ruby-2.6
     TAG_SUFFIX = imageTag.suffix()
@@ -212,7 +212,7 @@ pipeline {
               }
             }
 
-            if(env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms') {
+            if(env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
               stage('Rebase') {
                 timeout(time: 2) {
                   credentials.withGerritCredentials({ ->
@@ -250,7 +250,7 @@ pipeline {
             stage('Build Docker Image') {
               timeout(time: 30) {
                 skipIfPreviouslySuccessful('docker-build-and-push') {
-                  if (env.GERRIT_EVENT_TYPE != 'change-merged' && configuration.getBoolean('skip-docker-build')) {
+                  if (env.GERRIT_EVENT_TYPE != 'change-merged' && configuration.skipDockerBuild()) {
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                     sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                   } else {
