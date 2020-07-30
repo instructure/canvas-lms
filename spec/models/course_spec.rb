@@ -270,6 +270,18 @@ describe Course do
         it "returns false when there is only one section" do
           expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be false
         end
+
+        it "returns false when the user has at least one non-student enrollment" do
+          teacher = User.create!
+          @course.enroll_teacher(teacher, enrollment_state: :active)
+          @course.enroll_student(teacher, enrollment_state: :active)
+          expect(@course.sections_hidden_on_roster_page?(current_user: teacher)).to be false
+        end
+
+        it "returns false when the user has no enrollments (like an admin)" do
+          admin = account_admin_user
+          expect(@course.sections_hidden_on_roster_page?(current_user: admin)).to be false
+        end
       end
 
       context "Setting is set to Off" do
