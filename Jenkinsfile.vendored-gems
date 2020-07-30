@@ -20,8 +20,33 @@
 
 library "canvas-builds-library"
 
+def cleanupFn() {
+  try {
+    def htmlFiles
+
+    sh 'docker cp $(docker ps -f "ancestor"="$PATCHSET_TAG" -q):/usr/src/app/tmp/spec_results/. ./spec_results/'
+
+    dir ('spec_results') {
+      sh 'mv report.html canvas_i18nliner_results.html'
+      htmlFiles = findFiles glob: '*results.html'
+    }
+
+    publishHTML target: [
+      allowMissing: false,
+      alwaysLinkToLastBuild: false,
+      keepAll: true,
+      reportDir: "spec_results",
+      reportFiles: htmlFiles.join(','),
+      reportName: 'Test Results'
+    ]
+  } finally {
+    sh 'rm -vrf ./spec_results/'
+    execute 'bash/docker-cleanup.sh --allow-failure'
+  }
+}
+
 pipeline {
-  agent { label 'canvas-docker' }
+  agent none
   options {
     ansiColor('xterm')
     timestamps()
@@ -35,53 +60,28 @@ pipeline {
   }
 
   stages {
-    stage ('Setup') {
+    stage('Environment') {
       steps {
-        cleanAndSetup()
-        timeout(time: 5) {
-          sh 'build/new-jenkins/docker-compose-pull.sh'
-          sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'build/new-jenkins/docker-compose-setup-cassandra-keyspaces.sh'
+        script {
+          protectedNode('canvas-docker', { cleanupFn() }) {
+            stage ('Setup') {
+              cleanAndSetup()
+              timeout(time: 5) {
+                checkout scm
+                sh 'build/new-jenkins/docker-compose-pull.sh'
+                sh 'build/new-jenkins/docker-compose-build-up.sh'
+                sh 'build/new-jenkins/docker-compose-setup-cassandra-keyspaces.sh'
+              }
+            }
+
+            stage ('Run Vendored Gems specs') {
+              timeout(time: 10) {
+                sh 'build/new-jenkins/test-gems.sh'
+              }
+            }
+          }
         }
       }
-    }
-
-    stage ('Run Vendored Gems specs') {
-      steps {
-        timeout(time: 10) {
-          sh 'build/new-jenkins/test-gems.sh'
-        }
-      }
-    }
-  }
-
-  post {
-    always {
-      // copy the test results from the container
-      sh 'docker cp $(docker ps -f "ancestor"="$PATCHSET_TAG" -q):/usr/src/app/tmp/spec_results/. ./spec_results/'
-      script {
-        def htmlFiles
-        // find all results files
-        dir ('spec_results') {
-          sh 'mv report.html canvas_i18nliner_results.html'
-          htmlFiles = findFiles glob: '*results.html'
-        }
-
-        // publish html
-        publishHTML target: [
-          allowMissing: false,
-          alwaysLinkToLastBuild: false,
-          keepAll: true,
-          reportDir: "spec_results",
-          reportFiles: htmlFiles.join(','),
-          reportName: 'Test Results'
-        ]
-      }
-    }
-
-    cleanup {
-      sh 'rm -vrf ./spec_results/'
-      execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

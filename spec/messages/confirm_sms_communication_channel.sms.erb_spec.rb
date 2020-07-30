@@ -25,7 +25,7 @@ describe 'confirm_sms_communication_channel.sms' do
   it "should render" do
     user_factory
     @pseudonym = @user.pseudonyms.create!(:unique_id => 'unique@example.com', :password => 'password', :password_confirmation => 'password')
-    @object = @user.communication_channels.create!(:path_type => 'email', :path => 'bob@example.com', :user => @user)
+    @object = communication_channel(@user, {username: 'bob@example.com'})
     generate_message(:confirm_sms_communication_channel, :sms, @object,
                      data: { root_account_id: @pseudonym.account.global_id,
                              from_host: HostUrl.context_host(@pseudonym.account) })

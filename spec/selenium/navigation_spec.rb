@@ -103,6 +103,8 @@ describe 'Global Navigation' do
     end
     describe 'Navigation Expand/Collapse Link' do
       it 'should collapse and expand the navigation when clicked' do
+        skip('FOO-754 - 7/29/2020')
+
         get "/"
         f('#primaryNavToggle').click
         wait_for_ajaximations

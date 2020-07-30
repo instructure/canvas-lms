@@ -993,7 +993,6 @@ describe "Module Items API", type: :request do
     describe 'POST select_mastery_path' do
       before do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
-        allow(ConditionalRelease::Service).to receive(:select_mastery_path).and_return({ code: '200', body: {} })
         student_in_course(course: @course)
       end
 
@@ -1025,32 +1024,14 @@ describe "Module Items API", type: :request do
         expect(json['message']).to match(/assignment/)
       end
 
-      it 'should return the CYOE error if the action is unsuccessful' do
-        allow(ConditionalRelease::Service).to receive(:select_mastery_path).and_return({ code: '909', body: { 'foo' => 'bar' } })
-        json = call_select_mastery_path @assignment_tag, 100, @student.id, expected_status: 909
-        expect(json).to eq({ 'foo' => 'bar' })
-      end
-
       it 'should not allow unpublished items' do
         @assignment.unpublish!
         call_select_mastery_path @assignment_tag, 100, @student.id, expected_status: 404
       end
 
-      it 'should call the native selection path if configured' do
-        expect(ConditionalRelease::Service).to receive(:natively_enabled_for_account?).and_return(true)
-
-        assignment_ids = create_assignments([@course.id], 2)
-        expect(ConditionalRelease::OverrideHandler).to receive(:handle_assignment_set_selection).
-          with(@student, @assignment, "100").and_return(assignment_ids)
-        json = call_select_mastery_path @assignment_tag, "100", @student.id, expected_status: 200
-        expect(json['assignments'].map {|a| a['id']}).to eq assignment_ids
-      end
-
       context 'successful' do
         def cyoe_returns(assignment_ids)
-          cyoe_ids = assignment_ids.map {|id| { 'assignment_id' => "#{id}" }} # cyoe ids in strings
-          cyoe_response = { 'assignments' => cyoe_ids }
-          allow(ConditionalRelease::Service).to receive(:select_mastery_path).and_return({ code: '200', body: cyoe_response })
+          expect(ConditionalRelease::OverrideHandler).to receive(:handle_assignment_set_selection).and_return(assignment_ids)
         end
 
         it 'should return a list of assignments if the action is successful' do
@@ -1213,7 +1194,7 @@ describe "Module Items API", type: :request do
         rules = item.deep_symbolize_keys
         return false unless rules[:mastery_paths].present?
         rules[:mastery_paths][:assignment_sets].find do |set|
-          set[:assignments].find do |asg|
+          set[:assignment_set_associations].find do |asg|
             asg.key? :model
           end
         end
@@ -1234,42 +1215,16 @@ describe "Module Items API", type: :request do
                        :indent => 1, :updated_at => nil).publish!
           mod.publish
         end
-      end
 
-      before :each do
-        @resp = [{
-                  locked: false,
-                  trigger_assignment: @quiz.assignment_id,
-                  assignment_sets: [{
-                    id: 1,
-                    scoring_range_id: 1,
-                    created_at: @assignment.created_at,
-                    updated_at: @assignment.updated_at,
-                    position: 1,
-                    assignments: [{
-                      id: 1,
-                      assignment_id: @assignment.id,
-                      created_at: @assignment.created_at,
-                      updated_at: @assignment.updated_at,
-                      assignment_set_id: 1,
-                      position: 1
-                    }]
-                  }]
-                }]
-        allow(ConditionalRelease::Service).to receive_messages(headers_for: {}, submissions_for: [],
-          domain_for: "canvas.xyz", "enabled_in_context?" => true,
-          rules_summary_url: "cyoe.abc/rules", request_rules: @resp)
-      end
+        range = ConditionalRelease::ScoringRange.new(:lower_bound => 0.0, :upper_bound => 1.0, :assignment_sets => [
+          ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
+            ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @assignment.id)
+          ])
+        ])
+        @cyoe_rule = @course.conditional_release_rules.create!(:trigger_assignment_id => @quiz.assignment_id, :scoring_ranges => [range])
+        @course.enable_feature!(:conditional_release)
 
-      describe "CYOE interaction" do
-        it "makes a request to the CYOE service when included" do
-          expect(ConditionalRelease::Service).to receive(:request_rules).once
-
-          api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module1.id}/items?include[]=mastery_paths",
-            :controller => "context_module_items_api", :action => "index", :format => "json",
-            :course_id => @course.id.to_s, :module_id => @cyoe_module1.id.to_s,
-            :include => ['mastery_paths'])
-        end
+        graded_submission(@quiz, @student)
       end
 
       describe "module item list response data" do
@@ -1669,7 +1624,7 @@ describe "Module Items API", type: :request do
     describe 'POST select_mastery_path' do
       before do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
-        allow(ConditionalRelease::Service).to receive(:select_mastery_path).and_return({ code: '200', body: { 'assignments' => [] } })
+        allow(ConditionalRelease::OverrideHandler).to receive(:handle_assignment_set_selection).and_return([])
       end
 
       it 'should allow a mastery path' do

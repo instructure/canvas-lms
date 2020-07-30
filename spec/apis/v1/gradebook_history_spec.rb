@@ -176,6 +176,13 @@ describe Api::V1::GradebookHistory do
       harness.versions_json(course, versions, api_context)
       expect(versions.first.model.association(:originality_reports).loaded?).to eq true
     end
+
+    it "handles versions without an associated 'versionable' object" do
+      version = Version.create!(versionable: submission, model: submission)
+      version.update_column(:versionable_id, nil)
+      submission.reload
+      expect { harness.versions_json(course, [version], api_context) }.not_to raise_error
+    end
   end
 
   describe '#submissions_for' do

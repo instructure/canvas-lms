@@ -131,9 +131,7 @@ module Api::V1::DiscussionTopics
       json[:sections] = sections_json(topic.course_sections, user, session, section_includes)
     end
 
-    if topic.context.root_account.feature_enabled?(:student_planner)
-      json[:todo_date] = topic.todo_date
-    end
+    json[:todo_date] = topic.todo_date
 
     if opts[:root_topic_fields] && opts[:root_topic_fields].length > 0
       # If this is called from discussion_topics_api_json then we already

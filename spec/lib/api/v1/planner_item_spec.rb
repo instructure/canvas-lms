@@ -29,7 +29,6 @@ describe Api::V1::PlannerItem do
 
   before :once do
     course_factory active_all: true
-    @course.root_account.enable_feature!(:student_planner)
 
     teacher_in_course active_all: true
     @reviewer = student_in_course(course: @course, active_all: true).user

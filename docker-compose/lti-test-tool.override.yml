@@ -1,7 +1,7 @@
 # to use this add docker-compose/lti-test-tool.override.yml
 # to your COMPOSE_FILE var in .env
 
-version: '2'
+version: '2.3'
 services:
   web:
     links:

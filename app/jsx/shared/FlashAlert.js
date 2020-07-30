@@ -214,7 +214,7 @@ export function showFlashAlert({message, err, type = err ? 'error' : 'info', srO
     ReactDOM.render(
       <FlashAlert
         message={message}
-        timeout={isNaN(ENV.flashAlertTimeout) ? timeout : ENV.flashAlertTimeout}
+        timeout={Number.isNaN(parseInt(ENV.flashAlertTimeout, 10)) ? timeout : ENV.flashAlertTimeout}
         error={err}
         variant={type}
         onClose={closeAlert.bind(null, parent)} // eslint-disable-line react/jsx-no-bind

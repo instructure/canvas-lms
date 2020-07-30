@@ -775,6 +775,24 @@ describe Attachment do
   end
 
   context "clone_for" do
+    context 'with S3 storage enabled' do
+      subject { attachment.clone_for(context, nil, {force_copy: true}) }
+
+      let(:bank) { AssessmentQuestionBank.create!(context: course_model) }
+      let(:context) { AssessmentQuestion.create!(assessment_question_bank: bank) }
+      let(:attachment) { attachment_model(:filename => "blech.ppt", context: bank.context) }
+
+      before { s3_storage! }
+
+      context 'and the context has a nil root account' do
+        before { context.update_columns(root_account_id: nil) }
+
+        it 'does not raise an error' do
+          expect { subject }.not_to raise_exception
+        end
+      end
+    end
+
     it "should clone to another context" do
       a = attachment_model(:filename => "blech.ppt")
       course_factory
@@ -1280,6 +1298,7 @@ describe Attachment do
       expect(@a).to be_new_record
       expect(@a.read_attribute(:namespace)).to be_nil
       expect(@a.namespace).not_to be_nil
+      @a.set_root_account_id
       expect(@a.read_attribute(:namespace)).not_to be_nil
       expect(@a.root_account_id).to eq @account.id
     end
@@ -1303,6 +1322,7 @@ describe Attachment do
         Attachment.current_root_account = Account.default
         att = Attachment.new
         att.infer_namespace
+        att.set_root_account_id
         expect(att.namespace).to eq Account.default.asset_string
         expect(att.root_account_id).to eq Account.default.local_id
         @shard1.activate do
@@ -1318,6 +1338,7 @@ describe Attachment do
           Attachment.current_root_account = a
           att = Attachment.new
           att.infer_namespace
+          att.set_root_account_id
           expect(att.namespace).to eq a.global_asset_string
           expect(att.root_account_id).to eq a.local_id
         end
@@ -1331,6 +1352,7 @@ describe Attachment do
           a = Account.create!
           att = Attachment.new
           att.namespace = a.asset_string
+          att.set_root_account_id
           expect(att.root_account_id).to eq a.local_id
         end
         expect(att.root_account_id).to eq a.global_id
@@ -1342,6 +1364,7 @@ describe Attachment do
         @shard1.activate do
           att = Attachment.new
           att.infer_namespace
+          att.set_root_account_id
           expect(att.namespace).to eq Account.default.global_asset_string
           expect(att.root_account_id).to eq Account.default.global_id
         end
@@ -1663,24 +1686,22 @@ describe Attachment do
       # create a student to receive notifications
       @student = user_model
       @student.register!
-      e = @course.enroll_student(@student).accept
-      @cc = @student.communication_channels.create(:path => "default@example.com")
-      @cc.confirm!
+      @course.enroll_student(@student).accept
+      cc = communication_channel(@student, {username: 'default@example.com', active_cc: true})
 
       @student_ended = user_model
       @student_ended.register!
       @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
       @course.enroll_student(@student_ended, :section => @section_ended).accept
-      @cc_ended = @student_ended.communication_channels.create(:path => "default2@example.com")
-      @cc_ended.confirm!
+      cc_ended = communication_channel(@student_ended, {username: 'default2@example.com', active_cc: true})
 
-      NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added'), :communication_channel => @cc, :frequency => "immediately")
-      NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added'), :communication_channel => @cc, :frequency => "immediately")
+      NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added'), :communication_channel => cc, :frequency => "immediately")
+      NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added'), :communication_channel => cc, :frequency => "immediately")
 
       NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added - ended'),
-                                :communication_channel => @cc_ended, :frequency => "immediately")
+                                :communication_channel => cc_ended, :frequency => "immediately")
       NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added - ended'),
-                                :communication_channel => @cc_ended, :frequency => "immediately")
+                                :communication_channel => cc_ended, :frequency => "immediately")
     end
 
     it "should send a single-file notification" do
@@ -1762,8 +1783,7 @@ describe Attachment do
 
     it "should not send notifications to students if the file is uploaded to a locked folder" do
       @teacher.register!
-      cc = @teacher.communication_channels.create!(:path => "default@example.com")
-      cc.confirm!
+      cc = communication_channel(@teacher, {username: 'default@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
@@ -1781,8 +1801,7 @@ describe Attachment do
 
     it "should not send notifications to students if the file is unpublished because of usage rights" do
       @teacher.register!
-      cc = @teacher.communication_channels.create!(:path => "default@example.com")
-      cc.confirm!
+      cc = communication_channel(@teacher, {username: 'default@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       @course.usage_rights_required = true
@@ -1801,8 +1820,7 @@ describe Attachment do
 
     it "should not send notifications to students if the files navigation is hidden from student view" do
       @teacher.register!
-      cc = @teacher.communication_channels.create!(:path => "default@example.com")
-      cc.confirm!
+      cc = communication_channel(@teacher, {username: 'default@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')

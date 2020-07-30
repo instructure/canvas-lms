@@ -211,7 +211,6 @@ describe "calendar2" do
 
   context "to-do dates" do
     before :once do
-      Account.default.enable_feature!(:student_planner)
       @course = Course.create!(name: "Course 1")
       @course.offer!
       @student1 = User.create!(name: 'Student 1')

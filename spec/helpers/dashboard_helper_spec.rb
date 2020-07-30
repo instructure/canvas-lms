@@ -50,7 +50,6 @@ describe DashboardHelper do
     end
 
     it "should return 'planner' if set" do
-      @course.root_account.enable_feature!(:student_planner)
       @current_user.dashboard_view = 'planner'
       @current_user.save!
       expect(user_dashboard_view).to eq 'planner'

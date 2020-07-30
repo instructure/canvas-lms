@@ -1898,9 +1898,6 @@ class Submission < ActiveRecord::Base
     self.shard.activate do
       return unless self.graded? && self.posted?
       # use request caches to handle n+1's when updating a lot of submissions in the same course in one request
-      return unless RequestCache.cache('conditional_release_native', self.root_account_id) do
-        ConditionalRelease::Service.natively_enabled_for_account?(self.root_account)
-      end
       return unless RequestCache.cache('conditional_release_feature_enabled', self.course_id) do
         self.course.feature_enabled?(:conditional_release)
       end

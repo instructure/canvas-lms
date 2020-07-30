@@ -80,6 +80,7 @@ class Account < ActiveRecord::Base
   has_many :content_migrations, :as => :context, :inverse_of => :context
   has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
   has_one :outcome_proficiency, dependent: :destroy
+  has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :auditor_authentication_records,
     class_name: "Auditors::ActiveRecord::AuthenticationRecord",
@@ -185,6 +186,10 @@ class Account < ActiveRecord::Base
     outcome_proficiency || parent_account&.resolved_outcome_proficiency
   end
 
+  def resolved_outcome_calculation_method
+    outcome_calculation_method&.active? ? outcome_calculation_method : parent_account&.resolved_outcome_calculation_method
+  end
+
   include ::Account::Settings
   include ::Csp::AccountHelper
 
@@ -285,6 +290,9 @@ class Account < ActiveRecord::Base
   # privacy settings for root accounts
   add_setting :enable_fullstory, boolean: true, root_only: true, default: true
   add_setting :enable_google_analytics, boolean: true, root_only: true, default: true
+
+  add_setting :lock_outcome_proficiency, boolean: true, default: false, inheritable: true
+  add_setting :lock_proficiency_calculation, boolean: true, default: false, inheritable: true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -1578,7 +1586,7 @@ class Account < ActiveRecord::Base
     tabs += external_tool_tabs(opts, user)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
     tabs << { :id => TAB_ADMIN_TOOLS, :label => t('#account.tab_admin_tools', "Admin Tools"), :css_class => 'admin_tools', :href => :account_admin_tools_path } if can_see_admin_tools_tab?(user)
-    if user && grants_right?(user, :moderate_user_content) && root_account.feature_enabled?(:eportfolio_moderation)
+    if user && grants_right?(user, :moderate_user_content)
       tabs << {
         id: TAB_EPORTFOLIO_MODERATION,
         label: t("ePortfolio Moderation"),
@@ -1592,11 +1600,7 @@ class Account < ActiveRecord::Base
   end
 
   def can_see_rubrics_tab?(user)
-    if root_account.feature_enabled?(:decouple_rubrics)
-      user && self.grants_right?(user, :manage_rubrics)
-    else
-      user && self.grants_right?(user, :manage_outcomes)
-    end
+    user && self.grants_right?(user, :manage_rubrics)
   end
 
   def can_see_admin_tools_tab?(user)
@@ -1872,7 +1876,7 @@ class Account < ActiveRecord::Base
 
   # Different views are available depending on feature flags
   def dashboard_views
-    ['activity', 'cards'].tap {|views| views << 'planner' if root_account.feature_enabled?(:student_planner)}
+    ['activity', 'cards', 'planner']
   end
 
   # Getter/Setter for default_dashboard_view account setting

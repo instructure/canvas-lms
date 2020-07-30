@@ -25,6 +25,7 @@ describe "/shared/errors/_error_form" do
     view_context
     render :partial => "shared/errors/error_form"
     expect(response).not_to be_nil
+    expect(response).to include("error[user_roles]")
   end
 end
 

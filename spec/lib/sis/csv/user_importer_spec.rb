@@ -756,7 +756,7 @@ describe SIS::CSV::UserImporter do
     notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
     user1 = User.create!(:name => 'User Uno')
     user1.pseudonyms.create!(:unique_id => 'user1', :account => @account)
-    user1.communication_channels.create!(:path => 'user@example.com') { |cc| cc.workflow_state = 'active' }
+    communication_channel(user1, {username: 'user@example.com', active_cc: true})
 
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
@@ -846,7 +846,7 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active"
     )
     user1 = Pseudonym.by_unique_id('user1').first.user
-    user1.communication_channels.create!(:path => 'JT@instructure.com')
+    communication_channel(user1, {username: 'JT@instructure.com'})
 
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
@@ -879,7 +879,7 @@ describe SIS::CSV::UserImporter do
     notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
     user1 = User.create!(:name => 'User Uno')
     user1.pseudonyms.create!(:unique_id => 'user1', :account => @account)
-    user1.communication_channels.create!(:path => 'user1@example.com') { |cc| cc.workflow_state = 'active' }
+    communication_channel(user1, {username: 'user1@example.com', active_cc: true})
 
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
@@ -907,9 +907,9 @@ describe SIS::CSV::UserImporter do
   it "should not send merge opportunity notifications if the conflicting cc is retired or unconfirmed" do
     notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
     u1 = User.create! { |u| u.workflow_state = 'registered' }
-    cc1 = u1.communication_channels.create!(:path => 'user1@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired' }
+    cc1 = communication_channel(u1, {username: 'user1@example.com', cc_state: 'retired'})
     u2 = User.create! { |u| u.workflow_state = 'registered'}
-    cc2 = u2.communication_channels.create!(:path => 'user1@example.com', :path_type => 'email')
+    cc2 = communication_channel(u2, {username: 'user1@example.com'})
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
@@ -1036,7 +1036,7 @@ describe SIS::CSV::UserImporter do
     expect(user1.communication_channels.count).to eq 1
     expect(user1.communication_channels.first.path).to eq 'user1@example.com'
     expect(p.sis_communication_channel_id).to eq p.communication_channel_id
-    user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+    communication_channel(user1, {username: 'user2@example.com', active_cc: true})
 
     # change to user2@example.com; because user1@example.com was sis created, it should disappear
     process_csv_data_cleanly(
@@ -1055,7 +1055,7 @@ describe SIS::CSV::UserImporter do
   end
 
   it "should work when a communication channel already exists, but there's no sis_communication_channel" do
-    importer = process_csv_data_cleanly(
+    process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,,active"
     )
@@ -1066,9 +1066,9 @@ describe SIS::CSV::UserImporter do
     expect(p.communication_channel_id).to be_nil
     expect(user1.communication_channels.count).to eq 0
     expect(p.sis_communication_channel_id).to be_nil
-    user1.communication_channels.create!(:path => 'user2@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+    communication_channel(user1, {username: 'user2@example.com', active_cc: true})
 
-    importer = process_csv_data_cleanly(
+    process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user2@example.com,active"
     )

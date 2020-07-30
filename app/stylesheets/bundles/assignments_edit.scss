@@ -238,6 +238,15 @@ div.form-column-right, div.overrides-column-right {
   #discussion_topic_assignment_points_possible[readonly] {
     margin-top: -3px;
   }
+
+  // File inputs can take up 205px of width as of this comment. Issues can arise
+  // when width: auto; was set by bootstrap. This fixes the file input from
+  // creating a horizontal scrollbar. 
+  @media (max-width: 400px) {
+    input[type="file"] {
+      width: 100%; 
+    }
+  }
 }
 
 .GradeAnonymously__Checkbox {

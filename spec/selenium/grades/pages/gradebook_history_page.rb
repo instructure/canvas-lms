@@ -51,7 +51,7 @@ class GradeBookHistory
     end
 
     def enter_assignment_name(assignment_name)
-      assignment_name_textfield.send_keys(assignment_name)
+      replace_content(assignment_name_textfield, assignment_name)
       wait_for_ajaximations
     end
 

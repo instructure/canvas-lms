@@ -269,7 +269,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def manually_created?
-    cached_developer_key == DeveloperKey.default
+    developer_key_id == DeveloperKey.default.id
   end
 
   private

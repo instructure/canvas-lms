@@ -61,8 +61,7 @@ describe "profile communication settings" do
   end
 
   it "should display an SMS number as channel" do
-    channel = @user.communication_channels.create(:path => "8011235555@vtext.com", :path_type => "sms")
-    channel.confirm
+    communication_channel(@user, {username: '8011235555@vtext.com', path_type: 'sms', active_cc: true})
     get "/profile/communication"
     wait_for_ajaximations
     expect(fj('tr.grouping:first th.comm-channel:last')).to include_text('Cell Number')
@@ -82,7 +81,7 @@ describe "profile communication settings" do
   end
 
   let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
-  let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: 'push') }
+  let(:sns_channel) { communication_channel(@user, {username: 'push', path_type: CommunicationChannel::TYPE_PUSH}) }
 
   it "should display an sns channel" do
     sns_channel
@@ -128,8 +127,7 @@ describe "profile communication settings" do
   end
 
   it "should load an existing frequency setting and save a change" do
-    channel = @user.communication_channels.create(:path => "8011235555@vtext.com", :path_type => "email")
-    channel.confirm
+    channel = communication_channel(@user, {username: '8011235555@vtext.com', active_cc: true})
     # Create a notification policy entry as an existing setting.
     policy = NotificationPolicy.new(:communication_channel_id => channel.id, :notification_id => @sub_comment.id)
     policy.frequency = Notification::FREQ_DAILY

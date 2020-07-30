@@ -26,12 +26,6 @@ module ConditionalRelease
     end
 
     context 'handle_grade_change' do
-      it "should require native conditional release" do
-        expect(ConditionalRelease::Service).to receive(:natively_enabled_for_account?).and_return(false).once
-        expect(ConditionalRelease::OverrideHandler).to_not receive(:handle_grade_change)
-        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
-      end
-
       it "should check that the assignment is actually a trigger assignment" do
         @rule.destroy!
         expect(ConditionalRelease::OverrideHandler).to_not receive(:handle_grade_change)

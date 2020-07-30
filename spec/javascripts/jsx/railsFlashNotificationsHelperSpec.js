@@ -88,9 +88,9 @@ QUnit.module('RailsFlashNotificationsHelper#generateNodeHTML', {
 test('properly injects type, icon, and content into html', () => {
   const result = helper.generateNodeHTML('success', 'Some Data')
 
-  ok(result.search('class="ic-flash-success"') !== -1)
-  ok(result.search('class="icon-check"') !== -1)
-  ok(result.search('Some Data') !== -1)
+  notStrictEqual(result.search('class="ic-flash-success"'), -1)
+  notStrictEqual(result.search('class="icon-check"'), -1)
+  notStrictEqual(result.search('Some Data'), -1)
 })
 
 QUnit.module('RailsFlashNotificationsHelper#createNode', {
@@ -148,6 +148,33 @@ test('closes when the close button is clicked', () => {
   $(button[0]).click()
 
   equal(holder.firstChild, null)
+})
+
+test('respects timeout parameter if ENV.flashAlertTimeout variable is not set', () => {
+  const clock = sinon.useFakeTimers()
+
+  helper.initHolder()
+  helper.createNode('success', 'Closable Alert', 11000)
+
+  clock.tick(12000)
+  const holder = document.getElementById('flash_message_holder')
+
+  equal(holder.firstChild, null)
+  clock.restore()
+})
+
+test('forces ENV.flashAlertTimeout if variable is set', () => {
+  const clock = sinon.useFakeTimers()
+  ENV.flashAlertTimeout = 86400000
+
+  helper.initHolder()
+  helper.createNode('success', 'Closable Alert', 11000)
+
+  clock.tick(12000)
+  const holder = document.getElementById('flash_message_holder')
+
+  notEqual(holder.firstChild, null)
+  clock.restore()
 })
 
 test('closes when the alert is clicked', () => {
@@ -300,19 +327,19 @@ QUnit.module('RailsFlashNotificationsHelper#generateScreenreaderNodeHTML', {
 test('properly injects content into html', () => {
   const result = helper.generateScreenreaderNodeHTML('Some Data')
 
-  ok(result.search('Some Data') !== -1)
+  notStrictEqual(result.search('Some Data'), -1)
 })
 
 test('properly includes the indication to close when given true', () => {
   const result = helper.generateScreenreaderNodeHTML('Some Data', true)
 
-  ok(result.search(htmlEscape(I18n.t('close', 'Close'))) !== -1)
+  notStrictEqual(result.search(htmlEscape(I18n.t('close', 'Close'))), -1)
 })
 
 test('properly excludes the indication to close when given false', () => {
   const result = helper.generateScreenreaderNodeHTML('Some Data', false)
 
-  ok(result.search(htmlEscape(I18n.t('close', 'Close'))) == -1)
+  equal(result.search(htmlEscape(I18n.t('close', 'Close'))), -1)
 })
 
 QUnit.module('RailsFlashNotificationsHelper#createScreenreaderNode', {

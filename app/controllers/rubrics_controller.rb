@@ -24,11 +24,7 @@ class RubricsController < ApplicationController
   include Api::V1::Outcome
 
   def index
-    permission = if @domain_root_account.feature_enabled?(:rubrics_in_course_navigation)
-      @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
-    else
-      @context.is_a?(User) ? :manage : :manage_rubrics
-    end
+    permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
     return unless authorized_action(@context, @current_user, permission)
     js_env :ROOT_OUTCOME_GROUP => get_root_outcome,
       :PERMISSIONS => {
@@ -47,11 +43,7 @@ class RubricsController < ApplicationController
   end
 
   def show
-    permission = if @domain_root_account.feature_enabled?(:rubrics_in_course_navigation)
-      @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
-    else
-      @context.is_a?(User) ? :manage : :manage_rubrics
-    end
+    permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
     return unless authorized_action(@context, @current_user, permission)
     if (id = params[:id]) =~ Api::ID_REGEX
       js_env :ROOT_OUTCOME_GROUP => get_root_outcome,

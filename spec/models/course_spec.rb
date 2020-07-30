@@ -1566,6 +1566,50 @@ describe Course do
       expect(@course.course_section_visibility(worthless_loser)).to eq []
     end
   end
+
+  context 'resolved_outcome_calculation_method' do
+    it "retrieves account's outcome calculation method" do
+      root_account = Account.create!
+      method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      course = course_model(account: root_account)
+      expect(course.outcome_calculation_method).to eq nil
+      expect(course.resolved_outcome_calculation_method).to eq method
+    end
+
+    it "can retrieve ancestor account's outcome calculation method" do
+      root_account = Account.create!
+      subaccount = root_account.sub_accounts.create!
+      method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      course = course_model(account: subaccount)
+      expect(course.outcome_calculation_method).to eq nil
+      expect(course.resolved_outcome_calculation_method).to eq method
+    end
+
+    it "can retrieve own outcome calculation method" do
+      root_account = Account.create!
+      OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      course = course_model(account: root_account)
+      course_method = OutcomeCalculationMethod.create! context: course, calculation_method: :latest
+      expect(course.outcome_calculation_method).to eq course_method
+      expect(course.resolved_outcome_calculation_method).to eq course_method
+    end
+
+    it "can be nil" do
+      root_account = Account.create!
+      course = course_model(account: root_account)
+      expect(course.outcome_calculation_method).to eq nil
+      expect(course.resolved_outcome_calculation_method).to eq nil
+    end
+
+    it "ignores soft deleted calculation methods" do
+      root_account = Account.create!
+      account_method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      course = course_model(account: root_account)
+      course_method = OutcomeCalculationMethod.create! context: course, calculation_method: :latest, workflow_state: :deleted
+      expect(course.outcome_calculation_method).to eq course_method
+      expect(course.resolved_outcome_calculation_method).to eq account_method
+    end
+  end
 end
 
 
@@ -2364,7 +2408,6 @@ describe Course, "tabs_available" do
   context "teachers" do
     before :once do
       course_with_teacher(:active_all => true)
-      @course.root_account.enable_feature!(:rubrics_in_course_navigation)
     end
 
     it "should return the defaults if nothing specified" do
@@ -2459,12 +2502,6 @@ describe Course, "tabs_available" do
       @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_announcements', :enabled => false)
       tab_ids = @course.uncached_tabs_available(@teacher, include_hidden_unused: true).map{|t| t[:id] }
       expect(tab_ids).to_not include(Course::TAB_ANNOUNCEMENTS)
-    end
-
-    it "should not include Rubrics when the rubrics_in_course_navigation FF is disabled" do
-      @course.root_account.disable_feature!(:rubrics_in_course_navigation)
-      tab_ids = @course.tabs_available(@teacher)
-      expect(tab_ids).to_not include(Course::TAB_RUBRICS)
     end
   end
 
@@ -4088,20 +4125,6 @@ describe Course, 'tabs_available' do
     tabs = @course.external_tool_tabs({}, User.new)
     expect(tabs.map{|t| t[:id]}).to include(tool.asset_string)
   end
-
-  context 'rubrics tab' do
-    it 'hides the tab when the FF is not enabled' do
-      @course.root_account.disable_feature!(:rubrics_in_course_navigation)
-      tab_ids = @course.tabs_available(@teacher).map{|t| t[:id]}
-      expect(tab_ids).not_to include(Course::TAB_RUBRICS)
-    end
-
-    it 'does not hide the tab when the FF is enabled' do
-      @course.root_account.enable_feature!(:rubrics_in_course_navigation)
-      tab_ids = @course.tabs_available(@teacher).map{|t| t[:id]}
-      expect(tab_ids).to include(Course::TAB_RUBRICS)
-    end
-  end
 end
 
 describe Course, 'tab_hidden?' do
@@ -5335,7 +5358,7 @@ describe Course do
   describe 'grade weight notification' do
     before :once do
       course_with_student(:active_all => true)
-      @student.communication_channels.create!(:path => 'test@example.com').confirm!
+      communication_channel(@student, {username: 'test@example.com', active_cc: true})
       n = Notification.create!(name: 'Grade Weight Changed', category: 'TestImmediately')
       NotificationPolicy.create!(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
     end

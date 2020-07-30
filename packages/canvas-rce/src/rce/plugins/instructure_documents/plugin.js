@@ -19,6 +19,7 @@
 import formatMessage from '../../../format-message'
 import clickCallback from './clickCallback'
 import bridge from '../../../bridge'
+import {isOKToLink} from '../../contentInsertionUtils'
 
 const COURSE_PLUGIN_KEY = 'course_documents'
 const USER_PLUGIN_KEY = 'user_documents'
@@ -99,6 +100,15 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
       fetch(callback) {
         const items = menuItems
         callback(items)
+      },
+      onSetup(api) {
+        function handleNodeChange(_e) {
+          api.setDisabled(!isOKToLink(ed.selection.getContent()))
+        }
+        ed.on('NodeChange', handleNodeChange)
+        return () => {
+          ed.off('NodeChange', handleNodeChange)
+        }
       }
     })
   }

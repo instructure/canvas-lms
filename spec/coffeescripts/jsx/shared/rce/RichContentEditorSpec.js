@@ -62,6 +62,13 @@ test("freshNode returns the given element if it's not on the dom", () => {
   equal($el, $fresh)
 })
 
+test("node2jquery returns the given element is null'", () => {
+  const $el = null
+  const $empty_node = $()
+  const $fresh = RichContentEditor.node2jquery($el)
+  deepEqual($empty_node, $fresh)
+})
+
 QUnit.module('RichContentEditor - preloading', {
   setup() {
     fakeENV.setup()

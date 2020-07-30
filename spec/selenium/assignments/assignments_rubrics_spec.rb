@@ -46,8 +46,7 @@ describe "assignment rubrics" do
     end
 
     it "should add a new rubric", priority: "2", test_id: 56587 do
-      get "/courses/#{@course.id}/outcomes"
-      expect_new_page_load{f(' .manage_rubrics').click}
+      get "/courses/#{@course.id}/rubrics"
 
       expect do
        f('.add_rubric_link').click

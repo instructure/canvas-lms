@@ -1119,6 +1119,16 @@ Only available when launched as an assignment.
 ```
 true
 ```
+## Canvas.assignment.lockdownEnabled
+Returns true if the assignment is LDB enabled.
+Only available when launched as an assignment.
+
+**Availability**: *when launched as an assignment*  
+
+
+```
+true
+```
 ## LtiLink.custom.url
 Returns the endpoint url for accessing link-level tool settings
 Only available for LTI 2.0.

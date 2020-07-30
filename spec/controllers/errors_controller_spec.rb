@@ -46,11 +46,13 @@ describe ErrorsController do
         error: {
           url: "someurl",
           message: "BigError",
-          email: "testerrors42@example.com"
+          email: "testerrors42@example.com",
+          user_roles: "user,student"
         }
       }
       assert_recorded_error
       expect(ErrorReport.last.email).to eq("testerrors42@example.com")
+      expect(ErrorReport.last.data["user_roles"]).to eq("user,student")
     end
 
     it "doesnt need authentication" do

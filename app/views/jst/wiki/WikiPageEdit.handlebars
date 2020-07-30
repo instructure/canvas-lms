@@ -29,6 +29,7 @@
   {{#if content_is_locked}}
     {{{body}}}
   {{else}}
+    <label for="wiki_page_body" class="hidden-readable" aria-hidden="true">{{#t}}Raw HTML Editor{{/t}}</label>
     <textarea id="wiki_page_body" rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{convertApiUserContent body forEditing=1}}</textarea>
   {{/if}}
 

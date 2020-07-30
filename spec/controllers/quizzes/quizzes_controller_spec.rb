@@ -1966,7 +1966,7 @@ describe Quizzes::QuizzesController do
 
         @section = @course.course_sections.create!
 
-        @student.communication_channels.create(:path => "student@instructure.com").confirm!
+        communication_channel(@student, {username: 'student@instructure.com', active_cc: true})
         @student.email_channel.notification_policies.create!(notification: @notification,
                                                              frequency: 'immediately')
 

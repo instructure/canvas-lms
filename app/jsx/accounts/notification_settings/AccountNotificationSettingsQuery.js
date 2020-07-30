@@ -46,6 +46,8 @@ export default function AccountNotificationSettingsQuery(props) {
 
   return (
     <AccountNotificationSettingsManager
+      accountId={props.accountId}
+      userId={props.userId}
       notificationPreferences={data?.legacyNode?.notificationPreferences}
     />
   )

@@ -18,11 +18,6 @@
 
 import groovy.time.*
 
-def runDatadogMetric(name, extraTags, body) {
-  def dd = load('build/new-jenkins/groovy/datadog.groovy')
-  dd.runDataDogForMetricWithExtraTags(name,extraTags,body)
-}
-
 /**
  * appends stages to the nodes based on the count passed into
  * the closure.
@@ -46,17 +41,12 @@ def appendStagesAsBuildNodes(nodes,
     def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     def timeStart = new Date()
     nodes[stage_name] = {
-      node("canvas-$test_label-docker") {
+      protectedNode("canvas-$test_label-docker") {
         def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
         // make sure to unstash
         unstash name: "build-dir"
         unstash name: "build-docker-compose"
-        def splunk = load 'build/new-jenkins/groovy/splunk.groovy'
-        splunk.upload([splunk.eventForNodeWait(stage_name, duration)])
-        def extraTags = ["parallelStageName:${stage_name}"]
-        runDatadogMetric(test_label,extraTags) {
-          stage_block(index)
-        }
+        stage_block(index)
       }
 
       // mark with instance index.

@@ -23,12 +23,13 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-layout'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
+import WithBreakpoints, {breakpointsShape} from '../shared/WithBreakpoints'
 
 import {showFlashError} from '../shared/FlashAlert'
 import I18n from 'i18n!grade_summary'
 import SelectMenu from './SelectMenu'
 
-export default class SelectMenuGroup extends React.Component {
+class SelectMenuGroup extends React.Component {
   static propTypes = {
     assignmentSortOptions: PropTypes.arrayOf(PropTypes.array).isRequired,
     courses: PropTypes.arrayOf(
@@ -58,11 +59,13 @@ export default class SelectMenuGroup extends React.Component {
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired
       })
-    ).isRequired
+    ).isRequired,
+    breakpoints: breakpointsShape
   }
 
   static defaultProps = {
-    selectedGradingPeriodID: null
+    selectedGradingPeriodID: null,
+    breakpoints: {}
   }
 
   constructor(props) {
@@ -158,8 +161,14 @@ export default class SelectMenuGroup extends React.Component {
   }
 
   render() {
+    const isVertical = !this.props.breakpoints.miniTablet
     return (
-      <Flex alignItems="end" wrapItems margin="0 0 small 0">
+      <Flex
+        alignItems={isVertical ? 'start' : 'end'}
+        wrapItems
+        margin="0 0 small 0"
+        direction={isVertical ? 'column' : 'row'}
+      >
         <Flex.Item>
           {this.props.students.length > 1 && (
             <SelectMenu
@@ -216,7 +225,7 @@ export default class SelectMenuGroup extends React.Component {
           />
         </Flex.Item>
 
-        <Flex.Item margin="0 0 0 small">
+        <Flex.Item margin={isVertical ? 'small 0 0 0' : '0 0 0 small'}>
           <Button
             disabled={this.state.processing || this.noSelectMenuChanged()}
             id="apply_select_menus"
@@ -237,3 +246,5 @@ export default class SelectMenuGroup extends React.Component {
     )
   }
 }
+
+export default WithBreakpoints(SelectMenuGroup)

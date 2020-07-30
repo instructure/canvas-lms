@@ -35,10 +35,6 @@ export default class ShowOnFocusButton extends Component {
     children: node.isRequired
   }
 
-  static defaultProps = {
-    buttonRef: () => {}
-  }
-
   state = {
     visible: false
   }

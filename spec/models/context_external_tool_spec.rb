@@ -20,10 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextExternalTool do
   before(:once) do
-    course_model
-    @root_account = @course.root_account
+    @root_account = Account.default
     @account = account_model(:root_account => @root_account, :parent_account => @root_account)
-    @course.update_attribute(:account, @account)
+    course_model(:account => @account)
   end
 
   describe 'associations' do

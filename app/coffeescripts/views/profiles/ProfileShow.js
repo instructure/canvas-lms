@@ -125,6 +125,16 @@ export default class ProfileShow extends Backbone.View {
           if (value && value.length > 255) {
             return I18n.t('profile_title_too_long', 'Title is too long')
           }
+        },
+        'user_profile[bio]': function(value) {
+          if (value && value.length > 65536) {
+            return I18n.t('profile_bio_too_long', 'Bio is too long')
+          }
+        },
+        'link_urls[]': function(value) {
+          if (value && /\s/.test(value)) {
+            return I18n.t('invalid_url', 'Invalid URL')
+          }
         }
       }
     }

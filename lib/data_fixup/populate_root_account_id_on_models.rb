@@ -63,6 +63,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       AssignmentGroup => :context,
       AssignmentOverride => :assignment,
       AssignmentOverrideStudent => :assignment,
+      AttachmentAssociation => %i[course group submission attachment], # attachment is last, only used if context is a ConversationMessage
       CalendarEvent => [:context_course, :context_group, :context_course_section],
       ContentMigration => [:account, :course, :group],
       ContentParticipation => :content,
@@ -140,7 +141,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   # job cycle this backfill provides
   #
   # Each key points to a code module. This module is expected to have a
-  # `populate` method that takes `(table, assoc, min, max)`.
+  # `populate` method that takes `(min, max)`.
   #
   # Tables that are listed here must be also listed in the `migration_tables`
   # hash above, and may list their non-association dependencies in the
@@ -396,7 +397,7 @@ module DataFixup::PopulateRootAccountIdOnModels
         account_id_column = create_column_names(reflection, columns)
         scope = table.where(primary_key_field => batch_min..batch_max, root_account_id: nil)
         scope.joins(assoc).update_all("root_account_id = #{account_id_column}")
-        fill_cross_shard_associations(scope, reflection, account_id_column) unless table == Wiki
+        fill_cross_shard_associations(table, scope, reflection, account_id_column) unless table == Wiki
       end
     end
 
@@ -414,9 +415,15 @@ module DataFixup::PopulateRootAccountIdOnModels
     names.count == 1 ? names.first : "COALESCE(#{names.join(', ')})"
   end
 
-  def self.fill_cross_shard_associations(scope, reflection, column)
+  def self.fill_cross_shard_associations(table, scope, reflection, column)
     reflection = reflection.through_reflection if reflection.through_reflection?
     foreign_key = reflection.foreign_key
+
+    # is this a polymorphic reflection like `context`? If so, limit the query
+    # and updates to just the context type of this association
+    poly_ref = find_polymorphic_reflection(table, reflection)
+    scope = scope.where("#{poly_ref.foreign_type} = '#{reflection.class_name}'") if poly_ref
+
     min = scope.where("#{foreign_key} > ?", Shard::IDS_PER_SHARD).minimum(foreign_key)
     while min
       # one shard at a time

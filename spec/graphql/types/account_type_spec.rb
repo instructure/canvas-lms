@@ -46,6 +46,22 @@ describe Types::AccountType do
     ).to eq OutcomeProficiencyRating.all.map { |r| r.id.to_s }.sort
   end
 
+  context 'outcome_calculation_method field' do
+    it 'works' do
+      outcome_calculation_method_model(account)
+      expect(
+        account_type.resolve('outcomeCalculationMethod { _id }')
+      ).to eq account.outcome_calculation_method.id.to_s
+    end
+
+    it 'requires read permission' do
+      outcome_calculation_method_model(account)
+      expect(
+        account_type.resolve('outcomeCalculationMethod { _id }', current_user: @student)
+      ).to be_nil
+    end
+  end
+
   it 'works for courses' do
     expect(account_type.resolve('coursesConnection { nodes { _id } }', current_user: @admin)).to eq [@course.id.to_s]
   end

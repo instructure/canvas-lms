@@ -31,7 +31,8 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
-  self.ignored_columns = %i[type creation_unique_id creation_sis_batch_id creation_email sis_name bio merge_to unread_inbox_items_count visibility account_pronoun_id]
+  self.ignored_columns = %i[type creation_unique_id creation_sis_batch_id creation_email
+                            sis_name bio merge_to unread_inbox_items_count visibility account_pronoun_id gender birthdate]
 
 
   include Context
@@ -1583,8 +1584,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  def send_scores_in_emails?(root_account)
-    preferences[:send_scores_in_emails] == true && root_account.settings[:allow_sending_scores_in_emails] != false
+  def send_scores_in_emails?(course)
+    root_account = course.root_account
+    return false if root_account.settings[:allow_sending_scores_in_emails] == false
+    pref = get_preference(:send_scores_in_emails_override, "course_" + course.global_id.to_s)
+    pref = preferences[:send_scores_in_emails] if pref.nil?
+    !!pref
   end
 
   def send_observed_names_in_notifications?
@@ -1602,6 +1607,10 @@ class User < ActiveRecord::Base
 
   def prefers_high_contrast?
     !!feature_enabled?(:high_contrast)
+  end
+
+  def prefers_no_toast_timeout?
+    !!feature_enabled?(:disable_alert_timeouts)
   end
 
   def prefers_no_celebrations?
@@ -2973,6 +2982,7 @@ class User < ActiveRecord::Base
       root_account.all_enrollments.where(user_id: self, workflow_state: 'active').distinct.pluck(:type)
     end
     roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
+    roles << 'fake_student' if fake_student?
     roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
     roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
     account_users = Shackles.activate(:slave) do

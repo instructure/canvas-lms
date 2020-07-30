@@ -57,7 +57,7 @@ def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
   sh "mv coverage ${prefix}_coverage"
   archiveArtifacts(artifacts: "${prefix}_coverage_nodes/**")
   archiveArtifacts(artifacts: "${prefix}_coverage/**")
-  
+
   cleanupCoverage(prefix)
 }
 
@@ -135,7 +135,6 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
     buildIndexPage(failureCategories)
     htmlFiles = findFiles glob: '**/index.html'
   }
-  uploadSplunkFailures(failureCategories)
 
   def report_name = "spec-failure-$prefix"
   def report_url = "${BUILD_URL}${report_name}"
@@ -184,18 +183,6 @@ def buildIndexPage(failureCategories) {
   }
   indexHtml += "</body>"
   writeFile file: "index.html", text: indexHtml
-}
-
-def uploadSplunkFailures(failureCategories) {
-  def splunk = load 'build/new-jenkins/groovy/splunk.groovy'
-  def splunkFailureEvents = []
-  failureCategories.each {category, failures ->
-    failures.each { failure ->
-      def spec = (failure =~ /.*spec_failures\/(.*)\/index/)[0][1]
-      splunkFailureEvents.add(splunk.eventForTestFailure(spec, category))
-    }
-  }
-  splunk.upload(splunkFailureEvents)
 }
 
 def snykCheckDependencies(projectImage, projectDirectory) {

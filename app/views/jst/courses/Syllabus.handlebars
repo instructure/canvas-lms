@@ -1,18 +1,10 @@
 <div id="syllabus_links">
-  {{#if overrides_present}}
-    <a id="toggle_special_dates_in_syllabus" class="shown" href="#">
-      <span class="hide">{{#t "syllabus.hide_specific_dates"}}Hide section, group, and person specific dates{{/t}}</span>
-      <span class="show">{{#t "syllabus.show_specific_dates"}}Show section, group, and person specific dates{{/t}}</span>
-    </a>
-  {{else}}
-    &nbsp;
-  {{/if}}
 </div>
 <table id="syllabus" class="ic-Table ic-Table--condensed">
   <thead>
     <tr>
       <th scope="col" style="width: 25%;">{{#t "headers.date"}}Date{{/t}}</th>
-      <th scope="col" style="width: 75%;">
+      <th scope="col" colspan="2" style="width: 75%;">
         <div style="float: right;"></div>
         {{#t "headers.details"}}Details{{/t}}
       </th>
@@ -20,69 +12,67 @@
   </thead>
   <tbody>
     {{#each dates}}
-    <tr class="date{{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}}">
-      <td scope="row" valign="top" class="day_date" data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}">
+    {{#each events}}
+
+    <tr
+      class="date detail_list {{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}} syllabus_{{type}} related-{{related_id}}{{#if override}} special_date{{/if}}"
+      data-workflow-state="{{workflow_state}}">
+      {{#if @first}}
+      <td scope="row" rowspan="{{eventCount}}" valign="top" class="day_date"
+        data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}">
         {{#if orig_date}}
-          {{tDateToString orig_date "medium_with_weekday"}}
+        {{tDateToString orig_date "medium_with_weekday"}}
         {{/if}}
       </td>
-      <td class="details">
-        <table class="detail_list">
-          {{#each events}}
-          <tr class="syllabus_{{type}} related-{{related_id}}{{#if override}} special_date{{/if}}" data-workflow-state="{{workflow_state}}">
-            <td class="icon">
-              {{#ifEqual type 'assignment'}}
-                <span class="screenreader-only">{{#t}}Assignment{{/t}}</span>
-                {{addIcon 'assignment'}}
-              {{else}}{{#ifEqual type 'wiki_page' }}
-                <span class="screenreader-only">{{#t}}Page{{/t}}</span>
-                {{addIcon 'document'}}
-              {{else}}{{#ifEqual type 'discussion_topic' }}
-                <span class="screenreader-only">{{#t}}Discussion Topic{{/t}}</span>
-                {{addIcon 'discussion'}}
-              {{else}}
-                <span class="screenreader-only">{{#t}}Calendar Event{{/t}}</span>
-                {{addIcon 'calendar-month'}}
-              {{/ifEqual}}{{/ifEqual}}{{/ifEqual}}
-            </td>
-            <td class="name{{#unless last}} not_last{{/unless}}">
-              {{#if html_url}}
-                <a href="{{html_url}}">{{title}}</a>
-              {{else}}
-                {{title}}
-              {{/if}}
-              {{#if override}}
-                <div class="special_date_title">({{override.title}})</div>
-              {{/if}}
-            </td>
-            <td class="dates{{#unless last}} not_last{{/unless}}">
-              {{#if start_at}}
-                {{#if due_at}}
-                  {{t "due by"}} <span {{contextSensitiveDatetimeTitle (unfudge due_at)}} >{{tTimeHours due_at}}</span>
-                {{else}}{{#if todo_at}}
-                  {{t "to do:"}} <span {{contextSensitiveDatetimeTitle (unfudge todo_at)}} >{{tTimeHours todo_at}}</span>
-                {{else}}
-                  <span {{contextSensitiveDatetimeTitle (unfudge start_at)}} >{{tTimeHours start_at}}</span>
-                  {{#unless same_time}}
-                    {{t "to" }}
-                    <span {{contextSensitiveDatetimeTitle (unfudge end_at)}} >
-                      {{#if same_day}}
-                        {{tTimeHours end_at}}
-                      {{else}}
-                        {{tEventToString end_at 'short' 'tiny_on_the_hour'}}
-                      {{/if}}
-                   </span>
-                  {{/unless}}
-                {{/if}}{{/if}}
-              {{else}}
-                &nbsp;
-              {{/if}}
-            </td>
-          </tr>
-          {{/each}}
-        </table>
+      {{/if}}
+      <td class="name{{#unless last}} not_last{{/unless}}">
+        {{#ifEqual type 'assignment'}}
+        <span class="screenreader-only">{{#t}}Assignment{{/t}}</span>
+        {{addIcon 'assignment'}}
+        {{else}}{{#ifEqual type 'wiki_page' }}
+        <span class="screenreader-only">{{#t}}Page{{/t}}</span>
+        {{addIcon 'document'}}
+        {{else}}{{#ifEqual type 'discussion_topic' }}
+        <span class="screenreader-only">{{#t}}Discussion Topic{{/t}}</span>
+        {{addIcon 'discussion'}}
+        {{else}}
+        <span class="screenreader-only">{{#t}}Calendar Event{{/t}}</span>
+        {{addIcon 'calendar-month'}}
+        {{/ifEqual}}{{/ifEqual}}{{/ifEqual}}
+        {{#if html_url}}
+        <a href="{{html_url}}">{{title}}</a>
+        {{else}}
+        {{title}}
+        {{/if}}
+        {{#if override}}
+        <div class="special_date_title">({{override.title}})</div>
+        {{/if}}
+      </td>
+      <td class="dates{{#unless last}} not_last{{/unless}}">
+        {{#if start_at}}
+        {{#if due_at}}
+        {{t "due by"}} <span {{contextSensitiveDatetimeTitle (unfudge due_at)}}>{{tTimeHours due_at}}</span>
+        {{else}}{{#if todo_at}}
+        {{t "to do:"}} <span {{contextSensitiveDatetimeTitle (unfudge todo_at)}}>{{tTimeHours todo_at}}</span>
+        {{else}}
+        <span {{contextSensitiveDatetimeTitle (unfudge start_at)}}>{{tTimeHours start_at}}</span>
+        {{#unless same_time}}
+        {{t "to" }}
+        <span {{contextSensitiveDatetimeTitle (unfudge end_at)}}>
+          {{#if same_day}}
+          {{tTimeHours end_at}}
+          {{else}}
+          {{tEventToString end_at 'short' 'tiny_on_the_hour'}}
+          {{/if}}
+        </span>
+        {{/unless}}
+        {{/if}}{{/if}}
+        {{else}}
+        &nbsp;
+        {{/if}}
       </td>
     </tr>
+    {{/each}}
     {{/each}}
   </tbody>
 </table>

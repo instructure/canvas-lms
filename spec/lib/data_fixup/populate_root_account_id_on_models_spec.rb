@@ -185,6 +185,52 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(@override_student.reload.root_account_id).to eq @course.root_account_id
     end
 
+    context 'with AttachmentAssociation with a non-ConversationMessage context' do
+      let(:other_root_account) { account_model(root_account_id: nil) }
+      let(:attachment_association) do
+        AttachmentAssociation.create!(
+          attachment: attachment_model(context: other_root_account),
+          context: reference_record
+        )
+      end
+
+      context 'with a Course context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { attachment_association }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'with a Group context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { attachment_association }
+          let(:reference_record) { group_model }
+        end
+      end
+
+      context 'with a Submission context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { attachment_association }
+          let(:reference_record) { submission_model }
+        end
+      end
+    end
+
+    context 'with AssignmentAssocation with a ConverationMessage context' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:attachment) { attachment_model(context: account_model(root_account_id: nil)) }
+        let(:conversation_message) do
+          conversation(@user).messages.first.tap do |msg|
+            msg.update_attributes!(root_account_ids: [@course.root_account_id])
+          end
+        end
+        let(:record) do
+          AttachmentAssociation.create!(attachment: attachment, context: conversation_message)
+        end
+        let(:reference_record) { attachment }
+      end
+    end
+
     context 'with CalendarEvent' do
       context 'when context is Course' do
         it_behaves_like 'a datafixup that populates root_account_id' do
@@ -1282,6 +1328,27 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
         DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {course: :root_account_id}, favorite.id, favorite.id)
         expect(favorite.reload.root_account_id).to eq @course.root_account.global_id
+      end
+
+      it 'should not collide on cross-shard data of different types' do
+        user = @user
+        @shard1.activate do
+          a1 = account_model
+          a2 = account_model
+          course_model(id: 12345, account: a1)
+          group_model(id: 12345, context: a2)
+        end
+        
+        f1 = Favorite.create!(context: @course, user: user)
+        f2 = Favorite.create(context: @group, user: user)
+        f1.update_columns(root_account_id: nil)
+        f2.update_columns(root_account_id: nil)
+
+        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {group: :root_account_id}, f1.id, f2.id)
+        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {course: :root_account_id}, f1.id, f2.id)
+
+        expect(f1.reload.root_account_id).to eq @course.root_account.global_id
+        expect(f2.reload.root_account_id).to eq @group.root_account.global_id
       end
     end
   end

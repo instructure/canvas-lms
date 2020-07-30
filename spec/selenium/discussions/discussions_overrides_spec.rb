@@ -119,10 +119,10 @@ describe "discussions overrides" do
       it "should list discussions in the syllabus", priority: "2", test_id: 114321 do
         get "/courses/#{@course.id}/assignments/syllabus"
         expect(f('#syllabus tbody tr:nth-of-type(1) .day_date').text).to include(@default_due)
-        expect(f('#syllabus tbody tr:nth-of-type(1) .details').text).to include(@discussion_topic.title)
+        expect(f('#syllabus tbody tr:nth-of-type(1)').text).to include(@discussion_topic.title)
         expect(f('#syllabus tbody tr:nth-of-type(2) .day_date').text).to include(@override_due)
-        expect(f('#syllabus tbody tr:nth-of-type(2) .details').text).to include(@discussion_topic.title)
-        expect(f('.detail_list tbody tr td .special_date_title').text).to include(@new_section.name)
+        expect(f('#syllabus tbody tr:nth-of-type(2)').text).to include(@discussion_topic.title)
+        expect(f('#syllabus tbody tr:nth-of-type(2).detail_list td .special_date_title').text).to include(@new_section.name)
       end
 
       it "should list the discussions in course dashboard page", priority: "2", test_id: 114322 do

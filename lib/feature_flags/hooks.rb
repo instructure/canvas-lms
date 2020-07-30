@@ -62,20 +62,6 @@ module FeatureFlags
       root_account.settings&.dig(:provision, 'lti').present?
     end
 
-    def self.conditional_release_after_state_change_hook(user, context, _old_state, new_state)
-      if %w(on allowed).include?(new_state) && context.is_a?(Account)
-        if ConditionalRelease::Service.prefer_native? || ConditionalRelease::Service.natively_enabled_for_account?(context.root_account)
-          context.root_account.tap do |ra|
-            ra.settings[:use_native_conditional_release] = true
-            ra.save!
-          end
-        else
-          @service_account = ConditionalRelease::Setup.new(context.id, user.id)
-          @service_account.activate!
-        end
-      end
-    end
-
     def self.analytics_2_after_state_change_hook(_user, context, _old_state, _new_state)
       # if we clear the nav cache before HAStore clears, it can be recached with stale FF data
       nav_cache = Lti::NavigationCache.new(context.root_account)

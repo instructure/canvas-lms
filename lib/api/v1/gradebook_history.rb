@@ -75,11 +75,21 @@ module Api::V1
         ::Submission.bulk_load_versioned_attachments(versions.map(&:model))
       end
 
-      versions.map do |version|
+      versions.each_with_object([]) do |version, json_versions|
         submission = opts[:submission] || version.versionable
+        next unless submission
+
         assignment = opts[:assignment] || submission.assignment
         student = opts[:student] || submission.user
-        version_json(course, version, api_context, :submission => submission, :assignment => assignment, :student => student)
+        json_version = version_json(
+          course,
+          version,
+          api_context,
+          submission: submission,
+          assignment: assignment,
+          student: student
+        )
+        json_versions << json_version
       end
     end
 

@@ -56,8 +56,6 @@ export default class PermissionsIndex extends Component {
   state = {
     permissionSearchString: '',
     contextType: COURSE,
-    // TODO: remove logic around responsive_admin_settings once the feature flag is on by default
-    responsive_admin_settings: !!window.ENV?.FEATURES?.responsive_admin_settings
   }
 
   onRoleFilterChange = (_, value) => {
@@ -119,18 +117,15 @@ export default class PermissionsIndex extends Component {
   })
 
   renderHeader() {
-    // TODO: delete this logic once the feature flag is on by default
-    const responsive = this.state.responsive_admin_settings
-
     return (
       <div className="permissions-v2__header_container">
         <View display="block">
           <Grid
-            startAt={responsive ? 'large' : 'small'}
-            rowSpacing={responsive ? 'small' : 'medium'}
+            startAt="large"
+            rowSpacing='small'
           >
             <Grid.Row vAlign="middle">
-              <Grid.Col width={responsive ? 'auto' : 3}>
+              <Grid.Col width="auto">
                 <TextInput
                   label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search Permissions')}
@@ -143,7 +138,7 @@ export default class PermissionsIndex extends Component {
                   name="permission_search"
                 />
               </Grid.Col>
-              <Grid.Col width={responsive ? null : 7}>
+              <Grid.Col width={null}>
                 <Select
                   id="permissions-role-filter"
                   label={<ScreenReaderContent>{I18n.t('Filter Roles')}</ScreenReaderContent>}
@@ -172,7 +167,7 @@ export default class PermissionsIndex extends Component {
                     ))}
                 </Select>
               </Grid.Col>
-              <Grid.Col width={responsive ? 'auto' : 2}>
+              <Grid.Col width="auto">
                 <Button
                   id="add_role"
                   variant="primary"

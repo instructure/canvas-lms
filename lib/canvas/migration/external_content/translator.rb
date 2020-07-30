@@ -40,7 +40,7 @@ module Canvas::Migration::ExternalContent
         data.each do |key, item|
           if item.is_a?(Hash) || item.is_a?(Array)
             translate_data(item, translate_type)
-          elsif obj_class = object_class_for_translation(key)
+          elsif (obj_class = object_class_for_translation(key))
             data[key] =
               case translate_type
               when :export
@@ -79,10 +79,10 @@ module Canvas::Migration::ExternalContent
       'context_module_item' => 'context_module_tag',
       'file' => 'attachment',
       'page' => 'wiki_page'
-    }
+    }.freeze
 
     def object_class_for_translation(key)
-      if match = key.to_s.match(/^\$canvas_(\w+)_id$/)
+      if (match = key.to_s.match(/^\$canvas_(\w+)_id$/))
         type = match[1]
         TYPES_TO_CLASSES[ALIASED_TYPES[type] || type]
       end
@@ -97,18 +97,18 @@ module Canvas::Migration::ExternalContent
       end
     end
 
-    NOT_FOUND = "$OBJECT_NOT_FOUND"
+    NOT_FOUND = "$OBJECT_NOT_FOUND".freeze
 
     def get_canvas_id_from_migration_id(obj_class, migration_id)
       return NOT_FOUND if migration_id == NOT_FOUND
-      if item = content_migration.find_imported_migration_item(obj_class, migration_id)
+      if (item = content_migration.find_imported_migration_item(obj_class, migration_id))
         return item.id
       end
       # most of the time, the new canvas object have been imported with the current import
       # but it may have been imported earlier as a selective import
       # so we can search for it in the course just to be sure
-      obj_type = TYPES_TO_CLASSES.detect{|k, v| v == obj_class}.first
-      if item = content_migration.context.send(obj_type.pluralize).where(:migration_id => migration_id).first
+      obj_type = TYPES_TO_CLASSES.detect{|_k, v| v == obj_class}.first
+      if (item = content_migration.context.send(obj_type.pluralize).where(:migration_id => migration_id).first)
         return item.id
       end
       NOT_FOUND

@@ -221,12 +221,32 @@ module Canvadocs
     assignment = submission.assignment
     enrollments = assignment.course.enrollments.index_by(&:user_id)
     session_params = current_user_session_params(submission, current_user, enrollments)
+
+    # Graders may not have access to other graders' annotations if the
+    # assignment is set that way.
     if assignment.moderated_grading?
       session_params[:user_filter] = moderated_grading_user_filter(submission, current_user, enrollments)
       session_params[:restrict_annotations_to_user_filter] = true
     elsif assignment.anonymize_students?
       session_params[:user_filter] = anonymous_unmoderated_user_filter(submission, current_user, enrollments)
       session_params[:restrict_annotations_to_user_filter] = current_user.id == submission.user_id
+    end
+
+    # Set visibility for students and peer reviewers.
+    if !submission.user_can_read_grade?(current_user)
+      session_params[:restrict_annotations_to_user_filter] = true
+      session_params[:user_filter] ||= [
+        user_filter_entry(
+          current_user,
+          submission,
+          role: canvadocs_user_role(submission.assignment.course, current_user, enrollments),
+          anonymize: false
+        )
+      ]
+
+      if assignment.peer_reviews? && submission.user == current_user
+        session_params[:user_filter] = session_params[:user_filter] | peer_review_user_filter(submission, current_user, enrollments)
+      end
     end
 
     session_params
@@ -255,6 +275,19 @@ module Canvadocs
 
       current_user_params[:user_anonymous_id] = anonymous_id if anonymous_id
       current_user_params
+    end
+
+    def peer_review_user_filter(submission, current_user, enrollments)
+      assessors = User.where(id: submission.assessment_requests.pluck(:assessor_id)).to_a
+
+      assessors.push(current_user).map do |assessor|
+        user_filter_entry(
+          assessor,
+          submission,
+          role: canvadocs_user_role(submission.assignment.course, assessor, enrollments),
+          anonymize: false
+        )
+      end
     end
 
     def moderated_grading_user_filter(submission, current_user, enrollments)

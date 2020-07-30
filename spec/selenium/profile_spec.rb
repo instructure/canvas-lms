@@ -137,9 +137,7 @@ describe "profile" do
 
     it "should change default email address" do
       @user.communication_channel.confirm!
-      channel = @user.communication_channels.create!(:path_type => 'email',
-                                                     :path => 'walter_white@example.com')
-      channel.confirm!
+      channel = communication_channel(@user, {username: 'walter_white@example.com', active_cc: true})
 
       get '/profile/settings'
       row = f("#channel_#{channel.id}")

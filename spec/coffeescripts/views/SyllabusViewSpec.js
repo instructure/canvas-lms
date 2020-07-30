@@ -203,17 +203,17 @@ QUnit.module('Syllabus', {
   },
 
   renderAssertions() {
-    expect(23)
-
+    expect(24)
     // rendering
     const syllabus = $('#syllabus')
     ok(syllabus.length, 'syllabus - syllabus added to the dom')
     ok(syllabus.is(':visible'), 'syllabus - syllabus visible')
 
     const dates = $('tr.date', syllabus)
-    equal(dates.length, 6, 'dates - dates coalesce')
+    equal(dates.length, 22, 'dates - dates render')
+    equal($('td.day_date', dates).length, 6, 'dates - coalesce')
 
-    const assignments = $('tr.syllabus_assignment', dates)
+    const assignments = $('tr.syllabus_assignment', syllabus)
     equal(assignments.length, 10, 'events - all assignments rendered')
     if (this.view.can_read) {
       equal($('td.name a', assignments).length, 10, 'events - link rendered for each assignment')
@@ -221,7 +221,7 @@ QUnit.module('Syllabus', {
       equal($('td.name a', assignments).length, 0, 'events - link not rendered for each assignment')
     }
 
-    const events = $('tr.syllabus_event', dates)
+    const events = $('tr.syllabus_event', syllabus)
     equal(events.length, 6, 'events - all events rendered')
     if (this.view.can_read && this.view.is_valid_user) {
       equal($('td.name a', events).length, 6, 'events - link rendered for each event')
@@ -229,7 +229,7 @@ QUnit.module('Syllabus', {
       equal($('td.name a', events).length, 0, 'events - link not rendered for each event')
     }
 
-    const discussions = $('tr.syllabus_discussion_topic', dates)
+    const discussions = $('tr.syllabus_discussion_topic', syllabus)
     equal(discussions.length, 3, 'discussions - all discussions rendered')
     if (this.view.can_read && this.view.is_valid_user) {
       equal($('td.name a', discussions).length, 3, 'discussions - link rendered for each event')
@@ -237,7 +237,7 @@ QUnit.module('Syllabus', {
       equal($('td.name a', discussions).length, 0, 'discussions - link not rendered for each event')
     }
 
-    const pages = $('tr.syllabus_wiki_page', dates)
+    const pages = $('tr.syllabus_wiki_page', syllabus)
     equal(pages.length, 3, 'pages - all pages rendered')
     if (this.view.can_read && this.view.is_valid_user) {
       equal($('td.name a', pages).length, 3, 'pages - link rendered for each event')
@@ -261,12 +261,13 @@ QUnit.module('Syllabus', {
 
     expected = $('.events_2012_01_23')
     actual = $('tr.date.related')
-    equal(expected.length, 1, "today - today's events found")
+    equal(expected.length, 2, "today - today's events found")
     deepEqual(actual.toArray(), expected.toArray(), "today - today's events highlighted")
 
     expected = $('.events_2012_01_01, .events_2012_01_11')
     actual = $('tr.date.date_passed')
-    equal(expected.length, 2, 'passed events - passed events found')
+
+    equal(expected.length, 12, 'passed events - passed events found')
     deepEqual(
       actual.toArray(),
       expected.toArray(),
@@ -274,7 +275,7 @@ QUnit.module('Syllabus', {
     )
 
     // context-sensitive datetime titles
-    const assignment_ts = $('.events_2012_01_01 .related-assignment_1 .dates > span:nth-child(1)')
+    const assignment_ts = $('.events_2012_01_01.related-assignment_1 .dates > span:nth-child(1)')
     equal(assignment_ts.text(), '10am', 'assignment - local time in table')
     equal(
       assignment_ts.data('html-tooltip-title'),
@@ -282,7 +283,7 @@ QUnit.module('Syllabus', {
       'assignment - correct local and course times given'
     )
 
-    const event_ts = $('.events_2012_01_01 .related-appointment_group_1 .dates > span:nth-child(1)')
+    const event_ts = $('.events_2012_01_01.related-appointment_group_1 .dates > span:nth-child(1)')
     equal(event_ts.text(), ' 8am', 'event - local time in table')
     equal(
       event_ts.data('html-tooltip-title'),
@@ -334,9 +335,9 @@ test('syllabus interaction', function() {
   // dated hover
   const event = $('.events_2012_01_11')
   const date = $('#mini_day_2012_01_11')
-  equal(event.length, 1, 'hover dated syllabus row - event found')
+  equal(event.length, 2, 'hover dated syllabus row - event found')
   equal(date.length, 1, 'hover dated syllabus row - mini calendar day found')
-  event.simulate('mouseover')
+  event.first().simulate('mouseover')
 
   let expected = event
   let actual = $('tr.date.related')
@@ -354,7 +355,7 @@ test('syllabus interaction', function() {
   const undated = $(
     'tr.date:not(.events_2012_01_01, .events_2012_01_11, .events_2012_01_23, .events_2012_01_30, .events_2012_01_31)'
   )
-  equal(undated.length, 1, 'hover undated syllabus row - row found')
+  equal(undated.length, 2, 'hover undated syllabus row - row found')
 
   undated.simulate('mouseover')
 
@@ -391,7 +392,6 @@ test('syllabus interaction', function() {
   equal(override.length, 1, 'hover special date - found special date')
 
   override.simulate('mouseover')
-
   expected = $('tr.related-assignment_1').not(override)
   actual = $('tr.syllabus_assignment.related_event')
   equal(expected.length, 5, 'hover special date - related assignment and special dates found')
@@ -407,83 +407,6 @@ test('syllabus interaction', function() {
   expected = []
   actual = $('tr.syllabus_assignment.related_event')
   deepEqual(actual.toArray(), expected, 'unhover event - events no longer highlighted')
-})
-
-test('hide/show special events', function() {
-  expect(20)
-
-  this.view.is_public_course = true
-  this.view.can_participate = true
-  this.render()
-
-  // hide/show special
-  const day = $('#mini_day_2012_01_31')
-  equal(day.length, 1, 'render - expected day found')
-
-  const toggleSpecial = $('#toggle_special_dates_in_syllabus')
-  equal(toggleSpecial.length, 1, 'render - toggle special dates found')
-
-  equal(toggleSpecial.hasClass('shown'), true, 'render - toggle marked as shown')
-  equal(toggleSpecial.hasClass('hidden'), false, 'render - toggle not marked as hidden')
-
-  let expected = $('tr.syllabus_assignment, tr.syllabus_event')
-  let actual = expected.filter(':visible')
-  equal(expected.length, 16, 'render - all events found')
-  deepEqual(actual.toArray(), expected.toArray(), 'render - all events visible')
-
-  equal(
-    day.hasClass('has_event'),
-    true,
-    'render - dates with special events shown as having events'
-  )
-
-  // click toggle special (hide special)
-  toggleSpecial.simulate('click')
-
-  equal(toggleSpecial.hasClass('shown'), false, 'hide special - toggle not marked as shown')
-  equal(toggleSpecial.hasClass('hidden'), true, 'hide special - toggle marked as hidden')
-
-  expected = []
-  actual = $('tr.special_date:visible')
-  deepEqual(actual.toArray(), expected, 'hide special - all special events hidden')
-
-  expected = $('tr.syllabus_assignment:not(.special_date), tr.syllabus_event:not(.special_date)')
-  actual = expected.filter(':visible')
-  equal(expected.length, 11, 'hide special - all non-special events found')
-  deepEqual(actual.toArray(), expected.toArray(), 'hide special - all non-special events visible')
-
-  equal(
-    $('.mini_calendar_day.has_event').length,
-    4,
-    'hide special - dates that have non-special events still shown as having events'
-  )
-  equal(
-    day.hasClass('has_event'),
-    false,
-    'hide special - dates with only special events no longer shown having events'
-  )
-
-  // click toggle special (show special)
-  toggleSpecial.simulate('click')
-
-  equal(toggleSpecial.hasClass('shown'), true, 'show special - toggle marked as shown')
-  equal(toggleSpecial.hasClass('hidden'), false, 'show special - toggle not marked as hidden')
-
-  expected = $('tr.syllabus_assignment, tr.syllabus_event')
-  actual = expected.filter(':visible')
-  equal(expected.length, 16, 'show special - all events found')
-  deepEqual(actual.toArray(), expected.toArray(), 'show special - all events once again visible')
-
-  equal(
-    $('.mini_calendar_day.has_event').length,
-    5,
-    'show special - dates that have non-special events still shown as having events'
-  )
-  equal(
-    day.hasClass('has_event'),
-    true,
-    'show special - dates with only special events no longer shown having events'
-  )
 })
 
 test('mini calendar', function() {
@@ -517,7 +440,7 @@ test('mini calendar', function() {
 
   let expected = $('.events_2012_01_30')
   let actual = $('tr.date.related')
-  equal(expected.length, 1, 'event day hover - syllabus event found')
+  equal(expected.length, 4, 'event day hover - syllabus event found')
   deepEqual(actual.toArray(), expected.toArray(), 'event day hover - syllabus event highlighted')
 
   // unhover the event date
@@ -599,6 +522,7 @@ test('mini calendar', function() {
 
   expected = $('.events_2012_01_23')
   actual = $('tr.date.selected')
-  equal(expected.length, 1, "jump to today - today's events found")
+  equal(expected.length, 2, "jump to today - today's events found")
+
   deepEqual(actual.toArray(), expected.toArray(), "jump to today - today's events highlighted")
 })

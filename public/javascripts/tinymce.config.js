@@ -88,7 +88,7 @@ export default class EditorConfig {
       language_load: false,
       convert_urls: false,
       // we add the menubar for a11y purposes but then
-      // hide it with js for non screenreader users
+      // hide it with js for non screenreader users (for old rce only)
       menubar: true,
       branding: false,
       remove_script_host: true,

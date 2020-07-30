@@ -166,7 +166,7 @@ describe Outcomes::CsvImporter do
 
       by_method = LearningOutcome.all.to_a.group_by(&:calculation_method)
 
-      methods = LearningOutcome::CALCULATION_METHODS.keys.sort
+      methods = OutcomeCalculationMethod::CALCULATION_METHODS.sort
       expect(by_method.keys.sort).to eq(methods)
 
       expect(by_method['decaying_average'].map(&:calculation_int)).to include(40)

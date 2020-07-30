@@ -33,6 +33,47 @@ describe Account do
     expect(subaccount.resolved_outcome_proficiency).to eq proficiency
   end
 
+  context 'resolved_outcome_calculation_method' do
+    it "retrieves parent account's outcome calculation method" do
+      root_account = Account.create!
+      method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      subaccount = root_account.sub_accounts.create!
+      expect(root_account.outcome_calculation_method).to eq method
+      expect(subaccount.outcome_calculation_method).to eq nil
+      expect(root_account.resolved_outcome_calculation_method).to eq method
+      expect(subaccount.resolved_outcome_calculation_method).to eq method
+    end
+
+    it "can override parent account's outcome calculation method" do
+      root_account = Account.create!
+      method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      subaccount = root_account.sub_accounts.create!
+      submethod = OutcomeCalculationMethod.create! context: subaccount, calculation_method: :latest
+      expect(root_account.outcome_calculation_method).to eq method
+      expect(subaccount.outcome_calculation_method).to eq submethod
+      expect(root_account.resolved_outcome_calculation_method).to eq method
+      expect(subaccount.resolved_outcome_calculation_method).to eq submethod
+    end
+
+    it "can be nil" do
+      root_account = Account.create!
+      subaccount = root_account.sub_accounts.create!
+      expect(root_account.outcome_calculation_method).to eq nil
+      expect(subaccount.outcome_calculation_method).to eq nil
+      expect(root_account.resolved_outcome_calculation_method).to eq nil
+      expect(subaccount.resolved_outcome_calculation_method).to eq nil
+    end
+
+    it "ignores soft deleted calculation methods" do
+      root_account = Account.create!
+      method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
+      subaccount = root_account.sub_accounts.create!
+      submethod = OutcomeCalculationMethod.create! context: subaccount, calculation_method: :latest, workflow_state: :deleted
+      expect(subaccount.outcome_calculation_method).to eq submethod
+      expect(subaccount.resolved_outcome_calculation_method).to eq method
+    end
+  end
+
   it "should provide a list of courses" do
     expect{ Account.new.courses }.not_to raise_error
   end
@@ -947,44 +988,27 @@ describe Account do
     describe "'ePortfolio Moderation' tab" do
       let(:tab_ids) { @account.tabs_available(@admin).pluck(:id) }
 
-      it "is shown if the release flag is enabled and the user has the moderate_user_content permission" do
+      it "is shown if the user has the moderate_user_content permission" do
         account_admin_user_with_role_changes(acccount: @account, role_changes: { moderate_user_content: true })
-        @account.root_account.enable_feature!(:eportfolio_moderation)
-
         expect(tab_ids).to include(Account::TAB_EPORTFOLIO_MODERATION)
       end
 
-      it "is not shown if the user has permission but the release flag is not enabled" do
-        account_admin_user_with_role_changes(acccount: @account, role_changes: { moderate_user_content: true })
-
-        expect(tab_ids).not_to include(Account::TAB_EPORTFOLIO_MODERATION)
-      end
-
-      it "is not shown if the release flag is enabled but the user lacks permission" do
+      it "is not shown if the user lacks the moderate_user_content permission" do
         account_admin_user_with_role_changes(acccount: @account, role_changes: { moderate_user_content: false })
-        @account.root_account.enable_feature!(:eportfolio_moderation)
-
         expect(tab_ids).not_to include(Account::TAB_EPORTFOLIO_MODERATION)
       end
     end
 
-    describe "decouple_rubrics feature flag" do
+    describe "rubrics permissions" do
       let(:tab_ids) { @account.tabs_available(@admin).pluck(:id) }
 
-      it "does not return the rubrics tab if manage_outcomes is false with the FF off" do
-        account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_outcomes: false })
-        expect(tab_ids).not_to include(Account::TAB_RUBRICS)
-      end
-
-      it "returns rubrics tab if the FF is enabled/manage_outcomes is disabled" do
-        account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_outcomes: false })
-        @account.root_account.enable_feature!(:decouple_rubrics)
+      it "returns the rubrics tab for admins by default" do
+        account_admin_user(acccount: @account)
         expect(tab_ids).to include(Account::TAB_RUBRICS)
       end
 
-      it "the rubrics tab is not shown if the FF is enabled but the user lacks permission (manage_rubrics)" do
+      it "the rubrics tab is not shown if the user lacks permission (manage_rubrics)" do
         account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_rubrics: false })
-        @account.root_account.enable_feature!(:decouple_rubrics)
         expect(tab_ids).not_to include(Account::TAB_RUBRICS)
       end
     end
@@ -1526,6 +1550,10 @@ describe Account do
   end
 
   context "inheritable settings" do
+    before do
+      @settings = [:restrict_student_future_view, :lock_all_announcements, :lock_outcome_proficiency, :lock_proficiency_calculation]
+    end
+
     before :each do
       account_model
       @sub1 = @account.sub_accounts.create!
@@ -1537,44 +1565,57 @@ describe Account do
       [@account, @sub1, @sub2].each do |a|
         expect(a.restrict_student_future_view).to eq expected
         expect(a.lock_all_announcements).to eq expected
+        expect(a.lock_outcome_proficiency).to eq expected
+        expect(a.lock_proficiency_calculation).to eq expected
       end
     end
 
     it "should be able to lock values for sub-accounts" do
-      @sub1.settings[:restrict_student_future_view] = {:locked => true, :value => true}
-      @sub1.settings[:lock_all_announcements] = {:locked => true, :value => true}
+      @settings.each do |key|
+        @sub1.settings[key] = {:locked => true, :value => true}
+      end
       @sub1.save!
       # should ignore the subaccount's wishes
-      @sub2.settings[:restrict_student_future_view] = {:locked => true, :value => false}
-      @sub2.settings[:lock_all_announcements] = {:locked => true, :value => false}
+      @settings.each do |key|
+        @sub2.settings[key] = {:locked => true, :value => false}
+      end
       @sub2.save!
 
-      expect(@account.restrict_student_future_view).to eq({:locked => false, :value => false})
-      expect(@account.lock_all_announcements).to eq({:locked => false, :value => false})
+      @settings.each do |key|
+        expect(@account.send(key)).to eq({:locked => false, :value => false})
+      end
 
-      expect(@sub1.restrict_student_future_view).to eq({:locked => true, :value => true})
-      expect(@sub1.lock_all_announcements).to eq({:locked => true, :value => true})
+      @settings.each do |key|
+        expect(@sub1.send(key)).to eq({:locked => true, :value => true})
+      end
 
-      expect(@sub2.restrict_student_future_view).to eq({:locked => true, :value => true, :inherited => true})
-      expect(@sub2.lock_all_announcements).to eq({:locked => true, :value => true, :inherited => true})
+      @settings.each do |key|
+        expect(@sub2.send(key)).to eq({:locked => true, :value => true, :inherited => true})
+      end
     end
 
     it "should grandfather old pre-hash values in" do
-      @account.settings[:restrict_student_future_view] = true
-      @account.settings[:lock_all_announcements] = true
+      @settings.each do |key|
+        @account.settings[key] = true
+      end
       @account.save!
-      @sub2.settings[:restrict_student_future_view] = false
-      @sub2.settings[:lock_all_announcements] = false
+
+      @settings.each do |key|
+        @sub2.settings[key] = false
+      end
       @sub2.save!
 
-      expect(@account.restrict_student_future_view).to eq({:locked => false, :value => true})
-      expect(@account.lock_all_announcements).to eq({:locked => false, :value => true})
+      @settings.each do |key|
+        expect(@account.send(key)).to eq({:locked => false, :value => true})
+      end
 
-      expect(@sub1.restrict_student_future_view).to eq({:locked => false, :value => true, :inherited => true})
-      expect(@sub1.lock_all_announcements).to eq({:locked => false, :value => true, :inherited => true})
+      @settings.each do |key|
+        expect(@sub1.send(key)).to eq({:locked => false, :value => true, :inherited => true})
+      end
 
-      expect(@sub2.restrict_student_future_view).to eq({:locked => false, :value => false})
-      expect(@sub2.lock_all_announcements).to eq({:locked => false, :value => false})
+      @settings.each do |key|
+        expect(@sub2.send(key)).to eq({:locked => false, :value => false})
+      end
     end
 
     it "should translate string values in mass-assignment" do
@@ -1773,7 +1814,6 @@ describe Account do
     end
 
     it "should add or overwrite all account users' dashboard_view preference" do
-      @account.enable_feature!(:student_planner)
       @account.default_dashboard_view = 'planner'
       @account.save!
       @account.reload

@@ -1646,10 +1646,10 @@ describe Submission do
       end
 
       it "should create a message when the assignment has been graded and published" do
-        @cc = @user.communication_channels.create(:path => "somewhere")
+        communication_channel(@user, {username: 'somewhere@test.com'})
         @submission.reload
         expect(@submission.assignment).to eql(@assignment)
-        expect(@submission.assignment.state).to eql(:published)
+        expect(@submission.assignment.state).to be(:published)
         @submission = @assignment.grade_student(@student, grader: @teacher, score: 5).first
         expect(@submission.messages_sent).to include('Submission Graded')
       end
@@ -1660,10 +1660,10 @@ describe Submission do
         @course.restrict_enrollments_to_course_dates = true
         @course.save!
 
-        @cc = @user.communication_channels.create(:path => "somewhere")
+        communication_channel(@user, {username: 'somewhere@test.com'})
         @submission.reload
         expect(@submission.assignment).to eql(@assignment)
-        expect(@submission.assignment.state).to eql(:published)
+        expect(@submission.assignment.state).to be(:published)
         @submission = @assignment.grade_student(@student, grader: @teacher, score: 5).first
         expect(@submission.messages_sent).to_not include('Submission Graded')
       end
@@ -1675,17 +1675,17 @@ describe Submission do
       end
 
       it "should not create a message when a muted assignment has been graded and published" do
-        @cc = @user.communication_channels.create(:path => "somewhere")
+        communication_channel(@user, {username: 'somewhere@test.com'})
         @assignment.ensure_post_policy(post_manually: true)
         @submission.reload
         expect(@submission.assignment).to eql(@assignment)
-        expect(@submission.assignment.state).to eql(:published)
+        expect(@submission.assignment.state).to be(:published)
         @submission = @assignment.grade_student(@student, grader: @teacher, score: 5).first
         expect(@submission.messages_sent).not_to include "Submission Graded"
       end
 
       it "should not create a message when this is a quiz submission" do
-        @cc = @user.communication_channels.create(:path => "somewhere")
+        communication_channel(@user, {username: 'somewhere@test.com'})
         @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
@@ -1697,7 +1697,7 @@ describe Submission do
       end
 
       it "should create a hidden stream_item_instance when muted, graded, and published" do
-        @cc = @user.communication_channels.create :path => "somewhere"
+        communication_channel(@user, {username: 'somewhere@test.com'})
         @assignment.ensure_post_policy(post_manually: true)
         expect {
           @assignment.grade_student(@user, grade: 10, grader: @teacher).first
@@ -1706,7 +1706,7 @@ describe Submission do
       end
 
       it "should hide any existing stream_item_instances when grades are hidden" do
-        @cc = @user.communication_channels.create :path => "somewhere"
+        communication_channel(@user, {username: 'somewhere@test.com'})
         expect {
           @assignment.grade_student(@student, grader: @teacher, score: 5).first
         }.to change StreamItemInstance, :count
@@ -1716,7 +1716,7 @@ describe Submission do
       end
 
       it "should show hidden stream_item_instances when grades are posted" do
-        @cc = @user.communication_channels.create :path => "somewhere"
+        communication_channel(@user, {username: 'somewhere@test.com'})
         @assignment.ensure_post_policy(post_manually: true)
         expect {
           @assignment.update_submission(@student, :author => @teacher, :comment => "some comment")
@@ -1730,7 +1730,7 @@ describe Submission do
       end
 
       it "should not create hidden stream_item_instances for instructors when muted, graded, and published" do
-        @cc = @teacher.communication_channels.create :path => "somewhere"
+        communication_channel(@teacher, {username: 'somewhere@test.com'})
         @assignment.mute!
         expect {
           @submission.add_comment(:author => @student, :comment => "some comment")
@@ -1739,7 +1739,7 @@ describe Submission do
       end
 
       it "should not hide any existing stream_item_instances for instructors when muted" do
-        @cc = @teacher.communication_channels.create :path => "somewhere"
+        communication_channel(@teacher, {username: 'somewhere@test.com'})
         expect {
           @submission.add_comment(:author => @student, :comment => "some comment")
         }.to change StreamItemInstance, :count
@@ -1761,12 +1761,12 @@ describe Submission do
         quiz.workflow_state = 'available'
         quiz.save!
 
-        user       = account_admin_user
-        user.communication_channels.create!(:path => 'admin@example.com')
+        user = account_admin_user
+        communication_channel(user, {username: 'admin@example.com'})
         submission = quiz.generate_submission(user, false)
         Quizzes::SubmissionGrader.new(submission).grade_submission
 
-        @teacher.communication_channels.create!(:path => 'chang@example.com')
+        communication_channel(@teacher, {username: 'chang@example.com'})
         submission2 = quiz.generate_submission(@teacher, false)
         Quizzes::SubmissionGrader.new(submission2).grade_submission
 
@@ -1778,7 +1778,7 @@ describe Submission do
     it "should create a stream_item_instance when graded and published" do
       Notification.create :name => "Submission Graded"
       submission_spec_model
-      @cc = @user.communication_channels.create :path => "somewhere"
+      communication_channel(@user, {username: 'somewhere@test.com'})
       expect {
         @assignment.grade_student(@user, grade: 10, grader: @teacher)
       }.to change StreamItemInstance, :count
@@ -1787,7 +1787,7 @@ describe Submission do
     it "should create a stream_item_instance when graded, and then made it visible when unmuted" do
       Notification.create :name => "Submission Graded"
       submission_spec_model
-      @cc = @user.communication_channels.create :path => "somewhere"
+      communication_channel(@user, {username: 'somewhere@test.com'})
       @assignment.mute!
       expect {
         @assignment.grade_student(@user, grade: 10, grader: @teacher)
@@ -1807,10 +1807,10 @@ describe Submission do
       it "creates a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
         allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.now  - 100)
+        allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
         submission_spec_model
 
-        @cc = @user.communication_channels.create(:path => "somewhere")
+        communication_channel(@user, {username: 'somewhere@test.com'})
         s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
         s.graded_at = Time.zone.parse("Jan 1 2000")
         s.save
@@ -1828,7 +1828,7 @@ describe Submission do
         @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
-        @cc = @user.communication_channels.create(:path => "somewhere")
+        communication_channel(@user, {username: 'somewhere@test.com'})
         s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
         s.graded_at = Time.zone.parse("Jan 1 2000")
         s.save
@@ -1841,10 +1841,10 @@ describe Submission do
         @assignment.ensure_post_policy(post_manually: true)
         Notification.create(:name => 'Submission Grade Changed')
         allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.now  - 100)
+        allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
         submission_spec_model
 
-        @cc = @user.communication_channels.create(:path => "somewhere")
+        communication_channel(@user, {username: 'somewhere@test.com'})
         s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
         s.graded_at = Time.zone.parse("Jan 1 2000")
         s.save
@@ -1856,10 +1856,10 @@ describe Submission do
       it "does not create a message when the submission was recently graded" do
         Notification.create(:name => 'Submission Grade Changed')
         allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.now  - 100)
+        allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
         submission_spec_model
 
-        @cc = @user.communication_channels.create(:path => "somewhere")
+        communication_channel(@user, {username: 'somewhere@test.com'})
         s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
         @submission = @assignment.grade_student(@user, grade: 9, grader: @teacher)[0]
         expect(@submission).to eql(s)

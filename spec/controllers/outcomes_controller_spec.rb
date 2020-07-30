@@ -82,24 +82,6 @@ describe OutcomesController do
         expect(permissions.key?(permission)).to be_truthy
       end
     end
-
-    context "import_outcomes_permission_fix FF" do
-      before do
-        user_session(@admin)
-        controller.instance_variable_set(:@domain_root_account, Account.default)
-      end
-
-      it 'is false if the feature flag is off' do
-        get 'index', params: {:account_id => @account.id}
-        expect(assigns[:js_env][:IMPORT_OUTCOMES_PERMISSION_FIX]).to be_falsey
-      end
-
-      it 'is true if InstructureMiscPlugin is defined and the feature flag is on' do
-        Account.default.enable_feature!(:import_outcomes_permission_fix)
-        get 'index', params: {:account_id => @account.id}
-        expect(assigns[:js_env][:IMPORT_OUTCOMES_PERMISSION_FIX]).to be_truthy
-      end
-    end
   end
 
   describe "GET 'show'" do

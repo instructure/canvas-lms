@@ -216,7 +216,7 @@ class Course < ActiveRecord::Base
     dependent: :destroy
 
   has_many :conditional_release_rules, inverse_of: :course, class_name: "ConditionalRelease::Rule", dependent: :destroy
-
+  has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
 
   prepend Profile::Association
 
@@ -2114,16 +2114,10 @@ class Course < ActiveRecord::Base
       e.sis_pseudonym_id = opts[:sis_pseudonym_id]
       if e.changed?
         e.need_touch_user = true if opts[:skip_touch_user]
-        transaction do
-          # without this, inserting/updating on enrollments will share lock the course, but then
-          # it tries to touch the course, which will deadlock with another transaction doing the
-          # same thing.
-          self.lock!(:no_key_update)
-          if opts[:no_notify]
-            e.save_without_broadcasting
-          else
-            e.save
-          end
+        if opts[:no_notify]
+          e.save_without_broadcasting
+        else
+          e.save
         end
       end
       e.user = user
@@ -2742,9 +2736,10 @@ class Course < ActiveRecord::Base
       :href => :course_outcomes_path
     }, {
       :id => TAB_RUBRICS,
-       :label => t('#tabs.rubrics', "Rubrics"),
-       :css_class => 'rubrics',
-       :href => :course_rubrics_path
+      :label => t('#tabs.rubrics', "Rubrics"),
+      :css_class => 'rubrics',
+      :href => :course_rubrics_path,
+      :visibility => 'admins'
     }, {
       :id => TAB_QUIZZES,
       :label => t('#tabs.quizzes', "Quizzes"),
@@ -2832,12 +2827,6 @@ class Course < ActiveRecord::Base
       # Ensure that Settings is always at the bottom
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
       tabs << settings_tab
-
-      # remove rubrics tab if FF is not enabled
-      # remove conditional when FF is enabled on all root accounts
-      unless self.root_account.feature_enabled?(:rubrics_in_course_navigation)
-        tabs.delete_if {|t| t[:id] == TAB_RUBRICS}
-      end
 
       if opts[:only_check]
         tabs = tabs.select { |t| opts[:only_check].include?(t[:id]) }
@@ -3557,6 +3546,10 @@ class Course < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def resolved_outcome_calculation_method
+    outcome_calculation_method&.active? ? outcome_calculation_method : account&.resolved_outcome_calculation_method
   end
 
   private

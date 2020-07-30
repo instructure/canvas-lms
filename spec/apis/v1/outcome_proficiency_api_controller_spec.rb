@@ -198,6 +198,24 @@ describe OutcomeProficiencyApiController, type: :request do
   end
 
   describe '.show' do
+    context 'missing permissions' do
+      before do
+        user_model
+        @json = api_call_as_user(@user, :get,
+          "/api/v1/accounts/#{@account.id}/outcome_proficiency",
+          { :controller => 'outcome_proficiency_api', :action => 'show',
+            :format => 'json', :account_id => @account.id.to_s })
+      end
+
+      it 'returns 401 status' do
+        assert_status(401)
+      end
+
+      it 'returns unauthorized message' do
+        expect(@json.dig('errors', 0, 'message')).to eq 'user not authorized to perform that action'
+      end
+    end
+
     context 'no outcome proficiency' do
       it 'returns 404 status' do
         raw_api_call(:get,
@@ -213,19 +231,18 @@ describe OutcomeProficiencyApiController, type: :request do
         @proficiency = outcome_proficiency_model(@account)
       end
 
-      it 'returns proficiency' do
-        json = api_call(:get,
+      before do
+        @json = api_call(:get,
           "/api/v1/accounts/#{@account.id}/outcome_proficiency",
           { :controller => 'outcome_proficiency_api', :action => 'show',
             :format => 'json', :account_id => @account.id.to_s })
-        expect(json).to eq(@proficiency.as_json)
+      end
+
+      it 'returns proficiency' do
+        expect(@json).to eq(@proficiency.as_json)
       end
 
       it "returns 200 status" do
-        raw_api_call(:get,
-          "/api/v1/accounts/#{@account.id}/outcome_proficiency",
-          { :controller => 'outcome_proficiency_api', :action => 'show',
-            :format => 'json', :account_id => @account.id.to_s })
         assert_status(200)
       end
     end

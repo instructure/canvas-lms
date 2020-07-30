@@ -19,6 +19,7 @@
 import formatMessage from '../../../format-message'
 import bridge from '../../../bridge'
 import {isImageEmbed} from '../shared/ContentSelection'
+import {isOKToLink} from '../../contentInsertionUtils'
 import TrayController from './ImageOptionsTray/TrayController'
 import clickCallback from './clickCallback'
 
@@ -102,6 +103,15 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
         }
 
         callback(items)
+      },
+      onSetup(api) {
+        function handleNodeChange(_e) {
+          api.setDisabled(!isOKToLink(editor.selection.getContent()))
+        }
+        editor.on('NodeChange', handleNodeChange)
+        return () => {
+          editor.off('NodeChange', handleNodeChange)
+        }
       }
     })
 

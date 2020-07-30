@@ -686,3 +686,72 @@ legend + .control-group {
     padding-#{direction(left)}: $horizontalComponentOffset;
   }
 }
+
+.form-horizontal .margin-t-m { // todo: can we have margin utils?
+  margin-top: 1rem;
+}
+
+.form-horizontal .responsive-control-group {
+  display: flex;
+
+  .control-label {
+    flex-basis: $horizontalComponentOffset - $spacing-width;
+    flex-grow: 0;
+    padding-#{direction(right)}: $spacing-width;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    margin-#{direction(left)}: inherit; // undo cascade
+  }
+
+  .controls .input-append,
+  .responsive-input-with-add-on {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .controls .input-append input,
+  .responsive-control-input {
+    flex-grow: 1;
+  }
+
+  .controls .input-append .add-on,
+  .responsive-control-add-on {
+    flex-grow: 0;
+    width: auto; // potentially shrink it down to fit content
+  }
+}
+
+@include desktop-only {
+  .form-horizontal .responsive-button-container {
+    margin-left: $horizontalComponentOffset;
+  }
+
+  .form-horizontal .responsive-control-button {
+    align-self: flex-start;
+  }
+}
+
+@include mobile-only {
+  .form-horizontal .responsive-control-group {
+    flex-direction: column;
+  }
+
+  .form-horizontal .responsive-control-group .control-label {
+    flex-basis: inherit;  // undo cascade
+    float: inherit;  // undo cascade
+    padding-#{direction(right)}: inherit;
+    text-align: inherit; // undo cascade
+  }
+
+  .form-horizontal .responsive-button-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-horizontal .responsive-control-button {
+    flex-grow: 1;
+  }
+}

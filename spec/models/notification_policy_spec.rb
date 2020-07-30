@@ -36,38 +36,34 @@ describe NotificationPolicy do
     end
 
     it "should cause message dispatch to specified channel on triggered policies" do
-      @default_cc = @student.communication_channels.create(:path => "default@example.com")
-      @default_cc.confirm!
-      @cc = @student.communication_channels.create(:path => "secondary@example.com")
-      @cc.confirm!
+      communication_channel(@student, {username: 'default@example.com', active_cc: true})
+      communication_channel(@student, {username: 'secondary@example.com', active_cc: true})
       @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "immediately")
       @assignment = @course.assignments.create!(:title => "test assignment")
       expect(@assignment.messages_sent).to be_include("Assignment Created")
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "default@example.com"}
       expect(m).to be_nil
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "secondary@example.com"}
       expect(m).not_to be_nil
     end
 
     it "should prevent message dispatches if set to 'never' on triggered policies" do
-      @cc = @student.communication_channels.create(:path => "secondary@example.com")
-      @cc.confirm!
+      communication_channel(@student, {username: 'secondary@example.com', active_cc: true})
       @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "never")
       @assignment = @course.assignments.create!(:title => "test assignment")
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "default@example.com"}
       expect(m).to be_nil
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "secondary@example.com"}
       expect(m).to be_nil
     end
 
     it "should prevent message dispatches if no policy setting exists" do
-      @cc = @student.communication_channels.create(:path => "secondary@example.com")
-      @cc.confirm!
+      communication_channel(@student, {username: 'secondary@example.com', active_cc: true})
       NotificationPolicy.where(:notification_id => @notif, :communication_channel_id => @cc).delete_all
       @assignment = @course.assignments.create!(:title => "test assignment")
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "default@example.com"}
       expect(m).to be_nil
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "secondary@example.com"}
       expect(m).to be_nil
     end
   end
@@ -268,7 +264,7 @@ describe NotificationPolicy do
   describe "setup_with_default_policies" do
     before :once do
       @user = User.create!
-      @communication_channel = @user.communication_channels.create!(path: 'email@example.com')
+      @communication_channel = communication_channel(@user, {username: 'email@example.com'})
       @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
     end
 
@@ -350,8 +346,7 @@ describe NotificationPolicy do
   context 'find_all_for' do
     it 'should only return course type notification policies if provided a course context type' do
       student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
-      channel = student.communication_channels.create(:path => "default@example.com")
-      channel.confirm!
+      channel = communication_channel(student, {username: 'default@example.com', active_cc: true})
 
       course_type_notification = Notification.create!(:name => "Course Type", :subject => "Test", :category => 'Due Date')
       notification = Notification.create!(:name => "Panda Express", :subject => "Test", :category => 'Whatever')

@@ -374,8 +374,7 @@ describe AppointmentGroup do
       course_with_observer(active_all: true, active_cc: true, course: @course, associated_user_id: @student)
 
       [@teacher, @student].each do |user|
-        channel = user.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
-        channel.confirm
+        communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
       end
 
       @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])

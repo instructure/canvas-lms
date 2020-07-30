@@ -168,10 +168,37 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
           api.setDisabled(!isOKToLink(ed.selection.getContent()))
         }
 
+        // if the user selects all the content w/in a link and deletes it via the keyboard
+        // make sure the surrounding <a> gets deleted too.
+        function deleteEmptyLink() {
+          let node
+          if (ed.selection.getNode().tagName === 'A') {
+            node = ed.selection.getNode()
+          } else {
+            const rng = ed.selection.getRng()
+            if (
+              rng.commonAncestorContainer === rng.endContainer &&
+              rng.endContainer.nextSibling?.tagName === 'A'
+            ) {
+              node = rng.endContainer.nextSibling
+            } else if (rng.nextSibling?.tagName === 'A') {
+              node = rng.nextSibling
+            }
+          }
+          if (node) {
+            const txt = node.textContent?.trim()
+            if (txt.length === 0) {
+              ed.execCommand('Unlink')
+            }
+          }
+        }
+
         ed.on('NodeChange', handleNodeChange)
+        ed.on('Change', deleteEmptyLink)
 
         return () => {
           ed.off('NodeChange', handleNodeChange)
+          ed.off('Change', deleteEmptyLink)
         }
       }
     })

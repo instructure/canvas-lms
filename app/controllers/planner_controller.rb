@@ -25,7 +25,6 @@ class PlannerController < ApplicationController
 
   before_action :require_user, unless: :public_access?
   before_action :set_user
-  before_action :require_planner_enabled
   before_action :set_date_range
   before_action :set_params, only: [:index]
 

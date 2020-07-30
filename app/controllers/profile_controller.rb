@@ -229,9 +229,10 @@ class ProfileController < ApplicationController
     if Account.site_admin.feature_enabled?(:notification_update_account_ui)
       add_crumb(@current_user.short_name, profile_path)
       add_crumb(t("Notification Preferences"))
-      js_env :NOTIFICATION_PREFERENCES_OPTIONS => {
-        :deprecate_sms_enabled => !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
-        :allowed_sms_categories => Notification.categories_to_send_in_sms(@domain_root_account),
+      js_env NOTIFICATION_PREFERENCES_OPTIONS: {
+        deprecate_sms_enabled: !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
+        allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
+        send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account)
       }
       js_bundle :account_notification_settings_show
       render html: '', layout: true
@@ -431,9 +432,13 @@ class ProfileController < ApplicationController
       @profile.links = []
       params[:link_urls].zip(params[:link_titles]).
         reject { |url, title| url.blank? && title.blank? }.
-        each { |url, title|
-          @profile.links.build :url => url, :title => title
-        }
+        each do |url, title|
+          new_link = @profile.links.build :url => url, :title => title
+          # since every time we update links, we delete and recreate everything,
+          # deleting invalid link records will make sure the rest of the
+          # valid ones still save
+          new_link.delete unless new_link.valid?
+        end
     elsif params[:delete_links]
       @profile.links = []
     end

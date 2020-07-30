@@ -124,6 +124,9 @@ module Importers
         migration.add_imported_item(item)
       else
         item = outcome
+        if context.respond_to?(:root_account) && context.root_account.feature_enabled?(:outcome_alignments_course_migration)
+          migration.add_imported_item(item, key: CC::CCHelper.create_key(item, global: true))
+        end
       end
 
       # don't add a deleted outcome to an outcome group, or align it with an assignment

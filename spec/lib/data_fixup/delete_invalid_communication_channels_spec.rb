@@ -21,10 +21,7 @@ require "spec_helper"
 describe DataFixup::DeleteInvalidCommunicationChannels do
   before :once do
     user_model
-    @channel = @user.communication_channels.create!(
-      path: "valid@example.com",
-      path_type: CommunicationChannel::TYPE_EMAIL
-    )
+    @channel = communication_channel(@user, {username: 'valid@example.com'})
   end
 
   it "deletes email address with no @ sign" do
@@ -54,20 +51,14 @@ describe DataFixup::DeleteInvalidCommunicationChannels do
 
   it "deletes valid duplicate email with whitespace" do
     CommunicationChannel.where(id: @channel.id).update_all(path: " valid@example.com")
-    @channel2 = @user.communication_channels.create!(
-      path: "valid@example.com",
-      path_type: CommunicationChannel::TYPE_EMAIL
-    )
+    @channel2 = communication_channel(@user, {username: 'valid@example.com'})
     DataFixup::DeleteInvalidCommunicationChannels.run
     expect(CommunicationChannel.where(id: @channel.id).exists?).to be_falsey
   end
 
   it "deletes valid duplicate email with whitespace and mixed case" do
     CommunicationChannel.where(id: @channel.id).update_all(path: " Valid@Example.com")
-    @channel2 = @user.communication_channels.create!(
-      path: "valid@example.com",
-      path_type: CommunicationChannel::TYPE_EMAIL
-    )
+    @channel2 = communication_channel(@user, {username: 'valid@example.com'})
     DataFixup::DeleteInvalidCommunicationChannels.run
     expect(CommunicationChannel.where(id: @channel.id).exists?).to be_falsey
   end

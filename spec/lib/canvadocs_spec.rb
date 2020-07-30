@@ -120,9 +120,141 @@ describe Canvadocs do
       end
 
       describe 'user filter' do
+        let(:peer_reviewer) { User.create!(name: 'Percy the Peer Reviewer') }
+        let(:peer_reviewer_real_data) { {type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: 'Percy the Peer Reviewer'} }
         let(:student_real_data) { {type: 'real', role: 'student', id: student.global_id.to_s, name: 'Sev the Student'} }
         let(:student_anonymous_data) { hash_including(type: 'anonymous', role: 'student', id: submission.anonymous_id) }
         let(:teacher_real_data) { {type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader'} }
+
+        context "when an assignment posts manually and a submission is unposted" do
+          before do
+            course.enroll_student(peer_reviewer).accept(true)
+            assignment.post_policy.update!(post_manually: true)
+            assignment.hide_submissions
+          end
+
+          context "when the submission's student is viewing" do
+            before do
+              @current_user = student
+            end
+
+            it "sets restrict_annotations_to_user_filter to true" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+
+            it "includes the student" do
+              expect(user_filter).to include(student_real_data)
+            end
+
+            it "includes peer reviewers if there are peer reviewers" do
+              assignment.update!(peer_reviews: true)
+              AssessmentRequest.create!(
+                user: student,
+                asset: submission,
+                assessor: peer_reviewer,
+                assessor_asset: assignment.submission_for_student(peer_reviewer)
+              )
+
+              expect(user_filter).to include(peer_reviewer_real_data)
+            end
+
+            it "does not include graders in the filter" do
+              expect(user_filter).not_to include(teacher_real_data)
+            end
+          end
+
+          context "when a grader is viewing" do
+            before do
+              @current_user = teacher
+            end
+
+            it "does not set restrict_annotations_to_user_filter" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be nil
+            end
+
+            it "does not set user_filter" do
+              expect(user_filter).to be nil
+            end
+          end
+
+          context "when a peer reviewer is viewing" do
+            before do
+              @current_user = peer_reviewer
+              assignment.update!(peer_reviews: true)
+              AssessmentRequest.create!(
+                user: student,
+                asset: submission,
+                assessor: peer_reviewer,
+                assessor_asset: assignment.submission_for_student(peer_reviewer)
+              )
+            end
+
+            it "sets restrict_annotations_to_user_filter to true" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+
+            it "includes only the peer reviewer in the user_filter" do
+              expect(user_filter).to match [peer_reviewer_real_data]
+            end
+          end
+        end
+
+        context "when an assignment posts manually and a submission is posted" do
+          before do
+            course.enroll_student(peer_reviewer).accept(true)
+            assignment.post_policy.update!(post_manually: true)
+            assignment.post_submissions
+          end
+
+          context "when the submission's student is viewing" do
+            before do
+              @current_user = student
+            end
+
+            it "does not set restrict_annotations_to_user_filter" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be nil
+            end
+
+            it "does not set user_filter" do
+              expect(user_filter).to be nil
+            end
+          end
+
+          context "when a grader is viewing" do
+            before do
+              @current_user = teacher
+            end
+
+            it "does not set restrict_annotations_to_user_filter" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be nil
+            end
+
+            it "does not set user_filter" do
+              expect(user_filter).to be nil
+            end
+          end
+
+          context "when a peer reviewer is viewing" do
+            before do
+              @current_user = peer_reviewer
+              assignment.update!(peer_reviews: true)
+              AssessmentRequest.create!(
+                user: student,
+                asset: submission,
+                assessor: peer_reviewer,
+                assessor_asset: assignment.submission_for_student(peer_reviewer)
+              )
+            end
+
+            it "sets restrict_annotations_to_user_filter to true" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+
+            it "includes only the peer reviewer in the user_filter" do
+              expect(user_filter).to match [peer_reviewer_real_data]
+            end
+          end
+        end
 
         context 'for an unmoderated anonymized assignment' do
           before(:each) do

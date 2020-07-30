@@ -18,25 +18,16 @@
 
 import React, {useState} from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {CloseButton} from '@instructure/ui-buttons'
 
-import {Heading} from '@instructure/ui-elements'
-import {Checkbox, RadioInput, RadioInputGroup, Select, TextArea} from '@instructure/ui-forms'
-import {IconQuestionLine} from '@instructure/ui-icons'
-import {Flex, View} from '@instructure/ui-layout'
-import {Tooltip, Tray} from '@instructure/ui-overlays'
+import {Heading} from '@instructure/ui-heading'
+import {Flex} from '@instructure/ui-flex'
+import {Tray} from '@instructure/ui-tray'
 
-import {
-  CUSTOM,
-  MIN_HEIGHT,
-  MIN_WIDTH,
-  imageSizes,
-  labelForImageSize,
-  scaleToSize
-} from '../ImageEmbedOptions'
+import {CUSTOM, MIN_HEIGHT, MIN_WIDTH, scaleToSize} from '../ImageEmbedOptions'
 import formatMessage from '../../../../format-message'
-import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
+import {useDimensionsState} from '../../shared/DimensionsInput'
+import ImageOptionsForm from '../../shared/ImageOptionsForm'
 
 export default function ImageOptionsTray(props) {
   const {imageOptions, onRequestClose, open} = props
@@ -56,8 +47,6 @@ export default function ImageOptionsTray(props) {
     minHeight: MIN_HEIGHT,
     minWidth: MIN_WIDTH
   })
-
-  const imageSizeOption = {label: labelForImageSize(imageSize), value: imageSize}
 
   function handleAltTextChange(event) {
     setAltText(event.target.value)
@@ -103,29 +92,6 @@ export default function ImageOptionsTray(props) {
     })
   }
 
-  const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
-  const textAreaLabel = (
-    <Flex alignItems="center">
-      <Flex.Item>{formatMessage('Alt Text')}</Flex.Item>
-
-      <Flex.Item margin="0 0 0 xx-small">
-        <Tooltip
-          on={['hover', 'focus']}
-          placement="top"
-          tip={
-            <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
-              {tooltipText}
-            </View>
-          }
-        >
-          <Button icon={IconQuestionLine} size="small" variant="icon">
-            <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
-          </Button>
-        </Tooltip>
-      </Flex.Item>
-    </Flex>
-  )
-
   const messagesForSize = []
   if (imageSize !== CUSTOM) {
     messagesForSize.push({
@@ -133,10 +99,6 @@ export default function ImageOptionsTray(props) {
       type: 'hint'
     })
   }
-
-  const saveDisabled =
-    displayAs === 'embed' &&
-    ((!isDecorativeImage && altText === '') || (imageSize === CUSTOM && !dimensionsState.isValid))
 
   return (
     <Tray
@@ -167,88 +129,19 @@ export default function ImageOptionsTray(props) {
         </Flex.Item>
 
         <Flex.Item as="form" grow margin="none" shrink>
-          <Flex justifyItems="space-between" direction="column" height="100%">
-            <Flex.Item grow padding="small" shrink>
-              <Flex direction="column">
-                <Flex.Item padding="small">
-                  <TextArea
-                    aria-describedby="alt-text-label-tooltip"
-                    height="4rem"
-                    label={textAreaLabel}
-                    onChange={handleAltTextChange}
-                    placeholder={formatMessage('(Describe the image)')}
-                    resize="vertical"
-                    value={altText}
-                  />
-                </Flex.Item>
-
-                <Flex.Item padding="small">
-                  <Checkbox
-                    checked={isDecorativeImage}
-                    disabled={displayAs === 'link'}
-                    label={formatMessage('Decorative Image')}
-                    onChange={handleIsDecorativeChange}
-                  />
-                </Flex.Item>
-
-                <Flex.Item margin="small none none none" padding="small">
-                  <RadioInputGroup
-                    description={formatMessage('Display Options')}
-                    name="display-image-as"
-                    onChange={handleDisplayAsChange}
-                    value={displayAs}
-                  >
-                    <RadioInput label={formatMessage('Embed Image')} value="embed" />
-
-                    <RadioInput
-                      label={formatMessage('Display Text Link (Opens in a new tab)')}
-                      value="link"
-                    />
-                  </RadioInputGroup>
-                </Flex.Item>
-
-                <Flex.Item margin="small none xx-small none">
-                  <View as="div" padding="small small xx-small small">
-                    <Select
-                      disabled={displayAs !== 'embed'}
-                      label={formatMessage('Size')}
-                      messages={messagesForSize}
-                      onChange={handleImageSizeChange}
-                      selectedOption={imageSizeOption}
-                    >
-                      {imageSizes.map(size => (
-                        <option key={size} value={size}>
-                          {labelForImageSize(size)}
-                        </option>
-                      ))}
-                    </Select>
-                  </View>
-
-                  {imageSize === CUSTOM && (
-                    <View as="div" padding="xx-small small">
-                      <DimensionsInput
-                        dimensionsState={dimensionsState}
-                        disabled={displayAs !== 'embed'}
-                        minHeight={MIN_HEIGHT}
-                        minWidth={MIN_WIDTH}
-                      />
-                    </View>
-                  )}
-                </Flex.Item>
-              </Flex>
-            </Flex.Item>
-
-            <Flex.Item
-              background="light"
-              borderWidth="small none none none"
-              padding="small medium"
-              textAlign="end"
-            >
-              <Button disabled={saveDisabled} onClick={handleSave} variant="primary">
-                {formatMessage('Done')}
-              </Button>
-            </Flex.Item>
-          </Flex>
+          <ImageOptionsForm
+            imageSize={imageSize}
+            displayAs={displayAs}
+            isDecorativeImage={isDecorativeImage}
+            altText={altText}
+            dimensionsState={dimensionsState}
+            handleAltTextChange={handleAltTextChange}
+            handleIsDecorativeChange={handleIsDecorativeChange}
+            handleDisplayAsChange={handleDisplayAsChange}
+            handleImageSizeChange={handleImageSizeChange}
+            messagesForSize={messagesForSize}
+            handleSave={handleSave}
+          />
         </Flex.Item>
       </Flex>
     </Tray>

@@ -33,28 +33,18 @@ class LearningOutcome < ActiveRecord::Base
   before_save :infer_root_account_ids
   after_save :propagate_changes_to_rubrics
 
-  CALCULATION_METHODS = {
-    'decaying_average' => "Decaying Average",
-    'n_mastery'        => "n Number of Times",
-    'highest'          => "Highest Score",
-    'latest'           => "Most Recent Score",
-  }.freeze
-  VALID_CALCULATION_INTS = {
-    "decaying_average" => (1..99),
-    "n_mastery" => (1..5),
-    "highest" => [].freeze,
-    "latest" => [].freeze,
-  }.freeze
-
   validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   validates :short_description, length: { maximum: maximum_string_length }
   validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
   validates :display_name, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
-  validates :calculation_method, inclusion: { in: CALCULATION_METHODS.keys,
-    message: -> { t(
-      "calculation_method must be one of the following: %{calc_methods}",
-      :calc_methods => CALCULATION_METHODS.keys.to_s
-    ) }
+  validates :calculation_method, inclusion: {
+    in: OutcomeCalculationMethod::CALCULATION_METHODS,
+    message: -> {
+      t(
+        "calculation_method must be one of the following: %{calc_methods}",
+        :calc_methods => OutcomeCalculationMethod::CALCULATION_METHODS.to_s
+      )
+    }
   }
   validates :short_description, :workflow_state, presence: true
   sanitize_field :description, CanvasSanitize::SANITIZE
@@ -138,11 +128,11 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def self.valid_calculation_method?(method)
-    CALCULATION_METHODS.keys.include?(method)
+    OutcomeCalculationMethod::CALCULATION_METHODS.include?(method)
   end
 
   def self.valid_calculation_ints(method)
-    VALID_CALCULATION_INTS[method]
+    OutcomeCalculationMethod::VALID_CALCULATION_INTS[method]
   end
 
   def self.valid_calculation_int?(int, method)

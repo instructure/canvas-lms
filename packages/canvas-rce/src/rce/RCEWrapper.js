@@ -92,14 +92,6 @@ function injectTinySkin() {
 
 const editorWrappers = new WeakMap()
 
-function showMenubar(el, show) {
-  const $menubar = el.querySelector('.tox-menubar')
-  $menubar && ($menubar.style.display = show ? '' : 'none')
-  if (show) {
-    focusFirstMenuButton(el)
-  }
-}
-
 function focusToolbar(el) {
   const $firstToolbarButton = el.querySelector('.tox-tbtn')
   $firstToolbarButton && $firstToolbarButton.focus()
@@ -404,7 +396,7 @@ class RCEWrapper extends React.Component {
     <img
       alt="${formatMessage('Loading...')}"
       src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
-      data-placeholder-for="${fileMetaProps.name}"
+      data-placeholder-for="${encodeURIComponent(fileMetaProps.name)}"
       style="width: ${width}; height: ${height}; border: solid 1px #8B969E;"
     />`
 
@@ -424,7 +416,9 @@ class RCEWrapper extends React.Component {
   }
 
   removePlaceholders(name) {
-    const placeholder = this.mceInstance().dom.doc.querySelector(`[data-placeholder-for="${name}"]`)
+    const placeholder = this.mceInstance().dom.doc.querySelector(
+      `[data-placeholder-for="${encodeURIComponent(name)}"]`
+    )
     if (placeholder) {
       placeholder.remove()
     }
@@ -633,40 +627,29 @@ class RCEWrapper extends React.Component {
     return this[methodName](...args)
   }
 
-  initKeyboardShortcuts(el, editor) {
-    // hide the menubar
-    showMenubar(el, false)
-
-    // when typed w/in the editor's edit area
-    editor.addShortcut('Alt+F9', '', () => {
-      showMenubar(el, true)
-    })
-    // when typed somewhere else w/in RCEWrapper
-    el.addEventListener('keydown', event => {
-      if (event.altKey && event.code === 'F9') {
-        event.preventDefault()
-        event.stopPropagation()
-        showMenubar(el, true)
-      }
-    })
-
-    // toolbar help
-    el.addEventListener('keydown', event => {
-      if (event.altKey && event.code === 'F10') {
-        event.preventDefault()
-        event.stopPropagation()
-        focusToolbar(el)
-      }
-    })
-
-    editor.on('keydown', this.handleShortcutKeyShortcut)
+  handleKey = event => {
+    if (event.code === 'F9' && event.altKey) {
+      event.preventDefault()
+      event.stopPropagation()
+      focusFirstMenuButton(this._elementRef)
+    } else if (event.code === 'F10' && event.altKey) {
+      event.preventDefault()
+      event.stopPropagation()
+      focusToolbar(this._elementRef)
+    } else if ((event.code === 'F8' || event.code === 'Digit0') && event.altKey) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.openKBShortcutModal()
+    } else if (event.code === 'Escape') {
+      // ESC
+      this._forceCloseFloatingToolbar()
+    }
   }
 
   onInit = (_event, editor) => {
     editor.rceWrapper = this
     this.editor = editor
 
-    this.initKeyboardShortcuts(this._elementRef, editor)
     if (document.body.classList.contains('Underline-All-Links__enabled')) {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
     }
@@ -679,8 +662,8 @@ class RCEWrapper extends React.Component {
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
     editor.on('Change', this.doAutoResize)
-
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
+    editor.on('keydown', this.handleKey)
 
     this.announceContextToolbars(editor)
 
@@ -760,9 +743,6 @@ class RCEWrapper extends React.Component {
     if (this.storage) {
       editor.on('change', this.doAutoSave)
       editor.on('blur', this.doAutoSave)
-      window.addEventListener('unload', e => {
-        this.doAutoSave(e)
-      })
 
       this.cleanupAutoSave()
 
@@ -791,16 +771,18 @@ class RCEWrapper extends React.Component {
   // remove any autosaved value that's too old
 
   cleanupAutoSave = (deleteAll = false) => {
-    const expiry = deleteAll
-      ? Date.now()
-      : Date.now() - this.props.autosave.rce_auto_save_max_age_ms
-    let i = 0
-    let key
-    while ((key = this.storage.key(i++))) {
-      if (/^rceautosave:/.test(key)) {
-        const autosaved = this.getAutoSaved(key)
-        if (autosaved && autosaved.autosaveTimestamp < expiry) {
-          this.storage.removeItem(key)
+    if (this.storage) {
+      const expiry = deleteAll
+        ? Date.now()
+        : Date.now() - this.props.autosave.rce_auto_save_max_age_ms
+      let i = 0
+      let key
+      while ((key = this.storage.key(i++))) {
+        if (/^rceautosave:/.test(key)) {
+          const autosaved = this.getAutoSaved(key)
+          if (autosaved && autosaved.autosaveTimestamp < expiry) {
+            this.storage.removeItem(key)
+          }
         }
       }
     }
@@ -832,7 +814,7 @@ class RCEWrapper extends React.Component {
   getAutoSaved(key) {
     let autosaved = null
     try {
-      autosaved = JSON.parse(this.storage.getItem(key))
+      autosaved = this.storage && JSON.parse(this.storage.getItem(key))
     } catch (_ex) {
       this.storage.removeItem(this.autoSaveKey)
     }
@@ -855,35 +837,31 @@ class RCEWrapper extends React.Component {
   }
 
   doAutoSave = (e, retry = false) => {
-    const editor = this.mceInstance()
-    // if the editor is empty don't save
-    if (editor.dom.isEmpty(editor.getBody())) {
-      return
-    }
-    // if no changes have been made,
-    // delete and don't save
-    if (!editor.isDirty()) {
-      this.storage.removeItem(this.autoSaveKey)
-      return
-    }
+    if (this.storage) {
+      const editor = this.mceInstance()
+      // if the editor is empty don't save
+      if (editor.dom.isEmpty(editor.getBody())) {
+        return
+      }
 
-    const content = editor.getContent({no_events: true})
-    try {
-      this.storage.setItem(
-        this.autoSaveKey,
-        JSON.stringify({
-          autosaveTimestamp: Date.now(),
-          content
-        })
-      )
-    } catch (ex) {
-      if (!retry) {
-        // probably failed because there's not enough space
-        // delete up all the other entries and try again
-        this.cleanupAutoSave(true)
-        this.doAutoSave(e, true)
-      } else {
-        console.error('Autosave failed:', ex) // eslint-disable-line no-console
+      const content = editor.getContent({no_events: true})
+      try {
+        this.storage.setItem(
+          this.autoSaveKey,
+          JSON.stringify({
+            autosaveTimestamp: Date.now(),
+            content
+          })
+        )
+      } catch (ex) {
+        if (!retry) {
+          // probably failed because there's not enough space
+          // delete up all the other entries and try again
+          this.cleanupAutoSave(true)
+          this.doAutoSave(e, true)
+        } else {
+          console.error('Autosave failed:', ex) // eslint-disable-line no-console
+        }
       }
     }
   }
@@ -931,19 +909,11 @@ class RCEWrapper extends React.Component {
     this.onTinyMCEInstance('openAccessibilityChecker', {skip_focus: true})
   }
 
-  handleShortcutKeyShortcut = event => {
-    if (event.altKey && (event.keyCode === 48 || event.keyCode === 119)) {
-      event.preventDefault()
-      event.stopPropagation()
-      this.openKBShortcutModal()
-    } else if (event.keyCode === 27) {
-      // ESC
-      this._forceCloseFloatingToolbar()
-    }
-  }
-
   openKBShortcutModal = () => {
-    this.setState({KBShortcutModalOpen: true})
+    this.setState({
+      KBShortcutModalOpen: true,
+      KBShortcutFocusReturn: document.activeElement
+    })
   }
 
   closeKBShortcutModal = () => {
@@ -951,9 +921,12 @@ class RCEWrapper extends React.Component {
   }
 
   KBShortcutModalClosed = () => {
-    // when the modal is opened from the showOnFocus button, focus doesn't
-    // get automatically returned to the button like it should.
-    if (this._showOnFocusButton && document.activeElement === document.body) {
+    if (this.state.KBShortcutFocusReturn === this.iframe) {
+      // if the iframe has focus, we need to forward it on to tinymce
+      this.editor.focus(false)
+    } else if (this._showOnFocusButton && document.activeElement === document.body) {
+      // when the modal is opened from the showOnFocus button, focus doesn't
+      // get automatically returned to the button like it should.
       this._showOnFocusButton.focus()
     }
   }
@@ -963,7 +936,7 @@ class RCEWrapper extends React.Component {
     if (!this._destroyCalled) {
       this.destroy()
     }
-    this._elementRef.removeEventListener('keyup', this.handleShortcutKeyShortcut, true)
+    this._elementRef.removeEventListener('keydown', this.handleKey, true)
   }
 
   // Get top 2 favorited LTI Tools
@@ -1035,12 +1008,13 @@ class RCEWrapper extends React.Component {
             'instructure_image',
             'instructure_record',
             'instructure_documents',
-            ...this.ltiToolFavorites
+            ...this.ltiToolFavorites,
+            'lti_tool_dropdown'
           ]
         },
         {
           name: formatMessage('Miscellaneous and Apps'),
-          items: ['removeformat', 'table', 'instructure_equation', 'lti_tool_dropdown']
+          items: ['removeformat', 'table', 'instructure_equation']
         }
       ],
       contextmenu: '', // show the browser's native context menu
@@ -1063,6 +1037,7 @@ class RCEWrapper extends React.Component {
   handleTextareaChange = () => {
     if (this.isHidden()) {
       this.setCode(this.textareaValue())
+      this.doAutoSave()
     }
   }
 
@@ -1090,7 +1065,7 @@ class RCEWrapper extends React.Component {
 
   componentDidMount() {
     this.registerTextareaChange()
-    this._elementRef.addEventListener('keyup', this.handleShortcutKeyShortcut, true)
+    this._elementRef.addEventListener('keydown', this.handleKey, true)
     // give the textarea its initial size
     this.onResize(null, {deltaY: 0})
     // Preload the LTI Tools modal
@@ -1106,11 +1081,17 @@ class RCEWrapper extends React.Component {
     if (prevState.isHtmlView !== this.state.isHtmlView) {
       if (this.state.isHtmlView) {
         this.getTextarea().removeAttribute('aria-hidden')
+        // Also make the label visible
+        this.getTextarea().labels?.[0]?.removeAttribute('aria-hidden')
+
         this.mceInstance().hide()
         document.getElementById(mceProps.textareaId).focus()
       } else {
         this.setCode(this.textareaValue())
         this.getTextarea().setAttribute('aria-hidden', true)
+        // Also make the label hidden
+        this.getTextarea().labels?.[0]?.setAttribute('aria-hidden', true)
+
         this.mceInstance().show()
         this.mceInstance().focus()
         this.doAutoResize()

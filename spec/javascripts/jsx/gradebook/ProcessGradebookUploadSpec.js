@@ -39,6 +39,7 @@ const newAssignment1 = {id: 0, title: 'New Assignment 1', points_possible: 25, p
 const submissionNew1NoChange = {assignment_id: 0, grade: '20', original_grade: '20'}
 const submissionNew1Change = {assignment_id: 0, grade: '20', original_grade: '25'}
 const submissionNew1Excused = {assignment_id: 0, grade: 'EX', original_grade: '20'}
+const submissionNew1VerboselyExcused = {assignment_id: 0, grade: 'Excused', original_grade: '20'}
 
 const newAssignment2 = {id: -1, title: 'New Assignment 2', points_possible: 25, published: true}
 
@@ -287,11 +288,24 @@ test('alters a grade on a new assignment', () => {
   )
 })
 
-test('alters a grade to excused on a new assignment', () => {
+test('alters a grade to excused on a new assignment if "EX" is supplied', () => {
   const gradeData = {}
   const assignmentMap = mapAssignments()
   ProcessGradebookUpload.populateGradeDataPerSubmission(
     submissionNew1Excused,
+    0,
+    assignmentMap,
+    gradeData
+  )
+
+  equal(gradeData[assignmentMap[submissionNew1Excused.assignment_id]][0].excuse, true)
+})
+
+test('alters a grade to excused on a new assignment if "Excused" is supplied', () => {
+  const gradeData = {}
+  const assignmentMap = mapAssignments()
+  ProcessGradebookUpload.populateGradeDataPerSubmission(
+    submissionNew1VerboselyExcused,
     0,
     assignmentMap,
     gradeData

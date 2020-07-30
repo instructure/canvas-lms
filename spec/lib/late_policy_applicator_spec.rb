@@ -349,6 +349,7 @@ describe LatePolicyApplicator do
         override.assignment_override_students.create!(user: @students[0])
 
         # turn on the late policy without calling callbacks
+        @late_policy = late_policy_factory(course: @course, deduct: 50.0, every: :day, missing: 95.0)
         @course.update_attribute(:late_policy, @late_policy)
 
         late_policy_applicator = LatePolicyApplicator.new(@course, [assignment_to_override])

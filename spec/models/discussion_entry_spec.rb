@@ -288,6 +288,13 @@ describe DiscussionEntry do
       end
     end
 
+    it 'should allow teacher entry on assignment topic to be destroyed' do
+      assignment = @course.assignments.create!(title: @topic.title, submission_types: 'discussion_topic')
+      topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, assignment: assignment)
+      entry = topic.discussion_entries.create!(message: "entry", user: @teacher)
+      expect { entry.destroy }.to_not raise_error
+    end
+
     it "should decrement unread topic counts" do
       expect(@topic.unread_count(@reader)).to eq 2
 

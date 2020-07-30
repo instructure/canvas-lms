@@ -25,16 +25,21 @@ const commsChannel1 = 1
 const commsChannel2 = 2
 
 describe('Notification Preferences Table', () => {
-  it('correctly disables deprecated categories for sms', () => {
+  beforeEach(() => {
     window.ENV = {
       NOTIFICATION_PREFERENCES_OPTIONS: {
+        send_scores_in_emails_text: {
+          label: 'Some Label Text'
+        },
         deprecate_sms_enabled: true,
         allowed_sms_categories: ['announcement', 'grading']
       }
     }
+  })
 
+  it('correctly disables deprecated categories for sms', () => {
     const {getByTestId} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences} />
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
     )
 
     const dueDateCategory = getByTestId('due_date')
@@ -47,7 +52,7 @@ describe('Notification Preferences Table', () => {
 
   it('uses the notification policy overrides over the global policies if available', () => {
     const {getByTestId} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences} />
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
     )
 
     const dueDateCategory = getByTestId('due_date')
@@ -60,7 +65,7 @@ describe('Notification Preferences Table', () => {
 
   it('only renders the category groups and categories that it is given', () => {
     const {queryByTestId} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences} />
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
     )
 
     expect(queryByTestId('courseActivities')).not.toBeNull()
@@ -69,11 +74,31 @@ describe('Notification Preferences Table', () => {
 
   it('renders the category description', () => {
     const {getByTestId, getByText} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences} />
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
     )
 
     const dueDateTooltip = getByTestId('due_date_description')
     expect(dueDateTooltip).not.toBeNull()
     expect(dueDateTooltip).toContainElement(getByText('Due date description'))
+  })
+
+  it('renders the send scores in emails toggle as enabled when the setting is set', () => {
+    const {getByTestId} = render(
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
+    )
+
+    const sendScoresToggle = getByTestId('grading-send-score-in-email')
+    expect(sendScoresToggle.checked).toBe(true)
+  })
+
+  it('renders the send scores in emails toggle as unabled when the setting is not set', () => {
+    const {getByTestId} = render(
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences({sendScoresInEmails: false})}
+      />
+    )
+
+    const sendScoresToggle = getByTestId('grading-send-score-in-email')
+    expect(sendScoresToggle.checked).toBe(false)
   })
 })

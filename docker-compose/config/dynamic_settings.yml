@@ -53,9 +53,8 @@ development:
     canvas:
       auditors.yml: |
         write_paths:
-          - cassandra
           - active_record
-        read_path: cassandra
+        read_path: active_record
       datadog_apm.yml: |
         sample_rate: 0.0
         host_sample_rate: 0.0

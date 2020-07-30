@@ -86,6 +86,7 @@ module AccountReports
       account_report.logger.error e
       @er = ErrorReport.log_exception(nil, e, :user => account_report.user)
       self.message_recipient(account_report, "Generating the report, #{account_report.report_type.to_s.titleize}, failed.  Please report the following error code to your system administrator: ErrorReport:#{@er.id}")
+      @er = nil
     end
   end
 
@@ -193,7 +194,6 @@ module AccountReports
     account_report.end_at ||= Time.now
     account_report.save
     notification.create_message(account_report, [account_report.user]) if notification
-    message
   end
 
 end

@@ -1283,8 +1283,10 @@ QUnit.module('AssignListItemViewSpec - mastery paths link', {
       CONDITIONAL_RELEASE_ENV: {
         active_rules: [
           {
-            trigger_assignment: '1',
-            scoring_ranges: [{assignment_sets: [{assignments: [{assignment_id: '2'}]}]}]
+            trigger_assignment_id: '1',
+            scoring_ranges: [
+              {assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}]}
+            ]
           }
         ]
       },
@@ -1339,8 +1341,10 @@ QUnit.module('AssignListItemViewSpec - mastery paths icon', {
       CONDITIONAL_RELEASE_ENV: {
         active_rules: [
           {
-            trigger_assignment: '1',
-            scoring_ranges: [{assignment_sets: [{assignments: [{assignment_id: '2'}]}]}]
+            trigger_assignment_id: '1',
+            scoring_ranges: [
+              {assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}]}
+            ]
           }
         ]
       },

@@ -31,6 +31,15 @@ Please reference the [canvas-lms use of canvas-rce](https://github.com/instructu
 to get an idea on how to incorporate it into your project. Pay
 special attention to the `RichContentEditor.js` and `serviceRCELoader.js`.
 
+## Tests
+
+Jest tests are run against the .cjs version of the source, so make sure you've built the .cjs assets before running tests:
+
+```bash
+npm run build:canvas
+npm run test:jest
+```
+
 ## Polyfills
 
 This project makes use of modern JavaScript APIs like Promise, Object.assign,

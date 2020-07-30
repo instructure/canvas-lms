@@ -24,12 +24,6 @@ allow_postable_submission_comments:
     user will allow posting the assignment. Previously, this would have required a grade before posting could
     occur.
   applies_to: RootAccount
-eportfolio_moderation:
-  state: hidden
-  applies_to: RootAccount
-  display_name: ePortfolio Moderation
-  description: Flags new ePortfolio content matching specific keywords as possible spam, and allows
-    administrators to either confirm flagged ePortfolios or mark them as safe.
 analytics2_api_access:
   state: hidden
   applies_to: RootAccount
@@ -84,3 +78,9 @@ disable_post_to_sis_when_grading_period_closed:
   display_name: Disable Post to SIS for Assignment in Closed Grading Periods
   description: If set, turns off post-to-SIS functionality for assignments when their grading period closes.
     Only applies if the "Enable new SIS integration settings" feature is enabled.
+final_grade_override_in_gradebook_history:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Final Grade Override in Gradebook History
+  description: Includes overridden course grades in the Gradebook History.
+  applies_to: RootAccount

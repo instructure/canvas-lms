@@ -222,15 +222,15 @@ textarea#account_notification_message, .edit_notification_form textarea {
 }
 
 @include mobile-only {
-  body.responsive_admin_settings h4.ic-notification__title {
+  h4.ic-notification__title {
     padding-#{direction(right)}: 50px;
   }
 
-  body.responsive_admin_settings .announcement-details-post-info {
+  .announcement-details-post-info {
     flex-direction: column;
   }
 
-  body.responsive_admin_settings .announcement-details-post-info__datetime {
+  .announcement-details-post-info__datetime {
     padding-#{direction(right)}: 0px;
   }
 }

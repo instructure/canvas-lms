@@ -25,9 +25,9 @@ export default class WikiPageCollection extends PaginatedCollection {
     this.sortOrders = {
       title: 'asc',
       created_at: 'desc',
-      updated_at: 'desc'
+      updated_at: 'desc',
+      todo_date: 'desc'
     }
-    if (ENV.STUDENT_PLANNER_ENABLED) this.sortOrders.todo_date = 'desc'
     this.setSortField('title')
 
     // remove the front_page indicator on all other models when one is set
