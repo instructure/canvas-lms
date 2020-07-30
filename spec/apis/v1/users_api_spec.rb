@@ -256,7 +256,7 @@ describe Api::V1::User do
     end
 
     it "requires :view_user_logins to return login_id" do
-      RoleOverride.create!(context: Account.default, role: Role.get_built_in_role('AccountAdmin'),
+      RoleOverride.create!(context: Account.default, role: admin_role,
             permission: 'view_user_logins', enabled: false)
       @user = User.create!(:name => 'Test User')
       @user.pseudonyms.create!(:unique_id => 'abc', :account => Account.default)
@@ -277,7 +277,7 @@ describe Api::V1::User do
       end
 
       it "does not include email without :read_email_addresses permission" do
-        RoleOverride.create!(context: Account.default, role: Role.get_built_in_role('AccountAdmin'),
+        RoleOverride.create!(context: Account.default, role: admin_role,
             permission: 'read_email_addresses', enabled: false)
         json = @test_api.user_json(@user, @admin, {}, ['email'], Account.default)
         expect(json.keys).not_to include 'email'

@@ -20,7 +20,13 @@ class AccountNotificationRole < ActiveRecord::Base
   belongs_to :account_notification
 
   belongs_to :role
-  include Role::AssociationHelper
+  before_save :resolve_cross_account_role
+
+  def resolve_cross_account_role
+    if self.will_save_change_to_role_id? && self.role.root_account_id != self.account_notification.account.resolved_root_account_id
+      self.role = self.role.role_for_root_account_id(self.account_notification.account.resolved_root_account_id)
+    end
+  end
 
   def role_name
     self.role_id ? role.name : 'NilEnrollment'

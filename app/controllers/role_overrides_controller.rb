@@ -135,7 +135,7 @@ class RoleOverridesController < ApplicationController
       states = %w(active) if states.empty?
 
       roles = []
-      roles += Role.visible_built_in_roles if states.include?('active')
+      roles += Role.visible_built_in_roles(root_account_id: @context.resolved_root_account_id) if states.include?('active')
 
       scope = value_to_boolean(params[:show_inherited]) ? @context.available_custom_roles(true) : @context.roles
       roles += scope.where(:workflow_state => states).order(:id).to_a

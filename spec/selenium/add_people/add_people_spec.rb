@@ -117,7 +117,7 @@ describe "add_people" do
     end
 
     it "should include only manageable roles" do
-      @course.account.role_overrides.create! :role => Role.get_built_in_role('TeacherEnrollment'),
+      @course.account.role_overrides.create! :role => teacher_role,
                                              :permission => :manage_students,
                                              :enabled => false
       get "/courses/#{@course.id}/users"

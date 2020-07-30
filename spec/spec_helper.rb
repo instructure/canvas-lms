@@ -404,7 +404,6 @@ RSpec.configure do |config|
 
   config.before :all do
     raise "all specs need to use transactions" unless using_transactions_properly?
-    Role.ensure_built_in_roles!
   end
 
   Onceler.configure do |c|

@@ -21,7 +21,6 @@ class RoleOverride < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account]
 
   belongs_to :role
-  include Role::AssociationHelper
 
   validates :enabled, inclusion: [true, false]
   validates :locked, inclusion: [true, false]
@@ -31,6 +30,7 @@ class RoleOverride < ActiveRecord::Base
   after_save :clear_caches
 
   resolves_root_account through: ->(record) { record.context.resolved_root_account_id }
+  include Role::AssociationHelper
 
   def clear_caches
     RoleOverride.clear_caches(self.account, self.role)
@@ -56,7 +56,8 @@ class RoleOverride < ActiveRecord::Base
 
   ACCOUNT_ADMIN_LABEL = lambda { t('roles.account_admin', "Account Admin") }
   def self.account_membership_types(account)
-    res = [{:id => Role.get_built_in_role("AccountAdmin").id, :name => "AccountAdmin", :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => ACCOUNT_ADMIN_LABEL.call}]
+    res = [{:id => Role.get_built_in_role("AccountAdmin", root_account_id: account.resolved_root_account_id).id,
+      :name => "AccountAdmin", :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => ACCOUNT_ADMIN_LABEL.call}]
     account.available_custom_account_roles.each do |r|
       res << {:id => r.id, :name => r.name, :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => r.name}
     end
@@ -1152,7 +1153,14 @@ class RoleOverride < ActiveRecord::Base
       overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
         # skip loading from site admin if the role is not from site admin
         next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
-        RoleOverride.where(context_id: accounts, context_type: 'Account', role_id: role)
+        if role.built_in?
+          # it's possible we're still migrating the root account ownership - so pull for all equivalent built in roles
+          # TODO remove after datafixup
+          RoleOverride.where(:context_id => accounts, :context_type => 'Account',
+            :role_id => Role.where(:workflow_state => 'built_in', :base_role_type => role.base_role_type).select(:id))
+        else
+          RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
+        end
       end
 
       accounts.reverse!

@@ -48,27 +48,27 @@ module Factories
     custom_role(Role::DEFAULT_ACCOUNT_TYPE, name, opts)
   end
 
-  def student_role
-    Role.get_built_in_role("StudentEnrollment")
+  def student_role(root_account_id: Account.default.id)
+    Role.get_built_in_role("StudentEnrollment", root_account_id: root_account_id)
   end
 
-  def teacher_role
-    Role.get_built_in_role("TeacherEnrollment")
+  def teacher_role(root_account_id: Account.default.id)
+    Role.get_built_in_role("TeacherEnrollment", root_account_id: root_account_id)
   end
 
-  def ta_role
-    Role.get_built_in_role("TaEnrollment")
+  def ta_role(root_account_id: Account.default.id)
+    Role.get_built_in_role("TaEnrollment", root_account_id: root_account_id)
   end
 
-  def designer_role
-    Role.get_built_in_role("DesignerEnrollment")
+  def designer_role(root_account_id: Account.default.id)
+    Role.get_built_in_role("DesignerEnrollment", root_account_id: root_account_id)
   end
 
-  def observer_role
-    Role.get_built_in_role("ObserverEnrollment")
+  def observer_role(root_account_id: Account.default.id)
+    Role.get_built_in_role("ObserverEnrollment", root_account_id: root_account_id)
   end
 
-  def admin_role
-    Role.get_built_in_role("AccountAdmin")
+  def admin_role(root_account_id: Account.default.id)
+    Role.get_built_in_role("AccountAdmin", root_account_id: root_account_id)
   end
 end

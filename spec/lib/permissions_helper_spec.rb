@@ -21,8 +21,8 @@ require 'sharding_spec_helper'
 describe PermissionsHelper do
   describe '#manageable_enrollments_by_permission' do
     before :once do
-      @student_role = Role.get_built_in_role('StudentEnrollment')
-      @teacher_role = Role.get_built_in_role('TeacherEnrollment')
+      @student_role = student_role
+      @teacher_role = teacher_role
     end
 
     it 'should return enrollments that have permission by default' do
@@ -76,7 +76,6 @@ describe PermissionsHelper do
     it 'should handle AccountAdmin roles' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
-      admin_role = Role.get_built_in_role('AccountAdmin')
       @user.account_users.create!(account: Account.default, role: admin_role)
       enrollments = @user.manageable_enrollments_by_permission(:manage_calendar)
       expect(enrollments).to match_array([student_enrollment, teacher_enrollment])
@@ -89,7 +88,6 @@ describe PermissionsHelper do
       subaccount = Account.default.sub_accounts.create!
       student_enrollment = course_with_student(active_all: true, account: subaccount)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true, account: subaccount)
-      admin_role = Role.get_built_in_role('AccountAdmin')
       @user.account_users.create!(account: Account.default, role: admin_role)
       enrollments = @user.manageable_enrollments_by_permission(:manage_calendar)
       expect(enrollments).to match_array([student_enrollment, teacher_enrollment])
@@ -103,7 +101,7 @@ describe PermissionsHelper do
       custom_role = custom_account_role('OverrideTest', account: Account.default)
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: custom_role, account: Account.default)
       @user.account_users.create!(account: Account.default, role: custom_role)
-      @user.account_users.create!(account: Account.default, role: Role.get_built_in_role('AccountAdmin'))
+      @user.account_users.create!(account: Account.default, role: admin_role)
       enrollments = @user.manageable_enrollments_by_permission(:manage_calendar)
       expect(enrollments).to match_array([student_enrollment])
     end
@@ -266,7 +264,6 @@ describe PermissionsHelper do
 
     it 'should handle AccountAdmin when the permission is off by default' do
       student_enrollment = course_with_student(active_all: true)
-      admin_role = Role.get_built_in_role('AccountAdmin')
       @user.account_users.create!(account: Account.default, role: admin_role)
       enrollments1 = @user.manageable_enrollments_by_permission(:view_notifications)
       expect(enrollments1).to match_array([])
@@ -278,7 +275,6 @@ describe PermissionsHelper do
     it 'should handle role overrides that turn off the permission for AccountAdmin but on for another account admin' do
       student_enrollment = course_with_student(active_all: true)
       custom_role = custom_account_role('OverrideTest', account: Account.default)
-      admin_role = Role.get_built_in_role('AccountAdmin')
       @user.account_users.create!(account: Account.default, role: custom_role)
       @user.account_users.create!(account: Account.default, role: admin_role)
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: admin_role, account: Account.default)
@@ -289,7 +285,6 @@ describe PermissionsHelper do
 
     it 'should handle role overrides that turn off the permission for AccountAdmin and a course role that has it on by default' do
       teacher_enrollment = course_with_teacher(active_all: true)
-      admin_role = Role.get_built_in_role('AccountAdmin')
       @user.account_users.create!(account: Account.default, role: admin_role)
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: admin_role, account: Account.default)
       enrollments = @user.manageable_enrollments_by_permission(:manage_calendar)
@@ -298,7 +293,6 @@ describe PermissionsHelper do
 
     it 'should handle AccountAdmin with the permission on when another override turns it off' do
       teacher_enrollment = course_with_teacher(active_all: true)
-      admin_role = Role.get_built_in_role('AccountAdmin')
       @user.account_users.create!(account: Account.default, role: admin_role)
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: @teacher_role, account: Account.default)
       enrollments = @user.manageable_enrollments_by_permission(:manage_calendar)
@@ -337,13 +331,14 @@ describe PermissionsHelper do
           @another_account = Account.create!
           @student_enrollment1 = course_with_student(active_all: true, account: @another_account)
           @teacher_enrollment1 = course_with_teacher(user: @user, active_all: true, account: @another_account)
-          @user.account_users.create!(account: @another_account, role: Role.get_built_in_role('AccountAdmin'))
-          RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: Role.find_by(name: 'TeacherEnrollment'), account: @another_account)
+          @user.account_users.create!(account: @another_account, role: admin_role(root_account_id: @another_account.id))
+          RoleOverride.create!(permission: 'manage_calendar', enabled: false,
+            role: teacher_role(root_account_id: @another_account.id), account: @another_account)
         end
         student_enrollment2 = course_with_student(user: @user, active_all: true)
         teacher_enrollment2 = course_with_teacher(user: @user, active_all: true)
-        AccountUser.create!(user: @user, account: Account.default, role: Role.get_built_in_role('AccountAdmin'))
-        RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: Role.get_built_in_role('TeacherEnrollment'), account: Account.default)
+        AccountUser.create!(user: @user, account: Account.default, role: admin_role)
+        RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: teacher_role, account: Account.default)
         enrollments = @user.manageable_enrollments_by_permission(:manage_calendar)
         expect(enrollments).to match_array([student_enrollment2, teacher_enrollment2, @student_enrollment1, @teacher_enrollment1])
       end
@@ -491,14 +486,16 @@ describe PermissionsHelper do
           @another_account = Account.create!
           @student_enrollment1 = course_with_student(active_all: true, account: @another_account)
           @teacher_enrollment1 = course_with_teacher(user: @user, active_all: true, account: @another_account)
-          @user.account_users.create!(account: @another_account, role: Role.get_built_in_role('AccountAdmin'))
-          RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: Role.find_by(name: 'TeacherEnrollment'), account: @another_account)
-          RoleOverride.create!(permission: 'moderate_forum', enabled: true, role: Role.find_by(name: 'StudentEnrollment'), account: @another_account)
+          @user.account_users.create!(account: @another_account, role: admin_role(root_account_id: @another_account.id))
+          RoleOverride.create!(permission: 'manage_calendar', enabled: false,
+            role: teacher_role(root_account_id: @another_account.id), account: @another_account)
+          RoleOverride.create!(permission: 'moderate_forum', enabled: true,
+            role: student_role(root_account_id: @another_account.id), account: @another_account)
         end
         student_enrollment2 = course_with_student(user: @user, active_all: true)
         teacher_enrollment2 = course_with_teacher(user: @user, active_all: true)
-        AccountUser.create!(user: @user, account: Account.default, role: Role.get_built_in_role('AccountAdmin'))
-        RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: Role.get_built_in_role('TeacherEnrollment'), account: Account.default)
+        AccountUser.create!(user: @user, account: Account.default, role: admin_role)
+        RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: teacher_role, account: Account.default)
 
         courses = @user.enrollments.shard(@user).to_a.map(&:course)
         permissions = [:manage_calendar, :moderate_forum, :manage_grades]
