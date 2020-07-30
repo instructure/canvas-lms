@@ -44,6 +44,20 @@ describe "threaded discussions" do
     expect(last_entry.depth).to eq 1
   end
 
+  it "should reply with iframe element" do
+    entry_text = "<iframe src='https://example.com'></iframe>"
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    f('#discussion_topic').find_element(:css, '.discussion-reply-action').click
+    wait_for_ajaximations
+    fj("a:contains('HTML Editor')").click
+    wait_for_ajaximations
+    f("textarea[data-rich_text='true']").send_keys entry_text
+    fj("button:contains('Post Reply')").click
+    wait_for_ajaximations
+    expect(get_all_replies.count).to eq 1
+    expect(f("iframe[src='https://example.com']")).to be_present
+  end
+
   it "should allow edits to entries with replies", priority: "2", test_id: 222520 do
     skip_if_chrome('Type in tiny fails in chrome')
     edit_text = 'edit message'
