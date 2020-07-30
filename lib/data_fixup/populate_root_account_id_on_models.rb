@@ -175,6 +175,13 @@ module DataFixup::PopulateRootAccountIdOnModels
     ].freeze
   end
 
+  def self.ignore_cross_shard_associations_tables
+    [
+      ContentMigration, # there are a very small number cross-shard associations for some reason; we can ignore them
+      Wiki, # complicated because it is a has_one instead of a belongs_to; really shouldn't have cross-shard associations anyway
+    ]
+  end
+
   # tables that have been filled for a while already
   DONE_TABLES = [Account, Assignment, Course, CourseSection, Enrollment, EnrollmentDatesOverride, EnrollmentTerm, Group].freeze
 
@@ -402,7 +409,9 @@ module DataFixup::PopulateRootAccountIdOnModels
         account_id_column = create_column_names(reflection, columns)
         scope = table.where(primary_key_field => batch_min..batch_max, root_account_id: nil)
         scope.joins(assoc).update_all("root_account_id = #{account_id_column}")
-        fill_cross_shard_associations(table, scope, reflection, account_id_column) unless table == Wiki
+        unless ignore_cross_shard_associations_tables.include?(table)
+          fill_cross_shard_associations(table, scope, reflection, account_id_column)
+        end
       end
     end
 

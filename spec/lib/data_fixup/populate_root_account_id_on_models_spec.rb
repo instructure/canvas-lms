@@ -268,26 +268,45 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    it 'should populate the root_account_id on ContentMigration' do
-      cm = @course.content_migrations.create!(user: @user)
-      cm.update_columns(root_account_id: nil)
-      expect(cm.root_account_id).to be nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(cm.reload.root_account_id).to eq @course.root_account_id
+    context 'with ContentMigration' do
+      it 'should populate the root_account_id' do
+        cm = @course.content_migrations.create!(user: @user)
+        cm.update_columns(root_account_id: nil)
+        expect(cm.root_account_id).to be nil
+        DataFixup::PopulateRootAccountIdOnModels.run
+        expect(cm.reload.root_account_id).to eq @course.root_account_id
 
-      account = account_model(root_account: account_model)
-      cm = account.content_migrations.create!(user: @user)
-      cm.update_columns(root_account_id: nil)
-      expect(cm.root_account_id).to be nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(cm.reload.root_account_id).to eq account.root_account_id
+        account = account_model(root_account: account_model)
+        cm = account.content_migrations.create!(user: @user)
+        cm.update_columns(root_account_id: nil)
+        expect(cm.root_account_id).to be nil
+        DataFixup::PopulateRootAccountIdOnModels.run
+        expect(cm.reload.root_account_id).to eq account.root_account_id
 
-      group_model
-      cm = @group.content_migrations.create!(user: @user)
-      cm.update_columns(root_account_id: nil)
-      expect(cm.root_account_id).to be nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(cm.reload.root_account_id).to eq @group.root_account_id
+        group_model
+        cm = @group.content_migrations.create!(user: @user)
+        cm.update_columns(root_account_id: nil)
+        expect(cm.root_account_id).to be nil
+        DataFixup::PopulateRootAccountIdOnModels.run
+        expect(cm.reload.root_account_id).to eq @group.root_account_id
+      end
+
+      context 'with sharding' do
+        specs_require_sharding
+
+        it "shouldn't fill the root_account_id using cross-shard associations" do
+          # There are for some strange reason a small amount of these. ignore them.
+          account = @shard1.activate { account_model }
+          @shard2.activate do
+            cm = ContentMigration.create(context: account_model)
+            cm.update_columns(context_id: account.global_id, root_account_id: nil)
+            expect(cm.reload.root_account_id).to eq nil
+            expect(cm.shard.id).to_not eq(cm.context.shard.id)
+            DataFixup::PopulateRootAccountIdOnModels.run
+            expect(cm.reload.root_account_id).to eq nil
+          end
+        end
+      end
     end
 
     context 'with ContentParticipation' do
