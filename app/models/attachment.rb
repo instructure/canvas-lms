@@ -331,7 +331,7 @@ class Attachment < ActiveRecord::Base
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
     dup.shard.activate do
-      if Attachment.s3_storage? && !instfs_hosted? && context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
+      if Attachment.s3_storage? && !instfs_hosted? && context.try(:root_account) && self.namespace != context.root_account.file_namespace
         dup.save_without_broadcasting!
         dup.make_rootless
         dup.change_namespace(context.root_account.file_namespace)
