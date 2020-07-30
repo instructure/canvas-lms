@@ -28,12 +28,6 @@ def specs_require_sharding
   if has_sharding?
     include Switchman::RSpecHelper
     include Onceler::Sharding
-
-    before :all do
-      Shard.with_each_shard do
-        Role.ensure_built_in_roles!
-      end
-    end
   else
     before(:once) do
       skip 'Sharding specs fail without additional support from a multi-tenancy plugin'

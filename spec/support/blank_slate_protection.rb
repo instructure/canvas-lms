@@ -56,7 +56,6 @@ module BlankSlateProtection
     r_spec_helper
     add_onceler_hooks
     recreate_persistent_test_shards
-    ensure_built_in_roles
   ].freeze
 
   class << self

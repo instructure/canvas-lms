@@ -148,7 +148,6 @@ describe WikiPagesApiController, type: :request do
 
           context 'when the user does not have manage_wiki_update permission' do
             before :once do
-              teacher_role = Role.get_built_in_role('TeacherEnrollment')
               RoleOverride.create!(
                 permission: 'manage_wiki_update',
                 enabled: false,
@@ -255,7 +254,6 @@ describe WikiPagesApiController, type: :request do
       end
 
       it 'does not allow you to destroy a wiki page if you do not have the manage_wiki_delete permission' do
-        teacher_role = Role.get_built_in_role('TeacherEnrollment')
         RoleOverride.create!(
           permission: 'manage_wiki_delete',
           enabled: false,

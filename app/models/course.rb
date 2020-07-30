@@ -2091,7 +2091,7 @@ class Course < ActiveRecord::Base
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
     associated_user_id = opts[:associated_user_id]
 
-    role = opts[:role] || self.shard.activate { Enrollment.get_built_in_role_for_type(type) }
+    role = opts[:role] || self.shard.activate { Enrollment.get_built_in_role_for_type(type, root_account_id: self.root_account_id) }
 
     start_at = opts[:start_at]
     end_at = opts[:end_at]

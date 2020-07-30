@@ -68,7 +68,7 @@ describe "conversations new" do
 
     it "should not allow admins without read_roster permission to send a message without picking a context", priority: "1" do
       user = account_admin_user
-      RoleOverride.manage_role_override(Account.default, Role.get_built_in_role('AccountAdmin'), 'read_roster', override: false, locked: false)
+      RoleOverride.manage_role_override(Account.default, admin_role, 'read_roster', override: false, locked: false)
       user_logged_in({:user => user})
       conversations
       f('#compose-btn').click

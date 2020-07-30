@@ -3118,7 +3118,7 @@ describe CoursesController do
     it 'does not allow a teacher without the permission to change visibility' do
       course = Course.create!
       teacher = teacher_in_course(course: course, active_all: true).user
-      course.account.role_overrides.create!(role: Role.get_built_in_role('TeacherEnrollment'), permission: 'manage_course_visibility', enabled: false)
+      course.account.role_overrides.create!(role: teacher_role, permission: 'manage_course_visibility', enabled: false)
       user_session(teacher)
 
       post 'update', params: { id: course.id,

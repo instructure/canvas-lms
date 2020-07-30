@@ -1321,7 +1321,7 @@ describe Account do
     end
 
     it "should include built-in roles when called" do
-      expect(@sub_account.available_course_roles.sort_by(&:id)).to eq ([ @roleA, @roleB, @roleC ] + Role.built_in_course_roles).sort_by(&:id)
+      expect(@sub_account.available_course_roles.sort_by(&:id)).to eq ([ @roleA, @roleB, @roleC ] + Role.built_in_course_roles(root_account_id: @account.id)).sort_by(&:id)
     end
   end
 

@@ -1012,7 +1012,7 @@ class Account < ActiveRecord::Base
 
   def available_account_roles(include_inactive=false, user = nil)
     account_roles = available_custom_account_roles(include_inactive)
-    account_roles << Role.get_built_in_role('AccountAdmin')
+    account_roles << Role.get_built_in_role('AccountAdmin', root_account_id: resolved_root_account_id)
     if user
       account_roles.select! { |role| au = account_users.new; au.role_id = role.id; au.grants_right?(user, :create) }
     end
@@ -1025,7 +1025,7 @@ class Account < ActiveRecord::Base
 
   def available_course_roles(include_inactive=false)
     course_roles = available_custom_course_roles(include_inactive)
-    course_roles += Role.built_in_course_roles
+    course_roles += Role.built_in_course_roles(root_account_id: resolved_root_account_id)
     course_roles
   end
 
@@ -1050,7 +1050,7 @@ class Account < ActiveRecord::Base
   end
 
   def get_role_by_name(role_name)
-    if (role = Role.get_built_in_role(role_name))
+    if (role = Role.get_built_in_role(role_name, root_account_id: self.resolved_root_account_id))
       return role
     end
 
@@ -1891,9 +1891,23 @@ class Account < ActiveRecord::Base
       default_enrollment_term
       enable_canvas_authentication
       TermsOfService.ensure_terms_for_account(self, true) if self.root_account? && !TermsOfService.skip_automatic_terms_creation
+      create_built_in_roles if self.root_account?
     end
     return work.call if Rails.env.test?
     self.class.connection.after_transaction_commit(&work)
+  end
+
+  def create_built_in_roles
+    self.shard.activate do
+      Role::BASE_TYPES.each do |base_type|
+        role = Role.new
+        role.name = base_type
+        role.base_role_type = base_type
+        role.workflow_state = :built_in
+        role.root_account_id = self.id
+        role.save!
+      end
+    end
   end
 
   def migrate_to_canvadocs?
