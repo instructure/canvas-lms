@@ -216,17 +216,7 @@ require_relative 'rspec_mock_extensions'
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 require 'i18n_tasks'
-
-legit_global_methods = Object.private_methods
-Dir[File.dirname(__FILE__) + "/factories/**/*.rb"].each {|f| require f }
-crap_factories = (Object.private_methods - legit_global_methods)
-if crap_factories.present?
-  $stderr.puts "\e[31mError: Don't create global factories/helpers"
-  $stderr.puts "Put #{crap_factories.map { |m| "`#{m}`" }.to_sentence} in the `Factories` module"
-  $stderr.puts "(or somewhere else appropriate)\e[0m"
-  $stderr.puts
-  exit! 1
-end
+require_relative 'factories'
 
 Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].each {|f| require f }
 
@@ -527,22 +517,6 @@ RSpec.configure do |config|
 
   def default_uploaded_data
     fixture_file_upload('docs/doc.doc', 'application/msword', true)
-  end
-
-  def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
-    obj = ar_klass.respond_to?(:new) ? ar_klass.new : ar_klass.build
-    attrs.each { |k, v| obj.send("#{k}=", attrs[k]) }
-    obj.save! if do_save
-    obj
-  end
-
-  def update_with_protected_attributes!(ar_instance, attrs)
-    attrs.each { |k, v| ar_instance.send("#{k}=", attrs[k]) }
-    ar_instance.save!
-  end
-
-  def update_with_protected_attributes(ar_instance, attrs)
-    update_with_protected_attributes!(ar_instance, attrs) rescue false
   end
 
   def create_temp_dir!
