@@ -213,6 +213,7 @@ describe('Upload data actions', () => {
           store.spy.calledWith({
             type: actions.START_FILE_UPLOAD,
             file: {
+              bookmark: undefined,
               parentFolderId: 24,
               name: 'foo.png',
               size: 3000,

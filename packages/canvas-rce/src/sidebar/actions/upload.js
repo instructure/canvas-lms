@@ -252,6 +252,9 @@ export function createMediaServerSession() {
 
 export function uploadToMediaFolder(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
+    const editorComponent = Bridge.activeEditor()
+    const bookmark = editorComponent?.editor?.selection.getBookmark(2, true)
+
     dispatch(activateMediaUpload(fileMetaProps))
     const {source, jwt, host, contextId, contextType} = getState()
     return source
@@ -261,7 +264,7 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
         if (fileMetaProps.domObject) {
           delete fileMetaProps.domObject.preview // don't need this anymore
         }
-        dispatch(uploadPreflight(tabContext, fileMetaProps))
+        dispatch(uploadPreflight(tabContext, {...fileMetaProps, bookmark}))
       })
       .catch(e => {
         // Get rid of any placeholder that might be there.
@@ -382,7 +385,20 @@ export function uploadPreflight(tabContext, fileMetaProps) {
         return results
       })
       .then(results => {
-        return embedUploadResult({contextType, contextId, ...results}, tabContext)
+        let newBookmark
+        const editorComponent = Bridge.activeEditor()
+        if (fileMetaProps.bookmark) {
+          newBookmark = editorComponent.editor.selection.getBookmark(2, true)
+          editorComponent.editor.selection.moveToBookmark(fileMetaProps.bookmark)
+        }
+
+        const uploadResult = embedUploadResult({contextType, contextId, ...results}, tabContext)
+
+        if (fileMetaProps.bookmark) {
+          editorComponent.editor.selection.moveToBookmark(newBookmark)
+        }
+
+        return uploadResult
       })
       .then(results => {
         dispatch(allUploadCompleteActions(results, fileMetaProps, contextType))
