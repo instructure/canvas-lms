@@ -376,3 +376,18 @@ table.criterion .insert {
   list-style: none;
   padding: $ic-sp 0;
 }
+
+@media (min-width: 768px) and (max-width: 979px) {
+  .outcomes-browser {
+    .outcomes-content {
+      .learning_outcome {
+        label.span3 {
+          width: 220px
+        }
+        input.span3 {
+          width: 224px
+        }
+      }
+    }
+  }
+}
