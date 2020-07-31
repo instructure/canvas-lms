@@ -281,7 +281,7 @@ pt:
     tab_question_banks: "Bancos de perguntas"
     tab_root_accounts: "Contas de raiz"
     tab_rubrics: Protocolos
-    tab_settings: Definições
+    tab_settings: Configurações
     tab_sis_import: "Importação do SIS"
     tab_statistics: Estatísticas
     tab_sub_accounts: Subcontas
@@ -408,7 +408,7 @@ pt:
   account_id_f6e26867: "ID da conta"
   account_level_notification_preferences_require_an__66467cd7: "As preferências de notificação de nível de conta requerem uma account_id para atualização"
   account_level_notification_preferences_ui_update_f5e189a4: "Preferências de notificação ao nível da conta UI update"
-  account_level_settings_manage_4fca6f8e: "Definições no nível da conta - gerir"
+  account_level_settings_manage_4fca6f8e: "Configurações no nível da conta - gerir"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nome da conta"
   account_name_analytics_62bf60ae: "%{account.name} Análise"
@@ -434,7 +434,7 @@ pt:
       end_text: "Fim em: %{end_at};"
       error_text: "Falha, comunique o seguinte código de erro ao administrador do sistema: ErrorReport:%{error};"
       extra_text_term: "Período: %{term_name};"
-      message: "%{type} relatório gerado com sucesso com as seguintes definições. Conta: %{account}; %{options}"
+      message: "%{type} relatório gerado com sucesso com as seguintes configurações. Conta: %{account}; %{options}"
       section_text: "Para Seção: %{section};"
       start_text: "Início em: %{start_at};"
       term_text: "Período: %{term_name};"
@@ -568,7 +568,7 @@ pt:
       open_registration_delegated_warning_dialog: "Está ativado um fornecedor de identidade externo"
       what_are_quiz_ip_filters: "O que são filtros de IP de teste?"
     user: Utilizador
-  account_settings_fe083453: "Definições de conta"
+  account_settings_fe083453: "Configurações de conta"
   account_settings_subaccount_navigation_3af6f7f5: "Definições de conta (Navegação de subconta)"
   account_sis_id_2e4a461: "Id do sis da conta"
   account_sis_id_5da8fd2d: "ID Sis Conta"
@@ -839,8 +839,8 @@ pt:
         zero: Enviado
       title: "Imagens do perfil"
       unlock_link: destravar
-    cannot_manage_account: "Não tem permissão para gerir definições de conta"
-    cannot_manage_quotas: "Não tem permissão para gerir definições de quotas"
+    cannot_manage_account: "Não tem permissão para gerir configurações de conta"
+    cannot_manage_quotas: "Não tem permissão para gerir configurações de quotas"
     ccp_zero_activity_csv_parameters: 
       account_reports: 
         ccp: 
@@ -1163,7 +1163,7 @@ pt:
             check_box: "CSV de lista X"
         sis_default: 
           parameters: 
-            note: "*As definições de período têm impacto apenas nos ficheiros CSV de Disciplinas, Secções, Inscrições e lista X."
+            note: "*As configurações de período têm impacto apenas nos ficheiros CSV de Disciplinas, Secções, Inscrições e lista X."
     public_courses_csv_description: 
       account_reports: 
         default: 
@@ -1271,7 +1271,7 @@ pt:
       delete: excluir
       delete_announcement_tooltip: "Eliminar este anúncio"
       email_notification_from_description: "Esta definição permite ao Administrador marcar ou etiquetar o texto \"De\" em todas as notificações enviadas a partir do Canvas para esta conta."
-      email_notification_from_settings: "Definições de \"De\" em notificação por e-mail"
+      email_notification_from_settings: "Configurações de \"De\" em notificação por e-mail"
       enabled_web_serices_title: "Serviços da web ativados"
       equall_endpoint_help: "Este é o URL do seu serviço Equella. Provavelmente terá esta aparência \"%{sample_url}\"."
       equella_settings_title: "Configurações do Equella"
@@ -1289,7 +1289,7 @@ pt:
       headings: 
         quotas: "Quotas de conta"
         sections: Relatórios
-        settings: "Definições de conta"
+        settings: "Configurações de conta"
       help_link_available_to_all_admins: Administradores
       help_link_available_to_all_students: Alunos
       help_link_available_to_all_teachers: Professores
@@ -1410,7 +1410,7 @@ pt:
       open_registration_delegated_warning_message: "Um fornecedor de identidade externo está ativado e os utilizadores criados por meio de registo aberto podem não conseguir iniciar sessão, a menos que o formulário de início de sessão do fornecedor de identidade externo tenha uma ligação para %{url}."
       open_registration_delegated_warning_tooltip: "Está ativado um fornecedor de identidade externo"
       open_report_description: "Abrir descrição do relatório"
-      page_header_title: "Definições de conta"
+      page_header_title: "Configurações de conta"
       page_title: "Conteúdo compartilhado"
       quiz_ip_filters_delete: "Remover filtro"
       quiz_ip_filters_help_message: |-
@@ -1479,7 +1479,7 @@ pt:
       group_enrollments: "Inscrições em grupo"
       groups: Grupos
       imported_items_title: "Itens importados"
-      sections_label: Seções
+      sections_label: Secções
       terms_label: Períodos
       users_label: Utilizadores
     sis_batch_messages: 
@@ -1489,7 +1489,7 @@ pt:
       account_reports: 
         sis_export: 
           description: 
-            text: "Relatório de Exportação SIS: Este relatório vai exportar todos os ficheiros necessários para Utilizadores, Contas, Termos, Disciplinas, Seções, Inscrições, Grupos, Membros de Grupos, e Listagens de Verificação para uma importação SIS na sua respetiva categoria. Isto apenas vai devolver itens criados ou modificados através do SIS."
+            text: "Relatório de Exportação SIS: Este relatório vai exportar todos os ficheiros necessários para Utilizadores, Contas, Termos, Disciplinas, Secções, Inscrições, Grupos, Membros de Grupos, e Listagens de Verificação para uma importação SIS na sua respetiva categoria. Isto apenas vai devolver itens criados ou modificados através do SIS."
     sis_export_csv_parameters: 
       account_reports: 
         default: 
@@ -1514,7 +1514,7 @@ pt:
             check_box: "CSV de lista X"
         sis_default: 
           parameters: 
-            note: "*As definições de período têm impacto apenas nos ficheiros CSV de Disciplinas, Secções, Inscrições e lista X."
+            note: "*As configurações de período têm impacto apenas nos ficheiros CSV de Disciplinas, Secções, Inscrições e lista X."
     sis_import: 
       add_sis_stickiness_instructions: "Com esta opção selecionada, as alterações feitas através desta importação do SIS serão processadas como se fossem alterações de UI, evitando que importações de não substituição subsequentes alterem os campos aqui alterados."
       add_sis_stickiness_label: "Processar à medida que a UI é alterada"
@@ -1825,7 +1825,7 @@ pt:
   add_quiz_ip_filter_c7b37dc5: "Adicionar Filtro para Teste IP"
   add_rating_89d7fbde: "Adicionar classificação"
   add_recipient_ff135ed7: "Adicionar destinatário"
-  add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Adicionar, remover ou reorganizar seções para este portefólio"
+  add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Adicionar, remover ou reorganizar secções para este portefólio"
   add_review_2fb1590c: "Adicionar Revisão"
   add_role_3dc4d273: "Adicionar função"
   add_rubric_3636d9a6: "Adicionar protocolo"
@@ -1859,13 +1859,13 @@ pt:
   additional_considerations_3ee46e5b: "Considerações adicionais"
   additional_occurrence_s_7b5b0173: "ocorrência(s) adicional(is)"
   additional_outcomes_options_6df428f1: "Opções de resultados adicionais"
-  additional_settings_20362654: "Definições adicionais"
-  additional_settings_for_sis_syncing_f926973e: "Definições adicionais para a sincronização do SIS"
+  additional_settings_20362654: "Configurações adicionais"
+  additional_settings_for_sis_syncing_f926973e: "Configurações adicionais para a sincronização do SIS"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Configurações adicionais de Tarefa de Sincronização do SIS, Questionário e Discussão"
   additional_sort_options_for_new_gradebook_2dc1939: "Opções adicionais de ordenação para Novo  Livro de Notas"
   addressbook_microservice_a4940422: "AddressBook microserviço"
   addressbook_performance_tap_98ddf67: "AddressBook Toque de desempenho"
-  adds_analytics_link_on_the_user_settings_menu_3a048816: "Adiciona a ligação de análise no menu de definições do utilizador."
+  adds_analytics_link_on_the_user_settings_menu_3a048816: "Adiciona a ligação de análise no menu de configurações do utilizador."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Adiciona análises ao cartão de contexto de um aluno."
   adjust_final_grade_fa45e7e0: "Ajustar a nota final"
   admin_4d3ba42f: Admin
@@ -1961,7 +1961,7 @@ pt:
       threshold_should_be_numeric: "Este valor deve ser um número positivo."
   alerts_6b871b71: Alertas
   alerts_add_edit_delete_d71091c6: "Alertas - adicionar/editar/excluir"
-  alerts_course_settings_53551794: "Alertas (definições da disciplina)"
+  alerts_course_settings_53551794: "Alertas (configurações da disciplina)"
   align_outcomes_to_this_page_7d055196: "Alinhe os resultados a esta página"
   all_4321c3a1: Todos
   all_account_types_e83c1516: "Todos os tipos de conta"
@@ -1996,7 +1996,7 @@ pt:
   all_my_sections_375248b3: "Todas as minhas seções"
   all_roles_f3bba14d: "Todas as funções"
   all_scopename_scopes_6c220783: "Todos os escopos %{scopeName}"
-  all_sections_daf11554: "Todas as seções"
+  all_sections_daf11554: "Todas as secções"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Todas as datas de início têm de ser anteriores às datas finais"
   all_student_groups_f74cd6c3: "Todos os Grupos de Alunos"
   all_students_have_taken_the_quiz_b558f8b4: "Todos os alunos fizeram o teste"
@@ -2076,7 +2076,7 @@ pt:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permite que funções de professor/designer/TA acedam a ferramenta Bate-papo."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permite que funções baseadas em professores/TA acedam a ferramenta de Atendimento."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Permite que funções baseadas em professores/TA acedam a ferramenta de Atendimento."
-  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Permite aos professores esconderem seções da disciplina dos alunos na página Pessoas quando existe mais do que uma seção na disciplina."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Permite aos professores esconderem secções da disciplina dos alunos na página Pessoas quando existe mais do que uma seção na disciplina."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permitir que os professores consigam classificar notas para serem exportadas para integrações SIS."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Permite que os professores especifiquem políticas de publicação para esta disciplina ou tarefas específicas, permitindo que as classificações sejam 
@@ -2088,7 +2088,7 @@ pt:
   allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Permite que o aplicador da política em falta emita eventos em direto submission_updated para cada envio marcado como em falta."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Permitir a programação de eventos recorrentes no calendário"
   allows_the_user_to_navigate_away_while_submission__276d73b7: "Permite que o utilizador navegue enquanto o envio de novos carregamentos é processado."
-  allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Permite ao utilizador aceder e editar as definições de administrador no Commons. Permite ao utilizador criar e gerir grupos. Permite ao utilizador gerir recursos partilhados na conta."
+  allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Permite ao utilizador aceder e editar as configurações de administrador no Commons. Permite ao utilizador criar e gerir grupos. Permite ao utilizador gerir recursos partilhados na conta."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Permite ao utilizador aceder SpeedGrader de uma atribuição."
   allows_user_to_access_the_announcements_link_in_co_2783579a: "Permite ao utilizador aceder a ligação Anúncios na Navegação da disciplina. Permite ao utilizador ver os anúncios da disciplina. Permite ao utilizador visualizar os anúncios recentes na página inicial da disciplina."
   allows_user_to_access_the_announcements_link_in_co_b0ef1a10: |-
@@ -2096,10 +2096,10 @@ pt:
       Permite ao utilizador visualizar os anúncios da disciplina.
       Permite ao utilizador visualizar os anúncios recentes na página inicial da disciplina.
   allows_user_to_access_the_attendance_tool_72ef0b68: "Permite que o utilizador aceda a ferramenta de Atendimento."
-  allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "Permite ao utilizador aceder a Barra Lateral das Disciplinas do Blueprint. Permite ao utilizador gerir as definições de conteúdo do Blueprint nas Definições da disciplina. Permite ao utilizador remover uma disciplina associada. Permite ao utilizador editar definições de bloqueio de blueprint em tarefas, páginas ou discussões individuais"
+  allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "Permite ao utilizador aceder a Barra Lateral das Disciplinas do Blueprint. Permite ao utilizador gerir as configurações de conteúdo do Blueprint nas Configurações da disciplina. Permite ao utilizador remover uma disciplina associada. Permite ao utilizador editar configurações de bloqueio de blueprint em tarefas, páginas ou discussões individuais"
   allows_user_to_access_the_chat_tool_48d5f5c4: "Permite ao utilizador aceder a ferramenta Chat."
   allows_user_to_access_the_files_tab_in_the_content_a5187929: "Permite ao utilizador aceder a guia Ficheiros no Seletor de Conteúdo."
-  allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: "Permite ao utilizador aceder a guia Navegação nas Definições da disciplina. Permite ao utilizador aceder os botões Ver Aluno (aluno de teste), Copiar esta disciplina, Redefinir conteúdo da disciplina e Eliminar permanentemente disciplina. Permite ao utilizador editar a imagem da disciplina, o nome, o código da disciplina, o fuso horário, a subconta, o prazo e outras opções na guia Detalhes da disciplina."
+  allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: "Permite ao utilizador aceder a guia Navegação nas Configurações da disciplina. Permite ao utilizador aceder os botões Ver Aluno (aluno de teste), Copiar esta disciplina, Redefinir conteúdo da disciplina e Eliminar permanentemente disciplina. Permite ao utilizador editar a imagem da disciplina, o nome, o código da disciplina, o fuso horário, a subconta, o prazo e outras opções na guia Detalhes da disciplina."
   allows_user_to_access_the_restore_courses_tab_in_a_397d9178: "Permite ao utilizador aceder a guia Restaurar disciplinas na Ferramenta Admin"
   allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "Permite ao utilizador aceder a guia Restaurar disciplinas na Ferramenta Admin"
   allows_user_to_access_the_student_progress_page_aca95197: "Permite ao utilizador aceder a página Progresso do Aluno."
@@ -2109,9 +2109,9 @@ pt:
   allows_user_to_act_as_other_users_in_the_account_195628ae: "Permite ao utilizador atuar como outros utilizadores na conta."
   allows_user_to_add_and_remove_other_account_admins_7834ea9a: "Permite ao utilizador adicionar e remover outros administradores da conta."
   allows_user_to_add_and_remove_other_teachers_cours_b69ba1cd: "Permite ao utilizador adicionar e remover outros professores, designers de disciplina ou TAs. Permite ao utilizador adicionar e remover observadores. Permite ao utilizador exibir informações do ID de login para professores, designers e TAs. Permite ao utilizador visualizar os detalhes do utilizador para qualquer utilizador. Permite ao utilizador editar a seção ou a função de um utilizador."
-  allows_user_to_add_and_remove_other_teachers_cours_bff27199: "Permite ao utilizador adicionar e remover outros professores, designers de disciplina ou TAs. Permite ao utilizador adicionar e remover observadores à disciplina. Permite ao utilizador exibir informações do ID de login para professores, designers e TAs. Permite ao utilizador visualizar o menu de definições para professores, projetistas de disciplinas, TAs e observadores. Permite ao utilizador visualizar detalhes do utilizador para professores, designers de disciplina e TAs. Permite ao utilizador limitar os alunos a visualizar apenas os membros da seção."
-  allows_user_to_add_and_remove_students_allows_user_6b31aafc: "Permite ao utilizador adicionar e remover alunos. Permite ao utilizador adicionar e remover observadores. Permite ao utilizador visualizar informações do ID de login para os alunos. Permite ao utilizador visualizar as inscrições anteriores. Permite ao utilizador aceder o menu de definições e os detalhes do utilizador de um utilizador. Permite ao utilizador editar a seção ou a função de um aluno. Permite ao utilizador reenviar os convites da disciplina da página Pessoas da disciplina."
-  allows_user_to_add_and_remove_students_to_the_cour_bb69582a: "Permite ao utilizador adicionar e remover alunos à disciplina. Permite ao utilizador adicionar e remover observadores à disciplina. Permite ao utilizador visualizar informações do ID de login para os alunos. Permite ao utilizador visualizar as inscrições anteriores. Permite ao utilizador aceder o menu de definições e os detalhes do utilizador de um utilizador. Permite ao utilizador concluir ou eliminar inscrições na página de detalhes do aluno. Permite ao utilizador reenviar os convites da disciplina."
+  allows_user_to_add_and_remove_other_teachers_cours_bff27199: "Permite ao utilizador adicionar e remover outros professores, designers de disciplina ou TAs. Permite ao utilizador adicionar e remover observadores à disciplina. Permite ao utilizador exibir informações do ID de login para professores, designers e TAs. Permite ao utilizador visualizar o menu de configurações para professores, projetistas de disciplinas, TAs e observadores. Permite ao utilizador visualizar detalhes do utilizador para professores, designers de disciplina e TAs. Permite ao utilizador limitar os alunos a visualizar apenas os membros da seção."
+  allows_user_to_add_and_remove_students_allows_user_6b31aafc: "Permite ao utilizador adicionar e remover alunos. Permite ao utilizador adicionar e remover observadores. Permite ao utilizador visualizar informações do ID de login para os alunos. Permite ao utilizador visualizar as inscrições anteriores. Permite ao utilizador aceder o menu de configurações e os detalhes do utilizador de um utilizador. Permite ao utilizador editar a seção ou a função de um aluno. Permite ao utilizador reenviar os convites da disciplina da página Pessoas da disciplina."
+  allows_user_to_add_and_remove_students_to_the_cour_bb69582a: "Permite ao utilizador adicionar e remover alunos à disciplina. Permite ao utilizador adicionar e remover observadores à disciplina. Permite ao utilizador visualizar informações do ID de login para os alunos. Permite ao utilizador visualizar as inscrições anteriores. Permite ao utilizador aceder o menu de configurações e os detalhes do utilizador de um utilizador. Permite ao utilizador concluir ou eliminar inscrições na página de detalhes do aluno. Permite ao utilizador reenviar os convites da disciplina."
   allows_user_to_add_discussions_in_the_discussions__1b3d9a53: "Permite ao utilizador adicionar discussões na página Discussões."
   allows_user_to_add_discussions_in_the_discussions__3cc51c31: "Permite ao utilizador adicionar discussões na página Discussões. Permite ao utilizador fechar para comentários, mover, fixar e desafixar, editar e eliminar tópicos de discussão criados por outros utilizadores."
   allows_user_to_add_discussions_in_the_discussions__f5479e2c: |-
@@ -2124,7 +2124,7 @@ pt:
   allows_user_to_add_edit_and_delete_course_sections_91e4c96f: |-
       Permite ao utilizador adicionar, editar e eliminar seções da disciplina.
       Permite ao utilizador cruzar seções de lista.
-  allows_user_to_add_edit_and_delete_course_sections_92715d3: "Permite ao utilizador adicionar, editar e eliminar seções da disciplina. Permite ao utilizador cruzar seções de lista."
+  allows_user_to_add_edit_and_delete_course_sections_92715d3: "Permite ao utilizador adicionar, editar e eliminar secções da disciplina. Permite ao utilizador cruzar secções de lista."
   allows_user_to_add_edit_and_delete_events_in_the_c_14413268: "Permite ao utilizador adicionar, editar e eliminar eventos no calendário da disciplina."
   allows_user_to_add_edit_and_delete_global_announce_8463e383: "Permite ao utilizador adicionar, editar e eliminar e eliminar anúncios globais."
   allows_user_to_add_edit_and_update_grades_in_the_g_29a4068e: |-
@@ -2135,7 +2135,7 @@ pt:
   allows_user_to_add_edit_and_update_grades_in_the_g_f9c62224: |-
       Permite ao utilizador adicionar, editar e  atualizar notas no Livro de Notas e no SpeedGrader.
       Permite ao utilizador aceder o histórico da nota de classificação.
-  allows_user_to_add_edit_delete_and_publish_and_unp_4f9c2fd4: "Permite ao utilizador adicionar, editar, eliminar e publicar/cancelar a publicação de atribuições. Permite ao utilizador gerir as definições de atribuição. Permite ao utilizador adicionar grupos de atribuições em uma disciplina. Permite ao utilizador habilitar e editar a ponderação do grupo de atribuições em uma disciplina."
+  allows_user_to_add_edit_delete_and_publish_and_unp_4f9c2fd4: "Permite ao utilizador adicionar, editar, eliminar e publicar/cancelar a publicação de atribuições. Permite ao utilizador gerir as configurações de atribuição. Permite ao utilizador adicionar grupos de atribuições em uma disciplina. Permite ao utilizador habilitar e editar a ponderação do grupo de atribuições em uma disciplina."
   allows_user_to_add_edit_delete_and_publish_and_unp_5f5b97aa: "Permite ao utilizador adicionar, editar, eliminar e publicar/cancelar a publicação de questionários."
   allows_user_to_add_edit_delete_and_publish_unpubli_bc6374cf: "Permite ao utilizador adicionar, editar, eliminar e publicar/cancelar a publicação de questionários."
   allows_user_to_add_edit_delete_and_publish_unpubli_f1906287: |-
@@ -2172,10 +2172,10 @@ pt:
       Permite ao utilizador reenviar os convites da disciplina.
   allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: "Permite ao utilizador adicionar alunos a um disciplina na página Disciplinas da conta."
   allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: "Permite ao utilizador adicionar professores, designers de disciplina ou TAs a um disciplina na página Disciplinas da conta."
-  allows_user_to_configure_alerts_in_course_settings_38675b12: "Permite ao utilizador configurar alertas nas definições da disciplina. Os alertas são um recurso usado raramente para enviar um alerta a alunos, professores ou administradores para acionadores específicos (por exemplo, nenhuma interação aluno/professor por 7 dias). Eles são verificados todos os dias e as notificações serão enviadas ao aluno e/ou ao professor até que o problema de acionamento seja resolvido."
+  allows_user_to_configure_alerts_in_course_settings_38675b12: "Permite ao utilizador configurar alertas nas configurações da disciplina. Os alertas são um recurso usado raramente para enviar um alerta a alunos, professores ou administradores para acionadores específicos (por exemplo, nenhuma interação aluno/professor por 7 dias). Eles são verificados todos os dias e as notificações serão enviadas ao aluno e/ou ao professor até que o problema de acionamento seja resolvido."
   allows_user_to_configure_alerts_in_course_settings_40a81b1d: "Permite ao utilizador configurar alertas nas definições da disciplina. Os alertas são um recurso usado raramente para enviar um alerta a alunos, professores ou administradores para acionadores específicos (por exemplo, nenhuma interação aluno/professor por sete dias). Eles são verificados todos os dias e as notificações serão enviadas ao aluno e/ou ao professor até que o problema de acionamento seja resolvido."
   allows_user_to_configure_alerts_in_course_settings_806397b5: "Permite ao utilizador configurar alertas nas Definições da disciplina. Os alertas são um recurso usado raramente para enviar um alerta a alunos, professores ou administradores para acionadores específicos (por exemplo, nenhuma interação aluno/professor por sete dias). Eles são verificados todos os dias e as notificações serão enviadas ao aluno e/ou ao professor até que o problema de acionamento seja resolvido."
-  allows_user_to_configure_alerts_in_course_settings_f8acd7ba: "Permite ao utilizador configurar alertas nas Definições da disciplina. Os alertas são um recurso usado raramente para enviar um alerta a alunos, professores ou administradores para acionadores específicos (por exemplo, nenhuma interação aluno/professor por 7 dias). Eles são verificados todos os dias e as notificações serão enviadas ao aluno e/ou ao professor até que o problema de acionamento seja resolvido."
+  allows_user_to_configure_alerts_in_course_settings_f8acd7ba: "Permite ao utilizador configurar alertas nas Configurações da disciplina. Os alertas são um recurso usado raramente para enviar um alerta a alunos, professores ou administradores para acionadores específicos (por exemplo, nenhuma interação aluno/professor por 7 dias). Eles são verificados todos os dias e as notificações serão enviadas ao aluno e/ou ao professor até que o problema de acionamento seja resolvido."
   allows_user_to_create_accounts_for_new_users_with__30b55094: "Permite ao utilizador criar contas para novos utilizadores com o botão Adicionar pessoas no nível da conta. Permite ao utilizador remover e mesclar utilizadores em uma conta. Permite ao utilizador modificar detalhes da conta do utilizador, como nome, e-mail e fuso horário. Permite ao utilizador visualizar e modificar as informações de login de um utilizador."
   allows_user_to_create_accounts_for_new_users_with__37a233d7: |-
       Permite ao utilizador criar contas para novos utilizadores com o botão Adicionar pessoas no nível da conta.
@@ -2199,7 +2199,7 @@ pt:
       no nível da disciplina.
   allows_user_to_create_import_edit_and_delete_outco_8eff991: "Permite ao utilizador criar, importar, editar e eliminar resultados e grupos de resultados no nível da disciplina."
   allows_user_to_create_new_conferences_allows_user__89cebec2: "Permite ao utilizador criar novas conferências. Permite ao utilizador iniciar as conferências que eles criaram."
-  allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "Permite ao utilizador designar uma disciplina como uma Disciplina do Blueprint. Permite ao utilizador gerir as definições do Disciplina do Blueprint nas Definições da disciplina. Permite ao utilizador adicionar disciplinas associados."
+  allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "Permite ao utilizador designar uma disciplina como uma Disciplina do Blueprint. Permite ao utilizador gerir as configurações do Disciplina do Blueprint nas Configurações da disciplina. Permite ao utilizador adicionar disciplinas associados."
   allows_user_to_designate_a_course_as_a_blueprint_c_bc5ff9bc: |-
       Permite ao utilizador designar uma disciplina como uma Disciplina do Blueprint.
       Permite ao utilizador gerir as definições do Disciplina do Blueprint nas Definições da disciplina.
@@ -2208,17 +2208,17 @@ pt:
   allows_user_to_download_all_comments_in_a_student__33b36d0a: "Permite que o utilizador baixe todos os comentários no envio de um aluno."
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Permite ao utilizador editar detalhes da tarefa em discussões individuais. Módulos: Permite ao utilizador adicionar novas atribuições a um módulo."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Permite ao utilizador editar detalhes da tarefa em discussões individuais."
-  allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Permite ao utilizador editar as definições de bloqueio de conteúdo do blueprint em discussões individuais."
-  allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Permite ao utilizador editar definições de bloqueio de conteúdo do blueprint em definições individuais. Se o utilizador estiver inscrito em uma disciplina mestre do Blueprint."
-  allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "Permite ao utilizador editar as definições de bloqueio do blueprint na página de índice de Páginas em uma disciplina mestre do Blueprint."
+  allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Permite ao utilizador editar as configurações de bloqueio de conteúdo do blueprint em discussões individuais."
+  allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Permite ao utilizador editar configurações de bloqueio de conteúdo do blueprint em configurações individuais. Se o utilizador estiver inscrito em uma disciplina mestre do Blueprint."
+  allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "Permite ao utilizador editar as configurações de bloqueio do blueprint na página de índice de Páginas em uma disciplina mestre do Blueprint."
   allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: |-
       Permite ao utilizador editar as definições de bloqueio do blueprint no índice Atribuições
       e páginas de questionários em uma disciplina mestre do Blueprint.
-  allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Permite ao utilizador editar definições de bloqueio do blueprint na página de índice de Discussões em uma disciplina mestre do Blueprint."
-  allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Permite ao utilizador editar as definições de bloqueio do blueprint na página Arquivos em uma disciplina mestre do Blueprint."
-  allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Permite ao utilizador editar as definições de bloqueio do blueprint no índice Atribuições e páginas de questionários em uma disciplina mestre do Blueprint."
+  allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Permite ao utilizador editar configurações de bloqueio do blueprint na página de índice de Discussões em uma disciplina mestre do Blueprint."
+  allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Permite ao utilizador editar as configurações de bloqueio do blueprint na página Arquivos em uma disciplina mestre do Blueprint."
+  allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Permite ao utilizador editar as configurações de bloqueio do blueprint no índice Atribuições e páginas de questionários em uma disciplina mestre do Blueprint."
   allows_user_to_edit_conferences_61eb62e0: "Permite ao utilizador editar Conferências."
-  allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Permite ao utilizador editar definições para aplicativos externos adicionados manualmente."
+  allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Permite ao utilizador editar configurações para aplicativos externos adicionados manualmente."
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Permite ao utilizador editar notas e adicione comentários no SpeedGrader."
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: "Permite ao utilizador editar notas no Livro de Notas. Permite ao utilizador aceder o histórico da nota de classificação. Permite ao utilizador aceder o Livro de Notas de Maestria em Aprendizagem (se ativada)."
   allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
@@ -2248,16 +2248,16 @@ pt:
   allows_user_to_import_resources_from_commons_into__6e9d32e6: "Permite ao utilizador importar recursos do Commons para um disciplina. Permite ao utilizador partilhar atribuições ao Commons ou edite conteúdo compartilhado anteriormente."
   allows_user_to_import_sis_data_583b20a5: "Permite ao utilizador importar dados do SIS."
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Permite ao utilizador gostar de postagens de discussão quando a caixa de seleção Apenas niveladoras puder ser selecionada."
-  allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Permite ao utilizador gerir as opções de recursos nas definições da conta."
+  allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Permite ao utilizador gerir as opções de recursos nas configurações da conta."
   allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
       Permite ao utilizador gerir módulos (criar, adicionar itens, editar definições do módulo,
       publicar/cancelar publicação, etc.).
-  allows_user_to_manage_modules_create_add_items_edi_9459e815: "Permite ao utilizador gerir módulos (criar, adicionar itens, editar definições do módulo,"
+  allows_user_to_manage_modules_create_add_items_edi_9459e815: "Permite ao utilizador gerir módulos (criar, adicionar itens, editar configurações do módulo,"
   allows_user_to_manage_observers_associated_with_st_4b45f2be: "Permite ao utilizador gerir observadores associados aos alunos na conta."
   allows_user_to_manage_rubrics_326eedc2: "Permite ao utilizador gerir rubricas."
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Permite ao utilizador adicionar manualmente um aplicativo nas definições da conta."
-  allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Permite que o utilizador adicione e exclua manualmente uma aplicação nas Definições da conta."
-  allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Permite ao utilizador adicionar e eliminar manualmente uma aplicação nas Definições da disciplina."
+  allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Permite que o utilizador adicione e exclua manualmente uma aplicação nas Configurações da conta."
+  allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Permite ao utilizador adicionar e eliminar manualmente uma aplicação nas Configurações da disciplina."
   allows_user_to_moderate_a_quiz_6953d369: "Permite ao utilizador moderar um questionário."
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Permite ao utilizador moderar um questionário e visualize a página de estatísticas do questionário."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Permite ao utilizador moderar um questionário. Definições: Permite ao utilizador editar esquemas de classificação."
@@ -2307,13 +2307,13 @@ pt:
   allows_user_to_view_account_analytics_98fbc6ad: "Permite ao utilizador ver a análise da conta."
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Permite ao utilizador ver todos os grupos de disciplinas, não apenas aqueles em que estão inscritos, na janela Colaborar com."
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Permite ao utilizador ver todos os envios de tarefas do aluno e adicionar comentários."
-  allows_user_to_view_analytics_link_in_the_user_set_56867782: "Permite ao utilizador visualizar a ligação analítica no menu de definições do utilizador."
+  allows_user_to_view_analytics_link_in_the_user_set_56867782: "Permite ao utilizador visualizar a ligação analítica no menu de configurações do utilizador."
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Permite ao utilizador ver e adicionar utilizadores em uma colaboração."
   allows_user_to_view_and_configure_reports_in_accou_413e4e41: |-
       Permite ao utilizador ver e configure relatórios nas definições da conta.
       Permite ao utilizador ver relatórios dos Relatórios de Acesso e do interação do Aluno.
       Permite ao utilizador ver a última atividade e o total de informações de atividade na página Pessoas.
-  allows_user_to_view_and_configure_reports_in_accou_e8c6f9a1: "Permite ao utilizador ver e configure relatórios nas definições da conta. Permite ao utilizador ver os Relatórios de Acesso. Permite ao utilizador ver a última atividade e o total de informações de atividade na página Pessoas."
+  allows_user_to_view_and_configure_reports_in_accou_e8c6f9a1: "Permite ao utilizador ver e configure relatórios nas configurações da conta. Permite ao utilizador ver os Relatórios de Acesso. Permite ao utilizador ver a última atividade e o total de informações de atividade na página Pessoas."
   allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "Permite ao utilizador ver e editar o ID do SIS e o ID de integração nos detalhes de login do utilizador"
   allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "Permite ao utilizador ver e inserir dados no campo ID do SIS."
   allows_user_to_view_and_link_questions_in_a_quiz_t_b899a247: "Permite ao utilizador ver e vincular perguntas em um questionário para bancos de perguntas no nível da conta. Se desativado, o utilizador só poderá visualizar e vincular aos bancos de perguntas da disciplina. Habilita a ligação Gerir Bancos de Perguntas na Página de Índice do Questionários"
@@ -2326,10 +2326,10 @@ pt:
   allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "Permite ao utilizador ver e gerir disciplinas na conta."
   allows_user_to_view_and_manage_permissions_bdc80a1d: "Permite ao utilizador ver e gerir permissões."
   allows_user_to_view_and_manage_quotas_tab_in_accou_935a7874: "Permite ao utilizador ver e gerir a guia Cotas nas definições da conta. O utilizador pode definir cotações de armazenamento de disciplina, utilizador e grupo padrão."
-  allows_user_to_view_and_manage_quotas_tab_in_accou_aa3fea8: "Permite ao utilizador visualizar e gerir o separador Contingentes em Definições de Conta. O utilizador pode definir cotações de armazenamento de disciplina, utilizador e grupo padrão."
+  allows_user_to_view_and_manage_quotas_tab_in_accou_aa3fea8: "Permite ao utilizador visualizar e gerir o separador Contingentes em Configurações de Conta. O utilizador pode definir cotações de armazenamento de disciplina, utilizador e grupo padrão."
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Permite ao utilizador ver e gerir subcontas da conta."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Permite ao utilizador ver e gerir os termos da conta."
-  allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Permite ao utilizador ver e gerir as guias Definições e Notificações nas Definições da conta."
+  allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Permite ao utilizador ver e gerir as guias Configurações e Notificações nas Configurações da conta."
   allows_user_to_view_canvas_insights_f4f7ba8b: "Permite que o utilizador veja Canvas Insights."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Permite ao utilizador ver os botões Escolher página inicial e Lista de verificação da configuração da disciplina na página inicial."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Permite ao utilizador ver a análise da disciplina através do painel da disciplina. Permite ao utilizador ver a análise do aluno."
@@ -2345,7 +2345,7 @@ pt:
   allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
       Permite ao utilizador ver, criar, editar, eliminar e publicar/cancelar publicação de páginas.
       Permite ao utilizador ver o histórico da página e definir a página inicial.
-  allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "Permite ao utilizador ver as inscrições na guia Seções."
+  allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "Permite ao utilizador ver as inscrições na guia Secções."
   allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: "Permite ao utilizador visualizar as entradas do Diário do Professor no Relatório de Interações do Aluno."
   allows_user_to_view_gradebook_allows_user_to_expor_8ed9dfa8: |-
       Permite ao utilizador ver o Livro de Notas.
@@ -2383,7 +2383,7 @@ pt:
   allows_user_to_view_student_specific_data_in_analy_4abbf6be: "Permite ao utilizador ver dados específicos do aluno no Google Analytics."
   allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: "Permite ao utilizador ver a ligação Anúncios na Navegação da disciplina. Permite ao utilizador ver os anúncios da disciplina."
   allows_user_to_view_the_course_grading_scheme_32a6042: "Permite ao utilizador ver o esquema de classificação da disciplina."
-  allows_user_to_view_the_course_statistics_button_i_f44b2c7a: "Permite ao utilizador ver o botão Estatísticas da disciplina em Definições da disciplina."
+  allows_user_to_view_the_course_statistics_button_i_f44b2c7a: "Permite ao utilizador ver o botão Estatísticas da disciplina em Configurações da disciplina."
   allows_user_to_view_the_discussions_link_in_course_2604505d: |-
       Permite ao utilizador ver a ligação Discussões na Navegação da disciplina.
       Permite ao utilizador ver as discussões da disciplina.
@@ -2466,7 +2466,7 @@ pt:
   an_error_occurred_while_saving_associations_bd66f3f4: "Ocorreu um erro ao salvar associações"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Ocorreu um erro ao guardar a política de postagem da atribuição"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Ocorreu um erro ao salvar a política de postagem do curso"
-  an_error_occurred_while_saving_your_settings_b503a31c: "Ocorreu um erro ao guardar suas definições"
+  an_error_occurred_while_saving_your_settings_b503a31c: "Ocorreu um erro ao guardar suas configurações"
   an_error_occurred_while_starting_migration_8e6015e2: "Ocorreu um erro ao iniciar migração"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Ocorreu um erro ao atualizar os anúncios bloqueados."
   an_error_occurred_while_updating_late_policies_a95b707f: "Ocorreu um erro ao atualizar políticas tardias"
@@ -2659,7 +2659,7 @@ pt:
   api_token_scoping_d4f30a1b: "Escopo do token de API"
   api_url_3ee7cb0a: "API URL"
   app_b157c2b3: Aplicação
-  app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "O Centro de Aplicações irá aparecer no separador \"Aplicações\" na página de definições de uma disciplina ou de uma conta. O URL disponibilizado abaixo deverá apontar para um terminal de Centro de Aplicações válido (por exemplo, %{url} -- não se esqueça de omitir a barra final)."
+  app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "O Centro de Aplicações irá aparecer no separador \"Aplicações\" na página de configurações de uma disciplina ou de uma conta. O URL disponibilizado abaixo deverá apontar para um terminal de Centro de Aplicações válido (por exemplo, %{url} -- não se esqueça de omitir a barra final)."
   app_placements_6d877225: "Colocação App"
   app_reregistration_87cc8817: "Registar App"
   app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} Foi instalado pelo administrador e está bloqueado"
@@ -2714,7 +2714,7 @@ pt:
   application_id_2aa1640f: "ID de aplicação"
   application_secret_e6803c7e: "Segredo da Aplicação"
   applied_cc7be774: Aplicado
-  apply_781a2546: Candidate-se
+  apply_781a2546: Aplicar
   apply_changes_b1dffc70: "Aplicar Alterações"
   apply_date_range_selection_cc4351ed: "Aplicar seleção do intervalo de datas"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Aplicar filtros. Nota: clicar neste botão fará com que a página seja recarregada."
@@ -3254,7 +3254,7 @@ pt:
       differentiated_groups_warning: "Tarefas de grupo diferenciadas podem originar resultados inesperados."
       grade_group_students_individually: "Atribuir notas a cada aluno individualmente"
       group_assignment_header: "Tarefa de grupo"
-      group_category_locked_explanation: "Os alunos já enviaram trabalho de casa relativo a esta tarefa, por isso não é possível alterar as definições de grupo."
+      group_category_locked_explanation: "Os alunos já enviaram trabalho de casa relativo a esta tarefa, por isso não é possível alterar as configurações de grupo."
       group_category_options: "Nova categoria de grupo"
       group_set: "Conjunto de grupo"
       is_group_assignment: "Esta é uma tarefa em grupo"
@@ -3490,11 +3490,11 @@ pt:
         submission_not_turned_in: "Não enviado!"
         submission_turned_in: Enviado!
     submission_types_form: 
-      advanced_turnitin_settings: "Definições avançadas de Turnitin"
+      advanced_turnitin_settings: "Configurações avançadas de Turnitin"
       advanced_vericite_settings: "Configurações VeriCite Avançadas"
       descriptions: 
         allowed_extensions: "Introduzir uma lista de extensões aceites, por exemplo: doc,xls,txt"
-      external_tool_group_warning: "As tarefas de grupo não podem utilizar Ferramentas Externas. As definições de grupo serão apagadas depois de guardadas"
+      external_tool_group_warning: "As tarefas de grupo não podem utilizar Ferramentas Externas. As configurações de grupo serão apagadas depois de guardadas"
       external_tool_options: "Opções de ferramentas externas"
       label: 
         external_tool_new_tab: "Carregar esta ferramenta num separador novo"
@@ -3523,7 +3523,7 @@ pt:
       comments_placeholder: Comentários...
       errors: 
         unacceptable_file_type: "Este tipo de arquivo não é permitido. Os tipos de arquivo aceitos são: %{allowed_extensions_list}"
-      gmail_restriction_description: "A sua conta tem envios restritos de Google Docs para contas Google no domínio %{domain}. Para enviar esta tarefa com um Google Doc, é necessário reconfigurar a integração de Google Docs na sua página de definições de utilizador."
+      gmail_restriction_description: "A sua conta tem envios restritos de Google Docs para contas Google no domínio %{domain}. Para enviar esta tarefa com um Google Doc, é necessário reconfigurar a integração de Google Docs na sua página de configurações de utilizador."
       instructions: 
         from_external_tool: "Selecione uma ferramenta na lista abaixo para carregar e submeter um recurso fornecido por essa ferramenta."
         google_docs: "Selecione o arquivo da lista abaixo."
@@ -3624,7 +3624,7 @@ pt:
           labels: 
             exclude_small_matches: "Pequenas correspondências"
       buttons: 
-        update_settings: "Atualizar definições"
+        update_settings: "Atualizar configurações"
       turnitin_settings: 
         labels: 
           compare_against: "Comparar com"
@@ -3687,14 +3687,14 @@ pt:
   assignments_include_quizzes_graded_discussions_and_182e5899: |-
       As tarefas incluem testes, discussões graduais e muitos tipos
             de submissões online (ficheiros, imagens, texto, URLs e mídia). Atribuir
-            a todos em uma disciplina, ou atribua datas de vencimento diferentes para seções ou
+            a todos em uma disciplina, ou atribua datas de vencimento diferentes para secções ou
             utilizadores específicos. Criar grupos de tarefas para organizar suas tarefas
             e para grupos de peso por porcentagem. Habilitar a Revisão por Pares para que os alunos possam
             revisar o trabalho uns dos outros.
   assignments_index_menu_4088a035: "Menu Índice de Atribuições"
   assignments_list_fe3e54be: "Lista de tarefas"
   assignments_loaded_72ee472c: "Atribuições carregadas"
-  assignments_settings_30613d0c: "Definições de tarefas"
+  assignments_settings_30613d0c: "Configurações de tarefas"
   assignments_speedgrader_2fbd6df4: "Tarefas, SpeedGrader"
   assignments_tutorial_tray_4cc844b: "Bandeja de Tutorial de Tarefas"
   associated_74756cc4: Associado
@@ -3826,7 +3826,7 @@ pt:
       test_ldap_connection_help_body: "A conexão expirou ou foi recusada. Coisas a considerar:"
       test_ldap_connection_help_fixes_1: "O ecrã está a conectar a %{ips}"
       test_ldap_connection_help_fixes_2: "Este foi apenas um teste de conexão. Certificados SSL não foram validados."
-      test_ldap_connection_help_fixes_3: "Verifique as definições do seu firewall. Todos os endereços IP do ecrã são permitidos para acessar seu servidor?"
+      test_ldap_connection_help_fixes_3: "Verifique as configurações do seu firewall. Todos os endereços IP do ecrã são permitidos para acessar seu servidor?"
       test_ldap_connection_help_header: "O Canvas não consegue se conectar ao seu servidor LDAP"
       test_ldap_connection_label: "Testando a conexão..."
       test_ldap_dialog_close: Fechar
@@ -4056,18 +4056,18 @@ pt:
       
       Para editar as definições de bloqueio do blueprint na página de índice de Discussões, Discussões - moderado também deve estar ativado.
   blueprint_courses_must_be_enabled_for_an_account_b_4a79dc67: "Disciplinas do Blueprint devem ser habilitadas para uma conta por um administrador. As funções da disciplina só podem gerenciar o conteúdo nas Disciplinas do Blueprint se forem adicionadas à Disciplina do Blueprint como professor, TA ou função de designer. Se essa definição estiver desativada e a Discussões - visualizar estiver ativada, um utilizador ainda poderá ajustar as definições de bloqueio de conteúdo em discussões individuais em um disciplina mestre do Blueprint."
-  blueprint_courses_must_be_enabled_for_an_account_b_4ef094f4: "Disciplinas do Blueprint devem ser habilitadas para uma conta por um administrador. As funções da disciplina só podem gerir o conteúdo nas Disciplinas do Blueprint se forem adicionadas às Disciplinas do Blueprint como professor, TA ou função de designer. Se esta definição estiver desativada, e Discussões - visualização estiver ativada, o utilizador ainda poderá ajustar as definições de bloqueio de conteúdo em discussões individuais em uma disciplina de masterização do Blueprint."
-  blueprint_courses_must_be_enabled_for_an_account_b_5ab5b804: "Disciplinas do Blueprint devem ser habilitadas para uma conta por um administrador. As funções da disciplina só podem gerir o conteúdo nas Disciplinas do Blueprint se forem adicionadas às Disciplinas do Blueprint como professor, TA ou função de designer. Se essa permissão estiver desativada, um utilizador ainda poderá ajustar as definições de bloqueio de conteúdo em páginas individuais em um disciplina mestre do Blueprint."
+  blueprint_courses_must_be_enabled_for_an_account_b_4ef094f4: "Disciplinas do Blueprint devem ser habilitadas para uma conta por um administrador. As funções da disciplina só podem gerir o conteúdo nas Disciplinas do Blueprint se forem adicionadas às Disciplinas do Blueprint como professor, TA ou função de designer. Se esta definição estiver desativada, e Discussões - visualização estiver ativada, o utilizador ainda poderá ajustar as configurações de bloqueio de conteúdo em discussões individuais em uma disciplina de masterização do Blueprint."
+  blueprint_courses_must_be_enabled_for_an_account_b_5ab5b804: "Disciplinas do Blueprint devem ser habilitadas para uma conta por um administrador. As funções da disciplina só podem gerir o conteúdo nas Disciplinas do Blueprint se forem adicionadas às Disciplinas do Blueprint como professor, TA ou função de designer. Se essa permissão estiver desativada, um utilizador ainda poderá ajustar as configurações de bloqueio de conteúdo em páginas individuais em um disciplina mestre do Blueprint."
   blueprint_courses_must_be_enabled_for_an_account_b_79b2d93e: |-
       Disciplinas do Blueprint devem ser habilitadas para uma conta por um administrador.
       As funções da disciplina só podem gerenciar o conteúdo nas Disciplinas do Blueprint se forem adicionadas à Disciplina do Blueprint como professor, TA ou função de designer.
       Se essa permissão estiver desativada, um utilizador ainda poderá ajustar as definições de bloqueio de conteúdo em páginas individuais em um disciplina mestre do Blueprint.
-  blueprint_courses_must_be_enabled_for_an_account_b_a8e326ea: "Disciplinas do Blueprint devem ser habilitadas para uma conta por um administrador. Para editar as definições de bloqueio de blueprint para ficheiros de disciplina, os Disciplinas - adicionar / editar / eliminar também devem estar ativadas."
+  blueprint_courses_must_be_enabled_for_an_account_b_a8e326ea: "Disciplinas do Blueprint devem ser habilitadas para uma conta por um administrador. Para editar as configurações de bloqueio de blueprint para ficheiros de disciplina, os Disciplinas - adicionar / editar / eliminar também devem estar ativadas."
   blueprint_courses_must_be_enabled_for_an_account_b_e8e1984d: |-
       Disciplinas do Blueprint devem ser habilitadas para uma conta por um administrador.
       As funções da disciplina só podem gerenciar o conteúdo nas Disciplinas do Blueprint se forem adicionadas à Disciplina do Blueprint como professor, TA ou função de designer.
       Se essa configuração estiver desativada e a opção Discussões - visualização estiver ativada, um utilizador ainda poderá ajustar as definições de bloqueio de conteúdo em discussões individuais em um disciplina mestre do Blueprint.
-  blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "Disciplinas do Blueprint devem ser ativadas para uma conta por um administrador. As funções da disciplina só podem gerir o conteúdo nos Disciplinas do Blueprint se forem adicionadas à Disciplina de Blueprint com um professor, TA ou função de designer. Para editar as definições de bloqueio do blueprint na página de índice de Discussões, Discussões - moderado também deve estar ativado."
+  blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "Disciplinas do Blueprint devem ser ativadas para uma conta por um administrador. As funções da disciplina só podem gerir o conteúdo nos Disciplinas do Blueprint se forem adicionadas à Disciplina de Blueprint com um professor, TA ou função de designer. Para editar as configurações de bloqueio do blueprint na página de índice de Discussões, Discussões - moderado também deve estar ativado."
   blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Disciplinas do Blueprint devem ser habilitadas para uma conta por um administrador. As funções da disciplina só podem gerir o conteúdo nas Disciplinas do Blueprint se forem adicionadas às Disciplinas do Blueprint como professor, TA ou função de designer."
   blueprint_information_95dcef55: "Informação Blueprint"
   blueprint_settings_233e909a: "Configurações do Blueprint"
@@ -4257,7 +4257,7 @@ pt:
       Por padrão, os alunos podem criar grupos; para restringir os alunos de criar grupos, desmarque
       a caixa de seleção Permitir que os alunos organizem seus próprios grupos em Definições da disciplina.
   by_default_students_are_able_to_create_groups_to_r_d4901649: "Por padrão, os alunos podem criar grupos; para restringir os alunos de criar"
-  by_default_students_can_always_create_groups_in_a__149d08b7: "Por padrão, os alunos sempre podem criar grupos em uma disciplina. Para impedir que os alunos criem grupos, as Disciplinas - adicionar / editar / eliminar devem estar ativadas e a caixa de seleção Permitir que os alunos organizem seus próprios grupos nas Definições da disciplina precisam ser desmarcadas."
+  by_default_students_can_always_create_groups_in_a__149d08b7: "Por padrão, os alunos sempre podem criar grupos em uma disciplina. Para impedir que os alunos criem grupos, as Disciplinas - adicionar / editar / eliminar devem estar ativadas e a caixa de seleção Permitir que os alunos organizem seus próprios grupos nas Configurações da disciplina precisam ser desmarcadas."
   by_lti_2_registration_url_e421e523: "Por URL de registo LTI 2"
   by_url_a163275e: "Por URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -4909,7 +4909,7 @@ pt:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "As mudanças serão guardadas mesmo saindo desta página"
   changes_you_made_may_not_be_saved_4e8db973: "As alterações que realizou não podem ser guardadas."
   changing_course_dates_may_override_term_availabili_d92b10de: "Alterar as datas da disciplina pode substituir as configurações de disponibilidade de termo e o posicionamento na página Disciplinas e Painel. Por favor, confirme as datas antes de modificar as datas do curso."
-  changing_section_dates_may_override_course_and_ter_6634950e: "A alteração das datas da seção pode substituir as definições e a disponibilidade de disciplina e de prazo na página Disciplinas e no Painel. Por favor, confirme as datas da disciplina e da disciplina antes de modificar as datas da seção."
+  changing_section_dates_may_override_course_and_ter_6634950e: "A alteração das datas da seção pode substituir as configurações e a disponibilidade de disciplina e de prazo na página Disciplinas e no Painel. Por favor, confirme as datas da disciplina e da disciplina antes de modificar as datas da seção."
   changing_the_late_policy_will_affect_previously_gr_49071db7: "Alterar a política tardia afetará envios previamente classificados."
   changing_your_policy_now_will_affect_previously_gr_62063898: "Alterar sua política agora afetará submissões previamente classificadas."
   chars_written_max_character_length_len_fec9bd18: "%{chars} escrito, comprimento máximo do caractere %{len}"
@@ -4979,7 +4979,7 @@ pt:
   click_ok_to_continue_deleting_this_role_baa9d9e2: "Clique em \"ok\" para continuar a eliminar essa função."
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Clique em um instantâneo para voltar ao seu teste como era quando o instantâneo foi tirado. Nota: Você perderá todo o trabalho que você fêz desde que o instantâneo foi tirado e não pode ser desfeito!"
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Clicar no botão de navegação da conta para aceder às preferências de notificação."
-  click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Clique no botão de navegação administrativa para aceder às definições de conta."
+  click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Clique no botão de navegação administrativa para aceder às configurações de conta."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Clicar no botão de navegação dos cursos para aceder aos seus cursos."
   click_proceed_to_continue_b6eeffc6: "Clique em \"Continuar\" para continuar."
   click_the_button_above_to_add_content_4c7024a: "Clique no botão acima para adicionar conteúdo"
@@ -5358,7 +5358,7 @@ pt:
       no_recording: "Nenhuma gravação"
       recording: "1 gravação"
       recordings: "%{recordingCount} gravações"
-      settings: Definições
+      settings: Configurações
       type: "%{type}"
       view: Ver
     confirm: 
@@ -5369,7 +5369,7 @@ pt:
       delete: "Tem certeza de que deseja excluir esta conferência?"
     disabled_error: "As webconferências não foram ativadas para este site do Canvas"
     edit_conference_form: 
-      advanced_settings: "Gerir definições avançadas..."
+      advanced_settings: "Gerir configurações avançadas..."
       conference_type: Tipo
       description: Descrição
       duration: Duração
@@ -5401,7 +5401,7 @@ pt:
       join: Aderir
       recording: "1 gravação"
       recordings: "%{recordingCount} gravações"
-      settings: Definições
+      settings: Configurações
       start: Início
       type: "%{type}"
       view: Ver
@@ -6131,7 +6131,7 @@ pt:
     one: "%{contextName} e %{count} outro"
     other: "%{contextName} e %{count} outros"
   contextscount_more_66b2f99b: "+ %{contextsCount} mais"
-  contexttype_notification_settings_d72acd58: "%{contextType} Definições de Notificação"
+  contexttype_notification_settings_d72acd58: "%{contextType} Configurações de Notificação"
   continue_ac067716: Continuar
   continue_typing_to_find_additional_sections_or_stu_49786085: "Continue a escrever para encontrar secções adicionais ou estudantes."
   contributed_to_this_module_item_and_is_complete_2799d5c: "Contribuiu para este módulo e está completo"
@@ -6225,7 +6225,7 @@ pt:
       search_names_groups_courses: "Procurar nomes, grupos e disciplinas"
       sending: "a enviar"
       sent: Enviado
-      settings: Definições
+      settings: Configurações
       starred: Marcados
       submission_comments: "Comentários dos envios"
       titles: 
@@ -6466,7 +6466,7 @@ pt:
   count_rows_removed_c6ff7bc: "%{count} linhas removidas"
   count_sections_466dcd5c: 
     one: "1 Seção"
-    other: "%{count} Seções"
+    other: "%{count} Secções"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "1 grupo de períodos de classificação encontrado"
     other: "%{count} grupos de períodos de classificação encontrados."
@@ -6617,7 +6617,7 @@ pt:
       assignments: "Falha ao exportar algumas tarefas"
       canvas_meta: "Falha ao exportar metadados específicos do Canvas"
       course_export: "Erro ao executar exportação da disciplina."
-      course_settings: "Falha ao exportar definições da disciplina"
+      course_settings: "Falha ao exportar configurações da disciplina"
       events: "Falha ao exportar eventos de calendário"
       external_feeds: "Falha ao exportar feeds externos"
       file: "Falha ao exportar o arquivo \"%{file_name}\""
@@ -6660,7 +6660,7 @@ pt:
   course_grade_grade_in_course_code_9fa854db: "Classificação da disciplina: %{grade}% em %{course_code}"
   course_grade_grade_in_coursename_3cdd8551: "Classificação da disciplina: %{grade} em %{courseName}"
   course_grades_22adc27e: "Notas da disciplina"
-  course_grading_schemes_can_be_enabled_disabled_in__26b298b3: "Os esquemas de classificação de disciplinas podem ser ativados/desativados nas Definições da disciplina."
+  course_grading_schemes_can_be_enabled_disabled_in__26b298b3: "Os esquemas de classificação de disciplinas podem ser ativados/desativados nas Configurações da disciplina."
   course_groups_e8239a1e: "Grupos da disciplina"
   course_has_no_active_instructors_with_this_id_74f1d8a: "curso não tem instrutores ativos com este ID"
   course_home_4c4c0107: "Página inicial do curso"
@@ -6671,7 +6671,7 @@ pt:
   course_id_b0bc82d4: "ID de disciplina"
   course_id_f8640bb8: course_id
   course_image_for_course_cfbb08df: "Imagem de curso para %{course}"
-  course_image_settings_eba3ec55: "Definições da imagem da disciplina"
+  course_image_settings_eba3ec55: "Configurações da imagem da disciplina"
   course_implemented_apps_fa658f5a: "Apps Incluídas na Disciplina"
   course_is_already_associated_with_a_blueprint_4d9407cb: "A disciplina já está associada a um plano"
   course_landing_page_49a53ade: "Página de entrada da disciplina"
@@ -6761,10 +6761,10 @@ pt:
   course_name_successfully_added_48116a50: "%{course_name} adicionado com sucesso!"
   course_navigation_dd035109: "Navegação da disciplina"
   course_not_found_c248a721: "Disciplina não encontrada"
-  course_notification_settings_d9821d36: "Definições de Notificação de Disciplina"
+  course_notification_settings_d9821d36: "Configurações de Notificação de Disciplina"
   course_notification_settings_error_page_c0512c17: "Página de Erro de Definição de Notificação de Disciplina"
-  course_notification_settings_initial_query_error_6dfb24ef: "Erro inicial de consulta das Definições de Notificação de Disciplina"
-  course_notification_settings_updated_f6726d7e: "Definições de notificação da disciplina atualizadas"
+  course_notification_settings_initial_query_error_6dfb24ef: "Erro inicial de consulta das Configurações de Notificação de Disciplina"
+  course_notification_settings_updated_f6726d7e: "Configurações de notificação da disciplina atualizadas"
   course_option_links_a79d263d: "Ligações opcionais das disciplinas"
   course_outcomes_7dc1cbc7: "Resultados da Disciplina"
   course_pages_449f1dd4: "Páginas da Disciplina"
@@ -6776,7 +6776,7 @@ pt:
   course_results_updated_df9d1c95: "Resultados do curso atualizados."
   course_role_role_type_119c2f64: "Disciplina: %{role_type}"
   course_roles_1314f962: "Funções da disciplina"
-  course_roles_can_only_manage_blueprint_courses_if__4902d00b: "As funções da disciplina só podem gerir as disciplinas Blueprint se forem adicionadas à disciplina Blueprint como professor, assistente ou designer. Para aceder a barra lateral das Disciplina do Blueprint, disciplinas - adicionar/editar/eliminar disciplinas devem ser ativadas. Para adicionar uma disciplina associada, Disciplinas - lista de visualização e Disciplinas - adicionar/editar/eliminar também devem estar ativadas. Para editar as definições de bloqueio em qualquer tipo de objeto de blueprint, os campos - adicionar/editar/eliminar devem estar ativados."
+  course_roles_can_only_manage_blueprint_courses_if__4902d00b: "As funções da disciplina só podem gerir as disciplinas Blueprint se forem adicionadas à disciplina Blueprint como professor, assistente ou designer. Para aceder a barra lateral das Disciplina do Blueprint, disciplinas - adicionar/editar/eliminar disciplinas devem ser ativadas. Para adicionar uma disciplina associada, Disciplinas - lista de visualização e Disciplinas - adicionar/editar/eliminar também devem estar ativadas. Para editar as configurações de bloqueio em qualquer tipo de objeto de blueprint, os campos - adicionar/editar/eliminar devem estar ativados."
   course_roles_d2d5d666: "Funções da disciplina"
   course_roster_78f70e97: "Rol da disciplina"
   course_search: 
@@ -6785,7 +6785,7 @@ pt:
     sis_id_taken: "ID do SIS \"%{sis_id}\" já está em uso"
   course_section_7a988066: "Secção da disciplina"
   course_section_name_ea880ed1: "Secção da disciplina %{name}"
-  course_sections_add_edit_delete_c4f4ac19: "Seções da disciplina - adicionar/editar/eliminar"
+  course_sections_add_edit_delete_c4f4ac19: "Secções da disciplina - adicionar/editar/eliminar"
   course_selection_245808bf: "Seleção de Disciplina"
   course_set_up_tutorial_6ab7c2d1: "Tutorial de configuração da disciplina"
   course_set_up_tutorial_provides_tips_on_how_to_lev_3c098131: "O tutorial de configuração da disciplina fornece dicas sobre como aproveitar as oportunidades de recursos em cada página do Canvas. É especialmente útil quando se é novo no Canvas ou está a configurar uma nova disciplina pela primeira vez em muito tempo."
@@ -6833,10 +6833,10 @@ pt:
       reset_course_content_dialog_help: "Redefinir conteúdo da disciplina"
       section_enrollments: "Inscrições na secção"
   course_settings_course_details_tab_allows_user_to__2eb67ad2: "Definições da disciplina (guia Detalhes da disciplina): Permite ao utilizador aceder a guia Navegação nas Definições da disciplina. Permite ao utilizador aceder os botões Ver Aluno (aluno de teste), Copiar esta disciplina, Redefinir conteúdo da disciplina e Eliminar permanentemente disciplina. Permite ao utilizador editar a imagem da disciplina, o nome, o código da disciplina, o fuso horário, a subconta, o prazo e outras opções na guia Detalhes da disciplina."
-  course_settings_course_details_tab_fabf1adc: "Definições da disciplina (guia Detalhes da disciplina)"
-  course_settings_f6d0bbf8: "Definições da disciplina"
-  course_settings_sections_tab_4ae03a9a: "Definições da disciplina (guia Seções)"
-  course_settings_sub_navigation_b95deae: "Página Inicial de Definições do Curso"
+  course_settings_course_details_tab_fabf1adc: "Configurações da disciplina (guia Detalhes da disciplina)"
+  course_settings_f6d0bbf8: "Configurações da disciplina"
+  course_settings_sections_tab_4ae03a9a: "Configurações da disciplina (guia Secções)"
+  course_settings_sub_navigation_b95deae: "Página Inicial de Configurações do Curso"
   course_setup_checklist_78dcff7e: "Lista de verificação da configuração da disciplina"
   course_setup_checklist_course_home_page_f8baa04a: "Lista de verificação da configuração da disciplina, Página inicial da disciplina"
   course_setup_wizard_is_showing_a7c087c1: "O assistente de configuração da disciplina está visível."
@@ -6882,7 +6882,7 @@ pt:
         conclude_course: "Concluir disciplina"
         delete_course: "Eliminar disciplina"
       details: 
-        conclude_alt_text: "Se gostaria de manter a capacidade de poder alterar as notas enquanto limita o acesso dos estudantes ao curso, por favor utilize as definições de datas do curso. Pode saber mais acerca das definições de data do curso nos nossos guias *here*."
+        conclude_alt_text: "Se gostaria de manter a capacidade de poder alterar as notas enquanto limita o acesso dos estudantes ao curso, por favor utilize as configurações de datas do curso. Pode saber mais acerca das configurações de data do curso nos nossos guias *here*."
         confirm_conclude: "Atenção: Concluir o curso vai arquivar todo o conteúdo do curso e prevenir que possa modificar as notas."
         confirm_delete: "Tem a certeza de que pretende eliminar esta disciplina? Uma vez eliminada a disciplina, os alunos e os professores deixarão de ter acesso à mesma. Se pretender removê-la apenas do menu pendente de disciplinas, deve *concluir a disciplina*."
         confirm_delete_addendum: "Se não tiver permissão para concluir a disciplina, pode *alterar a data de fim da disciplina* ou pedir ao administrador que conclua a disciplina."
@@ -7127,7 +7127,7 @@ pt:
       course_open_enrollment: "Esta disciplina tem inscrições abertas. Os alunos podem inscrever-se na disciplina quando partilhar com eles este URL: *%{url}*.  Em alternativa, podem visitar este endereço *%{url2}* e usar o código seguinte: *%{code}* para se registarem na disciplina."
       course_open_enrollment_without_code: "Esta disciplina tem inscrições abertas. Os alunos podem inscrever-se na disciplina assim que partilhar com eles este URL: *%{url}*"
       course_overrides_term: "Isto substituirá qualquer configuração de disponibilidade de período."
-      course_settings_title: "Definições da disciplina"
+      course_settings_title: "Configurações da disciplina"
       deatils: 
         move_course: "Selecione uma nova conta de raiz para esta disciplina. Depois de mover a disciplina, você também precisará especificar um novo departamento para a disciplina."
       drag_details: "Desativar a maioria das páginas faz com que os alunos que as visitarem sejam redirecionados para a página inicial da disciplina."
@@ -7237,7 +7237,7 @@ pt:
         feature_options: "Opções de funcionalidades"
         grade_publishing: "Publicação de notas"
         navigation: Navegação
-        sections: Seções
+        sections: Secções
         tools: Aplicativos
       titles: 
         edit_navigation: "Editar navegação da disciplina"
@@ -8087,7 +8087,7 @@ pt:
       add_developer_key: "Adicionar chave de programador"
       details: Detalhes
       developer_keys: "Chaves de desenvolvedor"
-      key_settings: "Definições de chave"
+      key_settings: "Configurações de chave"
       name: Nome
       notes: Notas
       show_all: "Mostrar todas as %{count} chaves"
@@ -8109,7 +8109,7 @@ pt:
   developers_keys_table_69ae6b7e: "Tabela de Chaves de Desenvolvedores"
   dialog_form_wrapper: 
     cancel: Cancelar
-    save_settings: "Guardar definições"
+    save_settings: "Guardar configurações"
     saving: "A guardar..."
   different_course_b875770e: "disciplina diferente"
   differentiate_between_system_and_user_generated_li_dc466585: |-
@@ -8296,7 +8296,7 @@ pt:
     error_draft_state_with_posts: "Não é possível definir este tópico para estado de rascunho porque contém posts."
     error_group_announcement: "Não é possível utilizar discussão de grupo num anúncio."
     error_group_change: "Não é possível alterar agrupamento numa discussão com respostas."
-    error_section_permission: "Você não tem permissão para modificar a discussão para as seções %{section_ids}"
+    error_section_permission: "Você não tem permissão para modificar a discussão para as secções %{section_ids}"
     error_todo_date_assignment: "A data não pode ser adicionada se o tópico da discussão for classificado"
     error_todo_date_unauthorized: "Você não tem permissão para adicionar este tópico à lista de tarefas para alunos."
     flash: 
@@ -8309,7 +8309,7 @@ pt:
       separated_conversation_notice: "A conversa deste tópico foi separada em grupos separados. Abaixo estão todos os tópicos de grupo a que tem acesso."
     group_discussion: 
       separated_conversation_notice: "Visto que esta é uma discussão de grupo, cada grupo tem uma conversa própria relativa a este tópico. Pode aceder às seguintes:"
-    group_discussion_locked: "Alguns alunos já contribuíram para esta discussão, por isso não é possível alterar as definições do grupo."
+    group_discussion_locked: "Alguns alunos já contribuíram para esta discussão, por isso não é possível alterar as configurações do grupo."
     group_discussion_title: "Discussão de grupo"
     index: 
       course_discussions_atom_feed_title: "Feed Atom de discussões da disciplina"
@@ -8589,7 +8589,7 @@ pt:
   docviewer_strikeout_updated_f06aec74: "Discussão do Docviewer atualizada"
   does_not_meet_expectations_b0736d20: "Não atende às expectativas"
   domain_3b54c511: Domínio
-  domain_editing_is_disabled_when_security_settings__3feb6da0: "A edição do domínio é desativada quando as definições de segurança são herdadas de uma conta pai."
+  domain_editing_is_disabled_when_security_settings__3feb6da0: "A edição do domínio é desativada quando as configurações de segurança são herdadas de uma conta pai."
   domain_is_required_1d4c8b25: "É necessário um domínio"
   domain_name_6c783b0: "Nome do domínio"
   domains_66feaf7f: Domínios
@@ -8633,7 +8633,7 @@ pt:
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Arraste e largue ou clique para navegar no seu computador"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Arraste e solte ou clique para navegar no seu computador"
   drag_and_drop_your_image_here_or_7fba7c14: "Arraste a largue a sua imagem aqui ou "
-  drag_to_rearrange_sections_637efee3: "Arraste para reorganizar seções"
+  drag_to_rearrange_sections_637efee3: "Arraste para reorganizar secções"
   drag_up_or_down_to_reorder_382126ff: "Arrastar para cima ou para baixo para reordenar"
   drop_files_here_to_add_to_module_236304f5: "Ficheiros para adicionar ao módulo"
   drop_files_here_to_upload_ce0f50f9: "Soltar ficheiros aqui para carregar"
@@ -8934,7 +8934,7 @@ pt:
   enable_face_to_face_connection_9df19b76: "Permitir uma ligação cara a cara"
   enable_feature_title_987d8e9a: "Permitir a opção: %{title}"
   enable_fullstory_5c673a06: "Habilitar fullstory"
-  enable_gradebook_list_students_by_sortable_name: "Listar os alunos por seus nomes classificáveis no Livro de Classificações. O padrão do nome classificável é 'Sobrenome, Nome' e pode ser alterado nas Definições."
+  enable_gradebook_list_students_by_sortable_name: "Listar os alunos por seus nomes classificáveis no Livro de Classificações. O padrão do nome classificável é 'Sobrenome, Nome' e pode ser alterado nas Configurações."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Ativar Gradezilla (nome é apenas um espaço reservado, pois irá substituir Gradebook no futuro)."
   enable_gravatar_8a865b41: "Habilitar Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Ativar recursos do i18n nas exportações de resultados"
@@ -8954,7 +8954,7 @@ pt:
   enable_the_creation_of_blueprint_courses_79f91c30: "Ativar a criação de Cursos Blueprint"
   enable_the_creation_of_master_courses_8205b155: "Permitir a criação de Disciplinas Mestre"
   enable_the_plagiarism_detection_platform_7c3b6195: "Permitir a plataforma de detecção de plágio"
-  enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "Ative a guia Segurança na página de definições para ajustar as definições de CSP"
+  enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "Ative a guia Segurança na página de configurações para ajustar as configurações de CSP"
   enable_toolname_b06257b7: "Ativar %{toolName}"
   enable_toolname_dc64c25a: "Habilitar %{toolName}"
   enabled_and_locked_49ff3de4: "Ativado e bloqueado"
@@ -9063,7 +9063,7 @@ pt:
   eportfolio: 
     buttons: 
       done_editing: "Terminar a edição"
-      manage_sections: "Gerenciar seções"
+      manage_sections: "Gerenciar secções"
     confirm_delete_message: "Tem certeza de que deseja excluir esta mensagem?"
     confirm_delete_page: "Excluir esta página e todo seu conteúdo?"
     confirm_delete_section: "Excluir esta seção e todas páginas?"
@@ -9122,7 +9122,7 @@ pt:
       updated_at: "última atualização %{updated_at}"
     help_link_text: "%{help_icon} Como faço para...?"
     manage_pages_link_text: "Organizar/Gerenciar páginas"
-    manage_sections_link_text: "Organizar seções"
+    manage_sections_link_text: "Organizar secções"
     notices: 
       created: "ePortfólio criado com sucesso"
       deleted: "ePortfólio excluído com sucesso"
@@ -9153,7 +9153,7 @@ pt:
         submission: "Envio da disciplina"
       titles: 
         delete_section: "Excluir esta seção"
-        move_section: "Arraste para reorganizar seções"
+        move_section: "Arraste para reorganizar secções"
     page_section_static: 
       headers: 
         submission: "Envio do aluno para %{assignment}, criado %{created_date}"
@@ -9235,9 +9235,9 @@ pt:
       no_comments: "Nenhum comentário"
       no_files: "Nenhum upload de arquivo"
       no_submissions: "Nenhum envio encontrado"
-      private_comments: "Neste momento é a única pessoa que pode ver os comentários desta página. Pode tornar os comentários públicos, se desejar, *alterando as definições desta página*."
+      private_comments: "Neste momento é a única pessoa que pode ver os comentários desta página. Pode tornar os comentários públicos, se desejar, *alterando as configurações desta página*."
       private_eportfolio: "Isso significa que as pessoas não podem localizá-lo nem vê-lo sem permissão. Você pode vê-lo, uma vez que é o seu portefólio, mas se quiser que outra pessoa o veja, será necessário copiar e partilhar a seguinte ligação especial, para que essa pessoa possa aceder ao seu portefólio:"
-      public_eportfolio: "Isso significa que qualquer pessoa que saiba o endereço do seu portefólio pode vê-lo. Pode tornar o seu portefólio privado *alterando as definições do portefólio*."
+      public_eportfolio: "Isso significa que qualquer pessoa que saiba o endereço do seu portefólio pode vê-lo. Pode tornar o seu portefólio privado *alterando as configurações do portefólio*."
       recent_submissions: "Clique em qualquer envio para o adicionar a uma página nova no seu ePortefólio."
       titles: 
         already_used: "Este envio já está incluído no seu portefólio"
@@ -9297,26 +9297,26 @@ pt:
         introduction: Introdução
         page_content: "Conteúdo da página"
         pages: "Páginas da seção"
-        sections: "Seções do portfólio"
+        sections: "Secções do portfólio"
         settings: "Configurações do ePortfolio"
         submissions: "Como adicionar envios"
       introduction: 
-        body: "O ePortfolio é o local para apresentar seu trabalho. Eles são compostos por seções e páginas. A lista de seções estão à esquerda da janela (%{showme1}). Cada seção pode ter várias páginas, exibidas à direita da janela (%{showme2})."
+        body: "O ePortfolio é o local para apresentar seu trabalho. Eles são compostos por secções e páginas. A lista de secções estão à esquerda da janela (%{showme1}). Cada seção pode ter várias páginas, exibidas à direita da janela (%{showme2})."
       links: 
         portfolio: "Exibir o portfólio"
       page_content: 
         body1: "O conteúdo exibido em uma página é o mesmo conteúdo que os visitantes verão. Para editar este conteúdo, clique no link \"%{edit_link_text}\" (%{showme}) e a página será alterada para o modo de edição."
         body2: "Agora está a editar! Mude o nome da página ou altere as opções de comentário (%{showme1}), se desejar. Pode guardar, pré-visualizar ou cancelar as alterações a qualquer altura, clicando no botão à direita (%{showme2})."
-        body3: "O conteúdo é dividido em subseções e cada uma tem uma borda pontilhada. É possível excluir ou editar o conteúdo de uma subseção clicando nos ícones %{edit_icon} ou %{delete_icon}, no canto superior direito da subseção."
+        body3: "O conteúdo é dividido em subsecções e cada uma tem uma borda pontilhada. É possível excluir ou editar o conteúdo de uma subseção clicando nos ícones %{edit_icon} ou %{delete_icon}, no canto superior direito da subseção."
         body4: "Para adicionar novas subsecções, localize e clique no tipo de conteúdo que pretende adicionar na lista de opções no lado direito da página (%{showme})."
       pages: 
-        body1: "As seções têm várias páginas. É possível ver a lista de páginas da seção atual à direita da janela (%{showme1}). Para organizar e adicionar páginas, clique no link \"%{manage_pages}\" (%{showme2})."
+        body1: "As secções têm várias páginas. É possível ver a lista de páginas da seção atual à direita da janela (%{showme1}). Para organizar e adicionar páginas, clique no link \"%{manage_pages}\" (%{showme2})."
         body2: "É possível renomear qualquer página clicando no ícone %{edit_icon} exibido, excluir uma página clicando no ícone %{delete_icon} ou reorganizar a ordem das páginas clicando-as e arrastando-as."
       sections: 
-        body1: "As seções são listadas no lado esquerdo da janela (%{showme1}). Cada seção contém várias páginas. Para organizar e adicionar seções, clique no link \"%{manage_sections}\" (%{showme2})."
-        body2: "É possível renomear qualquer seção clicando no ícone %{edit_icon} exibido, reorganizar as seções clicando-as e arrastando-as ou excluir seções clicando no ícone %{delete_icon}."
+        body1: "As secções são listadas no lado esquerdo da janela (%{showme1}). Cada seção contém várias páginas. Para organizar e adicionar secções, clique no link \"%{manage_sections}\" (%{showme2})."
+        body2: "É possível renomear qualquer seção clicando no ícone %{edit_icon} exibido, reorganizar as secções clicando-as e arrastando-as ou excluir secções clicando no ícone %{delete_icon}."
       settings: 
-        body: "Para alterar as definições do seu ePortefólio, clique na ligação \"Definições do ePortefólio\" (%{showme}). Pode mudar o nome do portefólio e também alterar se ele é privado ou público. Os portefólios privados só poderão ser vistos por pessoas a quem conceder acesso."
+        body: "Para alterar as configurações do seu ePortefólio, clique na ligação \"Configurações do ePortefólio\" (%{showme}). Pode mudar o nome do portefólio e também alterar se ele é privado ou público. Os portefólios privados só poderão ser vistos por pessoas a quem conceder acesso."
       submissions: 
         body1: "Deve ter notado que na parte inferior desta página existe uma lista de envios recentes das suas aulas (%{showme}). Pode adicionar envios rapidamente a novas páginas no seu portefólio a partir desta página. Basta clicar no envio que pretende adicionar e aparece uma caixa de diálogo simples como pop-up."
         body2: "Ótimo! Agora, para concluir a adição do envio, é necessário escolher a secção à qual pretende adicionar o envio e dar um nome à página. Depois de clicar em \"Adicionar página\", será conduzido à nova página para que possa editá-la mais detalhadamente, se desejar."
@@ -9478,9 +9478,9 @@ pt:
   exported_package_history_bfca44b9: "Histórico de pacotes exportados"
   exporting_b1eab154: Exportando
   extend_due_date_20651e76: "Sem data de vencimento"
-  external_apps_account_course_settings_78de2b2f: "Aplicativos externos (definições de conta, disciplina)"
+  external_apps_account_course_settings_78de2b2f: "Aplicativos externos (configurações de conta, disciplina)"
   external_apps_account_course_settings_c44af5ef: "Aplicativos externos (definições de conta/disciplina)"
-  external_apps_course_settings_1f045644: "Aplicativos externos (definições da disciplina)"
+  external_apps_course_settings_1f045644: "Aplicativos externos (configurações da disciplina)"
   external_apps_f5490181: "Aplicações externas"
   external_collaborations_tool_a4899abb: "Ferramenta de Colaboração Externa"
   external_content: 
@@ -9684,7 +9684,7 @@ pt:
   failed_to_save_please_try_again_later_bb7070fb: "Falha na gravação, tente novamente mais tarde"
   failed_to_submit_draft_comment_1de83451: "Falhou a entrega do comentário em rascunho"
   failed_to_unpin_discussion_503eab82: "Falha ao tentar desafixar a discussão"
-  failed_to_update_course_notification_settings_cbf0eb18: "Falha na actualização das definições de notificação da disciplina"
+  failed_to_update_course_notification_settings_cbf0eb18: "Falha na actualização das configurações de notificação da disciplina"
   failed_to_update_discussion_23cc229a: "Falha ao atualizar a discussão"
   failed_to_update_permission_33c493f: "Falha ao atualizar a permissão"
   failed_to_update_role_name_8c7b0119: "Falha ao atualizar o nome da função"
@@ -9722,7 +9722,7 @@ pt:
   feature_flags_enable_disable_32e8f1ab: "Sinalizadores de recursos - ativar/desativar"
   feature_headline_3f0daf4: Destaque
   feature_options_37a2c317: "Opções de funcionalidades"
-  feature_options_account_settings_294a39f8: "Opções de recursos (definições da conta)"
+  feature_options_account_settings_294a39f8: "Opções de recursos (configurações da conta)"
   feature_options_enable_disable_7e748054: "Opções de recursos - ativar/desativar"
   feature_options_view_a170e80c: "Opções de recursos - exibir"
   feature_preview_5e1216a0: "Visualização de recursos"
@@ -10136,8 +10136,8 @@ pt:
   grade_change_log_231f90e4: "Registo de alteração de classificação"
   grade_change_notifications_98461261: "Notificações de alteração de nota"
   grade_changes_and_comments_have_been_released_for__3978b741: "Alterações de classificação e comentários foram liberados para todos."
-  grade_changes_and_comments_have_been_released_for__5d6a01a0: "Alterações de classificação e comentários foram liberados para todos nas seções: %{section_names}."
-  grade_changes_and_comments_have_been_released_for__624411ff: "Alterações de classificação e comentários foram liberados para todos os graduados nas seções: %{section_names}."
+  grade_changes_and_comments_have_been_released_for__5d6a01a0: "Alterações de classificação e comentários foram liberados para todos nas secções: %{section_names}."
+  grade_changes_and_comments_have_been_released_for__624411ff: "Alterações de classificação e comentários foram liberados para todos os graduados nas secções: %{section_names}."
   grade_changes_and_comments_have_been_released_for__79d3473e: "Alterações de classificação e comentários foram liberados para todos os graduados."
   grade_changes_and_new_comments_released_for_title__f1350f92: "Alterações de notas e novos comentários lançados para: %{title}, %{course}"
   grade_changes_cb5a57a8: "Alterações de nota"
@@ -10462,7 +10462,7 @@ pt:
   gradebookOutcomeGradebookGrid: 
     learning_outcome: "Resultado de aprendizagem"
   gradebookSectionMenuView: 
-    all_sections: "Todas as seções"
+    all_sections: "Todas as secções"
   gradebook_1620a0aa: "Livro de notas"
   gradebook_5fd8ef0: "Livro de classificação..."
   gradebook_and_speedgrader_3b122556: "Livro de notas e SpeedGrader"
@@ -10482,7 +10482,7 @@ pt:
   gradebook_individual_view_8846598e: "Livro de classificação: Vista individual"
   gradebook_performance_764d8b3d: "Histórico do Desempenho"
   gradebook_settings_b45c6df9: "Configurações do Livro de classificação"
-  gradebook_settings_updated_fef63d60: "Definições do livro de notas atualizadas"
+  gradebook_settings_updated_fef63d60: "Configurações do livro de notas atualizadas"
   gradebook_speedgrader_66cb7a6a: "Livro de notas, SpeedGrader"
   gradebook_tutorial_tray_d835c750: "Bandeja do tutorial do livro de classificação"
   gradebook_uploads: 
@@ -10700,11 +10700,11 @@ pt:
     screenreader: 
       page_titles: "Livro de notas: Vista individual"
     speed_grader: 
-      all_sections: "Todas as seções"
+      all_sections: "Todas as secções"
       attach: Anexar
       buttons: 
         save: Guardar
-        save_settings: "Guardar definições"
+        save_settings: "Guardar configurações"
         submit_comment: "Enviar comentário"
       comment_submitted: "O seu comentário foi enviado."
       crocodoc_pending: "O Crocodoc ainda está a processar este documento."
@@ -10754,7 +10754,7 @@ pt:
         previous: Voltar
         remove_attachment: "Remover anexo"
         settings: Configurações
-        show_all_sections: "Mostrar Todas as Seções"
+        show_all_sections: "Mostrar Todas as Secções"
         submit_same_score: "Usar esta mesma nota para o reenvio"
       loading: carregando...
       no_annotation: "Não estão disponíveis anotações para este documento"
@@ -11041,7 +11041,7 @@ pt:
       grading_scheme_info: "Exibir/Editar esquema de avaliação"
   grading_standards_b73bfa72: "Padrões de avaliação"
   grading_type_type_7d8b42d7: "Tipo de avaliação: %{type}"
-  granular_contexttype_notification_settings_will_be_c5dfc901: "As definições de notificação %{contextType} granular serão configuráveis aqui no futuro."
+  granular_contexttype_notification_settings_will_be_c5dfc901: "As configurações de notificação %{contextType} granular serão configuráveis aqui no futuro."
   granular_course_notification_settings_will_be_conf_68f122db: "As definições de notificação da disciplina granular serão configuráveis aqui no futuro."
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Permissões granulares para gestão de páginas wiki"
   graph_bar_b5daa23d: "Gráfico de barras"
@@ -11362,7 +11362,7 @@ pt:
         split_into_groups: "Divida os alunos em %{num_groups} grupos"
       group_category_detail: 
         add_group: "Adicionar grupo"
-        category_settings: Definições
+        category_settings: Configurações
         delete_category_option: Eliminar
         edit_category_option: Editar
         group: Grupo
@@ -11372,7 +11372,7 @@ pt:
         restricted_self_signup_blurb: "Todos os alunos num grupo têm de estar na mesma secção."
         self_organized_warning: "Estes grupos são auto-organizados pelos alunos. Ao contrário dos outros tipos de grupos, os alunos podem pertencer a mais de um destes grupos ao mesmo tempo, o que significa que estes grupos não podem ser utilizados para avaliações com nota."
         self_signup_blurb: "A auto-inscrição está ativada para estes grupos."
-        settings: Definições
+        settings: Configurações
         uncategorized_groups: "Estes grupos não estão associados a um conjunto de grupos específico. Visto que foram importados através de SIS, só podem ser atualizados ou eliminados através de SIS."
       group_category_edit: 
         allow_self_signup: "Permitir auto-inscrição"
@@ -11390,7 +11390,7 @@ pt:
         group_edit: Editar
         group_full: Cheio
         group_leader: "Líder do grupo"
-        group_settings: Definições
+        group_settings: Configurações
         show_group_details: "Mostrar detalhes do grupo %{name}"
         visit_group_homepage: "Visitar página inicial do grupo"
       group_edit: 
@@ -11652,8 +11652,8 @@ pt:
   hide_all_details_61d7ebb: "Ocultar todos os detalhes"
   hide_correct_answers_at_2421b0aa: "Esconder Respostas Corretas em"
   hide_correct_answers_at_b1a59408: "Esconder Respostas Corretas em"
-  hide_course_sections_for_course_name_bd1911af: "Ocultar seções da disciplina %{name}"
-  hide_course_sections_from_students_b7850d64: "Ocultar seções da disciplina dos alunos"
+  hide_course_sections_for_course_name_bd1911af: "Ocultar secções da disciplina %{name}"
+  hide_course_sections_from_students_b7850d64: "Ocultar secções da disciplina dos alunos"
   hide_courses_menu_1b8ca649: "Ocultar menu cursos"
   hide_courses_navigation_menu_6f7c4cfd: "Ocultar Menu de navegação das disciplinas"
   hide_courses_without_enrollments_6df4dfad: "Esconder Disciplinas sem inscrições"
@@ -11675,7 +11675,7 @@ pt:
   hide_students_with_no_results_6a22f991: "Ocultar alunos sem resultados"
   hide_sub_accounts_for_account_name_a6de98bd: "Ocultar Sub-Contas para %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Ocultar o botão Importar Resultados de Aprendizagem com base nas permissões do utilizador"
-  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Esconder determinados alunos e seções do LMGB se o professor só tiver acesso a uma determinada seção"
+  hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Esconder determinados alunos e secções do LMGB se o professor só tiver acesso a uma determinada seção"
   hiding_grades_82691e44: "Esconder classificações"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "As classificações ocultas não são permitidas porque as classificações não foram liberadas para essa atribuição."
   hiding_grades_is_not_allowed_because_no_grades_hav_6f52fcf6: "As classificações ocultas não são permitidas porque nenhuma classificação foi lançada para essa tarefa."
@@ -11688,7 +11688,7 @@ pt:
   highest_28ad71e6: "Mais alto"
   highest_score_e080551e: "Pontuação mais alta"
   hindi_9bcd4b34: Hindi
-  history_settings_c63dbaaf: "Definições do Histórico"
+  history_settings_c63dbaaf: "Configurações do Histórico"
   home_351838cd: Início
   home_page_is_not_valid_2e8a25ae: "A página inicial não é válida"
   home_tutorial_tray_66826983: "Bandeja do tutorial Início"
@@ -11766,7 +11766,7 @@ pt:
   how_do_i_start_a_meeting_e8a9e67b: "Como é que começo uma reunião?"
   how_do_i_turn_my_camera_on_or_off_and_use_zoom_con_8a96538b: "Como é que ligo ou desligo a minha câmara e uso os controlos do Zoom?"
   how_do_i_upload_a_file_to_a_course_e8332cfe: "Como faço o carregamento de um ficheiro para uma disciplina?"
-  how_do_i_use_course_settings_1e8467e6: "Como eu uso as definições da disciplina?"
+  how_do_i_use_course_settings_1e8467e6: "Como eu uso as configurações da disciplina?"
   how_do_i_use_files_as_an_instructor_70a996b: "Como posso usar os Ficheiros como instrutor?"
   how_do_i_use_speedgrader_e18e4ca2: "Como uso o SpeedGrader?"
   how_do_i_use_the_announcements_index_page_94a14011: "Como eu uso a página Índice de Anúncios?"
@@ -11863,7 +11863,7 @@ pt:
       
               Se a visibilidade da disciplina estiver limitada aos utilizadores inscritos na disciplina, essa permissão
               permite que um utilizador visualize o conteúdo da disciplina sem estar inscrito na disciplina.
-  if_disabled_user_will_still_have_access_to_course__d78fddc4: "Se desativado, o utilizador ainda terá acesso às definições da disciplina. O utilizador não pode gerir o conteúdo individual da disciplina sem a devida        permissão para esse item de conteúdo. Se a visibilidade da disciplina for limitada aos utilizadores inscritos na disciplina, esta permissão permite ao utilizador visualizar o conteúdo da disciplina sem estar inscrito na mesma."
+  if_disabled_user_will_still_have_access_to_course__d78fddc4: "Se desativado, o utilizador ainda terá acesso às configurações da disciplina. O utilizador não pode gerir o conteúdo individual da disciplina sem a devida        permissão para esse item de conteúdo. Se a visibilidade da disciplina for limitada aos utilizadores inscritos na disciplina, esta permissão permite ao utilizador visualizar o conteúdo da disciplina sem estar inscrito na mesma."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Se ativado, o acesso ao LTI 1.3 e ao LTI Advantage será ativado."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Se ativado, permite que mais do que a pontuação máxima possível de um resultado seja fornecida em uma rubrica."
   if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
@@ -11903,12 +11903,12 @@ pt:
   if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
       Se o Aprimoramentos RCE também estiver ativado,
       o RCE salvará seu trabalho automaticamente à medida que você for
-  if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Se definido, desliga a funcionalidade pós-SIS para tarefas quando o seu período de classificação se encerra. Só se aplica se a funcionalidade \"Activar novas definições de integração SIS\" estiver activada."
+  if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Se definido, desliga a funcionalidade pós-SIS para tarefas quando o seu período de classificação se encerra. Só se aplica se a funcionalidade \"Activar novas configurações de integração SIS\" estiver activada."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Se Estatísticas - visualizar ou Utilizadores - gerir detalhes de login estiver ativado, o utilizador será capaz de gerar atividade de login/logout em Ferramentas de Administração. Para ocultar a opção de atividade de login / logout nas Ferramentas de administração, essas duas permissões precisam ser desativadas."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Se Estatísticas - visualizar ou Utilizadores - gerir detalhes de login estiver ativado, um utilizador poderá gerar atividades de login/logout em Ferramentas administrativas. Para ocultar a opção de atividade de login / logout nas Ferramentas de administração, essas duas permissões precisam ser desativadas."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Se Estatísticas - visualizar ou Utilizadores - gerir detalhes de login estiver ativado, um utilizador poderá gerar atividades de login/logout em Ferramentas administrativas. Para ocultar a opção de atividade de login/logout nas Ferramentas de administração, essas duas permissões precisam ser desativadas."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Se a configuração Abrir conta de registro estiver ativada, os utilizadores com essa permissão poderão adicionar alunos ou observadores a um disciplina via endereço de e-mail ou ID de login, mesmo que o aluno ou observador ainda não tenha uma conta do Canvas."
-  if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "Se esta permissão estiver desativada e Disciplinas - adicionar / editar / eliminar estiver ativada, os utilizadores podem adicionar um nova disciplina com o botão Adicionar um nova disciplina na conta Definições."
+  if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "Se esta permissão estiver desativada e Disciplinas - adicionar / editar / eliminar estiver ativada, os utilizadores podem adicionar um nova disciplina com o botão Adicionar um nova disciplina na Configurações de Conta."
   if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
       Se esta permissão estiver desativada e Disciplinas - adicionar / editar / eliminar estiver ativada,
       os utilizadores podem adicionar um nova disciplina com o botão Adicionar um nova disciplina na conta
@@ -11920,7 +11920,7 @@ pt:
   if_this_permission_is_disabled_users_can_only_view_b68143d5: "Se essa permissão for desativada, os utilizadores só poderão visualizar grupos existentes, incluindo grupos criados por alunos."
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "Se essa permissão estiver desativada, os utilizadores ainda poderão criar ou adicionar rubricas a atribuições se as atribuições e os Questionários - adicionar / editar / eliminar estiverem ativados."
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "Se essa permissão estiver desativada, os utilizadores ainda poderão instalar aplicações aprovados por meio do Canvas App Center (se ativado para sua instituição). Além disso, se essa permissão estiver desativada, os utilizadores não poderão eliminar aplicativos externos adicionados manualmente."
-  if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "Se essa permissão estiver ativada e a lista Disciplinas - Exibir estiver desativada, os utilizadores poderão adicionar um nova disciplina com o botão Adicionar um nova disciplina em Definições da conta."
+  if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "Se essa permissão estiver ativada e a lista Disciplinas - Exibir estiver desativada, os utilizadores poderão adicionar um nova disciplina com o botão Adicionar um nova disciplina em Configurações da conta."
   if_this_permission_is_enabled_users_do_not_need_th_49974dc2: "Se essa permissão estiver ativada, os utilizadores não precisarão dos Dados do SIS - permissão de leitura ativada. A permissão da conta substitui a permissão da disciplina. Para impedir que os utilizadores gerenciem IDs do SIS no nível da disciplina, os Dados do SIS - gerir e SIS Data - lidos devem estar desabilitados. Para adicionar utilizadores a disciplinas por meio da ID SIS, Utilizadores - adicionar / remover alunos de disciplinas e/ou Utilizadores - adicionar / remover professores, designers de disciplinas ou TAs de disciplinas também devem estar ativados."
   if_this_permission_is_enabled_users_do_not_need_th_e3d0f334: |-
       Se essa permissão estiver ativada, os utilizadores não precisarão dos Dados do SIS - permissão de leitura ativada. A permissão da conta substitui a permissão da disciplina. Para impedir que os utilizadores gerenciem IDs do SIS no nível da disciplina, os Dados do SIS - gerir e Dados do SIS - lidos devem estar desabilitados.
@@ -12012,7 +12012,7 @@ pt:
         grading_standard_not_found: "A tarefa \"%{title}\" referenciava um esquema de avaliação que não foi encontrado na cadeia de contas da disciplina pretendida."
     imported_assignments_group: "Tarefas importadas"
   importers/context_external_tool_importer: 
-    external_tool_attention_needed: "Os parâmetros de segurança da ferramenta externa \"%{tool_name}\" precisam de ser definidos em Definições de disciplina."
+    external_tool_attention_needed: "Os parâmetros de segurança da ferramenta externa \"%{tool_name}\" precisam de ser definidos em Configurações de disciplina."
   importers/context_module_importer: 
     foreign_lti_tool: "A ferramenta externa da conta relativa ao item de módulo \"%{title}\" tem de ser configurada para ser possível iniciar o item"
     migration_module_item_type: "Item de módulo"
@@ -12438,7 +12438,7 @@ pt:
   key_f2a919d5: Chave
   key_ff4089c5: "Chave:"
   key_name_7311d22: "Nome da chave:"
-  key_settings_44df6a41: "Definições de chave"
+  key_settings_44df6a41: "Configurações de chave"
   key_state_for_the_current_account_d16b1cd5: "Estado-chave da conta corrente"
   keyboard_instructions_e032939f: "instruções teclado"
   keyboard_nav_dialog: 
@@ -12637,7 +12637,7 @@ pt:
         attachments: Ficheiros
         calendar_events: "Eventos do calendário"
         context_modules: Módulos
-        course_settings: "Definições de disciplina"
+        course_settings: "Configurações de disciplina"
         discussion_topics: "Tópicos de discussão"
         external_tools: "Ferramentas externas"
         groups: "Grupos de alunos"
@@ -13071,7 +13071,7 @@ pt:
   manage_update_23de23a1: "Gerir Carregamento"
   manage_update_for_toolname_f8e3b2fb: "Gerir carregamento para %{toolName}"
   manage_usage_rights_c5a8c216: "Gerir direitos de utilização"
-  manage_user_settings_827ab12d: "Gerir definições do utilizador"
+  manage_user_settings_827ab12d: "Gerir configurações do utilizador"
   manage_your_course_details_664c335f: "Gerir os detalhes da sua disciplina"
   manual_8c2665de: Manual
   manual_configuration_b586fe54: "Definição manual"
@@ -13863,7 +13863,7 @@ pt:
             e foi convidado através do seu endereço de e-mail, %{email}.
             
             Se este for o endereço de e-mail errado para este tipo de colaboração, será
-            necessário alterar as definições do seu perfil ou registar no %{service}.
+            necessário alterar as configurações do seu perfil ou registar no %{service}.
             
             Pode ver os detalhes aqui: 
             %{link}
@@ -13873,14 +13873,14 @@ pt:
             do seu endereço de e-mail, %{email}.
             
             Se este for o endereço de e-mail errado para este tipo de colaboração, será
-            necessário alterar as definições do seu perfil ou registar no %{service}.
+            necessário alterar as configurações do seu perfil ou registar no %{service}.
             
             Pode ver os detalhes aqui:
             %{link}
         html: 
           body: "Foi convidado a colaborar num documento, %{document} para %{course_or_group}.  O documento foi criado em %{service} e foi convidado através do seu endereço de e-mail, %{email}."
           body_with_user: "Foi convidado a colaborar num documento, %{document} para %{course_or_group}.  O documento foi criado por %{user} em %{service} e foi convidado através do seu endereço de e-mail, %{email}."
-          change_profile_settings: "Se esse for o endereço de e-mail incorreto para este tipo de colaboração, será necessário mudar as definições do seu perfil ou registar com %{service}."
+          change_profile_settings: "Se esse for o endereço de e-mail incorreto para este tipo de colaboração, será necessário mudar as configurações do seu perfil ou registar com %{service}."
           link: "Pode ver os detalhes aqui"
           subject: "Convite de colaboração: %{course_or_group}"
         subject: "Convite de colaboração: %{course_or_group}"
@@ -15327,7 +15327,7 @@ pt:
     must_submit_incomplete: "tem de enviar a tarefa"
     must_view_complete: "visualizou a página"
     must_view_incomplete: "tem de visualizar a página"
-  modules_settings_a7066f13: "Definições dos Módulos"
+  modules_settings_a7066f13: "Configurações dos Módulos"
   modules_tutorial_tray_d58ac3cb: "Bandeja Tutorial de Módulos"
   month_s_5c17590e: Mês(es)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} a começar em %{time}"
@@ -15448,7 +15448,7 @@ pt:
   must_contribute_to_this_module_item_to_complete_it_84ed571c: "Tem de contribuir para estemódulo para o completar"
   must_have_at_least_1_grader_d4a54e85: "Deve ter pelo menos 1 aluno"
   must_have_at_least_1_group_per_section_9809e708: "Deve ter pelo menos 1 grupo por seção"
-  must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "Deve ter pelo menos tantos grupos como seções para atribuir por seção"
+  must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "Deve ter pelo menos tantos grupos como secções para atribuir por seção"
   must_have_at_least_one_placement_defined_1bc586c6: "Deve ter pelo menos uma colocação definida."
   must_have_at_least_one_redirect_uri_defined_bb236d38: "Deve ter pelo menos uma redirect_uri definida."
   must_mark_as_done_91cff799: "Tem de marcar como terminado"
@@ -15491,7 +15491,7 @@ pt:
   my_dashboard_8983c283: "Meu painel"
   my_dashboard_b724020: "O meu painel"
   my_files_2f621040: "Os meus ficheiros"
-  my_settings_2ff35329: "As minhas definições"
+  my_settings_2ff35329: "As minhas configurações"
   my_themes_b72217b8: "Os meus temas"
   n_554bc493: "n"
   n_a_d6f6c42f: ND
@@ -15639,7 +15639,7 @@ pt:
       Qualquer cliente que esteja atualmente usando soluções de grade passback em produtos Canvas ou
       parceiros deve habilitar este recurso para fluxos de trabalho de validação de dados
       de atribuição aprimorados  Quando ativado, esse recurso exibe as novas configurações do SIS
-      Integration para o SIS Sync (Assignment Level Grade Passback) em Definições de
+      Integration para o SIS Sync (Assignment Level Grade Passback) em Configurações de
       Conta. A opção de recurso Post to SIS foi incorporada nesta nova
       definição e será ativada por padrão.
   new_slack_api_key_453d04d: "Nova Chave da API Slack"
@@ -15784,7 +15784,7 @@ pt:
       Nem todos estes serviços podem ser suportados pela sua instituição. Por favor contacte o seu
                 administrador local para mais informações.
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Nem todas as secções serão atribuídas a este item."
-  not_all_settings_options_are_available_at_the_suba_20efaa98: "Nem todas as opções de definições estão disponíveis no nível da subconta, incluindo a guia Notificações."
+  not_all_settings_options_are_available_at_the_suba_20efaa98: "Nem todas as opções de configurações estão disponíveis no nível da subconta, incluindo a guia Notificações."
   not_anonymously_graded_87574f91: "Não classificado anonimamente"
   not_applicable_d5dfd285: "não aplicável"
   not_available_487d3648: "Não está disponível"
@@ -16655,7 +16655,7 @@ pt:
             lista de recursos educacionais. As páginas podem incluir texto, multimídia e
             ligações para ficheiros e outros conteúdos ou páginas da disciplina. Você também pode
             permitir que os alunos contribuam para páginas específicas do curso.
-  pages_settings_968392a3: "Definições de páginas"
+  pages_settings_968392a3: "Configurações de páginas"
   pages_tutorial_tray_169464a9: "Bandeja de Tutorial de Páginas"
   pages_update_6c1750af: "Páginas - Atualização"
   paginated_collection: 
@@ -16759,7 +16759,7 @@ pt:
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "escolha um destino, vamos enviar-lhe os erros"
   pick_a_name_to_save_this_theme_as_9773cb1a: "Escolha um nome para guardar este tema"
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "escolha um local, vamos publicar os seus relatórios de erro ali"
-  pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Escolha a data e hora para as definições de conferência:"
+  pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Escolha a data e hora para as configurações de conferência:"
   pin_cdbc9f8f: Afixar
   pin_discussion_title_67c84658: "Afixar discussão %{title}"
   pin_of_discussion_title_failed_6c2c32a5: "O marcador da discussão %{title} falhou"
@@ -16867,7 +16867,7 @@ pt:
       description: "Configurações anteriores BigBlueButton para preservar as gravações durante a migração"
       name: "BigBlueButton Fallback Para Migração"
     big_blue_button_fallback_settings: 
-      description: "Quando você tem seu BigBlueButton Plugin configurado para usar definições de fallback, estas são as definições que ele usa. O fallback é apenas usado para procurar gravações de conferências que não foram criadas com a configuração do seu BigBlueButton Plugin."
+      description: "Quando você tem seu BigBlueButton Plugin configurado para usar configurações de fallback, estas são as configurações que ele usa. O fallback é apenas usado para procurar gravações de conferências que não foram criadas com a configuração do seu BigBlueButton Plugin."
       domain_description: "**nome do host** ou **endereço ip** da sua instalação do BigBlueButton (por exemplo, bigbluebutton.mycompany.com)"
       labels: 
         domain: Domínio
@@ -16882,7 +16882,7 @@ pt:
         recording_enabled: "Permitir a gravação de conferências."
         replace_with_alternatives: "Desativar conferências BigBlueButton; mostrar uma lista de alternativas em seu lugar"
         secret: Segredo
-        use_fallback: "Use as definições do BigBlueButton Fallback Plugin para procurar gravações para conferências que não foram hospedadas pela instância BBB configurada atualmente."
+        use_fallback: "Use as configurações do BigBlueButton Fallback Plugin para procurar gravações para conferências que não foram hospedadas pela instância BBB configurada atualmente."
       secret_description: "Este é o parâmetro %{parameter_name} que pode ser encontrado no arquivo config%{filename}."
     buttons: 
       saving: "A guardar..."
@@ -16956,7 +16956,7 @@ pt:
         post: "Publicar para um URL"
     errors: 
       plugin_doesnt_exist: "O plugin %{id} não existe."
-      setting_update_failed: "Ocorreu um erro ao guardar as definições do plug-in."
+      setting_update_failed: "Ocorreu um erro ao guardar as configurações do plug-in."
     etherpad: 
       description: "Compartilhamento de documento do EtherPad"
       name: EtherPad
@@ -16978,7 +16978,7 @@ pt:
     facebook_settings: 
       description: |-
           Vai precisar de criar uma [nova aplicação no Facebook](%{facebook_url}), e permitir o Registo Cliente OAuth
-          nas Definições Avançadas. Deve configurar %{callback_url} como um URL de redireção OAuth Válida.
+          nas Configurações Avançadas. Deve configurar %{callback_url} como um URL de redireção OAuth Válida.
           Depois de guardar a sua aplicação, crie uma nota da ID da App e a Palavra Secreta da App, e insira-os aqui.
       labels: 
         app_id: "ID do aplicativo"
@@ -17080,8 +17080,8 @@ pt:
           ou com um registo automático do Kaltura.
           
           **Atenção:** depois de ter o Kultura configurado na Canvas,
-          tem de verificar a Consola De Gestão Kaltura na aba "Definições ->
-          Definições de Integração" permitir notificações com uma
+          tem de verificar a Consola De Gestão Kaltura na aba "Configurações ->
+          Configurações de Integração" permitir notificações com uma
           Notificação URL de: 
           
           %{notification_url}
@@ -17089,9 +17089,9 @@ pt:
           Depois selecione as caixas de "Adicionar Entrada" e "Apagar Entrada" na coluna "Enviar por Servidor".
       headers: 
         account_settings: "Configurações de conta"
-        canvas_settings: "Definições do Canvas"
+        canvas_settings: "Configurações do Canvas"
         domain_settings: "Configurações do domínio"
-        misc_settings: "Definições diversas"
+        misc_settings: "Configurações diversas"
         ui_conf_ids: "IDs de Conf UI"
       hide_rte_button_note: "(ainda disponível para conversas/SpeedGrader/Gravações de multimédia/envios de trabalhos de casa)"
       hints: 
@@ -17234,7 +17234,7 @@ pt:
       description: "Serviço de detecção de plágio."
       name: VeriCite
     vericite_settings: 
-      default_assignment_settings: "**Definições de Tarefa Padrão**"
+      default_assignment_settings: "**Configurações de Tarefa Padrão**"
       default_comments_settings: "*O texto introduzido aqui será exibido aos alunos aquando da submissão para uma tarefa.*"
       labels: 
         account_id: "VeriCite Chave do cliente"
@@ -17617,7 +17617,7 @@ pt:
         delicious: Delicious
         diigo: Diigo
         disable_mfa: "Desativar autenticação multifatorial"
-        edit_settings: "Editar definições"
+        edit_settings: "Editar configurações"
         google_docs: "Google Docs"
         google_drive: "Google Drive"
         linkedin: LinkedIn
@@ -17750,7 +17750,7 @@ pt:
     ways_to_contact_me: Contatar
     yo_select: 
       yo: Yo
-    you_have_no_services: "Sem serviços registados, pode adicionar alguns na página *definições*."
+    you_have_no_services: "Sem serviços registados, pode adicionar alguns na página *configurações*."
   profile_6bd2baed: Perfil
   profile_photo_save_failed_too_many_times_e1ebda5: "O salvamento da foto do perfil falhou muitas vezes"
   profile_tray_bcec5044: "Bandeja de perfil"
@@ -17765,7 +17765,7 @@ pt:
       enter_gravatar_email_below: "introduza o endereço de e-mail do seu *Gravatar* abaixo"
     notification_preferences: 
       captions: 
-        notification_preferences: "Eventos e definições de notificação de %{name}"
+        notification_preferences: "Eventos e configurações de notificação de %{name}"
     notifications: 
       privacy_notice: 
         ok: Ok
@@ -18164,7 +18164,7 @@ pt:
   quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Os resultados deste teste estão protegidos e não podem ser vistos pelos alunos até estes enviarem a última tentativa."
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Os resultados deste teste estão protegidos e podem ser vistos só uma vez imediatamente após o envio."
   quiz_score_to_keep_d1f7c4b1: "Pontuação do teste para manter"
-  quiz_settings_4e17f005: "Definições do Teste"
+  quiz_settings_4e17f005: "Configurações do Teste"
   quiz_statistics: 
     answer_bars_chart: 
       audible_answer_position: "Resposta %{position}:"
@@ -19418,7 +19418,7 @@ pt:
     : Verdadeiro
   quizzes_tutorial_tray_6f87cdd3: "Bandeja de Tutorial de Testes"
   quizzes_view_submission_log_ec105e3e: "Questionários - ver log de submissão"
-  quotas_account_settings_22c12b8d: "Cotas (definições de conta)"
+  quotas_account_settings_22c12b8d: "Cotas (configurações de conta)"
   radio_button_option_1_a8ec51f9: "Botão de rádio opção 1"
   radio_button_option_2_31e50043: "Botão de rádio opção 2"
   range_56b2f310: Âmbito
@@ -19685,7 +19685,7 @@ pt:
   removed_user_as_group_leader_bb69330f: "Removido %{user} como líder do grupo"
   rename_45608f54: "Mudar o nome"
   rename_c_name_section_e0e92c97: "Renomear a Seção %{c.name}"
-  rename_or_reorder_a_page_via_the_settings_menu_nex_f4aff39f: "Renomeie ou reordene uma página através do menu de definições ao lado do nome da página. Alternativamente, clique no nome de uma página para renomeá-la ou arraste o nome de uma página para reorganizá-la."
+  rename_or_reorder_a_page_via_the_settings_menu_nex_f4aff39f: "Renomeie ou reordene uma página através do menu de configurações ao lado do nome da página. Alternativamente, clique no nome de uma página para renomeá-la ou arraste o nome de uma página para reorganizá-la."
   rename_this_page_554f0583: "Renomear esta página"
   rename_this_section_73065edd: "Renomear esta seção"
   rename_this_section_bcbb6741: "Renomear esta seção"
@@ -19714,7 +19714,7 @@ pt:
   report_issue_b5f1db0e: "Edição de relatório"
   reported_3de7086a: Relatado
   reports_1b9ab7a7: Relatórios
-  reports_account_settings_78f5336a: "Relatórios (definições da conta)"
+  reports_account_settings_78f5336a: "Relatórios (configurações da conta)"
   reports_course_f09b7d9e: "Relatórios (Disciplina)"
   request_id_1499afb0: "ID de pedido"
   request_values_89976f2c: "Solicitar Valores"
@@ -20062,7 +20062,7 @@ pt:
   save_key_b4dede06: "Guardar chave"
   save_learning_mastery_82889d8b: "Salvar o domínio de aprendizagem"
   save_publish_36440725: "Guardar e Publicar"
-  save_settings_cafe79a5: "Guardar definições"
+  save_settings_cafe79a5: "Guardar configurações"
   save_successful_b2f64da4: "Salvo com sucesso."
   save_theme_36c73e6a: "Salvar tema"
   save_theme_f706116e: "Guardar tema"
@@ -20203,7 +20203,7 @@ pt:
         sis_export: "Publicar notas em SIS"
         upload_scores: "Carregar pontuações (.csv)"
       header: 
-        global_settings: "Definições globais"
+        global_settings: "Configurações globais"
       mastery_toggles_and_actions: 
         download_results: "Descarregar resultados (.csv)"
         hide_student_names_label: "Ocultar nomes dos alunos"
@@ -20279,7 +20279,7 @@ pt:
   search_title_body_or_author_1d26711f: "Procurar título, corpo ou autor"
   search_users_48b1789e: "Procurar utilizadores..."
   searching_b0207e7f: Procurando
-  searching_for_announcements_in_sections_must_span__80e4dfe4: "A procura de anúncios em seções deve abranger exatamente uma disciplina"
+  searching_for_announcements_in_sections_must_span__80e4dfe4: "A procura de anúncios em secções deve abranger exatamente uma disciplina"
   searching_for_courses_8cc5f904: "A procurar disciplinas..."
   second_reviewer_90046c68: "Segundo revisor"
   secondary_button_36a86f03: "Botão Secundário"
@@ -20329,7 +20329,7 @@ pt:
   section_specific_announcements_e0d355d9: "Anúncios específicos da seção"
   section_specific_discussions_are_disabled_9e3fd431: "As discussões específicas da seção estão desativadas"
   section_specific_discussions_d6a3addf: "Discussões específicas da seção"
-  section_specific_topics_must_have_sections_11868960: "Os tópicos específicos da seção devem ter seções"
+  section_specific_topics_must_have_sections_11868960: "Os tópicos específicos da seção devem ter secções"
   section_starts_at_65eaed1: "A secção começa a"
   sections: 
     section_created: "Seção criada com sucesso!"
@@ -20346,7 +20346,7 @@ pt:
         one: "1 inscrição ativa"
         other: "%{count} inscrições ativas"
       buttons: 
-        back_to_course: "Voltar para as definições da disciplina"
+        back_to_course: "Voltar para as configurações da disciplina"
         cancel: Cancelar
         crosslist_section: "Realizar a listagem cruzada desta seção"
         crosslist_this_section: "Realizar a listagem cruzada desta seção"
@@ -20389,7 +20389,7 @@ pt:
         crosslist_this_section: "Fazer a listagem cruzada desta seção"
         current_enrollments: "Inscrições atuais"
         decrosslist_section: "Cancelar a listagem cruzada desta seção"
-  sections_94731e51: Seções
+  sections_94731e51: Secções
   security_7a7e8808: Segurança
   security_tab_failed_to_load_2d2242a: "Falha ao carregar a guia Segurança"
   see_more_in_canvas_guides_fc90a457: "Veja mais nos Guias do Canvas"
@@ -20663,7 +20663,7 @@ pt:
         ret_val: "URL de Regresso"
   settings_5aa0fd0c: Configurações
   settings_changed_exceptions_e5247936: "As configurações mudaram as exceções:"
-  settings_for_assignment_name_c19565e1: "Definições para a Tarefa %{name}"
+  settings_for_assignment_name_c19565e1: "Configurações para a Tarefa %{name}"
   settings_for_name_7731a33d: "Configurações para %{name}"
   settings_for_tab_label_3bff4468: "Configurações para %{tab_label}"
   settings_for_title_d3ca495: "Configurações para %{title}"
@@ -21240,7 +21240,7 @@ pt:
       wiki_page_notice: "Selecione a página wiki que pretende associar a este *módulo* ou adicione uma nova página selecionando \"Nova página\"."
       wiki_page_select_label: "Selecione a página wiki que pretende associar ou adicione uma nova página selecionando \"Nova página\"."
     static_notices: 
-      bouncing_communication_channels: "Parece haver um problema com um dos seus métodos de contacto. Verifique a sua *página de definições*."
+      bouncing_communication_channels: "Parece haver um problema com um dos seus métodos de contacto. Verifique a sua *página de configurações*."
       javascript_required: "É necessário ter o JavaScript ativado para aceder a este site."
     submission_comment: 
       assignment: Tarefa
@@ -21423,7 +21423,7 @@ pt:
   show_all_details_9879980c: "Exibir todos os detalhes"
   show_all_developerkeyscount_keys_63ef34ca: "Mostrar todas as chaves %{developerKeysCount}"
   show_all_keys_fa88c55c: "Mostrar todas as chaves"
-  show_all_sections_190203e8: "Exibir todas as seções"
+  show_all_sections_190203e8: "Exibir todas as secções"
   show_and_hide_courses_menu_9e09d1d0: "Mostrar e esconder o menu de disciplinas."
   show_attendance_columns_4d160e16: "Exibir colunas de presença"
   show_by_709f525b: "Mostrar por"
@@ -21433,7 +21433,7 @@ pt:
   show_concluded_enrollments_6a05544c: "Mostrar inscrições concluídas"
   show_correct_answers_at_30c37e01: "Mostrar respostas corretas em"
   show_correct_answers_at_a5475aa3: "Mostrar Respostas Corretas em"
-  show_course_sections_for_course_name_5f715702: "Mostrar as seções da disciplina %{name}"
+  show_course_sections_for_course_name_5f715702: "Mostrar as secções da disciplina %{name}"
   show_courses_from_8a087f63: "Mostrar disciplinas de"
   show_courses_menu_4e17e480: "Mostar menu cursos"
   show_courses_navigation_menu_7ad1a8d4: "Mostrar Menu de navegação de disciplinas"
@@ -21508,7 +21508,7 @@ pt:
   sis_errors_attachment__id_9a8f2921: "sis_errors_attachment_%{id}"
   sis_export_title: "Exportação de SIS"
   sis_friendly_name_52b5683d: "Nome amigável do SIS"
-  sis_grade_export_settings_45a9f709: "Definições de Exportação de Nota SIS"
+  sis_grade_export_settings_45a9f709: "Configurações de Exportação de Nota SIS"
   sis_id_4495a887: "ID do SIS"
   sis_id_70eda157: "ID SIS:"
   sis_id_8c2029e1: "id sis"
@@ -21533,7 +21533,7 @@ pt:
       group_enrollments: "Inscrições em grupo: %{group_enrollments_count}"
       groups: "Grupos: %{group_count}"
       logins: "Logins: %{login_count}"
-      sections: "Seções: %{section_count}"
+      sections: "Secções: %{section_count}"
       terms: "Termos: %{term_count}"
       user_observers: "Observadores de utilizador: %{user_observers_count}"
       users: "Utilizadores: %{user_count}"
@@ -21628,7 +21628,7 @@ pt:
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Algumas conferencias nesta página estão escondidas devido a erros enquanto recuperam o seu estado"
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Algumas colunas personalizadas não puderam ser alteradas porque eram somente leitura; alterações para essas colunas foram ignoradas."
   some_module_items_could_not_be_published_e4be3c0: "Alguns itens do módulo não puderam ser publicados"
-  some_settings_have_been_administratively_locked_9e3ee880: "Algumas definições foram bloqueadas administrativamente."
+  some_settings_have_been_administratively_locked_9e3ee880: "Algumas configurações foram bloqueadas administrativamente."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Algumas configurações foram desativadas porque a atribuição está em um período de classificação fechado."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Algumas submissões não são pontuáveis; as alterações de classificação para estas submissões foram ignoradas."
   someone: Alguém
@@ -21680,7 +21680,7 @@ pt:
   spain_34_d5286826: "Espanha (+34)"
   spain_817a5961: Espanha
   spanish_de9de5d6: Espanhol
-  specific_sections_a38d8b0d: "Seções Específicas"
+  specific_sections_a38d8b0d: "Secções Específicas"
   specify_max_and_min_points_to_clarify_boundaries_o_1c4d732a: "Especificar pontos máximos e mínimos para esclarecer os limites de uma classificação de critérios de rubrica."
   specify_the_transparency_of_the_watermark_backgrou_f4d5cc1d: "Especifique a transparência da marca de água na imagem de fundo."
   speech_recognition_c1c0b7f7: "Reconhecimento de voz"
@@ -21689,12 +21689,12 @@ pt:
       no_active_students: "Não há alunos ativos na disciplina ou nenhum deles pode ser avaliado por si."
       no_students_in_groups_back: "Desculpe, os envios para esta tarefa não podem ser classificados no Speedgrader porque não há utilizadores atribuídos. Por favor, atribua utilizadores a este grupo e tente novamente. Clique em 'OK' para voltar."
       no_students_in_groups_close: "Desculpe, os envios para esta tarefa não podem ser classificados no Speedgrader porque não há utilizadores atribuídos. Por favor, atribua utilizadores a este grupo e tente novamente. Clique em 'OK' para fechar esta janela."
-      no_students_in_section: "Não foi possível encontrar alunos nesta seção, retornando para a exibição de todas as seções."
+      no_students_in_section: "Não foi possível encontrar alunos nesta seção, retornando para a exibição de todas as secções."
     allow_message: "Clique no botão \"Permitir\" para iniciar a gravação."
     begin_record_prompt: "Clique no botão \"Gravar\" para começar."
     buttons: 
       dialog_buttons: Cancelar
-      saving_settings: "A guardar as definições..."
+      saving_settings: "A guardar as configurações..."
       submitting: "A enviar..."
     cancel_button: Cancelar
     canvadoc_expiring: "Sua sessão do DocViewer Canvas está a terminar em breve.  Recarregue a janela para evitar a perda de qualquer trabalho."
@@ -21708,7 +21708,7 @@ pt:
     mic_blocked_message: "A permissão para usar o microfone está bloqueada. Para alterar, vá para chrome://settings/content/microphone"
     mute_assignment: "Silenciar tarefa"
     no_submission_time: "Sem hora de envio"
-    nodetect_message: "Nenhuma fala foi detectada. Você pode precisar ajustar as definições do seu microfone."
+    nodetect_message: "Nenhuma fala foi detectada. Você pode precisar ajustar as configurações do seu microfone."
     portion_graded: "%{x}/%{y}"
     recording_expired_message: "O reconhecimento de fala expirou devido à inatividade. Clique no botão \"Parar\" para usar o texto atual para comentário ou \"Cancelar\" para descartar."
     recording_message: "A gravar..."
@@ -21745,7 +21745,7 @@ pt:
       resubmitting: "A reenviar..."
   speedgrader_d9a6fa90: Speedgrader
   speedgrader_de0affa6: SpeedGrader
-  speedgrader_settings_4195099b: "SpeedGrader Definições"
+  speedgrader_settings_4195099b: "SpeedGrader Configurações"
   speedgrader_settings_c9503705: "Definições do SpeedGrader"
   speedgrader_tm_44688790: SpeedGrader™
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Divisão desativada: atingiu o máximo de três grupos de atribuição em um intervalo de pontuação"
@@ -21782,7 +21782,7 @@ pt:
     online_url: "URL online"
     previous_object: "%{type} anterior"
     student_hidden_name: "Aluno %{position}"
-  sso_settings_ebf98263: "Definições SSO"
+  sso_settings_ebf98263: "Configurações SSO"
   star_2d27c137: estrela
   star_conversation_2e2ba614: "Marcar conversa"
   starred_5a9efa8a: "Marcada como favorita"
@@ -21907,7 +21907,7 @@ pt:
   student_planner_date_4cc73abb: "Data do planeador estudantil:"
   student_points_possible_points_196c7108: "{{student_points}}/{{possible_points}}"
   student_position_6d3b7750: "Aluno %{position}"
-  student_settings_354d9a7e: "Definições de alunos"
+  student_settings_354d9a7e: "Configurações de alunos"
   student_sis_6721040e: "Sis Aluno"
   student_sis_d9f0cd39: "sis do aluno"
   student_sis_id_abe6b292: "id do sis do aluno"
@@ -21995,8 +21995,8 @@ pt:
       other: "%{count} subcontas"
   sub_accounts_can_choose_one_of_three_options_b0dfe46a: "As subcontas podem escolher uma das três opções:"
   subaccount_91f4c279: "Subconta "
-  subaccount_navigation_account_settings_add9eff9: "Navegação em subcontas (Definições da conta)"
-  subaccount_settings_8549eff7: "Definições de subconta"
+  subaccount_navigation_account_settings_add9eff9: "Navegação em subcontas (Configurações da conta)"
+  subaccount_settings_8549eff7: "Configurações de subconta"
   subaccounts_efd02bd4: Subcontas
   subdomain_url_1e43b6f0: "URL de domínio secundário"
   subject_114b2e98: Assunto
@@ -22223,8 +22223,8 @@ pt:
   success_file_uploaded_8174e93f: "Sucesso: Ficheiro carregado"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Sucesso! As notas desta tarefa agora estão visíveis para os alunos."
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Sucesso! As classificações foram ocultadas para %{assignmentName}."
-  success_grades_have_been_hidden_for_the_selected_s_3ad5692: "Sucesso! As classificações foram ocultadas para as seções selecionadas de %{assignmentName}."
-  success_grades_have_been_posted_for_the_selected_s_54c73ef0: "Sucesso! As classificações foram publicadas para as seções selecionadas de %{assignmentName}."
+  success_grades_have_been_hidden_for_the_selected_s_3ad5692: "Sucesso! As classificações foram ocultadas para as secções selecionadas de %{assignmentName}."
+  success_grades_have_been_posted_for_the_selected_s_54c73ef0: "Sucesso! As classificações foram publicadas para as secções selecionadas de %{assignmentName}."
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Sucesso! As classificações foram publicadas para %{postedTo} para %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Sucesso! Os notas foram publicadas no livro de classificação."
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Sucesso! A política de postagem para %{name} foi atualizada."
@@ -22471,7 +22471,7 @@ pt:
   the_analytics_feature_must_be_enabled_in_account_s_b4e77562: |
       O recurso de análise deve estar ativado em Definições da conta para exibir páginas de análise.
       Para ver a ligação do Google Analytics na barra lateral do utilizador na página Pessoas, os perfis devem estar desativados na sua conta.
-  the_analytics_feature_must_be_enabled_in_account_s_cf577263: "O recurso de análise deve estar ativado em Definições da conta para exibir páginas de análise. Para ver a ligação do Google Analytics na barra lateral do utilizador na página Pessoas, os perfis devem estar desativados na sua conta."
+  the_analytics_feature_must_be_enabled_in_account_s_cf577263: "O recurso de análise deve estar ativado em Configurações da conta para exibir páginas de análise. Para ver a ligação do Google Analytics na barra lateral do utilizador na página Pessoas, os perfis devem estar desativados na sua conta."
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "O anúncio \"%{title}\" não pode ser ligado ao módulo \"%{mod_title}\""
   the_announcements_tab_is_always_visible_to_admins__58df854d: "A guia Anúncios é sempre visível para os administradores; no entanto, para gerenciar anúncios, Anúncios Globais - adicionar / editar / eliminar também deve estar ativada."
   the_announcements_tab_is_always_visible_to_admins__eb447785: "A guia Anúncios está sempre visível para os administradores; no entanto, para gerenciar anúncios, os anúncios globais - adicionar / editar / eliminar também devem estar ativados."
@@ -22596,7 +22596,7 @@ pt:
   the_profile_picture_has_been_reported_d609d6dd: "A fotografia de perfil foi denunciada"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "O ficheiro de referências académicas fornecido tem um erro."
   the_question_text_for_the_question_question_name_w_3a68a2c7: "O questionário para a questão \"%{question_name}\" é demasiado longo."
-  the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "A opção do recurso Auditoria de registro de questionários deve estar ativada nas Definições da disciplina."
+  the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "A opção do recurso Auditoria de registro de questionários deve estar ativada nas Configurações da disciplina."
   the_quiz_name_must_be_under_length_characters_68e7de3a: "O nome do Questionário deve estar sob %{length} caracteres"
   the_roles_api_refers_to_this_permission_as_become__bededd25: "A API de funções refere-se a essa permissão como become_user."
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "as tarefas mantidas pelo relatório de utilizador (estudante, formador, administrador, etc)"
@@ -22930,7 +22930,7 @@ pt:
   threshold_pts_45f0e5d8: "limite: %{pts}"
   ticket_successfully_submitted_f6254460: "Mensagem entregue com sucesso."
   ticketing_system_52205bff: "Sistema de Notas"
-  ticketing_system_configurations_c4fecd96: "Definições do sistema de Notas"
+  ticketing_system_configurations_c4fecd96: "Configurações do sistema de Notas"
   tiff_c70066a3: TIFF
   time: 
     am: am
@@ -23210,7 +23210,7 @@ pt:
   to_access_the_student_interactions_report_grades_v_69105662: "Para aceder somente por relatórios de interações de Aluno, Notas - visualizar todas as notas também deve estar ativado."
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "Para ativar SMS, insira o código de confirmação com quatro carateres enviado para %{sms_number}."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "Para ativar este canal de comunicação, digite o código de confirmação de quatro caracteres enviado para %{sms_number}."
-  to_add_announcements_discussions_moderate_must_als_2496cbd7: "Para adicionar anúncios, Discussões - moderado também deve estar ativado. Para visualizar anúncios recentes na página inicial, a caixa de seleção Exibir anúncios recentes na página inicial da disciplina deve estar selecionada em Definições da disciplina."
+  to_add_announcements_discussions_moderate_must_als_2496cbd7: "Para adicionar anúncios, Discussões - moderado também deve estar ativado. Para visualizar anúncios recentes na página inicial, a caixa de seleção Exibir anúncios recentes na página inicial da disciplina deve estar selecionada em Configurações da disciplina."
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "Para adicionar disciplinas associados, as Disciplinas do Blueprint - adicionar / editar / associar / eliminar e Disciplinas - adicionar / editar / eliminar também devem estar ativadas."
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "Para adicionar utilizadores em massa, disciplinas e inscrições, clique em Importações SIS."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "Para adicionar, editar ou eliminar grupos, os Grupos - adicionar / editar / eliminar também devem estar ativados."
@@ -23274,10 +23274,10 @@ pt:
   to_create_a_link_you_can_use_in_canvas_you_ll_need_7dd85497: "para criar uma ligação que você pode usar no Canvas. Você precisará de uma conta do Google para usar o Google Meet."
   to_create_announcements_discussions_manage_must_al_932ac38f: "Para criar anúncios, o comando Discussões - gerir também deve estar ativado."
   to_create_announcements_discussions_moderate_must__8a8278f2: "Para criar anúncios, Discussões - moderado também deve estar ativado."
-  to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Para fazer uma lista cruzada de uma seção, as Seções da disciplina - adicionar / editar / eliminar também devem estar ativadas. Para editar o ID da disciplina, o SIS Data - gerir também deve estar ativado. Para permitir que um utilizador no nível da conta exclua um disciplina, o estado da disciplina - gerir também deve estar ativado."
+  to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Para fazer uma lista cruzada de uma seção, as Secções da disciplina - adicionar / editar / eliminar também devem estar ativadas. Para editar o ID da disciplina, o SIS Data - gerir também deve estar ativado. Para permitir que um utilizador no nível da conta exclua um disciplina, o estado da disciplina - gerir também deve estar ativado."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Para fazer uma lista cruzada de uma seção, as Seções da disciplina - adicionar / editar / eliminar também devem estar ativadas. Para editar o ID da disciplina, o SIS Data - gerir também deve estar ativado. Para permitir que um utilizador no nível da conta exclua um disciplina, o estado da disciplina - gerir também deve estar ativado."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Para fazer uma lista cruzada de seções, a disciplina - adicionar / editar / eliminar também deve estar ativado."
-  to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "Para cruzar as seções da lista, as Disciplinas - adicionar / editar / eliminar também têm de estar ativadas."
+  to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "Para cruzar as secções da lista, as Disciplinas - adicionar / editar / eliminar também têm de estar ativadas."
   to_date_can_t_come_before_from_date_cf9e18aa: "\"Até à data\" não pode ser anterior a \"Da data\""
   to_date_cannot_come_before_from_date_3eeb2633: "Até a Data não pode vir antes Da data"
   to_differentiate_assignments_to_individual_student_6cc40fde: "Para diferenciar atribuições para alunos individuais, a lista Utilizadores - ver também deve estar ativada."
@@ -23303,14 +23303,14 @@ pt:
   to_edit_a_student_s_section_users_add_remove_stude_f974cf: |-
       Para editar a seção de um aluno, Utilizadores - adicionar / remover alunos de disciplinas e Enviar mensagens para membros individuais da disciplina também devem estar ativados.
       Para editar uma seção de professor, TA ou designer de disciplina, Utilizadores - adicionar / remover professores, designers de disciplinas ou TAs de disciplinas para a disciplina e Conversas - enviar mensagens para membros individuais da disciplina também devem estar ativados.
-  to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Para editar as definições da disciplina do Blueprint nas Definições da disciplina, Disciplinas do Blueprint - adicionar / editar / associar / eliminar também devem estar ativadas. Para adicionar uma disciplina associada, as Disciplinas Blueprint - adicionar / editar / associar / eliminar e Disciplinas - lista de visão também devem estar ativadas. Para editar as definições de bloqueio em qualquer objeto do blueprint, essa permissão deve estar ativada. Para editar as definições de bloqueio nos ficheiros, os ficheiros da disciplina - adicionar / editar / eliminar também devem estar ativados. Para editar as definições de bloqueio em questionários, Atribuições e Testes - adicionar / editar / eliminar também devem estar ativados."
-  to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Para editar as definições de bloqueio do blueprint na página de índice Atribuições, Disciplinas - adicionar/editar/eliminar também devem estar ativadas. Se essa permissão não estiver ativada e as Disciplinas - adicionar / editar / eliminar estiverem ativadas, as definições de bloqueio do blueprint para uma atribuição poderão ser geridos na página de detalhes da tarefa. Para editar as definições de bloqueio de blueprint em um questionário individual ou na página de índice de questionários, Disciplinas - adicionar / editar / eliminar também devem estar ativados."
+  to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Para editar as configurações da disciplina do Blueprint nas Configurações da disciplina, Disciplinas do Blueprint - adicionar / editar / associar / eliminar também devem estar ativadas. Para adicionar uma disciplina associada, as Disciplinas Blueprint - adicionar / editar / associar / eliminar e Disciplinas - lista de visão também devem estar ativadas. Para editar as configurações de bloqueio em qualquer objeto do blueprint, essa permissão deve estar ativada. Para editar as configurações de bloqueio nos ficheiros, os ficheiros da disciplina - adicionar / editar / eliminar também devem estar ativados. Para editar as configurações de bloqueio em questionários, Atribuições e Testes - adicionar / editar / eliminar também devem estar ativados."
+  to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Para editar as configurações de bloqueio do blueprint na página de índice Atribuições, Disciplinas - adicionar/editar/eliminar também devem estar ativadas. Se essa permissão não estiver ativada e as Disciplinas - adicionar / editar / eliminar estiverem ativadas, as configurações de bloqueio do blueprint para uma atribuição poderão ser geridos na página de detalhes da tarefa. Para editar as configurações de bloqueio de blueprint em um questionário individual ou na página de índice de questionários, Disciplinas - adicionar / editar / eliminar também devem estar ativados."
   to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "Para editar as configurações de bloqueio de planos a partir da página de índice de Discussões, Disciplinas - adicionar / editar / eliminar e Discussões - moderado também deve ser ativado. "
-  to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Para editar as definições de bloqueio do blueprint na página de índice de Discussões, Disciplinas - adicionar / editar / eliminar e Discussões - visualizar também deve estar ativada. Se esta permissão não estiver ativada, e as Disciplinas - adicionar / editar / apagar e Discussões - a visualização estiver ativada, as definições de bloqueio do projeto podem ser editadas em discussões individuais."
-  to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Para editar as definições de bloqueio do blueprint na página de índice das Páginas, os campos - adicionar / editar / eliminar também devem estar ativados. Se esta permissão não estiver ativada e Disciplinas - adicionar / editar / eliminar estiver ativada, as definições de bloqueio do blueprint poderão ser editadas em páginas individuais."
+  to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Para editar as configurações de bloqueio do blueprint na página de índice de Discussões, Disciplinas - adicionar / editar / eliminar e Discussões - visualizar também deve estar ativada. Se esta permissão não estiver ativada, e as Disciplinas - adicionar / editar / apagar e Discussões - a visualização estiver ativada, as configurações de bloqueio do projeto podem ser editadas em discussões individuais."
+  to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Para editar as configurações de bloqueio do blueprint na página de índice das Páginas, os campos - adicionar / editar / eliminar também devem estar ativados. Se esta permissão não estiver ativada e Disciplinas - adicionar / editar / eliminar estiver ativada, as configurações de bloqueio do blueprint poderão ser editadas em páginas individuais."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "Para editar os esquemas de graduação da disciplina, os Disciplinas - adicionar / editar / eliminar também devem estar ativados."
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "Para editar as definições da disciplina, os disciplinas - adicionar / editar / eliminar devem estar ativados."
-  to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "Para editar as definições da disciplina, as disciplinas - adicionar / editar / eliminar devem estar ativadas."
+  to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "Para editar as configurações da disciplina, as disciplinas - adicionar / editar / eliminar devem estar ativadas."
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       Para editar detalhes do utilizador, modificar detalhes de login ou alterar senhas de utilizadores, os Utilizadores - gerir detalhes de login também devem estar ativados.
       Para visualizar as visualizações de páginas do utilizador, ver Estatísticas também deve estar ativada.
@@ -23319,7 +23319,7 @@ pt:
   to_f0e90538: "Para:"
   to_generate_a_pairing_code_from_a_student_s_user_d_28a10a61: "Para gerar um código de pareamento na página Detalhes do utilizador do aluno, Utilizadores - adicionar / remover alunos em disciplinas também deve estar ativada."
   to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "Para gerar um código de pareamento na página Detalhes do utilizador do aluno, a permissão Utilizadores - adicionar / remover alunos em disciplinas também deve estar ativada."
-  to_generate_a_pairing_code_from_a_student_s_user_s_3dccb574: "Para gerar um código de pareamento na página de Definições do utilizador do aluno, a permissão Utilizador - atuar como permissão também deve estar ativada. Para gerar um código de pareamento na página Detalhes do utilizador do aluno, Utilizadores - adicionar / remover alunos da disciplina também deve estar ativada."
+  to_generate_a_pairing_code_from_a_student_s_user_s_3dccb574: "Para gerar um código de pareamento na página de Configurações do utilizador do aluno, a permissão Utilizador - atuar como permissão também deve estar ativada. Para gerar um código de pareamento na página Detalhes do utilizador do aluno, Utilizadores - adicionar / remover alunos da disciplina também deve estar ativada."
   to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
       Para gerar um código de pareamento na página de Definições do utilizador do aluno, a permissão Utilizador - atuar como permissão também deve estar ativada.
       Para gerar um código de pareamento na página Detalhes do utilizador do aluno, a permissão Utilizadores - adicionar / remover alunos da disciplina também deve estar ativada.
@@ -23333,7 +23333,7 @@ pt:
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Para ligar ao observador do curso *%{name}* a um estudante, comece por inserir o nome do estudante abaixo para encontrá-lo e depois clique Atualizar."
   to_log_in_to_your_canvas_account_when_you_re_on_th_54faeb1c: "Para iniciar sessão na sua conta Canvas quando estiver em movimento, digitalize este código QR da aplicação Canvas Student."
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: "Para iniciar sessão na sua conta Canvas quando estiver em movimento, digitalize este código QR a partir de qualquer aplicação móvel Canvas."
-  to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "Para gerir as definições do Disciplina de Blueprint nas Definições da disciplina, os disciplinas - adicionar / editar / eliminar também devem estar ativados."
+  to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "Para gerir as configurações do Disciplina de Blueprint nas Configurações da disciplina, os disciplinas - adicionar / editar / eliminar também devem estar ativados."
   to_manage_course_content_course_content_add_edit_d_94caa77f: "Para gerir a publicação do conteúdo da disciplina, o Conteúdo da disciplina - adicionar / editar / eliminar deve estar ativado."
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
       Para gerir discussões, Discussões moderadas também devem ser ativadas.
@@ -23370,7 +23370,7 @@ pt:
   to_moderate_grades_grades_select_final_grade_for_m_57d4f675: "Para moderar classificações, Classificações -  Selecionar classificação final para moderação também deve estar ativada. Para postar ou ocultar classificações para uma tarefa, Classificações - editar também deve estar ativada."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "Para moderar classificações, Classificações -  Selecionar classificação final para moderação também deve estar ativada."
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "Para obter um ID de cliente, um administrador de conta precisará gerar uma chave de desenvolvedor de LTI."
-  to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Para afixar uma discussão na parte superior da página, arraste uma discussão para aqui ou selecione Afixar no menu de definições de discussões."
+  to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Para afixar uma discussão na parte superior da página, arraste uma discussão para aqui ou selecione Afixar no menu de configurações de discussões."
   to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: "Para postar ou ocultar classificações, Classificações - editar também tem de estar ativadas."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "Para prévisualizar o Editor de Tema, vai precisar de desligar *desligar Alto Contraste UI*."
   to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: "Para publicar e cancelar a publicação do conteúdo do módulo, Disciplinas - adicionar / editar / eliminar e Conteúdo da disciplina - visualizar também deve estar ativada. Os itens do módulo não podem ser despublicados se houver envios de alunos."
@@ -23383,7 +23383,7 @@ pt:
   to_publish_final_grades_for_a_moderated_assignment_713090cf: "Para publicar classificações finais para um trabalho moderado, Classificações - editar também deve estar ativada."
   to_publish_unpublish_module_content_course_content_efc294d4: "Para publicar / cancelar a publicação do conteúdo do módulo, o Conteúdo da disciplina - adicionar / editar / eliminar deve estar ativado."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "Para restaurar um disciplina eliminada , Disciplinas - não eliminar e Contéudo da Disciplina - também deve estar ativada."
-  to_restrict_students_from_creating_groups_deselect_6269c8cb: "Para impedir que os alunos criem grupos, desmarque a caixa de seleção Permitir que os alunos organizem seus próprios grupos nas Definições da disciplina."
+  to_restrict_students_from_creating_groups_deselect_6269c8cb: "Para impedir que os alunos criem grupos, desmarque a caixa de seleção Permitir que os alunos organizem seus próprios grupos nas Configurações da disciplina."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "Para restringir a utilizadores de uma zona Clever específica, insira aqui o ID de zona Clever. É necessário para o Registo Clever Imediato para trabalhar num ambiente com múltiplos acessos."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Para restringir a utilizadores de um domínio do Google Apps específico, insira o domínio aqui."
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "Para restringir a utilizadores de domínios específicos do Google Apps, digite o(s) domínio(s) aqui como uma lista separada por vírgulas. Para restringir a um utilizador do Google Apps em geral, você pode inserir ''*\"."
@@ -23450,7 +23450,7 @@ pt:
   to_view_module_progression_grades_view_all_grades__b9fc4d6f: "Para visualizar a progressão do módulo, Notas - ver todas as notas também deve estar ativada."
   to_view_or_edit_a_user_s_sis_id_or_integration_id__76b8d055: "Para visualizar ou editar o ID do SIS do utilizador ou o ID de integração, os Utilizadores - ver lista e Utilizadores - gerir detalhes de login também precisam estar ativados."
   to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "Para visualizar ou editar o ID do SIS do utilizador ou o ID de integração, os Utilizadores - ver lista e Utilizadores - gerir detalhes de login também precisam estar ativados."
-  to_view_recent_announcements_on_the_home_page_cour_ffc52530: "Para visualizar os anúncios recentes na página inicial, a visualização do conteúdo da disciplina deve estar ativada e a caixa de seleção Exibir anúncios recentes na página inicial da disciplina deve estar selecionada em Definições da disciplina. Para gerir anúncios de disciplina, Discussões - moderado também deve estar ativado."
+  to_view_recent_announcements_on_the_home_page_cour_ffc52530: "Para visualizar os anúncios recentes na página inicial, a visualização do conteúdo da disciplina deve estar ativada e a caixa de seleção Exibir anúncios recentes na página inicial da disciplina deve estar selecionada em Configurações da disciplina. Para gerir anúncios de disciplina, Discussões - moderado também deve estar ativado."
   to_view_student_analytics_analytics_view_must_also_8a41d86e: "Para visualizar a análise de alunos, Analytics - ver também deve estar ativada."
   to_view_student_analytics_analytics_view_must_also_a735c0b4: "Para visualizar a análise de alunos, análise - visualizar também deve estar ativada."
   to_view_student_analytics_in_course_analytics_anal_21ed5b9c: "Para visualizar a análise de alunos na análise da disciplina, Analytics - visualizar também deve estar ativada."
@@ -23840,7 +23840,7 @@ pt:
   update_pages_c91d7ba: "Atualizar páginas"
   update_rating_6d29c2ef: "Classificação de atualização"
   update_tool_7d48ef2a: "Atualizar %{tool}"
-  update_your_notification_settings_ed9564f3: "Atualizar as definições de notificação"
+  update_your_notification_settings_ed9564f3: "Atualizar as configurações de notificação"
   updated_2c1e8615: Atualizado
   updated_current_grade_to_be_empty_c2ce1d13: "Classificação atual atualizado para ser vazio"
   updated_current_grade_to_currentgrade_bfe2ea14: "Classificação atual atualizada para %{currentGrade}"
@@ -24139,7 +24139,7 @@ pt:
       settings: Configurações
   user_profile_picture_46bffbc7: "Imagem de perfil do utilizador"
   user_results_updated_9ce38dce: "Resultados do utilizador atualizados."
-  user_s_settings_d65644b4: "Definições de %{user}"
+  user_s_settings_d65644b4: "Configurações de %{user}"
   user_search_panel_18f80511: "Painel de pesquisa do utilizador"
   user_search_results_3af96217: "Resultados da Pesquisa do utilizador"
   user_search_results_f5445b8b: "Resultados de pesquisa do utilizador"
@@ -24437,7 +24437,7 @@ pt:
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       Os utilizadores e os termos estão localizados na conta, portanto, o terminal do SIS sempre confirma as permissões do utilizador de acordo com a conta. As subcontas só têm propriedade de disciplinas e seções; eles não possuem dados do utilizador.
       Os administradores da subconta não podem visualizar as informações do SIS, a menos que também recebam uma função de instrutor em um disciplina. Os administradores da subconta não podem visualizar as informações do SIS sem a associação da disciplina, pois a função de instrutor tem permissão para ler os dados do SIS no nível da conta.
-  users_and_terms_are_located_at_the_account_so_the__6896b895: "Os utilizadores e os termos estão localizados na conta, portanto, o terminal do SIS sempre confirma as permissões do utilizador de acordo com a conta. As subcontas só têm propriedade de disciplinas e seções; eles não possuem dados do utilizador. Os administradores da subconta não podem visualizar as informações do SIS, a menos que também recebam uma função de instrutor em um disciplina. Os administradores da subconta não podem visualizar as informações do SIS sem a associação da disciplina, pois a função de instrutor tem permissão para ler os dados do SIS no nível da conta."
+  users_and_terms_are_located_at_the_account_so_the__6896b895: "Os utilizadores e os termos estão localizados na conta, portanto, o terminal do SIS sempre confirma as permissões do utilizador de acordo com a conta. As subcontas só têm propriedade de disciplinas e secções; eles não possuem dados do utilizador. Os administradores da subconta não podem visualizar as informações do SIS, a menos que também recebam uma função de instrutor em um disciplina. Os administradores da subconta não podem visualizar as informações do SIS sem a associação da disciplina, pois a função de instrutor tem permissão para ler os dados do SIS no nível da conta."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "Os utilizadores podem acessar e criar (mas não editar) rubricas de atribuição individuais por meio de Atribuições quando o Conteúdo da disciplina - ver e Tarefas e Testes - adicionar / editar / eliminar estiverem ativados."
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Os usuários podem aceder e criar (mas não editar) rubricas de atribuições individuais através de Atribuições quando Atribuições e Testes - adicionar / editar / eliminar está habilitado."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Os utilizadores podem acessar a ligação Gerenciar Bancos de Perguntas na Página de Índice de Questionários quando o conteúdo da disciplina - ver e Atribuições e Testes - adicionar / editar / eliminar estiverem ativados."
@@ -24728,7 +24728,7 @@ pt:
         use_front_page: "Utilizar como primeira página"
       published_indicator: Publicado
       toolbar_menu: 
-        settings: Definições
+        settings: Configurações
       unpublished_indicator: "Não publicado"
       view_page_history_wiki: "Ver histórico da página"
       wiki: 
@@ -24776,7 +24776,7 @@ pt:
       menu: 
         delete: Eliminar
         edit: Editar
-        settings: Definições
+        settings: Configurações
         use_front_page: "Utilizar como primeira página"
     wiki_page_revision: 
       latest_revision: "Revisão mais recente"
@@ -25063,7 +25063,7 @@ pt:
   you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Você será redirecionado para o Livro de notas enquanto seu ficheiro está a carregar. Se você tiver um ficheiro CSV grande, suas alterações podem levar alguns minutos para serem atualizadas. Para evitar a substituição de dados, confirme que o carregamento foi concluído e o Livro de notas está correto antes de fazer alterações adicionais."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       Vai precisar de criar uma [nova aplicação no Facebook](%{facebook_url}), e permitir o Registo Cliente OAuth
-      nas Definições Avançadas. Deve configurar %{callback_url} como um URL de redireção OAuth Válida.
+      nas Configurações Avançadas. Deve configurar %{callback_url} como um URL de redireção OAuth Válida.
       Depois de guardar a sua aplicação, crie uma nota da ID da App e a  Palavra Secreta da App, e insira-os aqui.
   you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
       Você precisará criar um ID de Serviço [Console de Desenvolvedor Apple](%{apple_url}).
