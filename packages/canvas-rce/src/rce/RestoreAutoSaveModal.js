@@ -70,6 +70,7 @@ export default function RestoreAutoSaveModal(props) {
             as="div"
             dangerouslySetInnerHTML={{__html: props.savedContent}}
             padding="0 x-small"
+            overflowX="auto"
           />
         </ToggleGroup>
       </Modal.Body>

@@ -825,8 +825,14 @@ class RCEWrapper extends React.Component {
   // the latter condition is necessary because the popup RestoreAutoSaveModal
   // is lousey UX when there are >1
   get isAutoSaving() {
+    // If the editor is invisible for some reason, don't show the autosave modal
+    // This doesn't apply if the editor is off-screen or has visibility:hidden;
+    // only if it isn't rendered or has display:none;
+    const editorVisible = this.editor.container.offsetParent
+
     return (
       this.props.autosave.enabled &&
+      editorVisible &&
       document.querySelectorAll('.rce-wrapper').length === 1 &&
       storageAvailable()
     )
