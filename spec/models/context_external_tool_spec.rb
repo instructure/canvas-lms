@@ -846,6 +846,38 @@ describe ContextExternalTool do
         expect(tool.tool_id).to eq('real')
       end
     end
+
+    context('with a client id') do
+      let(:url) { 'http://test.com' }
+      let(:tool_params) do
+        {
+          name: "a",
+          url: url,
+          consumer_key: '12345',
+          shared_secret: 'secret',
+        }
+      end
+      let!(:tool1) { @course.context_external_tools.create!(tool_params) }
+      let!(:tool2) do
+        @course.context_external_tools.create!(
+          tool_params.merge(developer_key: DeveloperKey.create!)
+        )
+      end
+
+      it 'preferred_tool_id has precedence over preferred_client_id' do
+        external_tool = ContextExternalTool.find_external_tool(
+          url, @course, tool1.id, nil, tool2.developer_key.id
+        )
+        expect(external_tool).to eq tool1
+      end
+
+      it 'finds the tool based on developer key id' do
+        external_tool = ContextExternalTool.find_external_tool(
+          url, @course, nil, nil, tool2.developer_key.id
+        )
+        expect(external_tool).to eq tool2
+      end
+    end
   end
 
   describe "#extension_setting" do
