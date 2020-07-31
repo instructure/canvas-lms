@@ -114,6 +114,10 @@ def postFn(status) {
   }
 }
 
+def getPluginVersion(plugin) {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", "master")
+}
+
 pipeline {
   agent none
   options {
@@ -194,10 +198,10 @@ pipeline {
                     /* this is the commit we're testing */
                     pullGerritRepo(gem, env.GERRIT_REFSPEC, 'gems/plugins')
                   } else {
-                    pullGerritRepo(gem, 'master', 'gems/plugins')
+                    pullGerritRepo(gem, getPluginVersion(gem), 'gems/plugins')
                   }
                 }
-                pullGerritRepo("qti_migration_tool", "master", "vendor")
+                pullGerritRepo("qti_migration_tool", getPluginVersion('qti_migration_tool'), "vendor")
 
                 sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
                 sh 'rm -v config/cache_store.yml'
