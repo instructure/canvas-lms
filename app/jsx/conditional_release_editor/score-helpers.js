@@ -136,7 +136,7 @@ const pointsToPercent = (score, assignment) => {
     return '0'
   }
   const pointsPossible = Number(assignment.get('points_possible')) || 100
-  return floor8(numberHelper.parse(score) / pointsPossible).toString()
+  return I18n.n(floor8(numberHelper.parse(score) / pointsPossible))
 }
 
 const percentToLetterGrade = (score, assignment) => {
@@ -170,14 +170,14 @@ const percentToExternalPercent = score => {
   if (!isNumeric(score)) {
     return score
   }
-  return Math.floor(numberHelper.parse(score) * 100).toString()
+  return I18n.n(Math.floor(numberHelper.parse(score) * 100))
 }
 
 const externalPercentToPercent = score => {
   if (!isNumeric(score)) {
     return score
   }
-  return (numberHelper.parse(score) / 100.0).toString()
+  return I18n.n(numberHelper.parse(score) / 100.0)
 }
 
 export const getScoringRangeSplitWarning = () => {
