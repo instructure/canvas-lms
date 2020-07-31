@@ -1022,6 +1022,8 @@ describe UserMerge do
 
     context "manual invitation" do
       it "should not keep a temporary invitation in cache for an enrollment deleted after a user merge" do
+        skip('FOO-755 - 7/31/2020')
+
         enable_cache(:redis_cache_store) do
           email = 'foo@example.com'
           course_factory
