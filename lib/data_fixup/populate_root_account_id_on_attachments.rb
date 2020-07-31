@@ -21,7 +21,7 @@ module DataFixup::PopulateRootAccountIdOnAttachments
   # Since Attachments needs multiple passes, in order, they all happen here.
   # DataFixup::PopulateRootAccountIdOnModels triggers this fixup
   # as part of the `populate_overrides` call. Hopefully no comedy ensues.
-  def self.run(min, max)
+  def self.populate(min, max)
 
     # First pass: do standard migration
     # Not inside of Attachment.find_ids_in_ranges since that is called inside of
