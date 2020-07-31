@@ -338,7 +338,7 @@ pipeline {
                 }
               }
 
-              if (env.GERRIT_EVENT_TYPE != 'change-merged') {
+              if (env.GERRIT_EVENT_TYPE != 'change-merged' && (sh(script: 'build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)) {
                 echo 'adding Flakey Spec Catcher'
                 stages['Flakey Spec Catcher'] = {
                   skipIfPreviouslySuccessful("flakey-spec-catcher") {
