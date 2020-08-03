@@ -183,7 +183,7 @@ class Account < ActiveRecord::Base
   end
 
   def resolved_outcome_proficiency
-    outcome_proficiency || parent_account&.resolved_outcome_proficiency
+    outcome_proficiency&.active? ? outcome_proficiency : parent_account&.resolved_outcome_proficiency
   end
 
   def resolved_outcome_calculation_method

@@ -152,6 +152,7 @@ class OutcomeProficiencyApiController < ApplicationController
     # delete unused ratings
     proficiency.outcome_proficiency_ratings[proficiency_params['ratings'].length..-1].each(&:mark_for_destruction)
     proficiency.context = context if context
+    proficiency.workflow_state = 'active'
     proficiency.save!
     proficiency
   end

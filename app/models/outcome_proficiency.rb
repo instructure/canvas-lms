@@ -18,19 +18,36 @@
 
 class OutcomeProficiency < ApplicationRecord
   extend RootAccountResolver
+  include Canvas::SoftDeletable
   self.ignored_columns = %i[account_id]
 
   has_many :outcome_proficiency_ratings, -> { order 'points DESC, id ASC' },
     dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
   belongs_to :context, polymorphic: %i[account], required: true
-  belongs_to :root_account, class_name: 'Account'
 
-  validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }
-  validate :single_mastery_rating
-  validate :strictly_decreasing_points
+  validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }, unless: :deleted?
+  validate :single_mastery_rating, unless: :deleted?
+  validate :strictly_decreasing_points, unless: :deleted?
   validates :context, presence: true
   validates :context_id, uniqueness: { scope: :context_type }
   resolves_root_account through: :context
+
+  alias original_destroy_permanently! destroy_permanently!
+  private :original_destroy_permanently!
+  def destroy_permanently!
+    self.outcome_proficiency_ratings.delete_all
+    original_destroy_permanently!
+  end
+
+  alias original_undestroy undestroy
+  private :original_undestroy
+  def undestroy
+    transaction do
+      OutcomeProficiencyRating.where(outcome_proficiency: self).update_all(workflow_state: 'active', updated_at: Time.zone.now.utc)
+      self.reload
+      original_undestroy
+    end
+  end
 
   def as_json(_options={})
     {

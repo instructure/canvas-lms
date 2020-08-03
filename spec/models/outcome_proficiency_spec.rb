@@ -71,4 +71,32 @@ describe OutcomeProficiency, type: :model do
       expect(proficiency.root_account_id).to be(root_account_2.resolved_root_account_id)
     end
   end
+
+  describe 'undestroy' do
+    before do
+      rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00')
+      rating2 = OutcomeProficiencyRating.new(description: 'worst', points: 0, mastery: false, color: 'ff0000')
+      @proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2], account: account_model)
+      @proficiency.destroy
+      @proficiency.undestroy
+    end
+
+    it 'restores soft deleted ratings' do
+      expect(OutcomeProficiencyRating.active.count).to eq 2
+    end
+
+    it 'should set workflow_state to active upon undestroying' do
+      expect(@proficiency.workflow_state).to eq 'active'
+    end
+  end
+
+  it_behaves_like "soft deletion" do
+    subject { OutcomeProficiency }
+
+    let(:first_account) { account_model }
+    let(:second_account) { account_model }
+    let(:rating1) { OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00') }
+    let(:params) { { outcome_proficiency_ratings: [rating1] } }
+    let(:creation_arguments) { [ params.merge(context: first_account), params.merge(context: second_account) ] }
+  end
 end
