@@ -2463,6 +2463,14 @@ class UsersController < ApplicationController
       @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
     end
 
+    identity_user_provisioned = params[:identity_user_provisioned].present?
+
+    if identity_user_provisioned
+      @pseudonym.get_identity_username?
+    else
+      @pseudonym.unique_id = "#{SecureRandom.hex(2)} #{@user.name.parameterize(separator: ' ')}"
+    end
+
     if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
       # save_without_session_maintenance directly. we don't want to auto-log-in
@@ -2476,14 +2484,6 @@ class UsersController < ApplicationController
       end
 
       begin
-        identity_user_provisioned = params[:identity_user_provisioned].present?
-
-        if identity_user_provisioned
-          @pseudonym.get_identity_username?
-        else
-          @pseudonym.unique_id = "#{SecureRandom.hex(2)} #{@user.name.parameterize(separator: ' ')}"
-        end
-
         User.transaction do
           @user.save_with_or_without_identity_create(
             params[:pseudonym][:unique_id],
