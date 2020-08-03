@@ -67,6 +67,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       AssignmentOverrideStudent => :assignment,
       AttachmentAssociation => %i[course group submission attachment], # attachment is last, only used if context is a ConversationMessage
       CalendarEvent => [:context_course, :context_group, :context_course_section],
+      CommunicationChannel => [], # has override
       ContentMigration => [:account, :course, :group],
       ContentParticipation => :content,
       ContentParticipationCount => :course,
@@ -138,6 +139,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     {
       AssetUserAccess => [:attachment, :calendar_event],
       Attachment => [:account, :assessment_question, :assignment, :course, :group, :submission],
+      CommunicationChannel => :user,
       LearningOutcome => :content_tag,
       User => :user_account_association,
     }.freeze
@@ -157,6 +159,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     {
       AssetUserAccess => DataFixup::PopulateRootAccountIdOnAssetUserAccesses,
       Attachment => DataFixup::PopulateRootAccountIdOnAttachments,
+      CommunicationChannel => DataFixup::PopulateRootAccountIdsOnCommunicationChannels,
       LearningOutcome => DataFixup::PopulateRootAccountIdsOnLearningOutcomes,
       User => DataFixup::PopulateRootAccountIdsOnUsers,
     }.freeze
@@ -166,6 +169,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   # tables listed here should override the populate method above
   def self.multiple_root_account_ids_tables
     [
+      CommunicationChannel,
       LearningOutcome,
       User
     ].freeze
@@ -400,7 +404,9 @@ module DataFixup::PopulateRootAccountIdOnModels
     shard_ids = [Shard.current.id, *scope.select("(#{assoc_reflection.foreign_key}/#{Shard::IDS_PER_SHARD}) as shard_id").distinct.map(&:shard_id)]
 
     # check associated table on all possible shards for any nil root account ids
-    empty_root_account_column_scope(class_name).shard(Shard.where(id: shard_ids)).none?
+    Shard.where(id: shard_ids).all? do |shard|
+      shard.activate { empty_root_account_column_scope(class_name).none? }
+    end
   end
 
   def self.empty_root_account_column_scope(table)
