@@ -405,6 +405,7 @@ fr:
   account_id_2c3b4f15: "identité du compte"
   account_id_73966078: account_id
   account_id_f6e26867: "ID de compte"
+  account_level_mastery_scales_a5bdff29: "Échelles de réussite au niveau du compte"
   account_level_notification_preferences_require_an__66467cd7: "Les préférences de notifications de niveau compte nécessitent un account_id pour être mises à jour"
   account_level_notification_preferences_ui_update_f5e189a4: "Mise à jour de l’interface des préférences de notifications de niveau compte"
   account_level_settings_manage_4fca6f8e: "Paramètres au niveau du compte - gérer"
@@ -417,6 +418,9 @@ fr:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "L’heure de fin est antérieure à l’heure de début pour les notifications du compte"
+  account_notification_settings_error_page_66c0bc61: "Page d’erreur des paramètres de notification de compte"
+  account_notification_settings_initial_query_error_f55e1cbf: "Erreur de la requête initiale sur les paramètres de notification de compte"
+  account_notification_settings_updated_dbabec35: "Paramètres de notifications de compte mis à jour"
   account_notifications: 
     announcement_created_notice: "L’annonce a été créée"
     announcement_creation_failed_notice: "La création de l’annonce a échoué"
@@ -1286,6 +1290,7 @@ fr:
         report_last_run: "Dernière exécution"
         report_name: Nom
       headings: 
+        privacy: Confidentialité
         quotas: "Quotas de compte"
         sections: Rapports
         settings: "Paramètres du compte"
@@ -1316,6 +1321,8 @@ fr:
         enable_alerts: Alertes
         enable_course_catalog: "Affichez une liste des cours consultable dans ce compte racine avec l’indicateur « Inclure ce cours dans l’index de cours public » activé."
         enable_eportfolios: "Portefeuilles électroniques"
+        enable_fullstory: "Autoriser le suivi par FullStory"
+        enable_google_analytics: "Autoriser le suivi par Google Analytics"
         enable_profiles: "Activer les profils"
         enable_turnitin: Turnitin
         enable_user_notes: "Journal des enseignants"
@@ -1411,7 +1418,7 @@ fr:
       open_report_description: "Ouvrir la description du rapport"
       page_header_title: "Paramètres du compte"
       page_title: "Contenu partagé"
-      quiz_ip_filters_delete: "Supprimer le filtre"
+      quiz_ip_filters_delete: "Supprimer le filtrage des quiz par IP"
       quiz_ip_filters_help_message: |-
           Les filtres IP de questionnaire permettent de limiter l’accès aux questionnaires des ordinateurs appartenant à une plage IP spécifiée.
           
@@ -1444,6 +1451,7 @@ fr:
       tab_announcements: Annonces
       tab_external_tools: Applications
       tab_notifications: Notifications
+      tab_privacy: Confidentialité
       tab_quotas: Quotas
       tab_reports: Rapports
       tab_settings: Paramètres
@@ -2038,6 +2046,7 @@ fr:
   allow_multiple_attempts_e67a0a37: "Autoriser plusieurs tentatives"
   allow_opt_out_of_inbox: "Autoriser les utilisateurs à sortir de la boîte de conversation. Cela entraînera l’envoi de tous les messages et notifications des conversations sous forme de notifications ASAP (aussi vite que possible) à l’adresse e-mail principale de l’utilisateur. Les badges « message non lu » seront masqués dans la boîte de réception des conversations de l’utilisateur, et les préférences de notification des conversations disparaîtront également."
   allow_outcome_extra_credit_57c1e84e: "Autoriser l'obtention de crédits supplémentaires pour les acquis"
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: "Permet de supprimer des pages en grande quantité"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Autoriser l'acceptation passive des Conditions d'utilisation"
   allow_postable_submission_comments_a301b742: "Autoriser les commentaires sur les soumissions postables"
   allow_reorder_dashboard_cards_78215947: "Autoriser la réorganisation des cartes du tableau de configuration."
@@ -2060,6 +2069,7 @@ fr:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Permet à un utilisateur d'accéder au lien Agir comme utilisateur sur les cartes contextuelles des élèves."
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Permet à un utilisateur d'afficher l'ID SIS dans les détails de connexion d'un utilisateur."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Permet à un utilisateur d'afficher les ID SIS de l'utilisateur dans une page Personnes du cours."
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: "Permet les échelles de réussite ainsi que les calculs de maîtrise au niveau du compte. Remplace les échelles par résultat/acquis."
   allows_admin_user_to_view_account_statistics_341f00d9: "Permet à l'utilisateur admin d'afficher les statistiques du compte."
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Permet aux administrateurs d'afficher un journal contenant des informations sur toutes les mutations GraphQL
@@ -2074,7 +2084,7 @@ fr:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permet aux enseignants / concepteurs / AE d'accéder à l'outil de Chat."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permet aux rôles basés sur l'enseignant / AE d'accéder à l'outil Présence."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Permet aux rôles basés sur l'enseignant, AE d'accéder à l'outil Présence."
-  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Autoriser les enseignants à cacher les sections de cours aux élèves sur la page « Personnes » lorsqu’il y a plusieurs sections dans un cours."
+  allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Autoriser les enseignants à cacher les sections de cours aux élèves sur la page « Personnes » lorsqu’il y a plusieurs sections dans un cours."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permettre aux professeurs de marquer les données de notes comme prêtes à un export global pour leurs intégrations au système d'information des étudiants."
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Permet aux enseignants de définir des politiques de publication pour ce cours ou pour des travaux spécifiques, permettant que les notes soient
@@ -4969,6 +4979,7 @@ fr:
   click_here_to_see_the_file_79e2b366: "Cliquez ici pour voir le fichier."
   click_here_to_view_ec8cb2fd: "Cliquez ici pour afficher"
   click_here_to_view_the_submission_24777a69: "Cliquez ici pour voir l’envoi"
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: "Cliquez ici pour vous rendre sur vos tâches et vousen occuper à temps !"
   click_ok_to_continue_deleting_this_role_baa9d9e2: "Cliquez sur \"ok\" pour continuer à supprimer ce rôle."
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Cliquez sur un point de restauration pour revenir à votre essai tel qu’il était au moment où le point a été enregistré. Remarque : Vous perdrez tout travail effectué depuis que ce point de restauration a été enregistré. Cette opération ne peut être annulée."
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Cliquez sur le bouton de navigation de compte pour accéder aux paramètres des notifications."
@@ -7878,6 +7889,7 @@ fr:
   delete_grading_scheme_6b308832: "Supprimer le système de notation"
   delete_grading_scheme_title_215f0a40: "Supprimer le système de notation %{title}"
   delete_group_86c381ec: "Supprimer le groupe"
+  delete_in_progress_2d3f0e0d: "Suppression en cours"
   delete_key_developername_be80e695: "Supprimer clé %{developerName}"
   delete_key_name_c2de8c0c: "Supprimer clé %{name}"
   delete_my_account_41060aad: "Supprimer mon compte"
@@ -7897,6 +7909,7 @@ fr:
   delete_section_name_a48d9d79: "Supprimer la section « %{name} »"
   delete_selected_a023ccf8: "Supprimer la sélection"
   delete_selected_announcements_69e23710: "Supprimer les annonces sélectionnées"
+  delete_selected_pages_7bc50580: "Supprimer les pages sélectionnées"
   delete_survey_56fddbbd: "Supprimer l’enquête"
   delete_term_name_f707abc9: "Supprimer le trimestre %{name}"
   delete_theme_918a7f24: "Supprimer le thème ?"
@@ -9662,6 +9675,7 @@ fr:
   failed_to_delete_discussion_title_986df717: "Échec de la suppression de la discussion %{title}"
   failed_to_delete_external_feed_36f19d70: "Échec de la suppression du flux externe"
   failed_to_delete_role_label_27959de3: "Échec de la suppression du rôle %{label}"
+  failed_to_delete_selected_pages_26fa87db: "Échec de la suppression des pages sélectionnées"
   failed_to_export_some_tool_settings_c992fc56: "Échec de l’exportation de certains paramètres d’outil"
   failed_to_import_media_objects_4c1fcb4f: "Échec d'importation des objets multimédias"
   failed_to_laod_more_submissions_990aacee: "N'a pas réussi à télécharger plus de soumissions"
@@ -9679,6 +9693,7 @@ fr:
   failed_to_save_please_try_again_later_bb7070fb: "Échec de l’enregistrement. Veuillez réessayer ultérieurement."
   failed_to_submit_draft_comment_1de83451: "Échec d'envoi de l'ébauche du commentaire"
   failed_to_unpin_discussion_503eab82: "Impossible de désépingler la discussion"
+  failed_to_update_account_notification_settings_194c1cd4: "Échec de la mise à jour des paramètres de notifications de compte"
   failed_to_update_course_notification_settings_cbf0eb18: "Échec de la mise à jour des paramètres de notification de cours"
   failed_to_update_discussion_23cc229a: "Échec de la mise à jour de la discussion"
   failed_to_update_permission_33c493f: "Échec de la mise à jour de l'autorisation"
@@ -12779,6 +12794,7 @@ fr:
   loading_courses_started_6e6d742c: "Chargement des cours démarré"
   loading_data_ecd89ba: "Chargement des données..."
   loading_discussions_8ed5fcd7: "Chargement des discussions"
+  loading_external_tool_d839042c: "Chargement de l'Outil externe"
   loading_f99d93d4: "...Chargement"
   loading_features_d26820f6: "Caractéristiques de chargement"
   loading_folders_d8b5869e: "Chargement des dossiers"
@@ -13081,6 +13097,7 @@ fr:
   master_lock_590266b6: "Master Lock"
   mastered_34d4c857: Maîtrisé
   mastery_7ec348b5: Maîtrise
+  mastery_connect_64598f55: "Connexion Maîtrise"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Maîtrise : %{n_mastery_points_precision_2_str} Points"
   mastery_path_processing_f4471152: "Traitement du chemin de réussite"
   mastery_paths_breakdown_6e0b5fce: "Répartition des parcours de maîtrise"
@@ -13089,6 +13106,7 @@ fr:
   mastery_paths_editor_930655bb: "Éditeur de Chemins de Réussite"
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: "La sélection des chemins de réussite a été temporairement désactivée le temps d'une maintenance."
   mastery_points_f1672cc: "points de maîtrise"
+  mastery_scale_abbc3557: "Échelle de réussite"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Le score de maîtrise reflète la meilleure note obtenue sur un travail ou un questionnaire noté."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Le niveau de maîtrise atteint reflète le dernier travail ou questionnaire noté."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Le niveau de maîtrise reflète le dernier travail ou questionnaire noté."
@@ -15643,6 +15661,7 @@ fr:
   next_mastery_path_is_currently_processing_f044d7d8: "Le chemin de maîtrise suivant est actuellement en cours de traitement"
   next_mastery_path_is_still_processing_please_perio_bb0121af: "Le prochain chemin de réussite est toujours en cours de traitement, veuillez rafraîchir cette page de temps à autre."
   next_message_780bcf24: "Message suivant"
+  next_module_item_19e835f3: "Élément de module suivant"
   next_module_item_9bb8a222: "Le module/L'élément suivant"
   next_month_749b1778: "Mois suivant"
   next_month_b55a387c: "Mois suivant"
@@ -16013,6 +16032,7 @@ fr:
       submission_graded: "Envoi noté"
       submission_needs_grading: "L’envoi doit être noté"
       summaries: Récapitulatif
+      upcoming_assignment_alert: "Alertes des travaux à venir"
       updated_wiki_page: "Page mise à jour"
       web_conference_invitation: "Invitation à la conférence Web"
       web_conference_recording_ready: "L'enregistrement de la conférence en ligne est prêt"
@@ -16073,7 +16093,7 @@ fr:
       other: Autres
       parent: "E-mails parents"
       scheduling: Planification
-  notification_preferences_cf47083d: "Préférences de notifications"
+  notification_preferences_cf47083d: "Préférences de notification"
   notifications_cbfa7704: Notifications
   notifications_off_80da021c: "Notifications désactivées"
   notifications_search_results_80a0b06f: "Résultats de la recherche de notifications"
@@ -16574,6 +16594,7 @@ fr:
   package_error: "Erreur lors de l'identification du type de paquet : %{error}"
   package_export_from_d6e2b073: "Export de paquet depuis"
   page_50c4823d: Page
+  page_bulk_deleting_74860a80: "Suppression de pages par lots"
   page_comment: 
     default_user_name: Anonyme
   page_comments: 
@@ -17405,6 +17426,7 @@ fr:
   previous_export_c6a997f7: "Export précédent"
   previous_message_8804f87e: "Message précédent"
   previous_module_item_2bb5e499: "Le module/L'élément précédent"
+  previous_module_item_a9e57348: "Élément de module précédent"
   previous_month_7adf1380: "Mois précédent"
   previous_month_bb1e3c84: "Mois précédent"
   previous_page_928fc112: "Page précédente"
@@ -19416,6 +19438,7 @@ fr:
   ratings_2433172b: Notes
   ratio_answered_correctly_b0c1e7d: "%{ratio}% ont répondu correctement"
   ratio_responded_correctly_6d890107: "%{ratio}% ont répondu correctement"
+  raw_html_editor_e3993e41: "Éditeur HTML brut"
   rce_auto_save_f004fba9: "Enregistrement automatique ECR"
   rce_enhancements_5701e06: "Améliorations de l'ECR"
   rce_initialization_fix_4f176bda: "Correctif initialisation RCE."
@@ -20442,6 +20465,7 @@ fr:
   select_one_8e0af564: "Sélectionner un élément"
   select_one_b647b384: "En sélectionner une"
   select_one_of_the_options_c8b0c6e4: "Sélectionnez l'une de ces options :"
+  select_page_e93fc123: "Sélectionner page"
   select_prerequisite_module_57894963: "Sélectionnez un module prérequis"
   select_prerequite_module_e9042bb0: "Sélectionnez un module prérequis"
   select_rubric_2aa2ffa2: "Sélectionner le barème"
@@ -20457,6 +20481,7 @@ fr:
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Sélectionnez les fichiers que vous souhaitez associer à ce *module*, ou ajoutez des fichiers en sélectionnant « Nouveau(x) fichier(s) »."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Sélectionnez la page que vous souhaitez associer, ou ajoutez une nouvelle page en sélectionnant « Nouvelle page »."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Sélectionnez la page que vous souhaitez associer à ce *module*, ou ajoutez une nouvelle page en sélectionnant « Nouvelle page »."
+  select_title_for_deletion_45b08247: "Sélectionner %{title} en vue de sa suppression"
   select_type_of_prerequisite_8d6fa902: "Sélectionner un type de prérequis"
   select_video_file_35b61d4e: "Sélectionner un fichier vidéo"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Sélectionnez ce que vous souhaiteriez afficher sur la page d’accueil."
@@ -20472,6 +20497,7 @@ fr:
   selected_filename_7552a8c0: "sélectionné %{filename}"
   selected_grade_942f40ba: "Note sélectionnée"
   selected_item_35bed33a: "élément sélectionné"
+  selected_pages_have_been_deleted_82a7f965: "Les pages sélectionnées ont été supprimées"
   selected_subtree_a7693937: "%{subtree} sélectionné"
   selection_end_date_10fcc8c6: "Date de fin de la sélection"
   selection_height_9d57ec24: "Sélection Hauteur"
@@ -23784,6 +23810,7 @@ fr:
   untitled_assignment_59354b34: "travail sans titre"
   unused_courses_title: "Cours non utilisés"
   up_c553575d: "Vers le haut"
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "Date d'échéance à venir - %{assignment_name}, %{course_name}"
   update_374eb54: "mise à jour"
   update_4d8ee62: "Mettre à jour"
   update_and_view_sections_course_details_navigation_dd10b45e: |-
@@ -24833,6 +24860,9 @@ fr:
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
     one: "Vous êtes sur le point de supprimer 1 discussion. Êtes-vous certain ?"
     other: "Vous êtes sur le point de supprimer %{count} discussions. Êtes-vous certain ?"
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
+    one: "Vous êtes sur le point de supprimer 1 page Êtes-vous certain ?"
+    other: "Vous êtes sur le point de supprimer %{count} pages. Êtes-vous certain ?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: "Vous êtes sur le point de perdre tous les changements que vous n'avez pas encore appliqués à votre compte. \n\n\
       Êtes-vous toujours certain de vouloir procéder ? "
   you_are_about_to_lose_any_unsaved_changes_would_yo_e255f393: |-
@@ -25051,6 +25081,8 @@ fr:
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "En l’état, vous ne recevrez aucune notification concernant %{contextType}. Pour activer les notifications concernant %{contextType}, utilisez l’interrupteur ci-dessus."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "En l’état actuel des choses, vous ne recevrez aucune notification de cours. Pour activer les notifications de cours, utilisez l’interrupteur ci-dessus."
   your_answer_8dad6ea4: "Votre réponse :"
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Votre travail %{assignment_name} est à rendre au plus tard le %{due_at}."
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Votre travail %{assignment_name} est à rendre au plus tard le %{due_at}. Cliquez sur le lien suivant pour vous rendre sur vos tâches et vous en occuper à temps :"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Votre liste des travaux peut maintenant être trouvée dans la page *Calendrier*."
   your_assignments_list_has_improved_3eded80e: "Votre liste *Travaux* s’est améliorée !"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Vos travaux s’afficheront ici par date d’échéance."
