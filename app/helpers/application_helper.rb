@@ -916,7 +916,7 @@ module ApplicationHelper
     end
 
     # set this if you want android users of your site to be prompted to install an android app
-    # you can see an example of the one that instructure uses in public/web-app-manifest/manifest.json
+    # you can see an example of the one that instructure uses in InfoController#web_app_manifest
     manifest_url = Setting.get('web_app_manifest_url', '')
     output << tag("link", rel: 'manifest', href: manifest_url) if manifest_url.present?
 
