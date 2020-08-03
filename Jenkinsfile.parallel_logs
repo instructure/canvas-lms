@@ -20,19 +20,6 @@
 import org.jenkinsci.plugins.workflow.support.steps.build.DownstreamFailureCause
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
-def buildParameters = [
-  string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
-  string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
-  string(name: 'GERRIT_PROJECT', value: "${env.GERRIT_PROJECT}"),
-  string(name: 'GERRIT_BRANCH', value: "${env.GERRIT_BRANCH}"),
-  string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
-  string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
-  string(name: 'GERRIT_EVENT_ACCOUNT_NAME', value: "${env.GERRIT_EVENT_ACCOUNT_NAME}"),
-  string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}"),
-  string(name: 'GERRIT_CHANGE_COMMIT_MESSAGE', value: "${env.GERRIT_CHANGE_COMMIT_MESSAGE}"),
-  string(name: 'GERRIT_HOST', value: "${env.GERRIT_HOST}")
-]
-
 library "canvas-builds-library"
 
 // if the build never starts or gets into a node block, then we
@@ -52,6 +39,10 @@ def ignoreBuildNeverStartedError(block) {
   }
 }
 
+def getPatchsetTag() {
+  (env.GERRIT_REFSPEC.contains('master')) ? "${configuration.buildRegistryPath()}:${env.GERRIT_BRANCH}" : imageTag.patchset()
+}
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -64,9 +55,8 @@ pipeline {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     POSTGRES = configuration.postgres()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
-
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
-    PATCHSET_TAG = imageTag.patchset()
+    PATCHSET_TAG = getPatchsetTag()
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
