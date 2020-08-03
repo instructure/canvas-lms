@@ -106,8 +106,10 @@
       margin-bottom: -3px;
     }
     .outcome-assessed-info-banner {
-      margin-top: -$ic-sp;
       margin-bottom: $ic-sp;
+    }
+    .outcome-assessed-info-banner-with-mastery-scale {
+      margin-top: -$ic-sp;
     }
     .move_button, .edit_button, .delete_button {
       margin-#{direction(left)}: 1em;

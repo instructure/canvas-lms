@@ -71,6 +71,306 @@ function createView(opts) {
   return view.render()
 }
 
+function changeSelectedCalcMethod(view, calcMethod) {
+  view.$('#calculation_method').val(calcMethod)
+  return view.$('#calculation_method').trigger('change')
+}
+
+function commonTests() {
+  test('outcome is created successfully', function() {
+    ok(this.outcome1.get('context_id'), 'upper context id')
+    ok(this.outcome1.outcomeLink)
+    ok(this.outcome1.outcomeLink.context_id)
+    ok(this.outcome1.outcomeLink.context_type)
+    ok(this.outcome1.outcomeLink.outcome)
+    ok(this.outcome1.outcomeLink.outcome.context_id)
+    ok(this.outcome1.outcomeLink.outcome.context_type)
+    ok(this.outcome1.outcomeLink.outcome.title)
+    ok(this.outcome1.outcomeLink.outcome.id)
+  })
+
+  test('placeholder text is rendered properly for new outcomes', () => {
+    const view = createView({
+      model: newOutcome(),
+      state: 'add'
+    })
+    equal(view.$('input[name="title"]').attr('placeholder'), 'New Outcome')
+    view.remove()
+  })
+
+  test('delete buttons is disabled for outcomes that have been assessed', () => {
+    const view = createView({
+      model: newOutcome(
+        {
+          assessed: true,
+          native: true,
+          can_edit: true,
+          can_unlink: true
+        },
+        {
+          assessed: true,
+          can_unlink: true
+        }
+      ),
+      state: 'show'
+    })
+    ok(view.$('.delete_button').length > 0)
+    ok(view.$('.delete_button').attr('disabled'))
+    view.remove()
+  })
+
+  test('delete buttons is enabled for outcomes that have not been assessed', () => {
+    const view = createView({
+      model: newOutcome(
+        {
+          assessed: false,
+          native: true,
+          can_edit: true,
+          can_unlink: true
+        },
+        {
+          assessed: false,
+          can_unlink: true
+        }
+      ),
+      state: 'show'
+    })
+    ok(view.$('.delete_button').length > 0)
+    notOk(view.$('.delete_button').attr('disabled'))
+    view.remove()
+  })
+
+  test('edit is enabled when viewing an assessed account outcome in its native context', () => {
+    const view = createView({
+      model: newOutcome(
+        {
+          assessed: true,
+          native: true,
+          can_edit: true,
+          can_unlink: true
+        },
+        {
+          assessed: false,
+          can_unlink: true
+        }
+      ),
+      state: 'show'
+    })
+    ok(view.$('.edit_button').length > 0)
+    notOk(view.$('.edit_button').attr('disabled'))
+    view.remove()
+  })
+
+  test('delete button is not shown for outcomes that cannot be unlinked', () => {
+    const view = createView({
+      model: newOutcome(
+        {
+          assessed: false,
+          native: true,
+          can_edit: true,
+          can_unlink: true
+        },
+        {
+          assessed: false,
+          can_unlink: false
+        }
+      ),
+      state: 'show'
+    })
+    ok(view.$('.edit_button').length > 0)
+    strictEqual(view.$('.delete_button').length, 0)
+    view.remove()
+  })
+
+  test('move and delete buttons are available for an account outcome if a user is a local admin', () => {
+    ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
+    const view = createView({
+      model: newOutcome(
+        {
+          context_type: 'Account',
+          assessed: false,
+          native: false,
+          can_edit: false,
+          can_unlink: true
+        },
+        {
+          assessed: false,
+          can_unlink: true
+        }
+      ),
+      state: 'show'
+    })
+    ok(view.$('.delete_button').length > 0)
+    ok(view.$('.move_button').length > 0)
+    strictEqual(view.$('.edit_button').length, 0)
+    view.remove()
+  })
+
+  test('move and delete buttons are not available for an account outcome if a user is a teacher', () => {
+    ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
+    ENV.current_user_roles = ['teacher']
+    const view = createView({
+      model: newOutcome(
+        {
+          context_type: 'Account',
+          assessed: false,
+          native: false,
+          can_edit: false,
+          can_unlink: true
+        },
+        {
+          assessed: false,
+          can_unlink: true
+        }
+      ),
+      state: 'show'
+    })
+    strictEqual(view.$('.delete_button').length, 0)
+    strictEqual(view.$('.move_button').length, 0)
+    strictEqual(view.$('.edit_button').length, 0)
+    view.remove()
+  })
+
+  test('it attempts a confirmation dialog when an outcome is modified', assert => {
+    const done = assert.async()
+    const view = createView({
+      model: newOutcome(
+        {assessed: true, native: true, has_updateable_rubrics: true},
+        {can_unlink: true}
+      ),
+      state: 'edit'
+    })
+    view.edit($.Event())
+    view.$('#title').val('this is a brand new title')
+    view.$('form').trigger('submit')
+    setTimeout(() => {
+      ok($('.confirm-outcome-edit-modal-container').length > 0)
+      // cleanup
+      $('#cancel-outcome-edit-modal').trigger('click')
+      $('.confirm-outcome-edit-modal-container').remove()
+      done()
+    })
+  })
+
+  test('it saves without dialog when outcome is unchanged', assert => {
+    const done = assert.async()
+    const view = createView({
+      model: newOutcome(
+        {assessed: true, native: true, has_updateable_rubrics: true},
+        {can_unlink: true}
+      ),
+      state: 'edit'
+    })
+    view.edit($.Event())
+    view.$('form').trigger('submit')
+    view.on('submit', () => {
+      ok(true, 'submit fired on form view')
+      done()
+    })
+    setTimeout(() => {
+      $('#confirm-outcome-edit-modal').trigger('click')
+    })
+  })
+
+  test('it saves without dialog when outcome title is changed but no rubrics aligned', assert => {
+    const done = assert.async()
+    const view = createView({
+      model: newOutcome(
+        {assessed: true, native: true, has_updateable_rubrics: false},
+        {can_unlink: true}
+      ),
+      state: 'edit'
+    })
+    view.edit($.Event())
+    view.$('form').trigger('submit')
+    view.on('submit', () => {
+      ok(true, 'submit fired on form view')
+      done()
+    })
+    setTimeout(() => {
+      $('#confirm-outcome-edit-modal').trigger('click')
+    })
+  })
+
+  test('delete button is disabled for account outcomes that have been assessed in this course', () => {
+    const view = createView({
+      model: newOutcome(
+        {
+          assessed: true,
+          native: false,
+          can_edit: true,
+          context_type: 'Account'
+        },
+        {
+          assessed: true,
+          can_unlink: true
+        }
+      ),
+      state: 'show'
+    })
+    ok(view.$el.find('.delete_button').length > 0)
+    ok(view.$el.find('.delete_button').attr('disabled'))
+    view.remove()
+  })
+
+  test('delete button is enabled for account outcomes that have been assessed, but not in this course', () => {
+    const view = createView({
+      model: newOutcome(
+        {
+          assessed: true,
+          native: false,
+          can_edit: true,
+          context_type: 'Account'
+        },
+        {
+          assessed: false,
+          can_unlink: true
+        }
+      ),
+      state: 'show'
+    })
+    ok(view.$el.find('.delete_button').length > 0)
+    ok(!view.$el.find('.delete_button').attr('disabled'))
+    view.remove()
+  })
+
+  test('validates title is present', function() {
+    const view = createView({
+      model: this.outcome1,
+      state: 'edit'
+    })
+    view.$('#title').val('')
+    view.$('#dtitle').trigger('change')
+    ok(!view.isValid())
+    ok(view.errors.title)
+    view.remove()
+  })
+
+  test('validates title length', function() {
+    const long_name = 'X'.repeat(260)
+    const view = createView({
+      model: this.outcome1,
+      state: 'edit'
+    })
+    view.$('#title').val(long_name)
+    ok(!view.isValid())
+    ok(view.errors.title)
+    view.remove()
+  })
+
+  test('validates display_name length', function() {
+    const long_name = 'X'.repeat(260)
+    const view = createView({
+      model: this.outcome1,
+      state: 'edit'
+    })
+    view.$('#display_name').val(long_name)
+    ok(!view.isValid())
+    ok(view.errors.display_name)
+    view.remove()
+  })
+}
+
 QUnit.module('OutcomeView', {
   setup() {
     fakeENV.setup()
@@ -87,41 +387,7 @@ QUnit.module('OutcomeView', {
   }
 })
 
-function changeSelectedCalcMethod(view, calcMethod) {
-  view.$('#calculation_method').val(calcMethod)
-  return view.$('#calculation_method').trigger('change')
-}
-
-function checkCalcOption(show, view, calcMethod, calcInt) {
-  if (show) {
-    equal(view.$('#calculation_method').data('calculation-method'), calcMethod)
-    if (!['highest', 'latest'].includes(calcMethod)) {
-      equal(view.$('#calculation_int').text(), calcInt)
-    }
-  } else {
-    equal(view.$('#calculation_method').val(), calcMethod)
-    if (!['highest', 'latest'].includes(calcMethod)) {
-      equal(view.$('#calculation_int').val(), calcInt)
-    }
-  }
-  if (['highest', 'latest'].includes(calcMethod)) {
-    ok(!view.$('#calculation_int_left_side').is(':visible'))
-  } else {
-    ok(view.$('#calculation_int_left_side').is(':visible'))
-  }
-}
-
-test('outcome is created successfully', function() {
-  ok(this.outcome1.get('context_id'), 'upper context id')
-  ok(this.outcome1.outcomeLink)
-  ok(this.outcome1.outcomeLink.context_id)
-  ok(this.outcome1.outcomeLink.context_type)
-  ok(this.outcome1.outcomeLink.outcome)
-  ok(this.outcome1.outcomeLink.outcome.context_id)
-  ok(this.outcome1.outcomeLink.outcome.context_type)
-  ok(this.outcome1.outcomeLink.outcome.title)
-  ok(this.outcome1.outcomeLink.outcome.id)
-})
+commonTests()
 
 test('dropdown includes available calculation methods', function() {
   const view = createView({
@@ -253,15 +519,6 @@ test('calculation method is rendered properly on add', () => {
   view.remove()
 })
 
-test('placeholder text is rendered properly for new outcomes', () => {
-  const view = createView({
-    model: newOutcome(),
-    state: 'add'
-  })
-  equal(view.$('input[name="title"]').attr('placeholder'), 'New Outcome')
-  view.remove()
-})
-
 test('calculation int updates when the calculation method is changed', () => {
   const view = createView({
     model: newOutcome({
@@ -306,49 +563,7 @@ test('calculation int updates when the calculation method is changed', () => {
   view.remove()
 })
 
-test('delete buttons is disabled for outcomes that have been assessed', () => {
-  const view = createView({
-    model: newOutcome(
-      {
-        assessed: true,
-        native: true,
-        can_edit: true,
-        can_unlink: true
-      },
-      {
-        assessed: true,
-        can_unlink: true
-      }
-    ),
-    state: 'show'
-  })
-  ok(view.$('.delete_button').length > 0)
-  ok(view.$('.delete_button').attr('disabled'))
-  view.remove()
-})
-
-test('delete buttons is enabled for outcomes that have not been assessed', () => {
-  const view = createView({
-    model: newOutcome(
-      {
-        assessed: false,
-        native: true,
-        can_edit: true,
-        can_unlink: true
-      },
-      {
-        assessed: false,
-        can_unlink: true
-      }
-    ),
-    state: 'show'
-  })
-  ok(view.$('.delete_button').length > 0)
-  notOk(view.$('.delete_button').attr('disabled'))
-  view.remove()
-})
-
-test('edit is enabled and warning text present when viewing an assessed account outcome in its native context', () => {
+test('warning text present when viewing an assessed account outcome in its native context', () => {
   const view = createView({
     model: newOutcome(
       {
@@ -365,84 +580,12 @@ test('edit is enabled and warning text present when viewing an assessed account 
     state: 'show'
   })
   ok(view.$('.outcome-assessed-info-banner').length > 0)
-  ok(view.$('.edit_button').length > 0)
-  notOk(view.$('.edit_button').attr('disabled'))
   view.remove()
 })
 
 test('warning text is not present if outcome view is read-only', () => {
   const view = createView({model: newOutcome({assessed: true}, {}), readOnly: true})
   notOk(view.$('.outcome-assessed-info-banner').length > 0)
-  view.remove()
-})
-
-test('delete button is not shown for outcomes that cannot be unlinked', () => {
-  const view = createView({
-    model: newOutcome(
-      {
-        assessed: false,
-        native: true,
-        can_edit: true,
-        can_unlink: true
-      },
-      {
-        assessed: false,
-        can_unlink: false
-      }
-    ),
-    state: 'show'
-  })
-  ok(view.$('.edit_button').length > 0)
-  strictEqual(view.$('.delete_button').length, 0)
-  view.remove()
-})
-
-test('move and delete buttons are available for an account outcome if a user is a local admin', () => {
-  ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
-  const view = createView({
-    model: newOutcome(
-      {
-        context_type: 'Account',
-        assessed: false,
-        native: false,
-        can_edit: false,
-        can_unlink: true
-      },
-      {
-        assessed: false,
-        can_unlink: true
-      }
-    ),
-    state: 'show'
-  })
-  ok(view.$('.delete_button').length > 0)
-  ok(view.$('.move_button').length > 0)
-  ok(view.$('.edit_button').length === 0)
-  view.remove()
-})
-
-test('move and delete buttons are not available for an account outcome if a user is a teacher', () => {
-  ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
-  ENV.current_user_roles = ['teacher']
-  const view = createView({
-    model: newOutcome(
-      {
-        context_type: 'Account',
-        assessed: false,
-        native: false,
-        can_edit: false,
-        can_unlink: true
-      },
-      {
-        assessed: false,
-        can_unlink: true
-      }
-    ),
-    state: 'show'
-  })
-  strictEqual(view.$('.delete_button').length, 0)
-  strictEqual(view.$('.move_button').length, 0)
-  strictEqual(view.$('.edit_button').length, 0)
   view.remove()
 })
 
@@ -478,10 +621,13 @@ test('the banner is not displayed when the outcome is not assessed', () => {
   ok(!view.$('#assessed_info_banner').length > 0)
 })
 
-test('it attempts a confirmation dialog when an outcome is modified', assert => {
+test('it attempts a confirmation dialog when calculation is modified', assert => {
   const done = assert.async()
   const view = createView({
-    model: newOutcome({assessed: true, native: true}, {can_unlink: true}),
+    model: newOutcome(
+      {assessed: true, native: true, has_updateable_rubrics: true},
+      {can_unlink: true}
+    ),
     state: 'edit'
   })
   view.edit($.Event())
@@ -496,21 +642,32 @@ test('it attempts a confirmation dialog when an outcome is modified', assert => 
   })
 })
 
-test('it saves when without dialog when outcome is unchanged', assert => {
-  const done = assert.async()
+test('validates mastery points', function() {
   const view = createView({
-    model: newOutcome({assessed: true, native: true}, {can_unlink: true}),
+    model: this.outcome1,
     state: 'edit'
   })
-  view.edit($.Event())
-  view.$('form').trigger('submit')
-  view.on('submit', () => {
-    ok(true, 'submit fired on form view')
-    done()
+  view.$('input[name="mastery_points"]').val('-1')
+  ok(!view.isValid())
+  ok(view.errors.mastery_points)
+  view.remove()
+})
+
+test('validates i18n mastery points', function() {
+  const view = createView({
+    model: this.outcome1,
+    state: 'edit'
   })
-  setTimeout(() => {
-    $('#confirm-outcome-edit-modal').trigger('click')
+  I18nStubber.pushFrame()
+  I18nStubber.setLocale('fr_FR')
+  I18nStubber.stub('fr_FR', {
+    'number.format.delimiter': ' ',
+    'number.format.separator': ','
   })
+  view.$('input[name="mastery_points"]').val('1 234,5')
+  ok(view.isValid())
+  view.remove()
+  I18nStubber.popFrame()
 })
 
 test('getModifiedFields returns false for all fields when not modified', () => {
@@ -592,116 +749,63 @@ test('calc int is not incorrectly changed to 65 when starting as n mastery and 5
   view.remove()
 })
 
-test('delete button is disabled for account outcomes that have been assessed in this course', () => {
+test('it attempts a confirmation dialog when outcome calculation is modified', assert => {
+  const done = assert.async()
   const view = createView({
     model: newOutcome(
-      {
-        assessed: true,
-        native: false,
-        can_edit: true,
-        context_type: 'Account'
-      },
-      {
-        assessed: true,
-        can_unlink: true
-      }
+      {assessed: true, native: true, has_updateable_rubrics: true},
+      {can_unlink: true}
     ),
-    state: 'show'
+    state: 'edit'
   })
-  ok(view.$el.find('.delete_button').length > 0)
-  ok(view.$el.find('.delete_button').attr('disabled'))
-  view.remove()
+  view.edit($.Event())
+  changeSelectedCalcMethod(view, 'latest')
+  view.$('#title').val('this is a brand new title')
+  view.$('form').trigger('submit')
+  setTimeout(() => {
+    ok($('.confirm-outcome-edit-modal-container').length > 0)
+    // cleanup
+    $('#cancel-outcome-edit-modal').trigger('click')
+    $('.confirm-outcome-edit-modal-container').remove()
+    done()
+  })
 })
 
-test('delete button is enabled for account outcomes that have been assessed, but not in this course', () => {
+test('it saves without dialog when outcome calculation is changed but no rubrics aligned and not assessed', assert => {
+  const done = assert.async()
   const view = createView({
     model: newOutcome(
-      {
-        assessed: true,
-        native: false,
-        can_edit: true,
-        context_type: 'Account'
-      },
-      {
-        assessed: false,
-        can_unlink: true
-      }
+      {assessed: false, native: true, has_updateable_rubrics: false},
+      {can_unlink: true}
     ),
-    state: 'show'
-  })
-  ok(view.$el.find('.delete_button').length > 0)
-  ok(!view.$el.find('.delete_button').attr('disabled'))
-  view.remove()
-})
-
-test('validates title is present', function() {
-  const view = createView({
-    model: this.outcome1,
     state: 'edit'
   })
-  view.$('#title').val('')
-  view.$('#dtitle').trigger('change')
-  ok(!view.isValid())
-  ok(view.errors.title)
-  view.remove()
+  view.edit($.Event())
+  view.$('form').trigger('submit')
+  view.on('submit', () => {
+    ok(true, 'submit fired on form view')
+    done()
+  })
+  setTimeout(() => {
+    $('#confirm-outcome-edit-modal').trigger('click')
+  })
 })
 
-test('validates title length', function() {
-  let long_name = 'long outcome name '
-  for (_ = 1; _ <= 5; _++) {
-    long_name += long_name
+QUnit.module('OutcomeView with mastery scales', {
+  setup() {
+    fakeENV.setup()
+    // Sometimes TinyMCE has stuff on the dom that causes issues, likely from things that
+    // don't clean up properly, we make sure that these run in a clean tiny state each time
+    tinymce.remove()
+    ENV.PERMISSIONS = {manage_outcomes: true}
+    ENV.ACCOUNT_LEVEL_MASTERY_SCALES = true
+    this.outcome1 = outcome1()
+  },
+  teardown() {
+    fakeENV.teardown()
+    tinymce.remove() // Don't leave anything hanging around
+    document.getElementById('fixtures').innerHTML = ''
   }
-  ok(long_name.length > 256)
-  const view = createView({
-    model: this.outcome1,
-    state: 'edit'
-  })
-  view.$('#title').val(long_name)
-  ok(!view.isValid())
-  ok(view.errors.title)
-  view.remove()
 })
 
-test('validates display_name length', function() {
-  let long_name = 'long outcome name '
-  for (_ = 1; _ <= 5; _++) {
-    long_name += long_name
-  }
-  ok(long_name.length > 256)
-  const view = createView({
-    model: this.outcome1,
-    state: 'edit'
-  })
-  view.$('#display_name').val(long_name)
-  ok(!view.isValid())
-  ok(view.errors.display_name)
-  view.remove()
-})
-
-test('validates mastery points', function() {
-  const view = createView({
-    model: this.outcome1,
-    state: 'edit'
-  })
-  view.$('input[name="mastery_points"]').val('-1')
-  ok(!view.isValid())
-  ok(view.errors.mastery_points)
-  view.remove()
-})
-
-test('validates i18n mastery points', function() {
-  const view = createView({
-    model: this.outcome1,
-    state: 'edit'
-  })
-  I18nStubber.pushFrame()
-  I18nStubber.setLocale('fr_FR')
-  I18nStubber.stub('fr_FR', {
-    'number.format.delimiter': ' ',
-    'number.format.separator': ','
-  })
-  view.$('input[name="mastery_points"]').val('1 234,5')
-  ok(view.isValid())
-  view.remove()
-  I18nStubber.popFrame()
-})
+commonTests()

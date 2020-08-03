@@ -31,9 +31,9 @@ class RubricsController < ApplicationController
         manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
         manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
       },
-      :NON_SCORING_RUBRICS => @domain_root_account.feature_enabled?(:non_scoring_rubrics),
-      :ACCOUNT_LEVEL_PROFICIENCIES => @domain_root_account.feature_enabled?(:account_level_mastery_scales)
+      :NON_SCORING_RUBRICS => @domain_root_account.feature_enabled?(:non_scoring_rubrics)
 
+    mastery_scales_js_env
     set_tutorial_js_env
 
     @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
@@ -50,6 +50,7 @@ class RubricsController < ApplicationController
         :PERMISSIONS => {
           manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
         }
+      mastery_scales_js_env
       @rubric_association = @context.rubric_associations.bookmarked.where(rubric_id: params[:id]).first
       raise ActiveRecord::RecordNotFound unless @rubric_association
       @actual_rubric = @rubric_association.rubric

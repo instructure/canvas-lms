@@ -1579,6 +1579,14 @@ describe Course do
     end
   end
 
+  context 'resolved_outcome_proficiency' do
+    it "retrieves account's outcome proficiency" do
+      course_model
+      method = outcome_proficiency_model(@course.root_account)
+      expect(@course.resolved_outcome_proficiency).to eq method
+    end
+  end
+
   context 'resolved_outcome_calculation_method' do
     it "retrieves account's outcome calculation method" do
       root_account = Account.create!

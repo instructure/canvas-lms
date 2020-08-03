@@ -1186,4 +1186,43 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe 'mastery_scales_js_env' do
+    before(:once) do
+      course_model
+      @context = @course
+      @domain_root_account = @course.root_account
+      @proficiency = outcome_proficiency_model(@course.root_account)
+      @calculation_method = outcome_calculation_method_model(@course.root_account)
+    end
+
+    let(:js_env) {{}}
+
+    before do
+      allow(helper).to receive(:js_env) {|env| js_env.merge!(env)}
+    end
+
+    it 'does not include mastery scales FF when account_level_mastery_scales disabled' do
+      helper.mastery_scales_js_env
+      expect(js_env).not_to have_key :ACCOUNT_LEVEL_MASTERY_SCALES
+    end
+
+    context 'when account_level_mastery_scales enabled' do
+      before(:once) do
+        @course.root_account.enable_feature! :account_level_mastery_scales
+      end
+
+      it 'includes mastery scales FF' do
+        helper.mastery_scales_js_env
+        expect(js_env).to have_key :ACCOUNT_LEVEL_MASTERY_SCALES
+      end
+
+      it 'includes appropriate mastery scale data' do
+        helper.mastery_scales_js_env
+        mastery_scale = js_env[:MASTERY_SCALE]
+        expect(mastery_scale[:outcome_proficiency]).to eq @proficiency.as_json
+        expect(mastery_scale[:outcome_calculation_method]).to eq @calculation_method.as_json
+      end
+    end
+  end
 end
