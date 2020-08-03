@@ -405,6 +405,7 @@ da:
   account_id_2c3b4f15: Konto-id
   account_id_73966078: account_id
   account_id_f6e26867: Konto-id
+  account_level_mastery_scales_a5bdff29: "Skala for opfyldelse af læringsmål på kontoniveau"
   account_level_notification_preferences_require_an__66467cd7: "Meddelelsespræferencer på kontoniveau kræver, at en account_id opdaterer"
   account_level_notification_preferences_ui_update_f5e189a4: "Opdatering af meddelelsespræferencer på kontoniveau"
   account_level_settings_manage_4fca6f8e: "Indstillinger på kontoniveau - administrer"
@@ -417,6 +418,9 @@ da:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Sluttid for kontonotifikation ligger forud for starttid"
+  account_notification_settings_error_page_66c0bc61: "Fejlside for indstillinger for kontomeddelelser"
+  account_notification_settings_initial_query_error_f55e1cbf: "Indledende forespørgselsfejl ved indstillinger for kontomeddelelser"
+  account_notification_settings_updated_dbabec35: "Indstillinger for kontomeddelelser opdateret"
   account_notifications: 
     announcement_created_notice: "Meddelelse oprettet."
     announcement_creation_failed_notice: "Oprettelse af meddelelse mislykkedes"
@@ -1286,6 +1290,7 @@ da:
         report_last_run: "Sidste kørsel"
         report_name: Navn
       headings: 
+        privacy: Datapolitik
         quotas: Kontokvoter
         sections: Rapporter
         settings: Kontoindstillinger
@@ -1316,6 +1321,8 @@ da:
         enable_alerts: "Varslinger (beta)"
         enable_course_catalog: "Vis en liste over fag, som du kan søge efter i denne rodkonto med den aktiverede afmærkning \"Inkluder dette fag i offentligt fagindeks\"."
         enable_eportfolios: ePortfolier
+        enable_fullstory: "Tillad sporing med FullStory"
+        enable_google_analytics: "Tillad sporing med Google Analytics"
         enable_profiles: "Aktivér profiler"
         enable_turnitin: Turnitin
         enable_user_notes: Undervisernotater
@@ -1410,7 +1417,7 @@ da:
       open_report_description: "Åbn rapportbeskrivelse"
       page_header_title: Kontoindstillinger
       page_title: "Delt indhold"
-      quiz_ip_filters_delete: "Fjern filter"
+      quiz_ip_filters_delete: "Fjern IP-filter for test"
       quiz_ip_filters_help_message: |-
           IP-filtre for test er en måde til at begrænse adgang til test for computere i et specificeret IP-interval.
           
@@ -1443,6 +1450,7 @@ da:
       tab_announcements: Beskeder
       tab_external_tools: Apps
       tab_notifications: Notifikationer
+      tab_privacy: Datapolitik
       tab_quotas: Kvoter
       tab_reports: Rapporter
       tab_settings: Indstillinger
@@ -2037,6 +2045,7 @@ da:
   allow_multiple_attempts_e67a0a37: "Tillad flere forsøg"
   allow_opt_out_of_inbox: "Tillad, at brugere melder sig fra Diskussioner-indbakken Dette vil medføre, at alle beskeder og meddelelser i diskussioner sendes som hurtigst muligt-meddelelser til brugerens primære e-mail, Diskussioner-indbakkens ikon for ulæste meddelelser skjules i indbakken og Diskussionens meddelelsesindstillinger skjules."
   allow_outcome_extra_credit_57c1e84e: "Tillad ekstra kredit for læringsudbytte"
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: "Tillad at slette flere sider ad gangen"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Tillad passiv accept af servicevilkår"
   allow_postable_submission_comments_a301b742: "Tillad afleveringskommentarer, der kan slås op"
   allow_reorder_dashboard_cards_78215947: "Tillad omorganisering af oversigt-kort"
@@ -2058,6 +2067,7 @@ da:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Gør det muligt for en bruger at få adgang til linket Optræd som bruger på studerendes kontekstkort"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Gør det muligt for en bruger at få vist SIS-ID’et i en brugers loginoplysninger."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Gør det muligt for en bruger at få vist SIS-ID’er på siden Deltagere i et fag."
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: "Tillader skalaler for opfyldelse af læringsmål på kontoniveau og færdighedsberegninger og erstatter skalaer pr. læringsudbytte"
   allows_admin_user_to_view_account_statistics_341f00d9: "Gør det muligt for en admin-bruger at få vist kontostatistik."
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Lader administratorer se en logfil med oplysninger om alle de nyligt kørte
@@ -4968,6 +4978,7 @@ da:
   click_here_to_tell_us_what_happened_5d773d1d: "så klik her for at fortælle os, hvad der skete"
   click_here_to_view_ec8cb2fd: "klik her for at vise"
   click_here_to_view_the_submission_24777a69: "Klik her for at vise afleveringen"
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: "Klik her for at besøge din opgave og få den afleveret i tide!"
   click_ok_to_continue_deleting_this_role_baa9d9e2: "Klik på \"ok\" for at fortsætte med at slette denne rolle."
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klik på et øjebliksbillede for at vende tilbage til din prøve, som den var, da øjebliksbilledet blev taget. Bemærk: Du vil miste det arbejde, du har udført, siden øjebliksbilledet blev taget, og det kan ikke fortrydes!"
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Klik på konto-navigationsknappen for at få adgang til meddelelses-indstillinger."
@@ -7870,6 +7881,7 @@ da:
   delete_grading_scheme_6b308832: "Slet karakterordning"
   delete_grading_scheme_title_215f0a40: "Sletter karaktersystem %{title}"
   delete_group_86c381ec: "Slet gruppe"
+  delete_in_progress_2d3f0e0d: "Sletning i gang"
   delete_key_developername_be80e695: "Slet nøgle %{developerName}"
   delete_key_name_c2de8c0c: "Slet nøgle %{name}"
   delete_my_account_41060aad: "Slet min konto"
@@ -7889,6 +7901,7 @@ da:
   delete_section_name_a48d9d79: "Slet sektion \"%{name}\""
   delete_selected_a023ccf8: "Slet valgte"
   delete_selected_announcements_69e23710: "Slet valgte beskeder"
+  delete_selected_pages_7bc50580: "Slet valgte sider"
   delete_survey_56fddbbd: "Slet spørgeundersøgelse"
   delete_term_name_f707abc9: "Slet semester %{name}"
   delete_theme_918a7f24: "Slet tema?"
@@ -9653,6 +9666,7 @@ da:
   failed_to_delete_discussion_title_986df717: "Kunne ikke slette diskussion %{title}"
   failed_to_delete_external_feed_36f19d70: "Kunne ikke slette eksternt feed"
   failed_to_delete_role_label_27959de3: "Kunne ikke slette rolle %{label}"
+  failed_to_delete_selected_pages_26fa87db: "Kunne ikke slette valgte sider"
   failed_to_export_some_tool_settings_c992fc56: "Kunne ikke eksportere nogle af værktøjsindstillingerne"
   failed_to_import_media_objects_4c1fcb4f: "Det mislykkedes at importere objekter"
   failed_to_laod_more_submissions_990aacee: "Kunne ikke indlæse flere afleveringer"
@@ -9670,6 +9684,7 @@ da:
   failed_to_save_please_try_again_later_bb7070fb: "Kunne ikke gemmes, prøv igen senere"
   failed_to_submit_draft_comment_1de83451: "Mislykkedes at aflevere kladde-kommentar"
   failed_to_unpin_discussion_503eab82: "Kunne ikke frigøre diskussion"
+  failed_to_update_account_notification_settings_194c1cd4: "Kunne ikke opdatere indstillinger for kontomeddelelser"
   failed_to_update_course_notification_settings_cbf0eb18: "Kunne ikke opdatere fagmeddelelsesindstillinger"
   failed_to_update_discussion_23cc229a: "Kunne ikke opdatere diskussionen"
   failed_to_update_permission_33c493f: "Kunne ikke opdatere tilladelse"
@@ -12783,6 +12798,7 @@ da:
   loading_courses_started_6e6d742c: "Indlæsning af fag påbegyndt"
   loading_data_ecd89ba: "Indlæsning af data ..."
   loading_discussions_8ed5fcd7: "Indlæser diskussioner"
+  loading_external_tool_d839042c: "Indlæser eksternt værktøj"
   loading_f99d93d4: "... indlæser"
   loading_features_d26820f6: "Indlæser funktioner"
   loading_folders_d8b5869e: "Indlæser mapper"
@@ -13085,6 +13101,7 @@ da:
   master_lock_590266b6: Hovedlås
   mastered_34d4c857: "Opfylder læringsmål"
   mastery_7ec348b5: Beherskelse
+  mastery_connect_64598f55: "Mastery Connect"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Opfyldelse af læringsmål: %{n_mastery_points_precision_2_str} point"
   mastery_path_processing_f4471152: "Behandling af læringsstier"
   mastery_paths_breakdown_6e0b5fce: "Opdeling af læringsstier"
@@ -13093,6 +13110,7 @@ da:
   mastery_paths_editor_930655bb: "Mål-sti redigeringsprogram"
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Valg af læringsstier er midlertidigt deaktiveret grundet vedligeholdelse."
   mastery_points_f1672cc: "point for opfyldelse af læringsmål"
+  mastery_scale_abbc3557: "Skala for opfyldelse af læringsmål"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultat af opfyldelse af læringsmål afspejler det højeste resultat for en bedømt opgave eller test."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Beherskelsescore reflektere den mest nylige bedømte opgave eller quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultat af opfyldelse af læringsmål afspejler den nyligt bedømte opgave eller test."
@@ -15647,6 +15665,7 @@ da:
   next_mastery_path_is_currently_processing_f044d7d8: "Næste læringssti bliver i øjeblikket behandlet"
   next_mastery_path_is_still_processing_please_perio_bb0121af: "Næste læringssti behandles stadig, opdater siden med jævne mellemrum"
   next_message_780bcf24: "Næste besked"
+  next_module_item_19e835f3: "Næste modulelement"
   next_module_item_9bb8a222: "Næste modul/element"
   next_month_749b1778: "Næste måned"
   next_month_b55a387c: "Næste måned"
@@ -16017,6 +16036,7 @@ da:
       submission_graded: "Aflevering bedømt"
       submission_needs_grading: "Afleveringen kræver karaktergivning"
       summaries: Oversigter
+      upcoming_assignment_alert: "Kommende opgave-varsling"
       updated_wiki_page: "Opdateret side"
       web_conference_invitation: "Invitation til webkonference"
       web_conference_recording_ready: "Optagelse af webkonference er klar"
@@ -16577,6 +16597,7 @@ da:
   package_error: "Fejl under identificering af pakketype: %{error}"
   package_export_from_d6e2b073: "Pakke-eksport fra"
   page_50c4823d: Side
+  page_bulk_deleting_74860a80: "Sletning af flere sider"
   page_comment: 
     default_user_name: Anonym
   page_comments: 
@@ -17409,6 +17430,7 @@ da:
   previous_export_c6a997f7: "Forrige eksport"
   previous_message_8804f87e: "Forrige besked"
   previous_module_item_2bb5e499: "Forrige modul/element"
+  previous_module_item_a9e57348: "Forrige modulelement"
   previous_month_7adf1380: "Forrige måned"
   previous_month_bb1e3c84: "Forrige måned"
   previous_page_928fc112: "Forrige side"
@@ -19418,6 +19440,7 @@ da:
   ratings_2433172b: Bedømmelser
   ratio_answered_correctly_b0c1e7d: "%{ratio}% besvaret korrekt"
   ratio_responded_correctly_6d890107: "%{ratio}% svarede korrekt"
+  raw_html_editor_e3993e41: "Rå HTML-editor"
   rce_auto_save_f004fba9: "RCE auto-gem"
   rce_contents_replace_description: "Aktiver RCE fuldtekst udskift fra LTI’er"
   rce_contents_replace_display_name: "RCE-indhold udskift"
@@ -20447,6 +20470,7 @@ da:
   select_one_8e0af564: "Vælg en"
   select_one_b647b384: "Vælg en"
   select_one_of_the_options_c8b0c6e4: "Vælg en af ​​mulighederne:"
+  select_page_e93fc123: "Vælg side"
   select_prerequisite_module_57894963: "Vælg forudsætningsmodul"
   select_prerequite_module_e9042bb0: "Vælg forudsætningsmodul"
   select_rubric_2aa2ffa2: "Vælg rubrik"
@@ -20462,6 +20486,7 @@ da:
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Vælg de filer, du vil knytte til dette *modul*, eller tilføj filerne ved at vælge \"Ny(e) fil(er)\"."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Vælg den side, du ønsker at tilknytte, eller tilføj en ny side ved at vælge \"Ny side\"."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Vælg den side, du vil tilknytte dette *modul*, eller tilføj en ny side ved at vælge \"Ny side\"."
+  select_title_for_deletion_45b08247: "Vælg %{title} til sletning"
   select_type_of_prerequisite_8d6fa902: "Vælg type forudsætning"
   select_video_file_35b61d4e: "Vælg videofil"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Vælg, hvad du vil vise på hjemmesiden."
@@ -20477,6 +20502,7 @@ da:
   selected_filename_7552a8c0: "valgt %{filename}"
   selected_grade_942f40ba: "Udvalgte karakter"
   selected_item_35bed33a: "valgt post"
+  selected_pages_have_been_deleted_82a7f965: "De valgte sider er blevet slettet"
   selected_subtree_a7693937: "Valgt %{subtree}"
   selection_end_date_10fcc8c6: "Valgt slutdato"
   selection_height_9d57ec24: "Valg højde"
@@ -23790,6 +23816,7 @@ da:
   untitled_assignment_59354b34: "opgave uden overskrift"
   unused_courses_title: "Ubrugte fag"
   up_c553575d: Op
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "Kommende afleveringsdato - %{assignment_name}, %{course_name}"
   update_374eb54: opdater
   update_4d8ee62: Opdatering
   update_and_view_sections_course_details_navigation_dd10b45e: "Opdater og se sektioner, fagdetaljer, navigation, funktionsindstillinger og eksterne app-integrationer, alle kun synlige for instruktører."
@@ -24843,6 +24870,9 @@ da:
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
     one: "Du er ved at slette 1 diskussion. Er du sikker?"
     other: "Du er ved at slette %{count} diskussioner. Er du sikker?"
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
+    one: "Du er ved at slette 1 side. Er du sikker?"
+    other: "Du er ved at slette %{count} sider. Er du sikker?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Du er ved at miste eventuelle ændringer, som du endnu ikke har anvendt til din konto. 
       
@@ -25061,6 +25091,8 @@ da:
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "Du modtager ikke nogen %{contextType} meddelelser på dette tidspunkt. For at aktivere %{contextType} meddelelser, kan du skifte ovenfor."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Du modtager ikke fagmeddelelser på nuværende tidspunkt. For at aktivere fagmeddelelser skal du bruge knappen ovenfor."
   your_answer_8dad6ea4: "Dit svar:"
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Din opgave %{assignment_name} skal afleveres den %{due_at}."
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Din opgave %{assignment_name} skal afleveres den %{due_at}. Klik på følgende link for at besøge din opgave og få den afleveret i tide:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din opgavelsite kan nu findes på *Kalender* siden."
   your_assignments_list_has_improved_3eded80e: "Din *opgaveliste* er forbedret!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Dine opgaver vil blive vist her sorteret efter forfaldsdato."
