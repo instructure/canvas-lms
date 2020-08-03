@@ -405,6 +405,7 @@ zh-Hant:
   account_id_2c3b4f15: "帳戶 ID"
   account_id_73966078: account_id
   account_id_f6e26867: "帳戶 ID"
+  account_level_mastery_scales_a5bdff29: 帳戶級掌握程度
   account_level_notification_preferences_require_an__66467cd7: "帳戶級別通知偏好需要 account_id 以更新"
   account_level_notification_preferences_ui_update_f5e189a4: "帳戶級別通知偏好 UI 更新"
   account_level_settings_manage_4fca6f8e: "帳戶級別設定 - 管理"
@@ -417,6 +418,9 @@ zh-Hant:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: 帳戶通知結束時間在開始時間之前
+  account_notification_settings_error_page_66c0bc61: 帳戶通知設定錯誤頁面
+  account_notification_settings_initial_query_error_f55e1cbf: 帳戶通知設定初始查詢錯誤
+  account_notification_settings_updated_dbabec35: 帳戶通知設定已更新
   account_notifications: 
     announcement_created_notice: 宣告已成功創建
     announcement_creation_failed_notice: 宣告創建失敗
@@ -1286,6 +1290,7 @@ zh-Hant:
         report_last_run: 上次執行
         report_name: 名稱
       headings: 
+        privacy: 隱私權
         quotas: 帳戶配額
         sections: 報告
         settings: 帳戶設置
@@ -1316,6 +1321,8 @@ zh-Hant:
         enable_alerts: "警示（Beta 版）"
         enable_course_catalog: 在該元帳戶中顯示可被搜尋的課程清單，啟用「將該課程加入公開課程索引」新增標記。
         enable_eportfolios: 電子檔案袋
+        enable_fullstory: "允許使用 FullStory 追蹤"
+        enable_google_analytics: "允許使用 Google Analytics 追蹤"
         enable_profiles: 啟用個人檔案
         enable_turnitin: Turnitin
         enable_user_notes: 教職員日誌
@@ -1411,7 +1418,7 @@ zh-Hant:
       open_report_description: 公開報告說明
       page_header_title: 帳戶設置
       page_title: 共用內容
-      quiz_ip_filters_delete: 刪除篩選器
+      quiz_ip_filters_delete: "移除測驗 IP 篩選器"
       quiz_ip_filters_help_message: |-
           測驗 IP 篩選器是一種將對測驗的訪問限制在指定的 IP 範圍內的電腦的控制方法。
           
@@ -1444,6 +1451,7 @@ zh-Hant:
       tab_announcements: 通告
       tab_external_tools: 應用程式
       tab_notifications: 通知
+      tab_privacy: 隱私權
       tab_quotas: 配額
       tab_reports: 報告
       tab_settings: 設置
@@ -2038,6 +2046,7 @@ zh-Hant:
   allow_multiple_attempts_e67a0a37: 允許多次嘗試
   allow_opt_out_of_inbox: "允許使用者選擇退出交談的收件匣。這將導致所有交談訊息和通知作為 ASAP 通知傳送到使用者的主要電子郵箱，隱藏交談收件匣中未讀取訊息標記，並且隱藏交談的通知偏好設定。"
   allow_outcome_extra_credit_57c1e84e: 允許成果額外加分
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: 允許批量刪除頁面
   allow_passive_acceptance_of_terms_of_service_63ef5994: 允許被動接受服務條款
   allow_postable_submission_comments_a301b742: 允許可公佈提交項目評論
   allow_reorder_dashboard_cards_78215947: 允許重新排列計分卡
@@ -2060,6 +2069,7 @@ zh-Hant:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: 允許使用者於學生群組卡上存取「作為使用者」連結
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "允許使用者於其他使用者的登入詳細資料中查看 SIS ID。"
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "允許使用者於課程成員頁面中查看使用者 SIS ID。"
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: 允許帳戶級掌握程度和能力計算，取代依結果程度
   allows_admin_user_to_view_account_statistics_341f00d9: 允許管理員使用者查看帳戶統計數據。
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       允許管理員檢視包含關於所有最近運行的
@@ -4969,6 +4979,7 @@ zh-Hant:
   click_here_to_see_the_file_79e2b366: 按一下此處以檢視文檔。
   click_here_to_view_ec8cb2fd: 按一下此處以檢視
   click_here_to_view_the_submission_24777a69: 按一下此處檢視提交項目
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: 點擊此處瀏覽您的作業並準時進入！
   click_ok_to_continue_deleting_this_role_baa9d9e2: 點撃「確定」以繼續刪除此角色。
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: 當快照拍攝好時，點擊快照可恢復為您的試用版本。注：您將失去自拍攝快照以來所做的任何工作，而且無法撤銷！
   click_on_the_account_navigation_button_to_access_n_fbe82181: 點擊帳戶導航工具按鈕以存取通知偏好設定。
@@ -7878,6 +7889,7 @@ zh-Hant:
   delete_grading_scheme_6b308832: 刪除評分方案
   delete_grading_scheme_title_215f0a40: "刪除等級評分方式 %{title}"
   delete_group_86c381ec: 刪除群組
+  delete_in_progress_2d3f0e0d: 進行刪除中
   delete_key_developername_be80e695: "刪除鍵%{developerName}"
   delete_key_name_c2de8c0c: "刪除鍵%{name}"
   delete_my_account_41060aad: 刪除我的帳戶
@@ -7897,6 +7909,7 @@ zh-Hant:
   delete_section_name_a48d9d79: "刪除班別 \"%{name}”"
   delete_selected_a023ccf8: 刪除所選項
   delete_selected_announcements_69e23710: 刪除所選通告
+  delete_selected_pages_7bc50580: 刪除選取的頁面
   delete_survey_56fddbbd: 刪除調查
   delete_term_name_f707abc9: "刪除學期%{name}"
   delete_theme_918a7f24: 刪除外觀主題？
@@ -9656,6 +9669,7 @@ zh-Hant:
   failed_to_delete_discussion_title_986df717: "無法刪除討論區%{title}"
   failed_to_delete_external_feed_36f19d70: 無法刪除外部摘要
   failed_to_delete_role_label_27959de3: "無法刪除身份%{label}"
+  failed_to_delete_selected_pages_26fa87db: 無法刪除選取的頁面
   failed_to_export_some_tool_settings_c992fc56: 無法匯出某些工具設定
   failed_to_import_media_objects_4c1fcb4f: 無法導出媒體對象
   failed_to_laod_more_submissions_990aacee: 無法載入更多提交項目
@@ -9673,6 +9687,7 @@ zh-Hant:
   failed_to_save_please_try_again_later_bb7070fb: 無法保存，請稍後再試一次
   failed_to_submit_draft_comment_1de83451: 提交草稿評論失敗
   failed_to_unpin_discussion_503eab82: 無法取消釘選討論區
+  failed_to_update_account_notification_settings_194c1cd4: 無法更新帳戶通知設定
   failed_to_update_course_notification_settings_cbf0eb18: 無法更新課程通知設定
   failed_to_update_discussion_23cc229a: 無法更新討論區
   failed_to_update_permission_33c493f: 無法更新權限
@@ -12772,6 +12787,7 @@ zh-Hant:
   loading_courses_started_6e6d742c: 開始載入課程
   loading_data_ecd89ba: 載入資料中..
   loading_discussions_8ed5fcd7: 載入討論區
+  loading_external_tool_d839042c: 正在載入外部工具
   loading_f99d93d4: "...載入中"
   loading_features_d26820f6: 載入功能
   loading_folders_d8b5869e: 正在載入資料夾
@@ -13074,6 +13090,7 @@ zh-Hant:
   master_lock_590266b6: 主鎖
   mastered_34d4c857: 掌握
   mastery_7ec348b5: 掌握程度
+  mastery_connect_64598f55: 掌握程度連線
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "精通：%{n_mastery_points_precision_2_str} 分數"
   mastery_path_processing_f4471152: 正在處理掌握歷程
   mastery_paths_breakdown_6e0b5fce: 精通路徑分解
@@ -13082,6 +13099,7 @@ zh-Hant:
   mastery_paths_editor_930655bb: 路徑編輯器
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: 已暫時停用掌握歷程選取功能以便進行維護。
   mastery_points_f1672cc: 掌握程度分數
+  mastery_scale_abbc3557: 掌握程度
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: 精通得分反映了一項評分作業或測驗的最高分數。
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: 精通分數反映最近評分的任務或測驗。
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: 精通得分反映最近評分的作業或測驗的情況。
@@ -15634,6 +15652,7 @@ zh-Hant:
   next_mastery_path_is_currently_processing_f044d7d8: 下一個掌握歷程目前正在處理
   next_mastery_path_is_still_processing_please_perio_bb0121af: 下一掌握歷程仍然處理中，請定時重新整理頁面
   next_message_780bcf24: 下一個信息
+  next_module_item_19e835f3: 下一個單元項目
   next_module_item_9bb8a222: 下一個單元/項目
   next_month_749b1778: 下個月
   next_month_b55a387c: 下個月
@@ -16004,6 +16023,7 @@ zh-Hant:
       submission_graded: 提交件已評分
       submission_needs_grading: 提交件需要評分
       summaries: 摘要
+      upcoming_assignment_alert: 即將進行的作業提醒
       updated_wiki_page: 已更新的頁面
       web_conference_invitation: 網路會議邀請
       web_conference_recording_ready: 網路會議記錄就緒：
@@ -16565,6 +16585,7 @@ zh-Hant:
   package_error: "正在確認包類型時發生錯誤: %{error}"
   package_export_from_d6e2b073: 軟件包由……匯出
   page_50c4823d: 頁面
+  page_bulk_deleting_74860a80: 頁面批量刪除
   page_comment: 
     default_user_name: 匿名
   page_comments: 
@@ -17391,6 +17412,7 @@ zh-Hant:
   previous_export_c6a997f7: 上一次導出
   previous_message_8804f87e: 上一個訊息
   previous_module_item_2bb5e499: 上一個單元/項目
+  previous_module_item_a9e57348: 上一個單元項目
   previous_month_7adf1380: 上個月
   previous_month_bb1e3c84: 上個月
   previous_page_928fc112: 上一頁
@@ -19403,6 +19425,7 @@ zh-Hant:
   ratings_2433172b: 評級
   ratio_answered_correctly_b0c1e7d: "%{ratio}% 回答正確"
   ratio_responded_correctly_6d890107: "%{ratio}% 回答正確"
+  raw_html_editor_e3993e41: "原始 HTML 編輯器"
   rce_auto_save_f004fba9: "RCE 自動儲存"
   rce_enhancements_5701e06: "RCE 強化"
   rce_initialization_fix_4f176bda: "RCE 初始化修復程式"
@@ -20429,6 +20452,7 @@ zh-Hant:
   select_one_8e0af564: 選擇一個
   select_one_b647b384: 選擇一個
   select_one_of_the_options_c8b0c6e4: 選取一個選項：
+  select_page_e93fc123: 選取頁面
   select_prerequisite_module_57894963: 選取必修單元
   select_prerequite_module_e9042bb0: 選取必修單元
   select_rubric_2aa2ffa2: 選擇評分標準
@@ -20444,6 +20468,7 @@ zh-Hant:
   select_the_files_you_want_to_associate_with_this_m_82677c50: 選擇您想要關聯至此*單元*的檔案，或者透過選擇「新檔案」添加檔案。
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "選取您想連結的頁面或選取 \"新頁面\" 增加一個新頁面。"
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "選取您想與此 *單元* 連結的頁面或選取\"新頁面\"增加一個新頁面。"
+  select_title_for_deletion_45b08247: "選取要刪除的 %{title}"
   select_type_of_prerequisite_8d6fa902: 選取必修項目
   select_video_file_35b61d4e: 選擇視訊文檔
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: 選擇您希望在首頁上顯示的內容。
@@ -20459,6 +20484,7 @@ zh-Hant:
   selected_filename_7552a8c0: "已選擇%{filename}"
   selected_grade_942f40ba: 已選擇的評分
   selected_item_35bed33a: 選擇項目
+  selected_pages_have_been_deleted_82a7f965: 已刪除選取的頁面
   selected_subtree_a7693937: "已選定 %{subtree}"
   selection_end_date_10fcc8c6: 選擇結束日期
   selection_height_9d57ec24: 選擇高度
@@ -23764,6 +23790,7 @@ zh-Hant:
   untitled_assignment_59354b34: 無標題的作業
   unused_courses_title: 未使用的課程
   up_c553575d: 向上
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "即將到來的截止日期 - %{assignment_name}, %{course_name}"
   update_374eb54: 更新
   update_4d8ee62: 更新
   update_and_view_sections_course_details_navigation_dd10b45e: |-
@@ -24812,6 +24839,9 @@ zh-Hant:
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
     one: "您即將刪除 %{count} 個討論區。您是否確定？"
     other: "您即將刪除 %{count} 個討論區。您是否確定？"
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
+    one: "您即將刪除 %{count} 個頁面。您是否確定？"
+    other: "您即將刪除 %{count} 個頁面。您是否確定？"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       您將會丟失未應用于您帳戶的改動。
       
@@ -25029,6 +25059,8 @@ zh-Hant:
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "此時您將不會收到任何 %{contextType} 通知。若要啟用 %{contextType} 通知 ，請使用以上的切換。"
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: 此時您將不會收到任何課程通知。若要啟用通知，請使用以上的切換。
   your_answer_8dad6ea4: 您的答案：
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: "您的作業 %{assignment_name} 在 %{due_at} 截止。"
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "您的作業 %{assignment_name} 在 %{due_at} 截止。點擊以下的連結瀏覽您的作業並準時進入："
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "您的任務列表現在可以在 *月曆* 頁面上找到。"
   your_assignments_list_has_improved_3eded80e: "您的 *任務* 列表已改進！"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 您的任務將顯示在此處，按截止日期列出。
