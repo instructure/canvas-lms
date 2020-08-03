@@ -252,4 +252,145 @@ describe ExternalContentController do
     end
   end
 
+  describe '#oembed_retrieve' do
+    subject do
+      get(:oembed_retrieve, params: params)
+      response
+    end
+
+    let(:oembed_resource) do
+      {
+        "height" => 75,
+        "html" => "<img src=\"www.test.edu/foo.svg\" alt=\"Read This\" width=\"75\" height=\"75\" style=\"background-color:\n#ffcc00;\"/>",
+        "type" => "rich",
+        "version" => "1.0",
+        "width" => 75
+      }
+    end
+
+    let(:endpoint) { 'https://www.test.edu/new/oembed-endpoint?img=21&color=ffcc00' }
+    let(:expected_oembed_uri) { "#{endpoint}&url=#{CGI.escape(url)}&format=json" }
+    let(:oembed_token) { '' }
+    let(:params) { { endpoint: endpoint, url: url } }
+    let(:success_double) { double('success', body: oembed_resource.to_json) }
+    let(:tool) { external_tool_model }
+    let(:url) { 'https://www.test.edu/new_actionicons/oembed-endpoint' }
+    let(:user) { user_model }
+
+    before { allow(CanvasHttp).to receive(:get).and_return(success_double) }
+
+    it 'embeds oembed objects' do
+      expect(CanvasHttp).to receive(:get).with(expected_oembed_uri)
+      expect(subject).to be_success
+    end
+
+    context 'With "use_oembed_token" enabed' do
+      let(:oembed_token) do
+        unsigned_token = JSON::JWT.new(
+          {
+            sub: sub,
+            iss: iss,
+            aud: aud,
+            iat: iat,
+            exp: exp,
+            jti: jti,
+            endpoint: endpoint,
+            url: url
+          }
+        )
+        unsigned_token.sign(tool.shared_secret).to_s
+      end
+
+      let(:aud) { Canvas::Security.config['lti_iss'] }
+      let(:exp) { iat + 5.minutes.seconds.to_i }
+      let(:iat) { Time.zone.now.to_i }
+      let(:iss) { tool.consumer_key }
+      let(:jti) { SecureRandom.uuid }
+      let(:params) { { oembed_token: oembed_token } }
+      let(:sub) { Lti::Asset.opaque_identifier_for(user) }
+
+      before { Account.site_admin.enable_feature!(:use_oembed_token) }
+
+      context 'and an active user session' do
+        before { user_session(user) }
+
+        it 'embeds oembed objects' do
+          expect(CanvasHttp).to receive(:get).with(expected_oembed_uri)
+          expect(subject).to be_success
+        end
+
+        context 'when the user has changed' do
+          before { user_session(user_model) }
+
+          it { is_expected.to be_unauthorized }
+        end
+
+        context 'when the token is expired' do
+          let(:exp) { 2.days.ago.to_i }
+
+          it { is_expected.to be_unauthorized }
+        end
+
+        context 'when the audience differs from the expected' do
+          let(:aud) { 'https://not.expected.audience' }
+
+          it { is_expected.to be_unauthorized }
+        end
+
+        context 'when the JTI has been seen already' do
+          let(:static_uuid) { "d219444f-a608-45c3-b81b-74bf6ac7da25" }
+
+          before do
+            allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
+            # record the JTI as used
+            get(:oembed_retrieve, params: params)
+          end
+
+          it { is_expected.to be_unauthorized }
+        end
+
+        context 'when the issuer is not found' do
+          let(:iss) { "#{tool.consumer_key}-no-tool-here" }
+
+          it { is_expected.to be_not_found }
+        end
+
+        context 'when the iss identifies a tool from another account' do
+          let(:root_account_two) { account_model }
+          let(:tool_two) { external_tool_model(context: root_account_two) }
+          let(:iss) { 'second-tool-consumer-key' }
+
+          before { tool_two.update!(consumer_key: iss) }
+
+          it { is_expected.to be_not_found }
+        end
+
+        context 'when the issuer secret yields the wrong signature' do
+          before do
+            oembed_token
+            tool.update!(shared_secret: 'super secret')
+          end
+
+          it { is_expected.to be_unauthorized }
+        end
+
+        context 'when the "oembed_token" parameter is empty' do
+          let(:params) { {} }
+
+          it { is_expected.to be_bad_request }
+        end
+
+        context 'when the "oembed_token" parameter is not a JWT' do
+          let(:oembed_token) { '123' }
+
+          it { is_expected.to be_bad_request }
+        end
+      end
+
+      context 'when there is no user session' do
+        it { is_expected.to redirect_to '/login' }
+      end
+    end
+
+  end
 end
