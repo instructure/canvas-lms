@@ -405,6 +405,7 @@ es:
   account_id_2c3b4f15: "Identificación de la cuenta"
   account_id_73966078: account_id
   account_id_f6e26867: "ID de cuenta"
+  account_level_mastery_scales_a5bdff29: "Escalas de dominio a nivel de la cuenta"
   account_level_notification_preferences_require_an__66467cd7: "Las preferencias de notificación de los niveles de las cuentas requieren una account_id para actualizarse"
   account_level_notification_preferences_ui_update_f5e189a4: "Actualización de la IU de preferencias de notificaciones a nivel de la cuenta"
   account_level_settings_manage_4fca6f8e: "Configuraciones del nivel de la cuenta: administrar"
@@ -417,6 +418,9 @@ es:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "La hora de finalización de la notificación de la cuenta es anterior a la hora de inicio"
+  account_notification_settings_error_page_66c0bc61: "Página de error de las configuraciones de notificación de la cuenta"
+  account_notification_settings_initial_query_error_f55e1cbf: "Error de consulta inicial de las configuraciones de notificación de la cuenta"
+  account_notification_settings_updated_dbabec35: "Se actualizaron las configuraciones de notificación de la cuenta"
   account_notifications: 
     announcement_created_notice: "Anuncio creado con éxito"
     announcement_creation_failed_notice: "Falló la creación del anuncio"
@@ -1286,6 +1290,7 @@ es:
         report_last_run: "Última ejecución"
         report_name: Nombre
       headings: 
+        privacy: Privacidad
         quotas: "Capacidades de almacenamiento de cuenta"
         sections: Informes
         settings: "Configuraciones de cuenta"
@@ -1316,6 +1321,8 @@ es:
         enable_alerts: "Alertas (beta)"
         enable_course_catalog: "Muestra una lista de cursos en la que se puede buscar para esta cuenta raíz con el marcador \"Incluya este curso en el índice de cursos públicos\" habilitado."
         enable_eportfolios: "Portafolios electrónicos"
+        enable_fullstory: "Permitir hacer un seguimiento con FullStory"
+        enable_google_analytics: "Permitir hacer un seguimiento con Google Analytics"
         enable_profiles: "Permitir perfiles"
         enable_turnitin: Turnitin
         enable_user_notes: "Diario del Docente"
@@ -1411,7 +1418,7 @@ es:
       open_report_description: "Abrir descripción del informe"
       page_header_title: "Configuraciones de cuenta"
       page_title: "Configuraciones de cuenta"
-      quiz_ip_filters_delete: "Eliminar filtro"
+      quiz_ip_filters_delete: "Eliminar filtro de IP para exámenes"
       quiz_ip_filters_help_message: |-
           Los filtros de IP para exámenes son una forma de limitar el acceso a los exámenes en computadoras en un rango específico de IP.
           
@@ -1444,6 +1451,7 @@ es:
       tab_announcements: Anuncios
       tab_external_tools: Aplicaciones
       tab_notifications: Notificaciones
+      tab_privacy: Privacidad
       tab_quotas: "Capacidades de almacenamiento"
       tab_reports: Informes
       tab_settings: Configuraciones
@@ -2038,6 +2046,7 @@ es:
   allow_multiple_attempts_e67a0a37: "Permitir múltiples intentos"
   allow_opt_out_of_inbox: "Permitir a los usuarios autoexcluirse de la bandeja de entrada de Mensajería. Esto hará que todos los mensajes y notificaciones de conversaciones se envíen como notificaciones lo antes posible al correo electrónico principal del usuario, se oculte la insignia de mensajes no leídos de la bandeja de entrada de Mensajería en la bandeja de entrada y se oculten las preferencias de notificación de Mensajería."
   allow_outcome_extra_credit_57c1e84e: "Permitir crédito adicional de la competencia"
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: "Permita eliminar páginas en bloque"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Permitir aceptación pasiva de los Términos de Servicio"
   allow_postable_submission_comments_a301b742: "Permitir comentarios sobre la entrega que se puedan publicar"
   allow_reorder_dashboard_cards_78215947: "Permitir la reorganización de las tarjetas del tablero"
@@ -2060,6 +2069,7 @@ es:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Permite a un usuario acceder al vínculo Actuar como usuario en las tarjetas de contexto del estudiante."
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Permite a un usuario ver la ID de SIS en los detalles de inicio de sesión de un usuario."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Permite a un usuario ver las ID de SIS en una página de Personas del curso."
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: "Permite las escalas de dominio a nivel de la cuenta y los cálculos de aptitud, y reemplaza las escalas según resultado"
   allows_admin_user_to_view_account_statistics_341f00d9: "Permite al usuario administrador ver las estadísticas de la cuenta."
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Permite a los administradores ver un registro que contiene información sobre todas las mutaciones
@@ -4969,6 +4979,7 @@ es:
   click_here_to_see_the_file_79e2b366: "Haga clic aquí para ver el archivo."
   click_here_to_view_ec8cb2fd: "haga clic aquí para ver"
   click_here_to_view_the_submission_24777a69: "Haga clic aquí para ver la entrega"
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: "Haga clic aquí para ir a su tarea y tenerla a tiempo."
   click_ok_to_continue_deleting_this_role_baa9d9e2: "Haga clic en \"Aceptar\" para continuar y eliminar este rol."
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Hacer clic en la instantánea para volver su versión de prueba al momento en que se tomó la instantánea. Nota: se perderá todo el trabajo que haya realizado desde que se tomó la instantánea y no podrá deshacerse."
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Haga clic en el botón de navegación de la cuenta para acceder a las preferencias de notificación."
@@ -7878,6 +7889,7 @@ es:
   delete_grading_scheme_6b308832: "Eliminar el esquema de calificaciones"
   delete_grading_scheme_title_215f0a40: "Eliminar esquema de calificaciones %{title}"
   delete_group_86c381ec: "Eliminar grupo"
+  delete_in_progress_2d3f0e0d: "Eliminación en progreso"
   delete_key_developername_be80e695: "Borrar clave %{developerName}"
   delete_key_name_c2de8c0c: "Borrar clave %{name}"
   delete_my_account_41060aad: "Eliminar mi cuenta"
@@ -7897,6 +7909,7 @@ es:
   delete_section_name_a48d9d79: "Eliminar la sección \"%{name}\""
   delete_selected_a023ccf8: "Eliminar lo seleccionado"
   delete_selected_announcements_69e23710: "Eliminar los anuncios seleccionados"
+  delete_selected_pages_7bc50580: "Eliminar las páginas seleccionadas"
   delete_survey_56fddbbd: "Eliminar encuesta"
   delete_term_name_f707abc9: "Eliminar período %{name}"
   delete_theme_918a7f24: "¿Eliminar tema?"
@@ -9657,6 +9670,7 @@ es:
   failed_to_delete_discussion_title_986df717: "Error al eliminar el foro de discusión %{title}"
   failed_to_delete_external_feed_36f19d70: "No se pudo eliminar el feed externo"
   failed_to_delete_role_label_27959de3: "No se pudo eliminar el rol %{label}"
+  failed_to_delete_selected_pages_26fa87db: "No se pudieron eliminar las páginas seleccionadas"
   failed_to_export_some_tool_settings_c992fc56: "Falló la exportación de la configuración de algunas herramientas"
   failed_to_import_media_objects_4c1fcb4f: "Se produjo un error al importar los objetos de multimedia"
   failed_to_laod_more_submissions_990aacee: "Falló la carga de más presentaciones"
@@ -9674,6 +9688,7 @@ es:
   failed_to_save_please_try_again_later_bb7070fb: "No se pudo guardar. Inténtelo más tarde"
   failed_to_submit_draft_comment_1de83451: "No se pudo entregar el comentario del borrador"
   failed_to_unpin_discussion_503eab82: "No se pudo desmarcar el debate"
+  failed_to_update_account_notification_settings_194c1cd4: "No se pudieron actualizar las configuraciones de notificación de la cuenta"
   failed_to_update_course_notification_settings_cbf0eb18: "No se pudieron actualizar las configuraciones de las notificaciones del curso"
   failed_to_update_discussion_23cc229a: "Error al actualizar el foro de discusión"
   failed_to_update_permission_33c493f: "No se pudo actualizar el permiso"
@@ -12566,7 +12581,7 @@ es:
   let_students_see_the_correct_answers_dacc2faf: "Permitir que los estudiantes vean las respuestas correctas"
   let_students_see_their_quiz_responses_fbc07d14: "Permitir que los estudiantes vean sus respuestas en las evaluaciones"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Permitir que los estudiantes vean sus respuestas del cuestionario (las respuestas incorrectas se marcarán en la devolución del estudiante)"
-  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Permitirle al administrador del sitio seleccionar hasta 2 aplicaciones LTI favoritas, que luego se mostrarán en la barra de herramientas del RCE"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Permitirle al administrador del sitio seleccionar hasta 2 aplicaciones LTI favoritas, que luego se mostrarán en la barra de herramientas del RCE"
   letter_grade_29ff1938: "Calificación por letra"
   letter_grade_f00fedc4: "letra de calificación"
   level_5fdf654a: Nivel
@@ -12776,6 +12791,7 @@ es:
   loading_courses_started_6e6d742c: "Carga de cursos iniciada"
   loading_data_ecd89ba: "Cargando datos..."
   loading_discussions_8ed5fcd7: "Cargando foros de discusión"
+  loading_external_tool_d839042c: "Cargando herramienta externa"
   loading_f99d93d4: "...cargando"
   loading_features_d26820f6: "Cargando funciones"
   loading_folders_d8b5869e: "Cargando carpetas"
@@ -13078,6 +13094,7 @@ es:
   master_lock_590266b6: "Bloqueo maestro"
   mastered_34d4c857: Dominado
   mastery_7ec348b5: Dominio
+  mastery_connect_64598f55: "Conexión de dominio"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Dominio: %{n_mastery_points_precision_2_str} Puntos"
   mastery_path_processing_f4471152: "Procesamiento del camino hacia el dominio"
   mastery_paths_breakdown_6e0b5fce: "Desglose de los caminos del dominio"
@@ -13086,6 +13103,7 @@ es:
   mastery_paths_editor_930655bb: "Editor de las rutas de dominio"
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: "La selección de caminos hacia el dominio se desactivó temporalmente para su mantenimiento."
   mastery_points_f1672cc: "puntos de dominio"
+  mastery_scale_abbc3557: "Escala de dominio"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "El puntaje del dominio refleja el puntaje máximo de una tarea o examen calificado."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "La puntuación de dominio refleja la tarea o evaluación puntuada más recientemente."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "El puntaje del dominio refleja la tarea o el examen calificado más recientemente."
@@ -15639,6 +15657,7 @@ es:
   next_mastery_path_is_currently_processing_f044d7d8: "El siguiente camino hacia el dominio se está procesando en este momento"
   next_mastery_path_is_still_processing_please_perio_bb0121af: "El siguiente camino hacia el dominio aún se está procesando. Actualice la página periódicamente."
   next_message_780bcf24: "Siguiente mensaje"
+  next_module_item_19e835f3: "Ítem del módulo siguiente"
   next_module_item_9bb8a222: "Siguiente módulo/Item"
   next_month_749b1778: "Próximo mes"
   next_month_b55a387c: "Próximo mes"
@@ -16009,6 +16028,7 @@ es:
       submission_graded: "La entrega fue calificada"
       submission_needs_grading: "La entrega requiere calificaciones"
       summaries: Resúmenes
+      upcoming_assignment_alert: "Alerta de tareas próxima"
       updated_wiki_page: "Página actualizada"
       web_conference_invitation: "Invitación a conferencia en línea"
       web_conference_recording_ready: "Grabación de la conferencia en línea lista"
@@ -16570,6 +16590,7 @@ es:
   package_error: "Error al identificar el tipo de paquete: %{error}"
   package_export_from_d6e2b073: "Paquete exportado de"
   page_50c4823d: Página
+  page_bulk_deleting_74860a80: "Eliminación de páginas en bloque"
   page_comment: 
     default_user_name: Anónimo
   page_comments: 
@@ -17401,6 +17422,7 @@ es:
   previous_export_c6a997f7: "Exportación anterior"
   previous_message_8804f87e: "Mensaje Previo"
   previous_module_item_2bb5e499: "Módulo/Item previo"
+  previous_module_item_a9e57348: "Ítem del módulo anterior"
   previous_month_7adf1380: "Mes anterior"
   previous_month_bb1e3c84: "Mes anterior"
   previous_page_928fc112: "Página anterior"
@@ -19410,6 +19432,7 @@ es:
   ratings_2433172b: Calificaciones
   ratio_answered_correctly_b0c1e7d: "%{ratio}% contestadas correctamente"
   ratio_responded_correctly_6d890107: "%{ratio}% respondidas correctamente"
+  raw_html_editor_e3993e41: "Editor HTML puro"
   rce_auto_save_f004fba9: "Guardado automático del editor de contenido enriquecido (RCE)"
   rce_enhancements_5701e06: "Mejoras del editor de contenidos"
   rce_initialization_fix_4f176bda: "Arreglo de iniciación del RCE"
@@ -20436,6 +20459,7 @@ es:
   select_one_8e0af564: "Seleccionar uno"
   select_one_b647b384: "Seleccionar uno"
   select_one_of_the_options_c8b0c6e4: "Seleccionar una de las siguientes opciones."
+  select_page_e93fc123: "Seleccionar página"
   select_prerequisite_module_57894963: "Seleccionar módulo de prerrequisitos"
   select_prerequite_module_e9042bb0: "Seleccionar módulo de requisitos"
   select_rubric_2aa2ffa2: "Seleccionar rúbrica"
@@ -20451,6 +20475,7 @@ es:
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Seleccione los archivos que desea asociar con este *módulo* o agregue archivos seleccionando \"Archivos nuevos\" (New File(s))."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Seleccione la página que usted desea vincular o agregue una nueva página al seleccionar la opción \"New Page\" (Nueva página)."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Seleccione la página que usted desea vincular con este *módulo* o agregue una nueva página al seleccionar la opción \"Nueva página\"."
+  select_title_for_deletion_45b08247: "Seleccionar %{title} para su eliminación"
   select_type_of_prerequisite_8d6fa902: "Seleccionar el tipo de prerrequisito"
   select_video_file_35b61d4e: "Seleccionar archivo de video"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Seleccione lo que desee que aparezca en la página de inicio."
@@ -20466,6 +20491,7 @@ es:
   selected_filename_7552a8c0: "%{filename} seleccionado"
   selected_grade_942f40ba: "Calificación seleccionada"
   selected_item_35bed33a: "elemento seleccionado"
+  selected_pages_have_been_deleted_82a7f965: "Se eliminaron las páginas seleccionadas"
   selected_subtree_a7693937: "%{subtree} seleccionado"
   selection_end_date_10fcc8c6: "Selección de la fecha de fin"
   selection_height_9d57ec24: "Altura de la selección"
@@ -22448,7 +22474,7 @@ es:
                      JavaScript que se ejecuta en su instancia de Canvas. Puede agregar manualmente
                      hasta %{max_domains} dominios permitidos. Se recomiendan los comodines
                      (por ejemplo, *.instructure.com). Los dominios de Canvas y de Instructure se incluyen
-                     automáticamente y no cuentan en su límite de 50 dominios.
+                     automáticamente y no cuentan en su límite de 50 dominios.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       La página de inicio del curso es la primera página que los estudiantes ven cuando abren
             su curso. La página de inicio puede mostrar el flujo de participación
@@ -22604,7 +22630,7 @@ es:
   there_are_no_unsaved_changes_9276e87c: "No hay cambios sin guardar"
   there_are_no_unsynced_changes_4e8f0838: "No hay cambios sin sincronizar"
   there_are_no_unsynched_changes_d208547c: "No hay cambios no sincronizados"
-  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Existe un límite de ubicación de 2 aplicaciones dentro de la barra de herramientas del RCE. Esta configuración solo se aplica al RCE mejorado."
+  there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Existe un límite de ubicación de 2 aplicaciones dentro de la barra de herramientas del RCE. Esta configuración solo se aplica al RCE mejorado."
   there_is_currently_1_available_grader_758e4a21: "Actualmente hay 1 calificador disponible"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Hubo un fallo al cerrar la sesión en su IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Hubo un problema al crear la columna de observaciones del maestro."
@@ -23768,6 +23794,7 @@ es:
   untitled_assignment_59354b34: "tarea sin título"
   unused_courses_title: "Cursos no utilizados"
   up_c553575d: Arriba
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "Fecha de entrega próxima - %{assignment_name}, %{course_name}"
   update_374eb54: actualizar
   update_4d8ee62: Actualizar
   update_and_view_sections_course_details_navigation_dd10b45e: |-
@@ -24817,6 +24844,9 @@ es:
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
     one: "Está a punto de eliminar 1 foro de discusión. ¿Está seguro?"
     other: "Está a punto de eliminar %{count} foros de discusión. ¿Está seguro?"
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
+    one: "Está por eliminar 1 página. ¿Está seguro?"
+    other: "Está por eliminar %{count} páginas. ¿Está seguro?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Está a punto de perder los cambios que aún no se han aplicado a su cuenta.
       ¿Todavía desea proceder?
@@ -25036,6 +25066,8 @@ es:
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "En este momento, no recibirá ninguna notificación de %{contextType}. Para activar las notificaciones de %{contextType}, use el botón para activar/desactivar anterior."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "No recibirá ninguna notificación del curso en este momento. Para habilitar las notificaciones del curso, use el botón activar/desactivar que se encuentra arriba."
   your_answer_8dad6ea4: "Su respuesta:"
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Su tarea %{assignment_name} debe entregarse el %{due_at}."
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Su tarea %{assignment_name} debe entregarse el %{due_at}. Haga clic en el siguiente enlace para ir a su tarea y tenerla a tiempo:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Puede encontrar su lista de tareas en la página *Calendario*."
   your_assignments_list_has_improved_3eded80e: "Ha mejorado su lista de *Tareas*"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Sus tareas se mostrarán aqui, ordenadas por fecha de vencimiento"
