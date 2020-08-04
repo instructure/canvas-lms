@@ -34,7 +34,7 @@
   {{/if}}
 
   {{#if CAN.EDIT_ROLES}}
-    <div class="control-group options">
+    <div class="responsive-control-group options">
       <label class="control-label"><strong>{{#t "options_label"}}Options{{/t}}</strong></label>
       <div class="controls">
         <label id="editing_roles_label"  for="editing_roles">{{t "Can edit this page role selection"}}</label>
@@ -48,27 +48,27 @@
             <option value="members,public"{{#if IS.ANYONE_ROLE}} selected{{/if}}>{{#t "editing_roles.anyone"}}Anyone{{/t}}</option>
           {{/if}}
         </select>
+        {{#if ENV.CAN_SET_TODO_DATE}}
+          <div class="controls-section">
+            <label for="student_planner_checkbox" class="checkbox">
+            <input value="1" type="checkbox" id="student_planner_checkbox" name="student_planner_checkbox" {{checkedIf todo_date}} />
+              {{#t}}Add to student to-do{{/t}}
+            </label>
+            <div id="todo_date_container" />
+          </div>
+        {{/if}}
+        {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
+          <div class="controls-section">
+            <label class="checkbox" for="conditional_content">
+              {{checkbox "assignment.set_assignment"
+                id="conditional_content"
+                class="element_toggler"
+                checked=set_assignment}}
+              {{#t}}Allow in mastery paths{{/t}}
+            </label>
+          </div>
+        {{/if}}
       </div>
-      {{#if ENV.CAN_SET_TODO_DATE}}
-        <div class="controls">
-          <label for="student_planner_checkbox" class="checkbox">
-          <input value="1" type="checkbox" id="student_planner_checkbox" name="student_planner_checkbox" {{checkedIf todo_date}} />
-            {{#t}}Add to student to-do{{/t}}
-          </label>
-          <div id="todo_date_container" />
-        </div>
-      {{/if}}
-      {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
-        <div class="controls">
-          <label class="checkbox" for="conditional_content">
-            {{checkbox "assignment.set_assignment"
-              id="conditional_content"
-              class="element_toggler"
-              checked=set_assignment}}
-            {{#t}}Allow in mastery paths{{/t}}
-          </label>
-        </div>
-      {{/if}}
     </div>
   {{/if}}
 </div>
