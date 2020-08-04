@@ -102,6 +102,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_update :clear_streams_if_not_published
   after_update :clear_non_applicable_stream_items_for_sections
   after_update :clear_non_applicable_stream_items_for_delayed_posts
+  after_update :clear_non_applicable_stream_items_for_locked_modules
   after_create :create_participant
   after_create :create_materialized_view
 
@@ -903,6 +904,8 @@ class DiscussionTopic < ActiveRecord::Base
       false
     elsif self.in_unpublished_module?
       false
+    elsif self.locked_by_module?
+      false
     else
       true
     end
@@ -940,6 +943,11 @@ class DiscussionTopic < ActiveRecord::Base
     ContextModule.joins(:content_tags).where(content_tags: { content_type: "DiscussionTopic", content_id: self }, workflow_state: 'unpublished').exists?
   end
 
+  def locked_by_module?
+    return false unless self.context_module_tags.any?
+    ContentTag.where(content_type: "DiscussionTopic", content_id: self, workflow_state: "active").all? { |tag| tag.context_module.unlock_at&.future? }
+  end
+
   def clear_non_applicable_stream_items_for_sections
     # either changed sections or made section specificness
     return unless self.is_section_specific? ? @sections_changed : self.is_section_specific_before_last_save
@@ -971,6 +979,22 @@ class DiscussionTopic < ActiveRecord::Base
     stream_item&.stream_item_instances&.find_each do |item|
       user_ids.push(item.user_id)
       item.destroy
+    end
+    self.clear_stream_item_cache_for(user_ids)
+  end
+
+  def clear_non_applicable_stream_items_for_locked_modules
+    return unless self.locked_by_module?
+    send_later_if_production(:clear_stream_items_for_locked_modules)
+  end
+
+  def clear_stream_items_for_locked_modules
+    user_ids = []
+    stream_item&.stream_item_instances&.find_each do |item|
+      if self.locked_by_module_item?(item.user)
+        user_ids.push(item.user_id)
+        item.destroy
+      end
     end
     self.clear_stream_item_cache_for(user_ids)
   end
