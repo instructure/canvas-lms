@@ -669,6 +669,9 @@ legend + .control-group {
   .controls {
     margin-#{direction(left)}: $horizontalComponentOffset;
   }
+  .controls .controls-section {
+    margin-top: 5px;
+  }
   // Remove bottom margin on block level help text since that's accounted for on .control-group
   .help-block {
     margin-bottom: 0;
@@ -725,6 +728,10 @@ legend + .control-group {
 }
 
 @include desktop-only {
+  .form-horizontal .responsive-control-group {
+    margin-bottom: $baseLineHeight;
+  }
+
   .form-horizontal .responsive-button-container {
     margin-left: $horizontalComponentOffset;
   }
