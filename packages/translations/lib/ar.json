@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "الأبعاد"
     },
-    "directionality_ebcae6d0": {
-        "message": "الاتجاهية"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "تعطيل المعاينة الداخلية."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "متأخر"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "من اليسار لليمين"
     },
     "link_7262adec": {
         "message": "ارتباط"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "محرر محتوى"
-    },
-    "right_to_left_ec223c81": {
-        "message": "من اليمين لليسار"
     },
     "save_11a80ec3": {
         "message": "حفظ"

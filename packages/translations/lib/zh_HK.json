@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "尺寸"
     },
-    "directionality_ebcae6d0": {
-        "message": "方向"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "停用行中預覽。"
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "逾期"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "左到右"
     },
     "link_7262adec": {
         "message": "連結"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "多種格式的內容編輯器"
-    },
-    "right_to_left_ec223c81": {
-        "message": "右到左"
     },
     "save_11a80ec3": {
         "message": "儲存"

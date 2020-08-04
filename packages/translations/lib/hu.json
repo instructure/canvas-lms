@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Méretek"
     },
-    "directionality_ebcae6d0": {
-        "message": "irányítottság"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Letiltja a beágyazott előnézetet."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Késve"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "balról jobbra"
     },
     "link_7262adec": {
         "message": "Hivatkozás"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Vizuális szövegszerkesztő"
-    },
-    "right_to_left_ec223c81": {
-        "message": "jobbról balra"
     },
     "save_11a80ec3": {
         "message": "Mentés"

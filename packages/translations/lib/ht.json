@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Dimansyon"
     },
-    "directionality_ebcae6d0": {
-        "message": "direksyonalite"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Dezaktive apèsi an liy."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "An reta"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "de goch a dwat"
     },
     "link_7262adec": {
         "message": "Lyen"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Editè Kontni Rich"
-    },
-    "right_to_left_ec223c81": {
-        "message": "de dwat a goch"
     },
     "save_11a80ec3": {
         "message": "Anrejistre"

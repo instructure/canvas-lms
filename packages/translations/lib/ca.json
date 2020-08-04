@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Mides"
     },
-    "directionality_ebcae6d0": {
-        "message": "direccionalitat"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Desactiveu la visualització prèvia en línia."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Tardà"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "d''esquerra a dreta"
     },
     "link_7262adec": {
         "message": "Enllaç"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de contingut enriquit"
-    },
-    "right_to_left_ec223c81": {
-        "message": "de dreta a esquerra"
     },
     "save_11a80ec3": {
         "message": "Desa"

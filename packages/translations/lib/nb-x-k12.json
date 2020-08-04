@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensjoner"
     },
-    "directionality_ebcae6d0": {
-        "message": "retning"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Deaktiver forhåndsvisning av prosesslinjen."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Sent"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "venstre til høyre"
     },
     "link_7262adec": {
         "message": "Lenke"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Rich innholdsredigering"
-    },
-    "right_to_left_ec223c81": {
-        "message": "høyre til venstre"
     },
     "save_11a80ec3": {
         "message": "Lagre"

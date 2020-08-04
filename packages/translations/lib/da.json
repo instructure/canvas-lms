@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensioner"
     },
-    "directionality_ebcae6d0": {
-        "message": "retningsbestemthed"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Deaktiver in-line forhåndsvisning."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Sen"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "venstre til højre"
     },
     "link_7262adec": {
         "message": "Link"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Rich Content Editor"
-    },
-    "right_to_left_ec223c81": {
-        "message": "højre til venstre"
     },
     "save_11a80ec3": {
         "message": "Gem"

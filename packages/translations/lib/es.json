@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensiones"
     },
-    "directionality_ebcae6d0": {
-        "message": "direccionalidad"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Desactivar vista previa directa."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Atrasado"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "Izquierda a derecha"
     },
     "link_7262adec": {
         "message": "Enlace"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de Contenido Enriquecido"
-    },
-    "right_to_left_ec223c81": {
-        "message": "derecha a izquierda"
     },
     "save_11a80ec3": {
         "message": "Guardar"

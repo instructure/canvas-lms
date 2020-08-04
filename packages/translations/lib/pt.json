@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensões"
     },
-    "directionality_ebcae6d0": {
-        "message": "direcionalidade"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Desativar visualização em linha."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Atrasado"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "esquerda para a direita"
     },
     "link_7262adec": {
         "message": "Ligação"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de conteúdo avançado"
-    },
-    "right_to_left_ec223c81": {
-        "message": "direita para esquerda"
     },
     "save_11a80ec3": {
         "message": "Guardar"

@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Mitat"
     },
-    "directionality_ebcae6d0": {
-        "message": "suuntaisuus"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Poista tekstiin sidottu esikatselu."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Myöhään"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "vasemmalta oikealle"
     },
     "link_7262adec": {
         "message": "Linkki"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Rikas sisältöeditori"
-    },
-    "right_to_left_ec223c81": {
-        "message": "oikealta vasemmalle"
     },
     "save_11a80ec3": {
         "message": "Tallenna"

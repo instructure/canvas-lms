@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Mere"
     },
-    "directionality_ebcae6d0": {
-        "message": "usmerjenost"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Onemogoči predogled v vrstici."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Zamuda"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "iz leve proti desni"
     },
     "link_7262adec": {
         "message": "Povezava"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Urejevalnik"
-    },
-    "right_to_left_ec223c81": {
-        "message": "z desne proti levi"
     },
     "save_11a80ec3": {
         "message": "Shrani"

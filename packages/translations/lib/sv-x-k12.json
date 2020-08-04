@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensioner"
     },
-    "directionality_ebcae6d0": {
-        "message": "Riktning"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Inaktivera infogad förhandsvisning."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Sen"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "vänster till höger"
     },
     "link_7262adec": {
         "message": "Länk"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Redigerare för formaterat innehåll"
-    },
-    "right_to_left_ec223c81": {
-        "message": "höger till vänster"
     },
     "save_11a80ec3": {
         "message": "Spara"

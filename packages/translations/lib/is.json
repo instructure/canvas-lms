@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Mál"
     },
-    "directionality_ebcae6d0": {
-        "message": "lestrarátt"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Afvirkja forskoðun í línu."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Seint"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "vinstri til hægri"
     },
     "link_7262adec": {
         "message": "Tengill"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Rich Content ritill"
-    },
-    "right_to_left_ec223c81": {
-        "message": "hægri til vinstri"
     },
     "save_11a80ec3": {
         "message": "Vista"

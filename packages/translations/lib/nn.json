@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensjonar"
     },
-    "directionality_ebcae6d0": {
-        "message": "retningsgivande"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Slå av integrert førehandsvising"
     },
@@ -571,9 +568,6 @@
     },
     "late_2be42b88": {
         "message": "Sein"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "venstre mot høgre"
     },
     "link_7262adec": {
         "message": "Lenke"
@@ -862,9 +856,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Redigeringsprogram for rikt innhald"
-    },
-    "right_to_left_ec223c81": {
-        "message": "høgre mot venstre"
     },
     "save_11a80ec3": {
         "message": "Lagre"

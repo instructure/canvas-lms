@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensiynau"
     },
-    "directionality_ebcae6d0": {
-        "message": "cyfeirioldeb"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Analluogi''r rhagolwg mewn-llinell."
     },
@@ -574,9 +571,6 @@
     },
     "late_2be42b88": {
         "message": "Yn Hwyr"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "chwith i''r dde"
     },
     "link_7262adec": {
         "message": "Dolen"
@@ -868,9 +862,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Golygydd Cynnwys Cyfoethog"
-    },
-    "right_to_left_ec223c81": {
-        "message": "de i''r chwith"
     },
     "save_11a80ec3": {
         "message": "Cadw"
