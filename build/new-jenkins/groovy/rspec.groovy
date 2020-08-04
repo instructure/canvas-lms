@@ -180,7 +180,8 @@ def uploadJunitReports() {
   uploadSeleniumJunit()
   uploadRspecJunit()
   def preStatus = currentBuild.getResult()
-  junit allowEmptyResults: true, testResults: 'spec_results/**/*.xml'
+  def reports = load('build/new-jenkins/groovy/reports.groovy')
+  reports.junitSafe("spec_results/**/*.xml")
   // junit publishing will set build status to unstable if failed tests found, if so set it back to SUCCESS
   if (currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
     currentBuild.rawBuild.@result = hudson.model.Result.SUCCESS
