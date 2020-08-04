@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_relative "../graphql_spec_helper"
 
 describe Types::UserType do
+
   before(:once) do
     student = student_in_course(active_all: true).user
     course = @course
@@ -34,8 +35,14 @@ describe Types::UserType do
     @teacher = teacher
   end
 
-  let(:user_type) { GraphQLTypeTester.new(@student, current_user: @teacher, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create ) }
-  let(:user) { @student }
+  let(:user_type) do
+     GraphQLTypeTester.new(
+        @student,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+  end
 
   context "node" do
     it "works" do
@@ -70,13 +77,13 @@ describe Types::UserType do
     end
 
     it "returns an avatar url when avatars are enabled" do
-      user.account.enable_service(:avatars)
+      @student.account.enable_service(:avatars)
       expect(user_type.resolve("avatarUrl")).to match(/avatar.*png/)
     end
 
     it "returns nil when a user has no avatar" do
-      user.account.enable_service(:avatars)
-      user.update! avatar_image_url: nil
+      @student.account.enable_service(:avatars)
+      @student.update! avatar_image_url: nil
       expect(user_type.resolve("avatarUrl")).to be_nil
     end
   end
@@ -116,7 +123,6 @@ describe Types::UserType do
     end
   end
 
-
   context "enrollments" do
     before(:once) do
       @course1 = @course
@@ -154,22 +160,47 @@ describe Types::UserType do
   end
 
   context "email" do
+    let!(:read_email_override) do
+      RoleOverride.create!(
+        context: @teacher.account,
+        permission: 'read_email_addresses',
+        role: teacher_role,
+        enabled: true
+      )
+    end
+
+    let!(:account_user) do
+      AccountUser.create!(
+        account: @teacher.account,
+        user: @teacher,
+        role: teacher_role
+      )
+    end
+
+    let(:teacher_role) { Role.get_built_in_role('TeacherEnrollment') }
+
     before(:once) do
       @student.update! email: "cooldude@example.com"
     end
 
     it "returns email for teachers/admins" do
-      expect(user_type.resolve("email")).to eq user.email
+      expect(user_type.resolve("email")).to eq @student.email
 
       # this is for the cached branch
-      allow(user).to receive(:email_cached?) { true }
-      expect(user_type.resolve("email")).to eq user.email
+      allow(@student).to receive(:email_cached?) { true }
+      expect(user_type.resolve("email")).to eq @student.email
     end
 
     it "doesn't return email for others" do
       expect(user_type.resolve("email", current_user: nil)).to be_nil
       expect(user_type.resolve("email", current_user: @other_student)).to be_nil
       expect(user_type.resolve("email", current_user: @random_person)).to be_nil
+    end
+
+    it "respects :read_email_addresses permission" do
+      read_email_override.update!(enabled: false)
+
+      expect(user_type.resolve("email")).to be_nil
     end
   end
 
