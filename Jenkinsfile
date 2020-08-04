@@ -129,7 +129,6 @@ pipeline {
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     NAME = imageTagVersion()
-    CANVAS_LMS_IMAGE = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms"
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     BUILD_IMAGE = configuration.buildRegistryPath()
     POSTGRES = configuration.postgres()
@@ -149,10 +148,10 @@ pipeline {
     PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-$PUBLISHABLE_TAG_SUFFIX"
 
     // e.g. canvas-lms:master when not on another branch
-    MERGE_TAG = "$CANVAS_LMS_IMAGE:$GERRIT_BRANCH"
+    MERGE_TAG = "$BUILD_IMAGE:$GERRIT_BRANCH"
 
     // e.g. canvas-lms:01.123456.78; this is for consumers like Portal 2 who want to build a patchset
-    EXTERNAL_TAG = "$CANVAS_LMS_IMAGE:$NAME"
+    EXTERNAL_TAG = "$BUILD_IMAGE:$NAME"
 
     ALPINE_MIRROR = configuration.alpineMirror()
     NODE = configuration.node()
