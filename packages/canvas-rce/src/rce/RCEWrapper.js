@@ -115,7 +115,7 @@ function isElementWithinTable(node) {
 
 // determines if localStorage is available for our use.
 // see https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
-function storageAvailable() {
+export function storageAvailable() {
   let storage
   try {
     storage = window.localStorage
@@ -1014,7 +1014,7 @@ class RCEWrapper extends React.Component {
         },
         {
           name: formatMessage('Canvas Plugins'),
-          items: [...canvasPlugins, ...this.ltiToolFavorites, 'lti_tool_dropdown']
+          items: [...canvasPlugins, ...this.ltiToolFavorites, 'lti_tool_dropdown', 'lti_mru_button']
         },
         {
           name: formatMessage('Miscellaneous and Apps'),

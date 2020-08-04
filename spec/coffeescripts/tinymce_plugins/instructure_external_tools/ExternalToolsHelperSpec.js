@@ -139,3 +139,55 @@ test('calls dropdownList with buttons as options', function() {
   ExternalToolsHelper.attachClumpedDropdown(this.fakeTarget, fakeButtons, this.fakeEditor)
   ok(this.theSpy.calledWith({options: fakeButtons}))
 })
+
+QUnit.module('ExternalToolsHelper:updateMRUList', {
+  setup() {
+    sinon.spy(window.console, 'log')
+  },
+  teardown() {
+    window.localStorage.clear()
+    window.console.log.restore()
+  }
+})
+
+test('creates the mru list if necessary', function() {
+  equal(window.localStorage.getItem('ltimru'), null)
+  ExternalToolsHelper.updateMRUList(2)
+  equal(window.localStorage.getItem('ltimru'), '[2]')
+})
+
+test('adds to tool to the mru list', function() {
+  window.localStorage.setItem('ltimru', '[1]')
+  ExternalToolsHelper.updateMRUList(2)
+  equal(window.localStorage.getItem('ltimru'), '[2,1]')
+})
+
+test('limits mru list to 5 tools', function() {
+  window.localStorage.setItem('ltimru', '[1,2,3,4]')
+  ExternalToolsHelper.updateMRUList(5)
+  equal(window.localStorage.getItem('ltimru'), '[5,1,2,3,4]')
+  ExternalToolsHelper.updateMRUList(6)
+  equal(window.localStorage.getItem('ltimru'), '[6,5,1,2,3]')
+})
+
+test("doesn't add the same tool twice", function() {
+  window.localStorage.setItem('ltimru', '[1,2,3,4]')
+  ExternalToolsHelper.updateMRUList(4)
+  equal(window.localStorage.getItem('ltimru'), '[1,2,3,4]')
+})
+
+test('copes with localStorage failure updating mru list', function() {
+  // localStorage in chrome is limitedto 5120k, and that seems to include the key
+  window.localStorage.setItem('xyzzy', 'x'.repeat(5119 * 1024) + 'x'.repeat(1016))
+  equal(window.localStorage.getItem('ltimru'), null)
+  ExternalToolsHelper.updateMRUList(1)
+  equal(window.localStorage.getItem('ltimru'), null)
+  ok(window.console.log.calledWith('Cannot save LTI MRU list'))
+})
+
+test('corrects bad data in local storage', function() {
+  window.localStorage.setItem('ltimru', 'this is not valid JSON')
+  ExternalToolsHelper.updateMRUList(1)
+  equal(window.localStorage.getItem('ltimru'), '[1]')
+  ok(window.console.log.calledWith('Found bad LTI MRU data'))
+})

@@ -32,6 +32,13 @@ const setUp = function(maxButtons) {
     getContent() {},
     selection: {
       getContent() {}
+    },
+    ui: {
+      registry: {
+        addButton: sinon.spy(),
+        addMenuButton: sinon.spy(),
+        addIcon: sinon.spy()
+      }
     }
   }
   this.INST = INST
@@ -65,4 +72,32 @@ test('adds button to clumped buttons', function() {
   equal(initResult, null)
   ok(this.buttonSpy.calledWith('instructure_external_button_clump'))
   ok(this.commandSpy.notCalled)
+})
+
+QUnit.module('with rce_enhancements', {
+  setup() {
+    window.ENV.use_rce_enhancements = true
+    return setUp.call(this, 2)
+  },
+  teardown() {
+    window.ENV.use_rce_enhancements = false
+  }
+})
+
+test('adds MRU menu button', function() {
+  ExternalToolsPlugin.init(this.fakeEditor, undefined, this.INST)
+  ok(this.fakeEditor.ui.registry.addMenuButton.calledWith('lti_mru_button'))
+})
+
+test('adds favorite buttons to the toolbar', function() {
+  this.INST.editorButtons[0].favorite = true
+  ExternalToolsPlugin.init(this.fakeEditor, undefined, this.INST)
+  ok(this.fakeEditor.ui.registry.addButton.calledWith('instructure_external_button_button_id'))
+})
+
+test("creates the tool's icon", function() {
+  this.INST.editorButtons[0].favorite = true
+  this.INST.editorButtons[0].icon_url = 'tool_image'
+  ExternalToolsPlugin.init(this.fakeEditor, undefined, this.INST)
+  ok(this.fakeEditor.ui.registry.addIcon.calledWith('lti_tool_button_id'))
 })
