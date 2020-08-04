@@ -82,10 +82,6 @@ def isPatchsetPublishable() {
   env.PATCHSET_TAG == env.PUBLISHABLE_TAG
 }
 
-def isPatchsetSlackableOnFailure() {
-  env.SLACK_MESSAGE_ON_FAILURE == 'true' && env.GERRIT_EVENT_TYPE == 'change-merged'
-}
-
 def cleanupFn(status) {
   ignoreBuildNeverStartedError {
     try {
@@ -114,9 +110,26 @@ def postFn(status) {
   }
 }
 
+// These functions are intentionally pinned to GERRIT_EVENT_TYPE == 'change-merged' to ensure that real post-merge
+// builds always run correctly. We intentionally ignore overrides for version pins, docker image paths, etc when
+// running real post-merge builds.
+// =========
+def getBuildImage() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.buildRegistryPathDefault() : configuration.buildRegistryPath()
+}
+
+def getPatchsetTag() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.patchsetDefault() : imageTag.patchset()
+}
+
 def getPluginVersion(plugin) {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", "master")
 }
+
+def isPatchsetSlackableOnFailure() {
+  return env.SLACK_MESSAGE_ON_FAILURE == 'true' && env.GERRIT_EVENT_TYPE == 'change-merged'
+}
+// =========
 
 pipeline {
   agent none
@@ -130,7 +143,7 @@ pipeline {
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     NAME = imageTagVersion()
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
-    BUILD_IMAGE = configuration.buildRegistryPath()
+    BUILD_IMAGE = getBuildImage()
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
     SKIP_CACHE = configuration.skipCache()
@@ -142,7 +155,7 @@ pipeline {
     PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffixNew()
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
-    PATCHSET_TAG = imageTag.patchset()
+    PATCHSET_TAG = getPatchsetTag()
 
     // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-2.6
     PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-$PUBLISHABLE_TAG_SUFFIX"
@@ -177,6 +190,13 @@ pipeline {
     stage('Environment') {
       steps {
         script {
+          // Ensure that all build flags are compatible.
+
+          if(configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
+            error "Manually triggering the change-merged build path must be combined with a custom build-registry-path"
+            return
+          }
+
           // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
           // wait for the current steps to complete (even wait to spin up a node), causing
           // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
@@ -226,7 +246,7 @@ pipeline {
               }
             }
 
-            if(env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
+            if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
               stage('Rebase') {
                 timeout(time: 2) {
                   credentials.withGerritCredentials({ ->
@@ -264,7 +284,7 @@ pipeline {
             stage('Build Docker Image') {
               timeout(time: 30) {
                 skipIfPreviouslySuccessful('docker-build-and-push') {
-                  if (env.GERRIT_EVENT_TYPE != 'change-merged' && configuration.skipDockerBuild()) {
+                  if (!configuration.isChangeMerged() && configuration.skipDockerBuild()) {
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                     sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                   } else {
@@ -284,14 +304,14 @@ pipeline {
 
             stage('Parallel Run Tests') {
               def stages = [:]
-              if (env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms') {
+              if (!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
                 echo 'adding Linters'
                 stages['Linters'] = {
                   skipIfPreviouslySuccessful("linters") {
                     credentials.withGerritCredentials {
                       sh 'build/new-jenkins/linters/run-gergich.sh'
                     }
-                    if (env.MASTER_BOUNCER_RUN == '1' && env.GERRIT_EVENT_TYPE == 'patchset-created') {
+                    if (env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged()) {
                       credentials.withMasterBouncerCredentials {
                         sh 'build/new-jenkins/linters/run-master-bouncer.sh'
                       }
@@ -359,7 +379,7 @@ pipeline {
                 echo 'no migrations added, skipping CDC Schema check'
               }
 
-              if (env.GERRIT_EVENT_TYPE != 'change-merged' && (sh(script: 'build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)) {
+              if (!configuration.isChangeMerged() && (sh(script: 'build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)) {
                 echo 'adding Flakey Spec Catcher'
                 stages['Flakey Spec Catcher'] = {
                   skipIfPreviouslySuccessful("flakey-spec-catcher") {
@@ -399,7 +419,7 @@ pipeline {
               parallel(stages)
             }
 
-            if(env.GERRIT_EVENT_TYPE == 'change-merged' && isPatchsetPublishable()) {
+            if(configuration.isChangeMerged() && isPatchsetPublishable()) {
               stage('Publish Image on Merge') {
                 timeout(time: 10) {
                   // Retriggers won't have an image to tag/push, pull that
@@ -435,7 +455,7 @@ pipeline {
               }
             }
 
-            if(env.GERRIT_EVENT_TYPE == 'change-merged') {
+            if(configuration.isChangeMerged()) {
               stage('Dependency Check') {
                 def reports = load 'build/new-jenkins/groovy/reports.groovy'
                 reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
