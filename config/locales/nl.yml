@@ -405,6 +405,7 @@ nl:
   account_id_2c3b4f15: account-ID
   account_id_73966078: account_id
   account_id_f6e26867: Account-id
+  account_level_mastery_scales_a5bdff29: "Scoringscriteria op accountniveau"
   account_level_notification_preferences_require_an__66467cd7: "Voor meldingsvoorkeuren op accountniveau is een account_id nodig om bij te werken"
   account_level_notification_preferences_ui_update_f5e189a4: "Udate voor accountniveau meldingsvoorkeuren UI"
   account_level_settings_manage_4fca6f8e: "Instellingen op accountniveau - beheren"
@@ -417,6 +418,9 @@ nl:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Eindtijd van de account-melding gaat aan starttijd vooraf"
+  account_notification_settings_error_page_66c0bc61: "Instellingen voor accountmeldingen - foutpagina"
+  account_notification_settings_initial_query_error_f55e1cbf: "Instellingen voor accountmeldingen - fout met initiële query"
+  account_notification_settings_updated_dbabec35: "Instellingen voor accountmeldingen bijgewerkt"
   account_notifications: 
     announcement_created_notice: "Aankondiging succesvol (aan)gemaakt"
     announcement_creation_failed_notice: "Het (aan)maken van aankondiging mislukt"
@@ -1286,6 +1290,7 @@ nl:
         report_last_run: "Laatste uitvoering"
         report_name: Naam
       headings: 
+        privacy: Privacy
         quotas: Accountquota's
         sections: Rapporten
         settings: Accountinstellingen
@@ -1316,6 +1321,8 @@ nl:
         enable_alerts: "Waarschuwingen (beta)"
         enable_course_catalog: "Een lijst met cursussen weergeven die je kunt doorzoeken in dit hoofdaccount met de markering \"Deze cursus opnemen in de openbare cursusindex” ingeschakeld."
         enable_eportfolios: ePortfolios
+        enable_fullstory: "Bijhouden met FullStory toestaan"
+        enable_google_analytics: "Bijhouden met Google Analytics toestaan"
         enable_profiles: "Profielen mogelijk maken"
         enable_turnitin: Turnitin
         enable_user_notes: Faculteitsnieuws
@@ -1411,7 +1418,7 @@ nl:
       open_report_description: "Rapport beschrijving openen"
       page_header_title: Accountinstellingen
       page_title: "Gedeelde inhoud"
-      quiz_ip_filters_delete: "Filter verwijderen"
+      quiz_ip_filters_delete: "Toets IP-filter verwijderen"
       quiz_ip_filters_help_message: |-
           Met toets-IP-filters kun je de toegang tot toetsen beperken tot computers uit een bepaald IP-bereik.
           
@@ -1444,6 +1451,7 @@ nl:
       tab_announcements: Aankondigingen
       tab_external_tools: Apps
       tab_notifications: Meldingen
+      tab_privacy: Privacy
       tab_quotas: Quota's
       tab_reports: Rapporten
       tab_settings: Instellingen
@@ -2038,6 +2046,7 @@ nl:
   allow_multiple_attempts_e67a0a37: "Meerdere pogingen toestaan"
   allow_opt_out_of_inbox: "Gebruikers toestaan om de Gesprekken Inbox af te wijzen. Hierdoor zullen alle gespreksberichten en meldingen als z.s.m. (zo spoedig mogelijk) meldingen naar de primaire e-mail van de gebruiker worden gestuurd, zal de ongelezen berichtenbadge van de Gesprekken Inbox worden verborgen en zullen de meldingsvoorkeuren van de Gesprekken worden verborgen."
   allow_outcome_extra_credit_57c1e84e: "Extra credit voor leerdoel toestaan"
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: "Toestaan dat pagina's worden verwijderd in bulkvorm"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Passieve acceptatie van Servicevoorwaarden toestaan"
   allow_postable_submission_comments_a301b742: "Postbare opmerkingen bij inleveringen toestaan"
   allow_reorder_dashboard_cards_78215947: "Opnieuw rangschikken van dashboard kaarten toestaan"
@@ -2060,6 +2069,7 @@ nl:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Hiermee kan een gebruiker de link Optreden als gebruiker openen in contextkaarten van een cursist"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Hiermee kan een gebruiker de SIS-ID in de aanmeldingsgegevens van een gebruiker bekijken."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Hiermee kan een gebruiker de SIS-ID van gebruikers op de pagina Personen in een cursus bekijken."
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: "Bedoeld voor scoringscriteria op accountniveau en berekeningen van vaardigheden, ter vervanging van scores op basis van resultaten"
   allows_admin_user_to_view_account_statistics_341f00d9: "Hiermee kan een beheerder accountstatistieken bekijken."
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Hiermee kunnen beheerders een logboek bekijken dat informatie bevat over alle onlangs uitgevoerde
@@ -4967,6 +4977,7 @@ nl:
   click_here_to_tell_us_what_happened_5d773d1d: "klik dan hier om ons te vertellen wat er gebeurd is"
   click_here_to_view_ec8cb2fd: "Hier klikken om te bekijken"
   click_here_to_view_the_submission_24777a69: "Hier klikken om de inzending weer te geven"
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: "Klik hier om je opdracht te openen en lever deze op tijd in!"
   click_ok_to_continue_deleting_this_role_baa9d9e2: "Klik op \"OK\" om door te gaan met het verwijderen van deze functie."
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klik op een snapshot om terug te keren naar je proefversie zoals deze was op het moment dat de snapshot werd gemaakt. Opmerking: Je verliest al het werk dat je hebt uitgevoerd sinds de snapshot is gemaakt. Dit kan niet ongedaan worden gemaakt!"
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Klik op de knop voor accountnavigatie voor toegang tot meldingsvoorkeuren."
@@ -7866,6 +7877,7 @@ nl:
   delete_grading_scheme_6b308832: "Beoordelingsschema verwijderen"
   delete_grading_scheme_title_215f0a40: "Beoordelingsschema %{title} verwijderen"
   delete_group_86c381ec: "Groep verwijderen"
+  delete_in_progress_2d3f0e0d: "Verwijderen wordt uitgevoerd"
   delete_key_developername_be80e695: "Sleutel verwijderen %{developerName}"
   delete_key_name_c2de8c0c: "Sleutel verwijderen %{name}"
   delete_my_account_41060aad: "Mijn account verwijderen"
@@ -7885,6 +7897,7 @@ nl:
   delete_section_name_a48d9d79: "Sectie \"%{name}\" verwijderen"
   delete_selected_a023ccf8: "Geselecteerde Verwijderen"
   delete_selected_announcements_69e23710: "Geselecteerde aankondigingen verwijderen"
+  delete_selected_pages_7bc50580: "Geselecteerde pagina's verwijderen"
   delete_survey_56fddbbd: "Enquête verwijderen"
   delete_term_name_f707abc9: "Periode verwijderen %{name}"
   delete_theme_918a7f24: "Thema verwijderen?"
@@ -9649,6 +9662,7 @@ nl:
   failed_to_delete_discussion_title_986df717: "Discussie kan niet worden verwijderd %{title}"
   failed_to_delete_external_feed_36f19d70: "Exporteren van externe feed mislukt"
   failed_to_delete_role_label_27959de3: "Rol verwijderen mislukt %{label}"
+  failed_to_delete_selected_pages_26fa87db: "Kan de geselecteerde pagina's niet verwijderen"
   failed_to_export_some_tool_settings_c992fc56: "Exporteren van enkele toolinstellingen is mislukt"
   failed_to_import_media_objects_4c1fcb4f: "Het importeren van media-objecten mislukt"
   failed_to_laod_more_submissions_990aacee: "Laden van meer inleveringen mislukt"
@@ -9666,6 +9680,7 @@ nl:
   failed_to_save_please_try_again_later_bb7070fb: "Het opslaan is mislukt, probeer het later opnieuw"
   failed_to_submit_draft_comment_1de83451: "Kon concept commentaar niet inleveren"
   failed_to_unpin_discussion_503eab82: "Vastzetten van discussie kan niet ongedaan worden gemaakt"
+  failed_to_update_account_notification_settings_194c1cd4: "Kan instellingen voor accountmeldingen niet bijwerken"
   failed_to_update_course_notification_settings_cbf0eb18: "Kan instellingen voor cursusmeldingen niet bijwerken"
   failed_to_update_discussion_23cc229a: "Discussie kan niet worden bijgewerkt"
   failed_to_update_permission_33c493f: "Machtiging bijwerken mislukt"
@@ -12769,6 +12784,7 @@ nl:
   loading_courses_started_6e6d742c: "Laden van cursussen is gestart"
   loading_data_ecd89ba: "Gegevens laden.."
   loading_discussions_8ed5fcd7: "Discussies laden"
+  loading_external_tool_d839042c: "Externe tool laden"
   loading_f99d93d4: "...laden"
   loading_features_d26820f6: "Functies laden"
   loading_folders_d8b5869e: "Mappen worden geladen"
@@ -13071,6 +13087,7 @@ nl:
   master_lock_590266b6: Hoofdvergrendeling
   mastered_34d4c857: Behaald
   mastery_7ec348b5: Vakbeheersing
+  mastery_connect_64598f55: "Vakbeheersing verbinden"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Bekwaamheid: %{n_mastery_points_precision_2_str} Punten"
   mastery_path_processing_f4471152: "Leertraject wordt verwerkt"
   mastery_paths_breakdown_6e0b5fce: "Uitsplitsing Mastery Paths"
@@ -13079,6 +13096,7 @@ nl:
   mastery_paths_editor_930655bb: "Editor Meesterschapspaden"
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Selectie van leertrajecten is tijdelijk uitgeschakeld voor onderhoud."
   mastery_points_f1672cc: bekwaamheidspunten
+  mastery_scale_abbc3557: Scoringscriteria
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Meesterschap scores geven de hoogste score weer van een beoordeelde opdracht of toets."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Beheersingsscore geeft de meest recent beoordeelde opdracht of toets weer."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Meesterschap scores geven de meest recente score weer van een beoordeelde opdracht of toets."
@@ -15633,6 +15651,7 @@ nl:
   next_mastery_path_is_currently_processing_f044d7d8: "Volgend leertraject wordt momenteel verwerkt"
   next_mastery_path_is_still_processing_please_perio_bb0121af: "Volgend leertraject wordt nog verwerkt. Vernieuw de pagina regelmatig."
   next_message_780bcf24: "Volgend bericht"
+  next_module_item_19e835f3: "Volgende Module-item"
   next_module_item_9bb8a222: "Volgende Module/Item"
   next_month_749b1778: "Volgende maand"
   next_month_b55a387c: "Volgende maand"
@@ -16003,6 +16022,7 @@ nl:
       submission_graded: "Inzending beoordeeld"
       submission_needs_grading: "Inzending moet beoordeeld worden"
       summaries: Samenvattingen
+      upcoming_assignment_alert: "Waarschuwing Aankomende opdrachten"
       updated_wiki_page: "Bijgewerkte pagina"
       web_conference_invitation: "Uitnodiging voor webvergadering"
       web_conference_recording_ready: "Webconferentie Opname Gereed"
@@ -16561,6 +16581,7 @@ nl:
   package_error: "Fout bij het identificeren van pakkettype: %{error}"
   package_export_from_d6e2b073: "Pakket geëxporteerd uit"
   page_50c4823d: Pagina
+  page_bulk_deleting_74860a80: "Pagina's verwijderen in bulkvorm"
   page_comment: 
     default_user_name: Anoniem
   page_comments: 
@@ -17394,6 +17415,7 @@ nl:
   previous_export_c6a997f7: "Vorige exportbewerking"
   previous_message_8804f87e: "Vorig bericht"
   previous_module_item_2bb5e499: "Vorige Module/Item"
+  previous_module_item_a9e57348: "Vorige Module-item"
   previous_month_7adf1380: "Vorige maand"
   previous_month_bb1e3c84: "Vorige maand"
   previous_page_928fc112: "Vorige pagina"
@@ -19405,6 +19427,7 @@ nl:
   ratings_2433172b: Beoordelingen
   ratio_answered_correctly_b0c1e7d: "%{ratio}% hebben juist beantwoord"
   ratio_responded_correctly_6d890107: "%{ratio}% hebben juist beantwoord"
+  raw_html_editor_e3993e41: "Editor voor onbewerkte HTML"
   rce_auto_save_f004fba9: "RCE Automatisch opslaan"
   rce_contents_replace_description: "Schakel volledige RCE-tekstvervanging op basis van LTI's in"
   rce_contents_replace_display_name: "RCE-inhoud vervangen"
@@ -20434,6 +20457,7 @@ nl:
   select_one_8e0af564: "Eén selecteren"
   select_one_b647b384: "Selecteer er één"
   select_one_of_the_options_c8b0c6e4: "Selecteer een van de opties:"
+  select_page_e93fc123: "Selecteer pagina"
   select_prerequisite_module_57894963: "Vereiste module selecteren"
   select_prerequite_module_e9042bb0: "Vereiste module selecteren"
   select_rubric_2aa2ffa2: "Rubriek selecteren"
@@ -20449,6 +20473,7 @@ nl:
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Selecteer de bestanden die je aan deze *module* wilt koppelen of voeg bestanden toe door \"Nieuwe bestanden\" te selecteren."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Selecteer de pagina die je wilt koppelen of voeg een nieuwe pagina toe door \"Nieuwe pagina\" te selecteren."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Selecteer de pagina die je wilt koppelen met deze *module* of voeg een nieuwe pagina toe door \"Nieuwe pagina\" te selecteren."
+  select_title_for_deletion_45b08247: "Selecteer %{title} om te verwijderen"
   select_type_of_prerequisite_8d6fa902: "Selecteer soort vereiste"
   select_video_file_35b61d4e: "Videobestand selecteren"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Selecteer wat je op de startpagina wilt weergeven."
@@ -20464,6 +20489,7 @@ nl:
   selected_filename_7552a8c0: "geselecteerd %{filename}"
   selected_grade_942f40ba: "Geselecteerd cijfer"
   selected_item_35bed33a: "geselecteerd item"
+  selected_pages_have_been_deleted_82a7f965: "Geselecteerde pagina's zijn verwijderd"
   selected_subtree_a7693937: "Geselecteerd %{subtree}"
   selection_end_date_10fcc8c6: "Einddatum van selectie"
   selection_height_9d57ec24: Selectiehoogte
@@ -23777,6 +23803,7 @@ nl:
   untitled_assignment_59354b34: "naamloze opdracht"
   unused_courses_title: "Ongebruikte cursussen"
   up_c553575d: Omhoog
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "Aankomende inleverdatum - %{assignment_name}, %{course_name}"
   update_374eb54: bijwerken
   update_4d8ee62: Bijwerken
   update_and_view_sections_course_details_navigation_dd10b45e: "Update en bekijk secties, cursusdetails, navigatie, functieopties en de integratie van externe applicaties, die allemaal alleen maar zichtbaar zijn voor cursusleiders."
@@ -24827,6 +24854,9 @@ nl:
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
     one: "Je staat op het punt 1 discussie te verwijderen. Weet je het zeker?"
     other: "Je staat op het punt %{count} discussies te verwijderen. Weet je het zeker?"
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
+    one: "Je staat op het punt 1 pagina te verwijderen. Weet je het zeker?"
+    other: "Je staat op het punt %{count} pagina's te verwijderen. Weet je het zeker?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Je staat op het punt onopgeslagen wijzigingen te verliezen.
       
@@ -25047,6 +25077,8 @@ nl:
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "Je ontvangt op dit moment geen %{contextType}. Gebruik de schakelaar hierboven om %{contextType} in te schakelen."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Je ontvangt op dit moment geen cursusmeldingen. Gebruik de schakelaar hierboven om cursusmeldingen in te schakelen."
   your_answer_8dad6ea4: "Jouw antwoord:"
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Je opdracht %{assignment_name} vervalt op %{due_at}."
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Je opdracht %{assignment_name} vervalt op %{due_at}. Klik op de volgende link om je opdracht te openen en lever deze op tijd in:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Je kunt nu je Opdrachtenlijst vinden op de *Kalender* pagina."
   your_assignments_list_has_improved_3eded80e: "Je *Opdrachten* lijst is verbeterd!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Je opdrachten worden hier weergegeven, op volgorde van vervaldatum."

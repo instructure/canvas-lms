@@ -423,7 +423,10 @@ class EnrollmentsApiController < ApplicationController
                                     course_index_enrollments :
                                     user_index_enrollments
 
-      use_bookmarking = @domain_root_account&.feature_enabled?(:bookmarking_for_enrollments_index)
+      # a few specific developer keys temporarily need bookmarking disabled, see INTEROP-5326
+      pagination_override_key_list = Setting.get("pagination_override_key_list", "").split(',').map(&:to_i)
+      use_numeric_pagination_override = pagination_override_key_list.include?(@access_token&.global_developer_key_id)
+      use_bookmarking = @domain_root_account&.feature_enabled?(:bookmarking_for_enrollments_index) && !use_numeric_pagination_override
       enrollments = use_bookmarking ?
         enrollments.joins(:user).select("enrollments.*, users.sortable_name AS sortable_name") :
         enrollments.joins(:user).select("enrollments.*").

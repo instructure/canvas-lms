@@ -405,6 +405,7 @@ ja:
   account_id_2c3b4f15: "アカウント ID"
   account_id_73966078: account_id
   account_id_f6e26867: "アカウント ID"
+  account_level_mastery_scales_a5bdff29: アカウントレベルの習熟度スケール
   account_level_notification_preferences_require_an__66467cd7: "アカウントレベルの通知設定を更新するには course_id が必要です。"
   account_level_notification_preferences_ui_update_f5e189a4: アカウントレベルの通知設定UIの更新
   account_level_settings_manage_4fca6f8e: "アカウントレベルの設定 - 管理"
@@ -417,6 +418,9 @@ ja:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: アカウントのお知らせの終了時刻が開始時刻よりも前になっています
+  account_notification_settings_error_page_66c0bc61: アカウント通知設定エラーページ
+  account_notification_settings_initial_query_error_f55e1cbf: アカウント通知設定の初期クエリエラー
+  account_notification_settings_updated_dbabec35: アカウント通知設定を更新しました
   account_notifications: 
     announcement_created_notice: アナウンスは正常に作成されました
     announcement_creation_failed_notice: アナウンスの作成に失敗しました
@@ -1286,6 +1290,7 @@ ja:
         report_last_run: 前回の実行
         report_name: 名前
       headings: 
+        privacy: プライバシー
         quotas: アカウントのクォータ
         sections: レポート
         settings: アカウント設定
@@ -1316,6 +1321,8 @@ ja:
         enable_alerts: アラート
         enable_course_catalog: "このルート アカウントの中で、[このコースを公開コース インデックスに含める] フラグが有効になっているコースの検索可能なリストを表示します。"
         enable_eportfolios: eポートフォリオ
+        enable_fullstory: FullStoryでの追跡を許可する
+        enable_google_analytics: Googleアナリティクスでの追跡を許可する
         enable_profiles: プロフィールの有効化
         enable_turnitin: Turnitin
         enable_user_notes: 講師日誌
@@ -1411,7 +1418,7 @@ ja:
       open_report_description: レポートの説明を開く
       page_header_title: アカウント設定
       page_title: 共有コンテンツ
-      quiz_ip_filters_delete: フィルタを削除
+      quiz_ip_filters_delete: クイズIPフィルターを削除
       quiz_ip_filters_help_message: |-
           クイズ IP フィルタは、クイズへのアクセスを、指定の IP 範囲内にあるコンピュータに制限するための一手段です。
           
@@ -1444,6 +1451,7 @@ ja:
       tab_announcements: アナウンス
       tab_external_tools: アプリ
       tab_notifications: お知らせ
+      tab_privacy: プライバシー
       tab_quotas: クォータ
       tab_reports: レポート
       tab_settings: 設定
@@ -2038,6 +2046,7 @@ ja:
   allow_multiple_attempts_e67a0a37: 複数回の試行を許可
   allow_opt_out_of_inbox: ユーザーが、会話の受信トレイからオプトアウトできるようにします。これにより、すべての会話メッセージと通知がユーザーのメインの電子メールにASAP（成る早）通知として送信され、会話の受信トレイの未読メッセージバッジが非表示になり、会話の通知設定が非表示になります。
   allow_outcome_extra_credit_57c1e84e: 結果の追加クレジットを許可する
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: ページの一括削除を許可する
   allow_passive_acceptance_of_terms_of_service_63ef5994: 利用規約の受諾を許可する
   allow_postable_submission_comments_a301b742: 投稿可能な提出コメントを許可する
   allow_reorder_dashboard_cards_78215947: ダッシュボードカードを再オーダーさせる
@@ -2060,6 +2069,7 @@ ja:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: 受講生がコンテクストカード上の「ユーザとして操作」のリンクにアクセスできるようにします
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "ユーザーがユーザーのログイン情報内で SIS ID を表示できるようにします。"
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "ユーザーがコースの人物のページのユーザー SIS ID を表示できるようにします。"
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: アカウントレベルの習熟度スケールと熟練度の計算ができるようにし、結果ごとのスケールを置き換える
   allows_admin_user_to_view_account_statistics_341f00d9: 管理者ユーザーがアカウントの統計情報を表示できるようにします。
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       管理者が最近実行されたすべての
@@ -4972,6 +4982,7 @@ ja:
   click_here_to_see_the_file_79e2b366: ここをクリックして、ファイルを表示。
   click_here_to_view_ec8cb2fd: ここをクリックして表示
   click_here_to_view_the_submission_24777a69: 提出物を表示するにはここをクリック
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: ここをクリックして課題にアクセスし、期限までに提出してください。
   click_ok_to_continue_deleting_this_role_baa9d9e2: "[OK]をクリックして、この役割の削除を続行します。"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "スナップショットがクリックされたときの状態に戻すには、スナップショットをクリックします。注意:スナップショット撮影時点からの作業がすべて失われます。元に戻すことはできません！"
   click_on_the_account_navigation_button_to_access_n_fbe82181: アカウントナビゲーションボタンをクリックして、通知設定にアクセスします。
@@ -7871,6 +7882,7 @@ ja:
   delete_grading_scheme_6b308832: 採点スキームの削除
   delete_grading_scheme_title_215f0a40: "採点方法%{title}を消去"
   delete_group_86c381ec: グループの削除
+  delete_in_progress_2d3f0e0d: 削除しています
   delete_key_developername_be80e695: "キーを削除%{developerName}"
   delete_key_name_c2de8c0c: "キーを削除%{name}"
   delete_my_account_41060aad: "マイ アカウントの削除"
@@ -7890,6 +7902,7 @@ ja:
   delete_section_name_a48d9d79: "セクション \"%{name}\"を削除する"
   delete_selected_a023ccf8: 選択項目の削除
   delete_selected_announcements_69e23710: 選択したアナウンスメントを削除
+  delete_selected_pages_7bc50580: 選択したページを削除する
   delete_survey_56fddbbd: サーベイの削除
   delete_term_name_f707abc9: "用語の削除%{name}"
   delete_theme_918a7f24: テーマを削除しますか？
@@ -9655,6 +9668,7 @@ ja:
   failed_to_delete_discussion_title_986df717: "ディスカッションを削除できませんでした%{title}"
   failed_to_delete_external_feed_36f19d70: 外部フィードの削除に失敗しました
   failed_to_delete_role_label_27959de3: "役割の削除ができませんでした%{label}"
+  failed_to_delete_selected_pages_26fa87db: 選択したページを削除できませんでした
   failed_to_export_some_tool_settings_c992fc56: 一部のツール設定のエクスポートに失敗しました
   failed_to_import_media_objects_4c1fcb4f: "メディア オブジェクトのインポートに失敗しました"
   failed_to_laod_more_submissions_990aacee: 他の提出の読込に失敗しました
@@ -9671,6 +9685,7 @@ ja:
   failed_to_save_please_try_again_later_bb7070fb: 保存に失敗しました。後でもう一度試してください
   failed_to_submit_draft_comment_1de83451: 下書きコメントの提出に失敗しました
   failed_to_unpin_discussion_503eab82: ディスカッションの固定を解除できませんでした
+  failed_to_update_account_notification_settings_194c1cd4: アカウント通知設定を更新できませんでした
   failed_to_update_course_notification_settings_cbf0eb18: コースの通知設定の更新に失敗しました
   failed_to_update_discussion_23cc229a: ディスカッションを更新できませんでした
   failed_to_update_permission_33c493f: 権限を更新できませんでした
@@ -12776,6 +12791,7 @@ ja:
   loading_courses_started_6e6d742c: コース読み込み開始
   loading_data_ecd89ba: データをロード中...
   loading_discussions_8ed5fcd7: ディスカッションを読み込み中
+  loading_external_tool_d839042c: 外部ツールを読み込み中
   loading_f99d93d4: "...読込み中"
   loading_features_d26820f6: 機能を読み込んでいます
   loading_folders_d8b5869e: フォルダを読み込み中...
@@ -13078,6 +13094,7 @@ ja:
   master_lock_590266b6: マスターロック
   mastered_34d4c857: 熟達
   mastery_7ec348b5: 熟達スコア
+  mastery_connect_64598f55: 習熟度コネクト
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "達成：%{n_mastery_points_precision_2_str} ポイント"
   mastery_path_processing_f4471152: 習得パス処理中
   mastery_paths_breakdown_6e0b5fce: 熟達の過程の内訳
@@ -13086,6 +13103,7 @@ ja:
   mastery_paths_editor_930655bb: マスタリーパスエディタ
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: 習熟パスの選択は、メンテナンスのため一時的に無効になっています。
   mastery_points_f1672cc: 習得ポイント
+  mastery_scale_abbc3557: 習熟度スケール
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: 熟達スコアは、採点された課題またはクイズの最高スコアを反映しています。
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: 熟達スコアは、直近に採点された課題またはクイズのスコアを反映しています。
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: 熟達スコアは、直近に採点された課題またはクイズのスコアを反映しています。
@@ -15640,6 +15658,7 @@ ja:
   next_mastery_path_is_currently_processing_f044d7d8: 次の習得パスは現在進行中です
   next_mastery_path_is_still_processing_please_perio_bb0121af: 次の習得パスはまだ処理中です。定期的にページをリフレッシュしてください
   next_message_780bcf24: 次のメッセージ
+  next_module_item_19e835f3: 次回のモジュール項目
   next_module_item_9bb8a222: 次のモジュール/アイテム
   next_month_749b1778: 翌月
   next_month_b55a387c: 翌月
@@ -16010,6 +16029,7 @@ ja:
       submission_graded: 提出物が採点されました
       submission_needs_grading: 提出物の採点が必要
       summaries: 要旨
+      upcoming_assignment_alert: 今度の課題アラート
       updated_wiki_page: 更新されたページ
       web_conference_invitation: "Web 会議への招待"
       web_conference_recording_ready: ウェブ会議の録音準備ができました
@@ -16070,7 +16090,7 @@ ja:
       other: その他
       parent: 親の電子メール
       scheduling: スケジューリング
-  notification_preferences_cf47083d: お知らせの基本設定
+  notification_preferences_cf47083d: 通知設定
   notifications_cbfa7704: お知らせ
   notifications_off_80da021c: 通知オフ
   notifications_search_results_80a0b06f: 通知検索結果
@@ -16570,6 +16590,7 @@ ja:
   package_error: "パッケージタイプを識別するエラー: %{error}"
   package_export_from_d6e2b073: ～のパッケージエクスポート
   page_50c4823d: ページ
+  page_bulk_deleting_74860a80: ページの一括削除
   page_comment: 
     default_user_name: 匿名
   page_comments: 
@@ -17394,6 +17415,7 @@ ja:
   previous_export_c6a997f7: 以前のエクスポート
   previous_message_8804f87e: 前のメッセージ
   previous_module_item_2bb5e499: 前のモジュール/アイテム
+  previous_module_item_a9e57348: 前回のモジュール項目
   previous_month_7adf1380: 前月
   previous_month_bb1e3c84: 前月
   previous_page_928fc112: 前のページ
@@ -19404,6 +19426,7 @@ ja:
   ratings_2433172b: 評価
   ratio_answered_correctly_b0c1e7d: "%{ratio}% aが正しく回答されています "
   ratio_responded_correctly_6d890107: "%{ratio}% が正しく回答されています"
+  raw_html_editor_e3993e41: "無変換の HTML エディタ"
   rce_auto_save_f004fba9: RCE自動保存
   rce_enhancements_5701e06: RCEの機能強化
   rce_initialization_fix_4f176bda: "RCE 初期化修正"
@@ -20430,6 +20453,7 @@ ja:
   select_one_8e0af564: "1 つを選択"
   select_one_b647b384: ひとつ選んでください
   select_one_of_the_options_c8b0c6e4: オプションを1つ選択
+  select_page_e93fc123: ページを選択する
   select_prerequisite_module_57894963: 前提条件モジュールの選択
   select_prerequite_module_e9042bb0: 前提条件モジュールの選択
   select_rubric_2aa2ffa2: ルービックを選択する
@@ -20445,6 +20469,7 @@ ja:
   select_the_files_you_want_to_associate_with_this_m_82677c50: この*モジュール*に関連付けたいファイルを選択、または「新規ファイル」を選択してファイルを追加します。
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "関連付けるページを選択するか、[新しいページ]を選択して新しいページを追加します。"
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "この*モジュール*に関連付けるページを選択するか、[新しいページ]を選択して新しいページを追加します。"
+  select_title_for_deletion_45b08247: "%{title}を削除すると選択する"
   select_type_of_prerequisite_8d6fa902: 前提条件のタイプを選択する
   select_video_file_35b61d4e: ビデオファイルを選択
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "ホーム ページに表示する内容を選択します。"
@@ -20460,6 +20485,7 @@ ja:
   selected_filename_7552a8c0: "選択されました%{filename}"
   selected_grade_942f40ba: 選択された成績
   selected_item_35bed33a: 選択された項目
+  selected_pages_have_been_deleted_82a7f965: 選択したページを削除しました
   selected_subtree_a7693937: "選択された %{subtree}"
   selection_end_date_10fcc8c6: 終了日で選択する
   selection_height_9d57ec24: 高さ選択
@@ -23773,6 +23799,7 @@ ja:
   untitled_assignment_59354b34: 無題の課題
   unused_courses_title: 未使用のコース
   up_c553575d: 上
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "今度の期限 - %{assignment_name}, %{course_name}"
   update_374eb54: 更新
   update_4d8ee62: 更新
   update_and_view_sections_course_details_navigation_dd10b45e: |-
@@ -24822,6 +24849,9 @@ ja:
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
     one: "%{count}件のディスカッションを削除しようとしています。よろしいですか？"
     other: "%{count}件のディスカッションを削除しようとしています。よろしいですか？"
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
+    one: "%{count}ページ削除しようとしています。よろしいですか？"
+    other: "%{count}ページ削除しようとしています。よろしいですか？"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       アカウントに適用していない変更が失われます。
       
@@ -25042,6 +25072,8 @@ ja:
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "現在%{contextType}の通知は受け取らないことになっています。%{contextType}の通知を有効にするには、上記の切り替えを使用してください。"
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: 現在コースの通知は受け取らないことになっています。コースの通知を有効にするには、上記の切り替えを使用してください。
   your_answer_8dad6ea4: "あなたの解答:"
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: "アナタの課題%{assignment_name}の期限は%{due_at}です。"
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "アナタの課題%{assignment_name}の期限は%{due_at}です。次のリンクをクリックして課題にアクセスし、期限までに提出してください。"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "課題リストは、*カレンダー* ページにあります。"
   your_assignments_list_has_improved_3eded80e: "*課題* リストが改良されました。"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 課題は、ここに期日ごとに表示されます。
