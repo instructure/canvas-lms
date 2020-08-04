@@ -1,6 +1,6 @@
 ARG RUBY=2.6
 
-FROM instructure/passenger-nginx-alpine:${RUBY}
+FROM instructure/passenger-nginx-alpine:${RUBY} AS gems-only
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12.2
@@ -92,4 +92,5 @@ RUN set -eux; \
   && bundle install --jobs $(nproc) \
   && rm -rf $GEM_HOME/cache
 
+FROM gems-only AS final
 COPY --chown=docker:docker . $APP_HOME

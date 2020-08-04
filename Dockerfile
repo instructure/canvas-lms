@@ -31,7 +31,6 @@ RUN set -eux; \
 USER docker
 COPY --chown=docker:docker babel.config.js    ${APP_HOME}
 COPY --chown=docker:docker build/new-jenkins  ${APP_HOME}build/new-jenkins
-COPY --chown=docker:docker gems               ${APP_HOME}gems
 COPY --chown=docker:docker package.json       ${APP_HOME}
 COPY --chown=docker:docker packages           ${APP_HOME}packages
 COPY --chown=docker:docker script             ${APP_HOME}script
