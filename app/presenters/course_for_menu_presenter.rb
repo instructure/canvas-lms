@@ -73,7 +73,7 @@ class CourseForMenuPresenter
           presenter.to_h
         end
       end
-      if course.root_account.feature_enabled?(:unpublished_courses)
+      if @context.root_account.feature_enabled?(:unpublished_courses)
         hash[:published] = course.published?
         hash[:canChangeCourseState] = course.grants_right?(@user, :change_course_state)
         hash[:defaultView] = course.default_view
