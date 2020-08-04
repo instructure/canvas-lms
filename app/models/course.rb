@@ -686,28 +686,49 @@ class Course < ActiveRecord::Base
   scope :recently_started, -> { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
   scope :recently_ended, -> { where(:conclude_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
   scope :recently_created, -> { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).preload(:teachers) }
-  scope :for_term, lambda {|term| term ? where(:enrollment_term_id => term) : all }
+  scope :for_term, lambda { |term| term ? where(:enrollment_term_id => term) : all }
   scope :active_first, -> { order(Arel.sql("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}")) }
-  scope :name_like, lambda {|name| where(coalesced_wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name)) }
+  scope :name_like, lambda { |query|
+    where(coalesced_wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', query))
+        .or(where(:id => query))
+  }
   scope :needs_account, lambda { |account, limit| where(:account_id => nil, :root_account_id => account).limit(limit) }
   scope :active, -> { where("courses.workflow_state<>'deleted'") }
   scope :least_recently_updated, lambda { |limit| order(:updated_at).limit(limit) }
+
   scope :manageable_by_user, lambda { |*args|
     # args[0] should be user_id, args[1], if true, will include completed
     # enrollments as well as active enrollments
     user_id = args[0]
     workflow_states = (args[1].present? ? %w{'active' 'completed'} : %w{'active'}).join(', ')
+    admin_completed_sql = ""
+    enrollment_completed_sql = ""
+
+    if args[1].blank?
+      admin_completed_sql = sanitize_sql(["INNER JOIN #{Course.quoted_table_name} AS c ON c.id = caa.course_id
+        INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = c.enrollment_term_id
+        WHERE (c.workflow_state<>'completed' AND
+          (c.conclude_at IS NULL OR c.conclude_at >= ?) AND
+          (et.end_at IS NULL OR et.end_at >= ?))", Time.now.utc, Time.now.utc])
+      enrollment_completed_sql = sanitize_sql(["INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
+        WHERE (courses.workflow_state<>'completed' AND
+          (courses.conclude_at IS NULL OR courses.conclude_at >= ?) AND
+          (et.end_at IS NULL OR et.end_at >= ?))", Time.now.utc, Time.now.utc])
+    end
+
     distinct.joins("INNER JOIN (
          SELECT caa.course_id, au.user_id FROM #{CourseAccountAssociation.quoted_table_name} AS caa
          INNER JOIN #{Account.quoted_table_name} AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
          INNER JOIN #{AccountUser.quoted_table_name} AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i} AND au.workflow_state = 'active'
+         #{admin_completed_sql}
        UNION SELECT courses.id AS course_id, e.user_id FROM #{Course.quoted_table_name}
          INNER JOIN #{Enrollment.quoted_table_name} AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
            AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
          INNER JOIN #{EnrollmentState.quoted_table_name} AS es ON es.enrollment_id = e.id AND es.state IN (#{workflow_states})
-         WHERE courses.workflow_state <> 'deleted') as course_users
+         #{enrollment_completed_sql}) AS course_users
        ON course_users.course_id = courses.id")
   }
+
   scope :not_deleted, -> { where("workflow_state<>'deleted'") }
 
   scope :with_enrollments, -> {

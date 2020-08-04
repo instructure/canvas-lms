@@ -151,7 +151,7 @@ describe('CourseImportPanel', () => {
     })
     useCourseModuleItemApi.mockClear()
     const input = getByLabelText(/select a course/i)
-    fireEvent.change(input, {target: {value: 'fo'}})
+    fireEvent.change(input, {target: {value: 'f'}})
     fireEvent.click(getByText('foo'))
     expect(queryByText(/Position/)).not.toBeInTheDocument()
     expect(useCourseModuleItemApi).not.toHaveBeenCalled()

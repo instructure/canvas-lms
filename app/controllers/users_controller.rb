@@ -752,7 +752,7 @@ class UsersController < ApplicationController
     @courses = []
     Shard.with_each_shard(@context.in_region_associated_shards) do
       scope = @query.present? ?
-        @context.manageable_courses_name_like(@query, include_concluded) :
+        @context.manageable_courses_by_query(@query, include_concluded) :
         @context.manageable_courses(include_concluded).limit(limit)
       @courses += scope.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key').preload(:enrollment_term).to_a
     end
@@ -760,10 +760,12 @@ class UsersController < ApplicationController
 
     @courses = @courses.select { |c| c.grants_right?(@current_user, :read_as_admin) && c.grants_right?(@current_user, :read) }
 
-    cancel_cache_buster
-    expires_in 30.minutes
     render :json => @courses.map { |c|
-      { :label => c.name, :id => c.id, :term => c.enrollment_term.name,
+      { :label => c.name,
+        :id => c.id,
+        :course_code => c.course_code,
+        :sis_id => c.sis_source_id,
+        :term => c.enrollment_term.name,
         :enrollment_start => c.enrollment_term.start_at,
         :account_name => c.enrollment_term.root_account.name,
         :account_id => c.enrollment_term.root_account.id,

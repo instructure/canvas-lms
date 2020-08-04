@@ -2406,7 +2406,7 @@ class User < ActiveRecord::Base
     Course.manageable_by_user(self.id, include_concluded).not_deleted
   end
 
-  def manageable_courses_name_like(query = '', include_concluded = false)
+  def manageable_courses_by_query(query='', include_concluded = false)
     self.manageable_courses(include_concluded).not_deleted.name_like(query).limit(50)
   end
 
