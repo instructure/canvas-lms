@@ -185,6 +185,52 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(@override_student.reload.root_account_id).to eq @course.root_account_id
     end
 
+    context 'with AttachmentAssociation with a non-ConversationMessage context' do
+      let(:other_root_account) { account_model(root_account_id: nil) }
+      let(:attachment_association) do
+        AttachmentAssociation.create!(
+          attachment: attachment_model(context: other_root_account),
+          context: reference_record
+        )
+      end
+
+      context 'with a Course context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { attachment_association }
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'with a Group context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { attachment_association }
+          let(:reference_record) { group_model }
+        end
+      end
+
+      context 'with a Submission context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { attachment_association }
+          let(:reference_record) { submission_model }
+        end
+      end
+    end
+
+    context 'with AssignmentAssocation with a ConverationMessage context' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:attachment) { attachment_model(context: account_model(root_account_id: nil)) }
+        let(:conversation_message) do
+          conversation(@user).messages.first.tap do |msg|
+            msg.update_attributes!(root_account_ids: [@course.root_account_id])
+          end
+        end
+        let(:record) do
+          AttachmentAssociation.create!(attachment: attachment, context: conversation_message)
+        end
+        let(:reference_record) { attachment }
+      end
+    end
+
     context 'with CalendarEvent' do
       context 'when context is Course' do
         it_behaves_like 'a datafixup that populates root_account_id' do
@@ -454,6 +500,28 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         context 'with sharding' do
           specs_require_sharding
 
+          it "processes all records when there is more than one foreign shard" do
+            expect([Shard.current.id, @shard1.id, @shard2.id].uniq.count).to eq(3)
+            course1 = @shard1.activate { course_model(account: account_model) }
+            course2 = @shard2.activate { course_model(account: account_model) }
+
+            user = user_model
+            fav1 = user.favorites.create!(context: course1)
+            fav2 = user.favorites.create!(context: course2)
+            fav1.update_columns(root_account_id: nil)
+            fav2.update_columns(root_account_id: nil)
+
+            expect(fav1.reload.root_account_id).to be_nil
+            expect(fav2.reload.root_account_id).to be_nil
+            DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(
+              Favorite, {course: :root_account_id}, fav1.id - 1, fav2.id + 1
+            )
+            expect(fav1.reload.root_account_id).to_not be_nil
+            expect(fav2.reload.root_account_id).to_not be_nil
+            expect(fav1.reload.root_account_id).to eq(course1.global_root_account_id)
+            expect(fav2.reload.root_account_id).to eq(course2.global_root_account_id)
+          end
+
           it_behaves_like 'a datafixup that populates root_account_id' do
             let(:record) do
               user = @user
@@ -462,6 +530,49 @@ describe DataFixup::PopulateRootAccountIdOnModels do
             let(:reference_record) { @course }
             let(:sharded) { true }
           end
+        end
+      end
+    end
+
+    context 'with Folder' do
+      context 'with course context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { Folder.create!(context: @course )}
+          let(:reference_record) { @course }
+        end
+      end
+
+      context 'with account context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { Folder.create!(context: reference_record )}
+          let(:reference_record) { account_model }
+        end
+      end
+
+      context 'with group context' do
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { Folder.create!(context: reference_record )}
+          let(:reference_record) { group_model }
+        end
+      end
+
+      context 'with user context' do
+        it 'should ignore record' do
+          folder = Folder.create!(context: user_model)
+          folder.update_columns(root_account_id: nil)
+          expect(folder.reload.root_account_id).to eq nil
+          DataFixup::PopulateRootAccountIdOnModels.run
+          expect(folder.reload.root_account_id).to eq nil
+        end
+      end
+
+      context 'with sharding' do
+        specs_require_sharding
+
+        it_behaves_like 'a datafixup that populates root_account_id' do
+          let(:record) { Folder.create!(context: @shard1.activate { course_model(account: account_model) }) }
+          let(:reference_record) { @course }
+          let(:sharded) { true }
         end
       end
     end

@@ -57,12 +57,15 @@ module DataFixup::PopulateRootAccountIdOnModels
     {
       AccessToken => :developer_key,
       AccountUser => :account,
+      # Attachment is handled differently than other fix ups, it is triggered in the populate_overrides
+      Attachment => [],
       AssessmentQuestion => :assessment_question_bank,
       AssessmentQuestionBank => :context,
       AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
       AssignmentGroup => :context,
       AssignmentOverride => :assignment,
       AssignmentOverrideStudent => :assignment,
+      AttachmentAssociation => %i[course group submission attachment], # attachment is last, only used if context is a ConversationMessage
       CalendarEvent => [:context_course, :context_group, :context_course_section],
       ContentMigration => [:account, :course, :group],
       ContentParticipation => :content,
@@ -83,6 +86,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       DiscussionTopicParticipant => :discussion_topic,
       EnrollmentState => :enrollment,
       Favorite => :context,
+      Folder => [:account, :course, :group],
       GradingPeriod => :grading_period_group,
       GradingPeriodGroup => [{root_account: [:root_account_id, :id]}, :course],
       GradingStandard => :context,
@@ -131,6 +135,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.dependencies
     {
       AssetUserAccess => [:attachment, :calendar_event],
+      Attachment => [:account, :assessment_question, :assignment, :course, :group, :submission],
       LearningOutcome => :content_tag,
     }.freeze
   end
@@ -140,7 +145,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   # job cycle this backfill provides
   #
   # Each key points to a code module. This module is expected to have a
-  # `populate` method that takes `(table, assoc, min, max)`.
+  # `populate` method that takes `(min, max)`.
   #
   # Tables that are listed here must be also listed in the `migration_tables`
   # hash above, and may list their non-association dependencies in the
@@ -148,6 +153,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.populate_overrides
     {
       AssetUserAccess => DataFixup::PopulateRootAccountIdOnAssetUserAccesses,
+      Attachment => DataFixup::PopulateRootAccountIdOnAttachments,
       LearningOutcome => DataFixup::PopulateRootAccountIdsOnLearningOutcomes,
     }.freeze
   end
@@ -428,8 +434,9 @@ module DataFixup::PopulateRootAccountIdOnModels
       # one shard at a time
       foreign_shard = Shard.shard_for(min)
       if foreign_shard
-        scope = scope.where("#{foreign_key} >= ? AND #{foreign_key} < ?", min, (foreign_shard.id + 1) * Shard::IDS_PER_SHARD)
-        associated_ids = scope.pluck(foreign_key)
+        # scope for developer key ids within the current foreign_shard:
+        subscope = scope.where("#{foreign_key} >= ? AND #{foreign_key} < ?", min, (foreign_shard.id + 1) * Shard::IDS_PER_SHARD)
+        associated_ids = subscope.pluck(foreign_key)
         root_ids_with_foreign_keys = foreign_shard.activate do
           reflection.klass.
             select("#{column} AS root_id, array_agg(#{reflection.table_name}.#{reflection.klass.primary_key}) AS foreign_keys").
@@ -438,11 +445,11 @@ module DataFixup::PopulateRootAccountIdOnModels
         end
         root_ids_with_foreign_keys.each do |attributes|
           foreign_keys = attributes.foreign_keys.map{|fk| Shard.global_id_for(fk, foreign_shard)}
-          scope.where("#{foreign_key} IN (#{foreign_keys.join(',')})").
+          subscope.where("#{foreign_key} IN (#{foreign_keys.join(',')})").
             update_all("root_account_id = #{Shard.global_id_for(attributes.root_id, foreign_shard) || "null"}")
         end
       end
-      min = scope.where("#{foreign_key} > ?", (min / Shard::IDS_PER_SHARD + 1) * Shard::IDS_PER_SHARD).minimum(:id)
+      min = scope.where("#{foreign_key} > ?", (min / Shard::IDS_PER_SHARD + 1) * Shard::IDS_PER_SHARD).minimum(foreign_key)
     end
   end
 
