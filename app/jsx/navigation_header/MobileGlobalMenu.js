@@ -38,6 +38,7 @@ import {
 import I18n from 'i18n!MobileGlobalMenu'
 import HelpDialog from '../help_dialog/HelpDialog'
 import LogoutButton from './LogoutButton'
+import HighContrastModeToggle from './trays/HighContrastModeToggle'
 
 function ActiveText({children, url}) {
   return window.location.pathname.startsWith(url) ? <Text weight="bold">{children}</Text> : children
@@ -163,6 +164,9 @@ export default class MobileGlobalMenu extends React.Component {
                   )}
                   <List.Item>
                     <LogoutButton variant="link" fluidWidth />
+                  </List.Item>
+                  <List.Item>
+                    <HighContrastModeToggle isMobile />
                   </List.Item>
                 </List>
               </ToggleDetails>

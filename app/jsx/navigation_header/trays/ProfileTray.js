@@ -22,8 +22,9 @@ import {arrayOf, bool, object, shape, string} from 'prop-types'
 import {Avatar, Badge, Heading, List, Text} from '@instructure/ui-elements'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import LogoutButton from '../LogoutButton'
+import HighContrastModeToggle from './HighContrastModeToggle'
 import {AccessibleContent} from '@instructure/ui-a11y'
 
 // Trying to keep this as generalized as possible, but it's still a bit
@@ -101,6 +102,8 @@ export default function ProfileTray(props) {
           </List.Item>
         )}
       </List>
+      <hr role="presentation" />
+      <HighContrastModeToggle />
     </View>
   )
 }
