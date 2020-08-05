@@ -80,7 +80,7 @@ gem 'inst-jobs', '0.15.16'
 gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.32.0', require: false
 gem 'inst-jobs-statsd', '1.3.2'
-gem 'json', '2.3.0'
+gem 'json', '2.3.1'
 gem 'json_schemer', '0.2.10'
 gem 'json-jwt', '1.11.0', require: false
 gem 'link_header', '0.0.8'
