@@ -1935,7 +1935,9 @@ tr:
       Kullanıcının bir kullanıcının ayarlar menüsüne ve kullanıcı ayrıntılarına erişmesine izin verir.
       Kullanıcının, bir öğrencinin ayrıntılar sayfasındaki kayıtları tamamlamasına veya silmesine izin verir.
       Kullanıcının ders davetiyelerini tekrar göndermesine izin verir.
+  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "Kullanıcıların değerlendirme listesi oluşturmalarına, düzenlemelerine ve silmelerine izin ver."
   allows_user_to_create_new_conferences_allows_user__89cebec2: "Kullanıcının yeni canlı dersler oluşturmasına izin verir. Kullanıcının oluşturduğu canlı dersleri başlatmasına izin verir."
+  allows_user_to_manage_rubrics_326eedc2: "Kullanıcıların değerlendirme listelerini yönetmelerine izin ver."
   allows_user_to_view_list_of_users_in_the_course_pe_1b0b4bab: |-
       Kullanıcının dersteki Kişiler sayfasındaki kullanıcıların listesini görüntülemesine izin verir.
       Kullanıcının dersteki Kişiler sayfasındaki Önceki Kayıtlar düğmesini görüntülemesini sağlar.
@@ -3190,6 +3192,7 @@ tr:
   available_8606e40c: Kullanılabilir
   available_after_unlock_at_b5682224: "%{unlock_at} tarihinden sonra geçerli"
   available_after_unlock_at_until_lock_at_499e8092: "%{unlock_at} tarihinden sonra %{lock_at} tarihine kadar geçerli"
+  available_folders_694d0436: "Mevcut klasörler"
   available_from_587ce92f: "Etkin Olduğu Tarih"
   available_from_date_43b5e11d: "Etkin Olduğu Tarih"
   available_from_date_afc594fa: "Şu Tarihten İtibaren Etkin:"
@@ -7200,6 +7203,9 @@ tr:
   duplicate_modules_8ea35557: "Modülleri Çoğalt"
   duplicate_provider_provider_d9842134: "%{provider} sağlayıcısını kopyala"
   duplicating_calendar_events_9932cd37: "Takvim Olaylarını Yineleme"
+  duplicating_module_9727f5e4: "Modülün kopyası oluşturuluyor..."
+  duplicating_module_ae6670b0: "Modülün kopyası oluşturuluyor"
+  duplicating_module_this_may_take_some_time_eef73720: "Modülün kopyası oluşturuluyor, bu biraz sürebilir"
   duration_1_minute_29c7d5ab: "Süre: 1 dakika"
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Süre: %{hours} saat %{minutes} dakika"
   duration_minutes_minutes_d7b9182b: "Süre: %{minutes} dakika"
@@ -7723,6 +7729,7 @@ tr:
   error_59293a2c: hata
   error_98e81528: Hata
   error_deleting_name_reason_11f9d399: "%{name}'i silerken hata oluştu: %{reason}"
+  error_duplicating_module_4b023042: "Modülün kopyası oluşturulurken hata oluştu"
   error_in_mastery_paths_range_index_7d17ddac: "%{index}yeterlilik süreci aralığında %{error}"
   error_message_2b9d12ee: "Hata: %{message}"
   error_reports_7d6c8b1e: "Hata Raporları"
@@ -8249,6 +8256,7 @@ tr:
   from_from_to_to_e31f6422: "%{from}'dan %{to}'a"
   from_gravatar_58372d5a: "Gravatar'dan al"
   front_page_must_be_set_first_4dbbfdbe: "Önce ana sayfa ayarlanmalıdır."
+  front_page_must_be_set_first_c5246f7d: "Öncelikle bir ana sayfa belirlenmelidir."
   full_article_9296bb6f: "Tüm makale"
   full_name_14c958f7: "Tam Ad:"
   full_name_23fdfb6d: "Tam Ad"
@@ -12263,6 +12271,7 @@ tr:
   module_locked_f6a7ea9d: "Modül Kilitli"
   module_menu_3201af4e: "Modül Menüsü"
   module_module_name_was_successfully_deleted_fc9e9d47: "%{module_name} modülü başarıyla silindi."
+  module_name_1127ebdb: "Modül Adı"
   module_navigation_97043417: "Modül Gezinme"
   modules: 
     add: 
@@ -13207,6 +13216,8 @@ tr:
   outcomesSidebarView: 
     titles: 
       find_outcomes: "Öğrenme Çıktısı Ara"
+  outcomes_and_rubrics_account_course_68d0bf1d: "Öğrenme Çıktıları ve Değerlendirme Listeleri (Hesap/Ders)"
+  outcomes_and_rubrics_f893d141: "Öğrenme Çıktıları ve Değerlendirme Listeleri"
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Öğrenme çıktıları bir derste yeterliliği izlemek için oluşturulur. Başlangıç olarak en üstteki menü çubuğunu kontrol edin. yeni bir öğrenme çıktısı oluşturmak için Öğrenme çıktısını butonuna tıklayın ya da öğrenme çıktılarınızı içinde düzenleyebileceğiniz yeni bir grup oluşturmak için Yeni Grup butonuna tıklayın. Bul butonu ile kurumunuz tarafından oluşturulmuş öğrenme çıktılarını kullanabilirsiniz. Öğrenme çıktılarını oluşturup kullanmaya başladıkça bu çıktılarınızı soldaki gezinme menüsünden seçip kullanabileceksiniz. Bir yapı oluşturmak için öğrenme çıktılarını farklı seviyelerde sürükleyip bırakabilirsiniz. "
   outcomes_csv_format_9005acfb: "Öğrenme çıktıları CSV formatı"
   outcomes_d1b18d33: "Öğrenme Çıktıları"
@@ -14230,7 +14241,7 @@ tr:
       published: Yayınlandı
       published_desc: "Yayınlanmış. Yayından kaldırmak için tıklayınız."
       publishing: Yayınlanıyor...
-      unpublish: Yayınlanmıyor
+      unpublish: "Yayından kaldır"
       unpublishing: "Yayından kaldırılıyor..."
   publish_grades_to_sis_51402d46: "Notları SIS'te Yayınla"
   publish_icon_component: 
@@ -16133,6 +16144,7 @@ tr:
       remove_rubric: "Değerlendirme listesini listemden sil"
   rubrics_add_edit_delete_8299eff7: "Değerlendirme Listeleri - ekle / düzenle / sil"
   rubrics_b5ef369b: "Değerlendirme Listeleri"
+  rubrics_speedgrader_a6ebec57: "Değerlendirme Listeleri, SpeedGrader"
   russia_7_87bc99d5: "Rusya (+7)"
   rwanda_250_1a6b344b: "Ruanda (+250)"
   salesforce_account_id_eb5c78ad: "Salesforce Hesap Id"
@@ -17489,6 +17501,7 @@ tr:
   students_can_see_originality_score_797fe634: "Öğrenciler özgünlük puanlarını görebilir"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Ders sonladırıldıktan sonra öğrenciler kısa sınava verdikleri cevapları göremezler"
   students_have_either_already_taken_or_started_taki_a076336: "Öğrenciler zaten bu kısa sınavı aldılar yada yapmaya başladılar, bu yüzden düzenlerken dikkat etmelisiniz. Eğer kısa sınav soruları üzerinde belirgin değişiklikler yapacaksanız, bu kısa sınavın eski versiyonunu yapan öğrencilerin tekrardan değerlendirilmesini göz önünde bulundurmalısınız."
+  students_must_complete_all_of_these_requirements_15fa97f7: "Öğrenciler bu gereksinimlerin tamamını yerine getirmeli"
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Kısa sınavı almayan öğrenciler (%{count})"
     other: "Kısa sınavı almayan öğrenciler (%{count})"
@@ -18289,6 +18302,7 @@ tr:
   unmute_assignment_29a49038: "Ödevi Beklemeden Çıkar"
   unnamed_tool_961cb95b: "İsimsiz Araç"
   unpin_a318452a: "Sabitlemeyi kaldır"
+  unpublish_9f2d730b: "Yayından kaldır"
   unpublish_title_26ae9667: "%{title} Yayından kaldır"
   unpublished_8b6107d6: Yayınlanmamış
   unpublished_assignments_9cdbcc87: "Yayınlanmamış Ödevler"
