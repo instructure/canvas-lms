@@ -1375,7 +1375,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.destroy_batch(courses, sis_batch: nil, batch_mode: false)
-    enroll_scope = Enrollment.where(course_id: courses, workflow_state: 'deleted')
+    enroll_scope = Enrollment.active.where(course_id: courses)
     enroll_scope.find_in_batches do |e_batch|
       user_ids = e_batch.map(&:user_id).uniq.sort
       data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch,
