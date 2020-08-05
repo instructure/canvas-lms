@@ -362,6 +362,7 @@ module SIS
 
       def enrollment_status(associated_user_id, enrollment, enrollment_info, pseudo, role, user)
         all_done = false
+        return true if enrollment.workflow_state == 'deleted' && pseudo.workflow_state == 'deleted'
         if enrollment_info.status =~ /\Aactive/i
           message = set_enrollment_workflow_state(enrollment, enrollment_info, pseudo, user)
           @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info) if message
