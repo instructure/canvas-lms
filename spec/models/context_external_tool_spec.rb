@@ -845,6 +845,50 @@ describe ContextExternalTool do
         tool = ContextExternalTool.find_external_tool('http://www.tool.com/launch?p1=2082', Course.find(@course.id))
         expect(tool.tool_id).to eq('real')
       end
+
+      context 'and there is a difference in LTI version' do
+        subject { ContextExternalTool.find_external_tool(requested_url, context) }
+
+        before do
+          # Creation order is important. Be default Canvas uses
+          # creation order as a tie-breaker. Creating the LTI 1.3
+          # tool first ensures we are actually exercising the preferred
+          # LTI version matching logic.
+          lti_1_1_tool
+          lti_1_3_tool
+        end
+
+        let(:context) { @course }
+        let(:domain) { 'www.test.com' }
+        let(:opts) { { url: url, domain: domain } }
+        let(:requested_url) { "" }
+        let(:url) { 'https://www.test.com/foo?bar=1' }
+        let(:lti_1_1_tool) { external_tool_model(context: context, opts: opts) }
+        let(:lti_1_3_tool) do
+          t = external_tool_model(context: context, opts: opts)
+          t.use_1_3 = true
+          t.save!
+          t
+        end
+
+        context 'with an exact URL match' do
+          let(:requested_url) { url }
+
+          it { is_expected.to eq lti_1_3_tool }
+        end
+
+        context 'with a partial URL match' do
+          let(:requested_url) { "#{url}&extra_param=1" }
+
+          it { is_expected.to eq lti_1_3_tool }
+        end
+
+        context 'whith a domain match' do
+          let(:requested_url) { "https://www.test.com/another_endpoint" }
+
+          it { is_expected.to eq lti_1_3_tool }
+        end
+      end
     end
 
     context('with a client id') do
