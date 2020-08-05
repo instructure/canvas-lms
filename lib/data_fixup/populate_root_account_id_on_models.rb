@@ -471,8 +471,9 @@ module DataFixup::PopulateRootAccountIdOnModels
       # one shard at a time
       foreign_shard = Shard.shard_for(min)
       if foreign_shard
-        scope = scope.where("#{foreign_key} >= ? AND #{foreign_key} < ?", min, (foreign_shard.id + 1) * Shard::IDS_PER_SHARD)
-        associated_ids = scope.pluck(foreign_key)
+        # scope for developer key ids within the current foreign_shard:
+        subscope = scope.where("#{foreign_key} >= ? AND #{foreign_key} < ?", min, (foreign_shard.id + 1) * Shard::IDS_PER_SHARD)
+        associated_ids = subscope.pluck(foreign_key)
         root_ids_with_foreign_keys = foreign_shard.activate do
           reflection.klass.
             select("#{column} AS root_id, array_agg(#{reflection.table_name}.#{reflection.klass.primary_key}) AS foreign_keys").
@@ -481,11 +482,11 @@ module DataFixup::PopulateRootAccountIdOnModels
         end
         root_ids_with_foreign_keys.each do |attributes|
           foreign_keys = attributes.foreign_keys.map{|fk| Shard.global_id_for(fk, foreign_shard)}
-          scope.where("#{foreign_key} IN (#{foreign_keys.join(',')})").
+          subscope.where("#{foreign_key} IN (#{foreign_keys.join(',')})").
             update_all("root_account_id = #{Shard.global_id_for(attributes.root_id, foreign_shard) || "null"}")
         end
       end
-      min = scope.where("#{foreign_key} > ?", (min / Shard::IDS_PER_SHARD + 1) * Shard::IDS_PER_SHARD).minimum(:id)
+      min = scope.where("#{foreign_key} > ?", (min / Shard::IDS_PER_SHARD + 1) * Shard::IDS_PER_SHARD).minimum(foreign_key)
     end
   end
 
