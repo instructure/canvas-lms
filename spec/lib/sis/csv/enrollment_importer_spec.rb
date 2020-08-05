@@ -783,7 +783,7 @@ describe SIS::CSV::EnrollmentImporter do
 
     warnings = []
     work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)
-    expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
+    expect(work).to receive(:root_account_from_id).once.and_return(account2)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
 
     # the enrollments
@@ -812,7 +812,7 @@ describe SIS::CSV::EnrollmentImporter do
 
     warnings = []
     work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)
-    expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
+    expect(work).to receive(:root_account_from_id).once.and_return(account2)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
     process_csv_data(
@@ -841,7 +841,7 @@ describe SIS::CSV::EnrollmentImporter do
 
     warnings = []
     work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)
-    expect(work).to receive(:root_account_from_id).with('account2').once.and_return(nil)
+    expect(work).to receive(:root_account_from_id).once.and_return(nil)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
     importer = process_csv_data_cleanly(

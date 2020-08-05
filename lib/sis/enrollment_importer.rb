@@ -139,7 +139,7 @@ module SIS
           end
 
           if enrollment_info.root_account_id.present?
-            root_account = root_account_from_id(enrollment_info.root_account_id)
+            root_account = root_account_from_id(enrollment_info.root_account_id, enrollment_info)
             next unless root_account
           else
             root_account = @root_account
@@ -340,7 +340,7 @@ module SIS
         end
       end
 
-      def root_account_from_id(root_account_sis_id)
+      def root_account_from_id(_root_account_id, _enrollment_info)
         nil
       end
 
