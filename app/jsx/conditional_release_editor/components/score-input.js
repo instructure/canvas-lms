@@ -24,6 +24,8 @@ import shortid from 'shortid'
 import I18n from 'i18n!conditional_release'
 import GradingTypes from '../grading-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Tooltip} from '@instructure/ui-tooltip'
+
 import {
   scoreToPercent,
   percentToScore,
@@ -102,19 +104,13 @@ export default class ScoreInput extends React.Component {
     return 'error-' + this.shortid
   }
 
-  errorMessage() {
+  screenreaderErrorMessage() {
     if (this.hasError()) {
       return (
-        <div className="cr-percent-input__error-holder">
+        <div>
           <ScreenReaderContent>
             <span id={this.errorMessageId()}>{this.props.error}</span>
           </ScreenReaderContent>
-          <div className="cr-percent-input__error ic-Form-message ic-Form-message--error">
-            <div className="ic-Form-message__Layout">
-              <i className="icon-warning" role="presentation" />
-              {this.props.error}
-            </div>
-          </div>
         </div>
       )
     } else {
@@ -152,18 +148,20 @@ export default class ScoreInput extends React.Component {
             {srLabel}
           </label>
         </ScreenReaderContent>
-        <input
-          className="cr-input cr-percent-input__input"
-          id={this.shortid}
-          type="text"
-          value={this.value()}
-          title={this.props.label}
-          onChange={this.changed}
-          onFocus={this.focused}
-          onBlur={this.blurred}
-          {...optionalProps}
-        />
-        {this.errorMessage()}
+        <Tooltip renderTip={this.props.error} isShowingContent={this.hasError()} color="primary">
+          <input
+            className="cr-input cr-percent-input__input"
+            id={this.shortid}
+            type="text"
+            value={this.value()}
+            title={this.props.label}
+            onChange={this.changed}
+            onFocus={this.focused}
+            onBlur={this.blurred}
+            {...optionalProps}
+          />
+        </Tooltip>
+        {this.screenreaderErrorMessage()}
       </div>
     )
   }
