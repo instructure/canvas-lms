@@ -57,6 +57,8 @@ module DataFixup::PopulateRootAccountIdOnModels
     {
       AccessToken => :developer_key,
       AccountUser => :account,
+      # Attachment is handled differently than other fix ups, it is triggered in the populate_overrides
+      Attachment => [],
       AssessmentQuestion => :assessment_question_bank,
       AssessmentQuestionBank => :context,
       AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
@@ -84,6 +86,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       DiscussionTopicParticipant => :discussion_topic,
       EnrollmentState => :enrollment,
       Favorite => :context,
+      Folder => [:account, :course, :group],
       GradingPeriod => :grading_period_group,
       GradingPeriodGroup => [{root_account: [:root_account_id, :id]}, :course],
       GradingStandard => :context,
@@ -120,6 +123,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       Submission => :assignment,
       SubmissionComment => :course,
       SubmissionVersion => :course,
+      User => [],
       UserAccountAssociation => :account,
       WebConference => :context,
       WebConferenceParticipant => :web_conference,
@@ -132,7 +136,9 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.dependencies
     {
       AssetUserAccess => [:attachment, :calendar_event],
+      Attachment => [:account, :assessment_question, :assignment, :course, :group, :submission],
       LearningOutcome => :content_tag,
+      User => :user_account_association,
     }.freeze
   end
 
@@ -149,7 +155,9 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.populate_overrides
     {
       AssetUserAccess => DataFixup::PopulateRootAccountIdOnAssetUserAccesses,
+      Attachment => DataFixup::PopulateRootAccountIdOnAttachments,
       LearningOutcome => DataFixup::PopulateRootAccountIdsOnLearningOutcomes,
+      User => DataFixup::PopulateRootAccountIdsOnUsers,
     }.freeze
   end
 
@@ -157,7 +165,8 @@ module DataFixup::PopulateRootAccountIdOnModels
   # tables listed here should override the populate method above
   def self.multiple_root_account_ids_tables
     [
-      LearningOutcome
+      LearningOutcome,
+      User
     ].freeze
   end
 
@@ -189,6 +198,9 @@ module DataFixup::PopulateRootAccountIdOnModels
         if populate_overrides.key?(table)
           # allow for one or more override methods of population
           Array(populate_overrides[table]).each do |override_module|
+            next unless override_module.respond_to?(:populate)
+            next if table.where(get_column_name(table) => nil).none?
+
             self.send_later_if_production_enqueue_args(:populate_root_account_ids_override,
             {
               priority: Delayed::MAX_PRIORITY,
@@ -198,6 +210,21 @@ module DataFixup::PopulateRootAccountIdOnModels
           end
         end
       end
+
+      if populate_overrides.key?(table)
+        Array(populate_overrides[table]).each do |override_module|
+          next unless override_module.respond_to?(:populate_table) &&
+            override_module.respond_to?(:run_populate_table?)
+          next unless override_module.run_populate_table?
+          self.send_later_if_production_enqueue_args(:populate_root_account_ids_override_table,
+           {
+             priority: Delayed::MAX_PRIORITY,
+             n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
+           },
+           table, override_module)
+        end
+      end
+
     end
   end
 
@@ -410,6 +437,12 @@ module DataFixup::PopulateRootAccountIdOnModels
     unlock_next_backfill_job(table)
   end
 
+  def self.populate_root_account_ids_override_table(table, override_module)
+    override_module.populate_table
+
+    unlock_next_backfill_job(table)
+  end
+
   def self.create_column_names(assoc, columns)
     names = Array(columns).map{|column| "#{assoc.klass.table_name}.#{column}"}
     names.count == 1 ? names.first : "COALESCE(#{names.join(', ')})"
@@ -429,8 +462,9 @@ module DataFixup::PopulateRootAccountIdOnModels
       # one shard at a time
       foreign_shard = Shard.shard_for(min)
       if foreign_shard
-        scope = scope.where("#{foreign_key} >= ? AND #{foreign_key} < ?", min, (foreign_shard.id + 1) * Shard::IDS_PER_SHARD)
-        associated_ids = scope.pluck(foreign_key)
+        # scope for developer key ids within the current foreign_shard:
+        subscope = scope.where("#{foreign_key} >= ? AND #{foreign_key} < ?", min, (foreign_shard.id + 1) * Shard::IDS_PER_SHARD)
+        associated_ids = subscope.pluck(foreign_key)
         root_ids_with_foreign_keys = foreign_shard.activate do
           reflection.klass.
             select("#{column} AS root_id, array_agg(#{reflection.table_name}.#{reflection.klass.primary_key}) AS foreign_keys").
@@ -439,11 +473,11 @@ module DataFixup::PopulateRootAccountIdOnModels
         end
         root_ids_with_foreign_keys.each do |attributes|
           foreign_keys = attributes.foreign_keys.map{|fk| Shard.global_id_for(fk, foreign_shard)}
-          scope.where("#{foreign_key} IN (#{foreign_keys.join(',')})").
+          subscope.where("#{foreign_key} IN (#{foreign_keys.join(',')})").
             update_all("root_account_id = #{Shard.global_id_for(attributes.root_id, foreign_shard) || "null"}")
         end
       end
-      min = scope.where("#{foreign_key} > ?", (min / Shard::IDS_PER_SHARD + 1) * Shard::IDS_PER_SHARD).minimum(:id)
+      min = scope.where("#{foreign_key} > ?", (min / Shard::IDS_PER_SHARD + 1) * Shard::IDS_PER_SHARD).minimum(foreign_key)
     end
   end
 
