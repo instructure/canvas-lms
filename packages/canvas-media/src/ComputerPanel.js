@@ -27,7 +27,7 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
 import {px} from '@instructure/ui-utils'
-import {VideoPlayer} from '@instructure/ui-media-player'
+import {MediaPlayer} from '@instructure/ui-media-player'
 
 import LoadingIndicator from './shared/LoadingIndicator'
 import RocketSVG from './RocketSVG'
@@ -135,7 +135,10 @@ export default function ComputerPanel({
           </Flex.Item>
         </Flex>
         <View as="div" textAlign="center" margin="0 auto">
-          <VideoPlayer sources={[{label: theFile.name, src}]} controls={renderControls} />
+          <MediaPlayer
+            sources={[{label: theFile.name, src}]}
+            hideFullScreen={!document.fullscreenEnabled}
+          />
         </View>
         {isVideo(theFile.type) && (
           <>
@@ -193,31 +196,6 @@ export default function ComputerPanel({
       />
     </div>
   )
-
-  function renderControls(VPC) {
-    if (isAudio(theFile.type)) {
-      return (
-        <VPC>
-          <VPC.PlayPauseButton />
-          <VPC.Timebar />
-          <VPC.Volume />
-          <VPC.PlaybackSpeed />
-          <VPC.TrackChooser />
-        </VPC>
-      )
-    }
-    return (
-      <VPC>
-        <VPC.PlayPauseButton />
-        <VPC.Timebar />
-        <VPC.Volume />
-        <VPC.PlaybackSpeed />
-        <VPC.TrackChooser />
-        <VPC.SourceChooser />
-        {document.fullscreenEnabled && <VPC.FullScreenButton />}
-      </VPC>
-    )
-  }
 }
 
 ComputerPanel.propTypes = {

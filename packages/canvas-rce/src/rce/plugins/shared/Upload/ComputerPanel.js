@@ -20,10 +20,6 @@
 // the RCE's Media > Upload/Record Media function, it's not this one
 // (though this panel can handle video with the right "accept" prop).
 // See @instructure/canvas-media/src/ComputerPanel.js
-// On the other hand, becuase the VideoPlayer v5 doesn't forward onLoadedMetadata
-// to the underlying <video>, the sizing of the video preview is wrong.
-// This isn't a big issue because (1) this isn't the panel being used to upload
-// video, and (2) it will be fixed with MediaPlayer v7
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {arrayOf, func, instanceOf, number, oneOfType, shape, string} from 'prop-types'
@@ -38,7 +34,7 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Img, Text, TruncateText} from '@instructure/ui-elements'
 import {Flex, View} from '@instructure/ui-layout'
-import {VideoPlayer} from '@instructure/ui-media-player'
+import {MediaPlayer} from '@instructure/ui-media-player'
 
 import {RocketSVG, useComputerPanelFocus, isAudio, sizeMediaPlayer} from '@instructure/canvas-media'
 
@@ -165,7 +161,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
           </View>
         )
       } else if (isAudioOrVideo(theFile.type)) {
-        return <VideoPlayer sources={preview.preview} onLoadedMetadata={handleLoadedMetadata} />
+        return <MediaPlayer sources={preview.preview} onLoadedMetadata={handleLoadedMetadata} />
       } else {
         return (
           <div

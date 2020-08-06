@@ -40,7 +40,7 @@
     "@instructure/ui-icons": "6",
     "@instructure/ui-heading": "6",
     "@instructure/ui-layout": "6",
-    "@instructure/ui-media-player": "^5",
+    "@instructure/ui-media-player": "^7",
     "@instructure/ui-overlays": "6",
     "@instructure/ui-pagination": "6",
     "@instructure/ui-react-utils": "6",

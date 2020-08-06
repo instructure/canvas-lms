@@ -19,11 +19,10 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {number, oneOf, string} from 'prop-types'
 import I18n from 'i18n!CanvasMediaPlayer'
 import {LoadingIndicator, isAudio, sizeMediaPlayer} from '@instructure/canvas-media'
-import {VideoPlayer} from '@instructure/ui-media-player'
+import {MediaPlayer} from '@instructure/ui-media-player'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
-import {View} from '@instructure/ui-layout'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 const byBitrate = (a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
@@ -41,7 +40,6 @@ export default function CanvasMediaPlayer(props) {
     ? props.media_sources.sort(byBitrate)
     : props.media_sources
   const [media_sources, setMedia_sources] = useState(sorted_sources)
-  const [retryTimerId, setRetryTimerId] = useState(0)
   const [retryAttempt, setRetryAttempt] = useState(0)
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
   // the ability to set these makes testing easier
@@ -95,34 +93,42 @@ export default function CanvasMediaPlayer(props) {
     [props.type]
   )
 
+  const fetchSources = useCallback(
+    async function() {
+      const url = `/media_objects/${props.media_id}/info`
+      let resp
+      try {
+        setMediaObjNetworkErr(null)
+        resp = await asJson(fetch(url, defaultFetchOptions))
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn(`Error getting ${url}`, e.message)
+        setMediaObjNetworkErr(e)
+        return
+      }
+      if (resp?.media_sources?.length) {
+        setMedia_sources(resp.media_sources.sort(byBitrate))
+      } else {
+        setRetryAttempt(retryAttempt + 1)
+      }
+    },
+    [props.media_id, retryAttempt]
+  )
+
   useEffect(() => {
-    if (!props.media_sources.length && retryAttempt <= MAX_RETRY_ATTEMPTS) {
-      fetchSources()
+    // if we just uploaded the media, notorious may still be processing it
+    // and we don't have its media_sources yet
+    let retryTimerId = 0
+    if (!media_sources.length && retryAttempt <= MAX_RETRY_ATTEMPTS) {
+      retryTimerId = setTimeout(() => {
+        fetchSources()
+      }, 2 ** retryAttempt * 1000)
     }
 
     return () => {
       clearTimeout(retryTimerId)
     }
-    // The way this function is setup seems to break things when more exhaustive
-    // deps are put in here.  We should investigate more in the future.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [retryAttempt])
-
-  // when we go to ui-media-player v7, <MediaPlayer> can listen for onLoadedMetedata
-  // but for now, it doesn't.
-  useEffect(() => {
-    const player = containerRef.current.querySelector('video')
-    if (player) {
-      if (player.loadedmetadata || player.readyState >= 1) {
-        handlePlayerSize()
-      } else {
-        player.addEventListener('loadedmetadata', handleLoadedMetadata)
-        return () => {
-          player.removeEventListener('loadedmetadata', handleLoadedMetadata)
-        }
-      }
-    }
-  }, [handlePlayerSize, handleLoadedMetadata])
+  }, [retryAttempt, media_sources, MAX_RETRY_ATTEMPTS, fetchSources])
 
   useEffect(() => {
     // what I wanted to do was listen for fullscreenchange on the MediaPlayer's div,
@@ -133,70 +139,6 @@ export default function CanvasMediaPlayer(props) {
       window.removeEventListener('resize', handlePlayerSize)
     }
   }, [handlePlayerSize])
-
-  async function fetchSources() {
-    const url = `/media_objects/${props.media_id}/info`
-    let resp
-    try {
-      setMediaObjNetworkErr(null)
-      resp = await asJson(fetch(url, defaultFetchOptions))
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn(`Error getting ${url}`, e.message)
-      setMediaObjNetworkErr(e)
-      return
-    }
-    if (resp && resp.media_sources && resp.media_sources.length) {
-      setMedia_sources(resp.media_sources.sort(byBitrate))
-    } else {
-      // they're not present yet, try again in a little bit
-      let tid = 0
-      const nextAttempt = retryAttempt + 1
-      if (nextAttempt < MAX_RETRY_ATTEMPTS) {
-        tid = setTimeout(() => {
-          setRetryAttempt(nextAttempt)
-        }, 2 ** retryAttempt * 1000)
-      } else {
-        setRetryAttempt(nextAttempt)
-      }
-      setRetryTimerId(tid)
-    }
-  }
-
-  function renderControls(VPC) {
-    if (props.type === 'audio') {
-      return (
-        <VPC>
-          <VPC.PlayPauseButton />
-          <VPC.Timebar />
-          <VPC.Volume />
-          <VPC.PlaybackSpeed />
-          <VPC.TrackChooser />
-        </VPC>
-      )
-    }
-
-    // TODO: when the fullscreen button is missing, the source chooser button is up against
-    // the right edge of the frame. When its popup menu is opened, the outset focus ring
-    // extends beyond the container's edge, causing a horiz. scrollbar, which steals vert.
-    // space and causes a vert. scrollbar, and this oscillates.
-    // remove the containing View when this jitter is fixed
-    return (
-      <VPC>
-        <VPC.PlayPauseButton />
-        <VPC.Timebar />
-        <VPC.Volume />
-        <VPC.PlaybackSpeed />
-        <VPC.TrackChooser />
-        {media_sources.length > 1 && (
-          <View margin={includeFullscreen ? '0 0 0 xx-small' : '0 xx-small'}>
-            <VPC.SourceChooser sources={media_sources} />
-          </View>
-        )}
-        {includeFullscreen && <VPC.FullScreenButton />}
-      </VPC>
-    )
-  }
 
   const includeFullscreen = document.fullscreenEnabled && props.type === 'video'
 
@@ -248,11 +190,12 @@ export default function CanvasMediaPlayer(props) {
   return (
     <div ref={containerRef}>
       {media_sources.length ? (
-        <VideoPlayer
+        <MediaPlayer
           ref={mediaPlayerRef}
           sources={media_sources}
           tracks={props.media_tracks}
-          controls={renderControls}
+          hideFullScreen={!includeFullscreen}
+          onLoadedMetadata={handleLoadedMetadata}
         />
       ) : (
         renderNoPlayer()
@@ -265,7 +208,7 @@ export function setPlayerSize(player, type, boundingBox, playerContainer) {
   const {width, height} = sizeMediaPlayer(player, type, boundingBox, !!document.fullscreenElement)
   player.style.width = width
   player.style.height = height
-  player.style.margin = '0 auto' // TODO: remove with player v7
+  // player.style.margin = '0 auto' // TODO: remove with player v7
   player.classList.add(isAudio(type) ? 'audio-player' : 'video-player')
 
   // videos that are wide-and-short portrait need to shrink the parent
@@ -288,8 +231,8 @@ export function setPlayerSize(player, type, boundingBox, playerContainer) {
 
 CanvasMediaPlayer.propTypes = {
   media_id: string.isRequired,
-  media_sources: VideoPlayer.propTypes.sources,
-  media_tracks: VideoPlayer.propTypes.tracks,
+  media_sources: MediaPlayer.propTypes.sources,
+  media_tracks: MediaPlayer.propTypes.tracks,
   type: oneOf(['audio', 'video']),
   MAX_RETRY_ATTEMPTS: number,
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: number
