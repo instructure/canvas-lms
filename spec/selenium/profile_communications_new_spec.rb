@@ -33,7 +33,21 @@ describe "profile communication settings new ui" do
 
   it "should render" do
     get "/profile/communication"
+    expect(f('#breadcrumbs')).to include_text('Account Notification Settings')
     expect(f("h1").text).to eq "Account Notification Settings"
     expect(fj("div:contains('Account-level notifications apply to all courses.')")).to be
+  end
+
+  it "should display the users email address as channel" do
+    get "/profile/communication"
+    expect(fj("th[scope='col'] span:contains('email')")).to be
+    expect(fj("th[scope='col'] span:contains('nobody@example.com')")).to be
+  end
+
+  it "should display an SMS number as channel" do
+    communication_channel(@user, {username: '8011235555@vtext.com', path_type: 'sms', active_cc: true})
+    get "/profile/communication"
+    expect(fj("span:contains('sms')")).to be
+    expect(fxpath("//span[contains(text(),'8011235555@vtext')]")).to be
   end
 end
