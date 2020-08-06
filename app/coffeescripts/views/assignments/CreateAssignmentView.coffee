@@ -17,7 +17,7 @@
 
 import _ from 'underscore'
 import Assignment from '../../models/Assignment'
-import DialogFormView from '../DialogFormView'
+import DialogFormView, {isSmallTablet, getResponsiveWidth} from '../DialogFormView'
 import DateValidator from '../../util/DateValidator'
 import template from 'jst/assignments/CreateAssignment'
 import wrapper from 'jst/EmptyDialogFormWrapper'
@@ -31,7 +31,7 @@ import 'jquery.instructure_date_and_time'
 
 export default class CreateAssignmentView extends DialogFormView
   defaults:
-    width: 500
+    width: getResponsiveWidth(320, 500)
     height: 380
 
   events: _.extend {}, @::events,
@@ -128,6 +128,7 @@ export default class CreateAssignmentView extends DialogFormView
       postToSISName: ENV.SIS_NAME
       isInClosedPeriod: @model.inClosedGradingPeriod(),
       defaultToolName: ENV.DEFAULT_ASSIGNMENT_TOOL_NAME
+      small_tablet: isSmallTablet
 
     # master_course_restrictions only apply if this is a child course
     # and is restricted by a master course.

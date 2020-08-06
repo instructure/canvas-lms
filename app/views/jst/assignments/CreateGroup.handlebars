@@ -1,5 +1,5 @@
 <div class="form-dialog-content">
-  <div class="form-horizontal">
+  <div class="{{#unless small_tablet}}form-horizontal{{/unless}}">
     {{#unless can_change_weighting}}
     <div class="ag-settings-weights-message alert">{{#t}}Assignment group weights and drop rules can't be edited because
       there are assignments in one of the groups whose due dates are closed.{{/t}}</div>
