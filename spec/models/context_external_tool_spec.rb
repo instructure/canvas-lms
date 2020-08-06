@@ -581,6 +581,20 @@ describe ContextExternalTool do
       let(:content_tag_opts) { super().merge({ content_id: tool.id }) }
 
       it { is_expected.to eq tool }
+
+      context 'and an LTI 1.3 tool has a conflicting URL' do
+        let(:arguments) do
+          [content_tag, tool.context]
+        end
+
+        before do
+          lti_1_3_tool = tool.dup
+          lti_1_3_tool.use_1_3 = true
+          lti_1_3_tool.save!
+        end
+
+        it { is_expected.to be_use_1_3 }
+      end
     end
 
     context 'when there are blank arguments' do

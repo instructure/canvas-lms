@@ -50,7 +50,12 @@ module Lti::Concerns
     # For an explanation of each type please review the documentation
     # for the generate_sessionless_launch endpoint.
     def sessionless_launch_url(options, context, tool, session_token)
-      return assignment_launch_url(options[:assignment], session_token) if options[:assignment].present?
+      if options[:assignment].present?
+        assignment = options[:assignment]
+        assignment.prepare_for_ags_if_needed!(tool)
+        return assignment_launch_url(assignment, session_token)
+      end
+
       return module_item_url(options[:module_item], session_token) if options[:module_item].present?
       course_or_account_launch_url(context, tool, session_token)
     end

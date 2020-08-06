@@ -613,18 +613,13 @@ end
   def self.from_content_tag(tag, context)
     return nil if tag.blank? || context.blank?
 
-    # Always return the object from the hard
-    # association if it is present
-    return tag.content if tag.content.present?
-
-    # If no hard association exists, lookup the
-    # tool by the usual "find_external_tool"
-    # method
+    # Lookup the tool by the usual "find_external_tool"
+    # method. Fall back on the tag's content if
+    # no matches found.
     find_external_tool(
       tag.url,
-      context,
-      tag.content_id
-    )
+      context
+    ) || tag.content
   end
 
   def self.contexts_to_search(context)
