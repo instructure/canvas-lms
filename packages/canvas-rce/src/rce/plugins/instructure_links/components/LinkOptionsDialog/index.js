@@ -42,7 +42,8 @@ export default function LinkOptionsDialog(props) {
       text: linkText,
       target: '_blank',
       href: url,
-      userText: props.showText
+      userText: props.showText,
+      embed: {disablePreview: true}
     })
   }
 

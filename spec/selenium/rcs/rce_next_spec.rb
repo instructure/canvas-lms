@@ -226,6 +226,24 @@ describe 'RCE next tests' do
           expect(f('#para').text).to eql ''
         end
       end
+
+      it 'should not magically create youtube video preview on a link', ignore_js_errors: true do
+        title = 'test_page'
+        unpublished = false
+        edit_roles = 'public'
+
+        create_wiki_page(title, unpublished, edit_roles)
+
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+
+        create_external_link('youtube', 'https://youtu.be/17oCQakzIl8')
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('class')).not_to include 'youtube_link_to_box'
+          expect(wiki_body_anchor.attribute('class')).to include 'inline_disabled'
+        end
+      end
     end
 
     it 'should click on sidebar assignment page to create link in body' do
