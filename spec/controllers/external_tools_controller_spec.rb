@@ -1861,7 +1861,10 @@ describe ExternalToolsController do
         let(:external_tool) do
           tool = external_tool_model(
             context: assignment.course,
-            opts: { url: launch_url }
+            opts: {
+              url: launch_url,
+              developer_key: DeveloperKey.create!
+            }
           )
           tool.settings[:use_1_3] = true
           tool.save!
@@ -1871,6 +1874,26 @@ describe ExternalToolsController do
         it 'returns an assignment launch URL' do
           get :generate_sessionless_launch, params: params
           expect(json_parse["url"]).to include "http://test.host/courses/#{@course.id}/assignments/#{assignment.id}?display=borderless&session_token="
+        end
+
+        context 'and the assignment is missing AGS records' do
+          before do
+            assignment.line_items.destroy_all
+
+            Lti::ResourceLink.where(
+              resource_link_id: assignment.lti_context_id
+            ).destroy_all
+
+            get :generate_sessionless_launch, params: params
+          end
+
+          it 'creates the missing line item' do
+            expect(assignment.reload.line_items).to be_present
+          end
+
+          it 'creates the missing resource link' do
+            expect(Lti::ResourceLink.where(resource_link_id: assignment.lti_context_id)).to be_present
+          end
         end
       end
 

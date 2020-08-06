@@ -1052,6 +1052,16 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def prepare_for_ags_if_needed!(tool)
+    # Don't do anything unless the tool is AGS ready
+    return unless tool&.use_1_3? && tool.developer_key.present?
+
+    # The assignment is already AGS ready
+    return if line_items.active.present?
+
+    update_line_items
+  end
+
   def create_assignment_line_item!
     update_line_items
   end
@@ -1083,8 +1093,12 @@ class Assignment < ActiveRecord::Base
     if lti_1_3_external_tool_tag? && line_items.empty?
       rl = Lti::ResourceLink.create!(
         resource_link_id: lti_context_id,
-        context_external_tool: ContextExternalTool.from_content_tag(external_tool_tag, context)
+        context_external_tool: ContextExternalTool.from_content_tag(
+          external_tool_tag,
+          context
+        )
       )
+
       line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true)
     elsif saved_change_to_title? || saved_change_to_points_possible?
       line_items.
@@ -1099,7 +1113,10 @@ class Assignment < ActiveRecord::Base
     return false unless external_tool_tag&.content_type == "ContextExternalTool"
 
     # Lookup the tool and check if the LTI version is 1.3
-    ContextExternalTool.from_content_tag(external_tool_tag, context)&.use_1_3?
+    ContextExternalTool.from_content_tag(
+      external_tool_tag,
+      context
+    )&.use_1_3?
   end
   private :lti_1_3_external_tool_tag?
 

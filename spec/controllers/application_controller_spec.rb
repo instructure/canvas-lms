@@ -972,6 +972,35 @@ RSpec.describe ApplicationController do
 
           context 'assignments' do
             it_behaves_like 'a placement that caches the launch'
+
+            context 'when a 1.3 tool replaces an LTI 1.1 tool' do
+              let(:assignment) { content_tag.context }
+
+              before do
+                # assignments configured with LTI 1.1 will not have
+                # LineItem or ResouceLink records prior to the LTI 1.3
+                # launch.
+                assignment.line_items.destroy_all
+
+                Lti::ResourceLink.where(
+                  resource_link_id: assignment.lti_context_id
+                ).destroy_all
+
+                assignment.update!(lti_context_id: SecureRandom.uuid)
+
+                controller.send(:content_tag_redirect, course, content_tag, nil)
+              end
+
+              it 'creates the default line item' do
+                expect(assignment.line_items).to be_present
+              end
+
+              it 'creates the LTI resource link' do
+                expect(
+                  Lti::ResourceLink.where(resource_link_id: assignment.lti_context_id)
+                ).to be_present
+              end
+            end
           end
 
           context 'module items' do

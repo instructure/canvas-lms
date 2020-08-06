@@ -553,20 +553,113 @@ describe ContextExternalTool do
     end
   end
 
+  describe "active?" do
+    subject { tool.active? }
+
+    let(:tool) { external_tool_model(opts: tool_opts) }
+    let(:tool_opts) { {} }
+
+    it { is_expected.to eq true }
+
+    context 'when "workflow_state" is "deleted"' do
+      let(:tool_opts) { { workflow_state: 'deleted' } }
+
+      it { is_expected.to eq false }
+    end
+
+    context 'when "workflow_state" is "disabled"' do
+      let(:tool_opts) { { workflow_state: 'disabled' } }
+
+      it { is_expected.to eq false }
+    end
+  end
+
+  describe "uses_preferred_lti_version?" do
+    subject { tool.uses_preferred_lti_version? }
+
+    let_once(:tool) { external_tool_model }
+
+    it { is_expected.to eq false }
+
+    context 'when the tool uses LTI 1.3' do
+      before do
+        tool.use_1_3 = true
+        tool.save!
+      end
+
+      it { is_expected.to eq true }
+    end
+  end
+
   describe "from_content_tag" do
     subject { ContextExternalTool.from_content_tag(*arguments) }
 
     let(:arguments) { [content_tag, tool.context] }
+    let(:assignment) { assignment_model(course: tool.context) }
     let(:tool) { external_tool_model }
-    let(:content_tag_opts) { { url: tool.url, content_type: 'ContextExternalTool' } }
+    let(:content_tag_opts) { { url: tool.url, content_type: 'ContextExternalTool', context: assignment } }
     let(:content_tag) { ContentTag.new(content_tag_opts) }
+
+    let(:lti_1_3_tool) do
+      t = tool.dup
+      t.use_1_3 = true
+      t.save!
+      t
+    end
 
     it { is_expected.to eq tool }
 
-    context 'when the tool is linked to the tag by id (hard association)' do
+    context 'when the tool is linked to the tag by id (LTI 1.1)' do
       let(:content_tag_opts) { super().merge({ content_id: tool.id }) }
 
       it { is_expected.to eq tool }
+
+      context 'and an LTI 1.3 tool has a conflicting URL' do
+        let(:arguments) do
+          [content_tag, tool.context]
+        end
+
+        before { lti_1_3_tool }
+
+        it { is_expected.to be_use_1_3 }
+      end
+    end
+
+    context 'when the tool is linked to a tag by id (LTI 1.3)' do
+      let(:content_tag_opts) { super().merge({ content_id: lti_1_3_tool.id }) }
+      let(:duplicate_1_3_tool) do
+        t = lti_1_3_tool.dup
+        t.save!
+        t
+      end
+
+      context 'and an LTI 1.1 tool has a conflicting URL' do
+
+        before { tool } # intitialized already, but included for clarity
+
+        it { is_expected.to eq lti_1_3_tool }
+
+        context 'and there are multiple matching LTI 1.3 tools' do
+          before { duplicate_1_3_tool }
+
+          let(:arguments) { [content_tag, tool.context] }
+          let(:content_tag_opts) { super().merge({ content_id: lti_1_3_tool.id }) }
+
+          it { is_expected.to eq lti_1_3_tool }
+        end
+
+        context 'and the LTI 1.3 tool gets reinstalled' do
+          before do
+            # "install" a copy of the tool
+            duplicate_1_3_tool
+
+            # "uninstall" the original tool
+            lti_1_3_tool.destroy!
+          end
+
+          it { is_expected.to eq duplicate_1_3_tool }
+        end
+      end
     end
 
     context 'when there are blank arguments' do

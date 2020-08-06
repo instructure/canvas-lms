@@ -373,6 +373,14 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:use_1_3] = bool
   end
 
+  def uses_preferred_lti_version?
+    !!send("use_#{PREFERRED_LTI_VERSION}?")
+  end
+
+  def active?
+    ['deleted', 'disabled'].exclude? workflow_state
+  end
+
   def self.find_custom_fields_from_string(str)
     return {} if str.nil?
     str.split(/[\r\n]+/).each_with_object({}) do |line, hash|
@@ -630,18 +638,19 @@ end
   def self.from_content_tag(tag, context)
     return nil if tag.blank? || context.blank?
 
-    # Always return the object from the hard
-    # association if it is present
-    return tag.content if tag.content.present?
+    # We can simply return the content if we
+    # know it uses the preferred LTI version.
+    # No need to go through the tool lookup logic.
+    content = tag.content
+    return content if content&.active? && content&.uses_preferred_lti_version?
 
-    # If no hard association exists, lookup the
-    # tool by the usual "find_external_tool"
-    # method
+    # Lookup the tool by the usual "find_external_tool"
+    # method. Fall back on the tag's content if
+    # no matches found.
     find_external_tool(
       tag.url,
-      context,
-      tag.content_id
-    )
+      context
+    ) || tag.content
   end
 
   def self.contexts_to_search(context)
@@ -721,10 +730,7 @@ end
         [contexts.index { |c| c.id == t.context_id && c.class.name == t.context_type }, t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last]
       end
 
-      search_options = {
-        exclude_tool_id: exclude_tool_id,
-        lti_version: PREFERRED_LTI_VERSION
-      }
+      search_options = { exclude_tool_id: exclude_tool_id }
 
       # Check for a tool that exactly matches the given URL
       match = find_tool_match(
@@ -763,7 +769,7 @@ end
   # If a preferred LTI version is specified, this method will use
   # LTI version as a tie-breaker.
   def self.find_tool_match(url, sorted_tool_collection, matcher, matcher_condition, opts)
-    exclude_tool_id, lti_version = opts.values_at(:exclude_tool_id, :lti_version)
+    exclude_tool_id = opts[:exclude_tool_id]
 
     # Find tools that match the given matcher
     exact_matches = sorted_tool_collection.select do |tool|
@@ -773,7 +779,7 @@ end
     # There was only a single match, so return it
     return exact_matches.first if exact_matches.count == 1
 
-    version_match = find_exact_version_match(exact_matches, lti_version)
+    version_match = find_exact_version_match(exact_matches)
 
     # There is no LTI version preference or no matching
     # version was found. Return the first matched tool
@@ -785,10 +791,8 @@ end
 
   # Given a collection of tools, finds the first with the given LTI version
   # If no matches were detected, returns nil
-  def self.find_exact_version_match(sorted_tool_collection, lti_version)
-    return nil if lti_version.blank?
-
-    sorted_tool_collection.find { |t| t.send("use_#{lti_version}?") }
+  def self.find_exact_version_match(sorted_tool_collection)
+    sorted_tool_collection.find { |t| t.uses_preferred_lti_version? }
   end
 
   scope :having_setting, lambda { |setting| setting ? joins(:context_external_tool_placements).
