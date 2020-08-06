@@ -5,11 +5,9 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 WORKSPACE=${WORKSPACE:-$(pwd)}
 RUBY_PATCHSET_IMAGE=${RUBY_PATCHSET_IMAGE:-canvas-lms-ruby}
 PATCHSET_TAG=${PATCHSET_TAG:-canvas-lms}
-optionalFromCache=''
-[[ "${SKIP_CACHE:-false}" = "false" ]] && optionalFromCache="--cache-from $MERGE_TAG"
 
-optionalFromCacheRuby=''
-[[ "${SKIP_CACHE:-false}" = "false" ]] && optionalFromCacheRuby="--cache-from $RUBY_GEMS_MERGE_IMAGE --cache-from $RUBY_GEMS_PATCHSET_IMAGE"
+optionalFromCache=''
+[[ "${SKIP_CACHE:-false}" = "false" ]] && optionalFromCache="--cache-from $RUBY_GEMS_MERGE_IMAGE --cache-from $RUBY_GEMS_PATCHSET_IMAGE --cache-from $MERGE_TAG"
 
 # shellcheck disable=SC2086
 DOCKER_BUILDKIT=1 docker build \
@@ -18,10 +16,10 @@ DOCKER_BUILDKIT=1 docker build \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
   --build-arg RUBY="$RUBY" \
-  --file ruby.Dockerfile \
-  $optionalFromCacheRuby \
+  --file Dockerfile \
+  $optionalFromCache \
   --tag "$RUBY_GEMS_PATCHSET_IMAGE" \
-  --target gems-only \
+  --target ruby-gems-only \
   "$WORKSPACE"
 
 # shellcheck disable=SC2086
@@ -31,10 +29,10 @@ DOCKER_BUILDKIT=1 docker build \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
   --build-arg RUBY="$RUBY" \
-  --file ruby.Dockerfile \
-  $optionalFromCacheRuby \
+  --file Dockerfile \
+  $optionalFromCache \
   --tag "$RUBY_PATCHSET_IMAGE" \
-  --target final \
+  --target ruby-final \
   "$WORKSPACE"
 
 # shellcheck disable=SC2086
@@ -42,8 +40,10 @@ DOCKER_BUILDKIT=1 docker build \
   --build-arg ALPINE_MIRROR="$ALPINE_MIRROR" \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg NODE="$NODE" \
-  --build-arg RUBY_PATCHSET_IMAGE="$RUBY_GEMS_PATCHSET_IMAGE" \
+  --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
+  --build-arg RUBY="$RUBY" \
   --file Dockerfile \
   $optionalFromCache \
   --tag "$PATCHSET_TAG" \
+  --target webpack-final \
   "$WORKSPACE"
