@@ -4294,6 +4294,8 @@ tr:
   complete_fd828dea: Tamamlandı
   complete_icon_7455be93: "simgeyi tamamla"
   complete_one_item_90e5fb03: "Bir Öğeyi Tamamla"
+  complete_registration_by_clicking_the_finish_the_r_6c1c958b: "Kayıt olma sürecini tamamlamak için eposta adresinize gönderilmiş \"kayıt işlemini tamamla\" bağlantısına tıklayın."
+  complete_registration_by_clicking_the_finish_the_r_fcd13ac8: "Kayıt olma sürecini tamamlamak için eposta adresinize gönderilmiş \"kayıt işlemini tamamla\" bağlantısına tıklayın."
   complete_title_7482ddcf: "Tamam %{title}"
   completed_19711ce7: Tamamlandı
   completed_9b809e44: tamamlandı
@@ -9510,9 +9512,11 @@ tr:
   hide_grades_5ff26682: "Notları Gizle"
   hide_grades_tray_5ed267fe: "Notları gizle menüsü"
   hide_notes_column_7749f408: "Notlar Sütununu Gizle"
+  hide_outcomes_with_no_results_7e4ce06f: "Sonuç içermeyen öğrenme çıktılarını gizle"
   hide_score_total_for_assessment_results_d0ef117f: "Sınav sonuçlarından toplam puanları gizle"
   hide_sidebar_2b5b3776: "Paneli Gizle"
   hide_student_names_3e59e862: "Öğrenci İsimlerini Gösterme"
+  hide_students_with_no_results_6a22f991: "Sonucu olmayan öğrencileriı gizle"
   high_b5cbd048: Yüksek
   high_contrast_description: |-
       Yüksek Karşıtlık, kullanıcı arayüzünün (metin, düğmeler, vb.) renk kontrastını geliştirerek bu öğeleri
@@ -12463,6 +12467,7 @@ tr:
     one: "Yeterlik en az 1 kere sağlanmış olmalı. Final puanını hesaplamak için yeterliğin üzerindeki puanların ortalaması alınacak."
     other: "Yeterlik en az %{count} kere sağlanmış olmalı. Final puanını hesaplamak için yeterliğin üzerindeki puanların ortalaması alınacak."
   must_be_between_availability_dates_ceaca984: "kullanılabilir tarih aralığında olmalı"
+  must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: "Bu eylemi gerçekleştirmek için kayıtlı kullanıcı olmalı ve oturum açmalısınız"
   must_contribute_to_the_page_fff632c: "Sayfaya katkı sağlamalı"
   must_mark_as_done_91cff799: "Tamamlandı olarak işaretlenmeli"
   must_mark_as_done_bf6cc563: "tamamlandı olarak işaretlenmeli"
@@ -13362,6 +13367,7 @@ tr:
   please_enter_your_label_name_and_password_5c56be80: "Lütfen %{label_name} Eposta adresiniz ve şifrenizi girin:"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Lütfen hangi sayfayı görüntülediğinizi ve hangi bağlantıya tıkladığınızı bildirin."
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Lütfen hangi sayfayı görüntülediğinizi ve hangi bağlantıya tıkladığınızı bildirin."
+  please_log_in_to_view_this_content_eec6cd0: "Bu içeriği görmek için lütfen oturum açın"
   please_select_a_group_set_for_this_assignment_e1da63d3: "Bu ödev için bir grup seçiniz"
   please_select_one_f931e883: "Lütfen birini seçin"
   please_upload_files_as_a_zip_5a2c799f: "Lütfen dosyaları .zip olarak yükleyin"
@@ -18454,6 +18460,7 @@ tr:
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı."
   user_name_just_turned_in_their_assignment_late_ass_a54b128a: "%{user_name},  %{assignment_name} ödevini teslim etti (geç)"
   user_name_you_just_sent_a_message_in_canvas_b1fd4598: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
+  user_not_authorized_to_perform_that_action_until_v_4f095a7c: "Eposta adresini doğrulayana kadar kullanıcı bu eylemi gerçekleştiremez."
   user_notes: 
     confirms: 
       delete_journal_entry: "Görev girişini silmek istediğinize emin misiniz?"
