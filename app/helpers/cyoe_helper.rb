@@ -77,12 +77,8 @@ module CyoeHelper
 
   def check_if_processing(data)
     if !data[:awaiting_choice] && data[:assignment_sets].length == 1
-      vis_assignments = RequestCache.cache('visible_assignment_ids_in_course', @current_user, @context) do
-        AssignmentStudentVisibility.visible_assignment_ids_for_user(@current_user.id, @context.id) || []
-      end
       set = data[:assignment_sets][0]
-      selected_set_assignment_ids = (set[:assignments] || set[:assignment_set_associations]).map{ |a| a[:assignment_id].to_i } || []
-      data[:still_processing] = (selected_set_assignment_ids - vis_assignments).present?
+      data[:still_processing] = !ConditionalRelease::AssignmentSetAction.where(:assignment_set_id => set[:id], :student_id => @current_user.id).exists?
     end
   end
 

@@ -107,8 +107,11 @@ module ConditionalRelease
       def rules_data(course, student, session = {})
         return [] if course.blank? || student.blank?
         rules_data =
-          ::Rails.cache.fetch(['conditional_release_rules_for_student', student.cache_key(:submissions), course.cache_key(:conditional_release)].cache_key) do
+          ::Rails.cache.fetch(['conditional_release_rules_for_student2', student.cache_key(:submissions), course.cache_key(:conditional_release)].cache_key) do
             rules = course.conditional_release_rules.active.preload(Rule.preload_associations).to_a
+
+            # ignore functionally empty rules
+            rules.reject!{|r| r.scoring_ranges.all?{|sr| sr.assignment_sets.all?{|s| s.assignment_set_associations.empty?}}}
 
             trigger_assignments = course.assignments.where(:id => rules.map(&:trigger_assignment_id)).to_a.index_by(&:id)
             trigger_submissions = course.submissions.where(:assignment_id => trigger_assignments.keys).
