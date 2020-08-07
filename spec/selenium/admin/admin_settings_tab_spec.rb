@@ -581,7 +581,12 @@ describe "admin settings tab" do
 
     Feature.applicable_features(Account.site_admin).each do |feature|
       next if feature.visible_on && !feature.visible_on.call(Account.site_admin)
-      expect(f(".feature.#{feature.feature}")).to be_displayed
+      # We don't want flags that are enabled in code to appear in the UI
+      if feature.enabled?
+        expect(f(".feature")).to_not contain_jqcss(".#{feature.feature}")
+      else
+        expect(f(".feature.#{feature.feature}")).to be_displayed
+      end
     end
   end
 end

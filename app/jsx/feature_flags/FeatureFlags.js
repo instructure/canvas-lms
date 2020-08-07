@@ -45,7 +45,7 @@ export default class FeatureFlags extends React.Component {
 
   retrieveFlagsConfig() {
     this.setState({isLoading: true})
-    const url = `/api/v1/accounts/${window.ENV.ACCOUNT.id}/features`
+    const url = `/api/v1/accounts/${window.ENV.ACCOUNT.id}/features?hide_inherited_enabled=true`
     axios.get(url).then(response => this.loadData(response.data))
   }
 
