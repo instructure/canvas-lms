@@ -62,10 +62,23 @@ module ConditionalRelease
       end
 
       it "should not automatically assign when there are multiple applicable sets for the student to choose from" do
-        @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher) # should automatically assign to top set
+        @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher)
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to_not include(@set3a_assmt)
         expect(visible_assmts).to_not include(@set3b_assmt)
+      end
+
+      it "should not accidentally relock an assignment if the same item is in two ranges we're switching between" do
+        @set2 = @set2_assmt1.conditional_release_associations.first.assignment_set
+        @set2.assignment_set_associations.create!(:assignment => @set1_assmt1) # add the set1 assignment to set2 for inexplicable reasons
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher) # should automatically assign to top set
+        visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
+        expect(visible_assmts).to include(@set1_assmt1) # should still unlock
+
+        @trigger_assmt.grade_student(@student, grade: 5, grader: @teacher) # actually nvm should automatically assign to middle set
+        visible_assmts2 = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
+        expect(visible_assmts2).to include(@set1_assmt1) # should stay unlocked even though we technically dropped set1
       end
     end
 

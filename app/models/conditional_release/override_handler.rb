@@ -67,7 +67,7 @@ module ConditionalRelease
 
       def set_assignment_overrides(student_id, sets_to_assign, sets_to_unassign)
         assignments_to_assign = assignments_for_sets(sets_to_assign)
-        assignments_to_unassign = assignments_for_sets(sets_to_unassign)
+        assignments_to_unassign = assignments_for_sets(sets_to_unassign) - assignments_to_assign # don't unassign anything we're trying to assign to
 
         existing_overrides = AssignmentOverride.active.
           where(:assignment_id => assignments_to_assign + assignments_to_unassign, :set_type => 'ADHOC').to_a
