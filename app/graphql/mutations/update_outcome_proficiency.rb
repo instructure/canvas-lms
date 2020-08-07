@@ -16,18 +16,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mutations::UpdateOutcomeCalculationMethod < Mutations::OutcomeCalculationMethodBase
-  graphql_name "UpdateOutcomeCalculationMethod"
+class Mutations::UpdateOutcomeProficiency < Mutations::OutcomeProficiencyBase
+  graphql_name "UpdateOutcomeProficiency"
 
   # input arguments
   argument :id, ID, required: true
-  argument :calculation_method, String, required: false
-  argument :calculation_int, Integer, required: false
+  argument :proficiency_ratings, [Mutations::OutcomeProficiencyRatingCreate], required: false
 
   def resolve(input:)
-    record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeCalculationMethod")
-    record = OutcomeCalculationMethod.find_by(id: record_id)
-    raise GraphQL::ExecutionError, "Unable to find OutcomeCalculationMethod" if record.nil?
+    record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeProficiency")
+    record = OutcomeProficiency.find_by(id: record_id)
+    raise GraphQL::ExecutionError, "Unable to find OutcomeProficiency" if record.nil?
     check_permission(record.context)
     upsert(input, record)
   end

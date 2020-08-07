@@ -55,6 +55,19 @@ class OutcomeProficiency < ApplicationRecord
     }
   end
 
+  def replace_ratings(ratings)
+    # update existing ratings & create any new ratings
+    ratings.each_with_index do |val, idx|
+      if idx <= outcome_proficiency_ratings.count - 1
+        outcome_proficiency_ratings[idx].assign_attributes(val.to_hash.symbolize_keys)
+      else
+        outcome_proficiency_ratings.build(val)
+      end
+    end
+    # delete unused ratings
+    outcome_proficiency_ratings[ratings.length..-1].each(&:mark_for_destruction)
+  end
+
   private
 
   def next_ratings

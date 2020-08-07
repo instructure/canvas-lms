@@ -22,6 +22,8 @@ module Types
 
     implements Interfaces::LegacyIDInterface
 
+    global_id_field :id
+
     field :calculation_method, String, null: false
     field :calculation_int, Integer, null: true
     field :context_type, String, null: false

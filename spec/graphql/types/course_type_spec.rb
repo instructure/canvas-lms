@@ -163,13 +163,6 @@ describe Types::CourseType do
         course_type.resolve('outcomeCalculationMethod { _id }', current_user: @teacher)
       ).to eq course.account.outcome_calculation_method.id.to_s
     end
-
-    it "requires read permission" do
-      outcome_calculation_method_model(course.account)
-      expect(
-        course_type.resolve('outcomeCalculationMethod { _id }', current_user: user_model)
-      ).to be_nil
-    end
   end
 
   describe "sectionsConnection" do

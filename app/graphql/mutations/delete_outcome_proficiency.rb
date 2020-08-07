@@ -16,26 +16,26 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mutations::DeleteOutcomeCalculationMethod < Mutations::BaseMutation
-  graphql_name "DeleteOutcomeCalculationMethod"
+class Mutations::DeleteOutcomeProficiency < Mutations::BaseMutation
+  graphql_name "DeleteOutcomeProficiency"
 
   # input arguments
   argument :id, ID, required: true
 
   # the return data if the delete is successful
-  field :outcome_calculation_method_id, ID, null: false
+  field :outcome_proficiency_id, ID, null: false
 
-  def self.outcome_calculation_method_id_log_entry(_entry, context)
-    context[:deleted_models][:outcome_calculation_method].context
+  def self.outcome_proficiency_id_log_entry(_entry, context)
+    context[:deleted_models][:outcome_proficiency].context
   end
 
   def resolve(input:)
-    record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeCalculationMethod")
-    record = OutcomeCalculationMethod.active.find_by(id: record_id)
-    raise GraphQL::ExecutionError, "Unable to find OutcomeCalculationMethod" if record.nil?
+    record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeProficiency")
+    record = OutcomeProficiency.active.find_by(id: record_id)
+    raise GraphQL::ExecutionError, "Unable to find OutcomeProficiency" if record.nil?
     raise GraphQL::ExecutionError, "insufficient permission" unless record.context.grants_right? current_user, :manage_outcomes
-    context[:deleted_models][:outcome_calculation_method] = record
+    context[:deleted_models][:outcome_proficiency] = record
     record.destroy
-    {outcome_calculation_method_id: record.id}
+    {outcome_proficiency_id: record.id}
   end
 end
