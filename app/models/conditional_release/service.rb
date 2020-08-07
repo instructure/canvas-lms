@@ -48,31 +48,6 @@ module ConditionalRelease
       rules_data(context, student, session)
     end
 
-    def self.clear_active_rules_cache(course)
-      return unless course.present?
-      clear_cache_with_key(active_rules_cache_key(course))
-      clear_cache_with_key(active_rules_reverse_cache_key(course))
-    end
-
-    def self.clear_applied_rules_cache(course)
-      return unless course.present?
-      clear_cache_with_key(assignments_cache_key(course))
-    end
-
-    def self.clear_submissions_cache_for(user)
-      return unless user.present?
-      clear_cache_with_key(submissions_cache_key(user))
-    end
-
-    def self.clear_rules_cache_for(context, student)
-      return if context.blank? || student.blank?
-      clear_cache_with_key(rules_cache_key(context, student))
-    end
-
-    def self.reset_config_cache
-      @config = nil
-    end
-
     def self.enabled_in_context?(context)
       Feature.definitions.key?('conditional_release') && context&.feature_enabled?(:conditional_release)
     end
@@ -129,29 +104,6 @@ module ConditionalRelease
         }
       end
 
-      def submissions_for(student, context, force: false)
-        return [] unless student.present?
-        Rails.cache.fetch(submissions_cache_key(student), force: force) do
-          keys = [:id, :assignment_id, :score, "assignments.points_possible"]
-          submissions = context.submissions.
-            for_user(student).
-            in_workflow_state(:graded).
-            eager_load(:assignment)
-
-          submissions = if context.post_policies_enabled?
-            submissions.posted
-          else
-            submissions.where(assignments: {muted: false})
-          end
-
-          submissions.pluck(*keys).map do |values|
-            submission = Hash[keys.zip(values)]
-            submission[:points_possible] = submission.delete("assignments.points_possible")
-            submission
-          end
-        end
-      end
-
       def rules_data(course, student, session = {})
         return [] if course.blank? || student.blank?
         rules_data =
@@ -206,21 +158,6 @@ module ConditionalRelease
         rules_data
       end
 
-      def rules_cache(context, student, force: false, &block)
-        Rails.cache.fetch(rules_cache_key(context, student), force: force, &block)
-      end
-
-      def rules_cache_expired?(context, cache)
-        assignment_timestamp = Rails.cache.fetch(assignments_cache_key(context)) do
-          Time.zone.now
-        end
-        if cache && cache.key?(:updated_at)
-          assignment_timestamp > cache[:updated_at]
-        else
-          true
-        end
-      end
-
       def assignments_for(response)
         rules = response.map(&:deep_symbolize_keys)
 
@@ -263,34 +200,6 @@ module ConditionalRelease
           points_possible min_score max_score grading_type
           submission_types workflow_state context_id
           context_type updated_at context_code)
-      end
-
-      def rules_cache_key(context, student)
-        context_id = context.is_a?(ActiveRecord::Base) ? context.global_id : context
-        student_id = student.is_a?(User) ? student.global_id : student
-        ['conditional_release_rules:2', context_id, student_id].cache_key
-      end
-
-      def assignments_cache_key(context)
-        ['conditional_release_rules:assignments:2', context.global_id].cache_key
-      end
-
-      def submissions_cache_key(student)
-        id = student.is_a?(User) ? student.global_id : student
-        ['conditional_release_submissions:2', id].cache_key
-      end
-
-      def active_rules_cache_key(course)
-        ['conditional_release', 'active_rules', course.global_id].cache_key
-      end
-
-      def active_rules_reverse_cache_key(course)
-        ['conditional_release', 'active_rules_reverse', course.global_id].cache_key
-      end
-
-      def clear_cache_with_key(key)
-        return if key.blank?
-        Rails.cache.delete(key)
       end
     end
   end
