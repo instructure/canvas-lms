@@ -878,6 +878,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    context 'with Role' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { Role.create!(name: 'Hi', account: reference_record, base_role_type: 'StudentEnrollment') }
+        let(:reference_record) { account_model }
+      end
+    end
+
     context 'with Score' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { reference_record.scores.create! }
