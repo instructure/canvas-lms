@@ -1,10 +1,4 @@
 ---
-caps_site_admin_test_feature:
-  state: allowed
-  applies_to: SiteAdmin
-  display_name: This is a SiteAdmin test Feature Flag
-  description: |-
-    This flag will not cause any change in behavior.
 assignments_2_student:
   state: hidden
   display_name: Assignment Enhancements - Student
