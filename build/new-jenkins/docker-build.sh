@@ -6,18 +6,27 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 RUBY_PATCHSET_IMAGE=${RUBY_PATCHSET_IMAGE:-canvas-lms-ruby}
 PATCHSET_TAG=${PATCHSET_TAG:-canvas-lms}
 
-optionalFromCache=''
-[[ "${SKIP_CACHE:-false}" = "false" ]] && optionalFromCache="--cache-from $RUBY_GEMS_MERGE_IMAGE --cache-from $RUBY_GEMS_PATCHSET_IMAGE --cache-from $MERGE_TAG"
+commonRubyArgs=(
+  --build-arg ALPINE_MIRROR="$ALPINE_MIRROR"
+  --build-arg BUILDKIT_INLINE_CACHE=1
+  --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
+  --build-arg RUBY="$RUBY"
+  --file Dockerfile
+)
+
+commonNodeArgs=(
+  --build-arg NODE="$NODE"
+)
+
+if [[ "${SKIP_CACHE:-false}" = "false" ]]; then
+  commonRubyArgs+=("--cache-from $RUBY_GEMS_MERGE_IMAGE")
+  commonNodeArgs+=("--cache-from $YARN_MERGE_IMAGE")
+fi
 
 # shellcheck disable=SC2086
 DOCKER_BUILDKIT=1 docker build \
   --pull \
-  --build-arg ALPINE_MIRROR="$ALPINE_MIRROR" \
-  --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
-  --build-arg RUBY="$RUBY" \
-  --file Dockerfile \
-  $optionalFromCache \
+  ${commonRubyArgs[@]} \
   --tag "$RUBY_GEMS_PATCHSET_IMAGE" \
   --target ruby-gems-only \
   "$WORKSPACE"
@@ -25,25 +34,23 @@ DOCKER_BUILDKIT=1 docker build \
 # shellcheck disable=SC2086
 DOCKER_BUILDKIT=1 docker build \
   --pull \
-  --build-arg ALPINE_MIRROR="$ALPINE_MIRROR" \
-  --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
-  --build-arg RUBY="$RUBY" \
-  --file Dockerfile \
-  $optionalFromCache \
+  ${commonRubyArgs[@]} \
   --tag "$RUBY_PATCHSET_IMAGE" \
   --target ruby-final \
   "$WORKSPACE"
 
 # shellcheck disable=SC2086
 DOCKER_BUILDKIT=1 docker build \
-  --build-arg ALPINE_MIRROR="$ALPINE_MIRROR" \
-  --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg NODE="$NODE" \
-  --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
-  --build-arg RUBY="$RUBY" \
-  --file Dockerfile \
-  $optionalFromCache \
+  ${commonRubyArgs[@]} \
+  ${commonNodeArgs[@]} \
+  --tag "$YARN_PATCHSET_IMAGE" \
+  --target yarn-only \
+  "$WORKSPACE"
+
+# shellcheck disable=SC2086
+DOCKER_BUILDKIT=1 docker build \
+  ${commonRubyArgs[@]} \
+  ${commonNodeArgs[@]} \
   --tag "$PATCHSET_TAG" \
   --target webpack-final \
   "$WORKSPACE"

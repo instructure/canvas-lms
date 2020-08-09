@@ -95,7 +95,7 @@ RUN set -eux; \
 FROM ruby-gems-only AS ruby-final
 COPY --chown=docker:docker . $APP_HOME
 
-FROM ruby-gems-only AS webpack-final
+FROM ruby-gems-only AS yarn-only
 LABEL maintainer="Instructure"
 
 # default alpine HTTPS mirror
@@ -157,6 +157,7 @@ RUN set -eux; \
   && (yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1) \
   && yarn cache clean
 
+FROM yarn-only AS webpack-final
 COPY --chown=docker:docker . ${APP_HOME}
 
 RUN set -exu; \

@@ -164,6 +164,10 @@ pipeline {
     RUBY_GEMS_MERGE_IMAGE = "$RUBY_GEMS_IMAGE:$GERRIT_BRANCH"
     RUBY_GEMS_PATCHSET_IMAGE = "$RUBY_GEMS_IMAGE:$NAME-$TAG_SUFFIX"
 
+    YARN_IMAGE = "$BUILD_IMAGE-yarn-only"
+    YARN_MERGE_IMAGE = "$YARN_IMAGE:$GERRIT_BRANCH"
+    YARN_PATCHSET_IMAGE = "$YARN_IMAGE:$NAME-$TAG_SUFFIX"
+
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
     POSTGRES_IMAGE_TAG=imageTag.postgres()
@@ -267,6 +271,7 @@ pipeline {
                     sh 'build/new-jenkins/docker-build.sh'
                     sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_GEMS_PATCHSET_IMAGE"
                     sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_PATCHSET_IMAGE"
+                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_PATCHSET_IMAGE"
                   }
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
                   if (isPatchsetPublishable()) {
@@ -396,6 +401,10 @@ pipeline {
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_PATCHSET_IMAGE'
                   }
 
+                  if (!sh (script: 'docker images -q $YARN_PATCHSET_IMAGE')) {
+                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $YARN_PATCHSET_IMAGE'
+                  }
+
                   if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
                   }
@@ -404,10 +413,12 @@ pipeline {
                   sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
                   sh 'docker tag $RUBY_GEMS_PATCHSET_IMAGE $RUBY_GEMS_MERGE_IMAGE'
                   sh 'docker tag $RUBY_PATCHSET_IMAGE $RUBY_MERGE_IMAGE'
+                  sh 'docker tag $YARN_PATCHSET_IMAGE $YARN_MERGE_IMAGE'
                   // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_GEMS_MERGE_IMAGE'
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_MERGE_IMAGE'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_MERGE_IMAGE'
                 }
               }
             }
