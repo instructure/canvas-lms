@@ -64,6 +64,10 @@ class DockerfileWriter
   def docker_compose_config
     DockerUtils.compose_config(*compose_files)
   end
+
+  def yarn_files_client_apps
+    paths = Dir.glob('./client_apps/*/package.json').map { |p| p.sub('./', '') }
+  end
 end
 
 options = {}

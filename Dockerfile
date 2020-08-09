@@ -135,6 +135,8 @@ COPY --chown=docker:docker packages           ${APP_HOME}packages
 COPY --chown=docker:docker script             ${APP_HOME}script
 COPY --chown=docker:docker yarn.lock          ${APP_HOME}
 
+COPY --chown=docker:docker client_apps/canvas_quizzes/package.json ${APP_HOME}client_apps/canvas_quizzes/package.json
+
 RUN set -eux; \
   mkdir -p .yardoc \
              app/stylesheets/brandable_css_brands \

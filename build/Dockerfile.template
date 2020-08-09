@@ -132,6 +132,8 @@ COPY --chown=docker:docker packages           ${APP_HOME}packages
 COPY --chown=docker:docker script             ${APP_HOME}script
 COPY --chown=docker:docker yarn.lock          ${APP_HOME}
 
+<%= yarn_files_client_apps.map { |p| "COPY --chown=docker:docker #{p} ${APP_HOME}#{p}" }.join('\n') %>
+
 RUN set -eux; \
   mkdir -p <%= docker_compose_volume_paths.join(" \\\n             ") %> \
   && (yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1) \
