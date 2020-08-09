@@ -1,6 +1,6 @@
 # GENERATED FILE, DO NOT MODIFY!
 # To update this file please edit the relevant template and run the generation
-# task `build/dockerfile_writer.rb`
+# task `build/dockerfile_writer.rb --env production --compose-file docker-compose.yml --in build/ubuntu.Dockerfile.template --out ubuntu.production.Dockerfile`
 
 # For documentation, please check doc/docker/README.md in
 # this local repo which is also published at:

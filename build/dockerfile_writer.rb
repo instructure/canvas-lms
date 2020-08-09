@@ -17,14 +17,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "erubi"
+require "optparse"
 require_relative "./docker_utils"
 
 class DockerfileWriter
-  attr_reader :env, :compose_files
+  attr_reader :env, :compose_files, :in_file, :out_file
 
-  def initialize(env:, compose_files:)
+  def initialize(env:, compose_files:, in_file:, out_file:)
     @env = env
     @compose_files = compose_files
+    @in_file = in_file
+    @out_file = out_file
   end
 
   def production?
@@ -39,13 +42,13 @@ class DockerfileWriter
     <<~STR
       # GENERATED FILE, DO NOT MODIFY!
       # To update this file please edit the relevant template and run the generation
-      # task `build/dockerfile_writer.rb`
+      # task `build/dockerfile_writer.rb --env #{env} --compose-file #{compose_files.join(',')} --in #{in_file} --out #{out_file}`
     STR
   end
 
-  def run(filename)
-    File.open(filename, "w") do |f|
-      f.write eval(Erubi::Engine.new(File.read("build/ubuntu.Dockerfile.template")).src, nil, "build/ubuntu.Dockerfile.template")
+  def run()
+    File.open(out_file, "w") do |f|
+      f.write eval(Erubi::Engine.new(File.read(in_file)).src, nil, in_file)
     end
   end
 
@@ -63,12 +66,26 @@ class DockerfileWriter
   end
 end
 
-DockerfileWriter.new(
-  env: "development",
-  compose_files: ["docker-compose.yml", "docker-compose.override.yml"]
-).run("ubuntu.development.Dockerfile")
+options = {}
 
-DockerfileWriter.new(
-  env: "production",
-  compose_files: ["docker-compose.yml"]
-).run("ubuntu.production.Dockerfile")
+OptionParser.new do |opts|
+  opts.banner = "Usage: dockerfile_writer.rb [options]"
+
+  opts.on("--env [ENVIRONMENT]", String, "Dockerfile Environment") do |v|
+    options[:env] = v
+  end
+
+  opts.on("--compose-file x,y,z", Array, "List of compose files") do |v|
+    options[:compose_files] = v
+  end
+
+  opts.on("--in [FILENAME]", String, "Input Template File") do |v|
+    options[:in_file] = v
+  end
+
+  opts.on("--out [FILENAME]", String, "Output File") do |v|
+    options[:out_file] = v
+  end
+end.parse!
+
+DockerfileWriter.new(**options).run()
