@@ -1120,6 +1120,12 @@ class RoleOverride < ActiveRecord::Base
 
   def self.clear_cached_contexts; end
 
+  # permission changes won't register right away but we already cache user permission checks for an hour so adding some latency here isn't the worst
+  def self.local_cache_ttl
+    return 0.seconds if ::Rails.env.test? # untangling the billion specs where this goes wrong is hard
+    Setting.get("role_override_local_cache_ttl_seconds", "300").to_i.seconds
+  end
+
   def self.permission_for(context, permission, role_or_role_id, role_context=:role_account)
     account = context.is_a?(Account) ? context :
       Account.new(id: context.account_id) # we can avoid a query since we're just using it for the batched keys on redis
@@ -1131,9 +1137,11 @@ class RoleOverride < ActiveRecord::Base
       # could depend on anything - can't cache (but that's okay because it's not super common)
       uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data)
     else
-      Rails.cache.fetch_with_batched_keys(full_base_key, batch_object: account,
-          batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
-        uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data)
+      LocalCache.fetch([full_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
+        Rails.cache.fetch_with_batched_keys(full_base_key, batch_object: account,
+            batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
+          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data)
+        end
       end
     end.freeze
   end
@@ -1179,27 +1187,29 @@ class RoleOverride < ActiveRecord::Base
     return generated_permission if locked
 
     overrides = RequestCache.cache(permissionless_base_key, account) do
-      Rails.cache.fetch_with_batched_keys(permissionless_base_key, batch_object: account,
-          batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
-        context.shard.activate do
-          accounts = context.account_chain(include_site_admin: true)
-          overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
-            # skip loading from site admin if the role is not from site admin
-            next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
-            RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
-          end
-
-          accounts.reverse!
-          overrides = overrides.group_by(&:permission)
-
-          # every context has to be represented so that we can't miss role_context below
-          overrides.each_key do |permission|
-            overrides_by_account = overrides[permission].index_by(&:context_id)
-            overrides[permission] = accounts.map do |account|
-              overrides_by_account[account.id] || RoleOverride.new(:context_id => account.id, :context_type => "Account")
+      LocalCache.fetch([permissionless_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
+        Rails.cache.fetch_with_batched_keys(permissionless_base_key, batch_object: account,
+            batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
+          context.shard.activate do
+            accounts = context.account_chain(include_site_admin: true)
+            overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
+              # skip loading from site admin if the role is not from site admin
+              next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
+              RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
             end
+
+            accounts.reverse!
+            overrides = overrides.group_by(&:permission)
+
+            # every context has to be represented so that we can't miss role_context below
+            overrides.each_key do |permission|
+              overrides_by_account = overrides[permission].index_by(&:context_id)
+              overrides[permission] = accounts.map do |account|
+                overrides_by_account[account.id] || RoleOverride.new(:context_id => account.id, :context_type => "Account")
+              end
+            end
+            overrides
           end
-          overrides
         end
       end
     end
