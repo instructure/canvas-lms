@@ -178,6 +178,16 @@ Returns an empty string otherwise.
  LTI 1.3: "a6e2e413-4afb-4b60-90d1-8b0344df3e91",
  All Others: "c0ddd6c90cbe1ef0f32fbce5c3bf654204be186c"
 ```
+## com.instructure.User.sectionNames
+Returns an array of the section names that the user is enrolled in, if the
+context of the tool launch is within a course.
+
+**Availability**: *when launched from a course*  
+**Launch Parameter**: *com_instructure_user_section_names*  
+
+```
+[ "Section 1", "Section 5", "TA Section"]
+```
 ## Context.title
 The title of the context.
 
