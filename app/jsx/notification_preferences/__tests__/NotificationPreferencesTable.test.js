@@ -47,7 +47,10 @@ describe('Notification Preferences Table', () => {
     }
 
     const {getByTestId, queryByText} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
     )
 
     const gradingCategory = getByTestId('grading')
@@ -57,7 +60,10 @@ describe('Notification Preferences Table', () => {
 
   it('renders the send scores toggle if the env var is set', () => {
     const {getByTestId, getByText} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
     )
 
     const gradingCategory = getByTestId('grading')
@@ -67,7 +73,10 @@ describe('Notification Preferences Table', () => {
 
   it('correctly disables deprecated categories for sms', () => {
     const {getByTestId} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
     )
 
     const dueDateCategory = getByTestId('due_date')
@@ -80,7 +89,10 @@ describe('Notification Preferences Table', () => {
 
   it('uses the notification policy overrides over the global policies if available', () => {
     const {getByTestId} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
     )
 
     const dueDateCategory = getByTestId('due_date')
@@ -91,9 +103,24 @@ describe('Notification Preferences Table', () => {
     ).toBeInTheDocument()
   })
 
+  it('displays the path and path type correctly for push', () => {
+    const {getByText} = render(
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
+    )
+
+    expect(getByText('Push Notification')).toBeInTheDocument()
+    expect(getByText('For All Devices')).toBeInTheDocument()
+  })
+
   it('only renders the category groups and categories that it is given', () => {
     const {queryByTestId} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
     )
 
     expect(queryByTestId('courseActivities')).not.toBeNull()
@@ -102,7 +129,10 @@ describe('Notification Preferences Table', () => {
 
   it('renders the category description', () => {
     const {getByTestId, getByText} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
     )
 
     const dueDateTooltip = getByTestId('due_date_description')
@@ -112,7 +142,10 @@ describe('Notification Preferences Table', () => {
 
   it('renders the send scores in emails toggle as enabled when the setting is set', () => {
     const {getByTestId} = render(
-      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
     )
 
     const sendScoresToggle = getByTestId('grading-send-score-in-email')
@@ -123,6 +156,7 @@ describe('Notification Preferences Table', () => {
     const {getByTestId} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences({sendScoresInEmails: false})}
+        updatePreference={jest.fn()}
       />
     )
 
