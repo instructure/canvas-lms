@@ -425,7 +425,8 @@ module AccountReports::ReportHelper
 
   def fail_with_error(error)
     Shackles.activate(:master) do
-      @account_report.account_report_runners.incomplete.update_all(workflow_state: 'aborted')
+      # this should leave the runner that caused a failure to be in running or error state.
+      @account_report.account_report_runners.in_progress.update_all(workflow_state: 'aborted')
       @account_report.delete_account_report_rows
       Canvas::Errors.capture_exception(:account_report, error)
       @account_report.workflow_state = 'error'

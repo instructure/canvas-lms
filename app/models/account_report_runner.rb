@@ -57,12 +57,10 @@ class AccountReportRunner < ActiveRecord::Base
   end
 
   def abort
-    write_rows
     self.update!(workflow_state: 'aborted', ended_at: Time.now.utc)
   end
 
   def fail
-    write_rows
     self.update!(workflow_state: 'error', ended_at: Time.now.utc)
   end
 
