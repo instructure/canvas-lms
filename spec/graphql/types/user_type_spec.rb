@@ -54,6 +54,13 @@ describe Types::UserType do
       expect(user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
     end
 
+    it "works for users without a current enrollment" do
+      user = user_model
+      type = GraphQLTypeTester.new(user, current_user: user, domain_root_account: user.account, request: ActionDispatch::TestRequest.create)
+      expect(type.resolve("_id")).to eq user.id.to_s
+      expect(type.resolve("name")).to eq user.name
+    end
+
     it "doesn't work for just anyone" do
       expect(user_type.resolve("_id", current_user: @random_person)).to be_nil
     end
