@@ -320,7 +320,7 @@ class Submission < ActiveRecord::Base
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
   before_save :prep_for_submitting_to_plagiarism
-  before_save :check_url_changed
+  before_save :check_is_new_attempt
   before_save :check_reset_graded_anonymously
   before_save :set_root_account_id
   after_save :touch_user
@@ -1443,8 +1443,8 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def check_url_changed
-    @url_changed = self.url && self.url_changed?
+  def check_is_new_attempt
+    @attempt_changed = self.attempt_changed?
     true
   end
 
@@ -1627,7 +1627,7 @@ class Submission < ActiveRecord::Base
   private :can_grade_symbolic_status
 
   def queue_websnap
-    if !self.attachment_id && @url_changed && self.url && self.submission_type == 'online_url'
+    if !self.attachment_id && @attempt_changed && self.url && self.submission_type == 'online_url'
       self.send_later_enqueue_args(:get_web_snapshot, { :priority => Delayed::LOW_PRIORITY })
     end
   end

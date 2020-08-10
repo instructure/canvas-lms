@@ -3985,6 +3985,53 @@ describe Submission do
     end
   end
 
+  describe "capturing screenshots for online_url submissions" do
+    let_once(:course) { Course.create! }
+    let_once(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:assignment) { course.assignments.create!(submission_types: ["online_url"]) }
+    let(:sub) { assignments.find_by(user: student) }
+    let(:submitted_url) { "https://example.com" }
+    let(:get_web_snapshot_jobs) { Delayed::Job.where(tag: "Submission#get_web_snapshot").order(:id) }
+
+    before do
+      allow(CutyCapt).to receive(:enabled?).and_return(true)
+    end
+
+    it "calls #get_web_snapshot when it's the first submission attempt" do
+      expect {
+        assignment.submit_homework(student, submission_type: "online_url", url: submitted_url)
+      }.to change {
+        get_web_snapshot_jobs.count
+      }.by(1)
+    end
+
+    it "calls #get_web_snapshot when it's not the first submission attempt" do
+      assignment.submit_homework(student, submission_type: "online_url", url: submitted_url)
+      expect {
+        assignment.submit_homework(student, submission_type: "online_url", url: "https://example.com/different")
+      }.to change {
+        get_web_snapshot_jobs.count
+      }.by(1)
+    end
+
+    it "calls #get_web_snapshot when it's not the first submission attempt and the url hasn't changed" do
+      assignment.submit_homework(student, submission_type: "online_url", url: submitted_url)
+      expect {
+        assignment.submit_homework(student, submission_type: "online_url", url: submitted_url)
+      }.to change {
+        get_web_snapshot_jobs.count
+      }.by(1)
+    end
+
+    it "does not call #get_web_snapshot when a url is not included" do
+      expect {
+        assignment.submit_homework(student, submission_type: "online_url", url: nil)
+      }.not_to change {
+        get_web_snapshot_jobs.count
+      }
+    end
+  end
+
   describe '#submit_attachments_to_canvadocs' do
     it 'creates crocodoc documents' do
       allow(Canvas::Crocodoc).to receive(:enabled?).and_return true
