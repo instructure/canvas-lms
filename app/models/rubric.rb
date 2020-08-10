@@ -20,6 +20,8 @@ class Rubric < ActiveRecord::Base
   include Workflow
   include HtmlTextHelper
 
+  POINTS_POSSIBLE_PRECISION = 4
+
   attr_writer :skip_updating_points_possible
   belongs_to :user
   belongs_to :rubric # based on another rubric
@@ -306,7 +308,7 @@ class Rubric < ActiveRecord::Base
       criteria[idx.to_i] = criterion
     end
     criteria = criteria.compact
-    points_possible = total_points_from_criteria(criteria)
+    points_possible = total_points_from_criteria(criteria)&.round(POINTS_POSSIBLE_PRECISION)
     CriteriaData.new(criteria, points_possible, title)
   end
 

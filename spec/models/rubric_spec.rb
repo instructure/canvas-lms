@@ -167,6 +167,35 @@ describe Rubric do
       expect(rubric.data.first[:points]).to be(0.5)
       expect(rubric.data.first[:ratings].first[:points]).to be(0.5)
     end
+
+    it "rounds the total points to four decimal places" do
+      course_factory
+
+      criteria = {
+        "0" => {
+          points: 0.33333,
+          description: "a criterion",
+          id: "1",
+          ratings: {
+            "0" => { points: 0.33333, description: "ok", id: "2" },
+            "1" => { points: 0, description: "not ok", id: "3" }
+          }
+        },
+        "1" => {
+          points: 0.33333,
+          description: "also a criterion",
+          id: "4",
+          ratings: {
+            "0" => { points: 0.33333, description: "ok", id: "5" },
+            "1" => { points: 0, description: "not ok", id: "6" }
+          }
+        }
+      }
+
+      rubric = rubric_model({context: @course})
+      rubric.update_criteria({criteria: criteria})
+      expect(rubric.points_possible).to eq 0.6667
+    end
   end
 
   it "should be cool about duplicate titles" do

@@ -235,7 +235,7 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def score
-    self[:score]&.round(4)
+    self[:score]&.round(Rubric::POINTS_POSSIBLE_PRECISION)
   end
 
   def assessor_name
