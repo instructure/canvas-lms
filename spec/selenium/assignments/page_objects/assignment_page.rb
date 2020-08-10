@@ -61,7 +61,7 @@ class AssignmentPage
     end
 
     def manage_assignment_button
-      fj("a[role=button]:contains('Manage')")
+      fj("button:contains('Manage')")
     end
 
     def send_to_menuitem

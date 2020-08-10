@@ -134,16 +134,16 @@
       <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
       <div class="header-group-right">
         <% if can_do(@quiz, @current_user, :update) %>
-        <a href="<%= edit_course_quiz_path(@context, @quiz) %>" class='btn edit_assignment_link quiz-edit-button' role='button'>
+        <a href="<%= edit_course_quiz_path(@context, @quiz) %>" class='btn edit_assignment_link quiz-edit-button'>
           <i class="icon-edit"></i> <%= admin_edit_title %>
         </a>
         <% end %>
 
         <div class="inline-block">
-          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+          <button class=" al-trigger btn"  aria-haspopup="true" aria-owns="toolbar-1">
             <i class="icon-more" aria-hidden="true"></i>
             <span class="screenreader-only"><%= admin_manage_title %></span>
-          </a>
+          </button>
           <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
             <% if can_do(@quiz, @current_user, :update) && @assignment %>
               <li role="presentation">

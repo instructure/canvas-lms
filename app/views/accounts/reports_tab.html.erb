@@ -21,10 +21,10 @@
       <td class="title reports">
         <span class="title"><%= title %></span>
         <% if description_partial %>
-          <a href="#" class="open_report_description_link" role="button" aria-haspopup="true" aria-owns="<%= "#{report}_report_description" %>">
+          <button style="border: none; background: none;" class="open_report_description_link"aria-haspopup="true" aria-owns="<%= "#{report}_report_description" %>">
             <i class="icon-question standalone-icon"></i>
             <span class="screenreader-only"><%= t(:open_report_description, "Open Report Description") %></span>
-          </a>
+          </button>
           <div id="<%= "#{report}_report_description" %>" style="display: none" class="report_description">
             <%= render(:partial => description_partial) %>
           </div>

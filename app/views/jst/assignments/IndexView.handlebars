@@ -48,26 +48,22 @@
           <a
             href="{{ENV.URLS.new_assignment_url}}?quiz_lti"
             class="new_quiz_lti btn icon-plus"
-            role="button"
             title='{{#t "title_add_quiz_lti"}}Add Quiz/Test{{/t}}'
             aria-label='{{#t "title_add_quiz_lti"}}Add Quiz/Test{{/t}}'
           >{{#t "add_quiz_lti"}}Quiz/Test{{/t}}</a>
         </span>
       {{/if}}
 
-      <a
-        href="#"
-        class="btn icon-plus"
+      <button
+        class="btn Button"
         id="addGroup"
-        role="button"
         title='{{#t "title_add_group"}}Add Assignment Group{{/t}}'
         aria-label='{{#t "title_add_group"}}Add Assignment Group{{/t}}'
-      >{{#t "add_group"}}Group{{/t}}</a>
+      ><i class="icon-plus">{{#t "add_group"}}Group{{/t}}</i></button>
 
       <a
         href="{{ENV.URLS.new_assignment_url}}"
         class="new_assignment btn btn-primary icon-plus"
-        role="button"
         title='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
         aria-label='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
       >{{#t "add_assignment"}}Assignment{{/t}}</a>
