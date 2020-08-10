@@ -835,7 +835,7 @@ class GradebooksController < ApplicationController
       return
     end
 
-    @progress = @assignment.submission_reupload_progress
+    @presenter = Submission::UploadPresenter.for(@context, @assignment)
 
     css_bundle :show_submissions_upload
     render :show_submissions_upload

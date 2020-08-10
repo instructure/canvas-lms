@@ -2388,9 +2388,11 @@ class Assignment < ActiveRecord::Base
         }
       end
 
+      comment_submission = comment.submission
       submission = {
-        user_id: comment.submission.user_id,
-        user_name: comment.submission.user.name
+        user_id: comment_submission.user_id,
+        user_name: comment_submission.user.name,
+        anonymous_id: comment_submission.anonymous_id
       }
 
       results[:comments].push({
