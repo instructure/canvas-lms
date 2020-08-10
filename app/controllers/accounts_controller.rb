@@ -1256,7 +1256,7 @@ class AccountsController < ApplicationController
     end
     associated_courses = @account.associated_courses(opts).active
     associated_courses = associated_courses.for_term(@term) if @term
-    @associated_courses_count = associated_courses.count
+    @associated_courses_count = 0
     @hide_enrollmentless_courses = params[:hide_enrollmentless_courses] == "1"
     @only_master_courses = (params[:only_master_courses] == "1")
     @courses_sort_orders = [
