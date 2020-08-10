@@ -364,6 +364,30 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@enrollment.reload).to be_active
   end
 
+  it 'should not update an enrollment that is deleted and pseudonym is deleted' do
+    # course
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    # deleted user
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,deleted"
+    )
+    # deleted enrollment
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,deleted,"
+    )
+    # skipped enrollment update
+    importer = process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,active,"
+    )
+    expect(importer.batch.roll_back_data.count).to eq 0
+  end
+
   it "should count re-deletions" do
     # because people get confused otherwise
     course_model(:account => @account, :sis_source_id => 'C001')

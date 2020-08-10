@@ -219,6 +219,9 @@ module SIS
               next
             end
 
+            # if the pseudonym is already deleted, we're done.
+            next if pseudo.workflow_state == 'deleted'
+
             # if this user is deleted and there are no more active logins,
             # we're going to delete any enrollments for this root account and
             # delete this pseudonym.
