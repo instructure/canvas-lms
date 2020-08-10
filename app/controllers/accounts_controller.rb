@@ -363,24 +363,8 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
     respond_to do |format|
       format.html do
-        if @account.feature_enabled?(:course_user_search)
-          @redirect_on_unauth = true
-          return course_user_search
-        end
-        if value_to_boolean(params[:theme_applied])
-          flash[:notice] = t("Your custom theme has been successfully applied.")
-        end
-        return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, :read_course_list)
-        js_env(:ACCOUNT_COURSES_PATH => account_courses_path(@account, :format => :json))
-        include_crosslisted_courses = value_to_boolean(params[:include_crosslisted_courses])
-        load_course_right_side(:include_crosslisted_courses => include_crosslisted_courses)
-        @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show,
-          :hide_enrollmentless_courses => @hide_enrollmentless_courses,
-          :only_master_courses => @only_master_courses,
-          :order => sort_order,
-          :include_crosslisted_courses => include_crosslisted_courses)
-        ActiveRecord::Associations::Preloader.new.preload(@courses, :enrollment_term)
-        build_course_stats
+        @redirect_on_unauth = true
+        return course_user_search
       end
       format.json { render :json => account_json(@account, @current_user, session, params[:includes] || [],
                                                  !@account.grants_right?(@current_user, session, :manage)) }
@@ -1058,7 +1042,6 @@ class AccountsController < ApplicationController
 
   def settings
     if authorized_action(@account, @current_user, :read)
-      load_course_right_side
       @account_users = @account.account_users.active
       @account_user_permissions_cache = AccountUser.create_permissions_cache(@account_users, @current_user, session)
       ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
@@ -1246,48 +1229,6 @@ class AccountsController < ApplicationController
     end
   end
 
-  def load_course_right_side(opts = {})
-    @root_account = @account.root_account
-    @maximum_courses_im_gonna_show = 50
-    @term = nil
-    if params[:enrollment_term_id].present?
-      @term = @root_account.enrollment_terms.active.find(params[:enrollment_term_id]) rescue nil
-      @term ||= @root_account.enrollment_terms.active[-1]
-    end
-    associated_courses = @account.associated_courses(opts).active
-    associated_courses = associated_courses.for_term(@term) if @term
-    @associated_courses_count = 0
-    @hide_enrollmentless_courses = params[:hide_enrollmentless_courses] == "1"
-    @only_master_courses = (params[:only_master_courses] == "1")
-    @courses_sort_orders = [
-      {
-        key: "name_asc",
-        label: -> { t("A - Z") },
-        col: Course.best_unicode_collation_key("courses.name"),
-        direction: "ASC"
-      },
-      {
-        key: "name_desc",
-        label: -> { t("Z - A") },
-        col: Course.best_unicode_collation_key("courses.name"),
-        direction: "DESC"
-      },
-      {
-        key: "created_at_desc",
-        label: -> { t("Newest - Oldest") },
-        col: "courses.created_at",
-        direction: "DESC"
-      },
-      {
-        key: "created_at_asc",
-        label: -> { t("Oldest - Newest") },
-        col: "courses.created_at",
-        direction: "ASC"
-      }
-    ].freeze
-  end
-  protected :load_course_right_side
-
   def statistics
     if authorized_action(@account, @current_user, :view_statistics)
       add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
@@ -1372,32 +1313,68 @@ class AccountsController < ApplicationController
     redirect_to course_url(params[:id])
   end
 
-  def courses
-    if authorized_action(@context, @current_user, :read)
-      order = sort_order # must be done on master because it persists in user preferences
-      Shackles.activate(:slave) do
-        load_course_right_side
-        @courses = []
-        @query = (params[:course] && params[:course][:name]) || params[:term]
-        if @context && @context.is_a?(Account) && @query
-          @courses = @context.courses_name_like(@query, :order => order, :term => @term,
-            :hide_enrollmentless_courses => @hide_enrollmentless_courses,
-            :only_master_courses => @only_master_courses)
-        end
+  def course_user_search
+    return unless authorized_action(@account, @current_user, :read)
+    can_read_course_list = @account.grants_right?(@current_user, session, :read_course_list)
+    can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
+    can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
+
+    unless can_read_course_list || can_read_roster
+      if @redirect_on_unauth
+        return redirect_to account_settings_url(@account)
+      else
+        return render_unauthorized_action
       end
-      respond_to do |format|
-        format.html {
-          return redirect_to @courses.first if @courses.length == 1
-          Shackles.activate(:slave) do
-            build_course_stats
-          end
-        }
-        format.json  {
-          cancel_cache_buster
-          expires_in 30.minutes
-          render :json => @courses.map{ |c| {:label => c.name, :id => c.id, :term => c.enrollment_term.name} }
-        }
-      end
+    end
+
+    js_env({
+             COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user)
+           })
+    js_bundle :account_course_user_search
+    css_bundle :addpeople
+    @page_title = @account.name
+    add_crumb '', '?' # the text for this will be set by javascript
+    js_env({
+             ROOT_ACCOUNT_NAME: @account.root_account.name, # used in AddPeopleApp modal
+             ACCOUNT_ID: @account.id,
+             ROOT_ACCOUNT_ID: @account.root_account.id,
+             customized_login_handle_name: @account.root_account.customized_login_handle_name,
+             delegated_authentication: @account.root_account.delegated_authentication?,
+             SHOW_SIS_ID_IN_NEW_USER_FORM: @account.root_account.allow_sis_import && @account.root_account.grants_right?(@current_user, session, :manage_sis),
+             PERMISSIONS: {
+               can_read_course_list: can_read_course_list,
+               can_read_roster: can_read_roster,
+               can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
+               can_create_enrollments: @account.grants_any_right?(@current_user, session, :manage_students, :manage_admin_users),
+               can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
+               analytics: @account.service_enabled?(:analytics),
+               can_masquerade: @account.grants_right?(@current_user, session, :become_user),
+               can_message_users: @account.grants_right?(@current_user, session, :send_messages),
+               can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
+               can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups),           # access to view user groups?
+               can_manage_admin_users: @account.grants_right?(@current_user, session, :manage_admin_users)  # access to manage user avatars page?
+             }
+           })
+    render html: '', layout: true
+  end
+
+  def users
+    get_context
+    unless params.key?(:term)
+      @account ||= @context
+      return course_user_search
+    end
+
+    return unless authorized_action(@context, @current_user, :read_roster)
+    @root_account = @context.root_account
+    @query = params[:term]
+    Shackles.activate(:slave) do
+      @users = @context.users_name_like(@query)
+      @users = @users.paginate(:page => params[:page])
+
+      cancel_cache_buster
+      expires_in 30.minutes
+      render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
     end
   end
 
@@ -1591,22 +1568,6 @@ class AccountsController < ApplicationController
     # i'm doing this instead of normal params because we do too much hackery to the weak params, especially in plugins
     # and it breaks when we enforce inherited weak parameters (because we're not actually editing request.parameters anymore)
     params.require(:account).permit(*permitted_account_attributes)
-  end
-
-  def sort_order
-    load_course_right_side unless @courses_sort_orders.present?
-
-    if !params[:courses_sort_order].nil?
-      @current_user.preferences[:course_sort] = params[:courses_sort_order]
-      @current_user.save!
-    end
-
-    order = @courses_sort_orders.find do |ord|
-      ord[:key] == @current_user.preferences[:course_sort]
-    end
-
-
-    order && "#{order[:col]} #{order[:direction]}"
   end
 
   def edit_help_links_env

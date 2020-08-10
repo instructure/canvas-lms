@@ -2674,58 +2674,6 @@ class ApplicationController < ActionController::Base
     LiveEvents.clear_context!
   end
 
-  # TODO: this belongs in AccountsController but while :course_user_search is still behind a feature flag we
-  # have to let UsersController::index own the /accounts/x/users route so it responds as it used to if the
-  # feature isn't enabled but `return course_user_search` if the feature is enabled. you can't `return` an
-  # action from another controller but you can from a controller you inherit from. Hence why this can be
-  # here in ApplicationController but not AccountsController for now. Once we remove the feature flag,
-  # we should move this back to AccountsController and just change conf/routes.rb to let
-  # AccountsController::users own /accounts/x/users instead UsersController::index
-  def course_user_search
-    return unless authorized_action(@account, @current_user, :read)
-    can_read_course_list = @account.grants_right?(@current_user, session, :read_course_list)
-    can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
-    can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
-
-    unless can_read_course_list || can_read_roster
-      if @redirect_on_unauth
-        return redirect_to account_settings_url(@account)
-      else
-        return render_unauthorized_action
-      end
-    end
-
-    js_env({
-      COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user)
-    })
-    js_bundle :account_course_user_search
-    css_bundle :addpeople
-    @page_title = @account.name
-    add_crumb '', '?' # the text for this will be set by javascript
-    js_env({
-      ROOT_ACCOUNT_NAME: @account.root_account.name, # used in AddPeopleApp modal
-      ACCOUNT_ID: @account.id,
-      ROOT_ACCOUNT_ID: @account.root_account.id,
-      customized_login_handle_name: @account.root_account.customized_login_handle_name,
-      delegated_authentication: @account.root_account.delegated_authentication?,
-      SHOW_SIS_ID_IN_NEW_USER_FORM: @account.root_account.allow_sis_import && @account.root_account.grants_right?(@current_user, session, :manage_sis),
-      PERMISSIONS: {
-        can_read_course_list: can_read_course_list,
-        can_read_roster: can_read_roster,
-        can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
-        can_create_enrollments: @account.grants_any_right?(@current_user, session, :manage_students, :manage_admin_users),
-        can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
-        analytics: @account.service_enabled?(:analytics),
-        can_masquerade: @account.grants_right?(@current_user, session, :become_user),
-        can_message_users: @account.grants_right?(@current_user, session, :send_messages),
-        can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
-        can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups),           # access to view user groups?
-        can_manage_admin_users: @account.grants_right?(@current_user, session, :manage_admin_users)  # access to manage user avatars page?
-      }
-    })
-    render html: '', layout: true
-  end
-
   def can_stream_template?
     if ::Rails.env.test?
       # don't actually stream because it kills selenium
