@@ -360,11 +360,11 @@ module AccountReports::ReportHelper
       @account_report.add_report_runner(batch)
       ids_so_far += batch.length
       if ids_so_far >= Setting.get("ids_per_report_runner_batch", 10_000).to_i
-        @account_report.write_report_runners
+        Shackles.activate(:master) { @account_report.write_report_runners }
         ids_so_far = 0
       end
     end
-    @account_report.write_report_runners
+    Shackles.activate(:master) { @account_report.write_report_runners }
   end
 
   def activate_report_db(&block)
