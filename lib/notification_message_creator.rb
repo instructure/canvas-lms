@@ -257,7 +257,7 @@ class NotificationMessageCreator
     # are already loaded so we are using the select :active? to not do another
     # query to load them again.
     users_from_to_list(to_list).each do |user|
-      to_user_channels[user] += user.communication_channels.select(&:active?)
+      to_user_channels[user] += user.communication_channels.select{ |cc| add_channel?(user, cc) }
     end
     # if the method gets communication channels, the user is loaded, and this
     # allows all the methods in this file to behave the same as if it were users.
@@ -266,6 +266,11 @@ class NotificationMessageCreator
     end
     to_user_channels.each_value(&:uniq!)
     to_user_channels
+  end
+
+  # only send emails to active channels or registration notifications to default users' channel
+  def add_channel?(user, channel)
+    channel.active? || (@notification.registration? && default_email?(user, channel))
   end
 
   def users_from_to_list(to_list)
