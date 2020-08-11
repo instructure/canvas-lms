@@ -116,8 +116,8 @@ class NotificationMessageCreator
   # have sent too many immediate messages to a user in a day.
   # returns delayed_message or nil
   def build_fallback_for(user, channel)
-    # if the notification is summarizable? it will be picked up in delayed_messages.
-    # if it's not an email we won't send a delayed_message.
+    # delayed_messages are only sent to email channels.
+    # some types of notifications are only for immediate.
     return unless @notification.summarizable? && channel.path_type == 'email'
     # we only send fallback when we did not send an immediate message, ie.
     # when the channel is bouncing or there have been too_many_messages
@@ -135,9 +135,8 @@ class NotificationMessageCreator
   # returns delayed_message or nil
   def build_delayed_message_for(user, channel)
     # delayed_messages are only sent to email channels.
-    return unless channel.path_type == 'email'
     # some types of notifications are only for immediate.
-    return if @notification.registration? || @notification.migration?
+    return unless @notification.summarizable? && channel.path_type == 'email'
     policy = effective_policy_for(user, channel)
     # if the policy is not daily or weekly, it is either immediate which was
     # picked up before in build_immediate_message_for, or it's never.
