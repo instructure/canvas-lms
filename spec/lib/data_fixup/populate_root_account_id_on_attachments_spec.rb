@@ -20,7 +20,7 @@ require 'spec_helper'
 describe DataFixup::PopulateRootAccountIdOnAttachments do
   let(:account) { account_model }
 
-  describe('.run') do
+  describe('.populate') do
     it 'updates the root_account_id' do
       attachment1 = attachment_model(context: account)
       attachment1.update_attributes!(root_account_id: nil)
@@ -30,7 +30,7 @@ describe DataFixup::PopulateRootAccountIdOnAttachments do
       expect(attachment1.reload.root_account_id).to be_nil
       expect(attachment2.reload.root_account_id).to be_nil
 
-      DataFixup::PopulateRootAccountIdOnAttachments.run(attachment1.id, attachment2.id)
+      DataFixup::PopulateRootAccountIdOnAttachments.populate(attachment1.id, attachment2.id)
 
       expect(attachment1.reload.root_account_id).to eq account.id
       expect(attachment2.reload.root_account_id).to eq account.id
