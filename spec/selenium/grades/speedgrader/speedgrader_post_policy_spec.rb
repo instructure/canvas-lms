@@ -69,10 +69,6 @@ end
 describe 'Speed Grader Post Policy' do
   include_context 'in-process server selenium tests'
 
-  # rubocop:disable RSpec/BeforeAfterAll, Specs/NoBeforeAll
-  before(:all) { preload_graphql_schema }
-  # rubocop:enable RSpec/BeforeAfterAll, Specs/NoBeforeAll
-
   before :once do
     @teacher = course_with_teacher(course_name: 'Post Policy Course', name: 'Teacher', active_all: true).user
     @course = Course.find_by!(name: 'Post Policy Course')

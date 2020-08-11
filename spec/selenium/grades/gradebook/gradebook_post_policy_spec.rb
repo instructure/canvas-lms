@@ -26,7 +26,6 @@ describe 'Gradebook Post Policy' do
   include_context "in-process server selenium tests"
 
   before :once do
-    preload_graphql_schema
     # course
     @course_with_manual_post = course_with_teacher(
       course_name: "Post Policy Course",
