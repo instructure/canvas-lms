@@ -568,6 +568,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "Invalid file type"
   },
+  "invalid_url_cbde79f": {
+    "message": "Invalid URL"
+  },
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
@@ -781,6 +784,9 @@
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Other editor shortcuts may be found at"
   },
+  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+    "message": "{ p } is not a valid protocol which must be ftp, http, https, mailto, skype, tel or may be omitted"
+  },
   "page_50c4823d": {
     "message": "Page"
   },
@@ -831,6 +837,9 @@
   },
   "previous_page_928fc112": {
     "message": "Previous Page"
+  },
+  "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+    "message": "Protocol must be ftp, http, https, mailto, skype, tel or may be omitted"
   },
   "pts_699bd9aa": {
     "message": "pts"
