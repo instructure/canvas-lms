@@ -142,6 +142,14 @@ describe NotificationMessageCreator do
       expect(messages.length).to eql(1)
     end
 
+    it 'should send registration emails to unconfirmed communication_channels' do
+      notification_model({ subject: "test", name: "Test Name", category: "Registration" })
+      communication_channel(user_model, cc_state: 'unconfirmed')
+      account_user = account_model.account_users.create!(user: @user)
+      messages = NotificationMessageCreator.new(@notification, account_user, to_list: @user).create_message
+      expect(messages.length).to eql(1)
+    end
+
     it 'does send other notifications when policy override is in effect' do
       notification_set(notification_opts: { :category => "Registration" })
       @course.root_account.enable_feature!(:mute_notifications_by_course)
