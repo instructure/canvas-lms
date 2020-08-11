@@ -38,6 +38,10 @@ class DockerfileWriter
     env == "development"
   end
 
+  def jenkins?
+    env == "jenkins"
+  end
+
   def generation_message
     <<~STR
       # GENERATED FILE, DO NOT MODIFY!

@@ -4,6 +4,7 @@
 
 ARG RUBY=2.6
 
+
 FROM instructure/passenger-nginx-alpine:${RUBY} AS dependencies
 LABEL maintainer="Instructure"
 
@@ -22,7 +23,7 @@ WORKDIR $APP_HOME
 COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
 COPY --chown=docker:docker Gemfile   ${APP_HOME}
 COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
-COPY --chown=docker:docker gems      ${APP_HOME}gems
+COPY --chown=docker:docker gems               ${APP_HOME}gems
 ENV GEM_HOME /home/docker/.gem/$RUBY_VERSION
 ENV PATH $GEM_HOME/bin:$PATH
 ENV BUNDLE_APP_CONFIG /home/docker/.bundle

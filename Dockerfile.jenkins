@@ -1,8 +1,19 @@
+# syntax = docker/dockerfile:1.0-experimental
 # GENERATED FILE, DO NOT MODIFY!
 # To update this file please edit the relevant template and run the generation
-# task `build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins`
+# task `build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins`
 
 ARG RUBY=2.6
+
+FROM busybox AS cache-helper-collect-gems
+RUN mkdir -p /tmp/dst /tmp/dst
+WORKDIR /tmp/src
+RUN --mount=target=/tmp/src find gems -name "Gemfile" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "Gemfile.d" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "Gemfile.lock" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "*.gemspec" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "gem_version.rb" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "version.rb" -exec cp --parents {} /tmp/dst \;
 
 FROM instructure/passenger-nginx-alpine:${RUBY} AS dependencies
 LABEL maintainer="Instructure"
@@ -22,7 +33,7 @@ WORKDIR $APP_HOME
 COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
 COPY --chown=docker:docker Gemfile   ${APP_HOME}
 COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
-COPY --chown=docker:docker gems      ${APP_HOME}gems
+COPY --chown=docker:docker --from=cache-helper-collect-gems /tmp/dst ${APP_HOME}
 ENV GEM_HOME /home/docker/.gem/$RUBY_VERSION
 ENV PATH $GEM_HOME/bin:$PATH
 ENV BUNDLE_APP_CONFIG /home/docker/.bundle
@@ -121,6 +132,7 @@ RUN set -eux; \
 USER docker
 COPY --chown=docker:docker babel.config.js    ${APP_HOME}
 COPY --chown=docker:docker build/new-jenkins  ${APP_HOME}build/new-jenkins
+COPY --chown=docker:docker gems               ${APP_HOME}gems
 COPY --chown=docker:docker package.json       ${APP_HOME}
 COPY --chown=docker:docker packages           ${APP_HOME}packages
 COPY --chown=docker:docker script             ${APP_HOME}script
