@@ -461,7 +461,10 @@ class User < ActiveRecord::Base
     end
 
     # Update the user
-    self.update!(root_account_ids: refreshed_root_account_ids.to_a)
+    relative_ids = refreshed_root_account_ids.map do |id|
+      Shard.relative_id_for(id, self.shard, self.shard)
+    end
+    self.update!(root_account_ids: relative_ids)
 
     # Update each communication channel associated with the user
     communication_channels_to_update.each do |c|

@@ -465,7 +465,7 @@ describe User do
         }.to change {
           user.root_account_ids&.sort
         }.from(nil).to(
-          [root_account.global_id, shard_two_root_account.global_id].sort
+          [root_account.id, shard_two_root_account.global_id].sort
         )
       end
 
