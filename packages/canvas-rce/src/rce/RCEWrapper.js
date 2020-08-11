@@ -1013,15 +1013,15 @@ class RCEWrapper extends React.Component {
           ]
         },
         {
-          name: formatMessage('Canvas Plugins'),
+          name: formatMessage('Content'),
           items: canvasPlugins
         },
         {
-          name: formatMessage('Apps'),
+          name: formatMessage('External Tools'),
           items: [...this.ltiToolFavorites, 'lti_tool_dropdown', 'lti_mru_button']
         },
         {
-          name: formatMessage('Alignment and Indentation'),
+          name: formatMessage('Alignment and Lists'),
           items: ['align', 'bullist', 'inst_indent', 'inst_outdent']
         },
         {
