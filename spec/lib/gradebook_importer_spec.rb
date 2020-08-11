@@ -419,6 +419,19 @@ describe GradebookImporter do
     end
   end
 
+  it "strips leading and trailing spaces from grades" do
+    rows = [
+      "Student;ID;Section;Aufgabe 1;Aufgabe 2;Final Score",
+      "Points Possible;;;10000,54;100,00;",
+      "'Merkel, Angela';1;Mein Kurs; 123,4;57,4%;",
+      "'Einstein, Albert';2;Mein Kurs;1234,5 ;4.200,3%;"
+    ]
+
+    importer = importer_with_rows(*rows)
+    grades = importer.upload.gradebook.fetch("students").map { |s| s.fetch("submissions").first.fetch("grade") }
+    expect(grades).to match_array ["123,4", "1234,5"]
+  end
+
   it "parses new and existing assignments" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
