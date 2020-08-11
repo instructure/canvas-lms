@@ -1655,6 +1655,56 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe 'outcome_proficiency' do
+    before do
+      @account = account_model
+      @rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00')
+      rating2 = OutcomeProficiencyRating.new(description: 'worst', points: 0, mastery: false, color: 'ff0000')
+      @proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [@rating1, rating2], context: @account)
+    end
+
+    def rating_event(rating)
+      {
+        outcome_proficiency_rating_id: rating.id.to_s,
+        description: rating.description,
+        points: rating.points,
+        mastery: rating.mastery,
+        color: rating.color,
+        workflow_state: rating.workflow_state
+      }
+    end
+
+    context 'created' do
+      it 'should trigger an outcome_proficiency_created live event' do
+        expect_event('outcome_proficiency_created', {
+          outcome_proficiency_id: @proficiency.id.to_s,
+          context_id: @proficiency.context_id.to_s,
+          context_type: @proficiency.context_type,
+          workflow_state: @proficiency.workflow_state,
+          outcome_proficiency_ratings: @proficiency.outcome_proficiency_ratings.map {|rating| rating_event(rating)}
+        }.compact).once
+
+        Canvas::LiveEvents.outcome_proficiency_created(@proficiency)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger an outcome_proficiency_updated live event' do
+        @proficiency.outcome_proficiency_ratings = [@rating1]
+        @proficiency.save!
+        expect_event('outcome_proficiency_updated', {
+          outcome_proficiency_id: @proficiency.id.to_s,
+          context_id: @proficiency.context_id.to_s,
+          context_type: @proficiency.context_type,
+          workflow_state: @proficiency.workflow_state,
+          updated_at: @proficiency.updated_at,
+          outcome_proficiency_ratings: @proficiency.outcome_proficiency_ratings.map {|rating| rating_event(rating)}
+        }.compact).once
+        Canvas::LiveEvents.outcome_proficiency_updated(@proficiency)
+      end
+    end
+  end
+
   describe 'grade_override' do
     it 'does not send event when score does not change' do
       course_model
