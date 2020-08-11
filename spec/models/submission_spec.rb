@@ -4909,10 +4909,40 @@ describe Submission do
       @student_assessment = @submission.rubric_assessments.where(assessor_id: @student).first
     end
 
-    it "returns empty if submission is unposted and user cannot :read_grade" do
-      @assignment.ensure_post_policy(post_manually: true)
-      @viewing_user = @student
-      expect(subject).to be_empty
+    context "when the submission is unposted and the viewing user cannot :read_grade" do
+      before(:once) do
+        @assignment.post_policy.update!(post_manually: true)
+        @viewing_user = @student
+      end
+
+      it "excludes assessments by other users" do
+        expect(subject).not_to include(@teacher_assessment)
+      end
+
+      it "includes assessments authored by the viewing user" do
+        course = Course.create!
+        assessed_student = course.enroll_student(User.create!, workflow_state: "active").user
+        assessing_student = course.enroll_student(User.create!, workflow_state: "active").user
+
+        assignment = course.assignments.create!(peer_reviews: true)
+        rubric_association = rubric_association_model(context: course, association_object: assignment, purpose: "grading")
+
+        submission = assignment.submission_for_student(assessed_student)
+        submission.assessment_requests.create!(
+          user: assessed_student,
+          assessor: assessing_student,
+          assessor_asset: assignment.submission_for_student(assessing_student)
+        )
+        peer_review_assessment = rubric_association.rubric_assessments.create!({
+          artifact: submission,
+          assessment_type: "grading",
+          assessor: assessing_student,
+          rubric: rubric_association.rubric,
+          user: assessed_student
+        })
+
+        expect(submission.visible_rubric_assessments_for(assessing_student)).to include(peer_review_assessment)
+      end
     end
 
     it "returns the rubric assessments if user can :read_grade" do
@@ -4958,6 +4988,14 @@ describe Submission do
       it 'can find historic rubric assessments of older attempts' do
         expect(
           @submission2.visible_rubric_assessments_for(@viewing_user, attempt: @submission.attempt)
+        ).to contain_exactly(@teacher_assessment, @student_assessment)
+      end
+
+      it "returns assessments for every attempt if attempt is nil" do
+        @teacher_assessment.update!(artifact_attempt: 0)
+        @student_assessment.update!(artifact_attempt: 1)
+        expect(
+          @submission2.visible_rubric_assessments_for(@viewing_user, attempt: nil)
         ).to contain_exactly(@teacher_assessment, @student_assessment)
       end
     end

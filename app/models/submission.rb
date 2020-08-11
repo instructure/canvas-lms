@@ -2548,24 +2548,17 @@ class Submission < ActiveRecord::Base
   end
 
   def visible_rubric_assessments_for(viewing_user, attempt: nil)
-    return [] unless posted? || grants_right?(viewing_user, :read_grade)
-    return [] unless self.assignment.rubric_association
+    return [] if assignment.rubric_association.blank?
 
-    assessments =
-      if attempt
-        self.rubric_assessments.each_with_object([]) do |assessment, assessments_for_attempt|
-          if assessment.artifact_attempt == attempt
-            assessments_for_attempt << assessment
-          else
-            version = assessment.versions.find { |v| v.model.artifact_attempt == attempt }
-            assessments_for_attempt << version.model if version
-          end
-        end
-      else
-        self.rubric_assessments
+    unless posted? || grants_right?(viewing_user, :read_grade)
+      # If this submission is unposted and the viewer can't view the grade,
+      # show only that viewer's assessments
+      return rubric_assessments_for_attempt(attempt: attempt).filter do |assessment|
+        assessment.assessor_id == viewing_user.id
       end
+    end
 
-    filtered_assessments = assessments.select do |a|
+    filtered_assessments = rubric_assessments_for_attempt(attempt: attempt).select do |a|
       a.grants_right?(viewing_user, :read) &&
         a.rubric_association == self.assignment.rubric_association
     end
@@ -2576,6 +2569,20 @@ class Submission < ActiveRecord::Base
       ]
     end
   end
+
+  def rubric_assessments_for_attempt(attempt: nil)
+    return rubric_assessments.to_a if attempt.blank?
+
+    rubric_assessments.each_with_object([]) do |assessment, assessments_for_attempt|
+      if assessment.artifact_attempt == attempt
+        assessments_for_attempt << assessment
+      else
+        version = assessment.versions.find { |v| v.model.artifact_attempt == attempt }
+        assessments_for_attempt << version.model if version
+      end
+    end
+  end
+  private :rubric_assessments_for_attempt
 
   def self.queue_bulk_update(context, section, grader, grade_data)
     progress = Progress.create!(:context => context, :tag => "submissions_update")
