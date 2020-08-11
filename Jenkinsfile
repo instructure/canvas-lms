@@ -80,7 +80,7 @@ def ignoreBuildNeverStartedError(block) {
 }
 
 // return false if the current patchset tag doesn't match the
-// mainline publishable tag. i.e. ignore ruby-2.6/pg-12 upgrade builds
+// mainline publishable tag. i.e. ignore pg-9.5 builds
 def isPatchsetPublishable() {
   env.PATCHSET_TAG == env.PUBLISHABLE_TAG
 }
@@ -151,16 +151,16 @@ pipeline {
     POSTGRES_CLIENT = configuration.postgresClient()
     SKIP_CACHE = configuration.skipCache()
 
-    // e.g. postgres-9.5-ruby-2.6
+    // e.g. postgres-12-ruby-2.6
     TAG_SUFFIX = imageTag.suffix()
 
     // this is found in the PUBLISHABLE_TAG_SUFFIX config file on jenkins
-    PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffixNew()
+    PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffix()
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = getPatchsetTag()
 
-    // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-2.6
+    // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-$PUBLISHABLE_TAG_SUFFIX"
 
     // e.g. canvas-lms:master when not on another branch

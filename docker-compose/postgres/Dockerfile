@@ -1,4 +1,4 @@
-ARG POSTGRES=9.5
+ARG POSTGRES=12
 FROM postgis/postgis:$POSTGRES-2.5
 
 RUN echo "max_locks_per_transaction = 640" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample \
