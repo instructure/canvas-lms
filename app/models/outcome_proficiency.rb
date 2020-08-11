@@ -21,6 +21,10 @@ class OutcomeProficiency < ApplicationRecord
   include Canvas::SoftDeletable
   self.ignored_columns = %i[account_id]
 
+  def self.emit_live_events_on_any_update?
+    true
+  end
+
   has_many :outcome_proficiency_ratings, -> { order 'points DESC, id ASC' },
     dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
   belongs_to :context, polymorphic: %i[account], required: true

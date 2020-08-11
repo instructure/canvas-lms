@@ -45,12 +45,13 @@ class LiveEventsObserver < ActiveRecord::Observer
           :learning_outcome_result,
           :learning_outcome,
           :learning_outcome_group,
-          :sis_batch
+          :sis_batch,
+          :outcome_proficiency
 
   NOP_UPDATE_FIELDS = [ "updated_at", "sis_batch_id" ].freeze
   def after_update(obj)
     changes = obj.saved_changes
-    return nil if changes.except(*NOP_UPDATE_FIELDS).empty?
+    return nil unless changes.except(*NOP_UPDATE_FIELDS).any? || obj.class.try(:emit_live_events_on_any_update?)
 
     obj.class.connection.after_transaction_commit do
       Canvas::LiveEventsCallbacks.after_update(obj, changes)
