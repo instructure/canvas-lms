@@ -28,23 +28,25 @@ const HomeTray = () => (
     image="/images/tutorial-tray-images/Panda_Home.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/docs/DOC-10460-
-      canvas-instructor-guide-table-of-contents#jive_content_id_Course_Navigation`
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
     }}
     links={[
       {
         label: I18n.t('How do I use the Course Home Page as an instructor?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12947-4152724144'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Course-Home-Page-as-an-instructor/ta-p/1250'
       },
       {
         label: I18n.t(
           'What layout options are available in the Course Home Page as an instructor?'
         ),
-        href: 'https://community.canvaslms.com/docs/DOC-12816-4152719700'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/What-layout-options-are-available-in-the-Course-Home-Page-as-an/ta-p/1291'
       },
       {
         label: I18n.t('How do I change the Course Home Page?'),
-        href: 'https://community.canvaslms.com/docs/DOC-13012-4152724499'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-Course-Home-Page/ta-p/1035'
       }
     ]}
   >

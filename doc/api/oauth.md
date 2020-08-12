@@ -114,7 +114,7 @@ ID and client secret. To obtain these application credentials, you will
 need to register your application.  The client secret should never be shared.
 
 For Canvas Cloud (hosted by Instructure), developer keys are
-<a href="https://community.canvaslms.com/docs/DOC-5141" target="_blank">issued by the admin of the institution</a>.
+<a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-developer-keys-for-an-account/ta-p/249" target="_blank">issued by the admin of the institution</a>.
 
 <b>NOTE for LTI providers:</b> Since developer keys are scoped to the institution they are issued
 from, tool providers that serve multiple institutions should store and look up the correct
@@ -122,7 +122,7 @@ developer key based on the launch parameters (eg. custom_canvas_api_domain) sent
 launch.
 
 For <a href="https://github.com/instructure/canvas-lms/wiki" target="_blank">open source Canvas users</a>,
-you can <a href="https://community.canvaslms.com/docs/DOC-5141" target="_blank">generate a client ID</a>
+you can <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-developer-keys-for-an-account/ta-p/249" target="_blank">generate a client ID</a>
 and secret in the Site Admin account of your Canvas install.
 
 <a name="oauth2-flow-1"></a>
@@ -315,7 +315,7 @@ To logout, simply send a [DELETE request to login/oauth2/token](file.oauth_endpo
 ## [Step 1: Developer Key Setup](#developer-key-setup)
 <small><a href="#top">Back to Top</a></small>
 
-<p>Before the client_credentials grant flow can be achieved, an <a href="https://community.canvaslms.com/docs/DOC-16729-42141110178" target="_blank">LTI developer key must be created</a>. During developer key configuration, a public JWK can either be configured statically or can be dynamically rotated by providing JWKs by a URL that Canvas can reach. Tools may also use a previously issued client_credentials token to <a href="/doc/api/public_jwk.html" target="_blank">retroactively rotate the public JWK via an API request</a>. The JWK <b>must</b> include an alg and use.</p>
+<p>Before the client_credentials grant flow can be achieved, an <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140" target="_blank">LTI developer key must be created</a>. During developer key configuration, a public JWK can either be configured statically or can be dynamically rotated by providing JWKs by a URL that Canvas can reach. Tools may also use a previously issued client_credentials token to <a href="/doc/api/public_jwk.html" target="_blank">retroactively rotate the public JWK via an API request</a>. The JWK <b>must</b> include an alg and use.</p>
 
 <h4>Example JWK</h4>
 
@@ -359,8 +359,3 @@ The following endpoints are currently supported:
 - <a href="/doc/api/line_items.html" target="_blank">Line Items</a>
 - <a href="/doc/api/score.html" target="_blank">Score</a>
 - <a href="/doc/api/result.html" target="_blank">Result</a>
-
-
-
-
-

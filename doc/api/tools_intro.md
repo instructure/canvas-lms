@@ -4,15 +4,15 @@ External Tools Introduction
 Canvas, like many LMSs, supports loading external resources inline using the
 <a href="http://www.imsglobal.org/lti/" target="_blank">IMS LTI standard</a>.
 These tools can be deployed on a course or account level. Once configured, tools
-can be surfaced <a href="file.link_selection_placement.html" target="_blank">as links in 
-course modules</a> or used to <a href="file.assignment_selection_placement.html" 
-target="_blank">deliver custom assignment experiences</a>. Canvas supports some 
-additional integration points using LTI (see the "Placements" dropdown in the 
-left hand navigation here) to offer a more integrated experience and to allow 
-for more customization of the Canvas product. This is accomplished by <a 
+can be surfaced <a href="file.link_selection_placement.html" target="_blank">as links in
+course modules</a> or used to <a href="file.assignment_selection_placement.html"
+target="_blank">deliver custom assignment experiences</a>. Canvas supports some
+additional integration points using LTI (see the "Placements" dropdown in the
+left hand navigation here) to offer a more integrated experience and to allow
+for more customization of the Canvas product. This is accomplished by <a
 href="file.lti_dev_key_config.html" target="_blank">configuring additional settings</a>
-on external tools used inside of Canvas and by leveraging <a 
-href="https://www.imsglobal.org/lti-advantage-overview" target="_blank">LTI 
+on external tools used inside of Canvas and by leveraging <a
+href="https://www.imsglobal.org/lti-advantage-overview" target="_blank">LTI
 Advantage services</a>.
 
 Because tools can be deployed at any level in the system heirarchy, they can be
@@ -28,8 +28,8 @@ Canvas currently supports the following types of tool placements:
 External tool <a href="file.assignment_tools.html" target="_blank">assignments integrations</a>:
 
   This type of integration is part of the
-  <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html" target=_"blank">LTI 1.1 
-  Outcomes Service</a> or <a href="http://www.imsglobal.org/spec/lti-ags/v2p0/" 
+  <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html" target=_"blank">LTI 1.1
+  Outcomes Service</a> or <a href="http://www.imsglobal.org/spec/lti-ags/v2p0/"
   target="_blank">LTI 1.3 Assignment and Grade Services</a> and allows external services to
   syncronize grades, and other assignment details.
 
@@ -39,7 +39,7 @@ External tool <a href="file.assignment_tools.html" target="_blank">assignments i
   - Evaluating a student's ability to correctly draw notes at different musical intervals
   - Giving students credit for participating in an interactive lesson on the Civil War
 
-Adding a link/tab to the <a href="file.navigation_tools.html#course_navigation" 
+Adding a link/tab to the <a href="file.navigation_tools.html#course_navigation"
 target="_blank">course navigation</a>:
 
   Example use cases might include:
@@ -68,17 +68,17 @@ user profile navigation</a>:
   - Leveraging single sign-on to student portal from within Canvas
   - Linking to an external user profile
 
-Selecting content to add to a variety of locations as <a 
+Selecting content to add to a variety of locations as <a
 href="file.deep_linking.html" target="_blank">LTI deep links</a>:
 
   Example use cases might include:
 
-  - adding a button to  <a href="file.editor_button_placement.html" 
+  - adding a button to  <a href="file.editor_button_placement.html"
     target="_blank">embed content to the Rich Content Editor</a>:
 
    * Embedding resources from campus video/image repository
    * Inserting custom-designed chemistry diagrams into quiz question text
-   * Building integrations with new or subject-area-specialized web authoring 
+   * Building integrations with new or subject-area-specialized web authoring
      services
 
   - <a href="file.link_selection_placement.html" target="_blank">selecting links
@@ -107,14 +107,14 @@ href="file.deep_linking.html" target="_blank">LTI deep links</a>:
 ### How to Configure/Import Integrated Tools
 
 #### LTI 1.1
-Tool's placements can be configured using 
-<a href="file.tools_xml.html">LTI configuration XML</a> 
-as specified in the IMS Common Cartridge specification, or using the <a 
-href="external_tools.html">external tools API</a>. Configuration XML contains all 
+Tool's placements can be configured using
+<a href="file.tools_xml.html">LTI configuration XML</a>
+as specified in the IMS Common Cartridge specification, or using the <a
+href="external_tools.html">external tools API</a>. Configuration XML contains all
 non-account-specific settings (except the consumer key and shared secret, which must always be
-entered manually). The user can <a href="https://community.canvaslms.com/docs/DOC-13117-415274482"
+entered manually). The user can <a href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-configure-an-external-app-for-a-course-using-a-URL/ta-p/884"
 target="_blank">configure the tool by a tool-provided URL</a>
-(recommended), or <a href="https://community.canvaslms.com/docs/DOC-12601-421474560" 
+(recommended), or <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-external-app-for-an-account-using-XML/ta-p/221"
 target="_blank">paste in the XML</a> that the tool provides.
 
 For information on how to programmatically configured external tools, so users
@@ -122,11 +122,11 @@ don't have to copy and paste URLs or XML, please see the Canvas
 <a href="external_tools.html">external tools API</a>.
 
 #### LTI 1.3
-Similar to LTI 1.1, tools built on the <a href="https://www.imsglobal.org/spec/lti/v1p3/" 
-target="_blank">LTI 1.3 specification</a> can be configured by either supplying clients with a 
+Similar to LTI 1.1, tools built on the <a href="https://www.imsglobal.org/spec/lti/v1p3/"
+target="_blank">LTI 1.3 specification</a> can be configured by either supplying clients with a
 JSON block or URL that hosts the JSON. This JSON is used to determine the behavior of the tool
-within Canvas by <a href="https://community.canvaslms.com/docs/DOC-16729-42141110178" 
+within Canvas by <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140"
 target="_blank">configuring and LTI Developer Key</a>. Once the developer key is created and
-turned on, users with sufficient permissions can 
-<a href=https://community.canvaslms.com/docs/DOC-16730-42141110273 target="_blank">install the 
+turned on, users with sufficient permissions can
+<a href=https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-external-app-for-an-account-using-a-client/ta-p/202 target="_blank">install the 
 tool using the developer key's client ID</a>.

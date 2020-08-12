@@ -1,6 +1,6 @@
 Introduction
 ====================
-External tools can be associated with Canvas assignments so that students are 
+External tools can be associated with Canvas assignments so that students are
 able to experience an integrated offering of the tool. Tools can also leverage
 LTI services to return submissions and/or scores back to the Canvas gradebook.
 
@@ -9,59 +9,59 @@ The specifics for how grading is achieved depend on the LTI version being used:
 - [LTI Advantage: Assignment and Grading Services](#lti_advantage)
 - [LTI 1.1 Grade Passback Tools](#outcomes_service)
 
-Tools become associated with Canvas assignments either through the UI during 
-<a href="https://community.canvaslms.com/docs/DOC-10384-4152501360" 
-target="_blank">assignment creation</a>, or by the tool using the 
-<a href="/doc/api/line_items.html" target="_blank">Line Items Service</a> to 
+Tools become associated with Canvas assignments either through the UI during
+<a href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-assignment-using-an-external-app/ta-p/656"
+target="_blank">assignment creation</a>, or by the tool using the
+<a href="/doc/api/line_items.html" target="_blank">Line Items Service</a> to
 create assignments.
 
-If configured in via the Canvas UI, Course Designers (Admins/Instructors) will 
-see a submission type called "External Tool" during assignment creation where 
-they can select a tool configuration to use for the assignment. The 
+If configured in via the Canvas UI, Course Designers (Admins/Instructors) will
+see a submission type called "External Tool" during assignment creation where
+they can select a tool configuration to use for the assignment. The
 <a href="file.assignment_selection_placement.html" target="_blank">
-assignment_selection placement</a> is often used in conjunction with the 
-<a href="file.content_item.html" target="_blank">deep linking specification</a> 
-to allow an Instructor or Course Designer to launch out to the tool and select a 
-specific resource to be associated to the assignment. When students view 
-the assignment, instead of seeing a standard Canvas assignment they'll see 
+assignment_selection placement</a> is often used in conjunction with the
+<a href="file.content_item.html" target="_blank">deep linking specification</a>
+to allow an Instructor or Course Designer to launch out to the tool and select a
+specific resource to be associated to the assignment. When students view
+the assignment, instead of seeing a standard Canvas assignment they'll see
 the tool loaded in an iframe on the page.
 
 <a name="lti_advantage"></a>
 LTI Advantage: Assignment and Grading Services
 ====================
-LTI 1.3 tools can be configured to have access to the 
+LTI 1.3 tools can be configured to have access to the
 <a href="https://www.imsglobal.org/spec/lti-ags/v2p0/" target="_blank">
 Assignment and Grading Services</a> (AGS). Assignment and Grading Services
-are a powerful way for tools  to interact with the LMS gradebook to save 
+are a powerful way for tools  to interact with the LMS gradebook to save
 time for instructors and students.
 
-Some examples of use cases that are uniquely solvable using AGS that were not 
+Some examples of use cases that are uniquely solvable using AGS that were not
 resolvable by the LTI 1.1 Outcomes Service include:
 
-- External tools can return scores for assignments without the need of students 
+- External tools can return scores for assignments without the need of students
 ever accessing the tool.
 - Using the Line Items service tools can create columns to store grades in
 the gradebook without the need for instructors to manually create them using
-<a href="file.assignment_selection_placement.html" target="_blank">deep linking 
+<a href="file.assignment_selection_placement.html" target="_blank">deep linking
 and the assignment_selection placement</a>.
 - Previously returned scores can be cleared out.
 
 In addition to permitting these use cases, many more use cases are described in
-the <a 
-href="https://www.imsglobal.org/spec/lti/v1p3/impl#lti-advantage-use-cases" 
+the <a
+href="https://www.imsglobal.org/spec/lti/v1p3/impl#lti-advantage-use-cases"
 target="_blank">IMS LTI Advantage Implementation Guide</a>.
 
 ##Configuring
-To configure an LTI 1.3 tool that has access to AGS, an 
-<a href="https://community.canvaslms.com/docs/DOC-16729-42141110178" 
-target="_blank">LTI Developer Key must be created</a> with the desired scopes 
-enabled. This can either be done via the "Manual" method, or by providing raw 
+To configure an LTI 1.3 tool that has access to AGS, an
+<a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140"
+target="_blank">LTI Developer Key must be created</a> with the desired scopes
+enabled. This can either be done via the "Manual" method, or by providing raw
 JSON or a secure URL that hosts JSON. A full list and description of available
 scopes is described in the <a href="https://www.imsglobal.org/spec/lti-ags/v2p0/" target="_blank">
 AGS documentation</a>.
 
 For example, the following JSON would create an LTI 1.3 tool that has access to
-read and write scores, check for existing scores, and manage line items (ex. 
+read and write scores, check for existing scores, and manage line items (ex.
 assignments) that are associated with the tool:
 
 
@@ -109,7 +109,7 @@ assignments) that are associated with the tool:
 ```
 
 
-NOTE: Using AGS does not require configuration of any specific placements, so 
+NOTE: Using AGS does not require configuration of any specific placements, so
 the placement(s) here could be any placement(s).
 
 ##Available Services
@@ -120,10 +120,10 @@ Canvas supports the following AGS services:
 - <a href="/doc/api/result.html" target="_blank">Result</a>
 
 ##Accessing AGS
-Before a tool can run AGS requests, it must be available in the course that it 
-wishes to interact with, and also complete the 
+Before a tool can run AGS requests, it must be available in the course that it
+wishes to interact with, and also complete the
 <a href="file.oauth.html#accessing-lti-advantage-services" target="_blank">
-OAuth2 Client Credentials</a> grant to obtain an access token. This covered in 
+OAuth2 Client Credentials</a> grant to obtain an access token. This covered in
 depth in the <a href="https://www.imsglobal.org/spec/security/v1p0/#securing_web_services" target="_blank">
 IMS LTI Security Framework, SEC 4</a>.
 
@@ -133,12 +133,12 @@ integrations. Here, we will focus on these extensions and describe how tools can
 be configured to leverage AGS in Canvas.
 
 ###Line Item Extension: Creating deep linked assignments
-The <a href="/doc/api/line_items.html" target="_blank">Line Item service</a> has been extended 
+The <a href="/doc/api/line_items.html" target="_blank">Line Item service</a> has been extended
 to allow an external tool to not only create gradebook columns (i.e. assignments)
 in Canvas, but also connect the column/assignment to a specific LTI resource on
 the external tool. This means that when the student accesses the assignment from
-Canvas, they are able to see the external tool content directly in the page, 
-complete their assessment on the tool side, and have grades returned without 
+Canvas, they are able to see the external tool content directly in the page,
+complete their assessment on the tool side, and have grades returned without
 the instructor having to manually create assignments in Canvas.
 
 This also allows tools to introduce new workflows, such as allowing instructors
@@ -146,10 +146,10 @@ to launch from a Course Navigation Placement, select multiple resources, and
 import them into their course.
 
 ###Score Extension: Creating submission data
-The <a href="/doc/api/score.html" target="_blank">Score service</a> has been extended to allow 
-an external tool to submission data back to the Canvas Gradebook. This data is 
-then exposed in the Submission Details and Speedgrader Views so that both 
-students and teachers can see what was submitted to the external tool without 
+The <a href="/doc/api/score.html" target="_blank">Score service</a> has been extended to allow
+an external tool to submission data back to the Canvas Gradebook. This data is
+then exposed in the Submission Details and Speedgrader Views so that both
+students and teachers can see what was submitted to the external tool without
 leaving Canvas. Support for basic urls, text, and LTI links are supported.
 
 
@@ -158,13 +158,13 @@ LTI 1.1 Grade Passback Tools
 ====================
 
 Tools can know that they have been launched in a graded context because
-additional parameters are sent across when a student accesses the external 
-tool assignment. Specifically, the `lis_outcome_service_url` and 
-`lis_result_sourced_id` are sent as specified in the LTI 1.1 specification. 
+additional parameters are sent across when a student accesses the external
+tool assignment. Specifically, the `lis_outcome_service_url` and
+`lis_result_sourced_id` are sent as specified in the LTI 1.1 specification.
 Grades are passed back to Canvas from the tool's servers using the
 <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html#_Toc319560472">
-outcomes component of LTI 1.1</a>. Notably, one of the major limitations of the 
-LTI 1.1 Outcomes Service is the inability of tools to return grades _before_ a 
+outcomes component of LTI 1.1</a>. Notably, one of the major limitations of the
+LTI 1.1 Outcomes Service is the inability of tools to return grades _before_ a
 student accesses the assignment from Cavnas. If this functionality is desirable,
 you should upgrade to LTI Advantage's Assignment and Grading Services.
 
