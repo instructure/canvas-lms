@@ -202,7 +202,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def direct_shareable?
-    content_id&.to_i > 0 && direct_share_type
+    content_id.to_i > 0 && direct_share_type
   end
 
   def direct_share_type
