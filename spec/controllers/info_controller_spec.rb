@@ -109,7 +109,7 @@ describe InfoController do
           :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
           :text => 'Search the Canvas Guides',
           :subtext => 'Find answers to common questions',
-          :url => 'http://community.canvaslms.com/community/answers/guides',
+          :url => 'https://community.canvaslms.com/t5/Canvas/ct-p/canvas',
           :is_default => 'true'
         },
         {

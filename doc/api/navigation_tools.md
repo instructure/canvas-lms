@@ -1,7 +1,7 @@
 Navigation Tools
 =================
-Canvas allows External Tools to be surfaced in a variety of navigation menus. 
-The primary use case for using a navigation placement is to permit SSO to 
+Canvas allows External Tools to be surfaced in a variety of navigation menus.
+The primary use case for using a navigation placement is to permit SSO to
 display a dashboard of some type.
 
 - [Course Navigation Placement](#course_navigation)
@@ -89,15 +89,15 @@ Configuration of the Course Navigation Placement depends on the LTI version.
 </cartridge_basiclti_link>
 ```
 
-For more examples, refer to the <a href="file.lti_dev_key_config.html" 
+For more examples, refer to the <a href="file.lti_dev_key_config.html"
 target="_blank">Configuring</a> documentation.
 
 ### Advantages
 The Course Navigation Placement is well suited for external apps that wish to
-be surfaced in Canvas without having to implement an LTI deep linking workflow. 
+be surfaced in Canvas without having to implement an LTI deep linking workflow.
 Once the tool is configured, no additional steps are required for users to see the
-launch point (unless the tool is disabled by default). It is well suited for 
-tools that want to provide a simple SSO connection from Canvas to the external 
+launch point (unless the tool is disabled by default). It is well suited for
+tools that want to provide a simple SSO connection from Canvas to the external
 application. A dashboard type experience can be provided by apps offering
 services like:
 
@@ -116,13 +116,13 @@ Assignment and Grading Services could be used to generate many line items in Can
 - There is no 'resource' context, only course context.
 
 ### Workflow
-1. After configuring a course navigation tool, the instructor or student navigates 
+1. After configuring a course navigation tool, the instructor or student navigates
 to their course in Canvas.
 2. Then, they click a link in the course navigation menu.
 3. The tool consumes the LTI launch and renders the application.
 
-If the tool is disabled by default, the instructor must first <a 
-href="https://community.canvaslms.com/docs/DOC-12933-415257079" target="_blank">
+If the tool is disabled by default, the instructor must first <a
+href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-Course-Navigation-links/ta-p/1020" target="_blank">
 organize the navigation tabs</a> to surface the LTI launch point.
 
 ### Settings
@@ -174,7 +174,7 @@ All of these settings are contained under "course_navigation"
       Does not include Canvas global navigation, course navigation, or breadcrumbs
 
 -   windowTarget: \_blank (optional)
-    
+
     When set to \_blank, the windowTarget propety allows you to configure a launch to happen in a new
     tab instead of in an iframe. Omit this if you want to launch in frame.
 
@@ -187,11 +187,11 @@ administrators in that account and any of its sub-accounts will see
 the link in their account navigation.
 
 ### Configuring
-Refer to the [Course Navigation Placement's](#course_navigation) configuring 
+Refer to the [Course Navigation Placement's](#course_navigation) configuring
 section and simply replace **course_navigation** with **account_navigation**.
 
 ### Advantages
-Once configured, the account_navigation placement surfaces the LTI launch point 
+Once configured, the account_navigation placement surfaces the LTI launch point
 in the account/sub-account navigation menu. This placement works well for:
 
 - Account-level reporting and analytics tools
@@ -202,11 +202,11 @@ in the account/sub-account navigation menu. This placement works well for:
 
 ### Limitations/Challenges
 - This placement does not provide any course or resource level context in the Launch.
-- This is primarily a one-way launch; returning data to Canvas requires using 
+- This is primarily a one-way launch; returning data to Canvas requires using
 Canvas API.
 
 ### Workflow
-1. After configuring an account navigation tool, the admin navigates 
+1. After configuring an account navigation tool, the admin navigates
 to the account.
 2. Then, they click the LTI link in the account navigation menu.
 3. The tool consumes the LTI launch and renders the application.
@@ -251,7 +251,7 @@ All of these settings are contained under "account_navigation"
       Does not include Canvas global navigation, account navigation, or breadcrumbs
 
 -   windowTarget: \_blank (optional)
-    
+
     When set to \_blank, the windowTarget propety allows you to configure a launch to happen in a new
     tab instead of in an iframe. Omit this if you want to launch in frame.
 
@@ -264,14 +264,14 @@ all users logged in to that account will see the link in their
 profile navigation by default.
 
 ### Configuring
-Refer to the [Course Navigation Placement's](#course_navigation) configuring 
-section and simply replace **course_navigation** with **user_navigation**. 
+Refer to the [Course Navigation Placement's](#course_navigation) configuring
+section and simply replace **course_navigation** with **user_navigation**.
 
 User navigation links will only work if they are configured at
 the **root account level**.
 
 ### Advantages
-Once configured, the user_navigation placement surfaces the LTI launch point 
+Once configured, the user_navigation placement surfaces the LTI launch point
 in the users "Account" slide-out tray. This placement works well for:
 
 - Student Planners
@@ -284,7 +284,7 @@ in the users "Account" slide-out tray. This placement works well for:
 
 ### Limitations/Challenges
 - This placement does not provide any course or resource level context in the Launch.
-- This is primarily a one-way launch. Returning data to Canvas requires using 
+- This is primarily a one-way launch. Returning data to Canvas requires using
 Canvas API.
 
 ### Workflow

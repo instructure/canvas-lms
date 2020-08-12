@@ -27,25 +27,28 @@ const PeopleTray = () => (
     image="/images/tutorial-tray-images/Panda_People.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-
-      instructor-guide-table-of-contents#jive_content_id_People`
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
     }}
     links={[
       {
         label: I18n.t('How do I use the People page in a course as an instructor?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12705-415255479'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-People-page-in-a-course-as-an-instructor/ta-p/667'
       },
       {
         label: I18n.t('How do I add users to a course?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12973-4152724200'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-users-to-a-course/ta-p/1119'
       },
       {
         label: I18n.t('How do I view a context card for a student in a course?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12709-4152698664'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-a-context-card-for-a-student-in-a-course/ta-p/608'
       },
       {
         label: I18n.t('How do I view user details for an enrollment in a course?'),
-        href: 'https://community.canvaslms.com/docs/DOC-10390-415257134'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-user-details-for-an-enrollment-in-a-course/ta-p/1216'
       }
     ]}
   >

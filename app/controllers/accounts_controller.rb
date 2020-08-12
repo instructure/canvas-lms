@@ -255,7 +255,7 @@ require 'csv'
 #               ],
 #               "text": "Search the Canvas Guides",
 #               "subtext": "Find answers to common questions",
-#               "url": "http://community.canvaslms.com/community/answers/guides",
+#               "url": "https://community.canvaslms.com/t5/Guides/ct-p/guides",
 #               "type": "default",
 #               "id": "search_the_canvas_guides",
 #               "is_featured": false,
