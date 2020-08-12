@@ -359,6 +359,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Недійсний тип файлу"
     },
+    "invalid_url_cbde79f": {
+        "message": "Невірний URL"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
     },

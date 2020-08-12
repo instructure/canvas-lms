@@ -560,6 +560,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Ugyldig filtype"
     },
+    "invalid_url_cbde79f": {
+        "message": "Ugyldig URL"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
     },
@@ -652,9 +655,6 @@
     },
     "mic_a7f3d311": {
         "message": "Mic"
-    },
-    "miscellaneous_and_apps_f450a387": {
-        "message": "DIverse og appar"
     },
     "missing_1a256b3b": {
         "message": "Manglar"

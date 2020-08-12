@@ -392,6 +392,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Geçersiz dosya türü"
     },
+    "invalid_url_cbde79f": {
+        "message": "Geçersiz bağlantı"
+    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Klavye Kısayolları"
     },

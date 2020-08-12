@@ -166,5 +166,47 @@
     },
     "invalid_file_type_881cc9b2": {
         "message": "Μη έγκυρος τύπος αρχείου"
+    },
+    "invalid_url_cbde79f": {
+        "message": "Μη έγκυρο URL"
+    },
+    "keyboard_shortcuts_ed1844bd": {
+        "message": "Συντομεύσεις πληκτρολογίου"
+    },
+    "late_2be42b88": {
+        "message": "Πρόσφατο/α"
+    },
+    "link_7262adec": {
+        "message": "Σύνδεσμος"
+    },
+    "links_14b70841": {
+        "message": "Σύνδεσμοι"
+    },
+    "load_more_a36f9cf9": {
+        "message": "Φόρτωση περισσότερων"
+    },
+    "load_more_results_460f49a9": {
+        "message": "Φόρτωση περισσότερων αποτελεσμάτων"
+    },
+    "loading_25990131": {
+        "message": "Φόρτωση..."
+    },
+    "loading_725811ca": {
+        "message": "φόρτωση"
+    },
+    "loading_bde52856": {
+        "message": "Φόρτωση"
+    },
+    "loading_failed_b3524381": {
+        "message": "Η Φόρτωση Απέτυχε"
+    },
+    "location_3b6ff307": {
+        "message": "Τοποθεσία:"
+    },
+    "locked_762f138b": {
+        "message": "Κλειδωμένο"
+    },
+    "media_af190855": {
+        "message": "Δεδομένα"
     }
 }
