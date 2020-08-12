@@ -87,6 +87,7 @@ const ExternalToolsPlugin = {
       buildToolsButton(ed, ltiButtons)
       buildFavoriteToolsButtons(ed, ltiButtons)
       buildMRUMenuButton(ed, ltiButtons)
+      buildMenubarItem(ed, ltiButtons)
     }
     if (clumpedButtons.length) {
       const handleClick = function() {
@@ -137,6 +138,26 @@ function registerToolIcon(ed, button) {
   }
 }
 
+// What I'd really like to do is start with a plain Apps button in the toolbar
+// and menubar's Tools menu, then replace it with a menu button/nested menu item
+// when there are MRU tools but I don't see a way to do that in tinymce.
+// What this does is:
+// for the toolbar: create both buttons and use CSS to show the one we want and hide the other
+// for the item in the menubar's Tools menu: always show a nexted menu. With no MRU tools,
+//    the submenu just shows "View All"
+
+// register the Apps menu item in the menubar's Tools menu
+function buildMenubarItem(ed, ltiButtons) {
+  if (ltiButtons.length) {
+    ed.ui.registry.addNestedMenuItem('lti_tools_menuitem', {
+      text: I18n.t('Apps'),
+      icon: 'lti',
+      getSubmenuItems: () => getLtiMRUItems(ed, ltiButtons)
+    })
+  }
+}
+
+// register the Apps toolbar button for when there are no MRU apps
 function buildToolsButton(ed, ltiButtons) {
   const tooltip = I18n.t('Apps')
   ed.ui.registry.addButton('lti_tool_dropdown', {
@@ -153,6 +174,7 @@ function buildToolsButton(ed, ltiButtons) {
   })
 }
 
+// register the favorite lti tools toolbar buttons
 function buildFavoriteToolsButtons(ed, ltiButtons) {
   ltiButtons.forEach(button => {
     if (!button.favorite) return
@@ -167,6 +189,7 @@ function buildFavoriteToolsButtons(ed, ltiButtons) {
   })
 }
 
+// register the Apps toolbar button for when there are MRU apps
 function buildMRUMenuButton(ed, ltiButtons) {
   const tooltip = I18n.t('Apps')
   ed.ui.registry.addMenuButton('lti_mru_button', {
@@ -181,24 +204,31 @@ function buildMRUMenuButton(ed, ltiButtons) {
   })
 }
 
+// build the array of MRU app menu items
 function getLtiMRUItems(ed, ltiButtons) {
-  const mruIds = JSON.parse(window.localStorage.getItem('ltimru'))
-  if (mruIds && Array.isArray(mruIds) && mruIds.length) {
-    const mruButtons = ltiButtons.filter(b => mruIds.includes(b.id))
-    const mruMenuItems = []
-    mruButtons.forEach(b => {
-      registerToolIcon(ed, b)
-      if (!b.menuItem) {
-        b.menuItem = {
-          type: 'menuitem',
-          text: b.title,
-          icon: b.icon,
-          onAction: b.onAction
+  const mruMenuItems = []
+  try {
+    const mruIds = JSON.parse(window.localStorage.getItem('ltimru'))
+    if (mruIds && Array.isArray(mruIds) && mruIds.length) {
+      const mruButtons = ltiButtons.filter(b => mruIds.includes(b.id))
+      mruButtons.forEach(b => {
+        registerToolIcon(ed, b)
+        if (!b.menuItem) {
+          b.menuItem = {
+            type: 'menuitem',
+            text: b.title,
+            icon: b.icon,
+            onAction: b.onAction
+          }
         }
-      }
-      mruMenuItems.push(b.menuItem)
-    })
-    mruMenuItems.sort((a, b) => a.text.localeCompare(b.text))
+        mruMenuItems.push(b.menuItem)
+      })
+      mruMenuItems.sort((a, b) => a.text.localeCompare(b.text))
+    }
+  } catch (ex) {
+    // eslint-disable-next-line no-console
+    console.log('Failed building mru menu', ex.message)
+  } finally {
     mruMenuItems.push({
       type: 'menuitem',
       text: I18n.t('View All'),
@@ -207,8 +237,8 @@ function getLtiMRUItems(ed, ltiButtons) {
         document.dispatchEvent(ev)
       }
     })
-    return mruMenuItems
   }
+  return mruMenuItems
 }
 
 export default ExternalToolsPlugin

@@ -37,7 +37,8 @@ const setUp = function(maxButtons) {
       registry: {
         addButton: sinon.spy(),
         addMenuButton: sinon.spy(),
-        addIcon: sinon.spy()
+        addIcon: sinon.spy(),
+        addNestedMenuItem: sinon.spy()
       }
     }
   }
@@ -100,4 +101,9 @@ test("creates the tool's icon", function() {
   this.INST.editorButtons[0].icon_url = 'tool_image'
   ExternalToolsPlugin.init(this.fakeEditor, undefined, this.INST)
   ok(this.fakeEditor.ui.registry.addIcon.calledWith('lti_tool_button_id'))
+})
+
+test('adds Apps to the Tools menubar menu', function() {
+  ExternalToolsPlugin.init(this.fakeEditor, undefined, this.INST)
+  ok(this.fakeEditor.ui.registry.addNestedMenuItem.calledWith('lti_tools_menuitem'))
 })

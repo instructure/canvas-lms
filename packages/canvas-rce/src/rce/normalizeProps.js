@@ -95,8 +95,11 @@ function configureMenus(editorOptions) {
       title: formatMessage('Format'),
       items:
         'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align directionality | forecolor backcolor | removeformat'
+    },
+    tools: {
+      title: formatMessage('Tools'),
+      items: 'wordcount lti_tools_menuitem'
     }
-    // default tools menu is fine
     // default table menu is fine
   }
 }
