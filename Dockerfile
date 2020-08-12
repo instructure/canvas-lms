@@ -4,11 +4,12 @@
 
 ARG RUBY=2.6
 
-FROM instructure/passenger-nginx-alpine:${RUBY} AS ruby-gems-only
+FROM instructure/passenger-nginx-alpine:${RUBY} AS dependencies
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12.2
 ARG ALPINE_MIRROR=http://dl-cdn.alpinelinux.org/alpine
+ARG NODE=10.19.0-r0
 
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV production
@@ -96,16 +97,6 @@ RUN set -eux; \
   && bundle install --jobs $(nproc) \
   && rm -rf $GEM_HOME/cache
 
-FROM ruby-gems-only AS ruby-final
-COPY --chown=docker:docker . $APP_HOME
-
-FROM ruby-gems-only AS yarn-only
-LABEL maintainer="Instructure"
-
-# default alpine HTTPS mirror
-ARG ALPINE_MIRROR=https://alpine.global.ssl.fastly.net/alpine/
-ARG NODE=10.19.0-r0
-
 USER root
 RUN set -eux; \
   \
@@ -178,7 +169,7 @@ RUN set -eux; \
   && (yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1) \
   && yarn cache clean
 
-FROM yarn-only AS webpack-final
+FROM dependencies AS webpack-final
 ARG JS_BUILD_NO_UGLIFY=0
 
 COPY --chown=docker:docker . ${APP_HOME}
