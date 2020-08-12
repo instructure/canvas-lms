@@ -731,7 +731,7 @@ class Group < ActiveRecord::Base
 
   def has_common_section_with_user?(user)
     return false unless self.context && self.context.is_a?(Course)
-    users = self.users + [user]
+    users = self.users.where(id: self.context.enrollments.active_or_pending.select(:user_id)) + [user]
     self.context.course_sections.active.any?{ |section| section.common_to_users?(users) }
   end
 

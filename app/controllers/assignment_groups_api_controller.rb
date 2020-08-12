@@ -142,6 +142,7 @@ class AssignmentGroupsApiController < ApplicationController
 
         if params[:move_assignments_to]
           @assignment_group.move_assignments_to params[:move_assignments_to]
+          recompute_student_scores
         end
       end
 
@@ -173,5 +174,11 @@ class AssignmentGroupsApiController < ApplicationController
   def valid_integration_data?(params)
     integration_data = params['integration_data']
     integration_data.is_a?(ActionController::Parameters) || integration_data.nil?
+  end
+
+  def recompute_student_scores
+    @context.recompute_student_scores
+  rescue
+    nil
   end
 end

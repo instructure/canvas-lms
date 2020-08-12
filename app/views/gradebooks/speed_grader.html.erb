@@ -165,7 +165,9 @@
                   download_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}")
                   preview_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}", inline: 1)
                 %>
-                <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= download_url %>" download></a>
+                <a class="submission-file-download icon-download" href="<%= download_url %>" download>
+                  <span class="screenreader-only"><%= t("Download this file") %></span>
+                </a>
                 <span class="turnitin_score_container"></span>
                 <a class="display_name no-hover" href="<%= preview_url %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
                 <span id="react_pill_container"></span>
@@ -184,7 +186,6 @@
 
         <div class="content_box">
           <% if @assignment.rubric_association %>
-          <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
           <div id="rubric_full" style="display: none;">
             <div id="rubric_full_resizer">
               <div id="rubric_full_resizer_handle"></div>
@@ -217,7 +218,6 @@
                 <%= render partial: "grading_box_extended", locals: {assignment: @assignment} %>
                 <span class="turnitin_score_container"></span>
                 <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
-                <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
                 <div class="turnitin_info_container"></div>
               </div>
 

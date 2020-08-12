@@ -972,7 +972,7 @@ function initRubricStuff() {
     } else {
       data.graded_anonymously = utils.shouldHideStudentNames()
     }
-    const url = $('.update_rubric_assessment_url').attr('href')
+    const url = ENV.update_rubric_assessment_url
     const method = 'POST'
     EG.toggleFullRubric('close')
 
@@ -3009,8 +3009,8 @@ EG = {
       return
     }
 
-    const url = $('.update_submission_grade_url').attr('href')
-    const method = $('.update_submission_grade_url').attr('title')
+    const url = ENV.update_submission_grade_url
+    const method = 'POST'
     const formData = {
       'submission[assignment_id]': jsonData.id,
       [`submission[${anonymizableUserId}]`]: EG.currentStudent[anonymizableId],

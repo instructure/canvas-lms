@@ -402,6 +402,7 @@ sv:
   account_id_2c3b4f15: konto-Id
   account_id_73966078: account_id
   account_id_f6e26867: Konto-Id
+  account_level_mastery_scales_a5bdff29: "Skalor för måluppfyllelse på kontonivå"
   account_level_notification_preferences_require_an__66467cd7: "För uppdatering krävs ett account_id för aviseringsinställningar på kontonivå"
   account_level_notification_preferences_ui_update_f5e189a4: "Uppdatering av meddelandepreferenser för kontonivå"
   account_level_settings_manage_4fca6f8e: "Inställningar på kontonivå – hantera"
@@ -414,6 +415,9 @@ sv:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Sluttiden för kontoavisering är före starttiden"
+  account_notification_settings_error_page_66c0bc61: "Fel sida för inställningar kontoavisering"
+  account_notification_settings_initial_query_error_f55e1cbf: "Initialt frågefel inställningar kontoavisering"
+  account_notification_settings_updated_dbabec35: "Inställningar för kontoaviseringar uppdaterade"
   account_notifications: 
     announcement_created_notice: "Meddelandet har skapats"
     announcement_creation_failed_notice: "Skapandet av meddelandet misslyckades"
@@ -1287,6 +1291,7 @@ sv:
         report_last_run: "Senaste export"
         report_name: Namn
       headings: 
+        privacy: Integritet
         quotas: Kontokvoter
         sections: Rapporter
         settings: Kontoinställningar
@@ -1317,6 +1322,8 @@ sv:
         enable_alerts: "Notiser (beta)"
         enable_course_catalog: "Visa en sökbar lista över kurser på detta rotkonto med flaggan ”Inkludera den här kursen i offentligt kursindex” aktiverad."
         enable_eportfolios: ePortfolios
+        enable_fullstory: "Tillåt spårning med FullStory"
+        enable_google_analytics: "Tillåt spårning med Google Analytics"
         enable_profiles: "Aktivera profiler"
         enable_turnitin: Tunitin
         enable_user_notes: Lärarjournal
@@ -1412,7 +1419,7 @@ sv:
       open_report_description: "Öppna rapportbeskrivning"
       page_header_title: Kontoinställningar
       page_title: Kontoinställningar
-      quiz_ip_filters_delete: "Ta bort filter"
+      quiz_ip_filters_delete: "Ta bort Quiz IP-filter"
       quiz_ip_filters_help_message: |-
           Quiz IP-filter är ett sätt att begränsa tillgången till quiz till datorer i ett specifikt IP-intervall.
           
@@ -1445,6 +1452,7 @@ sv:
       tab_announcements: Anslag
       tab_external_tools: Appar
       tab_notifications: Aviseringar
+      tab_privacy: Integritet
       tab_quotas: Kvoter
       tab_reports: Rapporter
       tab_settings: Inställningar
@@ -2041,6 +2049,7 @@ sv:
   allow_multiple_attempts_e67a0a37: "Tillåt flera försök"
   allow_opt_out_of_inbox: "Tillåt att användare avregistrerar sig från inkorgen för Konversationer. Detta gör att alla konversationsmeddelanden och aviseringar skickas som aviseringar så fort som möjligt till användarens privata e-post, döljer ikonen för olästa meddelanden i inkorgen för Konversationer och döljer inställningar för Konversationer-aviseringar."
   allow_outcome_extra_credit_57c1e84e: "Tillåt extra poäng för lärandemål"
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: "Tillåt sidor att raderas i bulk"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Tillåt passivt godkännande av användningsvillkoren"
   allow_postable_submission_comments_a301b742: "Tillåt publicerbara inlämningskommentarer"
   allow_reorder_dashboard_cards_78215947: "Tillåt registrering av översiktskort"
@@ -2063,6 +2072,7 @@ sv:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Gör det möjligt för användaren att få åtkomst till länken Agera som användare på studentkontextkort"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Gör att användare kan se SIS-ID:t i en användares inloggningsuppgifter."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Gör att användare kan se SIS-ID:t på sidan Personer i en kurs."
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: "Tillåter skalor för måluppfyllelse på kontonivå och färdighetsberäkningar, ersätter skalor per-resultat"
   allows_admin_user_to_view_account_statistics_341f00d9: "Gör det möjligt för admin att visa statistik för konton."
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Låter administratörer visa en logg med information om senast körda
@@ -4980,6 +4990,7 @@ sv:
   click_here_to_see_the_file_79e2b366: "Klicka här för att se filen."
   click_here_to_view_ec8cb2fd: "klicka här för att visa"
   click_here_to_view_the_submission_24777a69: "Klicka här för att visa inlämningen"
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: "Klicka här för att gå till din uppgift och lämna in den i tid!"
   click_ok_to_continue_deleting_this_role_baa9d9e2: "Klicka på \"OK\" för att fortsätta att ta bort den här rollen."
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klicka på en ögonblicksbild för att återgå till testversionen som det var när ögonblicksbilden togs. Notera: Du kommer att förlora eventuellt arbete som du har gjort sedan ögonblicksbilden togs, och det kan inte göras ogjort!"
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Klicka på navigeringsknappen för kontot för att öppna aviseringsinställningarna."
@@ -7890,6 +7901,7 @@ sv:
   delete_grading_scheme_6b308832: "Radera omdömesschema"
   delete_grading_scheme_title_215f0a40: "Ta bort bedömningsschema %{title}"
   delete_group_86c381ec: "Radera grupp"
+  delete_in_progress_2d3f0e0d: "Radera pågår"
   delete_key_developername_be80e695: "Ta bort nyckel %{developerName}"
   delete_key_name_c2de8c0c: "Ta bort nyckel %{name}"
   delete_my_account_41060aad: "Radera mitt konto"
@@ -7909,6 +7921,7 @@ sv:
   delete_section_name_a48d9d79: "Ta bort sektionen ”%{name}\""
   delete_selected_a023ccf8: "Radera valda"
   delete_selected_announcements_69e23710: "Ta bort anslag"
+  delete_selected_pages_7bc50580: "Radera valda sidor"
   delete_survey_56fddbbd: "Radera enkät"
   delete_term_name_f707abc9: "Ta bort term %{name}"
   delete_theme_918a7f24: "Ta bort tema?"
@@ -9672,6 +9685,7 @@ sv:
   failed_to_delete_discussion_title_986df717: "Det gick inte att ta bort diskussionen %{title}"
   failed_to_delete_external_feed_36f19d70: "Det gick inte att ta bort externt flöde"
   failed_to_delete_role_label_27959de3: "Det gick inte att ta bort rollen %{label}"
+  failed_to_delete_selected_pages_26fa87db: "Det gick inte att radera valda sidor"
   failed_to_export_some_tool_settings_c992fc56: "Misslyckades med att exportera vissa verktygsinställningar"
   failed_to_import_media_objects_4c1fcb4f: "Det gick inte att importera mediaobjekt"
   failed_to_laod_more_submissions_990aacee: "Det gick inte att läsa in fler inlämningar"
@@ -9689,6 +9703,7 @@ sv:
   failed_to_save_please_try_again_later_bb7070fb: "Det gick inte att spara, försök igen senare"
   failed_to_submit_draft_comment_1de83451: "Kunde inte skicka utkast till kommentar"
   failed_to_unpin_discussion_503eab82: "Misslyckades med att av-fästa diskussionen"
+  failed_to_update_account_notification_settings_194c1cd4: "Det gick inte att uppdatera inställningar för kontoaviseringar"
   failed_to_update_course_notification_settings_cbf0eb18: "Det gick inte att uppdatera inställningarna för kursaviseringar"
   failed_to_update_discussion_23cc229a: "Det gick inte att uppdatera diskussionen"
   failed_to_update_permission_33c493f: "Det gick inte att uppdatera behörighet"
@@ -12799,6 +12814,7 @@ sv:
   loading_courses_started_6e6d742c: "Läser in påbörjade kurser"
   loading_data_ecd89ba: "Läser in data ..."
   loading_discussions_8ed5fcd7: "Läser in diskussioner"
+  loading_external_tool_d839042c: "Laddar externt verktyg"
   loading_f99d93d4: "...läser in"
   loading_features_d26820f6: "Läser in funktioner"
   loading_folders_d8b5869e: "Läser in mappar"
@@ -13101,6 +13117,7 @@ sv:
   master_lock_590266b6: Huvudlås
   mastered_34d4c857: "Uppfyllt mål"
   mastery_7ec348b5: Måluppfyllelse
+  mastery_connect_64598f55: "Mastery Connect"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Måluppfyllelse: %{n_mastery_points_precision_2_str} poäng"
   mastery_path_processing_f4471152: "Bearbetning av måluppfyllelse"
   mastery_paths_breakdown_6e0b5fce: "Detaljerad information om måluppfyllelse"
@@ -13109,6 +13126,7 @@ sv:
   mastery_paths_editor_930655bb: "Redigerare huvudsökväg"
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Val av måluppfyllelseväg har avaktiverats tillfälligt för underhåll."
   mastery_points_f1672cc: måluppfyllelsepoäng
+  mastery_scale_abbc3557: Mastery-skala
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultatet för måluppfyllelse reflekterar det högsta resultatet som getts för uppgiften eller quizzet."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Poängen för måluppfyllelse reflekterar den senaste betygsatta uppgift eller quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultatet för måluppfyllelse reflekterar den uppgift eller det quiz som bedömts senast."
@@ -15667,6 +15685,7 @@ sv:
   next_mastery_path_is_currently_processing_f044d7d8: "Nästa bemästringsväg bearbetas för nävarande"
   next_mastery_path_is_still_processing_please_perio_bb0121af: "Nästa måluppfyllelseväg behandlas fortfarande, uppdatera sidan regelbundet"
   next_message_780bcf24: "Nästa meddelande"
+  next_module_item_19e835f3: "Nästa modulobjekt"
   next_module_item_9bb8a222: "Nästa modul/objekt"
   next_month_749b1778: "Nästa månad"
   next_month_b55a387c: "Nästa månad"
@@ -16037,6 +16056,7 @@ sv:
       submission_graded: "Inlämning bedömd"
       submission_needs_grading: "Inlämningen måste bedömas"
       summaries: Sammanfattningar
+      upcoming_assignment_alert: "Kommande uppgiftsavisering"
       updated_wiki_page: "Uppdaterad sida"
       web_conference_invitation: "Inbjudan till webbkonferens"
       web_conference_recording_ready: "Inspelning av webbkonferens redo"
@@ -16598,6 +16618,7 @@ sv:
   package_error: "Fel vid identifiering av pakettyp: %{error}"
   package_export_from_d6e2b073: "Paketexport från"
   page_50c4823d: Sida
+  page_bulk_deleting_74860a80: "Sida bulkradering"
   page_comment: 
     default_user_name: Anonym
   page_comments: 
@@ -17428,6 +17449,7 @@ sv:
   previous_export_c6a997f7: "Tidigare export"
   previous_message_8804f87e: "Föregående meddelande"
   previous_module_item_2bb5e499: "Föregående modul/objekt"
+  previous_module_item_a9e57348: "Föregående modulobjekt"
   previous_month_7adf1380: "Föregående månad"
   previous_month_bb1e3c84: "Föregående månad"
   previous_page_928fc112: "Föregående sida"
@@ -19435,6 +19457,7 @@ sv:
   ratings_2433172b: Bedömningar
   ratio_answered_correctly_b0c1e7d: "%{ratio}% svarade korrekt"
   ratio_responded_correctly_6d890107: "%{ratio}% svarade korrekt"
+  raw_html_editor_e3993e41: "Raw HTML Editor"
   rce_auto_save_f004fba9: "RCE – Automatisk spar-funktion"
   rce_enhancements_5701e06: "Förbättringar av Innehållsredigeraren"
   rce_initialization_fix_4f176bda: "Initieringskorrigering för RCE"
@@ -20462,6 +20485,7 @@ sv:
   select_one_8e0af564: "Välj en"
   select_one_b647b384: "Välj ett alternativ"
   select_one_of_the_options_c8b0c6e4: "Välj ett av alternativen:"
+  select_page_e93fc123: "Välj sida"
   select_prerequisite_module_57894963: "Välj förutsättningsmodul"
   select_prerequite_module_e9042bb0: "Välj förutsättningsmodul"
   select_rubric_2aa2ffa2: "Välj matris"
@@ -20477,6 +20501,7 @@ sv:
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Välj de filer du vill associera med den här *modulen* eller lägg till filer genom att välja ”Nya filer”."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Välj den sida som du vill associera eller lägg till en ny sida genom att välja ”Ny sida\"."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Välj den sida som du vill associera med denna *modul* eller lägg till en ny sida genom att välja ”Ny sida\"."
+  select_title_for_deletion_45b08247: "Välj %{title} för radering"
   select_type_of_prerequisite_8d6fa902: "Välj typ av förutsättning"
   select_video_file_35b61d4e: "Välj videofil"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Välj vad du vill visa på startsidan."
@@ -20492,6 +20517,7 @@ sv:
   selected_filename_7552a8c0: "valda %{filename}"
   selected_grade_942f40ba: "Vald omdöme"
   selected_item_35bed33a: "valt föremål"
+  selected_pages_have_been_deleted_82a7f965: "Valda sidor har raderats"
   selected_subtree_a7693937: "Markerade %{subtree}"
   selection_end_date_10fcc8c6: "Slutdatum för urval"
   selection_height_9d57ec24: Markeringshöjd
@@ -23802,6 +23828,7 @@ sv:
   untitled_assignment_59354b34: "uppgift utan namn"
   unused_courses_title: "Oanvända kurser"
   up_c553575d: Upp
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "Kommande förfallodatum - %{assignment_name}, %{course_name}"
   update_374eb54: uppdatera
   update_4d8ee62: Uppdatera
   update_and_view_sections_course_details_navigation_dd10b45e: |-
@@ -24854,6 +24881,9 @@ sv:
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
     one: "Du kommer att ta bort 1 diskussion. Vill du fortsätta?"
     other: "Du kommer att ta bort %{count} diskussioner. Vill du fortsätta?"
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
+    one: "Du håller på att radera 1 sida. Är du säker?"
+    other: "Du håller på att radera %{count} sidor. Är du säker?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Du är på bg att bli av med ändringar som du ännu inte hat tillämpat ditt konto.
       
@@ -25074,6 +25104,8 @@ sv:
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "Du kommer inte att få några %{contextType}-aviseringar för närvarande. För att aktivera %{contextType}-aviseringar, använd reglaget ovan."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Du kommer inte att få kursaviseringar. Använd reglaget ovan om du vill aktivera kursaviseringar."
   your_answer_8dad6ea4: "Ditt svar:"
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Din uppgift %{assignment_name} ska lämnas in den %{due_at}."
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Din uppgift %{assignment_name} ska lämnas in den %{due_at}. Klicka på följande länk för att gå till din uppgift och lämna in den i tid:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din uppgiftslista kan nu hittas på *Kalender* sidan."
   your_assignments_list_has_improved_3eded80e: "Din *Uppgifts* -list har förbättrats!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Dina uppgifter kommer visas här, listade efter sista dagen."

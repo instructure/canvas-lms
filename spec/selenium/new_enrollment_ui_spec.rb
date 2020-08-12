@@ -26,9 +26,9 @@ describe "New Enrollment" do
     course_with_teacher(active_all: true, new_user: true)
     @section1 = @course.course_sections.create!(:name => 'Section 1')
     @user1 = user_with_pseudonym(name: "user1")
-    @user1.communication_channels.create(path: "user1@example.com", path_type: 'email').confirm
+    communication_channel(@user1, {username: 'user1@example.com', active_cc: true})
     @user2 = user_with_pseudonym(name: "user2")
-    @user2.communication_channels.create(path: "user2@example.com", path_type: 'email').confirm
+    communication_channel(@user2, {username: 'user2@example.com', active_cc: true})
   end
 
   it "opens new enroll dialog", priority: "1", test_id: 3077472 do

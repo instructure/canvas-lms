@@ -429,6 +429,20 @@ describe User do
           user.root_account_ids
         }.from(nil).to([root_account.global_id])
       end
+
+      context 'and communication channels for the user exist' do
+        let(:communication_channel) { user.communication_channels.create!(path: 'test@test.com') }
+
+        before { communication_channel.update_attribute(:root_account_ids, []) }
+
+        it 'updates root_account_ids on associated communication channels' do
+          expect {
+            user.update_root_account_ids
+          }.to change {
+            user.communication_channels.first.root_account_ids
+          }.from([]).to([root_account.id])
+        end
+      end
     end
 
     context 'when there cross-shard root account associations' do
@@ -451,8 +465,40 @@ describe User do
         }.to change {
           user.root_account_ids&.sort
         }.from(nil).to(
-          [root_account.global_id, shard_two_root_account.global_id].sort
+          [root_account.id, shard_two_root_account.global_id].sort
         )
+      end
+
+      context 'and communication channels exist on each shard' do
+        let(:shard_one_channel) do
+          CommunicationChannel.create!(user: user, path: 'test@test.com')
+        end
+
+        let(:shard_two_channel) do
+          @shard2.activate { CommunicationChannel.create!(user: user, path: 'test@test.com') }
+        end
+
+        before do
+          shard_one_channel.update_attribute(:root_account_ids, [])
+          shard_two_channel.update_attribute(:root_account_ids, [])
+          user.update_root_account_ids
+        end
+
+        it 'populates root_account_ids on the local communication channel' do
+          expect(shard_one_channel.reload.root_account_ids).to match_array [
+            root_account.id,
+            shard_two_root_account.id
+          ]
+        end
+
+        it 'populates root_account_ids on the foreign communication channel' do
+          @shard2.activate {
+            expect(shard_two_channel.reload.root_account_ids).to match_array [
+              root_account.id,
+              shard_two_root_account.id
+            ]
+          }
+        end
       end
     end
   end
@@ -1584,7 +1630,7 @@ describe User do
       user_factory
       @user2 = @user
       @user2.update_attribute(:workflow_state, 'creation_pending')
-      @user2.communication_channels.create!(:path => @cc.path)
+      communication_channel(@user2, {username: @cc.path})
       course_factory(active_all: true)
       @course.enroll_user(@user2)
 
@@ -1666,7 +1712,7 @@ describe User do
       user_factory
       @user2 = @user
       @user2.update_attribute(:workflow_state, 'creation_pending')
-      @user2.communication_channels.create!(:path => @cc.path)
+      communication_channel(@user2, {username: @cc.path})
       course_factory(active_all: true)
       @enrollment = @course.enroll_user(@user2)
 
@@ -1833,9 +1879,9 @@ describe User do
   describe "email_channel" do
     it "should not return retired channels" do
       u = User.create!
-      retired = u.communication_channels.create!(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
+      communication_channel(u, {username: 'retired@example.com', cc_state: 'retired'})
       expect(u.email_channel).to be_nil
-      active = u.communication_channels.create!(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
+      active = communication_channel(u, {username: 'active@example.com', active_cc: true})
       expect(u.email_channel).to eq active
     end
   end
@@ -1857,7 +1903,7 @@ describe User do
     it "restores retired channels" do
       @user = User.create!
       path = 'john@example.com'
-      @user.communication_channels.create!(:path => path, :workflow_state => "retired")
+      communication_channel(@user, {username: path, cc_state: 'retired'})
       @user.email = path
       expect(@user.communication_channels.first).to be_unconfirmed
       expect(@user.email).to eq 'john@example.com'
@@ -2378,6 +2424,38 @@ describe User do
     it "should not include deleted pseudonyms" do
       @pseudonym.destroy
       expect(@user.active_pseudonyms).to be_empty
+    end
+  end
+
+  describe "send_scores_in_emails" do
+    before :once do
+      course_with_student(:active_all => true)
+    end
+
+    it "returns false if the root account setting is disabled" do
+      root_account = @course.root_account
+      root_account.settings[:allow_sending_scores_in_emails] = false
+      root_account.save!
+
+      expect(@student.send_scores_in_emails?(@course)).to be false
+    end
+
+    it "uses the user preference setting if no course overrides are available" do
+      @student.preferences[:send_scores_in_emails] = true
+      expect(@student.send_scores_in_emails?(@course)).to be true
+
+      @student.preferences[:send_scores_in_emails] = false
+      expect(@student.send_scores_in_emails?(@course)).to be false
+    end
+
+    it "uses course overrides if available" do
+      @student.preferences[:send_scores_in_emails] = false
+      @student.set_preference(:send_scores_in_emails_override, "course_" + @course.global_id.to_s, true)
+      expect(@student.send_scores_in_emails?(@course)).to be true
+
+      @student.preferences[:send_scores_in_emails] = true
+      @student.set_preference(:send_scores_in_emails_override, "course_" + @course.global_id.to_s, false)
+      expect(@student.send_scores_in_emails?(@course)).to be false
     end
   end
 
@@ -2937,7 +3015,7 @@ describe User do
 
     it "includes 'student' if the user has a student view student enrollment" do
       @user = @course.student_view_student
-      expect(@user.roles(@account)).to eq %w[user student]
+      expect(@user.roles(@account)).to eq %w[user student fake_student]
     end
 
     it "includes 'teacher' if the user has a teacher enrollment" do

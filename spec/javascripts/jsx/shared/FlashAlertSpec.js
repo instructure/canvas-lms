@@ -44,7 +44,11 @@ QUnit.module('FlashAlert', hooks => {
     }
   })
 
-  function callShowFlashAlert(props = {}) {
+  function callShowFlashAlert(props = {}, disableToastTimeouts = false) {
+    if (disableToastTimeouts) {
+      ENV.flashAlertTimeout = 86400000
+    }
+
     const defaultProps = {
       message: 'Example Message'
     }
@@ -53,10 +57,16 @@ QUnit.module('FlashAlert', hooks => {
 
   QUnit.module('.showFlashAlert')
 
-  test('closes after 11 seconds', () => {
+  test('closes after 11 seconds, respecting timeout if ENV.flashAlertTimeout is not set', () => {
     callShowFlashAlert()
     clock.tick(11000)
     strictEqual(document.querySelector('#flashalert_message_holder').innerHTML, '')
+  })
+
+  test('does not close after 11 seconds if ENV.flashAlertTimeout is set', () => {
+    callShowFlashAlert({}, true)
+    clock.tick(11000)
+    notStrictEqual(document.querySelector('#flashalert_message_holder').innerHTML, '')
   })
 
   test('has no effect when the container element has been removed', () => {

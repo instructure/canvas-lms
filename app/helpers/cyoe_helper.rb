@@ -57,7 +57,7 @@ module CyoeHelper
     result = conditional_release_rule_for_module_item(content_tag, opts)
     return if result.blank?
     result[:assignment_sets].each do |as|
-      associations = as[:assignments] || as[:assignment_set_associations]
+      associations = as[:assignment_set_associations]
       next if associations.blank?
       associations.each do |a|
         a[:model] = assignment_json(a[:model], user, nil) if a[:model]

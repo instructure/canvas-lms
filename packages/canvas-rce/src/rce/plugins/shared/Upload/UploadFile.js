@@ -33,6 +33,7 @@ import indicate from '../../../../common/indicate'
 import {StoreProvider} from '../StoreContext'
 import RceApiSource from '../../../../sidebar/sources/api'
 import Bridge from '../../../../bridge'
+import ImageOptionsForm from '../ImageOptionsForm'
 
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
 const UrlPanel = React.lazy(() => import('./UrlPanel'))
@@ -51,6 +52,7 @@ export const handleSubmit = (
   afterInsert = () => {}
 ) => {
   Bridge.focusEditor(editor.rceWrapper) // necessary since it blurred when the modal opened
+  const {altText, isDecorativeImage, displayAs} = uploadData?.imageOptions || {}
   switch (selectedPanel) {
     case 'COMPUTER': {
       const {theFile} = uploadData
@@ -59,7 +61,10 @@ export const handleSubmit = (
         name: theFile.name,
         size: theFile.size,
         contentType: theFile.type,
-        domObject: theFile
+        domObject: theFile,
+        altText,
+        isDecorativeImage,
+        displayAs
       }
       let tabContext = 'documents'
       if (isImage(theFile.type)) {
@@ -73,18 +78,34 @@ export const handleSubmit = (
     case 'UNSPLASH': {
       const {unsplashData} = uploadData
       source.pingbackUnsplash(unsplashData.id)
-      editor.insertContent(
-        editor.dom.createHTML('img', {src: unsplashData.url, alt: unsplashData.alt})
-      )
+      let editorHtml
+      if (displayAs !== 'link' && /image/.test(accept)) {
+        editorHtml = editor.dom.createHTML('img', {
+          src: unsplashData.url,
+          alt: altText || unsplashData.alt,
+          role: isDecorativeImage ? 'presentation' : undefined
+        })
+      } else {
+        editorHtml = editor.dom.createHTML(
+          'a',
+          {href: unsplashData.url},
+          altText || unsplashData.url
+        )
+      }
+      editor.insertContent(editorHtml)
       break
     }
     case 'URL': {
       const {fileUrl} = uploadData
       let editorHtml
-      if (/image/.test(accept)) {
-        editorHtml = editor.dom.createHTML('img', {src: fileUrl})
+      if (displayAs !== 'link' && /image/.test(accept)) {
+        editorHtml = editor.dom.createHTML('img', {
+          src: fileUrl,
+          alt: altText,
+          role: isDecorativeImage ? 'presentation' : undefined
+        })
       } else {
-        editorHtml = editor.dom.createHTML('a', {href: fileUrl})
+        editorHtml = editor.dom.createHTML('a', {href: fileUrl}, altText || fileUrl)
       }
       editor.insertContent(editorHtml)
       break
@@ -130,6 +151,23 @@ export function UploadFile({
   const [modalBodyWidth, setModalBodyWidth] = useState(undefined)
   const [modalBodyHeight, setModalBodyHeight] = useState(undefined)
   const bodyRef = React.createRef()
+
+  // Image options props
+  const [altText, setAltText] = useState('')
+  const [isDecorativeImage, setIsDecorativeImage] = useState(false)
+  const [displayAs, setDisplayAs] = useState('embed')
+
+  function handleAltTextChange(event) {
+    setAltText(event.target.value)
+  }
+
+  function handleIsDecorativeChange(event) {
+    setIsDecorativeImage(event.target.checked)
+  }
+
+  function handleDisplayAsChange(event) {
+    setDisplayAs(event.target.value)
+  }
 
   trayProps = trayProps || Bridge.trayProps.get(editor)
 
@@ -246,7 +284,12 @@ export function UploadFile({
               editor,
               accept,
               selectedPanel,
-              {fileUrl, theFile, unsplashData},
+              {
+                fileUrl,
+                theFile,
+                unsplashData,
+                imageOptions: {altText, isDecorativeImage, displayAs}
+              },
               contentProps,
               source,
               onDismiss
@@ -266,6 +309,17 @@ export function UploadFile({
             <Tabs onRequestTabChange={(event, {index}) => setSelectedPanel(panels[index])}>
               {renderTabs()}
             </Tabs>
+            {/image/.test(accept) && (
+              <ImageOptionsForm
+                altText={altText}
+                isDecorativeImage={isDecorativeImage}
+                displayAs={displayAs}
+                handleAltTextChange={handleAltTextChange}
+                handleIsDecorativeChange={handleIsDecorativeChange}
+                handleDisplayAsChange={handleDisplayAsChange}
+                hideDimensions
+              />
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={onDismiss}>{formatMessage('Close')}</Button>&nbsp;

@@ -173,6 +173,8 @@ class ApplicationController < ActionController::Base
             show_feedback_link: show_feedback_link?
           },
         }
+
+        @js_env[:flashAlertTimeout] = 1.day.in_milliseconds if @current_user.try(:prefers_no_toast_timeout?)
         @js_env[:KILL_JOY] = @domain_root_account.kill_joy? if @domain_root_account&.kill_joy?
 
         cached_features = cached_js_env_account_features
@@ -210,7 +212,7 @@ class ApplicationController < ActionController::Base
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [:cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
-    :direct_share, :assignment_bulk_edit, :responsive_admin_settings, :responsive_awareness,
+    :direct_share, :assignment_bulk_edit, :responsive_awareness,
     :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses, :bulk_delete_pages
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
@@ -270,8 +272,6 @@ class ApplicationController < ActionController::Base
       @current_user,
       session: session,
       assignment: assignment,
-      domain: request.env['HTTP_HOST'],
-      real_user: @real_current_user,
       includes: includes
     )
     js_env(cr_env)
@@ -2361,7 +2361,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'https://community.canvaslms.com/docs/DOC-1284'))
+    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-the-browser-and-computer-requirements-for-Canvas/ta-p/66'))
   end
 
   def browser_supported?

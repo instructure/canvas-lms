@@ -23,7 +23,7 @@ describe "/profile/_sms_select" do
   it "should render" do
     course_with_student
     view_context
-    cc = @user.communication_channels.create!(:path => 'user@example.com')
+    cc = communication_channel(@user, {username: 'user@example.com'})
     assign(:other_channels, [cc])
     assign(:sms_channels, [])
 

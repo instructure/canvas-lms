@@ -28,25 +28,28 @@ const PagesTray = () => (
     imageWidth="14.5rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/docs/DOC-10460-
-      canvas-instructor-guide-table-of-contents#jive_content_id_Pages`
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
     }}
     links={[
       {
         label: I18n.t('How do I create a new page in a course?'),
-        href: 'https://community.canvaslms.com/docs/DOC-13018-4152724253'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-new-page-in-a-course/ta-p/1031'
       },
       {
         label: I18n.t('How do I publish or unpublish a page as an instructor?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12796-4152180494'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-page-as-an-instructor/ta-p/592'
       },
       {
         label: I18n.t('How do I use the Pages Index Page?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12776-4152322017'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Pages-Index-Page/ta-p/1005'
       },
       {
         label: I18n.t('How do I set a Front Page in a course?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12784-415241445'
+        href:
+          'hhttps://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-a-Front-Page-in-a-course/ta-p/797'
       }
     ]}
   >

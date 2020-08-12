@@ -27,6 +27,16 @@ high_contrast:
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
   autoexpand: true
+disable_alert_timeouts:
+  state: allowed
+  display_name:
+    features.disable_alert_timeouts: Disable Alert Notification Timeouts
+  description:
+    disable_alert_timeouts_description: |-
+      Enabling this feature gets rid of the timeout for alert notifications that pop up, giving the
+      user as much time as they need to read the notification over and dismiss it when they are finished.
+  applies_to: User
+  autoexpand: true
 disable_celebrations:
   state: hidden
   display_name:
@@ -258,7 +268,6 @@ conditional_release:
     results.
   applies_to: Course
   root_opt_in: true
-  after_state_change_proc: conditional_release_after_state_change_hook
 wrap_calendar_event_titles:
   state: allowed
   display_name: Wrap event titles in Calendar month view
@@ -284,12 +293,6 @@ new_user_tutorial:
   state: allowed
   display_name: New User Tutorial
   description: Provide tutorial information for new users in a flyout tray.
-  applies_to: RootAccount
-  root_opt_in: true
-student_planner:
-  state: 'on'
-  display_name: To Do List Dashboard
-  description: Provides users with a To Do List Dashboard option.
   applies_to: RootAccount
   root_opt_in: true
 rubric_criterion_range:

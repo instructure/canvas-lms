@@ -25,7 +25,6 @@ describe "student planner" do
   include PlannerPageObject
 
   before :once do
-    Account.default.enable_feature!(:student_planner)
     course_with_teacher(active_all: true, new_user: true, user_name: 'PlannerTeacher', course_name: 'Planner Course')
     @student1 = User.create!(name: 'Student 1')
     @course.enroll_student(@student1).accept!

@@ -41,16 +41,10 @@
 html, body { height: 100%; }
 
 body {
-  overflow: hidden;
+  overflow: visible;
 
-  // TODO: Make all `responsive_admin_settings` styles the default once the
-  // responsive_admin_settings feature flag is on permanently
-  &.responsive_admin_settings {
-    overflow: visible;
-
-    @include breakpoint(tablet) {
-      overflow: hidden;
-    }
+  @include breakpoint(tablet) {
+    overflow: hidden;
   }
 }
 
@@ -83,18 +77,10 @@ $te-footer-height: 72px;
 }
 
 .Theme__layout {
-  body:not(.responsive_admin_settings) & {
+  @include breakpoint(tablet) {
     display: flex;
     height: calc(100vh - #{$te-footer-height});
     overflow: hidden;
-  }
-
-  body.responsive_admin_settings & {
-    @include breakpoint(tablet) {
-      display: flex;
-      height: calc(100vh - #{$te-footer-height});
-      overflow: hidden;
-    }
   }
 
   &.Theme__layout--is-active-theme {
@@ -108,31 +94,18 @@ $te-footer-height: 72px;
   position: relative;
   box-shadow: 2px 0 4px rgba(black, 0.3);
 
-  body:not(.responsive_admin_settings) & {
+  @include breakpoint(tablet) {
     flex: 0 0 $te-width;
     overflow-y: auto;
-  }
-
-  body.responsive_admin_settings & {
-    @include breakpoint(tablet) {
-      flex: 0 0 $te-width;
-      overflow-y: auto;
-    }
   }
 }
 
 .Theme__preview {
-  body:not(.responsive_admin_settings) & {
+  position: relative;
+
+  @include breakpoint(tablet) {
     flex: 1;
-  }
-
-  body.responsive_admin_settings & {
-    position: relative;
-
-    @include breakpoint(tablet) {
-      flex: 1;
-      position: static;
-    }
+    position: static;
   }
 }
 
@@ -146,19 +119,12 @@ $te-footer-height: 72px;
   align-items: center;
   justify-content: center;
 
-  body:not(.responsive_admin_settings) & {
+  width: 100%;
+  #{direction(left)}: 0;
+
+  @include breakpoint(tablet) {
     width: calc(100% - #{$te-width});
     #{direction(left)}: $te-width;
-  }
-
-  body.responsive_admin_settings & {
-    width: 100%;
-    #{direction(left)}: 0;
-
-    @include breakpoint(tablet) {
-      width: calc(100% - #{$te-width});
-      #{direction(left)}: $te-width;
-    }
   }
 
   .Theme__layout--is-active-theme & {
@@ -179,14 +145,8 @@ $te-footer-height: 72px;
   width: 100%;
   height: 100vh;
 
-  body:not(.responsive_admin_settings) & {
+  @include breakpoint(tablet) {
     padding-bottom: $te-footer-height;
-  }
-
-  body.responsive_admin_settings & {
-    @include breakpoint(tablet) {
-      padding-bottom: $te-footer-height;
-    }
   }
 }
 
@@ -200,11 +160,9 @@ $te-footer-height: 72px;
   background: $te-bgd-dark;
   color: $ic-color-light;
 
-  body.responsive_admin_settings & {
-    z-index: 8001; // make footer positioned higher than overlay for single-col mobile layout
-    @include breakpoint(tablet) {
-      z-index: auto;
-    }
+  z-index: 8001; // make footer positioned higher than overlay for single-col mobile layout
+  @include breakpoint(tablet) {
+    z-index: auto;
   }
 
   .Button { border-color: darken($te-bgd-dark, 8); }

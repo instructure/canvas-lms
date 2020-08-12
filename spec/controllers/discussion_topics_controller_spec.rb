@@ -978,24 +978,8 @@ describe DiscussionTopicsController do
   end
 
   context 'student planner' do
-    before do
-      @course.root_account.enable_feature!(:student_planner)
-    end
-
     before :each do
       course_topic
-    end
-
-    it 'js_env STUDENT_PLANNER_ENABLED is true for teachers' do
-      user_session(@teacher)
-      get :edit, params: {course_id: @course.id, id: @topic.id}
-      expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be true
-    end
-
-    it 'js_env STUDENT_PLANNER_ENABLED is false for students' do
-      user_session(@student)
-      get :edit, params: {course_id: @course.id, id: @topic.id}
-      expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be false
     end
 
     it 'should create a topic with a todo date' do

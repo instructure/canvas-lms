@@ -89,6 +89,9 @@ module SIS
           account = nil
           account = @root_account.all_accounts.where(sis_source_id: account_id).take if account_id.present?
           account ||= @root_account.all_accounts.where(sis_source_id: fallback_account_id).take if fallback_account_id.present?
+          if account_id.present? && !account
+            raise ImportError, "Account not found \"#{account_id}\" for course #{course_id}"
+          end
           course_account_stuck = course.stuck_sis_fields.include?(:account_id)
           unless course_account_stuck
             course.account = account if account

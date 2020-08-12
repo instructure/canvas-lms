@@ -47,10 +47,6 @@ end
 module ConditionalRelease
   module SpecHelper
     def setup_course_with_native_conditional_release(course: nil)
-      Account.default.tap do |ra|
-        ra.settings[:use_native_conditional_release] = true
-        ra.save!
-      end
       # set up a trigger assignment with rules and whatnot
       course ||= course_with_student(:active_all => true) && @course
       @trigger_assmt = course.assignments.create!(:points_possible => 10, submission_types: "online_text_entry")

@@ -177,10 +177,7 @@ function insertUndecoratedLink(editor, linkProps) {
   const selectedPlainText = editor.selection.getContent({format: 'text'})
   const onlyText = isOnlyTextSelected(selectedContent)
 
-  const linkText =
-    onlyText &&
-    ((linkProps.text && editor.dom.encode(linkProps.text)) ||
-      getAnchorText(editor.selection, anchorElm))
+  const linkText = onlyText && (linkProps.text || getAnchorText(editor.selection, anchorElm))
 
   // only keep the props we want as attributes on the <a>
   const linkAttrs = {

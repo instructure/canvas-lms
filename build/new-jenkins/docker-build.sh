@@ -6,7 +6,10 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 RUBY_PATCHSET_IMAGE=${RUBY_PATCHSET_IMAGE:-canvas-lms-ruby}
 PATCHSET_TAG=${PATCHSET_TAG:-canvas-lms}
 optionalFromCache=''
-[ -n "${MERGE_TAG}" ] && optionalFromCache="--cache-from $MERGE_TAG"
+[[ "${SKIP_CACHE}" = "false" ]] && optionalFromCache="--cache-from $MERGE_TAG"
+
+optionalFromCacheRuby=''
+[[ "${SKIP_CACHE}" = "false" ]] && optionalFromCacheRuby="--cache-from $RUBY_MERGE_IMAGE"
 
 # shellcheck disable=SC2086
 DOCKER_BUILDKIT=1 docker build \
@@ -16,7 +19,7 @@ DOCKER_BUILDKIT=1 docker build \
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
   --build-arg RUBY="$RUBY" \
   --file ruby.Dockerfile \
-  $optionalFromCache \
+  $optionalFromCacheRuby \
   --tag "$RUBY_PATCHSET_IMAGE" \
   "$WORKSPACE"
 

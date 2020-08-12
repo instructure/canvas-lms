@@ -23,22 +23,20 @@
 @import "components/ic-sortable-list.scss";
 
 @include mobile-only {
-  body.responsive_admin_settings table.narrow td {
+  table.narrow td {
     display: block;
     max-width: 320px;
   }
 
-  body.responsive_admin_settings {
-    .long-word {
-      word-break: break-all;
-    }
+  .long-word {
+    word-break: break-all;
+  }
 
-    .custom-text {
-      display: block;
-    }
+  .custom-text {
+    display: block;
   }
 }
 
-body.responsive_admin_settings .delete_filter_link {
+.delete_filter_link {
   margin: auto 5px;
 }

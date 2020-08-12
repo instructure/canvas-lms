@@ -146,6 +146,17 @@ describe ExternalToolsController do
         message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
         expect(message_hint['canvas_domain']).to eq 'localhost'
       end
+
+      context 'current user is a student view user' do
+        before do
+          user_session(@course.student_view_student)
+        end
+
+        it 'returns the TestUser claim when viewing as a student' do
+          get :show, params: {:course_id => @course.id, id: tool.id}
+          expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/roles"]).to include("http://purl.imsglobal.org/vocab/lti/system/person#TestUser")
+        end
+      end
     end
 
     context 'basic-lti-launch-request' do

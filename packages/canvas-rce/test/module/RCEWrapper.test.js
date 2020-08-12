@@ -95,6 +95,7 @@ describe('RCEWrapper', () => {
         decode: input => {
           return input
         },
+        isEmpty: () => editor.content.length === 0,
         doc: document.createElement('div')
       },
       selection: {
@@ -116,6 +117,7 @@ describe('RCEWrapper', () => {
       },
       setContent: sinon.spy(c => (editor.content = c)),
       getContent: () => editor.content,
+      getBody: () => editor.content,
       hidden: false,
       isHidden: () => {
         return editor.hidden
@@ -342,6 +344,30 @@ describe('RCEWrapper', () => {
       alt="Loading..."
       src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="green_square"
+      style="width: 10px; height: 10px; border: solid 1px #8B969E;"
+    />`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
+        restoreImage()
+      })
+
+      it('inserts a placeholder image with an encoded name to prevent nested quotes', () => {
+        mockImage()
+        const greenSquare =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'filename "with" quotes',
+          domObject: {
+            preview: greenSquare
+          },
+          contentType: 'image/png'
+        }
+
+        const imageMarkup = `
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+      data-placeholder-for="filename%20%22with%22%20quotes"
       style="width: 10px; height: 10px; border: solid 1px #8B969E;"
     />`
         instance.insertImagePlaceholder(props)
@@ -731,15 +757,16 @@ describe('RCEWrapper', () => {
   describe('textarea', () => {
     let instance, elem
 
-    function stubEventListeners(elem) {
-      sinon.stub(elem, 'addEventListener')
-      sinon.stub(elem, 'removeEventListener')
+    function stubEventListeners(elm) {
+      sinon.stub(elm, 'addEventListener')
+      sinon.stub(elm, 'removeEventListener')
     }
 
     beforeEach(() => {
       instance = createBasicElement()
       elem = document.getElementById(textareaId)
       stubEventListeners(elem)
+      sinon.stub(instance, 'doAutoSave')
     })
 
     describe('handleTextareaChange', () => {
@@ -749,12 +776,14 @@ describe('RCEWrapper', () => {
         editor.hidden = true
         instance.handleTextareaChange()
         sinon.assert.calledWith(editor.setContent, value)
+        sinon.assert.called(instance.doAutoSave)
       })
 
       it('does not update the editor if editor is not hidden', () => {
         editor.hidden = false
         instance.handleTextareaChange()
         sinon.assert.notCalled(editor.setContent)
+        sinon.assert.notCalled(instance.doAutoSave)
       })
     })
   })

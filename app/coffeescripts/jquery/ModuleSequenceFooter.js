@@ -37,11 +37,11 @@ import 'jquery.ajaxJSON'
 //       courseID: 25
 //     })
 //
-//   You can optionaly set options on the prototype for all instances of this plugin by default
+//   You can optionally set options on the prototype for all instances of this plugin by default
 //   by doing:
 //
 //   $.fn.moduleSequenceFooter.options = {
-//     assetType: 'Assigbnment'
+//     assetType: 'Assignment'
 //     assetID: 1
 //     courseID: 25
 //   }
@@ -102,6 +102,7 @@ export default class ModuleSequenceFooter {
     Assignment: 'icon-assignment',
     Quiz: 'icon-quiz',
     ExternalTool: 'icon-link',
+    ExternalUrl: 'icon-link',
     'Lti::MessageHandler': 'icon-link'
   }
 
@@ -205,6 +206,7 @@ export default class ModuleSequenceFooter {
 
   buildPreviousData() {
     this.previous.url = this.item.prev.html_url
+    this.previous.externalItem = this.item.prev.type === 'ExternalUrl' && this.item.prev.new_tab
 
     if (this.item.current.module_id === this.item.prev.module_id) {
       this.previous.tooltip = `<i class='${htmlEscape(
@@ -261,6 +263,8 @@ export default class ModuleSequenceFooter {
 
   buildNextData() {
     this.next.url = this.item.next.html_url
+    this.next.externalItem = this.item.next.type === 'ExternalUrl' && this.item.next.new_tab
+
     if (this.item.current.module_id === this.item.next.module_id) {
       this.next.tooltip = `<i class='${htmlEscape(
         this.iconClasses[this.item.next.type]

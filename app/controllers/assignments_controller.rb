@@ -464,8 +464,6 @@ class AssignmentsController < ApplicationController
 
       hash = {
         CONTEXT_ACTION_SOURCE: :syllabus,
-        # don't check for student enrollments because we want this to show for the teacher as well
-        STUDENT_PLANNER_ENABLED: @domain_root_account&.feature_enabled?(:student_planner)
       }
       append_sis_data(hash)
       js_env(hash)

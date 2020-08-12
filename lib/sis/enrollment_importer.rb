@@ -24,15 +24,13 @@ module SIS
     def process(messages)
       i = Work.new(@batch, @root_account, @logger, messages)
 
-      Enrollment.skip_touch_callbacks(:course) do
-        Enrollment.suspend_callbacks(:set_update_cached_due_dates, :add_to_favorites_later,
-                                     :recache_course_grade_distribution, :update_user_account_associations_if_necessary) do
-          User.skip_updating_account_associations do
-            Enrollment.process_as_sis(@sis_options) do
-              yield i
-              while i.any_left_to_process?
-                i.process_batch
-              end
+      Enrollment.suspend_callbacks(:set_update_cached_due_dates, :add_to_favorites_later,
+                                   :recache_course_grade_distribution, :update_user_account_associations_if_necessary) do
+        User.skip_updating_account_associations do
+          Enrollment.process_as_sis(@sis_options) do
+            yield i
+            while i.any_left_to_process?
+              i.process_batch
             end
           end
         end

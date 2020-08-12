@@ -22,74 +22,25 @@ module ConditionalRelease
   class Service
     private_class_method :new
 
-    DEFAULT_PATHS = {
-      base_path: '',
-      stats_path: "stats",
-      create_account_path: 'api/accounts',
-      content_exports_path: 'api/content_exports',
-      content_imports_path: 'api/content_imports',
-      rules_path: 'api/rules?include[]=all&active=true',
-      rules_summary_path: 'api/rules/summary',
-      select_assignment_set_path: 'api/rules/select_assignment_set',
-      editor_path: 'javascripts/generated/conditional_release_editor.bundle.js',
-      start_export_path: 'api/start_export',
-      export_status_path: 'api/export_status',
-      download_export_path: 'api/download_export',
-    }.freeze
-
-    DEFAULT_CONFIG = {
-      enabled: false, # required
-      host: nil,      # required
-      protocol: nil,  # defaults to Canvas
-    }.merge(DEFAULT_PATHS).freeze
-
-    def self.env_for(context, user = nil, session: nil, assignment: nil, domain: nil,
-                  real_user: nil, includes: [])
-      includes = Array.wrap(includes)
+    def self.env_for(context, user = nil, session: nil, assignment: nil, includes: [])
       enabled = self.enabled_in_context?(context)
       env = {
         CONDITIONAL_RELEASE_SERVICE_ENABLED: enabled
       }
       return env unless enabled && user
 
-      if self.natively_enabled_for_account?(context.root_account)
-        cyoe_env = {native: true}
-        cyoe_env[:assignment] = assignment_attributes(assignment) if assignment
-        if context.is_a?(Course)
-          cyoe_env[:course_id] = context.id
-          cyoe_env[:stats_url] = "/api/v1/courses/#{context.id}/mastery_paths/stats"
-        end
-      else
-        cyoe_env = {
-          jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
-          disable_editing: !!ConditionalRelease::Assimilator.assimilation_in_progress?(context.root_account),
-          assignment: assignment_attributes(assignment),
-          stats_url: stats_url,
-          locale: I18n.locale.to_s,
-          editor_url: editor_url,
-          base_url: base_url,
-          context_id: context.id
-        }
+      cyoe_env = {}
+      cyoe_env[:assignment] = assignment_attributes(assignment) if assignment
+      if context.is_a?(Course)
+        cyoe_env[:course_id] = context.id
+        cyoe_env[:stats_url] = "/api/v1/courses/#{context.id}/mastery_paths/stats"
       end
 
+      includes = Array.wrap(includes)
       cyoe_env[:rule] = rule_triggered_by(assignment, user, session) if includes.include? :rule
       cyoe_env[:active_rules] = active_rules(context, user, session) if includes.include? :active_rules
-      env.merge(CONDITIONAL_RELEASE_ENV: cyoe_env)
-    end
 
-    def self.jwt_for(context, user, domain, claims: {}, session: nil, real_user: nil)
-      Canvas::Security::ServicesJwt.generate(
-        claims.merge({
-          sub: user.id.to_s,
-          domain: domain,
-          account_id: Context.get_account(context).root_account.lti_guid.to_s,
-          context_type: context.class.name,
-          context_id: context.id.to_s,
-          role: find_role(user, session, context),
-          workflows: ['conditonal-release-api'],
-          canvas_token: Canvas::Security::ServicesJwt.for_user(domain, user, real_user: real_user, workflows: ['conditional-release'])
-        })
-      )
+      env.merge(CONDITIONAL_RELEASE_ENV: cyoe_env)
     end
 
     def self.rules_for(context, student, session)
@@ -122,75 +73,8 @@ module ConditionalRelease
       @config = nil
     end
 
-    def self.config
-      @config ||= DEFAULT_CONFIG.merge(config_file)
-    end
-
-    # whether new accounts will use the ported canvas db and UI instead of provisioning onto the service
-    # can flip this setting on when canvas-side is code-complete but the migration is still pending
-    def self.prefer_native?
-      Setting.get("conditional_release_prefer_native", "false") == "true"
-    end
-
-    # TODO: can remove when all accounts are migrated
-    def self.natively_enabled_for_account?(root_account)
-      !!root_account&.settings&.[](:use_native_conditional_release)
-    end
-
-    def self.service_configured?
-      !!(config[:enabled] && config[:host])
-    end
-
     def self.enabled_in_context?(context)
-      !!((service_configured? || natively_enabled_for_account?(context&.root_account)) && context&.feature_enabled?(:conditional_release))
-    end
-
-    def self.protocol
-      config[:protocol] || HostUrl.protocol
-    end
-
-    def self.host
-      config[:host]
-    end
-
-    def self.unique_id
-      config[:unique_id] || "conditional-release-service@instructure.auth"
-    end
-
-    DEFAULT_PATHS.each do |path_name, _path|
-      method_name = path_name.to_s.sub(/_path$/, '_url')
-      Service.define_singleton_method method_name do
-        build_url config[path_name]
-      end
-    end
-
-    # Returns an http response-like hash { code: string, body: string or object }
-    def self.select_mastery_path(context, current_user, student, trigger_assignment, assignment_set_id, session)
-      return unless enabled_in_context?(context)
-      if context.blank? || student.blank? || trigger_assignment.blank? || assignment_set_id.blank?
-        return { code: '400', body: { message: 'invalid request' } }
-      end
-
-      trigger_submission = trigger_assignment.submission_for_student(student)
-      submission_hidden = context.post_policies_enabled? ? !trigger_submission&.posted? : trigger_assignment.muted?
-      if trigger_submission.blank? || !trigger_submission.graded? || submission_hidden
-        return { code: '400', body: { message: 'invalid submission state' } }
-      end
-
-      request_data = {
-        trigger_assignment: trigger_assignment.id,
-        trigger_assignment_score: trigger_submission.score,
-        trigger_assignment_points_possible: trigger_assignment.points_possible,
-        student_id: student.id,
-        assignment_set_id: assignment_set_id
-      }
-      headers = headers_for(context, current_user, domain_for(context), session)
-      request = CanvasHttp.post(select_assignment_set_url, headers, form_data: request_data.to_param)
-
-      # either assignments have changed (req success) or unknown state (req error)
-      clear_rules_cache_for(context, student)
-
-      { code: request.code, body: JSON.parse(request.body) }
+      Feature.definitions.key?('conditional_release') && context&.feature_enabled?(:conditional_release)
     end
 
     def self.triggers_mastery_paths?(assignment, current_user, session = nil)
@@ -210,40 +94,7 @@ module ConditionalRelease
     def self.active_rules(course, current_user, session)
       return unless enabled_in_context?(course)
       return unless course.grants_any_right?(current_user, session, :read, :manage_assignments)
-      return native_active_rules(course) if natively_enabled_for_account?(course.root_account)
 
-      Rails.cache.fetch(active_rules_cache_key(course)) do
-        headers = headers_for(course, current_user, domain_for(course), session)
-        request = CanvasHttp.get(rules_url, headers)
-        unless request && request.code == '200'
-          InstStatsd::Statsd.increment("conditional_release_service_error",
-                                       short_stat: 'conditional_release_service_error',
-                                       tags: { type: 'active_rules' })
-          raise ServiceError, "error fetching active rules #{request}"
-        end
-        rules = JSON.parse(request.body)
-
-        trigger_ids = rules.map { |rule| rule['trigger_assignment'] }
-        trigger_assgs = Assignment.preload(:grading_standard).where(id: trigger_ids).each_with_object({}) do |a, assgs|
-          assgs[a.id.to_s] = {
-            points_possible: a.points_possible,
-            grading_type: a.grading_type,
-            grading_scheme: a.uses_grading_standard ? a.grading_scheme : nil,
-          }
-        end
-
-        rules.each do |rule|
-          rule['trigger_assignment_model'] = trigger_assgs[rule['trigger_assignment']]
-        end
-
-        rules
-      end
-    rescue => e
-      Canvas::Errors.capture(e, course_id: course.global_id, user_id: current_user.global_id)
-      []
-    end
-
-    def self.native_active_rules(course)
       rules_data = Rails.cache.fetch_with_batched_keys('conditional_release_active_rules', batch_object: course, batched_keys: :conditional_release) do
         rules = course.conditional_release_rules.active.with_assignments.to_a
         rules.as_json(include: Rule.includes_for_json, include_root: false, except: [:root_account_id, :deleted_at])
@@ -264,23 +115,6 @@ module ConditionalRelease
 
     class << self
       private
-      def config_file
-        ConfigFile.load('conditional_release').try(:symbolize_keys) || {}
-      end
-
-      def build_url(path)
-        "#{protocol}://#{host}/#{path}"
-      end
-
-      def find_role(user, session, context)
-        if Context.get_account(context).grants_right? user, session, :manage
-          'admin'
-        elsif context.is_a?(Course) && context.grants_right?(user, session, :manage_assignments)
-          'teacher'
-        elsif context.grants_right? user, session, :read
-          'student'
-        end
-      end
 
       def assignment_attributes(assignment)
         return nil unless assignment.present?
@@ -293,15 +127,6 @@ module ConditionalRelease
           submission_types: assignment.submission_types,
           grading_scheme: (assignment.grading_scheme if assignment.uses_grading_standard)
         }
-      end
-
-      def headers_for(context, user, domain, session)
-        jwt = jwt_for(context, user, domain, session: session)
-        {"Authorization" => "Bearer #{jwt}"}
-      end
-
-      def domain_for(context)
-        Context.get_account(context).root_account.domain
       end
 
       def submissions_for(student, context, force: false)
@@ -327,32 +152,8 @@ module ConditionalRelease
         end
       end
 
-      def rules_data(context, student, session = {})
-        return [] if context.blank? || student.blank?
-        if natively_enabled_for_account?(context.root_account)
-          return native_rules_data_for_student(context, student)
-        end
-
-        cached = rules_cache(context, student)
-        assignments = assignments_for(cached[:rules]) if cached
-        force_cache = rules_cache_expired?(context, cached)
-        rules_data = rules_cache(context, student, force: force_cache) do
-          data = { submissions: submissions_for(student, context, force: force_cache) }
-          headers = headers_for(context, student, domain_for(context), session)
-          req = request_rules(headers, data)
-          {rules: req, updated_at: Time.zone.now}
-        end
-        rules_data[:rules] = merge_assignment_data(rules_data[:rules], assignments)
-        rules_data[:rules]
-      rescue ConditionalRelease::ServiceError => e
-        InstStatsd::Statsd.increment("conditional_release_service_error",
-                                     short_stat: 'conditional_release_service_error',
-                                     tags: { type: 'rules_data' })
-        Canvas::Errors.capture(e, course_id: context.global_id, user_id: student.global_id)
-        []
-      end
-
-      def native_rules_data_for_student(course, student)
+      def rules_data(course, student, session = {})
+        return [] if course.blank? || student.blank?
         rules_data =
           ::Rails.cache.fetch(['conditional_release_rules_for_student', student.cache_key(:submissions), course.cache_key(:conditional_release)].cache_key) do
             rules = course.conditional_release_rules.active.preload(Rule.preload_associations).to_a
@@ -418,23 +219,6 @@ module ConditionalRelease
         else
           true
         end
-      end
-
-      def request_rules(headers, data)
-        req = CanvasHttp.post(rules_summary_url, headers, form_data: data.to_param)
-
-        if req && req.code == '200'
-          JSON.parse(req.body)
-        else
-          InstStatsd::Statsd.increment("conditional_release_service_error",
-                                       short_stat: 'conditional_release_service_error',
-                                       tags: { type: 'applied_rules' })
-          message = "error fetching applied rules #{req}"
-          raise ServiceError, message
-        end
-      rescue => e
-        raise if e.is_a? ServiceError
-        raise ServiceError, e.inspect
       end
 
       def assignments_for(response)

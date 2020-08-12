@@ -495,7 +495,7 @@ export default class EventDataSource {
     if (ENV.STUDENT_PLANNER_ENABLED) {
       eventDataSources.push(['/api/v1/planner_notes', params])
     }
-    if (ENV.PLANNER_ENABLED) {
+    if (ENV.CALENDAR && ENV.CALENDAR.MANAGE_CONTEXTS) {
       const [admin_contexts, student_contexts] = _.partition(
         params.context_codes,
         cc => ENV.CALENDAR.MANAGE_CONTEXTS.indexOf(cc) >= 0

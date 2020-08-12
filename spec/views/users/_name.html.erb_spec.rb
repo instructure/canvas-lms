@@ -66,7 +66,7 @@ describe "/users/name" do
     before :once do
       course_with_teacher :active_all => true
       student_in_course :active_all => true
-      @student.communication_channels.create!(:path_type => 'email', :path => 'secret@example.com').confirm!
+      communication_channel(@student, {username: 'secret@example.com', active_cc: true})
     end
 
     it "includes email address for teachers by default" do

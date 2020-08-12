@@ -790,7 +790,8 @@ QUnit.module('SpeedGrader', rootHooks => {
         grading_role: 'moderator',
         help_url: 'example.com/support',
         show_help_menu_item: false,
-        RUBRIC_ASSESSMENT: {}
+        RUBRIC_ASSESSMENT: {},
+        update_submission_grade_url: 'my_url.com'
       }
       fakeENV.setup(env)
       sandbox.spy($.fn, 'append')
@@ -805,7 +806,6 @@ QUnit.module('SpeedGrader', rootHooks => {
       setupFixtures(`
       <div id="iframe_holder"></div>
       <div id="multiple_submissions"></div>
-      <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
     `)
       SpeedGrader.setup()
       window.jsonData = {
@@ -4272,12 +4272,12 @@ QUnit.module('SpeedGrader', rootHooks => {
             grading_role: 'moderator',
             help_url: 'example.com/support',
             show_help_menu_item: false,
-            RUBRIC_ASSESSMENT: {}
+            RUBRIC_ASSESSMENT: {},
+            update_rubric_assessment_url: rubricUrl
           })
           setupFixtures(`
           <div id="rubric_holder">
             <div class="rubric"></div>
-            <div class='update_rubric_assessment_url' href=${rubricUrl}></div>
             <button class='save_rubric_button'></button>
           </div>
         `)

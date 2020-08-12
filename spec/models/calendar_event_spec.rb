@@ -402,8 +402,7 @@ describe CalendarEvent do
       course_with_student(:active_all => true)
       @teacher = user_factory(active_all: true)
       @course.enroll_teacher(@teacher).accept!
-      channel = @student.communication_channels.create(:path => "test_channel_email_#{user_factory.id}", :path_type => "email")
-      channel.confirm
+      communication_channel(@student, {username: "test_channel_email_#{user_factory.id}@test.com", active_cc: true})
     end
 
     context "with calendar event created" do
@@ -519,8 +518,7 @@ describe CalendarEvent do
         course_with_observer(active_all: true, course: @course, associated_user_id: @student1.id)
 
         [@teacher, @student1, @student2, @observer].each do |user|
-          channel = user.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
-          channel.confirm
+          communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
         end
 
         @expected_users = [@teacher.id, @student1.id, @student2.id, @observer.id].sort

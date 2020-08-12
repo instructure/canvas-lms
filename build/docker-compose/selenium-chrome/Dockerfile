@@ -1,4 +1,4 @@
-ARG SELENIUM_VERSION=3.141.59-20200525
+ARG SELENIUM_VERSION=3.141.59-20200719
 FROM selenium/standalone-chrome-debug:$SELENIUM_VERSION
 
 COPY entry_point.sh /opt/bin/custom_entry_point.sh

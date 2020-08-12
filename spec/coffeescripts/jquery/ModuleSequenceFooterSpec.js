@@ -71,7 +71,7 @@ test('throws error if option is not set', () =>
     this.$testEl.moduleSequenceFooter()
   }, 'throws error when no options are passed in'))
 
-test('generatess a url based on the course_id', () => {
+test('generates a url based on the course_id', () => {
   const msf = new $.fn.moduleSequenceFooter.MSFClass({
     courseID: 42,
     assetType: 'Assignment',
@@ -182,7 +182,7 @@ test('there is no button when next or prev data is null', function() {
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(this.$testEl.find('a').length === 0, 'no buttons rendered')
+  strictEqual(this.$testEl.find('a').length, 0, 'no buttons rendered')
 })
 
 const moduleTooltipData = {
@@ -569,5 +569,60 @@ test('does not show next button when no next items exist and paths are unlocked'
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(this.$testEl.find('a').length === 0, 'no buttons rendered')
+  strictEqual(this.$testEl.find('a').length, 0, 'no buttons rendered')
+})
+
+const externalUrlTypeData = {
+  items: [
+    {
+      prev: {
+        id: 769,
+        module_id: 123,
+        title: 'Not an external item',
+        type: 'Assignment'
+      },
+      current: {
+        id: 768,
+        module_id: 123,
+        title: 'A lonely page',
+        type: 'Page'
+      },
+      next: {
+        id: 111,
+        module_id: 123,
+        title: 'Rendering of the project',
+        type: 'ExternalUrl',
+        new_tab: true
+      }
+    }
+  ],
+
+  modules: [
+    {
+      id: 123,
+      name: 'Module A'
+    }
+  ]
+}
+
+test('SR reads new window when button linking to ExternalURL type is focused', function() {
+  this.server.respondWith('GET', default_course_url, server_200_response(externalUrlTypeData))
+  this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+  this.server.respond()
+
+  ok(
+    this.$testEl
+      .find('.module-sequence-footer-button--previous a')
+      .first()
+      .attr('aria-label')
+      .match('Previous Module Item'),
+    'includes correct SR label for non-ExternalUrl types'
+  )
+  ok(
+    nextButton(this.$testEl)
+      .find('a')
+      .attr('aria-label')
+      .match('Next Module Item - opens in new window'),
+    'includes correct SR label for ExternalUrl types'
+  )
 })

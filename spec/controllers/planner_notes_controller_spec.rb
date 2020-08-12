@@ -42,11 +42,6 @@ describe PlannerNotesController do
   end
 
   context "authenticated" do
-    before :once do
-      @course_1.root_account.enable_feature!(:student_planner)
-      @course_2.root_account.enable_feature!(:student_planner)
-    end
-
     context "as student" do
       before :each do
         user_session(@student)

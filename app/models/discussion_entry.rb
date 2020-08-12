@@ -210,7 +210,8 @@ class DiscussionEntry < ActiveRecord::Base
     if self.discussion_topic.for_assignment?
       entries = self.discussion_topic.discussion_entries.where(:user_id => self.user_id, :workflow_state => 'active')
       submission = self.discussion_topic.assignment.submissions.where(:user_id => self.user_id).take
-      if submission && entries.any?
+      return unless submission
+      if entries.any?
         submission_date = entries.order(:created_at).limit(1).pluck(:created_at).first
         if submission_date > self.created_at
           submission.submitted_at = submission_date

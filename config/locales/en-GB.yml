@@ -408,6 +408,7 @@ en-GB:
   account_id_2c3b4f15: "account ID"
   account_id_73966078: account_id
   account_id_f6e26867: "Account ID"
+  account_level_mastery_scales_a5bdff29: "Account-level Mastery Scales"
   account_level_notification_preferences_require_an__66467cd7: "Account level notification preferences require an account_id to update"
   account_level_notification_preferences_ui_update_f5e189a4: "Account level notification preferences UI update"
   account_level_settings_manage_4fca6f8e: "Account-level settings - manage"
@@ -420,6 +421,9 @@ en-GB:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Account notification end time precedes start time"
+  account_notification_settings_error_page_66c0bc61: "Account Notification Settings Error Page"
+  account_notification_settings_initial_query_error_f55e1cbf: "Account Notification Settings initial query error"
+  account_notification_settings_updated_dbabec35: "Account notification settings updated"
   account_notifications: 
     announcement_created_notice: "Announcement successfully created"
     announcement_creation_failed_notice: "Announcement creation failed"
@@ -1289,6 +1293,7 @@ en-GB:
         report_last_run: "Last run"
         report_name: Name
       headings: 
+        privacy: Privacy
         quotas: "Account quotas"
         sections: Reports
         settings: "Account settings"
@@ -1319,6 +1324,8 @@ en-GB:
         enable_alerts: "Alerts (beta)"
         enable_course_catalog: "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled."
         enable_eportfolios: ePortfolios
+        enable_fullstory: "Allow tracking with FullStory"
+        enable_google_analytics: "Allow tracking with Google Analytics"
         enable_profiles: "Enable profiles"
         enable_turnitin: Turnitin
         enable_user_notes: "Faculty journal"
@@ -1414,7 +1421,7 @@ en-GB:
       open_report_description: "Open report description"
       page_header_title: "Account settings"
       page_title: "Shared Content"
-      quiz_ip_filters_delete: "Remove filter"
+      quiz_ip_filters_delete: "Remove Quiz IP Filter"
       quiz_ip_filters_help_message: |-
           Quiz IP filters are a way to limit access to quizzes to computers in a specified IP range.
           
@@ -1447,6 +1454,7 @@ en-GB:
       tab_announcements: Announcements
       tab_external_tools: Apps
       tab_notifications: Notifications
+      tab_privacy: Privacy
       tab_quotas: Quotas
       tab_reports: Reports
       tab_settings: Settings
@@ -2041,6 +2049,7 @@ en-GB:
   allow_multiple_attempts_e67a0a37: "Allow multiple attempts"
   allow_opt_out_of_inbox: "Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences."
   allow_outcome_extra_credit_57c1e84e: "Allow outcome extra credit"
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: "Allow pages to be deleted in bulk"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Allow passive acceptance of Terms of Service"
   allow_postable_submission_comments_a301b742: "Allow Postable Submission Comments"
   allow_reorder_dashboard_cards_78215947: "Allow Reorder Dashboard Cards"
@@ -2063,6 +2072,7 @@ en-GB:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Allows a user to access the ‘Act as user’ link on student context cards"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Allows a user to view the SIS ID in a user’s login details."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Allows a user to view user SIS IDs in a course People page."
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: "Allows Account-level mastery scales and proficiency calculations, replacing per-outcome scales"
   allows_admin_user_to_view_account_statistics_341f00d9: "Allows admin user to view account statistics."
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Allows admins to view a log containing information about all recently run
@@ -4981,6 +4991,7 @@ en-GB:
   click_here_to_tell_us_what_happened_5d773d1d: "click here to tell us what happened"
   click_here_to_view_ec8cb2fd: "Click here to view"
   click_here_to_view_the_submission_24777a69: "Click here to view the submission"
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: "Click here to visit your assignment and get it in on time!"
   click_ok_to_continue_deleting_this_role_baa9d9e2: "Click \"ok\" to continue deleting this role."
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Click on a snapshot to revert back to your trial as it was when the snapshot was taken. Note: You will lose any work you have done since the snapshot was taken and it cannot be undone!"
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Click on the account navigation button to access notification preferences."
@@ -7892,6 +7903,7 @@ en-GB:
   delete_grading_scheme_6b308832: "Delete grading scheme"
   delete_grading_scheme_title_215f0a40: "Delete Grading Scheme %{title}"
   delete_group_86c381ec: "Delete group"
+  delete_in_progress_2d3f0e0d: "Delete in progress"
   delete_key_developername_be80e695: "Delete key %{developerName}"
   delete_key_name_c2de8c0c: "Delete key %{name}"
   delete_my_account_41060aad: "Delete My Account"
@@ -7911,6 +7923,7 @@ en-GB:
   delete_section_name_a48d9d79: "Delete Section \"%{name}\""
   delete_selected_a023ccf8: "Delete Selected"
   delete_selected_announcements_69e23710: "Delete selected announcements"
+  delete_selected_pages_7bc50580: "Delete selected pages"
   delete_survey_56fddbbd: "Delete survey"
   delete_term_name_f707abc9: "Delete term %{name}"
   delete_theme_918a7f24: "Delete Theme?"
@@ -9676,6 +9689,7 @@ en-GB:
   failed_to_delete_discussion_title_986df717: "Failed to delete discussion %{title}"
   failed_to_delete_external_feed_36f19d70: "Failed to delete external feed"
   failed_to_delete_role_label_27959de3: "Failed to delete role %{label}"
+  failed_to_delete_selected_pages_26fa87db: "Failed to delete selected pages"
   failed_to_export_some_tool_settings_c992fc56: "Failed to export some tool settings"
   failed_to_import_media_objects_4c1fcb4f: "Failed to import media objects"
   failed_to_laod_more_submissions_990aacee: "Failed to load more submissions"
@@ -9692,6 +9706,7 @@ en-GB:
   failed_to_save_please_try_again_later_bb7070fb: "Failed to save, please try again later"
   failed_to_submit_draft_comment_1de83451: "Failed to submit draft comment"
   failed_to_unpin_discussion_503eab82: "Failed to unpin discussion"
+  failed_to_update_account_notification_settings_194c1cd4: "Failed to update account notification settings"
   failed_to_update_course_notification_settings_cbf0eb18: "Failed to update course notification settings"
   failed_to_update_discussion_23cc229a: "Failed to update discussion"
   failed_to_update_permission_33c493f: "Failed to update permission"
@@ -12823,6 +12838,7 @@ en-GB:
   loading_courses_started_6e6d742c: "Loading courses started"
   loading_data_ecd89ba: "Loading Data…"
   loading_discussions_8ed5fcd7: "Loading discussions"
+  loading_external_tool_d839042c: "Loading External Tool"
   loading_f99d93d4: "...Loading"
   loading_features_d26820f6: "Loading features"
   loading_folders_d8b5869e: "Loading folders"
@@ -13125,6 +13141,7 @@ en-GB:
   master_lock_590266b6: "Master lock"
   mastered_34d4c857: Mastered
   mastery_7ec348b5: Mastery
+  mastery_connect_64598f55: "Mastery Connect"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Mastery: %{n_mastery_points_precision_2_str} Points"
   mastery_path_processing_f4471152: "Mastery path processing"
   mastery_paths_breakdown_6e0b5fce: "Mastery paths breakdown"
@@ -13133,6 +13150,7 @@ en-GB:
   mastery_paths_editor_930655bb: "Mastery Paths Editor"
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Mastery paths selection has been temporarily disabled for maintenance."
   mastery_points_f1672cc: "mastery points"
+  mastery_scale_abbc3557: "Mastery Scale"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Mastery score reflects highest score of a graded assignment or quiz."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Mastery score reflects the most recent graded assigment or quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Mastery score reflects the most recent graded assignment or quiz."
@@ -15688,6 +15706,7 @@ en-GB:
   next_mastery_path_is_currently_processing_f044d7d8: "Next mastery path is currently processing"
   next_mastery_path_is_still_processing_please_perio_bb0121af: "Next mastery path is still processing, please periodically refresh the page"
   next_message_780bcf24: "Next message"
+  next_module_item_19e835f3: "Next Module Item"
   next_module_item_9bb8a222: "Next module/item"
   next_month_749b1778: "Next month"
   next_month_b55a387c: "Next month"
@@ -16058,6 +16077,7 @@ en-GB:
       submission_graded: "Submission graded"
       submission_needs_grading: "Submission needs grading"
       summaries: Summaries
+      upcoming_assignment_alert: "Upcoming Assignment Alert"
       updated_wiki_page: "Updated page"
       web_conference_invitation: "Web conference invitation"
       web_conference_recording_ready: "Web conference recording ready"
@@ -16118,7 +16138,7 @@ en-GB:
       other: Other
       parent: "Parent emails"
       scheduling: Scheduling
-  notification_preferences_cf47083d: "Notification Preferences"
+  notification_preferences_cf47083d: "Notification preferences"
   notifications_cbfa7704: Notifications
   notifications_off_80da021c: "Notifications off"
   notifications_search_results_80a0b06f: "Notifications Search Results"
@@ -16622,6 +16642,7 @@ en-GB:
   package_error: "Error identifying package type: %{error}"
   package_export_from_d6e2b073: "Package export from"
   page_50c4823d: Page
+  page_bulk_deleting_74860a80: "Page Bulk Deleting"
   page_comment: 
     default_user_name: Anonymous
   page_comments: 
@@ -17454,6 +17475,7 @@ en-GB:
   previous_export_c6a997f7: "Previous export"
   previous_message_8804f87e: "Previous message"
   previous_module_item_2bb5e499: "Previous module/item"
+  previous_module_item_a9e57348: "Previous Module Item"
   previous_month_7adf1380: "Previous month"
   previous_month_bb1e3c84: "Previous month"
   previous_page_928fc112: "Previous page"
@@ -19470,6 +19492,7 @@ en-GB:
   ratings_2433172b: Ratings
   ratio_answered_correctly_b0c1e7d: "%{ratio}% answered correctly"
   ratio_responded_correctly_6d890107: "%{ratio}% responded correctly"
+  raw_html_editor_e3993e41: "Raw HTML Editor"
   rce_auto_save_f004fba9: "RCE Auto-Save"
   rce_contents_replace_description: "Enable RCE full text replace from LTIs"
   rce_contents_replace_display_name: "RCE Contents Replace"
@@ -20500,6 +20523,7 @@ en-GB:
   select_one_8e0af564: "Select one"
   select_one_b647b384: "Select one"
   select_one_of_the_options_c8b0c6e4: "Select one of the following options:"
+  select_page_e93fc123: "Select page"
   select_prerequisite_module_57894963: "Select pre-requisite module"
   select_prerequite_module_e9042bb0: "Select pre-requisite module"
   select_rubric_2aa2ffa2: "Select rubric"
@@ -20515,6 +20539,7 @@ en-GB:
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Select the files you want to associate with this *module*, or add files by selecting \"New File(s)\"."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Select the page you want to associate, or add a new page by selecting \"New Page\"."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Select the page you want to associate with this *module*, or add a new page by selecting \"New Page\"."
+  select_title_for_deletion_45b08247: "Select %{title} for deletion"
   select_type_of_prerequisite_8d6fa902: "Select type of pre-requisite"
   select_video_file_35b61d4e: "Select Video File"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Select what you'd like to display on the home page."
@@ -20530,6 +20555,7 @@ en-GB:
   selected_filename_7552a8c0: "selected %{filename}"
   selected_grade_942f40ba: "Selected grade"
   selected_item_35bed33a: "selected item"
+  selected_pages_have_been_deleted_82a7f965: "Selected pages have been deleted"
   selected_subtree_a7693937: "Selected %{subtree}"
   selection_end_date_10fcc8c6: "Selection end date"
   selection_height_9d57ec24: "Selection Height"
@@ -23853,6 +23879,7 @@ en-GB:
   unused_courses_title: "Unused courses"
   unvailable_c8756542: Unvailable
   up_c553575d: Up
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "Upcoming Due Date - %{assignment_name}, %{course_name}"
   update_374eb54: update
   update_4d8ee62: Update
   update_and_view_sections_course_details_navigation_dd10b45e: |-
@@ -24912,6 +24939,9 @@ en-GB:
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
     one: "You are about to delete 1 discussion. Are you sure?"
     other: "You are about to delete %{count} discussions. Are you sure?"
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
+    one: "You are about to delete 1 page. Are you sure?"
+    other: "You are about to delete %{count} pages. Are you sure?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       You are about to lose any changes that you have not yet applied to your account.
       
@@ -25138,6 +25168,8 @@ en-GB:
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "You will not receive any %{contextType} notifications at this time. To enable %{contextType} notifications, use the toggle above."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "You will not receive any course notifications at this time. To enable course notifications, use the toggle above."
   your_answer_8dad6ea4: "Your answer:"
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Your assignment %{assignment_name} is due on %{due_at}."
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Your assignment %{assignment_name} is due on %{due_at}. Click the following link to visit your assignment and get it in on time:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Your Assignment list can now be found on the *Calendar* page."
   your_assignments_list_has_improved_3eded80e: "Your *Assignments* list has improved!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Your Assignments will show here listed by due date."

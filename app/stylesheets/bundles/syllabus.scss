@@ -26,8 +26,26 @@
     text-align: direction(left);
     @include fontSize(14px);
   }
-  tr.date {
+  tr.detail_list {
 
+    td.dates {
+      white-space: nowrap;
+      padding-#{direction(right)}: 7px;
+
+      text-align: direction(right);
+    }
+    td {
+      padding-top: 15px;
+      padding-bottom: 15px;
+    }
+    td.not_last {
+      border-bottom: 1px solid $ic-border-light;
+    }
+    &.related_event {
+      background-color: $ic-bg-light-primary;
+    }
+  }
+  tr.date {
     &.date_passed {
       > td, > th {
         background-color: $ic-color-medium-light;
@@ -47,22 +65,7 @@
         width: 1rem;  // size of the contained icon.
       }
     }
-    table.detail_list {
-      width: 100%;
-
-      td.dates {
-        white-space: nowrap;
-        padding-#{direction(right)}: 7px;
-        text-align: direction(right);
-      }
-
-      td.not_last {
-        border-bottom: 1px solid $ic-border-light;
-      }
-      tr.related_event {
-        background-color: $ic-bg-light-primary;
-      }
-    }
+    
     &.date_passed {
       td, th {
         background-color: $ic-color-medium-light;
@@ -88,15 +91,6 @@
   > i {
     padding-#{direction(right)}: $ic-sp/2;
   }
-}
-#toggle_special_dates_in_syllabus {
-  &.hidden span.hide {
-    display: none;
-  }
-  &.shown span.show {
-    display: none;
-  }
-  float: direction(right);
 }
 
 #syllabus_links {

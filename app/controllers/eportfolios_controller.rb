@@ -111,8 +111,7 @@ class EportfoliosController < ApplicationController
   def update
     update_params = if @portfolio.grants_right?(@current_user, session, :update)
       eportfolio_params
-    elsif @portfolio.user.account&.feature_enabled?(:eportfolio_moderation) &&
-      @portfolio.grants_right?(@current_user, :moderate)
+    elsif @portfolio.grants_right?(@current_user, :moderate)
       eportfolio_moderation_params
     end
 

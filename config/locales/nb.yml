@@ -405,6 +405,7 @@ nb:
   account_id_2c3b4f15: konto-ID
   account_id_73966078: account_id
   account_id_f6e26867: Konto-ID
+  account_level_mastery_scales_a5bdff29: "Mestringsskalaer på gruppenivå"
   account_level_notification_preferences_require_an__66467cd7: "Varselpreferanser for kontonivå krever en account_id for å kunne oppdateres."
   account_level_notification_preferences_ui_update_f5e189a4: "Varselpreferanser for kontonivå brukergrensesnittoppdatering"
   account_level_settings_manage_4fca6f8e: "Kontonivå innstillinger - administrer"
@@ -417,6 +418,9 @@ nb:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Kontovarsel sluttid går forut med starttiden"
+  account_notification_settings_error_page_66c0bc61: "Feilside for kontovarslingsinnstillinger"
+  account_notification_settings_initial_query_error_f55e1cbf: "Innledende spørringsfeil for kontovarslingsinnstillinger"
+  account_notification_settings_updated_dbabec35: "Kontovarslingsinnstillinger oppdatert"
   account_notifications: 
     announcement_created_notice: "Kunngjøringen ble opprettet"
     announcement_creation_failed_notice: "Opprettelse av kunngjøring mislyktes"
@@ -1286,6 +1290,7 @@ nb:
         report_last_run: "Siste kjøring"
         report_name: Navn
       headings: 
+        privacy: Personvern
         quotas: Kontokvoter
         sections: Rapporter
         settings: Kontoinnstillinger
@@ -1316,6 +1321,8 @@ nb:
         enable_alerts: "Varsler (beta)"
         enable_course_catalog: "Vis søkbar liste over emner i denne rot-kontoen med \"Inkluder dette emnet i den offentlige emneoversikten\" flagget aktivert."
         enable_eportfolios: ePortfolioer
+        enable_fullstory: "Tillat sporing med FullStory"
+        enable_google_analytics: "Tillat sporing med Google Analytics"
         enable_profiles: "Slå på profiler"
         enable_turnitin: Turnitin
         enable_user_notes: Lærerprotokoll
@@ -1411,7 +1418,7 @@ nb:
       open_report_description: "Åpne Rapport Beskrivelse"
       page_header_title: Kontoinnstillinger
       page_title: "Delt innhold"
-      quiz_ip_filters_delete: "Fjern Filter"
+      quiz_ip_filters_delete: "Fjern Test-IP-filter"
       quiz_ip_filters_help_message: |-
           IP-filtere for tester er en måte å begrense tilgang til tester på datamaskiner i et visst IP-område.
           
@@ -1444,6 +1451,7 @@ nb:
       tab_announcements: Kunngjøringer
       tab_external_tools: Apper
       tab_notifications: Varslinger
+      tab_privacy: Personvern
       tab_quotas: Kvoter
       tab_reports: Rapporter
       tab_settings: Innstillinger
@@ -2038,6 +2046,7 @@ nb:
   allow_multiple_attempts_e67a0a37: "Tillat flere forsøk"
   allow_opt_out_of_inbox: "Tillat brukere å velge bort Innboksen for samtaler. Dette vil gjøre at alle samtalemeldinger og varslinger blir sendt som ASAP-varslinger til brukers hoved e-post, skjule skiltet uleste meldinger i innboksen for samtaler og skjule preferansene for samtalevarslinger."
   allow_outcome_extra_credit_57c1e84e: "Tillat ekstra kreditt for resultater"
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: "Tillat sider å bli slettet gruppevis"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Tillat passiv aksept av bruksvilkår"
   allow_postable_submission_comments_a301b742: "Tillat posterbare innleveringskommentarer"
   allow_reorder_dashboard_cards_78215947: "Tillat ny bestilling av kort til dashbordet"
@@ -2060,6 +2069,7 @@ nb:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Lar en bruker bruke Opptre som bruker-lenken på studentenes kontekstkort"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Lar en bruker vise SIS-ID-en i en brukers innloggingsdetaljer."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Lar en bruker vise brukeres SIS-ID-er på et emnes Folk-side."
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: "Tillater mestringsskalaer og ferdighetsberegninger på gruppenivå, og erstatter skalaer per læringsmål"
   allows_admin_user_to_view_account_statistics_341f00d9: "Lar en admin-bruker vise kontostatistikk."
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Lar administratorer se en logg som inneholder informasjon om alle nylige utførelser av
@@ -4965,6 +4975,7 @@ nb:
   click_here_to_see_the_file_79e2b366: "Klikk her for å se filen."
   click_here_to_view_ec8cb2fd: "klikk her for å se"
   click_here_to_view_the_submission_24777a69: "Klikk her for å vise innleveringen"
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: "Klikk her for å besøke oppgaven din og levere den i tide!"
   click_ok_to_continue_deleting_this_role_baa9d9e2: "Klikk «OK» for å fortsette å slette denne rollen."
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klikk på et øyeblikksbilde for å gå tilbake til prøveperioden slik den var da bildet ble tatt. Merk: Denne handlingen kan ikke angres, og du vil miste alt arbeid du har gjort siden bildet ble tatt."
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Klikk på kontonavigering-knappen for å få tilgang til varslingsinnstillinger."
@@ -7875,6 +7886,7 @@ nb:
   delete_grading_scheme_6b308832: "Slett vurderingsskala"
   delete_grading_scheme_title_215f0a40: "Slett vurderingsskala %{title}"
   delete_group_86c381ec: "Slett gruppe"
+  delete_in_progress_2d3f0e0d: "Sletting pågår"
   delete_key_developername_be80e695: "Slett nøkkel %{developerName}"
   delete_key_name_c2de8c0c: "Slett nøkkel %{name}"
   delete_my_account_41060aad: "Slett kontoen min"
@@ -7894,6 +7906,7 @@ nb:
   delete_section_name_a48d9d79: "Slett seksjonen \"%{name}\""
   delete_selected_a023ccf8: "Slett valgt"
   delete_selected_announcements_69e23710: "Slett valgte kunngjøringer"
+  delete_selected_pages_7bc50580: "Sletting av valgte sider"
   delete_survey_56fddbbd: "Slett undersøkelse"
   delete_term_name_f707abc9: "Slett semester %{name}"
   delete_theme_918a7f24: "Slette tema?"
@@ -9659,6 +9672,7 @@ nb:
   failed_to_delete_discussion_title_986df717: "Kunne ikke slette diskusjon %{title}"
   failed_to_delete_external_feed_36f19d70: "Kunne ikke slette ekstern informasjonsstrøm"
   failed_to_delete_role_label_27959de3: "Mislyktes i å slette rolle %{label}"
+  failed_to_delete_selected_pages_26fa87db: "Sletting av valgte sider mislyktes"
   failed_to_export_some_tool_settings_c992fc56: "Klarte ikke å eksportere noen verktøyinnstillinger"
   failed_to_import_media_objects_4c1fcb4f: "Feil ved import av medieobjekter"
   failed_to_laod_more_submissions_990aacee: "Kunne ikke laste opp flere innleveringer"
@@ -9680,6 +9694,7 @@ nb:
       
       
       Kunne ikke fjerne festet status for diskusjon
+  failed_to_update_account_notification_settings_194c1cd4: "Oppdatering av kontovarslingsinnstillinger mislyktes"
   failed_to_update_course_notification_settings_cbf0eb18: "Kunne ikke oppdatere innstillinger for emnevarsler"
   failed_to_update_discussion_23cc229a: "Kunne ikke oppdatere diskusjon"
   failed_to_update_permission_33c493f: "Mislyktes i å oppdatere tillatelser"
@@ -12788,6 +12803,7 @@ nb:
   loading_courses_started_6e6d742c: "Innlasting av emner påbegynt"
   loading_data_ecd89ba: "Laster data..."
   loading_discussions_8ed5fcd7: "Laster diskusjoner"
+  loading_external_tool_d839042c: "Laster inn eksternt verktøy"
   loading_f99d93d4: "...Laster"
   loading_features_d26820f6: "Laster funksjoner"
   loading_folders_d8b5869e: "Laster mapper"
@@ -13090,6 +13106,7 @@ nb:
   master_lock_590266b6: "Hoved lås"
   mastered_34d4c857: Mestret
   mastery_7ec348b5: Mestring
+  mastery_connect_64598f55: "Mastery Connect"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Mastery: %{n_mastery_points_precision_2_str} Poeng"
   mastery_path_processing_f4471152: Mestringsveibehandling
   mastery_paths_breakdown_6e0b5fce: "Læringsstier Sammendrag"
@@ -13098,6 +13115,7 @@ nb:
   mastery_paths_editor_930655bb: "Rediger mestringsveier"
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Læringsstiervalg har blitt midlertidig valgt for vedlikehold."
   mastery_points_f1672cc: mestringspoeng
+  mastery_scale_abbc3557: Mestringsskala
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Ekspertiseresultat reflekterer den høyeste poengsum i den karaktersatte oppgaven eller testen."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Poengsum for mestring reflekterer den siste vurderte oppgave eller quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Ekspertiseresultat reflekterer den siste karaktersatte oppgaven eller testen."
@@ -15647,6 +15665,7 @@ nb:
   next_mastery_path_is_currently_processing_f044d7d8: "Neste mestringsvei behandler for øyeblikket"
   next_mastery_path_is_still_processing_please_perio_bb0121af: "Neste mestringsvei behandles ennå, oppdater siden med gjevne mellomrom"
   next_message_780bcf24: "Neste melding"
+  next_module_item_19e835f3: "Neste modulelement"
   next_module_item_9bb8a222: "Neste modul/element"
   next_month_749b1778: "Neste måned"
   next_month_b55a387c: "Neste måned"
@@ -16017,6 +16036,7 @@ nb:
       submission_graded: "Innleveringen er rettet"
       submission_needs_grading: "Innleveringen trenger karaktersetting"
       summaries: Sammendrag
+      upcoming_assignment_alert: "Kommende oppgavevarsel"
       updated_wiki_page: "Oppdatert side"
       web_conference_invitation: "Invitasjon til nettkonferanse"
       web_conference_recording_ready: "Konferanseopptak klart"
@@ -16575,6 +16595,7 @@ nb:
   package_error: "Avvik ved identifisering av pakketype: %{error}"
   package_export_from_d6e2b073: "Eksport av pakke fra"
   page_50c4823d: Side
+  page_bulk_deleting_74860a80: "Gruppevis sletting av sider"
   page_comment: 
     default_user_name: Anonym
   page_comments: 
@@ -17406,6 +17427,7 @@ nb:
   previous_export_c6a997f7: "Forrige eksport"
   previous_message_8804f87e: "Forrige melding"
   previous_module_item_2bb5e499: "Forrige modul/element"
+  previous_module_item_a9e57348: "Forrige modulelement"
   previous_month_7adf1380: "Forrige måned"
   previous_month_bb1e3c84: "Forrige måned"
   previous_page_928fc112: "Forrige side"
@@ -19418,6 +19440,7 @@ nb:
   ratings_2433172b: Vurderinger
   ratio_answered_correctly_b0c1e7d: "%{ratio}% svart riktig"
   ratio_responded_correctly_6d890107: "%{ratio}% responderte riktig"
+  raw_html_editor_e3993e41: "Rå HTML-redigerer"
   rce_auto_save_f004fba9: "RCE autolagring"
   rce_contents_replace_description: "Aktivere RCE erstatte all tekst fra LTIer"
   rce_contents_replace_display_name: "Rik teksteditor erstatte innhold"
@@ -20447,6 +20470,7 @@ nb:
   select_one_8e0af564: "Velg én"
   select_one_b647b384: "Velg en"
   select_one_of_the_options_c8b0c6e4: "Velg ett av alternativene:"
+  select_page_e93fc123: "Velg side"
   select_prerequisite_module_57894963: "Velg forutsetningmodul"
   select_prerequite_module_e9042bb0: "Velg forutsetningmodul"
   select_rubric_2aa2ffa2: "Velg rubrikk"
@@ -20462,6 +20486,7 @@ nb:
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Velg filen du ønsker å assosiere med denne *modulen*, eller legg til flere filer ved å velge \"Ny(e) fil(er)\"."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Velg siden du vil tilknytte, eller legg til en ny side ved å velge \"Ny side\"."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Velg siden du vil tilknytte denne *modulen*, eller legg til en ny side ved å velge \"Ny side\"."
+  select_title_for_deletion_45b08247: "Velg %{title} for sletting"
   select_type_of_prerequisite_8d6fa902: "Velg type forutsetning"
   select_video_file_35b61d4e: "Velg videofil"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Velg det du vil vise på hjemmesiden."
@@ -20477,6 +20502,7 @@ nb:
   selected_filename_7552a8c0: "valgt %{filename}"
   selected_grade_942f40ba: "Valgt karakter"
   selected_item_35bed33a: "valgt element"
+  selected_pages_have_been_deleted_82a7f965: "Valgte sider ble slettet"
   selected_subtree_a7693937: "Valgt %{subtree}"
   selection_end_date_10fcc8c6: "Velg sluttdato"
   selection_height_9d57ec24: Høydeutvalg
@@ -23795,6 +23821,7 @@ nb:
   untitled_assignment_59354b34: "Uten tittel oppgave"
   unused_courses_title: "Ikke benyttede emner"
   up_c553575d: Opp
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "Kommende forfallsdato - %{assignment_name}, %{course_name}"
   update_374eb54: oppdater
   update_4d8ee62: Oppdater
   update_and_view_sections_course_details_navigation_dd10b45e: "Oppdater og vis seksjoner, emnedetaljer, navigasjon, funksjonsvalg og eksterne appintegrasjoner, kun synlig for instruktører."
@@ -24846,6 +24873,9 @@ nb:
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
     one: "Du er i ferd med å slette 1 diskusjon. Er du sikker?"
     other: "Du er i ferd med å slette %{count} diskusjoner. Er du sikker?"
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
+    one: "Du er i ferd med å slette én side. Er du sikker?"
+    other: "Du er i ferd med å slette %{count} sider. Er du sikker?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Du er i ferd med å miste eventuelle endringer som du ennå ikke har søkt til din konto.
       
@@ -25066,6 +25096,8 @@ nb:
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "Du vil ikke lenger motta %{contextType} varsler. For å aktivere %{contextType} varsler, benytt vekselbryteren ovenfor."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Du vil ikke lenger motta emnevarsler. For å aktivere emnevarsler, benytt vekselbryteren ovenfor."
   your_answer_8dad6ea4: "Ditt svar:"
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Oppgaven din %{assignment_name} forfaller den %{due_at}."
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Oppgaven din %{assignment_name} forfaller den %{due_at}. Klikk på følgende lenke for å besøke oppgaven din og levere den i tide:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din Oppgavelisten kan nå bli funnet på *Kalender* side."
   your_assignments_list_has_improved_3eded80e: "*Oppdrag* lista ditt har blitt forbedret"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Dine Oppdrag vil vise her listet etter forfallsdato."

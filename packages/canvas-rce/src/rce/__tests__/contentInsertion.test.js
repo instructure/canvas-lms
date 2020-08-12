@@ -214,6 +214,16 @@ describe('contentInsertion', () => {
       contentInsertion.insertLink(editor, link)
       expect(editor.content.match(link.embed.id)).toBeTruthy()
     })
+
+    it('encodes html entities once', () => {
+      link.href = 'http://www.google.com'
+      link.title = 'PB&J'
+      link.text = '3 < 4'
+      contentInsertion.insertLink(editor, link)
+      expect(editor.content).toEqual(
+        '<a href="http://www.google.com" title="PB&amp;J">3 &lt; 4</a>'
+      )
+    })
   })
 
   describe('insertContent', () => {

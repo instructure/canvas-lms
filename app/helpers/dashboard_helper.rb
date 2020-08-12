@@ -20,7 +20,6 @@ module DashboardHelper
   def user_dashboard_view
     dashboard_view = @current_user&.dashboard_view
     dashboard_view = 'activity' if @current_user&.preferences&.dig(:recent_activity_dashboard) && !@current_user.preferences[:dashboard_view]
-    dashboard_view = 'cards' if dashboard_view == 'planner' && !@current_user.account.feature_enabled?(:student_planner)
     dashboard_view
   end
 

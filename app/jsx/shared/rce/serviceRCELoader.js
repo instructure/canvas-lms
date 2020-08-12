@@ -40,6 +40,10 @@ function getTrayProps() {
     contextType = 'user'
   } else {
     ;[contextType, contextId] = splitAssetString(ENV.context_asset_string, false)
+    if (contextType === 'account') {
+      contextType = 'user'
+      contextId = userId
+    }
   }
 
   return {

@@ -168,21 +168,37 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     it 'should populate the root_account_id on AssignmentOverride' do
       assignment_model(course: @course)
       @course.enroll_student(@user)
-      create_adhoc_override_for_assignment(@assignment, @user)
-      @override.update_columns(root_account_id: nil)
-      expect(@override.attributes["root_account_id"]).to be nil
+      override1 = create_adhoc_override_for_assignment(@assignment, @user)
+      override1.update_columns(root_account_id: nil)
+      expect(override1.attributes["root_account_id"]).to be nil
+
+      quiz_model(course: @course)
+      override2 = create_adhoc_override_for_assignment(@quiz, @user)
+      override2.update_columns(root_account_id: nil)
+      expect(override2.attributes["root_account_id"]).to be nil
+
       DataFixup::PopulateRootAccountIdOnModels.run
-      expect(@override.reload.root_account_id).to eq @course.root_account_id
+      expect(override1.reload.attributes["root_account_id"]).to eq @course.root_account_id
+      expect(override2.reload.attributes["root_account_id"]).to eq @course.root_account_id
     end
 
     it 'should populate the root_account_id on AssignmentOverrideStudent' do
-      assignment_model(course: @course)
       @course.enroll_student(@user)
+      assignment_model(course: @course)
       create_adhoc_override_for_assignment(@assignment, @user)
       @override_student.update_columns(root_account_id: nil)
-      expect(@override_student.root_account_id).to be nil
+      os1 = @override_student
+      expect(os1.root_account_id).to be nil
+
+      quiz_model(course: @course)
+      create_adhoc_override_for_assignment(@quiz, @user)
+      @override_student.update_columns(root_account_id: nil)
+      os2 = @override_student
+      expect(os2.root_account_id).to be nil
+
       DataFixup::PopulateRootAccountIdOnModels.run
-      expect(@override_student.reload.root_account_id).to eq @course.root_account_id
+      expect(os1.reload.root_account_id).to eq @course.root_account_id
+      expect(os2.reload.root_account_id).to eq @course.root_account_id
     end
 
     context 'with AttachmentAssociation with a non-ConversationMessage context' do
@@ -859,6 +875,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    context 'with Role' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:record) { Role.create!(name: 'Hi', account: reference_record, base_role_type: 'StudentEnrollment') }
+        let(:reference_record) { account_model }
+      end
+    end
+
     context 'with Score' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { reference_record.scores.create! }
@@ -1019,7 +1042,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
   describe '#run' do
     it 'should create delayed jobs to backfill root_account_ids for the table' do
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:send_later_if_production_enqueue_args)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:send_later_if_production_enqueue_args).at_least(:once)
       DataFixup::PopulateRootAccountIdOnModels.run
     end
 
@@ -1027,7 +1050,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       ContextModule.delete_all
       LearningOutcome.create!(context: @course, short_description: "test")
       LearningOutcome.update_all(root_account_ids: nil)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override).at_least(:once)
       expect(DataFixup::PopulateRootAccountIdOnModels).not_to receive(:populate_root_account_ids)
       DataFixup::PopulateRootAccountIdOnModels.run
     end
@@ -1036,8 +1059,8 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       ContextModule.delete_all
       AssetUserAccess.create!(context: @user, asset_code: @course.asset_string)
       AssetUserAccess.update_all(root_account_id: nil)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids).at_least(:once)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override).at_least(:once)
       DataFixup::PopulateRootAccountIdOnModels.run
     end
   end

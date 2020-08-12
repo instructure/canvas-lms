@@ -29,54 +29,16 @@ module ConditionalRelease
           return unless assignment_ids.any?
         end
 
-        if ConditionalRelease::Service.natively_enabled_for_account?(course.root_account)
-          # just pretend like we started an export even if we're not actually hitting a service anymore
-          return {:native => true, :course => course, :assignment_ids => assignment_ids}
-        end
-
-        data = nil
-        if opts[:selective]
-          data = {:export_settings => {:selective => '1', :exported_assignment_ids => assignment_ids}}.to_param
-        end
-        response = CanvasHttp.post(ConditionalRelease::Service.content_exports_url, headers_for(course), form_data: data)
-        if response.code =~ /^2/
-          json = JSON.parse(response.body)
-          {:export_id => json['id'], :course => course}
-        else
-          raise "Error queueing export for Conditional Release: #{response.body}"
-        end
+        # just pretend like we started an export even if we're not actually hitting a service anymore
+        return {:native => true, :course => course, :assignment_ids => assignment_ids}
       end
 
       def export_completed?(export_data)
-        return true if export_data[:native]
-        response = CanvasHttp.get("#{ConditionalRelease::Service.content_exports_url}/#{export_data[:export_id]}", headers_for(export_data[:course]))
-        if response.code =~ /^2/
-          json = JSON.parse(response.body)
-          case json['state']
-          when 'completed'
-            true
-          when 'failed'
-            raise "Content Export for Conditional Release failed"
-          else
-            false
-          end
-        else
-          raise "Error retrieving export state for Conditional Release: #{response.body}"
-        end
+        export_data[:native]
       end
 
       def retrieve_export(export_data)
-        return generate_native_export(export_data[:course], export_data[:assignment_ids]) if export_data[:native]
-
-        response = CanvasHttp.get("#{ConditionalRelease::Service.content_exports_url}/#{export_data[:export_id]}/download", headers_for(export_data[:course]))
-        if response.code =~ /^2/
-          json = JSON.parse(response.body)
-          unless json.values.all?(&:empty?) # don't bother saving if there's nothing to import
-            return json
-          end
-        else
-          raise "Error retrieving export for Conditional Release: #{response.body}"
-        end
+        generate_native_export(export_data[:course], export_data[:assignment_ids])
       end
 
       def generate_native_export(course, assignment_ids)
@@ -108,35 +70,6 @@ module ConditionalRelease
       end
 
       def send_imported_content(course, _cm, imported_content)
-        if ConditionalRelease::Service.natively_enabled_for_account?(course.root_account)
-          return import_content_natively(course, imported_content)
-        end
-        if imported_content['native']
-          # translate to old format
-          imported_content['rules'].each do |rule_hash|
-            rule_hash['trigger_assignment'] = rule_hash.delete('trigger_assignment_id')
-            rule_hash['scoring_ranges'].each do |range_hash|
-              range_hash['assignment_sets'].each do |set_hash|
-                set_hash['assignments'] = set_hash.delete('assignment_set_associations')
-              end
-            end
-          end
-        end
-        send_imported_content_to_service(course, imported_content)
-      end
-
-      def send_imported_content_to_service(course, imported_content)
-        data = {:file => StringIO.new(imported_content.to_json)}
-        response = CanvasHttp.post(ConditionalRelease::Service.content_imports_url, headers_for(course), form_data: data, multipart: true)
-        if response.code =~ /^2/
-          json = JSON.parse(response.body)
-          {:import_id => json['id'], :course => course}
-        else
-          raise "Error sending import for Conditional Release: #{response.body}"
-        end
-      end
-
-      def import_content_natively(course, imported_content)
         all_successful = true
         is_native = imported_content['native']
         imported_content['rules']&.each do |rule_hash|
@@ -180,35 +113,7 @@ module ConditionalRelease
       end
 
       def import_completed?(import_data)
-        return true if import_data[:native]
-        response = CanvasHttp.get("#{ConditionalRelease::Service.content_imports_url}/#{import_data[:import_id]}", headers_for(import_data[:course]))
-        if response.code =~ /^2/
-          json = JSON.parse(response.body)
-          case json['state']
-          when 'completed'
-            true
-          when 'failed'
-            raise "Content Import for Conditional Release failed"
-          else
-            false
-          end
-        else
-          raise "Error retrieving import state for Conditional Release: #{response.body}"
-        end
-      end
-
-      protected
-
-      def headers_for(course)
-        token = Canvas::Security::ServicesJwt.generate({
-          sub: 'MIGRATION_SERVICE',
-          role: 'admin',
-          account_id: Context.get_account(course).root_account.lti_guid.to_s,
-          context_type: 'Course',
-          context_id: course.id.to_s,
-          workflows: ['conditonal-release-api']
-        })
-        {"Authorization" => "Bearer #{token}"}
+        import_data[:native]
       end
     end
   end

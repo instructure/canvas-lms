@@ -117,6 +117,7 @@ export default function factory(spec) {
         const promise = this._load(key, url, params, {append})
         if (!promise) return
 
+        // eslint-disable-next-line promise/catch-or-return
         promise.then(() => {
           const nextUrl = getNextUrl(this.getStateFor(key))
           if (nextUrl) this._loadAll(key, nextUrl, {}, true)
@@ -131,6 +132,7 @@ export default function factory(spec) {
         this.previousLoadRequest = xhr
 
         return xhr.then(
+          // eslint-disable-next-line no-shadow
           (data, _textStatus, xhr) => {
             if (this.jsonKey) data = data[this.jsonKey]
             if (options.wrap) data = [data]

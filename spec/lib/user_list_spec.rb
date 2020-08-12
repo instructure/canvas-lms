@@ -40,8 +40,7 @@ describe UserList do
 
   it "should find by SMS number" do
     user_with_pseudonym(:name => "JT", :active_all => 1)
-    cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
-    cc.confirm!
+    communication_channel(@user, {username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true})
     ul = UserList.new '(801) 555-5555'
     expect(ul.addresses).to eq [{:address => '(801) 555-5555', :type => :sms, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
     expect(ul.errors).to eq []
@@ -142,12 +141,12 @@ describe UserList do
     user.pseudonyms.create!(:unique_id => "user3", :account => @account)
     user = User.create!(:name => 'user 4')
     user.pseudonyms.create!(:unique_id => "user4", :account => @account)
-    user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+    communication_channel(user, {username: 'jt@instructure.com', active_cc: true})
 
     ul = UserList.new 'JT@INSTRUCTURE.COM, USER3', :root_account => @account
     expect(ul.addresses.map{|x| [x[:name], x[:address], x[:type]]}).to eql([
-        ['user 4', 'jt@instructure.com', :email],
-        ['user 3', 'user3', :pseudonym]])
+      ['user 4', 'jt@instructure.com', :email],
+      ['user 3', 'user3', :pseudonym]])
     expect(ul.errors).to eq []
   end
 
@@ -202,7 +201,7 @@ describe UserList do
   it "pseudonyms should take precedence over emails" do
     @user1 = user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
     @user2 = user_with_pseudonym(:name => 'Bob', :username => 'jt2@instructure.com', :active_all => 1)
-    @user2.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+    communication_channel(@user2, {username: 'jt@instructure.com', active_cc: true})
     ul = UserList.new 'jt@instructure.com'
     expect(ul.addresses).to eq [{:type => :pseudonym, :address => 'jt@instructure.com', :user_id => @user1.id, :name => 'JT', :shard => Shard.default}]
     expect(ul.duplicate_addresses).to eq []
@@ -211,7 +210,7 @@ describe UserList do
   it "pseudonyms should take precedence over phone numbers" do
     @user1 = user_with_pseudonym(:name => 'JT', :username => '8015555555', :active_all => 1)
     @user2 = user_with_pseudonym(:name => 'Bob', :username => 'jt2@instructure.com', :active_all => 1)
-    @user2.communication_channels.create!(:path => '8015555555@tmomail.net', :path_type => 'sms') { |cc| cc.workflow_state = 'active' }
+    communication_channel(@user2, {username: '8015555555@tmomail.net', path_type: 'sms', active_cc: true})
     ul = UserList.new '8015555555'
     expect(ul.addresses).to eq [{:type => :pseudonym, :address => '8015555555', :user_id => @user1.id, :name => 'JT', :shard => Shard.default}]
     expect(ul.duplicate_addresses).to eq []
@@ -241,7 +240,7 @@ describe UserList do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
       @user1 = @user
       user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => 1)
-      @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'jt@instructure.com', active_cc: true})
       ul = UserList.new 'jt@instructure.com'
       expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user1.id, :name => 'JT', :shard => Shard.default}]
       expect(ul.errors).to eq []
@@ -250,9 +249,9 @@ describe UserList do
 
     it "should complain if multiple people have the CC" do
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => true)
-      @user.communication_channels.create!(:path => 'jt+2@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'jt+2@instructure.com', active_cc: true})
       user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => true)
-      @user.communication_channels.create!(:path => 'jt+2@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'jt+2@instructure.com', active_cc: true})
       ul = UserList.new 'jt+2@instructure.com'
       expect(ul.addresses).to eq []
       expect(ul.errors).to eq [{:address => 'jt+2@instructure.com', :type => :email, :details => :non_unique }]
@@ -262,7 +261,7 @@ describe UserList do
     it "should not think that multiple pseudonyms for the same user is multiple users" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
       @user.pseudonyms.create!(:unique_id => 'jt+2@instructure.com')
-      @user.communication_channels.create!(:path => 'jt+3@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'jt+3@instructure.com', active_cc: true})
       ul = UserList.new 'jt+3@instructure.com'
       expect(ul.addresses).to eq [{:address => 'jt+3@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
       expect(ul.errors).to eq []
@@ -271,8 +270,7 @@ describe UserList do
 
     it "should detect duplicates, even from different CCs" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
-      cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
-      cc.confirm
+      cc = communication_channel(@user, {username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true})
       ul = UserList.new 'jt@instructure.com, (801) 555-5555'
       expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
       expect(ul.errors).to eq []
@@ -281,10 +279,10 @@ describe UserList do
 
     it "should choose the active CC if there is 1 active and n unconfirmed" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
-      @user.communication_channels.create!(:path => 'jt+2@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'jt+2@instructure.com', active_cc: true})
       @user1 = @user
       user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => true)
-      @user.communication_channels.create!(:path => 'jt+2@instructure.com')
+      communication_channel(@user, {username: 'jt+2@instructure.com'})
       ul = UserList.new 'jt+2@instructure.com'
       expect(ul.addresses).to eq [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user1.id, :name => 'JT', :shard => Shard.default }]
       expect(ul.errors).to eq []
@@ -294,10 +292,10 @@ describe UserList do
     # create the CCs in reverse order to check the logic when we see them in a different order
     it "should choose the active CC if there is 1 active and n unconfirmed, try 2" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
-      @user.communication_channels.create!(:path => 'jt+2@instructure.com')
+      communication_channel(@user, {username: 'jt+2@instructure.com'})
       @user1 = @user
       user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => true)
-      @user.communication_channels.create!(:path => 'jt+2@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'jt+2@instructure.com', active_cc: true})
       ul = UserList.new 'jt+2@instructure.com'
       expect(ul.addresses).to eq [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT 1', :shard => Shard.default }]
       expect(ul.errors).to eq []
@@ -410,8 +408,7 @@ describe UserList do
     it "should not find a user from a different account by SMS" do
       account = Account.create!
       user_with_pseudonym(:name => "JT", :active_all => 1, :account => account)
-      cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
-      cc.confirm!
+      communication_channel(@user, {username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true})
       ul = UserList.new '(801) 555-5555'
       expect(ul.addresses).to eq []
       expect(ul.errors).to eq [{:address => '(801) 555-5555', :type => :sms, :details => :not_found}]
@@ -422,7 +419,7 @@ describe UserList do
   context "preferred selection" do
     it "should find an existing user if there is only one" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
-      @user.communication_channels.create!(:path => 'jt+2@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'jt+2@instructure.com', active_cc: true})
       ul = UserList.new 'jt+2@instructure.com', :search_method => :preferred
       expect(ul.addresses).to eq [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
       expect(ul.errors).to eq []
@@ -440,8 +437,8 @@ describe UserList do
     it "should create a new user if multiple matching users are found" do
       @user1 = user_with_pseudonym(:name => 'JT', :username => 'jt+1@instructure.com')
       @user2 = user_with_pseudonym(:name => 'JT', :username => 'jt+2@instructure.com')
-      @user1.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
-      @user2.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user1, {username: 'jt@instructure.com', active_cc: true})
+      communication_channel(@user2, {username: 'jt@instructure.com', active_cc: true})
       ul = UserList.new 'jt@instructure.com', :search_method => :preferred
       expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :email, :details => :non_unique}]
       expect(ul.errors).to eq []
@@ -479,7 +476,7 @@ describe UserList do
 
     it "should create new users even if a user already exists" do
       user_with_pseudonym(:name => 'JT', :username => 'jt+1@instructure.com', :active_all => 1)
-      @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'jt@instructure.com', active_cc: true})
       ul = UserList.new 'Bob <jt@instructure.com>'
       expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :email, :name => 'Bob'}]
       users = ul.users

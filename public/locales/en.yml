@@ -577,6 +577,7 @@ en:
   features:
     google_docs_domain_restriction: Google Docs Domain Restriction
     high_contrast: High Contrast UI
+    disable_alert_timeouts: Disable Alert Notification Timeouts
     hide_celebrations: Disable Celebration Animations
     learning_mastery_gradebook: Learning Mastery Gradebook
     student_outcome_gradebook: Student Learning Mastery Gradebook
@@ -597,6 +598,9 @@ en:
   high_contrast_description: |-
     High Contrast enhances the color contrast of the UI (text, buttons, etc.), making those items more
     distinct and easier to identify. Note: Institution branding will be disabled.
+  disable_alert_timeouts_description: |-
+    Enabling this feature gets rid of the timeout for alert notifications that pop up, giving the
+    user as much time as they need to read the notification over and dismiss it when they are finished.
   disable_celebrations_description: Enabling this feature hides all celebration animations.
   underline_links_e7cf9b4f: Underline Links
   underline_all_links_description: |-
@@ -675,8 +679,6 @@ en:
   enable_student_context_card_links_eba2f2c5: Enable student context card links
   new_user_tutorial_cdd3a446: New User Tutorial
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: Provide tutorial information for new users in a flyout tray.
-  to_do_list_dashboard_d741f64e: To Do List Dashboard
-  provides_users_with_a_to_do_list_dashboard_option_9334f9fa: Provides users with a To Do List Dashboard option.
   rubric_criterion_range_12499bf1: Rubric Criterion Range
   specify_max_and_min_points_to_clarify_boundaries_o_1c4d732a: Specify max and min points to clarify boundaries of a rubric criterion rating.
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: Encrypted Sourcedids for Basic Outcomes
@@ -747,8 +749,6 @@ en:
   includes_grade_values_in_the_admin_grade_reports_a28200da: Includes grade values in the admin grade reports.
   allow_postable_submission_comments_a301b742: Allow Postable Submission Comments
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: For manually posted assignments, the presence of a submission comment not by the submission's own user will allow posting the assignment. Previously, this would have required a grade before posting could occur.
-  eportfolio_moderation_feb0ffd3: ePortfolio Moderation
-  flags_new_eportfolio_content_matching_specific_key_a66af560: Flags new ePortfolio content matching specific keywords as possible spam, and allows administrators to either confirm flagged ePortfolios or mark them as safe.
   new_analytics_api_access_7eec1ead: New Analytics API Access
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: Enables new API endpoints for the course and user data provided by New Analytics.
   gradebook_export_sort_order_bugfix_tally_219_62bfaacb: Gradebook Export Sort Order Bugfix (Tally-219)
@@ -767,13 +767,14 @@ en:
   allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: Allows the missing policy applicator to emit submission_updated live events for each submission marked as missing.
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: Disable Post to SIS for Assignment in Closed Grading Periods
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: If set, turns off post-to-SIS functionality for assignments when their grading period closes. Only applies if the "Enable new SIS integration settings" feature is enabled.
+  final_grade_override_in_gradebook_history_767147c: Final Grade Override in Gradebook History
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: Includes overridden course grades in the Gradebook History.
   product_tours_1e19eb95: Product Tours
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: In-product training walkthrough and tourpoints for admins, teachers, and students
   module_file_upload_enhancements_eecd4d37: Module File Upload Enhancements
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: Drag and Drop files on modules and multi-file module item uploads
-  responsive_admin_settings_4f8670d7: Responsive Admin/Settings
-  collection_of_responsive_improvements_throughout_c_dedfe6dc: Collection of responsive improvements throughout Canvas
   responsive_awareness_226843a: Responsive Awareness
+  collection_of_responsive_improvements_throughout_c_dedfe6dc: Collection of responsive improvements throughout Canvas
   responsive_misc_dc572cc0: Responsive Misc
   help_for_unpublished_courses_512a08d7: Help for Unpublished Courses
   improved_visual_reminders_to_encourage_instructors_f203c7f: Improved visual reminders to encourage instructors to publish courses
@@ -819,12 +820,6 @@ en:
   include_fullstory_recording_of_the_user_s_session_656d131e: Include FullStory recording of the user's session
   outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
-  rubrics_in_course_navigation_539ea536: Rubrics in course navigation
-  includes_rubrics_in_the_course_sidebar_navigation_6dd52682: Includes rubrics in the course sidebar navigation
-  modify_permissions_for_account_rubrics_6c3aee59: Modify permissions for Account Rubrics
-  change_rubrics_visibility_on_accounts_to_depend_on_967b4caa: Change Rubrics visibility on Accounts to depend on the Rubrics permission instead of the Learning Outcomes permission
-  hide_the_import_learning_outcomes_button_based_on__433d6ba7: Hide the Import Learning Outcomes button based on user permissions
-  ensures_that_users_without_the_import_outcomes_per_42dfc56d: Ensures that users without the Import Outcomes permission cannot see the button within the Outcomes tab
   reduce_outcome_duplication_on_course_import_26431b40: Reduce outcome duplication on course import
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: Ensures that outcomes that have already been imported into a course are not duplicated if they are imported again
   selectable_outcomes_during_course_content_migratio_3f108a1a: Selectable outcomes during course content migration
@@ -1314,6 +1309,7 @@ en:
         select_type_label: Find course or group
         select_type_courses: Course ID
         select_type_groups: Group ID
+        placeholder_course_or_group_id: Enter ID...
         find_button: Find
         megabytes_tooltip: megabytes
         megabytes: megabytes
@@ -1672,6 +1668,11 @@ en:
         penn_harris:
           parameters:
             note: Courses with muted assignments may not accurately reflect scores in this report.
+    proserv_student_progress_custom_report_csv_parameters:
+      account_reports:
+        pearson:
+          outcome:
+            text: 'Course SIS ID:'
     proserve_all_versions_submissions_csv_parameters:
       account_reports:
         proserv:
@@ -3102,7 +3103,6 @@ en:
   item_cannot_be_duplicated_cebf3109: Item cannot be duplicated
   context_modules_api:
     invalid_position: Invalid position
-  mastery_paths_selection_has_been_temporarily_disab_c40623b9: Mastery paths selection has been temporarily disabled for maintenance.
   choose_assignment_set_415f1b3: Choose Assignment Set
   module_item_is_locked_19fa60b4: Module Item is locked.
   context_modules:
@@ -3620,9 +3620,6 @@ en:
         other: "%{count} files"
     confirm_reject_invitation: Are you sure you want to reject the invitation to participate in this course?
     syllabus:
-      syllabus:
-        hide_specific_dates: Hide section, group, and person specific dates
-        show_specific_dates: Show section, group, and person specific dates
       headers:
         date: Date
         details: Details
@@ -6540,7 +6537,6 @@ en:
     twitter_added: Twitter access authorized!
     twitter_fail_whale: Twitter authorization failed. Please try again
     user_atom_feed: User Atom Feed (All Courses)
-    birthdate_invalid: Invalid date or invalid datetime for birthdate
     user_updated: User was successfully updated.
     could_not_find_url: Could not find download URL
     user_merge_success: User merge succeeded! %{first_user} and %{second_user} are now one and the same.
@@ -6775,6 +6771,7 @@ en:
   moderated_assignments_must_be_manually_posted_unti_39545855: Moderated assignments must be manually posted until grades are released
   course_level_notification_preferences_require_a_co_2f0a618: Course level notification preferences require a course_id to update
   account_level_notification_preferences_require_an__66467cd7: Account level notification preferences require an account_id to update
+  notification_policies_requires_the_communication_c_2e7ded08: Notification policies requires the communication channel id, the notification category, and the frequency to update
   global_message_icons:
     information: information
     error: error
@@ -6969,6 +6966,7 @@ en:
     tab_root_accounts: Root Accounts
   this_assignment_submission_is_my_own_original_work_e820ce4b: This assignment submission is my own, original work
   people_b4ebb13c: People
+  eportfolio_moderation_feb0ffd3: ePortfolio Moderation
   terms_of_service_attributes_not_valid_f3f9fca9: Terms of Service attributes not valid
   help_dialog:
     instructor_question: Ask Your Instructor a Question
@@ -7897,6 +7895,8 @@ en:
   missing_required_ratings_9b19e66: Missing required ratings
   exactly_one_rating_can_have_mastery_c1d87990: Exactly one rating can have mastery
   points_should_be_strictly_decreasing_l_r_18f26f87: 'Points should be strictly decreasing: %{l} <= %{r}'
+  unable_to_align_some_outcomes_to_a_page_65f7d412: Unable to align some outcomes to a page
+  unable_to_align_some_outcomes_to_title_53467231: Unable to align some outcomes to "%{title}"
   page_comment:
     default_user_name: Anonymous
   polling/poll_submission:
@@ -8264,6 +8264,8 @@ en:
       settings: Settings
       profile: Profile
     profile_title_too_long: Title is too long
+    profile_bio_too_long: Bio is too long
+    invalid_url: Invalid URL
   shared_content_803ac37b: Shared Content
   user_service:
     descriptions:
@@ -11433,12 +11435,12 @@ en:
   restrict_students_from_accessing_courses_after_end_7dd66bce: Restrict students from accessing courses after end date
   allow_students_to_download_course_content_and_view_810e66ec: Allow students to download course content and view offline
   copyright_and_license_information_must_be_provided_5feffaf: Copyright and license information must be provided for files before they are published.
+  restrict_instructors_from_changing_mastery_scales_5af13053: Restrict instructors from changing mastery scales
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: Restrict instructors from changing proficiency calculation method
   slack_api_key_92f0c667: Slack Api Key
   current_slack_api_key_9eba6a5: 'Current Slack Api Key:'
   new_slack_api_key_453d04d: New Slack Api Key
   personal_pronouns_7d271f52: Personal Pronouns
-  remove_pronouns_pronoun_c8b03d78: Remove Pronouns %{pronoun}
-  add_pronouns_option_906ff625: Add pronouns option
   acceptable_use_policy_29a28124: Acceptable Use Policy
   license_type_6b74b543: License Type
   old_policy_39e4f77: Old Policy
@@ -14153,7 +14155,6 @@ en:
       view_in_discussion: View in discussion
   remove_attachment_ceae0973: Remove Attachment
   failed_to_save_please_try_again_later_bb7070fb: Failed to save, please try again later
-  content_is_still_being_uploaded_if_you_continue_it_8f06d0cb: Content is still being uploaded, if you continue it will not be embedded properly.
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*An error occurred*, please post your reply again later"
   EditorToggle:
     done_as_in_finished: Done
@@ -14312,6 +14313,7 @@ en:
       media_comment_installation_broken: Media comment uploading has not been set up properly. Please contact your administrator.
     messages:
       submitting: Submitting Media File...
+  students_1b8cd07b: Students
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: Can't unpublish %{name} if there are student submissions
   percent_af88d1b1: "%{percent}%"
   uploading_progress_2f5dd4bf: Uploading progress
@@ -14869,7 +14871,10 @@ en:
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: Peer reviews cannot be enabled for moderated assignments
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: Group assignments cannot be enabled for moderated assignments
   points_bceb5005: points
-  students_1b8cd07b: Students
+  count_students_c9920376:
+    zero: 0 Students
+    one: 1 Student
+    other: "%{count} Students"
   assignment_d8387b78: assignment
   grader_is_required_62c88f67: Grader is required
   grader_count_is_required_45b6c85b: Grader count is required
@@ -15187,6 +15192,7 @@ en:
   more_people_options_730e9686: More People Options
   manage_profile_pictures_40c958ce: Manage profile pictures
   view_user_groups_d2bfa855: View user groups
+  available_pronouns_b45330b1: Available Pronouns
   content_on_this_page_violates_the_security_policy__25685d8a: Content on this page violates the security policy, contact your admin for assistance.
   canvas_content_security_policy_c3d7bf2b: Canvas Content Security Policy
   the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
@@ -17510,11 +17516,13 @@ en:
   we_couldn_t_find_that_page_34068c1d: We couldn't find that page!
   game_over_104baa: GAME OVER
   press_space_to_start_over_d4b8a2da: Press 'space' to start over
-  contexttype_notification_settings_d72acd58: "%{contextType} Notification Settings"
   enable_notifications_for_contextname_b5b4440e: Enable Notifications for %{contextName}
-  you_are_currently_receiving_notifications_for_this_4f542bb2: You are currently receiving notifications for this %{contextType}. To disable %{contextType} notifications, use the toggle above.
-  you_will_not_receive_any_contexttype_notifications_da7a58f1: You will not receive any %{contextType} notifications at this time. To enable %{contextType} notifications, use the toggle above.
-  granular_contexttype_notification_settings_will_be_c5dfc901: Granular %{contextType} notification settings will be configurable here in the future.
+  you_are_currently_receiving_notifications_for_this_9646b09d: You are currently receiving notifications for this course. To disable course notifications, use the toggle above.
+  you_will_not_receive_any_course_notifications_at_t_7d9ce24f: You will not receive any course notifications at this time. To enable course notifications, use the toggle above.
+  granular_course_notification_settings_will_be_conf_68f122db: Granular course notification settings will be configurable here in the future.
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level.
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: Account-level notifications apply to all courses. Notifications for individual courses can be changed within each course and will override these notifications.
+  account_notification_settings_e96de9b6: Account Notification Settings
   notify_immediately_d1749c07: Notify immediately
   daily_summary_cf43f37c: Daily summary
   weekly_summary_56cd0c95: Weekly summary
@@ -17524,7 +17532,6 @@ en:
   scheduling_5a3327e7: Scheduling
   alerts_6b871b71: Alerts
   categoryname_notification_preferences_cd64e4a0: "%{categoryName} notification preferences"
-  pathtype_93f80de1: "%{pathType}"
   confirm_edit_outcome_a9746c99: Confirm Edit Outcome
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: This will update all rubrics using this outcome that have not yet been assessed
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: You’ve updated the scoring criteria; this will affect all students previously assessed using this outcome
@@ -17546,11 +17553,11 @@ en:
   your_score_score_fb785381: 'Your score: %{score}'
   not_mastered_5c2f9968: Not mastered
   mastered_34d4c857: Mastered
+  score_out_of_points_possible_points_bbaea991: "%{score} out of %{points_possible} points"
   count_alignments_40fbc23c:
     zero: No alignments
     one: "%{count} alignment"
     other: "%{count} alignments"
-  score_out_of_points_possible_points_bbaea991: "%{score} out of %{points_possible} points"
   no_alignments_are_available_for_this_outcome_7f8346f9: No alignments are available for this outcome.
   toggle_alignment_details_for_title_944f605: Toggle alignment details for %{title}
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} of %{numGroup} Mastered"
@@ -17562,6 +17569,7 @@ en:
   1_item_scores_examplescores_9736236: '1- Item Scores: %{exampleScores}'
   2_final_score_exampleresult_922edf9c: '2- Final Score: %{exampleResult}'
   click_to_expand_outcome_details_74a2a967: Click to expand outcome details
+  outcome_details_ce254e89: Outcome Details
   not_yet_assessed_9362f199: Not yet assessed
   loading_outcome_results_96e21ce4: Loading outcome results
   an_error_occurred_loading_outcomes_data_cfd18b61: An error occurred loading outcomes data.
@@ -18312,7 +18320,6 @@ en:
   unreadcount_unread_replies_509e167f: "%{unreadCount} unread replies"
   totalcount_total_replies_b6988c0a: "%{totalCount} total replies"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} in mastery paths range %{index}"
-  mastery_paths_editing_has_been_temporarily_disable_4816f0f: Mastery Paths editing has been temporarily disabled for maintenance.
   multiple_ba5220cd: Multiple
   upper_lower_56cad16c: "%{upper} - %{lower}"
   select_a_course_4710371f: Select a Course
@@ -18334,7 +18341,9 @@ en:
   wiki_6603e81b: Wiki
   _5a374287: "..."
   load_more_results_460f49a9: Load more results
-  failed_retrieving_media_source_3f0cfd49: Failed retrieving media source
+  failed_retrieving_media_sources_32aed288: Failed retrieving media sources.
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: Giving up on retrieving media sources. This issue will probably resolve itself eventually.
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: Your media has been uploaded and will appear here after processing.
   course_files_a31f97fc: Course files
   group_files_82e5dcdb: Group files
   my_files_2f621040: My files
@@ -19014,6 +19023,7 @@ en:
   add_group_c84f9e9d: Add Group
   module_navigation_97043417: Module Navigation
   previous_module_item_a9e57348: Previous Module Item
+  opens_in_new_window_b4b99243: opens in new window
   jquery:
     module_sequence_footer:
       previous: Previous
@@ -19042,7 +19052,6 @@ en:
   add_a_new_outcome_group_e3fab2fc: Add a New Outcome Group
   import_a_set_of_outcomes_6b782192: Import a set of Outcomes
   find_an_outcome_919328e6: Find an Outcome
-  manage_rubrics_5d274f6a: Manage Rubrics
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: Outcomes are created here to track mastery in a course. To get started, checkout the menu bar along the top. Click on the New Outcome button to create a new outcome, or the New Group button to create a new group to organize your outcomes into. The Find button will allow you to use outcomes that have been created by your state or institution. As you create and use outcomes you will be able to use the panel to the left to navigate through your outcomes. You can drag and drop outcomes between the different levels to create structure.
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: In order to import a large quantity of Outcomes at once, or to update your existing outcomes, please *follow the CSV format*.
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: More importantly, Canvas allows you to add outcomes to your grading rubrics so that you can evaluate mastery as you grade assignments. Once you've set up outcomes, click Manage Rubrics to start using your outcomes for grading.
@@ -19164,6 +19173,7 @@ en:
       language: Language
       choose_a_language: "--Choose a Language--"
       file: File
+  raw_html_editor_e3993e41: Raw HTML Editor
   can_edit_this_page_role_selection_6ccec3c7: Can edit this page role selection
   allow_in_mastery_paths_5332c786: Allow in mastery paths
   delete_selected_pages_7bc50580: Delete selected pages

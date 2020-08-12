@@ -504,6 +504,7 @@ describe DiscussionTopic do
           section2 = @course.course_sections.create!
           student1 = create_enrolled_user(@course, section1, :name => 'student 1', :enrollment_type => 'StudentEnrollment')
           student2 = create_enrolled_user(@course, section2, :name => 'student 2', :enrollment_type => 'StudentEnrollment')
+          @course.reload
           add_section_to_topic(topic, section2)
           topic.save!
           topic.publish!

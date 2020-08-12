@@ -26,6 +26,7 @@ describe OutcomeProficiency, type: :model do
 
   describe 'validations' do
     it { is_expected.to validate_presence_of :account }
+    it { is_expected.to validate_presence_of :context_id }
     it { is_expected.to validate_presence_of :outcome_proficiency_ratings }
 
     describe 'uniqueness' do
@@ -49,6 +50,13 @@ describe OutcomeProficiency, type: :model do
         proficiency.outcome_proficiency_ratings = [rating1, rating2, rating3, rating4]
         expect(proficiency.valid?).to be(false)
       end
+    end
+
+    it 'sets the context_type, id from account' do
+      account = account_model
+      proficiency = outcome_proficiency_model(account)
+      expect(proficiency.context_type).to eq 'Account'
+      expect(proficiency.context_id).to eq account.id
     end
   end
 

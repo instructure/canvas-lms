@@ -58,7 +58,6 @@ describe Eportfolio do
       @student = User.create!
       @student.account_users.create!(account: Account.default, role: student_role)
       @eportfolio = Eportfolio.create!(user: @student, name: 'an eportfolio')
-      @eportfolio.user.account.enable_feature!(:eportfolio_moderation)
     end
 
     describe ":update" do
@@ -85,21 +84,9 @@ describe Eportfolio do
         expect(@eportfolio.grants_right?(@student, :update)).to be false
       end
 
-      it "can update if the eportfolio is flagged as possible spam and the release flag is disabled" do
-        @eportfolio.user.account.disable_feature!(:eportfolio_moderation)
-        @eportfolio.update!(spam_status: 'flagged_as_possible_spam')
-        expect(@eportfolio.grants_right?(@student, :update)).to be true
-      end
-
       it "cannot update if the eportfolio is marked as spam" do
         @eportfolio.update!(spam_status: 'marked_as_spam')
         expect(@eportfolio.grants_right?(@student, :update)).to be false
-      end
-
-      it "can update if the eportfolio is marked as spam and the release flag is disabled" do
-        @eportfolio.user.account.disable_feature!(:eportfolio_moderation)
-        @eportfolio.update!(spam_status: 'marked_as_spam')
-        expect(@eportfolio.grants_right?(@student, :update)).to be true
       end
 
       it "can update if active, the user is the author, eportfolios are enabled, and not spam" do
@@ -108,10 +95,6 @@ describe Eportfolio do
     end
 
     describe ":manage" do
-      before(:once) do
-        @eportfolio.user.account.enable_feature!(:eportfolio_moderation)
-      end
-
       it "cannot manage if not active" do
         @eportfolio.destroy
         expect(@eportfolio.grants_right?(@student, :manage)).to be false
@@ -135,21 +118,9 @@ describe Eportfolio do
         expect(@eportfolio.grants_right?(@student, :manage)).to be false
       end
 
-      it "can manage if the eportfolio is flagged as possible spam and the release flag is disabled" do
-        @eportfolio.user.account.disable_feature!(:eportfolio_moderation)
-        @eportfolio.update!(spam_status: 'flagged_as_possible_spam')
-        expect(@eportfolio.grants_right?(@student, :manage)).to be true
-      end
-
       it "cannot manage if the eportfolio is marked as spam" do
         @eportfolio.update!(spam_status: 'marked_as_spam')
         expect(@eportfolio.grants_right?(@student, :manage)).to be false
-      end
-
-      it "can manage if the eportfolio is marked as spam and the release flag is disabled" do
-        @eportfolio.user.account.disable_feature!(:eportfolio_moderation)
-        @eportfolio.update!(spam_status: 'marked_as_spam')
-        expect(@eportfolio.grants_right?(@student, :manage)).to be true
       end
 
       it "can manage if active, the user is the author, eportfolios are enabled, and not spam" do
@@ -253,18 +224,11 @@ describe Eportfolio do
     before(:once) do
       @student = User.create!
       @eportfolio = Eportfolio.new(user: @student, name: 'an eportfolio')
-      @eportfolio.user.account.enable_feature!(:eportfolio_moderation)
     end
 
     it "returns true if flagged as possible spam" do
       @eportfolio.spam_status = "flagged_as_possible_spam"
       expect(@eportfolio).to be_flagged_as_possible_spam
-    end
-
-    it "returns false if flagged as possible spam and the release flag is disabled" do
-      @eportfolio.user.account.disable_feature!(:eportfolio_moderation)
-      @eportfolio.spam_status = "flagged_as_possible_spam"
-      expect(@eportfolio).not_to be_flagged_as_possible_spam
     end
 
     it "returns false if marked as spam" do
@@ -281,7 +245,6 @@ describe Eportfolio do
     before(:once) do
       @student = User.create!
       @eportfolio = Eportfolio.new(user: @student, name: 'an eportfolio')
-      @eportfolio.user.account.enable_feature!(:eportfolio_moderation)
     end
 
     it "returns true if marked as spam" do
@@ -289,21 +252,9 @@ describe Eportfolio do
       expect(@eportfolio).to be_spam
     end
 
-    it "returns false if marked as spam and the release flag is disabled" do
-      @eportfolio.user.account.disable_feature!(:eportfolio_moderation)
-      @eportfolio.spam_status = "marked_as_spam"
-      expect(@eportfolio).not_to be_spam
-    end
-
     it "returns true if flagged as possible spam" do
       @eportfolio.spam_status = "flagged_as_possible_spam"
       expect(@eportfolio).to be_spam
-    end
-
-    it "returns false if flagged as possible spam and the release flag is disabled" do
-      @eportfolio.user.account.disable_feature!(:eportfolio_moderation)
-      @eportfolio.spam_status = "flagged_as_possible_spam"
-      expect(@eportfolio).not_to be_spam
     end
 
     it "returns false when passed include_possible_spam: false if flagged as possible spam" do
@@ -341,9 +292,8 @@ describe Eportfolio do
       let(:eportfolio) { Eportfolio.create!(name: "my file", user: user) }
       let(:spam_status) { eportfolio.reload.spam_status }
 
-      context "when the setting has a value and the release flag is enabled" do
+      context "when the setting has a value" do
         before(:each) do
-          user.account.root_account.enable_feature!(:eportfolio_moderation)
           Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
         end
 
@@ -368,14 +318,6 @@ describe Eportfolio do
       end
 
       it "does not attempt to mark as spam when the setting is empty" do
-        user.account.root_account.enable_feature!(:eportfolio_moderation)
-        expect {
-          eportfolio.update!(name: "actually a bad page")
-        }.not_to change { spam_status }
-      end
-
-      it "does not attempt to mark as spam when the release flag is not enabled" do
-        Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
         expect {
           eportfolio.update!(name: "actually a bad page")
         }.not_to change { spam_status }

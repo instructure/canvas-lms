@@ -34,6 +34,17 @@ module Types
       account.resolved_outcome_proficiency&.outcome_proficiency_ratings
     end
 
+    field :outcome_calculation_method, OutcomeCalculationMethodType, null: true
+    def outcome_calculation_method
+      return nil unless account.grants_any_right?(
+        current_user, session,
+        :read
+      )
+      # This does a recursive lookup of parent accounts, not sure how we could
+      # batch load it in a reasonable way.
+      account.resolved_outcome_calculation_method
+    end
+
     field :courses_connection, CourseType.connection_type, null: true
     def courses_connection
       return unless account.grants_right?(current_user, :read_course_list)

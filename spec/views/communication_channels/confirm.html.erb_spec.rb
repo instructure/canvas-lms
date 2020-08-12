@@ -23,7 +23,7 @@ describe "communication_channels/confirm.html.erb" do
   before do
     user_factory
     assign(:user, @user)
-    @cc = @communication_channel = assign(:communication_channel, @user.communication_channels.create!(:path => 'johndoe@example.com'))
+    @cc = @communication_channel = assign(:communication_channel, communication_channel(@user, {username: 'johndoe@example.com'}))
     assign(:nonce, @cc.confirmation_code)
     assign(:body_classes, [])
     assign(:domain_root_account, assign(:root_account, Account.default))
@@ -66,7 +66,7 @@ describe "communication_channels/confirm.html.erb" do
 
     it "should follow the simple path for logged in as a matching user" do
       user_with_pseudonym(:active_all => 1)
-      @user.communication_channels.create!(:path => 'johndoe@example.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'johndoe@example.com', active_cc: true})
       assign(:merge_opportunities, [[@user, [@user.pseudonym]]])
       assign(:current_user, @user)
       render

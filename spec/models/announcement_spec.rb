@@ -200,8 +200,7 @@ describe Announcement do
       n = Notification.create(:name => notification_name, :category => "TestImmediately")
       n2 = Notification.create(:name => "Announcement Created By You", :category => "TestImmediately")
 
-      channel = @teacher.communication_channels.create(:path => "test_channel_email_#{@teacher.id}", :path_type => "email")
-      channel.confirm
+      channel = communication_channel(@teacher, {username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true})
 
       NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
       NotificationPolicy.create(:notification => n, :communication_channel => @observer.communication_channel, :frequency => "immediately")

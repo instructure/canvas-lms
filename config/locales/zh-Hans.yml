@@ -405,6 +405,7 @@ zh-Hans:
   account_id_2c3b4f15: "帐户 id"
   account_id_73966078: account_id
   account_id_f6e26867: "帐户 ID"
+  account_level_mastery_scales_a5bdff29: 帐户级别的掌握程度评分
   account_level_notification_preferences_require_an__66467cd7: 课程级别通知首选项需要更新account_id
   account_level_notification_preferences_ui_update_f5e189a4: "帐户级别通知首选项 UI 更新"
   account_level_settings_manage_4fca6f8e: "帐户级设置 - 管理"
@@ -417,6 +418,9 @@ zh-Hans:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: 帐户通知结束时间早于开始时间
+  account_notification_settings_error_page_66c0bc61: 帐户通知设置错误页面
+  account_notification_settings_initial_query_error_f55e1cbf: 帐户通知设置初始查询错误
+  account_notification_settings_updated_dbabec35: 已更新帐户通知设置
   account_notifications: 
     announcement_created_notice: 通告已成功创建
     announcement_creation_failed_notice: 通告创建失败
@@ -1286,6 +1290,7 @@ zh-Hans:
         report_last_run: 上次运行
         report_name: 姓名
       headings: 
+        privacy: 隐私
         quotas: 帐户配额
         sections: 报告
         settings: 帐户设置
@@ -1316,6 +1321,8 @@ zh-Hans:
         enable_alerts: 警报（测试版本）
         enable_course_catalog: “在公共课程索引中包含此课程”标记启用的情况下，在此根帐户中显示一个可搜索的课程列表。
         enable_eportfolios: 电子学习档案
+        enable_fullstory: "允许使用 FullStory 跟踪"
+        enable_google_analytics: "允许使用 Google Analytics 跟踪"
         enable_profiles: 启用个人资料
         enable_turnitin: 抄袭监测系统
         enable_user_notes: 教师日志
@@ -1411,7 +1418,7 @@ zh-Hans:
       open_report_description: 打开报告说明
       page_header_title: 帐户设置
       page_title: 共享内容
-      quiz_ip_filters_delete: 删除过滤器
+      quiz_ip_filters_delete: "删除测验 IP 筛选器"
       quiz_ip_filters_help_message: |-
           可以使用测验 IP 过滤器，只允许指定 IP 范围的计算机访问测验。
           
@@ -1444,6 +1451,7 @@ zh-Hans:
       tab_announcements: 公告
       tab_external_tools: 应用程序
       tab_notifications: 通知
+      tab_privacy: 隐私
       tab_quotas: 配额
       tab_reports: 报告
       tab_settings: 设置
@@ -2038,6 +2046,7 @@ zh-Hans:
   allow_multiple_attempts_e67a0a37: 允许多次尝试
   allow_opt_out_of_inbox: 准许用户选择退出会话收件箱。此选项将导致所有会话消息和通知以紧急通知的形式发送到用户的主电子邮箱、在收件箱上隐藏会话收件箱的未读消息标识，并隐藏会话的通知首选项。
   allow_outcome_extra_credit_57c1e84e: 允许结果额外学分
+  allow_pages_to_be_deleted_in_bulk_199d3d3b: 允许批量删除的页面
   allow_passive_acceptance_of_terms_of_service_63ef5994: 允许被动接受服务条款
   allow_postable_submission_comments_a301b742: 准许可发布的提交项评论
   allow_reorder_dashboard_cards_78215947: 允许重排序控制面板卡
@@ -2060,6 +2069,7 @@ zh-Hans:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: 允许用户访问学生背景卡上的“作为用户”链接
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "允许用户在用户的登录详细信息中查看SIS ID。"
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "允许用户在课程的“人员”页面中查看用户SIS ID。"
+  allows_account_level_mastery_scales_and_proficienc_43899cf6: 允许帐户级别的掌握程度评分和熟练程度计算，取代按结果评分
   allows_admin_user_to_view_account_statistics_341f00d9: 允许管理员用户查看帐户统计信息。
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       准许管理员查看包含所有近期运行的
@@ -4965,6 +4975,7 @@ zh-Hans:
   click_here_to_see_the_file_79e2b366: 点击此处查看文件。
   click_here_to_view_ec8cb2fd: 单击此处查看
   click_here_to_view_the_submission_24777a69: 单击此处查看提交项
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: 单击此处访问作业并按时获取！
   click_ok_to_continue_deleting_this_role_baa9d9e2: 单击“确定”以继续删除此角色。
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: 单击快照以退回到捕捉快照时的测试。注意：已经捕捉快照且无法取消，因此您将丢失您已经完成的任何工作！
   click_on_the_account_navigation_button_to_access_n_fbe82181: 点击帐户导航按钮以访问通知首选项。
@@ -7862,6 +7873,7 @@ zh-Hans:
   delete_grading_scheme_6b308832: 删除评分方案
   delete_grading_scheme_title_215f0a40: "删除评分方案%{title}"
   delete_group_86c381ec: 删除小组
+  delete_in_progress_2d3f0e0d: 正在删除
   delete_key_developername_be80e695: "删除键%{developerName}"
   delete_key_name_c2de8c0c: "删除键%{name}"
   delete_my_account_41060aad: 删除我的帐户
@@ -7881,6 +7893,7 @@ zh-Hans:
   delete_section_name_a48d9d79: "删除班级“%{name}”"
   delete_selected_a023ccf8: 删除所选
   delete_selected_announcements_69e23710: 删除选定的公告
+  delete_selected_pages_7bc50580: 删除所选页面
   delete_survey_56fddbbd: 删除调查
   delete_term_name_f707abc9: "删除学期%{name}"
   delete_theme_918a7f24: 删除方案？
@@ -9081,7 +9094,7 @@ zh-Hans:
     click_through: 单击以查看页面内容
     default_content: 尚未添加内容
     default_name: 页面名称
-  eportfolio_moderation_feb0ffd3: ePortfolio调整
+  eportfolio_moderation_feb0ffd3: "ePortfolio 调整"
   eportfolio_settings_75ba1f9a: 电子学习档案的设置
   eportfolios: 
     _page_section: 
@@ -9644,6 +9657,7 @@ zh-Hans:
   failed_to_delete_discussion_title_986df717: "删除讨论失败%{title}"
   failed_to_delete_external_feed_36f19d70: 删除外部源失败
   failed_to_delete_role_label_27959de3: "删除角色出错%{label}"
+  failed_to_delete_selected_pages_26fa87db: 无法删除所选页面
   failed_to_export_some_tool_settings_c992fc56: 导出一些工具设置失败
   failed_to_import_media_objects_4c1fcb4f: 导入媒体对象失败
   failed_to_laod_more_submissions_990aacee: 加载更多提交项失败
@@ -9661,6 +9675,7 @@ zh-Hans:
   failed_to_save_please_try_again_later_bb7070fb: 保存失败，请稍后重试
   failed_to_submit_draft_comment_1de83451: 无法提交评论草案
   failed_to_unpin_discussion_503eab82: 取消固定讨论失败
+  failed_to_update_account_notification_settings_194c1cd4: 无法更新帐户通知设置
   failed_to_update_course_notification_settings_cbf0eb18: 无法更新课程通知设置
   failed_to_update_discussion_23cc229a: 更新讨论失败
   failed_to_update_permission_33c493f: 更新权限失败
@@ -12762,6 +12777,7 @@ zh-Hans:
   loading_courses_started_6e6d742c: 加载课程已开始
   loading_data_ecd89ba: 正在加载数据……
   loading_discussions_8ed5fcd7: 加载讨论
+  loading_external_tool_d839042c: 正在加载外部工具
   loading_f99d93d4: "...加载中"
   loading_features_d26820f6: 正在加载功能
   loading_folders_d8b5869e: 正在加载文件夹
@@ -13064,6 +13080,7 @@ zh-Hans:
   master_lock_590266b6: 主锁
   mastered_34d4c857: 已掌握
   mastery_7ec348b5: 掌握程度
+  mastery_connect_64598f55: "Mastery Connect"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "掌握程度%{n_mastery_points_precision_2_str} 分"
   mastery_path_processing_f4471152: 掌握途径处理
   mastery_paths_breakdown_6e0b5fce: 掌握途径故障
@@ -13072,6 +13089,7 @@ zh-Hans:
   mastery_paths_editor_930655bb: 主路径编辑器
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: 已临时禁用掌握程度路径选择，以进行维护。
   mastery_points_f1672cc: 掌握程度分数
+  mastery_scale_abbc3557: 掌握程度评分
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: 掌握得分体现了评分作业或测验的最高得分。
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: 掌握分数反映最近评分的作业或测验。
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: 掌握分数反映最新的评分作业或测验。
@@ -15626,6 +15644,7 @@ zh-Hans:
   next_mastery_path_is_currently_processing_f044d7d8: 下一个掌握路径目前正在进行
   next_mastery_path_is_still_processing_please_perio_bb0121af: 下一个掌握途径仍在处理中，请定期刷新页面
   next_message_780bcf24: 下一条消息
+  next_module_item_19e835f3: 下一个模块项
   next_module_item_9bb8a222: 下个单元/项目
   next_month_749b1778: 下个月
   next_month_b55a387c: 下个月
@@ -15996,6 +16015,7 @@ zh-Hans:
       submission_graded: 提交文件已计分
       submission_needs_grading: 提交文件需要评分
       summaries: 总结
+      upcoming_assignment_alert: 近期作业提醒
       updated_wiki_page: 已更新页面
       web_conference_invitation: 网络会议邀请
       web_conference_recording_ready: 网络会议录制准备
@@ -16554,6 +16574,7 @@ zh-Hans:
   package_error: "错误识别封装的类型：%{error}"
   package_export_from_d6e2b073: 文件包导出自
   page_50c4823d: 页面
+  page_bulk_deleting_74860a80: 页面批量删除
   page_comment: 
     default_user_name: 匿名
   page_comments: 
@@ -17385,6 +17406,7 @@ zh-Hans:
   previous_export_c6a997f7: 上一次导出
   previous_message_8804f87e: 上一封邮件
   previous_module_item_2bb5e499: 上个单元/项目
+  previous_module_item_a9e57348: 上一个模块项
   previous_month_7adf1380: 上个月
   previous_month_bb1e3c84: 上个月
   previous_page_928fc112: 上一页
@@ -19396,6 +19418,7 @@ zh-Hans:
   ratings_2433172b: 等级
   ratio_answered_correctly_b0c1e7d: "%{ratio}% a 正确地回答"
   ratio_responded_correctly_6d890107: "%{ratio}% 正确地回应"
+  raw_html_editor_e3993e41: "原始 HTML 编辑器"
   rce_auto_save_f004fba9: "RCE 自动保存"
   rce_enhancements_5701e06: 富文本编辑器增强功能
   rce_initialization_fix_4f176bda: 富文本编辑器初始化修复
@@ -20422,6 +20445,7 @@ zh-Hans:
   select_one_8e0af564: 选择一个
   select_one_b647b384: 选择一个
   select_one_of_the_options_c8b0c6e4: 选择一个选项：
+  select_page_e93fc123: 选择页面
   select_prerequisite_module_57894963: 选择先修课程单元
   select_prerequite_module_e9042bb0: 选择先修课程单元
   select_rubric_2aa2ffa2: 选择评价量规
@@ -20437,6 +20461,7 @@ zh-Hans:
   select_the_files_you_want_to_associate_with_this_m_82677c50: 选择您要与此*模块*关联的文件，或通过选择“新文件”添加文件。
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: 选择想要关联的页面，或选择“新页面”来添加新页面。
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: 选择想要与此*单元*关联的页面，或选择“新页面”来添加新页面。
+  select_title_for_deletion_45b08247: "选择要删除的 %{title}"
   select_type_of_prerequisite_8d6fa902: 选择先修课程类型
   select_video_file_35b61d4e: 选择视频文件
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: 选择您要在主页上显示的内容。
@@ -20452,6 +20477,7 @@ zh-Hans:
   selected_filename_7552a8c0: "已选择%{filename}"
   selected_grade_942f40ba: 已选择评分
   selected_item_35bed33a: 选择的项目
+  selected_pages_have_been_deleted_82a7f965: 所选页面已删除
   selected_subtree_a7693937: "已选定 %{subtree}"
   selection_end_date_10fcc8c6: 选择结束日期
   selection_height_9d57ec24: 选择高度
@@ -23758,6 +23784,7 @@ zh-Hans:
   untitled_assignment_59354b34: 无标题作业
   unused_courses_title: 未使用的课程
   up_c553575d: 上
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "近期到期日期 - %{assignment_name}，%{course_name}"
   update_374eb54: 更新
   update_4d8ee62: 更新
   update_and_view_sections_course_details_navigation_dd10b45e: 更新和查看章节、课程详细信息、导航、功能选择和外部应用集成，全部仅对讲师可见。
@@ -24801,6 +24828,9 @@ zh-Hans:
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
     one: "您即将删除 %{count} 个讨论。是否确定？"
     other: "您即将删除 %{count} 个讨论。是否确定？"
+  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
+    one: "您即将删除 %{count} 个页面。是否确定？"
+    other: "您即将删除 %{count} 个页面。是否确定？"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       由于还没有应用您的账户，您即将失去任何的更改。
       
@@ -25021,6 +25051,8 @@ zh-Hans:
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "此刻您不会收到任何%{contextType}通知。要启用%{contextType}通知，请使用上面的toggle。"
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: 您此后将无法接收任何课程通知。要启用课程通知，请使用上面的开关。
   your_answer_8dad6ea4: 您的答案：
+  your_assignment_assignment_name_is_due_on_due_at_9f82e587: "您的作业 %{assignment_name} 将于 %{due_at}到期。"
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "您的作业 %{assignment_name} 将于 %{due_at}到期。单击下面的链接访问作业并按时获取："
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "您的作业列表现在可以在 *日历* 页面上找到。"
   your_assignments_list_has_improved_3eded80e: "您的 *作业* 列表已改进！"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 您的作业将显示在此处，按到期日期列出。

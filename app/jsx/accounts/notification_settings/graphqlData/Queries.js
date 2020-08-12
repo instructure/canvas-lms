@@ -23,6 +23,7 @@ export const ACCOUNT_NOTIFICATIONS_QUERY = gql`
       ... on User {
         _id
         notificationPreferences {
+          sendScoresInEmails(userId: $userId)
           channels {
             _id
             path

@@ -255,7 +255,7 @@ require 'csv'
 #               ],
 #               "text": "Search the Canvas Guides",
 #               "subtext": "Find answers to common questions",
-#               "url": "http://community.canvaslms.com/community/answers/guides",
+#               "url": "https://community.canvaslms.com/t5/Guides/ct-p/guides",
 #               "type": "default",
 #               "id": "search_the_canvas_guides",
 #               "is_featured": false,
@@ -290,11 +290,11 @@ class AccountsController < ApplicationController
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
+  before_action :require_site_admin, only: [:restore_user]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
   include SupportHelpers::ControllerHelpers
-  before_action :require_site_admin, only: [:restore_user]
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
@@ -861,6 +861,18 @@ class AccountsController < ApplicationController
   # @argument account[settings][restrict_student_future_listing][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
   #
+  # @argument account[settings][lock_outcome_proficiency][value] [Boolean]
+  #   Restrict instructors from changing mastery scale
+  #
+  # @argument account[lock_outcome_proficiency][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[settings][lock_proficiency_calculation][value] [Boolean]
+  #   Restrict instructors from changing proficiency calculation method
+  #
+  # @argument account[lock_proficiency_calculation][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
   # @argument account[services] [Hash]
   #   Give this a set of keys and boolean values to enable or disable services matching the keys
   #
@@ -1182,20 +1194,21 @@ class AccountsController < ApplicationController
   def restore_user
     raise ActiveRecord::RecordNotFound unless @account.root_account?
     user = api_find(User, params[:user_id])
-    p = user && @account.pseudonyms.where(user_id: user).order(deleted_at: :desc).first
-    raise ActiveRecord::RecordNotFound unless p
-    unless user.allows_user_to_remove_from_account?(@account, @current_user)
-      return render_unauthorized_action
-    end
+    pseudonym = user && @account.pseudonyms.where(user_id: user).order(deleted_at: :desc).first!
+
+    is_permissible =
+      pseudonym.account.grants_right?(@current_user, :manage_user_logins) &&
+      pseudonym.user.has_subset_of_account_permissions?(@current_user, user.account)
+    return render_unauthorized_action unless is_permissible
+
     if @account.pseudonyms.where(user_id: user).active.any? && !user.deleted?
       return render json: {errors: 'User not deleted'}, status: :bad_request
     end
-    if user.deleted?
-      user.workflow_state = 'registered'
-      user.save!
-    end
-    p.workflow_state = 'active'
-    p.save!
+
+    # this is a no-op if the user was deleted from the account profile page
+    user.update!(workflow_state: 'registered') if user.deleted?
+    pseudonym.update!(workflow_state: 'active')
+    pseudonym.clear_permissions_cache(user)
     user.update_account_associations
     user.clear_cache_key(*Canvas::CacheRegister::ALLOWED_TYPES['User'])
     user.touch
@@ -1204,8 +1217,6 @@ class AccountsController < ApplicationController
 
   def eportfolio_moderation
     if authorized_action(@account, @current_user, :moderate_user_content)
-      return redirect_to account_settings_url(@account) unless @account.root_account.feature_enabled?(:eportfolio_moderation)
-
       results_per_page = Setting.get('eportfolio_moderation_results_per_page', 1000)
       spam_status_order = "CASE spam_status WHEN 'flagged_as_possible_spam' THEN 0 WHEN 'marked_as_spam' THEN 1 WHEN 'marked_as_safe' THEN 2 ELSE 3 END"
       @eportfolios = Eportfolio.active.preload(:user).
@@ -1556,6 +1567,8 @@ class AccountsController < ApplicationController
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
                                    {:usage_rights_required => [:value, :locked] }.freeze,
+                                   {:lock_outcome_proficiency => [:value, :locked] }.freeze,
+                                   {:lock_proficiency_calculation => [:value, :locked] }.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
                                    :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics].freeze
 

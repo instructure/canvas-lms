@@ -23,6 +23,7 @@ import NotificationPreferencesTable from './NotificationPreferencesTable'
 import PleaseWaitWristWatch from './SVG/PleaseWaitWristWatch.svg'
 import React, {useState} from 'react'
 
+import {Alert} from '@instructure/ui-alerts'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -31,20 +32,12 @@ import {View} from '@instructure/ui-view'
 
 const NotificationPreferences = props => {
   const [enabled, setEnabled] = useState(props.enabled)
-  const capitalizedContextType = props.contextType[0].toUpperCase() + props.contextType.slice(1)
 
-  return (
-    <Flex direction="column">
-      <Flex.Item overflowY="visible">
-        <Heading level="h2" as="h1">
-          {I18n.t('%{contextType} Notification Settings', {
-            contextType: capitalizedContextType
-          })}
-        </Heading>
-      </Flex.Item>
-      {props.contextType === 'course' && (
+  const renderMuteToggle = () => {
+    if (props.contextType === 'course') {
+      return (
         <>
-          <Flex.Item margin="large 0 small 0" padding="xx-small">
+          <Flex.Item margin="small 0 small 0" padding="xx-small">
             <Checkbox
               data-testid="enable-notifications-toggle"
               label={I18n.t('Enable Notifications for %{contextName}', {
@@ -63,32 +56,38 @@ const NotificationPreferences = props => {
             <Text>
               {enabled
                 ? I18n.t(
-                    'You are currently receiving notifications for this %{contextType}. To disable %{contextType} notifications, use the toggle above.',
-                    {contextType: props.contextType}
+                    'You are currently receiving notifications for this course. To disable course notifications, use the toggle above.'
                   )
                 : I18n.t(
-                    'You will not receive any %{contextType} notifications at this time. To enable %{contextType} notifications, use the toggle above.',
-                    {contextType: props.contextType}
+                    'You will not receive any course notifications at this time. To enable course notifications, use the toggle above.'
                   )}
             </Text>
           </Flex.Item>
         </>
-      )}
-      {props.contextType === 'account' ||
-      ENV.NOTIFICATION_PREFERENCES_OPTIONS?.granular_course_preferences_enabled ? (
+      )
+    }
+  }
+
+  const renderNotificationPreferences = () => {
+    if (
+      props.contextType === 'account' ||
+      ENV.NOTIFICATION_PREFERENCES_OPTIONS?.granular_course_preferences_enabled
+    ) {
+      return (
         <Flex.Item>
           <NotificationPreferencesTable
             preferences={props.notificationPreferences}
             updatePreference={props.updatePreference}
           />
         </Flex.Item>
-      ) : (
+      )
+    } else {
+      return (
         <Flex.Item>
           <View as="div" margin="large 0 medium 0" textAlign="center">
             <Text size="large">
               {I18n.t(
-                'Granular %{contextType} notification settings will be configurable here in the future.',
-                {contextType: props.contextType}
+                'Granular course notification settings will be configurable here in the future.'
               )}
             </Text>
           </View>
@@ -96,7 +95,36 @@ const NotificationPreferences = props => {
             <img alt="" src={PleaseWaitWristWatch} style={{width: '200px'}} />
           </div>
         </Flex.Item>
-      )}
+      )
+    }
+  }
+
+  const renderNotificationInfoAlert = () => (
+    <Flex.Item>
+      <Alert variant="info" renderCloseButtonLabel="Close">
+        {props.contextType === 'course'
+          ? I18n.t(
+              'Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level.'
+            )
+          : I18n.t(
+              'Account-level notifications apply to all courses. Notifications for individual courses can be changed within each course and will override these notifications.'
+            )}
+      </Alert>
+    </Flex.Item>
+  )
+
+  return (
+    <Flex direction="column">
+      <Flex.Item overflowY="visible" margin="0 0 small 0">
+        <Heading level="h2" as="h1">
+          {props.contextType === 'course'
+            ? I18n.t('Course Notification Settings')
+            : I18n.t('Account Notification Settings')}
+        </Heading>
+      </Flex.Item>
+      {renderNotificationInfoAlert()}
+      {renderMuteToggle()}
+      {renderNotificationPreferences()}
     </Flex>
   )
 }

@@ -53,28 +53,15 @@ $darkRowBg: #f9f9f9;
   // dimensions of the table on screen, the table will scroll inside this container
   // might want to change to match design
 
-  body:not(.responsive_admin_settings) & {
-    width: 72vw;
+  margin: $ic-sp 0;
+  @include breakpoint(tablet) {
     height: 64vh;
-    margin: direction-sides(20px 20px 20px 0px);
-  }
-
-  body.responsive_admin_settings & {
-    margin: $ic-sp 0;
-    @include breakpoint(tablet) {
-      height: 64vh;
-    }
   }
 
   // needed for scrolling + sticky headers
   overflow: auto;
   position: relative;
   border: 1px solid $border-color;
-}
-
-body:not(.responsive_admin_settings) .permissions-v2__header_container {
-  width: 70vw;
-  margin: direction-sides(20px 20px 20px 0px);
 }
 
 .ic-permissions_role_tray {

@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {render, shallow} from 'enzyme'
+import {render, fireEvent, within} from '@testing-library/react'
 import Outcome from '../Outcome'
 
-const result = (id = 1, date = new Date(), hidePoints = false) => ({
+const result = ({id = 1, date = new Date(), hide_points = false}, assignmentOverrides = {}) => ({
   id,
   percent: 0.1,
   assignment: {
@@ -28,9 +28,10 @@ const result = (id = 1, date = new Date(), hidePoints = false) => ({
     html_url: 'http://foo',
     name: 'My alignment',
     submission_types: '',
-    score: 0
+    score: 0,
+    ...assignmentOverrides
   },
-  hide_points: hidePoints,
+  hide_points,
   submitted_or_assessed_at: date.toISOString()
 })
 
@@ -42,11 +43,11 @@ const defaultProps = (props = {}) => ({
     id: 1,
     assignments: [
       {
-        assignment_id: 1,
+        assignment_id: '1',
         learning_outcome_id: 1,
         submission_types: 'online_quiz',
-        title: 'My assignment',
-        url: 'www.example.com'
+        name: 'My assignment',
+        html_url: 'www.example.com'
       }
     ],
     expansionId: 100,
@@ -76,6 +77,7 @@ const defaultProps = (props = {}) => ({
         assignment: {
           id: 'live_assessments/assessment_1',
           name: 'My assessment',
+          html_url: 'http://bar',
           submission_types: 'magic_marker',
           score: 0
         },
@@ -90,93 +92,72 @@ const defaultProps = (props = {}) => ({
   ...props
 })
 
-it('renders the Outcome component', () => {
-  const wrapper = shallow(<Outcome {...defaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
 it('renders correctly expanded', () => {
-  const wrapper = shallow(<Outcome {...defaultProps()} expanded />)
-  expect(wrapper).toMatchSnapshot()
+  const {getByText, getByRole} = render(<Outcome {...defaultProps()} expanded />)
+  expect(getByText('My outcome')).not.toBeNull()
+  expect(getByRole('list')).not.toBeNull()
 })
 
 it('renders correctly expanded with no results', () => {
   const props = defaultProps()
   props.outcome.results = []
-  const wrapper = shallow(<Outcome {...props} expanded />)
-  expect(wrapper).toMatchSnapshot()
+  const {getByText} = render(<Outcome {...props} expanded />)
+  expect(getByText(/Not yet assessed/)).not.toBeNull()
 })
 
 it('renders correctly expanded with no results or assignments', () => {
   const props = defaultProps()
   props.outcome.results = []
   props.outcome.assignments = []
-  const wrapper = shallow(<Outcome {...props} expanded />)
-  expect(wrapper).toMatchSnapshot()
+  const {getByText} = render(<Outcome {...props} expanded />)
+  expect(getByText(/No alignments are available/)).not.toBeNull()
 })
 
 describe('header', () => {
   it('includes the outcome name', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />)
-    const header = wrapper.find('ToggleGroup')
-    const summary = render(header.prop('summary'))
-    expect(summary.text()).toMatch('My outcome')
-  })
-
-  it('includes the outcome friendly name', () => {
-    const props = defaultProps()
-    props.outcome.display_name = 'Friendly name'
-    const wrapper = shallow(<Outcome {...props} />)
-    const header = wrapper.find('ToggleGroup')
-    const summary = render(header.prop('summary'))
-    expect(summary.text()).toMatch('Friendly name')
+    const {getByText} = render(<Outcome {...defaultProps()} />)
+    expect(getByText('My outcome')).not.toBeNull()
   })
 
   it('includes mastery when mastered', () => {
     const props = defaultProps()
     props.outcome.mastered = true
-    const wrapper = shallow(<Outcome {...props} />)
-    const header = wrapper.find('ToggleGroup')
-    const summary = render(header.prop('summary'))
-    expect(summary.text()).toMatch('Mastered')
+    const {getByText} = render(<Outcome {...props} />)
+    expect(getByText('Mastered')).not.toBeNull()
   })
 
   it('includes non-mastery when not mastered', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />)
-    const header = wrapper.find('ToggleGroup')
-    const summary = render(header.prop('summary'))
-    expect(summary.text()).toMatch('Not mastered')
+    const {getByText} = render(<Outcome {...defaultProps()} />)
+    expect(getByText('Not mastered')).not.toBeNull()
   })
 
   it('shows correct number of alignments', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />)
-    const header = wrapper.find('ToggleGroup')
-    const summary = render(header.prop('summary'))
-    expect(summary.text()).toMatch('1 alignment')
+    const {getByText} = render(<Outcome {...defaultProps()} />)
+    expect(getByText('1 alignment')).not.toBeNull()
   })
 
   it('shows points if only some results have hide points enabled', () => {
     const props = defaultProps()
-    props.outcome.results = [result(1, undefined, false), result(2, undefined, true)]
-    const wrapper = shallow(<Outcome {...props} />)
-    const header = wrapper.find('ToggleGroup')
-    const summary = render(header.prop('summary'))
-    expect(summary.text()).toMatch('1/5')
+    props.outcome.results = [
+      result({id: 1, hide_points: false}),
+      result({id: 2, hide_points: true})
+    ]
+    const {getByText} = render(<Outcome {...props} />)
+    expect(getByText('1/5')).not.toBeNull()
   })
 
   it('does not show points if all results have hide points enabled', () => {
     const props = defaultProps()
-    props.outcome.results = [result(1, undefined, true), result(2, undefined, true)]
-    const wrapper = shallow(<Outcome {...props} />)
-    const header = wrapper.find('ToggleGroup')
-    const summary = render(header.prop('summary'))
-    expect(summary.text()).not.toMatch('1/5')
+    props.outcome.results = [result({id: 1, hide_points: true}), result({id: 2, hide_points: true})]
+    const {queryByText} = render(<Outcome {...props} />)
+    expect(queryByText('1/5')).toBeNull()
   })
 })
 
 it('includes the individual results', () => {
-  const wrapper = shallow(<Outcome {...defaultProps()} />)
-  expect(wrapper.find('AssignmentResult')).toHaveLength(2)
+  const {getAllByRole} = render(<Outcome {...defaultProps()} expanded />)
+  const results = getAllByRole('listitem')
+  expect(results).toHaveLength(2)
 })
 
 it('renders the results by most recent', () => {
@@ -186,19 +167,19 @@ it('renders the results by most recent', () => {
   const hourAgo = new Date(now - 3600000)
   const yearishAgo = new Date(now - 3600000 * 24 * 360)
   props.outcome.results = [
-    result(1, hourAgo),
-    result(2, now),
-    result(3, minuteAgo),
-    result(4, yearishAgo)
+    result({id: 1, date: hourAgo}, {name: 'hour ago'}),
+    result({id: 2, date: now}, {name: 'now'}),
+    result({id: 3, date: minuteAgo}, {name: 'minute ago'}),
+    result({id: 4, date: yearishAgo}, {name: 'year ago'})
   ]
 
-  const wrapper = shallow(<Outcome {...props} />)
-  const results = wrapper.find('AssignmentResult')
+  const {getAllByRole} = render(<Outcome {...props} expanded />)
+  const results = getAllByRole('listitem')
   expect(results).toHaveLength(4)
-  expect(results.get(0).props.result.id).toEqual(2) // now
-  expect(results.get(1).props.result.id).toEqual(3) // minuteAgo
-  expect(results.get(2).props.result.id).toEqual(1) // hourAgo
-  expect(results.get(3).props.result.id).toEqual(4) // yearishAgo
+  expect(within(results[0]).getByText('now')).not.toBeNull()
+  expect(within(results[1]).getByText('minute ago')).not.toBeNull()
+  expect(within(results[2]).getByText('hour ago')).not.toBeNull()
+  expect(within(results[3]).getByText('year ago')).not.toBeNull()
 })
 
 describe('handleToggle()', () => {
@@ -206,8 +187,8 @@ describe('handleToggle()', () => {
     const props = defaultProps()
     props.onExpansionChange = jest.fn()
 
-    const wrapper = shallow(<Outcome {...props} />)
-    wrapper.instance().handleToggle(null, true)
+    const {getByText} = render(<Outcome {...props} />)
+    fireEvent.click(getByText(/Toggle alignment details/)) // expand
     expect(props.onExpansionChange).toHaveBeenCalledWith('outcome', 100, true)
   })
 })

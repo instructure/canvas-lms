@@ -1,9 +1,0 @@
-development:
-  # required to enable the feature. default is false.
-  enabled: false
-
-  # required. host of the url to the conditional release service. no default.
-  host: conditional_release.docker
-
-  # optional. default matches Canvas
-  protocol: https

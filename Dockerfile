@@ -1,4 +1,5 @@
-ARG RUBY_PATCHSET_IMAGE=starlord.inscloudgate.net/jenkins/canvas-lms-ruby:master
+# must build ruby.Dockerfile image first
+ARG RUBY_PATCHSET_IMAGE
 FROM ${RUBY_PATCHSET_IMAGE}
 LABEL maintainer="Instructure"
 

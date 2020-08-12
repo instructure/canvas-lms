@@ -178,7 +178,8 @@ const ProcessGradebookUpload = {
 
     gradeData[assignmentId] = gradeData[assignmentId] || {}
 
-    if (String(submission.grade || '').toUpperCase() === 'EX') {
+    const normalizedGrade = String(submission.grade || '').toUpperCase()
+    if (normalizedGrade === 'EX' || normalizedGrade === 'EXCUSED') {
       gradeData[assignmentId][studentId] = {excuse: true}
     } else {
       gradeData[assignmentId][studentId] = {

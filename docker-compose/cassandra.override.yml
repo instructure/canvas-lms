@@ -3,7 +3,7 @@
 # Then:
 # - Uncomment configuration in config/cassandra.yml
 # - See config/cassandra.yml.example for further setup instructions
-version: '2'
+version: '2.3'
 services:
   web:
     links:

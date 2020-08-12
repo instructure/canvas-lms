@@ -25,7 +25,7 @@
 # BTW if you add a new thing here, it probably needs adding to the /users/self/todo API
 show_legacy_todo_list ||= false
 %>
-<% if !show_legacy_todo_list && @domain_root_account&.feature_enabled?(:student_planner) %>
+<% if !show_legacy_todo_list %>
   <div class="todo-list Sidebar__TodoListContainer"></div>
 <% else
   cache_opts = (contexts.present? ? {} : { :expires_in => 3.minutes })

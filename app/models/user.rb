@@ -31,7 +31,8 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
-  self.ignored_columns = %i[type creation_unique_id creation_sis_batch_id creation_email sis_name bio merge_to unread_inbox_items_count visibility account_pronoun_id]
+  self.ignored_columns = %i[type creation_unique_id creation_sis_batch_id creation_email
+                            sis_name bio merge_to unread_inbox_items_count visibility account_pronoun_id gender birthdate]
 
 
   include Context
@@ -433,11 +434,15 @@ class User < ActiveRecord::Base
     !!@skip_updating_account_associations
   end
 
+  # Update the root_account_ids column on the user
+  # and all associated CommunicationChannels
   def update_root_account_ids
     # See User#associated_shards in MRA for an explanation of
     # shard association levels
     shards = associated_shards(:strong) + associated_shards(:weak)
+
     refreshed_root_account_ids = Set.new
+    communication_channels_to_update = Set.new
 
     Shard.with_each_shard(shards) do
       UserAccountAssociation.joins(:account).
@@ -446,9 +451,25 @@ class User < ActiveRecord::Base
         find_each do |association|
           refreshed_root_account_ids << association.global_account_id
         end
+
+      # Users can potentially have communication_channels on
+      # any of their associated shards. Collect those communication
+      # channels here for later root_account_ids updating.
+      communication_channels_to_update.merge(
+        CommunicationChannel.where(user: self)
+      )
     end
 
-    self.update!(root_account_ids: refreshed_root_account_ids.to_a)
+    # Update the user
+    relative_ids = refreshed_root_account_ids.map do |id|
+      Shard.relative_id_for(id, self.shard, self.shard)
+    end
+    self.update!(root_account_ids: relative_ids)
+
+    # Update each communication channel associated with the user
+    communication_channels_to_update.each do |c|
+      c.set_root_account_ids(persist_changes: true)
+    end
   end
 
   def update_root_account_ids_later
@@ -1583,8 +1604,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  def send_scores_in_emails?(root_account)
-    preferences[:send_scores_in_emails] == true && root_account.settings[:allow_sending_scores_in_emails] != false
+  def send_scores_in_emails?(course)
+    root_account = course.root_account
+    return false if root_account.settings[:allow_sending_scores_in_emails] == false
+    pref = get_preference(:send_scores_in_emails_override, "course_" + course.global_id.to_s)
+    pref = preferences[:send_scores_in_emails] if pref.nil?
+    !!pref
   end
 
   def send_observed_names_in_notifications?
@@ -1602,6 +1627,10 @@ class User < ActiveRecord::Base
 
   def prefers_high_contrast?
     !!feature_enabled?(:high_contrast)
+  end
+
+  def prefers_no_toast_timeout?
+    !!feature_enabled?(:disable_alert_timeouts)
   end
 
   def prefers_no_celebrations?
@@ -2973,6 +3002,7 @@ class User < ActiveRecord::Base
       root_account.all_enrollments.where(user_id: self, workflow_state: 'active').distinct.pluck(:type)
     end
     roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
+    roles << 'fake_student' if fake_student?
     roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
     roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
     account_users = Shackles.activate(:slave) do

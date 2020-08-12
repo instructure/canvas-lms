@@ -8,7 +8,7 @@
             role="button"
             class="Button"
             aria-describedby="msf{{instanceNumber}}-previous-desc"
-            aria-label="{{#t}}Previous Module Item{{/t}}"
+            aria-label="{{#t}}Previous Module Item{{/t}}{{#if previous.externalItem}} - {{#t}}opens in new window{{/t}}{{/if}}"
           >
             <i class="icon-mini-arrow-left"></i>{{#t 'previous'}}Previous{{/t}}
             <span id="msf{{instanceNumber}}-previous-desc" class="hidden" hidden>{{previous.tooltipText}}</span>
@@ -23,7 +23,7 @@
           role="button"
           class="Button"
           aria-describedby="msf{{instanceNumber}}-next-desc"
-          aria-label="{{#t}}Next Module Item{{/t}}"
+          aria-label="{{#t}}Next Module Item{{/t}}{{#if next.externalItem}} - {{#t}}opens in new window{{/t}}{{/if}}"
             {{#if next.modules_tab_disabled}} aria-disabled="true" {{/if}}
           {{ disabledIf next.modules_tab_disabled }}
         >

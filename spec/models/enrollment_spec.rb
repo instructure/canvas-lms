@@ -2512,7 +2512,7 @@ describe Enrollment do
     it "should return candidate enrollments" do
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      communication_channel(@user, {username: 'jt@instructure.com'})
       @course.enroll_user(@user)
       expect(Enrollment.invited.for_email('jt@instructure.com').count).to eq 1
     end
@@ -2521,27 +2521,27 @@ describe Enrollment do
       # mismatched e-mail
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      @user.communication_channels.create!(:path => 'bob@instructure.com')
+      communication_channel(@user, {username: 'bob@instructure.com'})
       @course.enroll_user(@user)
       # registered user
       user_factory
-      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      communication_channel(@user, {username: 'jt@instructure.com'})
       @user.register!
       @course.enroll_user(@user)
       # active e-mail
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'jt@instructure.com', active_cc: true})
       @course.enroll_user(@user)
       # accepted enrollment
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      communication_channel(@user, {username: 'jt@instructure.com'})
       @course.enroll_user(@user).accept
       # rejected enrollment
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      communication_channel(@user, {username: 'jt@instructure.com'})
       @course.enroll_user(@user).reject
 
       expect(Enrollment.invited.for_email('jt@instructure.com')).to eq []
@@ -2554,7 +2554,7 @@ describe Enrollment do
         course_factory(active_all: true)
         user_factory
         @user.update_attribute(:workflow_state, 'creation_pending')
-        @user.communication_channels.create!(:path => 'jt@instructure.com')
+        communication_channel(@user, {username: 'jt@instructure.com'})
         @enrollment = @course.enroll_user(@user)
         expect(Enrollment.cached_temporary_invitations('jt@instructure.com').length).to eq 1
         @enrollment.accept
@@ -2611,14 +2611,14 @@ describe Enrollment do
           course_factory(active_all: true)
           user_factory
           @user.update_attribute(:workflow_state, 'creation_pending')
-          @user.communication_channels.create!(:path => 'jt@instructure.com')
+          communication_channel(@user, {username: 'jt@instructure.com'})
           @enrollment1 = @course.enroll_user(@user)
           @shard1.activate do
             account = Account.create!
             course_factory(active_all: true, :account => account)
             user_factory
             @user.update_attribute(:workflow_state, 'creation_pending')
-            @user.communication_channels.create!(:path => 'jt@instructure.com')
+            communication_channel(@user, {username: 'jt@instructure.com'})
             @enrollment2 = @course.enroll_user(@user)
           end
         end

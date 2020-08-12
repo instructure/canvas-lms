@@ -28,7 +28,7 @@ const NewAnalyticsTray = () => (
     image="/images/tutorial-tray-images/Panda_Analytics.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-guide-table-of-contents#jive_content_id_New_Analytics`
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
     }}
     links={[
       {
@@ -36,15 +36,17 @@ const NewAnalyticsTray = () => (
           'How do I send a message to all students based on specific course criteria in New Analytics?'
         ),
         href:
-          'https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-guide-table-of-contents#jive_content_id_New_Analytics'
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-all-students-based-on-specific-course/ta-p/1162'
       },
       {
         label: I18n.t('How do I send a message to an individual student in New Analytics?'),
-        href: 'https://community.canvaslms.com/docs/DOC-18035-4152984805'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-an-individual-student-in-New/ta-p/1187'
       },
       {
         label: I18n.t('How do I view analytics for an individual student?'),
-        href: 'https://community.canvaslms.com/docs/DOC-17331-825371113470'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-analytics-for-an-individual-student-in-New/ta-p/801'
       }
     ]}
   >

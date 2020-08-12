@@ -1,7 +1,7 @@
 # Append `:docker-compose.spring.yml` to COMPOSE_FILE in `.env`
 # invoke a console with `docker-compose run --rm web bin/rails console`
 # or with specs: `docker-compose run --rm web bin/rspec spec/path/to/file_spec.rb`
-version: '2'
+version: '2.3'
 services:
   web:
     environment:

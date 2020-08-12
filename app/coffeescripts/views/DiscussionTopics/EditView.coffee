@@ -133,8 +133,6 @@ export default class EditView extends ValidatedFormView
   canPublish: =>
     !@isAnnouncement() && !@model.get('published') && @permissions.CAN_MODERATE
 
-  isResponsive: => !!window.ENV?.FEATURES?.responsive_awareness
-
   toJSON: ->
     data = super
     json = _.extend data, @options,
@@ -144,7 +142,6 @@ export default class EditView extends ValidatedFormView
       isTopic: @isTopic()
       isAnnouncement: @isAnnouncement()
       canPublish: @canPublish()
-      isResponsive: @isResponsive()
       contextIsCourse: @options.contextType is 'courses'
       canAttach: @permissions.CAN_ATTACH
       canModerate: @permissions.CAN_MODERATE
@@ -211,7 +208,7 @@ export default class EditView extends ValidatedFormView
     this
 
   afterRender: =>
-    @renderStudentTodoAtDate() if ENV.STUDENT_PLANNER_ENABLED && @$todoDateInput.length
+    @renderStudentTodoAtDate() if @$todoDateInput.length
     [context, context_id] = ENV.context_asset_string.split("_")
     if context == 'course'
       @AssignmentExternalTools = AssignmentExternalTools.attach(
@@ -251,7 +248,6 @@ export default class EditView extends ValidatedFormView
       hideGradeIndividually: true
       sectionLabel: @messages.group_category_section_label
       fieldLabel: @messages.group_category_field_label
-      isResponsiveDiscussion: @isResponsive()
       lockedMessage: @messages.group_locked_message
       inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
       renderSectionsAutocomplete: @renderSectionsAutocomplete
@@ -319,7 +315,7 @@ export default class EditView extends ValidatedFormView
     data.only_graders_can_rate = false unless data.allow_rating is '1'
     data.sort_by_rating = false unless data.allow_rating is '1'
     data.allow_todo_date = '0' if data.assignment?.set_assignment is '1'
-    data.todo_date = @studentTodoAtDateValue if ENV.STUDENT_PLANNER_ENABLED
+    data.todo_date = @studentTodoAtDateValue
     data.todo_date = null unless data.allow_todo_date is '1'
 
     if @groupCategorySelector && !ENV?.IS_LARGE_ROSTER

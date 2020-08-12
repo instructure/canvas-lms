@@ -562,9 +562,7 @@ class DiscussionTopicsController < ApplicationController
     if post_to_sis && @topic.new_record?
       js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value]
     end
-    if @context.root_account.feature_enabled?(:student_planner)
-      js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage_content)
-    end
+    js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage_content)
 
     if @topic.is_section_specific && @context.is_a?(Course)
       selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
@@ -1203,7 +1201,7 @@ class DiscussionTopicsController < ApplicationController
 
     process_group_parameters(discussion_topic_hash)
     process_pin_parameters(discussion_topic_hash)
-    process_todo_parameters(discussion_topic_hash)
+    process_todo_parameters()
 
     if @errors.present?
       render :json => {errors: @errors}, :status => :bad_request
@@ -1268,11 +1266,7 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  def process_todo_parameters(discussion_topic_hash)
-    unless @topic.context.root_account.feature_enabled?(:student_planner)
-      discussion_topic_hash.delete(:todo_date)
-      return
-    end
+  def process_todo_parameters
     remove_assign = ['false', false, '0'].include?(params.dig(:assignment, :set_assignment))
     if params[:assignment] && !remove_assign && !params[:todo_date]
       @topic.todo_date = nil

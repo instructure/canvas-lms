@@ -134,6 +134,7 @@ class OutcomeProficiencyApiController < ApplicationController
   #
   # @returns Proficiency
   def show
+    return unless authorized_action(@context, @current_user, :read)
     proficiency = @account.resolved_outcome_proficiency or raise ActiveRecord::RecordNotFound
     render json: outcome_proficiency_json(proficiency, @current_user, session)
   rescue ActiveRecord::RecordNotFound => e

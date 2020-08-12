@@ -184,6 +184,7 @@ QUnit.module('loadSidebarOnTarget', {
     ENV.RICH_CONTENT_APP_HOST = 'http://rce.host'
     ENV.RICH_CONTENT_CAN_UPLOAD_FILES = true
     ENV.context_asset_string = 'courses_1'
+    ENV.current_user_id = '17'
     fixtures.setup()
     this.$div = fixtures.create('<div />')
     this.sidebar = {}
@@ -207,6 +208,16 @@ test('passes host and context from ENV as props to sidebar', function() {
   equal(props.host, 'http://rce.host')
   equal(props.contextType, 'courses')
   equal(props.contextId, '1')
+})
+
+test('uses user context when in account context', function() {
+  ENV.context_asset_string = 'account_1'
+  const cb = sinon.spy()
+  RCELoader.loadSidebarOnTarget(this.$div, cb)
+  ok(this.rce.renderSidebarIntoDiv.called)
+  const props = this.rce.renderSidebarIntoDiv.args[0][1]
+  equal(props.contextType, 'user')
+  equal(props.contextId, '17')
 })
 
 test('yields sidebar to callback', function() {

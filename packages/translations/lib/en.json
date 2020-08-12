@@ -919,6 +919,9 @@
   "size_b30e1077": {
     "message": "Size"
   },
+  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+    "message": "Size of { file } is greater than the maximum { max } MB allowed file size."
+  },
   "small_b070434a": {
     "message": "Small"
   },

@@ -153,10 +153,14 @@ module Importers
             workflow_state: 'active', created_at: Time.now.utc, updated_at: Time.now.utc,
             assessment_question_bank_id: bank.id)
       else
-        query = AssessmentQuestion.send(:sanitize_sql, [<<-SQL, hash[:question_name], hash.to_yaml, Time.now.utc, Time.now.utc, bank.id, hash[:migration_id]])
-          INSERT INTO #{AssessmentQuestion.quoted_table_name} (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)
-          VALUES (?,?,'active',?,?,?,?)
+        sql = <<-SQL
+          INSERT INTO #{AssessmentQuestion.quoted_table_name} (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id, root_account_id)
+          VALUES (?,?,'active',?,?,?,?,?)
         SQL
+        query = AssessmentQuestion.send(
+          :sanitize_sql,
+          [sql, hash[:question_name], hash.to_yaml, Time.now.utc, Time.now.utc, bank.id, hash[:migration_id], bank.root_account_id]
+        )
         Shackles.activate(:master) do
           id = AssessmentQuestion.connection.insert(query, "#{name} Create",
             AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)

@@ -266,7 +266,6 @@ shared_context "in-process server selenium tests" do
         "Uncaught Error: Minified React error #188",
         "Uncaught Error: Minified React error #200", # this is coming from canvas-rce, but we should fix it
         "Uncaught Error: Loading chunk", # probably happens when the test ends when the browser is still loading some JS
-        "Uncaught TypeError: Cannot read property 'length' of null", # fixed by QUIZ-7709 / DE-37
         "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/",
         "Access to XMLHttpRequest at 'http://www.example.com/' from origin",
         "The user aborted a request" # The server doesn't respond fast enough sometimes and requests can be aborted. For example: when a closing a dialog.

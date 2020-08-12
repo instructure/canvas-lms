@@ -59,7 +59,7 @@ describe "settings tabs" do
     def edit_announcement(notification)
       f("#notification_edit_#{notification.id}").click
       replace_content f("#account_notification_subject_#{notification.id}"), "edited subject"
-      f("#account_notification_icon .warning").click
+      f("#account_notification_icon_#{notification.id} .warning").click
       textarea_selector = "textarea#account_notification_message_#{notification.id}"
       type_in_tiny(textarea_selector, "edited message", clear: true)
 
@@ -75,7 +75,6 @@ describe "settings tabs" do
 
     before do
       course_with_admin_logged_in
-
     end
 
     it "should add and delete an announcement" do

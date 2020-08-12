@@ -78,7 +78,7 @@ class RailsFlashNotificationsHelper {
         .appendTo($(this.holder))
         .css({zIndex: 2, ...cssOptions})
         .show('fast')
-        .delay(timeout || 7000)
+        .delay(ENV.flashAlertTimeout || timeout || 7000)
         .fadeOut('slow', function() {
           $(this).remove()
         })

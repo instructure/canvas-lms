@@ -252,8 +252,7 @@ module Alerts
           @teacher = @user
           @user = nil
           student_in_course(:active_all => 1)
-          a = @user.communication_channels.create(:path => "a@example.com")
-          a.confirm!
+          communication_channel(@user, {username: 'a@example.com', active_cc: true})
           @assignment = @course.assignments.new(:title => "some assignment")
           @assignment.workflow_state = "published"
           @assignment.save
@@ -325,7 +324,7 @@ module Alerts
 
       course_with_teacher(:active_all => 1)
       student_in_course(:active_all => 1)
-      @student.communication_channels.create(:path => "student@example.com").confirm!
+      communication_channel(@student, {username: 'student@example.com', active_cc: true})
       alert = @course.alerts.build(:recipients => [:student])
       alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
       alert.save!

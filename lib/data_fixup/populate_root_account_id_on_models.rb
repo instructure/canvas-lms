@@ -63,10 +63,11 @@ module DataFixup::PopulateRootAccountIdOnModels
       AssessmentQuestionBank => :context,
       AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
       AssignmentGroup => :context,
-      AssignmentOverride => :assignment,
-      AssignmentOverrideStudent => :assignment,
+      AssignmentOverride => [:assignment, :quiz],
+      AssignmentOverrideStudent => [:assignment, :quiz],
       AttachmentAssociation => %i[course group submission attachment], # attachment is last, only used if context is a ConversationMessage
       CalendarEvent => [:context_course, :context_group, :context_course_section],
+      CommunicationChannel => [], # has override
       ContentMigration => [:account, :course, :group],
       ContentParticipation => :content,
       ContentParticipationCount => :course,
@@ -114,6 +115,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       Quizzes::QuizGroup => :quiz,
       Quizzes::QuizQuestion => :quiz,
       Quizzes::QuizSubmission => :quiz,
+      Role => :account,
       RoleOverride => :account,
       Rubric => :context,
       RubricAssessment => :rubric,
@@ -123,6 +125,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       Submission => :assignment,
       SubmissionComment => :course,
       SubmissionVersion => :course,
+      User => [],
       UserAccountAssociation => :account,
       WebConference => :context,
       WebConferenceParticipant => :web_conference,
@@ -136,7 +139,9 @@ module DataFixup::PopulateRootAccountIdOnModels
     {
       AssetUserAccess => [:attachment, :calendar_event],
       Attachment => [:account, :assessment_question, :assignment, :course, :group, :submission],
+      CommunicationChannel => :user,
       LearningOutcome => :content_tag,
+      User => :user_account_association,
     }.freeze
   end
 
@@ -154,7 +159,9 @@ module DataFixup::PopulateRootAccountIdOnModels
     {
       AssetUserAccess => DataFixup::PopulateRootAccountIdOnAssetUserAccesses,
       Attachment => DataFixup::PopulateRootAccountIdOnAttachments,
+      CommunicationChannel => DataFixup::PopulateRootAccountIdsOnCommunicationChannels,
       LearningOutcome => DataFixup::PopulateRootAccountIdsOnLearningOutcomes,
+      User => DataFixup::PopulateRootAccountIdsOnUsers,
     }.freeze
   end
 
@@ -162,7 +169,9 @@ module DataFixup::PopulateRootAccountIdOnModels
   # tables listed here should override the populate method above
   def self.multiple_root_account_ids_tables
     [
-      LearningOutcome
+      CommunicationChannel,
+      LearningOutcome,
+      User
     ].freeze
   end
 
@@ -194,6 +203,9 @@ module DataFixup::PopulateRootAccountIdOnModels
         if populate_overrides.key?(table)
           # allow for one or more override methods of population
           Array(populate_overrides[table]).each do |override_module|
+            next unless override_module.respond_to?(:populate)
+            next if table.where(get_column_name(table) => nil).none?
+
             self.send_later_if_production_enqueue_args(:populate_root_account_ids_override,
             {
               priority: Delayed::MAX_PRIORITY,
@@ -203,6 +215,21 @@ module DataFixup::PopulateRootAccountIdOnModels
           end
         end
       end
+
+      if populate_overrides.key?(table)
+        Array(populate_overrides[table]).each do |override_module|
+          next unless override_module.respond_to?(:populate_table) &&
+            override_module.respond_to?(:run_populate_table?)
+          next unless override_module.run_populate_table?
+          self.send_later_if_production_enqueue_args(:populate_root_account_ids_override_table,
+           {
+             priority: Delayed::MAX_PRIORITY,
+             n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
+           },
+           table, override_module)
+        end
+      end
+
     end
   end
 
@@ -370,7 +397,9 @@ module DataFixup::PopulateRootAccountIdOnModels
     shard_ids = [Shard.current.id, *scope.select("(#{assoc_reflection.foreign_key}/#{Shard::IDS_PER_SHARD}) as shard_id").distinct.map(&:shard_id)]
 
     # check associated table on all possible shards for any nil root account ids
-    empty_root_account_column_scope(class_name).shard(Shard.where(id: shard_ids)).none?
+    Shard.where(id: shard_ids).all? do |shard|
+      shard.activate { empty_root_account_column_scope(class_name).none? }
+    end
   end
 
   def self.empty_root_account_column_scope(table)
@@ -411,6 +440,12 @@ module DataFixup::PopulateRootAccountIdOnModels
 
   def self.populate_root_account_ids_override(table, override_module, min, max)
     override_module.populate(min, max)
+
+    unlock_next_backfill_job(table)
+  end
+
+  def self.populate_root_account_ids_override_table(table, override_module)
+    override_module.populate_table
 
     unlock_next_backfill_job(table)
   end

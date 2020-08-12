@@ -27,24 +27,28 @@ const AssignmentsTray = () => (
     image="/images/tutorial-tray-images/Panda_Map.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-guide-table-of-contents#jive_content_id_Settings`
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
     }}
     links={[
       {
         label: I18n.t('How do I use course settings?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12814-4152724176'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-course-settings/ta-p/1267'
       },
       {
         label: I18n.t('How do I set details for a course?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12900-415257087'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-details-for-a-course/ta-p/1037'
       },
       {
         label: I18n.t('How do I change a course name and course code?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12851-415241512'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-a-course-name-and-course-code/ta-p/1234'
       },
       {
         label: I18n.t('How do I add an image to a course card in the Dashboard?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12780-4152626354'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-image-to-a-course-card-in-the-Dashboard/ta-p/624'
       }
     ]}
   >

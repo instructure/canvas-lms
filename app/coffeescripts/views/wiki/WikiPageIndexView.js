@@ -313,9 +313,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
   }
 
   collectionHasTodoDate() {
-    if (!ENV.STUDENT_PLANNER_ENABLED) {
-      return false
-    }
     return !!this.collection.find(m => m.has('todo_date'))
   }
 

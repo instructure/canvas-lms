@@ -66,6 +66,7 @@ module Lti
     LIS_V2_LTI_ADVANTAGE_ROLE_MAP = {
       'user' => [ 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User' ].freeze,
       'siteadmin' => [ 'http://purl.imsglobal.org/vocab/lis/v2/system/person#SysAdmin' ].freeze,
+      'fake_student' => [ 'http://purl.imsglobal.org/vocab/lti/system/person#TestUser' ].freeze,
 
       'teacher' => [ 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor' ].freeze,
       'student' => [ 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student' ].freeze,

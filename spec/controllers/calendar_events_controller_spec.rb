@@ -200,6 +200,15 @@ describe CalendarEventsController do
       end
     end
 
+    it 'should allow editing of event assigned to section' do
+      course_with_teacher
+      section = add_section('Section 01', course: @course)
+      section_event = section.calendar_events.create(:title => "some assignment")
+      user_session(@teacher)
+      get 'edit', params: {:course_id => @course.id, :id => section_event.id}
+      assert_status(200)
+    end
+
     # context "with web conferences" do
     #   before(:once) do
     #     Account.site_admin.enable_feature! 'calendar_conferences'
@@ -246,6 +255,15 @@ describe CalendarEventsController do
       expect(assigns[:event]).not_to be_nil
       expect(assigns[:event]).to eql(@event)
       expect(assigns[:event].title).to eql("new title")
+    end
+
+    it 'should allow updating of event assigned to section' do
+      course_with_teacher
+      section = add_section('Section 01', course: @course)
+      section_event = section.calendar_events.create(:title => "some assignment")
+      user_session(@teacher)
+      put 'update', params: {:course_id => @course.id, :id => section_event.id, :calendar_event => {:title => "new title"}}
+      assert_status(302)
     end
 
     include_examples 'accepts web_conference' do

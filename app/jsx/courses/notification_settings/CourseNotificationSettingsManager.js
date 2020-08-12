@@ -52,11 +52,13 @@ export default function CourseNotifcationSettingsManager(props) {
       updatePreference={(data = {}) =>
         updatePreference({
           variables: {
+            userId: props.userId,
             courseId: props.courseId,
             enabled: data.enabled,
             channelId: data.channel?._id,
             category: data.category?.split(' ').join('_'),
-            frequency: data.frequency
+            frequency: data.frequency,
+            sendScoresInEmails: data.sendScoresInEmails
           }
         })
       }
@@ -66,6 +68,7 @@ export default function CourseNotifcationSettingsManager(props) {
 }
 
 CourseNotifcationSettingsManager.propTypes = {
+  userId: string.isRequired,
   courseId: string.isRequired,
   courseName: string.isRequired,
   enabled: bool.isRequired,

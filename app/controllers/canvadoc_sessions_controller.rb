@@ -35,7 +35,6 @@ class CanvadocSessionsController < ApplicationController
         enable_annotations: blob['enable_annotations']
       }
 
-
       submission_id = blob["submission_id"]
       if submission_id
         submission = Submission.preload(:assignment).find(submission_id)
@@ -53,7 +52,7 @@ class CanvadocSessionsController < ApplicationController
         # If we're doing annotations, DocViewer needs additional information to send notifications
         opts[:canvas_base_url] = assignment.course.root_account.domain
         opts[:user_id] = @current_user.id
-        opts[:submission_user_ids] = submission.group_id ? submission.group.users.pluck(:id) : [submission.user_id] 
+        opts[:submission_user_ids] = submission.group_id ? submission.group.users.pluck(:id) : [submission.user_id]
         opts[:course_id] = assignment.context_id
         opts[:assignment_id] = assignment.id
         opts[:submission_id] = submission.id

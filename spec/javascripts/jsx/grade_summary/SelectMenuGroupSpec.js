@@ -16,7 +16,7 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {mount} from 'enzyme'
 
 import SelectMenuGroup from 'jsx/grade_summary/SelectMenuGroup'
 
@@ -40,9 +40,15 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
       {id: '60', nickname: 'Firebending', url: '/courses/60/grades', gradingPeriodSetId: '4'}
     ]
 
-    const gradingPeriods = [{id: '9', title: 'Fall Semester'}, {id: '12', title: 'Spring Semester'}]
+    const gradingPeriods = [
+      {id: '9', title: 'Fall Semester'},
+      {id: '12', title: 'Spring Semester'}
+    ]
 
-    const students = [{id: '7', name: 'Bob Smith'}, {id: '11', name: 'Jane Doe'}]
+    const students = [
+      {id: '7', name: 'Bob Smith'},
+      {id: '11', name: 'Jane Doe'}
+    ]
 
     props = {
       assignmentSortOptions,
@@ -66,12 +72,12 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
   })
 
   test('renders a student select menu if the students prop has more than 1 student', () => {
-    wrapper = shallow(<SelectMenuGroup {...props} />)
-    strictEqual(wrapper.find('#student_select_menu').length, 1)
+    wrapper = mount(<SelectMenuGroup {...props} />)
+    strictEqual(wrapper.find('SelectMenu#student_select_menu').length, 1)
   })
 
   test('does not render a student select menu if the students prop has only 1 student', () => {
-    wrapper = shallow(<SelectMenuGroup {...props} students={[{id: '11', name: 'Jane Doe'}]} />)
+    wrapper = mount(<SelectMenuGroup {...props} students={[{id: '11', name: 'Jane Doe'}]} />)
     strictEqual(wrapper.find('#student_select_menu').length, 0)
   })
 
@@ -89,8 +95,8 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
   })
 
   test('renders a grading period select menu if passed any grading periods', () => {
-    wrapper = shallow(<SelectMenuGroup {...props} />)
-    strictEqual(wrapper.find('#grading_period_select_menu').length, 1)
+    wrapper = mount(<SelectMenuGroup {...props} />)
+    strictEqual(wrapper.find('SelectMenu#grading_period_select_menu').length, 1)
   })
 
   test('includes "All Grading Periods" as an option in the grading period select menu', () => {
@@ -105,7 +111,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
   })
 
   test('does not render a grading period select menu if passed no grading periods', () => {
-    wrapper = shallow(<SelectMenuGroup {...props} gradingPeriods={[]} />)
+    wrapper = mount(<SelectMenuGroup {...props} gradingPeriods={[]} />)
     strictEqual(wrapper.find('#grading_period_select_menu').length, 0)
   })
 
@@ -116,12 +122,12 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
   })
 
   test('renders a course select menu if the courses prop has more than 1 course', () => {
-    wrapper = shallow(<SelectMenuGroup {...props} />)
-    strictEqual(wrapper.find('#course_select_menu').length, 1)
+    wrapper = mount(<SelectMenuGroup {...props} />)
+    strictEqual(wrapper.find('SelectMenu#course_select_menu').length, 1)
   })
 
   test('does not render a course select menu if the courses prop has only 1 course', () => {
-    wrapper = shallow(
+    wrapper = mount(
       <SelectMenuGroup
         {...props}
         courses={[{id: '2', nickname: 'Autos', url: '/courses/2/grades'}]}
@@ -169,13 +175,13 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
   })
 
   test('renders a submit button', () => {
-    wrapper = shallow(<SelectMenuGroup {...props} />)
-    strictEqual(wrapper.find('#apply_select_menus').length, 1)
+    wrapper = mount(<SelectMenuGroup {...props} />)
+    strictEqual(wrapper.find('button#apply_select_menus').length, 1)
   })
 
   test('disables the submit button if no select menu options have changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
-    const submitButton = wrapper.find('Button[id="apply_select_menus"]')
+    const submitButton = wrapper.find('button#apply_select_menus')
     strictEqual(submitButton.prop('disabled'), true)
   })
 
@@ -185,7 +191,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
       .find('#student_select_menu')
       .last()
       .simulate('change', {target: {value: '7'}})
-    const submitButton = wrapper.find('Button[id="apply_select_menus"]')
+    const submitButton = wrapper.find('button#apply_select_menus')
     strictEqual(submitButton.prop('disabled'), false)
   })
 
@@ -195,20 +201,17 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
       .find('#student_select_menu')
       .last()
       .simulate('change', {target: {value: '7'}})
-    wrapper
-      .find('Button[id="apply_select_menus"]')
-      .find('button')
-      .simulate('click')
-    strictEqual(wrapper.find('Button[id="apply_select_menus"]').prop('disabled'), true)
+    wrapper.find('button#apply_select_menus').simulate('click')
+    strictEqual(wrapper.find('button#apply_select_menus').prop('disabled'), true)
   })
 
   test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', () => {
     const stub = sinon.stub().resolves()
-    wrapper = shallow(<SelectMenuGroup {...props} saveAssignmentOrder={stub} />)
+    wrapper = mount(<SelectMenuGroup {...props} saveAssignmentOrder={stub} />)
     wrapper
-      .find('#assignment_sort_order_select_menu')
+      .find('select#assignment_sort_order_select_menu')
       .simulate('change', {target: {value: 'title'}})
-    const submitButton = wrapper.find('#apply_select_menus')
+    const submitButton = wrapper.find('button#apply_select_menus')
     submitButton.simulate('click')
     strictEqual(stub.callCount, 1)
   })
@@ -220,7 +223,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
       .find('#student_select_menu')
       .last()
       .simulate('change', {target: {value: '7'}})
-    const submitButton = wrapper.find('#apply_select_menus').last()
+    const submitButton = wrapper.find('button#apply_select_menus').last()
     submitButton.simulate('click')
     strictEqual(props.saveAssignmentOrder.callCount, 0)
   })
@@ -239,7 +242,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
     QUnit.module('when the student has changed', contextHooks => {
       contextHooks.beforeEach(() => {
         wrapper = mountComponent()
-        submitButton = wrapper.find('#apply_select_menus').last()
+        submitButton = wrapper.find('button#apply_select_menus').last()
         wrapper
           .find('#student_select_menu')
           .last()
@@ -261,7 +264,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
         contextHooks.beforeEach(() => {
           props.selectedCourseID = '2'
           wrapper = mountComponent()
-          submitButton = wrapper.find('#apply_select_menus').last()
+          submitButton = wrapper.find('button#apply_select_menus').last()
           wrapper
             .find('#course_select_menu')
             .last()
@@ -282,7 +285,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
         contextHooks.beforeEach(() => {
           props.selectedCourseID = '2'
           wrapper = mountComponent()
-          submitButton = wrapper.find('#apply_select_menus').last()
+          submitButton = wrapper.find('button#apply_select_menus').last()
           wrapper
             .find('#course_select_menu')
             .last()
@@ -305,7 +308,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
         contextHooks.beforeEach(() => {
           props.selectedCourseID = '21'
           wrapper = mountComponent()
-          submitButton = wrapper.find('#apply_select_menus').last()
+          submitButton = wrapper.find('button#apply_select_menus').last()
           wrapper
             .find('#course_select_menu')
             .last()
@@ -326,7 +329,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
         contextHooks.beforeEach(() => {
           props.selectedCourseID = '21'
           wrapper = mountComponent()
-          submitButton = wrapper.find('#apply_select_menus').last()
+          submitButton = wrapper.find('button#apply_select_menus').last()
           wrapper
             .find('#course_select_menu')
             .last()
@@ -347,7 +350,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
         contextHooks.beforeEach(() => {
           props.selectedCourseID = '21'
           wrapper = mountComponent()
-          submitButton = wrapper.find('#apply_select_menus').last()
+          submitButton = wrapper.find('button#apply_select_menus').last()
           wrapper
             .find('#course_select_menu')
             .last()

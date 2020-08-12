@@ -249,9 +249,9 @@ module GroupsCommon
   # Moves student from one group to another group. Assumes student can be seen by toggling group's collapse arrow.
   def move_student_to_group(group_destination, student=0)
     ff('.group-user-actions')[student].click
-    wait_for_ajaximations
+    wait_for(method: nil, timeout: 1) { f(".ui-menu-item .edit-group-assignment").displayed? }
     ff('.edit-group-assignment')[student].click
-    wait_for_ajaximations
+    wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
     click_option('.move-select .move-select__group select', "#{@testgroup[group_destination].name}")
     wait_for_animations
     button = f('.move-select button[type="submit"]')
