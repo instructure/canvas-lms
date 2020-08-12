@@ -321,7 +321,7 @@ module GradebookCommon
         @a3.submit_homework(@course.students.first, body: 'submitting my homework')
       end
     end
-
+    
     def grade_assignments
       # as a teacher grade the assignments
       @a1.grade_student(@course.students.first, grade: 90, grader: @teacher)

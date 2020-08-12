@@ -68,7 +68,6 @@ describe "speed grader - grade display" do
 
     it "shows late pill" do
       Speedgrader.visit(@course.id, @a1.id)
-
       expect(Speedgrader.submission_status_pill('late')).to be_displayed
     end
 
@@ -87,6 +86,50 @@ describe "speed grader - grade display" do
       Speedgrader.visit(@course.id, @a2.id)
 
       expect(Speedgrader.submission_status_pill('missing')).to be_displayed
+    end
+  end
+
+  context "keyboard shortcuts" do
+    FIRST_GRADE = 5
+    LAST_GRADE = 10
+
+    before(:each) do
+      course_with_teacher_logged_in
+      create_and_enroll_students(2)
+      @assignment = @course.assignments.create!(
+        title: 'assignment',
+        grading_type: 'points',
+        points_possible: 100,
+        due_at: 1.day.since(now),
+        submission_types: 'online_text_entry'
+      )
+      # submit assignemnt with different content for each student
+      @assignment.submit_homework(@course.students.first, body: 'submitting my homework')
+      @assignment.submit_homework(@course.students.second, body: 'submitting my different homework')
+      # as a teacher grade the assignment with different scores
+      @assignment.grade_student(@course.students.first, grade: FIRST_GRADE, grader: @teacher)
+      @assignment.grade_student(@course.students.second, grade: LAST_GRADE, grader: @teacher)
+      Speedgrader.visit(@course.id, @assignment.id)
+    end
+
+    it "shows correct student and submission using command+Home/command+end shortcut" do
+      student_select = f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')
+      driver.action.double_click(student_select).perform
+      driver.action.key_down(:meta).key_down(:end).key_up(:meta).key_up(:end).perform
+      last_student = f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text
+      last_grade = f('#grade_container #grading-box-extended').attribute('value')
+
+      expect(last_grade).to eql(LAST_GRADE.to_s)
+      expect(last_student).to eql(@course.students.last.name)
+
+      student_select = f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')
+      driver.action.double_click(student_select).perform
+      driver.action.key_down(:meta).key_down(:home).key_up(:meta).key_up(:end).perform
+      first_student = f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text
+      first_grade = f('#grade_container #grading-box-extended').attribute('value')
+
+      expect(first_grade).to eql(FIRST_GRADE.to_s)
+      expect(first_student).to eql(@course.students.first.name)
     end
   end
 end
