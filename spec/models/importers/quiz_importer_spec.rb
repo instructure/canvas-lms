@@ -187,4 +187,15 @@ describe "Importers::QuizImporter" do
     expect(quiz.lock_at).not_to be_nil
   end
 
+  it 'sets root_account_id correctly' do
+    context = course_model
+    question_data = import_example_questions context
+    data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
+    Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+    quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+
+    expect(quiz.root_account_id).not_to be_nil
+    expect(quiz.quiz_questions.first.root_account_id).to eq quiz.root_account_id
+    expect(quiz.root_account_id).to eq @course.root_account_id
+  end
 end
