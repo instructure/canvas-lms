@@ -44,7 +44,7 @@ For more information on variable substitution, see the <a href="https://www.imsg
 Variable substitutions can be configured for a tool in 3 ways:
 
 ## Via UI
-Custom fields can be <a href="https://community.canvaslms.com/docs/DOC-3033">configured via UI</a> by editing the tool configuration and adding the
+Custom fields can be <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140">configured via UI</a> by editing the tool configuration and adding the
 desired variable to the Custom Fields text box.
 
 The following would add the domain as a launch parameter called custom_arbitrary_name:
@@ -70,7 +70,7 @@ curl 'https://<domain>.instructure.com/api/v1/courses/<course_id>/external_tools
 ```
 
 ## Via JSON Configuration (LTI 1.3)
-JSON can be used to <a href="https://community.canvaslms.com/docs/DOC-16729-42141110178" target="_blank">configure an LTI 1.3 Developer Key</a>.
+JSON can be used to <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140" target="_blank">configure an LTI 1.3 Developer Key</a>.
 
 The following JSON would create a developer key with the a placement specfic custom field and a tool-level custom field:
 

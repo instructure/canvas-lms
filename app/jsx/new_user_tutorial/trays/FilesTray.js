@@ -27,25 +27,28 @@ const FilesTray = () => (
     image="/images/tutorial-tray-images/Panda_Files.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-
-      instructor-guide-table-of-contents#jive_content_id_Files`
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
     }}
     links={[
       {
         label: I18n.t('How do I use Files as an instructor?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12963-4152314203'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-Files-as-an-instructor/ta-p/929'
       },
       {
         label: I18n.t('How do I upload a file to a course?'),
-        href: 'https://community.canvaslms.com/docs/DOC-13033-415241383'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-upload-a-file-to-a-course/ta-p/618'
       },
       {
         label: I18n.t('How do I bulk upload files to a course?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12732-415241386'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-bulk-upload-files-to-a-course/ta-p/623'
       },
       {
         label: I18n.t('How do I move and organize my files as an instructor?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12728-415241387'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-and-organize-my-files-as-an-instructor/ta-p/622'
       }
     ]}
   >

@@ -52,7 +52,7 @@ export default [
           <li>
             <Link
               as="a"
-              href="https://community.canvaslms.com/docs/DOC-13111-4152719738"
+              href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -62,7 +62,7 @@ export default [
           <li>
             <Link
               as="a"
-              href="https://community.canvaslms.com/docs/DOC-18584-set-up-your-canvas-course-in-30-minutes-or-less"
+              href="https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -72,7 +72,7 @@ export default [
           <li>
             <Link
               as="a"
-              href="https://community.canvaslms.com/docs/DOC-12687-41524130"
+              href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -82,7 +82,7 @@ export default [
               <li>
                 <Link
                   as="a"
-                  href="https://community.canvaslms.com/docs/DOC-23893"
+                  href="https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -92,7 +92,7 @@ export default [
               <li>
                 <Link
                   as="a"
-                  href="https://community.canvaslms.com/docs/DOC-18570-google-hangouts-meet-lti"
+                  href="https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -130,7 +130,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/docs/DOC-13111-4152719738"
+            href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -164,7 +164,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/docs/DOC-18584-set-up-your-canvas-course-in-30-minutes-or-less"
+            href="https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -197,7 +197,7 @@ export default [
             <li>
               <Link
                 as="a"
-                href="https://community.canvaslms.com/docs/DOC-23893"
+                href="https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -207,7 +207,7 @@ export default [
             <li>
               <Link
                 as="a"
-                href="https://community.canvaslms.com/docs/DOC-18570-google-hangouts-meet-lti"
+                href="https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -227,7 +227,7 @@ export default [
             <li>
               <Link
                 as="a"
-                href="https://community.canvaslms.com/docs/DOC-12687-41524130"
+                href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156"
                 target="_blank"
                 rel="noopener noreferrer"
               >

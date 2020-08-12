@@ -110,7 +110,7 @@ export default class ManageAppListButton extends React.Component {
                   {
                     wrappers: [
                       '<a href="https://www.eduappcenter.com">$1</a>',
-                      '<a href="https://community.canvaslms.com/docs/DOC-3026">$1</a>'
+                      '<a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-a-whitelist-in-the-Edu-App-Center/ta-p/203">$1</a>'
                     ]
                   }
                 )

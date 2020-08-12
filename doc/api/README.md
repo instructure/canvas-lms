@@ -11,7 +11,7 @@ information below and the page on <a href="oauth.html">Authentication using OAut
 API Changes
 ------
 
-For API resources, such as the API Change Log for additions, changes, deprecations, and removals, view the <a href="https://community.canvaslms.com/community/answers/releases/canvas-apis">Canvas API page</a> in the Canvas Community.
+For API resources, such as the API Change Log for additions, changes, deprecations, and removals, view the <a href="https://community.canvaslms.com/t5/Change-Log/tkb-p/changelog">Canvas API page</a> in the Canvas Community.
 
 API Terms of Service
 ------

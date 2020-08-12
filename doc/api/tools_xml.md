@@ -542,7 +542,7 @@ beta\_domain, etc).  When used in this manner, specific environment properties t
 precedent over the default values.
 
 NOTE: Test environment settings are established during the refresh process when the environments are
-<a href="https://community.canvaslms.com/docs/DOC-1384">mirrored from production</a>.
+<a href="https://community.canvaslms.com/t5/Releases/What-is-the-Canvas-release-schedule-for-beta-production-and-test/ta-p/242411">mirrored from production</a>.
 
 ### Test Environment Example
 
