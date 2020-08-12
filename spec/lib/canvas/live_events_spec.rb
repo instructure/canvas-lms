@@ -618,6 +618,17 @@ describe Canvas::LiveEvents do
         Canvas::LiveEvents.submission_updated(submission)
       end
 
+      it 'should include posted_at' do
+        post_time = Time.zone.now
+        submission.update_attributes(posted_at: post_time)
+
+        expect_event('submission_updated',
+          hash_including(
+            posted_at: post_time,
+          ))
+        Canvas::LiveEvents.submission_updated(submission)
+      end
+
       it 'should include the associated_integration_id if the assignment has an assignment configuration tool lookup' do
         submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
           tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')

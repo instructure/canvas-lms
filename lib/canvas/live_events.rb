@@ -330,8 +330,9 @@ module Canvas::LiveEvents
       missing: submission.missing?,
       lti_assignment_id: submission.assignment.lti_context_id,
       group_id: submission.group_id,
+      posted_at: submission.posted_at,
     }
-    actl = AssignmentConfigurationToolLookup.find_by(assignment_id: submission.assignment_id)
+    actl = submission.assignment.assignment_configuration_tool_lookups.take
     event[:associated_integration_id] = "#{actl.tool_vendor_code}-#{actl.tool_product_code}" if actl
     event
   end
