@@ -63,8 +63,8 @@ module DataFixup::PopulateRootAccountIdOnModels
       AssessmentQuestionBank => :context,
       AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
       AssignmentGroup => :context,
-      AssignmentOverride => :assignment,
-      AssignmentOverrideStudent => :assignment,
+      AssignmentOverride => [:assignment, :quiz],
+      AssignmentOverrideStudent => [:assignment, :quiz],
       AttachmentAssociation => %i[course group submission attachment], # attachment is last, only used if context is a ConversationMessage
       CalendarEvent => [:context_course, :context_group, :context_course_section],
       CommunicationChannel => [], # has override
