@@ -19,7 +19,6 @@
 class AppointmentGroup < ActiveRecord::Base
   include Workflow
   include TextHelper
-  include HtmlTextHelper
 
   has_many :appointments, -> { order(:start_at).preload(:child_events).where("calendar_events.workflow_state <> 'deleted'") }, opts = { class_name: 'CalendarEvent', as: :context, inverse_of: :context }
   # has_many :through on the same table does not alias columns in condition
@@ -393,14 +392,10 @@ class AppointmentGroup < ActiveRecord::Base
     :location_address
   ]
 
-  def description_html
-    format_message(description).first if description
-  end
-
   def update_appointments
     changed = Hash[
       EVENT_ATTRIBUTES.select{ |attr| saved_change_to_attribute?(attr) }.
-      map{ |attr| [attr, attr == :description ? description_html : send(attr)] }
+      map{ |attr| [attr, send(attr)] }
     ]
 
     if @contexts_changed

@@ -416,3 +416,12 @@ QUnit.module('eachWithIndex', hooks => {
     strictEqual(output, '<p>Item 0: a</p><p>Item 1: b</p><p>Item 2: c</p>')
   })
 })
+
+QUnit.module('linkify helper')
+
+test('linkifies plaintext links into html links', function() {
+  const text = 'Make a reservation at http://google.com/reserve'
+  const html =
+    "Make a reservation at <a href='http:&#x2F;&#x2F;google.com&#x2F;reserve'>http:&#x2F;&#x2F;google.com&#x2F;reserve</a>"
+  equal(helpers.linkify(text), html)
+})
