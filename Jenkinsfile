@@ -38,6 +38,9 @@ def buildParameters = [
 library "canvas-builds-library"
 
 def skipIfPreviouslySuccessful(name, block) {
+  if (env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master')) {
+    name+="${env.CANVAS_LMS_REFSPEC}"
+  }
   def successes = load('build/new-jenkins/groovy/successes.groovy')
   successes.skipIfPreviouslySuccessful(name, true, block)
 }
