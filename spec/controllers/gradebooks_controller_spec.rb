@@ -2799,6 +2799,13 @@ describe GradebooksController do
         expect(response).to be_successful
       end
 
+      it "allows admins to view rubrics" do
+        user_session(account_admin_user)
+
+        get "grading_rubrics", params: {course_id: @course}
+        expect(response).to be_successful
+      end
+
       it "forbids viewing if the user lacks appropriate permissions" do
         user_session(@student)
 
