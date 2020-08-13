@@ -205,7 +205,7 @@ class GradebooksController < ApplicationController
   end
 
   def grading_rubrics
-    return unless authorized_action(@context, @current_user, :read_rubrics)
+    return unless authorized_action(@context, @current_user, [:read_rubrics, :manage_rubrics])
 
     @rubric_contexts = @context.rubric_contexts(@current_user)
     if params[:context_code]
