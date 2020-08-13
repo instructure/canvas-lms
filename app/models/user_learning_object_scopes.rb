@@ -305,10 +305,23 @@ module UserLearningObjectScopes
     params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
     objects_needing('Assignment', 'grading', :manage_grades, params, 120.minutes, **params) do |assignment_scope|
-      as = assignment_scope.
-        joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id").
+      if Setting.get('assignments_needing_grading_new_style', 'true') == 'true'
+        submissions_needing_grading = Submission.select(:assignment_id, :user_id).
+            joins("INNER JOIN (#{assignment_scope.to_sql}) assignments ON assignment_id=assignments.id").
+          where(Submission.needs_grading_conditions)
+        student_enrollments = Enrollment.from("#{Enrollment.quoted_table_name} student_enrollments").
+            select("1").
+            where("student_enrollments.course_id=assignments.context_id").
+            where("student_enrollments.user_id=submissions_needing_grading.user_id AND student_enrollments.workflow_state='active'").
+            where("(enrollments.limit_privileges_to_course_section='f' OR student_enrollments.course_section_id=enrollments.course_section_id)")
+        as = assignment_scope.joins("INNER JOIN (#{submissions_needing_grading.to_sql}) AS submissions_needing_grading ON assignments.id=submissions_needing_grading.assignment_id").
+            where("EXISTS(?)", student_enrollments)
+      else
+        as = assignment_scope.
+          where("EXISTS (#{grader_visible_submissions_sql})")
+      end
+      as = as.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id").
         where(enrollments: {user_id: self, workflow_state: 'active', type: ['TeacherEnrollment', 'TaEnrollment']}).
-        where("EXISTS (#{grader_visible_submissions_sql})").
         group('assignments.id').
         order('assignments.due_at').
         preload(:context)
