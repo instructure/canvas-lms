@@ -175,13 +175,13 @@ module DataFixup::PopulateRootAccountIdOnModels
     ].freeze
   end
 
-
   # In case we run into other tables that can't fully finish being filled with
-  # root account ids, and they have children who need them to pretend they're full
-  def self.unfillable_tables
-    [
-      DeveloperKey
-    ].freeze
+  # root account ids, and they have children who need them to consider them as full
+  def self.unfillable_criteria
+    @unfillable_criteria ||= {
+      DeveloperKey => ['account_id IS NULL OR account_id >= ?', Shard::IDS_PER_SHARD],
+      LearningOutcomeGroup => 'context_id IS NULL',
+    }.freeze
   end
 
   def self.ignore_cross_shard_associations_tables
@@ -391,7 +391,6 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.check_if_association_has_root_account(table, assoc_reflection)
     class_name = assoc_reflection&.class_name&.constantize
     return true if assoc_reflection.nil?
-    return true if unfillable_tables.include?(class_name)
 
     # find all cross-shard foreign keys for this association
     scope = table.where("#{assoc_reflection.foreign_key} > ?", Shard::IDS_PER_SHARD)
@@ -410,6 +409,10 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   def self.empty_root_account_column_scope(table)
+    if unfillable_criteria[table]
+      table = table.where.not(*Array(unfillable_criteria[table]))
+    end
+
     if multiple_root_account_ids_tables.include?(table)
       # takes care of nil and empty arrays
       table.where("ARRAY_LENGTH(#{table.quoted_table_name}.root_account_ids, 1) IS NULL")
@@ -500,7 +503,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.unlock_next_backfill_job(table)
     # when the current table has been fully backfilled, restart the backfill job
     # so it can check to see if any new tables can begin working based off of this table
-    if table.where(get_column_name(table) => nil).none?
+    if empty_root_account_column_scope(table).none?
       self.send_later_if_production_enqueue_args(:run, {
         priority: Delayed::LOWER_PRIORITY,
         singleton: "root_account_id_backfill_strand_#{Shard.current.id}"
