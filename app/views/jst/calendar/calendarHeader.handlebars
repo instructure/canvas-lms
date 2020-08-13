@@ -1,34 +1,35 @@
-<div class="calendar_header header-table">
-  <div class="recommend_agenda screenreader-only">
-    <button id="use_agenda" class="accessibility-warning">{{#t "links.improved_accessibility_recommend_agenda"}}Warning: For improved accessibility, please use the "Agenda view" Calendar.{{/t}}</button>
-  </div>
-  <div class="header-table-row">
-    <div class="header-table-cell header-table-left">
-      <div class="calendar_navigator"></div>
-      <h2 class="appointment_group_title">{{#t "my_appointment_groups"}}My Appointment Groups{{/t}}</h2>
-      <button class="btn scheduler_done_button">{{#t "done_go_back_to_list"}}Done, Go Back To List{{/t}}</button>
+<div class="header-bar-outer-container calendar_header">
+    <div class="sticky-toolbar" data-sticky>
+        <div class="header-bar flex-container">
+            <div class="header-bar-left header-left-flex">
+                <div class="calendar_navigator"></div>
+                <h2 class="appointment_group_title">{{#t "my_appointment_groups"}}My Appointment Groups{{/t}}</h2>
+                <button class="btn scheduler_done_button">{{#t "done_go_back_to_list"}}Done, Go Back To List{{/t}}</button>
+            </div>
+
+            <div class="header-bar-right header-right-flex">
+                <div class="recommend_agenda screenreader-only">
+                    <button id="use_agenda" class="accessibility-warning">{{#t "links.improved_accessibility_recommend_agenda"}}Warning: For improved accessibility, please use the "Agenda view" Calendar.{{/t}}</button>
+                </div>
+                <span id="refresh_calendar_link" title="{{#t "loading"}}Loading{{/t}}" data-tooltip>
+                    <span class="screenreader-only">{{#t "loading"}}Loading{{/t}}</span>
+                </span>
+                <span class="calendar_view_buttons btn-group" role="tablist">
+                    <button type="button" id="week" class="btn calendar-button" role="tab" aria-selected="false" aria-controls="calendar-app" tabindex="-1">
+                        {{#t "links.calendar_week"}}Week{{/t}}
+                    </button>
+                    <button type="button" id="month" class="btn calendar-button" role="tab" aria-selected="false" aria-controls="calendar-app" tabindex="-1">
+                        {{#t "links.calendar_month"}}Month{{/t}}
+                    </button>
+                    <button type="button" id="agenda" class="btn" role="tab" aria-selected="false" aria-controls="calendar-app" tabindex="-1">
+                        {{#t "links.calendar_agenda"}}Agenda{{/t}}
+                    </button>
+                  </span>
+                <a href="#" id="create_new_event_link" class="btn" title="{{#t "create_event"}}Create New Event{{/t}}" data-tooltip role="button">
+                    <i class="icon-plus"></i>
+                    <span class="screenreader-only">{{#t "create_event"}}Create New Event{{/t}}</span>
+                </a>
+            </div>
+        </div>
     </div>
-    <div class="calendar_action_buttons header-table-cell header-table-right">
-      <span id="refresh_calendar_link"
-            title="{{#t "loading"}}Loading{{/t}}"
-            data-tooltip>
-        <span class="screenreader-only">{{#t "loading"}}Loading{{/t}}</span>
-      </span>
-      <span class="calendar_view_buttons btn-group" role="tablist">
-        <button type="button" id="week" class="btn calendar-button" role="tab" aria-selected="false" aria-controls="calendar-app" tabindex="-1">
-          {{#t "links.calendar_week"}}Week{{/t}}
-        </button>
-        <button type="button" id="month" class="btn calendar-button" role="tab" aria-selected="false" aria-controls="calendar-app" tabindex="-1">
-          {{#t "links.calendar_month"}}Month{{/t}}
-        </button>
-        <button type="button" id="agenda" class="btn" role="tab" aria-selected="false" aria-controls="calendar-app" tabindex="-1">
-          {{#t "links.calendar_agenda"}}Agenda{{/t}}
-        </button>
-      </span>
-      <a href="#" id="create_new_event_link" class="btn" title="{{#t "create_event"}}Create New Event{{/t}}" data-tooltip role="button">
-        <i class="icon-plus"></i>
-        <span class="screenreader-only">{{#t "create_event"}}Create New Event{{/t}}</span>
-      </a>
-    </div>
-  </div>
 </div>
