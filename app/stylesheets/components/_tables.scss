@@ -149,6 +149,10 @@ table {
 
 $sp-table: $ic-sp + 2;
 
+.ic-Table-responsive-x-scroll {
+  overflow-x: auto;
+}
+
 .ic-Table {
   max-width: 100%;
   width: 100%;
