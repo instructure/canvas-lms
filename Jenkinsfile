@@ -104,7 +104,7 @@ def postFn(status) {
     def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
     def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
     def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-    def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. " : ''
+    def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. Please acknowledge and investigate. " : ''
     slackSend(
       channel: '#canvas_builds',
       color: 'danger',
