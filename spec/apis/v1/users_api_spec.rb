@@ -922,11 +922,11 @@ describe "Users API", type: :request do
       expect(response.code).to eql "401"
     end
 
-    it "returns an error when search_term is fewer than 3 characters" do
+    it "returns an error when search_term is fewer than 2 characters" do
       @account = Account.default
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'ab'}, {}, :expected_status => 400)
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'a'}, {}, :expected_status => 400)
       error = json["errors"].first
-      verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
+      verify_json_error(error, "search_term", "invalid", "2 or more characters is required")
     end
 
     it "returns a list of users filtered by search_term" do
