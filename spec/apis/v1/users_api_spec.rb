@@ -2245,45 +2245,51 @@ describe "Users API", type: :request do
 
       before :once do
         course_factory(:active_all => true)
+        @cs_course = @course
         @shard1.activate do
-          @user = user_factory(:account => Account.create!, :active_all => true)
+          a = Account.create!
+          @user = user_factory(:account => a, :active_all => true)
+          @local_course = course_factory(:active_all => true, :account => a)
+          @local_course.enroll_student(@user, :enrollment_state => 'active')
         end
-        @course.enroll_student(@user, :enrollment_state => 'active')
+        @cs_course.enroll_student(@user, :enrollment_state => 'active')
       end
 
       it "should save colors relative to user's shard" do
-        json = api_call(:put, "/api/v1/users/#{@user.id}/colors/course_#{@course.id}",
+        @user.set_preference(:custom_colors, {"course_#{@local_course.local_id}" => "#bababa"})
+        json = api_call(:put, "/api/v1/users/#{@user.id}/colors/course_#{@cs_course.id}",
           { controller: 'users', action: 'set_custom_color', format: 'json',
-            id: @user.id.to_s, asset_string: "course_#{@course.id}", hexcode: 'ababab'
+            id: @user.id.to_s, asset_string: "course_#{@cs_course.id}", hexcode: 'ababab'
           }, {}, {}, {:expected_status => 200}
         )
         expect(json['hexcode']).to eq '#ababab'
-        expect(@user.reload.get_preference(:custom_colors)["course_#{@course.global_id}"]).to eq '#ababab'
+        expect(@user.reload.get_preference(:custom_colors)["course_#{@cs_course.global_id}"]).to eq '#ababab'
+        expect(@user.reload.get_preference(:custom_colors)["course_#{@local_course.local_id}"]).to eq '#bababa' # should leave existing colors alone
       end
 
       it "should retrieve colors relative to user's shard" do
-        @user.set_preference(:custom_colors, {"course_#{@course.global_id}" => '#ababab'})
+        @user.set_preference(:custom_colors, {
+          "course_#{@cs_course.global_id}" => '#ababab',
+          "course_#{@local_course.local_id}" => '#bababa',
+        })
         json = api_call(:get, "/api/v1/users/#{@user.id}/colors",
           { controller: 'users', action: 'get_custom_colors', format: 'json', id: @user.id.to_s
           }, {}, {}, {:expected_status => 200}
         )
-        expect(json["custom_colors"]["course_#{@course.local_id}"]).to eq '#ababab'
+        expect(json["custom_colors"]["course_#{@cs_course.local_id}"]).to eq '#ababab'
+        expect(json["custom_colors"]["course_#{@local_course.global_id}"]).to eq '#bababa'
       end
 
       it "should ignore old cross-shard data" do
-        @shard1.activate do
-          @cs_course = Course.create!(:account => Account.first)
-          @cs_course.enroll_student(@user, :enrollment_state => "active")
-          @user.set_preference(:custom_colors, {
-            "course_#{@cs_course.global_id}" => '#ffffff', # old data plz ignore
-            "course_#{@cs_course.local_id}" => '#ababab' # new data
-          })
-        end
+        @user.set_preference(:custom_colors, {
+          "course_#{@local_course.global_id}" => '#ffffff', # old data plz ignore
+          "course_#{@local_course.local_id}" => '#ababab' # new data
+        })
         json = api_call(:get, "/api/v1/users/#{@user.id}/colors",
           { controller: 'users', action: 'get_custom_colors', format: 'json', id: @user.id.to_s
           }, {}, {}, {:expected_status => 200}
         )
-        expect(json["custom_colors"]["course_#{@cs_course.global_id}"]).to eq '#ababab'
+        expect(json["custom_colors"]["course_#{@local_course.global_id}"]).to eq '#ababab'
       end
     end
   end
