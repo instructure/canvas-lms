@@ -241,11 +241,13 @@ export function enhanceUserContent() {
   }, 10)
   // Remove sandbox attribute from user content iframes to fix busted
   // third-party content, like Google Drive documents.
-  document.querySelectorAll('.user_content iframe[sandbox]').forEach(frame => {
-    frame.removeAttribute('sandbox')
-    const src = frame.src
-    frame.src = src
-  })
+  document
+    .querySelectorAll('.user_content iframe[sandbox="allow-scripts allow-forms allow-same-origin"]')
+    .forEach(frame => {
+      frame.removeAttribute('sandbox')
+      const src = frame.src
+      frame.src = src
+    })
 }
 
 export function formatTimeAgoTitle(date) {
