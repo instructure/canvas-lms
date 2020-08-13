@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,18 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import deparam from 'compiled/util/deparam'
+import axios from 'axios'
 
-$(document).ready(() => {
-  const params = deparam()
-  if (params.focus) {
-    const el = $(`#${params.focus}`)
-    if (el) {
-      if (el.attr('type') === 'text') {
-        el.select()
-      }
-      el.focus()
-    }
-  }
-})
+export const fetchProficiency = accountId =>
+  axios.get(`/api/v1/accounts/${accountId}/outcome_proficiency`)
+
+export const saveProficiency = (accountId, config) =>
+  axios.post(`/api/v1/accounts/${accountId}/outcome_proficiency`, config)

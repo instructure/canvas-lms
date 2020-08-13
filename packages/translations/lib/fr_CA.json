@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensions"
     },
-    "directionality_ebcae6d0": {
-        "message": "directionnalité"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Désactiver l''aperçu en ligne."
     },
@@ -575,9 +572,6 @@
     "late_2be42b88": {
         "message": "En retard"
     },
-    "left_to_right_d6da6d7e": {
-        "message": "gauche à droite"
-    },
     "link_7262adec": {
         "message": "Lien"
     },
@@ -658,9 +652,6 @@
     },
     "mic_a7f3d311": {
         "message": "Mic"
-    },
-    "miscellaneous_and_apps_f450a387": {
-        "message": "Divers et applications"
     },
     "missing_1a256b3b": {
         "message": "Manquant"
@@ -868,9 +859,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Éditeur de texte enrichi"
-    },
-    "right_to_left_ec223c81": {
-        "message": "droite à gauche"
     },
     "save_11a80ec3": {
         "message": "Enregistrer"

@@ -18,7 +18,7 @@
 import React, {useState, useEffect} from 'react'
 import I18n from 'i18n!OutcomeManagement'
 import {Tabs} from '@instructure/ui-tabs'
-import ProficiencyTable from 'jsx/rubrics/ProficiencyTable'
+import ProficiencyTable from 'jsx/outcomes/MasteryScale/ProficiencyTable'
 
 export const OutcomePanel = () => {
   useEffect(() => {

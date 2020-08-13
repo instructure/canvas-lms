@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "尺寸"
     },
-    "directionality_ebcae6d0": {
-        "message": "方向性"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "禁用在线预览。"
     },
@@ -575,9 +572,6 @@
     "late_2be42b88": {
         "message": "延迟"
     },
-    "left_to_right_d6da6d7e": {
-        "message": "从左至右"
-    },
     "link_7262adec": {
         "message": "链接"
     },
@@ -658,9 +652,6 @@
     },
     "mic_a7f3d311": {
         "message": "麦克风"
-    },
-    "miscellaneous_and_apps_f450a387": {
-        "message": "杂项和应用程序"
     },
     "missing_1a256b3b": {
         "message": "缺失"
@@ -868,9 +859,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "富内容编辑器"
-    },
-    "right_to_left_ec223c81": {
-        "message": "从右至左"
     },
     "save_11a80ec3": {
         "message": "保存"

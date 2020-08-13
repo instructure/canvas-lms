@@ -551,6 +551,33 @@ describe MasterCourses::MasterMigration do
       expect(@new_assmt.reload).to_not be_deleted
     end
 
+    it "should delete an assignment group when all assignments are moved out in the same sync" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      ag1 = @copy_from.assignment_groups.create!(:name => "group1")
+      a1 = @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
+      ag2 = @copy_from.assignment_groups.create!(:name => "group2")
+      a2 = @copy_from.assignments.create!(:title => "assmt2", :assignment_group => ag2)
+
+      run_master_migration
+
+      ag1_to = @copy_to.assignment_groups.where(:migration_id => mig_id(ag1)).first
+      ag2_to = @copy_to.assignment_groups.where(:migration_id => mig_id(ag2)).first
+      a2_to = ag2_to.assignments.first
+
+      Timecop.freeze(30.seconds.from_now) do
+        a2.update_attribute(:assignment_group, ag1)
+        ag2.reload.destroy
+      end
+
+      run_master_migration
+
+      expect(ag2_to.reload).to be_deleted # should still delete
+      expect(a2_to.reload.assignment_group).to eq ag1_to
+      expect(a2_to).to be_active
+    end
+
     it "shouldn't change assignment group weights and rules if changed downstream" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)

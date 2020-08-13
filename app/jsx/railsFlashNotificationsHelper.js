@@ -95,7 +95,9 @@ class RailsFlashNotificationsHelper {
             <i class="icon-${htmlEscape(icon)}"></i>
           </div>
           ${this.escapeContent(content)}
-          <button type="button" class="Button Button--icon-action close_link">
+          <button type="button" class="Button Button--icon-action close_link" aria-label="${htmlEscape(
+            I18n.t('Close')
+          )}">
             <i class="icon-x"></i>
           </button>
         </li>

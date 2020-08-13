@@ -363,6 +363,7 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def stage_without_dispatch!
+    return if state == :bounced
     self.dispatch_at = Time.now.utc + self.delay_for
     self.workflow_state = 'staged'
   end

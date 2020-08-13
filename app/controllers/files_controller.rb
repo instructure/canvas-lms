@@ -561,7 +561,7 @@ class FilesController < ApplicationController
 
   def render_attachment(attachment)
     respond_to do |format|
-      if params[:preview] && attachment.mime_class == 'image'
+      if params[:download] && attachment.mime_class == 'image'
         format.html { redirect_to '/images/svg-icons/icon_lock.svg' }
       else
         if @files_domain

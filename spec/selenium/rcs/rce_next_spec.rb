@@ -226,6 +226,24 @@ describe 'RCE next tests' do
           expect(f('#para').text).to eql ''
         end
       end
+
+      it 'should not magically create youtube video preview on a link', ignore_js_errors: true do
+        title = 'test_page'
+        unpublished = false
+        edit_roles = 'public'
+
+        create_wiki_page(title, unpublished, edit_roles)
+
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+
+        create_external_link('youtube', 'https://youtu.be/17oCQakzIl8')
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('class')).not_to include 'youtube_link_to_box'
+          expect(wiki_body_anchor.attribute('class')).to include 'inline_disabled'
+        end
+      end
     end
 
     it 'should click on sidebar assignment page to create link in body' do
@@ -470,8 +488,37 @@ describe 'RCE next tests' do
       end
     end
 
-    it 'should open tray when clicking options button on existing image' do
-      page_title = 'Page1'
+    it "should link image to selected text" do
+      title = "email.png"
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+
+      @course.wiki_pages.create!(
+        title: 'title',
+        body: "<p id='para'>select me</p>"
+      )
+      visit_existing_wiki_edit(@course, 'title')
+      wait_for_tiny(edit_wiki_css)
+
+      f("##{rce_page_body_ifr_id}").click
+      select_text_of_element_by_id("para")
+
+      click_images_toolbar_button
+      click_course_images
+
+      click_image_link(title)
+
+      in_frame tiny_rce_ifr_id do
+        expect(wiki_body).not_to contain_css('img')
+        expect(wiki_body_anchor.attribute('href')).to include course_file_id_path(@image)
+      end
+    end
+
+    it "should open tray when clicking options button on existing image" do
+      page_title = "Page1"
       create_wiki_page_with_embedded_image(page_title)
 
       visit_existing_wiki_edit(@course, page_title)

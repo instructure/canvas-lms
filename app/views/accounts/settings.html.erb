@@ -313,6 +313,20 @@
                     </tr>
                   <% end %>
                 <% end %>
+
+                <% if @account.feature_enabled?(:rce_enhancements) %>
+                  <%= settings.fields_for :disable_rce_media_uploads do |r| %>
+                    <% hash = @account.disable_rce_media_uploads %>
+                    <% disabled = hash[:locked] && hash[:inherited] %>
+                    <tr>
+                      <td colspan="2">
+                        <%= r.check_box :value, checked: hash[:value], disabled: disabled %>
+                        <%= r.label :value, t("Disable uploads to Canvas Media from the enhanced rich content editor") %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+
                 <% if @account.root_account.feature_enabled?(:account_level_mastery_scales) %>
                   <%= settings.fields_for :lock_outcome_proficiency do |r| %>
                     <% hash = @account.lock_outcome_proficiency %>

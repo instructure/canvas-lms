@@ -60,6 +60,8 @@ import './jquery.templateData' /* fillTemplateData, getTemplateData */
 import './vendor/date' /* Date.parse */
 import 'jqueryui/sortable'
 import 'compiled/jquery.rails_flash_notifications'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
 
 function scrollTo($thing, time = 500) {
   if (!$thing || $thing.length === 0) return
@@ -1872,6 +1874,7 @@ modules.initModuleManagement = function() {
             .sortable('enable')
             .sortable('refresh')
           initNewItemPublishButton($item, data.content_tag)
+          initNewItemDirectShare($item, data.content_tag)
           modules.updateAssignmentData()
 
           $item.find('.lock-icon').data({
@@ -1903,6 +1906,7 @@ modules.initModuleManagement = function() {
       .then(({data}) => {
         const $item = modules.addItemToModule($module, data.content_tag)
         initNewItemPublishButton($item, data.content_tag)
+        initNewItemDirectShare($item, data.content_tag)
         modules.updateAssignmentData()
 
         $item.find('.lock-icon').data({
@@ -1925,6 +1929,84 @@ modules.initModuleManagement = function() {
           .sortable('refresh')
       })
       .catch(showFlashError('Error duplicating item'))
+  })
+
+  function renderCopyToTray(open, contentSelection, returnFocusTo) {
+    ReactDOM.render(
+      <DirectShareCourseTray
+        open={open}
+        sourceCourseId={ENV.COURSE_ID}
+        contentSelection={contentSelection}
+        onDismiss={() => {
+          renderCopyToTray(false, contentSelection, returnFocusTo)
+          returnFocusTo.focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
+  function renderSendToTray(open, contentSelection, returnFocusTo) {
+    ReactDOM.render(
+      <DirectShareUserModal
+        open={open}
+        sourceCourseId={ENV.COURSE_ID}
+        contentShare={contentSelection}
+        onDismiss={() => {
+          renderSendToTray(false, contentSelection, returnFocusTo)
+          returnFocusTo.focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
+  $('.module_copy_to').live('click', event => {
+    event.preventDefault()
+    const moduleId = $(event.target)
+      .closest('.context_module')
+      .data('module-id')
+      .toString()
+    const selection = {modules: [moduleId]}
+    const returnFocusTo = $(event.target)
+      .closest('ul')
+      .prev('.al-trigger')
+    renderCopyToTray(true, selection, returnFocusTo)
+  })
+
+  $('.module_send_to').live('click', event => {
+    event.preventDefault()
+    const moduleId = $(event.target)
+      .closest('.context_module')
+      .data('module-id')
+      .toString()
+    const selection = {content_type: 'module', content_id: moduleId}
+    const returnFocusTo = $(event.target)
+      .closest('ul')
+      .prev('.al-trigger')
+    renderSendToTray(true, selection, returnFocusTo)
+  })
+
+  $('.module_item_copy_to').live('click', event => {
+    event.preventDefault()
+    const select_id = $(event.target).data('select-id')
+    const select_class = $(event.target).data('select-class')
+    const selection = {[select_class]: [select_id]}
+    const returnFocusTo = $(event.target)
+      .closest('ul')
+      .prev('.al-trigger')
+    renderCopyToTray(true, selection, returnFocusTo)
+  })
+
+  $('.module_item_send_to').live('click', event => {
+    event.preventDefault()
+    const content_id = $(event.target).data('content-id')
+    const content_type = $(event.target).data('content-type')
+    const selection = {content_id, content_type}
+    const returnFocusTo = $(event.target)
+      .closest('ul')
+      .prev('.al-trigger')
+    renderSendToTray(true, selection, returnFocusTo)
   })
 
   $('#add_module_prerequisite_dialog .cancel_button').click(() => {
@@ -2151,6 +2233,26 @@ modules.initModuleManagement = function() {
     return view
   }
 
+  const initNewItemDirectShare = ($item, data) => {
+    const $copyToMenuItem = $item.find('.module_item_copy_to')
+    if ($copyToMenuItem.length === 0) return // feature not enabled, probably
+    const $sendToMenuItem = $item.find('.module_item_send_to')
+    const content_id = data.content_id
+    const content_type = data.type.replace(/^wiki_/, '')
+    const select_class = content_type === 'quiz' ? 'quizzes' : `${content_type}s`
+    if (['assignment', 'discussion_topic', 'page', 'quiz'].includes(content_type)) {
+      // make the direct share menu items work!
+      $copyToMenuItem.data('select-class', select_class)
+      $copyToMenuItem.data('select-id', content_id)
+      $sendToMenuItem.data('content-type', content_type)
+      $sendToMenuItem.data('content-id', content_id)
+    } else {
+      // not direct shareable; remove the menu items
+      $copyToMenuItem.closest('li').remove()
+      $sendToMenuItem.closest('li').remove()
+    }
+  }
+
   const moduleItems = {}
   const updateModuleItem = function(attrs, model) {
     let i, items, item, parsedAttrs
@@ -2267,6 +2369,18 @@ function itemContentKey(model) {
   }
 }
 
+const setExpandAllButton = function() {
+  let someVisible = false
+  $('.context_module').each(function() {
+    if ($(this).find('.content:visible').length > 0) {
+      someVisible = true
+    }
+  })
+  $('#expand_collapse_all').text(someVisible ? I18n.t('Collapse All') : I18n.t('Expand All'))
+  $('#expand_collapse_all').data('expand', !someVisible)
+  $('#expand_collapse_all').attr('aria-expanded', someVisible ? 'true' : 'false')
+}
+
 var toggleModuleCollapse = function(event) {
   event.preventDefault()
   const expandCallback = null
@@ -2294,6 +2408,7 @@ var toggleModuleCollapse = function(event) {
         $module.find('.expand_module_link').focus()
         $.screenReaderFlashMessage(I18n.t('Collapsed'))
       }
+      setExpandAllButton()
       if (expandCallback && $.isFunction(expandCallback)) {
         expandCallback()
       }
@@ -2332,6 +2447,37 @@ var toggleModuleCollapse = function(event) {
     toggle()
   }
 }
+
+$('#expand_collapse_all').click(function() {
+  const shouldExpand = $(this).data('expand')
+
+  $(this).text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
+  $(this).data('expand', !shouldExpand)
+  $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
+
+  $('.context_module').each(function() {
+    const $module = $(this)
+    if (
+      (shouldExpand && $module.find('.content:visible').length === 0) ||
+      (!shouldExpand && $module.find('.content:visible').length > 0)
+    ) {
+      const callback = function() {
+        $module.find('.collapse_module_link').css('display', shouldExpand ? 'inline-block' : 'none')
+        $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
+        $module.find('.footer .manage_module').css('display', '')
+        $module.toggleClass('collapsed_module', shouldExpand)
+      }
+      $module.find('.content').slideToggle({
+        queue: false,
+        done: callback()
+      })
+    }
+  })
+
+  const url = $(this).data('url')
+  const collapse = shouldExpand ? '0' : '1'
+  $.ajaxJSON(url, 'POST', {collapse})
+})
 
 // THAT IS THE END
 
@@ -2570,6 +2716,8 @@ $(document).ready(function() {
   $contextModules.each(function() {
     modules.updateProgressionState($(this))
   })
+
+  setExpandAllButton()
 
   function setExternalToolTray(tool, moduleData, selectable, returnFocusTo) {
     const handleDismiss = () => {

@@ -18,20 +18,19 @@
 
 class OutcomeProficiency < ApplicationRecord
   extend RootAccountResolver
+  self.ignored_columns = %i[account_id]
 
   has_many :outcome_proficiency_ratings, -> { order 'points DESC, id ASC' },
     dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
-  belongs_to :account, inverse_of: :outcome_proficiency
+  belongs_to :context, polymorphic: %i[account], required: true
   belongs_to :root_account, class_name: 'Account'
 
-  validates :account, uniqueness: true, presence: true
   validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }
   validate :single_mastery_rating
   validate :strictly_decreasing_points
-  validates :context_id, :context_type, presence: true
-  before_validation :ensure_context
-
-  resolves_root_account through: :account
+  validates :context, presence: true
+  validates :context_id, uniqueness: { scope: :context_type }
+  resolves_root_account through: :context
 
   def as_json(_options={})
     {
@@ -58,12 +57,5 @@ class OutcomeProficiency < ApplicationRecord
           t("Points should be strictly decreasing: %{l} <= %{r}", l: l.points, r: r.points))
       end
     end
-  end
-
-  # TODO: get rid of once all existing proficiencies have their context populated and creation methods can be rewritten
-  def ensure_context
-    return if self.context_type.present? && self.context_id.present?
-    self.context_type = 'Account'
-    self.context_id = self.account_id
   end
 end

@@ -118,7 +118,8 @@
     flex: 0 0 auto;
     display: flex;
     align-self: center;
-
+    margin-inline-start: auto;
+    
     .completion_status {
       margin: 0 16px;
       width: 16px;

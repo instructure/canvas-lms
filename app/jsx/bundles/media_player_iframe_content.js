@@ -44,7 +44,16 @@ ready(() => {
   // if the user takes the video fullscreen and back, the documentElement winds up
   // with scrollbars, even though everything is the right size.
   document.documentElement.setAttribute('style', 'overflow: hidden;')
-
+  const div = document.body.firstElementChild
+  if (!window.frameElement) {
+    // we're standalone
+    if (is_audio) {
+      div.setAttribute('style', 'width: 320px; height: 14.25rem; margin: 1rem auto;')
+    } else {
+      // CanvasMediaPlayer leaves room for the 16px vertical margin.
+      div.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
+    }
+  }
   const media_object = ENV.media_object || {}
 
   const mediaTracks = media_object?.media_tracks.map(track => {

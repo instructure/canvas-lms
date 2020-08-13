@@ -108,11 +108,13 @@ export default class TrayController {
        */
       this._renderId++
     }
+    const io = asImageEmbed(this.$img)
+    io.isLinked = this._editor.selection.getSel().anchorNode.tagName === 'A'
 
     const element = (
       <ImageOptionsTray
         key={this._renderId}
-        imageOptions={asImageEmbed(this.$img)}
+        imageOptions={io}
         onEntered={() => {
           this._isOpen = true
         }}

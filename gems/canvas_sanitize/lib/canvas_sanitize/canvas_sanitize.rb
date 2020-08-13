@@ -286,7 +286,7 @@ module CanvasSanitize #:nodoc:
 
       :protocols => {
           'a' => {
-            'href' => ['ftp', 'http', 'https', 'mailto', 'tel', :relative].freeze,
+            'href' => ['ftp', 'http', 'https', 'mailto', 'tel', 'skype', :relative].freeze,
             'data-url' => DEFAULT_PROTOCOLS,
             'data-item-href' => DEFAULT_PROTOCOLS
           }.freeze,

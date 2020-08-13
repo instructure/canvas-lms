@@ -20,6 +20,6 @@ module Factories
   def outcome_proficiency_model(account)
     rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00')
     rating2 = OutcomeProficiencyRating.new(description: 'worst', points: 0, mastery: false, color: 'ff0000')
-    OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2], account: account)
+    OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2], context: account)
   end
 end

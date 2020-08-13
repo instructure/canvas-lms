@@ -6,7 +6,9 @@ set -o nounset -o errexit -o errtrace -o pipefail -o xtrace
 max=$((CI_NODE_TOTAL * DOCKER_PROCESSES))
 group=$(((max-CI_NODE_TOTAL * TEST_PROCESS) - CI_NODE_INDEX))
 maybeOnlyFailures=()
-[ "${1-}" = 'only-failures' ] && maybeOnlyFailures=("--test-options" "'--only-failures'")
+if [ "${1-}" = 'only-failures' ] && [ ! "${RSPEC_LOG:-}" == "1" ]; then
+  maybeOnlyFailures=("--test-options" "'--only-failures'")
+fi
 
 # we want actual globbing of individual elements for passing argument literals
 # shellcheck disable=SC2068

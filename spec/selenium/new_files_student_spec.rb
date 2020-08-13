@@ -111,21 +111,18 @@ describe "better_file_browsing" do
       end
 
       it "should not return files from hidden folders in search results", priority: "1", test_id: 171774 do
-        skip('LA-372')
         @folder.update_attribute :hidden, true
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("example")
       end
 
       it "should not return files from unpublished folders in search results", priority: "1", test_id: 171774 do
-        skip('LA-372')
         @folder.update_attribute :locked, true
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("example")
       end
 
       it "should let student access files in restricted folder hidden by link", priority: "1", test_id: 134750 do
-        skip('LA-372')
         @folder.update_attribute :hidden, true
 
         get "/courses/#{@course.id}/files/folder/restricted_folder?preview=#{@file.id}"

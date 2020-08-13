@@ -462,22 +462,36 @@ class ContextModulesController < ApplicationController
     render :json => res
   end
 
+  def collapse(mod, should_collapse)
+    progression = mod.evaluate_for(@current_user)
+    progression ||= ContextModuleProgression.new
+    if value_to_boolean(should_collapse)
+      progression.collapsed = true
+    else
+      progression.uncollapse!
+    end
+    progression.save unless progression.new_record?
+    progression
+  end
+
   def toggle_collapse
     if authorized_action(@context, @current_user, :read)
+      return unless params.key?(:collapse)
       @module = @context.modules_visible_to(@current_user).find(params[:context_module_id])
-      @progression = @module.evaluate_for(@current_user) #context_module_progressions.find_by_user_id(@current_user)
-      @progression ||= ContextModuleProgression.new
-      if params[:collapse] == '1'
-        @progression.collapsed = true
-      elsif params[:collapse]
-        @progression.uncollapse!
-      else
-        @progression.collapsed = !@progression.collapsed
-      end
-      @progression.save unless @progression.new_record?
+      progression = collapse(@module, params[:collapse])
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
-        format.json { render :json => (@progression.collapsed ? @progression : @module.content_tags_visible_to(@current_user) )}
+        format.json { render :json => (progression.collapsed ? progression : @module.content_tags_visible_to(@current_user))}
+      end
+    end
+  end
+
+  def toggle_collapse_all
+    if authorized_action(@context, @current_user, :read)
+      return unless params.key?(:collapse)
+      @modules = @context.modules_visible_to(@current_user)
+      @modules.each do |mod|
+        collapse(mod, params[:collapse])
       end
     end
   end

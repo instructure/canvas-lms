@@ -79,7 +79,7 @@ class Account < ActiveRecord::Base
   has_many :progresses, :as => :context, :inverse_of => :context
   has_many :content_migrations, :as => :context, :inverse_of => :context
   has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
-  has_one :outcome_proficiency, dependent: :destroy
+  has_one :outcome_proficiency, as: :context, inverse_of: :context, dependent: :destroy
   has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :auditor_authentication_records,
@@ -268,6 +268,7 @@ class Account < ActiveRecord::Base
   add_setting :trusted_referers, root_only: true
   add_setting :app_center_access_token
   add_setting :enable_offline_web_export, boolean: true, default: false, inheritable: true
+  add_setting :disable_rce_media_uploads, boolean: true, default: false, inheritable: true
 
   add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
   add_setting :lock_all_announcements, default: false, boolean: true, inheritable: true
@@ -380,6 +381,10 @@ class Account < ActiveRecord::Base
 
   def enable_offline_web_export?
     enable_offline_web_export[:value]
+  end
+
+  def disable_rce_media_uploads?
+    disable_rce_media_uploads[:value]
   end
 
   def open_registration?
@@ -1904,10 +1909,10 @@ class Account < ActiveRecord::Base
   end
   handle_asynchronously :update_user_dashboards, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
-  def process_external_integration_keys(params_keys, current_user)
+  def process_external_integration_keys(params_keys, current_user, keys = ExternalIntegrationKey.indexed_keys_for(self))
     return unless params_keys
 
-    ExternalIntegrationKey.indexed_keys_for(self).each do |key_type, key|
+    keys.each do |key_type, key|
       next unless params_keys.key?(key_type)
       next unless key.grants_right?(current_user, :write)
       unless params_keys[key_type].blank?

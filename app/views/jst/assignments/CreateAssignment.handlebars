@@ -1,6 +1,5 @@
 <div class="form-dialog-content create_assignment_dialog">
-  <div class="form-horizontal">
-
+  <div class="{{#unless small_tablet}}form-horizontal{{/unless}}">
     {{#if canChooseType}}
     <div class="control-group">
       <label class="control-label" for="{{uniqLabel}}_assignment_type">

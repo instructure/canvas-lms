@@ -583,7 +583,7 @@ class ContentMigrationsController < ApplicationController
     if @current_user.adminable_accounts.any?
       false # assume that if they're an account admin they're probably managing so many courses it's not worth it to even try the count
     else
-      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses.count }.sum
+      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses(true).count }.sum
       course_count <= 100
     end
   end

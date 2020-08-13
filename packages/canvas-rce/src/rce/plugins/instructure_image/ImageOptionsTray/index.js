@@ -32,7 +32,7 @@ import ImageOptionsForm from '../../shared/ImageOptionsForm'
 export default function ImageOptionsTray(props) {
   const {imageOptions, onRequestClose, open} = props
 
-  const {naturalHeight, naturalWidth} = imageOptions
+  const {naturalHeight, naturalWidth, isLinked} = imageOptions
   const currentHeight = imageOptions.appliedHeight || naturalHeight
   const currentWidth = imageOptions.appliedWidth || naturalWidth
 
@@ -134,6 +134,7 @@ export default function ImageOptionsTray(props) {
             displayAs={displayAs}
             isDecorativeImage={isDecorativeImage}
             altText={altText}
+            isLinked={isLinked}
             dimensionsState={dimensionsState}
             handleAltTextChange={handleAltTextChange}
             handleIsDecorativeChange={handleIsDecorativeChange}
@@ -154,6 +155,7 @@ ImageOptionsTray.propTypes = {
     appliedHeight: number,
     appliedWidth: number,
     isDecorativeImage: bool.isRequired,
+    isLinked: bool,
     naturalHeight: number.isRequired,
     naturalWidth: number.isRequired
   }).isRequired,

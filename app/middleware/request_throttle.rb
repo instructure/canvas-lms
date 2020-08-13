@@ -85,11 +85,19 @@ class RequestThrottle
   end
 
   # currently we define cost as the amount of user cpu time plus the amount
-  # of time spent in db queries, plus any arbitrary cost the app assigns
+  # of time spent in db queries, plus any arbitrary cost the app assigns.
+  # The CPU and DB costs are weighted according to settings so they
+  # can be dialed up or down individually if we need to have them contribute more or
+  # less to overall throttling behaviour.  Overall throttling prevelency
+  # not related to any specific subcategory of time sinks should be controlled by tuning the
+  # "request_throttle.outflow" setting instead, which impacts how quickly
+  # the bucket leaks.
   def calculate_cost(user_time, db_time, env)
     extra_time = env.fetch("extra-request-cost", 0)
     extra_time = 0 unless extra_time.is_a?(Numeric) && extra_time >= 0
-    user_time + db_time + extra_time
+    cpu_cost = Setting.get("request_throttle.cpu_cost_weight", "1.0").to_f
+    db_cost = Setting.get("request_throttle.db_cost_weight", "1.0").to_f
+    (user_time * cpu_cost) + (db_time * db_cost) + extra_time
   end
 
   def subject_to_throttling?(request)
@@ -111,7 +119,7 @@ class RequestThrottle
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
           return false
         else
-          Rails.logger.info("WOULD HAVE blocked request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
+          Rails.logger.info("WOULD HAVE throttled request (config disabled), client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
         end
       end
       return true
@@ -308,12 +316,10 @@ class RequestThrottle
     # expecting the block to return the final cost. It then increments again,
     # subtracting the initial up_front_cost from the final cost to erase it.
     def reserve_capacity(up_front_cost = self.up_front_cost)
-      return (self.count = yield) unless RequestThrottle.enabled?
-
       increment(0, up_front_cost)
       cost = yield
     ensure
-      increment(cost || 0, -up_front_cost) if RequestThrottle.enabled?
+      increment(cost || 0, -up_front_cost)
     end
 
     def full?

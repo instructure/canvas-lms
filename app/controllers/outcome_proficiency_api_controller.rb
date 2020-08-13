@@ -113,12 +113,9 @@ class OutcomeProficiencyApiController < ApplicationController
   #
   def create
     if authorized_action(@context, @current_user, :manage_outcomes)
-      if @account.outcome_proficiency
-        update_ratings(@account.outcome_proficiency)
-      else
-        update_ratings(OutcomeProficiency.new, @account)
-      end
-      render json: outcome_proficiency_json(@account.outcome_proficiency, @current_user, session)
+      proficiency = @account.outcome_proficiency.presence || OutcomeProficiency.new
+      proficiency = update_ratings(proficiency, @account)
+      render json: outcome_proficiency_json(proficiency, @current_user, session)
     end
   end
 
@@ -143,7 +140,7 @@ class OutcomeProficiencyApiController < ApplicationController
 
   private
 
-  def update_ratings(proficiency, account = nil)
+  def update_ratings(proficiency, context = nil)
     # update existing ratings & create any new ratings
     proficiency_params['ratings'].each_with_index do |val, idx|
       if idx <= proficiency.outcome_proficiency_ratings.count - 1
@@ -154,7 +151,7 @@ class OutcomeProficiencyApiController < ApplicationController
     end
     # delete unused ratings
     proficiency.outcome_proficiency_ratings[proficiency_params['ratings'].length..-1].each(&:mark_for_destruction)
-    proficiency.account = account if account
+    proficiency.context = context if context
     proficiency.save!
     proficiency
   end

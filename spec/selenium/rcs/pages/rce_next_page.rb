@@ -17,7 +17,6 @@
 require_relative '../../common'
 
 module RCENextPage
-
   # ---------------------- Controls ----------------------
 
   def pages_accordion_button
@@ -135,8 +134,8 @@ module RCENextPage
   def possibly_hidden_toolbar_button(selector)
     f(selector)
   rescue Selenium::WebDriver::Error::NoSuchElementError
-      more_toolbar_button.click
-      f(selector)
+    more_toolbar_button.click
+    f(selector)
   end
 
   def links_toolbar_button
@@ -186,11 +185,11 @@ module RCENextPage
   def lti_favorite_button
     possibly_hidden_toolbar_button('button[aria-label="Commons Favorites"')
   end
-  
+
   def lti_favorite_modal
     f('[role="dialog"][aria-label="Embed content from External Tool"]')
   end
-  
+
   def course_images
     f('[role="menuitem"][title="Course Images"]')
   end
@@ -272,7 +271,7 @@ module RCENextPage
   end
 
   def editor_window
-    f("form.edit-form .edit-content")
+    f('form.edit-form .edit-content')
   end
 
   def indent_toggle_button
@@ -315,18 +314,6 @@ module RCENextPage
     # put align right button locator here
   end
 
-  def directionality_button
-    f('[role="button"][title="directionality"]')
-  end
-
-  def directionality_toggle_button
-    f('[role="button"][title="directionality"] .tox-split-button__chevron')
-  end
-
-  def right_to_left_button
-    f('[role="menuitemcheckbox"][title="right to left"]')
-  end
-
   def formatting_dropdown
     f("button[aria-label='Blocks'")
   end
@@ -348,7 +335,7 @@ module RCENextPage
   end
 
   def rce_next_toolbar
-    f(".tox-toolbar__primary")
+    f('.tox-toolbar__primary')
   end
 
   def a11y_checker_button
@@ -393,6 +380,38 @@ module RCENextPage
 
   def overflow_toolbar
     f(overflow_toolbar_selector)
+  end
+
+  def user_media_menu_item
+    fj('[role="menuitem"]:contains("User Media")')
+  end
+
+  def menu_items_by_menu_id(menu_id)
+    ffj("##{menu_id} [role='menuitem']")
+  end
+
+  def menu_item_by_menu_id(menu_id, item_label)
+    fj("##{menu_id}:contains('#{item_label}')")
+  end
+
+  def menu_item_by_name(menu_name)
+    fj("button.tox-mbtn:contains('#{menu_name}')")
+  end
+
+  def menu_option_by_name(menu_option)
+    fj("div.tox-collection__item:contains('#{menu_option}')")
+  end
+
+  def embed_code_textarea
+    f('textarea[placeholder="Embed Code"]')
+  end
+
+  def upload_media_submit_button
+    f('[aria-label="Upload Media"] button[type="submit"]')
+  end
+
+  def tiny_rce_ifr_id
+    f('.tox-editor-container iframe')['id']
   end
 
   # ---------------------- Actions ----------------------
@@ -601,14 +620,6 @@ module RCENextPage
     align_right_button.click
   end
 
-  def click_directionality_button
-    directionality_button.click
-  end
-
-  def click_directionality_toggle_button
-    directionality_toggle_button.click
-  end
-
   def click_right_to_left_option
     right_to_left_button.click
   end
@@ -669,26 +680,6 @@ module RCENextPage
     upload_media_submit_button.click
   end
 
-  def user_media_menu_item
-    fj('[role="menuitem"]:contains("User Media")')
-  end
-
-  def menu_items_by_menu_id(menu_id)
-    ffj("##{menu_id} [role='menuitem']")
-  end
-
-  def menu_item_by_menu_id(menu_id, item_label)
-    fj("##{menu_id}:contains('#{item_label}')")
-  end
-
-  def embed_code_textarea
-    f('textarea[placeholder="Embed Code"]')
-  end
-
-  def upload_media_submit_button
-    f('[aria-label="Upload Media"] button[type="submit"]')
-  end
-
   def switch_to_html_view
     fj('button:contains("Switch to raw html editor")').click
   end
@@ -701,9 +692,9 @@ module RCENextPage
     f('.tox-editor-container iframe')['id']
   end
 
-  def insert_tiny_text(text = "hello")
+  def insert_tiny_text(text = 'hello')
     in_frame tiny_rce_ifr_id do
-      tinyrce_element = f("body")
+      tinyrce_element = f('body')
       tinyrce_element.click
       tinyrce_element.send_keys("#{text}\n") # newline guarantees a tinymce change event
     end
@@ -713,10 +704,13 @@ module RCENextPage
     click_links_toolbar_button
     click_external_links
     expect(fj('[role="dialog"][aria-label="Insert Link"]')).to be_displayed
+
+    # linktext.clear doesn't work because it doesn't fire any events to update
+    # the react component's state
+
     if text
       linktext = f('input[name="linktext')
-      # linktext.clear doesn't work because it doesn't fire any events to update
-      # the react component's state
+
       linktext.send_keys(:backspace) while linktext.property('value').length > 0
       linktext.send_keys(text) if text
     end
@@ -726,5 +720,32 @@ module RCENextPage
       linklink.send_keys(href)
     end
     fj('[role="dialog"] button:contains("Done")').click
+  end
+
+  def click_ltr
+    menu_item_by_name('Format').click
+    menu_option_by_name('Directionality').click
+    menu_option_by_name('Left-to-Right').click
+  end
+
+  def click_rtl
+    menu_item_by_name('Format').click
+    menu_option_by_name('Directionality').click
+    menu_option_by_name('Right-to-Left').click
+  end
+
+  def select_text_of_element_by_id(id)
+    script = <<-JS
+        const id = arguments[0]
+        const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
+        const rng = win.document.createRange()
+        rng.setStart(win.document.getElementById(id).firstChild, 0)
+        rng.setEnd(win.document.getElementById(id).firstChild, 9)
+        const sel = win.getSelection()
+        sel.removeAllRanges()
+        sel.addRange(rng)
+      JS
+
+    driver.execute_script script, id
   end
 end

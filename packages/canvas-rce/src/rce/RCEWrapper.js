@@ -115,7 +115,7 @@ function isElementWithinTable(node) {
 
 // determines if localStorage is available for our use.
 // see https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
-function storageAvailable() {
+export function storageAvailable() {
   let storage
   try {
     storage = window.localStorage
@@ -326,6 +326,10 @@ class RCEWrapper extends React.Component {
 
   insertEmbedCode(code) {
     const editor = this.mceInstance()
+
+    // don't replace selected text, but embed after
+    editor.selection.collapse()
+
     // tinymce treats iframes uniquely, and doesn't like adding attributes
     // once it's in the editor, and I'd rather not parse the incomming html
     // string with a regex, so let's create a temp copy, then add a title
@@ -825,8 +829,14 @@ class RCEWrapper extends React.Component {
   // the latter condition is necessary because the popup RestoreAutoSaveModal
   // is lousey UX when there are >1
   get isAutoSaving() {
+    // If the editor is invisible for some reason, don't show the autosave modal
+    // This doesn't apply if the editor is off-screen or has visibility:hidden;
+    // only if it isn't rendered or has display:none;
+    const editorVisible = this.editor.container.offsetParent
+
     return (
       this.props.autosave.enabled &&
+      editorVisible &&
       document.querySelectorAll('.rce-wrapper').length === 1 &&
       storageAvailable()
     )
@@ -949,6 +959,11 @@ class RCEWrapper extends React.Component {
   wrapOptions(options = {}) {
     const setupCallback = options.setup
 
+    const canvasPlugins = ['instructure_links', 'instructure_image', 'instructure_documents']
+    if (!ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED) {
+      canvasPlugins.splice(2, 0, 'instructure_record')
+    }
+
     return {
       ...options,
 
@@ -998,22 +1013,19 @@ class RCEWrapper extends React.Component {
           ]
         },
         {
-          name: formatMessage('Alignment and Indentation'),
-          items: ['align', 'bullist', 'inst_indent', 'inst_outdent', 'directionality']
+          name: formatMessage('Content'),
+          items: canvasPlugins
         },
         {
-          name: formatMessage('Canvas Plugins'),
-          items: [
-            'instructure_links',
-            'instructure_image',
-            'instructure_record',
-            'instructure_documents',
-            ...this.ltiToolFavorites,
-            'lti_tool_dropdown'
-          ]
+          name: formatMessage('External Tools'),
+          items: [...this.ltiToolFavorites, 'lti_tool_dropdown', 'lti_mru_button']
         },
         {
-          name: formatMessage('Miscellaneous and Apps'),
+          name: formatMessage('Alignment and Lists'),
+          items: ['align', 'bullist', 'inst_indent', 'inst_outdent']
+        },
+        {
+          name: formatMessage('Miscellaneous'),
           items: ['removeformat', 'table', 'instructure_equation']
         }
       ],

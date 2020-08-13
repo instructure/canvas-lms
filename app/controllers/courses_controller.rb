@@ -504,7 +504,8 @@ class CoursesController < ApplicationController
     all_enrollments.group_by {|e| [e.course_id, e.type]}.values.each do |enrollments|
       e = enrollments.sort_by {|e| e.state_with_date_sortable}.first
       if enrollments.count > 1
-        e.course_section = nil
+        # pick the last one so if all sections have "ended" it still shows up in past enrollments because dates are still terrible
+        e.course_section = enrollments.map(&:course_section).sort_by{|cs| cs.end_at || CanvasSort::Last}.last
         e.readonly!
       end
 

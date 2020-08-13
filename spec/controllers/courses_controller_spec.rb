@@ -69,7 +69,7 @@ describe CoursesController do
         # enrollments with multiple sections of the same type should be de-duped
         course_factory(active_all: true)
         user_factory(active_all: true)
-        sec1 = @course.course_sections.create!(:name => "section1")
+        sec1 = @course.course_sections.create!(:name => "section1", :end_at => 1.week.ago)
         sec2 = @course.course_sections.create!(:name => "section2")
         ens = []
         ens << @course.enroll_student(@user, :section => sec1, :allow_multiple_enrollments => true)
@@ -87,7 +87,7 @@ describe CoursesController do
 
         student_e = current_ens.detect(&:student?)
         teacher_e = current_ens.detect(&:teacher?)
-        expect(student_e.course_section).to be_nil
+        expect(student_e.course_section).to eq sec2 # pick the "current" one
         expect(teacher_e.course_section).to eq sec2
 
         expect(assigns[:past_enrollments]).to eql([])
@@ -225,6 +225,26 @@ describe CoursesController do
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [enrollment1]
         expect(assigns[:current_enrollments]).to eq [enrollment2]
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
+      it "should do even more terrible date logic based on sections" do
+        @student = user_factory
+
+        # both section dates in past
+        course1 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.from_now
+        course1.default_section.update(:end_at => 1.month.ago)
+        section2 = course1.course_sections.create!(:end_at => 1.week.ago)
+        course1.offer!
+        enrollment1 = course_with_student course: course1, user: @student, active_all: true
+        enrollment2 = course_with_student course: course1, section: section2, user: @student, active_all: true, allow_multiple_enrollments: true
+
+        user_session(@student)
+        get_index
+        expect(response).to be_successful
+        expect(assigns[:past_enrollments].count).to eq 1
+        expect(assigns[:past_enrollments].first.course).to eq course1
+        expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
       end
 

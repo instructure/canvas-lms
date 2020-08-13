@@ -115,7 +115,8 @@ describe 'RCE Next autosave feature' do
     # get '/' is emitting
     # "Warning: [themeable] A theme registry has already been initialized. Ensure that you are importing only one copy of '@instructure/ui-themeable'."
     # It's a warning but logged as an error. I don't believe it is, and I can't find it. Ignore it.
-    it 'should make room if quota is exceeded due to other rce auto save data', ignore_js_errors: true do
+    it 'should make room if quota is exceeded due to other rce auto save data',
+       ignore_js_errors: true do
       get '/'
       driver.local_storage.clear
       driver.local_storage[autosave_key('http://some/url', 'id')] =
@@ -182,6 +183,49 @@ describe 'RCE Next autosave feature' do
         expect(f('body').text).to eql('hello')
       end
       driver.local_storage.clear # blur tinymce to force autosave
+    end
+  end
+  context 'WYSIWYG generic as an admin' do
+    before(:each) do
+      Setting.set('rce_auto_save_max_age_ms', 1.hour.to_i * 1_000)
+      account_with_admin_logged_in
+      Account.default.enable_feature!(:rce_enhancements)
+      Account.default.enable_feature!(:rce_auto_save)
+      stub_rcs_config
+    end
+
+    def account_with_admin_logged_in()
+      @account = Account.default
+      account_admin_user
+      user_session(@admin)
+    end
+
+    def wait_for_rce
+      wait_for_tiny(f('.tox-edit-area'))
+    end
+
+    def edit_announcement(text = 'hello')
+      insert_tiny_text text
+    end
+
+    def autosave_key(url = driver.current_url, textarea_id = 'discussion-topic-message8')
+      "rceautosave:#{url}:#{textarea_id}"
+    end
+    it 'should not prompt to restore autosaved content if the RCE is hidden',
+       ignore_js_errors: true do
+      get "/accounts/#{@account.id}/settings#tab-announcements"
+      wait_for_rce
+      fj('button:contains("New Announcement")').click
+
+      edit_announcement
+
+      get "/accounts/#{@account.id}/settings"
+      wait_for_rce
+      wait_for_animations
+
+      expect(f('#content')).not_to contain_jqcss('h2:contains("Found auto-saved content")')
+
+      driver.local_storage.clear
     end
   end
 end

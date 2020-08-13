@@ -125,6 +125,9 @@
     "files_index_af7c662b": {
         "message": "Ευρετήριο Αρχείων"
     },
+    "format_4247a9c5": {
+        "message": "Τύπος"
+    },
     "generating_preview_45b53be0": {
         "message": "Δημιουργία προεπισκόπησης..."
     },
@@ -163,6 +166,9 @@
     },
     "invalid_file_type_881cc9b2": {
         "message": "Μη έγκυρος τύπος αρχείου"
+    },
+    "invalid_url_cbde79f": {
+        "message": "Μη έγκυρο URL"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Συντομεύσεις πληκτρολογίου"

@@ -40,7 +40,8 @@ export default class ExternalToolsTableRow extends React.Component {
     tool: object.isRequired,
     canAddEdit: bool.isRequired,
     setFocusAbove: func.isRequired,
-    favoriteCount: number.isRequired
+    favoriteCount: number.isRequired,
+    showLTIFavoriteToggles: bool
   }
 
   get is13Tool() {
@@ -215,7 +216,7 @@ export default class ExternalToolsTableRow extends React.Component {
         >
           {this.props.tool.name} {this.disabledFlag()}
         </td>
-        {!ENV.ACCOUNT?.site_admin && ENV.FEATURES?.rce_lti_favorites && (
+        {this.props.showLTIFavoriteToggles && (
           <td>
             {canBeRCEFavorite(this.props.tool) ? (
               <Checkbox

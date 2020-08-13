@@ -134,17 +134,27 @@ module OutcomesService
           when 'completed'
             true
           when 'failed'
-            raise 'Content Import for Outcomes Service failed'
+            failure_desc = "Content Import for Outcomes Service failed"
+            add_failed_import_warning(import_data, failure_desc, json.to_s)
           else
             false
           end
         else
-          raise "Error retrieving import state for Outcomes Service: #{response.body}"
+          failure_desc = "Error retrieving import state for Outcomes Service: #{response.body}"
+          add_failed_import_warning(import_data, failure_desc)
         end
       end
 
       private
 
+      def add_failed_import_warning(data, description, additional_info = '')
+        data[:content_migration].add_warning(I18n.t('%{desc}', desc: description)) if data.key?(:content_migration)
+        if additional_info.present?
+          raise "#{description}: #{additional_info}"
+        else
+          raise description
+        end
+      end
 
       def lookup_artifact(artifact_type, artifact_id, course)
         case artifact_type

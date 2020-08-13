@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Ngā āhuatanga"
     },
-    "directionality_ebcae6d0": {
-        "message": "hangai tōtika"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Monoki i roto i te raina arokite."
     },
@@ -575,9 +572,6 @@
     "late_2be42b88": {
         "message": "Tūreiti"
     },
-    "left_to_right_d6da6d7e": {
-        "message": "maui ki te matau"
-    },
     "link_7262adec": {
         "message": "Hono"
     },
@@ -658,9 +652,6 @@
     },
     "mic_a7f3d311": {
         "message": "Mic"
-    },
-    "miscellaneous_and_apps_f450a387": {
-        "message": "Momo kē me ngā Taupanga"
     },
     "missing_1a256b3b": {
         "message": "Ngaro"
@@ -868,9 +859,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Ētita Ihirangi Whai Rawa"
-    },
-    "right_to_left_ec223c81": {
-        "message": "matau ki te maui"
     },
     "save_11a80ec3": {
         "message": "Tiaki"

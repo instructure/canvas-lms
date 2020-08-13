@@ -18,6 +18,11 @@
 class FallbackMemoryCache < ActiveSupport::Cache::MemoryStore
   KEY_SUFFIX = '__no_expire'.freeze
 
+  def fetch(*, expires_in: nil)
+    return yield if expires_in == 0
+    super
+  end
+
   def fetch_without_expiration(key)
     fetch(key + KEY_SUFFIX)
   end

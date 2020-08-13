@@ -1072,6 +1072,18 @@ module Lti
                 Lti::Asset.opaque_identifier_for(student)
               ]
             end
+
+            context 'the tool in use is an LTI 1.3 tool' do
+              before do
+                allow(tool).to receive(:use_1_3?).and_return(true)
+              end
+
+              it "returns the users' lti id instead of lti 1.1 user_id" do
+                expect(subject.split(',')).to match_array [
+                  student.lti_id
+                ]
+              end
+            end
           end
 
           context 'when the current user is not observing users in the context' do

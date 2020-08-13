@@ -107,7 +107,8 @@ describe('RCEWrapper', () => {
         },
         getContent: () => {
           return ''
-        }
+        },
+        collapse: () => undefined
       },
       insertContent: contentToInsert => {
         editor.content += contentToInsert

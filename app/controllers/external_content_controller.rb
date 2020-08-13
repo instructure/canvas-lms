@@ -20,7 +20,20 @@ require 'ims/lti'
 IMS::LTI::Models::ContentItems::ContentItem.add_attribute :canvas_url, json_key: 'canvasURL'
 
 class ExternalContentController < ApplicationController
+  include Lti::Concerns::Oembed
+
   protect_from_forgery :except => [:selection_test, :success], with: :exception
+
+  before_action :require_user, only: :oembed_retrieve, if: -> { require_oembed_token? }
+  before_action :validate_oembed_token!, only: :oembed_retrieve, if: -> { require_oembed_token? }
+
+  rescue_from Lti::Concerns::Oembed::OembedAuthorizationError do
+    head :unauthorized
+  end
+
+  rescue_from JSON::JWT::InvalidFormat do
+    head :bad_request
+  end
 
   def success
     normalize_deprecated_data!
@@ -33,6 +46,7 @@ class ExternalContentController < ApplicationController
       end
     elsif params[:return_type] == 'oembed'
       js_env(oembed: {endpoint: params[:endpoint], url: params[:url]})
+      @oembed_token = params[:oembed_token]
     elsif params[:service] == 'external_tool_dialog'
       get_context
       @retrieved_data = content_items_for_canvas
@@ -82,11 +96,8 @@ class ExternalContentController < ApplicationController
   end
 
   def oembed_retrieve
-    endpoint = params[:endpoint]
-    url = params[:url]
-    uri = URI.parse(endpoint + (endpoint.match(/\?/) ? '&url=' : '?url=') + CGI.escape(url) + '&format=json')
     begin
-      res = CanvasHttp.get(uri.to_s)
+      res = CanvasHttp.get(oembed_object_uri.to_s)
       data = JSON.parse(res.body)
       content_item = Lti::ContentItemConverter.convert_oembed(data)
     rescue StandardError

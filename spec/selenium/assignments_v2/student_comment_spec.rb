@@ -31,7 +31,6 @@ describe 'assignments' do
         points_possible: 10,
         submission_types: 'online_upload'
       )
-      preload_graphql_schema
     end
 
     before(:each) do

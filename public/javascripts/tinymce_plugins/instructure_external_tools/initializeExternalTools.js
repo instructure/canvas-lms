@@ -84,36 +84,9 @@ const ExternalToolsPlugin = {
       }
     }
     if (ltiButtons.length && ENV.use_rce_enhancements) {
-      ed.ui.registry.addButton('lti_tool_dropdown', {
-        onAction: () => {
-          const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
-          document.dispatchEvent(ev)
-        },
-        icon: 'lti',
-        tooltip: 'Apps'
-      })
-      ltiButtons.forEach(button => {
-        if (!button.favorite) return
-
-        // Sanitize input against XSS
-        const svg = document.createElement('svg')
-        svg.setAttribute('viewBox', '0 0 16 16')
-        svg.setAttribute('version', '1.1')
-        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-        const image = document.createElement('image')
-        image.setAttribute('xlink:href', button.image)
-        svg.appendChild(image)
-        const div = document.createElement('div')
-        div.appendChild(svg)
-
-        ed.ui.registry.addIcon(`favorite_lti_tool_${button.id}`, div.innerHTML)
-        ed.ui.registry.addButton(`instructure_external_button_${button.id}`, {
-          onAction: () => button.onAction(),
-          tooltip: button.title,
-          icon: `favorite_lti_tool_${button.id}`,
-          title: button.title
-        })
-      })
+      buildToolsButton(ed, ltiButtons)
+      buildFavoriteToolsButtons(ed, ltiButtons)
+      buildMRUMenuButton(ed, ltiButtons)
     }
     if (clumpedButtons.length) {
       const handleClick = function() {
@@ -143,6 +116,98 @@ const ExternalToolsPlugin = {
         })
       }
     }
+  }
+}
+
+function registerToolIcon(ed, button) {
+  if (!button.iconSVG && button.image) {
+    // Sanitize input against XSS
+    const svg = document.createElement('svg')
+    svg.setAttribute('viewBox', '0 0 16 16')
+    svg.setAttribute('version', '1.1')
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    const image = document.createElement('image')
+    image.setAttribute('xlink:href', button.image)
+    svg.appendChild(image)
+    button.iconSVG = svg.outerHTML
+    button.icon = `lti_tool_${button.id}`
+  }
+  if (button.iconSVG) {
+    ed.ui.registry.addIcon(button.icon, button.iconSVG)
+  }
+}
+
+function buildToolsButton(ed, ltiButtons) {
+  const tooltip = I18n.t('Apps')
+  ed.ui.registry.addButton('lti_tool_dropdown', {
+    onAction: () => {
+      const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
+      document.dispatchEvent(ev)
+    },
+    icon: 'lti',
+    tooltip,
+    onSetup(_api) {
+      // start off with the right button visible
+      ExternalToolsHelper.showHideButtons(ed)
+    }
+  })
+}
+
+function buildFavoriteToolsButtons(ed, ltiButtons) {
+  ltiButtons.forEach(button => {
+    if (!button.favorite) return
+
+    registerToolIcon(ed, button)
+    ed.ui.registry.addButton(`instructure_external_button_${button.id}`, {
+      onAction: button.onAction,
+      tooltip: button.title,
+      icon: button.icon,
+      title: button.title
+    })
+  })
+}
+
+function buildMRUMenuButton(ed, ltiButtons) {
+  const tooltip = I18n.t('Apps')
+  ed.ui.registry.addMenuButton('lti_mru_button', {
+    tooltip,
+    icon: 'lti',
+    fetch(callback) {
+      callback(getLtiMRUItems(ed, ltiButtons))
+    },
+    onSetup(_api) {
+      ExternalToolsHelper.showHideButtons(ed)
+    }
+  })
+}
+
+function getLtiMRUItems(ed, ltiButtons) {
+  const mruIds = JSON.parse(window.localStorage.getItem('ltimru'))
+  if (mruIds && Array.isArray(mruIds) && mruIds.length) {
+    const mruButtons = ltiButtons.filter(b => mruIds.includes(b.id))
+    const mruMenuItems = []
+    mruButtons.forEach(b => {
+      registerToolIcon(ed, b)
+      if (!b.menuItem) {
+        b.menuItem = {
+          type: 'menuitem',
+          text: b.title,
+          icon: b.icon,
+          onAction: b.onAction
+        }
+      }
+      mruMenuItems.push(b.menuItem)
+    })
+    mruMenuItems.sort((a, b) => a.text.localeCompare(b.text))
+    mruMenuItems.push({
+      type: 'menuitem',
+      text: I18n.t('View All'),
+      onAction: () => {
+        const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
+        document.dispatchEvent(ev)
+      }
+    })
+    return mruMenuItems
   }
 }
 

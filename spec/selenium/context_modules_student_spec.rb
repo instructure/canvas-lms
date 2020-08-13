@@ -523,6 +523,7 @@ describe "context modules" do
       end
 
       it "shows a tooltip when hovering over a completed icon", priority: "1", test_id: 255915 do
+        skip "flaky, LS-1297"
         go_to_modules
         navigate_to_module_item(0, @assignment_1.title)
         driver.action.move_to(f('.ig-header-admin .completion_status .icon-check'), 0, 0).perform

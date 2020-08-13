@@ -70,7 +70,7 @@ export default class State {
     this.setActiveLocationInternal(region, attr)
 
     if (region === 'body') {
-      this.grid.gotoCell(attr.row, attr.cell, true)
+      this.grid.gotoCell(attr.row, attr.cell, false)
       this.triggerActiveLocationChange()
       return
     }

@@ -495,23 +495,21 @@ export default class EventDataSource {
     if (ENV.STUDENT_PLANNER_ENABLED) {
       eventDataSources.push(['/api/v1/planner_notes', params])
     }
-    if (ENV.CALENDAR && ENV.CALENDAR.MANAGE_CONTEXTS) {
-      const [admin_contexts, student_contexts] = _.partition(
-        params.context_codes,
-        cc => ENV.CALENDAR.MANAGE_CONTEXTS.indexOf(cc) >= 0
-      )
-      if (student_contexts.length) {
-        const pparams = {filter: 'ungraded_todo_items', ...params, context_codes: student_contexts}
-        eventDataSources.push(['/api/v1/planner/items', pparams])
+    const [admin_contexts, student_contexts] = _.partition(
+      params.context_codes,
+      cc => ENV.CALENDAR?.MANAGE_CONTEXTS?.indexOf(cc) >= 0
+    )
+    if (student_contexts.length) {
+      const pparams = {filter: 'ungraded_todo_items', ...params, context_codes: student_contexts}
+      eventDataSources.push(['/api/v1/planner/items', pparams])
+    }
+    if (admin_contexts.length) {
+      const pparams = {
+        filter: 'all_ungraded_todo_items',
+        ...params,
+        context_codes: admin_contexts
       }
-      if (admin_contexts.length) {
-        const pparams = {
-          filter: 'all_ungraded_todo_items',
-          ...params,
-          context_codes: admin_contexts
-        }
-        eventDataSources.push(['/api/v1/planner/items', pparams])
-      }
+      eventDataSources.push(['/api/v1/planner/items', pparams])
     }
     return this.startFetch(eventDataSources, dataCB, doneCB, options)
   }

@@ -864,6 +864,15 @@ class User < ActiveRecord::Base
     true
   end
 
+  # Because some user's can have old lti ids that differ from self.lti_id,
+  # which also depends on the current context.
+  def lookup_lti_id(context)
+    old_lti_id = context.shard.activate do
+      self.past_lti_ids.where(context: context).take&.user_lti_id
+    end
+    old_lti_id || self.lti_id
+  end
+
   def preserve_lti_id
     errors.add(:lti_id, 'Cannot change lti_id!') if lti_id_changed? && lti_id_was != nil
   end
@@ -2397,7 +2406,7 @@ class User < ActiveRecord::Base
     Course.manageable_by_user(self.id, include_concluded).not_deleted
   end
 
-  def manageable_courses_name_like(query = '', include_concluded = false)
+  def manageable_courses_by_query(query='', include_concluded = false)
     self.manageable_courses(include_concluded).not_deleted.name_like(query).limit(50)
   end
 

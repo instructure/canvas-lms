@@ -42,6 +42,7 @@ module GraphQLNodeLoader
         return nil unless user && ctx[:current_user]
 
         return user if user.grants_right?(ctx[:current_user], :read_full_profile)
+        return user if user == ctx[:current_user]
 
         has_permission = Rails.cache.fetch(["node_user_perm", ctx[:current_user], user].cache_key) do
           has_perm = Shard.with_each_shard(user.associated_shards & ctx[:current_user].associated_shards) do

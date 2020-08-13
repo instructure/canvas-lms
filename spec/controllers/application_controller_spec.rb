@@ -147,33 +147,39 @@ RSpec.describe ApplicationController do
     end
 
     describe "DIRECT_SHARE_ENABLED feature flag" do
-      it "sets the env var to true when FF is enabled" do
-        root_account = double(global_id: 1, open_registration?: true, settings: {}, cache_key: "key")
-        allow(root_account).to receive(:kill_joy?)
-        allow(root_account).to receive(:feature_enabled?).and_return(false)
-        allow(root_account).to receive(:feature_enabled?).with(:direct_share).and_return(true)
-        allow(HostUrl).to receive_messages(file_host: 'files.example.com')
-        controller.instance_variable_set(:@domain_root_account, root_account)
+      before :each do
+        allow(controller).to receive(:user_display_json)
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+      end
+
+      it "sets the env var to true when FF is enabled and the user can use it" do
+        Account.default.enable_feature!(:direct_share)
+
+        course_with_teacher(:active_all => true)
+        controller.instance_variable_set(:@current_user, @teacher)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
       end
 
+      it "sets the env var to false when FF is enabled but the user can't use it" do
+        Account.default.enable_feature!(:direct_share)
+
+        course_with_student(:active_all => true)
+        controller.instance_variable_set(:@current_user, @student)
+        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
+      end
+
       it "sets the env var to false when the context is a group" do
-        root_account = double(global_id: 1, open_registration?: true, settings: {}, cache_key: "key")
-        allow(root_account).to receive(:kill_joy?)
-        allow(root_account).to receive(:feature_enabled?).and_return(false)
-        allow(root_account).to receive(:feature_enabled?).with(:direct_share).and_return(true)
-        allow(HostUrl).to receive_messages(file_host: 'files.example.com')
-        controller.instance_variable_set(:@domain_root_account, root_account)
+        Account.default.enable_feature!(:direct_share)
+
+        course_with_teacher(:active_all => true)
+        controller.instance_variable_set(:@current_user, @teacher)
         controller.instance_variable_set(:@context, group_model)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
 
       it "sets the env var to false when FF is disabled" do
-        root_account = double(global_id: 1, open_registration?: true, settings: {}, cache_key: "key")
-        allow(root_account).to receive(:kill_joy?)
-        allow(root_account).to receive(:feature_enabled?).and_return(false)
-        allow(HostUrl).to receive_messages(file_host: 'files.example.com')
-        controller.instance_variable_set(:@domain_root_account, root_account)
+        course_with_teacher(:active_all => true)
+        controller.instance_variable_set(:@current_user, @teacher)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
     end

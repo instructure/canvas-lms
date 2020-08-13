@@ -114,6 +114,12 @@ shared_context "in-process server selenium tests" do
   # set up so you can use rails urls helpers in your selenium tests
   include Rails.application.routes.url_helpers
 
+  prepend_before :all do
+    # building the schema is currently very slow.
+    # this ensures the schema is built before specs are run to avoid timeouts
+    CanvasSchema.graphql_definition
+  end
+
   prepend_before :each do
     resize_screen_to_standard
     SeleniumDriverSetup.allow_requests!

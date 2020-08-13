@@ -78,7 +78,7 @@ export default class ExternalToolsTable extends React.Component {
     this[`externalTool${tool.app_id}`] = node
   }
 
-  trs = () => {
+  trs = show_lti_favorite_toggles => {
     if (store.getState().externalTools.length === 0) {
       return null
     }
@@ -98,6 +98,7 @@ export default class ExternalToolsTable extends React.Component {
           setFocusAbove={this.setFocusAbove(t)}
           favoriteCount={rceFavCount}
           contextType={this.assetContextType}
+          showLTIFavoriteToggles={show_lti_favorite_toggles}
         />
       )
       return t
@@ -106,6 +107,12 @@ export default class ExternalToolsTable extends React.Component {
 
   // Don't forget to change the tooltip text whtn the rce_enhancements flag goes away
   render() {
+    // only in account settings (not course), but not site_admin, and with the feature on
+    const show_lti_favorite_toggles =
+      /^account_/.test(ENV.context_asset_string) &&
+      !ENV.ACCOUNT?.site_admin &&
+      ENV.FEATURES?.rce_lti_favorites
+
     return (
       <div className="ExternalToolsTable">
         <InfiniteScroll
@@ -125,7 +132,7 @@ export default class ExternalToolsTable extends React.Component {
                   <ScreenReaderContent>{I18n.t('Status')}</ScreenReaderContent>
                 </th>
                 <th scope="col">{I18n.t('Name')}</th>
-                {!ENV.ACCOUNT?.site_admin && ENV.FEATURES?.rce_lti_favorites && (
+                {show_lti_favorite_toggles && (
                   <th scope="col" style={{width: '12rem', whiteSpace: 'nowrap'}}>
                     {I18n.t('Add to RCE toolbar')}
                     <Tooltip
@@ -150,7 +157,7 @@ export default class ExternalToolsTable extends React.Component {
                 </th>
               </tr>
             </thead>
-            <tbody className="collectionViewItems">{this.trs()}</tbody>
+            <tbody className="collectionViewItems">{this.trs(show_lti_favorite_toggles)}</tbody>
           </table>
         </InfiniteScroll>
       </div>

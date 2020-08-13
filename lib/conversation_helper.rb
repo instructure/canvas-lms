@@ -21,6 +21,8 @@ module ConversationHelper
     write_attribute(:root_account_ids, conversation&.root_account_ids&.sort&.join(','))
   end
 
+  # Note: all ids are relative to the birth shard, if you are going to consume these you should do
+  # `Shard.birth.activate! do`
   def root_account_ids
     (read_attribute(:root_account_ids) || '').split(',').map(&:to_i).sort
   end

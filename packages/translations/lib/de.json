@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Abmessungen"
     },
-    "directionality_ebcae6d0": {
-        "message": "Bündelung"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Inline-Vorschau deaktivieren"
     },
@@ -575,9 +572,6 @@
     "late_2be42b88": {
         "message": "Verspätet"
     },
-    "left_to_right_d6da6d7e": {
-        "message": "Von links nach rechts"
-    },
     "link_7262adec": {
         "message": "Link"
     },
@@ -658,9 +652,6 @@
     },
     "mic_a7f3d311": {
         "message": "Mikrofon"
-    },
-    "miscellaneous_and_apps_f450a387": {
-        "message": "Verschiedenes und Apps"
     },
     "missing_1a256b3b": {
         "message": "Fehlt"
@@ -868,9 +859,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Rich-Content-Editor"
-    },
-    "right_to_left_ec223c81": {
-        "message": "Von rechts nach links"
     },
     "save_11a80ec3": {
         "message": "Speichern"

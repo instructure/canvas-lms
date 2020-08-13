@@ -28,6 +28,12 @@ describe CanvasSanitize do
 
         it { is_expected.to eq html_string }
       end
+
+      context "and the href uses the 'skype' protocol" do
+        let(:html_string) { '<a href="skype:inst-support?call">Call Support</a>' }
+
+        it { is_expected.to eq html_string }
+      end
     end
   end
 

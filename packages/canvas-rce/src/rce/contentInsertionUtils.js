@@ -37,7 +37,11 @@ export function cleanUrl(input) {
   if (input) {
     if (input.match(/@/) && !input.match(/\//) && !input.match(/^mailto:/)) {
       url = 'mailto:' + input
-    } else if (!input.match(/^\w+:\/\//) && !input.match(/^mailto:/) && !input.match(/^\//)) {
+    } else if (
+      !input.match(/^\w+:\/\//) &&
+      !input.match(/^(?:mailto|skype|tel):/) &&
+      !input.match(/^\//)
+    ) {
       url = 'http://' + input
     }
 

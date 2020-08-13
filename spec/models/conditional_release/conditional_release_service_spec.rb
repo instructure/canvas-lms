@@ -22,16 +22,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 describe ConditionalRelease::Service do
   Service = ConditionalRelease::Service
 
-  def clear_config
-    Service.reset_config_cache
-  end
-
   def enable_service
     allow(Service).to receive(:enabled_in_context?).and_return(true)
-  end
-
-  before(:each) do
-    clear_config
   end
 
   context 'configuration' do

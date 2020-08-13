@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require_relative '../conditional_release_spec_helper'
 
 describe CyoeHelper do
   include CyoeHelper
@@ -52,55 +52,55 @@ describe CyoeHelper do
 
   describe 'cyoe rules' do
     before do
-      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
-        {
-          trigger_assignment: 1,
-          locked: false,
-          selected_set_id: 99,
-          assignment_sets: [{assignments: [{assignment_id: 2}]}],
-        }
-      ])
+      setup_course_with_native_conditional_release
+      @context = @course
+      @current_user = @student
+
+      @mod = @course.context_modules.create!
+      @tag = @mod.add_item(type: 'assignment', id: @trigger_assmt.id)
+      @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
     end
 
     it 'should return rules for the mastery path for a matched assignment' do
-      content_tag = FakeTag.new(1, FakeItem.new(1, 'Assignment'))
-      content_tag2 = FakeTag.new(1, FakeItem.new(2, 'Assignment'))
-      expect(helper.conditional_release_rule_for_module_item(content_tag)[:selected_set_id]).to eq(99)
-      expect(helper.conditional_release_rule_for_module_item(content_tag2)).to be_nil
+      set1 = @set1_assmt1.conditional_release_associations.first.assignment_set
+      expect(helper.conditional_release_rule_for_module_item(@tag, :context => @course, :user => @student)[:selected_set_id]).to eq(set1.id)
+
+      @tag2 = @mod.add_item(type: 'assignment', id: @set1_assmt1.id)
+      expect(helper.conditional_release_rule_for_module_item(@tag2, :context => @course, :user => @student)).to be_nil
     end
 
     describe 'path data for student' do
-      before do
-        @context = course_factory(active_all: true)
-        @current_user = user_factory
-      end
-
-      it 'should return url data for the mastery path if assignments in set are visible' do
-        allow(AssignmentStudentVisibility).to receive(:visible_assignment_ids_for_user).and_return([2])
-        content_tag = FakeTag.new(1, FakeItem.new(1, 'Assignment'))
-        mastery_path = helper.conditional_release_rule_for_module_item(content_tag, {is_student: true})
+      it 'should return url data for the mastery path if assignment set action is created' do
+        mastery_path = helper.conditional_release_rule_for_module_item(@tag, {is_student: true, context: @course, user: @student})
         expect(mastery_path[:still_processing]).to be false
         expect(mastery_path[:modules_url]).to eq("/courses/#{@context.id}/modules")
       end
 
+      it 'should return url data for the mastery path even if one of the unlocked items is unpublished' do
+        set1 = @set1_assmt1.conditional_release_associations.first.assignment_set
+        unpublised_assmt = @course.assignments.create!(:only_visible_to_overrides => true, :workflow_state => "unpublished")
+        set1.assignment_set_associations.create!(:assignment => unpublised_assmt)
+
+        mastery_path = helper.conditional_release_rule_for_module_item(@tag, {is_student: true, context: @course, user: @student})
+        expect(mastery_path[:still_processing]).to be false # old code would have blown up because the unpublished assmt isn't visible
+        expect(mastery_path[:modules_url]).to eq("/courses/#{@context.id}/modules")
+      end
+
       it 'should list as processing if all requirements are met but assignment is not yet visible' do
-        content_tag = FakeTag.new(1, FakeItem.new(1, 'Assignment'))
-        mastery_path = helper.conditional_release_rule_for_module_item(content_tag, {is_student: true})
+        student2 = student_in_course(course: @course, active_all: true).user
+        @current_user = student2
+        expect(ConditionalRelease::OverrideHandler).to receive(:handle_grade_change).and_return(nil) # and do nothing
+        @trigger_assmt.grade_student(student2, grade: 9, grader: @teacher)
+
+        mastery_path = helper.conditional_release_rule_for_module_item(@tag, {is_student: true, context: @course, user: student2})
         expect(mastery_path[:still_processing]).to be true
       end
 
       it 'should set awaiting_choice to true if sets exist but none are selected' do
-        allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
-          {
-            trigger_assignment: 1,
-            locked: false,
-            selected_set_id: nil,
-            assignment_sets: [{assignments: [{assignment_id: 2}]}],
-          }
-        ])
-        content_tag = FakeTag.new(1, FakeItem.new(1, 'Assignment'))
-        mastery_path = helper.conditional_release_rule_for_module_item(content_tag, {is_student: true})
-        expect(mastery_path[:choose_url]).to eq("/courses/#{@context.id}/modules/items/1/choose")
+        @trigger_assmt.grade_student(@student, grade: 3, grader: @teacher)
+
+        mastery_path = helper.conditional_release_rule_for_module_item(@tag, {is_student: true, context: @course, user: @student})
+        expect(mastery_path[:choose_url]).to eq("/courses/#{@context.id}/modules/items/#{@tag.id}/choose")
         expect(mastery_path[:awaiting_choice]).to be true
       end
     end

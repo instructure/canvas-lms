@@ -125,6 +125,9 @@
     "files_index_af7c662b": {
         "message": "Ֆայլերի ցուցիչ"
     },
+    "format_4247a9c5": {
+        "message": "Ֆորմատ"
+    },
     "generating_preview_45b53be0": {
         "message": "Կարծիքը գեներացվում է ..."
     },
@@ -163,6 +166,9 @@
     },
     "invalid_file_type_881cc9b2": {
         "message": "Ֆայլի անընդունելի տեսակ"
+    },
+    "invalid_url_cbde79f": {
+        "message": "Սխալ URL"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Արագ հասանելիության ստեղներ"

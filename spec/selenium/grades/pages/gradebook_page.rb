@@ -331,10 +331,12 @@ module Gradebook
     driver.action.send_keys(:tab).perform
     driver.action.send_keys(:enter).perform
 
+    notes_cell(1).click
     driver.action.send_keys('A').perform
     driver.action.send_keys(:tab).perform
     driver.action.send_keys(:enter).perform
 
+    notes_cell(2).click
     driver.action.send_keys('C').perform
     driver.action.send_keys(:tab).perform
     driver.action.send_keys(:enter).perform
