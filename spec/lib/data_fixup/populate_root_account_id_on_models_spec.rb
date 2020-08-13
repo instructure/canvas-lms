@@ -1505,4 +1505,41 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       )
     end
   end
+
+  describe 'checking if a table is full' do
+    def table_has_root_account_id_filled(table)
+      assoc = described_class.migration_tables[table]
+      association_hash = described_class.hash_association(assoc)
+      direct_relation_associations = described_class.replace_polymorphic_associations(table, association_hash)
+      described_class.check_if_table_has_root_account(table, direct_relation_associations.keys)
+    end
+
+    context 'DeveloperKey' do
+      it 'ignores site admin keys (null account_id) and cross-shard account_id' do
+        dk1 = DeveloperKey.create!(account_id: 98765 * Shard::IDS_PER_SHARD + 1)
+        expect(dk1.root_account_id).to eq(nil)
+        dk2 = DeveloperKey.create!(account_id: nil)
+        expect(dk2.root_account_id).to eq(nil)
+        dk3 = DeveloperKey.create!(account: @course.account)
+        expect(dk3.root_account_id).to_not eq(nil)
+
+        expect(table_has_root_account_id_filled(DeveloperKey)).to eq(true)
+        dk3.update_columns(root_account_id: nil)
+        expect(table_has_root_account_id_filled(DeveloperKey)).to eq(false)
+      end
+    end
+
+    context 'LearningOutcomeGroup' do
+      it 'ignores null contexts' do
+        log1 = LearningOutcomeGroup.create!(context: nil, title: 'log')
+        expect(log1.root_account_id).to be_nil
+        log2 = outcome_group_model(context: @course)
+        expect(log2.root_account_id).to_not be_nil
+
+        expect(table_has_root_account_id_filled(LearningOutcomeGroup)).to eq(true)
+        log2.update_columns(root_account_id: nil)
+        expect(table_has_root_account_id_filled(LearningOutcomeGroup)).to eq(false)
+      end
+    end
+  end
 end
