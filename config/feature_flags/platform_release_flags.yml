@@ -63,3 +63,10 @@ use_oembed_token:
     tool-generated token to verify the origin
     of an oEmbed resource request.
   applies_to: SiteAdmin
+disable_graphql_authentication:
+  state: hidden
+  display_name: Disable authentication for GraphQL
+  description: |-
+    If enabled, GraphQL queries will not require
+    users to be signed in or use an access token.
+  applies_to: SiteAdmin
