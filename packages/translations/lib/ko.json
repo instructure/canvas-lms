@@ -190,5 +190,113 @@
     },
     "media_af190855": {
         "message": "미디어"
+    },
+    "modules_c4325335": {
+        "message": "모듈"
+    },
+    "my_files_2f621040": {
+        "message": "내 파일"
+    },
+    "new_13daf639": {
+        "message": "새 항목"
+    },
+    "no_e16d9132": {
+        "message": "아니요"
+    },
+    "no_results_940393cf": {
+        "message": "No results."
+    },
+    "nothing_for_now_e3e3ce2a": {
+        "message": "현재 없음"
+    },
+    "options_3ab0ea65": {
+        "message": "옵션"
+    },
+    "page_50c4823d": {
+        "message": "페이지"
+    },
+    "pages_e5414c2c": {
+        "message": "페이지"
+    },
+    "peer_review_74f26a13": {
+        "message": "피어 리뷰"
+    },
+    "people_b4ebb13c": {
+        "message": "사용자"
+    },
+    "points_bceb5005": {
+        "message": "점수"
+    },
+    "preview_53003fd2": {
+        "message": "미리 보기"
+    },
+    "pts_699bd9aa": {
+        "message": "점"
+    },
+    "quiz_e0dcce8f": {
+        "message": "퀴즈"
+    },
+    "quizzes_7e598f57": {
+        "message": "퀴즈"
+    },
+    "record_7c9448b": {
+        "message": "녹음/녹화"
+    },
+    "recording_98da6bda": {
+        "message": "녹음/녹화"
+    },
+    "save_11a80ec3": {
+        "message": "저장"
+    },
+    "search_280d00bd": {
+        "message": "검색"
+    },
+    "size_b30e1077": {
+        "message": "크기"
+    },
+    "sort_by_e75f9e3e": {
+        "message": "정렬 조건"
+    },
+    "start_over_f7552aa9": {
+        "message": "새로 시작"
+    },
+    "submit_a3cc6859": {
+        "message": "제출"
+    },
+    "submitted_318fad53": {
+        "message": "제출됨"
+    },
+    "syllabus_f191f65b": {
+        "message": "요강"
+    },
+    "time_2b5aac58": {
+        "message": "시간"
+    },
+    "title_ee03d132": {
+        "message": "제목"
+    },
+    "to_do_1d554f36": {
+        "message": "할 일"
+    },
+    "today_76e10f9c": {
+        "message": "오늘"
+    },
+    "tomorrow_9a6c9a00": {
+        "message": "내일"
+    },
+    "upload_file_fd2361b8": {
+        "message": "파일 업로드"
+    },
+    "url_22a5f3b8": {
+        "message": "URL"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "위키 홈"
+    },
+    "yes_dde87d5": {
+        "message": "예"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "어제"
     }
 }

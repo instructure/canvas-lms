@@ -208,5 +208,131 @@
     },
     "media_af190855": {
         "message": "Δεδομένα"
+    },
+    "missing_1a256b3b": {
+        "message": "Απομένει"
+    },
+    "modules_c4325335": {
+        "message": "Ενότητες"
+    },
+    "my_files_2f621040": {
+        "message": "Τα αρχεία μου"
+    },
+    "new_13daf639": {
+        "message": "Νέο"
+    },
+    "no_e16d9132": {
+        "message": "μη δημοσιευμένο"
+    },
+    "no_results_940393cf": {
+        "message": "Δεν υπάρχουν Αποτελέσματα"
+    },
+    "nothing_for_now_e3e3ce2a": {
+        "message": "Τίποτα για την ώρα"
+    },
+    "options_3ab0ea65": {
+        "message": "Επιλογές"
+    },
+    "page_50c4823d": {
+        "message": "Σελίδα"
+    },
+    "pages_e5414c2c": {
+        "message": "Σελίδες"
+    },
+    "peer_review_74f26a13": {
+        "message": "Αξιολόγηση Ομότιμων"
+    },
+    "people_b4ebb13c": {
+        "message": "Κοινό"
+    },
+    "points_bceb5005": {
+        "message": "Μόρια"
+    },
+    "preview_53003fd2": {
+        "message": "Προεπισκόπηση"
+    },
+    "pts_699bd9aa": {
+        "message": "pts"
+    },
+    "published_c944a23d": {
+        "message": "δημοσιευμένο/α"
+    },
+    "quiz_e0dcce8f": {
+        "message": "Κουίζ"
+    },
+    "quizzes_7e598f57": {
+        "message": "Κουίζ"
+    },
+    "record_7c9448b": {
+        "message": "Ηχογράφηση"
+    },
+    "recording_98da6bda": {
+        "message": "Εγγράφεται"
+    },
+    "replies_4a8577c8": {
+        "message": "Απαντήσεις"
+    },
+    "rich_content_editor_2708ef21": {
+        "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
+    },
+    "save_11a80ec3": {
+        "message": "Αποθήκευση"
+    },
+    "search_280d00bd": {
+        "message": "Αναζήτηση"
+    },
+    "size_b30e1077": {
+        "message": "Μέγεθος"
+    },
+    "start_over_f7552aa9": {
+        "message": "Ξεκινήστε Ξανά"
+    },
+    "submit_a3cc6859": {
+        "message": "Υποβολή"
+    },
+    "submitted_318fad53": {
+        "message": "Υποβλήθηκαν"
+    },
+    "syllabus_f191f65b": {
+        "message": "Αναλυτικό Πρόγραμμα"
+    },
+    "time_2b5aac58": {
+        "message": "Χρόνος"
+    },
+    "title_ee03d132": {
+        "message": "Τίτλος"
+    },
+    "to_do_1d554f36": {
+        "message": "Υποχρεώσεις"
+    },
+    "today_76e10f9c": {
+        "message": "Σήμερα"
+    },
+    "tomorrow_9a6c9a00": {
+        "message": "Αύριο"
+    },
+    "unpublished_dfd8801": {
+        "message": "μη δημοσιευμένο"
+    },
+    "upload_file_fd2361b8": {
+        "message": "Φόρτωση Αρχείου"
+    },
+    "upload_media_ce31135a": {
+        "message": "Μεταφόρτωση Αρχείου Πολυμέσων"
+    },
+    "url_22a5f3b8": {
+        "message": "URL"
+    },
+    "video_player_b371005": {
+        "message": "Πρόγραμμα Αναπαραγωγής Βίντεο"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "Αρχική Σελίδα Wiki"
+    },
+    "yes_dde87d5": {
+        "message": "Ναι"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "Χτες"
     }
 }
