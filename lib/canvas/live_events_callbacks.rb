@@ -81,8 +81,6 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.learning_outcome_group_created(obj)
     when SisBatch
       Canvas::LiveEvents.sis_batch_created(obj)
-    when OutcomeProficiency
-      Canvas::LiveEvents.outcome_proficiency_created(obj)
     end
   end
 
@@ -179,8 +177,6 @@ module Canvas::LiveEventsCallbacks
       if changes[:workflow_state].present?
         Canvas::LiveEvents.sis_batch_updated(obj)
       end
-    when OutcomeProficiency
-      Canvas::LiveEvents.outcome_proficiency_updated(obj)
     end
   end
 
