@@ -12990,6 +12990,7 @@ tr:
       
       Bir not manuel olarak yayınlandığında, otomatik olarak yeni bildirimler gönderir ve öğrenciler tarafından görülür.
       Yayınlanan notlar için gelecekteki not değişikliklerinin manuel olarak yayınlanmasına gerek yoktur.
+  once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Cevabınızı gönderdikten sonra değiştiremezsiniz. Bir önceki soruyu da göremezsiniz."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Cevabı bir kere değiştirdiniz mi soruyu güncellemeden önce bir seçim yapmak zorunda kalacaksınız."
   one_or_more_items_are_currently_being_imported_the_186fe069: "Şu anda bir veya daha fazla öğe içe aktarılıyor. Hazır olduklarında aşağıdaki dersin içinde görünecekler."
   one_per_line_format_name_value_79647700: "Her satırda bir değer Format: isim=değer"
