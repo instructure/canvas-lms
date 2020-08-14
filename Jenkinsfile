@@ -180,6 +180,9 @@ pipeline {
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
     POSTGRES_IMAGE_TAG=imageTag.postgres()
+    // This is primarily for the plugin build
+    // for testing canvas-lms changes against plugin repo changes
+    CANVAS_LMS_REFSPEC=configuration.canvasLmsRefspec()
   }
 
   stages {
