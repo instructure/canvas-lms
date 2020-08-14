@@ -1348,6 +1348,8 @@ el:
           user_access_token: 
             text: "Αυτή η αναφορά δείχνει τους χρήστες με token πρόσβασης."
     user_add_failed_message: "Η προσθήκη χρήστη απέτυχε, παρακαλούμε προσπαθ΄σητε ξανά"
+    user_added_message: "%{user} προστέθηκε επιτυχώς!"
+    user_added_message_sent_message: "%{user} προστέθηκε επιτυχώς! Θα πρέπει να λάβουν ένα email επιβεβαίωσης σύντομα."
     user_deleted_message: "%{username} διεγράφη επιτυχώς"
     user_inactivity_csv_parameters: 
       account_reports: 
