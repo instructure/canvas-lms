@@ -26,9 +26,6 @@
     "align_right_9bad3ac1": {
         "message": "Вирівняти по правому краю"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Вирівнювання та відступ"
-    },
     "all_4321c3a1": {
         "message": "Всі"
     },
@@ -124,9 +121,6 @@
     },
     "canvas_planner_98ed106": {
         "message": "Планувальник Canvas"
-    },
-    "canvas_plugins_705a5016": {
-        "message": "Canvas Модулі"
     },
     "clear_selected_file_82388e50": {
         "message": "Очистити вибраний файл"

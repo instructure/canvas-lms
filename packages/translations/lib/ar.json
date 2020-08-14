@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "محاذاة إلى اليمين"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "المحاذاة والمسافة البادئة"
-    },
     "all_4321c3a1": {
         "message": "الكل"
     },
@@ -145,9 +142,6 @@
     },
     "canvas_planner_98ed106": {
         "message": "مخطِط Canvas"
-    },
-    "canvas_plugins_705a5016": {
-        "message": "المكونات الإضافية لـ Canvas"
     },
     "choose_caption_file_9c45bc4e": {
         "message": "اختر ملف تسميات توضيحية"
