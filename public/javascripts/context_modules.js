@@ -1142,6 +1142,8 @@ modules.initModuleManagement = function() {
       }
 
       $('#no_context_modules_message').slideUp()
+      $('#expand_collapse_all').show()
+      setExpandAllButton()
       const $publishIcon = $module.find('.publish-icon')
       // new module, setup publish icon and other stuff
       if (!$publishIcon.data('id')) {
@@ -1475,6 +1477,10 @@ modules.initModuleManagement = function() {
             $(this).remove()
             modules.updateTaggedItems()
             $toFocus.focus()
+            const $contextModules = $('#context_modules .context_module')
+            if (!$contextModules.length) {
+              $('#expand_collapse_all').hide()
+            }
           })
           $.flashMessage(
             I18n.t('Module %{module_name} was successfully deleted.', {
@@ -2447,38 +2453,6 @@ var toggleModuleCollapse = function(event) {
     toggle()
   }
 }
-
-$('#expand_collapse_all').click(function() {
-  const shouldExpand = $(this).data('expand')
-
-  $(this).text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
-  $(this).data('expand', !shouldExpand)
-  $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
-
-  $('.context_module').each(function() {
-    const $module = $(this)
-    if (
-      (shouldExpand && $module.find('.content:visible').length === 0) ||
-      (!shouldExpand && $module.find('.content:visible').length > 0)
-    ) {
-      const callback = function() {
-        $module.find('.collapse_module_link').css('display', shouldExpand ? 'inline-block' : 'none')
-        $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
-        $module.find('.footer .manage_module').css('display', '')
-        $module.toggleClass('collapsed_module', shouldExpand)
-      }
-      $module.find('.content').slideToggle({
-        queue: false,
-        done: callback()
-      })
-    }
-  })
-
-  const url = $(this).data('url')
-  const collapse = shouldExpand ? '0' : '1'
-  $.ajaxJSON(url, 'POST', {collapse})
-})
-
 // THAT IS THE END
 
 function moduleContentIsHidden(contentEl) {
@@ -2711,6 +2685,7 @@ $(document).ready(function() {
   const $contextModules = $('#context_modules .context_module')
   if (!$contextModules.length) {
     $('#no_context_modules_message').show()
+    $('#expand_collapse_all').hide()
     $('#context_modules_sortable_container').addClass('item-group-container--is-empty')
   }
   $contextModules.each(function() {
@@ -2718,6 +2693,37 @@ $(document).ready(function() {
   })
 
   setExpandAllButton()
+
+  $('#expand_collapse_all').click(function() {
+    const shouldExpand = $(this).data('expand')
+
+    $(this).text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
+    $(this).data('expand', !shouldExpand)
+    $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
+
+    $('.context_module').each(function() {
+      const $module = $(this)
+      if (
+        (shouldExpand && $module.find('.content:visible').length === 0) ||
+        (!shouldExpand && $module.find('.content:visible').length > 0)
+      ) {
+        const callback = function() {
+          $module.find('.collapse_module_link').css('display', shouldExpand ? 'inline-block' : 'none')
+          $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
+          $module.find('.footer .manage_module').css('display', '')
+          $module.toggleClass('collapsed_module', shouldExpand)
+        }
+        $module.find('.content').slideToggle({
+          queue: false,
+          done: callback()
+        })
+      }
+    })
+
+    const url = $(this).data('url')
+    const collapse = shouldExpand ? '0' : '1'
+    $.ajaxJSON(url, 'POST', {collapse})
+  })
 
   function setExternalToolTray(tool, moduleData, selectable, returnFocusTo) {
     const handleDismiss = () => {
