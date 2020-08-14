@@ -314,7 +314,7 @@
                   <% end %>
                 <% end %>
 
-                <% if @account.feature_enabled?(:rce_enhancements) %>
+                <% if @account.feature_allowed?(:rce_enhancements) %>
                   <%= settings.fields_for :disable_rce_media_uploads do |r| %>
                     <% hash = @account.disable_rce_media_uploads %>
                     <% disabled = hash[:locked] && hash[:inherited] %>
