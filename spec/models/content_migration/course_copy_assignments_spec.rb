@@ -725,6 +725,24 @@ describe ContentMigration do
       end
     end
 
+    it "should copy the thing" do
+      @t1 = factory_with_protected_attributes(@copy_from.context_external_tools,
+        :url => "http://www.justanexamplenotarealwebsite.com/tool1", :shared_secret => 'test123',
+        :consumer_key => 'test123', :name => 'tool 1')
+      ext_data = {
+        'key' => "https://canvas.instructure.com/lti/mastery_connect_assessment"
+      }
+      a = assignment_model(
+        :course => @copy_from,
+        :title => "test1",
+        :submission_types => 'external_tool',
+        :external_tool_tag_attributes => {:content => @t1, :url => @t1.url, :external_data => ext_data.to_json}
+      )
+      run_course_copy
+      a_to = @copy_to.assignments.where(:migration_id => mig_id(a)).first
+      expect(a_to.external_tool_tag.external_data).to eq ext_data
+    end
+
     context 'external tools' do
       include_context 'lti2_spec_helper'
 
