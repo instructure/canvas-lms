@@ -239,6 +239,13 @@ export function enhanceUserContent() {
       .submit()
       .addClass('submitted')
   }, 10)
+  // Remove sandbox attribute from user content iframes to fix busted
+  // third-party content, like Google Drive documents.
+  document.querySelectorAll('.user_content iframe[sandbox]').forEach(frame => {
+    frame.removeAttribute('sandbox')
+    const src = frame.src
+    frame.src = src
+  })
 }
 $(function() {
   // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)
