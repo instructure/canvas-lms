@@ -176,21 +176,12 @@ const renderNotificationCategory = (
                     .notification.categoryDisplayName
                 }
               </Tooltip>
-              {category === 'Grading' && (
-                <View margin="x-small 0 0 small" display="block">
-                  <Checkbox
-                    data-testid="grading-send-score-in-email"
-                    label={ENV.NOTIFICATION_PREFERENCES_OPTIONS.send_scores_in_emails_text.label}
-                    size="small"
-                    variant="toggle"
-                    checked={sendScoresInEmails}
-                    onChange={() => {
-                      setSendScoresInEmails(!sendScoresInEmails)
-                      updatePreferenceCallback({sendScoresInEmails: !sendScoresInEmails})
-                    }}
-                  />
-                </View>
-              )}
+              {category === 'Grading' &&
+                renderSendScoresInEmailsToggle(
+                  sendScoresInEmails,
+                  setSendScoresInEmails,
+                  updatePreferenceCallback
+                )}
             </Table.RowHeader>
             {notificationPreferences.channels.map(channel => (
               <Table.Cell textAlign="center" key={category + channel.path}>
@@ -217,6 +208,30 @@ const renderNotificationCategory = (
     </Table.Body>
   </Table>
 )
+
+const renderSendScoresInEmailsToggle = (
+  sendScoresInEmails,
+  setSendScoresInEmails,
+  updatePreferenceCallback
+) => {
+  if (ENV.NOTIFICATION_PREFERENCES_OPTIONS.send_scores_in_emails_text !== null) {
+    return (
+      <View margin="x-small 0 0 small" display="block">
+        <Checkbox
+          data-testid="grading-send-score-in-email"
+          label={ENV.NOTIFICATION_PREFERENCES_OPTIONS.send_scores_in_emails_text.label}
+          size="small"
+          variant="toggle"
+          checked={sendScoresInEmails}
+          onChange={() => {
+            setSendScoresInEmails(!sendScoresInEmails)
+            updatePreferenceCallback({sendScoresInEmails: !sendScoresInEmails})
+          }}
+        />
+      </View>
+    )
+  }
+}
 
 const formatPreferencesData = preferences => {
   preferences.channels.forEach((channel, i) => {

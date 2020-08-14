@@ -37,6 +37,34 @@ describe('Notification Preferences Table', () => {
     }
   })
 
+  it('does not render the send scores in emails toggle if the env var is null', () => {
+    window.ENV = {
+      NOTIFICATION_PREFERENCES_OPTIONS: {
+        send_scores_in_emails_text: null,
+        deprecate_sms_enabled: true,
+        allowed_sms_categories: ['announcement', 'grading']
+      }
+    }
+
+    const {getByTestId, queryByText} = render(
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
+    )
+
+    const gradingCategory = getByTestId('grading')
+    expect(gradingCategory).not.toBeNull()
+    expect(queryByText('Some Label Text')).toBeNull()
+  })
+
+  it('renders the send scores toggle if the env var is set', () => {
+    const {getByTestId, getByText} = render(
+      <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
+    )
+
+    const gradingCategory = getByTestId('grading')
+    expect(gradingCategory).not.toBeNull()
+    expect(getByText('Some Label Text')).toBeInTheDocument()
+  })
+
   it('correctly disables deprecated categories for sms', () => {
     const {getByTestId} = render(
       <NotificationPreferencesTable preferences={mockedNotificationPreferences()} />
