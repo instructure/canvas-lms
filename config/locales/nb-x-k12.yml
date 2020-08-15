@@ -386,6 +386,7 @@ nb-x-k12:
   account_level_mastery_scales_a5bdff29: "Mestringsskalaer på gruppenivå"
   account_level_notification_preferences_require_an__66467cd7: "Varselpreferanser for kontonivå krever en account_id for å kunne oppdateres."
   account_level_notification_preferences_ui_update_f5e189a4: "Varselpreferanser for kontonivå brukergrensesnittoppdatering"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Varslinger på kontonivå gjelder for alle fag. Varslinger for individuelle fag kan endres for hvert fag og vil overstyre disse varslingene."
   account_level_settings_manage_4fca6f8e: "Kontonivå-innstillinger - behandle"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonavn
@@ -396,6 +397,7 @@ nb-x-k12:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Kontovarsel sluttid går forut med starttiden"
+  account_notification_settings_e96de9b6: "Innstillinger for kontovarsling"
   account_notification_settings_error_page_66c0bc61: "Feilside for kontovarslingsinnstillinger"
   account_notification_settings_initial_query_error_f55e1cbf: "Innledende spørringsfeil for kontovarslingsinnstillinger"
   account_notification_settings_updated_dbabec35: "Kontovarslingsinnstillinger oppdatert"
@@ -1260,6 +1262,7 @@ nb-x-k12:
         manual_quotas_title: "Manuelt justerbare kvoter"
         megabytes: megabyte
         megabytes_tooltip: megabyte
+        placeholder_course_or_group_id: "Angi ID..."
         select_type_courses: "Fag ID"
         select_type_groups: Gruppe-ID
         select_type_label: "Finn fag eller gruppe"
@@ -3559,6 +3562,7 @@ nb-x-k12:
   available_from_date_must_precede_available_until_c9f9e533: "\"Tilgjengelig fra\" dato må gå foran \"Tilgjengelig inntil\""
   available_from_f84e4611: "Tilgjengelig fra"
   available_from_field_for_styleguide_7ced3861: "Tilgjengelig fra felt for styleguide"
+  available_pronouns_b45330b1: "Tilgjengelige pronomener"
   available_to_b7350e02: "Tilgjengelig til"
   available_until_3278ebe9: "Tilgjengelig til"
   available_until_date_cd125c62: "Tilgjengelig til dato"
@@ -4705,6 +4709,7 @@ nb-x-k12:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Samarbeid er nettbaserte verktøy for å jobbe sammen med oppgaver som å ta notater eller gruppere papirer. Snakk med læreren din for å komme i gang."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samarbeid er internettbaserte verktøy for å samarbeide på oppgaver som å ta notater eller gruppearbeid. Kom igang ved å legge til samarbeids-appen."
   collaborations_tutorial_tray_9219d9d: "Samarbeid Tutorial Tray"
+  collapse_all_50275533: "Kollaps alle"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kollapse liste over medlemmene i gruppen for %{groupName}"
   collapse_subdiscussion_89af1f5c: "Kollapse Sub diskusjon"
   collapse_tutorial_tray_66ee7dc1: "Kollaps lærebrettet (Tutorial Tray)"
@@ -5825,6 +5830,10 @@ nb-x-k12:
   count_students_30e46120: 
     one: "1 elev"
     other: "%{count} elever"
+  count_students_c9920376: 
+    one: "1 Elev"
+    other: "%{count} Elever"
+    zero: "0 Elever"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 elev i persentil %{percentile}."
     other: "%{count} elever i persentil %{percentile}."
@@ -5983,6 +5992,7 @@ nb-x-k12:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Faget er allerede knyttet til en blåkopi"
   course_landing_page_49a53ade: "Fag landingside"
   course_level_notification_preferences_require_a_co_2f0a618: "Varselpreferanser for fagnivå krever en course_id for å kunne oppdateres."
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Varslinger på fagnivå avledes fra varslingsinnstillingene på kontonivå. Justering av varslinger for dette faget vil overstyre varslinger på gjeldende kontonivå."
   course_level_overrides_for_notification_preference_e86d1725: "Varselpreferanser for opphevelser av fagnivå"
   course_list: 
     favorited_tooltip: "Klikk for å fjerne fra fag menyen."
@@ -7222,6 +7232,9 @@ nb-x-k12:
   disableWhileLoading: 
     loading: Laster...
   disable_a5c05db3: "Slå av"
+  disable_alert_timeouts_description: |-
+      Aktivering av denne funksjonen deaktiverer alarmvarslinger som dukker opp, og gir
+      brukeren så mye tid som nødvendig for å lese varslingen og deretter lukke den.
   disable_all_read_only_scopes_f9ffdd28: "Deaktiver alle med omfang kun lesetilgang."
   disable_and_lock_7d0ef0e8: "Slå av og lås"
   disable_automatic_submission_8e1d8676: "Deaktiver automatisk innlevering"
@@ -7233,6 +7246,7 @@ nb-x-k12:
   disable_scope_6ba4e4d4: "Deaktiver omfang"
   disable_sync_to_name_10c371dc: "Deaktivere synkronisering til %{name}"
   disable_toolname_44d6397c: "Slå av %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Deaktiver opplastinger til Canvas Media fra det forbedrede utgaven av Rich innholdsredigering"
   disabled_18c33a73: (deaktivert)
   disabled_3b1b332a: "Slått av"
   disabled_and_locked_d14dc6c2: "Deaktivert og Låst"
@@ -8416,6 +8430,7 @@ nb-x-k12:
   excused_5877183c: Fritatt!
   excused_cf8792eb: Fritatt
   exit_d0c7b013: Avslutt
+  expand_all_bb64d2ea: "Utvid alle"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Utvid/minsk %{title} målgruppen, eleven har oppnådd ekspertise i %{mastery_count} av %{count} mål"
   expand_global_navigation_2c28d5d4: "Utvid global navigasjon"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Utvid listen over gruppemedlemmer for %{groupName}"
@@ -8531,6 +8546,7 @@ nb-x-k12:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Feil ved lasting av Usynkroniserte Endringer-komponent. Er nettverksforbindelsen din OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Mislykket, send følgende avviks-kode til din systemadministrator: Avviksrapport:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Mislyktes med å hente mediakilde"
+  failed_retrieving_media_sources_32aed288: "Kunne ikke hente mediekilder."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Mislykket, rapporten mislyktes i å generere en fil. Vennligst prøv igjen."
   failed_to_add_new_feed_ee1c5ea: "Kunne ikke legge til ny strøm"
   failed_to_change_last_attended_date_1e340ba6: "Kunne ikke endre siste oppmøte-dato"
@@ -8598,6 +8614,7 @@ nb-x-k12:
   features: 
     allow_opt_out_of_inbox: "Tillate brukerne å opt-out av innboksen"
     canvas_parent_display_name: "Canvas Parent"
+    disable_alert_timeouts: "Deaktiver tidsavbrudd for alarmvarslinger"
     google_docs_domain_restriction: "Domenebegrensning for Google Docs"
     gradebook_list_students_by_sortable_name: "Vurderingsoversikt - List opp elever etter sorteringsnavn"
     hide_celebrations: "Deaktiver fest animasjoner"
@@ -8736,6 +8753,7 @@ nb-x-k12:
   final_grade_a22c596: sluttvurdering
   final_grade_info_2aa35d25: "Endelig vurdering info"
   final_grade_override_be8a21cd: "Overskriv sluttvurderinger"
+  final_grade_override_in_gradebook_history_767147c: "Overstyring av avsluttende vurdering i vurderingsoversikt."
   final_grader_1693103c: "Setter av sluttvurderer"
   final_grader_can_view_other_grader_names_67736530: "Sluttsensor kan se andre sensorers navn."
   final_letter_grade_80dccec1: "Endelig bokstavvurdering"
@@ -8878,6 +8896,7 @@ nb-x-k12:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Gi alle elever samme vurdering for *%{assignment.name}* ved å skrive inn og sende inn en vurderingsverdi under:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Gi alle elever samme *prosent* vurdering for **%{assignment.name}** ved å skrive inn og sende inn en vurderingsverdi under:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Gir opp å hente mediekilder. Dette problemet vil sannsynligvis løse seg selv til slutt."
   global_announcements_a78912c8: "Globale beskjeder"
   global_announcements_add_edit_delete_843ca4d2: "Globale beskjeder - legg til / rediger / slett"
   global_branding_df1cae12: "Global merkevarebygging"
@@ -10306,6 +10325,7 @@ nb-x-k12:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inneholder en lenke til SpeedGrader i menyen oppgaveoverskrift i Vurderingsoversikten."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inkluderer vurderingsverdier i administrators vurderingsrapport."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Inkluderer tilpasning av mål-tjenesten ved eksport og import av faginnhold"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Inkluderer overstyrte fagvurderinger i vurderingsoversikt."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inkluderer vurderingskriterier i sidestolpen for navigering innad i faget"
   incomplete_95612d72: "ikke fullført"
   incomplete_da3c2ea2: "Ikke fullført"
@@ -13822,6 +13842,7 @@ nb-x-k12:
     submission_comment_description: "Kommentar – oppgaveinnlevering"
     submission_comment_display: Innleveringskommentar
     web_conference_recording_ready: "En konferanseinnspilling er klar"
+  notification_policies_requires_the_communication_c_2e7ded08: "Varslingspolicyer krever kommunikasjonskanal-ID, varslingskategori og oppdateringsfrekvens"
   notification_preferences: 
     communication: 
       email: 
@@ -14051,6 +14072,7 @@ nb-x-k12:
   open_this_keyboard_shortcuts_dialog_9658b83a: "Åpne denne tastatursnarveidialogen"
   open_title_in_a_new_window_b29fed77: "Åpne %{title} i et nytt vindu."
   openid_connect_initiation_url_d9037d30: "* OpenID Connect igangsettings-Url"
+  opens_in_new_window_b4b99243: "åpner i et nytt vindu"
   option_1_dea39f90: "Valg 1"
   option_2_47aace2a: "Valg 2"
   option_3_30adfebc: "Valg 3"
@@ -14113,6 +14135,7 @@ nb-x-k12:
   out_of_pointspossible_c163105a: "ut av %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Innretter mål til innhold som ikke scorer"
   outcome_da397d20: Mål
+  outcome_details_ce254e89: Måldetaljer
   outcome_export_89229eb4: Måleksport
   outcome_group_39fae76f: Målsgruppe
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Kunne ikke finne målgruppe med Canvas-ID %{id}"
@@ -17075,6 +17098,8 @@ nb-x-k12:
   restart_link_validation_b61286fc: "Restart lenkevalidering"
   restore_courses_182e162e: "Gjenopprett fag"
   restored_course_association_course_c9e16045: "Gjenopprettet fagassosiering %{course}"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Begrens instruktører fra å endre mestringsskalaer"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Begrens instruktører fra å endre ferdighetsberegningsmetoden"
   restrict_sms_to_select_types_9dd6399c: "Begrens SMS-er til kun valgte typer"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Begrense elevene fra å få tilgang til fagene etter sluttdato"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Begrense elevene fra å få tilgang til fagene før oppstartsdato"
@@ -20534,6 +20559,8 @@ nb-x-k12:
   ukrainian_945b00b7: Ukrainsk
   unable_to_accept_update_fd53a7e2: "Kan ikke akseptere oppdatering"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Ikke mulig å få tilgang til spesifikk elev. Gå til oppgave i SpeedGrader?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Kan ikke justere noen mål for en side"
+  unable_to_align_some_outcomes_to_title_53467231: "Kan ikke justere noen mål for «%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan ikke opprette resultatstatistikk fordi denne oppgaven har en forfallsdato innenfor en stengt vurderingsperiode for minst en elev."
   unable_to_delete_assignment_abcf8d62: "Kan ikke slette oppgave"
   unable_to_dismiss_update_df1e32eb: "Kan ikke fjerne oppdatering"
@@ -20946,6 +20973,8 @@ nb-x-k12:
   user_observers_454d4303: Brukerobservatører
   user_option_links_66090987: "Lenker for brukervalg"
   user_profile: 
+    invalid_url: "Ugyldig URL"
+    profile_bio_too_long: "Biografien er for lang"
     profile_title_too_long: "Tittelen er for lang"
     tabs: 
       notifications: Varslinger
@@ -21832,6 +21861,7 @@ nb-x-k12:
       
       Du kan se det her: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Ditt media er lastet opp og vil vises her etter behandling."
   your_message_has_been_sent_thank_you_e0284316: "Din melding er sendt. Takk!"
   your_message_was_sent_977f6583: "Meldingen ble sendt!"
   your_name_7665e1d8: "Ditt navn"
