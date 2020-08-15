@@ -287,6 +287,9 @@
     "dimensions_45ddb7b7": {
         "message": "Mál"
     },
+    "directionality_26ae9e08": {
+        "message": "Lestrarátt"
+    },
     "disable_in_line_preview_2a675175": {
         "message": "Afvirkja forskoðun í línu."
     },
@@ -467,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Möpputré"
     },
+    "format_4247a9c5": {
+        "message": "Snið"
+    },
     "formatting_5b143aa8": {
         "message": "Forsníð"
     },
@@ -565,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "Seint"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Vinstri til hægri"
     },
     "link_7262adec": {
         "message": "Tengill"
@@ -854,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Rich Content ritill"
     },
+    "right_to_left_9cfb092a": {
+        "message": "Hægri til vinstri"
+    },
     "save_11a80ec3": {
         "message": "Vista"
     },
@@ -898,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Stærð"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "Stærð { file } er meiri en hámarkið { max } MB fyrir skráastærð"
     },
     "small_b070434a": {
         "message": "Lítil"

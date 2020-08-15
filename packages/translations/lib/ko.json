@@ -47,6 +47,9 @@
     "collaborations_5c56c15f": {
         "message": "협업"
     },
+    "content_1440204b": {
+        "message": "내용"
+    },
     "content_type_2cf90d95": {
         "message": "내용 유형"
     },
@@ -106,6 +109,9 @@
     },
     "external_links_3d9f074e": {
         "message": "외부 링크"
+    },
+    "external_tools_6e77821": {
+        "message": "외부도구"
     },
     "files_c300e900": {
         "message": "파일"

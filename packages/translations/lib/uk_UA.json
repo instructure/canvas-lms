@@ -146,6 +146,9 @@
     "computer_1d7dfa6f": {
         "message": "Комп''ютер"
     },
+    "content_1440204b": {
+        "message": "Вміст"
+    },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Вміст все ще завантажується, якщо ви продовжите, він не буде вбудований належним чином."
     },
@@ -280,6 +283,9 @@
     },
     "excused_cf8792eb": {
         "message": "Виправдано"
+    },
+    "external_tools_6e77821": {
+        "message": "Зовнішні інструменти"
     },
     "failed_to_delete_to_do_64edff49": {
         "message": "Не вдалося видалити завдання"

@@ -287,6 +287,9 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensiynau"
     },
+    "directionality_26ae9e08": {
+        "message": "Cyfeirioldeb"
+    },
     "disable_in_line_preview_2a675175": {
         "message": "Analluogi''r rhagolwg mewn-llinell."
     },
@@ -467,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Coeden ffolderi"
     },
+    "format_4247a9c5": {
+        "message": "Fformat"
+    },
     "formatting_5b143aa8": {
         "message": "Fformatio"
     },
@@ -565,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "Yn Hwyr"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Chwith i’r Dde"
     },
     "link_7262adec": {
         "message": "Dolen"
@@ -854,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Golygydd Cynnwys Cyfoethog"
     },
+    "right_to_left_9cfb092a": {
+        "message": "De i’r Chwith"
+    },
     "save_11a80ec3": {
         "message": "Cadw"
     },
@@ -898,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Maint"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "Mae maint { file } yn fwy na’r { max } MB a ganiateir ar gyfer maint y ffeil."
     },
     "small_b070434a": {
         "message": "Bach"

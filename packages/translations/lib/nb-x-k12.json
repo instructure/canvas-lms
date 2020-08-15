@@ -287,6 +287,9 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensjoner"
     },
+    "directionality_26ae9e08": {
+        "message": "Retning"
+    },
     "disable_in_line_preview_2a675175": {
         "message": "Deaktiver forhåndsvisning av prosesslinjen."
     },
@@ -467,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Mappetre"
     },
+    "format_4247a9c5": {
+        "message": "Format"
+    },
     "formatting_5b143aa8": {
         "message": "Formatering"
     },
@@ -565,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "Sent"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Venstre-til-høyre"
     },
     "link_7262adec": {
         "message": "Lenke"
@@ -854,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Rich innholdsredigering"
     },
+    "right_to_left_9cfb092a": {
+        "message": "Høyre-til-venstre"
+    },
     "save_11a80ec3": {
         "message": "Lagre"
     },
@@ -898,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Størrelse"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "Størrelsen på { file } er større enn den maksimale { max } MB tillatte filstørrelsen."
     },
     "small_b070434a": {
         "message": "Liten"

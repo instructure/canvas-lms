@@ -287,6 +287,9 @@
     "dimensions_45ddb7b7": {
         "message": "Mere"
     },
+    "directionality_26ae9e08": {
+        "message": "Usmerjenost"
+    },
     "disable_in_line_preview_2a675175": {
         "message": "Onemogoči predogled v vrstici."
     },
@@ -467,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Drevo map"
     },
+    "format_4247a9c5": {
+        "message": "Oblika zapisa"
+    },
     "formatting_5b143aa8": {
         "message": "Oblikovanje"
     },
@@ -565,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "Zamuda"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Od leve proti desni"
     },
     "link_7262adec": {
         "message": "Povezava"
@@ -854,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Urejevalnik"
     },
+    "right_to_left_9cfb092a": {
+        "message": "Od desne proti levi"
+    },
     "save_11a80ec3": {
         "message": "Shrani"
     },
@@ -898,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Velikost"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "Velikost { file } je večja od največje dovoljene velikosti datoteke { max } MB."
     },
     "small_b070434a": {
         "message": "Majhna"

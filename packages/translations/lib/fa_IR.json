@@ -65,6 +65,9 @@
     "computer_1d7dfa6f": {
         "message": "کامپیوتر"
     },
+    "content_1440204b": {
+        "message": "محتوا"
+    },
     "content_type_2cf90d95": {
         "message": "نوع محتوا"
     },
@@ -148,6 +151,9 @@
     },
     "excused_cf8792eb": {
         "message": "معاف شد"
+    },
+    "external_tools_6e77821": {
+        "message": "ابزارهای بیرونی"
     },
     "file_upload_failed_af22dd91": {
         "message": "آپلود پرونده انجام نشد"

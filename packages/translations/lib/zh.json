@@ -287,6 +287,9 @@
     "dimensions_45ddb7b7": {
         "message": "尺寸"
     },
+    "directionality_26ae9e08": {
+        "message": "方向"
+    },
     "disable_in_line_preview_2a675175": {
         "message": "禁用在线预览。"
     },
@@ -467,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "文件夹树"
     },
+    "format_4247a9c5": {
+        "message": "格式"
+    },
     "formatting_5b143aa8": {
         "message": "格式化"
     },
@@ -565,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "延迟"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "从左至右"
     },
     "link_7262adec": {
         "message": "链接"
@@ -854,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "富内容编辑器"
     },
+    "right_to_left_9cfb092a": {
+        "message": "从右至左"
+    },
     "save_11a80ec3": {
         "message": "保存"
     },
@@ -898,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "大小"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "{ file }大于{ max } MB最大所允许的文件容量。"
     },
     "small_b070434a": {
         "message": "小"

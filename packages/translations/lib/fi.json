@@ -287,6 +287,9 @@
     "dimensions_45ddb7b7": {
         "message": "Mitat"
     },
+    "directionality_26ae9e08": {
+        "message": "Suuntaisuus"
+    },
     "disable_in_line_preview_2a675175": {
         "message": "Poista tekstiin sidottu esikatselu."
     },
@@ -467,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Kansiopuu"
     },
+    "format_4247a9c5": {
+        "message": "Muotoile"
+    },
     "formatting_5b143aa8": {
         "message": "Muotoillaan"
     },
@@ -565,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "Myöhään"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Vasemmalta-Oikealle"
     },
     "link_7262adec": {
         "message": "Linkki"
@@ -854,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Rikas sisältöeditori"
     },
+    "right_to_left_9cfb092a": {
+        "message": "Oikealta-Vasemmalle"
+    },
     "save_11a80ec3": {
         "message": "Tallenna"
     },
@@ -898,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Koko"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "{ file } on kooltaan suurempi kuin suurin sallittu tiedostokoko { max } MB."
     },
     "small_b070434a": {
         "message": "Pieni"

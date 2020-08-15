@@ -287,6 +287,9 @@
     "dimensions_45ddb7b7": {
         "message": "Dimensiones"
     },
+    "directionality_26ae9e08": {
+        "message": "Direccionalidad"
+    },
     "disable_in_line_preview_2a675175": {
         "message": "Desactivar vista previa directa."
     },
@@ -467,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Árbol de carpetas"
     },
+    "format_4247a9c5": {
+        "message": "Formato"
+    },
     "formatting_5b143aa8": {
         "message": "Formato"
     },
@@ -565,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "Atrasado"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Izquierda a derecha"
     },
     "link_7262adec": {
         "message": "Enlace"
@@ -854,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Editor de Contenido Enriquecido"
     },
+    "right_to_left_9cfb092a": {
+        "message": "Derecha a izquierda"
+    },
     "save_11a80ec3": {
         "message": "Guardar"
     },
@@ -898,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Tamaño"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "El tamaño de { file } es mayor que el tamaño máximo permitido para archivos, que es de { max } MB."
     },
     "small_b070434a": {
         "message": "Pequeño"

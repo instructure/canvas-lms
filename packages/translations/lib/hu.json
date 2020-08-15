@@ -185,6 +185,9 @@
     "computer_1d7dfa6f": {
         "message": "Számítógép"
     },
+    "content_1440204b": {
+        "message": "Tartalom"
+    },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "A tartalom feltöltése még folyamatban van. Ha folytatja, akkor nem lesz rendesen beágyazva."
     },
@@ -412,6 +415,9 @@
     },
     "external_links_3d9f074e": {
         "message": "Külső linkek"
+    },
+    "external_tools_6e77821": {
+        "message": "Külső eszközök"
     },
     "extra_large_b6cdf1ff": {
         "message": "Extra nagy"
