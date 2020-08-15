@@ -421,6 +421,7 @@ ru:
   account_level_mastery_scales_a5bdff29: "Шкалы мастерства на уровне учетной записи"
   account_level_notification_preferences_require_an__66467cd7: "Предпочтения уведомлений на уровне учетной записи требуют обновления account_id"
   account_level_notification_preferences_ui_update_f5e189a4: "Обновление пользовательского интерфейса предпочтений уведомлений на уровне учетной записи"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Уведомления на уровне учетной записи применяются ко всем курсам. Уведомления для индивидуальных курсов могут быть изменены в рамках каждого курса и заменяют эти уведомления."
   account_level_settings_manage_4fca6f8e: "Настройки уровня учетной записи - управление"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "имя аккаунта"
@@ -431,6 +432,7 @@ ru:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Время окончания уведомления учетной записи предшествует времени начала"
+  account_notification_settings_e96de9b6: "Настройки уведомлений учетной записи"
   account_notification_settings_error_page_66c0bc61: "Страница ошибок настроек уведомлений для учетной записи"
   account_notification_settings_initial_query_error_f55e1cbf: "Ошибка начального запроса настроек уведомлений для учетной записи"
   account_notification_settings_updated_dbabec35: "Настройки уведомлений для учетной записи обновлены"
@@ -1412,6 +1414,7 @@ ru:
         manual_quotas_title: "Квоты, устанавливаемые вручную"
         megabytes: мегабайт
         megabytes_tooltip: мегабайт
+        placeholder_course_or_group_id: "Ввести ID..."
         select_type_courses: "Идентификатор курса"
         select_type_groups: "Идентификатор группы"
         select_type_label: "Найти курс или группу"
@@ -4003,6 +4006,7 @@ ru:
   available_from_f84e4611: "Доступно с"
   available_from_field_for_styleguide_7ced3861: "Поле Доступно с для styleguide"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Доступно с - Формат: ГГГГ-MM-ДД чч:мм"
+  available_pronouns_b45330b1: "Доступные местоимения"
   available_to_b7350e02: "Доступно для"
   available_until_3278ebe9: "Доступно до"
   available_until_date_2c0ccec3: "Доступно до даты:"
@@ -5273,6 +5277,7 @@ ru:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Сотрудничества — это онлайновые инструменты для совместной работы над такими заданиями, как внесение заметок или работа со сгруппированными документами. Обратитесь к своему преподавателю, чтобы начать."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Сотрудничества представляют собой веб-инструменты для совместной работы над задачами, например заметки или сгруппированные документы. Начните работу путем добавления приложения для совместной работы."
   collaborations_tutorial_tray_9219d9d: "Лоток справки по совместной работе"
+  collapse_all_50275533: "Свернуть все"
   collapse_group_c2af7cad: "Свернуть группу"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Свернуть список участников группы для %{groupName}"
   collapse_subdiscussion_89af1f5c: "Свернуть под-обсуждение"
@@ -6604,6 +6609,10 @@ ru:
     many: "%{count} студентов"
     one: "1 студент"
     other: "%{count} студентов"
+  count_students_c9920376: 
+    one: "1 студент"
+    other: "%{count} студентов"
+    zero: "0 студентов"
   count_students_in_percentile_percentile_d0adecfe: 
     few: "%{count} учащихся в процентиле %{percentile}. "
     many: "%{count} учащихся в процентиле %{percentile}. "
@@ -6819,6 +6828,7 @@ ru:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Курс уже ассоциирован с шаблоном"
   course_landing_page_49a53ade: "Исходная страница учебного курса"
   course_level_notification_preferences_require_a_co_2f0a618: "Предпочтения уведомлений на уровне курса требуют обновления course_id"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Оповещения на уровне курса унаследованы из ваших настроек уведомлений на уровне учетной записи. Настройка уведомлений для этого курса заменяет уведомления на уровне учетной записи."
   course_level_overrides_for_notification_preference_e86d1725: "Уровень курса обходит предпочтения уведомлений"
   course_list: 
     favorited_tooltip: "Щелкните, чтобы удалить из меню курсов."
@@ -8309,6 +8319,9 @@ ru:
   disableWhileLoading: 
     loading: "Выполняется загрузка..."
   disable_a5c05db3: Отключить
+  disable_alert_timeouts_description: |-
+      Активация этой функции отключает тайм-аут для всплывающих предупреждающих оповещений, предоставляющих
+      пользователю столько времени, сколько ему нужно для прочтения оповещения и отклонения его после истечения срока его действия.
   disable_all_read_only_scopes_f9ffdd28: "Отключить все диапазоны «только для чтения»."
   disable_and_lock_7d0ef0e8: "Отключить и заблокировать"
   disable_automatic_submission_8e1d8676: "Отключить автоматическую отправку"
@@ -8320,6 +8333,7 @@ ru:
   disable_scope_6ba4e4d4: "Отключить диапазон"
   disable_sync_to_name_10c371dc: "Отключить синхронизацию с %{name}"
   disable_toolname_44d6397c: "Отключить %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Отключите загрузки в Canvas Media из усовершенствованного редактора контента"
   disabled_18c33a73: (отключено)
   disabled_3b1b332a: Отключено
   disabled_and_locked_d14dc6c2: "Отключено и заблокировано"
@@ -9670,6 +9684,7 @@ ru:
   exit_d0c7b013: Выход
   exit_theme_editor_9ddd41bb: "Выйти из редактора темы"
   expand_2f2fadbd: Развернуть
+  expand_all_bb64d2ea: "Развернуть все"
   expand_collapse_title_outcome_group_239f0a9d: "развернуть/свернуть %{title} Группу результатов"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Развернуть/свернуть %{title} группу результатов, учащийся соответствует критериям владения по %{mastery_count} из %{count} результатов"
   expand_global_navigation_2c28d5d4: "Расширить глобальную навигацию"
@@ -9874,6 +9889,7 @@ ru:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Не удалось загрузить компонент несинхронизированных изменений. Подключение в вашей сети в порядке?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Сбой, сообщите о следующем коде ошибке своему системному администратору: Отчет об ошибке:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Не удалось получить медиа-источник"
+  failed_retrieving_media_sources_32aed288: "Не удалось получить доступ к источникам мультимедиа."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Сбой, не удалось сгенерировать файл в отчете. Попробуйте еще раз."
   failed_to_add_new_feed_ee1c5ea: "Не удалось добавить новый источник"
   failed_to_change_last_attended_date_1e340ba6: "Не удалось изменить дату последнего посещения"
@@ -9961,6 +9977,7 @@ ru:
         Дифференцированные Задания это функция, которая позволяет выбирать, к какому разделу (разделам) или учащемуся (учащимся) это задание относится.
         Разделы, которые не даны в задании, не будут видны в содержании курса и итоговая оценка будет
         рассчитывается без них.
+    disable_alert_timeouts: "Отключить тайм-ауты предупреждающих оповещений"
     ember_modules: "Модули Ember"
     google_docs_domain_restriction: "Ограничение домена Google Docs"
     gradebook_list_students_by_sortable_name: "Табель успеваемости – список студентов по сортируемому имени"
@@ -10151,6 +10168,7 @@ ru:
   final_grade_finalgrade_408580bb: "Итоговая оценка: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Информация по итоговой оценке"
   final_grade_override_be8a21cd: "Отклонение итоговой оценки"
+  final_grade_override_in_gradebook_history_767147c: "Отклонение итоговой оценки в истории журнала оценок"
   final_grade_score_fe69a301: "Итоговая оценка: %{score}"
   final_grader_1693103c: "Окончательный оценщик"
   final_grader_can_view_other_grader_names_67736530: "Окончательный оценщик может просматривать имена других оценщиков"
@@ -10310,6 +10328,7 @@ ru:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Поставить всем студентам одинаковую оценку за *%{assignment.name}* путем ввода и отправки значения оценки ниже:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Поставить всем студентам одинаковую оценку *в процентах* за **%{assignment.name}** путем ввода и отправки значения оценки ниже:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Отказ от попыток получения доступа к источникам мультимедиа. Эта проблема в конечном счете может разрешиться сама по себе."
   global_announcements_a78912c8: "Общие объявления"
   global_announcements_add_edit_delete_843ca4d2: "Глобальные объявления - добавить / редактировать / удалить"
   global_branding_df1cae12: "Глобальный Брендинг"
@@ -12342,6 +12361,7 @@ ru:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Включает ссылку в SpeedGrader в меню заголовка заданий в журнале оценок."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Включает значения оценок в административные отчеты об успеваемости."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "В том числе, результатов совмещения услуг при экспорте и импорте содержания курса"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Включает исправленные оценки за курс в истории журнала оценок."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Включает рубрики в боковую панель навигации по курсам"
   incomplete_95612d72: незавершенный
   incomplete_da3c2ea2: "Не завершено"
@@ -16375,6 +16395,7 @@ ru:
     submission_comment_description: "Комментарий к отправке задания"
     submission_comment_display: "Комментарий отправки"
     web_conference_recording_ready: "Запись конференции готова"
+  notification_policies_requires_the_communication_c_2e7ded08: "Политики уведомления требуют указания идентификатора коммуникационного канала, категории уведомления и частоты обновления"
   notification_preferences: 
     communication: 
       email: 
@@ -16652,6 +16673,7 @@ ru:
   open_to_comments_23d5585e: "Открыть для комментариев"
   openid_connect_initiation_url_2be36b48: "URL-адрес инициации OpenID Connect"
   openid_connect_initiation_url_d9037d30: "* URL инициации подключения OpenID"
+  opens_in_new_window_b4b99243: "открывается в новом окне"
   option_1_dea39f90: "Вариант 1"
   option_2_47aace2a: "Вариант 2"
   option_3_30adfebc: "Вариант 3"
@@ -16720,6 +16742,7 @@ ru:
   out_of_pointspossible_c163105a: "из %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Совмещение результатов с неоцениваемым содержимым"
   outcome_da397d20: Результат
+  outcome_details_ce254e89: "Информация по результатам"
   outcome_export_89229eb4: "Экспорт результатов"
   outcome_group_39fae76f: "Группа результатов"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Группа результатов с идентификатором canvas %{id} не найдена"
@@ -20192,6 +20215,8 @@ ru:
   restore_courses_182e162e: "Восстановить курсы"
   restored_course_association_course_c9e16045: "Ассоциация восстановленного курса %{course}"
   restrict_access_84ba6bb8: "Ограничить доступ"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Запретить преподавателям изменять шкалы мастерства"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Запретить преподавателям изменять метод калькуляции уровня профподготовки"
   restrict_sms_to_select_types_9dd6399c: "Ограничение SMS выбранными типами"
   restrict_student_access: 
     button_text: 
@@ -24152,6 +24177,8 @@ ru:
   ukrainian_945b00b7: Украинский
   unable_to_accept_update_fd53a7e2: "Невозможно принять обновление"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Нет доступа к конкретному студенту. Перейти к заданию в SpeedGrader?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Невозможно привязать некоторые результаты к странице"
+  unable_to_align_some_outcomes_to_title_53467231: "Невозможно привязать некоторые результаты к \"%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Невозможно построить график успеваемости, потому что данное задание приходится на закрытый период оценки успеваемости как минимум для одного учащегося"
   unable_to_delete_assignment_abcf8d62: "Невозможно удалить задание"
   unable_to_dismiss_update_df1e32eb: "Невозможно отклонить обновление"
@@ -24629,6 +24656,8 @@ ru:
   user_observers_454d4303: "Оценщики пользователя"
   user_option_links_66090987: "Ссылки на опции пользователя"
   user_profile: 
+    invalid_url: "Неверный URL"
+    profile_bio_too_long: "Слишком большая длина Bio"
     profile_title_too_long: "Слишком длинный заголовок"
     tabs: 
       notifications: Уведомления
@@ -25646,6 +25675,7 @@ ru:
       
       Вы можете просмотреть это здесь: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Ваше мультимедиа было загружено и отобразится здесь после обработки."
   your_message_has_been_sent_thank_you_e0284316: "Ваше сообщение было отправлено. Спасибо!"
   your_message_was_sent_977f6583: "Ваше сообщение отправлено!"
   your_name_7665e1d8: "Ваше Имя"
