@@ -408,6 +408,7 @@ es:
   account_level_mastery_scales_a5bdff29: "Escalas de dominio a nivel de la cuenta"
   account_level_notification_preferences_require_an__66467cd7: "Las preferencias de notificación de los niveles de las cuentas requieren una account_id para actualizarse"
   account_level_notification_preferences_ui_update_f5e189a4: "Actualización de la IU de preferencias de notificaciones a nivel de la cuenta"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Las notificaciones a nivel de la cuenta se aplican a todos los cursos. Las notificaciones de cursos individuales pueden cambiarse dentro de cada curso y anularán estas notificaciones."
   account_level_settings_manage_4fca6f8e: "Configuraciones del nivel de la cuenta: administrar"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nombre de la cuenta"
@@ -418,6 +419,7 @@ es:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "La hora de finalización de la notificación de la cuenta es anterior a la hora de inicio"
+  account_notification_settings_e96de9b6: "Configuraciones de notificaciones de la cuenta"
   account_notification_settings_error_page_66c0bc61: "Página de error de las configuraciones de notificación de la cuenta"
   account_notification_settings_initial_query_error_f55e1cbf: "Error de consulta inicial de las configuraciones de notificación de la cuenta"
   account_notification_settings_updated_dbabec35: "Se actualizaron las configuraciones de notificación de la cuenta"
@@ -1393,6 +1395,7 @@ es:
         manual_quotas_title: "Configuración manual de capacidad de almacenamiento"
         megabytes: megabytes
         megabytes_tooltip: megabytes
+        placeholder_course_or_group_id: "Ingresar identificación…"
         select_type_courses: "Identificación del curso"
         select_type_groups: "Identificador del grupo"
         select_type_label: "Buscar curso o grupo"
@@ -3936,6 +3939,7 @@ es:
   available_from_f84e4611: "Disponible desde"
   available_from_field_for_styleguide_7ced3861: "Campo Disponible desde para la guía de estilo"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Disponible desde - Formato como DD-MM-YYYY hh:mm"
+  available_pronouns_b45330b1: "Pronombres disponibles"
   available_to_b7350e02: "Disponible para"
   available_until_3278ebe9: "Disponible hasta"
   available_until_date_2c0ccec3: "Disponible hasta la fecha:"
@@ -5203,6 +5207,7 @@ es:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Las colaboraciones son herramientas basadas en la web para trabajar colaborativamente en tareas como tomar notas o ensayos en grupos. Consulte a su profesor para empezar."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Las colaboraciones son herramientas basadas en la web para trabajar en colaboración en tareas como tomar notas o documentos en grupos. Comience agregando la aplicación de colaboración"
   collaborations_tutorial_tray_9219d9d: "Bandeja de tutoriales: colaboraciones"
+  collapse_all_50275533: "Colapsar Todo"
   collapse_group_c2af7cad: "Colapsar el Grupo"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Colapsar la lista de miembros del grupo por %{groupName}"
   collapse_subdiscussion_89af1f5c: "Colapsar subforo de discusión"
@@ -6480,6 +6485,10 @@ es:
   count_students_30e46120: 
     one: "1 estudiante"
     other: "%{count} estudiantes"
+  count_students_c9920376: 
+    one: 1 estudiante
+    other: "%{count} alumnos"
+    zero: 0 estudiantes
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 alumno en percentil %{percentile}. "
     other: "%{count} alumnos en percentil %{percentile}. "
@@ -6679,6 +6688,7 @@ es:
   course_is_already_associated_with_a_blueprint_4d9407cb: "El curso ya está asociado con un proyecto"
   course_landing_page_49a53ade: "Página de destino del curso"
   course_level_notification_preferences_require_a_co_2f0a618: "Las preferencias de notificación de los niveles de los cursos requieren una course_id para actualizarse"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Las notificaciones a nivel del curso se heredan de sus configuraciones de notificaciones a nivel de la cuenta. Al ajustar las notificaciones de este curso se anulan las notificaciones a nivel de la cuenta."
   course_level_overrides_for_notification_preference_e86d1725: "El nivel del curso anula las preferencias de notificación"
   course_list: 
     favorited_tooltip: "Haga clic para eliminar del menú de cursos."
@@ -8128,6 +8138,9 @@ es:
   disableWhileLoading: 
     loading: Cargando...
   disable_a5c05db3: Deshabilitar
+  disable_alert_timeouts_description: |-
+      Al habilitar esta funcionalidad se elimina el tiempo de espera para notificaciones de alerta emergentes, por lo que el
+      usuario tiene todo el tiempo que necesite para leer la notificación y descartarla cuando haya terminado.
   disable_all_read_only_scopes_f9ffdd28: "Desactivar todos los ámbitos de solo lectura."
   disable_and_lock_7d0ef0e8: "Deshabilitar y bloquear"
   disable_automatic_submission_8e1d8676: "Deshabilitar presentación automática"
@@ -8139,6 +8152,7 @@ es:
   disable_scope_6ba4e4d4: "Desactivar ámbito"
   disable_sync_to_name_10c371dc: "Desactivar sincronización con %{name}"
   disable_toolname_44d6397c: "Deshabilitar %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Deshabilitar cargas a Multimedia de Canvas desde el editor de contenido enriquecido"
   disabled_18c33a73: (deshabilitado)
   disabled_3b1b332a: Deshabilitado
   disabled_and_locked_d14dc6c2: "Desactivado y bloqueado"
@@ -9455,6 +9469,7 @@ es:
   exit_d0c7b013: Salir
   exit_theme_editor_9ddd41bb: "Salir del Editor de Tema"
   expand_2f2fadbd: Expandir
+  expand_all_bb64d2ea: "Expandir Todo"
   expand_collapse_title_outcome_group_239f0a9d: "ampliar/contraer %{title} Grupo de resultados"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Expandir/colapsar %{title} Grupo de competencia, el estudiante cuenta con el dominio de %{mastery_count} de %{count} resultados"
   expand_global_navigation_2c28d5d4: "Expandir navegación global"
@@ -9659,6 +9674,7 @@ es:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Error al cargar el componente Cambios no sincronizados. ¿La conexión de su red funciona bien?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Se ha producido un error. Reporte el siguiente código de error al administrador del sistema: ErrorReport:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Error al recuperar la fuente multimedia"
+  failed_retrieving_media_sources_32aed288: "No se pudieron recuperar las fuentes multimedia."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Se ha producido un error. El reporte no pudo generar un archivo. Inténtelo de nuevo."
   failed_to_add_new_feed_ee1c5ea: "No se pudo agregar un nuevo feed"
   failed_to_change_last_attended_date_1e340ba6: "No se pudo cambiar la fecha de la última asistencia"
@@ -9744,6 +9760,7 @@ es:
         Tareas Diferenciadas es una función que permite elegir a cuál(es) sección(es) o estudiante(s) individual(es)  se aplica una tarea. 
         Las secciones a las que no se les asigne una tarea no la verán en el contenido de su curso y su calificación final se calculará 
         sin esos puntos.
+    disable_alert_timeouts: "Deshabilitar los tiempos de espera para notificaciones de alerta"
     ember_modules: "Módulos Ember"
     google_docs_domain_restriction: "Restricción de dominio de Google Docs"
     gradebook_list_students_by_sortable_name: "Libro de calificaciones: ordenar a los estudiantes por el nombre clasificable"
@@ -9934,6 +9951,7 @@ es:
   final_grade_finalgrade_408580bb: "Calificación final: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Información de la calificación final"
   final_grade_override_be8a21cd: "Anulación de la calificación final"
+  final_grade_override_in_gradebook_history_767147c: "Anulación de calificación final en el historial del Libro de calificaciones"
   final_grade_score_fe69a301: "Calificación final: %{score}"
   final_grader_1693103c: "Calificador final"
   final_grader_can_view_other_grader_names_67736530: "El calificador final puede ver el nombre de otros calificadores"
@@ -10089,6 +10107,7 @@ es:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Dar a todos los estudiantes la misma calificación para *%{assignment.name}* ingresando y presentando un valor de la calificación a continuación:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Dar a todos los estudiantes la misma calificación *porcentual* para **%{assignment.name}** ingresando y presentando un valor de la calificación a continuación:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "No se intentará más recuperar las fuentes multimedia. Es probable que este problema finalmente se resuelva solo."
   global_announcements_a78912c8: "Anuncios globales"
   global_announcements_add_edit_delete_843ca4d2: "Anuncios globales: agregar/editar/eliminar"
   global_branding_df1cae12: "Marca global"
@@ -12076,6 +12095,7 @@ es:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Incluye un enlace a SpeedGrader en el menú del encabezado de la tarea en el Libro de calificaciones."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Incluye los valores de las calificaciones en los reportes de calificación del administrador."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Incluye las alineaciones de servicios de competencias cuando se exportan e importan los contenidos del curso"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Incluye las calificaciones de cursos anuladas en el historial del Libro de calificaciones."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Incluye rúbricas en la navegación del curso con la barra lateral"
   incomplete_95612d72: incompleto
   incomplete_da3c2ea2: Incompleta
@@ -16053,6 +16073,7 @@ es:
     submission_comment_description: "Comentario de la entrega de tareas"
     submission_comment_display: "Comentario de la entrega"
     web_conference_recording_ready: "Una grabación de la conferencia está lista"
+  notification_policies_requires_the_communication_c_2e7ded08: "En función de las políticas de notificaciones, deben actualizarse la identificación del canal de comunicación, la categoría de notificaciones y la frecuencia"
   notification_preferences: 
     communication: 
       email: 
@@ -16319,6 +16340,7 @@ es:
   open_title_in_a_new_window_b29fed77: "Abrir %{title} en una nueva ventana"
   open_to_comments_23d5585e: "Admite comentarios"
   openid_connect_initiation_url_d9037d30: "* URL de iniciación de OpenID Connect"
+  opens_in_new_window_b4b99243: "se abre en una nueva ventana"
   option_1_dea39f90: "Opción 1"
   option_2_47aace2a: "Opción 2"
   option_3_30adfebc: "Opción 3"
@@ -16388,6 +16410,7 @@ es:
   out_of_pointspossible_c163105a: "de %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Alineación de las competencias con el contenido sin puntaje"
   outcome_da397d20: Competencia
+  outcome_details_ce254e89: "Detalles de la competencia"
   outcome_export_89229eb4: "Exportación de competencias"
   outcome_group_39fae76f: "Grupo de competencias"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Grupo de competencias con identificación de Canvas %{id} no encontrada"
@@ -19753,6 +19776,8 @@ es:
   restore_courses_182e162e: "Restaurar cursos"
   restored_course_association_course_c9e16045: "Asociación del curso restablecida %{course}"
   restrict_access_84ba6bb8: "Restringir acceso"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Prohibirles a los profesores cambiar las escalas de dominio"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Prohibirles a los profesores cambiar el método de cálculo del dominio"
   restrict_sms_to_select_types_9dd6399c: "Limitar SMS a Tipos seleccionados"
   restrict_student_access: 
     button_text: 
@@ -23638,6 +23663,8 @@ es:
   ukrainian_945b00b7: Ucraniano
   unable_to_accept_update_fd53a7e2: "No se ha podido aceptar la actualización"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "No se puede acceder al estudiante específico. ¿Ir a la tarea en SpeedGrader?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "No se pudieron alinear algunas competencias con una página"
+  unable_to_align_some_outcomes_to_title_53467231: "No se pudieron alinear algunas competencias con \"%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "No se puede aplicar curva de notas porque esta tarea tiene fecha debida en un período de calificación cerrado para al menos un estudiante"
   unable_to_delete_assignment_abcf8d62: "No se puede eliminar la tarea"
   unable_to_dismiss_update_df1e32eb: "No se ha podido descartar la actualización"
@@ -24104,6 +24131,8 @@ es:
   user_observers_454d4303: "Observadores del usuario"
   user_option_links_66090987: "Enlaces de opción del usuario"
   user_profile: 
+    invalid_url: "URL inválida"
+    profile_bio_too_long: "La biografía es demasiado larga"
     profile_title_too_long: "El título es demasiado largo"
     tabs: 
       notifications: Notificaciones
@@ -24845,7 +24874,7 @@ es:
     one: "Está a punto de eliminar 1 foro de discusión. ¿Está seguro?"
     other: "Está a punto de eliminar %{count} foros de discusión. ¿Está seguro?"
   you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
-    one: "Está por eliminar 1 página. ¿Está seguro?"
+    one: "Está por eliminar 1 página. ¿Está seguro?"
     other: "Está por eliminar %{count} páginas. ¿Está seguro?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Está a punto de perder los cambios que aún no se han aplicado a su cuenta.
@@ -25089,6 +25118,7 @@ es:
       
       Los puede ver aquí: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Sus elementos multimedia se actualizaron y aparecerán aquí luego de ser procesados."
   your_message_has_been_sent_thank_you_e0284316: "Se ha enviado su mensaje. ¡Gracias!"
   your_message_was_sent_977f6583: "¡Su mensaje ha sido enviado!"
   your_name_7665e1d8: "Su nombre"
