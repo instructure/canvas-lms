@@ -385,6 +385,7 @@ da-x-k12:
   account_level_mastery_scales_a5bdff29: "Skala for opfyldelse af læringsmål på kontoniveau"
   account_level_notification_preferences_require_an__66467cd7: "Meddelelsespræferencer på kontoniveau kræver, at en account_id opdaterer"
   account_level_notification_preferences_ui_update_f5e189a4: "Opdatering af meddelelsespræferencer på kontoniveau"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Meddelelser på kontoniveau gælder for alle fag. Meddelelser for individuelle fag kan ændres inden for hvert fag og tilsidesætter disse meddelelser."
   account_level_settings_manage_4fca6f8e: "Indstillinger på kontoniveau - administrer"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonavn
@@ -395,6 +396,7 @@ da-x-k12:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Sluttid for kontonotifikation ligger forud for starttid"
+  account_notification_settings_e96de9b6: "Meddelelses-indstillinger for konti"
   account_notification_settings_error_page_66c0bc61: "Fejlside for indstillinger for kontomeddelelser"
   account_notification_settings_initial_query_error_f55e1cbf: "Indledende forespørgselsfejl ved indstillinger for kontomeddelelser"
   account_notification_settings_updated_dbabec35: "Indstillinger for kontomeddelelser opdateret"
@@ -1196,6 +1198,7 @@ da-x-k12:
         manual_quotas_title: "Manuelt indstillelige kvoter"
         megabytes: megabytes
         megabytes_tooltip: megabytes
+        placeholder_course_or_group_id: "Indtast ID..."
         select_type_courses: Fag-id
         select_type_groups: Gruppe-id
         select_type_label: "Find fag eller gruppe"
@@ -3485,6 +3488,7 @@ da-x-k12:
   available_from_date_must_precede_available_until_c9f9e533: "Datoen \"Tilgængelig fra\" skal være før \"Tilgængelig til\""
   available_from_f84e4611: "Tilgængelig fra"
   available_from_field_for_styleguide_7ced3861: "Feltet Tilgængelig fra til stilmanual"
+  available_pronouns_b45330b1: "Tilgængelige pronomener"
   available_to_b7350e02: "Tilgængelig indtil"
   available_until_3278ebe9: "Tilgængelig indtil"
   available_until_date_cd125c62: "Tilgængelig indtil dato"
@@ -4630,6 +4634,7 @@ da-x-k12:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Samarbejder er web-baserede værktøjer for at arbejde kollektivt på opgaver som f.eks. at tage notater eller gruppere dokumenter. Tal med din lærer for at komme i gang."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samarbejder er web-baserede værktøjer for at arbejde kollektivt på opgaver som f.eks. at tage notater eller gruppere dokumenter. Start ved at tilføje en samarbejds-app."
   collaborations_tutorial_tray_9219d9d: "Selvstudiumområde for samarbejder"
+  collapse_all_50275533: "Skjul alle"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Skjul listen over gruppemedlemmer for %{groupName}"
   collapse_subdiscussion_89af1f5c: "Skjul underdiskussion"
   collapse_tutorial_tray_66ee7dc1: "Skjul selvstudiumområde"
@@ -5749,6 +5754,10 @@ da-x-k12:
   count_students_30e46120: 
     one: "1 elev"
     other: "%{count} elever"
+  count_students_c9920376: 
+    one: "1 elev"
+    other: "%{count} elever"
+    zero: "0 elever"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 elev i percentil %{percentile}."
     other: "%{count} elever i percentilen %{percentile}."
@@ -5907,6 +5916,7 @@ da-x-k12:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Faget er allerede knyttet til en plan"
   course_landing_page_49a53ade: "Fagets landingsside"
   course_level_notification_preferences_require_a_co_2f0a618: "Meddelelsespræferencer på fagniveau kræver, at en course_id opdaterer"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Meddelelser på fagniveau nedarves fra dine meddelelsesindstillinger på kontoniveau. Justering af meddelelser for dette fag tilsidesætter meddelelser på kontoniveau."
   course_level_overrides_for_notification_preference_e86d1725: "Tilsidesættelser på fagniveau for meddelelsespræferencer"
   course_list: 
     favorited_tooltip: "Klik for at flytte fra fagmenuen."
@@ -7145,6 +7155,9 @@ da-x-k12:
   disableWhileLoading: 
     loading: "Indlæser ..."
   disable_a5c05db3: Deaktiver
+  disable_alert_timeouts_description: |-
+      Aktivering af denne funktion fjerner timeout for varslinger, der popper op, hvilket giver
+      brugeren den nødvendige tid til at læse meddelelsen og afvise den, når den er læst.
   disable_all_read_only_scopes_f9ffdd28: "Deaktiver alle skrivebeskyttede omfang."
   disable_and_lock_7d0ef0e8: "Deaktiver og lås"
   disable_automatic_submission_8e1d8676: "Deaktiver automatisk aflevering"
@@ -7155,6 +7168,7 @@ da-x-k12:
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Deaktiver Slå op til SIS for opgaver i lukkede vurderingsperioder."
   disable_scope_6ba4e4d4: "Deaktiver omfang"
   disable_sync_to_name_10c371dc: "Deaktiver synkronisering til %{name}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Deaktiver uploads til Canvas-medier fra den forbedrede Rich Content Editor"
   disabled_18c33a73: (deaktiveret)
   disabled_3b1b332a: Deaktiveret
   disabled_and_locked_d14dc6c2: "Deaktiveret og låst"
@@ -8335,6 +8349,7 @@ da-x-k12:
   excused_5877183c: Undskyldt!
   excused_cf8792eb: Undskyldt
   exit_d0c7b013: Afslut
+  expand_all_bb64d2ea: "Udvid alle"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Udvid/skjul %{title} resultatgruppe, elev opfylder mestring af %{mastery_count} af %{count} læringsudbytter"
   expand_global_navigation_2c28d5d4: "Udvid global navigation"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Udvid listen over gruppemedlemmer for %{groupName}"
@@ -8450,6 +8465,7 @@ da-x-k12:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Fejl ved læsning af ikke-synkroniserede ændringer-komponent. Er din netværksforbindelse OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Lykkedes ikke. Rapporter følgende fejlkode til systemadministratoren: FejlRapport:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Kunne ikke hente mediekilden"
+  failed_retrieving_media_sources_32aed288: "Kunne ikke hente mediekilder."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Lykkedes ikke. Rapporten kunne ikke generere en fil. Prøv igen."
   failed_to_add_new_feed_ee1c5ea: "Kunne ikke tilføje nyt feed"
   failed_to_change_last_attended_date_1e340ba6: "Kunne ikke ændre dato for sidste tilstedeværelse"
@@ -8517,6 +8533,7 @@ da-x-k12:
   features: 
     allow_opt_out_of_inbox: "Tillad, at brugere melder sig fra indbakken"
     canvas_parent_display_name: "Canvas Parent"
+    disable_alert_timeouts: "Deaktiver timeout for varslingsmeddelelse"
     google_docs_domain_restriction: "Domænebegrænsning for Google Docs"
     gradebook_list_students_by_sortable_name: "Vurderingsoversigt - Angiv elever efter sorterbare navne"
     hide_celebrations: "Deaktiver fejringsanimationer"
@@ -8655,6 +8672,7 @@ da-x-k12:
   final_grade_a22c596: "endelig vurdering"
   final_grade_info_2aa35d25: "Endelig vurderingsinformation"
   final_grade_override_be8a21cd: "Tilsidesættelse af endelig vurdering"
+  final_grade_override_in_gradebook_history_767147c: "Endelig tilsidesættelse af vurdering i vurderingsoversigtens-historikken"
   final_grader_1693103c: "Endelig vurderingsgiver"
   final_grader_can_view_other_grader_names_67736530: "Endelig bedømmer kan se andre bedømmeres navne"
   final_letter_grade_80dccec1: "Endelig bogstavvurdering"
@@ -8797,6 +8815,7 @@ da-x-k12:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Giv alle eleverne samme vurdering for *%{assignment.name}* ved at indtaste og aflevere en vurderingsværdi nedenfor:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Giv alle eleverne samme *procent-vurdering* for **%{assignment.name}** ved at indtaste og aflevere en vurderingsværdi nedenfor:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Giver op at hente mediekilder. Dette problem vil sandsynligvis løse sig selv i sidste ende."
   global_announcements_a78912c8: "Generelle beskeder"
   global_announcements_add_edit_delete_843ca4d2: "Globale beskeder - tilføj / rediger / slet"
   global_branding_df1cae12: "Global branding"
@@ -10220,6 +10239,7 @@ da-x-k12:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Indeholder et link til SpeedGrader i menuen Opgave-overskrift i vurderingsoversigten."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inkluderer vurderingsværdier i rapporterne om admin-vurderinger."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Inkluderer tjenestejusteringer for læringsudbytter ved eksport og import af fagindhold"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Inkluderer tilsidesatte fagvurdering i vurderingsoversigtens-historik."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inkluderer vurderingskriterier i fagets sidelinjenavigation"
   incomplete_95612d72: ufuldstændig
   incomplete_da3c2ea2: Ufuldstændig
@@ -13731,6 +13751,7 @@ da-x-k12:
     submission_comment_description: "Kommentar til opgaveaflevering"
     submission_comment_display: Afleveringskommentar
     web_conference_recording_ready: "En konferenceoptagelser er klar"
+  notification_policies_requires_the_communication_c_2e7ded08: "Meddelelsespolitikker kræver kommunikationskanal-id, meddelelseskategori og opdateringshyppighed"
   notification_preferences: 
     communication: 
       email: 
@@ -13958,6 +13979,7 @@ da-x-k12:
   open_this_keyboard_shortcuts_dialog_9658b83a: "Åbn dialogen for denne genvejstast"
   open_title_in_a_new_window_b29fed77: "Åbn %{title} i et nyt vindue"
   openid_connect_initiation_url_d9037d30: "* OpenID Connect initierings-url"
+  opens_in_new_window_b4b99243: "åbnes i et nyt vindue"
   option_1_dea39f90: "Mulighed 1"
   option_2_47aace2a: "Mulighed 2"
   option_3_30adfebc: "Mulighed 3"
@@ -14019,6 +14041,7 @@ da-x-k12:
   out_of_pointspossible_c163105a: "ud af %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Tilpasning af læringsudbytte for indhold uden vurdering"
   outcome_da397d20: Læringsudbytte
+  outcome_details_ce254e89: "Oplysninger om læringsudbytte"
   outcome_export_89229eb4: "Eksport af læringsudbytte"
   outcome_group_39fae76f: Læringsudbytte-gruppe
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Læringsudbytte med Canvas-ID %{id} ikke fundet"
@@ -16972,6 +16995,8 @@ da-x-k12:
   restart_link_validation_b61286fc: "Genstart godkendelse af link"
   restore_courses_182e162e: "Gendan fag"
   restored_course_association_course_c9e16045: "Gendannet fagassociation %{course}"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Begræns instruktører fra at ændre skalaen for opfyldelse af læringsmål"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Begræns instruktører fra at ændre metoden til beregning af færdigheder"
   restrict_sms_to_select_types_9dd6399c: "Begræns SMS for udvalgte typer"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Forhindr elever i at skaffe adgang til fag efter slutdatoen"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Forhindr elever i at skaffe adgang til fag før startdatoen"
@@ -20423,6 +20448,8 @@ da-x-k12:
   ukrainian_945b00b7: Ukrainsk
   unable_to_accept_update_fd53a7e2: "Kan ikke acceptere opdatering"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Kunne ikke få adgang til en bestemt elev. Gå til opgave i SpeedGrader?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Det er ikke muligt at tilpasse nogle af resultaterne til en side"
+  unable_to_align_some_outcomes_to_title_53467231: "Kan ikke tilpasse nogle af resultaterne til ”%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan ikke lægge vurderinger på en kurve, fordi denne opgave forfalder i en lukket vurderingsperiode for mindst én elev"
   unable_to_delete_assignment_abcf8d62: "Kunne ikke slette opgave"
   unable_to_dismiss_update_df1e32eb: "Kan ikke annullere opdatering"
@@ -20830,6 +20857,8 @@ da-x-k12:
   user_observers_454d4303: Bruger-observatører
   user_option_links_66090987: "Links til brugerindstillinger"
   user_profile: 
+    invalid_url: "Ugyldig URL"
+    profile_bio_too_long: "Bio’en er for lang"
     profile_title_too_long: "Titlen er for lang"
     tabs: 
       notifications: Notifikationer
@@ -21716,6 +21745,7 @@ da-x-k12:
       
       Du kan se dem her: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Dit medie er blevet uploadet og vises her efter behandling."
   your_message_has_been_sent_thank_you_e0284316: "Din besked er blevet sendt. Tak!"
   your_message_was_sent_977f6583: "Din besked blev sendt!"
   your_name_7665e1d8: "Dit navn"
