@@ -408,6 +408,7 @@ fr:
   account_level_mastery_scales_a5bdff29: "Échelles de réussite au niveau du compte"
   account_level_notification_preferences_require_an__66467cd7: "Les préférences de notifications de niveau compte nécessitent un account_id pour être mises à jour"
   account_level_notification_preferences_ui_update_f5e189a4: "Mise à jour de l’interface des préférences de notifications de niveau compte"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Les notifications au niveau du compte s'appliquent à tous les cours. Les notifications pour les cours individuels peuvent être paramétrées au sein de chaque cours, et ces paramètres se substitueront à celles du compte."
   account_level_settings_manage_4fca6f8e: "Paramètres au niveau du compte - gérer"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nom du compte"
@@ -418,6 +419,7 @@ fr:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "L’heure de fin est antérieure à l’heure de début pour les notifications du compte"
+  account_notification_settings_e96de9b6: "Paramètres de notifications de compte"
   account_notification_settings_error_page_66c0bc61: "Page d’erreur des paramètres de notification de compte"
   account_notification_settings_initial_query_error_f55e1cbf: "Erreur de la requête initiale sur les paramètres de notification de compte"
   account_notification_settings_updated_dbabec35: "Paramètres de notifications de compte mis à jour"
@@ -1393,6 +1395,7 @@ fr:
         manual_quotas_title: "Quotas réglables manuellement"
         megabytes: mégaoctets
         megabytes_tooltip: mégaoctets
+        placeholder_course_or_group_id: "Saisissez l’identifiant..."
         select_type_courses: "ID de cours"
         select_type_groups: "ID de groupe"
         select_type_label: "Trouver un cours ou un groupe"
@@ -3933,6 +3936,7 @@ fr:
   available_from_f84e4611: "Disponibles depuis le"
   available_from_field_for_styleguide_7ced3861: "Champ 'Disponible Depuis' du guide stylistique"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Disponible dès - Formatez comme suit : AAAA-MM-JJ hh:mm"
+  available_pronouns_b45330b1: "Pronoms disponibles"
   available_to_b7350e02: "Disponible pour"
   available_until_3278ebe9: "Disponibles jusqu’au"
   available_until_date_2c0ccec3: "Disponible jusqu'à la date : "
@@ -4979,7 +4983,7 @@ fr:
   click_here_to_see_the_file_79e2b366: "Cliquez ici pour voir le fichier."
   click_here_to_view_ec8cb2fd: "Cliquez ici pour afficher"
   click_here_to_view_the_submission_24777a69: "Cliquez ici pour voir l’envoi"
-  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: "Cliquez ici pour vous rendre sur vos tâches et vousen occuper à temps !"
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: "Cliquez ici pour vous rendre sur vos tâches et vousen occuper à temps !"
   click_ok_to_continue_deleting_this_role_baa9d9e2: "Cliquez sur \"ok\" pour continuer à supprimer ce rôle."
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Cliquez sur un point de restauration pour revenir à votre essai tel qu’il était au moment où le point a été enregistré. Remarque : Vous perdrez tout travail effectué depuis que ce point de restauration a été enregistré. Cette opération ne peut être annulée."
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Cliquez sur le bouton de navigation de compte pour accéder aux paramètres des notifications."
@@ -5203,6 +5207,7 @@ fr:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Les Collaborations sont des outils sous forme de pages Web permettant de travailler de manière collaborative sur des tâches telles que la prise de note ou les travaux en groupes. Parlez-en avec votre enseignant pour démarrer."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Les collaborations sont des outils en ligne pour travailler en équipe sur des tâches telles que des prises de notes ou des écrits de groupe. Commencez par ajouter une application de collaboration."
   collaborations_tutorial_tray_9219d9d: "Bac du didacticiel sur les collaborations"
+  collapse_all_50275533: "Tout réduire"
   collapse_group_c2af7cad: "Réduire le groupe"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Réduire la liste des membres du groupe %{groupName}"
   collapse_subdiscussion_89af1f5c: "Réduire la sous-discussion"
@@ -6480,6 +6485,10 @@ fr:
   count_students_30e46120: 
     one: "1 étudiant"
     other: "%{count} étudiants"
+  count_students_c9920376: 
+    one: "1 élève"
+    other: "%{count} élèves"
+    zero: "0 élève"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 élève dans le centile %{percentile}. "
     other: "%{count} élèves dans le centile %{percentile}. "
@@ -6679,6 +6688,7 @@ fr:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Le cours est déjà associé à un projet"
   course_landing_page_49a53ade: "Page d'accueil de cours"
   course_level_notification_preferences_require_a_co_2f0a618: "Les préférences de notifications de niveau cours nécessitent un course_id pour être mises à jour"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Les notifications au niveau du cours sont héritées de vos paramètres de notification au niveau du compte. L'ajustement des notifications pour ce cours entraînera leur substitution aux notifications paramétrées au niveau du compte."
   course_level_overrides_for_notification_preference_e86d1725: "Remplacement cours par cours des préférences de notification"
   course_list: 
     favorited_tooltip: "Cliquez pour retirer cet élément du menu des cours."
@@ -8129,6 +8139,9 @@ fr:
   disableWhileLoading: 
     loading: Chargement...
   disable_a5c05db3: Désactiver
+  disable_alert_timeouts_description: |-
+      L'activation de cette fonctionnalité enlève les délais d’expiration pour les notifications d'alertes surgissantes, ce qui donne à
+      l’utilisateur autant de temps qu'il le souhaite pour lire la notification, et la masquer lorsqu'il a terminé.
   disable_all_read_only_scopes_f9ffdd28: "Désactivez toutes les étendues en lecture seule."
   disable_and_lock_7d0ef0e8: "Désactiver et verrouiller"
   disable_automatic_submission_8e1d8676: "Désactiver la soumission automatique"
@@ -8140,6 +8153,7 @@ fr:
   disable_scope_6ba4e4d4: "Désactiver l'étendue"
   disable_sync_to_name_10c371dc: "Désactiver la synchronisation vers %{name}"
   disable_toolname_44d6397c: "Désactiver %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Désactiver les envois vers Canvas Media depuis l'éditeur de contenus enrichis amélioré"
   disabled_18c33a73: (désactivé)
   disabled_3b1b332a: Désactivé
   disabled_and_locked_d14dc6c2: "Désactivé et verrouillé"
@@ -9460,6 +9474,7 @@ fr:
   exit_d0c7b013: Sortir
   exit_theme_editor_9ddd41bb: "Sortir de l'éditeur de thème"
   expand_2f2fadbd: Développer
+  expand_all_bb64d2ea: "Tout développer"
   expand_collapse_title_outcome_group_239f0a9d: "développer/réduire le groupe de résultats %{title}"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Développer/réduire le groupe d'acquis %{title}, l'élève atteint les critères de réussite pour %{mastery_count} sur %{count} résultats"
   expand_global_navigation_2c28d5d4: "Développer la navigation globale"
@@ -9664,6 +9679,7 @@ fr:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Échec du chargement du composant Changements non synchronisés Votre connexion réseau fonctionne-t-elle correctement ?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Échec. Veuillez signaler le code d’erreur suivant à votre administrateur système : ErrorReport :%{error} ;"
   failed_retrieving_media_source_3f0cfd49: "Échec de la récupération de la source multimédia"
+  failed_retrieving_media_sources_32aed288: "Échec de la récupération des sources multimédia"
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Échec. Le rapport n'a pas pu générer de fichier. Veuillez réessayer."
   failed_to_add_new_feed_ee1c5ea: "Échec de l’ajout du nouveau flux"
   failed_to_change_last_attended_date_1e340ba6: "Échec du changement de date du dernier participant"
@@ -9751,6 +9767,7 @@ fr:
         Évaluations Différenciées est une fonction qui permet de choisir à quelle(s) section(s) ou à quel(le)(s) étudiant(e)(s) attribuer une évaluation.
         Les sections qui ne reçoivent pas d'évaluations ne les verront pas dans le contenu de leurs cours et leur note finale sera
         calculées sans ces points.
+    disable_alert_timeouts: "Désactiver les délais d’expiration des notifications d'alerte"
     ember_modules: "Modules Ember "
     google_docs_domain_restriction: "Restriction de domaine pour Google Docs"
     gradebook_list_students_by_sortable_name: "Relevé de notes – Liste des étudiants triée par nom"
@@ -9941,6 +9958,7 @@ fr:
   final_grade_finalgrade_408580bb: "Note finale : *%{finalGrade}*"
   final_grade_info_2aa35d25: "Informations sur la note finale"
   final_grade_override_be8a21cd: "Forçage de la note Finale"
+  final_grade_override_in_gradebook_history_767147c: "Substitution de la note finale dans l’historique du relevé de notes"
   final_grade_score_fe69a301: "Note finale : %{score}"
   final_grader_1693103c: "Note finale"
   final_grader_can_view_other_grader_names_67736530: "Le correcteur final peut voir les noms des autres correcteurs."
@@ -10096,6 +10114,7 @@ fr:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Donnez la même note à tous les élèves pour *%{assignment.name}* en indiquant et en soumettant la note de votre choix ci-dessous :"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Donnez la même note *en pourcentage* à tous les élèves pour **%{assignment.name}** en indiquant et en soumettant la note de votre choix ci-dessous :"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Abandon de la récupération des sources multimédia Ce problème finira probablement par se résoudre de lui-même."
   global_announcements_a78912c8: "Annonces générales"
   global_announcements_add_edit_delete_843ca4d2: "Annonces globales - ajouter / modifier / supprimer"
   global_branding_df1cae12: "Marquage global"
@@ -12079,6 +12098,7 @@ fr:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inclut un lien vers SpeedGrader dans le menu d’en-tête des travaux du Carnet de notes."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inclut les valeurs des notes dans les rapports de notes de l'administrateur."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Inclure les alignements du service Résultats lors de l’exportation et de l’importation du contenu de cours"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Ajoute les notes de cours substitutées à l’historique du relevé de notes"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inclure les barèmes dans la barre latérale de navigation de cours"
   incomplete_95612d72: incomplet
   incomplete_da3c2ea2: Incomplet
@@ -16057,6 +16077,7 @@ fr:
     submission_comment_description: "Commentaire sur l’envoi du travail"
     submission_comment_display: "Commentaire sur l’envoi"
     web_conference_recording_ready: "Un enregistrement de conférence est prêt"
+  notification_policies_requires_the_communication_c_2e7ded08: "Les stratégies de notification imposent que l’identifiant de canal de communication, la catégorie de notification et la fréquence soient mis à jour."
   notification_preferences: 
     communication: 
       email: 
@@ -16323,6 +16344,7 @@ fr:
   open_title_in_a_new_window_b29fed77: "Ouvrir %{title} dans une nouvelle fenêtre"
   open_to_comments_23d5585e: "Ouvrir aux commentaires"
   openid_connect_initiation_url_d9037d30: "* Url d’initiation OpenID Connect"
+  opens_in_new_window_b4b99243: "s'ouvre dans une nouvelle fenêtre"
   option_1_dea39f90: "Option 1"
   option_2_47aace2a: "Option 2"
   option_3_30adfebc: "Option 3"
@@ -16392,6 +16414,7 @@ fr:
   out_of_pointspossible_c163105a: "sur %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Alignement des résultats aux contenus sans note"
   outcome_da397d20: Acquis
+  outcome_details_ce254e89: "Détails des résultats"
   outcome_export_89229eb4: "Export de résultats"
   outcome_group_39fae76f: "Groupe d'acquis"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Groupe de résultats avec id canevas %{id} introuvable"
@@ -19759,6 +19782,8 @@ fr:
   restore_courses_182e162e: "Restaurer les cours"
   restored_course_association_course_c9e16045: "Association de cours restaurée %{course}"
   restrict_access_84ba6bb8: "Limiter l'accès"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Empêcher les instructeurs de modifier les échelles de réussite"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Empêcher les instructeurs de modifier la méthode de calcul de maîtrise"
   restrict_sms_to_select_types_9dd6399c: "Restreindre les SMS à certains types sélectionnés"
   restrict_student_access: 
     button_text: 
@@ -23653,6 +23678,8 @@ fr:
   ukrainian_945b00b7: Ukrainien
   unable_to_accept_update_fd53a7e2: "Impossible d'accepter le mise à jour"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Impossible d'accéder à un élève en particulier. Accéder au travail dans SpeedGrader ?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Impossible d'aligner certains résultats à une page"
+  unable_to_align_some_outcomes_to_title_53467231: "Impossible d'aligner certains résultats à « %{title} »"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Impossible de noter en courbe car ce travail doit être rendu lors d'une période non ouverte à la notation pour au moins un élève"
   unable_to_delete_assignment_abcf8d62: "Impossible de supprimer le travail"
   unable_to_dismiss_update_df1e32eb: "Impossible d'ignorer la mise à jour"
@@ -24120,6 +24147,8 @@ fr:
   user_observers_454d4303: "Utilisateurs observateurs"
   user_option_links_66090987: "Liens des options de l'utilisateur"
   user_profile: 
+    invalid_url: "URL non valide"
+    profile_bio_too_long: "La bio est trop longue."
     profile_title_too_long: "Titre trop long"
     tabs: 
       notifications: Notifications
@@ -25082,7 +25111,7 @@ fr:
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "En l’état actuel des choses, vous ne recevrez aucune notification de cours. Pour activer les notifications de cours, utilisez l’interrupteur ci-dessus."
   your_answer_8dad6ea4: "Votre réponse :"
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Votre travail %{assignment_name} est à rendre au plus tard le %{due_at}."
-  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Votre travail %{assignment_name} est à rendre au plus tard le %{due_at}. Cliquez sur le lien suivant pour vous rendre sur vos tâches et vous en occuper à temps :"
+  your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Votre travail %{assignment_name} est à rendre au plus tard le %{due_at}. Cliquez sur le lien suivant pour vous rendre sur vos tâches et vous en occuper à temps :"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Votre liste des travaux peut maintenant être trouvée dans la page *Calendrier*."
   your_assignments_list_has_improved_3eded80e: "Votre liste *Travaux* s’est améliorée !"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Vos travaux s’afficheront ici par date d’échéance."
@@ -25104,6 +25133,7 @@ fr:
       
       Vous pouvez les visualiser ici : 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Votre fichier multimédia a été transmis et apparaîtra ici une fois traité."
   your_message_has_been_sent_thank_you_e0284316: "Votre message a été envoyé. Merci !"
   your_message_was_sent_977f6583: "Votre message a été envoyé !"
   your_name_7665e1d8: "Votre Nom"
