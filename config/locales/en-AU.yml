@@ -409,6 +409,7 @@ en-AU:
   account_level_mastery_scales_a5bdff29: "Account-level Mastery Scales"
   account_level_notification_preferences_require_an__66467cd7: "Account level notification preferences require an account_id to update"
   account_level_notification_preferences_ui_update_f5e189a4: "Account level notification preferences UI update"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Account-level notifications apply to all courses. Notifications for individual courses can be changed within each course and will override these notifications."
   account_level_settings_manage_4fca6f8e: "Account-level settings - manage"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "account name"
@@ -419,6 +420,7 @@ en-AU:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Account notification end time precedes start time"
+  account_notification_settings_e96de9b6: "Account Notification Settings"
   account_notification_settings_error_page_66c0bc61: "Account Notification Settings Error Page"
   account_notification_settings_initial_query_error_f55e1cbf: "Account Notification Settings initial query error"
   account_notification_settings_updated_dbabec35: "Account notification settings updated"
@@ -1394,6 +1396,7 @@ en-AU:
         manual_quotas_title: "Manually Settable Quotas"
         megabytes: megabytes
         megabytes_tooltip: megabytes
+        placeholder_course_or_group_id: "Enter ID..."
         select_type_courses: "Course ID"
         select_type_groups: "Group ID"
         select_type_label: "Find course or group"
@@ -3943,6 +3946,7 @@ en-AU:
   available_from_f84e4611: "Available from"
   available_from_field_for_styleguide_7ced3861: "Available From field for styleguide"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Available from - Format Like YYYY-MM-DD hh:mm"
+  available_pronouns_b45330b1: "Available Pronouns"
   available_to_b7350e02: "Available to"
   available_until_3278ebe9: "Available until"
   available_until_date_2c0ccec3: "Available Until:"
@@ -5214,6 +5218,7 @@ en-AU:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Talk to your teacher to get started."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by adding a collaboration app."
   collaborations_tutorial_tray_9219d9d: "Collaborations Tutorial Tray"
+  collapse_all_50275533: "Collapse All"
   collapse_group_c2af7cad: "Collapse Group"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Collapse list of group members for %{groupName}"
   collapse_subdiscussion_89af1f5c: "Collapse Subdiscussion"
@@ -6492,6 +6497,10 @@ en-AU:
   count_students_30e46120: 
     one: "1 student"
     other: "%{count} students"
+  count_students_c9920376: 
+    one: "1 Student"
+    other: "%{count} Students"
+    zero: "0 Students"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 student in percentile %{percentile}. "
     other: "%{count} students in percentile %{percentile}. "
@@ -6691,6 +6700,7 @@ en-AU:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Course is already associated with a blueprint"
   course_landing_page_49a53ade: "Course landing page"
   course_level_notification_preferences_require_a_co_2f0a618: "Course level notification preferences require a course_id to update"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level."
   course_level_overrides_for_notification_preference_e86d1725: "Course level overrides for notification preferences"
   course_list: 
     favorited_tooltip: "Click to remove from the courses menu."
@@ -8142,6 +8152,9 @@ en-AU:
   disableWhileLoading: 
     loading: Loading...
   disable_a5c05db3: Disable
+  disable_alert_timeouts_description: |-
+      Enabling this feature gets rid of the timeout for alert notifications that pop up, giving the
+      user as much time as they need to read the notification over and dismiss it when they are finished.
   disable_all_read_only_scopes_f9ffdd28: "Disable all read only scopes."
   disable_and_lock_7d0ef0e8: "Disable and Lock"
   disable_automatic_submission_8e1d8676: "Disable Automatic Submission"
@@ -8153,6 +8166,7 @@ en-AU:
   disable_scope_6ba4e4d4: "Disable scope"
   disable_sync_to_name_10c371dc: "Disable Sync to %{name}"
   disable_toolname_44d6397c: "Disable %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Disable uploads to Canvas Media from the enhanced rich content editor"
   disabled_18c33a73: (disabled)
   disabled_3b1b332a: Disabled
   disabled_and_locked_d14dc6c2: "Disabled and Locked"
@@ -9473,6 +9487,7 @@ en-AU:
   exit_d0c7b013: Exit
   exit_theme_editor_9ddd41bb: "Exit Theme Editor"
   expand_2f2fadbd: Expand
+  expand_all_bb64d2ea: "Expand All"
   expand_collapse_title_outcome_group_239f0a9d: "expand/collapse %{title} Outcome Group"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Expand/collapse %{title} Outcome Group, student meets mastery of %{mastery_count} of %{count} outcomes"
   expand_global_navigation_2c28d5d4: "Expand global navigation"
@@ -9677,6 +9692,7 @@ en-AU:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Failed loading Unsynced Changes component. Is your network connection OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Failed, please report the following error code to your system administrator: ErrorReport:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Failed retrieving media source"
+  failed_retrieving_media_sources_32aed288: "Failed retrieving media sources."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Failed, the report failed to generate a file. Please try again."
   failed_to_add_new_feed_ee1c5ea: "Failed to add new feed"
   failed_to_change_last_attended_date_1e340ba6: "Failed to change last attended date"
@@ -9764,6 +9780,7 @@ en-AU:
         Differentiated Assignments is a feature that enables choosing which section(s) or individual student(s) an assignment applies to.
         Sections that are not given an assignment will not see it in their course content and their final grade will be
         calculated without those points.
+    disable_alert_timeouts: "Disable Alert Notification Timeouts"
     ember_modules: "Ember Modules"
     google_docs_domain_restriction: "Google Docs Domain Restriction"
     gradebook_list_students_by_sortable_name: "Gradebook - List Students by Sortable Name"
@@ -9954,6 +9971,7 @@ en-AU:
   final_grade_finalgrade_408580bb: "Final Grade: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Final Grade Info"
   final_grade_override_be8a21cd: "Final Grade Override"
+  final_grade_override_in_gradebook_history_767147c: "Final Grade Override in Gradebook History"
   final_grade_score_fe69a301: "Final mark: %{score}"
   final_grader_1693103c: "Final Grader"
   final_grader_can_view_other_grader_names_67736530: "Final grader can view other grader names"
@@ -10109,6 +10127,7 @@ en-AU:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Give all students the same grade for *%{assignment.name}* by entering and submitting a grade value below:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Give all students the same *percent* grade for **%{assignment.name}** by entering and submitting a grade value below:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Giving up on retrieving media sources. This issue will probably resolve itself eventually."
   global_announcements_a78912c8: "Global Announcements"
   global_announcements_add_edit_delete_843ca4d2: "Global Announcements - add / edit / delete"
   global_branding_df1cae12: "Global Branding"
@@ -12108,6 +12127,7 @@ en-AU:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Includes a link to SpeedGrader in the assignment header menu in Gradebook."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Includes grade values in the admin grade reports."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Includes Outcomes Service alignments when exporting and importing course content"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Includes overridden course grades in the Gradebook History."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Includes rubrics in the course sidebar navigation"
   incomplete_95612d72: incomplete
   incomplete_da3c2ea2: Incomplete
@@ -16104,6 +16124,7 @@ en-AU:
     submission_comment_description: "Assignment submission comment"
     submission_comment_display: "Submission Comment"
     web_conference_recording_ready: "A conference recording is ready"
+  notification_policies_requires_the_communication_c_2e7ded08: "Notification policies requires the communication channel id, the notification category, and the frequency to update"
   notification_preferences: 
     communication: 
       email: 
@@ -16373,6 +16394,7 @@ en-AU:
   open_to_comments_23d5585e: "Open to Comments"
   openid_connect_initiation_url_2be36b48: "OpenID Connect Initiation Url"
   openid_connect_initiation_url_d9037d30: "* OpenID Connect Initiation Url"
+  opens_in_new_window_b4b99243: "opens in new window"
   option_1_dea39f90: "Option 1"
   option_2_47aace2a: "Option 2"
   option_3_30adfebc: "Option 3"
@@ -16442,6 +16464,7 @@ en-AU:
   out_of_pointspossible_c163105a: "out of %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Outcome alignment to non-scoring content"
   outcome_da397d20: Outcome
+  outcome_details_ce254e89: "Outcome Details"
   outcome_export_89229eb4: "Outcome Export"
   outcome_group_39fae76f: "Outcome Group"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Outcome group with canvas id %{id} not found"
@@ -19818,6 +19841,8 @@ en-AU:
   restore_courses_182e162e: "Restore Courses"
   restored_course_association_course_c9e16045: "Restored course association %{course}"
   restrict_access_84ba6bb8: "Restrict Access"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Restrict instructors from changing mastery scales"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Restrict instructors from changing proficiency calculation method"
   restrict_sms_to_select_types_9dd6399c: "Restrict SMS to Select Types"
   restrict_student_access: 
     button_text: 
@@ -23728,6 +23753,8 @@ en-AU:
   ukrainian_945b00b7: Ukrainian
   unable_to_accept_update_fd53a7e2: "Unable to accept update"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Unable to access specific student. Go to assignment in SpeedGrader?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Unable to align some outcomes to a page"
+  unable_to_align_some_outcomes_to_title_53467231: "Unable to align some outcomes to \"%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Unable to curve grades because this assignment is due in a closed grading period for at least one student"
   unable_to_delete_assignment_abcf8d62: "Unable to delete assignment"
   unable_to_dismiss_update_df1e32eb: "Unable to dismiss update"
@@ -24196,6 +24223,8 @@ en-AU:
   user_observers_454d4303: "User Observers"
   user_option_links_66090987: "User option links"
   user_profile: 
+    invalid_url: "Invalid URL"
+    profile_bio_too_long: "Bio is too long"
     profile_title_too_long: "Title is too long"
     tabs: 
       notifications: Notifications
@@ -25198,6 +25227,7 @@ en-AU:
       
       You can view it here: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Your media has been uploaded and will appear here after processing."
   your_message_has_been_sent_thank_you_e0284316: "Your message has been sent. Thank you!"
   your_message_was_sent_977f6583: "Your message was sent!"
   your_name_7665e1d8: "Your Name"
