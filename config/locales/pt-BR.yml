@@ -408,6 +408,7 @@ pt-BR:
   account_level_mastery_scales_a5bdff29: "Escalas de domínio no nível da conta"
   account_level_notification_preferences_require_an__66467cd7: "Preferências de notificação em nível da conta exigem uma account_id para atualizar"
   account_level_notification_preferences_ui_update_f5e189a4: "Atualização da IU nas preferências de notificação a nível da conta"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Notificações a nível do curso são aplicáveis a todos os cursos. Notificações para cursos individuais podem ser alteradas dentro de cada curso e substituirão tais notificações."
   account_level_settings_manage_4fca6f8e: "Configurações em nível da conta - gerenciar"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nome da conta"
@@ -418,6 +419,7 @@ pt-BR:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "O tempo de finalização da notificação de conta precede o tempo de início"
+  account_notification_settings_e96de9b6: "Configurações de notificações da conta"
   account_notification_settings_error_page_66c0bc61: "Página de erro das configurações de notificação da conta"
   account_notification_settings_initial_query_error_f55e1cbf: "Erro de consulta inicial das Configurações de notificações da conta"
   account_notification_settings_updated_dbabec35: "Configurações de notificações da conta atualizadas"
@@ -1393,6 +1395,7 @@ pt-BR:
         manual_quotas_title: "Cotas manualmente ajustáveis"
         megabytes: megabytes
         megabytes_tooltip: megabytes
+        placeholder_course_or_group_id: "Digite a ID..."
         select_type_courses: "ID do curso"
         select_type_groups: "ID do grupo"
         select_type_label: "Localizar curso ou grupo"
@@ -3935,6 +3938,7 @@ pt-BR:
   available_from_f84e4611: "Disponível a partir de"
   available_from_field_for_styleguide_7ced3861: "Campo de 'Disponível a Partir de' para guia de estilo "
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Disponível a partir de - Formatar Como AAAA-MM-DD hh:mm"
+  available_pronouns_b45330b1: "Pronomes disponíveis"
   available_to_b7350e02: "Disponível para"
   available_until_3278ebe9: "Disponível até"
   available_until_date_2c0ccec3: "Disponível Até a Data::"
@@ -5201,6 +5205,7 @@ pt-BR:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Colaborações são ferramentas web para trabalhar de forma colaborativa em tarefas como tomar notas ou papéis agrupados. Converse com seu professor para começar."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Colaborações são ferramentas web para trabalhar de forma colaborativa em tarefas como tomar notas ou papéis agrupados. Comece adicionando um aplicativo de colaboração."
   collaborations_tutorial_tray_9219d9d: "Bandeja de Tutoriais de Colaborações"
+  collapse_all_50275533: "Recolher tudo"
   collapse_group_c2af7cad: "Recolher grupo"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Recolher lista de membros do grupo para %{groupName}"
   collapse_subdiscussion_89af1f5c: "Recolher subfórum"
@@ -6472,6 +6477,10 @@ pt-BR:
   count_students_30e46120: 
     one: "1 aluno"
     other: "%{count} alunos"
+  count_students_c9920376: 
+    one: "1 aluno"
+    other: "%{count} Alunos"
+    zero: "0 aluno"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 aluno no percentual %{percentile}. "
     other: "%{count} alunos no percentual %{percentile}. "
@@ -6671,6 +6680,7 @@ pt-BR:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Curso já está associado a um modelo"
   course_landing_page_49a53ade: "Página de destino do curso"
   course_level_notification_preferences_require_a_co_2f0a618: "Preferências de notificação em nível do curso exigem uma course_id para atualizar"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Notificações a nível do curso são herdadas das suas configurações de notificações a nível da conta. Ajustar notificações para este curso substituirá notificações no nível da conta."
   course_level_overrides_for_notification_preference_e86d1725: "Substituições de nível do curso para preferências de notificação"
   course_list: 
     favorited_tooltip: "Clique para remover do menu cursos."
@@ -8116,6 +8126,9 @@ pt-BR:
   disableWhileLoading: 
     loading: Carregando...
   disable_a5c05db3: Desativar
+  disable_alert_timeouts_description: |-
+      Habilitar este recurso impede que o tempo esgotado para notificações de alertas apareça, dando ao usuário
+      o tempo necessário para ler a notificação e dispensá-la quando terminar.
   disable_all_read_only_scopes_f9ffdd28: "Desabilitar todos os escopos somente leitura."
   disable_and_lock_7d0ef0e8: "Desativar e bloquear"
   disable_automatic_submission_8e1d8676: "Desativar envio automático"
@@ -8127,6 +8140,7 @@ pt-BR:
   disable_scope_6ba4e4d4: "Desabilitar escopo"
   disable_sync_to_name_10c371dc: "Desabilitar sincronização a %{name}"
   disable_toolname_44d6397c: "Desativar %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Desabilita carregamentos no Canvas Media a partir do editor aprimorado de conteúdo avançado"
   disabled_18c33a73: (desativado)
   disabled_3b1b332a: Desativado
   disabled_and_locked_d14dc6c2: "Desabilitado e bloqueado"
@@ -9445,6 +9459,7 @@ pt-BR:
   exit_d0c7b013: Sair
   exit_theme_editor_9ddd41bb: "Sair do Editor de Tema"
   expand_2f2fadbd: Expandir
+  expand_all_bb64d2ea: "Expandir tudo"
   expand_collapse_title_outcome_group_239f0a9d: "expandir/reduzir %{title} Grupo de resultados"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Expandir/recolher Grupo de objetivos de %{title}, aluno alcança o domínio de %{mastery_count} de %{count} objetivos"
   expand_global_navigation_2c28d5d4: "Expandir navegação global"
@@ -9649,6 +9664,7 @@ pt-BR:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Falha ao carregar componente do Histórico Não Sincronizado. A sua conexão à rede está OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Ocorreu uma falha. Comunique o seguinte código de erro ao seu administrador de sistema: ErrorReport:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Falhou ao recuperar fonte da mídia"
+  failed_retrieving_media_sources_32aed288: "Falhou ao recuperar fontes da mídia."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Falhou, o relatório falhou em gerar um arquivo. Por favor, tente novamente."
   failed_to_add_new_feed_ee1c5ea: "Falhou ao adicionar novo feed"
   failed_to_change_last_attended_date_1e340ba6: "Falhou ao alterar a última data de participação"
@@ -9736,6 +9752,7 @@ pt-BR:
         Atribuições Diferenciados é um recurso que permite escolher a qual(is) seção(ões) ou aluno(s) individual(is) uma atribuição se aplica.
         Seções que não recebem uma atribuição não irão vê-la em seu conteúdo do curso e a sua classificação final será
         calculada sem esses pontos.
+    disable_alert_timeouts: "Desabilitar tempos esgotados de notificações de alertas"
     ember_modules: "Módulos do Ember"
     google_docs_domain_restriction: "Restrição de domínio do Google Documentos"
     gradebook_list_students_by_sortable_name: "Boletim - Lista os alunos por nome ordenável"
@@ -9926,6 +9943,7 @@ pt-BR:
   final_grade_finalgrade_408580bb: "Nota final: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Informação da Nota Final"
   final_grade_override_be8a21cd: "Substituição da nota final"
+  final_grade_override_in_gradebook_history_767147c: "Substituição da nota final no histórico do boletim"
   final_grade_score_fe69a301: "Nota final: %{score}"
   final_grader_1693103c: "Avaliador final"
   final_grader_can_view_other_grader_names_67736530: "Avaliador final pode visualizar outros nomes de avaliadores"
@@ -10081,6 +10099,7 @@ pt-BR:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Dar a todos os alunos a mesma nota para *%{assignment.name}* ao inserir e enviar um valor de nota abaixo:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Dar a todos os alunos a mesma *nota* para **%{assignment.name}** ao inserir e enviar um valor de nota abaixo:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Desistindo da recuperação de fontes da mídia. Este problema provavelmente se resolverá eventualmente."
   global_announcements_a78912c8: "Avisos globais"
   global_announcements_add_edit_delete_843ca4d2: "Avisos Globais - adicionar/editar/excluir"
   global_branding_df1cae12: "Branding Global"
@@ -12077,6 +12096,7 @@ pt-BR:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inclui um link para SpeedGrader no menu do cabeçalho de tarefas no Boletim."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inclui valores de notas nos relatórios de notas do admin."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Inclui alinhamentos de Serviços de Resultados ao exportar e importar o conteúdo do curso"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Inclui notas do curso substituídas no histórico do boletim."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Inclui rubricas na navegação da barra lateral do curso"
   incomplete_95612d72: incompleto
   incomplete_da3c2ea2: Incompleto
@@ -16052,6 +16072,7 @@ pt-BR:
     submission_comment_description: "Comentário de envio da tarefa"
     submission_comment_display: "Comentário do envio"
     web_conference_recording_ready: "Uma gravação de conferência está pronta"
+  notification_policies_requires_the_communication_c_2e7ded08: "Políticas de notificação exigem a id do canal de comunicação, a categoria da notificação e a frequência para carregamento"
   notification_preferences: 
     communication: 
       email: 
@@ -16318,6 +16339,7 @@ pt-BR:
   open_title_in_a_new_window_b29fed77: "Abrir %{title} em uma nova janela"
   open_to_comments_23d5585e: "Abrir para Comentários"
   openid_connect_initiation_url_d9037d30: "* URL de iniciação do OpenID Connect"
+  opens_in_new_window_b4b99243: "abre em uma nova janela"
   option_1_dea39f90: "Opção 1"
   option_2_47aace2a: "Opção 2"
   option_3_30adfebc: "Opção 3"
@@ -16384,6 +16406,7 @@ pt-BR:
   out_of_pointspossible_c163105a: "de %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Alinhamento de resultados a conteúdo sem pontuação"
   outcome_da397d20: Objetivo
+  outcome_details_ce254e89: "Detalhes do resultado"
   outcome_export_89229eb4: "Exportação do objetivo"
   outcome_group_39fae76f: "Grupo de objetivos"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Grupo de objetivos com id do Canvas %{id} não encontrado"
@@ -19751,6 +19774,8 @@ pt-BR:
   restore_courses_182e162e: "Restaurar cursos"
   restored_course_association_course_c9e16045: "Associações do curso restaurado %{course}"
   restrict_access_84ba6bb8: "Restringir Acesso"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Restringe os instrutores de alterarem escalas de domínio"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Restringe os instrutores de alterarem o método de cálculo da proficiência"
   restrict_sms_to_select_types_9dd6399c: "Restringir SMS para tipos selecionados"
   restrict_student_access: 
     button_text: 
@@ -23647,6 +23672,8 @@ pt-BR:
   ukrainian_945b00b7: Ucraniano
   unable_to_accept_update_fd53a7e2: "Não foi possível aceitar atualização"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Incapaz de acessar aluno específico. Ir para a tarefa em SpeedGrader?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Incapaz de alinhar alguns resultados em uma página"
+  unable_to_align_some_outcomes_to_title_53467231: "Incapaz de alinhar alguns resultados em \"%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Não é possível curvar notas porque esta tarefa tem entrega em um período de avaliação fechado para ao menos um aluno"
   unable_to_delete_assignment_abcf8d62: "Incapaz de excluir tarefa"
   unable_to_dismiss_update_df1e32eb: "Não foi possível descartar atualização"
@@ -24110,6 +24137,8 @@ pt-BR:
   user_observers_454d4303: "Observadores do usuário"
   user_option_links_66090987: "Links de opção de usuário"
   user_profile: 
+    invalid_url: "URL inválido"
+    profile_bio_too_long: "Bio é longa demais"
     profile_title_too_long: "Título longo demais"
     tabs: 
       notifications: Notificações
@@ -25100,6 +25129,7 @@ pt-BR:
       
       É possível visualizá-las aqui: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Sua mídia foi carregada e aparecerá aqui após o processamento."
   your_message_has_been_sent_thank_you_e0284316: "Sua mensagem foi enviada. Obrigado!"
   your_message_was_sent_977f6583: "Sua mensagem foi enviada!"
   your_name_7665e1d8: "Seu Nome"
