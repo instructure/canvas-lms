@@ -267,6 +267,7 @@ fi:
   account_level_mastery_scales_a5bdff29: "Tilitason hallinnan suuruusluokat"
   account_level_notification_preferences_require_an__66467cd7: "Tilitason ilmoitusasetukset vaativat account_id päivittääkseen"
   account_level_notification_preferences_ui_update_f5e189a4: "Tilitason ilmoitusasetusten käyttöliittymän päivitys"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Tilitason ilmoituksia sovelletaan kaikkiin kursseihin. Erillisten kurssien ilmoitukset voidaan vaihtaa jokaisen kurssin sisällä. Tämä korvaa nämä ilmoitukset."
   account_level_settings_manage_4fca6f8e: "Tilin tason asetukset - hallitse"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "tilin nimi"
@@ -275,6 +276,7 @@ fi:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Tilin ilmoituksen päättymisaika edeltää alkamisaikaa"
+  account_notification_settings_e96de9b6: "Tilin ilmoitusasetukset"
   account_notification_settings_error_page_66c0bc61: "Kurssin ilmoitusasetusten virhesivu"
   account_notification_settings_initial_query_error_f55e1cbf: "Kurssin ilmoitusasetusten ensimmäisen kyselyn virhe"
   account_notification_settings_updated_dbabec35: "Tilin ilmoitusasetukset päivitetty"
@@ -865,6 +867,7 @@ fi:
         manual_quotas_title: "Manuaalisesti asetettavat kiintiöt"
         megabytes: megatavua
         megabytes_tooltip: megatavua
+        placeholder_course_or_group_id: "Kirjoita ID..."
         select_type_courses: "Kurssin tunnus"
         select_type_groups: "Ryhmän tunnus"
         select_type_label: "Hae kurssia tai ryhmää"
@@ -2940,6 +2943,7 @@ fi:
   available_from_date_43b5e11d: "Saatavissa tästä päivämäärästä lähtien"
   available_from_date_must_precede_available_until_c9f9e533: "\"”Saatavissa lähtien” päivämäärän täytyy olla ennen ”Saatavissa asti”\""
   available_from_f84e4611: "Saatavissa alkaen"
+  available_pronouns_b45330b1: "Saatavissa olevat pronominit"
   available_to_b7350e02: Saatavissa
   available_until_3278ebe9: "Saatavissa tähän asti"
   available_until_date_cd125c62: "Saatavilla tähän päivään saakka"
@@ -3959,6 +3963,7 @@ fi:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Yhteistyöt ovat verkkopohjaisia työkaluja, joiden avulla työstetään yhteiskäyttötiedostoja kuten yhteisiä muistiinpanoja tai ryhmäkirjoitelmia. Puhu opettajallesi päästäksesi alkuun."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Yhteistyöt ovat verkkopohjaisia työkaluja, joiden avulla työstetään yhteiskäyttötiedostoja kuten yhteisiä muistiinpanoja tai ryhmäkirjoitelmia. Aloita lisäämällä yhteistyösovellus."
   collaborations_tutorial_tray_9219d9d: "Yhteistöiden ohjetietopaneeli"
+  collapse_all_50275533: "Kutista kaikki"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kutista ryhmän jäsenten lista kohteelle %{groupName}"
   collapse_subdiscussion_89af1f5c: "Kutista alakeskustelu"
   collapse_tutorial_tray_66ee7dc1: "Kutista ohjetietopaneelia"
@@ -4977,6 +4982,10 @@ fi:
   count_students_30e46120: 
     one: "1 opiskelija"
     other: "%{count} opiskelijaa"
+  count_students_c9920376: 
+    one: "1 opiskelija"
+    other: "%{count} opiskelijaa"
+    zero: "0 opiskelijaa"
   count_sub_modules_3373a1c4: 
     one: "%{count} alamoduuli"
     other: "%{count} alamoduulia"
@@ -5126,6 +5135,7 @@ fi:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Kurssi on jo liitetty blueprint-kurssiin"
   course_landing_page_49a53ade: "Kurssin aloitussivu"
   course_level_notification_preferences_require_a_co_2f0a618: "Kurssitason ilmoitusasetukset vaativat course_id päivittääkseen"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Kurssitason ilmoitukset peritään tilitason ilmoitusasetuksista. Tämän kurssin ilmoitusten säätäminen ohittaa ilmoitukset tilitasolla."
   course_level_overrides_for_notification_preference_e86d1725: "Kurssitason asetukset ohittavat ilmoitusasetukset"
   course_list: 
     favorited_tooltip: "Napsauta poistaaksesi kurssit-valikosta."
@@ -6248,6 +6258,9 @@ fi:
   disableWhileLoading: 
     loading: Ladataan...
   disable_a5c05db3: "Poista käytöstä"
+  disable_alert_timeouts_description: |-
+      Tämän ominaisuuden käyttöönotto auttaa pääsemään eroon aikakatkaisun hälytysilmoituksille, jotka ponnahtavat esiin. Tämän ansiosta
+      käyttäjällä on ilmoitusten lukemiseen ja niiden ohittamiseen niin paljon aikaa kuin hän haluaa.
   disable_all_read_only_scopes_f9ffdd28: "Poista käytöstä kaikki vain luku -käyttöalat."
   disable_and_lock_7d0ef0e8: "Poista käytöstä ja lukitse"
   disable_automatic_submission_8e1d8676: "Poista automaattinen lähetys pois käytöstä"
@@ -6259,6 +6272,7 @@ fi:
   disable_scope_6ba4e4d4: "Poista vaikutusalue käytöstä"
   disable_sync_to_name_10c371dc: "Poista käytöstä synkronointi kohteeseen %{name}"
   disable_toolname_44d6397c: "Poista %{toolName} käytöstä"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Poista lataukset käytöstä Canvasin tietolaitteisiin paremmasta Rich Content Editorista"
   disabled_18c33a73: "(poistettu käytöstä)"
   disabled_3b1b332a: "Poistettu käytöstä"
   disabled_and_locked_d14dc6c2: "Pois käytöstä ja lukittu"
@@ -7335,6 +7349,7 @@ fi:
   excused_cf8792eb: Vapautettu
   exit_d0c7b013: Poistu
   expand_2f2fadbd: Laajenna
+  expand_all_bb64d2ea: "Laajenna kaikki"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Laajenna/kutista %{title} Osaamisen hallinnan tulosryhmä, opiskelijalla on hyvä osaaminen %{mastery_count} / %{count} tuloksesta"
   expand_global_navigation_2c28d5d4: "Laajenna päävalikkoa"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Laajenna ryhmän jäsenten lista kohteelle %{groupName}"
@@ -7424,6 +7439,7 @@ fi:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Synkronoimattomien muutosten komponentin lataus epäonnistui. Onko verkkoyhteytesi OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Epäonnistui, raportoi seuraava virhekoodi järjestelmäsi pääkäyttäjälle: Virheraportti:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Medialähteen nouto epäonnistui"
+  failed_retrieving_media_sources_32aed288: "Medialähteiden nouto epäonnistui."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Epäonnistui, raportista ei muodostunut tiedostoa. Yritä uudelleen."
   failed_to_add_new_feed_ee1c5ea: "Uuden syötteen lisääminen epäonnistui"
   failed_to_change_last_attended_date_1e340ba6: "Viimeisen osallistumispäivän vaihtaminen epäonnistui"
@@ -7483,6 +7499,7 @@ fi:
   features: 
     allow_opt_out_of_inbox: "Salli käyttäjien jättää Viestit-toiminto pois käytöstä"
     canvas_parent_display_name: "Canvas Parent"
+    disable_alert_timeouts: "Poista hälytysilmoitusten aikakatkaisut"
     google_docs_domain_restriction: "Google Docs -verkkotunnusrajoitus"
     gradebook_list_students_by_sortable_name: "Arvosanakirja - Listaa opiskelijat lajiteltavan nimen perusteella"
     hide_celebrations: "Poista juhlinta-animaatiot käytöstä."
@@ -7610,6 +7627,7 @@ fi:
   final_grade_a22c596: "lopullinen arvosana"
   final_grade_info_2aa35d25: "Lopullisen arvosanan tiedot"
   final_grade_override_be8a21cd: "Lopullisen arvosanan ohitus"
+  final_grade_override_in_gradebook_history_767147c: "Lopullisen arvosanan ohitus arvosanakirjan historiassa"
   final_grader_1693103c: "Lopullinen arvosanan antaja"
   final_grader_can_view_other_grader_names_67736530: "Lopullinen arvioija voi nähdä muiden arvioijien nimet"
   final_score_61e15cf3: "lopullinen pistemäärä"
@@ -7738,6 +7756,7 @@ fi:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Anna kaikille opiskelijoille sama arvosana *%{assignment.name}* syöttämällä alle arvosanan arvo:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Anna kaikille opiskelijoille sama *prosentti-* arvosana**%{assignment.name}** syöttämällä alle arvosanan arvo:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Medialähteiden noudosta luovutaan. Tämä ongelma todennäköisesti ratkeaa itsestään."
   global_announcements_a78912c8: "Organisaatiotason ilmoitukset"
   global_announcements_add_edit_delete_843ca4d2: "Organisaatiotason ilmoitukset - lisää/muokkaa/poista"
   global_branding_df1cae12: "Globaali brändäys"
@@ -9106,6 +9125,7 @@ fi:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Lisää arvosanakirjan tehtäväkohtaiseen otsikkovalikkoon linkin kohteeseen SpeedGrader ."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Sisällyttää arvosanan arvot pääkäyttäjän arvosanaraportteihin."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Sisältää tulosten palvelun linjaukset, kun kurssin sisältöä viedään ja tuodaan"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Sisältää ohitetut kurssin arvosanat arvosanakirjan historiassa."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Sisällyttää arviointitaulukot kurssin sivupalkin navigaatioon"
   incomplete_95612d72: keskeneräinen
   incomplete_da3c2ea2: Keskeneräinen
@@ -12408,6 +12428,7 @@ fi:
     submission_comment_description: "Tehtäväpalautuksen kommentti"
     submission_comment_display: "Tehtäväpalautuksen kommentti"
     web_conference_recording_ready: "Verkkotapaamisen nauhoitus on valmis"
+  notification_policies_requires_the_communication_c_2e7ded08: "Ilmoituskäytäntöihin vaaditaan viestintäkanavan tunnus, ilmoitusluokka ja päivityksen tiheys"
   notification_preferences: 
     communication: 
       email: 
@@ -12625,6 +12646,7 @@ fi:
   open_this_keyboard_shortcuts_dialog_9658b83a: "Avaa tämä näppäimistön pikakuvakkeiden valintaruutu"
   open_title_in_a_new_window_b29fed77: "Avaa %{title} uudessa ikkunassa"
   openid_connect_initiation_url_d9037d30: "* OpenID-yhdistämisen käynnistyksen Url"
+  opens_in_new_window_b4b99243: "avautuu uudessa ikkunassa"
   option_1_dea39f90: "Asetus 1"
   option_2_47aace2a: "Asetus 2"
   option_3_30adfebc: "Asetus 3"
@@ -12670,6 +12692,7 @@ fi:
   out_of_pointspossible_c163105a: "/%{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Osaamistulosten liittäminen ei-pisteytettävälle sisällölle"
   outcome_da397d20: Osaamistulos
+  outcome_details_ce254e89: "Tuloksen tiedot"
   outcome_export_89229eb4: "Osaamistulosten vienti"
   outcome_group_39fae76f: Osaamistulosryhmä
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Tulosryhmää, jolla on Canvasin tunnus %{id} ei löytynyt"
@@ -15347,6 +15370,8 @@ fi:
   restart_link_validation_b61286fc: "Käynnistä linkkien tarkistus uudelleen"
   restore_courses_182e162e: "Palauta kurssit"
   restored_course_association_course_c9e16045: "Kurssin liitos %{course} palautettu"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Rajoita ohjaajia vaihtamasta hallinnan asteikkoja"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Rajoita ohjaajia vaihtamasta pätevyyden laskentamenetelmää"
   restrict_sms_to_select_types_9dd6399c: "Rajoita tekstiviesti-ilmoituksia"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Rajoita opiskelijoiden pääsyä kursseille päättymispäivän jälkeen"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Rajoita opiskelijoiden pääsyä kursseille ennen alkamispäivää"
@@ -18583,6 +18608,8 @@ fi:
   ukrainian_945b00b7: ukraina
   unable_to_accept_update_fd53a7e2: "Päivitystä ei voida hyväksyä"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Ei pääsyä tietyn opiskelijan tietoihin. Siirrytäänkö tehtävään SpeedGraderissa?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Joidenkin tulosten linjaus sivulle ei onnistu"
+  unable_to_align_some_outcomes_to_title_53467231: "Joidenkin tulosten linjaus ei onnistu kohteeseen \"%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Arvosanojen asettaminen jakaumalle ei onnistunut, koska tämän tehtävän määräpäivä on suljetulla arvosanojen antojaksolla vähintään yhdelle opiskelijalle."
   unable_to_delete_assignment_abcf8d62: "Tehtävän poistaminen ei onnistu"
   unable_to_dismiss_update_df1e32eb: "Päivitystä ei voida ohittaa"
@@ -18982,6 +19009,8 @@ fi:
   user_observers_454d4303: "Käyttäjän tarkkailijat"
   user_option_links_66090987: "Käyttäjäasetusten linkit"
   user_profile: 
+    invalid_url: "Virheellinen URL"
+    profile_bio_too_long: "Bio on liian pitkä"
     profile_title_too_long: "Nimi on liian pitkä"
     tabs: 
       notifications: Ilmoitukset
@@ -19832,6 +19861,7 @@ fi:
       
       Voit tarkastella niitä täällä: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Mediasi on ladattu ja näkyy täällä käsittelyn jälkeen."
   your_message_has_been_sent_thank_you_e0284316: "Viestisi on lähetetty. Kiitos!"
   your_message_was_sent_977f6583: "Viestisi lähetettiin."
   your_name_7665e1d8: Nimesi
