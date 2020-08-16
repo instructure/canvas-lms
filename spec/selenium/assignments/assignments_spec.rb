@@ -220,7 +220,9 @@ describe "assignments" do
       end
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
-      hover_and_click(".edit_assignment")
+      fj("#assignment_#{@assignment.id} a.al-trigger").click
+      wait_for_ajaximations
+      f("#assignment_#{@assignment.id} .edit_assignment").click
       expect(f("#content")).not_to contain_jqcss('.form-dialog .ui-datepicker-trigger:visible')
       # be_disabled
       expect(f('.multiple_due_dates input')).to be_disabled
