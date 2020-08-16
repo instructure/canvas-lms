@@ -476,6 +476,8 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
+      # wait for jQuery UI sortable to be initialized
+      expect(f(".collectionViewItems.ui-sortable")).to be_displayed
       drag_with_js("#assignment_#{as[0].id}", 0, 50)
       wait_for_ajaximations
 
@@ -498,6 +500,8 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
+        # wait for jQuery UI sortable to be initialized
+        expect(f(".collectionViewItems.ui-sortable")).to be_displayed
         drag_with_js("#assignment_#{as[0].id} .draggable-handle", 0, 50)
         wait_for_ajaximations
 
