@@ -337,7 +337,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         {
           hasPostableComments: true,
           postedAt: submission.posted_at,
-          score: 1.0,
+          score: '1',
           workflowState: 'graded'
         }
       ])
