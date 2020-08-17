@@ -273,7 +273,7 @@ QUnit.module('Gradebook > Students', suiteHooks => {
     test('preserves an existing computed current score', () => {
       studentData[0].computed_current_score = 95
       gradebook.gotChunkOfStudents(studentData)
-      strictEqual(getStudent('1101').computed_current_score, 95)
+      strictEqual(getStudent('1101').computed_current_score, '95')
     })
 
     test('defaults the computed final score for each student to 0', () => {
@@ -286,7 +286,7 @@ QUnit.module('Gradebook > Students', suiteHooks => {
     test('preserves an existing computed final score', () => {
       studentData[0].computed_final_score = 95
       gradebook.gotChunkOfStudents(studentData)
-      strictEqual(getStudent('1101').computed_final_score, 95)
+      strictEqual(getStudent('1101').computed_final_score, '95')
     })
 
     test('sets a student as "concluded" when all enrollments for that student are "completed"', () => {

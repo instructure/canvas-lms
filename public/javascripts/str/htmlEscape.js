@@ -57,9 +57,9 @@ export default function escape(strOrObject) {
   }
 
   for (const k in strOrObject) {
-    const v = strOrObject[k]
-    if (typeof v === 'string') {
-      strOrObject[k] = htmlEscape(v)
+    if (strOrObject.hasOwnProperty(k)) {
+      const v = strOrObject[k]
+      strOrObject[k] = escape(v)
     }
   }
   return strOrObject
