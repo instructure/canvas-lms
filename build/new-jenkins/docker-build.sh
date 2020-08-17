@@ -12,7 +12,7 @@ dependencyArgs=(
   --build-arg NODE="$NODE"
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
   --build-arg RUBY="$RUBY"
-  --file Dockerfile
+  --file Dockerfile.jenkins
 )
 
 if [[ "${SKIP_CACHE:-false}" = "false" ]]; then
