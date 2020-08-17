@@ -223,6 +223,7 @@ module AuthenticationMethods
     end
 
     if @current_user && @current_user.unavailable?
+      logger.info "Invalid request: User is currently UNAVAILABLE"
       @current_pseudonym = nil
       @current_user = nil
     end
@@ -283,6 +284,7 @@ module AuthenticationMethods
       end
     end
 
+    logger.info "auth loaded user id: #{@current_user&.id}"
     @current_user
   end
   private :load_user
