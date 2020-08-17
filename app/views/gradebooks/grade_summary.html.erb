@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 <%
+  @use_responsive_design = @domain_root_account.feature_enabled?(:responsive_student_grades_page)
+
   provide :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)
 %>
 <%
@@ -77,8 +79,9 @@
       <h1 class="ic-Action-header__Heading">
         <%= t("Grades for %{student}", student: @presenter.student_name) %>
       </h1>
-
-      <div class="col-xs-6" ></div>
+      <% if !@use_responsive_design %>
+        <div class="col-xs-6" ></div>
+      <% end %>
     </div>
 
     <div id="print-grades-button-container" class="ic-Action-header__Secondary">
@@ -116,7 +119,10 @@
 
   <div id="assignments">
     <span id="aria-announcer" class="hide-text affix" aria-live="polite"></span>
-  <table id="grades_summary" class="<%= 'editable' if @presenter.editable? %> ic-Table ic-Table--hover-row">
+  <table
+    id="grades_summary"
+    class="<%= 'editable' if @presenter.editable? %> ic-Table ic-Table--hover-row <%= 'ic-Table--grades-summary-table' if @use_responsive_design %>"
+  >
     <% if @presenter.editable? %>
       <caption class="screenreader-only"><%= whatif_instructions %></caption>
     <% end %>
@@ -159,7 +165,7 @@
           <% if assignment_presenter.group %>
             <div class="context"><%= assignment_presenter.group.name %></div>
           <% end %>
-        </td>
+        </th>
         <td class="due">
           <% if assignment_presenter.has_no_group_weight?  %>
             <%= datetime_string(assignment.due_at, :due_date) rescue "" %>
