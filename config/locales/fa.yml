@@ -3972,6 +3972,9 @@ fa:
   canvas_alert_comment_author_name_for_assignment_ti_871fd642: "هشدار کانواس - نظر: %{author_name} برای %{assignment_title}، %{user_name}، %{course_name}."
   canvas_alert_grade_change_date_for_name_56f680ed: "هشدار کانواس - تغییر نمره : %{date} برای %{name}"
   canvas_alert_graded_assignment_context_for_name_459fdf31: "هشدار کانواس - نمره گذاری شده: %{assignment}، %{context} برای %{name}."
+  canvas_alert_in_asset_link_students_are_clicking_b_4cfcfbff: "هشدار کانواس- در %{asset_link}، دانشجویان برای محتوایی که نمی‌توانند به آن دسترسی داشته باشند، روی %{bad_link} کلیک می‌کنند."
+  canvas_alert_in_asset_link_students_are_clicking_b_d3ff2650: "هشدار کانواس - در %{asset_link}، دانشجویان برای دستبابی به صفحه ای که در درس شما وجود ندارد، روی %{bad_link} کلیک می‌کنند. "
+  canvas_alert_in_asset_link_students_are_clicking_b_da080154: "هشدار کانواس - در %{asset_link}، دانشجویان روی محتوا در درس دیگری روی %{bad_link} کلیک می‌کنند. "
   canvas_alert_invited_course_as_role_type_9ed79ce3: "هشدار کانواس - دعوت شده: %{course} به عنوان %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "هشدار کانواس - دعوت شده: درس به عنوان %{role_type}"
   canvas_alert_late_anonymous_submission_assignment__bf9a6452: "هشدار کانواس - مورد ارسالی دارای تأخیر ناشناس : %{assignment_name}"
@@ -3987,6 +3990,7 @@ fa:
   canvas_cartridge_file_description: "بسته صدور درس کانواس"
   canvas_cartridge_name: "وارد کننده کارتریج کانواس"
   canvas_cloud_information_fdd404f2: "اطلاعات ابر کانواس"
+  canvas_content_security_policy_c3d7bf2b: "سیاست امنیتی محتوا کانواس"
   canvas_course_id_db4de2b8: شناسه_درس_کانواس
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "پیوندهای داشبورد کانواس به داشبورد کاتالوگ هدایت خواهند شد"
   canvas_demo_7a005cf3: "نسخه نمایشی کانواس"
@@ -4069,6 +4073,7 @@ fa:
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "نمودار نمره های دانشجو برای هر تکلیف"
   chat_2153c6b7: گفتگو
   check_back_in_a_little_while_17756399: "در عین حال بررسی کنید"
+  check_back_later_c4234dbc: "بعدا بررسی کنید."
   check_submission_file_type_b3dbf3fd: "کنترل نوع فایل ارسالی"
   check_to_add_a_user_for_loginid_6cd25597: "برای افزودن کاربر برای %{loginid}، انتخاب کنید"
   check_to_select_all_98e484f1: "برای انتخاب همه گزینه ها انتخاب کنید"
@@ -5361,6 +5366,7 @@ fa:
   copy_to_a5396a6f: "کپی به..."
   copy_to_folder_32ecc3c3: "کپی کردن در پوشه"
   copying_628a9607: "در حال کپی کردن.."
+  copyright_and_license_information_must_be_provided_5feffaf: "اطلاعات حق نشر و مجوز باید قبل از انتشار اطلاعات برای  فایل‌ها ارائه شود."
   copyright_holder_66ee111: "دارنده حق نشر:"
   correct_answer: "جواب درست بود."
   correct_answer_5a6a57d1: "پاسخ درست"
@@ -7687,6 +7693,7 @@ fa:
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "\"{{CANVAS_USER_ID}}\" را برای جایگزین کردن شناسه یکتای کانواس کاربر وارد کنید"
   enter_grades_as_e113e606: "وارد کردن نمره به عنوان"
   enter_or_find_an_external_tool_url_6aebbd0d: "نشانی اینترنتی یک ابزار بیرونی را وارد کنید یا بیابید "
+  enter_specific_phrase_9b686755: "عبارت خاصی را وارد کنید."
   enter_the_access_token_for_your_organization_from__38b84fd1: "شانه دسترسی سازمان خود را از *eduappcenter.com* وارد کنید. به محض اعمال، فقط برنامه هایی که سازمان شما در EduAppCenter تأیید کرده است در صفحه برنامه های بیرونی فهرست خواهد شد. با شیوه **ایجاد نشانه دسترسی** آشنا شوید."
   enter_the_access_token_for_your_organization_from__cc77493d: "نشانه دسترسی سازمان خود را از *eduappcenter.com* وارد کنید. به محض اعمال، فقط برنامه هایی که سازمان شما در EduAppCenter تأیید کرده است در صفحه برنامه های بیرونی فهرست خواهد شد. با شیوه **ایجاد نشانه دسترسی** آشنا شوید."
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "نشانی های پست الکترونیکی کاربرانی که باید اضافه شوند به نحوی که با ویرگول یا خط از هم جدا شده باشند وارد کنید"
@@ -8130,6 +8137,7 @@ fa:
       posts_added: "ارسال ها افزوده شدند"
       remove_feed: "حذف %{display_name}"
   external_feeds_77f57c7d: "خوراک خبری بیرونی"
+  external_feeds_b6345379: "خوراک‌های خبری بیرونی"
   external_integration_keys_8b4f4548: "کلیدهای یکپارچه سازی بیرونی"
   external_tool_c5a6410a: "ابزار بیرونی"
   external_tool_url_cannot_be_left_blank_a34b6bb2: "نشانی اینترنتی بیرونی را نمی توان خالی گذاشت"
@@ -8462,6 +8470,7 @@ fa:
   filter_by_name_34cbe139: "فیلتر بر اساس نام"
   filter_by_student_name_or_secondary_id_83dc524f: "فیلتر بر اساس نام دانشجو یا شناسه ثانویه"
   filter_by_term_cfe778b2: "فیلتر براساس ترم"
+  filter_by_user_type_dbbd3e3d: "فیلتر بر اساس نوع کاربر"
   filter_conversations_by_type_1ce8c064: "فیلتر پیام ها بر اساس نوع"
   filter_discussions_by_assignments_757924ed: "فیلتر کردن بحث ها بر اساس تکلیف ها"
   filter_discussions_by_unread_6c48322: "فیلتر کردن بحث ها بر اساس موردهای خوانده نشده"
@@ -10171,6 +10180,7 @@ fa:
   importing_name_8f2b131d: "وارد کردن %{name}"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "در %{asset_link}، دانشجویان برای یک صفحه ناموجود در درس شما روی %{bad_link} کلیک می‌کنند. "
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "در %{asset_link}، دانشجویان روی محتوا در درس دیگری در %{bad_link} کلیک می‌کنند. "
+  in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "در %{asset_link}، دانشجویان برای محتوایی که نمی‌توانند به آن دسترسی داشته باشند، روی %{bad_link} کلیک می‌کنند."
   in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: "در مواردی که در دسترس است، RCE و نوار کناری ویکی را از سرویس محتوای غنی کانواس بارگذاری کنید."
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "در مواردی که در دسترس است، RCE را از سرویس محتوای غنی کانواس بارگذاری کنید."
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "به منظور تکمیل فرایند، به یک صفحه ورود هدایت خواهید شد که باید با استفاده از اعتبارنامه های فرزند خود وارد شوید."
@@ -10191,6 +10201,7 @@ fa:
   include_unpublished_assignments_83ebbaec: "شامل سازی تکلیف های منتشر نشده"
   include_unpublished_courses_7a0e7aab: "شامل سازی درس های منتشر نشده"
   include_unsubmitted_and_deleted_submissions_101225c7: "شامل موارد ارسالی ارسال نشده یا حذف شده"
+  include_unsubmitted_deleted_submissions_99fc2aad: "موارد ارسالی‌ ارسال نشده و حذف شده را درج کنید."
   incomplete_95612d72: ناقص
   incomplete_da3c2ea2: ناقص
   incompleteregistration: 
@@ -10563,6 +10574,7 @@ fa:
   latvian_2bbb6aab: لتونی
   launch_external_tool_672c0409: "راه اندازی ابزار بیرونی"
   launch_registration_tool_38d4781: "راه اندازی ابزار ثبت نام"
+  launch_speedgrader_filtered_by_student_group_8bd9b5c7: "راه اندازی نمره گذاری سریع که توسط گروه دانشجویی فیلتر شده است."
   launch_url_e150bd41: "راه اندازی نشانی اینترنتی"
   layouts: 
     application: 
@@ -10813,6 +10825,7 @@ fa:
   loading_more_gradebook_history_results_810f6d2e: "در حال بارگذاری نتایج بیشتر تاریخچه دفتر نمره."
   loading_more_results_1d437202: "در حال بارگذاری نتایج بیشتر"
   loading_more_results_def6df65: "در حال بارگذاری نتایج بیشتر..."
+  loading_more_sub_accounts_d0a30903: "در حال بارگیری حساب‌های کاربری فرعی بیش‌تر..."
   loading_more_terms_4053e31f: "در حال بارگذاری ترم های بیشتر..."
   loading_options_c823e98b: "بارگذاری انتخاب ها ..."
   loading_results_769c8819: "در حال بارگذاری نتایج"
@@ -14253,6 +14266,7 @@ fa:
     invalid_group_override: "نمی توانید به یک گروه خارج از مجموعه گروه تکلیف تخصیص دهید"
     overrides: 
       everyone: همه
+  overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "تنظیمات دلخواه داشبورد پیش‌فرض‌های موجود همه‌ی کاربران را رونویسی کنید."
   own_copyright_cc59db55: "حق نشر من"
   owner_email_236d1b2: "نشانی پست الکترونیکی مالک"
   owner_email_4d02f795: "نشانی پست الکترونیکی مالک:"
@@ -15276,6 +15290,7 @@ fa:
       yo: Yo
     you_have_no_services: "هیچ سرویس ثبت نشده است، می توانید چند مورد را در صفحه *تنظیمات* بیفزایید."
   profile_6bd2baed: "رخ نما"
+  profile_photo_save_failed_too_many_times_e1ebda5: "دخیره سازی  عکس پروفایل بارها شکست خورده است. "
   profiles: 
     avatar_dialog: 
       from_gravatar: "از گرآواتار"
@@ -16787,6 +16802,9 @@ fa:
   quizzes_public: 
     alerts: 
       no_valid_combinations: "سیستم نمی تواند هیچ ترکیب معتبری برای پارامترهای داده شده ایجاد کند"
+      only_n_valid_combinations: 
+        one: "این سیستم تنها می تواند 1 ترکیب معتبر را برای پارامترهای داده شده ایجاد کند."
+        other: "این سیستم تنها می تواند %{count}  ترکیب معتبر را برای پارامترهای داده شده ایجاد کند"
     answer_comments: "نظرهای مربوط به پاسخ"
     answer_text: "متن پاسخ"
     at_the_bottom: "-- در پایین --"
@@ -17035,6 +17053,7 @@ fa:
         start_participating: "شروع به مشارکت"
       labels: 
         code: "رمز جفتی دانشجو"
+        confirm_password: "وارد کردن مجدد رمز عبور"
         email: "پست الکترونیکی شما"
         name: "نام شما"
         password: "رمز عبور"
@@ -18854,6 +18873,7 @@ fa:
   something_broke_unexpectedly_6d3720ee: "چیزی به طور غیر منتظره خراب شد. "
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "اشکالی به وجود آمده است، اما اکنون می توانم آن را برطرف کنم."
   something_went_wrong_89195131: "اشکالی رخ داده است."
+  something_went_wrong_creating_the_course_please_tr_431adff5: "در ایجاد درس اشکالی رخ داده است. لطفا دوباره تلاش کنید."
   something_went_wrong_d238c551: "مشکلی پیش آمد"
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "اشتباهی رخ داده است. لطفا صفحه را از نوسازی کنید. اگر مشکل همچنان وجود داشت ممکن است علت آن وجود تعداد بیش از حد رکورد روی %{assignmentTitle} برای بارگذاری برنامه نمره‌گذاری سریع است."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "در هنگام فعال سازی دوباره کاربر اشکالی رخ داد. لطفا بعدا دوباره سعی کنید."
@@ -18861,6 +18881,7 @@ fa:
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "هنگام تلاش برای همگام‌سازی نمره ها در سامانه اطلاعات دانشجو اشکالی رخ داد. لطفا بعدا دوباره سعی کنید."
   something_went_wrong_while_deactivating_the_user_p_8ff3e261: "در هنگام غیر فعال سازی کاربر اشکالی رخ داد. لطفا بعدا دوباره سعی کنید."
   sorry_something_broke_91c15918: "متاسفانه، چیزی خراب شد"
+  sorry_the_action_performed_on_this_recording_faile_2a1badda: "متاسفانه ، اقدام انجام شده در این ضبط انجام نشد. بعدا دوباره تلاش کنید"
   sort_40afa70: "مرتب کردن:"
   sort_by_72dbba9c: "مرتب کردن بر اساس"
   sort_courses_cf94b8d4: "مرتب کردن درس‌ها"
@@ -19813,6 +19834,7 @@ fa:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "این امر به احتمال زیاد به این دلیل اتفاق افتاده است که محتوای درس را بدون فایل های مرتبط آن وارد کرده اید."
   this_name_appears_in_sorted_lists_dccbd84b: "این نام در فهرست های مرتب سازی شده نمایش داده می شود."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "اساتید از این نام برای نمره گذاری استفاده خواهند کرد."
+  this_option_is_not_compatible_with_new_quizzes_ed489d7c: "این گزینه با آزمون جدید سازگار نیست."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "این نتیجه برای ارزیابی دانشجو استفاده شده است و دیگر نمی تواند بهنگام شود"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "این نتیجه برای ارزیابی دانشجو استفاده شده است و نمی تواند ویرایش یا حذف شود"
   this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "این نتیجه برای ارزیابی دانشجو استفاده شده است و بعضی از ویرایش‌ها بر نتایج دانش آموزان تأثیر می گذارد."
@@ -19832,6 +19854,7 @@ fa:
   this_rating_is_selected_ca68fce6: "این رتبه بندی انتخاب شده است"
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "این ضبط کننده از فلاش استفاده می کند. در نتیجه ممکن است ضبط در دستگاه محلی شما را آسان تر بیابید، و سپس از زبانه بارگذارنده رسانه برای بارگذاری آن استفاده کنید."
   this_report_displays_student_engagement_activity_c1d96b5c: "این گزارش فعالیت  دانشجو را نشان می دهد."
+  this_report_displays_teacher_engagement_activity_f_5888d45b: "این گزارش فعالیت اشتغال استاد را برای هر ثبت نام استاد نمایش می‌دهد."
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "این گزارش همه درس های یک نیمسال خاص را نشان می دهد. فایل csv حاصله برای هر درس یک ردیف خواهد داشت و شناسه درس، شناسه درس در سامانه اطلاعات دانشجو، نام کوتاه درس، نام درس، شناسه حساب، شناسه حساب در سامانه اطلاعات دانشجو، نام حساب، ذخیره استفاده بر حسب مگابایت و مجموع همه فایل ها بر حسب مگابایت را نشان خواهد داد. ذخیره استفاده شده همه فایل هایی که با سهمیه درس ها در تضاد هستند را نشان می دهد. مجموع همه فایل ها در درس به مجموع همه فایل هایی که صرفنظر از تأثیر در سهمیه درس در درس موجود هستند، گفته می شود."
   this_report_shows_grading_period_grades_and_overal_a86346a: "این گزارش نمره های دوره نمره گذاری (و نمره های کلی درس) برای هر دانشجوی ثبت نام شده در یک نیمسال خاص را نشان می دهد. فایل csv حاصله برای هر ثبت نام یک ردیف خواهد داشت."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "این صفحه نمونه شامل عناصر رایج واسط کاربر در کانواس برای کمک به شما در ساختن علامت تجاری سفارشی است. وقتی ایجاد تغییرات در مقادیر رنگ و تصاویر موجود در نوار کناری سمت چپ را شروع کنید، یک دکمه *پیش نمایش تغییرات خود* را خواهید دید. برای تجدید این صفحه، روی این دکمه کلیک کنید و ببینید تغییرات شما چطور به نظر می رسند."
@@ -20574,6 +20597,7 @@ fa:
       profile: "رخ نما"
       settings: تنظیمات
   user_profile_picture_46bffbc7: "تصویر رخ نمای کاربر"
+  user_results_updated_9ce38dce: "نتایج کاربر به روز شد."
   user_s_settings_d65644b4: "تنظیمات %{user}"
   user_search_panel_18f80511: "پنل جستجوی کاربر"
   user_search_results_3af96217: "نتایج جستجوی کاربر"
@@ -21362,6 +21386,10 @@ fa:
   your_email_address_f881e583: "نشانی پست الکترونیکی شما"
   your_email_b5364bee: "پست الکترونیکی شما"
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "فایل شما در حال بارگذاری در دفتر نمره است، و می توانید در هر زمان از این صفحه خارج شوید. اگر یک فایل CSV بزرگ دارید، بهنگام سازی تغییرات شما ممکن است چند دقیقه طول بکشد. برای جلوگیری از رونویسی هر گونه داده، لطفا قبل از ایجاد تغییرات دیگر تأیید کنید که بارگذاری انجام شده است و دفتر نمره درست می باشد."
+  your_instructor_has_released_grade_changes_and_new_218d61bb: |-
+      استاد شما تغییرات نمره و نظرات  جدبد برای %{title}، %{course} را منتشر کرد.
+      
+      اطلاعات بیش‌تر در %{url}
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       استاد شما تغییر نمره ها و نظرهای جدید برای %{title} را منتشر کرده است. این تغییرها اکنون قابل مشاهده هستند.
       
