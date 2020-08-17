@@ -45,7 +45,7 @@
   position: fixed;
   z-index: 100000;
   #{direction(left)}: 0;
-  width: 100%;
+  width: 100vw;
 }
 
 // contains copies of all static messages so that we reserve enough height in the ui
@@ -1779,6 +1779,13 @@ form.user_content_post_form {
     padding: 15px;
     opacity: 0.9;
     color: black;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .warning_message {
+      margin-#{direction(left)}: auto;
+    }
   }
 }
 

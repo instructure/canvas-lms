@@ -22,7 +22,7 @@
       <div id="element_toggler_<%= index %>" class="fixed_warning" aria-expanded="true" role="banner" aria-label="<%= t("Warning") %>">
         <i class=<%= "icon-#{warning[:icon]}" %>></i>
         <b><%= warning[:title] %></b>
-        <div style="float: <%= direction('right') %>;">
+        <div class="warning_message">
           <%= warning[:message] %>
           <button class="element_toggler Button--icon-action" aria-controls="element_toggler_<%= index %>" >
             <i class="icon-x" aria-hidden="true"></i>
