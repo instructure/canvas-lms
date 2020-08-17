@@ -6460,7 +6460,7 @@ describe Assignment do
       zip.open
     end
 
-    def generate_comments(user)
+    def generate_comments(user, attachment_id = nil)
       tempfile = zip_submissions
 
       # create an uploaded file with the zipped submissions, as would be uploaded by the user
@@ -6468,7 +6468,8 @@ describe Assignment do
 
       @assignment.generate_comments_from_files_later(
         {uploaded_data: uploaded_data},
-        user
+        user,
+        attachment_id
       )
 
       # invoke the job that was created by the previous step
@@ -6485,6 +6486,17 @@ describe Assignment do
 
       expect(results[:comments].map { |c| c[:submission][:user_id] }).to eq [s1.id]
       expect(results[:ignored_files]).to be_empty
+    end
+
+    it "accepts an optional attachment ID to fetch an existing attachment instead of generating a new one" do
+      student = @students.first
+      submit_homework(student)
+
+      uploaded_data = ActionDispatch::Http::UploadedFile.new(tempfile: zip_submissions, filename: "submissions.zip")
+      attachment = @teacher.attachments.create!(uploaded_data: uploaded_data)
+      generate_comments(@teacher, attachment.id)
+      submission = @assignment.submission_reupload_progress.results.dig(:comments, 0, :submission)
+      expect(submission[:user_id]).to eq student.id
     end
 
     it "assigns an anonymous_id for each submission" do
