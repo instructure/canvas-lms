@@ -1120,8 +1120,6 @@ describe GradeCalculator do
           end
 
           it 'unposted current assignment group points are updated' do
-            skip 'EVAL-1104 (08/13/2020)'
-
             # 99.6 + 142.7 + 95.0 + 131.4
             expect(assignment_group_scores.map(&:unposted_current_points)).to eq([242.30, 226.40])
           end
@@ -1132,8 +1130,6 @@ describe GradeCalculator do
           end
 
           it 'unposted final assignment group points are updated' do
-            skip 'EVAL-1104 (08/13/2020)'
-
             # 99.6 + 142.7 + 95.0 + 131.4
             expect(assignment_group_scores.map(&:unposted_final_points)).to eq([242.30, 226.40])
           end
@@ -1165,27 +1161,21 @@ describe GradeCalculator do
           end
 
           it 'unposted current assignment group scores are updated' do
-            skip 'EVAL-1104 (08/13/2020)'
-
             # [142.7 / 150, 131.4 / 150]
             expect(assignment_group_scores.map(&:unposted_current_score)).to eq([80.77, 75.47])
           end
 
           it 'unposted current assignment group points are updated' do
-            skip 'EVAL-1104 (08/13/2020)'
             # 99.6 + 142.7 + 95.0 + 131.4
             expect(assignment_group_scores.map(&:unposted_current_points)).to eq([242.30, 226.40])
           end
 
           it 'unposted final assignment group scores are updated' do
-            skip 'EVAL-1104 (08/13/2020)'
-
             # (99.6 + 142.7 + 95.0 + 131.4) / 600
             expect(assignment_group_scores.map(&:unposted_final_score)).to eq([80.77, 75.47])
           end
 
           it 'unposted final assignment group points are updated' do
-            skip 'EVAL-1104 (08/13/2020)'
             # 99.6 + 142.7 + 95.0 + 131.4
             expect(assignment_group_scores.map(&:unposted_final_points)).to eq([242.30, 226.40])
           end
@@ -1605,8 +1595,6 @@ describe GradeCalculator do
           end
 
           it 'unposted current assignment group points are updated' do
-            skip 'EVAL-1104 (08/13/2020)'
-
             # 99.6 + 142.7 + 95.0 + 131.4
             expect(assignment_group_scores.map(&:unposted_current_points)).to eq([242.30, 226.40])
           end
@@ -1617,8 +1605,6 @@ describe GradeCalculator do
           end
 
           it 'unposted final assignment group points are updated' do
-            skip 'EVAL-1104 (08/13/2020)'
-
             # 99.6 + 142.7 + 95.0 + 131.4
             expect(assignment_group_scores.map(&:unposted_final_points)).to eq([242.30, 226.40])
           end
@@ -1655,8 +1641,6 @@ describe GradeCalculator do
           end
 
           it 'unposted current assignment group points are updated' do
-            skip 'EVAL-1104 (08/13/2020)'
-
             # 99.6 + 142.7 + 95.0 + 131.4
             expect(assignment_group_scores.map(&:unposted_current_points)).to eq([242.30, 226.40])
           end
@@ -1667,8 +1651,6 @@ describe GradeCalculator do
           end
 
           it 'unposted final assignment group points are updated' do
-            skip 'EVAL-1104 (08/13/2020)'
-
             # 99.6 + 142.7 + 95.0 + 131.4
             expect(assignment_group_scores.map(&:unposted_final_points)).to eq([242.30, 226.40])
           end
