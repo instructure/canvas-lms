@@ -170,18 +170,16 @@ module AuthenticationMethods
         return redirect_to(login_url(:needs_cookies => '1'))
       end
       @current_user = @current_pseudonym && @current_pseudonym.user
+      current_integration_id = @current_pseudonym.try(:integration_id)
 
-      sis_id = @current_user && @current_user.pseudonym && @current_user.pseudonym.sis_user_id
-      if sis_id
-        unless Rails.cache.read("unlocked_#{sis_id}")
-          begin
-            if call_to_strongmind_psp(sis_id)
-              redirect_to('https://flms.flipswitch.com')
-            else
-              Rails.cache.write("unlocked_#{sis_id}", true, :expires_in => 5.minutes)
-            end
-          rescue
+      if current_integration_id && !Rails.cache.read("unlocked_#{current_integration_id}")
+        begin
+          if AttendanceService.check_lockout(pseudonym: @current_pseudonym)
+            redirect_to(ENV["ATTENDANCE_V2_REDIRECT_URL"])
+          else
+            Rails.cache.write("unlocked_#{current_integration_id}", true, :expires_in => 5.minutes)
           end
+        rescue
         end
       end
 
@@ -346,21 +344,5 @@ module AuthenticationMethods
   # have always overridden it here
   def delegated_auth_redirect_uri(uri)
     uri
-  end
-
-  private
-
-  def attendance_lockout_request(school_id, sis_id)
-    HTTParty.get(
-      "https://flms.flipswitch.com/AttendanceTwo/IsLockedOut?schoolId=#{school_id}&studentId=#{sis_id}",
-      headers: {"CanvasAuth" => ENV['ATTENDANCE_API_KEY']}
-    ).body == 'true'
-  end
-
-  def call_to_strongmind_psp(sis_id)
-    school_psp_ids = ENV["PSP_IDS"]
-    if school_psp_ids
-      school_psp_ids.split(",").any? { |school_id| attendance_lockout_request(school_id, sis_id) }
-    end
   end
 end
