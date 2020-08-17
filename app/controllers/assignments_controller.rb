@@ -264,6 +264,7 @@ class AssignmentsController < ApplicationController
           ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
           SIMILARITY_PLEDGE: @similarity_pledge,
           CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
+          USER_ASSET_STRING: @current_user&.asset_string,
         })
 
         set_master_course_js_env_data(@assignment, @context)
