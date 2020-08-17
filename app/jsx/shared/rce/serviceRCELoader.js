@@ -204,7 +204,7 @@ const RCELoader = {
    */
   createRCEProps(textarea, tinyMCEInitOptions) {
     const width = textarea.offsetWidth
-    const height = textarea.offsetHeight
+    const height = textarea.offsetHeight || 400
 
     if (height) {
       tinyMCEInitOptions.tinyOptions = {
