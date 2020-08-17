@@ -817,8 +817,8 @@ class GradeCalculator
       kept = drop_assignments(group_submissions, group.rules_hash)
       dropped_submissions = (group_submissions - kept).map { |s| s[:submission]&.id }.compact
 
-      score, possible = kept.reduce([0, 0]) { |(s_sum,p_sum),s|
-        [s_sum + s[:score], p_sum + s[:total]]
+      score, possible = kept.reduce([0.0, 0.0]) { |(s_sum,p_sum),s|
+        [s_sum.to_d + s[:score].to_d, p_sum.to_d + s[:total].to_d]
       }
 
       {
