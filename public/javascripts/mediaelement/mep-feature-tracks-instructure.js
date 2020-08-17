@@ -612,6 +612,7 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
 
       // Loop the elements and remove anything that contains value="javascript:" or an `on*` attribute
       // (`onerror`, `onclick`, etc.)
+      // also remove any style or data-* attributes
       const allElements = doc.body.getElementsByTagName('*')
       for (let i = 0, n = allElements.length; i < n; i++) {
         const attributesObj = allElements[i].attributes,
@@ -619,7 +620,7 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
         for (let j = 0, total = attributes.length; j < total; j++) {
           if (attributes[j].name.startsWith('on') || attributes[j].value.startsWith('javascript')) {
             allElements[i].parentNode.removeChild(allElements[i])
-          } else if (attributes[j].name === 'style') {
+          } else if (attributes[j].name === 'style' || attributes[j].name.startsWith('data-')) {
             allElements[i].removeAttribute(attributes[j].name)
           }
         }
