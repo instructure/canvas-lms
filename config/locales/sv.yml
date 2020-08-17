@@ -405,6 +405,7 @@ sv:
   account_level_mastery_scales_a5bdff29: "Skalor för måluppfyllelse på kontonivå"
   account_level_notification_preferences_require_an__66467cd7: "För uppdatering krävs ett account_id för aviseringsinställningar på kontonivå"
   account_level_notification_preferences_ui_update_f5e189a4: "Uppdatering av meddelandepreferenser för kontonivå"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Aviseringar på kontonivå gäller för alla kurser. Aviseringar för individuella kurser kan ändras inom varje kurs och kommer då att åsidosätta dessa aviseringar."
   account_level_settings_manage_4fca6f8e: "Inställningar på kontonivå – hantera"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonamn
@@ -415,6 +416,7 @@ sv:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Sluttiden för kontoavisering är före starttiden"
+  account_notification_settings_e96de9b6: "Inställningar för kontoaviseringar"
   account_notification_settings_error_page_66c0bc61: "Fel sida för inställningar kontoavisering"
   account_notification_settings_initial_query_error_f55e1cbf: "Initialt frågefel inställningar kontoavisering"
   account_notification_settings_updated_dbabec35: "Inställningar för kontoaviseringar uppdaterade"
@@ -1394,6 +1396,7 @@ sv:
         manual_quotas_title: "Manuellt inställningsbara kvoter"
         megabytes: megabytes
         megabytes_tooltip: megabytes
+        placeholder_course_or_group_id: "Ange ID..."
         select_type_courses: Kurs-ID
         select_type_groups: Grupp-ID
         select_type_label: "Sök kurs eller grupp"
@@ -3939,6 +3942,7 @@ sv:
   available_from_f84e4611: "Tillgänglig från"
   available_from_field_for_styleguide_7ced3861: "Tillgänglig från fält för stilguide"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Tillgänglig från - format som ÅÅÅÅ-MM-DD hh:mm"
+  available_pronouns_b45330b1: "Tillgängliga pronomen"
   available_to_b7350e02: "Tillgänglig för"
   available_until_3278ebe9: "Tillgänglig till"
   available_until_date_2c0ccec3: "Tillgänglig tills datum:"
@@ -5214,6 +5218,7 @@ sv:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Samarbeten är webbaserade verktyg för att samarbeta om uppgifter som att göra anteckningar eller gruppuppsatser. Tala med din lärare för att komma igång."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samarbeten är webbaserade verktyg för att samarbeta om uppgifter som att göra anteckningar eller gruppuppsatser. Kom igång genom att lägga till en samarbetsapp."
   collaborations_tutorial_tray_9219d9d: "Självstudiefack för samarbeten"
+  collapse_all_50275533: "Dölj alla"
   collapse_group_c2af7cad: "Komprimera grupp"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Stäng listan av gruppmedlemmar för %{groupName}"
   collapse_subdiscussion_89af1f5c: "Stäng underdiskussion"
@@ -6492,6 +6497,10 @@ sv:
   count_students_30e46120: 
     one: "1 student"
     other: "%{count} studenter"
+  count_students_c9920376: 
+    one: "1 student"
+    other: "%{count} studenter"
+    zero: "0 studenter"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 student i percentil %{percentile}. "
     other: "%{count} studenter i percentil %{percentile}. "
@@ -6691,6 +6700,7 @@ sv:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Kursen är redan associerad med en plan"
   course_landing_page_49a53ade: "Kursens landningssida"
   course_level_notification_preferences_require_a_co_2f0a618: "För uppdatering krävs ett course_id för aviseringsinställningar på kursnivå"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Aviseringar på kursnivå ärvs från dina aviseringsinställningar på kontonivån. Om du ändrar aviseringar för den här kursen åsidosätts aviseringar på kontonivån."
   course_level_overrides_for_notification_preference_e86d1725: "Åsidosättningar på kursnivå för aviseringsinställningar"
   course_list: 
     favorited_tooltip: "Klicka för att ta bort från kursmenyn."
@@ -8141,6 +8151,9 @@ sv:
   disableWhileLoading: 
     loading: "Laddar ..."
   disable_a5c05db3: Inaktivera
+  disable_alert_timeouts_description: |-
+      När du inaktiverar den här funktionen tar du bort timeoutinställningen för notisaviseringar som visas och ger
+      användarna den tid som behövs för att läsa aviseringen och stänga den när den är läst.
   disable_all_read_only_scopes_f9ffdd28: "Inaktivera alla skrivskyddade omfattningar"
   disable_and_lock_7d0ef0e8: "Inaktivera och lås"
   disable_automatic_submission_8e1d8676: "Inaktivera automatisk inlämning"
@@ -8152,6 +8165,7 @@ sv:
   disable_scope_6ba4e4d4: "Inaktivera omfattning"
   disable_sync_to_name_10c371dc: "Inaktivera synkronisering med %{name}"
   disable_toolname_44d6397c: "Avaktivera %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Inaktivera uppladdningar till Canvas Media från den förbättrade innehållsredigeraren"
   disabled_18c33a73: (inaktiverad)
   disabled_3b1b332a: Inaktiverad
   disabled_and_locked_d14dc6c2: "Inaktiverad och låst"
@@ -9470,6 +9484,7 @@ sv:
   exit_d0c7b013: Avsluta
   exit_theme_editor_9ddd41bb: "Avsluta temaredigeraren"
   expand_2f2fadbd: Expandera
+  expand_all_bb64d2ea: "Förstora alla"
   expand_collapse_title_outcome_group_239f0a9d: "förstora/minska %{title} bedömningsgrupp"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Ta fram/dölj %{title} lärandemålgrupp, studenten uppfyller målen på  %{mastery_count} av %{count} lärandemål"
   expand_global_navigation_2c28d5d4: "Ta fram global navigering"
@@ -9674,6 +9689,7 @@ sv:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Misslyckades med att ladda ej synkroniserade ändringar (Unsynced Changes) komponenten. Är din nätverksanslutning OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Det gick inte, rapportera följande felkod till din systemadministratör: Felrapport:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Det gick inte att hämta mediekällan"
+  failed_retrieving_media_sources_32aed288: "Det gick inte att hämta mediekällor."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Det gick inte, rapporten genererade ingen fil. Försök igen."
   failed_to_add_new_feed_ee1c5ea: "Det gick inte att lägga till nytt flöde"
   failed_to_change_last_attended_date_1e340ba6: "Det gick inte att ändra senaste närvarodatum"
@@ -9761,6 +9777,7 @@ sv:
         Differentierade uppgifter är en funktion som låter en välja vilken sektion(er) eller enskilda elev(er) en uppgft avser.
         Sektioner som inte har tilldelats en uppgift kommer inte synas i kursinnehåll och deras slutbetyg kommer
         räknas fram utan dessa poängen.
+    disable_alert_timeouts: "Inaktivera timeout för notisaviseringar"
     ember_modules: "Ember moduler"
     google_docs_domain_restriction: "Domänbegränsningar för Google dokument"
     gradebook_list_students_by_sortable_name: "Bedömningsöversikt – Räkna upp studenter enligt sorterbara namn"
@@ -9951,6 +9968,7 @@ sv:
   final_grade_finalgrade_408580bb: "Slutbetyg: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Information om slutbedömning"
   final_grade_override_be8a21cd: "Åsidosättning av slutbedömning"
+  final_grade_override_in_gradebook_history_767147c: "Åsidosättning av slutlig bedömning i bedömningsöversiktens historik"
   final_grade_score_fe69a301: "Slutbetyg: %{score}"
   final_grader_1693103c: "Slutlig bedömare"
   final_grader_can_view_other_grader_names_67736530: "Slutliga bedömare kan visa namn på övriga bedömare"
@@ -10106,6 +10124,7 @@ sv:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Ge alla studenter samma omdöme för *%{assignment.name}* genom att ange och skicka ett bedömningsvärde nedan:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Ge alla studenter samma *procentuella* omdömen för **%{assignment.name}** genom att ange och skicka ett bedömningsvärde nedan:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Ger upp hämtning av mediekällor. Problemet kommer troligtvis att lösa sig själv med tiden."
   global_announcements_a78912c8: "Globala anslag"
   global_announcements_add_edit_delete_843ca4d2: "Globala anslag – lägg till/redigera/ta bort"
   global_branding_df1cae12: "Globalt varumärke"
@@ -12099,6 +12118,7 @@ sv:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inkluderar en länk till SpeedGrader i rubrikmenyn för uppgiften i bedömningsöversikten."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Innehåller bedömningsvärden i administratörsomdömesrapporterna."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Innehåller tjänstjusteringar för lärandemål vid export och import av kursinnehåll"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Inkluderar åsidosatta kursbedömningar i bedömningsöversiktens historik."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Innehåller matriser i kursens sidofältsnavigering"
   incomplete_95612d72: "ej fullständig"
   incomplete_da3c2ea2: Ofullständig
@@ -16081,6 +16101,7 @@ sv:
     submission_comment_description: "Kommentar på uppgiftsinlämning"
     submission_comment_display: Inlämningskommentar
     web_conference_recording_ready: "En konferensinspelning är redo"
+  notification_policies_requires_the_communication_c_2e7ded08: "Aviseringspolicyer behöver kommunikationskanalens ID, aviseringskategori och frekvens för att uppdatera."
   notification_preferences: 
     communication: 
       email: 
@@ -16347,6 +16368,7 @@ sv:
   open_title_in_a_new_window_b29fed77: "Öppna %{title} i ett nytt fönster"
   open_to_comments_23d5585e: "Öppna för kommentarer"
   openid_connect_initiation_url_d9037d30: "* Initierings-URL för OpenID Connect"
+  opens_in_new_window_b4b99243: "öppnas i nytt fönster"
   option_1_dea39f90: "Alternativ 1"
   option_2_47aace2a: "Alternativ 2"
   option_3_30adfebc: "Alternativ 3"
@@ -16416,6 +16438,7 @@ sv:
   out_of_pointspossible_c163105a: "av %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Justering av lärandemål för innehåll som inte ges poäng"
   outcome_da397d20: Lärandemål
+  outcome_details_ce254e89: "Information om lärandemål"
   outcome_export_89229eb4: "Export av lärandemål"
   outcome_group_39fae76f: Lärandemålsgrupp
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Resultatgrupp med Canvas-id %{id} hittades inte"
@@ -19778,6 +19801,8 @@ sv:
   restore_courses_182e162e: "Återställ kurser"
   restored_course_association_course_c9e16045: "Kursassociation har återställts %{course}"
   restrict_access_84ba6bb8: "Begränsa tillgång"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Begränsa instruktörer från att ändra skalan för måluppfyllelse"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Begränsa instruktörer från att ändra beräkningsmetoden för kompetens"
   restrict_sms_to_select_types_9dd6399c: "Begränsa SMS till utvalda typer"
   restrict_student_access: 
     button_text: 
@@ -23671,6 +23696,8 @@ sv:
   ukrainian_945b00b7: Ukrainska
   unable_to_accept_update_fd53a7e2: "Kunde inte acceptera uppdateringen"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Det går inte att få tillgång till en viss student. Gå till uppgiften i SpeedGrader?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Det gick inte att justera vissa lärandemål till en sida"
+  unable_to_align_some_outcomes_to_title_53467231: "Det gick inte att justera vissa lärandemål till \"%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Det går inte att justera (curve) bedömningar eftersom denna uppgifts inlämningsdatum infaller i en stängd bedömningsperiod för minst en student"
   unable_to_delete_assignment_abcf8d62: "Det gick inte att ta bort uppgiften"
   unable_to_dismiss_update_df1e32eb: "Kunde inte avvisa uppdateringen"
@@ -24138,6 +24165,8 @@ sv:
   user_observers_454d4303: Användarobservatörer
   user_option_links_66090987: "Länkar för användaralternativ"
   user_profile: 
+    invalid_url: "Ogiltig URL"
+    profile_bio_too_long: "Biografin är för lång"
     profile_title_too_long: "Titeln är för lång"
     tabs: 
       notifications: Aviseringar
@@ -25127,6 +25156,7 @@ sv:
       
       Du kan se det här: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Dina mediefiler har laddats upp och visas här efter bearbetning."
   your_message_has_been_sent_thank_you_e0284316: "Ditt meddelande har skickats. Tack!"
   your_message_was_sent_977f6583: "Ditt meddelande har skickats!"
   your_name_7665e1d8: "Ditt namn"

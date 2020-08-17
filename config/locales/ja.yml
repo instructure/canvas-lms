@@ -408,6 +408,7 @@ ja:
   account_level_mastery_scales_a5bdff29: アカウントレベルの習熟度スケール
   account_level_notification_preferences_require_an__66467cd7: "アカウントレベルの通知設定を更新するには course_id が必要です。"
   account_level_notification_preferences_ui_update_f5e189a4: アカウントレベルの通知設定UIの更新
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: アカウントレベルの通知はすべてのコースに適用されます。個々のコースの通知は各コース内で変更でき、これらの通知を上書きします。
   account_level_settings_manage_4fca6f8e: "アカウントレベルの設定 - 管理"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: アカウント名
@@ -418,6 +419,7 @@ ja:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: アカウントのお知らせの終了時刻が開始時刻よりも前になっています
+  account_notification_settings_e96de9b6: アカウント通知設定
   account_notification_settings_error_page_66c0bc61: アカウント通知設定エラーページ
   account_notification_settings_initial_query_error_f55e1cbf: アカウント通知設定の初期クエリエラー
   account_notification_settings_updated_dbabec35: アカウント通知設定を更新しました
@@ -1393,6 +1395,7 @@ ja:
         manual_quotas_title: 手動で設定可能なクォータ
         megabytes: メガバイト
         megabytes_tooltip: メガバイト
+        placeholder_course_or_group_id: "ID の入力..."
         select_type_courses: "コース ID"
         select_type_groups: "グループ ID"
         select_type_label: コースまたはグループを検索
@@ -3933,6 +3936,7 @@ ja:
   available_from_f84e4611: 次から使用可能
   available_from_field_for_styleguide_7ced3861: スタイルガイドの欄から使用できます
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "次の日付けから- このような形式で YYYY-MM-DD hh:mm"
+  available_pronouns_b45330b1: 利用できる代名詞
   available_to_b7350e02: 使用可能
   available_until_3278ebe9: 次の日付まで利用可能
   available_until_date_2c0ccec3: "日付まで利用可能:"
@@ -5206,6 +5210,7 @@ ja:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: コラボレーションは、メモやグループ化された論文の作成などの作業を共同で行うためのWebベースのツールです。開始するには、講師に相談してください。
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: コラボレーションは、ノートを取ったりグループ化された論文を書くといったタスクで共同作業するためのWebベースのツールです。コラボレーションアプリを追加して始めてください。
   collaborations_tutorial_tray_9219d9d: コラボレーションのチュートリアルトレイ
+  collapse_all_50275533: すべて折りたたみ
   collapse_group_c2af7cad: グループの折りたたみ
   collapse_list_of_group_members_for_groupname_d6c66fa0: "%{groupName} のグループ メンバーのリストを折りたたむ"
   collapse_subdiscussion_89af1f5c: サブディスカッションを折りたたむ
@@ -6476,6 +6481,10 @@ ja:
   count_students_30e46120: 
     one: "%{count} 人の受講生"
     other: "%{count} 人の受講生"
+  count_students_c9920376: 
+    one: 1名の受講生
+    other: "%{count}受講生"
+    zero: 0名の受講生
   count_students_in_percentile_percentile_d0adecfe: 
     one: "%{count} %{percentile} 内に受講生。"
     other: "%{count} %{percentile} 内に受講生。"
@@ -6675,6 +6684,7 @@ ja:
   course_is_already_associated_with_a_blueprint_4d9407cb: コースはすでに青写真に関連付けられています
   course_landing_page_49a53ade: コースのランディングページ
   course_level_notification_preferences_require_a_co_2f0a618: "コースレベルの通知設定を更新するには course_id が必要です。"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: コースレベルの通知は、アカウントレベルの通知設定から引き継がれます。このコースの通知を調整すると、アカウントレベルの通知が上書きされます。
   course_level_overrides_for_notification_preference_e86d1725: 通知設定のコースレベル上書き
   course_list: 
     favorited_tooltip: "クリックしてコース メニューから削除します。"
@@ -8122,6 +8132,9 @@ ja:
   disableWhileLoading: 
     loading: 読み込み中・・・
   disable_a5c05db3: 無効
+  disable_alert_timeouts_description: |-
+      この機能を有効にすると、ポップアップするアラート通知のタイムアウトが除去され、
+      ユーザーが通知をよく読み、終了時に通知を消すのに必要なだけの時間をユーザーに与えます。
   disable_all_read_only_scopes_f9ffdd28: 読み取り専用スコープをすべて無効にする。
   disable_and_lock_7d0ef0e8: 無効にしてロック
   disable_automatic_submission_8e1d8676: 自動提出を無効にする
@@ -8133,6 +8146,7 @@ ja:
   disable_scope_6ba4e4d4: スコープを無効にする
   disable_sync_to_name_10c371dc: "～への同期を無効にする%{name}"
   disable_toolname_44d6397c: "無効%{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "拡張リッチコンテンツエディタからのCanvas Mediaへのアップロードを無効にする"
   disabled_18c33a73: (無効)
   disabled_3b1b332a: 無効
   disabled_and_locked_d14dc6c2: 無効にしてロックしました
@@ -9453,6 +9467,7 @@ ja:
   exit_d0c7b013: 終了する
   exit_theme_editor_9ddd41bb: テーマエディターを終了する
   expand_2f2fadbd: 展開
+  expand_all_bb64d2ea: すべて展開
   expand_collapse_title_outcome_group_239f0a9d: "%{title} 成果グループを展開/折りたたみ"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "%{title} 結果グループを展開/折りたたみする、受講生は%{count} 結果の%{mastery_count} の達成を満たす"
   expand_global_navigation_2c28d5d4: グローバルナビゲーションを拡大する
@@ -9657,6 +9672,7 @@ ja:
   failed_loading_unsynced_changes_component_is_your__89f863d6: 非同期変更コンポーネントの読み込みに失敗しました。ネットワーク接続は正常ですか？
   failed_please_report_the_following_error_code_to_y_42248d60: "失敗しました。システム管理者に以下のエラーコードを報告してください。ErrorReport:%{error};"
   failed_retrieving_media_source_3f0cfd49: メディアソースの取得に失敗しました
+  failed_retrieving_media_sources_32aed288: メディアソースの取得に失敗しました。
   failed_the_report_failed_to_generate_a_file_please_60a6582d: 失敗しました。レポートがファイル生成に失敗しました。再度試してください。
   failed_to_add_new_feed_ee1c5ea: 新しいフィードの追加に失敗しました
   failed_to_change_last_attended_date_1e340ba6: 最後に出席した日付の変更に失敗しました
@@ -9743,6 +9759,7 @@ ja:
         分化された課題は、セクション、または個々の学生のどちらに課題が適用されるか選択することのできる機能です。
         課題が与えられなかったセクションは、コース内容にそれを見る事ができず、最終評価は
         それらの得点以外が計算されます。
+    disable_alert_timeouts: アラート通知タイムアウトを無効にする
     ember_modules: "Ember モジュール"
     google_docs_domain_restriction: "Google ドキュメントのドメイン制限"
     gradebook_list_students_by_sortable_name: "成績表 - 受講生を並べ替え可能な名前順に表示"
@@ -9933,6 +9950,7 @@ ja:
   final_grade_finalgrade_408580bb: "最終的な成績：*%{finalGrade}*"
   final_grade_info_2aa35d25: 最終成績についての情報
   final_grade_override_be8a21cd: 最終的な成績オーバーライド
+  final_grade_override_in_gradebook_history_767147c: 成績表の履歴での最終成績の上書き
   final_grade_score_fe69a301: "最終的な成績: %{score}"
   final_grader_1693103c: 最終採点者　
   final_grader_can_view_other_grader_names_67736530: 最終評価者は他の評価者の名前を見ることができます
@@ -10088,6 +10106,7 @@ ja:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "以下のグレードの値を入力して提出することによって、すべての生徒に*%{assignment.name}*への同じグレードを与えます："
   give_all_students_the_same_percent_grade_for_assig_6a008004: "以下のグレードの値を入力して提出することによって、すべての生徒に同じ*パーセント*のグレードを**%{assignment.name}**に対して与えます："
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: メディアソースの取得をあきらめる。この問題はおそらく、最終的には解決します。
   global_announcements_a78912c8: "グローバル アナウンス"
   global_announcements_add_edit_delete_843ca4d2: "グローバルアナウンス - 追加/編集/削除"
   global_branding_df1cae12: グローバルブランディング
@@ -12076,6 +12095,7 @@ ja:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: グレードブックの課題ヘッダメニューにSpeedGraderへのリンクを含めます。
   includes_grade_values_in_the_admin_grade_reports_a28200da: 管理者の成績レポートに成績値を含めます。
   includes_outcomes_service_alignments_when_exportin_6c578a35: コースコンテンツのエクスポートおよびインポート時には、結果サービスの調整を含みます
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: 成績表の履歴に上書きされたコースグレードが含まれます。
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: コースサイドバーナビゲーションに規定を含める
   incomplete_95612d72: 未完了
   incomplete_da3c2ea2: 不完全
@@ -16054,6 +16074,7 @@ ja:
     submission_comment_description: 課題提出物のコメント
     submission_comment_display: 提出コメント
     web_conference_recording_ready: 会議の録音準備ができました
+  notification_policies_requires_the_communication_c_2e7ded08: 通知ポリシーには、通信チャネルID、通知カテゴリー、および更新頻度が必須です
   notification_preferences: 
     communication: 
       email: 
@@ -16320,6 +16341,7 @@ ja:
   open_title_in_a_new_window_b29fed77: "%{title} を新しいウィンドウで表示"
   open_to_comments_23d5585e: コメントを受け付ける
   openid_connect_initiation_url_d9037d30: "* OpenID 接続開始 Url"
+  opens_in_new_window_b4b99243: 新しいウィンドウで開きます
   option_1_dea39f90: オプション1
   option_2_47aace2a: オプション2
   option_3_30adfebc: オプション3
@@ -16388,6 +16410,7 @@ ja:
   out_of_pointspossible_c163105a: "中%{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: 結果のスコアのないコンテンツへの整合
   outcome_da397d20: 結果
+  outcome_details_ce254e89: 結果の詳細
   outcome_export_89229eb4: 結果エクスポート
   outcome_group_39fae76f: 結果グループ
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Canvas ID %{id} を持つ成果グループが見つかりません"
@@ -19747,6 +19770,8 @@ ja:
   restore_courses_182e162e: コースを復元
   restored_course_association_course_c9e16045: "復元されたコース関連付け%{course}"
   restrict_access_84ba6bb8: アクセスを制限
+  restrict_instructors_from_changing_mastery_scales_5af13053: 講師が習熟スケールを変更できないようにする
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: 講師による習熟度計算方法の変更を制限する
   restrict_sms_to_select_types_9dd6399c: "SMS を一部のタイプに制限する"
   restrict_student_access: 
     button_text: 
@@ -20093,7 +20118,7 @@ ja:
   score_of_score_view_in_speedgrader_a7c1c954: "%{score}のスコア。SpeedGrader で表示"
   score_out_of_points_84f44331: "(%{score} / %{points})"
   score_out_of_points_possible_88f370fd: "%{score} (配点 %{points_possible})"
-  score_out_of_points_possible_points_bbaea991: "%{score} 点/ %{points_possible} 点"
+  score_out_of_points_possible_points_bbaea991: "%{points_possible} 点中 %{score} 点"
   score_percent_11941c81: "%{score} パーセント"
   score_points_3c48e2a8: "%{score} 点"
   score_pointspossible_bd57ea9e: "%{score}/%{pointsPossible}"
@@ -23642,6 +23667,8 @@ ja:
   ukrainian_945b00b7: ウクライナ語
   unable_to_accept_update_fd53a7e2: 更新を受け入れることができません
   unable_to_access_specific_student_go_to_assignment_585e05e9: 特定の受講生にアクセスできません。SpeedGraderの課題に進みますか？
+  unable_to_align_some_outcomes_to_a_page_65f7d412: 一部の結果をページに合わせることができません
+  unable_to_align_some_outcomes_to_title_53467231: "一部の結果を\"%{title}\"に合わせることができません"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: この課題は、少なくとも1人の受講生の終了後の採点期間に終了する予定であるため、成績をカーブすることができません
   unable_to_delete_assignment_abcf8d62: 課題を削除できません
   unable_to_dismiss_update_df1e32eb: 解散の更新ができません
@@ -24109,6 +24136,8 @@ ja:
   user_observers_454d4303: ユーザーオブザーバー
   user_option_links_66090987: ユーザーオプションリンク
   user_profile: 
+    invalid_url: "無効な URL"
+    profile_bio_too_long: 履歴が長すぎます
     profile_title_too_long: タイトルが長すぎます
     tabs: 
       notifications: お知らせ
@@ -25095,6 +25124,7 @@ ja:
       
       ここで表示できます：
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: メディアがアップロードされ、処理後にここに表示されます。
   your_message_has_been_sent_thank_you_e0284316: メッセージが送信されました。ありがとうございます!
   your_message_was_sent_977f6583: メッセージが送信されました！
   your_name_7665e1d8: お名前

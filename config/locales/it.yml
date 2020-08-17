@@ -393,6 +393,7 @@ it:
   account_level_mastery_scales_a5bdff29: "Scale di padronanza livello di account"
   account_level_notification_preferences_require_an__66467cd7: "Le preferenze di notifica del livello di account richiedono l’aggiornamento di un account_id"
   account_level_notification_preferences_ui_update_f5e189a4: "Aggiornamento interfaccia utente preferenze di notifica a livello di account"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Le notifiche del livello di account si applicano a tutti i corsi. Le notifiche per i singoli corsi possono essere cambiate all’interno di ciascun corso e sostituiranno queste notifiche."
   account_level_settings_manage_4fca6f8e: "Impostazioni a livello di account - gestisci"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nome account"
@@ -403,6 +404,7 @@ it:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "L'ora di fine della notifica dell'account precede l'ora di inizio"
+  account_notification_settings_e96de9b6: "Impostazioni di notifica account"
   account_notification_settings_error_page_66c0bc61: "Pagina di errore impostazioni di notifica account"
   account_notification_settings_initial_query_error_f55e1cbf: "Errore di query iniziale delle impostazioni di notifica account"
   account_notification_settings_updated_dbabec35: "Impostazioni di notifica account aggiornate"
@@ -1269,6 +1271,7 @@ it:
         manual_quotas_title: "Quote impostabili manualmente"
         megabytes: megabyte
         megabytes_tooltip: megabyte
+        placeholder_course_or_group_id: "Inserisci ID..."
         select_type_courses: "ID corso"
         select_type_groups: "ID gruppo"
         select_type_label: "Trova corso o gruppo"
@@ -3615,6 +3618,7 @@ it:
   available_from_date_must_precede_available_until_c9f9e533: "La data \"Disponibile da\" deve essere precedente alla data \"Disponibile fino a\""
   available_from_f84e4611: "Disponibile da"
   available_from_field_for_styleguide_7ced3861: "Campo Disponibile da per la guida di stile"
+  available_pronouns_b45330b1: "Pronomi disponibili"
   available_to_b7350e02: "Disponibile per"
   available_until_3278ebe9: "Disponibile fino a"
   available_until_date_cd125c62: "Data Disponibile fino a"
@@ -4788,6 +4792,7 @@ it:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Le collaborazioni sono strumenti basati sul Web per lavorare in modo collaborativo su attività come elaborati di gruppo o creazione di note. Parla con il tuo insegnante per cominciare."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Le collaborazioni sono strumenti basati sul Web per lavorare in modo collaborativo su attività come elaborati di gruppo o creazione di note. Inizia aggiungendo un'app di collaborazione."
   collaborations_tutorial_tray_9219d9d: "Riquadro tutorial collaborazioni"
+  collapse_all_50275533: "Comprimi tutto"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Comprimi elenco dei membri del gruppo per %{groupName}"
   collapse_subdiscussion_89af1f5c: "Comprimi discussione secondaria"
   collapse_tutorial_tray_66ee7dc1: "Comprimi riquadro tutorial"
@@ -5945,6 +5950,10 @@ it:
   count_students_30e46120: 
     one: "1 studente"
     other: "%{count} studenti"
+  count_students_c9920376: 
+    one: "1 studente"
+    other: "%{count} Studenti"
+    zero: "0 studenti"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 studente in percentile %{percentile}. "
     other: "%{count} studenti in percentile %{percentile}. "
@@ -6106,6 +6115,7 @@ it:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Il corso è già associato con un modello di base"
   course_landing_page_49a53ade: "Pagina di destinazione corso"
   course_level_notification_preferences_require_a_co_2f0a618: "Le preferenze di notifica del livello di corso richiedono l’aggiornamento di un course_id"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Le notifiche di livello corso vengono ereditate dalle impostazioni di notifica livello di account. La regolazione delle notifiche per questo corso sostituirà la notifiche nel livello di account."
   course_level_overrides_for_notification_preference_e86d1725: "Il livello di corso sostituisce le preferenze di notifica"
   course_list: 
     favorited_tooltip: "Fai clic per rimuovere dal menu dei corsi."
@@ -7366,6 +7376,9 @@ it:
   disableWhileLoading: 
     loading: "Caricamento in corso..."
   disable_a5c05db3: Disabilita
+  disable_alert_timeouts_description: |-
+      Abilitando questa funzione, si elimina il timeout per le notifiche di avviso che compaiono, dando all’utente
+      tutto il tempo che gli serve per leggere la notifica e rimuoverla quando ha finito.
   disable_all_read_only_scopes_f9ffdd28: "Disabilita tutti gli ambiti di sola lettura."
   disable_and_lock_7d0ef0e8: "Disabilita e blocca"
   disable_automatic_submission_8e1d8676: "Disattiva consegna automatica"
@@ -7377,6 +7390,7 @@ it:
   disable_scope_6ba4e4d4: "Disabilita ambito"
   disable_sync_to_name_10c371dc: "Disattiva sincronizzazione con %{name}"
   disable_toolname_44d6397c: "Disabilita %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Disabilita i caricamenti in Canvas Media dall’editor di contenuti avanzati migliorato"
   disabled_18c33a73: (disabilitato)
   disabled_3b1b332a: Disabilitato
   disabled_and_locked_d14dc6c2: "Disabilitato e bloccato"
@@ -8579,6 +8593,7 @@ it:
   excused_cf8792eb: Giustificato
   exit_d0c7b013: Esci
   expand_2f2fadbd: Espandi
+  expand_all_bb64d2ea: "Espandi tutto"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Espandi/comprimi gruppo di esiti %{title}. Lo studente soddisfa la padronanza di %{mastery_count} di %{count} esiti"
   expand_global_navigation_2c28d5d4: "Espandi navigazione globale"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Espandi elenco dei membri del gruppo per %{groupName}"
@@ -8696,6 +8711,7 @@ it:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Impossibile caricare il componente Modifiche non sincronizzate. La tua connessione di rete è OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Errore. Segnala il seguente codice di errore al tuo amministratore di sistema: Report errore:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Impossibile recuperare sorgente dei file multimediali"
+  failed_retrieving_media_sources_32aed288: "Impossibile recuperare le sorgenti multimediali."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Errore, il report non è riuscito a generare un file. Riprova."
   failed_to_add_new_feed_ee1c5ea: "Impossibile aggiungere il nuovo feed"
   failed_to_change_last_attended_date_1e340ba6: "Impossibile modificare la data dell'ultima partecipazione"
@@ -8769,6 +8785,7 @@ it:
   features: 
     allow_opt_out_of_inbox: "Consenti agli utenti di disattivare la Posta in arrivo"
     canvas_parent_display_name: "Canvas Parent"
+    disable_alert_timeouts: "Disabilita timeout notifiche di avviso"
     google_docs_domain_restriction: "Restrizione dominio Documenti Google"
     gradebook_list_students_by_sortable_name: "Registro dei voti - Elenco studenti per nome ordinabile"
     hide_celebrations: "Disabilita animazioni celebrazione"
@@ -8907,6 +8924,7 @@ it:
   final_grade_a22c596: "voto finale"
   final_grade_info_2aa35d25: "Informazioni voto finale"
   final_grade_override_be8a21cd: "Sostituzione valutazione finale"
+  final_grade_override_in_gradebook_history_767147c: "Sostituzione valutazione finale nella Cronologia registro dei voti"
   final_grader_1693103c: "Esaminatore finale"
   final_grader_can_view_other_grader_names_67736530: "L'esaminatore finale può visualizzare i nomi di altri esaminatori"
   final_letter_grade_80dccec1: "Voto in lettere finale"
@@ -9050,6 +9068,7 @@ it:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Assegna a tutti gli studenti lo stesso voto per *%{assignment.name}* inserendo e inviando un valore di voto di seguito:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Assegna a tutti gli studenti lo stesso voto in *percentuale* per **%{assignment.name}** inserendo e inviando un valore di voto di seguito:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Rinuncia al recupero delle sorgenti multimediali. Questo problema probabilmente si risolverà alla fine."
   global_announcements_a78912c8: "Annunci globali"
   global_announcements_add_edit_delete_843ca4d2: "Annunci globali - aggiungi/modifica/elimina"
   global_branding_df1cae12: "Branding globale"
@@ -10521,6 +10540,7 @@ it:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Include un link verso SpeedGrader nel menu dell’intestazione dei compiti del Registro dei voti."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Include i valori dei voti nei report dei voti admin"
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Include gli allineamenti del servizio dei risultati quando si esporta o importa contenuto del corso."
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Include le valutazioni sostituite del corso nella Cronologia registro dei voti."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Include la rubrica nell’esplorazione corso con barra laterale"
   incomplete_95612d72: "non completato"
   incomplete_da3c2ea2: "Non completato"
@@ -14076,6 +14096,7 @@ it:
     submission_comment_description: "Commento consegna compito"
     submission_comment_display: "Commento consegna"
     web_conference_recording_ready: "Una registrazione della conferenza è pronta"
+  notification_policies_requires_the_communication_c_2e7ded08: "I criteri di notifica richiedono l’ID del canale di comunicazione, la categoria della notifica e la frequenza dell'aggiornamento"
   notification_preferences: 
     communication: 
       email: 
@@ -14312,6 +14333,7 @@ it:
   open_title_in_a_new_window_b29fed77: "Apri %{title} in una nuova finestra"
   open_to_comments_23d5585e: "Aperto ai commenti"
   openid_connect_initiation_url_d9037d30: "* URL di avvio connessione ID aperto"
+  opens_in_new_window_b4b99243: "si apre in una nuova finestra"
   option_1_dea39f90: "Opzione 1"
   option_2_47aace2a: "Opzione 2"
   option_3_30adfebc: "Opzione 3"
@@ -14375,6 +14397,7 @@ it:
   out_of_pointspossible_c163105a: "su %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Allineamento risultato con contenuto senza punteggio"
   outcome_da397d20: Risultato
+  outcome_details_ce254e89: "Dettagli risultato"
   outcome_export_89229eb4: "Esportazione esiti"
   outcome_group_39fae76f: "Gruppo di esiti"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Gruppo di esiti con ID Canvas %{id} non trovato"
@@ -17368,6 +17391,8 @@ it:
   restart_link_validation_b61286fc: "Riavvia convalida link"
   restore_courses_182e162e: "Ripristina corsi"
   restored_course_association_course_c9e16045: "Associazione corsi ripristinata %{course}"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Impedisci agli istruttori di cambiare le scale di padronanza"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Impedisci agli istruttori di cambiare il metodo di calcolo delle competenze"
   restrict_sms_to_select_types_9dd6399c: "Limita SMS a tipi selezionati"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Limita l'accesso degli studenti ai corsi dopo la data di fine"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Limita l'accesso degli studenti ai corsi prima della data di inizio"
@@ -20927,6 +20952,8 @@ it:
   ukrainian_945b00b7: Ucraino
   unable_to_accept_update_fd53a7e2: "Impossibile accettare l'aggiornamento"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Impossibile accedere a uno studente specifico. Passare al compito in SpeedGrader?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Impossibile allineare alcuni risultati con una pagina"
+  unable_to_align_some_outcomes_to_title_53467231: "Impossibile allineare alcuni risultati con \"%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Impossibile realizzare una curva dei voti perché questo compito è in scadenza in un periodo di valutazione chiuso per almeno uno studente"
   unable_to_delete_assignment_abcf8d62: "Impossibile eliminare compito"
   unable_to_dismiss_update_df1e32eb: "Impossibile ignorare l'aggiornamento"
@@ -21349,6 +21376,8 @@ it:
   user_observers_454d4303: "Osservatori utenti"
   user_option_links_66090987: "Link opzioni utente"
   user_profile: 
+    invalid_url: "URL non valido"
+    profile_bio_too_long: "La biografia è troppo lunga"
     profile_title_too_long: "Il titolo è troppo lungo"
     tabs: 
       notifications: Notifiche
@@ -22248,6 +22277,7 @@ it:
       
       È possibile visualizzarle qui: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "I tuoi supporti multimediali sono stati caricati e saranno visualizzati qui dopo l’elaborazione."
   your_message_has_been_sent_thank_you_e0284316: "Il tuo messaggio è stato inviato. Grazie."
   your_message_was_sent_977f6583: "Il tuo messaggio è stato inviato."
   your_name_7665e1d8: "Il tuo nome"

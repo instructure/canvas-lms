@@ -432,6 +432,7 @@ ar:
   account_level_mastery_scales_a5bdff29: "مقاييس الإتقان لمستوى الحساب"
   account_level_notification_preferences_require_an__66467cd7: "تتطلب تفضيلات الإعلامات على مستوى الحساب account_id للتحديث"
   account_level_notification_preferences_ui_update_f5e189a4: "تحديث واجهة المستخدم لتفضيلات الإعلامات على مستوى الحساب"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "تنطبق الإعلامات على مستوى الحساب على جميع المساقات. يمكن تغيير الإعلامات لمساقات محددة داخل كل مساق وستتجاوز هذه الإعلامات."
   account_level_settings_manage_4fca6f8e: "إعدادات على مستوى الحساب - إدارة"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "اسم الحساب"
@@ -442,6 +443,7 @@ ar:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "وقت نهاية إشعار الحساب يسبق وقت البداية"
+  account_notification_settings_e96de9b6: "إعدادات إعلامات الحساب"
   account_notification_settings_error_page_66c0bc61: "صفحة خطأ إعدادات إخطار الحساب"
   account_notification_settings_initial_query_error_f55e1cbf: "خطأ في الاستعلام الأولي لإعدادات إخطار الحساب"
   account_notification_settings_updated_dbabec35: "تم تحديث إعدادات إخطار الحساب"
@@ -1429,6 +1431,7 @@ ar:
         manual_quotas_title: "الحصص القابلة للتعيين يدويًا"
         megabytes: ميجابايت
         megabytes_tooltip: ميجابايت
+        placeholder_course_or_group_id: "أدخل عنوان URL..."
         select_type_courses: "معرف المساق"
         select_type_groups: "معرف المجموعة"
         select_type_label: "البحث عن مساق أو مجموعة"
@@ -4053,6 +4056,7 @@ ar:
   available_from_f84e4611: "متوفر بدءًا من"
   available_from_field_for_styleguide_7ced3861: "متوفر منذ الحقل الخاص بدليل النمط"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "متوفر منذ - التنسيق على شكل DD-MM-YYYY hh:mm"
+  available_pronouns_b45330b1: "الضمائر المتوفرة"
   available_to_b7350e02: "متاح لـ"
   available_until_3278ebe9: "متوفر حتى"
   available_until_date_2c0ccec3: "متاح إلى غاية تاريخ:"
@@ -5329,6 +5333,7 @@ ar:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "التعاونات هي أدوات مستندة إلى الويب للعمل بشكل تعاوني في المهام مثل تدوين الملاحظات أو الأوراق المجمعة. تحدث إلى معلمك لتبدأ."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "التعاونات هي أدوات مستندة إلى الويب للعمل بشكل تعاوني في المهام مثل تدوين الملاحظات أو الأوراق المجمعة. ابدأ بإضافة تطبيق تعاون."
   collaborations_tutorial_tray_9219d9d: "علبة البرنامج التعليمي للأعمال الجماعية"
+  collapse_all_50275533: "طي الكل"
   collapse_group_c2af7cad: "طي المجموعة"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "طي قائمة أعضاء مجموعة %{groupName}"
   collapse_subdiscussion_89af1f5c: "طي المناقشة الفرعية"
@@ -6720,6 +6725,10 @@ ar:
     other: "%{count} من الطلاب"
     two: "%{count} من الطلاب"
     zero: "%{count} من الطلاب"
+  count_students_c9920376: 
+    one: "1 طالب"
+    other: "%{count} من الطلاب"
+    zero: "0 طالب"
   count_students_in_percentile_percentile_d0adecfe: 
     few: "%{count} طلاب في القيمة المئوية %{percentile}."
     many: "%{count} طلاب في القيمة المئوية %{percentile}."
@@ -6951,6 +6960,7 @@ ar:
   course_is_already_associated_with_a_blueprint_4d9407cb: "تم إقران المساق بالفعل مع مساق مخطَط"
   course_landing_page_49a53ade: "صفحة المساق المنتقل إليها"
   course_level_notification_preferences_require_a_co_2f0a618: "تتطلب تفضيلات الإعلامات على مستوى المساق course_id للتحديث"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "يتم استيراد الإعلامات على مستوى المساق من إعداد الإعلامات على مستوى الحساب. سيؤدي تعديل الإعلامات لهذا المساق إلى تجاوز الإعلامات على مستوى الحساب."
   course_level_overrides_for_notification_preference_e86d1725: "مستوى المساق يحل محل تفضيلات الإعلامات"
   course_list: 
     favorited_tooltip: "انقر للإزالة من قائمة الدورات التدريبية."
@@ -8487,6 +8497,9 @@ ar:
   disableWhileLoading: 
     loading: "جارٍ التحميل..."
   disable_a5c05db3: تعطيل
+  disable_alert_timeouts_description: |-
+      سيؤدي تمكين هذه الميزة إلى التخلص من المهلة لإعلامات التنبيه التي تظهر، مما يمنح
+      المستخدم الوقت الكافي الذي يحتاجون إليه لقراءة الإعلام وإبعاده عندما ينتهون منها.
   disable_all_read_only_scopes_f9ffdd28: "تعطيل جميع نطاقات القراءة فقط."
   disable_and_lock_7d0ef0e8: "تعطيل وتأمين"
   disable_automatic_submission_8e1d8676: "تعطيل الإرسال التلقائي"
@@ -8498,6 +8511,7 @@ ar:
   disable_scope_6ba4e4d4: "تعطيل نطاق"
   disable_sync_to_name_10c371dc: "تعطيل المزامنة إلى %{name}"
   disable_toolname_44d6397c: "تعطيل %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "تعطيل التحميلات إلى Canvas Media من محرر المحتوى المنسق المعزز"
   disabled_18c33a73: (معطل)
   disabled_3b1b332a: معطل
   disabled_and_locked_d14dc6c2: "تم التعطيل والتأمين"
@@ -9876,6 +9890,7 @@ ar:
   exit_d0c7b013: خروج
   exit_theme_editor_9ddd41bb: "الخروج من محرر النسق"
   expand_2f2fadbd: توسيع
+  expand_all_bb64d2ea: "توسيع الكل"
   expand_collapse_title_outcome_group_239f0a9d: "توسيع/طي مجموعة نتائج %{title}"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "توسيع/طي مجموعة نواتج %{title}، يفي الطالب بمستوى إجادة %{mastery_count} من نواتج %{count}"
   expand_global_navigation_2c28d5d4: "توسيع التنقل العمومي"
@@ -10080,6 +10095,7 @@ ar:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "فشل تحميل مكون التغييرات غير المتزامنة. هل اتصال شبكتك جيد؟"
   failed_please_report_the_following_error_code_to_y_42248d60: "فشل، يرجى الإبلاغ برمز الخطأ التالي لمسؤول النظام: تقرير الخطأ:%{error}."
   failed_retrieving_media_source_3f0cfd49: "تعذر استرداد مصدر الوسائط"
+  failed_retrieving_media_sources_32aed288: "تعذر استرداد مصادر الوسائط."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "فشل، تعذر إنشاء ملف من التقرير. يرجى إعادة المحاولة."
   failed_to_add_new_feed_ee1c5ea: "فشل إضافة موجز جديد"
   failed_to_change_last_attended_date_1e340ba6: "فشل تغيير تاريخ آخر حضور"
@@ -10167,6 +10183,7 @@ ar:
         المهام المتباينة عبارة عن ميزة تسمح باختيار القسم (الأقسام) أو الطالب (الطلبة) الذين تنطبق عليهم مهمة.
         الأقسام التي لم تكلف بمهمة لن تستطيع مشاهدتها في محتويات مساقاتها وسيتم حساب
         درجتها النهائية دون هذه النقاط..
+    disable_alert_timeouts: "تعطيل مهلات إعلام التنبيه"
     ember_modules: "وحدات Ember"
     google_docs_domain_restriction: "قيد على مجال Google Docs"
     gradebook_list_students_by_sortable_name: "دفتر الدرجات - تسجيل الطلاب حسب الاسم القابل للفرز"
@@ -10357,6 +10374,7 @@ ar:
   final_grade_finalgrade_408580bb: "الدرجة النهائية: *%{finalGrade}*"
   final_grade_info_2aa35d25: "معلومات الدرجة النهائية"
   final_grade_override_be8a21cd: "تجاوز الدرجة النهائية"
+  final_grade_override_in_gradebook_history_767147c: "استبدال التقدير النهائي في سجل دفتر الدرجات"
   final_grade_score_fe69a301: "الدرجة النهائية: %{score}"
   final_grader_1693103c: "المقيّم الأخير"
   final_grader_can_view_other_grader_names_67736530: "يمكن للمقيّم النهائي عرض أسماء المقيّمين الآخرين"
@@ -10520,6 +10538,7 @@ ar:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "منح كافة الطلاب نفس الدرجة الخاصة بـ *%{assignment.name}* عن طريق إدخال قيمة درجة وإرسالها أدناه:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "منح كافة الطلاب نفس درجة *النسبة المئوية* لـ **%{assignment.name}** عن طريق إدخال قيمة درجة وإرسالها أدناه:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "التوقف عن استرداد مصادر الوسائط. ستحل هذه المشكلة على الأرجح من تلقاء نفسها في النهاية."
   global_announcements_a78912c8: "الإعلانات العمومية"
   global_announcements_add_edit_delete_843ca4d2: "الإعلانات العامة - إضافة / تحرير / حذف"
   global_branding_df1cae12: "العلامات العامة"
@@ -12592,6 +12611,7 @@ ar:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "تضمين ارتباط إلى SpeedGrader في قائمة عنوان المهام في دفتر الدرجات."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "تشمل قيم الدرجات في تقارير درجات المسؤولين."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "تتضمن تنسيقات خدمة المخرجات عند تصدير واستيراد محتوى المساق"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "يتضمن تقديرات المساق التي تم تجاوزها في سجل دفتر الدرجات."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "تشمل معايير التقييم في تنقل الشريط الجانبي للمساق"
   incomplete_95612d72: "غير مكتمل"
   incomplete_da3c2ea2: "غير مكتمل"
@@ -16650,6 +16670,7 @@ ar:
     submission_comment_description: "تعليق إرسال المهمة"
     submission_comment_display: "تعليق الإرسال"
     web_conference_recording_ready: "تسجيل مؤتمر عبر الويب جاهز"
+  notification_policies_requires_the_communication_c_2e7ded08: "سياسات الإشعار تتطلب معرف قناة الاتصال وفئة الإعلام ومعدل تكرار التحديث"
   notification_preferences: 
     communication: 
       email: 
@@ -16931,6 +16952,7 @@ ar:
   open_title_in_a_new_window_b29fed77: "فتح %{title} في نافذة جديدة"
   open_to_comments_23d5585e: "مفتوح للتعليقات"
   openid_connect_initiation_url_d9037d30: "* Url بدء اتصال OpenID"
+  opens_in_new_window_b4b99243: "تفتح في نافذة جديدة"
   option_1_dea39f90: "الخيار 1"
   option_2_47aace2a: "الخيار 2"
   option_3_30adfebc: "الخيار 3"
@@ -16997,6 +17019,7 @@ ar:
   out_of_pointspossible_c163105a: "من إجمالي %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "موائمة النواتج مع المحتوى بدون درجات"
   outcome_da397d20: النتيجة
+  outcome_details_ce254e89: "تفاصيل المُخرج"
   outcome_export_89229eb4: "تصدير الحصيلة"
   outcome_group_39fae76f: "مجموعة النواتج"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "مجموعة النواتج التي تحمل معرف canvas %{id} غير موجودة"
@@ -20560,6 +20583,8 @@ ar:
   restore_courses_182e162e: "استرداد المساقات"
   restored_course_association_course_c9e16045: "اقتران مساق تم استعادته %{course}"
   restrict_access_84ba6bb8: "تقييد الوصول"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "تقييد المدرسين من تغيير مستويات الإجادة"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "تقييد المدرسين من تغيير طريقة حساب الإتقان"
   restrict_sms_to_select_types_9dd6399c: "تقييد الرسائل النصية لتحديد الأنواع"
   restrict_student_access: 
     button_text: 
@@ -20922,7 +20947,7 @@ ar:
   score_of_score_view_in_speedgrader_a7c1c954: "درجة %{score}. العرض في SpeedGrader"
   score_out_of_points_84f44331: "(%{score} من إجمالي %{points})"
   score_out_of_points_possible_88f370fd: "%{score} من  %{points_possible}"
-  score_out_of_points_possible_points_bbaea991: "%{score} من إجمالي %{points_possible} نقطة"
+  score_out_of_points_possible_points_bbaea991: "%{score} من إجمالي %{points_possible} نقاط"
   score_percent_11941c81: "%{score} النسبة المئوية"
   score_points_3c48e2a8: "%{score} من النقاط"
   score_pointspossible_bd57ea9e: "%{score}/%{pointsPossible}"
@@ -24570,6 +24595,8 @@ ar:
   ukrainian_945b00b7: الأوكرانية
   unable_to_accept_update_fd53a7e2: "تعذر قبول التحديث"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "يتعذر الوصول إلى طالب محدد. هل تريد الانتقال إلى مهمة في SpeedGrader؟"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "يتعذر محاذاة بعض المخرجات لصفحة"
+  unable_to_align_some_outcomes_to_title_53467231: "يتعذر محاذاة بعض المخرجات لـ \"%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "يتعذر تطبيق نظام المنحنى لمنح العلامات، نظرًا لأن هذه المهمة مستحقة في فترة مغلقة لمنح العلامات لطالب واحد على الأقل"
   unable_to_delete_assignment_abcf8d62: "تعذر حذف مهمة"
   unable_to_dismiss_update_df1e32eb: "تعذر رفض التحديث"
@@ -25062,6 +25089,8 @@ ar:
   user_observers_454d4303: "مراقبو المستخدم"
   user_option_links_66090987: "ارتباطات خيارات المستخدم"
   user_profile: 
+    invalid_url: "URL غير صالح"
+    profile_bio_too_long: "السيرة الذاتية طويلة للغاية"
     profile_title_too_long: "هذا العنوتن طويل جدًا"
     tabs: 
       notifications: إعلامات
@@ -26085,6 +26114,7 @@ ar:
       
       يمكنك عرضها هنا: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "تم تحميل وسائطك وستظهر هنا بعد المعالجة."
   your_message_has_been_sent_thank_you_e0284316: "تم إرسال رسالتك. شكرًا لك."
   your_message_was_sent_977f6583: "تم إرسال رسالتك!"
   your_name_7665e1d8: اسمك
