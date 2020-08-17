@@ -594,49 +594,45 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
         }
       }
     },
+    sanitize(html) {
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(html, 'text/html')
 
+      // Remove all nodes except those that are whitelisted
+      const elementWhitelist = ['i', 'b', 'u', 'v', 'c', 'ruby', 'rt', 'lang', 'link']
+      let elements = Array.from(doc.body.children || [])
+      while (elements.length) {
+        const node = elements.shift()
+        if (elementWhitelist.includes(node.tagName.toLowerCase())) {
+          elements = elements.concat(Array.from(node.children || []))
+        } else {
+          node.parentNode.removeChild(node)
+        }
+      }
+
+      // Loop the elements and remove anything that contains value="javascript:" or an `on*` attribute
+      // (`onerror`, `onclick`, etc.)
+      const allElements = doc.body.getElementsByTagName('*')
+      for (let i = 0, n = allElements.length; i < n; i++) {
+        const attributesObj = allElements[i].attributes,
+          attributes = Array.prototype.slice.call(attributesObj)
+        for (let j = 0, total = attributes.length; j < total; j++) {
+          if (attributes[j].name.startsWith('on') || attributes[j].value.startsWith('javascript')) {
+            allElements[i].parentNode.removeChild(allElements[i])
+          } else if (attributes[j].name === 'style') {
+            allElements[i].removeAttribute(attributes[j].name)
+          }
+        }
+      }
+
+      return doc.body.innerHTML
+    },
     displayCaptions() {
       if (typeof this.tracks === 'undefined') return
 
       let t = this,
         track = t.selectedTrack,
-        i,
-        sanitize = function(html) {
-          const parser = new DOMParser()
-          const doc = parser.parseFromString(html, 'text/html')
-
-          // Remove all nodes except those that are whitelisted
-          const elementWhitelist = ['i', 'b', 'u', 'v', 'c', 'ruby', 'rt', 'lang', 'link']
-          let elements = Array.from(doc.body.children || [])
-          while (elements.length) {
-            const node = elements.shift()
-            if (elementWhitelist.includes(node.tagName.toLowerCase())) {
-              elements = elements.concat(Array.from(node.children || []))
-            } else {
-              node.parentNode.removeChild(node)
-            }
-          }
-
-          // Loop the elements and remove anything that contains value="javascript:" or an `on*` attribute
-          // (`onerror`, `onclick`, etc.)
-          const allElements = doc.body.getElementsByTagName('*')
-          for (let i = 0, n = allElements.length; i < n; i++) {
-            const attributesObj = allElements[i].attributes,
-              attributes = Array.prototype.slice.call(attributesObj)
-            for (let j = 0, total = attributes.length; j < total; j++) {
-              if (
-                attributes[j].name.startsWith('on') ||
-                attributes[j].value.startsWith('javascript')
-              ) {
-                allElements[i].parentNode.removeChild(allElements[i])
-              } else if (attributes[j].name === 'style') {
-                allElements[i].removeAttribute(attributes[j].name)
-              }
-            }
-          }
-
-          return doc.body.innerHTML
-        }
+        i
 
       if (track !== null && track.isLoaded) {
         for (i = 0; i < track.entries.times.length; i++) {
@@ -646,7 +642,7 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
           ) {
             // Set the line before the timecode as a class so the cue can be targeted if needed
             t.captionsText
-              .html(sanitize(track.entries.text[i]))
+              .html(t.sanitize(track.entries.text[i]))
               .attr('class', 'mejs-captions-text ' + (track.entries.times[i].identifier || ''))
             t.captions.show().height(0)
             return // exit out if one is visible;
@@ -766,7 +762,7 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
               (i == chapters.entries.times.length - 1 ? ' mejs-chapter-block-last' : '') +
               '">' +
               '<span class="ch-title">' +
-              chapters.entries.text[i] +
+              t.sanitize(chapters.entries.text[i]) +
               '</span>' +
               '<span class="ch-time">' +
               mejs.Utility.secondsToTimeCode(chapters.entries.times[i].start, t.options) +
