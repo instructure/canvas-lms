@@ -1376,15 +1376,25 @@ describe Account do
   end
 
   describe "#update_account_associations" do
+    before do
+      @account = Account.default.sub_accounts.create!
+      @c1 = @account.courses.create!
+      @c2 = @account.courses.create!
+      @account.course_account_associations.scope.delete_all
+    end
+
     it "should update associations for all courses" do
-      account = Account.default.sub_accounts.create!
-      c1 = account.courses.create!
-      c2 = account.courses.create!
-      account.course_account_associations.scope.delete_all
-      expect(account.associated_courses).to eq []
-      account.update_account_associations
-      account.reload
-      expect(account.associated_courses.sort_by(&:id)).to eq [c1, c2]
+      expect(@account.associated_courses).to eq []
+      @account.update_account_associations
+      @account.reload
+      expect(@account.associated_courses.sort_by(&:id)).to eq [@c1, @c2]
+    end
+
+    it "can update associations in batch" do
+      expect(@account.associated_courses).to eq []
+      Account.update_all_update_account_associations
+      @account.reload
+      expect(@account.associated_courses.sort_by(&:id)).to eq [@c1, @c2]
     end
   end
 
