@@ -151,9 +151,9 @@ input[type="checkbox"] {
 // Set the height of select and file controls to match text inputs
 select,
 input[type="file"] {
-  // Adding "8" to the total to account for the extra padding on the updated button styles
-  height: $inputHeight + 8;
-  line-height: $inputHeight + 8;
+  // Adding "0.5" to the total to account for the extra padding on the updated button styles
+  height: $inputHeightRem + 0.5;
+  line-height: $inputHeightRem + 0.5;
 }
 
 // Make select elements obey height by applying a border
