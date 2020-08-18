@@ -51,6 +51,7 @@ $monoFontFamily:        Monaco, Menlo, Consolas, "Courier New", monospace !defau
 $baseFontSize:          14px !default;
 $baseFontFamily:        $sansFontFamily !default;
 $baseLineHeight:        20px !default;
+$baseLineHeightRem:     1.25rem !default;
 $altFontFamily:         $serifFontFamily !default;
 
 $headingsFontFamily:    inherit !default; // empty to use BS default, $baseFontFamily
@@ -118,6 +119,7 @@ $inputBorderRadius:             $baseBorderRadius !default;
 $inputDisabledBackground:       $grayLighter !default;
 $formActionsBackground:         #f5f5f5 !default;
 $inputHeight:                   $baseLineHeight + 10px; // base line-height + 8px vertical padding + 2px top/bottom border
+$inputHeightRem:                $baseLineHeightRem + 0.625rem;
 
 
 // Dropdowns
