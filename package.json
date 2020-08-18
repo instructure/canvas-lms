@@ -308,7 +308,7 @@
     "build:css:watch": "brandable_css --watch",
     "build:js": "yarn run webpack-development",
     "build:js:watch": "yarn run webpack",
-    "build:packages": "yarn workspace-run-serial build:canvas",
+    "build:packages": "yarn workspace-run build:canvas",
     "lint:browser-code": "es-check es8 ./public/dist/**/*.js",
     "lint:staged": "lint-staged",
     "lint:js:coffeescripts": "eslint ./app/coffeescripts/**/*.js",

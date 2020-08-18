@@ -168,13 +168,13 @@ RUN set -eux; \
   && (DISABLE_POSTINSTALL=1 yarn install --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --pure-lockfile --network-concurrency 1) \
   && yarn cache clean
 
-FROM dependencies AS webpack-final
-
 COPY --chown=docker:docker babel.config.js ${APP_HOME}
 COPY --chown=docker:docker script          ${APP_HOME}script
 
+RUN yarn postinstall
+
+FROM dependencies AS webpack-final
 ARG JS_BUILD_NO_UGLIFY=0
-RUN COMPILE_ASSETS_NPM_INSTALL=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" yarn postinstall
 
 COPY --chown=docker:docker . ${APP_HOME}
 RUN COMPILE_ASSETS_NPM_INSTALL=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets
