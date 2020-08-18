@@ -67,7 +67,7 @@ describe AuthenticationMethods do
     context "with active session" do
       before do
         user_with_pseudonym
-        @pseudonym_session = double(:record => @pseudonym)
+        @pseudonym_session = double(record: @pseudonym, errors: [])
         allow(PseudonymSession).to receive(:find).and_return(@pseudonym_session)
       end
 
