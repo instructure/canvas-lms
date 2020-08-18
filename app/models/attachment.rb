@@ -311,6 +311,12 @@ class Attachment < ActiveRecord::Base
     excluded_atts += ["locked", "hidden"] if dup == existing && !options[:migration]&.for_master_course_import?
     dup.assign_attributes(self.attributes.except(*excluded_atts))
     dup.context = context
+    if self.usage_rights && self.shard != context.shard
+      attrs = self.usage_rights.attributes.slice('use_justification', 'license', 'legal_copyright')
+      new_rights = context.usage_rights.detect{|ur| attrs.all?{|k, v| ur.attributes[k] == v}}
+      new_rights ||= context.usage_rights.create(attrs)
+      dup.usage_rights = new_rights
+    end
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
       if self.shard == dup.shard
