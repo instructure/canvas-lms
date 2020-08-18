@@ -2158,6 +2158,7 @@ fa:
   app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} توسط مدیر نصب شد و قفل شده است"
   app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} توسط درس اصلی نصب شد و قفل شده است"
   app_was_installed_by_the_master_course_e55ba1d7: "%{app} توسط درس اصلی نصب شد"
+  appears_at_the_top_of_the_global_navigation_tray_t_f293877e: "در بالای سینی پیمایش جهانی که روی صفحه‌های اندازه تلفن همراه باز می شود، ظاهر می شود.  ارتفاع نمایش: 48px. قالب‌های قابل قبول: svg, png, jpg, gif"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "یک شماره را به انتهای هر عنوان رویداد ضمیمه می کند (برای مثال، رویداد 1، رویداد 2 و غیره)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "یک شماره را به انتهای هر عنوان رویداد ضمیمه می کند (برای مثال، رویداد 1، رویداد 2 و غیره)\" for=\"append_iterator"
   application: 
@@ -19611,6 +19612,7 @@ fa:
       فراداده ارائه دهنده سرویس
       در نشانی اینترنتی قابل دسترس است.
   the_client_id_clientid_is_disabled_b4a02cb1: "شناسه مشتری %{clientId} غیرفعال است."
+  the_course_link_validator_searches_course_content__563fa215: "اعتبار سنجی لینک درس، محتوای درس را برای پیوندها و تصاویر نامعتبر یا غیر قابل دستیابی جستجو می کند."
   the_course_link_validator_searches_through_course__76f0bc63: "تأیید کننده پیوند درس محتوای درس را جستجو می کند و هر پیوند نامعتبر یا غیر فعالی که می یابد را به دست می دهد. لطفا توجه داشته باشید که برخی از پیوندهایی که به عنوان غیر فعال پرچم گذاری شده اند، از سرورهای ما غیر فایل دسترسی هستند ولی برای دانشجویان کار می کنند."
   the_course_to_report_on_defaults_to_canvas_id_unle_9e1d8f79: "درس مورد گزارش: به صورت پیش فرض شناسه کانواس است مگر اینکه به عنوان SIS در نوع شناسه درس تعیین شده باشد."
   the_default_report_only_includes_course_section_da_729092f0: "در صورت فعال بودن محدودیت های ثبت نام ، گزارش پیش فرض فقط تاریخ دوره / بخش را شامل می شود"
