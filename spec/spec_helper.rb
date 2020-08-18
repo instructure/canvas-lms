@@ -138,6 +138,11 @@ module ActionView::TestCase::Behavior
   end
 end
 
+if ENV['ENABLE_AXE_SELENIUM']
+  require_relative './axe_selenium_helper'
+  AxeSelenium.install!
+end
+
 module RSpec::Rails
   module ViewExampleGroup
     module ExampleMethods
