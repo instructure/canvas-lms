@@ -39,10 +39,16 @@ module Factories
       allow(pseudonym).to receive(:unique_id).and_return('unique_id')
     end
 
-    session = double('PseudonymSession', record: pseudonym, session_credentials: nil, errors: [])
+    session = double('PseudonymSession',
+      :record => pseudonym
+    )
 
     @session_stubbed = true
     allow(PseudonymSession).to receive(:find).and_wrap_original do |original|
+      next original.call unless @session_stubbed
+      session
+    end
+    allow(PseudonymSession).to receive(:find_with_validation).and_wrap_original do |original|
       next original.call unless @session_stubbed
       session
     end

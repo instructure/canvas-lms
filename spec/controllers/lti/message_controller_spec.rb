@@ -462,7 +462,7 @@ module Lti
         it 'redirects to login page if there is no session' do
           tool_proxy.raw_data['enabled_capability'] += enabled_capability
           tool_proxy.save!
-          allow(PseudonymSession).to receive(:find).and_return(nil)
+          allow(PseudonymSession).to receive(:find_with_validation).and_return(nil)
           get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id}
           expect(response).to redirect_to(login_url)
         end
