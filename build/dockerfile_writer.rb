@@ -17,6 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "erubi"
+require "json"
 require "optparse"
 require_relative "./docker_utils"
 
@@ -69,8 +70,8 @@ class DockerfileWriter
     DockerUtils.compose_config(*compose_files)
   end
 
-  def yarn_files_client_apps
-    paths = Dir.glob('./client_apps/*/package.json').map { |p| p.sub('./', '') }
+  def yarn_packages
+    JSON.load(File.open('package.json'))['workspaces']['packages']
   end
 end
 
