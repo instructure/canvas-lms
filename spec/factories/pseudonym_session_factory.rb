@@ -39,7 +39,7 @@ module Factories
       allow(pseudonym).to receive(:unique_id).and_return('unique_id')
     end
 
-    session = double('PseudonymSession', :record => pseudonym, :session_credentials => nil)
+    session = double('PseudonymSession', record: pseudonym, session_credentials: nil, errors: [])
 
     @session_stubbed = true
     allow(PseudonymSession).to receive(:find).and_wrap_original do |original|
