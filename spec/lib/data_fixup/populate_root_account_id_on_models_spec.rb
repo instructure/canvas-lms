@@ -1326,10 +1326,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(LearningOutcome, nil)).to be true
     end
 
-    it 'should ignore assocations that point to unfillable tables' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(AccessToken, AccessToken.reflections['developer_key'])).to be true
-    end
-
     context 'with_sharding' do
       specs_require_sharding
 
@@ -1516,8 +1512,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
     context 'DeveloperKey' do
       it 'ignores site admin keys (null account_id) and cross-shard account_id' do
-        dk1 = DeveloperKey.create!(account_id: 98765 * Shard::IDS_PER_SHARD + 1)
-        expect(dk1.root_account_id).to eq(nil)
         dk2 = DeveloperKey.create!(account_id: nil)
         expect(dk2.root_account_id).to eq(nil)
         dk3 = DeveloperKey.create!(account: @course.account)

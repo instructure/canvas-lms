@@ -57,14 +57,14 @@ module DataFixup::PopulateRootAccountIdOnModels
     {
       AccessToken => :developer_key,
       AccountUser => :account,
-      # Attachment is handled differently than other fix ups, it is triggered in the populate_overrides
-      Attachment => [],
       AssessmentQuestion => :assessment_question_bank,
       AssessmentQuestionBank => :context,
       AssetUserAccess => [:context_course, :context_group, {context_account: [:root_account_id, :id]}],
       AssignmentGroup => :context,
       AssignmentOverride => [:assignment, :quiz],
       AssignmentOverrideStudent => [:assignment, :quiz],
+      # Attachment is handled differently than other fix ups, it is triggered in the populate_overrides
+      Attachment => [],
       AttachmentAssociation => %i[course group submission attachment], # attachment is last, only used if context is a ConversationMessage
       CalendarEvent => [:context_course, :context_group, :context_course_section],
       CommunicationChannel => [], # has override
@@ -72,7 +72,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       ContentParticipation => :content,
       ContentParticipationCount => :course,
       ContentShare => [:course, :group],
-      ContextExternalTool => [{context: [:root_account_id, :id]}],
+      ContextExternalTool => :context,
       ContextModule => :context,
       ContextModuleProgression => :context_module,
       CourseAccountAssociation => :account,
@@ -179,7 +179,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   # root account ids, and they have children who need them to consider them as full
   def self.unfillable_criteria
     @unfillable_criteria ||= {
-      DeveloperKey => ['account_id IS NULL OR account_id >= ?', Shard::IDS_PER_SHARD],
+      DeveloperKey => 'account_id IS NULL',
       LearningOutcomeGroup => 'context_id IS NULL',
     }.freeze
   end
