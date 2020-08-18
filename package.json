@@ -68,6 +68,7 @@
     "@instructure/ui-react-utils": "6",
     "@instructure/ui-responsive": "6",
     "@instructure/ui-select": "6",
+    "@instructure/ui-simple-select": "6",
     "@instructure/ui-spinner": "6",
     "@instructure/ui-svg-images": "6",
     "@instructure/ui-table": "6",

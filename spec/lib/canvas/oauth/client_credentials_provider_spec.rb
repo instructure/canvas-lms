@@ -20,12 +20,58 @@ require_dependency "canvas/oauth/client_credentials_provider"
 
 module Canvas::Oauth
   describe ClientCredentialsProvider do
+    let(:dev_key) { DeveloperKey.create! }
+    let(:provider) { described_class.new dev_key.id, 'example.com' }
+
+    before {
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({:host => 'example.com'})
+    }
+
+    describe 'generate_token' do
+      subject { provider.generate_token }
+
+      it { is_expected.to be_a Hash }
+
+      it 'has the correct expected keys' do
+        %i(access_token token_type expires_in scope).each do |key|
+          expect(subject).to have_key key
+        end
+      end
+
+      context 'with iat in the future by a small amount' do
+        let(:future_iat_time) { 5.seconds.from_now }
+        let(:iat) { future_iat_time.to_i }
+
+        it 'returns an access token' do
+          Timecop.freeze(future_iat_time - 5.seconds) do
+            expect(subject).to be_a Hash
+          end
+        end
+      end
+
+      describe "with account scoped dev_key" do
+        before do
+          @account = Account.create!
+          dev_key.update!(account_id: @account)
+        end
+
+        it "includes a custom canvas account_id claim in the token" do
+          token = subject[:access_token]
+          claims = Canvas::Security.decode_jwt(token)
+          expect(claims).to have_key "canvas.instructure.com"
+          expect(claims["canvas.instructure.com"]["account_uuid"]).to eq @account.uuid
+        end
+      end
+    end
+  end
+
+  describe AsymmetricClientCredentialsProvider do
     let(:provider) { described_class.new jws, 'example.com' }
     let(:alg) { :RS256 }
     let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url }
     let(:iat) { 1.minute.ago.to_i }
     let(:exp) { 10.minutes.from_now.to_i }
-    let(:rsa_key_pair) { Lti::RSAKeyPair.new }
+    let(:rsa_key_pair) { Canvas::Security::RSAKeyPair.new }
     let(:signing_key) { JSON::JWK.new(rsa_key_pair.to_jwk) }
     let(:jwt) do
       {
@@ -126,17 +172,6 @@ module Canvas::Oauth
           expect(subject).to have_key key
         end
       end
-
-      context 'with iat in the future by a small amount' do
-        let(:future_iat_time) { 5.seconds.from_now }
-        let(:iat) { future_iat_time.to_i }
-
-        it 'returns an access token' do
-          Timecop.freeze(future_iat_time - 5.seconds) do
-            expect(subject).to be_a Hash
-          end
-        end
-      end
     end
 
     describe '#error_message' do
@@ -182,7 +217,7 @@ module Canvas::Oauth
       end
 
       context 'with bad signing key' do
-        let(:signing_key) { JSON::JWK.new(Lti::RSAKeyPair.new.to_jwk) }
+        let(:signing_key) { JSON::JWK.new(Canvas::Security::RSAKeyPair.new.to_jwk) }
 
         it { is_expected.not_to be_empty }
       end
@@ -253,6 +288,53 @@ module Canvas::Oauth
             expect(subject).to be false
           end
         end
+      end
+    end
+  end
+
+  describe SymmetricClientCredentialsProvider do
+    let(:dev_key) { DeveloperKey.create! client_credentials_audience: "external" }
+    let(:provider) { described_class.new dev_key.id, 'example.com' }
+
+    before {
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({:host => 'example.com'})
+    }
+
+    context 'with valid client_id' do
+      describe '#error_message' do
+        subject { provider.error_message }
+        it { is_expected.to be_empty }
+      end
+
+      describe '#valid?' do
+        subject { provider.valid? }
+        it { is_expected.to be true }
+      end
+
+      describe 'generate_token' do
+        subject { provider.generate_token }
+
+        it { is_expected.to be_a Hash }
+
+        it 'has the correct expected keys' do
+          %i(access_token token_type expires_in scope).each do |key|
+            expect(subject).to have_key key
+          end
+        end
+      end
+    end
+
+    context 'with invalid client_id' do
+      let(:provider) { described_class.new 'invalid', 'example.com' }
+
+      describe '#error_message' do
+        subject { provider.error_message }
+        it { is_expected.to eq("Unknown client_id") }
+      end
+
+      describe '#valid?' do
+        subject { provider.valid? }
+        it { is_expected.to be false }
       end
     end
   end

@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require 'timecop'
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 
-describe Lti::JWKKeyPair do
+describe Canvas::Security::JWKKeyPair do
   describe "to_jwk" do
     it 'has the private key in the JWK format' do
       Timecop.freeze(Time.zone.now) do
-        keys = Lti::RSAKeyPair.new
+        keys = Canvas::Security::RSAKeyPair.new
         expect(keys.to_jwk).to include(keys.private_key.to_jwk(kid: Time.now.utc.iso8601))
       end
     end
@@ -31,14 +31,14 @@ describe Lti::JWKKeyPair do
   describe "public_jwk" do
     it 'includes the public key in JWK format' do
       Timecop.freeze(Time.zone.now) do
-        keys = Lti::RSAKeyPair.new
+        keys = Canvas::Security::RSAKeyPair.new
         expect(keys.public_jwk).to include(keys.private_key.public_key.to_jwk(kid: Time.now.utc.iso8601))
       end
     end
 
     it 'does not include the private key claims in JWK format' do
       Timecop.freeze(Time.zone.now) do
-        keys = Lti::RSAKeyPair.new
+        keys = Canvas::Security::RSAKeyPair.new
         expect(keys.public_jwk.keys).not_to include 'd', 'p', 'q', 'dp', 'dq', 'qi'
       end
     end

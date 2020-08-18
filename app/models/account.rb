@@ -458,7 +458,7 @@ class Account < ActiveRecord::Base
     self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
     self.root_account_id ||= self.parent_account_id
     self.parent_account_id ||= self.root_account_id
-    Account.invalidate_cache(self.id) if self.id
+    Account.invalidate_cache(self.id) if self.id && self.root_account?
     true
   end
 
@@ -1374,6 +1374,7 @@ class Account < ActiveRecord::Base
         rescue ActiveRecord::RecordNotFound => e
           raise ::Canvas::AccountCacheError, e.message
         end
+        raise "Account.find_cached should only be used with root accounts" if !account.root_account? && !Rails.env.production?
         account.precache
         account
       end

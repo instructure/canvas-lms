@@ -38,6 +38,7 @@ class ApiScopeMapper
 
   RESOURCE_NAMES = {
     oauth2: -> {I18n.t('OAuth 2')},
+    peer_services: -> {I18n.t('Peer Services')},
     <%=resource_lookup.map { |k, v| "#{k}: -> {I18n.t('#{v}')}"}.join(",\n    " ) %>
   }.freeze
 

@@ -52,7 +52,7 @@ describe DeveloperKey do
 
   describe 'default values for is_lti_key' do
     let(:public_jwk) do
-      key_hash = Lti::RSAKeyPair.new.public_jwk.to_h
+      key_hash = Canvas::Security::RSAKeyPair.new.public_jwk.to_h
       key_hash['kty'] = key_hash['kty'].to_s
       key_hash
     end
@@ -937,11 +937,11 @@ describe DeveloperKey do
       before { subject.generate_rsa_keypair! }
 
       it 'populates the "public_jwk" column with a public key' do
-        expect(subject.public_jwk['kty']).to eq Lti::RSAKeyPair::KTY
+        expect(subject.public_jwk['kty']).to eq Canvas::Security::RSAKeyPair::KTY
       end
 
       it 'populates the "private_jwk" attribute with a private key' do
-        expect(subject.private_jwk['kty']).to eq Lti::RSAKeyPair::KTY.to_sym
+        expect(subject.private_jwk['kty']).to eq Canvas::Security::RSAKeyPair::KTY.to_sym
       end
     end
   end
@@ -1051,5 +1051,41 @@ describe DeveloperKey do
   it "doesn't allow the default key to be deleted" do
     expect { DeveloperKey.default.destroy }.to raise_error "Please never delete the default developer key"
     expect { DeveloperKey.default.deactivate }.to raise_error "Please never delete the default developer key"
+  end
+
+  describe "issue_token" do
+    subject { DeveloperKey.create! }
+    let(:claims) { { "key" => "value" } }
+    let(:asymmetric_keypair) { Canvas::Security::RSAKeyPair.new.to_jwk }
+    let(:asymmetric_public_key) { asymmetric_keypair.to_key.public_key.to_jwk }
+
+    before {
+      # set up assymetric key
+      allow(Canvas::Oauth::KeyStorage).to receive(:present_key).and_return(asymmetric_keypair)
+    }
+
+
+    it "defaults to internal symmetric encryption with no audience set" do
+      expect(subject.client_credentials_audience).to be_nil
+      token = subject.issue_token(claims)
+      decoded = Canvas::Security.decode_jwt(token)
+      expect(decoded).to eq claims
+    end
+
+    it "uses to symmetric encryption with audience set to internal" do
+      subject.client_credentials_audience = "internal"
+      subject.save!
+      token = subject.issue_token(claims)
+      decoded = Canvas::Security.decode_jwt(token)
+      expect(decoded).to eq claims
+    end
+
+    it "uses to asymmetric encryption with audience set to external" do
+      subject.client_credentials_audience = "external"
+      subject.save!
+      token = subject.issue_token(claims)
+      decoded = JSON::JWT.decode(token, asymmetric_public_key)
+      expect(decoded).to eq claims
+    end
   end
 end

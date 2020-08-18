@@ -136,7 +136,7 @@ class DeveloperKey < ActiveRecord::Base
 
   def generate_rsa_keypair!(overwrite: false)
     return if public_jwk.present? && !overwrite
-    key_pair = Lti::RSAKeyPair.new
+    key_pair = Canvas::Security::RSAKeyPair.new
     @private_jwk = key_pair.to_jwk
     self.public_jwk = key_pair.public_jwk.to_h
   end
@@ -306,6 +306,20 @@ class DeveloperKey < ActiveRecord::Base
       :update_tools_on_active_shard!,
       account
     )
+  end
+
+  def issue_token(claims)
+    case client_credentials_audience
+    when "external"
+      # asymmetric encryption signed with private key to be verified by third
+      # party using public key fetched from /login/oauth2/jwks
+      key = Canvas::Oauth::KeyStorage.present_key
+      Canvas::Security.create_jwt(claims, nil, key, :autodetect).to_s
+    else
+      # default symmetric encryption to be verified when given right back to
+      # canvas
+      Canvas::Security.create_jwt(claims).to_s
+    end
   end
 
   private

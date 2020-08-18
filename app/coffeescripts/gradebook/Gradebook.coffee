@@ -2740,7 +2740,7 @@ export default do ->
       @sections_enabled = sections.length > 1
 
     setStudentGroups: (groupCategories) =>
-      @studentGroupCategories = _.indexBy(groupCategories.map(htmlEscape), 'id')
+      @studentGroupCategories = _.indexBy(groupCategories, 'id')
 
       studentGroupList = _.flatten(_.pluck(groupCategories, 'groups')).map(htmlEscape)
       @studentGroups = _.indexBy(studentGroupList, 'id')

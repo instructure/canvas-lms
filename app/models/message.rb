@@ -300,6 +300,28 @@ class Message < ActiveRecord::Base
     end
   end
 
+  # overwrite existing html_to_text so that messages with links can have the ids
+  # translated to be shard aware while preserving the link_root_account for the
+  # host.
+  def html_to_text(html, *opts)
+    super(transpose_url_ids(html), *opts)
+  end
+
+  # overwrite existing html_to_simple_html so that messages with links can have
+  # the ids translated to be shard aware while preserving the link_root_account
+  # for the host.
+  def html_to_simple_html(html, *opts)
+    super(transpose_url_ids(html), *opts)
+  end
+
+  def transpose_url_ids(html)
+    url_helper = Api::Html::UrlProxy.new(self, self.context,
+                                         HostUrl.context_host(self.context),
+                                         HostUrl.protocol,
+                                         target_shard: self.link_root_account.shard)
+    Api::Html::Content.rewrite_outgoing(html, self.link_root_account, url_helper)
+  end
+
   # infer a root account associated with the context that the user can log in to
   def link_root_account
     @root_account ||= begin
