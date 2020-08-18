@@ -129,6 +129,29 @@ describe PseudonymsController do
         expect(response).to be_redirect
         expect(assigns[:ccs]).not_to include(@cc)
       end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "finds a user through a trust on a different shard" do
+          a2 = nil
+          @shard1.activate do
+            a2 = Account.create!
+            @user = User.create!
+            pseudonym(@user, account: a2)
+            @cc.confirm!
+          end
+          allow(Account.default).to receive(:trusted_account_ids).and_return([a2.id])
+          allow(CommunicationChannel).to receive(:associated_shards).with(@pseudonym.unique_id).and_return([@shard1])
+
+          get 'forgot_password', params: {:pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}}
+          expect(response).to be_redirect
+          expect(assigns[:ccs]).to include(@cc)
+          expect(assigns[:ccs].detect{|cc| cc == @cc}.messages_sent).not_to be_nil
+          expect(assigns[:ccs].detect{|cc| cc == @cc}.messages_sent).not_to be_empty
+
+        end
+      end
     end
 
     it "should render confirm change password view for registered user's email" do

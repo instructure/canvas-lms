@@ -74,7 +74,14 @@ class PseudonymsController < ApplicationController
     email = params[:pseudonym_session][:unique_id_forgot] if params[:pseudonym_session]
     @ccs = []
     if email.present?
-      @ccs = CommunicationChannel.email.by_path(email).active.to_a
+      shards = Set.new
+      shards << Shard.current
+      associated_shards = CommunicationChannel.associated_shards(email)
+      @domain_root_account.trusted_account_ids.each do |account_id|
+        shard = Shard.shard_for(account_id)
+        shards << shard if associated_shards.include?(shard)
+      end
+      @ccs = CommunicationChannel.email.by_path(email).shard(shards.to_a).active.to_a
       if @domain_root_account
         @domain_root_account.pseudonyms.active.by_unique_id(email).each do |p|
           cc = p.communication_channel if p.communication_channel && p.user
@@ -83,13 +90,22 @@ class PseudonymsController < ApplicationController
         end
       end
     end
+
     @ccs = @ccs.flatten.compact.uniq.select do |cc|
       if !cc.user
         false
       else
         cc.pseudonym ||= cc.user.pseudonym rescue nil
         cc.save if cc.changed?
-        @domain_root_account.pseudonyms.active.where(user_id: cc.user_id).exists?
+        found = false
+        Shard.partition_by_shard([@domain_root_account.id] + @domain_root_account.trusted_account_ids) do |account_ids|
+          next unless cc.user.associated_shards.include?(Shard.current)
+          if Pseudonym.active.where(user_id: cc.user_id, account_id: account_ids).exists?
+            found = true
+            break
+          end
+        end
+        found
       end
     end
     respond_to do |format|
