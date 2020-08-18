@@ -178,6 +178,11 @@ module AuthenticationMethods
       if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.where(id: @policy_pseudonym_id).first
       elsif (@pseudonym_session = PseudonymSession.with_scope(find_options: Pseudonym.eager_load(:user)) { PseudonymSession.find })
+        if @pseudonym_session.errors.any?
+          @pseudonym_session.errors.full_messages.each do |msg|
+            logger.info "[AUTH] Validation Error: #{msg}"
+          end
+        end
         @current_pseudonym = @pseudonym_session.record
         @current_pseudonym.user.reload if @current_pseudonym.shard != @current_pseudonym.user.shard
 
@@ -192,7 +197,7 @@ module AuthenticationMethods
           (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
           session_refreshed_at < invalid_before
 
-          logger.info "Invalidating session: Session created before user logged out."
+          logger.info "[AUTH] Invalidating session: Session created before user logged out."
           destroy_session
           @current_pseudonym = nil
           if api_request? || request.format.json?
@@ -204,7 +209,7 @@ module AuthenticationMethods
            session[:cas_session] &&
            @current_pseudonym.cas_ticket_expired?(session[:cas_session])
 
-          logger.info "Invalidating session: CAS ticket expired - #{session[:cas_session]}."
+          logger.info "[AUTH] Invalidating session: CAS ticket expired - #{session[:cas_session]}."
           destroy_session
           @current_pseudonym = nil
 
@@ -222,8 +227,9 @@ module AuthenticationMethods
       @current_user = @current_pseudonym && @current_pseudonym.user
     end
 
+    logger.info "[AUTH] inital load: pseud -> #{@current_pseudonym&.id}, user -> #{@current_user&.id}"
     if @current_user && @current_user.unavailable?
-      logger.info "Invalid request: User is currently UNAVAILABLE"
+      logger.info "[AUTH] Invalid request: User is currently UNAVAILABLE"
       @current_pseudonym = nil
       @current_user = nil
     end
@@ -276,7 +282,7 @@ module AuthenticationMethods
         @current_user = user
         @real_current_pseudonym = @current_pseudonym
         @current_pseudonym = SisPseudonym.for(@current_user, @domain_root_account, type: :implicit, require_sis: false)
-        logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
+        logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       elsif api_request?
         # fail silently for UI, but not for API
         render :json => {:errors => "Invalid as_user_id"}, :status => :unauthorized
@@ -284,7 +290,7 @@ module AuthenticationMethods
       end
     end
 
-    logger.info "auth loaded user id: #{@current_user&.id}"
+    logger.info "[AUTH] final user: #{@current_user&.id}"
     @current_user
   end
   private :load_user

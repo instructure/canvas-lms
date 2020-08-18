@@ -38,4 +38,17 @@ class SamesiteTransitionCookieStore < ActionDispatch::Session::EncryptedCookieSt
     super(req)
     cookie_jar(req)[@key] || cookie_jar(req)[@legacy_key]
   end
+
+  # TODO: When we remove this samesite transition thing,
+  # we probably still want to keep this useful logging
+  # for diagnosing auth issues quickly.  Maybe rename the
+  # store something else and keep it, dropping the
+  # cookie accessor wrappers.
+  def unmarshal(data, options={})
+    unmarshalled_data = super(data, options)
+    if unmarshalled_data.nil? && data.present?
+      Rails.logger.warn("[AUTH] Cookie data (present) failed to unmarshal. Inactivity timeout or invalid digest.")
+    end
+    unmarshalled_data
+  end
 end
