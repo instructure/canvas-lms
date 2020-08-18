@@ -634,6 +634,26 @@ describe Message do
         expect(message).to eq "value hi"
       end
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it 'should use relative ids in links of message body' do
+        @shard2.activate do
+          @c = Course.create!(account: Account.create!)
+          @a = @c.assignments.create!
+          @announcement = @c.announcements.create!(message: "<p>added assignment</p>\r\n<p><a title=\"assa\" href=\"/courses/#{@c.id}/assignments/#{@a.id}\"title</a></p>", title: 'title')
+        end
+        @shard1.activate do
+          @shard1_account = Account.create!(name: 'new acct')
+          expect_any_instance_of(Message).to receive(:link_root_account).at_least(:once).and_return(@shard1_account)
+          message = generate_message('New Announcement', 'email', @announcement)
+          parts = message.body.split("/courses/").second.split("/assignments/")
+          expect(parts.first.split('~')).to eq [@shard2.id.to_s, @c.local_id.to_s]
+          expect(parts.last.split(')').first.split('~')).to eq [@shard2.id.to_s, @a.local_id.to_s]
+        end
+      end
+    end
   end
 
   describe "author interface" do
