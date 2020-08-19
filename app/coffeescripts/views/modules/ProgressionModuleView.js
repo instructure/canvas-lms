@@ -54,8 +54,11 @@ export default ProgressionModuleView = (function() {
       json.status_text = this.statuses[json.state]
       json[json.state] = true
 
-      for (const item of json.items) {
-        item.icon_class = this.iconClasses[item.type] || this.iconClasses.ModuleItem
+      json.show_items = json.state === 'started' && json.items
+      if (json.show_items) {
+        for (const item of json.items) {
+          item.icon_class = this.iconClasses[item.type] || this.iconClasses.ModuleItem
+        }
       }
       return json
     }
