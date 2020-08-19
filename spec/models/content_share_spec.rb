@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe ContentShare do
   describe 'record create' do
@@ -26,6 +26,37 @@ describe ContentShare do
       export = factory_with_protected_attributes(@course.content_exports, user: @user, export_type: 'common_cartridge')
       share = ContentShare.create!(content_export: export, name: "Share01", user: @user, read_state: 'unread', type: 'SentContentShare')
       expect(share.root_account_id).to eq(export.context.root_account_id)
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "works when sharing from a course on different shard" do
+        @shard1.activate do
+          acc = Account.create!
+          user_factory(:account => acc)
+        end
+        course_factory active_all: true
+        export = factory_with_protected_attributes(@course.content_exports, user: @user, export_type: 'common_cartridge')
+        share = @user.content_shares.create!(content_export: export, name: "Share01", read_state: 'unread', type: 'SentContentShare')
+        expect(share.root_account_id).to eq(@course.root_account_id)
+      end
+
+      it "works when sharing to a user on different shard" do
+        user_model
+        @sending_user = @user
+        course_factory active_all: true
+        export = factory_with_protected_attributes(@course.content_exports, user: @sending_user, export_type: 'common_cartridge')
+        share = @sending_user.content_shares.create!(content_export: export, name: "Share01", read_state: 'unread', type: 'SentContentShare')
+
+        @shard1.activate do
+          acc = Account.create!
+          user_factory(:account => acc)
+          @receiving_user = @user
+        end
+        received_share = share.clone_for(@receiving_user)
+        expect(received_share.root_account_id).to eq(@course.root_account_id)
+      end
     end
   end
 end
