@@ -282,7 +282,10 @@ class EnrollmentState < ActiveRecord::Base
     enrollments_for_account_ids(account_ids).find_ids_in_ranges(:batch_size => ENROLLMENT_BATCH_SIZE) do |min_id, max_id|
       scope = enrollments_for_account_ids(account_ids).where(:id => min_id..max_id)
       if invalidate_access(scope, states_to_update) > 0
-        EnrollmentState.send_later_if_production_enqueue_args(:process_account_states_in_ranges, {:priority => Delayed::LOW_PRIORITY}, min_id, max_id, account_ids)
+        EnrollmentState.send_later_if_production_enqueue_args(:process_account_states_in_ranges, {
+          priority: Delayed::LOW_PRIORITY,
+          n_strand: ['invalidate_access_for_accounts', Shard.current.id]
+        }, min_id, max_id, account_ids)
       end
     end
   end
