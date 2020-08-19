@@ -178,7 +178,8 @@ class RCEWrapper extends React.Component {
       })
     ),
     tinymce: PropTypes.object,
-    trayProps
+    trayProps,
+    instRecordDisabled: PropTypes.bool
   }
 
   static defaultProps = {
@@ -950,7 +951,7 @@ class RCEWrapper extends React.Component {
     const setupCallback = options.setup
 
     const canvasPlugins = ['instructure_links', 'instructure_image', 'instructure_documents']
-    if (!ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED) {
+    if (!this.props.instRecordDisabled) {
       canvasPlugins.splice(2, 0, 'instructure_record')
     }
 

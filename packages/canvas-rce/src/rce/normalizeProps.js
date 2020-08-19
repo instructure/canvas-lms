@@ -60,7 +60,7 @@ export default function(props, tinymce, MutationObserver) {
   // we provide our own statusbar
   editorOptions.statusbar = false
 
-  configureMenus(editorOptions)
+  configureMenus(editorOptions, props.instRecordDisabled)
 
   return {
     // other props, including overrides
@@ -73,13 +73,13 @@ export default function(props, tinymce, MutationObserver) {
   }
 }
 
-function configureMenus(editorOptions) {
+function configureMenus(editorOptions, instRecordDisabled) {
   const insertMenuItems = [
     ['instructure_links', 'instructure_image', 'instructure_document'],
     ['instructure_equation', 'inserttable'],
     ['hr']
   ]
-  if (!ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED) {
+  if (!instRecordDisabled) {
     insertMenuItems[0].splice(2, 0, 'instructure_media')
   }
 

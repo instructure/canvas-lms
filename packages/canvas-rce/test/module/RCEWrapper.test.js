@@ -872,4 +872,33 @@ describe('RCEWrapper', () => {
       assert.ok(alerts.length === 2)
     })
   })
+
+  describe('wrapOptions', () => {
+    it('includes instructure_record in toolbar if not instRecordDisabled', () => {
+      const wrapper = new RCEWrapper({
+        tinymce: fakeTinyMCE,
+        ...trayProps(),
+        instRecordDisabled: false
+      })
+      const options = wrapper.wrapOptions({})
+      const expected = [
+        'instructure_links',
+        'instructure_image',
+        'instructure_record',
+        'instructure_documents'
+      ]
+      assert.deepStrictEqual(options.toolbar[2].items, expected)
+    })
+
+    it('instructure_record in not toolbar if instRecordDisabled is set', () => {
+      const wrapper = new RCEWrapper({
+        tinymce: fakeTinyMCE,
+        ...trayProps(),
+        instRecordDisabled: true
+      })
+      const options = wrapper.wrapOptions({})
+      const expected = ['instructure_links', 'instructure_image', 'instructure_documents']
+      assert.deepStrictEqual(options.toolbar[2].items, expected)
+    })
+  })
 })

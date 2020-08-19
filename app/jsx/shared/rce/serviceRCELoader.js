@@ -248,7 +248,8 @@ const RCELoader = {
       textareaId: textarea.id,
       trayProps: getTrayProps(),
       languages,
-      autosave
+      autosave,
+      instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED
     }
   }
 }
