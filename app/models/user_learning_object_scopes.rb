@@ -249,7 +249,8 @@ module UserLearningObjectScopes
       ar_scope = ar_scope.joins(submission: :assignment).
         joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id
                AND assessor_asset.assignment_id = assignments.id").
-        where(assessor_id: id)
+        where(assessor_id: id).
+        where(assessor_asset: { course_id: shard_course_ids })
       ar_scope = ar_scope.incomplete unless scope_only
       ar_scope = ar_scope.for_courses(shard_course_ids)
 
