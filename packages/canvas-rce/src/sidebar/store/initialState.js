@@ -103,8 +103,21 @@ export default function(props = {}) {
   if (newPageLinkExpanded === undefined) {
     newPageLinkExpanded = false
   }
+  function getAccordionIndex() {
+    try {
+      return window.sessionStorage.getItem('canvas_rce_links_accordion_index')
+    } catch (err) {
+      // If there is an error accessing session storage, just ignore it.
+      // We are likely in a test environment
+      return undefined
+    }
+  }
+  const ui = {
+    selectedAccordionIndex: getAccordionIndex()
+  }
 
   return {
+    ui,
     source,
     jwt,
     host,

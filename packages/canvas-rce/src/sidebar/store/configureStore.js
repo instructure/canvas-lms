@@ -29,5 +29,20 @@ export default function(props, state) {
     applyMiddleware(thunkMiddleware, batch)
   )
 
+  // We want the links accordion tabs to be the same when the sidebar tray
+  // is opened and closed, so we persist the index of the open accordion
+  // to session storage.
+  store.subscribe(() => {
+    try {
+      const accordionIndex = store.getState().ui.selectedAccordionIndex
+      if (accordionIndex !== window.sessionStorage.canvas_rce_links_accordion_index) {
+        window.sessionStorage.canvas_rce_links_accordion_index = accordionIndex
+      }
+    } catch (err) {
+      // If there is an error accessing session storage, just ignore it.
+      // We are likely in a test environment
+    }
+  })
+
   return store
 }
