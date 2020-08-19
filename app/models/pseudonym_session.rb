@@ -107,4 +107,27 @@ class PseudonymSession < Authlogic::Session::Base
   def too_many_attempts?
     too_many_attempts == true
   end
+
+  # This block is pulled from Authlogic::Session::Base.find,
+  # which does all this same stuff but logs nothing making it hard
+  # to know why your user that was previously logged in is now not
+  # logged in.
+  def self.find_with_validation
+    self.with_scope(find_options: Pseudonym.eager_load(:user)) do
+      sess = self.new({ priority_record: nil }, nil)
+      if sess.nil?
+        Rails.logger.info "[AUTH] Failed to create pseudonym session"
+        return false
+      end
+      sess.priority_record = nil
+      if sess.persisting?
+        Rails.logger.info "[AUTH] Approved Authlogic session"
+        return sess
+      end
+      sess.errors.full_messages.each {|msg| Rails.logger.warn "[AUTH] Authlogic Validation Error: #{msg}" }
+      Rails.logger.warn "[AUTH] Authlogic Failed Find" if sess.attempted_record.nil?
+      # established AuthLogic behavior is to return false if the session is not valid
+      false
+    end
+  end
 end

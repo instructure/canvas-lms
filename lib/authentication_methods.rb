@@ -177,45 +177,43 @@ module AuthenticationMethods
     if !@current_pseudonym
       if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.where(id: @policy_pseudonym_id).first
-      elsif (@pseudonym_session = PseudonymSession.with_scope(find_options: Pseudonym.eager_load(:user)) { PseudonymSession.find })
-        if @pseudonym_session.errors.any?
-          @pseudonym_session.errors.full_messages.each do |msg|
-            logger.info "[AUTH] Validation Error: #{msg}"
+      else
+        @pseudonym_session = PseudonymSession.find_with_validation
+        if @pseudonym_session
+          @current_pseudonym = @pseudonym_session.record
+          @current_pseudonym.user.reload if @current_pseudonym.shard != @current_pseudonym.user.shard
+
+          # if the session was created before the last time the user explicitly
+          # logged out (of any session for any of their pseudonyms), invalidate
+          # this session
+          invalid_before = @current_pseudonym.user.last_logged_out
+          # they logged out in the future?!? something's busted; just ignore it -
+          # either my clock is off or whoever set this value's clock is off
+          invalid_before = nil if invalid_before && invalid_before > Time.now.utc
+          if invalid_before &&
+            (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
+            session_refreshed_at < invalid_before
+
+            logger.info "[AUTH] Invalidating session: Session created before user logged out."
+            destroy_session
+            @current_pseudonym = nil
+            if api_request? || request.format.json?
+              raise LoggedOutError
+            end
           end
-        end
-        @current_pseudonym = @pseudonym_session.record
-        @current_pseudonym.user.reload if @current_pseudonym.shard != @current_pseudonym.user.shard
 
-        # if the session was created before the last time the user explicitly
-        # logged out (of any session for any of their pseudonyms), invalidate
-        # this session
-        invalid_before = @current_pseudonym.user.last_logged_out
-        # they logged out in the future?!? something's busted; just ignore it -
-        # either my clock is off or whoever set this value's clock is off
-        invalid_before = nil if invalid_before && invalid_before > Time.now.utc
-        if invalid_before &&
-          (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
-          session_refreshed_at < invalid_before
+          if @current_pseudonym &&
+            session[:cas_session] &&
+            @current_pseudonym.cas_ticket_expired?(session[:cas_session])
 
-          logger.info "[AUTH] Invalidating session: Session created before user logged out."
-          destroy_session
-          @current_pseudonym = nil
-          if api_request? || request.format.json?
-            raise LoggedOutError
+            logger.info "[AUTH] Invalidating session: CAS ticket expired - #{session[:cas_session]}."
+            destroy_session
+            @current_pseudonym = nil
+
+            raise LoggedOutError if api_request? || request.format.json?
+
+            redirect_to_login
           end
-        end
-
-        if @current_pseudonym &&
-           session[:cas_session] &&
-           @current_pseudonym.cas_ticket_expired?(session[:cas_session])
-
-          logger.info "[AUTH] Invalidating session: CAS ticket expired - #{session[:cas_session]}."
-          destroy_session
-          @current_pseudonym = nil
-
-          raise LoggedOutError if api_request? || request.format.json?
-
-          redirect_to_login
         end
       end
 
