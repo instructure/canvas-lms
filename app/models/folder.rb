@@ -263,6 +263,9 @@ class Folder < ActiveRecord::Base
     self.attributes.delete_if{|k,v| [:id, :full_name, :parent_folder_id].include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
     end
+    if self.unique_type && context.folders.active.where(:unique_type => self.unique_type).exists?
+      dup.unique_type = nil # we'll just copy the folder as a normal one and leave the existing unique_type'd one alone
+    end
     dup.context = context
     if options[:include_subcontent] != false
       dup.save!

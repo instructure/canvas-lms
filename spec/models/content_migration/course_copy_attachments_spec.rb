@@ -70,6 +70,27 @@ describe ContentMigration do
       end
     end
 
+    it "should still copy content in unique_type folders with a name mismatch" do
+      root = Folder.root_folders(@copy_from).first
+      f1 = root.sub_folders.create!(:name => "Uploaded Media", :context => @copy_from)
+      f2 = Folder.media_folder(@copy_from)
+      expect(f2.name).to eq "Uploaded Media 2"
+      f1_to = Folder.media_folder(@copy_to) # now create a regularly named media folder
+
+      att1 = Attachment.create!(:filename => 'dummy1.txt', :uploaded_data => StringIO.new('fakety'), :folder => f1, :context => @copy_from)
+      att2 = Attachment.create!(:filename => 'dummy2.txt', :uploaded_data => StringIO.new('fakety'), :folder => f2, :context => @copy_from)
+
+      run_course_copy
+
+      f2_to = @copy_to.folders.where(:name => f2.name).first
+      expect(f2_to.unique_type).to be_nil # because it's already taken by f1_to
+
+      att1_to = @copy_to.attachments.where(migration_id: mig_id(att1)).first
+      att2_to = @copy_to.attachments.where(migration_id: mig_id(att2)).first
+      expect(att1_to.folder).to eq f1_to
+      expect(att2_to.folder).to eq f2_to
+    end
+
     it "should add a warning instead of failing when trying to copy an invalid file" do
       att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       Attachment.where(:id => att).update_all(:filename => nil)
