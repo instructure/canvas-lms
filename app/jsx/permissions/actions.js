@@ -29,6 +29,8 @@ const types = [
   'ADD_TRAY_SAVING_FAIL',
   'ADD_TRAY_SAVING_START',
   'ADD_TRAY_SAVING_SUCCESS',
+  'API_COMPLETE',
+  'API_PENDING',
   'CLEAN_FOCUS',
   'DISPLAY_ADD_TRAY',
   'DISPLAY_PERMISSION_TRAY',
@@ -158,15 +160,18 @@ actions.modifyPermissions = function modifyPermissions({
 }) {
   return (dispatch, getState) => {
     const role = getState().roles.find(r => r.id === id)
+    dispatch(actions.apiPending({id, name}))
     apiClient
       .updateRole(getState().contextId, id, {permissions: {[name]: {enabled, locked, explicit}}})
       .then(res => {
         const newRes = {...res.data, contextType: role.contextType, displayed: role.displayed}
         dispatch(actions.updatePermissions({role: newRes}))
         dispatch(actions.fixButtonFocus({permissionName: name, roleId: id, inTray}))
+        dispatch(actions.apiComplete({id, name}))
       })
       .catch(_error => {
         setTimeout(() => showFlashError(I18n.t('Failed to update permission'))(), 500)
+        dispatch(actions.apiComplete({id, name}))
       })
   }
 }

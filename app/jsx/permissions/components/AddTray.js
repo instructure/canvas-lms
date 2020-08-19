@@ -35,7 +35,7 @@ import {Tray} from '@instructure/ui-overlays'
 export default class AddTray extends Component {
   static propTypes = {
     allBaseRoles: PropTypes.arrayOf(PropTypes.object).isRequired,
-    allLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
+    allLabels: PropTypes.arrayOf(PropTypes.string),
     hideTray: PropTypes.func.isRequired,
     createNewRole: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
@@ -52,7 +52,7 @@ export default class AddTray extends Component {
     }
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (!this.props.loading) {
       this.setState({
         selectedRoleName: '',
