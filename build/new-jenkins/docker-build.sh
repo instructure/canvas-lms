@@ -20,7 +20,7 @@ if [[ "${SKIP_CACHE:-false}" = "false" ]]; then
 fi
 
 # shellcheck disable=SC2086
-DOCKER_BUILDKIT=1 docker build \
+DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
   --pull \
   ${dependencyArgs[@]} \
   --tag "$DEPENDENCIES_PATCHSET_IMAGE" \
@@ -28,7 +28,7 @@ DOCKER_BUILDKIT=1 docker build \
   "$WORKSPACE"
 
 # shellcheck disable=SC2086
-DOCKER_BUILDKIT=1 docker build \
+DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
   ${dependencyArgs[@]} \
   --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" \
   --tag "$PATCHSET_TAG" \
