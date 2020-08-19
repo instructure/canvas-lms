@@ -163,6 +163,19 @@ module GroupCategories
       end
     end
 
+    describe '#create_group_member_count' do
+      it 'is nil if the option to split by member count was not selected' do
+        params = build_params(split_groups: '1', create_group_member_count: '5')
+        expect(params.create_group_member_count).to be_nil
+      end
+
+      it 'passes on the parameter value' do
+        params = build_params(split_groups: '2', create_group_member_count: '5')
+        expect(params.create_group_member_count).to eq 5
+      end
+
+    end
+
     describe '#assign_unassigned_members' do
       it 'is false if self signup is on' do
         params = build_params(enable_self_signup: true)

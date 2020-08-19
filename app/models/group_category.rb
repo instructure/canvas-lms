@@ -18,6 +18,7 @@
 
 class GroupCategory < ActiveRecord::Base
   attr_reader :create_group_count
+  attr_reader :create_group_member_count
   attr_accessor :assign_unassigned_members, :group_by_section
 
   belongs_to :context, polymorphic: [:course, :account]
@@ -404,6 +405,10 @@ class GroupCategory < ActiveRecord::Base
       nil
   end
 
+  def create_group_member_count=(num)
+    @create_group_member_count = num && num > 0 ? num : nil
+  end
+
   def set_root_account_id
     # context might be nil since this runs before validations.
     if self.context&.root_account
@@ -413,6 +418,16 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def auto_create_groups
+    split_type = if @create_group_member_count
+      'by_membership_count'
+    elsif @create_group_count
+      'by_group_count'
+    end
+
+    InstStatsd::Statsd.increment('groups.auto_create',
+     tags: {split_type: split_type, root_account_id: self.root_account_id})
+
+    calculate_group_count_by_membership if @create_group_member_count
     create_groups(@create_group_count) if @create_group_count
     if @assign_unassigned_members && @create_group_count
       by_section = @group_by_section && self.context.is_a?(Course)
@@ -428,6 +443,10 @@ class GroupCategory < ActiveRecord::Base
     num.times do |idx|
       groups.create(name: "#{group_name} #{idx + 1}", :context => context)
     end
+  end
+
+  def calculate_group_count_by_membership
+    @create_group_count = (unassigned_users.to_a.length.to_f / @create_group_member_count).ceil
   end
 
   def unassigned_users

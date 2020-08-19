@@ -51,10 +51,19 @@ QUnit.skip('toggling auto group leader enables and disables accompanying control
 })
 
 test('auto group leader controls are hidden if we arent splitting groups automatically', () => {
+  // Split by number of groups
   view.$autoGroupSplitControl.prop('checked', true)
   view.$autoGroupSplitControl.trigger('click')
   ok(view.$autoGroupLeaderControls.is(':visible'))
   view.$autoGroupSplitControl.prop('checked', false)
   view.$autoGroupSplitControl.trigger('click')
+  ok(view.$autoGroupLeaderControls.is(':hidden'))
+
+  // Split by number of members in a group
+  view.$autoGroupSplitByMemberControl.prop('checked', true)
+  view.$autoGroupSplitByMemberControl.trigger('click')
+  ok(view.$autoGroupLeaderControls.is(':visible'))
+  view.$autoGroupSplitByMemberControl.prop('checked', false)
+  view.$autoGroupSplitByMemberControl.trigger('click')
   ok(view.$autoGroupLeaderControls.is(':hidden'))
 })

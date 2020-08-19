@@ -44,12 +44,27 @@ module GroupCategories
     def create_group_count
       return _create_group_count if self_signup
       return nil unless split_group_enabled?
+      return nil if split_by_member_count_enabled?
       split_group_count
+    end
+
+    def create_group_member_count
+      return nil if self_signup || split_by_group_count_enabled?
+      return nil unless split_group_enabled?
+      raw_params[:create_group_member_count].to_i
     end
 
     def assign_unassigned_members
       return false if self_signup
-      split_group_enabled? && create_group_count && create_group_count > 0
+      return false unless split_group_enabled?
+
+      if create_group_count
+        create_group_count > 0
+      elsif create_group_member_count
+        create_group_member_count > 0
+      else
+        false
+      end
     end
 
     def group_by_section
@@ -68,6 +83,14 @@ module GroupCategories
 
     def split_group_enabled?
       raw_params[:split_groups] != '0'
+    end
+
+    def split_by_group_count_enabled?
+      raw_params[:split_groups] == '1'
+    end
+
+    def split_by_member_count_enabled?
+      raw_params[:split_groups] == '2'
     end
 
     def split_group_count
