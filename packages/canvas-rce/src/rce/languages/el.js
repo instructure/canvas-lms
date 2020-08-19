@@ -1,21 +1,3 @@
-/*
- * Copyright (C) 2018 - present Instructure, Inc.
- *
- * This file is part of Canvas.
- *
- * Canvas is free software: you can redistribute it and/or modify it under
- * the terms of the GNU Affero General Public License as published by the Free
- * Software Foundation, version 3 of the License.
- *
- * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Affero General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 tinymce.addI18n('el', {
   Redo: '\u0395\u03c0\u03b1\u03bd\u03ac\u03bb\u03b7\u03c8\u03b7',
   Undo: '\u0391\u03bd\u03b1\u03af\u03c1\u03b5\u03c3\u03b7',
@@ -375,7 +357,7 @@ tinymce.addI18n('el', {
   Table: '\u03a0\u03af\u03bd\u03b1\u03ba\u03b1\u03c2',
   Tools: '\u0395\u03c1\u03b3\u03b1\u03bb\u03b5\u03af\u03b1',
   'Powered by {0}':
-    '\u03a4\u03c1\u03bf\u03c6\u03bf\u03b4\u03bf\u03c4\u03b5\u03af\u03c4\u03b1\u03b9 \u03b1\u03c0\u03cc',
+    '\u03a4\u03c1\u03bf\u03c6\u03bf\u03b4\u03bf\u03c4\u03b5\u03af\u03c4\u03b1\u03b9 \u03b1\u03c0\u03cc {0}',
   'Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press ALT-0 for help':
     '\u03a0\u03b5\u03c1\u03b9\u03bf\u03c7\u03ae \u0395\u03bc\u03c0\u03bb\u03bf\u03c5\u03c4\u03b9\u03c3\u03bc\u03ad\u03bd\u03bf \u039a\u03b5\u03b9\u03bc\u03ad\u03bd\u03bf\u03c5. \u03a0\u03b1\u03c4\u03ae\u03c3\u03c4\u03b5 ALT-F9 \u03b3\u03b9\u03b1 \u03c4\u03bf \u03bc\u03b5\u03bd\u03bf\u03cd. \u03a0\u03b1\u03c4\u03ae\u03c3\u03c4\u03b5 ALT-F10 \u03b3\u03b9\u03b1  \u03c4\u03b7 \u03b3\u03c1\u03b1\u03bc\u03bc\u03ae \u03b5\u03c1\u03b3\u03b1\u03bb\u03b5\u03af\u03c9\u03bd. \u03a0\u03b1\u03c4\u03ae\u03c3\u03c4\u03b5 ALT-0 \u03b3\u03b9\u03b1 \u03b2\u03bf\u03ae\u03b8\u03b5\u03b9\u03b1'
 })

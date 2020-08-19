@@ -18,6 +18,7 @@
 
 import ar from '@instructure/translations/lib/canvas-rce/ar.json'
 import bg from '@instructure/translations/lib/canvas-rce/bg.json'
+import ca from '@instructure/translations/lib/canvas-rce/ca.json'
 import cs from '@instructure/translations/lib/canvas-rce/cs.json'
 import cy from '@instructure/translations/lib/canvas-rce/cy.json'
 import da from '@instructure/translations/lib/canvas-rce/da.json'
@@ -65,6 +66,7 @@ import zh_HK from '@instructure/translations/lib/canvas-rce/zh_HK.json'
 export default {
   ar,
   bg,
+  ca,
   cs,
   cy,
   da,

@@ -48,6 +48,7 @@ const mapping = {
 const recognized = [
   'ar',
   'bg',
+  'ca',
   'cs',
   'cy',
   'da',
