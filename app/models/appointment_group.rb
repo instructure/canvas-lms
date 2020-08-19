@@ -399,6 +399,7 @@ class AppointmentGroup < ActiveRecord::Base
     ]
 
     if @contexts_changed
+      changed[:root_account_id] = self.context&.root_account_id
       changed[:effective_context_code] = contexts.map(&:asset_string).join(",")
     end
 
