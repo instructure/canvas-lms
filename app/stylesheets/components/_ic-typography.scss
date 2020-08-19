@@ -320,12 +320,6 @@ input[type=radio] + label {
   }
 }
 
-// all the browsers render this differently, remove line-height so the text doesn't
-// get ridiculously misaligned.
-input[type=file] {
-  line-height: 1em;
-}
-
 ///////==============
 /// Table Settings
 ///////==============
