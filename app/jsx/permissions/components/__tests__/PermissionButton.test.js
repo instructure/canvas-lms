@@ -43,7 +43,8 @@ function buildProps({
     roleId: '1',
     roleLabel: ROLE_LABEL,
     fixButtonFocus: noop,
-    handleClick: noop
+    handleClick: noop,
+    apiBusy: false
   }
 }
 
@@ -52,32 +53,39 @@ describe('permissions::PermissionButton', () => {
     const check = div.querySelector('svg[name="IconPublish"]')
     const x = div.querySelector('svg[name="IconTrouble"]')
     const oval = div.querySelector('svg[name="IconOvalHalf"]')
-    const hideLock = div.querySelector('.ic-hidden-button')
+    const locked = div.querySelector('svg[name="IconLock"]')
 
-    return {check, x, oval, hideLock}
+    return {check, x, oval, locked}
   }
 
+  it('displays a spinner whilst the API is in flight', () => {
+    const {getByText} = render(<PermissionButton {...buildProps({})} apiBusy />)
+
+    expect(getByText('Waiting for request to complete')).toBeInTheDocument()
+  })
+
   it('displays the enabled state', () => {
-    const {container, getByText} = render(<PermissionButton {...buildProps({})} />)
-    const {check, x, oval, hideLock} = getThings(container)
+    const {container, getByText, queryByText} = render(<PermissionButton {...buildProps({})} />)
+    const {check, x, oval, locked} = getThings(container)
 
     expect(check).not.toBeNull()
     expect(x).toBeNull()
     expect(oval).toBeNull()
-    expect(hideLock).not.toBeNull()
+    expect(locked).toBeNull()
     expect(getByText(`Enabled ${PERM_LABEL} ${ROLE_LABEL}`)).toBeInTheDocument()
+    expect(queryByText('Waiting for request to complete')).toBeNull()
   })
 
   it('displays the disabled state', () => {
     const {container, getByText} = render(
       <PermissionButton {...buildProps({enabled: ENABLED_FOR_NONE})} />
     )
-    const {check, x, oval, hideLock} = getThings(container)
+    const {check, x, oval, locked} = getThings(container)
 
     expect(check).toBeNull()
     expect(x).not.toBeNull()
     expect(oval).toBeNull()
-    expect(hideLock).not.toBeNull()
+    expect(locked).toBeNull()
     expect(getByText(`Disabled ${PERM_LABEL} ${ROLE_LABEL}`)).toBeInTheDocument()
   })
 
@@ -85,23 +93,23 @@ describe('permissions::PermissionButton', () => {
     const {container, getByText} = render(
       <PermissionButton {...buildProps({enabled: ENABLED_FOR_PARTIAL})} />
     )
-    const {check, x, oval, hideLock} = getThings(container)
+    const {check, x, oval, locked} = getThings(container)
 
     expect(check).toBeNull()
     expect(x).toBeNull()
     expect(oval).not.toBeNull()
-    expect(hideLock).not.toBeNull()
+    expect(locked).toBeNull()
     expect(getByText(`Partially enabled ${PERM_LABEL} ${ROLE_LABEL}`)).toBeInTheDocument()
   })
 
   it('displays enabled and locked', () => {
     const {container, getByText} = render(<PermissionButton {...buildProps({locked: true})} />)
-    const {check, x, oval, hideLock} = getThings(container)
+    const {check, x, oval, locked} = getThings(container)
 
     expect(check).not.toBeNull()
     expect(x).toBeNull()
     expect(oval).toBeNull()
-    expect(hideLock).toBeNull()
+    expect(locked).not.toBeNull()
     expect(getByText(`Enabled and Locked ${PERM_LABEL} ${ROLE_LABEL}`)).toBeInTheDocument()
   })
 
@@ -109,12 +117,12 @@ describe('permissions::PermissionButton', () => {
     const {container, getByText} = render(
       <PermissionButton {...buildProps({enabled: ENABLED_FOR_NONE, locked: true})} />
     )
-    const {check, x, oval, hideLock} = getThings(container)
+    const {check, x, oval, locked} = getThings(container)
 
     expect(check).toBeNull()
     expect(x).not.toBeNull()
     expect(oval).toBeNull()
-    expect(hideLock).toBeNull()
+    expect(locked).not.toBeNull()
     expect(getByText(`Disabled and Locked ${PERM_LABEL} ${ROLE_LABEL}`)).toBeInTheDocument()
   })
 
@@ -122,12 +130,12 @@ describe('permissions::PermissionButton', () => {
     const {container, getByText} = render(
       <PermissionButton {...buildProps({enabled: ENABLED_FOR_PARTIAL, locked: true})} />
     )
-    const {check, x, oval, hideLock} = getThings(container)
+    const {check, x, oval, locked} = getThings(container)
 
     expect(check).toBeNull()
     expect(x).toBeNull()
     expect(oval).not.toBeNull()
-    expect(hideLock).toBeNull()
+    expect(locked).not.toBeNull()
     expect(
       getByText(`Partially enabled and Locked ${PERM_LABEL} ${ROLE_LABEL}`)
     ).toBeInTheDocument()

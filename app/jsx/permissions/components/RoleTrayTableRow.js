@@ -22,11 +22,10 @@ import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {View, Flex} from '@instructure/ui-layout'
 import {IconArrowOpenStartSolid} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {ConnectedGranularCheckbox} from './GranularCheckbox'
 import {ConnectedPermissionButton} from './PermissionButton'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Checkbox} from '@instructure/ui-checkbox'
-import permissionPropTypes, {ENABLED_FOR_NONE} from '../propTypes'
+import permissionPropTypes from '../propTypes'
 
 // TODO Pass in props needed to actually generate the button sara is working on
 // TODO add expandable-ness to this. Will probably need to make this not a
@@ -38,35 +37,27 @@ export default function RoleTrayTableRow({
   permission,
   permissionName,
   permissionLabel,
-  onChange,
   role,
-  permButton: PermButton
+  permButton: PermButton,
+  permCheckbox: PermCheckbox
 }) {
   const isGranular = typeof permission.group !== 'undefined'
   let button
 
-  function toggle() {
-    const id = role.id
-    const enabled = !permission.enabled
-    const name = permissionName
-
-    onChange({enabled, explicit: true, id, name})
-  }
-
   if (isGranular) {
     button = (
-      <Checkbox
-        checked={permission.enabled !== ENABLED_FOR_NONE}
-        disabled={permission.readonly}
-        label={<ScreenReaderContent>{permissionLabel}</ScreenReaderContent>}
-        value={permissionName}
-        onChange={toggle}
+      <PermCheckbox
+        permission={role.permissions[permissionName]}
+        permissionName={permissionName}
+        permissionLabel={permissionLabel}
+        roleId={role.id}
+        roleLabel={role.label}
       />
     )
   } else {
     button = (
       <PermButton
-        permission={permission}
+        permission={role.permissions[permissionName]}
         permissionName={permissionName}
         permissionLabel={permissionLabel}
         roleId={role.id}
@@ -119,14 +110,14 @@ RoleTrayTableRow.propTypes = {
   permissionName: string.isRequired,
   permissionLabel: string.isRequired,
   role: permissionPropTypes.role.isRequired,
-  onChange: func,
   title: string.isRequired,
-  permButton: oneOfType([node, func]) // used for tests only
+  permButton: oneOfType([node, func]), // used for tests only
+  permCheckbox: oneOfType([node, func]) // used for tests only
 }
 
 RoleTrayTableRow.defaultProps = {
   description: '',
-  onChange: Function.prototype,
   expandable: false,
-  permButton: ConnectedPermissionButton
+  permButton: ConnectedPermissionButton,
+  permCheckbox: ConnectedGranularCheckbox
 }
