@@ -569,7 +569,9 @@ class ContentMigrationsController < ApplicationController
         end
 
         if !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
-          @content_migration.queue_migration(@plugin)
+          @content_migration.shard.activate do
+            @content_migration.queue_migration(@plugin)
+          end
         end
       end
 
