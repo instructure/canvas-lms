@@ -330,6 +330,18 @@ describe CalendarEvent do
       appointment = CalendarEvent.create!(title: 'test', context: section)
       expect(appointment.root_account_id).to eq section.root_account_id
     end
+
+    it 'should set the root_account when assignment_group is not yet assigned to a course context' do
+      course = Course.create!
+      ag = AppointmentGroup.create(
+        :title => "test",
+        :contexts => [course],
+        :new_appointments => {
+            appt01: [Time.zone.now, Time.zone.now]
+        }
+      )
+      expect(ag.appointments[0].root_account_id).to eq course.root_account_id
+    end
   end
 
   context "for_user_and_context_codes" do
