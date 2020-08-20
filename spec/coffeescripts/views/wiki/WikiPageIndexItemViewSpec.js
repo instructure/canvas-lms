@@ -31,7 +31,11 @@ QUnit.module('WikiPageIndexItemView', {
 
 test('model.view maintained by item view', () => {
   const model = new WikiPage()
-  const view = new WikiPageIndexItemView({model, collectionHasTodoDate: () => {}})
+  const view = new WikiPageIndexItemView({
+    model,
+    collectionHasTodoDate: () => {},
+    selectedPages: {}
+  })
   strictEqual(model.view, view, 'model.view is set to the item view')
   view.render()
   strictEqual(model.view, view, 'model.view is set to the item view')
@@ -39,7 +43,11 @@ test('model.view maintained by item view', () => {
 
 test('detach/reattach the publish icon view', () => {
   const model = new WikiPage()
-  const view = new WikiPageIndexItemView({model, collectionHasTodoDate: () => {}})
+  const view = new WikiPageIndexItemView({
+    model,
+    collectionHasTodoDate: () => {},
+    selectedPages: {}
+  })
   view.render()
   const $previousEl = view.$el.find('> *:first-child')
   view.publishIconView.$el.data('test-data', 'test-is-good')
@@ -57,7 +65,11 @@ test('delegate useAsFrontPage to the model', () => {
     front_page: false,
     published: true
   })
-  const view = new WikiPageIndexItemView({model, collectionHasTodoDate: () => {}})
+  const view = new WikiPageIndexItemView({
+    model,
+    collectionHasTodoDate: () => {},
+    selectedPages: {}
+  })
   const stub = sandbox.stub(model, 'setFrontPage')
   view.useAsFrontPage()
   ok(stub.calledOnce)
@@ -67,6 +79,7 @@ test('only shows direct share menu items if enabled', () => {
   const view = new WikiPageIndexItemView({
     model: new WikiPage(),
     collectionHasTodoDate: () => {},
+    selectedPages: {},
     WIKI_RIGHTS: {read: true, manage: true, update: true},
     CAN: {MANAGE: true}
   })
@@ -89,7 +102,8 @@ const testRights = (subject, options) =>
       model,
       contextName: options.contextName,
       WIKI_RIGHTS: options.WIKI_RIGHTS,
-      collectionHasTodoDate: () => {}
+      collectionHasTodoDate: () => {},
+      selectedPages: {}
     })
     const json = view.toJSON()
     for (const key in options.CAN) {
@@ -195,7 +209,23 @@ testRights('CAN (update page)', {
 
 test('includes bulk_delete_pages feature flag', () => {
   const model = new WikiPage()
-  const view = new WikiPageIndexItemView({model, collectionHasTodoDate: () => {}})
+  const view = new WikiPageIndexItemView({
+    model,
+    collectionHasTodoDate: () => {},
+    selectedPages: {}
+  })
   ENV.FEATURES = {bulk_delete_pages: true}
   strictEqual(view.toJSON().BULK_DELETE_ENABLED, true)
+})
+
+test('includes is_checked', () => {
+  const model = new WikiPage({
+    page_id: '42'
+  })
+  const view = new WikiPageIndexItemView({
+    model,
+    collectionHasTodoDate: () => {},
+    selectedPages: {'42': model}
+  })
+  strictEqual(view.toJSON().isChecked, true)
 })

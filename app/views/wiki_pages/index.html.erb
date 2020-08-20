@@ -19,6 +19,6 @@
 <%
   provide :page_title, join_title(@context.name, t('titles.pages', 'Pages'))
   provide :right_side, render(:partial => "shared/wiki_sidebar")
-  css_bundle :tinymce
+  css_bundle :wiki_page, :tinymce
   js_bundle :wiki_page_index
 %>

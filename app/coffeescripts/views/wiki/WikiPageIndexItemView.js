@@ -53,6 +53,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     this.optionProperty('collection')
     this.optionProperty('WIKI_RIGHTS')
     this.optionProperty('contextName')
+    this.optionProperty('selectedPages')
     this.optionProperty('collectionHasTodoDate')
   }
 
@@ -89,6 +90,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     json.wiki_page_menu_tools.forEach(tool => {
       return (tool.url = tool.base_url + `&pages[]=${this.model.get('page_id')}`)
     })
+    json.isChecked = this.selectedPages.hasOwnProperty(this.model.get('page_id'))
     json.collectionHasTodoDate = this.collectionHasTodoDate()
     return json
   }
@@ -103,6 +105,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     }
 
     super.render(...arguments)
+    this.changeSelectPageCheckbox()
 
     // attach/re-attach the icons
     if (!this.publishIconView) {
@@ -193,7 +196,11 @@ export default class WikiPageIndexItemView extends Backbone.View {
     const deleteDialog = new WikiPageDeleteDialog({
       model: this.model,
       focusOnCancel: $curCog,
-      focusOnDelete: $focusOnDelete
+      onDelete: () => {
+        $focusOnDelete.focus()
+        delete this.selectedPages[this.model.id]
+        this.changeSelectPageCheckbox()
+      }
     })
     return deleteDialog.open()
   }
@@ -265,6 +272,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
         const cogs = $('.collectionViewItems').find('.al-trigger')
         $(cogs[curIndex]).focus()
       }
+      delete this.selectedPages[this.model.id]
       this.changeSelectPageCheckbox()
     })
   }
@@ -280,9 +288,17 @@ export default class WikiPageIndexItemView extends Backbone.View {
   }
 
   changeSelectPageCheckbox(ev) {
-    ev?.preventDefault()
-    const selected = $('.select-page-checkbox:checked').length
-    $('.delete_pages').attr('disabled', selected === 0)
+    if (ev) {
+      ev.preventDefault()
+      const {checked} = ev.target
+      const pageId = this.model.get('page_id')
+      if (checked) {
+        this.selectedPages[pageId] = this.model
+      } else {
+        delete this.selectedPages[pageId]
+      }
+    }
+    $('.delete_pages').attr('disabled', Object.keys(this.selectedPages).length === 0)
   }
 }
 WikiPageIndexItemView.initClass()
