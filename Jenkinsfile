@@ -208,7 +208,7 @@ pipeline {
                 buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
                 buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
                 buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
-                if (env.CANVAS_LMS_REFSPEC) {
+                if (currentBuild.projectName.contains("main-from-plugin")) {
                   // the plugin builds require the canvas lms refspec to be different. so only
                   // set this refspec if the main build is requesting it to be set.
                   // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
