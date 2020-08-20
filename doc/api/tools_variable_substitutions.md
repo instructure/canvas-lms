@@ -44,7 +44,7 @@ For more information on variable substitution, see the <a href="https://www.imsg
 Variable substitutions can be configured for a tool in 3 ways:
 
 ## Via UI
-Custom fields can be <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140">configured via UI</a> by editing the tool configuration and adding the
+Custom fields can be <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-a-manual-entry-external-app-for-an-account/ta-p/219">configured via UI</a> by editing the tool configuration and adding the
 desired variable to the Custom Fields text box.
 
 The following would add the domain as a launch parameter called custom_arbitrary_name:
