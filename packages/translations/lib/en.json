@@ -1072,6 +1072,9 @@
   "tomorrow_at_date_b53f2cf1": {
     "message": "Tomorrow at { date }"
   },
+  "tools_2fcf772e": {
+    "message": "Tools"
+  },
   "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
     "message": "{ totalResults } results found, { numDisplayed } results currently displayed"
   },

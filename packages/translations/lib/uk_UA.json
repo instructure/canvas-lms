@@ -652,41 +652,5 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "Завтра в { date }"
-    },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "Неможливо позначити як завершений."
-    },
-    "unpublished_dfd8801": {
-        "message": "Неопублікований"
-    },
-    "upload_media_ce31135a": {
-        "message": "Завантажити медіа контент"
-    },
-    "url_22a5f3b8": {
-        "message": "URL"
-    },
-    "video_player_b371005": {
-        "message": "Відеопрогравач"
-    },
-    "wiki_home_9cd54d0": {
-        "message": "Домашня сторінка Wiki"
-    },
-    "yes_dde87d5": {
-        "message": "Так"
-    },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "Вчора в { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Вчора"
-    },
-    "you_have_media_feedback_f5f9aba8": {
-        "message": "Ви маєте відгук у вигляді медіа файлу."
-    },
-    "you_must_provide_a_date_and_time_a86839d2": {
-        "message": "Ви маєте задати дату та час."
-    },
-    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-        "message": "Ви прокрутили назад до самого першого завдання!"
     }
 }
