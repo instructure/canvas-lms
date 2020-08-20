@@ -97,7 +97,7 @@ class ContentExport < ActiveRecord::Base
     can :create
 
     # users can read exports that are shared with them
-    given { |user| ContentShare.where(user: user, content_export: self).exists? }
+    given { |user| user && user.content_shares.where(content_export: self).exists? }
     can :read
   end
 
