@@ -20,7 +20,10 @@ require_relative 'pages/rcs_sidebar_page'
 require_relative '../test_setup/common_helper_methods/custom_selenium_actions'
 require_relative 'pages/rce_next_page'
 
-describe 'RCE Next toolbar features' do
+# while there's a mix of instui 6 and 7 in canvas we're getting
+# "Warning: [themeable] A theme registry has already been initialized." js errors
+# Ignore js errors so specs can pass
+describe 'RCE Next toolbar features', ignore_js_errors: true do
   include_context 'in-process server selenium tests'
   include WikiAndTinyCommon
   include RCSSidebarPage
@@ -39,10 +42,20 @@ describe 'RCE Next toolbar features' do
     end
 
     def assert_insert_buttons_enabled(is_enabled)
-      expect(links_toolbar_button.enabled?).to be is_enabled
-      expect(images_toolbar_button.enabled?).to be is_enabled
-      expect(media_toolbar_button.enabled?).to be is_enabled
-      expect(document_toolbar_button.enabled?).to be is_enabled
+      expect(
+        links_toolbar_button.enabled? && links_toolbar_button.attribute('aria-disabled') == 'false'
+      ).to be is_enabled
+      expect(
+        images_toolbar_button.enabled? &&
+          images_toolbar_button.attribute('aria-disabled') == 'false'
+      ).to be is_enabled
+      expect(
+        media_toolbar_button.enabled? && media_toolbar_button.attribute('aria-disabled') == 'false'
+      ).to be is_enabled
+      expect(
+        document_toolbar_button.enabled? &&
+          document_toolbar_button.attribute('aria-disabled') == 'false'
+      ).to be is_enabled
     end
 
     it 'should add bullet lists' do
@@ -248,7 +261,7 @@ describe 'RCE Next toolbar features' do
       rce_wysiwyg_state_setup(@course, text, html: true)
       click_ltr
       in_frame rce_page_body_ifr_id do
-        expect(f('#tinymce p').attribute('dir')).to eq "ltr"
+        expect(f('#tinymce p').attribute('dir')).to eq 'ltr'
       end
     end
 

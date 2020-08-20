@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../rcs/pages/rce_next_page'
 
 module WikiAndTinyCommon
 
@@ -212,11 +213,8 @@ module WikiAndTinyCommon
                                                   :context => @course) { |a| a.content_type = 'text/plain' }
     get "/courses/#{@course.id}/pages/front-page/edit"
     wait_for_tiny(f("form.edit-form .edit-content"))
-    selector = 'button[aria-label="Documents"]'
-    button = driver.execute_script("return document.querySelector('#{selector}')")
-    f('button[aria-label="More..."]').click unless button
-    f(selector).click
-    f('[role="menuitem"][title="Course Documents"]').click
+    click_document_toolbar_menu_button
+    click_course_documents
     fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')").click
 
     force_click('form.edit-form button.submit')
