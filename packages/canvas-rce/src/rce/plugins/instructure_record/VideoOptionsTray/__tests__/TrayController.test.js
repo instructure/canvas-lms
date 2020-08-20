@@ -58,7 +58,7 @@ const mockVideoPlayers = [
 
 beforeAll(() => {
   contentSelection.asVideoElement = jest.fn(elem => {
-    const vid = elem.getAttribute('id')
+    const vid = elem.parentElement.getAttribute('id')
     return mockVideoPlayers.find(vp => vp.id === vid)
   })
 
@@ -199,8 +199,8 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         updateMediaObject
       })
       expect(getTray()).toBeNull() // the tray is closed
-      const videoContainer = trayController.$videoContainer
-      const videoIframe = videoContainer.firstElementChild
+      const videoIframe = trayController.$videoContainer
+      const videoContainer = videoIframe.parentElement
       expect(videoContainer.getAttribute('data-mce-p-title')).toBe('new title')
       expect(videoIframe.getAttribute('title')).toBe('new title')
       expect(videoContainer.style.height).toBe('101px')

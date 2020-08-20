@@ -89,15 +89,19 @@ export function asLink($element, editor) {
 // tinymce releases.
 // see https://github.com/tinymce/tinymce/issues/5181
 export function asVideoElement($element) {
-  if (!isVideoElement($element)) {
+  const $videoElem = findVideoPlayerIframe($element)
+
+  if (!isVideoElement($videoElem)) {
     return null
   }
 
   return {
-    ...fromVideoEmbed($element),
+    ...fromVideoEmbed($videoElem),
     $element,
     type: VIDEO_EMBED_TYPE,
-    id: $element.getAttribute('data-mce-p-data-media-id')
+    id:
+      $videoElem.parentElement?.getAttribute('data-mce-p-data-media-id') ||
+      $videoElem.getAttribute('data-mce-p-data-media-id')
   }
 }
 
@@ -172,23 +176,43 @@ export function isImageEmbed($element) {
 export function isVideoElement($element) {
   // the video is hosted in an iframe, but tinymce
   // wraps it in a span with swizzled attribute names
-  if (!$element.getAttribute) {
+  if (!$element?.getAttribute) {
     return false
   }
 
-  if ($element.firstElementChild?.tagName !== 'IFRAME') {
+  const tinymceIframeShim = $element.tagName === 'IFRAME' ? $element.parentElement : $element
+
+  if (tinymceIframeShim.firstElementChild?.tagName !== 'IFRAME') {
     return false
   }
 
-  const media_obj_id = $element.getAttribute('data-mce-p-data-media-id')
+  const media_obj_id = tinymceIframeShim.getAttribute('data-mce-p-data-media-id')
   if (!media_obj_id) {
     return false
   }
 
-  const media_type = $element.getAttribute('data-mce-p-data-media-type')
+  const media_type = tinymceIframeShim.getAttribute('data-mce-p-data-media-type')
   if (media_type !== 'video') {
     return false
   }
 
   return true
+}
+
+export function findVideoPlayerIframe(elem) {
+  if (elem.tagName === 'IFRAME') {
+    // we have the iframe
+    return elem
+  }
+  if (elem.firstElementChild?.tagName === 'IFRAME') {
+    // we have the shim tinymce puts around the iframe
+    return elem.firstElementChild
+  }
+  if (elem.classList.contains('mce-shim')) {
+    // tinymce puts a <span class='mce-shin'> after the iframe (since v5, I think)
+    if (elem.previousSibling?.tagName === 'IFRAME') {
+      return elem.previousSibling
+    }
+  }
+  return null
 }

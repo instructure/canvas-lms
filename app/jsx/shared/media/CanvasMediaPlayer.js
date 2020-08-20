@@ -206,12 +206,7 @@ export default function CanvasMediaPlayer(props) {
 }
 
 export function setPlayerSize(player, type, boundingBox, playerContainer) {
-  const {width, height} = sizeMediaPlayer(
-    player,
-    type,
-    boundingBox,
-    !!(document.fullscreenElement || document.webkitFullscreenElement)
-  )
+  const {width, height} = sizeMediaPlayer(player, type, boundingBox)
   player.style.width = width
   player.style.height = height
   // player.style.margin = '0 auto' // TODO: remove with player v7

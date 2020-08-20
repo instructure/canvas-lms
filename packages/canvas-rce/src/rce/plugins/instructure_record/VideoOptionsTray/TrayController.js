@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
-import {asVideoElement} from '../../shared/ContentSelection'
+import {asVideoElement, findVideoPlayerIframe} from '../../shared/ContentSelection'
 import VideoOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
@@ -52,7 +52,7 @@ export default class TrayController {
 
   showTrayForEditor(editor) {
     this._editor = editor
-    this.$videoContainer = editor.selection.getNode()
+    this.$videoContainer = findVideoPlayerIframe(editor.selection.getNode())
     this._shouldOpen = true
     const trayProps = bridge.trayProps.get(editor)
     this._renderTray(trayProps)
@@ -65,7 +65,8 @@ export default class TrayController {
   }
 
   _applyVideoOptions(videoOptions) {
-    if (this.$videoContainer && this.$videoContainer.firstElementChild?.tagName === 'IFRAME') {
+    if (this.$videoContainer?.tagName === 'IFRAME') {
+      const $tinymceIframeShim = this.$videoContainer.parentElement
       if (videoOptions.displayAs === 'embed') {
         const isVertical = videoOptions.appliedHeight > videoOptions.appliedWidth
         // player v5 requires more space for the CC button
@@ -78,22 +79,18 @@ export default class TrayController {
             isVertical ? videoOptions.appliedHeight : videoOptions.appliedWidth
           )}px`
         }
+        this._editor.dom.setStyles($tinymceIframeShim, styl)
         this._editor.dom.setStyles(this.$videoContainer, styl)
-        this._editor.dom.setStyles(this.$videoContainer.firstElementChild, styl)
 
         const title = videoOptions.titleText
-        this._editor.dom.setAttrib(this.$videoContainer, 'data-mce-p-title', title)
+        this._editor.dom.setAttrib($tinymceIframeShim, 'data-mce-p-title', title)
         this._editor.dom.setAttrib(
-          this.$videoContainer,
+          $tinymceIframeShim,
           'data-mce-p-data-titleText',
           videoOptions.titleText
         )
-        this._editor.dom.setAttrib(this.$videoContainer.firstElementChild, 'title', title)
-        this._editor.dom.setAttrib(
-          this.$videoContainer.firstElementChild,
-          'data-titleText',
-          videoOptions.titleText
-        )
+        this._editor.dom.setAttrib(this.$videoContainer, 'title', title)
+        this._editor.dom.setAttrib(this.$videoContainer, 'data-titleText', videoOptions.titleText)
 
         // tell tinymce so the context toolbar resets
         this._editor.fire('ObjectResized', {
@@ -102,16 +99,15 @@ export default class TrayController {
           height: videoOptions.appliedHeight
         })
       } else {
-        const href = this._editor.dom.getAttrib(this.$videoContainer, 'data-mce-p-src')
+        const href = this._editor.dom.getAttrib($tinymceIframeShim, 'data-mce-p-src')
         const title =
-          videoOptions.titleText ||
-          this._editor.dom.getAttrib(this.$videoContainer.firstElementChild, 'title')
+          videoOptions.titleText || this._editor.dom.getAttrib(this.$videoContainer, 'title')
         const link = document.createElement('a')
         link.setAttribute('href', href)
         link.setAttribute('target', '_blank')
         link.setAttribute('rel', 'noreferrer noopener')
         link.textContent = title
-        this._editor.dom.replace(link, this.$videoContainer)
+        this._editor.dom.replace(link, $tinymceIframeShim)
         this._editor.selection.select(link)
         this.$videoContainer = null
       }
@@ -123,7 +119,7 @@ export default class TrayController {
         })
         .then(_r => {
           if (this.$videoContainer && videoOptions.displayAs === 'embed') {
-            this.$videoContainer.firstElementChild.contentWindow.location.reload()
+            this.$videoContainer.contentWindow.location.reload()
           }
         })
         .catch(ex => {

@@ -80,12 +80,7 @@ export default function ComputerPanel({
           height: window.innerHeight
         }
       }
-      const sz = sizeMediaPlayer(
-        player,
-        theFile.type,
-        boundingBox,
-        !!(document.fullscreenElement || document.webkitFullscreenElement)
-      )
+      const sz = sizeMediaPlayer(player, theFile.type, boundingBox)
       player.style.width = sz.width
       player.style.height = sz.height
       player.style.margin = '0 auto'
