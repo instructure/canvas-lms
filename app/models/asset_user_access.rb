@@ -25,6 +25,7 @@ class AssetUserAccess < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account, :course, :group, :user], polymorphic_prefix: true
   belongs_to :user
   has_many :page_views
+  # if you add any more callbacks, be sure to update #log
   before_save :infer_defaults
 
   resolves_root_account through: ->(instance){ instance.infer_root_account_id }
@@ -205,9 +206,19 @@ class AssetUserAccess < ActiveRecord::Base
     self.asset_group_code ||= accessed[:group_code]
     self.membership_type ||= accessed[:membership_type]
     self.context = kontext
-    self.last_access = Time.now.utc
+    self.updated_at = self.last_access = Time.now.utc
     log_action(accessed[:level])
-    save
+
+    # manually call callbacks to avoid transactions. this saves a BEGIN/COMMIT per request
+    infer_defaults
+    if new_record?
+      self.created_at = self.updated_at
+      self.id = self.class._insert_record(send(:attributes_with_values, changed_attribute_names_to_save))
+      @new_record = false
+    else
+      update_columns(send(:attributes_with_values, changed_attribute_names_to_save))
+    end
+    changes_applied
     self
   end
 
