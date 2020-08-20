@@ -56,6 +56,9 @@ describe ContentShare do
         end
         received_share = share.clone_for(@receiving_user)
         expect(received_share.root_account_id).to eq(@course.root_account_id)
+        @shard1.activate do
+          expect(export.grants_right?(@receiving_user, :read)).to eq true
+        end
       end
     end
   end
