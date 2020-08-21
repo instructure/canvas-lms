@@ -1,9 +1,4 @@
 ---
-granular_permissions_wiki_pages:
-  applies_to: RootAccount
-  description: Granular permissions for managing wiki pages
-  display_name: Granular permissions for managing wiki pages
-  state: hidden
 default_recaptcha_registration_enable:
   state: hidden
   display_name: Enable Recaptcha by default for self-registration

@@ -493,7 +493,6 @@ class Group < ActiveRecord::Base
     can :manage_calendar and
     can :manage_content and
     can :manage_files and
-    can :manage_wiki and
     can :manage_wiki_create and
     can :manage_wiki_delete and
     can :manage_wiki_update and
@@ -554,7 +553,6 @@ class Group < ActiveRecord::Base
       can :manage_content and
       can :manage_files and
       can :manage_students and
-      can :manage_wiki and
       can :manage_wiki_create and
       can :manage_wiki_delete and
       can :manage_wiki_update and

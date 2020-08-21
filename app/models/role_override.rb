@@ -672,26 +672,6 @@ class RoleOverride < ActiveRecord::Base
             'AccountAdmin'
           ]
     },
-    :manage_wiki => {
-        :label => lambda { t("Manage (add / edit / delete) pages") },
-        :label_v2 =>  lambda { t("Pages - add / edit / delete") },
-        :available_to => [
-          'TaEnrollment',
-          'TeacherEnrollment',
-          'DesignerEnrollment',
-          'TeacherlessStudentEnrollment',
-          'ObserverEnrollment',
-          'AccountAdmin',
-          'AccountMembership'
-         ],
-        :true_for => [
-          'TaEnrollment',
-          'TeacherEnrollment',
-          'DesignerEnrollment',
-          'AccountAdmin'
-         ],
-       :account_allows => lambda {|a| !a.root_account.feature_enabled?(:granular_permissions_wiki_pages)}
-    },
     :manage_wiki_create => {
       :label => lambda { t("Create pages") },
       :label_v2 =>  lambda { t("Pages - Create") },
@@ -710,7 +690,6 @@ class RoleOverride < ActiveRecord::Base
         'DesignerEnrollment',
         'AccountAdmin'
       ],
-      :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
       :group => 'manage_wiki',
       :group_label => lambda { t('Manage Pages') }
     },
@@ -732,7 +711,6 @@ class RoleOverride < ActiveRecord::Base
         'DesignerEnrollment',
         'AccountAdmin'
       ],
-      :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
       :group => 'manage_wiki',
       :group_label => lambda { t('Manage Pages') }
     },
@@ -754,7 +732,6 @@ class RoleOverride < ActiveRecord::Base
         'DesignerEnrollment',
         'AccountAdmin'
       ],
-      :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
       :group => 'manage_wiki',
       :group_label => lambda { t('Manage Pages') }
     },

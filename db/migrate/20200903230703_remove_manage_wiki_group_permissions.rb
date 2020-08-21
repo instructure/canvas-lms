@@ -14,14 +14,16 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-class GranularWikiPagePermissions < ActiveRecord::Migration[5.2]
+
+class RemoveManageWikiGroupPermissions < ActiveRecord::Migration[5.2]
   tag :postdeploy
+  disable_ddl_transaction!
 
   def up
-    # Since the old permission has been removed, skip_validation to support users with slower deploy cycles
-    DataFixup::AddRoleOverridesForNewPermission.run(:manage_wiki, :manage_wiki_create, skip_validation: true)
-    DataFixup::AddRoleOverridesForNewPermission.run(:manage_wiki, :manage_wiki_delete, skip_validation: true)
-    DataFixup::AddRoleOverridesForNewPermission.run(:manage_wiki, :manage_wiki_update, skip_validation: true)
+    RoleOverride.where(permission: 'manage_wiki').in_batches.delete_all
+  end
+
+  def down
+    raise ActiveRecord::IrreversibleMigration
   end
 end

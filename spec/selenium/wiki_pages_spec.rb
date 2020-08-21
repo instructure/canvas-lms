@@ -35,7 +35,6 @@ describe "Wiki Pages" do
     before do
       account_model
       course_with_teacher_logged_in :account => @account
-      @course.root_account.enable_feature!(:granular_permissions_wiki_pages)
     end
 
     it "should navigate to pages tab with no front page set", priority: "1", test_id: 126843 do
@@ -129,7 +128,6 @@ describe "Wiki Pages" do
     before do
       account_model
       course_with_teacher_logged_in
-      @course.root_account.enable_feature!(:granular_permissions_wiki_pages)
     end
 
     it "should edit page title from pages index", priority: "1", test_id: 126849 do
@@ -159,7 +157,6 @@ describe "Wiki Pages" do
   context "Index Page as a student" do
     before do
       course_with_student_logged_in
-      @course.root_account.enable_feature!(:granular_permissions_wiki_pages)
     end
 
     it "should display a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do
@@ -180,7 +177,6 @@ describe "Wiki Pages" do
   context "Insert RCE File" do
     before do
       course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
-      @course.root_account.enable_feature!(:granular_permissions_wiki_pages)
     end
 
     it "should insert a file using RCE in the wiki page", priority: "1", test_id: 126673 do
@@ -199,7 +195,6 @@ describe "Wiki Pages" do
     before do
       account_model
       course_with_student_logged_in account: @account
-      @course.root_account.enable_feature!(:granular_permissions_wiki_pages)
     end
 
     it "should lock page based on module date", priority: "1", test_id: 126845 do
@@ -248,7 +243,6 @@ describe "Wiki Pages" do
   context "Permissions" do
     before do
       course_with_teacher
-      @course.root_account.enable_feature!(:granular_permissions_wiki_pages)
     end
 
     it "displays public content to unregistered users", priority: "1", test_id: 270035 do
@@ -269,7 +263,6 @@ describe "Wiki Pages" do
   context "menu tools" do
     before do
       course_with_teacher_logged_in
-      @course.root_account.enable_feature!(:granular_permissions_wiki_pages)
       @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tool.wiki_page_menu = {:url => "http://www.example.com", :text => "Export Wiki Page"}
       @tool.save!
@@ -310,7 +303,6 @@ describe "Wiki Pages" do
 
     it "should display wiki content", priority: "1", test_id: 270035 do
       @coures = public_course
-      @course.root_account.enable_feature!(:granular_permissions_wiki_pages)
       title = "foo"
       public_course.wiki_pages.create!(:title => title, :body => "bar")
 
@@ -322,7 +314,6 @@ describe "Wiki Pages" do
   context "embed video in a Page" do
     before :each do
       course_with_teacher_logged_in :account => @account, :active_all => true
-      @course.root_account.enable_feature!(:granular_permissions_wiki_pages)
       @course.wiki_pages.create!(title: 'Page1')
     end
 

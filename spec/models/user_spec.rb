@@ -1046,7 +1046,9 @@ describe User do
     end
 
     it "should check both active and concluded courses" do
-      expect(@student1.check_courses_right?(@teacher1, :manage_wiki)).to be_truthy
+      expect(@student1.check_courses_right?(@teacher1, :manage_wiki_create)).to be_truthy
+      expect(@student1.check_courses_right?(@teacher1, :manage_wiki_update)).to be_truthy
+      expect(@student1.check_courses_right?(@teacher1, :manage_wiki_delete)).to be_truthy
       expect(@student2.check_courses_right?(@teacher2, :read_forum)).to be_truthy
       @concluded_course.grants_right?(@teacher2, :manage_wiki)
     end
