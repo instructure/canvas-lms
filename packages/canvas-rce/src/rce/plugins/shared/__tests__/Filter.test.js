@@ -159,6 +159,15 @@ describe('RCE Plugins > Filter', () => {
       expect(component.getByText('User Files')).toBeInTheDocument()
       expect(component.queryByText('Course Files')).toBeNull()
     })
+
+    it('includes the Link and User options in group context', () => {
+      renderComponent({userContextType: 'group'})
+      const contentTypeField = component.getByLabelText('Content Type')
+      fireEvent.click(contentTypeField)
+      expect(component.getByText('Links')).toBeInTheDocument()
+      expect(component.getByText('User Files')).toBeInTheDocument()
+      expect(component.queryByText('Course Files')).toBeNull()
+    })
   })
 
   describe('"Content Subtype" field', () => {

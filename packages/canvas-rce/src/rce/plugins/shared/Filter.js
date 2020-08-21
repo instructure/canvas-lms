@@ -60,13 +60,13 @@ function fileLabelFromContext(contextType) {
   }
 }
 
-function renderTypeOptions(contentType, contentSubtype) {
+function renderTypeOptions(contentType, contentSubtype, userContextType) {
   const options = [
     <option key="links" value="links" icon={IconLinkLine}>
       {formatMessage('Links')}
     </option>
   ]
-  if (contentType !== 'links' && contentSubtype !== 'all') {
+  if (userContextType === 'course' && contentType !== 'links' && contentSubtype !== 'all') {
     options.push(
       <option key="course_files" value="course_files" icon={IconFolderLine}>
         {fileLabelFromContext('course')}
@@ -82,7 +82,7 @@ function renderTypeOptions(contentType, contentSubtype) {
 }
 
 function renderType(contentType, contentSubtype, onChange, userContextType) {
-  if (userContextType === 'course') {
+  if (userContextType === 'course' || userContextType === 'group') {
     return (
       <Select
         label={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
@@ -96,7 +96,7 @@ function renderType(contentType, contentSubtype, onChange, userContextType) {
         }}
         selectedOption={contentType}
       >
-        {renderTypeOptions(contentType, contentSubtype)}
+        {renderTypeOptions(contentType, contentSubtype, userContextType)}
       </Select>
     )
   } else {
@@ -197,5 +197,5 @@ Filter.propTypes = {
   /**
    * The user's context
    */
-  userContextType: oneOf(['user', 'course'])
+  userContextType: oneOf(['user', 'course', 'group'])
 }
