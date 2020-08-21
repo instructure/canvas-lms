@@ -1036,16 +1036,21 @@ ActiveRecord::Relation.class_eval do
     scope
   end
 
-  def lock_in_order
-    lock(:no_key_update).order(:id).pluck(:id)
+  def update_all_locked_in_order(updates)
+    locked_scope = lock(:no_key_update).order(:id)
+    if Setting.get("update_all_locked_in_order_subquery", "true") == "true"
+      unscoped.where(id: locked_scope).update_all(updates)
+    else
+      transaction do
+        ids = locked_scope.pluck(:id)
+        unscoped.where(id: ids).update_all(updates) unless ids.empty?
+      end
+    end
   end
 
   def touch_all
     self.activate do |relation|
-      relation.transaction do
-        ids_to_touch = relation.not_recently_touched.lock_in_order
-        unscoped.where(id: ids_to_touch).update_all(updated_at: Time.now.utc) if ids_to_touch.any?
-      end
+      relation.update_all_locked_in_order(updated_at: Time.now.utc)
     end
   end
 

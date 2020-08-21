@@ -52,12 +52,9 @@ class Enrollment
     end
 
     def update_with(options)
-      Enrollment.transaction do
-        ids_to_update = all_enrollments_scope.
-          where("last_activity_at IS NULL OR last_activity_at < ?", options[:last_activity_at] - last_threshold).
-          lock_in_order
-        Enrollment.where(:id => ids_to_update).update_all(options) if ids_to_update.any?
-      end
+      all_enrollments_scope.
+        where("last_activity_at IS NULL OR last_activity_at < ?", options[:last_activity_at] - last_threshold).
+        update_all_locked_in_order(options)
     end
 
     def increment_total_activity?(as_of)
