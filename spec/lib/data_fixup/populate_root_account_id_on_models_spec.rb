@@ -1307,10 +1307,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(LearningOutcome, nil)).to be true
     end
 
-    it 'should ignore assocations that point to unfillable tables' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(AccessToken, AccessToken.reflections['developer_key'])).to be true
-    end
-
     context 'with_sharding' do
       specs_require_sharding
 
@@ -1484,6 +1480,41 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(AssetUserAccess.reflections["context_course"], 'root_account_id')).to eq(
         'courses.root_account_id'
       )
+    end
+  end
+
+  describe 'checking if a table is full' do
+    def table_has_root_account_id_filled(table)
+      assoc = described_class.migration_tables[table]
+      association_hash = described_class.hash_association(assoc)
+      direct_relation_associations = described_class.replace_polymorphic_associations(table, association_hash)
+      described_class.check_if_table_has_root_account(table, direct_relation_associations.keys)
+    end
+
+    context 'DeveloperKey' do
+      it 'ignores site admin keys (null account_id) and cross-shard account_id' do
+        dk2 = DeveloperKey.create!(account_id: nil)
+        expect(dk2.root_account_id).to eq(nil)
+        dk3 = DeveloperKey.create!(account: @course.account)
+        expect(dk3.root_account_id).to_not eq(nil)
+
+        expect(table_has_root_account_id_filled(DeveloperKey)).to eq(true)
+        dk3.update_columns(root_account_id: nil)
+        expect(table_has_root_account_id_filled(DeveloperKey)).to eq(false)
+      end
+    end
+
+    context 'LearningOutcomeGroup' do
+      it 'ignores null contexts' do
+        log1 = LearningOutcomeGroup.create!(context: nil, title: 'log')
+        expect(log1.root_account_id).to be_nil
+        log2 = outcome_group_model(context: @course)
+        expect(log2.root_account_id).to_not be_nil
+
+        expect(table_has_root_account_id_filled(LearningOutcomeGroup)).to eq(true)
+        log2.update_columns(root_account_id: nil)
+        expect(table_has_root_account_id_filled(LearningOutcomeGroup)).to eq(false)
+      end
     end
   end
 end
