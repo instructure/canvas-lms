@@ -368,7 +368,22 @@ module Importers
           tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
           if hash[:external_tool_id] && migration && !migration.cross_institution?
             tool_id = hash[:external_tool_id].to_i
-            tag.content_id = tool_id if ContextExternalTool.all_tools_for(context).where(id: tool_id).exists?
+
+            # First check to see if there are any matching tools for the
+            # tool URL provided in the migration hash (giving preference
+            # to the tool ID provided in that same hash).
+            #
+            # In some cases the tool ID in the source context does not match the
+            # tool ID from the destination context. This check should help find
+            # a matching tool correctly.
+            tool = ContextExternalTool.find_external_tool(hash[:external_tool_url], context, tool_id)
+
+            # If no match is found in the first search, fall back on using the tool ID
+            # provided in the migration hash if a tool with that ID is present
+            # in the destination context.
+            tool ||= ContextExternalTool.all_tools_for(context).find_by(id: tool_id)
+
+            tag.content_id = tool&.id
           elsif hash[:external_tool_migration_id]
             tool = context.context_external_tools.where(migration_id: hash[:external_tool_migration_id]).first
             tag.content_id = tool.id if tool

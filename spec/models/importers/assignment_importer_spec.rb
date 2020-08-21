@@ -250,16 +250,15 @@ describe "Importing assignments" do
     expect(assignment.lock_at).not_to be_nil
   end
 
-  context 'when assignment uses a 1.3 tool' do
+  context 'when assignments use an LTI tool' do
     subject do
       Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
       assignment.reload
     end
 
     let(:course) { course_model }
-    let(:use_1_3) { true }
-    let(:dev_key) { DeveloperKey.create! }
     let(:migration) { course.content_migrations.create! }
+
     let(:assignment) do
       course.assignments.create!(
         title: "test",
@@ -270,23 +269,13 @@ describe "Importing assignments" do
         migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6"
       )
     end
-    let(:tool) do
-      course.context_external_tools.create!(
-        consumer_key: 'key',
-        shared_secret: 'secret',
-        name: 'test tool',
-        url: 'http://www.tool.com/launch',
-        settings: { use_1_3: use_1_3 },
-        workflow_state: 'public',
-        developer_key: dev_key
-      )
-    end
+
     let(:assignment_hash) do
       {
         "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
         "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
         "workflow_state" => "published",
-        "title" => "LTI 1.3 Tool Assignment",
+        "title" => "Tool Assignment",
         "grading_type" => "points",
         "submission_types" => "external_tool",
         "points_possible" => 10,
@@ -294,16 +283,51 @@ describe "Importing assignments" do
         "peer_reviews_due_at" => nil,
         "lock_at" => nil,
         "unlock_at" => nil,
-        "external_tool_url" => tool.url
+        "external_tool_url" => tool.url,
+        "external_tool_id" => tool_id
       }
     end
 
-    it 'creates the assignment line item' do
-      expect { subject }.to change { assignment.line_items.count }.from(0).to 1
+    context 'and a matching tool is installed in the destination' do
+      let(:tool) { external_tool_model(context: course.root_account) }
+
+      context 'but the matching tool has a different ID' do
+        subject do
+          super()
+          course.assignments.find_by(title: assignment_hash['title'])
+        end
+
+        let(:tool_id) { tool.id + 1 }
+
+        it 'matches the tool via URL lookup' do
+          expect(subject.external_tool_tag.content).to eq tool
+        end
+      end
     end
 
-    it 'creates a resource link' do
-      expect { subject }.to change { assignment.line_items.first&.resource_link.present? }.from(false).to true
+    context 'and the tool uses LTI 1.3' do
+      let(:tool_id) { tool.id }
+      let(:use_1_3) { true }
+      let(:dev_key) { DeveloperKey.create! }
+      let(:tool) do
+        course.context_external_tools.create!(
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          name: 'test tool',
+          url: 'http://www.tool.com/launch',
+          settings: { use_1_3: use_1_3 },
+          workflow_state: 'public',
+          developer_key: dev_key
+        )
+      end
+
+      it 'creates the assignment line item' do
+        expect { subject }.to change { assignment.line_items.count }.from(0).to 1
+      end
+
+      it 'creates a resource link' do
+        expect { subject }.to change { assignment.line_items.first&.resource_link.present? }.from(false).to true
+      end
     end
   end
 
