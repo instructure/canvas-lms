@@ -205,6 +205,8 @@ describe "assignments" do
 
     it "only allows an assignment editor to edit points and title if assignment " +
            "if assignment has multiple due dates", priority: "2", test_id: 622376 do
+      skip "DEMO-25 (8/21/20)"
+
       middle_number = '15'
       expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
       @assignment = @course.assignments.create!(
