@@ -423,9 +423,8 @@ export default class GradingPeriodSetCollection extends React.Component {
             </div>
 
             <SearchGradingPeriodsField changeSearchText={this.changeSearchText} />
+            <div className="ic-Form-action-box__Actions">{this.renderAddSetFormButton()}</div>
           </div>
-
-          <div className="ic-Form-action-box__Actions">{this.renderAddSetFormButton()}</div>
         </div>
 
         {this.renderNewGradingPeriodSetForm()}

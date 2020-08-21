@@ -973,7 +973,9 @@ form.ic-Form-group { margin: 0; }
 
 .ic-Form-action-box__Actions {
   box-sizing: border-box;
-  padding-#{direction(left)}: $ic-sp*4;
+  @include breakpoint(desktop) {
+    padding-#{direction(left)}: $ic-sp*4;
+  }
 }
 
 .ic-Form-help-text {
