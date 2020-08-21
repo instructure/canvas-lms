@@ -298,5 +298,26 @@
     },
     "tomorrow_9a6c9a00": {
         "message": "Վաղը"
+    },
+    "unpublished_dfd8801": {
+        "message": "չհրապարակված"
+    },
+    "upload_file_fd2361b8": {
+        "message": "Բեռնել ֆայլը "
+    },
+    "url_22a5f3b8": {
+        "message": "URL"
+    },
+    "video_player_b371005": {
+        "message": "Տեսաձայնագրության նվագարկիչ"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "Վիկիի տնային էջ"
+    },
+    "yes_dde87d5": {
+        "message": "Այո"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "Երեկ"
     }
 }
