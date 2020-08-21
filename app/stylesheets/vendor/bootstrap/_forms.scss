@@ -163,6 +163,11 @@ select {
   background-color: $inputBackground; // Chrome on Linux and Mobile Safari need background-color
 }
 
+select.responsive-width {
+  width: unset;
+  min-width: 220px;
+}
+
 // Make multiple select elements height not fixed
 select[multiple],
 select[size] {
