@@ -211,14 +211,7 @@ class AssetUserAccess < ActiveRecord::Base
 
     # manually call callbacks to avoid transactions. this saves a BEGIN/COMMIT per request
     infer_defaults
-    if new_record?
-      self.created_at = self.updated_at
-      self.id = self.class._insert_record(send(:attributes_with_values, changed_attribute_names_to_save))
-      @new_record = false
-    else
-      update_columns(send(:attributes_with_values, changed_attribute_names_to_save))
-    end
-    changes_applied
+    save_without_transaction
     self
   end
 

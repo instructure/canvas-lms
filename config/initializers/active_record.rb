@@ -715,6 +715,23 @@ class ActiveRecord::Base
   end
 
   scope :non_shadow, ->(key = primary_key) { where("#{key}<=?", Shard::IDS_PER_SHARD) }
+
+  # skips validations, callbacks, and a transaction
+  # do _NOT_ improve in the future to handle validations and callbacks - make
+  # it a separate method or optional functionality. some callers explicitly
+  # rely on no callbacks or validations
+  def save_without_transaction
+    return unless changed?
+    self.updated_at = Time.now.utc
+    if new_record?
+      self.created_at = updated_at
+      self.id = self.class._insert_record(attributes_with_values(changed_attribute_names_to_save))
+      @new_record = false
+    else
+      update_columns(attributes_with_values(changed_attribute_names_to_save))
+    end
+    changes_applied
+  end
 end
 
 module UsefulFindInBatches
