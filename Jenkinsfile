@@ -505,6 +505,16 @@ pipeline {
                 }
               }
 
+              if((sh(script: 'build/new-jenkins/docker-dev-changes.sh', returnStatus: true) == 0)) {
+                echo 'adding Local Docker Dev Build'
+                stages['Local Docker Dev Build'] = {
+                  skipIfPreviouslySuccessful("local-docker-dev-smoke") {
+                    wrapBuildExecution('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, true, "")
+                  }
+                }
+              }
+
+
               // // keep this around in case there is changes to the subbuilds that need to happen
               // // and you have no other way to test it except by running a test build.
               // stages['Test Subbuild'] = {
@@ -570,9 +580,9 @@ pipeline {
               def successes = load 'build/new-jenkins/groovy/successes.groovy'
               successes.markBuildAsSuccessful()
             }
-          }
-        }
-      }
-    }
-  }
-}
+          }//protectedNode
+        }//script
+      }//steps
+    }//environment
+  }//stages
+}//pipline
