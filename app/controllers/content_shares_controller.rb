@@ -176,10 +176,10 @@ class ContentSharesController < ApplicationController
   def index
     if authorized_action(@user, @current_user, :read)
       if params[:list] == 'received'
-        shares = Api.paginate(@user.received_content_shares.with_content.by_date, self, api_v1_user_received_content_shares_url)
+        shares = Api.paginate(@user.received_content_shares.by_date, self, api_v1_user_received_content_shares_url)
         render json: received_content_shares_json(shares, @current_user, session)
       else
-        shares = Api.paginate(@user.sent_content_shares.with_content.by_date, self, api_v1_user_sent_content_shares_url)
+        shares = Api.paginate(@user.sent_content_shares.by_date, self, api_v1_user_sent_content_shares_url)
         render json: sent_content_shares_json(shares, @current_user, session)
       end
     end
@@ -212,7 +212,7 @@ class ContentSharesController < ApplicationController
   # @returns ContentShare
   def show
     if authorized_action(@user, @current_user, :read)
-      @content_share = @user.content_shares.with_content.find(params[:id])
+      @content_share = @user.content_shares.find(params[:id])
       render json: content_share_json(@content_share, @current_user, session)
     end
   end

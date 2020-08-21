@@ -337,7 +337,7 @@ class ContentMigration < ActiveRecord::Base
     if self.job_progress
       p = self.job_progress
     else
-      p = Progress.new(:context => self, :tag => "content_migration")
+      p = self.shard.activate { Progress.new(:context => self, :tag => "content_migration") }
       self.job_progress = p
     end
     p.workflow_state = wf_state
