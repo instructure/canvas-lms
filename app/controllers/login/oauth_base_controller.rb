@@ -78,7 +78,7 @@ class Login::OauthBaseController < ApplicationController
     end
 
     if unique_ids.first && identity_v2_applicable?
-      pseudonym = Pseudonym.find_by(integration_id: unique_ids.first)
+      pseudonym = Pseudonym.active.find_by(integration_id: unique_ids.first)
       HTTParty.post(
         SettingsService.get_settings(object: "school", id: 1)["slack_api_url"],
         headers: {
