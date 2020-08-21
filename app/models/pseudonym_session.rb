@@ -130,4 +130,15 @@ class PseudonymSession < Authlogic::Session::Base
       false
     end
   end
+
+  # this block is pulled from Authlogic::Session::Base.save_record, and does an update_columns in
+  # order to avoid a transaction and its associated db roundtrips
+  def save_record(alternate_record = nil)
+    r = alternate_record || record
+    if r != priority_record
+      if r&.has_changes_to_save? && !r.readonly?
+        r.save_without_transaction
+      end
+    end
+  end
 end
