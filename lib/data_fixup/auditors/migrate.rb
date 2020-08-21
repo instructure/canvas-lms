@@ -908,7 +908,7 @@ module DataFixup::Auditors
           current_date = next_schedule_date(current_date)
         end
         if current_date >= @end_date
-          schedule_worker = BackfillEngine.new(current_date, @end_date)
+          schedule_worker = BackfillEngine.new(current_date, @end_date, operation_type: operation)
           next_time = Time.now.utc + backfill_interval
           log("More work to do. Scheduling another job for #{next_time}")
           Delayed::Job.enqueue(schedule_worker, run_at: next_time, priority: Delayed::LOW_PRIORITY, n_strand: schedular_strand_tag, max_attempts: 5)
