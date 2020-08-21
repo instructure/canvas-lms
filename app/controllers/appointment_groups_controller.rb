@@ -356,6 +356,11 @@ class AppointmentGroupsController < ApplicationController
 
     raise ActiveRecord::RecordNotFound unless contexts.present?
 
+    # if all contexts are in the same shard, create the appointment group in the same shard
+    original_shard = Shard.current
+    context_shards = contexts.map(&:shard).uniq
+    context_shards.first.activate! if context_shards.size == 1
+
     publish = value_to_boolean(params[:appointment_group].delete(:publish))
     @group = AppointmentGroup.new(appointment_group_params.merge(:contexts => contexts))
     @group.update_contexts_and_sub_contexts
@@ -367,6 +372,8 @@ class AppointmentGroupsController < ApplicationController
         render :json => @group.errors, :status => :bad_request
       end
     end
+  ensure
+    original_shard&.activate!
   end
 
   # @API Get a single appointment group
