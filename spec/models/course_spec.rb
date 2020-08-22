@@ -4964,6 +4964,13 @@ describe Course do
       end
     end
 
+    it 'should activate shard for new student view students' do
+      course_model
+      @shard1.activate do
+        expect { @course.student_view_student }.not_to raise_error
+      end
+    end
+
     it "should grant enrollment-based permissions regardless of shard" do
       @shard1.activate do
         account = Account.create!

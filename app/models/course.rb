@@ -3172,6 +3172,7 @@ class Course < ActiveRecord::Base
         fake_student = User.new(:name => t('student_view_student_name', "Test Student"))
         fake_student.preferences[:fake_student] = true
         fake_student.workflow_state = 'registered'
+        fake_student.shard = self.shard
         fake_student.save
         # hash the unique_id so that it's hard to accidently enroll the user in
         # a course by entering something in a user list. :(
