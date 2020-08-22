@@ -520,6 +520,18 @@ describe SplitUsers do
         expect(shard1_source_user.reload.linked_observers).to eq [observer2]
       end
 
+      it 'should handle user_observers cross shard from target shard' do
+        observer1 = user_model
+        add_linked_observer(restored_user, observer1)
+        @shard1.activate do
+          UserMerge.from(restored_user).into(shard1_source_user)
+        end
+        expect(restored_user.linked_observers).to eq []
+        expect(shard1_source_user.linked_observers.pluck(:id).sort).to eq [observer1.id].sort
+        SplitUsers.split_db_users(shard1_source_user)
+        expect(restored_user.reload.linked_observers).to eq [observer1]
+      end
+
       it 'should handle conflicting submissions for cross shard users' do
         course1.enroll_student(restored_user, enrollment_state: 'active')
         course1.enroll_student(shard1_source_user, enrollment_state: 'active')

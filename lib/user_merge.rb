@@ -411,9 +411,9 @@ class UserMerge
     from_user.as_observer_observation_links.where(user_id: target_user).destroy_all
     target_user.as_observer_observation_links.where(user_id: from_user).destroy_all
     from_user.as_observer_observation_links.update_all(observer_id: target_user.id)
-    xor_observer_ids = UserObservationLink.where(student: [from_user, target_user]).distinct.pluck(:observer_id)
+    xor_observer_ids = UserObservationLink.shard(from_user, target_user).where(student: [from_user, target_user]).distinct.pluck(:observer_id)
     from_user.as_student_observation_links.where(observer_id: target_user.as_student_observation_links.map(&:observer_id)).destroy_all
-    from_user.as_student_observation_links.update_all(user_id: target_user.id)
+    from_user.shard.activate { from_user.as_student_observation_links.update_all(user_id: target_user.id) }
     # for any observers not already watching both users, make sure they have
     # any missing observer enrollments added
     if from_user.shard != target_user.shard
