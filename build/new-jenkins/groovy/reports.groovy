@@ -258,17 +258,6 @@ def publishJunitReport(prefix, total) {
   }
 }
 
-def junitSafe(xml) {
-  // Jenkins bug with uploading junit xmls, iterating through each file and uploading
-  // separately gives accurate test count. https://issues.jenkins-ci.org/browse/JENKINS-48583
-  def testResultFiles = findFiles(glob: "${xml}")
-  testResultFiles.each { f ->
-    def fPath = f.getPath()
-    sh "echo 'UPLOAD $fPath'"
-    junit fPath
-  }
-}
-
 def copyParallelLogs(rspecTotal, seleniumTotal) {
   dir('parallel_logs') {
     for(int index = 0; index < rspecTotal; index++) {
