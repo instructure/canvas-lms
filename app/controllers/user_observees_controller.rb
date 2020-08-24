@@ -130,7 +130,7 @@ class UserObserveesController < ApplicationController
       @student = verified_token.user
       common_root_accounts = common_root_accounts_for(observer, student)
     elsif params[:pairing_code]
-      code = ObserverPairingCode.active.where(code: params[:pairing_code]).first
+      code = find_observer_pairing_code(params[:pairing_code])
       if code.nil?
         render json: {errors: [{'message' => 'Invalid pairing code.'}]}, status: 422
         return
@@ -176,6 +176,10 @@ class UserObserveesController < ApplicationController
     create_observation_links(common_root_accounts)
 
     render_student_json
+  end
+
+  def find_observer_pairing_code(pairing_code)
+    ObserverPairingCode.active.where(code: pairing_code).first
   end
 
   # @API Show an observee
