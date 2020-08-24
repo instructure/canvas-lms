@@ -50,6 +50,7 @@ describe HistoryController, type: :request do
                              "visited_url" => "http://example.com/courses/X/users",
                              "interaction_seconds" => 5.0,
                              "asset_icon" => "icon-user",
+                             "asset_readable_category" => "People",
                              "asset_name" => "Course People",
                              "context_name" => "Something 101"},
                             {"asset_code" => "pages:#{@group.asset_string}",
@@ -59,6 +60,7 @@ describe HistoryController, type: :request do
                              "visited_url" => "http://example.com/groups/Z/pages",
                              "interaction_seconds" => 5.0,
                              "asset_icon" => "icon-document",
+                             "asset_readable_category" => "Page",
                              "asset_name" => "Group Pages",
                              "context_name" => "A Group"},
                             {"asset_code" => @assignment.asset_string,
@@ -68,9 +70,9 @@ describe HistoryController, type: :request do
                              "visited_url" => "http://example.com/courses/X/assignments/Y",
                              "interaction_seconds" => 5.0,
                              "asset_icon" => "icon-assignment",
+                             "asset_readable_category" => "Assignment",
                              "asset_name" => "Assign 1",
-                             "context_name" => "Something 101"}]
-                        )
+                             "context_name" => "Something 101"}])
       end
 
       it "respects course nicknames" do
