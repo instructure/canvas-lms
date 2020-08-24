@@ -1941,4 +1941,31 @@ class Account < ActiveRecord::Base
 
     Account.site_admin.feature_enabled?(:new_sis_integrations)
   end
+
+  class << self
+    attr_accessor :current_domain_root_account
+  end
+
+  module DomainRootAccountCache
+    def find_one(id)
+      return Account.current_domain_root_account if Account.current_domain_root_account &&
+        Account.current_domain_root_account.shard == shard_value &&
+        Account.current_domain_root_account.local_id == id
+      super
+    end
+
+    def find_take
+      return super unless where_clause.send(:predicates).length == 1
+      predicates = where_clause.to_h
+      return super unless predicates.length == 1
+      return super unless predicates.keys.first == "id"
+      return Account.current_domain_root_account if Account.current_domain_root_account &&
+        Account.current_domain_root_account.shard == shard_value &&
+        Account.current_domain_root_account.local_id == predicates.values.first
+      super
+    end
+  end
+
+  relation_delegate_class(ActiveRecord::Relation).prepend(DomainRootAccountCache)
+  relation_delegate_class(ActiveRecord::AssociationRelation).prepend(DomainRootAccountCache)
 end
