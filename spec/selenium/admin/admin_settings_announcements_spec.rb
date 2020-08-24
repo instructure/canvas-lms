@@ -175,17 +175,6 @@ describe "settings tabs" do
         wait_for_ajaximations
         f("#notification_edit_#{notification.id}").click
         expect(is_checked("#account_notification_send_message_#{notification.id}")).to be_truthy # checked still
-
-        # see https://instructure.atlassian.net/browse/KNO-528 flakey assertions
-        # above expectation already verifies checkbox is marked already
-        #
-        # input = f("#account_notification_start_at_#{notification.id}")
-        # input.clear
-        # input.send_keys(3.days.from_now.to_date.to_s) # change date
-        # f("#edit_notification_form_#{notification.id}").submit
-        # wait_for_ajax_requests
-        # expect(notification.reload.start_at.to_i).to_not eq old_start_at.to_i
-        # expect(job.reload.run_at.to_i).to_not eq old_start_at.to_i # changed job run date
       end
 
       it "should be able to re-send messages for an announcement" do
