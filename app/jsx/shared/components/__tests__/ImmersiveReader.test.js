@@ -49,6 +49,9 @@ describe('#initializeReaderButton', () => {
                   mimeType: 'text/html'
                 }
               ]
+            },
+            {
+              cookiePolicy: 1
             }
           ])
         const fakeReaderLib = Promise.resolve({
