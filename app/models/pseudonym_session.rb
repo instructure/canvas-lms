@@ -131,6 +131,13 @@ class PseudonymSession < Authlogic::Session::Base
     end
   end
 
+  def persist_by_session_search(persistence_token, record_id)
+    return super unless record_id
+    Rails.cache.fetch(["pseudonym_session", record_id].cache_key, expires_in: Setting.get("pseudonym_session_cache_ttl", 5).to_f.seconds) do
+      super
+    end
+  end
+
   # this block is pulled from Authlogic::Session::Base.save_record, and does an update_columns in
   # order to avoid a transaction and its associated db roundtrips
   def save_record(alternate_record = nil)
