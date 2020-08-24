@@ -55,7 +55,7 @@ class RequestThrottle
     bucket = LeakyBucket.new(client_identifier(request))
 
     up_front_cost = bucket.get_up_front_cost_for_path(path)
-    cost = bucket.reserve_capacity(up_front_cost) do
+    cost = bucket.reserve_capacity(up_front_cost, request_whitelisted: whitelisted?(request)) do
       status, headers, response = if !allowed?(request, bucket)
         throttled = true
         rate_limit_exceeded
@@ -315,11 +315,11 @@ class RequestThrottle
     # data out of redis at the same time. It then yields to the block,
     # expecting the block to return the final cost. It then increments again,
     # subtracting the initial up_front_cost from the final cost to erase it.
-    def reserve_capacity(up_front_cost = self.up_front_cost)
-      increment(0, up_front_cost)
+    def reserve_capacity(up_front_cost = self.up_front_cost, request_whitelisted: false)
+      increment(0, up_front_cost) unless request_whitelisted
       cost = yield
     ensure
-      increment(cost || 0, -up_front_cost)
+      increment(cost || 0, -up_front_cost) unless request_whitelisted
     end
 
     def full?
