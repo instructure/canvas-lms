@@ -2314,6 +2314,7 @@ tr:
   assignment_assignment_submission_plain_text_view_b217d372: "%{assignment}ödev gönderimi Düz Metin Görünümü"
   assignment_comments_e43ed898: "Ödev Yorumları"
   assignment_created_assignment_name_course_name_324a5639: "Ödev Oluşturuldu - %{assignment_name}, %{course_name}"
+  assignment_created_b3ee04d7: "Ödev oluşturuldu"
   assignment_d8387b78: ödev
   assignment_details: 
     no_graded_submissions: "Notlandırılmış gönderi yok"
@@ -3265,6 +3266,7 @@ tr:
   blueprint_5cca2ef: Şablon
   blueprint_course_associations_72c9609: "Şablon Ders İlişkilendirmeleri"
   blueprint_course_e16ed131: "Şablon Ders"
+  blueprint_course_id_9ee357fb: blueprint_course_id
   blueprint_course_information_term_course_10d5cf30: "Şablon Ders Bilgisi: %{term} - %{course}"
   blueprint_courses_9dd321b8: "Şablon Dersler"
   blueprint_courses_create_edit_associate_delete_bf41988e: "Şablon Dersler (oluştur / düzenle / ilişkilendir / sil)"
@@ -3905,7 +3907,7 @@ tr:
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Canvas kontrol paneli bağlantıları Katalog kontrol paneline gidecek"
   canvas_default_7f81a6b8: "Canvas Varsayılan"
   canvas_demo_7a005cf3: "Canvas Demo"
-  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas sizin kimlik saylayıcınızı tanımlayamadı"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas sizin kimlik sağlayıcınızı tanımlayamadı"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "%{user} kullanıcı Canvas üzerinde kayıtlı değil"
   canvas_enrollment_id_d0e8b9a4: canvas_enrollment_id
   canvas_error_report_ff678539: "Canvas Hata Raporu"
@@ -9020,6 +9022,7 @@ tr:
     name_too_long: "Kısa bir kategori ismi giriniz"
     name_unavailable: "%{name} zaten kullanılıyor."
     self_signup_for_courses: "Hızlı kayıt, sadece ders grupları veya topluluklar için etkin olabilir"
+  group_category_id_7001cf89: group_category_id
   group_category_locked: "Öğrenciler bu ödev için gönderim yaptıkları için grup kategorisi değiştirilemez."
   group_files_82e5dcdb: "Grup dosyaları"
   group_group_name_is_for_a_different_section_4d84d256: "%{group_name} grubu başka bir bölüm içindir"
@@ -9029,6 +9032,7 @@ tr:
   group_is_full_56849d78: "Grup dolu"
   group_is_joined_by_invitation_only_d00f5a63: "Gruba giriş sadece davetiye ile olabilir"
   group_leader_user_name_6f24bebb: "grup lideri %{user_name}"
+  group_limit_87ae4421: group_limit
   group_members_ae5489ed: "grup üyeleri"
   group_membership: 
     errors: 
@@ -10087,6 +10091,7 @@ tr:
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Kullanıcıları %{num_appointments}randevuya() katılacak şekilde sınırla"
   limit_search_to_activity_after_c1ac2449: "Aramayı şu aktiviteden sonra ile sınırla"
   limit_search_to_activity_before_e05aad05: "Aramayı şu aktiviteden önce ile sınırla"
+  limit_section_privileges_e6425dfd: limit_section_privileges
   link_7262adec: Bağlantı
   link_description_4355ca82: "Bağlantı açıklaması"
   link_enrollment: 
@@ -10350,6 +10355,7 @@ tr:
       miscellaneous: Çeşitli
       operators: Operatörler
       relationships: İlişkiler
+  max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Randevu başına maksimum kullanıcı/grup"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Bir katılımcının katılabileceği en fazla randevu sayısı"
   media_af190855: Medya
@@ -13060,6 +13066,7 @@ tr:
   out_of_points_possible_8ab14f7: "%{points_possible} üzerinden"
   out_of_pointspossible_3fb5ee20: "%{pointsPossible} üzerinden"
   outcome_da397d20: "Öğrenme Çıktısı"
+  outcome_export_89229eb4: "Öğrenme Çıktısı Dışa Aktarımı"
   outcome_group_39fae76f: "Öğrenme Çıktısı Grubu"
   outcome_groups: 
     invalid_file: "Geçersiz öğrenme çıktısı grubu dosyası"
@@ -15820,6 +15827,7 @@ tr:
   red_8258edf3: Kırmızı
   redirect_uri_legacy_b32323d3: "Yönlendirilecek URI (Legacy):"
   redirect_uris_a54bd82f: "Yönlendirilecek URI'ler:"
+  redirected_to_identity_provider_6c4e17d2: "Kimlik sağlayıcıya yönlendirildi"
   reference_code_3e8355dd: "Referans Kodu"
   register_email_efc06d59: "E-Mail Kaydet"
   registration: 
@@ -15941,6 +15949,7 @@ tr:
     duplicate_role: "Bu isimle bir rol zaten var"
   role_7c0b7eaa: "Rol:"
   role_b3951149: rol
+  role_id_f33b0bd2: role_id
   role_name_18a5943b: "Rol İsmi"
   role_override: 
     permission: 
@@ -16072,6 +16081,7 @@ tr:
     course_files: "Ders dosyaları"
     group_files: "Grup dosyaları"
     my_files: Dosyalarım
+  root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: "Root Hesapları"
   roster: 
     delete_confirm: "Bu kullanıcıyı silmek istediğinize emin misiniz?"
@@ -16342,8 +16352,11 @@ tr:
     status: 
       confirming_course: "%{course_name} Onaylanıyor..."
       removing_crosslisting_of_section: "Çarpraz Listeden Kaldırma Bölümü..."
+  section_84b5391: bölüm
+  section_id_6f73f3d5: "bölüm id"
   section_name_b6d82574: "Bölüm Adı"
   section_name_edb51b2: "bölüm ismi"
+  section_sis_94511bcd: "bölüm öbs"
   section_sis_id_6f989834: "bölüm öbs id"
   section_specific_topics_must_have_sections_11868960: "Bölüme özel konularda bölüm olmak zorunda"
   sections: 
@@ -16475,6 +16488,7 @@ tr:
         go_to_dashboard: "Kontrol Paneline Git"
       not_available_yet: "Sana bir e-posta mesajı yolladık kısa bir süre sonra derslere başlayacağız."
   self_registration_156392d6: "Kendi Kendine Kayıt"
+  self_signup_15b23092: self_signup
   send_a_message_to_student_b2e72576: "%{student} mesaj gönder"
   send_a_message_to_the_teacher_1ae115b6: "Eğitmene Bir Mesaj Gönderin"
   send_comment_to_the_whole_group_8d41e63a: "Tüm gruba yorum gönder"
@@ -17479,12 +17493,15 @@ tr:
       Bu, bir hesapta yeni öğrenci grup sayfasını etkinleştirir. Yeni sayfa, daha dinamik grup hesabı oluşturma deneyimi sağlamak
       için oluşturuldu.
   student_id: "Öğrenci ID"
+  student_id_236970d8: student_id
+  student_id_7cc45fb5: "öğrenci id"
   student_interactions_report_7717b685: "Öğrenci Etkileşim Raporu"
   student_messages_b0a242d: "Öğrenci Mesajları"
   student_must_complete_one_of_these_requirements_6046eb3a: "Öğrenci bu gerekliliklerden birini tamamlamalı"
   student_n_a_30b1753f: "Öğrenci: N/A"
   student_name: "Öğrenci adı"
   student_name_a30d555e: "Öğrenci: %{name}"
+  student_name_b446c661: "öğrenci adı"
   student_name_c45b2a7: "Öğrencinin Adı"
   student_name_hidden_b894d102: "öğrenci (isim gizli)"
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "İsimsiz notlandırma gerektiği için öğrenci isimleri gizli olmalı."
@@ -17496,6 +17513,7 @@ tr:
       yeterlik/telafi olarak gösterilir.
   student_position_6d3b7750: "Öğrenci %{position}"
   student_settings_354d9a7e: "Öğrenci Ayarları"
+  student_sis_d9f0cd39: "öğrenci öbs"
   student_sis_id_abe6b292: "öğrenci öbs id"
   student_submissions_910da1b3: "Öğrenci Gönderimleri"
   student_summary: 
@@ -17825,7 +17843,10 @@ tr:
   teachers_52e2423f: Öğretmenler
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Canvas'tan ne zaman ve hangi sıklıkla bildirim almak istediğinizi burada belirtiniz."
   templates_4ca13d07: Şablonlar
+  term_41f37cae: dönem
   term_e1c1d390: Dönem
+  term_id_74b933ef: "dönem id'si"
+  term_sis_7edb8ab7: "dönem öbs"
   terms: 
     errors: 
       not_unique: "ÖBS ID \"%{sis_source_id}\" zaten kullanılıyor"
@@ -18273,6 +18294,7 @@ tr:
   unable_to_find_filetype_7b620f02: "dosyatürü bulunamadı"
   unable_to_remove_app_4293cb53: "Uygulama kaldırılamıyor"
   unauthorized: yetkilendirilmemiş
+  unauthorized_to_delete_this_file_a1271224: "Bu dosyayı silmek için yetki yok"
   unbookmark_this_question_bank_d87d1a07: "Bu Soru Bankasını Sık Kullanılanlardan Çıkar"
   unchanged_aca18e02: "[Değişmemiş]"
   undated_15c2e5fe: Tarihsiz
@@ -18388,6 +18410,7 @@ tr:
     registration: 
       agree_to_terms_with_code_of_conduct: "*Kullanım Koşulları* ve **davranış kurallarını** Kabul Ediyorsunuz."
   user_696f4d6a: kullanıcı
+  user_access_tokens_title: "Kullanıcı Erişim Anahtarları"
   user_avatars_e4fc4ed3: "Kullanıcı Avatarları"
   user_c95de254: Kullanıcı
   user_content_aaf0fb5a: "Kullanıcı İçeriği"
@@ -18396,6 +18419,7 @@ tr:
     cant_come_before_from: "'e kadar', 'den Başlayarak'tan önce gelemez"
     results_found: "%{length} sonuç bulundu"
   user_details_2613c079: "Kullanıcı Ayrıntıları"
+  user_id_8256faeb: user_id
   user_id_bcace870: "Kullanıcı ID"
   user_id_user_id_69a9e865: "Kullanıcı ID: %{user_id}"
   user_lists: 
