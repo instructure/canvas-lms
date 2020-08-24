@@ -19,6 +19,7 @@
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 import MissingPeopleSection from '../missing_people_section'
+import {fireEvent, render, wait} from '@testing-library/react'
 
 describe('MissingPeopleSection', () => {
   const missingLogins = {
@@ -100,5 +101,33 @@ describe('MissingPeopleSection', () => {
     const rows = missingPeopleSection.find('tbody tr')
     expect(rows).toHaveLength(1)
     expect(rows.find('input[type="text"]').prop('value')).toEqual('Searched Name1') // name input
+  })
+
+  it('selects the checkbox when the "Click to add a name" link is clicked', () => {
+    const missing = {
+      addr1: {
+        address: 'addr1',
+        type: 'email',
+        createNew: false,
+        newUserInfo: {name: 'Searched Name1', email: 'addr1'}
+      }
+    }
+
+    const {container} = render(
+      <MissingPeopleSection
+        searchType="unique_id"
+        inviteUsersURL={inviteUsersURL}
+        missing={missing}
+        onChange={noop}
+      />
+    )
+    expect(container.querySelector('input[type="checkbox"][value="addr1"]').checked).toBe(false)
+
+    const clickToAddNameLink = container.querySelector('button[data-address="addr1"]')
+    fireEvent.click(clickToAddNameLink)
+
+    wait(() =>
+      expect(container.querySelector('input[type="checkbox"][value="addr1"]').checked).toBe(true)
+    )
   })
 })

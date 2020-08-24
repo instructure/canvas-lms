@@ -74,7 +74,7 @@ class MissingPeopleSection extends React.Component {
     ) {
       // The link was rendered with the attribute data-address=address for this row.
       // Use it to find the checkbox with the matching value.
-      const checkbox = this.tbodyNode.current.querySelector(
+      const checkbox = document.querySelector(
         `input[type="checkbox"][value="${event.currentTarget.getAttribute('data-address')}"]`
       )
       if (checkbox) {
