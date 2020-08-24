@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,18 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module Lti
-  module ToolProxyNameBookmarker
-    extend NameBookmarkerBase
 
-    def self.bookmark_for(tool_proxy)
-      bookmark_for_name_and_id(tool_proxy.name, tool_proxy.id)
+require 'spec_helper'
+require_relative 'name_bookmarker_base_shared_examples'
+
+describe Lti::ExternalToolNameBookmarker do
+  include_context 'name_bookmarker_base_shared_examples'
+
+  it_behaves_like 'a bookmarker for models with names' do
+    let(:model_factory_proc) do
+      lambda { |account, model_name| external_tool_model(context: account, opts: { name: model_name }) }
     end
 
-    def self.restrict_scope(scope, pager)
-      restrict_scope_by_name_and_id_fields(
-        scope: scope, pager: pager,
-        name_field: 'lti_tool_proxies.name', id_field: 'lti_tool_proxies.id'
+    let(:model_base_scope) do
+      ContextExternalTool.order(
+        BookmarkedCollection.best_unicode_collation_key('context_external_tools.name'),
+        :id
       )
     end
   end

@@ -19,29 +19,20 @@
 #
 module Lti
   module ExternalToolNameBookmarker
-    def self.bookmark_for(external_tool)
-      [external_tool.name.downcase, external_tool.id]
-    end
+    extend NameBookmarkerBase
 
-    def self.validate(bookmark)
-      bookmark.is_a?(Array) && bookmark.size == 2 &&
-        bookmark[0].is_a?(String) &&
-        bookmark[1].is_a?(Integer)
+    def self.bookmark_for(external_tool)
+      bookmark_for_name_and_id(external_tool.name, external_tool.id)
     end
 
     def self.restrict_scope(scope, pager)
-      name_collation_key = BookmarkedCollection.best_unicode_collation_key('context_external_tools.name')
-      placeholder_collation_key = BookmarkedCollection.best_unicode_collation_key('?')
-      if pager.current_bookmark
-        bookmark = pager.current_bookmark
-        comparison = (pager.include_bookmark ? ">=" : ">")
-        scope = scope.where(
-          " (#{name_collation_key} = #{placeholder_collation_key} AND context_external_tools.id #{comparison} ?) "\
-          "OR #{name_collation_key} #{comparison} #{placeholder_collation_key}",
-          bookmark[0], bookmark[1], bookmark[0]
-        )
-      end
-      scope
+      # Note -- order is apparently unnecessary here, it has already been done
+      # by ContextExternalTools.all_tools_for()
+      restrict_scope_by_name_and_id_fields(
+        scope: scope, pager: pager,
+        name_field: 'context_external_tools.name', id_field: 'context_external_tools.id',
+        order: false
+      )
     end
   end
 end
