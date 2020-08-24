@@ -110,8 +110,8 @@ class AccountNotification < ActiveRecord::Base
           else
             announcement.shard.activate do
               if announcement.account.root_account?
-                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course).
-                  where(:courses => {:root_account_id => announcement.account_id}).select(:role_id).to_a
+                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.
+                  where(root_account_id: announcement.account_id).select(:role_id).to_a
               else
                 sub_account_ids_map[announcement.account_id] ||=
                   Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
