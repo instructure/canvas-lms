@@ -26,6 +26,7 @@ import Conference from 'compiled/models/Conference'
 import ConferenceView from 'compiled/views/conferences/ConferenceView'
 import ConcludedConferenceView from 'compiled/views/conferences/ConcludedConferenceView'
 import EditConferenceView from 'compiled/views/conferences/EditConferenceView'
+import renderBigBlueButtonAlert from '../conferences/renderBigBlueButtonAlert'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_forms'
 import 'jqueryui/dialog'
@@ -37,9 +38,12 @@ import 'jquery.templateData'
 import 'jquery.instructure_date_and_time'
 import renderConferenceAlternatives from '../conferences/renderAlternatives'
 
+const bbbSettings = ENV.conference_type_details.find(d => d.type === 'BigBlueButton')
 if (ENV.can_create_conferences) {
   if (ENV.render_alternatives) {
     renderConferenceAlternatives()
+  } else if (bbbSettings?.free_trial) {
+    renderBigBlueButtonAlert()
   }
 }
 
