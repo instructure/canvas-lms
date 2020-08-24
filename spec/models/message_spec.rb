@@ -775,4 +775,20 @@ describe Message do
       expect(message.context_context).to eq dt.context
     end
   end
+
+  describe 'Message.in_partition' do
+    let(:partition) { { 'created_at' => DateTime.new(2020, 8, 25) } }
+
+    it 'uses the specific partition table' do
+      expect(Message.in_partition(partition).to_sql).to match(/^SELECT "messages_2020_35"\.\* FROM .*"messages_2020_35"$/)
+    end
+
+    it 'can be chained' do
+      expect(Message.in_partition(partition).where(id: 3).to_sql).to match(/^SELECT "messages_2020_35"\.\* FROM .*"messages_2020_35" WHERE "messages_2020_35"."id" = 3$/)
+    end
+
+    it 'has no side-effects on other scopes' do
+      expect(Message.in_partition(partition).unscoped.to_sql).to match(/^SELECT "messages"\.\* FROM .*"messages"$/)
+    end
+  end
 end
