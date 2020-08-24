@@ -58,13 +58,13 @@ export default function CanvasMediaPlayer(props) {
   const mediaPlayerRef = useRef(null)
 
   function boundingBox() {
-    if (window.frameElement?.tagName === 'IFRAME' || !containerRef.current) {
-      return {width: window.innerWidth, height: window.innerHeight}
-    } else if (document.fullscreenElement) {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
       return {
-        width: document.fullscreenElement.clientWidth,
-        height: document.fullscreenElement.clientHeight
+        width: window.innerWidth,
+        height: window.innerHeight
       }
+    } else if (window.frameElement?.tagName === 'IFRAME' || !containerRef.current) {
+      return {width: window.innerWidth, height: window.innerHeight}
     } else {
       // media_player_iframe_content.js includes a 16px top/bottom margin
       return {
@@ -140,7 +140,8 @@ export default function CanvasMediaPlayer(props) {
     }
   }, [handlePlayerSize])
 
-  const includeFullscreen = document.fullscreenEnabled && props.type === 'video'
+  const includeFullscreen =
+    (document.fullscreenEnabled || document.webkitFullscreenEnabled) && props.type === 'video'
 
   function renderNoPlayer() {
     if (mediaObjNetworkErr) {
@@ -205,7 +206,12 @@ export default function CanvasMediaPlayer(props) {
 }
 
 export function setPlayerSize(player, type, boundingBox, playerContainer) {
-  const {width, height} = sizeMediaPlayer(player, type, boundingBox, !!document.fullscreenElement)
+  const {width, height} = sizeMediaPlayer(
+    player,
+    type,
+    boundingBox,
+    !!(document.fullscreenElement || document.webkitFullscreenElement)
+  )
   player.style.width = width
   player.style.height = height
   // player.style.margin = '0 auto' // TODO: remove with player v7

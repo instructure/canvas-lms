@@ -335,6 +335,38 @@ describe('CanvasMediaPlayer', () => {
         expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
         expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
       })
+      describe("for safari's fullscreen api", () => {
+        beforeAll(() => {
+          document.fullscreenEnabled = undefined
+        })
+        it('renders all the buttons', () => {
+          document.webkitFullscreenEnabled = true
+          const {getAllByText} = render(
+            <CanvasMediaPlayer
+              media_id="dummy_media_id"
+              media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+            />
+          )
+          expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
+        })
+        it('skips fullscreen button when not enabled', () => {
+          document.webkitFullscreenEnabled = false
+          const {queryAllByText} = render(
+            <CanvasMediaPlayer
+              media_id="dummy_media_id"
+              media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+            />
+          )
+          expect(queryAllByText('Full Screen').length).toBe(0)
+        })
+        it('skips source chooser button when there is only 1 source', () => {
+          document.webkitFullscreenEnabled = true
+          const {getAllByText} = render(
+            <CanvasMediaPlayer media_id="dummy_media_id" media_sources={[defaultMediaObject()]} />
+          )
+          expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
+        })
+      })
       it('includes the CC button when there are subtitle track(s)', () => {
         const {getAllByText, getByLabelText, queryByLabelText} = render(
           <CanvasMediaPlayer
@@ -434,6 +466,27 @@ describe('CanvasMediaPlayer', () => {
       expect(player.classList.add).toHaveBeenCalledWith('video-player')
       expect(player.style.width).toBe('400px')
       expect(player.style.height).toBe('800px')
+    })
+    describe("for safari's fullscreen api", () => {
+      it('when the video is fullscreen landscape', async () => {
+        const container = document.createElement('div')
+        const player = makePlayer(500, 250)
+        document.webkitFullscreenElement = container
+        setPlayerSize(player, 'video/*', {width: 1000, height: 800}, null)
+        expect(player.classList.add).toHaveBeenCalledWith('video-player')
+        expect(player.style.width).toBe('1000px')
+        expect(player.style.height).toBe('500px')
+      })
+
+      it('when the video is fullscreen portrait', () => {
+        const container = document.createElement('div')
+        const player = makePlayer(250, 500)
+        document.webkitFullscreenElement = container
+        setPlayerSize(player, 'video/*', {width: 1000, height: 800}, null)
+        expect(player.classList.add).toHaveBeenCalledWith('video-player')
+        expect(player.style.width).toBe('400px')
+        expect(player.style.height).toBe('800px')
+      })
     })
   })
 })
