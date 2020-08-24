@@ -109,10 +109,15 @@ class AccountNotification < ActiveRecord::Base
             account_users = user.account_users.shard(user.in_region_associated_shards).distinct.select(:role_id).to_a
           else
             announcement.shard.activate do
-              sub_account_ids_map[announcement.account_id] ||=
-                Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
-              enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course).
-                where(:courses => {:account_id => sub_account_ids_map[announcement.account_id]}).select(:role_id).to_a
+              if announcement.account.root_account?
+                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course).
+                  where(:courses => {:root_account_id => announcement.account_id}).select(:role_id).to_a
+              else
+                sub_account_ids_map[announcement.account_id] ||=
+                  Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
+                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course).
+                  where(:courses => {:account_id => sub_account_ids_map[announcement.account_id]}).select(:role_id).to_a
+              end
               account_users = announcement.account.root_account.cached_all_account_users_for(user)
             end
           end
