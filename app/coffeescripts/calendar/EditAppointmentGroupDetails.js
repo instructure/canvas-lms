@@ -86,7 +86,10 @@ export default class EditAppointmentGroupDetails {
     this.contexts.forEach(c => (this.contextsHash[c.asset_string] = c))
 
     this.form = $(selector).find('form')
-    const editableContexts = this.contexts.filter(c => !c.concluded)
+    // disallow courses in foreign shards
+    const editableContexts = this.contexts.filter(
+      c => !c.concluded && (c.id || '').toString().length < 14
+    )
     this.contextSelector = new ContextSelector(
       '.ag-menu-container',
       this.apptGroup,
