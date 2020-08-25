@@ -718,4 +718,61 @@ describe NotificationMessageCreator do
       expect(@cc.notification_policies.reload.count).to eq 1
     end
   end
+
+  describe "#cancel_pending_duplicate_messages" do
+    context "partitions" do
+      let(:subject) { NotificationMessageCreator.new(double("notification", name: nil), nil) }
+
+      def set_up_stubs(start_time, *conditions)
+        scope = double("Message Scope")
+        expect(Message).to receive(:in_partition).ordered.with('created_at' => start_time).and_return(scope)
+        expect(scope).to receive(:where).ordered.and_return(scope)
+        expect(scope).to receive(:for).ordered.and_return(scope)
+        expect(scope).to receive(:by_name).ordered.and_return(scope)
+        expect(scope).to receive(:for_user).ordered.and_return(scope)
+        expect(scope).to receive(:cancellable).ordered.and_return(scope)
+        unless conditions.empty?
+          expect(scope).to receive(:where).with(*conditions).ordered.and_return(scope)
+        end
+        expect(scope).to receive(:update_all).ordered
+      end
+
+      it "targets a single partition by default" do
+        now = Time.parse("2020-08-26 12:00:00UTC")
+        Timecop.freeze(now) do
+          set_up_stubs(now - 6.hours, created_at: (now - 6.hours)..now)
+          subject.send(:cancel_pending_duplicate_messages)
+        end
+        # now verify the in_partition calls will result in what we expect
+        expect(Message.infer_partition_table_name('created_at' => now - 6.hours)).to eq "messages_2020_35"
+      end
+
+      it "targets both partitions if we cross the partition boundary" do
+        now = Time.parse("2020-08-24 03:00:00UTC")
+        Timecop.freeze(now) do
+          set_up_stubs(now - 6.hours, "created_at>=?", now - 6.hours)
+          set_up_stubs(now, "created_at<=?", now)
+          subject.send(:cancel_pending_duplicate_messages)
+        end
+        # now verify the in_partition calls will result in what we expect
+        expect(Message.infer_partition_table_name('created_at' => now - 6.hours)).to eq "messages_2020_34"
+        expect(Message.infer_partition_table_name('created_at' => now)).to eq "messages_2020_35"
+      end
+
+      it "targets 3 partitions if it's really long" do
+        now = Time.parse("2020-08-24 03:00:00UTC")
+        Setting.set("pending_duplicate_message_window_hours", 7 * 24 + 6)
+        Timecop.freeze(now) do
+          set_up_stubs(now - (7 * 24 + 6).hours, "created_at>=?", now - (7 * 24 + 6).hours)
+          set_up_stubs(now - 6.hours)
+          set_up_stubs(now, "created_at<=?", now)
+          subject.send(:cancel_pending_duplicate_messages)
+        end
+        # now verify the in_partition calls will result in what we expect
+        expect(Message.infer_partition_table_name('created_at' => now - (24 * 7 + 6).hours)).to eq "messages_2020_33"
+        expect(Message.infer_partition_table_name('created_at' => now - 6.hours)).to eq "messages_2020_34"
+        expect(Message.infer_partition_table_name('created_at' => now)).to eq "messages_2020_35"
+      end
+    end
+  end
 end
