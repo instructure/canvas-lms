@@ -335,13 +335,39 @@ class NotificationMessageCreator
   end
 
   def cancel_pending_duplicate_messages
-    Message.where(:notification_id => @notification).
-      for(@asset).
-      by_name(@notification.name).
-      for_user(@to_user_channels.keys).
-      cancellable.
-      where("created_at BETWEEN ? AND ?", Setting.get("pending_duplicate_message_window_hours", "6").to_i.hours.ago, Time.now.utc).
-      update_all(:workflow_state => 'cancelled')
+    first_start_time = start_time = Setting.get("pending_duplicate_message_window_hours", "6").to_i.hours.ago
+    final_end_time = Time.now.utc
+    first_partition = Message.infer_partition_table_name('created_at' => first_start_time)
+
+    loop do
+      end_time = start_time + 7.days
+      end_time = final_end_time if end_time > final_end_time
+      scope = Message.
+        in_partition('created_at' => start_time).
+        where(:notification_id => @notification).
+        for(@asset).
+        by_name(@notification.name).
+        for_user(@to_user_channels.keys).
+        cancellable
+      start_partition = Message.infer_partition_table_name('created_at' => start_time)
+      end_partition = Message.infer_partition_table_name('created_at' => end_time)
+      if first_partition == start_partition &&
+        start_partition == end_partition
+        Message.infer_partition_table_name('created_at' => end_time)
+        scope = scope.where(created_at: start_time..end_time)
+        break_this_loop = true
+      elsif start_time == first_start_time
+        scope = scope.where("created_at>=?", start_time)
+      elsif start_partition == end_partition
+        scope = scope.where("created_at<=?", end_time)
+        break_this_loop = true
+      # else <no conditions; we're addressing the entire partition>
+      end
+      scope.update_all(:workflow_state => 'cancelled')
+
+      break if break_this_loop
+      start_time = end_time
+    end
   end
 
   def too_many_messages_for?(user)
