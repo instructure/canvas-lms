@@ -966,5 +966,33 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
     end
+
+    context 'fonts', ignore_js_errors: true do
+      it 'should successfully change to Balsamiq Sans font with menubar options' do
+        text = 'Hello font'
+        rce_wysiwyg_state_setup(@course, text)
+        select_all_in_tiny(f('#wiki_page_body'))
+        click_menubar_submenu_item('Format', 'Fonts')
+        menu_option_by_name('Balsamiq Sans').click
+        fj('button:contains("Save")').click
+        wait_for_ajaximations
+        expect(f('.show-content.user_content p span').attribute('style')).to eq(
+          "font-family: \"Balsamiq Sans\", lato, \"Helvetica Neue\", Helvetica, Arial, sans-serif;"
+        )
+      end
+
+      it 'should successfully change to Architects Daughter font with menubar options' do
+        text = 'Hello font'
+        rce_wysiwyg_state_setup(@course, text)
+        select_all_in_tiny(f('#wiki_page_body'))
+        click_menubar_submenu_item('Format', 'Fonts')
+        menu_option_by_name("Architect's Daughter").click
+        fj('button:contains("Save")').click
+        wait_for_ajaximations
+        expect(f('.show-content.user_content p span').attribute('style')).to eq(
+          "font-family: \"Architects Daughter\", lato, \"Helvetica Neue\", Helvetica, Arial, sans-serif;"
+        )
+      end
+    end
   end
 end
