@@ -15892,7 +15892,7 @@ tr:
   renderDatepickerTime: 
     datepicker: 
       titles: 
-        am_pm: am/pm
+        am_pm: öö/ös
         hour: saat
         minute: dakika
   replace_e61834a7: Değiştir
@@ -18013,7 +18013,7 @@ tr:
       tiny: "%l:%M%P"
       tiny_on_the_hour: "%l%P"
     less_than_a_minute_ago: "bir dakikadan daha az"
-    pm: pm
+    pm: ös
     ranges: 
       different_days: "%{start_date_and_time} ile %{end_date_and_time}"
       same_day: "%{date} tarihi %{start_time} ile %{end_time}"
