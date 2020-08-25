@@ -3,8 +3,6 @@
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
 WORKSPACE=${WORKSPACE:-$(pwd)}
-RUBY_PATCHSET_IMAGE=${RUBY_PATCHSET_IMAGE:-canvas-lms-ruby}
-PATCHSET_TAG=${PATCHSET_TAG:-canvas-lms}
 
 dependencyArgs=(
   --build-arg BUILDKIT_INLINE_CACHE=1
@@ -13,22 +11,12 @@ dependencyArgs=(
   --file Dockerfile.jenkins
 )
 
-if [[ "${SKIP_CACHE:-false}" = "false" ]]; then
-  dependencyArgs+=("--cache-from $DEPENDENCIES_MERGE_IMAGE")
-fi
-
 # shellcheck disable=SC2086
 DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
   --pull \
   ${dependencyArgs[@]} \
-  --tag "$DEPENDENCIES_PATCHSET_IMAGE" \
-  --target dependencies \
-  "$WORKSPACE"
-
-# shellcheck disable=SC2086
-DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
-  ${dependencyArgs[@]} \
   --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" \
-  --tag "$PATCHSET_TAG" \
+  --cache-from $CACHE_TAG \
+  --tag "$1" \
   --target webpack-final \
   "$WORKSPACE"

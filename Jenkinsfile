@@ -272,10 +272,7 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
-    DEPENDENCIES_IMAGE = getDependenciesImage()
-    DEPENDENCIES_MERGE_IMAGE = getDependenciesMergeImage()
-    DEPENDENCIES_PATCHSET_IMAGE = getDependenciesPatchsetImage()
-
+    CACHE_IMAGE = "$BUILD_IMAGE-cache:$GERRIT_BRANCH"
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
@@ -425,11 +422,11 @@ pipeline {
                     sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                   } else {
                     withEnv([
+                      "CACHE_TAG=${configuration.isChangeMerged() ? env.MERGE_TAG : env.CACHE_IMAGE}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
                     ]) {
-                      sh 'build/new-jenkins/docker-build.sh'
+                      sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
                     }
-                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $DEPENDENCIES_PATCHSET_IMAGE"
                   }
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
                   if (isPatchsetPublishable()) {
@@ -461,6 +458,22 @@ pipeline {
                 "POSTGRES_IMAGE_TAG=${migrations.postgresTag()}"
               ]) {
                 def stages = [:]
+
+                if (configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
+                  echo 'adding Build Docker Image Cache'
+                  stages['Build Docker Image Cache'] = {
+                    skipIfPreviouslySuccessful("build-docker-cache") {
+                      withEnv([
+                        "CACHE_TAG=${env.CACHE_IMAGE}",
+                        "JS_BUILD_NO_UGLIFY=1"
+                      ]) {
+                        sh "build/new-jenkins/docker-build.sh $CACHE_IMAGE"
+                        sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $CACHE_IMAGE"
+                      }
+                    }
+                  }
+                }
+
                 if (!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
                   echo 'adding Linters'
                   timedStage('Linters', stages, {
@@ -582,25 +595,18 @@ pipeline {
                   // Retriggers won't have an image to tag/push, pull that
                   // image if doesn't exist. If image is not found it will
                   // return NULL
-                  if (!sh (script: 'docker images -q $DEPENDENCIES_PATCHSET_IMAGE')) {
-                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $DEPENDENCIES_PATCHSET_IMAGE'
-                  }
-
                   if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
                   }
 
                   // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
                   sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
-                  sh 'docker tag $DEPENDENCIES_PATCHSET_IMAGE $DEPENDENCIES_MERGE_IMAGE'
 
                   def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                   sh "docker tag \$PUBLISHABLE_TAG \$BUILD_IMAGE:${GIT_REV}"
-                  sh "docker tag \$DEPENDENCIES_PATCHSET_IMAGE \$DEPENDENCIES_IMAGE:${GIT_REV}"
 
                   // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $BUILD_IMAGE'
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $DEPENDENCIES_IMAGE'
                 }
               }
             }

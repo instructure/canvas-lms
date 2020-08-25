@@ -4,7 +4,7 @@
 
 ARG RUBY=2.6-p6.0.4
 
-FROM instructure/ruby-passenger:$RUBY AS dependencies
+FROM instructure/ruby-passenger:$RUBY AS webpack-final
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12
@@ -118,8 +118,7 @@ COPY --chown=docker:docker script          ${APP_HOME}script
 
 RUN yarn postinstall
 
-FROM dependencies AS webpack-final
-ARG JS_BUILD_NO_UGLIFY=0
-
 COPY --chown=docker:docker . ${APP_HOME}
+
+ARG JS_BUILD_NO_UGLIFY=0
 RUN COMPILE_ASSETS_NPM_INSTALL=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets
