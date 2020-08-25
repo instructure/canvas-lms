@@ -579,6 +579,7 @@ describe "context modules" do
         end
 
         it "shows tooltip warning for a min score assignemnt", priority: "1", test_id: 255917 do
+          skip "flaky, LS-1297 (8/23/2020)"
           grade_assignment(50)
           go_to_modules
           driver.action.move_to(f('.ig-row .module-item-status-icon .icon-minimize'), 0, 0).perform
