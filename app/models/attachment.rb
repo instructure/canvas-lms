@@ -674,7 +674,7 @@ class Attachment < ActiveRecord::Base
     policy = JSON.parse(Base64.decode64(policy_str))
     return nil unless Time.zone.parse(policy['expiration']) >= Time.now
     attachment = Attachment.find(policy['attachment_id'])
-    return nil unless attachment.try(:state) == :unattached
+    return nil unless [:unattached, :unattached_temporary].include?(attachment.try(:state))
     return policy, attachment
   end
 

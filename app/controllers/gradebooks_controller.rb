@@ -482,6 +482,7 @@ class GradebooksController < ApplicationController
       # TODO: remove `submissions_url` with TALLY-831
       submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
+      user_asset_string: @current_user&.asset_string,
       version: params.fetch(:version, nil)
     }
 
@@ -599,6 +600,7 @@ class GradebooksController < ApplicationController
       student_groups: group_categories_json(@context.group_categories.active, @current_user, session, {include: ['groups']}),
       submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
+      user_asset_string: @current_user&.asset_string,
       version: params.fetch(:version, nil)
     }
 

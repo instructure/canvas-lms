@@ -25,7 +25,8 @@ test('constructs reupload url from given assignment data and url template', () =
     {
       id: 'the_id'
     },
-    'the_{{ assignment_id }}_url'
+    'the_{{ assignment_id }}_url',
+    'user_22'
   )
 
   strictEqual(manager.reuploadUrl, 'the_the_id_url')
@@ -34,13 +35,21 @@ test('constructs reupload url from given assignment data and url template', () =
 QUnit.module('ReuploadSubmissionsDialogManager#isDialogEnabled')
 
 test('returns true when assignment submssions have been downloaded', () => {
-  const manager = new ReuploadSubmissionsDialogManager({hasDownloadedSubmissions: true}, 'the_url')
+  const manager = new ReuploadSubmissionsDialogManager(
+    {hasDownloadedSubmissions: true},
+    'the_url',
+    'user_22'
+  )
 
   strictEqual(manager.isDialogEnabled(), true)
 })
 
 test('returns false when assignment submssions have not been downloaded', () => {
-  const manager = new ReuploadSubmissionsDialogManager({hasDownloadedSubmissions: true}, 'the_url')
+  const manager = new ReuploadSubmissionsDialogManager(
+    {hasDownloadedSubmissions: true},
+    'the_url',
+    'user_22'
+  )
 
   strictEqual(manager.isDialogEnabled(), true)
 })
@@ -52,7 +61,8 @@ test('sets form action to reupload url', () => {
     {
       id: 'the_id'
     },
-    'the_{{ assignment_id }}_url'
+    'the_{{ assignment_id }}_url',
+    'user_22'
   )
   const dialog = sinon.stub()
   const attr = sinon.stub().returns({dialog})
@@ -67,7 +77,8 @@ test('opens dialog', () => {
     {
       id: 'the_id'
     },
-    'the_{{ assignment_id }}_url'
+    'the_{{ assignment_id }}_url',
+    'user_22'
   )
   const dialog = sinon.stub()
   const attr = sinon.stub().returns({dialog})
