@@ -43,7 +43,8 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         'click .new_page': 'createNewPage',
         'keyclick .new_page': 'createNewPage',
         'click .header-row a[data-sort-field]': 'sort',
-        'click .header-bar-right .menu_tool_link': 'openExternalTool'
+        'click .header-bar-right .menu_tool_link': 'openExternalTool',
+        'click .pages-mobile-header a[data-sort-mobile-field]': 'sortBySelect'
       },
 
       els: {
@@ -121,6 +122,12 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         $(this.focusAfterRenderSelector).focus()
       }, 1)
     }
+  }
+
+  sortBySelect(event) {
+    event.preventDefault()
+    const {sortMobileField, sortMobileKey} = event.target.dataset
+    return this.$el.disableWhileLoading(this.collection.sortByField(sortMobileField, sortMobileKey))
   }
 
   sort(event = {}) {
@@ -325,6 +332,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     json.CAN = {
       CREATE: !!this.WIKI_RIGHTS.create_page,
       MANAGE: !!this.WIKI_RIGHTS.update || !!this.WIKI_RIGHTS.delete_page,
+      DELETE: !!this.WIKI_RIGHTS.delete_page,
       PUBLISH: !!this.WIKI_RIGHTS.publish_page
     }
     json.CAN.VIEW_TOOLBAR = json.CAN.CREATE

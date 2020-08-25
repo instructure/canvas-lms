@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "base/environment";
 @import "pages/shared/mark_as_done.scss";
 
 .delete-wiki-pages-header {
@@ -23,6 +24,68 @@
   font-weight: bold;
 }
 
-.wiki-page-title {
-  padding-bottom: 8px;
+.ic-Table.wiki-page-table th,
+.ic-Table.wiki-page-table td {
+  @include mobile-only {
+    vertical-align: top;
+    padding-#{direction(left)}: 4px;
+    padding-#{direction(right)}: 4px;
+  }
+  .hide-overflow, .hide-overflow span {
+    max-width: 40vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+  .hide-overflow .front-page {
+    display: inline-block;
+  }
+  .mobile-column {
+    @include desktop-only {
+      display: none;
+    }
+  }
+}
+
+.ic-Table.wiki-page-table .header-row th {
+  padding-top: 0px;
+}
+
+.mobile-screenreader-only {
+  @include mobile-only {
+    // on mobile devices, hide certain columns and the header but
+    // keep it for screenreader purposes
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    transform: translatez(0);
+  }
+}
+
+.pages-mobile-header {
+  display: none;
+  @include mobile-only {
+    display: block;
+    font-weight: bold;
+    li {
+      font-weight: normal;
+      &.selected {
+        background-color: #d9edf9;
+      }
+    }
+    .pages-mobile-header-left {
+      float: direction(left);
+      padding-#{direction(left)}: 4px;
+    }
+    .pages-mobile-header-right {
+      float: direction(right);
+      padding-#{direction(right)}: 4px;
+    }
+  }
 }
