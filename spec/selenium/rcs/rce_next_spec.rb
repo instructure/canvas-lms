@@ -24,7 +24,7 @@
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative 'pages/rce_next_page'
 
-describe 'RCE next tests' do
+describe 'RCE next tests', ignore_js_errors: true do
   include_context 'in-process server selenium tests'
   include WikiAndTinyCommon
   include RCENextPage
@@ -224,6 +224,29 @@ describe 'RCE next tests' do
           # f('body').send_keys(:delete) --> didn't work
           f('#lnk').send_keys(:delete)
           expect(f('#para').text).to eql ''
+        end
+      end
+
+      it 'does not delete the <a> on change when content is non-text' do
+        @course.wiki_pages.create!(
+          title: 'title',
+          body:
+            "<p id='para'><a id='lnk' href='http://example.com/'><img src='some/image'/></a></p>"
+        )
+        visit_existing_wiki_edit(@course, 'title')
+        wait_for_tiny(edit_wiki_css)
+
+        click_link_for_options
+        click_link_options_button
+
+        expect(link_options_tray).to be_displayed
+
+        link_text_textbox = f('input[type="text"][value="http://example.com/"]')
+        link_text_textbox.send_keys([:end, 'x'])
+        click_link_options_done_button
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor).to be_displayed
         end
       end
 
