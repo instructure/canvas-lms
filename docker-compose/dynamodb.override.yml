@@ -1,20 +1,15 @@
 # to use this for global lookups add docker-compose/dynamodb.override.yml
 # to your COMPOSE_FILE var in .env
-# Then:
-# - Run `GlobalLookups.initialize_ddb_for_development!` from a console
+# Then run:
+# $ docker-compose run --rm web bin/rails runner GlobalLookups::DevUtils.initialize_ddb_for_development!
 version: '2.3'
 services:
   web:
     depends_on:
-      - "dynamodb"
-    links:
       - dynamodb
-    environment:
-      AWS_ACCESS_KEY_ID: 'DUMMYIDEXAMPLE'
-      AWS_SECRET_ACCESS_KEY: 'DUMMYEXAMPLEKEY'
 
   dynamodb:
     image: instructure/dynamo-local-admin:latest
-    container_name: dynamodb-local
-    ports:
-      - "8000:8000"
+    environment:
+      VIRTUAL_HOST: dynamodb.docker
+      VIRTUAL_PORT: 8000

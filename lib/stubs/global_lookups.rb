@@ -22,9 +22,11 @@ module GlobalLookups
     end
   end
 
-  unless singleton_class.method_defined?(:initialize_ddb_for_development!)
-    def self.initialize_ddb_for_development!
-      puts("Nothing to do for global lookups stub")
+  module DevUtils
+    unless singleton_class.method_defined?(:initialize_ddb_for_development!)
+      def self.initialize_ddb_for_development!
+        puts("Nothing to do for global lookups stub")
+      end
     end
   end
 end
