@@ -18,15 +18,16 @@
 
 import authenticity_token from 'compiled/behaviors/authenticity_token'
 import re_upload_submissions_form from 'jst/re_upload_submissions_form'
-import I18n from 'i18n!gradebook'
+import {setupSubmitHandler} from 'jsx/shared/helpers/reuploadSubmissionsHelper'
 import $ from 'jquery'
 import 'jquery.instructure_misc_helpers'
 
 class ReuploadSubmissionsDialogManager {
-  constructor(assignment, reuploadUrlTemplate) {
+  constructor(assignment, reuploadUrlTemplate, userAssetString) {
     this.assignment = assignment
     this.reuploadUrl = $.replaceTags(reuploadUrlTemplate, 'assignment_id', assignment.id)
     this.showDialog = this.showDialog.bind(this)
+    this.userAssetString = userAssetString
   }
 
   isDialogEnabled() {
@@ -40,31 +41,19 @@ class ReuploadSubmissionsDialogManager {
 
     ReuploadSubmissionsDialogManager.reuploadForm = $(
       re_upload_submissions_form({authenticityToken: authenticity_token()})
-    )
-      .dialog({
-        width: 400,
-        modal: true,
-        resizable: false,
-        autoOpen: false,
-        close: () => {
-          if (typeof cb === 'function') {
-            cb()
-          }
+    ).dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      autoOpen: false,
+      close: () => {
+        if (typeof cb === 'function') {
+          cb()
         }
-      })
-      .submit(function() {
-        const data = $(this).getFormData()
-        let submitForm = true
+      }
+    })
 
-        if (!data.submissions_zip) {
-          submitForm = false
-        } else if (!data.submissions_zip.match(/\.zip$/)) {
-          $(this).formErrors({submissions_zip: I18n.t('Please upload files as a .zip')})
-          submitForm = false
-        }
-
-        return submitForm
-      })
+    setupSubmitHandler(this.userAssetString)
 
     return ReuploadSubmissionsDialogManager.reuploadForm
   }

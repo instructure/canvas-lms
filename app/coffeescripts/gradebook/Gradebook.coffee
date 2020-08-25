@@ -2843,7 +2843,8 @@ export default do ->
       assignment = @getAssignment(assignmentId)
       manager = new ReuploadSubmissionsDialogManager(
         assignment,
-        @options.re_upload_submissions_url
+        @options.re_upload_submissions_url,
+        @options.user_asset_string
       )
 
       {
