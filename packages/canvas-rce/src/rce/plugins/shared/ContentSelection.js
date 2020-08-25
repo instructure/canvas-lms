@@ -170,7 +170,7 @@ export function isFileLink($element, editor) {
 }
 
 export function isImageEmbed($element) {
-  return !!asImageEmbed($element)
+  return !!asImageEmbed($element) && !$element.getAttribute('data-placeholder-for')
 }
 
 export function isVideoElement($element) {

@@ -178,10 +178,11 @@ describe('UploadFile: ComputerPanel', () => {
       expect(handleSetFile).toHaveBeenCalledWith(null)
     })
 
-    // this test passes locally, but consistently fails in jsnkins.
+    // this test passes locally, but consistently fails in jenkins.
     // Though I don't know why, this ComputerPanel typically isn't used to upload video
     // (that would be the version in canvas-media), and if you do select a video file
     // from "Upload Document", it works.
+    // see also packages/canvas-media/src/__tests__/ComputerPanel.test.js
     // eslint-disable-next-line jest/no-disabled-tests
     it.skip('Renders a video player preview if afile type is a video', async () => {
       const aFile = new File(['foo'], 'foo.mp4', {

@@ -41,6 +41,11 @@ import {RocketSVG, useComputerPanelFocus, isAudio, sizeMediaPlayer} from '@instr
 import formatMessage from '../../../../format-message'
 import {getIconFromType, isAudioOrVideo, isImage, isText} from '../fileTypeUtils'
 
+function isPreviewableAudioOrVideo(type) {
+  // chrome reports .avi files as video/avi, firefox and safari as video/x-msvideo
+  return type !== 'video/avi' && type !== 'video/x-msvideo' && isAudioOrVideo(type)
+}
+
 function readFile(theFile) {
   const p = new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -63,8 +68,8 @@ function readFile(theFile) {
       reader.readAsDataURL(theFile)
     } else if (isText(theFile.type)) {
       reader.readAsText(theFile)
-    } else if (isAudioOrVideo(theFile.type)) {
-      const sources = [{label: theFile.name, src: URL.createObjectURL(theFile)}]
+    } else if (isPreviewableAudioOrVideo(theFile.type)) {
+      const sources = [{label: theFile.name, src: URL.createObjectURL(theFile), type: theFile.type}]
       resolve(sources)
     } else {
       const icon = getIconFromType(theFile.type)
@@ -79,6 +84,14 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
   const [preview, setPreview] = useState({preview: null, isLoading: false})
   const height = 0.8 * (bounds.height - 38 - px('1.5rem')) // the trashcan is 38px tall and the 1.5rem margin-bottom
   const width = 0.8 * bounds.width
+
+  useEffect(() => {
+    return () => {
+      if (Array.isArray(preview?.preview)) {
+        URL?.revokeObjectURL?.(preview.preview[0].src)
+      }
+    }
+  }, [preview])
 
   useEffect(() => {
     if (!theFile || preview.isLoading || preview.preview || preview.error) return
@@ -160,7 +173,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
             <TruncateText maxLines={21}>{preview.preview}</TruncateText>
           </View>
         )
-      } else if (isAudioOrVideo(theFile.type)) {
+      } else if (isPreviewableAudioOrVideo(theFile.type)) {
         return <MediaPlayer sources={preview.preview} onLoadedMetadata={handleLoadedMetadata} />
       } else {
         return (
