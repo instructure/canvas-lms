@@ -44,7 +44,7 @@ module ReportSpecHelper
     account_report.parameters = parameters
     account_report.save!
     if AccountReport.available_reports[type]
-      AccountReports.generate_report(account_report)
+      AccountReports.generate_report(account_report, send_message: false)
     else
       raise ReportSpecHelperError.new("report is not properly configured in engine.")
     end

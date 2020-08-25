@@ -262,7 +262,7 @@ module AccountReports::ReportHelper
     if account_report.value_for_param "extra_text"
       options = account_report.parameters["extra_text"]
     end
-    AccountReports.message_recipient(
+    AccountReports.finalize_report(
       account_report,
       I18n.t(
         'account_reports.default.message',
