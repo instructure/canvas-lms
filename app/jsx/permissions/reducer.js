@@ -107,8 +107,10 @@ const roles = handleActions(
       groupGranularPermissionsInRole(roleToAdd)
       return roleSortedInsert(state, roleToAdd)
     },
-    [actionTypes.UPDATE_ROLE]: (state, action) =>
-      state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r)),
+    [actionTypes.UPDATE_ROLE]: (state, action) => {
+      groupGranularPermissionsInRole(action.payload)
+      return state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r))
+    },
     [actionTypes.DELETE_ROLE_SUCCESS]: (state, action) =>
       state.filter(role => action.payload.id !== role.id)
   },
