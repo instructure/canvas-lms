@@ -44,6 +44,7 @@ const ImageOptionsForm = ({
   displayAs,
   isDecorativeImage,
   altText,
+  isLinked,
   dimensionsState,
   handleAltTextChange,
   handleIsDecorativeChange,
@@ -111,6 +112,7 @@ const ImageOptionsForm = ({
           <Flex.Item margin="small none none none" padding="small">
             <RadioInputGroup
               description={formatMessage('Display Options')}
+              disabled={isLinked}
               name="display-image-as"
               onChange={handleDisplayAsChange}
               value={displayAs}

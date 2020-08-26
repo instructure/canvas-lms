@@ -74,15 +74,28 @@ export default function(props, tinymce, MutationObserver) {
 }
 
 function configureMenus(editorOptions) {
+  const insertMenuItems = [
+    ['instructure_links', 'instructure_image', 'instructure_document'],
+    ['instructure_equation', 'inserttable'],
+    ['hr']
+  ]
+  if (!ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED) {
+    insertMenuItems[0].splice(2, 0, 'instructure_media')
+  }
+
   editorOptions.menubar = 'edit insert format tools table'
   editorOptions.menu = {
+    // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
     // default edit menu is fine
     insert: {
       title: formatMessage('Insert'),
+      items: insertMenuItems.map(item => item.join(' ')).join(' | ')
+    },
+    format: {
+      title: formatMessage('Format'),
       items:
-        'instructure_links instructure_image instructure_media instructure_document | instructure_equation inserttable | hr'
+        'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align directionality | forecolor backcolor | removeformat'
     }
-    // default format menu is fine
     // default tools menu is fine
     // default table menu is fine
   }

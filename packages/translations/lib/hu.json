@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Méretek"
     },
-    "directionality_ebcae6d0": {
-        "message": "irányítottság"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Letiltja a beágyazott előnézetet."
     },
@@ -476,6 +473,9 @@
     "folder_tree_fbab0726": {
         "message": "Könyvtárfa"
     },
+    "format_4247a9c5": {
+        "message": "Formátum"
+    },
     "formatting_5b143aa8": {
         "message": "Formázás"
     },
@@ -563,6 +563,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Érvénytelen fájltípus"
     },
+    "invalid_url_cbde79f": {
+        "message": "Helytelen webcím"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } befejezve { items, plural,\n     =1 {elem}\n  other {elem}\n}"
     },
@@ -574,9 +577,6 @@
     },
     "late_2be42b88": {
         "message": "Késve"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "balról jobbra"
     },
     "link_7262adec": {
         "message": "Hivatkozás"
@@ -658,9 +658,6 @@
     },
     "mic_a7f3d311": {
         "message": "Mikrofon"
-    },
-    "miscellaneous_and_apps_f450a387": {
-        "message": "MIndenféle és Appok"
     },
     "missing_1a256b3b": {
         "message": "Hiányzik"
@@ -868,9 +865,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Vizuális szövegszerkesztő"
-    },
-    "right_to_left_ec223c81": {
-        "message": "jobbról balra"
     },
     "save_11a80ec3": {
         "message": "Mentés"

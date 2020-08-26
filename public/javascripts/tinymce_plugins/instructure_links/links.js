@@ -402,6 +402,7 @@ function updateLinks(ed, arg) {
         const yt_api = new YouTubeApi()
         const $link = $(this)
         if (
+          !ENV.use_rce_enhancements &&
           $link.attr('href') &&
           !$link.hasClass('inline_disabled') &&
           $link.attr('href').match(INST.youTubeRegEx)

@@ -38,7 +38,7 @@ class ContextController < ApplicationController
         @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
         @media_object.save
       end
-      render :json => @media_object.as_json.merge(:embedded_iframe_url => media_object_iframe_url(@media_object.media_id))
+      render :json => @media_object.as_json.merge(:embedded_iframe_url => media_object_iframe_path(@media_object.media_id))
     end
   end
 

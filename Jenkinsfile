@@ -82,37 +82,54 @@ def isPatchsetPublishable() {
   env.PATCHSET_TAG == env.PUBLISHABLE_TAG
 }
 
-def isPatchsetSlackableOnFailure() {
-  env.SLACK_MESSAGE_ON_FAILURE == 'true' && env.GERRIT_EVENT_TYPE == 'change-merged'
-}
-
 def cleanupFn(status) {
-  try {
-    ignoreBuildNeverStartedError {
+  ignoreBuildNeverStartedError {
+    try {
       def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
       rspec.uploadJunitReports()
       rspec.uploadSeleniumFailures()
       rspec.uploadRSpecFailures()
       load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
-    }
-
-    if(status == 'FAILURE' && isPatchsetSlackableOnFailure()) {
-      def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
-      def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
-      def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-      def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. " : ''
-      slackSend(
-        channel: '#canvas_builds',
-        color: 'danger',
-        message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
-      )
-    }
-  } finally {
-    ignoreBuildNeverStartedError {
+    } finally {
       execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }
+
+def postFn(status) {
+  if(status == 'FAILURE' && isPatchsetSlackableOnFailure()) {
+    def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
+    def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
+    def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
+    def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. " : ''
+    slackSend(
+      channel: '#canvas_builds',
+      color: 'danger',
+      message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
+    )
+  }
+}
+
+// These functions are intentionally pinned to GERRIT_EVENT_TYPE == 'change-merged' to ensure that real post-merge
+// builds always run correctly. We intentionally ignore overrides for version pins, docker image paths, etc when
+// running real post-merge builds.
+// =========
+def getBuildImage() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.buildRegistryPathDefault() : configuration.buildRegistryPath()
+}
+
+def getPatchsetTag() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.patchsetDefault() : imageTag.patchset()
+}
+
+def getPluginVersion(plugin) {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", "master")
+}
+
+def isPatchsetSlackableOnFailure() {
+  return env.SLACK_MESSAGE_ON_FAILURE == 'true' && env.GERRIT_EVENT_TYPE == 'change-merged'
+}
+// =========
 
 pipeline {
   agent none
@@ -125,12 +142,11 @@ pipeline {
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     NAME = imageTagVersion()
-    CANVAS_LMS_IMAGE = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms"
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
-    BUILD_IMAGE = configuration.buildRegistryPath()
+    BUILD_IMAGE = getBuildImage()
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
-    SKIP_CACHE = configuration.getBoolean('skip-cache')
+    SKIP_CACHE = configuration.skipCache()
 
     // e.g. postgres-9.5-ruby-2.6
     TAG_SUFFIX = imageTag.suffix()
@@ -139,16 +155,16 @@ pipeline {
     PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffixNew()
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
-    PATCHSET_TAG = imageTag.patchset()
+    PATCHSET_TAG = getPatchsetTag()
 
     // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-2.6
     PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-$PUBLISHABLE_TAG_SUFFIX"
 
     // e.g. canvas-lms:master when not on another branch
-    MERGE_TAG = "$CANVAS_LMS_IMAGE:$GERRIT_BRANCH"
+    MERGE_TAG = "$BUILD_IMAGE:$GERRIT_BRANCH"
 
     // e.g. canvas-lms:01.123456.78; this is for consumers like Portal 2 who want to build a patchset
-    EXTERNAL_TAG = "$CANVAS_LMS_IMAGE:$NAME"
+    EXTERNAL_TAG = "$BUILD_IMAGE:$NAME"
 
     ALPINE_MIRROR = configuration.alpineMirror()
     NODE = configuration.node()
@@ -156,6 +172,14 @@ pipeline {
     RUBY_IMAGE = "$BUILD_IMAGE-ruby"
     RUBY_MERGE_IMAGE = "$RUBY_IMAGE:$GERRIT_BRANCH"
     RUBY_PATCHSET_IMAGE = "$RUBY_IMAGE:$NAME-$TAG_SUFFIX"
+
+    RUBY_GEMS_IMAGE = "$BUILD_IMAGE-ruby-gems-only"
+    RUBY_GEMS_MERGE_IMAGE = "$RUBY_GEMS_IMAGE:$GERRIT_BRANCH"
+    RUBY_GEMS_PATCHSET_IMAGE = "$RUBY_GEMS_IMAGE:$NAME-$TAG_SUFFIX"
+
+    YARN_IMAGE = "$BUILD_IMAGE-yarn-only"
+    YARN_MERGE_IMAGE = "$YARN_IMAGE:$GERRIT_BRANCH"
+    YARN_PATCHSET_IMAGE = "$YARN_IMAGE:$NAME-$TAG_SUFFIX"
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
@@ -166,7 +190,17 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { status -> cleanupFn(status) }) {
+          // Ensure that all build flags are compatible.
+
+          if(configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
+            error "Manually triggering the change-merged build path must be combined with a custom build-registry-path"
+            return
+          }
+
+          // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
+          // wait for the current steps to complete (even wait to spin up a node), causing
+          // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
+          protectedNode('canvas-docker-nospot', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
             stage('Setup') {
               timeout(time: 5) {
                 cleanAndSetup()
@@ -191,10 +225,10 @@ pipeline {
                     /* this is the commit we're testing */
                     pullGerritRepo(gem, env.GERRIT_REFSPEC, 'gems/plugins')
                   } else {
-                    pullGerritRepo(gem, 'master', 'gems/plugins')
+                    pullGerritRepo(gem, getPluginVersion(gem), 'gems/plugins')
                   }
                 }
-                pullGerritRepo("qti_migration_tool", "master", "vendor")
+                pullGerritRepo("qti_migration_tool", getPluginVersion('qti_migration_tool'), "vendor")
 
                 sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
                 sh 'rm -v config/cache_store.yml'
@@ -212,7 +246,7 @@ pipeline {
               }
             }
 
-            if(env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms') {
+            if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
               stage('Rebase') {
                 timeout(time: 2) {
                   credentials.withGerritCredentials({ ->
@@ -250,12 +284,18 @@ pipeline {
             stage('Build Docker Image') {
               timeout(time: 30) {
                 skipIfPreviouslySuccessful('docker-build-and-push') {
-                  if (env.GERRIT_EVENT_TYPE != 'change-merged' && configuration.getBoolean('skip-docker-build')) {
+                  if (!configuration.isChangeMerged() && configuration.skipDockerBuild()) {
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                     sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                   } else {
-                    sh 'build/new-jenkins/docker-build.sh'
+                    withEnv([
+                      "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
+                    ]) {
+                      sh 'build/new-jenkins/docker-build.sh'
+                    }
+                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_GEMS_PATCHSET_IMAGE"
                     sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_PATCHSET_IMAGE"
+                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_PATCHSET_IMAGE"
                   }
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
                   if (isPatchsetPublishable()) {
@@ -268,14 +308,14 @@ pipeline {
 
             stage('Parallel Run Tests') {
               def stages = [:]
-              if (env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms') {
+              if (!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
                 echo 'adding Linters'
                 stages['Linters'] = {
                   skipIfPreviouslySuccessful("linters") {
                     credentials.withGerritCredentials {
                       sh 'build/new-jenkins/linters/run-gergich.sh'
                     }
-                    if (env.MASTER_BOUNCER_RUN == '1' && env.GERRIT_EVENT_TYPE == 'patchset-created') {
+                    if (env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged()) {
                       credentials.withMasterBouncerCredentials {
                         sh 'build/new-jenkins/linters/run-master-bouncer.sh'
                       }
@@ -331,7 +371,19 @@ pipeline {
                 }
               }
 
-              if (env.GERRIT_EVENT_TYPE != 'change-merged') {
+              if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
+                echo 'adding CDC Schema check'
+                stages['CDC Schema Check'] = {
+                  build job: '../Canvas/cdc-event-transformer-master', parameters: [
+                    string(name: 'CANVAS_LMS_IMAGE_TAG', value: "${env.NAME}-${env.TAG_SUFFIX}")
+                  ]
+                }
+              }
+              else {
+                echo 'no migrations added, skipping CDC Schema check'
+              }
+
+              if (!configuration.isChangeMerged() && (sh(script: 'build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)) {
                 echo 'adding Flakey Spec Catcher'
                 stages['Flakey Spec Catcher'] = {
                   skipIfPreviouslySuccessful("flakey-spec-catcher") {
@@ -371,14 +423,22 @@ pipeline {
               parallel(stages)
             }
 
-            if(env.GERRIT_EVENT_TYPE == 'change-merged' && isPatchsetPublishable()) {
+            if(configuration.isChangeMerged() && isPatchsetPublishable()) {
               stage('Publish Image on Merge') {
                 timeout(time: 10) {
                   // Retriggers won't have an image to tag/push, pull that
                   // image if doesn't exist. If image is not found it will
                   // return NULL
+                  if (!sh (script: 'docker images -q $RUBY_GEMS_PATCHSET_IMAGE')) {
+                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_GEMS_PATCHSET_IMAGE'
+                  }
+
                   if (!sh (script: 'docker images -q $RUBY_PATCHSET_IMAGE')) {
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_PATCHSET_IMAGE'
+                  }
+
+                  if (!sh (script: 'docker images -q $YARN_PATCHSET_IMAGE')) {
+                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $YARN_PATCHSET_IMAGE'
                   }
 
                   if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
@@ -387,15 +447,19 @@ pipeline {
 
                   // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
                   sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
+                  sh 'docker tag $RUBY_GEMS_PATCHSET_IMAGE $RUBY_GEMS_MERGE_IMAGE'
                   sh 'docker tag $RUBY_PATCHSET_IMAGE $RUBY_MERGE_IMAGE'
+                  sh 'docker tag $YARN_PATCHSET_IMAGE $YARN_MERGE_IMAGE'
                   // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_GEMS_MERGE_IMAGE'
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_MERGE_IMAGE'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_MERGE_IMAGE'
                 }
               }
             }
 
-            if(env.GERRIT_EVENT_TYPE == 'change-merged') {
+            if(configuration.isChangeMerged()) {
               stage('Dependency Check') {
                 def reports = load 'build/new-jenkins/groovy/reports.groovy'
                 reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")

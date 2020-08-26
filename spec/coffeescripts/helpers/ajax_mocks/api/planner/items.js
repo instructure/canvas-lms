@@ -16,5 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'account_add_user'
-import 'account_add_course'
+export default `[]`

@@ -16,9 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!ExternalToolsPlugin'
 import htmlEscape from '../../str/htmlEscape'
 import '../../jquery.dropdownList'
 import '../../jquery.instructure_misc_helpers'
+
+// setting ENV.MAX_MRU_LTI_TOOLS can make it easier to test
+const MAX_MRU_LTI_TOOLS = ENV.MAX_MRU_LTI_TOOLS || 5
 
 /**
  * A module for holding helper functions pulled out of the instructure_external_tools/plugin.
@@ -55,7 +59,11 @@ export default {
     }
     if (ENV.use_rce_enhancements) {
       config.id = button.id
-      config.onAction = () => editor.execCommand(`instructureExternalButton${button.id}`)
+      config.onAction = () => {
+        editor.execCommand(`instructureExternalButton${button.id}`)
+        this.updateMRUList(button.id)
+        this.showHideButtons(editor)
+      }
       config.description = button.description
       config.favorite = button.favorite
     } else {
@@ -129,5 +137,41 @@ export default {
     editor.on('click', () => {
       target.dropdownList('hide')
     })
+  },
+
+  showHideButtons(ed) {
+    const label = I18n.t('Apps')
+    if (window.localStorage?.getItem('ltimru')) {
+      ed.$(ed.editorContainer.querySelector(`.tox-tbtn--select[aria-label="${label}"]`)).show()
+      ed.$(ed.editorContainer.querySelector(`.tox-tbtn[aria-label="${label}"]`)).hide()
+    } else {
+      ed.$(ed.editorContainer.querySelector(`.tox-tbtn--select[aria-label="${label}"]`)).hide()
+      ed.$(ed.editorContainer.querySelector(`.tox-tbtn[aria-label="${label}"]`)).show()
+    }
+  },
+
+  updateMRUList(toolId) {
+    let mrulist
+    try {
+      mrulist = JSON.parse(window.localStorage?.getItem('ltimru') || '[]')
+    } catch (ex) {
+      // eslint-disable-next-line no-console
+      console.log('Found bad LTI MRU data', ex.message)
+    } finally {
+      if (!Array.isArray(mrulist)) {
+        mrulist = []
+      }
+    }
+    try {
+      if (!mrulist.includes(toolId)) {
+        mrulist.unshift(toolId)
+        mrulist.splice(MAX_MRU_LTI_TOOLS, mrulist.length)
+        window.localStorage?.setItem('ltimru', JSON.stringify(mrulist))
+      }
+    } catch (ex) {
+      // swallow it
+      // eslint-disable-next-line no-console
+      console.log('Cannot save LTI MRU list', ex.message)
+    }
   }
 }

@@ -125,7 +125,6 @@ describe "admin avatars" do
     include StudentContextTray
 
     before(:each) do
-      preload_graphql_schema
       @account = Account.default
       @account.enable_feature!(:student_context_cards)
       @student = student_in_course.user

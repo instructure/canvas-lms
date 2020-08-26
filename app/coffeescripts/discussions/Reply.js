@@ -26,6 +26,7 @@ import preventDefault from '../fn/preventDefault'
 import KeyboardShortcuts from '../views/editor/KeyboardShortcuts'
 import stripTags from 'str/stripTags'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import {send} from 'jsx/shared/rce/RceCommandShim'
 import 'jquery.instructure_forms'
 
 RichContentEditor.preloadRemoteModule()
@@ -153,6 +154,18 @@ class Reply {
   //
   // @api private
   submit() {
+    // Check to make sure the RCE is ready to submit
+    const rceInputs = this.discussionEntry.find('textarea[data-rich_text]').toArray()
+
+    if (rceInputs.length > 0) {
+      if (window.ENV.use_rce_enhancements) {
+        const okayToContinue = rceInputs
+          .map(rce => send($(rce), 'checkReadyToGetCode', window.confirm))
+          .every(i => i)
+        if (!okayToContinue) return
+      }
+    }
+
     this.hide()
     this.view.model.set(
       'notification',

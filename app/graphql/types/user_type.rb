@@ -61,14 +61,13 @@ module Types
     field :email, String, null: true
 
     def email
-      return nil unless object.grants_right? context[:current_user], :read_profile
-      if object.email_cached?
-        object.email
-      else
-        Loaders::AssociationLoader.for(User, :communication_channels).
-          load(object).
-          then { object.email }
-      end
+      return nil unless object.grants_all_rights?(context[:current_user], :read_profile, :read_email_addresses)
+
+      return object.email if object.email_cached?
+
+      Loaders::AssociationLoader.for(User, :communication_channels).
+        load(object).
+        then { object.email }
     end
 
     field :sis_id, String, null: true

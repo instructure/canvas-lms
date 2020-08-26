@@ -66,7 +66,7 @@ export default function DirectShareOperationStatus({promise, startingMsg, succes
     alert = (
       <CanvasInlineAlert variant="info" {...alertProps}>
         {startingMsg}
-        <Spinner renderTitle="" size="x-small" />
+        <Spinner renderTitle={startingMsg} size="x-small" />
       </CanvasInlineAlert>
     )
   }

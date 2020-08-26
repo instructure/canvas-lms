@@ -2920,7 +2920,8 @@ if (typeof Slick === 'undefined') {
       ) {
         if (!getEditorLock().isActive() || getEditorLock().commitCurrentEdit()) {
           scrollRowIntoView(cell.row, false)
-          setActiveCellInternal(getCellNode(cell.row, cell.cell))
+          // Always switch to edit mode if possible in response to a click
+          setActiveCellInternal(getCellNode(cell.row, cell.cell), true)
         }
       }
     }
@@ -3140,7 +3141,7 @@ if (typeof Slick === 'undefined') {
         activeCell = activePosX = getCellFromNode(activeCellNode)
 
         if (opt_editMode == null) {
-          opt_editMode = activeRow == getDataLength() || options.autoEdit
+          opt_editMode = (activeRow == getDataLength() || options.autoEdit) && !isCustomColumn(activeCell)
         }
 
         $(activeCellNode).addClass('active')
@@ -3300,7 +3301,7 @@ if (typeof Slick === 'undefined') {
       // if so, do not steal the focus from the editor
       if (getEditorLock().commitCurrentEdit()) {
         setFocus()
-        if (options.autoEdit) {
+        if (options.autoEdit && !isCustomColumn(activeCell)) {
           navigateDown()
         }
       }
@@ -3876,8 +3877,10 @@ if (typeof Slick === 'undefined') {
 
       var newCell = getCellNode(row, cell)
 
+      // Custom columns should not auto-edit when accessed via keyboard navigation
+      const autoEditDestinationCell = options.autoEdit && !isCustomColumn(cell)
       // if selecting the 'add new' row, start editing right away
-      setActiveCellInternal(newCell, forceEdit || row === getDataLength() || options.autoEdit)
+      setActiveCellInternal(newCell, forceEdit || row === getDataLength() || autoEditDestinationCell)
 
       // if no editor was created, set the focus back on the grid
       if (!currentEditor) {
@@ -3988,6 +3991,10 @@ if (typeof Slick === 'undefined') {
         throw 'Selection model is not set'
       }
       selectionModel.setSelectedRanges(rowsToRanges(rows))
+    }
+
+    function isCustomColumn(cell) {
+      return columns[cell]?.type === 'custom_column'
     }
 
     // ////////////////////////////////////////////////////////////////////////////////////////////

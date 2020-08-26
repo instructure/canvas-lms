@@ -113,6 +113,12 @@ def stashSpecResults(prefix, index) {
   }
 }
 
+def stashParallelLogs(prefix, index) {
+  dir("tmp") {
+    stash name: "${prefix}_spec_parallel_${index}", includes: 'parallel_runtime_rspec_tests/**/*.log'
+  }
+}
+
 def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
   def htmlFiles
   def failureCategories
@@ -249,6 +255,41 @@ def publishJunitReport(prefix, total) {
         }
       }
     }
+  }
+}
+
+def junitSafe(xml) {
+  // Jenkins bug with uploading junit xmls, iterating through each file and uploading
+  // separately gives accurate test count. https://issues.jenkins-ci.org/browse/JENKINS-48583
+  def testResultFiles = findFiles(glob: "${xml}")
+  testResultFiles.each { f ->
+    def fPath = f.getPath()
+    sh "echo 'UPLOAD $fPath'"
+    junit fPath
+  }
+}
+
+def copyParallelLogs(rspecTotal, seleniumTotal) {
+  dir('parallel_logs') {
+    for(int index = 0; index < rspecTotal; index++) {
+      dir("rspec_node_${index}") {
+        try {
+          unstash "rspec_spec_parallel_${index}"
+        } catch(err) {
+          println (err)
+        }
+      }
+    }
+    for(int index = 0; index < seleniumTotal; index++) {
+      dir("selenium_node_${index}") {
+        try {
+          unstash "selenium_spec_parallel_${index}"
+        } catch(err) {
+          println (err)
+        }
+      }
+    }
+    sh '../build/new-jenkins/parallel-log-combine.sh'
   }
 }
 

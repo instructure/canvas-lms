@@ -20,7 +20,16 @@ fa:
     titles: 
       add_assignment_group: "افزودن گروه تکلیف"
   AssignmentGroupListItemView: 
+    drop_highest_rule: 
+      one: "حذف بالاترین نمره"
+      other: "حذف %{count} نمره‌ بالاتر"
+    drop_lowest_rule: 
+      one: "حذف پایین‌ترین نمره"
+      other: "حذف %{count} نمره‌ پایین‌تر"
     never_drop_rule: "%{assignment_name} هرگز حذف نشود"
+    rules_text: 
+      one: "1 قاعده"
+      other: "%{count}  قاعده"
     toggle_message: "تغییر قابلیت مشاهده تکلیف"
   AssignmentKeyBindingsMixin: 
     keyboard_add_item: "افزودن تکلیف به گروه انتخاب شده"
@@ -194,10 +203,14 @@ fa:
         partner_id: "شناسه شریک"
         partner_key: "کلید شریک"
   accept_2fdd362e: قبول
+  accept_grades_4d56a3dd: "پذیرفتن نمره‌ها"
+  accept_grades_by_gradername_7a98b969: "پذیرفتن نمره‌ها توسط %{graderName} "
   acceptable_use_policy_29a28124: "سیاست استفاده قابل قبول "
+  accepted_c9f8ab87: "پذیرفته شد"
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "قالب های مورد قبول: hex، rgba، rgb، hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "قالب های مورد قبول: svg، png، jpg، gif"
   accepted_user_role_type_course_course_2ce91589: "پذیرفته شد: %{user}، %{role_type}، درس %{course}"
+  accepting_40ba3b70: " پذیرفتن"
   access_denied_f922a9ff: "دسترسی غیرمجاز شد"
   access_report_80d28095: "گزارش دسترسی"
   access_token_3be22221: "نشانه دسترسی"
@@ -1695,6 +1708,7 @@ fa:
   add_alert_b2729c99: "افزودن هشدار"
   add_an_assignment_fb73942e: "افزودن تکلیف"
   add_an_identity_provider_to_this_account_c2644478: "افزودن ارائه دهنده هویت به این حساب:"
+  add_announcement_165c3b05: "افزودن اطلاعیه"
   add_another_assignment_fc5c908f: "افزودن تکلیف دیگر"
   add_app_baf540f: "افزودن برنامه"
   add_assignment_to_name_caf173b0: "افزودن تکلیف به %{name}"
@@ -1774,6 +1788,7 @@ fa:
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "تکلیف های خود را بیفزایید. می توانید یک فهرست طولانی ایجاد کنید، یا آنها را به گروه هایی تقسیم کنید و حتی برای هر گروه تکلیف، وزن تعیین کنید."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "شناسه قسمت سفارشی نمونه Zendesk خود را برای هر یک از موارد زیر بیفزایید (قسمت هایی که دارای شناسه نباشند، ثبت نخواهد شد):"
   added_new_proficiency_rating_e30cab8a: "رتبه مهارت جدید اضافه شده است"
+  adding_rss_feed_f1202567: "افزودن خوراک خبری RSS"
   additional_comments_9aed10bb: "نظرهای دیگر"
   additional_occurrence_s_7b5b0173: "رویداد (های) دیگر"
   additional_options_7cefee79: "گزینه های بیشتر"
@@ -1911,6 +1926,7 @@ fa:
   allow_in_mastery_paths_5332c786: "دادن امکان ورود به مسیرهای تسلط"
   allow_intra_group_peer_reviews_53f1e455: "اجازه دادن به بازبینی های گروهی درون گروهی"
   allow_lor_tools: "به کاربران اجازه داده شود ابزارهای بیرونی پیکربندی شده برای LOR را مشاهده و از آنها استفاده نمایند."
+  allow_moderator_to_review_multiple_independent_gra_c59d64f6: "به یک ناظر اجازه داده شود چند نمره مستقل برای موردهای ارسالی را بازبینی کند"
   allow_multiple_attempts_e67a0a37: "اجازه دادن به چند تلاش"
   allow_opt_out_of_inbox: "به کاربران اجازه داده شود از صندوق ورودی گفتگو انتخاب کنند. این امر همه اطلاعیه ها و پیام های گفتگو را به عنوان اطلاعیه های فوری به پست الکترونیکی اولیه کاربر ارسال خواهد کرد، نشانه پیام های خوانده نشده صندوق ورودی گفتگو در صندوق ورودی را مخفی خواهد کرد و تنظیمات دلخواه اطلاعیه گفتگو را مخفی خواهد کرد."
   allow_outcome_extra_credit_57c1e84e: "امتیاز اضافی برای نتایج مجاز است."
@@ -1973,17 +1989,20 @@ fa:
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "در هنگام تنظیم حق استفاده برای %{filename} خطایی رخ داد"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "در هنگام تلاش برای ارتباط با Turnitin خطایی رخ داد."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "در هنگام بررسی وضعیت مهاجرت خطایی رخ داد"
+  an_error_occurred_while_deleting_announcements_ab1ff3f6: "در هنگام حذف اطلاعیه‌ها خطایی رخ داد."
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "هنگام بارگیری رتبه بندی های مهارت حساب خطایی روی داد: %{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: "هنگام بارگیری رتبه بندی های مهارت حساب خطایی روی داد"
   an_error_occurred_while_loading_associations_9699b3ee: "هنگام بارگذاری انجمن‌ها خطایی روی داد"
   an_error_occurred_while_loading_changes_9851b56f: "هنگام بارگذاری تغییرات خطایی رخ داد"
   an_error_occurred_while_loading_courses_11d4571e: "هنگام بارگذاری درس‌ها خطایی رخ داد"
   an_error_occurred_while_loading_late_policies_c415f676: "هنگام بارگذاری سیاست‌های دارای تأخیر خطایی رخ داد"
+  an_error_occurred_while_locking_announcements_8115ccd7: "در هنگام قفل کردن اطلاعیه ها خطایی رخ داد."
   an_error_occurred_while_migrating_405ac0b5: "در هنگام انتقال، خطایی رخ داد."
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "هنگام ذخیره سازی رتبه بندی های مهارت حساب خطایی روی داد"
   an_error_occurred_while_saving_associations_bd66f3f4: "هنگام ذخیره سازی انجمن ها خطایی رخ داد"
   an_error_occurred_while_saving_your_settings_b503a31c: "هنگام ذخیره تنظیمات شما خطایی روی داد"
   an_error_occurred_while_starting_migration_8e6015e2: "هنگام شروع انتقال خطایی رخ داد"
+  an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "هنگام به روزرسانی وضعیت اطلاعیه‌های قفل شده ، خطایی رخ داد."
   an_error_occurred_while_updating_late_policies_a95b707f: "هنگام به روزرسانی سیاست‌های دارای تأخیر خطایی رخ داد"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "هنگام حذف گروه قرار ملاقات خطایی رخ داد"
   an_error_ocurred_while_loading_announcements_32af2ce4: "در هنگام بارگذاری اطلاعیه ها خطایی رخ داد"
@@ -2040,6 +2059,7 @@ fa:
   announcement_ends_at_4ccc2a7e: "اطلاعیه خاتمه می یابد در"
   announcement_external_feeds_5be3f36b: "خوراک‌های خبری بیرونی اطلاعیه "
   announcement_fb4cb645: اطلاعیه
+  announcement_filter_d35318a7: "فیلتر اطلاعیه"
   announcement_not_found_d6d124c3: "اطلاعیه موجود نیست"
   announcement_starts_at_2e987a38: "اطلاعیه شروع می شود در"
   announcement_successfully_created_731a707f: "اطلاعیه با موفقیت ایجاد شد"
@@ -2087,14 +2107,18 @@ fa:
     podcast_title_group: "خوراک خبری پادکست اطلاعیه های گروه"
   announcements_a4b8ed4a: اطلاعیه‌ها
   announcements_cannot_be_duplicated_2de8824c: "اطلاعیه ها نمی توانند تکراری باشند"
+  announcements_deleted_successfully_7d77e9e1: "اطلاعیه‌ها با موفقیت حذف شدند."
   announcements_list_c75fc413: "فهرست اطلاعیه ها"
+  announcements_locked_successfully_43d58107: "اطلاعیه‌ها با موفقیت قفل شدند."
   announcements_tutorial_tray_994287d6: "سینی خودآموز اطلاعیه ها"
+  announcements_unlocked_successfully_1432da9d: "اطلاعیه‌ها با موفقیت قفل گشایی شدند."
   announcements_view_1019d00d: "مشاهده - اطلاعیه‌ها"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "ناشناس گذاشتن تمام یادآوری های ساخته شده توسط مربیان درباره موردهای ارسالی برای این تکلیف در برنامه نمره گذاری سریع"
   anonymize_all_annotations_made_by_instructors_on_s_5540bc09: "ناشناس گذاشتن تمام یادآوری های ساخته شده توسط مربیان درباره موردهای ارسالی برای این تکلیف در مستندساز"
   anonymize_all_instructor_comments_and_annotations__713924c9: "ناشناس گذاشتن تمام نظرات مربیان و یادداشت‌های داخل مستندساز "
   anonymous_assignments_must_be_manually_posted_a13d2ca5: "تکالیف ناشناس باید بصورت دستی ارسال شود"
   anonymous_e1b8ad27: ناشناس
+  anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "نمره‌گذاری ناشناس را نمی‌توان برای تکالیف گروهی فعال کرد."
   anonymous_grading_ccb5045c: "نمره‌گذاری ناشناس"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "نمره گذاری ناشناس نام دانشجویان را ملزم به مخفی کردن در برنامه نمره گذاری سریع™ می کند"
   anonymous_instructor_annotations_2b6c822: "یادآوری های ناشناس استاد"
@@ -2145,6 +2169,7 @@ fa:
   app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} توسط مدیر نصب شد و قفل شده است"
   app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} توسط درس اصلی نصب شد و قفل شده است"
   app_was_installed_by_the_master_course_e55ba1d7: "%{app} توسط درس اصلی نصب شد"
+  appears_at_the_top_of_the_global_navigation_tray_t_f293877e: "در بالای سینی پیمایش جهانی که روی صفحه‌های اندازه تلفن همراه باز می شود، ظاهر می شود.  ارتفاع نمایش: 48px. قالب‌های قابل قبول: svg, png, jpg, gif"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "یک شماره را به انتهای هر عنوان رویداد ضمیمه می کند (برای مثال، رویداد 1، رویداد 2 و غیره)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "یک شماره را به انتهای هر عنوان رویداد ضمیمه می کند (برای مثال، رویداد 1، رویداد 2 و غیره)\" for=\"append_iterator"
   application: 
@@ -2242,6 +2267,7 @@ fa:
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "مطمئنید که می خواهید این دوره نمره گذاری حذف شود؟"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "مطمئنید که می خواهید این طرح نمره گذاری حذف شود؟"
   are_you_sure_you_want_to_delete_this_page_2185844: "آیا اطمینان دارید که می‌خواهید این صفحه حذف شود؟"
+  are_you_sure_you_want_to_delete_this_recording_a4aab14b: "آیا مطمئن هستید که می‌خواهید این مورد ضبط شده را حذف کنید؟"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "مطمئنید که می خواهید این مورد فهرست اقدام حذف شود؟"
   are_you_sure_you_want_to_delete_this_track_f5a16357: "آیا مطمئن هستید که می خواهید این فایل صوتی را حذف کنید؟"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
@@ -2250,6 +2276,7 @@ fa:
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "مطمئنید که می خواهید رزرو شما برای این رویداد حذف شود؟"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "آیا مطمئن هستید که می خواهید همگام سازی به %{sisName} را برای همه تکالیف غیرفعال کنید؟"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "مطمئنید که می خواهید این کار را انجام دهید؟ این عمل لغو نمی شود و جایگزین نمره های موجود در دفتر نمره خواهد شد."
+  are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "آیا مطمئن هستید که می خواهید نمرات این تکلیف را برای دانشجویان ارسال کنید؟"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "مطمئنید که می خواهید این ابزار حذف شود؟"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "مطمئنید که می خواهید این کاربر حذف شود؟"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "مطمئنید که می خواهید این عکس رخ نما حذف شود؟"
@@ -2371,6 +2398,7 @@ fa:
   assignment_extensions_cac06daa: "پسوند تکلیف‌ها"
   assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "تکلیف نمره گذاری شد: %{grade} بر %{assignment_name} در %{course_code}"
   assignment_grades_have_already_been_published_ff2d84c6: "نمره های تکلیف منتشر شده اند."
+  assignment_grades_have_already_been_released_4c8a91b: "نمره های تکلیف منتشر شده اند."
   assignment_group: 
     default_name: "تکلیف ها"
     default_title: "تکلیف ها"
@@ -3092,6 +3120,7 @@ fa:
   attach_a_file_86a4fc00: "پیوست کردن یک فایل"
   attach_files_to_discussions_bd16c245: "پیوست کردن فایل ها به بحث ها"
   attach_terms_2b8770a5: "پیوست کردن نیمسال ها"
+  attached_d7423f41: "پیوست شده"
   attached_display_name_afa00c2e: "پیوست شده: %{display_name}"
   attached_files_4c1d26cf: "فایل های پیوست شده:"
   attached_files_must_be_greater_than_0_bytes_7f57bee7: "فایل های پیوست شده باید بزرگتر از 0 بایت باشند"
@@ -3115,6 +3144,8 @@ fa:
   attempt_3dd42b18: تلاش
   attempt_attempt_d3911720: "تلاش %{attempt}"
   attempt_attempt_grade_c01f45df: "تلاش %{attempt}: %{grade}"
+  attempt_current_attempt_ef626179: "تلاش %{current_attempt}"
+  attempt_current_attempt_of_max_attempts_427ed508: "تلاش %{current_attempt} از %{max_attempts}"
   attendance: 
     options: 
       clear_attendance_marks: "پاک کردن علامت های حضور"
@@ -3223,6 +3254,7 @@ fa:
   availability_dates_438d71e0: "تاریخ‌های دسترس پذیری"
   availability_dates_changed_exceptions_465ba375: "تاریخ‌های دسترس پذیری استثناء ها را تغییر داد:"
   available_8606e40c: "در دسترس"
+  available_after_3416802b: "در دسترس بعد از"
   available_after_unlock_at_b5682224: "بعد از %{unlock_at} در دسترس است"
   available_after_unlock_at_until_lock_at_499e8092: "بعد از %{unlock_at} تا %{lock_at} در دسترس است"
   available_folders_694d0436: "پوشه های موجود"
@@ -3932,6 +3964,7 @@ fa:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "نمی توان تاریخ مهلت جایگزینی را روی یک تاریخ در یک دوره نمره‌گذاری بسته شده قرار داد"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "نمی‌توان شناسه_حساب_سامانه اطلاعات دانشجو را در یک حساب_ریشه قرار داد."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "نمی‌توان تاریخ مهلت را روی یک تاریخ در دوره‌ نمره‌گذاری بسته شده قرار داد."
+  cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "تا زمانی که نمرات فعال هستند، نمی توانید گزارش های مفصل را برای تکالیف ناشناس مشاهده کنید."
   canvas: 
     migration: 
       errors: 
@@ -3958,6 +3991,9 @@ fa:
   canvas_alert_comment_author_name_for_assignment_ti_871fd642: "هشدار کانواس - نظر: %{author_name} برای %{assignment_title}، %{user_name}، %{course_name}."
   canvas_alert_grade_change_date_for_name_56f680ed: "هشدار کانواس - تغییر نمره : %{date} برای %{name}"
   canvas_alert_graded_assignment_context_for_name_459fdf31: "هشدار کانواس - نمره گذاری شده: %{assignment}، %{context} برای %{name}."
+  canvas_alert_in_asset_link_students_are_clicking_b_4cfcfbff: "هشدار کانواس- در %{asset_link}، دانشجویان برای محتوایی که نمی‌توانند به آن دسترسی داشته باشند، روی %{bad_link} کلیک می‌کنند."
+  canvas_alert_in_asset_link_students_are_clicking_b_d3ff2650: "هشدار کانواس - در %{asset_link}، دانشجویان برای دستبابی به صفحه ای که در درس شما وجود ندارد، روی %{bad_link} کلیک می‌کنند. "
+  canvas_alert_in_asset_link_students_are_clicking_b_da080154: "هشدار کانواس - در %{asset_link}، دانشجویان روی محتوا در درس دیگری روی %{bad_link} کلیک می‌کنند. "
   canvas_alert_invited_course_as_role_type_9ed79ce3: "هشدار کانواس - دعوت شده: %{course} به عنوان %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "هشدار کانواس - دعوت شده: درس به عنوان %{role_type}"
   canvas_alert_late_anonymous_submission_assignment__bf9a6452: "هشدار کانواس - مورد ارسالی دارای تأخیر ناشناس : %{assignment_name}"
@@ -3973,6 +4009,7 @@ fa:
   canvas_cartridge_file_description: "بسته صدور درس کانواس"
   canvas_cartridge_name: "وارد کننده کارتریج کانواس"
   canvas_cloud_information_fdd404f2: "اطلاعات ابر کانواس"
+  canvas_content_security_policy_c3d7bf2b: "سیاست امنیتی محتوا کانواس"
   canvas_course_id_db4de2b8: شناسه_درس_کانواس
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "پیوندهای داشبورد کانواس به داشبورد کاتالوگ هدایت خواهند شد"
   canvas_demo_7a005cf3: "نسخه نمایشی کانواس"
@@ -3999,6 +4036,7 @@ fa:
   canvas_user_id_4c18b78a: شناسه_کاربر_کانواس
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "کانواس همه موردهای ارسالی شما را پس از اینکه آزمون را ذخیره کردید، دوباره نمره گذاری می کند. این کار ممکن است چند دقیقه طول بکشد."
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: " اگر این ویژگی فعال شود ، کانواس، کلیدهایی با مقادیر تهی را از بارهای رویدادهای زنده حذف می کنیم."
+  captions_subtitles_af2c47e: "عنوان‌ها / زیرنویس‌ها"
   card_view_eaf73185: "نمای کارتی"
   careful_changes_to_group_membership_will_apply_to__19a9089c: "مراقب باشید! تغییر در عضویت گروه درباره گروه هایی اعمال خواهد شد که تکلیف های ارسالی داشته باشند. تکلیف های ارسالی گروهی ممکن است به عنوان نتیجه قرار نگیرند. مایلید یک مجموعه گروه جدید برای تکلیف های آتی ایجاد شود؟"
   cas_server_rejected_ticket_5dc2a0bc: "سرور CAS بلیت را رد کرد"
@@ -4048,12 +4086,14 @@ fa:
   changed_item_1d16a85f: "مورد تغییر یافته"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "در صورتی که از این صفحه خارج شوید، تغییرات باز هم اعمال خواهند شد."
   changes_you_made_may_not_be_saved_4e8db973: "تغییرات انجام شده ممکن است ذخیره نشوند."
+  changing_section_dates_may_override_course_and_ter_6634950e: "تغییر تاریخ‌های بخش ممکن است تنظیمات درس و تنظیمات مدت در دسترس بودن و جای گذاری در صفحه درس‌ها و داشبورد را جایگزین کند. لطفاً قبل از تغییر تاریخ بخش‌، ترم و درس را تأیید کنید."
   changing_the_late_policy_will_affect_previously_gr_49071db7: "با تغییر دادن سیاست تأخیر، موردهای ارسالی که از قبل ارسال شده اند تحت تأثیر قرار خواهند گرفت."
   changing_your_policy_now_will_affect_previously_gr_62063898: "تغییر سیاست شما در حال حاضر،  ارسالهای ارزیابی شده قبل را تحت تاثیر قرار میدهد."
   chars_written_max_character_length_len_fec9bd18: "%{chars} نوشته شده، حداکثر طول نویسه %{len} است"
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "نمودار نمره های دانشجو برای هر تکلیف"
   chat_2153c6b7: گفتگو
   check_back_in_a_little_while_17756399: "در عین حال بررسی کنید"
+  check_back_later_c4234dbc: "بعدا بررسی کنید."
   check_submission_file_type_b3dbf3fd: "کنترل نوع فایل ارسالی"
   check_to_add_a_user_for_loginid_6cd25597: "برای افزودن کاربر برای %{loginid}، انتخاب کنید"
   check_to_select_all_98e484f1: "برای انتخاب همه گزینه ها انتخاب کنید"
@@ -4100,6 +4140,7 @@ fa:
   click_here_to_view_ec8cb2fd: "برای مشاهده اینجا کلیک کنید"
   click_here_to_view_the_submission_24777a69: "برای مشاهده مورد ارسالی، اینجا کلیک کنید"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "برای بازگشت به نسخه آزمایشی خود که این تصویر لحظه‌ای گرفته شده بود، روی تصویر لحظه‌ای کلیک کنید. توجه: هر کاری که بعد از گرفتن این تصویر لحظه‌ای انجام شده، از دست خواهید داد و نمی‌توانید آن را لغو کرد!"
+  click_the_button_above_to_add_content_4c7024a: "برای افزودن محتوا روی دکمه بالا کلیک کنید"
   click_to_add_a_name_6cf551b0: "برای افزودن یک نام کلیک کنید"
   click_to_change_profile_picture_for_display_name_6a4b41db: "برای تغییر دادن عکس رخ نما برای %{display_name} کلیک کنید"
   click_to_create_a_new_user_for_address_325f6683: "برای ایجاد یک کاربر جدید برای %{address} کلیک کنید"
@@ -4737,10 +4778,12 @@ fa:
       skip_all_files: "فایل‌ها از درس بارگیری نشوند"
   content_migrations_c2841e9f: "انتقال محتوا"
   content_not_available_7b2e004: "مخاطب در دسترس نیست"
+  content_on_this_page_violates_the_security_policy__25685d8a: "محتوای این صفحه سیاست امنیتی را نقض می کند، برای راهنمایی با مدیر خود تماس بگیرید."
   content_security_policy_3bb8d922: "سیاست امنیت محتوا"
   content_security_policy_settings_3e87fcb2: "تنظیمات سیاست امنیتی محتوا "
   content_share_started_successfully_2c37fb79: "اشتراک محتوای با موفقیت شروع شد"
   content_shares_e1e1: "  اشتراک محتوا"
+  content_successfully_added_395c906f: "%{content} مورد با موفقیت افزوده شد"
   content_tag: 
     no_title: "عنوان موجود نیست"
   content_tags: 
@@ -5346,6 +5389,7 @@ fa:
   copy_to_a5396a6f: "کپی به..."
   copy_to_folder_32ecc3c3: "کپی کردن در پوشه"
   copying_628a9607: "در حال کپی کردن.."
+  copyright_and_license_information_must_be_provided_5feffaf: "اطلاعات حق نشر و مجوز باید قبل از انتشار اطلاعات برای  فایل‌ها ارائه شود."
   copyright_holder_66ee111: "دارنده حق نشر:"
   correct_answer: "جواب درست بود."
   correct_answer_5a6a57d1: "پاسخ درست"
@@ -5366,6 +5410,7 @@ fa:
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "قادر به یافتن عنوان های ورود CSV کانواس نیست"
   couldn_t_generate_diff_message_a0528b20: "امکان ایجاد diff: %{message} وجود ندارد"
   couldn_t_update_standards_for_authority_auth_81206187: "امکان بهنگام سازی استانداردها برای مرجع %{auth} وجود ندارد"
+  count_announcements_found_b7b055b3: "%{count} اطلاعیه یافت شد."
   count_apps_found_f4d86860: "%{count} برنامه یافت شد"
   count_assignments_found_17520826: 
     one: "1 تکلیف موجود است."
@@ -5426,11 +5471,17 @@ fa:
   count_points_4735a2e8: 
     one: "%{count} امتیاز"
     other: "%{count} امتیاز"
+  count_posts_added_fa55ce4: 
+    one: "%{count} مورد ارسالی افزوده شد."
+    other: "%{count} مورد ارسالی افزوده شد."
+    zero: "%{count} مورد ارسالی افزوده شد."
   count_pushed_changes_6fe7fba: "%{count} تغییر اعمال شده"
   count_quizzes_found_e5e29bb4: 
     one: "1 آزمون موجود است."
     other: "%{count} آزمون موجود است."
     zero: "هیچ آزمون نظیر موجود نیست."
+  count_recording_5ba8a655: "%{count} مورد ضبط شده"
+  count_recordings_9f8e4148: "%{count} مورد ضبط شده"
   count_replies_a685c742: "%{count} پاسخ"
   count_results_9926447c: 
     one: "%{count} نتیجه"
@@ -6327,6 +6378,7 @@ fa:
   create_a_new_user_for_address_7487e9c9: "یک کاربر جدید برای ‍‍%{address} ایجاد کنید"
   create_account_263ec6: "ایجاد حساب"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "ایجاد و اجرای آزمون‌ها و نظرسنجی‌های آنلاین نمره گذاری شده یا نمره گذاری نشده."
+  create_announcements_above_1c36202b: "اطلاعیه‌ها را در بالا ایجاد کنید."
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       هر تعداد مورد نیاز موضوع بحث، تکلیف برای نمره‌گذاری یا
       نشست برای اطلاعات و ایده های مشترک ایجاد کنید.
@@ -6354,6 +6406,7 @@ fa:
     quiz_name: "نام آزمون"
     ungrded_survey: "نظرسنجی نمره گذاری نشده"
     url: "نشانی اینترنتی"
+  create_new_attempt_19c96c03: "ایجاد تلاش جدید"
   create_new_course_e3ef9cd0: "ایجاد درس جدید"
   create_new_discussions_6ab69da2: "ایجاد کردن بحث‌های جدید"
   create_new_e0946c49: "ایجاد جدید"
@@ -6742,6 +6795,7 @@ fa:
   delete_domain_5ba75b7c: "حذف دامنه"
   delete_domain_domain_c5b68f5: "حذف دامنه %{domain}"
   delete_entry_title_5e59727b: "حذف ورودی %{title}"
+  delete_feedname_1ac9a4a4: "حذف %{feedName}"
   delete_grading_period_dba36e59: "حذف دوره نمره گذاری"
   delete_grading_period_set_b35358dd: "حذف مجموعه دوره نمره گذاری"
   delete_grading_scheme_6b308832: "حذف طرح نمره گذاری"
@@ -6762,6 +6816,7 @@ fa:
   delete_rubric_title_ac3a24e6: "حذف دستورالعمل ارزیابی:%{title}"
   delete_section_name_a48d9d79: "حذف بخش \"%{name}\""
   delete_selected_a023ccf8: "حذف انتخاب شده"
+  delete_selected_announcements_69e23710: "حذف کردن  اطلاعیه‌های انتخاب شده"
   delete_survey_56fddbbd: "حذف نظرسنجی"
   delete_term_name_f707abc9: "حذف نیمسال %{name}"
   delete_theme_918a7f24: "حذف زمینه؟"
@@ -7339,6 +7394,7 @@ fa:
   drag_to_rearrange_sections_637efee3: "برای بازآرایی بخش ها، بکشید"
   drag_up_or_down_to_reorder_382126ff: "برای مرتب سازی دوباره بالا یا پایین بکشید"
   drop_image_62a2a071: "حذف تصویر"
+  dropdown_changed_state_to_expanded_517689c2: " منوی بازشونده وضعیت را به %{expanded} تغییر داد."
   dropdown_option_1_e6ff2fc: "گزنیه منوی بازشونده 1"
   dropdown_option_2_9766a346: "گزنیه منوی بازشونده 2"
   dropped_38031953: "حذف شده"
@@ -7580,6 +7636,7 @@ fa:
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: "امکان تغییر در نمره نهایی برای کل درس بدون تغییر نمرات برای تکالیف را فعال کنید"
   enable_and_lock_e6099cc2: "فعال کردن و قفل کردن"
   enable_anonymous_grading_of_assignments_e18f75be: "نمره‌گذاری ناشناس تکالیف را فعال کنید."
+  enable_content_security_policy_8bd0b492: "سیاست امنیت محتوای فعال کنید."
   enable_course_as_a_blueprint_course_8515ffd5: "فعالسازی درس به عنوان دوره طرح"
   enable_dashboard_images_for_courses_5af458b0: "فعالسازی تصاویر داشبورد برای درس ها"
   enable_feature_title_987d8e9a: "فعالسازی ویژگی: %{title}"
@@ -7669,6 +7726,7 @@ fa:
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "\"{{CANVAS_USER_ID}}\" را برای جایگزین کردن شناسه یکتای کانواس کاربر وارد کنید"
   enter_grades_as_e113e606: "وارد کردن نمره به عنوان"
   enter_or_find_an_external_tool_url_6aebbd0d: "نشانی اینترنتی یک ابزار بیرونی را وارد کنید یا بیابید "
+  enter_specific_phrase_9b686755: "عبارت خاصی را وارد کنید."
   enter_the_access_token_for_your_organization_from__38b84fd1: "شانه دسترسی سازمان خود را از *eduappcenter.com* وارد کنید. به محض اعمال، فقط برنامه هایی که سازمان شما در EduAppCenter تأیید کرده است در صفحه برنامه های بیرونی فهرست خواهد شد. با شیوه **ایجاد نشانه دسترسی** آشنا شوید."
   enter_the_access_token_for_your_organization_from__cc77493d: "نشانه دسترسی سازمان خود را از *eduappcenter.com* وارد کنید. به محض اعمال، فقط برنامه هایی که سازمان شما در EduAppCenter تأیید کرده است در صفحه برنامه های بیرونی فهرست خواهد شد. با شیوه **ایجاد نشانه دسترسی** آشنا شوید."
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "نشانی های پست الکترونیکی کاربرانی که باید اضافه شوند به نحوی که با ویرگول یا خط از هم جدا شده باشند وارد کنید"
@@ -7952,6 +8010,7 @@ fa:
   error_message_2b9d12ee: "خطا: %{message}"
   error_rendering_duplicated_module_db821097: "خطا در تفسیر ماژول تکراری"
   error_reports_7d6c8b1e: "گزارش خطاها"
+  error_retrieving_assignment_external_tools_9102d343: "خطا در بازیابی ابزارهای بیرونی تکلیف"
   error_retrieving_content_c07ee76b: "خطا در بازیابی محتوا"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "خطا در بازیابی ابزارهای تشخیص شباهت"
   error_running_quizzes_2_export_cfecedba: "خطا در اجرای صدور Quizzes 2."
@@ -8085,6 +8144,8 @@ fa:
   external_feed: 
     original_article: "مقاله اصلی"
     short_feed_title: "خوراک خبری %{short_url}"
+  external_feed_deleted_successfully_33209dbc: "خوراک خبری بیرونی با موفقیت حذف شد."
+  external_feed_successfully_added_e0ce0784: "خوراک خبری بیرونی با موفقیت افزوده شد."
   external_feed_was_added_d6d16a0: "خوراک خبری بیرونی افزوده شد"
   external_feed_was_deleted_403465fd: "خوراک خبری بیرونی حذف شد"
   external_feeds: 
@@ -8110,8 +8171,10 @@ fa:
       posts_added: "ارسال ها افزوده شدند"
       remove_feed: "حذف %{display_name}"
   external_feeds_77f57c7d: "خوراک خبری بیرونی"
+  external_feeds_b6345379: "خوراک‌های خبری بیرونی"
   external_integration_keys_8b4f4548: "کلیدهای یکپارچه سازی بیرونی"
   external_tool_c5a6410a: "ابزار بیرونی"
+  external_tool_tool_id_6028b3b1: "ابزار بیرونی %{tool_id}"
   external_tool_url_cannot_be_left_blank_a34b6bb2: "نشانی اینترنتی بیرونی را نمی توان خالی گذاشت"
   external_tools: 
     account_navigation_configured: "پیمایش حساب پیکربندی شد"
@@ -8238,11 +8301,14 @@ fa:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "بارگذاری مؤلفه تغییرات همگام‌سازی نشده انجام نشد. آیا اتصال به شبکه درست است؟"
   failed_please_report_the_following_error_code_to_y_42248d60: "انجام نشد، لطفا رمز خطای زیر را به مدیر سیستم خود گزارش دهید: گزارش خطا:%{error}؛"
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "انجام نشد ، این گزارش در ایجاد پرونده موفق نشد. لطفا دوباره تلاش کنید. "
+  failed_to_add_new_feed_ee1c5ea: "افزایش خوراک‌های خبری جدید انجام نشد."
   failed_to_change_last_attended_date_1e340ba6: "تاریخ آخرین بازدید رانتوانست تغییر دهد"
   failed_to_clear_cache_7361ab: "پاک کردن حافظه نهان انجام نشد"
   failed_to_create_webhook_b766cf5c: "ایجاد وبهوک انجام نشد"
+  failed_to_delete_external_feed_36f19d70: "حذف خوراک های خبری بیرونی انجام نشد."
   failed_to_export_some_tool_settings_c992fc56: "صدور برخی تنظیمات ابزار انجام نشد"
   failed_to_import_media_objects_4c1fcb4f: "وارد کردن اشیاء رسانه ای انجام نشد"
+  failed_to_load_external_feeds_7ac8411d: "بارگذاری خوراک‌های خبری بیرونی انجام نشد."
   failed_to_log_in_7ceec561: "ورود انجام نشد"
   failed_to_save_please_try_again_later_bb7070fb: "ذخیره سازی انجام نشد، لطفا بعدا دوباره سعی کنید"
   failed_to_submit_draft_comment_1de83451: "ارسال نظر پیش نویس انجام نشد"
@@ -8303,7 +8369,9 @@ fa:
   features_2581da: ویژگی‌ها
   federated_attributes_5cbe6441: "ویژگی های متحد"
   federated_attributes_are_information_sent_from_you_2116fb61: "ویژگی های متحد به اطلاعات ارسالی از ارائه دهنده اعتبارسنجی گفته می شود که می توان از آن برای بهنگام سازی خودکار اطلاعات نظیر برای کاربران در کانواس در هر بار ورود آنها استفاده کرد."
+  feed_url_8a433438: "نشانی اینترنتی خوراک خبری"
   feed_url_is_required_253fda4e: "نشانی اینترنتی خوراک خبری لازم است"
+  feeds_9f1c5c76: "خوراک خبری"
   field_cannot_be_blank_afb5b332: "فیلد نمی تواند خالی باشد"
   field_must_be_either_active_or_deleted_329a42a: "\"%{field}\" باید \"%{active}\" یا \"%{deleted}\" باشد."
   field_name_31fff38e: "نام قسمت"
@@ -8378,6 +8446,7 @@ fa:
   filename_is_restricted_click_to_modify_c0bb77f8: "%{fileName} %{restricted}است- برای تغییر کلیک کنید"
   filename_is_unlocked_click_to_modify_99e847be: "%{fileName} قفل نشده است- برای تغییر دادن کلیک کنید"
   filename_is_unpublished_click_to_modify_7e731102: "%{fileName} منتشر نشده است. برای تغییر کلیک کنید"
+  filename_preview_71b2cde2: "پیش نمایش %{filename}"
   filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} درصد بارگذاری شد"
   filename_uploaded_successfully_edd8e825: "%{fileName} با موفقیت بارگذاری شد!"
   files: 
@@ -8438,6 +8507,7 @@ fa:
   filter_by_name_34cbe139: "فیلتر بر اساس نام"
   filter_by_student_name_or_secondary_id_83dc524f: "فیلتر بر اساس نام دانشجو یا شناسه ثانویه"
   filter_by_term_cfe778b2: "فیلتر براساس ترم"
+  filter_by_user_type_dbbd3e3d: "فیلتر بر اساس نوع کاربر"
   filter_conversations_by_type_1ce8c064: "فیلتر پیام ها بر اساس نوع"
   filter_discussions_by_assignments_757924ed: "فیلتر کردن بحث ها بر اساس تکلیف ها"
   filter_discussions_by_unread_6c48322: "فیلتر کردن بحث ها بر اساس موردهای خوانده نشده"
@@ -8454,6 +8524,7 @@ fa:
   final_grade_override_be8a21cd: "بازنویسی نمره نهایی"
   final_grade_score_fe69a301: "نمره نهایی: %{score}"
   final_grader_1693103c: "نمره گذار نهایی"
+  final_grader_can_view_other_grader_names_67736530: "نمره‌گذار نهایی می تواند نام سایر نمره‌گذارها را مشاهده کند"
   final_letter_grade_80dccec1: "نمره نهایی با حروف الفبا"
   final_score_26bcfc20: "نمره نهایی"
   final_score_61e15cf3: "نمره نهایی"
@@ -8622,6 +8693,7 @@ fa:
   grade_distribution_e52c9256: "توزیع نمره"
   grade_export_title: "صدور نمره"
   grade_for_name_b9df168a: "نمره برای: %{name}"
+  grade_for_studentname_d124b199: "نمره برای %{studentName}"
   grade_high_to_low_1cea0381: "نمره- زیاد به کم"
   grade_info_19fb9875: "اطلاعات نمره"
   grade_low_to_high_1678b713: "نمره - کم به زیاد"
@@ -8629,11 +8701,14 @@ fa:
   grade_out_of_points_d401b79d: "نمره از %{points}"
   grade_point_average_2976cc59: "متوسط امتیاز نمره"
   grade_posting_policy_42c8a94b: "سیاست ارسال نمره"
+  grade_saved_ab539b53: "نمره ذخیره شد."
+  grade_selection_table_dcf9d1ea: "جدول انتخاب نمره"
   grade_summary: 
     graph_title: "میانگین %{mean}،بالا %{high}، پایین %{low} "
     outcome: 
       alignment_count: "*%{count}* تطبیق"
       alignment_count_summary: "*8* از *%{count}* تطبیق"
+  grade_summary_255289f6: "خلاصه نمره"
   grade_syncing_e78475e8: "همگام‌سازی نمره"
   gradebook: 
     alerts: 
@@ -9241,26 +9316,39 @@ fa:
   graded_survey_c0f0c395: "نظرسنجی نمره گذاری شده"
   grader_comments_visible_to_graders_turned_off_d2af5e9d: "نظرات نمره گذار که برای دانشجویان قابل مشاهده است خاموش است"
   grader_comments_visible_to_graders_turned_on_dca303c7: "نظرات نمره گذار که برای دانشجویان قابل مشاهده است روشن است"
+  grader_count_cannot_be_0_9228afe4: "تعداد نمره گذار نمیتواند 0 باشد."
+  grader_count_is_required_45b6c85b: "تعداد نمره گذار لازم است."
   grader_count_set_to_count_24f05b53: "تعداد دانشجویان تنظیم شد %{count}"
   grader_d1198a9c: نمره‌گذار
+  grader_details_6406bea0: "جزئیات نمره گذاری"
   grader_grader_number_e92327d3: "نمره گذار%{grader_number}"
+  grader_gradernumber_fef5d5cf: "نمره %{graderNumber}"
+  grader_is_required_62c88f67: "نمره‌گذار لازم است."
   grader_names_visible_to_final_grader_turned_off_e2fb0c8b: "امکان مشاهده نام های دانشجویان برای دانشجویان نهایی غیر فعال شد"
   grader_names_visible_to_final_grader_turned_on_7f768b67: "امکان مشاهده نام های دانشجویان برای دانشجویان نهایی فعال  شد"
+  grader_that_determines_final_grade_cc55f20: "نمره‌گذار که نمره نهایی را تعیین می کند"
   graders_anonymous_to_graders_turned_off_e017d355: "دانشجویان ناشناس برای دانشجویان خاموش شدند."
   graders_anonymous_to_graders_turned_on_6ccf213f: "دانشجویان ناشناس برای دانشجویان روشن شدند."
+  graders_can_view_each_other_s_comments_d836b848: "نمره‌گذارها می توانند نظرات یکدیگر را مشاهده کنند."
   graders_cannot_view_each_other_s_names_b1fa7899: "دانش آموختگان نمی توانند نام یکدیگر را مشاهده کنند"
   graders_cannot_view_student_names_2e8d3ff9: "دانش آموختگان نمی توانند اسامی دانشجویان را مشاهده کنند"
   grades_a61eba0a: "نمره ها"
   grades_are_now_reverted_to_original_scores_e6deade1: "نمره ها اکنون به نمره های اصلی تبدیل شده اند"
   grades_are_now_showing_what_if_scores_711a8be2: "نمره ها اکنون نمره های احتمالی را نشان می دهند"
+  grades_cannot_be_modified_from_this_page_as_they_h_d0ebeb6: "نمرات نمی توانند از این صفحه تغییر کنند، زیرا قبلاً منتشر شده اند."
   grades_edit_773dfc24: "گروه‌ها - ویرایش"
   grades_for_student_aff00ba: "نمره های %{student}"
   grades_for_student_d4adfb55: "نمره های دانشجو"
+  grades_for_this_assignment_are_now_visible_to_stud_623efda0: "نمرات این تکلیف اکنون برای دانشجویان قابل مشاهده است."
   grades_posted_c5d8dcce: "نمره ها ارسال شد"
+  grades_posted_to_students_56b8cb2d: "نمرات به دانشجویان ارسال شد"
+  grades_released_488c2808: "نمرات منتشر شد"
+  grades_saved_5954b0bb: "نمره‌ها ذخیره شد."
   grades_select_final_grade_for_moderation_ae8585d1: "نمرات - انتخاب نمره نهایی برای تعدیل سازی"
   grades_view_all_grades_8bf9f8d3: "نمره‌ها- مشاهده همه نمره‌ها"
   grades_view_audit_trail_cc4c1fcc: "نمره‌ها - مشاهده دنباله حسابرسی"
   grades_view_change_logs_6bc1b959: "نمره‌ها - مشاهده تغییرات گزارش‌‌ها"
+  grades_were_successfully_released_to_the_gradebook_4c3b07d6: "نمرات با موفقیت در دفتر نمره  منتشر شدند."
   grades_will_be_made_visible_to_all_students_1cc4d67e: "نمرات برای همه دانشجویان قابل مشاهده خواهد بود"
   gradezilla: 
     alerts: 
@@ -9401,6 +9489,7 @@ fa:
   group_a8f5ed9c: گروه
   group_assignment_7060989f: "تکلیف گروهی"
   group_assignments_can_t_be_anonymously_graded_2dd9be24: "تکالیف گروهی نمی توانند به صورت ناشناس نمره گذاری شوند."
+  group_assignments_cannot_be_enabled_for_anonymousl_ed896b1c: "تکلیف‌های گروه را نمی توان برای تکلیف‌های نمره‌گذاری شده‌ی ناشناس فعال کرد."
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "تکلیف های گروه را نمی توان برای تکلیف های نظارت شده فعال کرد"
   group_categories: 
     notices: 
@@ -10029,6 +10118,8 @@ fa:
     text_entry_submission: "ارسال ورودی متن"
   id_ac7afadf: شناسه
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "شناسه هم اکنون در حال استفاده برای این حساب و ارائه دهنده اعتبارسنجی است"
+  id_del_alumno_bc4bcf8a: "حذف شناسه دانشجو"
+  id_del_curso_4ef15337: "حذف شناسه درس"
   id_id_4e148481: "شناسه: %{id}"
   id_token_fa5f144e: "شناسه ی token"
   identification_values_86d9ffda: "مقادیر شناسایی"
@@ -10141,6 +10232,8 @@ fa:
   importing_course_content_into_the_same_course_will_b09c69e: "وارد کردن محتوا در یک درس در بار اول محتوا را تکرار خواهد کرد و در صورت تکرار، روی موارد تکراری کپی خواهد شد."
   importing_name_8f2b131d: "وارد کردن %{name}"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "در %{asset_link}، دانشجویان برای یک صفحه ناموجود در درس شما روی %{bad_link} کلیک می‌کنند. "
+  in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "در %{asset_link}، دانشجویان روی محتوا در درس دیگری در %{bad_link} کلیک می‌کنند. "
+  in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "در %{asset_link}، دانشجویان برای محتوایی که نمی‌توانند به آن دسترسی داشته باشند، روی %{bad_link} کلیک می‌کنند."
   in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: "در مواردی که در دسترس است، RCE و نوار کناری ویکی را از سرویس محتوای غنی کانواس بارگذاری کنید."
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "در مواردی که در دسترس است، RCE را از سرویس محتوای غنی کانواس بارگذاری کنید."
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "به منظور تکمیل فرایند، به یک صفحه ورود هدایت خواهید شد که باید با استفاده از اعتبارنامه های فرزند خود وارد شوید."
@@ -10161,6 +10254,7 @@ fa:
   include_unpublished_assignments_83ebbaec: "شامل سازی تکلیف های منتشر نشده"
   include_unpublished_courses_7a0e7aab: "شامل سازی درس های منتشر نشده"
   include_unsubmitted_and_deleted_submissions_101225c7: "شامل موارد ارسالی ارسال نشده یا حذف شده"
+  include_unsubmitted_deleted_submissions_99fc2aad: "موارد ارسالی‌ ارسال نشده و حذف شده را درج کنید."
   incomplete_95612d72: ناقص
   incomplete_da3c2ea2: ناقص
   incompleteregistration: 
@@ -10190,6 +10284,7 @@ fa:
   information_7f11072: اطلاعات
   information_816d9fa5: اطلاعات
   information_icon_8a514faa: "نماد اطلاعات"
+  inherit_content_security_policy_94aff861: "ارث بری سیاست امنیت محتوا"
   inner_box_background_6f9092f: "پس زمینه کادر داخلی"
   inner_box_border_d0524b03: "مرز کادر داخلی"
   input_and_distribute_grades_for_students_display_g_9a2e46a0: "نمرات را برای دانشجویان وارد و توزیع کنید. نمرات را به صورت امتیاز، درصد، کامل یا ناقص، قبول یا مردود، مقیاس معدل و نمره به حروف نمایش دهید. تکالیف را برای وزن‌دار کردن نمرات گروه بندی کنید."
@@ -10533,6 +10628,7 @@ fa:
   latvian_2bbb6aab: لتونی
   launch_external_tool_672c0409: "راه اندازی ابزار بیرونی"
   launch_registration_tool_38d4781: "راه اندازی ابزار ثبت نام"
+  launch_speedgrader_filtered_by_student_group_8bd9b5c7: "راه اندازی نمره گذاری سریع که توسط گروه دانشجویی فیلتر شده است."
   launch_url_e150bd41: "راه اندازی نشانی اینترنتی"
   layouts: 
     application: 
@@ -10783,6 +10879,7 @@ fa:
   loading_more_gradebook_history_results_810f6d2e: "در حال بارگذاری نتایج بیشتر تاریخچه دفتر نمره."
   loading_more_results_1d437202: "در حال بارگذاری نتایج بیشتر"
   loading_more_results_def6df65: "در حال بارگذاری نتایج بیشتر..."
+  loading_more_sub_accounts_d0a30903: "در حال بارگیری حساب‌های کاربری فرعی بیش‌تر..."
   loading_more_terms_4053e31f: "در حال بارگذاری ترم های بیشتر..."
   loading_options_c823e98b: "بارگذاری انتخاب ها ..."
   loading_results_769c8819: "در حال بارگذاری نتایج"
@@ -10801,6 +10898,7 @@ fa:
   lock_date_cannot_be_after_term_end_cf1a188f: "تاریخ قفل کردن نمی تواند بعد از پایان نیمسال باشد"
   lock_date_cannot_be_before_due_date_ac30f54: "تاریخ قفل کردن نمی تواند قبل تاریخ مهلت باشد"
   lock_questions_after_answering_5aecef9d: "قفل کردن پرسش ها بعد از پاسخ دادن"
+  lock_selected_announcements_33740f80: "قفل کردن اطلاعیه‌های انتخاب شده"
   lock_this_setting_for_sub_accounts_2ae5af17: "قفل کردن این تنظیم برای زیر حساب ها"
   locked_762f138b: "قفل شده"
   locked_796957c7: "قفل شده:"
@@ -13209,6 +13307,7 @@ fa:
   more_info_at_course_name_56dc8c10: "اطلاعات بیشتر در %{course_name}"
   more_info_at_web_address_dba7e187: "اطلاعات بیشتر در %{web_address}"
   more_information_3dfb76b5: "اطلاعات بیشتر"
+  more_modules_d9a9f003: "ماژول‌های بیشتر"
   more_options_272b4953: "گزینه های دیگر"
   more_people_options_730e9686: "انتخاب افراد بیشتر"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "نتایج بیشتر در پایین صفحه اضافه شد."
@@ -13285,6 +13384,7 @@ fa:
   must_belong_to_an_active_root_account_d59a05af: "باید به یک حساب ریشه فعال تعلق داشته باشد"
   must_contribute_to_the_page_fff632c: "باید در صفحه مشارکت شود"
   must_contribute_to_this_module_item_to_complete_it_84ed571c: "باید برای تکمیل این مورد ماژول مشارکت شود"
+  must_have_at_least_1_grader_d4a54e85: "باید حداقل 1 نمره‌گذار داشته باشد"
   must_have_at_least_1_group_per_section_9809e708: "باید حداقل یک گروه به ازای هر بخش داشته باشد"
   must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "برای اختصاص بر اساس بخش، باید حداقل به تعداد بخش‌ها، گروه وجود داشته باشد"
   must_mark_as_done_91cff799: "باید به عنوان انجام شده علامت گذاری شود"
@@ -13293,6 +13393,7 @@ fa:
   must_provide_a_valid_url_26fe7e15: "باید یک نشانی اینترنتی معتبر ارائه شود."
   must_score_at_least_a_score_3b4f813d: "نمره باید حداقل %{score} باشد"
   must_score_at_least_score_to_complete_this_module__b86b5101: "برای تکمیل این مورد ماژول باید حداقل نمره %{score} کسب شود"
+  must_select_a_student_group_first_15c6a3cb: "ابتدا باید یک گروه دانشجویی را انتخاب کنید"
   must_submit_new_oauth2_request_e1fb00bb: "درخواست OAuth2 جدید باید ارسال شود"
   must_submit_the_assignment_782d025: "تکلیف باید ارسال شود"
   must_submit_this_module_item_to_complete_it_c29d67f0: "برای تکمیل، این مورد ماژول باید ارسال شود"
@@ -13445,6 +13546,7 @@ fa:
   nickname_1e6da3ad: "نام مستعار"
   nickname_7df95b09: "نام مستعار:"
   no_74e9b590: خیر
+  no_announcements_280df147: "بدون اطلاعیه"
   no_assignment_name_adbb215b: "نام تکلیف موجود نیست"
   no_assignments_with_that_name_found_1d7be1: "تکلیفی با آن نام یافت نشد"
   no_associated_terms_13bacefc: "نیمسال مرتبط موجود نیست"
@@ -13500,6 +13602,7 @@ fa:
   no_results_found_e4b686bd: "نتیجه ای یافت نشد."
   no_results_found_for_searchterm_7ee9b03e: "نتیجه ای یافت نشد برای %{searchTerm}"
   no_score_yet_c94e919b: "هنوز هیچ نمره ای موجود نیست"
+  no_students_being_observed_42e11732: "هیچ دانشجویی مشاهده نمی شود."
   no_students_dd8de9f0: "دانشجو موجود نیست"
   no_students_have_taken_the_quiz_yet_e667644b: "هیچ دانشجویی هنوز آزمون نداده است"
   no_students_have_taken_the_survey_yet_d378cd35: "هیچ دانشجویی هنوز نظرسنجی را انجام نداده است"
@@ -13876,6 +13979,7 @@ fa:
   number_between_1_and_16_inclusive_31f5468d: "عدد بین 1 و 16 شامل می شود"
   number_more_a46966: "%{number} دیگر..."
   number_of_allowed_attempts_3d10b740: "تعداد تلاش های مجاز"
+  number_of_graders_cde8dd54: "تعداد نمره‌گذارها"
   number_of_respondents_e1e7e8b: "تعداد پاسخ دهنده ها"
   number_of_scores_to_ignore_for_each_student_fb94e818: "تعداد نمرات برای نادیده گرفتن برای هر دانشجو"
   numerical_answer_ec7120bf: "پاسخ عددی"
@@ -13915,6 +14019,7 @@ fa:
   object_type_e4f3bbeb: "نوع شیء"
   observees: 
     being_observed: "دانشجویانی که در حال مشاهده شدن هستند"
+    new_observee_pairing_code: "رمز جفتی دانشجو"
     new_observee_password: "رمز عبور"
     new_observee_username: "نام کاربری"
     observee_added: "اکنون در حال مشاهده %{user}"
@@ -14221,6 +14326,7 @@ fa:
     invalid_group_override: "نمی توانید به یک گروه خارج از مجموعه گروه تکلیف تخصیص دهید"
     overrides: 
       everyone: همه
+  overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "تنظیمات دلخواه داشبورد پیش‌فرض‌های موجود همه‌ی کاربران را رونویسی کنید."
   own_copyright_cc59db55: "حق نشر من"
   owner_email_236d1b2: "نشانی پست الکترونیکی مالک"
   owner_email_4d02f795: "نشانی پست الکترونیکی مالک:"
@@ -14255,7 +14361,7 @@ fa:
     delete_confirmation: "آیا اطمینان دارید که می‌خواهید این صفحه حذف شود؟"
     delete_dialog_title: "حذف  صفحه"
     deleting_button: "درحال حذف..."
-    edit_dialog_title: "ویرایش صفحه ویکی"
+    edit_dialog_title: "ویرایش صفحه"
     errors: 
       require_title: "باید یک عنوان وارد کنید"
     headers: 
@@ -14374,6 +14480,7 @@ fa:
   planner_7fd46783: برنامه‌ریز
   play_media_comment_35257210: "پخش نظر رسانه ای"
   play_media_comment_8614d30f: "پخش نظر رسانه ای"
+  play_media_comment_by_name_from_createdat_515b3b: " نظر رسانه‌ای %{name} را  از %{createdAt} پخش کنید."
   please_add_a_due_date_1d433d2: "لطفا یک تاریخ مهلت اضافه کنید"
   please_add_at_least_one_non_blank_answer_213c2c8e: "لطفا حداقل یک پاسخ غیر خالی بیفزایید."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "لطفا حداقل یک پاسخ غیر خالی برای هر متغیر بیفزایید."
@@ -14888,6 +14995,7 @@ fa:
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "«ارسال نمره ها به سامانه اطلاعات دانشجو» به طور پیش فرض برای تکلیف ها، بحث های نمره گذاری شده و آزمون ها فعال شده است"
   post_or_hide_grades_2d1d7815: "ارسال یا پنهان کردن نمره‌ها"
   post_to_961f8937: "ارسال به"
+  post_to_students_b02df196: "ارسال به دانشجویان"
   post_types_93ff86d9: "انواع ارسال"
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_e1010e1e: "ارسال شده در:"
@@ -14895,6 +15003,7 @@ fa:
   posting_grades_cd7cd758: "در حال ارسال نمرات"
   posting_grades_is_not_allowed_because_grades_have__229d9c9e: "ارسال نمرات مجاز نیست زیرا نمرات برای این تکلیف منتشر نشده است."
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "ارسال نمرات مرورگر شما را بازیابی می کند. این ممکن است لحظه ای طول بکشد."
+  posting_to_students_eaa57964: "در حال ارسال به دانشجویان"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "آزمون تمرینی"
   pre_processing_92865c1d: "پیش پردازش"
@@ -14912,7 +15021,9 @@ fa:
   prev_month_34bd934c: "ماه قبل"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "دانشجویان را از قراردادن حاشیه نویسی روی تکالیف منع می‌کند. برای تکالیف بازبینی شده به صورت گروهی عمل نمی‌کند."
   preview_53003fd2: پیش‌نمایش
+  preview_filename_f1b58572: "%{filename} پیش نمایش"
   preview_removal_998101a9: "حذف پیش نمایش"
+  preview_unavailable_aacd459a: "پیش نمایش در دسترس نیست"
   preview_website_url_eb5b8a5f: "پیش نمایش آدرس وب سایت"
   preview_your_changes_373557d8: "پیش نمایش تغییرات شما"
   previous_445ca243: قبلی
@@ -15243,6 +15354,7 @@ fa:
       yo: Yo
     you_have_no_services: "هیچ سرویس ثبت نشده است، می توانید چند مورد را در صفحه *تنظیمات* بیفزایید."
   profile_6bd2baed: "رخ نما"
+  profile_photo_save_failed_too_many_times_e1ebda5: "دخیره سازی  عکس پروفایل بارها شکست خورده است. "
   profiles: 
     avatar_dialog: 
       from_gravatar: "از گرآواتار"
@@ -16754,6 +16866,9 @@ fa:
   quizzes_public: 
     alerts: 
       no_valid_combinations: "سیستم نمی تواند هیچ ترکیب معتبری برای پارامترهای داده شده ایجاد کند"
+      only_n_valid_combinations: 
+        one: "این سیستم تنها می تواند 1 ترکیب معتبر را برای پارامترهای داده شده ایجاد کند."
+        other: "این سیستم تنها می تواند %{count}  ترکیب معتبر را برای پارامترهای داده شده ایجاد کند"
     answer_comments: "نظرهای مربوط به پاسخ"
     answer_text: "متن پاسخ"
     at_the_bottom: "-- در پایین --"
@@ -16971,6 +17086,7 @@ fa:
   record_with_microphone_only_e4ee07aa: "ضبط فقط با میکروفون"
   record_with_webcam_af21e07c: "ضبط با وب کم"
   recording_98da6bda: "در حال ضبط"
+  recording_was_deleted_b989eaff: "مورد ضبط شده حذف شد."
   recurring_calendar_events_c940b6b8: "رویدادهای تکرارشونده تقویم"
   red_8258edf3: قرمز
   redirect_uri_legacy_b32323d3: "هدایت نشانی اینترنتی (جایگزین)"
@@ -17000,6 +17116,8 @@ fa:
         cancel: لغو
         start_participating: "شروع به مشارکت"
       labels: 
+        code: "رمز جفتی دانشجو"
+        confirm_password: "وارد کردن مجدد رمز عبور"
         email: "پست الکترونیکی شما"
         name: "نام شما"
         password: "رمز عبور"
@@ -17030,8 +17148,10 @@ fa:
     welcome_to_canvas: "به کانواس خوش آمدید!"
   registration_url_60e0eaaa: "نشانی اینترنتی ثبت نام"
   regular_style_checkbox_ee3d71c1: "کادر بررسی با سبک معمولی"
+  release_grades_c68fbcc: "انتشار نمرات"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "منتشر شده توسط مسیر تسلط: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "منتشر شده توسط مسیر تسلط: %{path}"
+  releasing_grades_31a57dde: "در حال انتشار نمرات"
   remove_account_from_this_profile_c3095eb2: "حذف حساب از این رخ نما"
   remove_all_course_observer_members_4622c70d: "همه اعضای ناظر دوره را حذف کنید"
   remove_all_group_observer_members_af5675f3: "همه اعضای گروه ناظر را حذف کنید"
@@ -17049,6 +17169,7 @@ fa:
   remove_empty_attachment_b2aea632: "حذف پیوست خالی"
   remove_f47dc62a: حذف
   remove_filename_87f3781e: "حذف %{filename}"
+  remove_filename_dab5c02e: "حذف %{filename}"
   remove_grading_scheme_title_d3942a08: "حذف طرح نمره گذاری %{title}"
   remove_icon_a4646413: "حذف نماد"
   remove_image_341340b3: "حذف تصویر"
@@ -17581,6 +17702,7 @@ fa:
     student_groups: "گروه های دانشجویی"
   search_23a88d5c: "جستجو ..."
   search_280d00bd: جستجو
+  search_announcements_by_title_407a998e: "جستجوی اطلاعیه‌ها با عنوان"
   search_by_99d1ba5f: "جستجو بر اساس"
   search_by_c559efd: "جستجو بر اساس ..."
   search_by_title_short_name_or_sis_id_fe84aa12: "جستجو بر اساس عنوان، نام کوچک یا شناسه سامانه اطلاعات دانشجو"
@@ -17754,6 +17876,8 @@ fa:
   select_course_color_cad8e62b: "انتخاب رنگ درس"
   select_d70f31da: انتخاب
   select_from_saved_comments_dd398cd4: "انتخاب از میان نظرهای ذخیره شده"
+  select_grader_782af48: "انتخاب نمره گذار"
+  select_group_to_grade_6df28d80: "انتخاب گروه برای نمره"
   select_image_e1696a4d: "انتخاب تصویر"
   select_indentation_d056bab8: "انتخاب تورفتگی"
   select_input_3dbd73c1: "انتخاب ورودی"
@@ -17786,6 +17910,7 @@ fa:
   selected_course_course_a581f834: "درس %{course} انتخاب شده"
   selected_external_tool_tool_bae095ba: "ابزار خارجی انتخاب شده %{tool}"
   selected_filename_7552a8c0: "%{filename} انتخاب شد"
+  selected_grade_942f40ba: "نمره‌ی انتخاب شده"
   selected_subtree_a7693937: "%{subtree} انتخاب شده"
   selection_height_9d57ec24: "انتخاب ارتفاع"
   selection_width_183acd79: "انتخاب عرض"
@@ -18659,6 +18784,7 @@ fa:
   show_key_1fbf0c64: "نمایش کلید"
   show_links_to_unpublished_content_30c0450d: "نمایش پیوندهای مربوط به محتوای منتشر نشده"
   show_more_af9cbc16: "نمایش بیشتر"
+  show_name_of_observed_students_in_notifications_a56dd9e4: "نام دانشجویان مشاهده شده را در اطلاعیه‌ها نشان دهید."
   show_navigation_menu_34e7f441: "نمایش منوی پیمایش"
   show_new_analytics_for_course_and_user_data_18e92636: "نمایش تحلیل‌های جدید برای داده درس و کاربر"
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "نمایش پرسش جدید در صفحه آزمون"
@@ -18669,6 +18795,7 @@ fa:
   show_params_3401895b: "نمایش پارامترها"
   show_question_details_b059df00: "نمایش اطلاعات پرسش"
   show_recent_activity_stream_2be4abc1: "نمایش جریان فعالیت اخیر"
+  show_report_to_students_a07888a6: "نمایش گزارش به دانشجویان"
   show_rubric_dca783f2: "نمایش دستورالعمل ارزیابی"
   show_saved_what_if_scores_358bfe5f: "نمایش نمره های «احتمالی» ذخیره شده"
   show_student_names_dcb40934: "نمایش نام دانشجویان"
@@ -18698,6 +18825,8 @@ fa:
   sis_data_import_8bb623ce: "داده های سامانه اطلاعات دانشجو - وارد کردن"
   sis_data_manage_328a4799: "داده های سامانه اطلاعات دانشجو - مدیریت"
   sis_data_read_ac68a29: "داده های سامانه اطلاعات دانشجو - خواندن "
+  sis_del_alumno_716babc5: "حذف سامانه اطلاعات دانشجویی دانشجو "
+  sis_del_curso_bf9d61ae: "حذف سامانه اطلاعات دانشجویی درس "
   sis_export_title: "صدور سامانه اطلاعات دانشجو"
   sis_friendly_name_52b5683d: "نام دوستانه سامانه اطلاعات دانشجو"
   sis_grade_export_settings_45a9f709: "تنظیمات صدور نمره برای سامانه اطلاعات دانشجو"
@@ -18717,6 +18846,7 @@ fa:
     import_counts: 
       accounts: "حساب ها: %{account_count}"
       admins: "مدیران: %{admin_count}"
+      change_sis_ids: "تغییر شناس‌های سامانه اطلاعات دانشجو:%{change_sis_ids_count}"
       courses: "درس ها: %{course_count}"
       crosslists: "فهرست های متقابل: %{crosslist_count}"
       enrollments: "ثبت نام ها: %{enrollment_count}"
@@ -18783,6 +18913,7 @@ fa:
   skipped_file_filename_due_to_error_94f0194: "به دلیل بروز خطا، از فایل %{filename} صرفنظر شد"
   skipping_unknown_file_type_cd1086ee: "صرفنظر از نوع فایل ناشناس"
   skype_18850ba7: اسکایپ
+  slack_1130ad43: ضعیف
   slack_api_key_92f0c667: "کلید Api ضعیف"
   slack_email_9204e2ea: " پست الکترونیکی ضعیف"
   slack_notifications_3a0288e6: "اطلاعیه‌های ضعیف"
@@ -18815,6 +18946,7 @@ fa:
   something_broke_unexpectedly_6d3720ee: "چیزی به طور غیر منتظره خراب شد. "
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "اشکالی به وجود آمده است، اما اکنون می توانم آن را برطرف کنم."
   something_went_wrong_89195131: "اشکالی رخ داده است."
+  something_went_wrong_creating_the_course_please_tr_431adff5: "در ایجاد درس اشکالی رخ داده است. لطفا دوباره تلاش کنید."
   something_went_wrong_d238c551: "مشکلی پیش آمد"
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "اشتباهی رخ داده است. لطفا صفحه را از نوسازی کنید. اگر مشکل همچنان وجود داشت ممکن است علت آن وجود تعداد بیش از حد رکورد روی %{assignmentTitle} برای بارگذاری برنامه نمره‌گذاری سریع است."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "در هنگام فعال سازی دوباره کاربر اشکالی رخ داد. لطفا بعدا دوباره سعی کنید."
@@ -18822,6 +18954,7 @@ fa:
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "هنگام تلاش برای همگام‌سازی نمره ها در سامانه اطلاعات دانشجو اشکالی رخ داد. لطفا بعدا دوباره سعی کنید."
   something_went_wrong_while_deactivating_the_user_p_8ff3e261: "در هنگام غیر فعال سازی کاربر اشکالی رخ داد. لطفا بعدا دوباره سعی کنید."
   sorry_something_broke_91c15918: "متاسفانه، چیزی خراب شد"
+  sorry_the_action_performed_on_this_recording_faile_2a1badda: "متاسفانه ، اقدام انجام شده در این ضبط انجام نشد. بعدا دوباره تلاش کنید"
   sort_40afa70: "مرتب کردن:"
   sort_by_72dbba9c: "مرتب کردن بر اساس"
   sort_courses_cf94b8d4: "مرتب کردن درس‌ها"
@@ -19047,6 +19180,7 @@ fa:
   student_sis_6721040e: "دانشجو در سامانه اطلاعات دانشجو"
   student_sis_d9f0cd39: "دانشجو در سامانه اطلاعات دانشجو"
   student_sis_id_abe6b292: "شناسه دانشجو در سامانه اطلاعات دانشجو"
+  student_studentnumber_f398d9c2: "دانشجو %{studentNumber}"
   student_submissions_910da1b3: "موردهای ارسالی دانشجویان"
   student_summary: 
     student_summary_table_ascending: "جدول خلاصه دانشجو به طور صعودی از طریق %{sortText} مرتب سازی شد"
@@ -19060,6 +19194,9 @@ fa:
     one: "%{studentCount}دانشجو، %{num} نمره خواهند گرفت."
     other: "%{studentCount}دانشجو، %{num} امتیاز خواهند گرفت"
   students_1b8cd07b: دانشجویان
+  students_are_attempting_to_access_unpublished_cont_be329862: "دانشجویان در تلاش اند تا به محتوای منتشر نشده %{bad_link}، در %{asset_link} دسترسی یابند."
+  students_are_clicking_on_bad_link_to_content_that__d9c51d0d: "دانشجویان برای محتوای حذف شده در %{asset_link}، روی %{bad_link} کلیک می کنند."
+  students_are_loading_206c5246: "دانشجویان در حال بارگذاری هستند"
   students_are_not_allowed_to_access_test_installati_11b9078: "دانشجویان مجاز به دسترسی به نصب های آزمایشی نیستند."
   students_being_observed_4de3e520: "دانشجویانی که در حال مشاهده شدن هستند"
   students_can_only_participate_in_the_course_betwee_6f8595aa: "دانشجویان فقط می‌توانند در بین این تاریخ‌ها در این درس شرکت نمایند"
@@ -19319,6 +19456,7 @@ fa:
   success_grades_have_been_hidden_for_the_selected_s_3ad5692: "موفقیت! نمرات برای قسمتهای منتخب پنهان شده است. %{assignmentName}."
   success_grades_have_been_posted_for_the_selected_s_54c73ef0: "موفقیت! نمرات برای بخش های منتخب ارسال شده است %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "موفقیت آمیز! نمره ها در دفتر نمره منتشر شدند."
+  successfully_added_fb3e6008: "با موفقیت افزوده شد."
   successfully_created_a_set_38374719: "یک مجموعه با موفقیت ایجاد شد"
   successfully_deleted_the_comment_a8bbe561: "این نظر حذف شد"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model} با موفقیت به %{newGroup} انتقال یافت"
@@ -19437,6 +19575,7 @@ fa:
   take_the_survey_ada59508: "انجام نظرسنجی"
   take_the_survey_again_24ce22c2: "انجام دوباره نظرسنجی"
   teacher_5a73b637: استاد
+  teacher_count_teachers_a92f7199: "%{teacher_count} استاد"
   teacher_engagement_report_ec03613d: "گزارش اشتغال استاد"
   teacher_s_fdefb2c: استاد(ها)
   teacher_view_b2047bc6: "دید استاد"
@@ -19548,6 +19687,7 @@ fa:
       فراداده ارائه دهنده سرویس
       در نشانی اینترنتی قابل دسترس است.
   the_client_id_clientid_is_disabled_b4a02cb1: "شناسه مشتری %{clientId} غیرفعال است."
+  the_course_link_validator_searches_course_content__563fa215: "اعتبار سنجی لینک درس، محتوای درس را برای پیوندها و تصاویر نامعتبر یا غیر قابل دستیابی جستجو می کند."
   the_course_link_validator_searches_through_course__76f0bc63: "تأیید کننده پیوند درس محتوای درس را جستجو می کند و هر پیوند نامعتبر یا غیر فعالی که می یابد را به دست می دهد. لطفا توجه داشته باشید که برخی از پیوندهایی که به عنوان غیر فعال پرچم گذاری شده اند، از سرورهای ما غیر فایل دسترسی هستند ولی برای دانشجویان کار می کنند."
   the_course_to_report_on_defaults_to_canvas_id_unle_9e1d8f79: "درس مورد گزارش: به صورت پیش فرض شناسه کانواس است مگر اینکه به عنوان SIS در نوع شناسه درس تعیین شده باشد."
   the_default_report_only_includes_course_section_da_729092f0: "در صورت فعال بودن محدودیت های ثبت نام ، گزارش پیش فرض فقط تاریخ دوره / بخش را شامل می شود"
@@ -19620,6 +19760,7 @@ fa:
   the_term_to_report_on_needed_for_report_type_stude_623bffbc: "نیمسال مورد گزارش (فقط برای نوع گزارش دانشجو  نیاز است)"
   the_title_cannot_be_longer_than_length_characters_7a822943: "عنوان نمی‌تواند بیشتر از %{length} نویسه باشد"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "عنوان مخزن پرسش زیر کوتاه شده است: \"%{title}\""
+  the_tool_is_not_installed_in_the_course_or_account_1be7230b: "ابزار در درس یا حساب نصب نشده است."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "شناسه یکتای استفاده شده برای نشان دادن چرخه خاص درخواست/پاسخ که این گزارش خطا در پیرامون آن رخ داد"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "نشانی اینترنتی که یک کاربر با اختیارات کافی می تواند برای ظاهر شدن به عنوان کاربر گزارش دهنده در یک صفحه برای امتحان کردن یا باز تولید مسئله استفاده شود"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "نشانی اینترنتی صفحه ای که کاربر در هنگام گزارش خطا در آن بود"
@@ -19638,12 +19779,14 @@ fa:
   there_are_count_unsynced_changes_25ed3bed: 
     one: "%{count} تغییر ناهمگام وجود دارد."
     other: "%{count} تغییر ناهمگام وجود دارد"
+  there_are_currently_availablegraderscount_availabl_58f85403: "در حال حاضر %{availableGradersCount} نمره‌گذار موجود است."
   there_are_currently_no_associated_courses_fba1754f: "در حال حاضر هیچ دوره مرتبطی وجود ندارد."
   there_are_no_announcements_for_this_course_5ee649c3: "هیچ اطلاعیه ای برای این درس وجود ندارد."
   there_are_no_available_signups_for_this_course_26b05c56: "در حال حاضر هیچ ثبت نام در دسترسی برای این درس وجود ندارد."
   there_are_no_reports_for_you_to_view_b716717a: "گزارشی جهت مشاهده برای شما وجود ندارد."
   there_are_no_unsaved_changes_9276e87c: "تغییرات ذخیره سازی نشده وجود ندارد"
   there_are_no_unsynced_changes_4e8f0838: "هیچ تغییر ناهمگامی وجود ندارد"
+  there_is_currently_1_available_grader_758e4a21: "در حال حاضر 1 نمره‌گذار موجود است."
   there_was_a_failure_logging_out_at_your_idp_30070527: "در هنگام خروج در IdP ایرادی رخ داد"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "در هنگام ساخت ستون یادداشت‌های استاد مشکلی رخ داد."
   there_was_a_problem_deleting_the_comment_93053aa9: "در هنگام حذف نظر اشکالی رخ داد"
@@ -19654,12 +19797,16 @@ fa:
   there_was_a_problem_hiding_assignment_grades_1d3fd0c7: "هنگام مخفی کردن نمرات تکالیف مشکلی رخ داد."
   there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: "در هنگام پنهان کردن ستون یادداشت‌های استاد، مشکلی رخ داد."
   there_was_a_problem_loading_final_grade_overrides_e269e08: "هنگام بارگیری درج نمره نهایی مشکلی رخ داد."
+  there_was_a_problem_loading_students_5bdb6cf2: "مشکلی در بارگزاری دانشجویان وجود داشت."
   there_was_a_problem_loading_submissions_39855ff0: "هنگام بارگیری موارد ارسالی مشکلی رخ داد."
   there_was_a_problem_loading_the_gradebook_69b2a17: "در هنگام بارگذاری دفتر نمره اشکالی رخ داد."
   there_was_a_problem_logging_in_at_institution_5a298155: "در هنگام ورود به %{institution} اشکالی رخ داد"
   there_was_a_problem_marking_submission_comments_as_27c2f5c7: "مشکلی در علامت گذاری نظرات ارسال شده به عنوان خوانده شده وجود دارد"
   there_was_a_problem_posting_assignment_grades_958669e8: "هنگام ارسال نمرات تکالیف مشکلی وجود دارد."
   there_was_a_problem_posting_the_comment_75d15646: "در هنگام ارسال نظر مشکلی رخ داد"
+  there_was_a_problem_releasing_grades_fa0ae6: "مشکلی در انتشار نمرات وجود داشت."
+  there_was_a_problem_saving_the_grade_8ea5d2ac: "در هنگام ذخیره نمره مشکلی وجود داشت."
+  there_was_a_problem_saving_the_grades_5e61f9e2: "در هنگام ذخیره نمره‌ها مشکلی وجود داشت."
   there_was_a_problem_saving_the_grading_period_243bed6c: "در هنگام ذخیره سازی دوره نمره گذاری اشکالی رخ داد"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "در هنگام ذخیره سازی طرح نمره گذاری، اشکالی رخ داد"
   there_was_a_problem_sending_your_message_22b249a5: "در هنگام ارسال پیام شما، اشکالی رخ داد."
@@ -19667,8 +19814,11 @@ fa:
   there_was_a_problem_starting_the_copy_operation_dd599cdd: "هنگام شروع عملیات کپی مشکلی رخ داد"
   there_was_a_problem_submitting_your_set_27ca2ed0: "در هنگام ارسال مجموعه اشکالی رخ داد"
   there_was_a_problem_toggling_the_content_lock_2a5d678b: "در هنگام تغییر وضعیت قفل محتوا، مشکلی رخ داد."
+  there_was_a_problem_updating_the_assignment_61b9b98b: "هنگام به‌روز رسانی تکلیف مشکلی وجود داشت."
   there_was_a_problem_updating_the_comment_5f3595b9: "در هنگام به‌روزرسانی نظر، مشکلی رخ داد"
+  there_was_a_problem_updating_the_grade_1b6c8b4c: "هنگام به‌روز رسانی نمره مشکلی وجود داشت."
   there_was_a_problem_updating_the_submission_6e5280a1: "در هنگام به روزرسانی مورد ارسالی، مشکلی رخ داد."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "در جستجوی آمارهای درس خطایی وجود داشت."
   there_was_an_error_fetching_outcome_results_45c57590: "در جستجوی موارد نتیجه خطایی وجود داشت"
   there_was_an_error_fetching_submission_comments_ce153077: "در هنگام ردیابی نظرات مورد ارسالی خطایی رخ داد"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "در هنگام ایجاد راه اندازی ابزار خطایی رخ داد"
@@ -19726,6 +19876,7 @@ fa:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "این امر پیمایش بهنگام شده، داشبورد جدید، و یک ظاهر و حس جدیدتر و ساده تر را میسر می سازد."
   this_enables_users_to_generate_and_download_course_4c69c531: "این امر به کاربران امکان می دهد ePub درس را ایجاد و بارگیری کنند."
   this_environment_is_currently_being_updated_with_a_235f1875: "این محیط در حال حاضر با کپی از آخرین داده‌های تولید به‌هنگام سازی  می‌شود. لطفا بعداً دوباره بررسی کنید."
+  this_feature_can_t_be_disabled_because_there_is_at_a015b943: "این ویژگی نمی‌تواند غیرفعال شود زیرا حداقل یک زیر حساب یا درس با این ویژگی وجود دارد."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "این ویژگی مادامی‌که تشخیص خودکار جداکننده  قسمت‌ها فعال باشند، نمی‌تواند فعال شود. "
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: "این ویژگی مادامی‌که اجبار شده سمیکالن‌ها جدا کننده قسمت‌ها باشند، نمی‌تواند فعال شود."
   this_feature_cannot_be_disabled_once_it_has_been_t_db7cc39e: "این ویژگی به محض اینکه فعال شود، نمی تواند غیر فعال شود."
@@ -19769,6 +19920,7 @@ fa:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "این امر به احتمال زیاد به این دلیل اتفاق افتاده است که محتوای درس را بدون فایل های مرتبط آن وارد کرده اید."
   this_name_appears_in_sorted_lists_dccbd84b: "این نام در فهرست های مرتب سازی شده نمایش داده می شود."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "اساتید از این نام برای نمره گذاری استفاده خواهند کرد."
+  this_option_is_not_compatible_with_new_quizzes_ed489d7c: "این گزینه با آزمون جدید سازگار نیست."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "این نتیجه برای ارزیابی دانشجو استفاده شده است و دیگر نمی تواند بهنگام شود"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "این نتیجه برای ارزیابی دانشجو استفاده شده است و نمی تواند ویرایش یا حذف شود"
   this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "این نتیجه برای ارزیابی دانشجو استفاده شده است و بعضی از ویرایش‌ها بر نتایج دانش آموزان تأثیر می گذارد."
@@ -19788,6 +19940,7 @@ fa:
   this_rating_is_selected_ca68fce6: "این رتبه بندی انتخاب شده است"
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "این ضبط کننده از فلاش استفاده می کند. در نتیجه ممکن است ضبط در دستگاه محلی شما را آسان تر بیابید، و سپس از زبانه بارگذارنده رسانه برای بارگذاری آن استفاده کنید."
   this_report_displays_student_engagement_activity_c1d96b5c: "این گزارش فعالیت  دانشجو را نشان می دهد."
+  this_report_displays_teacher_engagement_activity_f_5888d45b: "این گزارش فعالیت اشتغال استاد را برای هر ثبت نام استاد نمایش می‌دهد."
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "این گزارش همه درس های یک نیمسال خاص را نشان می دهد. فایل csv حاصله برای هر درس یک ردیف خواهد داشت و شناسه درس، شناسه درس در سامانه اطلاعات دانشجو، نام کوتاه درس، نام درس، شناسه حساب، شناسه حساب در سامانه اطلاعات دانشجو، نام حساب، ذخیره استفاده بر حسب مگابایت و مجموع همه فایل ها بر حسب مگابایت را نشان خواهد داد. ذخیره استفاده شده همه فایل هایی که با سهمیه درس ها در تضاد هستند را نشان می دهد. مجموع همه فایل ها در درس به مجموع همه فایل هایی که صرفنظر از تأثیر در سهمیه درس در درس موجود هستند، گفته می شود."
   this_report_shows_grading_period_grades_and_overal_a86346a: "این گزارش نمره های دوره نمره گذاری (و نمره های کلی درس) برای هر دانشجوی ثبت نام شده در یک نیمسال خاص را نشان می دهد. فایل csv حاصله برای هر ثبت نام یک ردیف خواهد داشت."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "این صفحه نمونه شامل عناصر رایج واسط کاربر در کانواس برای کمک به شما در ساختن علامت تجاری سفارشی است. وقتی ایجاد تغییرات در مقادیر رنگ و تصاویر موجود در نوار کناری سمت چپ را شروع کنید، یک دکمه *پیش نمایش تغییرات خود* را خواهید دید. برای تجدید این صفحه، روی این دکمه کلیک کنید و ببینید تغییرات شما چطور به نظر می رسند."
@@ -20057,21 +20210,25 @@ fa:
     people: افراد
     view_in_separate_window: "مشاهده در پنجره جداگانه"
   tls_7a2eaba5: TLS
+  to_1126ab55: تا
   to_35c6baa2: به
   to_51406be9: گیرنده
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "برای فعالسازی پیامک، رمز تأیید چهار نویسه ای ارسال شده به %{sms_number} را وارد کنید."
+  to_activate_this_communication_channel_enter_the_f_f465efc5: "برای فعال کردن این کانال ارتباطی ، کد تأیید چهارنویسه‌ای  را که برای %{sms_number} ارسال شده است ، وارد کنید."
   to_be_added_2959cc72: "باید اضافه شود"
   to_be_removed_d4b48586: "باید حذف شود"
   to_c4c44f4b: تا
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "برای تغییر شناسه_حساب_سامانه اطلاعات دانشجو ، کاربر باید مجوز مدیریت_سامانه اطلاعات دانشجو را داشته باشد."
   to_check_for_other_broken_links_visit_the_course_l_ace6921d: "برای بررسی سایر پیوندهای خراب، از تأیید کننده پیوند درس بازدید کنید."
   to_check_for_other_broken_links_visit_the_validato_ba3b3f1e: "برای بررسی سایر پیوندهای خراب،  از %{validator_link} بازدید کنید."
+  to_check_for_other_broken_links_visit_validator_li_e350c852: "برای بررسی سایر پیوندهای خراب،  از %{validator_link} بازدید کنید."
   to_configure_an_openid_connect_provider_you_need_t_5c937249: |-
       برای پیکربندی ارائه دهنده OpenID Connect، به نشانی های اینترنتی نشانه و مجوزدهی نیاز دارید
       تا شناسه مشتری و رمز مشتری را دریافت کنید.
       
       اگر ارائه دهنده می تواند نشانی های اینترنتی معتبر فراخوانی یا هدایت مجدد را ارائه دهد، از %{callback_url} استفاده کنید.
   to_date_can_t_come_before_from_date_cf9e18aa: "\"تا تاریخ\" نمی‌تواند قبل از \"از تاریخ\" باشد"
+  to_date_cannot_come_before_from_date_3eeb2633: "تاریخ تا نمی تواند قبل از تاریخ از باشد."
   to_do_1d554f36: "برای اقدام"
   to_do_5526f10a: "برای اقدام:"
   to_do_6ac7b2dc: "برای انجام:"
@@ -20106,6 +20263,7 @@ fa:
   tool_created_at_82c0daba: "ابزار ایجاد شده در"
   tool_id_afd739e1: "شناسه ابزار"
   tool_name_7d58a6e4: "نام ابزار"
+  tool_not_found_f6366382: "ابزار یافت نشد"
   tool_placements_3f996c24: "جای گذاری ابزارها"
   tool_privacy_level_9d392813: "میزان حریم خصوصی ابزار"
   tool_type_afa58fcb: "نوع ابزار"
@@ -20238,6 +20396,7 @@ fa:
   unlock_date_cannot_be_before_term_start_d3c01813: "تاریخ قفل گشایی نمی تواند قبل از شروع نیمسال باشد"
   unlock_f6196bf5: "قفل گشایی"
   unlock_module_on_date_17144fbd: "قفل گشایی ماژول در تاریخ"
+  unlock_selected_announcements_37485f05: "قفل گشایی اطلاعیه‌های انتخاب شده"
   unlocked_beee43de: "قفل گشایی شده"
   unlocked_click_to_lock_53262ce7: "قفل گشایی شده. برای قفل کردن کلیک کنید."
   unlocking_a6b5c02d: "درحال قفل گشایی..."
@@ -20279,6 +20438,7 @@ fa:
   unsyncable_message_95faa75d: "غیرقابل همگام سازی:%{message}"
   unsynced_changes_4ddaec76: "تغییرات همگام نشده"
   until_4a1f8cda: تا
+  until_6437a827: تا
   until_8bdea3de: تا
   until_date_949017c4: "تا %{date}"
   untitled_assignment_59354b34: "تکلیف بدون عنوان"
@@ -20528,6 +20688,7 @@ fa:
       profile: "رخ نما"
       settings: تنظیمات
   user_profile_picture_46bffbc7: "تصویر رخ نمای کاربر"
+  user_results_updated_9ce38dce: "نتایج کاربر به روز شد."
   user_s_settings_d65644b4: "تنظیمات %{user}"
   user_search_panel_18f80511: "پنل جستجوی کاربر"
   user_search_results_3af96217: "نتایج جستجوی کاربر"
@@ -20873,9 +21034,11 @@ fa:
   view_name_app_62a2ad8e: "مشاهده برنامه %{name}"
   view_next_file_a8a4a885: "مشاهده فایل بعدی"
   view_next_student_9fc72fef: "مشاهده دانشجوی بعدی"
+  view_next_submission_d2a429d: "مشاهده مورد ارسالی بعدی"
   view_notifications_6aea09a2: "مشاهده اطلاعیه ها"
   view_previous_file_b846db4f: "مشاهده فایل قبلی"
   view_previous_student_90000459: "مشاهده دانشجوی قبلی"
+  view_previous_submission_2b57bb85: "مشاهده مورد ارسالی قبلی"
   view_prior_enrollments_9b519b25: "مشاهده ثبت نام های قبلی"
   view_question_banks_188a9e0f: "مشاهده مخزن های پرسش"
   view_range_student_details_8116d68a: "مشاهده بازه بندی اطلاعات دانشجو"
@@ -20979,6 +21142,9 @@ fa:
   where_would_you_like_to_move_title_fabd6e8f: "می خواهید %{title} را به کجا انتقال دهید؟"
   which_course_is_this_question_about_f819a158: "این پرسش مربوط به کدام درس است؟"
   while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: "مادامی که نمرات این تکلیف  پنهان است ، دانشجویان  اطلاعیه های جدیدی درباره آن دریافت نمی کنند یا قادر به مشاهده آن نخواهند بود:"
+  whitelist_count_max_26a270f: "لیست سفید(%{count}/%{max}) "
+  whitelist_e88fd8ed: "لیست سفید"
+  whitelist_editing_is_disabled_when_security_settin_ab40cc90: "ویرایش لیست سفید زمانی که تنظیمات امنیتی از حساب والد به ارث برده می شوند غیرفعال است."
   who_can_create_new_courses_7a6c1338: "چه کسی می تواند درس های جدید را ایجاد  کند"
   widget: 
     upload_media_track_form: 
@@ -21167,6 +21333,9 @@ fa:
   yes_remove_86a61759: "بله, حذف"
   yiddish_f96986df: ییدیش
   yo_e4ee15a4: Yo
+  you_are_about_to_delete_count_announcements_are_yo_96a2b383: 
+    one: "شما در حال حذف 1 اطلاعیه هستید. آیا اطمینان دارید؟"
+    other: "شما در حال حذف %{count} اطلاعیه هستید. آیا اطمینان دارید؟"
   you_are_about_to_lose_any_unsaved_changes_would_yo_e255f393: |-
       به زودی هر گونه تغییر ذخیره نشده را از دست می دهید.
       
@@ -21241,10 +21410,12 @@ fa:
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: "برای این اقدام، وقت اضافی به شما داده شده است"
   you_have_changed_the_progression_requirements_for__6772bc89: "الزامات پیشرفت یک درس فعال را تغییر داده اید. ممکن است دانشجویانی باشند که به این ماژول یا سایر ماژول هایی که به آن وابسته اند پیشرفت کرده باشند."
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "یک بازبینی گروهی برای %{person} را کامل کرده اید. متشکریم."
+  you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "شما برای این دانشجو یک نمره نامعتبر وارد کرده اید. مقدار و نوع نمره‌گذاری  را بررسی کنید و دوباره امتحان کنید."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*تغییراتی در پرسش های موجود در این آزمون اعمال کرده اید.* این تغییرات تا زمانی که آزمون را ذخیره نکنید، برای دانشجویان نمایش داده نمی شوند."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "هیچ یک از برنامه های همکاری شما پیکربندی نشده است. برای دریافت برخی تنظیمات با استاد خود صحبت کنید."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "هیچ نتیجه ای ندارید. برای ایجاد یک نتیجه، *اینجا کلیک کنید*."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "هیج نتیجه ای ندارید. برای رفتن به صفحه نتایج، اینجا کلیک کنید."
+  you_have_reached_the_domain_limit_you_can_add_more_e5ccc070: "به محد.دیت دامنه رسیده‌اید. می توانید دامنه‌های بیشتری را با حذف دامنه‌های موجود در لیست سفید خود بیفزایید."
   you_have_reached_the_limit_of_len_characters_in_th_babea8fe: "شما به حداکثر %{len} نویسه در پیام اطلاعیه رسیده‌اید"
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "به حداکثر تعداد وب هوک ها در هر محدوده حساب (%{max}) رسیده اید"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "به حداکثر تعداد وب هوک ها در هر محدوده کاربر (%{max}) رسیده اید"
@@ -21268,10 +21439,12 @@ fa:
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "باید حداقل یک فایل را به این تکلیف پیوست کنید"
   you_must_enter_a_date_f8eabfb1: "باید یک تاریخ وارد کنید"
   you_must_have_a_student_or_section_selected_a99e45df: "باید یک دانشجو یا بخش را انتخاب کنید"
+  you_must_input_a_section_b8d370fe: "شما باید یک بخش را وارد کنید"
   you_must_log_in_to_view_replies_9ccd4da0: "برای مشاهده پاسخ ها باید وارد شوید"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "باید یک مقدار آماده کنید و یا انتخاب گزینه را لغو کنید."
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "باید یک درس را برای کپی کردن محتوا از آن، انتخاب کنید"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "باید یک پوشه انتخاب کنید برای بارگذاری انتقال خود در"
+  you_must_select_an_assignment_group_c16a2168: "شما باید یک گروه تکلیف انتخاب کنید."
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "باید آن را به عددی بزرگتر یا مساوی %{min} تنظیم کنید"
   you_must_specify_a_usage_right_5eb57f87: "باید حقوق استفاده را تعیین کنید."
   you_must_use_a_number_912ce4bd: "باید از یک عدد استفاده کنید"
@@ -21312,6 +21485,10 @@ fa:
   your_email_address_f881e583: "نشانی پست الکترونیکی شما"
   your_email_b5364bee: "پست الکترونیکی شما"
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "فایل شما در حال بارگذاری در دفتر نمره است، و می توانید در هر زمان از این صفحه خارج شوید. اگر یک فایل CSV بزرگ دارید، بهنگام سازی تغییرات شما ممکن است چند دقیقه طول بکشد. برای جلوگیری از رونویسی هر گونه داده، لطفا قبل از ایجاد تغییرات دیگر تأیید کنید که بارگذاری انجام شده است و دفتر نمره درست می باشد."
+  your_instructor_has_released_grade_changes_and_new_218d61bb: |-
+      استاد شما تغییرات نمره و نظرات  جدبد برای %{title}، %{course} را منتشر کرد.
+      
+      اطلاعات بیش‌تر در %{url}
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       استاد شما تغییر نمره ها و نظرهای جدید برای %{title} را منتشر کرده است. این تغییرها اکنون قابل مشاهده هستند.
       

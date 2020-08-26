@@ -20,6 +20,7 @@ import _ from 'lodash'
 import uuid from 'uuid'
 import parseLinkHeader from 'parse-link-header'
 import NaiveFetchDispatch from './NaiveFetchDispatch'
+import makePromisePool from '../../shared/makePromisePool'
 
 const deepMerge = (lhs, rhs) => {
   if (lhs === undefined || lhs === null) {
@@ -67,7 +68,6 @@ const fetchOutcomes = (courseId, studentId) => {
   function fetchWithDispatch(url) {
     return fetchUrl(url, dispatch)
   }
-
   return Promise.all([
     fetchWithDispatch(`/api/v1/courses/${courseId}/outcome_groups?per_page=100`),
     fetchWithDispatch(
@@ -84,24 +84,35 @@ const fetchOutcomes = (courseId, studentId) => {
       outcomeRollups = rollups
       outcomeAssignmentsByOutcomeId = _.groupBy(alignments, 'learning_outcome_id')
     })
-    .then(() =>
-      Promise.all(
-        outcomeLinks.map(outcomeLink =>
-          fetchWithDispatch(
-            `/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&outcome_ids[]=${outcomeLink.outcome.id}&include[]=assignments&per_page=100`
-          )
+    .then(() => {
+      const outcomeIds = outcomeLinks.map(link => link.outcome.id)
+      const chunks = _.chunk(outcomeIds, 10)
+      return makePromisePool(chunks, chunk => {
+        const chunkArgs = chunk.map(id => `outcome_ids[]=${id}`).join('&')
+        return fetchWithDispatch(
+          `/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&${chunkArgs}&include[]=assignments&per_page=100`
         )
-      )
-    )
-    .then(responses => {
-      outcomeResultsByOutcomeId = responses.reduce((acc, response, i) => {
-        acc[outcomeLinks[i].outcome.id] = response.outcome_results.filter(r => !r.hidden)
-        return acc
-      }, {})
-      assignmentsByAssignmentId = _.keyBy(
-        _.flatten(responses.map(response => response.linked.assignments)),
-        a => a.id
-      )
+      })
+    })
+    .then(({successes, failures}) => {
+      if (failures.length > 0) {
+        throw new Error('Unable to load all results')
+      }
+      outcomeResultsByOutcomeId = {}
+      assignmentsByAssignmentId = {}
+      successes.forEach(({data, res}) => {
+        data.forEach(id => {
+          outcomeResultsByOutcomeId[id] = outcomeResultsByOutcomeId[id] || []
+        })
+        res.outcome_results
+          .filter(r => !r.hidden)
+          .forEach(r => {
+            outcomeResultsByOutcomeId[r.links.learning_outcome].push(r)
+          })
+        res.linked.assignments.forEach(a => {
+          assignmentsByAssignmentId[a.id] = a
+        })
+      })
     })
     .then(() => {
       const outcomes = outcomeLinks.map(outcomeLink => ({

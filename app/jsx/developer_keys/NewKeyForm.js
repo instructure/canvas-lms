@@ -16,11 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Button} from '@instructure/ui-buttons'
 import {Checkbox, TextArea, TextInput} from '@instructure/ui-forms'
 import {FormFieldGroup} from '@instructure/ui-form-field'
+import {IconInfoLine} from '@instructure/ui-icons'
+import {Tooltip} from '@instructure/ui-overlays'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Grid} from '@instructure/ui-layout'
 import I18n from 'i18n!react_developer_keys'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -30,6 +35,10 @@ import ToolConfigurationForm from './ToolConfigurationForm'
 const validationMessage = [
   {text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'}
 ]
+
+const clientCredentialsAudienceTooltip = I18n.t(
+  'Will credentials issued by this key be presented to Canvas or to a peer service (e.g. Canvas Data)?'
+)
 
 export default class NewKeyForm extends React.Component {
   generateToolConfiguration = () => {
@@ -142,6 +151,36 @@ export default class NewKeyForm extends React.Component {
                     onChange={this.handleTestClusterOnlyChange}
                   />
                 ) : null}
+                {!isLtiKey ? (
+                  <SimpleSelect
+                    renderLabel={
+                      <div>
+                        <span>{I18n.t('Client Credentials Audience')}</span>
+                        <Tooltip
+                          tip={clientCredentialsAudienceTooltip}
+                          on={['click', 'focus']}
+                          variant="inverse"
+                        >
+                          <Button variant="icon" icon={IconInfoLine}>
+                            <ScreenReaderContent>{I18n.t('toggle tooltip')}</ScreenReaderContent>
+                          </Button>
+                        </Tooltip>
+                      </div>
+                    }
+                    name="developer_key[client_credentials_audience]"
+                    value={developerKey.client_credentials_audience}
+                    onChange={(_, {value}) =>
+                      updateDeveloperKey('client_credentials_audience', value)
+                    }
+                  >
+                    <SimpleSelect.Option id="audience-internal" value="internal">
+                      {I18n.t('Canvas')}
+                    </SimpleSelect.Option>
+                    <SimpleSelect.Option id="audience-external" value="external">
+                      {I18n.t('Peer Service')}
+                    </SimpleSelect.Option>
+                  </SimpleSelect>
+                ) : null}
               </FormFieldGroup>
             </Grid.Col>
             <Grid.Col width={8}>
@@ -191,6 +230,7 @@ NewKeyForm.propTypes = {
     notes: PropTypes.string,
     icon_url: PropTypes.string,
     vendor_code: PropTypes.string,
+    redirect_uri: PropTypes.string,
     redirect_uris: PropTypes.string,
     email: PropTypes.string,
     name: PropTypes.string,
@@ -198,7 +238,8 @@ NewKeyForm.propTypes = {
     tool_configuration: PropTypes.shape({
       oidc_initiation_url: PropTypes.string
     }),
-    test_cluster_only: PropTypes.bool
+    test_cluster_only: PropTypes.bool,
+    client_credentials_audience: PropTypes.string
   }),
   availableScopes: PropTypes.objectOf(
     PropTypes.arrayOf(

@@ -167,6 +167,9 @@
     "folder_tree_fbab0726": {
         "message": "درخت پوشه"
     },
+    "format_4247a9c5": {
+        "message": "قالب"
+    },
     "generating_preview_45b53be0": {
         "message": "در حال ایجاد پیش نمایش..."
     },
@@ -205,6 +208,9 @@
     },
     "invalid_file_type_881cc9b2": {
         "message": "نوع فایل معتبر نیست"
+    },
+    "invalid_url_cbde79f": {
+        "message": "نشانی اینترنتی معتبر نیست"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "میانبرهای صفحه کلید"

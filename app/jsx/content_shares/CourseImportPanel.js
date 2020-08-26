@@ -75,6 +75,7 @@ export default function CourseImportPanel({contentShare, onClose, onImport}) {
         selectedModuleId={selectedModule?.id || null}
         setSelectedModule={setSelectedModule}
         setModuleItemPosition={setSelectedPosition}
+        disableModuleInsertion={contentShare.content_type === 'module'}
       />
       <ConfirmActionButtonBar
         padding="small 0 0 0"

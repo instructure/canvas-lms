@@ -1,6 +1,7 @@
+<%= generation_message %>
 ARG RUBY=2.6
 
-FROM instructure/passenger-nginx-alpine:${RUBY}
+FROM instructure/passenger-nginx-alpine:${RUBY} AS ruby-gems-only
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12.2
@@ -92,4 +93,56 @@ RUN set -eux; \
   && bundle install --jobs $(nproc) \
   && rm -rf $GEM_HOME/cache
 
+FROM ruby-gems-only AS ruby-final
 COPY --chown=docker:docker . $APP_HOME
+
+FROM ruby-gems-only AS yarn-only
+LABEL maintainer="Instructure"
+
+# default alpine HTTPS mirror
+ARG ALPINE_MIRROR=https://alpine.global.ssl.fastly.net/alpine/
+ARG NODE=10.19.0-r0
+
+USER root
+RUN set -eux; \
+  \
+  # these packages are temporary for generating this image \
+  apk add --no-cache --virtual .builddeps --repository $ALPINE_MIRROR/v3.10/main \
+    g++ \
+    make \
+    libsass \
+  # these packages stick around in the final image \
+  && apk add --no-cache --repository $ALPINE_MIRROR/v3.10/main \
+    npm \
+    nodejs=${NODE} \
+    yarn \
+  && apk add --no-cache curl \
+  && cd /tmp \
+  && curl -Ls https://github.com/instructure/phantomized/releases/download/2.1.1a/dockerized-phantomjs.tar.gz | tar xzv -C / \
+  && curl -k -Ls https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 | tar -jxf - \
+  && cp phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs \
+  && apk del --no-network curl \
+  && rm -rf /tmp/*
+
+USER docker
+COPY --chown=docker:docker babel.config.js    ${APP_HOME}
+COPY --chown=docker:docker build/new-jenkins  ${APP_HOME}build/new-jenkins
+COPY --chown=docker:docker package.json       ${APP_HOME}
+COPY --chown=docker:docker packages           ${APP_HOME}packages
+COPY --chown=docker:docker script             ${APP_HOME}script
+COPY --chown=docker:docker yarn.lock          ${APP_HOME}
+
+<%= yarn_files_client_apps.map { |p| "COPY --chown=docker:docker #{p} ${APP_HOME}#{p}" }.join('\n') %>
+
+RUN set -eux; \
+  mkdir -p <%= docker_compose_volume_paths.join(" \\\n             ") %> \
+  && (yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1) \
+  && yarn cache clean
+
+FROM yarn-only AS webpack-final
+COPY --chown=docker:docker . ${APP_HOME}
+
+RUN set -exu; \
+  \
+  COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rails canvas:compile_assets \
+  && yarn cache clean

@@ -243,6 +243,20 @@ describe DiscussionEntriesController do
       expect(rss.items.length).to eql(0)
     end
 
+    it "should include media comments generated with rce enhancements" do
+      topic_with_media_reply
+      @topic.update_attribute(:podcast_has_student_posts, true)
+      @entry.update_attribute(:message, "<iframe data-media-id=\"#{@mo1.media_id}\"></iframe>")
+      get 'public_feed', params: {:discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code}, :format => 'rss'
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      expect(rss).not_to be_nil
+      expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
+      expect(rss.items.length).to eql(1)
+      expected_url = "courses/#{@course.id}/media_download.mp4?type=mp4&entryId=#{@mo1.media_id}&redirect=1"
+      expect(rss.items.first.enclosure.url).to end_with(expected_url)
+    end
+
     it "should leave out media objects if the attachment is already included" do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)

@@ -408,6 +408,7 @@ zh-Hant:
   account_level_mastery_scales_a5bdff29: 帳戶級掌握程度
   account_level_notification_preferences_require_an__66467cd7: "帳戶級別通知偏好需要 account_id 以更新"
   account_level_notification_preferences_ui_update_f5e189a4: "帳戶級別通知偏好 UI 更新"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: 帳戶等級通知會套用至所有課程。個別課程的通知可以在每個課程內變更，並會重寫這些通知。
   account_level_settings_manage_4fca6f8e: "帳戶級別設定 - 管理"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: 帳戶名稱
@@ -418,6 +419,7 @@ zh-Hant:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: 帳戶通知結束時間在開始時間之前
+  account_notification_settings_e96de9b6: 帳戶通知設定
   account_notification_settings_error_page_66c0bc61: 帳戶通知設定錯誤頁面
   account_notification_settings_initial_query_error_f55e1cbf: 帳戶通知設定初始查詢錯誤
   account_notification_settings_updated_dbabec35: 帳戶通知設定已更新
@@ -1393,6 +1395,7 @@ zh-Hant:
         manual_quotas_title: 可手動設置的配額
         megabytes: MB
         megabytes_tooltip: MB
+        placeholder_course_or_group_id: "輸入 ID..."
         select_type_courses: "課程 ID"
         select_type_groups: "群組 ID"
         select_type_label: 查找課程或群組
@@ -3933,6 +3936,7 @@ zh-Hant:
   available_from_f84e4611: 可用起始時間：
   available_from_field_for_styleguide_7ced3861: 風格指南的『可用起始』字段
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "可用起始時閒 - 格式示例：年-月-日 時:分"
+  available_pronouns_b45330b1: 可用代詞
   available_to_b7350e02: 可用於
   available_until_3278ebe9: 可用截止時間：
   available_until_date_2c0ccec3: 可用截止日期：
@@ -5203,6 +5207,7 @@ zh-Hant:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: 協作指使用基於網絡的工具進行諸如做筆記或合作論文等協同的工作。聯絡您的教師以開始使用。
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: 協作指使用基於網絡的工具進行諸如做筆記或合作論文等協同的工作。添加『協作』應用程序，以開始協作。
   collaborations_tutorial_tray_9219d9d: 協作教程列表
+  collapse_all_50275533: 全部收起
   collapse_group_c2af7cad: 收起群組
   collapse_list_of_group_members_for_groupname_d6c66fa0: "收起 %{groupName} 群組成員列表"
   collapse_subdiscussion_89af1f5c: 收起分組討論
@@ -6480,6 +6485,10 @@ zh-Hant:
   count_students_30e46120: 
     one: "%{count} 位學生"
     other: "%{count} 個學生"
+  count_students_c9920376: 
+    one: "1 個學生"
+    other: "%{count} 個學生"
+    zero: "0 個學生"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "%{count} 學生在百分之 %{percentile}。"
     other: "%{count} 學生在百分之 %{percentile}。"
@@ -6679,6 +6688,7 @@ zh-Hant:
   course_is_already_associated_with_a_blueprint_4d9407cb: 課程已經與計劃相關聯
   course_landing_page_49a53ade: 課程登入頁面
   course_level_notification_preferences_require_a_co_2f0a618: "課程級別通知偏好需要 course_id 以更新"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: 課程等級通知均繼承自您的帳戶等級通知設定。調整此課程的通知將重寫帳戶等級的通知。
   course_level_overrides_for_notification_preference_e86d1725: 課程級別重寫通知偏好
   course_list: 
     favorited_tooltip: 按一下以從課程功能表中刪除。
@@ -8129,6 +8139,9 @@ zh-Hant:
   disableWhileLoading: 
     loading: 正在載入……
   disable_a5c05db3: 停用
+  disable_alert_timeouts_description: |-
+      啟用此功能可防止提醒通知超時彈出，讓
+      使用者可以有充足時間閱讀通知，然後在閱讀完畢時忽略訊息。
   disable_all_read_only_scopes_f9ffdd28: 停用所有唯讀範圍。
   disable_and_lock_7d0ef0e8: 停用並鎖定
   disable_automatic_submission_8e1d8676: 停用自動提交
@@ -8140,6 +8153,7 @@ zh-Hant:
   disable_scope_6ba4e4d4: 停用範圍
   disable_sync_to_name_10c371dc: "停用下列項目同步功能：%{name}"
   disable_toolname_44d6397c: "停用%{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "停用升級版多種格式的內容編輯器的上載至 Canvas Media"
   disabled_18c33a73: （已停用）
   disabled_3b1b332a: 已停用
   disabled_and_locked_d14dc6c2: 停用並鎖定
@@ -9454,6 +9468,7 @@ zh-Hant:
   exit_d0c7b013: 退出
   exit_theme_editor_9ddd41bb: 退出主題編輯器
   expand_2f2fadbd: 展開
+  expand_all_bb64d2ea: 全部展開
   expand_collapse_title_outcome_group_239f0a9d: "展開/收起 %{title} 成果群組"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "展開/收起 %{title} 結果組合，學生可充分掌握 %{mastery_count} 結果組合 %{count}"
   expand_global_navigation_2c28d5d4: 擴大全球導航
@@ -9658,6 +9673,7 @@ zh-Hant:
   failed_loading_unsynced_changes_component_is_your__89f863d6: 未能加載未同步更改組件。您的網絡連接是否正常？
   failed_please_report_the_following_error_code_to_y_42248d60: "失敗，請將以下錯誤代碼報告給您的系統管理員：ErrorReport:%{error};"
   failed_retrieving_media_source_3f0cfd49: 取回媒體來源失敗
+  failed_retrieving_media_sources_32aed288: 取回媒體來源失敗。
   failed_the_report_failed_to_generate_a_file_please_60a6582d: 失敗，報告無法產生檔案。請重試。
   failed_to_add_new_feed_ee1c5ea: 無法添加新的摘要
   failed_to_change_last_attended_date_1e340ba6: 無法變更最後一次加入日期
@@ -9743,6 +9759,7 @@ zh-Hant:
         差異化任務可讓您選擇不同分組(s)或個別學生(s)完成作業。
         未獲得任務的分組將無法在課程内容中看到任務内容而且最終成績
         將不包括上述任務的分值。
+    disable_alert_timeouts: 停用提醒通知超時
     ember_modules: "Ember 模組"
     google_docs_domain_restriction: "Google Docs 網域限制"
     gradebook_list_students_by_sortable_name: "成績單 - 依可排序姓名列出學生"
@@ -9933,6 +9950,7 @@ zh-Hant:
   final_grade_finalgrade_408580bb: "最終評分：*%{finalGrade}*"
   final_grade_info_2aa35d25: 最終成績資訊
   final_grade_override_be8a21cd: 最終評分重寫
+  final_grade_override_in_gradebook_history_767147c: 成績單歷史記錄內的最終評分重寫
   final_grade_score_fe69a301: "最終成績： %{score}"
   final_grader_1693103c: 最終評分員
   final_grader_can_view_other_grader_names_67736530: 最終評分員可以查看其他評分員的名稱
@@ -10088,6 +10106,7 @@ zh-Hant:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "*%{assignment.name}* 透過輸入並提交以下評分值，為所有學生評定相同的評分："
   give_all_students_the_same_percent_grade_for_assig_6a008004: "**%{assignment.name}** 透過輸入並提交以下評分值，為所有學生評定相同的*百分比*評分："
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: 放棄取回媒體來源。此問題可能會自行解決。
   global_announcements_a78912c8: 全域通告
   global_announcements_add_edit_delete_843ca4d2: "總體通告 - 添加 / 編輯 / 刪除"
   global_branding_df1cae12: 全局品牌推廣
@@ -12072,6 +12091,7 @@ zh-Hant:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "納入連結到成績單中的作業標題選單中的 SpeedGrader。"
   includes_grade_values_in_the_admin_grade_reports_a28200da: 在管理員評分報告中包括評分值。
   includes_outcomes_service_alignments_when_exportin_6c578a35: 匯出和匯入課程內容時包括學習成果服務校準項目
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: 在成績單歷史記錄內包括已重寫的課程評分。
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: 在課程側欄導航中加入評分標準
   incomplete_95612d72: 未完成
   incomplete_da3c2ea2: 未完成
@@ -16048,6 +16068,7 @@ zh-Hant:
     submission_comment_description: 作業提交件評論
     submission_comment_display: 提交件評論
     web_conference_recording_ready: 一項會議記錄就緒
+  notification_policies_requires_the_communication_c_2e7ded08: "根據通知政策，需要提供通訊頻道 ID、通知類別，以及更新頻率"
   notification_preferences: 
     communication: 
       email: 
@@ -16314,6 +16335,7 @@ zh-Hant:
   open_title_in_a_new_window_b29fed77: "在新視窗中打開 %{title}。"
   open_to_comments_23d5585e: 開啟以徵求意見
   openid_connect_initiation_url_d9037d30: "* OpenID Connect 起始 URL"
+  opens_in_new_window_b4b99243: 在新視窗中打開
   option_1_dea39f90: "選項 1"
   option_2_47aace2a: "選項 2"
   option_3_30adfebc: "選項 3"
@@ -16383,6 +16405,7 @@ zh-Hant:
   out_of_pointspossible_c163105a: "滿分為%{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: 非得分內容的成果校準
   outcome_da397d20: 成果
+  outcome_details_ce254e89: 學習成果詳情
   outcome_export_89229eb4: 匯出成果
   outcome_group_39fae76f: 學習成果群組
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "沒有找到 Canvas ID %{id} 的成果群組"
@@ -19746,6 +19769,8 @@ zh-Hant:
   restore_courses_182e162e: 還原課程
   restored_course_association_course_c9e16045: "恢復課程藍圖%{course}"
   restrict_access_84ba6bb8: 限制存取
+  restrict_instructors_from_changing_mastery_scales_5af13053: 限制導師變更掌握程度
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: 限制導師變更能力計算方式
   restrict_sms_to_select_types_9dd6399c: 限制簡訊以選擇類型
   restrict_student_access: 
     button_text: 
@@ -23633,6 +23658,8 @@ zh-Hant:
   ukrainian_945b00b7: 烏克蘭語
   unable_to_accept_update_fd53a7e2: 無法接受更新
   unable_to_access_specific_student_go_to_assignment_585e05e9: "無法訪問特定的學生。前往 SpeedGrader 中的作業？"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: 有部分學習成果無法校準至一個頁面
+  unable_to_align_some_outcomes_to_title_53467231: "有部分學習成果無法校準至 \"%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: 因為此作業至少在一個學生的封閉評分期內到期，所以無法常模參照評級
   unable_to_delete_assignment_abcf8d62: 無法刪除作業
   unable_to_dismiss_update_df1e32eb: 無法解除更新
@@ -24100,6 +24127,8 @@ zh-Hant:
   user_observers_454d4303: 使用者觀察者
   user_option_links_66090987: 使用者選項連結
   user_profile: 
+    invalid_url: "無效的 URL"
+    profile_bio_too_long: 個人簡介過長
     profile_title_too_long: 標題太長
     tabs: 
       notifications: 通知
@@ -25082,6 +25111,7 @@ zh-Hant:
       
       您可在此處檢視：
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: 您的媒體已上載，並會在完成處理後顯示於此處。
   your_message_has_been_sent_thank_you_e0284316: 您的訊息已發送。謝謝您！
   your_message_was_sent_977f6583: 您的訊息已經發出。
   your_name_7665e1d8: 您的名稱

@@ -1164,6 +1164,8 @@ ko:
           enrollment_type: 
             header: "등록 유형"
     user_add_failed_message: "사용자 추가 실패"
+    user_added_message: "%{user}를 성공적으로 추가함"
+    user_added_message_sent_message: "%{user}를 성공적으로 추가했습니다. 잠시 후 사용자는 이메일 확인을 받게 됩니다."
     user_deleted_message: "%{username}을 성공적으로 삭제함"
     user_inactivity_csv_parameters: 
       account_reports: 

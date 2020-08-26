@@ -171,6 +171,26 @@
               aria-label="<%= t('Duplicate %{module_name}', {module_name: context_module ? context_module.name : 'module'} ) %>"
               title="<%= t(%{Duplicate this module}) %>"><%= t(%{Duplicate}) %></a>
           </li>
+          <% if @domain_root_account&.feature_enabled?(:direct_share) %>
+            <li role="presentation">
+              <a
+                href="#"
+                class="module_send_to icon-user"
+                aria-label="<%= t("Send this module to another user..." ) %>"
+                title="<%= t("Send this module to another user..." ) %>">
+                  <%= t("Send To...") %>
+              </a>
+            </li>
+            <li role="presentation">
+              <a
+                href="#"
+                class="module_copy_to icon-duplicate"
+                aria-label="<%= t("Copy this module to a course..." ) %>"
+                title="<%= t("Copy this module to a course..." ) %>">
+                  <%= t("Copy To...") %>
+              </a>
+            </li>
+          <% end %>
           <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
           <%= external_tools_menu_items(@module_group_tools, {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
         </ul>

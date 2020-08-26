@@ -18,7 +18,7 @@
 
 module Types
   class ProficiencyRatingType < ApplicationObjectType
-    description 'Customized proficiency ratings'
+    description 'Customized proficiency rating'
 
     implements Interfaces::LegacyIDInterface
 

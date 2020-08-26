@@ -25,18 +25,24 @@ describe 'Global Navigation' do
       course_with_teacher_logged_in
     end
 
+    it 'should minimize and expand the global nav when clicked' do
+      get "/"
+      primary_nav_toggle = f('#primaryNavToggle')
+      primary_nav_toggle.click
+      expect(primary_nav_toggle).to have_attribute('title', /expand/i)
+      expect(f('body')).not_to have_class("primary-nav-expanded")
+      primary_nav_toggle.click
+      expect(primary_nav_toggle).to have_attribute('title', /minimize/i)
+      expect(f('body')).to have_class("primary-nav-expanded")
+    end
+
     describe 'Profile Link' do
       it 'should show the profile tray upon clicking' do
         get "/"
-        f('#global_nav_profile_link').click
-        expect(f('[aria-label="Profile tray"] [aria-label="User profile picture"]')).to be_displayed
-      end
-
-      # Profile links are hardcoded, so check that something is appearing for
-      # the display_name in the tray header
-      it 'should populate the profile tray with the current user display_name' do
-        get "/"
+        # Profile links are hardcoded, so check that something is appearing for
+        # the display_name in the tray header using the displayed_username helper
         expect(displayed_username).to eq(@user.name)
+        expect(f('[aria-label="Profile tray"] [aria-label="User profile picture"]')).to be_displayed
       end
     end
 
@@ -99,19 +105,6 @@ describe 'Global Navigation' do
         @tool.save!
         get "/"
         expect(f('.ic-icon-svg--lti')).to be_displayed
-      end
-    end
-    describe 'Navigation Expand/Collapse Link' do
-      it 'should collapse and expand the navigation when clicked' do
-        skip('FOO-754 - 7/29/2020')
-
-        get "/"
-        f('#primaryNavToggle').click
-        wait_for_ajaximations
-        expect(f('body')).not_to have_class("primary-nav-expanded")
-        f('#primaryNavToggle').click
-        wait_for_ajaximations
-        expect(f('body')).to have_class("primary-nav-expanded")
       end
     end
   end

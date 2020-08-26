@@ -24,18 +24,19 @@ import denver from 'timezone/America/Denver'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
 import AgendaView from 'compiled/views/calendar/AgendaView'
-import Calendar from 'compiled/calendar/Calendar'
 import EventDataSource from 'compiled/calendar/EventDataSource'
 import eventResponse from 'helpers/ajax_mocks/api/v1/calendarEvents'
+import plannerItemsResponse from 'helpers/ajax_mocks/api/planner/items'
 import assignmentResponse from 'helpers/ajax_mocks/api/v1/calendarAssignments'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 
 const loadEventPage = (server, includeNext = false) =>
-  sendCustomEvents(server, eventResponse, assignmentResponse, includeNext)
-var sendCustomEvents = function(server, events, assignments, includeNext = false) {
-  const requestIndex = server.requests.length - 2
-  server.requests[requestIndex].respond(
+  sendCustomEvents(server, eventResponse, assignmentResponse, plannerItemsResponse, includeNext)
+const sendCustomEvents = function(server, events, assignments, plannerItems, includeNext = false) {
+  const requestIndex = server.requests.length - 3
+  server.requests[requestIndex].respond(200, {'Content-Type': 'application/json'}, plannerItems)
+  server.requests[requestIndex + 1].respond(
     200,
     {
       'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ var sendCustomEvents = function(server, events, assignments, includeNext = false
     },
     events
   )
-  return server.requests[requestIndex + 1].respond(
+  return server.requests[requestIndex + 2].respond(
     200,
     {'Content-Type': 'application/json'},
     assignments
@@ -151,7 +152,13 @@ test('should only include days on page breaks once', function() {
     date.setFullYear(date.getFullYear() + 1)
     addEvents(events, date)
   }
-  sendCustomEvents(this.server, JSON.stringify(events), JSON.stringify([]), true)
+  sendCustomEvents(
+    this.server,
+    JSON.stringify(events),
+    JSON.stringify([]),
+    JSON.stringify([]),
+    true
+  )
   ok(
     this.container.find('.agenda-event__item-container').length,
     40,
@@ -164,7 +171,13 @@ test('should only include days on page breaks once', function() {
     addEvents(events, date)
     date.setFullYear(date.getFullYear() + 1)
   }
-  sendCustomEvents(this.server, JSON.stringify(events), JSON.stringify([]), false)
+  sendCustomEvents(
+    this.server,
+    JSON.stringify(events),
+    JSON.stringify([]),
+    JSON.stringify([]),
+    false
+  )
   equal(
     this.container.find('.agenda-event__item-container').length,
     70,

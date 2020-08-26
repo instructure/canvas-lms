@@ -353,54 +353,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def index
-    get_context
-    if @context.feature_enabled?(:course_user_search) && !params.key?(:term)
-      @account ||= @context
-      return course_user_search
-    end
-
-    return unless authorized_action(@context, @current_user, :read_roster)
-    @root_account = @context.root_account
-    @query = (params[:user] && params[:user][:name]) || params[:term]
-    @include_recaptcha = recaptcha_enabled?
-    js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings'])
-    Shackles.activate(:slave) do
-      if @context && @context.is_a?(Account) && @query
-        @users = @context.users_name_like(@query)
-      elsif params[:enrollment_term_id].present? && @root_account == @context
-        @users = @context.fast_all_users.
-            where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").
-              joins(:course).
-              where(Enrollment::QueryBuilder.new(:active).conditions).
-              where(courses: { enrollment_term_id: params[:enrollment_term_id]}))
-      else
-        @users = @context.fast_all_users
-      end
-
-      @users = @users.paginate(:page => params[:page])
-
-      respond_to do |format|
-        if @users.length == 1 && params[:term]
-          format.html {
-            redirect_to(named_context_url(@context, :context_user_url, @users.first))
-          }
-        else
-          @enrollment_terms = []
-          if @root_account == @context
-            @enrollment_terms = @context.enrollment_terms.active
-          end
-          format.html
-        end
-        format.json {
-          cancel_cache_buster
-          expires_in 30.minutes
-          render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
-        }
-      end
-    end
-  end
-
   # @API List users in account
   # A paginated list of of users associated with this account.
   #
@@ -800,7 +752,7 @@ class UsersController < ApplicationController
     @courses = []
     Shard.with_each_shard(@context.in_region_associated_shards) do
       scope = @query.present? ?
-        @context.manageable_courses_name_like(@query, include_concluded) :
+        @context.manageable_courses_by_query(@query, include_concluded) :
         @context.manageable_courses(include_concluded).limit(limit)
       @courses += scope.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key').preload(:enrollment_term).to_a
     end
@@ -808,10 +760,12 @@ class UsersController < ApplicationController
 
     @courses = @courses.select { |c| c.grants_right?(@current_user, :read_as_admin) && c.grants_right?(@current_user, :read) }
 
-    cancel_cache_buster
-    expires_in 30.minutes
     render :json => @courses.map { |c|
-      { :label => c.name, :id => c.id, :term => c.enrollment_term.name,
+      { :label => c.name,
+        :id => c.id,
+        :course_code => c.course_code,
+        :sis_id => c.sis_source_id,
+        :term => c.enrollment_term.name,
         :enrollment_start => c.enrollment_term.start_at,
         :account_name => c.enrollment_term.root_account.name,
         :account_id => c.enrollment_term.root_account.id,

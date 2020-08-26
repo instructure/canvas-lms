@@ -55,3 +55,11 @@ plagiarism_tool_subscriptions:
   environments:
     ci:
       state: on
+use_oembed_token:
+  state: hidden
+  display_name: Require signed token for oEmbed
+  description: |-
+    If enabled, oEmbed endpoints will require a
+    tool-generated token to verify the origin
+    of an oEmbed resource request.
+  applies_to: SiteAdmin

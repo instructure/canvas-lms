@@ -22,7 +22,8 @@ library "canvas-builds-library"
 
 def cleanupFn(status) {
   try {
-    junit allowEmptyResults: true, testResults: 'tmp/spec_results/**/*.xml'
+    def reports = load('build/new-jenkins/groovy/reports.groovy')
+    reports.junitSafe("tmp/spec_results/**/*.xml")
 
     if(status == 'FAILURE') {
       sh 'mkdir -vp spec_results'

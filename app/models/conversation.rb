@@ -75,7 +75,7 @@ class Conversation < ActiveRecord::Base
         :workflow_state => 'read',
         :has_attachments => has_attachments?,
         :has_media_objects => has_media_objects?,
-        :root_account_ids => self.root_account_ids.join(',')
+        :root_account_ids => read_attribute(:root_account_ids)
     }.merge(options)
     ConversationParticipant.bulk_insert(user_ids.map{ |user_id|
       options.merge({:user_id => user_id})
@@ -654,7 +654,7 @@ class Conversation < ActiveRecord::Base
   def update_root_account_ids
     if root_account_ids_changed?
       # ids must be sorted for the scope to work
-      latest_ids = root_account_ids.sort.join(',')
+      latest_ids = read_attribute(:root_account_ids)
       %w[conversation_participants conversation_messages conversation_message_participants].each do |assoc|
         scope = self.send(assoc).where("#{assoc}.root_account_ids IS DISTINCT FROM ?", latest_ids).limit(1_000)
         until scope.update_all(root_account_ids: latest_ids) < 1_000; end

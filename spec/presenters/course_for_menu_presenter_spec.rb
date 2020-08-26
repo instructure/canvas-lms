@@ -19,13 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe CourseForMenuPresenter do
-  let_once(:course) { Course.create! }
+  let_once(:account) { Account.default }
+  let_once(:course) { Course.create!(account: account) }
   let_once(:user) { User.create! }
 
   let(:dashboard_card_tabs) { UsersController::DASHBOARD_CARD_TABS }
 
   let_once(:presenter) do
-    CourseForMenuPresenter.new(course, user, nil, nil, {tabs: dashboard_card_tabs})
+    CourseForMenuPresenter.new(course, user, account, nil, {tabs: dashboard_card_tabs})
   end
 
   describe '#to_h' do
@@ -65,7 +66,7 @@ describe CourseForMenuPresenter do
 
     it 'returns the course nickname if one is set' do
       user.set_preference(:course_nicknames, course.id, 'nickname')
-      cs_presenter = CourseForMenuPresenter.new(course, user)
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
       expect(h[:originalName]).to eq course.name
       expect(h[:shortName]).to eq 'nickname'
@@ -75,7 +76,7 @@ describe CourseForMenuPresenter do
       user.account.enable_feature!(:unfavorite_course_from_dashboard)
       course.enroll_student(user)
       Favorite.create!(user: user, context: course)
-      cs_presenter = CourseForMenuPresenter.new(course, user)
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
       expect(h[:isFavorited]).to eq true
     end
@@ -83,7 +84,7 @@ describe CourseForMenuPresenter do
     it 'sets isFavorited to false if course is favorited and unfavorite_course_from-dashboard flag disabled' do
       course.enroll_student(user)
       Favorite.create!(user: user, context: course)
-      cs_presenter = CourseForMenuPresenter.new(course, user)
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
       expect(h[:isFavorited]).to eq false
     end
@@ -91,14 +92,14 @@ describe CourseForMenuPresenter do
     it 'sets isFavorited to false if course is unfavorited and unfavorite_course_from_dashboard flag enabled' do
       user.account.enable_feature!(:unfavorite_course_from_dashboard)
       course.enroll_student(user)
-      cs_presenter = CourseForMenuPresenter.new(course, user)
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
       expect(h[:isFavorited]).to eq false
     end
 
     it 'sets isFavorited to false if course is unfavorited and unfavorite_course_from_dashboard flag disabled' do
       course.enroll_student(user)
-      cs_presenter = CourseForMenuPresenter.new(course, user)
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
       expect(h[:isFavorited]).to eq false
     end
@@ -109,7 +110,7 @@ describe CourseForMenuPresenter do
       end
 
       it 'sets additional keys' do
-        cs_presenter = CourseForMenuPresenter.new(course, user)
+        cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
         expect(h.key?(:published)).to eq true
         expect(h.key?(:canChangeCourseState)).to eq true
@@ -120,23 +121,32 @@ describe CourseForMenuPresenter do
     end
 
     context 'Dashcard Reordering' do
-      before(:each) do
-        @account = Account.default
-      end
-
       it 'returns a position if one is set' do
         user.set_dashboard_positions(course.asset_string => 3)
-        cs_presenter = CourseForMenuPresenter.new(course, user, @account)
+        cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
         expect(h[:position]).to eq 3
       end
 
       it 'returns nil when no position is set' do
-        cs_presenter = CourseForMenuPresenter.new(course, user, @account)
+        cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
         expect(h[:position]).to eq nil
       end
     end
 
+    context 'Using courses from a trusted account' do
+      it 'returns correct published value if the current account has FF enabled' do
+        account.enable_feature!(:unpublished_courses)
+        a2 = account_model(name: "second account")
+        a2.trust_links.create!(managing_account: account)
+        account.trust_links.create!(managing_account: a2)
+        course2 = a2.courses.create!(name: "course02")
+
+        cs_presenter = CourseForMenuPresenter.new(course2, user, account)
+        h = cs_presenter.to_h
+        expect(h.key?(:published)).to eq true
+      end
+    end
   end
 end

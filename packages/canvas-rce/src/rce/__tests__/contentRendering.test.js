@@ -172,7 +172,7 @@ describe('contentRendering', () => {
     it('builds iframe src from tray video data', () => {
       const video = videoFromTray()
       const src = contentRendering.mediaIframeSrcFromFile(video)
-      expect(src).toEqual('/media_objects_iframe?mediahref=%2Furl%2Fto%2Fcourse%2Ffile&type=video')
+      expect(src).toEqual('/media_objects_iframe/17?type=video')
     })
 
     it('builds iframe src from uploaded video data', () => {
@@ -185,7 +185,7 @@ describe('contentRendering', () => {
       const video = videoFromTray()
       const rendered = contentRendering.renderVideo(video)
       expect(rendered).toEqual(
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe?mediahref=%2Furl%2Fto%2Fcourse%2Ffile&type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;'
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;'
       )
     })
 

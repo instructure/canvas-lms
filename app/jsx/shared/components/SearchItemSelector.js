@@ -23,7 +23,7 @@ import {func, string} from 'prop-types'
 import CanvasAsyncSelect from './CanvasAsyncSelect'
 import useDebouncedSearchTerm from '../hooks/useDebouncedSearchTerm'
 
-const MINIMUM_SEARCH_LENGTH = 3
+const MINIMUM_SEARCH_LENGTH = 2
 
 SearchItemSelector.propTypes = {
   onItemSelected: func, // expects each item to have the 'name' property

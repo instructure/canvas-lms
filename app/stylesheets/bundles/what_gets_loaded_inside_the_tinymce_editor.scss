@@ -96,6 +96,7 @@ body#tinyrce {
 /* the span tinymce puts around the media player's iframe */
 .mce-content-body .mce-preview-object {
   border-style: none;
+  display: block;
 }
 
 [data-mce-p-data-media-id],

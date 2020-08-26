@@ -77,6 +77,20 @@ describe('RCE "Links" Plugin > LinkOptionsDialog', () => {
       renderComponent()
       expect(dialog.link).toEqual(props.url)
     })
+
+    it('shows an error message if the url is invalid', () => {
+      props.url = 'xxx://example.instructure.com/files/3201/download'
+      renderComponent()
+      expect(dialog.link).toEqual(props.url)
+      expect(dialog.$errorMessage).toBeInTheDocument()
+      expect(dialog.doneButtonIsDisabled).toBe(true)
+
+      // correct the URL
+      dialog.setLink('//example.instructure.com/files/3201/download')
+      expect(dialog.link).toEqual('//example.instructure.com/files/3201/download')
+      expect(dialog.$errorMessage).toBeNull()
+      expect(dialog.doneButtonIsDisabled).toBe(false)
+    })
   })
 
   describe('"Done" button', () => {

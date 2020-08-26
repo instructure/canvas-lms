@@ -86,6 +86,10 @@ export default class ImageOptionsTrayDriver {
     return this.$displayAsField.querySelector('input[type="radio"]:checked').value
   }
 
+  get isDisplayAsDisabled() {
+    return this.$displayAsField.querySelectorAll('input[disabled]').length === 2
+  }
+
   get size() {
     return this.$sizeSelect.value
   }

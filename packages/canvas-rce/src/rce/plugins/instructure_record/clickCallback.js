@@ -39,11 +39,17 @@ export default function(ed, document) {
       ed.focus(false)
     }
 
+    // We need to have a place to store the bookmark location
+    // while the upload happens.
+    let uploadBookmark = null
+
     // redux's activateMediaUpload action does the image placeholder,
     // but it also does the upload. We need to separate them if we
     // want to stay within the redux approach
     const handleStartUpload = fileProps => {
       Bridge.focusEditor(ed.rceWrapper)
+      const editorComponent = Bridge.activeEditor()
+      uploadBookmark = editorComponent?.editor?.selection.getBookmark(2, true)
       Bridge.insertImagePlaceholder(fileProps)
       handleDismiss()
     }
@@ -56,7 +62,17 @@ export default function(ed, document) {
           {file: error.file.name, max: error.maxFileSize}
         )
       }
+
+      const editorComponent = Bridge.activeEditor()
+      let newBookmark
+      if (uploadBookmark) {
+        newBookmark = editorComponent.editor.selection.getBookmark(2, true)
+        editorComponent.editor.selection.moveToBookmark(uploadBookmark)
+      }
       onUploadComplete(err_msg, uploadData)
+      if (newBookmark) {
+        editorComponent.editor.selection.moveToBookmark(newBookmark)
+      }
     }
 
     const trayProps = Bridge.trayProps.get(ed)

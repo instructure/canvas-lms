@@ -1098,4 +1098,54 @@ describe ContextModulesController do
       assert_response :missing
     end
   end
+
+  describe "POST 'toggle_collapse_all'" do
+    it "should collapse all modules as teacher when passed collapse=1" do
+      course_with_teacher_logged_in(active_all: true)
+      page1 = @course.wiki_pages.create title: "test 1"
+      page2 = @course.wiki_pages.create title: "test 2"
+      module1 = @course.context_modules.create!
+      module2 = @course.context_modules.create!
+      module1.add_item type: 'page', id: page1.id
+      module2.add_item type: 'page', id: page2.id
+
+      post 'toggle_collapse_all', params: {:collapse => '1', :course_id => @course.id}
+      expect(response).to be_successful
+      progression1 = module1.evaluate_for(@teacher)
+      progression2 = module2.evaluate_for(@teacher)
+      expect(progression1.collapsed).to be_truthy
+      expect(progression2.collapsed).to be_truthy
+    end
+
+    it "should expand all modules as student when passed collapse=0" do
+      course_with_student_logged_in(active_all: true)
+      page1 = @course.wiki_pages.create title: "test 1"
+      page2 = @course.wiki_pages.create title: "test 2"
+      module1 = @course.context_modules.create!
+      module2 = @course.context_modules.create!
+      module1.add_item type: 'page', id: page1.id
+      module2.add_item type: 'page', id: page2.id
+
+      post 'toggle_collapse_all', params: {:collapse => '0', :course_id => @course.id}
+      expect(response).to be_successful
+      progression1 = module1.evaluate_for(@student)
+      progression2 = module2.evaluate_for(@student)
+      expect(progression1.collapsed).to be_falsey
+      expect(progression2.collapsed).to be_falsey
+    end
+
+    it "should work multiple times in a row as a student" do
+      course_with_student_logged_in(active_all: true)
+      page1 = @course.wiki_pages.create title: "test 1"
+      module1 = @course.context_modules.create!
+      module1.add_item type: 'page', id: page1.id
+
+      post 'toggle_collapse_all', params: {:collapse => '1', :course_id => @course.id}
+      post 'toggle_collapse_all', params: {:collapse => '0', :course_id => @course.id}
+      post 'toggle_collapse_all', params: {:collapse => '0', :course_id => @course.id}
+      expect(response).to be_successful
+      progression1 = module1.evaluate_for(@student)
+      expect(progression1.collapsed).to be_falsey
+    end
+  end
 end

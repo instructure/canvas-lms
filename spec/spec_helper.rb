@@ -216,17 +216,7 @@ require_relative 'rspec_mock_extensions'
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 require 'i18n_tasks'
-
-legit_global_methods = Object.private_methods
-Dir[File.dirname(__FILE__) + "/factories/**/*.rb"].each {|f| require f }
-crap_factories = (Object.private_methods - legit_global_methods)
-if crap_factories.present?
-  $stderr.puts "\e[31mError: Don't create global factories/helpers"
-  $stderr.puts "Put #{crap_factories.map { |m| "`#{m}`" }.to_sentence} in the `Factories` module"
-  $stderr.puts "(or somewhere else appropriate)\e[0m"
-  $stderr.puts
-  exit! 1
-end
+require_relative 'factories'
 
 Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].each {|f| require f }
 
@@ -361,6 +351,10 @@ RSpec.configure do |config|
   if ENV['DOCKER_PROCESSES']
     # if file already exists this is a rerun of a failed spec, don't generate new xml.
     config.add_formatter "RspecJunitFormatter", "log/results.xml" unless File.file?("log/results.xml")
+  end
+
+  if ENV['RSPEC_LOG']
+    config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime_rspec_tests.log"
   end
 
   if ENV['RAILS_LOAD_ALL_LOCALES'] && RSpec.configuration.filter.rules[:i18n]
@@ -527,22 +521,6 @@ RSpec.configure do |config|
 
   def default_uploaded_data
     fixture_file_upload('docs/doc.doc', 'application/msword', true)
-  end
-
-  def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
-    obj = ar_klass.respond_to?(:new) ? ar_klass.new : ar_klass.build
-    attrs.each { |k, v| obj.send("#{k}=", attrs[k]) }
-    obj.save! if do_save
-    obj
-  end
-
-  def update_with_protected_attributes!(ar_instance, attrs)
-    attrs.each { |k, v| ar_instance.send("#{k}=", attrs[k]) }
-    ar_instance.save!
-  end
-
-  def update_with_protected_attributes(ar_instance, attrs)
-    update_with_protected_attributes!(ar_instance, attrs) rescue false
   end
 
   def create_temp_dir!
@@ -856,34 +834,6 @@ RSpec.configure do |config|
 
   def consider_all_requests_local(value)
     Rails.application.config.consider_all_requests_local = value
-  end
-
-  # a fast way to create a record, especially if you don't need the actual
-  # ruby object. since it just does a straight up insert, you need to
-  # provide any non-null attributes or things that would normally be
-  # inferred/defaulted prior to saving
-  def create_record(klass, attributes, return_type = :id)
-    create_records(klass, [attributes], return_type)[0]
-  end
-
-  # a little wrapper around bulk_insert that gives you back records or ids
-  # in order
-  # NOTE: if you decide you want to go add something like this to canvas
-  # proper, make sure you have it handle concurrent inserts (this does
-  # not, because READ COMMITTED is the default transaction isolation
-  # level)
-  def create_records(klass, records, return_type = :id)
-    return [] if records.empty?
-    klass.transaction do
-      klass.connection.bulk_insert klass.table_name, records
-      return if return_type == :nil
-      scope = klass.order("id DESC").limit(records.size)
-      if return_type == :record
-        scope.to_a.reverse
-      else
-        scope.pluck(:id).reverse
-      end
-    end
   end
 
   def skip_if_prepended_class_method_stubs_broken

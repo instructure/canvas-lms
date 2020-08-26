@@ -564,11 +564,11 @@ class ContentMigration < ActiveRecord::Base
       end
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
-      if self.for_master_course_import?
-        process_master_deletions(data['deletions']) if data['deletions'].present?
-      end
+      deletions = self.for_master_course_import? && data['deletions'].presence
+      process_master_deletions(deletions.except('AssignmentGroup')) if deletions # wait until after the import to do AssignmentGroups
       import!(data)
 
+      process_master_deletions(deletions.slice('AssignmentGroup')) if deletions
       if !self.import_immediately?
         update_import_progress(100)
       end

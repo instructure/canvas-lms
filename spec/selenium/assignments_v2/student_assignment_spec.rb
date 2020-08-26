@@ -25,7 +25,6 @@ describe 'as a student' do
     before(:once) do
       Account.default.enable_feature!(:assignments_2_student)
       course_with_student(course: @course, active_all: true)
-      preload_graphql_schema
     end
 
     context 'assignment details' do

@@ -421,6 +421,7 @@ pl:
   account_level_mastery_scales_a5bdff29: "Skale nauki na poziomie konta"
   account_level_notification_preferences_require_an__66467cd7: "Preferencje dot. powiadomień o poziomie konta wymagają aktualizacji account_id"
   account_level_notification_preferences_ui_update_f5e189a4: "Aktualizacja UI preferencji dot. powiadomień na poziomie konta"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Powiadomienia na poziomie konta dotyczą wszystkich kursów. Powiadomienia dla poszczególnych kursów można zmieniać w każdym kursie i zastąpią one te powiadomienia."
   account_level_settings_manage_4fca6f8e: "Ustawienia na poziomie konta - zarządzaj"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nazwa konta"
@@ -431,6 +432,7 @@ pl:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Czas zakończenia powiadomienia konta jest wcześniejszy od czasu rozpoczęcia"
+  account_notification_settings_e96de9b6: "Ustawienia powiadomień na koncie"
   account_notification_settings_error_page_66c0bc61: "Strona błędu ustawień powiadomień na koncie"
   account_notification_settings_initial_query_error_f55e1cbf: "Błąd początkowej kwerendy ustawień powiadomień na koncie"
   account_notification_settings_updated_dbabec35: "Zaktualizowano ustawienia powiadomień na koncie"
@@ -1412,6 +1414,7 @@ pl:
         manual_quotas_title: "Ręcznie ustawialne przydziały"
         megabytes: megabajty(-ów)
         megabytes_tooltip: megabajty(-ów)
+        placeholder_course_or_group_id: "Wpisz identyfikator..."
         select_type_courses: "Identyfikator kursu"
         select_type_groups: "Identyfikator grupy"
         select_type_label: "Znajdź kurs lub grupę"
@@ -3994,6 +3997,7 @@ pl:
   available_from_f84e4611: "Dostępne od"
   available_from_field_for_styleguide_7ced3861: "Pole Dostępne od dla styleguide"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Dostępne od - Format RRRR-MM-DD gg:mm"
+  available_pronouns_b45330b1: "Dostępne zaimki"
   available_to_b7350e02: "Dostępny do"
   available_until_3278ebe9: "Dostępny do"
   available_until_date_2c0ccec3: "Dostępne do:"
@@ -5268,6 +5272,7 @@ pl:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Collaborations to narzędzia internetowe do wspólnej pracy nad zadaniami takimi jak robienie notatek lub wspólne projekty. Aby rozpocząć, porozmawiaj z nauczycielem."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Projekty współpracy to narzędzia oparte na sieci Web, stworzone do wspólnej pracy nad zadaniami, takie jak robienie notatek czy grupowanie papierów. Rozpocznij poprzez dodanie aplikacji projektów współpracy."
   collaborations_tutorial_tray_9219d9d: "Panel samouczka współpracy"
+  collapse_all_50275533: "Zwiń wszystkie"
   collapse_group_c2af7cad: "Zwiń grupę"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Zwiń listę członków grupy dla %{groupName}"
   collapse_subdiscussion_89af1f5c: "Zwiń Sub-dyskusję"
@@ -6605,6 +6610,10 @@ pl:
     many: "%{count} uczestników"
     one: "1 uczestnik"
     other: "%{count} uczestników"
+  count_students_c9920376: 
+    one: "1 uczestnik"
+    other: "%{count} uczestników"
+    zero: "0 uczestników"
   count_students_in_percentile_percentile_d0adecfe: 
     few: "%{count} uczestników w percentylu %{percentile}. "
     many: "%{count} uczestników w percentylu %{percentile}. "
@@ -6819,6 +6828,7 @@ pl:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Kurs jest już powiązany z Blueprint"
   course_landing_page_49a53ade: "Strona startowa kursu"
   course_level_notification_preferences_require_a_co_2f0a618: "Preferencje dot. powiadomień o poziomie kursu wymagają aktualizacji course_id"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Powiadomienie na poziomie kursu są dziedziczone z ustawień powiadomień na poziomie konta. Dostosowanie powiadomień dla tego kursu spowoduje zastąpienie powiadomień na poziomie konta."
   course_level_overrides_for_notification_preference_e86d1725: "Obejścia poziomu kursu dla preferencji dot. powiadomień"
   course_list: 
     favorited_tooltip: "Kliknij, aby usunąć z menu Kursy."
@@ -8312,6 +8322,9 @@ pl:
   disableWhileLoading: 
     loading: Wczytywanie...
   disable_a5c05db3: Wyłącz
+  disable_alert_timeouts_description: |-
+      Włączenie tej funkcji eliminuje limit czasu dla powiadomień w wyskakujących okienkach,
+      zapewniając użytkownikowi dowolny czas na przeczytanie powiadomienia i odrzucenie go, gdy zakończy czytanie.
   disable_all_read_only_scopes_f9ffdd28: "Wyłącz wszystkie zakresy tylko do odczytu."
   disable_and_lock_7d0ef0e8: "Wyłącz i zablokuj"
   disable_automatic_submission_8e1d8676: "Wyłącz automatyczne przesyłki"
@@ -8323,6 +8336,7 @@ pl:
   disable_scope_6ba4e4d4: "Wyłącz zakres"
   disable_sync_to_name_10c371dc: "Wyłącz synchronizację z %{name}"
   disable_toolname_44d6397c: "Wyłącz %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Wyłącz przesyłki do Canvas Media z ulepszonego edytora formatowanej treści"
   disabled_18c33a73: (wyłączone)
   disabled_3b1b332a: Wyłączone
   disabled_and_locked_d14dc6c2: "Wyłączono i zablokowano"
@@ -9668,6 +9682,7 @@ pl:
   exit_d0c7b013: Wyjdź
   exit_theme_editor_9ddd41bb: "Wyjdź z edytora temat"
   expand_2f2fadbd: Rozwiń
+  expand_all_bb64d2ea: "Rozwiń wszystkie"
   expand_collapse_title_outcome_group_239f0a9d: "rozwiń/zwiń grupę wyników %{title} "
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Rozwiń/zwiń grupę wyników %{title}, uczestnik wykazuje opanowanie %{mastery_count} z %{count} wyników"
   expand_global_navigation_2c28d5d4: "Rozszerz nawigację globalną"
@@ -9872,6 +9887,7 @@ pl:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Nie udało się wczytać elementu Niezsynchronizowane zmiany. Czy połączenie sieciowe jest OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Niepowodzenie, zgłoś następujący kod błędu administratorowi systemu: Zgłoś błąd:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Nie udało się pobrać źródła multimediów"
+  failed_retrieving_media_sources_32aed288: "Nie udało się pobrać źródeł multimediów."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Niepowodzenie, nie udało się wygenerować pliku. Spróbuj ponownie."
   failed_to_add_new_feed_ee1c5ea: "Nie udało się dodać nowego kanału"
   failed_to_change_last_attended_date_1e340ba6: "Nie udało się zmienić ostatniej daty uczestnictwa"
@@ -9958,6 +9974,7 @@ pl:
         Zróżnicowane zadania to funkcja, umożliwiająca wybór sekcji lub indywidualnego ucznia (ów) których zadanie dotyczy.
         Sekcje bez przypisanego zadania nie będą go widziały w treści swojego kursu a ich ocena końcowa będzie
         obliczana bez tych punktów.
+    disable_alert_timeouts: "Wyłącz limity czasu dla powiadomień"
     ember_modules: "Moduły Ember"
     google_docs_domain_restriction: "Ograniczenie domeny Google Docs"
     gradebook_list_students_by_sortable_name: "Dzienniczek - Wyświetl listę uczestników według sortowalnej nazwy"
@@ -10148,6 +10165,7 @@ pl:
   final_grade_finalgrade_408580bb: "Ocena końcowa: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Informacje o ocenie końcowej"
   final_grade_override_be8a21cd: "Zastąpienie oceny końcowej"
+  final_grade_override_in_gradebook_history_767147c: "Zastąpienie oceny końcowej w historii dziennika ocen"
   final_grade_score_fe69a301: "Ocena końcowa: %{score}"
   final_grader_1693103c: "Oceniający końcowy"
   final_grader_can_view_other_grader_names_67736530: "Końcowy oceniający może wyświetlić nazwiska innych oceniających"
@@ -10307,6 +10325,7 @@ pl:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Daj wszystkim uczestnikom taką samą ocenę za *%{assignment.name}*, wpisując i przesyłając poniższą wartość oceny:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Daj wszystkim uczestnikom taką samą ocenę *procentową* za **%{assignment.name}**, wpisując i przesyłając poniższą wartość oceny:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Przerywanie próby pobrania źródeł multimediów. Problem ten zostanie prawdopodobnie rozwiązany."
   global_announcements_a78912c8: "Ogłoszenia globalne"
   global_announcements_add_edit_delete_843ca4d2: "Globalne ogłoszenia - dodaj / edytuj / usuń"
   global_branding_df1cae12: "Globalny branding"
@@ -12334,6 +12353,7 @@ pl:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Dodaj łącze do SpeedGrader w menu nagłówka zadania w Dzienniku ocen."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Uwzględnia wartości ocen w raportach ocen administratora."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Obejmuje dostosowania usługi Outcomes podczas eksportowania i importowania zawartości kursu"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Obejmuje zastępowanie ocen z kursów w historii dziennika ocen."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Uwzględnia kryteria ocen w pasku bocznym nawigacji kursu"
   incomplete_95612d72: nieukończony
   incomplete_da3c2ea2: "Nie ukończono"
@@ -16356,6 +16376,7 @@ pl:
     submission_comment_description: "Komentarz do przesłanego zadania"
     submission_comment_display: "Komentarz do przesłanego zadania"
     web_conference_recording_ready: "Zapis konferencji jest gotowy"
+  notification_policies_requires_the_communication_c_2e7ded08: "Zasady powiadomień wymagają aktualizacji identyfikatora kanału komunikacyjnego, kategorii powiadomień oraz częstotliwości ich występowania"
   notification_preferences: 
     communication: 
       email: 
@@ -16632,6 +16653,7 @@ pl:
   open_to_comments_23d5585e: "Można dodawać komentarze"
   openid_connect_initiation_url_2be36b48: "Otwórz adres inicjalizacji ID Connect"
   openid_connect_initiation_url_d9037d30: "* Otwórz adres inicjalizacji ID Connect"
+  opens_in_new_window_b4b99243: "otwiera się w nowym oknie"
   option_1_dea39f90: "Opcja 1"
   option_2_47aace2a: "Opcja 2"
   option_3_30adfebc: "Opcja 3"
@@ -16701,6 +16723,7 @@ pl:
   out_of_pointspossible_c163105a: "z %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Dostosowanie wyników do zawartości niepodlegającej ocenie"
   outcome_da397d20: Wynik
+  outcome_details_ce254e89: "Szczegóły wyniku"
   outcome_export_89229eb4: "Eksportuj wyniki"
   outcome_group_39fae76f: "Grupa wyników"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Nie odnaleziono grupy wyników z ID Canvas %{id}"
@@ -20164,6 +20187,8 @@ pl:
   restore_courses_182e162e: "Przywróć kursy"
   restored_course_association_course_c9e16045: "Przywrócono powiązanie kursu %{course}"
   restrict_access_84ba6bb8: "Ogranicz dostęp"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Nie zezwalaj na zmianę skali nauki przez instruktorów"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Nie zezwalaj na zmianę sposobu obliczeń stopnia kompetencji"
   restrict_sms_to_select_types_9dd6399c: "Ogranicz SMS do wyboru typów"
   restrict_student_access: 
     button_text: 
@@ -24110,6 +24135,8 @@ pl:
   ukrainian_945b00b7: Ukraiński
   unable_to_accept_update_fd53a7e2: "Nie można zaakceptować aktualizacji"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Nie można uzyskać dostępu do określonego uczestnika. Przejść do zadania w SpeedGrader?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Nie można dostosować niektórych wyników do strony"
+  unable_to_align_some_outcomes_to_title_53467231: "Nie można dostosować niektórych wyników do \"%{title}\""
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Nie można wykreślić ocen, ponieważ termin tego zadania przypada na zamknięty okres oceniania dla co najmniej jednego uczestnika"
   unable_to_delete_assignment_abcf8d62: "Nie można usunąć zadania"
   unable_to_dismiss_update_df1e32eb: "Nie można odrzucić aktualizacji"
@@ -24589,6 +24616,8 @@ pl:
   user_observers_454d4303: "Obserwujący użytkowników"
   user_option_links_66090987: "Linki do opcji użytkownika"
   user_profile: 
+    invalid_url: "Nieprawidłowy adres URL"
+    profile_bio_too_long: "Biogram jest zbyt długi"
     profile_title_too_long: "Tytuł jest zbyt długi"
     tabs: 
       notifications: Powiadomienia
@@ -25604,6 +25633,7 @@ pl:
       
       Możesz je wyświetlić tutaj: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Twoje multimedia zostały przesłane, a po przetworzeniu pojawią się tutaj."
   your_message_has_been_sent_thank_you_e0284316: "Twoja wiadomość została wysłana. Dziękujemy!"
   your_message_was_sent_977f6583: "Wysłano wiadomość!"
   your_name_7665e1d8: "Twoje imię i nazwisko"

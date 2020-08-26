@@ -57,8 +57,26 @@ module ModulesIndexPage
       f("#context_module_#{context_module.id} button[aria-label='Manage #{context_module.name}']")
     end
 
+    def manage_module_item_button(module_item)
+      f("#context_module_item_#{module_item.id} .al-trigger")
+    end
+
+    def add_module_item_button(context_module)
+      f("#context_module_#{context_module.id} .add_module_item_link")
+    end
+
     #------------------------------ Actions ------------------------------
     def visit_modules_index_page(course_id)
       get "/courses/#{course_id}/modules"
+    end
+
+    def add_new_module_item(context_module, type, name)
+      add_module_item_button(context_module).click
+      f("#add_module_item_select").click
+      f("#add_module_item_select option[value=\"#{type}\"]").click
+      f("##{type}s_select option[value=\"new\"]").click
+      replace_content(f("##{type}s_select input.item_title"), name)
+      fj(".add_item_button:visible").click
+      wait_for_ajax_requests
     end
 end

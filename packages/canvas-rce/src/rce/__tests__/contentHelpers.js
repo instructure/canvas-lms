@@ -20,10 +20,11 @@ export function videoFromTray() {
   return {
     class: 'instructure_file_link', // if from tray
     content_type: 'video/quicktime',
-    href: '/url/to/course/file',
+    embedded_iframe_url: '/media_objects_iframe/17',
+    href: '/media_objects_iframe/17',
     id: 17,
     target: '_blank',
-    text: 'filename.mov'
+    title: 'filename.mov'
   }
 }
 export function videoFromUpload() {

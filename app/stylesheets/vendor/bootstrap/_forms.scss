@@ -151,9 +151,9 @@ input[type="checkbox"] {
 // Set the height of select and file controls to match text inputs
 select,
 input[type="file"] {
-  // Adding "8" to the total to account for the extra padding on the updated button styles
-  height: $inputHeight + 8;
-  line-height: $inputHeight + 8;
+  // Adding "0.5" to the total to account for the extra padding on the updated button styles
+  height: $inputHeightRem + 0.5;
+  line-height: $inputHeightRem + 0.5;
 }
 
 // Make select elements obey height by applying a border
@@ -161,6 +161,11 @@ select {
   width: 220px; // default input width + 10px of padding that doesn't get applied
   border: 1px solid $inputBorder;
   background-color: $inputBackground; // Chrome on Linux and Mobile Safari need background-color
+}
+
+select.responsive-width {
+  width: unset;
+  min-width: 220px;
 }
 
 // Make multiple select elements height not fixed

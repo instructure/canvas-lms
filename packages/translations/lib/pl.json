@@ -293,9 +293,6 @@
     "dimensions_45ddb7b7": {
         "message": "Wymiary"
     },
-    "directionality_ebcae6d0": {
-        "message": "Kierunkowość"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Wyłącz podgląd w wierszu."
     },
@@ -575,9 +572,6 @@
     "late_2be42b88": {
         "message": "Późno"
     },
-    "left_to_right_d6da6d7e": {
-        "message": "Od lewej do prawej"
-    },
     "link_7262adec": {
         "message": "Łącze"
     },
@@ -658,9 +652,6 @@
     },
     "mic_a7f3d311": {
         "message": "Mikrofon"
-    },
-    "miscellaneous_and_apps_f450a387": {
-        "message": "Różne i aplikacje"
     },
     "missing_1a256b3b": {
         "message": "Brak"
@@ -868,9 +859,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Edytor wzbogaconej zawartości"
-    },
-    "right_to_left_ec223c81": {
-        "message": "Od prawej do lewej"
     },
     "save_11a80ec3": {
         "message": "Zapisz"

@@ -217,6 +217,17 @@ describe ContentMigration do
       test_zip_import(@course, cm)
     end
 
+    it "should go through instfs if enabled" do
+      cm = setup_zip_import(@course)
+      allow(InstFS).to receive(:enabled?).and_return(true)
+      @uuid = "1234-abcd"
+      allow(InstFS).to receive(:direct_upload).and_return(@uuid)
+
+      test_zip_import(@course, cm)
+      attachment = @course.attachments.last
+      expect(attachment.instfs_uuid).to eq(@uuid)
+    end
+
     it "should import into a user" do
       cm = setup_zip_import(@user)
       test_zip_import(@user, cm)

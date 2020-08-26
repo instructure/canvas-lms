@@ -25,6 +25,8 @@ services:
       DOCKER_PROCESSES:
       EXCLUDE_TESTS:
       TEST_PATTERN:
+      # rspec-parallel-log build
+      RSPEC_LOG:
     # this will stop passenger from booting so the container isn't running anything at all once up
     command: sleep infinity
     init: true

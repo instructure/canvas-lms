@@ -164,7 +164,10 @@ particular placement:
 If the current user is an observer in the launch
 context, this substitution returns a comma-separated
 list of user IDs linked to the current user for
-observing.
+observing. For LTI 1.3 tools, the user IDs will
+correspond to the "sub" claim made in LTI 1.3 launches
+(a UUIDv4), while for all other tools, the user IDs will
+be the user's typical LTI ID.
 
 Returns an empty string otherwise.
 
@@ -172,7 +175,8 @@ Returns an empty string otherwise.
 **Launch Parameter**: *com_instructure_user_observees*  
 
 ```
- "86157096483e6b3a50bfedc6bac902c0b20a824f","c0ddd6c90cbe1ef0f32fbce5c3bf654204be186c"
+ LTI 1.3: "a6e2e413-4afb-4b60-90d1-8b0344df3e91",
+ All Others: "c0ddd6c90cbe1ef0f32fbce5c3bf654204be186c"
 ```
 ## Context.title
 The title of the context.

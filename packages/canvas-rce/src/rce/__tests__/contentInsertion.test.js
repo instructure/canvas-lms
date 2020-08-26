@@ -50,7 +50,8 @@ describe('contentInsertion', () => {
         getEnd: () => {
           return node
         },
-        getRng: () => ({})
+        getRng: () => ({}),
+        isCollapsed: () => editor.selectionContent.length === 0
       },
       dom: {
         getParent: () => {
@@ -350,7 +351,7 @@ describe('contentInsertion', () => {
 
   describe('insertVideo', () => {
     beforeEach(() => {
-      // this is what's returned from editor.seletion.getEnd()
+      // this is what's returned from editor.selection.getEnd()
       node = {
         querySelector: () => 'the inserted iframe'
       }
@@ -371,9 +372,25 @@ describe('contentInsertion', () => {
       const video = videoFromTray()
       const result = contentInsertion.insertVideo(editor, video)
       expect(editor.insertContent).toHaveBeenCalledWith(
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe?mediahref=%2Furl%2Fto%2Fcourse%2Ffile&type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;'
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;'
       )
       expect(result).toEqual('the inserted iframe')
+    })
+
+    it('links video if user has made a selection', () => {
+      jest.spyOn(editor, 'execCommand')
+      editor.selectionContent = 'link me'
+      const video = videoFromTray()
+      contentInsertion.insertVideo(editor, video)
+      expect(editor.execCommand).toHaveBeenCalledWith('mceInsertLink', false, {
+        class: 'instructure_file_link',
+        'data-canvas-previewable': undefined,
+        href: '/media_objects_iframe/17?type=video',
+        id: 17,
+        rel: 'noopener noreferrer',
+        target: '_blank',
+        title: 'filename.mov'
+      })
     })
   })
 

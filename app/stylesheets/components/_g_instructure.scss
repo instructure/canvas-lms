@@ -132,6 +132,7 @@
   position: relative;
   min-height: 5px;
   max-width: 100%;
+  overflow-x: auto;
   a:not(.btn, .Button) {
     text-decoration: underline;
   }

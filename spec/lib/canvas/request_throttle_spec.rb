@@ -107,7 +107,7 @@ describe 'RequestThrottle' do
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
     end
 
-    it "should have headers even when disabled" do
+    it "should have headers even when disabled including cost tracking" do
       allow(RequestThrottle).to receive(:enabled?).and_return(false)
       allow(throttler).to receive(:calculate_cost).and_return(30)
 
@@ -115,7 +115,11 @@ describe 'RequestThrottle' do
       expected[1]['X-Request-Cost'] = '30'
       # hwm of 600 - cost of the request
       expected[1]['X-Rate-Limit-Remaining'] = '570.0'
-      expect(throttler.call(request_user_1)).to eq expected
+      output = throttler.call(request_user_1)
+      expect(output[1]['X-Request-Cost']).to eq('30')
+      remaining = output[1]['X-Rate-Limit-Remaining'].to_f
+      expect(remaining > 570.0).to be_truthy
+      expect(remaining < 580.0).to be_truthy
     end
 
     it "should blacklist based on ip" do
@@ -188,6 +192,13 @@ describe 'RequestThrottle' do
 
       it "sanity checks range of extra cost" do
         cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => -100})
+        expect(cost).to eq(42)
+      end
+
+      it "weights the cost by settings" do
+        cpu_cost = Setting.set("request_throttle.cpu_cost_weight", "2.0")
+        db_cost = Setting.set("request_throttle.db_cost_weight", "0.5")
+        cost = throttle.calculate_cost(20, 4, {})
         expect(cost).to eq(42)
       end
     end
@@ -364,6 +375,16 @@ describe 'RequestThrottle' do
           end
         end
 
+        it "does no reserving if whitelisted" do
+          Timecop.freeze('2012-01-29 12:00:00 UTC') do
+            @bucket.increment(0, 0, @current_time)
+            @bucket.reserve_capacity(20, request_whitelisted: true) do
+              expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(0)
+            end
+            expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(0)
+          end
+        end
+
         it "should still decrement when an error is thrown" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
@@ -414,10 +435,19 @@ describe 'RequestThrottle' do
           expect(@bucket.get_up_front_cost_for_path("/somethingelse")).to eq @bucket.up_front_cost
         end
 
-        it "does nothing if disabled" do
-          expect(RequestThrottle).to receive(:enabled?).twice.and_return(false)
-          expect(@bucket).to receive(:increment).never
+        it "still tracks cost when disabled (for debugging)" do
+          allow(RequestThrottle).to receive(:enabled?).and_return(false)
+          expect(@bucket).to receive(:increment).twice
           @bucket.reserve_capacity {}
+        end
+
+        it "will always be allowed when disabled, even with full bucket" do
+          allow(RequestThrottle).to receive(:enabled?).and_return(false)
+          req = request_logged_out
+          allow(req).to receive(:fullpath).and_return("/")
+          allow(req).to receive(:env).and_return({'canvas.request_throttle.user_id' => ['123']})
+          allow(@bucket).to receive(:full?).and_return(true)
+          expect(throttler.allowed?(request_logged_out, @bucket)).to be_truthy
         end
 
         after do

@@ -88,5 +88,53 @@ class ConditionalReleaseObjects
     def save_button
       f(".assignment__action-buttons .btn-primary")
     end
+
+    def breakdown_graph_exists?
+      element_exists?(".crs-breakdown-graph")
+    end
+
+    def last_add_assignment_button
+      ff('.cr-scoring-range__add-assignment-button').last
+    end
+
+    def mp_assignment_checkbox(assignment_name)
+      fxpath("//li[contains(@aria-label, 'assignment category icon for item name #{assignment_name}')]/label[@class = 'cr-label__cbox']")
+    end
+
+    def add_items_button
+      find_button('Add Items')
+    end
+
+    def assignment_card_exists?(assignment_name)
+      element_exists?("div[aria-label='#{assignment_name}']")
+    end
+
+    def or_toggle_button
+      f("[title = 'Click to merge sets here']")
+    end
+
+    def and_toggle_button
+      f("[title = 'Click to split set here']")
+    end
+
+    def or_toggle_button_exists?
+      element_exists?("[title = 'Click to merge sets here']")
+    end
+
+    def and_toggle_button_exists?
+      element_exists?("[title = 'Click to split set here']")
+    end
+
+    def assignment_options_button(assignment_name)
+      fxpath("//*[@class = 'cr-assignment-card']//button[//*[contains(text(),'assignment #{assignment_name} options')]]")
+    end
+
+    def menu_option(menu_item)
+      fxpath("//*[contains(text(),'#{menu_item}')]")
+    end
+
+    def assignment_exists_in_scoring_range?(ordered_range, assignment_name)
+      element_exists?("//*[@class = 'cr-scoring-range' and position() = #{ordered_range}]//div[@aria-label = '#{assignment_name}']", true)
+    end
   end
 end

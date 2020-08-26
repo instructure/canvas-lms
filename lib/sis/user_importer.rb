@@ -433,7 +433,7 @@ module SIS
         return false if @root_account.pseudonyms.active.where(user_id: user).where("sis_user_id != ? OR sis_user_id IS NULL", user_id).exists?
 
         enrollments = @root_account.enrollments.active.where(user_id: user).
-          where.not(workflow_state: 'deleted').select(:id, :type, :course_id, :course_section_id, :user_id, :workflow_state).to_a
+          select(:id, :type, :course_id, :course_section_id, :user_id, :workflow_state).to_a
         if enrollments.any?
           Enrollment.where(id: enrollments.map(&:id)).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
           EnrollmentState.where(enrollment_id: enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true, updated_at: Time.now.utc)

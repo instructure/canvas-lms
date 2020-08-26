@@ -51,6 +51,22 @@ function skipSlickGridDefaults(event) {
   ;(event.originalEvent || event).skipSlickGridDefaults = true
 }
 
+function isFirstRow(location, _grid) {
+  return location.row === 0
+}
+
+function isLastRow(location, grid) {
+  return location.row === grid.getData().length - 1
+}
+
+function isFirstCellInRow(location, _grid) {
+  return location.cell === 0
+}
+
+function isLastCellInRow(location, grid) {
+  return location.cell === grid.getColumns().length - 1
+}
+
 export default class Navigation {
   constructor(grid, gridSupport) {
     this.grid = grid
@@ -114,7 +130,7 @@ export default class Navigation {
     }
 
     if (isPrevArrow(event)) {
-      if (location.cell !== 0) {
+      if (!isFirstCellInRow(location, this.grid)) {
         // Left Arrow within the header: Activate the previous cell.
         this.gridSupport.state.setActiveLocation('header', {cell: location.cell - 1})
         this.trigger('onNavigateLeft', event)
@@ -125,10 +141,7 @@ export default class Navigation {
     }
 
     if (isNextArrow(event)) {
-      const columns = this.grid.getColumns()
-      const lastCell = columns.length - 1
-
-      if (location.cell !== lastCell) {
+      if (!isLastCellInRow(location, this.grid)) {
         // Right Arrow within the header: Activate the next cell.
         this.gridSupport.state.setActiveLocation('header', {cell: location.cell + 1})
         this.trigger('onNavigateRight', event)
@@ -173,7 +186,7 @@ export default class Navigation {
     }
 
     if (isPrevArrow(event)) {
-      if (location.cell === 0) {
+      if (isFirstCellInRow(location, this.grid)) {
         // Left Arrow in first cell of a row: Commit any edits
         // * this preserves focus for cells without an editor
         // * this also prevents a bug in SlickGrid when in the last row
@@ -181,25 +194,71 @@ export default class Navigation {
 
         // prevent SlickGrid behavior, but allow default browser behavior
         skipSlickGridDefaults(event)
-      }
-
-      // Left Arrow within the body: Activate the previous cell.
-      // * this is handled by SlickGrid
-    }
-
-    if (isUpArrow(event)) {
-      if (location.row === 0) {
-        // Up Arrow in top row of body: Activate the related header cell.
-        this.gridSupport.state.setActiveLocation('header', {cell: location.cell})
-        this.trigger('onNavigateUp', event)
+      } else {
+        // Left Arrow within the body: Activate the previous cell.
+        this.gridSupport.state.setActiveLocation('body', {
+          row: location.row,
+          cell: location.cell - 1
+        })
+        this.trigger('onNavigateLeft', event)
 
         // prevent both SlickGrid and default browser behavior
         event.preventDefault()
         skipSlickGridDefaults(event)
       }
+    }
 
-      // Up Arrow within the body: Activate the adjacent cell of the previous row.
-      // * this is handled by SlickGrid
+    if (isNextArrow(event)) {
+      // Right Arrow within the body: Activate the next cell.
+      if (!isLastCellInRow(location, this.grid)) {
+        this.gridSupport.state.setActiveLocation('body', {
+          row: location.row,
+          cell: location.cell + 1
+        })
+        this.trigger('onNavigateRight', event)
+
+        // prevent both SlickGrid and default browser behavior
+        event.preventDefault()
+        skipSlickGridDefaults(event)
+      }
+    }
+
+    if (isUpArrow(event)) {
+      if (isFirstRow(location, this.grid)) {
+        // Up Arrow in top row of body: Activate the related header cell.
+        this.gridSupport.state.setActiveLocation('header', {cell: location.cell})
+      } else {
+        // Up Arrow in a row below the top row: activate the cell above this one
+        this.gridSupport.state.setActiveLocation('body', {
+          row: location.row - 1,
+          cell: location.cell
+        })
+      }
+
+      this.trigger('onNavigateUp', event)
+      // prevent both SlickGrid and default browser behavior
+      event.preventDefault()
+      skipSlickGridDefaults(event)
+    }
+
+    if (isDownArrow(event)) {
+      if (!isLastRow(location, this.grid)) {
+        // Down Arrow in a row above the bottom row: activate the cell below
+        this.gridSupport.state.setActiveLocation('body', {
+          row: location.row + 1,
+          cell: location.cell
+        })
+        this.trigger('onNavigateDown', event)
+      } else if (!isLastCellInRow(location, this.grid)) {
+        // Down Arrow in the bottom row: activate the first row of the next column,
+        // assuming there is a next column
+        this.gridSupport.state.setActiveLocation('body', {row: 0, cell: location.cell + 1})
+        this.trigger('onNavigateDown', event)
+      }
+
+      // prevent both SlickGrid and default browser behavior
+      event.preventDefault()
+      skipSlickGridDefaults(event)
     }
 
     // All other keys are either handled by SlickGrid or altogether ignored.

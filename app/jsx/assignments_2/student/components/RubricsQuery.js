@@ -54,7 +54,9 @@ export default function RubricsQuery(props) {
     <RubricTab
       assessments={data.submission?.rubricAssessmentsConnection?.nodes}
       key={props.submission.attempt}
-      proficiencyRatings={data.course.account?.proficiencyRatingsConnection?.nodes}
+      proficiencyRatings={
+        data.course.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
+      }
       rubric={data.assignment.rubric}
     />
   )

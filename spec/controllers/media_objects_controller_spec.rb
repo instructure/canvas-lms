@@ -182,6 +182,30 @@ describe MediaObjectsController do
       ])
     end
 
+    it "will return media objects that do not belong to the user if course_id is supplied" do
+      course_factory
+      teacher1 = teacher_in_course(:course => @course).user
+      teacher2 = teacher_in_course(:course => @course).user
+
+      user_session(teacher1)
+
+      mo = MediaObject.create!(:user_id => teacher2, :context => @course, :media_id => "test")
+      @course.attachments.create!(:media_entry_id => "test", :uploaded_data => stub_png_data)
+
+      get 'index', params: {:course_id => @course.id, :exclude => ["sources", "tracks"]}
+
+      expect(json_parse(response.body)).to eq([
+        {
+          "can_add_captions"=>true,
+          "created_at"=>mo.created_at.as_json,
+          "media_id"=>"test",
+          "title"=>"Untitled",
+          "media_type"=>nil,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test"
+        }
+      ])
+    end
+
     it "will limit return to course media" do
       course_with_teacher_logged_in
       mo1 = MediaObject.create!(:user_id => @user, :context => @course, :media_id => "in_course_with_att")

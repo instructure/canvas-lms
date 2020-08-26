@@ -333,5 +333,25 @@ describe('CanvasMediaPlayer', () => {
       expect(container.style.width).toBe('400px')
       expect(container.style.height).toBe('40px')
     })
+
+    it('when the video is fullscreen landscape', async () => {
+      const container = document.createElement('div')
+      const player = makePlayer(500, 250)
+      document.fullscreenElement = container
+      setPlayerSize(player, 'video/*', {width: 1000, height: 800}, null)
+      expect(player.classList.add).toHaveBeenCalledWith('video-player')
+      expect(player.style.width).toBe('1000px')
+      expect(player.style.height).toBe('500px')
+    })
+
+    it('when the video is fullscreen portrait', () => {
+      const container = document.createElement('div')
+      const player = makePlayer(250, 500)
+      document.fullscreenElement = container
+      setPlayerSize(player, 'video/*', {width: 1000, height: 800}, null)
+      expect(player.classList.add).toHaveBeenCalledWith('video-player')
+      expect(player.style.width).toBe('400px')
+      expect(player.style.height).toBe('800px')
+    })
   })
 })

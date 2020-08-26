@@ -245,20 +245,28 @@ function linkImageFigure(editor, fig, attrs) {
 /* ** video insertion ** */
 
 export function insertVideo(editor, video) {
-  let result = insertContent(editor, renderVideo(video))
-  // for some reason, editor.selection.getEnd() returned from
-  // insertContent is parent paragraph when inserting the
-  // video iframe. Look for the iframe with the right
-  // src attribute. (Aside: tinymce strips the id or data-*
-  // attributes from the iframe, that's why we can't look for those)
-  const src = mediaIframeSrcFromFile(video)
-  result = result.querySelector(`iframe[src="${src}"]`)
-  return result
+  if (editor.selection.isCollapsed()) {
+    let result = insertContent(editor, renderVideo(video))
+    // for some reason, editor.selection.getEnd() returned from
+    // insertContent is parent paragraph when inserting the
+    // video iframe. Look for the iframe with the right
+    // src attribute. (Aside: tinymce strips the id or data-*
+    // attributes from the iframe, that's why we can't look for those)
+    const src = mediaIframeSrcFromFile(video)
+    result = result.querySelector(`iframe[src="${src}"]`)
+    return result
+  } else {
+    return insertLink(editor, {...video, href: mediaIframeSrcFromFile(video)})
+  }
 }
 
 export function insertAudio(editor, audio) {
-  let result = insertContent(editor, renderAudio(audio))
-  const src = mediaIframeSrcFromFile(audio)
-  result = result.querySelector(`iframe[src="${src}"]`)
-  return result
+  if (editor.selection.isCollapsed()) {
+    let result = insertContent(editor, renderAudio(audio))
+    const src = mediaIframeSrcFromFile(audio)
+    result = result.querySelector(`iframe[src="${src}"]`)
+    return result
+  } else {
+    return insertLink(editor, {...audio, href: mediaIframeSrcFromFile(audio)})
+  }
 }

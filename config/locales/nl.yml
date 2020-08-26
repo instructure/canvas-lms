@@ -408,6 +408,7 @@ nl:
   account_level_mastery_scales_a5bdff29: "Scoringscriteria op accountniveau"
   account_level_notification_preferences_require_an__66467cd7: "Voor meldingsvoorkeuren op accountniveau is een account_id nodig om bij te werken"
   account_level_notification_preferences_ui_update_f5e189a4: "Udate voor accountniveau meldingsvoorkeuren UI"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Meldingen op accountniveau gelden voor alle cursussen. Meldingen voor afzonderlijke cursussen kunnen binnen elke cursus worden gewijzigd en overschrijven deze meldingen."
   account_level_settings_manage_4fca6f8e: "Instellingen op accountniveau - beheren"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: accountnaam
@@ -418,6 +419,7 @@ nl:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Eindtijd van de account-melding gaat aan starttijd vooraf"
+  account_notification_settings_e96de9b6: "Instellingen voor accountmeldingen"
   account_notification_settings_error_page_66c0bc61: "Instellingen voor accountmeldingen - foutpagina"
   account_notification_settings_initial_query_error_f55e1cbf: "Instellingen voor accountmeldingen - fout met initiële query"
   account_notification_settings_updated_dbabec35: "Instellingen voor accountmeldingen bijgewerkt"
@@ -1393,6 +1395,7 @@ nl:
         manual_quotas_title: "Handmatig instelbare quota's"
         megabytes: megabytes
         megabytes_tooltip: megabytes
+        placeholder_course_or_group_id: "ID invoeren..."
         select_type_courses: Cursus-ID
         select_type_groups: Groeps-ID
         select_type_label: "Cursus of groep zoeken"
@@ -3935,6 +3938,7 @@ nl:
   available_from_f84e4611: "Beschikbaar vanaf"
   available_from_field_for_styleguide_7ced3861: "Veld Beschikbaar vanaf voor stijlgids"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Beschikbaar van - Formaat Als JJJJ-MM-DD uu:mm"
+  available_pronouns_b45330b1: "Beschikbare voornaamwoorden"
   available_to_b7350e02: "Beschikbaar voor"
   available_until_3278ebe9: "Beschikbaar tot"
   available_until_date_2c0ccec3: "Beschikbaar vanaf datum"
@@ -5201,6 +5205,7 @@ nl:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Samenwerkingen zijn web-gebaseerde tools om samen te werken aan taken zoals het maken van notities of gegroepeerde papers. Praat met je docent om aan de slag te gaan."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samenwerkingen zijn web-gebaseerde tools om samen te werken aan taken zoals het maken van notities of gegroepeerde papers. Ga aan de slag door een app voor samenwerking toe te voegen."
   collaborations_tutorial_tray_9219d9d: "Zelfstudiemenu Samenwerkingen"
+  collapse_all_50275533: "Alles invouwen"
   collapse_group_c2af7cad: "Groep invouwen"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Lijst van de groepsleden invouwen voor %{groupName}"
   collapse_subdiscussion_89af1f5c: "Subdiscussie invouwen"
@@ -6472,6 +6477,10 @@ nl:
   count_students_30e46120: 
     one: "1 cursist"
     other: "%{count} cursisten"
+  count_students_c9920376: 
+    one: "1 cursist"
+    other: "%{count} cursisten"
+    zero: "0 cursisten"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 cursist in percentiel %{percentile}. "
     other: "%{count} cursisten in percentiel %{percentile}. "
@@ -6671,6 +6680,7 @@ nl:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Cursus is al gekoppeld aan een blauwdruk"
   course_landing_page_49a53ade: "Landingspagina van de cursus"
   course_level_notification_preferences_require_a_co_2f0a618: "Voor meldingsvoorkeuren op cursusniveau is een course_id nodig om bij te werken"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Meldingen op cursusniveau worden overgenomen van je meldingsinstellingen op accountniveau. Door meldingen voor deze cursus te wijzigen worden meldingen op accountniveau overschreven."
   course_level_overrides_for_notification_preference_e86d1725: "Cursusniveau overschrijft voor meldingsvoorkeuren"
   course_list: 
     favorited_tooltip: "Klikken om uit het cursussen-menu te verwijderen."
@@ -8118,6 +8128,9 @@ nl:
   disableWhileLoading: 
     loading: "Bezig met laden..."
   disable_a5c05db3: Uitschakelen
+  disable_alert_timeouts_description: |-
+      Door deze functie in te schakelen worden er geen time-outs meer weergegeven voor waarschuwingsmeldingen. Dat geeft
+      de gebruiker alle tijd om de melding door te nemen en na afloop te verwijderen.
   disable_all_read_only_scopes_f9ffdd28: "Schakel alle bereiken voor alleen-lezen uit."
   disable_and_lock_7d0ef0e8: "Uitschakelen en vergrendelen"
   disable_automatic_submission_8e1d8676: "Automatisch inleveren uitschakelen"
@@ -8129,6 +8142,7 @@ nl:
   disable_scope_6ba4e4d4: "Bereik uitschakelen"
   disable_sync_to_name_10c371dc: "Uitschakelen van Synchroniseren naar %{name}"
   disable_toolname_44d6397c: "Uitschakelen %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Uploads naar Canvas Media vanuit de Enhanced Rich Content Editor uitschakelen"
   disabled_18c33a73: Uitgeschakeld
   disabled_3b1b332a: Uitgeschakeld
   disabled_and_locked_d14dc6c2: "Uitgeschakeld en vergrendeld"
@@ -9447,6 +9461,7 @@ nl:
   exit_d0c7b013: Afmelden
   exit_theme_editor_9ddd41bb: "Afmelden Thema Bewerker"
   expand_2f2fadbd: Uitvouwen
+  expand_all_bb64d2ea: "Alles uitvouwen"
   expand_collapse_title_outcome_group_239f0a9d: "uitvouwen/invouwen %{title} leerresultatengroep"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Leerdoelgroep %{title} uit-/samenvouwen, cursist beheerst %{mastery_count} van %{count} leerdoelen"
   expand_global_navigation_2c28d5d4: "Globale navigatie uitbreiden"
@@ -9651,6 +9666,7 @@ nl:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Laden van component Niet-gesynchroniseerde wijzigingen is mislukt. Is je netwerkverbinding in orde?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Mislukt, geef de volgende foutcode aan uw systeembeheerder door: ErrorReport:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Ophalen van mediabron is mislukt"
+  failed_retrieving_media_sources_32aed288: "Ophalen van mediabronnen is mislukt."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Mislukt, het rapport kon geen bestand genereren. Probeer het opnieuw."
   failed_to_add_new_feed_ee1c5ea: "Toevoegen van nieuwe feed mislukt"
   failed_to_change_last_attended_date_1e340ba6: "Wijzigen van datum laatste keer bijgewoond is mislukt"
@@ -9738,6 +9754,7 @@ nl:
         Gedifferentieerde opdrachten is een functie die het mogelijk maakt te kiezen op welke sectie(s) of individuele cursist(en) een opdracht van toepassing is.
         Secties waarbij geen opdracht wordt gegeven zullen dit niet in hun inhoud tonen en hun eindcijfer zal 
         zonder deze punten worden berekend.
+    disable_alert_timeouts: "Time-outs voor waarschuwingsmeldingen uitschakelen"
     ember_modules: "Ember Modules"
     google_docs_domain_restriction: "Beperking van Google Docs domein"
     gradebook_list_students_by_sortable_name: "Cijferlijst - Lijst maken van op naam te sorteren cursisten"
@@ -9928,6 +9945,7 @@ nl:
   final_grade_finalgrade_408580bb: "Eindcijfer: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Eindcijfer Info"
   final_grade_override_be8a21cd: "Overschrijving eindcijfers"
+  final_grade_override_in_gradebook_history_767147c: "Overschrijving eindcijfers in geschiedenis van de cijferlijst"
   final_grade_score_fe69a301: "Eindcijfer: %{score}"
   final_grader_1693103c: Eindbeoordelaar
   final_grader_can_view_other_grader_names_67736530: "Bepaler van eindcijfer kan namen van andere beoordelaars bekijken"
@@ -10083,6 +10101,7 @@ nl:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Geef alle cursisten hetzelfde cijfer voor *%{assignment.name}*  door hieronder een cijfer in te voeren en in te zenden:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Geef alle cursisten hetzelfde *percentage*cijfer voor **%{assignment.name}**  door hieronder een cijfer in te voeren en in te zenden:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Staak het ophalen van mediabronnen. Dit probleem zal zich uiteindelijk vanzelf oplossen."
   global_announcements_a78912c8: "Algemene aankondigingen"
   global_announcements_add_edit_delete_843ca4d2: "Algemene aankondigingen - toevoegen/bewerken/verwijderen"
   global_branding_df1cae12: "Globale merknaam"
@@ -12072,6 +12091,7 @@ nl:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Neem een link op naar SpeedGrader in het menu van de opdrachtheader in de Cijferlijst."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Bevat cijferwaarden in de cijferrapporten voor beheerders."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Bevat Outcomes Service-uitlijningen bij exporteren en importeren van cursusinhoud"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Heeft betrekking op overschreven cursuscijfers in de geschiedenis van de cijferlijst."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Omvat rubrieken in de navigatie met de zijbalk van de cursus"
   incomplete_95612d72: "niet voltooid"
   incomplete_da3c2ea2: Incompleet
@@ -16047,6 +16067,7 @@ nl:
     submission_comment_description: "Opmerking op ingezonden opdracht"
     submission_comment_display: "Opmerking over inzending"
     web_conference_recording_ready: "Een conferentie-opname is gereed"
+  notification_policies_requires_the_communication_c_2e7ded08: "Voor het meldingenbeleid zijn de ID van het communicatiekanaal, de categorie van de melding en updatefrequentie vereist"
   notification_preferences: 
     communication: 
       email: 
@@ -16313,6 +16334,7 @@ nl:
   open_title_in_a_new_window_b29fed77: "%{title} in een nieuw venster openen"
   open_to_comments_23d5585e: "Openen voor opmerkingen"
   openid_connect_initiation_url_d9037d30: "* Initiatie-URL OpenID-verbinding"
+  opens_in_new_window_b4b99243: "opent in een nieuw venster"
   option_1_dea39f90: "Optie 1"
   option_2_47aace2a: "Optie 2"
   option_3_30adfebc: "Optie 3"
@@ -16379,6 +16401,7 @@ nl:
   out_of_pointspossible_c163105a: "van %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Leerdoelen afstemmen op niet-scorende inhoud"
   outcome_da397d20: Leerdoel
+  outcome_details_ce254e89: Leerdoeldetails
   outcome_export_89229eb4: "Leerdoel exporteren"
   outcome_group_39fae76f: "Groepe van leerdoelen"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Leerdoelgroep met Canvas-ID %{id} niet gevonden"
@@ -19750,6 +19773,8 @@ nl:
   restore_courses_182e162e: "Cursussen herstellen"
   restored_course_association_course_c9e16045: "Herstelde cursuskoppeling %{course}"
   restrict_access_84ba6bb8: "Toegang beperken"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Voorkomen dat cursusleiders scoringscriteria kunnen wijzigen"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Voorkomen dat cursusleiders de berekeningsmethode voor vaardigheden kunnen wijzigen"
   restrict_sms_to_select_types_9dd6399c: "Sms beperken tot speciale typen"
   restrict_student_access: 
     button_text: 
@@ -20096,7 +20121,7 @@ nl:
   score_of_score_view_in_speedgrader_a7c1c954: "Cijfer van %{score}. In SpeedGrader weergeven"
   score_out_of_points_84f44331: "(%{score} vanuit %{points})"
   score_out_of_points_possible_88f370fd: "%{score} vanuit %{points_possible}"
-  score_out_of_points_possible_points_bbaea991: "%{score} van %{points_possible} punten"
+  score_out_of_points_possible_points_bbaea991: "%{score} van de %{points_possible} punten"
   score_percent_11941c81: "%{score} percentage"
   score_points_3c48e2a8: "%{score} punten"
   score_pointspossible_bd57ea9e: "%{score}/%{pointsPossible}"
@@ -23646,6 +23671,8 @@ nl:
   ukrainian_945b00b7: Oekraïens
   unable_to_accept_update_fd53a7e2: "Kan bijwerken niet accepteren"
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Kan geen toegang krijgen tot specifieke cursist. Naar opdracht in SpeedGrader gaan?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Kan enkele leerdoelen niet aan een pagina koppelen"
+  unable_to_align_some_outcomes_to_title_53467231: "Kan enkele leerdoelen niet koppelen aan “%{title}”"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan cijfers niet bijstellen omdat deze opdracht voor minstens één cursist moet worden ingeleverd in een afgesloten beoordelingsperiode"
   unable_to_delete_assignment_abcf8d62: "Kan opdracht niet verwijderen"
   unable_to_dismiss_update_df1e32eb: "Kan bijwerken niet verwijderen"
@@ -24110,6 +24137,8 @@ nl:
   user_observers_454d4303: "Waaremers van gebruikers"
   user_option_links_66090987: "Optielinks voor gebruiker"
   user_profile: 
+    invalid_url: "Ongeldige URL"
+    profile_bio_too_long: "Bio is te lang"
     profile_title_too_long: "Titel is te lang"
     tabs: 
       notifications: Meldingen
@@ -25100,6 +25129,7 @@ nl:
       
       Je kunt het hier bekijken: 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Je medium is geüpload en wordt na verwerking hier weergegeven."
   your_message_has_been_sent_thank_you_e0284316: "Jouw bericht is verzonden. Dank je wel!"
   your_message_was_sent_977f6583: "Je bericht is verzonden!"
   your_name_7665e1d8: "Jouw naam"

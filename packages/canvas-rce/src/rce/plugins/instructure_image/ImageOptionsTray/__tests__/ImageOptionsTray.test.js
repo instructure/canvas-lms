@@ -32,6 +32,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
         altText: '',
         appliedHeight: 300,
         appliedWidth: 150,
+        isLinked: false,
         isDecorativeImage: false,
         naturalHeight: 200,
         naturalWidth: 100,
@@ -113,6 +114,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
   describe('"Display Options" field', () => {
     it('is set to "embed" by default', () => {
       renderComponent()
+      expect(tray.isDisplayAsDisabled).toBe(false)
       expect(tray.displayAs).toEqual('embed')
     })
 
@@ -127,6 +129,12 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
       tray.setDisplayAs('link')
       tray.setDisplayAs('embed')
       expect(tray.displayAs).toEqual('embed')
+    })
+
+    it('is hidden when image is already linked', () => {
+      props.imageOptions.isLinked = true
+      renderComponent()
+      expect(tray.isDisplayAsDisabled).toBe(true)
     })
   })
 

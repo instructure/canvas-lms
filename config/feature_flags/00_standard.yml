@@ -253,14 +253,6 @@ international_sms:
     from Canvas.
   applies_to: RootAccount
   root_opt_in: true
-course_user_search:
-  state: 'on'
-  display_name: Account Course and User Search
-  description: Updated UI for searching and displaying users and courses within an
-    account.
-  applies_to: Account
-  root_opt_in: true
-  touch_context: true
 conditional_release:
   state: allowed
   display_name: Mastery Paths

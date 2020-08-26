@@ -288,6 +288,65 @@ describe UsersController do
       expect(courses.map { |c| c['label'] }).to eq %w(A C)
     end
 
+    context "query matching" do
+      before :each do
+        course_with_teacher_logged_in(:course_name => "Extra course", :active_all => 1)
+      end
+
+      it "should match query to course id" do
+        course_with_teacher(:course_name => "Biology", :user => @teacher, :active_all => 1)
+        get 'manageable_courses', params: {:user_id => @teacher.id, :term => @course.id}
+        expect(response).to be_successful
+        courses = json_parse
+        expect(courses.map { |c| c['id'] }).to eq [@course.id]
+      end
+
+      it "should match query to course code" do
+        course_code = "BIO 12239"
+        course_with_teacher(:course_name => "Biology", :user => @teacher, :active_all => 1)
+        @course.course_code = course_code
+        @course.save
+        get 'manageable_courses', params: {:user_id => @teacher.id, :term => course_code}
+        expect(response).to be_successful
+        courses = json_parse
+        expect(courses.map { |c| c['course_code'] }).to eq [course_code]
+      end
+    end
+
+    context "concluded courses" do
+      before :each do
+        course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
+        course1 = @course
+        course1.workflow_state = 'completed'
+        course1.save!
+
+        course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1)
+        course2 = @course
+        course2.start_at = 7.days.ago
+        course2.conclude_at = 1.day.ago
+        course2.save!
+
+        course_with_teacher(:course_name => "MyCourse3", :user => @teacher, :active_all => 1)
+      end
+
+      it "should not include soft or hard concluded courses for teachers" do
+        get 'manageable_courses', params: {:user_id => @teacher.id, :term => "MyCourse"}
+        expect(response).to be_successful
+        courses = json_parse
+        expect(courses.map { |c| c['id'] }).to eq [@course.id]
+      end
+
+      it "should not include soft or hard concluded courses for admins" do
+        account_admin_user
+        user_session(@admin)
+
+        get 'manageable_courses', params: {:user_id => @admin.id, :term => "MyCourse"}
+        expect(response).to be_successful
+        courses = json_parse
+        expect(courses.map { |c| c['id'] }).to eq [@course.id]
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 

@@ -32,7 +32,7 @@ export default class FeatureFlagCollection extends PaginatedCollection {
   }
 
   fetch(options = {}) {
-    options.data = {per_page: 20, ...options.data}
+    options.data = {hide_inherited_enabled: true, per_page: 20, ...options.data}
     return super.fetch(options)
   }
 }

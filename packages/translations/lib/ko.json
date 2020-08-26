@@ -116,6 +116,9 @@
     "files_index_af7c662b": {
         "message": "파일 색인"
     },
+    "format_4247a9c5": {
+        "message": "형식"
+    },
     "graded_25cd3fcd": {
         "message": "평가됨"
     },
@@ -151,6 +154,9 @@
     },
     "invalid_file_type_881cc9b2": {
         "message": "유효하지 않은 파일 유형"
+    },
+    "invalid_url_cbde79f": {
+        "message": "잘못된 URL"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "키보드 단축키"

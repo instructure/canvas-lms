@@ -407,6 +407,7 @@ de:
   account_level_mastery_scales_a5bdff29: "Maßstäbe für Leistungsziele auf Kontoebene"
   account_level_notification_preferences_require_an__66467cd7: "Benachrichtigungseinstellungen auf Kontoebene erfordern eine Aktualisierung des account_id-Kontos"
   account_level_notification_preferences_ui_update_f5e189a4: "UI-Aktualisierung für Benachrichtigungseinstellungen auf Kontoebene"
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Benachrichtigungen auf Kontoebene gelten für alle Kurse. Benachrichtigungen für einzelne Kurse können innerhalb jedes Kurses geändert werden und überschreiben diese Benachrichtigungen."
   account_level_settings_manage_4fca6f8e: "Einstellungen auf Kontoebene – verwalten"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: Kontoname
@@ -417,6 +418,7 @@ de:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Die Endzeit für Kontobenachrichtigungen liegt vor der Startzeit."
+  account_notification_settings_e96de9b6: "Einstellungen für Benachrichtigungen auf Kontoebene"
   account_notification_settings_error_page_66c0bc61: "Fehlerseite der Kontobenachrichtigungseinstellungen"
   account_notification_settings_initial_query_error_f55e1cbf: "Anfänglicher Abfragefehler bei Kontobenachrichtigungseinstellungen"
   account_notification_settings_updated_dbabec35: "Die Kontobenachrichtigungseinstellungen wurden aktualisiert"
@@ -1366,6 +1368,7 @@ de:
         manual_quotas_title: "Manuell festlegbare Kontingente"
         megabytes: Megabyte
         megabytes_tooltip: Megabyte
+        placeholder_course_or_group_id: "ID eingeben ..."
         select_type_courses: Kurs-ID
         select_type_groups: Gruppen-ID
         select_type_label: "Nach Kurs oder Gruppe suchen"
@@ -3903,6 +3906,7 @@ de:
   available_from_f84e4611: "Verfügbar von"
   available_from_field_for_styleguide_7ced3861: "Das Feld „Verfügbar von“ für Styleguide"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Vorhanden ab - im Format TT-MM-JJJJ HH:mm"
+  available_pronouns_b45330b1: "Verfügbare Pronomen"
   available_to_b7350e02: "Verfügbar für"
   available_until_3278ebe9: "Verfügbar bis"
   available_until_date_2c0ccec3: "\"Verfügbar bis\" Datum:"
@@ -5163,6 +5167,7 @@ de:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Collaborations sind Web-basierte Tools zur gemeinsamen Bearbeitung von Aufgaben wie Notizen anfertigen oder Gruppenarbeiten erledigen. Sprechen Sie mit Ihrem Lehrer, um anzufangen"
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Collaborations sind Web-basierte Tools zur gemeinsamen Bearbeitung von Aufgaben, wie mitschreiben oder Gruppenarbeiten erledigen. Beginnen Sie damit,eine Arbeitsgruppen-App hinzuzufügen."
   collaborations_tutorial_tray_9219d9d: Collaborations-Übungsfach
+  collapse_all_50275533: "Alle minimieren"
   collapse_group_c2af7cad: "Gruppe minimieren"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Liste der Gruppenmitglieder für %{groupName} reduzieren"
   collapse_subdiscussion_89af1f5c: "Subdiskussion reduzieren"
@@ -6436,6 +6441,10 @@ de:
   count_students_30e46120: 
     one: "1 Student"
     other: "%{count} Studenten"
+  count_students_c9920376: 
+    one: 1 Student
+    other: "%{count} Studenten"
+    zero: 0 Studenten
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 Student im Perzentil %{percentile}"
     other: "%{count} Studenten im Perzentil %{percentile}"
@@ -6632,6 +6641,7 @@ de:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Der Kurs ist bereits mit einem Muster verknüpft."
   course_landing_page_49a53ade: Kurs-Startseite
   course_level_notification_preferences_require_a_co_2f0a618: "Benachrichtigungseinstellungen auf Kursebene erfordern eine Aktualisierung des course_id-Kurses"
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: "Benachrichtigungen auf Kursebene werden von den Benachrichtigungseinstellungen auf Kontoebene geerbt. Durch das Anpassen der Benachrichtigungen für diesen Kurs werden die Benachrichtigungen auf Kontoebene überschrieben."
   course_level_overrides_for_notification_preference_e86d1725: "Außerkraftsetzungen auf Kursebene für Benachrichtigungseinstellungen"
   course_list: 
     favorited_tooltip: "Klicken zum Entfernen aus dem Menü „Kurse“"
@@ -8082,6 +8092,9 @@ de:
   disableWhileLoading: 
     loading: "Wird geladen ..."
   disable_a5c05db3: Deaktivieren
+  disable_alert_timeouts_description: |-
+      Mit dieser Funktion wird die werden Zeitüberschreitungen für Benachrichtigungen ausgeschaltet, sodass der
+      Benutzer genug Zeit hat, um die Textnachricht zu lesen, und sie dann schließen kann.
   disable_all_read_only_scopes_f9ffdd28: "Deaktivieren Sie alle schreibgeschützten Bereiche."
   disable_and_lock_7d0ef0e8: "Deaktivieren und sperren"
   disable_automatic_submission_8e1d8676: "Automatische Abgabe deaktivieren"
@@ -8093,6 +8106,7 @@ de:
   disable_scope_6ba4e4d4: "Bereich deaktivieren"
   disable_sync_to_name_10c371dc: "Deaktivieren der Synchronisierung mit %{name}"
   disable_toolname_44d6397c: "Deaktivieren %{toolName}"
+  disable_uploads_to_canvas_media_from_the_enhanced__2381c79b: "Das Hochladen nach Canvas Media aus dem erweiterten Rich Content Editor deaktivieren"
   disabled_18c33a73: (deaktiviert)
   disabled_3b1b332a: Deaktiviert
   disabled_and_locked_d14dc6c2: "Deaktiviert und gesperrt"
@@ -9406,6 +9420,7 @@ de:
   exit_d0c7b013: Verlassen
   exit_theme_editor_9ddd41bb: "Themen-Editor verlassen"
   expand_2f2fadbd: Erweitern
+  expand_all_bb64d2ea: "Alle aufklappen"
   expand_collapse_title_outcome_group_239f0a9d: "Ergebnisgruppe %{title} maximieren/minimieren"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "%{title}-Ergebnisgruppe erweitern/reduzieren, Student hat das Leistungsziel unter %{mastery_count} von %{count}-Ergebnisse erreicht"
   expand_global_navigation_2c28d5d4: "Globale Navigation erweitern"
@@ -9610,6 +9625,7 @@ de:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Fehler beim Laden der Komponente Nichtsynchronisierte Änderungen Ist Ihre Netzwerkverbindung in Ordnung?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Fehler. Bitte informieren Sie Ihren Systemadministrator über den folgenden Fehlercode: ErrorReport:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Abrufen von Medienquelle fehlgeschlagen"
+  failed_retrieving_media_sources_32aed288: "Medienressourcen wurden nicht abgerufen."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Fehlgeschlagen, der Bericht konnte keine Datei generieren. Bitte versuchen Sie es noch einmal."
   failed_to_add_new_feed_ee1c5ea: "Fehler beim Hinzufügen eines neuen Feed"
   failed_to_change_last_attended_date_1e340ba6: "Fehler beim Ändern des letzten Anwesenheitsdatum"
@@ -9696,6 +9712,7 @@ de:
         Differenzierte Aufgaben ist ein Feature, mit dessen Hilfe ausgewählt werden kann, für welche(n) Bereich(e) oder für welche(n) einzelnen Student(en) eine Aufgabe gilt.
         Bereiche, die keine Aufgabe enthalten, sehen diese auch nicht in ihrem Kursinhalt, und ihre Abschlussnote
         wird ohne diese Punkte errechnet.
+    disable_alert_timeouts: "Benachrichtigungs-Timeouts deaktivieren"
     ember_modules: Ember-Module
     google_docs_domain_restriction: "Google Docs-Domänenbeschränkung"
     gradebook_list_students_by_sortable_name: "Notenbuch – Studenten nach sortierbarem Namen auflisten"
@@ -9884,6 +9901,7 @@ de:
   final_grade_a22c596: "endgültige Note"
   final_grade_info_2aa35d25: Gesamtnoteninfo
   final_grade_override_be8a21cd: "Außerkraftsetzen der Gesamtnote"
+  final_grade_override_in_gradebook_history_767147c: "Überschreiben der Gesamtnote im Notenbuchverlauf"
   final_grade_score_fe69a301: "Abschlussnote: %{score}"
   final_grader_1693103c: Gesamtbenoter
   final_grader_can_view_other_grader_names_67736530: "Letzter Benoter darf die Namen der anderen Benoter sehen"
@@ -10038,6 +10056,7 @@ de:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Vergeben Sie an alle Studenten die gleiche Note für *%{assignment.name}*, indem Sie unten eine Note eingeben und absenden:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Vergeben Sie an alle Studenten die gleiche *prozentuale* Note für **%{assignment.name}**, indem Sie unten eine Note eingeben und absenden:"
+  giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Das Abrufen von Medienressourcen aufgeben. Dieses Problem wird wahrscheinlich schließlich von selbst lösen."
   global_announcements_a78912c8: "Globale Ankündigungen"
   global_announcements_add_edit_delete_843ca4d2: "Globale Ankündigungen – hinzufügen/bearbeiten/löschen"
   global_branding_df1cae12: "Globales Branding"
@@ -12020,6 +12039,7 @@ de:
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Nimmt einen Link auf SpeedGrader in das Aufgaben-Header-Menü im Notenbuch auf."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Fügt Notenwerte in Admin-Bewertungsberichte ein."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Umfasst Serviceausrichtungen für Lernziele beim Export und Import von Kursinhalten"
+  includes_overridden_course_grades_in_the_gradebook_d58cffb: "Schließt überschriebene Kursnoten im Notenbuchverlauf ein"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Bezieht Bewertungsschemata in die Kursnavigation auf der Seitenleiste ein"
   incomplete_95612d72: unvollständig
   incomplete_da3c2ea2: Unvollständig
@@ -15989,6 +16009,7 @@ de:
     submission_comment_description: "Kommentar zu Aufgabenabgabe"
     submission_comment_display: Abgabekommentar
     web_conference_recording_ready: "Eine Konferenzaufzeichnung ist fertig."
+  notification_policies_requires_the_communication_c_2e7ded08: "Benachrichtigungsrichtlinien erfordern die ID des Kommunikationskanals, die Benachrichtigungskategorie und die Aktualisierungshäufigkeit"
   notification_preferences: 
     communication: 
       email: 
@@ -16254,6 +16275,7 @@ de:
   open_title_in_a_new_window_b29fed77: "%{title} in einem neuen Fenster öffnen"
   open_to_comments_23d5585e: "Für Kommentare öffnen"
   openid_connect_initiation_url_d9037d30: "* OpenID Connect-Initiations-URL"
+  opens_in_new_window_b4b99243: "wird in einem neuen Fenster geöffnet"
   option_1_dea39f90: "Option 1"
   option_2_47aace2a: "Option 2"
   option_3_30adfebc: "Option 3"
@@ -16323,6 +16345,7 @@ de:
   out_of_pointspossible_c163105a: "von insgesamt %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Ergebnisausrichtung an Inhalten ohne Bewertung"
   outcome_da397d20: Lernziel
+  outcome_details_ce254e89: Ergebnisdetails
   outcome_export_89229eb4: Ergebnisexport
   outcome_group_39fae76f: Ergebnisgruppe
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Ergebnisgruppe mit Canvas-ID %{id} nicht gefunden"
@@ -19676,6 +19699,8 @@ de:
   restore_courses_182e162e: "Kurse wiederherstellen"
   restored_course_association_course_c9e16045: "Wiederhergestellte Kursverknüpfung %{course}"
   restrict_access_84ba6bb8: "Zugriff beschränken"
+  restrict_instructors_from_changing_mastery_scales_5af13053: "Das Ändern der Leistungszielskalen durch Lehrer einschränken"
+  restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Das Ändern der Methode zur Leistungsberechnung durch Lehrer einschränken"
   restrict_sms_to_select_types_9dd6399c: "SMS auf Typen auswählen beschränken"
   restrict_student_access: 
     button_text: 
@@ -23561,6 +23586,8 @@ de:
   ukrainian_945b00b7: Ukrainisch
   unable_to_accept_update_fd53a7e2: "Aktualisierung kann nicht akzeptiert werden."
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Zugriff auf einen bestimmten Studenten ist nicht möglich. Weiter mit Zuweisung in SpeedGrader?"
+  unable_to_align_some_outcomes_to_a_page_65f7d412: "Einige Ergebnisse lassen sich nicht an einer Seite ausrichten"
+  unable_to_align_some_outcomes_to_title_53467231: "Einige Ergebnisse lassen sich nicht an \"%{title}\" ausrichten"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Die Noten konnten nicht angepasst werden, weil diese Aufgabe für mindestens einen Schüler innerhalb eines abgeschlossenen Benotungszeitraums fällig ist."
   unable_to_delete_assignment_abcf8d62: "Aufgabe konnte nicht gelöscht werden"
   unable_to_dismiss_update_df1e32eb: "Aktualisierung kann nicht verworfen werden."
@@ -23715,7 +23742,7 @@ de:
   untitled_assignment_59354b34: "Aufgabe ohne Titel"
   unused_courses_title: "Nicht verwendete Kurse"
   up_c553575d: "Nach oben"
-  upcoming_due_date_assignment_name_course_name_ac1766c1: "Kommender Abgabetermin – %{assignment_name}, %{course_name}"
+  upcoming_due_date_assignment_name_course_name_ac1766c1: "Kommender Abgabetermin – %{assignment_name}, %{course_name}"
   update_374eb54: aktualisieren
   update_4d8ee62: Aktualisieren
   update_and_view_sections_course_details_navigation_dd10b45e: "Abschnitte aktualisieren und anzeigen, Kursdetails, Navigation, Funktionsoptionen und externe App-Integrationen sind alle nur für Dozenten sichtbar."
@@ -24023,6 +24050,8 @@ de:
   user_observers_454d4303: Benutzerbeobachter
   user_option_links_66090987: "Links mit Benutzeroption"
   user_profile: 
+    invalid_url: "Ungültige URL"
+    profile_bio_too_long: "Biografie ist zu lang"
     profile_title_too_long: "Titel ist zu lang"
     tabs: 
       notifications: Benachrichtigungen
@@ -24765,8 +24794,8 @@ de:
     one: "Sie sind im Begriff, 1 Diskussion zu löschen. Sind Sie sicher?"
     other: "Sie sind im Begriff, %{count} Diskussionen zu löschen. Sind Sie sicher?"
   you_are_about_to_delete_count_pages_are_you_sure_e40c3d2: 
-    one: "Sie sind im Begriff, 1 Seite zu löschen. Sind Sie sicher?"
-    other: "Sie sind im Begriff, %{count} Seiten zu löschen. Sind Sie sicher?"
+    one: "Sie sind im Begriff, 1 Seite zu löschen. Sind Sie sicher?"
+    other: "Sie sind im Begriff, %{count} Seiten zu löschen. Sind Sie sicher?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Sie verlieren gleich alle Änderungen, die Sie noch nicht auf Ihr Konto angewendet haben.
       
@@ -25007,6 +25036,7 @@ de:
       
       Sie können sie hier anzeigen. 
       %{url}
+  your_media_has_been_uploaded_and_will_appear_here__8546af57: "Ihre Medien wurden hochgeladen und werden anschließend hier angezeigt."
   your_message_has_been_sent_thank_you_e0284316: "Ihre Nachricht wurde gesendet. Vielen Dank."
   your_message_was_sent_977f6583: "Deine Nachricht wurde gesendet!"
   your_name_7665e1d8: "Ihr Name"

@@ -46,8 +46,10 @@ function gradedOverrides() {
     },
     Course: {
       account: {
-        proficiencyRatingsConnection: {
-          nodes: [{}]
+        outcomeProficiency: {
+          proficiencyRatingsConnection: {
+            nodes: [{}]
+          }
         }
       }
     }
@@ -59,7 +61,9 @@ function ungradedOverrides() {
     Submission: {rubricAssessmentsConnection: null},
     Course: {
       account: {
-        proficiencyRatingsConnection: null
+        outcomeProficiency: {
+          proficiencyRatingsConnection: null
+        }
       }
     }
   }
@@ -88,7 +92,8 @@ async function makeProps(opts = {}) {
   const result = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
   return {
     assessments: result.data.submission.rubricAssessmentsConnection?.nodes,
-    proficiencyRatings: result.data.course.account.proficiencyRatingsConnection?.nodes,
+    proficiencyRatings:
+      result.data.course.account.outcomeProficiency?.proficiencyRatingsConnection?.nodes,
     rubric: result.data.assignment.rubric
   }
 }

@@ -167,9 +167,7 @@ class ContentTag < ActiveRecord::Base
       next unless klass < ActiveRecord::Base
       next if klass < Tableless
       if klass.new.respond_to?(:could_be_locked=)
-        klass.transaction do
-          klass.where(id: klass.where(id: ids).lock_in_order).update_all(could_be_locked: true)
-        end
+        klass.where(id: ids).update_all_locked_in_order(could_be_locked: true)
       end
     end
   end
@@ -199,6 +197,18 @@ class ContentTag < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def direct_shareable?
+    content_id.to_i > 0 && direct_share_type
+  end
+
+  def direct_share_type
+    ContentShare::CLASS_NAME_TO_TYPE[content_type]
+  end
+
+  def direct_share_select_class
+    direct_share_type.pluralize
   end
 
   def content_type_class(is_student=false)
