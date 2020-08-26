@@ -1585,6 +1585,41 @@ describe Course do
       method = outcome_proficiency_model(@course.root_account)
       expect(@course.resolved_outcome_proficiency).to eq method
     end
+
+    it "can retrieve own proficiency" do
+      root_account = Account.create!
+      outcome_proficiency_model(root_account)
+      course = course_model(account: root_account)
+      course_method = outcome_proficiency_model(course)
+      expect(course.outcome_proficiency).to eq course_method
+      expect(course.resolved_outcome_proficiency).to eq course_method
+    end
+
+    it "can retrieve ancestor account's proficiency" do
+      root_account = Account.create!
+      root_method = outcome_proficiency_model(root_account)
+      subaccount = root_account.sub_accounts.create!
+      course = course_model(account: subaccount)
+      expect(course.outcome_proficiency).to eq nil
+      expect(course.resolved_outcome_proficiency).to eq root_method
+    end
+
+    it "can be nil" do
+      root_account = Account.create!
+      course = course_model(account: root_account)
+      expect(course.outcome_proficiency).to eq nil
+      expect(course.resolved_outcome_proficiency).to eq nil
+    end
+
+    it "ignores soft deleted proficiencies" do
+      root_account = Account.create!
+      account_method = outcome_proficiency_model(root_account)
+      course = course_model(account: root_account)
+      course_method = outcome_proficiency_model(course)
+      course_method.destroy
+      expect(course.outcome_proficiency).to eq course_method
+      expect(course.resolved_outcome_proficiency).to eq account_method
+    end
   end
 
   context 'resolved_outcome_calculation_method' do
