@@ -1,0 +1,35 @@
+# This file is used to configure an on-box cache.
+# If you set nothing, it will just cache in memory,
+# and for development this is probably fine.
+#
+# In production, we use a local redis db on each
+# box as a cache for things that might get throttled
+# if every process is asking for them all the time
+# (think vault assuming credentials to talk to another AWS asset).
+#
+# If you want to develop using a redis local cache, uncomment the
+# following (and if you're working without docker you probably want
+# "localhost" as your redis host rather than "redis")
+#
+# The chosen db is intentionally not 0, as that is the keyspace
+# used by the HA cache (see MultiCache), and since the use cases
+# are different it seems low cost and probably safer to not
+# use the same redis db (though they are talking to the same process).
+#
+#common: &common
+#  store: redis
+#  redis_host: localhost
+#  redis_port: 6379
+#  redis_db: 1
+#
+#production:
+#  <<: *common
+#
+#test:
+#  <<: *common
+#  redis_host: redis
+#  redis_db: 2
+#
+#development:
+#  <<: *common
+#  redis_host: redis

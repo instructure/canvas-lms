@@ -14,27 +14,10 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-class FallbackMemoryCache < ActiveSupport::Cache::MemoryStore
-  KEY_SUFFIX = '__no_expire'.freeze
-
-  def fetch(*, expires_in: nil)
-    return yield if expires_in == 0
-    super
-  end
-
-  def fetch_without_expiration(key)
-    fetch(key + KEY_SUFFIX)
-  end
-
-  private
-
-  def write_entry(key, entry, options)
-    super(key, entry, options)
-    forever_entry = entry.dup
-    forever_entry.remove_instance_variable(:@expires_in)
-    super(key + KEY_SUFFIX, forever_entry, options.except(:expires_in))
+module Canvas
+  module Cache
+    class FallbackMemoryCache < ActiveSupport::Cache::MemoryStore
+      include FallbackExpirationCache
+    end
   end
 end
-
-LocalCache = FallbackMemoryCache.new
