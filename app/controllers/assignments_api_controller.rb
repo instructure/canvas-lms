@@ -632,6 +632,11 @@
 #         "score_statistics": {
 #           "description": "(Optional) If 'score_statistics' and 'submission' are included in the 'include' parameter and statistics are available, includes the min, max, and mode for this assignment",
 #           "$ref": "ScoreStatistic"
+#         },
+#         "can_submit": {
+#           "description": "(Optional) If retrieving a single assignment and 'can_submit' is included in the 'include' parameter, flags whether user has the right to submit the assignment (i.e. checks enrollment dates, submission types, locked status, attempts remaining, etc...). Including 'can submit' automatically includes 'submission' in the include parameter.",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -857,8 +862,7 @@ class AssignmentsApiController < ApplicationController
                         include_overrides: include_override_objects,
                         preloaded_user_content_attachments: preloaded_attachments,
                         include_can_edit: include_params.include?('can_edit'),
-                        include_score_statistics: include_params.include?('score_statistics')
-                        )
+                        include_score_statistics: include_params.include?('score_statistics'))
       end
       hashes
     end
@@ -884,6 +888,10 @@ class AssignmentsApiController < ApplicationController
       return render_unauthorized_action unless @assignment.visible_to_user?(@current_user)
 
       included_params = Array(params[:include])
+      if included_params.include?('can_submit')
+        included_params.push 'submission'
+      end
+
       if included_params.include?('submission')
         submissions =
           submissions_hash(included_params, [@assignment])[@assignment.id]
@@ -900,6 +908,8 @@ class AssignmentsApiController < ApplicationController
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
+      include_can_submit = included_params.include?('can_submit')
+
       locked = @assignment.locked_for?(@current_user, :check_policies => true)
       @assignment.context_module_action(@current_user, :read) unless locked && !locked[:can_view]
       log_api_asset_access(@assignment, "assignments", @assignment.assignment_group)
@@ -912,7 +922,8 @@ class AssignmentsApiController < ApplicationController
         include_all_dates: include_all_dates,
         include_overrides: include_override_objects,
         include_can_edit: included_params.include?('can_edit'),
-        include_score_statistics: included_params.include?('score_statistics')
+        include_score_statistics: included_params.include?('score_statistics'),
+        include_can_submit: include_can_submit
       }
 
       result_json = if use_quiz_json?
