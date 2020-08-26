@@ -158,6 +158,9 @@
     "external_tools_6e77821": {
         "message": "ابزارهای بیرونی"
     },
+    "file_name_8fd421ff": {
+        "message": "نام فایل"
+    },
     "file_upload_failed_af22dd91": {
         "message": "آپلود پرونده انجام نشد"
     },
@@ -169,6 +172,9 @@
     },
     "files_index_af7c662b": {
         "message": "فهرست فایل ها"
+    },
+    "finish_bc343002": {
+        "message": "پایان"
     },
     "folder_tree_fbab0726": {
         "message": "درخت پوشه"
@@ -269,6 +275,9 @@
     "media_af190855": {
         "message": "رسانه"
     },
+    "mic_a7f3d311": {
+        "message": "میکروفون"
+    },
     "missing_1a256b3b": {
         "message": "جا افتاده"
     },
@@ -293,6 +302,9 @@
     "no_results_940393cf": {
         "message": "No results."
     },
+    "no_video_1ed00b26": {
+        "message": "بدون تصویر"
+    },
     "nothing_for_now_e3e3ce2a": {
         "message": "چیزی در حال حاضر موجود نیست"
     },
@@ -308,17 +320,29 @@
     "pages_e5414c2c": {
         "message": "صفحه ها"
     },
+    "pause_12af3bb4": {
+        "message": "مکث"
+    },
     "peer_review_74f26a13": {
         "message": "بازبینی گروهی"
     },
     "people_b4ebb13c": {
         "message": "افراد"
     },
+    "play_1a47eaa7": {
+        "message": "نمایش"
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "لطفاً به Canvas اجازه دهید تا به میکروفون و وب کم شما دسترسی پیدا کند."
+    },
     "points_bceb5005": {
         "message": "امتیازها"
     },
     "preview_53003fd2": {
         "message": "پیش‌نمایش"
+    },
+    "preview_a3f8f854": {
+        "message": "پیش نمایش"
     },
     "previous_month_bb1e3c84": {
         "message": "ماه قبل"
@@ -374,6 +398,9 @@
     "start_over_f7552aa9": {
         "message": "شروع دوباره"
     },
+    "start_recording_9a65141a": {
+        "message": "شروع ضبط"
+    },
     "submit_a3cc6859": {
         "message": "ارسال"
     },
@@ -410,6 +437,9 @@
     "unpublished_dfd8801": {
         "message": "منتشر نشده"
     },
+    "untitled_16aa4f2b": {
+        "message": "بدون عنوان"
+    },
     "upload_file_fd2361b8": {
         "message": "بارگذاری فایل"
     },
@@ -428,6 +458,9 @@
     "video_player_b371005": {
         "message": "پخش کننده فیلم"
     },
+    "webcam_fe91b20f": {
+        "message": "دوربین"
+    },
     "wiki_home_9cd54d0": {
         "message": "صفحه اصلی ویکی"
     },
@@ -436,5 +469,8 @@
     },
     "yesterday_c6bd6abf": {
         "message": "دیروز"
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "وب کم شما ممکن است در حال استفاده باشد."
     }
 }
