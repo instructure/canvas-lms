@@ -99,6 +99,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     context 'links' do
       it 'should respect selected text when creating a course link in body',
          ignore_js_errors: true do
+        skip 'flakey, LS-1394 (8/26/2020)'
         title = 'test_page'
         unpublished = false
         edit_roles = 'public'
@@ -270,6 +271,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     it 'should click on sidebar assignment page to create link in body' do
+      skip 'flakey, LS-1394 (8/26/2020)'
       title = 'Assignment-Title'
       @assignment = @course.assignments.create!(name: title)
 
