@@ -32,6 +32,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  define_callbacks :html_render
+
   attr_accessor :active_tab
   attr_reader :context
 
@@ -78,7 +80,7 @@ class ApplicationController < ActionController::Base
   before_action :init_body_classes
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
-  after_action :add_csp_for_root
+  set_callback :html_render, :before, :add_csp_for_root
   after_action :teardown_live_events_context
 
   # multiple actions might be called on a single controller instance in specs
@@ -2226,7 +2228,14 @@ class ApplicationController < ActionController::Base
         options[:json] = json
       end
     end
-    super
+
+    # _don't_ call before_render hooks if we're not returning HTML
+    unless options.is_a?(Hash) &&
+      (options[:json] || options[:plain] || options[:layout] == false)
+      run_callbacks(:html_render) { super }
+    else
+      super
+    end
   end
 
   # flash is normally only preserved for one redirect; make sure we carry
