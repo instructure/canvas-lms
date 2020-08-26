@@ -1284,15 +1284,13 @@ class ApplicationController < ActionController::Base
   end
 
   def set_page_view
-    return true if !page_views_enabled?
-
-    ENV['RAILS_HOST_WITH_PORT'] ||= request.host_with_port rescue nil
     # We only record page_views for html page requests coming from within the
     # app, or if coming from a developer api request and specified as a
     # page_view.
-    if @current_user && !request.xhr? && request.get?
-      generate_page_view
-    end
+    return unless @current_user && !request.xhr? && request.get? && page_views_enabled?
+
+    ENV['RAILS_HOST_WITH_PORT'] ||= request.host_with_port rescue nil
+    generate_page_view
   end
 
   def require_reacceptance_of_terms
@@ -1385,8 +1383,6 @@ class ApplicationController < ActionController::Base
   end
 
   def log_page_view
-    return true unless page_views_enabled?
-
     shard = (@accessed_asset && @accessed_asset[:shard]) || Shard.current
     shard.activate do
       begin
@@ -1411,6 +1407,7 @@ class ApplicationController < ActionController::Base
   def add_interaction_seconds
     updated_fields = params.slice(:interaction_seconds)
     return unless (request.xhr? || request.put?) && params[:page_view_token] && !updated_fields.empty?
+    return unless page_views_enabled?
 
     RequestContextGenerator.store_interaction_seconds_update(
       params[:page_view_token],
@@ -1437,7 +1434,7 @@ class ApplicationController < ActionController::Base
     return unless @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
     @access = AssetUserAccess.log(user, @context, @accessed_asset) if @context
 
-    if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
+    if @page_view.nil? && %w{participate submit}.include?(@accessed_asset[:level]) && page_views_enabled?
       generate_page_view(user)
     end
 
