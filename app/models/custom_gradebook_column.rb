@@ -24,10 +24,13 @@ class CustomGradebookColumn < ActiveRecord::Base
   has_many :custom_gradebook_column_data
 
   validates :title, presence: true
-  validate :title_reserved_names_check
 
   validates :teacher_notes, inclusion: { in: [true, false], message: "teacher_notes must be true or false" }
   validates :title, length: { maximum: maximum_string_length },
+    exclusion: {
+      in: GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES,
+      message: "cannot use gradebook importer reserved names"
+    },
     :allow_nil => true
 
   before_create :set_root_account_id
@@ -61,17 +64,6 @@ class CustomGradebookColumn < ActiveRecord::Base
   end
 
   private
-
-  # When the feature flag is retired, this method and validate can be removed and the following can be added to
-  # validates :title above
-  #   exclusion: {
-  #     in: GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES,
-  #     message: "cannot use gradebook importer reserved names"
-  #   }
-  def title_reserved_names_check
-    return true unless Account.site_admin.feature_enabled?(:gradebook_reserved_importer_bugfix)
-    errors.add(:title, "cannot use gradebook importer reserved names") if GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES.include?(title)
-  end
 
   def set_root_account_id
     self.root_account_id ||= course.root_account_id
