@@ -24,30 +24,25 @@ def cleanupFn(status) {
   try {
     junit "tmp/spec_results/**/*.xml"
 
-    if(status == 'FAILURE') {
-      sh 'mkdir -vp spec_results'
-      sh 'docker cp $(docker-compose ps -q canvas):/usr/src/app/log/spec_failures/. ./spec_results/'
-
-      dir('spec_results') {
-        htmlFiles = findFiles glob: '**/index.html'
-      }
-
-      publishHTML(target: [
-        allowMissing: false,
-        alwaysLinkToLastBuild: false,
-        keepAll: true,
-        reportDir: "spec_results",
-        reportFiles: htmlFiles.join(','),
-        reportName: 'Test Results'
-      ])
-    } else {
-      if(configuration.isChangeMerged()) {
-        sh 'build/new-jenkins/pact/contracts-publish-api.sh'
-      }
+    if(status == 'SUCCESS' && configuration.isChangeMerged()) {
+      sh 'build/new-jenkins/pact/contracts-publish-api.sh'
     }
   } finally {
-    sh 'rm -vrf spec_results/'
+    sh 'rm -vrf tmp/spec_results'
     execute 'bash/docker-cleanup.sh --allow-failure'
+  }
+}
+
+def runAndCopyResults(database_name, consumer_name, script_name='build/new-jenkins/pact/contracts-verify-api.sh') {
+  withEnv([
+    "DATABASE_NAME=${database_name}",
+    "PACT_API_CONSUMER=${consumer_name}",
+  ]) {
+    try {
+      sh script_name
+    } finally {
+      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
+    }
   }
 }
 
@@ -89,79 +84,43 @@ pipeline {
 
               stages['Android'] = {
                 timeout(time: 10) {
-                  withEnv([
-                    "DATABASE_NAME=pact_test1",
-                    "PACT_API_CONSUMER=android",
-                  ]) {
-                    sh 'build/new-jenkins/pact/contracts-verify-api.sh'
-                    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
-                  }
+                  runAndCopyResults('pact_test1', 'android')
                 }
               }
 
               stages['Canvas iOS'] = {
                 timeout(time: 10) {
-                  withEnv([
-                    "DATABASE_NAME=pact_test2",
-                    "PACT_API_CONSUMER=canvas-ios",
-                  ]) {
-                    sh 'build/new-jenkins/pact/contracts-verify-api.sh'
-                    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
-                  }
+                  runAndCopyResults('pact_test2', 'canvas-ios')
                 }
               }
 
               stages['Generic'] = {
                 timeout(time: 10) {
-                  withEnv([
-                    "DATABASE_NAME=pact_test3",
-                    "PACT_API_CONSUMER=Generic Consumer",
-                  ]) {
-                    sh 'build/new-jenkins/pact/contracts-verify-api.sh'
-                    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
-                  }
+                  runAndCopyResults('pact_test3', 'Generic Consumer')
                 }
               }
 
               stages['Quiz LTI'] = {
                 timeout(time: 10) {
-                  withEnv([
-                    "DATABASE_NAME=pact_test4",
-                    "PACT_API_CONSUMER=Quiz LTI",
-                  ]) {
-                    sh 'build/new-jenkins/pact/contracts-verify-api.sh'
-                    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
-                  }
+                  runAndCopyResults('pact_test4', 'Quiz LTI')
                 }
               }
 
               stages['Sistemic'] = {
                 timeout(time: 10) {
-                  withEnv([
-                    "DATABASE_NAME=pact_test5",
-                    "PACT_API_CONSUMER=Sistemic",
-                  ]) {
-                    sh 'build/new-jenkins/pact/contracts-verify-api.sh'
-                    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
-                  }
+                  runAndCopyResults('pact_test5', 'Sistemic')
                 }
               }
 
               stages['Live Events'] = {
                 timeout(time: 5) {
-                  sh 'build/new-jenkins/pact/contracts-verify-live-events.sh'
-                  sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/live_events live_events --allow-error --clean-dir'
+                  runAndCopyResults('live_events', '', 'build/new-jenkins/pact/contracts-verify-live-events.sh')
                 }
               }
 
               stages['Outcomes'] = {
                 timeout(time: 5) {
-                  withEnv([
-                    "DATABASE_NAME=pact_test6"
-                  ]) {
-                    sh 'build/new-jenkins/pact/contracts-generate-api.sh'
-                    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
-                  }
+                  runAndCopyResults('pact_test6', '', 'build/new-jenkins/pact/contracts-generate-api.sh')
                 }
               }
 
