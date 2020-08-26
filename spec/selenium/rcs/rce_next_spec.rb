@@ -348,6 +348,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     it 'should click on sidebar modules page to create link in body', ignore_js_errors: true do
+      skip 'flakey, LS-1394 (8/26/2020)'
       title = 'Module-Title'
       @module = @course.context_modules.create!(name: title)
 
@@ -461,6 +462,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     it 'should click on assignment in sidebar to create link to it in syllabus page' do
+      skip 'flakey, LS-1394 (8/26/2020)'
       title = 'Assignment-Title'
       @assignment = @course.assignments.create!(name: title)
 
