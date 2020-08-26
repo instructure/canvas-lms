@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'fallback_memory_cache'
+require_dependency 'local_cache'
 require_dependency 'canvas/dynamic_settings/fallback_proxy'
 require_dependency 'canvas/dynamic_settings/prefix_proxy'
 require 'imperium'
