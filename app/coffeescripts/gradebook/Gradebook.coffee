@@ -554,6 +554,13 @@ export default do ->
 
     gotChunkOfStudents: (students) =>
       @courseContent.assignmentStudentVisibility = {}
+      escapeStudentContent = (student) =>
+        escapedStudent = htmlEscape(student)
+        escapedStudent.enrollments?.forEach (enrollment) =>
+          gradesUrl = enrollment?.grades?.html_url
+          enrollment.grades.html_url = htmlEscape.unescape(gradesUrl) if gradesUrl
+        escapedStudent
+
       for student in students
         student.enrollments = _.filter student.enrollments, (e) ->
           e.type == "StudentEnrollment" || e.type == "StudentViewEnrollment"
@@ -561,9 +568,9 @@ export default do ->
         student.sections = student.enrollments.map (e) -> e.course_section_id
 
         if isStudentView
-          @studentViewStudents[student.id] = htmlEscape(student)
+          @studentViewStudents[student.id] = escapeStudentContent(student)
         else
-          @students[student.id] = htmlEscape(student)
+          @students[student.id] = escapeStudentContent(student)
 
         student.computed_current_score ||= 0
         student.computed_final_score ||= 0
