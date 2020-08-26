@@ -1,8 +1,22 @@
 #!/usr/bin/env ruby
 
+# check if the bundle installed gems somewhere besides the system, and if it
+# did manually add that path to the GEM_PATH. all without actually loading the
+# bundle, because it's huge
 require 'pathname'
 expanded_path = Pathname.new(__FILE__).realpath
-require File.expand_path('../../config/boot',  expanded_path)
+rails_root = File.expand_path("../..", expanded_path)
+bundle_config_file = "#{rails_root}/.bundle/config"
+if File.exist?(bundle_config_file)
+  require 'yaml'
+  bundle_config = YAML.load_file(bundle_config_file)
+  if bundle_config['BUNDLE_PATH']
+    bundle_gem_path = File.expand_path("#{bundle_config['BUNDLE_PATH']}/#{RUBY_ENGINE}/#{RbConfig::CONFIG['ruby_version']}", rails_root)
+    Gem::Specification.dirs = (Array(Gem.path) + [bundle_gem_path]).uniq
+  end
+end
+
+gem 'redis'
 
 require 'base64'
 require 'json'
