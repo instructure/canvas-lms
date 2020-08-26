@@ -120,7 +120,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def content_export
-    if !association(:content_export).loaded? && source_course_id && Shard.shard_for(source_course_id) != self.shard
+    if self.persisted? && !association(:content_export).loaded? && source_course_id && Shard.shard_for(source_course_id) != self.shard
       association(:content_export).target = Shard.shard_for(source_course_id).activate { ContentExport.where(:content_migration_id => self).first }
     end
     super
