@@ -40,6 +40,10 @@ def cleanupFn(status) {
         reportFiles: htmlFiles.join(','),
         reportName: 'Test Results'
       ])
+    } else {
+      if(configuration.isChangeMerged()) {
+        sh 'build/new-jenkins/pact/contracts-publish-api.sh'
+      }
     }
   } finally {
     sh 'rm -vrf spec_results/'
@@ -55,8 +59,8 @@ pipeline {
   }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
-    DOCKER_PROCESSES = '6'
+    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-contract-tests.yml'
+    DOCKER_PROCESSES = '7'
     POSTGRES_PASSWORD = 'sekret'
     PACT_BROKER = credentials('PACT_BROKER')
     PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}"
@@ -147,6 +151,17 @@ pipeline {
                 timeout(time: 5) {
                   sh 'build/new-jenkins/pact/contracts-verify-live-events.sh'
                   sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/live_events live_events --allow-error --clean-dir'
+                }
+              }
+
+              stages['Outcomes'] = {
+                timeout(time: 5) {
+                  withEnv([
+                    "DATABASE_NAME=pact_test6"
+                  ]) {
+                    sh 'build/new-jenkins/pact/contracts-generate-api.sh'
+                    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
+                  }
                 }
               }
 

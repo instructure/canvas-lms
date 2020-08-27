@@ -27,7 +27,10 @@ RSpec.describe 'Outcomes Service - GET Content Export', :pact do
         host: outcomes_host.split(':').first,
         consumer_key: outcomes_key,
         scope: 'content_migration.export',
-        exp: 100.years.from_now.to_i
+        exp: 100.years.from_now.to_i,
+        context_type: 'course',
+        context_id: '100',
+        id: '*'
       }
     end
     let(:export_get_token) { JSON::JWT.new(export_get_payload).sign(outcomes_secret, :HS512) }
@@ -59,7 +62,7 @@ RSpec.describe 'Outcomes Service - GET Content Export', :pact do
       }
     }
     end
-    let(:export_data) do { "export_id": "1" } end
+    let(:export_data) { { "export_id": "1" } }
 
     before do
       outcomes.given('artifacts and an export to retrieve').

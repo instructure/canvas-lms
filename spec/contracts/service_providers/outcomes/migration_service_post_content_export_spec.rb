@@ -26,8 +26,11 @@ RSpec.describe 'Outcomes Service - POST Content Export', :pact do
       {
         host: outcomes_host.split(':').first,
         consumer_key: outcomes_key,
-        scope: 'content_exports.create',
-        exp: 100.years.from_now.to_i
+        scope: 'content_migration.export',
+        exp: 100.years.from_now.to_i,
+        context_type: 'course',
+        context_id: '100',
+        id: '*'
       }
     end
     let(:export_post_token) { JSON::JWT.new(export_post_payload).sign(outcomes_secret, :HS512) }

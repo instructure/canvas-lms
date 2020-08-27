@@ -27,8 +27,11 @@ RSpec.describe 'Outcomes Service - GET Content Import', :pact do
       {
         host: outcomes_host.split(':').first,
         consumer_key: outcomes_key,
-        scope: 'content_imports.show',
-        exp: 100.years.from_now.to_i
+        scope: 'content_migration.import',
+        exp: 100.years.from_now.to_i,
+        context_type: 'course',
+        context_id: '100',
+        id: '*'
       }
     end
     let(:import_get_token) { JSON::JWT.new(import_get_payload).sign(outcomes_secret, :HS512) }
@@ -44,11 +47,11 @@ RSpec.describe 'Outcomes Service - GET Content Import', :pact do
       "state": "completed"
     }
     end
-    let!(:course) {course_factory(active_course: true)}
-    let(:import_data) do { course: course, import_id: 1 } end
+    let!(:course) { course_factory(active_course: true) }
+    let(:import_data) { { course: course, import_id: 1 } }
 
     before do
-      outcomes.given('a provisioned outcomes service account with existing outcomes').
+      outcomes.given('a provisioned outcomes service account with a completed content import').
         upon_receiving('a request to return imported content').
         with(
           method: :get,

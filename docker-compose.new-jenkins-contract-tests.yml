@@ -1,0 +1,8 @@
+version: "2.3"
+services:
+  canvas:
+    volumes:
+      - pacts:/usr/src/app/pacts
+
+volumes:
+  pacts: {}
