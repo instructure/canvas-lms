@@ -113,4 +113,32 @@ describe ActiveSupport::Cache::HaStore do
       expect(redis.zrank("consul_events", consul_event_id)).not_to be_nil
     end
   end
+
+  context "Account cache register" do
+    before do
+      allow(MultiCache).to receive(:cache).and_return(store)
+      allow(Imperium::Events.default_client).to receive(:fire)
+    end
+
+    it "uses MultiCache as store for feature_flags cache_key" do
+      Timecop.freeze do
+        now = Time.now.utc.to_s(Account.cache_timestamp_format)
+        full_key = Account.site_admin.root_account_cache_key
+        expect(Canvas::CacheRegister.lua).to receive(:run).with(:get_key, [full_key], [now], store.redis).and_return("cool beans")
+        expect(Account.site_admin.cache_key(:feature_flags)).to eq("accounts/#{Account.site_admin.global_id}-cool beans")
+        # doesn't use it for other key types
+        expect(Account.site_admin.cache_key(:global_navigation)).to eq("accounts/#{Account.site_admin.global_id}-#{now}")
+      end
+    end
+
+    it "properly invalidates feature_flags cache_key" do
+      Timecop.freeze do
+        key1 = Account.site_admin.cache_key(:feature_flags)
+        Timecop.travel(1)
+        expect(Account.site_admin.cache_key(:feature_flags)).to eq key1
+        Account.site_admin.clear_cache_key(:feature_flags)
+        expect(Account.site_admin.cache_key(:feature_flags)).not_to eq key1
+      end
+    end
+  end
 end
