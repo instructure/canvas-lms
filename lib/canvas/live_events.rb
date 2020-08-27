@@ -238,6 +238,8 @@ module Canvas::LiveEvents
     }
     actl = assignment.assignment_configuration_tool_lookups.take
     event[:associated_integration_id] = "#{actl.tool_vendor_code}-#{actl.tool_product_code}" if actl
+    domain = assignment.root_account&.domain
+    event[:domain] = domain if domain
     event
   end
 

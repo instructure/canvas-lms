@@ -867,7 +867,8 @@ describe Canvas::LiveEvents do
           lti_assignment_id: @assignment.lti_context_id,
           lti_resource_link_id: @assignment.lti_resource_link_id,
           lti_resource_link_id_duplicated_from: @assignment.duplicate_of&.lti_resource_link_id,
-          submission_types: @assignment.submission_types
+          submission_types: @assignment.submission_types,
+          domain: @assignment.root_account.domain
         }.compact!)).once
 
       Canvas::LiveEvents.assignment_created(@assignment)
@@ -907,7 +908,8 @@ describe Canvas::LiveEvents do
           lti_assignment_id: @assignment.lti_context_id,
           lti_resource_link_id: @assignment.lti_resource_link_id,
           lti_resource_link_id_duplicated_from: @assignment.duplicate_of&.lti_resource_link_id,
-          submission_types: @assignment.submission_types
+          submission_types: @assignment.submission_types,
+          domain: @assignment.root_account.domain
         }.compact!)).once
 
       Canvas::LiveEvents.assignment_updated(@assignment)
