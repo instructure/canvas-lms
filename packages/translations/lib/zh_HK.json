@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "向右對齊"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "校準及縮排"
-    },
     "all_4321c3a1": {
         "message": "全部"
     },
@@ -145,9 +142,6 @@
     },
     "canvas_planner_98ed106": {
         "message": "Canvas 手冊"
-    },
-    "canvas_plugins_705a5016": {
-        "message": "Canvas 外掛程式"
     },
     "choose_caption_file_9c45bc4e": {
         "message": "選擇字幕檔案"
@@ -292,6 +286,9 @@
     },
     "dimensions_45ddb7b7": {
         "message": "尺寸"
+    },
+    "directionality_26ae9e08": {
+        "message": "方向"
     },
     "disable_in_line_preview_2a675175": {
         "message": "停用行中預覽。"
@@ -473,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "樹狀資件夾"
     },
+    "format_4247a9c5": {
+        "message": "格式"
+    },
     "formatting_5b143aa8": {
         "message": "格式"
     },
@@ -571,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "逾期"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "左至右"
     },
     "link_7262adec": {
         "message": "連結"
@@ -860,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "多種格式的內容編輯器"
     },
+    "right_to_left_9cfb092a": {
+        "message": "右至左"
+    },
     "save_11a80ec3": {
         "message": "儲存"
     },
@@ -904,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "大小"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "{ file } 的大小超過允許的最大檔案大小 { max } MB。"
     },
     "small_b070434a": {
         "message": "小"

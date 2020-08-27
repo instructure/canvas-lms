@@ -29,7 +29,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconPlusLine} from '@instructure/ui-icons'
 import I18n from 'i18n!ProficiencyTable'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
-import {Table} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import ProficiencyRating from 'jsx/rubrics/ProficiencyRating'
 import uuid from 'uuid/v1'
@@ -80,7 +80,10 @@ export default class ProficiencyTable extends React.Component {
   componentDidUpdate() {
     if (this.fieldWithFocus()) {
       // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({rows: this.state.rows.map(row => row.delete('focusField'))})
+      this.setState(oldState => {
+        const rows = oldState.rows.map(row => row.delete('focusField'))
+        return {rows}
+      })
     }
   }
 
@@ -134,7 +137,10 @@ export default class ProficiencyTable extends React.Component {
       points = 0.0
     }
     const newRow = this.createRating('', points, ADD_DEFAULT_COLOR, 'mastery')
-    this.setState({rows: this.state.rows.push(newRow)})
+    this.setState(oldState => {
+      const rows = oldState.rows.push(newRow)
+      return {rows}
+    })
     $.screenReaderFlashMessage(I18n.t('Added new proficiency rating'))
   }
 
@@ -143,27 +149,33 @@ export default class ProficiencyTable extends React.Component {
   })
 
   handleDescriptionChange = _.memoize(index => value => {
-    let rows = this.state.rows
-    if (!this.invalidDescription(value)) {
-      rows = rows.removeIn([index, 'descriptionError'])
-    }
-    rows = rows.setIn([index, 'description'], value)
-    this.setState({rows})
+    this.setState(oldState => {
+      let rows = oldState.rows
+      if (!this.invalidDescription(value)) {
+        rows = rows.removeIn([index, 'descriptionError'])
+      }
+      rows = rows.setIn([index, 'description'], value)
+      return {rows}
+    })
   })
 
   handlePointsChange = _.memoize(index => value => {
     const parsed = NumberHelper.parse(value)
-    let rows = this.state.rows
-    if (!this.invalidPoints(parsed) && parsed >= 0) {
-      rows = rows.removeIn([index, 'pointsError'])
-    }
-    rows = rows.setIn([index, 'points'], parsed)
-    this.setState({rows})
+    this.setState(oldState => {
+      let rows = oldState.rows
+      if (!this.invalidPoints(parsed) && parsed >= 0) {
+        rows = rows.removeIn([index, 'pointsError'])
+      }
+      rows = rows.setIn([index, 'points'], parsed)
+      return {rows}
+    })
   })
 
   handleColorChange = _.memoize(index => value => {
-    const rows = this.state.rows.update(index, row => row.set('color', unformatColor(value)))
-    this.setState({rows})
+    this.setState(oldState => {
+      const rows = oldState.rows.update(index, row => row.set('color', unformatColor(value)))
+      return {rows}
+    })
   })
 
   handleDelete = _.memoize(index => () => {
@@ -204,6 +216,7 @@ export default class ProficiencyTable extends React.Component {
 
   handleSubmit = () => {
     if (!this.checkForErrors()) {
+      // eslint-disable-next-line promise/catch-or-return
       saveProficiency(this.props.accountId, this.stateToConfig()).then(response => {
         if (response.status === 200) {
           $.flashMessage(I18n.t('Account proficiency ratings saved'))
@@ -316,22 +329,22 @@ export default class ProficiencyTable extends React.Component {
     const masteryIndex = this.state.masteryIndex
     return (
       <div>
-        <Table caption={<ScreenReaderContent>{I18n.t('Proficiency ratings')}</ScreenReaderContent>}>
-          <thead>
-            <tr>
-              <th className="masteryCol" scope="col">
+        <Table caption={I18n.t('Proficiency ratings')}>
+          <Table.Head>
+            <Table.Row>
+              <Table.ColHeader id="mastery-column" width="1%">
                 {I18n.t('Mastery')}
-              </th>
-              <th scope="col">{I18n.t('Proficiency Rating')}</th>
-              <th className="pointsCol" scope="col">
+              </Table.ColHeader>
+              <Table.ColHeader id="rating-column">{I18n.t('Proficiency Rating')}</Table.ColHeader>
+              <Table.ColHeader id="points-column" width="1%">
                 {I18n.t('Points')}
-              </th>
-              <th className="colorCol" scope="col">
+              </Table.ColHeader>
+              <Table.ColHeader id="color-column" width="1%">
                 {I18n.t('Color')}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+              </Table.ColHeader>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
             {this.state.rows.map((rating, index) => (
               <ProficiencyRating
                 key={rating.get('key')}
@@ -350,14 +363,14 @@ export default class ProficiencyTable extends React.Component {
                 onPointsChange={this.handlePointsChange(index)}
               />
             ))}
-            <tr>
-              <td colSpan="4" style={{textAlign: 'center'}}>
+            <Table.Row>
+              <Table.Cell colSpan="4" textAlign="center">
                 <Button onClick={this.addRow} icon={<IconPlusLine />} variant="circle-primary">
                   <ScreenReaderContent>{I18n.t('Add proficiency rating')}</ScreenReaderContent>
                 </Button>
-              </td>
-            </tr>
-          </tbody>
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
         </Table>
         <div className="save">
           <Button variant="primary" onClick={this.handleSubmit}>

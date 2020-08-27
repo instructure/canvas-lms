@@ -12,32 +12,34 @@
 <div class="description">
   {{{description}}}
 </div>
-<table class="criterion">
-  <thead>
-    <tr>
-      {{#each ratings}}
-      <th class="rating" aria-label='{{description}}'>
-        <h3>{{description}}</h3>
-      </th>
-      {{/each}}
-      <th class="total" aria-label='{{#t}}Total Points{{/t}}'>
-        <h3 class="total">{{#t}}Total Points{{/t}}</h3>
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      {{#each ratings}}
-      <td class="rating">
-        {{#t}}{{n points precision=2 strip_insignificant_zeros=true}} Points{{/t}}
-      </td>
-      {{/each}}
-      <td class="total">
-        {{#t}}{{n points_possible precision=2 strip_insignificant_zeros=true}} Points{{/t}}
-      </td>
-    </tr>
-  </tbody>
-</table>
+{{#unless hideMasteryScale}}
+  <table class="criterion">
+    <thead>
+      <tr>
+        {{#each ratings}}
+        <th class="rating" aria-label='{{description}}'>
+          <h3>{{description}}</h3>
+        </th>
+        {{/each}}
+        <th class="total" aria-label='{{#t}}Total Points{{/t}}'>
+          <h3 class="total">{{#t}}Total Points{{/t}}</h3>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {{#each ratings}}
+        <td class="rating">
+          {{#t}}{{n points precision=2 strip_insignificant_zeros=true}} Points{{/t}}
+        </td>
+        {{/each}}
+        <td class="total">
+          {{#t}}{{n points_possible precision=2 strip_insignificant_zeros=true}} Points{{/t}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+{{/unless}}
 
 {{#if setQuizMastery}}
   <label for="outcome_mastery_at">
@@ -52,29 +54,37 @@
       {{#t "use_for_scoring"}}Use this criterion for scoring{{/t}}
     </label>
   {{else}}
-    <p>{{#t}}Mastery: {{n mastery_points precision=2 strip_insignificant_zeros=true}} Points{{/t}}</p>
+    {{#unless hideMasteryScale}}
+     <p>{{#t}}Mastery: {{n mastery_points precision=2 strip_insignificant_zeros=true}} Points{{/t}}</p>
+    {{/unless}}
   {{/if}}
 {{/if}}
 
-<div id="calculation_method" data-calculation-method="{{calculation_method}}">
-  {{#t}}Calculation Method{{/t}}: {{ friendlyCalculationMethod }}
-</div>
-
-<div class="content-box">
-  <div class="grid-row">
-    <!-- Hook for OutcomeCalculationMethodFormView -->
-    <div class="col-xs-12 outcome-calculation-method-form"></div>
+{{#unless hideMasteryScale}}
+  <div id="calculation_method" data-calculation-method="{{calculation_method}}">
+    {{#t}}Calculation Method{{/t}}: {{ friendlyCalculationMethod }}
   </div>
-</div>
+
+  <div class="content-box">
+    <div class="grid-row">
+      <!-- Hook for OutcomeCalculationMethodFormView -->
+      <div class="col-xs-12 outcome-calculation-method-form"></div>
+    </div>
+  </div>
+{{/unless}}
 
 {{#if can_manage}}
-  {{#if assessedInContext}}
-    <div id="assessed_info_banner" class="alert alert-info outcome-assessed-info-banner">
-      <span>
-        {{#t}}This outcome has been used to assess a student and some edits will affect student results.{{/t}}
-      </span>
-    </div>
-  {{/if}}
+  {{#unless hideMasteryScale}}
+    {{#if assessedInContext}}
+      <div id="assessed_info_banner" class="alert alert-info outcome-assessed-info-banner ">
+        <span>
+          <span class="outcome-assessed-info-banner-with-mastery-scale">
+            {{#t}}This outcome has been used to assess a student and some edits will affect student results.{{/t}}
+          </span>
+        </span>
+      </div>
+    {{/if}}
+  {{/unless}}
   <div class="pull-right">
     <button class="move_button ui-button ui-widget ui-state-default ui-corner-all">
       <span aria-hidden="true">{{#t}}Move{{/t}}</span>

@@ -33,7 +33,7 @@ const UnassessedAssignment = ({assignment}) => {
         <Button
           href={url}
           variant="link"
-          theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+          theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           icon={_.includes(submission_types, 'online_quiz') ? IconQuizLine : IconAssignmentLine}
         >
           {title} ({I18n.t('Not yet assessed')})
@@ -44,7 +44,7 @@ const UnassessedAssignment = ({assignment}) => {
 }
 
 UnassessedAssignment.propTypes = {
-  assignment: object.isRequired // eslint-disable-line react/forbid-prop-types
+  assignment: object.isRequired
 }
 
 export default UnassessedAssignment

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'underscore'
 import GradeOverrideEntry from '../../../../grading/GradeEntry/GradeOverrideEntry'
 
 function renderStartContainer(gradeInfo) {
@@ -28,13 +29,15 @@ function renderStartContainer(gradeInfo) {
 }
 
 function render(formattedGrade, gradeInfo) {
-  // xsslint safeString.identifier formattedGrade
+  const escapedGrade = _.escape(formattedGrade)
+
+  // xsslint safeString.identifier escapedGrade
   // xsslint safeString.function renderStartContainer
   return `
     <div class="gradebook-cell">
       ${renderStartContainer(gradeInfo)}
       <div class="Grid__GradeCell__Content">
-        <span class="Grade">${formattedGrade}</span>
+        <span class="Grade">${escapedGrade}</span>
       </div>
       <div class="Grid__GradeCell__EndContainer"></div>
     </div>

@@ -176,9 +176,6 @@ export default class AssignmentRowCell extends Component {
       pointsPossible = `/${I18n.n(this.props.assignment.pointsPossible)}`
     }
 
-    const showEndText =
-      this.props.enterGradesAs === 'percent' || this.props.enterGradesAs === 'points'
-
     const gradeIsInvalid = this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid
 
     const {similarityInfo} = this.props.submission
@@ -212,7 +209,7 @@ export default class AssignmentRowCell extends Component {
           </div>
 
           <div className="Grid__GradeCell__EndContainer">
-            {showEndText && (
+            {this.props.enterGradesAs === 'points' && (
               <span className="Grid__GradeCell__EndText">
                 {pointsPossible && <Text size="small">{pointsPossible}</Text>}
               </span>

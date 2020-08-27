@@ -76,6 +76,14 @@ class ConditionalReleaseObjects
       f("[title='Division cutoff 2']")
     end
 
+    def must_not_be_empty_exists?
+      element_exists?("//*[contains(@id,'error') and contains(text(),'must not be empty')]", true)
+    end
+
+    def these_scores_are_out_of_order_exists?
+      element_exists?("//*[contains(@id,'error') and contains(text(),'these scores are out of order')]", true)
+    end
+
     # Common Selectors
     def conditional_release_link
       f("#conditional_release_link")

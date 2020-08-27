@@ -221,9 +221,6 @@ module Types
       "permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])",
       null: true
 
-    # temporarily added back in to fix broken app
-    field :muted, Boolean, method: :muted?, null: false
-
     field :state, AssignmentStateType, method: :workflow_state, null: false
 
     field :quiz, Types::QuizType, null: true

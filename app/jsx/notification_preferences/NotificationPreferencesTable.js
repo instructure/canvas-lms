@@ -127,13 +127,19 @@ const renderNotificationCategory = (
             {renderChannelHeader ? (
               <>
                 <div style={{display: 'block'}}>
-                  <Text transform={channel.pathType === 'sms' ? 'uppercase' : 'capitalize'}>
-                    {channel.pathType}
-                  </Text>
+                  {channel.pathType === 'push' ? (
+                    <Text>{I18n.t('Push Notification')}</Text>
+                  ) : (
+                    <Text transform={channel.pathType === 'sms' ? 'uppercase' : 'capitalize'}>
+                      {channel.pathType}
+                    </Text>
+                  )}
                 </div>
                 <div style={{display: 'block'}}>
                   <TruncateText>
-                    <Text weight="light">{channel.path}</Text>
+                    <Text weight="light">
+                      {channel.pathType === 'push' ? I18n.t('For All Devices') : channel.path}
+                    </Text>
                   </TruncateText>
                 </div>
               </>
@@ -193,9 +199,9 @@ const renderNotificationCategory = (
                       : channel.categories[notificationCategory][category].frequency
                   }
                   preferenceOptions={
-                    channel.pathType === 'sms'
-                      ? ['immediately', 'never']
-                      : ['immediately', 'daily', 'weekly', 'never']
+                    channel.pathType === 'email'
+                      ? ['immediately', 'daily', 'weekly', 'never']
+                      : ['immediately', 'never']
                   }
                   updatePreference={frequency =>
                     updatePreferenceCallback({channel, category, frequency})

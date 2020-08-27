@@ -36,7 +36,7 @@ const indexMenuLtiTool = {
 
 let prevHtml
 
-QUnit.module('WikiPageIndexView:confirmDeletePages', {
+QUnit.module('WikiPageIndexView:confirmDeletePages not checked', {
   setup() {
     prevHtml = document.body.innerHTML
     fakeENV.setup()
@@ -53,36 +53,35 @@ QUnit.module('WikiPageIndexView:confirmDeletePages', {
   }
 })
 
-test('does not call showConfirmDelete when items are not checked', function() {
-  document.body.innerHTML = `
-    <table>
-      <tbody>
-        <td>
-          <input type="checkbox" class="select-page-checkbox" value="/stuff"/>
-        </td>
-      </tbody>
-    </table>
-  `
+test('does not call showConfirmDelete when no pages are checked', function() {
   const showConfirmDelete = sandbox.spy(ConfirmDeleteModal, 'showConfirmDelete')
   this.view.confirmDeletePages(null)
   notOk(showConfirmDelete.called)
 })
 
-test('calls showConfirmDelete when items are checked', function() {
-  document.body.innerHTML = `
-    <table>
-      <tbody>
-        <td>
-          <input type="checkbox" class="select-page-checkbox" value="/stuff" checked/>
-        </td>
-      </tbody>
-    </table>
-  `
+QUnit.module('WikiPageIndexView:confirmDeletePages checked', {
+  setup() {
+    prevHtml = document.body.innerHTML
+    fakeENV.setup()
+    this.model = new WikiPage({page_id: '42', title: 'page 42'})
+    this.collection = new WikiPageCollection([this.model])
+    this.view = new WikiPageIndexView({
+      collection: this.collection,
+      selectedPages: {'42': this.model}
+    })
+  },
+
+  teardown() {
+    document.body.innerHTML = prevHtml
+    fakeENV.teardown()
+  }
+})
+test('calls showConfirmDelete when pages are checked', function() {
   const showConfirmDelete = sandbox.spy(ConfirmDeleteModal, 'showConfirmDelete')
   this.view.confirmDeletePages(null)
   ok(
     showConfirmDelete.firstCall.calledWithMatch({
-      selectedCount: 1
+      pageTitles: ['page 42']
     })
   )
 })

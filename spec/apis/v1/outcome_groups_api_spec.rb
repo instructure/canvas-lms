@@ -1431,6 +1431,7 @@ describe "Outcome Groups API", type: :request do
 
     it "should fail (400) if this is the last link for an aligned outcome" do
       aqb = @account.assessment_question_banks.create!
+      exp_warning = /Outcome \'#{@outcome.short_description}\' cannot be deleted because it is aligned to content\./
       @outcome.align(aqb, @account, :mastery_type => "none")
       raw_api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    :controller => 'outcome_groups_api',
@@ -1441,7 +1442,7 @@ describe "Outcome Groups API", type: :request do
                    :format => 'json')
       assert_status(400)
       parsed_body = JSON.parse( response.body )
-      expect(parsed_body[ 'message' ]).to match /link is the last link/i
+      expect(parsed_body[ 'message' ]).to match exp_warning
     end
 
     it "should unlink the outcome from the group" do

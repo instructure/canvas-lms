@@ -330,8 +330,9 @@ module Canvas::LiveEvents
       missing: submission.missing?,
       lti_assignment_id: submission.assignment.lti_context_id,
       group_id: submission.group_id,
+      posted_at: submission.posted_at,
     }
-    actl = AssignmentConfigurationToolLookup.find_by(assignment_id: submission.assignment_id)
+    actl = submission.assignment.assignment_configuration_tool_lookups.take
     event[:associated_integration_id] = "#{actl.tool_vendor_code}-#{actl.tool_product_code}" if actl
     event
   end
@@ -843,5 +844,37 @@ module Canvas::LiveEvents
 
   def self.sis_batch_updated(batch)
     post_event_stringified('sis_batch_updated', sis_batch_payload(batch))
+  end
+
+  def self.outcome_proficiency_created(proficiency)
+    post_event_stringified('outcome_proficiency_created', get_outcome_proficiency_data(proficiency))
+  end
+
+  def self.outcome_proficiency_updated(proficiency)
+    post_event_stringified('outcome_proficiency_updated', get_outcome_proficiency_data(proficiency).merge(updated_at: proficiency.updated_at))
+  end
+
+  def self.get_outcome_proficiency_data(proficiency)
+    ratings = proficiency.outcome_proficiency_ratings.map do |rating|
+      get_outcome_proficiency_rating_data(rating)
+    end
+    {
+      outcome_proficiency_id: proficiency.id,
+      context_type: proficiency.context_type,
+      context_id: proficiency.context_id,
+      workflow_state: proficiency.workflow_state,
+      outcome_proficiency_ratings: ratings
+    }
+  end
+
+  def self.get_outcome_proficiency_rating_data(rating)
+    {
+      outcome_proficiency_rating_id: rating.id,
+      description: rating.description,
+      points: rating.points,
+      mastery: rating.mastery,
+      color: rating.color,
+      workflow_state: rating.workflow_state
+    }
   end
 end

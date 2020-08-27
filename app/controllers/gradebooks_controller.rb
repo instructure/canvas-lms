@@ -230,6 +230,7 @@ class GradebooksController < ApplicationController
 
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      log_asset_access(['grades', @context], 'grades')
       if requested_gradebook_view.present?
         update_preferred_gradebook_view!(requested_gradebook_view) if requested_gradebook_view != preferred_gradebook_view
         redirect_to polymorphic_url([@context, 'gradebook'])
@@ -835,7 +836,7 @@ class GradebooksController < ApplicationController
       return
     end
 
-    @progress = @assignment.submission_reupload_progress
+    @presenter = Submission::UploadPresenter.for(@context, @assignment)
 
     css_bundle :show_submissions_upload
     render :show_submissions_upload

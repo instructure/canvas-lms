@@ -30,7 +30,8 @@ class Mutations::DeleteOutcomeCalculationMethod < Mutations::BaseMutation
   end
 
   def resolve(input:)
-    record = OutcomeCalculationMethod.active.find_by(id: input[:id])
+    record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeCalculationMethod")
+    record = OutcomeCalculationMethod.active.find_by(id: record_id)
     raise GraphQL::ExecutionError, "Unable to find OutcomeCalculationMethod" if record.nil?
     raise GraphQL::ExecutionError, "insufficient permission" unless record.context.grants_right? current_user, :manage_outcomes
     context[:deleted_models][:outcome_calculation_method] = record

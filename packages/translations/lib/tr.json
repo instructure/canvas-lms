@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "Sağa dayalı"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Hizlama ve içerden başlatma"
-    },
     "all_4321c3a1": {
         "message": "Tümü"
     },
@@ -137,9 +134,6 @@
     "canvas_planner_98ed106": {
         "message": "Canvas Planlayıcı"
     },
-    "canvas_plugins_705a5016": {
-        "message": "Canvas Eklentileri"
-    },
     "choose_caption_file_9c45bc4e": {
         "message": "Alt yazı dosyasını seçin"
     },
@@ -169,6 +163,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "Bilgisayar"
+    },
+    "content_1440204b": {
+        "message": "İçerik"
     },
     "content_subtype_5ce35e88": {
         "message": "İçerik Alt Türü"
@@ -295,6 +292,9 @@
     },
     "external_links_3d9f074e": {
         "message": "Harici Bağlantılar"
+    },
+    "external_tools_6e77821": {
+        "message": "Harici Araçlar"
     },
     "extra_large_b6cdf1ff": {
         "message": "Ekstra Büyük"

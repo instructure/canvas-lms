@@ -183,7 +183,7 @@ class Account < ActiveRecord::Base
   end
 
   def resolved_outcome_proficiency
-    outcome_proficiency || parent_account&.resolved_outcome_proficiency
+    outcome_proficiency&.active? ? outcome_proficiency : parent_account&.resolved_outcome_proficiency
   end
 
   def resolved_outcome_calculation_method
@@ -1456,7 +1456,9 @@ class Account < ActiveRecord::Base
   end
 
   def self.update_all_update_account_associations
-    Account.root_accounts.active.non_shadow.find_each(&:update_account_associations)
+    Account.root_accounts.active.non_shadow.find_in_batches(strategy: :pluck_ids) do |account_batch|
+      account_batch.each(&:update_account_associations)
+    end
   end
 
   def course_count

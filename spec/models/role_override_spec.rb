@@ -664,5 +664,14 @@ describe RoleOverride do
       @student.touch
       expect(Course.find(course.id).grants_right?(@student, :read_forum)).to eq false
     end
+
+    it "does not try to hit caches inside permission_for if no_caching == true" do
+      account = Account.default
+      role = teacher_role
+      cache_key = "role_override_calculation/#{Shard.global_id_for(role)}"
+      expect(RoleOverride).to receive(:uncached_permission_for).once.and_call_original
+      expect(RequestCache).not_to receive(:cache).with(cache_key, account)
+      permissions = RoleOverride.permission_for(account, :moderate_forum, role, account, true)
+    end
   end
 end

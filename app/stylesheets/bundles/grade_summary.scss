@@ -22,6 +22,9 @@
 
 // print button for grades summary page
 .print-grades {
+  body:not(.responsive_student_grades_page) & {
+    float: direction(right);
+  }
   @media print {
     display: none;
   }
@@ -117,11 +120,28 @@
 
 #grades_summary td.assignment_score {
   cursor: pointer;
-  white-space: nowrap;
+
+  body:not(.responsive_student_grades_page) & {
+    white-space: nowrap;
+  }
+
+  body.responsive_student_grades_page & {
+    @include breakpoint(tablet) {
+      white-space: nowrap;
+    }
+  }
 }
 
 #grades_summary th.possible {
-  white-space: nowrap;
+  body:not(.responsive_student_grades_page) & {
+    white-space: nowrap;
+  }
+
+  body.responsive_student_grades_page & {
+    @include breakpoint(tablet) {
+      white-space: nowrap;
+    }
+  }
 }
 
 #grades_summary td a, #grades_summary th a {
@@ -136,8 +156,18 @@
 #grades_summary td.details {
   text-align: direction(right);
   padding-#{direction(left)}: 0;
-  white-space: nowrap;
-  min-width: 80px;  // equals 4 x 20 pixel icons
+
+  body:not(.responsive_student_grades_page) & {
+    white-space: nowrap;
+    min-width: 80px;  // equals 4 x 20 pixel icons
+  }
+
+  body.responsive_student_grades_page & {
+    @include breakpoint(tablet) {
+      white-space: nowrap;
+      min-width: 80px;  // equals 4 x 20 pixel icons
+    }
+  }
 
   & a {
     color: $ic-icon-link-color;
@@ -156,7 +186,10 @@
 }
 
 #grades_summary th.title .context {
-  visibility: hidden;
+  body:not(.responsive_student_grades_page) & {
+    visibility: hidden;
+  }
+
   font-size: $ic-font-size - 2;
   color: $ic-font-color-dark;
   @media print {
@@ -166,12 +199,22 @@
   }
 }
 
-#grades_summary th.title .context.context_hover {
-  visibility: visible;
+body:not(.responsive_student_grades_page) {
+  #grades_summary th.title .context.context_hover {
+    visibility: visible;
+  }
 }
 
 #grades_summary td.due {
-  white-space: nowrap;
+  body:not(.responsive_student_grades_page) & {
+    white-space: nowrap;
+  }
+
+  body.responsive_student_grades_page & {
+    @include breakpoint(tablet) {
+      white-space: nowrap;
+    }
+  }
 }
 
 #grades_summary tr.assignment_graded {
@@ -650,5 +693,16 @@ $outcome-border: 1px solid #BCC2CA;
 
   .turnitin_similarity_score {
     color: $ic-color-dark;
+  }
+}
+
+.ic-Table.ic-Table--grades-summary-table th,
+.ic-Table.ic-Table--grades-summary-table td {
+  padding-#{direction(left)}: 0;
+  padding-#{direction(right)}: 0;
+
+  @include breakpoint(tablet) {
+    padding-#{direction(left)}: $ic-sp + 2;
+    padding-#{direction(right)}: $ic-sp + 2;
   }
 }

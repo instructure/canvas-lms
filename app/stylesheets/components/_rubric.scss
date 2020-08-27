@@ -121,24 +121,7 @@
   padding: 0.75rem;
 }
 
-.rating-all {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-}
-
-.react-rubric .ratings .rating-tier-list {
-  margin: 0;
-  display: flex;
-  flex-direction: row;
-  margin-#{direction(left)}: -1px;
-  border-collapse: collapse;
-  height: 100%;
-}
-
 .react-rubric .rating-tier {
-  width: 100%;
   padding: 7px 10px;
   border-#{direction(left)}: 1px solid #C7CDD1;
   border-top: 0;
@@ -201,8 +184,8 @@
   }
 }
 
-.react-rubric .react-assessing .rating-tier:focus,
-.react-rubric .react-assessing .rating-tier:hover {
+.react-rubric .rating-tier.assessing:focus,
+.react-rubric .rating-tier.assessing:hover {
   background-color: #ad9;
   cursor: pointer;
 }

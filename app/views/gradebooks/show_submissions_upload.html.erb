@@ -21,13 +21,14 @@
   @comments = []
   @ignored_files = []
 
-  @finished = @progress && @progress.workflow_state == "completed"
-  @failed = @progress && @progress.workflow_state == "failed"
-  @pending = @progress && @progress.pending?
+  progress = @presenter.progress
+  @finished = progress&.workflow_state == "completed"
+  @failed = progress&.workflow_state == "failed"
+  @pending = progress&.pending?
 
-  if @progress && @progress.workflow_state == "completed"
-    @comments = @progress.results[:comments]
-    @ignored_files = @progress.results[:ignored_files]
+  if @finished
+    @comments = progress.results[:comments]
+    @ignored_files = progress.results[:ignored_files]
   end
 %>
 
@@ -44,7 +45,7 @@
   </a>
 </div>
 
-<% if @progress.nil? %>
+<% if progress.nil? %>
   <div class="NoUploads">
     <div class="NoUploads__svg"></div>
 
@@ -113,7 +114,9 @@
         <% @comments.each do |comment| %>
           <tr>
             <th scope="row">
-              <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, comment[:submission][:user_id]) %>"><%= comment[:submission][:user_name] %></a>
+              <a href="<%= @presenter.submission_href(comment) %>">
+                <%= @presenter.student_name(comment) %>
+              </a>
             </th>
 
             <td>
@@ -122,7 +125,7 @@
               <% comment[:attachments].each_with_index do |file, index| -%>
                 <% renamed = file[:filename] != file[:display_name] %>
 
-                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, comment[:submission][:user_id], download: file[:id], comment_id: comment[:id]) %>"><%= file[:display_name] %></a><%= "," unless renamed || index == last_index %>
+                <a href="<%= @presenter.file_download_href(comment, file) %>"><%= file[:display_name] %></a><%= "," unless renamed || index == last_index %>
 
                 <% if renamed -%>
                   <small>(<%= t("renamed from %{filename}", filename: file[:filename]) %>)</small><%= "," unless index == last_index %>

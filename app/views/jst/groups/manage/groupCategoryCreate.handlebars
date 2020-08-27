@@ -35,6 +35,14 @@
         {{/t}}
       </label>
     </div>
+    <div class="controls" style="margin-top:-4px">
+      <label class="radio">
+        <input type="radio" id="num_students" name="split_groups" value="2" style="margin-top:8px">
+        {{#t "split_into_sized_groups"}}
+          Split students into groups with {{{num_members}}} students per group
+        {{/t}}
+      </label>
+    </div>
     <div class="controls group-by-section-controls">
       <label class="checkbox" for="group_by_section">
         {{checkbox "group_by_section"}}

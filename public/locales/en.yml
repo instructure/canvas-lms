@@ -712,14 +712,14 @@ en:
   show_new_analytics_for_course_and_user_data_data_m_89526eb: Show new analytics for course and user data. Data may take 24 hours to appear in New Analytics after setting this feature flag to ON.
   new_gradebook_plagiarism_indicator_8dd22971: New Gradebook Plagiarism Indicator
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: Enables display of plagiarism reports and similarity scores in the New Gradebook submission tray.
-  course_favorites_from_dashboard_27a3515a: Course Favorites From Dashboard
-  this_allows_the_user_to_unfavorite_a_course_direct_828d0587: This allows the user to unfavorite a course directly from its dashboard card.
   import_commons_favorites_e68fce81: Import Commons Favorites
   if_commons_is_installed_allows_importing_favorited_eff368f: If Commons is installed, allows importing favorited content items from within Canvas.
   featured_help_links_d805fe44: Featured Help Links
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu.
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: Classic Quizzes Option for Timed Quizzes without Submission
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: Presents the quiz setting to avoid automatic submission of a timed quiz when the available time has ended.
+  recent_history_bcb0f4c0: Recent History
+  show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: Show a list of recently visited pages in the Canvas global navigation
   quiz_log_auditing_desc: |-
     Enable the tracking of events for a quiz submission, and the ability
           to view a log of those events once a submission is made.
@@ -767,6 +767,8 @@ en:
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: If set, turns off post-to-SIS functionality for assignments when their grading period closes. Only applies if the "Enable new SIS integration settings" feature is enabled.
   final_grade_override_in_gradebook_history_767147c: Final Grade Override in Gradebook History
   includes_overridden_course_grades_in_the_gradebook_d58cffb: Includes overridden course grades in the Gradebook History.
+  responsive_student_grades_page_324e9c8b: Responsive Student Grades Page
+  makes_the_student_grades_page_responsive_c13e00eb: Makes the student grades page responsive.
   product_tours_1e19eb95: Product Tours
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: In-product training walkthrough and tourpoints for admins, teachers, and students
   module_file_upload_enhancements_eecd4d37: Module File Upload Enhancements
@@ -792,8 +794,6 @@ en:
   edit_closed_captions_subtitles_to_videos_from_the__288ae432: Edit closed captions/subtitles to videos from the video options tray in the RCE
   support_favorite_lti_tools_in_the_rce_1680436d: Support favorite LTI tools in the RCE
   let_the_site_administrator_select_up_to_2_lti_apps_df016781: Let the site administrator select up to 2 LTI apps as favorites, which will then be displayed in the RCE's toolbar
-  this_is_a_siteadmin_test_feature_flag_3ab5184: This is a SiteAdmin test Feature Flag
-  this_flag_will_not_cause_any_change_in_behavior_24c0308b: This flag will not cause any change in behavior.
   assignment_enhancements_student_557372ab: Assignment Enhancements - Student
   use_the_new_assignments_student_page_944262af: Use the new assignments student page
   assignments_2_teacher_view_3cd3aeda: Assignments 2 Teacher View
@@ -4352,6 +4352,7 @@ en:
         require_same_section: Require group members to be in the same section
         group_structure: Group Structure
         split_into_groups: Split students into %{num_groups} groups
+        split_into_sized_groups: Split students into groups with %{num_members} students per group
         create_groups_manually: I'll create groups manually
         create_groups: Create %{num_groups} groups now
         limit_group_size: Limit groups to %{group_limit} members
@@ -6141,6 +6142,7 @@ en:
       quizzes:
         file_successfully_uploaded: Your file has been successfully uploaded.
         files_removed: "%{display_name} has been removed."
+  quiz_not_assigned_to_student_4b1846d5: Quiz not assigned to student
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: You do not have access to the requested quiz.
   new_quiz_34aacba6: New Quiz
   quiz_successfully_updated_ece5c63d: Quiz successfully updated
@@ -6979,14 +6981,24 @@ en:
   course_syllabus_5de1b0af: Course Syllabus
   course_discussions_38c0b74f: Course Discussions
   group_name_group_announcements_5ce81c6d: "%{group_name} - Group Announcements"
+  group_announcements_f6e0fc8c: Group Announcements
   group_name_group_calendar_7f10e0ed: "%{group_name} - Group Calendar"
+  group_calendar_5410c6ae: Group Calendar
   group_name_group_collaborations_49b5dcd7: "%{group_name} - Group Collaborations"
+  group_collaborations_b747d43: Group Collaborations
   group_name_group_conferences_8b01695f: "%{group_name} - Group Conferences"
+  group_conferences_12866179: Group Conferences
   group_name_group_files_f8b0c078: "%{group_name} - Group Files"
+  group_files_4324f3df: Group Files
   group_name_group_home_21f8a655: "%{group_name} - Group Home"
+  group_home_249cb392: Group Home
   group_name_group_pages_def16554: "%{group_name} - Group Pages"
+  group_pages_656556f3: Group Pages
   group_name_group_people_e9d548c1: "%{group_name} - Group People"
+  group_people_50e9785b: Group People
   group_name_group_discussions_8e509286: "%{group_name} - Group Discussions"
+  group_discussions_17d79aa0: Group Discussions
+  user_files_78e21703: User Files
   invalid_points_possible: The value of possible points for this assignment must be zero or greater.
   the_value_of_possible_points_for_this_assignment_c_42396e3: The value of possible points for this assignment cannot exceed 999999999.
   copy_9748f9f: Copy
@@ -8703,6 +8715,7 @@ en:
     everyone: Everyone
   question_answered: Answered
   question_unanswered: Haven't Answered Yet
+  anonymous_student_91b9d664: Anonymous Student
   more_than_a19b440: "%{more_than}+"
   more_than_999_submissions_need_grading_bc087dd0: More than 999 submissions need grading
   count_submissions_need_grading_d34bae25:
@@ -9239,6 +9252,7 @@ en:
   stream_items_api:
     assessment_request_title: Peer Review for %{title}
   oauth_2_eb9d97: OAuth 2
+  peer_services_102357e3: Peer Services
   api_token_scopes_67b11c16: API Token Scopes
   account_domain_lookups_f9d1147e: Account Domain Lookups
   account_notifications_f3b7f01f: Account Notifications
@@ -9284,6 +9298,7 @@ en:
   grading_standards_b73bfa72: Grading Standards
   group_categories_7a569a4d: Group Categories
   groups_6c90e26a: Groups
+  history_cd3f60a9: History
   image_search_b0944fc2: Image Search
   jwts_4f397c85: JWTs
   late_policy_9d0e76b5: Late Policy
@@ -12360,7 +12375,7 @@ en:
   logged_out_user_index_68a0edb2: Logged Out User %{index}
   search_people_4782671a: Search People
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.
-  quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: Quiz availability dates that pass during an attempt will still auto-submit even if the extended time has not expired.
+  quiz_attempts_whose_availability_dates_have_passed_b0d98829: Quiz attempts whose availability dates have passed will still auto-submit even if the extended time has not expired.
   available_until_date_cd125c62: Available Until Date
   message_students_who_369b8488: Message Students Who...
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: This is a preview of the draft version of the quiz
@@ -12452,7 +12467,7 @@ en:
   site:
     view_privacy_policy: View Privacy Policy
   please_enter_your_label_name_7745272d: 'Please enter your %{label_name}:'
-  this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: This course cannot be added to the courses menu at this time.
+  this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: This course cannot be added to the courses menu unless the course is active.
   chat_2153c6b7: Chat
   all_terms_cd27b0fb: All Terms
   active_terms_83df727e: Active Terms
@@ -13851,13 +13866,13 @@ en:
       scheduler_explanation_student_paragraph_1: Teachers can use this tool to schedule things for their students to sign up for, e.g. office hours, group presentation time slots, etc.
       scheduler_explanation_student_paragraph_2: Currently, none of your teachers have made any appointments available. You will be notified if appointment slots become available.
     calendar_header:
+      my_appointment_groups: My Appointment Groups
+      done_go_back_to_list: Done, Go Back To List
       links:
         improved_accessibility_recommend_agenda: 'Warning: For improved accessibility, please use the "Agenda view" Calendar.'
         calendar_week: Week
         calendar_month: Month
         calendar_agenda: Agenda
-      my_appointment_groups: My Appointment Groups
-      done_go_back_to_list: Done, Go Back To List
       loading: Loading
       create_event: Create New Event
     calendar_navigator:
@@ -13916,7 +13931,6 @@ en:
       location_name: 'Location:'
       location_address: 'Address:'
       repeat: Duplicate
-      count: 'Count:'
       delete: Delete
       buttons:
         create: Create Event
@@ -14994,7 +15008,8 @@ en:
       updateSuccess: Update successful
       error: An error occurred. Please refresh the page and try again.
       deleteSuccess: Deletion successful
-      deleteError: Something went wrong. Unable to delete at this time.
+      userDeleteError: Outcome Group contains one or more Outcomes that are currently aligned to content.
+      unexpectedDeleteError: Something went wrong. Unable to delete at this time.
     confirm:
       delete: Are you sure you want to delete?
   OutcomeView:
@@ -16302,6 +16317,7 @@ en:
   check_services_to_enable_8877c451: Check Services to enable
   manual_configuration_b586fe54: Manual Configuration
   must_have_at_least_one_redirect_uri_defined_bb236d38: Must have at least one redirect_uri defined.
+  will_credentials_issued_by_this_key_be_presented_t_68faff8c: Will credentials issued by this key be presented to Canvas or to a peer service (e.g. Canvas Data)?
   developer_key_settings_889721f1: Developer Key Settings
   key_name_7311d22: 'Key Name:'
   owner_email_4d02f795: 'Owner Email:'
@@ -16312,6 +16328,9 @@ en:
   icon_url_ecce6557: 'Icon URL:'
   notes_6cfc3988: 'Notes:'
   test_cluster_only_70e61c19: Test Cluster Only
+  client_credentials_audience_218f2d93: Client Credentials Audience
+  toggle_tooltip_1ed3b35e: toggle tooltip
+  peer_service_6b4828b9: Peer Service
   at_least_one_scope_must_be_selected_97d6fce9: At least one scope must be selected.
   save_successful_b2f64da4: Save successful.
   failed_to_save_changes_errors_6920f334: 'Failed to save changes: %{errors}%'
@@ -16595,7 +16614,6 @@ en:
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: Could not find an LTI configuration for client ID %{clientId}
   the_client_id_clientid_is_disabled_b4a02cb1: The client ID %{clientId} is disabled
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: An error occured while trying to find the LTI configuration
-  toggle_tooltip_1ed3b35e: toggle tooltip
   this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: This is the new Feature Preview UI. It is currently read-only. To revert to old UI, click the button. This will disable the "New Feature Flags" feature and refresh the page.
   revert_to_old_ui_3211da41: Revert to old UI
   loading_features_d26820f6: Loading features
@@ -17205,6 +17223,7 @@ en:
   admin_tray_3b680e7b: Admin tray
   profile_tray_bcec5044: Profile tray
   title_tray_ec9f7488: "%{title} tray"
+  recent_history_tray_241a384e: Recent History tray
   global_navigation_tray_35612e2e: Global navigation tray
   count_unread_messages_e312aa7b:
     one: One unread message.
@@ -17525,23 +17544,23 @@ en:
   change_description_34c49853: Change description
   change_points_9e5104ac: Change points
   delete_proficiency_rating_5436ee08: Delete proficiency rating
-  an_error_occurred_while_loading_account_proficienc_d38554c8: An error occurred while loading account proficiency ratings
-  an_error_occurred_while_loading_account_proficienc_c7d6568b: 'An error occurred while loading account proficiency ratings: %{m}'
+  mastery_7ec348b5: Mastery
+  below_mastery_abd1dca5: Below Mastery
   added_new_proficiency_rating_e30cab8a: Added new proficiency rating
+  an_error_occurred_while_saving_account_proficiency_9f0f9208: 'An error occurred while saving account proficiency ratings: %{message}'
   proficiency_rating_deleted_77827473: Proficiency Rating deleted
-  account_proficiency_ratings_saved_292d9239: Account proficiency ratings saved
-  an_error_occurred_while_saving_account_proficiency_43e7fb6a: An error occurred while saving account proficiency ratings
   missing_required_description_99a99ff: Missing required description
   invalid_points_8e929c3f: Invalid points
   negative_points_fda45730: Negative points
   points_must_be_less_than_previous_rating_bc627bec: Points must be less than previous rating
-  customize_learning_mastery_ratings_4ace142a: Customize Learning Mastery Ratings
-  set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n            Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook.\n            Adjust number of ratings, mastery level, points, and colors.\n          "
   proficiency_ratings_2bbabdcd: Proficiency ratings
-  mastery_7ec348b5: Mastery
   proficiency_rating_6346119f: Proficiency Rating
   add_proficiency_rating_d819f6b8: Add proficiency rating
-  save_learning_mastery_82889d8b: Save Learning Mastery
+  an_error_occurred_updating_the_proficiency_ratings_babe7029: An error occurred updating the proficiency ratings
+  http_response_code_832d6baa: 'HTTP Response: %{code}'
+  an_error_occurred_updating_the_proficiency_ratings_28d600aa: 'An error occurred updating the proficiency ratings: %{message}'
+  an_error_occurred_while_loading_the_proficiency_ra_98492357: 'An error occurred while loading the proficiency ratings: %{error}'
+  set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: Set the mastery scale to be used for all courses within this account.
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n              Can't delete alignments based on rubric associations.\n              To remove these associations you need to remove the row from the asset's rubric\"\n            "
   delete_alignment_f33c97d5: Delete alignment
   mastery_scale_abbc3557: Mastery Scale
@@ -18059,6 +18078,13 @@ en:
   points_possible_720fc8fd: "%{points} / %{possible}"
   invalid_score_3d247da7: Invalid score
   cannot_give_outcomes_extra_credit_696208f0: Cannot give outcomes extra credit
+  an_error_occurred_while_loading_account_proficienc_d38554c8: An error occurred while loading account proficiency ratings
+  an_error_occurred_while_loading_account_proficienc_c7d6568b: 'An error occurred while loading account proficiency ratings: %{m}'
+  account_proficiency_ratings_saved_292d9239: Account proficiency ratings saved
+  an_error_occurred_while_saving_account_proficiency_43e7fb6a: An error occurred while saving account proficiency ratings
+  customize_learning_mastery_ratings_4ace142a: Customize Learning Mastery Ratings
+  set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n            Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook.\n            Adjust number of ratings, mastery level, points, and colors.\n          "
+  save_learning_mastery_82889d8b: Save Learning Mastery
   points_to_endofrangepoints_pts_aad207f0: "%{points} to >%{endOfRangePoints} pts"
   this_rating_is_selected_ca68fce6: This rating is selected
   rating_selected_85c31e4c: Rating selected
@@ -18510,9 +18536,9 @@ en:
   export_failed_5d615d6d: Export failed
   most_recent_export_7282b756: Most recent export
   delete_in_progress_2d3f0e0d: Delete in progress
-  you_are_about_to_delete_count_pages_are_you_sure_e40c3d2:
-    one: You are about to delete 1 page. Are you sure?
-    other: You are about to delete %{count} pages. Are you sure?
+  count_pages_selected_for_deletion_1ab0f684:
+    one: "%{count} page selected for deletion"
+    other: "%{count} pages selected for deletion"
   sorted_descending_84ec84c8: sorted descending.
   col_is_sorted_descending_1cef74aa: "%{col} is sorted descending."
   sorted_ascending_3138603c: sorted ascending.
@@ -18847,6 +18873,7 @@ en:
   for_974cbb84: For
   additional_occurrence_s_7b5b0173: additional occurrence(s)
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: Appends a number to the end of each event title (e.g. Event 1, Event 2, etc)
+  number_each_event_d934cd65: Number each event
   to_do_date_ddfb582c: 'To Do Date:'
   to_do_time_a7e17623: To Do Time
   details_a6f427c3: 'Details:'

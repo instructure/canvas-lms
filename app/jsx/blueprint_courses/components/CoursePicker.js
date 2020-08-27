@@ -62,7 +62,7 @@ export default class CoursePicker extends React.Component {
     this.fixIcons()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.state.announceChanges && !this.props.isLoadingCourses && nextProps.isLoadingCourses) {
       $.screenReaderFlashMessage(I18n.t('Loading courses started'))
     }

@@ -95,12 +95,23 @@ module Types
       load_association(:account)
     end
 
+    # TODO: restore when OUT-3878 is complete
+    # field :outcome_proficiency, OutcomeProficiencyType, null: true
+    # def outcome_proficiency
+    #   # This does a recursive lookup of parent accounts, not sure how we could
+    #   # batch load it in a reasonable way.
+    #   course.resolved_outcome_proficiency
+    # end
+
+    # field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: true
+    # def proficiency_ratings_connection
+    #   # This does a recursive lookup of parent accounts, not sure how we could
+    #   # batch load it in a reasonable way.
+    #   outcome_proficiency&.outcome_proficiency_ratings
+    # end
+
     field :outcome_calculation_method, OutcomeCalculationMethodType, null: true
     def outcome_calculation_method
-      return nil unless course.grants_any_right?(
-        current_user, session,
-        :read
-      )
       # This does a recursive lookup of parent accounts, not sure how we could
       # batch load it in a reasonable way.
       course.resolved_outcome_calculation_method

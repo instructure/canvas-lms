@@ -163,8 +163,18 @@ module GraphQLNodeLoader
           enrollment_term
         end
       end
+    when "OutcomeCalculationMethod"
+      Loaders::IDLoader.for(OutcomeCalculationMethod).load(id).then do |record|
+        next if !record || record.deleted? || !record.context.grants_right?(ctx[:current_user], :read)
+        record
+      end
+    when "OutcomeProficiency"
+      Loaders::IDLoader.for(OutcomeProficiency).load(id).then do |record|
+        next if !record || record.deleted? || !record.context.grants_right?(ctx[:current_user], :read)
+        record
+      end
     else
-      raise UnsupportedTypeError.new("don't know how to load #{type}")
+      raise UnsupportedTypeError, "don't know how to load #{type}"
     end
   end
 

@@ -23,6 +23,7 @@ describe "permissions index" do
 
   before :once do
     @account = Account.default
+    @account.enable_feature!(:granular_permissions_wiki_pages)
     @subaccount = Account.create!(name: "subaccount", parent_account_id: @account.id)
     account_admin_user
   end

@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "Выровнять по правому краю"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Согласование и выравнивание"
-    },
     "all_4321c3a1": {
         "message": "Все"
     },
@@ -145,9 +142,6 @@
     },
     "canvas_planner_98ed106": {
         "message": "Планировщик Canvas"
-    },
-    "canvas_plugins_705a5016": {
-        "message": "Подключаемые модули Canvas"
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Выберите файл подписи к изображению"
@@ -292,6 +286,9 @@
     },
     "dimensions_45ddb7b7": {
         "message": "Размеры"
+    },
+    "directionality_26ae9e08": {
+        "message": "Направленность"
     },
     "disable_in_line_preview_2a675175": {
         "message": "Отключить встроенный предварительный просмотр."
@@ -473,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Структура папки"
     },
+    "format_4247a9c5": {
+        "message": "Формат"
+    },
     "formatting_5b143aa8": {
         "message": "Форматирование"
     },
@@ -571,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "Поздно"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Слева направо"
     },
     "link_7262adec": {
         "message": "Ссылка"
@@ -860,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Редактор форматированного текста"
     },
+    "right_to_left_9cfb092a": {
+        "message": "Справа налево"
+    },
     "save_11a80ec3": {
         "message": "Сохранить"
     },
@@ -904,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Размер"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "Размер { file } больше допустимого максимального размера файла в { max } Мб."
     },
     "small_b070434a": {
         "message": "Маленький"

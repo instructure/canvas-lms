@@ -38,9 +38,6 @@
     "cancel_caeb1e68": {
         "message": "Ακύρωση"
     },
-    "canvas_plugins_705a5016": {
-        "message": "Προσθήκες του Canvas"
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Κάντε κλικ για να ενσωματώσετε την εικόνα { imageName }"
     },
@@ -52,6 +49,9 @@
     },
     "collaborations_5c56c15f": {
         "message": "Συνεργασίες"
+    },
+    "content_1440204b": {
+        "message": "Περιεχόμενο"
     },
     "content_type_2cf90d95": {
         "message": "Τύπος Περιεχομένου"
@@ -118,6 +118,9 @@
     },
     "excused_cf8792eb": {
         "message": "Δικαιολογημένος/η"
+    },
+    "external_tools_6e77821": {
+        "message": "Εξωτερικά Εργαλεία"
     },
     "files_c300e900": {
         "message": "Αρχεία"

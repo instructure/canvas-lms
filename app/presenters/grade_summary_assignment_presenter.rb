@@ -43,9 +43,9 @@ class GradeSummaryAssignmentPresenter
     @originality_reports.present?
   end
 
-  def hide_distribution_graphs?
-    submission_count = @summary.assignment_stats[assignment.id]&.count || 0
-    submission_count < 5 || assignment.context.hide_distribution_graphs?
+  def show_distribution_graph?
+    @assignment.score_statistic = @summary.assignment_stats[assignment.id] # Avoid another query
+    @assignment.can_view_score_statistics?(@current_user)
   end
 
   def is_unread?

@@ -49,6 +49,7 @@ class OutcomesController < ApplicationController
            })
 
     set_tutorial_js_env
+    mastery_scales_js_env
   end
 
   def show

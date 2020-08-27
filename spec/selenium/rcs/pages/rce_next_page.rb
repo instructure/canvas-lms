@@ -414,6 +414,20 @@ module RCENextPage
     f('.tox-editor-container iframe')['id']
   end
 
+  # ---- menubar items ---
+  def menubar_button(menu_name)
+    fj("[role='menubar'] button[role='menuitem']:contains('#{menu_name}')")
+  end
+
+  def menubar_menu_item_css(item_name)
+    "[role='menuitem'][title='#{item_name}']"
+  end
+
+  def menubar_menu_item(item_name)
+    # works for sub-menus too
+    f(menubar_menu_item_css(item_name))
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -747,5 +761,19 @@ module RCENextPage
       JS
 
     driver.execute_script script, id
+  end
+
+  # menubar stuff
+  def menubar_open_menu(menu_name)
+    menubar_button(menu_name).click
+  end
+
+  def click_menubar_menu_item(item_name)
+    menubar_menu_item(item_name).click
+  end
+
+  def click_menubar_submenu_item(menu_name, item_name)
+    menubar_button(menu_name).click
+    menubar_menu_item(item_name).click
   end
 end

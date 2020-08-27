@@ -28,8 +28,21 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
   describe "mapping from event stream record" do
     let(:submission_record){ graded_submission_model }
     let(:es_record){ Auditors::GradeChange::Record.generate(submission_record) }
+    let(:grading_period) do
+      root_account = submission_record.assignment.context.root_account
+      grading_period_group = root_account.grading_period_groups.create!
+      now = Time.zone.now
+
+      grading_period_group.grading_periods.create!(
+        close_date: 1.week.from_now(now),
+        end_date: 1.week.from_now(now),
+        start_date: 1.week.ago(now),
+        title: "asdf"
+      )
+    end
 
     it "is creatable from an event_stream record of the correct type" do
+      submission_record.update!(grading_period: grading_period)
       ar_rec = Auditors::ActiveRecord::GradeChangeRecord.create_from_event_stream!(es_record)
       expect(ar_rec.id).to_not be_nil
       expect(ar_rec.uuid).to eq(es_record.id)
@@ -48,6 +61,12 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
       expect(ar_rec.submission_version_number).to eq(submission_record.version_number)
       expect(ar_rec.version_number).to eq(submission_record.version_number)
       expect(ar_rec.created_at).to_not be_nil
+      expect(ar_rec.grading_period_id).to eq(grading_period.id)
+    end
+
+    it "saves the grading period ID as null if it receives a placeholder value" do
+      ar_rec = Auditors::ActiveRecord::GradeChangeRecord.create_from_event_stream!(es_record)
+      expect(ar_rec.grading_period_id).to be nil
     end
 
     it "is updatable from ES record" do

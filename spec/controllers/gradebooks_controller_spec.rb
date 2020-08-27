@@ -1728,13 +1728,6 @@ describe GradebooksController do
       expect(assigns[:assignment]).to eql(@assignment)
     end
 
-    it "assigns the @progress variable for the template" do
-      progress = Progress.new(context: @assignment, completion: 100)
-      allow_any_instance_of(Assignment).to receive(:submission_reupload_progress).and_return(progress)
-      get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
-      expect(assigns[:progress]).to eql(progress)
-    end
-
     it "redirects to the assignment page when the course does not allow gradebook uploads" do
       allow_any_instance_of(Course).to receive(:allows_gradebook_uploads?).and_return(false)
       get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}

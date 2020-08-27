@@ -113,6 +113,17 @@ describe OutcomeProficiencyApiController, type: :request do
       it 'creates proficiency on account' do
         expect(@account.reload.outcome_proficiency).not_to be_nil
       end
+
+      context 'restores a soft deleted outcome_proficiency' do
+        before :once do
+          @proficiency = outcome_proficiency_model(@account)
+          @proficiency.destroy
+        end
+
+        it 'updates ratings and restores the soft deleted record' do
+          expect(@proficiency.reload.workflow_state).to eq 'active'
+        end
+      end
     end
 
     context 'update proficiencies' do

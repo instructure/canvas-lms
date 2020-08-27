@@ -222,6 +222,26 @@ describe Auditors::GradeChange do
       expect(@event.points_possible_after).to eq 15
     end
 
+    it "records the grading period ID of the affected submission if it has one" do
+      grading_period_group = @account.grading_period_groups.create!
+      now = Time.zone.now
+      grading_period = grading_period_group.grading_periods.create!(
+        close_date: 1.week.from_now(now),
+        end_date: 1.week.from_now(now),
+        start_date: 1.week.ago(now),
+        title: "a"
+      )
+
+      @submission.update!(grading_period: grading_period)
+      @event = Auditors::GradeChange.record(submission: @submission)
+      expect(@event.grading_period_id).to eq @submission.grading_period_id
+    end
+
+    it "records a placeholder value for the grading period ID if there is no grading period" do
+      @event = Auditors::GradeChange.record(submission: @submission)
+      expect(@event.grading_period_id).to eq 0
+    end
+
     describe "options forwarding" do
       before do
         record = Auditors::GradeChange::Record.new(

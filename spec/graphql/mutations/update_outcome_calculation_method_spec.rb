@@ -79,8 +79,6 @@ describe Mutations::UpdateOutcomeCalculationMethod do
     original_record.destroy
     query = <<~QUERY
       id: #{original_record.id}
-      contextType: "Course"
-      contextId: #{@course.id}
       calculationMethod: "highest"
       calculationInt: null
     QUERY
@@ -102,41 +100,15 @@ describe Mutations::UpdateOutcomeCalculationMethod do
     it "requires manage_outcomes permission" do
       query = <<~QUERY
         id: #{original_record.id}
-        contextType: "Course"
-        contextId: #{@course.id}
         calculationMethod: "highest"
       QUERY
       result = execute_with_input(query, user_executing: @student)
       expect_error(result, 'insufficient permission')
     end
 
-    it "invalid context type" do
-      query = <<~QUERY
-        id: #{original_record.id}
-        contextType: "Foobar"
-        contextId: 1
-        calculationMethod: "highest"
-      QUERY
-      result = execute_with_input(query)
-      expect_error(result, 'invalid context type')
-    end
-
-    it "invalid context id" do
-      query = <<~QUERY
-        id: #{original_record.id}
-        contextType: "Course"
-        contextId: -100
-        calculationMethod: "highest"
-      QUERY
-      result = execute_with_input(query)
-      expect_error(result, 'context not found')
-    end
-
     it "invalid calculation method" do
       query = <<~QUERY
         id: #{original_record.id}
-        contextType: "Course"
-        contextId: #{@course.id}
         calculationMethod: "foobaz"
       QUERY
       result = execute_with_input(query)
@@ -146,45 +118,11 @@ describe Mutations::UpdateOutcomeCalculationMethod do
     it "invalid calculation int" do
       query = <<~QUERY
         id: #{original_record.id}
-        contextType: "Course"
-        contextId: #{@course.id}
         calculationMethod: "highest"
         calculationInt: 100
       QUERY
       result = execute_with_input(query)
       expect_error(result, 'invalid calculation_int for this calculation_method')
-    end
-
-    context "with another course" do
-      let(:other_course) { @account.courses.create! }
-
-      context "with teacher enrolled in course" do
-        before { other_course.enroll_teacher(@teacher, enrollment_state: 'active') }
-
-        it "fails to update context" do
-          new_record = outcome_calculation_method_model(other_course)
-          query = <<~QUERY
-            id: #{new_record.id}
-            contextType: "Course"
-            contextId: #{@course.id}
-          QUERY
-          result = execute_with_input(query)
-          expect_error(result, 'has already been taken')
-        end
-      end
-
-      context "with teacher not in course" do
-        it "fails to update context" do
-          new_record = outcome_calculation_method_model(other_course)
-          query = <<~QUERY
-            id: #{new_record.id}
-            contextType: "Course"
-            contextId: #{@course.id}
-          QUERY
-          result = execute_with_input(query)
-          expect_error(result, 'insufficient permission')
-        end
-      end
     end
   end
 end

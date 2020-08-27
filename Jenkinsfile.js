@@ -51,8 +51,7 @@ def makeKarmaStage(group, ciNode, ciTotal) {
 def cleanupFn() {
   try {
     archiveArtifacts artifacts: 'tmp/**/*.xml'
-    def reports = load('build/new-jenkins/groovy/reports.groovy')
-    reports.junitSafe("tmp/**/*.xml")
+    junit "tmp/**/*.xml"
     sh 'find ./tmp -path "*.xml"'
   } finally {
     execute 'bash/docker-cleanup.sh --allow-failure'

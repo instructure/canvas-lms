@@ -224,7 +224,12 @@
 
 @mixin grid-core-span-x($gridColumns, $gridColumnWidth, $gridGutterWidth) {
   @while $gridColumns > 0 {
-    .span#{$gridColumns} { @include grid-core-span($gridColumns, $gridColumnWidth, $gridGutterWidth)}
+    @media (min-width: 768px) {
+      .span#{$gridColumns} { @include grid-core-span($gridColumns, $gridColumnWidth, $gridGutterWidth) }
+    }
+    @media (max-width: 767px) {
+      .span#{$gridColumns} { width: 100% }
+    }
     $gridColumns: $gridColumns - 1;
   }
 }
@@ -256,7 +261,12 @@
       min-height: $inputHeight;
       @include box-sizing(border-box);
       float: direction(left);
-      margin-#{direction(left)}: $fluidGridGutterWidth;
+      @media (min-width: 768px) {
+        margin-#{direction(left)}: $fluidGridGutterWidth;
+      }
+      @media (max-width: 767px) {
+        margin-#{direction(left)}: 0;
+      }
     }
     [class*="span"]:first-child {
       margin-#{direction(left)}: 0;
@@ -275,7 +285,12 @@
 
 @mixin grid-fluid-span-x($gridColumns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
   @while $gridColumns > 0 {
-    .span#{$gridColumns} { @include grid-fluid-span($gridColumns, $fluidGridColumnWidth, $fluidGridGutterWidth); }
+    @media (min-width: 768px) {
+      .span#{$gridColumns} { @include grid-fluid-span($gridColumns, $fluidGridColumnWidth, $fluidGridGutterWidth); }
+    }
+    @media (max-width: 767px) {
+      .span#{$gridColumns} { width: 100% }
+    }
     $gridColumns: $gridColumns - 1;
   }
 }

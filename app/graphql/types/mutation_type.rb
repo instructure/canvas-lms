@@ -52,6 +52,9 @@ class Types::MutationType < Types::ApplicationObjectType
     Sets the post policy for the course, with an option to override and delete
     existing assignment post policies.
   DESC
+  field :create_outcome_proficiency, mutation: Mutations::CreateOutcomeProficiency
+  field :update_outcome_proficiency, mutation: Mutations::UpdateOutcomeProficiency
+  field :delete_outcome_proficiency, mutation: Mutations::DeleteOutcomeProficiency
   field :create_outcome_calculation_method, mutation: Mutations::CreateOutcomeCalculationMethod
   field :update_outcome_calculation_method, mutation: Mutations::UpdateOutcomeCalculationMethod
   field :delete_outcome_calculation_method, mutation: Mutations::DeleteOutcomeCalculationMethod

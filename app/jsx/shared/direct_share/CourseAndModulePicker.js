@@ -21,6 +21,7 @@ import I18n from 'i18n!course_and_module_picker'
 import React from 'react'
 import {func, string, bool} from 'prop-types'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 
 import useManagedCourseSearchApi from '../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi from '../effects/useModuleCourseSearchApi'
@@ -51,6 +52,16 @@ export default function CourseAndModulePicker({
           onItemSelected={setSelectedCourse}
           renderLabel={I18n.t('Select a Course')}
           itemSearchFunction={useManagedCourseSearchApi}
+          renderOption={item => {
+            return (
+              <View>
+                {item.name}
+                <View as="p" margin="none" padding="none">
+                  <Text size="small">{item.course_code}</Text>
+                </View>
+              </View>
+            )
+          }}
         />
       </View>
       <View as="div" padding="0 0 small 0">
@@ -60,6 +71,16 @@ export default function CourseAndModulePicker({
             renderLabel={I18n.t('Select a Module (optional)')}
             itemSearchFunction={useModuleCourseSearchApi}
             contextId={selectedCourseId || null}
+            renderOption={item => {
+              return (
+                <View>
+                  {item.name}
+                  <View as="p" margin="none" padding="none">
+                    <Text size="small">{item.course_code}</Text>
+                  </View>
+                </View>
+              )
+            }}
           />
         )}
       </View>

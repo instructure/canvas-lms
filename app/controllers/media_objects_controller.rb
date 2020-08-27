@@ -124,15 +124,17 @@ class MediaObjectsController < ApplicationController
       course = Course.find(params[:course_id])
       root_folder = Folder.root_folders(course).first
       if root_folder.grants_right?(@current_user, :read_contents)
-        # return all media objects with one visible matching attachment in course
-        scope = MediaObject.active.where(:context => course).
-          where("EXISTS (?)", Attachments::ScopedToUser.new(course, @current_user).scope.
-            where("attachments.media_entry_id=media_objects.media_id"))
+        # if the user has access to the course's root folder, let's
+        # assume they have access to the course's media, even if it's
+        # media not associated with an Attachment in there
+        scope = MediaObject.active.where(:context => course)
+        url = api_v1_course_media_objects_url
       else
         return render_unauthorized_action # not allowed to view files in the course
       end
     else
-      scope = MediaObject.active.where(user: @current_user)
+      scope = MediaObject.active.where(context: @current_user)
+      url = api_v1_media_objects_url
     end
 
     order_dir = params[:order] == "desc" ? "desc" : "asc"
@@ -141,7 +143,7 @@ class MediaObjectsController < ApplicationController
     scope = scope.order(order_by => order_dir)
 
     exclude = params[:exclude] || []
-    media_objects = Api.paginate(scope, self, api_v1_media_objects_url).
+    media_objects = Api.paginate(scope, self, url).
       map{ |mo| media_object_api_json(mo, @current_user, session, exclude)}
     render :json => media_objects
   end

@@ -35,7 +35,6 @@ class CourseForMenuPresenter
 
   def to_h
     position = @user.dashboard_positions[course.asset_string]
-    show_favorites = @user.account.feature_enabled?(:unfavorite_course_from_dashboard)
 
     observee = if course.primary_enrollment_type == 'ObserverEnrollment'
       ObserverEnrollment.observed_students(course, @user)&.keys&.map(&:name).join(', ')
@@ -53,7 +52,7 @@ class CourseForMenuPresenter
       enrollmentType: course.primary_enrollment_type,
       observee: observee,
       id: course.id,
-      isFavorited: show_favorites && course.favorite_for_user?(@user),
+      isFavorited: course.favorite_for_user?(@user),
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
       position: position.present? ? position.to_i : nil
     }.tap do |hash|

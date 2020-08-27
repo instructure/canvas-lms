@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "Allinea a destra"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Allineamento e rientro"
-    },
     "all_4321c3a1": {
         "message": "Tutto"
     },
@@ -145,9 +142,6 @@
     },
     "canvas_planner_98ed106": {
         "message": "Canvas Planner"
-    },
-    "canvas_plugins_705a5016": {
-        "message": "Plug-in Canvas"
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Scegli un file di sottotitoli"
@@ -292,6 +286,9 @@
     },
     "dimensions_45ddb7b7": {
         "message": "Dimensioni"
+    },
+    "directionality_26ae9e08": {
+        "message": "Direzionalità"
     },
     "disable_in_line_preview_2a675175": {
         "message": "Disattivare l’anteprima in linea."
@@ -473,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Struttura ad albero delle cartelle"
     },
+    "format_4247a9c5": {
+        "message": "Formato"
+    },
     "formatting_5b143aa8": {
         "message": "Formattazione in corso"
     },
@@ -571,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "In ritardo"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Da sinistra a destra"
     },
     "link_7262adec": {
         "message": "Link"
@@ -860,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Editor di contenuti avanzati"
     },
+    "right_to_left_9cfb092a": {
+        "message": "Da destra a sinistra"
+    },
     "save_11a80ec3": {
         "message": "Salva"
     },
@@ -904,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Dimensioni"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "La dimensione del file { file } è maggiore della dimensione massima consentita di { max } MB."
     },
     "small_b070434a": {
         "message": "Piccolo"

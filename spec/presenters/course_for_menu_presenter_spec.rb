@@ -72,8 +72,7 @@ describe CourseForMenuPresenter do
       expect(h[:shortName]).to eq 'nickname'
     end
 
-    it 'sets isFavorited to true if course is favorited and unfavorite_course_from_dashboard flag enabled' do
-      user.account.enable_feature!(:unfavorite_course_from_dashboard)
+    it 'sets isFavorited to true if course is favorited' do
       course.enroll_student(user)
       Favorite.create!(user: user, context: course)
       cs_presenter = CourseForMenuPresenter.new(course, user, account)
@@ -81,23 +80,7 @@ describe CourseForMenuPresenter do
       expect(h[:isFavorited]).to eq true
     end
 
-    it 'sets isFavorited to false if course is favorited and unfavorite_course_from-dashboard flag disabled' do
-      course.enroll_student(user)
-      Favorite.create!(user: user, context: course)
-      cs_presenter = CourseForMenuPresenter.new(course, user, account)
-      h = cs_presenter.to_h
-      expect(h[:isFavorited]).to eq false
-    end
-
-    it 'sets isFavorited to false if course is unfavorited and unfavorite_course_from_dashboard flag enabled' do
-      user.account.enable_feature!(:unfavorite_course_from_dashboard)
-      course.enroll_student(user)
-      cs_presenter = CourseForMenuPresenter.new(course, user, account)
-      h = cs_presenter.to_h
-      expect(h[:isFavorited]).to eq false
-    end
-
-    it 'sets isFavorited to false if course is unfavorited and unfavorite_course_from_dashboard flag disabled' do
+    it 'sets isFavorited to false if course is unfavorited' do
       course.enroll_student(user)
       cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h

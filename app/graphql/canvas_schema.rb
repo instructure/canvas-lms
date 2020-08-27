@@ -63,6 +63,8 @@ class CanvasSchema < GraphQL::Schema
     when Attachment then Types::FileType
     when DiscussionTopic then Types::DiscussionType
     when Quizzes::Quiz then Types::QuizType
+    when OutcomeCalculationMethod then Types::OutcomeCalculationMethodType
+    when OutcomeProficiency then Types::OutcomeProficiencyType
     when Progress then Types::ProgressType
     when Rubric then Types::RubricType
     when MediaObject then Types::MediaObjectType

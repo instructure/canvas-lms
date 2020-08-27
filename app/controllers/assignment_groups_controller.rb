@@ -101,9 +101,10 @@ class AssignmentGroupsController < ApplicationController
   # Returns the paginated list of assignment groups for the current context.
   # The returned groups are sorted by their position field.
   #
-  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"|"observed_users"|"can_edit"]
+  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"|"observed_users"|"can_edit"|"score_statistics"]
   #  Associations to include with the group. "discussion_topic", "all_dates", "can_edit",
   #  "assignment_visibility" & "submission" are only valid if "assignments" is also included.
+  #  "score_statistics" requires that the "assignments" and "submission" options are included.
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #  If "observed_users" is passed along with "assignments" and "submission", submissions for observed users will also be included as an array.
   #
@@ -344,6 +345,7 @@ class AssignmentGroupsController < ApplicationController
 
   def index_groups_json(context, current_user, groups, assignments, submissions = [])
     include_overrides = include_params.include?('overrides')
+    include_score_statistics = include_params.include?('score_statistics')
 
     assignments_by_group = assignments.group_by(&:assignment_group_id)
     preloaded_attachments = user_content_attachments(assignments, context)
@@ -368,6 +370,7 @@ class AssignmentGroupsController < ApplicationController
         assignment_visibilities: assignment_visibilities(context, assignments),
         exclude_response_fields: assignment_excludes,
         include_overrides: include_overrides,
+        include_score_statistics: include_score_statistics,
         submissions: submissions,
         closed_grading_period_hash: closed_grading_period_hash,
         master_course_status: mc_status

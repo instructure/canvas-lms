@@ -136,7 +136,7 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     @course.soft_conclude!
     @course.save!
     expect(DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView).
-      to receive(:handle_concluded_students).with(@course, [@active_student.id, @concluded_student.id])
+      to receive(:handle_concluded_students).with(@course, a_collection_containing_exactly(@active_student.id, @concluded_student.id))
     DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.run
   end
 end

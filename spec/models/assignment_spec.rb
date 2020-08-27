@@ -6487,6 +6487,15 @@ describe Assignment do
       expect(results[:ignored_files]).to be_empty
     end
 
+    it "assigns an anonymous_id for each submission" do
+      student = @students.first
+      submit_homework(student)
+
+      generate_comments(@teacher)
+      submission = @assignment.submission_reupload_progress.results.dig(:comments, 0, :submission)
+      expect(submission).to have_key :anonymous_id
+    end
+
     it "should work for groups" do
       s1, s2 = @students
 

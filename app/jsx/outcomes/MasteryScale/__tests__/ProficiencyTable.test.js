@@ -15,319 +15,223 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash'
 import $ from 'jquery'
 import React from 'react'
-import axios from 'axios'
-import {shallow} from 'enzyme'
-import waitForExpect from 'wait-for-expect'
+import {render, fireEvent, wait, within} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
 
 const defaultProps = {
-  accountId: '1'
+  update: () => Promise.resolve()
 }
 
-let getSpy
-
 describe('default proficiency', () => {
+  let flashMock
   beforeEach(() => {
-    const err = _.assign(new Error(), {response: {status: 404}})
-    getSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject(err))
+    flashMock = jest.spyOn($, 'screenReaderFlashMessage')
   })
 
   afterEach(() => {
-    getSpy.mockRestore()
+    flashMock.mockRestore()
   })
 
   it('renders the ProficiencyRating component', () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    expect(wrapper).toMatchSnapshot()
+    const {getByText} = render(<ProficiencyTable {...defaultProps} />)
+    expect(getByText('Proficiency Rating')).not.toBeNull()
   })
 
-  it('renders loading at startup', () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    expect(wrapper.find('Spinner')).toHaveLength(1)
+  it('renders five ratings', () => {
+    const {getAllByLabelText} = render(<ProficiencyTable {...defaultProps} />)
+    const inputs = getAllByLabelText(/Change description/)
+    expect(inputs.length).toEqual(5)
   })
 
-  it('render billboard after loading', async () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    await waitForExpect(() => {
-      expect(wrapper.find('Billboard')).toHaveLength(1)
-    })
+  it('sets focus on mastery on first row only', async () => {
+    const {getAllByLabelText} = render(<ProficiencyTable {...defaultProps} />)
+    const inputs = getAllByLabelText(/Change mastery/)
+    const firstMastery = inputs[0]
+    await wait(() => expect(document.activeElement).toEqual(firstMastery))
   })
 
-  it('renders five ratings', done => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(5)
-      done()
-    }, 1)
+  it('clicking button adds rating', () => {
+    const {getByText, getAllByLabelText} = render(<ProficiencyTable {...defaultProps} />)
+    const button = getByText(/Add proficiency rating/)
+    fireEvent.click(button)
+    const inputs = getAllByLabelText(/Change description/)
+    expect(inputs.length).toEqual(6)
   })
 
-  it('sets focusField on mastery on first rating only', done => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .at(0)
-          .prop('focusField')
-      ).toBe('mastery')
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .at(1)
-          .prop('focusField')
-      ).toBeNull()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .at(2)
-          .prop('focusField')
-      ).toBeNull()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .at(3)
-          .prop('focusField')
-      ).toBeNull()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .at(4)
-          .prop('focusField')
-      ).toBeNull()
-      done()
-    }, 1)
+  it('clicking add rating button flashes SR message', () => {
+    const {getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const button = getByText(/Add proficiency rating/)
+    fireEvent.click(button)
+    expect(flashMock).toHaveBeenCalledTimes(1)
   })
 
-  it('clicking button adds rating', done => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(6)
-      done()
-    }, 1)
+  it('handling delete rating removes rating and flashes SR message', () => {
+    const {getAllByText} = render(<ProficiencyTable {...defaultProps} />)
+    const button = getAllByText(/Delete proficiency rating/)[0]
+    fireEvent.click(button)
+    expect(flashMock).toHaveBeenCalledTimes(1)
   })
 
-  it('clicking add rating button flashes SR message', done => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
-      expect(flashMock).toHaveBeenCalledTimes(1)
-      flashMock.mockRestore()
-      done()
-    }, 1)
+  it('setting blank description sets error', async () => {
+    jest.useFakeTimers()
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
+    const masteryField = getByDisplayValue('Mastery')
+    fireEvent.change(masteryField, {target: {value: ''}})
+    jest.advanceTimersByTime(1000)
+    const error = await within(masteryField.closest('td')).findByText(
+      'Missing required description'
+    )
+    expect(error).not.toBeNull()
   })
 
-  it('handling delete rating removes rating and flashes SR message', done => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.instance().handleDelete(1)()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(4)
-      expect(flashMock).toHaveBeenCalledTimes(1)
-      flashMock.mockRestore()
-      done()
-    }, 1)
+  it('setting blank points sets error', async () => {
+    jest.useFakeTimers()
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
+    const row = getByDisplayValue('Mastery').closest('tr')
+    const pointsInput = within(row).getByLabelText(/Change points/)
+    fireEvent.change(pointsInput, {target: {value: ''}})
+    jest.advanceTimersByTime(1000)
+    const error = await within(row).findByText('Invalid points')
+    expect(error).not.toBeNull()
   })
 
-  it('setting blank description sets error', done => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.instance().handleDescriptionChange(0)('')
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .first()
-          .prop('descriptionError')
-      ).toBe('Missing required description')
-      done()
-    }, 1)
+  it('setting invalid points sets error', async () => {
+    jest.useFakeTimers()
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
+    const row = getByDisplayValue('Mastery').closest('tr')
+    const pointsInput = within(row).getByLabelText(/Change points/)
+    fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
+    jest.advanceTimersByTime(1000)
+    const error = await within(row).findByText('Invalid points')
+    expect(error).not.toBeNull()
   })
 
-  it('setting blank points sets error', done => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.instance().handlePointsChange(0)('')
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .first()
-          .prop('pointsError')
-      ).toBe('Invalid points')
-      done()
-    }, 1)
+  it('setting negative points sets error', async () => {
+    jest.useFakeTimers()
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
+    const row = getByDisplayValue('Mastery').closest('tr')
+    const pointsInput = within(row).getByLabelText(/Change points/)
+    fireEvent.change(pointsInput, {target: {value: '-1'}})
+    jest.advanceTimersByTime(1000)
+    const error = await within(row).findByText('Negative points')
+    expect(error).not.toBeNull()
   })
 
-  it('setting invalid points sets error', done => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.instance().handlePointsChange(0)('1.1.1')
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .first()
-          .prop('pointsError')
-      ).toBe('Invalid points')
-      done()
-    }, 1)
+  it('calls update on change', async () => {
+    jest.useFakeTimers()
+    const updateSpy = jest.fn(() => Promise.resolve())
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
+    const masteryField = getByDisplayValue('Mastery')
+    fireEvent.change(masteryField, {target: {value: 'Mastery2'}})
+    jest.advanceTimersByTime(1000)
+    expect(updateSpy).toHaveBeenCalled()
   })
 
-  it('setting negative points sets error', done => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.instance().handlePointsChange(0)('-1')
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .first()
-          .prop('pointsError')
-      ).toBe('Negative points')
-      done()
-    }, 1)
+  it('empty rating description does not call update', () => {
+    jest.useFakeTimers()
+    const updateSpy = jest.fn(() => Promise.resolve())
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
+    const masteryField = getByDisplayValue('Mastery')
+    fireEvent.change(masteryField, {target: {value: ''}})
+    jest.advanceTimersByTime(1000)
+    expect(updateSpy).not.toHaveBeenCalled()
   })
 
-  it('sends POST on submit', done => {
-    const postSpy = jest
-      .spyOn(axios, 'post')
-      .mockImplementation(() => Promise.resolve({status: 200}))
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
-      expect(axios.post).toHaveBeenCalledTimes(1)
-      postSpy.mockRestore()
-      done()
-    }, 1)
+  it('empty rating points does not call update', () => {
+    jest.useFakeTimers()
+    const updateSpy = jest.fn(() => Promise.resolve())
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} updateSpy={updateSpy} />)
+    const row = getByDisplayValue('Mastery').closest('tr')
+    const pointsInput = within(row).getByLabelText(/Change points/)
+    fireEvent.change(pointsInput, {target: {value: ''}})
+    jest.advanceTimersByTime(1000)
+    expect(updateSpy).not.toHaveBeenCalled()
   })
 
-  it('empty rating description generates errors', () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    wrapper.instance().handleDescriptionChange(0)('')
-    expect(wrapper.instance().checkForErrors()).toBe(true)
+  it('invalid rating points does not call update', () => {
+    jest.useFakeTimers()
+    const updateSpy = jest.fn(() => Promise.resolve())
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} updateSpy={updateSpy} />)
+    const row = getByDisplayValue('Mastery').closest('tr')
+    const pointsInput = within(row).getByLabelText(/Change points/)
+    fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
+    jest.advanceTimersByTime(1000)
+    expect(updateSpy).not.toHaveBeenCalled()
   })
 
-  it('empty rating points generates errors', () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    wrapper.instance().handlePointsChange(0)('')
-    expect(wrapper.instance().checkForErrors()).toBe(true)
+  it('increasing rating points does not call update', () => {
+    jest.useFakeTimers()
+    const updateSpy = jest.fn(() => Promise.resolve())
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} updateSpy={updateSpy} />)
+    const row = getByDisplayValue('Mastery').closest('tr')
+    const pointsInput = within(row).getByLabelText(/Change points/)
+    fireEvent.change(pointsInput, {target: {value: '1000'}})
+    jest.advanceTimersByTime(1000)
+    expect(updateSpy).not.toHaveBeenCalled()
   })
 
-  it('invalid rating points generates errors', () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    wrapper.instance().handlePointsChange(0)('1.1.1')
-    expect(wrapper.instance().checkForErrors()).toBe(true)
-  })
-
-  it('increasing rating points generates errors', () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    wrapper.instance().handlePointsChange(1)('100')
-    expect(wrapper.instance().checkForErrors()).toBe(true)
-  })
-
-  it('negative rating points leaves state invalid', () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    wrapper.instance().handlePointsChange(0)('-1')
-    expect(wrapper.instance().isStateValid()).toBe(false)
+  it('negative rating points does not call update', () => {
+    jest.useFakeTimers()
+    const updateSpy = jest.fn(() => Promise.resolve())
+    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} updateSpy={updateSpy} />)
+    const row = getByDisplayValue('Mastery').closest('tr')
+    const pointsInput = within(row).getByLabelText(/Change points/)
+    fireEvent.change(pointsInput, {target: {value: '-10'}})
+    jest.advanceTimersByTime(1000)
+    expect(updateSpy).not.toHaveBeenCalled()
   })
 })
 
 describe('custom proficiency', () => {
   it('renders two ratings that are deletable', () => {
-    const promise = Promise.resolve({
-      status: 200,
-      data: {
-        ratings: [
-          {
-            description: 'Great',
-            points: 10,
-            color: '0000ff',
-            mastery: true
-          },
-          {
-            description: 'Poor',
-            points: 0,
-            color: 'ff0000',
-            mastery: false
-          }
-        ]
+    const customProficiencyProps = {
+      ...defaultProps,
+      proficiency: {
+        proficiencyRatingsConnection: {
+          nodes: [
+            {
+              description: 'Great',
+              points: 10,
+              color: '0000ff',
+              mastery: true
+            },
+            {
+              description: 'Poor',
+              points: 0,
+              color: 'ff0000',
+              mastery: false
+            }
+          ]
+        }
       }
-    })
-    const spy = jest.spyOn(axios, 'get').mockImplementation(() => promise)
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    return promise.then(() => {
-      spy.mockRestore()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(2)
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .first()
-          .prop('disableDelete')
-      ).toBeFalsy()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .last()
-          .prop('disableDelete')
-      ).toBeFalsy()
-    })
+    }
+    const {getAllByText} = render(<ProficiencyTable {...customProficiencyProps} />)
+    const deleteButtons = getAllByText(/Delete proficiency rating/).map(el => el.closest('button'))
+    expect(deleteButtons.length).toEqual(2)
+    expect(deleteButtons.some(btn => btn.disabled)).toEqual(false)
   })
 
   it('renders one rating that is not deletable', () => {
-    const promise = Promise.resolve({
-      status: 200,
-      data: {
-        ratings: [
-          {
-            description: 'Uno',
-            points: 1,
-            color: '0000ff',
-            mastery: true
-          }
-        ]
+    const props = {
+      ...defaultProps,
+      proficiency: {
+        proficiencyRatingsConnection: {
+          nodes: [
+            {
+              description: 'Uno',
+              points: 1,
+              color: '0000ff',
+              mastery: true
+            }
+          ]
+        }
       }
-    })
-    const spy = jest.spyOn(axios, 'get').mockImplementation(() => promise)
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    return promise.then(() => {
-      spy.mockRestore()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(1)
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .first()
-          .prop('disableDelete')
-      ).toBeTruthy()
-    })
+    }
+    const {getAllByText} = render(<ProficiencyTable {...props} />)
+    const deleteButtons = getAllByText(/Delete proficiency rating/).map(el => el.closest('button'))
+    expect(deleteButtons.length).toEqual(1)
+    expect(deleteButtons[0].disabled).toEqual(true)
   })
 })

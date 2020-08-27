@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "Högerjustera"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Justering och indrag"
-    },
     "all_4321c3a1": {
         "message": "Alla"
     },
@@ -145,9 +142,6 @@
     },
     "canvas_planner_98ed106": {
         "message": "Canvas Planner"
-    },
-    "canvas_plugins_705a5016": {
-        "message": "Canvas-plugins"
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Välj undertextfil"
@@ -292,6 +286,9 @@
     },
     "dimensions_45ddb7b7": {
         "message": "Dimensioner"
+    },
+    "directionality_26ae9e08": {
+        "message": "Dirigerbarhet"
     },
     "disable_in_line_preview_2a675175": {
         "message": "Inaktivera infogad förhandsvisning."
@@ -473,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Mappträd"
     },
+    "format_4247a9c5": {
+        "message": "Format"
+    },
     "formatting_5b143aa8": {
         "message": "Formaterar"
     },
@@ -571,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "Sen"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Vänster till höger"
     },
     "link_7262adec": {
         "message": "Länk"
@@ -860,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Redigerare för formaterat innehåll"
     },
+    "right_to_left_9cfb092a": {
+        "message": "Höger till vänster"
+    },
     "save_11a80ec3": {
         "message": "Spara"
     },
@@ -904,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Storlek"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "Storleken på { file } är större än den maximalt tillåtna storleken { max } MB för en fil."
     },
     "small_b070434a": {
         "message": "Liten"

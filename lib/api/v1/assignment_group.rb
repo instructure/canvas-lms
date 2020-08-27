@@ -63,6 +63,10 @@ module Api::V1::AssignmentGroup
           in_closed_grading_period_hash(group.context, assignments)
       end
 
+      if includes.include?('score_statistics')
+        ActiveRecord::Associations::Preloader.new.preload(assignments, :score_statistic)
+      end
+
       hash['assignments'] = assignments.map do |assignment|
         overrides = if opts[:overrides].present?
           opts[:overrides].select { |override| override.assignment_id == assignment.id }
@@ -79,6 +83,7 @@ module Api::V1::AssignmentGroup
           override_dates: opts[:override_assignment_dates],
           preloaded_user_content_attachments: user_content_attachments,
           include_visibility: includes.include?('assignment_visibility'),
+          include_score_statistics: includes.include?('score_statistics'),
           assignment_visibilities: opts[:assignment_visibilities].try(:[], assignment.id),
           exclude_response_fields: exclude_fields,
           overrides: overrides,

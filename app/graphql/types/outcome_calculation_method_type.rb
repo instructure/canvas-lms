@@ -20,7 +20,10 @@ module Types
   class OutcomeCalculationMethodType < ApplicationObjectType
     description 'Customized calculation method'
 
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface
+
+    global_id_field :id
 
     field :calculation_method, String, null: false
     field :calculation_int, Integer, null: true

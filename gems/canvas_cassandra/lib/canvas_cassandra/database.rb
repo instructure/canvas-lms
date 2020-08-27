@@ -68,12 +68,13 @@ module CanvasCassandra
     end
 
     # private Struct used to store batch information
-    class Batch < Struct.new(:statements, :args, :counter_statements, :counter_args)
+    class Batch < Struct.new(:statements, :args, :counter_statements, :counter_args, :execute_options)
       def initialize
         self.statements = []
         self.args = []
         self.counter_statements = []
         self.counter_args = []
+        self.execute_options = {}
       end
 
       def to_cql_ary(field = nil)
@@ -104,8 +105,10 @@ module CanvasCassandra
     # batched up.
     def update(query, *args)
       if in_batch?
+        execute_options = (args.last.is_a?(Hash) && args.pop) || {}
         @batch.statements << query
         @batch.args.concat args
+        @batch.execute_options.merge!(execute_options)
       else
         execute(query, *args)
       end
@@ -139,10 +142,10 @@ module CanvasCassandra
           @batch = Batch.new
           yield
           unless @batch.statements.empty?
-            execute(*@batch.to_cql_ary)
+            execute(*@batch.to_cql_ary + [@batch.execute_options])
           end
           unless @batch.counter_statements.empty?
-            execute(*@batch.to_cql_ary(:counter))
+            execute(*@batch.to_cql_ary(:counter) + [@batch.execute_options])
           end
         ensure
           @batch = nil
@@ -162,18 +165,18 @@ module CanvasCassandra
     # in other words, changes is a hash in either of these formats (mixing is ok):
     #   { "colname" => newvalue }
     #   { "colname" => [oldvalue, newvalue] }
-    def update_record(table_name, primary_key_attrs, changes, ttl_seconds=nil)
+    def update_record(table_name, primary_key_attrs, changes, ttl_seconds=nil, execute_options: {})
       batch do
-        do_update_record(table_name, primary_key_attrs, changes, ttl_seconds)
+        do_update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: execute_options)
       end
     end
 
     # same as update_record, but preferred when doing inserts -- it skips
     # updating columns with nil values, rather than creating tombstone delete
     # records for them
-    def insert_record(table_name, primary_key_attrs, changes, ttl_seconds=nil)
+    def insert_record(table_name, primary_key_attrs, changes, ttl_seconds=nil, execute_options: {})
       changes = changes.reject { |k,v| v.is_a?(Array) ? v.last.nil? : v.nil? }
-      update_record(table_name, primary_key_attrs, changes, ttl_seconds)
+      update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: execute_options)
     end
 
     def select_value(query, *args)
@@ -222,7 +225,7 @@ module CanvasCassandra
       end
     end
 
-    def do_update_record(table_name, primary_key_attrs, changes, ttl_seconds)
+    def do_update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: {})
       primary_key_attrs = stringify_hash(primary_key_attrs)
       changes = stringify_hash(changes)
       where_clause, where_args = build_where_conditions(primary_key_attrs)
@@ -255,6 +258,7 @@ module CanvasCassandra
         update_cql = updates.map { |key,val| args << val; "#{key} = ?" }.join(", ")
         statement << " SET #{update_cql} WHERE #{where_clause}"
         args.concat where_args
+        args.concat [execute_options]
         update(statement, *args)
       end
 
@@ -263,6 +267,7 @@ module CanvasCassandra
         delete_cql = deletes.map(&:first).join(", ")
         statement = "DELETE #{delete_cql} FROM #{table_name} WHERE #{where_clause}"
         args.concat where_args
+        args.concat [execute_options]
         update(statement, *args)
       end
     end

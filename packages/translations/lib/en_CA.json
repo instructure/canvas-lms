@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "Align right"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Alignment and Indentation"
-    },
     "all_4321c3a1": {
         "message": "All"
     },
@@ -145,9 +142,6 @@
     },
     "canvas_planner_98ed106": {
         "message": "Canvas Planner"
-    },
-    "canvas_plugins_705a5016": {
-        "message": "Canvas Plugins"
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Choose caption file"
@@ -292,6 +286,9 @@
     },
     "dimensions_45ddb7b7": {
         "message": "Dimensions"
+    },
+    "directionality_26ae9e08": {
+        "message": "Directionality"
     },
     "disable_in_line_preview_2a675175": {
         "message": "Disable in-line preview."
@@ -473,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Folder tree"
     },
+    "format_4247a9c5": {
+        "message": "Format"
+    },
     "formatting_5b143aa8": {
         "message": "Formatting"
     },
@@ -571,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "Late"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Left-to-Right"
     },
     "link_7262adec": {
         "message": "Link"
@@ -860,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Rich Content Editor"
     },
+    "right_to_left_9cfb092a": {
+        "message": "Right-to-Left"
+    },
     "save_11a80ec3": {
         "message": "Save"
     },
@@ -904,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Size"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "Size of { file } is greater than the maximum { max } MB allowed file size."
     },
     "small_b070434a": {
         "message": "Small"

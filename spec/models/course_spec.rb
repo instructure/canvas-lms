@@ -1579,6 +1579,14 @@ describe Course do
     end
   end
 
+  context 'resolved_outcome_proficiency' do
+    it "retrieves account's outcome proficiency" do
+      course_model
+      method = outcome_proficiency_model(@course.root_account)
+      expect(@course.resolved_outcome_proficiency).to eq method
+    end
+  end
+
   context 'resolved_outcome_calculation_method' do
     it "retrieves account's outcome calculation method" do
       root_account = Account.create!
@@ -4953,6 +4961,13 @@ describe Course do
         end
 
         expect(@course.grants_right?(@site_admin, :manage_content)).to be_truthy
+      end
+    end
+
+    it 'should activate shard for new student view students' do
+      course_model
+      @shard1.activate do
+        expect { @course.student_view_student }.not_to raise_error
       end
     end
 

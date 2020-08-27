@@ -18,7 +18,7 @@ POSTGIS=${POSTGIS:-2.5}
 
 # postgres database with postgis preinstalled
 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $POSTGRES_IMAGE_TAG || \
-  (docker build -t $POSTGRES_IMAGE_TAG build/docker-compose/postgres && \
+  (docker build -t $POSTGRES_IMAGE_TAG --build-arg POSTGRES="$POSTGRES" build/docker-compose/postgres && \
   ./build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTGRES_IMAGE_TAG)
 
 # cassandra:2:2

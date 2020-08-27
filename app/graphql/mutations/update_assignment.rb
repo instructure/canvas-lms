@@ -63,9 +63,6 @@ class Mutations::UpdateAssignment < Mutations::AssignmentBase
     # modifies input_hash
     prepare_input_params!(input_hash, update_proxy)
 
-    # temporarily added back, but always ignored
-    input_hash.delete(:muted)
-
     module_ids = prepare_module_ids!(input_hash)
 
     # make sure to do other required updates

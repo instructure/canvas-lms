@@ -22,7 +22,7 @@ import {
   getByLabelText,
   queryByLabelText,
   queryByTestId,
-  wait
+  waitFor
 } from '@testing-library/dom'
 
 function getSizeOptions($sizeSelect) {
@@ -104,7 +104,7 @@ export default class VideoOptionsTrayDriver {
 
   async setSize(sizeText) {
     this.$sizeSelect.click()
-    await wait(() => getSizeOptions(this.$sizeSelect))
+    await waitFor(() => getSizeOptions(this.$sizeSelect))
     const $options = getSizeOptions(this.$sizeSelect)
     $options.find($option => $option.textContent.trim().includes(sizeText)).click()
   }

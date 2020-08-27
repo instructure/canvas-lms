@@ -355,7 +355,8 @@ class ContentTag < ActiveRecord::Base
           alignment_conditions[:context_type] = self.context_type
         end
 
-        if ContentTag.learning_outcome_alignments.active.where(alignment_conditions).exists?
+        @active_alignment_tags = ContentTag.learning_outcome_alignments.active.where(alignment_conditions)
+        if @active_alignment_tags.exists?
           # then don't let them delete the link
           return false
         end
@@ -367,7 +368,8 @@ class ContentTag < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     unless can_destroy?
-      raise LastLinkToOutcomeNotDestroyed.new('Link is the last link to an aligned outcome. Remove the alignment and then try again')
+      aligned_outcome = @active_alignment_tags.map(&:learning_outcome).first.short_description
+      raise LastLinkToOutcomeNotDestroyed.new "Outcome '#{aligned_outcome}' cannot be deleted because it is aligned to content."
     end
 
     context_module.remove_completion_requirement(id) if context_module

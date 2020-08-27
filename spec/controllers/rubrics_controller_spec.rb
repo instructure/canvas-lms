@@ -53,12 +53,6 @@ describe RubricsController do
         get 'index', params: {:course_id => @course.id}
         expect(assigns[:js_env][:NON_SCORING_RUBRICS]).to eq true
       end
-
-      it 'should include the account_level_mastery_scales FF' do
-        @course.root_account.enable_feature!(:account_level_mastery_scales)
-        get 'index', params: {:course_id => @course.id}
-        expect(assigns[:js_env][:ACCOUNT_LEVEL_PROFICIENCIES]).to eq true
-      end
     end
 
     describe "after a course has concluded" do

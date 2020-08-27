@@ -20,9 +20,10 @@ import '@instructure/canvas-theme'
 import React from 'react'
 import {shallow} from 'enzyme'
 import ConfirmDeleteModal from '../ConfirmDeleteModal'
+import Modal from '../../../shared/components/InstuiModal'
 
 const defaultProps = () => ({
-  selectedCount: 1,
+  pageTitles: ['page_1'],
   onConfirm: () => Promise.resolve({})
 })
 
@@ -49,4 +50,14 @@ test('shows spinner on delete', () => {
   const deleteBtn = modal.find('Button').at(1)
   deleteBtn.simulate('click')
   expect(modal.find('Spinner').exists()).toBe(true)
+})
+
+test('renders provided page titles', () => {
+  const modal = shallow(<ConfirmDeleteModal {...defaultProps()} />)
+  expect(
+    modal
+      .find(Modal.Body)
+      .render()
+      .text()
+  ).toMatch(/page_1/)
 })

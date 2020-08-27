@@ -495,6 +495,7 @@ describe "context modules" do
       end
 
       it "should show a tooltip for locked icon when module is locked", priority:"1", test_id: 255918 do
+        skip "flaky, LS-1297 (8/23/2020)"
         go_to_modules
         driver.action.move_to(f("#context_module_#{@module_2.id} .completion_status .icon-lock"), 0, 0).perform
         expect(fj('.ui-tooltip:visible')).to include_text('Locked')
@@ -523,7 +524,7 @@ describe "context modules" do
       end
 
       it "shows a tooltip when hovering over a completed icon", priority: "1", test_id: 255915 do
-        skip "flaky, LS-1297"
+        skip "flaky, LS-1297 (8/23/2020)"
         go_to_modules
         navigate_to_module_item(0, @assignment_1.title)
         driver.action.move_to(f('.ig-header-admin .completion_status .icon-check'), 0, 0).perform
@@ -570,6 +571,7 @@ describe "context modules" do
         end
 
         it "shows tool tip text when hovering over the warning icon for a min score requirement", priority: "1", test_id: 255916 do
+          skip "flaky, LS-1297 (8/23/2020)"
           grade_assignment(50)
           go_to_modules
           driver.action.move_to(f('.ig-header-admin .completion_status .icon-minimize'), 0, 0).perform
@@ -577,6 +579,7 @@ describe "context modules" do
         end
 
         it "shows tooltip warning for a min score assignemnt", priority: "1", test_id: 255917 do
+          skip "flaky, LS-1297 (8/23/2020)"
           grade_assignment(50)
           go_to_modules
           driver.action.move_to(f('.ig-row .module-item-status-icon .icon-minimize'), 0, 0).perform

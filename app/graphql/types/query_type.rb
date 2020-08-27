@@ -120,5 +120,23 @@ module Types
     def audit_logs
       Canvas::DynamoDB::DatabaseBuilder.from_config(:auditors)
     end
+
+    field :outcome_calculation_method, Types::OutcomeCalculationMethodType, null: true do
+      description "OutcomeCalculationMethod"
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("OutcomeCalculationMethod")
+    end
+    def outcome_calculation_method(id:)
+      GraphQLNodeLoader.load("OutcomeCalculationMethod", id, context)
+    end
+
+    field :outcome_proficiency, Types::OutcomeProficiencyType, null: true do
+      description "OutcomeProficiency"
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("OutcomeProficiency")
+    end
+    def outcome_proficiency(id:)
+      GraphQLNodeLoader.load("OutcomeProficiency", id, context)
+    end
   end
 end

@@ -124,7 +124,7 @@ describe GroupCategory do
   end
 
   context 'communities?' do
-    it "should be true iff the role is 'communities', regardless of name" do
+    it "should be true if the role is 'communities', regardless of name" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).not_to be_communities
       expect(account.group_categories.create(:name => 'Communities')).not_to be_communities
@@ -459,6 +459,32 @@ describe GroupCategory do
       initial_spread = [0, 1, 7]
       result_spread = [4, 5, 7]
       assert_random_group_assignment(@category, @course, initial_spread, result_spread)
+    end
+  end
+
+  context "#calculate_group_count_by_membership" do
+    before(:once) do
+      @category = @course.group_categories.create(:name => "Group Category")
+    end
+
+    it "calculates correctly for a clean split" do
+      # 10 "users"
+      allow(@category).to receive(:unassigned_users) {['u','u','u','u','u','u','u','u','u','u']}
+      # groups of 5 students
+      @category.create_group_member_count = 5
+      @category.calculate_group_count_by_membership
+      # divides into 2 groups
+      expect(@category.create_group_count).to eq 2
+    end
+
+    it "rounds up for an uneven split" do
+      # 11 "users"
+      allow(@category).to receive(:unassigned_users) {['u','u','u','u','u','u','u','u','u','u','u']}
+      # groups of 5 students
+      @category.create_group_member_count = 5
+      @category.calculate_group_count_by_membership
+      # divides into 3 groups
+      expect(@category.create_group_count).to eq 3
     end
   end
 

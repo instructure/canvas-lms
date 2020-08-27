@@ -17,13 +17,25 @@
 #
 
 require "securerandom"
+require "swearjar"
 
 class CanvasSlug
   class << self
     CHARS = ('0'..'9').to_a + ('a'..'z').to_a + ('A'..'Z').to_a
+    SJ = Swearjar.default
 
     def generate_securish_uuid(length = 40)
-      Array.new(length) { CHARS[SecureRandom.random_number(CHARS.length)] }.join
+      # Ensure we don't get naughties by looping until we get something
+      # "clean". Loop count is arbitrary, we use length as shorter strings
+      # are less likely to result in problematic strings.
+      length.times do
+        uuid = Array.new(length) { CHARS[SecureRandom.random_number(CHARS.length)] }.join
+        return uuid unless SJ.profane?(uuid)
+      end
+
+      # TODO: raise exception to allow consumer to handle
+      # raise "CanvasSlug couldn't find valid uuid after #{length} attempts"
+      return uuid
     end
 
     def generate(purpose = nil, length = 4)

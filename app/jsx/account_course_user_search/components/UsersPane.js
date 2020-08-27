@@ -27,7 +27,7 @@ import SearchMessage from './SearchMessage'
 import SRSearchMessage from './SRSearchMessage'
 import UserActions from '../actions/UserActions'
 
-const MIN_SEARCH_LENGTH = 3
+const MIN_SEARCH_LENGTH = 2
 export const SEARCH_DEBOUNCE_TIME = 750
 
 export default class UsersPane extends React.Component {

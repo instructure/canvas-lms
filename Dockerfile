@@ -4,11 +4,12 @@
 
 ARG RUBY=2.6
 
-FROM instructure/passenger-nginx-alpine:${RUBY} AS ruby-gems-only
+FROM instructure/passenger-nginx-alpine:${RUBY} AS dependencies
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12.2
 ARG ALPINE_MIRROR=http://dl-cdn.alpinelinux.org/alpine
+ARG NODE=10.19.0-r0
 
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV production
@@ -21,7 +22,9 @@ WORKDIR $APP_HOME
 COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
 COPY --chown=docker:docker Gemfile   ${APP_HOME}
 COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
+
 COPY --chown=docker:docker gems      ${APP_HOME}gems
+
 ENV GEM_HOME /home/docker/.gem/$RUBY_VERSION
 ENV PATH $GEM_HOME/bin:$PATH
 ENV BUNDLE_APP_CONFIG /home/docker/.bundle
@@ -96,16 +99,6 @@ RUN set -eux; \
   && bundle install --jobs $(nproc) \
   && rm -rf $GEM_HOME/cache
 
-FROM ruby-gems-only AS ruby-final
-COPY --chown=docker:docker . $APP_HOME
-
-FROM ruby-gems-only AS yarn-only
-LABEL maintainer="Instructure"
-
-# default alpine HTTPS mirror
-ARG ALPINE_MIRROR=https://alpine.global.ssl.fastly.net/alpine/
-ARG NODE=10.19.0-r0
-
 USER root
 RUN set -eux; \
   \
@@ -128,14 +121,11 @@ RUN set -eux; \
   && rm -rf /tmp/*
 
 USER docker
-COPY --chown=docker:docker babel.config.js    ${APP_HOME}
-COPY --chown=docker:docker build/new-jenkins  ${APP_HOME}build/new-jenkins
-COPY --chown=docker:docker package.json       ${APP_HOME}
-COPY --chown=docker:docker packages           ${APP_HOME}packages
-COPY --chown=docker:docker script             ${APP_HOME}script
-COPY --chown=docker:docker yarn.lock          ${APP_HOME}
+COPY --chown=docker:docker package.json ${APP_HOME}
+COPY --chown=docker:docker yarn.lock    ${APP_HOME}
 
-COPY --chown=docker:docker client_apps/canvas_quizzes/package.json ${APP_HOME}client_apps/canvas_quizzes/package.json
+COPY --chown=docker:docker client_apps  ${APP_HOME}client_apps
+COPY --chown=docker:docker packages     ${APP_HOME}packages
 
 RUN set -eux; \
   mkdir -p .yardoc \
@@ -175,15 +165,16 @@ RUN set -eux; \
              /home/docker/.bundler/ \
              /home/docker/.cache/yarn \
              /home/docker/.gem/ \
-  && (yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1) \
+  && (DISABLE_POSTINSTALL=1 yarn install --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --pure-lockfile --network-concurrency 1) \
   && yarn cache clean
 
-FROM yarn-only AS webpack-final
+COPY --chown=docker:docker babel.config.js ${APP_HOME}
+COPY --chown=docker:docker script          ${APP_HOME}script
+
+RUN yarn postinstall
+
+FROM dependencies AS webpack-final
 ARG JS_BUILD_NO_UGLIFY=0
 
 COPY --chown=docker:docker . ${APP_HOME}
-
-RUN set -exu; \
-  \
-  COMPILE_ASSETS_NPM_INSTALL=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets \
-  && yarn cache clean
+RUN COMPILE_ASSETS_NPM_INSTALL=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets

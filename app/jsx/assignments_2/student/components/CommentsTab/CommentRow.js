@@ -23,7 +23,7 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {SubmissionComment} from '../../graphqlData/SubmissionComment'
-import {VideoPlayer} from '@instructure/ui-media-player'
+import {MediaPlayer} from '@instructure/ui-media-player'
 
 export default function CommentRow(props) {
   const {author, mediaObject, read} = props.comment
@@ -81,7 +81,7 @@ export default function CommentRow(props) {
             {attachment.displayName}
           </Button>
         ))}
-        {mediaObject && <VideoPlayer tracks={mediaTracks} sources={mediaObject.mediaSources} />}
+        {mediaObject && <MediaPlayer tracks={mediaTracks} sources={mediaObject.mediaSources} />}
       </div>
     </div>
   )

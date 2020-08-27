@@ -704,7 +704,7 @@ $(function() {
       }
       if ($this.hasClass('precision_question_input')) {
         var val = numberHelper.parse($this.val())
-        $this.val(isNaN(val) ? '' : I18n.n(val.toPrecision(16), {strip_insignificant_zeros: true}))
+        $this.val(isNaN(val) ? '' : I18n.n(val.toPrecision(16), {strip_insignificant_zeros: true, precision: 16}))
       }
       if (update !== false) {
         quizSubmission.updateSubmission()

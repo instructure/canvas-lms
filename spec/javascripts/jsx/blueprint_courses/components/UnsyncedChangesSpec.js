@@ -99,10 +99,10 @@ test('renders the migration options component', () => {
 
 test('renders the changes properly', () => {
   const tree = mount(connect())
-  const changes = tree.find('.bcs__unsynced-item')
+  const changes = tree.find('tr[data-testid="bcs__unsynced-item"]')
   equal(changes.length, 3)
-  const locks = tree.find('.bcs__unsynced-item IconBlueprintLockSolid')
+  const locks = changes.find('IconBlueprintLockSolid')
   equal(locks.length, 1)
-  const unlocks = tree.find('.bcs__unsynced-item IconBlueprintSolid')
+  const unlocks = changes.find('IconBlueprintSolid')
   equal(unlocks.length, 2)
 })

@@ -61,7 +61,7 @@ describe 'Moderated Marking' do
 
       scroll_into_view('.toggle_full_rubric')
       f('.toggle_full_rubric').click
-      f('td.criterion_points input').send_keys('3')
+      f('td[data-testid="criterion-points"] input').send_keys('3')
       Speedgrader.expand_right_pane
       fj("span:contains('Amazing'):visible").click
       wait_for_ajaximations

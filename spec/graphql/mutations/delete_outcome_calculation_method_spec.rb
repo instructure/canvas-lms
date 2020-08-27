@@ -47,9 +47,19 @@ describe Mutations::DeleteOutcomeCalculationMethod do
     CanvasSchema.execute(mutation_command, context: context)
   end
 
-  it "deletes an outcome calculation method" do
+  it "deletes an outcome calculation method with legacy id" do
     query = <<~QUERY
       id: #{original_record.id}
+    QUERY
+    result = execute_with_input(query)
+    expect(result.dig('errors')).to be_nil
+    expect(result.dig('data', 'deleteOutcomeCalculationMethod', 'errors')).to be_nil
+    expect(result.dig('data', 'deleteOutcomeCalculationMethod', 'outcomeCalculationMethodId')).to eq original_record.id.to_s
+  end
+
+  it "deletes an outcome calculation method with relay id" do
+    query = <<~QUERY
+      id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('OutcomeCalculationMethod').call(original_record.id.to_s)}
     QUERY
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
@@ -74,7 +84,7 @@ describe Mutations::DeleteOutcomeCalculationMethod do
 
     it "invalid id" do
       query = <<~QUERY
-        id: -100
+        id: 0
       QUERY
       result = execute_with_input(query)
       expect_error(result, 'Unable to find OutcomeCalculationMethod')

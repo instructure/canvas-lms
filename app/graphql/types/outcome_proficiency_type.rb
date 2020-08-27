@@ -20,7 +20,10 @@ module Types
   class OutcomeProficiencyType < ApplicationObjectType
     description 'Customized proficiency ratings'
 
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface
+
+    global_id_field :id
 
     field :context_type, String, null: false
     field :context_id, Integer, null: false

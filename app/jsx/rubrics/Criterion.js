@@ -21,6 +21,7 @@ import _ from 'lodash'
 import {Dialog, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading, Text} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import {IconOutcomesLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-overlays'
 import I18n from 'i18n!edit_rubricCriterion'
@@ -95,6 +96,8 @@ Threshold.defaultProps = {threshold: null}
 Threshold.propTypes = {threshold: PropTypes.number}
 
 export default class Criterion extends React.Component {
+  static displayName = 'Row'
+
   state = {}
 
   closeModal = () => {
@@ -133,7 +136,7 @@ export default class Criterion extends React.Component {
           points: tier
         }
       }
-      const text = tier.points
+      const text = tier.points.toString()
       const value = numberHelper.parse(text)
       const valid = !Number.isNaN(value)
       onAssessmentChange({
@@ -215,8 +218,8 @@ export default class Criterion extends React.Component {
     const threshold = criterion.mastery_points
 
     return (
-      <tr className="rubric-criterion">
-        <th scope="row" className="description-header">
+      <Table.Row data-testid="rubric-criterion">
+        <Table.RowHeader>
           <div className="description react-rubric-cell">
             {isOutcome ? <OutcomeIcon /> : ''}
             <Text size="small" weight="normal">
@@ -234,15 +237,15 @@ export default class Criterion extends React.Component {
             />
           </div>
           {!(hidePoints || _.isNil(threshold)) ? <Threshold threshold={threshold} /> : null}
-        </th>
-        <td className="ratings">{ratings}</td>
+        </Table.RowHeader>
+        <Table.Cell>{ratings}</Table.Cell>
         {hasPointsColumn && (
-          <td className="criterion_points">
+          <Table.Cell data-testid="criterion-points">
             {pointsElement()}
             {assessing && !freeForm && !editingComments ? commentButton : null}
-          </td>
+          </Table.Cell>
         )}
-      </tr>
+      </Table.Row>
     )
   }
 }

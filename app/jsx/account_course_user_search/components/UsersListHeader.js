@@ -19,9 +19,11 @@
 import React from 'react'
 import {string, func, shape} from 'prop-types'
 import {Tooltip} from '@instructure/ui-overlays'
+import {Table} from '@instructure/ui-table'
 import {IconMiniArrowUpSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import preventDefault from 'compiled/fn/preventDefault'
+import UsersListRow from './UsersListRow'
 
 export default function UsersListHeader(props) {
   const {id, tipAsc, tipDesc, label, onUpdateFilters} = props
@@ -29,7 +31,7 @@ export default function UsersListHeader(props) {
   const newOrder = (sort === id && order === 'asc') || (!sort && id === 'username') ? 'desc' : 'asc'
 
   return (
-    <th scope="col">
+    <Table.ColHeader id={id} data-testid="UsersListHeader">
       <Tooltip tip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
         <Button
           onClick={preventDefault(() => {
@@ -50,7 +52,7 @@ export default function UsersListHeader(props) {
           )}
         </Button>
       </Tooltip>
-    </th>
+    </Table.ColHeader>
   )
 }
 
@@ -67,3 +69,5 @@ UsersListHeader.propTypes = {
     fole_filter_id: string
   }).isRequired
 }
+
+UsersListHeader.displayName = 'ColHeader'

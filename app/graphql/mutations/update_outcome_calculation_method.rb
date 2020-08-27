@@ -21,13 +21,12 @@ class Mutations::UpdateOutcomeCalculationMethod < Mutations::OutcomeCalculationM
 
   # input arguments
   argument :id, ID, required: true
-  argument :context_type, String, required: false
-  argument :context_id, ID, required: false
   argument :calculation_method, String, required: false
   argument :calculation_int, Integer, required: false
 
   def resolve(input:)
-    record = OutcomeCalculationMethod.find_by(id: input[:id])
+    record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeCalculationMethod")
+    record = OutcomeCalculationMethod.find_by(id: record_id)
     raise GraphQL::ExecutionError, "Unable to find OutcomeCalculationMethod" if record.nil?
     check_permission(record.context)
     upsert(input, record)

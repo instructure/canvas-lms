@@ -32,6 +32,8 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "MediaObject"
   value "Module"
   value "ModuleItem"
+  value "OutcomeCalculationMethod"
+  value "OutcomeProficiency"
   value "Page"
   value "PostPolicy"
   value "Progress"

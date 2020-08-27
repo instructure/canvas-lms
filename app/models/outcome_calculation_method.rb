@@ -52,4 +52,8 @@ class OutcomeCalculationMethod < ApplicationRecord
     },
     message: "invalid calculation_int for this calculation_method"
   }
+
+  def as_json(options={})
+    super(options.reverse_merge(include_root: false, only: [:id, :calculation_method, :calculation_int, :context_type, :context_id]))
+  end
 end

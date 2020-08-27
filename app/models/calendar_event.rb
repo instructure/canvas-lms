@@ -244,7 +244,7 @@ class CalendarEvent < ActiveRecord::Base
   def populate_appointment_group_defaults
     self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
     if new_record?
-      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", attr == :description ? context.description_html : context.send(attr)) }
+      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", context.send(attr)) }
       if locked?
         self.start_at = start_at_was if !new_record? && start_at_changed?
         self.end_at   = end_at_was   if !new_record? && end_at_changed?

@@ -191,6 +191,27 @@ describe AppointmentGroup do
     end
   end
 
+  context "update_appointments" do
+    before :each do
+      course_with_teacher_logged_in(:active_all => true)
+      @ag = AppointmentGroup.create!(
+          :title => "test",
+          :description => "hello",
+          :contexts => [@course],
+          :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00'],
+                                ['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
+      )
+    end
+
+    it "should update the description for each event" do
+      new_desc = "new description 1234"
+      expect(@ag.update(:description => new_desc)).to be_truthy
+      expect(@ag.appointments.size).to be 2
+      expect(@ag.appointments.first.description).to eq new_desc
+      expect(@ag.appointments.last.description).to eq new_desc
+    end
+  end
+
   context "permissions" do
     before :once do
       @course, @course2, @course3, other_course = create_courses(4, return_type: :record)

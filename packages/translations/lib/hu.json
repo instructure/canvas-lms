@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "Jobbra igazítás"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Igazítás és behúzás"
-    },
     "all_4321c3a1": {
         "message": "Összes"
     },
@@ -146,9 +143,6 @@
     "canvas_planner_98ed106": {
         "message": "Canvas Tervező"
     },
-    "canvas_plugins_705a5016": {
-        "message": "Canvas Pluginok"
-    },
     "choose_caption_file_9c45bc4e": {
         "message": "Feliratfájl választása"
     },
@@ -190,6 +184,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "Számítógép"
+    },
+    "content_1440204b": {
+        "message": "Tartalom"
     },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "A tartalom feltöltése még folyamatban van. Ha folytatja, akkor nem lesz rendesen beágyazva."
@@ -418,6 +415,9 @@
     },
     "external_links_3d9f074e": {
         "message": "Külső linkek"
+    },
+    "external_tools_6e77821": {
+        "message": "Külső eszközök"
     },
     "extra_large_b6cdf1ff": {
         "message": "Extra nagy"

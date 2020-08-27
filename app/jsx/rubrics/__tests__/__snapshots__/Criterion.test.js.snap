@@ -78,12 +78,11 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
 `;
 
 exports[`Free-form Rubric with a custom criterion by default renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -107,9 +106,9 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -136,9 +135,10 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -163,8 +163,8 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
       onPointChange={null}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Free-form Rubric with a custom criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -243,12 +243,11 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
 `;
 
 exports[`Free-form Rubric with a custom criterion when assessing renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -272,9 +271,9 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -301,9 +300,10 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -328,8 +328,8 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
       onPointChange={[Function]}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Free-form Rubric with a custom criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -408,12 +408,11 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
 `;
 
 exports[`Free-form Rubric with a custom criterion without an assessment renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -437,9 +436,9 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -451,9 +450,10 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -463,8 +463,8 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
       onPointChange={null}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the LongDescription sub-component(s) as expected 1`] = `
@@ -593,12 +593,11 @@ exports[`Free-form Rubric with a outcome criterion by default renders the Thresh
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -629,9 +628,9 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -659,9 +658,10 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -687,8 +687,8 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
       onPointChange={null}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the LongDescription sub-component(s) as expected 1`] = `
@@ -817,12 +817,11 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Th
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -853,9 +852,9 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -883,9 +882,10 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -911,8 +911,8 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
       onPointChange={[Function]}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the LongDescription sub-component(s) as expected 1`] = `
@@ -1041,12 +1041,11 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -1077,9 +1076,9 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -1091,9 +1090,10 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -1103,8 +1103,8 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
       onPointChange={null}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a custom criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -1183,12 +1183,11 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
 `;
 
 exports[`Point Rubric with a custom criterion by default renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -1212,9 +1211,9 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={false}
@@ -1280,9 +1279,10 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -1307,8 +1307,8 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
       onPointChange={null}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a custom criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -1387,12 +1387,11 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
 `;
 
 exports[`Point Rubric with a custom criterion when assessing renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -1416,9 +1415,9 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={true}
@@ -1484,9 +1483,10 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -1511,8 +1511,8 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
       onPointChange={[Function]}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a custom criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -1591,12 +1591,11 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
 `;
 
 exports[`Point Rubric with a custom criterion without an assessment renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -1620,9 +1619,9 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={false}
@@ -1660,9 +1659,10 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -1672,8 +1672,8 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
       onPointChange={null}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the LongDescription sub-component(s) as expected 1`] = `
@@ -1802,12 +1802,11 @@ exports[`Point Rubric with a outcome criterion by default renders the Threshold 
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -1838,9 +1837,9 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={false}
@@ -1907,9 +1906,10 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -1935,8 +1935,8 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
       onPointChange={null}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the LongDescription sub-component(s) as expected 1`] = `
@@ -2065,12 +2065,11 @@ exports[`Point Rubric with a outcome criterion when assessing renders the Thresh
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -2101,9 +2100,9 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={true}
@@ -2170,9 +2169,10 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -2198,8 +2198,8 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
       onPointChange={[Function]}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the LongDescription sub-component(s) as expected 1`] = `
@@ -2328,12 +2328,11 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -2364,9 +2363,9 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={false}
@@ -2404,9 +2403,10 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -2416,6 +2416,6 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       onPointChange={null}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;

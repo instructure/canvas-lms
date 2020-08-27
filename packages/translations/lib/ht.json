@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "Aliyen adwat"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Aliyman ak Retrè"
-    },
     "all_4321c3a1": {
         "message": "Tout"
     },
@@ -145,9 +142,6 @@
     },
     "canvas_planner_98ed106": {
         "message": "Planifikatè Canvas"
-    },
-    "canvas_plugins_705a5016": {
-        "message": "Plugins Canvas"
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Chwazi fichye soutit"
@@ -292,6 +286,9 @@
     },
     "dimensions_45ddb7b7": {
         "message": "Dimansyon"
+    },
+    "directionality_26ae9e08": {
+        "message": "Direksyonalite"
     },
     "disable_in_line_preview_2a675175": {
         "message": "Dezaktive apèsi an liy."
@@ -473,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Yerachi Dosye"
     },
+    "format_4247a9c5": {
+        "message": "Fòma"
+    },
     "formatting_5b143aa8": {
         "message": "Fòmataj"
     },
@@ -571,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "An reta"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "De Goch a Dwat"
     },
     "link_7262adec": {
         "message": "Lyen"
@@ -860,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Editè Kontni Rich"
     },
+    "right_to_left_9cfb092a": {
+        "message": "De Dwat a Goch"
+    },
     "save_11a80ec3": {
         "message": "Anrejistre"
     },
@@ -904,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Dimansyon"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "Dimansyon { file } siperyè a maksimòm fichye { max } MB yo otorize a."
     },
     "small_b070434a": {
         "message": "Piti"
