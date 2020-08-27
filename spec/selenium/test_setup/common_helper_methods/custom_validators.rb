@@ -116,13 +116,9 @@ module CustomValidators
     driver.execute_script("window.INST = window.INST || {}; INST.still_on_old_page = true;")
     yield if block_given?
     wait_for(method: :wait_for_new_page_load) do
+      raise if !accept_alert && alert_present?
       driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoSuchAlertError
-      begin
-        driver.execute_script("return window.INST && INST.still_on_old_page !== true;")
-      rescue Selenium::WebDriver::Error::UnexpectedAlertOpenError, Selenium::WebDriver::Error::UnknownError
-        raise unless accept_alert
-        driver.switch_to.alert.accept
-      end
+      driver.execute_script("return window.INST && INST.still_on_old_page !== true;")
     end or return false
     wait_for_dom_ready
     wait_for_ajaximations
