@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as Turnitin from 'compiled/gradebook/Turnitin'
+import * as Turnitin from 'jsx/gradebook/Turnitin'
 
 let submissionWithReport = null
 

@@ -44,7 +44,7 @@ describe "Screenreader Gradebook" do
     srgb_page.select_assignment(assignment_1)
     srgb_page.ungraded_as_zero.click
     expect(srgb_page.final_grade).to include_text('50%')
-
+    
     srgb_page.ungraded_as_zero.click
     expect(srgb_page.final_grade).to include_text('100%')
   end

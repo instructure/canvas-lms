@@ -43,6 +43,8 @@ import ViewOptionsMenu from 'jsx/gradebook/default_gradebook/components/ViewOpti
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
 import {waitFor} from '../support/Waiters'
 
+import {compareAssignmentDueDates} from 'jsx/gradebook/default_gradebook/Gradebook.utils'
+
 import {
   createGradebook,
   setFixtureHtml
@@ -463,43 +465,6 @@ test('does not calculate when the student is not initialized', function() {
   notOk(CourseGradeCalculator.calculate.called)
 })
 
-QUnit.module('Gradebook#getStudentGradeForColumn')
-
-test('returns the grade stored on the student for the column id', () => {
-  const student = {total_grade: {score: 5, possible: 10}}
-  const grade = createGradebook().getStudentGradeForColumn(student, 'total_grade')
-  equal(grade, student.total_grade)
-})
-
-test('returns an empty grade when the student has no grade for the column id', () => {
-  const student = {total_grade: undefined}
-  const grade = createGradebook().getStudentGradeForColumn(student, 'total_grade')
-  strictEqual(grade.score, null, 'grade has a null score')
-  strictEqual(grade.possible, 0, 'grade has no points possible')
-})
-
-QUnit.module('Gradebook#getGradeAsPercent')
-
-test('returns a percent for a grade with points possible', () => {
-  const percent = createGradebook().getGradeAsPercent({score: 5, possible: 10})
-  equal(percent, 0.5)
-})
-
-test('returns null for a grade with no points possible', () => {
-  const percent = createGradebook().getGradeAsPercent({score: 5, possible: 0})
-  strictEqual(percent, null)
-})
-
-test('returns 0 for a grade with a null score', () => {
-  const percent = createGradebook().getGradeAsPercent({score: null, possible: 10})
-  strictEqual(percent, 0)
-})
-
-test('returns 0 for a grade with an undefined score', () => {
-  const percent = createGradebook().getGradeAsPercent({score: undefined, possible: 10})
-  strictEqual(percent, 0)
-})
-
 QUnit.module('Gradebook#localeSort')
 
 test('delegates to natcompare.strings', () => {
@@ -739,7 +704,6 @@ QUnit.module('Gradebook#makeColumnSortFn', {
     this.gradebook = createGradebook()
     sandbox.stub(this.gradebook, 'wrapColumnSortFn')
     sandbox.stub(this.gradebook, 'compareAssignmentPositions')
-    sandbox.stub(this.gradebook, 'compareAssignmentDueDates')
     sandbox.stub(this.gradebook, 'compareAssignmentNames')
     sandbox.stub(this.gradebook, 'compareAssignmentPointsPossible')
     sandbox.stub(this.gradebook, 'compareAssignmentModulePositions')
@@ -772,7 +736,7 @@ test('wraps compareAssignmentNames when called with a sortType of name', functio
 
 test('wraps compareAssignmentDueDates when called with a sortType of due_date', function() {
   this.gradebook.makeColumnSortFn(this.sortOrder('due_date', 'descending'))
-  const expectedArgs = [this.gradebook.compareAssignmentDueDates, 'descending']
+  const expectedArgs = [compareAssignmentDueDates, 'descending']
 
   strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1)
   deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
@@ -4195,45 +4159,6 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
       strictEqual(gradebook.updateColumnHeaders.callCount, 1)
     })
   })
-})
-
-QUnit.module('Gradebook#onGridKeyDown', {
-  setup() {
-    const columns = [
-      {id: 'student', type: 'student'},
-      {id: 'assignment_2301', type: 'assignment'}
-    ]
-    this.gradebook = createGradebook()
-    this.grid = {
-      getColumns() {
-        return columns
-      }
-    }
-  }
-})
-
-test('skips SlickGrid default behavior when pressing "enter" on a "student" cell', function() {
-  const event = {which: 13, originalEvent: {}}
-  this.gradebook.onGridKeyDown(event, {grid: this.grid, cell: 0, row: 0}) // 0 is the index of the 'student' column
-  strictEqual(event.originalEvent.skipSlickGridDefaults, true)
-})
-
-test('does not skip SlickGrid default behavior when pressing other keys on a "student" cell', function() {
-  const event = {which: 27, originalEvent: {}}
-  this.gradebook.onGridKeyDown(event, {grid: this.grid, cell: 0, row: 0}) // 0 is the index of the 'student' column
-  notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied')
-})
-
-test('does not skip SlickGrid default behavior when pressing "enter" on other cells', function() {
-  const event = {which: 27, originalEvent: {}}
-  this.gradebook.onGridKeyDown(event, {grid: this.grid, cell: 1, row: 0}) // 1 is the index of the 'assignment' column
-  notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied')
-})
-
-test('does not skip SlickGrid default behavior when pressing "enter" off the grid', function() {
-  const event = {which: 27, originalEvent: {}}
-  this.gradebook.onGridKeyDown(event, {grid: this.grid, cell: undefined, row: undefined})
-  notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied')
 })
 
 QUnit.module('Gradebook Grid Events', () => {

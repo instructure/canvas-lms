@@ -31,8 +31,7 @@ import tz from 'timezone'
 import AssignmentDetailsDialog from '../../../AssignmentDetailsDialog'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
 import {updateWithSubmissions, scopeToUser} from 'jsx/gradebook/EffectiveDueDates'
-import outcomeGrid from '../../../gradebook/OutcomeGradebookGrid'
-import ic_submission_download_dialog from '../../shared/components/ic_submission_download_dialog_component'
+import outcomeGrid from 'jsx/gradebook/OutcomeGradebookGrid'
 import CalculationMethodContent from '../../../models/grade_summary/CalculationMethodContent'
 import SubmissionStateMap from 'jsx/gradebook/SubmissionStateMap'
 import GradeOverrideEntry from '../../../../jsx/grading/GradeEntry/GradeOverrideEntry'
@@ -42,6 +41,8 @@ import GradebookSelector from 'jsx/gradebook/individual-gradebook/components/Gra
 import {updateFinalGradeOverride} from '../../../../jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 import 'jquery.instructure_date_and_time'
 import 'vendor/jquery.ba-tinypubsub'
+
+import '../../shared/components/ic_submission_download_dialog_component'
 
 const {get, set, setProperties} = Ember
 
@@ -613,7 +614,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       grades = grades[finalOrCurrent]
 
       let percent = round((grades.score / grades.possible) * 100, 2)
-      if (isNaN(percent)) {
+      if (Number.isNaN(Number(percent))) {
         percent = 0
       }
       return setProperties(student, {
@@ -1084,8 +1085,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.property('invalidAssignmentGroups', 'weightingScheme'),
 
   invalidGroupNames: function() {
-    let names
-    return (names = this.get('invalidAssignmentGroups').map(group => group.name))
+    return this.get('invalidAssignmentGroups').map(group => group.name)
   }
     .property('invalidAssignmentGroups')
     .readOnly(),
@@ -1390,7 +1390,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.property('selectedAssignment', 'students.@each.total_grade'),
 
   outcomeDetails: function() {
-    let details
     if (this.get('selectedOutcome') == null) {
       return null
     }
@@ -1399,12 +1398,12 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       this.get('selectedOutcome').id
     )
     const scores = _.filter(_.pluck(rollups, 'score'), _.isNumber)
-    return (details = {
+    return {
       average: outcomeGrid.Math.mean(scores),
       max: outcomeGrid.Math.max(scores),
       min: outcomeGrid.Math.min(scores),
       cnt: outcomeGrid.Math.cnt(scores)
-    })
+    }
   }.property('selectedOutcome', 'outcome_rollups'),
 
   calculationDetails: function() {

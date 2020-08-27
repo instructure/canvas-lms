@@ -19,7 +19,7 @@ import $ from 'jquery'
 import Ember from 'ember'
 import startApp from '../start_app'
 import fixtures from '../shared_ajax_fixtures'
-import GradebookHelpers from '../../../../gradebook/GradebookHelpers'
+import GradebookHelpers from 'jsx/gradebook/GradebookHelpers'
 import GradebookConstants from 'jsx/gradebook/shared/constants'
 
 const {run} = Ember

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Gradebook from 'compiled/gradebook/Gradebook'
+import Gradebook from 'jsx/gradebook/default_gradebook/Gradebook'
 
 export function createGradebook(options = {}) {
   const gradebook = new Gradebook({
