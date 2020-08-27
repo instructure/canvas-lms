@@ -122,7 +122,7 @@ module Lti::Ims
     # @argument https://canvas.instructure.com/lti/submission [Optional, Object]
     #   (EXTENSION) Optional submission type and data.
     #   new_submission [Boolean] flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
-    #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, or online_url
+    #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, external_tool, or online_url. Defaults to external_tool.
     #   submission_data [String] submission data (URL or body text)
     #
     # @returns resultUrl [String]
@@ -152,7 +152,8 @@ module Lti::Ims
 
     REQUIRED_PARAMS = %i[userId activityProgress gradingProgress timestamp].freeze
     OPTIONAL_PARAMS = %i[scoreGiven scoreMaximum comment].freeze
-    SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url].freeze
+    SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url external_tool].freeze
+    DEFAULT_SUBMISSION_TYPE = 'external_tool'.freeze
 
     def scopes_matcher
       self.class.all_of(TokenScopes::LTI_AGS_SCORE_SCOPE)
@@ -217,7 +218,7 @@ module Lti::Ims
       if !submission_type.nil? && SCORE_SUBMISSION_TYPES.include?(submission_type)
         submission.submission_type = submission_type
         case submission_type
-        when 'none'
+        when 'none', 'external_tool'
           submission.body = nil
           submission.url = nil
         when 'basic_lti_launch', 'online_url'
@@ -270,7 +271,7 @@ module Lti::Ims
     end
 
     def submission_type
-      scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submission_type)
+      scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submission_type) || DEFAULT_SUBMISSION_TYPE
     end
 
     def submission_data
