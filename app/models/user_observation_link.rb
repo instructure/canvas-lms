@@ -44,7 +44,7 @@ class UserObservationLink < ActiveRecord::Base
 
   MISSING_ROOT_ACCOUNT_ID = -1
 
-  # shadow_record param is private
+  # cross_shard_record param is private
   def self.create_or_restore(student: , observer: , root_account: , cross_shard_record: false)
     raise ArgumentError, 'student, observer and root_account are required' unless student && observer && root_account
     shard = cross_shard_record ? observer.shard : student.shard

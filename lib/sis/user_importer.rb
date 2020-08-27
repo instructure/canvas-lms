@@ -162,7 +162,7 @@ module SIS
           else
             if login_only
               if user_row.root_account_id.present?
-                root_account = root_account_from_id(user_row.root_account_id)
+                root_account = root_account_from_id(user_row.root_account_id, user_row)
                 next unless root_account
               else
                 root_account = @root_account
@@ -420,7 +420,7 @@ module SIS
 
       def other_user(_user_row, _pseudo); end
 
-      def root_account_from_id(_root_account_sis_id); end
+      def root_account_from_id(_root_account_sis_id, _user_row); end
 
       def maybe_write_roll_back_data
         if @roll_back_data.count > 1000
