@@ -218,7 +218,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
     # can be invalidated by a flag change on either site admin or the domain root account
-    Rails.cache.fetch(["js_env_account_features", JS_ENV_FEATURES_HASH,
+    MultiCache.fetch(["js_env_account_features", JS_ENV_FEATURES_HASH,
         Account.site_admin.cache_key(:feature_flags), @domain_root_account&.cache_key(:feature_flags)].cache_key) do
       results = {}
       JS_ENV_SITE_ADMIN_FEATURES.each do |f|
