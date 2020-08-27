@@ -34,13 +34,24 @@ module Canvas
       'Quizzes::Quiz' => %w{availability}
     }.freeze
 
+    PREFER_MULTI_CACHE_TYPES = {
+      'Account' => %w{feature_flags}
+    }.freeze
+
     MIGRATED_TYPES = {}.freeze # for someday when we're reasonably sure we've moved all the cache keys for a type over
 
     def self.lua
       @lua ||= ::Redis::Scripting::Module.new(nil, File.join(File.dirname(__FILE__), "cache_register"))
     end
 
-    def self.redis(base_key, shard)
+    def self.can_use_multi_cache_redis?
+      MultiCache.cache.respond_to?(:redis) && !MultiCache.cache.redis.respond_to?(:node_for)
+    end
+
+    def self.redis(base_key, shard, prefer_multi_cache: false)
+      if prefer_multi_cache && can_use_multi_cache_redis?
+        return MultiCache.cache.redis
+      end
       shard.activate do
         Canvas.redis.respond_to?(:node_for) ? Canvas.redis.node_for(base_key) : Canvas.redis
       end
@@ -69,6 +80,10 @@ module Canvas
             end
           end
 
+          def prefer_multi_cache_for_key_type?(key_type)
+            !!CacheRegister::PREFER_MULTI_CACHE_TYPES[self.base_class.name]&.include?(key_type.to_s)
+          end
+
           def skip_touch_for_type?(key_type)
             valid_cache_key_type?(key_type) &&
               CacheRegister::MIGRATED_TYPES[self.base_class.name]&.include?(key_type.to_s) &&
@@ -87,12 +102,23 @@ module Canvas
           def clear_cache_keys(ids_or_records, *key_types)
             return unless key_types.all?{|type| valid_cache_key_type?(type)} && CacheRegister.enabled?
 
+            multi_key_types, key_types = key_types.partition{|type| CacheRegister.can_use_multi_cache_redis? && self.prefer_multi_cache_for_key_type?(type)}
+
             ::Shard.partition_by_shard(Array(ids_or_records)) do |sharded_ids_or_records|
               base_keys = sharded_ids_or_records.map{|item| base_cache_register_key_for(item)}.compact
               return unless base_keys.any?
-              base_keys.group_by{|key| CacheRegister.redis(key, ::Shard.current)}.each do |redis, node_base_keys|
-                node_base_keys.map{|k| key_types.map{|type| "#{k}/#{type}"}}.flatten.each_slice(1000) do |slice|
-                  redis.del(*slice)
+              if key_types.any?
+                base_keys.group_by{|key| CacheRegister.redis(key, ::Shard.current)}.each do |redis, node_base_keys|
+                  node_base_keys.map{|k| key_types.map{|type| "#{k}/#{type}"}}.flatten.each_slice(1000) do |slice|
+                    redis.del(*slice)
+                  end
+                end
+              end
+              if multi_key_types.any?
+                base_keys.each do |base_key|
+                  multi_key_types.each do |type|
+                    MultiCache.delete("#{base_key}/#{type}")
+                  end
                 end
               end
             end
@@ -110,7 +136,8 @@ module Canvas
             return nil unless skip_check || (global_id && self.valid_cache_key_type?(key_type) && CacheRegister.enabled?)
 
             base_key = self.base_cache_register_key_for(global_id)
-            redis = CacheRegister.redis(base_key, ::Shard.shard_for(global_id))
+            prefer_multi_cache = self.prefer_multi_cache_for_key_type?(key_type)
+            redis = CacheRegister.redis(base_key, ::Shard.shard_for(global_id), prefer_multi_cache: prefer_multi_cache)
             full_key = "#{base_key}/#{key_type}"
             RequestCache.cache(full_key) do
               now = Time.now.utc.to_s(self.cache_timestamp_format)
@@ -163,6 +190,11 @@ module Canvas
           # so you should just use clear_cache_key
           def fetch_with_batched_keys(key, batch_object:, batched_keys:, skip_cache_if_disabled: false, **opts, &block)
             batched_keys = Array(batched_keys)
+            multi_types = batched_keys.select{|type| batch_object&.class&.prefer_multi_cache_for_key_type?(type)}
+            if multi_types.any? && !::Rails.env.production?
+              raise "fetch_with_batched_keys is not supported for multi-cache enabled key(s) - #{multi_types.join(", ")} on #{batch_object.class.name}"
+            end
+
             if batch_object && !opts[:force] &&
                 defined?(::ActiveSupport::Cache::RedisCacheStore) && self.is_a?(::ActiveSupport::Cache::RedisCacheStore) && CacheRegister.enabled? &&
                 batched_keys.all?{|type| batch_object.class.valid_cache_key_type?(type)}

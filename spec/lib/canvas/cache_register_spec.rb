@@ -372,7 +372,7 @@ describe Canvas::CacheRegister do
     end
 
     it "should pass the object's shard when looking up node for cache_key" do
-      expect_redis_call
+      expect(Canvas::CacheRegister).to receive(:redis).with(@base_key, @user.shard, :prefer_multi_cache => false).and_call_original
       @user.cache_key(:enrollments)
     end
 
@@ -386,6 +386,30 @@ describe Canvas::CacheRegister do
       Rails.cache.fetch_with_batched_keys("somekey", batch_object: @user, batched_keys: [:enrollments]) do
         "something"
       end
+    end
+  end
+
+  context "multi-cache preference" do
+    it "should retrieve multi-cache redis when preferred" do
+      allow(Canvas::CacheRegister).to receive(:can_use_multi_cache_redis?).and_return(true)
+      mock_redis = double
+      cache = double(:redis => mock_redis)
+      allow(MultiCache).to receive(:cache).and_return(cache)
+      expect(Canvas::CacheRegister.redis("key", Shard.default, prefer_multi_cache: true)).to eq mock_redis
+    end
+
+    it "should prefer multi-cache when retreiving a configured key" do
+      base_key = Account.base_cache_register_key_for(Account.default)
+      expect(Canvas::CacheRegister).to receive(:redis).with(base_key, Shard.default, :prefer_multi_cache => true).and_call_original
+      Account.default.cache_key(:feature_flags)
+    end
+
+    it "should use multi-cache delete when clearing a configured key" do
+      allow(Canvas::CacheRegister).to receive(:can_use_multi_cache_redis?).and_return(true)
+      expect(Canvas::CacheRegister).to_not receive(:redis)
+      key = Account.base_cache_register_key_for(Account.default) + "/feature_flags"
+      expect(MultiCache).to receive(:delete).with(key)
+      Account.default.clear_cache_key(:feature_flags)
     end
   end
 end

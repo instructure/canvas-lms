@@ -169,41 +169,6 @@ class Account < ActiveRecord::Base
     MultiCache.cache
   end
 
-  def redis_for_root_account_cache_register
-    return unless MultiCache.cache.respond_to?(:redis)
-    redis = MultiCache.cache.redis
-    return if redis.respond_to?(:node_for)
-    redis
-  end
-
-  def root_account_cache_key
-    base_key = self.class.base_cache_register_key_for(self)
-    "#{base_key}/feature_flags"
-  end
-
-  def cache_key(key_type = nil)
-    return super if new_record?
-    return super unless root_account? && key_type == :feature_flags
-    return super unless (redis = redis_for_root_account_cache_register)
-
-    # partially taken from CacheRegister.cache_key_for_id, but modified to
-    # target HACache
-    full_key = root_account_cache_key
-    RequestCache.cache(full_key) do
-      now = Time.now.utc.to_s(self.cache_timestamp_format)
-      # try to get the timestamp for the type, set it to now if it doesn't exist
-      ts = Canvas::CacheRegister.lua.run(:get_key, [full_key], [now], redis)
-      "#{self.model_name.cache_key}/#{global_id}-#{ts}"
-    end
-  end
-
-  def clear_cache_key(*key_types)
-    return super unless root_account? && key_types == [:feature_flags]
-    return super unless redis_for_root_account_cache_register
-
-    MultiCache.delete(root_account_cache_key)
-  end
-
   def self.recursive_default_locale_for_id(account_id)
     local_id, shard = Shard.local_id_for(account_id)
     (shard || Shard.current).activate do
