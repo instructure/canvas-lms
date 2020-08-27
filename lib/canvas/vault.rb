@@ -17,7 +17,7 @@
 
 require 'vault'
 
-class Canvas::Vault
+module Canvas::Vault
   class << self
     CACHE_KEY_PREFIX = 'vault/'.freeze
 
