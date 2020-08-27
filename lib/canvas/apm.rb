@@ -137,7 +137,7 @@ module Canvas
 
       def annotate_trace(shard, root_account, request_context_id, current_user)
         return unless self.configured?
-        apm_root_span = Datadog.tracer.active_root_span
+        apm_root_span = tracer.active_root_span
         return if apm_root_span.blank?
         apm_root_span.set_tag('request_context_id', request_context_id.to_s) if request_context_id.present?
         apm_root_span.set_tag('shard', shard.id.to_s) if shard.try(:id).present?
