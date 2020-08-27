@@ -92,4 +92,53 @@ describe ActiveSupport::Cache::HaStore do
       store.delete('mykey')
     end
   end
+
+  describe "consume_consul_events" do
+    it "works" do
+      # check that Canvas.redis is equivalent to Redis.new that consume_consule_events uses
+      # I would normally compare against `id`, but that might have localhost vs. 127.0.0.1
+      redis = Redis.new(connect_timeout: 0.5)
+      secret_key = SecureRandom.uuid
+      Canvas.redis.set(secret_key, "1", ex: 5)
+      skip "Can't run this spec unless redis is default configured" unless (redis.get(secret_key) rescue nil) == "1"
+      consul_event_id = SecureRandom.uuid
+
+      Bundler.with_clean_env do
+        payload = [{ ID: consul_event_id, Payload: Base64.strict_encode64(secret_key) }].to_json
+
+        `echo #{Shellwords.escape(payload)} | #{Rails.root}/script/consume_consul_events`
+        expect($?).to be_success
+      end
+      expect(redis.get(secret_key)).to be_nil
+      expect(redis.zrank("consul_events", consul_event_id)).not_to be_nil
+    end
+  end
+
+  context "Account cache register" do
+    before do
+      allow(MultiCache).to receive(:cache).and_return(store)
+      allow(Imperium::Events.default_client).to receive(:fire)
+    end
+
+    it "uses MultiCache as store for feature_flags cache_key" do
+      Timecop.freeze do
+        now = Time.now.utc.to_s(Account.cache_timestamp_format)
+        full_key = Account.site_admin.root_account_cache_key
+        expect(Canvas::CacheRegister.lua).to receive(:run).with(:get_key, [full_key], [now], store.redis).and_return("cool beans")
+        expect(Account.site_admin.cache_key(:feature_flags)).to eq("accounts/#{Account.site_admin.global_id}-cool beans")
+        # doesn't use it for other key types
+        expect(Account.site_admin.cache_key(:global_navigation)).to eq("accounts/#{Account.site_admin.global_id}-#{now}")
+      end
+    end
+
+    it "properly invalidates feature_flags cache_key" do
+      Timecop.freeze do
+        key1 = Account.site_admin.cache_key(:feature_flags)
+        Timecop.travel(1)
+        expect(Account.site_admin.cache_key(:feature_flags)).to eq key1
+        Account.site_admin.clear_cache_key(:feature_flags)
+        expect(Account.site_admin.cache_key(:feature_flags)).not_to eq key1
+      end
+    end
+  end
 end

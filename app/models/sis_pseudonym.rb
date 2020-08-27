@@ -72,15 +72,27 @@ class SisPseudonym
       end
     end
 
-    shards = @in_region ? user.in_region_associated_shards : user.associated_shards
-    trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) }
-    if type == :trusted
-      # only search the shards with trusted accounts
-      shards &= trusted_account_ids.keys
+
+    trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) } if type == :trusted
+
+    # try the user's home shard first
+    unless @in_region && (!user.shard.in_current_region? || !user.shard.default?)
+      if type != :trusted || (account_ids = trusted_account_ids[user.shard])
+        user.shard.activate do
+          result = find_in_trusted_accounts(account_ids)
+          return result if result
+        end
+      end
     end
+
+    shards = @in_region ? user.in_region_associated_shards : user.associated_shards
+    # only search the shards with trusted accounts
+    shards &= trusted_account_ids.keys if type == :trusted
+
     return nil if shards.empty?
 
     Shard.with_each_shard(shards.sort) do
+      next if Shard.current == user.shard
       account_ids = trusted_account_ids[Shard.current] if type == :trusted
       result = find_in_trusted_accounts(account_ids)
       return result if result

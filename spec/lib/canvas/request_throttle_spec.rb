@@ -375,10 +375,10 @@ describe 'RequestThrottle' do
           end
         end
 
-        it "does no reserving if whitelisted" do
+        it "does no reserving if status decided" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
-            @bucket.reserve_capacity(20, request_whitelisted: true) do
+            @bucket.reserve_capacity(20, request_prejudged: true) do
               expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(0)
             end
             expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(0)
