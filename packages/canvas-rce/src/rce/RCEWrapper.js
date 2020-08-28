@@ -250,6 +250,15 @@ class RCEWrapper extends React.Component {
     this.mceInstance().setContent(newContent)
   }
 
+  // This function is called imperatively by the page that renders the RCE.
+  // It should be called when the RCE content is done being edited.
+  RCEClosed() {
+    // We want to clear the autosaved content, since the page was legitimately closed.
+    if (this.storage) {
+      this.storage.removeItem(this.autoSaveKey)
+    }
+  }
+
   indicateEditor(element) {
     if (document.querySelector('[role="dialog"][data-mce-component]')) {
       // there is a modal open, which zeros out the vertical scroll
@@ -744,12 +753,19 @@ class RCEWrapper extends React.Component {
       try {
         const autosaved = this.getAutoSaved(this.autoSaveKey)
         if (autosaved && autosaved.content) {
-          const editorContent = editor.getContent({no_events: true})
-          const autosavedContent = this.patchAutosavedContent(autosaved.content)
-          if (autosaved.content !== editorContent) {
+          // We'll compare just the text of the autosave content, since
+          // Canvas is prone to swizzling images and iframes which will
+          // make the editor content and autosave content never match up
+          const editorContent = this.patchAutosavedContent(
+            editor.getContent({no_events: true}),
+            true
+          )
+          const autosavedContent = this.patchAutosavedContent(autosaved.content, true)
+
+          if (autosavedContent !== editorContent) {
             this.setState({
               confirmAutoSave: true,
-              autoSavedContent: autosavedContent
+              autoSavedContent: this.patchAutosavedContent(autosaved.content)
             })
           } else {
             this.storage.removeItem(this.autoSaveKey)
@@ -797,12 +813,13 @@ class RCEWrapper extends React.Component {
   // because the data url gets converted to a blob, which is not valid when restored.
   // besides, the placeholder is intended to be temporary while the file
   // is being uploaded
-  patchAutosavedContent(content) {
+  patchAutosavedContent(content, asText) {
     const temp = document.createElement('div')
     temp.innerHTML = content
     temp.querySelectorAll('img[data-placeholder-for]').forEach(placeholder => {
       placeholder.parentElement.removeChild(placeholder)
     })
+    if (asText) return temp.textContent
     return temp.innerHTML
   }
 
