@@ -60,12 +60,16 @@ describe AuditLogFieldExtension do
     CanvasSchema.execute(MUTATION, context: {current_user: @student})
   end
 
-  it "fails gracefully (or silently!? when dynamo isn't working" do
+  it "fails gracefully when dynamo isn't working, with captured exception" do
     require 'canvas_dynamodb'
     dynamo = CanvasDynamoDB::Database.new("asdf", "asdf", nil,
                                           {region: "us-east-1", endpoint: "http://localhost:8000"},
                                           Rails.logger)
     expect(dynamo).to receive(:put_item).and_raise(Aws::DynamoDB::Errors::ServiceError.new("two", "arguments"))
+    expect(::Canvas::Errors).to receive(:capture_exception) do |name, e|
+      expect(name).to eq(:graphql_mutation_audit_logs)
+      expect(e.class).to eq(Aws::DynamoDB::Errors::ServiceError)
+    end
     allow(Canvas::DynamoDB::DatabaseBuilder).to receive(:from_config).and_return(dynamo)
     response = CanvasSchema.execute(MUTATION, context: {current_user: @teacher})
     expect(response.dig("data", "updateAssignment", "assignment", "name")).to eq "asdf"

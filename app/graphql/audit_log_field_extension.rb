@@ -46,6 +46,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
         return_consumed_capacity: "TOTAL"
       )
     rescue Aws::DynamoDB::Errors::ServiceError => e
+      ::Canvas::Errors.capture_exception(:graphql_mutation_audit_logs, e)
       Rails.logger.error "Couldn't log mutation: #{e}"
     end
 
