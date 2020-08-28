@@ -23,13 +23,7 @@ ready(() => {
   // See service worker definition for comments on purpose and why we only
   // install it for recent (13+) Safari.
   const {name, version} = getBrowser()
-  if (name !== 'Safari' || parseFloat(version) < 13) {
-    console.log('Inst-FS ServiceWorker not necessary for this browser.')
-  } else if (!('serviceWorker' in navigator)) {
-    console.log('ServiceWorkers not available. :( Inst-FS files may fail to inline.')
-  } else if (navigator.serviceWorker.controller) {
-    console.log('Inst-FS ServiceWorker already registered.')
-  } else {
+  if (name === 'Safari' && parseFloat(version) >= 13 && 'serviceWorker' in navigator) {
     navigator.serviceWorker
       .register('/inst-fs-sw.js')
       .then(() => {
