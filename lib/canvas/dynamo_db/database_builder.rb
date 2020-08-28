@@ -47,7 +47,6 @@ module Canvas
             @clients[key] = CanvasDynamoDB::Database.new(
               fingerprint,
               config[:table_prefix],
-              config[:autoscaling_role_arn],
               opts,
               Rails.logger
             )
@@ -79,9 +78,6 @@ module Canvas
         configs.keys
       end
 
-      def self.read_consistency_setting(category)
-        Cavas::Cassandra::DatabaseBuilder.read_consistency_setting(category)
-      end
     end
   end
 end
