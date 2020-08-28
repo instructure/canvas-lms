@@ -37,6 +37,14 @@ def buildParameters = [
 
 library "canvas-builds-library"
 
+def getDockerWorkDir() {
+  return env.GERRIT_PROJECT == "canvas-lms" ? "/usr/src/app" : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
+}
+
+def getLocalWorkDir() {
+  return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
+}
+
 def skipIfPreviouslySuccessful(name, block) {
   if (env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master')) {
     name+="${env.CANVAS_LMS_REFSPEC}"
@@ -183,6 +191,8 @@ pipeline {
     // This is primarily for the plugin build
     // for testing canvas-lms changes against plugin repo changes
     CANVAS_LMS_REFSPEC=configuration.canvasLmsRefspec()
+    DOCKER_WORKDIR = getDockerWorkDir()
+    LOCAL_WORKDIR = getLocalWorkDir()
   }
 
   stages {
@@ -239,13 +249,29 @@ pipeline {
                 gems.each { gem ->
                   if (env.GERRIT_PROJECT == gem) {
                     /* this is the commit we're testing */
-                    pullGerritRepo(gem, env.GERRIT_REFSPEC, 'gems/plugins')
+                    dir(env.LOCAL_WORKDIR) {
+                      checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: 'FETCH_HEAD']],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[
+                          credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
+                          name: 'origin',
+                          refspec: "$env.GERRIT_REFSPEC",
+                          url: "ssh://$GERRIT_URL/${GERRIT_PROJECT}.git"
+                        ]]
+                      ])
+                    }
                   } else {
                     pullGerritRepo(gem, getPluginVersion(gem), 'gems/plugins')
                   }
                 }
                 pullGerritRepo("qti_migration_tool", getPluginVersion('qti_migration_tool'), "vendor")
 
+                // Plugin builds using the checkout above will create this @tmp file, we need to remove it
+                sh(script: 'rm -vr gems/plugins/*@tmp', returnStatus: true)
                 sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
                 sh 'rm -v config/cache_store.yml'
                 sh 'rm -vr gerrit_builder'
@@ -397,7 +423,7 @@ pipeline {
                 echo 'no migrations added, skipping CDC Schema check'
               }
 
-              if (!configuration.isChangeMerged() && (sh(script: 'build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)) {
+              if (!configuration.isChangeMerged() && dir(env.LOCAL_WORKDIR){ (sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0) }) {
                 echo 'adding Flakey Spec Catcher'
                 stages['Flakey Spec Catcher'] = {
                   skipIfPreviouslySuccessful("flakey-spec-catcher") {
