@@ -128,6 +128,7 @@ Delayed::Pool.on_fork = ->{
 
 Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   Canvas::Reloader.reload! if Canvas::Reloader.pending_reload
+  Canvas::Redis.clear_idle_connections
 
   # context for our custom logger
   Thread.current[:context] = {

@@ -16,6 +16,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Canvas::Redis
+  def self.clear_idle_connections
+    # every 1 minute, clear connections that have been idle at least a minute
+    clear_frequency = Setting.get("clear_idle_connections_frequency", 60).to_i
+    clear_timeout = Setting.get("clear_idle_connections_timeout", 60).to_i
+    @last_clear_time ||= Time.now.utc
+    if (Time.now.utc - @last_clear_time > clear_frequency)
+      @last_clear_time = Time.now.utc
+      # gather all the redises we can find
+      redises = Switchman.config[:cache_map].values.
+        map { |cache| cache.try(:redis) }.compact.uniq.
+        map { |redis| redis.try(:ring)&.nodes || [redis] }.inject([], &:concat).uniq
+      redises.each { |r| r._client.disconnect_if_idle(@last_clear_time - clear_timeout) }
+    end
+  end
+
   # try to grab a lock in Redis, returning false if the lock can't be held. If
   # the lock is grabbed and `ttl` is given, it'll be set to expire after `ttl`
   # seconds.
@@ -24,8 +39,7 @@ module Canvas::Redis
     full_key = lock_key(key)
     if Canvas.redis.setnx(full_key, 1)
       Canvas.redis.expire(full_key, ttl.to_i) if ttl
-      true
-    else
+      true else
       # key is already used
       false
     end
@@ -120,6 +134,10 @@ module Canvas::Redis
     }
 
   module Client
+    def disconnect_if_idle(since_when)
+      disconnect if !@process_start || @process_start < since_when
+    end
+
     def process(commands, *a, &b)
       # These instance vars are used by the added #log_request_response method.
       @processing_requests = commands.map(&:dup)
