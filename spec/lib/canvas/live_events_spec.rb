@@ -1177,7 +1177,8 @@ describe Canvas::LiveEvents do
         original_course_id: '1234',
         new_course_id: '5678',
         original_resource_link_id: 'abc123',
-        new_resource_link_id: 'def456'
+        new_resource_link_id: 'def456',
+        domain: 'canvas.instructure.com'
       }
 
       expect_event('quizzes_next_quiz_duplicated', event_payload).once
