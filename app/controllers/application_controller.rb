@@ -58,6 +58,7 @@ class ApplicationController < ActionController::Base
   skip_before_action :activate_authlogic
   prepend_before_action :activate_authlogic
 
+  before_action :clear_idle_connections
   before_action :annotate_apm
   before_action :check_pending_otp
   before_action :set_user_id_header
@@ -574,6 +575,10 @@ class ApplicationController < ActionController::Base
     else
       yield
     end
+  end
+
+  def clear_idle_connections
+    Canvas::Redis.clear_idle_connections
   end
 
   def annotate_apm
