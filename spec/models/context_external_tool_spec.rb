@@ -1679,6 +1679,13 @@ describe ContextExternalTool do
         root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'admins'
     end
 
+    it "should not let concluded teachers see admin tools" do
+      course_with_teacher(:account => @account, :active_all => true)
+      @course.enrollment_term.enrollment_dates_overrides.create!(:enrollment_type => "TeacherEnrollment", :end_at => 1.week.ago)
+      expect(ContextExternalTool.global_navigation_granted_permissions(
+        root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'members'
+    end
+
     it "should not let students see admin tools" do
       course_with_student(:account => @account, :active_all => true)
       expect(ContextExternalTool.global_navigation_granted_permissions(
