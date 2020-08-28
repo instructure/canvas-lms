@@ -186,6 +186,9 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
             }
           }
           if (node) {
+            if (node.firstElementChild) {
+              return
+            }
             const txt = node.textContent?.trim()
             if (txt.length === 0) {
               ed.execCommand('Unlink')
