@@ -361,16 +361,20 @@ describe Auditors::GradeChange do
       end
     end
 
-    it "does not return override grade changes in results" do
+    it "returns override grade changes if the final_grade_override_in_gradebook_history flag is enabled" do
+      Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+      Auditors::GradeChange.record(override_grade_change: override_grade_change)
+
+      expect(course_grade_changes.count).to eq 1
+    end
+
+    it "does not return override grade changes if the final_grade_override_in_gradebook_history flag is not enabled" do
       Auditors::GradeChange.record(override_grade_change: override_grade_change)
 
       expect(course_grade_changes).to be_empty
     end
 
-    it "nevertheless stores override grade changes in the database" do
-      # TODO: (EVAL-1068) this is just a temporary sanity check, remove it (and
-      # modify the preceding test) once we enable returning override grade
-      # changes via the methods in Auditors::GradeChange
+    it "stores override grade changes in the database even if the flag is not enabled" do
       expect {
         Auditors::GradeChange.record(override_grade_change: override_grade_change)
       }.to change {
@@ -424,6 +428,41 @@ describe Auditors::GradeChange do
       pg_record = Auditors::ActiveRecord::GradeChangeRecord.where(uuid: event.id).first
       expect(pg_record).to_not be_nil
       expect(pg_record.submission_id).to eq(@submission.id)
+    end
+  end
+
+  describe ".return_override_grades?" do
+    it "returns true if the final_grade_override_in_gradebook_history flag is enabled" do
+      Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+      expect(Auditors::GradeChange).to be_return_override_grades
+    end
+
+    it "returns false if the final_grade_override_in_gradebook_history flag is not enabled" do
+      expect(Auditors::GradeChange).not_to be_return_override_grades
+    end
+  end
+
+  describe Auditors::GradeChange::Record do
+    describe "#in_grading_period?" do
+      it "returns true if the record has a valid grading period" do
+        grading_period_group = @account.grading_period_groups.create!
+        now = Time.zone.now
+        grading_period = grading_period_group.grading_periods.create!(
+          close_date: 1.week.from_now(now),
+          end_date: 1.week.from_now(now),
+          start_date: 1.week.ago(now),
+          title: "a"
+        )
+
+        @submission.update!(grading_period: grading_period)
+        event = Auditors::GradeChange.record(submission: @submission)
+        expect(event).to be_in_grading_period
+      end
+
+      it "returns false if the record does not have a valid grading period" do
+        event = Auditors::GradeChange.record(submission: @submission)
+        expect(event).not_to be_in_grading_period
+      end
     end
   end
 end

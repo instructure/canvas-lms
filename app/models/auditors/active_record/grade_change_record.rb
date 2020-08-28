@@ -66,6 +66,14 @@ module Auditors::ActiveRecord
       submission_version_number
     end
 
+    def override_grade?
+      submission_id.blank?
+    end
+
+    def in_grading_period?
+      grading_period_id.present?
+    end
+
     def self.resolve_id_or_placeholder(id)
       return nil if id == Auditors::GradeChange::NULL_PLACEHOLDER
       Shard.relative_id_for(id, Shard.current, Shard.current)

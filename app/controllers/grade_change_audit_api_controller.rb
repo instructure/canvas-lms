@@ -267,19 +267,14 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def render_events(events, route, course: nil, remove_anonymous: false)
-    # When reading from Cassandra, filter out override grades here, since it's
-    # not straightforward to do so as part of fetching the data.  (If we're
-    # reading from Postgres, the filtering was already done as part of the
-    # query.)
-    #
-    # TODO: (EVAL-1068) don't actually do this if the
-    # final_grade_override_in_gradebook_history feature flag is enabled
-    events = BookmarkedCollection.filter(events) { |event| !event.override_grade? } if Auditors.read_from_cassandra?
+    events = BookmarkedCollection.filter(events) { |event| !event.override_grade? } if exclude_override_grades?
     events = Api.paginate(events, self, route)
 
     if params.fetch(:include, []).include?("current_grade")
       grades = current_grades(events)
       events.each { |event| event.grade_current = current_grade_for_event(event, grades) }
+
+      apply_current_override_grades!(events)
     end
 
     if course.present?
@@ -340,5 +335,68 @@ class GradeChangeAuditApiController < AuditorApiController
     submission_ids = events.map(&:submission_id)
     grades = Submission.where(id: submission_ids).pluck(:id, :grade)
     grades.each_with_object({}) { |(key, value), hsh| hsh[key] = value }
+  end
+
+  def apply_current_override_grades!(events)
+    override_events = events.select(&:override_grade?)
+    return if override_events.blank?
+
+    current_scores = current_override_scores_query(override_events).each_with_object({}) do |score, hash|
+      key = key_from_ids(score.enrollment.course_id, score.enrollment.user_id, score.grading_period_id)
+      hash[key] = score
+    end
+
+    override_events.each do |event|
+      grading_period_id = event.in_grading_period? ? event.grading_period_id : nil
+      key = key_from_ids(event.context_id, event.student_id, grading_period_id)
+      event.grade_current = current_scores[key]&.override_grade || current_scores[key]&.override_score.to_s
+    end
+  end
+
+  def current_override_scores_query(events)
+    base_score_scope = Score.active.joins(:enrollment).preload(:enrollment)
+    scopes = []
+
+    events_with_grading_period = events.select(&:in_grading_period?)
+    if events_with_grading_period.present?
+      values = events_with_grading_period.map do |event|
+        key = key_from_ids(event.context_id, event.student_id, event.grading_period_id).join(",")
+        "(#{key})"
+      end.join(", ")
+
+      scopes << base_score_scope.
+        where("(enrollments.course_id, enrollments.user_id, scores.grading_period_id) IN (#{values})")
+    end
+
+    events_without_grading_period = events.reject(&:in_grading_period?)
+    if events_without_grading_period.present?
+      values = events_without_grading_period.map do |event|
+        key = key_from_ids(event.context_id, event.student_id).join(",")
+        "(#{key})"
+      end.join(", ")
+
+      scopes << base_score_scope.
+        where(course_score: true).
+        where("(enrollments.course_id, enrollments.user_id) IN (#{values})")
+    end
+
+    scopes.reduce { |result, scope| result.union(scope) }
+  end
+
+  def key_from_ids(*ids)
+    # If we fetched our override change records from Postgres, the relevant ID
+    # fields will already be relative to the current shard and so the below
+    # method won't change them. If we got them from Cassandra, however, we have
+    # to adjust them before searching.
+
+    ids.map { |id| Shard.relative_id_for(id, Shard.current, Shard.current) }
+  end
+
+  def exclude_override_grades?
+    # If we are reading from Cassandra and *not* returning override grades,
+    # filter them out here, since it's not straightforward to do so as part of
+    # fetching the data.  (If we're reading from Postgres, the filtering was
+    # already done as part of the query if needed.)
+    Auditors.read_from_cassandra? && !Auditors::GradeChange.return_override_grades?
   end
 end

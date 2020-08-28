@@ -69,7 +69,6 @@ final_grade_override_in_gradebook_history:
   applies_to: SiteAdmin
   display_name: Final Grade Override in Gradebook History
   description: Includes overridden course grades in the Gradebook History.
-  applies_to: RootAccount
 responsive_student_grades_page:
   state: hidden
   applies_to: RootAccount

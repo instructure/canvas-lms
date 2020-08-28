@@ -26,12 +26,12 @@ module Api::V1::GradeChangeEvent
 
   def grade_change_event_json(event, user, session)
     links = {
-      assignment: Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current),
       course: Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
       student: Shard.relative_id_for(event.student_id, Shard.current, Shard.current)&.to_s,
       grader: Shard.relative_id_for(event.grader_id, Shard.current, Shard.current)&.to_s,
       page_view: event.request_id && PageView.find_by_id(event.request_id).try(:id)
     }
+    links[:assignment] = Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current) unless event.override_grade?
 
     json = {
       id: event.id,

@@ -195,6 +195,10 @@ class Auditors::GradeChange
       submission_id == Auditors::GradeChange::NULL_PLACEHOLDER
     end
 
+    def in_grading_period?
+      grading_period_id != Auditors::GradeChange::NULL_PLACEHOLDER
+    end
+
     delegate :assignment, :autograded?, to: :submission, allow_nil: true
     delegate :account, to: :context
     delegate :root_account, to: :account
@@ -206,9 +210,11 @@ class Auditors::GradeChange
     # No need to change anything if an assignment ID was specified
     return conditions if conditions[:assignment_id].present?
 
-    # TODO: (EVAL-1068) if the final_grade_override_in_gradebook_history feature is
-    # enabled and we explicitly specified we want override grades, return the
-    # unmodified hash as above
+    # If the final grade override feature flag is enabled, no need to restrict
+    # results further
+    return conditions if Auditors::GradeChange.return_override_grades?
+
+    # If the flag is not enabled, make sure we don't return override grades
     ["assignment_id IS NOT NULL", conditions.except(:assignment_id)]
   end
 
@@ -355,8 +361,8 @@ class Auditors::GradeChange
   end
 
   def self.insert_record(event_record)
-      Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :cassandra}) if Auditors.write_to_cassandra?
-      Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :active_record}) if Auditors.write_to_postgres?
+    Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :cassandra}) if Auditors.write_to_cassandra?
+    Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :active_record}) if Auditors.write_to_postgres?
   end
   private_class_method :insert_record
 
@@ -421,5 +427,9 @@ class Auditors::GradeChange
         Auditors::GradeChange::Stream.for_course_student(course, arguments[:student], options)
       end
     end
+  end
+
+  def self.return_override_grades?
+    Account.site_admin.feature_enabled?(:final_grade_override_in_gradebook_history)
   end
 end

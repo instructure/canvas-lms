@@ -79,28 +79,6 @@ describe GradeChangeAuditApiController do
           expect(student_ids).to be_empty
         end
       end
-
-      it "excludes override grade change events from the results" do
-        # TODO: (EVAL-1068) add a separate spec to include override grade
-        # changes if the final_grade_override_in_gradebook_history feature flag
-        # is enabled
-        override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
-          grader: teacher,
-          old_grade: nil,
-          old_score: nil,
-          score: student.enrollments.first.find_score
-        )
-        Auditors::GradeChange.record(override_grade_change: override_grade_change)
-
-        get :for_course, params: { course_id: course.id }
-        events = json_parse(response.body).fetch("events")
-        assignment_ids = events.map { |event| event.dig('links', 'assignment') }
-
-        # These results should contain only the assignment-level grade changes
-        # we created as part of setup, and not the override grade change we
-        # just added
-        expect(assignment_ids.uniq).to contain_exactly(assignment.id)
-      end
     end
 
     context "reading from active_record" do
@@ -119,6 +97,156 @@ describe GradeChangeAuditApiController do
       it "returns events with the student's id included" do
         get :for_assignment, params: params
         expect(student_ids).to include(student.id.to_s)
+      end
+    end
+
+    describe "override grade change events" do
+      before(:each) do
+        override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+          grader: teacher,
+          old_grade: nil,
+          old_score: nil,
+          score: student.enrollments.first.find_score
+        )
+        Auditors::GradeChange.record(override_grade_change: override_grade_change)
+      end
+
+      let(:returned_event_assignment_ids) do
+        get :for_course, params: { course_id: course.id }
+        events = json_parse(response.body).fetch("events")
+
+        events.map { |event| event.dig('links', 'assignment') }.uniq
+      end
+
+      it "includes override grade change events in the results if the feature flag is enabled" do
+        Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+        expect(returned_event_assignment_ids).to contain_exactly(assignment.id, nil)
+      end
+
+      it "excludes override grade change events from the results if the feature flag is disabled" do
+        # These results should contain only the assignment-level grade changes
+        # we created as part of setup, and not the override grade change we
+        # just added
+        expect(returned_event_assignment_ids).to contain_exactly(assignment.id)
+      end
+
+      it "explicitly filters out override events when reading from Cassandra and the feature flag is disabled" do
+        allow(Auditors).to receive(:read_from_cassandra?).and_return(true)
+        allow(Auditors).to receive(:read_from_postgres?).and_return(false)
+
+        expect(BookmarkedCollection).to receive(:filter).once
+        get :for_course, params: { course_id: course.id }
+      end
+    end
+
+    describe "current_grade" do
+      let(:returned_events) do
+        get :for_course, params: { course_id: course.id, include: ["current_grade"] }
+        json_parse(response.body).fetch("events")
+      end
+      let(:current_grades) { returned_events.pluck('grade_current') }
+
+      context "for assignment grade changes" do
+        before(:each) do
+          assignment.grade_student(student, grader: teacher, score: 75)
+        end
+
+        it "is set to the submission's current grade" do
+          expect(current_grades).to all(eq("75"))
+        end
+
+        it "is not present if there is no current grade" do
+          assignment.grade_student(student, grader: teacher, score: nil)
+          expect(returned_events.any? { |event| event.key?('current_grade') }).to be false
+        end
+      end
+
+      context "for override grade changes" do
+        before(:each) do
+          Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+        end
+
+        let(:returned_events) do
+          get :for_course, params: { course_id: course.id, include: ["current_grade"] }
+          json_parse(response.body).fetch("events").filter do |event|
+            event.dig('links', 'assignment') == 0
+          end
+        end
+
+        let(:course_score) { student.enrollments.first.find_score }
+
+        def apply_override_score(score_record: course_score, new_score:)
+          old_grade = course_score.override_grade
+          old_score = course_score.override_score
+
+          score_record.update!(override_score: new_score)
+          override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+            grader: teacher,
+            old_grade: old_grade,
+            old_score: old_score,
+            score: score_record
+          )
+          Auditors::GradeChange.record(override_grade_change: override_grade_change)
+        end
+
+        context "for scores not in a grading period" do
+          before(:each) do
+            apply_override_score(new_score: 90.0)
+            apply_override_score(new_score: 70.0)
+          end
+
+          it "is set to the student's current override grade if the course has a grading scheme" do
+            grading_standard = @course.grading_standards.create!(data: GradingStandard.default_grading_standard)
+            @course.update!(default_grading_standard: grading_standard)
+            expect(current_grades).to all(eq("C-"))
+          end
+
+          it "is set to the student's current override score if the course has no grading scheme" do
+            expect(current_grades).to all(eq("70.0"))
+          end
+
+          it "is not present if there is no override grade for the student" do
+            apply_override_score(new_score: nil)
+            expect(current_grades).to all(be(nil))
+          end
+        end
+
+        context "for scores in a grading period" do
+          let(:grading_period) do
+            grading_period_group = @course.account.grading_period_groups.create!
+            now = Time.zone.now
+
+            grading_period_group.grading_periods.create!(
+              close_date: 1.week.from_now(now),
+              end_date: 1.week.from_now(now),
+              start_date: 1.week.ago(now),
+              title: "a"
+            )
+          end
+          let(:grading_period_score) do
+            Score.create!(grading_period: grading_period, enrollment: student.enrollments.first)
+          end
+
+          before(:each) do
+            apply_override_score(score_record: grading_period_score, new_score: 90.0)
+            apply_override_score(score_record: grading_period_score, new_score: 70.0)
+          end
+
+          it "is set to the student's current override grade if the course has a grading scheme" do
+            grading_standard = @course.grading_standards.create!(data: GradingStandard.default_grading_standard)
+            @course.update!(default_grading_standard: grading_standard)
+            expect(current_grades).to all(eq("C-"))
+          end
+
+          it "is set to the student's current override score if the course has no grading scheme" do
+            expect(current_grades).to all(eq("70.0"))
+          end
+
+          it "is not present if there is no override grade for the student" do
+            apply_override_score(new_score: nil)
+            expect(current_grades).to all(be(nil))
+          end
+        end
       end
     end
   end

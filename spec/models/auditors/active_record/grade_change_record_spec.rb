@@ -124,5 +124,20 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
         end
       end
     end
+
+    describe "#in_grading_period?" do
+      let(:ar_assignment_grade_change) do
+        Auditors::ActiveRecord::GradeChangeRecord.create_from_event_stream!(es_record)
+      end
+
+      it "returns true if the record has a valid grading period" do
+        submission_record.update!(grading_period: grading_period)
+        expect(ar_assignment_grade_change).to be_in_grading_period
+      end
+
+      it "returns false if the record does not have a valid grading period" do
+        expect(ar_assignment_grade_change).not_to be_in_grading_period
+      end
+    end
   end
 end
