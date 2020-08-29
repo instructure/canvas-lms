@@ -32,6 +32,9 @@
     "align_right_9bad3ac1": {
         "message": "Hægrijafna"
     },
+    "alignment_and_lists_5cebcb69": {
+        "message": "Stillingar og listar"
+    },
     "all_4321c3a1": {
         "message": "Allt"
     },
@@ -184,6 +187,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "Tölva"
+    },
+    "content_1440204b": {
+        "message": "Efni"
     },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Enn er verið að hlaða upp efninu, ef þú heldur áfram verður það ekki innfellt á réttan hátt."
@@ -416,6 +422,9 @@
     "external_links_3d9f074e": {
         "message": "Ytri tenglar"
     },
+    "external_tools_6e77821": {
+        "message": "Ytri tæki"
+    },
     "extra_large_b6cdf1ff": {
         "message": "Sérstaklega stórar"
     },
@@ -560,6 +569,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Ógild skráartegund"
     },
+    "invalid_url_cbde79f": {
+        "message": "Ógild vefslóð"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } lokið { items, plural,\n     =1 {atriði}\n  other {atriði}\n}"
     },
@@ -655,6 +667,9 @@
     },
     "mic_a7f3d311": {
         "message": "Hljóðnemi"
+    },
+    "miscellaneous_e9818229": {
+        "message": "Ýmislegt"
     },
     "missing_1a256b3b": {
         "message": "Vantar"
@@ -770,6 +785,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Aðra flýtivísa ritils má finna á"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "{ p } er ekki gild samskiptaregla, hún verður að vera ftp, http, https, mailto, skype, tel eða henni verður sleppt. "
+    },
     "page_50c4823d": {
         "message": "Síða"
     },
@@ -820,6 +838,9 @@
     },
     "previous_page_928fc112": {
         "message": "Fyrri síða"
+    },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "Samskiptaregla verður að vera ftp, http, https, mailto, skype, tel eða henni verður sleppt."
     },
     "pts_699bd9aa": {
         "message": "punktar"

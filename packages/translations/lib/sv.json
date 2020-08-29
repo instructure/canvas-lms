@@ -32,6 +32,9 @@
     "align_right_9bad3ac1": {
         "message": "Högerjustera"
     },
+    "alignment_and_lists_5cebcb69": {
+        "message": "Justering och listor"
+    },
     "all_4321c3a1": {
         "message": "Alla"
     },
@@ -184,6 +187,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "Dator"
+    },
+    "content_1440204b": {
+        "message": "Innehåll"
     },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Innehåll laddas fortfarande upp, om du fortsätter kommer det inte att bäddas in korrekt."
@@ -416,6 +422,9 @@
     "external_links_3d9f074e": {
         "message": "Externa länkar"
     },
+    "external_tools_6e77821": {
+        "message": "Externa verktyg"
+    },
     "extra_large_b6cdf1ff": {
         "message": "Extra stor"
     },
@@ -560,6 +569,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Ogiltig filtyp"
     },
+    "invalid_url_cbde79f": {
+        "message": "Ogiltig URL"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } slutförda { items, plural,\n     =1 {objekt}\n  other {objekt}\n}"
     },
@@ -655,6 +667,9 @@
     },
     "mic_a7f3d311": {
         "message": "Mikrofon"
+    },
+    "miscellaneous_e9818229": {
+        "message": "Blandat"
     },
     "missing_1a256b3b": {
         "message": "Saknas"
@@ -770,6 +785,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Andra genvägar till redigeraren kan hittas på"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "{ p } är inte ett giltigt protokoll. Protokollet måste vara ftp, http, https, mailto, skype, tel eller så kan det utelämnas"
+    },
     "page_50c4823d": {
         "message": "Sida"
     },
@@ -820,6 +838,9 @@
     },
     "previous_page_928fc112": {
         "message": "Föregående sida"
+    },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "Protokollet måste vara ftp, http, https, mailto, skype, tel eller så kan det utelämnas"
     },
     "pts_699bd9aa": {
         "message": "poäng"
